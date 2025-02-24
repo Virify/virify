@@ -1,16 +1,16 @@
 <script setup lang="ts">
-const router = useRouter();
 definePageMeta({
-  middleware: ['login']
+  middleware: ["login"],
 });
+
 const form = ref({
-  email: '',
-  password: ''
+  email: "",
+  password: "",
 });
 
 const errors = ref({
   email: null as string | null,
-  password: null as string | null
+  password: null as string | null,
 });
 
 const notification = ref<string | null>(null);
@@ -18,13 +18,13 @@ const notification = ref<string | null>(null);
 function validateForm() {
   let isValid = true;
   if (!form.value.email) {
-    errors.value.email = 'Email is required';
+    errors.value.email = "Email is required";
     isValid = false;
   } else {
     errors.value.email = null;
   }
   if (!form.value.password) {
-    errors.value.password = 'Password is required';
+    errors.value.password = "Password is required";
     isValid = false;
   } else {
     errors.value.password = null;
@@ -57,16 +57,11 @@ async function handleLogin() {
           <input v-model="form.password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
           <span v-if="errors.password" class="text-red-500 text-xs italic">{{ errors.password }}</span>
         </div>
-        <div class="flex items-center justify-between">
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
-        </div>
       </form>
-      <a href="/auth/google" class="py-3 block">
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-4">Login with Google</button>
-      </a>
-      <a href="/auth/microsoft" class="py-3 block">
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-4">Login with Microsoft</button>
-      </a>
+      <div class="flex items-center justify-start gap-3">
+        <NuxtLink external to="/auth/google" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Google</NuxtLink>
+        <NuxtLink external to="/auth/microsoft" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Microsoft</NuxtLink>
+      </div>
     </div>
     <div v-if="notification" class="fixed bottom-0 right-0 m-4 p-4 bg-green-500 text-white rounded" :class="{ 'bg-red-500': notification.includes('failed') }">
       {{ notification }}

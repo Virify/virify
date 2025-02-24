@@ -1,11 +1,11 @@
-<script setup lang="ts"> 
+<script setup lang="ts">
 const { user, loggedIn, session, clear } = useUserSession();
 definePageMeta({
-  middleware: ['auth-redirect'],
-})
+  middleware: ["auth-redirect"],
+});
 async function logout() {
   await clear();
-  navigateTo('/login');
+  navigateTo("/login");
 }
 </script>
 <template>

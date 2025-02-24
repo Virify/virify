@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const route = useRoute();
 
 onMounted(() => {
@@ -178,7 +177,7 @@ async function handleForm() {
         </div>
       </form>
       <a href="/auth/google" class="py-3 block">
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Login with Google</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Login with Google</button>
       </a>
     </div>
     <div v-if="notification" class="fixed bottom-0 right-0 m-4 p-4 bg-green-500 text-white rounded" :class="{ 'bg-red-500': notification.includes('Not authorized') }">
