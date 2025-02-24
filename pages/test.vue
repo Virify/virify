@@ -1,17 +1,16 @@
-<script setup lang="ts">
+<script setup lang="ts"> 
 const { user, loggedIn, session, clear } = useUserSession();
 definePageMeta({
   middleware: ['auth-redirect'],
 })
-
 async function logout() {
   await clear();
   navigateTo('/login');
 }
 </script>
-
 <template>
-  <div class="flex justify-center items-center h-screen bg-gray-100">
+  <div>
+    <h1>TEST</h1>
     <div v-if="loggedIn" class="bg-white shadow-md rounded-lg p-8 w-1/3">
       <h1 class="text-2xl font-bold mb-4">Welcome {{ user?.email }}!</h1>
       <h2 class="text-xl mb-2">Username: {{ user?.username }}</h2>

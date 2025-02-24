@@ -1,11 +1,11 @@
-export default defineOAuthGoogleEventHandler({
+export default defineOAuthMicrosoftEventHandler({
   async onSuccess(event, { user, tokens }) {
     // check if user is already loggedin
     if (user.loggedIn) {
       await replaceUserSession(event, {
         user: {
-          username: user.name,
-          email: user.email,
+          email: user.mail,
+          username: user.displayName,
         },
         loggedIn: true,
         loggedInAt: new Date(),
@@ -14,8 +14,8 @@ export default defineOAuthGoogleEventHandler({
     } else {
       await setUserSession(event, {
         user: {
-          username: user.name,
-          email: user.email,
+          email: user.mail,
+          username: user.displayName,
         },
         loggedIn: true,
         loggedInAt: new Date(),
@@ -26,7 +26,7 @@ export default defineOAuthGoogleEventHandler({
   },
   // Optional, will return a json error and 401 status code by default
   onError(event, error) {
-    console.error("Google OAuth Error:", error);
+    console.error("Microsoft OAuth Error:", error);
     return sendRedirect(event, "/login");
   },
 });
