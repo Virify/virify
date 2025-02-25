@@ -8,9 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "migrate-run": "prisma migrate dev --schema ./server/database/prisma",
-    "prisma-generate": "prisma generate --schema ./server/database/prisma",
-    "prisma-studio": "prisma studio --schema ./server/database/prisma"
+    "pgen": "prisma generate",
+    "db-push": "prisma db push"
   },
   "prisma": {
     "schema": "./server/database/prisma/"
