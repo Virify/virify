@@ -31,4 +31,3 @@ export default defineOAuthMicrosoftEventHandler({
     return sendRedirect(event, "/login");
   },
 });
-Array.map((x) => x * 2);
