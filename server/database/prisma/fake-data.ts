@@ -1,4 +1,4 @@
-import { accessibilityFeaturesType, petPolicyType, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, PropertyType, propertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, epcType, verificationStatus } from '@prisma/client';
+import { accessibilityFeaturesType, petPolicyType, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, PropertyType, propertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, epcType, verificationStatus, Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import Decimal from 'decimal.js';
 
@@ -445,36 +445,37 @@ export function fakeStorageFeaturesComplete() {
 }
 export function fakeUser() {
   return {
-    firstName: faker.person.firstName(),
-    lastName: faker.person.lastName(),
+    firstName: undefined,
+    lastName: undefined,
     username: faker.internet.userName(),
     email: faker.internet.email(),
-    password: faker.lorem.words(5),
-    addressLine1: faker.lorem.words(5),
+    password: undefined,
+    addressLine1: undefined,
     addressLine2: undefined,
-    city: faker.lorem.words(5),
-    county: faker.lorem.words(5),
-    postcode: faker.lorem.words(5),
-    country: faker.lorem.words(5),
+    city: undefined,
+    county: undefined,
+    postcode: undefined,
+    country: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
 export function fakeUserComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    firstName: faker.person.firstName(),
-    lastName: faker.person.lastName(),
+    firstName: undefined,
+    lastName: undefined,
     username: faker.internet.userName(),
     email: faker.internet.email(),
-    password: faker.lorem.words(5),
+    password: undefined,
     verified: verificationStatus.NO,
-    addressLine1: faker.lorem.words(5),
+    addressLine1: undefined,
     addressLine2: undefined,
-    city: faker.lorem.words(5),
-    county: faker.lorem.words(5),
-    postcode: faker.lorem.words(5),
-    country: faker.lorem.words(5),
+    city: undefined,
+    county: undefined,
+    postcode: undefined,
+    country: undefined,
     agentId: undefined,
+    role: Role.USER,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };

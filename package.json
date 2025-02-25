@@ -8,9 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "migrate-run": "prisma migrate dev --schema ./server/database/prisma",
-    "prisma-generate": "prisma generate --schema ./server/database/prisma",
-    "prisma-studio": "prisma studio --schema ./server/database/prisma"
+    "pgen": "prisma generate",
+    "db-push": "prisma db push"
   },
   "prisma": {
     "schema": "./server/database/prisma/"
@@ -18,8 +17,13 @@
   "dependencies": {
     "@prisma/client": "6.4.0",
     "@prisma/nuxt": "^0.3.0",
+    "add": "^2.0.6",
+    "auth-utils": "^1.0.0",
     "dotenv": "^16.4.7",
+    "module": "^1.2.5",
+    "nuxi": "^3.22.2",
     "nuxt": "^3.15.4",
+    "nuxt-auth-utils": "^0.5.16",
     "pg": "^8.13.3",
     "vue": "latest",
     "vue-router": "^4.5.0"
