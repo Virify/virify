@@ -6,19 +6,18 @@ export default async function authDatabaseCheck(email: string, username: string)
         email: email,
       },
     });
-
     if (!dbUser) {
       // Create a new user if not found
       // intially set the username
       dbUser = await prisma.user.create({
         data: {
           email: email,
-          username: username.replace(/\s/g,''),
+          username: username.replace(/\s/g, ""),
         },
       });
-      console.log('User created:', dbUser);
+      console.log("User created:", dbUser);
     } else {
-      console.log('User exists - skipping');
+      console.log("User exists - skipping");
     }
 
     return dbUser;
