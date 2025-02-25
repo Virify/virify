@@ -40,7 +40,7 @@ function validateForm() {
 async function signup() {
   if (validateForm()) {
     try {
-      const response: { status: number } = await $fetch('/auth/local', {
+      const response: { status: number } = await $fetch('/auth/signup', {
         method: 'POST',
         body: {
           email: form.value.email,
@@ -48,12 +48,11 @@ async function signup() {
           password: form.value.password
         }
       });
-
       if (response.status === 201) {
         notification.value = 'Signup successful!';
         setTimeout(() => {
           notification.value = null;
-          navigateTo('/account');
+          navigateTo('/login');
         }, 2000);
       } else {
         notification.value = 'Signup failed!';
