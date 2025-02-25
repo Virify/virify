@@ -1,8 +1,18 @@
 {
+  "routes": [
+    {
+      "route": "/index.html",
+      "redirect": "/"
+    },
+    {
+      "route": "/",
+      "rewrite": "/api/server"
+    }
+  ],
   "platform": {
     "apiRuntime": "node:20"
   },
   "navigationFallback": {
-    "rewrite": "/"
+    "rewrite": "/api/server"
   }
 }
