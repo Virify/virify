@@ -19,7 +19,9 @@ async function logout() {
     </div>
     <div v-else class="bg-white shadow-md rounded-lg p-8 w-1/3">
       <h1 class="text-2xl font-bold mb-4">Not logged in</h1>
-      <NuxtLink to="/login" external class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Login with Google</NuxtLink>
+      <NuxtLink to="/auth/login" external class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Login</NuxtLink>
+      <NuxtLink to="/auth/google" external class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Login with Google</NuxtLink>
+      <NuxtLink to="/auth/microsoft" external class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Login with Microsoft</NuxtLink>
     </div>
   </div>
 </template>

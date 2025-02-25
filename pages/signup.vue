@@ -1,15 +1,14 @@
 <script setup lang="ts">
-
 const form = ref({
-  email: '',
-  password: '',
-  username: ''
+  email: "",
+  password: "",
+  username: "",
 });
 
 const errors = ref({
   email: null as string | null,
   username: null as string | null,
-  password: null as string | null
+  password: null as string | null,
 });
 
 const notification = ref<string | null>(null);
@@ -17,19 +16,22 @@ const notification = ref<string | null>(null);
 function validateForm() {
   let isValid = true;
   if (!form.value.email) {
-    errors.value.email = 'Email is required';
+    errors.value.email = "Email is required";
+    isValid = false;
+  } else if (!validateEmail(form.value.email)) {
+    errors.value.email = "Invalid email format";
     isValid = false;
   } else {
     errors.value.email = null;
   }
   if (!form.value.username) {
-    errors.value.username = 'username is required';
+    errors.value.username = "Username is required";
     isValid = false;
   } else {
     errors.value.username = null;
   }
   if (!form.value.password) {
-    errors.value.password = 'Password is required';
+    errors.value.password = "Password is required";
     isValid = false;
   } else {
     errors.value.password = null;
@@ -40,28 +42,29 @@ function validateForm() {
 async function signup() {
   if (validateForm()) {
     try {
-      const response: { status: number } = await $fetch('/auth/signup', {
-        method: 'POST',
+      const response: { status: number } = await $fetch("/auth/signup", {
+        method: "POST",
         body: {
           email: form.value.email,
           username: form.value.username,
-          password: form.value.password
-        }
+          password: form.value.password,
+        },
       });
+      useUserSession().fetch();
       if (response.status === 201) {
-        notification.value = 'Signup successful!';
+        notification.value = "Signup successful!";
         setTimeout(() => {
           notification.value = null;
-          navigateTo('/login');
+          navigateTo("/login");
         }, 2000);
       } else {
-        notification.value = 'Signup failed!';
+        notification.value = "Signup failed!";
         setTimeout(() => {
           notification.value = null;
         }, 3000);
       }
     } catch (error) {
-      notification.value = 'Signup failed!';
+      notification.value = "Signup failed!";
       setTimeout(() => {
         notification.value = null;
       }, 3000);
@@ -81,7 +84,7 @@ async function signup() {
           <span v-if="errors.email" class="text-red-500 text-xs italic">{{ errors.email }}</span>
         </div>
         <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Username</label>
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
           <input v-model="form.username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" />
           <span v-if="errors.username" class="text-red-500 text-xs italic">{{ errors.username }}</span>
         </div>
@@ -91,7 +94,7 @@ async function signup() {
           <span v-if="errors.password" class="text-red-500 text-xs italic">{{ errors.password }}</span>
         </div>
         <div class="flex items-center justify-between">
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Signup</button>
+          <button to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Signup</button>
         </div>
       </form>
     </div>

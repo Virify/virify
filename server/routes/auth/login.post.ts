@@ -1,35 +1,77 @@
 export default defineEventHandler(async (event) => {
-  // get username and password from form data
+  // Get email and password from form data
   const { email, password } = await readBody(event);
+
+  // Trim and validate input
+  const trimmedEmail = (email as string).trim();
+  const trimmedPassword = (password as string).trim();
+
+  if (!trimmedEmail || !trimmedPassword) {
+    return {
+      status: 400,
+      body: {
+        error: "Email and password are required",
+      },
+    };
+  }
+
+  if (!validateEmail(trimmedEmail)) {
+    return {
+      status: 400,
+      body: {
+        error: "Invalid email format",
+      },
+    };
+  }
+
   try {
-    // find user by email
+    // Find user by email
     const user = await prisma.user.findUnique({
       where: {
-        email: email as string,
+        email: trimmedEmail,
       },
     });
-    // verify password
-    const matchedPassword = await verifyPassword(user?.password as string, password as string);
+
+    if (!user) {
+      return {
+        status: 401,
+        body: {
+          error: "Failed! Username not found",
+        },
+      };
+    }
+
+    // Verify password
+    const matchedPassword = await verifyPassword(user.password as string, trimmedPassword);
+
     if (matchedPassword) {
-      // if password is correct, set user session
+      // If password is correct, set user session
       await setUserSession(event, {
         user: {
-          username: user?.username as string,
-          email: user?.email as string,
+          username: user.username,
+          email: user.email,
         },
         loggedIn: true,
         loggedInAt: new Date(),
       });
-      // return success status
+
+      // Return success status
       return {
         status: 200,
+      };
+    } else {
+      return {
+        status: 401,
+        body: {
+          error: "Failed! Password is incorrect",
+        },
       };
     }
   } catch (error) {
     return {
-      status: 401,
+      status: 500,
       body: {
-        session: await getUserSession(event),
+        error: "Internal server error",
       },
     };
   }

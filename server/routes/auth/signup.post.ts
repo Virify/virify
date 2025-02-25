@@ -1,12 +1,38 @@
 export default defineEventHandler(async (event) => {
   const { email, username, password } = await readBody(event);
-  const hashedPassword = await hashPassword(password as string);
-  // we need to check that the user does not already exist
+
+  // Trim and validate input
+  const trimmedEmail = (email as string).trim();
+  const trimmedUsername = (username as string).trim();
+  const trimmedPassword = (password as string).trim();
+
+  if (!trimmedEmail || !trimmedUsername || !trimmedPassword) {
+    return {
+      status: 400,
+      body: {
+        error: "All fields are required",
+      },
+    };
+  }
+
+  if (!validateEmail(trimmedEmail)) {
+    return {
+      status: 400,
+      body: {
+        error: "Invalid email format",
+      },
+    };
+  }
+
+  const hashedPassword = await hashPassword(trimmedPassword);
+
+  // Check that the user does not already exist
   const existingUser = await prisma.user.findUnique({
     where: {
-      email: email as string,
+      email: trimmedEmail,
     },
   });
+  console.log(existingUser);
   if (existingUser) {
     return {
       status: 409,
@@ -17,8 +43,8 @@ export default defineEventHandler(async (event) => {
   } else {
     const user = await prisma.user.create({
       data: {
-        email: email as string,
-        username: username as string,
+        email: trimmedEmail,
+        username: trimmedUsername,
         password: hashedPassword,
       },
     });

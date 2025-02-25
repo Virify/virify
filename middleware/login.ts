@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware((to, from) => {
   // get the user session
-  const {loggedIn} = useUserSession();
+  const { loggedIn } = useUserSession();
 
   // Get runtime configuration
   const config = useRuntimeConfig();
@@ -9,18 +9,18 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const redirectCookieName = config.public.redirectCookieName || "redirect";
   const lastPage = useCookie(redirectCookieName);
 
-  if(from.fullPath === '/signup') {
+  if (from.fullPath === "/signup") {
     lastPage.value = null;
   }
   // if logged in
-  if(loggedIn.value) {
+  if (loggedIn.value) {
     // if no cookie - redirect them to account
-    if(!lastPage.value) {
-      return navigateTo('/account');
+    if (!lastPage.value) {
+      return navigateTo("/account");
     }
     // if cookie - and the cookie is the login page - redirect them to account
-    if(lastPage.value === '/login') {
-      return navigateTo('/account');
+    if (lastPage.value === "/login") {
+      return navigateTo("/account");
     }
 
     // if cookie - and not login page - redirect them to the last page

@@ -16,6 +16,7 @@ model User {
   agent        Agent?             @relation(fields: [agentId], references: [id])
   property     Property[]
   listings     Listing[]
+  role         Role              @default(USER)
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 }
@@ -24,4 +25,13 @@ enum verificationStatus {
   PENDING
   VERIFIED
   NO
+}
+
+enum Role {
+  USER
+  AGENT
+  OWNER
+  JUNIOR_AGENT
+  SENIOR_AGENT
+  MANAGER
 }

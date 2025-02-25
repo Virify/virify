@@ -20,6 +20,9 @@ function validateForm() {
   if (!form.value.email) {
     errors.value.email = "Email is required";
     isValid = false;
+  } else if (!validateEmail(form.value.email)) {
+    errors.value.email = "Invalid email format";
+    isValid = false;
   } else {
     errors.value.email = null;
   }
@@ -33,28 +36,42 @@ function validateForm() {
 }
 
 async function login() {
-  const response: { status: number; session: any } = await $fetch("/auth/login", {
-    method: "POST",
-    body: {
-      email: form.value.email,
-      password: form.value.password,
-    },
-  });
-
-  if (response.status === 200) {
-    useUserSession().fetch();
-    notification.value = "Login successful!";
-    setTimeout(() => {
-      notification.value = null;
-      navigateTo("/account", {
-        replace: true,
+  if (validateForm()) {
+    try {
+      const response: { status: number; body: any } = await $fetch("/auth/login", {
+        method: "POST",
+        body: {
+          email: form.value.email,
+          password: form.value.password,
+        },
       });
-    }, 2000);
-  } else {
-    notification.value = "Login failed!";
-    setTimeout(() => {
-      notification.value = null;
-    }, 2000);
+
+      if (response.status === 200) {
+        useUserSession().fetch();
+        notification.value = "Login successful!";
+        setTimeout(() => {
+          notification.value = null;
+          navigateTo("/account");
+        }, 2000);
+      }
+      if (response.body.error === "Password is incorrect") {
+        notification.value = "Incorrect Password!";
+        setTimeout(() => {
+          notification.value = null;
+        }, 2000);
+      }
+      if (response.status === 401) {
+        notification.value = response.body.error;
+        setTimeout(() => {
+          notification.value = null;
+        }, 2000);
+      }
+    } catch (error) {
+      notification.value = "Login failed!";
+      setTimeout(() => {
+        notification.value = null;
+      }, 2000);
+    }
   }
 }
 </script>
@@ -74,16 +91,17 @@ async function login() {
           <input v-model="form.password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
           <span v-if="errors.password" class="text-red-500 text-xs italic">{{ errors.password }}</span>
         </div>
-        <div class="flex items-center justify-between">
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
+        <div class="flex items-center justify-start gap-3">
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4" type="submit">Login</button>
+          <NuxtLink external to="/auth/google" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Google</NuxtLink>
+          <NuxtLink external to="/auth/microsoft" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Microsoft</NuxtLink>
         </div>
       </form>
       <div class="flex items-center justify-start gap-3">
-        <NuxtLink external to="/auth/google" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Google</NuxtLink>
-        <NuxtLink external to="/auth/microsoft" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Microsoft</NuxtLink>
+        <NuxtLink to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Signup</NuxtLink>
       </div>
     </div>
-    <div v-if="notification" class="fixed bottom-0 right-0 m-4 p-4 bg-green-500 text-white rounded" :class="{ 'bg-red-500': notification.includes('failed') }">
+    <div v-if="notification" class="fixed bottom-0 right-0 m-4 p-4 bg-green-500 text-white rounded" :class="{ 'bg-red-500': notification.includes('Failed') }">
       {{ notification }}
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { accessibilityFeaturesType, petPolicyType, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, PropertyType, propertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, epcType, verificationStatus } from '@prisma/client';
+import { accessibilityFeaturesType, petPolicyType, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, PropertyType, propertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, epcType, verificationStatus, Role } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import Decimal from 'decimal.js';
 
@@ -475,6 +475,7 @@ export function fakeUserComplete() {
     postcode: undefined,
     country: undefined,
     agentId: undefined,
+    role: Role.USER,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
