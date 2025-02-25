@@ -21,6 +21,8 @@ export default defineOAuthGoogleEventHandler({
         loggedInAt: new Date(),
         session: tokens.session,
       });
+      await authDatabaseCheck(user.email, user.name);
+
     }
     return sendRedirect(event, "/login");
   },

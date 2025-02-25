@@ -1,17 +1,17 @@
 model User {
   id           Int                @id @default(autoincrement())
-  firstName    String
-  lastName     String
+  firstName    String?
+  lastName     String?
   username     String             @unique
   email        String             @unique
-  password     String
+  password     String?
   verified     verificationStatus @default(NO)
-  addressLine1 String
+  addressLine1 String?
   addressLine2 String?
-  city         String
-  county       String
-  postcode     String
-  country      String
+  city         String?
+  county       String?
+  postcode     String?
+  country      String?
   agentId      Int?
   agent        Agent?             @relation(fields: [agentId], references: [id])
   property     Property[]

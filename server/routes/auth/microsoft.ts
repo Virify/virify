@@ -21,6 +21,7 @@ export default defineOAuthMicrosoftEventHandler({
         loggedInAt: new Date(),
         session: tokens.session,
       });
+      await authDatabaseCheck(user.mail, user.displayName);
     }
     return sendRedirect(event, "/login");
   },
