@@ -17,11 +17,11 @@ const errors = ref({
 const notification = ref<string | null>(null);
 
 onMounted(() => {
-  if(route.query.login === 'success') {
-    notification.value = 'Logged in successfully! Redirecting to account page...';
+  if (route.query.login === "success") {
+    notification.value = "Logged in successfully! Redirecting to account page...";
     setTimeout(() => {
       notification.value = null;
-      navigateTo('/account');
+      navigateTo("/account");
     }, 2000);
   }
 });
@@ -59,8 +59,7 @@ async function login() {
 
       if (response.status === 200) {
         useUserSession().fetch();
-        console.log(response.body);
-        notification.value = "Login successful!";
+        notification.value = "Logged in successfully! Redirecting to account page...";
         setTimeout(() => {
           notification.value = null;
           navigateTo("/account");

@@ -23,7 +23,7 @@ export default defineOAuthMicrosoftEventHandler({
       });
       await authDatabaseCheck(user.mail, user.displayName);
     }
-    return sendRedirect(event, "/login");
+    return sendRedirect(event, "/login?login=success");
   },
   // Optional, will return a json error and 401 status code by default
   onError(event, error) {
