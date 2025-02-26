@@ -5,7 +5,7 @@ definePageMeta({
 });
 async function logout() {
   await clear();
-  navigateTo("/login");
+  navigateTo("/agent/login");
 }
 </script>
 

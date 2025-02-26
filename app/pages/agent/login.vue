@@ -52,7 +52,7 @@ function validateForm() {
 async function login() {
   if (validateForm()) {
     try {
-      const response: { status: number; body?: any } = await $fetch("/auth/login", {
+      const response: { status: number; body?: any } = await $fetch("/auth/agent/login", {
         method: "POST",
         body: {
           email: form.value.email,
@@ -65,7 +65,7 @@ async function login() {
         notification.value = "Logged in successfully! Redirecting to account page...";
         setTimeout(() => {
           notification.value = null;
-          navigateTo("/account");
+          navigateTo("/agent/review");
         }, 2000);
       } else if (response.body.error === "Password is incorrect") {
         notification.value = "Incorrect Password!";

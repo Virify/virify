@@ -1,12 +1,13 @@
 import { H3Event } from "h3";
 
 export async function loginUser(event: H3Event, email: string, password: string, userType: "user" | "agent") {
+  console.log(userType)
   try {
     // Trim and validate input
     const { trimmedEmail, trimmedPassword } = await loginFieldValidator(email, password);
 
     // Find user or agent by email
-    const user = await (prisma['agent'] as any).findUnique({
+    const user = await (prisma[userType] as any).findUnique({
       where: {
         email: trimmedEmail,
       },
