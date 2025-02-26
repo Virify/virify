@@ -2,7 +2,7 @@ model User {
   id           Int                @id @default(autoincrement())
   firstName    String?
   lastName     String?
-  username     String             @unique
+  username     String?            @unique
   email        String             @unique
   password     String?
   verified     verificationStatus @default(NO)
@@ -16,7 +16,7 @@ model User {
   agent        Agent?             @relation(fields: [agentId], references: [id])
   property     Property[]
   listings     Listing[]
-  role         Role              @default(USER)
+  role         Role               @default(USER)
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 }

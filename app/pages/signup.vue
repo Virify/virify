@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { Body } from '#components';
+
 
 const form = ref({
   email: "",
   password: "",
-  username: "",
 });
 
 const errors = ref({
   email: null as string | null,
-  username: null as string | null,
   password: null as string | null,
 });
 
@@ -25,12 +25,6 @@ function validateForm() {
   } else {
     errors.value.email = null;
   }
-  if (!form.value.username) {
-    errors.value.username = "Username is required";
-    isValid = false;
-  } else {
-    errors.value.username = null;
-  }
   if (!form.value.password) {
     errors.value.password = "Password is required";
     isValid = false;
@@ -42,11 +36,10 @@ function validateForm() {
 async function signup() {
   if (validateForm()) {
     try {
-      const response: { status: number } = await $fetch("/auth/signup", {
+      const response: { status: number, body: any } = await $fetch("/auth/signup", {
         method: "POST",
         body: {
           email: form.value.email,
-          username: form.value.username,
           password: form.value.password,
         },
       });
@@ -58,7 +51,7 @@ async function signup() {
           navigateTo("/login");
         }, 2000);
       } else {
-        notification.value = "Signup failed!";
+        notification.value = response.body.error;
         setTimeout(() => {
           notification.value = null;
         }, 3000);
@@ -85,13 +78,6 @@ async function signup() {
               <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
             </label>
             <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="username"
-              >Username:
-              <span v-if="errors.username" class="text-red-400 text-xs italic">{{ errors.username }}</span>
-            </label>
-            <input v-model="form.username" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" />
           </div>
           <div class="mb-6">
             <label class="block text-green-500 text-sm font-bold mb-2" for="password"

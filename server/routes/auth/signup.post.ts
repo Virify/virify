@@ -3,10 +3,9 @@ export default defineEventHandler(async (event) => {
 
   // Trim and validate input
   const trimmedEmail = (email as string).trim();
-  const trimmedUsername = (username as string).trim();
   const trimmedPassword = (password as string).trim();
 
-  if (!trimmedEmail || !trimmedUsername || !trimmedPassword) {
+  if (!trimmedEmail || !trimmedPassword) {
     return {
       status: 400,
       body: {
@@ -32,19 +31,43 @@ export default defineEventHandler(async (event) => {
       email: trimmedEmail,
     },
   });
-  console.log(existingUser);
-  if (existingUser) {
+
+  if (existingUser && existingUser.password) {
     return {
       status: 409,
       body: {
         error: "User already exists",
       },
     };
-  } else {
+  }
+  // if user exists but does not have a password, update the user with the password
+  // example: if the used has logged in via OAuth
+  if (existingUser && !existingUser.password) {
+    const user = await prisma.user.update({
+      where: {
+        email: trimmedEmail,
+      },
+      data: {
+        email: trimmedEmail,
+        password: hashedPassword,
+      },
+    });
+
+    return {
+      status: 201,
+      body: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    };
+  }
+
+  // if user does not exist, create a new user
+  if (!existingUser) {
     const user = await prisma.user.create({
       data: {
         email: trimmedEmail,
-        username: trimmedUsername,
         password: hashedPassword,
       },
     });

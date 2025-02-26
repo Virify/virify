@@ -1,4 +1,4 @@
-export default async function authDatabaseCheck(email: string, username: string, password?: string) {
+export default async function authDatabaseCheck(email: string, password?: string) {
   try {
     // Check if the user already exists in the database
     let dbUser = await prisma.user.findUnique({
@@ -11,7 +11,6 @@ export default async function authDatabaseCheck(email: string, username: string,
         dbUser = await prisma.user.create({
           data: {
             email: email,
-            username: username.replace(/\s/g, ""),
             password: password,
           },
         });
@@ -19,7 +18,6 @@ export default async function authDatabaseCheck(email: string, username: string,
         dbUser = await prisma.user.create({
           data: {
             email: email,
-            username: username.replace(/\s/g, ""),
           },
         });
       }
@@ -29,8 +27,6 @@ export default async function authDatabaseCheck(email: string, username: string,
     }
 
     return dbUser;
-
-    // Todo: return something different if the user already exists
   } catch (error) {
     throw new Error(`Error finding or creating user: ${(error as Error).message}`);
   }

@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
       // If password is correct, set user session
       await setUserSession(event, {
         user: {
-          username: user.username,
+          id: user.id,
           email: user.email,
         },
         loggedIn: true,

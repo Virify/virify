@@ -447,7 +447,7 @@ export function fakeUser() {
   return {
     firstName: undefined,
     lastName: undefined,
-    username: faker.internet.userName(),
+    username: undefined,
     email: faker.internet.email(),
     password: undefined,
     addressLine1: undefined,
@@ -464,7 +464,7 @@ export function fakeUserComplete() {
     id: faker.number.int({ max: 2147483647 }),
     firstName: undefined,
     lastName: undefined,
-    username: faker.internet.userName(),
+    username: undefined,
     email: faker.internet.email(),
     password: undefined,
     verified: verificationStatus.NO,

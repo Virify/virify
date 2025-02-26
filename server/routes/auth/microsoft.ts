@@ -1,11 +1,13 @@
 export default defineOAuthMicrosoftEventHandler({
   async onSuccess(event, { user, tokens }) {
+    const dbUser = await authDatabaseCheck(user.mail, user.displayName);
     // check if user is already loggedin
     if (user.loggedIn) {
       await replaceUserSession(event, {
         user: {
-          email: user.mail,
-          username: user.displayName,
+          id: dbUser.id,
+          email: dbUser.email,
+          username: dbUser.username || dbUser.email,
         },
         loggedIn: true,
         loggedInAt: new Date(),
@@ -14,14 +16,14 @@ export default defineOAuthMicrosoftEventHandler({
     } else {
       await setUserSession(event, {
         user: {
-          email: user.mail,
-          username: user.displayName,
+          id: dbUser.id,
+          email: dbUser.email,
+          username: dbUser.username || dbUser.email,
         },
         loggedIn: true,
         loggedInAt: new Date(),
         session: tokens.session,
       });
-      await authDatabaseCheck(user.mail, user.displayName);
     }
     return sendRedirect(event, "/login?login=success");
   },
