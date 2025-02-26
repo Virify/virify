@@ -52,7 +52,7 @@ async function signup() {
       });
       useUserSession().fetch();
       if (response.status === 201) {
-        notification.value = "Signup successful!";
+        notification.value = "Signup successful! Redirecting to login page...";
         setTimeout(() => {
           notification.value = null;
           navigateTo("/login");
