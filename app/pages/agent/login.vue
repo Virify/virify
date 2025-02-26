@@ -24,7 +24,7 @@ onMounted(() => {
     notification.value = "Logged in successfully! Redirecting to account page...";
     setTimeout(() => {
       notification.value = null;
-      navigateTo("/account");
+      navigateTo("agent/review");
     }, 2000);
   }
 });

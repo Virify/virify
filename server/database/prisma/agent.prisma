@@ -2,7 +2,7 @@ model Agent {
   id                   Int        @id @default(autoincrement())
   email                String     @unique
   password             String
-  name                 String
+  name                 String @unique
   contactInfo          String
   directContactOptions String?
   viewingAvailability  String?
@@ -12,7 +12,7 @@ model Agent {
   county               String
   postcode             String
   country              String
-  companyRegistration  String
+  companyRegistration  String @unique
   users                User[]
   addressId            Int?
   property             Property[]

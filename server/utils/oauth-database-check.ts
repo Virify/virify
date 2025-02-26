@@ -1,4 +1,4 @@
-export default async function authDatabaseCheck(email: string, password?: string) {
+export default async function oauthDatabaseCheck(email: string, password?: string) {
   try {
     // Check if the user already exists in the database
     let dbUser = await prisma.user.findUnique({

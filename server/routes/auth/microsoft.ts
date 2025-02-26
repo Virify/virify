@@ -1,6 +1,6 @@
 export default defineOAuthMicrosoftEventHandler({
   async onSuccess(event, { user, tokens }) {
-    const dbUser = await authDatabaseCheck(user.mail, user.displayName);
+    const dbUser = await oauthDatabaseCheck(user.mail, user.displayName);
     // check if user is already loggedin
     if (user.loggedIn) {
       await replaceUserSession(event, {

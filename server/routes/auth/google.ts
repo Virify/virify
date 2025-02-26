@@ -1,7 +1,7 @@
 export default defineOAuthGoogleEventHandler({
   async onSuccess(event, { user, tokens }) {
+    const dbUser = await oauthDatabaseCheck(user.email, user.name);
     // check if user is already loggedin
-    const dbUser = await authDatabaseCheck(user.email, user.name);
     if (user.loggedIn) {
       await replaceUserSession(event, {
         user: {
