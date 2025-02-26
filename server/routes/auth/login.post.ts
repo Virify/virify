@@ -58,6 +58,9 @@ export default defineEventHandler(async (event) => {
       // Return success status
       return {
         status: 200,
+        body: {
+          message: "Logged in successfully",
+        },
       };
     } else {
       return {

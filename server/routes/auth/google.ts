@@ -24,7 +24,7 @@ export default defineOAuthGoogleEventHandler({
       await authDatabaseCheck(user.email, user.name);
 
     }
-    return sendRedirect(event, "/login");
+    return sendRedirect(event, "/login?login=success");
   },
   // Optional, will return a json error and 401 status code by default
   onError(event, error) {

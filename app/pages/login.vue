@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const route = useRoute();
 definePageMeta({
   middleware: ["login"],
 });
@@ -14,6 +15,16 @@ const errors = ref({
 });
 
 const notification = ref<string | null>(null);
+
+onMounted(() => {
+  if(route.query.login === 'success') {
+    notification.value = 'Logged in successfully! Redirecting to account page...';
+    setTimeout(() => {
+      notification.value = null;
+      navigateTo('/account');
+    }, 2000);
+  }
+});
 
 function validateForm() {
   let isValid = true;
@@ -38,7 +49,7 @@ function validateForm() {
 async function login() {
   if (validateForm()) {
     try {
-      const response: { status: number; body: any } = await $fetch("/auth/login", {
+      const response: { status: number; body?: any } = await $fetch("/auth/login", {
         method: "POST",
         body: {
           email: form.value.email,
@@ -48,6 +59,7 @@ async function login() {
 
       if (response.status === 200) {
         useUserSession().fetch();
+        console.log(response.body);
         notification.value = "Login successful!";
         setTimeout(() => {
           notification.value = null;
