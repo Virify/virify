@@ -52,34 +52,40 @@ export function fakeAddressComplete() {
 }
 export function fakeAgent() {
   return {
+    email: faker.internet.email(),
+    password: faker.lorem.words(5),
     name: faker.person.fullName(),
     contactInfo: faker.lorem.words(5),
-    directContactOptions: faker.lorem.words(5),
-    viewingAvailability: faker.lorem.words(5),
+    directContactOptions: undefined,
+    viewingAvailability: undefined,
     addressLine1: faker.lorem.words(5),
-    addressLine2: faker.lorem.words(5),
+    addressLine2: undefined,
     city: faker.lorem.words(5),
     county: faker.lorem.words(5),
     postcode: faker.lorem.words(5),
     country: faker.lorem.words(5),
-    addressId: faker.number.int(),
+    companyRegistration: faker.lorem.words(5),
+    addressId: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
 export function fakeAgentComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
+    email: faker.internet.email(),
+    password: faker.lorem.words(5),
     name: faker.person.fullName(),
     contactInfo: faker.lorem.words(5),
-    directContactOptions: faker.lorem.words(5),
-    viewingAvailability: faker.lorem.words(5),
+    directContactOptions: undefined,
+    viewingAvailability: undefined,
     addressLine1: faker.lorem.words(5),
-    addressLine2: faker.lorem.words(5),
+    addressLine2: undefined,
     city: faker.lorem.words(5),
     county: faker.lorem.words(5),
     postcode: faker.lorem.words(5),
     country: faker.lorem.words(5),
-    addressId: faker.number.int(),
+    companyRegistration: faker.lorem.words(5),
+    addressId: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };

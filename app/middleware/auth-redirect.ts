@@ -8,6 +8,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   // Define the redirect cookie name and login URL
   const redirectCookieName = config.public.redirectCookieName || "redirect";
   const loginUrl = config.public.loginUrl || "/login";
+  const agentloginUrl = "/agent/login";
 
   // If not logged in
   if (!loggedIn.value) {
@@ -15,8 +16,13 @@ export default defineNuxtRouteMiddleware((to, from) => {
     const redirectCookie = useCookie(redirectCookieName);
     redirectCookie.value = from.fullPath;
 
-    // Navigate to the login page
-    return navigateTo(loginUrl);
+    // If the user is an agent, navigate to the agent login page
+    if (to.path.startsWith("/agent")) {
+      return navigateTo(agentloginUrl);
+    } else {
+      // Navigate to the login page
+      return navigateTo(loginUrl);
+    }
   } else {
     // If logged in, clear the redirect cookie
     const redirectCookie = useCookie(redirectCookieName);

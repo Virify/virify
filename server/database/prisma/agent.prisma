@@ -1,17 +1,20 @@
 model Agent {
   id                   Int        @id @default(autoincrement())
+  email                String     @unique
+  password             String
   name                 String
   contactInfo          String
-  directContactOptions String
-  viewingAvailability  String
+  directContactOptions String?
+  viewingAvailability  String?
   addressLine1         String
-  addressLine2         String
+  addressLine2        String?
   city                 String
   county               String
   postcode             String
   country              String
+  companyRegistration  String
   users                User[]
-  addressId            Int
+  addressId            Int?
   property             Property[]
   Listing              Listing[]
   createdAt            DateTime   @default(now())

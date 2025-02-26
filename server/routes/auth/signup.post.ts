@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const { email, username, password } = await readBody(event);
+  const { email, password } = await readBody(event);
 
   // Trim and validate input
   const trimmedEmail = (email as string).trim();
