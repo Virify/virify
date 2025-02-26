@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 const form = ref({
   email: "",
   password: "",
@@ -38,7 +39,6 @@ function validateForm() {
   }
   return isValid;
 }
-
 async function signup() {
   if (validateForm()) {
     try {
@@ -75,31 +75,48 @@ async function signup() {
 
 <template>
   <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="bg-white shadow-md rounded-lg p-8 w-1/3">
-      <h1 class="text-2xl font-bold mb-4">Signup</h1>
-      <form @submit.prevent="signup">
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
-          <input v-model="form.email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
-          <span v-if="errors.email" class="text-red-500 text-xs italic">{{ errors.email }}</span>
-        </div>
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
-          <input v-model="form.username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" />
-          <span v-if="errors.username" class="text-red-500 text-xs italic">{{ errors.username }}</span>
-        </div>
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
-          <input v-model="form.password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-          <span v-if="errors.password" class="text-red-500 text-xs italic">{{ errors.password }}</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <button to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Signup</button>
-        </div>
-      </form>
+    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs: w-full sm:w-1/2">
+      <div class="w-3/4 p-8 xs: w-full sm:w-3/4">
+        <h1 class="text-3xl font-bold mb-6 text-green-500">Signup</h1>
+        <form @submit.prevent="signup">
+          <div class="mb-6">
+            <label class="block text-green-500 text-sm font-bold mb-2" for="email"
+              >Email:
+              <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
+            </label>
+            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
+          </div>
+          <div class="mb-6">
+            <label class="block text-green-500 text-sm font-bold mb-2" for="username"
+              >Username:
+              <span v-if="errors.username" class="text-red-400 text-xs italic">{{ errors.username }}</span>
+            </label>
+            <input v-model="form.username" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" />
+          </div>
+          <div class="mb-6">
+            <label class="block text-green-500 text-sm font-bold mb-2" for="password"
+              >Password:
+              <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
+            </label>
+            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
+          </div>
+          <div class="flex items-center justify-between">
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Signup</button>
+            <NuxtLink to="/login" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Login</NuxtLink>
+          </div>
+        </form>
+      </div>
+      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('Failed') }">
+        {{ notification }}
+      </div>
     </div>
-    <div v-if="notification" class="fixed bottom-0 right-0 m-4 p-4 bg-green-500 text-white rounded" :class="{ 'bg-red-500': notification.includes('failed') }">
-      {{ notification }}
+    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs: hidden sm:flex">
+      <h1 class="text-white font-bold text-8xl">Virify</h1>
+      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Add any additional styles here */
+</style>

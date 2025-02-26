@@ -1,7 +1,10 @@
 <script setup lang="ts">
 const route = useRoute();
+
 definePageMeta({
-  middleware: ["login"],
+  title: "Login",
+  description: "Login to your account",
+  middleware: "login",
 });
 
 const form = ref({
@@ -64,14 +67,12 @@ async function login() {
           notification.value = null;
           navigateTo("/account");
         }, 2000);
-      }
-      if (response.body.error === "Password is incorrect") {
+      } else if (response.body.error === "Password is incorrect") {
         notification.value = "Incorrect Password!";
         setTimeout(() => {
           notification.value = null;
         }, 2000);
-      }
-      if (response.status === 401) {
+      } else if (response.status === 401) {
         notification.value = response.body.error;
         setTimeout(() => {
           notification.value = null;
@@ -89,31 +90,48 @@ async function login() {
 
 <template>
   <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="bg-white shadow-md rounded-lg p-8 w-1/3">
-      <h1 class="text-2xl font-bold mb-4">Login</h1>
-      <form @submit.prevent="login">
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
-          <input v-model="form.email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
-          <span v-if="errors.email" class="text-red-500 text-xs italic">{{ errors.email }}</span>
-        </div>
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
-          <input v-model="form.password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-          <span v-if="errors.password" class="text-red-500 text-xs italic">{{ errors.password }}</span>
-        </div>
-        <div class="flex items-center justify-start gap-3">
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4" type="submit">Login</button>
-          <NuxtLink external to="/auth/google" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Google</NuxtLink>
-          <NuxtLink external to="/auth/microsoft" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Login with Microsoft</NuxtLink>
-        </div>
-      </form>
-      <div class="flex items-center justify-start gap-3">
-        <NuxtLink to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Signup</NuxtLink>
+    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs: w-full sm:w-1/2">
+      <div class="w-3/4 p-8 xs: w-full sm:w-3/4">
+        <h1 class="text-3xl font-bold mb-6 text-green-500">Login</h1>
+        <form @submit.prevent="login">
+          <div class="mb-6">
+            <label class="block text-green-500 text-sm font-bold mb-2" for="email"
+              >Email:
+              <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
+            </label>
+            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
+          </div>
+          <div class="mb-6">
+            <label class="block text-green-500 text-sm font-bold mb-2" for="password"
+              >Password:
+              <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
+            </label>
+            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
+          </div>
+          <div class="flex items-center justify-between gap-3 mt-4 w-full flex-wrap">
+            <div class="flex items-center justify-start gap-3 flex-wrap">
+              <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
+              <NuxtLink external to="/auth/google" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Google</NuxtLink>
+              <NuxtLink external to="/auth/microsoft" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Microsoft</NuxtLink>
+            </div>
+            <div class="flex items-center justify-end gap-3 flex-wrap">
+              <NuxtLink to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">Signup</NuxtLink>
+            </div>
+          </div>
+        </form>
+        <div class="flex items-center justify-start gap-3 mt-4"></div>
+      </div>
+      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('Failed') }">
+        {{ notification }}
       </div>
     </div>
-    <div v-if="notification" class="fixed bottom-0 right-0 m-4 p-4 bg-green-500 text-white rounded" :class="{ 'bg-red-500': notification.includes('Failed') }">
-      {{ notification }}
+    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs: hidden sm:flex">
+      <h1 class="text-white font-bold text-8xl">Virify</h1>
+      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Add any additional styles here */
+</style>
