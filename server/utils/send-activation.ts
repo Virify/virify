@@ -7,6 +7,7 @@ export default async function sendActivation(email: string, token: string) {
   const emailHtml = await render(emailToSend, {
     token,
     userEmail: email,
+    baseUrl: process.env.EMAIL_BASE_URL || '',
   });
   // set the email subject etc
   const subject = "Welcome to Virify - Activate Required!";
