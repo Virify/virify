@@ -1,21 +1,19 @@
 import { render } from '@vue-email/render'
-import email from './emails/test.vue'
+import activationEmail from './emails/signup-activation.vue'
 export default defineEventHandler(async (event) => {
   // const { subject, content, to } = await readBody(event);
   // get the vue file
-  const test = email
-  const emailHtml = await render(test);
+  const email = activationEmail
+  const emailHtml = await render(email);
   
+  // get this from query params
   const subject = "Hello from Virify";
   const html = emailHtml;
-  const to = "jamie@virify.co.uk";
+  const to = "example@example.com";
 
 
   try {
-    // use composable
-    const { sendMail } = useNodeMailer();
-    // send email
-    sendMail({ subject: subject, html: html, to: to });
+    emailSender(html, subject, to);
     return {
       status: 200,
       body: {
@@ -23,7 +21,7 @@ export default defineEventHandler(async (event) => {
       },
     };
   } catch (error) {
-    console.error("Error sending email", error);
+    console.log(error);
     return {
       status: 500,
       body: {
