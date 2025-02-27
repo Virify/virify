@@ -39,7 +39,16 @@ export default defineEventHandler(async (event) => {
         },
       });
       // send email
-      await sendActivation(email as string, newToken);
+      try {
+        await sendActivation(email as string, newToken);
+      } catch (error) {
+        return {
+          status: 500,
+          message: "Failed to send activation email",
+          error: (error as Error).message!,
+        };
+      }
+      
 
       return {
         status: 400,

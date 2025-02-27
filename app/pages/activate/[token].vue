@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref } from "vue";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 const notification = ref<string | null>(null);
-const password = ref('');
+const password = ref("");
 const email = route.query.email as string;
 const errors = ref({
   password: null as string | null,
@@ -13,23 +13,23 @@ const errors = ref({
 // send the token and email to the server
 const activate = async () => {
   const response: { status: number; body?: any } = await $fetch(`/auth/user/activate-account`, {
-    method: 'POST',
-    body: { 
+    method: "POST",
+    body: {
       password: password.value,
       token: route.params.token,
-      email: route.query.email
-     },
+      email: route.query.email,
+    },
   });
   // if there is an error, display the error message
   if (response.status === 200) {
-   notification.value = 'Successfully activated your account! Redirecting to login page...';
+    notification.value = "Successfully activated your account! Redirecting to login page...";
     setTimeout(() => {
-     navigateTo('/login');
+      navigateTo("/login");
     }, 2000);
   } else {
-   notification.value = response.body.error;
+    notification.value = response.body.error;
     setTimeout(() => {
-    notification.value = null;
+      notification.value = null;
     }, 2000);
   }
 };
@@ -37,7 +37,7 @@ const activate = async () => {
 const validateForm = () => {
   let isValid = true;
   if (!password.value) {
-    errors.value.password = 'Password is required';
+    errors.value.password = "Password is required";
     isValid = false;
   } else {
     errors.value.password = null;
@@ -69,8 +69,8 @@ const handleSubmit = () => {
           </div>
         </form>
         <div v-if="notification" class="fixed bottom-0 left-0 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('Failed') }">
-        {{ notification }}
-      </div>
+          {{ notification }}
+        </div>
       </div>
     </div>
     <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">

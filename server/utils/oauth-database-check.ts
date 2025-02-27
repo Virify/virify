@@ -7,20 +7,12 @@ export default async function oauthDatabaseCheck(email: string, password?: strin
       },
     });
     if (!dbUser) {
-      if(password) {
-        dbUser = await prisma.user.create({
-          data: {
-            email: email,
-            password: password,
-          },
-        });
-      } else {
-        dbUser = await prisma.user.create({
-          data: {
-            email: email,
-          },
-        });
-      }
+      dbUser = await prisma.user.create({
+        data: {
+          email: email,
+        },
+      });
+
       console.log("User created:", dbUser);
     } else {
       console.log("User exists - skipping");
