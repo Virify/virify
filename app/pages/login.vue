@@ -52,7 +52,7 @@ function validateForm() {
 async function login() {
   if (validateForm()) {
     try {
-      const response: { status: number; body?: any } = await $fetch("/auth/login", {
+      const response: { status: number; body?: any } = await $fetch("/auth/user/login", {
         method: "POST",
         body: {
           email: form.value.email,
@@ -111,8 +111,8 @@ async function login() {
           <div class="flex items-center justify-between gap-3 mt-4 w-full flex-wrap">
             <div class="flex items-center justify-start gap-3 flex-wrap">
               <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
-              <NuxtLink external to="/auth/google" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Google</NuxtLink>
-              <NuxtLink external to="/auth/microsoft" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Microsoft</NuxtLink>
+              <NuxtLink external to="/auth/oauth/google" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Google</NuxtLink>
+              <NuxtLink external to="/auth/oauth/microsoft" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Microsoft</NuxtLink>
             </div>
             <div class="flex items-center justify-end gap-3 flex-wrap">
               <NuxtLink to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">Signup</NuxtLink>
