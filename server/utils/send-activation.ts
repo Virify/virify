@@ -16,20 +16,8 @@ export default async function sendActivation(email: string, token: string) {
 
   try {
     // send the email
-    await emailSender(html, subject, to);
-    return {
-      status: 200,
-      body: {
-        message: "Email sent",
-      },
-    };
+    return await emailSender(html, subject, to);
   } catch (error) {
-    console.log(error);
-    return {
-      status: 500,
-      body: {
-        message: "Error sending email",
-      },
-    };
+    throw new Error("Error sending activation email " + error);
   }
 }
