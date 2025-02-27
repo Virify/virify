@@ -17,6 +17,9 @@
   "dependencies": {
     "@prisma/client": "6.4.0",
     "@prisma/nuxt": "^0.3.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue-email/components": "^0.0.21",
+    "@vue-email/render": "^0.0.9",
     "add": "^2.0.6",
     "auth-utils": "^1.0.0",
     "dotenv": "^16.4.7",
@@ -33,6 +36,8 @@
     "@faker-js/faker": "^9.5.0",
     "@nuxtjs/tailwindcss": "^6.13.1",
     "@types/pg": "^8.11.11",
+    "nodemailer": "^6.10.0",
+    "nuxt-nodemailer": "^1.1.2",
     "prisma": "^6.4.1",
     "prisma-generator-fake-data": "^0.14.3",
     "tsx": "^4.19.3",

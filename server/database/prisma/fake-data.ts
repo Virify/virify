@@ -463,6 +463,8 @@ export function fakeUser() {
     postcode: undefined,
     country: undefined,
     updatedAt: faker.date.anytime(),
+    activationToken: undefined,
+    activationExpires: undefined,
   };
 }
 export function fakeUserComplete() {
@@ -484,5 +486,8 @@ export function fakeUserComplete() {
     role: Role.USER,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
+    activationToken: undefined,
+    activationExpires: undefined,
+    isActivated: false,
   };
 }
