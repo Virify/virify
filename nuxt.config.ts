@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxtjs/tailwindcss", "nuxt-auth-utils"],
+  modules: ["@nuxtjs/tailwindcss", "nuxt-auth-utils", 'nuxt-nodemailer'],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   nitro: {
@@ -31,6 +31,16 @@ export default defineNuxtConfig({
     public: {
       redirectCookieName: "redirect",
       loginUrl: "/login",
+    },
+  },
+  nodemailer: {
+    from: '"Virify" <no-reply@virify.co.uk>',
+    host: process.env.EMAIL_HOST,
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   },
 });
