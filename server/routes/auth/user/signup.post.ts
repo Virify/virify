@@ -55,12 +55,9 @@ export default defineEventHandler(async (event) => {
         },
       };
     }
-  }
-
-  // Create new user and send activation email
-  try {
+  } else {
     await sendActivation(trimmedEmail, token);
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: trimmedEmail,
         activationToken: token,
@@ -71,14 +68,6 @@ export default defineEventHandler(async (event) => {
       status: 200,
       body: {
         message: "Activation email sent",
-      },
-    };
-  } catch (error) {
-    return {
-      status: 500,
-      body: {
-        error: "Error creating user",
-        message: (error as Error).message,
       },
     };
   }
