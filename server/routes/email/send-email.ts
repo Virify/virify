@@ -1,7 +1,5 @@
 export default defineEventHandler(async (event) => {
-  console.log(event)
-  const { subject, content, to } = getQuery(event);
-  console.log(subject, content, to);
+  const { subject, content, to } = await readBody(event);
 
   try {
     // use composable
@@ -15,6 +13,12 @@ export default defineEventHandler(async (event) => {
       },
     };
   } catch (error) {
-    console.log(error);
+    console.error("Error sending email", error);
+    return {
+      status: 500,
+      body: {
+        message: "Error sending email",
+      },
+    };
   }
 });
