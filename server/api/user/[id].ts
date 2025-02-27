@@ -1,6 +1,7 @@
 export default defineEventHandler(async (event) => {
   // get the id from the request
-  const { id  } = getQuery(event);
+  const { id } = getRouterParams(event);
+
   try {
     // find the user by id
     const user = await prisma.user.findUnique({
