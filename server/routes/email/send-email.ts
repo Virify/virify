@@ -1,9 +1,13 @@
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  console.log(event)
+  const { subject, content, to } = getQuery(event);
+  console.log(subject, content, to);
+
   try {
     // use composable
     const { sendMail } = useNodeMailer();
     // send email
-    sendMail({ subject: "TEST NO-REPLY MAILBOX", text: "Well this was fun to test", to: "test@test.com" });
+    sendMail({ subject: subject, text: content, to: to });
     return {
       status: 200,
       body: {
