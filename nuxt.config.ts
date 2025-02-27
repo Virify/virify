@@ -1,9 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import vue from '@vitejs/plugin-vue'
 export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxtjs/tailwindcss", "nuxt-auth-utils", 'nuxt-nodemailer'],
+  modules: ["@nuxtjs/tailwindcss", "nuxt-auth-utils", "nuxt-nodemailer"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   nitro: {
@@ -12,7 +13,11 @@ export default defineNuxtConfig({
       tasks: true,
     },
     imports: {
-      dirs: ["server/database/lib/*.ts"],
+      dirs: ["server/database/lib/*.ts", "server/routes/email/emails/*.vue"],
+    },
+    rollupConfig: {
+     // @ts-ignore
+      plugins: [vue()]
     },
   },
   runtimeConfig: {
@@ -32,6 +37,7 @@ export default defineNuxtConfig({
       redirectCookieName: "redirect",
       loginUrl: "/login",
     },
+    
   },
   nodemailer: {
     from: '"Virify" <no-reply@virify.co.uk>',
