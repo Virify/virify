@@ -7,12 +7,12 @@ export const useResponse = () => {
    * Creates a generic response format.
    * @param status - The HTTP status code.
    * @param message - The message to include in the response.
-   * @param error - Whether the response indicates an error.
+   * @param error - Whether the response indicates an error or an Error object.
    * @returns An object representing the HTTP response.
    */
-  const createResponse = (status: number, message: string, error = false) => ({
+  const createResponse = (status: number, message: string, error: boolean | Error = false) => ({
     status,
-    body: error ? { error: `Failed! ${message}` } : { message },
+    body: error ? { error: `Failed! ${message}`, details: error instanceof Error ? error.message : undefined } : { message },
   });
 
   /**
@@ -45,9 +45,10 @@ export const useResponse = () => {
 
   /**
    * Creates a 500 Internal Server Error response.
+   * @param error - The error object to include in the response.
    * @returns An object representing the HTTP response.
    */
-  const internalServerError = () => createResponse(500, "Internal server error", true);
+  const internalServerError = (error: Error) => createResponse(500, "Internal server error", error);
 
   return {
     unauthorizedResponse,

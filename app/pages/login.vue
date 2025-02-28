@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
 const route = useRoute();
+const router = useRouter();
 
 definePageMeta({
   title: "Login",
@@ -24,7 +28,7 @@ onMounted(() => {
     notification.value = "Logged in successfully! Redirecting to account page...";
     setTimeout(() => {
       notification.value = null;
-      navigateTo("/account");
+      router.push("/account");
     }, 2000);
   }
 });
@@ -62,33 +66,30 @@ async function login() {
 
       if (response.status === 200) {
         useUserSession().fetch();
-        notification.value = "Logged in successfully! Redirecting to account page...";
+        notification.value = response.body.message;
         setTimeout(() => {
           notification.value = null;
-          navigateTo("/account");
+          router.push("/account");
         }, 2000);
       } else if (response.status === 403) {
-        notification.value = "User is an agent! Redirecting to agent login...";
+        notification.value = response.body.details;
         setTimeout(() => {
           notification.value = null;
-          navigateTo("/agent/login");
+          router.push("/agent/login");
         }, 2000);
-        setTimeout(() => {
-          notification.value = null;
-        }, 2000);
-      } else if (response.body.error === "Password is incorrect") {
-        notification.value = "Incorrect Password!";
+      } else if (response.body.error) {
+        notification.value = response.body.details;
         setTimeout(() => {
           notification.value = null;
         }, 2000);
       } else if (response.status === 401) {
-        notification.value = response.body.error;
+        notification.value = response.body.details;
         setTimeout(() => {
           notification.value = null;
         }, 2000);
       }
     } catch (error) {
-      notification.value = "Login failed!";
+      notification.value = (error as any).message;
       setTimeout(() => {
         notification.value = null;
       }, 2000);
@@ -99,8 +100,8 @@ async function login() {
 
 <template>
   <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs: w-full sm:w-1/2">
-      <div class="w-3/4 p-8 xs: w-full sm:w-3/4">
+    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
+      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
         <h1 class="text-3xl font-bold mb-6 text-green-500">Login</h1>
         <form @submit.prevent="login">
           <div class="mb-6">
@@ -134,7 +135,7 @@ async function login() {
         {{ notification }}
       </div>
     </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs: hidden sm:flex">
+    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
       <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
     </div>

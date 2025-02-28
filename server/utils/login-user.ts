@@ -1,5 +1,4 @@
 import { H3Event } from "h3";
-
 /**
  * Handles the login process for owners and agents.
  * @param event - The H3 event object.
@@ -9,16 +8,9 @@ import { H3Event } from "h3";
  * @returns A standardized HTTP response.
  */
 export async function loginUser(event: H3Event, user: any, isAgentLogin: boolean) {
-  const { successResponse, internalServerError } = useResponse();
-
-  try {
-    // Set the user session
-    await setSession(event, user, isAgentLogin);
-
-    // Return a success response
-    return successResponse("Logged in successfully");
-  } catch {
-    // Return an internal server error response in case of an exception
-    return internalServerError();
-  }
+  const { successResponse } = useResponse();
+  // Set the user session
+  await setSession(event, user, isAgentLogin);
+  // Return a success response
+  return successResponse("Logged in successfully");
 }
