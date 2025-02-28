@@ -32,6 +32,14 @@ export async function findAgent(email: string): Promise<Agent | null> {
 }
 
 /**
+ * Deletes an owner by email.
+ * @param email string
+ * @returns Promise<Owner>
+ */
+export async function deleteOwner(id: number): Promise<Owner> {
+  return prisma.owner.delete({ where: { id } });
+}
+/**
  * Create a new owner with the given email and token.
  * @param email string
  * @param token string
