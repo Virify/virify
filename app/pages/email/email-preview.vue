@@ -4,7 +4,7 @@ definePageMeta({
 });
 // chnage your email component path for the email you want to preview
 // @ts-ignore
-import SignupActivationEmail from './server/routes/email/emails/signup-activation.vue';
+import SignupActivationEmail from './server/routes/email/templates/signup-activation.vue';
 </script>
 
 <template>
