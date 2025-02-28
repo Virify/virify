@@ -22,6 +22,38 @@ export async function findAgent(email: string): Promise<Agent | null> {
 }
 
 /**
+ * Create a new owner with the given email and token.
+ * @param email string
+ * @param token string
+ * @returns Owner <Promise>
+ */
+export async function createOwnerWithToken(email: string, token: string): Promise<Owner> {
+  return prisma.owner.create({
+    data: {
+      email,
+      activationToken: token,
+      tokenExpiry: new Date(Date.now() + 3600000),
+    },
+  });
+
+}
+
+/**
+ * Update Owner Token and Expiry.
+ * @param email string
+ * @param token string
+ * @returns Promise<Owner>
+ */
+export async function updateOwnerToken(email: string, token: string): Promise<Owner> {
+  return prisma.owner.update({
+    where: { email },
+    data: {
+      activationToken: token,
+      tokenExpiry: new Date(Date.now() + 3600000),
+    },
+  });
+}
+/**
  * Create an owner with the given email.
  * @param email string
  * @returns Promise<Owner>
@@ -38,4 +70,8 @@ export async function createOauthOwner(email: string): Promise<Owner> {
  */
 export function hasRole(user: Owner | Agent, role: OwnerRole): boolean {
   return user.role === role;
+}
+
+export function isActive(user: Owner | Agent): boolean {
+  return user.isActivated;
 }
