@@ -50,71 +50,152 @@ export default defineEventHandler(async (event) => {
           },
         },
         agents: {
-          create: {
-            ...agentType,
-            properties: {
-              create: {
-                ...propertyType,
-                media: {
-                  create: {
-                    ...mediaType,
+          create: [
+            {
+              firstName: undefined,
+              lastName: undefined,
+              email: faker.internet.email(),
+              password: undefined,
+              passwordResetToken: undefined,
+              lastLogin: undefined,
+              activationToken: undefined,
+              tokenExpiry: undefined,
+              properties: {
+                create: {
+                  ...propertyType,
+                  media: {
+                    create: {
+                      ...mediaType,
+                    },
                   },
-                },
-                address: {
-                  create: {
-                    ...addressType,
+                  address: {
+                    create: {
+                      ...addressType,
+                    },
                   },
-                },
-                bedroomFeatures: {
-                  create: [{ ...bedroomFeaturesType }, { ...bedroomFeaturesType }],
-                },
-                livingAreaFeatures: {
-                  create: [{ ...livingAreaFeaturesType }, { ...livingAreaFeaturesType }],
-                },
-                bathroomFeatures: {
-                  create: [{ ...bathroomFeaturesType }, { ...bathroomFeaturesType }],
-                },
-                diningroomFeatures: {
-                  create: [{ ...diningroomType }, { ...diningroomType }],
-                },
-                kitchenFeatures: {
-                  create: {
-                    ...kitchenFeaturesType,
+                  bedroomFeatures: {
+                    create: [{ ...bedroomFeaturesType }, { ...bedroomFeaturesType }],
                   },
-                },
-                outdoorSpace: {
-                  create: {
-                    ...outdoorSpaceFeaturesType,
+                  livingAreaFeatures: {
+                    create: [{ ...livingAreaFeaturesType }, { ...livingAreaFeaturesType }],
                   },
-                },
-                storageFeatures: {
-                  create: {
-                    ...storageFeaturesType,
+                  bathroomFeatures: {
+                    create: [{ ...bathroomFeaturesType }, { ...bathroomFeaturesType }],
                   },
-                },
-                securityFeatures: {
-                  create: {
-                    ...securityFeaturesType,
+                  diningroomFeatures: {
+                    create: [{ ...diningroomType }, { ...diningroomType }],
                   },
-                },
-                parking: {
-                  create: {
-                    ...parkingType,
+                  kitchenFeatures: {
+                    create: {
+                      ...kitchenFeaturesType,
+                    },
                   },
-                },
-                runningCosts: {
-                  create: {
-                    ...runningCostsType,
+                  outdoorSpace: {
+                    create: {
+                      ...outdoorSpaceFeaturesType,
+                    },
                   },
-                },
-                amenities: {
-                  create: {
-                    ...amenitiesType,
+                  storageFeatures: {
+                    create: {
+                      ...storageFeaturesType,
+                    },
+                  },
+                  securityFeatures: {
+                    create: {
+                      ...securityFeaturesType,
+                    },
+                  },
+                  parking: {
+                    create: {
+                      ...parkingType,
+                    },
+                  },
+                  runningCosts: {
+                    create: {
+                      ...runningCostsType,
+                    },
+                  },
+                  amenities: {
+                    create: {
+                      ...amenitiesType,
+                    },
                   },
                 },
               },
             },
-          },
+            {
+              firstName: undefined,
+              lastName: undefined,
+              email: faker.internet.email(),
+              password: undefined,
+              passwordResetToken: undefined,
+              lastLogin: undefined,
+              activationToken: undefined,
+              tokenExpiry: undefined,
+              properties: {
+                create: {
+                  ...propertyType,
+                  media: {
+                    create: {
+                      ...mediaType,
+                    },
+                  },
+                  address: {
+                    create: {
+                      ...addressType,
+                    },
+                  },
+                  bedroomFeatures: {
+                    create: [{ ...bedroomFeaturesType }, { ...bedroomFeaturesType }],
+                  },
+                  livingAreaFeatures: {
+                    create: [{ ...livingAreaFeaturesType }, { ...livingAreaFeaturesType }],
+                  },
+                  bathroomFeatures: {
+                    create: [{ ...bathroomFeaturesType }, { ...bathroomFeaturesType }],
+                  },
+                  diningroomFeatures: {
+                    create: [{ ...diningroomType }, { ...diningroomType }],
+                  },
+                  kitchenFeatures: {
+                    create: {
+                      ...kitchenFeaturesType,
+                    },
+                  },
+                  outdoorSpace: {
+                    create: {
+                      ...outdoorSpaceFeaturesType,
+                    },
+                  },
+                  storageFeatures: {
+                    create: {
+                      ...storageFeaturesType,
+                    },
+                  },
+                  securityFeatures: {
+                    create: {
+                      ...securityFeaturesType,
+                    },
+                  },
+                  parking: {
+                    create: {
+                      ...parkingType,
+                    },
+                  },
+                  runningCosts: {
+                    create: {
+                      ...runningCostsType,
+                    },
+                  },
+                  amenities: {
+                    create: {
+                      ...amenitiesType,
+                    },
+                  },
+                },
+              },
+            },
+          ],
         },
       },
     });
