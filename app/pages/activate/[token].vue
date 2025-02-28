@@ -12,7 +12,7 @@ const errors = ref({
 
 // send the token and email to the server
 const activate = async () => {
-  const response: { status: number; body?: any } = await $fetch(`/auth/user/activate-account`, {
+  const response: { status: number; body?: any } = await $fetch(`/auth/owner/activate-account`, {
     method: "POST",
     body: {
       password: password.value,

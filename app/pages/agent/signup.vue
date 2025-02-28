@@ -1,11 +1,8 @@
 <script setup lang="ts">
 
-const router = useRouter();
-
 const form = ref({
   email: "",
-  password: "",
-  agentName: "",
+  businessName: "",
   mainContact: "",
   addressLine: "",
   city: "",
@@ -18,7 +15,7 @@ const form = ref({
 const errors = ref({
   email: null as string | null,
   password: null as string | null,
-  agentName: null as string | null,
+  businessName: null as string | null,
   mainContact: null as string | null,
   addressLine: null as string | null,
   city: null as string | null,
@@ -43,18 +40,11 @@ function validateForm() {
     errors.value.email = null;
   }
 
-  if (!form.value.password) {
-    errors.value.password = "Password is required";
+  if (!form.value.businessName) {
+    errors.value.businessName = "Business Name is required";
     isValid = false;
   } else {
-    errors.value.password = null;
-  }
-
-  if (!form.value.agentName) {
-    errors.value.agentName = "Agent Name is required";
-    isValid = false;
-  } else {
-    errors.value.agentName = null;
+    errors.value.businessName = null;
   }
 
   if (!form.value.mainContact) {
@@ -115,8 +105,7 @@ async function signup() {
         method: "POST",
         body: {
           email: form.value.email,
-          password: form.value.password,
-          agentName: form.value.agentName,
+          businessName: form.value.businessName,
           mainContact: form.value.mainContact,
           addressLine: form.value.addressLine,
           city: form.value.city,
@@ -150,10 +139,11 @@ async function signup() {
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen bg-purple-500 h-screen">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs: w-full sm:w-1/2">
-      <div class="p-8 xs: w-full sm:w-1/2 h-1/2 flex justify-center flex-col">
+  <div class="flex justify-center items-center bg-purple-500 h-screen">
+    <div class="flex justify-center items-center w-1/2 h-full bg-white py-12 xs: w-full sm:w-1/2">
+      <div class="p-8 flex justify-center flex-col sm:w-3/4 xs:w-full">
         <h1 class="text-3xl font-bold mb-6 text-purple-500">Agency Signup</h1>
+        <h3 class="text-xl font-bold mb-6 text-purple-500">Once you have signed up to Virify, we will verify you and then you can start adding agents to your Agency Account!</h3>
         <form @submit.prevent="signup">
           <div class="mb-6">
             <label class="block text-purple-500 text-sm font-bold" for="email"
@@ -164,27 +154,19 @@ async function signup() {
             <input v-model="form.email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
           </div>
           <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="password"
-              >Agent Password:
-              <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">This is required to manage your Agency</span>
-            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="agentName"
+            <label class="block text-purple-500 text-sm font-bold" for="businessName"
               >Agent Name:
-              <span v-if="errors.agentName" class="text-red-400 text-xs italic">{{ errors.agentName }}</span>
+              <span v-if="errors.businessName" class="text-red-400 text-xs italic">{{ errors.businessName }}</span>
             </label>
             <span class="block text-purple-500 text-xs font-xs mb-2">Your Agent operating name</span>
-            <input v-model="form.agentName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="agentName" type="text" placeholder="Agent Name" />
+            <input v-model="form.businessName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessName" type="text" placeholder="Business Name" />
           </div>
           <div class="mb-6">
             <label class="block text-purple-500 text-sm font-bold" for="mainContact"
               >Agent Main Contact:
               <span v-if="errors.mainContact" class="text-red-400 text-xs italic">{{ errors.mainContact }}</span>
             </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">The main contact for this Agency</span>
+            <span class="block text-purple-500 text-xs font-xs mb-2">The main contact number for this Agency</span>
             <input v-model="form.mainContact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="mainContact" type="text" placeholder="Main Contact" />
           </div>
           <div class="mb-6">
@@ -196,35 +178,31 @@ async function signup() {
             <input v-model="form.addressLine" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessAddress" type="text" placeholder="Address Line 1" />
           </div>
           <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="city"
-              >Business Address:
+            <label class="block text-purple-500 text-xs font-xs mb-2" for="city"
+              >City:
               <span v-if="errors.city" class="text-red-400 text-xs italic">{{ errors.city }}</span>
             </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">City</span>
             <input v-model="form.city" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="city" type="text" placeholder="City" />
           </div>
           <div class="mb-6">
             <label class="block text-purple-500 text-sm font-bold" for="county"
-              >Business Address:
+              >County:
               <span v-if="errors.county" class="text-red-400 text-xs italic">{{ errors.county }}</span>
             </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">County</span>
             <input v-model="form.county" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="county" type="text" placeholder="County" />
           </div>
           <div class="mb-6">
             <label class="block text-purple-500 text-sm font-bold" for="country"
-              >Business Address:
+              >Country:
               <span v-if="errors.country" class="text-red-400 text-xs italic">{{ errors.country }}</span>
             </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">Country</span>
             <input v-model="form.country" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="country" type="text" placeholder="Country" />
           </div>
           <div class="mb-6">
             <label class="block text-purple-500 text-sm font-bold" for="postcode"
-              >Business Address:
+              >Postcode:
               <span v-if="errors.postcode" class="text-red-400 text-xs italic">{{ errors.postcode }}</span>
             </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">Postcode</span>
             <input v-model="form.postcode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="postcode" type="text" placeholder="Postcode" />
           </div>
           <div class="mb-6">
@@ -244,7 +222,7 @@ async function signup() {
         {{ notification }}
       </div>
     </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-purple-500 h-screen xs: hidden sm:flex">
+    <div class="flex flex-col justify-center items-center w-1/2 bg-purple-500 h-full xs: hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
       <h2 class="text-white text-5xl italic p-4 text-center">For Agents</h2>
     </div>

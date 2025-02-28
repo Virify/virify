@@ -1,4 +1,4 @@
-import { accessibilityFeaturesType, petPolicyType, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, PropertyType, propertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, epcType, verificationStatus, Role } from '@prisma/client';
+import { AccessibilityFeaturesType, PetPolicyType, AgentRole, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, OwnerRole, PropertyType, PropertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, EpcType } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import Decimal from 'decimal.js';
 
@@ -7,8 +7,8 @@ import Decimal from 'decimal.js';
 export function fakeAdditionalFeatures() {
   return {
     investmentPotential: faker.lorem.words(5),
-    petPolicy: faker.lorem.words(5),
-    accessibilityFeatures: faker.helpers.arrayElement([accessibilityFeaturesType.WHEELCHAIR_ACCESSIBLE, accessibilityFeaturesType.WHEELCHAIR_RAMP, accessibilityFeaturesType.ELEVATOR, accessibilityFeaturesType.STAIRS, accessibilityFeaturesType.PARKING, accessibilityFeaturesType.OTHER] as const),
+    petPolicy: faker.helpers.arrayElement([PetPolicyType.ALLOWED, PetPolicyType.NOT_ALLOWED] as const),
+    accessibilityFeatures: faker.helpers.arrayElement([AccessibilityFeaturesType.WHEELCHAIR_ACCESSIBLE, AccessibilityFeaturesType.WHEELCHAIR_RAMP, AccessibilityFeaturesType.ELEVATOR, AccessibilityFeaturesType.STAIRS, AccessibilityFeaturesType.PARKING, AccessibilityFeaturesType.OTHER] as const),
     moveInDate: faker.date.anytime(),
     updatedAt: faker.date.anytime(),
   };
@@ -17,8 +17,8 @@ export function fakeAdditionalFeaturesComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
     investmentPotential: faker.lorem.words(5),
-    petPolicy: faker.lorem.words(5),
-    accessibilityFeatures: faker.helpers.arrayElement([accessibilityFeaturesType.WHEELCHAIR_ACCESSIBLE, accessibilityFeaturesType.WHEELCHAIR_RAMP, accessibilityFeaturesType.ELEVATOR, accessibilityFeaturesType.STAIRS, accessibilityFeaturesType.PARKING, accessibilityFeaturesType.OTHER] as const),
+    petPolicy: faker.helpers.arrayElement([PetPolicyType.ALLOWED, PetPolicyType.NOT_ALLOWED] as const),
+    accessibilityFeatures: faker.helpers.arrayElement([AccessibilityFeaturesType.WHEELCHAIR_ACCESSIBLE, AccessibilityFeaturesType.WHEELCHAIR_RAMP, AccessibilityFeaturesType.ELEVATOR, AccessibilityFeaturesType.STAIRS, AccessibilityFeaturesType.PARKING, AccessibilityFeaturesType.OTHER] as const),
     moveInDate: faker.date.anytime(),
     propertyId: faker.number.int(),
     createdAt: new Date(),
@@ -33,6 +33,7 @@ export function fakeAddress() {
     country: faker.lorem.words(5),
     latitude: undefined,
     longitude: undefined,
+    propertyId: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
@@ -52,42 +53,30 @@ export function fakeAddressComplete() {
 }
 export function fakeAgent() {
   return {
+    firstName: undefined,
+    lastName: undefined,
     email: faker.internet.email(),
     password: faker.lorem.words(5),
-    name: faker.person.fullName(),
-    contactInfo: faker.lorem.words(5),
-    directContactOptions: undefined,
-    viewingAvailability: undefined,
-    addressLine1: faker.lorem.words(5),
-    addressLine2: undefined,
-    city: faker.lorem.words(5),
-    county: faker.lorem.words(5),
-    postcode: faker.lorem.words(5),
-    country: faker.lorem.words(5),
-    companyRegistration: faker.lorem.words(5),
-    addressId: undefined,
-    updatedAt: faker.date.anytime(),
+    passwordResetToken: undefined,
+    lastLogin: undefined,
+    activationToken: undefined,
+    tokenExpiry: undefined,
   };
 }
 export function fakeAgentComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
+    firstName: undefined,
+    lastName: undefined,
     email: faker.internet.email(),
     password: faker.lorem.words(5),
-    name: faker.person.fullName(),
-    contactInfo: faker.lorem.words(5),
-    directContactOptions: undefined,
-    viewingAvailability: undefined,
-    addressLine1: faker.lorem.words(5),
-    addressLine2: undefined,
-    city: faker.lorem.words(5),
-    county: faker.lorem.words(5),
-    postcode: faker.lorem.words(5),
-    country: faker.lorem.words(5),
-    companyRegistration: faker.lorem.words(5),
-    addressId: undefined,
-    createdAt: new Date(),
-    updatedAt: faker.date.anytime(),
+    ownerId: faker.number.int(),
+    role: AgentRole.SENIOR,
+    passwordResetToken: undefined,
+    lastLogin: undefined,
+    activationToken: undefined,
+    tokenExpiry: undefined,
+    isActivated: false,
   };
 }
 export function fakeAmenitiesFeature() {
@@ -202,7 +191,7 @@ export function fakeListing() {
   return {
     title: faker.lorem.words(5),
     description: faker.lorem.words(5),
-    price: faker.number.float(),
+    price: undefined,
     priceType: faker.helpers.arrayElement([PriceType.OFFERS_IN_EXCESS_OF, PriceType.GUIDE_PRICE, PriceType.OFFERS_IN_THE_REGION_OF, PriceType.PER_CALENDAR_MONTH, PriceType.PER_WEEK] as const),
     listingType: faker.helpers.arrayElement([ListingType.FOR_SALE, ListingType.FOR_LONG_TERM_LET, ListingType.SHORT_TERM_LET, ListingType.AUCTION] as const),
     availabilityStatus: faker.helpers.arrayElement([AvailabilityStatus.AVAILABLE, AvailabilityStatus.UNDER_OFFER, AvailabilityStatus.SOLD, AvailabilityStatus.LET_AGREED] as const),
@@ -215,13 +204,12 @@ export function fakeListingComplete() {
     id: faker.number.int({ max: 2147483647 }),
     title: faker.lorem.words(5),
     description: faker.lorem.words(5),
-    price: faker.number.float(),
+    price: undefined,
     priceType: faker.helpers.arrayElement([PriceType.OFFERS_IN_EXCESS_OF, PriceType.GUIDE_PRICE, PriceType.OFFERS_IN_THE_REGION_OF, PriceType.PER_CALENDAR_MONTH, PriceType.PER_WEEK] as const),
     listingType: faker.helpers.arrayElement([ListingType.FOR_SALE, ListingType.FOR_LONG_TERM_LET, ListingType.SHORT_TERM_LET, ListingType.AUCTION] as const),
     availabilityStatus: faker.helpers.arrayElement([AvailabilityStatus.AVAILABLE, AvailabilityStatus.UNDER_OFFER, AvailabilityStatus.SOLD, AvailabilityStatus.LET_AGREED] as const),
     listingTier: faker.helpers.arrayElement([ListingTier.BASIC, ListingTier.PREMIUM, ListingTier.FEATURED] as const),
-    userId: undefined,
-    agentId: undefined,
+    ownerId: undefined,
     propertyId: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
@@ -320,6 +308,57 @@ export function fakeOutdoorSpaceComplete() {
     updatedAt: faker.date.anytime(),
   };
 }
+export function fakeOwner() {
+  return {
+    firstName: undefined,
+    lastName: undefined,
+    username: undefined,
+    email: faker.internet.email(),
+    mainContact: undefined,
+    password: undefined,
+    businessName: undefined,
+    addressLine1: undefined,
+    addressLine2: undefined,
+    city: undefined,
+    county: undefined,
+    postcode: undefined,
+    country: undefined,
+    companyRegistration: undefined,
+    passwordResetToken: undefined,
+    lastLogin: undefined,
+    deletedAt: undefined,
+    activationToken: undefined,
+    tokenExpiry: undefined,
+  };
+}
+export function fakeOwnerComplete() {
+  return {
+    id: faker.number.int({ max: 2147483647 }),
+    firstName: undefined,
+    lastName: undefined,
+    username: undefined,
+    email: faker.internet.email(),
+    mainContact: undefined,
+    password: undefined,
+    verified: false,
+    businessName: undefined,
+    addressLine1: undefined,
+    addressLine2: undefined,
+    city: undefined,
+    county: undefined,
+    postcode: undefined,
+    country: undefined,
+    companyRegistration: undefined,
+    umbrellaId: undefined,
+    role: OwnerRole.USER,
+    passwordResetToken: undefined,
+    lastLogin: undefined,
+    deletedAt: undefined,
+    activationToken: undefined,
+    tokenExpiry: undefined,
+    isActivated: false,
+  };
+}
 export function fakeParking() {
   return {
     garage: faker.datatype.boolean(),
@@ -349,7 +388,7 @@ export function fakeProperty() {
   return {
     propertyValue: undefined,
     propertyType: faker.helpers.arrayElement([PropertyType.HOUSE, PropertyType.COTTAGE, PropertyType.BUNGALOW, PropertyType.CONDO, PropertyType.PENTHOUSE, PropertyType.FLAT, PropertyType.LAND, PropertyType.NEW_BUILD, PropertyType.SHARED_OWNERSHIP, PropertyType.RETIREMENT, PropertyType.STUDENT] as const),
-    propertyClassification: faker.helpers.arrayElement([propertyClassification.SEMI_DETACHED, propertyClassification.END_OF_TERRACE, propertyClassification.DETACHED, propertyClassification.TERRACED, propertyClassification.NON_WORKING_FARM, propertyClassification.WORKING_FARM] as const),
+    propertyClassification: faker.helpers.arrayElement([PropertyClassification.SEMI_DETACHED, PropertyClassification.END_OF_TERRACE, PropertyClassification.DETACHED, PropertyClassification.TERRACED, PropertyClassification.NON_WORKING_FARM, PropertyClassification.WORKING_FARM] as const),
     size: undefined,
     yearBuilt: faker.lorem.words(5),
     constructionType: faker.helpers.arrayElement([ConstructionType.STONE, ConstructionType.BRICK, ConstructionType.STANDARD] as const),
@@ -366,7 +405,7 @@ export function fakePropertyComplete() {
     id: faker.number.int({ max: 2147483647 }),
     propertyValue: undefined,
     propertyType: faker.helpers.arrayElement([PropertyType.HOUSE, PropertyType.COTTAGE, PropertyType.BUNGALOW, PropertyType.CONDO, PropertyType.PENTHOUSE, PropertyType.FLAT, PropertyType.LAND, PropertyType.NEW_BUILD, PropertyType.SHARED_OWNERSHIP, PropertyType.RETIREMENT, PropertyType.STUDENT] as const),
-    propertyClassification: faker.helpers.arrayElement([propertyClassification.SEMI_DETACHED, propertyClassification.END_OF_TERRACE, propertyClassification.DETACHED, propertyClassification.TERRACED, propertyClassification.NON_WORKING_FARM, propertyClassification.WORKING_FARM] as const),
+    propertyClassification: faker.helpers.arrayElement([PropertyClassification.SEMI_DETACHED, PropertyClassification.END_OF_TERRACE, PropertyClassification.DETACHED, PropertyClassification.TERRACED, PropertyClassification.NON_WORKING_FARM, PropertyClassification.WORKING_FARM] as const),
     size: undefined,
     yearBuilt: faker.lorem.words(5),
     constructionType: faker.helpers.arrayElement([ConstructionType.STONE, ConstructionType.BRICK, ConstructionType.STANDARD] as const),
@@ -375,13 +414,13 @@ export function fakePropertyComplete() {
     furnishingStatus: faker.helpers.arrayElement([FurnishingStatus.FURNISHED, FurnishingStatus.UNFURNISHED, FurnishingStatus.PART_FURNISHED] as const),
     tenure: faker.helpers.arrayElement([Tenure.LEASEHOLD, Tenure.FREEHOLD] as const),
     leaseTerm: undefined,
+    addressId: undefined,
     bedrooms: 3,
     bathrooms: 1,
     kitchens: 1,
     livingRooms: 1,
     diningRooms: 1,
-    agentId: undefined,
-    userId: undefined,
+    ownerId: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
@@ -391,7 +430,7 @@ export function fakeRunningCosts() {
     councilTaxBand: faker.lorem.words(5),
     serviceCharges: undefined,
     groundRent: undefined,
-    epc: faker.helpers.arrayElement([epcType.A, epcType.B, epcType.C, epcType.D, epcType.E, epcType.F, epcType.G] as const),
+    epc: faker.helpers.arrayElement([EpcType.A, EpcType.B, EpcType.C, EpcType.D, EpcType.E, EpcType.F, EpcType.G] as const),
     updatedAt: faker.date.anytime(),
   };
 }
@@ -401,7 +440,7 @@ export function fakeRunningCostsComplete() {
     councilTaxBand: faker.lorem.words(5),
     serviceCharges: undefined,
     groundRent: undefined,
-    epc: faker.helpers.arrayElement([epcType.A, epcType.B, epcType.C, epcType.D, epcType.E, epcType.F, epcType.G] as const),
+    epc: faker.helpers.arrayElement([EpcType.A, EpcType.B, EpcType.C, EpcType.D, EpcType.E, EpcType.F, EpcType.G] as const),
     propertyId: faker.number.int(),
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
@@ -449,45 +488,30 @@ export function fakeStorageFeaturesComplete() {
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeUser() {
+export function fakeUmbrella() {
   return {
-    firstName: undefined,
-    lastName: undefined,
-    username: undefined,
-    email: faker.internet.email(),
-    password: undefined,
-    addressLine1: undefined,
+    name: faker.person.fullName(),
+    businessName: faker.lorem.words(5),
+    addressLine1: faker.lorem.words(5),
     addressLine2: undefined,
-    city: undefined,
+    city: faker.lorem.words(5),
     county: undefined,
-    postcode: undefined,
-    country: undefined,
-    updatedAt: faker.date.anytime(),
-    activationToken: undefined,
-    activationExpires: undefined,
+    postcode: faker.lorem.words(5),
+    country: faker.lorem.words(5),
+    companyRegistration: faker.lorem.words(5),
   };
 }
-export function fakeUserComplete() {
+export function fakeUmbrellaComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    firstName: undefined,
-    lastName: undefined,
-    username: undefined,
-    email: faker.internet.email(),
-    password: undefined,
-    verified: verificationStatus.NO,
-    addressLine1: undefined,
+    name: faker.person.fullName(),
+    businessName: faker.lorem.words(5),
+    addressLine1: faker.lorem.words(5),
     addressLine2: undefined,
-    city: undefined,
+    city: faker.lorem.words(5),
     county: undefined,
-    postcode: undefined,
-    country: undefined,
-    agentId: undefined,
-    role: Role.USER,
-    createdAt: new Date(),
-    updatedAt: faker.date.anytime(),
-    activationToken: undefined,
-    activationExpires: undefined,
-    isActivated: false,
+    postcode: faker.lorem.words(5),
+    country: faker.lorem.words(5),
+    companyRegistration: faker.lorem.words(5),
   };
 }

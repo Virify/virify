@@ -52,7 +52,7 @@ function validateForm() {
 async function login() {
   if (validateForm()) {
     try {
-      const response: { status: number; body?: any } = await $fetch("/auth/user/login", {
+      const response: { status: number; body?: any } = await $fetch("/auth/owner/login", {
         method: "POST",
         body: {
           email: form.value.email,
@@ -66,6 +66,15 @@ async function login() {
         setTimeout(() => {
           notification.value = null;
           navigateTo("/account");
+        }, 2000);
+      } else if (response.status === 403) {
+        notification.value = "User is an agent! Redirecting to agent login...";
+        setTimeout(() => {
+          notification.value = null;
+          navigateTo("/agent/login");
+        }, 2000);
+        setTimeout(() => {
+          notification.value = null;
         }, 2000);
       } else if (response.body.error === "Password is incorrect") {
         notification.value = "Incorrect Password!";

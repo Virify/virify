@@ -14,24 +14,24 @@ export default defineEventHandler(async (event) => {
   }
 
   // Find the user by token and ensure the token is still valid
-  const user = await prisma.user.findFirst({
+  const user = await prisma.owner.findFirst({
     where: {
       activationToken: token as string,
     },
   });
 
   // if the user has a token but its expired send another email
-  if (user && user.activationExpires && new Date(user.activationExpires) < new Date()) {
+  if (user && user.tokenExpiry && new Date(user.tokenExpiry) < new Date()) {
     // generate new token
     const newToken = crypto.randomBytes(20).toString("hex");
     // update the user with the new token and expiry
-    await prisma.user.update({
+    await prisma.owner.update({
       where: {
         id: user.id,
       },
       data: {
         activationToken: newToken,
-        activationExpires: new Date(Date.now() + 3600000), // 1 hour
+        tokenExpiry: new Date(Date.now() + 3600000), // 1 hour
       },
     });
     // send email
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
   const hashedPassword = await hashPassword(password as string);
 
   // Update the user with the new password and set the account as activated
-  await prisma.user.update({
+  await prisma.owner.update({
     where: {
       id: user.id,
     },
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
       password: hashedPassword,
       isActivated: true,
       activationToken: null,
-      activationExpires: null,
+      tokenExpiry: null,
     },
   });
 

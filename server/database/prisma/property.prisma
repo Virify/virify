@@ -2,7 +2,7 @@ model Property {
   id                     Int                    @id @default(autoincrement())
   propertyValue          Float?
   propertyType           PropertyType
-  propertyClassification propertyClassification
+  propertyClassification PropertyClassification
   size                   Float?
   yearBuilt              String
   constructionType       ConstructionType
@@ -11,7 +11,8 @@ model Property {
   furnishingStatus       FurnishingStatus
   tenure                 Tenure
   leaseTerm              Int?
-  address                Address?
+  address                Address?               @relation(fields: [addressId], references: [id])
+  addressId              Int?                   @unique
   bedrooms               Int                    @default(3)
   bathrooms              Int                    @default(1)
   kitchens               Int                    @default(1)
@@ -29,14 +30,15 @@ model Property {
   amenities              AmenitiesFeature[]
   runningCosts           RunningCosts?
   media                  Media[]
-  agent                  Agent?                 @relation(fields: [agentId], references: [id])
-  agentId                Int?
-  User                   User?                  @relation(fields: [userId], references: [id])
-  userId                 Int?
+  owner                  Owner?                 @relation(fields: [ownerId], references: [id])
+  ownerId                Int?
+  agents                 Agent[]
   additionalFeatures     AdditionalFeatures[]
   listing                Listing?
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
+
+  @@index([ownerId])
 }
 
 enum PropertyType {
@@ -53,7 +55,7 @@ enum PropertyType {
   STUDENT
 }
 
-enum propertyClassification {
+enum PropertyClassification {
   SEMI_DETACHED
   END_OF_TERRACE
   DETACHED

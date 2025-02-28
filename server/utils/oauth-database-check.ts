@@ -1,13 +1,13 @@
-export default async function oauthDatabaseCheck(email: string, password?: string) {
+export default async function oauthDatabaseCheck(email: string) {
   try {
     // Check if the user already exists in the database
-    let dbUser = await prisma.user.findUnique({
+    let dbUser = await prisma.owner.findUnique({
       where: {
         email: email,
       },
     });
     if (!dbUser) {
-      dbUser = await prisma.user.create({
+      dbUser = await prisma.owner.create({
         data: {
           email: email,
         },
@@ -19,6 +19,7 @@ export default async function oauthDatabaseCheck(email: string, password?: strin
     }
 
     return dbUser;
+    
   } catch (error) {
     throw new Error(`Error finding or creating user: ${(error as Error).message}`);
   }

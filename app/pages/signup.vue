@@ -28,7 +28,7 @@ async function signup() {
   if (validateForm()) {
     isLoading.value = true;
     try {
-      const response: { status: number, body: any } = await $fetch("/auth/user/signup", {
+      const response: { status: number; body: any } = await $fetch("/auth/owner/signup", {
         method: "POST",
         body: {
           email: form.value.email,
@@ -71,12 +71,15 @@ async function signup() {
             </label>
             <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
           </div>
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-start gap-4">
             <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
               <span v-if="isLoading">Loading...</span>
               <span v-else>Signup</span>
             </button>
             <NuxtLink to="/login" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Login</NuxtLink>
+            <div class="flex justify-end w-full">
+              <NuxtLink to="/agent/signup" class="text-green-500 underline p-4" type="submit">Estate Agent? Sign up here!</NuxtLink>
+            </div>
           </div>
         </form>
       </div>

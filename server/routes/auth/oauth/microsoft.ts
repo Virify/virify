@@ -1,30 +1,8 @@
 export default defineOAuthMicrosoftEventHandler({
   async onSuccess(event, { user, tokens }) {
-    const dbUser = await oauthDatabaseCheck(user.mail, user.displayName);
+    const dbUser = await oauthDatabaseCheck(user.mail);
     // check if user is already loggedin
-    if (user.loggedIn) {
-      await replaceUserSession(event, {
-        user: {
-          id: dbUser.id,
-          email: dbUser.email,
-          username: dbUser.username || dbUser.email,
-        },
-        loggedIn: true,
-        loggedInAt: new Date(),
-        session: tokens.session,
-      });
-    } else {
-      await setUserSession(event, {
-        user: {
-          id: dbUser.id,
-          email: dbUser.email,
-          username: dbUser.username || dbUser.email,
-        },
-        loggedIn: true,
-        loggedInAt: new Date(),
-        session: tokens.session,
-      });
-    }
+    await setSession(event, dbUser, false);
     return sendRedirect(event, "/login?login=success");
   },
   // Optional, will return a json error and 401 status code by default

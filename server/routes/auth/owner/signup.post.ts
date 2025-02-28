@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const token = crypto.randomBytes(20).toString("hex");
 
   // Check if user already exists
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await prisma.owner.findUnique({
     where: {
       email: trimmedEmail,
     },
@@ -28,13 +28,13 @@ export default defineEventHandler(async (event) => {
 
     // If the user is not activated, generate a new token and send activation email
     const newToken = crypto.randomBytes(20).toString("hex");
-    await prisma.user.update({
+    await prisma.owner.update({
       where: {
         id: existingUser.id,
       },
       data: {
         activationToken: newToken,
-        activationExpires: new Date(Date.now() + 3600000), // 1 hour
+        tokenExpiry: new Date(Date.now() + 3600000), // 1 hour
       },
     });
 
@@ -57,11 +57,11 @@ export default defineEventHandler(async (event) => {
     }
   } else {
     await sendActivation(trimmedEmail, token);
-    await prisma.user.create({
+    await prisma.owner.create({
       data: {
         email: trimmedEmail,
         activationToken: token,
-        activationExpires: new Date(Date.now() + 3600000), // 1 hour
+        tokenExpiry: new Date(Date.now() + 3600000), // 1 hour
       },
     });
     return {

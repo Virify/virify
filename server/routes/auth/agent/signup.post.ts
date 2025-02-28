@@ -1,12 +1,16 @@
+import { OwnerRole } from '@prisma/client';
 export default defineEventHandler(async (event) => {
-  const { email, password, agentName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = await readBody(event);
+  const { email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = await readBody(event);
 
   // check if the agent exists
-  const dbAgent = await prisma.agent.findFirst({
+  const dbAgent = await prisma.owner.findFirst({
     where: {
-      OR: [{ email: email }, { name: agentName }, {companyRegistration: registrationNumber}],
+      OR: [{ email: email }, { businessName: businessName }, {companyRegistration: registrationNumber}],
     },
   });
+
+  // adding to test
+  const hashedPassword = await hashPassword('test');
 
   if (dbAgent) {
     return {
@@ -16,19 +20,19 @@ export default defineEventHandler(async (event) => {
       },
     };
   } else {
-    const hashedPassword = await hashPassword(password);
-    const agent = await prisma.agent.create({
+    const agent = await prisma.owner.create({
       data: {
         email: email,
         password: hashedPassword,
-        name: agentName,
-        contactInfo: mainContact,
+        businessName: businessName,
+        mainContact: mainContact,
         addressLine1: addressLine,
         city: city,
         county: county,
         country: country,
         postcode: postcode,
         companyRegistration: registrationNumber,
+        role: OwnerRole.AGENT,
       },
     });
 

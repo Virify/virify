@@ -1,28 +1,36 @@
 import { H3Event } from "h3";
+import { OwnerRole } from '@prisma/client';
 
-export async function loginUser(event: H3Event, email: string, password: string, userType: "user" | "agent") {
-  console.log(userType)
+export async function loginOwner(event: H3Event, email: string, password: string) {
   try {
-    // Trim and validate input
     const { trimmedEmail, trimmedPassword } = await loginFieldValidator(email, password);
 
-    // Find user or agent by email
-    const user = await (prisma[userType] as any).findUnique({
+    // Find owner by email - because its a agency owner
+    const owner = await prisma.owner.findUnique({
       where: {
         email: trimmedEmail,
       },
     });
 
-    if (!user) {
+    // if owner is not found
+    if (!owner) {
       return {
         status: 401,
         body: {
-          error: `Failed! ${userType.charAt(0).toUpperCase() + userType.slice(1)} not found`,
+          error: `Failed! user not found`,
         },
       };
     } else {
-      // this is a hack but I will always have a password...
-      const matchedPassword = await verifyPassword((user.password as string), trimmedPassword)
+      if(owner.role === OwnerRole.AGENT) {
+        return {
+          status: 403,
+          body: {
+            error: `Failed! User is an agent, please login as an agent`,
+          },
+        };
+      }
+      // Check password
+      const matchedPassword = await verifyPassword(owner.password as string, trimmedPassword);
 
       if (!matchedPassword) {
         return {
@@ -33,16 +41,8 @@ export async function loginUser(event: H3Event, email: string, password: string,
         };
       }
 
-      // If password is correct, set user session
-      await setUserSession(event, {
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username || user.email,
-        },
-        loggedIn: true,
-        loggedInAt: new Date(),
-      });
+      // set session with the ownner and isAgent = false
+      await setSession(event, owner, false);
 
       // Return success status
       return {
@@ -52,8 +52,63 @@ export async function loginUser(event: H3Event, email: string, password: string,
         },
       };
     }
+  } catch (error) {
+    return {
+      status: 500,
+      body: {
+        error: "Internal server error",
+      },
+    };
+  }
+}
 
-    // verify password
+export async function loginAgent(event: H3Event, email: string, password: string) {
+  try {
+    // Trim and validate input
+    const { trimmedEmail, trimmedPassword } = await loginFieldValidator(email, password);
+
+    // search the agent by owner email
+    const agent = await prisma.owner.findFirst({
+      include: {
+        agents: {
+          where: {
+            email: trimmedEmail,
+          },
+        },
+      },
+    });
+
+    // if agent is not found
+    if (!agent) {
+      return {
+        status: 401,
+        body: {
+          error: `Failed! agent not found`,
+        },
+      };
+    }
+
+    // check password
+    const matchedPassword = await verifyPassword(agent.password as string, trimmedPassword);
+
+    // if password is incorrect
+    if (!matchedPassword) {
+      return {
+        status: 401,
+        body: {
+          error: "Failed! Password is incorrect",
+        },
+      };
+    } else {
+      // set session with the ownner and isAgent = false
+      await setSession(event, agent, true);
+      return {
+        status: 200,
+        body: {
+          message: "Logged in successfully",
+        },
+      };
+    }
   } catch (error) {
     return {
       status: 500,

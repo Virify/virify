@@ -6,7 +6,7 @@ model Address {
   country    String
   latitude   Float?
   longitude  Float?
-  property   Property? @relation(fields: [propertyId], references: [id])
+  property   Property?
   propertyId Int?      @unique
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
