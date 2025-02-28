@@ -11,9 +11,12 @@ model Agent {
   listings           Listing[]
   passwordResetToken String?
   lastLogin          DateTime?
-  activationToken    String?
+  activationToken    String? @unique
   tokenExpiry        DateTime?
   isActivated        Boolean    @default(false)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  deletedAt          DateTime?
 
   @@index([ownerId])
 }

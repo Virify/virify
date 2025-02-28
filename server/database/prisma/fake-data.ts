@@ -61,6 +61,8 @@ export function fakeAgent() {
     lastLogin: undefined,
     activationToken: undefined,
     tokenExpiry: undefined,
+    updatedAt: faker.date.anytime(),
+    deletedAt: undefined,
   };
 }
 export function fakeAgentComplete() {
@@ -77,6 +79,9 @@ export function fakeAgentComplete() {
     activationToken: undefined,
     tokenExpiry: undefined,
     isActivated: false,
+    createdAt: new Date(),
+    updatedAt: faker.date.anytime(),
+    deletedAt: undefined,
   };
 }
 export function fakeAmenitiesFeature() {
@@ -329,6 +334,7 @@ export function fakeOwner() {
     deletedAt: undefined,
     activationToken: undefined,
     tokenExpiry: undefined,
+    updatedAt: faker.date.anytime(),
   };
 }
 export function fakeOwnerComplete() {
@@ -357,6 +363,8 @@ export function fakeOwnerComplete() {
     activationToken: undefined,
     tokenExpiry: undefined,
     isActivated: false,
+    createdAt: new Date(),
+    updatedAt: faker.date.anytime(),
   };
 }
 export function fakeParking() {
@@ -499,6 +507,7 @@ export function fakeUmbrella() {
     postcode: faker.lorem.words(5),
     country: faker.lorem.words(5),
     companyRegistration: faker.lorem.words(5),
+    updatedAt: faker.date.anytime(),
   };
 }
 export function fakeUmbrellaComplete() {
@@ -513,5 +522,8 @@ export function fakeUmbrellaComplete() {
     postcode: faker.lorem.words(5),
     country: faker.lorem.words(5),
     companyRegistration: faker.lorem.words(5),
+    verified: false,
+    createdAt: new Date(),
+    updatedAt: faker.date.anytime(),
   };
 }

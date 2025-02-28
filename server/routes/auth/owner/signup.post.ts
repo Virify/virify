@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   });
 
   if (existingUser) {
-    if (existingUser.isActivated && existingUser.role === OwnerRole.AGENT) {
+    if (existingUser.isActivated || existingUser.role === OwnerRole.AGENT) {
       return {
         status: 400,
         body: {
