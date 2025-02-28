@@ -28,7 +28,7 @@ export async function findAgent(email: string): Promise<Agent | null> {
  */
 export async function createOauthOwner(email: string): Promise<Owner> {
   return prisma.owner.create({ data: { email } });
-} 
+}
 
 /**
  * Check for the role of the user.

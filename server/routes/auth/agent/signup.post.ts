@@ -1,16 +1,27 @@
-import { OwnerRole } from '@prisma/client';
+import { OwnerRole } from "@prisma/client";
+// TODO: Refactor
 export default defineEventHandler(async (event) => {
   const { email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = await readBody(event);
 
   // check if the agent exists
   const dbAgent = await prisma.owner.findFirst({
     where: {
-      OR: [{ email: email }, { businessName: businessName }, {companyRegistration: registrationNumber}],
+      OR: [
+        {
+          email: email,
+        },
+        {
+          businessName: businessName,
+        },
+        {
+          companyRegistration: registrationNumber,
+        },
+      ],
     },
   });
 
   // adding to test
-  const hashedPassword = await hashPassword('test');
+  const hashedPassword = await hashPassword("test");
 
   if (dbAgent) {
     return {

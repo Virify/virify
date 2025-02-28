@@ -1,4 +1,5 @@
 export default defineEventHandler(async (event) => {
+  // TODO: Refactor this function to delete the owner account
   try {
     console.log("Deleting account...");
     // get the owner id from the session

@@ -11,15 +11,16 @@ export async function handleOAuthSuccess(event: H3Event, email: string) {
   try {
     // Check if the user already exists in the database
     const dbUser = await handleOAuthDatabase(email);
-    console.log("HERE");
-    console.log(dbUser.role);
+
     // Check if the user is an agent
     if (dbUser.role === OwnerRole.AGENT) {
       // Throw an error if the user is an agent
       throw new Error("Error: Agent login not allowed");
     }
+
     // Set the session and redirect to the login page
     await setSession(event, dbUser, false);
+
     // Redirect to the login page with a success message
     return sendRedirect(event, "/login?login=success");
   } catch (error) {
@@ -47,10 +48,12 @@ export function handleOAuthError(event: H3Event, error: any) {
 export async function handleOAuthDatabase(email: string) {
   // Check if the user already exists in the database
   let user = await findOwner(email);
+
   // If the user does not exist, create a new OAuth owner
   if (!user) {
     user = await createOauthOwner(email);
   }
+
   // Return the user object
   return user;
 }

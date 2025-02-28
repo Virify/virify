@@ -2,6 +2,7 @@ import { OwnerRole } from "@prisma/client";
 import crypto from "crypto";
 import sendActivation from "~~/server/utils/email/send-activation";
 
+// TODO FACTOR
 export default defineEventHandler(async (event) => {
   const { email } = await readBody(event);
 
@@ -44,8 +45,8 @@ export default defineEventHandler(async (event) => {
       await sendActivation(trimmedEmail, newToken);
       return {
         status: 400,
-        body: { 
-          error: "User exists but is not activated. Resending activation email..."
+        body: {
+          error: "User exists but is not activated. Resending activation email...",
         },
       };
     } catch (error) {

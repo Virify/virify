@@ -47,6 +47,9 @@ importers:
       pg:
         specifier: ^8.13.3
         version: 8.13.3
+      prettier:
+        specifier: ^3.5.2
+        version: 3.5.2
       vue:
         specifier: latest
         version: 3.5.13(typescript@5.7.3)
@@ -3708,6 +3711,11 @@ packages:
   preserve@0.2.0:
     resolution: {integrity: sha512-s/46sYeylUfHNjI+sA/78FAHlmIuKqI9wNnzEOGehAlUUYeObv5C2mOinXBjyUyWmJ2SfcS2/ydApH4hTF4WXQ==}
     engines: {node: '>=0.10.0'}
+
+  prettier@3.5.2:
+    resolution: {integrity: sha512-lc6npv5PH7hVqozBR7lkBNOGXV9vMwROAPlumdBkX0wTbbzPu/U1hk5yL8p2pt4Xoc+2mkT8t/sow2YrV/M5qg==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   pretty-bytes@6.1.1:
     resolution: {integrity: sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ==}
@@ -8758,6 +8766,8 @@ snapshots:
   postgres-range@1.1.4: {}
 
   preserve@0.2.0: {}
+
+  prettier@3.5.2: {}
 
   pretty-bytes@6.1.1: {}
 

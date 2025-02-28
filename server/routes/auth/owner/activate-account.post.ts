@@ -1,6 +1,6 @@
+// TODO: Refactor this file to use the new event handler
 export default defineEventHandler(async (event) => {
   const { password, token, email } = await readBody(event);
-  console.log(password, token, email);
   // Check if token, email, and password are provided
   if (token === undefined || email === undefined || password === undefined) {
     return {
@@ -31,7 +31,9 @@ export default defineEventHandler(async (event) => {
   if (user && user.tokenExpiry && new Date(user.tokenExpiry) < new Date()) {
     return {
       status: 400,
-      body: { error: "Failed! Token expired, Please try signing up again with your email to issue a new email" },
+      body: {
+        error: "Failed! Token expired, Please try signing up again with your email to issue a new email",
+      },
     };
   }
   // Check if the user exists and the token is valid
