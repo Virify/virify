@@ -27,11 +27,6 @@ export default defineNuxtConfig({
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       },
-      microsoft: {
-        clientId: process.env.MICROSOFT_CLIENT_ID,
-        clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-        tenant: process.env.MICROSOFT_TENANT_ID,
-      },
     },
     public: {
       redirectCookieName: "redirect",
