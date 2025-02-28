@@ -27,7 +27,7 @@ const activate = async () => {
       navigateTo("/login");
     }, 2000);
   } else {
-    notification.value = response.body.error;
+    notification.value = response.body.details;
     setTimeout(() => {
       notification.value = null;
     }, 2000);

@@ -1,81 +1,59 @@
-// TODO: Refactor this file to use the new event handler
+import { findOwnerByToken, activateUser } from "~~/server/utils/owner";
+
+/**
+ * Handles user activation by verifying the token and updating their password.
+ */
 export default defineEventHandler(async (event) => {
-  const { password, token, email } = await readBody(event);
-  // Check if token, email, and password are provided
-  if (token === undefined || email === undefined || password === undefined) {
-    return {
-      status: 400,
-      body: {
-        error: "Failed! Invalid request",
-      },
-    };
+  const { internalServerError, successResponse } = useResponse();
+
+  try {
+    // Extract request body parameters
+    const { password, token, email } = await readBody(event);
+
+    // Validate input
+    validateActivationRequest(token, email, password);
+
+    // Find the user by token and email
+    const user = await findOwnerByToken(token as string);
+
+    // Handle cases where the token is expired
+    handleExpiredToken(user);
+
+    // Ensure the user exists (when get from token)
+    if (!user) throw new Error("Failed! Token Invalid");
+
+    // Hash the new password securely
+    const hashedPassword = await hashPassword(password);
+
+    // Activate user by updating password and clearing activation token
+    await activateUser(user.id, hashedPassword);
+    
+    // Return success response
+    return successResponse("User activated");
+  } catch (error) {
+    console.log(error);
+    return internalServerError(error as Error);
   }
-
-  // Find the user by token and ensure the token is still valid
-  const user = await prisma.owner.findUnique({
-    where: {
-      activationToken: token as string,
-    },
-  });
-
-  // check if user is already activated
-  if (user && user.isActivated === true) {
-    return {
-      status: 400,
-      body: {
-        error: "Failed! User already activated",
-      },
-    };
-  }
-  // if the user has a token but its expired send another email
-  if (user && user.tokenExpiry && new Date(user.tokenExpiry) < new Date()) {
-    return {
-      status: 400,
-      body: {
-        error: "Failed! Token expired, Please try signing up again with your email to issue a new email",
-      },
-    };
-  }
-  // Check if the user exists and the token is valid
-  if (!user) {
-    return {
-      status: 400,
-      body: {
-        error: "Failed! Token invalid",
-      },
-    };
-  }
-
-  // Check if the user is already activated
-  if (user.isActivated) {
-    return {
-      status: 400,
-      body: {
-        error: "Failed! User already activated",
-      },
-    };
-  }
-
-  // Hash the new password
-  const hashedPassword = await hashPassword(password as string);
-
-  // Update the user with the new password and set the account as activated
-  await prisma.owner.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      password: hashedPassword,
-      isActivated: true,
-      activationToken: null,
-      tokenExpiry: null,
-    },
-  });
-
-  return {
-    status: 200,
-    body: {
-      message: "User activated",
-    },
-  };
 });
+
+/**
+ * Validates activation request parameters.
+ * Ensures that the token, email, and password are provided.
+ * @throws Error if any required parameter is missing
+ */
+function validateActivationRequest(token?: string, email?: string, password?: string) {
+  if (!token || !email || !password) {
+    throw new Error("Token, email, and password are required");
+  }
+}
+
+/**
+ * Checks if the activation token has expired.
+ * If expired, instructs the user to request a new activation email.
+ * @throws Error if the token is expired
+ */
+function handleExpiredToken(user: any) {
+  if (user?.tokenExpiry && new Date(user.tokenExpiry) < new Date()) {
+    throw new Error("Failed! Token expired. Please request a new activation email.");
+  }
+}

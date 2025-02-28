@@ -1,3 +1,5 @@
+import { handleOAuthError, handleOAuthSuccess } from "./oauth-handler";
+
 /**
  * Defines the OAuth event handler for Google.
  */

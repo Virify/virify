@@ -40,14 +40,14 @@ async function signup() {
           navigateTo("/login");
           notification.value = null;
         }, 2000);
-      } else {
-        notification.value = response.body.error;
+      } else if (response.body.error) {
+        notification.value = 'Error: ' + response.body.details;
         setTimeout(() => {
           notification.value = null;
         }, 3000);
       }
     } catch (error) {
-      notification.value = "Signup failed";
+      notification.value = (error as any).message
       setTimeout(() => {
         notification.value = null;
       }, 3000);
@@ -83,7 +83,7 @@ async function signup() {
           </div>
         </form>
       </div>
-      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('failed') }">
+      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('Error') }">
         {{ notification }}
       </div>
     </div>

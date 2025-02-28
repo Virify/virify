@@ -10,6 +10,16 @@ export async function findOwner(email: string): Promise<Owner | null> {
 }
 
 /**
+ * Finds an owner by email and activation token.
+ * @param email - The email of the owner to find.
+ * @param token - The activation token of the owner to find.
+ * @returns The owner object if found, otherwise null.
+ */
+export async function findOwnerByToken(token: string): Promise<Owner | null> {
+  return prisma.owner.findFirst({ where: { activationToken: token } });
+}
+
+/**
  * Finds an agent by email.
  * @param email - The email of the agent to find.
  * @returns The agent object if found, otherwise null.
@@ -35,9 +45,25 @@ export async function createOwnerWithToken(email: string, token: string): Promis
       tokenExpiry: new Date(Date.now() + 3600000),
     },
   });
-
 }
 
+/**
+ * Update Owner Password and Activation.
+ * @param userId number
+ * @param password string
+ * @returns Promise<Owner>
+ */
+export async function activateUser(userId: number, password: string): Promise<Owner> {
+  return prisma.owner.update({
+    where: { id: userId },
+    data: {
+      password,
+      isActivated: true,
+      activationToken: null,
+      tokenExpiry: null,
+    },
+  });
+}
 /**
  * Update Owner Token and Expiry.
  * @param email string
@@ -63,7 +89,7 @@ export async function createOauthOwner(email: string): Promise<Owner> {
 }
 
 /**
- * Check for the role of the user.
+ * Check for the role of the owner.
  * @param user Owner | Agent
  * @param role OwnerRole
  * @returns Boolean
@@ -71,7 +97,11 @@ export async function createOauthOwner(email: string): Promise<Owner> {
 export function hasRole(user: Owner | Agent, role: OwnerRole): boolean {
   return user.role === role;
 }
-
+/**
+ * Check if a owner is active.
+ * @param user Owner | Agent
+ * @returns Boolean
+ */
 export function isActive(user: Owner | Agent): boolean {
   return user.isActivated;
 }
