@@ -1,4 +1,3 @@
-import { H3Event } from "h3";
 import { OwnerRole } from "@prisma/client";
 
 /**
@@ -9,8 +8,8 @@ import { OwnerRole } from "@prisma/client";
  * @param isAgentLogin - A boolean indicating if the login is for an agent.
  * @returns A standardized HTTP response.
  */
-export async function authenticateUser(event: H3Event, email: string, password: string, isAgentLogin: boolean) {
-  const { unauthorizedResponse, forbiddenResponse, successResponse, internalServerError } = useResponse();
+export async function authenticateUser(email: string, password: string, isAgentLogin: boolean) {
+  const { unauthorizedResponse, forbiddenResponse, internalServerError } = useResponse();
 
   try {
     // Validate and trim the email and password
