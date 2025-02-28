@@ -3,9 +3,31 @@ const { user, loggedIn, session, clear } = useUserSession();
 definePageMeta({
   middleware: ["auth-redirect"],
 });
+
+const notification = ref<string | null>(null);
+
 async function logout() {
   await clear();
   navigateTo("/login");
+}
+
+async function deleteAccount() {
+  const response: { status: number; body?: any } = await $fetch("/auth/owner/delete", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (response.status === 200) {
+    notification.value = "Account deleted successfully! Redirecting to home page...";
+    setTimeout(() => {
+      clear();
+      notification.value = null;
+      navigateTo("/");
+    }, 2000);
+  } else {
+    notification.value = response.body.message;
+  }
 }
 </script>
 
@@ -14,7 +36,12 @@ async function logout() {
     <div v-if="loggedIn" class="bg-white shadow-md rounded-lg p-8 w-1/3">
       <h1 class="text-2xl font-bold mb-4">Welcome {{ user?.email }}!</h1>
       <p class="text-gray-600 mb-4">Logged in since {{ session.loggedInAt }}</p>
-      <button @click="logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Logout</button>
+      <div class="flex justify-between">
+        <button @click="logout" class="bg-green-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Logout</button>
+        <button @click="deleteAccount" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Delete</button>
+      </div>
+
+      <div v-if="notification" class="text-green-600 pt-6">{{ notification }}</div>
     </div>
   </div>
 </template>
