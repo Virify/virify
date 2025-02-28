@@ -1,5 +1,6 @@
 import { OwnerRole } from "@prisma/client";
 import crypto from "crypto";
+import sendActivation from "~~/server/utils/email/send-activation";
 
 export default defineEventHandler(async (event) => {
   const { email } = await readBody(event);

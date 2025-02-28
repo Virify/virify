@@ -1,8 +1,10 @@
 import { render } from "@vue-email/render";
-import activationEmail from "../routes/email/emails/signup-activation.vue";
+import SignupActivation from '../../routes/email/templates/signup-activation.vue';
+import emailSender from "./email-sender";
+
 export default async function sendActivation(email: string, token: string) {
   // get the vue email template
-  const emailToSend = activationEmail;
+  const emailToSend = SignupActivation;
   // render the email to html
   const emailHtml = await render(emailToSend, {
     token,

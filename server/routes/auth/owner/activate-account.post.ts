@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import sendActivation from "~~/server/utils/email/send-activation";
 
 export default defineEventHandler(async (event) => {
   const { password, token, email } = await readBody(event);
