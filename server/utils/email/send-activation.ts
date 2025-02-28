@@ -12,7 +12,7 @@ export default async function sendActivation(email: string, token: string) {
     baseUrl: process.env.EMAIL_BASE_URL || '',
   });
   // set the email subject etc
-  const subject = "Welcome to Virify - Activate Required!";
+  const subject = "Welcome to Virify - Activatation Required!";
   const html = emailHtml;
   const to = email;
 
