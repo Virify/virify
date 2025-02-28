@@ -37,7 +37,7 @@ async function signup() {
       if (response.status === 200) {
         notification.value = "Signup successful! Please check your email for an activation link";
         setTimeout(() => {
-          navigateTo("/owner/login");
+          navigateTo("/login");
           notification.value = null;
         }, 2000);
       } else {
