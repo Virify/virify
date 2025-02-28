@@ -1,4 +1,4 @@
-import { Agent, Owner } from "@prisma/client";
+import { Agent, Owner, OwnerRole } from "@prisma/client";
 
 /**
  * Finds an owner by email.
@@ -19,4 +19,23 @@ export async function findAgent(email: string): Promise<Agent | null> {
     include: { agents: { where: { email } } },
   });
   return agentData?.agents?.[0] || null;
+}
+
+/**
+ * Create an owner with the given email.
+ * @param email string
+ * @returns Promise<Owner>
+ */
+export async function createOauthOwner(email: string): Promise<Owner> {
+  return prisma.owner.create({ data: { email } });
+} 
+
+/**
+ * Check for the role of the user.
+ * @param user Owner | Agent
+ * @param role OwnerRole
+ * @returns Boolean
+ */
+export function hasRole(user: Owner | Agent, role: OwnerRole): boolean {
+  return user.role === role;
 }

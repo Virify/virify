@@ -1,13 +1,24 @@
+/**
+ * Defines the OAuth event handler for Microsoft.
+ */
 export default defineOAuthMicrosoftEventHandler({
+  /**
+   * Handles the successful OAuth login.
+   * @param event - The H3 event object.
+   * @param user - The user object returned from the OAuth provider.
+   * @param tokens - The tokens returned from the OAuth provider.
+   * @returns A Promise that resolves to a redirect response.
+   */
   async onSuccess(event, { user, tokens }) {
-    const dbUser = await oauthDatabaseCheck(user.mail);
-    // check if user is already loggedin
-    await setSession(event, dbUser, false);
-    return sendRedirect(event, "/login?login=success");
+    return handleOAuthSuccess(event, user.mail);
   },
-  // Optional, will return a json error and 401 status code by default
+  /**
+   * Handles OAuth login errors.
+   * @param event - The H3 event object.
+   * @param error - The error object.
+   * @returns A redirect response with the error message.
+   */
   onError(event, error) {
-    console.error("Microsoft OAuth Error:", error);
-    return sendRedirect(event, "/login");
+    return handleOAuthError(event, error);
   },
 });

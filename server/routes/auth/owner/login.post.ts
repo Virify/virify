@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
     // return successResponse("Logged in successfully");
   } catch (error) {
     // Return an internal server error response in case of an exception
+    // TODO: Add status codes to the error messages
     return internalServerError(error as Error);
   }
 });

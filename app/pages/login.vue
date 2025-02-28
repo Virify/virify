@@ -26,6 +26,11 @@ onMounted(() => {
       notification.value = null;
       navigateTo("/account");
     }, 2000);
+  } else if (route.query.error === "agent") {
+    notification.value = "Error: Agent login required";
+    setTimeout(() => {
+      notification.value = null;
+    }, 2000);
   }
 });
 
@@ -68,10 +73,9 @@ async function login() {
           navigateTo("/account");
         }, 3000);
       } else if (response.body.details.includes("Forbidden")) {
-        notification.value = "Error: " + response.body.details + ". Redirecting to login page...";
+        notification.value = "Error: Agent login required";
         setTimeout(() => {
           notification.value = null;
-          navigateTo("/agent/login");
         }, 3000);
       } else if (response.body.error) {
         notification.value = "Error: " + response.body.details;
@@ -122,7 +126,7 @@ async function login() {
         </form>
         <div class="flex items-center justify-start gap-3 mt-4"></div>
       </div>
-      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold max-w-xs w-full" :class="{ 'bg-red-500': notification.includes('Error') }">
+      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white text-center rounded font-bold max-w-xs w-full" :class="{ 'bg-red-500': notification.includes('Error') }">
         {{ notification }}
       </div>
     </div>

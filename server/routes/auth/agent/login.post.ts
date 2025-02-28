@@ -1,18 +1,22 @@
 /**
- * Handles the login request for agents.
+ * Handles the login request for owners.
  * @param event - The H3 event object.
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
-  const { internalServerError } = useResponse();
+  const { internalServerError, successResponse } = useResponse();
   // Extract email and password from the request body
   const { email, password } = await readBody(event);
   try {
-    // Call the login function with the extracted email and password, and specify that this is an agent login
-    const authenticataedUser = await authenticateUser(email, password, true);
-    return await loginUser(event, authenticataedUser, true);
-  } catch {
+    // Authenticate the user
+    const user = await authenticateUser(email, password, true);
+    // Call the login function with the extracted email and password, and specify that this is not an agent login
+    await loginUser(event, user, false);
+    // Return a success response
+    return successResponse("Logged in successfully");
+    // return successResponse("Logged in successfully");
+  } catch (error) {
     // Return an internal server error response in case of an exception
-    return internalServerError();
+    return internalServerError(error as Error);
   }
 });
