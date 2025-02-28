@@ -1,0 +1,32 @@
+import { OwnerRole } from "@prisma/client";
+
+/**
+ * Authenticates the user by validating email and password.
+ * @param event - The H3 event object.
+ * @param email - The email of the user attempting to log in.
+ * @param password - The password of the user attempting to log in.
+ * @param isAgentLogin - A boolean indicating if the login is for an agent.
+ * @returns A User.
+ */
+export async function authenticateUser(email: string, password: string, isAgentLogin: boolean) {
+  // Validate and trim the email and password
+  const { trimmedEmail, trimmedPassword } = await loginFieldValidator(email, password);
+
+  // Find the user based on the login type (agent or owner)
+  const user = isAgentLogin ? await findAgent(trimmedEmail) : await findOwner(trimmedEmail);
+
+  // If user is not found, return an unauthorized response
+  if (!user) throw new Error("User not found");
+
+  // If the login is not for an agent and the user is an agent, return a forbidden response
+  if (!isAgentLogin && user.role === OwnerRole.AGENT) {
+    throw new Error("Forbidden: Agent login not allowed");
+  }
+
+  // Verify the password
+  const passwordVerified = await verifyPassword(user.password as string, trimmedPassword);
+  if (!passwordVerified) throw new Error("Password is incorrect");
+
+  // Return the authenticated user
+  return user;
+}

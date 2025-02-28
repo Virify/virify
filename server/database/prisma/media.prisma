@@ -1,6 +1,5 @@
 model Media {
   id         Int      @id @default(autoincrement())
-  // This should link to a image table
   images     String
   videoTour  String
   floorPlans String

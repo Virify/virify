@@ -24,12 +24,7 @@ onMounted(() => {
     notification.value = "Logged in successfully! Redirecting to account page...";
     setTimeout(() => {
       notification.value = null;
-      navigateTo("/account");
-    }, 2000);
-  } else if (route.query.error === "agent") {
-    notification.value = "Error: Agent login required";
-    setTimeout(() => {
-      notification.value = null;
+      navigateTo("agent/review");
     }, 2000);
   }
 });
@@ -57,7 +52,7 @@ function validateForm() {
 async function login() {
   if (validateForm()) {
     try {
-      const response: { status: number; body?: any } = await $fetch("/auth/owner/login", {
+      const response: { status: number; body?: any } = await $fetch("/auth/agent/login", {
         method: "POST",
         body: {
           email: form.value.email,
@@ -67,24 +62,24 @@ async function login() {
 
       if (response.status === 200) {
         useUserSession().fetch();
-        notification.value = response.body.message;
+        notification.value = "Logged in successfully! Redirecting to account page...";
         setTimeout(() => {
           notification.value = null;
-          navigateTo("/account");
-        }, 3000);
-      } else if (response.body.details.includes("Forbidden")) {
-        notification.value = "Error: Agent login required";
+          navigateTo("/agent/review");
+        }, 2000);
+      } else if (response.body.error === "Password is incorrect") {
+        notification.value = "Incorrect Password!";
         setTimeout(() => {
           notification.value = null;
-        }, 3000);
-      } else if (response.body.error) {
-        notification.value = "Error: " + response.body.details;
+        }, 2000);
+      } else if (response.status === 401) {
+        notification.value = response.body.error;
         setTimeout(() => {
           notification.value = null;
         }, 2000);
       }
     } catch (error) {
-      notification.value = (error as any).message;
+      notification.value = "Login failed!";
       setTimeout(() => {
         notification.value = null;
       }, 2000);
@@ -94,20 +89,20 @@ async function login() {
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
-      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-6 text-green-500">Login</h1>
+  <div class="flex justify-center items-center h-screen bg-purple-500">
+    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs: w-full sm:w-1/2">
+      <div class="w-3/4 p-8 xs: w-full sm:w-3/4">
+        <h1 class="text-3xl font-bold mb-6 text-purple-500">Agent Login</h1>
         <form @submit.prevent="login">
           <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="email"
+            <label class="block text-purple-500 text-sm font-bold mb-2" for="email"
               >Email:
               <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
             </label>
             <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
           </div>
           <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="password"
+            <label class="block text-purple-500 text-sm font-bold mb-2" for="password"
               >Password:
               <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
             </label>
@@ -115,24 +110,22 @@ async function login() {
           </div>
           <div class="flex items-center justify-between gap-3 mt-4 w-full flex-wrap">
             <div class="flex items-center justify-start gap-3 flex-wrap">
-              <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
-              <NuxtLink external to="/auth/oauth/google" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Google</NuxtLink>
-              <NuxtLink external to="/auth/oauth/microsoft" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Microsoft</NuxtLink>
+              <button class="bg-purple-500 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
             </div>
             <div class="flex items-center justify-end gap-3 flex-wrap">
-              <NuxtLink to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">Signup</NuxtLink>
+              <NuxtLink to="/agent/signup" class="bg-purple-500 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">Signup</NuxtLink>
             </div>
           </div>
         </form>
         <div class="flex items-center justify-start gap-3 mt-4"></div>
       </div>
-      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white text-center rounded font-bold max-w-xs w-full" :class="{ 'bg-red-500': notification.includes('Error') }">
+      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-purple-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('Failed') }">
         {{ notification }}
       </div>
     </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
+    <div class="flex flex-col justify-center items-center w-1/2 bg-purple-500 h-screen xs: hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
-      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
+      <h2 class="text-white text-5xl italic p-4 text-center">For Agents</h2>
     </div>
   </div>
 </template>

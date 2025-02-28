@@ -1,8 +1,9 @@
 import { faker } from "@faker-js/faker";
 
 import {
-  fakeUser,
+  fakeOwner,
   fakeProperty,
+  fakeAgent,
   fakeListing,
   fakeParking,
   fakeSecurityFeatures,
@@ -19,13 +20,14 @@ import {
   fakeAddress,
 } from "../database/prisma/fake-data";
 
-// a basic seeder that will seen user/property/listing data
+// a basic seeder that will seed user/property/listing data
 export default defineEventHandler(async (event) => {
-  const userType = fakeUser();
-  const PropertyType = fakeProperty();
+  const userType = fakeOwner();
+  const agentType = fakeAgent();
+  const propertyType = fakeProperty();
   const addressType = fakeAddress();
   const parkingType = fakeParking();
-  const secrutiyFeaturesType = fakeSecurityFeatures();
+  const securityFeaturesType = fakeSecurityFeatures();
   const kitchenFeaturesType = fakeKitchenFeatures();
   const livingAreaFeaturesType = fakeLivingAreaFeatures();
   const bathroomFeaturesType = fakeBathroomFeatures();
@@ -38,117 +40,198 @@ export default defineEventHandler(async (event) => {
   const diningroomType = fakeDiningroomFeatures();
 
   try {
-    // Create user with address
-    const buildUser = await prisma.user.create({
+    // Create owner with address
+    const buildUser = await prisma.owner.create({
       data: {
-       ...userType,
-        property: {
+        ...userType,
+        properties: {
           create: {
-            ...PropertyType,
-            media: {
-              create: {
-                ...mediaType,
-              },
-            },
-            address: {
-              create: {
-                ...addressType
-              },
-            },
-            bedroomFeatures: {
-              create: [{ ...bedroomFeaturesType }, { ...bedroomFeaturesType }],
-            },
-            livingAreaFeatures: {
-              create: [{ ...livingAreaFeaturesType }, { ...livingAreaFeaturesType }],
-            },
-            bathroomFeatures: {
-              create: [{ ...bathroomFeaturesType }, { ...bathroomFeaturesType }],
-            },
-            diningroomFeatures: {
-              create: [{ ...diningroomType }, { ...diningroomType }],
-            },
-            kitchenFeatures: {
-              create: {
-                ...kitchenFeaturesType,
-              },
-            },
-            outdoorSpace: {
-              create: {
-                ...outdoorSpaceFeaturesType,
-              },
-            },
-            storageFeatures: {
-              create: {
-                ...storageFeaturesType,
-              },
-            },
-            securityFeatures: {
-              create: {
-                ...secrutiyFeaturesType,
-              },
-            },
-            parking: {
-              create: {
-                ...parkingType,
-              },
-            },
-            runningCosts: {
-              create: {
-                ...runningCostsType,
-              },
-            },
-            amenities: {
-              create: {
-                ...amenitiesType,
-              },
-            },
+            ...propertyType,
           },
+        },
+        agents: {
+          create: [
+            {
+              firstName: undefined,
+              lastName: undefined,
+              email: faker.internet.email(),
+              password: undefined,
+              passwordResetToken: undefined,
+              lastLogin: undefined,
+              activationToken: undefined,
+              tokenExpiry: undefined,
+              properties: {
+                create: {
+                  ...propertyType,
+                  media: {
+                    create: {
+                      ...mediaType,
+                    },
+                  },
+                  address: {
+                    create: {
+                      ...addressType,
+                    },
+                  },
+                  bedroomFeatures: {
+                    create: [{ ...bedroomFeaturesType }, { ...bedroomFeaturesType }],
+                  },
+                  livingAreaFeatures: {
+                    create: [{ ...livingAreaFeaturesType }, { ...livingAreaFeaturesType }],
+                  },
+                  bathroomFeatures: {
+                    create: [{ ...bathroomFeaturesType }, { ...bathroomFeaturesType }],
+                  },
+                  diningroomFeatures: {
+                    create: [{ ...diningroomType }, { ...diningroomType }],
+                  },
+                  kitchenFeatures: {
+                    create: {
+                      ...kitchenFeaturesType,
+                    },
+                  },
+                  outdoorSpace: {
+                    create: {
+                      ...outdoorSpaceFeaturesType,
+                    },
+                  },
+                  storageFeatures: {
+                    create: {
+                      ...storageFeaturesType,
+                    },
+                  },
+                  securityFeatures: {
+                    create: {
+                      ...securityFeaturesType,
+                    },
+                  },
+                  parking: {
+                    create: {
+                      ...parkingType,
+                    },
+                  },
+                  runningCosts: {
+                    create: {
+                      ...runningCostsType,
+                    },
+                  },
+                  amenities: {
+                    create: {
+                      ...amenitiesType,
+                    },
+                  },
+                },
+              },
+            },
+            {
+              firstName: undefined,
+              lastName: undefined,
+              email: faker.internet.email(),
+              password: undefined,
+              passwordResetToken: undefined,
+              lastLogin: undefined,
+              activationToken: undefined,
+              tokenExpiry: undefined,
+              properties: {
+                create: {
+                  ...propertyType,
+                  media: {
+                    create: {
+                      ...mediaType,
+                    },
+                  },
+                  address: {
+                    create: {
+                      ...addressType,
+                    },
+                  },
+                  bedroomFeatures: {
+                    create: [{ ...bedroomFeaturesType }, { ...bedroomFeaturesType }],
+                  },
+                  livingAreaFeatures: {
+                    create: [{ ...livingAreaFeaturesType }, { ...livingAreaFeaturesType }],
+                  },
+                  bathroomFeatures: {
+                    create: [{ ...bathroomFeaturesType }, { ...bathroomFeaturesType }],
+                  },
+                  diningroomFeatures: {
+                    create: [{ ...diningroomType }, { ...diningroomType }],
+                  },
+                  kitchenFeatures: {
+                    create: {
+                      ...kitchenFeaturesType,
+                    },
+                  },
+                  outdoorSpace: {
+                    create: {
+                      ...outdoorSpaceFeaturesType,
+                    },
+                  },
+                  storageFeatures: {
+                    create: {
+                      ...storageFeaturesType,
+                    },
+                  },
+                  securityFeatures: {
+                    create: {
+                      ...securityFeaturesType,
+                    },
+                  },
+                  parking: {
+                    create: {
+                      ...parkingType,
+                    },
+                  },
+                  runningCosts: {
+                    create: {
+                      ...runningCostsType,
+                    },
+                  },
+                  amenities: {
+                    create: {
+                      ...amenitiesType,
+                    },
+                  },
+                },
+              },
+            },
+          ],
         },
       },
     });
 
     // Fetch the user with the address, properties, and listings
-    const user = await prisma.user.findUnique({
+    const user = await prisma.owner.findUnique({
       where: { id: buildUser.id },
       include: {
-        property: {
+        properties: true,
+        agents: {
           include: {
-            media: true,
-            address: true,
-            livingAreaFeatures: true,
-            bathroomFeatures: true,
-            kitchenFeatures: true,
-            bedroomFeatures: true,
-            diningroomFeatures: true,
-            outdoorSpace: true,
-            storageFeatures: true,
-            securityFeatures: true,
-            parking: true,
-            runningCosts: true,
-            amenities: true,
+            properties: {
+              include: {
+                media: true,
+                address: true,
+                livingAreaFeatures: true,
+                bathroomFeatures: true,
+                kitchenFeatures: true,
+                bedroomFeatures: true,
+                diningroomFeatures: true,
+                outdoorSpace: true,
+                storageFeatures: true,
+                securityFeatures: true,
+                parking: true,
+                runningCosts: true,
+                amenities: true,
+              },
+            },
           },
         },
         listings: true,
       },
     });
 
-    // find a property with a bathtub
-    const propertyWithBathtub = await prisma.property.findFirst({
-     include: {
-       bathroomFeatures: true,
-     },
-     where: {
-        bathroomFeatures: {
-          some: {
-            bathtub: true,
-          },
-        },
-      },
-    });
-
     return {
-      user: user,
-      propertyWithBathtub: propertyWithBathtub
+      owner: user,
     };
   } catch (error) {
     return {

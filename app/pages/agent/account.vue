@@ -8,7 +8,7 @@ const notification = ref<string | null>(null);
 
 async function logout() {
   await clear();
-  navigateTo("/login");
+  navigateTo("/agent/login");
 }
 
 async function deleteAccount() {
@@ -23,7 +23,7 @@ async function deleteAccount() {
     setTimeout(() => {
       clear();
       notification.value = null;
-      navigateTo("/");
+      navigateTo("/agent");
     }, 2000);
   } else {
     notification.value = response.body.message;

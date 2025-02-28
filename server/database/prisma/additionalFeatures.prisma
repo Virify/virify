@@ -1,8 +1,8 @@
 model AdditionalFeatures {
   id                    Int                       @id @default(autoincrement())
   investmentPotential   String
-  petPolicy             String
-  accessibilityFeatures accessibilityFeaturesType
+  petPolicy             PetPolicyType
+  accessibilityFeatures AccessibilityFeaturesType
   moveInDate            DateTime
   propertyId            Int                       @unique
   property              Property                  @relation(fields: [propertyId], references: [id])
@@ -10,7 +10,7 @@ model AdditionalFeatures {
   updatedAt             DateTime                  @updatedAt
 }
 
-enum accessibilityFeaturesType {
+enum AccessibilityFeaturesType {
   WHEELCHAIR_ACCESSIBLE
   WHEELCHAIR_RAMP
   ELEVATOR
@@ -19,7 +19,7 @@ enum accessibilityFeaturesType {
   OTHER
 }
 
-enum petPolicyType {
+enum PetPolicyType {
   ALLOWED
   NOT_ALLOWED
 }

@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { Body } from '#components';
-
-
 const form = ref({
   email: "",
-  password: "",
 });
 
 const errors = ref({
   email: null as string | null,
-  password: null as string | null,
 });
 
 const notification = ref<string | null>(null);
+const isLoading = ref(false);
 
 function validateForm() {
   let isValid = true;
@@ -25,30 +21,24 @@ function validateForm() {
   } else {
     errors.value.email = null;
   }
-  if (!form.value.password) {
-    errors.value.password = "Password is required";
-    isValid = false;
-  } else {
-    errors.value.password = null;
-  }
   return isValid;
 }
+
 async function signup() {
   if (validateForm()) {
+    isLoading.value = true;
     try {
-      const response: { status: number, body: any } = await $fetch("/auth/signup", {
+      const response: { status: number; body: any } = await $fetch("/auth/owner/signup", {
         method: "POST",
         body: {
           email: form.value.email,
-          password: form.value.password,
         },
       });
-      useUserSession().fetch();
-      if (response.status === 201) {
-        notification.value = "Signup successful! Redirecting to login page...";
+      if (response.status === 200) {
+        notification.value = "Signup successful! Please check your email for an activation link";
         setTimeout(() => {
-          notification.value = null;
           navigateTo("/login");
+          notification.value = null;
         }, 2000);
       } else {
         notification.value = response.body.error;
@@ -57,10 +47,12 @@ async function signup() {
         }, 3000);
       }
     } catch (error) {
-      notification.value = "Signup failed!";
+      notification.value = "Signup failed";
       setTimeout(() => {
         notification.value = null;
       }, 3000);
+    } finally {
+      isLoading.value = false;
     }
   }
 }
@@ -68,8 +60,8 @@ async function signup() {
 
 <template>
   <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs: w-full sm:w-1/2">
-      <div class="w-3/4 p-8 xs: w-full sm:w-3/4">
+    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
+      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
         <h1 class="text-3xl font-bold mb-6 text-green-500">Signup</h1>
         <form @submit.prevent="signup">
           <div class="mb-6">
@@ -79,24 +71,23 @@ async function signup() {
             </label>
             <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
           </div>
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="password"
-              >Password:
-              <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
-            </label>
-            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-          </div>
-          <div class="flex items-center justify-between">
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Signup</button>
+          <div class="flex items-center justify-start gap-4">
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+              <span v-if="isLoading">Loading...</span>
+              <span v-else>Signup</span>
+            </button>
             <NuxtLink to="/login" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Login</NuxtLink>
+            <div class="flex justify-end w-full">
+              <NuxtLink to="/agent/signup" class="text-green-500 underline p-4" type="submit">Estate Agent? Sign up here!</NuxtLink>
+            </div>
           </div>
         </form>
       </div>
-      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('Failed') }">
+      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('failed') }">
         {{ notification }}
       </div>
     </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs: hidden sm:flex">
+    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
       <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
     </div>

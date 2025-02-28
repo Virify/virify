@@ -3,14 +3,14 @@ model RunningCosts {
   councilTaxBand String
   serviceCharges Float?
   groundRent     Float?
-  epc            epcType
+  epc            EpcType
   propertyId     Int       @unique
   property       Property? @relation(fields: [propertyId], references: [id])
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
 
-enum epcType {
+enum EpcType {
   A
   B
   C

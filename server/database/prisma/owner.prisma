@@ -1,0 +1,39 @@
+model Owner {
+  id                  Int        @id @default(autoincrement())
+  firstName           String?
+  lastName            String?
+  username            String?    @unique
+  email               String     @unique
+  mainContact         String?
+  password            String?
+  verified            Boolean    @default(false)
+  businessName        String?
+  addressLine1        String?
+  addressLine2        String?
+  city                String?
+  county              String?
+  postcode            String?
+  country             String?
+  companyRegistration String?     @unique
+  umbrella            Umbrella?   @relation(fields: [umbrellaId], references: [id])
+  umbrellaId          Int?
+  properties          Property[]
+  listings            Listing[]
+  agents              Agent[]
+  role                OwnerRole @default(USER)
+  passwordResetToken  String?
+  lastLogin           DateTime?
+  deletedAt           DateTime?
+  activationToken     String? @unique
+  tokenExpiry         DateTime?
+  isActivated         Boolean    @default(false)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@index([umbrellaId])
+}
+
+enum OwnerRole {
+  USER
+  AGENT
+}
