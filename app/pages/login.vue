@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-
 const route = useRoute();
-const router = useRouter();
 
 definePageMeta({
   title: "Login",
@@ -28,7 +24,7 @@ onMounted(() => {
     notification.value = "Logged in successfully! Redirecting to account page...";
     setTimeout(() => {
       notification.value = null;
-      router.push("/account");
+      navigateTo("/account");
     }, 2000);
   }
 });
@@ -69,21 +65,16 @@ async function login() {
         notification.value = response.body.message;
         setTimeout(() => {
           notification.value = null;
-          router.push("/account");
-        }, 2000);
-      } else if (response.status === 403) {
-        notification.value = response.body.details;
+          navigateTo("/account");
+        }, 3000);
+      } else if (response.body.details.includes("Forbidden")) {
+        notification.value = "Error: " + response.body.details + ". Redirecting to login page...";
         setTimeout(() => {
           notification.value = null;
-          router.push("/agent/login");
-        }, 2000);
+          navigateTo("/agent/login");
+        }, 3000);
       } else if (response.body.error) {
-        notification.value = response.body.details;
-        setTimeout(() => {
-          notification.value = null;
-        }, 2000);
-      } else if (response.status === 401) {
-        notification.value = response.body.details;
+        notification.value = "Error: " + response.body.details;
         setTimeout(() => {
           notification.value = null;
         }, 2000);
@@ -131,7 +122,7 @@ async function login() {
         </form>
         <div class="flex items-center justify-start gap-3 mt-4"></div>
       </div>
-      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold" :class="{ 'bg-red-500': notification.includes('Failed') }">
+      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white rounded font-bold max-w-xs w-full" :class="{ 'bg-red-500': notification.includes('Error') }">
         {{ notification }}
       </div>
     </div>
