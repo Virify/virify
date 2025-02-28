@@ -20,7 +20,15 @@ export default defineEventHandler(async (event) => {
       activationToken: token as string,
     },
   });
-
+  // check if user is already activated
+  if (user && user.isActivated) {
+    return {
+      status: 400,
+      body: {
+        error: "Failed! User already activated",
+      },
+    };
+  }
   // if the user has a token but its expired send another email
   if (user && user.tokenExpiry && new Date(user.tokenExpiry) < new Date()) {
     // generate new token
@@ -70,6 +78,7 @@ export default defineEventHandler(async (event) => {
   await prisma.owner.update({
     where: {
       id: user.id,
+      isActivated: true,
     },
     data: {
       password: hashedPassword,
