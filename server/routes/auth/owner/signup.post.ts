@@ -1,3 +1,4 @@
+import { OwnerRole } from "@prisma/client";
 import crypto from "crypto";
 
 export default defineEventHandler(async (event) => {
@@ -17,11 +18,11 @@ export default defineEventHandler(async (event) => {
   });
 
   if (existingUser) {
-    if (existingUser.isActivated) {
+    if (existingUser.isActivated && existingUser.role === OwnerRole.AGENT) {
       return {
         status: 400,
         body: {
-          error: "Signup failed! User already exists",
+          error: "Signup failed! User already exists or is an agent",
         },
       };
     }
