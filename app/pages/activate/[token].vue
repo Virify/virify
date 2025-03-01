@@ -22,15 +22,10 @@ const activate = async () => {
   });
   // if there is an error, display the error message
   if (response.status === 200) {
-    notification.value = "Successfully activated your account! Redirecting to login page...";
-    setTimeout(() => {
-      navigateTo("/login");
-    }, 2000);
+    console.log("Successfully activated your account! Redirecting to login page...");
+    navigateTo("/login");
   } else {
     notification.value = response.body.details;
-    setTimeout(() => {
-      notification.value = null;
-    }, 2000);
   }
 };
 // validate the form

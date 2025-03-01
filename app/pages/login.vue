@@ -22,23 +22,14 @@ const notification = ref<string | null>(null);
 
 onMounted(() => {
   if (loggedIn.value) {
-    notification.value = "Already logged in! Redirecting to account page...";
-    setTimeout(() => {
-      notification.value = null;
-      navigateTo("/account");
-    }, 2000);
+    console.log("Already logged in! Redirecting to account page...");
+    navigateTo("/account");
   }
   if (route.query.login === "success") {
-    notification.value = "Logged in successfully! Redirecting to account page...";
-    setTimeout(() => {
-      notification.value = null;
-      navigateTo("/account");
-    }, 2000);
+    console.log("Logged in successfully! Redirecting to account page...");
+    navigateTo("/account");
   } else if (route.query.error === "agent") {
     notification.value = "Error: Agent login required";
-    setTimeout(() => {
-      notification.value = null;
-    }, 2000);
   }
 });
 
@@ -75,27 +66,15 @@ async function login() {
 
       if (response.status === 200) {
         await fetch();
-        notification.value = "Logged in successfully! Redirecting to account page...";
-        setTimeout(() => {
-          notification.value = null;
-          navigateTo("/account");
-        }, 2000);
+        console.log("Logged in successfully! Redirecting to account page...");
+        navigateTo("/account");
       } else if (response.body.details.includes("Forbidden")) {
         notification.value = "Error: Agent login required";
-        setTimeout(() => {
-          notification.value = null;
-        }, 3000);
       } else if (response.body.error) {
         notification.value = "Error: " + response.body.details;
-        setTimeout(() => {
-          notification.value = null;
-        }, 2000);
       }
     } catch (error) {
       notification.value = (error as any).message;
-      setTimeout(() => {
-        notification.value = null;
-      }, 2000);
     }
   }
 }

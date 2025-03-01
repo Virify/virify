@@ -19,12 +19,9 @@ async function deleteAccount() {
     },
   });
   if (response.status === 200) {
-    notification.value = "Account deleted successfully! Redirecting to home page...";
-    setTimeout(() => {
-      clear();
-      notification.value = null;
-      navigateTo("/");
-    }, 2000);
+    console.log("Account deleted successfully! Redirecting to home page...");
+    await clear();
+    navigateTo("/");
   } else {
     notification.value = response.body.message;
   }
