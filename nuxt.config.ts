@@ -21,13 +21,6 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    oauth: {
-      // provider in lowercase (github, google, etc.)
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      },
-    },
     public: {
       redirectCookieName: "redirect",
       loginUrl: "/login",

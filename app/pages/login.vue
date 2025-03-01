@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { loggedIn, fetch } = useUserSession();
 const route = useRoute();
 
 definePageMeta({
@@ -20,6 +21,13 @@ const errors = ref({
 const notification = ref<string | null>(null);
 
 onMounted(() => {
+  if (loggedIn.value) {
+    notification.value = "Already logged in! Redirecting to account page...";
+    setTimeout(() => {
+      notification.value = null;
+      navigateTo("/account");
+    }, 2000);
+  }
   if (route.query.login === "success") {
     notification.value = "Logged in successfully! Redirecting to account page...";
     setTimeout(() => {
@@ -66,12 +74,12 @@ async function login() {
       });
 
       if (response.status === 200) {
-        useUserSession().fetch();
-        notification.value = response.body.message;
+        await fetch();
+        notification.value = "Logged in successfully! Redirecting to account page...";
         setTimeout(() => {
           notification.value = null;
           navigateTo("/account");
-        }, 3000);
+        }, 2000);
       } else if (response.body.details.includes("Forbidden")) {
         notification.value = "Error: Agent login required";
         setTimeout(() => {
@@ -100,15 +108,15 @@ async function login() {
         <h1 class="text-3xl font-bold mb-6 text-green-500">Login</h1>
         <form @submit.prevent="login">
           <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="email"
-              >Email:
+            <label class="block text-green-500 text-sm font-bold mb-2" for="email">
+              Email:
               <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
             </label>
             <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
           </div>
           <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="password"
-              >Password:
+            <label class="block text-green-500 text-sm font-bold mb-2" for="password">
+              Password:
               <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
             </label>
             <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
@@ -116,7 +124,6 @@ async function login() {
           <div class="flex items-center justify-between gap-3 mt-4 w-full flex-wrap">
             <div class="flex items-center justify-start gap-3 flex-wrap">
               <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
-              <NuxtLink external to="/auth/oauth/google" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline">Login with Google</NuxtLink>
             </div>
             <div class="flex items-center justify-end gap-3 flex-wrap">
               <NuxtLink to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">Signup</NuxtLink>

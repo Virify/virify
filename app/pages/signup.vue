@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: "auth-redirect",
+});
 const form = ref({
   email: "",
 });
