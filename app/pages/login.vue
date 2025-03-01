@@ -1,13 +1,5 @@
 <script setup lang="ts">
-const { loggedIn, fetch } = useUserSession();
-const route = useRoute();
-
-definePageMeta({
-  title: "Login",
-  description: "Login to your account",
-  middleware: "login",
-});
-
+const { fetch } = useUserSession();
 const form = ref({
   email: "",
   password: "",
@@ -19,19 +11,13 @@ const errors = ref({
 });
 
 const notification = ref<string | null>(null);
+const isLoading = ref(false);
+const isSuccess = ref(false);
 
-onMounted(() => {
-  if (loggedIn.value) {
-    console.log("Already logged in! Redirecting to account page...");
-    navigateTo("/account");
-  }
-  if (route.query.login === "success") {
-    console.log("Logged in successfully! Redirecting to account page...");
-    navigateTo("/account");
-  } else if (route.query.error === "agent") {
-    notification.value = "Error: Agent login required";
-  }
-});
+function validateEmail(email: string): boolean {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
 
 function validateForm() {
   let isValid = true;
@@ -55,27 +41,30 @@ function validateForm() {
 
 async function login() {
   if (validateForm()) {
+    isLoading.value = true;
     try {
-      const response: { status: number; body?: any } = await $fetch("/auth/owner/login", {
+      await $fetch("/auth/owner/login", {
         method: "POST",
         body: {
           email: form.value.email,
           password: form.value.password,
         },
       });
-
-      if (response.status === 200) {
-        await fetch();
-        console.log("Logged in successfully! Redirecting to account page...");
-        navigateTo("/account");
-      } else if (response.body.details.includes("Forbidden")) {
-        notification.value = "Error: Agent login required";
-      } else if (response.body.error) {
-        notification.value = "Error: " + response.body.details;
-      }
-    } catch (error) {
-      notification.value = (error as any).message;
+      fetch();
+      isSuccess.value = true;
+      notification.value = "Login successful! Redirecting to account page...";
+    } catch (error: any) {
+      notification.value = "Woops! " + error.statusMessage;
+    } finally {
+      isLoading.value = false;
     }
+  }
+}
+
+function clearNotification() {
+  notification.value = null;
+  if (isSuccess.value) {
+    navigateTo("/account");
   }
 }
 </script>
@@ -100,20 +89,16 @@ async function login() {
             </label>
             <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
           </div>
-          <div class="flex items-center justify-between gap-3 mt-4 w-full flex-wrap">
-            <div class="flex items-center justify-start gap-3 flex-wrap">
-              <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Login</button>
-            </div>
-            <div class="flex items-center justify-end gap-3 flex-wrap">
-              <NuxtLink to="/signup" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">Signup</NuxtLink>
-            </div>
+          <div class="flex items-center justify-start gap-4">
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+              <span v-if="isLoading">Loading...</span>
+              <span v-else>Login</span>
+            </button>
+            <NuxtLink to="/signup" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Signup</NuxtLink>
           </div>
         </form>
-        <div class="flex items-center justify-start gap-3 mt-4"></div>
       </div>
-      <div v-if="notification" class="fixed bottom-80 left-50 m-4 p-6 bg-green-500 text-white text-center rounded font-bold max-w-xs w-full" :class="{ 'bg-red-500': notification.includes('Error') }">
-        {{ notification }}
-      </div>
+      <Modal v-if="notification" :message="notification" @clear="clearNotification" />
     </div>
     <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>

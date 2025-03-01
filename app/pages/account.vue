@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const { user, loggedIn, session, clear } = useUserSession();
 definePageMeta({
-  middleware: ["auth-redirect"],
+  middleware: "auth-redirect",
 });
+const { user, loggedIn, session, clear, fetch } = useUserSession();
 
 const notification = ref<string | null>(null);
 

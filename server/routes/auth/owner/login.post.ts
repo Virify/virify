@@ -4,7 +4,7 @@
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
-  const { internalServerError, successResponse } = useResponse();
+  const { successResponse } = useResponse();
 
   // Extract email and password from the request body
   const { email, password } = await readBody(event);
@@ -18,9 +18,7 @@ export default defineEventHandler(async (event) => {
 
     // Return a success response
     return successResponse("Logged in successfully");
-  } catch (error) {
-    // Return an internal server error response in case of an exception
-    // TODO: Add status codes to the error messages
-    return internalServerError(error as Error);
+  } catch (err) {
+    return err;
   }
 });

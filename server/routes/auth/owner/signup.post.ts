@@ -6,7 +6,7 @@ import sendActivation from "~~/server/utils/email/send-activation";
  */
 export default defineEventHandler(async (event) => {
   const { email } = await readBody(event);
-  const { successResponse, internalServerError } = useResponse();
+  const { successResponse } = useResponse();
 
   try {
     // Normalize and trim the email
@@ -21,12 +21,12 @@ export default defineEventHandler(async (event) => {
     if (existingUser) {
       // Handle existing user cases
       if (shouldRejectSignup(existingUser)) {
-        throw new Error("Signup failed! User already exists or is an agent");
+        throw createError({ statusCode: 403, statusMessage: "User already activated, or is agent!" });
       }
 
       // Check if the activation email has already been sent
       if (existingUser.tokenExpiry && existingUser.tokenExpiry > new Date()) {
-        throw new Error("Signup failed! Activation email already sent");
+        throw createError({ statusCode: 400, statusMessage: "Activation email already sent!" });
       }
 
       // Update the owner token
@@ -41,8 +41,7 @@ export default defineEventHandler(async (event) => {
 
     // Return a success response
     return successResponse("Activation email sent");
-  } catch (error) {
-    // Return an internal server error response
-    return internalServerError(error as Error);
+  } catch (err) {
+    return err;
   }
 });
