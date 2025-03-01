@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     await loginUser(event, user, false);
 
     // Return a success response
-    return successResponse("Logged in successfully");
+    return successResponse("Logged in successfully!");
   } catch (err) {
     return err;
   }
