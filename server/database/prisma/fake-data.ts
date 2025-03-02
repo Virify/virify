@@ -1,4 +1,4 @@
-import { AccessibilityFeaturesType, PetPolicyType, AgentRole, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, OwnerRole, PropertyType, PropertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, EpcType } from '@prisma/client';
+import { AccessibilityFeaturesType, PetPolicyType, AgentRole, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, OwnerRole, PropertyType, PropertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, EpcType, Reviewed } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import Decimal from 'decimal.js';
 
@@ -330,10 +330,9 @@ export function fakeOwner() {
     country: undefined,
     companyRegistration: undefined,
     passwordResetToken: undefined,
+    passwordResetTokenExpiry: undefined,
     lastLogin: undefined,
     deletedAt: undefined,
-    activationToken: undefined,
-    tokenExpiry: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
@@ -346,7 +345,6 @@ export function fakeOwnerComplete() {
     email: faker.internet.email(),
     mainContact: undefined,
     password: undefined,
-    verified: false,
     businessName: undefined,
     addressLine1: undefined,
     addressLine2: undefined,
@@ -358,10 +356,9 @@ export function fakeOwnerComplete() {
     umbrellaId: undefined,
     role: OwnerRole.USER,
     passwordResetToken: undefined,
+    passwordResetTokenExpiry: undefined,
     lastLogin: undefined,
     deletedAt: undefined,
-    activationToken: undefined,
-    tokenExpiry: undefined,
     isActivated: false,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
@@ -523,6 +520,40 @@ export function fakeUmbrellaComplete() {
     country: faker.lorem.words(5),
     companyRegistration: faker.lorem.words(5),
     verified: false,
+    createdAt: new Date(),
+    updatedAt: faker.date.anytime(),
+  };
+}
+export function fakeVerification() {
+  return {
+    identity: undefined,
+    address: undefined,
+    bank: undefined,
+    payslip: undefined,
+    business: undefined,
+    reviewToken: undefined,
+    reviewTokenExpiry: undefined,
+    activationToken: undefined,
+    activationTokenExpiry: undefined,
+    updatedAt: faker.date.anytime(),
+  };
+}
+export function fakeVerificationComplete() {
+  return {
+    id: faker.number.int({ max: 2147483647 }),
+    approved: false,
+    ownerId: faker.number.int(),
+    identity: undefined,
+    address: undefined,
+    bank: undefined,
+    payslip: undefined,
+    business: undefined,
+    reviewed: Reviewed.PENDING,
+    reviewToken: undefined,
+    reviewTokenExpiry: undefined,
+    activated: false,
+    activationToken: undefined,
+    activationTokenExpiry: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };

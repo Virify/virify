@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     const hashedPassword = await hashPassword(password);
 
     // Find the user by email
-    const user = await findOwner(email);
+    const user = await findOwnerWithVerification(email);
 
     if(!user) throw createError({ statusCode: 404, statusMessage: "User not found" });
 

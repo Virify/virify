@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     const token = generateToken();
 
     // Check if the user already exists
-    const existingUser = await findOwner(normalizedEmail);
+    const existingUser = await findOwnerWithVerification(normalizedEmail);
 
     if (existingUser) {
       // Handle existing user cases
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
       }
 
       // Check if the activation email has already been sent
-      if (existingUser.tokenExpiry && existingUser.tokenExpiry > new Date()) {
+      if (existingUser.verification?.activationToken && existingUser.verification.activationTokenExpiry! > new Date()) {
         throw createError({ statusCode: 400, statusMessage: "Activation email already sent! Please check your inbox" });
       }
 
@@ -44,4 +44,4 @@ export default defineEventHandler(async (event) => {
   } catch (err) {
     return err;
   }
-});
+}); 

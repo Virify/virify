@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Find the user by email
-    const user = await findOwner(email as string);
+    const user = await findOwnerWithVerification(email as string);
 
     // Throw an error if the user is not found
     if (!user) throw createError({ statusCode: 404, statusMessage: "User not found" });
@@ -18,14 +18,27 @@ export default defineEventHandler(async (event) => {
     // Throw an error if the user is an agent or already activated
     if (shouldRejectSignup(user)) throw createError({ statusCode: 403, statusMessage: "User already activated, or is agent!" });
 
-    // Throw an error if the token is invalid or expired
-    if (user.tokenExpiry && user.tokenExpiry < new Date()) throw createError({ statusCode: 400, statusMessage: "Invalid token" });
-
     // Validate the token
-    validateToken(token as string, user);
+    validateActivationToken(user, token as string);
 
     return successResponse("User not activated");
   } catch (error) {
     return error;
   }
 });
+
+/**
+ * Validates the activation token.
+ * @param user - The user object.
+ * @param token - The activation token to validate.
+ * @throws An error if the token is invalid or expired.
+ */
+function validateActivationToken(user: any, token: string) {
+  // Throw an error if the token is invalid or expired
+  if (user.verification?.activationToken && user.verification?.activationTokenExpiry < new Date()) {
+    throw createError({ statusCode: 400, statusMessage: "Invalid token" });
+  }
+
+  // Validate the token
+  validateToken(token, user);
+}

@@ -1,4 +1,4 @@
-import { Agent, Owner, OwnerRole } from "@prisma/client";
+import { Agent, Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
 
 /**
  * Finds an owner by email.
@@ -6,7 +6,22 @@ import { Agent, Owner, OwnerRole } from "@prisma/client";
  * @returns The owner object if found, otherwise null.
  */
 export async function findOwner(email: string): Promise<Owner | null> {
-  return prisma.owner.findUnique({ where: { email } });
+  return prisma.owner.findUnique({
+    where: {
+      email,
+    },
+  });
+}
+
+export async function findOwnerWithVerification(email: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+  return prisma.owner.findUnique({
+    where: {
+      email,
+    },
+    include: {
+      verification: true,
+    },
+  });
 }
 
 /**
@@ -15,10 +30,36 @@ export async function findOwner(email: string): Promise<Owner | null> {
  * @param token - The activation token of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function findOwnerByToken(token: string): Promise<Owner | null> {
-  return prisma.owner.findFirst({ where: { activationToken: token } });
+export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+  return prisma.owner.findFirst({
+    where: {
+      verification: {
+        is: { activationToken: token }
+      },
+    },
+    include: {
+      verification: true
+    },
+  });
 }
 
+/**
+ * Finds an owner by email, business name, and registration number.
+ * @param email - The email of the owner to find.
+ * @param businessName - The business name of the owner to find.
+ * @param registrationNumber - The registration number of the owner to find.
+ * @returns The owner object if found, otherwise null.
+ */
+export async function findBusinessOwner(email: string, businessName: string, registrationNumber: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+  return prisma.owner.findFirst({
+    where: {
+      OR: [{ email }, { businessName }, { companyRegistration: registrationNumber }],
+    },
+    include: {
+      verification: true
+    },
+  });
+}
 /**
  * Finds an agent by email.
  * @param email - The email of the agent to find.
@@ -26,7 +67,12 @@ export async function findOwnerByToken(token: string): Promise<Owner | null> {
  */
 export async function findAgent(email: string): Promise<Agent | null> {
   const agentData = await prisma.owner.findFirst({
-    include: { agents: { where: { email } } },
+    where: {
+      agents: {
+        some: { email }
+      }
+    },
+    include: { agents: true, verification: true },
   });
   return agentData?.agents?.[0] || null;
 }
@@ -45,12 +91,83 @@ export async function deleteOwner(id: number): Promise<Owner> {
  * @param token string
  * @returns Owner <Promise>
  */
-export async function createOwnerWithToken(email: string, token: string): Promise<Owner> {
+export async function createOwnerWithToken(email: string, token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
   return prisma.owner.create({
     data: {
       email,
-      activationToken: token,
-      tokenExpiry: new Date(Date.now() + 3600000),
+      verification: {
+        create: {
+          activationToken: token,
+          activationTokenExpiry: new Date(Date.now() + 3600000),
+        },
+      },
+    },
+    include: {
+      verification: true,
+    },
+  });
+}
+
+/**
+ * Create an owner with the given email.
+ * @param email string
+ * @returns Promise<Owner>
+ */
+export async function createOauthOwner(email: string): Promise<Owner> {
+  return prisma.owner.create({ data: { email } });
+}
+
+/**
+ * Create owner as agent
+ * @param email string
+ * @param businessName string
+ * @param mainContact string
+ * @param addressLine string
+ * @param city string
+ * @param county string
+ * @param country string
+ * @param postcode string
+ * @param registrationNumber string
+ * @returns Promise<Owner>
+ */
+export async function createBusinessOwner(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string): Promise<Owner> {
+  return prisma.owner.create({
+    data: {
+      email,
+      businessName,
+      mainContact,
+      addressLine1: addressLine,
+      city,
+      county,
+      country,
+      postcode,
+      companyRegistration: registrationNumber,
+      role: OwnerRole.AGENT,
+      verification: {
+        create: {
+          reviewed: Reviewed.PENDING,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Update Owner Token and Expiry.
+ * @param email string
+ * @param token string
+ * @returns Promise<Owner>
+ */
+export async function updateOwnerToken(email: string, token: string): Promise<Owner> {
+  return prisma.owner.update({
+    where: { email },
+    data: {
+      verification: {
+        update: {
+          activationToken: token,
+          activationTokenExpiry: new Date(Date.now() + 3600000),
+        },
+      },
     },
   });
 }
@@ -66,34 +183,15 @@ export async function activateUser(userId: number, password: string): Promise<Ow
     where: { id: userId },
     data: {
       password,
-      isActivated: true,
-      activationToken: null,
-      tokenExpiry: null,
+      verification: {
+        update: {
+          activationToken: null,
+          activationTokenExpiry: null,
+          activated: true,
+        },
+      },
     },
   });
-}
-/**
- * Update Owner Token and Expiry.
- * @param email string
- * @param token string
- * @returns Promise<Owner>
- */
-export async function updateOwnerToken(email: string, token: string): Promise<Owner> {
-  return prisma.owner.update({
-    where: { email },
-    data: {
-      activationToken: token,
-      tokenExpiry: new Date(Date.now() + 3600000),
-    },
-  });
-}
-/**
- * Create an owner with the given email.
- * @param email string
- * @returns Promise<Owner>
- */
-export async function createOauthOwner(email: string): Promise<Owner> {
-  return prisma.owner.create({ data: { email } });
 }
 
 /**

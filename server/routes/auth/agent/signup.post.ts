@@ -1,57 +1,60 @@
-import { OwnerRole } from "@prisma/client";
-// TODO: Refactor
+import sendAgentVerification from "~~/server/utils/email/send-agent-verification";
+
 export default defineEventHandler(async (event) => {
   const { email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = await readBody(event);
+  const { successResponse } = useResponse();
 
+  // validate the request body
+  const formData = {
+    email,
+    businessName,
+    mainContact,
+    addressLine,
+    city,
+    county,
+    country,
+    postcode,
+    registrationNumber,
+  }
+
+  try {
   // check if the agent exists
-  const dbAgent = await prisma.owner.findFirst({
+  const dbAgent = await findBusinessOwner(email, businessName, registrationNumber);
+
+  const testAgent = await prisma.owner.findFirst({
     where: {
       OR: [
-        {
-          email: email,
-        },
-        {
-          businessName: businessName,
-        },
-        {
-          companyRegistration: registrationNumber,
-        },
+        { email },
+        { businessName },
+        { companyRegistration: registrationNumber },
       ],
     },
+    include: {
+      verification: true, // Include the verification relation
+    },
   });
+  // if the agent exists, return an error
+  if(testAgent) {
+    if(testAgent.verification) {
+      throw createError({ statusCode: 403, statusMessage: "Agent already approved!" });
+    }
+  }
 
-  // adding to test
-  const hashedPassword = await hashPassword("test");
+  if(dbAgent) {
+    if(dbAgent.verification) {
+      throw createError({ statusCode: 403, statusMessage: "Agent already approved by another user!" });
+    }
+  }
 
-  if (dbAgent) {
-    return {
-      status: 409,
-      body: {
-        error: "Agent already exists",
-      },
-    };
-  } else {
-    const agent = await prisma.owner.create({
-      data: {
-        email: email,
-        password: hashedPassword,
-        businessName: businessName,
-        mainContact: mainContact,
-        addressLine1: addressLine,
-        city: city,
-        county: county,
-        country: country,
-        postcode: postcode,
-        companyRegistration: registrationNumber,
-        role: OwnerRole.AGENT,
-      },
-    });
+  // create the agent
+  await createBusinessOwner(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber);
 
-    return {
-      status: 201,
-      body: {
-        agent: agent,
-      },
-    };
+  // send the review email
+  await sendAgentVerification(formData);
+
+
+  return successResponse("Agent created successfully");
+  } catch (err) {
+    return err;
   }
 });

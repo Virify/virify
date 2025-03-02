@@ -1,12 +1,9 @@
-export function useAuthForm(initialForm: { email?: string; password?: string; token?: string }) {
+export function useAuthForm(initialForm: { [key: string]: any }) {
   // composable imports
   const { fetch } = useUserSession();
   // references
   const form = ref(initialForm);
-  const errors = ref({
-    email: null as string | null,
-    password: null as string | null,
-  });
+  const errors = ref<{ [key: string]: string | null }>({});
 
   const notification = ref<string | null>(null);
   const isLoading = ref(false);
@@ -24,31 +21,40 @@ export function useAuthForm(initialForm: { email?: string; password?: string; to
 
   /**
    * Validates the form fields
+   * Uses the key of the form object to determine the field to validate
+   * You can specify the validation rules for each field here if unique validation is required
    * @returns True if the form is valid, false otherwise
    */
   function validateForm() {
     let isValid = true;
 
-    // Validate email if it exists in the form
-    if ("email" in form.value) {
-      if (!form.value.email) {
-        errors.value.email = "Email is required";
-        isValid = false;
-      } else if (!validateEmail(form.value.email)) {
-        errors.value.email = "Invalid email format";
-        isValid = false;
-      } else {
-        errors.value.email = null;
-      }
-    }
+    // Iterate over the keys of the form object
+    for (const key in form.value) {
+      if (form.value.hasOwnProperty(key)) {
+        const value = form.value[key];
 
-    // Validate password if it exists in the form
-    if ("password" in form.value) {
-      if (!form.value.password) {
-        errors.value.password = "Password is required";
-        isValid = false;
-      } else {
-        errors.value.password = null;
+        // Validate email
+        if (key === "email") {
+          if (!value) {
+            errors.value[key] = "Email is required";
+            isValid = false;
+          } else if (!validateEmail(value)) {
+            errors.value[key] = "Invalid email format";
+            isValid = false;
+          } else {
+            errors.value[key] = null;
+          }
+        }
+
+        // Default validation for other fields
+        else {
+          if (!value) {
+            errors.value[key] = `${key.charAt(0).toUpperCase() + key.slice(1)} is required`;
+            isValid = false;
+          } else {
+            errors.value[key] = null;
+          }
+        }
       }
     }
 
