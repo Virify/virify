@@ -12,20 +12,19 @@ import emailSender from "./email-sender";
 export default async function sendActivation(email: string, token: string) {
   // Get the Vue email template
   const emailToSend = SignupActivation;
-
-  // Render the email to HTML
-  const emailHtml = await render(emailToSend, {
-    token,
-    userEmail: email,
-    baseUrl: process.env.EMAIL_BASE_URL || "",
-  });
-
-  // Set the email subject, HTML content, and recipient address
-  const subject = "Welcome to Virify - Activation Required!";
-  const html = emailHtml;
-  const to = email;
-
   try {
+    // Render the email to HTML
+    const emailHtml = await render(emailToSend, {
+      token,
+      userEmail: email,
+      baseUrl: process.env.EMAIL_BASE_URL || "",
+    });
+
+    // Set the email subject, HTML content, and recipient address
+    const subject = "Welcome to Virify - Activation Required!";
+    const html = emailHtml;
+    const to = email;
+
     // Send the email
     return await emailSender(html, subject, to);
   } catch (error) {

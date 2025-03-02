@@ -174,7 +174,7 @@ export async function updateOwnerToken(email: string, token: string): Promise<Ow
  * @param password string
  * @returns Promise<Owner>
  */
-export async function activateUser(userId: number, password: string): Promise<Owner> {
+export async function updateOwnerAndActivate(userId: number, password: string): Promise<Owner> {
   return prisma.owner.update({
     where: { id: userId },
     data: {
@@ -205,6 +205,6 @@ export function hasRole(user: Owner | Agent, role: OwnerRole): boolean {
  * @param user Owner | Agent
  * @returns Boolean
  */
-export function isActive(user: any): boolean {
-  return user.verification.activated;
+export function isActive(user: Prisma.OwnerGetPayload<{ include: { verification: true } }>): boolean {
+  return user.verification?.activated === true;
 }

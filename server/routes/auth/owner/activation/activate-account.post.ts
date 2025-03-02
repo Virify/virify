@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     if(!user) throw createError({ statusCode: 404, statusMessage: "User not found" });
 
     // Activate user by updating password and clearing activation token
-    await activateUser(user.id, hashedPassword);
+    await updateOwnerAndActivate(user.id, hashedPassword);
 
     // Return success response
     return successResponse("User activated");
