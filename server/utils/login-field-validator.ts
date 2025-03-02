@@ -5,7 +5,7 @@
  * @returns A Promise that resolves to an object containing the trimmed email and password.
  * @throws An error if the email or password is invalid.
  */
-export default async function loginFieldValidator(email: string, password: string) {
+export default async function loginFieldValidator(email: string, password: string): Promise<{ trimmedEmail: string; trimmedPassword: string }> {
   // Trim the email and password
   const trimmedPassword = password.trim();
   const trimmedEmail = email.trim();

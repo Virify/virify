@@ -6,7 +6,7 @@
  * @returns A Promise that resolves when the email is sent.
  * @throws An error if there is an issue sending the email.
  */
-export default async function emailSender(html: string, subject: string, to: string) {
+export default async function emailSender(html: string, subject: string, to: string): Promise<any> {
   try {
     // Import the sendMail function from NodeMailer
     const { sendMail } = useNodeMailer();
