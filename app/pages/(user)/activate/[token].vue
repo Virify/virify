@@ -41,8 +41,8 @@ onMounted(async () => {
         token: route.params.token as string,
       },
     });
-  } catch (error) {
-    notification.value = (error as any)?.statusMessage || "An error occurred.";
+  } catch (error: any) {
+    notification.value = error.data.statusMessage
   }
 });
 </script>
