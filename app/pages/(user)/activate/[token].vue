@@ -38,6 +38,7 @@ onMounted(async () => {
       method: "GET",
       params: {
         email: email,
+        token: route.params.token as string,
       },
     });
   } catch (error) {
