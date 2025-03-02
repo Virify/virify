@@ -1,3 +1,4 @@
+import type { NuxtError } from '#app'
 export function useAuthForm(initialForm: { [key: string]: any }) {
   // composable imports
   const { fetch } = useUserSession();
@@ -78,6 +79,7 @@ export function useAuthForm(initialForm: { [key: string]: any }) {
         isSuccess.value = true;
         fetch();
       } catch (error: any) {
+        console.log(showError(error));
         console.log(error);
         console.log(error.statusMessage);
         console.log(error.statusCode);
