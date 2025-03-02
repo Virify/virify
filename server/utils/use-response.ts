@@ -1,4 +1,4 @@
-import { H3Event } from "h3";
+import { H3Event, createError } from "h3";
 
 /**
  * Utility function to create standardized HTTP responses.
@@ -60,7 +60,11 @@ export const useResponse = () => {
    * @param error - The error object to include in the response.
    * @returns An object representing the HTTP response.
    */
-  const internalServerError = (error: Error) => createResponse(500, "Internal server error", error);
+  const internalServerError = (error: any) => {
+    const statusCode = error.statusCode || 500;
+    const statusMessage = error.statusMessage || "Internal Server Error";
+    return createResponse(statusCode, statusMessage, error);
+  };
 
   return {
     createResponse,

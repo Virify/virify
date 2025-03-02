@@ -1,38 +1,33 @@
+/**
+ * Handles the request to delete an owner account.
+ *
+ * @param event - The H3 event object representing the request.
+ * @returns A standardized HTTP response indicating success or failure.
+ */
 export default defineEventHandler(async (event) => {
-  // TODO: Refactor this function to delete the owner account
+  const { successResponse } = useResponse();
+
   try {
-    console.log("Deleting account...");
-    // get the owner id from the session
+    // Retrieve the user session
     const session = await getUserSession(event);
-    const ownerId = session.user?.id;
-    // get the owner from the database
-    if (ownerId) {
-      await prisma.owner.delete({
-        where: {
-          id: ownerId,
-        },
-      });
-      // return the owner
-      return {
-        status: 200,
-        body: {
-          message: "Account deleted successfully...",
-        },
-      };
-    } else {
-      return {
-        status: 400,
-        body: {
-          error: "Failed! Invalid request",
-        },
-      };
+
+    // Ensure the session and user exist
+    if (!session || !session.user?.id) {
+      throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
     }
+
+    // Extract the owner ID from the session
+    const ownerId = session.user.id;
+
+    // Attempt to delete the owner
+    const deleted = await deleteOwner(ownerId);
+
+    // Throw an error if the owner was not deleted
+    if (!deleted) throw createError({ statusCode: 400, statusMessage: "Failed to delete user. User may not exist" });
+
+    // Return a success response
+    return successResponse("Deleted Successfully! Redirecting to homepage...");
   } catch (error) {
-    return {
-      status: 400,
-      body: {
-        error: (error as Error).message,
-      },
-    };
+    return error;
   }
 });

@@ -1,5 +1,5 @@
 model Umbrella {
-  id                  Int     @id @default(autoincrement())
+  id                  Int      @id @default(autoincrement())
   name                String
   businessName        String
   addressLine1        String
@@ -8,9 +8,9 @@ model Umbrella {
   county              String?
   postcode            String
   country             String
-  companyRegistration String  @unique
+  companyRegistration String   @unique
   owners              Owner[]
-  verified            Boolean @default(false)
+  verified            Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }

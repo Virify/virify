@@ -5,7 +5,7 @@ CREATE TYPE "AccessibilityFeaturesType" AS ENUM ('WHEELCHAIR_ACCESSIBLE', 'WHEEL
 CREATE TYPE "PetPolicyType" AS ENUM ('ALLOWED', 'NOT_ALLOWED');
 
 -- CreateEnum
-CREATE TYPE "AgentRole" AS ENUM ('SENIOR_NEGOTIATOR', 'SALES_NEGOTIATOR', 'ADMIN_MARKETING', 'JUNIOR');
+CREATE TYPE "AgentRole" AS ENUM ('SENIOR', 'JUNIOR');
 
 -- CreateEnum
 CREATE TYPE "BedSizeType" AS ENUM ('SINGLE', 'DOUBLE', 'QUEEN', 'KING', 'SUPER_KING');
@@ -46,6 +46,9 @@ CREATE TYPE "Tenure" AS ENUM ('LEASEHOLD', 'FREEHOLD');
 -- CreateEnum
 CREATE TYPE "EpcType" AS ENUM ('A', 'B', 'C', 'D', 'E', 'F', 'G');
 
+-- CreateEnum
+CREATE TYPE "Reviewed" AS ENUM ('PENDING', 'YES', 'NO');
+
 -- CreateTable
 CREATE TABLE "AdditionalFeatures" (
     "id" SERIAL NOT NULL,
@@ -82,13 +85,17 @@ CREATE TABLE "Agent" (
     "firstName" TEXT,
     "lastName" TEXT,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
     "ownerId" INTEGER NOT NULL,
-    "role" "AgentRole" NOT NULL,
+    "role" "AgentRole" NOT NULL DEFAULT 'SENIOR',
     "passwordResetToken" TEXT,
     "lastLogin" TIMESTAMP(3),
     "activationToken" TEXT,
     "tokenExpiry" TIMESTAMP(3),
+    "isActivated" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Agent_pkey" PRIMARY KEY ("id")
 );
@@ -253,23 +260,25 @@ CREATE TABLE "Owner" (
     "lastName" TEXT,
     "username" TEXT,
     "email" TEXT NOT NULL,
+    "mainContact" TEXT,
     "password" TEXT,
-    "verified" BOOLEAN NOT NULL DEFAULT false,
-    "businessName" TEXT NOT NULL,
-    "addressLine1" TEXT NOT NULL,
+    "businessName" TEXT,
+    "addressLine1" TEXT,
     "addressLine2" TEXT,
-    "city" TEXT NOT NULL,
+    "city" TEXT,
     "county" TEXT,
-    "postcode" TEXT NOT NULL,
-    "country" TEXT NOT NULL,
-    "companyRegistration" TEXT NOT NULL,
-    "umbrellaId" INTEGER NOT NULL,
-    "role" "OwnerRole" NOT NULL,
+    "postcode" TEXT,
+    "country" TEXT,
+    "companyRegistration" TEXT,
+    "umbrellaId" INTEGER,
+    "role" "OwnerRole" NOT NULL DEFAULT 'USER',
     "passwordResetToken" TEXT,
+    "passwordResetTokenExpiry" TIMESTAMP(3),
     "lastLogin" TIMESTAMP(3),
     "deletedAt" TIMESTAMP(3),
-    "activationToken" TEXT,
-    "tokenExpiry" TIMESTAMP(3),
+    "isActivated" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Owner_pkey" PRIMARY KEY ("id")
 );
@@ -371,8 +380,33 @@ CREATE TABLE "Umbrella" (
     "postcode" TEXT NOT NULL,
     "country" TEXT NOT NULL,
     "companyRegistration" TEXT NOT NULL,
+    "verified" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Umbrella_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Verification" (
+    "id" SERIAL NOT NULL,
+    "approved" BOOLEAN NOT NULL DEFAULT false,
+    "ownerId" INTEGER NOT NULL,
+    "identity" BOOLEAN,
+    "address" BOOLEAN,
+    "bank" BOOLEAN,
+    "payslip" BOOLEAN,
+    "business" BOOLEAN,
+    "reviewed" "Reviewed" NOT NULL DEFAULT 'PENDING',
+    "reviewToken" TEXT,
+    "reviewTokenExpiry" TIMESTAMP(3),
+    "activated" BOOLEAN NOT NULL DEFAULT false,
+    "activationToken" TEXT,
+    "activationTokenExpiry" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Verification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -399,6 +433,9 @@ CREATE UNIQUE INDEX "Address_propertyId_key" ON "Address"("propertyId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Agent_email_key" ON "Agent"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Agent_activationToken_key" ON "Agent"("activationToken");
 
 -- CreateIndex
 CREATE INDEX "Agent_ownerId_idx" ON "Agent"("ownerId");
@@ -452,6 +489,15 @@ CREATE UNIQUE INDEX "StorageFeatures_propertyId_key" ON "StorageFeatures"("prope
 CREATE UNIQUE INDEX "Umbrella_companyRegistration_key" ON "Umbrella"("companyRegistration");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Verification_ownerId_key" ON "Verification"("ownerId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Verification_reviewToken_key" ON "Verification"("reviewToken");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Verification_activationToken_key" ON "Verification"("activationToken");
+
+-- CreateIndex
 CREATE INDEX "_AgentToProperty_B_index" ON "_AgentToProperty"("B");
 
 -- CreateIndex
@@ -497,7 +543,7 @@ ALTER TABLE "Media" ADD CONSTRAINT "Media_propertyId_fkey" FOREIGN KEY ("propert
 ALTER TABLE "OutdoorSpace" ADD CONSTRAINT "OutdoorSpace_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Owner" ADD CONSTRAINT "Owner_umbrellaId_fkey" FOREIGN KEY ("umbrellaId") REFERENCES "Umbrella"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Owner" ADD CONSTRAINT "Owner_umbrellaId_fkey" FOREIGN KEY ("umbrellaId") REFERENCES "Umbrella"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Parking" ADD CONSTRAINT "Parking_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -516,6 +562,9 @@ ALTER TABLE "SecurityFeatures" ADD CONSTRAINT "SecurityFeatures_propertyId_fkey"
 
 -- AddForeignKey
 ALTER TABLE "StorageFeatures" ADD CONSTRAINT "StorageFeatures_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Verification" ADD CONSTRAINT "Verification_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Owner"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_AgentToProperty" ADD CONSTRAINT "_AgentToProperty_A_fkey" FOREIGN KEY ("A") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;

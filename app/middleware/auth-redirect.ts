@@ -10,11 +10,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const loginUrl = config.public.loginUrl || "/login";
   const agentloginUrl = "/agent/login";
 
-  // If not logged in
-  if (!loggedIn.value) {
+  // If not logged in and not navigating to the signup page
+  if (!loggedIn.value && to.fullPath !== "/signup") {
     // Save the page they were trying to access in a cookie
     const redirectCookie = useCookie(redirectCookieName);
-    redirectCookie.value = from.fullPath;
+    redirectCookie.value = to.fullPath;
 
     // If the user is an agent, navigate to the agent login page
     if (to.path.startsWith("/agent")) {

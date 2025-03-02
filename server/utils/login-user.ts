@@ -1,3 +1,4 @@
+import { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
 /**
  * Handles the login process for owners and agents.
@@ -7,7 +8,7 @@ import { H3Event } from "h3";
  * @param isAgentLogin - A boolean indicating if the login is for an agen
  * @returns - set User Session
  */
-export async function loginUser(event: H3Event, user: any, isAgentLogin: boolean) {
+export async function loginUser(event: H3Event, user: any, isAgentLogin: boolean): Promise<UserSession> {
   // Set the user session
   return await setSession(event, user, isAgentLogin);
 }

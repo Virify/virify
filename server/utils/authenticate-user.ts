@@ -16,16 +16,19 @@ export async function authenticateUser(email: string, password: string, isAgentL
   const user = isAgentLogin ? await findAgent(trimmedEmail) : await findOwner(trimmedEmail);
 
   // If user is not found, return an unauthorized response
-  if (!user) throw new Error("User not found");
+  if (!user) {
+    throw createError({ statusCode: 401, statusMessage: "User not found" });
+  }
 
   // If the login is not for an agent and the user is an agent, return a forbidden response
   if (!isAgentLogin && user.role === OwnerRole.AGENT) {
-    throw new Error("Forbidden: Agent login not allowed");
+    throw createError({ statusCode: 403, statusMessage: "Agent login not allowed" });
   }
 
   // Verify the password
   const passwordVerified = await verifyPassword(user.password as string, trimmedPassword);
-  if (!passwordVerified) throw new Error("Password is incorrect");
+
+  if (!passwordVerified) throw createError({ statusCode: 401, statusMessage: "Password incorrect", message: "Password does not match" });
 
   // Return the authenticated user
   return user;

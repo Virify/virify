@@ -1,3 +1,4 @@
+import { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
 
 /**
@@ -7,7 +8,7 @@ import { H3Event } from "h3";
  * @param isAgent - A boolean indicating if the user is an agent.
  * @returns A Promise that resolves when the session is set.
  */
-export default async function setSession(event: H3Event, user: any, isAgent: boolean) {
+export default async function setSession(event: H3Event, user: any, isAgent: boolean): Promise<UserSession> {
   // Clear any existing session
   await clearUserSession(event);
   // Set the new session with user details
