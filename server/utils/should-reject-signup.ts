@@ -6,5 +6,5 @@ import { OwnerRole } from "@prisma/client";
  * @returns Boolean
  */
 export default function shouldRejectSignup(user: any): Boolean {
-  return isActive(user.verification.activated) || hasRole(user, OwnerRole.AGENT)
+  return isActive(user) || hasRole(user, OwnerRole.AGENT)
 };

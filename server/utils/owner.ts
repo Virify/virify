@@ -65,8 +65,8 @@ export async function findBusinessOwner(email: string, businessName: string, reg
  * @param email - The email of the agent to find.
  * @returns The agent object if found, otherwise null.
  */
-export async function findAgent(email: string): Promise<Agent | null> {
-  const agentData = await prisma.owner.findFirst({
+export async function findAgent(email: string): Promise<Owner | null> {
+  return prisma.owner.findFirst({
     where: {
       agents: {
         some: { email }
@@ -74,7 +74,6 @@ export async function findAgent(email: string): Promise<Agent | null> {
     },
     include: { agents: true, verification: true },
   });
-  return agentData?.agents?.[0] || null;
 }
 
 /**
@@ -91,7 +90,7 @@ export async function deleteOwner(id: number): Promise<Owner> {
  * @param token string
  * @returns Owner <Promise>
  */
-export async function createOwnerWithToken(email: string, token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function createOwnerWithToken(email: string, token: string): Promise<Owner> {
   return prisma.owner.create({
     data: {
       email,
@@ -101,9 +100,6 @@ export async function createOwnerWithToken(email: string, token: string): Promis
           activationTokenExpiry: new Date(Date.now() + 3600000),
         },
       },
-    },
-    include: {
-      verification: true,
     },
   });
 }
@@ -203,11 +199,12 @@ export async function activateUser(userId: number, password: string): Promise<Ow
 export function hasRole(user: Owner | Agent, role: OwnerRole): boolean {
   return user.role === role;
 }
+
 /**
  * Check if a owner is active.
  * @param user Owner | Agent
  * @returns Boolean
  */
-export function isActive(user: Owner | Agent): boolean {
-  return user.isActivated;
+export function isActive(user: any): boolean {
+  return user.verification.activated;
 }

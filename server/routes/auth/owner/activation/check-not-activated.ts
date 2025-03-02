@@ -1,3 +1,4 @@
+
 /**
  * Check if the user is activated.
  * @param event - The H3 event object.
@@ -14,6 +15,8 @@ export default defineEventHandler(async (event) => {
 
     // Throw an error if the user is not found
     if (!user) throw createError({ statusCode: 404, statusMessage: "User not found" });
+
+    if(!user.verification) throw createError({ statusCode: 404, statusMessage: "Verification status not found" });
 
     // Throw an error if the user is an agent or already activated
     if (shouldRejectSignup(user)) throw createError({ statusCode: 403, statusMessage: "User already activated, or is agent!" });
@@ -35,7 +38,7 @@ export default defineEventHandler(async (event) => {
  */
 function validateActivationToken(user: any, token: string) {
   // Throw an error if the token is invalid or expired
-  if (user.verification?.activationToken && user.verification?.activationTokenExpiry < new Date()) {
+  if (user.verification.activationToken && user.verification.activationTokenExpiry < new Date()) {
     throw createError({ statusCode: 400, statusMessage: "Invalid token" });
   }
 
