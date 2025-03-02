@@ -14,14 +14,10 @@ export default async function loginFieldValidator(email: string, password: strin
   const validEmail = validateEmail(trimmedEmail);
 
   // Check if the email or password is invalid
-  if (!validEmail || !trimmedPassword) {
-    throw new Error("Email and password are required");
-  }
+  if (!validEmail || !trimmedPassword) throw createError({ statusCode: 400, statusMessage: "Invalid email or password" });
 
   // Check if the email format is invalid
-  if (!validEmail) {
-    throw new Error("Invalid email format");
-  }
+  if (!validEmail) throw createError({ statusCode: 400, statusMessage: "Invalid email format" });
 
   // Return the trimmed email and password
   return {

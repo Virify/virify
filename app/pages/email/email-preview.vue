@@ -1,10 +1,10 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['email-test'],
+  middleware: ["email-test"],
 });
-// chnage your email component path for the email you want to preview
+// change your email component path for the email you want to preview
 // @ts-ignore
-import SignupActivationEmail from './server/routes/email/templates/signup-activation.vue';
+import SignupActivationEmail from "./server/routes/email/templates/signup-activation.vue";
 </script>
 
 <template>
@@ -15,7 +15,3 @@ import SignupActivationEmail from './server/routes/email/templates/signup-activa
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any additional styles here */
-</style>

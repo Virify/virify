@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
       // Check if the activation email has already been sent
       if (existingUser.tokenExpiry && existingUser.tokenExpiry > new Date()) {
-        throw createError({ statusCode: 400, statusMessage: "Activation email already sent!" });
+        throw createError({ statusCode: 400, statusMessage: "Activation email already sent! Please check your inbox" });
       }
 
       // Update the owner token

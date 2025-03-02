@@ -1,63 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import Modal from '~/components/modal.vue';
 
-definePageMeta({
-  middleware: "auth-redirect",
-});
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "" });
 
-const form = ref({
-  email: "",
-});
-
-const errors = ref({
-  email: null as string | null,
-});
-
-const notification = ref<string | null>(null);
-const isLoading = ref(false);
-const isSuccess = ref(false);
-
-function validateForm() {
-  let isValid = true;
-  if (!form.value.email) {
-    errors.value.email = "Email is required";
-    isValid = false;
-  } else if (!validateEmail(form.value.email)) {
-    errors.value.email = "Invalid email format";
-    isValid = false;
-  } else {
-    errors.value.email = null;
-  }
-  return isValid;
-}
-
+/**
+ * Signup function
+ */
 async function signup() {
-  if (validateForm()) {
-    isLoading.value = true;
-    try {
-      await $fetch("/auth/owner/signup", {
-        method: "POST",
-        body: {
-          email: form.value.email,
-        },
-      });
-      notification.value = "Signup successful! Please check your email to verify your account.";
-      isSuccess.value = true;
-    } catch (error: any) {
-      console.log(error);
-      notification.value = "Woops! " + error.statusMessage;
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  await submitForm('/auth/owner/signup', 'Signup successful! Redirecting to login page...');
 }
 
-function clearNotification() {
-  notification.value = null;
-  if (isSuccess.value) {
-    navigateTo("/login");
-  }
+/**
+ * Clear notification handler
+ */
+function clearNotificationHandler() {
+  clearNotification('/login');
 }
 </script>
 
@@ -86,7 +42,7 @@ function clearNotification() {
           </div>
         </form>
       </div>
-      <Modal v-if="notification" :message="notification" @clear="clearNotification" />
+      <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
     </div>
     <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
@@ -94,7 +50,3 @@ function clearNotification() {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any additional styles here */
-</style>

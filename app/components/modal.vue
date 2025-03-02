@@ -1,19 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 
 defineProps<{ message: string }>();
 const emit = defineEmits(['clear']);
-const okButton = ref<HTMLButtonElement | null>(null);
 
 function clearNotification() {
   emit('clear');
 }
-
-onMounted(() => {
-  if (okButton.value) {
-    okButton.value.focus();
-  }
-});
 </script>
 
 <template>

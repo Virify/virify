@@ -29,7 +29,6 @@ export default async function sendActivation(email: string, token: string) {
     // Send the email
     return await emailSender(html, subject, to);
   } catch (error) {
-    // Throw an error if there is an issue sending the activation email
-    throw new Error("Error sending activation email " + error);
+    return error;
   }
 }

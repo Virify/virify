@@ -1,71 +1,19 @@
 <script setup lang="ts">
-const { fetch } = useUserSession();
-const form = ref({
-  email: "",
-  password: "",
-});
+// composable imports
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "", password: "" });
 
-const errors = ref({
-  email: null as string | null,
-  password: null as string | null,
-});
-
-const notification = ref<string | null>(null);
-const isLoading = ref(false);
-const isSuccess = ref(false);
-
-function validateEmail(email: string): boolean {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-}
-
-function validateForm() {
-  let isValid = true;
-  if (!form.value.email) {
-    errors.value.email = "Email is required";
-    isValid = false;
-  } else if (!validateEmail(form.value.email)) {
-    errors.value.email = "Invalid email format";
-    isValid = false;
-  } else {
-    errors.value.email = null;
-  }
-  if (!form.value.password) {
-    errors.value.password = "Password is required";
-    isValid = false;
-  } else {
-    errors.value.password = null;
-  }
-  return isValid;
-}
-
+/**
+ * Login function
+ */
 async function login() {
-  if (validateForm()) {
-    isLoading.value = true;
-    try {
-      await $fetch("/auth/owner/login", {
-        method: "POST",
-        body: {
-          email: form.value.email,
-          password: form.value.password,
-        },
-      });
-      fetch();
-      isSuccess.value = true;
-      notification.value = "Login successful! Redirecting to account page...";
-    } catch (error: any) {
-      notification.value = "Woops! " + error.statusMessage;
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  await submitForm("/auth/owner/login", "Signup successful! Redirecting to account page...");
 }
 
-function clearNotification() {
-  notification.value = null;
-  if (isSuccess.value) {
-    navigateTo("/account");
-  }
+/**
+ * Clear notification handler
+ */
+function clearNotificationHandler() {
+  clearNotification("/account");
 }
 </script>
 
@@ -98,7 +46,7 @@ function clearNotification() {
           </div>
         </form>
       </div>
-      <Modal v-if="notification" :message="notification" @clear="clearNotification" />
+      <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
     </div>
     <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
@@ -106,7 +54,3 @@ function clearNotification() {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any additional styles here */
-</style>
