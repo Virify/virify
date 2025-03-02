@@ -79,12 +79,7 @@ export function useAuthForm(initialForm: { [key: string]: any }) {
         isSuccess.value = true;
         fetch();
       } catch (error: any) {
-        console.log(showError(error));
-        console.log(error);
-        console.log(error.statusMessage);
-        console.log(error.statusCode);
-        console.log(error.message)
-        notification.value = error.statusMessage;
+        notification.value = error.data.statusMessage;
       } finally {
         isLoading.value = false;
       }
