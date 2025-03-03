@@ -34,6 +34,6 @@ export default async function sendAgentActivation(email: string, agent: Business
     // Send the email
     return await emailSender(html, subject, to);
   } catch (error) {
-    return error;
+    throw error;
   }
 }

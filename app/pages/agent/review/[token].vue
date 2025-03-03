@@ -16,7 +16,7 @@ const error = ref<string | null>(null);
  */
 onMounted(async () => {
   try {
-    await $fetch("/auth/agent/review/review-account", {
+    await $fetch("/auth/review-account", {
       method: 'POST',
       body: {
         email: email,

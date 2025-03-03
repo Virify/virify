@@ -55,7 +55,6 @@ export async function findBusinessOwner(email: string, address: string): Promise
   return prisma.owner.findFirst({
     where: {
       OR: [{ email: email }, { addressLine1: address }],
-      role: OwnerRole.AGENT,
     },
     include: {
       verification: true,

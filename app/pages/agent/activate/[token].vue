@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // composable imports
 const route = useRoute();
-const { form, errors, notification, submitForm, clearNotification } = useAuthForm({ password: "", token: "", email: "" });
+const { form, errors, notification, submitForm, clearNotification } = useAuthForm({ password: "", token: "", email: "" }, 'agent');
 
 /**
  * Activate account function
@@ -14,7 +14,7 @@ async function activateAccount() {
   form.value.token = route.params.token as string;
   form.value.email = route.query.email as string;
 
-  await submitForm("/auth/agent/activation/activate-account", "Account activated successfully! Redirecting to login page...");
+  await submitForm("/auth/activate-account", "Account activated successfully! Redirecting to login page...");
 }
 
 /**
@@ -34,11 +34,12 @@ const email = route.query.email as string;
  */
 onMounted(async () => {
   try {
-    await $fetch("/auth/agent/activation/check-not-activated", {
+    await $fetch("/auth/check-not-activated", {
       method: "GET",
       params: {
         email: email,
         token: route.params.token as string,
+        role: 'agent',
       },
     });
     console.log(route.params.token);
