@@ -1,4 +1,5 @@
 import { Agent, Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
+export type BusinessOwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
 
 /**
  * Finds an owner by email.
@@ -50,7 +51,7 @@ export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPa
  * @param registrationNumber - The registration number of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function findBusinessOwner(email: string, address: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function findBusinessOwner(email: string, address: string): Promise<BusinessOwnerWithVerification | null> {
   return prisma.owner.findFirst({
     where: {
       OR: [{ email: email}, { addressLine1: address }],
@@ -127,7 +128,7 @@ export async function createOauthOwner(email: string): Promise<Owner> {
  * @param registrationNumber string
  * @returns Promise<Owner>
  */
-export async function createBusinessOwnerWithToken(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string, token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function createBusinessOwnerWithToken(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string, token: string): Promise<BusinessOwnerWithVerification | null> {
   return prisma.owner.create({
     data: {
       email,

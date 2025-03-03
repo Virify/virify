@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
       await updateOwnerAndReview(owner.id, approval);
     }
 
-    // TODO: Send an email to the owner notifying them of the review result
+    // TODO: Send an email to the owner notifying them 
     
     return successResponse("Owner reviewed successfully");
   } catch (error) {
