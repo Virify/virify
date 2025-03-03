@@ -1,12 +1,12 @@
 <script setup lang="ts">
 // composable imports
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "", password: "" });
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "", password: "" }, 'user');
 
 /**
  * Login function
  */
 async function login() {
-  await submitForm("/auth/owner/login", "Signup successful! Redirecting to account page...");
+  await submitForm("/auth/login", "Signup successful! Redirecting to account page...");
 }
 
 /**
