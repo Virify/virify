@@ -21,11 +21,10 @@ model Owner {
   listings                 Listing[]
   agents                   Agent[]
   role                     OwnerRole     @default(USER)
-  passwordResetToken       String?
+  passwordResetToken       String?       @unique
   passwordResetTokenExpiry DateTime?
   lastLogin                DateTime?
   deletedAt                DateTime?
-  isActivated              Boolean       @default(false)
   createdAt                DateTime      @default(now())
   updatedAt                DateTime      @updatedAt
 

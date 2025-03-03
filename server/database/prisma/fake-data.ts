@@ -359,7 +359,6 @@ export function fakeOwnerComplete() {
     passwordResetTokenExpiry: undefined,
     lastLogin: undefined,
     deletedAt: undefined,
-    isActivated: false,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
