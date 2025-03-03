@@ -24,6 +24,9 @@ defineProps<{
           <strong>We have a new Estate Agent signup. Please click the button below once you have reviewed and verified the agent:</strong>
         </Text>
         <Text>
+          <strong>Email: </strong> {{ email }}
+        </Text>
+        <Text>
           <strong>Business Name:</strong> {{ businessName }}
         </Text>
         <Text>
