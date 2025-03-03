@@ -1,5 +1,5 @@
 import { Prisma, Reviewed } from "@prisma/client";
-import sendAgentVerification from "~~/server/utils/email/send-agent-verification";
+import sendAgentReview from "~~/server/utils/email/send-agent-review";
 /**
  * Endpoint to handle agent signup.
  * @param event - The H3 event object.
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     await createBusinessOwner(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
 
     // Send the review email
-    await sendAgentVerification(formData, token as string);
+    await sendAgentReview(formData, token as string);
 
     return successResponse("Agent created successfully");
   } catch (err) {
@@ -54,6 +54,11 @@ function handleExistingAgent(agent: Prisma.OwnerGetPayload<{ include: { verifica
     if (agent.verification?.reviewed === Reviewed.PENDING) {
       throw createError({ statusCode: 400, statusMessage: "Agent already exists and is pending review" });
     }
+
+    if(agent.verification?.reviewed === Reviewed.REJECTED) {
+      throw createError({ statusCode: 400, statusMessage: "Agent already exists and was rejected. Contact us for more information" });
+    }
+
     throw createError({ statusCode: 400, statusMessage: "Agent already exists" });
   }
 }

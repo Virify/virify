@@ -1,5 +1,5 @@
 import { render } from "@vue-email/render";
-import ApproveAgentOwner from "../../routes/email/templates/agent-verification.vue";
+import AgentReview from "../../routes/email/templates/agent-review.vue";
 import emailSender from "./email-sender";
 
 /**
@@ -21,9 +21,9 @@ interface FormData {
   registrationNumber: string;
 }
 
-export default async function sendAgentVerification(formData: FormData, token: string) {
+export default async function sendAgentReview(formData: FormData, token: string) {
   // Get the Vue email template
-  const emailToSend = ApproveAgentOwner;
+  const emailToSend = AgentReview;
 
   // Render the email to HTML
   const emailHtml = await render(emailToSend, {

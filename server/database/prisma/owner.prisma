@@ -6,7 +6,7 @@ model Owner {
   email                    String        @unique
   mainContact              String?
   password                 String?
-  verification             Verification?  @relation
+  verification             Verification? @relation
   businessName             String?
   addressLine1             String?
   addressLine2             String?

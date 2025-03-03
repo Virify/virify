@@ -38,9 +38,14 @@ defineProps<{
         <Text style="margin-top: 20px;">
           <strong>Click the button below to activate the account:</strong>
         </Text>
-        <Button :href="baseUrl + '/auth/agent/verification/' + token + '?email=' + email" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
-          <strong>Activate Account</strong>
-        </Button>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+          <Button :href="baseUrl + '/agent/review/' + token + '?approve=true&email=' + email" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+            <strong>Approve Review</strong>
+          </Button>
+          <Button :href="baseUrl + '/agent/review/' + token + '?approve=false&email=' + email" style="background-color: #e3342f; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+            <strong>Deny Review</strong>
+          </Button>
+        </div>
         <Text style="color: #4a5568; font-size: 14px; margin-top: 20px;">
           <strong>This is for internal use only. If you did not sign up for this account, please ignore this email.</strong>
         </Text>

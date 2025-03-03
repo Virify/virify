@@ -1,4 +1,4 @@
-import sendActivation from "~~/server/utils/email/send-activation";
+import sendActivation from "~~/server/utils/email/send-owner-activation";
 /**
  * Handles the signup request for owners.
  * @param event - The H3 event object.
