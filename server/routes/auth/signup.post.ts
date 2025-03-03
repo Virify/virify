@@ -1,7 +1,7 @@
 import sendActivation from "~~/server/email/send-owner-activation";
 import sendAgentReview from "~~/server/email/send-agent-review";
 import sendToAgentReview from "~~/server/email/send-to-agent-review";
-import { Reviewed } from "@prisma/client";
+import { Reviewed, Owner, OwnerRole } from "@prisma/client";
 
 /**
  * Handles signup requests for both owners and agents.
@@ -17,11 +17,11 @@ export default defineEventHandler(async (event) => {
 
   // Ensure email is trimmed and formatted correctly
   const normalizedEmail = (email as string).trim();
-  
+
   // generate token
   const token = generateToken();
   try {
-    // Route the request based on the role provided in the request
+    // check if role is user or agent
     if (role === "user") {
       await handleOwnerSignup(normalizedEmail, token);
     } else if (role === "agent") {
@@ -49,7 +49,7 @@ async function handleOwnerSignup(email: string, token: string) {
   if (existingUser) {
     // If user exists, check if signup should be rejected
     if (shouldRejectSignup(existingUser)) {
-      throw createError({ statusCode: 403, statusMessage: "User already activated, or is an agent!" });
+      throw createError({ statusCode: 403, statusMessage: "User already activated" });
     }
 
     // If an activation email was already sent and is still valid, prevent resending
@@ -75,30 +75,25 @@ async function handleOwnerSignup(email: string, token: string) {
  * @param token - The generated activation token.
  */
 async function handleAgentSignup(formData: any, token: string) {
-  const {
-    email,
-    businessName,
-    mainContact,
-    addressLine,
-    city,
-    county,
-    country,
-    postcode,
-    registrationNumber,
-  } = formData;
+  const { email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = formData;
+  try {
+    // Check if an agent already exists with the same email or address
+    const agent = await findBusinessOwner(email, addressLine);
 
-  // Check if an agent already exists with the same email or address
-  const agent = await findBusinessOwner(email, addressLine);
-  handleExistingAgent(agent, addressLine);
+    // Handle existing agent
+    handleExistingAgent(agent, addressLine);
 
-  // If agent does not exist, create a new record with the token
-  await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
+    // If agent does not exist, create a new record with the token
+    await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
 
-  // Notify internal team for agent review
-  await sendAgentReview(formData, token);
+    // Notify internal team for agent review
+    await sendAgentReview(formData, token);
 
-  // Send an email to the agent informing them of the review process
-  await sendToAgentReview(formData);
+    // Send an email to the agent informing them of the review process
+    await sendToAgentReview(formData);
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**
@@ -110,6 +105,12 @@ async function handleAgentSignup(formData: any, token: string) {
  */
 function handleExistingAgent(agent: BusinessOwnerWithVerification | null, address: string): void {
   if (agent) {
+    
+    // Check is the agent is a user
+    if (agent.role === OwnerRole.USER) {
+      throw createError({ statusCode: 400, statusMessage: "User already exists with that email!" });
+    }
+
     // Check if the agent is still under review
     if (agent.verification?.reviewed === Reviewed.PENDING) {
       throw createError({ statusCode: 400, statusMessage: "Agent already exists and is pending review" });

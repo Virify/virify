@@ -1,29 +1,18 @@
 <script setup lang="ts">
-
-defineProps<{ message: string }>();
-const emit = defineEmits(['clear']);
-
-function clearNotification() {
-  emit('clear');
-}
+defineProps<{
+  message?: string;
+}>();
 </script>
-
 <template>
-  <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md mx-auto transform transition-transform duration-300 ease-in-out scale-100">
-      <p class="font-bold text-lg text-center mb-4">{{ message }}</p>
-      <div class="flex justify-center">
-        <button ref="okButton" @click="clearNotification" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-6 transition-colors duration-300 ease-in-out">
-          OK
-        </button>
+  <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <div v-if="message" class="mb-4">
+        <p>{{ message }}</p>
+      </div>
+      <slot></slot>
+      <div class="flex justify-end mt-4">
+        <button @click="$emit('clear')" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Close</button>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any additional styles here */
-.bg-black {
-  backdrop-filter: blur(5px);
-}
-</style>

@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
     // Return a success response
     return successResponse("Logged in successfully!");
   } catch (err) {
-    console.log(err);
-    return err;
+    throw err;
   }
 });
