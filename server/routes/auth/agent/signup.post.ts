@@ -1,5 +1,6 @@
 import { Reviewed } from "@prisma/client";
 import sendAgentReview from "~~/server/utils/email/send-agent-review";
+import sendToAgentReview from "~~/server/utils/email/send-to-agent-review";
 /**
  * Endpoint to handle agent signup.
  * @param event - The H3 event object.
@@ -30,16 +31,17 @@ export default defineEventHandler(async (event) => {
     // Handle existing agent
     handleExistingAgent(agent, addressLine);
 
+    // generate token
     const token = generateToken();
 
     // Create the agent
     await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
 
-    // Send the review email
+    // Send the review email to internal team
     await sendAgentReview(formData, token as string);
 
-    // TODO: Send an email to the agent notifying them
-    
+    // Send the review in progress email to agent
+    await sendToAgentReview(formData);
 
     return successResponse("Agent created successfully");
   } catch (err) {
@@ -54,7 +56,6 @@ export default defineEventHandler(async (event) => {
  */
 function handleExistingAgent(agent: BusinessOwnerWithVerification | null, address: string): void {
   if (agent) {
-    
     if (agent.verification?.reviewed === Reviewed.PENDING) {
       throw createError({ statusCode: 400, statusMessage: "Agent already exists and is pending review" });
     }
@@ -63,7 +64,7 @@ function handleExistingAgent(agent: BusinessOwnerWithVerification | null, addres
       throw createError({ statusCode: 400, statusMessage: "Agent already exists and was rejected. Contact us for more information" });
     }
 
-    if(agent.addressLine1 === address) throw createError({ statusCode: 400, statusMessage: "Agent already registered at that address!" });
+    if (agent.addressLine1 === address) throw createError({ statusCode: 400, statusMessage: "Agent already registered at that address!" });
 
     throw createError({ statusCode: 400, statusMessage: "Agent already exists" });
   }
