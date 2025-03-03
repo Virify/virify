@@ -6,7 +6,7 @@ model Owner {
   email                    String        @unique
   mainContact              String?
   password                 String?
-  verification             Verification?  @relation
+  verification             Verification? @relation
   businessName             String?
   addressLine1             String?
   addressLine2             String?
@@ -14,18 +14,17 @@ model Owner {
   county                   String?
   postcode                 String?
   country                  String?
-  companyRegistration      String?       @unique
+  companyRegistration      String?
   umbrella                 Umbrella?     @relation(fields: [umbrellaId], references: [id])
   umbrellaId               Int?
   properties               Property[]
   listings                 Listing[]
   agents                   Agent[]
   role                     OwnerRole     @default(USER)
-  passwordResetToken       String?
+  passwordResetToken       String?       @unique
   passwordResetTokenExpiry DateTime?
   lastLogin                DateTime?
   deletedAt                DateTime?
-  isActivated              Boolean       @default(false)
   createdAt                DateTime      @default(now())
   updatedAt                DateTime      @updatedAt
 

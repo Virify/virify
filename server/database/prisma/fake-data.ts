@@ -359,7 +359,6 @@ export function fakeOwnerComplete() {
     passwordResetTokenExpiry: undefined,
     lastLogin: undefined,
     deletedAt: undefined,
-    isActivated: false,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
@@ -541,7 +540,6 @@ export function fakeVerification() {
 export function fakeVerificationComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    approved: false,
     ownerId: faker.number.int(),
     identity: undefined,
     address: undefined,

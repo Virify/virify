@@ -17,13 +17,13 @@ export default defineEventHandler(async (event) => {
     // Find the user by email
     const user = await findOwnerWithVerification(email);
 
-    if(!user) throw createError({ statusCode: 404, statusMessage: "User not found" });
+    if(!user) throw createError({ statusCode: 404, statusMessage: "Agent not found" });
 
     // Activate user by updating password and clearing activation token
     await updateOwnerAndActivate(user.id, hashedPassword);
 
     // Return success response
-    return successResponse("User activated");
+    return successResponse("Agent activated");
   } catch (error) {
     console.error(error);
     return error;

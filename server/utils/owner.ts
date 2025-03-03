@@ -1,4 +1,5 @@
 import { Agent, Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
+export type BusinessOwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
 
 /**
  * Finds an owner by email.
@@ -34,11 +35,11 @@ export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPa
   return prisma.owner.findFirst({
     where: {
       verification: {
-        is: { activationToken: token }
+        is: { activationToken: token },
       },
     },
     include: {
-      verification: true
+      verification: true,
     },
   });
 }
@@ -50,27 +51,38 @@ export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPa
  * @param registrationNumber - The registration number of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function findBusinessOwner(email: string, businessName: string, registrationNumber: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function findBusinessOwner(email: string, address: string): Promise<BusinessOwnerWithVerification | null> {
   return prisma.owner.findFirst({
     where: {
-      OR: [{ email }, { businessName }, { companyRegistration: registrationNumber }],
+      OR: [{ email: email }, { addressLine1: address }],
+      role: OwnerRole.AGENT,
     },
     include: {
-      verification: true
+      verification: true,
     },
   });
 }
 /**
- * Finds an agent by email.
+ * Finds an agent by owner OR find owner by OwnerRole
  * @param email - The email of the agent to find.
  * @returns The agent object if found, otherwise null.
  */
 export async function findAgent(email: string): Promise<Owner | null> {
   return prisma.owner.findFirst({
     where: {
-      agents: {
-        some: { email }
-      }
+      OR: [
+        {
+          email: email,
+          role: OwnerRole.AGENT,
+        },
+        {
+          agents: {
+            some: {
+              email: email,
+            },
+          },
+        },
+      ],
     },
     include: { agents: true, verification: true },
   });
@@ -126,7 +138,18 @@ export async function createOauthOwner(email: string): Promise<Owner> {
  * @param registrationNumber string
  * @returns Promise<Owner>
  */
-export async function createBusinessOwner(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string): Promise<Owner> {
+export async function createBusinessOwnerWithToken(
+  email: string,
+  businessName: string,
+  mainContact: string,
+  addressLine: string,
+  city: string,
+  county: string,
+  country: string,
+  postcode: string,
+  registrationNumber: string,
+  token: string
+): Promise<BusinessOwnerWithVerification | null> {
   return prisma.owner.create({
     data: {
       email,
@@ -142,9 +165,12 @@ export async function createBusinessOwner(email: string, businessName: string, m
       verification: {
         create: {
           reviewed: Reviewed.PENDING,
+          reviewToken: token,
+          reviewTokenExpiry: new Date(Date.now() + 3600000),
         },
       },
     },
+    include: { verification: true },
   });
 }
 
@@ -174,7 +200,7 @@ export async function updateOwnerToken(email: string, token: string): Promise<Ow
  * @param password string
  * @returns Promise<Owner>
  */
-export async function activateUser(userId: number, password: string): Promise<Owner> {
+export async function updateOwnerAndActivate(userId: number, password?: string): Promise<Owner> {
   return prisma.owner.update({
     where: { id: userId },
     data: {
@@ -188,6 +214,54 @@ export async function activateUser(userId: number, password: string): Promise<Ow
       },
     },
   });
+}
+
+/**
+ * Update Owner and Review.
+ * if approval is approved, update the activation token and expiry.
+ * if approval is rejected, update the review token and expiry.
+ * @param id number
+ * @param approval Reviewed
+ * @param token string
+ * @returns Owner <Promise>
+ */
+export async function updateOwnerAndReview(id: number, approval: Reviewed, token: string): Promise<BusinessOwnerWithVerification> {
+  if (approval === Reviewed.APPROVED) {
+    return prisma.owner.update({
+      where: { id: id },
+      data: {
+        verification: {
+          update: {
+            activationToken: token,
+            activationTokenExpiry: new Date(Date.now() + 3600000),
+            activated: false,
+            reviewed: approval,
+            reviewToken: null,
+            reviewTokenExpiry: null,
+          },
+        },
+      },
+      include: {
+        verification: true,
+      },
+    });
+  } else {
+    return prisma.owner.update({
+      where: { id: id },
+      data: {
+        verification: {
+          update: {
+            reviewed: approval,
+            reviewToken: null,
+            reviewTokenExpiry: null,
+          },
+        },
+      },
+      include: {
+        verification: true,
+      },
+    });
+  }
 }
 
 /**
@@ -205,6 +279,6 @@ export function hasRole(user: Owner | Agent, role: OwnerRole): boolean {
  * @param user Owner | Agent
  * @returns Boolean
  */
-export function isActive(user: any): boolean {
-  return user.verification.activated;
+export function isActive(user: Prisma.OwnerGetPayload<{ include: { verification: true } }>): boolean {
+  return user.verification?.activated === true;
 }

@@ -8,7 +8,7 @@
  */
 export default async function emailSender(html: string, subject: string, to: string): Promise<any> {
   try {
-    // Import the sendMail function from NodeMailer
+    // use sendMail function from useNodeMailer composable
     const { sendMail } = useNodeMailer();
 
     // Send the email with the provided subject, HTML content, and recipient address

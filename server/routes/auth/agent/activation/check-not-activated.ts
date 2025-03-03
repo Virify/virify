@@ -18,18 +18,18 @@ export default defineEventHandler(async (event) => {
 
     // If the user does not exist or has no verification details, return a 404 error
     if (!user?.verification) {
-      throw createError({ statusCode: 404, statusMessage: "User not found or verification status missing" });
+      throw createError({ statusCode: 404, statusMessage: "Agent not found or verification status missing" });
     }
 
     // If the user is an agent or already activated, reject the request
-    if (shouldRejectSignup(user)) {
-      throw createError({ statusCode: 403, statusMessage: "User already activated, or is an agent!" });
+    if (shouldRejectAgentSignup(user)) {
+      throw createError({ statusCode: 403, statusMessage: "Agent already activated, or is a user!" });
     }
-
+    console.log(user.verification.activationToken)
     // Validate the activation token and its expiration date
     validateActivationToken(user.verification, token as string);
-
-    return successResponse("User not activated");
+    
+    return successResponse("Agent not activated");
   } catch (error) {
     return error;
   }

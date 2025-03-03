@@ -78,7 +78,7 @@ export function useAuthForm(initialForm: { [key: string]: any }) {
         isSuccess.value = true;
         fetch();
       } catch (error: any) {
-        notification.value = `${error.statusMessage}`;
+        notification.value = error.data.statusMessage;
       } finally {
         isLoading.value = false;
       }

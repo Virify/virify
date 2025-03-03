@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
-import ApproveAgentOwner from "../../routes/email/templates/agent-verification.vue";
-import emailSender from "./email-sender";
+import AgentReview from "./templates/agent-review.vue";
 
 /**
  * Sends an activation email to the user.
@@ -21,9 +20,9 @@ interface FormData {
   registrationNumber: string;
 }
 
-export default async function sendAgentVerification(formData: FormData) {
+export default async function sendAgentReview(formData: FormData, token: string) {
   // Get the Vue email template
-  const emailToSend = ApproveAgentOwner;
+  const emailToSend = AgentReview;
 
   // Render the email to HTML
   const emailHtml = await render(emailToSend, {
@@ -37,12 +36,13 @@ export default async function sendAgentVerification(formData: FormData) {
     postcode: formData.postcode,
     registrationNumber: formData.registrationNumber,
     baseUrl: process.env.EMAIL_BASE_URL || "",
+    token: token,
   });
 
   // Set the email subject, HTML content, and recipient address
   const subject = "New Estate Agent Review Required";
   const html = emailHtml;
-  const to = 'jamie@virify.co.uk';
+  const to = process.env.INTERNAL_EMAIL || "";
 
   try {
     // Send the email

@@ -1,4 +1,4 @@
-import sendActivation from "~~/server/utils/email/send-activation";
+import sendActivation from "~~/server/email/send-owner-activation";
 /**
  * Handles the signup request for owners.
  * @param event - The H3 event object.
@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if the user already exists
     const existingUser = await findOwnerWithVerification(normalizedEmail);
+    
     if (existingUser) {
       // Handle existing user cases
       if (shouldRejectSignup(existingUser)) {
