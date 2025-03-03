@@ -11,10 +11,6 @@ export default defineEventHandler(async (event) => {
   const approval = approve === 'true' ? Reviewed.APPROVED : Reviewed.REJECTED;
 
   try {
-    /**
-     * TODO: Implement the following:
-     * 1. Check for unqique company registration number
-     */
     // Retrieve the owner along with their verification details
     const owner = await findOwnerWithVerification(email as string);
 

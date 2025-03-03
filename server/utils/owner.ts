@@ -50,10 +50,11 @@ export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPa
  * @param registrationNumber - The registration number of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function findBusinessOwner(email: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function findBusinessOwner(email: string, address: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
   return prisma.owner.findFirst({
     where: {
-      email,
+      OR: [{ email: email}, { addressLine1: address }],
+      role: OwnerRole.AGENT,
     },
     include: {
       verification: true,
@@ -126,7 +127,7 @@ export async function createOauthOwner(email: string): Promise<Owner> {
  * @param registrationNumber string
  * @returns Promise<Owner>
  */
-export async function createBusinessOwner(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string, token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function createBusinessOwnerWithToken(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string, token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
   return prisma.owner.create({
     data: {
       email,

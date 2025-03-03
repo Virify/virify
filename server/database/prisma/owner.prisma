@@ -14,7 +14,7 @@ model Owner {
   county                   String?
   postcode                 String?
   country                  String?
-  companyRegistration      String?       @unique
+  companyRegistration      String?
   umbrella                 Umbrella?     @relation(fields: [umbrellaId], references: [id])
   umbrellaId               Int?
   properties               Property[]
