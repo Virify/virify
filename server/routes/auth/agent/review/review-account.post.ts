@@ -1,6 +1,6 @@
 import { Reviewed } from "@prisma/client";
-import sendAgentRejection from "~~/server/utils/email/send-agent-rejection";
-import sendAgentActivation from "~~/server/utils/email/send-agent-activation";
+import sendAgentActivation from "~~/server/email/send-agent-activation";
+import sendAgentRejection from "~~/server/email/send-agent-rejection";
 
 /**
  * Endpoint to handle agent verification.

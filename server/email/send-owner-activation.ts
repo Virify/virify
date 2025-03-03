@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
-import AgentDenied from "../../routes/email/templates/agent-denied.vue";
-import emailSender from "./email-sender";
+import OwnerActivation from "./templates/owner-activation.vue";
 
 /**
  * Sends an activation email to the user.
@@ -9,26 +8,19 @@ import emailSender from "./email-sender";
  * @returns A Promise that resolves when the email is sent.
  * @throws An error if there is an issue sending the email.
  */
-export default async function sendAgentActivation(email: string, agent: BusinessOwnerWithVerification) {
+export default async function sendActivation(email: string, token: string) {
   // Get the Vue email template
-  const emailToSend = AgentDenied;
+  const emailToSend = OwnerActivation;
   try {
     // Render the email to HTML
     const emailHtml = await render(emailToSend, {
-      email: email,
-      businessName: agent.businessName!,
-      mainContact: agent.mainContact!,
-      addressLine: agent.addressLine1!,
-      city: agent.city!,
-      county: agent.county!,
-      country: agent.country!,
-      postcode: agent.postcode!,
-      registrationNumber: agent.companyRegistration!,
+      token,
+      userEmail: email,
       baseUrl: process.env.EMAIL_BASE_URL || "",
     });
 
     // Set the email subject, HTML content, and recipient address
-    const subject = "Your account has been denied";
+    const subject = "Welcome to Virify - Activation Required!";
     const html = emailHtml;
     const to = email;
 

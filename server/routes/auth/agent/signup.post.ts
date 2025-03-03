@@ -1,6 +1,6 @@
 import { Reviewed } from "@prisma/client";
-import sendAgentReview from "~~/server/utils/email/send-agent-review";
-import sendToAgentReview from "~~/server/utils/email/send-to-agent-review";
+import sendAgentReview from "~~/server/email/send-agent-review";
+import sendToAgentReview from "~~/server/email/send-to-agent-review";
 /**
  * Endpoint to handle agent signup.
  * @param event - The H3 event object.

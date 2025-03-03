@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
-import AgentActivation from "../../routes/email/templates/agent-activation.vue";
-import emailSender from "./email-sender";
+import AgentActivation from "./templates/agent-activation.vue";
 
 /**
  * Sends an activation email to the user.

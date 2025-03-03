@@ -13,7 +13,7 @@ export default defineNuxtConfig({
       tasks: true,
     },
     imports: {
-      dirs: ["server/database/lib/*.ts"],
+      dirs: ["server/database/lib/*.ts", "/server/email/*.ts"],
     },
     rollupConfig: {
      // @ts-ignore
