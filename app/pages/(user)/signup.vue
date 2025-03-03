@@ -6,7 +6,7 @@ const { form, errors, notification, isLoading, submitForm, clearNotification } =
  * Signup function
  */
 async function signup() {
-  await submitForm('/auth/owner/signup', 'Signup successful! Redirecting to login page...');
+  await submitForm('/auth/owner/signup', 'Signup successful! Please check your inbox for an activation email.');
 }
 
 /**

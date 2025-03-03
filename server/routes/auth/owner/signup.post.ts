@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if the user already exists
     const existingUser = await findOwnerWithVerification(normalizedEmail);
+    
     if (existingUser) {
       // Handle existing user cases
       if (shouldRejectSignup(existingUser)) {

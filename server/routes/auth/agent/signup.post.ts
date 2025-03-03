@@ -1,10 +1,16 @@
+import { Prisma, Reviewed } from "@prisma/client";
 import sendAgentVerification from "~~/server/utils/email/send-agent-verification";
-
+/**
+ * Endpoint to handle agent signup.
+ * @param event - The H3 event object.
+ * @returns A standardized HTTP response indicating the result of the signup process.
+ */
 export default defineEventHandler(async (event) => {
+  // Extract form data from the request body
   const { email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = await readBody(event);
   const { successResponse } = useResponse();
 
-  // validate the request body
+  // Validate the request body
   const formData = {
     email,
     businessName,
@@ -15,46 +21,39 @@ export default defineEventHandler(async (event) => {
     country,
     postcode,
     registrationNumber,
-  }
+  };
 
   try {
-  // check if the agent exists
-  const dbAgent = await findBusinessOwner(email, businessName, registrationNumber);
+    // Check if the agent exists
+    const agent = await findBusinessOwner(email);
 
-  const testAgent = await prisma.owner.findFirst({
-    where: {
-      OR: [
-        { email },
-        { businessName },
-        { companyRegistration: registrationNumber },
-      ],
-    },
-    include: {
-      verification: true, // Include the verification relation
-    },
-  });
-  // if the agent exists, return an error
-  if(testAgent) {
-    if(testAgent.verification) {
-      throw createError({ statusCode: 403, statusMessage: "Agent already approved!" });
-    }
-  }
+    // Handle existing agent
+    handleExistingAgent(agent);
 
-  if(dbAgent) {
-    if(dbAgent.verification) {
-      throw createError({ statusCode: 403, statusMessage: "Agent already approved by another user!" });
-    }
-  }
+    const token = generateToken();
 
-  // create the agent
-  await createBusinessOwner(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber);
+    // Create the agent
+    await createBusinessOwner(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
 
-  // send the review email
-  await sendAgentVerification(formData);
+    // Send the review email
+    await sendAgentVerification(formData, token as string);
 
-
-  return successResponse("Agent created successfully");
+    return successResponse("Agent created successfully");
   } catch (err) {
     return err;
   }
 });
+
+/**
+ * Handles the case where an agent already exists.
+ * @param agent - The existing agent object.
+ * @throws An error if the agent already exists and is pending review.
+ */
+function handleExistingAgent(agent: Prisma.OwnerGetPayload<{ include: { verification: true } }> | null): void {
+  if (agent) {
+    if (agent.verification?.reviewed === Reviewed.PENDING) {
+      throw createError({ statusCode: 400, statusMessage: "Agent already exists and is pending review" });
+    }
+    throw createError({ statusCode: 400, statusMessage: "Agent already exists" });
+  }
+}

@@ -1,4 +1,3 @@
-import type { NuxtError } from '#app'
 export function useAuthForm(initialForm: { [key: string]: any }) {
   // composable imports
   const { fetch } = useUserSession();

@@ -34,11 +34,11 @@ export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPa
   return prisma.owner.findFirst({
     where: {
       verification: {
-        is: { activationToken: token }
+        is: { activationToken: token },
       },
     },
     include: {
-      verification: true
+      verification: true,
     },
   });
 }
@@ -50,13 +50,13 @@ export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPa
  * @param registrationNumber - The registration number of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function findBusinessOwner(email: string, businessName: string, registrationNumber: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function findBusinessOwner(email: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
   return prisma.owner.findFirst({
     where: {
-      OR: [{ email }, { businessName }, { companyRegistration: registrationNumber }],
+      email,
     },
     include: {
-      verification: true
+      verification: true,
     },
   });
 }
@@ -69,8 +69,8 @@ export async function findAgent(email: string): Promise<Owner | null> {
   return prisma.owner.findFirst({
     where: {
       agents: {
-        some: { email }
-      }
+        some: { email },
+      },
     },
     include: { agents: true, verification: true },
   });
@@ -126,7 +126,7 @@ export async function createOauthOwner(email: string): Promise<Owner> {
  * @param registrationNumber string
  * @returns Promise<Owner>
  */
-export async function createBusinessOwner(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string): Promise<Owner> {
+export async function createBusinessOwner(email: string, businessName: string, mainContact: string, addressLine: string, city: string, county: string, country: string, postcode: string, registrationNumber: string, token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
   return prisma.owner.create({
     data: {
       email,
@@ -142,9 +142,12 @@ export async function createBusinessOwner(email: string, businessName: string, m
       verification: {
         create: {
           reviewed: Reviewed.PENDING,
+          reviewToken: token,
+          reviewTokenExpiry: new Date(Date.now() + 3600000),
         },
       },
     },
+    include: { verification: true },
   });
 }
 
@@ -174,7 +177,7 @@ export async function updateOwnerToken(email: string, token: string): Promise<Ow
  * @param password string
  * @returns Promise<Owner>
  */
-export async function updateOwnerAndActivate(userId: number, password: string): Promise<Owner> {
+export async function updateOwnerAndActivate(userId: number, password?: string): Promise<Owner> {
   return prisma.owner.update({
     where: { id: userId },
     data: {
@@ -184,6 +187,26 @@ export async function updateOwnerAndActivate(userId: number, password: string): 
           activationToken: null,
           activationTokenExpiry: null,
           activated: true,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Update Owner and review.
+ * @param id number
+ * @returns Owner <Promise>
+ */
+export async function updateOwnerAndReview(id: number): Promise<Owner> {
+  return prisma.owner.update({
+    where: { id: id },
+    data: {
+      verification: {
+        update: {
+          reviewed: Reviewed.YES,
+          reviewToken: null,
+          reviewTokenExpiry: null,
         },
       },
     },
