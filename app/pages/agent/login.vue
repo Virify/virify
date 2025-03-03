@@ -4,7 +4,6 @@ const route = useRoute();
 definePageMeta({
   title: "Login",
   description: "Login to your account",
-  middleware: "login",
 });
 
 const form = ref({
@@ -24,7 +23,7 @@ onMounted(() => {
     notification.value = "Logged in successfully! Redirecting to account page...";
     setTimeout(() => {
       notification.value = null;
-      navigateTo("agent/review");
+      navigateTo("/agent/account");
     }, 2000);
   }
 });
@@ -65,7 +64,7 @@ async function login() {
         notification.value = "Logged in successfully! Redirecting to account page...";
         setTimeout(() => {
           notification.value = null;
-          navigateTo("/agent/review");
+          navigateTo("/agent/account");
         }, 2000);
       } else if (response.body.error === "Password is incorrect") {
         notification.value = "Incorrect Password!";

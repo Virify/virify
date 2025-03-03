@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
   const { email, password } = await readBody(event);
 
   try {
+
     // Authenticate the user
     const user = await authenticateUser(email, password, true);
 

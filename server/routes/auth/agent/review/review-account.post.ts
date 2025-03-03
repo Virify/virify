@@ -1,4 +1,6 @@
 import { Reviewed } from "@prisma/client";
+import sendAgentRejection from "~~/server/utils/email/send-agent-rejection";
+import sendAgentActivation from "~~/server/utils/email/send-agent-activation";
 
 /**
  * Endpoint to handle agent verification.
@@ -8,7 +10,7 @@ import { Reviewed } from "@prisma/client";
 export default defineEventHandler(async (event) => {
   const { email, token, approve } = await readBody(event);
   const { successResponse } = useResponse();
-  const approval = approve === 'true' ? Reviewed.APPROVED : Reviewed.REJECTED;
+  const approval = approve === "true" ? Reviewed.APPROVED : Reviewed.REJECTED;
 
   try {
     // Retrieve the owner along with their verification details
@@ -18,7 +20,7 @@ export default defineEventHandler(async (event) => {
     if (!owner) throw createError({ statusCode: 404, statusMessage: "Agent not found!" });
 
     // If the owner has already been reviewed, return a 403 error
-    if(owner?.verification?.reviewed === Reviewed.APPROVED || owner?.verification?.reviewed === Reviewed.REJECTED) {
+    if (owner?.verification?.reviewed === Reviewed.APPROVED || owner?.verification?.reviewed === Reviewed.REJECTED) {
       throw createError({ statusCode: 403, statusMessage: "Agent has already been reviewed! Please delete the email." });
     }
 
@@ -26,19 +28,38 @@ export default defineEventHandler(async (event) => {
     if (owner.verification?.reviewToken !== token) throw createError({ statusCode: 401, statusMessage: "Invalid Token!" });
 
     // Check if the review token has expired
-    if(owner.verification?.reviewTokenExpiry! < new Date()) throw createError({ statusCode: 401, statusMessage: "Token expired!" });
+    if (owner.verification?.reviewTokenExpiry! < new Date()) throw createError({ statusCode: 401, statusMessage: "Token expired!" });
 
     // If the owner is already activated, return a 403 error else update the owner and review
     if (owner.verification?.activated) {
       throw createError({ statusCode: 403, statusMessage: "Agent already activated!" });
     } else {
-      await updateOwnerAndReview(owner.id, approval);
+      // generate new token
+      const token = generateToken();
+
+      // Update the owner and review
+      const ownerResult = await updateOwnerAndReview(owner.id, approval, token);
+
+      // send the proper email to the agent
+      await informAgentOfDecision(ownerResult, ownerResult.email, token);
     }
 
-    // TODO: Send an email to the owner notifying them 
-    
     return successResponse("Owner reviewed successfully");
   } catch (error) {
     return error;
   }
 });
+
+/**
+ * Send out the activation email to the agent. or the rejection email.
+ * @param agent BusinessOwnerWithVerification
+ * @param email string
+ */
+async function informAgentOfDecision(agent: BusinessOwnerWithVerification, email: string, token: string): Promise<void> {
+  // If the agent is approved, send the activation email
+  if (agent.verification?.reviewed === Reviewed.APPROVED) {
+    await sendAgentActivation(email, token);
+  } else {
+    await sendAgentRejection(email, agent);
+  }
+}
