@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
     // Return success response
     return successResponse("User activated");
   } catch (error) {
+    console.error(error);
     return error;
   }
 });

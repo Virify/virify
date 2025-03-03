@@ -47,7 +47,7 @@ CREATE TYPE "Tenure" AS ENUM ('LEASEHOLD', 'FREEHOLD');
 CREATE TYPE "EpcType" AS ENUM ('A', 'B', 'C', 'D', 'E', 'F', 'G');
 
 -- CreateEnum
-CREATE TYPE "Reviewed" AS ENUM ('PENDING', 'YES', 'NO');
+CREATE TYPE "Reviewed" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- CreateTable
 CREATE TABLE "AdditionalFeatures" (
@@ -390,7 +390,6 @@ CREATE TABLE "Umbrella" (
 -- CreateTable
 CREATE TABLE "Verification" (
     "id" SERIAL NOT NULL,
-    "approved" BOOLEAN NOT NULL DEFAULT false,
     "ownerId" INTEGER NOT NULL,
     "identity" BOOLEAN,
     "address" BOOLEAN,

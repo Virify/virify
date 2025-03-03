@@ -198,13 +198,13 @@ export async function updateOwnerAndActivate(userId: number, password?: string):
  * @param id number
  * @returns Owner <Promise>
  */
-export async function updateOwnerAndReview(id: number): Promise<Owner> {
+export async function updateOwnerAndReview(id: number, approval: Reviewed): Promise<Owner> {
   return prisma.owner.update({
     where: { id: id },
     data: {
       verification: {
         update: {
-          reviewed: Reviewed.YES,
+          reviewed: approval,
           reviewToken: null,
           reviewTokenExpiry: null,
         },

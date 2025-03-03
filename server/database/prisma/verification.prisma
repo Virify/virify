@@ -1,7 +1,6 @@
 model Verification {
   id                    Int       @id @default(autoincrement())
-  approved              Boolean   @default(false)
-  owner                 Owner     @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  owner                 Owner     @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ownerId               Int       @unique
   identity              Boolean?
   address               Boolean?
@@ -20,6 +19,6 @@ model Verification {
 
 enum Reviewed {
   PENDING
-  YES
-  NO
+  APPROVED
+  REJECTED
 }
