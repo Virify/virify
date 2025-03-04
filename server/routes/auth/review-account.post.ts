@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
     return successResponse("Owner reviewed successfully");
   } catch (error) {
-    return error;
+    throw error;
   }
 });
 

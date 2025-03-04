@@ -1,12 +1,12 @@
 <script setup lang="ts">
 
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "" });
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "" }, 'user');
 
 /**
  * Signup function
  */
 async function signup() {
-  await submitForm('/auth/owner/signup', 'Signup successful! Please check your inbox for an activation email.');
+  await submitForm('/auth/signup', 'Signup successful! Please check your inbox for an activation email.');
 }
 
 /**

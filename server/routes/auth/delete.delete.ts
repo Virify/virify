@@ -28,6 +28,6 @@ export default defineEventHandler(async (event) => {
     // Return a success response
     return successResponse("Deleted Successfully! Redirecting to homepage...");
   } catch (error) {
-    return error;
+    throw error;
   }
 });

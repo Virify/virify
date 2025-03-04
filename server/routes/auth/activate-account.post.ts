@@ -10,23 +10,22 @@ export default defineEventHandler(async (event) => {
 
     // Validate input
     validateActivationRequest(token, email, password);
-    
+
     // Hash the new password securely
     const hashedPassword = await hashPassword(password);
 
     // Find the user by email
     const user = await findOwnerWithVerification(email);
 
-    if(!user) throw createError({ statusCode: 404, statusMessage: "Agent not found" });
+    if (!user) throw createError({ statusCode: 404, statusMessage: "User not found." });
 
     // Activate user by updating password and clearing activation token
     await updateOwnerAndActivate(user.id, hashedPassword);
 
     // Return success response
-    return successResponse("Agent activated");
+    return successResponse("Successfully activated account.");
   } catch (error) {
-    console.error(error);
-    return error;
+    throw error;
   }
 });
 

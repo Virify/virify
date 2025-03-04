@@ -7,7 +7,7 @@ import { OwnerRole, Prisma } from "@prisma/client";
  */
 export function shouldRejectSignup(user: Prisma.OwnerGetPayload<{ include: { verification: true } }>): Boolean {
   return isActive(user) || hasRole(user, OwnerRole.AGENT);
-};
+}
 
 /**
  * Check if the owner is active or is user.

@@ -1,8 +1,9 @@
-export function useAuthForm(initialForm: { [key: string]: any }) {
+export function useAuthForm(initialForm: { [key: string]: any }, role: string) {
   // composable imports
   const { fetch } = useUserSession();
   // references
   const form = ref(initialForm);
+  const userRole = ref(role);
   const errors = ref<{ [key: string]: string | null }>({});
 
   const notification = ref<string | null>(null);
@@ -72,7 +73,7 @@ export function useAuthForm(initialForm: { [key: string]: any }) {
       try {
         await $fetch(url, {
           method: "POST",
-          body: form.value,
+          body: { ...form.value, role: userRole.value },
         });
         notification.value = message;
         isSuccess.value = true;

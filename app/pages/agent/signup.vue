@@ -9,13 +9,13 @@ const { form, errors, notification, isLoading, submitForm, clearNotification } =
   country: "",
   postcode: "",
   registrationNumber: "",
-});
+}, 'agent');
 
 /**
  * Signup function
  */
 async function signup() {
-  await submitForm("/auth/agent/signup", "Signup successful! Approving your account, We will email you once your account is approved...");
+  await submitForm("/auth/signup", "Signup successful! Approving your account, We will email you once your account is approved...");
 }
 
 /**
