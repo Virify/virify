@@ -276,7 +276,6 @@ CREATE TABLE "Owner" (
     "passwordResetTokenExpiry" TIMESTAMP(3),
     "lastLogin" TIMESTAMP(3),
     "deletedAt" TIMESTAMP(3),
-    "isActivated" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -461,7 +460,7 @@ CREATE UNIQUE INDEX "Owner_username_key" ON "Owner"("username");
 CREATE UNIQUE INDEX "Owner_email_key" ON "Owner"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Owner_companyRegistration_key" ON "Owner"("companyRegistration");
+CREATE UNIQUE INDEX "Owner_passwordResetToken_key" ON "Owner"("passwordResetToken");
 
 -- CreateIndex
 CREATE INDEX "Owner_umbrellaId_idx" ON "Owner"("umbrellaId");
