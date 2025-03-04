@@ -1,4 +1,4 @@
-export function useAuthForm(initialForm: { [key: string]: any }, role: string) {
+export function useAuthForm(initialForm: { [key: string]: any }, role: string, formType?: string) {
   // composable imports
   const { fetch } = useUserSession();
   // references
@@ -41,6 +41,18 @@ export function useAuthForm(initialForm: { [key: string]: any }, role: string) {
             isValid = false;
           } else if (!validateEmail(value)) {
             errors.value[key] = "Invalid email format";
+            isValid = false;
+          } else {
+            errors.value[key] = null;
+          }
+        }
+
+        if(key === "password" && formType === "activate") {
+          if (!value) {
+            errors.value[key] = "Password is required";
+            isValid = false;
+          } else if (!validatePassword(value)) {
+            errors.value[key] = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number";
             isValid = false;
           } else {
             errors.value[key] = null;
