@@ -38,4 +38,8 @@ function validateActivationRequest(token?: string, email?: string, password?: st
   if (!token || !email || !password) {
     throw createError({ statusCode: 400, statusMessage: "Invalid request" });
   }
+
+  if(!validatePassword(password)) {
+    throw createError({ statusCode: 400, statusMessage: "Invalid password" });
+  }
 }
