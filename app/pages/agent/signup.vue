@@ -1,15 +1,19 @@
+import { Style } from '../../../.nuxt/components';
 <script setup lang="ts">
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({
-  email: "",
-  businessName: "",
-  mainContact: "",
-  addressLine: "",
-  city: "",
-  county: "",
-  country: "",
-  postcode: "",
-  registrationNumber: "",
-}, 'agent');
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm(
+  {
+    email: "",
+    businessName: "",
+    mainContact: "",
+    addressLine: "",
+    city: "",
+    county: "",
+    country: "",
+    postcode: "",
+    registrationNumber: "",
+  },
+  "agent"
+);
 
 /**
  * Signup function
@@ -32,73 +36,22 @@ function clearNotificationHandler() {
       <div class="p-8 flex justify-center flex-col sm:w-3/4 xs:w-full">
         <h1 class="text-3xl font-bold mb-6 text-purple-500">Agency Signup</h1>
         <h3 class="text-xl font-bold mb-6 text-purple-500">Once you have signed up to Virify, we will verify you and then you can start adding agents to your Agency Account!</h3>
-        <form @submit.prevent="signup">
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="email">Agent Email:
-              <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">This *must* be your business email</span>
-            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="businessName">Agent Name:
-              <span v-if="errors.businessName" class="text-red-400 text-xs italic">{{ errors.businessName }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">Your Agent operating name</span>
-            <input v-model="form.businessName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessName" type="text" placeholder="Business Name" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="mainContact">Agent Main Contact:
-              <span v-if="errors.mainContact" class="text-red-400 text-xs italic">{{ errors.mainContact }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">The main contact number for this Agency</span>
-            <input v-model="form.mainContact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="mainContact" type="text" placeholder="Main Contact" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="addressLine">Business Address:
-              <span v-if="errors.addressLine" class="text-red-400 text-xs italic">{{ errors.addressLine }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">Address Line 1</span>
-            <input v-model="form.addressLine" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessAddress" type="text" placeholder="Address Line 1" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="city">City:
-              <span v-if="errors.city" class="text-red-400 text-xs italic">{{ errors.city }}</span>
-            </label>
-            <input v-model="form.city" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="city" type="text" placeholder="City" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="county">County:
-              <span v-if="errors.county" class="text-red-400 text-xs italic">{{ errors.county }}</span>
-            </label>
-            <input v-model="form.county" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="county" type="text" placeholder="County" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="country">Country:
-              <span v-if="errors.country" class="text-red-400 text-xs italic">{{ errors.country }}</span>
-            </label>
-            <input v-model="form.country" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="country" type="text" placeholder="Country" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="postcode">Postcode:
-              <span v-if="errors.postcode" class="text-red-400 text-xs italic">{{ errors.postcode }}</span>
-            </label>
-            <input v-model="form.postcode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="postcode" type="text" placeholder="Postcode" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold mb-2" for="registrationNumber">Company Registration Number:
-              <span v-if="errors.registrationNumber" class="text-red-400 text-xs italic">{{ errors.registrationNumber }}</span>
-            </label>
-            <input v-model="form.registrationNumber" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="registrationNumber" type="text" placeholder="Registration Number" />
-          </div>
-          <div class="flex items-center justify-between">
-            <button class="bg-purple-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Signup</span>
-            </button>
-            <NuxtLink to="/agent/login" class="bg-white text-purple-500 font-bold py-3 px-4 rounded border border-purple-500 focus:outline-none focus:shadow-outline" type="submit">Login</NuxtLink>
-          </div>
-        </form>
+        <FormKit type="form" @submit="signup">
+          <FormKit steps-class="border-0 shadow-none px-0" type="multi-step" tab-style="progress">
+            <FormKit type="step" name="personal">
+              <FormKit type="email" prefix-icon="email" name="email" label="Email" validation="required|email" validation-visibility="dirty" help="Must be your business email address." />
+              <FormKit type="text" prefix-icon="text" name="businessName" label="Business Name" validation="required" validation-visibility="dirty" help="Your business name." />
+              <FormKit type="tel" prefix-icon="telephone" name="mainContact" label="Main Contact Number" validation="required|phone" validation-visibility="dirty" help="Your main contact number." prefiex-icon="telephone" />
+            </FormKit>
+            <FormKit type="step" name="address">
+              <FormKit type="text" name="addressLine" label="Address Line 1" validation="required" validation-visibility="dirty" />
+              <FormKit type="text" name="city" label="City" validation="required" validation-visibility="dirty" />
+              <FormKit type="text" name="county" label="County" validation="required" validation-visibility="dirty" />
+              <FormKit type="text" name="country" label="Country" validation="required" validation-visibility="dirty" />
+              <FormKit type="text" name="postcode" label="Postcode" validation="required|postcodeUK" validation-visibility="dirty" />
+            </FormKit>
+          </FormKit>
+        </FormKit>
       </div>
     </div>
     <div class="flex flex-col justify-center items-center w-1/2 bg-purple-500 h-full xs:hidden sm:flex">
@@ -108,3 +61,20 @@ function clearNotificationHandler() {
     <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
   </div>
 </template>
+<style scoped>
+form {
+  max-width: 100%;
+  border: none !important;
+  .group {
+    max-width: 100%;
+    border: none !important;
+    border-width: 0;
+    box-shadow: none !important;
+    .stepNext {
+      button {
+        background-color: #6b46c1;
+      }
+    }
+  }
+}
+</style>
