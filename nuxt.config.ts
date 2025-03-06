@@ -1,12 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxtjs/tailwindcss", "nuxt-auth-utils", "nuxt-nodemailer"],
+  modules: ["nuxt-auth-utils", "nuxt-nodemailer"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
+  css: ['~/assets/css/main.css'],
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+  },
   nitro: {
     experimental: {
       openAPI: true,
