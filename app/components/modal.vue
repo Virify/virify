@@ -4,7 +4,7 @@ defineProps<{
 }>();
 </script>
 <template>
-  <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="fixed inset-0 flex items-center justify-center backdrop-blur-xs">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
       <div v-if="message" class="mb-4">
         <p>{{ message }}</p>
