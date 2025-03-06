@@ -15,11 +15,6 @@
     "schema": "./server/database/prisma/"
   },
   "dependencies": {
-    "@formkit/addons": "^1.6.9",
-    "@formkit/core": "^1.6.9",
-    "@formkit/icons": "^1.6.9",
-    "@formkit/nuxt": "^1.6.9",
-    "@formkit/vue": "^1.6.9",
     "@prisma/client": "6.4.0",
     "@prisma/nuxt": "^0.3.0",
     "@vitejs/plugin-vue": "^5.2.1",
@@ -37,7 +32,7 @@
     "vue": "latest",
     "vue-router": "^4.5.0"
   },
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
   "devDependencies": {
     "@faker-js/faker": "^9.5.0",
     "@nuxtjs/tailwindcss": "^6.13.1",

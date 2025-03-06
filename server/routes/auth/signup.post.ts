@@ -1,8 +1,7 @@
 import sendActivation from "~~/server/email/send-owner-activation";
 import sendAgentReview from "~~/server/email/send-agent-review";
 import sendToAgentReview from "~~/server/email/send-to-agent-review";
-import { Reviewed, OwnerRole } from "@prisma/client";
-import agent from "~~/server/api/agent/agent";
+import { Reviewed, Owner, OwnerRole } from "@prisma/client";
 
 /**
  * Handles signup requests for both owners and agents.
@@ -12,33 +11,21 @@ import agent from "~~/server/api/agent/agent";
  */
 export default defineEventHandler(async (event) => {
   // Read request body
-  const { signup, role } = await readBody(event);
+  const body = await readBody(event);
+  const { role, email } = body;
   const { successResponse } = useResponse();
-  
-  let userInfo;
-  let agentInfo;
 
-  switch (role) {
-    case "agent":
-      agentInfo = { ...signup.personal, ...signup.company, ...signup.address };
-      console.log(agentInfo);
-      break;
-    case "user":
-      userInfo = signup.email;
-      break;
-    default:
-      throw createError({ statusCode: 400, statusMessage: "Invalid role specified" });
-  }
+  // Ensure email is trimmed and formatted correctly
+  const normalizedEmail = (email as string).trim();
 
   // generate token
   const token = generateToken();
-
   try {
     // check if role is user or agent
     if (role === "user") {
-      await handleOwnerSignup(userInfo, token);
+      await handleOwnerSignup(normalizedEmail, token);
     } else if (role === "agent") {
-      await handleAgentSignup(agentInfo, token);
+      await handleAgentSignup(body, token);
     } else {
       throw createError({ statusCode: 400, statusMessage: "Invalid role specified" });
     }
@@ -118,6 +105,7 @@ async function handleAgentSignup(formData: any, token: string) {
  */
 function handleExistingAgent(agent: BusinessOwnerWithVerification | null, address: string): void {
   if (agent) {
+    
     // Check is the agent is a user
     if (agent.role === OwnerRole.USER) {
       throw createError({ statusCode: 400, statusMessage: "User already exists with that email!" });
