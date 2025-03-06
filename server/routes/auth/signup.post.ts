@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   // Read request body
   const { signup, role } = await readBody(event);
   const { successResponse } = useResponse();
-  console.log(signup, role);
+  
   let userInfo;
   let agentInfo;
 
