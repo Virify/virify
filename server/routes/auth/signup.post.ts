@@ -2,6 +2,7 @@ import sendActivation from "~~/server/email/send-owner-activation";
 import sendAgentReview from "~~/server/email/send-agent-review";
 import sendToAgentReview from "~~/server/email/send-to-agent-review";
 import { Reviewed, OwnerRole } from "@prisma/client";
+import agent from "~~/server/api/agent/agent";
 
 /**
  * Handles signup requests for both owners and agents.
@@ -13,13 +14,14 @@ export default defineEventHandler(async (event) => {
   // Read request body
   const { signup, role } = await readBody(event);
   const { successResponse } = useResponse();
-
+  console.log(signup, role);
   let userInfo;
   let agentInfo;
 
   switch (role) {
     case "agent":
-      agentInfo = { ...signup.personal, ...signup.business, ...signup.address };
+      agentInfo = { ...signup.personal, ...signup.company, ...signup.address };
+      console.log(agentInfo);
       break;
     case "user":
       userInfo = signup.email;

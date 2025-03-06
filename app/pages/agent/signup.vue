@@ -5,6 +5,7 @@ const notification = ref<string | null>(null);
  * Login function
  */
 async function signup(signup: any) {
+  console.log(signup);
   try {
     await $fetch("/auth/signup", {
       method: "POST",
@@ -33,8 +34,8 @@ function clearNotificationHandler() {
       <div class="p-8 flex justify-center flex-col sm:w-3/4 xs:w-full">
         <h1 class="text-3xl font-bold mb-6 text-green-500">Agency Signup</h1>
         <h3 class="text-xl font-bold mb-6 text-green-500">Once you have signed up to Virify, we will verify you and then you can start adding agents to your Agency Account!</h3>
-        <FormKit type="form" @submit="signup" #default="{ value }">
-          <FormKit type="multi-step" tab-style="progress">
+        <FormKit type="form" @submit="signup">
+          <FormKit type="multi-step" tab-style="progress" name="signup">
             <FormKit type="step" name="personal">
               <FormKit label-class="text-green-500" type="email" prefix-icon="email" name="email" label="Email" validation="required|email" validation-visibility="dirty" help="Must be your business email address." />
               <FormKit type="tel" prefix-icon="telephone" name="mainContact" label="Main Contact Number" validation="required|phone" validation-visibility="dirty" help="Your main contact number." prefiex-icon="telephone" />
