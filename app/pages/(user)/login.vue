@@ -13,6 +13,7 @@ async function login(credentials: any) {
       body: {
         email: email,
         password: password,
+        role: "user",
       },
     });
     notification.value = "Login successful";
@@ -37,15 +38,7 @@ function clearNotificationHandler() {
         <h1 class="text-3xl font-bold mb-6 text-green-500">Login</h1>
         <FormKit type="form" submit-label="Login" @submit="login" label-class="text-green-500">
           <FormKit label-class="text-green-500" type="email" name="email" label="Email" validation="required|email" validation-visibility="dirty" />
-          <FormKit
-            label-class="text-green-500"
-            type="password"
-            name="password"
-            label="Password"
-            validation="contains_uppercase|*contains_symbol|*length:8|*required"
-            validation-visibility="dirty"
-            :validation-messages="{ length: 'Password must be at least 8 characters' }"
-          />
+          <FormKit type="password" name="password" label="Password" validation="required" validation-visibility="dirty" />
         </FormKit>
       </div>
       <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />

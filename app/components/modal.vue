@@ -11,7 +11,7 @@ defineProps<{
       </div>
       <slot></slot>
       <div class="flex justify-end mt-4">
-        <button @click="$emit('clear')" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Close</button>
+        <button @click="$emit('clear')" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Close</button>
       </div>
     </div>
   </div>
