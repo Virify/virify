@@ -1,19 +1,29 @@
 <script setup lang="ts">
-
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "" }, 'user');
+const notification = ref<string | null>(null);
 
 /**
  * Signup function
  */
-async function signup() {
-  await submitForm('/auth/signup', 'Signup successful! Please check your inbox for an activation email.');
+async function signup(signup: any) {
+  try {
+    await $fetch("/auth/signup", {
+      method: "POST",
+      body: {
+        signup,
+        role: "user",
+      },
+    });
+    notification.value = "Signup successful! Please check your inbox for an activation email.";
+  } catch (error: any) {
+    notification.value = error.data.statusMessage;
+  }
 }
 
 /**
  * Clear notification handler
  */
 function clearNotificationHandler() {
-  clearNotification('/login');
+  notification.value = null;
 }
 </script>
 
@@ -22,25 +32,9 @@ function clearNotificationHandler() {
     <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
       <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
         <h1 class="text-3xl font-bold mb-6 text-green-500">Signup</h1>
-        <form @submit.prevent="signup">
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="email">
-              Email:
-              <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
-            </label>
-            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
-          </div>
-          <div class="flex items-center justify-start gap-4">
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Signup</span>
-            </button>
-            <NuxtLink to="/login" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Login</NuxtLink>
-            <div class="flex justify-end w-full">
-              <NuxtLink to="/agent/signup" class="text-green-500 underline p-4" type="submit">Estate Agent? Sign up here!</NuxtLink>
-            </div>
-          </div>
-        </form>
+        <FormKit type="form" submit-label="Signup" @submit="signup">
+          <FormKit type="email" prefix-icon="email" name="email" label="Email" validation="required|email" help="Email Address" validation-visibility="dirty" />
+        </FormKit>
       </div>
       <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
     </div>
