@@ -13,6 +13,7 @@ async function submit() {
       method: "POST",
       body: {
         password: password.value,
+        token: useRoute().params.token,
       },
     });
   } catch (error: any) {

@@ -1,6 +1,4 @@
 import { Agent, Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
-import passwordResetPost from "../routes/auth/password-reset.post";
-import { tokenToString } from "typescript";
 export type BusinessOwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
 
 /**
@@ -23,6 +21,38 @@ export async function findOwnerWithVerification(email: string): Promise<Prisma.O
     },
     include: {
       verification: true,
+    },
+  });
+}
+
+/**
+ * Find Owner by Password reset token
+ * @param token string
+ * @returns Owner
+ */
+export async function findOwnerByPasswordToken(token: string) {
+  return prisma.owner.findUnique({
+    where: {
+      passwordResetToken: token,
+    },
+  });
+}
+
+/**
+ * Update the owners password based on the token *which has been verified*.
+ * @param token string
+ * @param password string
+ * @returns Owner
+ */
+export async function updateOwnerByToken(token: string, password: string) {
+  return prisma.owner.update({
+    where: {
+      passwordResetToken: token,
+    },
+    data: {
+      password,
+      passwordResetToken: null,
+      passwordResetTokenExpiry: null,
     },
   });
 }
