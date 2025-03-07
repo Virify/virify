@@ -1,0 +1,55 @@
+<script setup lang="ts">
+
+// password reference
+const password = ref();
+const notification = ref();
+
+/**
+ * Submit function
+ * Submits the password reset form
+ */
+async function submit() {
+  try {
+    await $fetch("/auth/password-reset", {
+      method: "POST",
+      body: {
+        password: password.value,
+      },
+    });
+  } catch (error: any) {
+    notification.value = error.data.statusMessage;
+  }
+}
+
+/**
+ * Clear notification handler
+ * Clears the notification
+ */
+function clearNotificationHandler() {
+  notification.value = null;
+}
+</script>
+<template>
+  <div class="flex justify-center items-center h-screen bg-gray-100">
+    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
+      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
+        <h3 class="text-xl mb-6 text-green-500">Please enter a password to reset your password</h3>
+        <form @submit.prevent="submit">
+          <div class="mb-6">
+            <label class="block text-green-500 text-sm font-bold mb-2" for="password">Password:</label>
+            <input v-model="password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
+            <!-- <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span> -->
+          </div>
+          <div class="flex items-center justify-between">
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Activate</button>
+          </div>
+        </form>
+        <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
+      </div>
+    </div>
+    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
+      <h1 class="text-white font-bold text-8xl">Virify</h1>
+      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
+    </div>
+  </div>
+</template>
