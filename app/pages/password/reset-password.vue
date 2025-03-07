@@ -1,4 +1,3 @@
-import validateEmail from '../../../shared/utils/validate-email';
 <script setup lang="ts">
 // password reference
 const email = ref();
@@ -10,7 +9,7 @@ function validateEmailHandler() {
     errors.value = "Please enter a valid email address";
     return false;
   }
-  if(!email.value) {
+  if (!email.value) {
     errors.value = "Please enter an email address";
     return false;
   }
@@ -27,7 +26,7 @@ async function submit() {
     await $fetch("/auth/email-reset", {
       method: "POST",
       body: {
-       email: email.value,
+        email: email.value,
       },
     });
     notification.value = "Check your inbox for the password reset link";
@@ -49,6 +48,7 @@ function clearNotificationHandler() {
   <div class="flex justify-center items-center h-screen bg-gray-100">
     <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
       <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
+        <h1 class="text-3xl font-bold mb-3 text-green-500">Password Reset</h1>
         <h3 class="text-xl mb-6 text-green-500">Please enter your Email address to reset your password</h3>
         <form @submit.prevent="submit">
           <div class="mb-6">

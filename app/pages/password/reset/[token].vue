@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 // password reference
 const password = ref();
 const notification = ref();
@@ -33,6 +32,7 @@ function clearNotificationHandler() {
   <div class="flex justify-center items-center h-screen bg-gray-100">
     <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
       <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
+        <h1>Password Reset</h1>
         <h3 class="text-xl mb-6 text-green-500">Please enter a password to reset your password</h3>
         <form @submit.prevent="submit">
           <div class="mb-6">
