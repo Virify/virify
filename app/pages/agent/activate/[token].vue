@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // composable imports
 const route = useRoute();
-const { form, errors, notification, submitForm, clearNotification } = useAuthForm({ password: "", token: "", email: "" }, 'agent');
+const { form, errors, notification, submitForm, clearNotification } = useAuthForm({ password: "", token: "", email: "" }, 'agent', 'activate');
 
 /**
  * Activate account function
