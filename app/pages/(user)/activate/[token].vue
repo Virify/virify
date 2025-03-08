@@ -32,6 +32,7 @@ const email = route.query.email as string;
  * On page mount if the account is activated, show an error notification
  * If the account is not activated, do nothing and let the user activate the account
  */
+// TODO: MOVE THIS INTO MIDDLEWARE LIKE THE PASSWORD RESET TOKEN CHECK
 onMounted(async () => {
   try {
     await $fetch("/auth/check-not-activated", {
