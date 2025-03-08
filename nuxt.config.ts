@@ -14,6 +14,9 @@ export default defineNuxtConfig({
       tailwindcss(),
     ],
   },
+  ui: {
+    colorMode: false
+  },
   nitro: {
     experimental: {
       openAPI: true,
