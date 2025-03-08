@@ -1,5 +1,4 @@
 import sendActivation from "~~/server/email/send-password-reset";
-import { BusinessOwnerWithVerification } from "~~/server/utils/owner";
 
 /**
  * Send password reset email to the user from the email address
@@ -16,10 +15,10 @@ export default defineEventHandler(async (event) => {
     const dbOwner = await findOwnerWithVerification(email);
 
     //validate owner
-    validateOwner(dbOwner!);
+     validateOwner(dbOwner);
 
     // create a specific token for the user
-    const token = await generateToken();
+    const token = generateToken();
 
     // save the token to the database for the user of which email they sent
     await updateOwnerByEmailPasswordReset(email, token);
@@ -38,7 +37,7 @@ export default defineEventHandler(async (event) => {
  * Check if email is valid/activate and does not already have a password reset token
  * @param owner
  */
-function validateOwner(owner: BusinessOwnerWithVerification): void {
+function validateOwner(owner: BusinessOwnerWithVerification | null): void {
   if (!owner) throw createError({ statusCode: 400, statusMessage: "User not found" });
   if (!owner?.verification?.activated) throw createError({ statusCode: 400, statusMessage: "User not activated" });
   if (owner.passwordResetToken) throw createError({ statusCode: 400, statusMessage: "Password reset token already exists" });

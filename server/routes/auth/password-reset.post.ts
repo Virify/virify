@@ -1,5 +1,4 @@
 import { Owner } from "@prisma/client";
-import { findOwnerByPasswordToken } from "~~/server/utils/owner";
 
 export default defineEventHandler(async (event) => {
   try {

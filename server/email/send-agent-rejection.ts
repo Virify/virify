@@ -2,7 +2,8 @@ import { render } from "@vue-email/render";
 import AgentDenied from "./templates/agent-denied.vue";
 
 /**
- * Sends an activation email to the user.
+ * Sends a rejection email to the user.
+ * 
  * @param email - The recipient's email address.
  * @param token - The activation token.
  * @returns A Promise that resolves when the email is sent.
