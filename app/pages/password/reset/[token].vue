@@ -3,15 +3,35 @@ definePageMeta({
   middleware: ["check-password-token"],
 })
 
+// references
 const password = ref();
 const notification = ref();
+const errors = ref();
 
+/**
+ * Validate password function
+ * @param password - The password to validate
+ * @returns true if the password is valid, false otherwise
+ */
+function validatePasswordHandler() {
+  if (!password.value) {
+    errors.value = "Please enter a password";
+    return false;
+  }
+  if (password.value.length < 6) {
+    errors.value = "Password must be at least 6 characters long";
+    return false;
+  }
+  errors.value = null;
+  return true;
+}
 
 /**
  * Submit function
  * Submits the password reset form
  */
 async function submit() {
+  validatePasswordHandler();
   try {
     await $fetch("/auth/password-reset", {
       method: "POST",
@@ -44,7 +64,7 @@ function clearNotificationHandler() {
           <div class="mb-6">
             <label class="block text-green-500 text-sm font-bold mb-2" for="password">Password:</label>
             <input v-model="password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-            <!-- <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span> -->
+            <span v-if="errors" class="text-red-400 text-xs italic">{{ errors }}</span>
           </div>
           <div class="flex items-center justify-between">
             <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Activate</button>

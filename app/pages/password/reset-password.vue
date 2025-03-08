@@ -4,6 +4,11 @@ const email = ref();
 const notification = ref();
 const errors = ref();
 
+/**
+ * Validate email function
+ * @param email - The email address to validate
+ * @returns true if the email is valid, false otherwise
+ */
 function validateEmailHandler() {
   if (!validateEmail(email.value)) {
     errors.value = "Please enter a valid email address";
