@@ -16,7 +16,6 @@ export default async function sendActivation(email: string, token: string) {
     // Render the email to HTML
     const emailHtml = await render(emailToSend, {
       token,
-      userEmail: email,
       baseUrl: process.env.EMAIL_BASE_URL || "",
     });
 

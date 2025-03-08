@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     const dbOwner = await findOwnerWithVerification(email);
 
     //validate owner
-     validateOwner(dbOwner);
+    validateOwner(dbOwner);
 
     // create a specific token for the user
     const token = generateToken();

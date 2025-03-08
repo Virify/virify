@@ -6,16 +6,16 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Extract request body parameters
-    const { password, token, email } = await readBody(event);
+    const { password, token } = await readBody(event);
 
     // Validate input
-    validateActivationRequest(token, email, password);
+    validateActivationRequest(token, password);
 
     // Hash the new password securely
     const hashedPassword = await hashPassword(password);
 
     // Find the user by email
-    const user = await findOwnerWithVerification(email);
+    const user = await findOwnerByActivationToken(token as string);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "User not found." });
 
@@ -34,12 +34,12 @@ export default defineEventHandler(async (event) => {
  * Ensures that the token, email, and password are provided.
  * @throws Error if any required parameter is missing
  */
-function validateActivationRequest(token?: string, email?: string, password?: string) {
-  if (!token || !email || !password) {
+function validateActivationRequest(token?: string, password?: string) {
+  if (!token || !password) {
     throw createError({ statusCode: 400, statusMessage: "Invalid request" });
   }
 
-  if(!validatePassword(password)) {
+  if (!validatePassword(password)) {
     throw createError({ statusCode: 400, statusMessage: "Invalid password" });
   }
 }

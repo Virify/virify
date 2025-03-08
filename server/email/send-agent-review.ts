@@ -3,7 +3,7 @@ import AgentReview from "./templates/agent-review.vue";
 
 /**
  * Sends a review email to the internal team
- * 
+ *
  * @param email - The recipient's email address.
  * @param token - The activation token.
  * @returns A Promise that resolves when the email is sent.
@@ -49,6 +49,6 @@ export default async function sendAgentReview(formData: FormData, token: string)
     // Send the email
     return await emailSender(html, subject, to);
   } catch (error) {
-   throw error;
+    throw error;
   }
 }

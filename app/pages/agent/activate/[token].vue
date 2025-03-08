@@ -6,10 +6,8 @@ definePageMeta({
 
 // composable imports
 const route = useRoute();
-// Get the email from the query
-const email = route.query.email as string;
 
-const { form, errors, notification, submitForm, clearNotification, isLoading } = useAuthForm({ password: "", token: "", email: "" }, 'agent', 'activate');
+const { form, errors, notification, submitForm, clearNotification, isLoading } = useAuthForm({ password: "", token: "" }, 'agent', 'activate');
 
 /**
  * Activate account function
@@ -20,7 +18,6 @@ const { form, errors, notification, submitForm, clearNotification, isLoading } =
 async function activateAccount() {
   // Include token and email in the form data
   form.value.token = route.params.token as string;
-  form.value.email = email;
 
   await submitForm("/auth/activate-account", "Account activated successfully! Redirecting to login page...");
 }
@@ -37,7 +34,7 @@ function clearNotificationHandler() {
   <div class="flex justify-center items-center h-screen bg-gray-100">
     <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
       <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-6 text-purple-500">Welcome {{ email }}</h1>
+        <h1 class="text-3xl font-bold mb-6 text-purple-500">Welcome</h1>
         <h3 class="text-xl mb-6 text-purple-500">Please enter a password to activate your account</h3>
         <form @submit.prevent="activateAccount">
           <div class="mb-6">

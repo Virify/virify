@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Html, Text, Button, Container, Section, Heading } from "@vue-email/components";
-defineProps<{ token: string, userEmail: string, baseUrl: string }>();
+defineProps<{ token: string, baseUrl: string }>();
 </script>
 
 <template>
@@ -11,7 +11,7 @@ defineProps<{ token: string, userEmail: string, baseUrl: string }>();
         <Text style="color: #4a5568; font-size: 16px; margin-bottom: 20px;">
           So you have forgtotten your password? No problem! Please click the button below to reset your password:
         </Text>
-        <Button :href="baseUrl + `/password/reset/` + token + `?email=` + userEmail" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+        <Button :href="baseUrl + `/password/reset/` + token" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
           Reset Password
         </Button>
         <Text style="color: #4a5568; font-size: 14px; margin-top: 20px;">

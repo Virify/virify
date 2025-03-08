@@ -26,6 +26,24 @@ export async function findOwnerWithVerification(email: string): Promise<Prisma.O
 }
 
 /**
+ * Find Owner by Activation Token
+ * 
+ * @param token string
+ */
+export async function findOwnerByActivationToken(token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+  return prisma.owner.findFirst({
+    where: {
+      verification: {
+        activationToken: token,
+      },
+    },
+    include: {
+      verification: true,
+    },
+  });
+}
+
+/**
  * Find Owner by Password reset token
  * @param token string
  * @returns Owner
