@@ -1,13 +1,13 @@
+import { UButton } from '../../../.nuxt/components';
 <script setup lang="ts">
-
 // composable imports
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "", password: "" }, 'user');
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "", password: "" }, "user");
 
 // check for errors from query
 const error = useRoute().query.error;
 
 // if there is an error, set the notification to the error message
-if (error) notification.value =  error as string;
+if (error) notification.value = error as string;
 
 /**
  * Login function
@@ -45,10 +45,10 @@ function clearNotificationHandler() {
             <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
           </div>
           <div class="flex items-center justify-start gap-4">
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Login</span>
-            </button>
+            <UButton type="submit" loading-auto size="xl" class="text-white" variant="solid" active> Login </UButton>
+            <!-- <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+           
+            </button> -->
             <NuxtLink to="/signup" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Signup</NuxtLink>
           </div>
         </form>
