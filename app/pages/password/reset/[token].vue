@@ -7,6 +7,7 @@ definePageMeta({
 const password = ref();
 const notification = ref();
 const errors = ref();
+const isLoading = ref(false);
 
 /**
  * Validate password function
@@ -31,6 +32,7 @@ function validatePasswordHandler() {
  * Submits the password reset form
  */
 async function submit() {
+  isLoading.value = true;
   validatePasswordHandler();
   try {
     await $fetch("/auth/password-reset", {
@@ -40,6 +42,7 @@ async function submit() {
         token: useRoute().params.token,
       },
     });
+    isLoading.value = false;
   } catch (err: any) {
     notification.value = err.statusMessage;
   }
@@ -66,9 +69,10 @@ function clearNotificationHandler() {
             <input v-model="password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
             <span v-if="errors" class="text-red-400 text-xs italic">{{ errors }}</span>
           </div>
-          <div class="flex items-center justify-between">
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Activate</button>
-          </div>
+          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+              <span v-if="isLoading">Loading...</span>
+              <span v-else>Update</span>
+            </button>
         </form>
         <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
       </div>

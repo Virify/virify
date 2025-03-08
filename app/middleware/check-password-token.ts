@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const token = to.params.token
+  const token = to.params.token;
   try {
     await $fetch("/auth/check-password-token", {
       method: "GET",
@@ -13,4 +13,4 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       query: { error: "Invalid or expired token" },
     });
   }
-})
+});

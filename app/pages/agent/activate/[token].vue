@@ -9,7 +9,7 @@ const route = useRoute();
 // Get the email from the query
 const email = route.query.email as string;
 
-const { form, errors, notification, submitForm, clearNotification } = useAuthForm({ password: "", token: "", email: "" }, 'agent', 'activate');
+const { form, errors, notification, submitForm, clearNotification, isLoading } = useAuthForm({ password: "", token: "", email: "" }, 'agent', 'activate');
 
 /**
  * Activate account function
@@ -46,7 +46,10 @@ function clearNotificationHandler() {
             <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Activate</button>
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+              <span v-if="isLoading">Loading...</span>
+              <span v-else>Activate</span>
+            </button>
           </div>
         </form>
         <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />

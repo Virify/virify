@@ -3,6 +3,7 @@
 const email = ref();
 const notification = ref();
 const errors = ref();
+const isLoading = ref(false);
 
 /**
  * Validate email function
@@ -26,6 +27,7 @@ function validateEmailHandler() {
  * Submits the password reset form
  */
 async function submit() {
+  isLoading.value = true;
   validateEmailHandler();
   try {
     await $fetch("/auth/email-password-reset", {
@@ -34,6 +36,7 @@ async function submit() {
         email: email.value,
       },
     });
+    isLoading.value = false;
     notification.value = "Check your inbox for the password reset link";
   } catch (error: any) {
     notification.value = error.data.statusMessage;
@@ -62,7 +65,10 @@ function clearNotificationHandler() {
             <span v-if="errors" class="text-red-400 text-xs italic">{{ errors }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Activate</button>
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+              <span v-if="isLoading">Loading...</span>
+              <span v-else>Reset</span>
+            </button>
           </div>
         </form>
         <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />

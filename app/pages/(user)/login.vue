@@ -13,7 +13,7 @@ if (error) notification.value =  error as string;
  * Login function
  */
 async function login() {
-  await submitForm("/auth/login", "Signup successful! Redirecting to account page...");
+  await submitForm("/auth/login", "Login successful! Redirecting to account page...");
 }
 
 /**

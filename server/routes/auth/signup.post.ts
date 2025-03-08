@@ -1,7 +1,7 @@
 import sendActivation from "~~/server/email/send-owner-activation";
 import sendAgentReview from "~~/server/email/send-agent-review";
 import sendToAgentReview from "~~/server/email/send-to-agent-review";
-import { Reviewed, Owner, OwnerRole } from "@prisma/client";
+import { Reviewed, OwnerRole } from "@prisma/client";
 
 /**
  * Handles signup requests for both owners and agents.
