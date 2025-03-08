@@ -7,9 +7,7 @@ const { form, errors, notification, isLoading, submitForm, clearNotification } =
 const error = useRoute().query.error;
 
 // if there is an error, set the notification to the error message
-if (error) {
-  notification.value =  error as string;
-}
+if (error) notification.value =  error as string;
 
 /**
  * Login function

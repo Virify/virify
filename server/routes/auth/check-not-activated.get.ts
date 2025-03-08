@@ -15,12 +15,16 @@ export default defineEventHandler(async (event) => {
   try {
     // Determine if we're checking an agent or a user
     const isAgent = role === "agent";
+
+    // get the user with the email
     const user = await findOwnerWithVerification(email as string);
 
+    // Validate the user and their verification status
     if (!user?.verification) {
       throw createError({ statusCode: 404, statusMessage: `${isAgent ? "Agent" : "User"} not found or verification status missing` });
     }
 
+    // if user is agent and tries to activate on user account reject and vice versa
     if (isAgent ? shouldRejectAgentSignup(user) : shouldRejectSignup(user)) {
       throw createError({ statusCode: 403, statusMessage: `${isAgent ? "Agent" : "User"} already activated, or invalid type!` });
     }

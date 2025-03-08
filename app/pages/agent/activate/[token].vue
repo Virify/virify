@@ -1,6 +1,14 @@
 <script setup lang="ts">
+
+definePageMeta({
+  middleware: ["check-agent-activation"],
+});
+
 // composable imports
 const route = useRoute();
+// Get the email from the query
+const email = route.query.email as string;
+
 const { form, errors, notification, submitForm, clearNotification } = useAuthForm({ password: "", token: "", email: "" }, 'agent', 'activate');
 
 /**
@@ -12,7 +20,7 @@ const { form, errors, notification, submitForm, clearNotification } = useAuthFor
 async function activateAccount() {
   // Include token and email in the form data
   form.value.token = route.params.token as string;
-  form.value.email = route.query.email as string;
+  form.value.email = email;
 
   await submitForm("/auth/activate-account", "Account activated successfully! Redirecting to login page...");
 }
@@ -23,31 +31,6 @@ async function activateAccount() {
 function clearNotificationHandler() {
   clearNotification('/agent/login');
 }
-
-// Get the email from the query
-const email = route.query.email as string;
-
-/**
- * Check if the account is not activated
- * On page mount if the account is activated, show an error notification
- * If the account is not activated, do nothing and let the user activate the account
- */
-onMounted(async () => {
-  try {
-    await $fetch("/auth/check-not-activated", {
-      method: "GET",
-      params: {
-        email: email,
-        token: route.params.token as string,
-        role: 'agent',
-      },
-    });
-    console.log(route.params.token);
-  } catch (error: any) {
-    notification.value = error.data.statusMessage;
-    console.log(route.params.token);
-  }
-});
 </script>
 
 <template>
