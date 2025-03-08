@@ -1,7 +1,11 @@
 <script setup lang="ts">
-// password reference
+definePageMeta({
+  middleware: ["check-password-token"],
+})
+
 const password = ref();
 const notification = ref();
+
 
 /**
  * Submit function
@@ -16,8 +20,8 @@ async function submit() {
         token: useRoute().params.token,
       },
     });
-  } catch (error: any) {
-    notification.value = error.data.statusMessage;
+  } catch (err: any) {
+    notification.value = err.statusMessage;
   }
 }
 
@@ -27,6 +31,7 @@ async function submit() {
  */
 function clearNotificationHandler() {
   notification.value = null;
+  navigateTo("/login");
 }
 </script>
 <template>

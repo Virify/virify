@@ -1,6 +1,12 @@
 import sendActivation from "~~/server/email/send-password-reset";
 import { BusinessOwnerWithVerification } from "~~/server/utils/owner";
 
+/**
+ * Send password reset email to the user from the email address
+ * @param event - The H3 event object containing the request data.
+ * @returns A standardized HTTP response indicating whether the email was sent successfully.
+ * @throws Will throw an error if the email is invalid, user not found, or token already exists.
+ */
 export default defineEventHandler(async (event) => {
   const { email } = await readBody(event);
   try {

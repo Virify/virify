@@ -23,7 +23,7 @@ function validateEmailHandler() {
 async function submit() {
   validateEmailHandler();
   try {
-    await $fetch("/auth/email-reset", {
+    await $fetch("/auth/email-password-reset", {
       method: "POST",
       body: {
         email: email.value,
