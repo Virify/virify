@@ -1,48 +1,43 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ["check-user-activation"],
+  middleware: ["check-password-token"],
 });
 
-// composable imports
-const route = useRoute();
-// Get the email from the query
-const { form, errors, notification, submitForm, clearNotification, isLoading } = useAuthForm({ password: "", token: "" }, "user", "activate");
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ password: "", token: "" }, "user");
 
 /**
- * Activate account function
- * Activates the account and redirects to the login page
- * Shows an error notification if activation fails
- * Shows a success notification if activation is successful
+ * Submit function
+ * Submits the password reset form
  */
-async function activateAccount() {
-  // Include token and email in the form data
-  form.value.token = route.params.token as string;
-  await submitForm("/auth/activate-account", "Account activated successfully! Redirecting to login page...");
+async function submit() {
+  // Include token in the form data
+  form.value.token = useRoute().params.token as string;
+  await submitForm("/auth/password-reset", "Password reset successfully! Redirecting to login page...");
 }
 
 /**
  * Clear notification handler
+ * Clears the notification
  */
 function clearNotificationHandler() {
   clearNotification("/login");
 }
 </script>
-
 <template>
   <div class="flex justify-center items-center h-screen bg-gray-100">
     <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
       <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-6 text-green-500">Welcome</h1>
-        <h3 class="text-xl mb-6 text-green-500">Please enter a password to activate your account</h3>
-        <form @submit.prevent="activateAccount">
+        <h1 class="text-3xl font-bold mb-3 text-green-500">Password Reset</h1>
+        <h3 class="text-xl mb-6 text-green-500">Please enter a password to reset your password</h3>
+        <form @submit.prevent="submit">
           <div class="mb-6">
             <label class="block text-green-500 text-sm font-bold mb-2" for="password">Password:</label>
             <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-            <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
+            <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.paassword }}</span>
           </div>
           <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
             <span v-if="isLoading">Loading...</span>
-            <span v-else>Activate</span>
+            <span v-else>Update</span>
           </button>
         </form>
         <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />

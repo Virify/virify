@@ -1,12 +1,19 @@
 <script setup lang="ts">
+
 // composable imports
 const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "", password: "" }, 'user');
+
+// check for errors from query
+const error = useRoute().query.error;
+
+// if there is an error, set the notification to the error message
+if (error) notification.value =  error as string;
 
 /**
  * Login function
  */
 async function login() {
-  await submitForm("/auth/login", "Signup successful! Redirecting to account page...");
+  await submitForm("/auth/login", "Login successful! Redirecting to account page...");
 }
 
 /**

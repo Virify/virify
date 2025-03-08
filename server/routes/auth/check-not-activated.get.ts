@@ -1,3 +1,4 @@
+
 /**
  * Endpoint to check if a user or agent is activated.
  *
@@ -9,18 +10,23 @@
  */
 export default defineEventHandler(async (event) => {
   // Extract email and activation token from query parameters
-  const { email, token, role } = await getQuery(event);
+  const { token, role } = await getQuery(event);
   const { successResponse } = useResponse();
 
   try {
     // Determine if we're checking an agent or a user
     const isAgent = role === "agent";
-    const user = await findOwnerWithVerification(email as string);
 
+    // get the user by activation token
+    const user = await findOwnerByActivationToken(token as string);
+
+
+    // Validate the user and their verification status
     if (!user?.verification) {
       throw createError({ statusCode: 404, statusMessage: `${isAgent ? "Agent" : "User"} not found or verification status missing` });
     }
 
+    // if user is agent and tries to activate on user account reject and vice versa
     if (isAgent ? shouldRejectAgentSignup(user) : shouldRejectSignup(user)) {
       throw createError({ statusCode: 403, statusMessage: `${isAgent ? "Agent" : "User"} already activated, or invalid type!` });
     }

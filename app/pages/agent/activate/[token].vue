@@ -1,7 +1,13 @@
 <script setup lang="ts">
+
+definePageMeta({
+  middleware: ["check-agent-activation"],
+});
+
 // composable imports
 const route = useRoute();
-const { form, errors, notification, submitForm, clearNotification } = useAuthForm({ password: "", token: "", email: "" }, 'agent', 'activate');
+
+const { form, errors, notification, submitForm, clearNotification, isLoading } = useAuthForm({ password: "", token: "" }, 'agent', 'activate');
 
 /**
  * Activate account function
@@ -12,7 +18,6 @@ const { form, errors, notification, submitForm, clearNotification } = useAuthFor
 async function activateAccount() {
   // Include token and email in the form data
   form.value.token = route.params.token as string;
-  form.value.email = route.query.email as string;
 
   await submitForm("/auth/activate-account", "Account activated successfully! Redirecting to login page...");
 }
@@ -23,38 +28,13 @@ async function activateAccount() {
 function clearNotificationHandler() {
   clearNotification('/agent/login');
 }
-
-// Get the email from the query
-const email = route.query.email as string;
-
-/**
- * Check if the account is not activated
- * On page mount if the account is activated, show an error notification
- * If the account is not activated, do nothing and let the user activate the account
- */
-onMounted(async () => {
-  try {
-    await $fetch("/auth/check-not-activated", {
-      method: "GET",
-      params: {
-        email: email,
-        token: route.params.token as string,
-        role: 'agent',
-      },
-    });
-    console.log(route.params.token);
-  } catch (error: any) {
-    notification.value = error.data.statusMessage;
-    console.log(route.params.token);
-  }
-});
 </script>
 
 <template>
   <div class="flex justify-center items-center h-screen bg-gray-100">
     <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
       <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-6 text-purple-500">Welcome {{ email }}</h1>
+        <h1 class="text-3xl font-bold mb-6 text-purple-500">Welcome</h1>
         <h3 class="text-xl mb-6 text-purple-500">Please enter a password to activate your account</h3>
         <form @submit.prevent="activateAccount">
           <div class="mb-6">
@@ -63,7 +43,10 @@ onMounted(async () => {
             <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Activate</button>
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+              <span v-if="isLoading">Loading...</span>
+              <span v-else>Activate</span>
+            </button>
           </div>
         </form>
         <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
