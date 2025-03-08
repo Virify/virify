@@ -1,55 +1,21 @@
 <script setup lang="ts">
-// password reference
-const email = ref();
-const notification = ref();
-const errors = ref();
-const isLoading = ref(false);
 
-/**
- * Validate email function
- * @param email - The email address to validate
- * @returns true if the email is valid, false otherwise
- */
-function validateEmailHandler() {
-  if (!validateEmail(email.value)) {
-    errors.value = "Please enter a valid email address";
-    return false;
-  }
-  if (!email.value) {
-    errors.value = "Please enter an email address";
-    return false;
-  }
-  errors.value = null;
-  return true;
-}
+// composable imports
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "" }, 'user');
+
 /**
  * Submit function
  * Submits the password reset form
  */
 async function submit() {
-  isLoading.value = true;
-  validateEmailHandler();
-  try {
-    await $fetch("/auth/email-password-reset", {
-      method: "POST",
-      body: {
-        email: email.value,
-      },
-    });
-    isLoading.value = false;
-    notification.value = "Check your inbox for the password reset link";
-  } catch (error: any) {
-    notification.value = error.data.statusMessage;
-  }
+  await submitForm("/auth/email-password-reset", "Check your inbox for the password reset link");
 }
 
 /**
  * Clear notification handler
- * Clears the notification
  */
 function clearNotificationHandler() {
-  notification.value = null;
-  navigateTo("/login");
+  clearNotification();
 }
 </script>
 <template>
@@ -61,8 +27,8 @@ function clearNotificationHandler() {
         <form @submit.prevent="submit">
           <div class="mb-6">
             <label class="block text-green-500 text-sm font-bold mb-2" for="password">Email:</label>
-            <input v-model="email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" required />
-            <span v-if="errors" class="text-red-400 text-xs italic">{{ errors }}</span>
+            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" required />
+            <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
           </div>
           <div class="flex items-center justify-between">
             <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">

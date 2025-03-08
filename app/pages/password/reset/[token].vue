@@ -1,52 +1,18 @@
 <script setup lang="ts">
 definePageMeta({
   middleware: ["check-password-token"],
-})
+});
 
-// references
-const password = ref();
-const notification = ref();
-const errors = ref();
-const isLoading = ref(false);
-
-/**
- * Validate password function
- * @param password - The password to validate
- * @returns true if the password is valid, false otherwise
- */
-function validatePasswordHandler() {
-  if (!password.value) {
-    errors.value = "Please enter a password";
-    return false;
-  }
-  if (password.value.length < 6) {
-    errors.value = "Password must be at least 6 characters long";
-    return false;
-  }
-  errors.value = null;
-  return true;
-}
+const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ password: "", token: "" }, "user");
 
 /**
  * Submit function
  * Submits the password reset form
  */
 async function submit() {
-  isLoading.value = true;
-  validatePasswordHandler();
-  try {
-    await $fetch("/auth/password-reset", {
-      method: "POST",
-      body: {
-        password: password.value,
-        token: useRoute().params.token,
-      },
-    });
-    isLoading.value = false;
-    notification.value = "Password reset successfully! Redirecting to login page...";
-  } catch (err: any) {
-    notification.value = err.statusMessage;
-  }
+  // Include token in the form data
+  form.value.token = useRoute().params.token as string;
+  await submitForm("/auth/password-reset", "Password reset successfully! Redirecting to login page...");
 }
 
 /**
@@ -54,8 +20,7 @@ async function submit() {
  * Clears the notification
  */
 function clearNotificationHandler() {
-  notification.value = null;
-  navigateTo("/login");
+  clearNotification("/login");
 }
 </script>
 <template>
@@ -67,13 +32,13 @@ function clearNotificationHandler() {
         <form @submit.prevent="submit">
           <div class="mb-6">
             <label class="block text-green-500 text-sm font-bold mb-2" for="password">Password:</label>
-            <input v-model="password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-            <span v-if="errors" class="text-red-400 text-xs italic">{{ errors }}</span>
+            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
+            <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.paassword }}</span>
           </div>
           <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Update</span>
-            </button>
+            <span v-if="isLoading">Loading...</span>
+            <span v-else>Update</span>
+          </button>
         </form>
         <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
       </div>

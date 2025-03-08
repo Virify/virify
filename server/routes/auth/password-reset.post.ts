@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
 
     // get params from request
     const { password, token } = await readBody(event);
+    console.log("Password reset token: ", token);
 
     // we need to get the user with the token
     const tokenUser = await findOwnerByPasswordToken(token);
