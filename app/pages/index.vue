@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="flex justify-center items-center h-screen">
+  <div class="flex justify-center items-center h-screen bg-white">
     <div class="flex justify-center items-center w-1/2 bg-white h-screen flex-col">
       <h1 class="text-green-500 font-bold text-8xl">Virify</h1>
       <h2 class="text-green-500 text-4xl p-4 text-center">Your awesome property people!</h2>
