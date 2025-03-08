@@ -45,7 +45,7 @@ function clearNotificationHandler() {
             <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
             <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
           </div>
-          <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
+          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
               <span v-if="isLoading">Loading...</span>
               <span v-else>Activate</span>
             </button>
