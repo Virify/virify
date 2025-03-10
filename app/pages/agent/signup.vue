@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+const { showToast } = useToastNotification();
 
 // personal, business and address schemas
 const personalSchema = z.object({
@@ -32,8 +33,6 @@ const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>
 // refs
 const stepper = useTemplateRef("stepper");
 const form = useTemplateRef("form");
-const toast = useToast();
-const notification = ref("");
 
 // Form steps configuration
 const formStep = ref([
@@ -57,18 +56,6 @@ async function nextStep() {
     return;
   }
 }
-
-/**
- * Global Toast
- */
-function showToast() {
-  toast.add({
-    title: notification.value,
-    icon: "ri:error-warning-line",
-  });
-  toast.clear();
-}
-
 /**
  * Submit handler
  *
@@ -85,13 +72,11 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     },
   })
     .then(() => {
-      notification.value = "";
       // redirect to account page
       navigateTo("/agent");
     })
     .catch((error) => {
-      notification.value = error.statusMessage;
-      showToast();
+      showToast({ title: error.statusMessage, icon: "ri:error-warning-line" });
     });
 }
 
@@ -100,7 +85,11 @@ async function onSubmit(event: FormSubmitEvent<any>) {
  * Forces user to fill out the form before moving to the next step
  */
 function submitState() {
-  return form.value?.errors.length || stepper?.value?.hasNext ? true : false;
+  const isPersonalValid = !personalSchema.safeParse(state).error;
+  const isBusinessValid = !businessSchema.safeParse(state).error;
+  const isAddressValid = !addressSchema.safeParse(state).error;
+
+  return !(isPersonalValid && isBusinessValid && isAddressValid);
 }
 </script>
 
@@ -160,13 +149,14 @@ function submitState() {
               </UForm>
             </template>
           </UStepper>
-
+          <!-- END stepper -->
           <div class="flex gap-2 justify-between mt-6">
             <UButton variant="outline" leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="stepper?.prev()" color="neutral" size="lg"> Prev </UButton>
             <UButton variant="outline" trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" color="neutral" size="lg"> Next </UButton>
           </div>
-          <UButton type="submit" loading-auto size="xl" class="text-white mt-8" variant="solid" :disabled="submitState"> Submit </UButton>
+          <UButton type="submit" loading-auto size="xl" class="text-white mt-8" variant="solid" :disabled="submitState()"> Submit </UButton>
         </UForm>
+        <!-- END form -->
       </div>
     </div>
     <div class="flex flex-col justify-center items-center w-1/2 bg-purple-500 h-full xs:hidden sm:flex">
