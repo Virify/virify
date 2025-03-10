@@ -1,28 +1,106 @@
 <script setup lang="ts">
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({
-  email: "",
-  businessName: "",
-  mainContact: "",
-  addressLine: "",
-  city: "",
-  county: "",
-  country: "",
-  postcode: "",
-  registrationNumber: "",
-}, 'agent');
+import * as z from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
+
+// personal, business and address schemas
+const personalSchema = z.object({
+  email: z.string().email("Invalid email address").nonempty("Email is required"),
+  mainContact: z.string().nonempty("Main contact number is required"),
+});
+
+const businessSchema = z.object({
+  businessName: z.string().nonempty("Business name is required"),
+  registrationNumber: z.string().nonempty("Registration number is required"),
+});
+
+const addressSchema = z.object({
+  addressLine: z.string().nonempty("Address line is required"),
+  city: z.string().nonempty("City is required"),
+  county: z.string().nonempty("County is required"),
+  country: z.string().nonempty("Country is required"),
+  postcode: z.string().nonempty("Postcode is required"),
+});
+
+// Define type for each schema
+type PersonalSchema = z.output<typeof personalSchema>;
+type BusinessSchema = z.output<typeof businessSchema>;
+type AddressSchema = z.output<typeof addressSchema>;
+
+// Reactive form state
+const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>({});
+
+// refs
+const stepper = useTemplateRef("stepper");
+const form = useTemplateRef("form");
+const toast = useToast();
+const notification = ref("");
+
+// Form steps configuration
+const formStep = ref([
+  { slot: "personalInformation", title: "Personal Information", icon: "i-lucide-user" },
+  { slot: "businessInformation", title: "Business Information", icon: "i-lucide-briefcase" },
+  { slot: "businessAddress", title: "Business Address", icon: "i-lucide-map-pin" },
+]);
 
 /**
- * Signup function
+ * Next step handler
+ * Validate the current form step and move to the next step
  */
-async function signup() {
-  await submitForm("/auth/signup", "Signup successful! Approving your account, We will email you once your account is approved...");
+async function nextStep() {
+  try {
+    if (form.value) {
+      await form.value.validate({ nested: true });
+      stepper.value?.next();
+    }
+    // need to catch error and return to prevent the stepper from moving
+  } catch (error) {
+    return;
+  }
 }
 
 /**
- * Clear notification handler
+ * Global Toast
  */
-function clearNotificationHandler() {
-  clearNotification("/agent/login");
+function showToast() {
+  toast.add({
+    title: notification.value,
+    icon: "ri:error-warning-line",
+  });
+  toast.clear();
+}
+
+/**
+ * Submit handler
+ *
+ * @param event FormSubmitEvent
+ */
+async function onSubmit(event: FormSubmitEvent<any>) {
+  // You can handle the form submission here
+
+  await $fetch("/auth/signup", {
+    method: "POST",
+    body: {
+      ...state,
+      role: "agent",
+    },
+  })
+    .then(() => {
+      notification.value = "";
+      // redirect to account page
+      navigateTo("/agent");
+    })
+    .catch((error) => {
+      notification.value = error.statusMessage;
+      showToast();
+    });
+}
+
+/**
+ * Disable button if there are errors or if the stepper has a next step
+ * Forces user to fill out the form before moving to the next step
+ */
+function submitState() {
+  return form.value?.errors.length || stepper?.value?.hasNext ? true : false;
 }
 </script>
 
@@ -31,80 +109,69 @@ function clearNotificationHandler() {
     <div class="flex justify-center items-center w-1/2 h-full bg-white py-12 xs:w-full sm:w-1/2">
       <div class="p-8 flex justify-center flex-col sm:w-3/4 xs:w-full">
         <h1 class="text-3xl font-bold mb-6 text-purple-500">Agency Signup</h1>
-        <h3 class="text-xl font-bold mb-6 text-purple-500">Once you have signed up to Virify, we will verify you and then you can start adding agents to your Agency Account!</h3>
-        <form @submit.prevent="signup">
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="email">Agent Email:
-              <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">This *must* be your business email</span>
-            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
+        <h3 class="text-md font-bold mb-6 text-purple-500">Once you have signed up to Virify, we will verify you and then you can start adding agents to your Agency Account!</h3>
+
+        <!-- start of form -->
+        <UForm @submit="onSubmit" :state="state" class="w-full" ref="form">
+          <!-- Stepper -->
+          <UStepper ref="stepper" :items="formStep" size="sm" class="w-full" disabled>
+            <!-- Personal Information Step -->
+            <template #personalInformation>
+              <UForm :state="state" :schema="personalSchema" ref="form" class="pt-6">
+                <UFormField label="Email Address" name="email" size="lg" hint="Required" class="py-2" help="Your business email">
+                  <UInput v-model="state.email" type="email" placeholder="Enter your email..." size="xl" class="w-full" autocomplete="on" />
+                </UFormField>
+                <UFormField label="Main Contact Number" name="mainContact" size="lg" hint="Required" class="py-2" help="The number to reach you on">
+                  <UInput v-model="state.mainContact" type="tel" placeholder="Enter contact number..." size="xl" class="w-full" />
+                </UFormField>
+              </UForm>
+            </template>
+
+            <!-- Business Information Step -->
+            <template #businessInformation>
+              <UForm :state="state" :schema="businessSchema" ref="form" class="pt-6">
+                <UFormField label="Business Name" name="businessName" size="lg" hint="Required" class="py-2" help="Your operating name">
+                  <UInput v-model="state.businessName" type="text" placeholder="Enter name..." size="xl" class="w-full" />
+                </UFormField>
+                <UFormField label="Company Registration Number" name="registrationNumber" size="lg" hint="Required" class="py-2" help="Your operating company registration number">
+                  <UInput v-model="state.registrationNumber" type="string" placeholder="Enter registration number..." size="xl" class="w-full" />
+                </UFormField>
+              </UForm>
+            </template>
+
+            <!-- Business Address Step -->
+            <template #businessAddress>
+              <UForm :state="state" :schema="addressSchema" ref="form" class="pt-6">
+                <UFormField label="Address" name="addressLine" size="lg" hint="Required" class="py-2" help="Busisness Operating Address">
+                  <UInput v-model="state.addressLine" type="text" placeholder="Enter address..." size="xl" class="w-full" />
+                </UFormField>
+                <UFormField label="City" name="city" size="lg" hint="Required" class="py-2" help="Business Operating City">
+                  <UInput v-model="state.city" type="text" placeholder="Enter city..." size="xl" class="w-full" />
+                </UFormField>
+                <UFormField label="County" name="county" size="lg" hint="Required" class="py-2" help="Busness Operating County">
+                  <UInput v-model="state.county" type="text" placeholder="Enter county..." size="xl" class="w-full" />
+                </UFormField>
+                <UFormField label="Country" name="country" size="lg" hint="Required" class="py-2" help="Business Operating Country">
+                  <UInput v-model="state.country" type="text" placeholder="Enter country..." size="xl" class="w-full" />
+                </UFormField>
+                <UFormField label="Postcode" name="postcode" size="lg" hint="Required" class="py-2" help="Business Operating Postcode">
+                  <UInput v-model="state.postcode" type="text" placeholder="Enter postcode..." size="xl" class="w-full" />
+                </UFormField>
+              </UForm>
+            </template>
+          </UStepper>
+
+          <div class="flex gap-2 justify-between mt-6">
+            <UButton variant="outline" leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="stepper?.prev()" color="neutral" size="lg"> Prev </UButton>
+            <UButton variant="outline" trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" color="neutral" size="lg"> Next </UButton>
           </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="businessName">Agent Name:
-              <span v-if="errors.businessName" class="text-red-400 text-xs italic">{{ errors.businessName }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">Your Agent operating name</span>
-            <input v-model="form.businessName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessName" type="text" placeholder="Business Name" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="mainContact">Agent Main Contact:
-              <span v-if="errors.mainContact" class="text-red-400 text-xs italic">{{ errors.mainContact }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">The main contact number for this Agency</span>
-            <input v-model="form.mainContact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="mainContact" type="text" placeholder="Main Contact" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="addressLine">Business Address:
-              <span v-if="errors.addressLine" class="text-red-400 text-xs italic">{{ errors.addressLine }}</span>
-            </label>
-            <span class="block text-purple-500 text-xs font-xs mb-2">Address Line 1</span>
-            <input v-model="form.addressLine" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessAddress" type="text" placeholder="Address Line 1" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="city">City:
-              <span v-if="errors.city" class="text-red-400 text-xs italic">{{ errors.city }}</span>
-            </label>
-            <input v-model="form.city" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="city" type="text" placeholder="City" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="county">County:
-              <span v-if="errors.county" class="text-red-400 text-xs italic">{{ errors.county }}</span>
-            </label>
-            <input v-model="form.county" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="county" type="text" placeholder="County" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="country">Country:
-              <span v-if="errors.country" class="text-red-400 text-xs italic">{{ errors.country }}</span>
-            </label>
-            <input v-model="form.country" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="country" type="text" placeholder="Country" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold" for="postcode">Postcode:
-              <span v-if="errors.postcode" class="text-red-400 text-xs italic">{{ errors.postcode }}</span>
-            </label>
-            <input v-model="form.postcode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="postcode" type="text" placeholder="Postcode" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-purple-500 text-sm font-bold mb-2" for="registrationNumber">Company Registration Number:
-              <span v-if="errors.registrationNumber" class="text-red-400 text-xs italic">{{ errors.registrationNumber }}</span>
-            </label>
-            <input v-model="form.registrationNumber" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="registrationNumber" type="text" placeholder="Registration Number" />
-          </div>
-          <div class="flex items-center justify-between">
-            <button class="bg-purple-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Signup</span>
-            </button>
-            <NuxtLink to="/agent/login" class="bg-white text-purple-500 font-bold py-3 px-4 rounded border border-purple-500 focus:outline-none focus:shadow-outline" type="submit">Login</NuxtLink>
-          </div>
-        </form>
+          <UButton type="submit" loading-auto size="xl" class="text-white mt-8" variant="solid" :disabled="submitState"> Submit </UButton>
+        </UForm>
       </div>
     </div>
     <div class="flex flex-col justify-center items-center w-1/2 bg-purple-500 h-full xs:hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
       <h2 class="text-white text-5xl italic p-4 text-center">For Agents</h2>
     </div>
-    <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
   </div>
 </template>

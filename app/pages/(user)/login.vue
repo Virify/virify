@@ -1,61 +1,89 @@
 <script setup lang="ts">
+import * as z from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
 
-// composable imports
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "", password: "" }, 'user');
-
-// check for errors from query
+const toast = useToast();
+const notification = ref("");
 const error = useRoute().query.error;
 
 // if there is an error, set the notification to the error message
-if (error) notification.value =  error as string;
+if (error) {
+  toast.clear();
+  toast.add({
+    title: error as string,
+  });
+};
+
+// validation schema
+const schema = z.object({
+  email: z.string().email("Invalid email address").nonempty("Email is required"),
+  password: z.string().min(6, "Password must be at least 6 characters").nonempty("Password is required"),
+});
+
+type Schema = z.output<typeof schema>;
+
+// Form state
+const state = reactive<Partial<Schema>>({
+  email: "",
+  password: "",
+});
+
+/**
+ * Global Toast
+ */
+function showToast() {
+  toast.add({
+    title: notification.value,
+    icon: "ri:error-warning-line",
+  });
+  toast.clear();
+}
 
 /**
  * Login function
  */
 async function login() {
-  await submitForm("/auth/login", "Login successful! Redirecting to account page...");
-}
-
-/**
- * Clear notification handler
- */
-function clearNotificationHandler() {
-  clearNotification("/account");
+  await $fetch("/auth/login", {
+    method: "POST",
+    body: {
+      email: state.email,
+      password: state.password,
+      role: "user",
+    },
+  })
+    .then(() => {
+      notification.value = "Login successful! Redirecting to account page...";
+      // redirect to account page
+      navigateTo("/account");
+    })
+    .catch((error) => {
+      notification.value = error.statusMessage;
+      showToast();
+    });
 }
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
-      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
+  <div class="flex justify-center items-center h-screen flex-col sm:flex-row">
+    <div class="flex justify-center items-center w-full bg-white h-screen">
+      <div class="p-8 w-full sm:w-3/4">
         <h1 class="text-3xl font-bold mb-6 text-green-500">Login</h1>
-        <form @submit.prevent="login">
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="email">
-              Email:
-              <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
-            </label>
-            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="password">
-              Password:
-              <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
-            </label>
-            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-          </div>
-          <div class="flex items-center justify-start gap-4">
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Login</span>
-            </button>
-            <NuxtLink to="/signup" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Signup</NuxtLink>
-          </div>
-        </form>
+        <!-- UI Form -->
+        <UForm @submit="login" :state="state" :schema="schema" class="w-full">
+          <!-- email input -->
+          <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2">
+            <UInput v-model="state.email" type="email" placeholder="Enter your email" size="xl" class="w-full" autocomplete="on"/>
+          </UFormField>
+          <!-- password input -->
+          <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
+            <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
+          </UFormField>
+          <UButton type="submit" loading-auto size="xl" class="text-white mt-4" variant="solid" active> Login </UButton>
+        </UForm>
+        <!-- END UI Form -->
       </div>
-      <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
     </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
+    <div class="flex-col justify-center items-center w-full bg-green-500 h-screen hidden sm:flex">
       <h1 class="text-white font-bold text-8xl">Virify</h1>
       <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
     </div>
