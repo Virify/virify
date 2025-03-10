@@ -2,7 +2,7 @@
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
-// Define validation schemas for each section
+// personal, business and address schemas
 const personalSchema = z.object({
   email: z.string().email("Invalid email address").nonempty("Email is required"),
   mainContact: z.string().nonempty("Main contact number is required"),
@@ -27,18 +27,9 @@ type BusinessSchema = z.output<typeof businessSchema>;
 type AddressSchema = z.output<typeof addressSchema>;
 
 // Reactive form state
-const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>({
-  email: "",
-  mainContact: "",
-  businessName: "",
-  registrationNumber: "",
-  addressLine: "",
-  city: "",
-  county: "",
-  country: "",
-  postcode: "",
-});
+const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>({});
 
+// ref for the stepper and form
 const stepper = useTemplateRef("stepper");
 const form = useTemplateRef("form");
 
@@ -49,15 +40,44 @@ const formStep = ref([
   { slot: "businessAddress", title: "Business Address", icon: "i-lucide-map-pin" },
 ]);
 
-// Handle next step action
-function nextStep() {
-  stepper.value?.next();
+/**
+ * Next step handler
+ * Validate the current form step and move to the next step
+ */
+async function nextStep() {
+  try {
+    if (form.value) {
+      await form.value.validate({ nested: true });
+      stepper.value?.next();
+    }
+    // need to catch error and return to prevent the stepper from moving
+  } catch (error) {
+    return;
+  }
 }
 
-// Form submission handling
+/**
+ * Submit handler
+ *
+ * @param event FormSubmitEvent
+ */
 async function onSubmit(event: FormSubmitEvent<any>) {
   // You can handle the form submission here
   console.log("Form submitted:", event.data);
+}
+
+/**
+ * disable button if there are errors in the form or if the stepper has next step
+ * this forces the user to fill in the form before moving to the next step
+ *
+ * @returns {boolean}
+ */
+function buttonState() {
+  if (form.value?.errors.length || stepper?.value?.hasNext) {
+    return true;
+  } else {
+    return false;
+  }
 }
 </script>
 
@@ -71,10 +91,10 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         <!-- start of form -->
         <UForm @submit="onSubmit" :state="state" class="w-full" ref="form">
           <!-- Stepper -->
-          <UStepper ref="stepper" :items="formStep" size="md" class="w-full" disabled>
+          <UStepper ref="stepper" :items="formStep" size="sm" class="w-full" disabled>
             <!-- Personal Information Step -->
             <template #personalInformation>
-              <UForm :state="state" :schema="personalSchema">
+              <UForm :state="state" :schema="personalSchema" ref="form">
                 <UFormField label="Email Address" name="email" size="lg" hint="Required" class="py-2" help="Your business email">
                   <UInput v-model="state.email" type="email" placeholder="Enter your email..." size="xl" class="w-full" autocomplete="on" />
                 </UFormField>
@@ -86,7 +106,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
             <!-- Business Information Step -->
             <template #businessInformation>
-              <UForm :state="state" :schema="businessSchema">
+              <UForm :state="state" :schema="businessSchema" ref="form">
                 <UFormField label="Business Name" name="businessName" size="lg" hint="Required" class="py-2" help="Your operating name">
                   <UInput v-model="state.businessName" type="text" placeholder="Business name..." size="xl" class="w-full" />
                 </UFormField>
@@ -98,7 +118,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
             <!-- Business Address Step -->
             <template #businessAddress>
-              <UForm :state="state" :schema="addressSchema">
+              <UForm :state="state" :schema="addressSchema" ref="form">
                 <UFormField label="Business Address" name="addressLine" size="lg" hint="Required" class="py-2">
                   <UInput v-model="state.addressLine" type="text" placeholder="Address line 1..." size="xl" class="w-full" />
                 </UFormField>
@@ -122,7 +142,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             <UButton leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="stepper?.prev()" color="neutral"> Prev </UButton>
             <UButton trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" color="neutral"> Next </UButton>
           </div>
-          <UButton type="submit" loading-auto size="xl" class="text-white mt-4" variant="solid"> Submit </UButton>
+          <UButton type="submit" loading-auto size="xl" class="text-white mt-4" variant="solid" :disabled="buttonState()"> Submit </UButton>
         </UForm>
       </div>
     </div>
