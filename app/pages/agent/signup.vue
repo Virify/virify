@@ -29,9 +29,11 @@ type AddressSchema = z.output<typeof addressSchema>;
 // Reactive form state
 const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>({});
 
-// ref for the stepper and form
+// refs
 const stepper = useTemplateRef("stepper");
 const form = useTemplateRef("form");
+const toast = useToast();
+const notification = ref("");
 
 // Form steps configuration
 const formStep = ref([
@@ -57,27 +59,48 @@ async function nextStep() {
 }
 
 /**
+ * Global Toast
+ */
+function showToast() {
+  toast.add({
+    title: notification.value,
+    icon: "ri:error-warning-line",
+  });
+  toast.clear();
+}
+
+/**
  * Submit handler
  *
  * @param event FormSubmitEvent
  */
 async function onSubmit(event: FormSubmitEvent<any>) {
   // You can handle the form submission here
-  console.log("Form submitted:", event.data);
+
+  await $fetch("/auth/signup", {
+    method: "POST",
+    body: {
+      ...state,
+      role: "agent",
+    },
+  })
+    .then(() => {
+      notification.value = "";
+      // redirect to account page
+      navigateTo("/agent");
+    })
+    .catch((error) => {
+      notification.value = error.statusMessage;
+      showToast();
+    });
 }
 
 /**
- * disable button if there are errors in the form or if the stepper has next step
- * this forces the user to fill in the form before moving to the next step
- *
- * @returns {boolean}
+ * Disable button if there are errors or if the stepper has a next step
+ * Forces user to fill out the form before moving to the next step
  */
-function buttonState() {
-  if (form.value?.errors.length || stepper?.value?.hasNext) {
-    return true;
-  } else {
-    return false;
-  }
+function submitState() {
+  return form.value?.errors.length || stepper?.value?.hasNext ? true : false;
 }
 </script>
 
@@ -94,55 +117,55 @@ function buttonState() {
           <UStepper ref="stepper" :items="formStep" size="sm" class="w-full" disabled>
             <!-- Personal Information Step -->
             <template #personalInformation>
-              <UForm :state="state" :schema="personalSchema" ref="form">
+              <UForm :state="state" :schema="personalSchema" ref="form" class="pt-6">
                 <UFormField label="Email Address" name="email" size="lg" hint="Required" class="py-2" help="Your business email">
                   <UInput v-model="state.email" type="email" placeholder="Enter your email..." size="xl" class="w-full" autocomplete="on" />
                 </UFormField>
                 <UFormField label="Main Contact Number" name="mainContact" size="lg" hint="Required" class="py-2" help="The number to reach you on">
-                  <UInput v-model="state.mainContact" type="tel" placeholder="Enter your contact number" size="xl" class="w-full" />
+                  <UInput v-model="state.mainContact" type="tel" placeholder="Enter contact number..." size="xl" class="w-full" />
                 </UFormField>
               </UForm>
             </template>
 
             <!-- Business Information Step -->
             <template #businessInformation>
-              <UForm :state="state" :schema="businessSchema" ref="form">
+              <UForm :state="state" :schema="businessSchema" ref="form" class="pt-6">
                 <UFormField label="Business Name" name="businessName" size="lg" hint="Required" class="py-2" help="Your operating name">
-                  <UInput v-model="state.businessName" type="text" placeholder="Business name..." size="xl" class="w-full" />
+                  <UInput v-model="state.businessName" type="text" placeholder="Enter name..." size="xl" class="w-full" />
                 </UFormField>
                 <UFormField label="Company Registration Number" name="registrationNumber" size="lg" hint="Required" class="py-2" help="Your operating company registration number">
-                  <UInput v-model="state.registrationNumber" type="string" placeholder="Business registration number..." size="xl" class="w-full" />
+                  <UInput v-model="state.registrationNumber" type="string" placeholder="Enter registration number..." size="xl" class="w-full" />
                 </UFormField>
               </UForm>
             </template>
 
             <!-- Business Address Step -->
             <template #businessAddress>
-              <UForm :state="state" :schema="addressSchema" ref="form">
-                <UFormField label="Business Address" name="addressLine" size="lg" hint="Required" class="py-2">
-                  <UInput v-model="state.addressLine" type="text" placeholder="Address line 1..." size="xl" class="w-full" />
+              <UForm :state="state" :schema="addressSchema" ref="form" class="pt-6">
+                <UFormField label="Address" name="addressLine" size="lg" hint="Required" class="py-2" help="Busisness Operating Address">
+                  <UInput v-model="state.addressLine" type="text" placeholder="Enter address..." size="xl" class="w-full" />
                 </UFormField>
-                <UFormField label="City" name="city" size="lg" hint="Required" class="py-2">
-                  <UInput v-model="state.city" type="text" placeholder="City..." size="xl" class="w-full" />
+                <UFormField label="City" name="city" size="lg" hint="Required" class="py-2" help="Business Operating City">
+                  <UInput v-model="state.city" type="text" placeholder="Enter city..." size="xl" class="w-full" />
                 </UFormField>
-                <UFormField label="County" name="county" size="lg" hint="Required" class="py-2">
-                  <UInput v-model="state.county" type="text" placeholder="County..." size="xl" class="w-full" />
+                <UFormField label="County" name="county" size="lg" hint="Required" class="py-2" help="Busness Operating County">
+                  <UInput v-model="state.county" type="text" placeholder="Enter county..." size="xl" class="w-full" />
                 </UFormField>
-                <UFormField label="Country" name="country" size="lg" hint="Required" class="py-2">
-                  <UInput v-model="state.country" type="text" placeholder="Country..." size="xl" class="w-full" />
+                <UFormField label="Country" name="country" size="lg" hint="Required" class="py-2" help="Business Operating Country">
+                  <UInput v-model="state.country" type="text" placeholder="Enter country..." size="xl" class="w-full" />
                 </UFormField>
-                <UFormField label="Postcode" name="postcode" size="lg" hint="Required" class="py-2">
-                  <UInput v-model="state.postcode" type="text" placeholder="Postcode..." size="xl" class="w-full" />
+                <UFormField label="Postcode" name="postcode" size="lg" hint="Required" class="py-2" help="Business Operating Postcode">
+                  <UInput v-model="state.postcode" type="text" placeholder="Enter postcode..." size="xl" class="w-full" />
                 </UFormField>
               </UForm>
             </template>
           </UStepper>
 
-          <div class="flex gap-2 justify-between mt-4">
-            <UButton leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="stepper?.prev()" color="neutral"> Prev </UButton>
-            <UButton trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" color="neutral"> Next </UButton>
+          <div class="flex gap-2 justify-between mt-6">
+            <UButton variant="outline" leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="stepper?.prev()" color="neutral" size="lg"> Prev </UButton>
+            <UButton variant="outline" trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" color="neutral" size="lg"> Next </UButton>
           </div>
-          <UButton type="submit" loading-auto size="xl" class="text-white mt-4" variant="solid" :disabled="buttonState()"> Submit </UButton>
+          <UButton type="submit" loading-auto size="xl" class="text-white mt-8" variant="solid" :disabled="submitState"> Submit </UButton>
         </UForm>
       </div>
     </div>
