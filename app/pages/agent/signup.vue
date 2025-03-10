@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import * as z from "zod";
-const stepper = useTemplateRef("stepper");
-const form = useTemplateRef("form");
-// Zod validation schema for the signup form
+import type { FormSubmitEvent } from "@nuxt/ui";
+
+// Define validation schemas for each section
 const personalSchema = z.object({
   email: z.string().email("Invalid email address").nonempty("Email is required"),
   mainContact: z.string().nonempty("Main contact number is required"),
 });
 
-type PersonalSchema = z.output<typeof personalSchema>;
-
 const businessSchema = z.object({
   businessName: z.string().nonempty("Business name is required"),
   registrationNumber: z.string().nonempty("Registration number is required"),
 });
-
-type BusinessSchema = z.output<typeof businessSchema>;
 
 const addressSchema = z.object({
   addressLine: z.string().nonempty("Address line is required"),
@@ -25,36 +21,43 @@ const addressSchema = z.object({
   postcode: z.string().nonempty("Postcode is required"),
 });
 
+// Define type for each schema
+type PersonalSchema = z.output<typeof personalSchema>;
+type BusinessSchema = z.output<typeof businessSchema>;
 type AddressSchema = z.output<typeof addressSchema>;
 
-// form state
-const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>({});
+// Reactive form state
+const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>({
+  email: "",
+  mainContact: "",
+  businessName: "",
+  registrationNumber: "",
+  addressLine: "",
+  city: "",
+  county: "",
+  country: "",
+  postcode: "",
+});
 
-// form steps
+const stepper = useTemplateRef("stepper");
+const form = useTemplateRef("form");
+
+// Form steps configuration
 const formStep = ref([
-  {
-    slot: "personalInformation",
-    title: "Personal Information",
-    icon: "i-lucide-user",
-  },
-  {
-    slot: "businessInformation",
-    title: "Business Information",
-    icon: "i-lucide-briefcase",
-  },
-  {
-    slot: "businessAddress",
-    title: "Buisness Address",
-    icon: "i-lucide-map-pin",
-  },
+  { slot: "personalInformation", title: "Personal Information", icon: "i-lucide-user" },
+  { slot: "businessInformation", title: "Business Information", icon: "i-lucide-briefcase" },
+  { slot: "businessAddress", title: "Business Address", icon: "i-lucide-map-pin" },
 ]);
 
+// Handle next step action
 function nextStep() {
   stepper.value?.next();
 }
 
-function signup() {
-  console.log(state);
+// Form submission handling
+async function onSubmit(event: FormSubmitEvent<any>) {
+  // You can handle the form submission here
+  console.log("Form submitted:", event.data);
 }
 </script>
 
@@ -64,22 +67,25 @@ function signup() {
       <div class="p-8 flex justify-center flex-col sm:w-3/4 xs:w-full">
         <h1 class="text-3xl font-bold mb-6 text-purple-500">Agency Signup</h1>
         <h3 class="text-md font-bold mb-6 text-purple-500">Once you have signed up to Virify, we will verify you and then you can start adding agents to your Agency Account!</h3>
+
         <!-- start of form -->
-        <UForm @submit="signup" :state="state" :schema="personalSchema" class="w-full" ref="form">
-          <!-- stepper  -->
+        <UForm @submit="onSubmit" :state="state" class="w-full" ref="form">
+          <!-- Stepper -->
           <UStepper ref="stepper" :items="formStep" size="md" class="w-full" disabled>
-            <!-- personal information step -->
+            <!-- Personal Information Step -->
             <template #personalInformation>
-              <UFormField label="Email Address" name="email" size="lg" hint="Required" class="py-2" help="Your business email">
-                <UInput v-model="state.email" type="email" placeholder="Enter your email..." size="xl" class="w-full" autocomplete="on" />
-              </UFormField>
-              <UFormField label="Main Contact Number" name="mainContact" size="lg" hint="Required" class="py-2" help="The number to reach you on">
-                <UInput v-model="state.mainContact" type="tel" placeholder="Enter your contact number" size="xl" class="w-full" />
-              </UFormField>
+              <UForm :state="state" :schema="personalSchema">
+                <UFormField label="Email Address" name="email" size="lg" hint="Required" class="py-2" help="Your business email">
+                  <UInput v-model="state.email" type="email" placeholder="Enter your email..." size="xl" class="w-full" autocomplete="on" />
+                </UFormField>
+                <UFormField label="Main Contact Number" name="mainContact" size="lg" hint="Required" class="py-2" help="The number to reach you on">
+                  <UInput v-model="state.mainContact" type="tel" placeholder="Enter your contact number" size="xl" class="w-full" />
+                </UFormField>
+              </UForm>
             </template>
-            <!-- business information step -->
+
+            <!-- Business Information Step -->
             <template #businessInformation>
-              <!-- business info form schema -->
               <UForm :state="state" :schema="businessSchema">
                 <UFormField label="Business Name" name="businessName" size="lg" hint="Required" class="py-2" help="Your operating name">
                   <UInput v-model="state.businessName" type="text" placeholder="Business name..." size="xl" class="w-full" />
@@ -89,9 +95,9 @@ function signup() {
                 </UFormField>
               </UForm>
             </template>
-            <!-- business address step -->
+
+            <!-- Business Address Step -->
             <template #businessAddress>
-              <!-- address form schema -->
               <UForm :state="state" :schema="addressSchema">
                 <UFormField label="Business Address" name="addressLine" size="lg" hint="Required" class="py-2">
                   <UInput v-model="state.addressLine" type="text" placeholder="Address line 1..." size="xl" class="w-full" />
@@ -111,6 +117,7 @@ function signup() {
               </UForm>
             </template>
           </UStepper>
+
           <div class="flex gap-2 justify-between mt-4">
             <UButton leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="stepper?.prev()" color="neutral"> Prev </UButton>
             <UButton trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" color="neutral"> Next </UButton>
