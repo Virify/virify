@@ -1,7 +1,10 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      agent: 'purple',
+      primary: 'brand-purple',
+      secondary: 'brand-green',
+      accent: 'brand-accent',
+      bg: 'brand-bg',
     }
   }
 })
