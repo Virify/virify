@@ -113,15 +113,15 @@ function submitState() {
 </script>
 
 <template>
-  <div class="flex justify-center items-center bg-brand-bg h-screen">
-    <div class="flex justify-center items-center flex-col bg-brand-bg py-12 w-full">
+  <div class="flex justify-center items-center h-screen">
+    <div class="flex justify-center items-center flex-col py-12 w-full">
       <div class="max-w-md w-full justify-baseline">
         <h1 class="text-4xl text-brand-accent font-semibold pb-6">Sign up</h1>
         <p class="text-brand-accent pb-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil doloremque distinctio commodi laborum accusantium?</p>
       </div>
 
       <!-- start of form -->
-      <UForm @submit="onSubmit" :state="state" ref="form" class="max-w-md w-full bg-brand-bg mt-6">
+      <UForm @submit="onSubmit" :state="state" ref="form" class="max-w-md w-full mt-6">
         <!-- Stepper -->
         <UStepper ref="stepper" :items="formStep" size="sm" disabled color="primary">
           <!-- Personal Information Step -->
