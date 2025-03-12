@@ -5,22 +5,22 @@ const items = ref([
   [
     {
       label: "User",
-      icon: "i-lucide-book-open",
+      icon: "material-symbols:person-pin-circle",
       active: false,
       children: [
-        { label: "Signup", icon: "i-lucide-book-open", to: "/signup", active: false },
-        { label: "Login", icon: "i-lucide-book-open", to: "/login", active: false },
-        { label: "Account", icon: "i-lucide-book-open", to: "/account", active: false },
+        { label: "Signup", icon: "game-icons:archive-register", to: "/signup", active: false },
+        { label: "Login", icon: "hugeicons:login-method", to: "/login", active: false },
+        { label: "Account", icon: "material-symbols:article-person", to: "/account", active: false },
       ],
     },
     {
       label: "Agent",
-      icon: "i-lucide-database",
+      icon: "mdi:home",
       active: false,
       children: [
-        { label: "Signup", icon: "i-lucide-database", to: "/agent/signup", active: false },
-        { label: "Login", icon: "i-lucide-database", to: "/agent/login", active: false },
-        { label: "Account", icon: "i-lucide-database", to: "/agent/account", active: false },
+        { label: "Signup", icon: "game-icons:archive-register", to: "/agent/signup", active: false },
+        { label: "Login", icon: "hugeicons:login-method", to: "/agent/login", active: false },
+        { label: "Account", icon: "material-symbols:article-person", to: "/agent/account", active: false },
       ],
     },
   ],
@@ -49,7 +49,7 @@ watch(() => route.path, updateActiveState, { immediate: true });
 <template>
   <header>
     <UContainer>
-      <UNavigationMenu color="primary" highlight highlight-color="primary" :items="items" content-orientation="vertical" class="w-full" />
+      <UNavigationMenu color="primary" :items="items" content-orientation="vertical" class="w-full p-2" />
     </UContainer>
   </header>
   <NuxtPage />
