@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { FormSubmitEvent } from '@nuxt/ui';
+
 const items = ref([
   { label: "1/2 mile", value: 0.5 },
   { label: "1 mile", value: 1 },
@@ -11,16 +13,18 @@ const items = ref([
 
 const state = reactive({
   search: "",
-  distance: items.value[0].value,
+  distance: items.value[0]?.value,
 });
 
-async function onSubmit(event: FormSubmitEvent) {
+async function onSubmit(event: FormSubmitEvent<any>) {
   console.log("Form submitted with:", state);
   try {
     const location = await $fetch('http://localhost:8080/search', {
     method: 'GET',
     query: {
       q: state.search,
+      addressdetails: 1,
+      format: 'geojson',
     },
   });
   console.log("Location data:", location);

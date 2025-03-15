@@ -74,7 +74,6 @@ const isDark = computed({
         <template #mode>
           <ClientOnly>
             <UButton
-              :key="isDark"
               :icon="isDark ? 'ri:moon-line' : 'ri:sun-line'"
               variant="link"
               color="primary"
