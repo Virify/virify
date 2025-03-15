@@ -7,14 +7,14 @@ model Listing {
   listingType        ListingType
   availabilityStatus AvailabilityStatus
   listingTier        ListingTier
-  listingCosts       ListingCosts?
-  owner              Owner?             @relation(fields: [ownerId], references: [id])
   ownerId            Int?
-  agents             Agent[]
   propertyId         Int?               @unique
-  property           Property?          @relation(fields: [propertyId], references: [id])
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
+  owner              Owner?             @relation(fields: [ownerId], references: [id])
+  property           Property?          @relation(fields: [propertyId], references: [id])
+  listingCosts       ListingCosts?
+  agents             Agent[]            @relation("AgentToListing")
 
   @@index([ownerId])
 }

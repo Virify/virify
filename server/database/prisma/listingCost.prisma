@@ -3,8 +3,8 @@ model ListingCosts {
   deposit      Float
   upfrontCosts Float
   description  String
-  listing      Listing? @relation(fields: [listingId], references: [id])
   listingId    Int      @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  listing      Listing  @relation(fields: [listingId], references: [id])
 }

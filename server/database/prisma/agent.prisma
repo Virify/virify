@@ -4,11 +4,8 @@ model Agent {
   lastName           String?
   email              String     @unique
   password           String?
-  owner              Owner      @relation(fields: [ownerId], references: [id])
   ownerId            Int
   role               AgentRole  @default(SENIOR)
-  properties         Property[]
-  listings           Listing[]
   passwordResetToken String?
   lastLogin          DateTime?
   activationToken    String?    @unique
@@ -17,6 +14,9 @@ model Agent {
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
   deletedAt          DateTime?
+  owner              Owner      @relation(fields: [ownerId], references: [id])
+  listings           Listing[]  @relation("AgentToListing")
+  properties         Property[] @relation("AgentToProperty")
 
   @@index([ownerId])
 }
