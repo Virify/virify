@@ -1,14 +1,42 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const items = ref([
+  { label: "1/2 mile", value: 0.5 },
+  { label: "1 mile", value: 1 },
+  { label: "2 miles", value: 2 },
+  { label: "5 miles", value: 5 },
+  { label: "10 miles", value: 10 },
+  { label: "20 miles", value: 20 },
+  { label: "50 miles", value: 50 },
+]);
+
+const state = reactive({
+  search: "",
+  distance: items.value[0].value,
+});
+
+async function onSubmit(event: FormSubmitEvent) {
+  console.log("Form submitted with:", state);
+  try {
+    const location = await $fetch('http://localhost:8080/search', {
+    method: 'GET',
+    query: {
+      q: state.search,
+    },
+  });
+  console.log("Location data:", location);
+  } catch (error) {
+    console.error("Error fetching location data:", error);
+  }
+  
+}
+</script>
 
 <template>
-  <div class="flex justify-center items-center h-screen bg-white">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen flex-col">
-      <h1 class="text-green-500 font-bold text-8xl">Virify</h1>
-      <h2 class="text-green-500 text-4xl p-4 text-center">Your awesome property people!</h2>
-      <div class="flex justify-between gap-20 py-5 text-center">
-        <NuxtLink to="/login" class="w-24 bg-white text-green-500 border border-green-500 font-bold py-3 px-3 rounded focus:outline-none focus:shadow-outline">Login</NuxtLink>
-        <NuxtLink to="/signup" class="w-24 bg-white text-green-500 border border-green-500 font-bold py-3 px-3 rounded focus:outline-none focus:shadow-outline">Signup</NuxtLink>
-      </div>
-    </div>
+  <div class="flex flex-row items-center justify-center w-full h-full p-4">
+    <UForm @submit="onSubmit" :state="state" class="w-full max-w-3/4">
+      <UInput v-model="state.search" label="Search for properties" placeholder="Enter property name or description" type="text" aria-label="Property search" size="xl" class="w-3/4" />
+      <USelect v-model="state.distance" :items="items" size="xl" class="w-1/4" />
+      <UButton type="submit" color="primary" variant="solid" size="xl" class="mt-3"> Search </UButton>
+    </UForm>
   </div>
 </template>
