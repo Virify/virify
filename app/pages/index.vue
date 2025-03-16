@@ -19,17 +19,16 @@ const state = reactive({
 async function onSubmit(event: FormSubmitEvent<any>) {
   console.log("Form submitted with:", state);
   try {
-    const location = await $fetch('http://localhost:8080/search', {
-    method: 'GET',
-    query: {
-      q: state.search,
-      addressdetails: 1,
-      format: 'geojson',
+    const location = await $fetch('/api/location/geocode', {
+    method: 'POST',
+    body: {
+      search: state.search,
+      distance: state.distance,
     },
   });
   console.log("Location data:", location);
   } catch (error) {
-    console.error("Error fetching location data:", error);
+   console.log(error)
   }
   
 }

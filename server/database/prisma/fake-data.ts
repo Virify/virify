@@ -27,26 +27,28 @@ export function fakeAdditionalFeaturesComplete() {
 }
 export function fakeAddress() {
   return {
-    number: undefined,
     street: undefined,
     city: undefined,
     postcode: undefined,
     country: undefined,
+    county: undefined,
     propertyId: undefined,
     updatedAt: faker.date.anytime(),
+    number: undefined,
   };
 }
 export function fakeAddressComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    number: undefined,
     street: undefined,
     city: undefined,
     postcode: undefined,
     country: undefined,
+    county: undefined,
     propertyId: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
+    number: undefined,
   };
 }
 export function fakeAgent() {
