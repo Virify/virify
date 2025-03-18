@@ -31,54 +31,27 @@ const items = ref([
       slot: "mode",
     },
   ],
-])
+]);
 
-const colorMode = useColorMode()
+const colorMode = useColorMode();
 
 const isDark = computed({
   get() {
-    return colorMode.value === "dark"
+    return colorMode.value === "dark";
   },
   set(value) {
-    colorMode.preference = value ? "dark" : "light"
+    colorMode.preference = value ? "dark" : "light";
   },
-})
-
-/**
- * Update the active state of the items based on the current route
- */
-// function updateActiveState() {
-//   items.value.forEach((group) => {
-//     group.forEach((item) => {
-//       item.active = item.children?.some((child) => {
-//         child.active = child.to === route.path
-//         return child.active
-//       })
-//     })
-//   })
-// }
-
-// // Keep it reactive by watching the route
-// watch(() => route.path, updateActiveState, { immediate: true })
+});
 </script>
 
 <template>
   <header>
     <UContainer>
-      <UNavigationMenu
-        color="primary"
-        :items="items"
-        content-orientation="vertical"
-        class="w-full p-2 z-1"
-      >
+      <UNavigationMenu color="primary" :items="items" content-orientation="vertical" class="w-full p-2 z-2">
         <template #mode>
           <ClientOnly>
-            <UButton
-              :icon="isDark ? 'ri:moon-line' : 'ri:sun-line'"
-              variant="link"
-              color="primary"
-              @click="isDark = !isDark"
-            />
+            <UButton :icon="isDark ? 'ri:moon-line' : 'ri:sun-line'" variant="link" color="primary" @click="isDark = !isDark" />
           </ClientOnly>
         </template>
       </UNavigationMenu>

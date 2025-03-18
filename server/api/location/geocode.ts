@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
 
     // Get coordinates from the geocoding service
     const response = await getCoordinatesFromGeocodingService(search);
+    console.log("Geocoding response:", response);
 
     // Extract coordinates and address from the response
     const { coordinates, address } = extractGeocodingResponse(response);
@@ -88,7 +89,7 @@ function extractGeocodingResponse(response: GeocodingResponse) {
 /**
  * Creates a new address in the database if it doesn't already exist.
  * Updates the location field with coordinates if provided.
- * 
+ *
  * @param address { postcode: string; town: string; country: string; county: string }
  * @param coordinates number[]
  * @returns Address
