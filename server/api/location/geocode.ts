@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
  * @param search string
  */
 async function getCoordinatesFromGeocodingService(search: string) {
-  const response: GeocodingResponse = await $fetch("http://localhost:8080/search", {
+  const response: GeocodingResponse = await $fetch(`${process.env.NOMINATIM_API_URL}/search`, {
     method: "get",
     query: {
       q: search,
