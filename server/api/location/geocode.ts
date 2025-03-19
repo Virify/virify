@@ -24,6 +24,13 @@ interface GeocodingResponse {
   features: Feature[];
 }
 
+/**
+ * This API endpoint handles geocoding requests.
+ * It retrieves coordinates and address details based on the provided search query.
+ * The coordinates are then used to create a new address in the database if it doesn't already exist.
+ * If the address already exists, an error is thrown.
+ * The endpoint returns a success response if the address is created successfully.
+ */
 export default defineEventHandler(async (event) => {
   const { search, distance } = await readBody(event);
   const { successResponse } = useResponse();
@@ -53,7 +60,6 @@ export default defineEventHandler(async (event) => {
  * Calls the geocoding service to get coordinates and address details.
  *
  * @param search string
- * @returns response { features: { geometry: { coordinates: number[] }; properties: { address: { postcode: string; town: string; country: string; county: string } } }[] }
  */
 async function getCoordinatesFromGeocodingService(search: string) {
   const response: GeocodingResponse = await $fetch("http://localhost:8080/search", {
@@ -75,9 +81,6 @@ async function getCoordinatesFromGeocodingService(search: string) {
 
 /**
  *  Extracts coordinates and address from the geocoding response.
- *
- * @param response { features: { geometry: { coordinates: number[] }; properties: { address: { postcode: string; town: string; country: string; county: string } } }[] }
- * @returns Object
  */
 function extractGeocodingResponse(response: GeocodingResponse) {
   const coordinates = response.features[0].geometry.coordinates;

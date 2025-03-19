@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted, ref, reactive, defineEmits } from "vue";
 
 // Declare the map and other variables
 let map: any;
@@ -48,7 +47,7 @@ onMounted(() => {
 
 // Function to search for locations
 const handleInput = async () => {
-  if (state.search.length > 2) {
+  if (state.search.length > 4) {
     const results = (await searchLocations(state.search)) as LocationResult[];
 
     searchResults.value = results.sort((a, b) => a.displayName.localeCompare(b.displayName));
