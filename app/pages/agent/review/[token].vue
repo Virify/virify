@@ -25,9 +25,9 @@ onMounted(async () => {
       }
     });
     notification.value = approve === 'true' ? 'Thank you for approving the agent!' : 'Thank you for denying the agent!';
-  } catch (err: any) {
-    error.value = err.data.statusMessage;
-    notification.value = err.data.statusMessage;
+  } catch (error: any) {
+    error.value = error.data.message;
+    notification.value = error.data.message;
   }
 });
 

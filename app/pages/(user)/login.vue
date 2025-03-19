@@ -14,7 +14,9 @@ onMounted(() => {
   }
 });
 
-// validation schema
+/**
+ * Form validation schema
+ */
 const schema = z.object({
   email: z.string().email("Invalid email address").nonempty("Email is required"),
   password: z.string().min(6, "Password must be at least 6 characters").nonempty("Password is required"),
@@ -30,6 +32,8 @@ const state = reactive<Partial<Schema>>({
 
 /**
  * Login function
+ * Note the role is hardcoded to user
+ * This is because the login page is only for users
  */
 async function login() {
   await $fetch("/auth/login", {
@@ -48,8 +52,13 @@ async function login() {
       // redirect to account page
       navigateTo("/account");
     })
+    /**
+     * Strangely enough, on the client you can only access statusMessage via data.message
+     * This is ONLY in production deployed - might be a Netlify issue
+     * In development, you can access statusMessage directly
+     */
     .catch((error: any) => {
-      showToast({ title: error.statusMessage, icon: "ri:error-warning-line" });
+      showToast({ title: error.data.message, icon: "ri:error-warning-line" });
     });
 }
 </script>
