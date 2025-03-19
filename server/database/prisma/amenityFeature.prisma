@@ -7,7 +7,7 @@ model AmenitiesFeature {
   greenSpaces    String
   description    String
   propertyId     Int
-  property       Property @relation(fields: [propertyId], references: [id])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  property       Property @relation(fields: [propertyId], references: [id])
 }

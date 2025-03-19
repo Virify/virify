@@ -5,10 +5,15 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["nuxt-auth-utils", "nuxt-nodemailer", '@nuxt/ui'],
+  modules: [
+    "nuxt-auth-utils",
+    "nuxt-nodemailer",
+    "@nuxt/ui",
+    "@nuxtjs/leaflet",
+  ],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', "leaflet/dist/leaflet.css"],
   ui: {
     theme: {
       colors: ['primary', 'secondary', 'accent', 'info', 'success', 'warning', 'error', 'bg'],

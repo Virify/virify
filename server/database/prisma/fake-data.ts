@@ -27,28 +27,28 @@ export function fakeAdditionalFeaturesComplete() {
 }
 export function fakeAddress() {
   return {
-    street: faker.lorem.words(5),
-    city: faker.lorem.words(5),
-    postcode: faker.lorem.words(5),
-    country: faker.lorem.words(5),
-    latitude: undefined,
-    longitude: undefined,
+    street: undefined,
+    city: undefined,
+    postcode: undefined,
+    country: undefined,
+    county: undefined,
     propertyId: undefined,
     updatedAt: faker.date.anytime(),
+    number: undefined,
   };
 }
 export function fakeAddressComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    street: faker.lorem.words(5),
-    city: faker.lorem.words(5),
-    postcode: faker.lorem.words(5),
-    country: faker.lorem.words(5),
-    latitude: undefined,
-    longitude: undefined,
+    street: undefined,
+    city: undefined,
+    postcode: undefined,
+    country: undefined,
+    county: undefined,
     propertyId: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
+    number: undefined,
   };
 }
 export function fakeAgent() {
@@ -169,6 +169,23 @@ export function fakeDiningroomFeaturesComplete() {
     propertyId: faker.number.int(),
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
+  };
+}
+export function fakespatial_ref_sys() {
+  return {
+    auth_name: undefined,
+    auth_srid: undefined,
+    srtext: undefined,
+    proj4text: undefined,
+  };
+}
+export function fakespatial_ref_sysComplete() {
+  return {
+    srid: faker.number.int({ max: 2147483647 }),
+    auth_name: undefined,
+    auth_srid: undefined,
+    srtext: undefined,
+    proj4text: undefined,
   };
 }
 export function fakeKitchenFeatures() {
