@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
 
-const toast = useToast();
-const notification = ref("");
+const { showToast } = useToastNotification();
 const error = useRoute().query.error;
 
-// if there is an error, set the notification to the error message
-if (error) {
-  toast.clear();
-  toast.add({
-    title: error as string,
-  });
-};
+onMounted(() => {
+  // if there is an error, set the notification to the error message
+  if (error) {
+    showToast({
+      title: error as string,
+      icon: "ri:error-warning-line",
+    });
+  }
+});
 
 // validation schema
 const schema = z.object({
@@ -29,17 +29,6 @@ const state = reactive<Partial<Schema>>({
 });
 
 /**
- * Global Toast
- */
-function showToast() {
-  toast.add({
-    title: notification.value,
-    icon: "ri:error-warning-line",
-  });
-  toast.clear();
-}
-
-/**
  * Login function
  */
 async function login() {
@@ -52,40 +41,36 @@ async function login() {
     },
   })
     .then(() => {
-      notification.value = "Login successful! Redirecting to account page...";
+      showToast({
+        title: "Login successful",
+        icon: "ri:check-line",
+      });
       // redirect to account page
       navigateTo("/account");
     })
-    .catch((error) => {
-      notification.value = error.statusMessage;
-      showToast();
+    .catch((error: any) => {
+      showToast({ title: error.statusMessage, icon: "ri:error-warning-line" });
     });
 }
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen flex-col sm:flex-row">
-    <div class="flex justify-center items-center w-full bg-white h-screen">
-      <div class="p-8 w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-6 text-green-500">Login</h1>
-        <!-- UI Form -->
-        <UForm @submit="login" :state="state" :schema="schema" class="w-full">
-          <!-- email input -->
-          <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2">
-            <UInput v-model="state.email" type="email" placeholder="Enter your email" size="xl" class="w-full" autocomplete="on"/>
-          </UFormField>
-          <!-- password input -->
-          <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
-            <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
-          </UFormField>
-          <UButton type="submit" loading-auto size="xl" class="text-white mt-4" variant="solid" active> Login </UButton>
-        </UForm>
-        <!-- END UI Form -->
-      </div>
-    </div>
-    <div class="flex-col justify-center items-center w-full bg-green-500 h-screen hidden sm:flex">
-      <h1 class="text-white font-bold text-8xl">Virify</h1>
-      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
+  <div class="flex justify-center items-center w-full">
+    <div class="w-full sm:w-lg p-8">
+      <h1 class="text-3xl font-bold mb-6">Login</h1>
+      <!-- UI Form -->
+      <UForm @submit="login" :state="state" :schema="schema" class="w-full">
+        <!-- email input -->
+        <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2">
+          <UInput v-model="state.email" type="email" placeholder="Enter your email" size="xl" class="w-full" autocomplete="on" />
+        </UFormField>
+        <!-- password input -->
+        <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
+          <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
+        </UFormField>
+        <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Login </UButton>
+      </UForm>
+      <!-- END UI Form -->
     </div>
   </div>
 </template>

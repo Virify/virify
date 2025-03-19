@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const route = useRoute();
-
 const items = ref([
   [
     {
@@ -46,16 +44,20 @@ const isDark = computed({
 </script>
 
 <template>
-  <header>
-    <UContainer>
-      <UNavigationMenu color="primary" :items="items" content-orientation="vertical" class="w-full p-2 z-2">
-        <template #mode>
-          <ClientOnly>
-            <UButton :icon="isDark ? 'ri:moon-line' : 'ri:sun-line'" variant="link" color="primary" @click="isDark = !isDark" />
-          </ClientOnly>
-        </template>
-      </UNavigationMenu>
-    </UContainer>
-  </header>
-  <NuxtPage />
+  <div class="flex flex-col min-h-screen">
+    <header>
+      <UContainer>
+        <UNavigationMenu color="primary" :items="items" content-orientation="vertical" class="w-full p-2 z-2 h-auto">
+          <template #mode>
+            <ClientOnly>
+              <UButton :icon="isDark ? 'ri:moon-line' : 'ri:sun-line'" variant="link" color="primary" @click="isDark = !isDark" />
+            </ClientOnly>
+          </template>
+        </UNavigationMenu>
+      </UContainer>
+    </header>
+    <main class="flex flex-grow w-full">
+      <NuxtPage />
+    </main>
+  </div>
 </template>
