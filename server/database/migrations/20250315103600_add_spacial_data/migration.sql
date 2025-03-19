@@ -6,7 +6,7 @@
 
 */
 -- CreateExtension
-CREATE EXTENSION IF NOT EXISTS "postgis" WITH VERSION "3.4.2";
+CREATE EXTENSION IF NOT EXISTS "postgis" WITH VERSION "3.3.3";
 
 -- AlterTable
 ALTER TABLE "Address" DROP COLUMN "latitude",
