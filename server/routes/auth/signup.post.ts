@@ -10,6 +10,7 @@ import { Reviewed, OwnerRole } from "@prisma/client";
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
+  // TODO: Incorporate zod validation for the request body
   // Read request body
   const body = await readBody(event);
   const { role, email } = body;
@@ -86,7 +87,7 @@ async function handleAgentSignup(formData: any, token: string) {
     // If agent does not exist, create a new record with the token
     await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
 
-    // Notify internal team for agent review
+    // send internal email to the team for review the sign up request
     await sendAgentReview(formData, token);
 
     // Send an email to the agent informing them of the review process
@@ -97,7 +98,7 @@ async function handleAgentSignup(formData: any, token: string) {
 }
 
 /**
- * Handles cases where an agent already exists.
+ * Handles cases where an agent already exists. OR is rejectedf
  * Throws an error if the agent is pending, rejected, or already registered at the same address.
  * @param agent - The existing agent object (if found).
  * @param address - The submitted address to check against.

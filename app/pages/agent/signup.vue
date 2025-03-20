@@ -3,17 +3,25 @@ import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 const { showToast } = useToastNotification();
 
-// personal, business and address schemas
+/**
+ * Personal information schema
+ */
 const personalSchema = z.object({
   email: z.string().email("Invalid email address").nonempty("Email is required"),
   mainContact: z.string().nonempty("Main contact number is required"),
 });
 
+/**
+ * Business information schema
+ */
 const businessSchema = z.object({
   businessName: z.string().nonempty("Business name is required"),
   registrationNumber: z.string().nonempty("Registration number is required"),
 });
 
+/**
+ * Address schema
+ */
 const addressSchema = z.object({
   addressLine: z.string().nonempty("Address line is required"),
   city: z.string().nonempty("City is required"),
@@ -27,7 +35,9 @@ type PersonalSchema = z.output<typeof personalSchema>;
 type BusinessSchema = z.output<typeof businessSchema>;
 type AddressSchema = z.output<typeof addressSchema>;
 
-// Reactive form state
+/**
+ * Form state
+ */
 const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>({
   email: "",
   mainContact: "",
@@ -40,13 +50,13 @@ const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>
   postcode: "",
 });
 
-// refs
 const stepper = useTemplateRef("stepper");
 const form = useTemplateRef("form");
-// Reactive width tracking
 const isXs = ref(false);
 
-// Form steps configuration
+/**
+ * Form stepper items
+ */
 const formStep = ref([
   { slot: "personalInformation", title: "Personal Information", icon: "i-lucide-user" },
   { slot: "businessInformation", title: "Business Information", icon: "i-lucide-briefcase" },
@@ -54,9 +64,9 @@ const formStep = ref([
 ]);
 
 /**
- * Submit handler
- *
- * @param event FormSubmitEvent
+ * Form submit handler
+ * note the role is hardcoded to agent
+ * This is because the signup page is only for agents
  */
 async function onSubmit(event: FormSubmitEvent<any>) {
   // You can handle the form submission here
@@ -167,9 +177,11 @@ watchEffect(() => {
         <template #personalInformation>
           <div class="flex items-center justify-center flex-col w-full pt-6">
             <UForm :state="state" :schema="personalSchema" ref="form" class="w-full sm:w-md">
+              <!-- email field -->
               <UFormField label="Email Address" name="email" size="lg" hint="Required" class="py-2" help="Your business email">
                 <UInput v-model="state.email" type="email" placeholder="Enter your email..." size="lg" autocomplete="on" class="w-full" />
               </UFormField>
+              <!-- main contact number field -->
               <UFormField label="Main Contact Number" name="mainContact" size="lg" hint="Required" class="py-2" help="The number to reach you on">
                 <UInput v-model="state.mainContact" type="tel" placeholder="Enter contact number..." size="lg" class="w-full" />
               </UFormField>
@@ -181,9 +193,11 @@ watchEffect(() => {
         <template #businessInformation>
           <div class="flex items-center justify-center flex-col w-full pt-6">
             <UForm :state="state" :schema="businessSchema" ref="form" class="w-full sm:w-md">
+              <!-- Business Name Field -->
               <UFormField label="Business Name" name="businessName" size="lg" hint="Required" class="py-2" help="Your operating name">
                 <UInput v-model="state.businessName" type="text" placeholder="Enter name..." size="xl" />
               </UFormField>
+              <!-- Registration Number Field -->
               <UFormField label="Company Registration Number" name="registrationNumber" size="lg" hint="Required" class="py-2" help="Your operating company registration number">
                 <UInput v-model="state.registrationNumber" type="string" placeholder="Enter registration number..." size="xl" />
               </UFormField>
@@ -195,18 +209,23 @@ watchEffect(() => {
         <template #businessAddress>
           <div class="flex items-center justify-center flex-col w-full pt-6">
             <UForm :state="state" :schema="addressSchema" ref="form" class="w-full sm:w-md">
+              <!-- Operating Address Field -->
               <UFormField label="Address" name="addressLine" size="lg" hint="Required" class="py-2" help="Busisness Operating Address">
                 <UInput v-model="state.addressLine" type="text" placeholder="Enter address..." size="xl" />
               </UFormField>
+              <!-- City Field -->
               <UFormField label="City" name="city" size="lg" hint="Required" class="py-2" help="Business Operating City">
                 <UInput v-model="state.city" type="text" placeholder="Enter city..." size="xl" />
               </UFormField>
+              <!-- County Field -->
               <UFormField label="County" name="county" size="lg" hint="Required" class="py-2" help="Busness Operating County">
                 <UInput v-model="state.county" type="text" placeholder="Enter county..." size="xl" />
               </UFormField>
+              <!-- Country Field -->
               <UFormField label="Country" name="country" size="lg" hint="Required" class="py-2" help="Business Operating Country">
                 <UInput v-model="state.country" type="text" placeholder="Enter country..." size="xl" />
               </UFormField>
+              <!-- Postcode Field -->
               <UFormField label="Postcode" name="postcode" size="lg" hint="Required" class="py-2" help="Business Operating Postcode">
                 <UInput v-model="state.postcode" type="text" placeholder="Enter postcode..." size="xl" />
               </UFormField>
