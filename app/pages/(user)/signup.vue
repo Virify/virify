@@ -1,52 +1,58 @@
 <script setup lang="ts">
+import * as z from "zod";
+const { showToast } = useToastNotification();
 
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ email: "" }, 'user');
+const schema = z.object({
+  email: z.string().email("Email is required").nonempty("Invalid email address"),
+});
 
-/**
- * Signup function
- */
+type Schema = z.output<typeof schema>;
+
+const state = reactive<Partial<Schema>>({
+  email: "",
+});
+
 async function signup() {
-  await submitForm('/auth/signup', 'Signup successful! Please check your inbox for an activation email.');
-}
-
-/**
- * Clear notification handler
- */
-function clearNotificationHandler() {
-  clearNotification('/login');
+  await $fetch("/auth/signup", {
+    method: "POST",
+    body: {
+      email: state.email,
+      role: "user",
+    },
+  })
+    .then(() => {
+      showToast({
+        title: "Signup successful! Please check your inbox for an activation email.",
+        icon: "ri:check-line",
+      });
+      // redirect to login page
+      navigateTo("/login");
+    })
+    .catch((error) => {
+      console.log(error.data);
+      showToast({
+        title: error.data.message,
+        icon: "ri:error-warning-line",
+      });
+    });
 }
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
-      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-6 text-green-500">Signup</h1>
-        <form @submit.prevent="signup">
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="email">
-              Email:
-              <span v-if="errors.email" class="text-red-400 text-xs italic">{{ errors.email }}</span>
-            </label>
-            <input v-model="form.email" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email" />
-          </div>
-          <div class="flex items-center justify-start gap-4">
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Signup</span>
-            </button>
-            <NuxtLink to="/login" class="bg-white text-green-500 font-bold py-3 px-4 rounded border border-green-500 focus:outline-none focus:shadow-outline" type="submit">Login</NuxtLink>
-            <div class="flex justify-end w-full">
-              <NuxtLink to="/agent/signup" class="text-green-500 underline p-4" type="submit">Estate Agent? Sign up here!</NuxtLink>
-            </div>
-          </div>
-        </form>
-      </div>
-      <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
-    </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
-      <h1 class="text-white font-bold text-8xl">Virify</h1>
-      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
+  <div class="flex justify-center items-center w-full">
+    <div class="w-full sm:w-lg">
+      <h1 class="text-3xl font-bold mb-6">Signup</h1>
+      <p class="mb-6">Signup quickly to Virify to gain access to creating you own listings and much more...</p>
+      <!-- UI Form -->
+      <UForm @submit="signup" :state="state" :schema="schema" class="w-full">
+        <!-- email input -->
+        <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2 mb-2">
+          <UInput v-model="state.email" type="email" placeholder="JohnDoe@email.com" size="xl" class="w-full" autocomplete="on" />
+        </UFormField>
+        <!-- password input -->
+        <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Signup </UButton>
+      </UForm>
+      <!-- END UI Form -->
     </div>
   </div>
 </template>

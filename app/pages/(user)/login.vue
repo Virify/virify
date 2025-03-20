@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import * as z from "zod";
-
 const { showToast } = useToastNotification();
-const error = useRoute().query.error;
-
-onMounted(() => {
-  // if there is an error, set the notification to the error message
-  if (error) {
-    showToast({
-      title: error as string,
-      icon: "ri:error-warning-line",
-    });
+const route = useRoute();
+/**
+ * Check for errors from query
+ * If there is an error, set the notification to the error message
+ * This is used to show a notification if the user is not logged in
+ */
+watch(
+  () => route.query.error,
+  (newError) => {
+    if (newError) {
+      showToast({
+        title: "Please login to access your account.",
+        icon: "ri:error-warning-line",
+      });
+      navigateTo(route.path, { replace: true }); // Removes query params
+    }
   }
-});
+);
 
 /**
  * Form validation schema
