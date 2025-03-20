@@ -43,6 +43,8 @@ const state = reactive<Partial<PersonalSchema & BusinessSchema & AddressSchema>>
 // refs
 const stepper = useTemplateRef("stepper");
 const form = useTemplateRef("form");
+// Reactive width tracking
+const isXs = ref(false);
 
 // Form steps configuration
 const formStep = ref([
@@ -110,23 +112,61 @@ function submitState() {
 
   return !(isPersonalValid && isBusinessValid && isAddressValid);
 }
+
+/**
+ * Reactive window size tracking
+ * This is used to determine if the screen size is xs or not
+ */
+const updateSize = () => {
+  isXs.value = window.innerWidth < 475;
+};
+
+/**
+ * Check if window is defined
+ * This is to prevent SSR issues
+ * We only want to run this on the client side
+ */
+if (typeof window !== "undefined") {
+  updateSize();
+  window.addEventListener("resize", updateSize);
+}
+
+/**
+ * Cleanup
+ */
+onUnmounted(() => {
+  window.removeEventListener("resize", updateSize);
+});
+
+/**
+ * Watch for window size changes
+ * This is to prevent SSR issues
+ * We only want to run this on the client side
+ */
+watchEffect(() => {
+  if (typeof window !== "undefined") {
+    updateSize();
+  }
+});
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen">
-    <div class="flex justify-center items-center flex-col py-12 w-full">
-      <div class="max-w-md w-full justify-baseline">
-        <h1 class="text-4xl text-brand-accent font-semibold pb-6">Sign up</h1>
-        <p class="text-brand-accent pb-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil doloremque distinctio commodi laborum accusantium?</p>
-      </div>
+  <!-- container -->
+  <div class="flex justify-center items-center flex-col py-12 px-2 w-full">
+    <!-- Pre Form Content -->
+    <div class="max-w-md w-full justify-baseline p-4 sm:p-0">
+      <h1 class="text-4xl --ui-text font-semibold pb-6">Sign up</h1>
+      <p class="--ui-text pb-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil doloremque distinctio commodi laborum accusantium?</p>
+    </div>
 
-      <!-- start of form -->
-      <UForm @submit="onSubmit" :state="state" ref="form" class="max-w-md w-full mt-6">
-        <!-- Stepper -->
-        <UStepper ref="stepper" :items="formStep" size="sm" disabled color="primary">
-          <!-- Personal Information Step -->
-          <template #personalInformation>
-            <UForm :state="state" :schema="personalSchema" ref="form" class="pt-6">
+    <!-- start of form -->
+    <UForm @submit="onSubmit" :state="state" ref="form" class="flex flex-col justify-center items-center w-full mt-6 p-4 sm:p-0">
+      <!-- Stepper -->
+      <UStepper ref="stepper" :items="formStep" :size="isXs ? 'xs' : 'lg'" disabled color="primary" class="flex justify-center w-full sm:w-4xl">
+        <!-- Personal Information Step -->
+        <template #personalInformation>
+          <div class="flex items-center justify-center flex-col w-full pt-6">
+            <UForm :state="state" :schema="personalSchema" ref="form" class="w-full sm:w-md">
               <UFormField label="Email Address" name="email" size="lg" hint="Required" class="py-2" help="Your business email">
                 <UInput v-model="state.email" type="email" placeholder="Enter your email..." size="lg" autocomplete="on" class="w-full" />
               </UFormField>
@@ -134,11 +174,13 @@ function submitState() {
                 <UInput v-model="state.mainContact" type="tel" placeholder="Enter contact number..." size="lg" class="w-full" />
               </UFormField>
             </UForm>
-          </template>
+          </div>
+        </template>
 
-          <!-- Business Information Step -->
-          <template #businessInformation>
-            <UForm :state="state" :schema="businessSchema" ref="form" class="pt-6">
+        <!-- Business Information Step -->
+        <template #businessInformation>
+          <div class="flex items-center justify-center flex-col w-full pt-6">
+            <UForm :state="state" :schema="businessSchema" ref="form" class="w-full sm:w-md">
               <UFormField label="Business Name" name="businessName" size="lg" hint="Required" class="py-2" help="Your operating name">
                 <UInput v-model="state.businessName" type="text" placeholder="Enter name..." size="xl" />
               </UFormField>
@@ -146,11 +188,13 @@ function submitState() {
                 <UInput v-model="state.registrationNumber" type="string" placeholder="Enter registration number..." size="xl" />
               </UFormField>
             </UForm>
-          </template>
+          </div>
+        </template>
 
-          <!-- Business Address Step -->
-          <template #businessAddress>
-            <UForm :state="state" :schema="addressSchema" ref="form" class="pt-6">
+        <!-- Business Address Step -->
+        <template #businessAddress>
+          <div class="flex items-center justify-center flex-col w-full pt-6">
+            <UForm :state="state" :schema="addressSchema" ref="form" class="w-full sm:w-md">
               <UFormField label="Address" name="addressLine" size="lg" hint="Required" class="py-2" help="Busisness Operating Address">
                 <UInput v-model="state.addressLine" type="text" placeholder="Enter address..." size="xl" />
               </UFormField>
@@ -167,16 +211,21 @@ function submitState() {
                 <UInput v-model="state.postcode" type="text" placeholder="Enter postcode..." size="xl" />
               </UFormField>
             </UForm>
-          </template>
-        </UStepper>
-        <!-- END stepper -->
-        <div class="flex gap-2 justify-between mt-6">
-          <UButton variant="ghost" leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="prevStep()" size="lg"> Prev </UButton>
-          <UButton variant="ghost" trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" size="lg"> Next </UButton>
-        </div>
-        <UButton type="submit" loading-auto size="xl" class="text-white mt-8 rounded-3xl px-4" variant="solid" :disabled="submitState()"> Submit </UButton>
-      </UForm>
-      <!-- END form -->
-    </div>
+          </div>
+        </template>
+        <!-- end Address Step -->
+      </UStepper>
+      <!-- Stepper buttons -->
+      <div class="flex gap-2 justify-between mt-6 w-full sm:w-md">
+        <UButton variant="outline" leading-icon="i-lucide-arrow-left" :disabled="!stepper?.hasPrev" @click="prevStep()" size="lg"> Prev </UButton>
+        <UButton variant="outline" trailing-icon="i-lucide-arrow-right" :disabled="!stepper?.hasNext" @click="nextStep()" size="lg"> Next </UButton>
+      </div>
+      <!-- Submit button -->
+      <div class="w-full sm:w-md">
+        <UButton type="submit" loading-auto size="xl" class="mt-8 px-4" variant="solid" :disabled="submitState()"> Submit </UButton>
+      </div>
+      <!-- END submit button -->
+    </UForm>
+    <!-- END form -->
   </div>
 </template>
