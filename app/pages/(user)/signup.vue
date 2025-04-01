@@ -40,6 +40,9 @@ async function signup() {
       navigateTo("/login");
     })
     .catch((error) => {
+      console.log(error)
+      console.log(error.data)
+      console.log(error.statusMessage)
       showToast({
         title: error.data.message,
         icon: "ri:error-warning-line",
