@@ -41,11 +41,11 @@ export default defineEventHandler(async (event) => {
 
     // Get coordinates from the geocoding service
     const response = await getCoordinatesFromGeocodingService(search);
-    console.log("Geocoding response:", response);
 
     // Extract coordinates and address from the response
     const { coordinates, address } = extractGeocodingResponse(response);
     console.log("Coordinates:", coordinates);
+    
     // create the address and cache the coordinates
     await createAddressIfNotExist(address, coordinates);
 
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
  * @param search string
  */
 async function getCoordinatesFromGeocodingService(search: string) {
-  const response: GeocodingResponse = await $fetch(`${process.env.NOMINATIM_API_URL}/search`, {
+  const response: GeocodingResponse = await $fetch(`${process.env.NOMINATIM_API_URL}`, {
     method: "get",
     query: {
       q: search,
@@ -98,11 +98,23 @@ function extractGeocodingResponse(response: GeocodingResponse) {
  * @returns Address
  */
 async function createAddressIfNotExist(address: AddressDetails, coordinates: number[]) {
+
+  // Street needs a value due to indexing
+  if (!address.street || address.street === 'null') {
+    address.street = 'Unknown';
+  }
+
+  // we need to set a default value for the postcode
+  // this is important for indexing and we will allow null values in the database
+  if(!address.postcode || address.postcode === 'null') {
+    address.postcode = 'Unknown';
+  }
+  
   // Check if the address already exists in the database
   const existingAddress = await prisma.address.findUnique({
     where: {
       street_city_postcode_country: {
-        street: address.road ?? null,
+        street: address.road ?? address.street ?? null,
         city: address.town ?? address.city ?? null,
         postcode: address.postcode ?? null,
         country: address.state ?? null,
@@ -112,6 +124,8 @@ async function createAddressIfNotExist(address: AddressDetails, coordinates: num
 
   // If the address exists, throw an error
   if (existingAddress) {
+    console.log("Address already exists: ", existingAddress);
+    console.log("SKIPPING ADDRESS CREATION");
     throw createError({ statusCode: 400, statusMessage: "Address already exists" });
   }
 
@@ -122,7 +136,7 @@ async function createAddressIfNotExist(address: AddressDetails, coordinates: num
       postcode: address.postcode ?? null,
       county: address.county ?? null,
       country: address.state ?? null,
-      street: address.road ?? null,
+      street: address.road ?? address.street ?? null,
       number: null,
     },
   });

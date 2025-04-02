@@ -18,3 +18,25 @@ model Address {
   @@index([street], map: "address_street_idx")
   @@unique([street, city, postcode, country])
 }
+
+
+// Example SQL query to select all addresses with a non-null location
+// SELECT id, street, city, ST_AsText(location) AS location
+// FROM "Address"
+// WHERE location IS NOT NULL;
+
+// Example SQL + Prisma
+// const nearestAddress = await prisma.$queryRaw`
+//   SELECT id FROM "Address"
+//   ORDER BY ST_Distance(location, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)) ASC
+//   LIMIT 1;
+// `;
+
+// if (nearestAddress.length > 0) {
+//   const fullAddress = await prisma.address.findUnique({
+//     where: { id: nearestAddress[0].id },
+//     include: { property: true }
+//   });
+
+//   console.log(fullAddress);
+// }
