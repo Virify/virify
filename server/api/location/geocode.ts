@@ -24,6 +24,8 @@ interface GeocodingResponse {
   features: Feature[];
 }
 
+const nominatimUrl = useRuntimeConfig().public.NOMINATIM_API_URL;
+
 /**
  * This API endpoint handles geocoding requests.
  * It retrieves coordinates and address details based on the provided search query.
@@ -62,7 +64,6 @@ export default defineEventHandler(async (event) => {
  * @param search string
  */
 async function getCoordinatesFromGeocodingService(search: string) {
-  const nominatimUrl = useRuntimeConfig().public.NOMINATIM_API_URL;
   const response: GeocodingResponse = await $fetch(nominatimUrl, {
     method: "get",
     query: {

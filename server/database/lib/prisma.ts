@@ -4,7 +4,7 @@ const prismaClientSingleton = () => {
   return new PrismaClient({
     datasources: {
       db: {
-        url: config.private.NUXT_DATABASE_URL,
+        url: config.private.DATABASE_URL,
       },
     }
   })

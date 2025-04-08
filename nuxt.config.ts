@@ -51,7 +51,7 @@ export default defineNuxtConfig({
     private: {
       EMAIL_PASS: process.env.EMAIL_PASS,
       // to remove after testing and its working - this is to check env var coming through
-      NUXT_DATABASE_URL: process.env.NUXT_DATABASE_URL,
+      DATABASE_URL: process.env.DATABASE_URL,
     }
   },
   nodemailer: {

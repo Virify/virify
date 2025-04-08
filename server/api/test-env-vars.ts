@@ -8,6 +8,6 @@ export default defineEventHandler(() => {
     internalEmail: config.public.INTERNAL_EMAIL,
     sessionPassword: config.public.NUXT_SESSION_PASSWORD,
     nominatimApiUrl: config.public.NOMINATIM_API_URL,
-    databaseUrl: config.private.NUXT_DATABASE_URL,
+    databaseUrl: config.private.DATABASE_URL,
   }
 })
