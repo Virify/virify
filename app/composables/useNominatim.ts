@@ -1,4 +1,7 @@
 export function useNominatim() {
+
+  const config = useRuntimeConfig();
+
   interface LocationResult {
     displayName: string;
     lat: string;
@@ -20,7 +23,7 @@ export function useNominatim() {
     if (!query) return [];
 
     try {
-      const response: GeocodingResponse = await $fetch(`${process.env.NOMINATIM_API_URL}/search`, {
+      const response: GeocodingResponse = await $fetch(`${config.public.NOMINATIM_API_URL}/search`, {
         method: "get",
         query: {
           q: query,

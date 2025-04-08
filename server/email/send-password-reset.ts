@@ -1,5 +1,6 @@
 import { render } from "@vue-email/render";
 import PasswordReset from "./templates/password-reset.vue";
+const config = useRuntimeConfig();
 
 /**
  * Sends a password reset email to the user.
@@ -16,7 +17,7 @@ export default async function sendActivation(email: string, token: string) {
     // Render the email to HTML
     const emailHtml = await render(emailToSend, {
       token,
-      baseUrl: process.env.EMAIL_BASE_URL || "",
+      baseUrl: config.public.EMAIL_BASE_URL,
     });
 
     // Set the email subject, HTML content, and recipient address

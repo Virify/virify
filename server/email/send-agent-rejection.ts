@@ -1,5 +1,6 @@
 import { render } from "@vue-email/render";
 import AgentDenied from "./templates/agent-denied.vue";
+const config = useRuntimeConfig();
 
 /**
  * Sends a rejection email to the user.
@@ -24,7 +25,7 @@ export default async function sendAgentActivation(email: string, agent: Business
       country: agent.country!,
       postcode: agent.postcode!,
       registrationNumber: agent.companyRegistration!,
-      baseUrl: process.env.EMAIL_BASE_URL || "",
+      baseUrl: config.public.EMAIL_BASE_URL,
     });
 
     // Set the email subject, HTML content, and recipient address

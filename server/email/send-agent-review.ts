@@ -1,5 +1,6 @@
 import { render } from "@vue-email/render";
 import AgentReview from "./templates/agent-review.vue";
+const config = useRuntimeConfig();
 
 /**
  * Sends a review email to the internal team
@@ -36,14 +37,14 @@ export default async function sendAgentReview(formData: FormData, token: string)
     country: formData.country,
     postcode: formData.postcode,
     registrationNumber: formData.registrationNumber,
-    baseUrl: process.env.EMAIL_BASE_URL || "",
+    baseUrl: config.public.EMAIL_BASE_URL,
     token: token,
   });
 
   // Set the email subject, HTML content, and recipient address
   const subject = "New Estate Agent Review Required";
   const html = emailHtml;
-  const to = process.env.INTERNAL_EMAIL || "";
+  const to = config.public.INTERNAL_EMAIL;
 
   try {
     // Send the email
