@@ -1,12 +1,13 @@
 export default defineEventHandler(() => {
+  const config = useRuntimeConfig()
   return {
-    emailUser: process.env.EMAIL_USER,
-    emailHost: process.env.EMAIL_HOST,
-    emailPass: process.env.EMAIL_PASS,
-    emailBaseUrl: process.env.EMAIL_BASE_URL,
-    internalEmail: process.env.INTERNAL_EMAIL,
-    sessionPassword: process.env.NUXT_SESSION_PASSWORD,
-    nominatimApiUrl: process.env.NOMINATIM_API_URL,
-    databaseUrl: process.env.DATABASE_URL,
+    emailUser: config.public.EMAIL_USER,
+    emailHost: config.public.EMAIL_HOST,
+    emailPass: config.private.EMAIL_PASS,
+    emailBaseUrl: config.public.EMAIL_BASE_URL,
+    internalEmail: config.public.INTERNAL_EMAIL,
+    sessionPassword: config.public.NUXT_SESSION_PASSWORD,
+    nominatimApiUrl: config.public.NOMINATIM_API_URL,
+    databaseUrl: config.private.DATABASE_URL,
   }
 })

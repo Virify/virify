@@ -42,8 +42,18 @@ export default defineNuxtConfig({
     public: {
       redirectCookieName: "redirect",
       loginUrl: "/login",
+      EMAIL_USER: process.env.EMAIL_USER,
+      EMAIL_HOST: process.env.EMAIL_HOST,
+      EMAIL_BASE_URL: process.env.EMAIL_BASE_URL,
+      INTERNAL_EMAIL: process.env.INTERNAL_EMAIL,
+      NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
+      NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
+      DATABASE_URL: process.env.DATABASE_URL,
     },
-    
+    private: {
+      EMAIL_PASS: process.env.EMAIL_PASS,
+      DATABASE_URL: process.env.DATABASE_URL,
+    }
   },
   nodemailer: {
     from: '"Virify" <no-reply@virify.co.uk>',
