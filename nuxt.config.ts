@@ -5,7 +5,6 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  ssr: true,
   modules: [
     "nuxt-auth-utils",
     "nuxt-nodemailer",
