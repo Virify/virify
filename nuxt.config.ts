@@ -47,11 +47,10 @@ export default defineNuxtConfig({
       INTERNAL_EMAIL: process.env.INTERNAL_EMAIL,
       NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
       NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
-      DATABASE_URL: process.env.DATABASE_URL,
     },
     private: {
       EMAIL_PASS: process.env.EMAIL_PASS,
-      DATABASE_URL: process.env.DATABASE_URL,
+      NUXT_DATABASE_URL: process.env.NUXT_DATABASE_URL,
     }
   },
   nodemailer: {
