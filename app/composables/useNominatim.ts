@@ -23,7 +23,7 @@ export function useNominatim() {
     if (!query) return [];
 
     try {
-      const response: GeocodingResponse = await $fetch(`${config.public.NOMINATIM_API_URL}/search`, {
+      const response: GeocodingResponse = await $fetch(config.public.NOMINATIM_API_URL, {
         method: "get",
         query: {
           q: query,

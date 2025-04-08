@@ -62,7 +62,8 @@ export default defineEventHandler(async (event) => {
  * @param search string
  */
 async function getCoordinatesFromGeocodingService(search: string) {
-  const response: GeocodingResponse = await $fetch(`${useRuntimeConfig().public.NOMINATIM_API_URL}/search`, {
+  const nominatimUrl = useRuntimeConfig().public.NOMINATIM_API_URL;
+  const response: GeocodingResponse = await $fetch(nominatimUrl, {
     method: "get",
     query: {
       q: search,
