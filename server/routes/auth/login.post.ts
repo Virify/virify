@@ -13,7 +13,8 @@ const loginSchema = z.object({
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
-  const { email, password, role } = loginSchema.parse(await readBody(event));
+  const requestBody = await readBody(event);
+  const { email, password, role } = await loginSchema.parse(requestBody);
 
   const { successResponse } = useResponse();
 
