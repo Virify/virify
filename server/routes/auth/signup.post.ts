@@ -104,7 +104,6 @@ async function handleAgentSignup(formData: any, token: string) {
     // If agent does not exist, create a new record with the token
     await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
 
-    console.log("Agent created successfully");
     // send internal email to the team for review the sign up request
     await sendAgentReview(formData, token);
 
