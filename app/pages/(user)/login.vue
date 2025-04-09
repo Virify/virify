@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 const { showToast } = useToastNotification();
+const { fetch } = useUserSession();
 const route = useRoute();
 /**
  * Check for errors from query
@@ -55,6 +56,8 @@ async function login() {
         title: "Login successful",
         icon: "ri:check-line",
       });
+      // we have set the userSession in the backend, we need the client to fetch the user session
+      fetch();
       // redirect to account page
       navigateTo("/account");
     })
