@@ -4,6 +4,29 @@ import sendToAgentReview from "~~/server/email/send-to-agent-review";
 import { Reviewed, OwnerRole } from "@prisma/client";
 import { z } from "zod";
 
+// Zod schema for validating the request body
+const roleSchema = z.object({
+  role: z.enum(["user", "agent"]),
+});
+
+const userSchema = z.object({
+  email: z.string().email(),
+});
+
+const agentSchema = z.object({
+  email: z.string().email(),
+  businessName: z.string(),
+  mainContact: z.string(),
+  addressLine: z.string(),
+  city: z.string(),
+  county: z.string(),
+  country: z.string(),
+  postcode: z.string(),
+  registrationNumber: z.string(),
+});
+
+type AgentFormData = z.infer<typeof agentSchema>;
+
 /**
  * Handles signup requests for both owners and agents.
  * Determines the role, processes user validation, and sends activation emails.
@@ -14,34 +37,20 @@ export default defineEventHandler(async (event) => {
   const { successResponse } = useResponse();
   // Zod schema for validating the request body
   try {
-    const userSchema = z.object({
-      email: z.string().email(),
-      role: z.string().includes("user"),
-    });
+    const requestBody = await readBody(event);
 
-    const agentSchema = z.object({
-      email: z.string().email(),
-      businessName: z.string(),
-      mainContact: z.string(),
-      addressLine: z.string(),
-      city: z.string(),
-      county: z.string(),
-      country: z.string(),
-      postcode: z.string(),
-      registrationNumber: z.string(),
-      role: z.string().includes("agent"),
-    });
-    
-    const { email, role } = await userSchema.parse(await readBody(event));
-    const agentBody = await agentSchema.parse(await readBody(event));
+    // parse and validate the role
+    const { role } = await roleSchema.parse(requestBody);
 
-    // generate token
+    // once we have a valid role we generate a token
     const token = generateToken();
 
-    // check if role is user or agent
     if (role === "user") {
+      const { email } = await userSchema.parse(requestBody);
       await handleOwnerSignup(email, token);
-    } else if (role === "agent") {
+    } else {
+      // we can assume this is agent due to zod validation
+      const agentBody = await agentSchema.parse(requestBody);
       await handleAgentSignup(agentBody, token);
     }
 
@@ -49,7 +58,11 @@ export default defineEventHandler(async (event) => {
     return successResponse(`${role.charAt(0).toUpperCase() + role.slice(1)} signup successful`);
   } catch (err) {
     if (err instanceof z.ZodError) {
-      throw err.flatten();
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Validation failed",
+        data: err.errors, // Send structured error messages
+      });
     }
     throw err;
   }
@@ -92,7 +105,7 @@ async function handleOwnerSignup(email: string, token: string) {
  * @param formData - The agent's submitted data.
  * @param token - The generated activation token.
  */
-async function handleAgentSignup(formData: any, token: string) {
+async function handleAgentSignup(formData: AgentFormData, token: string) {
   const { email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = formData;
   try {
     // Check if an agent already exists with the same email or address
