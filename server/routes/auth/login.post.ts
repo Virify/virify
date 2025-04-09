@@ -1,21 +1,19 @@
 import { z } from "zod";
 
+// schema for validating the request body
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  role: z.enum(["user", "agent"]),
+});
+
 /**
  * Handles the login request for owners.
  * @param event - The H3 event object.
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
-  /**
-   * Schema for validating the request body.
-   */
-  const bodySchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(8),
-    role: z.enum(["user", "agent"]),
-  });
-
-  const { email, password, role } = bodySchema.parse(await readBody(event));
+  const { email, password, role } = loginSchema.parse(await readBody(event));
 
   const { successResponse } = useResponse();
 
@@ -34,7 +32,11 @@ export default defineEventHandler(async (event) => {
     return successResponse("Logged in successfully!");
   } catch (err) {
     if (err instanceof z.ZodError) {
-      throw err.flatten();
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Validation failed",
+        data: err.errors, // Send structured error messages
+      });
     }
     throw err;
   }
