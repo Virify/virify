@@ -1,0 +1,18 @@
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  const token = to.params.token;
+
+  try {
+    await $fetch("/auth/check-not-activated", {
+      method: "GET",
+      params: {
+        token: token as string,
+        role: "agent",
+      },
+    });
+  } catch (err) {
+    return navigateTo({
+      path: "/agent/login",
+      query: { error: "Invalid or expired token" },
+    });
+  }
+});

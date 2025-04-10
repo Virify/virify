@@ -11,32 +11,32 @@ model Property {
   furnishingStatus       FurnishingStatus
   tenure                 Tenure
   leaseTerm              Int?
-  address                Address?               @relation(fields: [addressId], references: [id])
   addressId              Int?                   @unique
   bedrooms               Int                    @default(3)
   bathrooms              Int                    @default(1)
   kitchens               Int                    @default(1)
   livingRooms            Int                    @default(1)
   diningRooms            Int                    @default(1)
+  ownerId                Int?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  additionalFeatures     AdditionalFeatures?
+  amenities              AmenitiesFeature[]
+  bathroomFeatures       BathroomFeatures[]
   bedroomFeatures        BedroomFeatures[]
   diningroomFeatures     DiningroomFeatures[]
   kitchenFeatures        KitchenFeatures?
+  listing                Listing?
   livingAreaFeatures     LivingAreaFeatures[]
-  bathroomFeatures       BathroomFeatures[]
-  storageFeatures        StorageFeatures?
+  media                  Media[]
   outdoorSpace           OutdoorSpace?
   parking                Parking?
-  securityFeatures       SecurityFeatures?
-  amenities              AmenitiesFeature[]
-  runningCosts           RunningCosts?
-  media                  Media[]
+  address                Address?               @relation(fields: [addressId], references: [id])
   owner                  Owner?                 @relation(fields: [ownerId], references: [id])
-  ownerId                Int?
-  agents                 Agent[]
-  additionalFeatures     AdditionalFeatures[]
-  listing                Listing?
-  createdAt              DateTime               @default(now())
-  updatedAt              DateTime               @updatedAt
+  runningCosts           RunningCosts?
+  securityFeatures       SecurityFeatures?
+  storageFeatures        StorageFeatures?
+  agents                 Agent[]                @relation("AgentToProperty")
 
   @@index([ownerId])
 }

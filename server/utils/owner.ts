@@ -26,6 +26,71 @@ export async function findOwnerWithVerification(email: string): Promise<Prisma.O
 }
 
 /**
+ * Find Owner by Activation Token
+ * 
+ * @param token string
+ */
+export async function findOwnerByActivationToken(token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+  return prisma.owner.findFirst({
+    where: {
+      verification: {
+        activationToken: token,
+      },
+    },
+    include: {
+      verification: true,
+    },
+  });
+}
+
+/**
+ * Find Owner by Password reset token
+ * @param token string
+ * @returns Owner
+ */
+export async function findOwnerByPasswordToken(token: string) {
+  return prisma.owner.findUnique({
+    where: {
+      passwordResetToken: token,
+    },
+  });
+}
+
+/**
+ * Update the owners password based on the token *which has been verified*.
+ * @param token string
+ * @param password string
+ * @returns Owner
+ */
+export async function updateOwnerByToken(token: string, password: string) {
+  return prisma.owner.update({
+    where: {
+      passwordResetToken: token,
+    },
+    data: {
+      password,
+      passwordResetToken: null,
+      passwordResetTokenExpiry: null,
+    },
+  });
+}
+
+/**
+ * Find owner by Email and create a password reset token.
+ * @param email - The email of the owner to find.
+ * @returns The owner object if found, otherwise null.
+ */
+export async function updateOwnerByEmailPasswordReset(email: string, token: string) {
+  return prisma.owner.update({
+    where: { email },
+    data: {
+      passwordResetToken: token,
+      passwordResetTokenExpiry: new Date(Date.now() + 3600000),
+    },
+  });
+}
+
+/**
  * Finds an owner by email and activation token.
  * @param email - The email of the owner to find.
  * @param token - The activation token of the owner to find.

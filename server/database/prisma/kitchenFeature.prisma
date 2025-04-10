@@ -5,7 +5,7 @@ model KitchenFeatures {
   appliancesIncluded Boolean
   description        String
   propertyId         Int      @unique
-  property           Property @relation(fields: [propertyId], references: [id])
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  property           Property @relation(fields: [propertyId], references: [id])
 }

@@ -18,10 +18,16 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
     // If the user is an agent, navigate to the agent login page
     if (to.path.startsWith("/agent")) {
-      return navigateTo(agentloginUrl);
+      return navigateTo({
+        path: agentloginUrl,
+        query: { error: "auth" },
+      });
     } else {
       // Navigate to the login page
-      return navigateTo(loginUrl);
+      return navigateTo({
+        path: loginUrl,
+        query: { error: "auth" },
+      });
     }
   } else {
     // If logged in, clear the redirect cookie

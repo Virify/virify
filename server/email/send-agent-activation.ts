@@ -1,8 +1,10 @@
 import { render } from "@vue-email/render";
 import AgentActivation from "./templates/agent-activation.vue";
+const config = useRuntimeConfig();
 
 /**
- * Sends an activation email to the user.
+ * Sends a activation email to the user.
+ * 
  * @param email - The recipient's email address.
  * @param token - The activation token.
  * @returns A Promise that resolves when the email is sent.
@@ -15,8 +17,7 @@ export default async function sendAgentActivation(email: string, token: string) 
     // Render the email to HTML
     const emailHtml = await render(emailToSend, {
       token,
-      userEmail: email,
-      baseUrl: process.env.EMAIL_BASE_URL || "",
+      baseUrl: config.public.EMAIL_BASE_URL,
     });
 
     // Set the email subject, HTML content, and recipient address

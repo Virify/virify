@@ -5,7 +5,7 @@
  * @returns A standardized HTTP response indicating success or failure.
  */
 export default defineEventHandler(async (event) => {
-  const { successResponse } = useResponse();
+  const { successResponse, errorResponse } = useResponse();
 
   try {
     // Retrieve the user session
@@ -28,6 +28,6 @@ export default defineEventHandler(async (event) => {
     // Return a success response
     return successResponse("Deleted Successfully! Redirecting to homepage...");
   } catch (error) {
-    throw error;
+    return errorResponse(error, event);
   }
 });

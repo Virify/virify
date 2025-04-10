@@ -1,21 +1,26 @@
+import * as z from "zod";
+
+const activateSchema = z.object({
+  password: z.string().min(8),
+  token: z.string(),
+});
+
 /**
  * Handles user activation by verifying the token and updating their password.
  */
 export default defineEventHandler(async (event) => {
-  const { successResponse } = useResponse();
-
+  const { successResponse, errorResponse } = useResponse();
   try {
-    // Extract request body parameters
-    const { password, token, email } = await readBody(event);
+    const { password, token } = await readValidatedBody(event, activateSchema.parse);
 
     // Validate input
-    validateActivationRequest(token, email, password);
+    validateActivationRequest(token, password);
 
     // Hash the new password securely
     const hashedPassword = await hashPassword(password);
 
     // Find the user by email
-    const user = await findOwnerWithVerification(email);
+    const user = await findOwnerByActivationToken(token);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "User not found." });
 
@@ -25,7 +30,7 @@ export default defineEventHandler(async (event) => {
     // Return success response
     return successResponse("Successfully activated account.");
   } catch (error) {
-    throw error;
+    return errorResponse(error, event);
   }
 });
 
@@ -34,12 +39,12 @@ export default defineEventHandler(async (event) => {
  * Ensures that the token, email, and password are provided.
  * @throws Error if any required parameter is missing
  */
-function validateActivationRequest(token?: string, email?: string, password?: string) {
-  if (!token || !email || !password) {
+function validateActivationRequest(token?: string, password?: string) {
+  if (!token || !password) {
     throw createError({ statusCode: 400, statusMessage: "Invalid request" });
   }
 
-  if(!validatePassword(password)) {
+  if (!validatePassword(password)) {
     throw createError({ statusCode: 400, statusMessage: "Invalid password" });
   }
 }

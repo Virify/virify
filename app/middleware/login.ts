@@ -27,5 +27,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
   // If not logged in and navigating to the login page, clear the last page cookie
   if (!loggedIn.value && to.fullPath === "/login") {
     lastPage.value = null;
+    to.query.error = "Please log in to access this page.";
   }
 });

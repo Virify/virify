@@ -1,7 +1,13 @@
 import { PrismaClient } from '@prisma/client'
-
+const config = useRuntimeConfig()
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  return new PrismaClient({
+    datasources: {
+      db: {
+        url: config.DATABASE_URL,
+      },
+    }
+  })
 }
 
 declare const globalThis: {

@@ -1,13 +1,20 @@
 model Address {
-  id         Int       @id @default(autoincrement())
-  street     String
-  city       String
-  postcode   String
-  country    String
-  latitude   Float?
-  longitude  Float?
+  id         Int                      @id @default(autoincrement())
+  street     String?
+  city       String?
+  postcode   String?
+  country    String?
+  county     String?
+  propertyId Int?                     @unique
+  createdAt  DateTime                 @default(now())
+  updatedAt  DateTime                 @updatedAt
+  location   Unsupported("geometry")?
+  number     String?
   property   Property?
-  propertyId Int?      @unique
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+
+  @@index([location], map: "address_location_idx", type: Gist)
+  @@index([postcode], map: "address_postcode_idx")
+  @@index([city], map: "address_city_idx")
+  @@index([street], map: "address_street_idx")
+  @@unique([street, city, postcode, country])
 }

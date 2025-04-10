@@ -1,17 +1,15 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["prismaSchemaFolder"]
+  previewFeatures = ["postgresqlExtensions", "prismaSchemaFolder"]
   binaryTargets   = ["native", "rhel-openssl-1.0.x"]
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator customer_generator {
   provider = "prisma-generator-fake-data"
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
 }

@@ -36,8 +36,8 @@ async function deleteAccount() {
     notification.value = "Account deleted successfully! Redirecting to home page...";
     await clear();
     navigateTo("/");
-  } catch (error) {
-    notification.value = (error as any)?.statusMessage || "An error occurred.";
+  } catch (error: any) {
+    notification.value = error.data.message;
   }
 }
 
