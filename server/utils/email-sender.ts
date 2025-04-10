@@ -14,7 +14,6 @@ export default async function emailSender(html: string, subject: string, to: str
     // Send the email with the provided subject, HTML content, and recipient address
     return await sendMail({ subject: subject, html: html, to: to });
   } catch (error) {
-    // Throw an error if there is an issue sending the email
     throw error;
   }
 }

@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const requestBody = await readBody(event);
-    
+  
     // Parse and validate the request body
     const { email, password, role } = await loginSchema.parse(requestBody);
 
@@ -34,6 +34,6 @@ export default defineEventHandler(async (event) => {
     // Return a success response
     return successResponse("Logged in successfully!");
   } catch (err) {
-    errorResponse(err);
+    return errorResponse(err, event);
   }
 });

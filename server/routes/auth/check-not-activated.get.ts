@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
     return successResponse(`${isAgent ? "Agent" : "User"} not activated`);
   } catch (error) {
-    errorResponse(error);
+    return errorResponse(error, event);
   }
 });
 

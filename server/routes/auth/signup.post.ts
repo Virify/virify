@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     // Return a success message with dynamic role name
     return successResponse(`${role.charAt(0).toUpperCase() + role.slice(1)} signup successful`);
   } catch (err) {
-    errorResponse(err);
+    return errorResponse(err, event);
   }
 });
 

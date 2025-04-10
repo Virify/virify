@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     // Return success response
     return successResponse("Successfully activated account.");
   } catch (error) {
-    errorResponse(error);
+    return errorResponse(error, event);
   }
 });
 

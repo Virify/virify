@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
 
     return successResponse("Token is valid");
   } catch (error) {
-    errorResponse(error);
+    return errorResponse(error, event);
   }
 });
 

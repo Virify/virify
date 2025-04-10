@@ -1,4 +1,4 @@
-import { H3Event, createError } from "h3";
+import { H3Event, setResponseStatus } from "h3";
 import { z } from "zod";
 
 /**
@@ -67,15 +67,22 @@ export const useResponse = () => {
     return createResponse(statusCode, statusMessage, error);
   };
 
-  const errorResponse = (error: any) => {
+  /**
+   * Creates a standardized error response.
+   * 
+   * Zod errors with throw a 400 status and return the field errors.
+   * Other errors will be returned via createError and should be handled by the frontend
+   * 
+   * @param error Error object
+   * @param event H3 Event
+   * @returns error response
+   */
+  const errorResponse = (error: any, event: H3Event) => {
     if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Validation failed",
-        data: error.errors,
-      });
+      setResponseStatus(event, 400);
+      return error.flatten().fieldErrors;
     }
-    throw error;
+    return error;
   };
 
   return {

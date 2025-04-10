@@ -36,8 +36,7 @@ export default defineEventHandler(async (event) => {
     // return a success message
     return { message: "Email sent successfully" };
   } catch (error) {
-    errorResponse(error);
-    throw error;
+    return errorResponse(error, event);
   }
 });
 
