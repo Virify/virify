@@ -1,23 +1,35 @@
 import { Reviewed } from "@prisma/client";
 import sendAgentActivation from "~~/server/email/send-agent-activation";
 import sendAgentRejection from "~~/server/email/send-agent-rejection";
+import * as z from "zod";
 
+const reviewSchema = z.object({
+  email: z.string().email(),
+  token: z.string(),
+  approve: z.string(),
+});
 /**
  * Endpoint to handle agent verification.
  * @param event - The H3 event object.
  * @returns A standardized HTTP response indicating the result of the verification process.
  */
 export default defineEventHandler(async (event) => {
-  const { email, token, approve } = await readBody(event);
-  const { successResponse } = useResponse();
-  const approval = approve === "true" ? Reviewed.APPROVED : Reviewed.REJECTED;
+  const { successResponse, errorResponse } = useResponse();
 
   try {
+    const requestBody = await readBody(event);
+
+    // Parse and validate the request body
+    const { email, token, approve } = await reviewSchema.parse(requestBody);
+
+    // Validate the approval status
+    const approval = approve === "true" ? Reviewed.APPROVED : Reviewed.REJECTED;
+    
     // Retrieve the owner along with their verification details
-    const owner = await findOwnerWithVerification(email as string);
+    const owner = await findOwnerWithVerification(email);
 
     // Validate the verification details
-    const validOwner = validateVerification(owner, token as string);
+    const validOwner = validateVerification(owner, token);
 
     // If the owner is already activated, return a 403 error else update the owner and review
     if (validOwner.verification?.activated) {
@@ -35,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
     return successResponse("Owner reviewed successfully");
   } catch (error) {
-    throw error;
+    errorResponse(error);
   }
 });
 

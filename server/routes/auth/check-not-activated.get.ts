@@ -1,3 +1,9 @@
+import * as z from "zod";
+
+const activateSchema = z.object({
+  token: z.string(),
+  role: z.enum(["user", "agent"]),
+});
 
 /**
  * Endpoint to check if a user or agent is activated.
@@ -9,17 +15,20 @@
  * @returns A standardized HTTP response indicating whether the entity is activated.
  */
 export default defineEventHandler(async (event) => {
-  // Extract email and activation token from query parameters
-  const { token, role } = await getQuery(event);
-  const { successResponse } = useResponse();
+  const { successResponse, errorResponse } = useResponse();
 
   try {
+    // Extract email and activation token from query parameters
+    const requestBody = await readBody(event);
+
+    // Parse and validate the request body
+    const { token, role } = await activateSchema.parse(requestBody);
+
     // Determine if we're checking an agent or a user
     const isAgent = role === "agent";
 
     // get the user by activation token
-    const user = await findOwnerByActivationToken(token as string);
-
+    const user = await findOwnerByActivationToken(token);
 
     // Validate the user and their verification status
     if (!user?.verification) {
@@ -32,11 +41,11 @@ export default defineEventHandler(async (event) => {
     }
 
     // Validate the activation token and its expiration date
-    validateActivationToken(user.verification, token as string);
+    validateActivationToken(user.verification, token);
 
     return successResponse(`${isAgent ? "Agent" : "User"} not activated`);
   } catch (error) {
-    throw error;
+    errorResponse(error);
   }
 });
 

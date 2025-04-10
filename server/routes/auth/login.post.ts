@@ -13,16 +13,18 @@ const loginSchema = z.object({
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
-  const requestBody = await readBody(event);
-  const { email, password, role } = await loginSchema.parse(requestBody);
-
-  const { successResponse } = useResponse();
-
-  // detemine which form is being submitted
-  // TRUE = USER, false = AGENT
-  const userRole = role === "user" ? true : false;
+  const { successResponse, errorResponse } = useResponse();
 
   try {
+    const requestBody = await readBody(event);
+    
+    // Parse and validate the request body
+    const { email, password, role } = await loginSchema.parse(requestBody);
+
+    // detemine which form is being submitted
+    // TRUE = USER, false = AGENT
+    const userRole = role === "user" ? true : false;
+
     // Authenticate the user
     const user = await authenticateUser(email, password, userRole);
 
@@ -32,13 +34,6 @@ export default defineEventHandler(async (event) => {
     // Return a success response
     return successResponse("Logged in successfully!");
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Validation failed",
-        data: err.errors, // Send structured error messages
-      });
-    }
-    throw err;
+    errorResponse(err);
   }
 });

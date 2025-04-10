@@ -34,8 +34,7 @@ type AgentFormData = z.infer<typeof agentSchema>;
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
-  const { successResponse } = useResponse();
-  // Zod schema for validating the request body
+  const { successResponse, errorResponse } = useResponse();
   try {
     const requestBody = await readBody(event);
 
@@ -57,14 +56,7 @@ export default defineEventHandler(async (event) => {
     // Return a success message with dynamic role name
     return successResponse(`${role.charAt(0).toUpperCase() + role.slice(1)} signup successful`);
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Validation failed",
-        data: err.errors, // Send structured error messages
-      });
-    }
-    throw err;
+    errorResponse(err);
   }
 });
 

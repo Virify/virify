@@ -1,4 +1,5 @@
 import { H3Event, createError } from "h3";
+import { z } from "zod";
 
 /**
  * Utility function to create standardized HTTP responses.
@@ -66,6 +67,17 @@ export const useResponse = () => {
     return createResponse(statusCode, statusMessage, error);
   };
 
+  const errorResponse = (error: any) => {
+    if (error instanceof z.ZodError) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Validation failed",
+        data: error.errors,
+      });
+    }
+    throw error;
+  };
+
   return {
     createResponse,
     setResponse,
@@ -74,5 +86,6 @@ export const useResponse = () => {
     successResponse,
     createdResponse,
     internalServerError,
+    errorResponse,
   };
 };

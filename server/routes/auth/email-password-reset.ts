@@ -1,5 +1,9 @@
 import sendActivation from "~~/server/email/send-password-reset";
+import * as z from "zod";
 
+const emailSchema = z.object({
+  email: z.string().email(),
+});
 /**
  * Send password reset email to the user from the email address
  * @param event - The H3 event object containing the request data.
@@ -7,10 +11,13 @@ import sendActivation from "~~/server/email/send-password-reset";
  * @throws Will throw an error if the email is invalid, user not found, or token already exists.
  */
 export default defineEventHandler(async (event) => {
-  const { email } = await readBody(event);
+  const { errorResponse } = useResponse();
   try {
-    if (!validateEmail(email)) throw createError({ statusCode: 400, statusMessage: "Invalid email address" });
+    const requestBody = await readBody(event);
 
+    // parse and validate the request body
+    const { email } = await emailSchema.parse(requestBody);
+    
     // check if the email exists in the database
     const dbOwner = await findOwnerWithVerification(email);
 
@@ -29,6 +36,7 @@ export default defineEventHandler(async (event) => {
     // return a success message
     return { message: "Email sent successfully" };
   } catch (error) {
+    errorResponse(error);
     throw error;
   }
 });
