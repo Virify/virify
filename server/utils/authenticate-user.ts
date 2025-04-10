@@ -9,11 +9,9 @@ import { OwnerRole } from "@prisma/client";
  * @returns A User.
  */
 export async function authenticateUser(email: string, password: string, isUserLogin: boolean) {
-  // Validate and trim the email and password
-  const { trimmedEmail, trimmedPassword } = await loginFieldValidator(email, password);
 
   // Find the user based on the login type (agent or owner)
-  const user = await findOwner(trimmedEmail);
+  const user = await findOwner(email);
 
   // If user is not found, return an unauthorized response
   if (!user) {
@@ -31,7 +29,7 @@ export async function authenticateUser(email: string, password: string, isUserLo
   }
 
   // Verify the password
-  const passwordVerified = await verifyPassword(user.password as string, trimmedPassword);
+  const passwordVerified = await verifyPassword(user.password as string, password);
 
   if (!passwordVerified) throw createError({ statusCode: 401, statusMessage: "Password incorrect", message: "Password does not match" });
 

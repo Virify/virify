@@ -1,14 +1,16 @@
 import { Owner } from "@prisma/client";
+import * as z from "zod";
+
+const passwordSchema = z.object({
+  password: z.string().min(8),
+  token: z.string(),
+});
 
 export default defineEventHandler(async (event) => {
+  const { successResponse, errorResponse } = useResponse();
   try {
-    // use the useResponse function to handle responses
-    const { successResponse } = useResponse();
-
-    // get params from request
-    const { password, token } = await readBody(event);
-    console.log("Password reset token: ", token);
-
+    // parse and validate the request body
+    const { password, token } = await readValidatedBody(event, passwordSchema.parse);
     // we need to get the user with the token
     const tokenUser = await findOwnerByPasswordToken(token);
 
@@ -22,12 +24,12 @@ export default defineEventHandler(async (event) => {
 
     return successResponse("Password updated successfully");
   } catch (error) {
-    throw error;
+    return errorResponse(error, event);
   }
 });
 
 /**
- * Validates the owner and token 
+ * Validates the owner and token
  * @param owner Owner
  * @throws {Error} If the token is invalid or expired
  */

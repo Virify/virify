@@ -1,12 +1,17 @@
+import * as z from "zod";
+
+const activateSchema = z.object({
+  password: z.string().min(8),
+  token: z.string(),
+});
+
 /**
  * Handles user activation by verifying the token and updating their password.
  */
 export default defineEventHandler(async (event) => {
-  const { successResponse } = useResponse();
-
+  const { successResponse, errorResponse } = useResponse();
   try {
-    // Extract request body parameters
-    const { password, token } = await readBody(event);
+    const { password, token } = await readValidatedBody(event, activateSchema.parse);
 
     // Validate input
     validateActivationRequest(token, password);
@@ -15,7 +20,7 @@ export default defineEventHandler(async (event) => {
     const hashedPassword = await hashPassword(password);
 
     // Find the user by email
-    const user = await findOwnerByActivationToken(token as string);
+    const user = await findOwnerByActivationToken(token);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "User not found." });
 
@@ -25,7 +30,7 @@ export default defineEventHandler(async (event) => {
     // Return success response
     return successResponse("Successfully activated account.");
   } catch (error) {
-    throw error;
+    return errorResponse(error, event);
   }
 });
 
