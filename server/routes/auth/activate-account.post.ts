@@ -11,10 +11,7 @@ const activateSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
   try {
-    const requestBody = await readBody(event);
-
-    // parse and validate the request body
-    const { password, token } = await activateSchema.parse(requestBody);
+    const { password, token } = await readValidatedBody(event, activateSchema.parse);
 
     // Validate input
     validateActivationRequest(token, password);

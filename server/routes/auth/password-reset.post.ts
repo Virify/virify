@@ -9,9 +9,8 @@ const passwordSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
   try {
-    const requestBody = await readBody(event);
     // parse and validate the request body
-    const { password, token } = await passwordSchema.parse(requestBody);
+    const { password, token } = await readValidatedBody(event, passwordSchema.parse);
     // we need to get the user with the token
     const tokenUser = await findOwnerByPasswordToken(token);
 

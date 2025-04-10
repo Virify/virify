@@ -13,10 +13,7 @@ const emailSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const requestBody = await readBody(event);
-
-    // parse and validate the request body
-    const { email } = await emailSchema.parse(requestBody);
+    const { email } = await readValidatedBody(event, emailSchema.parse);
     
     // check if the email exists in the database
     const dbOwner = await findOwnerWithVerification(email);

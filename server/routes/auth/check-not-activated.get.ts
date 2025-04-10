@@ -18,11 +18,7 @@ export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
 
   try {
-    // Extract email and activation token from query parameters
-    const requestBody = await readBody(event);
-
-    // Parse and validate the request body
-    const { token, role } = await activateSchema.parse(requestBody);
+    const { token, role } = await readValidatedBody(event, activateSchema.parse);
 
     // Determine if we're checking an agent or a user
     const isAgent = role === "agent";

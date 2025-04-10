@@ -17,14 +17,12 @@ export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
 
   try {
-    const requestBody = await readBody(event);
-
     // Parse and validate the request body
-    const { email, token, approve } = await reviewSchema.parse(requestBody);
+    const { email, token, approve } = await readValidatedBody(event, reviewSchema.parse);
 
     // Validate the approval status
     const approval = approve === "true" ? Reviewed.APPROVED : Reviewed.REJECTED;
-    
+
     // Retrieve the owner along with their verification details
     const owner = await findOwnerWithVerification(email);
 

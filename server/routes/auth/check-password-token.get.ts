@@ -1,7 +1,6 @@
 import { Owner } from "@prisma/client";
 import * as z from "zod";
 
-//TODO: Maybe use Zod for the token validation
 const tokenSchema = z.object({
   token: z.string(),
 });
@@ -16,10 +15,7 @@ export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
 
   try {
-    const requestBody = await readBody(event);
-
-    // parse and validate the request body
-    const { token } = await tokenSchema.parse(requestBody);
+    const { token } = await readValidatedBody(event, tokenSchema.parse);
 
     // get the user with the token
     const tokenUser = await findOwnerByPasswordToken(token);

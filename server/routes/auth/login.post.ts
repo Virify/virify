@@ -16,10 +16,8 @@ export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
 
   try {
-    const requestBody = await readBody(event);
-  
     // Parse and validate the request body
-    const { email, password, role } = await loginSchema.parse(requestBody);
+    const { email, password, role } = await readValidatedBody(event, loginSchema.parse);
 
     // detemine which form is being submitted
     // TRUE = USER, false = AGENT
