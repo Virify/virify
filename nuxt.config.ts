@@ -36,7 +36,8 @@ export default defineNuxtConfig({
       loginUrl: "/login",
       NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
       NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
-      EMAIL_BASE_URL: process.env.EMAIL_BASE_URL,
+      // This will default to the preview email service via build and will be overridden by branch deploys
+      EMAIL_BASE_URL: process.env.EMAIL_BASE_URL || process.env.PREVIEW_EMAIL_BASE_URL,
       INTERNAL_EMAIL: process.env.INTERNAL_EMAIL,
     },
     EMAIL_HOST: process.env.EMAIL_HOST,

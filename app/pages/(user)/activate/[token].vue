@@ -1,3 +1,4 @@
+<!-- This is old and needs refactoring to use Nuxt UI -->
 <script setup lang="ts">
 definePageMeta({
   middleware: ["check-user-activation"],
