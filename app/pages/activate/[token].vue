@@ -1,4 +1,3 @@
-<!-- This is old and needs refactoring to use Nuxt UI -->
 <script setup lang="ts">
 definePageMeta({
   // TODO: Add error handling for invalid token on the frontend

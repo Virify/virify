@@ -18,15 +18,12 @@ export default defineEventHandler(async (event) => {
     // Parse and validate the request body
     const { email, password } = await readValidatedBody(event, loginSchema.parse);
 
-    // detemine which form is being submitted
-
     // Authenticate the user
     const user = await authenticateUser(email, password);
 
-    // Login the user using nuxt auth session and set their role
+    // Login the user using nuxt auth session and set their role (important in the future)
     await loginUser(event, user, user.role);
 
-    // Return a success response
     return successResponse("Logged in successfully!");
   } catch (err) {
     return errorResponse(err, event);

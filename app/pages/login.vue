@@ -39,8 +39,6 @@ const state = reactive<Partial<Schema>>({
 
 /**
  * Login function
- * Note the role is hardcoded to user
- * This is because the login page is only for users
  */
 async function login() {
   await $fetch("/auth/login", {

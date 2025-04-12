@@ -115,45 +115,10 @@ function submitState() {
 }
 
 /**
- * Reactive window size tracking
- * This is used to determine if the screen size is xs or not
- */
-const updateSize = () => {
-  isXs.value = window.innerWidth < 475;
-};
-
-/**
- * Check if window is defined
- * This is to prevent SSR issues
- * We only want to run this on the client side
- */
-if (typeof window !== "undefined") {
-  updateSize();
-  window.addEventListener("resize", updateSize);
-}
-
-/**
- * Cleanup
- */
-onUnmounted(() => {
-  window.removeEventListener("resize", updateSize);
-});
-
-/**
- * Watch for window size changes
- * This is to prevent SSR issues
- * We only want to run this on the client side
- */
-watchEffect(() => {
-  if (typeof window !== "undefined") {
-    updateSize();
-  }
-});
-
-/**
  * Signup function
- * Note the role is hardcoded to user
- * This is because the signup page is only for users
+ * 
+ * The users role is set here on user creation.
+ * This is an important step determining if the user is an agent or a normal user and has knock on effects.
  */
 async function signup(event: FormSubmitEvent<any>) {
   await $fetch("/auth/signup", {
