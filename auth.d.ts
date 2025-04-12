@@ -4,7 +4,7 @@ declare module "#auth-utils" {
     username?: string;
     firstName?: string;
     email: string;
-    agent?: boolean;
+    role: string;
   }
 }
 

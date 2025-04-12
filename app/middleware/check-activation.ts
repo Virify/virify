@@ -6,7 +6,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       method: "GET",
       params: {
         token: token as string,
-        role: "user",
       },
     });
   } catch (err) {

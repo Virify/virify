@@ -42,10 +42,10 @@ defineProps<{
           <strong>Click the button below to activate the account:</strong>
         </Text>
         <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-          <Button :href="baseUrl + '/agent/review/' + token + '?approve=true&email=' + email" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+          <Button :href="baseUrl + '/review/' + token + '?approve=true&email=' + email" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
             <strong>Approve Review</strong>
           </Button>
-          <Button :href="baseUrl + '/agent/review/' + token + '?approve=false&email=' + email" style="background-color: #e3342f; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+          <Button :href="baseUrl + '/review/' + token + '?approve=false&email=' + email" style="background-color: #e3342f; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
             <strong>Deny Review</strong>
           </Button>
         </div>

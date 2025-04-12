@@ -49,6 +49,7 @@ async function deleteAccount() {
       <p class="mb-6">Logged in since {{ session.loggedInAt }}</p>
       <p class="mb-6">User ID: {{ user?.id }}</p>
       <p class="mb-6">User Email: {{ user?.email }}</p>
+      <p class="mb-6">User Email: {{ user?.role}}</p>
       <div class="w-full sm:w-lg">
         <!-- UI Form -->
         <UButton @click="logout" class="mb-4 mr-2" variant="solid">Logout</UButton>

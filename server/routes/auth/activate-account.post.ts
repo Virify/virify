@@ -11,9 +11,8 @@ const activateSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
   try {
+    // validate the request body
     const { password, token } = await readValidatedBody(event, activateSchema.parse);
-    console.log("Activating account with token:", token);
-    console.log("New password provided:", password);
 
     // Find the user by the activation token
     // The token has already been verified by check-not-activated

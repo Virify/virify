@@ -4,7 +4,6 @@ import { z } from "zod";
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  role: z.enum(["user", "agent"]),
 });
 
 /**
@@ -17,17 +16,15 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Parse and validate the request body
-    const { email, password, role } = await readValidatedBody(event, loginSchema.parse);
+    const { email, password } = await readValidatedBody(event, loginSchema.parse);
 
     // detemine which form is being submitted
-    // TRUE = USER, false = AGENT
-    const userRole = role === "user" ? true : false;
 
     // Authenticate the user
-    const user = await authenticateUser(email, password, userRole);
+    const user = await authenticateUser(email, password);
 
-    // Login the user using nuxt auth session
-    await loginUser(event, user, userRole);
+    // Login the user using nuxt auth session and set their role
+    await loginUser(event, user, user.role);
 
     // Return a success response
     return successResponse("Logged in successfully!");

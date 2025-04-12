@@ -48,7 +48,6 @@ async function login() {
     body: {
       email: state.email,
       password: state.password,
-      role: "user",
     },
   })
     .then(() => {
