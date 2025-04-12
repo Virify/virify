@@ -9,7 +9,11 @@ definePageMeta({
 import * as z from "zod";
 const { showToast } = useToastNotification();
 const route = useRoute();
+const token = route.params.token;
 
+const tokenSchema = z.object({
+  token: z.string().nonempty("Token is required"),
+});
 /**
  * Form validation schema
  */
@@ -41,12 +45,14 @@ const state = reactive<Partial<Schema>>({
  */
 async function activateAccount() {
   // Include token and email in the form data
-  const token = route.params.token as string;
+  const validToken = tokenSchema.parse({
+    token: token,
+  });
   await $fetch("/auth/activate-account", {
     method: "POST",
     body: {
       password: state.password,
-      token: token,
+      token: validToken,
     },
   })
     .then(() => {

@@ -10,9 +10,9 @@ const reviewSchema = z.object({
 });
 
 // get email and approval from query
-const email = route.query.email as string;
-const approve = route.query.approve as string;
-const token = route.params.token as string;
+const email = route.query.email;
+const approve = route.query.approve;
+const token = route.params.token;
 
 /**
  * Check if the account is not activated
