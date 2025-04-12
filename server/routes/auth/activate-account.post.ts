@@ -12,17 +12,17 @@ export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
   try {
     const { password, token } = await readValidatedBody(event, activateSchema.parse);
+    console.log("Activating account with token:", token);
+    console.log("New password provided:", password);
 
-    // Validate input
-    validateActivationRequest(token, password);
-
-    // Hash the new password securely
-    const hashedPassword = await hashPassword(password);
-
-    // Find the user by email
+    // Find the user by the activation token
+    // The token has already been verified by check-not-activated
     const user = await findOwnerByActivationToken(token);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "User not found." });
+
+    // Hash the new password securely
+    const hashedPassword = await hashPassword(password);
 
     // Activate user by updating password and clearing activation token
     await updateOwnerAndActivate(user.id, hashedPassword);
@@ -33,18 +33,3 @@ export default defineEventHandler(async (event) => {
     return errorResponse(error, event);
   }
 });
-
-/**
- * Validates activation request parameters.
- * Ensures that the token, email, and password are provided.
- * @throws Error if any required parameter is missing
- */
-function validateActivationRequest(token?: string, password?: string) {
-  if (!token || !password) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid request" });
-  }
-
-  if (!validatePassword(password)) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid password" });
-  }
-}

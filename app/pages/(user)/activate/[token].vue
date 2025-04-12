@@ -1,13 +1,35 @@
 <!-- This is old and needs refactoring to use Nuxt UI -->
 <script setup lang="ts">
 definePageMeta({
-  middleware: ["check-user-activation"],
+  // middleware: ["check-user-activation"],
 });
 
-// composable imports
+import * as z from "zod";
+const { showToast } = useToastNotification();
 const route = useRoute();
-// Get the email from the query
-const { form, errors, notification, submitForm, clearNotification, isLoading } = useAuthForm({ password: "", token: "" }, "user", "activate");
+
+/**
+ * Form validation schema
+ */
+const schema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters").nonempty("Password is required"),
+    confirmedPassword: z.string().min(8, "Password must be at least 8 characters").nonempty("Password is required"),
+  })
+  .refine((data) => data.password === data.confirmedPassword, {
+    message: "Passwords do not match",
+    path: ["confirmedPassword"],
+  });
+
+type Schema = z.output<typeof schema>;
+
+/**
+ * Form state
+ */
+const state = reactive<Partial<Schema>>({
+  password: "",
+  confirmedPassword: "",
+});
 
 /**
  * Activate account function
@@ -17,41 +39,51 @@ const { form, errors, notification, submitForm, clearNotification, isLoading } =
  */
 async function activateAccount() {
   // Include token and email in the form data
-  form.value.token = route.params.token as string;
-  await submitForm("/auth/activate-account", "Account activated successfully! Redirecting to login page...");
-}
-
-/**
- * Clear notification handler
- */
-function clearNotificationHandler() {
-  clearNotification("/login");
+  const token = route.params.token as string;
+  await $fetch("/auth/activate-account", {
+    method: "POST",
+    body: {
+      password: state.password,
+      token: token,
+    },
+  })
+    .then(() => {
+      showToast({
+        title: "Account activated successfully! Redirecting to login page...",
+        icon: "ri:check-line",
+      });
+      // redirect to login page
+      navigateTo("/login");
+    })
+    .catch((error) => {
+      showToast({
+        title: error.data.message,
+        icon: "ri:error-warning-line",
+      });
+    });
 }
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
-      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-6 text-green-500">Welcome</h1>
-        <h3 class="text-xl mb-6 text-green-500">Please enter a password to activate your account</h3>
-        <form @submit.prevent="activateAccount">
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="password">Password:</label>
-            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-            <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.password }}</span>
-          </div>
-          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-            <span v-if="isLoading">Loading...</span>
-            <span v-else>Activate</span>
-          </button>
-        </form>
-        <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
-      </div>
-    </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
-      <h1 class="text-white font-bold text-8xl">Virify</h1>
-      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
+  <div class="flex justify-center items-center w-full p-4 sm:p-0">
+    <div class="w-full sm:w-lg">
+      <!-- pre form content -->
+      <h1 class="text-3xl font-bold mb-6">Activate Account</h1>
+      <p class="mb-6">Please enter a password to finish activating your account</p>
+      <!-- UI Form -->
+      <UForm @submit="activateAccount" :state="state" :schema="schema" class="w-full">
+        <!-- password input -->
+        <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
+          <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
+        </UFormField>
+        <!-- password input -->
+        <UFormField label="Confirm Password" name="confirmedPassword" size="xl" hint="Required" class="py-2">
+          <UInput v-model="state.confirmedPassword" type="password" placeholder="Enter your password again" size="xl" class="w-full" />
+        </UFormField>
+        <!-- submit button -->
+        <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Signup </UButton>
+      </UForm>
+      <!-- END UI Form -->
     </div>
   </div>
 </template>
