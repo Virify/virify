@@ -1,7 +1,9 @@
 <!-- This is old and needs refactoring to use Nuxt UI -->
 <script setup lang="ts">
 definePageMeta({
-  // middleware: ["check-user-activation"],
+  // TODO: Add error handling for invalid token on the frontend
+  // Right now it just redirects to the login page as a user clicks on a link in a email
+  middleware: ["check-user-activation"],
 });
 
 import * as z from "zod";

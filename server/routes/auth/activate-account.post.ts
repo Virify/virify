@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     // The token has already been verified by check-not-activated
     const user = await findOwnerByActivationToken(token);
 
-    if (!user) throw createError({ statusCode: 404, statusMessage: "User not found." });
+    if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid Token." });
 
     // Hash the new password securely
     const hashedPassword = await hashPassword(password);
