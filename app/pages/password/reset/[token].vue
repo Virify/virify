@@ -1,51 +1,88 @@
 <script setup lang="ts">
 definePageMeta({
+  // TODO: Error handing for middleware
   middleware: ["check-password-token"],
 });
 
-const { form, errors, notification, isLoading, submitForm, clearNotification } = useAuthForm({ password: "", token: "" }, "user");
+import * as z from "zod";
+const { showToast } = useToastNotification();
+const route = useRoute();
 
 /**
- * Submit function
- * Submits the password reset form
+ * Form validation schema
+ */
+const schema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters").nonempty("Password is required"),
+    confirmedPassword: z.string().min(8, "Password must be at least 8 characters").nonempty("Password is required"),
+  })
+  .refine((data) => data.password === data.confirmedPassword, {
+    message: "Passwords do not match",
+    path: ["confirmedPassword"],
+  });
+
+type Schema = z.output<typeof schema>;
+
+/**
+ * Form state
+ */
+const state = reactive<Partial<Schema>>({
+  password: "",
+  confirmedPassword: "",
+});
+
+/**
+ * Reset password function
+ * Resets the password and redirects to the login page
+ * Shows an error notification if reset fails
+ * Shows a success notification if reset is successful
  */
 async function submit() {
-  // Include token in the form data
-  form.value.token = useRoute().params.token as string;
-  await submitForm("/auth/password-reset", "Password reset successfully! Redirecting to login page...");
-}
-
-/**
- * Clear notification handler
- * Clears the notification
- */
-function clearNotificationHandler() {
-  clearNotification("/login");
+  // Include token and email in the form data
+  const token = route.params.token as string;
+  await $fetch("/auth/password-reset", {
+    method: "POST",
+    body: {
+      password: state.password,
+      token: token,
+    },
+  })
+    .then(() => {
+      showToast({
+        title: "Password reset succesfully! Redirecting to login page...",
+        icon: "ri:check-line",
+      });
+      // redirect to login page
+      navigateTo("/login");
+    })
+    .catch((error) => {
+      showToast({
+        title: error.data.message,
+        icon: "ri:error-warning-line",
+      });
+    });
 }
 </script>
 <template>
-  <div class="flex justify-center items-center h-screen bg-gray-100">
-    <div class="flex justify-center items-center w-1/2 bg-white h-screen xs:w-full sm:w-1/2">
-      <div class="w-3/4 p-8 xs:w-full sm:w-3/4">
-        <h1 class="text-3xl font-bold mb-3 text-green-500">Password Reset</h1>
-        <h3 class="text-xl mb-6 text-green-500">Please enter a password to reset your password</h3>
-        <form @submit.prevent="submit">
-          <div class="mb-6">
-            <label class="block text-green-500 text-sm font-bold mb-2" for="password">Password:</label>
-            <input v-model="form.password" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="Password" />
-            <span v-if="errors.password" class="text-red-400 text-xs italic">{{ errors.paassword }}</span>
-          </div>
-          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" :disabled="isLoading">
-            <span v-if="isLoading">Loading...</span>
-            <span v-else>Update</span>
-          </button>
-        </form>
-        <Modal v-if="notification" :message="notification" @clear="clearNotificationHandler" />
-      </div>
-    </div>
-    <div class="flex flex-col justify-center items-center w-1/2 bg-green-500 h-screen xs:hidden sm:flex">
-      <h1 class="text-white font-bold text-8xl">Virify</h1>
-      <h2 class="text-white text-4xl p-4 text-center">Your awesome property people!</h2>
+  <div class="flex justify-center items-center w-full p-4 sm:p-0">
+    <div class="w-full sm:w-lg">
+      <!-- pre form content -->
+      <h1 class="text-3xl font-bold mb-6">Reset Your Password</h1>
+      <p class="mb-6">Please enter and confirm a new password.</p>
+      <!-- UI Form -->
+      <UForm @submit="submit" :state="state" :schema="schema" class="w-full">
+        <!-- password input -->
+        <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
+          <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
+        </UFormField>
+        <!-- password input -->
+        <UFormField label="Confirm Password" name="confirmedPassword" size="xl" hint="Required" class="py-2">
+          <UInput v-model="state.confirmedPassword" type="password" placeholder="Enter your password again" size="xl" class="w-full" />
+        </UFormField>
+        <!-- submit button -->
+        <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Reset </UButton>
+      </UForm>
+      <!-- END UI Form -->
     </div>
   </div>
 </template>

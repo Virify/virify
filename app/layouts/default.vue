@@ -2,24 +2,22 @@
 const items = ref([
   [
     {
-      label: "User",
-      icon: "material-symbols:person-pin-circle",
+      label: "Signup",
+      icon: "mdi:register",
       active: false,
-      children: [
-        { label: "Signup", icon: "game-icons:archive-register", to: "/signup", active: false },
-        { label: "Login", icon: "hugeicons:login-method", to: "/login", active: false },
-        { label: "Account", icon: "material-symbols:article-person", to: "/account", active: false },
-      ],
+      to: "/signup",
     },
     {
-      label: "Agent",
-      icon: "mdi:home",
+      label: "Login",
+      icon: "mdi:user-edit",
       active: false,
-      children: [
-        { label: "Signup", icon: "game-icons:archive-register", to: "/agent/signup", active: false },
-        { label: "Login", icon: "hugeicons:login-method", to: "/agent/login", active: false },
-        { label: "Account", icon: "material-symbols:article-person", to: "/agent/account", active: false },
-      ],
+      to: "/login",
+    },
+    {
+      label: "Account",
+      icon: "mdi:account",
+      active: false,
+      to: "/account",
     },
   ],
   [
