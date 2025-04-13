@@ -39,8 +39,6 @@ const state = reactive<Partial<Schema>>({
 
 /**
  * Login function
- * Note the role is hardcoded to user
- * This is because the login page is only for users
  */
 async function login() {
   await $fetch("/auth/login", {
@@ -48,7 +46,6 @@ async function login() {
     body: {
       email: state.email,
       password: state.password,
-      role: "user",
     },
   })
     .then(() => {
@@ -86,7 +83,11 @@ async function login() {
         <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
           <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
         </UFormField>
-        <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Login </UButton>
+        <div class="flex justify-between items-base mt-4">
+        <UButton color="primary" type="submit" loading-auto size="xl" variant="solid" active> Login </UButton>
+        <NuxtLink to="/password/forgot" class="text-sm">Forgot Password?</NuxtLink>
+        </div>
+        
       </UForm>
       <!-- END UI Form -->
     </div>

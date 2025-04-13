@@ -5,8 +5,9 @@ import { Reviewed, OwnerRole } from "@prisma/client";
 import { z } from "zod";
 
 // Zod schema for validating the request body
+// Role is important for signup - it determines the role in the database
 const roleSchema = z.object({
-  role: z.enum(["user", "agent"]),
+  role: z.boolean(),
 });
 
 const userSchema = z.object({
@@ -40,11 +41,14 @@ export default defineEventHandler(async (event) => {
 
     // parse and validate the role
     const { role } = await roleSchema.parse(requestBody);
-
     // once we have a valid role we generate a token
     const token = generateToken();
 
-    if (role === "user") {
+    /**
+     * We only parse the user schema if the role is user
+     * Ignoring the agent schema
+     */
+    if (!role) {
       const { email } = await userSchema.parse(requestBody);
       await handleOwnerSignup(email, token);
     } else {
@@ -54,8 +58,9 @@ export default defineEventHandler(async (event) => {
     }
 
     // Return a success message with dynamic role name
-    return successResponse(`${role.charAt(0).toUpperCase() + role.slice(1)} signup successful`);
+    return successResponse("Successfully signed up!");
   } catch (err) {
+    console.log(err);
     return errorResponse(err, event);
   }
 });

@@ -11,18 +11,17 @@ const activateSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
   try {
+    // validate the request body
     const { password, token } = await readValidatedBody(event, activateSchema.parse);
 
-    // Validate input
-    validateActivationRequest(token, password);
+    // Find the user by the activation token
+    // The token has already been verified by check-not-activated
+    const user = await findOwnerByActivationToken(token);
+
+    if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid Token." });
 
     // Hash the new password securely
     const hashedPassword = await hashPassword(password);
-
-    // Find the user by email
-    const user = await findOwnerByActivationToken(token);
-
-    if (!user) throw createError({ statusCode: 404, statusMessage: "User not found." });
 
     // Activate user by updating password and clearing activation token
     await updateOwnerAndActivate(user.id, hashedPassword);
@@ -33,18 +32,3 @@ export default defineEventHandler(async (event) => {
     return errorResponse(error, event);
   }
 });
-
-/**
- * Validates activation request parameters.
- * Ensures that the token, email, and password are provided.
- * @throws Error if any required parameter is missing
- */
-function validateActivationRequest(token?: string, password?: string) {
-  if (!token || !password) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid request" });
-  }
-
-  if (!validatePassword(password)) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid password" });
-  }
-}

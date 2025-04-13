@@ -1,7 +1,8 @@
 <script setup lang="ts">
 definePageMeta({
-  // TODO: Error handing for middleware
-  middleware: ["check-password-token"],
+  // TODO: Add error handling for invalid token on the frontend
+  // Right now it just redirects to the login page as a user clicks on a link in a email
+  middleware: ["check-activation"],
 });
 
 import * as z from "zod";
@@ -9,11 +10,9 @@ const { showToast } = useToastNotification();
 const route = useRoute();
 const token = route.params.token;
 
-// schema specifying the token
 const tokenSchema = z.object({
   token: z.string().nonempty("Token is required"),
 });
-
 /**
  * Form validation schema
  */
@@ -38,17 +37,17 @@ const state = reactive<Partial<Schema>>({
 });
 
 /**
- * Reset password function
- * Resets the password and redirects to the login page
- * Shows an error notification if reset fails
- * Shows a success notification if reset is successful
+ * Activate account function
+ * Activates the account and redirects to the login page
+ * Shows an error notification if activation fails
+ * Shows a success notification if activation is successful
  */
-async function submit() {
-  // validate the token
+async function activateAccount() {
+  // Include token and email in the form data
   const validToken = tokenSchema.parse({
     token: token,
   });
-  await $fetch("/auth/password-reset", {
+  await $fetch("/auth/activate-account", {
     method: "POST",
     body: {
       password: state.password,
@@ -57,7 +56,7 @@ async function submit() {
   })
     .then(() => {
       showToast({
-        title: "Password reset succesfully! Redirecting to login page...",
+        title: "Account activated successfully! Redirecting to login page...",
         icon: "ri:check-line",
       });
       // redirect to login page
@@ -71,14 +70,15 @@ async function submit() {
     });
 }
 </script>
+
 <template>
   <div class="flex justify-center items-center w-full p-4 sm:p-0">
     <div class="w-full sm:w-lg">
       <!-- pre form content -->
-      <h1 class="text-3xl font-bold mb-6">Reset Your Password</h1>
-      <p class="mb-6">Please enter and confirm a new password.</p>
+      <h1 class="text-3xl font-bold mb-6">Activate Account</h1>
+      <p class="mb-6">Please enter a password to finish activating your account</p>
       <!-- UI Form -->
-      <UForm @submit="submit" :state="state" :schema="schema" class="w-full">
+      <UForm @submit="activateAccount" :state="state" :schema="schema" class="w-full">
         <!-- password input -->
         <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
           <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
@@ -88,7 +88,7 @@ async function submit() {
           <UInput v-model="state.confirmedPassword" type="password" placeholder="Enter your password again" size="xl" class="w-full" />
         </UFormField>
         <!-- submit button -->
-        <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Reset </UButton>
+        <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Signup </UButton>
       </UForm>
       <!-- END UI Form -->
     </div>

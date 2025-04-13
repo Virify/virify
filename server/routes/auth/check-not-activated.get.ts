@@ -2,7 +2,6 @@ import * as z from "zod";
 
 const activateSchema = z.object({
   token: z.string(),
-  role: z.enum(["user", "agent"]),
 });
 
 /**
@@ -18,28 +17,25 @@ export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
 
   try {
-    const { token, role } = await readValidatedBody(event, activateSchema.parse);
-
-    // Determine if we're checking an agent or a user
-    const isAgent = role === "agent";
+    const { token } = await readValidatedBody(event, activateSchema.parse);
 
     // get the user by activation token
     const user = await findOwnerByActivationToken(token);
 
     // Validate the user and their verification status
     if (!user?.verification) {
-      throw createError({ statusCode: 404, statusMessage: `${isAgent ? "Agent" : "User"} not found or verification status missing` });
+      throw createError({ statusCode: 404, statusMessage: "User not found" });
     }
 
     // if user is agent and tries to activate on user account reject and vice versa
-    if (isAgent ? shouldRejectAgentSignup(user) : shouldRejectSignup(user)) {
-      throw createError({ statusCode: 403, statusMessage: `${isAgent ? "Agent" : "User"} already activated, or invalid type!` });
+    if (shouldRejectSignup(user)) {
+      throw createError({ statusCode: 403, statusMessage: "User already activated" });
     }
 
     // Validate the activation token and its expiration date
     validateActivationToken(user.verification, token);
 
-    return successResponse(`${isAgent ? "Agent" : "User"} not activated`);
+    return successResponse("User is not activated");
   } catch (error) {
     return errorResponse(error, event);
   }

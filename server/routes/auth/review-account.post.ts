@@ -4,10 +4,11 @@ import sendAgentRejection from "~~/server/email/send-agent-rejection";
 import * as z from "zod";
 
 const reviewSchema = z.object({
-  email: z.string().email(),
-  token: z.string(),
-  approve: z.string(),
+  email: z.string().email("Invalid email address").nonempty("Email is required"),
+  token: z.string().nonempty("Token is required"),
+  approve: z.enum(["true", "false"]),
 });
+
 /**
  * Endpoint to handle agent verification.
  * @param event - The H3 event object.

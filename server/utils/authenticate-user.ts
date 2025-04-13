@@ -8,7 +8,7 @@ import { OwnerRole } from "@prisma/client";
  * @param isAgentLogin - A boolean indicating if the login is for an agent.
  * @returns A User.
  */
-export async function authenticateUser(email: string, password: string, isUserLogin: boolean) {
+export async function authenticateUser(email: string, password: string) {
 
   // Find the user based on the login type (agent or owner)
   const user = await findOwner(email);
@@ -16,16 +16,6 @@ export async function authenticateUser(email: string, password: string, isUserLo
   // If user is not found, return an unauthorized response
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: "Sorry, User not found." });
-  }
-
-  // If the login is not for an agent and the user is an agent, return a forbidden response
-  if (isUserLogin && user.role === OwnerRole.AGENT) {
-    throw createError({ statusCode: 403, statusMessage: "Sorry, Agent login not allowed." });
-  }
-
-  // If the login is for an agent and the user is not an agent, return a forbidden response
-  if (!isUserLogin && user.role === OwnerRole.USER) {
-    throw createError({ statusCode: 403, statusMessage: "Sorry, only Agents can log in here." });
   }
 
   // Verify the password

@@ -17,7 +17,7 @@ defineProps<{
         <Text style="color: #4a5568; font-size: 16px; margin-bottom: 20px;">
           This will allow you to create a password and then login!
         </Text>
-        <Button :href="baseUrl + `/agent/activate/` + token" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+        <Button :href="baseUrl + `/activate/` + token" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
           Activate Account
         </Button>
         <Text style="color: #4a5568; font-size: 14px; margin-top: 20px;">
