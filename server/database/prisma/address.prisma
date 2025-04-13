@@ -1,5 +1,7 @@
 model Address {
   id         Int                      @id @default(autoincrement())
+  number     String?
+  flat       String?
   street     String?
   city       String?
   postcode   String?
@@ -8,13 +10,13 @@ model Address {
   propertyId Int?                     @unique
   createdAt  DateTime                 @default(now())
   updatedAt  DateTime                 @updatedAt
+  // geolocation fields
   location   Unsupported("geometry")?
-  number     String?
   property   Property?
 
+  @@unique([street, city, postcode, country])
   @@index([location], map: "address_location_idx", type: Gist)
   @@index([postcode], map: "address_postcode_idx")
   @@index([city], map: "address_city_idx")
   @@index([street], map: "address_street_idx")
-  @@unique([street, city, postcode, country])
 }

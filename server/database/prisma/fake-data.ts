@@ -1,4 +1,4 @@
-import { AccessibilityFeaturesType, PetPolicyType, AgentRole, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, OwnerRole, PropertyType, PropertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, EpcType, Reviewed } from '@prisma/client';
+import { AccessibilityFeaturesType, AgentRole, BedSizeType, ListingType, ListingTier, PriceType, AvailabilityStatus, OwnerRole, PropertyType, PropertyClassification, ConstructionType, RoofConstruction, FurnishingStatus, Tenure, EpcType, Reviewed } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import Decimal from 'decimal.js';
 
@@ -7,7 +7,7 @@ import Decimal from 'decimal.js';
 export function fakeAdditionalFeatures() {
   return {
     investmentPotential: faker.lorem.words(5),
-    petPolicy: faker.helpers.arrayElement([PetPolicyType.ALLOWED, PetPolicyType.NOT_ALLOWED] as const),
+    petPolicy: faker.datatype.boolean(),
     accessibilityFeatures: faker.helpers.arrayElement([AccessibilityFeaturesType.WHEELCHAIR_ACCESSIBLE, AccessibilityFeaturesType.WHEELCHAIR_RAMP, AccessibilityFeaturesType.ELEVATOR, AccessibilityFeaturesType.STAIRS, AccessibilityFeaturesType.PARKING, AccessibilityFeaturesType.OTHER] as const),
     moveInDate: faker.date.anytime(),
     updatedAt: faker.date.anytime(),
@@ -17,7 +17,7 @@ export function fakeAdditionalFeaturesComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
     investmentPotential: faker.lorem.words(5),
-    petPolicy: faker.helpers.arrayElement([PetPolicyType.ALLOWED, PetPolicyType.NOT_ALLOWED] as const),
+    petPolicy: faker.datatype.boolean(),
     accessibilityFeatures: faker.helpers.arrayElement([AccessibilityFeaturesType.WHEELCHAIR_ACCESSIBLE, AccessibilityFeaturesType.WHEELCHAIR_RAMP, AccessibilityFeaturesType.ELEVATOR, AccessibilityFeaturesType.STAIRS, AccessibilityFeaturesType.PARKING, AccessibilityFeaturesType.OTHER] as const),
     moveInDate: faker.date.anytime(),
     propertyId: faker.number.int(),
@@ -27,6 +27,8 @@ export function fakeAdditionalFeaturesComplete() {
 }
 export function fakeAddress() {
   return {
+    number: undefined,
+    flat: undefined,
     street: undefined,
     city: undefined,
     postcode: undefined,
@@ -34,12 +36,13 @@ export function fakeAddress() {
     county: undefined,
     propertyId: undefined,
     updatedAt: faker.date.anytime(),
-    number: undefined,
   };
 }
 export function fakeAddressComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
+    number: undefined,
+    flat: undefined,
     street: undefined,
     city: undefined,
     postcode: undefined,
@@ -48,7 +51,6 @@ export function fakeAddressComplete() {
     propertyId: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
-    number: undefined,
   };
 }
 export function fakeAgent() {
@@ -84,32 +86,32 @@ export function fakeAgentComplete() {
     deletedAt: undefined,
   };
 }
-export function fakeAmenitiesFeature() {
+export function fakeAmenities() {
   return {
-    transportLinks: faker.lorem.words(5),
-    schools: faker.lorem.words(5),
-    hospitals: faker.lorem.words(5),
-    shopping: faker.lorem.words(5),
-    greenSpaces: faker.lorem.words(5),
-    description: faker.lorem.words(5),
+    transportLinks: undefined,
+    schools: undefined,
+    hospitals: undefined,
+    shopping: undefined,
+    greenSpaces: undefined,
+    description: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeAmenitiesFeatureComplete() {
+export function fakeAmenitiesComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    transportLinks: faker.lorem.words(5),
-    schools: faker.lorem.words(5),
-    hospitals: faker.lorem.words(5),
-    shopping: faker.lorem.words(5),
-    greenSpaces: faker.lorem.words(5),
-    description: faker.lorem.words(5),
+    transportLinks: undefined,
+    schools: undefined,
+    hospitals: undefined,
+    shopping: undefined,
+    greenSpaces: undefined,
+    description: undefined,
     propertyId: faker.number.int(),
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeBathroomFeatures() {
+export function fakeBathroom() {
   return {
     enSuite: faker.datatype.boolean(),
     bathtub: faker.datatype.boolean(),
@@ -117,10 +119,11 @@ export function fakeBathroomFeatures() {
     downstairs: faker.datatype.boolean(),
     upstairs: faker.datatype.boolean(),
     description: faker.lorem.words(5),
+    size: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeBathroomFeaturesComplete() {
+export function fakeBathroomComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
     roomNumber: 1,
@@ -130,43 +133,49 @@ export function fakeBathroomFeaturesComplete() {
     downstairs: faker.datatype.boolean(),
     upstairs: faker.datatype.boolean(),
     description: faker.lorem.words(5),
+    size: undefined,
     propertyId: faker.number.int(),
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeBedroomFeatures() {
+export function fakeBedroom() {
   return {
+    roomNumber: faker.number.int(),
+    bed: faker.helpers.arrayElement([BedSizeType.SINGLE, BedSizeType.DOUBLE, BedSizeType.QUEEN, BedSizeType.KING, BedSizeType.SUPER_KING, BedSizeType.BUNK] as const),
     description: faker.lorem.words(5),
+    size: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeBedroomFeaturesComplete() {
+export function fakeBedroomComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    roomNumber: 2,
-    bedNumber: 1,
-    bedSize: BedSizeType.SINGLE,
+    roomNumber: faker.number.int(),
+    bed: faker.helpers.arrayElement([BedSizeType.SINGLE, BedSizeType.DOUBLE, BedSizeType.QUEEN, BedSizeType.KING, BedSizeType.SUPER_KING, BedSizeType.BUNK] as const),
     description: faker.lorem.words(5),
     propertyId: faker.number.int(),
+    size: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeDiningroomFeatures() {
+export function fakeDiningroom() {
   return {
     openConcept: faker.datatype.boolean(),
     description: faker.lorem.words(5),
+    size: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeDiningroomFeaturesComplete() {
+export function fakeDiningroomComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    roomNumber: 2,
+    roomNumber: 1,
     openConcept: faker.datatype.boolean(),
     description: faker.lorem.words(5),
     propertyId: faker.number.int(),
+    size: undefined,
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
   };
@@ -188,22 +197,24 @@ export function fakespatial_ref_sysComplete() {
     proj4text: undefined,
   };
 }
-export function fakeKitchenFeatures() {
+export function fakeKitchen() {
   return {
     modern: faker.datatype.boolean(),
     openPlan: faker.datatype.boolean(),
     appliancesIncluded: faker.datatype.boolean(),
     description: faker.lorem.words(5),
+    size: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeKitchenFeaturesComplete() {
+export function fakeKitchenComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
     modern: faker.datatype.boolean(),
     openPlan: faker.datatype.boolean(),
     appliancesIncluded: faker.datatype.boolean(),
     description: faker.lorem.words(5),
+    size: undefined,
     propertyId: faker.number.int(),
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
@@ -256,16 +267,17 @@ export function fakeListingCostsComplete() {
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeLivingAreaFeatures() {
+export function fakeLivingArea() {
   return {
     fireplace: faker.datatype.boolean(),
     balcony: faker.datatype.boolean(),
     openConcept: faker.datatype.boolean(),
     description: faker.lorem.words(5),
+    size: undefined,
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeLivingAreaFeaturesComplete() {
+export function fakeLivingAreaComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
     roomNumber: 1,
@@ -273,6 +285,7 @@ export function fakeLivingAreaFeaturesComplete() {
     balcony: faker.datatype.boolean(),
     openConcept: faker.datatype.boolean(),
     description: faker.lorem.words(5),
+    size: undefined,
     propertyId: faker.number.int(),
     createdAt: new Date(),
     updatedAt: faker.date.anytime(),
@@ -280,9 +293,9 @@ export function fakeLivingAreaFeaturesComplete() {
 }
 export function fakeMedia() {
   return {
-    images: faker.lorem.words(5),
-    videoTour: faker.lorem.words(5),
-    floorPlans: faker.lorem.words(5),
+    images: undefined,
+    videoTour: undefined,
+    floorPlans: undefined,
     metadata: faker.lorem.words(5),
     updatedAt: faker.date.anytime(),
   };
@@ -290,9 +303,9 @@ export function fakeMedia() {
 export function fakeMediaComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
-    images: faker.lorem.words(5),
-    videoTour: faker.lorem.words(5),
-    floorPlans: faker.lorem.words(5),
+    images: undefined,
+    videoTour: undefined,
+    floorPlans: undefined,
     metadata: faker.lorem.words(5),
     propertyId: faker.number.int(),
     createdAt: new Date(),
@@ -467,7 +480,7 @@ export function fakeRunningCostsComplete() {
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeSecurityFeatures() {
+export function fakeSecurity() {
   return {
     gatedCommunity: faker.datatype.boolean(),
     cctv: faker.datatype.boolean(),
@@ -476,7 +489,7 @@ export function fakeSecurityFeatures() {
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeSecurityFeaturesComplete() {
+export function fakeSecurityComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
     gatedCommunity: faker.datatype.boolean(),
@@ -488,7 +501,7 @@ export function fakeSecurityFeaturesComplete() {
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeStorageFeatures() {
+export function fakeStorage() {
   return {
     closets: faker.datatype.boolean(),
     attic: faker.datatype.boolean(),
@@ -497,7 +510,7 @@ export function fakeStorageFeatures() {
     updatedAt: faker.date.anytime(),
   };
 }
-export function fakeStorageFeaturesComplete() {
+export function fakeStorageComplete() {
   return {
     id: faker.number.int({ max: 2147483647 }),
     closets: faker.datatype.boolean(),

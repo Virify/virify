@@ -21,21 +21,21 @@ model Property {
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
   additionalFeatures     AdditionalFeatures?
-  amenities              AmenitiesFeature[]
-  bathroomFeatures       BathroomFeatures[]
-  bedroomFeatures        BedroomFeatures[]
-  diningroomFeatures     DiningroomFeatures[]
-  kitchenFeatures        KitchenFeatures?
+  amenities              Amenities[]
+  bathroomFeatures       Bathroom[]
+  bedroomFeatures        Bedroom[]
+  diningroomFeatures     Diningroom[]
+  kitchenFeatures        Kitchen?
   listing                Listing?
-  livingAreaFeatures     LivingAreaFeatures[]
+  livingAreaFeatures     LivingArea[]
   media                  Media[]
   outdoorSpace           OutdoorSpace?
   parking                Parking?
   address                Address?               @relation(fields: [addressId], references: [id])
   owner                  Owner?                 @relation(fields: [ownerId], references: [id])
   runningCosts           RunningCosts?
-  securityFeatures       SecurityFeatures?
-  storageFeatures        StorageFeatures?
+  securityFeatures       Security?
+  storageFeatures        Storage?
   agents                 Agent[]                @relation("AgentToProperty")
 
   @@index([ownerId])
