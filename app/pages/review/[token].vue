@@ -42,7 +42,6 @@ onMounted(async () => {
         icon: "ri:error-warning-line",
       });
     } else {
-      console.log(error);
       showToast({
         title: error?.data?.message || "Something went wrong",
         icon: "ri:error-warning-line",

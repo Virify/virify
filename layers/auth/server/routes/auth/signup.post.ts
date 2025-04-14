@@ -60,7 +60,6 @@ export default defineEventHandler(async (event) => {
     // Return a success message with dynamic role name
     return successResponse("Successfully signed up!");
   } catch (err) {
-    console.log(err);
     return errorResponse(err, event);
   }
 });

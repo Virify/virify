@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 // schema for validating the request body
 const loginSchema = z.object({

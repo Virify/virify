@@ -58,7 +58,6 @@ const validToken = tokenSchema.parse(token);
       navigateTo("/login");
     })
     .catch((error) => {
-      console.log(error)
       showToast({
         title: error.data.message,
         icon: "ri:error-warning-line",

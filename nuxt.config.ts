@@ -1,12 +1,11 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
+import vue from "@vitejs/plugin-vue";
 export default defineNuxtConfig({
-  extends: ["./layers/email", "./layers/database"],
+  extends: ["./layers/email", "./layers/database", './layers/auth'],
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["nuxt-auth-utils", "@nuxt/ui", "@nuxtjs/leaflet"],
+  modules: ["@nuxt/ui", "@nuxtjs/leaflet"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css", "leaflet/dist/leaflet.css"],
@@ -26,14 +25,11 @@ export default defineNuxtConfig({
     rollupConfig: {
       // @ts-ignore
       plugins: [vue()],
-    },
+    }
   },
   runtimeConfig: {
     public: {
-      redirectCookieName: "redirect",
-      loginUrl: "/login",
       NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
-      NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
     },
   },
 });

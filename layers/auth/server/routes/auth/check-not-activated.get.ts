@@ -34,10 +34,8 @@ export default defineEventHandler(async (event) => {
 
     // Validate the activation token and its expiration date
     validateActivationToken(user.verification, token);
-    console.log("finished checking activation status");
     return successResponse("User is not activated");
   } catch (error) {
-    console.log(error);
     return errorResponse(error, event);
   }
 });

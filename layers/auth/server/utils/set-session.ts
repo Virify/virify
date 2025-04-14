@@ -1,4 +1,4 @@
-import { UserSession } from "#auth-utils";
+import type { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
 
 /**

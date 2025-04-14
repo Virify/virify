@@ -1,5 +1,6 @@
-import { UserSession } from "#auth-utils";
+import type { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
+
 /**
  * Handles the login process for owners and agents.
  * @param event - The H3 event object.

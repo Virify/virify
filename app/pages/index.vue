@@ -85,7 +85,6 @@ const placeMarkerOnMap = (lat: string, lon: string, location: string) => {
 
 // Function to handle form submission (onSubmit)
 const onSubmit = async (event: any) => {
-  console.log("Form submitted with:", state);
 
   try {
     // Search for the location based on the user's input and place the marker
