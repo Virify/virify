@@ -88,7 +88,7 @@ async function handleOwnerSignup(email: string, token: string) {
       }
 
       // if the token has expired, we can send a new one
-      if(existingUser.verification?.activationToken && existingUser.verification.activationTokenExpiry! < new Date()) {
+      if (existingUser.verification?.activationToken && existingUser.verification.activationTokenExpiry! < new Date()) {
         await sendActivation(email, token);
         await updateOwnerToken(email, token);
       }
@@ -97,7 +97,7 @@ async function handleOwnerSignup(email: string, token: string) {
       await createOwnerWithToken(email, token);
     }
   } catch (error) {
-    throw createError({ statusCode: 500, statusMessage: "Error creating User", data: "Error creating User" });
+    throw error;
   }
 }
 
