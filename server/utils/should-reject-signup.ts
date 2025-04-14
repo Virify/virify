@@ -1,4 +1,3 @@
-import { OwnerRole } from "~~/layers/database/server/utils/owner";
 /**
  * Check if the owner is active or is agent.
  * @param user User

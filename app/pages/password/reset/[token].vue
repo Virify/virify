@@ -10,9 +10,7 @@ const route = useRoute();
 const token = route.params.token;
 
 // schema specifying the token
-const tokenSchema = z.object({
-  token: z.string().nonempty("Token is required"),
-});
+const tokenSchema = z.string().min(1, "Token is required");
 
 /**
  * Form validation schema
@@ -45,9 +43,7 @@ const state = reactive<Partial<Schema>>({
  */
 async function submit() {
   // validate the token
-  const validToken = tokenSchema.parse({
-    token: token,
-  });
+  const validToken = tokenSchema.parse(token);
   await $fetch("/auth/password-reset", {
     method: "POST",
     body: {

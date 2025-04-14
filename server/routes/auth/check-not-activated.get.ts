@@ -17,11 +17,11 @@ export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
 
   try {
-    const { token } = await readValidatedBody(event, activateSchema.parse);
+    const query = getQuery(event);
+    const { token } = activateSchema.parse(query);
 
     // get the user by activation token
     const user = await findOwnerByActivationToken(token);
-
     // Validate the user and their verification status
     if (!user?.verification) {
       throw createError({ statusCode: 404, statusMessage: "User not found" });
@@ -34,9 +34,10 @@ export default defineEventHandler(async (event) => {
 
     // Validate the activation token and its expiration date
     validateActivationToken(user.verification, token);
-
+    console.log("finished checking activation status");
     return successResponse("User is not activated");
   } catch (error) {
+    console.log(error);
     return errorResponse(error, event);
   }
 });

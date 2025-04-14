@@ -1,6 +1,7 @@
 import { type Agent, type Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
 export type OwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
 export { OwnerRole, Reviewed };
+export type { Agent, Owner}
 /**
  * Finds an owner by email.
  * @param email - The email of the owner to find.
