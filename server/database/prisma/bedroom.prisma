@@ -1,0 +1,22 @@
+model Bedroom {
+  id          Int           @id @default(autoincrement())
+  // i.e Bedroom 1, Bedroom 2, etc.
+  roomNumber  Int
+  // The number of beds by size         
+  bed         BedSizeType[]
+  description String
+  propertyId  Int
+  size        Float?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  property    Property      @relation(fields: [propertyId], references: [id])
+}
+
+enum BedSizeType {
+  SINGLE
+  DOUBLE
+  QUEEN
+  KING
+  SUPER_KING
+  BUNK
+}

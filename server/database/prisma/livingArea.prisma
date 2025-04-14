@@ -1,8 +1,11 @@
-model DiningroomFeatures {
+model LivingArea {
   id          Int      @id @default(autoincrement())
-  roomNumber  Int      @default(2)
+  roomNumber  Int      @default(1)
+  fireplace   Boolean
+  balcony     Boolean
   openConcept Boolean
   description String
+  size        Float?
   propertyId  Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

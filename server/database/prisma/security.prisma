@@ -1,4 +1,4 @@
-model SecurityFeatures {
+model Security {
   id                Int      @id @default(autoincrement())
   gatedCommunity    Boolean
   cctv              Boolean

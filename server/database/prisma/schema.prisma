@@ -3,11 +3,6 @@ generator client {
   previewFeatures = ["postgresqlExtensions", "prismaSchemaFolder"]
   binaryTargets   = ["native", "rhel-openssl-1.0.x"]
 }
-
-generator customer_generator {
-  provider = "prisma-generator-fake-data"
-}
-
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")

@@ -1,12 +1,10 @@
-model AmenitiesFeature {
+model Storage {
   id             Int      @id @default(autoincrement())
-  transportLinks String
-  schools        String
-  hospitals      String
-  shopping       String
-  greenSpaces    String
-  description    String
-  propertyId     Int
+  closets        Boolean
+  attic          Boolean
+  basement       Boolean
+  walkInWardrobe Boolean
+  propertyId     Int      @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   property       Property @relation(fields: [propertyId], references: [id])

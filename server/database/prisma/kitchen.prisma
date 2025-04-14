@@ -1,9 +1,10 @@
-model KitchenFeatures {
+model Kitchen {
   id                 Int      @id @default(autoincrement())
   modern             Boolean
   openPlan           Boolean
   appliancesIncluded Boolean
   description        String
+  size               Float?
   propertyId         Int      @unique
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
