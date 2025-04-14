@@ -1,6 +1,6 @@
-import sendActivation from "~~/server/email/send-owner-activation";
-import sendAgentReview from "~~/server/email/send-agent-review";
-import sendToAgentReview from "~~/server/email/send-to-agent-review";
+import sendActivation from "~~/layers/email/server/email/send-owner-activation";
+import sendAgentReview from "~~/layers/email/server/email/send-agent-review";
+import sendToAgentReview from "~~/layers/email/server/email/send-to-agent-review";
 import { Reviewed, OwnerRole } from "@prisma/client";
 import { z } from "zod";
 

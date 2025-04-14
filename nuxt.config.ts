@@ -2,6 +2,7 @@
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
+  extends: ['./layers/email'],
   future: {
     compatibilityVersion: 4,
   },
@@ -23,7 +24,7 @@ export default defineNuxtConfig({
       tasks: true,
     },
     imports: {
-      dirs: ["server/database/lib/*.ts", "/server/email/*.ts"],
+      dirs: ["server/database/lib/*.ts"],
     },
     rollupConfig: {
       // @ts-ignore
@@ -36,12 +37,7 @@ export default defineNuxtConfig({
       loginUrl: "/login",
       NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
       NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
-      // TODO: I can get the base URL from the request, so I don't need to set this
-      EMAIL_BASE_URL: process.env.EMAIL_BASE_URL || process.env.PREVIEW_EMAIL_BASE_URL,
-      INTERNAL_EMAIL: process.env.INTERNAL_EMAIL,
     },
     DATABASE_URL: process.env.DATABASE_URL,
-    SES_ACCESS_KEY_ID: process.env.SES_ACCESS_KEY_ID,
-    SES_SECRET_ACCESS_KEY: process.env.SES_SECRET_ACCESS_KEY,
   },
 });

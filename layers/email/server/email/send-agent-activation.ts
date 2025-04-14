@@ -1,19 +1,18 @@
 import { render } from "@vue-email/render";
-import PasswordReset from "./templates/password-reset.vue";
+import AgentActivation from "../../components/email/templates/agent-activation.vue";
+import { sesSender } from "../utils/ses-sender";
 const config = useRuntimeConfig();
-
 /**
- * Sends a password reset email to the user.
+ * Sends a activation email to the user.
  *
  * @param email - The recipient's email address.
  * @param token - The activation token.
  * @returns A Promise that resolves when the email is sent.
  * @throws An error if there is an issue sending the email.
  */
-export default async function sendPasswordReset(email: string, token: string) {
+export default async function sendAgentActivation(email: string, token: string) {
   // Get the Vue email template
-  const emailToSend = PasswordReset;
-
+  const emailToSend = AgentActivation;
   // Render the email to HTML
   const emailHtml = await render(emailToSend, {
     token,
@@ -21,7 +20,7 @@ export default async function sendPasswordReset(email: string, token: string) {
   });
 
   // Set the email subject, HTML content, and recipient address
-  const subject = "Password Reset Requested!";
+  const subject = "Approved! Activate your account now!";
   const html = emailHtml;
   const to = email;
 

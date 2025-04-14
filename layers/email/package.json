@@ -1,0 +1,10 @@
+{
+  "name": "email-layer",
+  "version": "1.0.0",
+  "description": "A reusable Nuxt layer for email templates and utilities.",
+  "dependencies": {
+    "@vue-email/components": "^0.0.21",
+    "@vue-email/render": "^0.0.9",
+    "@aws-sdk/client-ses": "^3.787.0"
+  }
+}
