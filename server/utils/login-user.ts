@@ -8,7 +8,7 @@ import { H3Event } from "h3";
  * @param isAgentLogin - A boolean indicating if the login is for an agen
  * @returns - set User Session
  */
-export async function loginUser(event: H3Event, user: any, role: string): Promise<UserSession> {
+export async function loginUser(event: H3Event, user: Owner, role: string): Promise<UserSession> {
   // Set the user session
   return await setSession(event, user, role);
 }

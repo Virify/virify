@@ -1,5 +1,3 @@
-import { OwnerRole } from "@prisma/client";
-
 /**
  * Authenticates the user by validating email and password.
  * @param event - The H3 event object.

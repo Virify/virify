@@ -1,6 +1,6 @@
-import { Reviewed } from "@prisma/client";
 import sendAgentActivation from "~~/layers/email/server/email/send-agent-activation";
 import sendAgentRejection from "~~/layers/email/server/email/send-agent-rejection";
+import { Reviewed } from "~~/layers/database/server/utils/owner";
 import * as z from "zod";
 
 const reviewSchema = z.object({
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
  * @param agent BusinessOwnerWithVerification
  * @param email string
  */
-async function informAgentOfDecision(agent: BusinessOwnerWithVerification, email: string, token: string): Promise<void> {
+async function informAgentOfDecision(agent: OwnerWithVerification, email: string, token: string): Promise<void> {
   // If the agent is approved, send the activation email
   if (agent.verification?.reviewed === Reviewed.APPROVED) {
     await sendAgentActivation(email, token);
@@ -71,7 +71,7 @@ async function informAgentOfDecision(agent: BusinessOwnerWithVerification, email
  * @param token String
  * @returns BusinessOwnerWithVerification
  */
-function validateVerification(owner: BusinessOwnerWithVerification | null, token: string): BusinessOwnerWithVerification {
+function validateVerification(owner: OwnerWithVerification | null, token: string): OwnerWithVerification {
   // Check if the owner has a verification object and if it has a review token
   // If the owner does not exist or has no verification details, return a 404 error
   if (!owner) throw createError({ statusCode: 404, statusMessage: "Agent not found!" });

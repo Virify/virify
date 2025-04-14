@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
  * Check if email is valid/activate and does not already have a password reset token
  * @param owner
  */
-function validateOwner(owner: BusinessOwnerWithVerification | null): void {
+function validateOwner(owner: OwnerWithVerification | null): void {
   if (!owner) throw createError({ statusCode: 400, statusMessage: "User not found" });
   if (!owner?.verification?.activated) throw createError({ statusCode: 400, statusMessage: "User not activated" });
   if (owner.passwordResetToken) throw createError({ statusCode: 400, statusMessage: "Password reset token already exists" });

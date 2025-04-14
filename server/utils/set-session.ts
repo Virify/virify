@@ -8,7 +8,7 @@ import { H3Event } from "h3";
  * @param isAgent - A boolean indicating if the user is an agent.
  * @returns A Promise that resolves when the session is set.
  */
-export default async function setSession(event: H3Event, user: any, role: string): Promise<UserSession> {
+export default async function setSession(event: H3Event, user: Owner, role: string): Promise<UserSession> {
   // Clear any existing session
   await clearUserSession(event);
   // Set the new session with user details
@@ -16,7 +16,7 @@ export default async function setSession(event: H3Event, user: any, role: string
     user: {
       id: user.id,
       email: user.email,
-      username: user.username || user.email || user.firstName,
+      username: user.username ?? user.email ?? user.firstName,
       role: role,
     },
     loggedIn: true,

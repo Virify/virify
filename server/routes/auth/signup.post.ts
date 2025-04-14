@@ -1,7 +1,7 @@
 import sendActivation from "~~/layers/email/server/email/send-owner-activation";
 import sendAgentReview from "~~/layers/email/server/email/send-agent-review";
 import sendToAgentReview from "~~/layers/email/server/email/send-to-agent-review";
-import { Reviewed, OwnerRole } from "@prisma/client";
+import { Reviewed, OwnerRole } from "~~/layers/database/server/utils/owner";
 import { z } from "zod";
 
 // Zod schema for validating the request body
@@ -136,7 +136,7 @@ async function handleAgentSignup(formData: AgentFormData, token: string) {
  * @param address - The submitted address to check against.
  * @throws An error if an agent is already registered with the given details.
  */
-function handleExistingAgent(agent: BusinessOwnerWithVerification | null, address: string): void {
+function handleExistingAgent(agent: OwnerWithVerification | null, address: string): void {
   if (agent) {
     // Check is the agent is a user
     if (agent.role === OwnerRole.USER) {

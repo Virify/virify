@@ -1,11 +1,10 @@
-import { OwnerRole, Prisma } from "@prisma/client";
-
+import { OwnerRole } from "~~/layers/database/server/utils/owner";
 /**
  * Check if the owner is active or is agent.
  * @param user User
  * @returns Boolean
  */
-export function shouldRejectSignup(user: Prisma.OwnerGetPayload<{ include: { verification: true } }>): Boolean {
+export function shouldRejectSignup(user: OwnerWithVerification): Boolean {
   return isActive(user);
 }
 
@@ -14,6 +13,6 @@ export function shouldRejectSignup(user: Prisma.OwnerGetPayload<{ include: { ver
  * @param user Owner
  * @returns Boolean
  */
-export function shouldRejectAgentSignup(user: Prisma.OwnerGetPayload<{ include: { verification: true } }>): Boolean {
+export function shouldRejectAgentSignup(user: OwnerWithVerification): Boolean {
   return isActive(user) || hasRole(user, OwnerRole.USER);
 }

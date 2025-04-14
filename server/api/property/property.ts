@@ -1,5 +1,3 @@
-import owner from "../owner/owner";
-
 export default defineEventHandler(async (event) => {
   const property = await prisma.property.findFirst({
     where: {

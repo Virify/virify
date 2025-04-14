@@ -2,7 +2,7 @@
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
-  extends: ['./layers/email'],
+  extends: ["./layers/email", "./layers/database"],
   future: {
     compatibilityVersion: 4,
   },
@@ -23,9 +23,6 @@ export default defineNuxtConfig({
       openAPI: true,
       tasks: true,
     },
-    imports: {
-      dirs: ["server/database/lib/*.ts"],
-    },
     rollupConfig: {
       // @ts-ignore
       plugins: [vue()],
@@ -38,6 +35,5 @@ export default defineNuxtConfig({
       NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
       NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
     },
-    DATABASE_URL: process.env.DATABASE_URL,
   },
 });

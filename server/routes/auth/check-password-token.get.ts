@@ -1,4 +1,3 @@
-import { Owner } from "@prisma/client";
 import * as z from "zod";
 
 const tokenSchema = z.object({

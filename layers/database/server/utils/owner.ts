@@ -1,6 +1,6 @@
-import { Agent, Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
-export type BusinessOwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
-
+import { type Agent, type Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
+export type OwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
+export { OwnerRole, Reviewed };
 /**
  * Finds an owner by email.
  * @param email - The email of the owner to find.
@@ -14,7 +14,20 @@ export async function findOwner(email: string): Promise<Owner | null> {
   });
 }
 
-export async function findOwnerWithVerification(email: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+/**
+ * Find the first owner
+ * @returns The Owner
+ */
+export async function findFirstOwner(): Promise<Owner | null> {
+  return prisma.owner.findFirst();
+}
+
+/**
+ * Find Owner with Verification by Email
+ * @param email string
+ * @returns Owner with Verification Relation
+ */
+export async function findOwnerWithVerification(email: string): Promise<OwnerWithVerification | null> {
   return prisma.owner.findUnique({
     where: {
       email,
@@ -27,10 +40,10 @@ export async function findOwnerWithVerification(email: string): Promise<Prisma.O
 
 /**
  * Find Owner by Activation Token
- * 
+ *
  * @param token string
  */
-export async function findOwnerByActivationToken(token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function findOwnerByActivationToken(token: string): Promise<OwnerWithVerification | null> {
   return prisma.owner.findFirst({
     where: {
       verification: {
@@ -48,7 +61,7 @@ export async function findOwnerByActivationToken(token: string): Promise<Prisma.
  * @param token string
  * @returns Owner
  */
-export async function findOwnerByPasswordToken(token: string) {
+export async function findOwnerByPasswordToken(token: string): Promise<Owner | null> {
   return prisma.owner.findUnique({
     where: {
       passwordResetToken: token,
@@ -96,7 +109,7 @@ export async function updateOwnerByEmailPasswordReset(email: string, token: stri
  * @param token - The activation token of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPayload<{ include: { verification: true } }> | null> {
+export async function findOwnerByToken(token: string): Promise<OwnerWithVerification | null> {
   return prisma.owner.findFirst({
     where: {
       verification: {
@@ -116,7 +129,7 @@ export async function findOwnerByToken(token: string): Promise<Prisma.OwnerGetPa
  * @param registrationNumber - The registration number of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function findBusinessOwner(email: string, address: string): Promise<BusinessOwnerWithVerification | null> {
+export async function findBusinessOwner(email: string, address: string): Promise<OwnerWithVerification | null> {
   return prisma.owner.findFirst({
     where: {
       OR: [{ email: email }, { addressLine1: address }],
@@ -213,7 +226,7 @@ export async function createBusinessOwnerWithToken(
   postcode: string,
   registrationNumber: string,
   token: string
-): Promise<BusinessOwnerWithVerification | null> {
+): Promise<OwnerWithVerification | null> {
   return prisma.owner.create({
     data: {
       email,
@@ -289,7 +302,7 @@ export async function updateOwnerAndActivate(userId: number, password?: string):
  * @param token string
  * @returns Owner <Promise>
  */
-export async function updateOwnerAndReview(id: number, approval: Reviewed, token: string): Promise<BusinessOwnerWithVerification> {
+export async function updateOwnerAndReview(id: number, approval: Reviewed, token: string): Promise<OwnerWithVerification> {
   if (approval === Reviewed.APPROVED) {
     return prisma.owner.update({
       where: { id: id },
@@ -343,6 +356,6 @@ export function hasRole(user: Owner | Agent, role: OwnerRole): boolean {
  * @param user Owner | Agent
  * @returns Boolean
  */
-export function isActive(user: Prisma.OwnerGetPayload<{ include: { verification: true } }>): boolean {
+export function isActive(user: OwnerWithVerification): boolean {
   return user.verification?.activated === true;
 }
