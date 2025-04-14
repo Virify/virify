@@ -9,8 +9,8 @@ export async function sesSender(html: string, subject: string, to: string) {
     const client = new SESClient({
       region: "eu-west-2",
       credentials: {
-        accessKeyId: config.AWS_ACCESS_KEY_ID,
-        secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
+        accessKeyId: config.SES_ACCESS_KEY_ID,
+        secretAccessKey: config.SES_SECRET_ACCESS_KEY,
       },
     });
 
