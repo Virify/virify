@@ -35,6 +35,7 @@ type AgentFormData = z.infer<typeof agentSchema>;
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
+  // TODO: This whole file is a mess, we need to refactor it
   const { successResponse, errorResponse } = useResponse();
   try {
     const requestBody = await readBody(event);
@@ -72,28 +73,32 @@ export default defineEventHandler(async (event) => {
  * @param token - The generated activation token.
  */
 async function handleOwnerSignup(email: string, token: string) {
-  const existingUser = await findOwnerWithVerification(email);
+  try {
+    const existingUser = await findOwnerWithVerification(email);
 
-  if (existingUser) {
-    // If user exists, check if signup should be rejected
-    if (shouldRejectSignup(existingUser)) {
-      throw createError({ statusCode: 403, statusMessage: "User already activated" });
+    if (existingUser) {
+      // If user exists, check if signup should be rejected
+      if (shouldRejectSignup(existingUser)) {
+        throw createError({ statusCode: 403, statusMessage: "User already activated" });
+      }
+
+      // If an activation email was already sent and is still valid, prevent resending
+      if (existingUser.verification?.activationToken && existingUser.verification.activationTokenExpiry! > new Date()) {
+        throw createError({ statusCode: 400, statusMessage: "Activation email already sent! Please check your inbox" });
+      }
+
+      // if the token has expired, we can send a new one
+      if(existingUser.verification?.activationToken && existingUser.verification.activationTokenExpiry! < new Date()) {
+        await sendActivation(email, token);
+        await updateOwnerToken(email, token);
+      }
+    } else {
+      await sendActivation(email, token);
+      await createOwnerWithToken(email, token);
     }
-
-    // If an activation email was already sent and is still valid, prevent resending
-    if (existingUser.verification?.activationToken && existingUser.verification.activationTokenExpiry! > new Date()) {
-      throw createError({ statusCode: 400, statusMessage: "Activation email already sent! Please check your inbox" });
-    }
-
-    // If all checks pass, update the activation token
-    await updateOwnerToken(email, token);
-  } else {
-    // If user does not exist, create a new owner record with the token
-    await createOwnerWithToken(email, token);
+  } catch (error) {
+    throw createError({ statusCode: 500, statusMessage: "Error creating User", data: "Error creating User" });
   }
-
-  // Send activation email to the owner
-  await sendActivation(email, token);
 }
 
 /**
@@ -111,16 +116,16 @@ async function handleAgentSignup(formData: AgentFormData, token: string) {
     // Handle existing agent
     handleExistingAgent(agent, addressLine);
 
+    // send review emails
+    await sendToAgentReview(formData);
+    await sendAgentReview(formData, token);
+
     // If agent does not exist, create a new record with the token
     await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
 
-    // send internal email to the team for review the sign up request
-    await sendAgentReview(formData, token);
-
     // Send an email to the agent informing them of the review process
-    await sendToAgentReview(formData);
   } catch (error) {
-    throw error;
+    throw createError({ statusCode: 500, statusMessage: "Error creating Agent", data: "Error creating Agent" });
   }
 }
 

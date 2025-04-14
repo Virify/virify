@@ -1,4 +1,4 @@
-import sendActivation from "~~/server/email/send-password-reset";
+import sendPasswordReset from "~~/server/email/send-password-reset";
 import * as z from "zod";
 
 const emailSchema = z.object({
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
     const { email } = await readValidatedBody(event, emailSchema.parse);
-    
+
     // check if the email exists in the database
     const dbOwner = await findOwnerWithVerification(email);
 
@@ -24,11 +24,11 @@ export default defineEventHandler(async (event) => {
     // create a specific token for the user
     const token = generateToken();
 
+    // now we need to send them an email with the token
+    await sendPasswordReset(email, token);
+
     // save the token to the database for the user of which email they sent
     await updateOwnerByEmailPasswordReset(email, token);
-
-    // now we need to send them an email with the token
-    await sendActivation(email, token);
 
     // return a success message
     return { message: "Email sent successfully" };

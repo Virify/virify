@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["nuxt-auth-utils", "nuxt-nodemailer", "@nuxt/ui", "@nuxtjs/leaflet"],
+  modules: ["nuxt-auth-utils", "@nuxt/ui", "@nuxtjs/leaflet"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css", "leaflet/dist/leaflet.css"],
@@ -36,23 +36,12 @@ export default defineNuxtConfig({
       loginUrl: "/login",
       NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
       NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
-      // This will default to the preview email service via build and will be overridden by branch deploys
+      // TODO: I can get the base URL from the request, so I don't need to set this
       EMAIL_BASE_URL: process.env.EMAIL_BASE_URL || process.env.PREVIEW_EMAIL_BASE_URL,
       INTERNAL_EMAIL: process.env.INTERNAL_EMAIL,
     },
-    EMAIL_HOST: process.env.EMAIL_HOST,
-    EMAIL_USER: process.env.EMAIL_USER,
-    EMAIL_PASS: process.env.EMAIL_PASS,
     DATABASE_URL: process.env.DATABASE_URL,
-  },
-  nodemailer: {
-    from: '"Virify" <no-reply@virify.co.uk>',
-    host: process.env.EMAIL_HOST,
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });

@@ -43,10 +43,6 @@ export default async function sendToAgentReview(formData: FormData) {
   const html = emailHtml;
   const to = formData.email;
 
-  try {
-    // Send the email
-    return await emailSender(html, subject, to);
-  } catch (error) {
-    throw error;
-  }
+  // Send the email
+  return await sesSender(html, subject, to);
 }

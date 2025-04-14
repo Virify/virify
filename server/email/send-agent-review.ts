@@ -46,10 +46,6 @@ export default async function sendAgentReview(formData: FormData, token: string)
   const html = emailHtml;
   const to = config.public.INTERNAL_EMAIL;
 
-  try {
-    // Send the email
-    return await emailSender(html, subject, to);
-  } catch (error) {
-    throw error;
-  }
+  // Send the email
+  return await sesSender(html, subject, to);
 }
