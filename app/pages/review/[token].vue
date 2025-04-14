@@ -37,7 +37,6 @@ onMounted(async () => {
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       const errorMessages = error.issues.map((issue) => issue.message).join(", ");
-      console.log(errorMessages);
       showToast({
         title: errorMessages,
         icon: "ri:error-warning-line",
