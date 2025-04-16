@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
 import AgentDenied from "../../components/email/templates/agent-denied.vue";
-import { sesSender } from "../utils/ses-sender";
 const config = useRuntimeConfig();
 
 /**
@@ -11,7 +10,7 @@ const config = useRuntimeConfig();
  * @returns A Promise that resolves when the email is sent.
  * @throws An error if there is an issue sending the email.
  */
-export default async function sendAgentRejection(email: string, agent: BusinessOwnerWithVerification) {
+export default async function sendAgentRejection(email: string, agent: OwnerWithVerification) {
   // Get the Vue email template
   const emailToSend = AgentDenied;
 

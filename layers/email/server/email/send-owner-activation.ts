@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
 import OwnerActivation from "../../components/email/templates/owner-activation.vue";
-import { sesSender } from "../utils/ses-sender";
 const config = useRuntimeConfig();
 
 /**

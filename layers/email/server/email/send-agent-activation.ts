@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
 import AgentActivation from "../../components/email/templates/agent-activation.vue";
-import { sesSender } from "../utils/ses-sender";
 const config = useRuntimeConfig();
 /**
  * Sends a activation email to the user.
