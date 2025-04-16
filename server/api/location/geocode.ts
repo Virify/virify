@@ -43,17 +43,14 @@ export default defineEventHandler(async (event) => {
 
     // Get coordinates from the geocoding service
     const response = await getCoordinatesFromGeocodingService(search);
-    console.log("Geocoding response:", response);
 
     // Extract coordinates and address from the response
     const { coordinates, address } = extractGeocodingResponse(response);
-    console.log("Coordinates:", coordinates);
     // create the address and cache the coordinates
     await createAddressIfNotExist(address, coordinates);
 
     return successResponse("success");
   } catch (error) {
-    console.log(error);
     throw error;
   }
 });
@@ -77,7 +74,6 @@ async function getCoordinatesFromGeocodingService(search: string) {
       "Accept-Language": "en",
     },
   });
-  console.log("Geocoding response:", response.features[0].properties.address);
   return response;
 }
 

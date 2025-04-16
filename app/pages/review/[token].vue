@@ -37,13 +37,11 @@ onMounted(async () => {
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       const errorMessages = error.issues.map((issue) => issue.message).join(", ");
-      console.log(errorMessages);
       showToast({
         title: errorMessages,
         icon: "ri:error-warning-line",
       });
     } else {
-      console.log(error);
       showToast({
         title: error?.data?.message || "Something went wrong",
         icon: "ri:error-warning-line",

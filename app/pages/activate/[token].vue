@@ -1,7 +1,5 @@
 <script setup lang="ts">
 definePageMeta({
-  // TODO: Add error handling for invalid token on the frontend
-  // Right now it just redirects to the login page as a user clicks on a link in a email
   middleware: ["check-activation"],
 });
 
@@ -10,9 +8,8 @@ const { showToast } = useToastNotification();
 const route = useRoute();
 const token = route.params.token;
 
-const tokenSchema = z.object({
-  token: z.string().nonempty("Token is required"),
-});
+const tokenSchema = z.string().min(1, "Token is required");
+
 /**
  * Form validation schema
  */
@@ -44,9 +41,7 @@ const state = reactive<Partial<Schema>>({
  */
 async function activateAccount() {
   // Include token and email in the form data
-  const validToken = tokenSchema.parse({
-    token: token,
-  });
+const validToken = tokenSchema.parse(token);
   await $fetch("/auth/activate-account", {
     method: "POST",
     body: {
