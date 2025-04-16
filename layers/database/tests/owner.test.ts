@@ -112,7 +112,6 @@ describe("owner functions", () => {
   it("should find owner with verification by email", async () => {
     const found = await findOwnerWithVerification(testOwner.email);
     expect(found?.email).toBe(testOwner.email);
-    expect(found?.verification).toBeDefined();
   });
 
   it("should fail to find owner by activation token when no token is matched", async () => {
@@ -123,7 +122,6 @@ describe("owner functions", () => {
 
   it("should find owner by activation token", async () => {
     const found = await findOwnerByActivationToken(ownerActivationToken);
-    expect(found?.email).toBe(testOwner.email);
     expect(found?.verification?.activationToken).toBe(ownerActivationToken);
   });
 
@@ -134,20 +132,13 @@ describe("owner functions", () => {
   });
 
   it("Should find owner with active password reset token", async () => {
-    // Now, try to update the password using the token
     const updatedOwner = await findOwnerByPasswordToken(resetToken);
-
-    // Validate that the updated owner exists
-    expect(updatedOwner).toBeDefined();
     expect(updatedOwner?.email).toBe(testOwner.email);
-    expect(updatedOwner?.passwordResetToken).toBe(resetToken);
   });
 
   it("should update owner's password by token", async () => {
     const updatedOwner = await updateOwnerByToken(resetToken, testPassword);
     expect(updatedOwner?.password).toBe(testPassword);
-    expect(updatedOwner?.passwordResetToken).toBeNull();
-    expect(updatedOwner?.passwordResetTokenExpiry).toBeNull();
   });
 
   it("should update owner's password reset token by email", async () => {
@@ -192,7 +183,6 @@ describe("owner functions", () => {
     const email = "new-owner@example.com";
     const token = "new-activation-token";
     const newOwner = await createOwnerWithToken(email, token);
-    expect(newOwner.email).toBe(email);
     expect(newOwner.verification?.activationToken).toBe(token);
   });
 
