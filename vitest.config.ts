@@ -7,5 +7,6 @@ export default defineVitestConfig({
         domEnvironment: "jsdom",
       },
     },
+    globals: true,
   },
 });

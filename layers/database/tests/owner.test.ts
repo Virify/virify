@@ -25,7 +25,7 @@ vi.mock("../server/utils/prisma-client", () => {
   const testPrisma = new PrismaClient({
     datasources: {
       db: {
-        url: process.env.DATABASE_URL,
+        url: process.env.TEST_DATABASE_URL,
       },
     },
   });
