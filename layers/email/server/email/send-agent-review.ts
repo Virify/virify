@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
 import AgentReview from "../../components/email/templates/agent-review.vue";
-import { sesSender } from "../utils/ses-sender";
 const config = useRuntimeConfig();
 
 /**

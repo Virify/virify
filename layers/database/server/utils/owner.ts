@@ -1,7 +1,9 @@
 import { type Agent, type Owner, OwnerRole, Prisma, Reviewed } from "@prisma/client";
+import { prisma } from "./prisma-client";
 export type OwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
 export { OwnerRole, Reviewed };
 export type { Agent, Owner}
+
 /**
  * Finds an owner by email.
  * @param email - The email of the owner to find.
@@ -180,7 +182,7 @@ export async function deleteOwner(id: number): Promise<Owner> {
  * @param token string
  * @returns Owner <Promise>
  */
-export async function createOwnerWithToken(email: string, token: string): Promise<Owner> {
+export async function createOwnerWithToken(email: string, token: string): Promise<OwnerWithVerification> {
   return prisma.owner.create({
     data: {
       email,
@@ -191,16 +193,10 @@ export async function createOwnerWithToken(email: string, token: string): Promis
         },
       },
     },
+    include: {
+      verification: true,
+    },
   });
-}
-
-/**
- * Create an owner with the given email.
- * @param email string
- * @returns Promise<Owner>
- */
-export async function createOauthOwner(email: string): Promise<Owner> {
-  return prisma.owner.create({ data: { email } });
 }
 
 /**
@@ -258,7 +254,7 @@ export async function createBusinessOwnerWithToken(
  * @param token string
  * @returns Promise<Owner>
  */
-export async function updateOwnerToken(email: string, token: string): Promise<Owner> {
+export async function updateOwnerToken(email: string, token: string): Promise<OwnerWithVerification> {
   return prisma.owner.update({
     where: { email },
     data: {
@@ -269,6 +265,9 @@ export async function updateOwnerToken(email: string, token: string): Promise<Ow
         },
       },
     },
+    include: {
+      verification: true,
+    }
   });
 }
 
@@ -278,7 +277,7 @@ export async function updateOwnerToken(email: string, token: string): Promise<Ow
  * @param password string
  * @returns Promise<Owner>
  */
-export async function updateOwnerAndActivate(userId: number, password?: string): Promise<Owner> {
+export async function updateOwnerAndActivate(userId: number, password?: string): Promise<OwnerWithVerification> {
   return prisma.owner.update({
     where: { id: userId },
     data: {
@@ -290,6 +289,9 @@ export async function updateOwnerAndActivate(userId: number, password?: string):
           activated: true,
         },
       },
+    },
+    include: {
+      verification: true,
     },
   });
 }

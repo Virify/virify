@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
 import PasswordReset from "../../components/email/templates/password-reset.vue";
-import { sesSender } from "../utils/ses-sender";
 const config = useRuntimeConfig();
 
 /**

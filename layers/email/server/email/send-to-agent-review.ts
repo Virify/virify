@@ -1,6 +1,5 @@
 import { render } from "@vue-email/render";
 import ToAgentReview from "../../components/email/templates/to-agent-review.vue";
-import { sesSender } from "../utils/ses-sender";
 
 /**
  * Sends a review email to the user.
