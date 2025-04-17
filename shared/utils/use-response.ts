@@ -69,10 +69,10 @@ export const useResponse = () => {
 
   /**
    * Creates a standardized error response.
-   * 
+   *
    * Zod errors with throw a 400 status and return the field errors.
    * Other errors will be returned via createError and should be handled by the frontend
-   * 
+   *
    * @param error Error object
    * @param event H3 Event
    * @returns error response
@@ -81,6 +81,14 @@ export const useResponse = () => {
     if (error instanceof z.ZodError) {
       setResponseStatus(event, 400);
       return error.flatten().fieldErrors;
+    }
+    // if the error has not come from createError and does not have a statusCode, return a 500 error
+    if (!error.statusCode) {
+      return {
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+        message: error.message,
+      }
     }
     return error;
   };
