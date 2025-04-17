@@ -1,6 +1,6 @@
-import sendActivation from "~~/layers/email/server/email/send-owner-activation";
-import sendAgentReview from "~~/layers/email/server/email/send-agent-review";
-import sendToAgentReview from "~~/layers/email/server/email/send-to-agent-review";
+import sendActivation from "#layers/email/server/email/send-owner-activation";
+import sendAgentReview from "#layers/email/server/email/send-agent-review";
+import sendToAgentReview from "#layers/email/server/email/send-to-agent-review";
 import { z } from "zod";
 
 // Zod schema for validating the request body

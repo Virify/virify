@@ -1,4 +1,4 @@
-import sendPasswordReset from "~~/layers/email/server/email/send-password-reset";
+import sendPasswordReset from "#layers/email/server/email/send-password-reset";
 import * as z from "zod";
 
 const emailSchema = z.object({
