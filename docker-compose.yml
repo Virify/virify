@@ -1,0 +1,36 @@
+services:
+  webapp:
+    build: .               
+    working_dir: /home/node/app
+    ports:
+      - "3000:3000"
+    volumes:
+      - pnpm-store:/home/node/.pnpm-store
+      - .:/home/node/app
+    tty: true
+    depends_on:
+      - database
+    networks:
+      - virify-network
+    user: node
+
+  database:
+    image: postgis/postgis:17-3.4
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: virify-user
+      POSTGRES_PASSWORD: ********
+      POSTGRES_DB: virify
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - virify-network
+
+volumes:
+  pgdata:
+  pnpm-store:
+
+networks:
+  virify-network:
