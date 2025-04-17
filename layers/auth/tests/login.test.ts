@@ -1,7 +1,6 @@
 // @vitest-environment nuxt
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import type { H3Event } from "h3";
-import ts from "typescript";
 
 const mockUser = {
   id: 1,
@@ -102,5 +101,4 @@ describe("Login User", () => {
     await loginUser(h3Event, mockUser, mockUser.role);
     expect(clearUserSession).toHaveBeenCalledWith(h3Event);
   });
-
 });
