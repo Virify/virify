@@ -10,6 +10,8 @@ export default defineNuxtConfig({
   imports: {
     dirs: [
       "server/**",
+      "server/routes/**",
+      "server/routes/auth/**",
       "server/utils/**",
     ],
   },

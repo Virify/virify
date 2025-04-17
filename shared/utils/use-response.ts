@@ -14,7 +14,7 @@ export const useResponse = () => {
    * @returns An object representing the HTTP response.
    */
   const createResponse = (status: number, message: string, error: boolean | Error = false) => ({
-    status,
+    statusCode: status,
     body: error ? { error: `Failed! ${message}`, details: error instanceof Error ? error.message : undefined } : { message },
   });
 
