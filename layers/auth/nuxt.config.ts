@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils', '@nuxt/test-utils/module'],
+  modules: ['nuxt-auth-utils'],
   runtimeConfig: {
     public: {
       redirectCookieName: "redirect",

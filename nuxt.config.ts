@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxt/ui", "@nuxtjs/leaflet"],
+  modules: ["@nuxt/ui", "@nuxtjs/leaflet", "@nuxt/test-utils/module"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css", "leaflet/dist/leaflet.css"],
