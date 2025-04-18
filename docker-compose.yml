@@ -1,0 +1,38 @@
+services:
+  webapp:
+    build: .
+    working_dir: /home/node/app
+    ports:
+      - "3000:3000"
+      # prisma studio
+      - "5555:5555"
+    volumes:
+      - pnpm-store:/home/node/pnpm/app/.pnpm-store
+      - .:/home/node/app
+    tty: true
+    depends_on:
+      - database
+    networks:
+      - virify-network
+    user: node
+
+  database:
+    image: postgis/postgis:17-3.4
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: USER
+      POSTGRES_PASSWORD: CHANGEME
+      POSTGRES_DB: NAME
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - virify-network
+
+volumes:
+  pgdata:
+  pnpm-store:
+
+networks:
+  virify-network:
