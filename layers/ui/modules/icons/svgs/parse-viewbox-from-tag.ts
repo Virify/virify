@@ -21,7 +21,7 @@ function getRegexMatchGroup<T = string>(str: string, pattern: RegExp): T | undef
  *
  */
 export function parseViewboxFromTag(tag: string): ViewBox | undefined {
-  const viewBox = getRegexMatchGroup(tag, /viewBox="([\d\s]+)"/)
+  const viewBox = getRegexMatchGroup(tag, /viewBox="([\d\s\-]+)"/)
 
   // If a viewbox is ground, return it
   if (viewBox) return viewBox as ViewBox
