@@ -39,6 +39,16 @@
     }
   }
 
+  &-monochrome {
+    background: var(--monochrome-100);
+    color: var(--monochrome-900);
+
+    &:hover {
+      background: var(--monochrome-200);
+      color: var(--monochrome-900);
+    }
+  }
+
   &-ghost {
     background: var(--blue-500);
     color: var(--blue-0);

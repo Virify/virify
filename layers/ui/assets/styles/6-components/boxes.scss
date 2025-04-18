@@ -1,0 +1,9 @@
+/**
+ *  Button base
+ */
+.box {
+  border-radius: var(--size-12);
+  padding: var(--size-12);
+  background: var(--monochrome-900);
+  border: 1px solid var(--monochrome-800);
+}
