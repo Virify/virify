@@ -1,5 +1,5 @@
 <template>
-  <svg width="816" height="231" class="layout-logo">
+  <svg width="24" height="24">
     <title v-if="title">{{ title }}</title>
     <use :href="iconFile"></use>
   </svg>
@@ -22,8 +22,10 @@ const iconFile = computed(() => {
   // Split icon string
   const [prefix, name] = getSplitString(icon, '/')
 
-  // If no name exists, assume prefix is the name
-  if (!name) return `/sprites/icon.svg#${prefix}`
+  // If no name exists, or is already set to the default value
+  if (!name || name === 'icon') {
+    return `/sprites/icon.svg#${prefix}`
+  }
 
   // Else use prefix in filename
   return `/sprites/icon-${prefix}.svg#${name}`
