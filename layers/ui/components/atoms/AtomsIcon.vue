@@ -22,9 +22,14 @@ const iconFile = computed(() => {
   // Split icon string
   const [prefix, name] = getSplitString(icon, '/')
 
-  // If no name exists, or is already set to the default value
-  if (!name || name === 'icon') {
+  // If no name exists, assume default
+  if (!name) {
     return `/sprites/icon.svg#${prefix}`
+  }
+
+  // Else if the prefix is the default prefix, do not append
+  if (prefix === 'icon') {
+    return `/sprites/icon.svg#${name}`
   }
 
   // Else use prefix in filename
