@@ -1,10 +1,12 @@
 model AdditionalFeatures {
   id                    Int                         @id @default(autoincrement())
   investmentPotential   String
-  petPolicy             Boolean
+  petFriendly             Boolean
   // accessibility features in array
   accessibilityFeatures AccessibilityFeaturesType[]
   moveInDate            DateTime
+  homeOffice            Boolean
+  pool                  Boolean
   propertyId            Int                         @unique
   createdAt             DateTime                    @default(now())
   updatedAt             DateTime                    @updatedAt
