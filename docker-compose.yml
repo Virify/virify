@@ -7,7 +7,7 @@ services:
       # prisma studio
       - "5555:5555"
     volumes:
-      - pnpm-store:/home/node/pnpm/app/.pnpm-store
+      - pnpm-store:/home/node/app/.pnpm-store
       - .:/home/node/app
     tty: true
     depends_on:
