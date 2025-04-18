@@ -43,6 +43,7 @@ const isDark = computed({
 
 <template>
   <div class="flex flex-col min-h-screen">
+    <OrganismsHeader />
     <header>
       <UContainer>
         <UNavigationMenu color="primary" :items="items" content-orientation="vertical" class="w-full p-2 z-2 h-auto">

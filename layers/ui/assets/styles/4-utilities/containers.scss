@@ -1,0 +1,7 @@
+/**
+ *  Page widths
+ */
+.container {
+  width: min(100% - var(--size-48), 50rem);
+  margin-inline: auto;
+}
