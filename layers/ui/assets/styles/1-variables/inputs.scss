@@ -1,0 +1,17 @@
+@use '../_utils/functions' as fn;
+
+:root {
+  --input-text-background: var(--blue-600);
+  --input-text-border: var(--blue-500);
+  --input-text-color: var(--blue-0);
+
+  // Toggle inputs, etc.
+  --input-toggle-background: light-dark(var(--blue-800), var(--blue-400));
+  --input-toggle-border: light-dark(var(--blue-700), var(--blue-300));
+
+  // General accent colours
+  --input-accent-colour: var(--secondary-400);
+  --input-accent-inactive: var(--monochrome-500);
+  --input-accent-colour-hover: var(--secondary-400);
+  --input-accent-inactive-hover: var(--monochrome-400);
+}

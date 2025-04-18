@@ -1,0 +1,31 @@
+/**
+ *  Content stacking
+ */
+.stacked {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+}
+
+/**
+ *  Content flow
+ */
+.flow {
+  --flow-gap: var(--size-16);
+}
+
+.flow--lg {
+  --flow-gap: var(--size-20);
+}
+
+.flow--xl {
+  --flow-gap: var(--size-24);
+}
+
+.flow--2xl {
+  --flow-gap: var(--size-28);
+}
+
+:where(.flow>*:not(:first-child)) {
+  margin-top: var(--flow-gap);
+}

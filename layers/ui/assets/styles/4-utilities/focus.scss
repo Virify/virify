@@ -1,0 +1,15 @@
+@use '../_utils/functions' as fn;
+
+/**
+ *  Focus states
+ */
+:where(:focus),
+:where(.no-visible-focus:focus),
+:where(.no-visible-focus:focus-visible),
+:where(.no-visible-focus :focus-visible) {
+  outline: none
+}
+
+:where(:focus-visible) {
+  outline: 3px solid fn.faded-color(60%, var(--blue-300))
+}

@@ -1,7 +1,12 @@
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 export default defineNuxtConfig({
-  extends: ["./layers/email", "./layers/database", './layers/auth'],
+  extends: [
+    "./layers/ui",
+    "./layers/email",
+    "./layers/database",
+    './layers/auth'
+  ],
   future: {
     compatibilityVersion: 4,
   },

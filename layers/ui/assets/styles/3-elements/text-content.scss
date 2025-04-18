@@ -1,0 +1,21 @@
+/**
+ *  Sensible margins for paragraphs, title
+ */
+:where(h1, h2, h3, h4, h5) {
+  margin: 0;
+}
+
+:where(p:first-child) {
+  margin-top: 0
+}
+
+:where(p:last-child) {
+  margin-bottom: 0
+}
+
+/**
+ *  Standardise strong bodyweight
+ */
+strong {
+  font-weight: var(--font-bold);
+}
