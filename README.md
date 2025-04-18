@@ -1,6 +1,22 @@
 # Virify API
 
-## System Dependencies
+## System setup with Docker
+
+If using Docker you have a one-step setup to get up and running. Simply populate your `.env` file and run:
+```shell
+make up
+```
+To get started. You can then enter the container by running:
+```shell
+make exec
+```
+Or to enter the database container by running:
+```shell
+make exec-db
+```
+From here you can run the normal commands for working with Nuxt and Postgres.
+
+## Non-Docker System Dependencies
 
 *Node*
 [WSL Install](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl#install-nvm-nodejs-and-npm)  

@@ -1,13 +1,13 @@
 services:
   webapp:
-    build: .               
+    build: .
     working_dir: /home/node/app
     ports:
       - "3000:3000"
       # prisma studio
       - "5555:5555"
     volumes:
-      - pnpm-store:/home/node/.pnpm-store
+      - pnpm-store:/home/node/pnpm/app/.pnpm-store
       - .:/home/node/app
     tty: true
     depends_on:
