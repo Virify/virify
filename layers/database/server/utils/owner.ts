@@ -290,6 +290,8 @@ export async function updateOwnerAndActivate(userId: number, password?: string):
         update: {
           activationToken: null,
           activationTokenExpiry: null,
+          otpCode: null,
+          otpCodeExpiry: null,
           activated: true,
         },
       },
