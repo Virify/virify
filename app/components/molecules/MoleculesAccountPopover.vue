@@ -88,7 +88,7 @@ const $button = useTemplateRef('button')
   transition: background-color 0.15s;
 
   &:hover {
-    background: fn.faded-color(6%);
+    background: var(--background-100);
   }
 }
 

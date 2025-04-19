@@ -12,8 +12,8 @@ const currentYear = new Date().getFullYear()
 
 <style>
 .o-footer {
-  background: var(--monochrome-900);
-  color: var(--monochrome-100);
+  background-color: var(--background-200);
+  color: var(--foreground-100);
   padding: var(--size-32) 0;
   margin: var(--size-64) 0 0;
 }

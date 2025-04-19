@@ -2,6 +2,17 @@
   color-scheme: light dark;
 
   /**
+   *  Backgrounds and foregrounds
+   */
+  --foreground-100: light-dark(#2b2c35, #f6f6fa);
+  --foreground-200: light-dark(#3c3d48, #fff);
+  --foreground-300: light-dark(#16171d, #e7e7ef);
+
+  --background-100: light-dark(#f6f6fa, #2b2c35);
+  --background-200: light-dark(#fff, #3c3d48);
+  --background-300: light-dark(#e7e7ef, #16171d);
+
+  /**
    *  Monochrome
    */
   --monochrome-100: light-dark(#000, #fff);
