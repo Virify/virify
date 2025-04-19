@@ -1,7 +1,7 @@
 <template>
   <nav class="o-site-navigation">
     <ul class="o-site-navigation-list">
-      <template v-if="loggedIn">
+      <template v-if="!loggedIn">
         <li>
           <nuxt-link to="/login" class="o-site-navigation-link | font-sm font-bold">
             Log in
@@ -48,7 +48,6 @@ const accountOptions = [
 }
 
 .o-site-navigation-link {
-  color: var(--foreground-100);
   white-space: nowrap;
   text-decoration: none;
 }
