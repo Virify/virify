@@ -182,10 +182,11 @@ export async function deleteOwner(id: number): Promise<Owner> {
  * @param token string
  * @returns Owner <Promise>
  */
-export async function createOwnerWithTokens(email: string, token: string, otpCode: string): Promise<OwnerWithVerification> {
+export async function createOwnerWithTokens(email: string, password: string, token: string, otpCode: string): Promise<OwnerWithVerification> {
   return prisma.owner.create({
     data: {
       email,
+      password,
       verification: {
         create: {
           activationToken: token,
@@ -225,6 +226,7 @@ export async function createBusinessOwnerWithToken(
   postcode: string,
   registrationNumber: string,
   token: string,
+  password: string,
 ): Promise<OwnerWithVerification | null> {
   return prisma.owner.create({
     data: {
@@ -285,7 +287,6 @@ export async function updateOwnerAndActivate(userId: number, password?: string):
   return prisma.owner.update({
     where: { id: userId },
     data: {
-      password,
       verification: {
         update: {
           activationToken: null,

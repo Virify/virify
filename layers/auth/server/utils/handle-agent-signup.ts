@@ -10,7 +10,7 @@ import validateExistingAgent from "./validate-existing-agent";
  * @param formData - The agent's submitted data.
  * @param token - The generated activation token.
  */
-export default async function handleAgentSignup(formData: AgentFormData, token: string, otpCode: string) {
+export default async function handleAgentSignup(formData: AgentFormData, password: string, token: string, otpCode: string) {
   const { email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber } = formData;
 
   try {
@@ -22,7 +22,7 @@ export default async function handleAgentSignup(formData: AgentFormData, token: 
 
     await Promise.all([sendToAgentReview(formData), sendAgentReview(formData, token)]);
 
-    await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token);
+    await createBusinessOwnerWithToken(email, businessName, mainContact, addressLine, city, county, country, postcode, registrationNumber, token, password);
 
     return 
   } catch (error) {

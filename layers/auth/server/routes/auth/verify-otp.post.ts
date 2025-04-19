@@ -15,11 +15,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     const { token, otp } = await readValidatedBody(event, otpSchema.parse);
-
     const user = await findOwnerByActivationToken(token);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
-
+    
     const isValid = await verifyOtpCode(user, otp);
 
     if (!isValid) {

@@ -6,10 +6,17 @@ const { showToast } = useToastNotification();
 /**
  * Form validation schema
  */
-const schema = z.object({
-  email: z.string().email("Email Address Required").nonempty("Invalid email address"),
-  role: z.boolean().default(false),
-});
+const schema = z
+  .object({
+    email: z.string().email("Email Address Required").nonempty("Invalid email address"),
+    role: z.boolean().default(false),
+    password: z.string().min(8, "Password must be at least 8 characters").nonempty("Password is required"),
+    confirmedPassword: z.string().min(8, "Password must be at least 8 characters").nonempty("Password is required"),
+  })
+  .refine((data) => data.password === data.confirmedPassword, {
+    message: "Passwords do not match",
+    path: ["confirmedPassword"],
+  });
 
 /**
  * Personal information schema
@@ -48,6 +55,8 @@ type Schema = z.output<typeof schema>;
  */
 const state = reactive<Partial<Schema & PersonalSchema & BusinessSchema & AddressSchema>>({
   email: "",
+  password: "",
+  confirmedPassword: "",
   role: false,
   mainContact: "",
   businessName: "",
@@ -158,8 +167,19 @@ async function signup(event: FormSubmitEvent<any>) {
         <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2 mb-2">
           <UInput v-model="state.email" type="email" placeholder="JohnDoe@email.com" size="xl" class="w-full" autocomplete="on" />
         </UFormField>
+        <!-- password input -->
+        <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2 mb-2">
+          <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
+        </UFormField>
+        <!-- password input -->
+        <UFormField label="Confirm Password" name="confirmedPassword" size="xl" hint="Required" class="py-2 mb-2">
+          <UInput v-model="state.confirmedPassword" type="password" placeholder="Enter your password again" size="xl" class="w-full" />
+        </UFormField>
         <!-- role input -->
-        <UCheckbox label="Estate Agent?" name="role" v-model="state.role" />
+        <label for="role">
+          <input type="checkbox" label="Estate Agent?" name="role" v-model="state.role" />
+          Estate Agent?
+        </label>
         <!-- start of form -->
         <UForm v-if="state.role" :state="state" ref="form" class="w-full">
           <!-- Stepper -->
