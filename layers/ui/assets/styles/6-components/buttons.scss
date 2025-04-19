@@ -10,6 +10,7 @@
   font-size: var(--font-md);
   font-weight: var(--font-semibold);
   line-height: var(--lineheight-md);
+  align-items: center;
   background-color: var(--primary-300);
   color: var(--monochrome-100);
   padding: var(--size-10) var(--size-18);
@@ -111,4 +112,12 @@
     font-size: var(--font-lg);
     padding: var(--size-16) var(--size-28);
   }
+}
+
+/**
+ *  Button icons
+ */
+.button svg {
+  width: var(--lineheight-sm);
+  height: var(--lineheight-sm);
 }
