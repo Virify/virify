@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
 
     const token = generateToken();
     const otpCode = generateOtpCode();
-
+     // if Agent
     if (role) {
       const agentFormData = agentSchema.parse(requestBody);
       await handleAgentSignup(agentFormData, token, otpCode);

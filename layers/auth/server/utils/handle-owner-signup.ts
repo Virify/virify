@@ -18,5 +18,6 @@ export default async function handleOwnerSignup(email: string, token: string, ot
   }
 
   await sendActivation(email, token, otpCode);
+  // we create a new user with the token and otpCode
   return await createOwnerWithTokens(email, token, otpCode);
 }

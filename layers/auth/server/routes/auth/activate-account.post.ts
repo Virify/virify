@@ -27,7 +27,9 @@ export default defineEventHandler(async (event) => {
     await updateOwnerAndActivate(user.id, hashedPassword);
 
     // Return success response
-    return successResponse("Successfully activated account.");
+    return {
+      user
+    }
   } catch (error) {
     return errorResponse(error, event);
   }

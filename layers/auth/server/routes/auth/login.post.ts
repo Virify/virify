@@ -24,7 +24,9 @@ export default defineEventHandler(async (event) => {
     // Login the user using nuxt auth session and set their role (important in the future)
     await loginUser(event, user, user.role);
 
-    return successResponse("Logged in successfully!");
+    return {
+      user
+    }
   } catch (err) {
     return errorResponse(err, event);
   }
