@@ -82,7 +82,7 @@ async function nextStep() {
     if (form.value && mainForm.value) {
       await mainForm.value.validate({ nested: true });
       await form.value.validate({ nested: true });
-        stepper.value?.next();
+      stepper.value?.next();
     }
     // need to catch error and return to prevent the stepper from moving
   } catch (error) {
@@ -116,31 +116,33 @@ function submitState() {
 
 /**
  * Signup function
- * 
+ *
  * The users role is set here on user creation.
  * This is an important step determining if the user is an agent or a normal user and has knock on effects.
  */
 async function signup(event: FormSubmitEvent<any>) {
-  await $fetch("/auth/signup", {
-    method: "POST",
-    body: {
-      ...state,
-    },
-  })
-    .then(() => {
-      showToast({
-        title: "Signup successful! Please check your inbox for an activation email.",
-        icon: "ri:check-line",
-      });
-      // redirect to login page
-      navigateTo("/login");
-    })
-    .catch((error) => {
-      showToast({
-        title: error.data.message,
-        icon: "ri:error-warning-line",
-      });
+  interface SignupResponse {
+    userID: string;
+    email: string;
+    token: string;
+    otpCode: string;
+  }
+  try {
+    const user = await $fetch<SignupResponse>("/auth/signup", {
+      method: "POST",
+      body: {
+        ...state,
+      },
     });
+    // redirect to login page
+    console.log(user);
+    navigateTo("/verify/" + user.token);
+  } catch (error) {
+    showToast({
+      title: (error as { data: { message: string } }).data.message,
+      icon: "ri:error-warning-line",
+    });
+  }
 }
 </script>
 
