@@ -10,13 +10,14 @@ const config = useRuntimeConfig();
  * @returns A Promise that resolves when the email is sent.
  * @throws An error if there is an issue sending the email.
  */
-export default async function sendActivation(email: string, token: string) {
+export default async function sendActivation(email: string, token: string, otpCode: string) {
   // Get the Vue email template
   const emailToSend = OwnerActivation;
 
   // Render the email to HTML
   const emailHtml = await render(emailToSend, {
     token,
+    otpCode,
     baseUrl: config.public.EMAIL_BASE_URL,
   });
 
