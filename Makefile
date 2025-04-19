@@ -42,7 +42,7 @@ COMPOSE_SERVICE=docker-compose -p virify-app
 
 
 # ----------
-# SETUP
+# Setup
 # ----------
 
 up:
@@ -54,5 +54,16 @@ exec:
 exec-db:
 		${COMPOSE_SERVICE} exec database /bin/sh
 
-stop:
+down:
 		${COMPOSE_SERVICE} down
+
+# ----------
+# Aliases
+# ----------
+
+start:
+		@make up
+		@make exec
+
+stop:
+		@make down
