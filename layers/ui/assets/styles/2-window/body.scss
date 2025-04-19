@@ -2,8 +2,8 @@
 
 html,
 body {
-  background-color: var(--blue-900);
-  color: var(--monochrome-100);
+  background-color: var(--background-100);
+  color: var(--foreground-100);
   font-size: 1em;
   font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: var(--font-light);
@@ -14,11 +14,11 @@ body {
   }
 
   @include mq.desktop {
-    font-size: 1.125em;
+    font-size: 1.075em;
   }
 
   @include mq.superultrawide {
-    font-size: 1.2em;
+    font-size: 1.125em;
   }
 }
 
