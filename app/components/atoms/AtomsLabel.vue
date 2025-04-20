@@ -1,6 +1,6 @@
 <template>
   <label class="a-label">
-    <span class="a-label-text | body-sm" v-if="label">{{ label }}</span>
+    <span class="a-label-text | body-sm" v-if="label" aria-role="presentation">{{ label }}</span>
     <slot></slot>
   </label>
 </template>

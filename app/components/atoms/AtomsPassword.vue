@@ -6,7 +6,7 @@
 
     <div class="a-password" role="none">
       <input :id="passwordId" v-bind="$attrs" :type="inputType" class="a-password-input | text-input"
-        @blur="checkValidity" />
+        :aria-describedby="errorId" @blur="checkValidity" />
 
       <client-only>
         <!-- Client only as this feature only works with JS anyway -->
@@ -17,7 +17,7 @@
       </client-only>
     </div>
 
-    <span v-if="errorText" class="| text-input-error body-sm">
+    <span v-if="errorText" :id="errorId" class="| text-input-error body-sm">
       {{ errorText }}
     </span>
   </fieldset>
@@ -50,6 +50,7 @@ function checkValidity({ target }) {
 /**
  *  a11y
  */
+const errorId = useId()
 const passwordId = useId()
 
 /**
