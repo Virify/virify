@@ -3,14 +3,9 @@ const { showToast } = useToastNotification();
 const { fetch } = useUserSession();
 
 /**
- *  Form setup
+ *  Form state
  */
-const $form = useTemplateRef('form')
 const formPending = ref(false)
-
-onMounted(() => {
-  unref($form).setAttribute('novalidate', true)
-})
 
 /**
  *  Form errors
@@ -88,7 +83,7 @@ async function loginUser({ target }) {
 
     <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
 
-    <form ref="form" method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
+    <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
       <AtomsLabel label="Email address">
         <AtomsInput type="email" name="email" required />
       </AtomsLabel>
@@ -101,7 +96,7 @@ async function loginUser({ target }) {
       <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="formPending">
         Log in
       </AtomsButton>
-    </form>
+    </MoleculesForm>
 
     <AtomsDivider text="or" />
 
