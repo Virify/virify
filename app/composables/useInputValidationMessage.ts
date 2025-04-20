@@ -2,7 +2,7 @@
  *  Standardise input validation
  *
  */
-export function useInputValidationMessage(maybeRefInput: unknown) {
+export function useInputValidationMessage(maybeRefInput: unknown): string {
   const input = unref(maybeRefInput)
 
   // If input is not an element it can't be invalid, so return empty string
