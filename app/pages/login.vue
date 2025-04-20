@@ -86,10 +86,10 @@ async function loginUser({ target }) {
 </script>
 
 <template>
-  <div class="| container container-xs">
-    <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
+  <div class="| container container-2xs flow flow-lg">
+    <h1 class="| title-xl">Welcome back</h1>
 
-    <h1 class="| title-lg">Login</h1>
+    <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
 
     <form ref="form" method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
       <label>
@@ -103,19 +103,27 @@ async function loginUser({ target }) {
           :validation-text-overrides="validityText" />
       </label>
 
-      <AtomsButton type="submit" :pending="formPending">
-        Submit
+      <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="formPending">
+        Log in
       </AtomsButton>
     </form>
 
-    <nuxt-link to="/password/forgot" class="| body-sm">
-      Forgot Password?
-    </nuxt-link>
+    <AtomsDivider text="or" />
+
+    <div class="| center-text flow flow-sm">
+      <p class="| body-sm">Don't have an account yet? <nuxt-link to="/signup">Create an account</nuxt-link></p>
+
+      <p>
+        <nuxt-link to="/password/forgot" class="| body-sm">
+          Forgot password?
+        </nuxt-link>
+      </p>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.p-login-form {
-  margin: var(--size-16) auto var(--size-32);
+.p-login-form-submit {
+  margin-top: var(--size-24);
 }
 </style>
