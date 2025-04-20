@@ -30,6 +30,10 @@ export function useFormValidationMessage(maybeRefForm: unknown): Validity {
   form.querySelectorAll('input').forEach((input) => {
     const message = useInputValidationMessage(input)
 
+    // If no error message, skip
+    if (!message) return
+
+    // Add error message to array
     errors.push({
       name: input.name,
       error: message
