@@ -13,3 +13,11 @@ export function isElement(elem: unknown): elem is HTMLElement {
 export function isInputElement(elem: unknown): elem is HTMLInputElement {
   return isElement(elem) && elem instanceof HTMLInputElement
 }
+
+/**
+ *  Check if an input is a HTML form element
+ *
+ */
+export function isFormElement(elem: unknown): elem is HTMLFormElement {
+  return isElement(elem) && elem instanceof HTMLFormElement
+}

@@ -16,6 +16,11 @@ onMounted(() => {
  *  Form errors
  */
 const formError = ref(null)
+
+function setFormError(str: string) {
+  formError.value = str || null
+}
+
 /**
  *  Validate form and submit
  */
@@ -23,14 +28,17 @@ async function loginUser({ target }) {
   if (formPending.value) return
 
   // Clear any existing form errors
-  formError.value = ''
+  setFormError(null)
 
   // First check the validity of the form
-  const isValid = target.checkValidity()
+  const { validity, errors } = useFormValidationMessage(target)
 
-  // If not valid, report that validity
-  if (!isValid) {
-    formError.value = "Your form contains errors - please ensure all fields are correctly filled out"
+  // If errors exist, show them
+  if (!validity) {
+    setFormError("Your form contains errors - please ensure all fields are correctly filled out")
+
+    // @TODO add below to error message
+    console.error({ errors })
 
     return
   }

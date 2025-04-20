@@ -5,11 +5,8 @@
 export function useInputValidationMessage(maybeRefInput: unknown): string {
   const input = unref(maybeRefInput)
 
-  // If input is not an element it can't be invalid, so return empty string
-  if (!isInputElement(input)) return ''
-
-  // If valid, return empty string
-  if (input.checkValidity()) return ''
+  // If not an input, or checkValidity is true, return empty string
+  if (!isInputElement(input) || input.checkValidity()) return ''
 
   // If validation failed due to a pattern mismatch, allow overrides
   if (input.validity.patternMismatch) {
