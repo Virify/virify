@@ -3,7 +3,7 @@ import { verifyOtpCode } from "../../utils/verify-otp-code";
 
 const otpSchema = z.object({
   token: z.string(),
-  otp: z.string().length(6, "OTP must be 6 digits"), // assuming 6-digit OTP
+  otpCode: z.string().length(6, "OTP must be 6 digits"),
 });
 
 /**
@@ -14,19 +14,24 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 
   try {
-    const { token, otp } = await readValidatedBody(event, otpSchema.parse);
+    const { token, otpCode } = await readValidatedBody(event, otpSchema.parse);
     const user = await findOwnerByActivationToken(token);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
     
-    const isValid = await verifyOtpCode(user, otp);
+    const isValid = await verifyOtpCode(user, otpCode);
 
     if (!isValid) {
       throw createError({ statusCode: 400, statusMessage: "Invalid OTP code." });
     }
+    
+    await loginUser(event, user, user.role);
+    await updateOwnerAndActivate(user.id);
+  
 
     return {
-      user
+      message: "User activated successfully",
+      user: user,
     };
   } catch (error) {
     return errorResponse(error, event);

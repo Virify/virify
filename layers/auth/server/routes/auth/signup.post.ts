@@ -1,6 +1,4 @@
 import { z } from "zod";
-import handleOwnerSignup from "../../utils/handle-owner-signup";
-import handleAgentSignup from "../../utils/handle-agent-signup";
 
 const roleSchema = z.object({
   role: z.boolean(), // false = Owner, true = Agent
@@ -29,7 +27,7 @@ const agentSchema = z.object({
 export type AgentFormData = z.infer<typeof agentSchema>;
 
 export default defineEventHandler(async (event) => {
-  const { errorResponse, successResponse } = useResponse();
+  const { errorResponse } = useResponse();
 
   try {
     const requestBody = await readBody(event);
@@ -43,12 +41,16 @@ export default defineEventHandler(async (event) => {
     // if Agent
     if (role) {
       const agentFormData = agentSchema.parse(requestBody);
-      await handleAgentSignup(agentFormData, hashedPassword, token, otpCode);
-      return successResponse("Agent signup successful");
+      const agent = await handleAgentSignup(agentFormData, hashedPassword, token, otpCode);
+      return {
+        userID: agent.id,
+        email: agent.email,
+        token: agent.verification?.activationToken,
+        otpCode: agent.verification?.otpCode,
+      }
     }
 
     const { email } = userSchema.parse(requestBody);
-
     const user = await handleOwnerSignup(email, hashedPassword, token, otpCode);
     return {
       userID: user.id,

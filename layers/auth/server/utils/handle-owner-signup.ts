@@ -2,7 +2,6 @@ import { createOwnerWithTokens, findOwnerWithVerification } from "~~/layers/data
 import handleExistingUser from "./handle-existing-user";
 import sendActivation from "~~/layers/email/server/email/send-owner-activation";
 
-
 /**
  * Handles the signup process for an owner.
  * Validates existing users, updates tokens when needed, and sends activation emails.
@@ -11,12 +10,17 @@ import sendActivation from "~~/layers/email/server/email/send-owner-activation";
  * @param otpCode - The generated OTP code.
  */
 export default async function handleOwnerSignup(email: string, password: string, token: string, otpCode: string) {
-  const existingUser = await findOwnerWithVerification(email);
+  try {
+    const existingUser = await findOwnerWithVerification(email);
 
-  if (existingUser) {
-    return await handleExistingUser(existingUser, token, otpCode);
+    if (existingUser) {
+      return await handleExistingUser(existingUser, token, otpCode);
+    }
+
+    await sendActivation(email, token, otpCode);
+
+    return await createOwnerWithTokens(email, password, token, otpCode);
+  } catch (error) {
+    throw error;
   }
-
-  await sendActivation(email, token, otpCode);
-  return await createOwnerWithTokens(email, password, token, otpCode);
 }

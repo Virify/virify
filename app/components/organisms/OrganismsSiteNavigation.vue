@@ -23,7 +23,12 @@
 </template>
 
 <script setup>
-const { loggedIn } = useUserSession()
+const { loggedIn, clear } = useUserSession()
+
+// logout function
+async function logout() {
+  await clear()
+}
 
 const accountOptions = [
   { to: '/account', label: 'My Account' },

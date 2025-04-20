@@ -15,7 +15,7 @@ defineProps<{ token: string, baseUrl: string, otpCode: string }>();
         <Text style="color: #4a5568; font-size: 16px; margin-bottom: 20px;">
           Alternatively, you can activate your account by clicking the button below.
         </Text>
-        <Button :href="baseUrl + `/activate/` + token" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+        <Button :href="baseUrl + `/auth/activate-account?token=` + token" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
           Activate Account
         </Button>
         <Text style="color: #4a5568; font-size: 14px; margin-top: 20px;">

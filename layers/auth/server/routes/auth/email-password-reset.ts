@@ -4,6 +4,7 @@ import * as z from "zod";
 const emailSchema = z.object({
   email: z.string().email(),
 });
+
 /**
  * Send password reset email to the user from the email address
  * @param event - The H3 event object containing the request data.
@@ -15,22 +16,12 @@ export default defineEventHandler(async (event) => {
   try {
     const { email } = await readValidatedBody(event, emailSchema.parse);
 
-    // check if the email exists in the database
     const dbOwner = await findOwnerWithVerification(email);
-
-    //validate owner
     validateOwner(dbOwner);
-
-    // create a specific token for the user
     const token = generateToken();
-
-    // now we need to send them an email with the token
     await sendPasswordReset(email, token);
-
-    // save the token to the database for the user of which email they sent
     await updateOwnerByEmailPasswordReset(email, token);
 
-    // return a success message
     return { message: "Email sent successfully" };
   } catch (error) {
     return errorResponse(error, event);

@@ -5,7 +5,6 @@
  * @param address - The address to check for duplicates.
  */
 export default function validateExistingAgent(agent: OwnerWithVerification, address: string): OwnerWithVerification {
-
   if (agent.role === OwnerRole.USER) {
     throw createError({ statusCode: 400, statusMessage: "User already exists with that email!" });
   }

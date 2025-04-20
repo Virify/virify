@@ -227,7 +227,7 @@ export async function createBusinessOwnerWithToken(
   registrationNumber: string,
   token: string,
   password: string,
-): Promise<OwnerWithVerification | null> {
+): Promise<OwnerWithVerification> {
   return prisma.owner.create({
     data: {
       email,
