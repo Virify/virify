@@ -56,7 +56,7 @@ async function loginUser({ target }) {
   const formData = new FormData(target)
 
   // Post data
-  await useFetch("/auth/login", {
+  await $fetch("/auth/login", {
     method: "POST",
     body: {
       email: formData.get('email'),
@@ -64,6 +64,7 @@ async function loginUser({ target }) {
     }
   })
     .then(() => {
+      // Else show successful login
       showToast({
         title: "Login successful",
         icon: "ri:check-line",
@@ -74,16 +75,9 @@ async function loginUser({ target }) {
       // redirect to account page
       navigateTo("/account");
     })
-    .catch((error: any) => {
-      /**
-       * Strangely enough, on the client you can only access statusMessage via
-       * data.message. This is ONLY in production deployed - might be a Netlify
-       * issue. In development, you can access statusMessage directly
-       * 
-       * @TODO
-       * Probably show this error inline
-       */
-      showToast({ title: error.data.message, icon: "ri:error-warning-line" });
+    .catch(() => {
+      formErrorTitle.value = 'An error occurred'
+      formErrorContent.value = 'Sorry, we were unable to log you in - please check your details and try again'
     })
     .finally(() => {
       formPending.value = false
