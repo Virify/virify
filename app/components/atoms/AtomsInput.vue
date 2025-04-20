@@ -1,6 +1,11 @@
 <template>
-  <input v-bind="$attrs" class="| text-input" @blur="checkValidity" />
-  <span v-if="errorText" class="| text-input-error body-sm">{{ errorText }}</span>
+  <AtomsLabel :label>
+    <input v-bind="$attrs" class="| text-input" @blur="checkValidity" />
+
+    <span v-if="errorText" class="| text-input-error body-sm">
+      {{ errorText }}
+    </span>
+  </AtomsLabel>
 </template>
 
 <script setup>
@@ -10,6 +15,9 @@
 const props = defineProps({
   validationTextOverrides: {
     type: Object
+  },
+  label: {
+    type: String
   }
 })
 
