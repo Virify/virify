@@ -18,11 +18,11 @@ onMounted(() => {
 const { query } = useRoute()
 
 const formErrorTitle = ref(query.error && 'Unauthorised user')
-const formErrorList = ref(query.error && 'Please login to access your account')
+const formErrorContent = ref(query.error && 'Please login to access your account')
 
 function setFormError(str: string, errors?: string[]) {
   formErrorTitle.value = str || null
-  formErrorList.value = errors
+  formErrorContent.value = errors
 }
 
 /**
@@ -93,7 +93,7 @@ async function loginUser({ target }) {
 
 <template>
   <div class="| container container-xs">
-    <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorList" />
+    <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
 
     <h1 class="| title-lg">Login</h1>
 
