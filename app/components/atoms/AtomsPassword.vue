@@ -94,7 +94,7 @@ function toggleShowPassword() {
 }
 
 @media (hover: hover) {
-  .a-password:not(:hover) .a-password-toggle {
+  .a-password:not(:hover) .a-password-toggle:not(:focus) {
     opacity: 0;
   }
 }
