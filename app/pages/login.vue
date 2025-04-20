@@ -1,51 +1,38 @@
 <script setup lang="ts">
-import * as z from "zod";
 const { showToast } = useToastNotification();
 const { fetch } = useUserSession();
-const route = useRoute();
+
 /**
- * Check for errors from query
- * If there is an error, set the notification to the error message
- * This is used to show a notification if the user is not logged in
+ *  Form setup
  */
-watch(
-  () => route.query.error,
-  (newError) => {
-    if (newError) {
-      showToast({
-        title: "Please login to access your account.",
-        icon: "ri:error-warning-line",
-      });
-      navigateTo(route.path, { replace: true }); // Removes query params
-    }
+const $form = useTemplateRef('form')
+
+onMounted(() => {
+  unref($form).setAttribute('novalidate', true)
+})
+
+/**
+ *  Validate form and submit
+ */
+async function loginUser({ target }) {
+  // First check the validity of the form
+  const isValid = target.checkValidity()
+
+  // If not valid, report that validity
+  if (!isValid) {
+    showToast({ title: "Your form contains errors - please ensure all fields are correctly filled out", icon: "ri:error-warning-line" });
+
+    return
   }
-);
 
-/**
- * Form validation schema
- */
-const schema = z.object({
-  email: z.string().email("Invalid email address").nonempty("Email is required"),
-  password: z.string().min(8, "Password must be at least 8 characters").nonempty("Password is required"),
-});
+  // Construct a form object
+  const formData = new FormData(target)
 
-type Schema = z.output<typeof schema>;
-
-// Form state
-const state = reactive<Partial<Schema>>({
-  email: "",
-  password: "",
-});
-
-/**
- * Login function
- */
-async function login() {
   await $fetch("/auth/login", {
     method: "POST",
     body: {
-      email: state.email,
-      password: state.password,
+      email: formData.get('email'),
+      password: formData.get('password'),
     },
   })
     .then(() => {
@@ -59,9 +46,12 @@ async function login() {
       navigateTo("/account");
     })
     /**
-     * Strangely enough, on the client you can only access statusMessage via data.message
-     * This is ONLY in production deployed - might be a Netlify issue
-     * In development, you can access statusMessage directly
+     * Strangely enough, on the client you can only access statusMessage via
+     * data.message. This is ONLY in production deployed - might be a Netlify
+     * issue. In development, you can access statusMessage directly
+     * 
+     * @TODO
+     * Probably show this error inline
      */
     .catch((error: any) => {
       showToast({ title: error.data.message, icon: "ri:error-warning-line" });
@@ -70,26 +60,40 @@ async function login() {
 </script>
 
 <template>
-  <div class="flex justify-center items-center w-full">
-    <div class="w-full sm:w-lg p-8">
-      <h1 class="text-3xl font-bold mb-6">Login</h1>
-      <!-- UI Form -->
-      <UForm @submit="login" :state="state" :schema="schema" class="w-full">
-        <!-- email input -->
-        <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2">
-          <UInput v-model="state.email" type="email" placeholder="Enter your email" size="xl" class="w-full" autocomplete="on" />
-        </UFormField>
-        <!-- password input -->
-        <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
-          <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
-        </UFormField>
-        <div class="flex justify-between items-base mt-4">
-        <UButton color="primary" type="submit" loading-auto size="xl" variant="solid" active> Login </UButton>
-        <NuxtLink to="/password/forgot" class="text-sm">Forgot Password?</NuxtLink>
-        </div>
-        
-      </UForm>
-      <!-- END UI Form -->
-    </div>
+  <div class="| container container-xs">
+    <p v-if="$route.query.error" class="| box box-error">
+      Please login to access your account.
+    </p>
+
+    <h1 class="| title-lg">Login</h1>
+
+    <form ref="form" method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
+      <label>
+        Email address:
+        <AtomsInput type="email" name="email" required />
+      </label>
+
+      <label>
+        Password:
+        <AtomsInput type="password" name="password" required minlength="8" check-password />
+      </label>
+
+      <!--
+        @TODO
+        Add a pending state to form and disable button whilst submitting. Might
+        even be worth adding some animated dots or something over button text?
+      -->
+      <button type="submit" class="| button">Submit</button>
+    </form>
+
+    <nuxt-link to="/password/forgot" class="| body-sm">
+      Forgot Password?
+    </nuxt-link>
   </div>
 </template>
+
+<style scoped>
+.p-login-form {
+  margin: var(--size-16) auto var(--size-32);
+}
+</style>
