@@ -6,6 +6,7 @@ const { fetch } = useUserSession();
  *  Form setup
  */
 const $form = useTemplateRef('form')
+const formPending = ref(false)
 
 onMounted(() => {
   unref($form).setAttribute('novalidate', true)
@@ -15,6 +16,8 @@ onMounted(() => {
  *  Validate form and submit
  */
 async function loginUser({ target }) {
+  if (formPending.value) return
+
   // First check the validity of the form
   const isValid = target.checkValidity()
 
@@ -24,6 +27,9 @@ async function loginUser({ target }) {
 
     return
   }
+
+  // Set pending state
+  formPending.value = true
 
   // Construct a form object
   const formData = new FormData(target)
@@ -57,7 +63,10 @@ async function loginUser({ target }) {
        * Probably show this error inline
        */
       showToast({ title: error.data.message, icon: "ri:error-warning-line" });
-    });
+    })
+    .finally(() => {
+      formPending.value = false
+    })
 }
 </script>
 
@@ -80,12 +89,9 @@ async function loginUser({ target }) {
         <AtomsInput type="password" name="password" required minlength="8" check-password />
       </label>
 
-      <!--
-        @TODO
-        Add a pending state to form and disable button whilst submitting. Might
-        even be worth adding some animated dots or something over button text?
-      -->
-      <button type="submit" class="| button">Submit</button>
+      <AtomsButton type="submit" :pending="formPending">
+        Submit
+      </AtomsButton>
     </form>
 
     <nuxt-link to="/password/forgot" class="| body-sm">
