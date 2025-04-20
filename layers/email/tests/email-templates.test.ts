@@ -18,7 +18,7 @@ describe("Agent Activation Email Template", () => {
     );
 
     expect(html).toContain("Your Account Has Been Approved");
-    expect(html).toContain("https://example.com/activate/abc123");
+    expect(html).toContain("https://example.com/auth/activate-account?token=abc123");
     expect(html).toContain("Congratulations! Your account has been approved.");
     expect(html).toContain("If you did not sign up for this account");
   });
@@ -78,10 +78,12 @@ describe("Owner Activation Email Template", () => {
       h(OwnerActivation, {
         token: "abc123",
         baseUrl: "https://example.com",
+        otpCode: "123456",
       })
     );
     expect(html).toContain("Activate Account");
-    expect(html).toContain("https://example.com/activate/abc123");
+    expect(html).toContain("https://example.com/auth/activate-account?token=abc123");
+    expect(html).toContain("123456");
   });
 });
 
