@@ -1,6 +1,6 @@
-import { createOwnerWithTokens, findOwnerWithVerification } from "~~/layers/database/server/utils/owner";
+import { createOwnerWithTokens, findOwnerWithVerification } from "#layers/database/server/utils/owner";
 import handleExistingUser from "./handle-existing-user";
-import sendActivation from "~~/layers/email/server/email/send-owner-activation";
+import sendActivation from "#layers/email/server/email/send-owner-activation";
 
 /**
  * Handles the signup process for an owner.

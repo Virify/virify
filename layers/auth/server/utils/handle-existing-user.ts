@@ -1,4 +1,4 @@
-import sendActivation from "~~/layers/email/server/email/send-owner-activation";
+import sendActivation from "#layers/email/server/email/send-owner-activation";
 /**
  * Handles the case where an existing user is found.
  * Validates user state and conditionally resends activation tokens.

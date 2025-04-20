@@ -1,7 +1,7 @@
 import sendAgentReview from "#layers/email/server/email/send-agent-review";
 import sendToAgentReview from "#layers/email/server/email/send-to-agent-review";
-import type { AgentFormData } from "~~/layers/auth/server/routes/auth/signup.post";
-import { findBusinessOwner, createBusinessOwnerWithToken, type Owner, type OwnerWithVerification } from "#layers/database/server/utils/owner";
+import type { AgentFormData } from "#layers/auth/server/routes/auth/signup.post";
+import { findBusinessOwner, createBusinessOwnerWithToken, type OwnerWithVerification } from "#layers/database/server/utils/owner";
 
 /**
  * Handles the signup process for an agent.

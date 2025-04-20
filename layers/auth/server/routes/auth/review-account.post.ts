@@ -1,5 +1,5 @@
-import sendAgentActivation from "~~/layers/email/server/email/send-agent-activation";
-import sendAgentRejection from "~~/layers/email/server/email/send-agent-rejection";
+import sendAgentActivation from "#layers/email/server/email/send-agent-activation";
+import sendAgentRejection from "#layers/email/server/email/send-agent-rejection";
 import * as z from "zod";
 
 const reviewSchema = z.object({
