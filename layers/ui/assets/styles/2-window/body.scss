@@ -1,0 +1,37 @@
+@use '../_utils/media' as mq;
+
+html,
+body {
+  background-color: var(--background-100);
+  color: var(--foreground-100);
+  font-size: 1em;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-weight: var(--font-light);
+  line-height: var(--lineheight-md);
+
+  @include mq.motion {
+    scroll-behavior: smooth;
+  }
+
+  @include mq.desktop {
+    font-size: 1.075em;
+  }
+
+  @include mq.superultrawide {
+    font-size: 1.125em;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+html.light {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}

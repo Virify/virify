@@ -1,0 +1,84 @@
+@use 'breakpoints.module' as breakpoints;
+
+/**
+ *  Common breakpoints
+ */
+@mixin mobile-only {
+    @media (max-width: #{ breakpoints.$tablet - 1px }) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: breakpoints.$tablet) {
+        @content;
+    }
+}
+
+@mixin tablet-only {
+    @media (min-width: breakpoints.$tablet) and (max-width: #{ breakpoints.$notebook - 1px }) {
+        @content;
+    }
+}
+
+@mixin notebook {
+    @media (min-width: breakpoints.$notebook) {
+        @content;
+    }
+}
+
+@mixin notebook-only {
+    @media (min-width: breakpoints.$notebook) and (max-width: #{ breakpoints.$desktop - 1px }) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: breakpoints.$desktop) {
+        @content;
+    }
+}
+
+@mixin ultrawide {
+    @media (min-width: #{ breakpoints.$ultrawide }) {
+        @content;
+    }
+}
+
+@mixin superultrawide {
+    @media (min-width: #{ breakpoints.$superultrawide }) {
+        @content;
+    }
+}
+
+
+/**
+ *  Menu breakpoints
+ */
+@mixin menu-mobile {
+    @media (max-width: #{ breakpoints.$menu - 1px }) {
+        @content;
+    }
+}
+
+@mixin menu-desktop {
+    @media (min-width: #{ breakpoints.$menu }) {
+        @content;
+    }
+}
+
+
+/**
+ *  Vestibular disorders
+ */
+@mixin motion {
+    @media (prefers-reduced-motion: no-preference) {
+        @content;
+    }
+}
+
+@mixin reduced-motion {
+    @media (prefers-reduced-motion: reduce) {
+        @content;
+    }
+}

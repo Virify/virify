@@ -8,17 +8,12 @@ const passwordSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { successResponse, errorResponse } = useResponse();
   try {
-    // parse and validate the request body
     const { password, token } = await readValidatedBody(event, passwordSchema.parse);
-    // we need to get the user with the token
     const tokenUser = await findOwnerByPasswordToken(token);
 
     verifyToken(tokenUser);
-
-    // hash the password
+    
     const hashedPassword = await hashPassword(password);
-
-    // update the password in the database and set token to null
     await updateOwnerByToken(token, hashedPassword);
 
     return successResponse("Password updated successfully");

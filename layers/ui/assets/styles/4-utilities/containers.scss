@@ -1,0 +1,11 @@
+/**
+ *  Page widths
+ */
+.container {
+  width: min(100% - var(--size-48), 72rem);
+  margin-inline: auto;
+
+  // @TODO remove once Tailwind is removed, this only exists to
+  // prevent conflicts in the meantime
+  max-width: none;
+}

@@ -16,9 +16,7 @@ export default defineEventHandler(async (event) => {
   try {
     const { token } = await readValidatedBody(event, tokenSchema.parse);
 
-    // get the user with the token
     const tokenUser = await findOwnerByPasswordToken(token);
-
     validateToken(tokenUser);
 
     return successResponse("Token is valid");
@@ -33,10 +31,8 @@ export default defineEventHandler(async (event) => {
  * @param user Owner
  */
 function validateToken(user: Owner | null): void {
-  // check if the token is valid
   if (!user) throw createError({ statusCode: 400, statusMessage: "Invalid token or User!" });
 
-  // check token expiration
   if (user.passwordResetToken && new Date(user.passwordResetToken) < new Date()) {
     throw createError({ statusCode: 400, statusMessage: "Activation token expired, try signing up again" });
   }

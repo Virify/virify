@@ -182,14 +182,17 @@ export async function deleteOwner(id: number): Promise<Owner> {
  * @param token string
  * @returns Owner <Promise>
  */
-export async function createOwnerWithToken(email: string, token: string): Promise<OwnerWithVerification> {
+export async function createOwnerWithTokens(email: string, password: string, token: string, otpCode: string): Promise<OwnerWithVerification> {
   return prisma.owner.create({
     data: {
       email,
+      password,
       verification: {
         create: {
           activationToken: token,
           activationTokenExpiry: new Date(Date.now() + 3600000),
+          otpCode: otpCode,
+          otpCodeExpiry: new Date(Date.now() + 3600000),
         },
       },
     },
@@ -222,8 +225,9 @@ export async function createBusinessOwnerWithToken(
   country: string,
   postcode: string,
   registrationNumber: string,
-  token: string
-): Promise<OwnerWithVerification | null> {
+  token: string,
+  password: string,
+): Promise<OwnerWithVerification> {
   return prisma.owner.create({
     data: {
       email,
@@ -254,7 +258,7 @@ export async function createBusinessOwnerWithToken(
  * @param token string
  * @returns Promise<Owner>
  */
-export async function updateOwnerToken(email: string, token: string): Promise<OwnerWithVerification> {
+export async function updateOwnerTokens(email: string, token: string, otpCode: string): Promise<OwnerWithVerification> {
   return prisma.owner.update({
     where: { email },
     data: {
@@ -262,6 +266,8 @@ export async function updateOwnerToken(email: string, token: string): Promise<Ow
         update: {
           activationToken: token,
           activationTokenExpiry: new Date(Date.now() + 3600000),
+          otpCode: otpCode,
+          otpCodeExpiry: new Date(Date.now() + 3600000),
         },
       },
     },
@@ -281,11 +287,12 @@ export async function updateOwnerAndActivate(userId: number, password?: string):
   return prisma.owner.update({
     where: { id: userId },
     data: {
-      password,
       verification: {
         update: {
           activationToken: null,
           activationTokenExpiry: null,
+          otpCode: null,
+          otpCodeExpiry: null,
           activated: true,
         },
       },

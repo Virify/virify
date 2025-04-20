@@ -14,6 +14,7 @@ const reviewSchema = z.object({
  * @returns A standardized HTTP response indicating the result of the verification process.
  */
 export default defineEventHandler(async (event) => {
+  // TODO: This is old and needs replacing with our new user flow for activation
   const { successResponse, errorResponse } = useResponse();
 
   try {
