@@ -13,7 +13,7 @@ const formPending = ref(false)
 const { query } = useRoute()
 
 const formErrorTitle = ref(query.error && 'Unauthorised user')
-const formErrorContent = ref(query.error && 'Please login to access your account')
+const formErrorContent = ref(query.error && 'Please log in to access your account')
 
 /**
  *  For password inputs
