@@ -28,32 +28,34 @@ async function loginUser({ target }) {
   // Construct a form object
   const formData = new FormData(target)
 
-  await $fetch("/auth/login", {
+  // Post data
+  await useFetch("/auth/login", {
     method: "POST",
     body: {
       email: formData.get('email'),
-      password: formData.get('password'),
-    },
+      password: formData.get('password')
+    }
   })
     .then(() => {
       showToast({
         title: "Login successful",
         icon: "ri:check-line",
       });
+
       // we have set the userSession in the backend, we need the client to fetch the user session
       fetch();
       // redirect to account page
       navigateTo("/account");
     })
-    /**
-     * Strangely enough, on the client you can only access statusMessage via
-     * data.message. This is ONLY in production deployed - might be a Netlify
-     * issue. In development, you can access statusMessage directly
-     * 
-     * @TODO
-     * Probably show this error inline
-     */
     .catch((error: any) => {
+      /**
+       * Strangely enough, on the client you can only access statusMessage via
+       * data.message. This is ONLY in production deployed - might be a Netlify
+       * issue. In development, you can access statusMessage directly
+       * 
+       * @TODO
+       * Probably show this error inline
+       */
       showToast({ title: error.data.message, icon: "ri:error-warning-line" });
     });
 }
