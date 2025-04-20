@@ -14,6 +14,14 @@
   --flow-gap: var(--size-16);
 }
 
+.flow-xs {
+  --flow-gap: var(--size-8);
+}
+
+.flow-sm {
+  --flow-gap: var(--size-12);
+}
+
 .flow-lg {
   --flow-gap: var(--size-20);
 }

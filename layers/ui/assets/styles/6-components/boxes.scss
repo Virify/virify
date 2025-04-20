@@ -14,6 +14,7 @@
 }
 
 .box-error {
+  padding: var(--size-16);
   color: var(--error-200);
   border-color: var(--error-200);
   background-color: light-dark(var(--error-100), var(--error-300));
