@@ -1,8 +1,8 @@
 <template>
-  <section class="| box box-lg box-error flow">
-    <h2 class="| title-xs">{{ errorTitle }}</h2>
+  <section class="m-error-box | box box-lg box-error flow">
+    <h2 class="m-error-box-title | title-xs">{{ errorTitle }}</h2>
 
-    <p v-if="errorsIsString" class="body-sm">{{ errorContent }}</p>
+    <p v-if="errorsIsString" class="| body-sm">{{ errorContent }}</p>
 
     <ul v-else-if="errorsIsArray && errorContent.length">
       <li v-for="{ type, message } of errorContent" class="body-sm">
@@ -42,3 +42,9 @@ const errorsIsArray = computed(() => {
   })
 })
 </script>
+
+<style>
+.m-error-box-title {
+  margin: 0;
+}
+</style>
