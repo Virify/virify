@@ -9,3 +9,11 @@
   // prevent conflicts in the meantime
   max-width: none;
 }
+
+.container-sm {
+  width: min(100% - var(--size-48), 48rem);
+}
+
+.container-xs {
+  width: min(100% - var(--size-48), 36rem);
+}
