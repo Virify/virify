@@ -72,7 +72,7 @@ async function loginUser({ target }) {
 
 <template>
   <div class="| container container-xs">
-    <p v-if="$route.query.error" class="| box box-error">
+    <p v-if="$route.query.error" class="| box box-lg box-error">
       Please login to access your account.
     </p>
 
