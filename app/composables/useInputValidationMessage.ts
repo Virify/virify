@@ -1,8 +1,12 @@
+interface ErrorOverrides {
+  patternMismatch?: string
+}
+
 /**
  *  Standardise input validation
  *
  */
-export function useInputValidationMessage(maybeRefInput: unknown): string {
+export function useInputValidationMessage(maybeRefInput: unknown, overrides: ErrorOverrides = {}): string {
   const input = unref(maybeRefInput)
 
   // If not an input, or checkValidity is true, return empty string
@@ -10,7 +14,9 @@ export function useInputValidationMessage(maybeRefInput: unknown): string {
 
   // If validation failed due to a pattern mismatch, allow overrides
   if (input.validity.patternMismatch) {
-    return `Your password should contain at least 1 number and at least one of the following symbols: ${PASSWORD_VALID_SYMBOLS}`
+    const { patternMismatch } = asObject(overrides)
+
+    return asString(patternMismatch) || 'Not a valid format'
   }
   // Otherwise just show the user the error
   else {

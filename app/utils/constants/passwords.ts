@@ -1,1 +1,0 @@
-export const PASSWORD_VALID_SYMBOLS = '!@£$%\^&*_+'

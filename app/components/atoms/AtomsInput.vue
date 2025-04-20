@@ -1,5 +1,5 @@
 <template>
-  <input :pattern v-bind="$attrs" class="| text-input" @blur="checkValidity" />
+  <input v-bind="$attrs" class="| text-input" @blur="checkValidity" />
   <span v-if="errorText" class="| text-input-error body-sm">{{ errorText }}</span>
 </template>
 
@@ -8,16 +8,8 @@
  *  Apply the appropriate settings for password inputs
  */
 const props = defineProps({
-  checkPassword: {
-    type: Boolean
-  }
-})
-
-const pattern = computed(() => {
-  const { checkPassword } = props
-
-  if (checkPassword) {
-    return `.*(?=.*[0-9])(?=.*[${PASSWORD_VALID_SYMBOLS}]).*`
+  whenMismatched: {
+    type: String
   }
 })
 
@@ -27,6 +19,10 @@ const pattern = computed(() => {
 const errorText = ref(null)
 
 function checkValidity({ target }) {
-  errorText.value = useInputValidationMessage(target)
+  const { whenMismatched } = props
+
+  errorText.value = useInputValidationMessage(target, {
+    patternMismatch: asString(whenMismatched)
+  })
 }
 </script>
