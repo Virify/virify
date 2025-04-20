@@ -15,10 +15,12 @@ onMounted(() => {
 /**
  *  Form errors
  */
-const formError = ref(null)
+const formErrorTitle = ref(null)
+const formErrorList = ref([])
 
-function setFormError(str: string) {
-  formError.value = str || null
+function setFormError(str: string, errors?: string[]) {
+  formErrorTitle.value = str || null
+  formErrorList.value = errors
 }
 
 /**
@@ -40,10 +42,7 @@ async function loginUser({ target }) {
 
   // If errors exist, show them
   if (!validity) {
-    setFormError("Your form contains errors - please ensure all fields are correctly filled out")
-
-    // @TODO add below to error message
-    console.error({ errors })
+    setFormError("Your form contains errors - please ensure all fields are correctly filled out", errors)
 
     return
   }
@@ -92,13 +91,10 @@ async function loginUser({ target }) {
 
 <template>
   <div class="| container container-xs">
-    <p v-if="formError" class="| box box-lg box-error">
-      {{ formError }}
-    </p>
+    <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorList" />
 
-    <p v-else-if="$route.query.error" class="| box box-lg box-error">
-      Please login to access your account.
-    </p>
+    <MoleculesErrorBox v-else-if="$route.query.error" error-title="Unauthorised"
+      error-content="Please login to access your account" />
 
     <h1 class="| title-lg">Login</h1>
 

@@ -1,6 +1,6 @@
 interface InputError {
-  name: string
-  error: string
+  type: string
+  message: string
 }
 
 interface Validity {
@@ -35,8 +35,8 @@ export function useFormValidationMessage(maybeRefForm: unknown): Validity {
 
     // Add error message to array
     errors.push({
-      name: input.name,
-      error: message
+      type: input.name,
+      message
     })
   })
 
