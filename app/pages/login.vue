@@ -28,7 +28,7 @@ function setFormError(str: string, errors?: string[]) {
 /**
  *  For password inputs
  */
-const { pattern, whenMismatched } = getValidPassword()
+const { pattern, validityText } = getValidPassword()
 
 /**
  *  Validate form and submit
@@ -99,7 +99,8 @@ async function loginUser({ target }) {
 
       <label>
         Password:
-        <AtomsInput type="password" name="password" required minlength="8" :pattern :when-mismatched />
+        <AtomsInput type="password" name="password" required minlength="8" :pattern
+          :validation-text-overrides="validityText" />
       </label>
 
       <AtomsButton type="submit" :pending="formPending">

@@ -8,8 +8,8 @@
  *  Apply the appropriate settings for password inputs
  */
 const props = defineProps({
-  whenMismatched: {
-    type: String
+  validationTextOverrides: {
+    type: Object
   }
 })
 
@@ -19,10 +19,8 @@ const props = defineProps({
 const errorText = ref(null)
 
 function checkValidity({ target }) {
-  const { whenMismatched } = props
+  const { validationTextOverrides: overrides } = props
 
-  errorText.value = useInputValidationMessage(target, {
-    patternMismatch: asString(whenMismatched)
-  })
+  errorText.value = useInputValidationMessage(target, overrides)
 }
 </script>
