@@ -92,16 +92,14 @@ async function loginUser({ target }) {
     <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
 
     <form ref="form" method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
-      <label>
-        Email address:
+      <AtomsLabel label="Email address">
         <AtomsInput type="email" name="email" required />
-      </label>
+      </AtomsLabel>
 
-      <label>
-        Password:
+      <AtomsLabel label="Password">
         <AtomsInput type="password" name="password" required minlength="8" :pattern
           :validation-text-overrides="validityText" />
-      </label>
+      </AtomsLabel>
 
       <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="formPending">
         Log in
