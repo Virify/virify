@@ -12,9 +12,9 @@ import {
   findBusinessOwner,
   findAgent,
   deleteOwner,
-  createOwnerWithToken,
+  createOwnerWithTokens,
   createBusinessOwnerWithToken,
-  updateOwnerToken,
+  updateOwnerTokens,
   updateOwnerAndActivate,
   updateOwnerAndReview,
   hasRole,
@@ -41,6 +41,7 @@ let ownerActivationToken: string;
 let agentActivationToken: string;
 let resetToken: string;
 let testPassword: string;
+let otpCode: string;
 
 /**
  * Create a test owner and agent before all tests
@@ -51,6 +52,7 @@ beforeAll(async () => {
   agentActivationToken = "agent-activation-token";
   resetToken = "reset-token";
   testPassword = "new-password";
+  otpCode = "123456";
 
   const { prisma } = await import("../server/utils/prisma-client");
   testOwner = await prisma.owner.create({
@@ -61,6 +63,7 @@ beforeAll(async () => {
       verification: {
         create: {
           activationToken: ownerActivationToken,
+          otpCode: otpCode,
         },
       },
     },
@@ -125,6 +128,11 @@ describe("owner functions", () => {
     expect(found?.verification?.activationToken).toBe(ownerActivationToken);
   });
 
+  it('should return a otp code', async () => {
+    const found = await findOwnerWithVerification(testOwner.email);
+    expect(found?.verification?.otpCode).toBe(otpCode);
+  });
+
   it("should fail to find owner by password reset token", async () => {
     const token = "non-existent-token";
     const found = await findOwnerByPasswordToken(token);
@@ -182,18 +190,20 @@ describe("owner functions", () => {
   it("should create owner with token", async () => {
     const email = "new-owner@example.com";
     const token = "new-activation-token";
-    const newOwner = await createOwnerWithToken(email, token);
+    const otpCode = "654321";
+    const newOwner = await createOwnerWithTokens(email, testPassword, token, otpCode);
     expect(newOwner.verification?.activationToken).toBe(token);
   });
 
   it("should create business owner with token", async () => {
-    const newOwner = await createBusinessOwnerWithToken("business-owner@example.com", "Business Inc.", "John Doe", "123 Business St", "City", "County", "Country", "12345", "123456789", "review-token");
+    const password = "business-password";
+    const newOwner = await createBusinessOwnerWithToken("business-owner@example.com", "Business Inc.", "John Doe", "123 Business St", "City", "County", "Country", "12345", "123456789", "review-token", password);
     expect(newOwner?.email).toBe("business-owner@example.com");
   });
 
   it("should update owner's activation token by email", async () => {
     const token = "random-token-activation-token";
-    const updatedOwner = await updateOwnerToken(testOwner.email, token);
+    const updatedOwner = await updateOwnerTokens(testOwner.email, token, otpCode);
     expect(updatedOwner.verification?.activationToken).toBe(token);
   });
 
