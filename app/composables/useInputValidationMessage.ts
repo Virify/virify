@@ -1,25 +1,40 @@
+import { defu } from 'defu'
+
 interface ErrorOverrides {
   patternMismatch?: string
+}
+
+const defaultOverrides = {
+  patternMismatch: 'Value is an invalid format.',
+  valueMissing: 'This field is required.'
 }
 
 /**
  *  Standardise input validation
  *
  */
-export function useInputValidationMessage(maybeRefInput: unknown, overrides: ErrorOverrides = {}): string {
+export function useInputValidationMessage(maybeRefInput: unknown, userOverrides: ErrorOverrides = {}): string {
   const input = unref(maybeRefInput)
+
+  // Combine user and default overrides
+  const overrides = defu(userOverrides, defaultOverrides)
 
   // If not an input, or checkValidity is true, return empty string
   if (!isInputElement(input) || input.checkValidity()) return ''
 
-  // If validation failed due to a pattern mismatch, allow overrides
-  if (input.validity.patternMismatch) {
-    const { patternMismatch } = asObject(overrides)
+  // Destructure overrides
+  const { patternMismatch, valueMissing } = asObject(overrides)
 
-    return asString(patternMismatch) || 'Not a valid format'
+  // Pattern overrides
+  if (input.validity.patternMismatch && isString(patternMismatch)) {
+    input.setCustomValidity(patternMismatch)
   }
-  // Otherwise just show the user the error
+  else if (input.validity.valueMissing && isString(valueMissing)) {
+    input.setCustomValidity(valueMissing)
+  }
   else {
-    return input.validationMessage
+    input.setCustomValidity('')
   }
+
+  return input.validationMessage
 }
