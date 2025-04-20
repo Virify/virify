@@ -13,17 +13,24 @@ onMounted(() => {
 })
 
 /**
+ *  Form errors
+ */
+const formError = ref(null)
+/**
  *  Validate form and submit
  */
 async function loginUser({ target }) {
   if (formPending.value) return
+
+  // Clear any existing form errors
+  formError.value = ''
 
   // First check the validity of the form
   const isValid = target.checkValidity()
 
   // If not valid, report that validity
   if (!isValid) {
-    showToast({ title: "Your form contains errors - please ensure all fields are correctly filled out", icon: "ri:error-warning-line" });
+    formError.value = "Your form contains errors - please ensure all fields are correctly filled out"
 
     return
   }
@@ -72,7 +79,11 @@ async function loginUser({ target }) {
 
 <template>
   <div class="| container container-xs">
-    <p v-if="$route.query.error" class="| box box-lg box-error">
+    <p v-if="formError" class="| box box-lg box-error">
+      {{ formError }}
+    </p>
+
+    <p v-else-if="$route.query.error" class="| box box-lg box-error">
       Please login to access your account.
     </p>
 
