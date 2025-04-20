@@ -13,8 +13,6 @@ const props = defineProps({
   }
 })
 
-const PASSWORD_VALID_SYMBOLS = '!@£$%\^&*_+'
-
 const pattern = computed(() => {
   const { checkPassword } = props
 
@@ -29,19 +27,6 @@ const pattern = computed(() => {
 const errorText = ref(null)
 
 function checkValidity({ target }) {
-  const isValid = target.checkValidity()
-
-  if (isValid) {
-    errorText.value = null
-  }
-
-  // If pattern ismatch, because those errors are unhelpful
-  if (target.validity.patternMismatch) {
-    errorText.value = `Your password should contain at least 1 number and at least one of the following symbols: ${PASSWORD_VALID_SYMBOLS}`
-  }
-  // Otherwise just show the user the error
-  else {
-    errorText.value = target.validationMessage
-  }
+  errorText.value = useInputValidationMessage(target)
 }
 </script>
