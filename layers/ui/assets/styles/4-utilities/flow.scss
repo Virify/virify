@@ -8,6 +8,15 @@
 }
 
 /**
+ *  Content dividers
+ */
+.divider {
+  margin: var(--size-24) 0;
+  border: 0;
+  border-top: var(--divider-100);
+}
+
+/**
  *  Content flow
  */
 .flow {
