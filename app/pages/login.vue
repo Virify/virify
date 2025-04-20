@@ -20,11 +20,6 @@ const { query } = useRoute()
 const formErrorTitle = ref(query.error && 'Unauthorised user')
 const formErrorContent = ref(query.error && 'Please login to access your account')
 
-function setFormError(str: string, errors?: string[]) {
-  formErrorTitle.value = str || null
-  formErrorContent.value = errors
-}
-
 /**
  *  For password inputs
  */
@@ -37,14 +32,16 @@ async function loginUser({ target }) {
   if (formPending.value) return
 
   // Clear any existing form errors
-  setFormError(null)
+  formErrorTitle.value = null
+  formErrorContent.value = null
 
   // First check the validity of the form
   const { validity, errors } = useFormValidationMessage(target)
 
   // If errors exist, show them
   if (!validity) {
-    setFormError("Your form contains errors - please ensure all fields are correctly filled out", errors)
+    formErrorTitle.value = "Your form contains errors - please ensure all fields are correctly filled out"
+    formErrorContent.value = errors
 
     return
   }
