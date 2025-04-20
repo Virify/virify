@@ -1,11 +1,11 @@
 <template>
   <ul v-if="hasMenuItems" popover :id="popoverId" class="m-account-popover | box">
     <li class="m-account-popover-listitem" v-for="{ to, label } of options" :key="label">
-      <nuxt-link :to="to" class="m-account-popover-link | font-sm">{{ label }}</nuxt-link>
+      <nuxt-link :to="to" class="m-account-popover-link | body-sm">{{ label }}</nuxt-link>
     </li>
   </ul>
 
-  <button ref="button" type="button" class="m-account-popover-toggle | font-sm font-bold" :popovertarget="popoverId"
+  <button ref="button" type="button" class="m-account-popover-toggle | body-sm font-bold" :popovertarget="popoverId"
     :disabled="!hasMenuItems" aria-label="Expand menu">
     Hi, User
     <AtomsIcon width="24" height="24" title="Menu icon" icon="icon/profile" class="m-account-popover-icon" />
