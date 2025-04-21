@@ -15,18 +15,17 @@ const state = reactive({
 
 async function verify(event: FormSubmitEvent<any>) {
   try {
-    const user = await $fetch("/auth/verify-otp", {
+    const response = await $fetch("/auth/verify-otp", {
       method: "POST",
       body: {
         otpCode: state.otpCode,
         token: route.params.token,
       },
     });
-    console.log(user);
+    console.log(response.user);
     // need to fetch the auth session on the client side
     await fetch()
-    // TODO Make this route dynamic for password reset
-    navigateTo("/account");
+    navigateTo(response.redirect);
   } catch (error) {
     console.log(error);
   }

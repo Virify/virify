@@ -61,13 +61,17 @@ async function loginUser({ target }) {
         title: "Login successful",
         icon: "ri:check-line",
       });
-
       // we have set the userSession in the backend, we need the client to fetch the user session
       fetch();
       // redirect to account page
       navigateTo("/account");
     })
-    .catch(() => {
+    .catch((error) => {
+      if(error.data.message === "No password set") {
+        formErrorTitle.value = 'No password set'
+        formErrorContent.value = 'Your account has no password set. Please use the password reset to verify your email and set your password.'
+        return
+      } 
       formErrorTitle.value = 'An error occurred'
       formErrorContent.value = 'Sorry, we were unable to log you in - please check your details and try again'
     })

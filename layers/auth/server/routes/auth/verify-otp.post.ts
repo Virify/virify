@@ -9,6 +9,7 @@ const otpSchema = z.object({
 /**
  * Verifies the OTP code for a given token during activation.
  * This allows users to activate using an OTP instead of clicking the email link.
+ * 
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -27,11 +28,11 @@ export default defineEventHandler(async (event) => {
     
     await loginUser(event, user, user.role);
     await updateOwnerAndActivate(user.id);
-  
-
+    
     return {
       message: "User activated successfully",
       user: user,
+      redirect: "/account?success=Account%20activated",
     };
   } catch (error) {
     return errorResponse(error, event);

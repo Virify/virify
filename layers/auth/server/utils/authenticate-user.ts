@@ -13,7 +13,12 @@ export async function authenticateUser(email: string, password: string) {
     throw createError({ statusCode: 401, statusMessage: "Sorry, User not found." });
   }
 
+  if(!user.password) {
+    throw createError({ statusCode: 401, statusMessage: "No password set"})
+  }
+
   const passwordVerified = await verifyPassword(user.password as string, password);
+  
   if (!passwordVerified) throw createError({ statusCode: 401, statusMessage: "Password incorrect", message: "Password does not match" });
 
   return user;
