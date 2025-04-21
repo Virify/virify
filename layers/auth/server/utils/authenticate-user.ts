@@ -7,20 +7,19 @@
  * @returns A User.
  */
 export async function authenticateUser(email: string, password: string) {
+  const user = await findUser(email);
 
-  // Find the user based on the login type (agent or owner)
-  const user = await findOwner(email);
-
-  // If user is not found, return an unauthorized response
   if (!user) {
-    throw createError({ statusCode: 401, statusMessage: "Sorry, User not found." });
+    throw createError({ statusCode: 404, statusMessage: "User not found"});
   }
 
-  // Verify the password
-  const passwordVerified = await verifyPassword(user.password as string, password);
+  if(!user.password) {
+    throw createError({ statusCode: 403, statusMessage: "Login failed", message: "User has no password set" });
+  }
 
+  const passwordVerified = await verifyPassword(user.password as string, password);
+  
   if (!passwordVerified) throw createError({ statusCode: 401, statusMessage: "Password incorrect", message: "Password does not match" });
 
-  // Return the authenticated user
   return user;
 }

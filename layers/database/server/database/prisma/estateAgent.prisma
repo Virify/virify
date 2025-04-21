@@ -1,37 +1,25 @@
-model Owner {
+model EstateAgent {
   id                       Int           @id @default(autoincrement())
   firstName                String?
   lastName                 String?
-  username                 String?       @unique
   email                    String        @unique
   mainContact              String?
+  phoneNumber              String?
   password                 String?
   businessName             String?
-  addressLine1             String?
-  addressLine2             String?
-  city                     String?
-  county                   String?
-  postcode                 String?
-  country                  String?
   companyRegistration      String?
-  umbrellaId               Int?
-  role                     OwnerRole     @default(USER)
   passwordResetToken       String?       @unique
   passwordResetTokenExpiry DateTime?
+  otpCode                  String?
+  otpCodeExpiry            DateTime?
   lastLogin                DateTime?
   deletedAt                DateTime?
   createdAt                DateTime      @default(now())
   updatedAt                DateTime      @updatedAt
   agents                   Agent[]
   listings                 Listing[]
-  umbrella                 Umbrella?     @relation(fields: [umbrellaId], references: [id])
   properties               Property[]
   verification             Verification?
-
-  @@index([umbrellaId])
-}
-
-enum OwnerRole {
-  USER
-  AGENT
+  address                  Address?      @relation(fields: [addressId], references: [id])
+  addressId                Int?
 }

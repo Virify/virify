@@ -1,7 +1,7 @@
 model AdditionalFeatures {
   id                    Int                         @id @default(autoincrement())
   investmentPotential   String
-  petFriendly             Boolean
+  petFriendly           Boolean
   // accessibility features in array
   accessibilityFeatures AccessibilityFeaturesType[]
   moveInDate            DateTime

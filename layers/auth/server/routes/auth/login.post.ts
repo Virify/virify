@@ -7,24 +7,21 @@ const loginSchema = z.object({
 });
 
 /**
- * Handles the login request for owners.
+ * Handles the login request for users.
  * @param event - The H3 event object.
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
-  const { successResponse, errorResponse } = useResponse();
+  const { errorResponse } = useResponse();
 
   try {
-    // Parse and validate the request body
     const { email, password } = await readValidatedBody(event, loginSchema.parse);
-
-    // Authenticate the user
     const user = await authenticateUser(email, password);
+    await loginUser(event, user);
 
-    // Login the user using nuxt auth session and set their role (important in the future)
-    await loginUser(event, user, user.role);
-
-    return successResponse("Logged in successfully!");
+    return {
+      user
+    }
   } catch (err) {
     return errorResponse(err, event);
   }

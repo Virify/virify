@@ -1,24 +1,24 @@
 model Agent {
-  id                 Int        @id @default(autoincrement())
+  id                 Int         @id @default(autoincrement())
   firstName          String?
   lastName           String?
-  email              String     @unique
+  email              String      @unique
   password           String?
-  ownerId            Int
-  role               AgentRole  @default(SENIOR)
+  estateAgentId      Int
+  role               AgentRole   @default(SENIOR)
   passwordResetToken String?
   lastLogin          DateTime?
-  activationToken    String?    @unique
+  activationToken    String?     @unique
   tokenExpiry        DateTime?
-  isActivated        Boolean    @default(false)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  isActivated        Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
   deletedAt          DateTime?
-  owner              Owner      @relation(fields: [ownerId], references: [id])
-  listings           Listing[]  @relation("AgentToListing")
-  properties         Property[] @relation("AgentToProperty")
+  estateAgent        EstateAgent @relation(fields: [estateAgentId], references: [id])
+  listings           Listing[]   @relation("AgentToListing")
+  properties         Property[]  @relation("AgentToProperty")
 
-  @@index([ownerId])
+  @@index([estateAgentId])
 }
 
 enum AgentRole {

@@ -61,15 +61,14 @@ async function loginUser({ target }) {
         title: "Login successful",
         icon: "ri:check-line",
       });
-
       // we have set the userSession in the backend, we need the client to fetch the user session
       fetch();
       // redirect to account page
       navigateTo("/account");
     })
-    .catch(() => {
-      formErrorTitle.value = 'An error occurred'
-      formErrorContent.value = 'Sorry, we were unable to log you in - please check your details and try again'
+    .catch((error) => {
+      formErrorTitle.value = 'Login failed'
+      formErrorContent.value = error.data.message
     })
     .finally(() => {
       formPending.value = false

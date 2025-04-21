@@ -2,14 +2,24 @@ import type { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
 
 /**
- * Handles the login process for owners and agents.
+ * Handles the login process for users and agents.
  * @param event - The H3 event object.
  * @param email - The email of the user attempting to log in.
  * @param password - The password of the user attempting to log in.
  * @param isAgentLogin - A boolean indicating if the login is for an agen
  * @returns - set User Session
  */
-export async function loginUser(event: H3Event, user: Owner, role: string): Promise<UserSession> {
-  // Set the user session
-  return await setSession(event, user, role);
+export async function loginUser(event: H3Event, user: User): Promise<UserSession> {
+  // Clear any existing session
+  await clearUserSession(event);
+  // Set the new session with user details
+  return await setUserSession(event, {
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username ?? user.email ?? user.firstName,
+    },
+    loggedIn: true,
+    loggedInAt: new Date(),
+  });
 }
