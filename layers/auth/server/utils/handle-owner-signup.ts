@@ -9,7 +9,7 @@ import sendActivation from "#layers/email/server/email/send-owner-activation";
  * @param token - The generated activation token.
  * @param otpCode - The generated OTP code.
  */
-export default async function handleOwnerSignup(email: string, password: string, token: string, otpCode: string) {
+export default async function handleOwnerSignup(email: string, token: string, otpCode: string) {
   try {
     const existingUser = await findOwnerWithVerification(email);
 
@@ -19,7 +19,7 @@ export default async function handleOwnerSignup(email: string, password: string,
 
     await sendActivation(email, token, otpCode);
 
-    return await createOwnerWithTokens(email, password, token, otpCode);
+    return await createOwnerWithTokens(email, token, otpCode);
   } catch (error) {
     throw error;
   }
