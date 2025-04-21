@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <dialog ref="$dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
+    <dialog ref="dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
       <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="close"></button>
 
       <section v-if="dialog" class="o-dialog-content" :class="dialog.className">
@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-const $dialog = ref(null)
+const $dialog = useTemplateRef('dialog')
 
 /**
  *  Monitor changes in dialog content
