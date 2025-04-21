@@ -22,8 +22,8 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const passwordToken = await generateToken();
-    const otpCode = await generateOtpCode();
+    const passwordToken = generateToken();
+    const otpCode = generateOtpCode();
 
     const updatedUser = await updateOwnerPasswordToken(email, passwordToken, otpCode);
 

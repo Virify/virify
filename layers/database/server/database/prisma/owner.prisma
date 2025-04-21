@@ -19,6 +19,8 @@ model Owner {
   role                     OwnerRole     @default(USER)
   passwordResetToken       String?       @unique
   passwordResetTokenExpiry DateTime?
+  otpCode                  String?
+  otpCodeExpiry            DateTime?
   lastLogin                DateTime?
   deletedAt                DateTime?
   createdAt                DateTime      @default(now())

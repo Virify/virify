@@ -15,7 +15,7 @@ export default async function handleExistingUser(user: OwnerWithVerification, to
     }
 
     const hasValidToken = user.verification?.activationToken && user.verification.activationTokenExpiry! > now;
-    const hasValidOtp = user.verification?.otpCodeExpiry && user.verification.otpCodeExpiry > now;
+    const hasValidOtp = user.otpCodeExpiry && user.otpCodeExpiry > now;
 
     if (hasValidToken && hasValidOtp) {
       throw createError({ statusCode: 400, statusMessage: "Activation email already sent! Please check your inbox" });

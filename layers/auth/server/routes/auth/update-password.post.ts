@@ -10,8 +10,6 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
     const { password, passwordToken } = await readValidatedBody(event, passwordSchema.parse);
-    console.log("password", password);
-    console.log("passwordToken", passwordToken);
 
     if (passwordToken) {
       await updatePasswordByToken(passwordToken, password);

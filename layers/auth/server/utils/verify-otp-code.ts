@@ -54,11 +54,11 @@ export async function verifyPasswordResetOtpCode(passwordToken: string, otpCode:
 export async function verifyOtpCode(user: OwnerWithVerification, code: string): Promise<boolean> {
   const now = new Date();
 
-  if (!user.verification?.otpCode || user.verification.otpCode !== code) {
+  if (!user.otpCode || user.otpCode !== code) {
     return false;
   }
 
-  if (user.verification?.otpCodeExpiry && user.verification.otpCodeExpiry < now) {
+  if (user.otpCodeExpiry && user.otpCodeExpiry < now) {
     return false;
   }
 

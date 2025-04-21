@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
         userID: agent.id,
         email: agent.email,
         token: agent.verification?.activationToken,
-        otpCode: agent.verification?.otpCode,
+        otpCode: agent.otpCode,
       }
     }
 
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
       userID: user.id,
       email: user.email,
       token: user.verification?.activationToken,
-      otpCode: user.verification?.otpCode,
+      otpCode: user.otpCode,
     };
   } catch (err) {
     return errorResponse(err, event);

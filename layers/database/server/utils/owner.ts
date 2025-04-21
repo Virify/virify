@@ -2,7 +2,7 @@ import { type Agent, type Owner, OwnerRole, Prisma, Reviewed } from "@prisma/cli
 import { prisma } from "./prisma-client";
 export type OwnerWithVerification = Prisma.OwnerGetPayload<{ include: { verification: true } }>;
 export { OwnerRole, Reviewed };
-export type { Agent, Owner}
+export type { Agent, Owner };
 
 /**
  * Finds an owner by email.
@@ -84,7 +84,7 @@ export async function findOwnerByPasswordToken(token: string): Promise<OwnerWith
     },
     include: {
       verification: true,
-    }
+    },
   });
 }
 /**
@@ -128,21 +128,14 @@ export async function updateOwnerPasswordById(id: number, password: string) {
  * @param email - The email of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function updateOwnerPasswordToken(email: string, token: string, otpCode: string): Promise<OwnerWithVerification | null> {
+export async function updateOwnerPasswordToken(email: string, token: string, otpCode: string): Promise<Owner | null> {
   return prisma.owner.update({
     where: { email },
     data: {
-      verification: {
-        update: {
-          otpCode,
-          otpCodeExpiry: new Date(Date.now() + 3600000),
-        },
-      },
+      otpCode,
+      otpCodeExpiry: new Date(Date.now() + 3600000),
       passwordResetToken: token,
       passwordResetTokenExpiry: new Date(Date.now() + 3600000),
-    },
-    include: {
-      verification: true,
     },
   });
 }
@@ -227,12 +220,12 @@ export async function createOwnerWithTokens(email: string, token: string, otpCod
   return prisma.owner.create({
     data: {
       email,
+      otpCode: otpCode,
+      otpCodeExpiry: new Date(Date.now() + 3600000),
       verification: {
         create: {
           activationToken: token,
           activationTokenExpiry: new Date(Date.now() + 3600000),
-          otpCode: otpCode,
-          otpCodeExpiry: new Date(Date.now() + 3600000),
         },
       },
     },
@@ -265,7 +258,7 @@ export async function createBusinessOwnerWithToken(
   country: string,
   postcode: string,
   registrationNumber: string,
-  token: string,
+  token: string
 ): Promise<OwnerWithVerification> {
   return prisma.owner.create({
     data: {
@@ -301,18 +294,18 @@ export async function updateOwnerTokens(email: string, token: string, otpCode: s
   return prisma.owner.update({
     where: { email },
     data: {
+      otpCode: otpCode,
+      otpCodeExpiry: new Date(Date.now() + 3600000),
       verification: {
         update: {
           activationToken: token,
           activationTokenExpiry: new Date(Date.now() + 3600000),
-          otpCode: otpCode,
-          otpCodeExpiry: new Date(Date.now() + 3600000),
         },
       },
     },
     include: {
       verification: true,
-    }
+    },
   });
 }
 
@@ -326,12 +319,12 @@ export async function updateOwnerAndActivate(userId: number, password?: string):
   return prisma.owner.update({
     where: { id: userId },
     data: {
+      otpCode: null,
+      otpCodeExpiry: null,
       verification: {
         update: {
           activationToken: null,
           activationTokenExpiry: null,
-          otpCode: null,
-          otpCodeExpiry: null,
           activated: true,
         },
       },
