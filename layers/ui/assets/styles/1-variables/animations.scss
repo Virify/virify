@@ -1,0 +1,12 @@
+/**
+ *  Animations
+ */
+:root {
+  // Easing functions
+  --ease-out: cubic-bezier(0.2, 1.1, 0.8, 1);
+
+  // Speeds
+  --animation-fast: 0.15s;
+  --animation-medium: 0.2s;
+  --animation-slow: 0.4s;
+}
