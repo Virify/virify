@@ -6,7 +6,7 @@
 
     <div class="a-password" role="none">
       <input :id="passwordId" v-bind="$attrs" :type="inputType" class="a-password-input | text-input"
-        :aria-describedby="errorId" @blur="checkValidity" />
+        :aria-describedby="errorId" @input="checkValidity" />
 
       <client-only>
         <!-- Client only as this feature only works with JS anyway -->
@@ -24,6 +24,13 @@
 </template>
 
 <script setup>
+/**
+ *  Prevent attributes being added to fieldset
+ */
+defineOptions({
+  inheritAttrs: false
+})
+
 /**
  *  Apply the appropriate settings for password inputs
  */
@@ -94,7 +101,7 @@ function toggleShowPassword() {
 }
 
 @media (hover: hover) {
-  .a-password:not(:hover) .a-password-toggle:not(:focus) {
+  .a-password:not(:hover):not(:focus-within) .a-password-toggle {
     opacity: 0;
   }
 }

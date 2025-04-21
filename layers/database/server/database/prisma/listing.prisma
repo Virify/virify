@@ -7,16 +7,18 @@ model Listing {
   listingType        ListingType
   availabilityStatus AvailabilityStatus
   listingTier        ListingTier
-  ownerId            Int?
+  userId             Int?
   propertyId         Int?               @unique
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
-  owner              Owner?             @relation(fields: [ownerId], references: [id])
+  user               User?              @relation(fields: [userId], references: [id])
   property           Property?          @relation(fields: [propertyId], references: [id])
   listingCosts       ListingCosts?
   agents             Agent[]            @relation("AgentToListing")
+  EstateAgent        EstateAgent?       @relation(fields: [estateAgentId], references: [id])
+  estateAgentId      Int?
 
-  @@index([ownerId])
+  @@index([userId])
 }
 
 enum ListingType {

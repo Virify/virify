@@ -9,7 +9,7 @@ defineProps<{ passwordToken: string, baseUrl: string, otpCode: string }>();
       <Section style="background-color: #ffffff; border-radius: 8px; padding: 20px; text-align: center;">
         <Heading style="color: #22c55e; font-size: 24px; margin-bottom: 20px;">Password Reset Request! Virify!</Heading>
         <Text style="color: #4a5568; font-size: 16px; margin-bottom: 20px;">
-          So you have forgtotten your password? No problem! Please click the button below to reset your password:
+          So you have forgtotten your password? No problem! Please enter the OTP code below to reset your password.
         </Text>
         <Heading style="color: #22c55e; font-size: 24px; margin-bottom: 20px;">{{ otpCode }}</Heading>
         <Text style="color: #4a5568; font-size: 16px; margin-bottom: 20px;">

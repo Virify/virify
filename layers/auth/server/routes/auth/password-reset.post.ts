@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { updateOwnerPasswordToken } from "~~/layers/database/server/utils/owner";
 import sendPasswordReset from "~~/layers/email/server/email/send-password-reset";
 import validatePasswordToken from "../../utils/validate-password-token";
 
@@ -12,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const { email } = await readValidatedBody(event, passwordSchema.parse);
-    const existingUser = await findOwner(email);
+    const existingUser = await findUser(email);
 
     // Check if the user already has a valid password reset token
     if (existingUser && validatePasswordToken(existingUser)) {
@@ -25,7 +24,7 @@ export default defineEventHandler(async (event) => {
     const passwordToken = generateToken();
     const otpCode = generateOtpCode();
 
-    const updatedUser = await updateOwnerPasswordToken(email, passwordToken, otpCode);
+    const updatedUser = await updateUserPasswordToken(email, passwordToken, otpCode);
 
     if (!updatedUser) {
       throw createError({ statusCode: 404, statusMessage: "User not found" });

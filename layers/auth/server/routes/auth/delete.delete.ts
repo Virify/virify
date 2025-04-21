@@ -1,5 +1,5 @@
 /**
- * Handles the request to delete an owner account.
+ * Handles the request to delete an user account.
  *
  * @param event - The H3 event object representing the request.
  * @returns A standardized HTTP response indicating success or failure.
@@ -14,8 +14,8 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
     }
 
-    const ownerId = session.user.id;
-    const deleted = await deleteOwner(ownerId);
+    const userId = session.user.id;
+    const deleted = await deleteUser(userId);
 
     if (!deleted) throw createError({ statusCode: 400, statusMessage: "Failed to delete user. User may not exist" });
 

@@ -1,5 +1,5 @@
 import { render } from "@vue-email/render";
-import OwnerActivation from "../../components/email/templates/owner-activation.vue";
+import userActivation from "../../components/email/templates/user-activation.vue";
 const config = useRuntimeConfig();
 
 /**
@@ -12,7 +12,7 @@ const config = useRuntimeConfig();
  */
 export default async function sendActivation(email: string, token: string, otpCode: string) {
   // Get the Vue email template
-  const emailToSend = OwnerActivation;
+  const emailToSend = userActivation;
 
   // Render the email to HTML
   const emailHtml = await render(emailToSend, {

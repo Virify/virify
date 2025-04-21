@@ -1,10 +1,13 @@
-import validatePasswordToken from "../../utils/validate-password-token";
-
+/**
+ * Password reset token validation
+ * @param event H3Event
+ * @returns Object
+ */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
     const { passwordToken } = getQuery(event);
-    const user = await findOwnerByPasswordToken(passwordToken as string);
+    const user = await findUserByPasswordToken(passwordToken as string);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
     

@@ -8,7 +8,7 @@ const otpSchema = z.object({
 });
 
 /**
- * Handles the OTP verification request for owners.
+ * Handles the OTP verification request for users.
  * Dependng the token provided, it will forward the user appropriately
  * 
  * @param event - The H3 event object.

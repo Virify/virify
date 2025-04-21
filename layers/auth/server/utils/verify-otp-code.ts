@@ -6,10 +6,10 @@ import { H3Event } from "h3";
  * @param event H3Event
  * @param token string
  * @param otpCode string
- * @returns OwnerWithVerification
+ * @returns userWithVerification
  */
 export async function verifyActivationOtpCode(event: H3Event, token: string, otpCode: string) {
-  const user = await findOwnerByActivationToken(token);
+  const user = await findUserByActivationToken(token);
 
   if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
 
@@ -19,8 +19,8 @@ export async function verifyActivationOtpCode(event: H3Event, token: string, otp
     throw createError({ statusCode: 400, statusMessage: "Invalid OTP code." });
   }
 
-  await loginUser(event, user, user.role);
-  return await updateOwnerAndActivate(user.id);
+  await loginUser(event, user);
+  return await updateuUserAndActivate(user.id);
 }
 
 /**
@@ -28,10 +28,10 @@ export async function verifyActivationOtpCode(event: H3Event, token: string, otp
  * 
  * @param passwordToken string
  * @param otpCode string
- * @returns OwnerWithVerification
+ * @returns userWithVerification
  */
 export async function verifyPasswordResetOtpCode(passwordToken: string, otpCode: string) {
-  const user = await findOwnerByPasswordToken(passwordToken);
+  const user = await findUserByPasswordToken(passwordToken);
   if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
 
   const isValid = await verifyOtpCode(user, otpCode);
@@ -46,12 +46,12 @@ export async function verifyPasswordResetOtpCode(passwordToken: string, otpCode:
 /**
  * Valiadates the OTP code for a given user.
  * 
- * @param user OwnerWithVerification
+ * @param user userWithVerification
  * @param code string
  * @description Verifies the OTP code for a given user.
  * @returns Boolean
  */
-export async function verifyOtpCode(user: OwnerWithVerification, code: string): Promise<boolean> {
+export async function verifyOtpCode(user: UserWithVerification, code: string): Promise<boolean> {
   const now = new Date();
 
   if (!user.otpCode || user.otpCode !== code) {
