@@ -1,5 +1,5 @@
 <template>
-  <form ref="$form-elem">
+  <form ref="$form">
     <slot></slot>
   </form>
 </template>
