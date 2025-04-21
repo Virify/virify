@@ -3,7 +3,7 @@
     <ul class="o-site-navigation-list">
       <template v-if="!loggedIn">
         <li>
-          <nuxt-link to="/login" class="o-site-navigation-link | font-sm font-bold">
+          <nuxt-link to="/login" class="o-site-navigation-link | body-sm font-bold">
             Log in
           </nuxt-link>
         </li>
