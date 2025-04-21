@@ -12,7 +12,7 @@
         <!-- Client only as this feature only works with JS anyway -->
         <button type="button" class="a-password-toggle" :aria-label="inputLabel" :aria-controls="passwordId"
           :aria-pressed="show" @click.prevent="toggleShowPassword">
-          <AtomsIcon aria-role="none" class="a-password-icon" :icon="inputIcon" />
+          <AtomsIcon role="none" class="a-password-icon" :icon="inputIcon" />
         </button>
       </client-only>
     </div>
