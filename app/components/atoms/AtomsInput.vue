@@ -1,6 +1,6 @@
 <template>
   <AtomsLabel :label>
-    <input v-bind="$attrs" :aria-describedby="errorId" class="| text-input" @blur="checkValidity" />
+    <input v-bind="$attrs" :aria-describedby="errorId" class="| text-input" @input="checkValidity" />
 
     <span v-if="errorText" :id="errorId" class="| text-input-error body-sm">
       {{ errorText }}
