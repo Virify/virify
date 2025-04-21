@@ -8,10 +8,27 @@
 }
 
 /**
+ *  Content dividers
+ */
+.divider {
+  margin: var(--size-24) 0;
+  border: 0;
+  border-top: var(--divider-100);
+}
+
+/**
  *  Content flow
  */
 .flow {
   --flow-gap: var(--size-16);
+}
+
+.flow-xs {
+  --flow-gap: var(--size-8);
+}
+
+.flow-sm {
+  --flow-gap: var(--size-12);
 }
 
 .flow-lg {

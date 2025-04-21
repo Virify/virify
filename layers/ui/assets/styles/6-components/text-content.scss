@@ -27,21 +27,21 @@
 .title-2xs {
   font-weight: var(--font-bold);
   font-size: var(--font-md);
-  line-height: var(--lineheight-md);
+  line-height: var(--lineheight-sm);
   margin-bottom: var(--size-8);
 }
 
 .title-xs {
   font-weight: var(--font-bold);
   font-size: var(--font-lg);
-  line-height: var(--lineheight-md);
+  line-height: var(--lineheight-sm);
   margin-bottom: var(--size-8);
 }
 
 .title-sm {
   font-weight: var(--font-bold);
   font-size: var(--font-xl);
-  line-height: var(--lineheight-md);
+  line-height: var(--lineheight-sm);
   margin-bottom: var(--size-8);
 }
 
@@ -71,4 +71,11 @@
   font-size: var(--font-5xl);
   line-height: var(--lineheight-sm);
   margin-bottom: var(--size-24);
+}
+
+/**
+ *  Text alignment
+ */
+.center-text {
+  text-align: center;
 }

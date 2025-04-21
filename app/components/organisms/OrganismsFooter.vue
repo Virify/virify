@@ -1,7 +1,7 @@
 <template>
   <footer class="o-footer">
     <div class="| container">
-      <p class="| font-sm">Copyright &copy; Virify Ltd {{ currentYear }}</p>
+      <p class="| body-sm">Copyright &copy; Virify Ltd {{ currentYear }}</p>
     </div>
   </footer>
 </template>
