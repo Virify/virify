@@ -6,7 +6,7 @@
 
     <div class="a-password" role="none">
       <input :id="passwordId" v-bind="$attrs" :type="inputType" class="a-password-input | text-input"
-        :aria-describedby="errorId" @blur="checkValidity" />
+        :aria-describedby="errorId" @input="checkValidity" />
 
       <client-only>
         <!-- Client only as this feature only works with JS anyway -->
