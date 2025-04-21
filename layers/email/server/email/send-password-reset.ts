@@ -1,5 +1,6 @@
 import { render } from "@vue-email/render";
 import PasswordReset from "../../components/email/templates/password-reset.vue";
+import type { OtpCode } from "~~/shared/utils/generate-otp-code";
 const config = useRuntimeConfig();
 
 /**
@@ -10,7 +11,7 @@ const config = useRuntimeConfig();
  * @returns A Promise that resolves when the email is sent.
  * @throws An error if there is an issue sending the email.
  */
-export default async function sendPasswordReset(email: string, passwordToken: string, otpCode: string) {
+export default async function sendPasswordReset(email: string, passwordToken: string, otpCode: OtpCode) {
   // Get the Vue email template
   const emailToSend = PasswordReset;
 

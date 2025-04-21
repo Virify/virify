@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
       return {
         message: "User activated successfully",
         user: user,
-        redirect: "/account?success=Account%20activated",
+        redirect: "/account",
       };
     }
     // password reset

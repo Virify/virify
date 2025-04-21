@@ -67,13 +67,8 @@ async function loginUser({ target }) {
       navigateTo("/account");
     })
     .catch((error) => {
-      if(error.data.message === "No password set") {
-        formErrorTitle.value = 'No password set'
-        formErrorContent.value = 'Your account has no password set. Please use the password reset to verify your email and set your password.'
-        return
-      } 
-      formErrorTitle.value = 'An error occurred'
-      formErrorContent.value = 'Sorry, we were unable to log you in - please check your details and try again'
+      formErrorTitle.value = 'Login failed'
+      formErrorContent.value = error.data.message
     })
     .finally(() => {
       formPending.value = false

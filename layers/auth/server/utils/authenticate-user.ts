@@ -10,11 +10,11 @@ export async function authenticateUser(email: string, password: string) {
   const user = await findOwner(email);
 
   if (!user) {
-    throw createError({ statusCode: 401, statusMessage: "Sorry, User not found." });
+    throw createError({ statusCode: 404, statusMessage: "User not found"});
   }
 
   if(!user.password) {
-    throw createError({ statusCode: 401, statusMessage: "No password set"})
+    throw createError({ statusCode: 403, statusMessage: "Login failed", message: "User has no password set" });
   }
 
   const passwordVerified = await verifyPassword(user.password as string, password);

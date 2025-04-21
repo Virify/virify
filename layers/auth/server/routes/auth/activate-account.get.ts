@@ -1,3 +1,4 @@
+import type { H3Event, EventHandlerRequest } from "h3";
 import * as z from "zod";
 
 const tokenSchema = z.string().min(1, "Token is required").max(100, "Token is too long");
@@ -9,6 +10,7 @@ const tokenSchema = z.string().min(1, "Token is required").max(100, "Token is to
  * @returns A standardized HTTP response.
  */
 export default defineEventHandler(async (event) => {
+  const { errorResponse } = useResponse();
   try {
     const { token } = getQuery(event);
     
@@ -21,8 +23,10 @@ export default defineEventHandler(async (event) => {
     await updateOwnerAndActivate(user.id);
     await loginUser(event, user, user.role);
 
-    return sendRedirect(event, "/account?success=Account%20activated");
+    return sendRedirect(event, "/account");
   } catch (error) {
-    return sendRedirect(event, "/login?error=Invalid%20or%20expired%20token");
+    const structuredError = errorResponse(error, event);
+    return sendRedirect(event, "/login?error=" + structuredError.statusCode);
   }
 });
+
