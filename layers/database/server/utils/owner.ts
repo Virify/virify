@@ -18,6 +18,19 @@ export async function findOwner(email: string): Promise<Owner | null> {
 }
 
 /**
+ * Find owner by ID
+ * @param id number
+ * @returns Owner
+ */
+export async function findOwnerById(id: number): Promise<Owner | null> {
+  return prisma.owner.findUnique({
+    where: {
+      id,
+    },
+  });
+}
+
+/**
  * Find the first owner
  * @returns The Owner
  */
@@ -87,6 +100,21 @@ export async function updateOwnerByToken(token: string, password: string) {
       password,
       passwordResetToken: null,
       passwordResetTokenExpiry: null,
+    },
+  });
+}
+
+/**
+ * Update the owners password based on ID
+ * @param id number
+ * @param password string
+ * @returns Owner
+ */
+export async function updateOwnerPasswordById(id: number, password: string) {
+  return prisma.owner.update({
+    where: { id },
+    data: {
+      password,
     },
   });
 }
