@@ -1,5 +1,5 @@
 <template>
-  <div class="o-dialog-view-signin">
+  <div class="o-dialog-view-signin | flow">
     <h1 class="| title-md">Sign in</h1>
 
     <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit</p>

@@ -80,8 +80,7 @@ function afterClosed() {
 }
 
 .o-dialog::backdrop {
-  background-color: fn.faded-color(60%, var(--monochrome-100));
-  backdrop-filter: blur(5px);
+  background-color: fn.faded-color(85%, var(--monochrome-300));
   animation: fadeDialogIn var(--animation-medium) var(--ease-out);
 }
 
@@ -123,8 +122,6 @@ function afterClosed() {
   margin: auto;
   width: fit-content;
   max-width: calc(100% - var(--size-32));
-  min-width: 80px;
-  min-height: 80px;
   box-sizing: border-box;
   border-radius: var(--size-12);
   animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);

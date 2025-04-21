@@ -1,6 +1,6 @@
 <template>
   <div class="w-full text-center">
-    <h1>Virify</h1>
+    <h1 class="| title-2xl">Virify</h1>
 
     <button @click.prevent="open" class="| button">Show dialog</button>
   </div>
