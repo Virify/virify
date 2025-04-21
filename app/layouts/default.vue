@@ -8,6 +8,8 @@
     </div>
 
     <OrganismsFooter />
+
+    <OrganismsDialog />
   </div>
 </template>
 
