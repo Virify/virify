@@ -1,0 +1,16 @@
+/**
+ *  Set default styling for lists
+ */
+ul,
+ol {
+  padding-inline: var(--size-14);
+  margin-inline: var(--size-10);
+}
+
+ul {
+  list-style: disc;
+}
+
+ol {
+  list-style: decimal;
+}
