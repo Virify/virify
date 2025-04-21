@@ -1,14 +1,14 @@
 import handleExistingUser from "./handle-existing-user";
-import sendActivation from "#layers/email/server/email/send-owner-activation";
+import sendActivation from "~~/layers/email/server/email/send-user-activation";
 
 /**
- * Handles the signup process for an owner.
+ * Handles the signup process for an user.
  * Validates existing users, updates tokens when needed, and sends activation emails.
- * @param email - The owner's email address.
+ * @param email - The user's email address.
  * @param token - The generated activation token.
  * @param otpCode - The generated OTP code.
  */
-export default async function handleOwnerSignup(email: string, token: string, otpCode: string) {
+export default async function handleUserSignup(email: string, token: string, otpCode: string) {
   try {
     const existingUser = await finduUserWithVerification(email);
 

@@ -7,7 +7,7 @@ const loginSchema = z.object({
 });
 
 /**
- * Handles the login request for owners.
+ * Handles the login request for users.
  * @param event - The H3 event object.
  * @returns A standardized HTTP response.
  */

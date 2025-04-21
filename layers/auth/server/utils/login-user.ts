@@ -2,7 +2,7 @@ import type { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
 
 /**
- * Handles the login process for owners and agents.
+ * Handles the login process for users and agents.
  * @param event - The H3 event object.
  * @param email - The email of the user attempting to log in.
  * @param password - The password of the user attempting to log in.

@@ -37,11 +37,11 @@ let testPassword: string;
 let otpCode: string;
 
 /**
- * Create a test owner and agent before all tests
+ * Create a test user and agent before all tests
  */
 beforeAll(async () => {
   // global tokens
-  userActivationToken = "owner-activation-token";
+  userActivationToken = "user-activation-token";
   resetToken = "reset-token";
   testPassword = "new-password";
   otpCode = "123456";
@@ -49,7 +49,7 @@ beforeAll(async () => {
   const { prisma } = await import("../server/utils/prisma-client");
   testUser = await prisma.user.create({
     data: {
-      email: "test-owner@example.com",
+      email: "test-user@example.com",
       passwordResetToken: resetToken,
       otpCode: otpCode,
       verification: {
@@ -75,31 +75,31 @@ afterAll(async () => {
 });
 
 /**
- * Test suite for owner functions
+ * Test suite for user functions
  */
-describe("owner functions", () => {
-  it("should find owner by email", async () => {
+describe("user functions", () => {
+  it("should find user by email", async () => {
     const found = await findUser(testUser.email);
     expect(found?.email).toBe(testUser.email);
   });
 
-  it("should find the first owner", async () => {
+  it("should find the first user", async () => {
     const found = await findFirstUser();
     expect(found).toBeDefined();
   });
 
-  it("should find owner with verification by email", async () => {
+  it("should find user with verification by email", async () => {
     const found = await finduUserWithVerification(testUser.email);
     expect(found?.email).toBe(testUser.email);
   });
 
-  it("should fail to find owner by activation token when no token is matched", async () => {
+  it("should fail to find user by activation token when no token is matched", async () => {
     const token = "test-token";
     const found = await findUserByActivationToken(token);
     expect(found).toBeNull();
   });
 
-  it("should find owner by activation token", async () => {
+  it("should find user by activation token", async () => {
     const found = await findUserByActivationToken(userActivationToken);
     expect(found?.verification?.activationToken).toBe(userActivationToken);
   });
@@ -109,37 +109,37 @@ describe("owner functions", () => {
     expect(found?.otpCode).toBe(otpCode);
   });
 
-  it("should fail to find owner by password reset token", async () => {
+  it("should fail to find user by password reset token", async () => {
     const token = "non-existent-token";
     const found = await findUserByPasswordToken(token);
     expect(found).toBeNull();
   });
 
-  it("Should find owner with active password reset token", async () => {
-    const updatedOwner = await findUserByPasswordToken(resetToken);
-    expect(updatedOwner?.email).toBe(testUser.email);
+  it("Should find user with active password reset token", async () => {
+    const updateduser = await findUserByPasswordToken(resetToken);
+    expect(updateduser?.email).toBe(testUser.email);
   });
 
-  it("should update owner's password by token", async () => {
-    const updatedOwner = await updateUserByToken(resetToken, testPassword);
-    expect(updatedOwner?.password).toBe(testPassword);
+  it("should update user's password by token", async () => {
+    const updateduser = await updateUserByToken(resetToken, testPassword);
+    expect(updateduser?.password).toBe(testPassword);
   });
 
-  it("should fail to find owner by token", async () => {
+  it("should fail to find user by token", async () => {
     const token = "no-match-token";
     const found = await findUserByToken(token);
     expect(found).toBeNull();
   });
 
-  it("should find owner by valid token", async () => {
+  it("should find user by valid token", async () => {
     const found = await findUserByToken(userActivationToken);
     expect(found?.email).toBe(testUser.email);
   });
 
 
-  it("should delete owner by ID", async () => {
+  it("should delete user by ID", async () => {
     const { prisma } = await import("../server/utils/prisma-client");
-    const testOwner = await prisma.user.create({
+    const testuser = await prisma.user.create({
       data: {
         email: "delete@example.com",
       },
@@ -148,15 +148,15 @@ describe("owner functions", () => {
     expect(deletedUser.id).toBe(testUser.id);
   });
 
-  it("should create owner with token", async () => {
-    const email = "new-owner@example.com";
+  it("should create user with token", async () => {
+    const email = "new-user@example.com";
     const token = "new-activation-token";
     const otpCode = "654321";
     const newUser = await createUserWithTokens(email, token, otpCode);
     expect(newUser.verification?.activationToken).toBe(token);
   });
 
-  it("should check if owner is active", () => {
+  it("should check if user is active", () => {
     const result = isActive(testUser);
     expect(result).toBe(false);
   });

@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { renderToString } from "vue/server-renderer";
 import { h } from "vue";
-import OwnerActivation from "../components/email/templates/user-activation.vue";
+import userActivation from "../components/email/templates/user-activation.vue";
 import passwordReset from "../components/email/templates/password-reset.vue";
 
-describe("Owner Activation Email Template", () => {
+describe("user Activation Email Template", () => {
   it("renders correct HTML with given props", async () => {
     const html = await renderToString(
-      h(OwnerActivation, {
+      h(userActivation, {
         token: "abc123",
         baseUrl: "https://example.com",
         otpCode: "123456",

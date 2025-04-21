@@ -6,7 +6,7 @@ import { H3Event } from "h3";
  * @param event H3Event
  * @param token string
  * @param otpCode string
- * @returns OwnerWithVerification
+ * @returns userWithVerification
  */
 export async function verifyActivationOtpCode(event: H3Event, token: string, otpCode: string) {
   const user = await findUserByActivationToken(token);
@@ -28,7 +28,7 @@ export async function verifyActivationOtpCode(event: H3Event, token: string, otp
  * 
  * @param passwordToken string
  * @param otpCode string
- * @returns OwnerWithVerification
+ * @returns userWithVerification
  */
 export async function verifyPasswordResetOtpCode(passwordToken: string, otpCode: string) {
   const user = await findUserByPasswordToken(passwordToken);
@@ -46,7 +46,7 @@ export async function verifyPasswordResetOtpCode(passwordToken: string, otpCode:
 /**
  * Valiadates the OTP code for a given user.
  * 
- * @param user OwnerWithVerification
+ * @param user userWithVerification
  * @param code string
  * @description Verifies the OTP code for a given user.
  * @returns Boolean

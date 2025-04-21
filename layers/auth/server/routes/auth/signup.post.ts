@@ -1,4 +1,5 @@
 import { z } from "zod";
+import handleUserSignup from "../../utils/handle-user-signup";
 
 const userSchema = z.object({
   email: z.string().email(),
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
     const otpCode = generateOtpCode();
 
     const { email } = userSchema.parse(requestBody);
-    const user = await handleOwnerSignup(email, token, otpCode);
+    const user = await handleUserSignup(email, token, otpCode);
     return {
       userID: user.id,
       email: user.email,
