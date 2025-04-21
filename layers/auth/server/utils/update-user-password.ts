@@ -1,5 +1,6 @@
 import type { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
+import { findUserById, findUserByPasswordToken, updateUserPasswordById } from "~~/layers/database/server/utils/user";
 /**
  * Updates or creates a new password for the user using the password token.
  *
@@ -9,7 +10,7 @@ import { H3Event } from "h3";
  */
 export async function updatePasswordByToken(passwordToken: string, password: string) {
   try {
-    const user = await findOwnerByPasswordToken(passwordToken);
+    const user = await findUserByPasswordToken(passwordToken);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
 
@@ -18,7 +19,7 @@ export async function updatePasswordByToken(passwordToken: string, password: str
     if (verifiedPassword) throw createError({ statusCode: 400, statusMessage: "New password cannot be the same as the old password" });
 
     const hashedPassword = await hashPassword(password);
-    await updateOwnerPasswordById(user.id, hashedPassword);
+    await updateUserPasswordById(user.id, hashedPassword);
 
     return {
       message: "Password updated successfully",
@@ -44,7 +45,7 @@ export async function updatePasswordBySession(event: H3Event, password: string) 
 
   if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
 
-  const user = await findOwnerById(userId);
+  const user = await findUserById(userId);
 
   if (!user) throw createError({ statusCode: 404, statusMessage: "User not found" });
 
@@ -54,7 +55,7 @@ export async function updatePasswordBySession(event: H3Event, password: string) 
   if (verifiedPassword) throw createError({ statusCode: 400, statusMessage: "New password cannot be the same as the old password" });
 
   const hashedPassword = await hashPassword(password);
-  await updateOwnerPasswordById(userId, hashedPassword);
+  await updateUserPasswordById(userId, hashedPassword);
 
   return {
     message: "Password updated successfully",

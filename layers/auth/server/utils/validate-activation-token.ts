@@ -1,4 +1,4 @@
-import type { OwnerWithVerification } from "#layers/database/server/utils/owner";
+import type { UserWithVerification } from "~~/layers/database/server/utils/user";
 
 /**
  * Validate the activation token and check if it is expired.
@@ -12,7 +12,7 @@ import type { OwnerWithVerification } from "#layers/database/server/utils/owner"
  * @param token - The activation token provided by the user.
  * @throws Will throw an error if the token is missing, does not match, or has expired.
  */
-export default function validateActivationToken(user: OwnerWithVerification, token?: string) {
+export default function validateActivationToken(user: UserWithVerification, token?: string) {
   const now = new Date();
 
   if (shouldRejectSignup(user)) {

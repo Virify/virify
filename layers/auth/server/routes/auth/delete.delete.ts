@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const ownerId = session.user.id;
-    const deleted = await deleteOwner(ownerId);
+    const deleted = await deleteUser(ownerId);
 
     if (!deleted) throw createError({ statusCode: 400, statusMessage: "Failed to delete user. User may not exist" });
 

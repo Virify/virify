@@ -17,7 +17,8 @@ model Property {
   kitchens               Int                    @default(1)
   livingRooms            Int                    @default(1)
   diningRooms            Int                    @default(1)
-  ownerId                Int?
+  userId                 Int?
+  agentId                Int?
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
   additionalFeatures     AdditionalFeatures?
@@ -32,13 +33,16 @@ model Property {
   outdoorSpace           OutdoorSpace?
   parking                Parking?
   address                Address?               @relation(fields: [addressId], references: [id])
-  owner                  Owner?                 @relation(fields: [ownerId], references: [id])
+  user                   User?                  @relation(fields: [userId], references: [id])
   runningCosts           RunningCosts?
   securityFeatures       Security?
   storageFeatures        Storage?
   agents                 Agent[]                @relation("AgentToProperty")
+  EstateAgent            EstateAgent?           @relation(fields: [estateAgentId], references: [id])
+  estateAgentId          Int?
 
-  @@index([ownerId])
+  @@index([userId])
+  @@index([agentId])
 }
 
 enum PropertyType {

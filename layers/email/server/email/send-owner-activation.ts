@@ -1,5 +1,5 @@
 import { render } from "@vue-email/render";
-import OwnerActivation from "../../components/email/templates/owner-activation.vue";
+import OwnerActivation from "../../components/email/templates/user-activation.vue";
 const config = useRuntimeConfig();
 
 /**

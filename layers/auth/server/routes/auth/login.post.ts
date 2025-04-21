@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   try {
     const { email, password } = await readValidatedBody(event, loginSchema.parse);
     const user = await authenticateUser(email, password);
-    await loginUser(event, user, user.role);
+    await loginUser(event, user);
 
     return {
       user

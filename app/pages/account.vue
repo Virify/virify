@@ -98,7 +98,6 @@ async function logout() {
         <p class="mb-6">Logged in since {{ session?.loggedInAt }}</p>
         <p class="mb-6">User ID: {{ user?.id }}</p>
         <p class="mb-6">User Email: {{ user?.email }}</p>
-        <p class="mb-6">User Email: {{ user?.role }}</p>
 
         <!-- UI Form -->
         <UForm @submit="setPassword" :state="state" :schema="passwordSchema" class="w-full mb-6">

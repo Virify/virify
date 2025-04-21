@@ -1,4 +1,3 @@
-import { createOwnerWithTokens, findOwnerWithVerification } from "#layers/database/server/utils/owner";
 import handleExistingUser from "./handle-existing-user";
 import sendActivation from "#layers/email/server/email/send-owner-activation";
 
@@ -11,7 +10,7 @@ import sendActivation from "#layers/email/server/email/send-owner-activation";
  */
 export default async function handleOwnerSignup(email: string, token: string, otpCode: string) {
   try {
-    const existingUser = await findOwnerWithVerification(email);
+    const existingUser = await finduUserWithVerification(email);
 
     if (existingUser) {
       return await handleExistingUser(existingUser, token, otpCode);
@@ -19,7 +18,7 @@ export default async function handleOwnerSignup(email: string, token: string, ot
 
     await sendActivation(email, token, otpCode);
 
-    return await createOwnerWithTokens(email, token, otpCode);
+    return await createUserWithTokens(email, token, otpCode);
   } catch (error) {
     throw error;
   }

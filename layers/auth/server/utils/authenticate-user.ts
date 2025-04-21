@@ -7,7 +7,7 @@
  * @returns A User.
  */
 export async function authenticateUser(email: string, password: string) {
-  const user = await findOwner(email);
+  const user = await findUser(email);
 
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: "Sorry, User not found." });

@@ -6,7 +6,7 @@ import sendActivation from "#layers/email/server/email/send-owner-activation";
  * @param token - The new activation token.
  * @param otpCode - The new OTP code.
  */
-export default async function handleExistingUser(user: OwnerWithVerification, token: string, otpCode: string): Promise<OwnerWithVerification> {
+export default async function handleExistingUser(user: UserWithVerification, token: string, otpCode: string): Promise<UserWithVerification> {
   try {
     const now = new Date();
 
@@ -23,7 +23,7 @@ export default async function handleExistingUser(user: OwnerWithVerification, to
 
     // Resend activation if either token or OTP is expired
     await sendActivation(user.email, token, otpCode);
-    await updateOwnerTokens(user.email, token, otpCode);
+    await updateUserTokens(user.email, token, otpCode);
 
     return user;
   } catch (error) {

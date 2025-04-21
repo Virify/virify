@@ -13,13 +13,13 @@ export default defineEventHandler(async (event) => {
     const { token } = getQuery(event);
     
     tokenSchema.parse(token);
-    const user = await findOwnerByActivationToken(token as string);
+    const user = await findUserByActivationToken(token as string);
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
 
     validateActivationToken(user, token as string);
-    await updateOwnerAndActivate(user.id);
-    await loginUser(event, user, user.role);
+    await updateuUserAndActivate(user.id);
+    await loginUser(event, user);
 
     return sendRedirect(event, "/account?success=Account%20activated");
   } catch (error) {
