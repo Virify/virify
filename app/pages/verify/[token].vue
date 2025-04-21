@@ -25,6 +25,7 @@ async function verify(event: FormSubmitEvent<any>) {
     console.log(user);
     // need to fetch the auth session on the client side
     await fetch()
+    // TODO Make this route dynamic for password reset
     navigateTo("/account");
   } catch (error) {
     console.log(error);

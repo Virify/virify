@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// TODO: This needs a redo to immplelment OTP and remove middleware
 definePageMeta({
   // TODO: Error handing for middleware
   middleware: ["check-password-token"],

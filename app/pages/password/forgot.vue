@@ -37,7 +37,7 @@ async function submit() {
   <div class="flex justify-center items-center w-full">
     <div class="w-full sm:w-lg p-8">
       <h1 class="text-3xl font-bold mb-6">Password Reset</h1>
-      <p class="text-md mb-4">If you have an account with us we will send you an email to reset your password</p>
+      <p class="text-md mb-4">If you have an account with us, we will send you a one time code to verify your email before creating a new password!</p>
       <!-- UI Form -->
       <UForm @submit="submit" :state="state" :schema="emailSchema" class="w-full">
         <!-- email input -->
