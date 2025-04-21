@@ -1,38 +1,45 @@
 import * as z from "zod";
+import { updateOwnerPasswordToken } from "~~/layers/database/server/utils/owner";
+import sendPasswordReset from "~~/layers/email/server/email/send-password-reset";
+import validatePasswordToken from "../../utils/validate-password-token";
 
 const passwordSchema = z.object({
-  password: z.string().min(8),
-  token: z.string(),
+  email: z.string().email("Invalid email address"),
 });
 
 export default defineEventHandler(async (event) => {
-  const { successResponse, errorResponse } = useResponse();
+  const { errorResponse } = useResponse();
+
   try {
-    const { password, token } = await readValidatedBody(event, passwordSchema.parse);
-    const tokenUser = await findOwnerByPasswordToken(token);
+    const { email } = await readValidatedBody(event, passwordSchema.parse);
+    const existingUser = await findOwner(email);
 
-    verifyToken(tokenUser);
-    
-    const hashedPassword = await hashPassword(password);
-    await updateOwnerByToken(token, hashedPassword);
+    // Check if the user already has a valid password reset token
+    if (existingUser && validatePasswordToken(existingUser)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Valid password reset email already sent",
+      });
+    }
 
-    return successResponse("Password updated successfully");
+    const passwordToken = await generateToken();
+    const otpCode = await generateOtpCode();
+
+    const updatedUser = await updateOwnerPasswordToken(email, passwordToken, otpCode);
+
+    if (!updatedUser) {
+      throw createError({ statusCode: 404, statusMessage: "User not found" });
+    }
+
+    await sendPasswordReset(email, passwordToken, otpCode);
+
+    return {
+      userID: updatedUser.id,
+      email: updatedUser.email,
+      passwordToken,
+      otpCode,
+    };
   } catch (error) {
     return errorResponse(error, event);
   }
 });
-
-/**
- * Validates the owner and token
- * @param owner Owner
- * @throws {Error} If the token is invalid or expired
- */
-function verifyToken(owner: Owner | null) {
-  // check if the token OR user exists
-  if (!owner) throw createError({ statusCode: 400, statusMessage: "Invalid token or user" });
-
-  // check the token expiration
-  if (owner.passwordResetToken && new Date(owner.passwordResetToken) < new Date()) {
-    throw createError({ statusCode: 400, statusMessage: "Activation token expired, try signing up again" });
-  }
-}

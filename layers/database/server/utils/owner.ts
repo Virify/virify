@@ -77,14 +77,16 @@ export async function findOwnerByActivationToken(token: string): Promise<OwnerWi
  * @param token string
  * @returns Owner
  */
-export async function findOwnerByPasswordToken(token: string): Promise<Owner | null> {
+export async function findOwnerByPasswordToken(token: string): Promise<OwnerWithVerification | null> {
   return prisma.owner.findUnique({
     where: {
       passwordResetToken: token,
     },
+    include: {
+      verification: true,
+    }
   });
 }
-
 /**
  * Update the owners password based on the token *which has been verified*.
  * @param token string
@@ -115,6 +117,8 @@ export async function updateOwnerPasswordById(id: number, password: string) {
     where: { id },
     data: {
       password,
+      passwordResetToken: null,
+      passwordResetTokenExpiry: null,
     },
   });
 }
@@ -124,12 +128,21 @@ export async function updateOwnerPasswordById(id: number, password: string) {
  * @param email - The email of the owner to find.
  * @returns The owner object if found, otherwise null.
  */
-export async function updateOwnerByEmailPasswordReset(email: string, token: string) {
+export async function updateOwnerPasswordToken(email: string, token: string, otpCode: string): Promise<OwnerWithVerification | null> {
   return prisma.owner.update({
     where: { email },
     data: {
+      verification: {
+        update: {
+          otpCode,
+          otpCodeExpiry: new Date(Date.now() + 3600000),
+        },
+      },
       passwordResetToken: token,
       passwordResetTokenExpiry: new Date(Date.now() + 3600000),
+    },
+    include: {
+      verification: true,
     },
   });
 }

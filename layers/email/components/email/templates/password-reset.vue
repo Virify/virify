@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Html, Text, Button, Container, Section, Heading } from "@vue-email/components";
-defineProps<{ token: string, baseUrl: string }>();
+defineProps<{ passwordToken: string, baseUrl: string, otpCode: string }>();
 </script>
 
 <template>
@@ -11,7 +11,11 @@ defineProps<{ token: string, baseUrl: string }>();
         <Text style="color: #4a5568; font-size: 16px; margin-bottom: 20px;">
           So you have forgtotten your password? No problem! Please click the button below to reset your password:
         </Text>
-        <Button :href="baseUrl + `/password/reset/` + token" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+        <Heading style="color: #22c55e; font-size: 24px; margin-bottom: 20px;">{{ otpCode }}</Heading>
+        <Text style="color: #4a5568; font-size: 16px; margin-bottom: 20px;">
+          Alternatively, you can activate your account by clicking the button below.
+        </Text>
+        <Button :href="baseUrl + `/auth/password-reset?passwordToken=` + passwordToken" style="background-color: #22c55e; color: #ffffff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
           Reset Password
         </Button>
         <Text style="color: #4a5568; font-size: 14px; margin-top: 20px;">

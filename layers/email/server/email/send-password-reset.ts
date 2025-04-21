@@ -6,17 +6,18 @@ const config = useRuntimeConfig();
  * Sends a password reset email to the user.
  *
  * @param email - The recipient's email address.
- * @param token - The activation token.
+ * @param passwordToken - The activation token.
  * @returns A Promise that resolves when the email is sent.
  * @throws An error if there is an issue sending the email.
  */
-export default async function sendPasswordReset(email: string, token: string) {
+export default async function sendPasswordReset(email: string, passwordToken: string, otpCode: string) {
   // Get the Vue email template
   const emailToSend = PasswordReset;
 
   // Render the email to HTML
   const emailHtml = await render(emailToSend, {
-    token,
+    passwordToken,
+    otpCode,
     baseUrl: config.public.EMAIL_BASE_URL,
   });
 

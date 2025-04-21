@@ -13,13 +13,18 @@ const state = reactive({
   otpCode: "",
 });
 
+/**
+ * We need need to send the token OR passwordToken to the server
+ * Any other routes or tokens required for OtP verification should be added here
+ */
 async function verify(event: FormSubmitEvent<any>) {
   try {
     const response = await $fetch("/auth/verify-otp", {
       method: "POST",
       body: {
         otpCode: state.otpCode,
-        token: route.params.token,
+        token: route.query.token,
+        passwordToken: route.query.passwordToken,
       },
     });
     console.log(response.user);

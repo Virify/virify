@@ -134,9 +134,9 @@ async function signup(event: FormSubmitEvent<any>) {
         ...state,
       },
     });
-    // redirect to login page
     console.log(user);
-    navigateTo("/verify/" + user.token);
+    // redirect to OTP Verification for activation
+    navigateTo("/verify?token=" + user.token);
   } catch (error) {
     showToast({
       title: (error as { data: { message: string } }).data.message,

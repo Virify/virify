@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
+
+interface SignupResponse {
+  userID: string;
+  email: string;
+  passwordToken: string;
+  otpCode: string;
+}
+
 const { showToast } = useToastNotification();
 
 const emailSchema = z.object({
@@ -12,25 +21,29 @@ const state = reactive<Partial<Schema>>({
   email: "",
 });
 
-async function submit() {
-  await $fetch("/auth/email-password-reset", {
-    method: "POST",
-    body: {
-      email: state.email,
-    },
-  })
-    .then(() => {
-      showToast({
-        title: "Check your inbox for the password reset link",
-        icon: "ri:check-line",
-      });
-    })
-    .catch((error) => {
-      showToast({
-        title: error.data.message,
-        icon: "ri:error-warning-line",
-      });
+/**
+ * Signup function
+ *
+ * The users role is set here on user creation.
+ * This is an important step determining if the user is an agent or a normal user and has knock on effects.
+ */
+async function reset(event: FormSubmitEvent<any>) {
+  try {
+    const user = await $fetch<SignupResponse>("/auth/password-reset", {
+      method: "POST",
+      body: {
+        ...state,
+      },
     });
+    console.log(user);
+    // redirect to OTP verification for password reset
+    navigateTo("/verify?passwordToken=" + user.passwordToken);
+  } catch (error) {
+    showToast({
+      title: (error as { data: { message: string } }).data.message,
+      icon: "ri:error-warning-line",
+    });
+  }
 }
 </script>
 <template>
@@ -39,7 +52,7 @@ async function submit() {
       <h1 class="text-3xl font-bold mb-6">Password Reset</h1>
       <p class="text-md mb-4">If you have an account with us, we will send you a one time code to verify your email before creating a new password!</p>
       <!-- UI Form -->
-      <UForm @submit="submit" :state="state" :schema="emailSchema" class="w-full">
+      <UForm @submit="reset" :state="state" :schema="emailSchema" class="w-full">
         <!-- email input -->
         <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2">
           <UInput v-model="state.email" type="email" placeholder="Enter your email" size="xl" class="w-full" autocomplete="on" />

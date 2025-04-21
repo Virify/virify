@@ -1,14 +1,8 @@
 <script setup lang="ts">
-// TODO: This needs a redo to immplelment OTP and remove middleware
-definePageMeta({
-  // TODO: Error handing for middleware
-  middleware: ["check-password-token"],
-});
-
 import * as z from "zod";
 const { showToast } = useToastNotification();
 const route = useRoute();
-const token = route.params.token;
+const token = route.query.passwordToken;
 
 // schema specifying the token
 const tokenSchema = z.string().min(1, "Token is required");
@@ -45,11 +39,12 @@ const state = reactive<Partial<Schema>>({
 async function submit() {
   // validate the token
   const validToken = tokenSchema.parse(token);
-  await $fetch("/auth/password-reset", {
+  console.log(validToken);
+  await $fetch("/auth/update-password", {
     method: "POST",
     body: {
       password: state.password,
-      token: validToken,
+      passwordToken: validToken,
     },
   })
     .then(() => {

@@ -36,6 +36,7 @@ export default defineEventHandler(async (event) => {
     if (role) {
       const agentFormData = agentSchema.parse(requestBody);
       const agent = await handleAgentSignup(agentFormData, token, otpCode);
+      // I don't actually think this works? Seeing as they can get then token from the client side?
       return {
         userID: agent.id,
         email: agent.email,
