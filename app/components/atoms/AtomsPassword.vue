@@ -25,6 +25,13 @@
 
 <script setup>
 /**
+ *  Prevent attributes being added to fieldset
+ */
+defineOptions({
+  inheritAttrs: false
+})
+
+/**
  *  Apply the appropriate settings for password inputs
  */
 const props = defineProps({
