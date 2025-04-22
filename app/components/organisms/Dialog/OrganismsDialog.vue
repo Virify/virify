@@ -53,6 +53,11 @@ function afterClosed() {
   // Clean up any existing state
   hideDialog()
 }
+
+/**
+ *  Close modal on route change
+ */
+watch(useRoute(), close)
 </script>
 
 <style lang="scss">
