@@ -18,14 +18,14 @@
 const emits = defineEmits(['form-success', 'form-error', 'form-clear-error'])
 
 /**
- *  Form state
- */
-const { isPending, setPendingWhile } = usePending()
-
-/**
  *  For password inputs
  */
 const { pattern, validityText } = getValidPassword()
+
+/**
+ *  Form state
+ */
+const { isPending, setPendingWhile } = usePending()
 
 /**
  *  Validate form and submit
@@ -38,20 +38,12 @@ async function loginUser({ target }) {
     emits('form-clear-error')
 
     // First check the validity of the form
-    const { validity, errors } = useFormValidationMessage(target)
+    const { formData, errors } = useFormData(target)
 
     // If errors exist, show them
-    if (!validity) {
-      emits('form-error', {
-        title: "Your form contains errors - please ensure all fields are correctly filled out",
-        message: errors
-      })
-
-      return
+    if (errors) {
+      return emits('form-error', errors)
     }
-
-    // Construct a form object
-    const formData = new FormData(target)
 
     // Post data
     await $fetch("/auth/login", {
@@ -67,7 +59,7 @@ async function loginUser({ target }) {
       .catch((error) => {
         emits('form-error', {
           title: 'Login failed',
-          message: error.data.message
+          content: error.data.message
         })
       })
   })
