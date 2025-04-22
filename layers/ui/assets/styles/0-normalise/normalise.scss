@@ -32,7 +32,7 @@ main {
  * Correct the font size and margin on `h1` elements within `section` and
  * `article` contexts in Chrome, Firefox, and Safari.
  */
-h1 {
+:where(h1) {
   font-size: 2em;
   margin: 0.67em 0;
 }
@@ -148,11 +148,11 @@ img {
  * 1. Change the font styles in all browsers.
  * 2. Remove the margin in Firefox and Safari.
  */
-button,
-input,
-optgroup,
-select,
-textarea {
+:where(button,
+  input,
+  optgroup,
+  select,
+  textarea) {
   font-family: inherit;
   /* 1 */
   font-size: 100%;
@@ -217,7 +217,7 @@ button:-moz-focusring,
 /**
  * Correct the padding in Firefox.
  */
-fieldset {
+:where(fieldset) {
   padding: 0.35em 0.75em 0.625em;
 }
 
@@ -227,7 +227,7 @@ fieldset {
  * 3. Remove the padding so developers are not caught out when they zero out
  *    `fieldset` elements in all browsers.
  */
-legend {
+:where(legend) {
   box-sizing: border-box;
   /* 1 */
   color: inherit;
@@ -260,8 +260,7 @@ textarea {
  * 1. Add the correct box sizing in IE 10.
  * 2. Remove the padding in IE 10.
  */
-[type="checkbox"],
-[type="radio"] {
+:where([type="checkbox"], [type="radio"]) {
   box-sizing: border-box;
   /* 1 */
   padding: 0;

@@ -17,7 +17,7 @@
   color: var(--monochrome-100);
   padding: var(--size-10) var(--size-18);
   border-radius: var(--size-32);
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color var(--animation-fast), color var(--animation-fast);
   box-sizing: border-box;
 
   &:hover {
@@ -86,7 +86,7 @@
     border: var(--size-2) solid fn.faded-color(30%);
     background: transparent;
     color: currentColor;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition: background-color var(--animation-fast), border-color var(--animation-fast);
 
     &:hover {
       background: fn.faded-color(8%);

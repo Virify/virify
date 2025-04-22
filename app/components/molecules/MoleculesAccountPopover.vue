@@ -85,7 +85,7 @@ const $button = useTemplateRef('button')
   text-decoration: none;
   border-radius: var(--size-8);
   background: transparent;
-  transition: background-color 0.15s;
+  transition: background-color var(--animation-fast);
 
   &:hover {
     background: var(--background-100);
@@ -103,6 +103,6 @@ const $button = useTemplateRef('button')
 }
 
 [popover]:popover-open {
-  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  transition: opacity var(--animation-fast) ease-out, transform var(--animation-fast) ease-out;
 }
 </style>
