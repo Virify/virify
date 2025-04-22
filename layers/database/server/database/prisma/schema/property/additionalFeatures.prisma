@@ -1,0 +1,13 @@
+model AdditionalFeatures {
+  id          Int      @id @default(autoincrement())
+  petFriendly Boolean  @default(true)
+  moveInDate  DateTime
+  homeOffice  Boolean  @default(false)
+  pool        Boolean  @default(false)
+  propertyId  Int      @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  property    Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}

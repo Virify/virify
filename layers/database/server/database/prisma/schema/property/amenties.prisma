@@ -1,0 +1,41 @@
+model Amenities {
+  id          Int             @id @default(autoincrement())
+  type        AmenityType
+  subtype     AmenitySubtype?
+  name        String
+  distanceM   Float
+  description String?
+  // I could use adress here - but I think it is better to use location
+  location    Json?
+  propertyId  Int
+  createdAt   DateTime        @default(now())
+  property Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}
+
+enum AmenityType {
+  TRANSPORT
+  EDUCATION
+  HEALTHCARE
+  SHOPPING_ENTERTAINMENT
+  GREEN_SPACE
+}
+
+enum AmenitySubtype {
+  TRAIN_STATION
+  BUS_STOP
+  MOTORWAY_ACCESS
+  SCHOOL
+  UNIVERSITY
+  HOSPITAL
+  MEDICAL_CENTRE
+  SHOP
+  RESTAURANT
+  CINEMA
+  GYM
+  PARK
+  TRAIL
+  PLAYGROUND
+  OTHER
+}

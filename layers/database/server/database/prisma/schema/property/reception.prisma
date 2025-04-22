@@ -1,0 +1,21 @@
+model Reception {
+  id          Int            @id @default(autoincrement())
+  roomNumber  Int
+  description String
+  size        Float?
+  openPlan    Boolean        @default(false)
+  fireplace   FireplaceType?
+  gamesRoom   Boolean        @default(false)
+  homeCinema  Boolean        @default(false)
+  propertyId  Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  property Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}
+
+enum FireplaceType {
+  LOG_BURNER
+  OPEN_FIRE
+}

@@ -1,13 +1,13 @@
-model Amenities {
+model AdditionalToilet {
   id             Int      @id @default(autoincrement())
-  transportLinks String?
-  schools        String?
-  hospitals      String?
-  shopping       String?
-  greenSpaces    String?
+  downstairs     Boolean  @default(false)
+  upstairs       Boolean  @default(false)
+  guestCloakroom Boolean  @default(false)
   description    String?
   propertyId     Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   property       Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
 }

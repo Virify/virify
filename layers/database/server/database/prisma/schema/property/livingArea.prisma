@@ -1,0 +1,14 @@
+model LivingArea {
+  id          Int            @id @default(autoincrement())
+  roomNumber  Int
+  fireplace   FireplaceType? // reference to the enum defined in reception.prisma
+  balcony     Boolean        @default(false)
+  description String
+  size        Float?
+  propertyId  Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  property    Property       @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}

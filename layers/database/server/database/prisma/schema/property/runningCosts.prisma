@@ -1,16 +1,12 @@
-model OutdoorSpace {
+model RunningCosts {
   id             Int      @id @default(autoincrement())
-  land           Boolean
-  landSize       Float?
-  garden         Boolean
-  gardenSize     Float?
-  terrace        Boolean
-  balcony        Boolean
-  patio          Boolean
-  separateParcel Boolean
-  description    String
+  councilTaxBand String
+  serviceCharges Float?
+  groundRent     Float?
   propertyId     Int      @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   property       Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
 }

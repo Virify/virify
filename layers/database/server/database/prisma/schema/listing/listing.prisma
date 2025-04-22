@@ -15,10 +15,11 @@ model Listing {
   property           Property?          @relation(fields: [propertyId], references: [id])
   listingCosts       ListingCosts?
   agents             Agent[]            @relation("AgentToListing")
-  EstateAgent        EstateAgent?       @relation(fields: [estateAgentId], references: [id])
+  estateAgent        EstateAgent?       @relation(fields: [estateAgentId], references: [id])
   estateAgentId      Int?
 
   @@index([userId])
+  @@index([propertyId])
 }
 
 enum ListingType {

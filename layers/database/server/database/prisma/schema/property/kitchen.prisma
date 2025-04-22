@@ -1,0 +1,18 @@
+model Kitchen {
+  id                 Int      @id @default(autoincrement())
+  modern             Boolean  @default(true)
+  openPlan           Boolean  @default(false)
+  appliancesIncluded Boolean  @default(true)
+  description        String
+  size               Float?
+  breakfastBar       Boolean  @default(false)
+  island             Boolean  @default(false)
+  utilityAccess      Boolean  @default(false)
+  pantry             Boolean  @default(true)
+  propertyId         Int      @unique
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  property           Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}

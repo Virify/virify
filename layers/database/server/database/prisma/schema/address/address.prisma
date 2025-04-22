@@ -13,12 +13,13 @@ model Address {
   // geolocation fields
   location    Unsupported("geometry")?
   property    Property?
-  EstateAgent EstateAgent[]
-  User        User[]
+  estateAgent EstateAgent[]
+  user        User[]
 
   @@unique([street, city, postcode, country])
   @@index([location], map: "address_location_idx", type: Gist)
   @@index([postcode], map: "address_postcode_idx")
   @@index([city], map: "address_city_idx")
   @@index([street], map: "address_street_idx")
+  @@index([propertyId])
 }

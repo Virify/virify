@@ -1,0 +1,15 @@
+model Storage {
+  id               Int      @id @default(autoincrement())
+  attic            Boolean  @default(false)
+  basement         Boolean  @default(false)
+  separateDressing Boolean  @default(false)
+  underStairs      Boolean  @default(false)
+  pantry           Boolean  @default(false)
+  description      String?
+  propertyId       Int      @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  property         Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}
