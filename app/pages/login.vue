@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { showToast } = useToastNotification();
 const { fetch } = useUserSession();
 
 /**
@@ -31,13 +30,7 @@ function formError(error) {
  *  Success
  */
 function formSuccess() {
-  showToast({
-    title: "Login successful",
-    icon: "ri:check-line",
-  });
-  // we have set the userSession in the backend, we need the client to fetch the user session
   fetch();
-  // redirect to account page
   navigateTo("/account");
 }
 </script>
