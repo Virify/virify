@@ -9,7 +9,7 @@ model Amenities {
   location    Json?
   propertyId  Int
   createdAt   DateTime        @default(now())
-  property Property @relation(fields: [propertyId], references: [id])
+  property    Property        @relation(fields: [propertyId], references: [id])
 
   @@index([propertyId])
 }

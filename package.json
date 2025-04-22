@@ -12,7 +12,7 @@
     "db-push": "prisma db push"
   },
   "prisma": {
-    "schema": "./layers/database/server/database/prisma/schema/"
+    "schema": "./layers/database/server/database/prisma/"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.787.0",
