@@ -7,13 +7,13 @@
 </template>
 
 <script setup>
-import { OrganismsDialogViewSignIn } from '#components'
+import { OrganismsDialogViewLogin } from '#components'
 
 const { showDialog } = useDialog()
 
 function open() {
   showDialog({
-    component: OrganismsDialogViewSignIn,
+    component: OrganismsDialogViewLogin,
     onClose: ({ returnValue }) => {
       console.log('Closed with value', returnValue)
     }
