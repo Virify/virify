@@ -38,6 +38,9 @@ async function resetPassword({ target }) {
     return
   }
 
+  // Set pending state
+  formPending.value = true
+
   // Construct a form object
   const formData = new FormData(target)
 
@@ -57,6 +60,9 @@ async function resetPassword({ target }) {
     formErrorTitle.value = 'An error occured'
     formErrorContent.value = error?.data?.message
   }
+
+  // Clear pending state
+  formPending.value = false
 }
 </script>
 <template>
