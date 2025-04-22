@@ -1,5 +1,5 @@
 <template>
-  <form ref="form">
+  <form ref="$form">
     <slot></slot>
   </form>
 </template>
@@ -8,7 +8,7 @@
 /**
  *  Form setup
  */
-const $form = useTemplateRef('form')
+const $form = useTemplateRef('$form')
 
 onMounted(() => {
   unref($form).setAttribute('novalidate', true)

@@ -92,7 +92,7 @@ function toggleShowPassword() {
   align-items: center;
   justify-content: center;
   aspect-ratio: 1;
-  transition: opacity 0.15s;
+  transition: opacity var(--animation-fast);
 }
 
 .a-password-icon {

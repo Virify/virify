@@ -1,25 +1,18 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui";
-import * as z from "zod";
-
-interface SignupResponse {
-  userID: string;
-  email: string;
-  passwordToken: string;
-  otpCode: string;
-}
-
 const { showToast } = useToastNotification();
 
-const emailSchema = z.object({
-  email: z.string().email("Invalid email address").nonempty("Email is required"),
-});
+/**
+ *  Form state
+ */
+const formPending = ref(false)
 
-type Schema = z.output<typeof emailSchema>;
+/**
+ *  Form errors
+ */
+const { query } = useRoute()
 
-const state = reactive<Partial<Schema>>({
-  email: "",
-});
+const formErrorTitle = ref(false)
+const formErrorContent = ref(false)
 
 /**
  * Signup function
@@ -27,41 +20,82 @@ const state = reactive<Partial<Schema>>({
  * The users role is set here on user creation.
  * This is an important step determining if the user is an agent or a normal user and has knock on effects.
  */
-async function reset(event: FormSubmitEvent<any>) {
+async function resetPassword({ target }) {
+  if (formPending.value) return
+
+  // Clear any existing form errors
+  formErrorTitle.value = null
+  formErrorContent.value = null
+
+  // First check the validity of the form
+  const { validity, errors } = useFormValidationMessage(target)
+
+  // If errors exist, show them
+  if (!validity) {
+    formErrorTitle.value = "Your form contains errors - please ensure all fields are correctly filled out"
+    formErrorContent.value = errors
+
+    return
+  }
+
+  // Set pending state
+  formPending.value = true
+
+  // Construct a form object
+  const formData = new FormData(target)
+
   try {
     const user = await $fetch<SignupResponse>("/auth/password-reset", {
       method: "POST",
       body: {
-        ...state,
+        email: formData.get('email'),
       },
     });
+
     console.log(user);
+
     // redirect to OTP verification for password reset
     navigateTo("/verify?passwordToken=" + user.passwordToken);
   } catch (error) {
-    showToast({
-      title: (error as { data: { message: string } }).data.message,
-      icon: "ri:error-warning-line",
-    });
+    formErrorTitle.value = 'An error occured'
+    formErrorContent.value = error?.data?.message
   }
+
+  // Clear pending state
+  formPending.value = false
 }
 </script>
 <template>
-  <div class="flex justify-center items-center w-full">
-    <div class="w-full sm:w-lg p-8">
-      <h1 class="text-3xl font-bold mb-6">Password Reset</h1>
-      <p class="text-md mb-4">If you have an account with us, we will send you a one time code to verify your email before creating a new password!</p>
-      <!-- UI Form -->
-      <UForm @submit="reset" :state="state" :schema="emailSchema" class="w-full">
-        <!-- email input -->
-        <UFormField label="Email" name="email" size="xl" hint="Required" class="py-2">
-          <UInput v-model="state.email" type="email" placeholder="Enter your email" size="xl" class="w-full" autocomplete="on" />
-        </UFormField>
-        <div class="flex justify-between items-base mt-4">
-          <UButton color="primary" type="submit" loading-auto size="xl" variant="solid" active> Submit </UButton>
-        </div>
-      </UForm>
-      <!-- END UI Form -->
+  <div class="| container container-2xs flow flow-lg">
+    <h1 class="| title-xl">Reset password</h1>
+
+    <p class="| body-sm">Forgot your password? Don't worry - it happens to us all. Just enter your email address below
+      and we will send you a one-time password to initiate a password reset</p>
+
+    <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
+
+    <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword"
+      class="p-login-form | stacked">
+      <AtomsInput label="Email address" type="email" name="email" required />
+
+      <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="formPending">
+        Submit
+      </AtomsButton>
+    </MoleculesForm>
+
+    <AtomsDivider text="or" />
+
+    <div class="| center-text flow flow-sm">
+      <p class="| body-sm">
+        Already know your password?
+        <nuxt-link to="/login">Log in now</nuxt-link>
+      </p>
+
+      <p class="| body-sm">
+        Don't have an account yet?
+        <nuxt-link to="/signup">Create an account</nuxt-link>
+      </p>
     </div>
+
   </div>
 </template>

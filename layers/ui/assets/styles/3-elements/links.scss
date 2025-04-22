@@ -4,7 +4,7 @@
 a {
   color: currentColor;
   text-decoration: underline;
-  transition: color 0.15s;
+  transition: color var(--animation-fast);
   text-decoration-thickness: var(--size-2);
   text-underline-offset: 0.2em;
   text-decoration-skip-ink: none;

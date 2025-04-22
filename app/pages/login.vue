@@ -96,12 +96,15 @@ async function loginUser({ target }) {
     <AtomsDivider text="or" />
 
     <div class="| center-text flow flow-sm">
-      <p class="| body-sm">Don't have an account yet? <nuxt-link to="/signup">Create an account</nuxt-link></p>
-
       <p>
         <nuxt-link to="/password/forgot" class="| body-sm">
           Forgot password?
         </nuxt-link>
+      </p>
+
+      <p class="| body-sm">
+        Don't have an account yet?
+        <nuxt-link to="/signup">Create an account</nuxt-link>
       </p>
     </div>
   </div>
