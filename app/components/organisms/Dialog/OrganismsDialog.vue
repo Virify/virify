@@ -86,7 +86,7 @@ watch(useRoute(), close)
 }
 
 .o-dialog::backdrop {
-  background-color: fn.faded-color(85%, var(--monochrome-300));
+  background-color: fn.faded-color(85%, light-dark(var(--monochrome-300), var(--monochrome-100)));
   animation: fadeDialogIn var(--animation-medium) var(--ease-out);
 }
 
@@ -121,7 +121,7 @@ watch(useRoute(), close)
 
 :where(.o-dialog-content) {
   position: relative;
-  background: var(--background-200);
+  background: light-dark(var(--background-200), var(--background-100));
   color: var(--foreground-200);
   padding: var(--size-28);
   margin: auto;
