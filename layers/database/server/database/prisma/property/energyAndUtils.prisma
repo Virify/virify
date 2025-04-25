@@ -3,26 +3,16 @@ model EnergyAndUtilities {
   propertyId                Int             @unique
   epcRating                 EPCRating?
   epcCertificateUrl         String?
-  primaryHeatingType        HeatingType?
-  secondaryHeatingType      HeatingType?
+  primaryHeatingType        HeatingType[]
+  secondaryHeatingType      HeatingType[]
   boilerType                BoilerType?
   hotWaterSource            HotWaterSource?
-  solarPanels               Boolean         @default(false)
-  batteryStorage            Boolean         @default(false)
-  smartMeterInstalled       Boolean         @default(false)
-  evChargingPointInstalled  Boolean         @default(false)
+  renewables RenewableEnergy[]
   // This will get pulled from an API of property creation
+  connectedUtilities         ConnectedUtilities[]
   broadbandType             BroadbandType?
   fullFibreAvailable        Boolean         @default(false)
   maxDownloadSpeedMbps      Float?
-  mainsGas                  Boolean         @default(false)
-  mainsElectricity          Boolean         @default(false)
-  mainsWater                Boolean         @default(false)
-  privateWaterSupply        Boolean         @default(false)
-  mainsDrainage             Boolean         @default(false)
-  septicTank                Boolean         @default(false)
-  cesspool                  Boolean         @default(false)
-  rainwaterHarvestingSystem Boolean         @default(false)
   createdAt                 DateTime        @default(now())
   updatedAt                 DateTime        @updatedAt
   property                  Property        @relation(fields: [propertyId], references: [id])
@@ -50,6 +40,9 @@ enum HeatingType {
   HEAT_PUMP
   DISTRICT
   STORAGE_HEATERS
+  LPG
+  PASSIVE
+  SOLAR_THERMAL
   OTHER
 }
 
@@ -67,6 +60,25 @@ enum HotWaterSource {
   SOLAR_THERMAL
   HEAT_PUMP
   OTHER
+}
+
+enum RenewableEnergy {
+  SOLAR_PV
+  BATTERY_STORAGE
+  SMART_METER
+  EV_CHARGING
+  GREY_WATER
+}
+
+enum ConnectedUtilities {
+  GAS
+  ELECTRICITY
+  WATER
+  SEWAGE
+  DRAINAGE
+  SEPTIC_TANK
+  CESSPIT
+  RAINWATER_HARVESTING
 }
 
 enum BroadbandType {

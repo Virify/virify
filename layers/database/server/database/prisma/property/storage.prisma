@@ -3,7 +3,7 @@ model Storage {
   attic            Boolean  @default(false)
   basement         Boolean  @default(false)
   separateDressing Boolean  @default(false)
-  underStairs      Boolean  @default(false)
+  underStairsStorage      Boolean  @default(false)
   pantry           Boolean  @default(false)
   description      String?
   propertyId       Int      @unique

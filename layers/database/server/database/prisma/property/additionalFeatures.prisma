@@ -1,9 +1,18 @@
 model AdditionalFeatures {
   id          Int      @id @default(autoincrement())
+  description String
   petFriendly Boolean  @default(true)
   moveInDate  DateTime
+  chainFree   Boolean  @default(false)
   homeOffice  Boolean  @default(false)
   pool        Boolean  @default(false)
+  internet    Boolean  @default(false)
+  cableTv     Boolean  @default(false)
+  phone       Boolean  @default(false)
+  laundry     Boolean  @default(false)
+  concierge   Boolean  @default(false)
+  shop        Boolean  @default(false)
+  gym         Boolean  @default(false)
   propertyId  Int      @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

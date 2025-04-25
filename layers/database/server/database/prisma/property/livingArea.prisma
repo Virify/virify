@@ -4,6 +4,7 @@ model LivingArea {
   fireplace   FireplaceType? // reference to the enum defined in reception.prisma
   balcony     Boolean        @default(false)
   description String
+  openPlan    Boolean        @default(false)
   size        Float?
   propertyId  Int
   createdAt   DateTime       @default(now())
