@@ -67,8 +67,8 @@
     color: light-dark(var(--monochrome-100), var(--monochrome-900));
 
     &:hover {
-      background: var(--blue-500);
-      color: var(--monochrome-900);
+      background: fn.faded-color(12%);
+      color: light-dark(var(--monochrome-100), var(--monochrome-900));
     }
   }
 

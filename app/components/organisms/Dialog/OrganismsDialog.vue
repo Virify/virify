@@ -53,10 +53,16 @@ function afterClosed() {
   // Clean up any existing state
   hideDialog()
 }
+
+/**
+ *  Close modal on route change
+ */
+watch(useRoute(), close)
 </script>
 
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
+@use '#styles/_utils/media' as mq;
 
 .o-dialog {
   position: fixed;
@@ -80,7 +86,7 @@ function afterClosed() {
 }
 
 .o-dialog::backdrop {
-  background-color: fn.faded-color(85%, var(--monochrome-300));
+  background-color: fn.faded-color(85%, light-dark(var(--monochrome-300), var(--monochrome-100)));
   animation: fadeDialogIn var(--animation-medium) var(--ease-out);
 }
 
@@ -91,7 +97,6 @@ function afterClosed() {
   padding: var(--size-8);
   width: var(--size-42);
   height: var(--size-42);
-  border-radius: var(--size-8);
 }
 
 .o-dialog-close-icon {
@@ -116,15 +121,27 @@ function afterClosed() {
 
 :where(.o-dialog-content) {
   position: relative;
-  background: var(--background-200);
+  background: light-dark(var(--background-200), var(--background-100));
   color: var(--foreground-200);
-  padding: var(--size-24);
+  padding: var(--size-28);
   margin: auto;
   width: fit-content;
   max-width: calc(100% - var(--size-32));
   box-sizing: border-box;
-  border-radius: var(--size-12);
+  border-radius: var(--size-24);
   animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
+
+  @include mq.tablet {
+    padding: var(--size-32)
+  }
+
+  @include mq.notebook {
+    padding: var(--size-36)
+  }
+
+  @include mq.desktop {
+    padding: var(--size-40)
+  }
 }
 
 :where(.o-dialog-content > *) {

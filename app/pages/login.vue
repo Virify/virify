@@ -1,78 +1,37 @@
 <script setup lang="ts">
-const { showToast } = useToastNotification();
 const { fetch } = useUserSession();
 
 /**
- *  Form state
+ *  Errors
  */
-const formPending = ref(false)
+const formErrorTitle = ref()
+const formErrorContent = ref()
 
-/**
- *  Form errors
- */
-const { query } = useRoute()
+function formClearError() {
+  formErrorTitle.value = ''
+  formErrorContent.value = ''
+}
 
-const formErrorTitle = ref(query.error && 'Unauthorised user')
-const formErrorContent = ref(query.error && 'Please log in to access your account')
-
-/**
- *  For password inputs
- */
-const { pattern, validityText } = getValidPassword()
-
-/**
- *  Validate form and submit
- */
-async function loginUser({ target }) {
-  if (formPending.value) return
-
-  // Clear any existing form errors
-  formErrorTitle.value = null
-  formErrorContent.value = null
-
-  // First check the validity of the form
-  const { validity, errors } = useFormValidationMessage(target)
-
-  // If errors exist, show them
-  if (!validity) {
-    formErrorTitle.value = "Your form contains errors - please ensure all fields are correctly filled out"
-    formErrorContent.value = errors
-
-    return
+function formError(error) {
+  // If is string, just save error as title
+  if (isString(error)) {
+    formErrorTitle.value = error
   }
 
-  // Set pending state
-  formPending.value = true
+  // Else destructure to title, message
+  const { title, message } = asObject(error)
 
-  // Construct a form object
-  const formData = new FormData(target)
+  // And then save
+  formErrorTitle.value = title
+  formErrorContent.value = message
+}
 
-  // Post data
-  await $fetch("/auth/login", {
-    method: "POST",
-    body: {
-      email: formData.get('email'),
-      password: formData.get('password')
-    }
-  })
-    .then(() => {
-      // Else show successful login
-      showToast({
-        title: "Login successful",
-        icon: "ri:check-line",
-      });
-      // we have set the userSession in the backend, we need the client to fetch the user session
-      fetch();
-      // redirect to account page
-      navigateTo("/account");
-    })
-    .catch((error) => {
-      formErrorTitle.value = 'Login failed'
-      formErrorContent.value = error.data.message
-    })
-    .finally(() => {
-      formPending.value = false
-    })
+/**
+ *  Success
+ */
+function formSuccess() {
+  fetch();
+  navigateTo("/account");
 }
 </script>
 
@@ -82,16 +41,7 @@ async function loginUser({ target }) {
 
     <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
 
-    <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
-      <AtomsInput label="Email address" type="email" name="email" required />
-
-      <AtomsPassword label="Password" type="password" name="password" required minlength="8" :pattern
-        :validation-text-overrides="validityText" />
-
-      <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="formPending">
-        Log in
-      </AtomsButton>
-    </MoleculesForm>
+    <OrganismsFormsLogin @form-success="formSuccess" @form-error="formError" @form-clear-error="formClearError" />
 
     <AtomsDivider text="or" />
 
