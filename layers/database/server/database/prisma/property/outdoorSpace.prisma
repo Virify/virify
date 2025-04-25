@@ -1,5 +1,7 @@
 model OutdoorSpace {
   id              Int      @id @default(autoincrement())
+  description     String?
+  totalSize       Float?
   frontGarden     Boolean  @default(false)
   frontGardenSize Float?
   rearGarden      Boolean  @default(false)
@@ -12,7 +14,6 @@ model OutdoorSpace {
   shed            Boolean  @default(false)
   summerHouse     Boolean  @default(false)
   gardenOffice    Boolean  @default(false)
-  description     String?
   propertyId      Int      @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

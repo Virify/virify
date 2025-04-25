@@ -29,13 +29,19 @@ CREATE TYPE "BedSizeType" AS ENUM ('SINGLE', 'DOUBLE', 'QUEEN', 'KING', 'SUPER_K
 CREATE TYPE "EPCRating" AS ENUM ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'UNKNOWN');
 
 -- CreateEnum
-CREATE TYPE "HeatingType" AS ENUM ('GAS_CENTRAL', 'ELECTRIC', 'OIL', 'UNDERFLOOR', 'BIOMASS', 'HEAT_PUMP', 'DISTRICT', 'STORAGE_HEATERS', 'OTHER');
+CREATE TYPE "HeatingType" AS ENUM ('GAS_CENTRAL', 'ELECTRIC', 'OIL', 'UNDERFLOOR', 'BIOMASS', 'HEAT_PUMP', 'DISTRICT', 'STORAGE_HEATERS', 'LPG', 'PASSIVE', 'SOLAR_THERMAL', 'OTHER');
 
 -- CreateEnum
 CREATE TYPE "BoilerType" AS ENUM ('COMBI', 'SYSTEM', 'CONVENTIONAL', 'BACK_BOILER', 'UNKNOWN');
 
 -- CreateEnum
 CREATE TYPE "HotWaterSource" AS ENUM ('BOILER', 'IMMERSION_HEATER', 'SOLAR_THERMAL', 'HEAT_PUMP', 'OTHER');
+
+-- CreateEnum
+CREATE TYPE "RenewableEnergy" AS ENUM ('SOLAR_PV', 'BATTERY_STORAGE', 'SMART_METER', 'EV_CHARGING', 'GREY_WATER');
+
+-- CreateEnum
+CREATE TYPE "ConnectedUtilities" AS ENUM ('GAS', 'ELECTRICITY', 'WATER', 'SEWAGE', 'DRAINAGE', 'SEPTIC_TANK', 'CESSPIT', 'RAINWATER_HARVESTING');
 
 -- CreateEnum
 CREATE TYPE "BroadbandType" AS ENUM ('ADSL', 'FTTC', 'FTTP', 'CABLE', 'MOBILE', 'UNKNOWN');
@@ -47,22 +53,13 @@ CREATE TYPE "PlanningClassification" AS ENUM ('AGRICULTURAL', 'RESIDENTIAL', 'CO
 CREATE TYPE "LandUse" AS ENUM ('GRAZING', 'ARABLE', 'PASTURE', 'FORESTRY', 'EQUESTRIAN', 'HORTICULTURE', 'CONSERVATION', 'MIXED', 'VACANT', 'OTHER');
 
 -- CreateEnum
-CREATE TYPE "PropertyType" AS ENUM ('HOUSE', 'COTTAGE', 'BUNGALOW', 'PENTHOUSE', 'FLAT', 'LAND', 'FARM', 'SHARED_OWNERSHIP', 'RETIREMENT_HOME', 'NEW_BUILD_HOME', 'STUDENT_ACCOMMODATION');
-
--- CreateEnum
-CREATE TYPE "PropertyClassification" AS ENUM ('TERRACED_HOUSE', 'SEMI_DETACHED_HOUSE', 'END_OF_TERRACE_HOUSE', 'DETACHED_HOUSE', 'MANSION', 'TERRACED_COTTAGE', 'SEMI_DETACHED_COTTAGE', 'END_OF_TERRACE_COTTAGE', 'DETACHED_COTTAGE', 'TERRACED_BUNGALOW', 'SEMI_DETACHED_BUNGALOW', 'END_OF_TERRACE_BUNGALOW', 'DETACHED_BUNGALOW', 'PENTHOUSE', 'CONVERTED_FLAT', 'STUDIO_FLAT', 'MAISONETTE', 'HIGH_RISE_FLAT', 'COMPLEX_FLAT', 'RESIDENTIAL_LAND', 'COMMERCIAL_LAND', 'AGRICULTURAL_LAND', 'DEVELOPMENT_PLOT', 'NON_WORKING_FARMHOUSE', 'WORKING_FARM', 'SHARED_OWNERSHIP', 'RETIREMENT_HOME', 'NEW_BUILD_HOME', 'STUDENT_FLAT', 'STUDENT_HOUSE', 'STUDENT_HOUSE_SHARE');
-
--- CreateEnum
 CREATE TYPE "ConstructionType" AS ENUM ('STANDARD', 'NON_STANDARD');
-
--- CreateEnum
-CREATE TYPE "RoofConstruction" AS ENUM ('SLATE_TILE', 'CONCRETE_TILE');
 
 -- CreateEnum
 CREATE TYPE "FurnishingStatus" AS ENUM ('FURNISHED', 'UNFURNISHED', 'PART_FURNISHED');
 
 -- CreateEnum
-CREATE TYPE "Tenure" AS ENUM ('LEASEHOLD', 'FREEHOLD');
+CREATE TYPE "Tenure" AS ENUM ('LEASEHOLD', 'FREEHOLD', 'SHARED_OWNERSHIP');
 
 -- CreateEnum
 CREATE TYPE "FireplaceType" AS ENUM ('LOG_BURNER', 'OPEN_FIRE');
@@ -201,10 +198,19 @@ CREATE TABLE "Accessibility" (
 -- CreateTable
 CREATE TABLE "AdditionalFeatures" (
     "id" SERIAL NOT NULL,
+    "description" TEXT NOT NULL,
     "petFriendly" BOOLEAN NOT NULL DEFAULT true,
     "moveInDate" TIMESTAMP(3) NOT NULL,
+    "chainFree" BOOLEAN NOT NULL DEFAULT false,
     "homeOffice" BOOLEAN NOT NULL DEFAULT false,
     "pool" BOOLEAN NOT NULL DEFAULT false,
+    "internet" BOOLEAN NOT NULL DEFAULT false,
+    "cableTv" BOOLEAN NOT NULL DEFAULT false,
+    "phone" BOOLEAN NOT NULL DEFAULT false,
+    "laundry" BOOLEAN NOT NULL DEFAULT false,
+    "concierge" BOOLEAN NOT NULL DEFAULT false,
+    "shop" BOOLEAN NOT NULL DEFAULT false,
+    "gym" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -282,25 +288,15 @@ CREATE TABLE "EnergyAndUtilities" (
     "propertyId" INTEGER NOT NULL,
     "epcRating" "EPCRating",
     "epcCertificateUrl" TEXT,
-    "primaryHeatingType" "HeatingType",
-    "secondaryHeatingType" "HeatingType",
+    "primaryHeatingType" "HeatingType"[],
+    "secondaryHeatingType" "HeatingType"[],
     "boilerType" "BoilerType",
     "hotWaterSource" "HotWaterSource",
-    "solarPanels" BOOLEAN NOT NULL DEFAULT false,
-    "batteryStorage" BOOLEAN NOT NULL DEFAULT false,
-    "smartMeterInstalled" BOOLEAN NOT NULL DEFAULT false,
-    "evChargingPointInstalled" BOOLEAN NOT NULL DEFAULT false,
+    "renewables" "RenewableEnergy"[],
+    "connectedUtilities" "ConnectedUtilities"[],
     "broadbandType" "BroadbandType",
     "fullFibreAvailable" BOOLEAN NOT NULL DEFAULT false,
     "maxDownloadSpeedMbps" DOUBLE PRECISION,
-    "mainsGas" BOOLEAN NOT NULL DEFAULT false,
-    "mainsElectricity" BOOLEAN NOT NULL DEFAULT false,
-    "mainsWater" BOOLEAN NOT NULL DEFAULT false,
-    "privateWaterSupply" BOOLEAN NOT NULL DEFAULT false,
-    "mainsDrainage" BOOLEAN NOT NULL DEFAULT false,
-    "septicTank" BOOLEAN NOT NULL DEFAULT false,
-    "cesspool" BOOLEAN NOT NULL DEFAULT false,
-    "rainwaterHarvestingSystem" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -312,7 +308,7 @@ CREATE TABLE "Kitchen" (
     "id" SERIAL NOT NULL,
     "modern" BOOLEAN NOT NULL DEFAULT true,
     "openPlan" BOOLEAN NOT NULL DEFAULT false,
-    "appliancesIncluded" BOOLEAN NOT NULL DEFAULT true,
+    "whiteGoods" BOOLEAN NOT NULL DEFAULT false,
     "description" TEXT NOT NULL,
     "size" DOUBLE PRECISION,
     "breakfastBar" BOOLEAN NOT NULL DEFAULT false,
@@ -355,6 +351,7 @@ CREATE TABLE "LivingArea" (
     "fireplace" "FireplaceType",
     "balcony" BOOLEAN NOT NULL DEFAULT false,
     "description" TEXT NOT NULL,
+    "openPlan" BOOLEAN NOT NULL DEFAULT false,
     "size" DOUBLE PRECISION,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -366,6 +363,8 @@ CREATE TABLE "LivingArea" (
 -- CreateTable
 CREATE TABLE "OutdoorSpace" (
     "id" SERIAL NOT NULL,
+    "description" TEXT,
+    "totalSize" DOUBLE PRECISION,
     "frontGarden" BOOLEAN NOT NULL DEFAULT false,
     "frontGardenSize" DOUBLE PRECISION,
     "rearGarden" BOOLEAN NOT NULL DEFAULT false,
@@ -378,7 +377,6 @@ CREATE TABLE "OutdoorSpace" (
     "shed" BOOLEAN NOT NULL DEFAULT false,
     "summerHouse" BOOLEAN NOT NULL DEFAULT false,
     "gardenOffice" BOOLEAN NOT NULL DEFAULT false,
-    "description" TEXT,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -411,12 +409,11 @@ CREATE TABLE "Property" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "value" DOUBLE PRECISION,
-    "type" "PropertyType" NOT NULL,
-    "classification" "PropertyClassification" NOT NULL,
+    "propertyTypeId" INTEGER NOT NULL,
+    "propertyClassificationId" INTEGER NOT NULL,
     "size" DOUBLE PRECISION,
     "yearBuilt" TEXT NOT NULL,
     "constructionType" "ConstructionType" NOT NULL,
-    "roofConstruction" "RoofConstruction" NOT NULL,
     "floorLevel" INTEGER,
     "furnishingStatus" "FurnishingStatus" NOT NULL,
     "tenure" "Tenure" NOT NULL,
@@ -429,6 +426,23 @@ CREATE TABLE "Property" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Property_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PropertyClassification" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "categoryId" INTEGER NOT NULL,
+
+    CONSTRAINT "PropertyClassification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PropertyType" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "PropertyType_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -464,11 +478,13 @@ CREATE TABLE "RunningCosts" (
 -- CreateTable
 CREATE TABLE "Security" (
     "id" SERIAL NOT NULL,
-    "gatedCommunity" BOOLEAN NOT NULL,
-    "cctv" BOOLEAN NOT NULL,
-    "alarmSystem" BOOLEAN NOT NULL,
-    "neighborhoodWatch" BOOLEAN NOT NULL,
-    "intercomSystem" BOOLEAN NOT NULL,
+    "gatedCommunity" BOOLEAN NOT NULL DEFAULT false,
+    "cctv" BOOLEAN NOT NULL DEFAULT false,
+    "alarmSystem" BOOLEAN NOT NULL DEFAULT false,
+    "neighborhoodWatch" BOOLEAN NOT NULL DEFAULT false,
+    "intercomSystem" BOOLEAN NOT NULL DEFAULT false,
+    "security" BOOLEAN NOT NULL DEFAULT false,
+    "reception" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -482,7 +498,7 @@ CREATE TABLE "Storage" (
     "attic" BOOLEAN NOT NULL DEFAULT false,
     "basement" BOOLEAN NOT NULL DEFAULT false,
     "separateDressing" BOOLEAN NOT NULL DEFAULT false,
-    "underStairs" BOOLEAN NOT NULL DEFAULT false,
+    "underStairsStorage" BOOLEAN NOT NULL DEFAULT false,
     "pantry" BOOLEAN NOT NULL DEFAULT false,
     "description" TEXT,
     "propertyId" INTEGER NOT NULL,
@@ -700,6 +716,9 @@ CREATE INDEX "Property_userId_idx" ON "Property"("userId");
 CREATE INDEX "Property_agentId_idx" ON "Property"("agentId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "PropertyType_name_key" ON "PropertyType"("name");
+
+-- CreateIndex
 CREATE INDEX "Reception_propertyId_idx" ON "Reception"("propertyId");
 
 -- CreateIndex
@@ -821,6 +840,15 @@ ALTER TABLE "Property" ADD CONSTRAINT "Property_userId_fkey" FOREIGN KEY ("userI
 
 -- AddForeignKey
 ALTER TABLE "Property" ADD CONSTRAINT "Property_estateAgentId_fkey" FOREIGN KEY ("estateAgentId") REFERENCES "EstateAgent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Property" ADD CONSTRAINT "Property_propertyTypeId_fkey" FOREIGN KEY ("propertyTypeId") REFERENCES "PropertyType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Property" ADD CONSTRAINT "Property_propertyClassificationId_fkey" FOREIGN KEY ("propertyClassificationId") REFERENCES "PropertyClassification"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PropertyClassification" ADD CONSTRAINT "PropertyClassification_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "PropertyType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Reception" ADD CONSTRAINT "Reception_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

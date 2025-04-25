@@ -1,21 +1,21 @@
 model EnergyAndUtilities {
-  id                        Int             @id @default(autoincrement())
-  propertyId                Int             @unique
-  epcRating                 EPCRating?
-  epcCertificateUrl         String?
-  primaryHeatingType        HeatingType[]
-  secondaryHeatingType      HeatingType[]
-  boilerType                BoilerType?
-  hotWaterSource            HotWaterSource?
-  renewables RenewableEnergy[]
+  id                   Int                  @id @default(autoincrement())
+  propertyId           Int                  @unique
+  epcRating            EPCRating?
+  epcCertificateUrl    String?
+  primaryHeatingType   HeatingType[]
+  secondaryHeatingType HeatingType[]
+  boilerType           BoilerType?
+  hotWaterSource       HotWaterSource?
+  renewables           RenewableEnergy[]
   // This will get pulled from an API of property creation
-  connectedUtilities         ConnectedUtilities[]
-  broadbandType             BroadbandType?
-  fullFibreAvailable        Boolean         @default(false)
-  maxDownloadSpeedMbps      Float?
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
-  property                  Property        @relation(fields: [propertyId], references: [id])
+  connectedUtilities   ConnectedUtilities[]
+  broadbandType        BroadbandType?
+  fullFibreAvailable   Boolean              @default(false)
+  maxDownloadSpeedMbps Float?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  property             Property             @relation(fields: [propertyId], references: [id])
 
   @@index([propertyId])
 }
