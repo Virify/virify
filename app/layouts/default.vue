@@ -9,7 +9,7 @@
 
     <OrganismsFooter />
 
-    <OrganismsDialog />
+    <ViewsDialog />
   </div>
 </template>
 
