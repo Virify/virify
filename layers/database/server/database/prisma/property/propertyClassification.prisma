@@ -1,0 +1,56 @@
+model PropertyClassification {
+  id         Int          @id @default(autoincrement())
+  name       String
+  categoryId Int
+  category   PropertyType @relation(fields: [categoryId], references: [id])
+  Property   Property[]
+}
+
+// enum PropertyClassification {
+//   // Houses
+//   TERRACED_HOUSE
+//   SEMI_DETACHED_HOUSE
+//   END_OF_TERRACE_HOUSE
+//   DETACHED_HOUSE
+//   MANSION
+
+//   // Cottages
+//   TERRACED_COTTAGE
+//   SEMI_DETACHED_COTTAGE
+//   END_OF_TERRACE_COTTAGE
+//   DETACHED_COTTAGE
+
+//   // Bungalows
+//   TERRACED_BUNGALOW
+//   SEMI_DETACHED_BUNGALOW
+//   END_OF_TERRACE_BUNGALOW
+//   DETACHED_BUNGALOW
+
+//   // Flats
+//   PENTHOUSE
+//   CONVERTED_FLAT
+//   STUDIO_FLAT
+//   MAISONETTE
+//   HIGH_RISE_FLAT
+//   COMPLEX_FLAT
+
+//   // Land
+//   RESIDENTIAL_LAND
+//   COMMERCIAL_LAND
+//   AGRICULTURAL_LAND
+//   DEVELOPMENT_PLOT
+
+//   // Farms
+//   NON_WORKING_FARMHOUSE
+//   WORKING_FARM
+
+//   // Other Categories
+//   SHARED_OWNERSHIP
+//   RETIREMENT_HOME
+//   NEW_BUILD_HOME
+
+//   // Student Accommodation
+//   STUDENT_FLAT
+//   STUDENT_HOUSE
+//   STUDENT_HOUSE_SHARE
+// }
