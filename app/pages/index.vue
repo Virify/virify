@@ -2,21 +2,18 @@
   <div class="w-full text-center">
     <h1 class="| title-2xl">Virify</h1>
 
-    <button @click.prevent="open" class="| button">Show dialog</button>
+    <button @click.prevent="openLogin" class="| button">Log in</button>
   </div>
 </template>
 
 <script setup>
-import { OrganismsDialogViewSignIn } from '#components'
+import { OrganismsDialogViewLogin } from '#components'
 
 const { showDialog } = useDialog()
 
-function open() {
+function openLogin() {
   showDialog({
-    component: OrganismsDialogViewSignIn,
-    onClose: ({ returnValue }) => {
-      console.log('Closed with value', returnValue)
-    }
+    component: OrganismsDialogViewLogin
   })
 }
 </script>
