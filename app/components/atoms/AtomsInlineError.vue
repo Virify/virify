@@ -1,12 +1,25 @@
 <template>
-  <span class="a-inline-error | body-sm">
+  <span class="a-inline-error | body-sm lineheight-sm">
+    <AtomsIcon icon="errors/error" aria-hidden class="a-inline-error-icon" />
+
     <slot></slot>
   </span>
 </template>
 
 <style>
 .a-inline-error {
-  display: block;
-  color: var(--error-200);
+  display: flex;
+  align-items: center;
+  color: var(--error-foreground);
+  gap: var(--size-14);
+  padding: var(--size-14) var(--size-16);
+  background: var(--error-background);
+  border-radius: var(--border-radius-ui);
+}
+
+.a-inline-error-icon {
+  flex: 0 0 auto;
+  width: var(--size-24);
+  height: var(--size-24);
 }
 </style>

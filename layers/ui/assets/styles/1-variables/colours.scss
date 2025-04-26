@@ -88,7 +88,6 @@
   /**
    *  Error colours
    */
-  --error-100: #f8e6e6;
-  --error-200: #ef1b1b;
-  --error-300: #390909;
+  --error-background: light-dark(#f8e6e6, #342222);
+  --error-foreground: light-dark(#ef1b1b, #ff6d6d);
 }
