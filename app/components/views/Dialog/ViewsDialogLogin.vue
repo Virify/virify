@@ -65,7 +65,7 @@ function formSuccess() {
 }
 </script>
 
-<style lang="scss">
+<style>
 .o-dialog-view-signin {
   width: 24em;
 }
