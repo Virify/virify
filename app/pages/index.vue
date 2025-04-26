@@ -7,13 +7,13 @@
 </template>
 
 <script setup>
-import { OrganismsDialogViewLogin } from '#components'
+import { ViewsDialogLogin } from '#components'
 
 const { showDialog } = useDialog()
 
 function openLogin() {
   showDialog({
-    component: OrganismsDialogViewLogin
+    component: ViewsDialogLogin
   })
 }
 </script>
