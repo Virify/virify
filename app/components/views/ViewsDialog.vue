@@ -128,7 +128,7 @@ watch(useRoute(), close)
   width: fit-content;
   max-width: calc(100% - var(--size-32));
   box-sizing: border-box;
-  border-radius: var(--size-24);
+  border-radius: var(--border-radius-2xl);
   animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
 
   @include mq.tablet {

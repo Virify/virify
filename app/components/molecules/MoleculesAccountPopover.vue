@@ -75,7 +75,7 @@ const $button = useTemplateRef('button')
   margin: 0;
   min-width: 14ch;
   padding: var(--size-8);
-  border-radius: var(--size-12);
+  border-radius: var(--border-radius-lg);
 }
 
 .m-account-popover-link {
@@ -83,7 +83,7 @@ const $button = useTemplateRef('button')
   padding: var(--size-6) var(--size-14);
   white-space: nowrap;
   text-decoration: none;
-  border-radius: var(--size-8);
+  border-radius: var(--border-radius-md);
   background: transparent;
   transition: background-color var(--animation-fast);
 
