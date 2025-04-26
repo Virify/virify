@@ -1,68 +1,37 @@
 <script setup lang="ts">
-const { showToast } = useToastNotification();
+
+const { fetch } = useUserSession();
 
 /**
- *  Form state
+ *  Errors
  */
-const formPending = ref(false)
+const formErrorTitle = ref()
+const formErrorContent = ref()
 
-/**
- *  Form errors
- */
-const { query } = useRoute()
+function formClearError() {
+  formErrorTitle.value = ''
+  formErrorContent.value = ''
+}
 
-const formErrorTitle = ref(false)
-const formErrorContent = ref(false)
-
-/**
- * Signup function
- *
- * The users role is set here on user creation.
- * This is an important step determining if the user is an agent or a normal user and has knock on effects.
- */
-async function resetPassword({ target }) {
-  if (formPending.value) return
-
-  // Clear any existing form errors
-  formErrorTitle.value = null
-  formErrorContent.value = null
-
-  // First check the validity of the form
-  const { validity, errors } = useFormValidationMessage(target)
-
-  // If errors exist, show them
-  if (!validity) {
-    formErrorTitle.value = "Your form contains errors - please ensure all fields are correctly filled out"
-    formErrorContent.value = errors
-
-    return
+function formError(error) {
+  // If is string, just save error as title
+  if (isString(error)) {
+    formErrorTitle.value = error
   }
 
-  // Set pending state
-  formPending.value = true
+  // Else destructure to title, content
+  const { title, content } = asObject(error)
 
-  // Construct a form object
-  const formData = new FormData(target)
+  // And then save
+  formErrorTitle.value = title
+  formErrorContent.value = content
+}
 
-  try {
-    const user = await $fetch<SignupResponse>("/auth/password-reset", {
-      method: "POST",
-      body: {
-        email: formData.get('email'),
-      },
-    });
-
-    console.log(user);
-
-    // redirect to OTP verification for password reset
-    navigateTo("/verify?passwordToken=" + user.passwordToken);
-  } catch (error) {
-    formErrorTitle.value = 'An error occured'
-    formErrorContent.value = error?.data?.message
-  }
-
-  // Clear pending state
-  formPending.value = false
+/**
+ *  Success
+ */
+function formSuccess(passwordToken) {
+  navigateTo("/verify?passwordToken=" + passwordToken);
 }
 </script>
 <template>
@@ -74,14 +43,9 @@ async function resetPassword({ target }) {
 
     <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
 
-    <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword"
-      class="p-login-form | stacked">
-      <AtomsInput label="Email address" type="email" name="email" required />
 
-      <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="formPending">
-        Submit
-      </AtomsButton>
-    </MoleculesForm>
+    <OrganismsFormsForgotPassword @form-success="formSuccess" @form-error="formError"
+      @form-clear-error="formClearError" />
 
     <AtomsDivider text="or" />
 
@@ -96,6 +60,5 @@ async function resetPassword({ target }) {
         <nuxt-link to="/signup">Create an account</nuxt-link>
       </p>
     </div>
-
   </div>
 </template>

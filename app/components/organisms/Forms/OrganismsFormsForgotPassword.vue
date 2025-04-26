@@ -1,12 +1,10 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
+  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword"
+    class="p-login-form | stacked">
     <AtomsInput label="Email address" type="email" name="email" required />
 
-    <AtomsPassword label="Password" type="password" name="password" required minlength="8" :pattern
-      :validation-text-overrides="validityText" />
-
     <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="isPending">
-      Log in
+      Submit
     </AtomsButton>
   </MoleculesForm>
 </template>
@@ -30,7 +28,7 @@ const { isPending, setPendingWhile } = usePending()
 /**
  *  Validate form and submit
  */
-async function loginUser({ target }) {
+async function resetPassword({ target }) {
   if (isPending.value) return
 
   setPendingWhile(async () => {
@@ -46,15 +44,14 @@ async function loginUser({ target }) {
     }
 
     // Post data
-    await $fetch("/auth/login", {
+    await $fetch("/auth/password-reset", {
       method: "POST",
       body: {
         email: formData.get('email'),
-        password: formData.get('password')
-      }
+      },
     })
-      .then(() => {
-        emits('form-success')
+      .then(({ passwordToken }) => {
+        emits('form-success', passwordToken)
       })
       .catch((error) => {
         emits('form-error', {

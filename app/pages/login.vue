@@ -18,12 +18,12 @@ function formError(error) {
     formErrorTitle.value = error
   }
 
-  // Else destructure to title, message
-  const { title, message } = asObject(error)
+  // Else destructure to title, content
+  const { title, content } = asObject(error)
 
   // And then save
   formErrorTitle.value = title
-  formErrorContent.value = message
+  formErrorContent.value = content
 }
 
 /**
