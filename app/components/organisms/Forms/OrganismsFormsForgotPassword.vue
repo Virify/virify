@@ -1,11 +1,10 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword"
-    class="p-login-form | stacked">
+  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword" class="| stacked">
     <MoleculesFormField label="Email address">
       <AtomsInput type="email" name="email" required />
     </MoleculesFormField>
 
-    <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="isPending">
+    <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending">
       Submit
     </AtomsButton>
   </MoleculesForm>

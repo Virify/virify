@@ -1,5 +1,5 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="p-login-form | stacked">
+  <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="| stacked">
     <MoleculesFormField label="Email address">
       <AtomsInput type="email" name="email" required />
     </MoleculesFormField>
@@ -7,7 +7,7 @@
     <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern
       :validation-text-overrides="validityText" />
 
-    <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="isPending">
+    <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending">
       Log in
     </AtomsButton>
   </MoleculesForm>
