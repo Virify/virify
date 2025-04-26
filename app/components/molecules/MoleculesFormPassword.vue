@@ -4,18 +4,16 @@
 
     <AtomsLabel :for="passwordId">{{ label }}</AtomsLabel>
 
-    <div class="| relative">
-      <AtomsInput :id="passwordId" v-bind="$attrs" :type="inputType" class="m-formpassword-input"
-        :validation-text-overrides="validationTextOverrides" />
+    <AtomsInput :id="passwordId" v-bind="$attrs" :type="inputType" class="m-formpassword-input"
+      wrapper-class="| relative" :validation-text-overrides="validationTextOverrides">
 
-      <client-only>
-        <!-- Client only as this feature only works with JS anyway -->
+      <template v-slot:suffix>
         <button type="button" class="m-formpassword-toggle" :aria-label="inputLabel" :aria-controls="passwordId"
           :aria-pressed="show" @click.prevent="toggleShowPassword">
           <AtomsIcon role="none" class="m-formpassword-icon" :icon="inputIcon" />
         </button>
-      </client-only>
-    </div>
+      </template>
+    </AtomsInput>
   </fieldset>
 </template>
 

@@ -1,10 +1,16 @@
 <template>
-  <input :id="inputId" v-bind="$attrs" :aria-describedby="errorText && errorId" class="| text-input"
-    @input="checkValidity" />
+  <div :class="wrapperClass" class="a-input" role="presentation">
+    <slot name="prefix" />
 
-  <span v-if="errorText" :id="errorId" class="| text-input-error body-sm">
+    <input :id="inputId" v-bind="$attrs" :aria-describedby="errorText && errorId" class="| text-input"
+      @input="checkValidity" />
+
+    <slot name="suffix" />
+  </div>
+
+  <AtomsInlineError v-if="errorText" :id="errorId">
     {{ errorText }}
-  </span>
+  </AtomsInlineError>
 </template>
 
 <script setup>
@@ -20,6 +26,9 @@ const errorId = useId()
 const props = defineProps({
   validationTextOverrides: {
     type: Object
+  },
+  wrapperClass: {
+    type: String
   }
 })
 
