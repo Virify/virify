@@ -23,23 +23,23 @@
   --flow-gap: var(--size-16);
 }
 
-.flow-xs {
+.flow-xs>* {
   --flow-gap: var(--size-8);
 }
 
-.flow-sm {
+.flow-sm>* {
   --flow-gap: var(--size-12);
 }
 
-.flow-lg {
+.flow-lg>* {
   --flow-gap: var(--size-20);
 }
 
-.flow-xl {
+.flow-xl>* {
   --flow-gap: var(--size-24);
 }
 
-.flow-2xl {
+.flow-2xl>* {
   --flow-gap: var(--size-28);
 }
 
