@@ -1,17 +1,17 @@
 <template>
-  <AtomsLabel :label>
-    <input v-bind="$attrs" :aria-describedby="errorId" class="| text-input" @input="checkValidity" />
+  <input :id="inputId" v-bind="$attrs" :aria-describedby="errorText && errorId" class="| text-input"
+    @input="checkValidity" />
 
-    <span v-if="errorText" :id="errorId" class="| text-input-error body-sm">
-      {{ errorText }}
-    </span>
-  </AtomsLabel>
+  <span v-if="errorText" :id="errorId" class="| text-input-error body-sm">
+    {{ errorText }}
+  </span>
 </template>
 
 <script setup>
 /**
  *  a11y
  */
+const inputId = inject('for', '')
 const errorId = useId()
 
 /**
@@ -20,9 +20,6 @@ const errorId = useId()
 const props = defineProps({
   validationTextOverrides: {
     type: Object
-  },
-  label: {
-    type: String
   }
 })
 

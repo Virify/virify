@@ -1,25 +1,21 @@
 <template>
-  <fieldset>
+  <fieldset class="m-formpassword | flow flow-xs" role="presentation">
     <legend class="| visually-hidden">Password with toggle</legend>
 
-    <AtomsLabel :label :for="passwordId" />
+    <AtomsLabel :for="passwordId">{{ label }}</AtomsLabel>
 
-    <div class="a-password" role="none">
-      <input :id="passwordId" v-bind="$attrs" :type="inputType" class="a-password-input | text-input"
-        :aria-describedby="errorId" @input="checkValidity" />
+    <div class="| relative">
+      <AtomsInput :id="passwordId" v-bind="$attrs" :type="inputType" class="m-formpassword-input"
+        :validation-text-overrides="validationTextOverrides" />
 
       <client-only>
         <!-- Client only as this feature only works with JS anyway -->
-        <button type="button" class="a-password-toggle" :aria-label="inputLabel" :aria-controls="passwordId"
+        <button type="button" class="m-formpassword-toggle" :aria-label="inputLabel" :aria-controls="passwordId"
           :aria-pressed="show" @click.prevent="toggleShowPassword">
-          <AtomsIcon role="none" class="a-password-icon" :icon="inputIcon" />
+          <AtomsIcon role="none" class="m-formpassword-icon" :icon="inputIcon" />
         </button>
       </client-only>
     </div>
-
-    <span v-if="errorText" :id="errorId" class="| text-input-error body-sm">
-      {{ errorText }}
-    </span>
   </fieldset>
 </template>
 
@@ -44,20 +40,8 @@ const props = defineProps({
 })
 
 /**
- *  Validate inputs - this can probably be made into a composable
- */
-const errorText = ref(null)
-
-function checkValidity({ target }) {
-  const { validationTextOverrides: overrides } = props
-
-  errorText.value = useInputValidationMessage(target, overrides)
-}
-
-/**
  *  a11y
  */
-const errorId = useId()
 const passwordId = useId()
 
 /**
@@ -75,15 +59,15 @@ function toggleShowPassword() {
 </script>
 
 <style>
-.a-password {
+.m-formpassword {
   position: relative;
 }
 
-.a-password-input {
+.m-formpassword-input {
   padding-right: var(--input-text-height);
 }
 
-.a-password-toggle {
+.m-formpassword-toggle {
   position: absolute;
   top: 0;
   right: 0;
@@ -95,13 +79,13 @@ function toggleShowPassword() {
   transition: opacity var(--animation-fast);
 }
 
-.a-password-icon {
+.m-formpassword-icon {
   width: var(--size-20);
   height: var(--size-20);
 }
 
 @media (hover: hover) {
-  .a-password:not(:hover):not(:focus-within) .a-password-toggle {
+  .m-formpassword:not(:hover):not(:focus-within) .m-formpassword-toggle {
     opacity: 0;
   }
 }
