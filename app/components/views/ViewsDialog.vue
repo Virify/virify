@@ -180,49 +180,14 @@ watch(useRoute(), close)
     view-transition-name: dialog-window;
   }
 
-  .o-dialog-content {
-    view-transition-name: dialog-content;
-  }
-
-  .o-dialog-close {
-    view-transition-name: dialog-close;
-  }
-
-  ::view-transition-group(dialog-content),
   ::view-transition-group(dialog-window) {
-    animation-duration: var(--animation-slow);
+    animation-duration: var(--animation-fast);
     animation-timing-function: var(--ease-out);
   }
 
   ::view-transition-old(dialog-window),
   ::view-transition-new(dialog-window) {
     height: 100%;
-  }
-
-  ::view-transition-old(dialog-content) {
-    animation-name: slidePageTo;
-  }
-
-  ::view-transition-new(dialog-content) {
-    animation-name: slidePageFrom;
-  }
-}
-
-
-/**
- *  View transition keyframes
- */
-@keyframes slidePageTo {
-  to {
-    opacity: 0;
-    transform: translateY(-2em);
-  }
-}
-
-@keyframes slidePageFrom {
-  from {
-    opacity: 0;
-    transform: translateY(2em);
   }
 }
 </style>
