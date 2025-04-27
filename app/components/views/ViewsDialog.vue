@@ -4,12 +4,12 @@
       <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="close"></button>
 
       <section v-if="dialog" class="o-dialog-content" :class="dialog.className">
+        <component :is="dialog.component" v-bind="dialog.props" />
+
         <button class="o-dialog-close | button button-quiet" aria-label="Close modal" aria-controls="modal"
           @click.prevent="close">
           <AtomsIcon icon="cross" aria-hidden class="o-dialog-close-icon" />
         </button>
-
-        <component :is="dialog.component" v-bind="dialog.props" />
       </section>
     </dialog>
   </Teleport>
