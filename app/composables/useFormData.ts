@@ -1,14 +1,6 @@
-interface InputError {
-  type: string
-  message: string
-}
+import type { ErrorBoxProp } from '~/types'
 
-interface ErrorResponse {
-  title: string
-  content: InputError[]
-}
-
-type UseFormData = { errors: ErrorResponse } | { formData: FormData }
+type UseFormData = { errors: ErrorBoxProp } | { formData: FormData }
 
 /**
  *  Standardise form validation
@@ -25,9 +17,9 @@ export function useFormData(maybeRefForm: unknown): UseFormData {
   }
 
   // Create an default errors message
-  const errors: ErrorResponse = {
+  const errors: ErrorBoxProp = {
     title: 'Element is not a form',
-    content: []
+    list: []
   }
 
   // Check is form
@@ -43,7 +35,7 @@ export function useFormData(maybeRefForm: unknown): UseFormData {
       if (!message) return
 
       // Add error message to array
-      errors.content.push({
+      errors.list.push({
         type: input.name,
         message
       })

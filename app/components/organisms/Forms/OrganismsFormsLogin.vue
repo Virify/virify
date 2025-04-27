@@ -1,5 +1,5 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="| stacked">
+  <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="| stacked" :error="formErrors">
     <MoleculesFormField label="Email address">
       <AtomsInput type="email" name="email" required />
     </MoleculesFormField>
@@ -20,14 +20,15 @@
 const emits = defineEmits(['form-success', 'form-error', 'form-clear-error'])
 
 /**
- *  For password inputs
+ *  Composables
  */
 const { pattern, validityText } = getValidPassword()
+const { isPending, setPendingWhile } = usePending()
 
 /**
- *  Form state
+ *  Handle errors
  */
-const { isPending, setPendingWhile } = usePending()
+const formErrors = ref(null)
 
 /**
  *  Validate form and submit
@@ -37,14 +38,16 @@ async function loginUser({ target }) {
 
   setPendingWhile(async () => {
     // Clear any existing form errors
-    emits('form-clear-error')
+    formErrors.value = null
 
     // First check the validity of the form
     const { formData, errors } = useFormData(target)
 
     // If errors exist, show them
     if (errors) {
-      return emits('form-error', errors)
+      formErrors.value = errors
+
+      return
     }
 
     // Post data
@@ -59,10 +62,10 @@ async function loginUser({ target }) {
         emits('form-success')
       })
       .catch((error) => {
-        emits('form-error', {
+        formErrors.value = {
           title: 'Login failed',
-          content: error.data.message
-        })
+          message: error.data.message
+        }
       })
   })
 }
