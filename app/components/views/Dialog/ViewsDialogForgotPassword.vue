@@ -12,12 +12,12 @@
     <div class="| center-text flow flow-sm">
       <p class="| body-sm">
         Already know your password?
-        <nuxt-link to="/login">Log in now</nuxt-link>
+        <dialog-link to="/login">Log in now</dialog-link>
       </p>
 
       <p class="| body-sm">
         Don't have an account yet?
-        <nuxt-link to="/signup">Create an account</nuxt-link>
+        <dialog-link to="/signup">Create an account</dialog-link>
       </p>
     </div>
   </div>
