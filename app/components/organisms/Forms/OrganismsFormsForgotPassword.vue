@@ -1,5 +1,7 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword" class="| stacked">
+  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword" class="| stacked"
+    :error="formErrors">
+
     <MoleculesFormField label="Email address">
       <AtomsInput type="email" name="email" required />
     </MoleculesFormField>
@@ -14,17 +16,18 @@
 /**
  *  Emits
  */
-const emits = defineEmits(['form-success', 'form-error', 'form-clear-error'])
+const emits = defineEmits(['form-success'])
 
 /**
- *  For password inputs
+ *  Composables
  */
 const { pattern, validityText } = getValidPassword()
+const { isPending, setPendingWhile } = usePending()
 
 /**
- *  Form state
+ *  Handle errors
  */
-const { isPending, setPendingWhile } = usePending()
+const formErrors = ref(null)
 
 /**
  *  Validate form and submit
@@ -34,14 +37,16 @@ async function resetPassword({ target }) {
 
   setPendingWhile(async () => {
     // Clear any existing form errors
-    emits('form-clear-error')
+    formErrors.value = null
 
     // First check the validity of the form
     const { formData, errors } = useFormData(target)
 
     // If errors exist, show them
     if (errors) {
-      return emits('form-error', errors)
+      formErrors.value = errors
+
+      return
     }
 
     // Post data
@@ -55,10 +60,10 @@ async function resetPassword({ target }) {
         emits('form-success', passwordToken)
       })
       .catch((error) => {
-        emits('form-error', {
-          title: 'Login failed',
-          content: error.data.message
-        })
+        formErrors.value = {
+          title: 'Password reset failed',
+          message: error.data.message
+        }
       })
   })
 }

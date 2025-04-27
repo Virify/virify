@@ -1,16 +1,18 @@
 <template>
   <section class="m-error-box | flow flow-xs" role="alert" aria-live="polite">
-    <h2 class="m-error-box-title | title-xs">
+    <h2 v-if="formattedError.title" class="m-error-box-title | title-xs">
       <AtomsIcon title="Error icon" icon="errors/error" class="m-error-box-icon" />
 
-      {{ errorTitle }}
+      {{ formattedError.title }}
     </h2>
 
     <div class="m-error-box-content" role="presentation">
-      <p v-if="errorsIsString" class="| body-sm">{{ errorContent }}</p>
+      <p v-if="formattedError.message" class="| body-sm">
+        {{ formattedError.message }}
+      </p>
 
-      <ul v-else-if="errorsIsArray && errorContent.length">
-        <li v-for="{ type, message } of errorContent" class="body-sm">
+      <ul v-if="formattedError.list?.length">
+        <li v-for="{ type, message } of formattedError.list" class="body-sm">
           {{ type }} - {{ message }}
         </li>
       </ul>
@@ -18,34 +20,42 @@
   </section>
 </template>
 
-<script setup>
-const props = defineProps({
-  errorTitle: {
-    type: String,
-    default: 'An unspecified error occurred'
-  },
-  errorContent: {
-    type: [String, Array]
-  }
+<script setup lang="ts">
+import type { ErrorBoxProp } from '~/types'
+
+const props = withDefaults(defineProps<{ error: ErrorBoxProp }>(), {
+  error: 'An error occurred'
 })
 
 /**
  *  Determine format to render errors
  */
-const errorsIsString = computed(() => {
-  const { errorContent } = props
+const formattedError = computed(() => {
+  const { error } = props
 
-  return isString(errorContent)
-})
+  // If error is a string, return that
+  if (isString(error)) {
+    return {
+      title: error
+    }
+  }
 
-const errorsIsArray = computed(() => {
-  const { errorContent } = props
+  // If error is instance of Error, return error message
+  if (isError(error)) {
+    return {
+      title: error.message || 'An error occurred'
+    }
+  }
 
-  return Array.isArray(errorContent) && errorContent.every((error) => {
-    if (!isObject(error)) return false
+  // Otherwise try and destructure error message
+  const { title, message, list } = asObject(error)
 
-    return error.type && error.message
-  })
+  // Return in valid format
+  return {
+    title: asString(title),
+    message: asString(message),
+    list: asArray(list).filter(isObject),
+  }
 })
 </script>
 
