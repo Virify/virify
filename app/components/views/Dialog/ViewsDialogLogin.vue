@@ -8,7 +8,7 @@
 
     <div class="| center-text flow flow-sm">
       <p>
-        <dialog-link to="/password/forgot" class="| body-sm">
+        <dialog-link to="/password/forgot" :component="LazyViewsDialogForgotPassword" class="| body-sm">
           Forgot password?
         </dialog-link>
       </p>
@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import { LazyViewsDialogForgotPassword } from '#components'
+
 const { fetch } = useUserSession();
 
 /**

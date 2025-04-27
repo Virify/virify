@@ -1,5 +1,5 @@
 <template>
-  <nuxt-link v-bind="$attrs" @click.native="openDialog">
+  <nuxt-link v-bind="$attrs" @click.capture="openDialog">
     <slot></slot>
   </nuxt-link>
 </template>
@@ -29,11 +29,32 @@ interface Props {
 const props = defineProps<Props>()
 
 /**
- *  Open dialog
+ *  Dialog
+ */
+const { showDialog } = useDialog()
+
+/**
+ *  Check if special keys are pressed
+ */
+const { isMetaKey } = useEventKey()
+
+/**
+ *  Conditionally block navigation and load custom modals
  */
 function openDialog(e) {
-  const { component } = props
+  const { component, componentProps, componentClose } = props
 
-  console.log('Open dialog', { component })
+  // If no component was provided, of meta key pressed, ignore
+  if (!component || isMetaKey(e)) return
+
+  // Else block navigation
+  e.preventDefault()
+
+  // And then show the appropriate dialog
+  showDialog({
+    component,
+    props: asObject(componentProps),
+    onClose: componentClose
+  })
 }
 </script>
