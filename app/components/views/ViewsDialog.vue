@@ -87,7 +87,10 @@ watch(useRoute(), close)
 
 .o-dialog::backdrop {
   background-color: fn.faded-color(85%, light-dark(var(--monochrome-300), var(--monochrome-100)));
-  animation: fadeDialogIn var(--animation-medium) var(--ease-out);
+
+  @include mq.motion {
+    animation: fadeDialogIn var(--animation-medium) var(--ease-out);
+  }
 }
 
 .o-dialog-close {
@@ -129,7 +132,10 @@ watch(useRoute(), close)
   max-width: calc(100% - var(--size-32));
   box-sizing: border-box;
   border-radius: var(--border-radius-2xl);
-  animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
+
+  @include mq.motion {
+    animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
+  }
 
   @include mq.tablet {
     padding: var(--size-32)
@@ -168,24 +174,30 @@ watch(useRoute(), close)
 /**
  *  View transitions
  */
-.o-dialog-content {
-  view-transition-name: dialog-window;
+@include mq.motion {
+  .o-dialog-content {
+    view-transition-name: dialog-window;
+  }
+
+  ::view-transition-old(dialog-window),
+  ::view-transition-new(dialog-window) {
+    animation-duration: var(--animation-slow);
+    animation-timing-function: var(--ease-out);
+  }
+
+  ::view-transition-old(dialog-window) {
+    animation-name: slidePageTo;
+  }
+
+  ::view-transition-new(dialog-window) {
+    animation-name: slidePageFrom;
+  }
 }
 
-::view-transition-old(dialog-window),
-::view-transition-old(dialog-window) {
-  animation-duration: 0.2s;
-  animation-timing-function: ease-in-out;
-}
 
-::view-transition-old(dialog-window) {
-  animation-name: slidePageTo;
-}
-
-::view-transition-new(dialog-window) {
-  animation-name: slidePageFrom;
-}
-
+/**
+ *  View transition keyframes
+ */
 @keyframes slidePageTo {
   from {
     opacity: 1;
