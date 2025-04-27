@@ -3,8 +3,8 @@
     <dialog ref="$dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
       <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="close"></button>
 
-      <section v-if="dialog" class="o-dialog-content" :class="dialog.className">
-        <component :is="dialog.component" v-bind="dialog.props" />
+      <section v-if="dialog" class="o-dialog-window" :class="dialog.className">
+        <component class="o-dialog-content" :is="dialog.component" v-bind="dialog.props" />
 
         <button class="o-dialog-close | button button-quiet" aria-label="Close modal" aria-controls="modal"
           @click.prevent="close">
@@ -122,7 +122,7 @@ watch(useRoute(), close)
   height: 100%;
 }
 
-:where(.o-dialog-content) {
+:where(.o-dialog-window) {
   position: relative;
   background: light-dark(var(--background-200), var(--background-100));
   color: var(--foreground-200);
@@ -132,6 +132,7 @@ watch(useRoute(), close)
   max-width: calc(100% - var(--size-32));
   box-sizing: border-box;
   border-radius: var(--border-radius-2xl);
+  overflow: hidden;
 
   @include mq.motion {
     animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
@@ -150,7 +151,7 @@ watch(useRoute(), close)
   }
 }
 
-:where(.o-dialog-content > *) {
+:where(.o-dialog-window > *) {
   max-width: 100%;
 }
 
@@ -175,21 +176,34 @@ watch(useRoute(), close)
  *  View transitions
  */
 @include mq.motion {
-  .o-dialog-content {
+  .o-dialog-window {
     view-transition-name: dialog-window;
   }
 
-  ::view-transition-old(dialog-window),
-  ::view-transition-new(dialog-window) {
+  .o-dialog-content {
+    view-transition-name: dialog-content;
+  }
+
+  .o-dialog-close {
+    view-transition-name: dialog-close;
+  }
+
+  ::view-transition-group(dialog-content),
+  ::view-transition-group(dialog-window) {
     animation-duration: var(--animation-slow);
     animation-timing-function: var(--ease-out);
   }
 
-  ::view-transition-old(dialog-window) {
+  ::view-transition-old(dialog-window),
+  ::view-transition-new(dialog-window) {
+    height: 100%;
+  }
+
+  ::view-transition-old(dialog-content) {
     animation-name: slidePageTo;
   }
 
-  ::view-transition-new(dialog-window) {
+  ::view-transition-new(dialog-content) {
     animation-name: slidePageFrom;
   }
 }
@@ -199,26 +213,16 @@ watch(useRoute(), close)
  *  View transition keyframes
  */
 @keyframes slidePageTo {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
   to {
     opacity: 0;
-    transform: translateY(-5em)
+    transform: translateY(-2em);
   }
 }
 
 @keyframes slidePageFrom {
   from {
     opacity: 0;
-    transform: translateY(5em)
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0)
+    transform: translateY(2em);
   }
 }
 </style>
