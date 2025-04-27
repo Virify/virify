@@ -148,6 +148,10 @@ watch(useRoute(), close)
   max-width: 100%;
 }
 
+
+/**
+ *  Show/hide animations for modals
+ */
 @keyframes fadeTransformDialogIn {
   from {
     opacity: 0;
@@ -158,6 +162,51 @@ watch(useRoute(), close)
 @keyframes fadeDialogIn {
   from {
     opacity: 0;
+  }
+}
+
+/**
+ *  View transitions
+ */
+.o-dialog-content {
+  view-transition-name: dialog-window;
+}
+
+::view-transition-old(dialog-window),
+::view-transition-old(dialog-window) {
+  animation-duration: 0.2s;
+  animation-timing-function: ease-in-out;
+}
+
+::view-transition-old(dialog-window) {
+  animation-name: slidePageTo;
+}
+
+::view-transition-new(dialog-window) {
+  animation-name: slidePageFrom;
+}
+
+@keyframes slidePageTo {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-5em)
+  }
+}
+
+@keyframes slidePageFrom {
+  from {
+    opacity: 0;
+    transform: translateY(5em)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
   }
 }
 </style>

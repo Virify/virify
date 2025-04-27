@@ -51,10 +51,12 @@ function openDialog(e) {
   e.preventDefault()
 
   // And then show the appropriate dialog
-  showDialog({
-    component,
-    props: asObject(componentProps),
-    onClose: componentClose
+  useViewTransition(() => {
+    showDialog({
+      component,
+      props: asObject(componentProps),
+      onClose: componentClose
+    })
   })
 }
 </script>
