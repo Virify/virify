@@ -39,7 +39,7 @@ function formSuccess(user) {
 
 <template>
   <div class="| container container-2xs flow flow-lg">
-    <h1 class="| title-xl">Welcome</h1>
+    <h1 class="| title-xl">Create account</h1>
 
     <p class="| body-sm">You can do more when you have an account - and it only takes a jiffy to set up</p>
 
