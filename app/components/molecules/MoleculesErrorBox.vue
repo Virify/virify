@@ -1,5 +1,5 @@
 <template>
-  <section class="m-error-box | flow flow-xs">
+  <section class="m-error-box | flow flow-xs" role="alert" aria-live="polite">
     <h2 class="m-error-box-title | title-xs">
       <AtomsIcon title="Error icon" icon="errors/error" class="m-error-box-icon" />
 

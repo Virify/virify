@@ -1,5 +1,5 @@
 <template>
-  <span class="a-inline-error | body-sm lineheight-sm">
+  <span class="a-inline-error | body-sm lineheight-sm" role="alert" aria-live="polite">
     <AtomsIcon icon="errors/error" aria-hidden class="a-inline-error-icon" />
 
     <slot></slot>
