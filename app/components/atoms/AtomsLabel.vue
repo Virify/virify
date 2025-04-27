@@ -1,21 +1,11 @@
 <template>
-  <label class="a-label">
-    <span class="a-label-text | body-sm" v-if="label" role="presentation">{{ label }}</span>
+  <label class="a-label | body-sm">
     <slot></slot>
   </label>
 </template>
 
-<script setup>
-defineProps({
-  label: {
-    type: String
-  }
-})
-</script>
-
 <style>
-.a-label-text {
+.a-label {
   display: block;
-  margin-bottom: var(--size-6);
 }
 </style>

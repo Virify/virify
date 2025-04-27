@@ -23,4 +23,19 @@
   --size-48: #{fn.toRem(48)};
   --size-56: #{fn.toRem(56)};
   --size-64: #{fn.toRem(64)};
+  --size-72: #{fn.toRem(72)};
+
+  /**
+   *  Border radius sizes
+   */
+  --border-radius-sm: var(--size-6);
+  --border-radius-md: var(--size-8);
+  --border-radius-lg: var(--size-12);
+  --border-radius-xl: var(--size-16);
+  --border-radius-2xl: var(--size-24);
+  --border-radius-3xl: var(--size-32);
+
+  // For UI elements (e.g. buttons)
+  --border-radius-ui: var(--size-12);
+  --border-radius-pill: var(--size-72);
 }

@@ -9,18 +9,11 @@
   background: var(--input-text-background);
   color: var(--input-text-color);
   border: 1px solid var(--input-text-border);
-  border-radius: var(--input-text-radius);
   height: var(--input-text-height);
+  border-radius: var(--border-radius-ui);
 }
 
 .text-input:user-invalid {
   color: var(--text-input-error-color);
   border-color: var(--text-input-error-border);
-  background-color: var(--text-input-error-background);
-}
-
-.text-input-error {
-  display: block;
-  margin: var(--size-8) 0;
-  color: var(--error-200)
 }

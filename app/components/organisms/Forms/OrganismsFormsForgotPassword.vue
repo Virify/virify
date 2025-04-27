@@ -1,7 +1,9 @@
 <template>
   <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword"
     class="p-login-form | stacked">
-    <AtomsInput label="Email address" type="email" name="email" required />
+    <MoleculesFormField label="Email address">
+      <AtomsInput type="email" name="email" required />
+    </MoleculesFormField>
 
     <AtomsButton class="p-login-form-submit | button-full button-monochrome" type="submit" :pending="isPending">
       Submit

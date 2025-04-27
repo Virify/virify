@@ -1,12 +1,12 @@
 <template>
-  <section class="m-error-box | box box-lg box-error">
-    <AtomsIcon title="Error icon" icon="errors/error" class="m-error-box-icon" />
+  <section class="m-error-box | flow flow-xs">
+    <h2 class="m-error-box-title | title-xs">
+      <AtomsIcon title="Error icon" icon="errors/error" class="m-error-box-icon" />
 
-    <div class="| flow flow-xs">
-      <h2 class="m-error-box-title | title-xs">
-        {{ errorTitle }}
-      </h2>
+      {{ errorTitle }}
+    </h2>
 
+    <div class="m-error-box-content" role="presentation">
       <p v-if="errorsIsString" class="| body-sm">{{ errorContent }}</p>
 
       <ul v-else-if="errorsIsArray && errorContent.length">
@@ -51,17 +51,26 @@ const errorsIsArray = computed(() => {
 
 <style>
 .m-error-box {
-  display: flex;
-  gap: var(--size-12);
+  color: var(--error-foreground);
+  background-color: var(--error-background);
+  padding: var(--size-16);
+  border-radius: var(--border-radius-lg);
 }
 
 .m-error-box-title {
+  display: flex;
+  align-items: center;
+  gap: var(--size-12);
   margin: 0;
 }
 
 .m-error-box-icon {
-  height: var(--lineheight-sm);
-  width: var(--lineheight-sm);
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  width: var(--size-24);
+  height: var(--size-24);
+}
+
+.m-error-box-content {
+  padding-left: calc(var(--size-24) + var(--size-12));
 }
 </style>

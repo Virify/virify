@@ -2,20 +2,13 @@
  *  Button base
  */
 .box {
-  border-radius: var(--size-12);
-  padding: var(--size-12) var(--size-16);
   color: var(--foreground-100);
+  padding: var(--size-12) var(--size-16);
+  border-radius: var(--border-radius-lg);
   background-color: var(--background-200);
   border: 1px solid var(--background-300);
 }
 
 .box-lg {
   padding: var(--size-20) var(--size-24);
-}
-
-.box-error {
-  padding: var(--size-16);
-  color: var(--error-200);
-  border-color: var(--error-200);
-  background-color: light-dark(var(--error-100), var(--error-300));
 }

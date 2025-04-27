@@ -4,13 +4,11 @@
   --input-text-background: var(--background-200);
   --input-text-border: var(--background-300);
   --input-text-color: var(--foreground-100);
-  --input-text-radius: var(--size-8);
   --input-text-height: #{fn.toRem(52)};
 
   // Error colours
-  --text-input-error-color: var(--error-200);
-  --text-input-error-border: var(--error-200);
-  --text-input-error-background: light-dark(var(--error-100), var(--error-300));
+  --text-input-error-color: var(--error-foreground);
+  --text-input-error-border: var(--error-foreground);
 
   // Toggle inputs, etc.
   --input-toggle-background: light-dark(var(--blue-800), var(--blue-400));
