@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import type { ErrorBoxProp } from '~/types'
 
-defineProps<{ error: ErrorBoxProp }>()
+defineProps<{ error?: ErrorBoxProp | null }>()
 
 /**
  *  Form setup
