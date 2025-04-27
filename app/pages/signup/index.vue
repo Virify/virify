@@ -33,7 +33,7 @@ function formSuccess(user) {
   console.log('DEBUG', user);
 
   // redirect to OTP Verification for activation
-  navigateTo("/verify?token=" + user.token);
+  navigateTo("/signup/verify?token=" + user.token);
 }
 </script>
 

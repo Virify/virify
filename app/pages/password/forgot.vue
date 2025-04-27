@@ -31,7 +31,7 @@ function formError(error) {
  *  Success
  */
 function formSuccess(passwordToken) {
-  navigateTo("/verify?passwordToken=" + passwordToken);
+  navigateTo("/signup/verify?passwordToken=" + passwordToken);
 }
 </script>
 <template>
