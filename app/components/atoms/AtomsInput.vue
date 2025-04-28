@@ -14,6 +14,8 @@
 </template>
 
 <script setup>
+import { useDebounceFn } from '@vueuse/core'
+
 /**
  *  a11y
  */
@@ -37,9 +39,9 @@ const props = defineProps({
  */
 const errorText = ref(null)
 
-function checkValidity({ target }) {
+const checkValidity = useDebounceFn(({ target }) => {
   const { validationTextOverrides: overrides } = props
 
   errorText.value = useInputValidationMessage(target, overrides)
-}
+}, 500)
 </script>
