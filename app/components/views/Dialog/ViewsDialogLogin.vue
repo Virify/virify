@@ -1,5 +1,5 @@
 <template>
-  <div class="o-dialog-view-signin | flow">
+  <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">Welcome back</h1>
 
     <OrganismsFormsLogin @form-success="formSuccess" />
@@ -41,9 +41,3 @@ function formSuccess() {
   hideDialog("/account");
 }
 </script>
-
-<style>
-.o-dialog-view-signin {
-  width: 24em;
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="o-dialog-view-signup | flow">
+  <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">Create account</h1>
 
     <p class="| body-sm">You can do more when you have an account - and it only takes a jiffy to set up</p>
@@ -37,9 +37,3 @@ function formSuccess(user) {
   navigateTo("/signup/verify?token=" + user.token);
 }
 </script>
-
-<style>
-.o-dialog-view-signup {
-  width: 24em;
-}
-</style>

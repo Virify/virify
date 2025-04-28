@@ -1,3 +1,5 @@
+@use '../_utils/media' as mq;
+
 /**
  *  Page widths
  */
@@ -20,4 +22,38 @@
 
 .container-2xs {
   width: min(100% - var(--size-48), 26rem);
+
+/**
+ *  Dialog containers
+ */
+.dialog-container {
+  --container-width: 42rem;
+
+  width: var(--container-width);
+  padding: var(--size-28);
+  max-width: 100%;
+
+  @include mq.tablet {
+    padding: var(--size-32)
+  }
+
+  @include mq.notebook {
+    padding: var(--size-36)
+  }
+
+  @include mq.desktop {
+    padding: var(--size-40)
+  }
+}
+
+.dialog-container-lg {
+  --container-width: 54rem;
+}
+
+.dialog-container-sm {
+  --container-width: 34rem;
+}
+
+.dialog-container-xs {
+  --container-width: 26rem;
 }

@@ -123,25 +123,12 @@ watch(useRoute(), close)
   position: relative;
   background: light-dark(var(--background-200), var(--background-100));
   color: var(--foreground-200);
-  padding: var(--size-28);
   margin: auto;
   width: fit-content;
   max-width: calc(100% - var(--size-32));
   box-sizing: border-box;
   border-radius: var(--border-radius-2xl);
   animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
-
-  @include mq.tablet {
-    padding: var(--size-32)
-  }
-
-  @include mq.notebook {
-    padding: var(--size-36)
-  }
-
-  @include mq.desktop {
-    padding: var(--size-40)
-  }
 }
 
 :where(.o-dialog-content > *) {
