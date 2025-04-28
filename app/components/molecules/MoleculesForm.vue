@@ -1,10 +1,16 @@
 <template>
   <form ref="$form">
+    <MoleculesErrorBox v-if="error" :error />
+
     <slot></slot>
   </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { ErrorBoxProp } from '~/types'
+
+defineProps<{ error?: ErrorBoxProp | null }>()
+
 /**
  *  Form setup
  */

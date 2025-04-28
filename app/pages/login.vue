@@ -2,31 +2,6 @@
 const { fetch } = useUserSession();
 
 /**
- *  Errors
- */
-const formErrorTitle = ref()
-const formErrorContent = ref()
-
-function formClearError() {
-  formErrorTitle.value = ''
-  formErrorContent.value = ''
-}
-
-function formError(error) {
-  // If is string, just save error as title
-  if (isString(error)) {
-    formErrorTitle.value = error
-  }
-
-  // Else destructure to title, content
-  const { title, content } = asObject(error)
-
-  // And then save
-  formErrorTitle.value = title
-  formErrorContent.value = content
-}
-
-/**
  *  Success
  */
 function formSuccess() {
@@ -39,9 +14,7 @@ function formSuccess() {
   <div class="| container container-2xs flow flow-lg">
     <h1 class="| title-xl">Welcome back</h1>
 
-    <MoleculesErrorBox v-if="formErrorTitle" :error-title="formErrorTitle" :error-content="formErrorContent" />
-
-    <OrganismsFormsLogin @form-success="formSuccess" @form-error="formError" @form-clear-error="formClearError" />
+    <OrganismsFormsLogin @form-success="formSuccess" />
 
     <AtomsDivider text="or" />
 
