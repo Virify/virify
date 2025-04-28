@@ -4,7 +4,10 @@
  *  Page widths
  */
 .container {
-  width: min(100% - var(--size-48), 72rem);
+  --container-width: 72rem;
+  --container-padding: var(--size-48);
+
+  width: min(100% - var(--container-padding), var(--container-width));
   margin-inline: auto;
 
   // @TODO remove once Tailwind is removed, this only exists to
@@ -13,15 +16,18 @@
 }
 
 .container-sm {
-  width: min(100% - var(--size-48), 48rem);
+  --container-width: 48rem;
 }
 
 .container-xs {
-  width: min(100% - var(--size-48), 36rem);
+  --container-width: 36rem;
+  --container-padding: var(--size-36);
 }
 
 .container-2xs {
-  width: min(100% - var(--size-48), 26rem);
+  --container-width: 24rem;
+  --container-padding: var(--size-36);
+}
 
 /**
  *  Dialog containers
