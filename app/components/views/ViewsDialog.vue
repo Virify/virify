@@ -4,7 +4,7 @@
       <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="close"></button>
 
       <section v-if="dialog" class="o-dialog-window" :class="dialog.className">
-        <component class="o-dialog-content" :is="dialog.component" v-bind="dialog.props" />
+        <component :is="dialog.component" v-bind="dialog.props" />
 
         <button class="o-dialog-close | button button-quiet" aria-label="Close modal" aria-controls="modal"
           @click.prevent="close">
