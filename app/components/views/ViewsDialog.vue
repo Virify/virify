@@ -136,18 +136,6 @@ watch(useRoute(), close)
   @include mq.motion {
     animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
   }
-
-  @include mq.tablet {
-    padding: var(--size-32)
-  }
-
-  @include mq.notebook {
-    padding: var(--size-36)
-  }
-
-  @include mq.desktop {
-    padding: var(--size-40)
-  }
 }
 
 :where(.o-dialog-window > *) {
