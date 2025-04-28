@@ -1,0 +1,12 @@
+model RunningCosts {
+  id             Int      @id @default(autoincrement())
+  councilTaxBand String
+  serviceCharges Float?
+  groundRent     Float?
+  propertyId     Int      @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  property       Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}

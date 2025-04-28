@@ -1,0 +1,51 @@
+model Listing {
+  id                 Int                @id @default(autoincrement())
+  title              String
+  description        String
+  price              Float?
+  priceType          PriceType
+  listingType        ListingType
+  availabilityStatus AvailabilityStatus
+  listingTier        ListingTier
+  userId             Int?
+  propertyId         Int?               @unique
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  user               User?              @relation(fields: [userId], references: [id])
+  property           Property?          @relation(fields: [propertyId], references: [id])
+  listingCosts       ListingCosts?
+  agents             Agent[]            @relation("AgentToListing")
+  estateAgent        EstateAgent?       @relation(fields: [estateAgentId], references: [id])
+  estateAgentId      Int?
+
+  @@index([userId])
+  @@index([propertyId])
+}
+
+enum ListingType {
+  FOR_SALE
+  FOR_LONG_TERM_LET
+  SHORT_TERM_LET
+  AUCTION
+}
+
+enum ListingTier {
+  BASIC
+  PREMIUM
+  FEATURED
+}
+
+enum PriceType {
+  OFFERS_IN_EXCESS_OF
+  GUIDE_PRICE
+  OFFERS_IN_THE_REGION_OF
+  PER_CALENDAR_MONTH
+  PER_WEEK
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  UNDER_OFFER
+  SOLD
+  LET_AGREED
+}

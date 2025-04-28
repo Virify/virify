@@ -1,0 +1,17 @@
+model Bathroom {
+  id           Int      @id @default(autoincrement())
+  roomNumber   Int
+  enSuite      Boolean  @default(false)
+  bathtub      Boolean  @default(true)
+  walkInShower Boolean  @default(false)
+  downstairs   Boolean  @default(false)
+  upstairs     Boolean  @default(true)
+  description  String
+  size         Float?
+  propertyId   Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  property     Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}

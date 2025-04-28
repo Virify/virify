@@ -126,7 +126,6 @@ watch(useRoute(), close)
   position: relative;
   background: light-dark(var(--background-200), var(--background-100));
   color: var(--foreground-200);
-  padding: var(--size-28);
   margin: auto;
   width: fit-content;
   max-width: calc(100% - var(--size-32));
