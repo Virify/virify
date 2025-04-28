@@ -1,0 +1,20 @@
+model PropertyType {
+  id              Int                      @id @default(autoincrement())
+  name            String                   @unique
+  classifications PropertyClassification[]
+  Property        Property[]
+}
+
+// enum PropertyType {
+//   HOUSE
+//   COTTAGE
+//   BUNGALOW
+//   PENTHOUSE
+//   FLAT
+//   LAND
+//   FARM
+//   SHARED_OWNERSHIP
+//   RETIREMENT_HOME
+//   NEW_BUILD_HOME
+//   STUDENT_ACCOMMODATION
+// }

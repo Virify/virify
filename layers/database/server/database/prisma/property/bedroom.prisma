@@ -1,0 +1,25 @@
+model Bedroom {
+  id             Int           @id @default(autoincrement())
+  roomNumber     Int
+  bed            BedSizeType[]
+  description    String
+  enSuite        Boolean       @default(false)
+  builtInStorage Boolean       @default(false)
+  walkInWardrobe Boolean       @default(false)
+  size           Float?
+  propertyId     Int
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  property       Property      @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}
+
+enum BedSizeType {
+  SINGLE
+  DOUBLE
+  QUEEN
+  KING
+  SUPER_KING
+  BUNK
+}
