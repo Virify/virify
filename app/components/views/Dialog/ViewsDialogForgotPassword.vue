@@ -12,14 +12,14 @@
     <div class="| center-text flow flow-sm">
       <p class="| body-sm">
         Already know your password?
-        <dialog-link to="/login" :component="LazyViewsDialogLogin">
+        <dialog-link to="/login" :component="ViewsDialogLogin">
           Log in now
         </dialog-link>
       </p>
 
       <p class="| body-sm">
         Don't have an account yet?
-        <dialog-link to="/signup" :component="LazyViewsDialogSignup">
+        <dialog-link to="/signup" :component="ViewsDialogSignup">
           Create an account
         </dialog-link>
       </p>
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { LazyViewsDialogLogin, LazyViewsDialogSignup } from '#components'
+import { ViewsDialogLogin, ViewsDialogSignup } from '#components'
 
 /**
  *  Modal control

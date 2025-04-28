@@ -3,7 +3,7 @@
     <dialog ref="$dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
       <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="close"></button>
 
-      <section v-if="dialog" class="o-dialog-content" :class="dialog.className">
+      <section v-if="dialog" class="o-dialog-window" :class="dialog.className">
         <component :is="dialog.component" v-bind="dialog.props" />
 
         <button class="o-dialog-close | button button-quiet" aria-label="Close modal" aria-controls="modal"
@@ -87,7 +87,10 @@ watch(useRoute(), close)
 
 .o-dialog::backdrop {
   background-color: fn.faded-color(85%, light-dark(var(--monochrome-300), var(--monochrome-100)));
-  animation: fadeDialogIn var(--animation-medium) var(--ease-out);
+
+  @include mq.motion {
+    animation: fadeDialogIn var(--animation-medium) var(--ease-out);
+  }
 }
 
 .o-dialog-close {
@@ -119,7 +122,7 @@ watch(useRoute(), close)
   height: 100%;
 }
 
-:where(.o-dialog-content) {
+:where(.o-dialog-window) {
   position: relative;
   background: light-dark(var(--background-200), var(--background-100));
   color: var(--foreground-200);
@@ -128,13 +131,21 @@ watch(useRoute(), close)
   max-width: calc(100% - var(--size-32));
   box-sizing: border-box;
   border-radius: var(--border-radius-2xl);
-  animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
+  overflow: hidden;
+
+  @include mq.motion {
+    animation: fadeTransformDialogIn var(--animation-medium) var(--ease-out);
+  }
 }
 
-:where(.o-dialog-content > *) {
+:where(.o-dialog-window > *) {
   max-width: 100%;
 }
 
+
+/**
+ *  Show/hide animations for modals
+ */
 @keyframes fadeTransformDialogIn {
   from {
     opacity: 0;
@@ -145,6 +156,25 @@ watch(useRoute(), close)
 @keyframes fadeDialogIn {
   from {
     opacity: 0;
+  }
+}
+
+/**
+ *  View transitions
+ */
+@include mq.motion {
+  .o-dialog-window {
+    view-transition-name: dialog-window;
+  }
+
+  ::view-transition-group(dialog-window) {
+    animation-duration: var(--animation-fast);
+    animation-timing-function: var(--ease-out);
+  }
+
+  ::view-transition-old(dialog-window),
+  ::view-transition-new(dialog-window) {
+    height: 100%;
   }
 }
 </style>

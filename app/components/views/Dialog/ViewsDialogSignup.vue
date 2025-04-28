@@ -11,7 +11,7 @@
     <div class="| center-text flow flow-sm">
       <p class="| body-sm">
         Already have an account?
-        <dialog-link to="/login" :component="LazyViewsDialogLogin">
+        <dialog-link to="/login" :component="ViewsDialogLogin">
           Log in
         </dialog-link>
       </p>
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { LazyViewsDialogLogin } from '#components'
+import { ViewsDialogLogin } from '#components'
 
 /**
  *  Modal control
