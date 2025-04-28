@@ -1,14 +1,11 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="| stacked">
+  <MoleculesForm method="POST" action="/auth/signup" @submit.prevent="createAccount" class="| stacked">
     <MoleculesFormField label="Email address">
       <AtomsInput type="email" name="email" required />
     </MoleculesFormField>
 
-    <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern
-      :validation-text-overrides="validityText" />
-
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending">
-      Log in
+      Create account
     </AtomsButton>
   </MoleculesForm>
 </template>
@@ -32,7 +29,7 @@ const { isPending, setPendingWhile } = usePending()
 /**
  *  Validate form and submit
  */
-async function loginUser({ target }) {
+async function createAccount({ target }) {
   if (isPending.value) return
 
   setPendingWhile(async () => {
@@ -48,19 +45,18 @@ async function loginUser({ target }) {
     }
 
     // Post data
-    await $fetch("/auth/login", {
+    await $fetch("/auth/signup", {
       method: "POST",
       body: {
         email: formData.get('email'),
-        password: formData.get('password')
-      }
+      },
     })
-      .then(() => {
-        emits('form-success')
+      .then((response) => {
+        emits('form-success', response)
       })
       .catch((error) => {
         emits('form-error', {
-          title: 'Login failed',
+          title: 'Sign-up failed',
           content: error.data.message
         })
       })

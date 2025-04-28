@@ -59,9 +59,3 @@ function formSuccess() {
     </div>
   </div>
 </template>
-
-<style scoped>
-.p-login-form-submit {
-  margin-top: var(--size-24);
-}
-</style>
