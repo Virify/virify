@@ -1,25 +1,9 @@
-import type { Component } from 'vue'
-
-interface DialogReturnObject {
-  returnValue?: unknown
-}
-
-interface GenericObject {
-  [key: string]: unknown
-}
-
-interface UseDialogState extends Record<string, unknown> {
-  component?: Component
-  onClose?: (arg0: DialogReturnObject) => void
-  className?: string
-  wrapperClassName?: string
-  props?: GenericObject
-}
+import type { DialogState, DialogStateReturn } from '~/types'
 
 interface UseDialogResponse {
-  dialog?: Ref<UseDialogState | undefined>
-  showDialog: (arg0: UseDialogState) => void
-  hideDialog: (arg0?: DialogReturnObject) => void
+  dialog?: Ref<DialogState | undefined>
+  showDialog: (arg0: DialogState) => void
+  hideDialog: (arg0?: DialogState) => void
 }
 
 /**
@@ -34,13 +18,13 @@ const isObjectWithReturnValue = (obj?: unknown): boolean => {
  *  Structure a dialog response as a valid object
  *
  */
-function createResponseObject(response: unknown): DialogReturnObject {
+function createResponseObject(response: unknown): DialogStateReturn {
   if (!isObjectWithReturnValue(response)) {
     return { returnValue: response }
   }
 
   // Else return as object with response as returnValue key
-  return response as DialogReturnObject
+  return response as DialogStateReturn
 }
 
 /**
@@ -48,7 +32,7 @@ function createResponseObject(response: unknown): DialogReturnObject {
  *
  */
 export default function useDialog(): UseDialogResponse {
-  const state = useState<UseDialogState | undefined>('dialog')
+  const state = useState<DialogState | undefined>('dialog')
 
   /**
    *  Hide a dialog modal
@@ -79,7 +63,7 @@ export default function useDialog(): UseDialogResponse {
    *
    *  @param {String} path
    */
-  const showDialog = (config: UseDialogState = {}) => {
+  const showDialog = (config: DialogState = {}) => {
     const { component, ...content } = asObject(config)
 
     if (!component) {

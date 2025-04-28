@@ -8,20 +8,24 @@
 
     <div class="| center-text flow flow-sm">
       <p>
-        <nuxt-link to="/password/forgot" class="| body-sm">
+        <dialog-link to="/password/forgot" :component="LazyViewsDialogForgotPassword" class="| body-sm">
           Forgot password?
-        </nuxt-link>
+        </dialog-link>
       </p>
 
       <p class="| body-sm">
         Don't have an account yet?
-        <nuxt-link to="/signup">Create an account</nuxt-link>
+        <dialog-link to="/signup" :component="LazyViewsDialogSignup">
+          Create an account
+        </dialog-link>
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { LazyViewsDialogForgotPassword, LazyViewsDialogSignup } from '#components'
+
 const { fetch } = useUserSession();
 
 /**
