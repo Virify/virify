@@ -1,0 +1,18 @@
+model Parking {
+  id               Int      @id @default(autoincrement())
+  garage           Boolean
+  driveway         Boolean
+  permitParking    Boolean
+  onStreet         Boolean
+  noParking        Boolean
+  carport          Boolean
+  allocatedParking Boolean
+  evCharging       Boolean
+  description      String
+  propertyId       Int      @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  property         Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}

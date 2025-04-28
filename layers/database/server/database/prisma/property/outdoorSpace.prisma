@@ -1,0 +1,23 @@
+model OutdoorSpace {
+  id              Int      @id @default(autoincrement())
+  description     String?
+  totalSize       Float?
+  frontGarden     Boolean  @default(false)
+  frontGardenSize Float?
+  rearGarden      Boolean  @default(false)
+  rearGardenSize  Float?
+  sunTerrace      Boolean  @default(false)
+  terrace         Boolean  @default(false)
+  balcony         Boolean  @default(false)
+  patio           Boolean  @default(false)
+  separateParcel  Boolean  @default(false)
+  shed            Boolean  @default(false)
+  summerHouse     Boolean  @default(false)
+  gardenOffice    Boolean  @default(false)
+  propertyId      Int      @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  property        Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}
