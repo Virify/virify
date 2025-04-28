@@ -1,0 +1,43 @@
+model Land {
+  id                     Int                    @id @default(autoincrement())
+  propertyId             Int                    @unique
+  planningClassification PlanningClassification
+  landSize               Float?
+  accessRights           Boolean                @default(false)
+  roadFrontage           Boolean                @default(false)
+  utilitiesAvailable     Boolean                @default(false)
+  currentUse             LandUse
+  agriculturalSubsidies  Boolean                @default(false)
+  stewardshipScheme      Boolean                @default(false)
+  tenanted               Boolean                @default(false)
+  vacant                 Boolean                @default(true)
+  agriculturalUse        Boolean                @default(false)
+  description            String?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  property               Property               @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}
+
+enum PlanningClassification {
+  AGRICULTURAL
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+  MIXED_USE
+  OTHER
+}
+
+enum LandUse {
+  GRAZING
+  ARABLE
+  PASTURE
+  FORESTRY
+  EQUESTRIAN
+  HORTICULTURE
+  CONSERVATION
+  MIXED
+  VACANT
+  OTHER
+}

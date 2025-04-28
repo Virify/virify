@@ -12,7 +12,8 @@
     "db-push": "prisma db push"
   },
   "prisma": {
-    "schema": "./layers/database/server/database/prisma/"
+    "schema": "./layers/database/server/database/prisma/",
+    "seed": "ts-node ./layers/database/server/database/prisma/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.787.0",
@@ -46,6 +47,7 @@
     "jsdom": "^26.1.0",
     "prisma": "^6.4.1",
     "sass": "^1.86.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "vitest": "^3.1.1"
   }

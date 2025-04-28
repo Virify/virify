@@ -1,0 +1,15 @@
+model Utility {
+  id          Int      @id @default(autoincrement())
+  description String?
+  appliances  String[]
+  storage     Boolean  @default(false)
+  sink        Boolean  @default(false)
+  plumbing    Boolean  @default(false)
+  size        Float?
+  propertyId  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  property    Property @relation(fields: [propertyId], references: [id])
+
+  @@index([propertyId])
+}

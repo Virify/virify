@@ -14,7 +14,7 @@ function formSuccess(user) {
   <div class="| container container-2xs flow flow-lg">
     <h1 class="| title-xl">Create account</h1>
 
-    <p class="| body-sm">You can do more when you have an account - and it only takes a jiffy to set up</p>
+    <p class="| body-sm">You can do more when you have an account - it only takes a minute to set up</p>
 
     <OrganismsFormsSignup @form-success="formSuccess" />
 
