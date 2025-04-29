@@ -5,9 +5,10 @@
       <option value="Rent">Rent</option>
     </select>
 
-    <input type="text" placeholder="Location" class="o-searchform-input" @input="searchInput" v-model="currentSearch" />
+    <input type="text" placeholder="Location" class="o-searchform-input" @input="searchInput" v-model="currentSearch"
+      @focus="$event.target.select()" />
 
-    <select class="o-searchform-input">
+    <select class="o-searchform-select">
       <option value="0">0 miles</option>
       <option value="0.25">0.25 miles</option>
       <option value="0.5">0.5 miles</option>
@@ -44,10 +45,20 @@ const currentSearch = defineModel({ default: '' })
   gap: var(--size-8);
 }
 
-.o-searchform-input {
-  flex: 0 1 min-content;
+.o-searchform-input,
+.o-searchform-selected {
   width: auto;
   min-width: 0;
+  height: 100%;
+}
+
+.o-searchform-input {
+  flex: 1 1 min-content;
+  padding-inline-start: var(--size-14);
+}
+
+.o-searchform-selected {
+  flex: 0 1 min-content;
 }
 
 .o-searchform-core-button {
