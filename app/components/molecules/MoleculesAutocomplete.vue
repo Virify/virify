@@ -67,10 +67,11 @@ function emitSuggestion(suggestion: string) {
   color: currentColor;
   background-color: transparent;
   transition: background-color var(--animation-fast);
+}
 
-  &:hover {
-    background: fn.faded-color(8%);
-    color: var(--monochrome-100);
-  }
+.m-autocomplete-button:hover,
+.m-autocomplete:not(:has(.m-autocomplete-button:hover)) li:first-child .m-autocomplete-button {
+  background: fn.faded-color(8%);
+  color: var(--monochrome-100);
 }
 </style>
