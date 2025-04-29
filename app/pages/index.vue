@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full text-center">
-    <h1 class="| title-2xl">Virify</h1>
+  <div>
+    <OrganismsHeroHome />
 
     <div class="| stacked container container-2xs">
       <button @click.prevent="openLogin" class="| button button-full">
