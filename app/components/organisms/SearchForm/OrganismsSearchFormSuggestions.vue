@@ -2,19 +2,20 @@
   <div class="o-searchform-suggestions | flow flow-2xl">
     <div v-if="suggestions" class="o-searchform-suggestions-autocomplete" role="presentation">
       <div role="presentation">
-        <h2 class="| title-xs">Locations</h2>
+        <h2 class="| title-sm">Locations</h2>
 
         <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
           @suggestion-selected="emitSuggestions" />
       </div>
 
       <div role="presentation">
-        <h2 class="| title-xs">Map</h2>
+        <h2 class="| title-sm">Map</h2>
+        <p>Maybe add in a 'search by map' button here?</p>
       </div>
     </div>
 
     <div role="presentation" class="| flow flow-md">
-      <h2 class="| title-xs">Property type</h2>
+      <h2 class="| title-sm">Property type</h2>
 
       <MoleculesScrollBox>
         <ul class="o-searchform-suggestions-property-types">
@@ -26,7 +27,7 @@
     </div>
 
     <div role="presentation" class="| flow flow-md">
-      <h3 class="| title-xs">Explore more</h3>
+      <h3 class="| title-sm">Explore more</h3>
 
       <ul class="o-searchform-suggestions-explore-more">
         <li>
