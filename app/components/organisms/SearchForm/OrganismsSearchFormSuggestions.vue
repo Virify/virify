@@ -8,9 +8,8 @@
           @suggestion-selected="emitSuggestions" />
       </div>
 
-      <div role="presentation">
-        <h2 class="| title-sm">Map</h2>
-        <p>Maybe add in a 'search by map' button here?</p>
+      <div class="o-searchform-suggestions-map | title-2xl">
+        Map
       </div>
     </div>
 
@@ -144,5 +143,15 @@ const suggestionsMatches = computed(() => {
   width: 100%;
   box-sizing: border-box;
   border-radius: var(--border-radius-ui);
+}
+
+.o-searchform-suggestions-map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--monochrome-800);
+  color: var(--monochrome-600);
+  border-radius: var(--border-radius-ui);
+  aspect-ratio: 1;
 }
 </style>
