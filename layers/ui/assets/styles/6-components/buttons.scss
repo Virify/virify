@@ -53,12 +53,12 @@
   }
 
   &-ghost {
-    background: fn.faded-color(15%, var(--blue-500));
+    background: fn.faded-color(8%, var(--blue-500));
     color: light-dark(var(--monochrome-100), var(--monochrome-900));
 
     &:hover {
-      background: var(--blue-500);
-      color: var(--monochrome-900);
+      background: fn.faded-color(18%, var(--blue-500));
+      color: light-dark(var(--monochrome-100), var(--monochrome-900));
     }
   }
 
@@ -137,7 +137,7 @@
 /**
  *  Button icons
  */
-.button svg {
+:where(.button svg) {
   width: var(--lineheight-sm);
   height: var(--lineheight-sm);
 }
