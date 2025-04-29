@@ -2,9 +2,9 @@ model Address {
   id          Int                      @id @default(autoincrement())
   number      String?
   flat        String?
-  street      String?
-  city        String?
-  postcode    String?
+  street      String
+  city        String
+  postcode    String
   country     String?
   county      String?
   propertyId  Int?                     @unique

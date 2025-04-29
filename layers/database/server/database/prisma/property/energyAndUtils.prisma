@@ -1,9 +1,9 @@
 model EnergyAndUtilities {
   id                   Int                  @id @default(autoincrement())
   propertyId           Int                  @unique
-  epcRating            EPCRating?
+  epcRating            EPCRating
   epcCertificateUrl    String?
-  primaryHeatingType   HeatingType[]
+  primaryHeatingType   HeatingType[]        @default([NILL])
   secondaryHeatingType HeatingType[]
   boilerType           BoilerType?
   hotWaterSource       HotWaterSource?
@@ -44,6 +44,7 @@ enum HeatingType {
   PASSIVE
   SOLAR_THERMAL
   OTHER
+  NILL
 }
 
 enum BoilerType {

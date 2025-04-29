@@ -6,13 +6,13 @@ model Property {
   propertyTypeId           Int
   propertyClassificationId Int
   size                     Float?
-  yearBuilt                String
-  constructionType         ConstructionType
+  yearBuilt                String?
+  constructionType         ConstructionType?
   floorLevel               Int?
   furnishingStatus         FurnishingStatus
   tenure                   Tenure
   leaseTerm                Int?
-  addressId                Int?                   @unique
+  addressId                Int                    @unique
   userId                   Int?
   agentId                  Int?
   // features
@@ -33,7 +33,7 @@ model Property {
   reception                Reception[]
   utility                  Utility[]
   additionalToilet         AdditionalToilet[]
-  address                  Address?               @relation(fields: [addressId], references: [id])
+  address                  Address                @relation(fields: [addressId], references: [id])
   user                     User?                  @relation(fields: [userId], references: [id])
   runningCosts             RunningCosts?
   securityFeatures         Security?
@@ -49,69 +49,6 @@ model Property {
   @@index([userId])
   @@index([agentId])
 }
-
-// enum PropertyType {
-//   HOUSE
-//   COTTAGE
-//   BUNGALOW
-//   PENTHOUSE
-//   FLAT
-//   LAND
-//   FARM
-//   SHARED_OWNERSHIP
-//   RETIREMENT_HOME
-//   NEW_BUILD_HOME
-//   STUDENT_ACCOMMODATION
-// }
-
-// enum PropertyClassification {
-//   // Houses
-//   TERRACED_HOUSE
-//   SEMI_DETACHED_HOUSE
-//   END_OF_TERRACE_HOUSE
-//   DETACHED_HOUSE
-//   MANSION
-
-//   // Cottages
-//   TERRACED_COTTAGE
-//   SEMI_DETACHED_COTTAGE
-//   END_OF_TERRACE_COTTAGE
-//   DETACHED_COTTAGE
-
-//   // Bungalows
-//   TERRACED_BUNGALOW
-//   SEMI_DETACHED_BUNGALOW
-//   END_OF_TERRACE_BUNGALOW
-//   DETACHED_BUNGALOW
-
-//   // Flats
-//   PENTHOUSE
-//   CONVERTED_FLAT
-//   STUDIO_FLAT
-//   MAISONETTE
-//   HIGH_RISE_FLAT
-//   COMPLEX_FLAT
-
-//   // Land
-//   RESIDENTIAL_LAND
-//   COMMERCIAL_LAND
-//   AGRICULTURAL_LAND
-//   DEVELOPMENT_PLOT
-
-//   // Farms
-//   NON_WORKING_FARMHOUSE
-//   WORKING_FARM
-
-//   // Other Categories
-//   SHARED_OWNERSHIP
-//   RETIREMENT_HOME
-//   NEW_BUILD_HOME
-
-//   // Student Accommodation
-//   STUDENT_FLAT
-//   STUDENT_HOUSE
-//   STUDENT_HOUSE_SHARE
-// }
 
 enum ConstructionType {
   STANDARD
