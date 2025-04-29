@@ -1,4 +1,5 @@
 @use '../_utils/media' as mq;
+@use '../_utils/functions' as fn;
 
 /**
  *  Page widths
@@ -62,4 +63,16 @@
 
 .dialog-container-xs {
   --container-width: 26rem;
+}
+
+/**
+ *  Elevations
+ */
+.elevate-200 {
+  box-shadow: 0 10px 40px -20px fn.faded-color(8%, black);
+}
+
+.elevate-300 {
+  box-shadow:
+    0 10px 20px -10px fn.faded-color(8%, black), 0 10px 40px -20px fn.faded-color(33%, black);
 }
