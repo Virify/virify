@@ -1,10 +1,22 @@
 <template>
-  <form ref="$form" class="o-searchform" tabindex="-1">
-    <OrganismsSearchFormCore @search-input="setSuggestions" class="o-searchform-box" v-model="currentSearch" />
+  <form class="o-searchform | flow flow-sm">
+    <select class="o-searchform-toggle">
+      <option value="Buy">Buy</option>
+      <option value="Rent">Rent</option>
+    </select>
 
-    <div ref="$popover" class="o-searchform-popover | container container-md elevate-300" hidden>
-      <OrganismsSearchFormSuggestions :suggestions @suggestion-selected="setSelectedSuggestion" />
+    <div ref="$form" class="o-searchform-form" tabindex="-1">
+      <OrganismsSearchFormCore @search-input="setSuggestions" class="o-searchform-box" v-model="currentSearch" />
+
+      <div ref="$popover" class="o-searchform-popover | container container-md elevate-300" hidden>
+        <OrganismsSearchFormSuggestions :suggestions @suggestion-selected="setSelectedSuggestion" />
+      </div>
     </div>
+
+    <AtomsDivider text="or" class="o-searchform-divider" />
+
+    <p>Search using AI</p>
+    <p>Search by map</p>
   </form>
 </template>
 
@@ -41,9 +53,12 @@ function setSelectedSuggestion(suggestion) {
 
 <style>
 .o-searchform {
-  position: relative;
   max-width: 32em;
   margin: 0 auto;
+}
+
+.o-searchform-form {
+  position: relative;
 }
 
 .o-searchform-box,
@@ -67,6 +82,12 @@ function setSelectedSuggestion(suggestion) {
   transform: translateX(-50%);
   width: min(100vw - var(--size-72), 42em);
   padding: var(--size-32);
+}
+
+.o-searchform-divider {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: calc(100% - var(--size-32));
 }
 
 /**

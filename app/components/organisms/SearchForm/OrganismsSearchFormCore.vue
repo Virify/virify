@@ -1,10 +1,5 @@
 <template>
   <div class="o-searchform-core">
-    <select class="o-searchform-input">
-      <option value="Buy">Buy</option>
-      <option value="Rent">Rent</option>
-    </select>
-
     <input type="text" placeholder="Location" class="o-searchform-input" @input="searchInput" v-model="currentSearch"
       @focus="$event.target.select()" />
 
@@ -38,7 +33,7 @@ const searchInput = useDebounceFn(({ target }) => {
 const currentSearch = defineModel({ default: '' })
 </script>
 
-<style>
+<style lang="scss">
 .o-searchform-core {
   display: flex;
   align-items: center;
@@ -50,6 +45,10 @@ const currentSearch = defineModel({ default: '' })
   width: auto;
   min-width: 0;
   height: 100%;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .o-searchform-input {

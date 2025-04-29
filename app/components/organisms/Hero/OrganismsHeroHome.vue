@@ -13,7 +13,7 @@
   background: var(--monochrome-200);
   color: var(--monochrome-900);
   border-radius: var(--border-radius-3xl);
-  padding: var(--size-32);
+  padding: var(--size-72) var(--size-32);
   min-height: max(400px, 50vh);
   margin-bottom: var(--size-32);
   display: flex;
