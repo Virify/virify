@@ -17,18 +17,13 @@ import { useFocusWithin } from '@vueuse/core'
 const $form = useTemplateRef('$form')
 const $popover = useTemplateRef('$popover')
 
-// VueUse watcher for :focus-within events
+// Toggle popover as necessary with focus enabled
 const { focused } = useFocusWithin($form)
 
-// Toggle popover as necessary with focus enabled
 watch(focused, (containsFocus) => {
   $popover.value.toggleAttribute('hidden', !containsFocus)
 })
 
-/**
- *  a11y
- */
-const popoverId = useId()
 </script>
 
 <style>
@@ -43,13 +38,13 @@ const popoverId = useId()
   background: var(--monochrome-900);
   color: var(--monochrome-100);
   border-radius: var(--border-radius-xl);
-  padding: var(--size-12);
 }
 
 .o-searchform-box {
   display: flex;
   align-items: center;
   gap: var(--size-12);
+  padding: var(--size-12);
 }
 
 .o-searchform-popover {
@@ -57,7 +52,8 @@ const popoverId = useId()
   top: calc(100% + var(--size-12));
   left: 50%;
   transform: translateX(-50%);
-  width: min(100vw - var(--size-72), 48em);
+  width: min(100vw - var(--size-72), 42em);
+  padding: var(--size-32);
 }
 
 /**

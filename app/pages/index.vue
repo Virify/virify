@@ -2,7 +2,7 @@
   <div>
     <OrganismsHeroHome />
 
-    <div class="| stacked container container-2xs">
+    <div class="p-index-buttons | stacked container container-2xs">
       <button @click.prevent="openLogin" class="| button button-full">
         Log in
       </button>
@@ -30,3 +30,10 @@ function openForgotPassword() {
   })
 }
 </script>
+
+<style>
+.p-index-buttons {
+  margin-top: 100vh;
+  margin-bottom: 100vh;
+}
+</style>
