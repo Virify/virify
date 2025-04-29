@@ -1,9 +1,9 @@
 <template>
   <form ref="$form" class="o-searchform" tabindex="-1">
-    <OrganismsSearchFormCore class="o-searchform-box" />
+    <OrganismsSearchFormCore @search-input="setSuggestions" class="o-searchform-box" />
 
     <div ref="$popover" class="o-searchform-popover | container container-md elevate-300" hidden>
-      <OrganismsSearchFormSuggestions />
+      <OrganismsSearchFormSuggestions :suggestions />
     </div>
   </form>
 </template>
@@ -24,6 +24,14 @@ watch(focused, (containsFocus) => {
   $popover.value.toggleAttribute('hidden', !containsFocus)
 })
 
+/**
+ *  Search typed
+ */
+const suggestions = ref('')
+
+function setSuggestions(search) {
+  suggestions.value = search
+}
 </script>
 
 <style>

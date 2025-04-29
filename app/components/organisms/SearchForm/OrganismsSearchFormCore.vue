@@ -5,7 +5,7 @@
       <option value="Rent">Rent</option>
     </select>
 
-    <input type="text" placeholder="Location" class="o-searchform-input" />
+    <input type="text" placeholder="Location" class="o-searchform-input" @input="searchInput" />
 
     <select class="o-searchform-input">
       <option value="0">0 miles</option>
@@ -24,6 +24,16 @@
     </button>
   </div>
 </template>
+
+<script setup>
+import { useDebounceFn } from '@vueuse/core';
+
+const emits = defineEmits(['search-input'])
+
+const searchInput = useDebounceFn(({ target }) => {
+  emits('search-input', target.value)
+}, 200)
+</script>
 
 <style>
 .o-searchform-core {
