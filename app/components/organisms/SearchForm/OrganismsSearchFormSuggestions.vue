@@ -115,8 +115,8 @@ const suggestionsMatches = computed(() => {
 
 .o-searchform-suggestions-autocomplete {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: var(--size-16);
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--size-32);
 }
 
 .o-searchform-suggestions-property-types {
