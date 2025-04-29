@@ -5,7 +5,7 @@
       <option value="Rent">Rent</option>
     </select>
 
-    <input type="text" placeholder="Location" class="o-searchform-input" @input="searchInput" />
+    <input type="text" placeholder="Location" class="o-searchform-input" @input="searchInput" v-model="currentSearch" />
 
     <select class="o-searchform-input">
       <option value="0">0 miles</option>
@@ -33,6 +33,8 @@ const emits = defineEmits(['search-input'])
 const searchInput = useDebounceFn(({ target }) => {
   emits('search-input', target.value)
 }, 200)
+
+const currentSearch = defineModel({ default: '' })
 </script>
 
 <style>

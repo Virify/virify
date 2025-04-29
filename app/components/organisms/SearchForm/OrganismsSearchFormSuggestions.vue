@@ -4,11 +4,8 @@
       <div role="presentation">
         <h2 class="| title-xs">Locations</h2>
 
-        <ul>
-          <li>
-            {{ suggestions }}
-          </li>
-        </ul>
+        <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
+          @suggestion-selected="emitSuggestions" />
       </div>
 
       <div role="presentation">
@@ -54,7 +51,7 @@ interface Props {
   suggestions: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const propertType = [
   'Detached',
@@ -71,6 +68,41 @@ const selected = reactive<Record<string, boolean>>({
   'Semi-detached': true,
   'Terraced': true,
   'End-terrace': true
+})
+
+/**
+ *  Mock auto-suggestions
+ */
+const emits = defineEmits(['suggestion-selected'])
+
+function emitSuggestions(suggestions: string) {
+  emits('suggestion-selected', suggestions)
+}
+
+const suggestionsMatches = computed(() => {
+  const { suggestions } = props
+
+  // Avoid case sensitivity
+  const suggestionsLower = suggestions.toLowerCase()
+
+  // Mock filter
+  return [
+    'Stevenage, Hertfordshire',
+    'Steventon, Oxford',
+    'St. Albans, Hertforshire',
+    'St. Neots, Hertfordshire',
+    'Stoke-on-Trent, Staffordshire',
+    'Stepps, Glasgow',
+    'Stepney, London',
+    'Stockwell, London',
+    'Stratford, London',
+    'South London',
+    'South West London'
+  ].filter(str => {
+    const strLower = str.toLowerCase()
+
+    return strLower.startsWith(suggestionsLower)
+  }).slice(0, 5)
 })
 
 </script>
