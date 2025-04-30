@@ -15,8 +15,10 @@
 
     <AtomsDivider text="or" class="o-searchform-divider" />
 
-    <p>Search using AI</p>
-    <p>Search by map</p>
+    <div role="presentation" class="o-searchform-footer-links">
+      <MoleculesIconLink to="#" icon="explore/ai" content="Search using AI" icon-inline />
+      <MoleculesIconLink to="#" icon="explore/map" content="Search by map" icon-inline />
+    </div>
   </form>
 </template>
 

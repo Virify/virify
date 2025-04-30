@@ -1,6 +1,10 @@
 <template>
-  <nuxt-link :to class="m-icon-link | button button-ghost">
-    <AtomsIcon v-if="icon" class="m-icon-link-icon" :icon :title="iconTitle" />
+  <nuxt-link :to class="m-icon-link | button button-ghost" :class="{
+    'm-icon-link-inline': !iconInline,
+  }" :style="{ 'aspect-ratio': aspectRatio }">
+    <AtomsIcon v-if="icon" class="m-icon-link-icon" :class="{
+      'm-icon-link-icon-large': iconLarge
+    }" :icon :title="iconTitle" />
 
     {{ content }}
   </nuxt-link>
@@ -20,6 +24,15 @@ defineProps({
   },
   content: {
     type: String
+  },
+  aspectRatio: {
+    type: String
+  },
+  iconLarge: {
+    type: Boolean
+  },
+  iconInline: {
+    type: Boolean
   }
 })
 </script>
@@ -27,20 +40,35 @@ defineProps({
 <style lang="scss">
 .m-icon-link {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-ui);
+  text-decoration: none;
+  color: currentColor;
+  padding: var(--size-16);
+  gap: var(--size-12);
+
+  &:hover {
+    color: currentColor;
+  }
+}
+
+.m-icon-link-inline {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
-  border-radius: var(--border-radius-ui);
-  text-decoration: none;
-  aspect-ratio: 16/9;
-  padding: var(--size-16);
   gap: var(--size-4);
 }
 
 .m-icon-link-icon {
   display: block;
+  width: var(--size-24);
+  height: var(--size-24);
+  color: var(--secondary-500);
+}
+
+.m-icon-link-icon-large {
   width: var(--size-40);
   height: var(--size-40);
-  color: var(--secondary-500);
 }
 </style>

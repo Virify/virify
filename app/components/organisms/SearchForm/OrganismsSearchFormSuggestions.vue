@@ -30,13 +30,14 @@
 
       <ul class="o-searchform-suggestions-explore-more">
         <li>
-          <MoleculesIconLink to="#" icon="explore/hot" content="Hot right now" />
+          <MoleculesIconLink to="#" icon="explore/hot" content="Hot right now" aspect-ratio="16/9" icon-large />
         </li>
         <li>
-          <MoleculesIconLink to="#" icon="explore/trending" content="Trending locations" />
+          <MoleculesIconLink to="#" icon="explore/trending" content="Trending locations" aspect-ratio="16/9"
+            icon-large />
         </li>
         <li>
-          <MoleculesIconLink to="#" icon="explore/top-picks" content="Top picks" />
+          <MoleculesIconLink to="#" icon="explore/top-picks" content="Top picks" aspect-ratio="16/9" icon-large />
         </li>
       </ul>
 
