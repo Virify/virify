@@ -2,8 +2,8 @@ model Listing {
   id                 Int                @id @default(autoincrement())
   title              String
   description        String
-  price              Float?
-  priceType          PriceType?
+  price              Float
+  priceType          PriceType
   listingType        ListingType
   listingCategory    ListingCategory
   availabilityStatus AvailabilityStatus
@@ -12,18 +12,18 @@ model Listing {
   listingStartDate   DateTime?
   listingEndDate     DateTime?
   contactMethod      ContactMethod[]
-  viewingOptions     String? 
+  viewingOptions     String?
   verificationLevel  VerificationLevel?
   userId             Int?
   propertyId         Int?               @unique
   estateAgentId      Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user         User?         @relation(fields: [userId], references: [id])
-  property     Property?     @relation(fields: [propertyId], references: [id])
-  estateAgent  EstateAgent?  @relation(fields: [estateAgentId], references: [id])
-  listingCosts ListingCosts?
-  agents       Agent[]       @relation("AgentToListing")
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  user               User?              @relation(fields: [userId], references: [id])
+  property           Property?          @relation(fields: [propertyId], references: [id])
+  estateAgent        EstateAgent?       @relation(fields: [estateAgentId], references: [id])
+  listingCosts       ListingCosts?
+  agents             Agent[]            @relation("AgentToListing")
 
   @@index([userId])
   @@index([propertyId])

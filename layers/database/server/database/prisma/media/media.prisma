@@ -1,8 +1,8 @@
 model Media {
   id         Int      @id @default(autoincrement())
-  images     String?
+  image      String?
   videoTour  String?
-  floorPlans String?
+  floorPlan  String?
   metadata   String
   propertyId Int
   createdAt  DateTime @default(now())

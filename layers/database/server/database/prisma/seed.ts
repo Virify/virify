@@ -1,7 +1,23 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+/**
+ * Seeding function to populate the database with initial data.
+ * This function is called when the database is initialized or reset.
+ */
 const seed = async () => {
+  await seedPropertyTypes();
+};
+
+seed().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
+
+/**
+ * Seeding function to populate property types and classifications in the database.
+ */
+export async function seedPropertyTypes() {
   const types = {
     House: ["Terraced", "Semi-detached", "End of terrace", "Detached", "Mansion"],
     Cottage: ["Terraced", "Detached", "Semi-detached", "End of terrace"],
@@ -12,7 +28,6 @@ const seed = async () => {
     Specialty: ["Shared Ownership", "Retirement Homes", "New Build Homes"],
     "Student Accommodation": ["Flat", "House", "House-share"],
   };
-  
 
   for (const [typeName, classification] of Object.entries(types)) {
     const createTypes = await prisma.propertyType.create({
@@ -30,9 +45,4 @@ const seed = async () => {
   }
 
   console.log("✅ Seed complete");
-};
-
-seed().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+}
