@@ -1,10 +1,56 @@
-import { FurnishingStatus, Tenure, type Address } from "@prisma/client";
+import { FurnishingStatus, Tenure, BedSizeType} from "@prisma/client";
+import type { Bedroom, Bathroom, Parking, Address, Property, Prisma } from "@prisma/client";
 export default defineEventHandler(async (event) => {
   try {
-    const address = {
+    const address: Prisma.AddressCreateWithoutPropertiesInput = {
       street: "Llantrisant Road",
       city: "Pontypridd",
       postcode: "CF371LN",
+    };
+
+    const bedrooms: Prisma.BedroomCreateWithoutPropertyInput[] = [
+      {
+        roomNumber: 1,
+        bed: [BedSizeType.SUPER_KING],
+        description: "This is a single bedroom",
+        enSuite: true,
+        builtInStorage: true,
+      },
+      {
+        roomNumber: 2,
+        bed: [BedSizeType.SINGLE],
+        description: "This is a singe bedroom",
+      },
+      {
+        roomNumber: 3,
+        bed: [BedSizeType.DOUBLE],
+        description: "This is a double bedroom",
+        builtInStorage: true,
+      },
+    ];
+
+    const bathrooms: Prisma.BathroomCreateWithoutPropertyInput[] = [
+      {
+        roomNumber: 1,
+        enSuite: true,
+        description: "This is a ensuite bathroom",
+        upstairs: true,
+        bathtub: true,
+      },
+      {
+        roomNumber: 2,
+        description: "This is a downstarirs bathroom",
+        downstairs: true,
+        upstairs: false,
+        bathtub: false,
+      },
+    ];
+
+    const parking: Prisma.ParkingCreateWithoutPropertyInput = {
+      description: "This is parking with EV charging and a garage",
+      garage: true,
+      driveway: true,
+      evCharging: true,
     };
 
     // const additionalFeatures = {
@@ -12,7 +58,7 @@ export default defineEventHandler(async (event) => {
     //   moveInDate: new Date(),
     // }
 
-    const minimumProperty = await prisma.property.create({
+    const minimumProperty: Property = await prisma.property.create({
       data: {
         title: "New Property",
         description: "This is a new property",
@@ -21,35 +67,62 @@ export default defineEventHandler(async (event) => {
         tenure: Tenure.FREEHOLD,
         type: {
           connect: {
-            id: 1, // house
+            id: 1, // House
+          },
+        },
+        classification: {
+          connect: {
+            id: 2, // Semi-Detached
           },
         },
         address: {
           create: {
-            ...address,
+            ...address
+          },
+        },
+        bedroomFeatures: {
+          create: [...bedrooms],
+        },
+        bathroomFeatures: {
+          create: [...bathrooms],
+        },
+        parking: {
+          create: {
+            ...parking,
           },
         },
         media: {
-          create: {
-            image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
-            metadata: "Description of the image",
-          },
+          create: [
+            {
+              image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+              metadata: "Description of the image",
+            },
+            {
+              image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+              metadata: "Description of the image",
+            },
+            {
+              image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+              metadata: "Description of the image",
+            },
+          ],
         },
       },
       include: {
         address: true,
+        bedroomFeatures: true,
         media: true,
-        type: {
-          include: {
-            classifications: true,
-          }
-        }
-      }
+        parking: true,
+        type: true,
+        classification: true,
+      },
     });
-    
+
     return {
       minimumProperty,
-    }
+      bedrooms: bedrooms.length,
+      bathrooms: bathrooms.length,
+    };
   } catch (error) {
     console.log(error);
   }

@@ -1,51 +1,48 @@
 model Property {
-  id                    Int                 @id @default(autoincrement())
-  title                 String
-  description           String
-  value                 Float?
-  propertyTypeId        Int
-  size                  Float?
-  yearBuilt             String?
-  constructionType      ConstructionType?
-  floorLevel            Int?
-  furnishingStatus      FurnishingStatus
-  tenure                Tenure
-  leaseTerm             Int?
-  userId                Int?
-  agentId               Int?
-  addressId             Int
-  // features
-  additionalFeatures    AdditionalFeatures?
-  accessibilityFeatures Accessibility?
-  amenities             Amenities[]
-  bathroomFeatures      Bathroom[]
-  bedroomFeatures       Bedroom[]
-  diningroomFeatures    Diningroom[]
-  kitchenFeatures       Kitchen[]
-  listing               Listing?
-  livingAreaFeatures    LivingArea[]
-  media                 Media[]
-  outdoorSpace          OutdoorSpace?
-  Land                  Land?
-  parking               Parking?
-  energyAndUtilities    EnergyAndUtilities?
-  reception             Reception[]
-  utility               Utility[]
-  additionalToilet      AdditionalToilet[]
-  address               Address             @relation(fields: [addressId], references: [id])
-  user                  User?               @relation(fields: [userId], references: [id])
-  runningCosts          RunningCosts?
-  securityFeatures      Security?
-  storageFeatures       Storage?
-  agents                Agent[]             @relation("AgentToProperty")
-  estateAgent           EstateAgent?        @relation(fields: [estateAgentId], references: [id])
-  type                  PropertyType        @relation(fields: [propertyTypeId], references: [id])
-  estateAgentId         Int?
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt
-
-  @@index([userId])
-  @@index([agentId])
+  id                       Int                    @id @default(autoincrement())
+  title                    String
+  description              String
+  value                    Float?
+  size                     Float?
+  yearBuilt                String?
+  constructionType         ConstructionType?
+  floorLevel               Int?
+  furnishingStatus         FurnishingStatus
+  tenure                   Tenure
+  leaseTerm                Int?
+  additionalFeatures       AdditionalFeatures?
+  accessibilityFeatures    Accessibility?
+  amenities                Amenities[]
+  bathroomFeatures         Bathroom[]
+  bedroomFeatures          Bedroom[]
+  diningroomFeatures       Diningroom[]
+  kitchenFeatures          Kitchen[]
+  listing                  Listing?
+  livingAreaFeatures       LivingArea[]
+  media                    Media[]
+  outdoorSpace             OutdoorSpace?
+  Land                     Land?
+  parking                  Parking?
+  energyAndUtilities       EnergyAndUtilities?
+  reception                Reception[]
+  utility                  Utility[]
+  additionalToilet         AdditionalToilet[]
+  address                  Address                @relation(fields: [addressId], references: [id])
+  user                     User?                  @relation(fields: [userId], references: [id])
+  runningCosts             RunningCosts?
+  securityFeatures         Security?
+  storageFeatures          Storage?
+  agents                   Agent[]                @relation("AgentToProperty")
+  estateAgent              EstateAgent?           @relation(fields: [estateAgentId], references: [id])
+  type                     PropertyType           @relation(fields: [propertyTypeId], references: [id])
+  classification           PropertyClassification @relation(fields: [propertyClassificationId], references: [id])
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  addressId                Int
+  userId                   Int?
+  estateAgentId            Int?
+  propertyTypeId           Int
+  propertyClassificationId Int
 }
 
 enum ConstructionType {

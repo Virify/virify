@@ -3,6 +3,7 @@ model PropertyClassification {
   name       String
   categoryId Int
   category   PropertyType @relation(fields: [categoryId], references: [id])
+  Property   Property[]
 }
 
 // enum PropertyClassification {

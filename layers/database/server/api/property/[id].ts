@@ -16,11 +16,8 @@ export default defineEventHandler(async (event): Promise<Property | null> => {
       include: {
         address: true,
         media: true,
-        type: {
-          include: {
-            classifications: true,
-          },
-        },
+        type: true,
+        classification: true,
       },
     });
 
