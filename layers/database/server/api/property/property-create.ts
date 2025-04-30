@@ -1,13 +1,15 @@
 import { FurnishingStatus, Tenure, BedSizeType} from "@prisma/client";
-import type { Bedroom, Bathroom, Parking, Address, Property, Prisma } from "@prisma/client";
+import type { Property, Prisma } from "@prisma/client";
 export default defineEventHandler(async (event) => {
   try {
+    // Address
     const address: Prisma.AddressCreateWithoutPropertiesInput = {
       street: "Llantrisant Road",
       city: "Pontypridd",
       postcode: "CF371LN",
     };
 
+    // Bedrooms
     const bedrooms: Prisma.BedroomCreateWithoutPropertyInput[] = [
       {
         roomNumber: 1,
@@ -29,6 +31,7 @@ export default defineEventHandler(async (event) => {
       },
     ];
 
+    // Bathrooms
     const bathrooms: Prisma.BathroomCreateWithoutPropertyInput[] = [
       {
         roomNumber: 1,
@@ -46,6 +49,7 @@ export default defineEventHandler(async (event) => {
       },
     ];
 
+    // Parking
     const parking: Prisma.ParkingCreateWithoutPropertyInput = {
       description: "This is parking with EV charging and a garage",
       garage: true,
@@ -53,11 +57,7 @@ export default defineEventHandler(async (event) => {
       evCharging: true,
     };
 
-    // const additionalFeatures = {
-    //   description: "Additional features",
-    //   moveInDate: new Date(),
-    // }
-
+    // Create a new property with minimum required fields
     const minimumProperty: Property = await prisma.property.create({
       data: {
         title: "New Property",
