@@ -3,6 +3,7 @@
     <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="[
       { key: 'buy', value: 'Buy' },
       { key: 'rent', value: 'Rent' },
+      { key: 'price', value: 'House prices' },
     ]" v-model="buyOrRent" />
 
     <div ref="$form" class="o-searchform-form" tabindex="-1">

@@ -42,7 +42,7 @@ const selected = defineModel({ default: 'buy' })
   display: block;
   padding: var(--size-4) var(--size-16);
   border-radius: var(--size-8);
-  flex-grow: 1;
+  flex: 1 0 0px;
   text-align: center;
   font-size: var(--font-sm);
   cursor: pointer;
