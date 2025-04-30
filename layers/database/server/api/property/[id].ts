@@ -1,6 +1,6 @@
-import { type Property } from "@prisma/client";
+import type { PropertyWithRelations } from "~/types/property";
 
-export default defineEventHandler(async (event): Promise<Property | null> => {
+export default defineEventHandler(async (event): Promise<PropertyWithRelations | null> => {
   const id = getRouterParam(event, "id");
   if (!id) {
     throw createError({
@@ -18,6 +18,9 @@ export default defineEventHandler(async (event): Promise<Property | null> => {
         media: true,
         type: true,
         classification: true,
+        bedroomFeatures: true,
+        bathroomFeatures: true,
+        parking: true,
       },
     });
 
