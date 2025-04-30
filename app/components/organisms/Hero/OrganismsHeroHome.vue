@@ -10,7 +10,9 @@
 
 <style>
 .o-hero-home {
-  background: var(--monochrome-200);
+  background:
+    url('/img/logo-background.svg') no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+  background-size: auto 120%, cover;
   color: var(--monochrome-900);
   border-radius: var(--border-radius-3xl);
   padding: var(--size-72) var(--size-32);
