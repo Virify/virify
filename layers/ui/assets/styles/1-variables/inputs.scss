@@ -19,4 +19,7 @@
   --input-accent-inactive: var(--monochrome-500);
   --input-accent-colour-hover: var(--secondary-400);
   --input-accent-inactive-hover: var(--monochrome-400);
+
+  // Focus states
+  --focus-outline: 3px solid fn.faded-color(60%, var(--blue-300))
 }
