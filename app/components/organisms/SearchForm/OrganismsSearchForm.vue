@@ -1,9 +1,9 @@
 <template>
   <form class="o-searchform | flow flow-sm">
-    <select class="o-searchform-toggle">
-      <option value="Buy">Buy</option>
-      <option value="Rent">Rent</option>
-    </select>
+    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="[
+      { key: 'buy', value: 'Buy' },
+      { key: 'rent', value: 'Rent' },
+    ]" v-model="buyOrRent" />
 
     <div ref="$form" class="o-searchform-form" tabindex="-1">
       <OrganismsSearchFormCore @search-input="setSuggestions" class="o-searchform-box" v-model="currentSearch" />
@@ -51,12 +51,25 @@ function setSuggestions(search) {
 function setSelectedSuggestion(suggestion) {
   currentSearch.value = suggestion
 }
+
+/**
+ *  Buy or rent
+ */
+const buyOrRent = ref('buy')
 </script>
 
-<style>
+<style lang="scss">
+@use '#styles/_utils/functions' as fn;
+
 .o-searchform {
   max-width: 32em;
   margin: 0 auto;
+}
+
+.o-searchform-buyrent {
+  background: fn.faded-color(12%, var(--primary-700));
+  backdrop-filter: blur(10px);
+  color: var(--monochrome-900);
 }
 
 .o-searchform-form {
