@@ -79,8 +79,8 @@ const buyOrRent = ref('buy')
 
 .o-searchform-box,
 .o-searchform-popover {
-  background: var(--monochrome-900);
-  color: var(--monochrome-100);
+  background: var(--background-200);
+  color: var(--foreground-100);
   border-radius: var(--border-radius-xl);
 }
 

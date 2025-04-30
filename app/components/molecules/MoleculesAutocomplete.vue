@@ -72,6 +72,6 @@ function emitSuggestion(suggestion: string) {
 .m-autocomplete-button:hover,
 .m-autocomplete:not(:has(.m-autocomplete-button:hover)) li:first-child .m-autocomplete-button {
   background: fn.faded-color(8%);
-  color: var(--monochrome-100);
+  color: var(--foreground-100);
 }
 </style>

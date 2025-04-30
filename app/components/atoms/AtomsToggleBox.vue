@@ -22,9 +22,9 @@ const checked = defineModel({ default: false })
 <style lang="scss">
 .a-toggle-box {
   display: block;
-  background: var(--monochrome-900);
-  color: var(--monochrome-100);
-  box-shadow: inset 0 0 0 1px var(--monochrome-700);
+  background: var(--background-200);
+  color: var(--foreground-100);
+  box-shadow: inset 0 0 0 1px light-dark(var(--monochrome-700), var(--monochrome-500));
   padding: var(--size-10) var(--size-16);
   border-radius: var(--border-radius-ui);
   white-space: nowrap;
@@ -32,11 +32,11 @@ const checked = defineModel({ default: false })
   transition: background-color var(--animation-fast), box-shadow var(--animation-fast);
 
   &:hover {
-    background: var(--monochrome-800);
+    background: var(--background-300);
   }
 
   &:has(input:checked) {
-    background: var(--monochrome-800);
+    background: var(--background-300);
     box-shadow: inset 0 0 0 2px currentColor;
 
     &:hover {
