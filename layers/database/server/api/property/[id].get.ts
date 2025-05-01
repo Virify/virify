@@ -1,4 +1,4 @@
-import type { PropertyWithRelations } from "~/types/property";
+import type { PropertyWithRelations } from "~~/shared/types/property";
 
 export default defineEventHandler(async (event): Promise<PropertyWithRelations | null> => {
   const id = getRouterParam(event, "id");
