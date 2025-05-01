@@ -7,7 +7,7 @@
       <table class="table-auto w-full text-left border-collapse border border-gray-200">
         <tbody>
           <!-- location -->
-          <tr class="bg-gray-100">
+          <tr>
             <th class="px-4 py-2 text-lg font-semibold">Location</th>
           </tr>
           <tr colsppan="4">
@@ -18,7 +18,7 @@
             </td>
           </tr>
           <!-- Basic Info -->
-          <tr class="bg-gray-100">
+          <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">Basic Info</th>
           </tr>
           <tr>
@@ -47,7 +47,7 @@
           </tr>
 
           <!-- Room Info -->
-          <tr class="bg-gray-100">
+          <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">Number of Rooms</th>
           </tr>
           <tr>
@@ -59,7 +59,7 @@
             <td class="px-4 py-2">{{ property.bathroomFeatures.length }}</td>
           </tr>
           <!-- Bedroom Features -->
-          <tr class="bg-gray-100">
+          <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">Bedroom Features</th>
           </tr>
           <tr v-for="(room, index) in bedroomFeatures" :key="index">
@@ -70,7 +70,7 @@
             </td>
           </tr>
           <!-- Bathroom Features -->
-          <tr class="bg-gray-100">
+          <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">bathroom Features</th>
           </tr>
           <tr v-for="(room, index) in bathroomFeatures" :key="index">
@@ -79,7 +79,7 @@
           </tr>
 
           <!-- Parking Info -->
-          <tr class="bg-gray-100">
+          <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">Parking</th>
           </tr>
           <tr v-for="(item, index) in parking" :key="index">
