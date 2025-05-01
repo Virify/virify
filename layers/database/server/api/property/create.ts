@@ -1,5 +1,7 @@
-import { FurnishingStatus, Tenure, BedSizeType} from "@prisma/client";
+import { FurnishingStatus, Tenure, BedSizeType } from "@prisma/client";
 import type { Property, Prisma } from "@prisma/client";
+import { updateLocationByAddressId, getLocationByAddressId } from "../../utils/location";
+
 export default defineEventHandler(async (event) => {
   try {
     // Address
@@ -58,7 +60,7 @@ export default defineEventHandler(async (event) => {
     };
 
     // Create a new property with minimum required fields
-    const minimumProperty: Property = await prisma.property.create({
+    const property: Property = await prisma.property.create({
       data: {
         title: "New Property",
         description: "This is a new property",
@@ -77,7 +79,7 @@ export default defineEventHandler(async (event) => {
         },
         address: {
           create: {
-            ...address
+            ...address,
           },
         },
         bedroomFeatures: {
@@ -118,10 +120,15 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    const updateLocation = await updateLocationByAddressId(property.addressId, -3.347182, 51.594768);
+    const location = await getLocationByAddressId(property.addressId);
+
     return {
-      minimumProperty,
+      propertyId: property.id,
+      property,
       bedrooms: bedrooms.length,
       bathrooms: bathrooms.length,
+      location,
     };
   } catch (error) {
     console.log(error);

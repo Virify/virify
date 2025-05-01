@@ -1,5 +1,6 @@
 <template>
   <div class="p-6 max-w-4xl mx-auto">
+    <h1 class="pb-4">This is a property page (not a listing)</h1>
     <div v-if="property">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <NuxtImg v-for="(mediaItem, index) in property.media" :key="index" :src="(mediaItem.image as string)" :alt="mediaItem?.metadata" class="rounded-lg" width="300" />
@@ -11,11 +12,11 @@
             <th class="px-4 py-2 text-lg font-semibold">Location</th>
           </tr>
           <tr colsppan="4">
-            <td class="px-4 py-2">
+            <!-- <td class="px-4 py-2">
               {{ property.address.street }}, 
               {{ property.address.city }}, 
               {{ property.address.postcode }}
-            </td>
+            </td> -->
           </tr>
           <!-- Basic Info -->
           <tr>
@@ -105,7 +106,14 @@ const propertyId = route.params.id as string;
 
 const url: string = `/api/property/${propertyId}`;
 
-const { data: property } = await useAsyncData("property", () => $fetch<PropertyWithRelations>(url));
+const { data } = await useAsyncData("property", () => $fetch<PropertyWithRelations & any>(url));
+
+// Destructure property and location from the response
+const property = computed(() => data.value?.property);
+const location = computed(() => data.value?.location);
+
+console.log("Property:", property.value);
+console.log("Location:", location.value);
 
 const parking = computed(() => {
   const parking = property.value?.parking;
@@ -124,7 +132,7 @@ const parking = computed(() => {
 });
 const bedroomFeatures = computed(
   () =>
-    property.value?.bedroomFeatures.map((feature, i) => {
+    property.value?.bedroomFeatures.map((feature: { enSuite: any; builtInStorage: any; walkInWardrobe: any; bed: any[]; }, i: number) => {
       const attributes: string[] = [];
 
       if (feature.enSuite) attributes.push("Ensuite");
@@ -141,7 +149,7 @@ const bedroomFeatures = computed(
 
 const bathroomFeatures = computed(
   () =>
-    property.value?.bathroomFeatures.map((feature, i) => {
+    property.value?.bathroomFeatures.map((feature: { bathtub: any; walkInShower: any; upstairs: any; downstairs: any; }, i: number) => {
       const attributes: string[] = [];
 
       if (feature.bathtub) attributes.push("Bath");
@@ -155,8 +163,4 @@ const bathroomFeatures = computed(
       };
     }) || []
 );
-
-console.log(bedroomFeatures);
-
-console.log(property.value);
 </script>
