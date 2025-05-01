@@ -1,10 +1,13 @@
+import type { AddressLocation } from "~~/shared/types/location";
+
 /**
  * Retuns the location of a given addressId
+ * PostGis always returns an array
  * 
  * @param addressId Number
- * @returns Latitude and Longitude of the address
+ * @returns AddressLocation
  */
-export async function getLocationByAddressId(addressId:number) {
+export async function getLocationByAddressId(addressId:number): Promise<AddressLocation> {
   const result = await prisma.$queryRawUnsafe<{ lat: number; lon: number }[]>(
     `
     SELECT ST_Y(location) as lat, ST_X(location) as lon
@@ -14,7 +17,9 @@ export async function getLocationByAddressId(addressId:number) {
     addressId
   );
 
-  return result[0]
+  if(!result[0]) throw createError({statusCode: 404,statusMessage: "location not found",});
+
+  return result[0];
 }
 
 /**

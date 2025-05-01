@@ -1,6 +1,7 @@
 import { FurnishingStatus, Tenure, BedSizeType } from "@prisma/client";
-import type { Property, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { updateLocationByAddressId, getLocationByAddressId } from "../../utils/location";
+import type { PropertyWithRelations } from "~~/shared/types/property";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -9,6 +10,8 @@ export default defineEventHandler(async (event) => {
       street: "Llantrisant Road",
       city: "Pontypridd",
       postcode: "CF371LN",
+      lat: 51.594768,
+      lon: -3.347182,
     };
 
     // Bedrooms
@@ -60,7 +63,7 @@ export default defineEventHandler(async (event) => {
     };
 
     // Create a new property with minimum required fields
-    const property: Property = await prisma.property.create({
+    const property: PropertyWithRelations = await prisma.property.create({
       data: {
         title: "New Property",
         description: "This is a new property",
@@ -113,6 +116,7 @@ export default defineEventHandler(async (event) => {
       include: {
         address: true,
         bedroomFeatures: true,
+        bathroomFeatures: true,
         media: true,
         parking: true,
         type: true,
@@ -120,7 +124,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    const updateLocation = await updateLocationByAddressId(property.addressId, -3.347182, 51.594768);
+    const updateLocation = await updateLocationByAddressId(property.addressId, property.address.lon!, property.address.lat!);
     const location = await getLocationByAddressId(property.addressId);
 
     return {
@@ -131,6 +135,6 @@ export default defineEventHandler(async (event) => {
       location,
     };
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 });

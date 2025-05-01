@@ -1,10 +1,16 @@
 <template>
   <div class="p-6 max-w-4xl mx-auto">
-    <h1 class="pb-4">This is a property page (not a listing)</h1>
-    <div v-if="property">
+    <div v-if="listing && property">
+      <h1 class="pb-4">{{ listing.title }}</h1>
+      <!-- media -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <NuxtImg v-for="(mediaItem, index) in property.media" :key="index" :src="(mediaItem.image as string)" :alt="mediaItem?.metadata" class="rounded-lg" width="300" />
       </div>
+
+      <ClientOnly>
+        <LeafletMap v-if="property.address" :lat="(property.address.lat as number)" :lon="(property.address.lon as number)" :zoom="15" />
+      </ClientOnly>
+
       <table class="table-auto w-full text-left border-collapse border border-gray-200">
         <tbody>
           <!-- location -->
@@ -12,12 +18,68 @@
             <th class="px-4 py-2 text-lg font-semibold">Location</th>
           </tr>
           <tr colsppan="4">
-            <!-- <td class="px-4 py-2">
-              {{ property.address.street }}, 
-              {{ property.address.city }}, 
+            <td class="px-4 py-2">
+              {{ property.address.street }}, {{ property.address.city }},
               {{ property.address.postcode }}
-            </td> -->
+            </td>
           </tr>
+          <!-- listing -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Listing Description:</th>
+          </tr>
+          <tr colsppan="4">
+            <td class="px-4 py-2">
+              {{ listing.description }}
+            </td>
+          </tr>
+          <!-- listing tier -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Tier: (not shown to user)</th>
+          </tr>
+          <tr colsppan="4">
+            <td class="px-4 py-2">
+              {{ listing.listingTier }}
+            </td>
+          </tr>
+          <!-- listing category -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Category: (sale or rent)</th>
+          </tr>
+          <tr colsppan="4">
+            <td class="px-4 py-2">
+              {{ listing.listingCategory }}
+            </td>
+          </tr>
+          <!-- listing type -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Type: (For Sale, Long term let, auction etc...)</th>
+          </tr>
+          <tr colsppan="4">
+            <td class="px-4 py-2">
+              {{ listing.listingType }}
+            </td>
+          </tr>
+          <!-- availability -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Availability:</th>
+          </tr>
+          <tr colsppan="4">
+            <td class="px-4 py-2">
+              {{ listing.availabilityStatus }}
+            </td>
+          </tr>
+          <!-- listing price -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Price:</th>
+          </tr>
+          <tr colsppan="4">
+            <td class="px-4 py-2">{{ listing.price }}, {{ listing.priceType }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="table-auto w-full text-left border-collapse border border-gray-200">
+        <tbody>
           <!-- Basic Info -->
           <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">Basic Info</th>
@@ -37,10 +99,6 @@
           <tr>
             <td class="px-4 py-2 font-medium">Classification</td>
             <td class="px-4 py-2">{{ property.classification.name }}</td>
-          </tr>
-          <tr>
-            <td class="px-4 py-2 font-medium">Price</td>
-            <td class="px-4 py-2">£{{ property.value?.toLocaleString() }}</td>
           </tr>
           <tr>
             <td class="px-4 py-2 font-medium">Furnished</td>
@@ -98,22 +156,21 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import type { ListingWithProperty } from "~~/shared/types/listing";
 
 const route = useRoute();
-const id = route.params.id;
-const propertyId = route.params.id as string;
+const listingId = route.params.id as string;
 
-const url: string = `/api/property/${propertyId}`;
+const url: string = `/api/listing/${listingId}`;
 
-const { data } = await useAsyncData("property", () => $fetch<PropertyWithRelations & any>(url));
+const { data } = await useAsyncData("listing", () => $fetch<ListingWithProperty>(url));
 
-// Destructure property and location from the response
+const listing = computed(() => data.value);
 const property = computed(() => data.value?.property);
-const location = computed(() => data.value?.location);
 
+// logs for ease
+console.log("Listing:", listing.value);
 console.log("Property:", property.value);
-console.log("Location:", location.value);
 
 const parking = computed(() => {
   const parking = property.value?.parking;
@@ -132,7 +189,7 @@ const parking = computed(() => {
 });
 const bedroomFeatures = computed(
   () =>
-    property.value?.bedroomFeatures.map((feature: { enSuite: any; builtInStorage: any; walkInWardrobe: any; bed: any[]; }, i: number) => {
+    property.value?.bedroomFeatures.map((feature: { enSuite: any; builtInStorage: any; walkInWardrobe: any; bed: any[] }, i: number) => {
       const attributes: string[] = [];
 
       if (feature.enSuite) attributes.push("Ensuite");
@@ -149,7 +206,7 @@ const bedroomFeatures = computed(
 
 const bathroomFeatures = computed(
   () =>
-    property.value?.bathroomFeatures.map((feature: { bathtub: any; walkInShower: any; upstairs: any; downstairs: any; }, i: number) => {
+    property.value?.bathroomFeatures.map((feature: { bathtub: any; walkInShower: any; upstairs: any; downstairs: any }, i: number) => {
       const attributes: string[] = [];
 
       if (feature.bathtub) attributes.push("Bath");

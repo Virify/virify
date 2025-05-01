@@ -11,3 +11,9 @@ export type PropertyWithRelations = Prisma.PropertyGetPayload<{
     parking: true;
   };
 }>
+
+export type PropertyWithAddress = Prisma.PropertyGetPayload<{
+  include: {
+    address: true;
+  };
+}>

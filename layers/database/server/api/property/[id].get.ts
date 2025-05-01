@@ -1,5 +1,4 @@
 import type { PropertyWithRelations } from "~~/shared/types/property";
-import { getLocationByAddressId } from "../../utils/location";
 
 export default defineEventHandler(async (event): Promise<PropertyWithRelations & any> => {
   const id = getRouterParam(event, "id");
@@ -32,12 +31,7 @@ export default defineEventHandler(async (event): Promise<PropertyWithRelations &
       });
     }
 
-    const location = await getLocationByAddressId(property?.addressId as number);
-
-    return {
-      property: property,
-      location: location,
-    }
+    return property
   } catch (error) {
     throw error;
   }

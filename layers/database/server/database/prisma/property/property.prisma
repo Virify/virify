@@ -17,7 +17,7 @@ model Property {
   bedroomFeatures          Bedroom[]
   diningroomFeatures       Diningroom[]
   kitchenFeatures          Kitchen[]
-  listing                  Listing? 
+  listing                  Listing?
   livingAreaFeatures       LivingArea[]
   media                    Media[]
   outdoorSpace             OutdoorSpace?
