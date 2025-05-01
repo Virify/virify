@@ -1,6 +1,7 @@
 model EnergyAndUtilities {
   id                   Int                  @id @default(autoincrement())
   propertyId           Int                  @unique
+  description          String?
   epcRating            EPCRating
   epcCertificateUrl    String?
   primaryHeatingType   HeatingType[]        @default([NILL])

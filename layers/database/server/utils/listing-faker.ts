@@ -5,12 +5,11 @@ const prisma = new PrismaClient();
 
 /**
  * Gnerate a full random Listing object
- * 
+ *
  * @param propertyId number
  * @returns Listing
  */
 export const generateListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
-
   const listing: Listing = await prisma.listing.create({
     data: {
       title: faker.word.words(10),
@@ -39,11 +38,11 @@ export const generateListing = async (propertyId: number): Promise<Prisma.Listin
   });
 
   return listing;
-}
+};
 
 /**
  * Generate a random Listing Costs object
- * 
+ *
  * @returns ListingCosts
  */
 export const generateListingCosts = (): Prisma.ListingCostsCreateWithoutListingInput => {

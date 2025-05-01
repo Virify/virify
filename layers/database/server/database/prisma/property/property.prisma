@@ -17,21 +17,21 @@ model Property {
   bedroomFeatures          Bedroom[]
   diningroomFeatures       Diningroom[]
   kitchenFeatures          Kitchen[]
-  listing                  Listing?
   livingAreaFeatures       LivingArea[]
+  reception                Reception[]
+  utility                  Utility[]
+  additionalToilet         AdditionalToilet[]
+  listing                  Listing?
   media                    Media[]
   outdoorSpace             OutdoorSpace?
   Land                     Land?
   parking                  Parking?
   energyAndUtilities       EnergyAndUtilities?
-  reception                Reception[]
-  utility                  Utility[]
-  additionalToilet         AdditionalToilet[]
   address                  Address                @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  user                     User?                  @relation(fields: [userId], references: [id])
   runningCosts             RunningCosts?
   securityFeatures         Security?
   storageFeatures          Storage?
+  user                     User?                  @relation(fields: [userId], references: [id])
   agents                   Agent[]                @relation("AgentToProperty")
   estateAgent              EstateAgent?           @relation(fields: [estateAgentId], references: [id])
   type                     PropertyType           @relation(fields: [propertyTypeId], references: [id])
