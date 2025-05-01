@@ -1,6 +1,6 @@
 import type { PropertyWithRelations } from "~~/shared/types/property";
 
-export default defineEventHandler(async (event): Promise<PropertyWithRelations & any> => {
+export default defineEventHandler(async (event): Promise<PropertyWithRelations> => {
   const id = getRouterParam(event, "id");
   if (!id) {
     throw createError({
@@ -21,6 +21,21 @@ export default defineEventHandler(async (event): Promise<PropertyWithRelations &
         bedroomFeatures: true,
         bathroomFeatures: true,
         parking: true,
+        amenities: true,
+        additionalFeatures: true,
+        accessibilityFeatures: true,
+        diningroomFeatures: true,
+        kitchenFeatures: true,
+        livingAreaFeatures: true,
+        reception: true,
+        utility: true,
+        additionalToilet: true,
+        outdoorSpace: true,
+        energyAndUtilities: true,
+        securityFeatures: true,
+        storageFeatures: true,
+        runningCosts: true,
+        Land: true,
       },
     });
 

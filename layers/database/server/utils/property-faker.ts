@@ -347,19 +347,17 @@ export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
   };
 };
 
-// Generate mapped property types and classifications
-const typeId = faker.helpers.arrayElement(Object.keys(typeToClassificationMap).map(Number));
-const classificationOptions = typeToClassificationMap[typeId];
-const classificationId = faker.helpers.arrayElement(classificationOptions!);
-
 /**
  * Generates a full property object with address
- * 
+ *
  * @param address Address
  * @returns PropertyWithAddress
  */
 export const generateProperty = async (address: Prisma.AddressCreateWithoutPropertiesInput): Promise<PropertyWithAddress> => {
-  const propertyTypeId = faker.number.int({ min: 1, max: 8 });
+  // Generate mapped property types and classifications
+  const typeId = faker.helpers.arrayElement(Object.keys(typeToClassificationMap).map(Number));
+  const classificationOptions = typeToClassificationMap[typeId];
+  const classificationId = faker.helpers.arrayElement(classificationOptions!);
   const property: PropertyWithAddress = await prisma.property.create({
     data: {
       title: faker.word.words(10),
