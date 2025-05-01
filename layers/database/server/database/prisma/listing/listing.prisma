@@ -6,6 +6,7 @@ model Listing {
   priceType          PriceType
   listingType        ListingType
   listingCategory    ListingCategory
+  listingCosts       ListingCosts?
   availabilityStatus AvailabilityStatus
   moveInDate         DateTime?
   listingTier        ListingTier
@@ -22,7 +23,6 @@ model Listing {
   user               User?              @relation(fields: [userId], references: [id])
   property           Property?          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   estateAgent        EstateAgent?       @relation(fields: [estateAgentId], references: [id])
-  listingCosts       ListingCosts?
   agents             Agent[]            @relation("AgentToListing")
 
   @@index([userId])

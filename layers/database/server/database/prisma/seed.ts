@@ -1,4 +1,9 @@
+// Need to use `ts-node` to run this file and add ts extension to the file name
+
 import { PrismaClient } from "@prisma/client";
+import { address, cityCenters } from "../../utils/address-to-seed.ts";
+import { generateProperty } from "../../utils/property-faker.ts";
+import { generateListing } from "../../utils/listing-faker.ts";
 const prisma = new PrismaClient();
 
 /**
@@ -6,13 +11,27 @@ const prisma = new PrismaClient();
  * This function is called when the database is initialized or reset.
  */
 const seed = async () => {
+  await seedCityCenters();
   await seedPropertyTypes();
+
+  for (const addr of address) {
+    let property = await generateProperty(addr);
+    await generateListing(property.id);
+  }
+  console.log("Seeding completed successfully.");
 };
 
 seed().catch((e) => {
   console.error(e);
   process.exit(1);
 });
+
+export async function seedCityCenters() {
+  const addresses = await prisma.address.createMany({
+    data: cityCenters,
+    skipDuplicates: true,
+  });
+}
 
 /**
  * Seeding function to populate property types and classifications in the database.
@@ -43,6 +62,4 @@ export async function seedPropertyTypes() {
       console.log(`Seeded category '${typeName}' with no subtypes.`);
     }
   }
-
-  console.log("✅ Seed complete");
 }

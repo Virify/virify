@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, type Listing } from '@prisma/client';
 
 export type ListingWithProperty = Prisma.ListingGetPayload<{
   include: {
@@ -14,4 +14,4 @@ export type ListingWithProperty = Prisma.ListingGetPayload<{
       };
     };
   };
-}>
+}> & Listing;
