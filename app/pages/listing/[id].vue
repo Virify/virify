@@ -157,14 +157,14 @@
 </template>
 
 <script setup lang="ts">
-import type { ListingWithProperty } from "~~/shared/types/listing";
+import type { ListingWithFullProperty } from "~~/shared/types/listing";
 
 const route = useRoute();
 const listingId = route.params.id as string;
 
 const url: string = `/api/listing/${listingId}`;
 
-const { data } = await useAsyncData("listing", () => $fetch<ListingWithProperty>(url));
+const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullProperty>(url));
 
 const listing = computed(() => data.value);
 const property = computed(() => data.value?.property);

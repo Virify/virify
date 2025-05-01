@@ -1,7 +1,22 @@
+// imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
 import { roundFloat } from "../../../../shared/utils/float.ts";
 import { AvailabilityStatus, ContactMethod, ListingCategory, ListingTier, ListingType, PriceType, PrismaClient, VerificationLevel, type Listing, type Prisma } from "@prisma/client";
 const prisma = new PrismaClient();
+
+/**
+ * Generate a random Listing Costs object
+ *
+ * @returns ListingCosts
+ */
+export const generateListingCosts = (): Prisma.ListingCostsCreateWithoutListingInput => {
+  return {
+    holdingDeposit: faker.number.int({ min: 100, max: 500 }),
+    tenancyDeposit: faker.number.int({ min: 1000, max: 5000 }),
+    upfrontCosts: faker.number.int({ min: 1000, max: 5000 }),
+    description: faker.word.words(10),
+  };
+};
 
 /**
  * Gnerate a full random Listing object
@@ -38,18 +53,4 @@ export const generateListing = async (propertyId: number): Promise<Prisma.Listin
   });
 
   return listing;
-};
-
-/**
- * Generate a random Listing Costs object
- *
- * @returns ListingCosts
- */
-export const generateListingCosts = (): Prisma.ListingCostsCreateWithoutListingInput => {
-  return {
-    holdingDeposit: faker.number.int({ min: 100, max: 500 }),
-    tenancyDeposit: faker.number.int({ min: 1000, max: 5000 }),
-    upfrontCosts: faker.number.int({ min: 1000, max: 5000 }),
-    description: faker.word.words(10),
-  };
 };

@@ -1,8 +1,7 @@
-import type { AddressLocation } from "~~/shared/types/location";
-import { getLocationByAddressId } from "../../utils/location";
-import type { ListingWithProperty } from "~~/shared/types/listing";
+import type { ListingWithFullProperty } from "~~/shared/types/listing";
+import { getFullListingById } from "../../utils/listing";
 
-export default defineEventHandler(async (event): Promise<ListingWithProperty> => {
+export default defineEventHandler(async (event): Promise<ListingWithFullProperty> => {
   const id = getRouterParam(event, "id");
   if (!id) {
     throw createError({
@@ -11,39 +10,7 @@ export default defineEventHandler(async (event): Promise<ListingWithProperty> =>
     });
   }
   try {
-    const listing = await prisma.listing.findUnique({
-      where: {
-        id: Number(id),
-      },
-      include: {
-        property: {
-          include: {
-            address: true,
-            media: true,
-            type: true,
-            classification: true,
-            bedroomFeatures: true,
-            bathroomFeatures: true,
-            parking: true,
-            amenities: true,
-            additionalFeatures: true,
-            accessibilityFeatures: true,
-            diningroomFeatures: true,
-            kitchenFeatures: true,
-            livingAreaFeatures: true,
-            reception: true,
-            utility: true,
-            additionalToilet: true,
-            outdoorSpace: true,
-            energyAndUtilities: true,
-            securityFeatures: true,
-            storageFeatures: true,
-            runningCosts: true,
-            Land: true,
-          },
-        },
-      },
-    });
+    const listing = await getFullListingById(Number(id));
 
     if (!listing) {
       throw createError({
@@ -52,11 +19,7 @@ export default defineEventHandler(async (event): Promise<ListingWithProperty> =>
       });
     }
 
-    const location: AddressLocation = await getLocationByAddressId(listing?.property?.addressId as number);
-
-    return {
-      ...listing,
-    };
+    return listing
   } catch (error) {
     throw error;
   }

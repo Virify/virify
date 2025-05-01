@@ -1,3 +1,4 @@
+// imports require .ts extension to run seed
 import {
   BedSizeType,
   PrismaClient,
@@ -17,7 +18,7 @@ import {
 } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import { type PropertyWithAddress } from "../../../../shared/types/property.ts";
+import { type PropertyWithAddress} from "../../../../shared/types/property.ts";
 import { roundFloat } from "../../../../shared/utils/float.ts";
 import { updateLocationByAddressId, getLocationByAddressId } from "./location.ts";
 import { typeToClassificationMap } from "./property-type-map.ts";
@@ -354,10 +355,12 @@ export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
  * @returns PropertyWithAddress
  */
 export const generateProperty = async (address: Prisma.AddressCreateWithoutPropertiesInput): Promise<PropertyWithAddress> => {
+
   // Generate mapped property types and classifications
   const typeId = faker.helpers.arrayElement(Object.keys(typeToClassificationMap).map(Number));
   const classificationOptions = typeToClassificationMap[typeId];
   const classificationId = faker.helpers.arrayElement(classificationOptions!);
+
   const property: PropertyWithAddress = await prisma.property.create({
     data: {
       title: faker.word.words(10),

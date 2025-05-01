@@ -1,43 +1,11 @@
-import type { PropertyWithRelations } from "~~/shared/types/property";
+import type { Fullproperty } from "~~/shared/types/property";
+import { getFullPropertyById } from "../../utils/property";
 
-export default defineEventHandler(async (event): Promise<PropertyWithRelations> => {
+export default defineEventHandler(async (event): Promise<Fullproperty> => {
   const id = getRouterParam(event, "id");
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Missing property ID",
-    });
-  }
+
   try {
-    const property = await prisma.property.findUnique({
-      where: {
-        id: Number(id),
-      },
-      include: {
-        address: true,
-        media: true,
-        type: true,
-        classification: true,
-        bedroomFeatures: true,
-        bathroomFeatures: true,
-        parking: true,
-        amenities: true,
-        additionalFeatures: true,
-        accessibilityFeatures: true,
-        diningroomFeatures: true,
-        kitchenFeatures: true,
-        livingAreaFeatures: true,
-        reception: true,
-        utility: true,
-        additionalToilet: true,
-        outdoorSpace: true,
-        energyAndUtilities: true,
-        securityFeatures: true,
-        storageFeatures: true,
-        runningCosts: true,
-        Land: true,
-      },
-    });
+    const property = await getFullPropertyById(Number(id));
 
     if (!property) {
       throw createError({
