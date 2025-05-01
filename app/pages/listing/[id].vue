@@ -7,6 +7,7 @@
         <NuxtImg v-for="(mediaItem, index) in property.media" :key="index" :src="(mediaItem.image as string)" :alt="mediaItem?.metadata" class="rounded-lg" width="300" />
       </div>
 
+      <!-- static map -->
       <ClientOnly>
         <LeafletMap v-if="property.address" :lat="(property.address.lat as number)" :lon="(property.address.lon as number)" :zoom="15" />
       </ClientOnly>
