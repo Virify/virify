@@ -4,6 +4,13 @@
       <h1 class="o-hero-home-title | title-2xl lineheight-sm">Property search on another level</h1>
 
       <OrganismsSearchForm />
+
+      <AtomsDivider text="or" class="o-hero-home-divider" />
+
+      <div role="presentation" class="o-hero-home-footer-links">
+        <MoleculesIconLink to="#" icon="explore/ai" content="Search using AI" icon-inline />
+        <MoleculesIconLink to="#" icon="explore/map" content="Search by map" icon-inline />
+      </div>
     </div>
   </div>
 </template>
@@ -30,5 +37,21 @@
 .o-hero-home-title {
   max-width: 15ch;
   margin: 0 auto var(--size-32);
+}
+
+.o-hero-home-divider {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: calc(100% - var(--size-32));
+}
+
+.o-hero-home-footer-links {
+  display: flex;
+  align-items: stretch;
+  gap: var(--size-16);
+}
+
+.o-hero-home-footer-links a {
+  flex-grow: 1;
 }
 </style>

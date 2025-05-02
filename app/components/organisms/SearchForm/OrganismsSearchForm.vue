@@ -10,13 +10,6 @@
         <OrganismsSearchFormSuggestions :suggestions @suggestion-selected="setSelectedSuggestion" />
       </div>
     </div>
-
-    <AtomsDivider text="or" class="o-searchform-divider" />
-
-    <div role="presentation" class="o-searchform-footer-links">
-      <MoleculesIconLink to="#" icon="explore/ai" content="Search using AI" icon-inline />
-      <MoleculesIconLink to="#" icon="explore/map" content="Search by map" icon-inline />
-    </div>
   </form>
 </template>
 
@@ -101,25 +94,6 @@ const buyOrRentOptions = [
   transform: translateX(-50%);
   width: min(100vw - var(--size-72), 42em);
   padding: var(--size-32);
-}
-
-.o-searchform-divider {
-  --divider-100: 1px solid currentColor;
-
-  margin-left: auto;
-  margin-right: auto;
-  max-width: calc(100% - var(--size-32));
-  color: var(--monochrome-400);
-}
-
-.o-searchform-footer-links {
-  display: flex;
-  align-items: stretch;
-  gap: var(--size-16);
-}
-
-.o-searchform-footer-links a {
-  flex-grow: 1;
 }
 
 /**
