@@ -5,7 +5,7 @@
 
     <div class="o-searchform-banner">
       <input type="search" placeholder="Location" class="o-searchform-banner-input" required @click="showPopover"
-        @focus="showPopover" @input="showPopover" />
+        @focus="showPopover" @input="showPopover" v-model="suggestions" />
 
       <select class="o-searchform-banner-select">
         <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
@@ -59,14 +59,9 @@ onClickOutside($form, () => {
  *  Search typed
  */
 const suggestions = ref('')
-const currentSearch = ref('')
 
-function setSuggestions(search) {
-  suggestions.value = search
-}
-
-function setSelectedSuggestion(suggestion) {
-  currentSearch.value = suggestion
+function setSelectedSuggestion(newValue) {
+  suggestions.value = newValue
 }
 
 /**
