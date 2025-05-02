@@ -9,9 +9,6 @@ model Property {
   vacant                   Boolean                @default(false)
   constructionType         ConstructionType?
   floorLevel               Int?
-  furnishingStatus         FurnishingStatus?
-  tenure                   Tenure
-  leaseTerm                Int?
   additionalFeatures       AdditionalFeatures?
   accessibilityFeatures    Accessibility?
   amenities                Amenities[]
@@ -23,7 +20,7 @@ model Property {
   reception                Reception[]
   utility                  Utility[]
   additionalToilet         AdditionalToilet[]
-  listing                  Listing?
+  listing                  Listing[]
   media                    Media[]
   outdoorSpace             OutdoorSpace?
   Land                     Land?
@@ -50,16 +47,4 @@ model Property {
 enum ConstructionType {
   STANDARD
   NON_STANDARD
-}
-
-enum FurnishingStatus {
-  FURNISHED
-  UNFURNISHED
-  PART_FURNISHED
-}
-
-enum Tenure {
-  LEASEHOLD
-  FREEHOLD
-  SHARED_OWNERSHIP
 }

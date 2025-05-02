@@ -3,8 +3,6 @@ import {
   BedSizeType,
   PrismaClient,
   ConstructionType,
-  FurnishingStatus,
-  Tenure,
   FireplaceType,
   PlanningClassification,
   LandUse,
@@ -371,9 +369,6 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       vacant: faker.datatype.boolean(),
       constructionType: faker.helpers.arrayElement(Object.values(ConstructionType)),
       floorLevel: undefined,
-      furnishingStatus: faker.helpers.arrayElement(Object.values(FurnishingStatus)),
-      tenure: faker.helpers.arrayElement(Object.values(Tenure)),
-      leaseTerm: faker.number.int({ min: 1, max: 99 }),
       additionalFeatures: {
         create: generateAdditionalFeatures(),
       },

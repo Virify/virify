@@ -28,7 +28,8 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
       id,
     },
     include: {
-      listingCosts: true,
+      rentalListing: true,
+      saleListing: true,
       property: {
         include: {
           ...propertyInclude
@@ -46,7 +47,8 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
 export async function getAllListings(): Promise<ListingWithFullProperty[]> {
   return await prisma.listing.findMany({
     include: {
-      listingCosts: true,
+      rentalListing: true,
+      saleListing: true,
       property: {
         include: {
           ...propertyInclude

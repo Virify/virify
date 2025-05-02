@@ -1,42 +1,53 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
 import { roundFloat } from "../../../../shared/utils/float.ts";
-import { AvailabilityStatus, ContactMethod, ListingCategory, ListingTier, ListingType, PriceType, PrismaClient, VerificationLevel, type Listing, type Prisma } from "@prisma/client";
+import { ContactMethod, FurnishedStatus, ListingTier, PrismaClient, RentalPriceType, VerificationLevel, type Listing, type Prisma, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus } from "@prisma/client";
 const prisma = new PrismaClient();
 
 /**
- * Generate a random Listing Costs object
- *
- * @returns ListingCosts
+ * Generate a random RentalListing object
+ * 
+ * @returns RentalListing
  */
-export const generateListingCosts = (): Prisma.ListingCostsCreateWithoutListingInput => {
+export const generateRentalObject = (): Prisma.RentalListingCreateWithoutListingInput => {
   return {
-    holdingDeposit: faker.number.int({ min: 100, max: 500 }),
-    tenancyDeposit: faker.number.int({ min: 1000, max: 5000 }),
-    upfrontCosts: faker.number.int({ min: 1000, max: 5000 }),
-    description: faker.word.words(10),
+    deposit: roundFloat(faker.number.float({ min: 1000, max: 10000 }), 2),
+    holdingDeposit: roundFloat(faker.number.float({ min: 1000, max: 10000 }), 2),
+    rentFrequency: faker.helpers.arrayElement(Object.values(RentalPriceType)),
+    isBillsIncluded: faker.datatype.boolean(),
+    rentalLength: faker.number.int({ min: 1, max: 48 }),
+    furnishedStatus: faker.helpers.arrayElement(Object.values(FurnishedStatus)),
+    availabilityStatus: faker.helpers.arrayElement(Object.values(RentalAvailabilityStatus)),
   };
 };
 
 /**
- * Gnerate a full random Listing object
+ * Generate a random SaleListing object
+ * 
+ * @returns SaleListing
+ */
+export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInput => {
+  return {
+    tenureType: faker.helpers.arrayElement(Object.values(TenureType)),
+    chain: faker.datatype.boolean(),
+    ownershipType: faker.helpers.arrayElement(Object.values(OwnershipType)),
+    priceType: faker.helpers.arrayElement(Object.values(SalePriceType)),
+    availabilityStatus: faker.helpers.arrayElement(Object.values(SaleAvailabilityStatus)),
+  }
+}
+
+/**
+ * Gnerate a full random SALE Listing object
  *
  * @param propertyId number
  * @returns Listing
  */
-export const generateListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
+export const generateSaleListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
       title: faker.word.words(10),
       description: faker.word.words(20),
       price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
-      priceType: faker.helpers.arrayElement(Object.values(PriceType)),
-      listingType: faker.helpers.arrayElement(Object.values(ListingType)),
-      listingCategory: faker.helpers.arrayElement(Object.values(ListingCategory)),
-      listingCosts: {
-        create: generateListingCosts(),
-      },
-      availabilityStatus: faker.helpers.arrayElement(Object.values(AvailabilityStatus)),
       moveInDate: faker.date.future(),
       listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
       listingStartDate: new Date(),
@@ -44,6 +55,9 @@ export const generateListing = async (propertyId: number): Promise<Prisma.Listin
       contactMethod: [faker.helpers.arrayElement(Object.values(ContactMethod))],
       viewingOptions: faker.word.words(10),
       verificationLevel: faker.helpers.arrayElement(Object.values(VerificationLevel)),
+      rentalListing: {
+        create: generateRentalObject(),
+      },
       property: {
         connect: {
           id: propertyId,
@@ -54,3 +68,37 @@ export const generateListing = async (propertyId: number): Promise<Prisma.Listin
 
   return listing;
 };
+
+/**
+ * Gnerate a full random RENTAL Listing object
+ *
+ * @param propertyId number
+ * @returns Listing
+ */
+export const generateRentalListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
+  const listing: Listing = await prisma.listing.create({
+    data: {
+      title: faker.word.words(10),
+      description: faker.word.words(20),
+      price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
+      moveInDate: faker.date.future(),
+      listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
+      listingStartDate: new Date(),
+      listingEndDate: faker.date.future(),
+      contactMethod: [faker.helpers.arrayElement(Object.values(ContactMethod))],
+      viewingOptions: faker.word.words(10),
+      verificationLevel: faker.helpers.arrayElement(Object.values(VerificationLevel)),
+      saleListing: {
+        create: generateSaleObject(),
+      },
+      property: {
+        connect: {
+          id: propertyId,
+        },
+      },
+    },
+  });
+
+  return listing;
+};
+

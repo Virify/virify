@@ -3,7 +3,7 @@
 import { PrismaClient } from "@prisma/client";
 import { address, cityCenters } from "../../utils/address-to-seed.ts";
 import { generateProperty } from "../../utils/property-faker.ts";
-import { generateListing } from "../../utils/listing-faker.ts";
+import { generateRentalListing, generateSaleListing } from "../../utils/listing-faker.ts";
 const prisma = new PrismaClient();
 
 /**
@@ -16,7 +16,8 @@ const seed = async () => {
 
   for (const addr of address) {
     let property = await generateProperty(addr);
-    await generateListing(property.id);
+    await generateSaleListing(property.id);
+    await generateRentalListing(property.id);
   }
   console.log("Seeding completed successfully.");
 };

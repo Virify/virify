@@ -2,7 +2,8 @@ import { Prisma } from "@prisma/client";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {
-    listingCosts: true;
+    rentalListing: true;
+    saleListing: true;
     property: {
       include: {
         address: true;

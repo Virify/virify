@@ -1,0 +1,32 @@
+model RentalListing {
+  id                 Int                      @id
+  listing            Listing                  @relation(fields: [id], references: [id])
+  deposit            Float?
+  holdingDeposit     Float?
+  rentFrequency      RentalPriceType
+  isBillsIncluded    Boolean
+  rentalLength       Int?
+  furnishedStatus    FurnishedStatus?
+  availabilityStatus RentalAvailabilityStatus
+
+  @@index([id])
+}
+
+enum FurnishedStatus {
+  FURNISHED
+  UNFURNISHED
+  PART_FURNISHED
+}
+
+enum RentalPriceType {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum RentalAvailabilityStatus {
+  AVAILABLE
+  UNDER_OFFER
+  LET_AGREED
+  LET
+}
