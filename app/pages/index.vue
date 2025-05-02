@@ -2,7 +2,18 @@
   <div>
     <OrganismsHeroHome />
 
-    <div class="p-index-buttons | stacked container container-2xs">
+    <div class="p-index-spacer"></div>
+
+    <div class="| stacked container container-2xs flow flow-xs">
+      <MoleculesOtp v-model="otpTest" @complete="registerCompletion" />
+
+      <div>
+        <p>OTP inputs: {{ otpTest }}</p>
+        <p>Check in dev console for logs when OTP is completed</p>
+      </div>
+    </div>
+
+    <div class="| stacked container container-2xs">
       <button @click.prevent="openLogin" class="| button button-full">
         Log in
       </button>
@@ -29,11 +40,19 @@ function openForgotPassword() {
     component: ViewsDialogForgotPassword
   })
 }
+
+/**
+ *  OTP test
+ */
+const otpTest = ref([])
+
+function registerCompletion(code) {
+  console.log('Submitted', code)
+}
 </script>
 
 <style>
-.p-index-buttons {
-  margin-top: 100vh;
-  margin-bottom: 100vh;
+.p-index-spacer {
+  height: 100vh;
 }
 </style>

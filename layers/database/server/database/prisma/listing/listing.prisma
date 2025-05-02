@@ -3,20 +3,27 @@ model Listing {
   title              String
   description        String
   price              Float?
-  priceType          PriceType
+  priceType          PriceType?
   listingType        ListingType
+  listingCategory    ListingCategory
   availabilityStatus AvailabilityStatus
+  moveInDate         DateTime?
   listingTier        ListingTier
+  listingStartDate   DateTime?
+  listingEndDate     DateTime?
+  contactMethod      ContactMethod[]
+  viewingOptions     String? 
+  verificationLevel  VerificationLevel?
   userId             Int?
   propertyId         Int?               @unique
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  user               User?              @relation(fields: [userId], references: [id])
-  property           Property?          @relation(fields: [propertyId], references: [id])
-  listingCosts       ListingCosts?
-  agents             Agent[]            @relation("AgentToListing")
-  estateAgent        EstateAgent?       @relation(fields: [estateAgentId], references: [id])
   estateAgentId      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user         User?         @relation(fields: [userId], references: [id])
+  property     Property?     @relation(fields: [propertyId], references: [id])
+  estateAgent  EstateAgent?  @relation(fields: [estateAgentId], references: [id])
+  listingCosts ListingCosts?
+  agents       Agent[]       @relation("AgentToListing")
 
   @@index([userId])
   @@index([propertyId])
@@ -24,7 +31,9 @@ model Listing {
 
 enum ListingType {
   FOR_SALE
-  FOR_LONG_TERM_LET
+  RENT_SHORT
+  RENT_LONG
+  RENT_TO_BUY
   SHORT_TERM_LET
   AUCTION
 }
@@ -35,17 +44,37 @@ enum ListingTier {
   FEATURED
 }
 
-enum PriceType {
-  OFFERS_IN_EXCESS_OF
-  GUIDE_PRICE
-  OFFERS_IN_THE_REGION_OF
-  PER_CALENDAR_MONTH
-  PER_WEEK
-}
-
 enum AvailabilityStatus {
   AVAILABLE
   UNDER_OFFER
   SOLD
   LET_AGREED
+}
+
+enum ListingCategory {
+  SALE
+  RENTAL
+}
+
+enum PriceType {
+  OFFERS_IN_EXCESS_OF
+  GUIDE_PRICE
+  OFFERS_IN_THE_REGION_OF
+  ASKING_PRICE
+  PER_CALENDAR_MONTH
+  PER_WEEK
+}
+
+enum ContactMethod {
+  CALL
+  EMAIL
+  WHATSAPP
+  LIVE_CHAT
+}
+
+enum VerificationLevel {
+  UNVERIFIED
+  BASIC
+  VERIFIED
+  FULLY_VERIFIED
 }

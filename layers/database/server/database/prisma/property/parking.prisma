@@ -1,13 +1,13 @@
 model Parking {
   id               Int      @id @default(autoincrement())
-  garage           Boolean
-  driveway         Boolean
-  permitParking    Boolean
-  onStreet         Boolean
-  noParking        Boolean
-  carport          Boolean
-  allocatedParking Boolean
-  evCharging       Boolean
+  garage           Boolean  @default(false)
+  driveway         Boolean  @default(false)
+  permitParking    Boolean  @default(false)
+  onStreet         Boolean  @default(false)
+  noParking        Boolean  @default(false)
+  carport          Boolean  @default(false)
+  allocatedParking Boolean  @default(false)
+  evCharging       Boolean  @default(false)
   description      String
   propertyId       Int      @unique
   createdAt        DateTime @default(now())

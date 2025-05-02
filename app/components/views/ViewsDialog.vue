@@ -77,6 +77,7 @@ watch(useRoute(), close)
   overflow: auto;
   box-sizing: border-box;
   background: transparent;
+  scrollbar-gutter: stable;
 }
 
 .o-dialog[open] {
