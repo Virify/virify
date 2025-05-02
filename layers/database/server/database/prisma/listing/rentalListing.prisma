@@ -25,7 +25,6 @@ enum RentalPriceType {
 
 enum RentalAvailabilityStatus {
   AVAILABLE
-  UNDER_OFFER
   LET_AGREED
   LET
 }
