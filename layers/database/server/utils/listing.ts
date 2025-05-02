@@ -1,5 +1,6 @@
 import type { Listing } from "@prisma/client";
 import type { ListingWithFullProperty } from "~~/shared/types/listing";
+import { propertyInclude } from "./property";
 
 /**
  * Get a listing by ID
@@ -30,27 +31,7 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
       listingCosts: true,
       property: {
         include: {
-          address: true,
-          media: true,
-          type: true,
-          classification: true,
-          bedroomFeatures: true,
-          bathroomFeatures: true,
-          parking: true,
-          amenities: true,
-          additionalFeatures: true,
-          accessibilityFeatures: true,
-          diningroomFeatures: true,
-          kitchenFeatures: true,
-          livingAreaFeatures: true,
-          reception: true,
-          utility: true,
-          additionalToilet: true,
-          outdoorSpace: true,
-          energyAndUtilities: true,
-          securityFeatures: true,
-          storageFeatures: true,
-          runningCosts: true,
+          ...propertyInclude
         },
       },
     },
@@ -68,27 +49,7 @@ export async function getAllListings(): Promise<ListingWithFullProperty[]> {
       listingCosts: true,
       property: {
         include: {
-          address: true,
-          media: true,
-          type: true,
-          classification: true,
-          bedroomFeatures: true,
-          bathroomFeatures: true,
-          parking: true,
-          amenities: true,
-          additionalFeatures: true,
-          accessibilityFeatures: true,
-          diningroomFeatures: true,
-          kitchenFeatures: true,
-          livingAreaFeatures: true,
-          reception: true,
-          utility: true,
-          additionalToilet: true,
-          outdoorSpace: true,
-          energyAndUtilities: true,
-          securityFeatures: true,
-          storageFeatures: true,
-          runningCosts: true,
+          ...propertyInclude
         },
       },
     },
