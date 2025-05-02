@@ -1,10 +1,7 @@
 <template>
   <form class="o-searchform | flow flow-sm">
-    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="[
-      { key: 'buy', value: 'Buy' },
-      { key: 'rent', value: 'Rent' },
-      { key: 'price', value: 'House prices' },
-    ]" v-model="buyOrRent" />
+    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions"
+      v-model="buyOrRent" />
 
     <div ref="$form" class="o-searchform-form" tabindex="-1">
       <OrganismsSearchFormCore @search-input="setSuggestions" class="o-searchform-box" v-model="currentSearch" />
@@ -57,6 +54,12 @@ function setSelectedSuggestion(suggestion) {
  *  Buy or rent
  */
 const buyOrRent = ref('buy')
+
+const buyOrRentOptions = [
+  { key: 'buy', value: 'Buy' },
+  { key: 'rent', value: 'Rent' },
+  { key: 'price', value: 'House prices' },
+]
 </script>
 
 <style lang="scss">
