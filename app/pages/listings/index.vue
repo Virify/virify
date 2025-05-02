@@ -8,24 +8,22 @@
     </div>
 
     <div class="mt-8">
-      <ClientOnly>
-        <LeafletMap
-          :markers="
-            filteredListings
-              .map((listing) => ({
-                id: listing.id,
-                lat: listing.property?.address.lat ?? 0,
-                lon: listing.property?.address.lon ?? 0,
-                title: listing.title,
-                bedrooms: listing.property?.bedroomFeatures.length || 0,
-                bathrooms: listing.property?.bathroomFeatures.length || 0,
-                price: listing.price,
-              }))
-              .filter((m) => m.lat !== 0 && m.lon !== 0)
-          "
-          :zoom="18"
-        />
-      </ClientOnly>
+      <LeafletMap
+        :markers="
+          filteredListings
+            .map((listing) => ({
+              id: listing.id,
+              lat: listing.property?.address.lat ?? 0,
+              lon: listing.property?.address.lon ?? 0,
+              title: listing.title,
+              bedrooms: listing.property?.bedroomFeatures.length || 0,
+              bathrooms: listing.property?.bathroomFeatures.length || 0,
+              price: listing.price,
+            }))
+            .filter((m) => m.lat !== 0 && m.lon !== 0)
+        "
+        :zoom="18"
+      />
     </div>
 
     <!-- Listings Grid -->
