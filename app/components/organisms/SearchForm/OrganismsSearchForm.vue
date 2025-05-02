@@ -1,32 +1,58 @@
 <template>
-  <form class="o-searchform | flow flow-sm">
+  <form class="o-searchform | flow flow-sm relative" ref="$form" @keydown.escape="hidePopover">
     <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions"
       v-model="buyOrRent" />
 
-    <div ref="$form" class="o-searchform-form" tabindex="-1">
-      <OrganismsSearchFormCore @search-input="setSuggestions" class="o-searchform-box" v-model="currentSearch" />
+    <div class="o-searchform-banner">
+      <input type="search" placeholder="Location" class="o-searchform-banner-input" required @click="showPopover"
+        @focus="showPopover" @input="showPopover" />
 
-      <div ref="$popover" class="o-searchform-popover | container container-md elevate-300" hidden>
-        <OrganismsSearchFormSuggestions :suggestions @suggestion-selected="setSelectedSuggestion" />
-      </div>
+      <select class="o-searchform-banner-select">
+        <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
+      </select>
+
+      <button type="button" class="o-searchform-banner-button | button button-monochrome">
+        <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
+      </button>
+    </div>
+
+    <div class="o-searchform-popover | container container-md elevate-300" :hidden="popoverHidden">
+      <OrganismsSearchFormSuggestions :suggestions @suggestion-selected="setSelectedSuggestion" />
     </div>
   </form>
 </template>
 
 <script setup>
-import { useFocusWithin } from '@vueuse/core'
+import { onClickOutside } from '@vueuse/core'
 
 /**
  *  Popover management
  */
 const $form = useTemplateRef('$form')
-const $popover = useTemplateRef('$popover')
 
-// Toggle popover as necessary with focus enabled
-const { focused } = useFocusWithin($form)
+// Track state of form
+const popoverHidden = ref(true)
 
-watch(focused, (containsFocus) => {
-  $popover.value.toggleAttribute('hidden', !containsFocus)
+// Show/hide form if appropriate
+function togglePopoverHidden(setHidden = false) {
+  if (popoverHidden.value === setHidden) return
+
+  popoverHidden.value = setHidden
+}
+
+// Show form
+function showPopover() {
+  togglePopoverHidden(false)
+}
+
+// Hide form
+function hidePopover() {
+  togglePopoverHidden(true)
+}
+
+// Hide form on click outside
+onClickOutside($form, () => {
+  hidePopover(true)
 })
 
 /**
@@ -42,6 +68,21 @@ function setSuggestions(search) {
 function setSelectedSuggestion(suggestion) {
   currentSearch.value = suggestion
 }
+
+/**
+ *  Search radius
+ */
+const radiusOptions = [
+  { value: '0', key: 'This location only' },
+  { value: '0.25', key: 'Within 0.25 miles' },
+  { value: '0.5', key: 'Within 0.5 miles' },
+  { value: '1', key: 'Within 1 mile' },
+  { value: '2', key: 'Within 2 miles' },
+  { value: '5', key: 'Within 5 miles' },
+  { value: '10', key: 'Within 10 miles' },
+  { value: '20', key: 'Within 20 miles' },
+  { value: '40', key: 'Within 40 miles' }
+]
 
 /**
  *  Buy or rent
@@ -69,22 +110,51 @@ const buyOrRentOptions = [
   color: var(--monochrome-900);
 }
 
-.o-searchform-form {
-  position: relative;
-}
-
-.o-searchform-box,
-.o-searchform-popover {
-  background: var(--background-200);
-  color: var(--foreground-100);
-  border-radius: var(--border-radius-xl);
-}
-
-.o-searchform-box {
+.o-searchform-banner {
   display: flex;
   align-items: center;
   gap: var(--size-12);
   padding: var(--size-12);
+}
+
+.o-searchform-banner-input,
+.o-searchform-banner-selected {
+  width: auto;
+  min-width: 0;
+  height: 100%;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.o-searchform-banner-input {
+  flex: 1 1 min-content;
+  padding-inline-start: var(--size-14);
+}
+
+.o-searchform-banner-selected {
+  flex: 0 1 min-content;
+}
+
+.o-searchform-banner-button {
+  width: var(--size-56);
+  height: var(--size-56);
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: var(--border-radius-ui);
+}
+
+.o-searchform-banner-button-icon {
+  width: var(--size-24);
+  height: var(--size-24);
+}
+
+.o-searchform-banner,
+.o-searchform-popover {
+  background: var(--background-200);
+  color: var(--foreground-100);
+  border-radius: var(--border-radius-xl);
 }
 
 .o-searchform-popover {
