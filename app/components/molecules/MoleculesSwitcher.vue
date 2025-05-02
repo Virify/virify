@@ -4,8 +4,8 @@
       {{ legend }}
     </legend>
 
-    <label v-for="{ key, value } of options" :key class="m-toggle-text-label | font-semibold">
-      <input type="radio" class="| visually-hidden" :value="key" v-model="selected" />
+    <label v-for="{ key, value, tabindex } of optionsWithTabIndex" :key class="m-toggle-text-label | font-semibold">
+      <input type="radio" class="| visually-hidden" :value="key" v-model="selected" :tabindex />
       {{ value }}
     </label>
   </fieldset>
@@ -17,9 +17,28 @@ interface Props {
   options: { key: string, value: string }[]
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
+/**
+ *  Track current value
+ */
 const selected = defineModel({ default: 'buy' })
+
+/**
+ *  Toggle tabindex only for active toggle
+ */
+const optionsWithTabIndex = computed(() => {
+  const { options } = props
+
+  // If not a valid array, return nothing
+  if (!isArrayOfOptions(options)) return []
+
+  // Set only the current option to have a focusable tabindex
+  return options.map(option => ({
+    ...option,
+    tabindex: option.key === selected.value ? 0 : -1
+  }))
+})
 </script>
 
 <style lang="scss">
@@ -47,8 +66,7 @@ const selected = defineModel({ default: 'buy' })
   font-size: var(--font-sm);
   cursor: pointer;
 
-  &:focus,
-  &:focus-within {
+  &:has(:focus-visible) {
     outline: var(--focus-outline);
   }
 
