@@ -13,3 +13,11 @@
 :where(:focus-visible) {
   outline: var(--focus-outline);
 }
+
+/**
+ *  Allow focus overflows
+ */
+.focus-overflow {
+  padding: var(--outline-size);
+  margin: calc(0px - var(--outline-size));
+}

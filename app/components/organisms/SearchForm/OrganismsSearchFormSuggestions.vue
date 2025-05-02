@@ -16,7 +16,7 @@
     <div role="presentation" class="| flow flow-md">
       <h2 class="| title-sm">Property type</h2>
 
-      <MoleculesScrollBox>
+      <MoleculesScrollBox class="| focus-overflow">
         <ul class="o-searchform-suggestions-property-types">
           <li v-for="label of propertType">
             <AtomsToggleBox :label type="checkbox" name="property-type" v-model="selected[label]" />
