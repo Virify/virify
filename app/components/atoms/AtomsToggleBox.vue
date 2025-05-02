@@ -39,7 +39,7 @@ const checked = defineModel({ default: false })
     background: light-dark(var(--background-300), var(--background-100));
   }
 
-  &:focus-within {
+  &:has(:focus-visible) {
     outline: var(--focus-outline);
   }
 
