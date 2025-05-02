@@ -19,10 +19,8 @@ enum TenureType {
 
 enum SalePriceType {
   FIXED
-  AUCTION
   OFFERS_OVER
   GUIDE_PRICE
-  PRICE_ON_APPLICATION
 }
 
 enum OwnershipType {

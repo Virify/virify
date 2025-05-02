@@ -42,12 +42,12 @@ export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInpu
  * @param propertyId number
  * @returns Listing
  */
-export const generateSaleListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
+export const generateRentalListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
       title: faker.word.words(10),
       description: faker.word.words(20),
-      price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
+      price: roundFloat(faker.number.float({ min: 300, max: 3000 }), 2),
       moveInDate: faker.date.future(),
       listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
       listingStartDate: new Date(),
@@ -75,7 +75,7 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
  * @param propertyId number
  * @returns Listing
  */
-export const generateRentalListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
+export const generateSaleListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
       title: faker.word.words(10),

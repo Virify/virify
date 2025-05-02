@@ -21,7 +21,6 @@ enum FurnishedStatus {
 enum RentalPriceType {
   WEEKLY
   MONTHLY
-  YEARLY
 }
 
 enum RentalAvailabilityStatus {
