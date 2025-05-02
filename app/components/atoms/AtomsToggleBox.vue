@@ -24,19 +24,27 @@ const checked = defineModel({ default: false })
   display: block;
   background: var(--background-200);
   color: var(--foreground-100);
-  box-shadow: inset 0 0 0 1px light-dark(var(--monochrome-700), var(--monochrome-500));
+  box-shadow: inset 0 0 0 1px light-dark(var(--monochrome-700), var(--monochrome-400));
   padding: var(--size-10) var(--size-16);
   border-radius: var(--border-radius-ui);
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color var(--animation-fast), box-shadow var(--animation-fast);
+  transition: background-color var(--animation-fast), box-shadow var(--animation-fast), transform var(--animation-fast);
+
+  &:active {
+    transform: scale(0.96);
+  }
 
   &:hover {
-    background: var(--background-300);
+    background: light-dark(var(--background-300), var(--background-100));
+  }
+
+  &:focus-within {
+    outline: var(--focus-outline);
   }
 
   &:has(input:checked) {
-    background: var(--background-300);
+    background: light-dark(var(--background-300), var(--background-100));
     box-shadow: inset 0 0 0 2px currentColor;
 
     &:hover {
