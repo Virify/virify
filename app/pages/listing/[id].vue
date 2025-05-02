@@ -219,7 +219,7 @@
 
 <script setup lang="ts">
 import type { ListingWithFullProperty } from "~~/shared/types/listing";
-import { formatMDY } from "../../../shared/utils/format-date";
+import { formatMDY } from "~~/shared/utils/format-date";
 
 const route = useRoute();
 const listingId = route.params.id as string;
@@ -231,7 +231,6 @@ const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullPrope
 const listing = computed(() => data.value);
 const property = computed(() => data.value?.property);
 const listingType = computed(() => listing.value?.listingType);
-const runningCosts = computed(() => property.value?.runningCosts);
 
 // logs for ease
 console.log("Listing:", listing.value);
