@@ -2,8 +2,8 @@
   <LMap
     v-if="center"
     style="height: 350px; width: 100%"
-    :zoom="zoom || 9"
-    :center="center"
+    :zoom="zoom || 12"
+    :center="[51.481583, -3.1791]"
   >
     <LTileLayer
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

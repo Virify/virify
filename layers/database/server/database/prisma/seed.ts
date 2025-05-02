@@ -1,7 +1,7 @@
 // Need to use `ts-node` to run this file and add ts extension to the file name
 
 import { PrismaClient } from "@prisma/client";
-import { address, cityCenters } from "../../utils/address-to-seed.ts";
+import { saleAddress, rentalAddress, cityCenters } from "../../utils/address-to-seed.ts";
 import { generateProperty } from "../../utils/property-faker.ts";
 import { generateRentalListing, generateSaleListing } from "../../utils/listing-faker.ts";
 const prisma = new PrismaClient();
@@ -14,9 +14,12 @@ const seed = async () => {
   await seedCityCenters();
   await seedPropertyTypes();
 
-  for (const addr of address) {
+  for (const addr of saleAddress) {
     let property = await generateProperty(addr);
     await generateSaleListing(property.id);
+  }
+  for (const addr of rentalAddress) {
+    let property = await generateProperty(addr);
     await generateRentalListing(property.id);
   }
   console.log("Seeding completed successfully.");
