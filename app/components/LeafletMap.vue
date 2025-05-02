@@ -2,7 +2,7 @@
   <LMap
     v-if="center"
     style="height: 350px; width: 100%"
-    :zoom="9"
+    :zoom="zoom || 9"
     :center="center"
   >
     <LTileLayer

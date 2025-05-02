@@ -22,7 +22,7 @@
             }))
             .filter((m) => m.lat !== 0 && m.lon !== 0)
         "
-        :zoom="18"
+        :zoom="9"
       />
     </div>
 
