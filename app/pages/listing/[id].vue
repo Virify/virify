@@ -69,6 +69,15 @@
               {{ listing.availabilityStatus }}
             </td>
           </tr>
+          <!-- move in date -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Move in date:</th>
+          </tr>
+          <tr colsppan="4">
+            <td class="px-4 py-2">
+              {{ formattedMoveInDate }}
+            </td>
+          </tr>
           <!-- listing price -->
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Price:</th>
@@ -101,11 +110,14 @@
             <td class="px-4 py-2 font-medium">Classification</td>
             <td class="px-4 py-2">{{ property.classification.name }}</td>
           </tr>
-          <tr>
+          <tr v-if="['SALE', 'AUCTION'].includes(listingType!)">
+            <td class="px-4 py-2 font-medium">Chain Free:</td>
+            <td class="px-4 py-2">{{ property.chainFree }}</td>
+          </tr>
+          <tr v-if="['LET', 'LET_LONG', 'LET_SHORT', 'LET_TO_BUY'].includes(listingType!)">
             <td class="px-4 py-2 font-medium">Furnished</td>
             <td class="px-4 py-2">{{ property.furnishingStatus }}</td>
           </tr>
-
           <!-- Room Info -->
           <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">Number of Rooms</th>
@@ -137,7 +149,38 @@
             <td class="px-4 py-2 font-medium">{{ room.label }}</td>
             <td class="px-4 py-2">Features: {{ room.features }}</td>
           </tr>
-
+          <!-- outdoor spaces -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Outdoor Spaces</th>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Description:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.description }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Total Sise:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.totalSize }} Msq</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Front Garden:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.frontGarden ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Rear Garden:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.rearGarden ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Patio:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.patio ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Seperate Parcel:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.separateParcel ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Shed:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.shed ? "Yes" : "No" }}</td>
+          </tr>
           <!-- Parking Info -->
           <tr>
             <th colspan="2" class="px-4 py-2 text-lg font-semibold">Parking</th>
@@ -147,6 +190,24 @@
               {{ index }}
             </td>
             <td class="px-4 py-2">{{ item }}</td>
+          </tr>
+          <!-- Energy and Utilities -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Energy and Utilties</th>
+          </tr>
+          <tr v-for="(item, index) in energyAndUtil" :key="index">
+            <td class="px-4 py-2 font-medium">
+              {{ index }}
+            </td>
+            <td class="px-4 py-2">{{ item }}</td>
+          </tr>
+          <!-- Council Tax Band -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Council Tax Band</th>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Band</td>
+            <td class="px-4 py-2">{{ councilTaxBand }}</td>
           </tr>
         </tbody>
       </table>
@@ -158,6 +219,7 @@
 
 <script setup lang="ts">
 import type { ListingWithFullProperty } from "~~/shared/types/listing";
+import { formatMDY } from "../../../shared/utils/format-date";
 
 const route = useRoute();
 const listingId = route.params.id as string;
@@ -168,6 +230,8 @@ const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullPrope
 
 const listing = computed(() => data.value);
 const property = computed(() => data.value?.property);
+const listingType = computed(() => listing.value?.listingType);
+const runningCosts = computed(() => property.value?.runningCosts);
 
 // logs for ease
 console.log("Listing:", listing.value);
@@ -221,4 +285,19 @@ const bathroomFeatures = computed(
       };
     }) || []
 );
+
+const energyAndUtil = computed(() => {
+  const energyAndUtil = property.value?.energyAndUtilities;
+  if (!energyAndUtil) return null;
+
+  return {
+    description: energyAndUtil.description,
+    "EPC Rating": energyAndUtil.epcRating,
+    Heating: energyAndUtil.primaryHeatingType.join(", "),
+  };
+});
+
+const councilTaxBand = computed(() => property.value?.runningCosts?.councilTaxBand);
+
+const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
 </script>

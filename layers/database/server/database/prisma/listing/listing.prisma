@@ -30,11 +30,11 @@ model Listing {
 }
 
 enum ListingType {
-  FOR_SALE
-  RENT_SHORT
-  RENT_LONG
-  RENT_TO_BUY
-  SHORT_TERM_LET
+  SALE
+  LET
+  LET_LONG
+  LET_TO_BUY
+  LET_SHORT
   AUCTION
 }
 

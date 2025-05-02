@@ -3,7 +3,6 @@ model AdditionalFeatures {
   description String
   petFriendly Boolean  @default(true)
   moveInDate  DateTime
-  chainFree   Boolean  @default(false)
   homeOffice  Boolean  @default(false)
   pool        Boolean  @default(false)
   internet    Boolean  @default(false)

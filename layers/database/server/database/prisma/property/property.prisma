@@ -5,9 +5,11 @@ model Property {
   value                    Float?
   size                     Float?
   yearBuilt                String?
+  chainFree                Boolean                @default(false)
+  vacant                   Boolean                @default(false)
   constructionType         ConstructionType?
   floorLevel               Int?
-  furnishingStatus         FurnishingStatus
+  furnishingStatus         FurnishingStatus?
   tenure                   Tenure
   leaseTerm                Int?
   additionalFeatures       AdditionalFeatures?
