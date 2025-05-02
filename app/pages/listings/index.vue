@@ -2,32 +2,37 @@
   <div class="p-4 space-y-6">
     <!-- Tabs -->
     <div class="flex gap-4 border-b pb-2">
-      <button
-        v-for="tab in tabs"
-        :key="tab"
-        @click="activeTab = tab"
-        :class="[
-          'px-4 py-2 rounded-t-md border-b-2 transition',
-          activeTab === tab ? 'font-semibold' : 'border-transparent text-gray-500'
-        ]"
-      >
+      <button v-for="tab in tabs" :key="tab" @click="activeTab = tab" :class="['px-4 py-2 rounded-t-md border-b-2 transition', activeTab === tab ? 'font-semibold' : 'border-transparent text-gray-500']">
         {{ tab }}
       </button>
     </div>
 
+    <div class="mt-8">
+      <ClientOnly>
+        <LeafletMap
+          :markers="
+            filteredListings
+              .map((listing) => ({
+                id: listing.id,
+                lat: listing.property?.address.lat ?? 0,
+                lon: listing.property?.address.lon ?? 0,
+                title: listing.title,
+                bedrooms: listing.property?.bedroomFeatures.length || 0,
+                bathrooms: listing.property?.bathroomFeatures.length || 0,
+                price: listing.price,
+              }))
+              .filter((m) => m.lat !== 0 && m.lon !== 0)
+          "
+          :zoom="18"
+        />
+      </ClientOnly>
+    </div>
+
     <!-- Listings Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div
-        v-for="listing in filteredListings"
-        :key="listing.id"
-        class="rounded-xl shadow-lg overflow-hidden flex flex-col"
-      >
+      <div v-for="listing in filteredListings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col">
         <!-- Property Image -->
-        <NuxtImg
-          :src="listing.property?.media[0]?.image as string"
-          :alt="listing.property?.media[0]?.metadata"
-          class="w-full h-42 object-cover"
-        />
+        <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata" class="w-full h-42 object-cover" />
 
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
@@ -36,15 +41,20 @@
 
           <!-- Address -->
           <p class="text-sm mt-2">
-            <span>{{ listing.property?.address.street }}</span>,
-            <span>{{ listing.property?.address.city }}</span>,
+            <span>{{ listing.property?.address.street }}</span
+            >, <span>{{ listing.property?.address.city }}</span
+            >,
             <span>{{ listing.property?.address.postcode }}</span>
           </p>
 
           <!-- Bedrooms and Bathrooms -->
           <div class="mt-2 text-sm">
-            <p>Bedrooms: <strong>{{ listing.property?.bedroomFeatures.length }}</strong></p>
-            <p>Bathrooms: <strong>{{ listing.property?.bathroomFeatures.length }}</strong></p>
+            <p>
+              Bedrooms: <strong>{{ listing.property?.bedroomFeatures.length }}</strong>
+            </p>
+            <p>
+              Bathrooms: <strong>{{ listing.property?.bathroomFeatures.length }}</strong>
+            </p>
           </div>
 
           <div v-if="listing.rentalListing" class="mt-2 text-sm">
@@ -57,9 +67,7 @@
 
         <!-- Link to Full Listing -->
         <div class="p-4">
-          <NuxtLink :to="`/listing/${listing.id}`" class="text-blue-600 hover:underline">
-            View Full Listing
-          </NuxtLink>
+          <NuxtLink :to="`/listing/${listing.id}`" class="text-blue-600 hover:underline"> View Full Listing </NuxtLink>
         </div>
       </div>
     </div>
@@ -69,25 +77,23 @@
 <script setup lang="ts">
 import type { ListingWithFullProperty } from "~~/shared/types/listing";
 
-const tabs = ['All', 'Rental', 'Sale'];
-const activeTab = ref('All');
+const tabs = ["All", "Rental", "Sale"];
+const activeTab = ref("All");
 
-const { data: listings, error } = await useAsyncData('listings', () =>
-  $fetch<ListingWithFullProperty[]>('/api/listings/all')
-);
+const { data: listings, error } = await useAsyncData("listings", () => $fetch<ListingWithFullProperty[]>("/api/listings/all"));
 
 if (error.value) {
-  console.error('Error fetching listings:', error.value);
+  console.error("Error fetching listings:", error.value);
 }
 
 const filteredListings = computed(() => {
   if (!listings.value) return [];
 
   switch (activeTab.value) {
-    case 'Rental':
-      return listings.value.filter(listing => !!listing.rentalListing);
-    case 'Sale':
-      return listings.value.filter(listing => !!listing.saleListing);
+    case "Rental":
+      return listings.value.filter((listing) => !!listing.rentalListing);
+    case "Sale":
+      return listings.value.filter((listing) => !!listing.saleListing);
     default:
       return listings.value;
   }

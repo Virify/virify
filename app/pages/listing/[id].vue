@@ -9,7 +9,7 @@
 
       <!-- static map -->
       <ClientOnly>
-        <LeafletMap v-if="property.address" :lat="(property.address.lat as number)" :lon="(property.address.lon as number)" :zoom="15" />
+        <LeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
       </ClientOnly>
 
       <table class="table-auto w-full text-left border-collapse border border-gray-200">
