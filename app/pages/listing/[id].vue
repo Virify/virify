@@ -8,9 +8,7 @@
       </div>
 
       <!-- static map -->
-      <ClientOnly>
-        <LeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
-      </ClientOnly>
+      <LeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
 
       <table class="table-auto w-full text-left border-collapse border border-gray-200">
         <tbody>
@@ -18,7 +16,7 @@
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Location</th>
           </tr>
-          <tr colsppan="4">
+          <tr colspan="2">
             <td class="px-4 py-2">
               {{ property.address.street }}, {{ property.address.city }},
               {{ property.address.postcode }}
@@ -28,7 +26,7 @@
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Listing Description:</th>
           </tr>
-          <tr colsppan="4">
+          <tr colspan="2">
             <td class="px-4 py-2">
               {{ listing.description }}
             </td>
@@ -37,7 +35,7 @@
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Tier: (not shown to user)</th>
           </tr>
-          <tr colsppan="4">
+          <tr colspan="2">
             <td class="px-4 py-2">
               {{ listing.listingTier }}
             </td>
@@ -46,34 +44,25 @@
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Category: (sale or rent)</th>
           </tr>
-          <tr colsppan="4">
+          <tr colspan="2">
             <td class="px-4 py-2">
-              {{ listing.listingCategory }}
-            </td>
-          </tr>
-          <!-- listing type -->
-          <tr>
-            <th class="px-4 py-2 text-lg font-semibold">Type: (For Sale, Long term let, auction etc...)</th>
-          </tr>
-          <tr colsppan="4">
-            <td class="px-4 py-2">
-              {{ listing.listingType }}
+              {{ listing.saleListing ? "Sale" : "Rent" }}
             </td>
           </tr>
           <!-- availability -->
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Availability:</th>
           </tr>
-          <tr colsppan="4">
+          <tr>
             <td class="px-4 py-2">
-              {{ listing.availabilityStatus }}
+              {{ listing.rentalListing?.availabilityStatus ?? listing.saleListing?.availabilityStatus }}
             </td>
           </tr>
           <!-- move in date -->
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Move in date:</th>
           </tr>
-          <tr colsppan="4">
+          <tr colspan="2">
             <td class="px-4 py-2">
               {{ formattedMoveInDate }}
             </td>
@@ -82,8 +71,21 @@
           <tr>
             <th class="px-4 py-2 text-lg font-semibold">Price:</th>
           </tr>
-          <tr colsppan="4">
-            <td class="px-4 py-2">{{ listing.price }}, {{ listing.priceType }}</td>
+          <tr colspan="2">
+            <td class="px-4 py-2">£{{ listing.price }}, {{ listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency }}</td>
+          </tr>
+          <tr v-if="listing.rentalListing">
+            <th class="px-4 py-2 text-lg font-semibold">Deposit:</th>
+          </tr>
+          <tr v-if="listing.rentalListing" colspan="2">
+            <td class="px-4 py-2">£{{ listing.rentalListing.deposit }}</td>
+          </tr>
+          <!-- furnished -->
+          <tr v-if="listing.rentalListing">
+            <th class="px-4 py-2 text-lg font-semibold">Furnished:</th>
+          </tr>
+          <tr v-if="listing.rentalListing" colspan="2">
+            <td class="px-4 py-2">{{ listing.rentalListing.furnishedStatus }}</td>
           </tr>
         </tbody>
       </table>
@@ -109,14 +111,6 @@
           <tr>
             <td class="px-4 py-2 font-medium">Classification</td>
             <td class="px-4 py-2">{{ property.classification.name }}</td>
-          </tr>
-          <tr v-if="['SALE', 'AUCTION'].includes(listingType!)">
-            <td class="px-4 py-2 font-medium">Chain Free:</td>
-            <td class="px-4 py-2">{{ property.chainFree }}</td>
-          </tr>
-          <tr v-if="['LET', 'LET_LONG', 'LET_SHORT', 'LET_TO_BUY'].includes(listingType!)">
-            <td class="px-4 py-2 font-medium">Furnished</td>
-            <td class="px-4 py-2">{{ property.furnishingStatus }}</td>
           </tr>
           <!-- Room Info -->
           <tr>
@@ -230,7 +224,6 @@ const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullPrope
 
 const listing = computed(() => data.value);
 const property = computed(() => data.value?.property);
-const listingType = computed(() => listing.value?.listingType);
 
 // logs for ease
 console.log("Listing:", listing.value);
