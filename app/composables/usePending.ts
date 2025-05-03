@@ -5,7 +5,7 @@
 export function usePending() {
   const isPending = ref(false)
 
-  async function setPendingWhile(fn: typeof Function) {
+  async function setPendingWhile(fn: () => unknown) {
     isPending.value = true
 
     try {
