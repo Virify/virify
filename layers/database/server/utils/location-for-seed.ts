@@ -1,15 +1,10 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import type { AddressLocation } from "~~/shared/types/location";
+const prisma = new PrismaClient();
 
 /**
- * Convert meters to miles. For PostGIS, we need to convert meters to miles.
- * 
- * @param miles Number
- * @returns Numer
+ * !! This file is only to be used for seeding - because it instantiates a new PrismaClient which does not work in production.
  */
-export const convertMilesToMeters = (miles: number): number => {
-  return miles * 1609.34;
-};
 
 /**
  * Returns the location of a given addressId.
@@ -18,7 +13,7 @@ export const convertMilesToMeters = (miles: number): number => {
  * @param addressId Number
  * @returns AddressLocation
  */
-export async function getLocationByAddressId(addressId: number): Promise<AddressLocation> {
+export async function getLocationByAddressIdForSeed(addressId: number): Promise<AddressLocation> {
   const result = await prisma.$queryRaw<{ lat: number; lon: number }[]>(
     Prisma.sql`
       SELECT ST_Y(location) as lat, ST_X(location) as lon
@@ -40,7 +35,7 @@ export async function getLocationByAddressId(addressId: number): Promise<Address
  * @param latitude Number
  * @returns 
  */
-export async function updateLocationByAddressId(addressId: number, long: number, lat: number) {
+export async function updateLocationByAddressIdForSeed(addressId: number, long: number, lat: number) {
   return await prisma.$executeRaw(
     Prisma.sql`
       UPDATE "Address"
@@ -56,7 +51,7 @@ export async function updateLocationByAddressId(addressId: number, long: number,
  * @param locations List of locations with id, lat, and lon
  * @returns 
  */
-export async function updateLocationsByAddressList(
+export async function updateLocationsByAddressListForSeed(
   locations: { id: number; lat: number; lon: number }[]
 ) {
   const queries = locations.map((loc) =>
@@ -70,31 +65,4 @@ export async function updateLocationsByAddressList(
   );
 
   return await prisma.$transaction(queries);
-}
-
-
-/**
- * Get Nearby Properties by Latitude and Longitude with a distance threshold.
- *
- * @param lat Latitude of the location
- * @param lon Longitude of the location
- * @param distanceMeters Distance in meters for proximity filtering
- * @returns List of nearby propertyID's
- */
-export async function getPropertyIdsByDistance(lat: number, lon: number, distanceMiles: number): Promise<{ propertyId: number }[]> {
-  const meters = convertMilesToMeters(distanceMiles);
-  const nearbyProperties = await prisma.$queryRaw<{ propertyId: number }[]>(
-    Prisma.sql`
-      SELECT p.id as "propertyId"
-      FROM "Property" p
-      JOIN "Address" a ON p."addressId" = a.id
-      WHERE ST_DWithin(
-        ST_Transform(a.location, 3857),
-        ST_Transform(ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326), 3857),
-        ${meters}
-      )
-    `
-  );
-
-  return nearbyProperties;
 }
