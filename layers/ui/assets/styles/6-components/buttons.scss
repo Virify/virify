@@ -9,13 +9,13 @@
   gap: var(--size-8);
   font-size: var(--font-md);
   font-weight: var(--font-semibold);
-  line-height: var(--lineheight-md);
+  line-height: var(--lineheight-sm);
   align-items: center;
   justify-content: center;
   text-align: center;
   background-color: var(--primary-300);
   color: var(--monochrome-100);
-  padding: var(--size-10) var(--size-18);
+  padding: var(--size-12) var(--size-18);
   border-radius: var(--border-radius-pill);
   transition: background-color var(--animation-fast), color var(--animation-fast);
   box-sizing: border-box;
@@ -102,17 +102,17 @@
 .button {
   &-xs {
     font-size: var(--font-xs);
-    padding: var(--size-4) var(--size-10);
+    padding: var(--size-6) var(--size-10);
   }
 
   &-sm {
     font-size: var(--font-sm);
-    padding: var(--size-8) var(--size-16);
+    padding: var(--size-10) var(--size-16);
   }
 
   &-lg {
     font-size: var(--font-lg);
-    padding: var(--size-16) var(--size-28);
+    padding: var(--size-18) var(--size-28);
   }
 
   &-full {
