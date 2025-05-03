@@ -17,7 +17,7 @@
     </div>
 
     <div class="o-searchform-popover | container container-md elevate-300" :hidden="popoverHidden">
-      <OrganismsSearchFormSuggestions :suggestions @suggestion-selected="setSelectedSuggestion" />
+      <OrganismsSearchFormPopover :suggestions @suggestion-selected="setSelectedSuggestion" />
     </div>
   </form>
 </template>
