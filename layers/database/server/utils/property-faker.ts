@@ -18,7 +18,7 @@ import type { Prisma } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { type PropertyWithAddress} from "../../../../shared/types/property.ts";
 import { roundFloat } from "../../../../shared/utils/float.ts";
-import { updateLocationByAddressId, getLocationByAddressId } from "./location.ts";
+import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed.ts";
 import { typeToClassificationMap } from "./property-type-map.ts";
 const prisma = new PrismaClient();
 
@@ -450,8 +450,8 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     },
   });
 
-  const updateLocation = await updateLocationByAddressId(property.addressId, property.address.lon!, property.address.lat!);
-  const location = await getLocationByAddressId(property.addressId);
+  const updateLocation = await updateLocationByAddressIdForSeed(property.addressId, property.address.lon!, property.address.lat!);
+  const location = await getLocationByAddressIdForSeed(property.addressId);
 
   return property;
 };
