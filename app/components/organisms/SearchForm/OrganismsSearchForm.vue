@@ -12,9 +12,11 @@
         <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
       </select>
 
-      <button type="submit" class="o-searchform-banner-button | button button-monochrome">
-        <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
-      </button>
+      <div class="o-searchform-banner-button-wrapper">
+        <button type="submit" class="o-searchform-banner-button | button button-monochrome">
+          <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
+        </button>
+      </div>
     </div>
 
     <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
@@ -225,29 +227,51 @@ function sendForm({ target }) {
 
 .o-searchform-banner {
   display: flex;
-  align-items: center;
-  gap: var(--size-12);
-  padding: var(--size-12);
+  align-items: stretch;
 }
 
 .o-searchform-banner-input,
-.o-searchform-banner-selected {
+.o-searchform-banner-select {
   width: auto;
   min-width: 0;
-  height: 100%;
+}
+
+.o-searchform-banner-input {
+  outline: none;
+}
+
+.o-searchform-banner:has(.o-searchform-banner-input:focus) {
+  outline: var(--focus-outline);
+}
+
+.o-searchform-banner-select {
+  height: var(--size-56);
+  border-radius: var(--border-radius-ui);
+  padding-inline: var(--size-12);
+  margin: auto 0;
+  cursor: pointer;
 
   &:focus {
     outline: none;
   }
+
+  &:focus-visible {
+    outline: var(--focus-outline);
+  }
+
+  &:hover {
+    background: fn.faded-color(12%);
+  }
 }
 
 .o-searchform-banner-input {
-  flex: 1 1 min-content;
-  padding-inline-start: var(--size-14);
+  flex: 1 0 min-content;
+  padding-inline-start: var(--size-32);
+  padding-inline-end: var(--size-12);
 }
 
-.o-searchform-banner-selected {
-  flex: 0 1 min-content;
+.o-searchform-banner-button-wrapper {
+  padding: var(--size-12);
 }
 
 .o-searchform-banner-button {
@@ -322,7 +346,6 @@ function sendForm({ target }) {
   border-radius: var(--border-radius-ui);
   aspect-ratio: 1;
 }
-
 
 /**
  *  Open animatinos
