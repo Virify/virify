@@ -16,40 +16,38 @@
       </button>
     </div>
 
-    <div class="o-searchform-popover | container container-md elevate-300" :hidden="popoverHidden">
-      <OrganismsSearchFormPopover>
-        <div v-if="suggestions" class="o-searchform-autocomplete" role="presentation">
-          <div role="presentation">
-            <h2 class="| title-sm">Locations</h2>
+    <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
+      :hidden="popoverHidden">
+      <div v-if="suggestions" class="o-searchform-autocomplete" role="presentation">
+        <div role="presentation">
+          <h2 class="| title-sm">Locations</h2>
 
-            <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
-              v-slot="{ original, current, suggestion }">
-              <button class="o-searchform-autocomplete-button | body-md"
-                @click.prevent="setSelectedSuggestion(original)">
-                <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
-              </button>
-            </MoleculesAutocomplete>
-          </div>
-
-          <div class="o-searchform-map | title-2xl">
-            Map
-          </div>
+          <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
+            v-slot="{ original, current, suggestion }">
+            <button class="o-searchform-autocomplete-button | body-md" @click.prevent="setSelectedSuggestion(original)">
+              <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
+            </button>
+          </MoleculesAutocomplete>
         </div>
 
-        <div role="presentation" class="| flow flow-md">
-          <h2 class="| title-sm">Property type</h2>
-
-          <MoleculesScrollBox class="| focus-overflow">
-            <ul class="o-searchform-property-types">
-              <li v-for="label of propertType">
-                <AtomsToggleBox :label type="checkbox" name="property-type" v-model="selectedPropertyType[label]" />
-              </li>
-            </ul>
-          </MoleculesScrollBox>
+        <div class="o-searchform-map | title-2xl">
+          Map
         </div>
+      </div>
 
-      </OrganismsSearchFormPopover>
-    </div>
+      <div role="presentation" class="| flow flow-md">
+        <h2 class="| title-sm">Property type</h2>
+
+        <MoleculesScrollBox class="| focus-overflow">
+          <ul class="o-searchform-property-types">
+            <li v-for="label of propertType">
+              <AtomsToggleBox :label type="checkbox" name="property-type" v-model="selectedPropertyType[label]" />
+            </li>
+          </ul>
+        </MoleculesScrollBox>
+      </div>
+
+    </OrganismsSearchFormPopover>
   </form>
 </template>
 

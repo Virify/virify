@@ -1,5 +1,5 @@
 <template>
-  <div class="o-searchform-suggestions | flow flow-2xl">
+  <div class="| flow flow-2xl">
     <slot />
 
     <div role="presentation" class="| flow flow-md">
