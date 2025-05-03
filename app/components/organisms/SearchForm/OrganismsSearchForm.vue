@@ -4,14 +4,14 @@
       v-model="buyOrRent" />
 
     <div class="o-searchform-banner">
-      <input type="search" placeholder="Location" class="o-searchform-banner-input" required @click="showPopover"
-        @focus="showPopover" @input="showPopover" v-model="suggestions" />
+      <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
+        required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" />
 
-      <select class="o-searchform-banner-select">
+      <select class="o-searchform-banner-select" aria-label="Radius of search">
         <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
       </select>
 
-      <button type="button" class="o-searchform-banner-button | button button-monochrome">
+      <button type="submit" class="o-searchform-banner-button | button button-monochrome">
         <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
       </button>
     </div>
