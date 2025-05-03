@@ -61,6 +61,7 @@ import { onClickOutside } from '@vueuse/core'
  *  Popover management
  */
 const $form = useTemplateRef('$form')
+const searchListings = inject<Ref<ListingWithFullProperty[] | null>>('searchListings');
 
 // Track state of form
 const popoverHidden = ref(true)
@@ -187,16 +188,26 @@ watch(suggestions, (newValue) => {
   formErrors.value = null
 })
 
-function sendForm({ target }) {
+async function sendForm({ target }) {
   const { formData, errors } = useFormData(target)
 
   if (errors) {
     formErrors.value = errors
-
     showPopover()
-
     return
   }
+
+  const listingsResult = await $fetch<ListingWithFullProperty[]>('/api/search/listings', {
+    method: 'POST',
+    body: {
+      location: formData.get('location'),
+      radius: formData.get('radius'),
+      buyOrRent: formData.get('buyOrRent'),
+    }
+  })
+
+  searchListings.value = listingsResult
+  console.log(listingsResult)
 
   console.log('formData', {
     location: formData.get('location'),
