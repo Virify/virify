@@ -1,13 +1,14 @@
 <template>
-  <form class="o-searchform | flow flow-sm relative" ref="$form" @keydown.escape="hidePopover">
-    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions"
-      v-model="buyOrRent" />
+  <form class="o-searchform | flow flow-sm relative" ref="$form" @keydown.escape="hidePopover"
+    @submit.prevent="sendForm">
+    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions" v-model="buyOrRent"
+      name="buyOrRent" />
 
     <div class="o-searchform-banner">
       <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
-        required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" />
+        required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
-      <select class="o-searchform-banner-select" aria-label="Radius of search">
+      <select class="o-searchform-banner-select" aria-label="Radius of search" name="radius">
         <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
       </select>
 
@@ -41,7 +42,7 @@
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
             <li v-for="label of propertType">
-              <AtomsToggleBox :label type="checkbox" name="property-type" v-model="selectedPropertyType[label]" />
+              <AtomsToggleBox :label type="checkbox" :name="label" v-model="selectedPropertyType[label]" />
             </li>
           </ul>
         </MoleculesScrollBox>
@@ -165,6 +166,30 @@ const suggestionsMatches = computed(() => {
     return strLower.startsWith(suggestionsLower)
   }).slice(0, 5)
 })
+
+/**
+ *  Submit form
+ */
+const formErrors = ref(null)
+
+function sendForm({ target }) {
+  const { formData, errors } = useFormData(target)
+
+  if (errors) {
+    formErrors.value = errors
+
+    return
+  }
+
+  console.log('formData', {
+    location: formData.get('location'),
+    radius: formData.get('radius'),
+    buyOrRent: formData.get('buyOrRent'),
+    propertType: propertType
+      .map((label) => formData.get(label))
+      .filter(Boolean)
+  })
+}
 </script>
 
 <style lang="scss">

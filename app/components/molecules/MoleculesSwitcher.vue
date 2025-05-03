@@ -5,7 +5,7 @@
     </legend>
 
     <label v-for="{ key, value, tabindex } of optionsWithTabIndex" :key class="m-toggle-text-label | font-semibold">
-      <input type="radio" class="| visually-hidden" :value="key" v-model="selected" :tabindex />
+      <input type="radio" class="| visually-hidden" :value="key" v-model="selected" :tabindex :name />
       {{ value }}
     </label>
   </fieldset>
@@ -13,7 +13,8 @@
 
 <script setup lang="ts">
 interface Props {
-  legend?: string,
+  legend?: string
+  name?: string
   options: { key: string, value: string }[]
 }
 
