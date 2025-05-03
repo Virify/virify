@@ -68,21 +68,6 @@ export enum ConstructionType {
   NON_STANDARD = "NON_STANDARD"
 }
 
-export enum RoofConstruction {
-  SLATE_TILE = "SLATE_TILE",
-  CONCRETE_TILE = "CONCRETE_TILE"
-}
-
-export enum FurnishingStatus {
-  FURNISHED = "FURNISHED",
-  UNFURNISHED = "UNFURNISHED",
-  PART_FURNISHED = "PART_FURNISHED"
-}
-
-export enum Tenure {
-  LEASEHOLD = "LEASEHOLD",
-  FREEHOLD = "FREEHOLD"
-}
 
 function formatLabel(key: string): string {
   return key
@@ -103,21 +88,6 @@ export const propertyClassificationOptions = Object.values(PropertyClassificatio
 }));
 
 export const constructionTypeOptions = Object.values(ConstructionType).map(value => ({
-  label: formatLabel(value),
-  value
-}));
-
-export const roofConstructionOptions = Object.values(RoofConstruction).map(value => ({
-  label: formatLabel(value),
-  value
-}));
-
-export const furnishingStatusOptions = Object.values(FurnishingStatus).map(value => ({
-  label: formatLabel(value),
-  value
-}));
-
-export const tenureOptions = Object.values(Tenure).map(value => ({
   label: formatLabel(value),
   value
 }));

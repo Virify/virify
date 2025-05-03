@@ -3,19 +3,12 @@ model Property {
   title                    String
   description              String
   value                    Float?
-  propertyTypeId           Int
-  propertyClassificationId Int
   size                     Float?
   yearBuilt                String?
+  chainFree                Boolean                @default(false)
+  vacant                   Boolean                @default(false)
   constructionType         ConstructionType?
   floorLevel               Int?
-  furnishingStatus         FurnishingStatus
-  tenure                   Tenure
-  leaseTerm                Int?
-  addressId                Int                    @unique
-  userId                   Int?
-  agentId                  Int?
-  // features
   additionalFeatures       AdditionalFeatures?
   accessibilityFeatures    Accessibility?
   amenities                Amenities[]
@@ -23,46 +16,35 @@ model Property {
   bedroomFeatures          Bedroom[]
   diningroomFeatures       Diningroom[]
   kitchenFeatures          Kitchen[]
-  listing                  Listing?
   livingAreaFeatures       LivingArea[]
+  reception                Reception[]
+  utility                  Utility[]
+  additionalToilet         AdditionalToilet[]
+  listing                  Listing[]
   media                    Media[]
   outdoorSpace             OutdoorSpace?
   Land                     Land?
   parking                  Parking?
   energyAndUtilities       EnergyAndUtilities?
-  reception                Reception[]
-  utility                  Utility[]
-  additionalToilet         AdditionalToilet[]
-  address                  Address                @relation(fields: [addressId], references: [id])
-  user                     User?                  @relation(fields: [userId], references: [id])
+  address                  Address                @relation(fields: [addressId], references: [id], onDelete: Cascade)
   runningCosts             RunningCosts?
   securityFeatures         Security?
   storageFeatures          Storage?
+  user                     User?                  @relation(fields: [userId], references: [id])
   agents                   Agent[]                @relation("AgentToProperty")
   estateAgent              EstateAgent?           @relation(fields: [estateAgentId], references: [id])
   type                     PropertyType           @relation(fields: [propertyTypeId], references: [id])
   classification           PropertyClassification @relation(fields: [propertyClassificationId], references: [id])
-  estateAgentId            Int?
   createdAt                DateTime               @default(now())
   updatedAt                DateTime               @updatedAt
-
-  @@index([userId])
-  @@index([agentId])
+  addressId                Int
+  userId                   Int?
+  estateAgentId            Int?
+  propertyTypeId           Int
+  propertyClassificationId Int
 }
 
 enum ConstructionType {
   STANDARD
   NON_STANDARD
-}
-
-enum FurnishingStatus {
-  FURNISHED
-  UNFURNISHED
-  PART_FURNISHED
-}
-
-enum Tenure {
-  LEASEHOLD
-  FREEHOLD
-  SHARED_OWNERSHIP
 }
