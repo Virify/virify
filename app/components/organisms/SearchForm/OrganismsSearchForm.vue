@@ -8,7 +8,7 @@
       <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
         required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
-      <select class="o-searchform-banner-select" aria-label="Radius of search" name="radius">
+      <select class="o-searchform-banner-select | focus-visible" aria-label="Radius of search" name="radius">
         <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
       </select>
 
@@ -276,14 +276,6 @@ function sendForm({ target }) {
   padding-inline: var(--size-12);
   margin: auto 0;
   cursor: pointer;
-
-  &:focus {
-    outline: none;
-  }
-
-  &:focus-visible {
-    outline: var(--focus-outline);
-  }
 
   &:hover {
     background: fn.faded-color(12%);
