@@ -1,7 +1,7 @@
 <template>
   <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">Verify your email</h1>
-    <p class="| body-sm">Please enter your one time pin below.</p>
+    <p class="| body-sm">Please enter your one time pin that you have recived in your email below.</p>
     <p v-if="errors" class="| body-sm">{{ errors }}</p>
     <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
   </div>
