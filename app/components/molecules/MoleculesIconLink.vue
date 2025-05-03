@@ -1,7 +1,7 @@
 <template>
   <nuxt-link :to class="m-icon-link | button button-ghost" :class="{
     'm-icon-link-inline': !iconInline,
-  }" :style="{ 'aspect-ratio': aspectRatio }">
+  }">
     <AtomsIcon v-if="icon" class="m-icon-link-icon" :class="{
       'm-icon-link-icon-large': iconLarge
     }" :icon :title="iconTitle" />
@@ -25,9 +25,6 @@ defineProps({
   content: {
     type: String
   },
-  aspectRatio: {
-    type: String
-  },
   iconLarge: {
     type: Boolean
   },
@@ -47,6 +44,7 @@ defineProps({
   color: currentColor;
   padding: var(--size-16);
   gap: var(--size-12);
+  text-align: left;
 
   &:hover {
     color: currentColor;
@@ -61,6 +59,7 @@ defineProps({
 }
 
 .m-icon-link-icon {
+  flex: 0 0 auto;
   display: block;
   width: var(--size-24);
   height: var(--size-24);

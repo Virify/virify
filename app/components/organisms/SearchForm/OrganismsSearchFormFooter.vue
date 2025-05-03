@@ -33,6 +33,10 @@ const exploreMoreLinks = [
   align-items: stretch;
 }
 
+.o-searchform-footer-icon-link {
+  min-height: 10ch;
+}
+
 .o-searchform-footer-full-button {
   display: block;
   text-decoration: none;
