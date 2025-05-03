@@ -2,9 +2,7 @@
   <div class="| flow flow-2xl">
     <slot />
 
-    <div role="presentation" class="| flow flow-md">
-      <h3 class="| title-sm">Explore more</h3>
-
+    <OrganismsSearchFormTitleBlock title="Explore more">
       <ul class="o-searchform-popover-explore-more">
         <li v-for="{ icon, to, content } of exploreMoreLinks">
           <MoleculesIconLink :to :icon :content icon-large class="o-searchform-popover-icon-link" />
@@ -13,7 +11,7 @@
 
       <nuxt-link to="#" class="o-searchform-popover-full-button | button button-ghost font-semibold">Advanced
         search</nuxt-link>
-    </div>
+    </OrganismsSearchFormTitleBlock>
   </div>
 </template>
 

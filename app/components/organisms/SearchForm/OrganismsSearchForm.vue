@@ -23,7 +23,7 @@
       :hidden="popoverHidden">
       <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
-      <div v-if="suggestions" class="o-searchform-autocomplete" role="presentation">
+      <OrganismsSearchFormTitleBlock v-if="suggestions" class="o-searchform-autocomplete">
         <div role="presentation">
           <h2 class="| title-sm">Locations</h2>
 
@@ -38,11 +38,9 @@
         <div class="o-searchform-map | title-2xl">
           Map
         </div>
-      </div>
+      </OrganismsSearchFormTitleBlock>
 
-      <div role="presentation" class="| flow flow-md">
-        <h2 class="| title-sm">Property type</h2>
-
+      <OrganismsSearchFormTitleBlock title="Property type">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
             <li v-for="label of propertType">
@@ -50,8 +48,7 @@
             </li>
           </ul>
         </MoleculesScrollBox>
-      </div>
-
+      </OrganismsSearchFormTitleBlock>
     </OrganismsSearchFormPopover>
   </form>
 </template>
