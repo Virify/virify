@@ -1,6 +1,6 @@
 <template>
   <div class="m-range-slider">
-    <SliderRoot v-model="rangeValue" :min="0" :max="100" class="m-range-slider-root">
+    <SliderRoot v-model="rangeValue" :min :max class="m-range-slider-root">
       <SliderTrack class="m-range-slider-track">
         <SliderRange class="m-range-slider-range" />
       </SliderTrack>
@@ -20,10 +20,34 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { SliderRoot, SliderTrack, SliderRange, SliderThumb } from 'reka-ui'
 
-const rangeValue = ref([25, 75])
+/**
+ *  Props
+ */
+interface Props {
+  min?: number
+  max?: number
+  startingMin?: number
+  startingMax?: number
+}
+
+withDefaults(defineProps<Props>(), {
+  min: 0,
+  max: 100,
+  startingMin: 25,
+  startingMax: 75
+})
+
+/**
+ *  Values
+ */
+const rangeValue = defineModel({
+  default: ({ startingMin, startingMax }): number[] => {
+    return [startingMin as number, startingMax as number]
+  }
+})
 </script>
 
 <style lang="scss">
@@ -32,6 +56,7 @@ const rangeValue = ref([25, 75])
   grid-template-columns: repeat(2, 1fr);
   align-items: center;
   gap: var(--size-12);
+  margin: 0;
 }
 
 .m-range-slider-label-min,
