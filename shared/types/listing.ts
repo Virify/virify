@@ -31,3 +31,18 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
     };
   };
 }>
+
+export type ListingSaleWithFullProperty = Prisma.ListingGetPayload<{
+  include: {
+    saleListing: true,
+    property: true
+  },
+}>;
+
+export type ListingRentalWithFullProperty = Prisma.ListingGetPayload<{
+  include: {
+    rentalListing: true,
+    property: true
+  },
+}>;
+

@@ -1,5 +1,5 @@
 import type { Listing } from "@prisma/client";
-import type { ListingWithFullProperty } from "~~/shared/types/listing";
+import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
 
 /**
@@ -32,7 +32,7 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
       saleListing: true,
       property: {
         include: {
-          ...propertyInclude
+          ...propertyInclude,
         },
       },
     },
@@ -51,7 +51,86 @@ export async function getAllListings(): Promise<ListingWithFullProperty[]> {
       saleListing: true,
       property: {
         include: {
-          ...propertyInclude
+          ...propertyInclude,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get Listings by Property IDs
+ *
+ * @param propertyIds number[]
+ * @returns ListingWithFullProperty[]
+ */
+export async function getAllListingsByPropertyIds(propertyIds: number[]): Promise<ListingWithFullProperty[]> {
+  return await prisma.listing.findMany({
+    where: {
+      propertyId: {
+        in: propertyIds,
+      },
+    },
+    include: {
+      rentalListing: true,
+      saleListing: true,
+      property: {
+        include: {
+          ...propertyInclude,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get Sale Listings by Property IDs
+ *
+ * @param propertyIds number[]
+ * @returns ListingWithFullProperty[]
+ */
+export async function getSaleListingsByPropertyIds(propertyIds: number[]): Promise<ListingSaleWithFullProperty[]> {
+  return await prisma.listing.findMany({
+    where: {
+      propertyId: {
+        in: propertyIds,
+      },
+      saleListing: {
+        isNot: null,
+      },
+    },
+    include: {
+      saleListing: true,
+      property: {
+        include: {
+          ...propertyInclude,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get Rental Listings by Property IDs
+ *
+ * @param propertyIds number[]
+ * @returns ListingWithFullProperty[]
+ */
+export async function getRentalListingsByPropertyIds(propertyIds: number[]): Promise<ListingRentalWithFullProperty[]> {
+  return await prisma.listing.findMany({
+    where: {
+      propertyId: {
+        in: propertyIds,
+      },
+      rentalListing: {
+        isNot: null,
+      },
+    },
+    include: {
+      rentalListing: true,
+      property: {
+        include: {
+          ...propertyInclude,
         },
       },
     },
