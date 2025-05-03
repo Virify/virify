@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { saleAddress, rentalAddress, cityCenters } from "../../utils/address-to-seed.ts";
 import { generateProperty } from "../../utils/property-faker.ts";
 import { generateRentalListing, generateSaleListing } from "../../utils/listing-faker.ts";
+import { updateLocationsByAddressList } from "../../utils/location.ts";
 const prisma = new PrismaClient();
 
 /**
@@ -30,12 +31,34 @@ seed().catch((e) => {
   process.exit(1);
 });
 
+/**
+ * Seeding function to populate city center addresses in the database.
+ */
 export async function seedCityCenters() {
-  const addresses = await prisma.address.createMany({
-    data: cityCenters,
-    skipDuplicates: true,
-  });
+  const created = await Promise.all(
+    cityCenters.map((center) =>
+      prisma.address.upsert({
+        where: {
+          street_city_postcode_country: {
+            street: center.street,
+            city: center.city,
+            postcode: center.postcode,
+            country: center.country || "",
+          },
+        },
+        update: {},
+        create: center,
+      })
+    )
+  );
+
+  await updateLocationsByAddressList(created as {
+    id: number;
+    lat: number;
+    lon: number;
+  }[]);
 }
+
 
 /**
  * Seeding function to populate property types and classifications in the database.
