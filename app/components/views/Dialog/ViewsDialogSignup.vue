@@ -20,20 +20,28 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogLogin } from '#components'
+import { ViewsDialogLogin, ViewsDialogVerifyOtp } from '#components'
 
 /**
  *  Modal control
  */
-const { hideDialog } = useDialog()
+const { hideDialog, showDialog } = useDialog()
 
 /**
  *  Success
  */
-function formSuccess(user) {
+function formSuccess(user: { token: string; }) {
   console.log('DEBUG', user);
 
-  // redirect to OTP Verification for activation
-  navigateTo("/signup/verify?token=" + user.token);
+  // Hide the current dialog
+  hideDialog()
+
+  // Show the OTP verification dialog with props
+  showDialog({
+    component: ViewsDialogVerifyOtp,
+    props: {
+      token: user.token
+    }
+  })
 }
 </script>

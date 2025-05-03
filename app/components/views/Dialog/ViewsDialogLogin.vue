@@ -36,8 +36,8 @@ const { hideDialog } = useDialog()
 /**
  *  Success
  */
-function formSuccess() {
-  fetch();
+async function formSuccess() {
+  await fetch();
   hideDialog("/account");
 }
 </script>
