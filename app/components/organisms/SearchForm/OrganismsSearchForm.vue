@@ -17,12 +17,38 @@
     </div>
 
     <div class="o-searchform-popover | container container-md elevate-300" :hidden="popoverHidden">
-      <OrganismsSearchFormPopover :suggestions @suggestion-selected="setSelectedSuggestion" />
+      <OrganismsSearchFormPopover>
+        <div v-if="suggestions" class="o-searchform-autocomplete" role="presentation">
+          <div role="presentation">
+            <h2 class="| title-sm">Locations</h2>
+
+            <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
+              @suggestion-selected="setSelectedSuggestion" />
+          </div>
+
+          <div class="o-searchform-map | title-2xl">
+            Map
+          </div>
+        </div>
+
+        <div role="presentation" class="| flow flow-md">
+          <h2 class="| title-sm">Property type</h2>
+
+          <MoleculesScrollBox class="| focus-overflow">
+            <ul class="o-searchform-property-types">
+              <li v-for="label of propertType">
+                <AtomsToggleBox :label type="checkbox" name="property-type" v-model="selectedPropertyType[label]" />
+              </li>
+            </ul>
+          </MoleculesScrollBox>
+        </div>
+
+      </OrganismsSearchFormPopover>
     </div>
   </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 
 /**
@@ -89,6 +115,53 @@ const buyOrRentOptions = [
   { key: 'rent', value: 'Rent' },
   { key: 'price', value: 'House prices' },
 ]
+
+/**
+ *  Property type
+ */
+const propertType = [
+  'Detached',
+  'Semi-detached',
+  'Terraced',
+  'End-terrace',
+  'Flat',
+  'Cottage',
+  'Bungalow',
+]
+
+const selectedPropertyType = reactive<Record<string, boolean>>({
+  'Detached': true,
+  'Semi-detached': true,
+  'Terraced': true,
+  'End-terrace': true
+})
+
+/**
+ *  Mock autocomplete
+ */
+const suggestionsMatches = computed(() => {
+  // Avoid case sensitivity
+  const suggestionsLower = suggestions.value.toLowerCase()
+
+  // Mock filter
+  return [
+    'Stevenage, Hertfordshire',
+    'Steventon, Oxford',
+    'St. Albans, Hertforshire',
+    'St. Neots, Hertfordshire',
+    'Stoke-on-Trent, Staffordshire',
+    'Stepps, Glasgow',
+    'Stepney, London',
+    'Stockwell, London',
+    'Stratford, London',
+    'South London',
+    'South West London'
+  ].filter(str => {
+    const strLower = str.toLowerCase()
+
+    return strLower.startsWith(suggestionsLower)
+  }).slice(0, 5)
+})
 </script>
 
 <style lang="scss">
@@ -159,7 +232,35 @@ const buyOrRentOptions = [
   transform: translateX(-50%);
   width: min(100vw - var(--size-72), 42em);
   padding: var(--size-32);
+  text-align: left;
+  overflow: hidden;
 }
+
+.o-searchform-autocomplete {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--size-32);
+}
+
+.o-searchform-property-types {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  gap: var(--size-8);
+  white-space: nowrap;
+}
+
+.o-searchform-map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--monochrome-800);
+  color: var(--monochrome-600);
+  border-radius: var(--border-radius-ui);
+  aspect-ratio: 1;
+}
+
 
 /**
  *  Open animatinos
