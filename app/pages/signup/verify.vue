@@ -11,11 +11,13 @@ async function registerCompletion() {
   await verifyOtp();
   await fetch();
   if (route.query.passwordToken) {
-    return navigateTo("/password/reset?passwordToken=" + route.query.passwordToken);
+    navigateTo("/password/reset?passwordToken=" + route.query.passwordToken);
   } else {
     navigateTo("/account");
   }
 }
+
+const errors = ref("");
 
 async function verifyOtp() {
   try {
@@ -27,9 +29,8 @@ async function verifyOtp() {
         passwordToken: route.query.passwordToken,
       },
     });
-  } catch (error) {
-    // TODO: Handle Error
-    console.error("Error verifying OTP:", error);
+  } catch (error: any) {
+      errors.value = error.data.message;
   }
 }
 </script>
@@ -38,6 +39,7 @@ async function verifyOtp() {
     <h1 class="| title-xl">Verify your email</h1>
 
     <p class="| body-sm">Please enter your one time pin below.</p>
+    <p v-if="errors" class="| body-sm">{{ errors }}</p>
 
     <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
 
