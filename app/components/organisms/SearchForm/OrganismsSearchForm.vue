@@ -128,7 +128,7 @@ const buyOrRent = ref('buy')
 const buyOrRentOptions = [
   { key: 'buy', value: 'Buy' },
   { key: 'rent', value: 'Rent' },
-  { key: 'price', value: 'House prices' },
+  { key: 'price', value: 'Prices' },
 ]
 
 /**
@@ -213,6 +213,7 @@ function sendForm({ target }) {
 
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
+@use '#styles/_utils/media' as mq;
 
 .o-searchform {
   max-width: 32em;
@@ -226,8 +227,19 @@ function sendForm({ target }) {
 }
 
 .o-searchform-banner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-column-gap: var(--size-12);
   align-items: stretch;
+  padding: var(--size-12);
+
+  @include mq.small-tablet {
+    display: flex;
+    grid-template-columns: unset;
+    grid-column-gap: unset;
+    flex-direction: row;
+    padding: 0;
+  }
 }
 
 .o-searchform-banner-input,
@@ -238,6 +250,18 @@ function sendForm({ target }) {
 
 .o-searchform-banner-input {
   outline: none;
+  grid-column: span 2;
+  height: var(--size-56);
+  flex: 1 0 min-content;
+  padding-inline: var(--size-12);
+  text-align: center;
+
+  @include mq.small-tablet {
+    grid-column: unset;
+    height: unset;
+    padding-inline-start: var(--size-32);
+    text-align: left;
+  }
 }
 
 .o-searchform-banner:has(.o-searchform-banner-input:focus) {
@@ -264,14 +288,10 @@ function sendForm({ target }) {
   }
 }
 
-.o-searchform-banner-input {
-  flex: 1 0 min-content;
-  padding-inline-start: var(--size-32);
-  padding-inline-end: var(--size-12);
-}
-
 .o-searchform-banner-button-wrapper {
-  padding: var(--size-12);
+  @include mq.small-tablet {
+    padding: var(--size-12);
+  }
 }
 
 .o-searchform-banner-button {
@@ -296,13 +316,19 @@ function sendForm({ target }) {
 
 .o-searchform-popover {
   position: absolute;
-  top: calc(100% + var(--size-12));
+  top: calc(100% + var(--size-14));
   left: 50%;
   transform: translateX(-50%);
-  width: min(100vw - var(--size-72), 42em);
-  padding: var(--size-32);
+  padding: var(--size-16);
+  width: min(100vw - var(--size-24), 42em);
   text-align: left;
   overflow: hidden;
+  margin: 0;
+
+  @include mq.tablet {
+    padding: var(--size-32);
+    width: min(100vw - var(--size-72), 42em);
+  }
 }
 
 .o-searchform-autocomplete {

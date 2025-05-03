@@ -1,4 +1,5 @@
 @use '../_utils/functions' as fn;
+@use '../_utils/media' as mq;
 
 :root {
   /*
@@ -9,11 +10,11 @@
   --font-sm: #{fn.toRem(16)};
   --font-md: #{fn.toRem(18)};
   --font-lg: #{fn.toRem(20)};
-  --font-xl: #{fn.toRem(24)};
-  --font-2xl: #{fn.toRem(28)};
-  --font-3xl: #{fn.toRem(34)};
-  --font-4xl: #{fn.toRem(42)};
-  --font-5xl: #{fn.toRem(48)};
+  --font-xl: #{fn.toRem(22)};
+  --font-2xl: #{fn.toRem(24)};
+  --font-3xl: #{fn.toRem(28)};
+  --font-4xl: #{fn.toRem(32)};
+  --font-5xl: #{fn.toRem(36)};
 
   /*
    *  Line-height sizes
@@ -30,4 +31,20 @@
   --font-medium: 400;
   --font-semibold: 600;
   --font-bold: 700;
+
+  /**
+   *  Responsive sizes
+   */
+  @include mq.tablet {
+    --font-2xs: #{fn.toRem(12)};
+    --font-xs: #{fn.toRem(14)};
+    --font-sm: #{fn.toRem(16)};
+    --font-md: #{fn.toRem(18)};
+    --font-lg: #{fn.toRem(20)};
+    --font-xl: #{fn.toRem(24)};
+    --font-2xl: #{fn.toRem(28)};
+    --font-3xl: #{fn.toRem(34)};
+    --font-4xl: #{fn.toRem(42)};
+    --font-5xl: #{fn.toRem(48)};
+  }
 }

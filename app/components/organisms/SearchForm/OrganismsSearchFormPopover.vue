@@ -26,19 +26,27 @@ const exploreMoreLinks = [
 
 </script>
 
-<style>
+<style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .o-searchform-popover-explore-more {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--size-16);
   align-items: stretch;
+
+  @include mq.tablet {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .o-searchform-popover-icon-link {
-  min-height: 10ch;
+  @include mq.tablet {
+    min-height: 10ch;
+  }
 }
 
 .o-searchform-popover-full-button {
