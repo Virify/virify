@@ -2,7 +2,14 @@
   <div class="w-full text-center">
     <h1 class="| title-2xl">Virify</h1>
 
-    <div class="| stacked container container-2xs">
+    <div class="| stacked container container-2xs flow flow-xs">
+      <MoleculesOtp v-model="otpTest" @complete="registerCompletion" />
+
+      <div>
+        <p>OTP inputs: {{ otpTest }}</p>
+        <p>Check in dev console for logs when OTP is completed</p>
+      </div>
+
       <button @click.prevent="openLogin" class="| button button-full">
         Log in
       </button>
@@ -28,5 +35,14 @@ function openForgotPassword() {
   showDialog({
     component: ViewsDialogForgotPassword
   })
+}
+
+/**
+ *  OTP test
+ */
+const otpTest = ref([])
+
+function registerCompletion(code) {
+  console.log('Submitted', code)
 }
 </script>
