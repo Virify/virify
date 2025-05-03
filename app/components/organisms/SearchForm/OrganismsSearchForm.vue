@@ -49,6 +49,11 @@
           </ul>
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
+
+      <OrganismsSearchFormTitleBlock title="Price">
+        <MoleculesRangeSlider />
+      </OrganismsSearchFormTitleBlock>
+
     </OrganismsSearchFormPopover>
   </form>
 </template>
