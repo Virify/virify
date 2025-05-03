@@ -19,6 +19,8 @@
 
     <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
       :hidden="popoverHidden">
+      <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
+
       <div v-if="suggestions" class="o-searchform-autocomplete" role="presentation">
         <div role="presentation">
           <h2 class="| title-sm">Locations</h2>
@@ -83,6 +85,13 @@ function hidePopover() {
 // Hide form on click outside
 onClickOutside($form, () => {
   hidePopover(true)
+})
+
+/**
+ *  Block native form validation on mount
+ */
+onMounted(() => {
+  $form.value.setAttribute('novalidate', true)
 })
 
 /**
@@ -172,11 +181,19 @@ const suggestionsMatches = computed(() => {
  */
 const formErrors = ref(null)
 
+watch(suggestions, (newValue) => {
+  if (!formErrors.value || !newValue) return
+
+  formErrors.value = null
+})
+
 function sendForm({ target }) {
   const { formData, errors } = useFormData(target)
 
   if (errors) {
     formErrors.value = errors
+
+    showPopover()
 
     return
   }
