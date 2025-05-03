@@ -25,25 +25,7 @@
       </MoleculesScrollBox>
     </div>
 
-    <div role="presentation" class="| flow flow-md">
-      <h3 class="| title-sm">Explore more</h3>
-
-      <ul class="o-searchform-suggestions-explore-more">
-        <li>
-          <MoleculesIconLink to="#" icon="explore/hot" content="Hot right now" aspect-ratio="16/9" icon-large />
-        </li>
-        <li>
-          <MoleculesIconLink to="#" icon="explore/trending" content="Trending locations" aspect-ratio="16/9"
-            icon-large />
-        </li>
-        <li>
-          <MoleculesIconLink to="#" icon="explore/top-picks" content="Top picks" aspect-ratio="16/9" icon-large />
-        </li>
-      </ul>
-
-      <nuxt-link to="#" class="o-searchform-suggestions-full-button | button button-ghost font-semibold">Advanced
-        search</nuxt-link>
-    </div>
+    <OrganismsSearchFormFooter class="| flow flow-md" />
   </div>
 </template>
 
@@ -126,24 +108,6 @@ const suggestionsMatches = computed(() => {
   margin: 0;
   gap: var(--size-8);
   white-space: nowrap;
-}
-
-.o-searchform-suggestions-explore-more {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--size-16);
-}
-
-.o-searchform-suggestions-full-button {
-  display: block;
-  text-decoration: none;
-  padding: var(--size-12);
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: var(--border-radius-ui);
 }
 
 .o-searchform-suggestions-map {
