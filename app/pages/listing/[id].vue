@@ -1,0 +1,295 @@
+<template>
+  <div class="p-6 max-w-4xl mx-auto">
+    <div v-if="listing && property">
+      <h1 class="pb-4">{{ listing.title }}</h1>
+      <!-- media -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <NuxtImg v-for="(mediaItem, index) in property.media" :key="index" :src="(mediaItem.image as string)" :alt="mediaItem?.metadata" class="rounded-lg" width="300" />
+      </div>
+
+      <!-- static map -->
+      <LeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
+
+      <table class="table-auto w-full text-left border-collapse border border-gray-200">
+        <tbody>
+          <!-- location -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Location</th>
+          </tr>
+          <tr colspan="2">
+            <td class="px-4 py-2">
+              {{ property.address.street }}, {{ property.address.city }},
+              {{ property.address.postcode }}
+            </td>
+          </tr>
+          <!-- listing -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Listing Description:</th>
+          </tr>
+          <tr colspan="2">
+            <td class="px-4 py-2">
+              {{ listing.description }}
+            </td>
+          </tr>
+          <!-- listing tier -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Tier: (not shown to user)</th>
+          </tr>
+          <tr colspan="2">
+            <td class="px-4 py-2">
+              {{ listing.listingTier }}
+            </td>
+          </tr>
+          <!-- listing category -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Category: (sale or rent)</th>
+          </tr>
+          <tr colspan="2">
+            <td class="px-4 py-2">
+              {{ listing.saleListing ? "Sale" : "Rent" }}
+            </td>
+          </tr>
+          <!-- availability -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Availability:</th>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">
+              {{ listing.rentalListing?.availabilityStatus ?? listing.saleListing?.availabilityStatus }}
+            </td>
+          </tr>
+          <!-- move in date -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Move in date:</th>
+          </tr>
+          <tr colspan="2">
+            <td class="px-4 py-2">
+              {{ formattedMoveInDate }}
+            </td>
+          </tr>
+          <!-- listing price -->
+          <tr>
+            <th class="px-4 py-2 text-lg font-semibold">Price:</th>
+          </tr>
+          <tr colspan="2">
+            <td class="px-4 py-2">£{{ listing.price }}, {{ listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency }}</td>
+          </tr>
+          <tr v-if="listing.rentalListing">
+            <th class="px-4 py-2 text-lg font-semibold">Deposit:</th>
+          </tr>
+          <tr v-if="listing.rentalListing" colspan="2">
+            <td class="px-4 py-2">£{{ listing.rentalListing.deposit }}</td>
+          </tr>
+          <!-- furnished -->
+          <tr v-if="listing.rentalListing">
+            <th class="px-4 py-2 text-lg font-semibold">Furnished:</th>
+          </tr>
+          <tr v-if="listing.rentalListing" colspan="2">
+            <td class="px-4 py-2">{{ listing.rentalListing.furnishedStatus }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="table-auto w-full text-left border-collapse border border-gray-200">
+        <tbody>
+          <!-- Basic Info -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Basic Info</th>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Title</td>
+            <td class="px-4 py-2">{{ property.title }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Description</td>
+            <td class="px-4 py-2">{{ property.description }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Type</td>
+            <td class="px-4 py-2">{{ property.type.name }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Classification</td>
+            <td class="px-4 py-2">{{ property.classification.name }}</td>
+          </tr>
+          <!-- Room Info -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Number of Rooms</th>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Bedrooms</td>
+            <td class="px-4 py-2">{{ property.bedroomFeatures.length }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Bathrooms</td>
+            <td class="px-4 py-2">{{ property.bathroomFeatures.length }}</td>
+          </tr>
+          <!-- Bedroom Features -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Bedroom Features</th>
+          </tr>
+          <tr v-for="(room, index) in bedroomFeatures" :key="index">
+            <td class="px-4 py-2 font-medium">{{ room.label }}</td>
+            <td class="px-4 py-2">
+              Size: {{ room.size }}<br />
+              Features: {{ room.features }}
+            </td>
+          </tr>
+          <!-- Bathroom Features -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">bathroom Features</th>
+          </tr>
+          <tr v-for="(room, index) in bathroomFeatures" :key="index">
+            <td class="px-4 py-2 font-medium">{{ room.label }}</td>
+            <td class="px-4 py-2">Features: {{ room.features }}</td>
+          </tr>
+          <!-- outdoor spaces -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Outdoor Spaces</th>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Description:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.description }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Total Sise:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.totalSize }} Msq</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Front Garden:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.frontGarden ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Rear Garden:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.rearGarden ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Patio:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.patio ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Seperate Parcel:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.separateParcel ? "Yes" : "No" }}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Shed:</td>
+            <td class="px-4 py-2">{{ property.outdoorSpace?.shed ? "Yes" : "No" }}</td>
+          </tr>
+          <!-- Parking Info -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Parking</th>
+          </tr>
+          <tr v-for="(item, index) in parking" :key="index">
+            <td class="px-4 py-2 font-medium">
+              {{ index }}
+            </td>
+            <td class="px-4 py-2">{{ item }}</td>
+          </tr>
+          <!-- Energy and Utilities -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Energy and Utilties</th>
+          </tr>
+          <tr v-for="(item, index) in energyAndUtil" :key="index">
+            <td class="px-4 py-2 font-medium">
+              {{ index }}
+            </td>
+            <td class="px-4 py-2">{{ item }}</td>
+          </tr>
+          <!-- Council Tax Band -->
+          <tr>
+            <th colspan="2" class="px-4 py-2 text-lg font-semibold">Council Tax Band</th>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">Band</td>
+            <td class="px-4 py-2">{{ councilTaxBand }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-else class="text-gray-500">Loading...</div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { ListingWithFullProperty } from "~~/shared/types/listing";
+import { formatMDY } from "~~/shared/utils/format-date";
+
+const route = useRoute();
+const listingId = route.params.id as string;
+
+const url: string = `/api/listing/${listingId}`;
+
+const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullProperty>(url));
+
+const listing = computed(() => data.value);
+const property = computed(() => data.value?.property);
+
+// logs for ease
+console.log("Listing:", listing.value);
+console.log("Property:", property.value);
+
+const parking = computed(() => {
+  const parking = property.value?.parking;
+  if (!parking) return null;
+
+  return {
+    description: parking.description,
+    "Has Parking": parking.noParking ? "No" : "Yes",
+    Garage: parking.garage ? "Yes" : "No",
+    "Ev Charging": parking.evCharging ? "Yes" : "No",
+    Driveway: parking.driveway ? "Yes" : "No",
+    Carport: parking.carport ? "Yes" : "No",
+    "Permit Parking": parking.permitParking ? "Yes" : "No",
+    "On Street": parking.onStreet ? "Yes" : "No",
+  };
+});
+const bedroomFeatures = computed(
+  () =>
+    property.value?.bedroomFeatures.map((feature: { enSuite: any; builtInStorage: any; walkInWardrobe: any; bed: any[] }, i: number) => {
+      const attributes: string[] = [];
+
+      if (feature.enSuite) attributes.push("Ensuite");
+      if (feature.builtInStorage) attributes.push("Built-in Storage");
+      if (feature.walkInWardrobe) attributes.push("Walk-in Wardrobe");
+
+      return {
+        label: `Bedroom ${i + 1}`,
+        size: feature.bed?.[0] || "Unknown size",
+        features: attributes.join(", ") || "None",
+      };
+    }) || []
+);
+
+const bathroomFeatures = computed(
+  () =>
+    property.value?.bathroomFeatures.map((feature: { bathtub: any; walkInShower: any; upstairs: any; downstairs: any }, i: number) => {
+      const attributes: string[] = [];
+
+      if (feature.bathtub) attributes.push("Bath");
+      if (feature.walkInShower) attributes.push("Shower");
+      if (feature.upstairs) attributes.push("Upstairs");
+      if (feature.downstairs) attributes.push("Downstairs");
+
+      return {
+        label: `Bathroom ${i + 1}`,
+        features: attributes.join(", ") || "None",
+      };
+    }) || []
+);
+
+const energyAndUtil = computed(() => {
+  const energyAndUtil = property.value?.energyAndUtilities;
+  if (!energyAndUtil) return null;
+
+  return {
+    description: energyAndUtil.description,
+    "EPC Rating": energyAndUtil.epcRating,
+    Heating: energyAndUtil.primaryHeatingType.join(", "),
+  };
+});
+
+const councilTaxBand = computed(() => property.value?.runningCosts?.councilTaxBand);
+
+const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
+</script>
