@@ -13,5 +13,6 @@
 
 input.visually-hidden {
   appearance: none;
-  top: 0;
+  position: absolute;
+  top: unset;
 }
