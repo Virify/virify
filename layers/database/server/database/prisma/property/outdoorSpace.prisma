@@ -14,10 +14,11 @@ model OutdoorSpace {
   shed            Boolean  @default(false)
   summerHouse     Boolean  @default(false)
   gardenOffice    Boolean  @default(false)
+  pool            Boolean  @default(false)
   propertyId      Int      @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  property        Property @relation(fields: [propertyId], references: [id])
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
 }

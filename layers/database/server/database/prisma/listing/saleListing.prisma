@@ -1,0 +1,37 @@
+model SaleListing {
+  id                 Int                    @id
+  listing            Listing                @relation(fields: [id], references: [id])
+  tenureType         TenureType?
+  chain              Boolean
+  ownershipType      OwnershipType?
+  priceType          SalePriceType
+  availabilityStatus SaleAvailabilityStatus
+
+  @@index([id])
+}
+
+enum TenureType {
+  FREEHOLD
+  LEASEHOLD
+  COMMONHOLD
+  SHARE_OF_FREEHOLD
+}
+
+enum SalePriceType {
+  FIXED
+  OFFERS_OVER
+  GUIDE_PRICE
+}
+
+enum OwnershipType {
+  FULL_OWNERSHIP
+  PARTIAL_OWNERSHIP
+  SHARED_OWNERSHIP
+  JOINT_OWNERSHIP
+}
+
+enum SaleAvailabilityStatus {
+  AVAILABLE
+  UNDER_OFFER
+  SOLD
+}

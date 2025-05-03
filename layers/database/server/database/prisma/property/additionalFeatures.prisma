@@ -3,7 +3,6 @@ model AdditionalFeatures {
   description String
   petFriendly Boolean  @default(true)
   moveInDate  DateTime
-  chainFree   Boolean  @default(false)
   homeOffice  Boolean  @default(false)
   pool        Boolean  @default(false)
   internet    Boolean  @default(false)
@@ -16,7 +15,7 @@ model AdditionalFeatures {
   propertyId  Int      @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  property    Property @relation(fields: [propertyId], references: [id])
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
 }

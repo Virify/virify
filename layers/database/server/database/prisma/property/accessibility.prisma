@@ -12,7 +12,7 @@ model Accessibility {
   propertyId         Int      @unique
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
-  property           Property @relation(fields: [propertyId], references: [id])
+  property           Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
 }

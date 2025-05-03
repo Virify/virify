@@ -1,0 +1,57 @@
+import type { Property } from "@prisma/client";
+import type { Fullproperty } from "~~/shared/types/property";
+
+export const propertyInclude = {
+  address: true,
+  media: true,
+  type: true,
+  classification: true,
+  bedroomFeatures: true,
+  bathroomFeatures: true,
+  parking: true,
+  amenities: true,
+  additionalFeatures: true,
+  accessibilityFeatures: true,
+  diningroomFeatures: true,
+  kitchenFeatures: true,
+  livingAreaFeatures: true,
+  reception: true,
+  utility: true,
+  additionalToilet: true,
+  outdoorSpace: true,
+  energyAndUtilities: true,
+  securityFeatures: true,
+  storageFeatures: true,
+  runningCosts: true,
+};
+
+/**
+ * Get a property by ID
+ *
+ * @param id number
+ * @returns Property
+ */
+export async function getPropertyById(id: number): Promise<Property | null> {
+  return await prisma.property.findUnique({
+    where: {
+      id,
+    },
+  });
+}
+
+/**
+ * Get a full property by ID
+ *
+ * @param id number
+ * @returns Property
+ */
+export async function getFullPropertyById(id: number): Promise<Fullproperty | null> {
+  return await prisma.property.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      ...propertyInclude
+    },
+  });
+}
