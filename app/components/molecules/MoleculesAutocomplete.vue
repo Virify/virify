@@ -1,9 +1,7 @@
 <template>
   <ul class="m-autocomplete">
-    <li v-for="{ current, suggestion, original } of matchesComputed">
-      <button class="m-autocomplete-button | body-md" @click.prevent="emitSuggestion(original)">
-        <strong class="m-autocomplete-highlight">{{ current }}</strong>{{ suggestion }}
-      </button>
+    <li v-for="match of matchesComputed">
+      <slot v-bind="{ ...match }"></slot>
     </li>
   </ul>
 </template>
@@ -55,23 +53,5 @@ function emitSuggestion(suggestion: string) {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.m-autocomplete-button {
-  display: block;
-  width: 100%;
-  padding: var(--size-8) var(--size-14);
-  border-radius: var(--border-radius-ui);
-  cursor: pointer;
-  text-align: left;
-  color: currentColor;
-  background-color: transparent;
-  transition: background-color var(--animation-fast);
-}
-
-.m-autocomplete-button:hover,
-.m-autocomplete:not(:has(.m-autocomplete-button:hover)) li:first-child .m-autocomplete-button {
-  background: fn.faded-color(8%);
-  color: var(--foreground-100);
 }
 </style>

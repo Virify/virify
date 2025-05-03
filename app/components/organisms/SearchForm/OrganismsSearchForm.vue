@@ -23,7 +23,12 @@
             <h2 class="| title-sm">Locations</h2>
 
             <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
-              @suggestion-selected="setSelectedSuggestion" />
+              v-slot="{ original, current, suggestion }">
+              <button class="o-searchform-autocomplete-button | body-md"
+                @click.prevent="setSelectedSuggestion(original)">
+                <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
+              </button>
+            </MoleculesAutocomplete>
           </div>
 
           <div class="o-searchform-map | title-2xl">
@@ -240,6 +245,23 @@ const suggestionsMatches = computed(() => {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: var(--size-32);
+}
+
+.o-searchform-autocomplete-button {
+  display: block;
+  width: 100%;
+  padding: var(--size-8) var(--size-14);
+  border-radius: var(--border-radius-ui);
+  cursor: pointer;
+  text-align: left;
+  color: currentColor;
+  background-color: transparent;
+  transition: background-color var(--animation-fast);
+}
+
+.o-searchform-autocomplete-button:hover {
+  background: fn.faded-color(8%);
+  color: var(--foreground-100);
 }
 
 .o-searchform-property-types {
