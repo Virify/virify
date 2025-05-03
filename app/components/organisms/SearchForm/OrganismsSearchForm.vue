@@ -51,7 +51,7 @@
       </OrganismsSearchFormTitleBlock>
 
       <OrganismsSearchFormTitleBlock title="Price">
-        <MoleculesRangeSlider />
+        <LazyMoleculesRangeSlider hydrate-on-visible />
       </OrganismsSearchFormTitleBlock>
 
     </OrganismsSearchFormPopover>
