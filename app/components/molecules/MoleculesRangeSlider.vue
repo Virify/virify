@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <SliderRoot v-model="rangeValue" :min="0" :max="100" class="m-range-slider">
+  <div class="m-range-slider">
+    <SliderRoot v-model="rangeValue" :min="0" :max="100" class="m-range-slider-root">
       <SliderTrack class="m-range-slider-track">
         <SliderRange class="m-range-slider-range" />
       </SliderTrack>
@@ -8,18 +8,58 @@
       <SliderThumb class="m-range-slider-thumb" />
     </SliderRoot>
 
-    <div>{{ rangeValue }}</div>
+    <label class="m-range-slider-label-min | body-sm">
+      <input type="number" v-model="rangeValue[0]" class="m-range-slider-input | text-input focus-visible" />
+      Min price
+    </label>
+
+    <label class="m-range-slider-label-max | body-sm">
+      <input type="number" v-model="rangeValue[1]" class="m-range-slider-input | text-input focus-visible" />
+      Max price
+    </label>
   </div>
 </template>
 
 <script setup>
 import { SliderRoot, SliderTrack, SliderRange, SliderThumb } from 'reka-ui'
 
-const rangeValue = ref([50, 100])
+const rangeValue = ref([25, 75])
 </script>
 
 <style lang="scss">
 .m-range-slider {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  gap: var(--size-12);
+}
+
+.m-range-slider-label-min,
+.m-range-slider-label-max {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.m-range-slider-label-min {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.m-range-slider-label-max {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.m-range-slider-input {
+  width: min-content;
+  max-width: 100%;
+  margin-bottom: var(--size-4);
+  text-align: inherit;
+}
+
+.m-range-slider-root {
+  grid-column: span 2;
   position: relative;
   display: flex;
   align-items: center;
@@ -27,6 +67,7 @@ const rangeValue = ref([50, 100])
   touch-action: none;
   width: 100%;
   height: var(--size-32);
+  flex-shrink: 1;
 }
 
 .m-range-slider-track {
