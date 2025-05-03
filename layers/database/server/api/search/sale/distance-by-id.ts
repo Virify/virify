@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
 
     // Get location coordinates from Address
     const location = await getLocationByAddressId(addressId);
-    console.log("Location:", location);
 
     if (!location) throw createError({ statusCode: 404, statusMessage: "Address not found" });
 
@@ -27,7 +26,6 @@ export default defineEventHandler(async (event) => {
       listings,
     };
   } catch (error) {
-    console.log("Error in distance-by-id.ts:", error);
     throw error;
   }
 });

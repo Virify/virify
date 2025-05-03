@@ -26,7 +26,6 @@ export default defineEventHandler(async (event) => {
       listings,
     };
   } catch (error) {
-    console.log("Error in distance-by-id.ts:", error);
     throw error;
   }
 });
