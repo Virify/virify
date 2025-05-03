@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { z } from "zod";
 const { user, session, clear, loggedIn } = useUserSession();
-const { showToast } = useToastNotification();
 
 /**
  * Form validation schema
@@ -47,10 +46,7 @@ async function setPassword() {
       state.confirmedPassword = "";
     })
     .catch((error) => {
-      showToast({
-        title: error.data.message,
-        icon: "ri:error-warning-line",
-      });
+      console.error("Error resetting password:", error);
     });
 }
 
@@ -66,17 +62,10 @@ async function deleteAccount() {
   })
     .then(() => {
       clear();
-      showToast({
-        title: "Account deleted successfully! Redirecting to home page...",
-        icon: "ri:check-line",
-      });
       navigateTo("/");
     })
     .catch((error) => {
-      showToast({
-        title: error.data.message,
-        icon: "ri:error-warning-line",
-      });
+      console.error("Error deleting account:", error);
     });
 }
 

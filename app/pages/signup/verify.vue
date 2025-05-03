@@ -1,48 +1,53 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui";
-import { z } from "zod";
-
 const { fetch } = useUserSession();
 const route = useRoute();
-
-const otpSchema = z.object({
-  otpCode: z.string().min(6, "OTP code must be at least 6 characters long"),
-});
-
-const state = reactive({
-  otpCode: "",
-});
+const otpCode = ref([]);
 
 /**
  * We need need to send the token OR passwordToken to the server
  * Any other routes or tokens required for OtP verification should be added here
  */
-async function verify(event: FormSubmitEvent<any>) {
+async function registerCompletion() {
+  await verifyOtp();
+  await fetch();
+  if (route.query.passwordToken) {
+    return navigateTo("/password/reset?passwordToken=" + route.query.passwordToken);
+  } else {
+    navigateTo("/account");
+  }
+}
+
+async function verifyOtp() {
   try {
-    const response = await $fetch("/auth/verify-otp", {
+    await $fetch("/auth/verify-otp", {
       method: "POST",
       body: {
-        otpCode: state.otpCode,
+        otpCode: otpCode.value,
         token: route.query.token,
         passwordToken: route.query.passwordToken,
       },
     });
-    console.log(response.user);
-    // need to fetch the auth session on the client side
-    await fetch()
-    navigateTo(response.redirect);
   } catch (error) {
-    console.log(error);
+    // TODO: Handle Error
+    console.error("Error verifying OTP:", error);
   }
 }
 </script>
 <template>
-  <div>
-    <h1>Verify your email address with your OTP code sent to your email</h1>
-    <UForm @submit="verify" :state="state" :schema="otpSchema" class="w-full pb-10" ref="mainForm">
-      <UFormField label="otp" name="otp" size="xl" hint="Required" class="py-2 mb-2">
-        <UInput v-model="state.otpCode" type="text" size="xl" class="w-full" />
-      </UFormField>
-    </UForm>
+  <div class="| container container-2xs flow flow-lg">
+    <h1 class="| title-xl">Verify your email</h1>
+
+    <p class="| body-sm">Please enter your one time pin below.</p>
+
+    <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
+
+    <AtomsDivider text="or" />
+
+    <div class="| center-text flow flow-sm">
+      <p class="| body-sm">
+        Already have an account?
+        <nuxt-link to="/login">Log in</nuxt-link>
+      </p>
+    </div>
   </div>
 </template>

@@ -1,8 +1,11 @@
 <script setup lang="ts">
+const { fetch } = useUserSession();
+
 /**
  *  Success
  */
-function formSuccess(passwordToken) {
+async function formSuccess(passwordToken: string) {
+  await fetch();
   navigateTo("/signup/verify?passwordToken=" + passwordToken);
 }
 </script>
