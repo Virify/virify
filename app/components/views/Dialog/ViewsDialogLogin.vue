@@ -1,7 +1,8 @@
 <template>
   <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">Welcome back</h1>
-
+    <p v-if="successMessage" class="success | text-sm">{{ successMessage }}</p>
+    
     <OrganismsFormsLogin @form-success="formSuccess" />
 
     <AtomsDivider text="or" />
@@ -21,7 +22,12 @@
 
 <script setup lang="ts">
 import { ViewsDialogForgotPassword, ViewsDialogSignup } from "#components";
-
+defineProps({
+  successMessage: {
+    type: String,
+    default: "",
+  },
+})
 const { fetch } = useUserSession();
 
 /**
@@ -36,3 +42,8 @@ async function formSuccess() {
   navigateTo("/account");
 }
 </script>
+<style>
+.success {
+  color: var(--primary-500);
+}
+</style>

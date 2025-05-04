@@ -74,7 +74,7 @@ async function deleteAccount() {
  */
 async function logout() {
   await clear();
-  navigateTo("/login");
+  navigateTo("/");
 }
 </script>
 

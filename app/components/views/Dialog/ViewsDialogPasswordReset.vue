@@ -27,6 +27,9 @@ defineProps({
 function formSuccess() {
   showDialog({
     component: ViewsDialogLogin,
+    props: {
+      successMessage: "Password reset successfully. You can now log in.",
+    },
   });
 }
 </script>
