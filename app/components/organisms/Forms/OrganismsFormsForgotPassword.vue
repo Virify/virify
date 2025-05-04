@@ -13,7 +13,7 @@
 /**
  *  Emits
  */
-const emits = defineEmits(["form-success"]);
+const emits = defineEmits(['form-success']);
 
 /**
  *  Composables
@@ -46,18 +46,18 @@ async function resetPassword({ target }: SubmitEvent) {
     }
 
     // Post data
-    await $fetch("/auth/password-reset", {
-      method: "POST",
+    await $fetch('/auth/password-reset', {
+      method: 'POST',
       body: {
-        email: formData?.get("email"),
+        email: formData?.get('email'),
       },
     })
       .then(({ passwordToken }) => {
-        emits("form-success", passwordToken);
+        emits('form-success', passwordToken);
       })
       .catch((error) => {
         formErrors.value = {
-          title: "Password reset failed",
+          title: 'Password reset failed',
           message: error.data.message,
         };
       });
