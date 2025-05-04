@@ -1,4 +1,5 @@
 import { defu } from 'defu'
+import { useDebounceFn } from '@vueuse/core'
 
 interface ErrorOverrides {
   patternMismatch?: string
@@ -13,7 +14,7 @@ const defaultOverrides = {
  *  Standardise input validation
  *
  */
-export function useInputValidationMessage(maybeRefInput: unknown, userOverrides: ErrorOverrides = {}): string {
+export function useCheckValidityInput(maybeRefInput: unknown, userOverrides: ErrorOverrides = {}): string {
   const input = unref(maybeRefInput)
 
   // Combine user and default overrides
@@ -37,4 +38,18 @@ export function useInputValidationMessage(maybeRefInput: unknown, userOverrides:
   }
 
   return input.validationMessage
+}
+
+/**
+ *  Composable for input validation
+ *
+ */
+export function useCheckValidity(overrides = {}) {
+  const validityText = ref()
+
+  const checkValidity = useDebounceFn(({ target }) => {
+    validityText.value = useCheckValidityInput(target, overrides)
+  }, 500)
+
+  return { validityText, checkValidity }
 }

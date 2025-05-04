@@ -2,31 +2,33 @@
   <div :class="wrapperClass" class="a-input" role="presentation">
     <slot name="prefix" />
 
-    <input :id="inputId" v-bind="$attrs" :aria-describedby="errorText && errorId" class="| text-input"
-      @input="checkValidity" />
+    <input v-bind="$attrs" :ariaDescribed class="| text-input" @input="checkValidity" />
 
     <slot name="suffix" />
   </div>
 
-  <AtomsInlineError v-if="errorText" :id="errorId">
-    {{ errorText }}
+  <AtomsInlineError v-if="validityText" :id="errorId">
+    {{ validityText }}
   </AtomsInlineError>
 </template>
 
-<script setup>
-import { useDebounceFn } from '@vueuse/core'
-
+<script setup lang="ts">
 /**
  *  a11y
  */
-const inputId = inject('for', '')
 const errorId = useId()
+
+const ariaDescribed = computed(() => {
+  if (validityText.value) return errorId
+
+  return ''
+})
 
 /**
  *  Apply the appropriate settings for password inputs
  */
-const props = defineProps({
-  validationTextOverrides: {
+const { customValidation } = defineProps({
+  customValidation: {
     type: Object
   },
   wrapperClass: {
@@ -37,11 +39,5 @@ const props = defineProps({
 /**
  *  Validate inputs - this can probably be made into a composable
  */
-const errorText = ref(null)
-
-const checkValidity = useDebounceFn(({ target }) => {
-  const { validationTextOverrides: overrides } = props
-
-  errorText.value = useInputValidationMessage(target, overrides)
-}, 500)
+const { validityText, checkValidity } = useCheckValidity(customValidation)
 </script>

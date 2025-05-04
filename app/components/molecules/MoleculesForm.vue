@@ -17,6 +17,6 @@ defineProps<{ error?: ErrorBoxProp | null }>()
 const $form = useTemplateRef('$form')
 
 onMounted(() => {
-  unref($form).setAttribute('novalidate', true)
+  unref($form)?.setAttribute('novalidate', 'novalidate')
 })
 </script>
