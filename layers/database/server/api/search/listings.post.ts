@@ -1,34 +1,40 @@
-import { getPropertyIdsByDistance } from "../../utils/location";
+import * as z from "zod";
+
+const LISTING_FETCHERS = {
+  rent: getRentalListingsByPropertyIds,
+  buy: getSaleListingsByPropertyIds,
+};
+
+const searchSchema = z.object({
+  buyOrRent: z.enum(["rent", "buy"]),
+  radius: z.number().min(0).max(100),
+});
 
 export default defineEventHandler(async (event) => {
-  const { buyOrRent, radius } = await readBody(event);
-
-  console.log("buyOrRent", buyOrRent);
-  console.log("radius", radius);
-  const fakeaddressId = 1; // TODO: remove this when we have a real addressId
+  const { errorResponse } = useResponse();
   try {
-    if (!radius) {
-      throw createError({ statusCode: 400, statusMessage: "Missing addressId or radius" });
-    }
+    const { buyOrRent, radius }: { buyOrRent: keyof typeof LISTING_FETCHERS; radius: number } = await readValidatedBody(event, searchSchema.parse);
 
-    // Get location coordinates from Address
-    const location = await getLocationByAddressId(fakeaddressId);
+    const fakeAddressId = 1; // TODO: Replace with actual address ID when available
+
+    // undefined check as 0 is a valid radius
+    if (radius === undefined || !buyOrRent) throw createError({ statusCode: 400, statusMessage: "Missing required fields: radius or buyOrRent" });
+
+    const location = await getLocationByAddressId(fakeAddressId);
 
     if (!location) throw createError({ statusCode: 404, statusMessage: "Address not found" });
 
-    const { lat, lon } = location;
+    const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
+    const propertyIds = nearbyProperties.map((p) => p.propertyId);
 
-    const nearbyProperties = await getPropertyIdsByDistance(lat, lon, radius);
+    const fetchListings = LISTING_FETCHERS[buyOrRent];
 
-    if(buyOrRent === "rent") {
-      const listings = await getRentalListingsByPropertyIds(nearbyProperties.map((p) => p.propertyId));
-      return listings
-    }
-    if(buyOrRent === "buy") {
-      const listings = await getSaleListingsByPropertyIds(nearbyProperties.map((p) => p.propertyId));
-      return listings
-    }
+    if (!fetchListings) throw createError({ statusCode: 400, statusMessage: `Unsupported listing type: ${buyOrRent}` });
+
+    const listings = await fetchListings(propertyIds);
+
+    return listings;
   } catch (error) {
-    throw error;
+    errorResponse(error, event);
   }
 });

@@ -19,8 +19,6 @@ const filteredListings = computed(() => {
   if (!listings.value) return [];
   return listings.value.filter((listing) => listing.listingTier === "FEATURED");
 });
-
-console.log("Filtered Listings", filteredListings.value);
 </script>
 
 <style>
