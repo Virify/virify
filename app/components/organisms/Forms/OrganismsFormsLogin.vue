@@ -4,17 +4,18 @@
       <AtomsInput :id type="email" name="email" required />
     </MoleculesFormField>
 
-    <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern :custom-validation="validityText" />
+    <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern
+      :custom-validation="validityText" />
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Log in </AtomsButton>
   </MoleculesForm>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /**
  *  Emits
  */
-const emits = defineEmits(["form-success", "form-error", "form-clear-error"]);
+const emits = defineEmits(['form-success']);
 
 /**
  *  Composables
@@ -25,12 +26,12 @@ const { isPending, setPendingWhile } = usePending();
 /**
  *  Handle errors
  */
-const formErrors = ref(null);
+const formErrors = ref();
 
 /**
  *  Validate form and submit
  */
-async function loginUser({ target }) {
+async function loginUser({ target }: SubmitEvent) {
   if (isPending.value) return;
 
   setPendingWhile(async () => {
@@ -48,19 +49,19 @@ async function loginUser({ target }) {
     }
 
     // Post data
-    await $fetch("/auth/login", {
-      method: "POST",
+    await $fetch('/auth/login', {
+      method: 'POST',
       body: {
-        email: formData.get("email"),
-        password: formData.get("password"),
+        email: formData?.get('email'),
+        password: formData?.get('password'),
       },
     })
       .then(() => {
-        emits("form-success");
+        emits('form-success');
       })
       .catch((error) => {
         formErrors.value = {
-          title: "Login failed",
+          title: 'Login failed',
           message: error.data.message,
         };
       });
