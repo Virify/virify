@@ -1,6 +1,7 @@
 model PropertyType {
   id              Int                      @id @default(autoincrement())
   name            String                   @unique
+  defaultSelected Boolean
   classifications PropertyClassification[]
   Property        Property[]
 }
