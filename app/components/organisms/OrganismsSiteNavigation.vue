@@ -42,7 +42,6 @@ function openForgotPassword() {
 
 const accountOptions = [
   { to: '/account', label: 'My Account' },
-  { to: '/logout', label: 'Log out' }
 ]
 </script>
 
