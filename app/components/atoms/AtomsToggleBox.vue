@@ -1,13 +1,15 @@
 <template>
   <label class="a-toggle-box | font-semibold body-sm lineheight-sm">
-    <input :type v-model="checked" :value="label" :name="name" class="| visually-hidden" />
-    {{ label }}
+    <input :type v-model="checked" :value="label.name" :name="name" class="| visually-hidden" />
+    {{ label.name }}
   </label>
 </template>
 
 <script setup lang="ts">
+import type { PropertyType } from '@prisma/client';
+
 interface Props {
-  label: string
+  label: PropertyType,
   name: string
   type?: 'radio' | 'checkbox'
 }

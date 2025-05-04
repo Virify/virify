@@ -37,8 +37,8 @@
       <OrganismsSearchFormTitleBlock title="Property type">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
-            <li v-for="label of propertType">
-              <AtomsToggleBox :label type="checkbox" :name="label" v-model="selectedPropertyType[label]" />
+            <li v-for="label of propertyTypes" :key="label.id">
+              <AtomsToggleBox :label type="checkbox" :name="label.name" v-model="selectedPropertyType[label.name]" />
             </li>
           </ul>
         </MoleculesScrollBox>
@@ -52,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+import type { PropertyType } from "@prisma/client";
 import { onClickOutside } from "@vueuse/core";
 import type { ErrorBoxProp } from "~/types/error-box";
 
@@ -89,10 +90,11 @@ onClickOutside($form, () => {
 /**
  *  Block native form validation on mount
  */
-onMounted(() => {
+onMounted(async () => {
   if ($form.value) {
     $form.value.setAttribute("novalidate", true.toString());
   }
+  await fetchPropertyTypes();
 });
 
 /**
@@ -133,14 +135,34 @@ const buyOrRentOptions = [
 /**
  *  Property type
  */
-const propertType = ["Detached", "Semi-detached", "Terraced", "End-terrace", "Flat", "Cottage", "Bungalow"];
 
-const selectedPropertyType = reactive<Record<string, boolean>>({
-  Detached: true,
-  "Semi-detached": true,
-  Terraced: true,
-  "End-terrace": true,
-});
+const propertyTypes = ref<PropertyType[]>([]);
+const selectedPropertyType = reactive<Record<string, boolean>>({});
+
+/**
+ * Fetch property types
+ */
+const fetchPropertyTypes = async () => {
+  const propertyTypesResult = await $fetch<PropertyType[]>("/api/property-type/all")
+
+  propertyTypes.value = propertyTypesResult;
+  console.log(propertyTypesResult)
+
+  /**
+   *  Set default property types
+   */
+  for (const propertyType of propertyTypesResult) {
+    if(["House", "Flat", "Cottage"].includes(propertyType.name)) {
+      selectedPropertyType[propertyType.name] = true;
+    }
+  }
+};
+
+/**
+ * Get selected property types for posting
+ */
+const selectedTypes = Object.entries(selectedPropertyType)
+  .map(([type]) => type);
 
 /**
  *  Mock autocomplete
@@ -199,8 +221,16 @@ async function sendForm({ target }: { target: HTMLFormElement }) {
       location: formData ? formData.get("location") : null,
       radius: radius,
       buyOrRent: formData ? formData.get("buyOrRent") : null,
+      propertyTypes: selectedPropertyType
     },
   });
+
+  console.log("POST DEBUG", {
+    location: formData ? formData.get("location") : null,
+    radius: radius,
+    buyOrRent: formData ? formData.get("buyOrRent") : null,
+    propertyTypes: selectedPropertyType
+  })
 
   searchListings ? searchListings.value = listingsResult : null;
   // Hide popover when search is successful
