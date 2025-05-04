@@ -58,7 +58,6 @@
 <script setup lang="ts">
 import type { PropertyType } from '@prisma/client';
 import { onClickOutside } from '@vueuse/core';
-import type { ErrorBoxProp } from '~/types/error-box';
 
 /**
  *  Popover management
@@ -194,7 +193,7 @@ const suggestionsMatches = computed(() => {
 /**
  *  Submit form
  */
-const formErrors = ref<ErrorBoxProp | null>(null);
+const formErrors = ref();
 
 watch(suggestions, (newValue) => {
   if (!formErrors.value || !newValue) return;
