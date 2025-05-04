@@ -1,9 +1,12 @@
 <template>
-  <form class="o-searchform | flow flow-sm relative" ref="$form" @keydown.escape="hidePopover" @submit.prevent="sendForm">
-    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions" v-model="buyOrRent" name="buyOrRent" />
+  <form class="o-searchform | flow flow-sm relative" ref="$form" @keydown.escape="hidePopover"
+    @submit.prevent="sendForm">
+    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions" v-model="buyOrRent"
+      name="buyOrRent" />
 
     <div class="o-searchform-banner">
-      <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input" required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
+      <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
+        required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
       <select class="o-searchform-banner-select | focus-visible" aria-label="Radius of search" name="radius">
         <option v-for="{ key, value } of radiusOptions" :key="value" :value="value">{{ key }}</option>
@@ -16,17 +19,18 @@
       </div>
     </div>
 
-    <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300" :hidden="popoverHidden">
+    <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
+      :hidden="popoverHidden">
       <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
       <OrganismsSearchFormTitleBlock v-if="suggestions" class="o-searchform-autocomplete">
         <div role="presentation">
           <h2 class="| title-sm">Locations</h2>
 
-          <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches" v-slot="{ original, current, suggestion }">
+          <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
+            v-slot="{ original, current, suggestion }">
             <button class="o-searchform-autocomplete-button | body-md" @click.prevent="setSelectedSuggestion(original)">
-              <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong
-              >{{ suggestion }}
+              <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
             </button>
           </MoleculesAutocomplete>
         </div>
@@ -52,15 +56,15 @@
 </template>
 
 <script setup lang="ts">
-import type { PropertyType } from "@prisma/client";
-import { onClickOutside } from "@vueuse/core";
-import type { ErrorBoxProp } from "~/types/error-box";
+import type { PropertyType } from '@prisma/client';
+import { onClickOutside } from '@vueuse/core';
+import type { ErrorBoxProp } from '~/types/error-box';
 
 /**
  *  Popover management
  */
-const $form = useTemplateRef("$form");
-const searchListings = inject<Ref<ListingWithFullProperty[] | null>>("searchListings");
+const $form = useTemplateRef('$form');
+const searchListings = inject<Ref<ListingWithFullProperty[] | null>>('searchListings');
 
 // Track state of form
 const popoverHidden = ref(true);
@@ -92,7 +96,7 @@ onClickOutside($form, () => {
  */
 onMounted(async () => {
   if ($form.value) {
-    $form.value.setAttribute("novalidate", true.toString());
+    $form.value.setAttribute('novalidate', true.toString());
   }
   await fetchPropertyTypes();
 });
@@ -100,7 +104,7 @@ onMounted(async () => {
 /**
  *  Search typed
  */
-const suggestions = ref("");
+const suggestions = ref('');
 
 function setSelectedSuggestion(newValue: string) {
   suggestions.value = newValue;
@@ -110,26 +114,26 @@ function setSelectedSuggestion(newValue: string) {
  *  Search radius
  */
 const radiusOptions = [
-  { value: 0, key: "This location only" },
-  { value: 0.25, key: "Within 0.25 miles" },
-  { value: 0.5, key: "Within 0.5 miles" },
-  { value: 1, key: "Within 1 mile" },
-  { value: 2, key: "Within 2 miles" },
-  { value: 5, key: "Within 5 miles" },
-  { value: 10, key: "Within 10 miles" },
-  { value: 20, key: "Within 20 miles" },
-  { value: 40, key: "Within 40 miles" },
+  { value: 0, key: 'This location only' },
+  { value: 0.25, key: 'Within 0.25 miles' },
+  { value: 0.5, key: 'Within 0.5 miles' },
+  { value: 1, key: 'Within 1 mile' },
+  { value: 2, key: 'Within 2 miles' },
+  { value: 5, key: 'Within 5 miles' },
+  { value: 10, key: 'Within 10 miles' },
+  { value: 20, key: 'Within 20 miles' },
+  { value: 40, key: 'Within 40 miles' },
 ];
 
 /**
  *  Buy or rent
  */
-const buyOrRent = ref("buy");
+const buyOrRent = ref('buy');
 
 const buyOrRentOptions = [
-  { key: "buy", value: "Buy" },
-  { key: "rent", value: "Rent" },
-  { key: "price", value: "Prices" },
+  { key: 'buy', value: 'Buy' },
+  { key: 'rent', value: 'Rent' },
+  { key: 'price', value: 'Prices' },
 ];
 
 /**
@@ -143,7 +147,7 @@ const selectedPropertyType = reactive<Record<string, boolean>>({});
  * Fetch property types
  */
 const fetchPropertyTypes = async () => {
-  const propertyTypesResult = await $fetch<PropertyType[]>("/api/property-type/all")
+  const propertyTypesResult = await $fetch<PropertyType[]>('/api/property-type/all')
 
   propertyTypes.value = propertyTypesResult;
   console.log(propertyTypesResult)
@@ -152,7 +156,7 @@ const fetchPropertyTypes = async () => {
    *  Set default property types
    */
   for (const propertyType of propertyTypesResult) {
-    if(["House", "Flat", "Cottage"].includes(propertyType.name)) {
+    if (['House', 'Flat', 'Cottage'].includes(propertyType.name)) {
       selectedPropertyType[propertyType.name] = true;
     }
   }
@@ -167,17 +171,17 @@ const suggestionsMatches = computed(() => {
 
   // Mock filter
   return [
-    "Stevenage, Hertfordshire",
-    "Steventon, Oxford",
-    "St. Albans, Hertforshire",
-    "St. Neots, Hertfordshire",
-    "Stoke-on-Trent, Staffordshire",
-    "Stepps, Glasgow",
-    "Stepney, London",
-    "Stockwell, London",
-    "Stratford, London",
-    "South London",
-    "South West London",
+    'Stevenage, Hertfordshire',
+    'Steventon, Oxford',
+    'St. Albans, Hertforshire',
+    'St. Neots, Hertfordshire',
+    'Stoke-on-Trent, Staffordshire',
+    'Stepps, Glasgow',
+    'Stepney, London',
+    'Stockwell, London',
+    'Stratford, London',
+    'South London',
+    'South West London',
   ]
     .filter((str) => {
       const strLower = str.toLowerCase();
@@ -201,7 +205,7 @@ watch(suggestions, (newValue) => {
 async function sendForm({ target }: { target: HTMLFormElement }) {
   const { formData, errors } = useFormData(target);
   // radius as number
-  const radiusStr = formData?.get("radius");
+  const radiusStr = formData?.get('radius');
   const radius = radiusStr !== null ? parseFloat(radiusStr as string) : null;
   if (errors) {
     formErrors.value = errors;
@@ -209,20 +213,20 @@ async function sendForm({ target }: { target: HTMLFormElement }) {
     return;
   }
 
-  const listingsResult = await $fetch<ListingWithFullProperty[]>("/api/search/listings", {
-    method: "POST",
+  const listingsResult = await $fetch<ListingWithFullProperty[]>('/api/search/listings', {
+    method: 'POST',
     body: {
-      location: formData?.get("location"),
+      location: formData?.get('location'),
       radius: radius,
-      buyOrRent: formData?.get("buyOrRent"),
+      buyOrRent: formData?.get('buyOrRent'),
       propertyTypes: selectedPropertyType
     },
   });
 
-  console.log("POST DEBUG", {
-    location: formData?.get("location"),
+  console.log('POST DEBUG', {
+    location: formData?.get('location'),
     radius: radius,
-    buyOrRent: formData?.get("buyOrRent"),
+    buyOrRent: formData?.get('buyOrRent'),
     propertyTypes: selectedPropertyType
   })
 
@@ -233,8 +237,8 @@ async function sendForm({ target }: { target: HTMLFormElement }) {
 </script>
 
 <style lang="scss">
-@use "#styles/_utils/functions" as fn;
-@use "#styles/_utils/media" as mq;
+@use '#styles/_utils/functions' as fn;
+@use '#styles/_utils/media' as mq;
 
 .o-searchform {
   max-width: 32em;
