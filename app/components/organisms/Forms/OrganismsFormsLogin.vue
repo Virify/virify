@@ -5,7 +5,7 @@
     </MoleculesFormField>
 
     <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern
-      :validation-text-overrides="validityText" />
+      :custom-validation="validityText" />
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending">
       Log in

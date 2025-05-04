@@ -29,13 +29,13 @@ export function useFormData(maybeRefForm: unknown): UseFormData {
 
     // @TODO should also account for other invalid inputs, such as fieldsets
     form.querySelectorAll('input').forEach((input) => {
-      const message = useInputValidationMessage(input)
+      const message = useCheckValidityInput(input)
 
       // If no error message, skip
       if (!message) return
 
       // Add error message to array
-      errors.list.push({
+      errors.list?.push({
         type: input.name,
         message
       })

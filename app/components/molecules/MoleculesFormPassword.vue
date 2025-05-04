@@ -5,7 +5,7 @@
     <AtomsLabel :for="passwordId">{{ label }}</AtomsLabel>
 
     <AtomsInput :id="passwordId" v-bind="$attrs" :type="inputType" class="m-formpassword-input"
-      wrapper-class="| relative" :validation-text-overrides="validationTextOverrides">
+      wrapper-class="| relative" :custom-validation="customValidation">
 
       <template v-slot:suffix>
         <button type="button" class="m-formpassword-toggle" :aria-label="inputLabel" :aria-controls="passwordId"
@@ -29,7 +29,7 @@ defineOptions({
  *  Apply the appropriate settings for password inputs
  */
 const props = defineProps({
-  validationTextOverrides: {
+  customValidation: {
     type: Object
   },
   label: {

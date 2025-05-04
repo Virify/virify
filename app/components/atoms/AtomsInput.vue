@@ -8,14 +8,12 @@
     <slot name="suffix" />
   </div>
 
-  <AtomsInlineError v-if="errorText" :id="errorId">
-    {{ errorText }}
+  <AtomsInlineError v-if="validityText" :id="errorId">
+    {{ validityText }}
   </AtomsInlineError>
 </template>
 
-<script setup>
-import { useDebounceFn } from '@vueuse/core'
-
+<script setup lang="ts">
 /**
  *  a11y
  */
@@ -25,8 +23,8 @@ const errorId = useId()
 /**
  *  Apply the appropriate settings for password inputs
  */
-const props = defineProps({
-  validationTextOverrides: {
+const { customValidation } = defineProps({
+  customValidation: {
     type: Object
   },
   wrapperClass: {
@@ -37,11 +35,5 @@ const props = defineProps({
 /**
  *  Validate inputs - this can probably be made into a composable
  */
-const errorText = ref(null)
-
-const checkValidity = useDebounceFn(({ target }) => {
-  const { validationTextOverrides: overrides } = props
-
-  errorText.value = useInputValidationMessage(target, overrides)
-}, 500)
+const { validityText, checkValidity } = useCheckValidity(customValidation)
 </script>
