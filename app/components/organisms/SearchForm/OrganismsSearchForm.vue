@@ -8,20 +8,22 @@
       <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
         required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
-      <select class="o-searchform-banner-select" aria-label="Radius of search" name="radius">
+      <select class="o-searchform-banner-select | focus-visible" aria-label="Radius of search" name="radius">
         <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
       </select>
 
-      <button type="submit" class="o-searchform-banner-button | button button-monochrome">
-        <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
-      </button>
+      <div class="o-searchform-banner-button-wrapper">
+        <button type="submit" class="o-searchform-banner-button | button button-monochrome">
+          <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
+        </button>
+      </div>
     </div>
 
     <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
       :hidden="popoverHidden">
       <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
-      <div v-if="suggestions" class="o-searchform-autocomplete" role="presentation">
+      <OrganismsSearchFormTitleBlock v-if="suggestions" class="o-searchform-autocomplete">
         <div role="presentation">
           <h2 class="| title-sm">Locations</h2>
 
@@ -36,11 +38,9 @@
         <div class="o-searchform-map | title-2xl">
           Map
         </div>
-      </div>
+      </OrganismsSearchFormTitleBlock>
 
-      <div role="presentation" class="| flow flow-md">
-        <h2 class="| title-sm">Property type</h2>
-
+      <OrganismsSearchFormTitleBlock title="Property type">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
             <li v-for="label of propertType">
@@ -48,7 +48,11 @@
             </li>
           </ul>
         </MoleculesScrollBox>
-      </div>
+      </OrganismsSearchFormTitleBlock>
+
+      <OrganismsSearchFormTitleBlock title="Price">
+        <LazyMoleculesRangeSlider hydrate-on-visible />
+      </OrganismsSearchFormTitleBlock>
 
     </OrganismsSearchFormPopover>
   </form>
@@ -127,7 +131,7 @@ const buyOrRent = ref('buy')
 const buyOrRentOptions = [
   { key: 'buy', value: 'Buy' },
   { key: 'rent', value: 'Rent' },
-  { key: 'price', value: 'House prices' },
+  { key: 'price', value: 'Prices' },
 ]
 
 /**
@@ -222,6 +226,7 @@ async function sendForm({ target }) {
 
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
+@use '#styles/_utils/media' as mq;
 
 .o-searchform {
   max-width: 32em;
@@ -235,30 +240,63 @@ async function sendForm({ target }) {
 }
 
 .o-searchform-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--size-12);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-column-gap: var(--size-12);
+  align-items: stretch;
   padding: var(--size-12);
-}
 
-.o-searchform-banner-input,
-.o-searchform-banner-selected {
-  width: auto;
-  min-width: 0;
-  height: 100%;
-
-  &:focus {
-    outline: none;
+  @include mq.small-tablet {
+    display: flex;
+    grid-template-columns: unset;
+    grid-column-gap: unset;
+    flex-direction: row;
+    padding: 0;
   }
 }
 
-.o-searchform-banner-input {
-  flex: 1 1 min-content;
-  padding-inline-start: var(--size-14);
+.o-searchform-banner-input,
+.o-searchform-banner-select {
+  width: auto;
+  min-width: 0;
 }
 
-.o-searchform-banner-selected {
-  flex: 0 1 min-content;
+.o-searchform-banner-input {
+  outline: none;
+  grid-column: span 2;
+  height: var(--size-56);
+  flex: 1 0 min-content;
+  padding-inline: var(--size-12);
+  text-align: center;
+
+  @include mq.small-tablet {
+    grid-column: unset;
+    height: unset;
+    padding-inline-start: var(--size-32);
+    text-align: left;
+  }
+}
+
+.o-searchform-banner:has(.o-searchform-banner-input:focus) {
+  outline: var(--focus-outline);
+}
+
+.o-searchform-banner-select {
+  height: var(--size-56);
+  border-radius: var(--border-radius-ui);
+  padding-inline: var(--size-12);
+  margin: auto 0;
+  cursor: pointer;
+
+  &:hover {
+    background: fn.faded-color(12%);
+  }
+}
+
+.o-searchform-banner-button-wrapper {
+  @include mq.small-tablet {
+    padding: var(--size-12);
+  }
 }
 
 .o-searchform-banner-button {
@@ -283,13 +321,19 @@ async function sendForm({ target }) {
 
 .o-searchform-popover {
   position: absolute;
-  top: calc(100% + var(--size-12));
+  top: calc(100% + var(--size-14));
   left: 50%;
   transform: translateX(-50%);
-  width: min(100vw - var(--size-72), 42em);
-  padding: var(--size-32);
+  padding: var(--size-16);
+  width: min(100vw - var(--size-24), 42em);
   text-align: left;
   overflow: hidden;
+  margin: 0;
+
+  @include mq.tablet {
+    padding: var(--size-32);
+    width: min(100vw - var(--size-72), 42em);
+  }
 }
 
 .o-searchform-autocomplete {
@@ -333,7 +377,6 @@ async function sendForm({ target }) {
   border-radius: var(--border-radius-ui);
   aspect-ratio: 1;
 }
-
 
 /**
  *  Open animatinos
