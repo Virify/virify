@@ -12,7 +12,7 @@
   </MoleculesForm>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /**
  *  Emits
  */
@@ -27,12 +27,12 @@ const { isPending, setPendingWhile } = usePending()
 /**
  *  Handle errors
  */
-const formErrors = ref(null)
+const formErrors = ref()
 
 /**
  *  Validate form and submit
  */
-async function resetPassword({ target }) {
+async function resetPassword({ target }: SubmitEvent) {
   if (isPending.value) return
 
   setPendingWhile(async () => {
@@ -53,7 +53,7 @@ async function resetPassword({ target }) {
     await $fetch("/auth/password-reset", {
       method: "POST",
       body: {
-        email: formData.get('email'),
+        email: formData?.get('email'),
       },
     })
       .then(({ passwordToken }) => {

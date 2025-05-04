@@ -1,6 +1,6 @@
 import type { ErrorBoxProp } from '~/types'
 
-type UseFormData = { errors: ErrorBoxProp } | { formData: FormData }
+type UseFormData = { errors?: ErrorBoxProp, formData?: FormData }
 
 /**
  *  Standardise form validation
