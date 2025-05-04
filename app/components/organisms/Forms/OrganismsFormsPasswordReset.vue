@@ -1,8 +1,8 @@
 <template>
   <MoleculesForm method="POST" action="/auth/update-password" @submit.prevent="resetPassword" class="| stacked" :error="formErrors">
-    <MoleculesFormPassword label="Password" name="password" required minlength="8" v-model="password" :pattern :validation-text-overrides="validityText"/>
+    <MoleculesFormPassword label="Password" name="password" required minlength="8" v-model="password" :pattern :custom-validation="validityText"/>
 
-    <MoleculesFormPassword label="Confirm Password" name="confirm" required minlength="8" :confirm-against="password" :pattern :validation-text-overrides="{ patternMismatch: 'Passwords must match' }" v-model="confirm" />
+    <MoleculesFormPassword label="Confirm Password" name="confirm" required minlength="8" :confirm-against="password" :pattern :custom-validation="{ patternMismatch: 'Passwords must match' }" v-model="confirm" />
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Submit </AtomsButton>
   </MoleculesForm>

@@ -9,6 +9,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ErrorBoxProp } from '~/types';
+
 /**
  *  Emits
  */
@@ -22,12 +24,12 @@ const { isPending, setPendingWhile } = usePending();
 /**
  *  Handle errors
  */
-const formErrors = ref(null);
+const formErrors = ref<ErrorBoxProp | null>(null);
 
 /**
  *  Validate form and submit
  */
-async function resetPassword({ target }) {
+async function resetPassword({ target }: { target: HTMLFormElement }) {
   if (isPending.value) return;
 
   setPendingWhile(async () => {
@@ -48,7 +50,7 @@ async function resetPassword({ target }) {
     await $fetch("/auth/password-reset", {
       method: "POST",
       body: {
-        email: formData.get("email"),
+        email: formData?.get("email"),
       },
     })
       .then(({ passwordToken }) => {
