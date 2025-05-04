@@ -9,7 +9,7 @@
         required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
       <select class="o-searchform-banner-select | focus-visible" aria-label="Radius of search" name="radius">
-        <option v-for="{ key, value } of radiusOptions" :key="value" :value="value">{{ key }}</option>
+        <option v-for="{ key, value } of radiusOptions" :key="value" :value>{{ key }}</option>
       </select>
 
       <div class="o-searchform-banner-button-wrapper">
