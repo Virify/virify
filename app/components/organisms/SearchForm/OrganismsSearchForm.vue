@@ -201,7 +201,7 @@ watch(suggestions, (newValue) => {
 async function sendForm({ target }: { target: HTMLFormElement }) {
   const { formData, errors } = useFormData(target);
   // radius as number
-  const radiusStr = formData ? formData.get("radius") : null;
+  const radiusStr = formData?.get("radius");
   const radius = radiusStr !== null ? parseFloat(radiusStr as string) : null;
   if (errors) {
     formErrors.value = errors;
@@ -212,17 +212,17 @@ async function sendForm({ target }: { target: HTMLFormElement }) {
   const listingsResult = await $fetch<ListingWithFullProperty[]>("/api/search/listings", {
     method: "POST",
     body: {
-      location: formData ? formData.get("location") : null,
+      location: formData?.get("location"),
       radius: radius,
-      buyOrRent: formData ? formData.get("buyOrRent") : null,
+      buyOrRent: formData?.get("buyOrRent"),
       propertyTypes: selectedPropertyType
     },
   });
 
   console.log("POST DEBUG", {
-    location: formData ? formData.get("location") : null,
+    location: formData?.get("location"),
     radius: radius,
-    buyOrRent: formData ? formData.get("buyOrRent") : null,
+    buyOrRent: formData?.get("buyOrRent"),
     propertyTypes: selectedPropertyType
   })
 
