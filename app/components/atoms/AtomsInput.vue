@@ -2,8 +2,7 @@
   <div :class="wrapperClass" class="a-input" role="presentation">
     <slot name="prefix" />
 
-    <input :id="inputId" v-bind="$attrs" :aria-describedby="errorText && errorId" class="| text-input"
-      @input="checkValidity" />
+    <input :id="inputId" v-bind="$attrs" :ariaDescribed class="| text-input" @input="checkValidity" />
 
     <slot name="suffix" />
   </div>
@@ -19,6 +18,12 @@
  */
 const inputId = inject('for', '')
 const errorId = useId()
+
+const ariaDescribed = computed(() => {
+  if (validityText.value) return errorId
+
+  return ''
+})
 
 /**
  *  Apply the appropriate settings for password inputs
