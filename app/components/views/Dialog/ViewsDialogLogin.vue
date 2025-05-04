@@ -8,36 +8,31 @@
 
     <div class="| center-text flow flow-sm">
       <p>
-        <dialog-link to="/password/forgot" :component="ViewsDialogForgotPassword" class="| body-sm">
-          Forgot password?
-        </dialog-link>
+        <dialog-link to="/password/forgot" :component="ViewsDialogForgotPassword" class="| body-sm"> Forgot password? </dialog-link>
       </p>
 
       <p class="| body-sm">
         Don't have an account yet?
-        <dialog-link to="/signup" :component="ViewsDialogSignup">
-          Create an account
-        </dialog-link>
+        <dialog-link to="/signup" :component="ViewsDialogSignup"> Create an account </dialog-link>
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogForgotPassword, ViewsDialogSignup } from '#components'
+import { ViewsDialogForgotPassword, ViewsDialogSignup } from "#components";
 
 const { fetch } = useUserSession();
 
 /**
  *  Modal control
  */
-const { hideDialog } = useDialog()
 
 /**
  *  Success
  */
 async function formSuccess() {
   await fetch();
-  hideDialog("/account");
+  navigateTo("/account");
 }
 </script>

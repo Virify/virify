@@ -1,3 +1,14 @@
+<template>
+  <div class="| container container-2xs flow flow-lg">
+    <h1 class="| title-xl">Verify your email</h1>
+
+    <p class="| body-sm">Please enter your one time pin below.</p>
+    <p v-if="errors" class="| body-sm">{{ errors }}</p>
+
+    <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
+
+  </div>
+</template>
 <script setup lang="ts">
 const { fetch } = useUserSession();
 const route = useRoute();
@@ -34,22 +45,3 @@ async function verifyOtp() {
   }
 }
 </script>
-<template>
-  <div class="| container container-2xs flow flow-lg">
-    <h1 class="| title-xl">Verify your email</h1>
-
-    <p class="| body-sm">Please enter your one time pin below.</p>
-    <p v-if="errors" class="| body-sm">{{ errors }}</p>
-
-    <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
-
-    <AtomsDivider text="or" />
-
-    <div class="| center-text flow flow-sm">
-      <p class="| body-sm">
-        Already have an account?
-        <nuxt-link to="/login">Log in</nuxt-link>
-      </p>
-    </div>
-  </div>
-</template>

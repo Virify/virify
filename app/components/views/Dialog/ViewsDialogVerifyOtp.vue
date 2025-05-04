@@ -8,23 +8,25 @@
 </template>
 
 <script setup lang="ts">
-
+import { ViewsDialogPasswordReset } from "#components";
 const props = defineProps({
   token: {
     type: String,
-    required: true,
+    required: false,
+  },
+  passwordToken: {
+    type: String,
+    required: false,
   },
 });
 
 const { fetch } = useUserSession();
-const route = useRoute();
 const otpCode = ref([]);
-
 
 /**
  *  Modal control
  */
-const { hideDialog } = useDialog()
+const { hideDialog, showDialog } = useDialog();
 
 /**
  * We need need to send the token OR passwordToken to the server
@@ -33,8 +35,13 @@ const { hideDialog } = useDialog()
 async function registerCompletion() {
   await verifyOtp();
   await fetch();
-  if (route.query.passwordToken) {
-    navigateTo("/password/reset?passwordToken=" + route.query.passwordToken);
+  if (props.passwordToken) {
+    showDialog({
+      component: ViewsDialogPasswordReset,
+      props: {
+        passwordToken: props.passwordToken,
+      },
+    });
   } else {
     navigateTo("/account");
   }
@@ -49,10 +56,11 @@ async function verifyOtp() {
       body: {
         otpCode: otpCode.value,
         token: props.token,
+        passwordToken: props.passwordToken,
       },
     });
   } catch (error: any) {
-      errors.value = error.data.message;
+    errors.value = error.data.message;
   }
 }
 </script>

@@ -1,14 +1,27 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword" class="| stacked" :error="formErrors">
-    <MoleculesFormField label="Email address">
-      <AtomsInput type="email" name="email" required />
-    </MoleculesFormField>
+  <MoleculesForm method="POST" action="/auth/update-password" @submit.prevent="resetPassword" class="| stacked" :error="formErrors">
+    <MoleculesFormPassword label="Password" name="password" required minlength="8" v-model="password" :pattern :validation-text-overrides="validityText"/>
+
+    <MoleculesFormPassword label="Confirm Password" name="confirm" required minlength="8" :confirm-against="password" :pattern :validation-text-overrides="{ patternMismatch: 'Passwords must match' }" v-model="confirm" />
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Submit </AtomsButton>
   </MoleculesForm>
 </template>
 
 <script setup>
+/**
+ * props
+ */
+const props = defineProps({
+  token: {
+    type: String,
+    required: true,
+  },
+});
+
+const password = ref("");
+const confirm = ref("");
+
 /**
  *  Emits
  */
@@ -17,6 +30,7 @@ const emits = defineEmits(["form-success"]);
 /**
  *  Composables
  */
+const { pattern, validityText } = getValidPassword();
 const { isPending, setPendingWhile } = usePending();
 
 /**
@@ -45,14 +59,15 @@ async function resetPassword({ target }) {
     }
 
     // Post data
-    await $fetch("/auth/password-reset", {
+    await $fetch("/auth/update-password", {
       method: "POST",
       body: {
-        email: formData.get("email"),
+        password: formData.get("password"),
+        passwordToken: props.token,
       },
     })
-      .then(({ passwordToken }) => {
-        emits("form-success", passwordToken);
+      .then(() => {
+        emits("form-success");
       })
       .catch((error) => {
         formErrors.value = {

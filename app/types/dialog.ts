@@ -1,4 +1,4 @@
-import type { Component, ComponentPropsOptions } from 'vue'
+import type { Component } from 'vue'
 
 type DialogStateReturn = string | { returnValue?: unknown }
 
@@ -7,7 +7,7 @@ interface DialogState extends Record<string, unknown> {
   onClose?: (arg0: DialogStateReturn) => void
   className?: string
   wrapperClassName?: string
-  props?: ComponentPropsOptions
+  props?: Record<string, unknown>
 }
 
 export type { DialogState, DialogStateReturn }
