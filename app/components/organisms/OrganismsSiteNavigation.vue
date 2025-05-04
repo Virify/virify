@@ -3,10 +3,11 @@
     <ul class="o-site-navigation-list">
       <template v-if="!loggedIn">
         <li>
-          <button @click.prevent="openLogin" class="| bo-site-navigation-link | body-sm font-bold">Log in</button>
+          <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm font-bold">Log in</button>
         </li>
         <li>
-          <button @click.prevent="openForgotPassword" class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
+          <button @click.prevent="openForgotPassword"
+            class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
         </li>
       </template>
 
@@ -18,14 +19,9 @@
 </template>
 
 <script setup>
-const { loggedIn, clear } = useUserSession()
+const { loggedIn } = useUserSession()
 const { showDialog } = useDialog()
 import { ViewsDialogSignup, ViewsDialogLogin } from '#components';
-
-// logout function
-async function logout() {
-  await clear()
-}
 
 function openLogin() {
   showDialog({
@@ -38,7 +34,6 @@ function openForgotPassword() {
     component: ViewsDialogSignup,
   });
 }
-
 
 const accountOptions = [
   { to: '/account', label: 'My Account' },
