@@ -1,7 +1,8 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword" class="| stacked" :error="formErrors">
-    <MoleculesFormField label="Email address">
-      <AtomsInput type="email" name="email" required />
+  <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword" class="| stacked"
+    :error="formErrors">
+    <MoleculesFormField label="Email address" v-slot="{ id }">
+      <AtomsInput :id type="email" name="email" required />
     </MoleculesFormField>
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Submit </AtomsButton>
@@ -9,8 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ErrorBoxProp } from '~/types';
-
 /**
  *  Emits
  */
@@ -24,12 +23,12 @@ const { isPending, setPendingWhile } = usePending();
 /**
  *  Handle errors
  */
-const formErrors = ref<ErrorBoxProp | null>(null);
+const formErrors = ref();
 
 /**
  *  Validate form and submit
  */
-async function resetPassword({ target }: { target: HTMLFormElement }) {
+async function resetPassword({ target }: SubmitEvent) {
   if (isPending.value) return;
 
   setPendingWhile(async () => {
