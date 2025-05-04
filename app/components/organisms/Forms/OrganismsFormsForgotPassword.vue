@@ -8,7 +8,7 @@
   </MoleculesForm>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /**
  *  Emits
  */

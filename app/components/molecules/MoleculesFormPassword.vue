@@ -1,20 +1,15 @@
 <template>
-  <fieldset class="m-formpassword | flow flow-xs" role="presentation">
-    <legend class="| visually-hidden">Password with toggle</legend>
-
-    <AtomsLabel :for="passwordId">{{ label }}</AtomsLabel>
-
-    <AtomsInput :id="passwordId" v-bind="$attrs" :type="inputType" class="m-formpassword-input"
-      wrapper-class="| relative" :validation-text-overrides="validationTextOverrides">
-
+  <MoleculesFormField :label v-slot="{ id }">
+    <AtomsInput v-bind="$attrs" :id :type="inputType" class="m-formpassword-input" wrapper-class="| relative"
+      :custom-validation="customValidation">
       <template v-slot:suffix>
-        <button type="button" class="m-formpassword-toggle" :aria-label="inputLabel" :aria-controls="passwordId"
+        <button type="button" class="m-formpassword-toggle" :aria-label="inputLabel" :aria-controls="id"
           :aria-pressed="show" @click.prevent="toggleShowPassword">
           <AtomsIcon role="none" class="m-formpassword-icon" :icon="inputIcon" />
         </button>
       </template>
     </AtomsInput>
-  </fieldset>
+  </MoleculesFormField>
 </template>
 
 <script setup>
@@ -29,7 +24,7 @@ defineOptions({
  *  Apply the appropriate settings for password inputs
  */
 const props = defineProps({
-  validationTextOverrides: {
+  customValidation: {
     type: Object
   },
   label: {

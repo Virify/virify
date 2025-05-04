@@ -1,7 +1,8 @@
 <template>
-  <MoleculesForm method="POST" action="/auth/signup" @submit.prevent="createAccount" class="| stacked" :error="formErrors">
-    <MoleculesFormField label="Email address">
-      <AtomsInput type="email" name="email" required />
+  <MoleculesForm method="POST" action="/auth/signup" @submit.prevent="createAccount" class="| stacked"
+    :error="formErrors">
+    <MoleculesFormField label="Email address" v-slot="{ id }">
+      <AtomsInput :id type="email" name="email" required />
     </MoleculesFormField>
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Create account </AtomsButton>
