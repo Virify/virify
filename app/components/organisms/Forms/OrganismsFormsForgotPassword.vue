@@ -2,8 +2,8 @@
   <MoleculesForm method="POST" action="/auth/password-reset" @submit.prevent="resetPassword" class="| stacked"
     :error="formErrors">
 
-    <MoleculesFormField label="Email address">
-      <AtomsInput type="email" name="email" required />
+    <MoleculesFormField label="Email address" v-slot="{ id }">
+      <AtomsInput :id type="email" name="email" required />
     </MoleculesFormField>
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending">

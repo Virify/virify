@@ -1,7 +1,7 @@
 <template>
   <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="| stacked" :error="formErrors">
-    <MoleculesFormField label="Email address">
-      <AtomsInput type="email" name="email" required />
+    <MoleculesFormField label="Email address" v-slot="{ id }">
+      <AtomsInput :id type="email" name="email" required />
     </MoleculesFormField>
 
     <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern

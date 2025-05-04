@@ -2,7 +2,7 @@
   <div :class="wrapperClass" class="a-input" role="presentation">
     <slot name="prefix" />
 
-    <input :id="inputId" v-bind="$attrs" :ariaDescribed class="| text-input" @input="checkValidity" />
+    <input v-bind="$attrs" :ariaDescribed class="| text-input" @input="checkValidity" />
 
     <slot name="suffix" />
   </div>
@@ -16,7 +16,6 @@
 /**
  *  a11y
  */
-const inputId = inject('for', '')
 const errorId = useId()
 
 const ariaDescribed = computed(() => {

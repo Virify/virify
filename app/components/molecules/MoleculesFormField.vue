@@ -2,11 +2,11 @@
   <div role="presentation" class="m-formfield | flow flow-xs">
     <AtomsLabel :for="labelId">{{ label }}</AtomsLabel>
 
-    <slot></slot>
+    <slot v-bind="{ id: labelId }"></slot>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   label: {
     type: String,
@@ -16,9 +16,6 @@ defineProps({
 
 // Create ID for label
 const labelId = useId()
-
-// Provide label to children
-provide('for', labelId)
 </script>
 
 <style>
