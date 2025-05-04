@@ -123,7 +123,7 @@ export async function getSaleListingsByPropertyIds(propertyIds: number[], proper
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getRentalListingsByPropertyIds(propertyIds: number[]): Promise<ListingRentalWithFullProperty[]> {
+export async function getRentalListingsByPropertyIds(propertyIds: number[], propertyTypes?: Array<string>): Promise<ListingRentalWithFullProperty[]> {
   return await prisma.listing.findMany({
     where: {
       propertyId: {
@@ -132,6 +132,13 @@ export async function getRentalListingsByPropertyIds(propertyIds: number[]): Pro
       rentalListing: {
         isNot: null,
       },
+      property: {
+        type: {
+          name: {
+            in: propertyTypes,
+          },
+        },
+      }
     },
     include: {
       rentalListing: true,
