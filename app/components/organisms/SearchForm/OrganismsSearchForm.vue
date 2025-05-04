@@ -159,12 +159,6 @@ const fetchPropertyTypes = async () => {
 };
 
 /**
- * Get selected property types for posting
- */
-const selectedTypes = Object.entries(selectedPropertyType)
-  .map(([type]) => type);
-
-/**
  *  Mock autocomplete
  */
 const suggestionsMatches = computed(() => {
