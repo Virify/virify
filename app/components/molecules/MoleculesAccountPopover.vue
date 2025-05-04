@@ -4,7 +4,7 @@
       <nuxt-link :to="to" class="m-account-popover-link | body-sm">{{ label }}</nuxt-link>
     </li>
     <li class="m-account-popover-listitem">
-      <p @click.prevent="logout" class="m-account-popover-link m-account-button-link | body-sm">Log out</p>
+      <button type="button" @click.prevent="logout" class="m-account-popover-link | body-sm">Log out</button>
     </li>
   </ul>
 
