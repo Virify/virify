@@ -1,0 +1,20 @@
+/**
+ *  Animations
+ */
+.animate-fade-down {
+  transition: opacity var(--animation-medium) var(--ease-out), transform var(--animation-medium) var(--ease-out);
+  transition-delay: var(--delay, 0ms);
+}
+
+/**
+ *  Open animatinos
+ */
+@starting-style {
+  .animate-fade-down {
+    --animation-distance: -1rem;
+
+    opacity: 0;
+    height: 0;
+    transform: translateY(var(--animation-distance));
+  }
+}

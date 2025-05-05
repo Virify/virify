@@ -41,7 +41,7 @@ const { isMetaKey } = useEventKey()
 /**
  *  Conditionally block navigation and load custom modals
  */
-function openDialog(e) {
+function openDialog(e: PointerEvent) {
   const { component, componentProps, componentClose } = props
 
   // If no component was provided, of meta key pressed, ignore
