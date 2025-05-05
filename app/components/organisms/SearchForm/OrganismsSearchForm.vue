@@ -62,6 +62,7 @@
 <script setup lang="ts">
 import type { PropertyType } from '@prisma/client';
 import { onClickOutside } from '@vueuse/core';
+import type { MinMaxPriceResponse } from '~~/shared/types/price';
 
 /**
  *  Popover management
@@ -101,6 +102,7 @@ onMounted(async () => {
   if ($form.value) {
     $form.value.setAttribute('novalidate', 'novalidate')
   }
+  priceRange.value = await $fetch<MinMaxPriceResponse>('/api/price/min-max');
 });
 
 /**
@@ -173,6 +175,11 @@ const suggestionsMatches = computed(() => {
 });
 
 /**
+ * Price range
+ */
+const priceRange = ref()
+
+/**
  *  Submit form
  */
 const formErrors = ref();
@@ -219,7 +226,8 @@ async function sendForm(event: Event) {
     buyOrRent: formData?.get('buyOrRent'),
     propertyTypes: propertyTypes.map(({ name }) => {
       return formData?.get(name)
-    }).filter(Boolean)
+    }).filter(Boolean),
+    priceRange: priceRange.value,
   })
 
   searchListings ? searchListings.value = listingsResult : null;
