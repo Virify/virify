@@ -8,35 +8,35 @@
       <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
         required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
-      <select class="o-searchform-banner-select | focus-visible" aria-label="Radius of search" name="radius">
-        <option v-for="{ key, value } of radiusOptions" :key="value" :value>{{ key }}</option>
-      </select>
-
-      <div class="o-searchform-banner-button-wrapper">
-        <button type="submit" class="o-searchform-banner-button | button button-monochrome">
-          <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
-        </button>
-      </div>
+      <button type="submit" class="o-searchform-banner-button | button button-monochrome">
+        <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
+      </button>
     </div>
 
     <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
       :hidden="popoverHidden">
       <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
-      <OrganismsSearchFormTitleBlock v-if="suggestions" class="o-searchform-autocomplete">
-        <div role="presentation">
-          <h2 class="| title-sm">Locations</h2>
-
+      <div v-if="suggestions" role="presentation" class="o-searchform-autocomplete">
+        <OrganismsSearchFormTitleBlock title="Suggestions">
           <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
             v-slot="{ original, current, suggestion }">
             <button class="o-searchform-autocomplete-button | body-md" @click.prevent="setSelectedSuggestion(original)">
               <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
             </button>
           </MoleculesAutocomplete>
-        </div>
+        </OrganismsSearchFormTitleBlock>
 
-        <div class="o-searchform-map | title-2xl">Map</div>
-      </OrganismsSearchFormTitleBlock>
+        <OrganismsSearchFormTitleBlock title="Suggestion filters">
+          <MoleculesFormField label="Search radius" v-slot="{ id }">
+            <select :id class="| text-input focus-visible" name="radius">
+              <option v-for="{ key, value }, index of radiusOptions" :key="value" :value :selected="index === 0">{{ key
+                }}
+              </option>
+            </select>
+          </MoleculesFormField>
+        </OrganismsSearchFormTitleBlock>
+      </div>
 
       <OrganismsSearchFormTitleBlock title="Property type">
         <MoleculesScrollBox class="| focus-overflow">
@@ -239,63 +239,25 @@ async function sendForm({ target }: SubmitEvent) {
 }
 
 .o-searchform-banner {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-column-gap: var(--size-12);
+  display: flex;
+  grid-gap: var(--size-8);
   align-items: stretch;
-  padding: var(--size-12);
+  padding: var(--size-8);
 
   @include mq.small-tablet {
-    display: flex;
-    grid-template-columns: unset;
-    grid-column-gap: unset;
-    flex-direction: row;
-    padding: 0;
+    padding: var(--size-12);
   }
-}
-
-.o-searchform-banner-input,
-.o-searchform-banner-select {
-  width: auto;
-  min-width: 0;
 }
 
 .o-searchform-banner-input {
   outline: none;
-  grid-column: span 2;
-  height: var(--size-56);
-  flex: 1 0 min-content;
+  flex: 1 0 max-content;
   padding-inline: var(--size-12);
-  text-align: center;
-
-  @include mq.small-tablet {
-    grid-column: unset;
-    height: unset;
-    padding-inline-start: var(--size-32);
-    text-align: left;
-  }
+  text-align: left;
 }
 
 .o-searchform-banner:has(.o-searchform-banner-input:focus) {
   outline: var(--focus-outline);
-}
-
-.o-searchform-banner-select {
-  height: var(--size-56);
-  border-radius: var(--border-radius-ui);
-  padding-inline: var(--size-12);
-  margin: auto 0;
-  cursor: pointer;
-
-  &:hover {
-    background: fn.faded-color(12%);
-  }
-}
-
-.o-searchform-banner-button-wrapper {
-  @include mq.small-tablet {
-    padding: var(--size-12);
-  }
 }
 
 .o-searchform-banner-button {
