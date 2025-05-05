@@ -8,7 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogPasswordReset } from "#components";
+import { ViewsDialogPasswordReset, ViewsDialogPasswordSet } from '#components';
+
 const props = defineProps({
   token: {
     type: String,
@@ -45,7 +46,11 @@ async function registerCompletion() {
       });
     });
   } else {
-    navigateTo("/account");
+    useViewTransition(() => {
+      showDialog({
+        component: ViewsDialogPasswordSet,
+      });
+    })
   }
 }
 
