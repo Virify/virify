@@ -2,36 +2,14 @@ import type { MinMaxPrice } from "~~/shared/types/price";
 
 /**
  * Retrieves the minimum and maximum price of sale listings from the database.
- * 
+ *
  * @returns { MinMaxPrice }
  */
-export async function getMinMaxPriceBySaleListings(): Promise<MinMaxPrice> {
-  const minMaxPrice = await prisma.listing.aggregate({
-    _min: {
-      price: true,
-    },
-    _max: {
-      price: true,
-    },
-    where: {
-      saleListing: {
-        isNot: null,
-      },
-    }
-  });
-  
-  return [
-    minMaxPrice._min.price ?? 0,
-    minMaxPrice._max.price ?? 0,
-  ]
-}
+type ListingType = "sales" | "rentals";
 
-/**
- * Retrieves the minimum and maximum price of rental listings from the database.
- * 
- * @returns { MinMaxPrice }
- */
-export async function getMinMaxPriceByRentalListings(): Promise<MinMaxPrice> {
+export async function getMinMaxPrice(type: ListingType = "sales"): Promise<MinMaxPrice> {
+  const listingType = type === "sales" ? "saleListing" : "rentalListing";
+
   const minMaxPrice = await prisma.listing.aggregate({
     _min: {
       price: true,
@@ -40,14 +18,11 @@ export async function getMinMaxPriceByRentalListings(): Promise<MinMaxPrice> {
       price: true,
     },
     where: {
-      rentalListing: {
+      [listingType]: {
         isNot: null,
       },
-    }
+    },
   });
-  
-  return [
-    minMaxPrice._min.price ?? 0,
-    minMaxPrice._max.price ?? 0
-  ]
+
+  return [minMaxPrice._min.price ?? 0, minMaxPrice._max.price ?? 0];
 }

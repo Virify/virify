@@ -1,5 +1,5 @@
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
-import { getMinMaxPriceBySaleListings, getMinMaxPriceByRentalListings } from "../../utils/price";
+import { getMinMaxPrice } from "../../utils/price";
 
 /**
  * Retrieves the minimum and maximum price of sale and rental listings from the database.
@@ -9,8 +9,8 @@ import { getMinMaxPriceBySaleListings, getMinMaxPriceByRentalListings } from "..
 export default defineEventHandler(async (event): Promise<MinMaxPriceResponse | undefined> => {
   const { errorResponse } = useResponse();
   try {
-    const saleMinMax = await getMinMaxPriceBySaleListings();
-    const rentalMinMax = await getMinMaxPriceByRentalListings();
+    const saleMinMax = await getMinMaxPrice('sales');
+    const rentalMinMax = await getMinMaxPrice();
 
     if (!saleMinMax || !rentalMinMax) throw createError({ statusCode: 500, statusMessage: "Failed to retrieve min and max prices" });
 
