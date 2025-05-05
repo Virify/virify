@@ -134,7 +134,7 @@ const buyOrRent = ref('buy');
 const buyOrRentOptions = [
   { key: 'buy', value: 'Buy' },
   { key: 'rent', value: 'Rent' },
-  { key: 'price', value: 'Prices' },
+  // { key: 'price', value: 'Prices' },
 ];
 
 /**
