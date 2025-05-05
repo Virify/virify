@@ -38,18 +38,19 @@
         </OrganismsSearchFormTitleBlock>
       </div>
 
-      <OrganismsSearchFormTitleBlock title="Property type">
+      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-up" style="--delay: 50ms">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
-            <li v-for="{ id, name, defaultSelected } of propertyTypes" :key="id">
+            <li v-for="{ id, name, defaultSelected }, index of propertyTypes" :key="id" class="| animate-fade-up"
+              :style="`--delay: ${50 + index * 30}ms`">
               <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
             </li>
           </ul>
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
 
-      <OrganismsSearchFormTitleBlock title="Price">
-        <LazyMoleculesRangeSlider hydrate-on-visible />
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-up" style="--delay: 200ms">
+        <LazyMoleculesRangeSlider hydrate-on-visible class="| animate-fade-up" style="--delay: 250ms" />
       </OrganismsSearchFormTitleBlock>
     </OrganismsSearchFormPopover>
   </form>
@@ -342,15 +343,14 @@ async function sendForm({ target }: SubmitEvent) {
 /**
  *  Open animatinos
  */
+.o-searchform-popover {
+  transition: opacity var(--animation-medium) ease-out, transform var(--animation-medium) ease-out;
+}
+
 @starting-style {
   .o-searchform-popover {
     opacity: 0;
-    transform: translateX(-50%) translateY(-1em);
+    transform: translateX(-50%) translateY(2em);
   }
-}
-
-.o-searchform-popover {
-  display: block;
-  transition: opacity var(--animation-fast) ease-out, transform var(--animation-fast) ease-out;
 }
 </style>

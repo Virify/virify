@@ -1,0 +1,20 @@
+/**
+ *  Animations
+ */
+.animate-fade-up {
+  transition: opacity var(--animation-fast) ease-out, transform var(--animation-fast) ease-out;
+  transition-delay: var(--delay, 0ms);
+}
+
+/**
+ *  Open animatinos
+ */
+@starting-style {
+  .animate-fade-up {
+    --animation-distance: var(--size-16);
+
+    opacity: 0;
+    height: 0;
+    transform: translateY(var(--animation-distance));
+  }
+}
