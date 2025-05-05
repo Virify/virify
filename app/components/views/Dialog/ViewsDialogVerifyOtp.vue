@@ -36,11 +36,13 @@ async function registerCompletion() {
   await verifyOtp();
   await fetch();
   if (props.passwordToken) {
-    showDialog({
-      component: ViewsDialogPasswordReset,
-      props: {
-        passwordToken: props.passwordToken,
-      },
+    useViewTransition(() => {
+      showDialog({
+        component: ViewsDialogPasswordReset,
+        props: {
+          passwordToken: props.passwordToken,
+        },
+      });
     });
   } else {
     navigateTo("/account");
