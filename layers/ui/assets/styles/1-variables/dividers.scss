@@ -1,6 +1,8 @@
+@use '../_utils/functions.scss' as fn;
+
 /**
  *  Page dividers
  */
 :root {
-  --divider-100: 1px solid light-dark(var(--monochrome-600), var(--monochrome-200));
+  --divider-100: 1px solid #{ fn.faded-color(30%) };
 }

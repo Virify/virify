@@ -8,9 +8,9 @@
 import type { DialogState, DialogStateReturn } from '~/types'
 
 const props = defineProps<{
-  component?: DialogState.component
-  componentProps?: DialogState.props
-  componentClose?: DialogState.onClose
+  component?: DialogState['component']
+  componentProps?: DialogState['props']
+  componentClose?: DialogState['onClose']
 }>()
 
 /**

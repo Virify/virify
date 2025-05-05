@@ -31,6 +31,10 @@
   --flow-gap: var(--size-12);
 }
 
+.flow-md>* {
+  --flow-gap: var(--size-16);
+}
+
 .flow-lg>* {
   --flow-gap: var(--size-20);
 }

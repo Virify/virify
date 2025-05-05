@@ -5,22 +5,22 @@
 </template>
 
 <script setup lang="ts">
-import { PinInputInput, PinInputRoot } from 'reka-ui'
+import { PinInputInput, PinInputRoot } from 'reka-ui';
 
 /**
  *  Props
  */
 withDefaults(defineProps<{ otpLength?: number }>(), {
-  otpLength: 6
-})
+  otpLength: 6,
+});
 
 /**
  *  Events
  */
-const emits = defineEmits(['complete'])
+const emits = defineEmits(['complete']);
 
-function notifyCompletion(otpCode) {
-  emits('complete', otpCode.join(''))
+function notifyCompletion(otpCode: any) {
+  emits('complete', otpCode.join(''));
 }
 </script>
 

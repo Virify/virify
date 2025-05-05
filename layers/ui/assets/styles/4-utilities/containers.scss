@@ -1,11 +1,12 @@
 @use '../_utils/media' as mq;
+@use '../_utils/functions' as fn;
 
 /**
  *  Page widths
  */
 .container {
   --container-width: 72rem;
-  --container-padding: var(--size-48);
+  --container-padding: var(--size-24);
 
   width: min(100% - var(--container-padding), var(--container-width));
   margin-inline: auto;
@@ -13,6 +14,10 @@
   // @TODO remove once Tailwind is removed, this only exists to
   // prevent conflicts in the meantime
   max-width: none;
+
+  @include mq.tablet {
+    --container-padding: var(--size-48);
+  }
 }
 
 .container-sm {
@@ -21,12 +26,20 @@
 
 .container-xs {
   --container-width: 36rem;
-  --container-padding: var(--size-36);
+  --container-padding: var(--size-20);
+
+  @include mq.tablet {
+    --container-padding: var(--size-36);
+  }
 }
 
 .container-2xs {
   --container-width: 24rem;
-  --container-padding: var(--size-36);
+  --container-padding: var(--size-20);
+
+  @include mq.tablet {
+    --container-padding: var(--size-36);
+  }
 }
 
 /**
@@ -62,4 +75,16 @@
 
 .dialog-container-xs {
   --container-width: 26rem;
+}
+
+/**
+ *  Elevations
+ */
+.elevate-200 {
+  box-shadow: 0 10px 40px -20px fn.faded-color(8%, black);
+}
+
+.elevate-300 {
+  box-shadow:
+    0 10px 20px -10px fn.faded-color(8%, black), 0 10px 40px -20px fn.faded-color(33%, black);
 }

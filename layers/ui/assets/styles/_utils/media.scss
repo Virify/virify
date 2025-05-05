@@ -9,6 +9,18 @@
     }
 }
 
+@mixin small-tablet {
+    @media (min-width: breakpoints.$small-tablet) {
+        @content;
+    }
+}
+
+@mixin small-tablet-only {
+    @media (min-width: breakpoints.$small-tablet) and (max-width: #{ breakpoints.$tablet - 1px }) {
+        @content;
+    }
+}
+
 @mixin tablet {
     @media (min-width: breakpoints.$tablet) {
         @content;

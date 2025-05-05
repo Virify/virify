@@ -13,6 +13,8 @@ export default defineEventHandler(async (event) => {
     const { email } = await readValidatedBody(event, passwordSchema.parse);
     const existingUser = await findUser(email);
 
+    if(!existingUser) throw createError({ statusCode: 404, statusMessage: "User not found" });
+
     // Check if the user already has a valid password reset token
     if (existingUser && validatePasswordToken(existingUser)) {
       throw createError({

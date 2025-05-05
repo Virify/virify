@@ -1,48 +1,28 @@
 <template>
-  <div class="w-full text-center">
-    <h1 class="| title-2xl">Virify</h1>
+  <div>
+    <OrganismsHeroHome />
 
-    <div class="| stacked container container-2xs flow flow-xs">
-      <MoleculesOtp v-model="otpTest" @complete="registerCompletion" />
-
-      <div>
-        <p>OTP inputs: {{ otpTest }}</p>
-        <p>Check in dev console for logs when OTP is completed</p>
-      </div>
-
-      <button @click.prevent="openLogin" class="| button button-full">
-        Log in
-      </button>
-      <button @click.prevent="openForgotPassword" class="| button button-full">
-        Forgot password
-      </button>
-    </div>
+    <SearchListings v-if=searchListings :listings="searchListings" />
+    <FeaturedListings v-else :listings="filteredListings" />
   </div>
 </template>
 
-<script setup>
-import { ViewsDialogLogin, ViewsDialogForgotPassword } from '#components'
+<script setup lang="ts">
 
-const { showDialog } = useDialog()
+const searchListings = ref<ListingWithFullProperty[] | null>(null);
+provide('searchListings', searchListings);
 
-function openLogin() {
-  showDialog({
-    component: ViewsDialogLogin
-  })
-}
 
-function openForgotPassword() {
-  showDialog({
-    component: ViewsDialogForgotPassword
-  })
-}
+const { data: listings, error } = await useAsyncData("listings", () => $fetch<ListingWithFullProperty[]>("/api/listings/all"));
 
-/**
- *  OTP test
- */
-const otpTest = ref([])
-
-function registerCompletion(code) {
-  console.log('Submitted', code)
-}
+const filteredListings = computed(() => {
+  if (!listings.value) return [];
+  return listings.value.filter((listing) => listing.listingTier === "FEATURED");
+});
 </script>
+
+<style>
+.p-index-spacer {
+  height: 100vh;
+}
+</style>

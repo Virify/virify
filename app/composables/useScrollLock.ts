@@ -35,6 +35,11 @@ export function useScrollLock(): UseScrollLock {
 
     // Check if shouldLock is true/false
     if (shouldLock) {
+      setStyle(container, {
+        overflow: '',
+        paddingRight: ''
+      })
+
       const scrollbarWidth = window.innerWidth - document.body.offsetWidth
 
       setStyle(container, {

@@ -3,7 +3,7 @@ import { verifyActivationOtpCode, verifyPasswordResetOtpCode } from "../../utils
 
 const otpSchema = z.object({
   token: z.string().optional(),
-  otpCode: z.string().length(6, "OTP must be 6 digits"),
+  otpCode: z.array(z.string()).length(6),
   passwordToken: z.string().optional(),
 });
 

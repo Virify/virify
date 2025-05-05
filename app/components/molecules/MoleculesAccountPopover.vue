@@ -3,6 +3,9 @@
     <li class="m-account-popover-listitem" v-for="{ to, label } of options" :key="label">
       <nuxt-link :to="to" class="m-account-popover-link | body-sm">{{ label }}</nuxt-link>
     </li>
+    <li class="m-account-popover-listitem">
+      <button type="button" @click.prevent="logout" class="m-account-popover-link | body-sm">Log out</button>
+    </li>
   </ul>
 
   <button ref="button" type="button" class="m-account-popover-toggle | body-sm font-bold" :popovertarget="popoverId"
@@ -18,6 +21,12 @@ const props = defineProps({
     type: Array
   }
 })
+
+const { clear } = useUserSession()
+
+async function logout() {
+  await clear()
+}
 
 /**
  *  Check options length
