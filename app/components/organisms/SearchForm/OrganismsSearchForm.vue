@@ -17,8 +17,8 @@
       :hidden="popoverHidden">
       <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
-      <div v-if="suggestions" role="presentation" class="o-searchform-autocomplete">
-        <OrganismsSearchFormTitleBlock title="Suggestions">
+      <div v-if="suggestions" class="o-searchform-autocomplete">
+        <OrganismsSearchFormTitleBlock title="Location">
           <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
             v-slot="{ original, current, suggestion }">
             <button class="o-searchform-autocomplete-button | body-md" @click.prevent="setSelectedSuggestion(original)">
@@ -27,15 +27,18 @@
           </MoleculesAutocomplete>
         </OrganismsSearchFormTitleBlock>
 
-        <OrganismsSearchFormTitleBlock title="Suggestion filters">
+        <div role="presentation" class="| flow flow-md">
           <MoleculesFormField label="Search radius" v-slot="{ id }">
             <select :id class="| text-input focus-visible" name="radius">
-              <option v-for="{ key, value }, index of radiusOptions" :key="value" :value :selected="index === 0">{{ key
+              <option v-for="{ key, value }, index of radiusOptions" :key="value" :value :selected="index === 0">{{
+                key
                 }}
               </option>
             </select>
           </MoleculesFormField>
-        </OrganismsSearchFormTitleBlock>
+
+          <div class="o-searchform-map | title-2xl">Map</div>
+        </div>
       </div>
 
       <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-up" style="--delay: 50ms">
@@ -132,7 +135,7 @@ const buyOrRent = ref('buy');
 const buyOrRentOptions = [
   { key: 'buy', value: 'Buy' },
   { key: 'rent', value: 'Rent' },
-  { key: 'price', value: 'Prices' },
+  // { key: 'price', value: 'Prices' },
 ];
 
 /**
@@ -300,8 +303,12 @@ async function sendForm({ target }: SubmitEvent) {
 
 .o-searchform-autocomplete {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--size-32);
+
+  @include mq.tablet {
+    grid-template-columns: 1.2fr 1fr;
+  }
 }
 
 .o-searchform-autocomplete-button {
@@ -337,7 +344,16 @@ async function sendForm({ target }: SubmitEvent) {
   background: var(--monochrome-800);
   color: var(--monochrome-600);
   border-radius: var(--border-radius-ui);
-  aspect-ratio: 1;
+  height: 7ch;
+
+  @include mq.small-tablet {
+    height: 10ch;
+  }
+
+  @include mq.tablet {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
 }
 
 /**
