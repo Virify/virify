@@ -42,6 +42,8 @@ model Property {
   estateAgentId            Int?
   propertyTypeId           Int
   propertyClassificationId Int
+
+  @@index(addressId)
 }
 
 enum ConstructionType {
