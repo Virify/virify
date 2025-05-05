@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
     const searchLocation = await getLocationByAddressId(fakeAddressId);
 
-    if (!location) {
+    if (!searchLocation) {
       throw createError({ statusCode: 404, statusMessage: "Address not found" });
     }
 
@@ -39,6 +39,7 @@ export default defineEventHandler(async (event) => {
 
     return listings;
   } catch (error) {
+    console.error("Error fetching listings:", error);
     errorResponse(error, event);
   }
 });
