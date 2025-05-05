@@ -3,15 +3,11 @@
     <ul class="o-site-navigation-list">
       <template v-if="!loggedIn">
         <li>
-          <nuxt-link to="/login" class="o-site-navigation-link | body-sm font-bold">
-            Log in
-          </nuxt-link>
+          <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm font-bold">Log in</button>
         </li>
-
         <li>
-          <nuxt-link to="/signup" class="o-site-navigation-link | button button-monochrome button-sm">
-            Create account
-          </nuxt-link>
+          <button @click.prevent="openForgotPassword"
+            class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
         </li>
       </template>
 
@@ -23,16 +19,24 @@
 </template>
 
 <script setup>
-const { loggedIn, clear } = useUserSession()
+const { loggedIn } = useUserSession()
+const { showDialog } = useDialog()
+import { ViewsDialogSignup, ViewsDialogLogin } from '#components';
 
-// logout function
-async function logout() {
-  await clear()
+function openLogin() {
+  showDialog({
+    component: ViewsDialogLogin,
+  });
+}
+
+function openForgotPassword() {
+  showDialog({
+    component: ViewsDialogSignup,
+  });
 }
 
 const accountOptions = [
   { to: '/account', label: 'My Account' },
-  { to: '/logout', label: 'Log out' }
 ]
 </script>
 

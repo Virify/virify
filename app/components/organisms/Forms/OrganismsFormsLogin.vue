@@ -7,66 +7,64 @@
     <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern
       :custom-validation="validityText" />
 
-    <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending">
-      Log in
-    </AtomsButton>
+    <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Log in </AtomsButton>
   </MoleculesForm>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /**
  *  Emits
  */
-const emits = defineEmits(['form-success', 'form-error', 'form-clear-error'])
+const emits = defineEmits(['form-success']);
 
 /**
  *  Composables
  */
-const { pattern, validityText } = getValidPassword()
-const { isPending, setPendingWhile } = usePending()
+const { pattern, validityText } = getValidPassword();
+const { isPending, setPendingWhile } = usePending();
 
 /**
  *  Handle errors
  */
-const formErrors = ref(null)
+const formErrors = ref();
 
 /**
  *  Validate form and submit
  */
-async function loginUser({ target }) {
-  if (isPending.value) return
+async function loginUser({ target }: SubmitEvent) {
+  if (isPending.value) return;
 
   setPendingWhile(async () => {
     // Clear any existing form errors
-    formErrors.value = null
+    formErrors.value = null;
 
     // First check the validity of the form
-    const { formData, errors } = useFormData(target)
+    const { formData, errors } = useFormData(target);
 
     // If errors exist, show them
     if (errors) {
-      formErrors.value = errors
+      formErrors.value = errors;
 
-      return
+      return;
     }
 
     // Post data
-    await $fetch("/auth/login", {
-      method: "POST",
+    await $fetch('/auth/login', {
+      method: 'POST',
       body: {
-        email: formData.get('email'),
-        password: formData.get('password')
-      }
+        email: formData?.get('email'),
+        password: formData?.get('password'),
+      },
     })
       .then(() => {
-        emits('form-success')
+        emits('form-success');
       })
       .catch((error) => {
         formErrors.value = {
           title: 'Login failed',
-          message: error.data.message
-        }
-      })
-  })
+          message: error.data.message,
+        };
+      });
+  });
 }
 </script>

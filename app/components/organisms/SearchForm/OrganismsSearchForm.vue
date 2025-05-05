@@ -9,7 +9,7 @@
         required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
       <select class="o-searchform-banner-select | focus-visible" aria-label="Radius of search" name="radius">
-        <option v-for="{ key, value } of radiusOptions" :key :value>{{ key }}</option>
+        <option v-for="{ key, value } of radiusOptions" :key="value" :value>{{ key }}</option>
       </select>
 
       <div class="o-searchform-banner-button-wrapper">
@@ -35,16 +35,14 @@
           </MoleculesAutocomplete>
         </div>
 
-        <div class="o-searchform-map | title-2xl">
-          Map
-        </div>
+        <div class="o-searchform-map | title-2xl">Map</div>
       </OrganismsSearchFormTitleBlock>
 
       <OrganismsSearchFormTitleBlock title="Property type">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
-            <li v-for="label of propertType">
-              <AtomsToggleBox :label type="checkbox" :name="label" v-model="selectedPropertyType[label]" />
+            <li v-for="{ id, name, defaultSelected } of propertyTypes" :key="id">
+              <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
             </li>
           </ul>
         </MoleculesScrollBox>
@@ -53,112 +51,100 @@
       <OrganismsSearchFormTitleBlock title="Price">
         <LazyMoleculesRangeSlider hydrate-on-visible />
       </OrganismsSearchFormTitleBlock>
-
     </OrganismsSearchFormPopover>
   </form>
 </template>
 
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
+import type { PropertyType } from '@prisma/client';
+import { onClickOutside } from '@vueuse/core';
 
 /**
  *  Popover management
  */
-const $form = useTemplateRef('$form')
+const $form = useTemplateRef('$form');
+const searchListings = inject<Ref<ListingWithFullProperty[] | null>>('searchListings');
 
 // Track state of form
-const popoverHidden = ref(true)
+const popoverHidden = ref(true);
 
 // Show/hide form if appropriate
 function togglePopoverHidden(setHidden = false) {
-  if (popoverHidden.value === setHidden) return
+  if (popoverHidden.value === setHidden) return;
 
-  popoverHidden.value = setHidden
+  popoverHidden.value = setHidden;
 }
 
 // Show form
 function showPopover() {
-  togglePopoverHidden(false)
+  togglePopoverHidden(false);
 }
 
 // Hide form
 function hidePopover() {
-  togglePopoverHidden(true)
+  togglePopoverHidden(true);
 }
 
 // Hide form on click outside
 onClickOutside($form, () => {
-  hidePopover(true)
-})
+  hidePopover();
+});
 
 /**
  *  Block native form validation on mount
  */
-onMounted(() => {
-  $form.value.setAttribute('novalidate', true)
-})
+onMounted(async () => {
+  if ($form.value) {
+    $form.value.setAttribute('novalidate', 'novalidate')
+  }
+});
 
 /**
  *  Search typed
  */
-const suggestions = ref('')
+const suggestions = ref('');
 
-function setSelectedSuggestion(newValue) {
-  suggestions.value = newValue
+function setSelectedSuggestion(newValue: string) {
+  suggestions.value = newValue;
 }
 
 /**
  *  Search radius
  */
 const radiusOptions = [
-  { value: '0', key: 'This location only' },
-  { value: '0.25', key: 'Within 0.25 miles' },
-  { value: '0.5', key: 'Within 0.5 miles' },
-  { value: '1', key: 'Within 1 mile' },
-  { value: '2', key: 'Within 2 miles' },
-  { value: '5', key: 'Within 5 miles' },
-  { value: '10', key: 'Within 10 miles' },
-  { value: '20', key: 'Within 20 miles' },
-  { value: '40', key: 'Within 40 miles' }
-]
+  { value: 0, key: 'This location only' },
+  { value: 0.25, key: 'Within 0.25 miles' },
+  { value: 0.5, key: 'Within 0.5 miles' },
+  { value: 1, key: 'Within 1 mile' },
+  { value: 2, key: 'Within 2 miles' },
+  { value: 5, key: 'Within 5 miles' },
+  { value: 10, key: 'Within 10 miles' },
+  { value: 20, key: 'Within 20 miles' },
+  { value: 40, key: 'Within 40 miles' },
+];
 
 /**
  *  Buy or rent
  */
-const buyOrRent = ref('buy')
+const buyOrRent = ref('buy');
 
 const buyOrRentOptions = [
   { key: 'buy', value: 'Buy' },
   { key: 'rent', value: 'Rent' },
   { key: 'price', value: 'Prices' },
-]
+];
 
 /**
  *  Property type
  */
-const propertType = [
-  'Detached',
-  'Semi-detached',
-  'Terraced',
-  'End-terrace',
-  'Flat',
-  'Cottage',
-  'Bungalow',
-]
-
-const selectedPropertyType = reactive<Record<string, boolean>>({
-  'Detached': true,
-  'Semi-detached': true,
-  'Terraced': true,
-  'End-terrace': true
-})
+const propertyTypes = await $fetch<PropertyType[]>('/api/property-type/all')
 
 /**
  *  Mock autocomplete
  */
 const suggestionsMatches = computed(() => {
   // Avoid case sensitivity
-  const suggestionsLower = suggestions.value.toLowerCase()
+  const suggestionsLower = suggestions.value.toLowerCase();
 
   // Mock filter
   return [
@@ -172,44 +158,68 @@ const suggestionsMatches = computed(() => {
     'Stockwell, London',
     'Stratford, London',
     'South London',
-    'South West London'
-  ].filter(str => {
-    const strLower = str.toLowerCase()
+    'South West London',
+  ]
+    .filter((str) => {
+      const strLower = str.toLowerCase();
 
-    return strLower.startsWith(suggestionsLower)
-  }).slice(0, 5)
-})
+      return strLower.startsWith(suggestionsLower);
+    })
+    .slice(0, 5);
+});
 
 /**
  *  Submit form
  */
-const formErrors = ref(null)
+const formErrors = ref();
 
 watch(suggestions, (newValue) => {
-  if (!formErrors.value || !newValue) return
+  if (!formErrors.value || !newValue) return;
 
-  formErrors.value = null
-})
+  formErrors.value = null;
+});
 
-function sendForm({ target }) {
-  const { formData, errors } = useFormData(target)
+async function sendForm({ target }: { target: HTMLFormElement }) {
+  const { formData, errors } = useFormData(target);
 
+  // If any errors exist, terminate and display
   if (errors) {
-    formErrors.value = errors
+    formErrors.value = errors;
 
-    showPopover()
+    showPopover();
 
-    return
+    return;
   }
 
-  console.log('formData', {
-    location: formData.get('location'),
-    radius: formData.get('radius'),
-    buyOrRent: formData.get('buyOrRent'),
-    propertType: propertType
-      .map((label) => formData.get(label))
-      .filter(Boolean)
+  // Get radius as number
+  const radiusStr = formData?.get('radius') as string;
+  const radius = radiusStr ?? parseFloat(radiusStr);
+
+  // Perform fetch for properties
+  const listingsResult = await $fetch<ListingWithFullProperty[]>('/api/search/listings', {
+    method: 'POST',
+    body: {
+      location: formData?.get('location'),
+      radius: radius,
+      buyOrRent: formData?.get('buyOrRent'),
+      propertyTypes: propertyTypes.map(({ name }) => {
+        return formData?.get(name)
+      }).filter(Boolean)
+    },
+  });
+
+  console.log('POST DEBUG', {
+    location: formData?.get('location'),
+    radius: radius,
+    buyOrRent: formData?.get('buyOrRent'),
+    propertyTypes: propertyTypes.map(({ name }) => {
+      return formData?.get(name)
+    }).filter(Boolean)
   })
+
+  searchListings ? searchListings.value = listingsResult : null;
+  // Hide popover when search is successful
+  hidePopover();
 }
 </script>
 
@@ -373,7 +383,7 @@ function sendForm({ target }) {
 @starting-style {
   .o-searchform-popover {
     opacity: 0;
-    transform: translateX(-50%) translateY(-1em)
+    transform: translateX(-50%) translateY(-1em);
   }
 }
 

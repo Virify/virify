@@ -5,9 +5,7 @@
       <AtomsInput :id type="email" name="email" required />
     </MoleculesFormField>
 
-    <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending">
-      Create account
-    </AtomsButton>
+    <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Create account </AtomsButton>
   </MoleculesForm>
 </template>
 
@@ -15,55 +13,54 @@
 /**
  *  Emits
  */
-const emits = defineEmits(['form-success', 'form-error', 'form-clear-error'])
+const emits = defineEmits(["form-success", "form-error", "form-clear-error"]);
 
 /**
  *  Composables
  */
-const { pattern, validityText } = getValidPassword()
-const { isPending, setPendingWhile } = usePending()
+const { isPending, setPendingWhile } = usePending();
 
 /**
  *  Handle errors
  */
-const formErrors = ref(null)
+const formErrors = ref(null);
 
 /**
  *  Validate form and submit
  */
 async function createAccount({ target }) {
-  if (isPending.value) return
+  if (isPending.value) return;
 
   setPendingWhile(async () => {
     // Clear any existing form errors
-    formErrors.value = null
+    formErrors.value = null;
 
     // First check the validity of the form
-    const { formData, errors } = useFormData(target)
+    const { formData, errors } = useFormData(target);
 
     // If errors exist, show them
     if (errors) {
-      formErrors.value = errors
+      formErrors.value = errors;
 
-      return
+      return;
     }
 
     // Post data
     await $fetch("/auth/signup", {
       method: "POST",
       body: {
-        email: formData.get('email'),
+        email: formData.get("email"),
       },
     })
       .then((response) => {
-        emits('form-success', response)
+        emits("form-success", response);
       })
       .catch((error) => {
         formErrors.value = {
-          title: 'Account creation failed',
-          message: error.data.message
-        }
-      })
-  })
+          title: "Account creation failed",
+          message: error.data.message,
+        };
+      });
+  });
 }
 </script>

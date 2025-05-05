@@ -1,18 +1,32 @@
 <template>
-  <div class="| container container-2xs flow flow-lg">
+  <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">Verify your email</h1>
-
-    <p class="| body-sm">Please enter your one time pin below.</p>
+    <p class="| body-sm">Please enter your one time pin that you have recived in your email below.</p>
     <p v-if="errors" class="| body-sm">{{ errors }}</p>
-
     <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
-
   </div>
 </template>
+
 <script setup lang="ts">
+import { ViewsDialogPasswordReset } from "#components";
+const props = defineProps({
+  token: {
+    type: String,
+    required: false,
+  },
+  passwordToken: {
+    type: String,
+    required: false,
+  },
+});
+
 const { fetch } = useUserSession();
-const route = useRoute();
 const otpCode = ref([]);
+
+/**
+ *  Modal control
+ */
+const { hideDialog, showDialog } = useDialog();
 
 /**
  * We need need to send the token OR passwordToken to the server
@@ -21,8 +35,13 @@ const otpCode = ref([]);
 async function registerCompletion() {
   await verifyOtp();
   await fetch();
-  if (route.query.passwordToken) {
-    navigateTo("/password/reset?passwordToken=" + route.query.passwordToken);
+  if (props.passwordToken) {
+    showDialog({
+      component: ViewsDialogPasswordReset,
+      props: {
+        passwordToken: props.passwordToken,
+      },
+    });
   } else {
     navigateTo("/account");
   }
@@ -36,12 +55,12 @@ async function verifyOtp() {
       method: "POST",
       body: {
         otpCode: otpCode.value,
-        token: route.query.token,
-        passwordToken: route.query.passwordToken,
+        token: props.token,
+        passwordToken: props.passwordToken,
       },
     });
   } catch (error: any) {
-      errors.value = error.data.message;
+    errors.value = error.data.message;
   }
 }
 </script>

@@ -1,22 +1,26 @@
 <template>
   <label class="a-toggle-box | font-semibold body-sm lineheight-sm">
-    <input :type v-model="checked" :value="label" :name="name" class="| visually-hidden" />
+    <input :type v-model="localChecked" :value="label" :name="name" class="| visually-hidden" />
     {{ label }}
   </label>
 </template>
 
 <script setup lang="ts">
 interface Props {
-  label: string
+  label: string,
   name: string
+  checked: boolean
   type?: 'radio' | 'checkbox'
 }
 
 withDefaults(defineProps<Props>(), {
-  type: 'radio'
+  type: 'radio',
+  checked: false
 })
 
-const checked = defineModel({ default: false })
+const localChecked = defineModel({
+  default: (props) => props.checked
+})
 </script>
 
 <style lang="scss">
