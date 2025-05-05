@@ -1,5 +1,5 @@
 <template>
-  <form class="o-searchform | flow flow-sm relative" ref="$form" @keydown.escape="hidePopover"
+  <form class="o-searchform | flow flow-sm relative" ref="$form" autocomplete="off" @keydown.escape="hidePopover"
     @submit.prevent="sendForm">
     <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions" v-model="buyOrRent"
       name="buyOrRent" />
@@ -8,48 +8,52 @@
       <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
         required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
-      <select class="o-searchform-banner-select | focus-visible" aria-label="Radius of search" name="radius">
-        <option v-for="{ key, value } of radiusOptions" :key="value" :value>{{ key }}</option>
-      </select>
-
-      <div class="o-searchform-banner-button-wrapper">
-        <button type="submit" class="o-searchform-banner-button | button button-monochrome">
-          <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
-        </button>
-      </div>
+      <button type="submit" class="o-searchform-banner-button | button button-monochrome">
+        <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
+      </button>
     </div>
 
     <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
       :hidden="popoverHidden">
       <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
-      <OrganismsSearchFormTitleBlock v-if="suggestions" class="o-searchform-autocomplete">
-        <div role="presentation">
-          <h2 class="| title-sm">Locations</h2>
-
+      <div v-if="suggestions" class="o-searchform-autocomplete">
+        <OrganismsSearchFormTitleBlock title="Location">
           <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
             v-slot="{ original, current, suggestion }">
             <button class="o-searchform-autocomplete-button | body-md" @click.prevent="setSelectedSuggestion(original)">
               <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
             </button>
           </MoleculesAutocomplete>
+        </OrganismsSearchFormTitleBlock>
+
+        <div role="presentation" class="| flow flow-md">
+          <MoleculesFormField label="Search radius" v-slot="{ id }">
+            <select :id class="| text-input focus-visible" name="radius">
+              <option v-for="{ key, value }, index of radiusOptions" :key="value" :value :selected="index === 0">{{
+                key
+                }}
+              </option>
+            </select>
+          </MoleculesFormField>
+
+          <!-- <div class="o-searchform-map | title-2xl">Map</div> -->
         </div>
+      </div>
 
-        <div class="o-searchform-map | title-2xl">Map</div>
-      </OrganismsSearchFormTitleBlock>
-
-      <OrganismsSearchFormTitleBlock title="Property type">
+      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 50ms">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
-            <li v-for="{ id, name, defaultSelected } of propertyTypes" :key="id">
+            <li v-for="{ id, name, defaultSelected }, index of propertyTypes" :key="id" class="| animate-fade-down"
+              :style="`--delay: ${50 + index * 40}ms`">
               <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
             </li>
           </ul>
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
 
-      <OrganismsSearchFormTitleBlock title="Price">
-        <LazyMoleculesRangeSlider hydrate-on-visible />
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 200ms">
+        <LazyMoleculesRangeSlider hydrate-on-visible class="| animate-fade-down" style="--delay: 250ms" />
       </OrganismsSearchFormTitleBlock>
     </OrganismsSearchFormPopover>
   </form>
@@ -131,7 +135,7 @@ const buyOrRent = ref('buy');
 const buyOrRentOptions = [
   { key: 'buy', value: 'Buy' },
   { key: 'rent', value: 'Rent' },
-  { key: 'price', value: 'Prices' },
+  // { key: 'price', value: 'Prices' },
 ];
 
 /**
@@ -179,7 +183,8 @@ watch(suggestions, (newValue) => {
   formErrors.value = null;
 });
 
-async function sendForm({ target }: SubmitEvent) {
+async function sendForm(event: Event) {
+  const target = event.target as HTMLFormElement;
   const { formData, errors } = useFormData(target);
 
   // If any errors exist, terminate and display
@@ -239,63 +244,25 @@ async function sendForm({ target }: SubmitEvent) {
 }
 
 .o-searchform-banner {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-column-gap: var(--size-12);
+  display: flex;
+  grid-gap: var(--size-8);
   align-items: stretch;
-  padding: var(--size-12);
+  padding: var(--size-8);
 
   @include mq.small-tablet {
-    display: flex;
-    grid-template-columns: unset;
-    grid-column-gap: unset;
-    flex-direction: row;
-    padding: 0;
+    padding: var(--size-12);
   }
-}
-
-.o-searchform-banner-input,
-.o-searchform-banner-select {
-  width: auto;
-  min-width: 0;
 }
 
 .o-searchform-banner-input {
   outline: none;
-  grid-column: span 2;
-  height: var(--size-56);
-  flex: 1 0 min-content;
+  flex: 1 0 max-content;
   padding-inline: var(--size-12);
-  text-align: center;
-
-  @include mq.small-tablet {
-    grid-column: unset;
-    height: unset;
-    padding-inline-start: var(--size-32);
-    text-align: left;
-  }
+  text-align: left;
 }
 
 .o-searchform-banner:has(.o-searchform-banner-input:focus) {
   outline: var(--focus-outline);
-}
-
-.o-searchform-banner-select {
-  height: var(--size-56);
-  border-radius: var(--border-radius-ui);
-  padding-inline: var(--size-12);
-  margin: auto 0;
-  cursor: pointer;
-
-  &:hover {
-    background: fn.faded-color(12%);
-  }
-}
-
-.o-searchform-banner-button-wrapper {
-  @include mq.small-tablet {
-    padding: var(--size-12);
-  }
 }
 
 .o-searchform-banner-button {
@@ -337,8 +304,12 @@ async function sendForm({ target }: SubmitEvent) {
 
 .o-searchform-autocomplete {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--size-32);
+
+  @include mq.tablet {
+    grid-template-columns: 1.2fr 1fr;
+  }
 }
 
 .o-searchform-autocomplete-button {
@@ -361,8 +332,10 @@ async function sendForm({ target }: SubmitEvent) {
 .o-searchform-property-types {
   list-style: none;
   display: flex;
-  padding: 0;
-  margin: 0;
+  // Allows some vertical overflow for animations
+  padding: 1em 0 0;
+  margin: -1em 0 0;
+  // End animation vertical overflow
   gap: var(--size-8);
   white-space: nowrap;
 }
@@ -374,21 +347,44 @@ async function sendForm({ target }: SubmitEvent) {
   background: var(--monochrome-800);
   color: var(--monochrome-600);
   border-radius: var(--border-radius-ui);
-  aspect-ratio: 1;
+  height: 7ch;
+
+  @include mq.small-tablet {
+    height: 10ch;
+  }
+
+  @include mq.tablet {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
 }
 
 /**
  *  Open animatinos
  */
-@starting-style {
-  .o-searchform-popover {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-1em);
-  }
+.o-searchform-popover {
+  interpolate-size: allow-keywords;
+
+  transition: height var(--animation-slow) var(--ease-out), opacity var(--animation-medium) var(--ease-out), transform var(--animation-medium) var(--ease-out);
+  overflow-y: clip;
+  height: calc-height(max-content, size);
 }
 
-.o-searchform-popover {
-  display: block;
-  transition: opacity var(--animation-fast) ease-out, transform var(--animation-fast) ease-out;
+.o-searchform-autocomplete {
+  transition: height var(--animation-veryslow) var(--ease-out);
+  overflow-y: clip;
+  height: calc-height(max-content, size);
+}
+
+@starting-style {
+  .o-searchform-popover {
+    height: 0;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-2em);
+  }
+
+  .o-searchform-autocomplete {
+    height: 0;
+  }
 }
 </style>
