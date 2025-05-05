@@ -1,5 +1,5 @@
 <template>
-  <form class="o-searchform | flow flow-sm relative" ref="$form" @keydown.escape="hidePopover"
+  <form class="o-searchform | flow flow-sm relative" ref="$form" autocomplete="off" @keydown.escape="hidePopover"
     @submit.prevent="sendForm">
     <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions" v-model="buyOrRent"
       name="buyOrRent" />
