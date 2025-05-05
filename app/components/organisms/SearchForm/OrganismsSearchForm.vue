@@ -41,8 +41,8 @@
       <OrganismsSearchFormTitleBlock title="Property type">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
-            <li v-for="label of propertyTypes" :key="label.id">
-              <AtomsToggleBox :label type="checkbox" :name="label.name" v-model="selectedPropertyType[label.name]" />
+            <li v-for="{ id, name, defaultSelected } of propertyTypes" :key="id">
+              <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
             </li>
           </ul>
         </MoleculesScrollBox>
@@ -95,9 +95,8 @@ onClickOutside($form, () => {
  */
 onMounted(async () => {
   if ($form.value) {
-    $form.value.setAttribute('novalidate', true.toString());
+    $form.value.setAttribute('novalidate', 'novalidate')
   }
-  await fetchPropertyTypes();
 });
 
 /**
@@ -138,28 +137,7 @@ const buyOrRentOptions = [
 /**
  *  Property type
  */
-
-const propertyTypes = ref<PropertyType[]>([]);
-const selectedPropertyType = reactive<Record<string, boolean>>({});
-
-/**
- * Fetch property types
- */
-const fetchPropertyTypes = async () => {
-  const propertyTypesResult = await $fetch<PropertyType[]>('/api/property-type/all')
-
-  propertyTypes.value = propertyTypesResult;
-  console.log(propertyTypesResult)
-
-  /**
-   *  Set default property types
-   */
-  for (const propertyType of propertyTypesResult) {
-    if (['House', 'Flat', 'Cottage'].includes(propertyType.name)) {
-      selectedPropertyType[propertyType.name] = true;
-    }
-  }
-};
+const propertyTypes = await $fetch<PropertyType[]>('/api/property-type/all')
 
 /**
  *  Mock autocomplete
@@ -218,7 +196,9 @@ async function sendForm({ target }: { target: HTMLFormElement }) {
       location: formData?.get('location'),
       radius: radius,
       buyOrRent: formData?.get('buyOrRent'),
-      propertyTypes: selectedPropertyType
+      propertyTypes: propertyTypes.map(({ name }) => {
+        return formData?.get(name)
+      }).filter(Boolean)
     },
   });
 
@@ -226,7 +206,9 @@ async function sendForm({ target }: { target: HTMLFormElement }) {
     location: formData?.get('location'),
     radius: radius,
     buyOrRent: formData?.get('buyOrRent'),
-    propertyTypes: selectedPropertyType
+    propertyTypes: propertyTypes.map(({ name }) => {
+      return formData?.get(name)
+    }).filter(Boolean)
   })
 
   searchListings ? searchListings.value = listingsResult : null;
