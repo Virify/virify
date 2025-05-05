@@ -63,7 +63,6 @@ const rangeValue = defineModel({
 .m-range-slider-label-max {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .m-range-slider-label-min {
@@ -77,12 +76,14 @@ const rangeValue = defineModel({
 }
 
 .m-range-slider-input {
-  width: min-content;
-  max-width: 100%;
   margin-bottom: var(--size-4);
   text-align: inherit;
+  max-width: 15ch;
 }
 
+/**
+ *  Range slider styling
+ */
 .m-range-slider-root {
   grid-column: span 2;
   position: relative;
