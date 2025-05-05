@@ -181,15 +181,21 @@ watch(suggestions, (newValue) => {
 
 async function sendForm({ target }: { target: HTMLFormElement }) {
   const { formData, errors } = useFormData(target);
-  // radius as number
-  const radiusStr = formData?.get('radius');
-  const radius = radiusStr !== null ? parseFloat(radiusStr as string) : null;
+
+  // If any errors exist, terminate and display
   if (errors) {
     formErrors.value = errors;
+
     showPopover();
+
     return;
   }
 
+  // Get radius as number
+  const radiusStr = formData?.get('radius') as string;
+  const radius = radiusStr ?? parseFloat(radiusStr);
+
+  // Perform fetch for properties
   const listingsResult = await $fetch<ListingWithFullProperty[]>('/api/search/listings', {
     method: 'POST',
     body: {
