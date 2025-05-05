@@ -148,32 +148,19 @@ const propertyTypes = await $fetch<PropertyType[]>('/api/property-type/all')
 /**
  *  Mock autocomplete
  */
-const suggestionsMatches = computed(() => {
-  // Avoid case sensitivity
+const suggestionsMatches = ref<string[]>([]);
+
+watchEffect(async () => {
   const suggestionsLower = suggestions.value.toLowerCase();
-
-  // Mock filter
-  return [
-    'Stevenage, Hertfordshire',
-    'Steventon, Oxford',
-    'St. Albans, Hertforshire',
-    'St. Neots, Hertfordshire',
-    'Stoke-on-Trent, Staffordshire',
-    'Stepps, Glasgow',
-    'Stepney, London',
-    'Stockwell, London',
-    'Stratford, London',
-    'South London',
-    'South West London',
-  ]
-    .filter((str) => {
-      const strLower = str.toLowerCase();
-
-      return strLower.startsWith(suggestionsLower);
-    })
-    .slice(0, 5);
+  if (suggestionsLower) {
+    const result = await $fetch<string[]>('/api/address/auto-complete', {
+      query: { location: suggestionsLower },
+    });
+    suggestionsMatches.value = result;
+  } else {
+    suggestionsMatches.value = [];
+  }
 });
-
 /**
  * Price range
  */

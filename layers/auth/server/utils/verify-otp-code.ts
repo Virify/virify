@@ -8,7 +8,7 @@ import { H3Event } from "h3";
  * @param otpCode string
  * @returns userWithVerification
  */
-export async function verifyActivationOtpCode(event: H3Event, token: string, otpCode: Array<string>) {
+export async function verifyActivationOtpCode(event: H3Event, token: string, otpCode: string[]) {
   const user = await findUserByActivationToken(token);
 
   if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
@@ -30,7 +30,7 @@ export async function verifyActivationOtpCode(event: H3Event, token: string, otp
  * @param otpCode string
  * @returns userWithVerification
  */
-export async function verifyPasswordResetOtpCode(passwordToken: string, otpCode: Array<string>) {
+export async function verifyPasswordResetOtpCode(passwordToken: string, otpCode: string[]) {
   const user = await findUserByPasswordToken(passwordToken);
   if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
 
@@ -67,9 +67,9 @@ export async function verifyOtpCode(user: UserWithVerification, code: string): P
 /**
  * OTP code to string
  * 
- * @param otpCode Array<string>
+ * @param otpCode string[]
  * @returns String
  */
-export function otpToString(otpCode: Array<string>): string {
+export function otpToString(otpCode: string[]): string {
   return otpCode.join("");
 }
