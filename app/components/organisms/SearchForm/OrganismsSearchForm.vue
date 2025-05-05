@@ -299,8 +299,12 @@ async function sendForm({ target }: SubmitEvent) {
 
 .o-searchform-autocomplete {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--size-32);
+
+  @include mq.tablet {
+    grid-template-columns: 1.2fr 1fr;
+  }
 }
 
 .o-searchform-autocomplete-button {
