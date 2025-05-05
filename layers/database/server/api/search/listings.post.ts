@@ -1,8 +1,9 @@
 import * as z from "zod";
+import { getSaleListingsByDistance, getRentalListingsByDistance } from "../../utils/listing";
 
 const LISTING_FETCHERS = {
-  rent: getRentalListingsByPropertyIds,
-  buy: getSaleListingsByPropertyIds,
+  rent: getRentalListingsByDistance,
+  buy: getSaleListingsByDistance,
 };
 
 const searchSchema = z.object({
@@ -13,32 +14,31 @@ const searchSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
+
   try {
-    const { buyOrRent, radius, propertyTypes } = await readValidatedBody(event, searchSchema.parse);  
+    const { buyOrRent, radius, propertyTypes } = await readValidatedBody(event, searchSchema.parse);
 
-    // const { propertyTypes } = await readBody(event);
-    const fakeAddressId = 1; // TODO: Replace with actual address ID when available
+    if (radius === undefined || !buyOrRent) {
+      throw createError({ statusCode: 400, statusMessage: "Missing required fields: radius or buyOrRent" });
+    }
 
-    // undefined check as 0 is a valid radius
-    if (radius === undefined || !buyOrRent) throw createError({ statusCode: 400, statusMessage: "Missing required fields: radius or buyOrRent" });
+    const fakeAddressId = 2; // TODO: Replace with actual address ID when available
 
-    const location = await getLocationByAddressId(fakeAddressId);
+    const searchLocation = await getLocationByAddressId(fakeAddressId);
 
-    if (!location) throw createError({ statusCode: 404, statusMessage: "Address not found" });
-
-    const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
-    const propertyIds = nearbyProperties.map((p) => p.propertyId);
+    if (!location) {
+      throw createError({ statusCode: 404, statusMessage: "Address not found" });
+    }
 
     const fetchListings = LISTING_FETCHERS[buyOrRent];
 
-    if (!fetchListings) throw createError({ statusCode: 400, statusMessage: `Unsupported listing type: ${buyOrRent}` });
-
-    const listings = await fetchListings(propertyIds, propertyTypes);
+    if (!fetchListings) {
+      throw createError({ statusCode: 400, statusMessage: `Unsupported listing type: ${buyOrRent}` });
+    }
+    const listings = await fetchListings(searchLocation, radius, propertyTypes);
 
     return listings;
   } catch (error) {
-    // logging for now as no error handler on frontend
-    console.error("Error in search handler:", error);
     errorResponse(error, event);
   }
 });

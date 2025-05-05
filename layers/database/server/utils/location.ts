@@ -100,6 +100,36 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
 }
 
 /**
+ * Get Nearby Property IDs by Latitude and Longitude with a distance threshold.
+ * 
+ * @param lat latitude number
+ * @param lon longitude number
+ * @param distanceMiles number
+ * @returns number
+ */
+export async function getNearbyPropertyIds(
+  lat: number,
+  lon: number,
+  radius: number
+): Promise<{ propertyId: number }[]> {
+  const meters = convertMilesToMeters(radius);
+
+  return await prisma.$queryRaw<{ propertyId: number }[]>(
+    Prisma.sql`
+      SELECT p.id as "propertyId"
+      FROM "Property" p
+      JOIN "Address" a ON p."addressId" = a.id
+      WHERE ST_DWithin(
+        ST_Transform(a.location, 3857),
+        ST_Transform(ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326), 3857),
+        ${meters}
+      )
+    `
+  );
+}
+
+
+/**
  * Get Nearby Properties by Latitude and Longitude with a distance threshold.
  * Filters by property types as well.
  *

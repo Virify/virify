@@ -1,6 +1,7 @@
 import type { Listing } from "@prisma/client";
 import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
+import { getNearbyPropertyIds } from "./location";
 
 /**
  * Get a listing by ID
@@ -89,16 +90,17 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getSaleListingsByPropertyIds(propertyIds: number[], propertyTypes?: Array<string>): Promise<ListingSaleWithFullProperty[]> {
+export async function getSaleListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: Array<string>): Promise<ListingSaleWithFullProperty[]> {
+  const nearbyProperties = await getNearbyPropertyIds(location.lat, location.lon, radius);
   return await prisma.listing.findMany({
     where: {
-      propertyId: {
-        in: propertyIds,
-      },
       saleListing: {
         isNot: null,
       },
       property: {
+        id: {
+          in: nearbyProperties.map((p) => p.propertyId),
+        },
         type: {
           name: {
             in: propertyTypes,
@@ -123,16 +125,17 @@ export async function getSaleListingsByPropertyIds(propertyIds: number[], proper
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getRentalListingsByPropertyIds(propertyIds: number[], propertyTypes?: Array<string>): Promise<ListingRentalWithFullProperty[]> {
+export async function getRentalListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: Array<string>): Promise<ListingRentalWithFullProperty[]> {
+  const nearbyProperties = await getNearbyPropertyIds(location.lat, location.lon, radius);
   return await prisma.listing.findMany({
     where: {
-      propertyId: {
-        in: propertyIds,
-      },
       rentalListing: {
         isNot: null,
       },
       property: {
+        id: {
+          in: nearbyProperties.map((p) => p.propertyId),
+        },
         type: {
           name: {
             in: propertyTypes,
