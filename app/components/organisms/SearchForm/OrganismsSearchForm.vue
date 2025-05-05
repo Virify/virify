@@ -37,22 +37,23 @@
             </select>
           </MoleculesFormField>
 
-          <div class="o-searchform-map | title-2xl">Map</div>
+          <!-- <div class="o-searchform-map | title-2xl">Map</div> -->
         </div>
       </div>
 
-      <OrganismsSearchFormTitleBlock title="Property type">
+      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 50ms">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
-            <li v-for="{ id, name, defaultSelected } of propertyTypes" :key="id">
+            <li v-for="{ id, name, defaultSelected }, index of propertyTypes" :key="id" class="| animate-fade-down"
+              :style="`--delay: ${50 + index * 40}ms`">
               <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
             </li>
           </ul>
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
 
-      <OrganismsSearchFormTitleBlock title="Price">
-        <LazyMoleculesRangeSlider hydrate-on-visible />
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 200ms">
+        <LazyMoleculesRangeSlider hydrate-on-visible class="| animate-fade-down" style="--delay: 250ms" />
       </OrganismsSearchFormTitleBlock>
     </OrganismsSearchFormPopover>
   </form>
@@ -182,7 +183,8 @@ watch(suggestions, (newValue) => {
   formErrors.value = null;
 });
 
-async function sendForm({ target }: SubmitEvent) {
+async function sendForm(event: Event) {
+  const target = event.target as HTMLFormElement;
   const { formData, errors } = useFormData(target);
 
   // If any errors exist, terminate and display
@@ -330,8 +332,10 @@ async function sendForm({ target }: SubmitEvent) {
 .o-searchform-property-types {
   list-style: none;
   display: flex;
-  padding: 0;
-  margin: 0;
+  // Allows some vertical overflow for animations
+  padding: 1em 0 0;
+  margin: -1em 0 0;
+  // End animation vertical overflow
   gap: var(--size-8);
   white-space: nowrap;
 }
@@ -358,15 +362,29 @@ async function sendForm({ target }: SubmitEvent) {
 /**
  *  Open animatinos
  */
-@starting-style {
-  .o-searchform-popover {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-1em);
-  }
+.o-searchform-popover {
+  interpolate-size: allow-keywords;
+
+  transition: height var(--animation-slow) var(--ease-out), opacity var(--animation-medium) var(--ease-out), transform var(--animation-medium) var(--ease-out);
+  overflow-y: clip;
+  height: calc-height(max-content, size);
 }
 
-.o-searchform-popover {
-  display: block;
-  transition: opacity var(--animation-fast) ease-out, transform var(--animation-fast) ease-out;
+.o-searchform-autocomplete {
+  transition: height var(--animation-veryslow) var(--ease-out);
+  overflow-y: clip;
+  height: calc-height(max-content, size);
+}
+
+@starting-style {
+  .o-searchform-popover {
+    height: 0;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-2em);
+  }
+
+  .o-searchform-autocomplete {
+    height: 0;
+  }
 }
 </style>
