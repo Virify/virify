@@ -1,6 +1,6 @@
 <template>
   <label class="a-toggle-box | font-semibold body-sm lineheight-sm">
-    <input :type v-model="localChecked" :value="label" :name="name" class="| visually-hidden" />
+    <input :type :name :value="label" v-model="localChecked" class="| visually-hidden" />
     {{ label }}
   </label>
 </template>

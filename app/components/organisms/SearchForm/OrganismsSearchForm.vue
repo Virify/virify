@@ -179,7 +179,7 @@ watch(suggestions, (newValue) => {
   formErrors.value = null;
 });
 
-async function sendForm({ target }: { target: HTMLFormElement }) {
+async function sendForm({ target }: SubmitEvent) {
   const { formData, errors } = useFormData(target);
 
   // If any errors exist, terminate and display
