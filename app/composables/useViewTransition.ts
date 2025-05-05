@@ -15,7 +15,8 @@ function getSkipTransitions(forceTransition: boolean = false): boolean {
  *  Provide basic support for view transitions
  *
  */
-export function useViewTransition(fn: typeof Function, forceTransition: boolean = false) {
+export function useViewTransition(fn: () => void, forceTransition: boolean = false): void {
+
   if (import.meta.server || !isFunction(fn)) return
 
   // Check if transition should be skipped

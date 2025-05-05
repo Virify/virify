@@ -37,7 +37,7 @@
             </select>
           </MoleculesFormField>
 
-          <div class="o-searchform-map | title-2xl">Map</div>
+          <!-- <div class="o-searchform-map | title-2xl">Map</div> -->
         </div>
       </div>
 
@@ -183,7 +183,8 @@ watch(suggestions, (newValue) => {
   formErrors.value = null;
 });
 
-async function sendForm({ target }: SubmitEvent) {
+async function sendForm(event: Event) {
+  const target = event.target as HTMLFormElement;
   const { formData, errors } = useFormData(target);
 
   // If any errors exist, terminate and display
