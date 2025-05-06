@@ -134,22 +134,6 @@ onClickOutside($root, forceHoverNone)
   transition: transform var(--animation-veryslow) var(--ease-out);
 }
 
-.m-listing-card-content-parent,
-.m-listing-card-content-parent-expanded {
-  text-align: center;
-}
-
-.m-listing-card-content-parent-expanded {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  background: var(--background-100);
-  width: var(--listing-card-expanded-size);
-  transform: translateX(-50%) translateY(calc(0px - var(--listing-card-padding)));
-  padding: var(--listing-card-padding);
-  border-radius: var(--border-radius-2xl);
-}
-
 /**
  *  Hover and backdrop
  */
@@ -168,6 +152,22 @@ onClickOutside($root, forceHoverNone)
   background: #{ fn.faded-color(90%, var(--background-200)) };
   pointer-events: none;
   z-index: -1;
+}
+
+.m-listing-card-content-parent,
+.m-listing-card-content-parent-expanded {
+  text-align: center;
+}
+
+.m-listing-card-content-parent-expanded {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  background: var(--background-100);
+  width: var(--listing-card-expanded-size);
+  transform: translateX(-50%) translateY(calc(0px - var(--listing-card-padding)));
+  padding: var(--listing-card-padding);
+  border-radius: var(--border-radius-2xl);
 }
 
 /**
