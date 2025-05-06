@@ -19,17 +19,26 @@
       </li>
     </ul>
 
-    <div v-if="showTabs" class="m-listing-card-content-tabs">
-      TABS<br />TABS
+    <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding">
+      <p>TABS</p>
+
+      <p class="| body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut
+        aliquam quis ab</p>
 
       <div class="m-listing-card-content-agent">
         Agent Details
       </div>
     </div>
 
-    <button v-else @click.prevent="$emit('force-expanded')" class="m-listing-card-content-expand-button">
-      <AtomsIcon icon="read-more" title="Read more dots" />
-    </button>
+    <template v-else>
+      <p class="| body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
+
+      <button @click.prevent="$emit('force-expanded')" class="m-listing-card-content-expand-button">
+        <AtomsIcon icon="read-more" title="Read more dots" />
+      </button>
+    </template>
+
+
   </div>
 </template>
 
@@ -93,7 +102,7 @@ withDefaults(defineProps<Props>(), {
 /**
  *  Tab fade animation
  */
-.m-listing-card-content-tabs {
+.m-listing-card-content-expanding {
   interpolate-size: allow-keywords;
 
   transition: height, margin;
@@ -106,7 +115,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 @starting-style {
-  .m-listing-card-content-tabs {
+  .m-listing-card-content-expanding {
     height: 0;
   }
 }
