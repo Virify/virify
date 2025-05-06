@@ -1,5 +1,5 @@
 <template>
-  <div class="m-listing-card-content | flow flow-md" role="presentation">
+  <div class="m-listing-card-content | flow flow-sm" role="presentation">
     <h3 class="m-listing-card-content-title | title-xs">32 Someplace St., Cardiff</h3>
 
     <ul class="m-listing-card-content-icons">
@@ -21,15 +21,15 @@
 
     <div v-if="showTabs" class="m-listing-card-content-tabs">
       TABS<br />TABS
+
+      <div class="m-listing-card-content-agent">
+        Agent Details
+      </div>
     </div>
 
     <button v-else @click.prevent="$emit('force-expanded')" class="m-listing-card-content-expand-button">
       <AtomsIcon icon="read-more" title="Read more dots" />
     </button>
-
-    <div class="m-listing-card-content-agent">
-      Agent Details
-    </div>
   </div>
 </template>
 

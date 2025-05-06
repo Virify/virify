@@ -120,10 +120,10 @@ onClickOutside($root, forceHoverNone)
 
 .m-listing-card-carousel-parent {
   position: absolute;
-  top: 50%;
+  bottom: 0;
   left: 50%;
   width: var(--listing-card-expanded-size);
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
 
 .m-listing-card-buttons-parent {
@@ -174,17 +174,6 @@ onClickOutside($root, forceHoverNone)
   transition-delay: 200ms;
 }
 
-/**
- *  Hover states
- */
-.m-listing-card-image-parent-hover .m-listing-card-buttons-parent {
-  transform: translateY(var(--listing-card-padding));
-}
-
-.m-listing-card-image-parent-hover .m-listing-card-content-parent-wrapper {
-  z-index: -2;
-}
-
 @starting-style {
   .m-listing-card-backdrop {
     opacity: 0;
@@ -196,7 +185,9 @@ onClickOutside($root, forceHoverNone)
  */
 .image-enter-active,
 .image-leave-active {
-  transition: width var(--animation-veryslow) var(--ease-out);
+  transition-property: width;
+  transition-duration: var(--animation-veryslow);
+  transition-timing-function: var(--ease-out);
 }
 
 .image-leave-to,

@@ -22,8 +22,9 @@
 .p-listing-test-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--size-32);
-  padding: var(--size-32);
+  row-gap: var(--size-56);
+  column-gap: var(--size-28);
+  padding: var(--size-56);
 
   @include mq.tablet {
     grid-template-columns: repeat(3, 1fr);
