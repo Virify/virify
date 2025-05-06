@@ -2,16 +2,16 @@
   <div class="| flow flow-2xl">
     <slot />
 
-    <OrganismsSearchFormTitleBlock title="Explore more" class="| animate-fade-down" style="--delay: 250ms">
+    <OrganismsSearchFormTitleBlock title="Explore more" class="| animate-fade-down" style="--delay: 200ms">
       <ul class="o-searchform-popover-explore-more">
         <li v-for="{ icon, to, content }, index of exploreMoreLinks" class="| animate-fade-down"
-          :style="`--delay: ${250 + index * 20}ms`">
+          :style="`--delay: ${200 + index * 60}ms`">
           <MoleculesIconLink :to :icon :content icon-large class="o-searchform-popover-icon-link" />
         </li>
       </ul>
 
       <nuxt-link to="#" class="o-searchform-popover-full-button | button button-ghost font-semibold animate-fade-down"
-        style="--delay: 350ms">Advanced
+        style="--delay: 300ms">Advanced
         search</nuxt-link>
     </OrganismsSearchFormTitleBlock>
   </div>
