@@ -1,5 +1,7 @@
 import { Prisma } from "@prisma/client";
 import type { AddressLocation } from "~~/shared/types/location";
+import { prepareFullTextSearch } from "./address";
+import type { PropertySearchResult } from "~~/shared/types/property";
 
 /**
  * Convert meters to miles. For PostGIS, we need to convert meters to miles.
@@ -80,7 +82,7 @@ export async function updateLocationsByAddressList(locations: { id: number; lat:
  */
 export async function getPropertyIdsByDistance(lat: number, lon: number, distanceMiles: number): Promise<{ propertyId: number }[]> {
   const meters = convertMilesToMeters(distanceMiles);
-  const nearbyProperties = await prisma.$queryRaw<{ propertyId: number }[]>(
+  const nearbyProperties = await prisma.$queryRaw<PropertySearchResult>(
     Prisma.sql`
       SELECT p.id as "propertyId"
       FROM "Property" p
@@ -94,4 +96,48 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
   );
 
   return nearbyProperties;
+}
+
+/**
+ *
+ * @param query string
+ * @param distanceMeters number
+ *
+ * @returns propertyId
+ */
+export async function getNearbyPropertiesByTextQuery(query: string, distanceMiles: number): Promise<PropertySearchResult> {
+  const meters = convertMilesToMeters(distanceMiles);
+  const sanitizedQuery = prepareFullTextSearch(query);
+
+  return await prisma.$queryRaw<PropertySearchResult>`
+  -- Find the most relevant address based on the full-text search query
+  WITH matched_address AS (
+    SELECT id, location
+    FROM "Address"
+    WHERE to_tsvector('english', COALESCE(street, '') || ' ' || COALESCE(city, '') || ' ' || COALESCE(postcode, ''))
+          @@ to_tsquery('english', ${sanitizedQuery})
+    ORDER BY ts_rank(
+      to_tsvector('english', COALESCE(street, '') || ' ' || COALESCE(city, '') || ' ' || COALESCE(postcode, '')),
+      to_tsquery('english', ${sanitizedQuery})
+    ) DESC
+    LIMIT 1
+  )
+
+  -- Select property IDs for properties whose address is within the given distance from the matched address
+  SELECT p.id as "propertyId"
+  FROM "Property" p
+
+  -- Join each property to its address (to get its coordinates)
+  JOIN "Address" a ON p."addressId" = a.id
+
+  -- Join to the matched address from the CTE (cross join, since it's a single row)
+  JOIN matched_address ma ON TRUE
+
+  -- Spatial filter: only include addresses within the distance threshold
+  WHERE ST_DWithin(
+    ST_Transform(a.location, 3857),
+    ST_Transform(ma.location, 3857),
+    ${meters}
+  )
+`;
 }
