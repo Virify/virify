@@ -31,14 +31,10 @@
     </div>
 
     <template v-else>
-      <p class="| body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
-
       <button @click.prevent="$emit('force-expanded')" class="m-listing-card-content-expand-button">
         <AtomsIcon icon="read-more" title="Read more dots" />
       </button>
     </template>
-
-
   </div>
 </template>
 
@@ -54,6 +50,7 @@ withDefaults(defineProps<Props>(), {
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+@use '#styles/_utils/functions' as fn;
 
 .m-listing-card-content-title {
   white-space: nowrap;
@@ -66,7 +63,7 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--size-20);
+  gap: var(--size-24);
   text-align: center;
   white-space: nowrap;
   padding: 0;
@@ -77,6 +74,7 @@ withDefaults(defineProps<Props>(), {
   width: var(--size-32);
   height: var(--size-32);
   margin: 0 auto var(--size-6);
+  color: fn.faded-color(33%);
 }
 
 .m-listing-card-content-expand-button {
