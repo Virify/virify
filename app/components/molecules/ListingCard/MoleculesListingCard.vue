@@ -168,16 +168,6 @@ onClickOutside($root, forceHoverNone)
   background: #{ fn.faded-color(90%, var(--background-200)) };
   pointer-events: none;
   z-index: -1;
-  transition-property: opacity;
-  transition-duration: var(--animation-subtle);
-  transition-timing-function: var(--ease-out);
-  transition-delay: 200ms;
-}
-
-@starting-style {
-  .m-listing-card-backdrop {
-    opacity: 0;
-  }
 }
 
 /**
@@ -211,8 +201,9 @@ onClickOutside($root, forceHoverNone)
 .backdrop-enter-active,
 .backdrop-leave-active {
   transition-property: opacity;
-  transition-duration: var(--animation-veryslow);
+  transition-duration: 1s;
   transition-timing-function: var(--ease-out);
+  transition-delay: 200ms;
 }
 
 .backdrop-leave-to,
