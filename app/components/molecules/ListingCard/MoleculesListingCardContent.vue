@@ -43,7 +43,9 @@ withDefaults(defineProps<Props>(), {
 })
 </script>
 
-<style>
+<style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .m-listing-card-content-title {
   white-space: nowrap;
   overflow: hidden;
@@ -68,6 +70,12 @@ withDefaults(defineProps<Props>(), {
   margin: 0 auto var(--size-6);
 }
 
+.m-listing-card-content-expand-button {
+  @include mq.hover {
+    display: none;
+  }
+}
+
 /**
  *  Agent tab
  */
@@ -76,6 +84,10 @@ withDefaults(defineProps<Props>(), {
   background: var(--blue-400);
   color: var(--monochrome-900);
   border-radius: var(--border-radius-xl);
+
+  @include mq.hover {
+    margin-top: var(--size-32);
+  }
 }
 
 /**

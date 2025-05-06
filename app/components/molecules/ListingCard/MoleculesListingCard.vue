@@ -45,7 +45,7 @@ const $root = useTemplateRef('$root')
  */
 const hoverRegion = ref('')
 
-const isHover = useElementHover($root, { delayEnter: 1000 })
+const isHover = useElementHover($root, { delayEnter: 200 })
 
 const isHoverImage = computed(() => {
   return isHover.value && hoverRegion.value === 'image'
@@ -127,7 +127,7 @@ onClickOutside($root, forceHoverNone)
 }
 
 .m-listing-card-buttons-parent {
-  margin: 0 auto;
+  margin: 0 auto calc(0px - var(--size-8));
   position: relative;
   z-index: 2;
   transform: translateY(-50%);
@@ -151,23 +151,6 @@ onClickOutside($root, forceHoverNone)
 }
 
 /**
- *  Hover states
- */
-.m-listing-card-image-parent-hover .m-listing-card-buttons-parent {
-  transform: translateY(var(--listing-card-padding));
-}
-
-.m-listing-card-image-parent-hover .m-listing-card-content-parent-wrapper {
-  z-index: -2;
-}
-
-@starting-style {
-  .m-listing-card-backdrop::before {
-    opacity: 0;
-  }
-}
-
-/**
  *  Hover and backdrop
  */
 .m-listing-card-hover {
@@ -185,7 +168,27 @@ onClickOutside($root, forceHoverNone)
   background: #{ fn.faded-color(90%, var(--background-200)) };
   pointer-events: none;
   z-index: -1;
-  transition: opacity var(--animation-veryslow) var(--ease-out);
+  transition-property: opacity;
+  transition-duration: var(--animation-subtle);
+  transition-timing-function: var(--ease-out);
+  transition-delay: 200ms;
+}
+
+/**
+ *  Hover states
+ */
+.m-listing-card-image-parent-hover .m-listing-card-buttons-parent {
+  transform: translateY(var(--listing-card-padding));
+}
+
+.m-listing-card-image-parent-hover .m-listing-card-content-parent-wrapper {
+  z-index: -2;
+}
+
+@starting-style {
+  .m-listing-card-backdrop {
+    opacity: 0;
+  }
 }
 
 /**
