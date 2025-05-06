@@ -1,11 +1,11 @@
 <template>
   <div ref="$root" class="m-listing-card" :class="{
     'm-listing-card-backdrop': isHoverImage || isHoverContent,
-    'm-listing-card-image-hover': isHoverImage,
-    'm-listing-card-content-hover': isHoverContent
+    'm-listing-card-image-parent-hover': isHoverImage,
+    'm-listing-card-content-parent-hover': isHoverContent
   }">
     <div @mouseenter="setHoverImage" role="presentation" class="| relative">
-      <button @click.prevent="forceHoverImage" class="m-listing-card-image-button">
+      <button @click.prevent="forceHoverImage" class="m-listing-card-image-parent-button">
         <MoleculesListingCardImage />
       </button>
 
@@ -16,18 +16,15 @@
 
     <MoleculesListingCardButtons class="m-listing-card-buttons-parent" />
 
-    <div @mouseenter="setHoverContent" class="m-listing-card-content">
-      Content
+    <div class="m-listing-card-content-parent-wrapper | relative">
+      <MoleculesListingCardContent @mouseenter="setHoverContent" @force-expanded="forceHoverContent"
+        class="m-listing-card-content-parent" />
 
-      <button @click.prevent="forceHoverContent">Expand</button>
-
-      <pre>image: {{ isHoverImage }}
-content: {{ isHoverContent }}</pre>
+      <Transition name="content">
+        <MoleculesListingCardContent v-if="isHoverContent" class="m-listing-card-content-parent-expanded | elevate-300"
+          show-tabs />
+      </Transition>
     </div>
-
-    <!-- <div class="m-listing-card-expanded">
-      Expanded content
-    </div> -->
   </div>
 </template>
 
@@ -94,13 +91,13 @@ onClickOutside($root, forceHoverNone)
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
 
-.m-listing-card-image {
+.m-listing-card-image-parent {
   background: var(--monochrome-500);
   aspect-ratio: 4/3;
   border-radius: var(--border-radius-2xl);
 }
 
-.m-listing-card-image-button {
+.m-listing-card-image-parent-button {
   padding: 0;
   margin: 0;
   border: 0;
@@ -125,11 +122,35 @@ onClickOutside($root, forceHoverNone)
   transition: transform var(--animation-veryslow) var(--ease-out);
 }
 
+.m-listing-card-content-parent,
+.m-listing-card-content-parent-expanded {
+  text-align: center;
+}
+
+.m-listing-card-content-parent {
+  padding: 0 var(--size-16);
+}
+
+.m-listing-card-content-parent-expanded {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  background: var(--background-100);
+  width: calc(100% + (2 * var(--size-40)));
+  transform: translate(-50%, calc(0px - var(--size-16)));
+  padding: var(--size-16);
+  border-radius: var(--border-radius-2xl);
+}
+
 /**
  *  Hover states
  */
-.m-listing-card-image-hover .m-listing-card-buttons-parent {
+.m-listing-card-image-parent-hover .m-listing-card-buttons-parent {
   transform: none;
+}
+
+.m-listing-card-image-parent-hover .m-listing-card-content-parent-wrapper {
+  z-index: -2;
 }
 
 @starting-style {
@@ -176,6 +197,19 @@ onClickOutside($root, forceHoverNone)
 
 .image-leave-to,
 .image-enter-from {
+  width: 100%;
+}
+
+.content-enter-active,
+.content-leave-active {
+  transition-property: width, box-shadow;
+  transition-duration: var(--animation-veryslow);
+  transition-timing-function: var(--ease-out);
+}
+
+.content-leave-to,
+.content-enter-from {
+  opacity: 0;
   width: 100%;
 }
 </style>
