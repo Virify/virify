@@ -3,7 +3,7 @@
     <OrganismsHeroHome />
 
     <SearchListings v-if=searchListings :listings="searchListings" />
-    <FeaturedListings v-else :listings="filteredListings" />
+    <FeaturedListings v-else :listings="listings" />
   </div>
 </template>
 
@@ -12,13 +12,9 @@
 const searchListings = ref<ListingWithFullProperty[] | null>(null);
 provide('searchListings', searchListings);
 
+const numberOfListings = 12;
+const { data: listings } = await useAsyncData("listings", () => $fetch<ListingWithFullProperty[]>("/api/listings/featured?amount=" + numberOfListings));
 
-const { data: listings, error } = await useAsyncData("listings", () => $fetch<ListingWithFullProperty[]>("/api/listings/all"));
-
-const filteredListings = computed(() => {
-  if (!listings.value) return [];
-  return listings.value.filter((listing) => listing.listingTier === "FEATURED");
-});
 </script>
 
 <style>

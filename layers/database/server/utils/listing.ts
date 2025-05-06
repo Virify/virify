@@ -1,4 +1,4 @@
-import type { Listing } from "@prisma/client";
+import { ListingTier, type Listing } from "@prisma/client";
 import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
@@ -29,6 +29,29 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
     where: {
       id,
     },
+    include: {
+      rentalListing: true,
+      saleListing: true,
+      property: {
+        include: {
+          ...propertyInclude,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get featured listings
+ * 
+ * @returns ListingWithFullProperty[]
+ */
+export async function getAllFeaturedListings(amount: number = 9): Promise<ListingWithFullProperty[] | undefined> {
+  return await prisma.listing.findMany({
+    where: {
+      listingTier: ListingTier.FEATURED,
+    },
+    take: amount,
     include: {
       rentalListing: true,
       saleListing: true,
@@ -157,4 +180,3 @@ export async function getRentalListingsByDistance(location: string, radius: numb
     },
   });
 }
-
