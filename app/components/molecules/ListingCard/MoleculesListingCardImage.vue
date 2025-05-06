@@ -1,19 +1,18 @@
 <template>
-  <div class="m-listing-card-image">IMAGE</div>
+  <div class="m-listing-card-image">
+    <img src="/images/placeholder-property.jpg" class="m-listing-card-image-src" />
+  </div>
 </template>
 
 <style>
-.m-listing-card-image {
-  background: var(--monochrome-500);
-  aspect-ratio: 4/3;
+.m-listing-card-image-src {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+  padding: 0;
   border-radius: var(--border-radius-2xl);
-
-  /* FOR TESTING */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--size-32);
-  font-weight: var(--font-bold);
-  color: var(--monochrome-400);
+  aspect-ratio: 4/3;
 }
 </style>

@@ -91,6 +91,10 @@ onClickOutside($root, forceHoverNone)
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
 
+.m-listing-card {
+  --listing-card-expanded-size: calc(100% + (2 * var(--size-40)));
+}
+
 .m-listing-card-image-parent {
   background: var(--monochrome-500);
   aspect-ratio: 4/3;
@@ -98,11 +102,14 @@ onClickOutside($root, forceHoverNone)
 }
 
 .m-listing-card-image-parent-button {
+  display: block;
+  appearance: none;
   padding: 0;
   margin: 0;
   border: 0;
   width: 100%;
-  border-radius: none;
+  border: none;
+  border-radius: 0;
   background: none;
 }
 
@@ -110,7 +117,7 @@ onClickOutside($root, forceHoverNone)
   position: absolute;
   top: 50%;
   left: 50%;
-  width: calc(100% + (2 * var(--size-28)));
+  width: var(--listing-card-expanded-size);
   transform: translate(-50%, -50%);
 }
 
@@ -136,8 +143,8 @@ onClickOutside($root, forceHoverNone)
   top: 0;
   left: 50%;
   background: var(--background-100);
-  width: calc(100% + (2 * var(--size-40)));
-  transform: translate(-50%, calc(0px - var(--size-16)));
+  width: var(--listing-card-expanded-size);
+  transform: translateX(-50%) translateY(calc(0px - var(--size-16)));
   padding: var(--size-16);
   border-radius: var(--border-radius-2xl);
 }

@@ -1,21 +1,19 @@
 <template>
   <div class="m-listing-card-carousel">
-    CAROUSEL
+    <img src="/images/placeholder-property.jpg" class="m-listing-card-carousel-image" />
   </div>
 </template>
 
 <style>
-.m-listing-card-carousel {
-  background: var(--monochrome-500);
-  aspect-ratio: 4/3;
+.m-listing-card-carousel-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+  padding: 0;
   border-radius: var(--border-radius-2xl);
-
-  /* FOR TESTING */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--size-32);
-  font-weight: var(--font-bold);
-  color: var(--monochrome-400);
+  aspect-ratio: 4/3;
+  outline: var(--size-4) solid var(--background-100);
 }
 </style>
