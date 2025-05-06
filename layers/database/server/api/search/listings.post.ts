@@ -12,6 +12,8 @@ const searchSchema = z.object({
   propertyTypes: z.array(z.string()).optional(),
   priceRange: z.array(z.coerce.number()).optional(),
   location: z.string(),
+  bedrooms: z.array(z.coerce.number()).optional(),
+  bathrooms: z.array(z.coerce.number()).optional(),
 });
 
 /**
@@ -24,7 +26,7 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 
   try {
-    const { buyOrRent, radius, propertyTypes, priceRange, location } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, propertyTypes, priceRange, location, bathrooms, bedrooms } = await readValidatedBody(event, searchSchema.parse);
 
     validateQueries(radius, buyOrRent, location);
 
@@ -35,7 +37,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // we won't need the location when we integrate with mapbox - we just get coords - reduces a read of the database
-    const listings = await fetchListings(location, radius, propertyTypes, priceRange);
+    const listings = await fetchListings(location, radius, propertyTypes, priceRange, bedrooms, bathrooms);
 
     return listings;
   } catch (error) {
