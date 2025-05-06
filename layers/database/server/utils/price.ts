@@ -24,5 +24,8 @@ export async function getMinMaxPrice(type: ListingType = "sales"): Promise<MinMa
     },
   });
 
-  return [minMaxPrice._min.price ?? 0, minMaxPrice._max.price ?? 0];
+  return [
+    Math.round(minMaxPrice._min.price ?? 0),
+    Math.round(minMaxPrice._max.price ?? 0)
+  ];
 }

@@ -53,7 +53,7 @@
       </OrganismsSearchFormTitleBlock>
 
       <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
-        <LazyMoleculesRangeSlider hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
+        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin" :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
       </OrganismsSearchFormTitleBlock>
     </OrganismsSearchFormPopover>
   </form>
@@ -132,6 +132,7 @@ const radiusOptions = [
 /**
  *  Buy or rent
  */
+
 const buyOrRent = ref('buy');
 
 const buyOrRentOptions = [
@@ -146,7 +147,7 @@ const buyOrRentOptions = [
 const propertyTypes = await $fetch<PropertyType[]>('/api/property-type/all')
 
 /**
- *  Mock autocomplete
+ * Auto Complete
  */
 const suggestionsMatches = ref<string[]>([]);
 
@@ -167,7 +168,15 @@ watchDebounced(
 /**
  * Price range
  */
-const priceRange = ref()
+const priceRange = ref<MinMaxPriceResponse>({
+  rental: [0, 0],
+  sale: [0, 0],
+});
+
+const priceMin = computed(() => (buyOrRent.value === 'rent' ? priceRange.value.rental[0] : priceRange.value.sale[0]));
+const priceMax = computed(() => (buyOrRent.value === 'rent' ? priceRange.value.rental[1] : priceRange.value.sale[1]));
+
+const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value]);
 
 /**
  *  Submit form
@@ -217,7 +226,7 @@ async function sendForm(event: Event) {
     propertyTypes: propertyTypes.map(({ name }) => {
       return formData?.get(name)
     }).filter(Boolean),
-    priceRange: priceRange.value,
+    priceRange: selectedPriceRange.value,
   })
 
   searchListings ? searchListings.value = listingsResult : null;
