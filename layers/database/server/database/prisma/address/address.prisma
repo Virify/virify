@@ -22,4 +22,5 @@ model Address {
   @@index([postcode], map: "address_postcode_idx")
   @@index([city], map: "address_city_idx")
   @@index([street], map: "address_street_idx")
+  @@index([street, city, postcode, country], map: "address_autocomplete_idx")
 }

@@ -89,7 +89,7 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getSaleListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: Array<string>): Promise<ListingSaleWithFullProperty[]> {
+export async function getSaleListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[]): Promise<ListingSaleWithFullProperty[]> {
   const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
   return await prisma.listing.findMany({
     where: {
@@ -124,7 +124,7 @@ export async function getSaleListingsByDistance(location: AddressLocation, radiu
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getRentalListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: Array<string>): Promise<ListingRentalWithFullProperty[]> {
+export async function getRentalListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[]): Promise<ListingRentalWithFullProperty[]> {
   const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
   return await prisma.listing.findMany({
     where: {

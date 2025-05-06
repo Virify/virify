@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import type { PropertyType } from '@prisma/client';
-import { onClickOutside } from '@vueuse/core';
+import { onClickOutside, watchDebounced } from '@vueuse/core';
 import type { MinMaxPriceResponse } from '~~/shared/types/price';
 
 /**
@@ -148,32 +148,22 @@ const propertyTypes = await $fetch<PropertyType[]>('/api/property-type/all')
 /**
  *  Mock autocomplete
  */
-const suggestionsMatches = computed(() => {
-  // Avoid case sensitivity
-  const suggestionsLower = suggestions.value.toLowerCase();
+const suggestionsMatches = ref<string[]>([]);
 
-  // Mock filter
-  return [
-    'Stevenage, Hertfordshire',
-    'Steventon, Oxford',
-    'St. Albans, Hertforshire',
-    'St. Neots, Hertfordshire',
-    'Stoke-on-Trent, Staffordshire',
-    'Stepps, Glasgow',
-    'Stepney, London',
-    'Stockwell, London',
-    'Stratford, London',
-    'South London',
-    'South West London',
-  ]
-    .filter((str) => {
-      const strLower = str.toLowerCase();
-
-      return strLower.startsWith(suggestionsLower);
-    })
-    .slice(0, 5);
-});
-
+watchDebounced(
+  () => suggestions.value.toLowerCase(),
+  async (suggestionsLower) => {
+    if (suggestionsLower) {
+      const result = await $fetch<string[]>('/api/address/auto-complete', {
+        query: { location: suggestionsLower },
+      });
+      suggestionsMatches.value = result;
+    } else {
+      suggestionsMatches.value = [];
+    }
+  },
+  { debounce: 150 }
+);
 /**
  * Price range
  */

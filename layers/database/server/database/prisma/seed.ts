@@ -1,10 +1,10 @@
 // Need to use `ts-node` to run this file and add ts extension to the file name
 
 import { PrismaClient } from "@prisma/client";
-import { saleAddress, rentalAddress, cityCenters } from "../../utils/address-to-seed.ts";
-import { generateProperty } from "../../utils/property-faker.ts";
-import { generateRentalListing, generateSaleListing } from "../../utils/listing-faker.ts";
-import { updateLocationsByAddressListForSeed } from "../../utils/location-for-seed.ts";
+import { saleAddress, rentalAddress, cityCenters } from "../../utils/seed/address-to-seed.ts";
+import { generateProperty } from "../../utils/seed/property-faker.ts";
+import { generateRentalListing, generateSaleListing } from "../../utils/seed/listing-faker.ts";
+import { updateLocationsByAddressListForSeed } from "../../utils/seed/location-for-seed.ts";
 const prisma = new PrismaClient();
 
 /**
