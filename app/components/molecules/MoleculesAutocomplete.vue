@@ -35,15 +35,6 @@ const matchesComputed = computed(() => {
     original: match
   }))
 })
-
-/**
- *  Emits
- */
-const emits = defineEmits(['suggestion-selected'])
-
-function emitSuggestion(suggestion: string) {
-  emits('suggestion-selected', suggestion)
-}
 </script>
 
 <style lang="scss">
