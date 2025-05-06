@@ -46,12 +46,13 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
  *
  * @returns ListingWithFullProperty[]
  */
-export async function getAllFeaturedListings(amount: number = 9): Promise<ListingWithFullProperty[] | undefined> {
+export async function getAllFeaturedListings(take: number = 10, skip: number = 0): Promise<ListingWithFullProperty[] | undefined> {
   return await prisma.listing.findMany({
     where: {
       listingTier: ListingTier.FEATURED,
     },
-    take: amount,
+    take,
+    skip,
     include: {
       rentalListing: true,
       saleListing: true,
