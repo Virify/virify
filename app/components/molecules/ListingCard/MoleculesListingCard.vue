@@ -1,25 +1,26 @@
 <template>
-  <div class="m-listing-card" :class="{
-    'm-listing-card-backdrop': imageHover || contentHover,
-    'm-listing-card-image-hover': imageHover,
-    'm-listing-card-content-hover': contentHover
+  <div ref="$root" class="m-listing-card" :class="{
+    'm-listing-card-backdrop': isHoverImage || isHoverContent,
+    'm-listing-card-image-hover': isHoverImage,
+    'm-listing-card-content-hover': isHoverContent
   }">
-    <div ref="$image" role="presentation" class="| relative">
+    <div @mouseenter="setHoverImage" role="presentation" class="| relative">
       <MoleculesListingCardImage />
+
       <Transition name="image">
-        <MoleculesListingCardCarousel v-if="imageHover" class="m-listing-card-carousel-parent" />
+        <MoleculesListingCardCarousel v-if="isHoverImage" class="m-listing-card-carousel-parent" />
       </Transition>
     </div>
 
     <MoleculesListingCardButtons class="m-listing-card-buttons-parent" />
 
-    <div ref="$content" class="m-listing-card-content">
+    <div @mouseenter="setHoverContent" class="m-listing-card-content">
       Content
 
       <button @click.prevent="showContentHover">Expand</button>
 
-      <pre>image: {{ imageHover }}
-content: {{ contentHover }}</pre>
+      <pre>image: {{ isHoverImage }}
+content: {{ isHoverContent }}</pre>
     </div>
 
     <!-- <div class="m-listing-card-expanded">
@@ -34,24 +35,49 @@ import { useElementHover, onClickOutside } from '@vueuse/core'
 /**
  *  Selectors
  */
-const $image = useTemplateRef('$image');
-const $content = useTemplateRef('$content')
+const $root = useTemplateRef('$root')
 
 /**
  *  Set hover states
  */
-const hoverConfig = { delayEnter: 500 }
+const hoverRegion = ref('')
 
-const imageHover = useElementHover($image, hoverConfig)
-const contentHover = useElementHover($content, hoverConfig)
+const isHover = useElementHover($root, { delayEnter: 500 })
+
+const isHoverImage = computed(() => {
+  return isHover.value && hoverRegion.value === 'image'
+})
+
+const isHoverContent = computed(() => {
+  return isHover.value && hoverRegion.value === 'content'
+})
+
+function setHoverImage() {
+  hoverRegion.value = 'image'
+}
+
+function setHoverContent() {
+  hoverRegion.value = 'content'
+}
+
+function setHoverNone() {
+  hoverRegion.value = 'none'
+}
 
 /**
  *  Set hover states for touch
  */
-const showContentHover = () => contentHover.value = true
-const hideContentHover = () => contentHover.value = false
+function showContentHover() {
+  isHover.value = true
+  setHoverContent()
+}
 
-onClickOutside($content, hideContentHover)
+function hideContentHover() {
+  isHover.value = false
+  setHoverNone()
+}
+
+onClickOutside($root, hideContentHover)
 
 </script>
 
