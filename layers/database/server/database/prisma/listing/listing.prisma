@@ -11,7 +11,7 @@ model Listing {
   viewingOptions    String?
   verificationLevel VerificationLevel?
   rentalListing     RentalListing?
-  saleListing      SaleListing?  
+  saleListing       SaleListing?
   userId            Int?
   propertyId        Int
   estateAgentId     Int?
