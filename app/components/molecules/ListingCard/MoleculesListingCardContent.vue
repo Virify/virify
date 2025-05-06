@@ -1,19 +1,34 @@
 <template>
-  <div>
-    <div>
-      Content
-    </div>
+  <div class="m-listing-card-content | flow flow-md" role="presentation">
+    <h3 class="m-listing-card-content-title | title-xs">32 Someplace St., Cardiff</h3>
+
+    <ul class="m-listing-card-content-icons">
+      <li class="| font-semibold body-xs">
+        <AtomsIcon icon="cards/property-type" aria-hidden="true" class="m-listing-card-content-icon" />
+        Detatched
+      </li>
+
+      <li class="| font-semibold body-xs">
+        <AtomsIcon icon="cards/beds" aria-hidden="true" class="m-listing-card-content-icon" />
+        3 beds
+      </li>
+
+      <li class="| font-semibold body-xs">
+        <AtomsIcon icon="cards/bathrooms" aria-hidden="true" class="m-listing-card-content-icon" />
+        2 bathrooms
+      </li>
+    </ul>
 
     <div v-if="showTabs" class="m-listing-card-content-tabs">
       TABS<br />TABS
     </div>
 
-    <button v-else @click.prevent="$emit('force-expanded')">
-      Expand
+    <button v-else @click.prevent="$emit('force-expanded')" class="m-listing-card-content-expand-button">
+      <AtomsIcon icon="read-more" title="Read more dots" />
     </button>
 
-    <div>
-      Agent
+    <div class="m-listing-card-content-agent">
+      Agent Details
     </div>
   </div>
 </template>
@@ -29,6 +44,43 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <style>
+.m-listing-card-content-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m-listing-card-content-icons {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-20);
+  text-align: center;
+  white-space: nowrap;
+  padding: 0;
+  margin-inline: auto;
+}
+
+.m-listing-card-content-icon {
+  width: var(--size-32);
+  height: var(--size-32);
+  margin: 0 auto var(--size-6);
+}
+
+/**
+ *  Agent tab
+ */
+.m-listing-card-content-agent {
+  padding: var(--size-12);
+  background: var(--blue-400);
+  color: var(--monochrome-900);
+  border-radius: var(--border-radius-xl);
+}
+
+/**
+ *  Tab fade animation
+ */
 .m-listing-card-content-tabs {
   interpolate-size: allow-keywords;
 

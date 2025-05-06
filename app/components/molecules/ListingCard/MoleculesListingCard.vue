@@ -1,6 +1,6 @@
 <template>
   <div ref="$root" class="m-listing-card" :class="{
-    'm-listing-card-backdrop': isHoverImage || isHoverContent,
+    'm-listing-card-hover': isHoverImage || isHoverContent,
     'm-listing-card-image-parent-hover': isHoverImage,
     'm-listing-card-content-parent-hover': isHoverContent
   }">
@@ -25,6 +25,10 @@
           show-tabs />
       </Transition>
     </div>
+
+    <Transition name="backdrop">
+      <div v-if="isHoverImage || isHoverContent" class="m-listing-card-backdrop" />
+    </Transition>
   </div>
 </template>
 
@@ -41,7 +45,7 @@ const $root = useTemplateRef('$root')
  */
 const hoverRegion = ref('')
 
-const isHover = useElementHover($root, { delayEnter: 200 })
+const isHover = useElementHover($root, { delayEnter: 1000 })
 
 const isHoverImage = computed(() => {
   return isHover.value && hoverRegion.value === 'image'
@@ -92,7 +96,8 @@ onClickOutside($root, forceHoverNone)
 @use '#styles/_utils/functions' as fn;
 
 .m-listing-card {
-  --listing-card-expanded-size: calc(100% + (2 * var(--size-40)));
+  --listing-card-expanded-size: calc(100% + (2 * var(--size-56)));
+  --listing-card-padding: var(--size-16);
 }
 
 .m-listing-card-image-parent {
@@ -134,18 +139,14 @@ onClickOutside($root, forceHoverNone)
   text-align: center;
 }
 
-.m-listing-card-content-parent {
-  padding: 0 var(--size-16);
-}
-
 .m-listing-card-content-parent-expanded {
   position: absolute;
   top: 0;
   left: 50%;
   background: var(--background-100);
   width: var(--listing-card-expanded-size);
-  transform: translateX(-50%) translateY(calc(0px - var(--size-16)));
-  padding: var(--size-16);
+  transform: translateX(-50%) translateY(calc(0px - var(--listing-card-padding)));
+  padding: var(--listing-card-padding);
   border-radius: var(--border-radius-2xl);
 }
 
@@ -153,7 +154,7 @@ onClickOutside($root, forceHoverNone)
  *  Hover states
  */
 .m-listing-card-image-parent-hover .m-listing-card-buttons-parent {
-  transform: none;
+  transform: translateY(var(--listing-card-padding));
 }
 
 .m-listing-card-image-parent-hover .m-listing-card-content-parent-wrapper {
@@ -167,11 +168,24 @@ onClickOutside($root, forceHoverNone)
 }
 
 /**
- *  Backdrop
+ *  Hover and backdrop
  */
-.m-listing-card-backdrop {
+.m-listing-card-hover {
   position: relative;
-  z-index: 2;
+  z-index: 3;
+}
+
+.m-listing-card-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #{ fn.faded-color(90%, var(--background-200)) };
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity var(--animation-veryslow) var(--ease-out);
 }
 
 /**
@@ -197,6 +211,18 @@ onClickOutside($root, forceHoverNone)
 .content-leave-to,
 .content-enter-from {
   opacity: 0;
-  width: 100%;
+  width: calc(100% + (2 * var(--listing-card-padding)));
+}
+
+.backdrop-enter-active,
+.backdrop-leave-active {
+  transition-property: opacity;
+  transition-duration: var(--animation-veryslow);
+  transition-timing-function: var(--ease-out);
+}
+
+.backdrop-leave-to,
+.backdrop-enter-from {
+  opacity: 0;
 }
 </style>
