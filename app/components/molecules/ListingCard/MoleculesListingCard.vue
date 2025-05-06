@@ -5,7 +5,9 @@
     'm-listing-card-content-hover': isHoverContent
   }">
     <div @mouseenter="setHoverImage" role="presentation" class="| relative">
-      <MoleculesListingCardImage />
+      <button @click.prevent="forceHoverImage" class="m-listing-card-image-button">
+        <MoleculesListingCardImage />
+      </button>
 
       <Transition name="image">
         <MoleculesListingCardCarousel v-if="isHoverImage" class="m-listing-card-carousel-parent" />
@@ -17,7 +19,7 @@
     <div @mouseenter="setHoverContent" class="m-listing-card-content">
       Content
 
-      <button @click.prevent="showContentHover">Expand</button>
+      <button @click.prevent="forceHoverContent">Expand</button>
 
       <pre>image: {{ isHoverImage }}
 content: {{ isHoverContent }}</pre>
@@ -52,6 +54,9 @@ const isHoverContent = computed(() => {
   return isHover.value && hoverRegion.value === 'content'
 })
 
+/**
+ *  Set hover states
+ */
 function setHoverImage() {
   hoverRegion.value = 'image'
 }
@@ -64,20 +69,25 @@ function setHoverNone() {
   hoverRegion.value = 'none'
 }
 
-/**
- *  Set hover states for touch
- */
-function showContentHover() {
+function forceHoverImage() {
+  isHover.value = true
+  setHoverImage()
+}
+
+function forceHoverContent() {
   isHover.value = true
   setHoverContent()
 }
 
-function hideContentHover() {
+function forceHoverNone() {
   isHover.value = false
   setHoverNone()
 }
 
-onClickOutside($root, hideContentHover)
+/**
+ *  Clickout function
+ */
+onClickOutside($root, forceHoverNone)
 
 </script>
 
@@ -88,6 +98,15 @@ onClickOutside($root, hideContentHover)
   background: var(--monochrome-500);
   aspect-ratio: 4/3;
   border-radius: var(--border-radius-2xl);
+}
+
+.m-listing-card-image-button {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  width: 100%;
+  border-radius: none;
+  background: none;
 }
 
 .m-listing-card-carousel-parent {
