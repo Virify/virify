@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import type { PropertyType } from '@prisma/client';
-import { onClickOutside } from '@vueuse/core';
+import { onClickOutside, watchDebounced } from '@vueuse/core';
 import type { MinMaxPriceResponse } from '~~/shared/types/price';
 
 /**
@@ -150,17 +150,20 @@ const propertyTypes = await $fetch<PropertyType[]>('/api/property-type/all')
  */
 const suggestionsMatches = ref<string[]>([]);
 
-watchEffect(async () => {
-  const suggestionsLower = suggestions.value.toLowerCase();
-  if (suggestionsLower) {
-    const result = await $fetch<string[]>('/api/address/auto-complete', {
-      query: { location: suggestionsLower },
-    });
-    suggestionsMatches.value = result;
-  } else {
-    suggestionsMatches.value = [];
-  }
-});
+watchDebounced(
+  () => suggestions.value.toLowerCase(),
+  async (suggestionsLower) => {
+    if (suggestionsLower) {
+      const result = await $fetch<string[]>('/api/address/auto-complete', {
+        query: { location: suggestionsLower },
+      });
+      suggestionsMatches.value = result;
+    } else {
+      suggestionsMatches.value = [];
+    }
+  },
+  { debounce: 150 }
+);
 /**
  * Price range
  */
