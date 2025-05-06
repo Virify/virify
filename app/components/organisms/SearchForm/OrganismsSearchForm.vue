@@ -13,11 +13,11 @@
       </button>
     </div>
 
-    <OrganismsSearchFormPopover class="o-searchform-popover | container container-md elevate-300"
+    <OrganismsSearchFormPopover class="o-searchform-popover o-searchform-animation | container container-md elevate-300"
       :hidden="popoverHidden">
       <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
-      <div v-if="suggestions" class="o-searchform-autocomplete">
+      <div v-if="suggestions" class="o-searchform-autocomplete o-searchform-animation">
         <OrganismsSearchFormTitleBlock title="Location">
           <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
             v-slot="{ original, current, suggestion }">
@@ -52,8 +52,8 @@
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
 
-      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 200ms">
-        <LazyMoleculesRangeSlider hydrate-on-visible class="| animate-fade-down" style="--delay: 250ms" />
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
+        <LazyMoleculesRangeSlider hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
       </OrganismsSearchFormTitleBlock>
     </OrganismsSearchFormPopover>
   </form>
@@ -360,18 +360,22 @@ async function sendForm(event: Event) {
 /**
  *  Open animatinos
  */
-.o-searchform-popover {
+.o-searchform-animation {
   interpolate-size: allow-keywords;
 
-  transition: height var(--animation-slow) var(--ease-out), opacity var(--animation-medium) var(--ease-out), transform var(--animation-medium) var(--ease-out);
+  transition-duration: var(--animation-veryslow);
+  transition-timing-function: var(--ease-out);
+  transition-delay: var(--delay, 0ms);
   overflow-y: clip;
   height: calc-height(max-content, size);
 }
 
+.o-searchform-popover {
+  transition-property: opacity, transform;
+}
+
 .o-searchform-autocomplete {
-  transition: height var(--animation-veryslow) var(--ease-out);
-  overflow-y: clip;
-  height: calc-height(max-content, size);
+  transition-property: height;
 }
 
 @starting-style {
