@@ -41,7 +41,7 @@ const $root = useTemplateRef('$root')
  */
 const hoverRegion = ref('')
 
-const isHover = useElementHover($root, { delayEnter: 500 })
+const isHover = useElementHover($root, { delayEnter: 200 })
 
 const isHoverImage = computed(() => {
   return isHover.value && hoverRegion.value === 'image'
@@ -165,26 +165,6 @@ onClickOutside($root, forceHoverNone)
 .m-listing-card-backdrop {
   position: relative;
   z-index: 2;
-
-  &::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    background: #{ fn.faded-color(70%, var(--background-200)) };
-    pointer-events: none;
-    z-index: -1;
-    transition: opacity var(--animation-veryslow) var(--ease-out);
-  }
-}
-
-@starting-style {
-  .m-listing-card-backdrop::before {
-    opacity: 0;
-  }
 }
 
 /**
