@@ -6,7 +6,7 @@
 .m-listing-card-image {
   background: var(--monochrome-500);
   aspect-ratio: 4/3;
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--border-radius-2xl);
 
   /* FOR TESTING */
   display: flex;
