@@ -10,13 +10,14 @@ const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
   radius: z.coerce.number().min(0).max(100),
   propertyTypes: z.array(z.string()).optional(),
+  priceRange: z.array(z.coerce.number()).optional(),
 });
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 
   try {
-    const { buyOrRent, radius, propertyTypes } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, propertyTypes, priceRange } = await readValidatedBody(event, searchSchema.parse);
 
     if (radius === undefined || !buyOrRent) {
       throw createError({ statusCode: 400, statusMessage: "Missing required fields: radius or buyOrRent" });
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
     if (!fetchListings) {
       throw createError({ statusCode: 400, statusMessage: `Unsupported listing type: ${buyOrRent}` });
     }
-    const listings = await fetchListings(searchLocation, radius, propertyTypes);
+    const listings = await fetchListings(searchLocation, radius, propertyTypes, priceRange);
 
     return listings;
   } catch (error) {

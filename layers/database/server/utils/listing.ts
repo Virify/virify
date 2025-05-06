@@ -1,6 +1,7 @@
 import type { Listing } from "@prisma/client";
 import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
+import { getPriceFilter } from "./price";
 
 /**
  * Get a listing by ID
@@ -89,13 +90,15 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getSaleListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[]): Promise<ListingSaleWithFullProperty[]> {
+export async function getSaleListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[], priceRange?: number[]): Promise<ListingSaleWithFullProperty[]> {
   const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
+
   return await prisma.listing.findMany({
     where: {
       saleListing: {
         isNot: null,
       },
+      price: getPriceFilter(priceRange),
       property: {
         id: {
           in: nearbyProperties.map((p) => p.propertyId),
@@ -124,13 +127,14 @@ export async function getSaleListingsByDistance(location: AddressLocation, radiu
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getRentalListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[]): Promise<ListingRentalWithFullProperty[]> {
+export async function getRentalListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[], priceRange?: number[]): Promise<ListingRentalWithFullProperty[]> {
   const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
   return await prisma.listing.findMany({
     where: {
       rentalListing: {
         isNot: null,
       },
+      price: getPriceFilter(priceRange),
       property: {
         id: {
           in: nearbyProperties.map((p) => p.propertyId),
@@ -152,3 +156,4 @@ export async function getRentalListingsByDistance(location: AddressLocation, rad
     },
   });
 }
+

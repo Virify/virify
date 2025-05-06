@@ -215,7 +215,8 @@ async function sendForm(event: Event) {
       buyOrRent: formData?.get('buyOrRent'),
       propertyTypes: propertyTypes.map(({ name }) => {
         return formData?.get(name)
-      }).filter(Boolean)
+      }).filter(Boolean),
+      priceRange: selectedPriceRange.value,
     },
   });
 
