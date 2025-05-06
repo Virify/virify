@@ -29,6 +29,7 @@ defineProps({
   },
 })
 const { fetch } = useUserSession();
+const { hideDialog } = useDialog();
 
 /**
  *  Modal control
@@ -39,7 +40,7 @@ const { fetch } = useUserSession();
  */
 async function formSuccess() {
   await fetch();
-  navigateTo("/account");
+  hideDialog();
 }
 </script>
 <style>
