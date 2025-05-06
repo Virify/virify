@@ -10,7 +10,7 @@ export default defineEventHandler(async (event): Promise<MinMaxPriceResponse | u
   const { errorResponse } = useResponse();
   try {
     const saleMinMax = await getMinMaxPrice('sales');
-    const rentalMinMax = await getMinMaxPrice();
+    const rentalMinMax = await getMinMaxPrice('rentals');
 
     if (!saleMinMax || !rentalMinMax) throw createError({ statusCode: 500, statusMessage: "Failed to retrieve min and max prices" });
 
