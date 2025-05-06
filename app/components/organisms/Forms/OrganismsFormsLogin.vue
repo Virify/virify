@@ -4,8 +4,7 @@
       <AtomsInput :id type="email" name="email" required />
     </MoleculesFormField>
 
-    <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" :pattern
-      :custom-validation="validityText" />
+    <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" />
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Log in </AtomsButton>
   </MoleculesForm>
