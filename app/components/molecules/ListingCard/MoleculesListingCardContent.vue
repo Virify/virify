@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 interface Props {
-  showTabs: boolean
+  showTabs?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
