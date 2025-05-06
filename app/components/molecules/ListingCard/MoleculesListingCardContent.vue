@@ -110,7 +110,6 @@ withDefaults(defineProps<Props>(), {
   transition-timing-function: var(--ease-out);
   transition-delay: var(--delay, 0ms);
   overflow-y: clip;
-  margin: var(--size-16);
   height: calc-height(max-content, size);
 }
 
