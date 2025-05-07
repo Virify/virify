@@ -5,9 +5,9 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="listing in listings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col">
         <!-- Property Image -->
-        <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata" class="w-full h-42 object-cover" />
-        <MoleculesAddToFav :listing-id="listing.id" @add-to-favourites="handleAdd"/>
-        <MoleculesRemoveFromFav :listing-id="listing.id" @remove-from-favourties="handleRemove"/>
+        <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata"
+          class="w-full h-42 object-cover" />
+        <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" />
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
@@ -17,9 +17,7 @@
 
           <!-- Address -->
           <p class="text-sm mt-2">
-            <span>{{ listing.property?.address.street }}</span
-            >, <span>{{ listing.property?.address.city }}</span
-            >,
+            <span>{{ listing.property?.address.street }}</span>, <span>{{ listing.property?.address.city }}</span>,
             <span>{{ listing.property?.address.postcode }}</span>
           </p>
 
@@ -50,7 +48,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import MoleculesRemoveFromFav from './molecules/MoleculesRemoveFromFav.vue';
 defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
@@ -63,12 +60,13 @@ defineProps({
 const emit = defineEmits(['remove-from-listings']);
 const { addToFavourites, removeFromFavourites } = useFavourites();
 
-const handleAdd = async (listingId: number) => {
-  await addToFavourites(listingId);
-};
-
-const handleRemove = async (listingId: number) => {
-  await removeFromFavourites(listingId);
-  emit('remove-from-listings', listingId);
+const handleToggle = async (listingId: number, action: 'add' | 'remove') => {
+  if (action === 'add') {
+    await addToFavourites(listingId);
+  }
+  if (action === 'remove') {
+    emit('remove-from-listings', listingId);
+    await removeFromFavourites(listingId);
+  }
 };
 </script>
