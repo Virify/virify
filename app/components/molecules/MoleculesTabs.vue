@@ -2,8 +2,9 @@
   <div class="m-tabs">
     <ul role="tablist" class="m-tabs-tabheading">
       <li v-for="{ label }, index of validOptions" role="presentation">
-        <button type="button" role="tab" :aria-controls="tabsId" :aria-expanded="index === currentIndex"
-          class="m-tabs-tabbutton | body-sm font-semibold" @click.prevent="setCurrentOption(index)">
+        <button ref="$button" type="button" role="tab" :aria-controls="tabsId" :aria-expanded="index === currentIndex"
+          :tabindex="index === focusIndex ? '0' : '-1'" class="m-tabs-tabbutton | body-sm font-semibold"
+          @keydown.left="setPreviousOptions" @keydown.right="setNextOptions" @click.prevent="setCurrentOption(index)">
           {{ label }}
         </button>
       </li>
@@ -64,6 +65,35 @@ const currentIndex = ref(0)
 function setCurrentOption(index: number) {
   currentIndex.value = index
 }
+
+/**
+ *  Track focus for a11y
+ */
+const focusIndex = ref(0)
+const $button = useTemplateRef<HTMLButtonElement[]>('$button')
+
+function setPreviousOptions() {
+  focusIndex.value = focusIndex.value - 1
+
+  if (focusIndex.value < 0) {
+    focusIndex.value = optionsCount.value - 1
+  }
+}
+
+function setNextOptions() {
+  focusIndex.value = focusIndex.value + 1
+
+  if (focusIndex.value >= optionsCount.value) {
+    focusIndex.value = 0
+  }
+}
+
+watch(focusIndex, (newIndex: number) => {
+  if (!$button.value) return
+
+  $button.value[newIndex]?.focus()
+})
+
 </script>
 
 <style>
