@@ -1,6 +1,6 @@
 <template>
   <div ref="$root" class="m-listing-card" :class="{
-    'm-listing-card-hover': isHoverImage || isHoverContent,
+    'm-listing-card-hover': isHoverContentOrImage,
     'm-listing-card-image-parent-hover': isHoverImage,
     'm-listing-card-content-parent-hover': isHoverContent
   }">
@@ -27,7 +27,7 @@
     </div>
 
     <Transition name="backdrop">
-      <div v-if="isHoverImage || isHoverContent" class="m-listing-card-backdrop" />
+      <div v-if="isHoverContentOrImage" class="m-listing-card-backdrop" />
     </Transition>
   </div>
 </template>
@@ -53,6 +53,10 @@ const isHoverImage = computed(() => {
 
 const isHoverContent = computed(() => {
   return isHover.value && hoverRegion.value === 'content'
+})
+
+const isHoverContentOrImage = computed(() => {
+  return isHoverImage.value || isHoverContent.value
 })
 
 /**
@@ -137,11 +141,6 @@ onClickOutside($root, forceHoverNone)
 /**
  *  Hover and backdrop
  */
-.m-listing-card-hover {
-  position: relative;
-  z-index: 3;
-}
-
 .m-listing-card-backdrop {
   position: fixed;
   top: 0;
@@ -203,11 +202,27 @@ onClickOutside($root, forceHoverNone)
   transition-property: opacity;
   transition-duration: 1s;
   transition-timing-function: var(--ease-out);
+}
+
+.backdrop-enter-active {
   transition-delay: 200ms;
 }
 
 .backdrop-leave-to,
 .backdrop-enter-from {
   opacity: 0;
+}
+
+/**
+ *  Retain z-index for animations
+ */
+.m-listing-card:has(.backdrop-leave-active) {
+  position: relative;
+  z-index: 2;
+}
+
+.m-listing-card-hover {
+  position: relative;
+  z-index: 3;
 }
 </style>

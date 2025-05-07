@@ -1,6 +1,6 @@
 <template>
   <div class="m-listing-card-content | flow flow-sm" role="presentation">
-    <h3 class="m-listing-card-content-title | title-xs">32 Someplace St., Cardiff</h3>
+    <h3 class="m-listing-card-content-title | title-xs">32 Someplace St, Cardiff</h3>
 
     <ul class="m-listing-card-content-icons">
       <li class="| font-semibold body-xs">
