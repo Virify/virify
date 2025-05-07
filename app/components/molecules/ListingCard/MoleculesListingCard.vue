@@ -149,7 +149,7 @@ onClickOutside($root, forceHoverNone)
   width: 100%;
   height: 100%;
   display: block;
-  background: #{ fn.faded-color(90%, var(--background-200)) };
+  background: #{ fn.faded-color(85%, var(--background-200)) };
   pointer-events: none;
   z-index: -1;
 }
@@ -201,7 +201,7 @@ onClickOutside($root, forceHoverNone)
 .backdrop-enter-active,
 .backdrop-leave-active {
   transition-property: opacity;
-  transition-duration: 1s;
+  transition-duration: 0.6s;
   transition-timing-function: var(--ease-out);
 }
 
