@@ -1,51 +1,36 @@
-/**
- * Use Paginated Listings
- * 
- * @param baseUrl string
- * @param pageSize number
- */
-export function usePaginatedListings<T>(baseUrl: string, pageSize: number = 12) {
+export function usePaginatedListings<T>(baseUrl: string, pageSize: number = 12, initial: T[] = []) {
   /**
-   * state
+   * State
    */
-  const listings = ref<T[]>([]);
+  const listings: Ref<T[]> = ref([...initial]) as Ref<T[]>;
   const currentPage = ref(1);
   const hasMoreListings = ref(true);
-
-/**
- * Fetch Listings
- */
-  async function fetchListings(page: number) {
-    const { data } = await useAsyncData(
-      `listings-page-${page}`,
-      () => $fetch<T[]>(`${baseUrl}?page=${page}&pageSize=${pageSize}`)
-    );
-
-    if (!data.value) {
-      hasMoreListings.value = false;
-    } else {
-      hasMoreListings.value = data.value.length === pageSize;
-    }
-
-    listings.value = data.value || [];
-  }
+  const isLoading = ref(false);
 
   /**
-   * watchers
+   * Fetch more listings
    */
-  watch(currentPage, (newPage) => {
-    fetchListings(newPage);
-  });
+  async function fetchMoreListings() {
+    if (isLoading.value) return;
+    isLoading.value = true;
 
-/** 
- * Initial fetch
- */
-  fetchListings(currentPage.value);
+    const nextPage = currentPage.value + 1;
+    const newListings = await $fetch<T[]>(`${baseUrl}?page=${nextPage}&pageSize=${pageSize}`);
+
+    if (!newListings.length || newListings.length < pageSize) {
+      hasMoreListings.value = false;
+    }
+
+    listings.value.push(...newListings);
+    currentPage.value = nextPage;
+    isLoading.value = false;
+  }
 
   return {
     listings,
     currentPage,
     hasMoreListings,
-    fetchListings
+    fetchMoreListings,
+    isLoading,
   };
 }

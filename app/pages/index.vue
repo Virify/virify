@@ -1,48 +1,62 @@
 <template>
-  <div>
+  <div ref="scrollContainer">
     <OrganismsHeroHome />
 
     <SearchListings v-if="searchListings" :listings="searchListings" />
     <div v-else>
       <FeaturedListings :listings="listings" />
-
-      <MoleculesPagination
-        v-model:currentPage="currentPage"
-        :has-more-listings="hasMoreListings"
-      />
+      <div ref="infiniteTrigger" class="p-index-spacer"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { usePaginatedListings } from '~/composables/usePaginatedListings';
+import { useIntersectionObserver } from '@vueuse/core';
+
 /**
- * state
+ * State
  */
 const searchListings = ref<ListingWithFullProperty[] | null>(null);
 provide("searchListings", searchListings);
-const pageSize = 12;
+const pageSize = 20;
 
 /**
- * Pagination setup from composable
+ * Fetch initial listings
  */
-const { listings, currentPage, hasMoreListings } = usePaginatedListings<ListingWithFullProperty>('/api/listings/featured', pageSize);
+const { data: initialListings } = await useAsyncData('featured-listings', () =>
+  $fetch<ListingWithFullProperty[]>('/api/listings/featured?page=1&pageSize=12')
+);
+
+/**
+ * Pagination
+ */
+const {
+  listings,
+  hasMoreListings,
+  fetchMoreListings,
+  isLoading
+} = usePaginatedListings<ListingWithFullProperty>('/api/listings/featured', pageSize, initialListings.value || []);
+
+/**
+ * Infinite scroll trigger
+ */
+const infiniteTrigger = ref(null);
+
+/**
+ * Trigger for infinite scroll
+ */
+useIntersectionObserver(
+  infiniteTrigger,
+  (entries) => {
+    const entry = entries[0];
+    if (entry?.isIntersecting && hasMoreListings.value && !isLoading.value) {
+      console.log('Fetching more listings...');
+      fetchMoreListings();
+    }
+  },
+  {
+    rootMargin: '0px 0px 200px 0px',
+  }
+);
 </script>
-
-<style>
-.p-index-spacer {
-  height: 100vh;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  gap: 10px;
-}
-
-.pagination-info {
-  font-size: 16px;
-  font-weight: bold;
-}
-</style>
