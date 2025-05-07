@@ -1,5 +1,5 @@
 import { ListingTier, type Listing } from "@prisma/client";
-import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingWithFullProperty } from "~~/shared/types/listing";
+import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
 import { getNearbyPropertiesByTextQuery } from "./location";
@@ -46,12 +46,13 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
  *
  * @returns ListingWithFullProperty[]
  */
-export async function getAllFeaturedListings(amount: number = 9): Promise<ListingWithFullProperty[] | undefined> {
+export async function getAllFeaturedListings(take: number = 20, skip: number = 0): Promise<ListingWithFullProperty[] | undefined> {
   return await prisma.listing.findMany({
     where: {
       listingTier: ListingTier.FEATURED,
     },
-    take: amount,
+    take,
+    skip,
     include: {
       rentalListing: true,
       saleListing: true,
@@ -114,7 +115,10 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getSaleListingsByDistance(location: string, radius: number, propertyTypes?: string[], priceRange?: number[], bedrooms?: number[], bathrooms?: number[]): Promise<ListingSaleWithFullProperty[]> {
+export async function getSaleListingsByDistance(
+  { location, radius }: ListingSearch,
+  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
+): Promise<ListingSaleWithFullProperty[]> {
   const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
 
   return await prisma.listing.findMany({
@@ -146,6 +150,8 @@ export async function getSaleListingsByDistance(location: string, radius: number
           : undefined,
       },
     },
+    take,
+    skip,
     include: {
       saleListing: true,
       property: {
@@ -163,7 +169,9 @@ export async function getSaleListingsByDistance(location: string, radius: number
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getRentalListingsByDistance(location: string, radius: number, propertyTypes?: string[], priceRange?: number[], bedrooms?: number[], bathrooms?: number[]): Promise<ListingRentalWithFullProperty[]> {
+export async function getRentalListingsByDistance( { location, radius }: ListingSearch,
+  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
+): Promise<ListingRentalWithFullProperty[]> {
   const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
   return await prisma.listing.findMany({
     where: {
@@ -194,6 +202,8 @@ export async function getRentalListingsByDistance(location: string, radius: numb
           : undefined,
       },
     },
+    take,
+    skip,
     include: {
       rentalListing: true,
       property: {

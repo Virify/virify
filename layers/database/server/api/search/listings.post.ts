@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { getSaleListingsByDistance, getRentalListingsByDistance } from "../../utils/listing";
+import type { ListingSearch, ListingSearchOptional } from "~~/shared/types/listing";
 
 const LISTING_FETCHERS = {
   rent: getRentalListingsByDistance,
@@ -31,13 +32,26 @@ export default defineEventHandler(async (event) => {
     validateQueries(radius, buyOrRent, location);
 
     const fetchListings = LISTING_FETCHERS[buyOrRent];
+    
 
     if (!fetchListings) {
       throw createError({ statusCode: 400, statusMessage: `Unsupported listing type: ${buyOrRent}` });
     }
 
+    const listingSearch: ListingSearch = {
+      location,
+      radius,
+    };
+
+    const optional: ListingSearchOptional = {
+      bedrooms,
+      bathrooms,
+      propertyTypes,
+      priceRange,
+    };
+
     // we won't need the location when we integrate with mapbox - we just get coords - reduces a read of the database
-    const listings = await fetchListings(location, radius, propertyTypes, priceRange, bedrooms, bathrooms);
+    const listings = await fetchListings(listingSearch, optional);
 
     return listings;
   } catch (error) {

@@ -2,7 +2,7 @@
   <div class="| container">
     <h1 class="| title-2xl lineheight-sm">Search Listings:</h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-if="listings.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="listing in listings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col">
         <!-- Property Image -->
         <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata" class="w-full h-42 object-cover" />
@@ -45,6 +45,9 @@
           <NuxtLink :to="`/listing/${listing.id}`" class="text-blue-600 hover:underline"> View Full Listing </NuxtLink>
         </div>
       </div>
+    </div>
+    <div v-else class="text-center">
+      <p class="text-lg">No listings found.</p>
     </div>
   </div>
 </template>
