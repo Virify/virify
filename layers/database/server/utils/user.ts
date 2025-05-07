@@ -1,4 +1,4 @@
-import { type User, Prisma, Reviewed } from "@prisma/client";
+import { type User, type UserFavourites, Prisma, Reviewed } from "@prisma/client";
 import { prisma } from "./prisma-client";
 export type UserWithVerification = Prisma.UserGetPayload<{ include: { verification: true } }>;
 export type { User };
@@ -290,6 +290,57 @@ export async function updateUserAndReview(id: number, approval: Reviewed, token:
     });
   }
 }
+
+/**
+ * Get user favourites by ID
+ * 
+ * @param id number
+ * @returns user
+ */
+export async function getUserFavourites(id: number): Promise<UserFavourites | null> {
+  return prisma.userFavourites.findUnique({
+    where: { userId: id },
+    include: {
+      listings: {
+        include: {
+          property: {
+            include: {
+              ...propertyInclude
+            }
+          }
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Add a listing to the user's favourites from the UserFavourites table
+ * 
+ * @param userId number (User ID)
+ * @param favouriteId number (Listing ID to be added to favourites)
+ * @returns UserFavourites
+ */
+export async function addFavouriteFromUserFavourites(userId: number, favouriteId: number): Promise<UserFavourites> {
+  return prisma.userFavourites.upsert({
+    where: { userId },
+    create: {
+      userId,
+      listings: {
+        connect: { id: favouriteId }
+      }
+    },
+    update: {
+      listings: {
+        connect: { id: favouriteId }
+      }
+    }
+  });
+}
+
+
+
+
 
 /**
  * Check if a user is active.

@@ -63,6 +63,11 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
           id: propertyId,
         },
       },
+      user: {
+        connect: {
+          id: 1, // admin user
+        },
+      }
     },
   });
 
@@ -96,6 +101,11 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
           id: propertyId,
         },
       },
+      user: {
+        connect: {
+          id: 1, // admin user
+        },
+      }
     },
   });
 

@@ -4,7 +4,7 @@
 
     <SearchListings v-if="searchListings" :listings="searchListings" />
     <div v-else>
-      <FeaturedListings :listings="listings" />
+      <FeaturedListings :listings="listings" @add-to-favourites="log" />
       <div ref="infiniteTrigger" class="p-index-spacer"></div>
     </div>
   </div>
@@ -14,6 +14,20 @@
 import { usePaginatedListings } from '~/composables/usePaginatedListings';
 import { useIntersectionObserver } from '@vueuse/core';
 
+async function log(listing: any) {
+  console.log('Added to favourites:', listing.id);
+  // Add logic here to save the listing to the user's favourites
+  await $fetch('/api/user/add-to-favourite', {
+    method: 'POST',
+    body: {
+      listing: listing.id,
+    },
+  }).then(() => {
+    console.log('Added to favourites:', listing.id);
+  }).catch((error) => {
+    console.error('Error adding to favourites:', error);
+  });
+}
 /**
  * State
  */

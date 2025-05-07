@@ -593,6 +593,16 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
+CREATE TABLE "UserFavourites" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "UserFavourites_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Verification" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER,
@@ -628,6 +638,14 @@ CREATE TABLE "_AgentToProperty" (
     "B" INTEGER NOT NULL,
 
     CONSTRAINT "_AgentToProperty_AB_pkey" PRIMARY KEY ("A","B")
+);
+
+-- CreateTable
+CREATE TABLE "_ListingToUserFavourites" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_ListingToUserFavourites_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -799,6 +817,12 @@ CREATE UNIQUE INDEX "User_passwordResetToken_key" ON "User"("passwordResetToken"
 CREATE INDEX "User_addressId_idx" ON "User"("addressId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "UserFavourites_userId_key" ON "UserFavourites"("userId");
+
+-- CreateIndex
+CREATE INDEX "UserFavourites_userId_idx" ON "UserFavourites"("userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Verification_userId_key" ON "Verification"("userId");
 
 -- CreateIndex
@@ -815,6 +839,9 @@ CREATE INDEX "_AgentToListing_B_index" ON "_AgentToListing"("B");
 
 -- CreateIndex
 CREATE INDEX "_AgentToProperty_B_index" ON "_AgentToProperty"("B");
+
+-- CreateIndex
+CREATE INDEX "_ListingToUserFavourites_B_index" ON "_ListingToUserFavourites"("B");
 
 -- AddForeignKey
 ALTER TABLE "Agent" ADD CONSTRAINT "Agent_estateAgentId_fkey" FOREIGN KEY ("estateAgentId") REFERENCES "EstateAgent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -916,6 +943,9 @@ ALTER TABLE "Utility" ADD CONSTRAINT "Utility_propertyId_fkey" FOREIGN KEY ("pro
 ALTER TABLE "User" ADD CONSTRAINT "User_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "UserFavourites" ADD CONSTRAINT "UserFavourites_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Verification" ADD CONSTRAINT "Verification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -932,3 +962,9 @@ ALTER TABLE "_AgentToProperty" ADD CONSTRAINT "_AgentToProperty_A_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "_AgentToProperty" ADD CONSTRAINT "_AgentToProperty_B_fkey" FOREIGN KEY ("B") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ListingToUserFavourites" ADD CONSTRAINT "_ListingToUserFavourites_A_fkey" FOREIGN KEY ("A") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ListingToUserFavourites" ADD CONSTRAINT "_ListingToUserFavourites_B_fkey" FOREIGN KEY ("B") REFERENCES "UserFavourites"("id") ON DELETE CASCADE ON UPDATE CASCADE;

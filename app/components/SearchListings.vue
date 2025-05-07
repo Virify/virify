@@ -6,7 +6,6 @@
       <div v-for="listing in listings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col">
         <!-- Property Image -->
         <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata" class="w-full h-42 object-cover" />
-
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
