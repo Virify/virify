@@ -4,7 +4,7 @@ model AdditionalToilet {
   upstairs       Boolean  @default(false)
   guestCloakroom Boolean  @default(false)
   description    String?
-  propertyId     Int
+  propertyId     Int      @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   property       Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)

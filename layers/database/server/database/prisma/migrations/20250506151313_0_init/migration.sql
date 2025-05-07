@@ -299,7 +299,6 @@ CREATE TABLE "Bedroom" (
 -- CreateTable
 CREATE TABLE "Diningroom" (
     "id" SERIAL NOT NULL,
-    "roomNumber" INTEGER NOT NULL DEFAULT 1,
     "openConcept" BOOLEAN NOT NULL DEFAULT false,
     "description" TEXT NOT NULL,
     "size" DOUBLE PRECISION,
@@ -376,7 +375,6 @@ CREATE TABLE "Land" (
 -- CreateTable
 CREATE TABLE "LivingArea" (
     "id" SERIAL NOT NULL,
-    "roomNumber" INTEGER NOT NULL,
     "fireplace" "FireplaceType",
     "balcony" BOOLEAN NOT NULL DEFAULT false,
     "description" TEXT NOT NULL,
@@ -445,6 +443,9 @@ CREATE TABLE "Property" (
     "vacant" BOOLEAN NOT NULL DEFAULT false,
     "constructionType" "ConstructionType",
     "floorLevel" INTEGER,
+    "numberBedrooms" INTEGER DEFAULT 0,
+    "numberBathrooms" INTEGER DEFAULT 0,
+    "numberReceptions" INTEGER DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "addressId" INTEGER NOT NULL,
@@ -469,6 +470,7 @@ CREATE TABLE "PropertyClassification" (
 CREATE TABLE "PropertyType" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "defaultSelected" BOOLEAN NOT NULL,
 
     CONSTRAINT "PropertyType_pkey" PRIMARY KEY ("id")
 );
@@ -641,6 +643,9 @@ CREATE INDEX "address_city_idx" ON "Address"("city");
 CREATE INDEX "address_street_idx" ON "Address"("street");
 
 -- CreateIndex
+CREATE INDEX "address_autocomplete_idx" ON "Address"("street", "city", "postcode", "country");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Address_street_city_postcode_country_key" ON "Address"("street", "city", "postcode", "country");
 
 -- CreateIndex
@@ -665,6 +670,9 @@ CREATE INDEX "Listing_userId_idx" ON "Listing"("userId");
 CREATE INDEX "Listing_propertyId_idx" ON "Listing"("propertyId");
 
 -- CreateIndex
+CREATE INDEX "Listing_price_idx" ON "Listing"("price");
+
+-- CreateIndex
 CREATE INDEX "RentalListing_id_idx" ON "RentalListing"("id");
 
 -- CreateIndex
@@ -686,6 +694,9 @@ CREATE UNIQUE INDEX "AdditionalFeatures_propertyId_key" ON "AdditionalFeatures"(
 CREATE INDEX "AdditionalFeatures_propertyId_idx" ON "AdditionalFeatures"("propertyId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Amenities_propertyId_key" ON "Amenities"("propertyId");
+
+-- CreateIndex
 CREATE INDEX "Amenities_propertyId_idx" ON "Amenities"("propertyId");
 
 -- CreateIndex
@@ -693,6 +704,9 @@ CREATE INDEX "Bathroom_propertyId_idx" ON "Bathroom"("propertyId");
 
 -- CreateIndex
 CREATE INDEX "Bedroom_propertyId_idx" ON "Bedroom"("propertyId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Diningroom_propertyId_key" ON "Diningroom"("propertyId");
 
 -- CreateIndex
 CREATE INDEX "Diningroom_propertyId_idx" ON "Diningroom"("propertyId");
@@ -716,6 +730,9 @@ CREATE UNIQUE INDEX "Land_propertyId_key" ON "Land"("propertyId");
 CREATE INDEX "Land_propertyId_idx" ON "Land"("propertyId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "LivingArea_propertyId_key" ON "LivingArea"("propertyId");
+
+-- CreateIndex
 CREATE INDEX "LivingArea_propertyId_idx" ON "LivingArea"("propertyId");
 
 -- CreateIndex
@@ -729,6 +746,9 @@ CREATE UNIQUE INDEX "Parking_propertyId_key" ON "Parking"("propertyId");
 
 -- CreateIndex
 CREATE INDEX "Parking_propertyId_idx" ON "Parking"("propertyId");
+
+-- CreateIndex
+CREATE INDEX "Property_addressId_idx" ON "Property"("addressId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PropertyType_name_key" ON "PropertyType"("name");
@@ -755,7 +775,13 @@ CREATE UNIQUE INDEX "Storage_propertyId_key" ON "Storage"("propertyId");
 CREATE INDEX "Storage_propertyId_idx" ON "Storage"("propertyId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "AdditionalToilet_propertyId_key" ON "AdditionalToilet"("propertyId");
+
+-- CreateIndex
 CREATE INDEX "AdditionalToilet_propertyId_idx" ON "AdditionalToilet"("propertyId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Utility_propertyId_key" ON "Utility"("propertyId");
 
 -- CreateIndex
 CREATE INDEX "Utility_propertyId_idx" ON "Utility"("propertyId");

@@ -9,10 +9,11 @@
 </template>
 
 <script setup lang="ts">
+const { hideDialog } = useDialog();
 /**
  *  Success
  */
 function formSuccess() {
-  navigateTo("/account");
+  hideDialog();
 }
 </script>
