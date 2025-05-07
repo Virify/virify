@@ -2,7 +2,7 @@
   <div class="container">
 
     <div v-if="favorites.length > 0" class="mb-6">
-      <FeaturedListings :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites" />
+      <FeaturedListings :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites"  />
     </div>
 
     <div class="w-full sm:w-lg">
@@ -48,7 +48,7 @@ const { getFavourites, removeListingFromArray } = useFavourites();
 
 const favorites = ref<ListingWithFullProperty[]>([]);
 
-onMounted(() => {
+onMounted(async () => {
   // Fetch the user's favorites when the component is mounted
   fetchFavorites();
 });

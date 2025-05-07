@@ -30,8 +30,8 @@ export async function getUserFavourites(id: number): Promise<UserFavourites | nu
  * @param favouriteId number (Listing ID to be added to favourites)
  * @returns UserFavourites
  */
-export async function addFavouriteFromUserFavourites(userId: number, favouriteId: number): Promise<UserFavourites> {
-  return prisma.userFavourites.upsert({
+export async function addFavouriteFromUserFavourites(userId: number, favouriteId: number): Promise<Number[]> {
+ const userFavourites = await prisma.userFavourites.upsert({
     where: { userId },
     create: {
       userId,
@@ -43,9 +43,16 @@ export async function addFavouriteFromUserFavourites(userId: number, favouriteId
       listings: {
         connect: { id: favouriteId }
       }
+    },
+    include: {
+      listings: {
+        select: { id: true }
+      }
     }
   });
+  return userFavourites.listings.map(listing => listing.id);
 }
+
 
 /**
  * Remove a listing from the user's favourites from the UserFavourites table
@@ -54,15 +61,21 @@ export async function addFavouriteFromUserFavourites(userId: number, favouriteId
  * @param favouriteId number (Listing ID to be removed from favourites)
  * @returns UserFavourites
  */
-export async function deleteFavouriteFromUserFavourites(userId: number, favouriteId: number): Promise<UserFavourites> {
-  return prisma.userFavourites.update({
+export async function deleteFavouriteFromUserFavourites(userId: number, favouriteId: number): Promise<Number[]> {
+  const userFavourites = await prisma.userFavourites.update({
     where: { userId },
     data: {
       listings: {
         disconnect: { id: favouriteId }
       }
+    },
+    include: {
+      listings: {
+        select: { id: true }
+      }
     }
   });
+  return userFavourites.listings.map(listing => listing.id);
 }
 
 /**
@@ -80,4 +93,26 @@ export async function deleteAllFavouritesFromUserFavourites(userId: number): Pro
       }
     }
   });
+}
+
+/**
+ * Get all favourite listings IDs for a user
+ * 
+ * @param userId number (User ID)
+ * @param favouriteId number (Listing ID to be checked)
+ * @returns Favourite Listings by ID
+ */
+export async function getFavouriteListingIds(userId: number): Promise<Number[]> {
+  const userFavourites = await prisma.userFavourites.findUnique({
+    where: { userId },
+    select: {
+      listings: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+
+  return userFavourites?.listings.map(listing => listing.id) || [];
 }

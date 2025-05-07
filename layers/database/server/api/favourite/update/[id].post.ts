@@ -9,15 +9,10 @@ export default defineEventHandler(async (event) => {
     const userId = session?.user?.id;
 
     if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-    console.log("userId", userId);
-    console.log("listing", listing);
 
-    await addFavouriteFromUserFavourites(userId, listing);
+    const listings = await addFavouriteFromUserFavourites(userId, listing);
 
-    return {
-      statusCode: 200,
-      message: "Favourites updated successfully",
-    };
+    return listings;
   } catch (error) {
     console.log(error);
     return errorResponse(error, event);
