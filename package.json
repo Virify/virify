@@ -30,6 +30,7 @@
     "@vue-email/render": "^0.0.9",
     "@vueuse/core": "^13.1.0",
     "auth-utils": "^1.0.0",
+    "embla-carousel-vue": "^8.6.0",
     "nuxi": "^3.25.0",
     "nuxt": "^3.17.1",
     "nuxt-auth-utils": "^0.5.20",
