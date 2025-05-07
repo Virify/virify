@@ -10,7 +10,8 @@
       </button>
 
       <Transition name="image">
-        <MoleculesListingCardCarousel v-if="isHoverImage" class="m-listing-card-carousel-parent" />
+        <LazyMoleculesListingCardCarousel v-if="isHoverImage" class="m-listing-card-carousel-parent"
+          hydrate-on-visible />
       </Transition>
     </div>
 

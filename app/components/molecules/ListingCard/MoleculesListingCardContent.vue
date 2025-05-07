@@ -20,7 +20,7 @@
     </ul>
 
     <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding">
-      <p>TABS</p>
+      <LazyMoleculesListingCardTabs hydrate-on-visible />
 
       <p class="| body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut
         aliquam quis ab</p>
