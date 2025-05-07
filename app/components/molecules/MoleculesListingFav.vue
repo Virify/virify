@@ -2,11 +2,11 @@
   <div>
     <button
     class="| button button-secondary button-xs"
-    @click="toggle(currentFavourite ? 'remove' : 'add')"
+    @click="toggle(isCurrentFavourite ? 'remove' : 'add')"
     aria-label="Toggle favourite"
   >
     <Icon
-      :name="currentFavourite ? 'iconoir:trash' : 'material-symbols:kid-star-outline-sharp'"
+      :name="isCurrentFavourite ? 'iconoir:trash' : 'material-symbols:kid-star-outline-sharp'"
       class="icon"
     />
   </button>
@@ -26,7 +26,7 @@ const props = defineProps({
 
 const { isFavourite } = useFavourites();
 
-const currentFavourite = computed(() => {
+const isCurrentFavourite = computed(() => {
   return isFavourite(props.listingId, props.userFavourites || []);
 });
 
