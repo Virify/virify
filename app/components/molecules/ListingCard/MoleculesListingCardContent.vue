@@ -22,7 +22,9 @@
     </h3>
 
     <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding | flow flow-md">
-      <LazyMoleculesListingCardTabs hydrate-on-visible />
+      <LazyMoleculesTabs :options="tabContent" v-slot="{ ...option }">
+        {{ option }}
+      </LazyMoleculesTabs>
 
       <p class="| body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut
         aliquam quis ab</p>
@@ -48,6 +50,12 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   showTabs: false
 })
+
+const tabContent = [
+  { label: 'Description', content: 'Hello, World' },
+  { label: 'Features', content: 'See all features' },
+  { label: 'Amenities', content: 'The amenities, wow!' },
+]
 </script>
 
 <style lang="scss">
