@@ -1,6 +1,6 @@
 <template>
   <div class="m-range-slider">
-    <SliderRoot v-model="rangeValue" :min :max class="m-range-slider-root">
+    <SliderRoot v-model="rangeValue" :min="min" :max="max" class="m-range-slider-root">
       <SliderTrack class="m-range-slider-track">
         <SliderRange class="m-range-slider-range" />
       </SliderTrack>
@@ -21,33 +21,52 @@
 </template>
 
 <script setup lang="ts">
-import { SliderRoot, SliderTrack, SliderRange, SliderThumb } from 'reka-ui'
+import { SliderRoot, SliderTrack, SliderRange, SliderThumb } from "reka-ui";
 
 /**
  *  Props
  */
-interface Props {
-  min?: number
-  max?: number
-  startingMin?: number
-  startingMax?: number
-}
+const props = defineProps({
+  min: {
+    type: Number,
+    default: 0,
+  },
+  max: {
+    type: Number,
+    default: 100,
+  },
+  startingMin: {
+    type: Number,
+    default: 0,
+  },
+  startingMax: {
+    type: Number,
+    default: 100,
+  },
+});
 
-withDefaults(defineProps<Props>(), {
-  min: 0,
-  max: 100,
-  startingMin: 25,
-  startingMax: 75
-})
+const rangeValue = defineModel<[number, number]>({  
+  default: (props) => [props.startingMin, props.startingMax],  
+});  
+
+// Set the actual default values from props after the component is mounted
+onMounted(() => {
+  rangeValue.value = [props.startingMin, props.startingMax];
+});
 
 /**
- *  Values
+ * Watchers
  */
-const rangeValue = defineModel({
-  default: ({ startingMin, startingMax }): number[] => {
-    return [startingMin as number, startingMax as number]
+watch(
+  () => [props.min, props.max, props.startingMin, props.startingMax],
+  ([newMin, newMax, newStartingMin, newStartingMax]) => {
+    // Update rangeValue to stay within the new bounds
+    rangeValue.value = [
+      Math.max(newMin ?? 0, newStartingMin ?? 0),
+      Math.min(newMax ?? 100, newStartingMax ?? 100),
+    ];
   }
-})
+);
 </script>
 
 <style lang="scss">

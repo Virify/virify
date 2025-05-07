@@ -7,11 +7,7 @@ import type { Address } from "@prisma/client";
  * @returns A promise that resolves to an array of formatted address strings.
  */
 export async function autocompleteAddresses(query: string): Promise<string[]> {
-  const trimmedQuery = query.trim();
-  // Replace spaces with " & " for AND logic
-  const fullTextQuery = trimmedQuery.replace(/\s+/g, " & ");
-  // Add ":*" for prefix matching
-  const sanitizedQuery = `${fullTextQuery}:*`;
+  const sanitizedQuery = prepareFullTextSearch(query);
   const addresses: Address[] = await prisma.$queryRaw<Address[]>`
     SELECT id, street, city, postcode,
     location::text AS location
@@ -22,6 +18,46 @@ export async function autocompleteAddresses(query: string): Promise<string[]> {
   `;
 
   return addresses.map((address) => formatAddress(address, query));
+}
+
+/**
+ * Get AddressID by Text Search.
+ *
+ * Returns the best match for the given query.
+ *
+ * @param query The query string to search for an address.
+ * @returns A promise that resolves to the ID of the best-matching address or `null` if no match is found.
+ */
+export async function getAddressIdByTextSearch(query: string): Promise<number | null> {
+  const sanitizedQuery = prepareFullTextSearch(query);
+  const address = await prisma.$queryRaw<{ id: number }[]>`
+    SELECT id
+    FROM "Address"
+    WHERE to_tsvector('english', COALESCE(street, '') || ' ' || COALESCE(city, '') || ' ' || COALESCE(postcode, ''))
+          @@ to_tsquery('english', ${sanitizedQuery})
+    ORDER BY ts_rank(
+      to_tsvector('english', COALESCE(street, '') || ' ' || COALESCE(city, '') || ' ' || COALESCE(postcode, '')),
+      to_tsquery('english', ${sanitizedQuery})
+    ) DESC
+    LIMIT 1;
+  `;
+
+  // Return the ID of the best match or null if no match is found
+  return address.length > 0 && address[0] ? address[0].id : null;
+}
+
+/**
+ * Prepares the query string for PostgreSQL full-text search.
+ *
+ * @param query string
+ * @returns string
+ */
+export function prepareFullTextSearch(query: string): string {
+  const trimmedQuery = query.trim();
+  // Replace spaces with " & " for AND logic
+  const fullTextQuery = trimmedQuery.replace(/\s+/g, " & ");
+  // Add ":*" for prefix matching
+  return `${fullTextQuery}:*`;
 }
 
 /**
@@ -45,7 +81,7 @@ function formatAddress(address: Address, query: string): string {
     `${postcode}, ${street}, ${city}`,
     `${city}, ${postcode}, ${street}`,
     `${street}, ${postcode}, ${city}`,
-    `${postcode}, ${city}, ${street}`,
+    `${postcode}, ${city}, ${street}`
   ];
 
   // Check if the query matches any of the variations (case-insensitive)

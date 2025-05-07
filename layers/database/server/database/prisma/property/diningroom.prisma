@@ -1,10 +1,9 @@
 model Diningroom {
   id          Int      @id @default(autoincrement())
-  roomNumber  Int      @default(1)
   openConcept Boolean  @default(false)
   description String
   size        Float?
-  propertyId  Int
+  propertyId  Int      @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)

@@ -52,7 +52,6 @@
 defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
-    required: true,
   },
 });
 </script>

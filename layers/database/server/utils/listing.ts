@@ -1,6 +1,8 @@
-import type { Listing } from "@prisma/client";
-import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingWithFullProperty } from "~~/shared/types/listing";
+import { ListingTier, type Listing } from "@prisma/client";
+import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
+import { getPriceFilter } from "./price";
+import { getNearbyPropertiesByTextQuery } from "./location";
 
 /**
  * Get a listing by ID
@@ -27,6 +29,30 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
     where: {
       id,
     },
+    include: {
+      rentalListing: true,
+      saleListing: true,
+      property: {
+        include: {
+          ...propertyInclude,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get featured listings
+ *
+ * @returns ListingWithFullProperty[]
+ */
+export async function getAllFeaturedListings(take: number = 20, skip: number = 0): Promise<ListingWithFullProperty[] | undefined> {
+  return await prisma.listing.findMany({
+    where: {
+      listingTier: ListingTier.FEATURED,
+    },
+    take,
+    skip,
     include: {
       rentalListing: true,
       saleListing: true,
@@ -89,13 +115,18 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getSaleListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[]): Promise<ListingSaleWithFullProperty[]> {
-  const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
+export async function getSaleListingsByDistance(
+  { location, radius }: ListingSearch,
+  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
+): Promise<ListingSaleWithFullProperty[]> {
+  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
+
   return await prisma.listing.findMany({
     where: {
       saleListing: {
         isNot: null,
       },
+      price: getPriceFilter(priceRange),
       property: {
         id: {
           in: nearbyProperties.map((p) => p.propertyId),
@@ -105,8 +136,22 @@ export async function getSaleListingsByDistance(location: AddressLocation, radiu
             in: propertyTypes,
           },
         },
+        numberBedrooms: bedrooms
+          ? {
+              gte: bedrooms[0], // min bedroom
+              lte: bedrooms[1], // max bedroom
+            }
+          : undefined,
+        numberBathrooms: bathrooms
+          ? {
+              gte: bathrooms[0], // min bathroom
+              lte: bathrooms[1], // max bathroom
+            }
+          : undefined,
       },
     },
+    take,
+    skip,
     include: {
       saleListing: true,
       property: {
@@ -124,13 +169,16 @@ export async function getSaleListingsByDistance(location: AddressLocation, radiu
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getRentalListingsByDistance(location: AddressLocation, radius: number, propertyTypes?: string[]): Promise<ListingRentalWithFullProperty[]> {
-  const nearbyProperties = await getPropertyIdsByDistance(location.lat, location.lon, radius);
+export async function getRentalListingsByDistance( { location, radius }: ListingSearch,
+  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
+): Promise<ListingRentalWithFullProperty[]> {
+  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
   return await prisma.listing.findMany({
     where: {
       rentalListing: {
         isNot: null,
       },
+      price: getPriceFilter(priceRange),
       property: {
         id: {
           in: nearbyProperties.map((p) => p.propertyId),
@@ -140,8 +188,22 @@ export async function getRentalListingsByDistance(location: AddressLocation, rad
             in: propertyTypes,
           },
         },
+        numberBedrooms: bedrooms
+          ? {
+              gte: bedrooms[0], // min bedroom
+              lte: bedrooms[1], // max bedroom
+            }
+          : undefined,
+        numberBathrooms: bathrooms
+          ? {
+              gte: bathrooms[0], // min bathroom
+              lte: bathrooms[1], // max bathroom
+            }
+          : undefined,
       },
     },
+    take,
+    skip,
     include: {
       rentalListing: true,
       property: {

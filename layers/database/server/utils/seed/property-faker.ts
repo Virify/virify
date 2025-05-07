@@ -1,22 +1,8 @@
 // imports require .ts extension to run seed
-import {
-  BedSizeType,
-  PrismaClient,
-  ConstructionType,
-  FireplaceType,
-  PlanningClassification,
-  LandUse,
-  BoilerType,
-  BroadbandType,
-  ConnectedUtilities,
-  EPCRating,
-  HeatingType,
-  HotWaterSource,
-  RenewableEnergy,
-} from "@prisma/client";
+import { BedSizeType, PrismaClient, ConstructionType, FireplaceType, PlanningClassification, LandUse, BoilerType, BroadbandType, ConnectedUtilities, EPCRating, HeatingType, HotWaterSource, RenewableEnergy } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import { type PropertyWithAddress} from "../../../../../shared/types/property.ts";
+import { type PropertyWithAddress } from "../../../../../shared/types/property.ts";
 import { roundFloat } from "../../../../../shared/utils/float.ts";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed.ts";
 import { typeToClassificationMap } from "./property-type-map.ts";
@@ -68,18 +54,21 @@ export const generateAccessability = (): Prisma.AccessibilityCreateWithoutProper
  *
  * @returns Array of bathrooms
  */
-export const generateBathrooms = (): Prisma.BathroomCreateWithoutPropertyInput[] => {
+export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreateWithoutPropertyInput[] } => {
   const bathroomCount = faker.number.int({ min: 1, max: 3 });
-  return Array.from({ length: bathroomCount }, (_, i) => ({
-    roomNumber: i + 1,
-    description: faker.word.words(10),
-    enSuite: faker.datatype.boolean(),
-    upstairs: faker.datatype.boolean(),
-    downstairs: faker.datatype.boolean(),
-    bathtub: faker.datatype.boolean(),
-    walkInShower: faker.datatype.boolean(),
-    size: faker.number.int({ min: 10, max: 50 }),
-  }));
+  return {
+    count: bathroomCount,
+    data: Array.from({ length: bathroomCount }, (_, i) => ({
+      roomNumber: i + 1,
+      description: faker.word.words(10),
+      enSuite: faker.datatype.boolean(),
+      upstairs: faker.datatype.boolean(),
+      downstairs: faker.datatype.boolean(),
+      bathtub: faker.datatype.boolean(),
+      walkInShower: faker.datatype.boolean(),
+      size: faker.number.int({ min: 10, max: 50 }),
+    })),
+  };
 };
 
 /**
@@ -87,34 +76,33 @@ export const generateBathrooms = (): Prisma.BathroomCreateWithoutPropertyInput[]
  *
  * @returns Array of bedrooms
  */
-export const generateBedrooms = (): Prisma.BedroomCreateWithoutPropertyInput[] => {
+export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateWithoutPropertyInput[] } => {
   const bedroomCount = faker.number.int({ min: 1, max: 5 });
-  return Array.from({ length: bedroomCount }, (_, i) => ({
-    roomNumber: i + 1,
-    bed: [faker.helpers.arrayElement(Object.values(BedSizeType))],
-    description: faker.word.words(10),
-    enSuite: faker.datatype.boolean(),
-    builtInStorage: faker.datatype.boolean(),
-    walkInWardrobe: faker.datatype.boolean(),
-    size: faker.number.int({ min: 10, max: 50 }),
-  }));
+  return {
+    count: bedroomCount,
+    data: Array.from({ length: bedroomCount }, (_, i) => ({
+      roomNumber: i + 1,
+      bed: [faker.helpers.arrayElement(Object.values(BedSizeType))],
+      description: faker.word.words(10),
+      enSuite: faker.datatype.boolean(),
+      builtInStorage: faker.datatype.boolean(),
+      walkInWardrobe: faker.datatype.boolean(),
+      size: faker.number.int({ min: 10, max: 50 }),
+    })),
+  };
 };
-
 /**
  * Generate random Dining room Object
  *
- * @returns Array of dining room objects
+ * @returns Single dining room object
  */
-export const generateDiningRoom = (): Prisma.DiningroomCreateWithoutPropertyInput[] => {
-  const diningRoomCount = faker.number.int({ min: 1, max: 3 });
-  return Array.from({ length: diningRoomCount }, (_, i) => ({
-    roomNumber: i + 1,
+export const generateDiningRoom = (): Prisma.DiningroomCreateWithoutPropertyInput => {
+  return {
     openConcept: faker.datatype.boolean(),
     description: faker.word.words(10),
     size: faker.number.int({ min: 10, max: 50 }),
-  }));
+  };
 };
-
 /**
  * Generate random Kitchen object
  *
@@ -138,16 +126,14 @@ export const generateKitchen = (): Prisma.KitchenCreateWithoutPropertyInput => {
  *
  * @returns Random LivingArea Objects
  */
-export const generateLivingArea = (): Prisma.LivingAreaCreateWithoutPropertyInput[] => {
-  const livingAreaCount = faker.number.int({ min: 1, max: 3 });
-  return Array.from({ length: livingAreaCount }, (_, i) => ({
-    roomNumber: i + 1,
+export const generateLivingArea = (): Prisma.LivingAreaCreateWithoutPropertyInput => {
+  return {
     fireplace: faker.helpers.arrayElement(Object.values(FireplaceType)),
     balcony: faker.datatype.boolean(),
     description: faker.word.words(10),
     openPlan: faker.datatype.boolean(),
     size: faker.number.int({ min: 10, max: 50 }),
-  }));
+  };
 };
 
 /**
@@ -155,17 +141,20 @@ export const generateLivingArea = (): Prisma.LivingAreaCreateWithoutPropertyInpu
  *
  * @returns Array of Reception objects
  */
-export const generateReception = (): Prisma.ReceptionCreateWithoutPropertyInput[] => {
+export const generateReception = (): { count: number; data: Prisma.ReceptionCreateWithoutPropertyInput[] } => {
   const receptionCount = faker.number.int({ min: 1, max: 3 });
-  return Array.from({ length: receptionCount }, (_, i) => ({
-    roomNumber: i + 1,
-    description: faker.word.words(10),
-    size: faker.number.int({ min: 10, max: 50 }),
-    openPlan: faker.datatype.boolean(),
-    fireplace: faker.helpers.arrayElement(Object.values(FireplaceType)),
-    gamesRoom: faker.datatype.boolean(),
-    homeCinema: faker.datatype.boolean(),
-  }));
+  return {
+    count: receptionCount,
+    data: Array.from({ length: receptionCount }, (_, i) => ({
+      roomNumber: i + 1,
+      description: faker.word.words(10),
+      size: faker.number.int({ min: 10, max: 50 }),
+      openPlan: faker.datatype.boolean(),
+      fireplace: faker.helpers.arrayElement(Object.values(FireplaceType)),
+      gamesRoom: faker.datatype.boolean(),
+      homeCinema: faker.datatype.boolean(),
+    })),
+  };
 };
 
 /**
@@ -352,11 +341,14 @@ export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
  * @returns PropertyWithAddress
  */
 export const generateProperty = async (address: Prisma.AddressCreateWithoutPropertiesInput): Promise<PropertyWithAddress> => {
-
   // Generate mapped property types and classifications
   const typeId = faker.helpers.arrayElement(Object.keys(typeToClassificationMap).map(Number));
   const classificationOptions = typeToClassificationMap[typeId];
   const classificationId = faker.helpers.arrayElement(classificationOptions!);
+
+  const { count: bedroomCount, data: bedrooms } = generateBedrooms();
+  const { count: bathroomCount, data: bathrooms } = generateBathrooms();
+  const { count: receptionCount, data: receptions } = generateReception();
 
   const property: PropertyWithAddress = await prisma.property.create({
     data: {
@@ -375,14 +367,15 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       accessibilityFeatures: {
         create: generateAccessability(),
       },
-      amenities: {
-        create: [],
-      },
+      amenities: {},
+      numberBedrooms: bedroomCount,
+      numberBathrooms: bathroomCount,
+      numberReceptions: receptionCount,
       bathroomFeatures: {
-        create: generateBathrooms(),
+        create: bathrooms,
       },
       bedroomFeatures: {
-        create: generateBedrooms(),
+        create: bedrooms,
       },
       diningroomFeatures: {
         create: generateDiningRoom(),
@@ -394,7 +387,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
         create: generateLivingArea(),
       },
       reception: {
-        create: generateReception(),
+        create: receptions,
       },
       utility: {
         create: generateUtility(),

@@ -31,3 +31,7 @@ export type Fullproperty = Prisma.PropertyGetPayload<{
     runningCosts: true;
   };
 }>;
+
+export type PropertySearchResult = {
+  propertyId: number;
+}[]
