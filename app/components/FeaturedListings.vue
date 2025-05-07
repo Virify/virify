@@ -3,11 +3,13 @@
     <h1 class="| title-2xl lineheight-sm">{{ title }}:</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-for="listing in listings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col relative">
+      <div v-for="listing in listings" :key="listing.id"
+        class="rounded-xl shadow-lg overflow-hidden flex flex-col relative">
         <!-- Property Image -->
         <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata"
           class="w-full h-42 object-cover" />
-        <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" :user-favourites="userFavourites" class="m-listing-fav" />
+        <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" :user-favourites="userFavourites"
+          class="m-listing-fav" />
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
@@ -38,7 +40,6 @@
             <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">For Sale</span>
           </div>
         </div>
-
         <!-- Link to Full Listing -->
         <div class="p-4">
           <NuxtLink :to="`/listing/${listing.id}`" class="text-blue-600 hover:underline"> View Full Listing </NuxtLink>
@@ -54,7 +55,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: 'Featured Listings',
+    default: "Featured Listings",
   },
 });
 
@@ -63,25 +64,25 @@ onMounted(async () => {
 });
 
 const userFavourites = ref<number[]>([]);
-const emit = defineEmits(['remove-from-listings']);
+const emit = defineEmits(["remove-from-listings"]);
 const { addToFavourites, removeFromFavourites, getUserFavouriteIds } = useFavourites();
 
-const handleToggle = async (listingId: number, action: 'add' | 'remove') => {
-  if (action === 'add') {
+const handleToggle = async (listingId: number, action: "add" | "remove") => {
+  if (action === "add") {
     userFavourites.value = await addToFavourites(listingId);
   }
-  if (action === 'remove') {
-    emit('remove-from-listings', listingId);
+  if (action === "remove") {
+    emit("remove-from-listings", listingId);
     userFavourites.value = await removeFromFavourites(listingId);
   }
 };
 </script>
 <style lang="scss">
-@use '#styles/_utils/functions' as fn;
+@use "#styles/_utils/functions" as fn;
+
 .m-listing-fav {
   position: absolute;
-  top: 10px;
   right: 10px;
-  z-index: 10;
+  top: 10px;
 }
 </style>

@@ -1,12 +1,16 @@
 <template>
   <div class="| container">
     <h1 class="| title-2xl lineheight-sm">Search Listings:</h1>
-
-    <div v-if="listings.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-for="listing in listings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col">
-        <!-- Property Image -->
-        <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata" class="w-full h-42 object-cover" />
-        <MoleculesAddToFav :listing-id="listing.id" @add-to-favourites="handleAdd" />
+    <div v-if="listings?.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="listing in listings" :key="listing.id"
+        class="rounded-xl shadow-lg overflow-hidden flex flex-col relative">
+        <div class="w-full h-42 flex items-start justify-end bg-gray-100">
+          <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata"
+            class="object-cover w-full h-full" />
+          <!-- Fav icon is naturally in top-right -->
+          <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" :user-favourites="userFavourites"
+            class="m-listing-fav" />
+        </div>
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
@@ -16,9 +20,7 @@
 
           <!-- Address -->
           <p class="text-sm mt-2">
-            <span>{{ listing.property?.address.street }}</span
-            >, <span>{{ listing.property?.address.city }}</span
-            >,
+            <span>{{ listing.property?.address.street }}</span>, <span>{{ listing.property?.address.city }}</span>,
             <span>{{ listing.property?.address.postcode }}</span>
           </p>
 
@@ -52,16 +54,40 @@
   </div>
 </template>
 <script setup lang="ts">
-defineProps({
+const props = defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
-    required: true,
+  },
+  title: {
+    type: String,
+    default: "Featured Listings",
   },
 });
 
-const { addToFavourites } = useFavourites();
+onMounted(async () => {
+  userFavourites.value = await getUserFavouriteIds();
+});
 
-const handleAdd = async (listingId: number) => {
-  await addToFavourites(listingId);
+const userFavourites = ref<number[]>([]);
+const emit = defineEmits(["remove-from-listings"]);
+const { addToFavourites, removeFromFavourites, getUserFavouriteIds } = useFavourites();
+
+const handleToggle = async (listingId: number, action: "add" | "remove") => {
+  if (action === "add") {
+    userFavourites.value = await addToFavourites(listingId);
+  }
+  if (action === "remove") {
+    emit("remove-from-listings", listingId);
+    userFavourites.value = await removeFromFavourites(listingId);
+  }
 };
 </script>
+<style lang="scss">
+@use "#styles/_utils/functions" as fn;
+
+.m-listing-fav {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+</style>

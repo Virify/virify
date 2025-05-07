@@ -1,7 +1,7 @@
 <template>
   <div>
     <button
-    class="| button button-xs"
+    class="| button button-secondary button-xs"
     @click="toggle(currentFavourite ? 'remove' : 'add')"
     aria-label="Toggle favourite"
   >
@@ -38,10 +38,11 @@ const toggle = (action: 'add' | 'remove') => {
   emit('toggle', props.listingId, action);
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @use '#styles/_utils/functions' as fn;
 .icon {
   height: var(--size-24);
   width: var(--size-24);
+  z-index: 0;
 }
 </style>
