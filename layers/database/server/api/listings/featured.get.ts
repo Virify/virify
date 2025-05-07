@@ -1,5 +1,6 @@
-import { getAllFeaturedListings } from "../../utils/listing";
 import * as z from "zod";
+import { getAllFeaturedListings } from "../../utils/listing";
+import { caluclatePagination } from "../../utils/pagination";
 
 const querySchema = z.object({
   pageSize: z.coerce.number().min(1).max(100).optional(),
@@ -12,10 +13,9 @@ export default defineEventHandler(async (event): Promise<ListingWithFullProperty
   try {
     const { page = 1, pageSize = 10 } = await getValidatedQuery(event, querySchema.parse);
 
-    const skip = (page - 1) * pageSize;
-    const take = pageSize;
+    const pagination = caluclatePagination(page, pageSize);
 
-    const listings = await getAllFeaturedListings(take, skip);
+    const listings = await getAllFeaturedListings(pagination.take, pagination.skip);
 
     if (!listings) {
       throw createError({

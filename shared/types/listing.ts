@@ -30,19 +30,32 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
       };
     };
   };
-}>
+}>;
 
 export type ListingSaleWithFullProperty = Prisma.ListingGetPayload<{
   include: {
-    saleListing: true,
-    property: true
-  },
+    saleListing: true;
+    property: true;
+  };
 }>;
 
 export type ListingRentalWithFullProperty = Prisma.ListingGetPayload<{
   include: {
-    rentalListing: true,
-    property: true
-  },
+    rentalListing: true;
+    property: true;
+  };
 }>;
 
+export type ListingSearch = {
+  location: string;
+  radius: number;
+};
+
+export type ListingSearchOptional = {
+  bedrooms?: number[];
+  bathrooms?: number[];
+  propertyTypes?: string[];
+  priceRange?: number[];
+  take?: number | undefined;
+  skip?: number | undefined;
+}
