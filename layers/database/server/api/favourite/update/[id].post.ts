@@ -1,11 +1,9 @@
-import type { UserSession } from "#auth-utils";
-
 /**
  * Add a listing to the user's favourites from the UserFavourites table
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
-  const session = (await getUserSession(event)) as UserSession;
+  const session = await getUserSession(event);
   const { listing } = await readBody(event);
   try {
     const userId = session?.user?.id;
@@ -14,7 +12,7 @@ export default defineEventHandler(async (event) => {
     console.log("userId", userId);
     console.log("listing", listing);
 
-    const updateFavourite = await addFavouriteFromUserFavourites(userId, listing);
+    await addFavouriteFromUserFavourites(userId, listing);
 
     return {
       statusCode: 200,

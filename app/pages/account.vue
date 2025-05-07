@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 const { user, session, clear, loggedIn } = useUserSession();
+const { getFavourites } = useFavourites();
 
 const favorites = ref<ListingWithFullProperty[]>([]);
 
@@ -52,20 +53,13 @@ onMounted(() => {
   fetchFavorites();
 });
 
-async function fetchFavorites() {
-  // Fetch the user's favorites from the API
-  await $fetch("/api/favourite/get-favourites", {
-    method: "GET",
-  })
-    .then((data: any) => {
-      console.log("Fetched favorites data:", data.listings);
-      favorites.value = data.listings;
-      console.log("Fetched favorites:", favorites.value);
-    })
-    .catch((error) => {
-      // console.error("Error fetching favorites:", error);
-    });
-}
+/**
+ * Fetches the user's favorite listings
+ * and updates the favorites state
+ */
+const fetchFavorites = async () => {
+  favorites.value = await getFavourites();
+};
 
 /**
  * Form validation schema

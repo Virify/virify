@@ -7,6 +7,7 @@
         <!-- Property Image -->
         <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata" class="w-full h-42 object-cover" />
         <MoleculesAddToFav :listing-id="listing.id" @add-to-favourites="handleAdd"/>
+        <MoleculesRemoveFromFav :listing-id="listing.id" @remove-from-favourties="handleRemove"/>
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
@@ -49,6 +50,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import MoleculesRemoveFromFav from './molecules/MoleculesRemoveFromFav.vue';
+
 defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
@@ -58,9 +61,13 @@ defineProps({
     default: 'Featured Listings',
   },
 });
-const { addToFavourites } = useFavourites();
+const { addToFavourites, removeFromFavourites } = useFavourites();
 
 const handleAdd = async (listingId: number) => {
   await addToFavourites(listingId);
+};
+
+const handleRemove = async (listingId: number) => {
+  await removeFromFavourites(listingId);
 };
 </script>
