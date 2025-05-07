@@ -26,6 +26,7 @@ const { clear } = useUserSession()
 
 async function logout() {
   await clear()
+  navigateTo("/")
 }
 
 /**

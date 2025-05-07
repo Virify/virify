@@ -1,6 +1,6 @@
 <template>
   <div class="| container">
-    <h1 class="| title-2xl lineheight-sm">{{ title }}:</h1>
+    <h1 class="| title-2xl lineheight-sm">{{ title }}</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="listing in listings" :key="listing.id"
@@ -8,8 +8,7 @@
         <!-- Property Image -->
         <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata"
           class="w-full h-42 object-cover" />
-        <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" :user-favourites="userFavourites"
-          class="m-listing-fav" />
+        <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" :user-favourites="userFavourites" class="m-listing-fav" />
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
@@ -49,7 +48,7 @@
   </div>
 </template>
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
   },
@@ -59,14 +58,30 @@ const props = defineProps({
   },
 });
 
-onMounted(async () => {
-  userFavourites.value = await getUserFavouriteIds();
-});
-
+/**
+ * state
+ */
 const userFavourites = ref<number[]>([]);
 const emit = defineEmits(["remove-from-listings"]);
-const { addToFavourites, removeFromFavourites, getUserFavouriteIds } = useFavourites();
 
+/**
+ * composables
+ */
+const { addToFavourites, removeFromFavourites, getUserFavouriteIds } = useFavourites();
+const { loggedIn } = useUserSession();
+
+/**
+ * lifecycle
+ */
+onMounted(async () => {
+  if(loggedIn.value) {
+    userFavourites.value = await getUserFavouriteIds();
+  }
+});
+
+/**
+ * emits
+ */
 const handleToggle = async (listingId: number, action: "add" | "remove") => {
   if (action === "add") {
     userFavourites.value = await addToFavourites(listingId);
@@ -76,6 +91,22 @@ const handleToggle = async (listingId: number, action: "add" | "remove") => {
     userFavourites.value = await removeFromFavourites(listingId);
   }
 };
+
+/**
+ * watch
+ */
+watch(loggedIn, async (isLoggedIn) => {
+    if (isLoggedIn) {
+      // fetch user favourites when logged in
+      console.log("User logged in, fetching favourite IDs...");
+      userFavourites.value = await getUserFavouriteIds();
+    }
+    if(!isLoggedIn) {
+      // reset user favourites when logged out
+      console.log("User logged out, resetting favourite IDs...");
+      userFavourites.value = [];
+    }
+  });
 </script>
 <style lang="scss">
 @use "#styles/_utils/functions" as fn;
