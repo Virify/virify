@@ -1,11 +1,11 @@
 <template>
   <div ref="$root" class="m-listing-card" :class="{
-    'm-listing-card-hover': isHoverContentOrImage,
-    'm-listing-card-image-parent-hover': isHoverImage,
-    'm-listing-card-content-parent-hover': isHoverContent
+    'm-listing-card-hover': isHoverContentOrImage
   }">
     <div @mouseenter="setHoverImage" role="presentation" class="| relative">
-      <button @click.prevent="forceHoverImage" class="m-listing-card-image-parent-button">
+      <button @click.prevent="forceHoverImage" class="m-listing-card-image-parent-button" :class="{
+        'm-listing-card-image-parent-button-hide': isHoverImage
+      }">
         <MoleculesListingCardImage />
       </button>
 
@@ -121,6 +121,10 @@ onClickOutside($root, forceHoverNone)
   border: none;
   border-radius: 0;
   background: none;
+}
+
+.m-listing-card-image-parent-button-hide {
+  opacity: 0;
 }
 
 .m-listing-card-carousel-parent {
