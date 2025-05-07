@@ -51,7 +51,6 @@
 </template>
 <script setup lang="ts">
 import MoleculesRemoveFromFav from './molecules/MoleculesRemoveFromFav.vue';
-
 defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
@@ -61,6 +60,7 @@ defineProps({
     default: 'Featured Listings',
   },
 });
+const emit = defineEmits(['remove-from-listings']);
 const { addToFavourites, removeFromFavourites } = useFavourites();
 
 const handleAdd = async (listingId: number) => {
@@ -69,5 +69,6 @@ const handleAdd = async (listingId: number) => {
 
 const handleRemove = async (listingId: number) => {
   await removeFromFavourites(listingId);
+  emit('remove-from-listings', listingId);
 };
 </script>

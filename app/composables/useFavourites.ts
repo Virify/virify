@@ -73,10 +73,15 @@ export function useFavourites() {
     }
   };
 
+  function removeListingFromArray(listings: ListingWithFullProperty[], idToRemove: number) {
+    return listings.filter(listing => listing?.id !== idToRemove);
+  }
+
   return {
     addToFavourites,
     getFavourites,
     removeAllFavourites,
-    removeFromFavourites
+    removeFromFavourites,
+    removeListingFromArray,
   };
 }

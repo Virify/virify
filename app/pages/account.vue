@@ -2,7 +2,7 @@
   <div class="container">
 
     <div v-if="favorites.length > 0" class="mb-6">
-      <FeaturedListings :listings="favorites" :title="`Favourite Listings: `" />
+      <FeaturedListings :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites" />
     </div>
 
     <div class="w-full sm:w-lg">
@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 const { user, session, clear, loggedIn } = useUserSession();
-const { getFavourites } = useFavourites();
+const { getFavourites, removeListingFromArray } = useFavourites();
 
 const favorites = ref<ListingWithFullProperty[]>([]);
 
@@ -61,6 +61,12 @@ const fetchFavorites = async () => {
   favorites.value = await getFavourites();
 };
 
+/**
+ * Remove a listing from favorites
+ */
+const removeFromFavorites = (listingId: number) => {
+  favorites.value = removeListingFromArray(favorites.value, listingId);
+};
 /**
  * Form validation schema
  */
