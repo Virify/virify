@@ -47,7 +47,7 @@ const { user, session, clear, loggedIn } = useUserSession();
 
 const favorites = ref<ListingWithFullProperty[]>([]);
 
-await $fetch("/api/user/favourite/get-favourites", {
+await $fetch("/api/favourite/get-favourites", {
   method: "GET",
 })
   .then((data: any) => {

@@ -17,7 +17,7 @@ import { useIntersectionObserver } from '@vueuse/core';
 async function log(listing: any) {
   console.log('Added to favourites:', listing.id);
   // Add logic here to save the listing to the user's favourites
-  await $fetch('/api/user/add-to-favourite', {
+  await $fetch('/api/favourite/add-to-favourite', {
     method: 'POST',
     body: {
       listing: listing.id,
