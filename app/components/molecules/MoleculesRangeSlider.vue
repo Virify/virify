@@ -45,9 +45,9 @@ const props = defineProps({
   },
 });
 
-const rangeValue = defineModel<[number, number]>({
-  default: [0, 0],
-});
+const rangeValue = defineModel<[number, number]>({  
+  default: (props) => [props.startingMin, props.startingMax],  
+});  
 
 // Set the actual default values from props after the component is mounted
 // avoid hosting issue?
