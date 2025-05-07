@@ -8,11 +8,6 @@
     <div class="p-listing-test-grid">
       <MoleculesListingCard v-for="i in 8" class="p-listing-test-griditem" />
     </div>
-
-    <AtomsIcon icon="cards/verified" />
-    <AtomsIcon icon="cards/beds" />
-    <AtomsIcon icon="cards/favourite" />
-    <AtomsIcon icon="cards/property-type" />
   </div>
 </template>
 
