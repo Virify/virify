@@ -22,12 +22,9 @@
     </h3>
 
     <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding | flow flow-md">
-      <LazyMoleculesTabs :options="tabContent" v-slot="{ ...option }">
-        {{ option }}
+      <LazyMoleculesTabs :options="tabContent" v-slot="{ content }">
+        <p class="| body-sm">{{ content }}</p>
       </LazyMoleculesTabs>
-
-      <p class="| body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut
-        aliquam quis ab</p>
 
       <div class="m-listing-card-content-agent">
         Agent Details
@@ -52,7 +49,7 @@ withDefaults(defineProps<Props>(), {
 })
 
 const tabContent = [
-  { label: 'Description', content: 'Hello, World' },
+  { label: 'Description', content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut aliquam quis ab' },
   { label: 'Features', content: 'See all features' },
   { label: 'Amenities', content: 'The amenities, wow!' },
 ]
