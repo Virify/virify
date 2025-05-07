@@ -1,7 +1,5 @@
 <template>
-  <div class="m-listing-card-content | flow flow-sm" role="presentation">
-    <h3 class="m-listing-card-content-title | title-xs">32 Someplace St, Cardiff</h3>
-
+  <div class="m-listing-card-content | flow flow-md" role="presentation">
     <ul class="m-listing-card-content-icons">
       <li class="| font-semibold body-xs">
         <AtomsIcon icon="cards/property-type" aria-hidden="true" class="m-listing-card-content-icon" />
@@ -19,7 +17,11 @@
       </li>
     </ul>
 
-    <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding">
+    <h3 class="m-listing-card-content-title | title-xs">
+      32 Someplace Longname St, Cardiff
+    </h3>
+
+    <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding | flow flow-md">
       <LazyMoleculesListingCardTabs hydrate-on-visible />
 
       <p class="| body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut
@@ -53,9 +55,8 @@ withDefaults(defineProps<Props>(), {
 @use '#styles/_utils/functions' as fn;
 
 .m-listing-card-content-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 20ch;
+  margin-inline: auto;
 }
 
 .m-listing-card-content-icons {
