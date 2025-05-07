@@ -10,7 +10,7 @@
 
   <button ref="button" type="button" class="m-account-popover-toggle | body-sm font-bold" :popovertarget="popoverId"
     :disabled="!hasMenuItems" aria-label="Expand menu">
-    Hi, User
+    Hi, {{ user.username ?? 'Name'}}!
     <AtomsIcon width="24" height="24" title="Menu icon" icon="icon/profile" class="m-account-popover-icon" />
   </button>
 </template>
@@ -22,8 +22,14 @@ const props = defineProps({
   }
 })
 
-const { clear } = useUserSession()
+/**
+ * Composables
+ */
+const { clear, user } = useUserSession()
 
+/**
+ * Logout
+ */
 async function logout() {
   await clear()
   navigateTo("/")
