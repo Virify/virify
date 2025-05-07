@@ -6,9 +6,7 @@
       <div v-for="listing in listings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col">
         <!-- Property Image -->
         <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata" class="w-full h-42 object-cover" />
-        <button class="| button button-xs" @click="$emit('add-to-favourites', listing)">
-          <Icon name="healthicons:heart-outline-24px" />
-        </button>
+        <MoleculesAddToFav :listing-id="listing.id" @add-to-favourites="handleAdd"/>
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
@@ -60,5 +58,9 @@ defineProps({
     default: 'Featured Listings',
   },
 });
-defineEmits(['add-to-favourites']);
+const { addToFavourites } = useFavourites();
+
+const handleAdd = async (listingId: number) => {
+  await addToFavourites(listingId);
+};
 </script>

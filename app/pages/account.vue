@@ -1,8 +1,8 @@
 <template>
   <div class="container">
 
-    <div v-if="favorites" class="mb-6">
-      <FeaturedListings :listings="favorites" :title="`Favourite Listings`" />
+    <div v-if="favorites.length > 0" class="mb-6">
+      <FeaturedListings :listings="favorites" :title="`Favourite Listings: `" />
     </div>
 
     <div class="w-full sm:w-lg">
@@ -47,17 +47,26 @@ const { user, session, clear, loggedIn } = useUserSession();
 
 const favorites = ref<ListingWithFullProperty[]>([]);
 
-await $fetch("/api/favourite/get-favourites", {
-  method: "GET",
-})
-  .then((data: any) => {
-    console.log("Fetched favorites data:", data.listings);
-    favorites.value = data.listings;
-    console.log("Fetched favorites:", favorites.value);
+onMounted(() => {
+  // Fetch the user's favorites when the component is mounted
+  fetchFavorites();
+});
+
+async function fetchFavorites() {
+  // Fetch the user's favorites from the API
+  await $fetch("/api/favourite/get-favourites", {
+    method: "GET",
   })
-  .catch((error) => {
-    console.error("Error fetching favorites:", error);
-  });
+    .then((data: any) => {
+      console.log("Fetched favorites data:", data.listings);
+      favorites.value = data.listings;
+      console.log("Fetched favorites:", favorites.value);
+    })
+    .catch((error) => {
+      // console.error("Error fetching favorites:", error);
+    });
+}
+
 /**
  * Form validation schema
  */
