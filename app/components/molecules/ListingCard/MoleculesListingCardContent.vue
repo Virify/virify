@@ -50,8 +50,8 @@ withDefaults(defineProps<Props>(), {
 
 const tabContent = [
   { label: 'Description', content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut aliquam quis ab' },
-  { label: 'Features', content: 'See all features' },
-  { label: 'Amenities', content: 'The amenities, wow!' },
+  { label: 'Features', content: 'See all features (list format)' },
+  { label: 'Amenities', content: 'The amenities, wow! (list format)' },
 ]
 </script>
 
