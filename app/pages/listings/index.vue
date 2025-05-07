@@ -8,7 +8,7 @@
     </div>
 
     <div class="mt-8">
-      <LeafletMap
+      <OrganismsMapsLeafletMap
         :markers="
           filteredListings
             .map((listing) => ({

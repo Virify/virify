@@ -2,7 +2,7 @@
   <div class="container">
 
     <div v-if="favorites.length > 0" class="mb-6">
-      <FeaturedListings :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites"  />
+      <ListingCard :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites"  />
     </div>
 
     <div class="w-full sm:w-lg">
