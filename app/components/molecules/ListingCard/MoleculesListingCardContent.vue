@@ -22,7 +22,7 @@
     </h3>
 
     <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding | flow flow-md">
-      <LazyMoleculesTabs :options="tabContent" v-slot="{ content }">
+      <LazyMoleculesTabs class="m-listing-card-content-tabs" :options="tabContent" v-slot="{ content }">
         <p class="| body-sm">{{ content }}</p>
       </LazyMoleculesTabs>
 
@@ -119,6 +119,27 @@ const tabContent = [
 
 @starting-style {
   .m-listing-card-content-expanding {
+    height: 0;
+  }
+}
+
+/**
+ *  Fade in to reduce CLS
+ */
+.m-listing-card-content-tabs {
+  interpolate-size: allow-keywords;
+
+  transition-property: height, opacity;
+  transition-duration: var(--animation-slow);
+  transition-timing-function: var(--ease-out);
+  transition-delay: var(--animation-slow);
+  overflow-y: clip;
+  height: calc-height(max-content, size);
+}
+
+@starting-style {
+  .m-listing-card-content-tabs {
+    opacity: 0;
     height: 0;
   }
 }

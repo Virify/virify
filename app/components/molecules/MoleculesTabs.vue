@@ -104,15 +104,16 @@ watch(focusIndex, (newIndex: number) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--size-16);
+  gap: var(--size-14);
 }
 
 .m-tabs-tabbutton {
-  padding: var(--size-6);
+  padding: var(--size-4);
   margin: 0;
   border: 0;
   border-radius: 0;
   border-bottom: var(--size-4) solid transparent;
+  white-space: nowrap;
 }
 
 .m-tabs-tabbutton[aria-expanded=true] {
