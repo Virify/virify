@@ -28,6 +28,16 @@
   }
 }
 
+/**
+ *  Invisible button
+ */
+.button-none {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+}
 
 /**
  *  Button styles
