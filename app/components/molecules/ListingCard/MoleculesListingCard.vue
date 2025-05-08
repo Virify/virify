@@ -27,14 +27,12 @@
         </p>
       </NuxtLink>
 
-      <div role="presentation">
-        <Transition name="content">
-          <div class="m-list-card-expanding m-listing-card-outline | flow flow-md" role="presentation" v-if="isHover">
-            <LazyMoleculesListingCardTabs :description />
-            <MoleculesListingCardAgent agent-id="001" />
-          </div>
-        </Transition>
-      </div>
+      <Transition name="content">
+        <div class="m-list-card-expanding m-listing-card-outline | flow flow-md" role="presentation" v-if="isHover">
+          <LazyMoleculesListingCardTabs :description />
+          <MoleculesListingCardAgent agent-id="001" />
+        </div>
+      </Transition>
     </div>
 
     <Transition name="backdrop">
@@ -140,6 +138,7 @@ const iconOptions = computed(() => {
   text-align: center;
   max-width: 400px;
   background: var(--listing-card-background);
+  height: fit-content;
 }
 
 .m-listing-card-hover {
