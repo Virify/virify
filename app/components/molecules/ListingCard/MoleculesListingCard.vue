@@ -4,14 +4,14 @@
   }">
     <div @mouseenter="setHoverImage" role="presentation" class="| relative">
       <button @click.prevent="forceHoverImage" class="m-listing-card-image-parent-button" :class="{
-        'm-listing-card-image-parent-button-hide': isHoverImage
+        'm-listing-card-image-parent-button-hide': isHoverContentOrImage
       }">
         <MoleculesListingCardImage :src="imageSrc" :alt="imageAlt" />
       </button>
 
       <Transition name="image">
-        <LazyMoleculesListingCardCarousel v-if="isHoverImage" class="m-listing-card-carousel-parent" hydrate-on-visible
-          :src="imageSrc" :alt="imageAlt" />
+        <LazyMoleculesListingCardCarousel v-if="isHoverContentOrImage" class="m-listing-card-carousel-parent"
+          hydrate-on-visible :src="imageSrc" :alt="imageAlt" />
       </Transition>
     </div>
 
@@ -24,7 +24,7 @@
 
       <Transition name="content">
         <MoleculesListingCardContent :price="priceFormatted" :address="addressString" :property-type :bedrooms
-          :bathrooms :property-url :description v-if="isHoverContent"
+          :bathrooms :property-url :description v-if="isHoverContentOrImage"
           class="m-listing-card-content-parent-expanded | elevate-300" show-tabs />
       </Transition>
     </div>
