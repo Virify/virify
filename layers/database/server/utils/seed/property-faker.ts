@@ -3,7 +3,7 @@ import { BedSizeType, PrismaClient, ConstructionType, FireplaceType, PlanningCla
 import type { Prisma } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { type PropertyWithAddress } from "../../../../../shared/types/property.ts";
-import { roundFloat } from "../../../../../shared/utils/float.ts";
+import { roundFloat } from "../../../../../shared/utils/numbers.ts";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed.ts";
 import { typeToClassificationMap } from "./property-type-map.ts";
 const prisma = new PrismaClient();

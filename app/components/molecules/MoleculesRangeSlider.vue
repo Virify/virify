@@ -8,23 +8,13 @@
       <SliderThumb class="m-range-slider-thumb" />
     </SliderRoot>
 
-    <label class="m-range-slider-label-min | body-sm">
-      <input
-        type="text"
-        :value="inputMin"
-        @input="onMinInput"
-        class="m-range-slider-input | text-input focus-visible"
-      />
-    </label>
+    <AtomsLabel class="m-range-slider-label-min">
+      <AtomsCurrencyInput v-model="rangeValue[0]" class="m-range-slider-input" />
+    </AtomsLabel>
 
-    <label class="m-range-slider-label-max | body-sm">
-      <input
-        type="text"
-        :value="inputMax"
-        @input="onMaxInput"
-        class="m-range-slider-input | text-input focus-visible"
-      />
-    </label>
+    <AtomsLabel class="m-range-slider-label-max">
+      <AtomsCurrencyInput v-model="rangeValue[1]" class="m-range-slider-input" />
+    </AtomsLabel>
   </div>
 </template>
 
@@ -54,16 +44,8 @@ const rangeValue = defineModel<[number, number]>({
   default: (props) => [props.startingMin, props.startingMax],
 });
 
-const inputMin = ref(formatPrice(props.startingMin));
-const inputMax = ref(formatPrice(props.startingMax));
-
 onMounted(() => {
   rangeValue.value = [props.startingMin, props.startingMax];
-});
-
-watch(rangeValue, ([newMin, newMax]) => {
-  inputMin.value = formatPrice(newMin);
-  inputMax.value = formatPrice(newMax);
 });
 
 watch(
@@ -75,25 +57,6 @@ watch(
   }
 );
 
-/**
- * Format a number to a currency string
- */
-function onMinInput(e: Event) {
-  const raw = (e.target as HTMLInputElement).value;
-  const parsed = parseCurrencyInput(raw);
-  rangeValue.value[0] = parsed;
-  inputMin.value = formatPrice(parsed);
-}
-
-/**
- * Format a number to a currency string
- */
-function onMaxInput(e: Event) {
-  const raw = (e.target as HTMLInputElement).value;
-  const parsed = parseCurrencyInput(raw);
-  rangeValue.value[1] = parsed;
-  inputMax.value = formatPrice(parsed);
-}
 </script>
 
 <style lang="scss">

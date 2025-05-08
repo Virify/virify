@@ -1,10 +1,13 @@
+
+type CurrencyString = `£${string}`
+
 /**
  * Format Price for GBP
  * 
  * @param value string
  * @returns string
  */
-export function formatPrice(value: number): string {
+export function numberToCurrency(value: number): string {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
@@ -18,6 +21,6 @@ export function formatPrice(value: number): string {
  * @param input string
  * @returns number
  */
-export function parseCurrencyInput(input: string): number {
+export function currencyToNumber(input: string): number {
   return parseInt(input.replace(/[^\d]/g, ""), 10) || 0;
 }
