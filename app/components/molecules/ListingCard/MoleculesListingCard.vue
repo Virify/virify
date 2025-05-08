@@ -1,7 +1,7 @@
 <template>
-  <div ref="$root" class="m-listing-card | relative" :class="{
+  <div ref="$root" :id="controlsId" class="m-listing-card | relative" :class="{
     'm-listing-card-hover': isHover
-  }">
+  }" @mouseleave="removeHover">
     <div role="presentation" class="m-listing-card-media | relative">
       <LazyMoleculesCarousel :slides="carouselImages" hydrate-on-interaction="mouseover"
         class="m-listing-card-media-carousel m-listing-card-outline" v-slot="{ slide: { src, alt } }">
@@ -9,7 +9,8 @@
       </LazyMoleculesCarousel>
     </div>
 
-    <MoleculesListingCardButtons class="m-listing-card-buttons-parent" />
+    <MoleculesListingCardButtons :controls-id="controlsId" class="m-listing-card-buttons-parent" :is-expanded="isHover"
+      @toggle-content="toggleHover" />
 
     <div class="| flow flow-lg" role="presentation">
       <ul class="m-listing-card-icons">
@@ -61,21 +62,24 @@ interface Props {
 const props = defineProps<Props>()
 
 /**
+ *  a11y
+ */
+const controlsId = useId()
+
+/**
  *  Manage hover state
  */
-const $root = useTemplateRef('$root')
+const isHover = ref(false);
 
-const isHover = useElementHover($root, { delayEnter: 200 })
-
-function forceHover() {
-  isHover.value = true
+function toggleHover(value: boolean) {
+  isHover.value = value
 }
 
 function removeHover() {
   isHover.value = false
 }
 
-onClickOutside($root, removeHover)
+onClickOutside(useTemplateRef('$root'), removeHover)
 
 /**
  *  Format content
