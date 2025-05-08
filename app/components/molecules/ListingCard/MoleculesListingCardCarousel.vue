@@ -31,6 +31,7 @@ const [emblaRef] = emblaCarouselVue()
   padding: 0;
   border-radius: var(--border-radius-2xl);
   aspect-ratio: 4/3;
+  background: var(--monochrome-400);
 }
 </style>
 
