@@ -63,7 +63,6 @@ const props = defineProps({
     default: "Featured Listings",
   },
 });
-console.log(props.listings)
 /**
  * state
  */
@@ -103,13 +102,11 @@ const handleToggle = async (listingId: number, action: "add" | "remove") => {
  */
 watch(loggedIn, async (isLoggedIn) => {
     if (isLoggedIn) {
-      // fetch user favourites when logged in
-      console.log("User logged in, fetching favourite IDs...");
+      // fetch user favourites when logged in;
       userFavourites.value = await getUserFavouriteIds();
     }
     if(!isLoggedIn) {
       // reset user favourites when logged out
-      console.log("User logged out, resetting favourite IDs...");
       userFavourites.value = [];
     }
   });

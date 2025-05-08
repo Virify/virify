@@ -97,7 +97,6 @@ async function setPassword() {
     },
   })
     .then(() => {
-      console.log("Password reset successfully!");
       state.password = "";
       state.confirmedPassword = "";
     })

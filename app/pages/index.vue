@@ -51,7 +51,6 @@ useIntersectionObserver(
   (entries) => {
     const entry = entries[0];
     if (entry?.isIntersecting && hasMoreListings.value && !isLoading.value) {
-      console.log('Fetching more listings...');
       fetchMoreListings();
     }
   },
