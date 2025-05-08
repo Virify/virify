@@ -34,9 +34,7 @@
               <p class="| body-sm">{{ content }}</p>
             </LazyMoleculesTabs>
 
-            <div class="m-listing-card-content-agent">
-              Agent Details
-            </div>
+            <MoleculesListingCardAgent />
           </div>
         </Transition>
       </div>
@@ -278,20 +276,6 @@ const iconOptions = computed(() => {
   .m-listing-card-content-tabs {
     opacity: 0;
     height: 0;
-  }
-}
-
-/**
- *  Agent tab
- */
-.m-listing-card-content-agent {
-  padding: var(--size-12);
-  background: var(--blue-400);
-  color: var(--monochrome-900);
-  border-radius: var(--border-radius-xl);
-
-  @include mq.hover {
-    margin-top: var(--size-32);
   }
 }
 
