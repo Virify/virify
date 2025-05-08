@@ -1,25 +1,29 @@
 <template>
-  <div class="m-listing-card-content | flow flow-md" role="presentation">
+  <div class="m-listing-card-content | flow flow-lg" role="presentation">
     <ul class="m-listing-card-content-icons">
-      <li class="| font-semibold body-xs">
+      <li class="| font-semibold body-xs nowrap">
         <AtomsIcon icon="cards/property-type" aria-hidden="true" class="m-listing-card-content-icon" />
-        Detatched
+        {{ propertyType }}
       </li>
 
-      <li class="| font-semibold body-xs">
+      <li class="| font-semibold body-xs nowrap">
         <AtomsIcon icon="cards/beds" aria-hidden="true" class="m-listing-card-content-icon" />
-        3 beds
+        {{ bedrooms }} beds
       </li>
 
-      <li class="| font-semibold body-xs">
+      <li class="| font-semibold body-xs nowrap">
         <AtomsIcon icon="cards/bathrooms" aria-hidden="true" class="m-listing-card-content-icon" />
-        2 bathrooms
+        {{ bathrooms }} bathrooms
       </li>
     </ul>
 
-    <h3 class="m-listing-card-content-title | title-xs">
-      32 Someplace Longname St, Cardiff
-    </h3>
+    <NuxtLink :to="propertyUrl" role="presentation" class="m-listing-card-content-link">
+      <h3 class="m-listing-card-content-price | title-md">{{ price }}</h3>
+
+      <p class="m-listing-card-content-address | body-sm font-bold">
+        {{ address }}
+      </p>
+    </NuxtLink>
 
     <div v-if="showTabs" role="presentation" class="m-listing-card-content-expanding | flow flow-md">
       <LazyMoleculesTabs class="m-listing-card-content-tabs" :options="tabContent" v-slot="{ content }">
@@ -42,26 +46,45 @@
 <script setup lang="ts">
 interface Props {
   showTabs?: boolean
+  price?: string
+  address?: string
+  bedrooms?: number
+  bathrooms?: number
+  description?: string
+  propertyUrl?: string
+  propertyType?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   showTabs: false
 })
 
-const tabContent = [
-  { label: 'Description', content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae officiis minus numquam ut aliquam quis ab' },
-  { label: 'Features', content: 'See all features (list format)' },
-  { label: 'Amenities', content: 'The amenities, wow! (list format)' },
-]
+const tabContent = computed(() => {
+  return [
+    { label: 'Description', content: props.description },
+    { label: 'Features', content: 'See all features (list format)' },
+    { label: 'Amenities', content: 'The amenities, wow! (list format)' },
+  ]
+})
 </script>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
 @use '#styles/_utils/functions' as fn;
 
-.m-listing-card-content-title {
-  max-width: 20ch;
+.m-listing-card-content-price,
+.m-listing-card-content-address {
+  max-width: 22ch;
   margin-inline: auto;
+}
+
+.m-listing-card-content-price {
+  margin-bottom: var(--size-6);
+}
+
+.m-listing-card-content-link {
+  display: block;
+  text-decoration: none;
 }
 
 .m-listing-card-content-icons {
@@ -71,7 +94,6 @@ const tabContent = [
   justify-content: center;
   gap: var(--size-24);
   text-align: center;
-  white-space: nowrap;
   padding: 0;
   margin-inline: auto;
 }

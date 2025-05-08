@@ -6,24 +6,26 @@
       <button @click.prevent="forceHoverImage" class="m-listing-card-image-parent-button" :class="{
         'm-listing-card-image-parent-button-hide': isHoverImage
       }">
-        <MoleculesListingCardImage />
+        <MoleculesListingCardImage :src="imageSrc" :alt="imageAlt" />
       </button>
 
       <Transition name="image">
-        <LazyMoleculesListingCardCarousel v-if="isHoverImage" class="m-listing-card-carousel-parent"
-          hydrate-on-visible />
+        <LazyMoleculesListingCardCarousel v-if="isHoverImage" class="m-listing-card-carousel-parent" hydrate-on-visible
+          :src="imageSrc" :alt="imageAlt" />
       </Transition>
     </div>
 
     <MoleculesListingCardButtons class="m-listing-card-buttons-parent" />
 
     <div class="m-listing-card-content-parent-wrapper | relative">
-      <MoleculesListingCardContent @mouseenter="setHoverContent" @force-expanded="forceHoverContent"
+      <MoleculesListingCardContent :price="priceFormatted" :address="addressString" :property-type :bedrooms :bathrooms
+        :property-url :description @mouseenter="setHoverContent" @force-expanded="forceHoverContent"
         class="m-listing-card-content-parent" />
 
       <Transition name="content">
-        <MoleculesListingCardContent v-if="isHoverContent" class="m-listing-card-content-parent-expanded | elevate-300"
-          show-tabs />
+        <MoleculesListingCardContent :price="priceFormatted" :address="addressString" :property-type :bedrooms
+          :bathrooms :property-url :description v-if="isHoverContent"
+          class="m-listing-card-content-parent-expanded | elevate-300" show-tabs />
       </Transition>
     </div>
 
@@ -33,8 +35,48 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useElementHover, onClickOutside } from '@vueuse/core'
+
+/**
+ *  Props
+ */
+interface Props {
+  image?: Record<string, unknown>[]
+  address?: Record<string, unknown>
+  price?: number
+  bedrooms?: number
+  bathrooms?: number
+  description?: string
+  propertyId: number
+  propertyType?: string
+}
+
+const props = defineProps<Props>()
+
+/**
+ *  Break down props
+ */
+const imageSrc = computed(() => props.image?.[0]?.image as string)
+const imageAlt = computed(() => props.image?.[0]?.metadata as string)
+
+const priceFormatted = computed(() => {
+  const { price = 0 } = props
+
+  return `£${parseInt(String(price)).toLocaleString()}`
+})
+
+const addressString = computed(() => {
+  const { street, city, postcode } = asObject(props.address)
+
+  return [street, city, postcode].filter(Boolean).join(', ')
+})
+
+const propertyUrl = computed(() => {
+  const { propertyId } = props
+
+  return `/listing/${propertyId}`
+})
 
 /**
  *  Selectors

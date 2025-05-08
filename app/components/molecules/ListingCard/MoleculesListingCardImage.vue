@@ -1,8 +1,17 @@
 <template>
   <div class="m-listing-card-image">
-    <img src="/images/placeholder-property.jpg" class="m-listing-card-image-src" />
+    <img :src :alt class="m-listing-card-image-src" />
   </div>
 </template>
+
+<script setup lang="ts">
+interface Props {
+  src: string
+  alt: string
+}
+
+defineProps<Props>()
+</script>
 
 <style>
 .m-listing-card-image-src {
