@@ -12,7 +12,7 @@
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-sm font-semibold mb-2">{{ listing.title }}</h2>
-          <p class="text-lg font-bold pt-2">{{ formatPrice(listing.price) }}</p>
+          <p class="text-lg font-bold pt-2">{{ numberToCurrency(listing.price) }}</p>
           <p v-if="listing.rentalListing" class="text-xs pt-2">{{ listing.rentalListing?.rentFrequency }}</p>
           <p v-else class="text-xs pt-2 capitalize">{{ mapPriceType(listing.saleListing?.priceType!) }}</p>
           <p v-if="listing.publishedAt">Added to site: {{ dateAddedToDays(listing.publishedAt) }}</p>
