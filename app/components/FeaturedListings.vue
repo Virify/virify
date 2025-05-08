@@ -25,7 +25,7 @@ defineProps({
 
 .p-listing-test-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 300px);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   row-gap: var(--size-56);
   column-gap: var(--size-28);
   padding: var(--size-56);
