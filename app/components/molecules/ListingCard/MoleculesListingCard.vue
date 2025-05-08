@@ -30,18 +30,15 @@
       <div role="presentation">
         <Transition name="content">
           <div class="m-list-card-expanding m-listing-card-outline | flow flow-md" role="presentation" v-if="isHover">
-            <LazyMoleculesTabs class="m-listing-card-content-tabs" :options="tabContent" v-slot="{ content }">
-              <p class="| body-sm">{{ content }}</p>
-            </LazyMoleculesTabs>
-
-            <MoleculesListingCardAgent />
+            <LazyMoleculesListingCardTabs :description />
+            <MoleculesListingCardAgent agent-id="001" />
           </div>
         </Transition>
       </div>
     </div>
 
     <Transition name="backdrop">
-      <div v-if="isHover" class="m-listing-card-backdrop" />
+      <div v-if="isHover" class="m-listing-card-backdrop"></div>
     </Transition>
   </div>
 </template>
@@ -58,7 +55,7 @@ interface Props {
   price?: number
   bedrooms?: number
   bathrooms?: number
-  description?: string
+  description: string
   propertyId: number
   propertyType?: string
 }
@@ -114,14 +111,6 @@ const propertyUrl = computed(() => {
   const { propertyId } = props
 
   return `/listing/${propertyId}`
-})
-
-const tabContent = computed(() => {
-  return [
-    { label: 'Description', content: props.description },
-    { label: 'Features', content: 'See all features (list format)' },
-    { label: 'Amenities', content: 'The amenities, wow! (list format)' },
-  ]
 })
 
 const iconOptions = computed(() => {

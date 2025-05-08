@@ -1,8 +1,16 @@
 <template>
   <div class="m-listing-card-agent">
-    Agent Details
+    Agent Details for {{ agentId }}
   </div>
 </template>
+
+<script setup lang="ts">
+interface Props {
+  agentId: string
+}
+
+defineProps<Props>()
+</script>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
