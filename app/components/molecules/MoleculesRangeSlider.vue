@@ -9,13 +9,21 @@
     </SliderRoot>
 
     <label class="m-range-slider-label-min | body-sm">
-      <input type="number" v-model="rangeValue[0]" class="m-range-slider-input | text-input focus-visible" />
-      Min price
+      <input
+        type="text"
+        :value="inputMin"
+        @input="onMinInput"
+        class="m-range-slider-input | text-input focus-visible"
+      />
     </label>
 
     <label class="m-range-slider-label-max | body-sm">
-      <input type="number" v-model="rangeValue[1]" class="m-range-slider-input | text-input focus-visible" />
-      Max price
+      <input
+        type="text"
+        :value="inputMax"
+        @input="onMaxInput"
+        class="m-range-slider-input | text-input focus-visible"
+      />
     </label>
   </div>
 </template>
@@ -23,9 +31,6 @@
 <script setup lang="ts">
 import { SliderRoot, SliderTrack, SliderRange, SliderThumb } from "reka-ui";
 
-/**
- *  Props
- */
 const props = defineProps({
   min: {
     type: Number,
@@ -33,7 +38,7 @@ const props = defineProps({
   },
   max: {
     type: Number,
-    default: 100,
+    default: 10,
   },
   startingMin: {
     type: Number,
@@ -41,32 +46,54 @@ const props = defineProps({
   },
   startingMax: {
     type: Number,
-    default: 100,
+    default: 1,
   },
 });
 
-const rangeValue = defineModel<[number, number]>({  
-  default: (props) => [props.startingMin, props.startingMax],  
-});  
+const rangeValue = defineModel<[number, number]>({
+  default: (props) => [props.startingMin, props.startingMax],
+});
 
-// Set the actual default values from props after the component is mounted
+const inputMin = ref(formatPrice(props.startingMin));
+const inputMax = ref(formatPrice(props.startingMax));
+
 onMounted(() => {
   rangeValue.value = [props.startingMin, props.startingMax];
 });
 
-/**
- * Watchers
- */
+watch(rangeValue, ([newMin, newMax]) => {
+  inputMin.value = formatPrice(newMin);
+  inputMax.value = formatPrice(newMax);
+});
+
 watch(
   () => [props.min, props.max, props.startingMin, props.startingMax],
   ([newMin, newMax, newStartingMin, newStartingMax]) => {
-    // Update rangeValue to stay within the new bounds
-    rangeValue.value = [
-      Math.max(newMin ?? 0, newStartingMin ?? 0),
-      Math.min(newMax ?? 100, newStartingMax ?? 100),
-    ];
+    const newMinVal = Math.max(newMin ?? 0, newStartingMin ?? 0);
+    const newMaxVal = Math.min(newMax ?? 1000000, newStartingMax ?? 1000000);
+    rangeValue.value = [newMinVal, newMaxVal];
   }
 );
+
+/**
+ * Format a number to a currency string
+ */
+function onMinInput(e: Event) {
+  const raw = (e.target as HTMLInputElement).value;
+  const parsed = parseCurrencyInput(raw);
+  rangeValue.value[0] = parsed;
+  inputMin.value = formatPrice(parsed);
+}
+
+/**
+ * Format a number to a currency string
+ */
+function onMaxInput(e: Event) {
+  const raw = (e.target as HTMLInputElement).value;
+  const parsed = parseCurrencyInput(raw);
+  rangeValue.value[1] = parsed;
+  inputMax.value = formatPrice(parsed);
+}
 </script>
 
 <style lang="scss">

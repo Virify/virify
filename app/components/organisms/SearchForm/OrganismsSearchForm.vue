@@ -38,6 +38,19 @@
         </div>
       </div>
 
+      <!-- property types -->
+      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 50ms">
+        <MoleculesScrollBox class="| focus-overflow">
+          <ul class="o-searchform-property-types">
+            <li v-for="({ id, name, defaultSelected }, index) of propertyTypes" :key="id" class="| animate-fade-down"
+              :style="`--delay: ${50 + index * 40}ms`">
+              <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
+            </li>
+          </ul>
+        </MoleculesScrollBox>
+      </OrganismsSearchFormTitleBlock>
+
+
       <!-- bedrooms & bathrooms -->
       <div class="o-searchform-filter o-searchform-animation">
         <OrganismsSearchFormTitleBlock title="Bedrooms" class="| animate-fade-down" style="--delay: 50ms">
@@ -75,13 +88,20 @@
         </OrganismsSearchFormTitleBlock>
       </div>
 
+      <!-- price -->
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
+        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
+          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
+      </OrganismsSearchFormTitleBlock>
+
+
       <!-- Date Added and Include Options -->
       <div class="o-searchform-filter o-searchform-animation">
         <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 50ms">
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
             <select class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }, index) of dateOptions" :key="value" :value :selected="index === 0">{{ key
-                }}</option>
+              }}</option>
             </select>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
@@ -97,26 +117,8 @@
         </OrganismsSearchFormTitleBlock>
       </div>
 
-      <!-- price -->
-      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
-        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
-          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
-      </OrganismsSearchFormTitleBlock>
-
-      <!-- property types -->
-      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 50ms">
-        <MoleculesScrollBox class="| focus-overflow">
-          <ul class="o-searchform-property-types">
-            <li v-for="({ id, name, defaultSelected }, index) of propertyTypes" :key="id" class="| animate-fade-down"
-              :style="`--delay: ${50 + index * 40}ms`">
-              <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
-            </li>
-          </ul>
-        </MoleculesScrollBox>
-      </OrganismsSearchFormTitleBlock>
-
-      <!-- property features -->
-      <OrganismsSearchFormTitleBlock title="Property Features" class="| animate-fade-down" style="--delay: 250ms">
+      <!-- popular features -->
+      <OrganismsSearchFormTitleBlock title="Popular Features" class="| animate-fade-down" style="--delay: 250ms">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
             <li v-for="({ key, label, isDefault }, index) in propertyFeatures" :key="key" class="| animate-fade-down"
@@ -128,6 +130,7 @@
       </OrganismsSearchFormTitleBlock>
 
     </OrganismsSearchFormPopover>
+
   </form>
 </template>
 
@@ -336,10 +339,13 @@ async function sendForm(event: Event) {
   const target = event.target as HTMLFormElement;
   const { formData, errors } = useFormData(target);
   // format features to post
-  const formatFeatures = propertyFeatures.map(({ key }) => {
+  const formatFeatures = propertyFeatures.map(({ key, group }) => {
     const keyValue = formData?.get(key);
     if (keyValue) {
-      return { key, group: keyValue };
+      return {
+        group,
+        key
+      };
     }
     return null;
   }).filter(Boolean);
@@ -371,14 +377,14 @@ async function sendForm(event: Event) {
       buyOrRent: formData?.get("buyOrRent"),
       propertyTypes: formatPropertyTypes,
       priceRange: selectedPriceRange.value,
-      // bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
-      // bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
-      // addedToSite: formData?.get('added-to-site'),
-      // include: formData?.get('include'),
-      // featured: formatFeatures
+      bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
+      bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
+      addedToSite: formData?.get('added-to-site'),
+      include: formData?.get('include'),
+      featured: formatFeatures
     }
   });
-    
+
   console.log("POST DEBUG", {
     location: formData?.get("location"),
     radius: radius,

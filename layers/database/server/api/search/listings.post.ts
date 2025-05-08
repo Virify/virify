@@ -15,6 +15,9 @@ const searchSchema = z.object({
   location: z.string(),
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
+  addedToSite: z.coerce.number().optional(),
+  include: z.string().optional(),
+  featured: z.array(z.object({ key: z.string(), group: z.string() })).optional(),
 });
 
 /**
@@ -27,8 +30,9 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 
   try {
-    const { buyOrRent, radius, propertyTypes, priceRange, location, bathrooms, bedrooms } = await readValidatedBody(event, searchSchema.parse);
-
+    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, include, featured } = await readValidatedBody(event, searchSchema.parse);
+    console.log("Search parameters:", { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, include, featured });
+    
     validateQueries(radius, buyOrRent, location);
 
     const fetchListings = LISTING_FETCHERS[buyOrRent];
