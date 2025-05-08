@@ -1,7 +1,9 @@
 <template>
-  <div class="m-listing-card-carousel embla" ref="emblaRef">
-    <div class="embla-slides">
-      <img v-for="i of 3" :src :alt class="m-listing-card-carousel-image embla-slide" />
+  <div role="presentation">
+    <div class="m-listing-card-carousel embla" ref="emblaRef">
+      <div class="embla-slides">
+        <img v-for="i of 3" :src :alt class="m-listing-card-carousel-image embla-slide" />
+      </div>
     </div>
   </div>
 </template>

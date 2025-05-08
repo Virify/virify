@@ -4,8 +4,8 @@
   }">
     <div role="presentation" class="m-listing-card-media | relative">
       <Transition name="image">
-        <LazyMoleculesListingCardCarousel v-if="isHover" class="m-listing-card-media-carousel" hydrate-on-visible
-          :src="imageSrc" :alt="imageAlt" />
+        <LazyMoleculesListingCardCarousel v-if="isHover" class="m-listing-card-media-carousel m-listing-card-outline"
+          hydrate-on-visible :src="imageSrc" :alt="imageAlt" />
 
         <button v-else type="button" @click.prevent="forceHover" class="m-listing-card-media-toggle | button-none">
           <MoleculesListingCardImage :src="imageSrc" :alt="imageAlt" class="m-listing-card-media-image" />
@@ -17,7 +17,7 @@
 
     <div class="| flow flow-lg" role="presentation">
       <ul class="m-listing-card-icons">
-        <li class="| font-semibold body-xs nowrap" v-for="{ icon, label } of iconOptions">
+        <li class="| font-semibold body-xs" v-for="{ icon, label } of iconOptions">
           <AtomsIcon :icon aria-hidden="true" class="m-listing-card-icon" />
           {{ label }}
         </li>
@@ -33,7 +33,7 @@
 
       <div role="presentation">
         <Transition name="content">
-          <div class="m-list-card-expanding | flow flow-md" role="presentation" v-if="isHover">
+          <div class="m-list-card-expanding m-listing-card-outline | flow flow-md" role="presentation" v-if="isHover">
             <LazyMoleculesTabs class="m-listing-card-content-tabs" :options="tabContent" v-slot="{ content }">
               <p class="| body-sm">{{ content }}</p>
             </LazyMoleculesTabs>
@@ -45,6 +45,10 @@
         </Transition>
       </div>
     </div>
+
+    <Transition name="backdrop">
+      <div v-if="isHover" class="m-listing-card-backdrop" />
+    </Transition>
   </div>
 </template>
 
@@ -133,12 +137,16 @@ const iconOptions = computed(() => {
 @use '#styles/_utils/media' as mq;
 
 .m-listing-card {
+  --listing-card-background: var(--background-100);
+  --listing-card-boxshadow: #{ fn.faded-color(18%) };
+  --listing-card-outline: var(--size-14);
   --listing-card-padding: var(--size-40);
   --listing-card-width: calc(100% + (2 * var(--listing-card-padding)));
 
   position: relative;
   text-align: center;
   max-width: 400px;
+  background: var(--listing-card-background);
 }
 
 .m-listing-card-hover {
@@ -149,7 +157,7 @@ const iconOptions = computed(() => {
  *  Media hoverstate
  */
 .m-listing-card-media {
-  aspect-ratio: 4 /3;
+  aspect-ratio: 4 / 3;
 }
 
 .m-listing-card-media-toggle {
@@ -188,11 +196,13 @@ const iconOptions = computed(() => {
  */
 .m-listing-card-icons {
   list-style: none;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
   justify-content: center;
-  gap: var(--size-24);
+  gap: var(--size-20);
   text-align: center;
+  width: fit-content;
   padding: 0;
   margin-inline: auto;
 }
@@ -229,7 +239,7 @@ const iconOptions = computed(() => {
 }
 
 /**
- *  Tab fade animation
+ *  Expanding content
  */
 .m-list-card-expanding {
   interpolate-size: allow-keywords;
@@ -238,19 +248,9 @@ const iconOptions = computed(() => {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  transition: height, margin;
-  transition-duration: var(--animation-veryslow);
-  transition-timing-function: var(--ease-out);
-  transition-delay: var(--delay, 0ms);
-  overflow-y: clip;
   height: calc-height(max-content, size);
   width: calc(var(--listing-card-width));
-}
-
-@starting-style {
-  .m-list-card-expanding {
-    height: 0;
-  }
+  background: var(--listing-card-background);
 }
 
 /**
@@ -263,7 +263,6 @@ const iconOptions = computed(() => {
   transition-duration: var(--animation-slow);
   transition-timing-function: var(--ease-out);
   transition-delay: var(--animation-slow);
-  overflow-y: clip;
   height: calc-height(max-content, size);
 }
 
@@ -289,6 +288,38 @@ const iconOptions = computed(() => {
 }
 
 /**
+ *  Backdrop
+ */
+.m-listing-card-backdrop {
+  background: var(--listing-card-background);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: calc(var(--listing-card-width) + (2 * var(--listing-card-outline)));
+  height: calc(100% + var(--border-radius-2xl));
+  transform: translateX(-50%);
+  z-index: -1;
+  box-shadow: 0 0 20px var(--listing-card-boxshadow);
+}
+
+.m-listing-card-outline::before {
+  content: '';
+  position: absolute;
+  top: calc(0px - var(--listing-card-outline));
+  left: calc(0px - var(--listing-card-outline));
+  right: calc(0px - var(--listing-card-outline));
+  bottom: calc(0px - var(--listing-card-outline));
+  background: var(--listing-card-background);
+  border-radius: var(--border-radius-2xl);
+  z-index: -2;
+  box-shadow: 0 20px 20px var(--listing-card-boxshadow);
+}
+
+.m-listing-card-media-carousel.m-listing-card-outline::before {
+  box-shadow: none;
+}
+
+/**
  *  View transitions
  *  Title and prive
  */
@@ -306,7 +337,7 @@ const iconOptions = computed(() => {
 
 .content-enter-active,
 .content-leave-active {
-  transition-property: width, box-shadow;
+  transition-property: width;
   transition-duration: var(--animation-veryslow);
   transition-timing-function: var(--ease-out);
 }
@@ -314,6 +345,18 @@ const iconOptions = computed(() => {
 .content-leave-to,
 .content-enter-from {
   opacity: 0;
+  width: 100%;
+}
+
+.backdrop-enter-active,
+.backdrop-leave-active {
+  transition-property: width;
+  transition-duration: var(--animation-veryslow);
+  transition-timing-function: var(--ease-out);
+}
+
+.backdrop-leave-to,
+.backdrop-enter-from {
   width: 100%;
 }
 </style>
