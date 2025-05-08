@@ -64,6 +64,7 @@ const currentIndex = ref(0)
 
 function setCurrentOption(index: number) {
   currentIndex.value = index
+  focusIndex.value = index
 }
 
 /**
