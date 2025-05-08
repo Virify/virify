@@ -13,6 +13,7 @@
           <p class="text-lg font-bold pt-2">£{{ listing.price.toLocaleString() }}</p>
           <p v-if="listing.rentalListing" class="text-xs pt-2">{{ listing.rentalListing?.rentFrequency }}</p>
           <p v-else class="text-xs pt-2">{{ listing.saleListing?.priceType }}</p>
+          <p v-if="listing.publishedAt">Date Dated: {{ dateAddedToDays(listing.publishedAt) }}</p>
 
           <!-- Address -->
           <p class="text-sm mt-2">
@@ -49,6 +50,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { dateAddedToDays } from '~~/shared/utils/format-date';
 defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,

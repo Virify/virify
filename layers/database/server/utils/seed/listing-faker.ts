@@ -5,6 +5,15 @@ import { ContactMethod, FurnishedStatus, ListingTier, PrismaClient, RentalPriceT
 const prisma = new PrismaClient();
 
 /**
+ * Generate a random date between 1, 3, 7, and 14 days ago.
+ */
+export const generateRandomDate = ()  => {
+  const daysOptions = [1, 3, 7, 14];
+  const randomDays = daysOptions[Math.floor(Math.random() * daysOptions.length)];
+  return faker.date.recent({ days: randomDays });
+}
+
+/**
  * Generate a random RentalListing object
  * 
  * @returns RentalListing
@@ -58,6 +67,8 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
       rentalListing: {
         create: generateRentalObject(),
       },
+      published: true,
+      publishedAt: generateRandomDate(),
       property: {
         connect: {
           id: propertyId,
@@ -91,6 +102,8 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
       saleListing: {
         create: generateSaleObject(),
       },
+      published: true,
+      publishedAt: generateRandomDate(),
       property: {
         connect: {
           id: propertyId,

@@ -1,6 +1,6 @@
 <template>
   <div class="| container">
-    <h1 class="| title-2xl lineheight-sm">Search Listings:</h1>
+    <h1 class="| title-2xl lineheight-sm">Search Listings: {{ listings.length }}</h1>
 
     <div v-if="listings.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="listing in listings" :key="listing.id" class="rounded-xl shadow-lg overflow-hidden flex flex-col">
@@ -13,6 +13,7 @@
           <p class="text-lg font-bold pt-2">£{{ listing.price.toLocaleString() }}</p>
           <p v-if="listing.rentalListing" class="text-xs pt-2">{{ listing.rentalListing?.rentFrequency }}</p>
           <p v-else class="text-xs pt-2">{{ listing.saleListing?.priceType }}</p>
+          <p v-if="listing.publishedAt">Date Dated: {{ dateAddedToDays(listing.publishedAt) }}</p>
 
           <!-- Address -->
           <p class="text-sm mt-2">
@@ -52,7 +53,8 @@
   </div>
 </template>
 <script setup lang="ts">
-defineProps({
+import { dateAddedToDays } from '~~/shared/utils/format-date';
+const props = defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
     required: true,

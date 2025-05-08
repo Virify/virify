@@ -115,18 +115,30 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
-export async function getSaleListingsByDistance(
-  { location, radius }: ListingSearch,
-  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
-): Promise<ListingSaleWithFullProperty[]> {
+export async function getListingByDistanceAndFilters(
+  { buyOrRent, location, radius }: ListingSearch,
+  { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, take, skip }: ListingSearchOptional = {}
+): Promise<ListingSaleWithFullProperty[] | ListingRentalWithFullProperty[]> {
   const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
-
   return await prisma.listing.findMany({
     where: {
-      saleListing: {
-        isNot: null,
-      },
+      ...(buyOrRent === "buy" && {
+        saleListing: {
+          isNot: null,
+        },
+      }),
+      ...(buyOrRent === "rent" && {
+        rentalListing: {
+          isNot: null,
+        },
+      }),
       price: getPriceFilter(priceRange),
+      published: true,
+      publishedAt: addedToSite
+        ? {
+            gte: new Date(addedToSite),
+          }
+        : undefined,
       property: {
         id: {
           in: nearbyProperties.map((p) => p.propertyId),
@@ -153,59 +165,8 @@ export async function getSaleListingsByDistance(
     take,
     skip,
     include: {
-      saleListing: true,
-      property: {
-        include: {
-          ...propertyInclude,
-        },
-      },
-    },
-  });
-}
-
-/**
- * Get Rental Listings by Property IDs
- *
- * @param propertyIds number[]
- * @returns ListingWithFullProperty[]
- */
-export async function getRentalListingsByDistance( { location, radius }: ListingSearch,
-  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
-): Promise<ListingRentalWithFullProperty[]> {
-  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
-  return await prisma.listing.findMany({
-    where: {
-      rentalListing: {
-        isNot: null,
-      },
-      price: getPriceFilter(priceRange),
-      property: {
-        id: {
-          in: nearbyProperties.map((p) => p.propertyId),
-        },
-        type: {
-          name: {
-            in: propertyTypes,
-          },
-        },
-        numberBedrooms: bedrooms
-          ? {
-              gte: bedrooms[0], // min bedroom
-              lte: bedrooms[1], // max bedroom
-            }
-          : undefined,
-        numberBathrooms: bathrooms
-          ? {
-              gte: bathrooms[0], // min bathroom
-              lte: bathrooms[1], // max bathroom
-            }
-          : undefined,
-      },
-    },
-    take,
-    skip,
-    include: {
-      rentalListing: true,
+      ...(buyOrRent === "buy" && { saleListing: true }),
+      ...(buyOrRent === "rent" && { rentalListing: true }),
       property: {
         include: {
           ...propertyInclude,

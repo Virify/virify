@@ -143,8 +143,6 @@ import type { MinMaxPriceResponse } from "~~/shared/types/price";
  *  Popover management
  */
 const $form = useTemplateRef("$form");
-const searchListings = inject<Ref<ListingWithFullProperty[] | null>>("searchListings");
-
 /**
  * state
  */
@@ -217,6 +215,11 @@ const bedroomOptions = [
   { value: "3", key: "3" },
   { value: "4", key: "4" },
   { value: "5", key: "5" },
+  { value: "6", key: "6" },
+  { value: "7", key: "7" },
+  { value: "8", key: "8" },
+  { value: "9", key: "9" },
+  { value: "10", key: "10" },
 ];
 
 /**
@@ -335,6 +338,9 @@ watch(suggestions, (newValue) => {
   formErrors.value = null;
 });
 
+const searchListings = inject<Ref<ListingWithFullProperty[] | null>>("searchListings");
+
+
 async function sendForm(event: Event) {
   const target = event.target as HTMLFormElement;
   const { formData, errors } = useFormData(target);
@@ -384,7 +390,6 @@ async function sendForm(event: Event) {
       featured: formatFeatures
     }
   });
-
   console.log("POST DEBUG", {
     location: formData?.get("location"),
     radius: radius,
@@ -398,7 +403,9 @@ async function sendForm(event: Event) {
     featured: formatFeatures
   });
 
-  searchListings ? (searchListings.value = listingsResult) : null;
+  if (searchListings) {
+    searchListings.value = listingsResult;
+  }
   // Hide popover when search is successful
   hidePopover();
 }

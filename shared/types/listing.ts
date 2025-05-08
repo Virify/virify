@@ -47,6 +47,7 @@ export type ListingRentalWithFullProperty = Prisma.ListingGetPayload<{
 }>;
 
 export type ListingSearch = {
+  buyOrRent: "buy" | "rent";
   location: string;
   radius: number;
 };
@@ -56,6 +57,9 @@ export type ListingSearchOptional = {
   bathrooms?: number[];
   propertyTypes?: string[];
   priceRange?: number[];
+  addedToSite?: Date;
+  include?: string;
+  featured?: { key: string; group: string }[];
   take?: number | undefined;
   skip?: number | undefined;
 }
