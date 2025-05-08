@@ -29,10 +29,10 @@
 
         <div role="presentation" class="| flow flow-md">
           <MoleculesFormField label="Search radius" v-slot="{ id }">
-            <select :id class="| text-input body-sm focus-visible" name="radius">
+            <AtomsSelect :id class="| text-input body-sm focus-visible" name="radius">
               <option v-for="({ key, value }, index) of radiusOptions" :key="value" :value :selected="index === 0">{{
                 key }}</option>
-            </select>
+            </AtomsSelect>
           </MoleculesFormField>
           <!-- <div class="o-searchform-map | title-2xl">Map</div> -->
         </div>
@@ -56,16 +56,16 @@
         <OrganismsSearchFormTitleBlock title="Bedrooms" class="| animate-fade-down" style="--delay: 50ms">
           <div class="o-searchform-filter">
             <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
-              <select :id class="| text-input body-sm focus-visible" name="min-bedrooms">
+              <AtomsSelect :id class="| text-input body-sm focus-visible" name="min-bedrooms">
                 <option v-for="({ key, value }, index) of bedroomOptions" :key="value" :value :selected="index === 0">{{
                   key }}</option>
-              </select>
+              </AtomsSelect>
             </MoleculesFormField>
             <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
-              <select :id class="| text-input body-sm focus-visible" name="max-bedrooms">
+              <AtomsSelect :id class="| text-input body-sm focus-visible" name="max-bedrooms">
                 <option v-for="({ key, value }, index) of bedroomOptions" :key="value" :value :selected="index === 0">{{
                   key }}</option>
-              </select>
+              </AtomsSelect>
             </MoleculesFormField>
           </div>
         </OrganismsSearchFormTitleBlock>
@@ -73,16 +73,16 @@
         <OrganismsSearchFormTitleBlock title="Bathrooms" class="| animate-fade-down" style="--delay: 50ms">
           <div class="o-searchform-filter">
             <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
-              <select :id class="| text-input body-sm focus-visible" name="min-bathrooms">
+              <AtomsSelect :id class="| text-input body-sm focus-visible" name="min-bathrooms">
                 <option v-for="({ key, value }, index) of bathroomOptions" :key="value" :value :selected="index === 0">
                   {{ key }}</option>
-              </select>
+              </AtomsSelect>
             </MoleculesFormField>
             <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
-              <select :id class="| text-input body-sm focus-visible" name="max-bathrooms">
+              <AtomsSelect :id class="| text-input body-sm focus-visible" name="max-bathrooms">
                 <option v-for="({ key, value }, index) of bathroomOptions" :key="value" :value :selected="index === 0">
                   {{ key }}</option>
-              </select>
+              </AtomsSelect>
             </MoleculesFormField>
           </div>
         </OrganismsSearchFormTitleBlock>
@@ -99,20 +99,20 @@
       <div class="o-searchform-filter o-searchform-animation">
         <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 50ms">
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
-            <select class="| text-input focus-visible body-sm" name="added-to-site">
+            <AtomsSelect class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }, index) of dateOptions" :key="value" :value :selected="index === 0">{{ key
               }}</option>
-            </select>
+            </AtomsSelect>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
 
         <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 50ms">
           <MoleculesFormField label="Show" class="| focus-overflow">
-            <select class="| text-input focus-visible body-sm" name="include">
+            <AtomsSelect class="| text-input focus-visible body-sm" name="include">
               <option v-for="({ key, value }, index) of isBuy ? saleIncludeOptions : rentIncludedOptions" :key="value"
                 :value :selected="index === 0">{{ key
                 }}</option>
-            </select>
+            </AtomsSelect>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
       </div>
