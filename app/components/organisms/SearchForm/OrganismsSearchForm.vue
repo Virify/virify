@@ -29,22 +29,85 @@
 
         <div role="presentation" class="| flow flow-md">
           <MoleculesFormField label="Search radius" v-slot="{ id }">
-            <select :id class="| text-input focus-visible" name="radius">
-              <option v-for="{ key, value }, index of radiusOptions" :key="value" :value :selected="index === 0">{{
-                key
-                }}
-              </option>
+            <select :id class="| text-input body-sm focus-visible" name="radius">
+              <option v-for="({ key, value }, index) of radiusOptions" :key="value" :value :selected="index === 0">{{
+                key }}</option>
             </select>
           </MoleculesFormField>
-
           <!-- <div class="o-searchform-map | title-2xl">Map</div> -->
         </div>
       </div>
 
+      <!-- bedrooms & bathrooms -->
+      <div class="o-searchform-filter o-searchform-animation">
+        <OrganismsSearchFormTitleBlock title="Bedrooms" class="| animate-fade-down" style="--delay: 50ms">
+          <div class="o-searchform-filter">
+            <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
+              <select :id class="| text-input body-sm focus-visible" name="min-bedrooms">
+                <option v-for="({ key, value }, index) of bedroomOptions" :key="value" :value :selected="index === 0">{{
+                  key }}</option>
+              </select>
+            </MoleculesFormField>
+            <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
+              <select :id class="| text-input body-sm focus-visible" name="max-bedrooms">
+                <option v-for="({ key, value }, index) of bedroomOptions" :key="value" :value :selected="index === 0">{{
+                  key }}</option>
+              </select>
+            </MoleculesFormField>
+          </div>
+        </OrganismsSearchFormTitleBlock>
+
+        <OrganismsSearchFormTitleBlock title="Bathrooms" class="| animate-fade-down" style="--delay: 50ms">
+          <div class="o-searchform-filter">
+            <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
+              <select :id class="| text-input body-sm focus-visible" name="min-bathrooms">
+                <option v-for="({ key, value }, index) of bathroomOptions" :key="value" :value :selected="index === 0">
+                  {{ key }}</option>
+              </select>
+            </MoleculesFormField>
+            <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
+              <select :id class="| text-input body-sm focus-visible" name="max-bathrooms">
+                <option v-for="({ key, value }, index) of bathroomOptions" :key="value" :value :selected="index === 0">
+                  {{ key }}</option>
+              </select>
+            </MoleculesFormField>
+          </div>
+        </OrganismsSearchFormTitleBlock>
+      </div>
+
+      <!-- Date Added and Include Options -->
+      <div class="o-searchform-filter o-searchform-animation">
+        <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 50ms">
+          <MoleculesFormField label="Recently Added" class="| focus-overflow">
+            <select class="| text-input focus-visible body-sm" name="added-to-site">
+              <option v-for="({ key, value }, index) of dateOptions" :key="value" :value :selected="index === 0">{{ key
+                }}</option>
+            </select>
+          </MoleculesFormField>
+        </OrganismsSearchFormTitleBlock>
+
+        <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 50ms">
+          <MoleculesFormField label="Show" class="| focus-overflow">
+            <select class="| text-input focus-visible body-sm" name="include">
+              <option v-for="({ key, value }, index) of isBuy ? saleIncludeOptions : rentIncludedOptions" :key="value"
+                :value :selected="index === 0">{{ key
+                }}</option>
+            </select>
+          </MoleculesFormField>
+        </OrganismsSearchFormTitleBlock>
+      </div>
+
+      <!-- price -->
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
+        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
+          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
+      </OrganismsSearchFormTitleBlock>
+
+      <!-- property types -->
       <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 50ms">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
-            <li v-for="{ id, name, defaultSelected }, index of propertyTypes" :key="id" class="| animate-fade-down"
+            <li v-for="({ id, name, defaultSelected }, index) of propertyTypes" :key="id" class="| animate-fade-down"
               :style="`--delay: ${50 + index * 40}ms`">
               <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
             </li>
@@ -52,25 +115,36 @@
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
 
-      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
-        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin" :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
+      <!-- property features -->
+      <OrganismsSearchFormTitleBlock title="Property Features" class="| animate-fade-down" style="--delay: 250ms">
+        <MoleculesScrollBox class="| focus-overflow">
+          <ul class="o-searchform-property-types">
+            <li v-for="({ key, label, isDefault }, index) in propertyFeatures" :key="key" class="| animate-fade-down"
+              :style="`--delay: ${250 + index * 40}ms`">
+              <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
+            </li>
+          </ul>
+        </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
+
     </OrganismsSearchFormPopover>
   </form>
 </template>
 
 <script setup lang="ts">
-import type { PropertyType } from '@prisma/client';
-import { onClickOutside, watchDebounced } from '@vueuse/core';
-import type { MinMaxPriceResponse } from '~~/shared/types/price';
+import type { PropertyType } from "@prisma/client";
+import { onClickOutside, watchDebounced } from "@vueuse/core";
+import type { MinMaxPriceResponse } from "~~/shared/types/price";
 
 /**
  *  Popover management
  */
-const $form = useTemplateRef('$form');
-const searchListings = inject<Ref<ListingWithFullProperty[] | null>>('searchListings');
+const $form = useTemplateRef("$form");
+const searchListings = inject<Ref<ListingWithFullProperty[] | null>>("searchListings");
 
-// Track state of form
+/**
+ * state
+ */
 const popoverHidden = ref(true);
 
 // Show/hide form if appropriate
@@ -100,15 +174,15 @@ onClickOutside($form, () => {
  */
 onMounted(async () => {
   if ($form.value) {
-    $form.value.setAttribute('novalidate', 'novalidate')
+    $form.value.setAttribute("novalidate", "novalidate");
   }
-  priceRange.value = await $fetch<MinMaxPriceResponse>('/api/price/min-max');
+  priceRange.value = await $fetch<MinMaxPriceResponse>("/api/price/min-max");
 });
 
 /**
  *  Search typed
  */
-const suggestions = ref('');
+const suggestions = ref("");
 
 function setSelectedSuggestion(newValue: string) {
   suggestions.value = newValue;
@@ -118,33 +192,102 @@ function setSelectedSuggestion(newValue: string) {
  *  Search radius
  */
 const radiusOptions = [
-  { value: 0, key: 'This location only' },
-  { value: 0.25, key: 'Within 0.25 miles' },
-  { value: 0.5, key: 'Within 0.5 miles' },
-  { value: 1, key: 'Within 1 mile' },
-  { value: 2, key: 'Within 2 miles' },
-  { value: 5, key: 'Within 5 miles' },
-  { value: 10, key: 'Within 10 miles' },
-  { value: 20, key: 'Within 20 miles' },
-  { value: 40, key: 'Within 40 miles' },
+  { value: 0, key: "This location only" },
+  { value: 0.25, key: "Within 0.25 miles" },
+  { value: 0.5, key: "Within 0.5 miles" },
+  { value: 1, key: "Within 1 mile" },
+  { value: 2, key: "Within 2 miles" },
+  { value: 5, key: "Within 5 miles" },
+  { value: 10, key: "Within 10 miles" },
+  { value: 20, key: "Within 20 miles" },
+  { value: 40, key: "Within 40 miles" },
+];
+
+/**
+ * Bedrooms
+ */
+
+const bedroomOptions = [
+  { value: "0", key: "Any" },
+  { value: "1", key: "1" },
+  { value: "2", key: "2" },
+  { value: "3", key: "3" },
+  { value: "4", key: "4" },
+  { value: "5", key: "5" },
+];
+
+/**
+ * Date Options
+ */
+const dateOptions = [
+  { value: "0", key: "Anytime" },
+  { value: "1", key: "1 day" },
+  { value: "3", key: "3 days" },
+  { value: "7", key: "7 days" },
+  { value: "14", key: "14 days" },
+];
+
+/**
+ * Bathroom options
+ */
+
+const bathroomOptions = [
+  { value: "0", key: "Any" },
+  { value: "1", key: "1" },
+  { value: "2", key: "2" },
+  { value: "3", key: "3" },
+  { value: "4", key: "4" },
+  { value: "5", key: "5" },
+];
+
+/**
+ * Include Options
+ */
+
+const saleIncludeOptions = [
+  { value: "all", key: "All" },
+  { value: "available", key: "Available" },
+  { value: "under offer", key: "Under offer" },
+  { value: "sold", key: "Sold" },
+]
+
+const rentIncludedOptions = [
+  { value: "all", key: "All" },
+  { value: "available", key: "Available" },
+  { value: "let agreed", key: "Let agreed" },
+  { value: "let", key: "Let" },
+]
+
+/**
+ * Propety Feature options
+ */
+
+const propertyFeatures = [
+  { group: 'additional', key: "pets", label: "Pet-friendly", isDefault: true },
+  { group: 'parking', key: "garage", label: "Garage", isDefault: false },
+  { group: 'parking', key: "evCharging", label: "EV Charging", isDefault: false },
+  { group: 'outdoor', key: "garden", label: "Garden", isDefault: false },
+  { group: 'accessability', key: "accessible", label: "Accessible", isDefault: false },
 ];
 
 /**
  *  Buy or rent
  */
 
-const buyOrRent = ref('buy');
+const buyOrRent = ref("buy");
 
 const buyOrRentOptions = [
-  { key: 'buy', value: 'Buy' },
-  { key: 'rent', value: 'Rent' },
+  { key: "buy", value: "Buy" },
+  { key: "rent", value: "Rent" },
   // { key: 'price', value: 'Prices' },
 ];
+
+const isBuy = computed(() => buyOrRent.value === "buy" ? true : false);
 
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyType[]>('/api/property-type/all')
+const propertyTypes = await $fetch<PropertyType[]>("/api/property-type/all");
 
 /**
  * Auto Complete
@@ -155,7 +298,7 @@ watchDebounced(
   () => suggestions.value.toLowerCase(),
   async (suggestionsLower) => {
     if (suggestionsLower) {
-      const result = await $fetch<string[]>('/api/address/auto-complete', {
+      const result = await $fetch<string[]>("/api/address/auto-complete", {
         query: { location: suggestionsLower },
       });
       suggestionsMatches.value = result;
@@ -173,8 +316,8 @@ const priceRange = ref<MinMaxPriceResponse>({
   sale: [0, 0],
 });
 
-const priceMin = computed(() => (buyOrRent.value === 'rent' ? priceRange.value.rental[0] : priceRange.value.sale[0]));
-const priceMax = computed(() => (buyOrRent.value === 'rent' ? priceRange.value.rental[1] : priceRange.value.sale[1]));
+const priceMin = computed(() => (buyOrRent.value === "rent" ? priceRange.value.rental[0] : priceRange.value.sale[0]));
+const priceMax = computed(() => (buyOrRent.value === "rent" ? priceRange.value.rental[1] : priceRange.value.sale[1]));
 
 const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value]);
 
@@ -192,6 +335,19 @@ watch(suggestions, (newValue) => {
 async function sendForm(event: Event) {
   const target = event.target as HTMLFormElement;
   const { formData, errors } = useFormData(target);
+  // format features to post
+  const formatFeatures = propertyFeatures.map(({ key }) => {
+    const keyValue = formData?.get(key);
+    if (keyValue) {
+      return { key, group: keyValue };
+    }
+    return null;
+  }).filter(Boolean);
+
+  // format propertyTypes to post
+  const formatPropertyTypes = propertyTypes.map(({ name }) => {
+    return formData?.get(name);
+  }).filter(Boolean);
 
   // If any errors exist, terminate and display
   if (errors) {
@@ -203,42 +359,48 @@ async function sendForm(event: Event) {
   }
 
   // Get radius as number
-  const radiusStr = formData?.get('radius') as string;
+  const radiusStr = formData?.get("radius") as string;
   const radius = radiusStr ?? parseFloat(radiusStr);
 
   // Perform fetch for properties
-  const listingsResult = await $fetch<ListingWithFullProperty[]>('/api/search/listings', {
-    method: 'POST',
+  const listingsResult = await $fetch<ListingWithFullProperty[]>("/api/search/listings", {
+    method: "POST",
     body: {
-      location: formData?.get('location'),
+      location: formData?.get("location"),
       radius: radius,
-      buyOrRent: formData?.get('buyOrRent'),
-      propertyTypes: propertyTypes.map(({ name }) => {
-        return formData?.get(name)
-      }).filter(Boolean),
+      buyOrRent: formData?.get("buyOrRent"),
+      propertyTypes: formatPropertyTypes,
       priceRange: selectedPriceRange.value,
-    },
+      // bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
+      // bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
+      // addedToSite: formData?.get('added-to-site'),
+      // include: formData?.get('include'),
+      // featured: formatFeatures
+    }
+  });
+    
+  console.log("POST DEBUG", {
+    location: formData?.get("location"),
+    radius: radius,
+    buyOrRent: formData?.get("buyOrRent"),
+    propertyTypes: formatPropertyTypes,
+    priceRange: selectedPriceRange.value,
+    bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
+    bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
+    addedToSite: formData?.get('added-to-site'),
+    include: formData?.get('include'),
+    featured: formatFeatures
   });
 
-  console.log('POST DEBUG', {
-    location: formData?.get('location'),
-    radius: radius,
-    buyOrRent: formData?.get('buyOrRent'),
-    propertyTypes: propertyTypes.map(({ name }) => {
-      return formData?.get(name)
-    }).filter(Boolean),
-    priceRange: selectedPriceRange.value,
-  })
-
-  searchListings ? searchListings.value = listingsResult : null;
+  searchListings ? (searchListings.value = listingsResult) : null;
   // Hide popover when search is successful
   hidePopover();
 }
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/functions' as fn;
-@use '#styles/_utils/media' as mq;
+@use "#styles/_utils/functions" as fn;
+@use "#styles/_utils/media" as mq;
 
 .o-searchform {
   max-width: 32em;
@@ -318,6 +480,23 @@ async function sendForm(event: Event) {
   @include mq.tablet {
     grid-template-columns: 1.2fr 1fr;
   }
+}
+
+.o-searchform-filter {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--size-16);
+
+  @include mq.tablet {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.o-searchform-toggle {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 34px;
 }
 
 .o-searchform-autocomplete-button {
