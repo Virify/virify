@@ -36,7 +36,7 @@ import { z } from "zod";
 const { user, session, clear, loggedIn } = useUserSession();
 const { getFavourites, removeListingFromArray } = useFavourites();
 
-const favorites = ref<ListingWithFullProperty[]>([]);
+const favorites = ref<ListingCardType[]>([]);
 
 onMounted(async () => {
   // Fetch the user's favorites when the component is mounted

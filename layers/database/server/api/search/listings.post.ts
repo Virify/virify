@@ -1,7 +1,7 @@
 import * as z from "zod";
-import { getListingByDistanceAndFilters } from "../../utils/listing";
 import type { ListingSearch, ListingSearchOptional } from "~~/shared/types/listing";
 import { calculateDateFromDays } from "~~/shared/utils/format-date";
+import { convertToValidEnum } from "~~/shared/utils/enums";
 
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
@@ -12,7 +12,7 @@ const searchSchema = z.object({
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
   addedToSite: z.coerce.number().optional(),
-  include: z.string().optional(),
+  availabilityOptions: z.string().optional(),
   featured: z.array(z.object({ key: z.string(), group: z.string() })).optional(),
 });
 
@@ -25,14 +25,37 @@ const searchSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, include, featured } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, availabilityOptions, featured } = await readValidatedBody(event, searchSchema.parse);
+
+    console.log("Search Params: ", {
+      buyOrRent,
+      radius,
+      propertyTypes,
+      priceRange,
+      location,
+      bedrooms,
+      bathrooms,
+      addedToSite,
+      availabilityOptions,
+      featured,
+    });
+
     validateQueries(radius, buyOrRent, location);
 
+    /**
+     * Required for search
+     */
     const listingSearch: ListingSearch = {
-      buyOrRent,
       location,
       radius,
+      type: buyOrRent,
     };
+
+    /**
+     * Enums are always uppercase and _ instead of space
+     */
+    const availabilityOptionsToEnum = convertToValidEnum(availabilityOptions);
+
     // TODO: Add include and popular filters
     const optional: ListingSearchOptional = {
       bedrooms: bedrooms && bedrooms[0] === 0 && bedrooms[1] === 0 ? undefined : bedrooms,
@@ -40,10 +63,11 @@ export default defineEventHandler(async (event) => {
       propertyTypes,
       priceRange,
       addedToSite: addedToSite && addedToSite !== 0 ? calculateDateFromDays(addedToSite) : undefined,
+      availabilityOptions: availabilityOptionsToEnum,
     };
 
-    // we won't need the location when we integrate with mapbox - we just get coords - reduces a read of the database
     const listings = await getListingByDistanceAndFilters(listingSearch, optional);
+  
     return listings
   } catch (error) {
     console.error("Error fetching listings:", error);

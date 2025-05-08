@@ -15,7 +15,6 @@
 const props = defineProps({
   token: {
     type: String,
-    required: true,
   },
 });
 

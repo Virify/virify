@@ -75,7 +75,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ListingCardType  } from "~~/shared/types/listing";
 
 const tabs = ["All", "Rental", "Sale"];
 const activeTab = ref("All");

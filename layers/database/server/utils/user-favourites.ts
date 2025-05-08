@@ -1,4 +1,7 @@
 import type { UserFavourites } from "@prisma/client";
+import { type ListingCardType, listingCardFields } from './listing'
+import type { UserFavouritesListingType } from "~~/shared/types/user-favourites";
+
 
 /**
  * Get user favourites by ID
@@ -6,18 +9,12 @@ import type { UserFavourites } from "@prisma/client";
  * @param id number
  * @returns user
  */
-export async function getUserFavourites(id: number): Promise<UserFavourites | null> {
+export async function getUserFavourites(id: number): Promise<UserFavouritesListingType | null> {
   return prisma.userFavourites.findUnique({
     where: { userId: id },
     include: {
       listings: {
-        include: {
-          property: {
-            include: {
-              ...propertyInclude
-            }
-          }
-        },
+        select: listingCardFields
       },
     },
   });

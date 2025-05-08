@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus } from "@prisma/client";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {
@@ -36,7 +36,7 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
  * Buy or Rent 
  */
 export type ListingSearch = {
-  buyOrRent: "buy" | "rent";
+  type: "buy" | "rent";
   location: string;
   radius: number;
 };
@@ -50,77 +50,10 @@ export type ListingSearchOptional = {
   propertyTypes?: string[];
   priceRange?: number[];
   addedToSite?: Date;
-  include?: string;
+  availabilityOptions?: string[];
   featured?: { key: string; group: string }[];
   take?: number | undefined;
   skip?: number | undefined;
 }
 
-/**
- * Listing Card Type
- */
-export type ListingCardType = Prisma.ListingGetPayload<{
-  select: {
-    id: true;
-    title: true;
-    price: true;
-    publishedAt: true;
-    rentalListing: {
-      select: {
-        rentFrequency: true;
-      } | null;
-    };
-    saleListing: {
-      select: {
-        priceType: true;
-      } | null;
-    };
-    property: {
-      select: {
-        media: {
-          select: {
-            image: true;
-            metadata: true
-          };
-        };
-        address: {
-          select: {
-            number: true;
-            id: true;
-            flat: true;
-            street: true;
-            city: true;
-            postcode: true;
-            country: true;
-            county: true;
-            lat: true;
-            lon: true;
-          };
-        }
-        type: {
-          select: {
-            name: true;
-          };
-        };
-        numberBedrooms: true;
-        numberBathrooms: true;
-        parking: {
-          select: {
-            evCharging: true;
-          };
-        };
-        outdoorSpace: {
-          select: {
-            frontGarden: true;
-            rearGarden: true;
-          };
-        };
-        additionalFeatures: {
-          select: {
-            petFriendly: true;
-          };
-        };
-      };
-    };
-  };
-}>;
+export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilityStatus | (SaleAvailabilityStatus | RentalAvailabilityStatus)[];

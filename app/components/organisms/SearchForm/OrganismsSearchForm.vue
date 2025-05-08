@@ -109,7 +109,7 @@
         <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 50ms">
           <MoleculesFormField label="Show" class="| focus-overflow">
             <AtomsSelect class="| text-input focus-visible body-sm" name="include">
-              <option v-for="({ key, value }, index) of isBuy ? saleIncludeOptions : rentIncludedOptions" :key="value"
+              <option v-for="({ key, value }, index) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions" :key="value"
                 :value :selected="index === 0">{{ key
                 }}</option>
             </AtomsSelect>
@@ -248,16 +248,18 @@ const bathroomOptions = [
 
 /**
  * Include Options
+ * 
+ * !! These are very specific enums from the database
  */
 
-const saleIncludeOptions = [
+const saleAvailabilityOptions = [
   { value: "all", key: "All" },
   { value: "available", key: "Available" },
   { value: "under offer", key: "Under offer" },
   { value: "sold", key: "Sold" },
 ]
 
-const rentIncludedOptions = [
+const rentAvailabilityOptions = [
   { value: "all", key: "All" },
   { value: "available", key: "Available" },
   { value: "let agreed", key: "Let agreed" },
@@ -386,7 +388,7 @@ async function sendForm(event: Event) {
       bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
       bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
       addedToSite: formData?.get('added-to-site'),
-      include: formData?.get('include'),
+      availabilityOptions: formData?.get('include'),
       featured: formatFeatures
     }
   });
@@ -399,7 +401,7 @@ async function sendForm(event: Event) {
     bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
     bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
     addedToSite: formData?.get('added-to-site'),
-    include: formData?.get('include'),
+    availabilityOptions: formData?.get('include'),
     featured: formatFeatures
   });
 

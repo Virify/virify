@@ -1,0 +1,30 @@
+import type { RentalAvailabilityStatus, SaleAvailabilityStatus } from "@prisma/client";
+
+/**
+ * Converts a string to a valid Prisma enum value.
+ * 
+ * @param value The input string to convert.
+ * @returns A valid enum value or undefined if the input is invalid.
+ */
+export function convertToValidEnum(
+  value: string | undefined
+): (RentalAvailabilityStatus | SaleAvailabilityStatus)[] | undefined {
+  if (!value || value === "all") {
+    return undefined;
+  }
+
+  // Convert string to array of valid Prisma enum values
+  return value.split(",").map((v) =>
+    v.trim().toUpperCase().replace(/\s+/g, "_") as RentalAvailabilityStatus | SaleAvailabilityStatus
+  );
+}
+
+/**
+ * Format and return a pretty price type enum.
+ * 
+ * @param type Price Type enum.
+ * @returns string.
+ */
+export function convertEnumToString(type: string): string {
+  return type.toLowerCase().replace("_", " ");
+}

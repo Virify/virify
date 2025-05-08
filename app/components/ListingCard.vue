@@ -14,7 +14,7 @@
           <h2 class="text-sm font-semibold mb-2">{{ listing.title }}</h2>
           <p class="text-lg font-bold pt-2">{{ numberToCurrency(listing.price) }}</p>
           <p v-if="listing.rentalListing" class="text-xs pt-2">{{ listing.rentalListing?.rentFrequency }}</p>
-          <p v-else class="text-xs pt-2 capitalize">{{ mapPriceType(listing.saleListing?.priceType!) }}</p>
+          <p v-else class="text-xs pt-2 capitalize">{{ convertEnumToString(listing.saleListing?.priceType!) }}</p>
           <p v-if="listing.publishedAt">Added to site: {{ dateAddedToDays(listing.publishedAt) }}</p>
           <p v-if="listing.property?.type" class="capitalize">Type: {{ listing.property?.type?.name }}</p>
           <p v-if="listing.property?.additionalFeatures" class="text-xs">Pets: {{ listing.property?.additionalFeatures?.petFriendly }}</p>
@@ -41,6 +41,12 @@
             <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Rental</span>
           </div>
           <div v-if="listing.saleListing" class="mt-2 text-sm">
+            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">{{ convertEnumToString(listing.saleListing.availabilityStatus) }}</span>
+          </div>
+          <div v-if="listing.rentalListing" class="mt-2 text-sm">
+            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">{{ convertEnumToString(listing.rentalListing.availabilityStatus) }}</span>
+          </div>
+          <div v-if="listing.saleListing" class="mt-2 text-sm">
             <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">For Sale</span>
           </div>
         </div>
@@ -54,6 +60,7 @@
 </template>
 <script setup lang="ts">
 import { numberToCurrency } from '~~/shared/utils/currency';
+import { convertEnumToString } from '~~/shared/utils/enums';
 const props = defineProps({
   listings: {
     type: Array as PropType<ListingCardType[]>,

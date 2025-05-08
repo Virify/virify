@@ -39,9 +39,9 @@ export function useFavourites() {
    *
    * @returns Array of ListingWithFullProperty or empty array on error
    */
-  const getFavourites = async (): Promise<ListingWithFullProperty[]> => {
+  const getFavourites = async (): Promise<ListingCardType[] | []> => {
     try {
-      const { listings } = await $fetch<{ listings: ListingWithFullProperty[] }>("/api/favourite/get/all");
+      const { listings } = await $fetch<UserFavouritesListingType>("/api/favourite/get/all");
       return listings;
     } catch (error) {
       console.error("Error fetching favourites:", error);
@@ -85,7 +85,7 @@ export function useFavourites() {
   /**
    * Remove a listing from an array favourite Listings
    */
-  function removeListingFromArray(listings: ListingWithFullProperty[], idToRemove: number) {
+  function removeListingFromArray(listings: ListingCardType[], idToRemove: number) {
     return listings.filter((listing) => listing?.id !== idToRemove);
   }
 
