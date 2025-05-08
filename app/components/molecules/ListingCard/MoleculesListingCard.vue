@@ -5,7 +5,9 @@
     <div role="presentation" class="m-listing-card-media | relative">
       <LazyMoleculesCarousel :slides="carouselImages" hydrate-on-interaction="mouseover"
         class="m-listing-card-media-carousel m-listing-card-outline" v-slot="{ slide: { src, alt } }">
-        <img :src :alt class="m-listing-card-carousel-image" />
+        <nuxt-link :to="propertyUrl">
+          <img :src :alt class="m-listing-card-carousel-image" />
+        </nuxt-link>
       </LazyMoleculesCarousel>
     </div>
 
@@ -20,13 +22,13 @@
         </li>
       </ul>
 
-      <NuxtLink :to="propertyUrl" role="presentation" class="m-listing-card-link">
+      <nuxt-link :to="propertyUrl" class="m-listing-card-link">
         <h3 class="m-listing-card-price | title-md">{{ priceFormatted }}</h3>
 
         <p class="m-listing-card-address | body-sm font-bold">
           {{ addressString }}
         </p>
-      </NuxtLink>
+      </nuxt-link>
 
       <Transition name="content">
         <div class="m-list-card-expanding m-listing-card-outline | flow flow-md" role="presentation" v-if="isHover">
