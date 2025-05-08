@@ -2,8 +2,14 @@
   <div ref="scrollContainer">
     <OrganismsHeroHome />
 
-    <ListingCard :listings="typeOfListing" :title="searchListings ? `Search Results: ` : `Featured Listings: `" />
-      <div ref="infiniteTrigger" class="p-index-spacer"></div>
+    <div class="p-listing-test-grid">
+      <MoleculesListingCard v-for="listing in typeOfListing" :key="listing.id" :property-id="listing.id"
+        :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
+        :address="listing.property?.address" :bedrooms="listing.property?.numberBedrooms"
+        :bathrooms="listing.property?.numberBathrooms" :description="listing.title" />
+    </div>
+
+    <pre>{{ JSON.stringify(typeOfListing, null, 2) }}</pre>
   </div>
 </template>
 
