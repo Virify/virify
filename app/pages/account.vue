@@ -1,42 +1,32 @@
 <template>
   <div class="container">
-
-    <div v-if="favorites.length > 0" class="mb-6">
-      <ListingCard :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites"  />
+    <div v-if="favorites.length > 0">
+      <ListingCard :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites" />
     </div>
 
-    <div class="w-full sm:w-lg">
-      <h1 class="text-3xl font-bold mb-6">Account</h1>
-      <div v-if="loggedIn">
-        <p class="mb-6">Manage your account settings and preferences.</p>
-        <p class="mb-6">Logged in since {{ session?.loggedInAt }}</p>
-        <p class="mb-6">User ID: {{ user?.id }}</p>
-        <p class="mb-6">User Email: {{ user?.email }}</p>
+    <div class="pt-6">
 
-        <!-- UI Form -->
-        <UForm @submit="setPassword" :state="state" :schema="passwordSchema" class="w-full mb-6">
-          <!-- password input -->
-          <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
-            <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl"
-              class="w-full" />
-          </UFormField>
-          <!-- password input -->
-          <UFormField label="Confirm Password" name="confirmedPassword" size="xl" hint="Required" class="py-2">
-            <UInput v-model="state.confirmedPassword" type="password" placeholder="Enter your password again" size="xl"
-              class="w-full" />
-          </UFormField>
-          <!-- submit button -->
-          <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Set
-            Password </UButton>
-        </UForm>
-        <!-- END UI Form -->
+      <div v-if="loggedIn" class="w-full max-w-md">
+        <div>
+          <h1 class="title-xl">Account</h1>
+          <p class="title-xs">Manage your account settings and preferences.</p>
+          <p class="body-sm"><strong>ID:</strong> {{ user?.id }}</p>
+          <p class="body-sm"><strong>Email: </strong> {{ user?.email }}</p>
+          <p class="body-sm"><strong>Username:</strong> {{ user?.username }}</p>
+        </div>
 
-        <div class="w-full sm:w-lg">
-          <!-- UI Form -->
-          <UButton @click="logout" class="mb-4 mr-2" variant="solid">Logout</UButton>
-          <UButton @click="deleteAccount" class="mb-4" variant="solid">Delete Account</UButton>
+        <div class="flex flex-row gap-2">
+          <button @click="logout" class="button button-ghost button-sm">Logout</button>
+          <button @click="deleteAccount" class="button button-monochrome button-sm">Delete Account</button>
         </div>
       </div>
+
+      <div class="w-full max-w-md pt-6">
+        <h2 class="title-xl">Update Password</h2>
+        <OrganismsFormsPasswordReset />
+      </div>
+
+
     </div>
   </div>
 </template>
