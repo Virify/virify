@@ -6,12 +6,17 @@ import { generateProperty } from "../../utils/seed/property-faker.ts";
 import { generateRentalListing, generateSaleListing } from "../../utils/seed/listing-faker.ts";
 import { updateLocationsByAddressListForSeed } from "../../utils/seed/location-for-seed.ts";
 const prisma = new PrismaClient();
+import dotenv from 'dotenv';
+dotenv.config();
+
+
 
 /**
  * Seeding function to populate the database with initial data.
  * This function is called when the database is initialized or reset.
  */
 const seed = async () => {
+  await seedAdminUser();
   await seedCityCenters();
   await seedPropertyTypes();
 
@@ -23,7 +28,6 @@ const seed = async () => {
     let property = await generateProperty(addr);
     await generateRentalListing(property.id);
   }
-  console.log("Seeding completed successfully.");
 };
 
 seed().catch((e) => {
@@ -32,9 +36,46 @@ seed().catch((e) => {
 });
 
 /**
+ * Seeding function to create an admin user in the database.
+ * This function is called when the database is initialized or reset.
+ */
+async function seedAdminUser() {
+  const adminUser = {
+    email: process.env.ADMIN_EMAIL || "default_admin_email@example.com",
+    password: process.env.ADMIN_PASSWORD || "default_admin_password",
+    username: process.env.ADMIN_USERNAME || "default_admin_username",
+    firstName: "Virify",
+    lastName: "Admin",
+  }
+
+  await prisma.user.create({
+    data: {
+      email: adminUser.email,
+      password: adminUser.password,
+      username: adminUser.username,
+      firstName: adminUser.firstName,
+      lastName: adminUser.lastName,
+      verification: {
+        create: {
+          activated: true,
+        },
+      },
+      address: {
+        create: {
+          street: "123 Admin St",
+          city: "Admin City",
+          postcode: "12345",
+          country: "Admin Country",
+        },
+      }
+    }
+  })
+}
+    
+/**
  * Seeding function to populate city center addresses in the database.
  */
-export async function seedCityCenters() {
+async function seedCityCenters() {
   const created = await Promise.all(
     cityCenters.map((center) =>
       prisma.address.upsert({
@@ -62,7 +103,7 @@ export async function seedCityCenters() {
 /**
  * Seeding function to populate property types and classifications in the database.
  */
-export async function seedPropertyTypes() {
+async function seedPropertyTypes() {
   const types = {
     House: ["Terraced", "Semi-detached", "End of terrace", "Detached", "Mansion"],
     Cottage: ["Terraced", "Detached", "Semi-detached", "End of terrace"],

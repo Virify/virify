@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import * as z from "zod";
-const { showToast } = useToastNotification();
 const route = useRoute();
 
 const reviewSchema = z.object({
@@ -30,22 +29,12 @@ onMounted(async () => {
       method: "POST",
       body: validatedData,
     });
-    showToast({
-      title: "Account review successful, You can now close this page.",
-      icon: "ri:check-line",
-    });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       const errorMessages = error.issues.map((issue) => issue.message).join(", ");
-      showToast({
-        title: errorMessages,
-        icon: "ri:error-warning-line",
-      });
     } else {
-      showToast({
-        title: error?.data?.message || "Something went wrong",
-        icon: "ri:error-warning-line",
-      });
+      // Handle other errors (e.g., network errors)
+      console.error("An error occurred:", error);
     }
   }
 });

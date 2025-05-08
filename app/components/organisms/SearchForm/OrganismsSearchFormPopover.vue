@@ -1,5 +1,5 @@
 <template>
-  <div class="| flow flow-2xl">
+  <div class="| flow flow-2xl z-1">
     <slot />
 
     <OrganismsSearchFormTitleBlock title="Explore more" class="| animate-fade-down" style="--delay: 200ms">

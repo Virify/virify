@@ -422,7 +422,11 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       storageFeatures: {
         create: generateStorage(),
       },
-      user: undefined,
+      user: {
+        connect: {
+          id: 1, // admin user
+        },
+      },
       agents: {
         connect: [], // if any
       },

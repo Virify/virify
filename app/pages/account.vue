@@ -1,7 +1,62 @@
+<template>
+  <div class="container">
+    <div v-if="favorites.length > 0">
+      <ListingCard :listings="favorites" :title="`Favourite Listings: `" @remove-from-listings="removeFromFavorites" />
+    </div>
+
+    <div class="pt-6">
+
+      <div v-if="loggedIn" class="w-full max-w-md">
+        <div>
+          <h1 class="title-xl">Account</h1>
+          <p class="title-xs">Manage your account settings and preferences.</p>
+          <p class="body-sm"><strong>ID:</strong> {{ user?.id }}</p>
+          <p class="body-sm"><strong>Email: </strong> {{ user?.email }}</p>
+          <p class="body-sm"><strong>Username:</strong> {{ user?.username }}</p>
+        </div>
+
+        <div class="flex flex-row gap-2">
+          <button @click="logout" class="button button-ghost button-sm">Logout</button>
+          <button @click="deleteAccount" class="button button-monochrome button-sm">Delete Account</button>
+        </div>
+      </div>
+
+      <div class="w-full max-w-md pt-6">
+        <h2 class="title-xl">Update Password</h2>
+        <OrganismsFormsPasswordReset />
+      </div>
+
+
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { z } from "zod";
 const { user, session, clear, loggedIn } = useUserSession();
+const { getFavourites, removeListingFromArray } = useFavourites();
 
+const favorites = ref<ListingWithFullProperty[]>([]);
+
+onMounted(async () => {
+  // Fetch the user's favorites when the component is mounted
+  fetchFavorites();
+});
+
+/**
+ * Fetches the user's favorite listings
+ * and updates the favorites state
+ */
+const fetchFavorites = async () => {
+  favorites.value = await getFavourites();
+};
+
+/**
+ * Remove a listing from favorites
+ */
+const removeFromFavorites = (listingId: number) => {
+  favorites.value = removeListingFromArray(favorites.value, listingId);
+};
 /**
  * Form validation schema
  */
@@ -24,6 +79,7 @@ const state = reactive<Partial<Schema & { userId: number }>>({
   password: "",
   confirmedPassword: "",
 });
+
 
 /**
  * Reset password function
@@ -77,38 +133,3 @@ async function logout() {
   navigateTo("/");
 }
 </script>
-
-<template>
-  <div class="flex justify-center items-center w-full p-4 sm:p-0">
-    <div class="w-full sm:w-lg">
-      <h1 class="text-3xl font-bold mb-6">Account</h1>
-      <div v-if="loggedIn">
-        <p class="mb-6">Manage your account settings and preferences.</p>
-        <p class="mb-6">Logged in since {{ session?.loggedInAt }}</p>
-        <p class="mb-6">User ID: {{ user?.id }}</p>
-        <p class="mb-6">User Email: {{ user?.email }}</p>
-
-        <!-- UI Form -->
-        <UForm @submit="setPassword" :state="state" :schema="passwordSchema" class="w-full mb-6">
-          <!-- password input -->
-          <UFormField label="Password" name="password" size="xl" hint="Required" class="py-2">
-            <UInput v-model="state.password" type="password" placeholder="Enter your password" size="xl" class="w-full" />
-          </UFormField>
-          <!-- password input -->
-          <UFormField label="Confirm Password" name="confirmedPassword" size="xl" hint="Required" class="py-2">
-            <UInput v-model="state.confirmedPassword" type="password" placeholder="Enter your password again" size="xl" class="w-full" />
-          </UFormField>
-          <!-- submit button -->
-          <UButton color="primary" type="submit" loading-auto size="xl" class="mt-4" variant="solid" active> Set Password </UButton>
-        </UForm>
-        <!-- END UI Form -->
-
-        <div class="w-full sm:w-lg">
-          <!-- UI Form -->
-          <UButton @click="logout" class="mb-4 mr-2" variant="solid">Logout</UButton>
-          <UButton @click="deleteAccount" class="mb-4" variant="solid">Delete Account</UButton>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
