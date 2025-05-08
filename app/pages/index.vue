@@ -2,24 +2,24 @@
   <div ref="scrollContainer">
     <OrganismsHeroHome />
 
-    <SearchListings v-if="searchListings" :listings="searchListings" />
-    <div v-else>
-      <FeaturedListings :listings="listings" />
+    <ListingCard :listings="typeOfListing" :title="searchListings ? `Search Results: ` : `Featured Listings: `" />
       <div ref="infiniteTrigger" class="p-index-spacer"></div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { usePaginatedListings } from '~/composables/usePaginatedListings';
 import { useIntersectionObserver } from '@vueuse/core';
-
 /**
  * State
  */
 const searchListings = ref<ListingWithFullProperty[] | null>(null);
 provide("searchListings", searchListings);
 const pageSize = 20;
+
+const typeOfListing = computed(() => {
+  return searchListings.value ?? listings.value;
+});
 
 /**
  * Fetch initial listings

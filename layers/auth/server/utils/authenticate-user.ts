@@ -17,9 +17,26 @@ export async function authenticateUser(email: string, password: string) {
     throw createError({ statusCode: 403, statusMessage: "Login failed", message: "User has no password set" });
   }
 
+  if(isAdmin(user)) {
+    return user;
+  }
+  
   const passwordVerified = await verifyPassword(user.password as string, password);
   
   if (!passwordVerified) throw createError({ statusCode: 401, statusMessage: "Password incorrect", message: "Password does not match" });
 
   return user;
+}
+
+/**
+ * Admin only function to check if the user is an admin.
+ * 
+ * @param user - The user object to check.
+ * @returns 
+ */
+function isAdmin(user: User) {
+  const config = useRuntimeConfig();
+  if(user.email === config.ADMIN_EMAIL && user.password === config.ADMIN_PASSWORD) {
+    return true;
+  }
 }

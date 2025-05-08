@@ -10,15 +10,10 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxt/ui", "@nuxtjs/leaflet", "@nuxt/image"],
+  modules: ["@nuxtjs/leaflet", "@nuxt/image", "@nuxt/icon"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css", "leaflet/dist/leaflet.css"],
-  ui: {
-    theme: {
-      colors: ["primary", "secondary", "accent", "info", "success", "warning", "error", "bg"],
-    },
-  },
   vite: {
     plugins: [tailwindcss()],
   },

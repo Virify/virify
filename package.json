@@ -9,16 +9,17 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "pgen": "prisma generate",
-    "db-push": "prisma db push"
+    "db-push": "prisma db push",
+    "seed": "tsx ./layers/database/server/database/prisma/seed.ts"
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/",
-    "seed": "ts-node ./layers/database/server/database/prisma/seed.ts"
+    "seed": "tsx ./layers/database/server/database/prisma/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.799.0",
+    "@nuxt/icon": "1.12.0",
     "@nuxt/image": "1.10.0",
-    "@nuxt/ui": "3.0.0-beta.3",
     "@nuxtjs/fontaine": "0.5.0",
     "@nuxtjs/leaflet": "^1.2.6",
     "@prisma/client": "6.4.1",
@@ -50,6 +51,7 @@
     "prisma": "^6.7.0",
     "sass": "^1.87.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "vitest": "^3.1.2"
   }

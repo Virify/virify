@@ -8,7 +8,7 @@
       </div>
 
       <!-- static map -->
-      <LeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
+      <OrganismsMapsLeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
 
       <table class="table-auto w-full text-left border-collapse border border-gray-200">
         <tbody>
