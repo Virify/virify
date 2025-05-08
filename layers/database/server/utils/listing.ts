@@ -115,6 +115,8 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
  * @param propertyIds number[]
  * @returns ListingWithFullProperty[]
  */
+
+// TODO: Add include and popular filters
 export async function getListingByDistanceAndFilters(
   { buyOrRent, location, radius }: ListingSearch,
   { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, take, skip }: ListingSearchOptional = {}

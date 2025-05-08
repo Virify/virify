@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
       location,
       radius,
     };
-
+    // TODO: Add include and popular filters
     const optional: ListingSearchOptional = {
       bedrooms: bedrooms && bedrooms[0] === 0 && bedrooms[1] === 0 ? undefined : bedrooms,
       bathrooms: bathrooms && bathrooms[0] === 0 && bathrooms[1] === 0 ? undefined : bathrooms,

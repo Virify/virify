@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="| container">
     <h1 class="| title-2xl lineheight-sm">{{ title }}</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -11,10 +11,15 @@
         <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" :user-favourites="userFavourites" class="m-listing-fav" />
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
-          <h2 class="text-md font-semibold mb-2">{{ listing.title }}</h2>
-          <p class="text-lg font-bold pt-2">£{{ listing.price }}</p>
+          <h2 class="text-sm font-semibold mb-2">{{ listing.title }}</h2>
+          <p class="text-lg font-bold pt-2">{{ formatPrice(listing.price) }}</p>
           <p v-if="listing.rentalListing" class="text-xs pt-2">{{ listing.rentalListing?.rentFrequency }}</p>
-          <p v-else class="text-xs pt-2">{{ listing.saleListing?.priceType }}</p>
+          <p v-else class="text-xs pt-2 capitalize">{{ mapPriceType(listing.saleListing?.priceType!) }}</p>
+          <p v-if="listing.publishedAt">Added to site: {{ dateAddedToDays(listing.publishedAt) }}</p>
+          <p v-if="listing.property?.type" class="capitalize">Type: {{ listing.property?.type?.name }}</p>
+          <p v-if="listing.property?.additionalFeatures" class="text-xs">Pets: {{ listing.property?.additionalFeatures?.petFriendly }}</p>
+          <p v-if="listing.property?.additionalFeatures" class="text-xs">EV Charging: {{ listing.property?.parking?.evCharging }}</p>
+          <p v-if="listing.property?.additionalFeatures" class="text-xs">Garden: {{ listing.property?.outdoorSpace?.frontGarden || listing.property?.outdoorSpace?.rearGarden }}</p>
 
           <!-- Address -->
           <p class="text-sm mt-2">
@@ -48,7 +53,8 @@
   </div>
 </template>
 <script setup lang="ts">
-defineProps({
+import { mapPriceType } from '~~/shared/utils/price-type';
+const props = defineProps({
   listings: {
     type: Array as PropType<ListingWithFullProperty[]>,
   },
@@ -57,7 +63,7 @@ defineProps({
     default: "Featured Listings",
   },
 });
-
+console.log(props.listings)
 /**
  * state
  */

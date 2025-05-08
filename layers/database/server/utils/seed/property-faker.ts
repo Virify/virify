@@ -16,7 +16,7 @@ const prisma = new PrismaClient();
 export const generateAdditionalFeatures = (): Prisma.AdditionalFeaturesCreateWithoutPropertyInput => {
   return {
     description: faker.word.words(10),
-    petFriendly: true,
+    petFriendly: faker.datatype.boolean(),
     moveInDate: faker.date.future(),
     homeOffice: faker.datatype.boolean(),
     pool: faker.datatype.boolean(),
