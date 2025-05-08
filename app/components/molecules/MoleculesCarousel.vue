@@ -16,7 +16,7 @@ import emblaCarouselVue from 'embla-carousel-vue'
 const [emblaRef] = emblaCarouselVue()
 
 interface Props {
-  slides: unknown[]
+  slides?: any[]
 }
 
 defineProps<Props>()
