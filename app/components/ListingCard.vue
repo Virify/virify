@@ -30,10 +30,10 @@
           <!-- Bedrooms and Bathrooms -->
           <div class="mt-2 text-sm">
             <p>
-              Bedrooms: <strong>{{ listing.property?.bedroomFeatures.length }}</strong>
+              Bedrooms: <strong>{{ listing.property?.numberBedrooms }}</strong>
             </p>
             <p>
-              Bathrooms: <strong>{{ listing.property?.bathroomFeatures.length }}</strong>
+              Bathrooms: <strong>{{ listing.property?.numberBathrooms }}</strong>
             </p>
           </div>
 
@@ -53,10 +53,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { mapPriceType } from '~~/shared/utils/price-type';
+import { numberToCurrency } from '~~/shared/utils/currency';
 const props = defineProps({
   listings: {
-    type: Array as PropType<ListingWithFullProperty[]>,
+    type: Array as PropType<ListingCardType[]>,
   },
   title: {
     type: String,

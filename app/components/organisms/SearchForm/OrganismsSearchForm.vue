@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PropertyType } from "@prisma/client";
+import type { Listing, PropertyType } from "@prisma/client";
 import { onClickOutside, watchDebounced } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
 
@@ -338,7 +338,7 @@ watch(suggestions, (newValue) => {
   formErrors.value = null;
 });
 
-const searchListings = inject<Ref<ListingWithFullProperty[] | null>>("searchListings");
+const searchListings = inject<Ref<ListingCardType[] | null>>("searchListings");
 
 
 async function sendForm(event: Event) {
@@ -375,7 +375,7 @@ async function sendForm(event: Event) {
   const radius = radiusStr ?? parseFloat(radiusStr);
 
   // Perform fetch for properties
-  const listingsResult = await $fetch<ListingWithFullProperty[]>("/api/search/listings", {
+  const searchResult = await $fetch<ListingCardType[]>("/api/search/listings", {
     method: "POST",
     body: {
       location: formData?.get("location"),
@@ -404,7 +404,7 @@ async function sendForm(event: Event) {
   });
 
   if (searchListings) {
-    searchListings.value = listingsResult;
+    searchListings.value = searchResult;
   }
   // Hide popover when search is successful
   hidePopover();
