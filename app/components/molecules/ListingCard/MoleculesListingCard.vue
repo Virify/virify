@@ -3,14 +3,10 @@
     'm-listing-card-hover': isHover
   }">
     <div role="presentation" class="m-listing-card-media | relative">
-      <Transition name="image">
-        <LazyMoleculesListingCardCarousel v-if="isHover" class="m-listing-card-media-carousel m-listing-card-outline"
-          hydrate-on-visible :src="imageSrc" :alt="imageAlt" />
-
-        <button v-else type="button" @click.prevent="forceHover" class="m-listing-card-media-toggle | button-none">
-          <MoleculesListingCardImage :src="imageSrc" :alt="imageAlt" class="m-listing-card-media-image" />
-        </button>
-      </Transition>
+      <LazyMoleculesCarousel :slides="carouselImages" hydrate-on-interaction="mouseover"
+        class="m-listing-card-media-carousel m-listing-card-outline" v-slot="{ slide: { src, alt } }">
+        <img :src :alt class="m-listing-card-carousel-image" />
+      </LazyMoleculesCarousel>
     </div>
 
     <MoleculesListingCardButtons class="m-listing-card-buttons-parent" />
@@ -91,8 +87,18 @@ onClickOutside($root, removeHover)
 /**
  *  Format content
  */
-const imageSrc = computed(() => props.image?.[0]?.image as string)
-const imageAlt = computed(() => props.image?.[0]?.metadata as string)
+const carouselImages = computed(() => {
+  const { image = [] } = props
+
+  return Array.from({ length: 3 }).map(() => {
+    const [firstImage] = image
+
+    return {
+      src: firstImage?.image,
+      alt: firstImage?.metadata
+    }
+  })
+})
 
 const priceFormatted = computed(() => {
   const { price = 0 } = props
@@ -160,24 +166,26 @@ const iconOptions = computed(() => {
   aspect-ratio: 4 / 3;
 }
 
-.m-listing-card-media-toggle {
-  width: 100%;
-}
-
-.m-listing-card-media-image {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-}
-
 .m-listing-card-media-carousel {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  width: 100%;
+  transition-property: width;
+  transition-duration: var(--animation-veryslow);
+  transition-timing-function: var(--ease-out);
+}
+
+.m-listing-card-hover .m-listing-card-media-carousel {
   width: var(--listing-card-width);
-  z-index: 2;
+}
+
+.m-listing-card-carousel-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--border-radius-2xl);
 }
 
 /**
@@ -323,18 +331,6 @@ const iconOptions = computed(() => {
  *  View transitions
  *  Title and prive
  */
-.image-enter-active,
-.image-leave-active {
-  transition-property: width;
-  transition-duration: var(--animation-veryslow);
-  transition-timing-function: var(--ease-out);
-}
-
-.image-leave-to,
-.image-enter-from {
-  width: 100%;
-}
-
 .content-enter-active,
 .content-leave-active {
   transition-property: width;
