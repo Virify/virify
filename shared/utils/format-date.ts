@@ -7,3 +7,27 @@
 export const formatMDY = (date: Date) => {
   return new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "long", day: "numeric" }).format(new Date(date))
 }
+
+/**
+ * Converts a number of days into a date.
+ * @param days Number of days ago
+ * @returns A Date object
+ */
+export function calculateDateFromDays(days: number): Date {
+  const today = new Date();
+  today.setDate(today.getDate() - days);
+  return today;
+}
+
+/**
+ * convery a date into days
+ * 
+ * @param date Date
+ * @returns Date in Days
+ */
+export const dateAddedToDays = (date: Date): number => {
+  const dateAdded = new Date(date);
+  const today = new Date();
+  const timeDiff = Math.abs(today.getTime() - dateAdded.getTime());
+  return Math.ceil(timeDiff / (1000 * 3600 * 24));
+};

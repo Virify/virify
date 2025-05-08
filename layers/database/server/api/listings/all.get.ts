@@ -3,7 +3,7 @@
  *
  * @returns Listing[]
  */
-export default defineEventHandler(async (event): Promise<ListingWithFullProperty[]> => {
+export default defineEventHandler(async (event): Promise<ListingCardType[]> => {
   try {
     const listings = await getAllListings();
 

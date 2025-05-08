@@ -8,7 +8,7 @@
     </div>
 
     <div class="mt-8">
-      <LeafletMap
+      <OrganismsMapsLeafletMap
         :markers="
           filteredListings
             .map((listing) => ({
@@ -16,8 +16,8 @@
               lat: listing.property?.address.lat ?? 0,
               lon: listing.property?.address.lon ?? 0,
               title: listing.title,
-              bedrooms: listing.property?.bedroomFeatures.length || 0,
-              bathrooms: listing.property?.bathroomFeatures.length || 0,
+              bedrooms: listing.property?.numberBedrooms || 0,
+              bathrooms: listing.property?.numberBathrooms || 0,
               price: listing.price,
             }))
             .filter((m) => m.lat !== 0 && m.lon !== 0)
@@ -50,10 +50,10 @@
           <!-- Bedrooms and Bathrooms -->
           <div class="mt-2 text-sm">
             <p>
-              Bedrooms: <strong>{{ listing.property?.bedroomFeatures.length }}</strong>
+              Bedrooms: <strong>{{ listing.property?.numberBedrooms }}</strong>
             </p>
             <p>
-              Bathrooms: <strong>{{ listing.property?.bathroomFeatures.length }}</strong>
+              Bathrooms: <strong>{{ listing.property?.numberBathrooms }}</strong>
             </p>
           </div>
 
@@ -75,12 +75,12 @@
 </template>
 
 <script setup lang="ts">
-import type { ListingWithFullProperty } from "~~/shared/types/listing";
+import type { ListingCardType  } from "~~/shared/types/listing";
 
 const tabs = ["All", "Rental", "Sale"];
 const activeTab = ref("All");
 
-const { data: listings, error } = await useAsyncData("listings", () => $fetch<ListingWithFullProperty[]>("/api/listings/all"));
+const { data: listings, error } = await useAsyncData("listings", () => $fetch<ListingCardType[]>("/api/listings/all"));
 
 if (error.value) {
   console.error("Error fetching listings:", error.value);

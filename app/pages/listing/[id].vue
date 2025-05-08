@@ -8,7 +8,7 @@
       </div>
 
       <!-- static map -->
-      <LeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
+      <OrganismsMapsLeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
 
       <table class="table-auto w-full text-left border-collapse border border-gray-200">
         <tbody>
@@ -224,10 +224,6 @@ const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullPrope
 
 const listing = computed(() => data.value);
 const property = computed(() => data.value?.property);
-
-// logs for ease
-console.log("Listing:", listing.value);
-console.log("Property:", property.value);
 
 const parking = computed(() => {
   const parking = property.value?.parking;

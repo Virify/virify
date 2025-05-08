@@ -1,8 +1,17 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { roundFloat } from "../../../../../shared/utils/float.ts";
+import { roundFloat } from "../../../../../shared/utils/numbers.ts";
 import { ContactMethod, FurnishedStatus, ListingTier, PrismaClient, RentalPriceType, VerificationLevel, type Listing, type Prisma, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus } from "@prisma/client";
 const prisma = new PrismaClient();
+
+/**
+ * Generate a random date between 1, 3, 7, and 14 days ago.
+ */
+export const generateRandomDate = ()  => {
+  const daysOptions = [1, 3, 7, 14];
+  const randomDays = daysOptions[Math.floor(Math.random() * daysOptions.length)];
+  return faker.date.recent({ days: randomDays });
+}
 
 /**
  * Generate a random RentalListing object
@@ -58,11 +67,18 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
       rentalListing: {
         create: generateRentalObject(),
       },
+      published: true,
+      publishedAt: generateRandomDate(),
       property: {
         connect: {
           id: propertyId,
         },
       },
+      user: {
+        connect: {
+          id: 1, // admin user
+        },
+      }
     },
   });
 
@@ -91,11 +107,18 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
       saleListing: {
         create: generateSaleObject(),
       },
+      published: true,
+      publishedAt: generateRandomDate(),
       property: {
         connect: {
           id: propertyId,
         },
       },
+      user: {
+        connect: {
+          id: 1, // admin user
+        },
+      }
     },
   });
 

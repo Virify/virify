@@ -1,19 +1,19 @@
 import * as z from "zod";
-import { getSaleListingsByDistance, getRentalListingsByDistance } from "../../utils/listing";
-
-const LISTING_FETCHERS = {
-  rent: getRentalListingsByDistance,
-  buy: getSaleListingsByDistance,
-};
+import { getListingByDistanceAndFilters } from "../../utils/listing";
+import type { ListingSearch, ListingSearchOptional } from "~~/shared/types/listing";
+import { calculateDateFromDays } from "~~/shared/utils/format-date";
 
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
-  radius: z.coerce.number().min(0).max(100),
+  radius: z.coerce.number().min(0).max(40),
   propertyTypes: z.array(z.string()).optional(),
   priceRange: z.array(z.coerce.number()).optional(),
   location: z.string(),
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
+  addedToSite: z.coerce.number().optional(),
+  include: z.string().optional(),
+  featured: z.array(z.object({ key: z.string(), group: z.string() })).optional(),
 });
 
 /**
@@ -24,22 +24,27 @@ const searchSchema = z.object({
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
-
   try {
-    const { buyOrRent, radius, propertyTypes, priceRange, location, bathrooms, bedrooms } = await readValidatedBody(event, searchSchema.parse);
-
+    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, include, featured } = await readValidatedBody(event, searchSchema.parse);
     validateQueries(radius, buyOrRent, location);
 
-    const fetchListings = LISTING_FETCHERS[buyOrRent];
-
-    if (!fetchListings) {
-      throw createError({ statusCode: 400, statusMessage: `Unsupported listing type: ${buyOrRent}` });
-    }
+    const listingSearch: ListingSearch = {
+      buyOrRent,
+      location,
+      radius,
+    };
+    // TODO: Add include and popular filters
+    const optional: ListingSearchOptional = {
+      bedrooms: bedrooms && bedrooms[0] === 0 && bedrooms[1] === 0 ? undefined : bedrooms,
+      bathrooms: bathrooms && bathrooms[0] === 0 && bathrooms[1] === 0 ? undefined : bathrooms,
+      propertyTypes,
+      priceRange,
+      addedToSite: addedToSite && addedToSite !== 0 ? calculateDateFromDays(addedToSite) : undefined,
+    };
 
     // we won't need the location when we integrate with mapbox - we just get coords - reduces a read of the database
-    const listings = await fetchListings(location, radius, propertyTypes, priceRange, bedrooms, bathrooms);
-
-    return listings;
+    const listings = await getListingByDistanceAndFilters(listingSearch, optional);
+    return listings
   } catch (error) {
     console.error("Error fetching listings:", error);
     errorResponse(error, event);
@@ -57,5 +62,4 @@ function validateQueries(radius: number | undefined, buyOrRent: string, location
   if (radius === undefined || !buyOrRent || !location) {
     throw createError({ statusCode: 400, statusMessage: "Missing required fields: radius, buy or rent or location" });
   }
-
 }
