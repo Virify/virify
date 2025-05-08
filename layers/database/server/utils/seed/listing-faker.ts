@@ -1,6 +1,6 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { roundFloat } from "../../../../../shared/utils/float.ts";
+import { roundFloat } from "../../../../../shared/utils/numbers.ts";
 import { ContactMethod, FurnishedStatus, ListingTier, PrismaClient, RentalPriceType, VerificationLevel, type Listing, type Prisma, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus } from "@prisma/client";
 const prisma = new PrismaClient();
 
