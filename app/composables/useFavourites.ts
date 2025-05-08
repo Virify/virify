@@ -20,19 +20,19 @@ export function useFavourites() {
       showDialog({
         component: ViewsDialogLogin,
       });
+  
       return [];
     }
-    try {
-      const favListings = await $fetch<number[]>(`/api/favourite/update/${listingId}`, {
-        method: "POST",
-        body: { listing: listingId },
-      });
-      return favListings;
-    } catch (error) {
+  
+    return await $fetch<number[]>(`/api/favourite/update/${listingId}`, {
+      method: "POST",
+      body: { listing: listingId },
+    }).catch((error) => {
       console.error("Error adding to favourites:", error);
-      return []; // Return an empty array in case of error
-    }
-  };
+  
+      return []
+    })
+  }
 
   /**
    * Get all favourite listings for the user

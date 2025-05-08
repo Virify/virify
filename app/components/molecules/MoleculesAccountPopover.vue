@@ -10,7 +10,7 @@
 
   <button ref="button" type="button" class="m-account-popover-toggle | body-sm font-bold" :popovertarget="popoverId"
     :disabled="!hasMenuItems" aria-label="Expand menu">
-    Hi, {{ user.username ?? 'Name'}}!
+    Hi, {{ user.username ?? 'User'}}!
     <AtomsIcon width="24" height="24" title="Menu icon" icon="icon/profile" class="m-account-popover-icon" />
   </button>
 </template>
