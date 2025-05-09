@@ -102,7 +102,7 @@
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
             <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                }}</option>
+              }}</option>
             </AtomsSelect>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
@@ -139,6 +139,20 @@
 import type { PropertyType } from "@prisma/client";
 import { onClickOutside, watchDebounced } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
+
+/**
+ *  Get search form config
+ */
+const {
+  radiusOptions,
+  bedroomOptions,
+  bathroomOptions,
+  dateOptions,
+  saleAvailabilityOptions,
+  rentAvailabilityOptions,
+  propertyFeatures,
+  buyOrRentOptions
+} = getSearchFormConfig()
 
 /**
  *  Popover management
@@ -199,103 +213,8 @@ function setSelectedSuggestion(newValue: string) {
 }
 
 /**
- *  Search radius
- */
-const radiusOptions = [
-  { value: 0, key: "This location only" },
-  { value: 0.25, key: "Within 0.25 miles" },
-  { value: 0.5, key: "Within 0.5 miles" },
-  { value: 1, key: "Within 1 mile" },
-  { value: 2, key: "Within 2 miles" },
-  { value: 5, key: "Within 5 miles" },
-  { value: 10, key: "Within 10 miles" },
-  { value: 20, key: "Within 20 miles" },
-  { value: 40, key: "Within 40 miles" },
-];
-
-/**
- * Bedrooms
- */
-
-const bedroomOptions = [
-  { value: "0", key: "Any" },
-  { value: "1", key: "1" },
-  { value: "2", key: "2" },
-  { value: "3", key: "3" },
-  { value: "4", key: "4" },
-  { value: "5", key: "5" },
-  { value: "6", key: "6" },
-  { value: "7", key: "7" },
-  { value: "8", key: "8" },
-  { value: "9", key: "9" },
-  { value: "10", key: "10" },
-];
-
-/**
- * Date Options
- */
-const dateOptions = [
-  { value: "0", key: "Anytime" },
-  { value: "1", key: "1 day" },
-  { value: "3", key: "3 days" },
-  { value: "7", key: "7 days" },
-  { value: "14", key: "14 days" },
-];
-
-/**
- * Bathroom options
- */
-
-const bathroomOptions = [
-  { value: "0", key: "Any" },
-  { value: "1", key: "1" },
-  { value: "2", key: "2" },
-  { value: "3", key: "3" },
-  { value: "4", key: "4" },
-  { value: "5", key: "5" },
-];
-
-/**
- * Include Options
- * 
- * !! These are very specific enums from the database
- */
-const saleAvailabilityOptions = [
-  { value: "all", key: "All" },
-  { value: "available", key: "Available" },
-  { value: "under offer", key: "Under offer" },
-  { value: "sold", key: "Sold" },
-]
-
-const rentAvailabilityOptions = [
-  { value: "all", key: "All" },
-  { value: "available", key: "Available" },
-  { value: "let agreed", key: "Let agreed" },
-  { value: "let", key: "Let" },
-]
-
-/**
- * Propety Feature options
- * 
- * !! refer to the property schema for correct group fields
- */
-const propertyFeatures = [
-  { group: 'additionalFeatures', key: "petFriendly", label: "Pet-friendly", isDefault: true },
-  { group: 'parking', key: "garage", label: "Garage", isDefault: false },
-  { group: 'parking', key: "evCharging", label: "EV Charging", isDefault: false },
-  { group: 'outdoorSpace', key: "garden", label: "Garden", isDefault: false },
-  { group: 'accessibilityFeatures', key: "wheelchairFriendly", label: "Accessible", isDefault: false },
-];
-
-/**
  *  Buy or rent
  */
-const buyOrRentOptions = [
-  { key: "buy", value: "Buy" },
-  { key: "rent", value: "Rent" },
-  // { key: 'price', value: 'Prices' },
-];
-
 const isBuy = computed(() => buyOrRent.value === "buy" ? true : false);
 
 /**
