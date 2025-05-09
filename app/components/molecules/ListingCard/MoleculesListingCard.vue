@@ -6,7 +6,7 @@
       <LazyMoleculesCarousel :slides="carouselImages" hydrate-on-interaction="mouseover"
         class="m-listing-card-media-carousel m-listing-card-outline" v-slot="{ slide: { src, alt } }">
         <nuxt-link :to="propertyUrl">
-          <img :src :alt class="m-listing-card-carousel-image" />
+          <img :src :alt class="m-listing-card-carousel-image" width="400" height="300" loading="lazy" />
         </nuxt-link>
       </LazyMoleculesCarousel>
     </div>
