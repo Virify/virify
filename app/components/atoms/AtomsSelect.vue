@@ -15,8 +15,8 @@ type Option = {
 }
 
 interface Props {
-  options?: string[] | Option[]
-  selected?: Option['value']
+  options?: (string | number)[] | Option[]
+  modelValue?: any
 }
 
 const props = defineProps<Props>()
@@ -31,7 +31,7 @@ const selected = defineModel({
   default: (props: Props) => {
     const [firstOption] = asArrayOfOptions(props.options)
 
-    return props.selected || firstOption?.value
+    return props.modelValue || firstOption?.value
   }
 })
 </script>
