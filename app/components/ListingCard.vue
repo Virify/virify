@@ -1,6 +1,6 @@
 <template>
   <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="| title-2xl lineheight-sm">{{ title }}: {{ resultsLength }} </h1>
+    <h1 class="| title-2xl lineheight-sm">{{ title }} {{ resultsLength }} </h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-for="listing in listings" :key="listing.id"
