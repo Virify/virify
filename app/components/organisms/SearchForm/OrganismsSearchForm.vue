@@ -56,13 +56,13 @@
         <OrganismsSearchFormTitleBlock title="Bedrooms" class="| animate-fade-down" style="--delay: 50ms">
           <div class="o-searchform-filter">
             <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect :id class="| text-input body-sm focus-visible" name="min-bedrooms">
+              <AtomsSelect v-model="bedroomRange[0]" :id class="| text-input body-sm focus-visible" name="min-bedrooms">
                 <option v-for="({ key, value }, index) of bedroomOptions" :key="value" :value :selected="index === 0">{{
                   key }}</option>
               </AtomsSelect>
             </MoleculesFormField>
             <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect :id class="| text-input body-sm focus-visible" name="max-bedrooms">
+              <AtomsSelect v-model="bedroomRange[1]" :id class="| text-input body-sm focus-visible" name="max-bedrooms">
                 <option v-for="({ key, value }, index) of bedroomOptions" :key="value" :value :selected="index === 0">{{
                   key }}</option>
               </AtomsSelect>
@@ -73,13 +73,13 @@
         <OrganismsSearchFormTitleBlock title="Bathrooms" class="| animate-fade-down" style="--delay: 50ms">
           <div class="o-searchform-filter">
             <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect :id class="| text-input body-sm focus-visible" name="min-bathrooms">
+              <AtomsSelect v-model="bathroomRange[0]" :id class="| text-input body-sm focus-visible" name="min-bathrooms">
                 <option v-for="({ key, value }, index) of bathroomOptions" :key="value" :value :selected="index === 0">
                   {{ key }}</option>
               </AtomsSelect>
             </MoleculesFormField>
             <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect :id class="| text-input body-sm focus-visible" name="max-bathrooms">
+              <AtomsSelect v-model="bathroomRange[1]" :id class="| text-input body-sm focus-visible" name="max-bathrooms">
                 <option v-for="({ key, value }, index) of bathroomOptions" :key="value" :value :selected="index === 0">
                   {{ key }}</option>
               </AtomsSelect>
@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Listing, PropertyType } from "@prisma/client";
+import type { PropertyType } from "@prisma/client";
 import { onClickOutside, watchDebounced } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
 
@@ -143,10 +143,14 @@ import type { MinMaxPriceResponse } from "~~/shared/types/price";
  *  Popover management
  */
 const $form = useTemplateRef("$form");
+
 /**
  * state
  */
 const popoverHidden = ref(true);
+const bedroomRange = ref<[number, number]>([0, 0])
+const bathroomRange = ref<[number, number]>([0, 0])
+
 
 // Show/hide form if appropriate
 function togglePopoverHidden(setHidden = false) {
@@ -377,6 +381,14 @@ async function sendForm(event: Event) {
   const radiusStr = formData?.get("radius") as string;
   const radius = radiusStr ?? parseFloat(radiusStr);
 
+  function normalizeRange(range: [number, number]): [number, number] {
+    const [min, max] = range;
+    return min > max ? [max, min] : [min, max];
+  }
+
+  bedroomRange.value = normalizeRange(bedroomRange.value);
+  bathroomRange.value = normalizeRange(bathroomRange.value);
+
   // Perform fetch for properties
   const searchResult = await $fetch<ListingCardType[]>("/api/search/listings", {
     method: "POST",
@@ -386,8 +398,8 @@ async function sendForm(event: Event) {
       buyOrRent: formData?.get("buyOrRent"),
       propertyTypes: formatPropertyTypes,
       priceRange: selectedPriceRange.value,
-      bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
-      bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
+      bedrooms: bedroomRange.value,
+      bathrooms: bathroomRange.value,
       addedToSite: formData?.get('added-to-site'),
       availabilityOptions: formData?.get('include'),
       featured: formatFeatures
@@ -399,8 +411,8 @@ async function sendForm(event: Event) {
     buyOrRent: formData?.get("buyOrRent"),
     propertyTypes: formatPropertyTypes,
     priceRange: selectedPriceRange.value,
-    bedrooms: [formData?.get('min-bedrooms'), formData?.get('max-bedrooms')],
-    bathrooms: [formData?.get('min-bathrooms'), formData?.get('max-bathrooms')],
+    bedrooms: bedroomRange.value,
+    bathrooms: bathroomRange.value,
     addedToSite: formData?.get('added-to-site'),
     availabilityOptions: formData?.get('include'),
     featured: formatFeatures

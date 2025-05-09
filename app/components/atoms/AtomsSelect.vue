@@ -1,9 +1,19 @@
 <template>
-  <select class="a-select">
+  <select class="a-select" :value="modelValue" @change="onChange">
     <slot />
   </select>
 </template>
+<script setup lang="ts">
+const props = defineProps({
+  modelValue: [String, Number],
+})
 
+const emit = defineEmits(['update:modelValue'])
+
+function onChange(event: any) {
+  emit('update:modelValue', event.target.value)
+}
+</script>
 <style lang="scss">
 .a-select {
   appearance: none;
