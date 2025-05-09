@@ -343,10 +343,8 @@ const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value
 watch(buyOrRent, () => {
   if (buyOrRent.value === 'rent') {
     includeOptions.value = rentAvailabilityOptions;
-    console.log(includeOptions.value);
   } else if (buyOrRent.value === 'buy') {
     includeOptions.value = saleAvailabilityOptions;
-    console.log(includeOptions.value);
   }
 }, { immediate: true });
 
