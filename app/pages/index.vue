@@ -39,7 +39,7 @@ const { data: listingsFetch } = await useAsyncData('featured-listings', () =>
   $fetch<ListingCardType[]>('/api/listings/featured', {
     params: {
       page: page.value,
-      pageSize: 8
+      pageSize: 16
     }
   }), {
   dedupe: 'defer',
