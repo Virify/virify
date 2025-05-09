@@ -15,4 +15,15 @@ defineProps({
     type: Boolean
   }
 })
+
+useHead({
+  link: [
+    {
+      rel: 'prefetch',
+      as: 'image',
+      href: '/sprites/icon-animated-dots.svg',
+      type: 'image/svg+xml'
+    },
+  ]
+})
 </script>
