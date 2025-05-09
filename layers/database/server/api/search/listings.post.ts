@@ -12,7 +12,7 @@ const searchSchema = z.object({
   location: z.string(),
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
-  addedToSite: z.coerce.number().optional(),
+  addedToSite: z.enum(["0", "1", "3", "7", "14"]).optional(),
   availabilityOptions: z.string().optional(),
   featured: z.array(z.object({ key: z.string(), group: z.enum(["parking", "additionalFeatures", "accessibilityFeatures", "outdoorSpace"]) })).optional(),
 });
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
       bathrooms: bathrooms && bathrooms[0] === 0 && bathrooms[1] === 0 ? undefined : bathrooms,
       propertyTypes,
       priceRange,
-      addedToSite: addedToSite && addedToSite !== 0 ? calculateDateFromDays(addedToSite) : undefined,
+      addedToSite: addedToSite && addedToSite !== "0" ? calculateDateFromDays(addedToSite) : undefined,
       availabilityOptions: availabilityOptionsToEnum,
       featured: mappedFeatured
     };
