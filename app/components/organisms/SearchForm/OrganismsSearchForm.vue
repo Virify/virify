@@ -148,6 +148,8 @@ const {
   bedroomOptions,
   bathroomOptions,
   dateOptions,
+  saleAvailabilityOptions,
+  rentAvailabilityOptions,
   propertyFeatures,
   buyOrRentOptions
 } = getSearchFormConfig()
