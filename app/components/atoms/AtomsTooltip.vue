@@ -1,9 +1,11 @@
 <template>
   <TooltipProvider delay-duration="2000">
     <TooltipRoot>
-      <TooltipTrigger as-child>
-        <slot></slot>
-      </TooltipTrigger>
+      <NuxtErrorBoundary>
+        <TooltipTrigger as-child>
+          <slot></slot>
+        </TooltipTrigger>
+      </NuxtErrorBoundary>
 
       <TooltipPortal>
         <TooltipContent :side-offset="5" class="a-tooltip-popover | body-sm lineheight-sm">
