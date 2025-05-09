@@ -1,5 +1,5 @@
-import { ListingTier, type Listing } from "@prisma/client";
-import type { ListingRentalWithFullProperty, ListingSaleWithFullProperty, ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
+import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "@prisma/client";
+import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
 import { getNearbyPropertiesByTextQuery } from "./location";
@@ -19,7 +19,7 @@ export async function getListingById(id: number): Promise<Listing | null> {
 }
 
 /**
- * Get a full listing by ID including property details
+ * Get a full listing by ID including property details for a detailed listing page
  *
  * @param id number
  * @returns ListingWithFullProperty
@@ -42,45 +42,29 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
 }
 
 /**
- * Get featured listings
+ * Get featured listings for a card
  *
- * @returns ListingWithFullProperty[]
+ * @returns ListingCardType[]
  */
-export async function getAllFeaturedListings(take: number = 20, skip: number = 0): Promise<ListingWithFullProperty[] | undefined> {
+export async function getAllFeaturedListings(take: number = 20, skip: number = 0): Promise<ListingCardType[] | undefined> {
   return await prisma.listing.findMany({
     where: {
       listingTier: ListingTier.FEATURED,
     },
     take,
     skip,
-    include: {
-      rentalListing: true,
-      saleListing: true,
-      property: {
-        include: {
-          ...propertyInclude,
-        },
-      },
-    },
+    select: listingCardFields,
   });
 }
 
 /**
- * Get All Listings
+ * Get All Listings for cards
  *
- * @returns Listing[]
+ * @returns ListingCardType[]
  */
-export async function getAllListings(): Promise<ListingWithFullProperty[]> {
+export async function getAllListings(): Promise<ListingCardType[]> {
   return await prisma.listing.findMany({
-    include: {
-      rentalListing: true,
-      saleListing: true,
-      property: {
-        include: {
-          ...propertyInclude,
-        },
-      },
-    },
+    select: listingCardFields,
   });
 }
 
@@ -109,27 +93,33 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
   });
 }
 
-/**
- * Get Sale Listings by Property IDs
- *
- * @param propertyIds number[]
- * @returns ListingWithFullProperty[]
- */
-export async function getSaleListingsByDistance(
-  { location, radius }: ListingSearch,
-  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
-): Promise<ListingSaleWithFullProperty[]> {
-  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
+export async function getListingByDistanceAndFilters(
+  { type, location, radius }: ListingSearch,
+  { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
+): Promise<ListingCardType[]> {
 
-  return await prisma.listing.findMany({
+  // Get the nearby properties with distance
+  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
+  const listingFilter = type === "rent" ? "rentalListing" : "saleListing";
+
+  // Fetch listings from the database
+  const listings = await prisma.listing.findMany({
     where: {
-      saleListing: {
-        isNot: null,
+      [listingFilter]: {
+        availabilityStatus: {
+          in: availabilityOptions as (typeof type extends "rent" ? RentalAvailabilityStatus[] : SaleAvailabilityStatus[]),
+        },
       },
       price: getPriceFilter(priceRange),
+      published: true,
+      publishedAt: addedToSite
+        ? {
+            gte: new Date(addedToSite),
+          }
+        : undefined,
       property: {
         id: {
-          in: nearbyProperties.map((p) => p.propertyId),
+          in: nearbyProperties.map((p) => p.propertyId), // Use the nearby property IDs
         },
         type: {
           name: {
@@ -148,69 +138,22 @@ export async function getSaleListingsByDistance(
               lte: bathrooms[1], // max bathroom
             }
           : undefined,
+        ...featured,
       },
     },
     take,
     skip,
-    include: {
-      saleListing: true,
-      property: {
-        include: {
-          ...propertyInclude,
-        },
-      },
-    },
+    select: listingCardFields,
   });
-}
 
-/**
- * Get Rental Listings by Property IDs
- *
- * @param propertyIds number[]
- * @returns ListingWithFullProperty[]
- */
-export async function getRentalListingsByDistance( { location, radius }: ListingSearch,
-  { propertyTypes, priceRange, bedrooms, bathrooms, take, skip }: ListingSearchOptional = {}
-): Promise<ListingRentalWithFullProperty[]> {
-  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
-  return await prisma.listing.findMany({
-    where: {
-      rentalListing: {
-        isNot: null,
-      },
-      price: getPriceFilter(priceRange),
-      property: {
-        id: {
-          in: nearbyProperties.map((p) => p.propertyId),
-        },
-        type: {
-          name: {
-            in: propertyTypes,
-          },
-        },
-        numberBedrooms: bedrooms
-          ? {
-              gte: bedrooms[0], // min bedroom
-              lte: bedrooms[1], // max bedroom
-            }
-          : undefined,
-        numberBathrooms: bathrooms
-          ? {
-              gte: bathrooms[0], // min bathroom
-              lte: bathrooms[1], // max bathroom
-            }
-          : undefined,
-      },
-    },
-    take,
-    skip,
-    include: {
-      rentalListing: true,
-      property: {
-        include: {
-          ...propertyInclude,
-        },
-      },
-    },
+  // Map the listings to include the distance
+  const listingsWithDistance = listings.map(listing => {
+    const property = nearbyProperties.find(p => p.propertyId === listing.property?.address?.id);
+    return {
+      ...listing,
+      distanceMiles: property ? property.distanceMiles : 0, 
+    };
   });
+
+  return listingsWithDistance;
 }

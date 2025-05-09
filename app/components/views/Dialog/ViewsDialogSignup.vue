@@ -29,7 +29,6 @@ const { hideDialog, showDialog } = useDialog();
  *  Success
  */
 function formSuccess(user: { token: string }) {
-  console.log("DEBUG", user);
 
   // Hide the current dialog
   hideDialog();

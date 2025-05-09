@@ -13,7 +13,7 @@ import { useIntersectionObserver } from '@vueuse/core';
 /**
  * State
  */
-const searchListings = ref<ListingWithFullProperty[] | null>(null);
+const searchListings = ref<ListingCardType[] | null>(null);
 provide("searchListings", searchListings);
 const pageSize = 20;
 
@@ -25,7 +25,7 @@ const typeOfListing = computed(() => {
  * Fetch initial listings
  */
 const { data: initialListings } = await useAsyncData('featured-listings', () =>
-  $fetch<ListingWithFullProperty[]>('/api/listings/featured?page=1&pageSize=12')
+  $fetch<ListingCardType[]>('/api/listings/featured?page=1&pageSize=12')
 );
 
 /**
@@ -36,7 +36,7 @@ const {
   hasMoreListings,
   fetchMoreListings,
   isLoading
-} = usePaginatedListings<ListingWithFullProperty>('/api/listings/featured', pageSize, initialListings.value || []);
+} = usePaginatedListings<ListingCardType>('/api/listings/featured', pageSize, initialListings.value || []);
 
 /**
  * Infinite scroll trigger
@@ -51,7 +51,6 @@ useIntersectionObserver(
   (entries) => {
     const entry = entries[0];
     if (entry?.isIntersecting && hasMoreListings.value && !isLoading.value) {
-      console.log('Fetching more listings...');
       fetchMoreListings();
     }
   },

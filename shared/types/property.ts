@@ -34,4 +34,5 @@ export type Fullproperty = Prisma.PropertyGetPayload<{
 
 export type PropertySearchResult = {
   propertyId: number;
+  distanceMiles: number;
 }[]

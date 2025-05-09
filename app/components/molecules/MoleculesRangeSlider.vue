@@ -8,24 +8,19 @@
       <SliderThumb class="m-range-slider-thumb" />
     </SliderRoot>
 
-    <label class="m-range-slider-label-min | body-sm">
-      <input type="number" v-model="rangeValue[0]" class="m-range-slider-input | text-input focus-visible" />
-      Min price
-    </label>
+    <AtomsLabel class="m-range-slider-label-min">
+      <AtomsCurrencyInput v-model="rangeValue[0]" class="m-range-slider-input" />
+    </AtomsLabel>
 
-    <label class="m-range-slider-label-max | body-sm">
-      <input type="number" v-model="rangeValue[1]" class="m-range-slider-input | text-input focus-visible" />
-      Max price
-    </label>
+    <AtomsLabel class="m-range-slider-label-max">
+      <AtomsCurrencyInput v-model="rangeValue[1]" class="m-range-slider-input" />
+    </AtomsLabel>
   </div>
 </template>
 
 <script setup lang="ts">
 import { SliderRoot, SliderTrack, SliderRange, SliderThumb } from "reka-ui";
 
-/**
- *  Props
- */
 const props = defineProps({
   min: {
     type: Number,
@@ -33,7 +28,7 @@ const props = defineProps({
   },
   max: {
     type: Number,
-    default: 100,
+    default: 10,
   },
   startingMin: {
     type: Number,
@@ -41,32 +36,27 @@ const props = defineProps({
   },
   startingMax: {
     type: Number,
-    default: 100,
+    default: 1,
   },
 });
 
-const rangeValue = defineModel<[number, number]>({  
-  default: (props) => [props.startingMin, props.startingMax],  
-});  
+const rangeValue = defineModel<[number, number]>({
+  default: (props) => [props.startingMin, props.startingMax],
+});
 
-// Set the actual default values from props after the component is mounted
 onMounted(() => {
   rangeValue.value = [props.startingMin, props.startingMax];
 });
 
-/**
- * Watchers
- */
 watch(
   () => [props.min, props.max, props.startingMin, props.startingMax],
   ([newMin, newMax, newStartingMin, newStartingMax]) => {
-    // Update rangeValue to stay within the new bounds
-    rangeValue.value = [
-      Math.max(newMin ?? 0, newStartingMin ?? 0),
-      Math.min(newMax ?? 100, newStartingMax ?? 100),
-    ];
+    const newMinVal = Math.max(newMin ?? 0, newStartingMin ?? 0);
+    const newMaxVal = Math.min(newMax ?? 1000000, newStartingMax ?? 1000000);
+    rangeValue.value = [newMinVal, newMaxVal];
   }
 );
+
 </script>
 
 <style lang="scss">
