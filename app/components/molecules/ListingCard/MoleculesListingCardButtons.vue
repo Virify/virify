@@ -18,7 +18,7 @@
     </AtomsTooltip>
 
     <AtomsTooltip>
-      <LazyAtomsFavouriteButton hydrate-on-idle class="| button-none" :property-id="1"
+      <LazyAtomsFavouriteButton hydrate-on-interaction="mouseenter" class="| button-none" :property-id
         icon-class="m-listing-card-button-icon" />
 
       <template #tooltip>Add to favourites</template>
@@ -31,6 +31,7 @@
 import AtomsTooltip from '~/components/atoms/AtomsTooltip.vue';
 
 interface Props {
+  propertyId: number,
   controlsId: string
   isExpanded?: boolean
 }

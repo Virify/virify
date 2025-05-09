@@ -12,7 +12,7 @@
     </div>
 
     <MoleculesListingCardButtons :controls-id="controlsId" class="m-listing-card-buttons-parent" :is-expanded="isHover"
-      @toggle-content="toggleHover" />
+      :property-id @toggle-content="toggleHover" />
 
     <div class="| flow flow-lg" role="presentation">
       <ul class="m-listing-card-icons">
