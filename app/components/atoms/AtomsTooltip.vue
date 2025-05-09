@@ -31,10 +31,21 @@ import { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipPortal, TooltipCon
   animation: fadeTooltipUp var(--animation-slow) var(--ease-out);
 }
 
+.a-tooltip-popover[data-side="bottom"] {
+  animation-name: fadeTooltipDown;
+}
+
 @keyframes fadeTooltipUp {
   from {
     opacity: 0;
-    transform: translateY(var(--size-12));
+    transform: translateY(0.5em);
+  }
+}
+
+@keyframes fadeTooltipDown {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5em)
   }
 }
 </style>
