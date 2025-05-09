@@ -9,7 +9,8 @@
       <AtomsIcon icon="cards/notes" class="m-listing-card-button-icon" />
     </button>
 
-    <AtomsFavouriteButton class="| button-none" :property-id="1" icon-class="m-listing-card-button-icon" />
+    <LazyAtomsFavouriteButton hydrate-on-idle class="| button-none" :property-id="1"
+      icon-class="m-listing-card-button-icon" />
   </div>
 </template>
 
