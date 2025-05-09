@@ -80,7 +80,7 @@ function toggle() {
 
 .a-favourite-button.selected {
   color: var(--favourite-colour);
-  animation: selectedBounce var(--animation-veryslow) linear;
+  animation: selectedBounce var(--animation-subtle) linear;
 }
 
 @keyframes selectedBounce {
