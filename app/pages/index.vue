@@ -2,7 +2,7 @@
   <div ref="scrollContainer">
     <OrganismsHeroHome />
 
-    <ListingCard :listings="typeOfListing" :title="searchListings ? `Search Results: ` : `Featured Listings: `" />
+    <ListingCards :listings="typeOfListing" :title="searchListings ? `Search Results: ` : `Featured Listings: `" />
       <div ref="infiniteTrigger" class="p-index-spacer"></div>
   </div>
 </template>
