@@ -145,6 +145,7 @@ const iconOptions = computed(() => {
   max-width: 400px;
   background: var(--listing-card-background);
   height: fit-content;
+  z-index: 1;
 }
 
 .m-listing-card-hover {

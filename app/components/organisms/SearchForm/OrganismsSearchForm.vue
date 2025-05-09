@@ -102,7 +102,7 @@
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
             <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-              }}</option>
+                }}</option>
             </AtomsSelect>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
@@ -366,6 +366,7 @@ async function sendForm(event: Event) {
 .o-searchform {
   max-width: 32em;
   margin: 0 auto;
+  z-index: 2;
 }
 
 .o-searchform-buyrent {
