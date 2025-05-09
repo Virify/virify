@@ -9,7 +9,7 @@ export function isArrayOfOptions(arr: unknown): arr is Option[] {
   return Array.isArray(arr) && arr.every(isOptionObject)
 }
 
-export function asArrayOfObjects(arr: unknown): Option[] {
+export function asArrayOfOptions(arr: unknown): Option[] {
   if (isArrayOfStrings(arr)) {
     return arr.map(str => ({
       value: str,

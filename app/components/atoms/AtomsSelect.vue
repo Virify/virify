@@ -24,12 +24,12 @@ const props = defineProps<Props>()
 const validOptions = computed(() => {
   const { options } = props
 
-  return asArrayOfObjects(options)
+  return asArrayOfOptions(options)
 })
 
 const selected = defineModel({
   default: (props: Props) => {
-    const [firstOption] = asArrayOfObjects(props.options)
+    const [firstOption] = asArrayOfOptions(props.options)
 
     return props.selected || firstOption?.value
   }
