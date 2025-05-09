@@ -29,13 +29,15 @@
 
         <div role="presentation" class="| flow flow-md">
           <MoleculesFormField label="Search radius" v-slot="{ id }">
-            <AtomsSelect :id class="| text-input body-sm focus-visible" name="radius">
-              <option v-for="({ key, value }, index) of radiusOptions" :key="value" :value :selected="index === 0">{{
-                key }}</option>
+            <AtomsSelect :id :model-value="initialRadius" class="| text-input body-sm focus-visible" name="radius">
+              <option v-for="({ key, value }) of radiusOptions" :key="value" :value>
+                {{ key }}
+              </option>
             </AtomsSelect>
           </MoleculesFormField>
           <!-- <div class="o-searchform-map | title-2xl">Map</div> -->
         </div>
+        
       </div>
 
       <!-- property types -->
@@ -49,7 +51,7 @@
           </ul>
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
-
+      
 
       <!-- bedrooms & bathrooms -->
       <div class="o-searchform-filter o-searchform-animation">
@@ -99,7 +101,7 @@
       <div class="o-searchform-filter o-searchform-animation">
         <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 50ms">
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
-            <AtomsSelect class="| text-input focus-visible body-sm" name="added-to-site">
+            <AtomsSelect :model-value="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }, index) of dateOptions" :key="value" :value :selected="index === 0">{{ key
               }}</option>
             </AtomsSelect>
@@ -108,9 +110,8 @@
 
         <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 50ms">
           <MoleculesFormField label="Show" class="| focus-overflow">
-            <AtomsSelect class="| text-input focus-visible body-sm" name="include">
-              <option v-for="({ key, value }, index) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions" :key="value"
-                :value :selected="index === 0">{{ key
+            <AtomsSelect :model-value="initialInclude" class="| text-input focus-visible body-sm" name="include">
+              <option v-for="({ key, value }, index) of includeOptions" :key="value" :value>{{ key
                 }}</option>
             </AtomsSelect>
           </MoleculesFormField>
@@ -148,9 +149,14 @@ const $form = useTemplateRef("$form");
  * state
  */
 const popoverHidden = ref(true);
+const suggestions = ref("");
 const bedroomRange = ref<[number, number]>([0, 0])
 const bathroomRange = ref<[number, number]>([0, 0])
-
+const initialRadius = computed(() => radiusOptions?.[0]?.value)
+const initialDate = computed(() => dateOptions?.[0]?.value)
+const buyOrRent = ref("buy");
+const includeOptions = ref<{ value: string; key: string; }[]>([]);
+const initialInclude = computed(() => includeOptions.value?.[0]?.value) 
 
 // Show/hide form if appropriate
 function togglePopoverHidden(setHidden = false) {
@@ -187,7 +193,6 @@ onMounted(async () => {
 /**
  *  Search typed
  */
-const suggestions = ref("");
 
 function setSelectedSuggestion(newValue: string) {
   suggestions.value = newValue;
@@ -255,7 +260,6 @@ const bathroomOptions = [
  * 
  * !! These are very specific enums from the database
  */
-
 const saleAvailabilityOptions = [
   { value: "all", key: "All" },
   { value: "available", key: "Available" },
@@ -286,9 +290,6 @@ const propertyFeatures = [
 /**
  *  Buy or rent
  */
-
-const buyOrRent = ref("buy");
-
 const buyOrRentOptions = [
   { key: "buy", value: "Buy" },
   { key: "rent", value: "Rent" },
@@ -321,6 +322,7 @@ watchDebounced(
   },
   { debounce: 150 }
 );
+
 /**
  * Price range
  */
@@ -333,6 +335,20 @@ const priceMin = computed(() => (buyOrRent.value === "rent" ? priceRange.value.r
 const priceMax = computed(() => (buyOrRent.value === "rent" ? priceRange.value.rental[1] : priceRange.value.sale[1]));
 
 const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value]);
+
+/**
+ *  Watchers
+ */
+
+watch(buyOrRent, () => {
+  if (buyOrRent.value === 'rent') {
+    includeOptions.value = rentAvailabilityOptions;
+    console.log(includeOptions.value);
+  } else if (buyOrRent.value === 'buy') {
+    includeOptions.value = saleAvailabilityOptions;
+    console.log(includeOptions.value);
+  }
+}, { immediate: true });
 
 /**
  *  Submit form
