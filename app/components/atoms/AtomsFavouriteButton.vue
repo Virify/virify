@@ -2,7 +2,7 @@
   <button type="button" role="switch" :aria-checked="isSelected" :aria-label class="a-favourite-button | relative"
     :class="{
       selected: isSelected
-    }" @click.prevent="toggle">
+    }" @click.prevent="toggleSelected" :disabled="isPending">
     <AtomsIcon :icon :class="iconClass" />
 
     <client-only>
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { watchOnce } from '@vueuse/core'
+import { watchOnce, createSharedComposable } from '@vueuse/core'
 
 interface Props {
   propertyId: number
@@ -41,17 +41,60 @@ interface Props {
   iconClass?: string
 }
 
+/**
+ *  Local mocking
+ */
+const useLocalFavourites = createSharedComposable(() => {
+  const favourites = useState<number[]>('favourites', () => {
+    return getAllFavourites()
+  })
+
+  function getFavourite(propertyId: number) {
+    return computed(() => favourites.value.includes(propertyId))
+  }
+
+  function getAllFavourites() {
+    return [10, 15]
+  }
+
+  function addFavourite(propertyId: number) {
+    const idFromServer = propertyId
+
+    favourites.value.push(idFromServer)
+  }
+
+  function removeFavourite(propertyId: number) {
+    const idFromServer = propertyId
+
+    favourites.value = favourites.value.filter(existingId => {
+      return existingId != idFromServer
+    })
+  }
+
+  return {
+    getFavourite,
+    addFavourite,
+    removeFavourite
+  }
+})
+
+const {
+  getFavourite,
+  addFavourite,
+  removeFavourite
+} = useLocalFavourites()
+
 // Confirm remove will make an alert modal appear to confirm before
 // removing a listing from favourites (e.g. on the profile page where
 // it is hard to then re-add after removing)
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   confirmRemoval: false
 })
 
 /**
  *  Do not show animation on first use
  */
-const isSelected = ref(false)
+const isSelected = getFavourite(props.propertyId)
 const isInteracted = ref(false)
 
 watchOnce(isSelected, () => {
@@ -74,11 +117,23 @@ const icon = computed(() => {
 })
 
 /**
- *  Fetch, retrieve favourites
+ *  Get, set favourites from server
  */
-function toggle() {
-  isSelected.value = !isSelected.value
+const { isPending, setPendingWhile } = usePending();
+
+function toggleSelected() {
+  const { propertyId } = props
+
+  setPendingWhile(async () => {
+    // Toggle whether favourite is toggled or not
+    if (!isSelected.value) {
+      return addFavourite(propertyId)
+    }
+
+    removeFavourite(propertyId)
+  })
 }
+
 </script>
 
 <style>
