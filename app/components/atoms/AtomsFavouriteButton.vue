@@ -6,8 +6,8 @@
     <AtomsIcon :icon :class="iconClass" />
 
     <client-only>
-      <svg v-if="isSelected" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"
-        aria-hidden class="a-favourite-button-confetti">
+      <svg v-if="isSelected && isInteracted" width="90" height="90" viewBox="0 0 90 90" fill="none"
+        xmlns="http://www.w3.org/2000/svg" aria-hidden class="a-favourite-button-confetti">
         <circle cx="45" cy="45" r="35" fill-opacity="0.5" class="root" />
         <circle cx="12.5" cy="3.5" r="3.5" class="dot dot-1" />
         <circle cx="14.5" cy="35.5" r="7.5" class="dot dot-2" />
@@ -33,6 +33,8 @@
 </template>
 
 <script setup lang="ts">
+import { watchOnce } from '@vueuse/core'
+
 interface Props {
   propertyId: number
   confirmRemoval?: boolean
@@ -47,10 +49,18 @@ withDefaults(defineProps<Props>(), {
 })
 
 /**
- *  a11y
+ *  Do not show animation on first use
  */
 const isSelected = ref(false)
+const isInteracted = ref(false)
 
+watchOnce(isSelected, () => {
+  isInteracted.value = true
+})
+
+/**
+ *  a11y
+ */
 const ariaLabel = computed(() => {
   if (isSelected.value) return 'Remove from favourites'
 
