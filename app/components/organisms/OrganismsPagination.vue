@@ -2,8 +2,6 @@
   <div>
     <slot></slot>
 
-    <AtomsDivider />
-
     <p v-if="isEnd">
       You've reached the end
     </p>
@@ -15,10 +13,10 @@
 
       @TODO style this
     -->
-    <button v-else type="button" ref="$trigger" @click.prevent="fetchNextPage" :disabled="isPending">
-      <template v-if="isPending">LOADING...</template>
-      <template v-else>Click to load more</template>
-    </button>
+    <AtomsButton ref="$trigger" :pending="isPending" class="o-pagination-button | button-full button-quiet"
+      @click.prevent="fetchNextPage">
+      Click to load more
+    </AtomsButton>
   </div>
 </template>
 
@@ -61,3 +59,15 @@ useIntersectionObserver($trigger, ([entries]) => {
   fetchNextPage()
 });
 </script>
+
+<style>
+.o-pagination-button {
+  padding: var(--size-16);
+  border-radius: var(--border-radius-ui);
+}
+
+.o-pagination-button .a-icon {
+  width: var(--size-36);
+  height: var(--size-36);
+}
+</style>
