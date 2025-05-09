@@ -1,4 +1,4 @@
-import { ListingTier, Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "@prisma/client";
+import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "@prisma/client";
 import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
@@ -93,24 +93,17 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
   });
 }
 
-/**
- * Get Listings By Distance and Filters
- *
- * @param location - coordinates for the search
- * @param radius - search radius in miles
- * @param type - listing type ('rent' or 'buy')
- * @param filters - filters to apply (propertyTypes, priceRange, etc.)
- * @returns ListingCardType[]
- */
 export async function getListingByDistanceAndFilters(
   { type, location, radius }: ListingSearch,
-  { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, take, skip }: ListingSearchOptional
+  { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
 ): Promise<ListingCardType[]> {
 
+  // Get the nearby properties with distance
   const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
   const listingFilter = type === "rent" ? "rentalListing" : "saleListing";
 
-  return await prisma.listing.findMany({
+  // Fetch listings from the database
+  const listings = await prisma.listing.findMany({
     where: {
       [listingFilter]: {
         availabilityStatus: {
@@ -126,7 +119,7 @@ export async function getListingByDistanceAndFilters(
         : undefined,
       property: {
         id: {
-          in: nearbyProperties.map((p) => p.propertyId),
+          in: nearbyProperties.map((p) => p.propertyId), // Use the nearby property IDs
         },
         type: {
           name: {
@@ -145,77 +138,22 @@ export async function getListingByDistanceAndFilters(
               lte: bathrooms[1], // max bathroom
             }
           : undefined,
+        ...featured,
       },
     },
     take,
     skip,
     select: listingCardFields,
   });
+
+  // Map the listings to include the distance
+  const listingsWithDistance = listings.map(listing => {
+    const property = nearbyProperties.find(p => p.propertyId === listing.property?.address?.id);
+    return {
+      ...listing,
+      distanceMiles: property ? property.distanceMiles : 0, 
+    };
+  });
+
+  return listingsWithDistance;
 }
-
-
-/**
- * Listing Card Select Object
- */
-export const listingCardFields = {
-  id: true,
-  title: true,
-  price: true,
-  publishedAt: true,
-  rentalListing: true,
-  saleListing: true,
-  property: {
-    select: {
-      media: {
-        select: {
-          image: true,
-          metadata: true,
-        },
-      },
-      address: {
-        select: {
-          number: true,
-          id: true,
-          flat: true,
-          street: true,
-          city: true,
-          postcode: true,
-          country: true,
-          county: true,
-          lat: true,
-          lon: true,
-        },
-      },
-      type: {
-        select: {
-          name: true,
-        },
-      },
-      additionalFeatures: {
-        select: {
-          petFriendly: true,
-        },
-      },
-      numberBedrooms: true,
-      numberBathrooms: true,
-      parking: {
-        select: {
-          evCharging: true,
-        },
-      },
-      outdoorSpace: {
-        select: {
-          frontGarden: true,
-          rearGarden: true,
-        },
-      },
-    },
-  },
-};
-
-/**
- * Listing Card Type
- */
-export type ListingCardType = Prisma.ListingGetPayload<{
-  select: typeof listingCardFields;
-}>;

@@ -2,6 +2,7 @@ import * as z from "zod";
 import type { ListingSearch, ListingSearchOptional } from "~~/shared/types/listing";
 import { calculateDateFromDays } from "~~/shared/utils/format-date";
 import { convertToValidEnum } from "~~/shared/utils/enums";
+import { mapFeatureToFilters } from "../../utils/db-fields";
 
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
@@ -13,12 +14,12 @@ const searchSchema = z.object({
   bathrooms: z.array(z.coerce.number()).optional(),
   addedToSite: z.coerce.number().optional(),
   availabilityOptions: z.string().optional(),
-  featured: z.array(z.object({ key: z.string(), group: z.string() })).optional(),
+  featured: z.array(z.object({ key: z.string(), group: z.enum(["parking", "additionalFeatures", "accessibilityFeatures", "outdoorSpace"]) })).optional(),
 });
 
 /**
  * Fetches listings based on search parameters.
- * 
+ *
  * @param event The event object containing the request data.
  * @returns A promise that resolves to the listings data.
  */
@@ -52,6 +53,11 @@ export default defineEventHandler(async (event) => {
     };
 
     /**
+     * Map featured filters to Prisma query format
+     */
+    const mappedFeatured = mapFeatureToFilters(featured);
+
+    /**
      * Enums are always uppercase and _ instead of space
      */
     const availabilityOptionsToEnum = convertToValidEnum(availabilityOptions);
@@ -64,11 +70,12 @@ export default defineEventHandler(async (event) => {
       priceRange,
       addedToSite: addedToSite && addedToSite !== 0 ? calculateDateFromDays(addedToSite) : undefined,
       availabilityOptions: availabilityOptionsToEnum,
+      featured: mappedFeatured
     };
 
     const listings = await getListingByDistanceAndFilters(listingSearch, optional);
-  
-    return listings
+
+    return listings;
   } catch (error) {
     console.error("Error fetching listings:", error);
     errorResponse(error, event);
@@ -77,7 +84,7 @@ export default defineEventHandler(async (event) => {
 
 /**
  * Validates the search queries.
- * 
+ *
  * @param radius number | undefined
  * @param buyOrRent string
  * @param location string

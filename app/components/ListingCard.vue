@@ -9,6 +9,7 @@
         <NuxtImg :src="listing.property?.media[0]?.image as string" :alt="listing.property?.media[0]?.metadata"
           class="w-full h-42 object-cover" />
         <MoleculesListingFav :listing-id="listing.id" @toggle="handleToggle" :user-favourites="userFavourites" class="m-listing-fav" />
+        <p v-if="listing.distanceMiles">Distance: {{ roundFloat(listing.distanceMiles, 1) }} miles</p>
         <div class="p-4 flex flex-col flex-grow">
           <!-- Title and Price -->
           <h2 class="text-sm font-semibold mb-2">{{ listing.title }}</h2>
@@ -18,8 +19,10 @@
           <p v-if="listing.publishedAt">Added to site: {{ dateAddedToDays(listing.publishedAt) }}</p>
           <p v-if="listing.property?.type" class="capitalize">Type: {{ listing.property?.type?.name }}</p>
           <p v-if="listing.property?.additionalFeatures" class="text-xs">Pets: {{ listing.property?.additionalFeatures?.petFriendly }}</p>
-          <p v-if="listing.property?.additionalFeatures" class="text-xs">EV Charging: {{ listing.property?.parking?.evCharging }}</p>
+          <p v-if="listing.property?.parking" class="text-xs">EV Charging: {{ listing.property?.parking?.evCharging }}</p>
+          <p v-if="listing.property?.parking" class="text-xs">Garage: {{ listing.property?.parking?.garage }}</p>
           <p v-if="listing.property?.additionalFeatures" class="text-xs">Garden: {{ listing.property?.outdoorSpace?.frontGarden || listing.property?.outdoorSpace?.rearGarden }}</p>
+           <p v-if="listing.property?.accessibilityFeatures" class="text-xs">Accessible: {{ listing.property?.accessibilityFeatures.wheelchairFriendly }}</p>
 
           <!-- Address -->
           <p class="text-sm mt-2">

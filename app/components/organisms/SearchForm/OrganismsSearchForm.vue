@@ -268,14 +268,15 @@ const rentAvailabilityOptions = [
 
 /**
  * Propety Feature options
+ * 
+ * !! refer to the property schema for correct group fields
  */
-
 const propertyFeatures = [
-  { group: 'additional', key: "pets", label: "Pet-friendly", isDefault: true },
+  { group: 'additionalFeatures', key: "petFriendly", label: "Pet-friendly", isDefault: true },
   { group: 'parking', key: "garage", label: "Garage", isDefault: false },
   { group: 'parking', key: "evCharging", label: "EV Charging", isDefault: false },
-  { group: 'outdoor', key: "garden", label: "Garden", isDefault: false },
-  { group: 'accessability', key: "accessible", label: "Accessible", isDefault: false },
+  { group: 'outdoorSpace', key: "garden", label: "Garden", isDefault: false },
+  { group: 'accessibilityFeatures', key: "wheelchairFriendly", label: "Accessible", isDefault: false },
 ];
 
 /**

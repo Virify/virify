@@ -51,9 +51,87 @@ export type ListingSearchOptional = {
   priceRange?: number[];
   addedToSite?: Date;
   availabilityOptions?: string[];
-  featured?: { key: string; group: string }[];
+  featured?: Record<string, Record<string, boolean>>;
   take?: number | undefined;
   skip?: number | undefined;
 }
 
 export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilityStatus | (SaleAvailabilityStatus | RentalAvailabilityStatus)[];
+
+/**
+ * ListingCardType
+ */
+/**
+ * Listing Card Select Object
+ */
+export const listingCardFields = {
+  id: true,
+  title: true,
+  price: true,
+  publishedAt: true,
+  rentalListing: true,
+  saleListing: true,
+  property: {
+    select: {
+      media: {
+        select: {
+          image: true,
+          metadata: true,
+        },
+      },
+      address: {
+        select: {
+          number: true,
+          id: true,
+          flat: true,
+          street: true,
+          city: true,
+          postcode: true,
+          country: true,
+          county: true,
+          lat: true,
+          lon: true,
+        },
+      },
+      type: {
+        select: {
+          name: true,
+        },
+      },
+      accessibilityFeatures: {
+        select: {
+          wheelchairFriendly: true,
+        },
+      },
+      additionalFeatures: {
+        select: {
+          petFriendly: true,
+        },
+      },
+      numberBedrooms: true,
+      numberBathrooms: true,
+      parking: {
+        select: {
+          evCharging: true,
+          garage: true,
+        },
+      },
+      outdoorSpace: {
+        select: {
+          frontGarden: true,
+          rearGarden: true,
+        },
+      },
+    },
+    distanceMiles: true,
+  },
+};
+
+/**
+ * Listing Card Type
+ */
+export type ListingCardType = Prisma.ListingGetPayload<{
+  select: typeof listingCardFields & {
+    distanceMiles?: number;
+  }
+}>;
