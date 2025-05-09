@@ -28,21 +28,6 @@ export default defineEventHandler(async (event) => {
   try {
     const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, availabilityOptions, featured } = await readValidatedBody(event, searchSchema.parse);
 
-    console.log("Search Params: ", {
-      buyOrRent,
-      radius,
-      propertyTypes,
-      priceRange,
-      location,
-      bedrooms,
-      bathrooms,
-      addedToSite,
-      availabilityOptions,
-      featured,
-    });
-
-    validateQueries(radius, buyOrRent, location);
-
     /**
      * Required for search
      */
@@ -62,7 +47,9 @@ export default defineEventHandler(async (event) => {
      */
     const availabilityOptionsToEnum = convertToValidEnum(availabilityOptions);
 
-    // TODO: Add include and popular filters
+    /**
+     * optional filters
+     */
     const optional: ListingSearchOptional = {
       bedrooms: bedrooms && bedrooms[0] === 0 && bedrooms[1] === 0 ? undefined : bedrooms,
       bathrooms: bathrooms && bathrooms[0] === 0 && bathrooms[1] === 0 ? undefined : bathrooms,
@@ -82,15 +69,3 @@ export default defineEventHandler(async (event) => {
   }
 });
 
-/**
- * Validates the search queries.
- *
- * @param radius number | undefined
- * @param buyOrRent string
- * @param location string
- */
-function validateQueries(radius: number | undefined, buyOrRent: string, location: string): void {
-  if (radius === undefined || !buyOrRent || !location) {
-    throw createError({ statusCode: 400, statusMessage: "Missing required fields: radius, buy or rent or location" });
-  }
-}
