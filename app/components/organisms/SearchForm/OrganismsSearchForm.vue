@@ -102,7 +102,7 @@
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
             <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                }}</option>
+              }}</option>
             </AtomsSelect>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
@@ -278,8 +278,6 @@ watch(suggestions, (newValue) => {
   formErrors.value = null;
 });
 
-const searchListings = inject<Ref<ListingCardType[] | null>>("searchListings");
-
 
 async function sendForm(event: Event) {
   const target = event.target as HTMLFormElement;
@@ -351,9 +349,6 @@ async function sendForm(event: Event) {
     featured: formatFeatures
   });
 
-  if (searchListings) {
-    searchListings.value = searchResult;
-  }
   // Hide popover when search is successful
   hidePopover();
 }
