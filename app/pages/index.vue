@@ -2,7 +2,7 @@
   <div>
     <OrganismsHeroHome />
 
-    <OrganismsPagination :is-pending="pending" @reached-end="nextPage" class="| container">
+    <OrganismsPagination :is-pending="pending" :is-end="isEnd" @reached-end="nextPage" class="| container">
       <div class="p-listing-test-grid">
         <MoleculesListingCard v-for="listing in listings" :key="listing.id" :property-id="listing.id"
           :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
@@ -23,6 +23,7 @@ const page = ref(1)
  * Fetch initial listings
  */
 const listings = ref<ListingCardType[]>([])
+const isEnd = ref(false)
 
 const { data: listingsFetch, pending } = await useAsyncData('featured-listings', () =>
   $fetch<ListingCardType[]>('/api/listings/featured', {
