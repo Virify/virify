@@ -2,7 +2,7 @@
   <div ref="scrollContainer">
     <OrganismsHeroHome />
 
-    <div class="p-listing-test-grid">
+    <div class="p-listing-test-grid | container">
       <MoleculesListingCard v-for="listing in typeOfListing" :key="listing.id" :property-id="listing.id"
         :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
         :address="listing.property?.address" :bedrooms="listing.property?.numberBedrooms"
