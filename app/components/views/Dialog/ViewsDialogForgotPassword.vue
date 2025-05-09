@@ -34,7 +34,6 @@ const { showDialog } = useDialog();
  *  Success
  */
 function formSuccess(passwordToken: string) {
-  console.log("DEBUG", passwordToken);
   useViewTransition(() => {
     showDialog({
       component: ViewsDialogVerifyOtp,

@@ -7,7 +7,7 @@ const querySchema = z.object({
   page: z.coerce.number().min(1).max(100).optional(),
 });
 
-export default defineEventHandler(async (event): Promise<ListingWithFullProperty[] | undefined> => {
+export default defineEventHandler(async (event): Promise<ListingCardType[] | undefined> => {
   const { errorResponse } = useResponse();
 
   try {

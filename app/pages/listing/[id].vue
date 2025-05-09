@@ -225,10 +225,6 @@ const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullPrope
 const listing = computed(() => data.value);
 const property = computed(() => data.value?.property);
 
-// logs for ease
-console.log("Listing:", listing.value);
-console.log("Property:", property.value);
-
 const parking = computed(() => {
   const parking = property.value?.parking;
   if (!parking) return null;

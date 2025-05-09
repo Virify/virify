@@ -159,6 +159,8 @@ CREATE TABLE "Listing" (
     "userId" INTEGER,
     "propertyId" INTEGER NOT NULL,
     "estateAgentId" INTEGER,
+    "publishedAt" TIMESTAMP(3),
+    "published" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
