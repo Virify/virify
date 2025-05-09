@@ -15,27 +15,24 @@
 
 <script setup lang="ts">
 const props = defineProps({
-  userFavourites: {
-    type: Array as PropType<number[]>,
-  },
   listingId: {
     type: Number,
     required: true,
   },
 });
 
-const { isFavourite } = useFavourites();
+const { isFavourite, addToFavourite, removeFromFavourite } = useFavourites();
 
 const isCurrentFavourite = computed(() => {
-  return isFavourite(props.listingId, props.userFavourites || []);
+  return isFavourite(props.listingId);
 });
 
-const emit = defineEmits<{
-  (event: 'toggle', listingId: number, action: 'add' | 'remove'): void;
-}>();
-
-const toggle = (action: 'add' | 'remove') => {
-  emit('toggle', props.listingId, action);
+const toggle = async (action: 'add' | 'remove') => {
+  if (action === 'add') {
+    await addToFavourite(props.listingId);
+  } else {
+    await removeFromFavourite(props.listingId);
+  }
 };
 </script>
 <style lang="scss" scoped>
