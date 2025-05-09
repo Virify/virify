@@ -1,17 +1,15 @@
 <template>
   <div class="m-listing-card-buttons">
     <button @click.prevent="toggle" :aria-expanded="isExpanded" :aria-controls="controlsId"
-      :aria-label="isExpandedLabel">
-      <AtomsIcon :icon="isExpandedIcon" />
+      :aria-label="isExpandedLabel" class="| button-none">
+      <AtomsIcon :icon="isExpandedIcon" class="m-listing-card-button-resize" />
     </button>
 
-    <button type="button">
+    <button type="button" class="| button-none">
       <AtomsIcon icon="cards/notes" class="m-listing-card-button-icon" />
     </button>
 
-    <button type="button">
-      <AtomsIcon icon="cards/favourite" class="m-listing-card-button-icon" />
-    </button>
+    <AtomsFavouriteButton class="| button-none" :property-id="1" icon-class="m-listing-card-button-icon" />
   </div>
 </template>
 
@@ -50,7 +48,7 @@ const isExpandedLabel = computed(() => {
 })
 </script>
 
-<style>
+<style lang="scss">
 .m-listing-card-buttons {
   display: flex;
   align-items: center;
@@ -60,11 +58,26 @@ const isExpandedLabel = computed(() => {
   border: 1px solid var(--background-300);
   background: var(--background-200);
   width: fit-content;
-  border-radius: var(--border-radius-pill)
+  border-radius: var(--border-radius-pill);
+}
+
+.m-listing-card-button-resize {
+  width: var(--size-24);
+  height: var(--size-24);
 }
 
 .m-listing-card-button-icon {
-  width: var(--size-28);
-  height: var(--size-28);
+  width: var(--size-32);
+  height: var(--size-32);
+}
+
+.m-listing-card-buttons {
+  button svg {
+    transition: transform var(--animation-medium) var(--ease-out);
+  }
+
+  button:active svg {
+    transform: scale(0.9);
+  }
 }
 </style>
