@@ -33,22 +33,29 @@ const page = ref(1)
 /**
  * Fetch initial listings
  */
-const { data: listings } = await useAsyncData('featured-listings', () =>
+const listings = ref<ListingCardType[]>([])
+
+const { data: listingsFetch } = await useAsyncData('featured-listings', () =>
   $fetch<ListingCardType[]>('/api/listings/featured', {
     params: {
       page: page.value,
       pageSize: 8
     }
   }), {
+  dedupe: 'defer',
   watch: [page]
-});
+})
+
+watch(listingsFetch, (newValue) => {
+  if (!Array.isArray(newValue)) return
+
+  listings.value.push(...newValue)
+}, { immediate: true })
 
 /**
  *  Page fetcher
  */
 const fetchNextPage = useDebounceFn(() => {
-  console.log('Reached bottom')
-
   page.value += 1
 }, 1000)
 
