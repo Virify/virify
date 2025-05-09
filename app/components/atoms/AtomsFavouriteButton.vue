@@ -5,28 +5,30 @@
     }" @click.prevent="toggle">
     <AtomsIcon :icon :class="iconClass" />
 
-    <svg v-if="isSelected" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"
-      aria-hidden class="a-favourite-button-confetti">
-      <circle cx="45" cy="45" r="35" fill-opacity="0.5" class="root" />
-      <circle cx="12.5" cy="3.5" r="3.5" class="dot dot-1" />
-      <circle cx="14.5" cy="35.5" r="7.5" class="dot dot-2" />
-      <circle cx="25.5" cy="74.5" r="3.5" class="dot dot-3" />
-      <circle cx="80" cy="78" r="3" class="dot dot-4" />
-      <circle cx="76.5" cy="32.5" r="5.5" class="dot dot-5" />
-      <circle cx="73" cy="4" r="2" class="dot dot-6" />
-      <circle cx="70" cy="69" r="8" class="dot dot-7" />
-      <circle cx="59" cy="82" r="4" class="dot dot-8" />
-      <circle cx="26" cy="56" r="3" class="dot dot-9" />
-      <circle cx="2" cy="81" r="2" class="dot dot-10" />
-      <circle cx="31" cy="88" r="2" class="dot dot-11" />
-      <circle cx="57.5" cy="11.5" r="4.5" class="dot dot-12" />
-      <circle cx="35.5" cy="25.5" r="5.5" class="dot dot-13" />
-      <circle cx="43.5" cy="78.5" r="4.5" class="dot dot-14" />
-      <circle cx="9.5" cy="55.5" r="3.5" class="dot dot-15" />
-      <circle cx="62.5" cy="36.5" r="3.5" class="dot dot-16" />
-      <circle cx="80.5" cy="64.5" r="1.5" class="dot dot-17" />
-      <circle cx="87.5" cy="41.5" r="1.5" class="dot dot-18" />
-    </svg>
+    <client-only>
+      <svg v-if="isSelected" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden class="a-favourite-button-confetti">
+        <circle cx="45" cy="45" r="35" fill-opacity="0.5" class="root" />
+        <circle cx="12.5" cy="3.5" r="3.5" class="dot dot-1" />
+        <circle cx="14.5" cy="35.5" r="7.5" class="dot dot-2" />
+        <circle cx="25.5" cy="74.5" r="3.5" class="dot dot-3" />
+        <circle cx="80" cy="78" r="3" class="dot dot-4" />
+        <circle cx="76.5" cy="32.5" r="5.5" class="dot dot-5" />
+        <circle cx="73" cy="4" r="2" class="dot dot-6" />
+        <circle cx="70" cy="69" r="8" class="dot dot-7" />
+        <circle cx="59" cy="82" r="4" class="dot dot-8" />
+        <circle cx="26" cy="56" r="3" class="dot dot-9" />
+        <circle cx="2" cy="81" r="2" class="dot dot-10" />
+        <circle cx="31" cy="88" r="2" class="dot dot-11" />
+        <circle cx="57.5" cy="11.5" r="4.5" class="dot dot-12" />
+        <circle cx="35.5" cy="25.5" r="5.5" class="dot dot-13" />
+        <circle cx="43.5" cy="78.5" r="4.5" class="dot dot-14" />
+        <circle cx="9.5" cy="55.5" r="3.5" class="dot dot-15" />
+        <circle cx="62.5" cy="36.5" r="3.5" class="dot dot-16" />
+        <circle cx="80.5" cy="64.5" r="1.5" class="dot dot-17" />
+        <circle cx="87.5" cy="41.5" r="1.5" class="dot dot-18" />
+      </svg>
+    </client-only>
   </button>
 </template>
 
