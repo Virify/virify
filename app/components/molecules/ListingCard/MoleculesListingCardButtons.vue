@@ -18,8 +18,7 @@
     </AtomsTooltip>
 
     <AtomsTooltip>
-      <LazyAtomsFavouriteButton hydrate-on-interaction="mouseenter" class="| button-none" :property-id
-        icon-class="m-listing-card-button-icon" />
+      <AtomsFavouriteButton class="| button-none" :property-id icon-class="m-listing-card-button-icon" />
 
       <template #tooltip>Add to favourites</template>
     </AtomsTooltip>
