@@ -55,23 +55,6 @@ const dateOptions = [
 ];
 
 /**
- * Include Options
- */
-const saleIncludeOptions = [
-  { value: "all", key: "All" },
-  { value: "available", key: "Available" },
-  { value: "under offer", key: "Under offer" },
-  { value: "sold", key: "Sold" },
-]
-
-const rentIncludedOptions = [
-  { value: "all", key: "All" },
-  { value: "available", key: "Available" },
-  { value: "let agreed", key: "Let agreed" },
-  { value: "let", key: "Let" },
-]
-
-/**
  * Propety Feature options
  */
 const propertyFeatures = [
@@ -97,8 +80,6 @@ export function getSearchFormConfig() {
     bedroomOptions,
     bathroomOptions,
     dateOptions,
-    saleIncludeOptions,
-    rentIncludedOptions,
     propertyFeatures,
     buyOrRentOptions
   }

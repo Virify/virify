@@ -102,7 +102,7 @@
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
             <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                }}</option>
+              }}</option>
             </AtomsSelect>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
@@ -148,8 +148,6 @@ const {
   bedroomOptions,
   bathroomOptions,
   dateOptions,
-  saleIncludeOptions,
-  rentIncludedOptions,
   propertyFeatures,
   buyOrRentOptions
 } = getSearchFormConfig()
