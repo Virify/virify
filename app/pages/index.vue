@@ -20,6 +20,10 @@ import { useIntersectionObserver } from '@vueuse/core';
 const searchListings = ref<ListingCardType[] | null>(null);
 provide("searchListings", searchListings);
 const pageSize = 20;
+const searchParams = useState<Record<string, any>>("searchParams");
+watch(searchParams, () => {
+  console.log("searchParams", searchParams.value);
+})
 
 const typeOfListing = computed(() => {
   return searchListings.value ?? listings.value;
