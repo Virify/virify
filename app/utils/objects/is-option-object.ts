@@ -1,11 +1,11 @@
 import { isObject } from './is-object'
-import { isString } from '../strings'
+import { isStringy } from '../strings'
 
 interface Option {
-  key: string
-  value: string
+  key: string | number
+  value: string | number
 }
 
 export function isOptionObject(arg: unknown): arg is Option {
-  return isObject(arg) && isString(arg.key) && isString(arg.value)
+  return isObject(arg) && isStringy(arg.key) && isStringy(arg.value)
 }

@@ -123,8 +123,12 @@ export async function getNearbyPropertiesByTextQuery(query: string, distanceMile
     LIMIT 1
   )
 
-  -- Select property IDs for properties whose address is within the given distance from the matched address
-  SELECT p.id as "propertyId"
+-- Select property IDs and distance from the matched address
+  SELECT p.id as "propertyId", 
+    ST_Distance(
+      ST_Transform(a.location, 3857), 
+      ST_Transform(ma.location, 3857)
+    ) / 1609.34 AS "distanceMiles"  -- distance in miles
   FROM "Property" p
 
   -- Join each property to its address (to get its coordinates)

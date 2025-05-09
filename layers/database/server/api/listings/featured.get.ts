@@ -1,7 +1,6 @@
 import * as z from "zod";
 import { getAllFeaturedListings } from "../../utils/listing";
 import { caluclatePagination } from "../../utils/pagination";
-import type { ListingCardType } from "~~/shared/types/listing";
 
 const querySchema = z.object({
   pageSize: z.coerce.number().min(1).max(100).optional(),

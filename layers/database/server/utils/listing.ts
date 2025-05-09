@@ -1,5 +1,5 @@
-import { ListingTier, type Listing } from "@prisma/client";
-import type { ListingCardType, ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
+import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "@prisma/client";
+import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
 import { getNearbyPropertiesByTextQuery } from "./location";
@@ -93,87 +93,23 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
   });
 }
 
-/**
- * Get Sale Listings by Property IDs
- *
- * @param propertyIds number[]
- * @returns ListingWithFullProperty[]
- */
-
-// TODO: Add include and popular filters
 export async function getListingByDistanceAndFilters(
-  { buyOrRent, location, radius }: ListingSearch,
-  { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, take, skip }: ListingSearchOptional = {}
+  { type, location, radius }: ListingSearch,
+  { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
 ): Promise<ListingCardType[]> {
-  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
 
-  const selectFields = {
-    id: true,
-    title: true,
-    price: true,
-    publishedAt: true,
-    rentalListing: buyOrRent === "rent" ? { select: { rentFrequency: true } } : undefined,
-    saleListing: buyOrRent === "buy" ? { select: { priceType: true } } : undefined,
-    property: {
-      select: {
-        media: {
-          select: {
-            image: true,
-          },
-        },
-        address: {
-          select: {
-            number: true,
-            id: true,
-            flat: true,
-            street: true,
-            city: true,
-            postcode: true,
-            country: true,
-            county: true,
-            lat: true,
-            lon: true,
-          },
-        },
-        type: {
-          select: {
-            name: true,
-          },
-        },
-        additionalFeatures: {
-          select: {
-            petFriendly: true,
-          },
-        },
-        numberBedrooms: true,
-        numberBathrooms: true,
-        parking: {
-          select: {
-            evCharging: true,
-          },
-        },
-        outdoorSpace: {
-          select: {
-            frontGarden: true,
-            rearGarden: true,
-          },
+  // Get the nearby properties with distance
+  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
+  const listingFilter = type === "rent" ? "rentalListing" : "saleListing";
+
+  // Fetch listings from the database
+  const listings = await prisma.listing.findMany({
+    where: {
+      [listingFilter]: {
+        availabilityStatus: {
+          in: availabilityOptions as (typeof type extends "rent" ? RentalAvailabilityStatus[] : SaleAvailabilityStatus[]),
         },
       },
-    },
-  };
-
-  return await prisma.listing.findMany({
-    where: {
-      ...(buyOrRent === "buy" && {
-        saleListing: {
-          isNot: null,
-        },
-      }),
-      ...(buyOrRent === "rent" && {
-        rentalListing: {
-          isNot: null,
-        },
-      }),
       price: getPriceFilter(priceRange),
       published: true,
       publishedAt: addedToSite
@@ -183,7 +119,7 @@ export async function getListingByDistanceAndFilters(
         : undefined,
       property: {
         id: {
-          in: nearbyProperties.map((p) => p.propertyId),
+          in: nearbyProperties.map((p) => p.propertyId), // Use the nearby property IDs
         },
         type: {
           name: {
@@ -202,67 +138,22 @@ export async function getListingByDistanceAndFilters(
               lte: bathrooms[1], // max bathroom
             }
           : undefined,
+        ...featured,
       },
     },
     take,
     skip,
-    select: selectFields,
+    select: listingCardFields,
   });
+
+  // Map the listings to include the distance
+  const listingsWithDistance = listings.map(listing => {
+    const property = nearbyProperties.find(p => p.propertyId === listing.property?.address?.id);
+    return {
+      ...listing,
+      distanceMiles: property ? property.distanceMiles : 0, 
+    };
+  });
+
+  return listingsWithDistance;
 }
-
-
-const listingCardFields = {
-  id: true,
-  title: true,
-  price: true,
-  publishedAt: true,
-  rentalListing: true,
-  saleListing: true,
-  property: {
-    select: {
-      media: {
-        select: {
-          image: true,
-          metadata: true,
-        },
-      },
-      address: {
-        select: {
-          number: true,
-          id: true,
-          flat: true,
-          street: true,
-          city: true,
-          postcode: true,
-          country: true,
-          county: true,
-          lat: true,
-          lon: true,
-        },
-      },
-      type: {
-        select: {
-          name: true,
-        },
-      },
-      additionalFeatures: {
-        select: {
-          petFriendly: true,
-        },
-      },
-      numberBedrooms: true,
-      numberBathrooms: true,
-      parking: {
-        select: {
-          evCharging: true,
-        },
-      },
-      outdoorSpace: {
-        select: {
-          frontGarden: true,
-          rearGarden: true,
-        },
-      },
-    },
-  },
-};

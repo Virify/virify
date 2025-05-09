@@ -1,8 +1,40 @@
 <template>
-  <select class="a-select">
-    <slot />
+  <select class="a-select" v-model="selected">
+    <slot v-bind="{ options: validOptions }">
+      <option v-for="({ key, value }) of validOptions" :key="value" :value>
+        {{ key }}
+      </option>
+    </slot>
   </select>
 </template>
+
+<script setup lang="ts">
+type Option = {
+  key: string | number
+  value: string | number
+}
+
+interface Props {
+  options?: (string | number)[] | Option[]
+  modelValue?: any
+}
+
+const props = defineProps<Props>()
+
+const validOptions = computed(() => {
+  const { options } = props
+
+  return asArrayOfOptions(options)
+})
+
+const selected = defineModel({
+  default: (props: Props) => {
+    const [firstOption] = asArrayOfOptions(props.options)
+
+    return props.modelValue || firstOption?.value
+  }
+})
+</script>
 
 <style lang="scss">
 .a-select {
