@@ -10,7 +10,7 @@
     </AtomsTooltip>
 
     <AtomsTooltip>
-      <button type="button" class="| button-none">
+      <button type="button" class="| button-none" aria-label="Add notes">
         <AtomsIcon icon="cards/notes" class="m-listing-card-button-icon" />
       </button>
 
@@ -22,7 +22,6 @@
 
       <template #tooltip>Add to favourites</template>
     </AtomsTooltip>
-
   </div>
 </template>
 
