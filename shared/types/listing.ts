@@ -68,6 +68,7 @@ export const listingCardFields = {
   id: true,
   title: true,
   price: true,
+  listingTier: true,
   publishedAt: true,
   rentalListing: true,
   saleListing: true,
@@ -123,7 +124,6 @@ export const listingCardFields = {
         },
       },
     },
-    distanceMiles: true,
   },
 };
 
@@ -131,7 +131,7 @@ export const listingCardFields = {
  * Listing Card Type
  */
 export type ListingCardType = Prisma.ListingGetPayload<{
-  select: typeof listingCardFields & {
-    distanceMiles?: number;
-  }
-}>;
+  select: typeof listingCardFields;
+}> & {
+  distanceMiles?: number;
+};
