@@ -1,20 +1,35 @@
 <template>
   <div class="m-listing-card-buttons">
-    <button @click.prevent="toggle" :aria-expanded="isExpanded" :aria-controls="controlsId"
-      :aria-label="isExpandedLabel" class="| button-none">
-      <AtomsIcon :icon="isExpandedIcon" class="m-listing-card-button-resize" />
-    </button>
+    <AtomsTooltip>
+      <button @click.prevent="toggle" :aria-expanded="isExpanded" :aria-controls="controlsId"
+        :aria-label="isExpandedLabel" class="| button-none">
+        <AtomsIcon :icon="isExpandedIcon" class="m-listing-card-button-resize" />
+      </button>
 
-    <button type="button" class="| button-none">
-      <AtomsIcon icon="cards/notes" class="m-listing-card-button-icon" />
-    </button>
+      <template #tooltip>Expand property card</template>
+    </AtomsTooltip>
 
-    <LazyAtomsFavouriteButton hydrate-on-idle class="| button-none" :property-id="1"
-      icon-class="m-listing-card-button-icon" />
+    <AtomsTooltip>
+      <button type="button" class="| button-none">
+        <AtomsIcon icon="cards/notes" class="m-listing-card-button-icon" />
+      </button>
+
+      <template #tooltip>Add notes</template>
+    </AtomsTooltip>
+
+    <AtomsTooltip>
+      <LazyAtomsFavouriteButton hydrate-on-idle class="| button-none" :property-id="1"
+        icon-class="m-listing-card-button-icon" />
+
+      <template #tooltip>Add to favourites</template>
+    </AtomsTooltip>
+
   </div>
 </template>
 
 <script setup lang="ts">
+import AtomsTooltip from '~/components/atoms/AtomsTooltip.vue';
+
 interface Props {
   controlsId: string
   isExpanded?: boolean
