@@ -1,19 +1,41 @@
 <template>
-  <select class="a-select" :value="modelValue" @change="onChange">
-    <slot />
+  <select class="a-select" v-model="selected">
+    <slot v-bind="{ options: validOptions }">
+      <option v-for="({ key, value }) of validOptions" :key="value" :value>
+        {{ key }}
+      </option>
+    </slot>
   </select>
 </template>
+
 <script setup lang="ts">
-const props = defineProps({
-  modelValue: [String, Number],
+type Option = {
+  key: string | number
+  value: string | number
+}
+
+interface Props {
+  options?: string[] | Option[]
+  selected?: Option['value']
+}
+
+const props = defineProps<Props>()
+
+const validOptions = computed(() => {
+  const { options } = props
+
+  return asArrayOfObjects(options)
 })
 
-const emit = defineEmits(['update:modelValue'])
+const selected = defineModel({
+  default: (props: Props) => {
+    const [firstOption] = asArrayOfObjects(props.options)
 
-function onChange(event: any) {
-  emit('update:modelValue', event.target.value)
-}
+    return props.selected || firstOption?.value
+  }
+})
 </script>
+
 <style lang="scss">
 .a-select {
   appearance: none;
