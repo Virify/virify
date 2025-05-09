@@ -54,8 +54,8 @@ interface Props {
   image?: Record<string, unknown>[]
   address?: Record<string, unknown>
   price?: number
-  bedrooms?: number
-  bathrooms?: number
+  bedrooms?: number | undefined | null
+  bathrooms?: number | undefined | null
   description: string
   propertyId: number
   propertyType?: string

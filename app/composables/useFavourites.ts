@@ -50,6 +50,7 @@ export const useFavourites = createSharedComposable(() => {
       showDialog({
         component: ViewsDialogLogin,
       });
+      return;
     }
 
     await $fetch<number[]>(`/api/favourite/update/${listingId}`, {
