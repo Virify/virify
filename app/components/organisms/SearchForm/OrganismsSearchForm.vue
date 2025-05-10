@@ -92,7 +92,7 @@
             <MoleculesFormField label="Recently Added" class="| focus-overflow">
               <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                 <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                  }}</option>
+                }}</option>
               </AtomsSelect>
             </MoleculesFormField>
           </OrganismsSearchFormTitleBlock>
@@ -122,7 +122,7 @@
       </template>
 
       <!-- Toggle popover -->
-      <AtomsButton type="button" class="o-searchform-expand | button-ghost button-full"
+      <AtomsButton type="button" class="o-searchform-expand | button-bordered button-full"
         @click.prevent="togglePopoverExpanded">
         {{ popoverExpanded ? 'Show fewer options' : 'Show more options' }}
       </AtomsButton>

@@ -83,14 +83,14 @@
   }
 
   &-bordered {
-    border: var(--size-2) solid fn.faded-color(30%);
+    border: var(--size-1) solid #{fn.faded-color(15%)};
     background: transparent;
     color: currentColor;
     transition: background-color var(--animation-fast), border-color var(--animation-fast);
 
     &:hover {
       background: fn.faded-color(8%);
-      border-color: fn.faded-color(40%);
+      border-color: #{fn.faded-color(25%)};
       color: currentColor;
     }
   }
