@@ -1,5 +1,6 @@
 <script>
 import defu from 'defu'
+import { cloneVNode, mergeProps } from 'vue'
 
 export default {
   props: {
@@ -15,33 +16,17 @@ export default {
   setup({ animationName, delay }) {
     const slots = useSlots()
 
-    // Get default slot
-    const defaultSlot = computed(() => slots.default?.({})[0])
+    // Get default slot, with new props
+    const defaultSlot = computed(() => {
+      const slot = slots.default?.({})[0]
 
-    try {
-      if (!isString(animationName) || !isNumber(delay)) {
-        throw new TypeError('Invalid props')
-      }
+      slot.props = mergeProps(slot.props, {
+        class: `| ${animationName}`,
+        style: { '--delay': `${delay}ms` }
+      })
 
-      // Ensure props exists
-      if (!defaultSlot.value.props) {
-        defaultSlot.value.props = {}
-      }
-
-      // Get props from default slot
-      const { props = {} } = defaultSlot.value
-
-      // Create new classnames, styles
-      const newClasses = joinAttr(props.class, `| ${animationName}`)
-      const newStyles = defu(props.style, { '--delay': `${delay}ms` })
-
-      // Add classname, style
-      defaultSlot.value.props.class = newClasses
-      defaultSlot.value.props.style = newStyles
-    }
-    catch (err) {
-      console.error(err)
-    }
+      return slot
+    })
 
     // Return slot
     return () => [defaultSlot.value]
