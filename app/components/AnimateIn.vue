@@ -1,4 +1,8 @@
-<script>
+<template>
+  <slot></slot>
+</template>
+
+<!-- <script>
 import defu from 'defu'
 
 export default {
@@ -47,4 +51,4 @@ export default {
     return () => defaultSlot
   }
 }
-</script>
+</script> -->
