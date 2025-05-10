@@ -413,16 +413,22 @@ async function sendForm(event: Event) {
   top: calc(100% + var(--size-14));
   left: 50%;
   transform: translateX(-50%);
-  padding: var(--size-16);
+  padding: var(--size-20);
   width: min(100vw - var(--size-24), 42em);
   text-align: left;
   overflow: hidden;
-  border-radius: var(--border-radius-3xl);
+  border-radius: var(--border-radius-xl);
   margin: 0;
+
+  @include mq.small-tablet {
+    padding: var(--size-28);
+    border-radius: var(--border-radius-2xl);
+  }
 
   @include mq.tablet {
     padding: var(--size-32);
     width: min(100vw - var(--size-72), 42em);
+    border-radius: var(--border-radius-3xl);
   }
 
   @include mq.notebook {
