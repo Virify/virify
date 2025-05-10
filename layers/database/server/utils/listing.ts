@@ -1,5 +1,6 @@
 import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "@prisma/client";
 import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
+import { prisma } from "./prisma-client";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
 import { getNearbyPropertiesByTextQuery } from "./location";

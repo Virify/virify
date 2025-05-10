@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "pgen": "prisma generate",
     "db-push": "prisma db push",
-    "seed": "tsx ./layers/database/server/database/prisma/seed.ts"
+    "seed": "tsx ./layers/database/server/database/prisma/seed.ts",
+    "test": "vitest"
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/",
