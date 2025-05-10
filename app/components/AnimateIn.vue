@@ -1,13 +1,5 @@
-<template>
-  <slot></slot>
-</template>
-
-<script setup>
-defineProps(['animation-name', 'delay'])
-</script>
-
-<!-- <script>
-import defu from 'defu'
+<script>
+import { mergeProps } from 'vue'
 
 export default {
   props: {
@@ -20,39 +12,21 @@ export default {
       default: 0
     }
   },
-  setup({ animationName, delay }) {
-    const slots = useSlots()
+  setup({ animationName, delay }, { slots }) {
+    // Get default slot, with new props
+    const defaultSlot = computed(() => {
+      const slot = slots.default()[0]
 
-    // Get default slot
-    const [defaultSlot] = slots.default?.({})
+      slot.props = mergeProps(slot.props, {
+        class: `| ${animationName}`,
+        style: { '--delay': `${delay}ms` }
+      })
 
-    try {
-      if (!isString(animationName) || !isNumber(delay)) {
-        throw new TypeError('Invalid props')
-      }
-
-      // Ensure props exists
-      if (!defaultSlot.props) {
-        defaultSlot.props = {}
-      }
-
-      // Get props from default slot
-      const { props = {} } = defaultSlot
-
-      // Create new classnames, styles
-      const newClasses = joinAttr(props.class, `| ${animationName}`)
-      const newStyles = defu(props.style, { '--delay': `${delay}ms` })
-
-      // Add classname, style
-      defaultSlot.props.class = newClasses
-      defaultSlot.props.style = newStyles
-    }
-    catch (err) {
-      console.error(err)
-    }
+      return slot
+    })
 
     // Return slot
-    return () => defaultSlot
+    return () => [defaultSlot.value]
   }
 }
-</script> -->
+</script>
