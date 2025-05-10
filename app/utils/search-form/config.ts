@@ -73,13 +73,17 @@ const rentAvailabilityOptions = [
 
 /**
  * Propety Feature options
+ * 
+ * !! IMPORTANT !!
+ *  - The group name must match the Prisma model name
+ *  - The key name must match the Prisma model field name
  */
 const propertyFeatures = [
-  { group: 'additional', key: "pets", label: "Pet-friendly", isDefault: true },
+  { group: 'additionalFeatures', key: "petFriendly", label: "Pet-friendly", isDefault: true },
   { group: 'parking', key: "garage", label: "Garage", isDefault: false },
   { group: 'parking', key: "evCharging", label: "EV Charging", isDefault: false },
-  { group: 'outdoor', key: "garden", label: "Garden", isDefault: false },
-  { group: 'accessability', key: "accessible", label: "Accessible", isDefault: false },
+  { group: 'outdoorSpace', key: "garden", label: "Garden", isDefault: false },
+  { group: 'accessibilityFeatures', key: "wheelchairFriendly", label: "Accessible", isDefault: false },
 ];
 
 const buyOrRentOptions = [

@@ -1,12 +1,12 @@
 <template>
-  <button type="button" role="switch" :aria-checked="isSelected" :aria-label class="a-favourite-button | relative"
+  <button type="button" role="switch" :aria-checked="isCurrentFavourite" :aria-label class="a-favourite-button | relative"
     :class="{
-      selected: isSelected
+      selected: isCurrentFavourite,
     }" @click.prevent="toggle">
     <AtomsIcon :icon :class="iconClass" />
 
     <client-only>
-      <svg v-if="isSelected && isInteracted" width="90" height="90" viewBox="0 0 90 90" fill="none"
+      <svg v-if="isCurrentFavourite && isSelected && isInteracted" width="90" height="90" viewBox="0 0 90 90" fill="none"
         xmlns="http://www.w3.org/2000/svg" aria-hidden class="a-favourite-button-confetti">
         <circle cx="45" cy="45" r="35" fill-opacity="0.5" class="root" />
         <circle cx="12.5" cy="3.5" r="3.5" class="dot dot-1" />
@@ -33,7 +33,8 @@
 </template>
 
 <script setup lang="ts">
-import { watchOnce } from '@vueuse/core'
+import { watchOnce } from '@vueuse/core';
+const { isFavourite, addToFavourite, removeFromFavourite } = useFavourites();
 
 interface Props {
   propertyId: number
@@ -44,8 +45,9 @@ interface Props {
 // Confirm remove will make an alert modal appear to confirm before
 // removing a listing from favourites (e.g. on the profile page where
 // it is hard to then re-add after removing)
-withDefaults(defineProps<Props>(), {
-  confirmRemoval: false
+const props = withDefaults(defineProps<Props>(), {
+  propertyid: 0,
+  confirmRemoval: true
 })
 
 /**
@@ -54,6 +56,10 @@ withDefaults(defineProps<Props>(), {
 const isSelected = ref(false)
 const isInteracted = ref(false)
 
+const isCurrentFavourite = computed(() => {
+  return isFavourite(props.propertyId)
+});
+
 watchOnce(isSelected, () => {
   isInteracted.value = true
 })
@@ -61,23 +67,28 @@ watchOnce(isSelected, () => {
 /**
  *  a11y
  */
-const ariaLabel = computed(() => {
-  if (isSelected.value) return 'Remove from favourites'
-
-  return 'Add to favourites'
-})
-
 const icon = computed(() => {
-  if (isSelected.value) return 'cards/favourite-filled'
+  return isCurrentFavourite.value ? 'cards/favourite-filled' : 'cards/favourite'
+});
 
-  return 'cards/favourite'
-})
+const ariaLabel = computed(() => {
+  return isCurrentFavourite.value ? 'Remove from favourites' : 'Add to favourites'
+});
 
 /**
  *  Fetch, retrieve favourites
  */
 function toggle() {
   isSelected.value = !isSelected.value
+  if (isCurrentFavourite.value) {
+    // just a tad delayed to allow the animation to finish when removing from a list of favourites
+    setTimeout(() => {
+      isSelected.value = false
+      removeFromFavourite(props.propertyId)
+    }, 100) 
+  } else {
+    addToFavourite(props.propertyId)
+  }
 }
 </script>
 
