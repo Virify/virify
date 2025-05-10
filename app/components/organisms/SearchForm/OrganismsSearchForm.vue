@@ -8,9 +8,9 @@
       <input type="search" placeholder="Location" aria-label="Location to search in" class="o-searchform-banner-input"
         required @click="showPopover" @focus="showPopover" @input="showPopover" v-model="suggestions" name="location" />
 
-      <button type="submit" class="o-searchform-banner-button | button button-monochrome">
+      <AtomsButton type="submit" :pending="isPending" class="o-searchform-banner-button | button-monochrome">
         <AtomsIcon title="Search" icon="search" class="o-searchform-banner-button-icon" />
-      </button>
+      </AtomsButton>
     </div>
 
     <OrganismsSearchFormPopover class="o-searchform-popover o-searchform-animation | container container-md elevate-300"
@@ -303,6 +303,11 @@ watch(
 );
 
 /**
+ *  Pending states
+ */
+const { isPending, setPendingWhile } = usePending()
+
+/**
  *  Submit form
  */
 const formErrors = ref();
@@ -352,12 +357,14 @@ async function sendForm(event: Event) {
   };
 
   // Perform fetch for properties
-  const searchResult = await $fetch<ListingCardType[]>("/api/search/listings", {
-    method: "POST",
-    body: searchParams.value,
-  });
+  const searchResult = await setPendingWhile<ListingCardType[]>(() => {
+    return $fetch<ListingCardType[]>("/api/search/listings", {
+      method: "POST",
+      body: searchParams.value,
+    });
+  })
 
-  if (searchListings) {
+  if (searchListings && searchResult) {
     searchListings.value = searchResult;
   }
 
