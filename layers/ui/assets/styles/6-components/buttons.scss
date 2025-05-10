@@ -19,6 +19,7 @@
   border-radius: var(--border-radius-pill);
   transition: background-color var(--animation-fast), color var(--animation-fast);
   box-sizing: border-box;
+  text-decoration: none;
 
   &:hover {
     background-color: var(--primary-400);
@@ -27,6 +28,16 @@
   }
 }
 
+/**
+ *  Invisible button
+ */
+.button-none {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+}
 
 /**
  *  Button styles

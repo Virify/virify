@@ -9,13 +9,17 @@ export const formatMDY = (date: Date) => {
 }
 
 /**
- * Converts a number of days into a date.
- * @param days Number of days ago
+ * Converts a number of days (as a string) into a date.
+ * @param days String representing the number of days ago
  * @returns A Date object
  */
-export function calculateDateFromDays(days: number): Date {
+export function calculateDateFromDays(days: string): Date {
+  const daysAsNumber = parseInt(days, 10);
+  if (isNaN(daysAsNumber)) {
+    throw createError("Invalid input: days must be a valid number in string format.");
+  }
   const today = new Date();
-  today.setDate(today.getDate() - days);
+  today.setDate(today.getDate() - daysAsNumber);
   return today;
 }
 

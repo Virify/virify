@@ -1,0 +1,100 @@
+/**
+ * Get user favourites with listing data only
+ *
+ * @param userId number
+ * @returns list of favourite listings
+ */
+export async function getUserFavourites(userId: number): Promise<UserFavouriteListingCard[]> {
+  return await prisma.userFavouriteListing.findMany({
+    where: {
+      userPreferences: {
+        userId,
+      },
+    },
+    select: {
+      listing: {
+        select: listingCardFields,
+      },
+    },
+  });
+}
+
+
+/**
+ * Add a listing to user favourites, optionally including a note
+ *
+ * @param userId number
+ * @param listingId number
+ * @param note optional string
+ * @returns array of favourite listing IDs
+ */
+export async function updateFavouriteListing(userId: number, listingId: number, note?: string
+): Promise<number[]> {
+  const { userPreferencesId } = await prisma.userFavouriteListing.upsert({
+    where: {
+      userPreferencesId_listingId: {
+        userPreferencesId: userId,
+        listingId,
+      },
+    },
+    create: {
+      userPreferences: {
+        connectOrCreate: {
+          where: { userId },
+          create: { userId },
+        },
+      },
+      listing: {
+        connect: { id: listingId },
+      },
+      note,
+    },
+    update: {
+      note,
+    },
+    select: {
+      userPreferencesId: true,
+    },
+  });
+
+  const favourites = await prisma.userFavouriteListing.findMany({
+    where: { userPreferencesId },
+    select: { listingId: true },
+  });
+
+  return favourites.map(fav => fav.listingId);
+}
+
+
+/**
+ * Remove a listing from the user's favourites
+ *
+ * @param userId number
+ * @param listingId number
+ * @returns array of remaining favourite listing IDs
+ */
+export async function deleteFavouriteListing(userId: number, listingId: number): Promise<{ count: number }> {
+  return await prisma.userFavouriteListing.deleteMany({
+    where: {
+      userPreferences: {
+        userId,
+      },
+      listingId,
+    },
+  });
+}
+
+/**
+ * Remove all favourite listings for a user
+ *
+ * @param userId number
+ */
+export async function deleteAllFavourites(userId: number) {
+  return await prisma.userFavouriteListing.deleteMany({
+    where: {
+      userPreferences: {
+        userId,
+      },
+    },
+  });
+}
