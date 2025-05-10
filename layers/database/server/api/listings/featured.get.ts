@@ -11,11 +11,11 @@ export default defineEventHandler(async (event): Promise<ListingCardType[] | und
   const { errorResponse } = useResponse();
 
   try {
-    const { page = 1, pageSize = 10 } = await getValidatedQuery(event, querySchema.parse);
+    const { page, pageSize } = await getValidatedQuery(event, querySchema.parse);
 
     const pagination = caluclatePagination(page, pageSize);
 
-    const listings = await getAllFeaturedListings(pagination.take, pagination.skip);
+    const listings = await getAllFeaturedListings(pagination?.take, pagination?.skip);
 
     if (!listings) {
       throw createError({

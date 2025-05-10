@@ -46,7 +46,7 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
  *
  * @returns ListingCardType[]
  */
-export async function getAllFeaturedListings(take: number = 20, skip: number = 0): Promise<ListingCardType[] | undefined> {
+export async function getAllFeaturedListings(take?: number, skip?: number): Promise<ListingCardType[] | undefined> {
   return await prisma.listing.findMany({
     where: {
       listingTier: ListingTier.FEATURED,
