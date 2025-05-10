@@ -1,15 +1,19 @@
 <template>
   <div class="o-hero-home | container">
     <div class="o-hero-home-content">
-      <h1 class="o-hero-home-title | title-2xl lineheight-xs">Property search on another level</h1>
+      <h1 class="o-hero-home-title | title-2xl lineheight-xs">
+        Property search on another level
+      </h1>
 
       <OrganismsSearchForm />
 
       <AtomsDivider text="or" class="o-hero-home-divider" />
 
       <div role="presentation" class="o-hero-home-footer-links">
-        <MoleculesIconLink to="#" icon="explore/ai" content="Search using AI" icon-inline />
-        <MoleculesIconLink to="#" icon="explore/map" content="Search by map" icon-inline />
+        <MoleculesIconLink class="o-hero-home-footer-link" to="#" icon="explore/ai" content="Search using AI"
+          icon-inline />
+        <MoleculesIconLink class="o-hero-home-footer-link" to="#" icon="explore/map" content="Search by map"
+          icon-inline />
       </div>
     </div>
   </div>
@@ -17,6 +21,7 @@
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+@use '#styles/_utils/functions' as fn;
 
 .o-hero-home {
   background: linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
@@ -58,7 +63,12 @@
   gap: var(--size-16);
 }
 
-.o-hero-home-footer-links a {
+.o-hero-home-footer-link {
   flex-grow: 1;
+  background-color: fn.faded-color(12%, var(--monochrome-600));
+
+  &:hover {
+    background-color: fn.faded-color(24%, var(--monochrome-600));
+  }
 }
 </style>

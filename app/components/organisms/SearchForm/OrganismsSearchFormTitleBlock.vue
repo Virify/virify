@@ -1,6 +1,9 @@
 <template>
   <div role="presentation" class="| flow flow-md">
-    <h2 v-if="title" class="| title-sm">{{ title }}</h2>
+    <h2 v-if="title" :class="{
+      '| title-xs': !titleLarge,
+      '| title-md': titleLarge,
+    }">{{ title }}</h2>
 
     <slot></slot>
   </div>
@@ -9,7 +12,10 @@
 <script setup lang="ts">
 interface Props {
   title?: string
+  titleLarge?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  titleLarge: false
+})
 </script>

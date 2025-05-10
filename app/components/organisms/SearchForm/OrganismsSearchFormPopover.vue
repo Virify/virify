@@ -2,7 +2,8 @@
   <div class="| flow flow-2xl z-1">
     <slot />
 
-    <OrganismsSearchFormTitleBlock title="Explore more" class="| animate-fade-down" style="--delay: 200ms">
+    <OrganismsSearchFormTitleBlock title="Explore more" title-large
+      class="o-searchform-popover-footer | animate-fade-down" style="--delay: 200ms">
       <ul class="o-searchform-popover-explore-more">
         <li v-for="{ icon, to, content }, index of exploreMoreLinks" class="| animate-fade-down"
           :style="`--delay: ${200 + index * 60}ms`">
@@ -28,6 +29,21 @@ const exploreMoreLinks = [
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+
+.o-searchform-popover-footer {
+  margin-top: var(--popover-padding);
+  background: var(--background-100);
+  padding: var(--popover-padding);
+  border-radius: var(--border-radius-lg);
+
+  @include mq.small-tablet {
+    border-radius: var(--border-radius-xl);
+  }
+
+  @include mq.tablet {
+    border-radius: var(--border-radius-2xl);
+  }
+}
 
 .o-searchform-popover-explore-more {
   list-style: none;
