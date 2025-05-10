@@ -5,7 +5,7 @@
  *  Page widths
  */
 .container {
-  --container-width: 72rem;
+  --container-width: 82rem;
   --container-padding: var(--size-24);
 
   width: min(100% - var(--container-padding), var(--container-width));

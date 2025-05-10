@@ -12,9 +12,11 @@ const searchSchema = z.object({
   location: z.string(),
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
-  addedToSite: z.coerce.number().optional(),
+  addedToSite: z.enum(["0", "1", "3", "7", "14"]).optional(),
   availabilityOptions: z.string().optional(),
   featured: z.array(z.object({ key: z.string(), group: z.enum(["parking", "additionalFeatures", "accessibilityFeatures", "outdoorSpace"]) })).optional(),
+  page: z.coerce.number().optional(),
+  pageSize: z.coerce.number().optional(),
 });
 
 /**
@@ -26,7 +28,7 @@ const searchSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, availabilityOptions, featured } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
 
     /**
      * Required for search
@@ -36,6 +38,11 @@ export default defineEventHandler(async (event) => {
       radius,
       type: buyOrRent,
     };
+
+    /**
+     * Pagination
+     */
+    const pagination = caluclatePagination(page, pageSize);
 
     /**
      * Map featured filters to Prisma query format
@@ -55,9 +62,11 @@ export default defineEventHandler(async (event) => {
       bathrooms: bathrooms && bathrooms[0] === 0 && bathrooms[1] === 0 ? undefined : bathrooms,
       propertyTypes,
       priceRange,
-      addedToSite: addedToSite && addedToSite !== 0 ? calculateDateFromDays(addedToSite) : undefined,
+      addedToSite: addedToSite && addedToSite !== "0" ? calculateDateFromDays(addedToSite) : undefined,
       availabilityOptions: availabilityOptionsToEnum,
-      featured: mappedFeatured
+      featured: mappedFeatured,
+      skip: pagination?.skip,
+      take: pagination?.take,
     };
 
     const listings = await getListingByDistanceAndFilters(listingSearch, optional);

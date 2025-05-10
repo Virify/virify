@@ -1,7 +1,11 @@
 <template>
   <div class="container">
-    <div v-if="favourites.length > 0">
-      <ListingCards :listings="favourites" :title="`Favourite Listings: `" />
+
+    <div class="p-listing-test-grid | container">
+      <MoleculesListingCard v-for="listing in favourites" :key="listing.id"      :property-id="listing.id"
+        :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
+        :address="listing.property?.address" :bedrooms="listing.property?.numberBedrooms"
+        :bathrooms="listing.property?.numberBathrooms" :description="listing.title" />
     </div>
 
     <div class="pt-6">

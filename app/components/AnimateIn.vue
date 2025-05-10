@@ -1,4 +1,12 @@
-<script>
+<template>
+  <slot></slot>
+</template>
+
+<script setup>
+defineProps(['animation-name', 'delay'])
+</script>
+
+<!-- <script>
 import defu from 'defu'
 
 export default {
@@ -47,4 +55,4 @@ export default {
     return () => defaultSlot
   }
 }
-</script>
+</script> -->

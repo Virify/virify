@@ -1,0 +1,12 @@
+model UserPreferences {
+  id             Int                    @id @default(autoincrement())
+  userId         Int                    @unique
+  user           User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favourites     UserFavouriteListing[]
+  savedSearches  SavedSearch[]
+  hiddenListings HiddenListing[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@index([userId])
+}

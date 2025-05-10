@@ -115,13 +115,12 @@ async function seedPropertyTypes() {
     "Student Accommodation": ["Flat", "House", "House-share"],
   };
 
-  const defaultSelected = ["House", "Cottage", "Flat"]
 
   for (const [typeName, classification] of Object.entries(types)) {
     const createTypes = await prisma.propertyType.create({
       data: {
         name: typeName,
-        defaultSelected: defaultSelected.includes(typeName),
+        defaultSelected: true,
         classifications: {
           create: classification.map((name) => ({ name })),
         },

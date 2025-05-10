@@ -94,3 +94,13 @@
         @content;
     }
 }
+
+
+/**
+ *  Touch screen devices disorders
+ */
+@mixin hover {
+    @media (hover: hover) {
+        @content;
+    }
+}

@@ -1,5 +1,5 @@
 /**
- * Delete all listings from user favourites
+ * Get user favourites
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -9,11 +9,11 @@ export default defineEventHandler(async (event) => {
 
     if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
 
-    const result = await deleteAllFavouritesFromUserFavourites(userId as number);
+    const result = await getUserFavourites(userId as number);
 
     return result;
   } catch (error) {
-    console.log(error);
-    return errorResponse(error, event);
+    console.log(error)
+    errorResponse(error, event);
   }
 });

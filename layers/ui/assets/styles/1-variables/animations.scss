@@ -4,6 +4,7 @@
 :root {
   // Easing functions
   --ease-out: cubic-bezier(0.2, 1.1, 0.8, 1);
+  --ease-in: cubic-bezier(1, 0, 1, 1);
   --bounce-out: cubic-bezier(0.25, 1.8, 0.5, 0.7);
 
   // Speeds
@@ -11,4 +12,5 @@
   --animation-medium: 0.2s;
   --animation-slow: 0.3s;
   --animation-veryslow: 0.35s;
+  --animation-subtle: 0.5s;
 }
