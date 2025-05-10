@@ -12,12 +12,10 @@ export default {
       default: 0
     }
   },
-  setup({ animationName, delay }) {
-    const slots = useSlots()
-
+  setup({ animationName, delay }, { slots }) {
     // Get default slot, with new props
     const defaultSlot = computed(() => {
-      const slot = slots.default?.({})[0]
+      const slot = slots.default()[0]
 
       slot.props = mergeProps(slot.props, {
         class: `| ${animationName}`,
