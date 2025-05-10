@@ -9,11 +9,8 @@
   --container-padding: var(--size-24);
 
   width: min(100% - var(--container-padding), var(--container-width));
+  box-sizing: border-box;
   margin-inline: auto;
-
-  // @TODO remove once Tailwind is removed, this only exists to
-  // prevent conflicts in the meantime
-  max-width: none;
 
   @include mq.tablet {
     --container-padding: var(--size-48);
@@ -48,6 +45,7 @@
 .dialog-container {
   --container-width: 42rem;
 
+  box-sizing: border-box;
   width: var(--container-width);
   padding: var(--size-28);
   max-width: 100%;

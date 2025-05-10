@@ -8,6 +8,10 @@ select,
 textarea {
   font: inherit;
   box-sizing: border-box;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: unset;
 }
 
 button {
@@ -16,6 +20,13 @@ button {
 }
 
 fieldset {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
   display: block;
   margin: 0;
   padding: 0;

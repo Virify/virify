@@ -205,10 +205,12 @@ const iconOptions = computed(() => {
   text-align: center;
   width: fit-content;
   padding: 0;
+  margin: 0;
   margin-inline: auto;
 }
 
 .m-listing-card-icon {
+  display: block;
   width: var(--size-32);
   height: var(--size-32);
   margin: 0 auto var(--size-6);
