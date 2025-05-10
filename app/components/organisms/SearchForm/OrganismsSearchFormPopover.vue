@@ -2,17 +2,17 @@
   <div class="| flow flow-2xl z-1">
     <slot></slot>
 
-    <animate-in :delay="200">
+    <animate-in :delay="150">
       <OrganismsSearchFormTitleBlock title="Explore more" title-large class="o-searchform-popover-footer">
         <ul class="o-searchform-popover-explore-more">
-          <animate-in v-for="{ icon, to, content }, index of exploreMoreLinks" :delay="200 + index * 60">
+          <animate-in v-for="{ icon, to, content }, index of exploreMoreLinks" :delay="150 + index * 50">
             <li>
               <MoleculesIconLink :to :icon :content icon-large class="o-searchform-popover-icon-link" />
             </li>
           </animate-in>
         </ul>
 
-        <animate-in :delay="300">
+        <animate-in :delay="200">
           <nuxt-link to="#" class="o-searchform-popover-full-button | button button-ghost font-semibold">
             Advanced search
           </nuxt-link>

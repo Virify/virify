@@ -43,7 +43,7 @@
       <!-- price -->
       <animate-in :delay="50">
         <OrganismsSearchFormTitleBlock title="Price">
-          <animate-in :delay="100">
+          <animate-in :delay="75">
             <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax"
               :starting-min="priceMin" :starting-max="priceMax" hydrate-on-visible />
           </animate-in>
@@ -51,10 +51,10 @@
       </animate-in>
 
       <!-- bedrooms & bathrooms -->
-      <animate-in :delay="50">
+      <animate-in :delay="75">
         <div class="o-searchform-grid">
           <OrganismsSearchFormRooms legend="Bedrooms">
-            <animate-in :delay="50">
+            <animate-in :delay="75">
               <div role="presentation" class="o-searchform-inline-label">
                 <span aria-hidden class="| body-sm">Between</span>
                 <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions"
@@ -72,7 +72,7 @@
           </OrganismsSearchFormRooms>
 
           <OrganismsSearchFormRooms legend="Bathrooms">
-            <animate-in :delay="150">
+            <animate-in :delay="125">
               <div role="presentation" class="o-searchform-inline-label">
                 <span aria-hidden class="| body-sm">Between</span>
                 <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
@@ -80,7 +80,7 @@
               </div>
             </animate-in>
 
-            <animate-in :delay="200">
+            <animate-in :delay="150">
               <div role="presentation" class="o-searchform-inline-label">
                 <span aria-hidden class="| body-sm">and</span>
                 <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
@@ -92,11 +92,11 @@
       </animate-in>
 
       <!-- property types -->
-      <animate-in :delay="200">
+      <animate-in :delay="150">
         <OrganismsSearchFormTitleBlock title="Property type">
           <MoleculesScrollBox class="| focus-overflow">
             <ul class="o-searchform-property-types">
-              <animate-in v-for="({ id, name, defaultSelected }, index) of propertyTypes" :delay="200 + index * 40">
+              <animate-in v-for="({ id, name, defaultSelected }, index) of propertyTypes" :delay="150 + index * 30">
                 <li :key="id">
                   <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
                 </li>
@@ -121,7 +121,7 @@
             </OrganismsSearchFormTitleBlock>
           </animate-in>
 
-          <animate-in :delay="50">
+          <animate-in :delay="25">
             <OrganismsSearchFormTitleBlock title="Include">
               <MoleculesFormField label="Show" class="| focus-overflow">
                 <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
@@ -135,11 +135,11 @@
         </div>
 
         <!-- popular features -->
-        <animate-in :delay="100">
+        <animate-in :delay="50">
           <OrganismsSearchFormTitleBlock title="Popular Features">
             <MoleculesScrollBox class="| focus-overflow">
               <ul class="o-searchform-property-types">
-                <animate-in v-for="({ key, label, isDefault }, index) in propertyFeatures" :delay="100 + index * 40">
+                <animate-in v-for="({ key, label, isDefault }, index) in propertyFeatures" :delay="50 + index * 30">
                   <li :key>
                     <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
                   </li>
@@ -151,7 +151,7 @@
       </div>
 
       <!-- Expand popover -->
-      <animate-in :delay="300">
+      <animate-in :delay="200">
         <div role="presentation">
           <AtomsButton type="button" class="o-searchform-expand | button-bordered button-full"
             @click.prevent="togglePopoverExpanded">

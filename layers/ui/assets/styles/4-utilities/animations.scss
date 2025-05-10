@@ -6,7 +6,7 @@
 @include mq.motion {
   .animate-fade-down {
     transition-property: opacity, transform;
-    transition-duration: var(--animation-veryslow);
+    transition-duration: var(--animation-slow);
     transition-timing-function: var(--ease-out), var(--bounce-out);
     transition-delay: var(--delay, 0ms);
   }
