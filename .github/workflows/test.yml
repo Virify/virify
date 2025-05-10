@@ -1,4 +1,4 @@
-name: Test
+name: Run unit Tests
 
 on:
   push:
@@ -39,23 +39,5 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    - name: Generate Prisma Client
-      run: pnpm pgen
-
-    - name: Setup Database
-      run: |
-        pnpm prisma migrate
-      env:
-        DATABASE_URL: postgresql://${{ secrets.TEST_DB_USER }}:${{ secrets.TEST_DB_PASSWORD }}@${{ secrets.TEST_DB_HOST }}:5432/virify
-
     - name: Run tests
-      run: pnpm test:full
-      env:
-        DATABASE_URL: postgresql://${{ secrets.TEST_DB_USER }}:${{ secrets.TEST_DB_PASSWORD }}@${{ secrets.TEST_DB_HOST }}:5432/virify
-
-    - name: Cleanup Database
-      if: always()
-      run: |
-        pnpm prisma db push --force-reset
-      env:
-        DATABASE_URL: postgresql://${{ secrets.TEST_DB_USER }}:${{ secrets.TEST_DB_PASSWORD }}@${{ secrets.TEST_DB_HOST }}:5432/virify_test
+      run: pnpm test
