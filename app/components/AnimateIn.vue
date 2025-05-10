@@ -2,6 +2,10 @@
   <slot></slot>
 </template>
 
+<script setup>
+defineProps(['animation-name', 'delay'])
+</script>
+
 <!-- <script>
 import defu from 'defu'
 

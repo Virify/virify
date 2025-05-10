@@ -151,7 +151,7 @@
       </template>
 
       <!-- Toggle popover -->
-      <animate-in :delay="300" wrap-with="div">
+      <animate-in :delay="300">
         <div role="presentation">
           <AtomsButton type="button" class="o-searchform-expand | button-bordered button-full"
             @click.prevent="togglePopoverExpanded">
