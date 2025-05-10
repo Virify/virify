@@ -1,6 +1,5 @@
 <script>
-import defu from 'defu'
-import { cloneVNode, mergeProps } from 'vue'
+import { mergeProps } from 'vue'
 
 export default {
   props: {
