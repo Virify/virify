@@ -11,7 +11,8 @@
     "pgen": "prisma generate",
     "db-push": "prisma db push",
     "seed": "tsx ./layers/database/server/database/prisma/seed.ts",
-    "test": "vitest"
+    "test": "vitest run --exclude=\"**/*.e2e.test.ts\"",
+    "test:full": "vitest run"
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/",

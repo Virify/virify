@@ -1,5 +1,4 @@
 /**
- * @fileoverview
  * End-to-end tests for the Listing utilities, focusing on the getListingByDistanceAndFilters function.
  * These tests use a real test database and verify the integration of property, address, user, and listing creation,
  * as well as geospatial queries and filtering logic. The test data is created and cleaned up for each run.
