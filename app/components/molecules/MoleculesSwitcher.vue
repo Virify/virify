@@ -47,14 +47,12 @@ const optionsWithTabIndex = computed(() => {
 
 .m-toggle-text {
   display: flex;
-  margin: 0;
   padding: 0;
   border: 0;
   background: var(--background-300);
   color: var(--foreground-300);
   padding: var(--size-4);
   border-radius: var(--size-12);
-  width: 100%;
   box-sizing: border-box;
 }
 
@@ -72,7 +70,7 @@ const optionsWithTabIndex = computed(() => {
   }
 
   &:has(input:checked) {
-    background: var(--secondary-500);
+    background: var(--secondary-400);
     box-shadow: var(--monochrome-100);
   }
 }
