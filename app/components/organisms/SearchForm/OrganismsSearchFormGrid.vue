@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 interface Props {
-  gridAuto: boolean
+  gridAuto?: boolean
 }
 
 withDefaults(defineProps<Props>(), {

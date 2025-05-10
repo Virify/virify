@@ -17,7 +17,7 @@
 interface Props {
   title?: string
   titleLarge?: boolean
-  hasGrid: boolean
+  hasGrid?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
