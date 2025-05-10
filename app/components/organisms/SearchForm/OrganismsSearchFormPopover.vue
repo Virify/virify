@@ -1,9 +1,9 @@
 <template>
-  <div class="| flow flow-2xl z-1">
+  <div class="| flow flow-lg">
     <slot></slot>
 
     <animate-in :delay="150">
-      <OrganismsSearchFormTitleBlock title="Explore more" title-large class="o-searchform-popover-footer">
+      <OrganismsSearchFormTitleBlock title="Explore more" title-large>
         <ul class="o-searchform-popover-explore-more">
           <animate-in v-for="{ icon, to, content }, index of exploreMoreLinks" :delay="150 + index * 50">
             <li>
@@ -33,21 +33,6 @@ const exploreMoreLinks = [
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
-
-.o-searchform-popover-footer {
-  margin-top: var(--popover-padding);
-  background: var(--background-100);
-  padding: var(--popover-padding);
-  border-radius: var(--border-radius-lg);
-
-  @include mq.small-tablet {
-    border-radius: var(--border-radius-xl);
-  }
-
-  @include mq.tablet {
-    border-radius: var(--border-radius-2xl);
-  }
-}
 
 .o-searchform-popover-explore-more {
   list-style: none;

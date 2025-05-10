@@ -1,11 +1,15 @@
 <template>
-  <div role="presentation" class="| flow flow-md">
+  <div role="presentation" class="o-searchform-title-block | flow flow-md">
     <h2 v-if="title" :class="{
       '| title-xs': !titleLarge,
       '| title-md': titleLarge,
     }">{{ title }}</h2>
 
-    <slot></slot>
+    <OrganismsSearchFormGrid v-if="hasGrid">
+      <slot></slot>
+    </OrganismsSearchFormGrid>
+
+    <slot v-else></slot>
   </div>
 </template>
 
@@ -13,9 +17,29 @@
 interface Props {
   title?: string
   titleLarge?: boolean
+  hasGrid: boolean
 }
 
 withDefaults(defineProps<Props>(), {
-  titleLarge: false
+  titleLarge: false,
+  hasGrid: false
 })
 </script>
+
+<style lang="scss">
+@use '#styles/_utils/media' as mq;
+
+.o-searchform-title-block {
+  background: var(--background-100);
+  padding: var(--popover-gap);
+  border-radius: var(--border-radius-lg);
+
+  @include mq.small-tablet {
+    border-radius: var(--border-radius-xl);
+  }
+
+  @include mq.tablet {
+    border-radius: var(--border-radius-2xl);
+  }
+}
+</style>
