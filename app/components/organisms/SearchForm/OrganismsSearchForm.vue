@@ -36,6 +36,12 @@
         </div>
       </div>
 
+      <!-- price -->
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 50ms">
+        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
+          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 100ms" />
+      </OrganismsSearchFormTitleBlock>
+
       <!-- bedrooms & bathrooms -->
       <div class="o-searchform-grid | animate-fade-down" style="--delay: 50ms">
         <OrganismsSearchFormRooms legend="Bedrooms">
@@ -67,12 +73,6 @@
         </OrganismsSearchFormRooms>
       </div>
 
-      <!-- price -->
-      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 200ms">
-        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
-          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 250ms" />
-      </OrganismsSearchFormTitleBlock>
-
       <!-- property types -->
       <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 200ms">
         <MoleculesScrollBox class="| focus-overflow">
@@ -85,42 +85,49 @@
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
 
-      <!-- Date Added and Include Options -->
-      <div class="o-searchform-grid o-searchform-animation">
-        <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 200ms">
-          <MoleculesFormField label="Recently Added" class="| focus-overflow">
-            <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
-              <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                }}</option>
-            </AtomsSelect>
-          </MoleculesFormField>
-        </OrganismsSearchFormTitleBlock>
+      <template v-if="popoverExpanded">
+        <!-- Date Added and Include Options -->
+        <div class="o-searchform-grid o-searchform-animation">
+          <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 0">
+            <MoleculesFormField label="Recently Added" class="| focus-overflow">
+              <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
+                <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
+                  }}</option>
+              </AtomsSelect>
+            </MoleculesFormField>
+          </OrganismsSearchFormTitleBlock>
 
-        <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 250ms">
-          <MoleculesFormField label="Show" class="| focus-overflow">
-            <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
-              <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions" :key="value"
-                :value>{{ key
-                }}</option>
-            </AtomsSelect>
-          </MoleculesFormField>
-        </OrganismsSearchFormTitleBlock>
-      </div>
+          <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 50ms">
+            <MoleculesFormField label="Show" class="| focus-overflow">
+              <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
+                <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
+                  :key="value" :value>{{ key
+                  }}</option>
+              </AtomsSelect>
+            </MoleculesFormField>
+          </OrganismsSearchFormTitleBlock>
+        </div>
 
-      <!-- popular features -->
-      <OrganismsSearchFormTitleBlock title="Popular Features" class="| animate-fade-down" style="--delay: 250ms">
-        <MoleculesScrollBox class="| focus-overflow">
-          <ul class="o-searchform-property-types">
-            <li v-for="({ key, label, isDefault }, index) in propertyFeatures" :key="key" class="| animate-fade-down"
-              :style="`--delay: ${250 + index * 40}ms`">
-              <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
-            </li>
-          </ul>
-        </MoleculesScrollBox>
-      </OrganismsSearchFormTitleBlock>
+        <!-- popular features -->
+        <OrganismsSearchFormTitleBlock title="Popular Features" class="| animate-fade-down" style="--delay: 100ms">
+          <MoleculesScrollBox class="| focus-overflow">
+            <ul class="o-searchform-property-types">
+              <li v-for="({ key, label, isDefault }, index) in propertyFeatures" :key="key" class="| animate-fade-down"
+                :style="`--delay: ${100 + index * 40}ms`">
+                <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
+              </li>
+            </ul>
+          </MoleculesScrollBox>
+        </OrganismsSearchFormTitleBlock>
+      </template>
+
+      <!-- Toggle popover -->
+      <AtomsButton type="button" class="o-searchform-expand | button-ghost button-full"
+        @click.prevent="togglePopoverExpanded">
+        {{ popoverExpanded ? 'Show fewer options' : 'Show more options' }}
+      </AtomsButton>
 
     </OrganismsSearchFormPopover>
-
   </form>
 </template>
 
@@ -148,6 +155,15 @@ const {
  *  Popover management
  */
 const $form = useTemplateRef("$form");
+
+/**
+ *  Popover expanded
+ */
+const popoverExpanded = ref(false)
+
+function togglePopoverExpanded() {
+  popoverExpanded.value = !popoverExpanded.value
+}
 
 /**
  * state
@@ -409,30 +425,38 @@ async function sendForm(event: Event) {
 }
 
 .o-searchform-popover {
+  --popover-radius: var(--border-radius-xl);
+  --popover-padding: var(--size-20);
+
+  width: min(100vw - var(--size-24), 42em);
+  text-align: left;
+  overflow: hidden;
+  margin: 0;
   position: absolute;
   top: calc(100% + var(--size-14));
   left: 50%;
   transform: translateX(-50%);
-  padding: var(--size-20);
   width: min(100vw - var(--size-24), 42em);
   text-align: left;
   overflow: hidden;
-  border-radius: var(--border-radius-xl);
-  margin: 0;
+  padding: var(--popover-padding);
+  border-radius: var(--popover-radius);
 
   @include mq.small-tablet {
-    padding: var(--size-28);
-    border-radius: var(--border-radius-2xl);
+    --popover-radius: var(--size-28);
+    --popover-padding: var(--border-radius-2xl);
   }
 
   @include mq.tablet {
-    padding: var(--size-32);
+    --popover-radius: var(--size-32);
+    --popover-padding: var(--border-radius-3xl);
+
     width: min(100vw - var(--size-72), 42em);
-    border-radius: var(--border-radius-3xl);
   }
 
   @include mq.notebook {
-    padding: var(--size-40);
+    --popover-radius: var(--size-40);
+
     width: min(100vw - var(--size-72), 42em);
   }
 }
@@ -516,6 +540,11 @@ async function sendForm(event: Event) {
     height: auto;
     aspect-ratio: 16 / 9;
   }
+}
+
+.o-searchform-expand {
+  padding: var(--size-12);
+  border-radius: var(--border-radius-ui);
 }
 
 /**

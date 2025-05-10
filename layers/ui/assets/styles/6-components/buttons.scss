@@ -53,11 +53,11 @@
   }
 
   &-ghost {
-    background: fn.faded-color(12%, var(--monochrome-600));
+    background: fn.faded-color(6%, light-dark(var(--blue-100), var(--blue-900)));
     color: light-dark(var(--monochrome-100), var(--monochrome-900));
 
     &:hover {
-      background: fn.faded-color(24%, var(--monochrome-600));
+      background: fn.faded-color(12%, light-dark(var(--blue-100), var(--blue-900)));
       color: light-dark(var(--monochrome-100), var(--monochrome-900));
     }
   }
