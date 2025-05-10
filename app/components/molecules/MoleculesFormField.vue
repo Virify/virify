@@ -1,5 +1,7 @@
 <template>
-  <div role="presentation" class="m-formfield | flow flow-xs">
+  <div role="presentation" class="m-formfield" :class="{
+    '|flow flow-xs': !noSpacing
+  }">
     <AtomsLabel :for="labelId">{{ label }}</AtomsLabel>
 
     <slot v-bind="{ id: labelId }"></slot>
@@ -7,11 +9,13 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  label: {
-    type: String,
-    required: true
-  }
+interface Props {
+  label: string
+  noSpacing?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  noSpacing: false
 })
 
 // Create ID for label
