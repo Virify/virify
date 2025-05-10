@@ -1,12 +1,4 @@
-<template>
-  <slot></slot>
-</template>
-
-<script setup>
-defineProps(['animation-name', 'delay'])
-</script>
-
-<!-- <script>
+<script>
 import defu from 'defu'
 
 export default {
@@ -24,7 +16,7 @@ export default {
     const slots = useSlots()
 
     // Get default slot
-    const [defaultSlot] = slots.default?.({})
+    const defaultSlot = computed(() => slots.default?.({})[0])
 
     try {
       if (!isString(animationName) || !isNumber(delay)) {
@@ -32,27 +24,27 @@ export default {
       }
 
       // Ensure props exists
-      if (!defaultSlot.props) {
-        defaultSlot.props = {}
+      if (!defaultSlot.value.props) {
+        defaultSlot.value.props = {}
       }
 
       // Get props from default slot
-      const { props = {} } = defaultSlot
+      const { props = {} } = defaultSlot.value
 
       // Create new classnames, styles
       const newClasses = joinAttr(props.class, `| ${animationName}`)
       const newStyles = defu(props.style, { '--delay': `${delay}ms` })
 
       // Add classname, style
-      defaultSlot.props.class = newClasses
-      defaultSlot.props.style = newStyles
+      defaultSlot.value.props.class = newClasses
+      defaultSlot.value.props.style = newStyles
     }
     catch (err) {
       console.error(err)
     }
 
     // Return slot
-    return () => defaultSlot
+    return () => [defaultSlot.value]
   }
 }
-</script> -->
+</script>
