@@ -106,7 +106,7 @@
         </OrganismsSearchFormTitleBlock>
       </animate-in>
 
-      <div role="presentation" v-show="popoverExpanded">
+      <div v-show="popoverExpanded" class="| flow flow-2xl" role="presentation">
         <!-- Date Added and Include Options -->
         <div class="o-searchform-grid o-searchform-animation">
 
