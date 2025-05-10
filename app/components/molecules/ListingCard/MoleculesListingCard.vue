@@ -332,6 +332,10 @@ const iconOptions = computed(() => {
   transition-timing-function: var(--ease-out);
 }
 
+.backdrop-leave-active {
+  box-shadow: none;
+}
+
 .backdrop-leave-to,
 .backdrop-enter-from {
   width: 100%;
