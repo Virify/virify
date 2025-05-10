@@ -44,8 +44,7 @@ jobs:
 
     - name: Setup Database
       run: |
-        pnpm db-push
-        pnpm seed
+        pnpm prisma migrate
       env:
         DATABASE_URL: postgresql://${{ secrets.TEST_DB_USER }}:${{ secrets.TEST_DB_PASSWORD }}@${{ secrets.TEST_DB_HOST }}:5432/virify
 
