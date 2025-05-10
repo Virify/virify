@@ -34,8 +34,44 @@
           </MoleculesFormField>
           <!-- <div class="o-searchform-map | title-2xl">Map</div> -->
         </div>
-
       </div>
+
+      <!-- bedrooms & bathrooms -->
+      <div class="o-searchform-grid">
+        <OrganismsSearchFormRooms legend="Bedrooms">
+          <div role="presentation" class="o-searchform-inline-label">
+            <span aria-hidden class="| body-sm">Between</span>
+            <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions" class="| text-input body-sm focus-visible"
+              name="min-bedrooms" aria-label="Minimum bedrooms" />
+          </div>
+
+          <div role="presentation" class="o-searchform-inline-label">
+            <span aria-hidden class="| body-sm">and</span>
+            <AtomsSelect v-model="bedroomRange[1]" :options="bedroomOptions" class="| text-input body-sm focus-visible"
+              name="max-bedrooms" aria-label="Maximum bedrooms" />
+          </div>
+        </OrganismsSearchFormRooms>
+
+        <OrganismsSearchFormRooms legend="Bathrooms">
+          <div role="presentation" class="o-searchform-inline-label">
+            <span aria-hidden class="| body-sm">Between</span>
+            <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
+              class="| text-input body-sm focus-visible" name="min-bathrooms" aria-label="Minimum bathrooms" />
+          </div>
+
+          <div role="presentation" class="o-searchform-inline-label">
+            <span aria-hidden class="| body-sm">and</span>
+            <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
+              class="| text-input body-sm focus-visible" name="max-bathrooms" aria-label="Maximum bathrooms" />
+          </div>
+        </OrganismsSearchFormRooms>
+      </div>
+
+      <!-- price -->
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
+        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
+          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
+      </OrganismsSearchFormTitleBlock>
 
       <!-- property types -->
       <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 50ms">
@@ -49,60 +85,13 @@
         </MoleculesScrollBox>
       </OrganismsSearchFormTitleBlock>
 
-
-      <!-- bedrooms & bathrooms -->
-      <div class="o-searchform-filter o-searchform-animation">
-        <OrganismsSearchFormTitleBlock title="Bedrooms" class="| animate-fade-down" style="--delay: 50ms">
-          <div class="o-searchform-filter">
-            <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect v-model="bedroomRange[0]" :id class="| text-input body-sm focus-visible" name="min-bedrooms">
-                <option v-for="({ key, value }) of bedroomOptions" :key :value>{{
-                  key }}</option>
-              </AtomsSelect>
-            </MoleculesFormField>
-            <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect v-model="bedroomRange[1]" :id class="| text-input body-sm focus-visible" name="max-bedrooms">
-                <option v-for="({ key, value }) of bedroomOptions" :key :value>{{
-                  key }}</option>
-              </AtomsSelect>
-            </MoleculesFormField>
-          </div>
-        </OrganismsSearchFormTitleBlock>
-
-        <OrganismsSearchFormTitleBlock title="Bathrooms" class="| animate-fade-down" style="--delay: 50ms">
-          <div class="o-searchform-filter">
-            <MoleculesFormField label="Min" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect v-model="bathroomRange[0]" :id class="| text-input body-sm focus-visible"
-                name="min-bathrooms">
-                <option v-for="({ key, value }) of bathroomOptions" :key :value>
-                  {{ key }}</option>
-              </AtomsSelect>
-            </MoleculesFormField>
-            <MoleculesFormField label="Max" class="| focus-overflow" v-slot="{ id }">
-              <AtomsSelect v-model="bathroomRange[1]" :id class="| text-input body-sm focus-visible"
-                name="max-bathrooms">
-                <option v-for="({ key, value }) of bathroomOptions" :key :value>
-                  {{ key }}</option>
-              </AtomsSelect>
-            </MoleculesFormField>
-          </div>
-        </OrganismsSearchFormTitleBlock>
-      </div>
-
-      <!-- price -->
-      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
-        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
-          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
-      </OrganismsSearchFormTitleBlock>
-
-
       <!-- Date Added and Include Options -->
-      <div class="o-searchform-filter o-searchform-animation">
+      <div class="o-searchform-grid o-searchform-animation">
         <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 50ms">
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
             <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-              }}</option>
+                }}</option>
             </AtomsSelect>
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
@@ -139,6 +128,7 @@
 import type { PropertyType } from "@prisma/client";
 import { onClickOutside, watchDebounced } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
+import OrganismsSearchFormRooms from "./OrganismsSearchFormRooms.vue";
 
 /**
  *  Get search form config
@@ -372,6 +362,8 @@ async function sendForm(event: Event) {
   background: fn.faded-color(12%, var(--primary-700));
   backdrop-filter: blur(10px);
   color: var(--monochrome-900);
+  width: fit-content;
+  margin-inline: auto;
 }
 
 .o-searchform-banner {
@@ -379,6 +371,7 @@ async function sendForm(event: Event) {
   grid-gap: var(--size-8);
   align-items: stretch;
   padding: var(--size-8);
+  border-radius: var(--border-radius-xl);
 
   @include mq.small-tablet {
     padding: var(--size-12);
@@ -413,7 +406,6 @@ async function sendForm(event: Event) {
 .o-searchform-popover {
   background: var(--background-200);
   color: var(--foreground-100);
-  border-radius: var(--border-radius-xl);
 }
 
 .o-searchform-popover {
@@ -425,10 +417,16 @@ async function sendForm(event: Event) {
   width: min(100vw - var(--size-24), 42em);
   text-align: left;
   overflow: hidden;
+  border-radius: var(--border-radius-3xl);
   margin: 0;
 
   @include mq.tablet {
     padding: var(--size-32);
+    width: min(100vw - var(--size-72), 42em);
+  }
+
+  @include mq.notebook {
+    padding: var(--size-40);
     width: min(100vw - var(--size-72), 42em);
   }
 }
@@ -443,14 +441,21 @@ async function sendForm(event: Event) {
   }
 }
 
-.o-searchform-filter {
+.o-searchform-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--size-16);
+  grid-template-columns: 1fr;
+  gap: var(--size-20);
 
   @include mq.tablet {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--size-32);
   }
+}
+
+.o-searchform-inline-label {
+  display: flex;
+  align-items: center;
+  gap: var(--size-12);
 }
 
 .o-searchform-toggle {

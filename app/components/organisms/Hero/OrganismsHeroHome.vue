@@ -1,7 +1,9 @@
 <template>
   <div class="o-hero-home | container">
     <div class="o-hero-home-content">
-      <h1 class="o-hero-home-title | title-2xl lineheight-xs">Property search on another level</h1>
+      <h1 class="o-hero-home-title | title-2xl lineheight-xs">
+        Bringing you home
+      </h1>
 
       <OrganismsSearchForm />
 
