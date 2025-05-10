@@ -37,15 +37,15 @@
       </div>
 
       <!-- bedrooms & bathrooms -->
-      <div class="o-searchform-grid">
+      <div class="o-searchform-grid | animate-fade-down" style="--delay: 50ms">
         <OrganismsSearchFormRooms legend="Bedrooms">
-          <div role="presentation" class="o-searchform-inline-label">
+          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 50ms">
             <span aria-hidden class="| body-sm">Between</span>
             <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions" class="| text-input body-sm focus-visible"
               name="min-bedrooms" aria-label="Minimum bedrooms" />
           </div>
 
-          <div role="presentation" class="o-searchform-inline-label">
+          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 100ms">
             <span aria-hidden class="| body-sm">and</span>
             <AtomsSelect v-model="bedroomRange[1]" :options="bedroomOptions" class="| text-input body-sm focus-visible"
               name="max-bedrooms" aria-label="Maximum bedrooms" />
@@ -53,13 +53,13 @@
         </OrganismsSearchFormRooms>
 
         <OrganismsSearchFormRooms legend="Bathrooms">
-          <div role="presentation" class="o-searchform-inline-label">
+          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 150ms">
             <span aria-hidden class="| body-sm">Between</span>
             <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
               class="| text-input body-sm focus-visible" name="min-bathrooms" aria-label="Minimum bathrooms" />
           </div>
 
-          <div role="presentation" class="o-searchform-inline-label">
+          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 200ms">
             <span aria-hidden class="| body-sm">and</span>
             <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
               class="| text-input body-sm focus-visible" name="max-bathrooms" aria-label="Maximum bathrooms" />
@@ -68,17 +68,17 @@
       </div>
 
       <!-- price -->
-      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 150ms">
+      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 200ms">
         <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
-          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 200ms" />
+          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 250ms" />
       </OrganismsSearchFormTitleBlock>
 
       <!-- property types -->
-      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 50ms">
+      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 200ms">
         <MoleculesScrollBox class="| focus-overflow">
           <ul class="o-searchform-property-types">
             <li v-for="({ id, name, defaultSelected }, index) of propertyTypes" :key="id" class="| animate-fade-down"
-              :style="`--delay: ${50 + index * 40}ms`">
+              :style="`--delay: ${200 + index * 40}ms`">
               <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
             </li>
           </ul>
@@ -87,7 +87,7 @@
 
       <!-- Date Added and Include Options -->
       <div class="o-searchform-grid o-searchform-animation">
-        <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 50ms">
+        <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 200ms">
           <MoleculesFormField label="Recently Added" class="| focus-overflow">
             <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
               <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
@@ -96,7 +96,7 @@
           </MoleculesFormField>
         </OrganismsSearchFormTitleBlock>
 
-        <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 50ms">
+        <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 250ms">
           <MoleculesFormField label="Show" class="| focus-overflow">
             <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
               <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions" :key="value"
