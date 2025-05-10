@@ -134,14 +134,19 @@
 /**
  *  Disabled state
  */
-.button[disabled] {
-  cursor: default;
-  color: light-dark(var(--monochrome-400), var(--monochrome-700));
-  background-color: light-dark(var(--monochrome-700), var(--monochrome-400));
+.button {
+  &[disabled] {
+    cursor: default;
+  }
 
-  &:hover {
+  &[disabled]:not(&-pending) {
     color: light-dark(var(--monochrome-400), var(--monochrome-700));
     background-color: light-dark(var(--monochrome-700), var(--monochrome-400));
+
+    &:hover {
+      color: light-dark(var(--monochrome-400), var(--monochrome-700));
+      background-color: light-dark(var(--monochrome-700), var(--monochrome-400));
+    }
   }
 }
 
