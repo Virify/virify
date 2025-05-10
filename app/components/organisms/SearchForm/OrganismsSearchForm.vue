@@ -36,6 +36,10 @@
         </div>
       </div>
 
+      <div class="o-searchform-suggestion-hint | title-2xs faded-text" v-else>
+        Start typing for location suggestions
+      </div>
+
       <!-- price -->
       <animate-in :delay="50">
         <OrganismsSearchFormTitleBlock title="Price">
@@ -480,13 +484,13 @@ async function sendForm(event: Event) {
     --popover-radius: var(--size-32);
     --popover-padding: var(--border-radius-3xl);
 
-    <<<<<<< Updated upstream width: min(100vw - var(--size-72), 42em);
+    width: min(100vw - var(--size-72), 42em);
   }
 
   @include mq.notebook {
     --popover-radius: var(--size-40);
 
-    =======>>>>>>>Stashed changes width: min(100vw - var(--size-72), 42em);
+    width: min(100vw - var(--size-72), 42em);
   }
 
   @include mq.notebook {
@@ -528,9 +532,8 @@ async function sendForm(event: Event) {
 
   @include mq.tablet {
     grid-template-columns: repeat(2, 1fr);
-    <<<<<<< Updated upstream gap: var(--size-32);
-    =======gap: var(--size-48);
-    >>>>>>>Stashed changes
+
+    gap: var(--size-48);
   }
 }
 
