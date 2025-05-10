@@ -1,3 +1,5 @@
+@use '../_utils/functions' as fn;
+
 /**
  *  Font weights
  */
@@ -11,6 +13,13 @@
 
 .font-bold {
   font-weight: var(--font-bold);
+}
+
+/**
+ *  Font styles
+ */
+.faded-text {
+  color: #{fn.faded-color(60%)};
 }
 
 /**

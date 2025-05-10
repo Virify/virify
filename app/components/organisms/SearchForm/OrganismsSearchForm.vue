@@ -36,96 +36,129 @@
         </div>
       </div>
 
-      <!-- price -->
-      <OrganismsSearchFormTitleBlock title="Price" class="| animate-fade-down" style="--delay: 50ms">
-        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax" :starting-min="priceMin"
-          :starting-max="priceMax" hydrate-on-visible class="| animate-fade-down" style="--delay: 100ms" />
-      </OrganismsSearchFormTitleBlock>
-
-      <!-- bedrooms & bathrooms -->
-      <div class="o-searchform-grid | animate-fade-down" style="--delay: 50ms">
-        <OrganismsSearchFormRooms legend="Bedrooms">
-          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 50ms">
-            <span aria-hidden class="| body-sm">Between</span>
-            <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions" class="| text-input body-sm focus-visible"
-              name="min-bedrooms" aria-label="Minimum bedrooms" />
-          </div>
-
-          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 100ms">
-            <span aria-hidden class="| body-sm">and</span>
-            <AtomsSelect v-model="bedroomRange[1]" :options="bedroomOptions" class="| text-input body-sm focus-visible"
-              name="max-bedrooms" aria-label="Maximum bedrooms" />
-          </div>
-        </OrganismsSearchFormRooms>
-
-        <OrganismsSearchFormRooms legend="Bathrooms">
-          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 150ms">
-            <span aria-hidden class="| body-sm">Between</span>
-            <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
-              class="| text-input body-sm focus-visible" name="min-bathrooms" aria-label="Minimum bathrooms" />
-          </div>
-
-          <div role="presentation" class="o-searchform-inline-label | animate-fade-down" style="--delay: 200ms">
-            <span aria-hidden class="| body-sm">and</span>
-            <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
-              class="| text-input body-sm focus-visible" name="max-bathrooms" aria-label="Maximum bathrooms" />
-          </div>
-        </OrganismsSearchFormRooms>
+      <div class="o-searchform-suggestion-hint | title-2xs faded-text" v-else>
+        Start typing for location suggestions
       </div>
 
+      <!-- price -->
+      <animate-in :delay="50">
+        <OrganismsSearchFormTitleBlock title="Price">
+          <animate-in :delay="100">
+            <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax"
+              :starting-min="priceMin" :starting-max="priceMax" hydrate-on-visible />
+          </animate-in>
+        </OrganismsSearchFormTitleBlock>
+      </animate-in>
+
+      <!-- bedrooms & bathrooms -->
+      <animate-in :delay="50">
+        <div class="o-searchform-grid">
+          <OrganismsSearchFormRooms legend="Bedrooms">
+            <animate-in :delay="50">
+              <div role="presentation" class="o-searchform-inline-label">
+                <span aria-hidden class="| body-sm">Between</span>
+                <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions"
+                  class="| text-input body-sm focus-visible" name="min-bedrooms" aria-label="Minimum bedrooms" />
+              </div>
+            </animate-in>
+
+            <animate-in :delay="100">
+              <div role="presentation" class="o-searchform-inline-label">
+                <span aria-hidden class="| body-sm">and</span>
+                <AtomsSelect v-model="bedroomRange[1]" :options="bedroomOptions"
+                  class="| text-input body-sm focus-visible" name="max-bedrooms" aria-label="Maximum bedrooms" />
+              </div>
+            </animate-in>
+          </OrganismsSearchFormRooms>
+
+          <OrganismsSearchFormRooms legend="Bathrooms">
+            <animate-in :delay="150">
+              <div role="presentation" class="o-searchform-inline-label">
+                <span aria-hidden class="| body-sm">Between</span>
+                <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
+                  class="| text-input body-sm focus-visible" name="min-bathrooms" aria-label="Minimum bathrooms" />
+              </div>
+            </animate-in>
+
+            <animate-in :delay="200">
+              <div role="presentation" class="o-searchform-inline-label">
+                <span aria-hidden class="| body-sm">and</span>
+                <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
+                  class="| text-input body-sm focus-visible" name="max-bathrooms" aria-label="Maximum bathrooms" />
+              </div>
+            </animate-in>
+          </OrganismsSearchFormRooms>
+        </div>
+      </animate-in>
+
       <!-- property types -->
-      <OrganismsSearchFormTitleBlock title="Property type" class="| animate-fade-down" style="--delay: 200ms">
-        <MoleculesScrollBox class="| focus-overflow">
-          <ul class="o-searchform-property-types">
-            <li v-for="({ id, name, defaultSelected }, index) of propertyTypes" :key="id" class="| animate-fade-down"
-              :style="`--delay: ${200 + index * 40}ms`">
-              <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
-            </li>
-          </ul>
-        </MoleculesScrollBox>
-      </OrganismsSearchFormTitleBlock>
+      <animate-in :delay="200">
+        <OrganismsSearchFormTitleBlock title="Property type">
+          <MoleculesScrollBox class="| focus-overflow">
+            <ul class="o-searchform-property-types">
+              <animate-in v-for="({ id, name, defaultSelected }, index) of propertyTypes" :delay="200 + index * 40">
+                <li :key="id">
+                  <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
+                </li>
+              </animate-in>
+            </ul>
+          </MoleculesScrollBox>
+        </OrganismsSearchFormTitleBlock>
+      </animate-in>
 
       <template v-if="popoverExpanded">
         <!-- Date Added and Include Options -->
         <div class="o-searchform-grid o-searchform-animation">
-          <OrganismsSearchFormTitleBlock title="Added to site" class="| animate-fade-down" style="--delay: 0">
-            <MoleculesFormField label="Recently Added" class="| focus-overflow">
-              <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
-                <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                }}</option>
-              </AtomsSelect>
-            </MoleculesFormField>
-          </OrganismsSearchFormTitleBlock>
 
-          <OrganismsSearchFormTitleBlock title="Include" class="| animate-fade-down" style="--delay: 50ms">
-            <MoleculesFormField label="Show" class="| focus-overflow">
-              <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
-                <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
-                  :key="value" :value>{{ key
-                  }}</option>
-              </AtomsSelect>
-            </MoleculesFormField>
-          </OrganismsSearchFormTitleBlock>
+          <animate-in :delay="0">
+            <OrganismsSearchFormTitleBlock title="Added to site">
+              <MoleculesFormField label="Recently Added" class="| focus-overflow">
+                <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
+                  <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
+                    }}</option>
+                </AtomsSelect>
+              </MoleculesFormField>
+            </OrganismsSearchFormTitleBlock>
+          </animate-in>
+
+          <animate-in :delay="50">
+            <OrganismsSearchFormTitleBlock title="Include">
+              <MoleculesFormField label="Show" class="| focus-overflow">
+                <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
+                  <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
+                    :key="value" :value>{{ key
+                    }}</option>
+                </AtomsSelect>
+              </MoleculesFormField>
+            </OrganismsSearchFormTitleBlock>
+          </animate-in>
         </div>
 
         <!-- popular features -->
-        <OrganismsSearchFormTitleBlock title="Popular Features" class="| animate-fade-down" style="--delay: 100ms">
-          <MoleculesScrollBox class="| focus-overflow">
-            <ul class="o-searchform-property-types">
-              <li v-for="({ key, label, isDefault }, index) in propertyFeatures" :key="key" class="| animate-fade-down"
-                :style="`--delay: ${100 + index * 40}ms`">
-                <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
-              </li>
-            </ul>
-          </MoleculesScrollBox>
-        </OrganismsSearchFormTitleBlock>
+        <animate-in :delay="100">
+          <OrganismsSearchFormTitleBlock title="Popular Features">
+            <MoleculesScrollBox class="| focus-overflow">
+              <ul class="o-searchform-property-types">
+                <animate-in v-for="({ key, label, isDefault }, index) in propertyFeatures" :delay="100 + index * 40">
+                  <li :key>
+                    <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
+                  </li>
+                </animate-in>
+              </ul>
+            </MoleculesScrollBox>
+          </OrganismsSearchFormTitleBlock>
+        </animate-in>
       </template>
 
       <!-- Toggle popover -->
-      <AtomsButton type="button" class="o-searchform-expand | button-bordered button-full"
-        @click.prevent="togglePopoverExpanded">
-        {{ popoverExpanded ? 'Show fewer options' : 'Show more options' }}
-      </AtomsButton>
+      <animate-in :delay="300" wrap-with="div">
+        <div role="presentation">
+          <AtomsButton type="button" class="o-searchform-expand | button-bordered button-full"
+            @click.prevent="togglePopoverExpanded">
+            {{ popoverExpanded ? 'Show fewer options' : 'Show more options' }}
+          </AtomsButton>
+        </div>
+      </animate-in>
 
     </OrganismsSearchFormPopover>
   </form>
@@ -428,6 +461,27 @@ async function sendForm(event: Event) {
 
     width: min(100vw - var(--size-72), 42em);
   }
+
+  @include mq.notebook {
+    --popover-radius: var(--size-40);
+
+    width: min(100vw - var(--size-72), 42em);
+  }
+}
+
+.o-searchform-suggestion-hint {
+  background: var(--background-100);
+  padding: var(--popover-padding);
+  border-radius: var(--border-radius-lg);
+  text-align: center;
+
+  @include mq.small-tablet {
+    border-radius: var(--border-radius-xl);
+  }
+
+  @include mq.tablet {
+    border-radius: var(--border-radius-2xl);
+  }
 }
 
 .o-searchform-autocomplete {
@@ -447,7 +501,8 @@ async function sendForm(event: Event) {
 
   @include mq.tablet {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--size-32);
+
+    gap: var(--size-48);
   }
 }
 
