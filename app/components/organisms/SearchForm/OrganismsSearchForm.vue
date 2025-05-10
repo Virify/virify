@@ -106,49 +106,46 @@
         </OrganismsSearchFormTitleBlock>
       </animate-in>
 
-      <div v-show="popoverExpanded" class="| flow flow-2xl" role="presentation">
-        <!-- Date Added and Include Options -->
-        <div class="o-searchform-grid o-searchform-animation">
+      <!-- Date Added and Include Options -->
+      <div v-show="popoverExpanded" class="o-searchform-grid o-searchform-animation">
+        <animate-in :delay="0">
+          <OrganismsSearchFormTitleBlock title="Added to site">
+            <MoleculesFormField label="Recently Added" class="| focus-overflow">
+              <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
+                <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
+                  }}</option>
+              </AtomsSelect>
+            </MoleculesFormField>
+          </OrganismsSearchFormTitleBlock>
+        </animate-in>
 
-          <animate-in :delay="0">
-            <OrganismsSearchFormTitleBlock title="Added to site">
-              <MoleculesFormField label="Recently Added" class="| focus-overflow">
-                <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
-                  <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                    }}</option>
-                </AtomsSelect>
-              </MoleculesFormField>
-            </OrganismsSearchFormTitleBlock>
-          </animate-in>
-
-          <animate-in :delay="25">
-            <OrganismsSearchFormTitleBlock title="Include">
-              <MoleculesFormField label="Show" class="| focus-overflow">
-                <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
-                  <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
-                    :key="value" :value>{{ key
-                    }}</option>
-                </AtomsSelect>
-              </MoleculesFormField>
-            </OrganismsSearchFormTitleBlock>
-          </animate-in>
-        </div>
-
-        <!-- popular features -->
-        <animate-in :delay="50">
-          <OrganismsSearchFormTitleBlock title="Popular Features">
-            <MoleculesScrollBox class="| focus-overflow">
-              <ul class="o-searchform-property-types">
-                <animate-in v-for="({ key, label, isDefault }, index) in propertyFeatures" :delay="50 + index * 30">
-                  <li :key>
-                    <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
-                  </li>
-                </animate-in>
-              </ul>
-            </MoleculesScrollBox>
+        <animate-in :delay="25">
+          <OrganismsSearchFormTitleBlock title="Include">
+            <MoleculesFormField label="Show" class="| focus-overflow">
+              <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
+                <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
+                  :key="value" :value>{{ key
+                  }}</option>
+              </AtomsSelect>
+            </MoleculesFormField>
           </OrganismsSearchFormTitleBlock>
         </animate-in>
       </div>
+
+      <!-- popular features -->
+      <animate-in :delay="50">
+        <OrganismsSearchFormTitleBlock v-show="popoverExpanded" title="Popular Features">
+          <MoleculesScrollBox class="| focus-overflow">
+            <ul class="o-searchform-property-types">
+              <animate-in v-for="({ key, label, isDefault }, index) in propertyFeatures" :delay="50 + index * 30">
+                <li :key>
+                  <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
+                </li>
+              </animate-in>
+            </ul>
+          </MoleculesScrollBox>
+        </OrganismsSearchFormTitleBlock>
+      </animate-in>
 
       <!-- Expand popover -->
       <animate-in :delay="200">
