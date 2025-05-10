@@ -1,29 +1,30 @@
 model Listing {
-  id                Int                @id @default(autoincrement())
-  title             String
-  description       String
-  price             Float
-  moveInDate        DateTime?
-  listingTier       ListingTier
-  listingStartDate  DateTime?
-  listingEndDate    DateTime?
-  contactMethod     ContactMethod[]
-  viewingOptions    String?
-  verificationLevel VerificationLevel?
-  rentalListing     RentalListing?
-  saleListing       SaleListing?
-  userId            Int?
-  propertyId        Int
-  estateAgentId     Int?
-  publishedAt      DateTime?
-  published         Boolean            @default(false)
-  userFavourites    UserFavourites[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  user              User?              @relation(fields: [userId], references: [id])
-  property          Property?          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  estateAgent       EstateAgent?       @relation(fields: [estateAgentId], references: [id])
-  agents            Agent[]            @relation("AgentToListing")
+  id                   Int                    @id @default(autoincrement())
+  title                String
+  description          String
+  price                Float
+  moveInDate           DateTime?
+  listingTier          ListingTier
+  listingStartDate     DateTime?
+  listingEndDate       DateTime?
+  contactMethod        ContactMethod[]
+  viewingOptions       String?
+  verificationLevel    VerificationLevel?
+  rentalListing        RentalListing?
+  saleListing          SaleListing?
+  userId               Int?
+  propertyId           Int
+  estateAgentId        Int?
+  publishedAt          DateTime?
+  published            Boolean                @default(false)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  user                 User?                  @relation(fields: [userId], references: [id])
+  property             Property?              @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  estateAgent          EstateAgent?           @relation(fields: [estateAgentId], references: [id])
+  agents               Agent[]                @relation("AgentToListing")
+  HiddenListing        HiddenListing[]
+  UserFavouriteListing UserFavouriteListing[]
 
   @@index([userId])
   @@index([propertyId])

@@ -1,5 +1,7 @@
 import { ViewsDialogLogin } from "#components";
 import { createSharedComposable } from "@vueuse/core";
+import type { UserFavouriteListingCard } from "~~/shared/types/user-favourite-listing";
+
 /**
  * Favourites Composable
  *
@@ -18,19 +20,19 @@ export const useFavourites = createSharedComposable(() => {
    * Get all favourite listings for the user
    * This triggers onMount of user Login
    *
-   * @returns Array of ListingWithFullProperty or empty array on error
+   * @returns Array of ListingCardType empty array on error
    */
   const getAllFavourites = async () => {
     if (loggedIn.value) {
-      const result = await $fetch<UserFavouritesListingType>("/api/favourite/get/all");
-      favourites.value = result.listings as ListingCardType[];
+      const result = await $fetch<UserFavouriteListingCard[]>("/api/user/saved/listing/get/all");
+      favourites.value = result.map((fav) => fav.listing) || [];
     }
   };
 
   /**
    * Is a listing a favourite
    *
-   * @param propertyId - ID of the Listing
+   * @param listingId - ID of the Listing
    * @returns
    */
   function isFavourite(listingId: number): boolean {
@@ -39,7 +41,7 @@ export const useFavourites = createSharedComposable(() => {
 
   /**
    * Adds a listing to the user's favourites and updates the state.
-   * Upadates the favourites state with the new listing ID.
+   * Updates the favourites state with the new listing ID.
    *
    * @param listingId - The ID of the listing to add to favourites
    * @returns Array of favourited listing IDs
@@ -53,12 +55,11 @@ export const useFavourites = createSharedComposable(() => {
       return;
     }
 
-    await $fetch<number[]>(`/api/favourite/update/${listingId}`, {
+    await $fetch<UserFavouriteListingCard[]>(`/api/user/saved/listing/update/${listingId}`, {
       method: "POST",
-      body: { listing: listingId },
+      body: { listingId },
     });
-    // fetch the updated list of favourites
-    await getAllFavourites();
+    await getAllFavourites()
   };
 
   /**
@@ -69,15 +70,17 @@ export const useFavourites = createSharedComposable(() => {
    * @returns Array of remaining favourite listing IDs or empty array on error
    */
   const removeFromFavourite = async (listingId: number) => {
-    await $fetch<number[]>(`/api/favourite/delete/${listingId}`, {
+    const result = await $fetch<number[]>(`/api/user/saved/listing/delete/${listingId}`, {
       method: "DELETE",
-      body: { listing: listingId },
+      body: { listingId },
     });
-    favourites.value = removeListingFromArray(listingId) || [];
+    if (result) {
+      favourites.value = removeListingFromArray(listingId) || [];
+    }
   };
 
   /**
-   * Remove a listing from an array favourite Listings
+   * Remove a listing from an array of favourite Listings
    */
   function removeListingFromArray(dToRemove: number) {
     return favourites.value?.filter((d) => d.id !== dToRemove);
@@ -85,7 +88,7 @@ export const useFavourites = createSharedComposable(() => {
 
   /**
    * Watch for changes in the loggedIn state
-   * This is already under a provided composable via isLoggedIn I think this is fine
+   * This is already under a provided composable via isLoggedIn, I think this is fine
    */
   watch(loggedIn, async (isLoggedIn) => {
     if (isLoggedIn) {
