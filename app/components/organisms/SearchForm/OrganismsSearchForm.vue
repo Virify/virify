@@ -106,7 +106,7 @@
         </OrganismsSearchFormTitleBlock>
       </animate-in>
 
-      <template v-if="popoverExpanded">
+      <div role="presentation" v-show="popoverExpanded">
         <!-- Date Added and Include Options -->
         <div class="o-searchform-grid o-searchform-animation">
 
@@ -148,10 +148,10 @@
             </MoleculesScrollBox>
           </OrganismsSearchFormTitleBlock>
         </animate-in>
-      </template>
+      </div>
 
-      <!-- Toggle popover -->
-      <animate-in :delay="300" wrap-with="div">
+      <!-- Expand popover -->
+      <animate-in :delay="300">
         <div role="presentation">
           <AtomsButton type="button" class="o-searchform-expand | button-bordered button-full"
             @click.prevent="togglePopoverExpanded">
