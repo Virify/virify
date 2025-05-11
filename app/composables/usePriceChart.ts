@@ -1,21 +1,15 @@
-interface Data extends Record<string, unknown> {
-  amount: number
-}
-
 interface ChartNode {
   offset: number
   height: number
 }
 
 interface Config extends Record<string, unknown> {
-  data: Data[]
   width?: number
   height?: number
   paddingX?: number
   paddingY?: number
-  lineThickness?: number
-  emptyLineColour?: string
-  lineColour?: string
+  emptyFillColour?: string
+  fillColour?: string
   pixelDensity?: number
 }
 
@@ -30,6 +24,14 @@ interface DrawCanvas {
   max: number
 }
 
+interface DrawCanvasConfig {
+  width: number
+  height: number
+  colour: string
+  startY: number
+  computedData: ChartNode[]
+}
+
 interface DrawCanvasClip {
   min: number
   max: number
@@ -40,15 +42,14 @@ type Canvas = HTMLCanvasElement
 /**
  *  Create a chart on a canvas
  */
-export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
+export function usePriceChart(canvas: Canvas, userConfig: Config) {
   const isCanvas = canvas instanceof HTMLCanvasElement
-  const isValidData = Array.isArray(data)
 
   // Validate data
-  if (!isCanvas || !isValidData) {
+  if (!isCanvas) {
     throw createError({
       statusCode: 400,
-      message: 'Invalid arguments provided for price chart',
+      message: 'Invalid config provided for price chart',
       fatal: false
     })
   }
@@ -59,8 +60,8 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
     height: 80,
     paddingX: 0,
     paddingY: 0,
-    emptyLineColour: '#ccc',
-    lineColour: '#fcc',
+    emptyFillColour: '#ccc',
+    fillColour: '#fcc',
     pixelDensity: 2,
     ...userConfig
   }
@@ -71,36 +72,10 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
     height,
     paddingX,
     paddingY,
-    emptyLineColour,
-    lineColour,
+    emptyFillColour,
+    fillColour,
     pixelDensity
   } = config
-
-  // Get relevant data, length
-  const dataValues = data.map(({ amount }) => amount)
-
-  // Check the maximum height of all rows
-  const maxRow = Math.max(...dataValues)
-
-  // Get the chart width, height when accounting for padding
-  const chartHeight = height - 2 * paddingY
-  const chartWidth = width - 2 * paddingX
-
-  // Get the spacing between each row, relative height of each row
-  const chartSpacing = chartWidth / (dataValues.length - 1)
-  const chartHeightRatio = chartHeight / maxRow
-  const chartYStart = chartHeight + paddingY
-
-  // Convert chart into relative sizes, offsets
-  const chartDataComputed = dataValues.map((value, index) => {
-    const relativeHeight = Math.round(chartHeightRatio * value)
-    const offsetSize = chartSpacing * index
-
-    return {
-      height: chartYStart - Math.max(relativeHeight, 1),
-      offset: paddingX + offsetSize
-    }
-  })
 
   /**
    *  Closure function to clean the canvas
@@ -133,8 +108,8 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
   /**
    *  Closure function for getNotes
    */
-  const createGetNodes = (computedNodes: ChartNode[]) => {
-    const fallbackNode = { offset: width - paddingX, height: chartYStart }
+  const createGetNodes = (computedNodes: ChartNode[], startY: number) => {
+    const fallbackNode = { offset: width - paddingX, height: startY }
 
     const nodes = unref(computedNodes)
 
@@ -151,18 +126,20 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
   /**
    *  Get percentage as x-coord
    */
-  function getPercentAsCoord(percent?: number) {
+  function getPercentAsCoord(width: number, percent?: number) {
     if (!Number(percent)) return 0
 
-    return Math.round(chartWidth * (percent as number / 100))
+    return Math.round(width * (percent as number / 100))
   }
 
   /**
    *  Function draw
    */
-  function drawChartColour(context: CanvasRenderingContext2D, colour: string, clip?: DrawCanvasClip) {
+  function drawChartColour(context: CanvasRenderingContext2D, config: DrawCanvasConfig, clip?: DrawCanvasClip) {
+    const { width, height, colour, startY, computedData } = config
+
     // Get nodes
-    const { nodes, getNode } = createGetNodes(chartDataComputed)
+    const { nodes, getNode } = createGetNodes(computedData, startY)
 
     // Start a path
     context.lineJoin = 'round'
@@ -177,7 +154,7 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
       const clipWidth = clip.max - clip.min
 
       // Create clip
-      context.rect(clipX, 0, clipWidth, chartHeight)
+      context.rect(clipX, 0, clipWidth, height)
       context.clip()
 
       // Start line
@@ -185,7 +162,7 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
     }
 
     // Start line
-    context.lineTo(paddingX, chartYStart)
+    context.lineTo(paddingX, startY)
 
     // Loop through rows and draw
     for (let index = 0; index < nodes.length; index++) {
@@ -200,7 +177,7 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
       context.quadraticCurveTo(currentOffset, currentHeight, nextOffset, nextHeight)
     }
 
-    context.lineTo(width - paddingX, chartYStart)
+    context.lineTo(width - paddingX, startY)
     context.closePath()
     context.fill()
   }
@@ -208,20 +185,57 @@ export function usePriceChart(canvas: Canvas, { data, ...userConfig }: Config) {
   /**
    *  Function to draw chart
    */
-  function drawChart({ min, max }: DrawCanvas) {
+  function drawChart(data: number[], { min, max }: DrawCanvas) {
+    if (!Array.isArray(data) || !data.every(isNumber)) {
+      console.error('Invalid data supplied to drawCart')
+      return
+    }
+
+    // Check the maximum height of all rows
+    const maxRow = Math.max(...data)
+
+    // Get the chart width, height when accounting for padding
+    const chartHeight = height - 2 * paddingY
+    const chartWidth = width - 2 * paddingX
+
+    // Get the spacing between each row, relative height of each row
+    const chartSpacing = chartWidth / (data.length - 1)
+    const chartHeightRatio = chartHeight / maxRow
+    const chartYStart = chartHeight + paddingY
+
+    // Convert chart into relative sizes, offsets
+    const chartDataComputed = data.map((value, index) => {
+      const relativeHeight = Math.round(chartHeightRatio * value)
+      const offsetSize = chartSpacing * index
+
+      return {
+        height: chartYStart - Math.max(relativeHeight, 1),
+        offset: paddingX + offsetSize
+      }
+    })
+
     const clip = {
-      min: getPercentAsCoord(min),
-      max: getPercentAsCoord(max)
+      min: getPercentAsCoord(chartWidth, min),
+      max: getPercentAsCoord(chartWidth, max)
     }
 
     // Get fresh canvas
     const context = getCleanContext()
 
+    // Create config for drawing charts
+    const config: DrawCanvasConfig = {
+      colour: emptyFillColour,
+      width: chartWidth,
+      height: chartHeight,
+      startY: chartYStart,
+      computedData: chartDataComputed
+    }
+
     // Draw background shape
-    drawChartColour(context, emptyLineColour)
+    drawChartColour(context, config)
 
     // Draw orange shape
-    drawChartColour(context, lineColour, clip)
+    drawChartColour(context, { ...config, colour: fillColour }, clip)
   }
 
   return {

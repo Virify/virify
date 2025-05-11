@@ -28,52 +28,37 @@ const percentages = computed(() => {
   }
 })
 
+const validGraphData = computed(() => {
+  const { graphData } = props
+
+  if (!Array.isArray(graphData)) return []
+
+  console.log({ graphData })
+
+  return graphData
+})
+
 /**
  *  Canvas
  */
 const $canvas = ref(null)
 
 /**
- *  MOCK DATA
- *
- *  @TODO this data should be passed in as a prop after a fetch has been
- *        made to the server based on filters
- */
-const data = ref([
-  { amount: 1 },
-  { amount: 2 },
-  { amount: 20 },
-  { amount: 43 },
-  { amount: 9 },
-  { amount: 24 },
-  { amount: 9 },
-  { amount: 11 },
-  { amount: 2 },
-  { amount: 5 },
-  { amount: 2 },
-  { amount: 1 },
-  { amount: 0 },
-  { amount: 1 },
-])
-
-/**
  *  Mount
  */
 onMounted(() => {
-  if (!data.value) return
-
   try {
     const { drawChart } = usePriceChart($canvas.value, {
-      data: data.value,
-      emptyLineColour: 'rgba(0, 0, 0, 0.05)',
-      lineColour: '#FD8E61',
-      lineThickness: 4
+      emptyFillColour: 'rgba(0, 0, 0, 0.05)',
+      fillColour: '#FD8E61'
     })
 
-    watch(percentages, ({ min, max }) => {
-      drawChart({ min, max })
+    watch([percentages, validGraphData], ([{ min, max }, data]) => {
+      drawChart(data, { min, max })
     }, { immediate: true })
   } catch (err) {
+    console.error(err)
+
     $canvas.value.hidden = true
   }
 })
