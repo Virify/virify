@@ -31,6 +31,11 @@ const formatPrices = defineCachedFunction((allPrices: number[]) => {
   // Create new array
   const pricePrevelance: number[] = []
 
+  // Create sorted copy of allPrices
+  // @TODO - see below
+  // --
+  // const allPricesSorted = allPrices.toSorted()
+
   // Loop through all prices and see how many fit into each 'band'
   for (let i = minPrice; i < maxPrice; i += bandSize) {
     const bandMin = i;
