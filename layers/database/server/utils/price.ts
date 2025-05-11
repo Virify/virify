@@ -24,10 +24,7 @@ export async function getMinMaxPrice(type: ListingType = "sales"): Promise<MinMa
     },
   });
 
-  return [
-    Math.round(minMaxPrice._min.price ?? 0),
-    Math.round(minMaxPrice._max.price ?? 0)
-  ];
+  return [Math.round(minMaxPrice._min.price ?? 0), Math.round(minMaxPrice._max.price ?? 0)];
 }
 
 /**
@@ -48,7 +45,7 @@ export function getPriceFilter(priceRange: number[] | undefined): PriceFilter | 
 
 /**
  * Get All prices for rentals or sales
- * 
+ *
  * @param type - The type of listing to filter by (sales or rentals)
  * @returns {number[]} An array of prices for the specified listing type
  */
