@@ -24,10 +24,7 @@ export async function getMinMaxPrice(type: ListingType = "sales"): Promise<MinMa
     },
   });
 
-  return [
-    Math.round(minMaxPrice._min.price ?? 0),
-    Math.round(minMaxPrice._max.price ?? 0)
-  ];
+  return [Math.round(minMaxPrice._min.price ?? 0), Math.round(minMaxPrice._max.price ?? 0)];
 }
 
 /**
@@ -45,3 +42,35 @@ export function getPriceFilter(priceRange: number[] | undefined): PriceFilter | 
     lte: priceRange[1],
   };
 }
+
+/**
+ * Get All prices for rentals or sales
+ *
+ * @param type - The type of listing to filter by (sales or rentals)
+ * @returns {number[]} An array of prices for the specified listing type
+ */
+export async function getAllPrices(type: ListingType = "sales"): Promise<number[]> {
+  const listingType = type === "sales" ? "saleListing" : "rentalListing";
+
+  const prices = await prisma.listing.findMany({
+    where: {
+      [listingType]: {
+        isNot: null,
+      },
+    },
+    select: {
+      price: true,
+    },
+  });
+
+  return prices.map((price) => price.price);
+}
+
+export const getAllPricesCached = defineCachedFunction(async (listingType: string) => {
+  return await getAllPrices(listingType === "buy" ? "sales" : "rentals");
+}, {
+  swr: true,
+  staleMaxAge: 60 * 5, // SWR cache for 5 minutes,
+  maxAge: 60 * 5, // SWR cache for 5 minutes,
+  getKey: (listingType) => listingType
+})
