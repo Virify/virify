@@ -5,28 +5,22 @@
         :aria-label="isExpandedLabel" class="| button-none">
         <AtomsIcon :icon="isExpandedIcon" class="m-listing-card-button-resize" />
       </button>
-
       <template #tooltip>Expand property card</template>
     </AtomsTooltip>
 
     <AtomsTooltip>
-      <button type="button" class="| button-none" aria-label="Add notes">
-        <AtomsIcon icon="cards/notes" class="m-listing-card-button-icon" />
-      </button>
-
-      <template #tooltip>Add notes</template>
+      <AtomsNoteButton :property-id="props.propertyId" />
+      <template #tooltip>Add/Edit Notes</template>
     </AtomsTooltip>
 
     <AtomsTooltip>
       <AtomsFavouriteButton class="| button-none" :property-id icon-class="m-listing-card-button-icon" />
-
       <template #tooltip>Add to favourites</template>
     </AtomsTooltip>
   </div>
 </template>
 
 <script setup lang="ts">
-import AtomsTooltip from '~/components/atoms/AtomsTooltip.vue';
 
 interface Props {
   propertyId: number,
@@ -38,27 +32,19 @@ const props = withDefaults(defineProps<Props>(), {
   isExpanded: false
 })
 
-/**
- *  Emits
- */
 const emits = defineEmits(['toggle-content'])
 
 function toggle() {
   emits('toggle-content', !props.isExpanded)
 }
 
-/**
- *  Button content
- */
 const isExpandedIcon = computed(() => {
   const { isExpanded } = props
-
   return isExpanded ? 'cards/contract' : 'cards/expand'
 })
 
 const isExpandedLabel = computed(() => {
   const { isExpanded } = props
-
   return isExpanded ? 'Show more details' : 'Show fewer details'
 })
 </script>
