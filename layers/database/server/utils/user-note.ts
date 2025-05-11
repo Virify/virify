@@ -1,4 +1,4 @@
-import type { NoteResponse } from "~~/shared/types/note";
+import type { NoteData, NoteResponse } from "~~/shared/types/note";
 
 /**
  * Get all notes for a user
