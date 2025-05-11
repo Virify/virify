@@ -33,7 +33,10 @@ const percentages = computed(() => {
 const $canvas = ref(null)
 
 /**
- *  Mock data
+ *  MOCK DATA
+ *
+ *  @TODO this data should be passed in as a prop after a fetch has been
+ *        made to the server based on filters
  */
 const data = ref([
   { amount: 1 },
