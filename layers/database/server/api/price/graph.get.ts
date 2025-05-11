@@ -4,17 +4,18 @@ import { getAllPricesCached } from "../../utils/price";
 
 const buyOrRentSchema = z.object({
   listingType: z.enum(["buy", "rent"]),
-  // @TODO support the below...
-  // location: z.string().optional(),
-  // propertyType: z.string().array().optional(),
-  // bedrooms: z.object({
-  //   min: z.number(),
-  //   max: z.number(),
-  // }).optional(),
-  // bathrooms: z.object({
-  //   min: z.number(),
-  //   max: z.number(),
-  // }).optional(),
+  // @TODO the below params are not currently used - this will be a
+  // future phase of work
+  location: z.string().optional(),
+  propertyType: z.string().array().optional(),
+  bedrooms: z.object({
+    min: z.number(),
+    max: z.number(),
+  }).optional(),
+  bathrooms: z.object({
+    min: z.number(),
+    max: z.number(),
+  }).optional(),
 });
 
 const formatPrices = defineCachedFunction((allPrices: number[]) => {
