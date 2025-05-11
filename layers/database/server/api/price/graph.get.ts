@@ -37,6 +37,12 @@ const formatPrices = defineCachedFunction((allPrices: number[]) => {
     const bandMax = i + bandSize
 
     // Filter to all properties within a given band
+    // @TODO
+    // This can probably be made more efficient by doing something like
+    // sorting the array and then doing a splice after each loop so we
+    // are not re-checking the same prices. Once we have 1000s of
+    // properties, this will become more critical. But for the PoC this
+    // should not be any bottleneck at all
     const propertyCount = allPrices.filter((price) => {
       return !!(bandMax >= price && price >= bandMin)
     })
