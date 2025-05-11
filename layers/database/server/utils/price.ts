@@ -65,3 +65,12 @@ export async function getAllPrices(type: ListingType = "sales"): Promise<number[
 
   return prices.map((price) => price.price);
 }
+
+export const getAllPricesCached = defineCachedFunction(async (listingType: string) => {
+  return await getAllPrices(listingType === "buy" ? "sales" : "rentals");
+}, {
+  swr: true,
+  staleMaxAge: 60 * 5, // SWR cache for 5 minutes,
+  maxAge: 60 * 5, // SWR cache for 5 minutes,
+  getKey: (listingType) => listingType
+})
