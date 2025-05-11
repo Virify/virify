@@ -5,6 +5,7 @@ model UserPreferences {
   favourites     UserFavouriteListing[]
   savedSearches  SavedSearch[]
   hiddenListings HiddenListing[]
+  notes          UserNote[]
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
 

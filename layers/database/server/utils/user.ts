@@ -1,4 +1,4 @@
-import { type User, type UserFavourites, Prisma, Reviewed } from "@prisma/client";
+import { type User, Prisma, Reviewed } from "@prisma/client";
 import { prisma } from "./prisma-client";
 export type UserWithVerification = Prisma.UserGetPayload<{ include: { verification: true } }>;
 export type { User };
@@ -157,7 +157,6 @@ export async function findUserByToken(token: string): Promise<UserWithVerificati
     },
   });
 }
-
 
 /**
  * Deletes an user by email.

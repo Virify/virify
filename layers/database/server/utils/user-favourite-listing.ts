@@ -19,17 +19,14 @@ export async function getUserFavourites(userId: number): Promise<UserFavouriteLi
   });
 }
 
-
 /**
- * Add a listing to user favourites, optionally including a note
+ * Add a listing to user favourites
  *
  * @param userId number
  * @param listingId number
- * @param note optional string
  * @returns array of favourite listing IDs
  */
-export async function updateFavouriteListing(userId: number, listingId: number, note?: string
-): Promise<number[]> {
+export async function updateFavouriteListing(userId: number, listingId: number): Promise<number[]> {
   const { userPreferencesId } = await prisma.userFavouriteListing.upsert({
     where: {
       userPreferencesId_listingId: {
@@ -47,10 +44,14 @@ export async function updateFavouriteListing(userId: number, listingId: number, 
       listing: {
         connect: { id: listingId },
       },
-      note,
     },
     update: {
-      note,
+      userPreferences: {
+        connect: { userId },
+      },
+      listing: {
+        connect: { id: listingId },
+      },
     },
     select: {
       userPreferencesId: true,
@@ -62,9 +63,8 @@ export async function updateFavouriteListing(userId: number, listingId: number, 
     select: { listingId: true },
   });
 
-  return favourites.map(fav => fav.listingId);
+  return favourites.map((fav) => fav.listingId);
 }
-
 
 /**
  * Remove a listing from the user's favourites

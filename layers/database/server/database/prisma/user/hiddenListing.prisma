@@ -1,11 +1,11 @@
 model HiddenListing {
-  id                Int      @id @default(autoincrement())
+  id                Int             @id @default(autoincrement())
   userPreferencesId Int
   listingId         Int
   reason            String?
-  hiddenAt          DateTime @default(now())
-  listing         Listing         @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  userPreferences UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
+  hiddenAt          DateTime        @default(now())
+  listing           Listing         @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  userPreferences   UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
 
   @@unique([userPreferencesId, listingId])
 }
