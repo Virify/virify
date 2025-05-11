@@ -1,12 +1,6 @@
 <template>
-  <div class="m-range-slider">
-    <SliderRoot v-model="rangeValue" :min="min" :max="max" class="m-range-slider-root">
-      <SliderTrack class="m-range-slider-track">
-        <SliderRange class="m-range-slider-range" />
-      </SliderTrack>
-      <SliderThumb class="m-range-slider-thumb" />
-      <SliderThumb class="m-range-slider-thumb" />
-    </SliderRoot>
+  <div class="m-range-slider | relative">
+    <AtomsRangeGraph :min :max :range="rangeValue" class="m-range-slider-graph" />
 
     <AtomsLabel class="m-range-slider-label-min">
       <AtomsCurrencyInput v-model="rangeValue[0]" class="m-range-slider-input" />
@@ -15,6 +9,14 @@
     <AtomsLabel class="m-range-slider-label-max">
       <AtomsCurrencyInput v-model="rangeValue[1]" class="m-range-slider-input" />
     </AtomsLabel>
+
+    <SliderRoot v-model="rangeValue" :min="min" :max="max" class="m-range-slider-root">
+      <SliderTrack class="m-range-slider-track">
+        <SliderRange class="m-range-slider-range" />
+      </SliderTrack>
+      <SliderThumb class="m-range-slider-thumb" />
+      <SliderThumb class="m-range-slider-thumb" />
+    </SliderRoot>
   </div>
 </template>
 
@@ -68,8 +70,19 @@ watch(
   margin: 0;
 }
 
+.m-range-slider-graph {
+  --thumb-size: var(--size-32);
+
+  position: absolute;
+  bottom: var(--size-16);
+  left: calc(var(--thumb-size) / 2);
+  width: calc(100% - var(--thumb-size));
+  height: auto;
+}
+
 .m-range-slider-label-min,
 .m-range-slider-label-max {
+  position: relative;
   display: flex;
   flex-direction: column;
 }
@@ -100,7 +113,6 @@ watch(
   align-items: center;
   user-select: none;
   touch-action: none;
-  width: 100%;
   height: var(--size-32);
   flex-shrink: 1;
 }
