@@ -6,7 +6,8 @@
 interface Props {
   min: number
   max: number
-  range: [number, number]
+  range: [number, number],
+  graphData?: number[]
 }
 
 const props = defineProps<Props>()

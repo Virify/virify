@@ -41,7 +41,7 @@
         <OrganismsSearchFormTitleBlock title="Price">
           <animate-in :delay="75">
             <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax"
-              :starting-min="priceMin" :starting-max="priceMax" hydrate-on-visible />
+              :starting-min="priceMin" :starting-max="priceMax" :graph-data="priceRangeGraph" hydrate-on-visible />
           </animate-in>
         </OrganismsSearchFormTitleBlock>
       </animate-in>
@@ -272,6 +272,16 @@ watchDebounced(
 /**
  * Price range
  */
+const { data: priceRangeGraph } = useAsyncData('price-graph', () => {
+  return $fetch("/api/price/graph", {
+    params: {
+      listingType: buyOrRent.value
+    }
+  })
+}, {
+  watch: [buyOrRent]
+})
+
 const priceRange = ref<MinMaxPriceResponse>({
   rental: [0, 0],
   sale: [0, 0],

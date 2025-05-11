@@ -1,6 +1,7 @@
 <template>
   <div class="m-range-slider | relative">
-    <AtomsRangeGraph :min :max :range="rangeValue" class="m-range-slider-graph" />
+    <AtomsRangeGraph v-if="graphData.length" :min :max :range="rangeValue" :graph-data="graphData"
+      class="m-range-slider-graph" />
 
     <AtomsLabel class="m-range-slider-label-min">
       <AtomsCurrencyInput v-model="rangeValue[0]" class="m-range-slider-input" />
@@ -40,6 +41,10 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  graphData: {
+    type: Array,
+    default: []
+  }
 });
 
 const rangeValue = defineModel<[number, number]>({
