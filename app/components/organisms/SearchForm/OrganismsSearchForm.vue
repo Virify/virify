@@ -477,11 +477,13 @@ async function sendForm(event: Event) {
 
 .o-searchform {
   --searchform-width: 16rem;
-  --searchform-width-expanded: 32rem;
+  --searchform-width-expanded: 36rem;
+  --searchform-popover-expanded: 32rem;
   --searchform-maxwidth: calc(100vw - var(--size-24));
   --popover-radius: var(--size-40);
   --popover-gap: var(--size-12);
   --popover-padding: var(--size-20);
+  --popover-offset: var(--size-20);
 
   width: fit-content;
   margin-inline: auto;
@@ -557,7 +559,7 @@ async function sendForm(event: Event) {
 
   @include mq.tablet {
     --searchform-width: 24rem;
-    --searchform-width-expanded: 48rem;
+    --searchform-popover-expanded: 48rem;
     --popover-gap: var(--size-20);
     --popover-padding: var(--size-32);
   }
@@ -631,18 +633,18 @@ async function sendForm(event: Event) {
 
 .o-searchform-popover {
   position: absolute;
-  top: calc(100% + var(--size-12));
+  top: calc(100% + var(--popover-offset));
   left: 50%;
   transform: translateX(-50%);
   text-align: left;
   border-radius: var(--popover-radius);
-  width: min(var(--searchform-maxwidth), var(--searchform-width-expanded));
+  width: min(var(--searchform-maxwidth), var(--searchform-popover-expanded));
   z-index: 2;
   background: var(--background-200);
   color: var(--foreground-100);
   padding: var(--popover-padding);
   border-radius: var(--popover-radius);
-  max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
+  max-height: calc(100vh - var(--header-expanded-height) - var(--popover-offset));
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
