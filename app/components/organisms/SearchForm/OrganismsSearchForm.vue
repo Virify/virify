@@ -1,15 +1,14 @@
 <template>
-  <form class="o-searchform  | flow flow-lg" ref="$form" autocomplete="off" @keydown.escape="hidePopover"
-    @submit.prevent="sendForm">
+  <form ref="$form" autocomplete="off" class="o-searchform | flow flow-lg" :class="{
+    'o-searchform-expanded': !popoverHidden,
+    'o-searchform-contracted': isScrolled && popoverHidden
+  }" @keydown.escape="hidePopover" @submit.prevent="sendForm">
     <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions" v-model="buyOrRent"
       name="buyOrRent" />
 
     <div class="o-searchform-offset | relative" role="presentation">
       <div class="o-searchform-absolute-wrapper | flow flow-sm">
-        <div class="o-searchform-location" :class="{
-          'o-searchform-location-expanded': !popoverHidden,
-          'o-searchform-location-contracted': isScrolled && popoverHidden
-        }">
+        <div class="o-searchform-location">
           <input type="search" placeholder="Location" aria-label="Location to search in"
             class="o-searchform-location-input" required @click="showPopover" @focus="showPopover" @input="showPopover"
             v-model="suggestions" name="location" />
@@ -433,6 +432,63 @@ async function sendForm(event: Event) {
   margin-inline: auto;
   z-index: 2;
 
+  .o-searchform-buyrent {
+    transition-property: opacity, transform;
+  }
+
+  .o-searchform-location-input,
+  .o-searchform-location-button {
+    transition-property: width, height;
+  }
+
+  .o-searchform-location-button-icon {
+    transition-property: opacity;
+  }
+
+  .o-searchform-buyrent,
+  .o-searchform-location-input,
+  .o-searchform-location-button,
+  .o-searchform-location-button-icon {
+    transition-duration: var(--animation-medium);
+    transition-timing-function: var(--ease-out);
+  }
+
+  &-expanded {
+    .o-searchform-location {
+      width: min(var(--searchform-maxwidth), var(--searchform-width-expanded));
+    }
+
+    .o-searchform-location-button {
+      width: var(--size-56);
+      height: var(--size-56);
+    }
+
+    .o-searchform-location-button-icon {
+      width: var(--size-24);
+      height: var(--size-24);
+    }
+
+    .o-searchform-location-input {
+      font-size: var(--font-md);
+    }
+  }
+
+  &-contracted {
+    .o-searchform-buyrent {
+      opacity: 0;
+      transform: translateY(-2em);
+    }
+
+    .o-searchform-location-button {
+      width: var(--size-24);
+      height: var(--size-24);
+    }
+
+    .o-searchform-location-button-icon {
+      opacity: 0;
+    }
+  }
+
   @include mq.small-tablet {
     --searchform-maxwidth: calc(100vw - var(--size-48));
     --searchform-width: 18rem;
@@ -470,48 +526,6 @@ async function sendForm(event: Event) {
   border-radius: var(--popover-radius);
   width: min(var(--searchform-maxwidth), var(--searchform-width));
   margin: 0 auto;
-
-  .o-searchform-location-input,
-  .o-searchform-location-button {
-    transition-property: width, height;
-    transition-duration: var(--animation-medium);
-    transition-timing-function: var(--ease-out);
-  }
-
-  .o-searchform-location-button-icon {
-    transition-property: opacity;
-    transition-duration: var(--animation-medium);
-    transition-timing-function: var(--ease-out);
-  }
-
-  &-expanded {
-    width: min(var(--searchform-maxwidth), var(--searchform-width-expanded));
-
-    .o-searchform-location-button {
-      width: var(--size-56);
-      height: var(--size-56);
-    }
-
-    .o-searchform-location-button-icon {
-      width: var(--size-24);
-      height: var(--size-24);
-    }
-
-    .o-searchform-location-input {
-      font-size: var(--font-md);
-    }
-  }
-
-  &-contracted {
-    .o-searchform-location-button {
-      width: var(--size-24);
-      height: var(--size-24);
-    }
-
-    .o-searchform-location-button-icon {
-      opacity: 0;
-    }
-  }
 
   @include mq.small-tablet {
     padding: var(--size-10);
