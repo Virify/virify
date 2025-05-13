@@ -13,6 +13,7 @@
             class="o-searchform-location-input" required @click="showPopover" @focus="showPopover" @input="showPopover"
             v-model="suggestions" name="location" />
 
+          <!-- Search radius (desktop) -->
           <client-only>
             <AtomsSelect aria-label="Search radius" v-if="isTablet && !popoverHidden" :options="radiusOptions"
               v-model="initialRadius" class="o-searchform-location-radius | text-input body-sm focus-visible"
