@@ -509,6 +509,9 @@ async function sendForm(event: Event) {
 }
 
 .o-searchform-buyrent {
+  --switcher-outer-radius: var(--border-radius-pill);
+  --switcher-inner-radius: var(--border-radius-pill);
+
   width: fit-content;
   margin-inline: auto;
 }

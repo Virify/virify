@@ -45,6 +45,11 @@ const optionsWithTabIndex = computed(() => {
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
 
+:where(.m-toggle-text) {
+  --switcher-outer-radius: var(--border-radius-xl);
+  --switcher-inner-radius: var(--border-radius-lg);
+}
+
 .m-toggle-text {
   display: flex;
   padding: 0;
@@ -52,14 +57,14 @@ const optionsWithTabIndex = computed(() => {
   background: var(--background-300);
   color: var(--foreground-300);
   padding: var(--size-4);
-  border-radius: var(--size-12);
+  border-radius: var(--switcher-outer-radius);
   box-sizing: border-box;
 }
 
 .m-toggle-text-label {
   display: block;
   padding: var(--size-4) var(--size-24);
-  border-radius: var(--size-8);
+  border-radius: var(--switcher-inner-radius);
   flex: 1 0 0px;
   text-align: center;
   font-size: var(--font-sm);
