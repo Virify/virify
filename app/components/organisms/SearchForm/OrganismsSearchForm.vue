@@ -648,6 +648,15 @@ async function sendForm(event: Event) {
   color: var(--foreground-100);
   padding: var(--popover-padding);
   border-radius: var(--popover-radius);
+  max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #{fn.faded-color(30%)} transparent;
+
+  @supports (max-height: 100dvh) {
+    max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
+  }
 }
 
 .o-searchform-toggles {
