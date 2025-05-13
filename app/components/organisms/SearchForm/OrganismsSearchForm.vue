@@ -7,7 +7,8 @@
     <div class="o-searchform-offset | relative" role="presentation">
       <div class="o-searchform-absolute-wrapper | flow flow-sm">
         <div class="o-searchform-location" :class="{
-          'o-searchform-location-expanded': !popoverHidden
+          'o-searchform-location-expanded': !popoverHidden,
+          'o-searchform-location-contracted': isScrolled && popoverHidden
         }">
           <input type="search" placeholder="Location" aria-label="Location to search in"
             class="o-searchform-location-input" required @click="showPopover" @focus="showPopover" @input="showPopover"
@@ -191,6 +192,15 @@ import { useMediaQuery } from '@vueuse/core'
  *  Whether to show the radius dropdown inline or below
  */
 const isTablet = useMediaQuery('(min-width: 768px)')
+
+/**
+ *  Determine whether to shrink the search form
+ */
+const isScrolled = ref(false)
+
+useScrollThreshold(50, (newValue) => {
+  isScrolled.value = newValue
+})
 
 /**
  *  Get search form config
@@ -461,6 +471,19 @@ async function sendForm(event: Event) {
   width: min(var(--searchform-maxwidth), var(--searchform-width));
   margin: 0 auto;
 
+  .o-searchform-location-input,
+  .o-searchform-location-button {
+    transition-property: width, height;
+    transition-duration: var(--animation-medium);
+    transition-timing-function: var(--ease-out);
+  }
+
+  .o-searchform-location-button-icon {
+    transition-property: opacity;
+    transition-duration: var(--animation-medium);
+    transition-timing-function: var(--ease-out);
+  }
+
   &-expanded {
     width: min(var(--searchform-maxwidth), var(--searchform-width-expanded));
 
@@ -476,6 +499,17 @@ async function sendForm(event: Event) {
 
     .o-searchform-location-input {
       font-size: var(--font-md);
+    }
+  }
+
+  &-contracted {
+    .o-searchform-location-button {
+      width: var(--size-24);
+      height: var(--size-24);
+    }
+
+    .o-searchform-location-button-icon {
+      opacity: 0;
     }
   }
 
