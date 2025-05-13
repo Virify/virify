@@ -96,7 +96,7 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
 
 export async function getListingByDistanceAndFilters(
   { type, location, radius }: ListingSearch,
-  { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
+  { propertyTypeIds, propertyClassifications, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
 ): Promise<ListingCardType[]> {
 
   // Get the nearby properties with distance
@@ -122,11 +122,22 @@ export async function getListingByDistanceAndFilters(
         id: {
           in: nearbyProperties.map((p) => p.propertyId), // Use the nearby property IDs
         },
-        type: {
-          name: {
-            in: propertyTypes,
+        ...(propertyTypeIds && propertyTypeIds.length > 0 ? {
+          type: {
+            id: {
+              in: propertyTypeIds,
+            },
           },
-        },
+        } : {}),
+        
+        // Handle property classifications separately
+        ...(propertyClassifications && propertyClassifications.length > 0 ? {
+          classification: {
+            id: {
+              in: propertyClassifications.map(c => c.id),
+            }
+          },
+        } : {}),
         numberBedrooms: bedrooms
           ? {
               gte: bedrooms[0], // min bedroom

@@ -7,7 +7,16 @@ import { mapFeatureToFilters } from "../../utils/db-fields";
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
   radius: z.coerce.number().min(0).max(40),
-  propertyTypes: z.array(z.string()).optional(),
+  propertyTypeIds: z.array(z.number()).optional(),
+  propertyClassifications: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      propertyTypeId: z.number(),
+      propertyTypeName: z.string(),
+      selected: z.boolean().optional()
+    })
+  ).optional(),
   priceRange: z.array(z.coerce.number()).optional(),
   location: z.string(),
   bedrooms: z.array(z.coerce.number()).optional(),
@@ -28,7 +37,7 @@ const searchSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, propertyTypeIds, propertyClassifications, priceRange, location, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
 
     /**
      * Required for search
@@ -60,7 +69,8 @@ export default defineEventHandler(async (event) => {
     const optional: ListingSearchOptional = {
       bedrooms: bedrooms && bedrooms[0] === 0 && bedrooms[1] === 0 ? undefined : bedrooms,
       bathrooms: bathrooms && bathrooms[0] === 0 && bathrooms[1] === 0 ? undefined : bathrooms,
-      propertyTypes,
+      propertyTypeIds,
+      propertyClassifications: propertyClassifications?.filter(c => c.selected !== false),
       priceRange,
       addedToSite: addedToSite && addedToSite !== "0" ? calculateDateFromDays(addedToSite) : undefined,
       availabilityOptions: availabilityOptionsToEnum,
