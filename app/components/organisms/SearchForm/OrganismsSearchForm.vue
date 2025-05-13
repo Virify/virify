@@ -1,6 +1,7 @@
 <template>
   <div class="o-searchform-fixed" :class="{
     'o-searchform-fixed-contracted': isContracted,
+    'o-searchform-fixed-background': isScrolled,
   }">
     <Teleport to="#teleports">
       <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
@@ -137,7 +138,7 @@
                 <MoleculesFormField label="Recently Added" class="| focus-overflow">
                   <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                     <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                    }}</option>
+                      }}</option>
                   </AtomsSelect>
                 </MoleculesFormField>
               </OrganismsSearchFormTitleBlock>
@@ -443,7 +444,7 @@ async function sendForm(event: Event) {
   top: 0;
   left: 0;
   width: 100%;
-  background: var(--background-100);
+  background: none;
   color: var(--foreground-100);
   display: flex;
   align-items: center;
@@ -451,10 +452,16 @@ async function sendForm(event: Event) {
   height: var(--header-expanded-height);
   z-index: 3;
   box-shadow: 0 20px 60px -20px #{fn.faded-color(12%, var(--monochrome-100))};
-  transition: height var(--animation-medium) var(--ease-out);
+  transition: height, background-color;
+  transition-duration: (--animation-medium);
+  transition-timing-function: var(--ease-out);
 
   &-contracted {
     height: var(--header-height);
+  }
+
+  &-background {
+    background: var(--background-100);
   }
 }
 
