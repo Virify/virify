@@ -122,7 +122,7 @@
               <MoleculesFormField label="Recently Added" class="| focus-overflow">
                 <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                   <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                    }}</option>
+                  }}</option>
                 </AtomsSelect>
               </MoleculesFormField>
             </OrganismsSearchFormTitleBlock>
@@ -408,7 +408,7 @@ async function sendForm(event: Event) {
 .o-searchform {
   --searchform-width: 16rem;
   --searchform-width-expanded: 32rem;
-  --searchform-maxwidth: calc(100vw - 2rem);
+  --searchform-maxwidth: calc(100vw - var(--size-24));
   --popover-radius: var(--size-40);
   --popover-gap: var(--size-12);
   --popover-padding: var(--size-20);
@@ -420,7 +420,7 @@ async function sendForm(event: Event) {
   z-index: 2;
 
   @include mq.small-tablet {
-    --searchform-maxwidth: calc(100vw - 4rem);
+    --searchform-maxwidth: calc(100vw - var(--size-48));
     --searchform-width: 18rem;
     --popover-padding: var(--size-28);
     --popover-gap: var(--size-16);
