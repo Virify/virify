@@ -1,7 +1,7 @@
 <template>
   <div class="o-searchform-fixed" :class="{
     'o-searchform-fixed-contracted': isContracted,
-    'o-searchform-fixed-background': isScrolled || !popoverHidden,
+    'o-searchform-fixed-background': hasBackground
   }">
     <Teleport to="#teleports">
       <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
@@ -220,7 +220,11 @@ useScrollThreshold(50, (newValue) => {
 })
 
 const isContracted = computed(() => {
-  return isScrolled.value && popoverHidden.value
+  return (!isTablet.value || isScrolled.value) && popoverHidden.value
+})
+
+const hasBackground = computed(() => {
+  return isScrolled.value || !isTablet.value || !popoverHidden.value
 })
 
 /**
@@ -735,5 +739,41 @@ async function sendForm(event: Event) {
   opacity: 0;
   height: 0;
   transform: translateY(-2em);
+}
+
+/**
+ *  Mobile layout
+ */
+@include mq.mobile-only {
+  .o-searchform-fixed {
+    top: auto;
+    bottom: 0;
+    z-index: 4;
+  }
+
+  .o-searchform {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .o-searchform-popover {
+    top: auto;
+    bottom: calc(100% + var(--size-8));
+    max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
+
+    @supports (max-height: 100dvh) {
+      max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
+    }
+  }
+
+  .o-searchform-buyrent {
+    margin-top: var(--size-10);
+    margin-bottom: 0;
+  }
+
+  .buyrent-enter-from,
+  .buyrent-leave-to {
+    transform: translateY(2em);
+  }
 }
 </style>
