@@ -70,7 +70,7 @@ const optionsWithTabIndex = computed(() => {
   }
 
   &:has(input:checked) {
-    background: var(--secondary-400);
+    background: var(--secondary-500);
     box-shadow: var(--monochrome-100);
   }
 }
