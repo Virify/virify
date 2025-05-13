@@ -1,7 +1,7 @@
 <template>
   <div class="o-searchform-fixed" :class="{
     'o-searchform-fixed-contracted': isContracted,
-    'o-searchform-fixed-background': isScrolled,
+    'o-searchform-fixed-background': isScrolled || !popoverHidden,
   }">
     <Teleport to="#teleports">
       <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
