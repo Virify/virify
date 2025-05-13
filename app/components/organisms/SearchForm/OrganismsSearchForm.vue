@@ -1,7 +1,6 @@
 <template>
   <div class="o-searchform-fixed" :class="{
-    'o-searchform-fixed-contracted': isContracted,
-    'o-searchform-fixed-background': hasBackground
+    'o-searchform-fixed-contracted': isContracted
   }">
     <Teleport to="#teleports">
       <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
@@ -141,7 +140,7 @@
                 <MoleculesFormField label="Recently Added" class="| focus-overflow">
                   <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                     <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                      }}</option>
+                    }}</option>
                   </AtomsSelect>
                 </MoleculesFormField>
               </OrganismsSearchFormTitleBlock>
@@ -215,16 +214,12 @@ const isTablet = useMediaQuery('(min-width: 768px)')
  */
 const isScrolled = ref(false)
 
-useScrollThreshold(50, (newValue) => {
+useScrollThreshold(10, (newValue) => {
   isScrolled.value = newValue
 })
 
 const isContracted = computed(() => {
   return (!isTablet.value || isScrolled.value) && popoverHidden.value
-})
-
-const hasBackground = computed(() => {
-  return isScrolled.value || !isTablet.value || !popoverHidden.value
 })
 
 /**
@@ -452,6 +447,7 @@ async function sendForm(event: Event) {
   left: 0;
   width: 100%;
   background: none;
+  background: var(--background-100);
   color: var(--foreground-100);
   display: flex;
   align-items: center;
@@ -465,10 +461,6 @@ async function sendForm(event: Event) {
 
   &-contracted {
     height: var(--header-height);
-  }
-
-  &-background {
-    background: var(--background-100);
   }
 }
 
@@ -491,10 +483,13 @@ async function sendForm(event: Event) {
   --popover-gap: var(--size-12);
   --popover-padding: var(--size-20);
 
-  transition-property: padding;
   width: fit-content;
   margin-inline: auto;
   z-index: 2;
+
+  .o-searchform-location {
+    transition-property: padding;
+  }
 
   .o-searchform-location-input {
     transition-property: width, height;
@@ -508,7 +503,7 @@ async function sendForm(event: Event) {
     transition-property: opacity;
   }
 
-  .o-searchform,
+  .o-searchform-location,
   .o-searchform-location-input,
   .o-searchform-location-button,
   .o-searchform-location-button-icon {

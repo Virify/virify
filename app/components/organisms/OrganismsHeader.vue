@@ -17,7 +17,7 @@
   justify-content: space-between;
   z-index: 4;
   height: var(--header-height);
-  margin-bottom: var(--header-offset);
+  margin-bottom: calc(var(--header-offset) + var(--size-24));
 }
 
 .o-header-homelink {
