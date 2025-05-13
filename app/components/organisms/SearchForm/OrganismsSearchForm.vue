@@ -432,6 +432,9 @@ async function sendForm(event: Event) {
   left: 0;
   width: 100%;
   background: var(--background-100);
+  color: var(--foreground-100);
+  z-index: 3;
+  box-shadow: 0 20px 60px -20px #{fn.faded-color(12%, var(--monochrome-100))};
 }
 
 .o-searchform {
