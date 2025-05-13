@@ -400,7 +400,7 @@ async function sendForm(event: Event) {
 @use "#styles/_utils/media" as mq;
 
 .o-searchform {
-  --searchform-width: 18rem;
+  --searchform-width: 16rem;
   --searchform-width-expanded: 32rem;
   --searchform-maxwidth: calc(100vw - 2rem);
   --popover-radius: var(--size-40);
@@ -415,13 +415,13 @@ async function sendForm(event: Event) {
 
   @include mq.small-tablet {
     --searchform-maxwidth: calc(100vw - 4rem);
-    --searchform-width: 22rem;
+    --searchform-width: 18rem;
     --popover-padding: var(--size-28);
     --popover-gap: var(--size-16);
   }
 
   @include mq.tablet {
-    --searchform-width: 24rem;
+    --searchform-width: 22rem;
     --searchform-width-expanded: 48rem;
     --popover-gap: var(--size-20);
     --popover-padding: var(--size-32);
@@ -456,10 +456,20 @@ async function sendForm(event: Event) {
 
   &-expanded {
     width: min(var(--searchform-maxwidth), var(--searchform-width-expanded));
+
+    .o-searchform-location-button {
+      width: var(--size-56);
+      height: var(--size-56);
+    }
+
+    .o-searchform-location-button-icon {
+      width: var(--size-24);
+      height: var(--size-24);
+    }
   }
 
   @include mq.small-tablet {
-    padding: var(--size-12);
+    padding: var(--size-10);
 
     &-expanded {
       padding: var(--size-16);
@@ -488,8 +498,8 @@ async function sendForm(event: Event) {
 }
 
 .o-searchform-location-button {
-  width: var(--size-56);
-  height: var(--size-56);
+  width: var(--size-48);
+  height: var(--size-48);
   padding: 0;
   flex-shrink: 0;
   align-self: center;
@@ -497,8 +507,8 @@ async function sendForm(event: Event) {
 }
 
 .o-searchform-location-button-icon {
-  width: var(--size-24);
-  height: var(--size-24);
+  width: var(--size-20);
+  height: var(--size-20);
 }
 
 .o-searchform-wrapper {
