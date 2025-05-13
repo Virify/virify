@@ -18,10 +18,10 @@
       </Transition>
 
       <div class="| relative" role="presentation">
-        <div class="o-searchform-location">
+        <div class="o-searchform-location" @click="showPopover">
           <input type="search" placeholder="Location" aria-label="Location to search in"
-            class="o-searchform-location-input" required @click="showPopover" @focus="showPopover" @input="showPopover"
-            v-model="suggestions" name="location" />
+            class="o-searchform-location-input" required @focus="showPopover" @input="showPopover" v-model="suggestions"
+            name="location" />
 
           <!-- Search radius (desktop) -->
           <client-only>
