@@ -519,6 +519,7 @@ async function sendForm(event: Event) {
   &-expanded {
     .o-searchform-location {
       width: min(var(--searchform-maxwidth), var(--searchform-width-expanded));
+      padding: var(--size-10);
     }
 
     .o-searchform-location-button {
@@ -576,6 +577,7 @@ async function sendForm(event: Event) {
   --switcher-inner-radius: var(--border-radius-pill);
 
   width: fit-content;
+  min-width: 20ch;
   margin-inline: auto;
   margin-bottom: var(--size-10);
 }
@@ -595,13 +597,6 @@ async function sendForm(event: Event) {
   width: min(var(--searchform-maxwidth), var(--searchform-width));
   border: 1px solid var(--background-300);
   margin: 0 auto;
-
-  @include mq.small-tablet {
-    &-expanded {
-      padding: var(--size-12);
-      gap: var(--size-12);
-    }
-  }
 }
 
 .o-searchform-location-input {
