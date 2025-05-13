@@ -492,9 +492,12 @@ async function sendForm(event: Event) {
   margin-inline: auto;
   z-index: 2;
 
-  .o-searchform-location-input,
-  .o-searchform-location-button {
+  .o-searchform-location-input {
     transition-property: width, height;
+  }
+
+  .o-searchform-location-button {
+    transition-property: width, height, transform;
   }
 
   .o-searchform-location-button-icon {
@@ -533,12 +536,11 @@ async function sendForm(event: Event) {
     padding: var(--size-14) 0;
 
     .o-searchform-location {
-      padding: var(--size-6) var(--size-10);
+      padding: var(--size-4);
     }
 
     .o-searchform-location-button {
-      width: var(--size-24);
-      height: var(--size-24);
+      transform: scale(0.4);
     }
 
     .o-searchform-location-button-icon {
