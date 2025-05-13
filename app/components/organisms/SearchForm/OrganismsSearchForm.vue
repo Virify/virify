@@ -460,7 +460,7 @@ async function sendForm(event: Event) {
   z-index: 3;
   box-shadow: 0 20px 60px -20px #{fn.faded-color(12%, var(--monochrome-100))};
   transition: height, background-color;
-  transition-duration: (--animation-medium);
+  transition-duration: var(--animation-medium);
   transition-timing-function: var(--ease-out);
 
   &-contracted {
