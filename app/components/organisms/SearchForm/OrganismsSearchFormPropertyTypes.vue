@@ -20,9 +20,9 @@
         <AtomsDivider />
 
         <div v-for="propertyType in selectedPropertyTypesWithClassifications" :key="propertyType.id"
-          class="o-searchform-animation">
+          class="o-property-type-classification">
           <animate-in :delay="75">
-            <OrganismsSearchFormTitleBlock :title="`${propertyType.name} Type`" class="py-2">
+            <OrganismsSearchFormTitleBlock :title="`${propertyType.name} Type`">
               <MoleculesScrollBox class="| focus-overflow">
                 <ul class="o-searchform-property-types">
                   <li
@@ -41,7 +41,7 @@
 
       <!-- Show more options button -->
       <div v-if="selectedPropertyTypesWithClassifications.length > 0" role="presentation"
-        class="o-searchform-animation">
+        class="o-property-type-button">
         <AtomsButton type="button" class="o-searchform-expand o-searchform-buttons | button-bordered button-full"
           @click.prevent="toggleClassificationPopoverExpanded">
           {{ classificationPopoverExpanded ? "Show fewer options" : "Show more property options" }}
@@ -183,3 +183,12 @@ onMounted(() => {
   }
 });
 </script>
+<style lang="scss">
+.o-property-type-classification {
+  margin-bottom: var(--size-16);
+}
+
+.o-property-type-button {
+  margin-top: var(--size-16);
+}
+</style>
