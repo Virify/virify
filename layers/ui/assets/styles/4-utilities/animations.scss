@@ -25,6 +25,7 @@
 
 .pulse {
   --pulse-colour: var(--foreground-200);
+  --pulse-size: 30px;
 
   animation: pulseBackground 3s var(--ease-out) infinite;
 }
@@ -35,6 +36,6 @@
   }
 
   100% {
-    box-shadow: 0 0 0 20px fn.faded-color(00%, var(--pulse-colour))
+    box-shadow: 0 0 0 var(--pulse-size) fn.faded-color(00%, var(--pulse-colour))
   }
 }
