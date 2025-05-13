@@ -11,9 +11,11 @@
           class="o-searchform-location-input" required @click="showPopover" @focus="showPopover" @input="showPopover"
           v-model="suggestions" name="location" />
 
-        <AtomsSelect aria-label="Search radius" v-if="isTablet && !popoverHidden" :id :options="radiusOptions"
-          v-model="initialRadius" class="o-searchform-location-radius | text-input body-sm focus-visible"
-          name="radius" />
+        <client-only>
+          <AtomsSelect aria-label="Search radius" v-if="isTablet && !popoverHidden" :options="radiusOptions"
+            v-model="initialRadius" class="o-searchform-location-radius | text-input body-sm focus-visible"
+            name="radius" />
+        </client-only>
 
         <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome">
           <AtomsIcon title="Search" icon="search" class="o-searchform-location-button-icon" />
@@ -23,6 +25,7 @@
       <div role="presentation" class="o-searchform-popover | flow flow-xl" :hidden="popoverHidden">
         <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
+        <!-- Location -->
         <OrganismsSearchFormTitleBlock v-if="suggestions" title="Location">
           <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
             v-slot="{ original, current, suggestion }">
@@ -32,12 +35,15 @@
           </MoleculesAutocomplete>
         </OrganismsSearchFormTitleBlock>
 
-        <OrganismsSearchFormTitleBlock v-if="!isTablet">
-          <MoleculesFormField label="Search radius" v-slot="{ id }">
-            <AtomsSelect :id :options="radiusOptions" v-model="initialRadius" class="| text-input body-sm focus-visible"
-              name="radius" />
-          </MoleculesFormField>
-        </OrganismsSearchFormTitleBlock>
+        <!-- Search readius -->
+        <client-only>
+          <OrganismsSearchFormTitleBlock v-if="!isTablet">
+            <MoleculesFormField label="Search radius" v-slot="{ id }">
+              <AtomsSelect :id :options="radiusOptions" v-model="initialRadius"
+                class="| text-input body-sm focus-visible" name="radius" />
+            </MoleculesFormField>
+          </OrganismsSearchFormTitleBlock>
+        </client-only>
 
         <!-- price -->
         <animate-in :delay="50">
