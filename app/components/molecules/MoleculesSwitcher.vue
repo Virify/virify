@@ -63,7 +63,8 @@ const optionsWithTabIndex = computed(() => {
 
 .m-toggle-text-label {
   display: block;
-  padding: var(--size-4) var(--size-24);
+  padding: var(--size-6) var(--size-24);
+  line-height: var(--lineheight-sm);
   border-radius: var(--switcher-inner-radius);
   flex: 1 0 0px;
   text-align: center;

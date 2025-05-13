@@ -495,8 +495,8 @@ async function sendForm(event: Event) {
     }
 
     .o-searchform-location-button {
-      width: var(--size-56);
-      height: var(--size-56);
+      width: var(--size-48);
+      height: var(--size-48);
     }
 
     .o-searchform-location-button-icon {
@@ -512,6 +512,10 @@ async function sendForm(event: Event) {
   &-contracted {
     padding: var(--size-14) 0;
 
+    .o-searchform-location {
+      padding: var(--size-6) var(--size-10);
+    }
+
     .o-searchform-location-button {
       width: var(--size-24);
       height: var(--size-24);
@@ -524,13 +528,13 @@ async function sendForm(event: Event) {
 
   @include mq.small-tablet {
     --searchform-maxwidth: calc(100vw - var(--size-48));
-    --searchform-width: 18rem;
+    --searchform-width: 20rem;
     --popover-padding: var(--size-28);
     --popover-gap: var(--size-16);
   }
 
   @include mq.tablet {
-    --searchform-width: 22rem;
+    --searchform-width: 24rem;
     --searchform-width-expanded: 48rem;
     --popover-gap: var(--size-20);
     --popover-padding: var(--size-32);
@@ -547,7 +551,7 @@ async function sendForm(event: Event) {
 
   width: fit-content;
   margin-inline: auto;
-  margin-bottom: var(--size-16);
+  margin-bottom: var(--size-10);
 }
 
 .o-searchform-location {
@@ -558,26 +562,26 @@ async function sendForm(event: Event) {
   color: var(--foreground-100);
   display: flex;
   align-items: stretch;
-  grid-gap: var(--size-12);
+  justify-content: space-between;
   padding: var(--size-8);
+  grid-gap: var(--size-8);
   border-radius: var(--popover-radius);
   width: min(var(--searchform-maxwidth), var(--searchform-width));
   border: 1px solid var(--background-300);
   margin: 0 auto;
 
   @include mq.small-tablet {
-    padding: var(--size-10);
-
     &-expanded {
-      padding: var(--size-16);
-      gap: var(--size-16);
+      padding: var(--size-12);
+      gap: var(--size-12);
     }
   }
 }
 
 .o-searchform-location-input {
   outline: none;
-  flex: 1 0 max-content;
+  flex: 1 1;
+  width: 0;
   padding-inline: var(--size-12);
   text-align: left;
   font-size: var(--font-sm);
@@ -596,8 +600,8 @@ async function sendForm(event: Event) {
 }
 
 .o-searchform-location-button {
-  width: var(--size-48);
-  height: var(--size-48);
+  width: var(--size-40);
+  height: var(--size-40);
   padding: 0;
   flex-shrink: 0;
   align-self: center;
