@@ -1,13 +1,15 @@
 <template>
-  <form ref="$form" autocomplete="off" class="o-searchform | flow flow-lg" :class="{
-    'o-searchform-expanded': !popoverHidden,
-    'o-searchform-contracted': isScrolled && popoverHidden
-  }" @keydown.escape="hidePopover" @submit.prevent="sendForm">
-    <MoleculesSwitcher class="o-searchform-buyrent" legend="Buy or rent" :options="buyOrRentOptions" v-model="buyOrRent"
-      name="buyOrRent" />
+  <div class="o-searchform-fixed">
+    <form ref="$form" autocomplete="off" class="o-searchform" :class="{
+      'o-searchform-expanded': !popoverHidden,
+      'o-searchform-contracted': isContracted
+    }" @keydown.escape="hidePopover" @submit.prevent="sendForm">
+      <Transition name="buyrent">
+        <MoleculesSwitcher v-show="!isContracted" class="o-searchform-buyrent" legend="Buy or rent"
+          :options="buyOrRentOptions" v-model="buyOrRent" name="buyOrRent" />
+      </Transition>
 
-    <div class="o-searchform-offset | relative" role="presentation">
-      <div class="o-searchform-absolute-wrapper | flow flow-sm">
+      <div class="| relative" role="presentation">
         <div class="o-searchform-location">
           <input type="search" placeholder="Location" aria-label="Location to search in"
             class="o-searchform-location-input" required @click="showPopover" @focus="showPopover" @input="showPopover"
@@ -177,8 +179,8 @@
           </animate-in>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -199,6 +201,10 @@ const isScrolled = ref(false)
 
 useScrollThreshold(50, (newValue) => {
   isScrolled.value = newValue
+})
+
+const isContracted = computed(() => {
+  return isScrolled.value && popoverHidden.value
 })
 
 /**
@@ -420,6 +426,14 @@ async function sendForm(event: Event) {
 @use "#styles/_utils/functions" as fn;
 @use "#styles/_utils/media" as mq;
 
+.o-searchform-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--background-100);
+}
+
 .o-searchform {
   --searchform-width: 16rem;
   --searchform-width-expanded: 32rem;
@@ -428,13 +442,11 @@ async function sendForm(event: Event) {
   --popover-gap: var(--size-12);
   --popover-padding: var(--size-20);
 
+  transition-property: padding;
+  padding: var(--size-20) 0;
   width: fit-content;
   margin-inline: auto;
   z-index: 2;
-
-  .o-searchform-buyrent {
-    transition-property: opacity, transform;
-  }
 
   .o-searchform-location-input,
   .o-searchform-location-button {
@@ -445,7 +457,7 @@ async function sendForm(event: Event) {
     transition-property: opacity;
   }
 
-  .o-searchform-buyrent,
+  .o-searchform,
   .o-searchform-location-input,
   .o-searchform-location-button,
   .o-searchform-location-button-icon {
@@ -474,10 +486,7 @@ async function sendForm(event: Event) {
   }
 
   &-contracted {
-    .o-searchform-buyrent {
-      opacity: 0;
-      transform: translateY(-2em);
-    }
+    padding: var(--size-14) 0;
 
     .o-searchform-location-button {
       width: var(--size-24);
@@ -514,6 +523,7 @@ async function sendForm(event: Event) {
 
   width: fit-content;
   margin-inline: auto;
+  margin-bottom: var(--size-16);
 }
 
 .o-searchform-location {
@@ -528,6 +538,7 @@ async function sendForm(event: Event) {
   padding: var(--size-8);
   border-radius: var(--popover-radius);
   width: min(var(--searchform-maxwidth), var(--searchform-width));
+  border: 1px solid var(--background-300);
   margin: 0 auto;
 
   @include mq.small-tablet {
@@ -574,22 +585,15 @@ async function sendForm(event: Event) {
   height: var(--size-20);
 }
 
-.o-searchform-offset {
-  height: 5rem;
-}
-
-.o-searchform-absolute-wrapper {
+.o-searchform-popover {
   position: absolute;
-  top: 0;
+  top: calc(100% + var(--size-12));
   left: 50%;
   transform: translateX(-50%);
   text-align: left;
   border-radius: var(--popover-radius);
   width: min(var(--searchform-maxwidth), var(--searchform-width-expanded));
   z-index: 2;
-}
-
-.o-searchform-popover {
   background: var(--background-200);
   color: var(--foreground-100);
   padding: var(--popover-padding);
@@ -643,5 +647,29 @@ async function sendForm(event: Event) {
 ::view-transition-old(location-input),
 ::view-transition-new(location-input) {
   width: fit-content
+}
+
+/**
+ *  Hide/show buy-rent switcher. Do not use view transitions as this
+ *  gets laggy when done with scroll events
+ */
+.buyrent-enter-active,
+.buyrent-leave-active {
+  interpolate-size: allow-keywords;
+
+  overflow-y: clip;
+  transition-property: padding, height, opacity, transform, margin;
+  transition-duration: var(--animation-medium);
+  transition-timing-function: var(--ease-out);
+}
+
+.buyrent-enter-from,
+.buyrent-leave-to {
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  height: 0;
+  transform: translateY(-2em);
 }
 </style>
