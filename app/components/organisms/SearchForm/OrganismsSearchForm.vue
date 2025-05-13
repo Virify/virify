@@ -30,7 +30,10 @@
               name="radius" />
           </client-only>
 
-          <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome">
+          <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
+            :class="{
+              '| pulse pointer-none': isContracted
+            }">
             <AtomsIcon title="Search" icon="search" class="o-searchform-location-button-icon" />
           </AtomsButton>
         </div>

@@ -1,4 +1,5 @@
 @use '../_utils/media' as mq;
+@use '../_utils/functions' as fn;
 
 /**
  *  Animations
@@ -19,5 +20,21 @@
       height: 0;
       transform: translateY(var(--animation-distance));
     }
+  }
+}
+
+.pulse {
+  --pulse-colour: var(--foreground-200);
+
+  animation: pulseBackground 3s var(--ease-out) infinite;
+}
+
+@keyframes pulseBackground {
+  20% {
+    box-shadow: 0 0 0 0 fn.faded-color(60%, var(--pulse-colour))
+  }
+
+  100% {
+    box-shadow: 0 0 0 20px fn.faded-color(00%, var(--pulse-colour))
   }
 }
