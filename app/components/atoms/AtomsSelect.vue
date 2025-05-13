@@ -39,6 +39,8 @@ const selected = defineModel({
 <style lang="scss">
 .a-select {
   appearance: none;
+  min-width: fit-content;
+  padding-right: var(--size-32);
   background-position: right;
   background-repeat: no-repeat;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='black'><path d='M16 19L11 14H21L16 19Z'/></svg>");
