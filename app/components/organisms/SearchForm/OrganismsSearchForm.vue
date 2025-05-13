@@ -1,5 +1,7 @@
 <template>
-  <div class="o-searchform-fixed">
+  <div class="o-searchform-fixed" :class="{
+    'o-searchform-fixed-contracted': isContracted,
+  }">
     <Teleport to="#teleports">
       <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
         :aria-controls="popoverId" aria-expanded="true"></button>
@@ -443,8 +445,17 @@ async function sendForm(event: Event) {
   width: 100%;
   background: var(--background-100);
   color: var(--foreground-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--header-expanded-height);
   z-index: 3;
   box-shadow: 0 20px 60px -20px #{fn.faded-color(12%, var(--monochrome-100))};
+  transition: height var(--animation-medium) var(--ease-out);
+
+  &-contracted {
+    height: var(--header-height);
+  }
 }
 
 .o-searchform-backdrop {
@@ -467,7 +478,6 @@ async function sendForm(event: Event) {
   --popover-padding: var(--size-20);
 
   transition-property: padding;
-  padding: var(--size-20) 0;
   width: fit-content;
   margin-inline: auto;
   z-index: 2;
@@ -658,10 +668,15 @@ async function sendForm(event: Event) {
   view-transition-name: popover-search;
 }
 
+.o-searchform-buyrent {
+  view-transition-name: location-buyrent;
+}
+
 ::view-transition-group(location-search),
 ::view-transition-group(location-button),
 ::view-transition-group(location-input),
-::view-transition-group(popover-search) {
+::view-transition-group(popover-search),
+::view-transition-group(location-buyrent) {
   animation-duration: var(--animation-medium);
   animation-timing-function: var(--ease-out);
 }

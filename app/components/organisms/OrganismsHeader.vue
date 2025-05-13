@@ -12,11 +12,12 @@
 .o-header {
   position: sticky;
   top: 0;
-  padding: var(--size-16) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 4;
+  height: var(--header-height);
+  margin-bottom: var(--header-offset);
 }
 
 .o-header-homelink {
