@@ -472,6 +472,10 @@ async function sendForm(event: Event) {
       width: var(--size-24);
       height: var(--size-24);
     }
+
+    .o-searchform-location-input {
+      font-size: var(--font-md);
+    }
   }
 
   @include mq.small-tablet {
@@ -489,6 +493,7 @@ async function sendForm(event: Event) {
   flex: 1 0 max-content;
   padding-inline: var(--size-12);
   text-align: left;
+  font-size: var(--font-sm);
 }
 
 .o-searchform-location-radius {
