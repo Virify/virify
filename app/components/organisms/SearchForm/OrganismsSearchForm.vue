@@ -1,5 +1,10 @@
 <template>
   <div class="o-searchform-fixed">
+    <Teleport to="#teleports">
+      <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
+        :aria-controls="popoverId" aria-expanded="true"></button>
+    </Teleport>
+
     <form ref="$form" autocomplete="off" class="o-searchform" :class="{
       'o-searchform-expanded': !popoverHidden,
       'o-searchform-contracted': isContracted
@@ -27,7 +32,7 @@
           </AtomsButton>
         </div>
 
-        <div role="presentation" class="o-searchform-popover | flow flow-xl" :hidden="popoverHidden">
+        <div :id="popoverId" role="presentation" class="o-searchform-popover | flow flow-xl" :hidden="popoverHidden">
           <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
           <!-- Location -->
@@ -130,7 +135,7 @@
                 <MoleculesFormField label="Recently Added" class="| focus-overflow">
                   <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                     <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                      }}</option>
+                    }}</option>
                   </AtomsSelect>
                 </MoleculesFormField>
               </OrganismsSearchFormTitleBlock>
@@ -188,6 +193,11 @@ import type { PropertyType } from "@prisma/client";
 import { onClickOutside, watchDebounced } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
 import { useMediaQuery } from '@vueuse/core'
+
+/**
+ *  a11y
+ */
+const popoverId = useId()
 
 /**
  *  Whether to show the radius dropdown inline or below
@@ -435,6 +445,17 @@ async function sendForm(event: Event) {
   color: var(--foreground-100);
   z-index: 3;
   box-shadow: 0 20px 60px -20px #{fn.faded-color(12%, var(--monochrome-100))};
+}
+
+.o-searchform-backdrop {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #{fn.faded-color(25%)};
+  cursor: pointer;
 }
 
 .o-searchform {
