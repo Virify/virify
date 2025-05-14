@@ -1,7 +1,7 @@
 <template>
   <div class="o-searchform-fixed" :class="{
     'o-searchform-fixed-contracted': isContracted
-  }">
+  }" data-allow-mismatch="class">
     <Teleport to="#teleports">
       <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
         :aria-controls="popoverId" aria-expanded="true"></button>
@@ -10,7 +10,7 @@
     <form ref="$form" autocomplete="off" class="o-searchform" :class="{
       'o-searchform-expanded': !popoverHidden,
       'o-searchform-contracted': isContracted
-    }" @keydown.escape="hidePopover" @submit.prevent="sendForm">
+    }" @keydown.escape="hidePopover" @submit.prevent="sendForm" data-allow-mismatch="class">
       <Transition name="buyrent">
         <MoleculesSwitcher v-show="!isContracted" class="o-searchform-buyrent" legend="Buy or rent"
           :options="buyOrRentOptions" v-model="buyOrRent" name="buyOrRent" />
@@ -32,7 +32,7 @@
           <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
             :class="{
               '| pulse pointer-none': isContracted
-            }">
+            }" data-allow-mismatch="class">
             <AtomsIcon title="Search" icon="search" class="o-searchform-location-button-icon" />
           </AtomsButton>
         </div>

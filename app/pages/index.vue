@@ -1,8 +1,6 @@
 <template>
   <div ref="scrollContainer">
-    <client-only>
-      <OrganismsSearchForm />
-    </client-only>
+    <OrganismsSearchForm />
 
     <OrganismsHeroHome />
 
