@@ -40,8 +40,20 @@ const { data: initialListings } = await useAsyncData('featured-listings', () =>
 <style>
 .p-listing-test-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--size-28);
   padding: var(--size-56);
+}
+
+@media (max-width: 1100px) {
+  .p-listing-test-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .p-listing-test-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
