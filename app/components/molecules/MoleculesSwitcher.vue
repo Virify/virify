@@ -1,10 +1,14 @@
 <template>
-  <fieldset class="m-toggle-text">
+  <fieldset ref="$wrapper" class="m-toggle-text | relative" :class="{
+    'm-toggle-text-loading': !isMounted
+  }">
     <legend v-if="legend" class="| visually-hidden">
       {{ legend }}
     </legend>
 
-    <label v-for="{ key, value } of options" :key class="m-toggle-text-label | font-semibold">
+    <span ref="$highlight" class="m-toggle-text-highlight"></span>
+
+    <label ref="$labels" v-for="{ key, value } of options" :key class="m-toggle-text-label | font-semibold">
       <input type="radio" class="| visually-hidden" :value="key" v-model="selected" :name />
       {{ value }}
     </label>
@@ -12,6 +16,8 @@
 </template>
 
 <script setup lang="ts">
+import { useResizeObserver, watchImmediate } from '@vueuse/core'
+
 interface Props {
   legend?: string
   name?: string
@@ -25,6 +31,47 @@ defineProps<Props>()
  */
 const selected = defineModel({ default: 'buy' })
 
+/**
+ *  Loading state
+ */
+const isMounted = ref(false)
+
+/**
+ *  Update highlight position
+ */
+const $labels = useTemplateRef('$labels')
+const $highlight = useTemplateRef('$highlight')
+const $wrapper = useTemplateRef('$wrapper')
+
+function updateHighlightPosition() {
+  // Search for active label
+  const activeLabel = unref($labels)?.find(label => {
+    return label.querySelector('input:checked')
+  })
+
+  // If no valid matches found, do nothing
+  if (!isElement(activeLabel)) return
+
+  // Get width, left position of active element
+  const { offsetLeft, offsetWidth } = activeLabel
+
+  // Get highlight as a non-reactive value
+  const highlight = unref($highlight);
+
+  // Do nothing if highlight is not an element
+  if (!isElement(highlight)) return
+
+  // Update higlight positions accordingly
+  highlight.style.width = `${offsetWidth}px`
+  highlight.style.left = `${offsetLeft}px`
+}
+
+onMounted(() => {
+  isMounted.value = true
+
+  watchImmediate(selected, updateHighlightPosition)
+  useResizeObserver($wrapper, updateHighlightPosition)
+})
 </script>
 
 <style lang="scss">
@@ -59,10 +106,26 @@ const selected = defineModel({ default: 'buy' })
   &:has(:focus-visible) {
     outline: var(--focus-outline);
   }
+}
 
-  &:has(input:checked) {
-    background: var(--secondary-500);
-    box-shadow: var(--monochrome-100);
-  }
+.m-toggle-text-loading .m-toggle-text-label:has(input:checked) {
+  background: var(--secondary-500);
+  box-shadow: var(--monochrome-100);
+}
+
+.m-toggle-text-highlight {
+  position: absolute;
+  top: var(--size-4);
+  left: var(--size-4);
+  height: calc(100% - (2 * var(--size-4)));
+  width: 0;
+  background: var(--secondary-500);
+  box-shadow: var(--monochrome-100);
+  border-radius: var(--switcher-inner-radius);
+  z-index: -1;
+
+  transition-property: width, left;
+  transition-duration: var(--animation-medium);
+  transition-timing-function: var(--ease-out);
 }
 </style>
