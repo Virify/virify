@@ -3,8 +3,9 @@
     <OrganismsHeroHome />
 
     <div class="p-listing-test-grid | container">
-      <MoleculesListingCard v-for="listing in typeOfListing" :key="listing.id" :property-id="listing.id"
-        :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
+      <MoleculesListingCard v-for="listing in typeOfListing" :key="listing.id" :property-id="listing.id" :listing-tier="listing.listingTier"
+      :price-type="listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency"
+        :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name" :classification="listing.property?.classification?.name"
         :address="listing.property?.address" :bedrooms="listing.property?.numberBedrooms"
         :bathrooms="listing.property?.numberBathrooms" :description="listing.title" />
     </div>
