@@ -7,7 +7,7 @@
         Toggle all
       </label>
     </li>
-    <li v-for="{ key, value } of options">
+    <li v-for="{ key, value } of validatedOptions">
       <label>
         <input type="checkbox" :value="key" v-model="selected" />
 
@@ -31,12 +31,17 @@ const selected = defineModel<string[]>({ default: [] })
 const isAllSelected = ref<boolean>(false)
 
 /**
+ *  Validate options
+ */
+const validatedOptions = computed(() => {
+  return asArrayOfOptions(props.options)
+})
+
+/**
  *  Get all keys - as function as this doesn't need to be reactive
  */
 function getKeys() {
-  const { options } = props
-
-  return options.map(({ key }) => key)
+  return unref(validatedOptions).map(({ key }) => key)
 }
 
 /**
