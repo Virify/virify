@@ -1,5 +1,7 @@
 <template>
   <div ref="scrollContainer">
+    <OrganismsSearchForm />
+
     <OrganismsHeroHome />
 
     <div class="p-listing-test-grid | container">

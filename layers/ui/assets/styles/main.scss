@@ -8,6 +8,7 @@
 @use '1-variables/inputs' as variables-inputs;
 @use '1-variables/dividers' as variables-dividers;
 @use '1-variables/animations' as variables-animations;
+@use '1-variables/offsets' as variables-offsets;
 
 // Window
 @use '2-window/body' as window-body;
@@ -27,6 +28,7 @@
 @use '4-utilities/a11y' as utilities-a11y;
 @use '4-utilities/position' as utilities-position;
 @use '4-utilities/animations' as utilities-animations;
+@use '4-utilities/pointer-events' as utilities-pointer-events;
 
 // Components
 @use '6-components/boxes' as components-boxes;
