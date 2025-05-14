@@ -39,7 +39,6 @@
 
       <Transition name="content">
         <div class="m-list-card-expanding m-listing-card-outline | flow flow-md" role="presentation" v-if="isHover">
-          <div class="m-listing-card-ribbon m-listing-card-ribbon--expanded | body-md font-semibold">Featured</div>
           <LazyMoleculesListingCardTabs :description />
           <MoleculesListingCardAgent agent-id="001" />
         </div>
