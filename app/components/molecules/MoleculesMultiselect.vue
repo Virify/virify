@@ -53,6 +53,23 @@ function selectAll({ target }: Event) {
 }
 
 watch(selected, (newValue) => {
-  isAllSelected.value = newValue.length === getKeys().length
+  const selectedLength = newValue.length
+  const maxSelectedLength = getKeys().length
+
+  // Update isAllSelected...
+  isAllSelected.value = selectedLength === maxSelectedLength
+
+  // ...and emit events, in case they are useful
+  if (selectedLength === 0) {
+    emits('all-unselected')
+  }
+  if (selectedLength === maxSelectedLength) {
+    emits('all-selected')
+  }
 })
+
+/**
+ *  Useful events
+ */
+const emits = defineEmits(['all-selected', 'all-unselected'])
 </script>
