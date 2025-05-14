@@ -3,8 +3,20 @@
     v-if="center"
     style="height: 350px; width: 100%"
     :zoom="zoom || 12"
-    :center="[51.481583, -3.1791]"
+    :center="lat !== undefined && lon !== undefined ? [lat, lon] : undefined"
     :use-global-leaflet="false"
+    :zoomControl="false"
+    :options="{
+      attributionControl: false,
+      zoomControl: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      tap: false,
+      touchZoom: false
+    }"
   >
     <LTileLayer
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
