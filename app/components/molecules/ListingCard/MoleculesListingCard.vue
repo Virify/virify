@@ -378,7 +378,7 @@ const iconOptions = computed(() => {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  height: calc-height(max-content, size);
+  height: calc-size(max-content, size);
   width: calc(var(--listing-card-width));
   background: var(--listing-card-background);
 }
@@ -393,7 +393,7 @@ const iconOptions = computed(() => {
   transition-duration: var(--animation-slow);
   transition-timing-function: var(--ease-out);
   transition-delay: var(--animation-slow);
-  height: calc-height(max-content, size);
+  height: calc-size(max-content, size);
 }
 
 @starting-style {

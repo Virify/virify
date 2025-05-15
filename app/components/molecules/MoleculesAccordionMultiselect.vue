@@ -110,7 +110,7 @@ const emits = defineEmits(['expanded'])
 .v-leave-active {
   interpolate-size: allow-keywords;
 
-  height: calc-height(max-content, size);
+  height: calc-size(max-content, size);
   transition: height var(--animation-veryslow) var(--ease-out);
   overflow: hidden;
 }
