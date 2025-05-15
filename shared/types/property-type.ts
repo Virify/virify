@@ -7,3 +7,10 @@ export type PropertyTypeWithClassifications = {
     name: string
   }[]
 }
+
+export type PropertyTypeWithOptions = {
+  id: number
+  name: string
+  defaultSelected: boolean
+  options: string[]
+}
