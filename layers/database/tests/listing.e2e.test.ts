@@ -24,6 +24,9 @@ vi.mock("../server/utils/prisma-client", () => {
   return { prisma: testPrisma };
 });
 
+// No need to mock defineCachedFunction anymore since the price.ts
+// module now handles undefined defineCachedFunction gracefully
+
 // Import prisma from the mocked module
 const { prisma } = await import("../server/utils/prisma-client");
 
@@ -166,7 +169,7 @@ describe("Listing E2E Tests", () => {
     const result = await getListingByDistanceAndFilters(
       { type: "rent", location: testAddress.city, radius: 5 },
       {
-        propertyTypes: ["House"], // Different from our test property type
+        propertyTypes: { "999": [] }, // Invalid property type ID
         priceRange: [999999, 1000000] // Outside our test price range
       }
     );

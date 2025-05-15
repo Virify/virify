@@ -47,13 +47,7 @@ export type ListingSearch = {
 export type ListingSearchOptional = {
   bedrooms?: number[];
   bathrooms?: number[];
-  propertyTypeIds?: number[];
-  propertyClassifications?: {
-    id: number;
-    name: string;
-    propertyTypeId: number;
-    propertyTypeName: string;
-  }[];
+  propertyTypes?: Record<string, number[]>;
   priceRange?: number[];
   addedToSite?: Date;
   availabilityOptions?: string[];

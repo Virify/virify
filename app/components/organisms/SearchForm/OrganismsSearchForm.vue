@@ -408,7 +408,7 @@ async function sendForm(event: Event) {
     location,
     radius,
     buyOrRent,
-    propertyClassifications: selectedPropertyTypes,
+    propertyTypes: selectedPropertyTypes,
     priceRange: selectedPriceRange.value,
     bedrooms: bedroomRange.value,
     bathrooms: bathroomRange.value,
