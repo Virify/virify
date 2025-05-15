@@ -33,8 +33,6 @@ const validGraphData = computed(() => {
 
   if (!Array.isArray(graphData)) return []
 
-  console.log({ graphData })
-
   return graphData
 })
 

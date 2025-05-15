@@ -105,6 +105,11 @@ export const listingCardFields = {
           name: true,
         },
       },
+      classification: {
+        select: {
+          name: true,
+        },
+      },
       accessibilityFeatures: {
         select: {
           wheelchairFriendly: true,

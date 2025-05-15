@@ -1,25 +1,19 @@
 <template>
-  <div class="| flow flow-lg">
-    <slot></slot>
+  <OrganismsSearchFormTitleBlock title="Explore more" title-large>
+    <ul class="o-searchform-popover-explore-more">
+      <animate-in v-for="{ icon, to, content }, index of exploreMoreLinks" :delay="150 + index * 50">
+        <li>
+          <MoleculesIconLink :to :icon :content icon-large class="o-searchform-popover-icon-link" />
+        </li>
+      </animate-in>
+    </ul>
 
-    <animate-in :delay="150">
-      <OrganismsSearchFormTitleBlock title="Explore more" title-large>
-        <ul class="o-searchform-popover-explore-more">
-          <animate-in v-for="{ icon, to, content }, index of exploreMoreLinks" :delay="150 + index * 50">
-            <li>
-              <MoleculesIconLink :to :icon :content icon-large class="o-searchform-popover-icon-link" />
-            </li>
-          </animate-in>
-        </ul>
-
-        <animate-in :delay="200">
-          <nuxt-link to="#" class="o-searchform-popover-full-button | button button-ghost font-semibold">
-            Advanced search
-          </nuxt-link>
-        </animate-in>
-      </OrganismsSearchFormTitleBlock>
+    <animate-in :delay="200">
+      <nuxt-link to="#" class="o-searchform-popover-full-button | button button-ghost font-semibold">
+        Advanced search
+      </nuxt-link>
     </animate-in>
-  </div>
+  </OrganismsSearchFormTitleBlock>
 </template>
 
 <script setup>

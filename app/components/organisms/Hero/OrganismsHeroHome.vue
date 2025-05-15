@@ -5,8 +5,6 @@
         Property search on another level
       </h1>
 
-      <OrganismsSearchForm />
-
       <AtomsDivider text="or" class="o-hero-home-divider" />
 
       <div role="presentation" class="o-hero-home-footer-links">

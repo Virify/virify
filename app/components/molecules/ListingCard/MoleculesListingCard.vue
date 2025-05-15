@@ -2,13 +2,18 @@
   <div ref="$root" :id="controlsId" class="m-listing-card | relative" :class="{
     'm-listing-card-hover': isHover
   }" @mouseleave="removeHover">
+    
     <div role="presentation" class="m-listing-card-media | relative">
-      <LazyMoleculesCarousel :slides="carouselImages" hydrate-on-interaction="mouseover"
-        class="m-listing-card-media-carousel m-listing-card-outline" v-slot="{ slide: { src, alt } }">
-        <nuxt-link :to="propertyUrl">
-          <img :src :alt class="m-listing-card-carousel-image" width="400" height="300" loading="lazy" />
-        </nuxt-link>
-      </LazyMoleculesCarousel>
+      <!-- Tier Banner -->
+      <div v-if="tierTab && !isHover" :class="`${tierTab.class} | body-md font-semibold`">{{ tierTab.label }}</div>
+      <div class="m-listing-card-media-carousel-wrapper | relative">
+        <LazyMoleculesCarousel :slides="carouselImages" hydrate-on-interaction="mouseover"
+          class="m-listing-card-media-carousel m-listing-card-outline" v-slot="{ slide: { src, alt } }">
+          <nuxt-link :to="propertyUrl" class="relative">
+            <img :src :alt class="m-listing-card-carousel-image" width="400" height="300" loading="lazy" />
+          </nuxt-link>
+        </LazyMoleculesCarousel>
+      </div>
     </div>
 
     <MoleculesListingCardButtons :controls-id="controlsId" class="m-listing-card-buttons-parent" :is-expanded="isHover"
@@ -17,15 +22,17 @@
     <div class="| flow flow-lg" role="presentation">
       <ul class="m-listing-card-icons">
         <li class="| font-semibold body-xs" v-for="{ icon, label } of iconOptions">
-          <AtomsIcon :icon aria-hidden="true" class="m-listing-card-icon" />
-          {{ label }}
+          <AtomsIcon :icon="icon" aria-hidden="true" class="m-listing-card-icon" />
+          {{ label === 'Student Accommodation' ? 'Student' : label }}
         </li>
       </ul>
 
       <nuxt-link :to="propertyUrl" class="m-listing-card-link">
-        <h3 class="m-listing-card-price | title-md">{{ priceFormatted }}</h3>
-
-        <p class="m-listing-card-address | body-sm font-bold">
+        <h3 class="m-listing-card-price | title-lg">{{ priceFormatted }}</h3>
+        <p class="m-listing-card-price-type | body-xs">
+          {{ convertEnumToString(priceType) }}
+        </p>
+        <p class="m-listing-card-address | body-md font-bold">
           {{ addressString }}
         </p>
       </nuxt-link>
@@ -45,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+import type { RentalPriceType, SalePriceType } from '@prisma/client'
 import { useElementHover, onClickOutside } from '@vueuse/core'
 
 /**
@@ -54,14 +62,27 @@ interface Props {
   image?: Record<string, unknown>[]
   address?: Record<string, unknown>
   price?: number
+  priceType?: SalePriceType | RentalPriceType
   bedrooms?: number | undefined | null
   bathrooms?: number | undefined | null
   description: string
   propertyId: number
   propertyType?: string
+  classification?: string
+  listingTier?: string
 }
-
 const props = defineProps<Props>()
+
+const tierTab = computed(() => {
+  if (props.listingTier === 'FEATURED') {
+    return { label: 'Featured', class: 'm-listing-card-tab' }
+  }
+  if (props.listingTier === 'PREMIUM') {
+    return { label: 'Premium', class: 'm-listing-card-tab m-listing-card-tab-premium' }
+  }
+  return null
+})
+
 
 /**
  *  a11y
@@ -117,16 +138,82 @@ const propertyUrl = computed(() => {
   return `/listing/${propertyId}`
 })
 
+/**
+ * Map classification to icon
+ */
+const getClassificationIcon = (classification: string | undefined) => {
+  // Map of classifications to icons
+  const iconMappings: Record<string, string> = {
+    'Terraced': 'property/terraced',
+    'Semi-detached': 'property/terraced',
+    'End of terrace': 'property/terraced',
+    'Detached': 'property/detatched',
+    'Mansion': 'property/mansion',
+    'Cottage': 'property/cottage',
+    'Bungalow': 'property/bungalow',
+    'Converted flat': 'property/flat',
+    'Studio flat': 'property/flat',
+    'Maisonette': 'property/flat',
+    'High-rise': 'property/flat',
+    'Within a complex': 'property/flat',
+    'Penthouse': 'property/flat',
+    'Land': 'property/land',
+    'Residential Land': 'property/land',
+    'Commercial Land': 'property/land',
+    'Agricultural Land': 'property/land',
+    'Development plot': 'property/land',
+    'Development potential': 'property/land',
+    'Non-working Farmhouse': 'property/farm',
+    'Working Farm': 'property/farm',
+    'Small Holding': 'property/farm',
+    'Shared Ownership': 'property/shared',
+    'Retirement Home': 'property/other',
+    'New Build Home': 'property/newbuild',
+    'Student Accommodation': 'property/other',
+    'House': 'property/house',
+    'House-share': 'property/shared',
+  }
+
+  return classification && iconMappings[classification] ? iconMappings[classification] : 'property/other'
+}
+
+/**
+ * Map property type to icon
+ */
+const getPropertyTypeIcon = (propertyType: string | undefined) => {
+  // Map of property types to icons
+  const iconMappings: Record<string, string> = {
+    'House': 'property/house',
+    'Cottage': 'property/cottage',
+    'Bungalow': 'property/bungalow',
+    'Flat': 'property/flat',
+    'Land': 'property/land',
+    'Farms': 'property/farm',
+    'Farm': 'property/farm',
+    'Specialty': 'property/other',
+    'Student Accommodation': 'property/shared',
+    'Shared Ownership': 'property/shared',
+    'New Build': 'property/newbuild',
+    'Retirement': 'property/other',
+    'Terraced': 'property/terraced',
+    'Detached': 'property/detatched',
+    'Semi-detached': 'property/terraced',
+    'Mansion': 'property/mansion',
+  }
+
+  return propertyType && iconMappings[propertyType] ? iconMappings[propertyType] : 'property/other'
+}
+
 const iconOptions = computed(() => {
-  const { propertyType, bedrooms, bathrooms } = props
+  const { propertyType, bedrooms, bathrooms, classification } = props
 
   return [
-    { icon: 'cards/property-type', label: `${propertyType}` },
+    { icon: getPropertyTypeIcon(propertyType), label: `${propertyType || 'Property'}` },
+    { icon: getClassificationIcon(classification), label: `${classification || 'Classification'}` },
     { icon: 'cards/beds', label: `${bedrooms} beds` },
-    { icon: 'cards/bathrooms', label: `${bathrooms} bathrooms` }
+    { icon: 'cards/bathrooms', label: `${bathrooms} bathrooms` },
   ]
 })
-
 </script>
 
 <style lang="scss">
@@ -157,20 +244,56 @@ const iconOptions = computed(() => {
  */
 .m-listing-card-media {
   aspect-ratio: 4 / 3;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
-.m-listing-card-media-carousel {
+.m-listing-card-tab {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  padding: var(--size-8);
+  background: var(--secondary-400);
+  color: var(--monochrome-900);
+  border-radius: 0 0 8px 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.m-listing-card-tab-premium {
+  background: var(--primary-200);
+}
+
+.m-listing-card-hover .m-listing-card-tab {
+  top: 12px;
+  left: 12px;
+  width: auto;
+  min-width: 100px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 8px;
+  transition: all var(--animation-veryslow) var(--ease-out);
+}
+
+.m-listing-card-media-carousel-wrapper {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  width: 100%;
+  overflow: visible;
+}
+
+.m-listing-card-media-carousel {
   width: 100%;
   transition-property: width;
   transition-duration: var(--animation-veryslow);
   transition-timing-function: var(--ease-out);
 }
 
-.m-listing-card-hover .m-listing-card-media-carousel {
+.m-listing-card-hover .m-listing-card-media-carousel-wrapper {
   width: var(--listing-card-width);
 }
 
@@ -198,10 +321,10 @@ const iconOptions = computed(() => {
 .m-listing-card-icons {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: center;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, auto);
+  align-items: top;
   justify-content: center;
-  gap: var(--size-20);
   text-align: center;
   width: fit-content;
   padding: 0;
@@ -219,13 +342,19 @@ const iconOptions = computed(() => {
  *  Title and prive
  */
 .m-listing-card-price,
-.m-listing-card-address {
+.m-listing-card-address,
+.m-listing-card-price-type {
   max-width: 22ch;
   margin-inline: auto;
 }
 
 .m-listing-card-price {
   margin-bottom: var(--size-6);
+}
+
+.m-listing-card-price-type {
+  margin-top: -5px;
+  padding-bottom: var(--size-12);
 }
 
 .m-listing-card-link {
