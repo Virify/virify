@@ -123,8 +123,6 @@
             <OrganismsSearchFormTitleBlock title="Property type">
               <MoleculesAccordionMultiselect v-for="{ id, name, options } of propertyTypes" :title="name" :options
                 v-model="selectedPropertyTypes[id]" />
-
-              <pre>{{ selectedPropertyTypes }}</pre>
             </OrganismsSearchFormTitleBlock>
           </animate-in>
 
