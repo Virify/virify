@@ -10,7 +10,7 @@ jobs:
   all-tests:
     runs-on: ubuntu-latest
     env:
-      TEST_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
 
     steps:
     - uses: actions/checkout@v4
