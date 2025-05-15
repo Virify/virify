@@ -44,9 +44,6 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    - name: Generate Prisma client
-      run: pnpm prisma generate
-
     - name: Run database migrations
       run: pnpm prisma migrate reset --force --skip-seed
 
