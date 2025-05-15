@@ -9,11 +9,7 @@
     <Transition>
       <ul v-show="expandOptions" class="m-accordion-multiselect-list">
         <li v-for="{ key, value } of validatedOptions">
-          <label class="m-accordion-multiselect-checkbox">
-            <input type="checkbox" :value="key" v-model="selected" />
-
-            {{ value }}
-          </label>
+          <AtomsCheckbox :value="key" v-model="selected" :label="value" />
         </li>
       </ul>
     </Transition>
