@@ -28,7 +28,7 @@ const isChecked = defineModel({
 .a-checkbox {
   position: relative;
   display: block;
-  border: 1px solid light-dark(var(--monochrome-700), var(--monochrome-400));
+  border: 1px solid var(--border-color-200);
   padding: var(--size-6) var(--size-28);
   line-height: var(--lineheight-md);
   border-radius: var(--border-radius-pill);
@@ -42,14 +42,14 @@ const isChecked = defineModel({
   &:hover {
     color: currentColor;
     background: #{ fn.faded-color(6%) };
-    border-color: light-dark(var(--monochrome-600), var(--monochrome-500));
+    border-color: var(--border-color-300);
   }
 
   &-icon {
     display: none;
     position: absolute;
     top: 50%;
-    right: var(--size-8);
+    left: var(--size-8);
     width: var(--size-24);
     height: var(--size-24);
     transform: translateY(-50%);
@@ -82,7 +82,7 @@ const isChecked = defineModel({
   }
 
   &:has(input:checked) &-text {
-    transform: translateX(calc(0px - var(--size-10)));
+    transform: translateX(var(--size-10));
   }
 
   &:active {

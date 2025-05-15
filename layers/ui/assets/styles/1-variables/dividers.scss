@@ -4,5 +4,10 @@
  *  Page dividers
  */
 :root {
+  // HR dividers
   --divider-100: 1px solid #{ fn.faded-color(30%) };
+
+  // Borders
+  --border-color-200: light-dark(var(--monochrome-700), var(--monochrome-400));
+  --border-color-300: light-dark(var(--monochrome-500), var(--monochrome-400));
 }
