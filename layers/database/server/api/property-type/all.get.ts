@@ -11,7 +11,10 @@ export default defineEventHandler(async (event) => {
     return propertyTypes.map((({ classifications = [], ...type }) => {
       return {
         ...type,
-        options: classifications.map(({ name }) => name)
+        options: classifications.map(({ id, name }) => ({
+          key: id,
+          value: name
+        }))
       }
     }))
   } catch (error) {
