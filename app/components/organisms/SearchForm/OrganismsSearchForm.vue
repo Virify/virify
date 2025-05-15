@@ -245,7 +245,7 @@ const popoverHidden = ref(true);
 const suggestions = ref("");
 const bedroomRange = ref<[number, number]>([0, 0]);
 const bathroomRange = ref<[number, number]>([0, 0]);
-const initialRadius = computed(() => radiusOptions?.[0]?.value);
+const initialRadius = ref(radiusOptions?.[0]?.value);
 const initialDate = computed(() => dateOptions?.[0]?.value);
 const buyOrRent = ref("buy");
 const includeOptions = ref<{ value: string; key: string }[]>([]);
