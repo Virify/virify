@@ -160,6 +160,11 @@ const emits = defineEmits(['expanded'])
 
   .a-checkbox {
     transition: opacity var(--animation-veryslow) var(--ease-out);
+
+    &-text,
+    &-icon {
+      transition: none;
+    }
   }
 }
 
