@@ -406,7 +406,7 @@ async function sendForm(event: Event) {
     location,
     radius,
     buyOrRent,
-    propertyTypes: selectedPropertyTypes,
+    propertyTypes: removeObjectEmptyArrays(unref(selectedPropertyTypes)),
     priceRange: selectedPriceRange.value,
     bedrooms: bedroomRange.value,
     bathrooms: bathroomRange.value,
