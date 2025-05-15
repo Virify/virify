@@ -1,4 +1,4 @@
-export type PropertyTypeWithClassifications = {
+export type PropertyTypeWIthClassifications = {
   id: number
   name: string
   defaultSelected: boolean
@@ -6,11 +6,4 @@ export type PropertyTypeWithClassifications = {
     id: number
     name: string
   }[]
-}
-
-export type PropertyTypeWithOptions = {
-  id: number
-  name: string
-  defaultSelected: boolean
-  options: string[]
 }
