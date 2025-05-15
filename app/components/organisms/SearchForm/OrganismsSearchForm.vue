@@ -187,7 +187,7 @@
 <script setup lang="ts">
 import { onClickOutside, watchDebounced, useMediaQuery } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
-import type { PropertyTypeWIthClassifications } from "~~/shared/types/property-type";
+import type { PropertyTypeWithClassifications } from "~~/shared/types/property-type";
 import type { SearchParams } from "~~/shared/types/search";
 
 /**
@@ -298,7 +298,7 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyTypeWIthClassifications[]>("/api/property-type/all");
+const propertyTypes = await $fetch<PropertyTypeWithClassifications[]>("/api/property-type/all");
 // Add selected property to each property type
 let specificPropertyTypes = ref(propertyTypes.map(pt => ({ ...pt, selected: false })));
 let propertyClassifications = ref<{ id: number; name: string; selected: boolean; propertyTypeId: number; propertyTypeName: string }[]>([]);

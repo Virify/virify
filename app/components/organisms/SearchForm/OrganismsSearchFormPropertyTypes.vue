@@ -54,9 +54,9 @@
 </template>
 
 <script setup lang="ts">
-import type { PropertyTypeWIthClassifications } from "~~/shared/types/property-type";
+import type { PropertyTypeWithClassifications } from "~~/shared/types/property-type";
 
-type PropertyTypeWithSelected = PropertyTypeWIthClassifications & { selected: boolean };
+type PropertyTypeWithSelected = PropertyTypeWithClassifications & { selected: boolean };
 type PropertyClassification = {
   id: number;
   name: string;
@@ -66,7 +66,7 @@ type PropertyClassification = {
 };
 
 const props = defineProps<{
-  propertyTypes: PropertyTypeWIthClassifications[];
+  propertyTypes: PropertyTypeWithClassifications[];
   modelValue?: PropertyTypeWithSelected[];
   propertyClassificationsValue?: PropertyClassification[];
 }>();
