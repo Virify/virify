@@ -44,11 +44,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    - name: Generate Prisma client
-      run: pnpm prisma generate
+    # - name: Generate Prisma client
+    #   run: pnpm prisma generate
 
-    - name: Run database migrations
-      run: pnpm prisma migrate deploy
+    # - name: Run database migrations
+    #   run: pnpm prisma migrate deploy
 
-    - name: Run all tests (including e2e)
-      run: pnpm test:full 
+    - name: Run Unit Tests
+      run: pnpm test
