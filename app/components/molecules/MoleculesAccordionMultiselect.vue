@@ -9,7 +9,7 @@
     <Transition>
       <ul v-show="expandOptions" class="m-accordion-multiselect-list">
         <li v-for="{ key, value } of validatedOptions">
-          <label>
+          <label class="m-accordion-multiselect-checkbox">
             <input type="checkbox" :value="key" v-model="selected" />
 
             {{ value }}
@@ -87,6 +87,27 @@ watch(selected, (newValue) => {
  */
 const emits = defineEmits(['expanded'])
 </script>
+
+<style>
+.m-accordion-multiselect-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: var(--size-8);
+}
+
+.m-accordion-multiselect-checkbox {
+  display: block;
+  white-space: nowrap;
+  padding: var(--size-2) var(--size-10);
+  border: 1px solid var(--monochrome-400);
+  border-radius: var(--border-radius-ui);
+}
+</style>
 
 <style scoped>
 .v-enter-active,
