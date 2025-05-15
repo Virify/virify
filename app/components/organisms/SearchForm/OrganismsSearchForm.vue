@@ -189,7 +189,7 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside, watchDebounced, useMediaQuery } from "@vueuse/core";
+import { onClickOutside, watchDebounced, watchImmediate, useMediaQuery } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
 import type { PropertyTypeWithClassifications } from "~~/shared/types/property-type";
 import type { SearchParams } from "~~/shared/types/search";
@@ -246,10 +246,10 @@ const suggestions = ref("");
 const bedroomRange = ref<[number, number]>([0, 0]);
 const bathroomRange = ref<[number, number]>([0, 0]);
 const initialRadius = ref(radiusOptions?.[0]?.value);
-const initialDate = computed(() => dateOptions?.[0]?.value);
+const initialDate = ref(dateOptions?.[0]?.value);
 const buyOrRent = ref("buy");
 const includeOptions = ref<{ value: string; key: string }[]>([]);
-const initialInclude = computed(() => includeOptions.value?.[0]?.value);
+const initialInclude = ref(includeOptions.value?.[0]?.value);
 const searchParams = useState<SearchParams>("searchParams");
 
 // Show/hide form if appropriate
@@ -352,17 +352,15 @@ const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value
  *  Watchers
  */
 
-watch(
-  buyOrRent,
-  () => {
-    if (buyOrRent.value === "rent") {
-      includeOptions.value = rentAvailabilityOptions;
-    } else if (buyOrRent.value === "buy") {
-      includeOptions.value = saleAvailabilityOptions;
-    }
-  },
-  { immediate: true }
-);
+watchImmediate(buyOrRent, () => {
+  if (buyOrRent.value === "rent") {
+    includeOptions.value = rentAvailabilityOptions;
+    initialInclude.value = rentAvailabilityOptions[0].value;
+  } else if (buyOrRent.value === "buy") {
+    includeOptions.value = saleAvailabilityOptions;
+    initialInclude.value = rentAvailabilityOptions[0].value;
+  }
+});
 
 /**
  *  Pending states
