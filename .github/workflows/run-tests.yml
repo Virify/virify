@@ -44,8 +44,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
+    - name: Generate Prisma client
+      run: pnpm prisma generate
+
     - name: Run database migrations
-      run: pnpm prisma migrate reset --force --skip-seed
+      run: pnpm prisma migrate deploy
 
     - name: Run all tests (including e2e)
       run: pnpm test:full 
