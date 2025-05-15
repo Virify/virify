@@ -1,5 +1,3 @@
-import type { PropertyType } from "@prisma/client";
-
 /**
  * Get All Property Types
  * @param event
@@ -8,8 +6,14 @@ import type { PropertyType } from "@prisma/client";
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const propertyTypes: PropertyType[] = await getPropertyTypes();
-    return propertyTypes;
+    const propertyTypes = await getPropertyTypes()
+
+    return propertyTypes.map((({ classifications = [], ...type }) => {
+      return {
+        ...type,
+        options: classifications.map(({ name }) => name)
+      }
+    }))
   } catch (error) {
     errorResponse(error, event);
   }
