@@ -120,8 +120,11 @@
 
           <!-- property types -->
           <animate-in :delay="150">
-            <OrganismsSearchFormPropertyTypes :property-types="propertyTypes" v-model="specificPropertyTypes"
-              v-model:property-classifications-value="propertyClassifications" />
+            <OrganismsSearchFormTitleBlock title="Property type">
+              <MoleculesAccordionMultiselect v-for="{ name, options } of propertyTypes" :title="name" :options
+
+              <pre>{{ selectedPropertyTypes }}</pre>
+            </OrganismsSearchFormTitleBlock>
           </animate-in>
 
           <!-- Date Added and Include Options -->
@@ -299,16 +302,7 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
  *  Property type
  */
 const propertyTypes = await $fetch<PropertyTypeWithClassifications[]>("/api/property-type/all");
-// Add selected property to each property type
-let specificPropertyTypes = ref(propertyTypes.map(pt => ({ ...pt, selected: false })));
-let propertyClassifications = ref<{ id: number; name: string; selected: boolean; propertyTypeId: number; propertyTypeName: string }[]>([]);
-const allDefaultsSelected = ref(true);
-
-// We're using v-model for property types and classifications
-watch(specificPropertyTypes, () => {
-  const allSelected = specificPropertyTypes.value.every((pt) => pt.selected);
-  allDefaultsSelected.value = allSelected;
-});
+const selectedPropertyTypes = reactive({})
 
 /**
  * Auto Complete
@@ -406,25 +400,6 @@ async function sendForm(event: Event) {
     return;
   }
 
-
-  // Extract property type IDs - no need to send names
-  const selectedPropertyTypeIds = specificPropertyTypes.value
-    .filter((pt) => pt.selected)
-    .map((pt) => pt.id);
-
-  // Extract selected classifications
-  const selectedClassifications = propertyClassifications.value && propertyClassifications.value.length > 0
-    ? propertyClassifications.value
-      .filter((c) => c.selected)
-      .map((c) => ({
-        id: c.id,
-        name: c.name,
-        propertyTypeId: c.propertyTypeId,
-        propertyTypeName: c.propertyTypeName,
-        selected: true
-      }))
-    : [];
-
   /**
    * Save search params to state
    */
@@ -432,8 +407,7 @@ async function sendForm(event: Event) {
     location,
     radius,
     buyOrRent,
-    propertyTypeIds: selectedPropertyTypeIds.length > 0 ? selectedPropertyTypeIds : undefined,
-    propertyClassifications: selectedClassifications.length > 0 ? selectedClassifications : undefined,
+    propertyClassifications: selectedPropertyTypes,
     priceRange: selectedPriceRange.value,
     bedrooms: bedroomRange.value,
     bathrooms: bathroomRange.value,
