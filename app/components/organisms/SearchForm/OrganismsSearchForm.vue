@@ -1,7 +1,7 @@
 <template>
   <div class="o-searchform-fixed" :class="{
     'o-searchform-fixed-contracted': isContracted
-  }">
+  }" data-allow-mismatch="class">
     <Teleport to="#teleports">
       <button v-if="!popoverHidden" class="o-searchform-backdrop" aria-label="Hide search form"
         :aria-controls="popoverId" aria-expanded="true"></button>
@@ -10,7 +10,7 @@
     <form ref="$form" autocomplete="off" class="o-searchform" :class="{
       'o-searchform-expanded': !popoverHidden,
       'o-searchform-contracted': isContracted
-    }" @keydown.escape="hidePopover" @submit.prevent="sendForm">
+    }" @keydown.escape="hidePopover" @submit.prevent="sendForm" data-allow-mismatch="class">
       <Transition name="buyrent">
         <MoleculesSwitcher v-show="!isContracted" class="o-searchform-buyrent" legend="Buy or rent"
           :options="buyOrRentOptions" v-model="buyOrRent" name="buyOrRent" />
@@ -32,7 +32,7 @@
           <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
             :class="{
               '| pulse pointer-none': isContracted
-            }">
+            }" data-allow-mismatch="class">
             <AtomsIcon title="Search" icon="search" class="o-searchform-location-button-icon" />
           </AtomsButton>
         </div>
@@ -120,17 +120,8 @@
 
           <!-- property types -->
           <animate-in :delay="150">
-            <OrganismsSearchFormTitleBlock title="Property type">
-              <MoleculesScrollBox class="| focus-overflow">
-                <ul class="o-searchform-toggles">
-                  <animate-in v-for="({ id, name, defaultSelected }, index) of propertyTypes" :delay="150 + index * 30">
-                    <li :key="id">
-                      <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
-                    </li>
-                  </animate-in>
-                </ul>
-              </MoleculesScrollBox>
-            </OrganismsSearchFormTitleBlock>
+            <OrganismsSearchFormPropertyTypes :property-types="propertyTypes" v-model="specificPropertyTypes"
+              v-model:property-classifications-value="propertyClassifications" />
           </animate-in>
 
           <!-- Date Added and Include Options -->
@@ -140,7 +131,7 @@
                 <MoleculesFormField label="Recently Added" class="| focus-overflow">
                   <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                     <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                    }}</option>
+                      }}</option>
                   </AtomsSelect>
                 </MoleculesFormField>
               </OrganismsSearchFormTitleBlock>
@@ -194,10 +185,10 @@
 </template>
 
 <script setup lang="ts">
-import type { PropertyType } from "@prisma/client";
-import { onClickOutside, watchDebounced } from "@vueuse/core";
+import { onClickOutside, watchDebounced, useMediaQuery } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
-import { useMediaQuery } from '@vueuse/core'
+import type { PropertyTypeWIthClassifications } from "~~/shared/types/property-type";
+import type { SearchParams } from "~~/shared/types/search";
 
 /**
  *  a11y
@@ -207,7 +198,9 @@ const popoverId = useId()
 /**
  *  Whether to show the radius dropdown inline or below
  */
-const isTablet = useMediaQuery('(min-width: 768px)')
+const isTablet = useMediaQuery('(min-width: 768px)', {
+  ssrWidth: 1024
+})
 
 /**
  *  Determine whether to shrink the search form
@@ -235,10 +228,10 @@ const $form = useTemplateRef("$form");
 /**
  *  Popover expanded
  */
-const popoverExpanded = ref(false)
+const popoverExpanded = ref(false);
 
 function togglePopoverExpanded() {
-  popoverExpanded.value = !popoverExpanded.value
+  popoverExpanded.value = !popoverExpanded.value;
 }
 
 /**
@@ -253,7 +246,7 @@ const initialDate = computed(() => dateOptions?.[0]?.value);
 const buyOrRent = ref("buy");
 const includeOptions = ref<{ value: string; key: string }[]>([]);
 const initialInclude = computed(() => includeOptions.value?.[0]?.value);
-const searchParams = useState<Record<string, any>>("searchParams");
+const searchParams = useState<SearchParams>("searchParams");
 
 // Show/hide form if appropriate
 function togglePopoverHidden(setHidden = false) {
@@ -305,7 +298,17 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyType[]>("/api/property-type/all");
+const propertyTypes = await $fetch<PropertyTypeWIthClassifications[]>("/api/property-type/all");
+// Add selected property to each property type
+let specificPropertyTypes = ref(propertyTypes.map(pt => ({ ...pt, selected: false })));
+let propertyClassifications = ref<{ id: number; name: string; selected: boolean; propertyTypeId: number; propertyTypeName: string }[]>([]);
+const allDefaultsSelected = ref(true);
+
+// We're using v-model for property types and classifications
+watch(specificPropertyTypes, () => {
+  const allSelected = specificPropertyTypes.value.every((pt) => pt.selected);
+  allDefaultsSelected.value = allSelected;
+});
 
 /**
  * Auto Complete
@@ -369,7 +372,7 @@ watch(
 /**
  *  Pending states
  */
-const { isPending, setPendingWhile } = usePending()
+const { isPending, setPendingWhile } = usePending();
 
 /**
  *  Submit form
@@ -392,7 +395,6 @@ async function sendForm(event: Event) {
    */
   const { formData, errors } = useFormData(target);
   const formattedFeatures = formatFeatures(propertyFeatures, formData);
-  const formattedPropertyTypes = formatPropertyTypes(propertyTypes, formData);
   bedroomRange.value = normalizeRange(bedroomRange.value);
   bathroomRange.value = normalizeRange(bathroomRange.value);
   const { radius, location, buyOrRent } = extractFormData(formData, ["radius", "location", "buyOrRent"]);
@@ -404,6 +406,25 @@ async function sendForm(event: Event) {
     return;
   }
 
+
+  // Extract property type IDs - no need to send names
+  const selectedPropertyTypeIds = specificPropertyTypes.value
+    .filter((pt) => pt.selected)
+    .map((pt) => pt.id);
+
+  // Extract selected classifications
+  const selectedClassifications = propertyClassifications.value && propertyClassifications.value.length > 0
+    ? propertyClassifications.value
+      .filter((c) => c.selected)
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        propertyTypeId: c.propertyTypeId,
+        propertyTypeName: c.propertyTypeName,
+        selected: true
+      }))
+    : [];
+
   /**
    * Save search params to state
    */
@@ -411,7 +432,8 @@ async function sendForm(event: Event) {
     location,
     radius,
     buyOrRent,
-    propertyTypes: formattedPropertyTypes,
+    propertyTypeIds: selectedPropertyTypeIds.length > 0 ? selectedPropertyTypeIds : undefined,
+    propertyClassifications: selectedClassifications.length > 0 ? selectedClassifications : undefined,
     priceRange: selectedPriceRange.value,
     bedrooms: bedroomRange.value,
     bathrooms: bathroomRange.value,
@@ -426,7 +448,7 @@ async function sendForm(event: Event) {
       method: "POST",
       body: searchParams.value,
     });
-  })
+  });
 
   if (searchListings && searchResult) {
     searchListings.value = searchResult;

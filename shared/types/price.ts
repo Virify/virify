@@ -1,3 +1,5 @@
+import type { RentalPriceType, SaleListing, SalePriceType } from "@prisma/client"
+
 export type MinMaxPrice = [
   min: number,
   max: number
@@ -12,3 +14,8 @@ export type PriceFilter = {
   gte: number
   lte: number
 } | undefined
+
+export type PriceType = {
+  sale: SalePriceType
+  rental: RentalPriceType
+}

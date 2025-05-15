@@ -25,6 +25,7 @@ export function convertToValidEnum(
  * @param type Price Type enum.
  * @returns string.
  */
-export function convertEnumToString(type: string): string {
-  return type.toLowerCase().replace("_", " ");
+export function convertEnumToString(type: string | undefined): string {
+  if(!type) return "";
+  return type.toUpperCase().replace("_", " ");
 }

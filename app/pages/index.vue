@@ -1,14 +1,13 @@
 <template>
   <div ref="scrollContainer">
-    <client-only>
-      <OrganismsSearchForm />
-    </client-only>
+    <OrganismsSearchForm />
 
     <OrganismsHeroHome />
 
     <div class="p-listing-test-grid | container">
-      <MoleculesListingCard v-for="listing in typeOfListing" :key="listing.id" :property-id="listing.id"
-        :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
+      <MoleculesListingCard v-for="listing in typeOfListing" :key="listing.id" :property-id="listing.id" :listing-tier="listing.listingTier"
+      :price-type="listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency"
+        :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name" :classification="listing.property?.classification?.name"
         :address="listing.property?.address" :bedrooms="listing.property?.numberBedrooms"
         :bathrooms="listing.property?.numberBathrooms" :description="listing.title" />
     </div>
@@ -43,8 +42,20 @@ const { data: initialListings } = await useAsyncData('featured-listings', () =>
 <style>
 .p-listing-test-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--size-28);
   padding: var(--size-56);
+}
+
+@media (max-width: 1100px) {
+  .p-listing-test-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .p-listing-test-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

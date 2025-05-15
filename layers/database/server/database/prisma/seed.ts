@@ -111,7 +111,7 @@ async function seedPropertyTypes() {
     Flat: ["Converted flat", "Studio flat", "Maisonette", "High-rise", "Within a complex", "Penthouse"],
     Land: ["Residential Land", "Commercial Land", "Agricultural Land", "Development plot", "Development potential"],
     Farms: ["Non-working Farmhouse", "Working Farm", "Small Holding"],
-    Specialty: ["Shared Ownership", "Retirement Homes", "New Build Homes"],
+    Specialty: ["Shared Ownership", "Retirement Home", "New Build Home"],
     "Student Accommodation": ["Flat", "House", "House-share"],
   };
 

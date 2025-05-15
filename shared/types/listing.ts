@@ -47,7 +47,13 @@ export type ListingSearch = {
 export type ListingSearchOptional = {
   bedrooms?: number[];
   bathrooms?: number[];
-  propertyTypes?: string[];
+  propertyTypeIds?: number[];
+  propertyClassifications?: {
+    id: number;
+    name: string;
+    propertyTypeId: number;
+    propertyTypeName: string;
+  }[];
   priceRange?: number[];
   addedToSite?: Date;
   availabilityOptions?: string[];
@@ -95,6 +101,11 @@ export const listingCardFields = {
         },
       },
       type: {
+        select: {
+          name: true,
+        },
+      },
+      classification: {
         select: {
           name: true,
         },
