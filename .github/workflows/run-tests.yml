@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # used to generate the Prisma client
-      DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.MAIN_DATABASE_URL }}
       # used to bootstrap the prisma client
-      TEST_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
 
     steps:
     - uses: actions/checkout@v4
@@ -44,8 +44,8 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    # - name: Generate Prisma client
-    #   run: pnpm prisma generate
+    - name: Generate Prisma client
+      run: pnpm prisma generate
 
     # - name: Run database migrations
     #   run: pnpm prisma migrate deploy
