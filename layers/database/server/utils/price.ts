@@ -66,17 +66,13 @@ export async function getAllPrices(type: ListingType = "sales"): Promise<number[
   return prices.map((price) => price.price);
 }
 
-// Use a simple function implementation for testing environments
-// and the actual cached version for production
-export const getAllPricesCached = 
-  // Check if we're in a test environment
-  typeof defineCachedFunction === 'undefined' 
-  ? async (listingType: string) => getAllPrices(listingType === "buy" ? "sales" : "rentals")
-  : defineCachedFunction(async (listingType: string) => {
-      return await getAllPrices(listingType === "buy" ? "sales" : "rentals");
-    }, {
-      swr: true,
-      staleMaxAge: 60 * 5, // SWR cache for 5 minutes,
-      maxAge: 60 * 5, // SWR cache for 5 minutes,
-      getKey: (listingType) => listingType
-    })
+/**
+ * A version of getAllPrices that converts the listing type input format.
+ * This is now a regular function without caching.
+ * 
+ * @param listingType - "buy" or "rent"
+ * @returns {Promise<number[]>} The prices for the specified listing type
+ */
+export const getAllPricesCached = async (listingType: string): Promise<number[]> => {
+  return await getAllPrices(listingType === "buy" ? "sales" : "rentals");
+};
