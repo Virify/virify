@@ -1,16 +1,5 @@
 /**
  * End-to-end tests for the Listing utilities, focusing on the getListingByDistanceAndFilters function.
- * These tes    // Create a property for rental listing
-    testProperty = await prisma.property.create({
-      data: {
-        title: "Test Rental Property",
-        description: "A test property for rental",
-        value: 500000,
-        size: 100,
-        yearBuilt: "2020",
-        chainFree: true,
-        vacant: true,
-        constructionType: ConstructionType.STANDARD,al test database and verify the integration of property, address, user, and listing creation,
  * as well as geospatial queries and filtering logic. The test data is created and cleaned up for each run.
  */
 
@@ -56,6 +45,10 @@ let testUser: any;
 let testRentalListing: any;
 let testSaleListing: any;
 let testProperty2: any;
+let testPropertyType1: any;
+let testPropertyType2: any;
+let testClassification1: any;
+let testClassification2: any;
 
 /**
  * Main test suite for Listing E2E functionality.
@@ -63,6 +56,8 @@ let testProperty2: any;
  */
 describe("Listing E2E Tests", () => {
   sequential: true;
+  
+  // No beforeAll needed - afterAll should handle all cleanup
 
   /**
    * Creates test data for both rental and sale listings to support comprehensive testing
@@ -71,7 +66,45 @@ describe("Listing E2E Tests", () => {
    * @returns {Promise<void>}
    */
   it("should create test data for rental and sale listings", async () => {
-    // Create test user first
+    // Create property types and classifications first
+    // Generate unique names with timestamp to avoid unique constraint violations
+    const timestamp = Date.now();
+    
+    testPropertyType1 = await prisma.propertyType.create({
+      data: {
+        name: `Test Property Type 1 ${timestamp}`,
+        defaultSelected: true,
+        classifications: {
+          create: {
+            name: `Test Classification 1 ${timestamp}`
+          }
+        }
+      },
+      include: {
+        classifications: true
+      }
+    });
+    
+    testClassification1 = testPropertyType1.classifications[0];
+    
+    testPropertyType2 = await prisma.propertyType.create({
+      data: {
+        name: `Test Property Type 2 ${timestamp}`,
+        defaultSelected: true,
+        classifications: {
+          create: {
+            name: `Test Classification 2 ${timestamp}`
+          }
+        }
+      },
+      include: {
+        classifications: true
+      }
+    });
+    
+    testClassification2 = testPropertyType2.classifications[0];
+
+    // Create test user
     testUser = await prisma.user.create({
       data: {
         email: "test@example.com",
@@ -142,12 +175,12 @@ describe("Listing E2E Tests", () => {
         },
         type: {
           connect: {
-            id: 1 // Assumes a valid property type exists with id 1
+            id: testPropertyType1.id
           }
         },
         classification: {
           connect: {
-            id: 1 // Assumes a valid classification exists with id 1
+            id: testClassification1.id
           }
         },
         user: {
@@ -184,12 +217,12 @@ describe("Listing E2E Tests", () => {
         },
         type: {
           connect: {
-            id: 2 // Assumes a valid property type exists with id 2
+            id: testPropertyType2.id
           }
         },
         classification: {
           connect: {
-            id: 2 // Assumes a valid classification exists with id 2
+            id: testClassification2.id
           }
         },
         user: {
@@ -472,37 +505,65 @@ describe("Listing E2E Tests", () => {
    * @returns {Promise<void>}
    */
   afterAll(async () => {
-    // Clean up rental listing
-    if (testRentalListing?.id) {
+    try {
+      // Clean up in reverse order of creation to respect foreign key constraints
+      
+      // Clean up listings first
       await prisma.rentalListing.delete({ where: { id: testRentalListing.id } });
       await prisma.listing.delete({ where: { id: testRentalListing.id } });
-    }
-    
-    // Clean up sale listing
-    if (testSaleListing?.id) {
+      
       await prisma.saleListing.delete({ where: { id: testSaleListing.id } });
       await prisma.listing.delete({ where: { id: testSaleListing.id } });
-    }
-    
-    // Clean up properties
-    if (testProperty?.id) {
-      await prisma.property.delete({ where: { id: testProperty.id } });
-    }
-    if (testProperty2?.id) {
-      await prisma.property.delete({ where: { id: testProperty2.id } });
-    }
-    
-    // Clean up addresses
-    if (testAddress?.id) {
-      await prisma.address.delete({ where: { id: testAddress.id } });
-    }
-    if (testAddress2?.id) {
-      await prisma.address.delete({ where: { id: testAddress2.id } });
-    }
-    
-    // Clean up user
-    if (testUser?.id) {
-      await prisma.user.delete({ where: { id: testUser.id } });
+      
+      // Clean up properties - this removes the references to classifications
+      await prisma.property.deleteMany({
+        where: {
+          OR: [
+            { id: testProperty.id },
+            { id: testProperty2.id }
+          ]
+        }
+      });
+      
+      // Clean up addresses
+      await prisma.address.deleteMany({
+        where: {
+          OR: [
+            { id: testAddress.id },
+            { id: testAddress2.id }
+          ]
+        }
+      });
+      
+      // Clean up user
+      await prisma.user.delete({
+        where: { id: testUser.id }
+      });
+      
+      // First, clean up the PropertyClassifications
+      await prisma.propertyClassification.deleteMany({
+        where: {
+          OR: [
+            { id: testClassification1.id },
+            { id: testClassification2.id }
+          ]
+        }
+      });
+      
+      // Then clean up the PropertyTypes
+      await prisma.propertyType.deleteMany({
+        where: {
+          OR: [
+            { id: testPropertyType1.id },
+            { id: testPropertyType2.id }
+          ]
+        }
+      });
+      
+      console.log('Test cleanup complete');
+    } catch (error) {
+      console.error('Cleanup error:', error);
+      // Continue even if cleanup fails, but log the error
     }
   });
 }); 
