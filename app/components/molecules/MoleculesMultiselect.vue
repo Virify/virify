@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 interface Props {
-  options: { key: string, value: string }[]
+  options: { key: string, value: string }[] | string[]
 }
 
 const props = defineProps<Props>()

@@ -24,7 +24,7 @@
 interface Props {
   title: string
   hideWhenUnselected?: boolean,
-  options: { key: string, value: string }[]
+  options: { key: string, value: string }[] | string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
