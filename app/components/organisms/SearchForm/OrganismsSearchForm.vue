@@ -198,7 +198,9 @@ const popoverId = useId()
 /**
  *  Whether to show the radius dropdown inline or below
  */
-const isTablet = useMediaQuery('(min-width: 768px)')
+const isTablet = useMediaQuery('(min-width: 768px)', {
+  ssrWidth: 1024
+})
 
 /**
  *  Determine whether to shrink the search form
