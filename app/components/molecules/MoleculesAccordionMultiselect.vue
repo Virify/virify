@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  *  Model
  */
-const selected = defineModel<string[]>({ default: [] })
+const selected = defineModel<any>({ default: [] })
 const expandOptions = ref<boolean>(false)
 
 /**

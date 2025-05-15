@@ -19,8 +19,8 @@ const props = defineProps<Props>()
 /**
  *  Model
  */
-const selected = defineModel<string[]>({ default: [] })
-const isAllSelected = ref<boolean>(false)
+const selected = defineModel<any>()
+const isAllSelected = ref<any>(false)
 
 /**
  *  Validate options
@@ -39,8 +39,8 @@ function getKeys() {
 /**
  *  Select all
  */
-function selectAll(isChecked: boolean): void {
-  if (isChecked) {
+function selectAll(isChecked: any): void {
+  if (!!isChecked) {
     selected.value = getKeys()
 
     return
