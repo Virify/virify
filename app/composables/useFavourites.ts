@@ -59,7 +59,7 @@ export const useFavourites = createSharedComposable(() => {
       method: "POST",
       body: { listingId },
     });
-    await getAllFavourites()
+    await getAllFavourites();
   };
 
   /**
@@ -127,6 +127,6 @@ export const useFavourites = createSharedComposable(() => {
     isFavourite,
     removeFromFavourite,
     removeListingFromArray,
-    toggleFavourite, // <-- add this
+    toggleFavourite,
   };
 });
