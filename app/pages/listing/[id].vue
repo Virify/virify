@@ -73,9 +73,14 @@
       <!-- Map -->
       <div class="p-listing-map-container">
         <h2 class="title-md">Map</h2>
-        <div class="p-listing-map">
-          <OrganismsMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" :interactive="false" />
-        </div>
+        <OrganismsMap
+          v-if="property?.address?.lat && property?.address?.lon"
+          class="p-listing-map-inner"
+          :lat="property.address.lat"
+          :lon="property.address.lon"
+          :zoom="15"
+          :interactive="false"
+        />
       </div>
 
       <!-- Descriptions -->
@@ -471,8 +476,11 @@ const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate a
   margin-bottom: var(--size-24);
 }
 
-.p-listing-map {
-  height: 400px;
+.p-listing-map-inner {
+  min-height: 300px;
+  height: 40vh;
+  max-height: 500px;
+  width: 100%;
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   border: 1px solid var(--background-300);

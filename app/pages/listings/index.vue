@@ -9,7 +9,9 @@
     </div>
 
     <div class="mt-8">
-      <OrganismsMap :markers="filteredListings
+      <OrganismsMap
+        class="map-container"
+        :markers="filteredListings
           .map((listing) => ({
             id: listing.id,
             lat: listing.property?.address.lat ?? 0,
@@ -19,8 +21,10 @@
             bathrooms: listing.property?.numberBathrooms || 0,
             price: listing.price,
           }))
-          .filter((m) => m.lat !== 0 && m.lon !== 0)
-        " :zoom="11" :interactive="true" />
+          .filter((m) => m.lat !== 0 && m.lon !== 0)"
+        :zoom="11"
+        :interactive="true"
+      />
     </div>
     <div class="p-listing-test-grid | container">
       <MoleculesListingCard v-for="listing in listings" :key="listing.id" :property-id="listing.id"
@@ -64,6 +68,13 @@ const filteredListings = computed(() => {
   grid-template-columns: repeat(3, 1fr);
   gap: var(--size-28);
   padding: var(--size-56);
+}
+
+.map-container {
+  min-height: 400px;
+  height: 40vh;
+  width: 100%;
+  max-height: 600px;
 }
 
 @media (max-width: 1100px) {

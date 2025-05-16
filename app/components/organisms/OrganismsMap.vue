@@ -1,8 +1,9 @@
 <template>
   <div v-if="hasValidCoordinates" ref="mapContainer"
-    :class="['maptiler-map', interactive ? 'maptiler-map-interactive' : 'maptiler-map-static']"
-    style="height: 500px; width: 100%"></div>
-  <div v-else class="map-placeholder">
+    :class="['maptiler-map', interactive ? 'maptiler-map-interactive' : 'maptiler-map-static', customClass]"
+  >
+  </div>
+  <div v-else class="map-placeholder" :class="customClass">
     <div class="map-placeholder-content">
       <span>Location information not available</span>
     </div>
@@ -11,6 +12,14 @@
 
 <script setup lang="ts">
 import type { MapMarker } from '../../../shared/types/map-coordinates';
+import { defineEmits } from 'vue';
+
+const emit = defineEmits(['property-note', 'property-favourite']);
+
+const mapTiler = useMapTiler({
+  onPropertyNote: (propertyId: number) => emit('property-note', propertyId),
+  onPropertyFavourite: (propertyId: number) => emit('property-favourite', propertyId)
+});
 
 const {
   sdk,
@@ -19,7 +28,7 @@ const {
   hasValidCoordinates: checkValidCoordinates,
   addInteractiveIndicator,
   setupEventHandlers
-} = useMapTiler();
+} = mapTiler;
 
 const props = defineProps<{
   markers?: MapMarker[];
@@ -27,6 +36,7 @@ const props = defineProps<{
   lon?: number;
   zoom?: number;
   interactive?: boolean;
+  customClass?: string;
 }>();
 
 const mapContainer = ref<HTMLElement | null>(null);
@@ -72,7 +82,7 @@ onMounted(() => {
   // Add markers after the map has loaded
   map.on('load', () => {
     // Add markers to the map
-    markerElements = addMarkersToMap(map, props.markers, props.lat, props.lon);
+    markerElements = mapTiler.addMarkersToMap(map, props.markers, props.lat, props.lon);
 
     // Add interactive indicator if the map is interactive
     if (props.interactive && mapContainer.value) {
@@ -103,17 +113,20 @@ onBeforeUnmount(() => {
 });
 
 // Watch for changes in props that require map updates
-watch(() => props.markers, () => {
-  if (!map) return;
-
-  // Remove existing markers
-  if (markerElements.length) {
-    markerElements.forEach(marker => marker.remove());
-  }
-
-  // Add new markers
-  markerElements = addMarkersToMap(map, props.markers, props.lat, props.lon);
-}, { deep: true });
+watch(
+  () => props.markers,
+  () => {
+    if (!map) return;
+    // Remove existing markers
+    if (markerElements.length) {
+      markerElements.forEach(marker => marker.remove());
+      markerElements = [];
+    }
+    // Add new markers
+    markerElements = mapTiler.addMarkersToMap(map, props.markers ? [...props.markers] : [], props.lat, props.lon);
+  },
+  { deep: true, immediate: true }
+);
 
 // Watch for changes in lat/lon
 watch(() => [props.lat, props.lon], () => {
@@ -156,44 +169,195 @@ watch(() => [props.lat, props.lon], () => {
   background: transparent;
   z-index: 999;
   /* Higher z-index to be above all map controls */
-  pointer-events: auto;
-  /* Capture all events to prevent map interaction */
+  pointer-events: none;
+  /* Allow pointer events to pass through static map overlay */
 }
 
 .marker-popup {
-  padding: 8px;
-  max-width: 200px;
+  padding: 0;
+  max-width: 325px !important; /* Adjusted width */
+  font-family: var(--font-family, system-ui, sans-serif);
+  border-radius: var(--border-radius-md, 8px);
+  overflow: hidden;
+  width: 325px !important; /* Force the width */
+  background-color: var(--background-100);
+  color: var(--text-primary);
 }
 
-.marker-popup strong {
-  font-size: 14px;
+.marker-popup-image-container {
+  width: 100%;
+  height: 200px; /* Increased from 160px to be proportional with the wider popup */
+  overflow: hidden;
+  position: relative;
+}
+
+.marker-popup-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.marker-popup-image:hover {
+  transform: scale(1.05);
+}
+
+.marker-popup-title {
+  font-size: 16px;
+  font-weight: 600;
   display: block;
   margin-bottom: 6px;
-  color: var(--color-text-primary, #000);
+  color: var(--text-primary);
+  padding: 12px 12px 0;
 }
 
-.marker-popup div {
+.marker-popup-address {
   font-size: 12px;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 0 12px;
+}
+
+.marker-popup-info-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  margin: 10px 0;
+  gap: 15px;
+}
+
+.marker-popup-price-column {
+  flex: 1;
+}
+
+.marker-popup-details-column {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.marker-popup-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--secondary-500);
+  margin-bottom: 2px;
+}
+
+.marker-popup-price-type {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.marker-popup-property-type {
+  font-size: 13px;
   margin-bottom: 4px;
-  color: var(--color-text-secondary, #333);
+  color: var(--text-primary);
 }
 
-.marker-popup a {
+.marker-popup-features {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+.marker-popup-actions {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0 12px 12px;
+}
+
+.marker-popup-view-link {
   display: block;
-  margin-top: 8px;
-  padding: 4px 8px;
-  background-color: var(--color-primary, #0066cc);
-  color: var(--color-text-on-primary, white);
+  padding: 8px 12px;
+  background-color: var(--secondary-500);
+  color: white;
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm, 4px);
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  flex-grow: 1;
 }
 
-.marker-popup a:hover {
-  background-color: var(--color-primary-dark, #0055aa);
+.marker-popup-view-link:hover {
+  background-color: var(--secondary-600);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
+}
+
+.marker-popup-notes-button,
+.marker-popup-favorite-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--background-200);
+  border: none;
+  border-radius: var(--border-radius-sm, 4px);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.marker-popup-notes-button:hover,
+.marker-popup-favorite-button:hover {
+  background-color: var(--background-300);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
+}
+
+/* Selected state for favorites button */
+.marker-popup-favorite-button.selected {
+  background-color: var(--pink-100);
+}
+
+.marker-popup-favorite-button.selected svg {
+  fill: var(--pink-500);
+  color: var(--pink-500);
+}
+
+.marker-popup-button-icon,
+.note-button-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+}
+
+/* Note button styles */
+.note-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Has note styling */
+.marker-popup-notes-button.has-note {
+  background-color: var(--background-200);
+}
+
+.marker-popup-notes-button.has-note svg {
+  color: var(--secondary-600);
+}
+
+/* Has note animation (same as original component) */
+.marker-popup-notes-button.has-note .note-button-confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.marker-popup-notes-button-container,
+.marker-popup-favorite-button-container {
+  position: relative;
 }
 
 /* Show controls for interactive maps, hide for non-interactive */
@@ -241,23 +405,60 @@ watch(() => [props.lat, props.lon], () => {
 
 /* Price marker styling */
 .price-marker {
-  background-color: var(--color-primary, #0066cc);
-  color: var(--color-text-on-primary, white);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  background-color: var(--secondary-500);
+  color: white;
   font-weight: bold;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  min-width: 50px;
+  text-align: center;
+  border-radius: var(--border-radius-sm, 4px);
   white-space: nowrap;
+  font-size: 12px;
+  box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
   display: flex;
   justify-content: center;
-  text-align: center;
+}
+
+/* Marker content layout */
+.price-marker-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.price-marker-price {
+  display: inline-block;
+}
+
+/* Status indicators */
+.marker-status-container {
+  display: flex;
+  gap: 2px;
+}
+
+.marker-favorite-indicator,
+.marker-note-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.marker-favorite-indicator,
+.marker-note-indicator {
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
 }
 
 /* Cluster styling */
 .map-cluster {
   color: white;
-  background: var(--color-primary, #0066cc);
+  background: var(--primary-500);
   border-radius: 50%;
   padding: 10px;
   width: 40px;
@@ -266,46 +467,49 @@ watch(() => [props.lat, props.lon], () => {
   justify-content: center;
   align-items: center;
   font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 5px var(--shadow-subtle, rgba(0, 0, 0, 0.3));
 }
 
-/* Style popups */
+/* Style MapTiler popups */
 .maplibregl-popup-content {
-  padding: 12px;
-  border-radius: 6px;
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.2);
-  background-color: var(--color-background, white);
-  color: var(--color-text-primary, #000);
+  padding: 0 !important; /* Changed from 12px to remove extra padding */
+  border-radius: var(--border-radius-lg, 10px);
+  box-shadow: 0 4px 20px var(--shadow-medium, rgba(0, 0, 0, 0.15));
+  background-color: var(--background-100);
+  color: var(--text-primary);
+  max-width: 325px !important; /* Adjusted width */
+  width: auto !important; /* Ensure the width adapts to content up to max-width */
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.05));
 }
 
 .custom-popup .maplibregl-popup-content {
-  border-top: 3px solid var(--color-primary, #0066cc);
+  border-top: 3px solid var(--secondary-500);
 }
 
 .maplibregl-popup-tip {
-  border-top-color: var(--color-background, white) !important;
+  border-top-color: var(--background-100) !important;
 }
 
 .maplibregl-popup {
   z-index: 100;
   /* Ensure popups appear above other elements */
+  max-width: 325px !important; /* Adjusted width */
 }
 
 /* Map placeholder when coordinates are not available */
 .map-placeholder {
-  height: 350px;
   width: 100%;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  background-color: var(--background-200);
+  border-radius: var(--border-radius-md, 8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px var(--shadow-subtle, rgba(0, 0, 0, 0.1));
 }
 
 .map-placeholder-content {
   text-align: center;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -314,8 +518,8 @@ watch(() => [props.lat, props.lon], () => {
   position: absolute;
   bottom: 10px;
   left: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: #ffffff;
+  background-color: var(--overlay-dark, rgba(0, 0, 0, 0.7));
+  color: var(--text-on-dark);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;

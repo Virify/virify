@@ -1,4 +1,4 @@
-import { ViewsDialogLogin } from "#components";
+import { ViewsDialogLogin, ViewsDialogNotes } from "#components";
 import { createSharedComposable } from "@vueuse/core";
 import type { NoteData } from "~~/shared/types/note";
 
@@ -140,11 +140,28 @@ export const useNotes = createSharedComposable(() => {
     }
   });
 
+  /**
+   * Show note dialog for a specific property
+   *
+   * @param propertyId - ID of the property
+   */
+  const showNoteDialog = (propertyId: number) => {
+    if (!loggedIn.value) {
+      showDialog({ component: ViewsDialogLogin });
+      return;
+    }
+    showDialog({
+      component: ViewsDialogNotes,
+      props: { propertyId },
+    });
+  };
+
   return {
     getNote,
     updateNote,
     deleteNote,
     hasNote,
     getAllNotes,
+    showNoteDialog,
   };
 });

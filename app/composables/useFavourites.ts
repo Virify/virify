@@ -108,11 +108,25 @@ export const useFavourites = createSharedComposable(() => {
     }
   });
 
+  // Add a toggleFavourite method to useFavourites composable
+  const toggleFavourite = async (listingId: number) => {
+    if (!loggedIn.value) {
+      showDialog({ component: ViewsDialogLogin });
+      return;
+    }
+    if (isFavourite(listingId)) {
+      await removeFromFavourite(listingId);
+    } else {
+      await addToFavourite(listingId);
+    }
+  };
+
   return {
     addToFavourite,
     getAllFavourites,
     isFavourite,
     removeFromFavourite,
     removeListingFromArray,
+    toggleFavourite, // <-- add this
   };
 });
