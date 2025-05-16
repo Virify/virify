@@ -221,7 +221,7 @@ const iconOptions = computed(() => {
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '#styles/_utils/functions' as fn;
 @use '#styles/_utils/media' as mq;
 
