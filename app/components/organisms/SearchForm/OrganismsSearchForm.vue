@@ -121,16 +121,18 @@
           <!-- property types -->
           <animate-in :delay="150">
             <OrganismsSearchFormTitleBlock title="Property type">
-              <MoleculesAccordionMultiselect v-for="{ id, name, options } of propertyTypes" :title="name" :options
-                v-model="selectedPropertyTypes[id]" />
+              <div role="presentation" class="| flow flow-xs">
+                <MoleculesAccordionMultiselect v-for="{ id, name, options } of propertyTypes" :title="name" :options
+                  v-model="selectedPropertyTypes[id]" />
+              </div>
             </OrganismsSearchFormTitleBlock>
           </animate-in>
 
           <!-- Date Added and Include Options -->
           <OrganismsSearchFormGrid v-show="popoverExpanded" class="o-searchform-animation">
             <animate-in :delay="0">
-              <OrganismsSearchFormTitleBlock title="Added to site">
-                <MoleculesFormField label="Recently Added" class="| focus-overflow">
+              <OrganismsSearchFormTitleBlock>
+                <MoleculesFormField label="Added to site" class="| focus-overflow">
                   <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                     <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
                       }}</option>
@@ -140,8 +142,8 @@
             </animate-in>
 
             <animate-in :delay="25">
-              <OrganismsSearchFormTitleBlock title="Include">
-                <MoleculesFormField label="Show" class="| focus-overflow">
+              <OrganismsSearchFormTitleBlock>
+                <MoleculesFormField label="Property availability" class="| focus-overflow">
                   <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
                     <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
                       :key="value" :value>{{ key
