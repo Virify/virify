@@ -476,7 +476,6 @@ async function sendForm(event: Event) {
   --searchform-popover-expanded: 32rem;
   --searchform-maxwidth: calc(100vw - var(--size-24));
   --popover-radius: var(--size-40);
-  --popover-gap: var(--size-12);
   --popover-padding: var(--size-20);
   --popover-offset: var(--size-20);
 
@@ -549,18 +548,12 @@ async function sendForm(event: Event) {
     --searchform-maxwidth: calc(100vw - var(--size-48));
     --searchform-width: 20rem;
     --popover-padding: var(--size-28);
-    --popover-gap: var(--size-16);
   }
 
   @include mq.tablet {
     --searchform-width: 24rem;
     --searchform-popover-expanded: 48rem;
-    --popover-gap: var(--size-20);
     --popover-padding: var(--size-32);
-  }
-
-  @include mq.desktop {
-    --popover-gap: var(--size-24);
   }
 }
 

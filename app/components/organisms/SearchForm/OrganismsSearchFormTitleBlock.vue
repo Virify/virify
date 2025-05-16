@@ -36,7 +36,7 @@ withDefaults(defineProps<Props>(), {
 .o-searchform-title-block {
 
   &-backgorund {
-    padding: var(--popover-gap);
+    padding: var(--popover-padding);
     background: var(--background-100);
     border-radius: var(--border-radius-lg);
 
