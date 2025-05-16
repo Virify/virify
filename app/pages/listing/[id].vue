@@ -74,7 +74,7 @@
       <div class="p-listing-map-container">
         <h2 class="title-md">Map</h2>
         <div class="p-listing-map">
-          <OrganismsMapsLeafletMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" />
+          <OrganismsMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat" :lon="property.address.lon" :zoom="15" :interactive="false" />
         </div>
       </div>
 

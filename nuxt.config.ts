@@ -10,10 +10,10 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxtjs/leaflet", "@nuxt/image", "@nuxt/icon"],
+  modules: ["@nuxt/image", "@nuxt/icon"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  css: ["~/assets/css/main.css", "leaflet/dist/leaflet.css"],
+  css: ["~/assets/css/main.css", "@maptiler/sdk/dist/maptiler-sdk.css"],
   vite: {
     plugins: [tailwindcss()],
   },
@@ -30,6 +30,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
+      MAPTILER_API_KEY: process.env.MAPTILER_API_KEY,
+      MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
     },
   },
 });

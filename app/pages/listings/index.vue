@@ -8,7 +8,7 @@
     </div>
 
     <div class="mt-8">
-      <OrganismsMapsLeafletMap
+      <OrganismsMap
         :markers="
           filteredListings
             .map((listing) => ({
@@ -23,6 +23,7 @@
             .filter((m) => m.lat !== 0 && m.lon !== 0)
         "
         :zoom="11"
+        :interactive="true"
       />
     </div>
 
@@ -75,7 +76,6 @@
 </template>
 
 <script setup lang="ts">
-
 const tabs = ["All", "Rental", "Sale"];
 const activeTab = ref("All");
 
