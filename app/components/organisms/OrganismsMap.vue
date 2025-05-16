@@ -1,7 +1,6 @@
 <template>
   <div v-if="hasValidCoordinates" ref="mapContainer"
-    :class="['maptiler-map', interactive ? 'maptiler-map-interactive' : 'maptiler-map-static', customClass]"
-  >
+    :class="['maptiler-map', interactive ? 'maptiler-map-interactive' : 'maptiler-map-static', customClass]">
   </div>
   <div v-else class="map-placeholder" :class="customClass">
     <div class="map-placeholder-content">
@@ -56,6 +55,13 @@ const handleResize = () => {
   }
 };
 
+// Watch for zoom changes and update the map
+watch(() => props.zoom, (newZoom) => {
+  if (map && newZoom !== undefined) {
+    map.setZoom(newZoom);
+  }
+});
+
 onMounted(() => {
   if (!mapContainer.value || !hasValidCoordinates.value) return;
 
@@ -68,8 +74,8 @@ onMounted(() => {
   // Create map instance
   map = initializeMap(
     mapContainer.value,
-    { 
-      interactive: !!props.interactive, 
+    {
+      interactive: !!props.interactive,
       zoom: props.zoom
     },
     props.markers,
@@ -175,18 +181,21 @@ watch(() => [props.lat, props.lon], () => {
 
 .marker-popup {
   padding: 0;
-  max-width: 325px !important; /* Adjusted width */
+  max-width: 325px !important;
+  /* Adjusted width */
   font-family: var(--font-family, system-ui, sans-serif);
   border-radius: var(--border-radius-md, 8px);
   overflow: hidden;
-  width: 325px !important; /* Force the width */
+  width: 325px !important;
+  /* Force the width */
   background-color: var(--background-100);
   color: var(--text-primary);
 }
 
 .marker-popup-image-container {
   width: 100%;
-  height: 200px; /* Increased from 160px to be proportional with the wider popup */
+  height: 200px;
+  /* Increased from 160px to be proportional with the wider popup */
   overflow: hidden;
   position: relative;
 }
@@ -472,13 +481,16 @@ watch(() => [props.lat, props.lon], () => {
 
 /* Style MapTiler popups */
 .maplibregl-popup-content {
-  padding: 0 !important; /* Changed from 12px to remove extra padding */
+  padding: 0 !important;
+  /* Changed from 12px to remove extra padding */
   border-radius: var(--border-radius-lg, 10px);
   box-shadow: 0 4px 20px var(--shadow-medium, rgba(0, 0, 0, 0.15));
   background-color: var(--background-100);
   color: var(--text-primary);
-  max-width: 325px !important; /* Adjusted width */
-  width: auto !important; /* Ensure the width adapts to content up to max-width */
+  max-width: 325px !important;
+  /* Adjusted width */
+  width: auto !important;
+  /* Ensure the width adapts to content up to max-width */
   border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.05));
 }
 
@@ -493,7 +505,8 @@ watch(() => [props.lat, props.lon], () => {
 .maplibregl-popup {
   z-index: 100;
   /* Ensure popups appear above other elements */
-  max-width: 325px !important; /* Adjusted width */
+  max-width: 325px !important;
+  /* Adjusted width */
 }
 
 /* Map placeholder when coordinates are not available */
