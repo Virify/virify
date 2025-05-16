@@ -7,7 +7,7 @@
   >
     <OrganismsSearchForm />
     <OrganismsHeroHome v-if="currentView === 'list'" />
-    <div :class="['view-toggle-container', 'container', { 'no-bottom-margin': isMapView }]">
+    <div :class="['view-toggle-container', 'container', { 'no-bottom-margin': isMapView }]" v-if="searchListings">
       <MoleculesTabs 
         :options="viewOptions" 
         @update:content="handleViewChange"
@@ -15,7 +15,7 @@
       >
         <div v-show="content === 'list'" class="p-listing-test-grid | container">
           <MoleculesListingCard 
-            v-for="listing in typeOfListing" 
+            v-for="listing in searchListings" 
             :key="listing.id" 
             :property-id="listing.id" 
             :listing-tier="listing.listingTier"
@@ -44,7 +44,7 @@
           </div>
           <div class="dual-view-listings">
             <MoleculesListingCardHorizontal 
-              v-for="listing in typeOfListing" 
+              v-for="listing in searchListings" 
               :key="listing.id" 
               :property-id="listing.id" 
               :listing-tier="listing.listingTier"
@@ -66,7 +66,6 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogNotes, ViewsDialogLogin } from '#components';
 /**
  * State
  */
@@ -126,7 +125,7 @@ function handleMapFavourite(propertyId: number) {
 // Reactive computed property so markers update when notes or favorites change
 const getMapMarkers = computed(() => {
   // Always return a new array reference for reactivity
-  return [...typeOfListing.value
+  return [...searchListings.value
     ?.map((listing) => ({
       id: listing.id,
       lat: listing.property?.address.lat ?? 0,
@@ -155,17 +154,6 @@ watch(searchParams, () => {
     console.log("searchParams", searchParams.value);
   }
 })
-
-const typeOfListing = computed(() => {
-  return searchListings.value ?? initialListings.value;
-});
-
-/**
- * Fetch initial listings
- */
-const { data: initialListings } = await useAsyncData('featured-listings', () =>
-  $fetch<ListingCardType[]>('/api/listings/featured')
-);
 </script>
 
 <style>
