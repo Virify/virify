@@ -9,7 +9,9 @@ interface Config extends Record<string, unknown> {
   paddingX?: number
   paddingY?: number
   emptyFillColour?: string
+  emptyFillFadedColour?: string
   fillColour?: string
+  fillFadedColour?: string
   pixelDensity?: number
 }
 
@@ -24,17 +26,19 @@ interface DrawCanvas {
   max: number
 }
 
-interface DrawCanvasConfig {
-  width: number
-  height: number
-  colour: string
-  startY: number
-  computedData: ChartNode[]
-}
-
-interface DrawCanvasClip {
+interface DrawActiveArea {
   min: number
   max: number
+}
+
+interface DrawCanvasConfig {
+  activeArea: DrawActiveArea
+  width: number
+  height: number
+  fillColour: string
+  fillFadedColour: string
+  startY: number
+  computedData: ChartNode[]
 }
 
 type Canvas = HTMLCanvasElement
@@ -60,8 +64,8 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
     height: 80,
     paddingX: 0,
     paddingY: 0,
-    emptyFillColour: '#ccc',
-    fillColour: '#fcc',
+    emptyRGB: '0, 0, 0',
+    filledRGB: '255, 0, 0',
     pixelDensity: 2,
     ...userConfig
   }
@@ -72,10 +76,16 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
     height,
     paddingX,
     paddingY,
-    emptyFillColour,
-    fillColour,
+    emptyRGB,
+    filledRGB,
     pixelDensity
   } = config
+
+  // Compile colours
+  const emptyFillColour = `rgba(${emptyRGB}, 0.075)`;
+  const emptyFillFadedColour = `rgba(${emptyRGB}, 0)`;
+  const fillColour = `rgba(${filledRGB}, 1)`;
+  const fillFadedColour = `rgba(${filledRGB}, 1)`;
 
   /**
    *  Closure function to clean the canvas
@@ -135,26 +145,25 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
   /**
    *  Function draw
    */
-  function drawChartColour(context: CanvasRenderingContext2D, config: DrawCanvasConfig, clip?: DrawCanvasClip) {
-    const { width, height, colour, startY, computedData } = config
+  function drawChartColour(context: CanvasRenderingContext2D, config: DrawCanvasConfig, isActive?: boolean) {
+    const { activeArea, width, height, fillColour, fillFadedColour, startY, computedData } = config
 
     // Get nodes
     const { nodes, getNode } = createGetNodes(computedData, startY)
 
-    // Start a path
-    context.lineJoin = 'round'
-    context.fillStyle = colour
+    // Create clip area
+    const activeX = activeArea.min
+    const activeWidth = activeArea.max - activeArea.min
 
-    // Start line
+    // Start new path
     context.beginPath()
 
-    // Create clip, if provided
-    if (clip) {
-      const clipX = clip.min
-      const clipWidth = clip.max - clip.min
+    // Set correct clip states
+    if (isActive) {
+      context.clearRect(activeX, 0, activeWidth, height);
 
       // Create clip
-      context.rect(clipX, 0, clipWidth, height)
+      context.rect(activeX, 0, activeWidth, height)
       context.clip()
 
       // Start line
@@ -177,8 +186,16 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
       context.quadraticCurveTo(currentOffset, currentHeight, nextOffset, nextHeight)
     }
 
+    // Create gradient
+    const gradient = context.createLinearGradient(0, 0, 0, height)
+
+    gradient.addColorStop(0, fillColour);
+    gradient.addColorStop(1, fillFadedColour);
+
+    context.fillStyle = gradient
+
+    // Stroke and fill 
     context.lineTo(width - paddingX, startY)
-    context.closePath()
     context.fill()
   }
 
@@ -214,7 +231,7 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
       }
     })
 
-    const clip = {
+    const activeArea = {
       min: getPercentAsCoord(chartWidth, min),
       max: getPercentAsCoord(chartWidth, max)
     }
@@ -224,7 +241,9 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
 
     // Create config for drawing charts
     const config: DrawCanvasConfig = {
-      colour: emptyFillColour,
+      activeArea,
+      fillColour: emptyFillColour,
+      fillFadedColour: emptyFillFadedColour,
       width: chartWidth,
       height: chartHeight,
       startY: chartYStart,
@@ -235,7 +254,11 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
     drawChartColour(context, config)
 
     // Draw orange shape
-    drawChartColour(context, { ...config, colour: fillColour }, clip)
+    drawChartColour(context, {
+      ...config,
+      fillColour: fillColour,
+      fillFadedColour: fillFadedColour,
+    }, true)
   }
 
   return {

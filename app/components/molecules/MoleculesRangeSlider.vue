@@ -90,6 +90,7 @@ watch(
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-bottom: var(--size-32);
 }
 
 .m-range-slider-label-min {

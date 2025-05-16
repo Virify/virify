@@ -47,8 +47,8 @@ const $canvas = ref(null)
 onMounted(() => {
   try {
     const { drawChart } = usePriceChart($canvas.value, {
-      emptyFillColour: 'rgba(0, 0, 0, 0.05)',
-      fillColour: '#FD8E61'
+      emptyRGB: '0, 0, 0',
+      filledRGB: '253, 142, 97',
     })
 
     watch([percentages, validGraphData], ([{ min, max }, data]) => {
