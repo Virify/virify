@@ -47,7 +47,7 @@ type Canvas = HTMLCanvasElement
 /**
  *  Create a chart on a canvas
  */
-export function usePriceChart(canvas: Canvas, userConfig: Config) {
+export function usePriceChart(canvas: Canvas, userConfig: Config = {}) {
   const isCanvas = canvas instanceof HTMLCanvasElement
 
   // Validate data
@@ -65,10 +65,10 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
     height: 80,
     paddingX: 0,
     paddingY: 0,
-    emptyRGB: '0, 0, 0',
-    filledRGB: '255, 0, 0',
+    emptyRGB: '165, 165, 165',
+    filledRGB: '253, 142, 97',
     pixelDensity: 2,
-    ...userConfig
+    ...asObject(userConfig)
   }
 
   // Destructure config
@@ -83,7 +83,7 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
   } = config
 
   // Compile colours
-  const emptyFillColour = `rgba(${emptyRGB}, 0.05)`;
+  const emptyFillColour = `rgba(${emptyRGB}, 0.18)`;
   const emptyFillFadedColour = `rgba(${emptyRGB}, 0)`;
   const fillColour = `rgba(${filledRGB}, 1)`;
   const strokeColor = `rgb(${filledRGB})`;
