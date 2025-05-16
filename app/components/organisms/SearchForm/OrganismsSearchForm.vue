@@ -25,8 +25,8 @@
           <!-- Search radius (desktop) -->
           <client-only>
             <AtomsSelect aria-label="Search radius" v-if="isTablet && !popoverHidden" :options="radiusOptions"
-              v-model="initialRadius" class="o-searchform-location-radius | text-input body-sm focus-visible"
-              name="radius" />
+              v-model="initialRadius"
+              class="o-searchform-location-radius o-searchform-dropdown | text-input focus-visible" name="radius" />
           </client-only>
 
           <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
@@ -59,7 +59,7 @@
             <OrganismsSearchFormDividedRows v-if="!isTablet">
               <MoleculesFormField label="Search radius" v-slot="{ id }">
                 <AtomsSelect :id :options="radiusOptions" v-model="initialRadius"
-                  class="| text-input body-sm focus-visible" name="radius" />
+                  class="o-searchform-dropdown | text-input focus-visible" name="radius" />
               </MoleculesFormField>
             </OrganismsSearchFormDividedRows>
           </client-only>
@@ -88,7 +88,7 @@
                         <OrganismsSearchFormFlex>
                           <span aria-hidden class="| body-sm">Between</span>
                           <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions"
-                            class="| text-input body-sm focus-visible" name="min-bedrooms"
+                            class="o-searchform-dropdown | text-input focus-visible" name="min-bedrooms"
                             aria-label="Minimum bedrooms" />
                         </OrganismsSearchFormFlex>
                       </animate-in>
@@ -97,7 +97,7 @@
                         <OrganismsSearchFormFlex>
                           <span aria-hidden class="| body-sm">and</span>
                           <AtomsSelect v-model="bedroomRange[1]" :options="bedroomOptions"
-                            class="| text-input body-sm focus-visible" name="max-bedrooms"
+                            class="o-searchform-dropdown | text-input focus-visible" name="max-bedrooms"
                             aria-label="Maximum bedrooms" />
                         </OrganismsSearchFormFlex>
                       </animate-in>
@@ -112,7 +112,7 @@
                         <OrganismsSearchFormFlex>
                           <span aria-hidden class="| body-sm">Between</span>
                           <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
-                            class="| text-input body-sm focus-visible" name="min-bathrooms"
+                            class="o-searchform-dropdown | text-input focus-visible" name="min-bathrooms"
                             aria-label="Minimum bathrooms" />
                         </OrganismsSearchFormFlex>
                       </animate-in>
@@ -121,7 +121,7 @@
                         <OrganismsSearchFormFlex>
                           <span aria-hidden class="| body-sm">and</span>
                           <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
-                            class="| text-input body-sm focus-visible" name="max-bathrooms"
+                            class="o-searchform-dropdown | text-input focus-visible" name="max-bathrooms"
                             aria-label="Maximum bathrooms" />
                         </OrganismsSearchFormFlex>
                       </animate-in>
@@ -150,7 +150,8 @@
               <template #left-column>
                 <animate-in :delay="0">
                   <MoleculesFormField label="Added to site" class="| focus-overflow">
-                    <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
+                    <AtomsSelect v-model="initialDate" class="o-searchform-dropdown | text-input focus-visible"
+                      name="added-to-site">
                       <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
                       }}</option>
                     </AtomsSelect>
@@ -161,7 +162,8 @@
               <template #right-column>
                 <animate-in :delay="25">
                   <MoleculesFormField label="Property availability" class="| focus-overflow">
-                    <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
+                    <AtomsSelect class="o-searchform-dropdown | text-input focus-visible" name="include"
+                      v-model="initialInclude">
                       <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
                         :key="value" :value>{{ key
                         }}</option>
@@ -544,7 +546,7 @@ async function sendForm(event: Event) {
     }
 
     .o-searchform-location-input {
-      font-size: var(--font-md);
+      font-size: max(var(--font-md), 16px);
     }
   }
 
@@ -614,7 +616,7 @@ async function sendForm(event: Event) {
   width: 0;
   padding-inline: var(--size-12);
   text-align: left;
-  font-size: var(--font-sm);
+  font-size: max(var(--font-sm), 16px);
 }
 
 .o-searchform-location-radius {
@@ -623,6 +625,11 @@ async function sendForm(event: Event) {
   max-width: fit-content;
   flex-grow: 0;
   border-radius: var(--popover-radius);
+}
+
+.o-searchform-dropdown {
+  // Important to reduce zooming on iOS
+  font-size: max(var(--font-sm), 16px);
 }
 
 .o-searchform-location:has(.o-searchform-location-input:focus) {
