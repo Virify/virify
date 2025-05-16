@@ -121,15 +121,8 @@
           <!-- property types -->
           <animate-in :delay="150">
             <OrganismsSearchFormTitleBlock title="Property type">
-              <MoleculesScrollBox class="| focus-overflow">
-                <ul class="o-searchform-toggles">
-                  <animate-in v-for="({ id, name, defaultSelected }, index) of propertyTypes" :delay="150 + index * 30">
-                    <li :key="id">
-                      <AtomsToggleBox :label="name" :checked="defaultSelected" type="checkbox" :name />
-                    </li>
-                  </animate-in>
-                </ul>
-              </MoleculesScrollBox>
+              <MoleculesAccordionMultiselect v-for="{ id, name, options } of propertyTypes" :title="name" :options
+                v-model="selectedPropertyTypes[id]" />
             </OrganismsSearchFormTitleBlock>
           </animate-in>
 
@@ -140,7 +133,7 @@
                 <MoleculesFormField label="Recently Added" class="| focus-overflow">
                   <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
                     <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                    }}</option>
+                      }}</option>
                   </AtomsSelect>
                 </MoleculesFormField>
               </OrganismsSearchFormTitleBlock>
@@ -194,10 +187,10 @@
 </template>
 
 <script setup lang="ts">
-import type { PropertyType } from "@prisma/client";
-import { onClickOutside, watchDebounced } from "@vueuse/core";
+import { onClickOutside, watchDebounced, watchImmediate, useMediaQuery } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
-import { useMediaQuery } from '@vueuse/core'
+import type { PropertyTypeWithClassifications } from "~~/shared/types/property-type";
+import type { SearchParams } from "~~/shared/types/search";
 
 /**
  *  a11y
@@ -207,7 +200,9 @@ const popoverId = useId()
 /**
  *  Whether to show the radius dropdown inline or below
  */
-const isTablet = useMediaQuery('(min-width: 768px)')
+const isTablet = useMediaQuery('(min-width: 768px)', {
+  ssrWidth: 1024
+})
 
 /**
  *  Determine whether to shrink the search form
@@ -236,10 +231,10 @@ const $form = useTemplateRef("$form");
 /**
  *  Popover expanded
  */
-const popoverExpanded = ref(false)
+const popoverExpanded = ref(false);
 
 function togglePopoverExpanded() {
-  popoverExpanded.value = !popoverExpanded.value
+  popoverExpanded.value = !popoverExpanded.value;
 }
 
 /**
@@ -249,12 +244,12 @@ const popoverHidden = ref(true);
 const suggestions = ref("");
 const bedroomRange = ref<[number, number]>([0, 0]);
 const bathroomRange = ref<[number, number]>([0, 0]);
-const initialRadius = computed(() => radiusOptions?.[0]?.value);
-const initialDate = computed(() => dateOptions?.[0]?.value);
+const initialRadius = ref(radiusOptions?.[0]?.value);
+const initialDate = ref(dateOptions?.[0]?.value);
 const buyOrRent = ref("buy");
 const includeOptions = ref<{ value: string; key: string }[]>([]);
-const initialInclude = computed(() => includeOptions.value?.[0]?.value);
-const searchParams = useState<Record<string, any>>("searchParams");
+const initialInclude = ref(includeOptions.value?.[0]?.value);
+const searchParams = useState<SearchParams>("searchParams");
 
 // Show/hide form if appropriate
 function togglePopoverHidden(setHidden = false) {
@@ -306,7 +301,8 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyType[]>("/api/property-type/all");
+const propertyTypes = await $fetch<PropertyTypeWithClassifications[]>("/api/property-type/all");
+const selectedPropertyTypes = reactive({})
 
 /**
  * Auto Complete
@@ -355,22 +351,20 @@ const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value
  *  Watchers
  */
 
-watch(
-  buyOrRent,
-  () => {
-    if (buyOrRent.value === "rent") {
-      includeOptions.value = rentAvailabilityOptions;
-    } else if (buyOrRent.value === "buy") {
-      includeOptions.value = saleAvailabilityOptions;
-    }
-  },
-  { immediate: true }
-);
+watchImmediate(buyOrRent, () => {
+  if (buyOrRent.value === "rent") {
+    includeOptions.value = rentAvailabilityOptions;
+    initialInclude.value = rentAvailabilityOptions[0].value;
+  } else if (buyOrRent.value === "buy") {
+    includeOptions.value = saleAvailabilityOptions;
+    initialInclude.value = rentAvailabilityOptions[0].value;
+  }
+});
 
 /**
  *  Pending states
  */
-const { isPending, setPendingWhile } = usePending()
+const { isPending, setPendingWhile } = usePending();
 
 /**
  *  Submit form
@@ -393,7 +387,6 @@ async function sendForm(event: Event) {
    */
   const { formData, errors } = useFormData(target);
   const formattedFeatures = formatFeatures(propertyFeatures, formData);
-  const formattedPropertyTypes = formatPropertyTypes(propertyTypes, formData);
   bedroomRange.value = normalizeRange(bedroomRange.value);
   bathroomRange.value = normalizeRange(bathroomRange.value);
   const { radius, location, buyOrRent } = extractFormData(formData, ["radius", "location", "buyOrRent"]);
@@ -412,7 +405,7 @@ async function sendForm(event: Event) {
     location,
     radius,
     buyOrRent,
-    propertyTypes: formattedPropertyTypes,
+    propertyTypes: removeObjectEmptyArrays(unref(selectedPropertyTypes)),
     priceRange: selectedPriceRange.value,
     bedrooms: bedroomRange.value,
     bathrooms: bathroomRange.value,
@@ -427,7 +420,7 @@ async function sendForm(event: Event) {
       method: "POST",
       body: searchParams.value,
     });
-  })
+  });
 
   if (searchListings && searchResult) {
     searchListings.value = searchResult;

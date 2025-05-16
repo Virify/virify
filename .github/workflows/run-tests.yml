@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Tests
 
 on:
   push:
@@ -7,8 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
-  unit-tests:
+  all-tests:
     runs-on: ubuntu-latest
+    env:
+      # used to generate the Prisma client
+      DATABASE_URL: ${{ secrets.MAIN_DATABASE_URL }}
+      # used to bootstrap the prisma client
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
 
     steps:
     - uses: actions/checkout@v4
@@ -39,8 +44,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    - name: Generate Prisma Client
-      run: pnpm pgen
+    - name: Generate Prisma client
+      run: pnpm prisma generate
 
-    - name: Run tests
-      run: pnpm test 
+    # - name: Run database migrations
+    #   run: pnpm prisma migrate deploy
+
+    - name: Run Unit Tests
+      run: pnpm test

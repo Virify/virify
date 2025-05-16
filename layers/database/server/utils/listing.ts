@@ -103,6 +103,42 @@ export async function getListingByDistanceAndFilters(
   const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
   const listingFilter = type === "rent" ? "rentalListing" : "saleListing";
 
+  // Process the propertyTypes to create appropriate filters
+  let propertyTypeFilter = {};
+  let classificationFilter = {};
+  
+  if (propertyTypes && Object.keys(propertyTypes).length > 0) {
+    // Collect all propertyTypeIds
+    const propertyTypeIds = Object.keys(propertyTypes);
+    if (propertyTypeIds.length > 0) {
+      propertyTypeFilter = {
+        type: {
+          id: {
+            in: propertyTypeIds.map(id => parseInt(id, 10))
+          }
+        }
+      };
+      
+      // Collect all classification IDs per property type
+      const allClassificationIds: number[] = [];
+      Object.values(propertyTypes).forEach(classIds => {
+        if (classIds && classIds.length > 0) {
+          allClassificationIds.push(...classIds);
+        }
+      });
+      
+      if (allClassificationIds.length > 0) {
+        classificationFilter = {
+          classification: {
+            id: {
+              in: allClassificationIds
+            }
+          }
+        };
+      }
+    }
+  }
+
   // Fetch listings from the database
   const listings = await prisma.listing.findMany({
     where: {
@@ -122,11 +158,8 @@ export async function getListingByDistanceAndFilters(
         id: {
           in: nearbyProperties.map((p) => p.propertyId), // Use the nearby property IDs
         },
-        type: {
-          name: {
-            in: propertyTypes,
-          },
-        },
+        ...propertyTypeFilter,
+        ...classificationFilter,
         numberBedrooms: bedrooms
           ? {
               gte: bedrooms[0], // min bedroom
@@ -152,7 +185,7 @@ export async function getListingByDistanceAndFilters(
     const property = nearbyProperties.find(p => p.propertyId === listing.property?.address?.id);
     return {
       ...listing,
-      distanceMiles: property ? property.distanceMiles : 0, 
+      distanceMiles: property ? property.distanceMiles : 0,
     };
   });
 

@@ -47,7 +47,7 @@ export type ListingSearch = {
 export type ListingSearchOptional = {
   bedrooms?: number[];
   bathrooms?: number[];
-  propertyTypes?: string[];
+  propertyTypes?: Record<string, number[]>;
   priceRange?: number[];
   addedToSite?: Date;
   availabilityOptions?: string[];
