@@ -31,7 +31,8 @@
 
           <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
             :class="{
-              '| pulse pointer-none': isContracted
+              '| pointer-none': isContracted,
+              '| pulse': isContracted && !isPending,
             }" data-allow-mismatch="class">
             <AtomsIcon title="Search" icon="search" class="o-searchform-location-button-icon" />
           </AtomsButton>
@@ -554,8 +555,12 @@ async function sendForm(event: Event) {
       padding: var(--size-4);
     }
 
-    .o-searchform-location-button {
+    .o-searchform-location-button:not(.button-pending) {
       transform: scale(0.4);
+    }
+
+    .o-searchform-location-button.button-pending {
+      transform: scale(0.8);
     }
 
     .o-searchform-location-button-icon {
