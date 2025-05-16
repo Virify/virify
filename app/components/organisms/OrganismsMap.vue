@@ -11,7 +11,6 @@
 
 <script setup lang="ts">
 import type { MapMarker } from '../../../shared/types/map-coordinates';
-import { defineEmits } from 'vue';
 
 const emit = defineEmits(['property-note', 'property-favourite']);
 
