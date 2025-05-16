@@ -662,6 +662,10 @@ async function sendForm(event: Event) {
   scrollbar-width: thin;
   scrollbar-color: #{fn.faded-color(30%)} transparent;
 
+  @include mq.mobile-only {
+    background: var(--background-100);
+  }
+
   @supports (max-height: 100dvh) {
     max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
   }
@@ -750,34 +754,25 @@ async function sendForm(event: Event) {
  */
 @include mq.mobile-only {
   .o-searchform-fixed {
-    top: auto;
-    bottom: 0;
-    z-index: 4;
-  }
+    --o-searchform-fixed-offset: calc(var(--header-height) + var(--header-expanded-height));
 
-  .o-searchform {
-    display: flex;
-    flex-direction: column-reverse;
+    top: var(--header-height);
   }
 
   .o-searchform-popover {
-    top: auto;
-    bottom: calc(100% + var(--size-8));
-    max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
+    position: fixed;
+    border-radius: 0;
+    top: var(--o-searchform-fixed-offset);
+    left: 0;
+    max-width: none;
+    width: 100%;
+    height: calc(100% - var(--o-searchform-fixed-offset));
+    transform: none;
+    // max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
 
-    @supports (max-height: 100dvh) {
-      max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
-    }
-  }
-
-  .o-searchform-buyrent {
-    margin-top: var(--size-10);
-    margin-bottom: 0;
-  }
-
-  .buyrent-enter-from,
-  .buyrent-leave-to {
-    transform: translateY(2em);
+    // @supports (max-height: 100dvh) {
+    //   max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
+    // }
   }
 }
 </style>
