@@ -14,8 +14,9 @@
       </div>
       <div v-show="content === 'dual'" class="dual-view-container">
         <div class="dual-view-map">
-          <OrganismsMap ref="dualMapRef" :markers="getMapMarkers" :zoom="mapZoomLevel" :interactive="true"
-            customClass="map-sidebar" @property-note="handleMapNote" @property-favourite="handleMapFavourite" />
+          <OrganismsMap ref="dualMapRef" :markers="getMapMarkers" :zoom="mapZoomLevel" :lat="mapCenterCoordinates?.lat"
+            :lon="mapCenterCoordinates?.lon" :interactive="true" customClass="map-sidebar"
+            @property-note="handleMapNote" @property-favourite="handleMapFavourite" />
         </div>
         <div class="dual-view-listings">
           <MoleculesListingCardHorizontal v-for="listing in searchListings" :key="listing.id" :property-id="listing.id"
@@ -56,14 +57,24 @@ const viewOptions = ref([
   { label: "Map View", content: "dual" }
 ]);
 
+// Import composables
+const { isFavourite } = useFavourites();
+const { hasNote } = useNotes();
+const mapTilerFunctions = useMapTiler();
+
 // Update currentView when tab changes
 function handleViewChange(content: string) {
   currentView.value = content;
-}
 
-// Import composables for notes and favorites
-const { isFavourite } = useFavourites();
-const { hasNote } = useNotes();
+  // If switching to map view, use the useMapTiler function to handle map view changes
+  if (content === 'dual' && dualMapRef.value?.map) {
+    mapTilerFunctions.handleMapViewChange(
+      dualMapRef.value.map,
+      mapCenterCoordinates.value,
+      getMapMarkers.value
+    );
+  }
+}
 
 // Add event listeners for map marker buttons
 onMounted(() => {
@@ -71,6 +82,19 @@ onMounted(() => {
   const route = useRoute();
   if (route.query.view === 'map') {
     currentView.value = 'dual';
+
+    // If starting directly in map view, ensure we center the map after it loads
+    // Use a slightly longer timeout to ensure the map and data are fully loaded
+    setTimeout(() => {
+      if (dualMapRef.value?.map) {
+        // Use the handleMapViewChange function from the useMapTiler composable
+        mapTilerFunctions.handleMapViewChange(
+          dualMapRef.value.map,
+          mapCenterCoordinates.value,
+          getMapMarkers.value
+        );
+      }
+    }, 500);
   }
 });
 
@@ -87,59 +111,47 @@ function handleMapFavourite(propertyId: number) {
   toggleFavourite(propertyId);
 }
 
-// Function to create map markers from listings data
 // Reactive computed property so markers update when notes or favorites change
 const getMapMarkers = computed(() => {
-  // Always return a new array reference for reactivity
-  return [...searchListings.value
-    ?.map((listing) => ({
-      id: listing.id,
-      lat: listing.property?.address.lat ?? 0,
-      lon: listing.property?.address.lon ?? 0,
-      title: listing.title,
-      bedrooms: listing.property?.numberBedrooms || 0,
-      bathrooms: listing.property?.numberBathrooms || 0,
-      price: listing.price,
-      propertyType: listing.property?.type?.name,
-      classification: listing.property?.classification?.name,
-      priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency,
-      address: {
-        street: listing.property?.address?.street,
-        city: listing.property?.address?.city,
-        postcode: listing.property?.address?.postcode
-      },
-      image: listing.property?.media,
-      hasNote: hasNote(listing.id),
-      isFavorite: isFavourite(listing.id)
-    }))
-    .filter((m) => m.lat !== 0 && m.lon !== 0) || []];
+  // Use the createMapMarkersFromListings function from the useMapTiler composable
+  return mapTilerFunctions.createMapMarkersFromListings(
+    searchListings.value,
+    isFavourite,
+    hasNote
+  );
 });
 
-// Calculate zoom level based on radius
+// Get coordinates for map center from first marker - delegated to useMapTiler
+const mapCenterCoordinates = computed(() => {
+  return mapTilerFunctions.getMapCenterFromMarkers(getMapMarkers.value);
+});
+
+// Calculate zoom level based on radius - delegated to useMapTiler
 const mapZoomLevel = computed(() => {
-  if (!searchParams.value?.radius) return 14; // Default zoom if no radius is specified (higher zoom)
-
-  // Map radius values to appropriate zoom levels - higher minimum as requested
-  // Lower zoom value = more zoomed out
-  const radius = Number(searchParams.value.radius);
-
-  if (radius === 0) return 16;      // This location only - very zoomed in
-  else if (radius <= 0.25) return 15;
-  else if (radius <= 0.5) return 14;
-  else if (radius <= 1) return 13;
-  else if (radius <= 2) return 12;  // Min recommended zoom
-  else if (radius <= 5) return 12;  // Min recommended zoom
-  else if (radius <= 10) return 12; // Min recommended zoom 
-  else if (radius <= 20) return 11;
-  else return 10;                   // 40+ miles - more zoomed out, but not too far
+  return mapTilerFunctions.calculateZoomLevelFromRadius(searchParams.value?.radius);
 });
 
-watch(searchParams, () => {
-  if (searchParams.value) {
-    console.log("searchParams", searchParams.value);
-    console.log("Current map zoom level:", mapZoomLevel.value);
-  }
-})
+// Set up automatic map recentering using the useMapTiler composable
+mapTilerFunctions.setupMapAutoRecentering(
+  dualMapRef,
+  mapCenterCoordinates,
+  mapZoomLevel,
+  currentView,
+  searchParams
+);
+
+// Set up a simple watcher for logging search parameters
+watch(
+  searchParams,
+  (newSearchParams) => {
+    // Log search parameters when they change (keeping the existing logging)
+    if (newSearchParams) {
+      console.log("searchParams", newSearchParams);
+      console.log("Current map zoom level:", mapZoomLevel.value);
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <style>

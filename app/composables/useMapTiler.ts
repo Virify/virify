@@ -1,9 +1,16 @@
 import type { MapMarker } from "../../shared/types/map-coordinates";
+import type { ListingCardType } from "../../shared/types/listing";
+import type { Ref, ComputedRef } from 'vue';
 
 interface UseMapTilerOptions {
   interactive?: boolean;
   zoom?: number;
   enableClustering?: boolean;
+}
+
+interface MapCenterCoordinates {
+  lat: number;
+  lon: number;
 }
 
 // Accept callbacks for marker actions
@@ -222,6 +229,44 @@ export function useMapTiler({
   }
 
   /**
+   * Center map on specified coordinates
+   */
+  function centerMapOnCoordinates(map: any, lat?: number, lon?: number): boolean {
+    // Verify we have a valid map and coordinates
+    if (!map || typeof lat !== 'number' || typeof lon !== 'number' || !isFinite(lat) || !isFinite(lon)) {
+      return false;
+    }
+
+    // Check if coordinates are valid (non-zero)
+    if (lat === 0 && lon === 0) {
+      return false;
+    }
+
+    // Center the map
+    map.setCenter([lon, lat]);
+    return true;
+  }
+
+  /**
+   * Center map using the first marker or specified coordinates
+   */
+  function centerMapOnMarkers(map: any, markers?: MapMarker[], fallbackLat?: number, fallbackLon?: number): boolean {
+    if (!map) return false;
+
+    // Try to use first marker coordinates
+    if (markers?.length && markers[0] && typeof markers[0].lat === 'number' && typeof markers[0].lon === 'number') {
+      return centerMapOnCoordinates(map, markers[0].lat, markers[0].lon);
+    }
+    
+    // Fall back to specified coordinates
+    if (typeof fallbackLat === 'number' && typeof fallbackLon === 'number') {
+      return centerMapOnCoordinates(map, fallbackLat, fallbackLon);
+    }
+
+    return false;
+  }
+
+  /**
    * Determine map center coordinates
    */
   function getMapCenter(markers?: MapMarker[], singleLat?: number, singleLon?: number): [number, number] | undefined {
@@ -291,6 +336,129 @@ export function useMapTiler({
     };
   }
 
+  /**
+   * Create map markers from listings data
+   */
+  function createMapMarkersFromListings(
+    listings: ListingCardType[] | null, 
+    isFavouriteFn: (id: number) => boolean, 
+    hasNoteFn: (id: number) => boolean
+  ): MapMarker[] {
+    if (!listings) return [];
+    
+    return listings
+      .map((listing) => ({
+        id: listing.id,
+        lat: listing.property?.address.lat ?? 0,
+        lon: listing.property?.address.lon ?? 0,
+        title: listing.title,
+        bedrooms: listing.property?.numberBedrooms || 0,
+        bathrooms: listing.property?.numberBathrooms || 0,
+        price: listing.price,
+        propertyType: listing.property?.type?.name,
+        classification: listing.property?.classification?.name,
+        priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency,
+        address: {
+          street: listing.property?.address?.street,
+          city: listing.property?.address?.city,
+          postcode: listing.property?.address?.postcode
+        },
+        image: listing.property?.media,
+        hasNote: hasNoteFn(listing.id),
+        isFavorite: isFavouriteFn(listing.id)
+      }))
+      .filter((m) => m.lat !== 0 && m.lon !== 0);
+  }
+
+  /**
+   * Get map center coordinates from markers
+   */
+  function getMapCenterFromMarkers(markers: MapMarker[]): MapCenterCoordinates | null {
+    if (markers && markers.length > 0 && markers[0]) {
+      return {
+        lat: markers[0].lat,
+        lon: markers[0].lon
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Calculate appropriate zoom level based on search radius
+   */
+  function calculateZoomLevelFromRadius(radius?: number | null): number {
+    if (!radius) return 14; // Default zoom if no radius is specified (higher zoom)
+
+    // Map radius values to appropriate zoom levels - higher minimum as requested
+    // Lower zoom value = more zoomed out
+    const radiusNum = Number(radius);
+
+    if (radiusNum === 0) return 16;
+    else if (radiusNum <= 0.25) return 15;
+    else if (radiusNum <= 0.5) return 14;
+    else if (radiusNum <= 1) return 13;
+    else if (radiusNum <= 2) return 12;
+    else if (radiusNum <= 5) return 12;
+    else if (radiusNum <= 10) return 12;
+    else if (radiusNum <= 20) return 11;
+    else return 10;
+  }
+
+  /**
+   * Handle map view changes, updating map responsively
+   */
+  function handleMapViewChange(
+    map: any, 
+    mapCenterCoordinates: MapCenterCoordinates | null,
+    markers?: MapMarker[]
+  ): void {
+    if (!map) return;
+    
+    // Trigger map resize to ensure it renders correctly
+    map.resize();
+
+    // Center the map with a small delay to ensure resize has completed
+    setTimeout(() => {
+      // Try to center on specific coordinates first
+      if (mapCenterCoordinates) {
+        centerMapOnCoordinates(map, mapCenterCoordinates.lat, mapCenterCoordinates.lon);
+      } 
+      // Fall back to centering on markers
+      else if (markers && markers.length > 0) {
+        centerMapOnMarkers(map, markers);
+      }
+    }, 100);
+  }
+
+  /**
+   * Setup watchers to automatically recenter map when relevant data changes
+   */
+  function setupMapAutoRecentering(
+    map: Ref<any | null>,
+    coordinates: ComputedRef<MapCenterCoordinates | null>,
+    zoomLevel: ComputedRef<number>,
+    currentView: Ref<string>,
+    searchParams?: Ref<Record<string, any> | null>
+  ): void {
+    watch(
+      [searchParams || ref(null), coordinates, zoomLevel, currentView],
+      ([newSearchParams, newCoordinates, newZoomLevel, newView]) => {
+        // Only proceed if we're in map view and have valid coordinates
+        if (newView === 'dual' && map.value?.map && newCoordinates) {
+          // For zoom changes, add a small delay to allow the zoom transition to complete
+          if (newZoomLevel !== undefined) {
+            setTimeout(() => {
+              centerMapOnCoordinates(map.value.map, newCoordinates.lat, newCoordinates.lon);
+            }, 100);
+          } else {
+            centerMapOnCoordinates(map.value.map, newCoordinates.lat, newCoordinates.lon);
+          }
+        }
+      },
+      { deep: true }
+    );
+  }
+
   return {
     sdk,
     initializeMap,
@@ -300,5 +468,12 @@ export function useMapTiler({
     hasValidCoordinates,
     addInteractiveIndicator,
     setupEventHandlers,
+    centerMapOnCoordinates,
+    centerMapOnMarkers,
+    createMapMarkersFromListings,
+    getMapCenterFromMarkers,
+    calculateZoomLevelFromRadius,
+    handleMapViewChange,
+    setupMapAutoRecentering,
   };
 }

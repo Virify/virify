@@ -22,10 +22,10 @@ const mapTiler = useMapTiler({
 const {
   sdk,
   initializeMap,
-  addMarkersToMap,
   hasValidCoordinates: checkValidCoordinates,
   addInteractiveIndicator,
-  setupEventHandlers
+  setupEventHandlers,
+  centerMapOnCoordinates
 } = mapTiler;
 
 const props = defineProps<{
@@ -53,13 +53,6 @@ const handleResize = () => {
     map.resize();
   }
 };
-
-// Watch for zoom changes and update the map
-watch(() => props.zoom, (newZoom) => {
-  if (map && newZoom !== undefined) {
-    map.setZoom(newZoom);
-  }
-});
 
 onMounted(() => {
   if (!mapContainer.value || !hasValidCoordinates.value) return;
@@ -117,31 +110,36 @@ onBeforeUnmount(() => {
   }
 });
 
-// Watch for changes in props that require map updates
+// Combined watcher for all prop changes that affect the map
 watch(
-  () => props.markers,
-  () => {
+  [() => props.markers, () => props.lat, () => props.lon, () => props.zoom],
+  ([markers, lat, lon, zoom]) => {
     if (!map) return;
-    // Remove existing markers
-    if (markerElements.length) {
-      markerElements.forEach(marker => marker.remove());
-      markerElements = [];
+
+    // Handle marker updates
+    if (markers) {
+      // Remove existing markers
+      if (markerElements.length) {
+        markerElements.forEach(marker => marker.remove());
+        markerElements = [];
+      }
+      // Add new markers
+      markerElements = mapTiler.addMarkersToMap(map, markers ? [...markers] : [], lat, lon);
     }
-    // Add new markers
-    markerElements = mapTiler.addMarkersToMap(map, props.markers ? [...props.markers] : [], props.lat, props.lon);
+
+    // Handle center updates
+    if (lat !== undefined && lon !== undefined) {
+      // Use the centerMapOnCoordinates function from useMapTiler
+      centerMapOnCoordinates(map, lat, lon);
+    }
+
+    // Handle zoom updates
+    if (zoom !== undefined) {
+      map.setZoom(zoom);
+    }
   },
   { deep: true, immediate: true }
 );
-
-// Watch for changes in lat/lon
-watch(() => [props.lat, props.lon], () => {
-  if (!map) return;
-
-  // Update center if single lat/lon changes
-  if (props.lat !== undefined && props.lon !== undefined) {
-    map.setCenter([props.lon, props.lat]);
-  }
-});
 </script>
 
 <style>
