@@ -1,6 +1,6 @@
 <template>
   <div role="presentation" class="o-searchform-title-block | flow flow-md" :class="{
-    'o-searchform-title-block-backgorund': hasBackground
+    'o-searchform-title-block-background': hasBackground
   }">
     <h2 v-if="title" :class="{
       '| title-xs': !titleLarge,
@@ -35,7 +35,7 @@ withDefaults(defineProps<Props>(), {
 
 .o-searchform-title-block {
 
-  &-backgorund {
+  &-background {
     padding: var(--popover-padding);
     background: var(--background-100);
     border-radius: var(--border-radius-lg);
