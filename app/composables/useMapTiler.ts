@@ -1,6 +1,5 @@
 import type { MapMarker } from "../../shared/types/map-coordinates";
 import type { ListingCardType } from "../../shared/types/listing";
-import type { Ref, ComputedRef } from 'vue';
 
 interface UseMapTilerOptions {
   interactive?: boolean;
