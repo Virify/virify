@@ -34,8 +34,11 @@ withDefaults(defineProps<Props>(), {
 @use '#styles/_utils/media' as mq;
 
 .o-searchform-title-block {
+  margin: 0;
+  padding: 0;
 
   &-background {
+    margin-top: var(--popover-padding);
     padding: var(--popover-padding);
     background: var(--background-100);
     border-radius: var(--border-radius-lg);
