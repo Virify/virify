@@ -40,7 +40,6 @@ const isChecked = defineModel({
   color: #{ fn.faded-color(50%) };
 
   &:hover {
-    color: currentColor;
     background: #{ fn.faded-color(6%) };
     border-color: var(--border-color-300);
   }

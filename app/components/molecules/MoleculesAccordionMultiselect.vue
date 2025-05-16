@@ -100,6 +100,11 @@ const emits = defineEmits(['expanded'])
     border: 1px solid var(--border-color-300);
   }
 
+  &-title:hover,
+  &:has(input:checked) &-title {
+    background: var(--background-100);
+  }
+
   &-title {
     display: flex;
     align-items: center;
@@ -136,7 +141,6 @@ const emits = defineEmits(['expanded'])
     padding: var(--size-16);
     gap: var(--size-8);
     border-top: 1px solid var(--border-color-200);
-    background: var(--background-100);
   }
 
   &-checkbox {
