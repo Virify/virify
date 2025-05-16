@@ -35,6 +35,7 @@ interface DrawCanvasConfig {
   activeArea: DrawActiveArea
   width: number
   height: number
+  strokeColor: string
   fillColour: string
   fillFadedColour: string
   startY: number
@@ -82,10 +83,10 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
   } = config
 
   // Compile colours
-  const emptyFillColour = `rgba(${emptyRGB}, 0.075)`;
+  const emptyFillColour = `rgba(${emptyRGB}, 0.05)`;
   const emptyFillFadedColour = `rgba(${emptyRGB}, 0)`;
   const fillColour = `rgba(${filledRGB}, 1)`;
-  const fillFadedColour = `rgba(${filledRGB}, 1)`;
+  const strokeColor = `rgb(${filledRGB})`;
 
   /**
    *  Closure function to clean the canvas
@@ -146,10 +147,14 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
    *  Function draw
    */
   function drawChartColour(context: CanvasRenderingContext2D, config: DrawCanvasConfig, isActive?: boolean) {
-    const { activeArea, width, height, fillColour, fillFadedColour, startY, computedData } = config
+    const { activeArea, width, height, strokeColor, fillColour, fillFadedColour, startY, computedData } = config
 
     // Get nodes
     const { nodes, getNode } = createGetNodes(computedData, startY)
+
+    // Start a path
+    context.strokeStyle = strokeColor
+    context.lineWidth = 1
 
     // Create clip area
     const activeX = activeArea.min
@@ -197,6 +202,11 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
     // Stroke and fill 
     context.lineTo(width - paddingX, startY)
     context.fill()
+
+    if (!isActive) {
+
+      context.stroke()
+    }
   }
 
   /**
@@ -242,6 +252,7 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
     // Create config for drawing charts
     const config: DrawCanvasConfig = {
       activeArea,
+      strokeColor: emptyFillColour,
       fillColour: emptyFillColour,
       fillFadedColour: emptyFillFadedColour,
       width: chartWidth,
@@ -256,8 +267,9 @@ export function usePriceChart(canvas: Canvas, userConfig: Config) {
     // Draw orange shape
     drawChartColour(context, {
       ...config,
+      strokeColor,
       fillColour: fillColour,
-      fillFadedColour: fillFadedColour,
+      fillFadedColour: fillColour,
     }, true)
   }
 
