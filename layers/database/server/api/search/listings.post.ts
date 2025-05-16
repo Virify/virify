@@ -7,7 +7,7 @@ import { mapFeatureToFilters } from "../../utils/db-fields";
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
   radius: z.coerce.number().min(0).max(40),
-  propertyTypes: z.array(z.string()).optional(),
+  propertyTypes: z.record(z.coerce.string(), z.array(z.coerce.number())).optional(),
   priceRange: z.array(z.coerce.number()).optional(),
   location: z.string(),
   bedrooms: z.array(z.coerce.number()).optional(),

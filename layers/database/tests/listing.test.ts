@@ -84,7 +84,7 @@ describe("getListingByDistanceAndFilters", () => {
     const result = await getListingByDistanceAndFilters(
       { type: "rent", location: "Testville", radius: 5 },
       {
-        propertyTypes: ["Flat"],
+        propertyTypes: { "1": [1, 2] },
         priceRange: [900, 1100],
         bedrooms: [1, 3],
         bathrooms: [1, 2],
@@ -125,7 +125,7 @@ describe("getListingByDistanceAndFilters", () => {
     mockPrisma.listing.findMany.mockResolvedValue([]);
     const result = await getListingByDistanceAndFilters(
       { type: "rent", location: "Testville", radius: 5 },
-      { propertyTypes: ["Flat"] }
+      { propertyTypes: { "1": [2, 3] } }
     );
     expect(result).toEqual([]);
   });
