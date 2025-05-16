@@ -1,5 +1,5 @@
 <template>
-  <OrganismsSearchFormTitleBlock title="Explore more" title-large>
+  <OrganismsSearchFormTitleBlock title="Explore more" title-large has-background>
     <ul class="o-searchform-popover-explore-more">
       <animate-in v-for="{ icon, to, content }, index of exploreMoreLinks" :delay="150 + index * 50">
         <li>
