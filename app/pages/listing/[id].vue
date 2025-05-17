@@ -25,7 +25,9 @@
 
     <AtomsDivider text="DEBUG" />
 
-    <pre>{{ listing }}</pre>
+    <div style="overflow: hidden">
+      <pre>{{ listing }}</pre>
+    </div>
   </div>
 </template>
 
