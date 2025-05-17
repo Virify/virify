@@ -31,11 +31,9 @@
       </li>
     </ul>
 
-    <div class="o-listing-sidebar__agent-details | body-sm">
-      Estate agent info
+    <a href="#" class="o-listing-sidebar__enquire | button button-secondary button-full">Enquire now</a>
 
-      <address>Email, Phone Number</address>
-    </div>
+    <OrganismsListingAgent />
   </section>
 </template>
 
@@ -95,13 +93,6 @@ const priceFormatted = computed(() => {
     display: block;
     width: var(--size-20);
     height: var(--size-20);
-  }
-
-  &__agent-details {
-    background: var(--blue-300);
-    color: var(--monochrome-900);
-    border-radius: var(--border-radius-2xl);
-    padding: var(--size-16) var(--size-24);
   }
 }
 </style>
