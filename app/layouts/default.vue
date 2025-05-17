@@ -7,7 +7,7 @@
       <NuxtPage />
     </div>
 
-    <!-- <OrganismsFooter /> -->
+    <OrganismsFooter />
 
     <ViewsDialog />
   </div>
