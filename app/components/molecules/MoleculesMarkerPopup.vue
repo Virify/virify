@@ -1,11 +1,12 @@
 <template>
-  <div class="marker-popup">
+  <div class="marker-popup" @click.stop>
     <!-- Property image -->
     <div v-if="hasImage" class="marker-popup-image-container">
       <img 
         class="marker-popup-image" 
-        :src="markerData.image && markerData.image[0] ? markerData.image[0].image : ''" 
-        :alt="markerData.image && markerData.image[0] && markerData.image[0].metadata ? markerData.image[0].metadata : (markerData.title || 'Property image')" 
+        :src="markerData.image?.[0]?.image" 
+        :alt="markerData.image?.[0]?.metadata || markerData.title || 'Property image'"
+        @click.stop 
       />
     </div>
     
@@ -45,78 +46,41 @@
     </div>
     
     <!-- Action buttons -->
-    <div v-if="propertyId !== null" class="marker-popup-actions">
-      <NuxtLink :to="`/listing/${propertyId}`" class="marker-popup-view-link">
+    <div v-if="propertyId !== null" class="marker-popup-actions" @click.stop>
+      <NuxtLink :to="`/listing/${propertyId}`" class="marker-popup-view-link" @click.stop>
         View Listing
       </NuxtLink>
       
       <!-- Notes button -->
-      <div class="marker-popup-notes-button-container" :data-property-id="propertyId">
+      <div class="marker-popup-notes-button-container">
         <button 
           type="button" 
           role="switch" 
           aria-label="Add/Edit Notes" 
           class="marker-popup-notes-button note-button" 
           :class="{ 'has-note': markerData.hasNote }"
-          @click.stop.prevent="onNoteClick"
+          @click.stop="onNoteClick"
         >
-          <div class="note-icon-wrapper">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="16" 
-              height="16" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              class="note-button-icon"
-            >
-              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
-          </div>
+          <AtomsIcon icon="cards/notes" class="note-button-icon" />
         </button>
       </div>
       
       <!-- Favorite button -->
-      <div class="marker-popup-favorite-button-container" :data-property-id="propertyId">
-        <button 
-          type="button" 
-          role="switch" 
-          aria-label="Add to favourites" 
-          class="marker-popup-favorite-button a-favourite-button" 
-          :class="{ 'selected': markerData.isFavorite }"
-          @click.stop.prevent="onFavoriteClick"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="16" 
-            height="16" 
-            viewBox="0 0 24 24" 
-            :fill="markerData.isFavorite ? 'currentColor' : 'none'" 
-            stroke="currentColor" 
-            stroke-width="2" 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            class="marker-popup-button-icon"
-          >
-            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
-          </svg>
-        </button>
-      </div>
+      <AtomsFavouriteButton 
+        :property-id="propertyId" 
+        class="marker-popup-favorite-button"
+        @click.stop
+      />
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import type { MapMarker } from '../../../shared/types/map-coordinates';
+import { useNotes } from '~/composables/useNotes';
 
 const props = defineProps<{ 
   markerData: MapMarker;
-  onNoteClick?: (id: number) => void;
-  onFavoriteClick?: (id: number) => void;
 }>();
 
 // Computed properties
@@ -147,27 +111,28 @@ const hasImage = computed(() =>
 );
 
 // Event handlers
+const { showNoteDialog } = useNotes();
 const onNoteClick = () => {
-  if (propertyId.value && props.onNoteClick) {
-    // Only call the provided handler, no local state changes here
-    props.onNoteClick(propertyId.value);
-  }
-};
-
-const onFavoriteClick = () => {
-  if (propertyId.value && props.onFavoriteClick) {
-    // Only call the provided handler, no local state changes here
-    props.onFavoriteClick(propertyId.value);
+  if (propertyId.value) {
+    showNoteDialog(propertyId.value);
   }
 };
 </script>
 
 <style scoped>
-/* Main popup container */
-
-.maplibregl-popup-content {
-  width: 100%;
+/* Override MapTiler popup styles */
+:global(.maplibregl-popup-content) {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
 }
+
+:global(.maplibregl-popup-tip) {
+  display: none;
+}
+
+/* Main popup styles */
 .marker-popup {
   padding: 0;
   max-width: 325px !important;
@@ -288,8 +253,7 @@ const onFavoriteClick = () => {
   box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
 }
 
-.marker-popup-notes-button,
-.marker-popup-favorite-button {
+.marker-popup-notes-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -303,8 +267,7 @@ const onFavoriteClick = () => {
   position: relative;
 }
 
-.marker-popup-notes-button:hover,
-.marker-popup-favorite-button:hover {
+.marker-popup-notes-button:hover {
   background-color: var(--background-300);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));

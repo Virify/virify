@@ -11,7 +11,9 @@
 
 <script setup lang="ts">
 import type { MapMarker } from '../../../shared/types/map-coordinates';
+import type { Map as MapTilerMap } from '@maptiler/sdk';
 import { useMapTiler } from '~/composables/useMapTiler';
+import { nextTick } from 'vue';
 
 const props = defineProps<{
   markers?: MapMarker[];
@@ -25,10 +27,10 @@ const props = defineProps<{
 
 const emit = defineEmits(['property-note', 'property-favourite']);
 const mapContainer = ref<HTMLElement>();
-const map = shallowRef<any>(null);
+const map = shallowRef<MapTilerMap | null>(null);
 
 // Import map utilities from composable
-const { initializeMap, handleMapViewChange } = useMapTiler();
+const { initializeMap, addMarker, clearMarkers, centerMap } = useMapTiler();
 
 // Check if we have valid coordinates to display
 const hasValidCoordinates = computed(() => {
@@ -41,83 +43,95 @@ const hasValidCoordinates = computed(() => {
   return !!props.markers?.some(m => m.lat !== 0 && m.lon !== 0);
 });
 
-// Display full popups on listing pages but not on detail pages
-const shouldDisplayPopups = computed(() => {
-  return props.displayPopups !== false;
-});
-
-// Simple event emitters for UI updates
-const mapEventHandlers = {
-  onNote: (id: number) => emit('property-note', id),
-  onFavorite: (id: number) => emit('property-favourite', id)
-};
-
 // Initialize map on mount
 onMounted(() => {
-  if (!mapContainer.value || !hasValidCoordinates.value) return;
-  
-  // Create or reuse map instance
-  map.value = initializeMap(
-    mapContainer.value,
-    { interactive: !!props.interactive, zoom: props.zoom },
-    props.mapId
-  );
-  
-  // Apply initial map state
+  // Wait for next tick to ensure container is properly sized
   nextTick(() => {
-    handleMapViewChange(
-      map.value,
-      props.center || props.markers?.[0],
-      props.markers,
-      !!props.interactive,
-      props.zoom,
-      shouldDisplayPopups.value,
-      shouldDisplayPopups.value ? mapEventHandlers : undefined
+    if (!mapContainer.value || !hasValidCoordinates.value) return;
+    
+    // Create or reuse map instance
+    const mapInstance = initializeMap(
+      mapContainer.value,
+      { interactive: !!props.interactive, zoom: props.zoom },
+      props.mapId
     );
-  });
+  
+  // Setup map event handlers
+  mapInstance.on('marker-note', (e: any) => emit('property-note', e.id));
+  mapInstance.on('marker-favorite', (e: any) => emit('property-favourite', e.id));
+  
+  map.value = mapInstance;
+
+  // Set initial center and zoom
+  if (props.center) {
+    centerMap(
+      mapInstance,
+      props.center.lat,
+      props.center.lon,
+      props.zoom
+    );
+  } else if (props.markers?.[0]) {
+    centerMap(
+      mapInstance,
+      props.markers[0].lat,
+      props.markers[0].lon,
+      props.zoom
+    );
+  }
+  
+  // Add initial markers
+  updateMarkers();
+});
 });
 
-// Update map when props change - with optimized handling
+// Update markers when props change
+function updateMarkers() {
+  if (!map.value) return;
+  
+  // Update markers
+  clearMarkers(map.value);
+  if (props.markers?.length) {
+    props.markers.forEach(markerData => {
+      addMarker(map.value!, markerData, props.displayPopups !== false);
+    });
+  }
+}
+
+// Only watch markers
 watch(
-  [
-    () => props.markers,
-    () => props.center,
-    () => props.zoom,
-    () => props.interactive,
-    () => props.displayPopups
-  ],
-  ([markers, center, zoom, interactive, displayPopups]) => {
-    if (!map.value) return;
-    
-    // Only update center if explicitly provided as a prop
-    const centerToUse = center && typeof center.lat === 'number' && typeof center.lon === 'number' 
-      ? center 
-      : undefined;
-    
-    // Only update markers if they've actually changed
-    const markersToUse = markers && Array.isArray(markers) && markers.length > 0
-      ? markers
-      : undefined;
-    
-    handleMapViewChange(
-      map.value,
-      centerToUse,
-      markersToUse,
-      !!interactive,
-      zoom,
-      displayPopups !== false,
-      displayPopups !== false ? mapEventHandlers : undefined
-    );
-  },
+  () => props.markers,
+  () => updateMarkers(),
   { deep: true }
 );
 
 // Force map resize on visibility change
 onUpdated(() => {
-  if (map.value && typeof map.value.resize === 'function') {
-    setTimeout(() => map.value.resize(), 100);
+  if (map.value) {
+    // Wait for the DOM to update
+    nextTick(() => {
+      // Trigger resize to ensure map fills container
+      map.value?.resize();
+      
+      // Re-center map if we have coordinates
+      if (props.center) {
+        centerMap(map.value!, props.center.lat, props.center.lon, props.zoom);
+      } else if (props.markers?.[0]) {
+        centerMap(map.value!, props.markers[0].lat, props.markers[0].lon, props.zoom);
+      }
+    });
   }
 });
+
+// Watch for props.center changes
+watch([() => props.center, () => props.markers, () => props.zoom], () => {
+  if (!map.value) return;
+  
+  if (props.center) {
+    centerMap(map.value, props.center.lat, props.center.lon, props.zoom);
+  } else if (props.markers?.[0]) {
+    centerMap(map.value, props.markers[0].lat, props.markers[0].lon, props.zoom);
+  }
+}, { immediate: true });
 </script>
 
 <style>
@@ -126,6 +140,8 @@ onUpdated(() => {
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .maptiler-map-interactive {

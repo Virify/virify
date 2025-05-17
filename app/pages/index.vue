@@ -15,16 +15,9 @@
       </div>
       <div v-show="content === 'dual'" class="dual-view-container">
         <div class="dual-view-map">
-          <OrganismsMap
-            v-if="currentView === 'dual'"
-            :markers="getMapMarkers"
-            :zoom="mapZoomLevel"
-            :center="mapCenterCoordinates"
-            :interactive="true"
-            :display-popups="true"
-            mapId="global-app-map"
-            customClass="map-sidebar"
-            />
+          <OrganismsMap v-if="currentView === 'dual'" :markers="mapMarkers" :zoom="mapZoomLevel"
+            :center="mapCenterCoordinates" :interactive="true" :display-popups="true" :mapId="GLOBAL_MAP_ID"
+            customClass="map-sidebar" @property-note="handleNote" @property-favourite="handleFavorite" />
         </div>
         <div class="dual-view-listings">
           <MoleculesListingCardHorizontal v-for="listing in searchListings" :key="listing.id" :property-id="listing.id"
@@ -37,16 +30,9 @@
         </div>
       </div>
       <div v-show="content === 'map'" class="map-only-container">
-        <OrganismsMap
-          v-if="currentView === 'map'"
-          :markers="getMapMarkers"
-          :zoom="mapZoomLevel"
-          :center="mapCenterCoordinates"
-          :interactive="true"
-          :display-popups="true"
-          mapId="global-app-map"
-          customClass="map-fullscreen"
-           />
+        <OrganismsMap v-if="currentView === 'map'" :markers="mapMarkers" :zoom="mapZoomLevel"
+          :center="mapCenterCoordinates" :interactive="true" :display-popups="true" :mapId="GLOBAL_MAP_ID"
+          customClass="map-fullscreen" @property-note="handleNote" @property-favourite="handleFavorite" />
       </div>
     </MoleculesTabs>
   </div>
@@ -54,7 +40,11 @@
 
 <script setup lang="ts">
 import { useState, useRoute } from '#imports';
-import { useMapTiler } from '~/composables/useMapTiler';
+import { useMapTiler, GLOBAL_MAP_ID } from '~/composables/useMapTiler';
+import type { MapMarker } from '~~/shared/types/map-coordinates';
+import type { ListingCardType } from '~~/shared/types/listing';
+import { useNotes } from '~/composables/useNotes';
+import { useFavourites } from '~/composables/useFavourites';
 
 // Listings state
 const searchListings = ref<ListingCardType[] | null>(null);
@@ -65,36 +55,72 @@ const searchParams = useState<Record<string, any>>('searchParams');
 const currentView = ref('list');
 const isMapView = computed(() => currentView.value === 'dual' || currentView.value === 'map');
 const heroTitle = computed(() => {
-  if(searchListings.value && searchListings.value.length === 0) {
+  if (searchListings.value && searchListings.value.length === 0) {
     return "No Results Found";
   } else {
-     return "Property search on another level";
+    return "Property search on another level";
   }
-}
+});
 
-);
 const viewOptions = [
   { label: 'List View', content: 'list' },
   { label: 'Split View', content: 'dual' },
   { label: 'Map View', content: 'map' }
 ];
+
 function handleViewChange(content: string) {
   currentView.value = content;
 }
 
-// Map helpers with state management moved into the composable
-const { calculateZoomLevelFromRadius, useReactiveMapMarkers } = useMapTiler();
+// Map functionality
+const { calculateZoomLevelFromRadius } = useMapTiler();
+const { hasNote } = useNotes();
+const { isFavourite } = useFavourites();
 
-// Create reactive map markers that update when favorites or notes change
-const getMapMarkers = useReactiveMapMarkers(searchListings);
+// Create map markers from listings
+const mapMarkers = computed<MapMarker[]>(() => {
+  if (!searchListings.value?.length) return [];
 
+  return searchListings.value.map(listing => ({
+    id: listing.id,
+    lat: listing.property?.address?.lat ?? 0,
+    lon: listing.property?.address?.lon ?? 0,
+    title: listing.title ?? null,
+    bedrooms: listing.property?.numberBedrooms ?? null,
+    bathrooms: listing.property?.numberBathrooms ?? null,
+    price: listing.price ?? null,
+    propertyType: listing.property?.type?.name ?? null,
+    classification: listing.property?.classification?.name ?? null,
+    priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,
+    address: listing.property?.address ? {
+      street: listing.property.address.street,
+      city: listing.property.address.city,
+      postcode: listing.property.address.postcode,
+    } : null,
+    image: listing.property?.media ?? [],
+    hasNote: hasNote(listing.id),
+    isFavorite: isFavourite(listing.id)
+  }));
+});
+
+// Map positioning
 const mapZoomLevel = computed(() => calculateZoomLevelFromRadius(searchParams.value?.radius));
 
 const mapCenterCoordinates = computed(() => {
-  const m = getMapMarkers.value[0];
+  const m = mapMarkers.value[0];
   return m ? { lat: m.lat, lon: m.lon } : undefined;
 });
 
+// Event handlers
+function handleNote(id: number) {
+  const { showNoteDialog } = useNotes();
+  showNoteDialog(id);
+}
+
+function handleFavorite(id: number) {
+  const { toggleFavourite } = useFavourites();
+  toggleFavourite(id);
+}
 
 // Initialize view from URL
 onMounted(() => {
@@ -119,7 +145,8 @@ onMounted(() => {
 /* Map-only view container */
 .map-only-container {
   width: 100vw;
-  height: calc(100vh - var(--header-height) - 45px); /* Adjusted to account for tab height */
+  height: calc(100vh - var(--header-height) - 45px);
+  /* Adjusted to account for tab height */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   position: relative;
@@ -137,7 +164,8 @@ onMounted(() => {
   grid-template-columns: 1fr 1fr;
   gap: 0;
   width: 100vw;
-  height: calc(100vh - var(--header-height) - 45px); /* Adjusted to account for tab height */
+  height: calc(100vh - var(--header-height) - 45px);
+  /* Adjusted to account for tab height */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding: 0;

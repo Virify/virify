@@ -79,7 +79,7 @@
           :zoom="15"
           :center="{ lat: property.address.lat, lon: property.address.lon }"
           :interactive="false"
-          mapId="global-app-map"
+          :mapId="GLOBAL_MAP_ID"
           customClass="p-listing-map-inner"
           :displayPopups="false"
         />
@@ -394,7 +394,6 @@ const property = computed(() => {
 });
 const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
 
-// Prepare single marker for detail map
 const propertyMarkers = computed<MapMarker[]>(() => {
   if (!property.value?.address?.lat || !property.value.address.lon) return [];
   return [{
@@ -408,17 +407,6 @@ const propertyMarkers = computed<MapMarker[]>(() => {
     isFavorite: false
   }];
 });
-
-// Map event handlers
-function handleMapNote(propertyId: number) {
-  const { showNoteDialog } = useNotes();
-  showNoteDialog(propertyId);
-}
-
-function handleMapFavourite(propertyId: number) {
-  const { toggleFavourite } = useFavourites();
-  toggleFavourite(propertyId);
-}
 </script>
 
 <style lang="scss">
