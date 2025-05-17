@@ -111,7 +111,10 @@ useIntersectionObserver($images, ([entry]) => {
     left: unset;
     top: var(--header-height);
     max-height: calc(100dvh - var(--header-height));
+    overflow: auto;
     overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding-bottom: var(--size-16);
 
     &-expand {
       overflow: hidden;
@@ -125,7 +128,7 @@ useIntersectionObserver($images, ([entry]) => {
     background: var(--foreground-300);
     aspect-ratio: 16 / 9;
     border-radius: var(--border-radius-2xl);
-    margin-bottom: var(--size-12);
+    margin-bottom: var(--size-24);
 
     /**
      *  DEBUG
