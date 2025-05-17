@@ -65,7 +65,7 @@ const searchParams = useState<Record<string, any>>('searchParams');
 const currentView = ref('list');
 const isMapView = computed(() => currentView.value === 'dual' || currentView.value === 'map');
 const heroTitle = computed(() => {
-  if(searchListings.value && searchListings.value.length < 0) {
+  if(searchListings.value && searchListings.value.length === 0) {
     return "No Results Found";
   } else {
      return "Property search on another level";
