@@ -11,9 +11,14 @@
 </template>
 
 <style lang="scss">
+@use '#styles/_utils/functions' as fn;
+
 .o-listing-sidebar-agent {
-  background: var(--background-300);
-  color: var(--foreground-300);
+  --estate-agent-brand-background: #4e2489;
+  --estate-agent-brand-foreground: #fff;
+
+  background: var(--estate-agent-brand-background);
+  color: var(--estate-agent-brand-foreground);
   border-radius: var(--border-radius-2xl);
   padding: var(--size-16);
   display: grid;
@@ -24,7 +29,7 @@
   &__logo {
     aspect-ratio: 1;
     border-radius: var(--border-radius-lg);
-    background: var(--monochrome-400);
+    background: #{ fn.faded-color(20%) };
   }
 
   &__name {
