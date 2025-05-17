@@ -4,14 +4,6 @@
       <h1>Loading...</h1>
     </div>
     <div v-else class="p-listing">
-      <div class="p-listing__content">
-        <OrganismsListingCarousel ref="$images" class="p-listing__images p-listing__images--large" :slides="images"
-          :width="1000" />
-
-        <h3 class="| title-sm">Property</h3>
-        <pre>{{ property }}</pre>
-      </div>
-
       <div class="p-listing__sidebar">
         <Transition name="p-listing-images">
           <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
@@ -20,6 +12,14 @@
         </Transition>
 
         <OrganismsListingSidebar :price="listing?.price" />
+      </div>
+
+      <div class="p-listing__content">
+        <OrganismsListingCarousel ref="$images" class="p-listing__images p-listing__images--large" :slides="images"
+          :width="1000" />
+
+        <h3 class="| title-sm">Property</h3>
+        <pre>{{ property }}</pre>
       </div>
     </div>
 
@@ -102,18 +102,25 @@ useIntersectionObserver($images, ([entry]) => {
   }
 
   &__sidebar {
-    position: sticky;
-    bottom: auto;
-    left: unset;
-    top: var(--header-height);
-    max-height: calc(100dvh - var(--header-height));
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    padding-bottom: var(--size-16);
+
+    @include mq.notebook {
+      order: 2;
+      position: sticky;
+      top: var(--header-height);
+      max-height: calc(100dvh - var(--header-height));
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      padding-bottom: var(--size-16);
+    }
 
     &-expand {
       overflow: hidden;
+      display: none;
+
+      @include mq.notebook {
+        display: block;
+      }
     }
   }
 
@@ -126,18 +133,6 @@ useIntersectionObserver($images, ([entry]) => {
     border-radius: var(--border-radius-2xl);
     margin-bottom: var(--size-24);
     overflow: hidden;
-
-    /**
-     *  DEBUG
-     */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3em;
-    color: #{ fn.faded-color(15%, var(--background-200))};
-    /**
-     *  END DEBUG
-     */
 
     &--large {
       border-radius: var(--border-radius-3xl);

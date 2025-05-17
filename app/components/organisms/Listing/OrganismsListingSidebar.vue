@@ -58,6 +58,7 @@ const priceFormatted = computed(() => {
 
 <style lang="scss">
 .o-listing-sidebar {
+  max-width: 20em;
 
   &__title {
     margin-bottom: 0;

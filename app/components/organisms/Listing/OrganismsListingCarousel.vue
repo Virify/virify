@@ -33,6 +33,7 @@ const validatedSlides = computed(() => {
 .o-listing-carousel {
 
   &__image {
+    width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
   }
