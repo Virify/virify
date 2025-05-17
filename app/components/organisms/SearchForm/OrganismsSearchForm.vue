@@ -25,146 +25,170 @@
           <!-- Search radius (desktop) -->
           <client-only>
             <AtomsSelect aria-label="Search radius" v-if="isTablet && !popoverHidden" :options="radiusOptions"
-              v-model="initialRadius" class="o-searchform-location-radius | text-input body-sm focus-visible"
-              name="radius" />
+              v-model="initialRadius"
+              class="o-searchform-location-radius o-searchform-dropdown | text-input focus-visible" name="radius" />
           </client-only>
 
           <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
             :class="{
-              '| pulse pointer-none': isContracted
+              '| pointer-none': isContracted,
+              '| pulse': isContracted && !isPending,
             }" data-allow-mismatch="class">
             <AtomsIcon title="Search" icon="search" class="o-searchform-location-button-icon" />
           </AtomsButton>
         </div>
 
-        <div :id="popoverId" role="presentation" class="o-searchform-popover | flow flow-xl" :hidden="popoverHidden">
+        <div :id="popoverId" role="presentation" class="o-searchform-popover" :hidden="popoverHidden">
           <MoleculesErrorBox v-if="formErrors" :error="formErrors" />
 
           <!-- Location -->
-          <OrganismsSearchFormTitleBlock v-if="suggestions" title="Location">
-            <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
-              v-slot="{ original, current, suggestion }">
-              <button class="o-searchform-autocomplete-button | body-md"
-                @click.prevent="setSelectedSuggestion(original)">
-                <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
-              </button>
-            </MoleculesAutocomplete>
-          </OrganismsSearchFormTitleBlock>
+          <OrganismsSearchFormDividedRows v-if="suggestions">
+            <OrganismsSearchFormTitleBlock title="Location">
+              <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
+                v-slot="{ original, current, suggestion }">
+                <button class="o-searchform-autocomplete-button | body-md"
+                  @click.prevent="setSelectedSuggestion(original)">
+                  <strong class="o-searchform-autocomplete-button-highlight">{{ current }}</strong>{{ suggestion }}
+                </button>
+              </MoleculesAutocomplete>
+            </OrganismsSearchFormTitleBlock>
+          </OrganismsSearchFormDividedRows>
 
           <!-- Search readius -->
           <client-only>
-            <OrganismsSearchFormTitleBlock v-if="!isTablet">
+            <OrganismsSearchFormDividedRows v-if="!isTablet">
               <MoleculesFormField label="Search radius" v-slot="{ id }">
                 <AtomsSelect :id :options="radiusOptions" v-model="initialRadius"
-                  class="| text-input body-sm focus-visible" name="radius" />
+                  class="o-searchform-dropdown | text-input focus-visible" name="radius" />
               </MoleculesFormField>
-            </OrganismsSearchFormTitleBlock>
+            </OrganismsSearchFormDividedRows>
           </client-only>
 
           <!-- price -->
           <animate-in :delay="50">
-            <OrganismsSearchFormTitleBlock title="Price">
-              <animate-in :delay="75">
-                <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax"
-                  :starting-min="priceMin" :starting-max="priceMax" :graph-data="priceRangeGraph" hydrate-on-visible />
-              </animate-in>
-            </OrganismsSearchFormTitleBlock>
+            <OrganismsSearchFormDividedRows>
+              <OrganismsSearchFormTitleBlock title="Price">
+                <animate-in :delay="75">
+                  <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="priceMin" :max="priceMax"
+                    :starting-min="priceMin" :starting-max="priceMax" :graph-data="priceRangeGraph"
+                    hydrate-on-visible />
+                </animate-in>
+              </OrganismsSearchFormTitleBlock>
+            </OrganismsSearchFormDividedRows>
           </animate-in>
 
           <!-- bedrooms & bathrooms -->
           <animate-in :delay="75">
-            <OrganismsSearchFormGrid>
-              <OrganismsSearchFormTitleBlock title="Bedrooms">
-                <OrganismsSearchFormGrid grid-auto>
-                  <animate-in :delay="75">
-                    <OrganismsSearchFormFlex>
-                      <span aria-hidden class="| body-sm">Between</span>
-                      <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions"
-                        class="| text-input body-sm focus-visible" name="min-bedrooms" aria-label="Minimum bedrooms" />
-                    </OrganismsSearchFormFlex>
-                  </animate-in>
+            <OrganismsSearchFormDividedRows>
+              <OrganismsSearchFormDividedColumns>
+                <template #left-column>
+                  <OrganismsSearchFormTitleBlock title="Bedrooms">
+                    <OrganismsSearchFormGrid grid-auto>
+                      <animate-in :delay="75">
+                        <OrganismsSearchFormFlex>
+                          <span aria-hidden class="| body-sm">Between</span>
+                          <AtomsSelect v-model="bedroomRange[0]" :options="bedroomOptions"
+                            class="o-searchform-dropdown | text-input focus-visible" name="min-bedrooms"
+                            aria-label="Minimum bedrooms" />
+                        </OrganismsSearchFormFlex>
+                      </animate-in>
 
-                  <animate-in :delay="100">
-                    <OrganismsSearchFormFlex>
-                      <span aria-hidden class="| body-sm">and</span>
-                      <AtomsSelect v-model="bedroomRange[1]" :options="bedroomOptions"
-                        class="| text-input body-sm focus-visible" name="max-bedrooms" aria-label="Maximum bedrooms" />
-                    </OrganismsSearchFormFlex>
-                  </animate-in>
-                </OrganismsSearchFormGrid>
-              </OrganismsSearchFormTitleBlock>
+                      <animate-in :delay="100">
+                        <OrganismsSearchFormFlex>
+                          <span aria-hidden class="| body-sm">and</span>
+                          <AtomsSelect v-model="bedroomRange[1]" :options="bedroomOptions"
+                            class="o-searchform-dropdown | text-input focus-visible" name="max-bedrooms"
+                            aria-label="Maximum bedrooms" />
+                        </OrganismsSearchFormFlex>
+                      </animate-in>
+                    </OrganismsSearchFormGrid>
+                  </OrganismsSearchFormTitleBlock>
+                </template>
 
-              <OrganismsSearchFormTitleBlock title="Bathrooms">
-                <OrganismsSearchFormGrid grid-auto>
-                  <animate-in :delay="125">
-                    <OrganismsSearchFormFlex>
-                      <span aria-hidden class="| body-sm">Between</span>
-                      <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
-                        class="| text-input body-sm focus-visible" name="min-bathrooms"
-                        aria-label="Minimum bathrooms" />
-                    </OrganismsSearchFormFlex>
-                  </animate-in>
+                <template #right-column>
+                  <OrganismsSearchFormTitleBlock title="Bathrooms">
+                    <OrganismsSearchFormGrid grid-auto>
+                      <animate-in :delay="125">
+                        <OrganismsSearchFormFlex>
+                          <span aria-hidden class="| body-sm">Between</span>
+                          <AtomsSelect v-model="bathroomRange[0]" :options="bathroomOptions"
+                            class="o-searchform-dropdown | text-input focus-visible" name="min-bathrooms"
+                            aria-label="Minimum bathrooms" />
+                        </OrganismsSearchFormFlex>
+                      </animate-in>
 
-                  <animate-in :delay="150">
-                    <OrganismsSearchFormFlex>
-                      <span aria-hidden class="| body-sm">and</span>
-                      <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
-                        class="| text-input body-sm focus-visible" name="max-bathrooms"
-                        aria-label="Maximum bathrooms" />
-                    </OrganismsSearchFormFlex>
-                  </animate-in>
-                </OrganismsSearchFormGrid>
-              </OrganismsSearchFormTitleBlock>
-            </OrganismsSearchFormGrid>
+                      <animate-in :delay="150">
+                        <OrganismsSearchFormFlex>
+                          <span aria-hidden class="| body-sm">and</span>
+                          <AtomsSelect v-model="bathroomRange[1]" :options="bathroomOptions"
+                            class="o-searchform-dropdown | text-input focus-visible" name="max-bathrooms"
+                            aria-label="Maximum bathrooms" />
+                        </OrganismsSearchFormFlex>
+                      </animate-in>
+                    </OrganismsSearchFormGrid>
+                  </OrganismsSearchFormTitleBlock>
+                </template>
+              </OrganismsSearchFormDividedColumns>
+            </OrganismsSearchFormDividedRows>
           </animate-in>
 
           <!-- property types -->
           <animate-in :delay="150">
-            <OrganismsSearchFormTitleBlock title="Property type">
-              <MoleculesAccordionMultiselect v-for="{ id, name, options } of propertyTypes" :title="name" :options
-                v-model="selectedPropertyTypes[id]" />
-            </OrganismsSearchFormTitleBlock>
+            <OrganismsSearchFormDividedRows :hide-divider="!popoverExpanded">
+              <OrganismsSearchFormTitleBlock title="Property type">
+                <div role="presentation" class="| flow flow-xs">
+                  <MoleculesAccordionMultiselect v-for="{ id, name, options } of propertyTypes" :title="name" :options
+                    v-model="selectedPropertyTypes[id]" />
+                </div>
+              </OrganismsSearchFormTitleBlock>
+            </OrganismsSearchFormDividedRows>
           </animate-in>
 
           <!-- Date Added and Include Options -->
-          <OrganismsSearchFormGrid v-show="popoverExpanded" class="o-searchform-animation">
-            <animate-in :delay="0">
-              <OrganismsSearchFormTitleBlock title="Added to site">
-                <MoleculesFormField label="Recently Added" class="| focus-overflow">
-                  <AtomsSelect v-model="initialDate" class="| text-input focus-visible body-sm" name="added-to-site">
-                    <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
+          <OrganismsSearchFormDividedRows v-show="popoverExpanded">
+            <OrganismsSearchFormDividedColumns class="o-searchform-animation">
+              <template #left-column>
+                <animate-in :delay="0">
+                  <MoleculesFormField label="Added to site" class="| focus-overflow">
+                    <AtomsSelect v-model="initialDate" class="o-searchform-dropdown | text-input focus-visible"
+                      name="added-to-site">
+                      <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
                       }}</option>
-                  </AtomsSelect>
-                </MoleculesFormField>
-              </OrganismsSearchFormTitleBlock>
-            </animate-in>
+                    </AtomsSelect>
+                  </MoleculesFormField>
+                </animate-in>
+              </template>
 
-            <animate-in :delay="25">
-              <OrganismsSearchFormTitleBlock title="Include">
-                <MoleculesFormField label="Show" class="| focus-overflow">
-                  <AtomsSelect class="| text-input focus-visible body-sm" name="include" v-model="initialInclude">
-                    <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
-                      :key="value" :value>{{ key
-                      }}</option>
-                  </AtomsSelect>
-                </MoleculesFormField>
-              </OrganismsSearchFormTitleBlock>
-            </animate-in>
-          </OrganismsSearchFormGrid>
+              <template #right-column>
+                <animate-in :delay="25">
+                  <MoleculesFormField label="Property availability" class="| focus-overflow">
+                    <AtomsSelect class="o-searchform-dropdown | text-input focus-visible" name="include"
+                      v-model="initialInclude">
+                      <option v-for="({ key, value }) of isBuy ? saleAvailabilityOptions : rentAvailabilityOptions"
+                        :key="value" :value>{{ key
+                        }}</option>
+                    </AtomsSelect>
+                  </MoleculesFormField>
+                </animate-in>
+              </template>
+            </OrganismsSearchFormDividedColumns>
+          </OrganismsSearchFormDividedRows>
 
           <!-- popular features -->
           <animate-in :delay="50">
-            <OrganismsSearchFormTitleBlock v-show="popoverExpanded" title="Popular Features">
-              <MoleculesScrollBox class="| focus-overflow">
-                <ul class="o-searchform-toggles">
-                  <animate-in v-for="({ key, label, isDefault }, index) in propertyFeatures" :delay="50 + index * 30">
-                    <li :key>
-                      <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
-                    </li>
-                  </animate-in>
-                </ul>
-              </MoleculesScrollBox>
-            </OrganismsSearchFormTitleBlock>
+            <OrganismsSearchFormDividedRows hide-divider v-show="popoverExpanded">
+              <OrganismsSearchFormTitleBlock title="Popular Features">
+                <MoleculesScrollBox class="| focus-overflow">
+                  <ul class="o-searchform-toggles">
+                    <animate-in v-for="({ key, label, isDefault }, index) in propertyFeatures" :delay="50 + index * 30">
+                      <li :key>
+                        <AtomsToggleBox :label="label" :checked="isDefault" type="checkbox" :name="key" />
+                      </li>
+                    </animate-in>
+                  </ul>
+                </MoleculesScrollBox>
+              </OrganismsSearchFormTitleBlock>
+            </OrganismsSearchFormDividedRows>
           </animate-in>
 
           <!-- Expand popover -->
@@ -475,7 +499,6 @@ async function sendForm(event: Event) {
   --searchform-popover-expanded: 32rem;
   --searchform-maxwidth: calc(100vw - var(--size-24));
   --popover-radius: var(--size-40);
-  --popover-gap: var(--size-12);
   --popover-padding: var(--size-20);
   --popover-offset: var(--size-20);
 
@@ -524,7 +547,7 @@ async function sendForm(event: Event) {
     }
 
     .o-searchform-location-input {
-      font-size: var(--font-md);
+      font-size: max(var(--font-md), 16px);
     }
   }
 
@@ -535,8 +558,12 @@ async function sendForm(event: Event) {
       padding: var(--size-4);
     }
 
-    .o-searchform-location-button {
+    .o-searchform-location-button:not(.button-pending) {
       transform: scale(0.4);
+    }
+
+    .o-searchform-location-button.button-pending {
+      transform: scale(0.8);
     }
 
     .o-searchform-location-button-icon {
@@ -548,18 +575,12 @@ async function sendForm(event: Event) {
     --searchform-maxwidth: calc(100vw - var(--size-48));
     --searchform-width: 20rem;
     --popover-padding: var(--size-28);
-    --popover-gap: var(--size-16);
   }
 
   @include mq.tablet {
     --searchform-width: 24rem;
     --searchform-popover-expanded: 48rem;
-    --popover-gap: var(--size-20);
     --popover-padding: var(--size-32);
-  }
-
-  @include mq.desktop {
-    --popover-gap: var(--size-24);
   }
 }
 
@@ -596,7 +617,7 @@ async function sendForm(event: Event) {
   width: 0;
   padding-inline: var(--size-12);
   text-align: left;
-  font-size: var(--font-sm);
+  font-size: max(var(--font-sm), 16px);
 }
 
 .o-searchform-location-radius {
@@ -605,6 +626,11 @@ async function sendForm(event: Event) {
   max-width: fit-content;
   flex-grow: 0;
   border-radius: var(--popover-radius);
+}
+
+.o-searchform-dropdown {
+  // Important to reduce zooming on iOS
+  font-size: max(var(--font-sm), 16px);
 }
 
 .o-searchform-location:has(.o-searchform-location-input:focus) {
@@ -643,6 +669,10 @@ async function sendForm(event: Event) {
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: #{fn.faded-color(30%)} transparent;
+
+  @include mq.mobile-only {
+    background: var(--background-100);
+  }
 
   @supports (max-height: 100dvh) {
     max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
@@ -732,34 +762,25 @@ async function sendForm(event: Event) {
  */
 @include mq.mobile-only {
   .o-searchform-fixed {
-    top: auto;
-    bottom: 0;
-    z-index: 4;
-  }
+    --o-searchform-fixed-offset: calc(var(--header-height) + var(--header-expanded-height));
 
-  .o-searchform {
-    display: flex;
-    flex-direction: column-reverse;
+    top: var(--header-height);
   }
 
   .o-searchform-popover {
-    top: auto;
-    bottom: calc(100% + var(--size-8));
-    max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
+    position: fixed;
+    border-radius: 0;
+    top: var(--o-searchform-fixed-offset);
+    left: 0;
+    max-width: none;
+    width: 100%;
+    height: calc(100% - var(--o-searchform-fixed-offset));
+    transform: none;
+    // max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
 
-    @supports (max-height: 100dvh) {
-      max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
-    }
-  }
-
-  .o-searchform-buyrent {
-    margin-top: var(--size-10);
-    margin-bottom: 0;
-  }
-
-  .buyrent-enter-from,
-  .buyrent-leave-to {
-    transform: translateY(2em);
+    // @supports (max-height: 100dvh) {
+    //   max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
+    // }
   }
 }
 </style>

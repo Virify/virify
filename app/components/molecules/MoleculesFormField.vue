@@ -1,6 +1,6 @@
 <template>
   <div role="presentation" class="m-formfield" :class="{
-    '|flow flow-xs': !noSpacing
+    '| flow flow-xs': !noSpacing
   }">
     <AtomsLabel :for="labelId">{{ label }}</AtomsLabel>
 

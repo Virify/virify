@@ -1,5 +1,7 @@
 <template>
-  <div role="presentation" class="o-searchform-title-block | flow flow-md">
+  <div role="presentation" class="o-searchform-title-block | flow flow-md" :class="{
+    'o-searchform-title-block-background': hasBackground
+  }">
     <h2 v-if="title" :class="{
       '| title-xs': !titleLarge,
       '| title-md': titleLarge,
@@ -17,11 +19,13 @@
 interface Props {
   title?: string
   titleLarge?: boolean
+  hasBackground?: boolean
   hasGrid?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   titleLarge: false,
+  hasBackground: false,
   hasGrid: false
 })
 </script>
@@ -30,16 +34,22 @@ withDefaults(defineProps<Props>(), {
 @use '#styles/_utils/media' as mq;
 
 .o-searchform-title-block {
-  background: var(--background-100);
-  padding: var(--popover-gap);
-  border-radius: var(--border-radius-lg);
+  margin: 0;
+  padding: 0;
 
-  @include mq.small-tablet {
-    border-radius: var(--border-radius-xl);
-  }
+  &-background {
+    margin-top: var(--popover-padding);
+    padding: var(--popover-padding);
+    background: var(--background-100);
+    border-radius: var(--border-radius-lg);
 
-  @include mq.tablet {
-    border-radius: var(--border-radius-2xl);
+    @include mq.small-tablet {
+      border-radius: var(--border-radius-xl);
+    }
+
+    @include mq.tablet {
+      border-radius: var(--border-radius-2xl);
+    }
   }
 }
 </style>

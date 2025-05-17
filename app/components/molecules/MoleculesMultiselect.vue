@@ -1,18 +1,10 @@
 <template>
   <ul class="m-multiselect">
     <li>
-      <label>
-        <input type="checkbox" @change="selectAll" v-model="isAllSelected" />
-
-        Toggle all
-      </label>
+      <AtomsCheckbox v-model="isAllSelected" label="Toggle all" @update:modelValue="selectAll" />
     </li>
     <li v-for="{ key, value } of validatedOptions">
-      <label>
-        <input type="checkbox" :value="key" v-model="selected" />
-
-        {{ value }}
-      </label>
+      <AtomsCheckbox :value="key" v-model="selected" :label="value" />
     </li>
   </ul>
 </template>
@@ -27,8 +19,8 @@ const props = defineProps<Props>()
 /**
  *  Model
  */
-const selected = defineModel<string[]>({ default: [] })
-const isAllSelected = ref<boolean>(false)
+const selected = defineModel<any>()
+const isAllSelected = ref<any>(false)
 
 /**
  *  Validate options
@@ -47,11 +39,11 @@ function getKeys() {
 /**
  *  Select all
  */
-function selectAll({ target }: Event) {
-  const isChecked = (target as HTMLInputElement).checked
+function selectAll(isChecked: any): void {
+  if (!!isChecked) {
+    selected.value = getKeys()
 
-  if (isChecked) {
-    return selected.value = getKeys()
+    return
   }
 
   selected.value = []

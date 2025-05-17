@@ -45,19 +45,18 @@ const $canvas = ref(null)
  *  Mount
  */
 onMounted(() => {
+  if (!$canvas.value) return
+
   try {
-    const { drawChart } = usePriceChart($canvas.value, {
-      emptyFillColour: 'rgba(0, 0, 0, 0.05)',
-      fillColour: '#FD8E61'
-    })
+    const { drawChart } = usePriceChart($canvas.value)
 
     watch([percentages, validGraphData], ([{ min, max }, data]) => {
       drawChart(data, { min, max })
     }, { immediate: true })
   } catch (err) {
-    console.error(err)
+    console.error(err);
 
-    $canvas.value.hidden = true
+    ($canvas.value as HTMLElement).hidden = true
   }
 })
 </script>
