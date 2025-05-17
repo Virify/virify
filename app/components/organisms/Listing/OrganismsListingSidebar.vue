@@ -8,26 +8,9 @@
       {{ priceFormatted }}
     </h2>
 
-    <div role="presentation" class="o-listing-sidebar__address-wrapper | flow flow-2xs">
-      <p role="presentation" class="o-listing-sidebar__address font-bold | body-md">
-        123 House, Somewhere Street
-      </p>
-
-      <ul class="o-listing-sidebar__address-links">
-        <li>
-          <a href="#" class="o-listing-sidebar__address-link | body-xs font-semibold">
-            <AtomsIcon icon="listings/map" aria-hidden class="o-listing-sidebar__address-link-icon" />
-            View on map
-          </a>
-        </li>
-        <li>
-          <a href="#" class="o-listing-sidebar__address-link | body-xs font-semibold">
-            <AtomsIcon icon="listings/streetview" aria-hidden class="o-listing-sidebar__address-link-icon" />
-            Streetview
-          </a>
-        </li>
-      </ul>
-    </div>
+    <p role="presentation" class="o-listing-sidebar__address font-bold | body-md">
+      123 House, Somewhere Street
+    </p>
 
     <ul class="o-listing-sidebar__icons | body-sm">
       <li class="o-listing-sidebar__icons-row o-listing-sidebar__icons-row--full">
@@ -83,39 +66,8 @@ const priceFormatted = computed(() => {
     margin-bottom: var(--size-4);
   }
 
-  &__address-wrapper {
-    padding: var(--size-12) 0 var(--size-16);
-    border-top: 1px solid var(--border-color-200);
-    border-bottom: 1px solid var(--border-color-200);
-  }
-
   &__address {
     margin: 0;
-  }
-
-  &__address-links {
-    list-style: none;
-    margin-inline: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--size-20);
-  }
-
-  &__address-link {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--size-6);
-    text-decoration: none;
-    color: var(--secondary-400);
-  }
-
-  &__address-link-icon {
-    display: block;
-    width: var(--size-20);
-    height: var(--size-20);
   }
 
   &__icons {
