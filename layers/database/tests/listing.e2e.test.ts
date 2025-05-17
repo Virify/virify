@@ -120,14 +120,15 @@ describe("Listing E2E Tests", () => {
     const addressTimestamp = Date.now();
     testAddress = await prisma.address.create({
       data: {
-        number: "123",
-        street: `Test Street ${addressTimestamp}`, // Make street unique
-        city: `Test City ${addressTimestamp}`, // Make city unique 
-        postcode: `TE${addressTimestamp}`, // Make postcode unique
-        country: "Test Country",
-        county: "Test County",
-        lat: 51.5074, // London coordinates
-        lon: -0.1278
+      number: "123",
+      street: `Test Street ${addressTimestamp}`, // Make street unique
+      city: `Test City ${addressTimestamp}`, // Make city unique 
+      postcode: `TE${addressTimestamp}`, // Make postcode unique
+      country: "Test Country",
+      county: "Test County",
+      fullAddress: `Test Street ${addressTimestamp}, Test City ${addressTimestamp}, TE${addressTimestamp}, Test Country`,
+      lat: 51.5074, // London coordinates
+      lon: -0.1278
       }
     });
 

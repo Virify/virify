@@ -334,6 +334,16 @@ export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
   };
 };
 
+export const generateAddress = (address: any) => {
+  return {
+    street: address.street,
+    city: address.city,
+    postcode: address.postcode,
+    fullAddress: address.street + ", " + address.city + ", " + address.postcode,
+    lat: address.lat,
+    lon: address.lon,
+  }
+}
 /**
  * Generates a full property object with address
  *
@@ -411,7 +421,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
         create: generateEnergyAndUtilities(),
       },
       address: {
-        create: address,
+        create: generateAddress(address),
       },
       runningCosts: {
         create: generateRunningCosts(),
