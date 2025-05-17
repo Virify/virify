@@ -5,12 +5,8 @@
     </div>
     <div v-else class="p-listing">
       <div class="p-listing__content">
-        <div ref="$images" class="p-listing__images p-listing__images--large">
-          Images
-        </div>
-
-        <h3 class="| title-sm">Images</h3>
-        <pre>{{ images }}</pre>
+        <OrganismsListingCarousel ref="$images" class="p-listing__images p-listing__images--large" :slides="images"
+          :width="1000" />
 
         <h3 class="| title-sm">Property</h3>
         <pre>{{ property }}</pre>
@@ -19,9 +15,7 @@
       <div class="p-listing__sidebar">
         <Transition name="p-listing-images">
           <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
-            <div class="p-listing__images">
-              Images
-            </div>
+            <OrganismsListingCarousel class="p-listing__images" :slides="images" :width="400" />
           </div>
         </Transition>
 
@@ -129,6 +123,7 @@ useIntersectionObserver($images, ([entry]) => {
     aspect-ratio: 16 / 9;
     border-radius: var(--border-radius-2xl);
     margin-bottom: var(--size-24);
+    overflow: hidden;
 
     /**
      *  DEBUG
