@@ -62,9 +62,17 @@ const optionsCount = computed(() => {
  */
 const currentIndex = ref(0)
 
+// Emit event for parent components
+const emit = defineEmits(['update:content']);
+
 function setCurrentOption(index: number) {
   currentIndex.value = index
   focusIndex.value = index
+  
+  // Emit the content value when tab changes
+  if (validOptions.value[index]) {
+    emit('update:content', validOptions.value[index].content)
+  }
 }
 
 /**

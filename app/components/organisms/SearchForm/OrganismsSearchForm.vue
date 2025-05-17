@@ -214,7 +214,8 @@ useScrollThreshold(10, (newValue) => {
 })
 
 const isContracted = computed(() => {
-  return (!isTablet.value || isScrolled.value) && popoverHidden.value
+  // Only contract when scrolling, not on initial page load
+  return isScrolled.value && popoverHidden.value
 })
 
 /**
@@ -327,7 +328,7 @@ watchDebounced(
  * Price range
  */
 const { data: priceRangeGraph } = useAsyncData('price-graph', () => {
-  return $fetch("/api/price/graph", {
+  return $fetch<string[]>("/api/price/graph", {
     params: {
       listingType: buyOrRent.value
     }
