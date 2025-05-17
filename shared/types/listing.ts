@@ -58,9 +58,7 @@ export type ListingSearchOptional = {
 
 export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilityStatus | (SaleAvailabilityStatus | RentalAvailabilityStatus)[];
 
-/**
- * ListingCardType
- */
+
 /**
  * Listing Card Select Object
  */
@@ -90,6 +88,7 @@ export const listingCardFields = {
           postcode: true,
           country: true,
           county: true,
+          fullAddress: true,
           lat: true,
           lon: true,
         },
