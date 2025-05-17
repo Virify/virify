@@ -9,7 +9,11 @@ const searchSchema = z.object({
   radius: z.coerce.number().min(0).max(40),
   propertyTypes: z.record(z.coerce.string(), z.array(z.coerce.number())).optional(),
   priceRange: z.array(z.coerce.number()).optional(),
-  location: z.string(),
+  location: z.string().optional(),
+  coordinates: z.object({
+    lat: z.number(),
+    lon: z.number(),
+  }),
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
   addedToSite: z.enum(["0", "1", "3", "7", "14"]).optional(),
@@ -28,13 +32,13 @@ const searchSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const { buyOrRent, radius, propertyTypes, priceRange, location, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, coordinates, propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
 
     /**
      * Required for search
      */
     const listingSearch: ListingSearch = {
-      location,
+      coordinates,
       radius,
       type: buyOrRent,
     };
@@ -77,4 +81,3 @@ export default defineEventHandler(async (event) => {
     errorResponse(error, event);
   }
 });
-

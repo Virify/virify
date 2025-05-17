@@ -1,402 +1,306 @@
-import type { MapMarker } from "../../shared/types/map-coordinates";
-import type { ListingCardType } from "../../shared/types/listing";
+import type { MapMarker } from "~~/shared/types/map-coordinates";
+import { useNotes } from "~~/app/composables/useNotes";
+import { useFavourites } from "~~/app/composables/useFavourites";
+import { createVNode, render, h, defineComponent } from "vue";
+import MoleculesMarkerPopup from "../components/molecules/MoleculesMarkerPopup.vue";
+import MoleculesPriceMarker from "../components/molecules/MoleculesPriceMarker.vue";
 
-interface UseMapTilerOptions {
-  interactive?: boolean;
-  zoom?: number;
-  enableClustering?: boolean;
+/**
+ * Extended map type to include our custom properties
+ */
+interface ExtendedMap {
+  _markers?: any[];
+  _controls?: any[];
+  _lastMarkerData?: MapMarker[];
+  _eventHandlers?: {
+    noteHandler?: (id: number) => void;
+    favoriteHandler?: (id: number) => void;
+  };
+  [key: string]: any;
 }
 
-interface MapCenterCoordinates {
-  lat: number;
-  lon: number;
-}
+/**
+ * Map instance cache for reusing maps across the app to reduce MapTiler API usage
+ */
+const mapInstanceCache: Record<string, ExtendedMap> = {};
 
-// Accept callbacks for marker actions
-export function useMapTiler({
-  onPropertyNote,
-  onPropertyFavourite,
-}: {
-  onPropertyNote?: (propertyId: number) => void;
-  onPropertyFavourite?: (propertyId: number) => void;
-} = {}) {
-  const { $maptilersdk: sdk } = useNuxtApp();
+export function useMapTiler() {
+  const sdk = useNuxtApp().$maptilersdk;
+  const notes = useNotes();
+  const favs = useFavourites();
 
   /**
-   * Initialize a map with markers
+   * Initialize or reuse a MapTiler map instance.
+   * @param container DOM element for map
+   * @param options interactive & zoom settings
+   * @param mapId optional cache key
    */
-  function initializeMap(container: HTMLElement, options: UseMapTilerOptions = {}, markers?: MapMarker[], singleLat?: number, singleLon?: number) {
-    // Determine center coordinates
-    const center = getMapCenter(markers, singleLat, singleLon);
-    if (!center) return null;
+  function initializeMap(container: HTMLElement, options: { interactive?: boolean; zoom?: number } = {}, mapId?: string): ExtendedMap {
+    // Case 1: Reuse existing map if available
+    if (mapId && mapInstanceCache[mapId]) {
+      const existingMap = mapInstanceCache[mapId];
+      console.log(`[useMapTiler] Reusing map instance: ${mapId}`);
 
-    // Define map options
-    const mapOptions = {
-      container: container,
-      // Use a complete style URL that includes all required sprites/assets
+      // Safely detach from old container and attach to new one
+      try {
+        const mapContainer = existingMap.getContainer();
+        if (mapContainer && mapContainer.parentElement) {
+          mapContainer.remove();
+        }
+        container.appendChild(mapContainer || document.createElement("div"));
+      } catch (e) {
+        console.error("[useMapTiler] Error reattaching map:", e);
+      }
+
+      // Schedule a safe resize to ensure proper rendering
+      setTimeout(() => {
+        try {
+          existingMap.resize();
+          console.log("[useMapTiler] Resized reused map");
+        } catch {}
+      }, 50);
+
+      return existingMap;
+    }
+
+    // Case 2: Create new map instance
+    console.log(`[useMapTiler] Creating new map instance${mapId ? ": " + mapId : ""}`);
+    const map = new sdk.Map({
+      container,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${sdk.config.apiKey}`,
-      center: [center[1], center[0]] as [number, number],
-      zoom: options.zoom || 12,
-      interactive: options.interactive === true,
-      attributionControl: false,
-      dragPan: options.interactive === true,
-      scrollZoom: options.interactive === true,
-      doubleClickZoom: options.interactive === true,
-      touchZoomRotate: options.interactive === true,
-      boxZoom: options.interactive === true,
-      keyboard: options.interactive === true,
-    };
+      zoom: options.zoom ?? 12,
+      interactive: options.interactive !== false,
+    }) as ExtendedMap;
 
-    // Create map instance
-    const map = new sdk.Map(mapOptions);
+    // Initialize map data structures
+    map._markers = [];
+    map._controls = [];
+    map._eventHandlers = {};
 
-    // Handle missing style images to prevent console warnings
-    map.on("styleimagemissing", (e: { id: string }) => {
-      // With a complete style URL, we should not get these warnings anymore
-      console.debug(`Missing map style image: ${e.id}`);
+    // Set up map event listeners for stability
+    map.on("load", () => {
+      console.log("[useMapTiler] Map loaded, forcing resize");
+      setTimeout(() => {
+        try {
+          map.resize();
+        } catch {}
+      }, 100);
     });
+
+    // Cache if ID provided
+    if (mapId) {
+      mapInstanceCache[mapId] = map;
+    }
 
     return map;
   }
 
   /**
-   * Add markers to a map
+   * Update map controls (navigation, etc)
    */
-  function addMarkersToMap(map: any, markers?: MapMarker[], singleLat?: number, singleLon?: number) {
-    const markerElements: any[] = [];
+  function setControls(map: ExtendedMap, interactive: boolean) {
+    if (!map) return;
 
-    // Add markers from an array
-    if (markers?.length) {
-      markers.forEach((markerData) => {
-        const marker = createMarker(map, markerData);
-        if (marker) markerElements.push(marker);
-      });
-    }
-    // Add a single marker if lat/lon are provided
-    else if (singleLat !== undefined && singleLon !== undefined) {
-      const marker = new sdk.Marker().setLngLat([singleLon, singleLat]).addTo(map);
-      markerElements.push(marker);
+    // Store current control count for debugging
+    const currentControlCount = map._controls?.length || 0;
+
+    // Check if any control elements exist on the map
+    let mapControlContainer;
+    try {
+      mapControlContainer = map.getContainer()?.querySelector(".maplibregl-control-container");
+    } catch (e) {}
+
+    // If controls already exist with correct state, don't modify them
+    if ((interactive && currentControlCount > 0) || (!interactive && currentControlCount === 0)) {
+      return;
     }
 
-    return markerElements;
+    // Remove existing controls - both tracked and any that might exist on the DOM
+    (map._controls || []).forEach((control: any) => {
+      try {
+        map.removeControl(control);
+      } catch {}
+    });
+
+    // Reset controls tracking array
+    map._controls = [];
+
+    // Also try to remove any pre-existing controls that might be left over
+    if (mapControlContainer) {
+      try {
+        const navControls = mapControlContainer.querySelectorAll(".maplibregl-ctrl-group");
+        navControls.forEach((ctrl: { remove: () => void }) => {
+          ctrl.remove();
+        });
+      } catch (e) {}
+    }
+
+    // Add new controls if interactive
+    if (interactive) {
+      try {
+        const navControl = new sdk.NavigationControl({
+          showCompass: true,
+          showZoom: true,
+        });
+        map.addControl(navControl);
+        map._controls.push(navControl);
+      } catch (e) {
+        console.error("[useMapTiler] Error adding controls:", e);
+      }
+    }
   }
 
   /**
-   * Create a marker with popup (Vue 3 idiomatic, declarative template)
+   * Remove all existing markers from the map
    */
-  function createMarker(map: any, markerData: MapMarker) {
-    // --- Declarative popup HTML ---
-    const hasBedrooms = markerData.bedrooms !== null && markerData.bedrooms !== undefined;
-    const hasBathrooms = markerData.bathrooms !== null && markerData.bathrooms !== undefined;
-    const hasNote = !!markerData.hasNote;
-    const isFavorite = !!markerData.isFavorite;
-    const propertyId = typeof markerData.id === "number" ? markerData.id : null;
-    const priceDisplay = markerData.price !== null && markerData.price !== undefined ? (markerData.price >= 10000 ? `£${Math.round(markerData.price / 1000)}k` : `£${markerData.price.toLocaleString()}`) : "";
-    const addressParts = markerData.address ? [markerData.address.street, markerData.address.city, markerData.address.postcode].filter(Boolean) : [];
-    const typeText = [markerData.propertyType, markerData.classification].filter(Boolean).join(" - ");
+  function clearMarkers(map: ExtendedMap) {
+    if (!map) return;
 
-    // Compose popup HTML
-    const popupHtml = `
-      <div class="marker-popup">
-        ${
-          markerData.image && markerData.image[0] && markerData.image[0].image
-            ? `
-          <div class="marker-popup-image-container">
-            <img class="marker-popup-image" src="${markerData.image[0].image}" alt="${markerData.image[0].metadata || markerData.title || "Property image"}" />
-          </div>
-        `
-            : ""
+    // Remove all existing markers
+    (map._markers || []).forEach((marker: any) => {
+      try {
+        if (marker && typeof marker.remove === "function") {
+          marker.remove();
         }
-        ${markerData.title ? `<strong class="marker-popup-title">${markerData.title}</strong>` : ""}
-        ${addressParts.length > 0 ? `<div class="marker-popup-address">${addressParts.join(", ")}</div>` : ""}
-        <div class="marker-popup-info-container">
-          <div class="marker-popup-price-column">
-            ${markerData.price !== null && markerData.price !== undefined ? `<div class="marker-popup-price">£${markerData.price.toLocaleString()}</div>` : ""}
-            ${markerData.priceType ? `<div class="marker-popup-price-type">${markerData.priceType.replace(/_/g, " ").toLowerCase()}</div>` : ""}
-          </div>
-          <div class="marker-popup-details-column">
-            ${typeText ? `<div class="marker-popup-property-type">${typeText}</div>` : ""}
-            ${
-              hasBedrooms || hasBathrooms
-                ? `
-              <div class="marker-popup-features">
-                ${hasBedrooms ? `<span class="marker-popup-bedrooms">${markerData.bedrooms} bed${markerData.bedrooms !== 1 ? "s" : ""}</span>` : ""}
-                ${hasBedrooms && hasBathrooms ? "<span> • </span>" : ""}
-                ${hasBathrooms ? `<span class="marker-popup-bathrooms">${markerData.bathrooms} bath${markerData.bathrooms !== 1 ? "s" : ""}</span>` : ""}
-              </div>
-            `
-                : ""
-            }
-          </div>
-        </div>
-        <div class="marker-popup-actions">
-          ${
-            propertyId !== null
-              ? `
-            <a class="marker-popup-view-link" href="/listing/${propertyId}">View Listing</a>
-            <div class="marker-popup-notes-button-container" data-property-id="${propertyId}">
-              <button type="button" role="switch" aria-label="Add/Edit Notes" class="marker-popup-notes-button note-button${hasNote ? " has-note" : ""}">
-                <div class="note-icon-wrapper">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="note-button-icon">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                </div>
-              </button>
-            </div>
-            <div class="marker-popup-favorite-button-container" data-property-id="${propertyId}">
-              <button type="button" role="switch" aria-label="Add to favourites" class="marker-popup-favorite-button a-favourite-button${isFavorite ? " selected" : ""}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="${
-                  isFavorite ? "currentColor" : "none"
-                }" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="marker-popup-button-icon">
-                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
-                </svg>
-              </button>
-            </div>
-          `
-              : ""
-          }
-        </div>
-      </div>
-    `;
+      } catch {}
+    });
 
-    // Create popup element and set HTML
-    const popupContent = document.createElement("div");
-    popupContent.innerHTML = popupHtml;
+    map._markers = [];
+  }
 
-    // Attach event listeners for notes and favourite buttons
-    if (propertyId !== null) {
-      // Notes button
-      const notesBtn = popupContent.querySelector(".marker-popup-notes-button") as HTMLButtonElement | null;
-      if (notesBtn) {
-        notesBtn.addEventListener("click", () => {
-          if (onPropertyNote) onPropertyNote(propertyId);
-        });
-      }
-      // Favourite button
-      const favBtn = popupContent.querySelector(".marker-popup-favorite-button") as HTMLButtonElement | null;
-      if (favBtn) {
-        favBtn.addEventListener("click", () => {
-          if (onPropertyFavourite) onPropertyFavourite(propertyId);
-        });
-      }
+  /**
+   * Create a single marker with popup or simple marker based on data
+   */
+  function createMarker(map: ExtendedMap, data: MapMarker, displayPopup: boolean = true) {
+    if (!map || !data) return null;
+
+    // Case 1: Simple marker (no price/popup) for detail pages
+    if (!displayPopup) {
+      return new sdk.Marker().setLngLat([data.lon, data.lat]).addTo(map as any);
     }
 
-    const popup = new sdk.Popup({
-      offset: 25,
-      closeButton: false,
-      className: "custom-popup",
-    }).setDOMContent(popupContent);
+    // Case 2: Full marker with popup for listings
+    // Create popup with Vue component
+    let popup;
+    try {
+      const wrapper = document.createElement("div");
+      const vueApp = useNuxtApp().vueApp;
 
-    // --- Declarative marker element ---
-    if (markerData.price !== null && markerData.price !== undefined) {
-      const el = document.createElement("div");
-      el.className = "price-marker";
-      el.innerHTML = `
-        <div class="price-marker-content">
-          <span class="price-marker-price">${priceDisplay}</span>
-          ${
-            isFavorite || hasNote
-              ? `
-            <div class="marker-status-container">
-              ${
-                isFavorite
-                  ? `<div class="marker-favorite-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="white" stroke="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>`
-                  : ""
-              }
-              ${
-                hasNote
-                  ? `<div class="marker-note-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="white" stroke="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>`
-                  : ""
-              }
-            </div>
-          `
-              : ""
-          }
-        </div>
-      `;
-      const markerOptions = {
-        element: el,
-        anchor: "bottom",
-        offset: [0, -15] as [number, number],
+      // Handler functions using map._eventHandlers
+      const onNoteClick = (id: number) => {
+        if (typeof id === "number") {
+          notes.showNoteDialog(id);
+          map._eventHandlers?.noteHandler?.(id);
+        }
       };
-      return new sdk.Marker(markerOptions).setLngLat([markerData.lon, markerData.lat]).setPopup(popup).addTo(map);
-    } else {
-      // Use standard marker if no price available
-      return new sdk.Marker().setLngLat([markerData.lon, markerData.lat]).setPopup(popup).addTo(map);
-    }
-  }
+      const onFavoriteClick = (id: number) => {
+        if (typeof id === "number") {
+          favs.toggleFavourite(id);
+          map._eventHandlers?.favoriteHandler?.(id);
+        }
+      };
 
-  /**
-   * Center map on specified coordinates
-   */
-  function centerMapOnCoordinates(map: any, lat?: number, lon?: number): boolean {
-    // Verify we have a valid map and coordinates
-    if (!map || typeof lat !== 'number' || typeof lon !== 'number' || !isFinite(lat) || !isFinite(lon)) {
-      return false;
-    }
-
-    // Check if coordinates are valid (non-zero)
-    if (lat === 0 && lon === 0) {
-      return false;
-    }
-
-    // Center the map
-    map.setCenter([lon, lat]);
-    return true;
-  }
-
-  /**
-   * Center map using the first marker or specified coordinates
-   */
-  function centerMapOnMarkers(map: any, markers?: MapMarker[], fallbackLat?: number, fallbackLon?: number): boolean {
-    if (!map) return false;
-
-    // Try to use first marker coordinates
-    if (markers?.length && markers[0] && typeof markers[0].lat === 'number' && typeof markers[0].lon === 'number') {
-      return centerMapOnCoordinates(map, markers[0].lat, markers[0].lon);
-    }
-    
-    // Fall back to specified coordinates
-    if (typeof fallbackLat === 'number' && typeof fallbackLon === 'number') {
-      return centerMapOnCoordinates(map, fallbackLat, fallbackLon);
-    }
-
-    return false;
-  }
-
-  /**
-   * Determine map center coordinates
-   */
-  function getMapCenter(markers?: MapMarker[], singleLat?: number, singleLon?: number): [number, number] | undefined {
-    if (markers?.length) {
-      return markers[0] ? [markers[0].lat, markers[0].lon] : undefined;
-    } else if (singleLat !== undefined && singleLon !== undefined) {
-      return [singleLat, singleLon];
-    }
-    return undefined;
-  }
-
-  /**
-   * Check if coordinates are valid for displaying a map
-   */
-  function hasValidCoordinates(markers?: MapMarker[], singleLat?: number, singleLon?: number): boolean {
-    const isValid = (lat?: number, lon?: number) => typeof lat === "number" && typeof lon === "number" && lat !== 0 && lon !== 0;
-
-    if (markers?.length) {
-      return markers.some((marker) => isValid(marker.lat, marker.lon));
-    }
-
-    return isValid(singleLat, singleLon);
-  }
-
-  /**
-   * Add interactive indicator to map
-   */
-  function addInteractiveIndicator(mapContainer: HTMLElement) {
-    const interactiveIndicator = document.createElement("div");
-    interactiveIndicator.className = "interactive-map-indicator";
-    interactiveIndicator.innerHTML = "Interactive Map";
-    mapContainer.appendChild(interactiveIndicator);
-
-    // Add timeout to fade out the indicator
-    setTimeout(() => {
-      interactiveIndicator.classList.add("fade-out");
-      setTimeout(() => {
-        interactiveIndicator.remove();
-      }, 1000);
-    }, 3000);
-  }
-
-  /**
-   * Setup event handlers for map interaction prevention
-   */
-  function setupEventHandlers(mapContainer: HTMLElement, interactive: boolean) {
-    const preventScroll = (e: Event) => {
-      if (!interactive) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-
-    if (mapContainer) {
-      mapContainer.addEventListener("wheel", preventScroll, { passive: false });
-      mapContainer.addEventListener("mousewheel", preventScroll, { passive: false });
-      mapContainer.addEventListener("touchstart", preventScroll, { passive: false });
-    }
-
-    // Return cleanup function
-    return () => {
-      if (mapContainer) {
-        mapContainer.removeEventListener("wheel", preventScroll);
-        mapContainer.removeEventListener("mousewheel", preventScroll);
-        mapContainer.removeEventListener("touchstart", preventScroll);
-      }
-    };
-  }
-
-  /**
-   * Create map markers from listings data
-   */
-  function createMapMarkersFromListings(
-    listings: ListingCardType[] | null, 
-    isFavouriteFn: (id: number) => boolean, 
-    hasNoteFn: (id: number) => boolean
-  ): MapMarker[] {
-    if (!listings) return [];
-    
-    return listings
-      .map((listing) => ({
-        id: listing.id,
-        lat: listing.property?.address.lat ?? 0,
-        lon: listing.property?.address.lon ?? 0,
-        title: listing.title,
-        bedrooms: listing.property?.numberBedrooms || 0,
-        bathrooms: listing.property?.numberBathrooms || 0,
-        price: listing.price,
-        propertyType: listing.property?.type?.name,
-        classification: listing.property?.classification?.name,
-        priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency,
-        address: {
-          street: listing.property?.address?.street,
-          city: listing.property?.address?.city,
-          postcode: listing.property?.address?.postcode
+      // Create the popup component with event handlers
+      const PopupComp = defineComponent({
+        setup: () => {
+          return () =>
+            h(MoleculesMarkerPopup, {
+              markerData: data,
+              onNoteClick,
+              onFavoriteClick,
+            });
         },
-        image: listing.property?.media,
-        hasNote: hasNoteFn(listing.id),
-        isFavorite: isFavouriteFn(listing.id)
-      }))
-      .filter((m) => m.lat !== 0 && m.lon !== 0);
-  }
+      });
 
-  /**
-   * Get map center coordinates from markers
-   */
-  function getMapCenterFromMarkers(markers: MapMarker[]): MapCenterCoordinates | null {
-    if (markers && markers.length > 0 && markers[0]) {
-      return {
-        lat: markers[0].lat,
-        lon: markers[0].lon
-      };
+      const vnode = createVNode(PopupComp);
+      vnode.appContext = vueApp._context;
+      render(vnode, wrapper);
+
+      popup = new sdk.Popup({ offset: 25, closeButton: false }).setDOMContent(wrapper);
+    } catch (e) {
+      console.error("[useMapTiler] Error creating popup:", e);
     }
-    return null;
+
+    // Create price marker element if price exists
+    let el;
+    if (data.price != null) {
+      try {
+        el = document.createElement("div");
+        el.className = "vue-marker-container";
+        const PriceComp = defineComponent({
+          setup: () => () =>
+            h(MoleculesPriceMarker, {
+              price: data.price,
+              hasNote: !!data.hasNote,
+              isFavorite: !!data.isFavorite,
+            }),
+        });
+        const priceNode = createVNode(PriceComp);
+        priceNode.appContext = useNuxtApp().vueApp._context;
+        render(priceNode, el);
+      } catch (e) {
+        console.error("[useMapTiler] Error creating price marker:", e);
+      }
+    }
+
+    // Create and return marker
+    try {
+      const marker = new sdk.Marker(el ? { element: el, anchor: "bottom" } : {}).setLngLat([data.lon, data.lat]);
+
+      if (popup) {
+        marker.setPopup(popup);
+      }
+
+      return marker.addTo(map as any);
+    } catch (e) {
+      console.error("[useMapTiler] Error creating marker:", e);
+      return null;
+    }
   }
 
   /**
-   * Calculate appropriate zoom level based on search radius
+   * Clear all markers and add new ones
+   */
+  function addMarkers(map: ExtendedMap, markers: MapMarker[] = [], displayPopups: boolean = true): any[] {
+    if (!map) return [];
+    clearMarkers(map);
+    const created: any[] = [];
+    markers.forEach((data) => {
+      const marker = createMarker(map, data, displayPopups);
+      if (marker) created.push(marker);
+    });
+    map._markers = created;
+    return created;
+  }
+
+  /**
+   * Center map on coordinates
+   */
+  function centerMap(map: ExtendedMap, lat: number, lon: number) {
+    if (!map || typeof lat !== "number" || typeof lon !== "number") return;
+
+    try {
+      map.jumpTo({ center: [lon, lat], animate: false });
+    } catch (e) {
+      console.error("[useMapTiler] Error centering map:", e);
+      try {
+        map.setCenter([lon, lat]);
+      } catch {}
+    }
+  }
+
+  /**
+   * Calculate zoom level based on search radius
    */
   function calculateZoomLevelFromRadius(radius?: number | null): number {
-    if (!radius) return 14; // Default zoom if no radius is specified (higher zoom)
+    if (!radius) return 14;
 
-    // Map radius values to appropriate zoom levels - higher minimum as requested
-    // Lower zoom value = more zoomed out
     const radiusNum = Number(radius);
 
     if (radiusNum === 0) return 16;
     else if (radiusNum <= 0.25) return 15;
     else if (radiusNum <= 0.5) return 14;
     else if (radiusNum <= 1) return 13;
-    else if (radiusNum <= 2) return 12;
     else if (radiusNum <= 5) return 12;
     else if (radiusNum <= 10) return 12;
     else if (radiusNum <= 20) return 11;
@@ -404,75 +308,177 @@ export function useMapTiler({
   }
 
   /**
-   * Handle map view changes, updating map responsively
+   * Create map markers from listings data
+   * Uses internal state management for favorites and notes
+   */
+  function createMapMarkersFromListings(listings: any[] | null | undefined): MapMarker[] {
+    if (!listings || !Array.isArray(listings)) return [];
+
+    return listings.map((item) => ({
+      id: item.id,
+      lat: item.property?.address?.lat ?? 0,
+      lon: item.property?.address?.lon ?? 0,
+      title: item.title ?? null,
+      bedrooms: item.property?.numberBedrooms ?? null,
+      bathrooms: item.property?.numberBathrooms ?? null,
+      price: item.price ?? null,
+      propertyType: item.property?.type?.name ?? null,
+      classification: item.property?.classification?.name ?? null,
+      priceType: item.saleListing?.priceType ?? item.rentalListing?.rentFrequency ?? null,
+      address: item.property?.address
+        ? {
+            street: item.property.address.street,
+            city: item.property.address.city,
+            postcode: item.property.address.postcode,
+          }
+        : null,
+      image: item.property?.media ?? [],
+      hasNote: notes.hasNote(item.id),
+      isFavorite: favs.isFavourite(item.id),
+    }));
+  }
+
+  /**
+   * Geocoding autocomplete
+   */
+  async function autoComplete(query: string): Promise<any[]> {
+    if (!query) return [];
+
+    try {
+      const res = await $fetch(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json`, { query: { key: sdk.config.apiKey, country: "gb" } });
+      return (res as any).features ?? [];
+    } catch (e) {
+      console.error("[useMapTiler] Autocomplete error:", e);
+      return [];
+    }
+  }
+
+  /**
+   * Main function to update map view (center, zoom, markers, controls)
    */
   function handleMapViewChange(
-    map: any, 
-    mapCenterCoordinates: MapCenterCoordinates | null,
-    markers?: MapMarker[]
-  ): void {
+    map: ExtendedMap,
+    center?: { lat: number; lon: number },
+    markers?: MapMarker[],
+    interactive: boolean = true,
+    zoom?: number,
+    displayPopups: boolean = true,
+    eventHandlers?: {
+      onNote?: (id: number) => void;
+      onFavorite?: (id: number) => void;
+    }
+  ) {
     if (!map) return;
-    
-    // Trigger map resize to ensure it renders correctly
-    map.resize();
 
-    // Center the map with a small delay to ensure resize has completed
+    console.log(`[useMapTiler] Updating map view:`, {
+      hasCenter: !!center,
+      markerCount: markers?.length ?? 0,
+      interactive,
+      zoom,
+      displayPopups,
+    });
+
+    // Store event handlers on map
+    if (eventHandlers) {
+      map._eventHandlers = {
+        noteHandler: eventHandlers.onNote,
+        favoriteHandler: eventHandlers.onFavorite,
+      };
+    }
+
+    // Update controls
+    setControls(map, interactive);
+
+    // Only update map position if center or zoom explicitly provided
+    const hasPositionChange = center || typeof zoom === "number";
+
+    if (hasPositionChange) {
+      // Prepare jump options - only include properties that are provided
+      const jumpOptions: Record<string, any> = { animate: false };
+
+      if (center) {
+        jumpOptions.center = [center.lon, center.lat];
+      }
+
+      if (typeof zoom === "number") {
+        jumpOptions.zoom = zoom;
+      }
+
+      // Only update position if we have something to update
+      if (Object.keys(jumpOptions).length > 1) {
+        // More than just 'animate: false'
+        try {
+          map.jumpTo(jumpOptions);
+        } catch (e) {
+          console.error("[useMapTiler] Error updating map view:", e);
+
+          // Fallback to individual methods
+          if (center) {
+            try {
+              map.setCenter([center.lon, center.lat]);
+            } catch {}
+          }
+
+          if (typeof zoom === "number") {
+            try {
+              map.setZoom(zoom);
+            } catch {}
+          }
+        }
+      }
+    }
+
+    // Update markers only if explicitly provided AND data actually changed
+    if (markers) {
+      const prev = map._lastMarkerData || [];
+      const changed =
+        !prev ||
+        prev.length !== markers.length ||
+        markers.some((m, i) => {
+          return !prev[i] || m.id !== prev[i].id || m.hasNote !== prev[i].hasNote || m.isFavorite !== prev[i].isFavorite;
+        });
+
+      if (changed) {
+        console.log(`[useMapTiler] Updating ${markers.length} markers`);
+        addMarkers(map, markers, displayPopups);
+        map._lastMarkerData = [...markers];
+      }
+    }
+
+    // Final resize after all updates, but only if map is still valid
     setTimeout(() => {
-      // Try to center on specific coordinates first
-      if (mapCenterCoordinates) {
-        centerMapOnCoordinates(map, mapCenterCoordinates.lat, mapCenterCoordinates.lon);
-      } 
-      // Fall back to centering on markers
-      else if (markers && markers.length > 0) {
-        centerMapOnMarkers(map, markers);
+      // Check if map is still mounted and valid
+      if (map && map.getContainer && map.getContainer()) {
+        try {
+          map.resize();
+          console.log("[useMapTiler] Map resized successfully");
+        } catch (e) {
+          console.error("[useMapTiler] Error during map resize:", e);
+        }
       }
     }, 100);
   }
 
   /**
-   * Setup watchers to automatically recenter map when relevant data changes
+   * Create reactive map markers that update when favorites or notes change
    */
-  function setupMapAutoRecentering(
-    map: Ref<any | null>,
-    coordinates: ComputedRef<MapCenterCoordinates | null>,
-    zoomLevel: ComputedRef<number>,
-    currentView: Ref<string>,
-    searchParams?: Ref<Record<string, any> | null>
-  ): void {
-    watch(
-      [searchParams || ref(null), coordinates, zoomLevel, currentView],
-      ([newSearchParams, newCoordinates, newZoomLevel, newView]) => {
-        // Only proceed if we're in map view and have valid coordinates
-        if (newView === 'dual' && map.value?.map && newCoordinates) {
-          // For zoom changes, add a small delay to allow the zoom transition to complete
-          if (newZoomLevel !== undefined) {
-            setTimeout(() => {
-              centerMapOnCoordinates(map.value.map, newCoordinates.lat, newCoordinates.lon);
-            }, 100);
-          } else {
-            centerMapOnCoordinates(map.value.map, newCoordinates.lat, newCoordinates.lon);
-          }
-        }
-      },
-      { deep: true }
-    );
+  function useReactiveMapMarkers(listings: Ref<any[] | null> | any[] | null) {
+    return computed(() => {
+      const listArray = Array.isArray(unref(listings)) ? unref(listings) : [];
+      return createMapMarkersFromListings(listArray);
+    });
   }
 
   return {
-    sdk,
     initializeMap,
-    addMarkersToMap,
-    createMarker,
-    getMapCenter,
-    hasValidCoordinates,
-    addInteractiveIndicator,
-    setupEventHandlers,
-    centerMapOnCoordinates,
-    centerMapOnMarkers,
-    createMapMarkersFromListings,
-    getMapCenterFromMarkers,
+    setControls,
+    clearMarkers,
+    addMarkers,
+    centerMap,
     calculateZoomLevelFromRadius,
+    autoComplete,
+    createMapMarkersFromListings,
     handleMapViewChange,
-    setupMapAutoRecentering,
+    useReactiveMapMarkers,
   };
 }

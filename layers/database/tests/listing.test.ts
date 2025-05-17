@@ -18,7 +18,7 @@ vi.mock("../server/utils/prisma-client", () => ({
 }));
 
 vi.mock("../server/utils/location", () => ({
-  getNearbyPropertiesByTextQuery: mockNearbyProperties,
+  getPropertyIdsByDistance: mockNearbyProperties,
 }));
 
 vi.mock("../server/utils/price", () => ({
@@ -62,6 +62,9 @@ const baseNearby = [
   { propertyId: 20, distanceMiles: 4.2 },
 ];
 
+// Test coordinates for Testville
+const testvilleCoords = { lat: 51.5074, lon: -0.1278 };
+
 describe("getListingByDistanceAndFilters", () => {
   /**
    * Clears all mocks before each test.
@@ -82,7 +85,7 @@ describe("getListingByDistanceAndFilters", () => {
     ]);
 
     const result = await getListingByDistanceAndFilters(
-      { type: "rent", location: "Testville", radius: 5 },
+      { type: "rent", coordinates: testvilleCoords, radius: 5 },
       {
         propertyTypes: { "1": [1, 2] },
         priceRange: [900, 1100],
@@ -96,7 +99,7 @@ describe("getListingByDistanceAndFilters", () => {
       }
     );
 
-    expect(mockNearbyProperties).toHaveBeenCalledWith("Testville", 5);
+    expect(mockNearbyProperties).toHaveBeenCalledWith(testvilleCoords.lat, testvilleCoords.lon, 5);
     expect(mockPriceFilter).toHaveBeenCalledWith([900, 1100]);
     expect(mockPrisma.listing.findMany).toHaveBeenCalled();
     expect(result).toHaveLength(2);
@@ -111,7 +114,7 @@ describe("getListingByDistanceAndFilters", () => {
     mockNearbyProperties.mockResolvedValue([]);
     mockPrisma.listing.findMany.mockResolvedValue([]);
     const result = await getListingByDistanceAndFilters(
-      { type: "buy", location: "Nowhere", radius: 10 },
+      { type: "buy", coordinates: { lat: 0, lon: 0 }, radius: 10 },
       {}
     );
     expect(result).toEqual([]);
@@ -124,7 +127,7 @@ describe("getListingByDistanceAndFilters", () => {
     mockNearbyProperties.mockResolvedValue(baseNearby);
     mockPrisma.listing.findMany.mockResolvedValue([]);
     const result = await getListingByDistanceAndFilters(
-      { type: "rent", location: "Testville", radius: 5 },
+      { type: "rent", coordinates: testvilleCoords, radius: 5 },
       { propertyTypes: { "1": [2, 3] } }
     );
     expect(result).toEqual([]);
@@ -138,7 +141,7 @@ describe("getListingByDistanceAndFilters", () => {
     mockPriceFilter.mockReturnValue(undefined);
     mockPrisma.listing.findMany.mockResolvedValue([{ ...baseListing }]);
     const result = await getListingByDistanceAndFilters(
-      { type: "buy", location: "Testville", radius: 5 },
+      { type: "buy", coordinates: testvilleCoords, radius: 5 },
       {}
     );
     expect(result).toHaveLength(1);
@@ -153,7 +156,7 @@ describe("getListingByDistanceAndFilters", () => {
     mockPriceFilter.mockReturnValue(undefined);
     mockPrisma.listing.findMany.mockResolvedValue([{ ...baseListing }]);
     const result = await getListingByDistanceAndFilters(
-      { type: "rent", location: "Testville", radius: 5 },
+      { type: "rent", coordinates: testvilleCoords, radius: 5 },
       {}
     );
     expect(result).toHaveLength(1);
@@ -167,7 +170,7 @@ describe("getListingByDistanceAndFilters", () => {
     mockPriceFilter.mockReturnValue({ gte: 500000, lte: 600000 });
     mockPrisma.listing.findMany.mockResolvedValue([{ ...baseListing, saleListing: { availabilityStatus: SaleAvailabilityStatus.AVAILABLE } }]);
     const result = await getListingByDistanceAndFilters(
-      { type: "buy", location: "Testville", radius: 5 },
+      { type: "buy", coordinates: testvilleCoords, radius: 5 },
       { priceRange: [500000, 600000], availabilityOptions: [SaleAvailabilityStatus.AVAILABLE] }
     );
     expect(result[0]).toBeTruthy();

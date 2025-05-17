@@ -1,7 +1,8 @@
 <template>
   <OrganismsSearchForm />
-  <OrganismsHeroHome v-if="currentView === 'list'" />
-  <div :class="['view-toggle-container', 'container', { 'no-bottom-margin': isMapView }]" v-if="searchListings">
+  <OrganismsHeroHome v-if="currentView === 'list'" :title="heroTitle" />
+  <div :class="['view-toggle-container', 'container', { 'no-bottom-margin': isMapView }]"
+    v-if="searchListings && searchListings.length > 0">
     <MoleculesTabs :options="viewOptions" @update:content="handleViewChange" v-slot="{ content }">
       <div v-show="content === 'list'" class="p-listing-test-grid | container">
         <MoleculesListingCard v-for="listing in searchListings" :key="listing.id" :property-id="listing.id"
@@ -14,9 +15,16 @@
       </div>
       <div v-show="content === 'dual'" class="dual-view-container">
         <div class="dual-view-map">
-          <OrganismsMap ref="dualMapRef" :markers="getMapMarkers" :zoom="mapZoomLevel" :lat="mapCenterCoordinates?.lat"
-            :lon="mapCenterCoordinates?.lon" :interactive="true" customClass="map-sidebar"
-            @property-note="handleMapNote" @property-favourite="handleMapFavourite" />
+          <OrganismsMap
+            v-if="currentView === 'dual'"
+            :markers="getMapMarkers"
+            :zoom="mapZoomLevel"
+            :center="mapCenterCoordinates"
+            :interactive="true"
+            :display-popups="true"
+            mapId="global-app-map"
+            customClass="map-sidebar"
+            />
         </div>
         <div class="dual-view-listings">
           <MoleculesListingCardHorizontal v-for="listing in searchListings" :key="listing.id" :property-id="listing.id"
@@ -28,130 +36,73 @@
             :description="listing.title" />
         </div>
       </div>
+      <div v-show="content === 'map'" class="map-only-container">
+        <OrganismsMap
+          v-if="currentView === 'map'"
+          :markers="getMapMarkers"
+          :zoom="mapZoomLevel"
+          :center="mapCenterCoordinates"
+          :interactive="true"
+          :display-popups="true"
+          mapId="global-app-map"
+          customClass="map-fullscreen"
+           />
+      </div>
     </MoleculesTabs>
   </div>
 </template>
 
 <script setup lang="ts">
-/**
- * State
- */
+import { useState, useRoute } from '#imports';
+import { useMapTiler } from '~/composables/useMapTiler';
+
+// Listings state
 const searchListings = ref<ListingCardType[] | null>(null);
-provide("searchListings", searchListings);
-const searchParams = useState<Record<string, any>>("searchParams");
+provide('searchListings', searchListings);
+const searchParams = useState<Record<string, any>>('searchParams');
 
-// Replace 'any' with the actual type of your OrganismsMap component instance if available
-type OrganismsMapInstance = {
-  map: any; // Replace 'any' with the actual map instance type if known
-};
-
-const dualMapRef = ref<OrganismsMapInstance | null>(null);
-
-// Track current view (initialized with default view)
+// View toggles
 const currentView = ref('list');
-const isMapView = computed(() => currentView.value === 'dual');
+const isMapView = computed(() => currentView.value === 'dual' || currentView.value === 'map');
+const heroTitle = computed(() => {
+  if(searchListings.value && searchListings.value.length < 0) {
+    return "No Results Found";
+  } else {
+     return "Property search on another level";
+  }
+}
 
-// View toggle options
-const viewOptions = ref([
-  { label: "List View", content: "list" },
-  { label: "Map View", content: "dual" }
-]);
-
-// Import composables
-const { isFavourite } = useFavourites();
-const { hasNote } = useNotes();
-const mapTilerFunctions = useMapTiler();
-
-// Update currentView when tab changes
+);
+const viewOptions = [
+  { label: 'List View', content: 'list' },
+  { label: 'Split View', content: 'dual' },
+  { label: 'Map View', content: 'map' }
+];
 function handleViewChange(content: string) {
   currentView.value = content;
-
-  // If switching to map view, use the useMapTiler function to handle map view changes
-  if (content === 'dual' && dualMapRef.value?.map) {
-    mapTilerFunctions.handleMapViewChange(
-      dualMapRef.value.map,
-      mapCenterCoordinates.value,
-      getMapMarkers.value
-    );
-  }
 }
 
-// Add event listeners for map marker buttons
+// Map helpers with state management moved into the composable
+const { calculateZoomLevelFromRadius, useReactiveMapMarkers } = useMapTiler();
+
+// Create reactive map markers that update when favorites or notes change
+const getMapMarkers = useReactiveMapMarkers(searchListings);
+
+const mapZoomLevel = computed(() => calculateZoomLevelFromRadius(searchParams.value?.radius));
+
+const mapCenterCoordinates = computed(() => {
+  const m = getMapMarkers.value[0];
+  return m ? { lat: m.lat, lon: m.lon } : undefined;
+});
+
+
+// Initialize view from URL
 onMounted(() => {
-  // Check URL for any view parameter and set the initial view
   const route = useRoute();
   if (route.query.view === 'map') {
-    currentView.value = 'dual';
-
-    // If starting directly in map view, ensure we center the map after it loads
-    // Use a slightly longer timeout to ensure the map and data are fully loaded
-    setTimeout(() => {
-      if (dualMapRef.value?.map) {
-        // Use the handleMapViewChange function from the useMapTiler composable
-        mapTilerFunctions.handleMapViewChange(
-          dualMapRef.value.map,
-          mapCenterCoordinates.value,
-          getMapMarkers.value
-        );
-      }
-    }, 500);
+    currentView.value = route.query.fullMap === 'true' ? 'map' : 'dual';
   }
 });
-
-// Add new methods to handle map events
-function handleMapNote(propertyId: number) {
-  // Use the useNotes composable directly, which now checks for login and shows dialogs
-  const { showNoteDialog } = useNotes();
-  showNoteDialog(propertyId);
-}
-
-function handleMapFavourite(propertyId: number) {
-  // Use the useFavourites composable directly, which now checks for login and toggles
-  const { toggleFavourite } = useFavourites();
-  toggleFavourite(propertyId);
-}
-
-// Reactive computed property so markers update when notes or favorites change
-const getMapMarkers = computed(() => {
-  // Use the createMapMarkersFromListings function from the useMapTiler composable
-  return mapTilerFunctions.createMapMarkersFromListings(
-    searchListings.value,
-    isFavourite,
-    hasNote
-  );
-});
-
-// Get coordinates for map center from first marker - delegated to useMapTiler
-const mapCenterCoordinates = computed(() => {
-  return mapTilerFunctions.getMapCenterFromMarkers(getMapMarkers.value);
-});
-
-// Calculate zoom level based on radius - delegated to useMapTiler
-const mapZoomLevel = computed(() => {
-  return mapTilerFunctions.calculateZoomLevelFromRadius(searchParams.value?.radius);
-});
-
-// Set up automatic map recentering using the useMapTiler composable
-mapTilerFunctions.setupMapAutoRecentering(
-  dualMapRef,
-  mapCenterCoordinates,
-  mapZoomLevel,
-  currentView,
-  searchParams
-);
-
-// Set up a simple watcher for logging search parameters
-watch(
-  searchParams,
-  (newSearchParams) => {
-    // Log search parameters when they change (keeping the existing logging)
-    if (newSearchParams) {
-      console.log("searchParams", newSearchParams);
-      console.log("Current map zoom level:", mapZoomLevel.value);
-    }
-  },
-  { deep: true }
-)
 </script>
 
 <style>
@@ -165,15 +116,18 @@ watch(
   margin-bottom: 0;
 }
 
-/* Full page map view */
-.map-view-fullpage {
+/* Map-only view container */
+.map-only-container {
   width: 100vw;
+  height: calc(100vh - var(--header-height) - 45px); /* Adjusted to account for tab height */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
+  position: relative;
 }
 
-.map-fullpage {
-  height: 700px;
+/* Full screen map */
+.map-fullscreen {
+  height: 100%;
   width: 100%;
 }
 
@@ -183,8 +137,7 @@ watch(
   grid-template-columns: 1fr 1fr;
   gap: 0;
   width: 100vw;
-  height: calc(100vh - var(--header-height) - 160px);
-  /* Subtract header height and view toggle container */
+  height: calc(100vh - var(--header-height) - 45px); /* Adjusted to account for tab height */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding: 0;
@@ -222,7 +175,7 @@ watch(
   width: 100%;
 }
 
-/* Prevent body scrolling when in map view */
+/* Prevent body scrolling when in split or full map view */
 :global(body.map-view-active) {
   overflow: hidden;
 }

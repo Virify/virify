@@ -318,7 +318,11 @@ describe("Listing E2E Tests", () => {
     }
     
     const result = await getListingByDistanceAndFilters(
-      { type: "rent", location: testAddress.city, radius: 5 },
+      { 
+        type: "rent", 
+        coordinates: { lat: testAddress.lat, lon: testAddress.lon },
+        radius: 5 
+      },
       {
         propertyTypes: { "999": [] }, // Invalid property type ID
         priceRange: [999999, 1000000] // Outside our test price range
@@ -341,7 +345,11 @@ describe("Listing E2E Tests", () => {
     }
     
     const result = await getListingByDistanceAndFilters(
-      { type: "rent", location: testAddress.city, radius: 5 },
+      { 
+        type: "rent", 
+        coordinates: { lat: testAddress.lat, lon: testAddress.lon }, 
+        radius: 5 
+      },
       {
         priceRange: [1400, 1600]
       }
@@ -366,7 +374,11 @@ describe("Listing E2E Tests", () => {
     }
     
     const result = await getListingByDistanceAndFilters(
-      { type: "buy", location: testAddress2.city, radius: 5 },
+      { 
+        type: "buy", 
+        coordinates: { lat: testAddress2.lat, lon: testAddress2.lon }, 
+        radius: 5 
+      },
       {
         priceRange: [700000, 800000]
       }
@@ -393,7 +405,11 @@ describe("Listing E2E Tests", () => {
     
     // Using a small radius (5 mile) from the first address should only find the rental listing
     const resultSmallRadius = await getListingByDistanceAndFilters(
-      { type: "rent", location: testAddress.city, radius: 5 },
+      { 
+        type: "rent", 
+        coordinates: { lat: testAddress.lat, lon: testAddress.lon }, 
+        radius: 5 
+      },
       {}
     );
 
@@ -403,7 +419,11 @@ describe("Listing E2E Tests", () => {
 
     // Using a larger radius (5 mile) from the second address to find the sale listing
     const resultSmallRadius2 = await getListingByDistanceAndFilters(
-      { type: "buy", location: testAddress2.city, radius: 5 },
+      { 
+        type: "buy", 
+        coordinates: { lat: testAddress2.lat, lon: testAddress2.lon }, 
+        radius: 5 
+      },
       {}
     );
 
@@ -425,7 +445,11 @@ describe("Listing E2E Tests", () => {
     
     // Find rental listing with 2 bedrooms
     const rentalResult = await getListingByDistanceAndFilters(
-      { type: "rent", location: testAddress.city, radius: 5 },
+      { 
+        type: "rent", 
+        coordinates: { lat: testAddress.lat, lon: testAddress.lon }, 
+        radius: 5 
+      },
       {
         bedrooms: [2, 2]  // Exactly 2 bedrooms
       }
@@ -437,7 +461,11 @@ describe("Listing E2E Tests", () => {
 
     // Find sale listing with 3 bedrooms and 2 bathrooms
     const saleResult = await getListingByDistanceAndFilters(
-      { type: "buy", location: testAddress2.city, radius: 5 },
+      { 
+        type: "buy", 
+        coordinates: { lat: testAddress2.lat, lon: testAddress2.lon }, 
+        radius: 5 
+      },
       {
         bedrooms: [3, 3],  // Exactly 3 bedrooms
         bathrooms: [2, 2]  // Exactly 2 bathrooms
@@ -450,7 +478,11 @@ describe("Listing E2E Tests", () => {
 
     // No listings with 4 bedrooms
     const noResult = await getListingByDistanceAndFilters(
-      { type: "buy", location: testAddress.city, radius: 10 },
+      { 
+        type: "buy", 
+        coordinates: { lat: testAddress.lat, lon: testAddress.lon }, 
+        radius: 10 
+      },
       {
         bedrooms: [4, 5]  // 4-5 bedrooms (none match)
       }
@@ -472,7 +504,11 @@ describe("Listing E2E Tests", () => {
     
     // Get the rental listing with FEATURED tier
     const rentalResults = await getListingByDistanceAndFilters(
-      { type: "rent", location: testAddress.city, radius: 10 },
+      { 
+        type: "rent", 
+        coordinates: { lat: testAddress.lat, lon: testAddress.lon }, 
+        radius: 10 
+      },
       {}
     );
     
@@ -487,7 +523,11 @@ describe("Listing E2E Tests", () => {
     
     // Get the sale listing with BASIC tier in a separate query
     const saleResults = await getListingByDistanceAndFilters(
-      { type: "buy", location: testAddress2.city, radius: 10 },
+      { 
+        type: "buy", 
+        coordinates: { lat: testAddress2.lat, lon: testAddress2.lon }, 
+        radius: 10 
+      },
       {}
     );
     
