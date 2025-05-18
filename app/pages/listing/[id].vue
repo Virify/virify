@@ -11,29 +11,27 @@
         </client-only>
       </div>
 
-      <div class="p-listing__mobile-overlap" role="presentation">
-        <div class="p-listing__grid | container flow flow-2xl">
-          <div class="p-listing__content">
-            <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
-              role="presentation">
-              <client-only>
-                <OrganismsListingCarousel v-if="isDesktop" :slides="images" :width="1000" />
-              </client-only>
+      <div class="p-listing__grid | container" role="presentation">
+        <div class="p-listing__content | flow flow-2xl">
+          <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
+            role="presentation">
+            <client-only>
+              <OrganismsListingCarousel v-if="isDesktop" :slides="images" :width="1000" />
+            </client-only>
+          </div>
+
+          <h3 class="| title-sm">Property</h3>
+          <pre>{{ property }}</pre>
+        </div>
+
+        <div class="p-listing__sidebar" role="presentation">
+          <Transition name="p-listing-images">
+            <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
+              <OrganismsListingCarousel class="p-listing__sidebar-carousel" :slides="images" :width="400" />
             </div>
+          </Transition>
 
-            <h3 class="| title-sm">Property</h3>
-            <pre>{{ property }}</pre>
-          </div>
-
-          <div class="p-listing__sidebar" role="presentation">
-            <Transition name="p-listing-images">
-              <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
-                <OrganismsListingCarousel class="p-listing__sidebar-carousel" :slides="images" :width="400" />
-              </div>
-            </Transition>
-
-            <OrganismsListingSidebar :price="listing?.price" />
-          </div>
+          <OrganismsListingSidebar :price="listing?.price" />
         </div>
       </div>
     </div>
@@ -155,6 +153,18 @@ const debugContent = computed(() => {
     gap: var(--size-32);
     align-items: flex-start;
 
+    @include mq.not-notebook {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: none;
+      background: var(--background-100);
+      border-top-right-radius: var(--border-radius-3xl);
+      border-top-left-radius: var(--border-radius-3xl);
+      padding: var(--border-radius-3xl) 0 0;
+      margin: calc(0px - var(--border-radius-3xl)) 0 0;
+    }
+
     @include mq.notebook {
       gap: var(--size-40);
       grid-template-columns: 1fr 18em;
@@ -167,23 +177,14 @@ const debugContent = computed(() => {
   }
 
   /**
-   *  Wrapper allows overlapping carousel on mobile
-   */
-  &__mobile-overlap {
-    position: relative;
-    background: var(--background-100);
-    z-index: 2;
-    border-top-right-radius: var(--border-radius-3xl);
-    border-top-left-radius: var(--border-radius-3xl);
-    margin-top: calc(0px - var(--border-radius-3xl));
-    padding-top: var(--border-radius-3xl);
-  }
-
-  /**
    *  Content wrappers
    */
   &__content {
     overflow: hidden;
+
+    @include mq.not-notebook {
+      padding-inline: var(--size-24);
+    }
   }
 
   &__sidebar {
