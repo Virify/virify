@@ -88,10 +88,6 @@ withDefaults(defineProps<Props>(), {
 
   &__buttons {
     margin: 0;
-
-    .button {
-      font-size: var(--font-sm);
-    }
   }
 }
 
