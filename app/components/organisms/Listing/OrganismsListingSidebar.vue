@@ -31,13 +31,7 @@
       </li>
     </ul>
 
-    <div class="o-listing-sidebar__buttons" role="presentation">
-      <AtomsNoteButton class="| button button-square button-ghost" :property-id="4" />
-      <AtomsFavouriteButton class="| button button-square button-ghost" :property-id="4" />
-
-      <a href="#" class="o-listing-sidebar__enquire | button button-secondary button-full">Enquire now</a>
-    </div>
-
+    <OrganismsListingButtons :property-id="4" enquire-url="#" />
     <OrganismsListingAgent />
   </section>
 </template>
@@ -99,17 +93,6 @@ const priceFormatted = computed(() => {
     display: block;
     width: var(--size-20);
     height: var(--size-20);
-  }
-
-  &__buttons {
-    display: flex;
-    align-items: center;
-    gap: var(--size-8);
-
-    .a-icon {
-      width: var(--size-24);
-      height: var(--size-24);
-    }
   }
 }
 </style>
