@@ -39,7 +39,7 @@ const validatedSlides = computed(() => {
     width: 100%;
     object-fit: cover;
     aspect-ratio: var(--aspect-ratio);
-    max-height: 70dvh;
+    max-height: 70vh;
   }
 }
 </style>

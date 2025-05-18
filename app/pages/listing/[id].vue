@@ -6,18 +6,18 @@
 
     <div v-else class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
-        <client-only>
+        <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
           <OrganismsListingCarousel v-if="!isDesktop" :slides="images" :width="1000" aspect-ratio="4/3" />
-        </client-only>
+        </skeleton-loader>
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
         <div class="p-listing__content | flow flow-2xl">
           <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
             role="presentation">
-            <client-only>
+            <skeleton-loader class="p-listing__main-carousel-skeleton">
               <OrganismsListingCarousel v-if="isDesktop" :slides="images" :width="1000" />
-            </client-only>
+            </skeleton-loader>
           </div>
 
           <h3 class="| title-sm">Property</h3>
@@ -243,6 +243,19 @@ const debugContent = computed(() => {
   &__sidebar-carousel {
     border-radius: var(--border-radius-2xl);
     margin-bottom: var(--size-24);
+  }
+
+  /**
+   *  Skeleton loaders
+   */
+  &__main-carousel-skeleton {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+
+    &--mobile {
+      aspect-ratio: 4 / 3;
+      max-height: 70vh;
+    }
   }
 }
 
