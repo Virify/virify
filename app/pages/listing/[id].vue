@@ -31,7 +31,7 @@
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="listing?.price" />
+          <OrganismsListingSidebar :price="priceFormatted" />
         </div>
       </div>
     </div>
@@ -64,7 +64,15 @@ const { data: listing, status } = await useAsyncData("listing", () => {
  *  Content
  */
 const property = computed(() => {
-  return asObject(unref(listing)?.property)
+  const { property } = asObject(listing.value)
+
+  return property
+})
+
+const priceFormatted = computed(() => {
+  const { price } = asObject(listing.value)
+
+  return isNumber(price) ? numberToCurrency(price) : ''
 })
 
 /**

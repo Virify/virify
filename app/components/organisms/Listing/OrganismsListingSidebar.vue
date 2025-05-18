@@ -1,11 +1,11 @@
 <template>
   <section role="presentation" class="o-listing-sidebar | flow flow-md">
-    <h2 v-if="priceFormatted" class="o-listing-sidebar__title | title-2xl lineheight-xs">
+    <h2 v-if="price" class="o-listing-sidebar__title | title-2xl lineheight-xs">
       <AtomsPill class="o-listing-sidebar__title-offertype | body-xs">
         Offers in excess of
       </AtomsPill>
 
-      {{ priceFormatted }}
+      {{ price }}
     </h2>
 
     <p role="presentation" class="o-listing-sidebar__address font-bold | body-md">
@@ -38,16 +38,11 @@
 
 <script setup lang="ts">
 interface Props {
-  price?: number
+  price?: string
 }
 
 const props = defineProps<Props>()
 
-const priceFormatted = computed(() => {
-  const { price } = props
-
-  return isNumber(price) ? numberToCurrency(price) : ''
-})
 </script>
 
 <style lang="scss">
