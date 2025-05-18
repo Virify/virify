@@ -8,7 +8,7 @@
       {{ price }}
     </h2>
 
-    <p role="presentation" class="o-listing-sidebar__address font-bold | body-md">
+    <p role="presentation" class="o-listing-sidebar__address | body-md font-bold">
       123 House, Somewhere Street
     </p>
 
