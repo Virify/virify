@@ -51,6 +51,7 @@ withDefaults(defineProps<Props>(), {
     @include mq.not-tablet {
       width: fit-content;
       min-width: 325px;
+      text-align: center;
     }
 
     @include mq.tablet {
@@ -68,13 +69,21 @@ withDefaults(defineProps<Props>(), {
   &__title {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: var(--size-8);
+    justify-content: center;
+    gap: var(--size-10);
     margin: 0;
+
+    @include mq.tablet {
+      justify-content: flex-start;
+    }
   }
 
   &__address {
-    text-align: left;
+    text-align: center;
+
+    @include mq.tablet {
+      text-align: left;
+    }
   }
 
   &__buttons {
