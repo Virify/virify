@@ -1,6 +1,6 @@
 <template>
   <section role="presentation" class="o-listing-sidebar | flow flow-md">
-    <h2 v-if="priceFormatted" class="o-listing-sidebar__title | title-xl lineheight-xs">
+    <h2 v-if="priceFormatted" class="o-listing-sidebar__title | title-2xl lineheight-xs">
       <AtomsPill class="o-listing-sidebar__title-offertype | body-xs">
         Offers in excess of
       </AtomsPill>
