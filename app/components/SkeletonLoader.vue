@@ -20,7 +20,7 @@ defineOptions({
  *  Props
  */
 interface Props {
-  isPending: boolean
+  isPending?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
