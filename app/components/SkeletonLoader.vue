@@ -37,7 +37,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
 .skeleton-loader {
   background: #ccc;
 }
