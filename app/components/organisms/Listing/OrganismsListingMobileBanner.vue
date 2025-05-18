@@ -1,11 +1,11 @@
 <template>
   <div class="o-listing-mobile-banner" role="presentation">
-    <div class="| container flow flow-xs" role="presentation">
+    <div class="o-listing-mobile-banner__container | container flow flow-xs" role="presentation">
       <div role="presentation">
-        <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
+        <h2 v-if="price" class="o-listing-mobile-banner__title | title-sm lineheight-xs">
           {{ price }}
 
-          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-xs">
+          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
             Offers in excess of
           </AtomsPill>
         </h2>
@@ -15,7 +15,7 @@
         </p>
       </div>
 
-      <OrganismsListingButtons :property-id="4" enquire-url="#" />
+      <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :property-id="4" enquire-url="#" />
     </div>
   </div>
 </template>
@@ -30,6 +30,8 @@ defineProps<Props>()
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .o-listing-mobile-banner {
   position: fixed;
   bottom: 0;
@@ -40,12 +42,29 @@ defineProps<Props>()
   border-top: 1px solid var(--border-color-200);
   padding: var(--size-12) 0;
 
+  &__container {
+    @include mq.tablet {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--size-32);
+    }
+  }
+
   &__title {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--size-12);
+    justify-content: flex-start;
+    gap: var(--size-8);
     margin: 0;
+  }
+
+  &__address {
+    text-align: left;
+  }
+
+  &__buttons .button {
+    font-size: var(--font-sm);
   }
 }
 </style>
