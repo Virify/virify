@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 interface Props {
-  propertyId: number,
+  propertyId: number
   enquireUrl: string
 }
 
@@ -23,6 +23,11 @@ defineProps<Props>()
   display: flex;
   align-items: center;
   gap: var(--size-8);
+
+  &__enquire {
+    white-space: nowrap;
+    padding-inline: var(--size-32);
+  }
 
   .a-icon {
     width: var(--size-24);
