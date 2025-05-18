@@ -42,12 +42,3 @@ useHead({
   ]
 })
 </script>
-
-<style>
-/*
- *  Temporary spacing just until proper page styling is implemented
- */
-.page {
-  margin: var(--size-32) auto;
-}
-</style>

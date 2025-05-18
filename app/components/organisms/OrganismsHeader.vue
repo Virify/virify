@@ -27,7 +27,6 @@
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    margin-bottom: calc(var(--header-offset) + var(--size-24));
   }
 
   &-homelink {
@@ -40,5 +39,12 @@
     width: 100%;
     height: auto;
   }
+}
+
+/**
+ *  @TODO: refactor
+ */
+body:has(.o-searchform-fixed) .o-header-container {
+  margin-bottom: calc(var(--header-offset) + var(--size-24));
 }
 </style>
