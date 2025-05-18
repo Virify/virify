@@ -1,19 +1,21 @@
 <template>
   <div class="o-listing-mobile-banner" role="presentation">
-    <div class="o-listing-mobile-banner__container | container flow flow-xs" role="presentation">
-      <div role="presentation">
-        <h2 v-if="price" class="o-listing-mobile-banner__title | title-sm lineheight-xs">
-          {{ price }}
+    <div class="o-listing-mobile-banner__container | container" role="presentation">
+      <Transition name="o-listing-mobile-banner">
+        <div class="o-listing-mobile-banner__overview" role="presentation" v-show="!overviewVisible">
+          <h2 v-if="price" class="o-listing-mobile-banner__title | title-sm lineheight-xs">
+            {{ price }}
 
-          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            Offers in excess of
-          </AtomsPill>
-        </h2>
+            <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+              Offers in excess of
+            </AtomsPill>
+          </h2>
 
-        <p role="presentation" class="o-listing-mobile-banner__address | body-sm">
-          123 House, Somewhere Street
-        </p>
-      </div>
+          <p role="presentation" class="o-listing-mobile-banner__address | body-sm">
+            123 House, Somewhere Street
+          </p>
+        </div>
+      </Transition>
 
       <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :property-id="4" enquire-url="#" />
     </div>
@@ -23,9 +25,12 @@
 <script setup lang="ts">
 interface Props {
   price: string
+  overviewVisible?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  overviewVisible: true
+})
 
 </script>
 
@@ -51,6 +56,10 @@ defineProps<Props>()
     }
   }
 
+  &__overview {
+    margin-bottom: var(--size-6);
+  }
+
   &__title {
     display: flex;
     align-items: center;
@@ -63,8 +72,32 @@ defineProps<Props>()
     text-align: left;
   }
 
-  &__buttons .button {
-    font-size: var(--font-sm);
+  &__buttons {
+    margin: 0;
+
+    .button {
+      font-size: var(--font-sm);
+    }
   }
+}
+
+/**
+ *  Animations
+ */
+.o-listing-mobile-banner-enter-active,
+.o-listing-mobile-banner-leave-active {
+  interpolate-size: allow-keywords;
+
+  transition: height, margin, opacity;
+  transition-duration: var(--animation-medium);
+  transition-timing-function: var(--ease-out);
+  overflow: hidden;
+}
+
+.o-listing-mobile-banner-leave-to,
+.o-listing-mobile-banner-enter-from {
+  height: 0;
+  margin: 0;
+  opacity: 0;
 }
 </style>
