@@ -17,16 +17,13 @@
       <div class="p-listing__content">
         <OrganismsListingCarousel ref="$images" class="p-listing__images p-listing__images--large" :slides="images"
           :width="1000" />
-
-        <h3 class="| title-sm">Property</h3>
-        <pre>{{ property }}</pre>
       </div>
     </div>
 
     <AtomsDivider text="DEBUG" />
 
     <div style="overflow: hidden">
-      <pre>{{ listing }}</pre>
+      <pre>{{ debugContent }}</pre>
     </div>
   </div>
 </template>
@@ -71,6 +68,30 @@ const isImagesVisible = shallowRef(true)
 
 useIntersectionObserver($images, ([entry]) => {
   isImagesVisible.value = !!entry?.isIntersecting
+})
+
+/**
+ *  Debug content
+ */
+const debugContent = computed(() => {
+  const data = listing.value
+
+  if (!isObject(data)) return {}
+
+  function excludeKeys(obj: Record<string, unknown>, keys: string[] = []) {
+    const objClone = structuredClone(obj)
+
+    for (let key of keys) {
+      delete objClone[key]
+    }
+
+    return objClone
+  }
+
+  return {
+    ...data,
+    property: excludeKeys(data?.property || {}, ['media'])
+  }
 })
 
 </script>
