@@ -21,7 +21,7 @@
           </div>
 
           <h3 class="| title-sm">Property</h3>
-          <pre>{{ property }}</pre>
+          <pre class="| body-sm">{{ property }}</pre>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
@@ -36,10 +36,14 @@
       </div>
     </div>
 
+    <client-only>
+      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" />
+    </client-only>
+
     <AtomsDivider text="DEBUG" />
 
     <div style="overflow: hidden">
-      <pre>{{ debugContent }}</pre>
+      <pre class="| body-sm">{{ debugContent }}</pre>
     </div>
   </main>
 </template>
