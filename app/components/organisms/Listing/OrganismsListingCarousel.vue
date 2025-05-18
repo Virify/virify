@@ -1,5 +1,5 @@
 <template>
-  <LazyMoleculesCarousel :slides="validatedSlides" hydrate-on-interaction="mouseover" class="o-listing-carousel"
+  <LazyMoleculesCarousel :slides="validatedSlides" hydrate-on-idle class="o-listing-carousel"
     v-slot="{ slide: { image, metadata } }">
     <img :src="image" :alt="metadata" class="o-listing-carousel__image" :width loading="lazy" />
   </LazyMoleculesCarousel>
