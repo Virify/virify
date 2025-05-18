@@ -3,7 +3,7 @@
     <div class="o-listing-mobile-banner__container | container" role="presentation">
       <Transition name="o-listing-mobile-banner">
         <div class="o-listing-mobile-banner__overview" role="presentation" v-show="!overviewVisible">
-          <h2 v-if="price" class="o-listing-mobile-banner__title | title-sm lineheight-xs">
+          <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
             {{ price }}
 
             <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
@@ -88,6 +88,10 @@ withDefaults(defineProps<Props>(), {
 
   &__buttons {
     margin: 0;
+
+    .button {
+      font-size: var(--font-lg);
+    }
   }
 }
 
