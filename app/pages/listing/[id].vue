@@ -7,7 +7,7 @@
     <div v-else class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
         <client-only>
-          <OrganismsListingCarousel v-if="!isDesktop" :slides="images" :width="1000" />
+          <OrganismsListingCarousel v-if="!isDesktop" :slides="images" :width="1000" aspect-ratio="4/3" />
         </client-only>
       </div>
 
@@ -21,9 +21,8 @@
               </client-only>
             </div>
 
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum, est! Ullam eum commodi temporibus, ipsa
-              praesentium, architecto soluta iure nisi sed dignissimos voluptatibus cum repellendus quae nostrum impedit
-              optio! Exercitationem!</p>
+            <h3 class="| title-sm">Property</h3>
+            <pre>{{ property }}</pre>
           </div>
 
           <div class="p-listing__sidebar" role="presentation">
@@ -185,7 +184,6 @@ const debugContent = computed(() => {
    */
   &__content {
     overflow: hidden;
-    min-height: calc(100vw / (16 / 9));
   }
 
   &__sidebar {
@@ -218,7 +216,6 @@ const debugContent = computed(() => {
   &__main-carousel,
   &__sidebar-carousel {
     background: var(--foreground-300);
-    aspect-ratio: 16 / 9;
     overflow: hidden;
   }
 
@@ -243,8 +240,6 @@ const debugContent = computed(() => {
   }
 
   &__sidebar-carousel {
-    background: var(--foreground-300);
-    aspect-ratio: 16 / 9;
     border-radius: var(--border-radius-2xl);
     margin-bottom: var(--size-24);
   }

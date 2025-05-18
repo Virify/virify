@@ -1,7 +1,8 @@
 <template>
   <LazyMoleculesCarousel :slides="validatedSlides" hydrate-on-idle class="o-listing-carousel"
     v-slot="{ slide: { image, metadata } }">
-    <img :src="image" :alt="metadata" class="o-listing-carousel__image" :width loading="lazy" />
+    <img :src="image" :alt="metadata" class="o-listing-carousel__image" :width loading="lazy"
+      :style="`--aspect-ratio: ${aspectRatio}`" />
   </LazyMoleculesCarousel>
 </template>
 
@@ -9,10 +10,12 @@
 interface Props {
   slides: { image: string, metadata: string }[]
   width?: number
+  aspectRatio?: `${number}/${number}` | number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  width: 400
+  width: 400,
+  aspectRatio: '16/9'
 })
 
 /**
@@ -34,8 +37,9 @@ const validatedSlides = computed(() => {
 
   &__image {
     width: 100%;
-    aspect-ratio: 16 / 9;
     object-fit: cover;
+    aspect-ratio: var(--aspect-ratio);
+    max-height: 70dvh;
   }
 }
 </style>
