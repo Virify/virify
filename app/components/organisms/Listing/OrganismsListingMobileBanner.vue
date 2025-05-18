@@ -48,6 +48,11 @@ withDefaults(defineProps<Props>(), {
   padding: var(--size-12) 0;
 
   &__container {
+    @include mq.not-tablet {
+      width: fit-content;
+      min-width: 325px;
+    }
+
     @include mq.tablet {
       display: flex;
       align-items: flex-start;
