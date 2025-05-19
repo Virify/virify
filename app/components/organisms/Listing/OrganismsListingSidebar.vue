@@ -41,7 +41,7 @@ interface Props {
   price?: string
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 </script>
 
