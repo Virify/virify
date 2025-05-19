@@ -2,7 +2,7 @@
   <div class="o-listing-mobile-banner" role="presentation">
     <div class="o-listing-mobile-banner__container | container" role="presentation">
       <Transition name="o-listing-mobile-banner">
-        <div class="o-listing-mobile-banner__overview" role="presentation" v-show="!overviewVisible">
+        <div class="o-listing-mobile-banner__overview" role="presentation" v-show="isTablet || !overviewVisible">
           <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
             {{ price }}
 
@@ -23,6 +23,12 @@
 </template>
 
 <script setup lang="ts">
+import breakpoints from '#styles/_utils/breakpoints.module.scss'
+import { useMediaQuery } from '@vueuse/core';
+
+/**
+ *  Props
+ */
 interface Props {
   price: string
   overviewVisible?: boolean
@@ -31,6 +37,11 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   overviewVisible: true
 })
+
+/**
+ *  Check for tablet layouts
+ */
+const isTablet = useMediaQuery(`(min-width: ${breakpoints.tablet})`)
 
 </script>
 
