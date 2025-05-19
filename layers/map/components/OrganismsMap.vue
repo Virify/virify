@@ -10,10 +10,9 @@
 </template>
 
 <script setup lang="ts">
-import type { MapMarker } from '../../../shared/types/map-coordinates';
+import type { MapMarker } from '~~/shared/types/map-coordinates';
 import type { Map as MapTilerMap } from '@maptiler/sdk';
-import { useMapTiler } from '~/composables/useMapTiler';
-import { nextTick } from 'vue';
+import { useMapTiler } from '../composables/useMapTiler';
 
 const props = defineProps<{
   markers?: MapMarker[];

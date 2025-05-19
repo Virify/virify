@@ -380,9 +380,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ListingWithFullProperty } from "~~/shared/types/listing";
-import { formatMDY } from "~~/shared/utils/format-date";
-
 const route = useRoute();
 const listingId = route.params.id as string;
 const url: string = `/api/listing/${listingId}`;

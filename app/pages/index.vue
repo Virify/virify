@@ -39,12 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import { useState, useRoute } from '#imports';
-import { useMapTiler, GLOBAL_MAP_ID } from '~/composables/useMapTiler';
 import type { MapMarker } from '~~/shared/types/map-coordinates';
 import type { ListingCardType } from '~~/shared/types/listing';
-import { useNotes } from '~/composables/useNotes';
-import { useFavourites } from '~/composables/useFavourites';
 
 // Listings state
 const searchListings = ref<ListingCardType[] | null>(null);

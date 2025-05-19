@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MapMarker } from '../../../shared/types/map-coordinates';
+import type { MapMarker } from '~~/shared/types/map-coordinates';
 import { useNotes } from '~/composables/useNotes';
 
 const props = defineProps<{ 

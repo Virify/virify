@@ -1,8 +1,8 @@
-import type { MapMarker } from "~~/shared/types/map-coordinates";
-import type { Map as MapTilerMap, IControl } from "@maptiler/sdk";
+import type { MapMarker } from '#shared/types/map-coordinates';
+import type { Map as MapTilerMap } from "@maptiler/sdk";
 import { createVNode, render, h, defineComponent } from "vue";
-import MoleculesMarkerPopup from "../components/molecules/MoleculesMarkerPopup.vue";
-import MoleculesPriceMarker from "../components/molecules/MoleculesPriceMarker.vue";
+import MoleculesMarkerPopup from '../components/molecules/MoleculesMarkerPopup.vue';
+import MoleculesPriceMarker from '../components/molecules/MoleculesPriceMarker.vue';
 
 interface MapInstance {
   map: MapTilerMap;
