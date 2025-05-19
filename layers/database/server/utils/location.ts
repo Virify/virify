@@ -81,9 +81,9 @@ export async function updateLocationsByAddressList(locations: { id: number; lat:
  * @param distanceMeters Distance in meters for proximity filtering
  * @returns List of nearby propertyID's
  */
-export async function getPropertyIdsByDistance(lat: number, lon: number, distanceMiles: number): Promise<{ propertyId: number }[]> {
+export async function getPropertyIdsByDistance(lat: number, lon: number, distanceMiles: number): Promise<PropertySearchResult> {
   const meters = convertMilesToMeters(distanceMiles);
-  const nearbyProperties = await prisma.$queryRaw<PropertySearchResult>(
+  return await prisma.$queryRaw<PropertySearchResult>(
     Prisma.sql`
       SELECT p.id as "propertyId"
       FROM "Property" p
@@ -95,8 +95,6 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
       )
     `
   );
-
-  return nearbyProperties;
 }
 
 /**

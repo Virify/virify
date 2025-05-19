@@ -37,7 +37,10 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
  */
 export type ListingSearch = {
   type: "buy" | "rent";
-  location: string;
+  coordinates: {
+    lat: number;
+    lon: number;
+  };
   radius: number;
 };
 

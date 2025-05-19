@@ -19,8 +19,8 @@
       <div class="| relative" role="presentation">
         <div class="o-searchform-location | elevate-200" @click="showPopover">
           <input type="search" placeholder="Location" aria-label="Location to search in"
-            class="o-searchform-location-input" required @focus="showPopover" @input="showPopover" v-model="suggestions"
-            name="location" />
+            class="o-searchform-location-input" required @focus="showPopover" @input="showPopover"
+            v-model="suggestions.location" name="location" />
 
           <!-- Search radius (desktop) -->
           <client-only>
@@ -44,7 +44,7 @@
           <!-- Location -->
           <OrganismsSearchFormDividedRows v-if="suggestions">
             <OrganismsSearchFormTitleBlock title="Location">
-              <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
+              <MoleculesAutocomplete :input="suggestions.location" :matches="suggestionsMatches"
                 v-slot="{ original, current, suggestion }">
                 <button class="o-searchform-autocomplete-button | body-md"
                   @click.prevent="setSelectedSuggestion(original)">
@@ -153,7 +153,7 @@
                     <AtomsSelect v-model="initialDate" class="o-searchform-dropdown | text-input focus-visible"
                       name="added-to-site">
                       <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                      }}</option>
+                        }}</option>
                     </AtomsSelect>
                   </MoleculesFormField>
                 </animate-in>
@@ -213,7 +213,7 @@
 <script setup lang="ts">
 import { onClickOutside, watchDebounced, watchImmediate, useMediaQuery } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
-import type { PropertyTypeWithClassifications } from "~~/shared/types/property-type";
+import type { PropertyTypeWithOptions } from "~~/shared/types/property-type";
 import type { SearchParams } from "~~/shared/types/search";
 
 /**
@@ -246,6 +246,7 @@ const isContracted = computed(() => {
  *  Get search form config
  */
 const { radiusOptions, bedroomOptions, bathroomOptions, dateOptions, saleAvailabilityOptions, rentAvailabilityOptions, propertyFeatures, buyOrRentOptions } = getSearchFormConfig();
+const { autoComplete } = useMapTiler();
 
 /**
  *  Popover management
@@ -265,7 +266,13 @@ function togglePopoverExpanded() {
  * state
  */
 const popoverHidden = ref(true);
-const suggestions = ref("");
+const suggestions = ref({
+  location: "",
+  geo: {
+    lat: 0,
+    lon: 0,
+  },
+});
 const bedroomRange = ref<[number, number]>([0, 0]);
 const bathroomRange = ref<[number, number]>([0, 0]);
 const initialRadius = ref(radiusOptions?.[0]?.value);
@@ -313,8 +320,20 @@ onMounted(async () => {
  *  Search typed
  */
 
-function setSelectedSuggestion(newValue: string) {
-  suggestions.value = newValue;
+// Store geocoded results to use when selecting a suggestion
+const geocodedResults = ref<any[]>([]);
+
+async function setSelectedSuggestion(newValue: string) {
+  suppressSuggestionFetch.value = true
+  suggestions.value.location = newValue;
+
+  // Find the selected suggestion in our cached geocoded results
+  const selecedLocation = geocodedResults.value.find(item => item.place_name_en === newValue);
+  if (selecedLocation) {
+    suggestions.value.geo.lat = selecedLocation.center[1];
+    suggestions.value.geo.lon = selecedLocation.center[0];
+    console.log("Selected coordinates:", suggestions.value.geo);
+  }
 }
 
 /**
@@ -325,27 +344,35 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyTypeWithClassifications[]>("/api/property-type/all");
+const propertyTypes = await $fetch<PropertyTypeWithOptions>("/api/property-type/all");
 const selectedPropertyTypes = reactive({})
 
 /**
  * Auto Complete
  */
 const suggestionsMatches = ref<string[]>([]);
+const suppressSuggestionFetch = ref(false)
 
 watchDebounced(
-  () => suggestions.value.toLowerCase(),
+  () => suggestions.value.location.toLowerCase(),
   async (suggestionsLower) => {
-    if (suggestionsLower) {
-      const result = await $fetch<string[]>("/api/address/auto-complete", {
-        query: { location: suggestionsLower },
+    // stop request when selecting a suggestion
+    if (suppressSuggestionFetch.value) {
+      suppressSuggestionFetch.value = false
+      return
+    }
+    if (suggestionsLower && suggestionsLower.length > 4) {
+      const result = await autoComplete(suggestionsLower);
+      // Store the full geocoded results for later use
+      geocodedResults.value = result;
+      suggestionsMatches.value = result.map((item) => {
+        return item.place_name_en;
       });
-      suggestionsMatches.value = result;
     } else {
       suggestionsMatches.value = [];
     }
   },
-  { debounce: 150 }
+  { debounce: 300 }
 );
 
 /**
@@ -378,10 +405,10 @@ const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value
 watchImmediate(buyOrRent, () => {
   if (buyOrRent.value === "rent") {
     includeOptions.value = rentAvailabilityOptions;
-    initialInclude.value = rentAvailabilityOptions[0].value;
+    initialInclude.value = rentAvailabilityOptions[0]?.value;
   } else if (buyOrRent.value === "buy") {
     includeOptions.value = saleAvailabilityOptions;
-    initialInclude.value = rentAvailabilityOptions[0].value;
+    initialInclude.value = rentAvailabilityOptions[0]?.value;
   }
 });
 
@@ -426,7 +453,11 @@ async function sendForm(event: Event) {
    * Save search params to state
    */
   searchParams.value = {
-    location,
+    location: suggestions.value.location, // Use the display name for location
+    coordinates: {
+      lat: suggestions.value.geo.lat,
+      lon: suggestions.value.geo.lon
+    }, // Add coordinates for the search
     radius,
     buyOrRent,
     propertyTypes: removeObjectEmptyArrays(unref(selectedPropertyTypes)),
@@ -450,7 +481,7 @@ async function sendForm(event: Event) {
     searchListings.value = searchResult;
   }
 
-  // Hide popover when search is successful
+  // Hide when search is successful
   hidePopover();
 }
 </script>
@@ -776,11 +807,6 @@ async function sendForm(event: Event) {
     width: 100%;
     height: calc(100% - var(--o-searchform-fixed-offset));
     transform: none;
-    // max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
-
-    // @supports (max-height: 100dvh) {
-    //   max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
-    // }
   }
 }
 </style>

@@ -95,5 +95,11 @@ declare module '@maptiler/sdk' {
 
   export interface Map {
     addControl(control: IControl, position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'): this;
+    getContainer(): HTMLElement;
+    jumpTo(options: { center?: [number, number]; zoom?: number; animate?: boolean }): void;
+    resize(): void;
+    on(event: string, listener: Function): this;
+    off(event: string, listener: Function): this;
+    fire(event: string, data?: any): this;
   }
 }

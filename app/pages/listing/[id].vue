@@ -75,11 +75,13 @@
         <h2 class="title-md">Map</h2>
         <OrganismsMap
           v-if="property?.address?.lat && property?.address?.lon"
-          class="p-listing-map-inner"
-          :lat="property.address.lat"
-          :lon="property.address.lon"
+          :markers="propertyMarkers"
           :zoom="15"
+          :center="{ lat: property.address.lat, lon: property.address.lon }"
           :interactive="false"
+          :mapId="GLOBAL_MAP_ID"
+          customClass="p-listing-map-inner"
+          :displayPopups="false"
         />
       </div>
 
@@ -391,6 +393,20 @@ const property = computed(() => {
   return data.value.property as typeof data.value.property & { Land?: any };
 });
 const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
+
+const propertyMarkers = computed<MapMarker[]>(() => {
+  if (!property.value?.address?.lat || !property.value.address.lon) return [];
+  return [{
+    id: property.value.id,
+    lat: property.value.address.lat,
+    lon: property.value.address.lon,
+    bedrooms: property.value.bedroomFeatures?.length ?? null,
+    bathrooms: property.value.bathroomFeatures?.length ?? null,
+    price: listing.value?.price ?? null,
+    hasNote: false,
+    isFavorite: false
+  }];
+});
 </script>
 
 <style lang="scss">
