@@ -90,3 +90,77 @@ const {
 - Properly clean up markers before adding new ones
 - Use the marker cache to optimize performance
 - Always validate coordinates before displaying them
+
+# Map Drawing Implementation
+
+The map drawing functionality has been simplified to use only the standard MapboxDraw polygon drawing feature.
+
+## How It Works
+
+1. We use the standard MapboxDraw library with its built-in polygon drawing mode
+2. Drawing is initialized via the `initDrawing` function in the `useMapTiler` composable
+3. The drawing function supports:
+   - Drawing polygons by clicking multiple points and double-clicking to finish
+   - Getting all drawn shapes via `getDrawnShapes`
+   - Clearing all shapes via `clearDrawnShapes`
+
+## Usage
+
+There are two ways to use the drawing functionality:
+
+### 1. Using OrganismsMap Component (Recommended)
+
+```vue
+<template>
+  <OrganismsMap
+    :center="mapCenter"
+    :zoom="13"
+    :interactive="true"
+    :drawingEnabled="true"
+    :drawingMode="'polygon'"
+    @shape-drawn="handleShapeDrawn"
+    @shape-updated="handleShapeUpdated"
+    @shape-deleted="handleShapeDeleted"
+  />
+</template>
+
+<script setup>
+function handleShapeDrawn(feature) {
+  console.log('Shape drawn:', feature);
+}
+
+function handleShapeUpdated(feature) {
+  console.log('Shape updated:', feature);
+}
+
+function handleShapeDeleted(features) {
+  console.log('Shape deleted:', features);
+}
+</script>
+```
+
+### 2. Using the useMapTiler Composable Directly
+
+```typescript
+import { useMapTiler } from '~/layers/map/composables/useMapTiler';
+
+// In your component setup function
+const { initializeMap, initDrawing, getDrawnShapes, clearDrawnShapes } = useMapTiler();
+
+// Initialize map
+const map = initializeMap(mapContainerElement);
+
+// Enable polygon drawing
+initDrawing(map, 'polygon');
+
+// To disable drawing
+initDrawing(map, null);
+
+// To get drawn shapes
+const shapes = getDrawnShapes(map);
+
+// To clear all shapes
+clearDrawnShapes(map);
+```
+
+This simplified implementation makes it easier to maintain and extend the map functionality.

@@ -95,11 +95,50 @@ declare module '@maptiler/sdk' {
 
   export interface Map {
     addControl(control: IControl, position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'): this;
+    removeControl(control: IControl): this;
     getContainer(): HTMLElement;
     jumpTo(options: { center?: [number, number]; zoom?: number; animate?: boolean }): void;
     resize(): void;
     on(event: string, listener: Function): this;
     off(event: string, listener: Function): this;
     fire(event: string, data?: any): this;
+  }
+  
+  // GeoJSON related types
+  export interface GeoJSONFeature {
+    type: string;
+    geometry: {
+      type: string;
+      coordinates: any;
+    };
+    properties?: any;
+    id?: string | number;
+  }
+
+  // Draw control for creating shapes
+  export interface DrawControlOptions {
+    displayControlsDefault?: boolean;
+    controls?: {
+      point?: boolean;
+      line_string?: boolean;
+      polygon?: boolean;
+      trash?: boolean;
+      combine_features?: boolean;
+      uncombine_features?: boolean;
+      rectangle?: boolean;
+      circle?: boolean;
+    };
+    defaultMode?: string;
+    styles?: any[];
+  }
+
+  export class DrawControl implements IControl {
+    constructor(options?: DrawControlOptions);
+    getAll(): { features: GeoJSONFeature[] };
+    delete(featureIds: string[]): void;
+    deleteAll(): void;
+    add(feature: GeoJSONFeature): void;
+    onAdd(map: Map): HTMLElement;
+    onRemove(map: Map): void;
   }
 }

@@ -1,6 +1,11 @@
 <template>
   <div v-if="hasValidCoordinates" ref="mapContainer"
-    :class="['maptiler-map', interactive ? 'maptiler-map-interactive' : 'maptiler-map-static', customClass]">
+    :class="[
+      'maptiler-map', 
+      interactive ? 'maptiler-map-interactive' : 'maptiler-map-static', 
+      drawingEnabled ? 'drawing-enabled' : '',
+      customClass
+    ]">
   </div>
   <div v-else :class="['map-placeholder', customClass]">
     <div class="map-placeholder-content">
@@ -13,6 +18,8 @@
 import type { MapMarker } from '~~/shared/types/map-coordinates';
 import type { Map as MapTilerMap } from '@maptiler/sdk';
 import { useMapTiler } from '../composables/useMapTiler';
+// Import draw CSS if drawing functionality is used
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
 const props = defineProps<{
   markers?: MapMarker[];
@@ -22,14 +29,26 @@ const props = defineProps<{
   center?: { lat: number; lon: number };
   customClass?: string;
   displayPopups?: boolean;
+  // Drawing functionality
+  drawingEnabled?: boolean;
+  drawingMode?: 'polygon' | null;
+  onShapeDrawn?: (feature: any) => void;
+  onShapeUpdated?: (feature: any) => void;
+  onShapeDeleted?: (features: any[]) => void;
 }>();
 
-const emit = defineEmits(['property-note', 'property-favourite']);
+const emit = defineEmits([
+  'property-note', 
+  'property-favourite',
+  'shape-drawn',
+  'shape-updated',
+  'shape-deleted'
+]);
 const mapContainer = ref<HTMLElement>();
 const map = shallowRef<MapTilerMap | null>(null);
 
 // Import map utilities from composable
-const { initializeMap, addMarker, clearMarkers, centerMap } = useMapTiler();
+const { initializeMap, addMarker, clearMarkers, centerMap, initDrawing, clearDrawnShapes } = useMapTiler();
 
 // Check if we have valid coordinates to display
 const hasValidCoordinates = computed(() => {
@@ -58,6 +77,25 @@ onMounted(() => {
     // Setup map event handlers
     mapInstance.on('marker-note', (e: any) => emit('property-note', e.id));
     mapInstance.on('marker-favorite', (e: any) => emit('property-favourite', e.id));
+    
+    // Setup drawing event handlers
+    mapInstance.on('shape-drawn', (e: any) => {
+      console.info('[Map] Shape drawn:', e);
+      emit('shape-drawn', e.feature);
+      if (props.onShapeDrawn) props.onShapeDrawn(e.feature);
+    });
+    
+    mapInstance.on('shape-updated', (e: any) => {
+      console.info('[Map] Shape updated:', e);
+      emit('shape-updated', e.feature);
+      if (props.onShapeUpdated) props.onShapeUpdated(e.feature);
+    });
+    
+    mapInstance.on('shape-deleted', (e: any) => {
+      console.info('[Map] Shape deleted:', e);
+      emit('shape-deleted', e.features || []);
+      if (props.onShapeDeleted) props.onShapeDeleted(e.features || []);
+    });
 
     map.value = mapInstance;
 
@@ -80,6 +118,11 @@ onMounted(() => {
 
     // Add initial markers
     updateMarkers();
+    
+    // Initialize drawing if enabled
+    if (props.drawingEnabled) {
+      initDrawing(mapInstance, props.drawingMode || 'polygon');
+    }
   });
 });
 
@@ -141,6 +184,36 @@ watch(
   },
   { deep: true }
 );
+
+// Watch for changes to drawing props
+watch(
+  [() => props.drawingEnabled, () => props.drawingMode],
+  ([newDrawingEnabled, newDrawingMode], [oldDrawingEnabled, oldDrawingMode]) => {
+    if (!map.value) return;
+    
+    if (newDrawingEnabled !== oldDrawingEnabled || newDrawingMode !== oldDrawingMode) {
+      console.info(`[Map] Drawing settings changed: enabled=${newDrawingEnabled}, mode=${newDrawingMode}`);
+      
+      if (newDrawingEnabled) {
+        initDrawing(map.value, newDrawingMode || 'polygon');
+      } else {
+        initDrawing(map.value, null);
+      }
+    }
+  }
+);
+
+// Method to clear drawn shapes - can be called from outside via ref if needed
+function clearDrawings() {
+  if (map.value) {
+    clearDrawnShapes(map.value);
+    // Optional: notify any listeners
+    emit('shape-deleted', []);
+  }
+}
+
+// Add clearDrawings to exposed methods
+defineExpose({ map, clearDrawings });
 </script>
 
 <style>
@@ -199,5 +272,28 @@ watch(
 /* Show controls for interactive maps, hide for non-interactive */
 .maptiler-map-static .maplibregl-control-container {
   display: none !important;
+}
+
+/* Drawing control styles */
+.mapbox-gl-draw_ctrl-draw-btn {
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Override pointer-events when drawing is enabled */
+.drawing-enabled .mapboxgl-canvas-container,
+.drawing-enabled .mapboxgl-canvas,
+.drawing-enabled .mapboxgl-ctrl-group,
+.drawing-enabled .mapbox-gl-draw_ctrl-draw-btn,
+.drawing-enabled .maplibregl-canvas-container,
+.drawing-enabled .maplibregl-canvas,
+.drawing-enabled .maplibregl-ctrl-group,
+.drawing-enabled .mapbox-gl-draw_trash {
+  pointer-events: auto !important;
+}
+
+/* Make sure static map mode can be disabled for drawing */
+.drawing-enabled.maptiler-map-static::after {
+  pointer-events: none !important;
 }
 </style>

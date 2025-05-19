@@ -1,12 +1,14 @@
 import type { MapMarker } from '#shared/types/map-coordinates';
 import type { Map as MapTilerMap } from "@maptiler/sdk";
-import { createVNode, render, h, defineComponent } from "vue";
-import MoleculesMarkerPopup from '../components/molecules/MoleculesMarkerPopup.vue';
-import MoleculesPriceMarker from '../components/molecules/MoleculesPriceMarker.vue';
+import { defineComponent, h, createVNode, render } from 'vue';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import type { DrawingMode } from '../../../shared/types/map-drawing';
+import { MoleculesMarkerPopup, MoleculesPriceMarker } from '#components';
 
 interface MapInstance {
   map: MapTilerMap;
   markers: any[];
+  drawControl?: DrawControl;
 }
 
 // Simple cache to share map instances across pages
@@ -214,6 +216,252 @@ export function useMapTiler() {
     }
   }
 
+  /**
+   * Get default styles for the drawing control
+   */
+  function getDrawStyles() {
+    // You can customize these styles or make them themeable
+    return [
+      // Default styles for drawing
+      {
+        'id': 'gl-draw-polygon-fill-inactive',
+        'type': 'fill',
+        'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon']],
+        'paint': {
+          'fill-color': '#3388ff',
+          'fill-outline-color': '#3388ff',
+          'fill-opacity': 0.1
+        }
+      },
+      {
+        'id': 'gl-draw-polygon-fill-active',
+        'type': 'fill',
+        'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+        'paint': {
+          'fill-color': '#3388ff',
+          'fill-outline-color': '#3388ff',
+          'fill-opacity': 0.3
+        }
+      },
+      {
+        'id': 'gl-draw-polygon-stroke-inactive',
+        'type': 'line',
+        'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon']],
+        'paint': {
+          'line-color': '#3388ff',
+          'line-width': 2
+        }
+      },
+      {
+        'id': 'gl-draw-polygon-stroke-active',
+        'type': 'line',
+        'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+        'paint': {
+          'line-color': '#3388ff',
+          'line-dasharray': [2, 2],
+          'line-width': 2
+        }
+      },
+      {
+        'id': 'gl-draw-line-inactive',
+        'type': 'line',
+        'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'LineString']],
+        'paint': {
+          'line-color': '#3388ff',
+          'line-width': 2
+        }
+      },
+      {
+        'id': 'gl-draw-line-active',
+        'type': 'line',
+        'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'LineString']],
+        'paint': {
+          'line-color': '#3388ff',
+          'line-dasharray': [2, 2],
+          'line-width': 2
+        }
+      },
+      {
+        'id': 'gl-draw-point-inactive',
+        'type': 'circle',
+        'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'Point']],
+        'paint': {
+          'circle-radius': 5,
+          'circle-color': '#ffffff',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#3388ff'
+        }
+      },
+      {
+        'id': 'gl-draw-point-active',
+        'type': 'circle',
+        'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Point']],
+        'paint': {
+          'circle-radius': 7,
+          'circle-color': '#ffffff',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#3388ff'
+        }
+      },
+      {
+        'id': 'gl-draw-polygon-midpoint',
+        'type': 'circle',
+        'filter': ['all', ['==', '$type', 'Point'], ['==', 'meta', 'midpoint']],
+        'paint': {
+          'circle-radius': 4,
+          'circle-color': '#ffffff',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#3388ff'
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize drawing mode on the map
+   * @param map - The MapTiler map instance
+   * @param mode - The drawing mode ('polygon', 'rectangle', 'circle', or null to disable)
+   */
+  function initDrawing(map: MapTilerMap, mode: DrawingMode) {
+    // Setup a new MapInstance or get existing one
+    let instance: MapInstance | undefined;
+    
+    // Try to find existing instance
+    for (const [_, inst] of mapCache) {
+      if (inst.map === map) {
+        instance = inst;
+        break;
+      }
+    }
+    
+    // If we don't have an instance for this map, create one
+    if (!instance) {
+      instance = { map, markers: [] };
+      // Generate a random ID to add to the cache
+      const randomId = `map-${Math.random().toString(36).substring(2, 9)}`;
+      mapCache.set(randomId, instance);
+    }
+
+    // Remove existing draw control if present
+    if (instance.drawControl) {
+      try {
+        map.removeControl(instance.drawControl);
+      } catch (e) {
+        console.warn("[Map] Error removing draw control:", e);
+      }
+      instance.drawControl = undefined;
+    }
+
+    // If mode is null, we're just disabling drawing
+    if (!mode) return;
+
+    // Initialize the draw control with the specified mode
+    try {
+      console.log(`[Map] Initializing drawing mode: ${mode}`);
+      
+      const options: any = {
+        displayControlsDefault: false,  // Don't show all controls by default
+        controls: {
+          polygon: true,
+          line_string: false,
+          point: false,
+          trash: true
+        },
+        styles: getDrawStyles()
+      };
+      
+      // Use standard MapboxDraw with polygon drawing only
+      const drawControl = new MapboxDraw(options);
+      
+      // Add the control to the map in the top-left position
+      // This will be positioned below the navigation control
+      map.addControl(drawControl, 'top-left');
+      
+      // Store the draw control in the instance so we can reference it later
+      instance.drawControl = drawControl;
+      
+      // Set the drawing mode after adding the control
+      // We need a small delay to ensure the control is fully initialized
+      setTimeout(() => {
+        try {
+          console.log(`[Map] Setting drawing mode to: ${mode}`);
+          
+          // Always use polygon drawing mode (the only mode we support now)
+          drawControl.changeMode('draw_polygon');
+        } catch (e) {
+          console.error("[Map] Error changing drawing mode:", e);
+        }
+      }, 100);
+      
+      // Add event listeners
+      map.on('draw.create', (e: any) => {
+        if (e.features && e.features.length > 0) {
+          map.fire('shape-drawn', { 
+            feature: e.features[0],
+            type: mode
+          });
+        }
+      });
+      
+      map.on('draw.update', (e: any) => {
+        if (e.features && e.features.length > 0) {
+          map.fire('shape-updated', { 
+            feature: e.features[0],
+            type: mode
+          });
+        }
+      });
+
+      map.on('draw.delete', (e: any) => {
+        map.fire('shape-deleted', { 
+          features: e.features || [],
+          type: mode
+        });
+      });
+    } catch (e) {
+      console.error("[Map] Error initializing drawing mode:", e);
+    }
+  }
+
+  /**
+   * Get all drawn shapes from the map
+   */
+  function getDrawnShapes(map: MapTilerMap): any[] {
+    // Find cached instance
+    for (const [_, instance] of mapCache) {
+      if (instance.map === map && instance.drawControl) {
+        return instance.drawControl.getAll().features;
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Clear all drawn shapes from the map
+   */
+  function clearDrawnShapes(map: MapTilerMap): void {
+    let found = false;
+    // Find cached instance
+    for (const [_, instance] of mapCache) {
+      if (instance.map === map) {
+        if (instance.drawControl) {
+          console.log('[Map] Clearing drawn shapes');
+          try {
+            instance.drawControl.deleteAll();
+            found = true;
+          } catch (e) {
+            console.error('[Map] Error clearing shapes:', e);
+          }
+          return;
+        }
+      }
+    }
+    
+    if (!found) {
+      console.warn('[Map] No draw control found for this map instance');
+    }
+  }
+
   return {
     initializeMap,
     addMarker,
@@ -221,5 +469,8 @@ export function useMapTiler() {
     centerMap,
     autoComplete,
     calculateZoomLevelFromRadius,
+    initDrawing,
+    getDrawnShapes,
+    clearDrawnShapes,
   };
 }
