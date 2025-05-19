@@ -48,7 +48,7 @@ const mapContainer = ref<HTMLElement>();
 const map = shallowRef<MapTilerMap | null>(null);
 
 // Import map utilities from composable
-const { initializeMap, addMarker, clearMarkers, centerMap, initDrawing, clearDrawnShapes } = useMapTiler();
+const { initializeMap, addMarker, clearMarkers, centerMap, initDrawing, clearDrawnShapes, getDrawnShapes } = useMapTiler();
 
 // Check if we have valid coordinates to display
 const hasValidCoordinates = computed(() => {
