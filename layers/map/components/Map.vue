@@ -32,11 +32,11 @@ const props = withDefaults(defineProps<{
   center: () => [51.505, -0.09],
 });
 
-/**
- * Load the map on mount - don't add markers yet as they'll be added by the watchEffect
- */
 onMounted(() => {
   loadMap();
+  nextTick(() => {
+    if (map.value) map.value.resize();
+  });
 });
 
 
@@ -45,10 +45,7 @@ onMounted(() => {
  * Using watchEffect to detect all reactive dependencies while limiting renders
  */
 watchEffect(() => {
-  // Only update if map is initialized and we have markers to show
-  if (map.value && ((props.markers && props.markers.length > 0) || props.marker)) {
-    updateMarkers();
-  }
+  updateMarkers();
 });
 
 /**
