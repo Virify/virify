@@ -1,55 +1,66 @@
 <template>
   <OrganismsSearchForm />
   <OrganismsHeroHome v-if="currentView === 'list'" :title="heroTitle" />
-  <div :class="['view-toggle-container', 'container', { 'no-bottom-margin': isMapView }]"
-    v-if="searchListings && searchListings.length > 0">
+  <div :class="['view-toggle-container', 'container', { 'no-bottom-margin': isMapView }]" v-if="searchListings && searchListings.length > 0">
     <MoleculesTabs :options="viewOptions" @update:content="handleViewChange" v-slot="{ content }">
       <div v-show="content === 'list'" class="p-listing-test-grid | container">
-        <MoleculesListingCard v-for="listing in searchListings" :key="listing.id" :property-id="listing.id"
+        <MoleculesListingCard
+          v-for="listing in searchListings"
+          :key="listing.id"
+          :property-id="listing.id"
           :listing-tier="listing.listingTier"
           :price-type="listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency"
-          :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
-          :classification="listing.property?.classification?.name" :address="listing.property?.address"
-          :bedrooms="listing.property?.numberBedrooms" :bathrooms="listing.property?.numberBathrooms"
-          :description="listing.title" />
+          :image="listing.property?.media"
+          :price="listing.price"
+          :property-type="listing.property?.type?.name"
+          :classification="listing.property?.classification?.name"
+          :address="listing.property?.address"
+          :bedrooms="listing.property?.numberBedrooms"
+          :bathrooms="listing.property?.numberBathrooms"
+          :description="listing.title"
+        />
       </div>
       <div v-show="content === 'dual'" class="dual-view-container">
         <div class="dual-view-map">
-          <OrganismsMap v-if="currentView === 'dual'" :markers="mapMarkers" :zoom="mapZoomLevel"
-            :center="mapCenterCoordinates" :interactive="true" :display-popups="true" :mapId="GLOBAL_MAP_ID"
-            customClass="map-sidebar" @property-note="handleNote" @property-favourite="handleFavorite" />
+          <Map v-if="currentView === 'dual'" :markers="searchListings" :zoom="mapZoomLevel" :center="mapCenterCoordinates" :interactive="true" :mapId="GLOBAL_MAP_ID" />
         </div>
         <div class="dual-view-listings">
-          <MoleculesListingCardHorizontal v-for="listing in searchListings" :key="listing.id" :property-id="listing.id"
+          <MoleculesListingCardHorizontal
+            v-for="listing in searchListings"
+            :key="listing.id"
+            :property-id="listing.id"
             :listing-tier="listing.listingTier"
             :price-type="listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency"
-            :image="listing.property?.media" :price="listing.price" :property-type="listing.property?.type?.name"
-            :classification="listing.property?.classification?.name" :address="listing.property?.address"
-            :bedrooms="listing.property?.numberBedrooms" :bathrooms="listing.property?.numberBathrooms"
-            :description="listing.title" />
+            :image="listing.property?.media"
+            :price="listing.price"
+            :property-type="listing.property?.type?.name"
+            :classification="listing.property?.classification?.name"
+            :address="listing.property?.address"
+            :bedrooms="listing.property?.numberBedrooms"
+            :bathrooms="listing.property?.numberBathrooms"
+            :description="listing.title"
+          />
         </div>
       </div>
       <div v-show="content === 'map'" class="map-only-container">
-        <OrganismsMap v-if="currentView === 'map'" :markers="mapMarkers" :zoom="mapZoomLevel"
-          :center="mapCenterCoordinates" :interactive="true" :display-popups="true" :mapId="GLOBAL_MAP_ID"
-          customClass="map-fullscreen" @property-note="handleNote" @property-favourite="handleFavorite" />
+        <Map v-if="currentView === 'map'" :markers="searchListings" :zoom="mapZoomLevel" :center="mapCenterCoordinates" :mapId="GLOBAL_MAP_ID" />
       </div>
     </MoleculesTabs>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { MapMarker } from '~~/shared/types/map-coordinates';
-import type { ListingCardType } from '~~/shared/types/listing';
+import type { ListingCardType } from "~~/shared/types/listing";
 
 // Listings state
 const searchListings = ref<ListingCardType[] | null>(null);
-provide('searchListings', searchListings);
-const searchParams = useState<Record<string, any>>('searchParams');
+provide("searchListings", searchListings);
+const searchParams = useState<Record<string, any>>("searchParams");
 
 // View toggles
-const currentView = ref('list');
-const isMapView = computed(() => currentView.value === 'dual' || currentView.value === 'map');
+const currentView = ref("list");
+const isMapView = computed(() => currentView.value === "dual" || currentView.value === "map");
+
 const heroTitle = computed(() => {
   if (searchListings.value && searchListings.value.length === 0) {
     return "No Results Found";
@@ -59,9 +70,9 @@ const heroTitle = computed(() => {
 });
 
 const viewOptions = [
-  { label: 'List View', content: 'list' },
-  { label: 'Split View', content: 'dual' },
-  { label: 'Map View', content: 'map' }
+  { label: "List View", content: "list" },
+  { label: "Split View", content: "dual" },
+  { label: "Map View", content: "map" },
 ];
 
 function handleViewChange(content: string) {
@@ -69,60 +80,21 @@ function handleViewChange(content: string) {
 }
 
 // Map functionality
-const { calculateZoomLevelFromRadius } = useMapTiler();
-const { hasNote } = useNotes();
-const { isFavourite } = useFavourites();
-
-// Create map markers from listings
-const mapMarkers = computed<MapMarker[]>(() => {
-  if (!searchListings.value?.length) return [];
-
-  return searchListings.value.map(listing => ({
-    id: listing.id,
-    lat: listing.property?.address?.lat ?? 0,
-    lon: listing.property?.address?.lon ?? 0,
-    title: listing.title ?? null,
-    bedrooms: listing.property?.numberBedrooms ?? null,
-    bathrooms: listing.property?.numberBathrooms ?? null,
-    price: listing.price ?? null,
-    propertyType: listing.property?.type?.name ?? null,
-    classification: listing.property?.classification?.name ?? null,
-    priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,
-    address: listing.property?.address ? {
-      street: listing.property.address.street,
-      city: listing.property.address.city,
-      postcode: listing.property.address.postcode,
-    } : null,
-    image: listing.property?.media ?? [],
-    hasNote: hasNote(listing.id),
-    isFavorite: isFavourite(listing.id)
-  }));
-});
+const { calculateZoomLevelFromRadius } = useMap();
 
 // Map positioning
 const mapZoomLevel = computed(() => calculateZoomLevelFromRadius(searchParams.value?.radius));
 
 const mapCenterCoordinates = computed(() => {
-  const m = mapMarkers.value[0];
+  const m = searchParams.value?.coordinates;
   return m ? { lat: m.lat, lon: m.lon } : undefined;
 });
-
-// Event handlers
-function handleNote(id: number) {
-  const { showNoteDialog } = useNotes();
-  showNoteDialog(id);
-}
-
-function handleFavorite(id: number) {
-  const { toggleFavourite } = useFavourites();
-  toggleFavourite(id);
-}
 
 // Initialize view from URL
 onMounted(() => {
   const route = useRoute();
-  if (route.query.view === 'map') {
-    currentView.value = route.query.fullMap === 'true' ? 'map' : 'dual';
+  if (route.query.view === "map") {
+    currentView.value = route.query.fullMap === "true" ? "map" : "dual";
   }
 });
 </script>
@@ -170,7 +142,6 @@ onMounted(() => {
 
   @media screen and (max-width: 1100px) {
     grid-template-columns: 1fr;
-
   }
 }
 

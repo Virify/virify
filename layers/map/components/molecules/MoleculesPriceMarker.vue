@@ -21,8 +21,8 @@
 <script setup lang="ts">
 interface MarkerProps {
   price: number | null;
-  hasNote: boolean;
-  isFavorite: boolean;
+  hasNote?: boolean | null;
+  isFavorite?: boolean | null;
 }
 
 const props = defineProps<MarkerProps>();
@@ -41,9 +41,10 @@ const priceDisplay = computed(() => {
 <style scoped>
 .price-marker {
   border-radius: 8px;
+  border: 1px solid black;
   background: var(--secondary-400);
   color: white;
-  padding: 4px 8px;
+  padding: 6px 12px;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   position: relative;
@@ -52,6 +53,7 @@ const priceDisplay = computed(() => {
 .price-marker-content {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
 }
 

@@ -246,7 +246,7 @@ const isContracted = computed(() => {
  *  Get search form config
  */
 const { radiusOptions, bedroomOptions, bathroomOptions, dateOptions, saleAvailabilityOptions, rentAvailabilityOptions, propertyFeatures, buyOrRentOptions } = getSearchFormConfig();
-const { autoComplete } = useMapTiler();
+const { autoComplete } = useMap();
 
 /**
  *  Popover management

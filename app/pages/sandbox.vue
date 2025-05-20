@@ -4,15 +4,6 @@
 
     <div class="| flow">
       <p>Testing interactive form elements and components</p>
-      
-      <div class="demo-nav">
-        <h3 class="| title-xs">Map Demos</h3>
-        <div class="| button-group">
-          <NuxtLink to="/map-area-search" class="| button">
-            Map Area Search Example
-          </NuxtLink>
-        </div>
-      </div>
     </div>
 
     <h2 class="| title-sm">Multi-select</h2>
