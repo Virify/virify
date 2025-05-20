@@ -48,7 +48,6 @@ watchEffect(() => {
   // Only update if map is initialized and we have markers to show
   if (map.value && ((props.markers && props.markers.length > 0) || props.marker)) {
     updateMarkers();
-    map.value.resize();
   }
 });
 
