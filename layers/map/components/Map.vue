@@ -17,7 +17,7 @@ const { initMap, addMarkers, clearMarkers, addMarker } = useMap();
  * props
  */
 const props = withDefaults(defineProps<{
-  center?: { lat: number; lon: number };
+  center?: [number, number];
   zoom?: number;
   interactive?: boolean;
   mapId?: string;
@@ -29,33 +29,56 @@ const props = withDefaults(defineProps<{
   zoom: 12,
   mapId: GLOBAL_MAP_ID,
   popups: true,
+  center: () => [51.505, -0.09],
 });
 
 /**
- * Load the map and add markers on mount
+ * Load the map on mount - don't add markers yet as they'll be added by the watchEffect
  */
 onMounted(() => {
   loadMap();
-  updateMarkers();
 });
 
 
 /**
- * Watch for changes in markers and update the map
- * if the map is already initialized  
+ * Watch for changes in markers list or favorite/note status
+ * Using watchEffect to detect all reactive dependencies while limiting renders
  */
 watchEffect(() => {
-  updateMarkers();
+  // Only update if map is initialized and we have markers to show
+  if (map.value && ((props.markers && props.markers.length > 0) || props.marker)) {
+    updateMarkers();
+    map.value.resize();
+  }
 });
 
 /**
- * Watch for changes in the zoom
+ * Watch for changes in the zoom or center
+ * Use flyTo for smoother transitions between locations
  */
-watch(() => props.zoom, (newZoom) => {
-  if (map.value) {
-    map.value.setZoom(newZoom);
+watch(
+  [() => props.zoom, () => props.center],
+  ([newZoom, newCenter]) => {
+    if (!map.value) return;
+    
+    if (newCenter !== undefined) {
+      // Use flyTo for smooth animation when center or zoom changes
+      map.value.flyTo({
+        center: newCenter,
+        zoom: newZoom !== undefined ? newZoom : map.value.getZoom(),
+        essential: true, // This animation is considered essential for the user experience
+        duration: 1000  // Animation duration in milliseconds
+      });
+    } else if (newZoom !== undefined) {
+      // If only zoom changed, just animate zoom
+      map.value.flyTo({
+        zoom: newZoom,
+        essential: true,
+        duration: 800
+      });
+    }
   }
-});
+);
 
 /**
  * Initialise the map
@@ -67,7 +90,7 @@ function loadMap() {
       {
         interactive: props.interactive,
         zoom: props.zoom,
-        center: props.center,
+        center: props.center ?? [0, 0],
       },
       props.mapId ?? GLOBAL_MAP_ID,
     );

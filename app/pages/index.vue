@@ -20,11 +20,17 @@
           :description="listing.title"
         />
       </div>
-      <div v-show="content === 'dual'" class="dual-view-container">
-        <div class="dual-view-map">
-          <Map v-if="currentView === 'dual'" :markers="searchListings" :zoom="mapZoomLevel" :center="mapCenterCoordinates" :interactive="true" :mapId="GLOBAL_MAP_ID" />
+      <div class="dual-view-container" v-show="content === 'dual' || content === 'map'">
+        <div class="dual-view-map" :class="{ 'map-fullscreen': content === 'map' }">
+          <Map
+            :markers="searchListings"
+            :zoom="mapZoomLevel"
+            :center="mapCenterCoordinates"
+            :interactive="true"
+            :mapId="GLOBAL_MAP_ID"
+          />
         </div>
-        <div class="dual-view-listings">
+        <div class="dual-view-listings" v-show="content === 'dual'">
           <MoleculesListingCardHorizontal
             v-for="listing in searchListings"
             :key="listing.id"
@@ -41,9 +47,6 @@
             :description="listing.title"
           />
         </div>
-      </div>
-      <div v-show="content === 'map'" class="map-only-container">
-        <Map v-if="currentView === 'map'" :markers="searchListings" :zoom="mapZoomLevel" :center="mapCenterCoordinates" :mapId="GLOBAL_MAP_ID" />
       </div>
     </MoleculesTabs>
   </div>
@@ -87,7 +90,14 @@ const mapZoomLevel = computed(() => calculateZoomLevelFromRadius(searchParams.va
 
 const mapCenterCoordinates = computed(() => {
   const m = searchParams.value?.coordinates;
-  return m ? { lat: m.lat, lon: m.lon } : undefined;
+  if (
+    m &&
+    typeof m.lon === "number" &&
+    typeof m.lat === "number"
+  ) {
+    return [m.lon, m.lat] as [number, number];
+  }
+  return undefined;
 });
 
 // Initialize view from URL
@@ -133,16 +143,24 @@ onMounted(() => {
   gap: 0;
   width: 100vw;
   height: calc(100vh - var(--header-height) - 45px);
-  /* Adjusted to account for tab height */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding: 0;
   overflow: hidden;
-  /* Prevent container from scrolling */
+}
 
-  @media screen and (max-width: 1100px) {
-    grid-template-columns: 1fr;
-  }
+.dual-view-map {
+  position: relative;
+  height: 100%;
+  transition: width 0.3s, height 0.3s;
+}
+
+.dual-view-map.map-fullscreen {
+  grid-column: 1 / -1;
+  width: 100vw;
+  height: 100vh;
+  min-height: 400px;
+  z-index: 2;
 }
 
 .dual-view-listings {
@@ -150,67 +168,28 @@ onMounted(() => {
   flex-direction: column;
   gap: var(--size-16);
   height: 100%;
-  /* Take full height of parent */
   overflow-y: auto;
-  /* Only allow scrolling within listing area */
   padding: var(--size-28);
   min-width: 0;
-  /* Prevents overflow issues */
 }
 
-.dual-view-map {
-  position: relative;
-  /* Changed from sticky since parent is now fixed height */
-  height: 100%;
-  /* Take full height of parent */
-}
-
-.map-sidebar {
-  height: 100%;
-  width: 100%;
-}
-
-/* Prevent body scrolling when in split or full map view */
-:global(body.map-view-active) {
-  overflow: hidden;
-}
-
-/* Adjust the scroll container to prevent scrolling in map view */
-:global(body.map-view-active) #scrollContainer {
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* Responsive adjustments for map view */
 @media (max-width: 1100px) {
   .dual-view-container {
     grid-template-columns: 1fr;
     height: auto;
-    /* Allow container to expand on mobile */
     overflow: visible;
-    /* Allow scrolling on mobile */
   }
-
   .dual-view-listings {
     height: 50vh;
-    /* Fixed height for listings on mobile */
     max-height: 500px;
   }
-
   .dual-view-map {
     height: 50vh;
-    /* Fixed height for map on mobile */
     min-height: 400px;
   }
-
-  /* Re-enable scrolling on mobile */
-  :global(body.map-view-active) {
-    overflow: auto;
-  }
-
-  :global(body.map-view-active) #scrollContainer {
-    height: auto;
-    overflow: visible;
+  .dual-view-map.map-fullscreen {
+    height: 100vh;
+    min-height: 400px;
   }
 }
 

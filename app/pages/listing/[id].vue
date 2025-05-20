@@ -78,7 +78,7 @@
             ref="mapRef"
             :marker="listing"
             :zoom="15"
-            :center="{ lat: property.address.lat, lon: property.address.lon }"
+            :center="[property.address.lon, property.address.lat]"
             :interactive="false"
             :mapId="GLOBAL_MAP_ID"
           />
@@ -380,6 +380,8 @@
 </template>
 
 <script setup lang="ts">
+import type { MapMarker } from '~~/shared/types/map';
+
 const route = useRoute();
 const listingId = route.params.id as string;
 const listing = ref<ListingWithFullProperty | null>(null);

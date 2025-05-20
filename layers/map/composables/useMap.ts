@@ -1,12 +1,7 @@
 import { MoleculesMarkerPopup, MoleculesPriceMarker } from "#components";
 import { defineComponent, h, createVNode, render } from "vue";
-
-interface MapInstance {
-  map: any;
-  markers: Marker[];
-  markerMap: Map<string | number, Marker>;
-  interactive: boolean;
-}
+import { Marker, Popup } from "@maptiler/sdk";
+import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, GeocodingFeature, GeocodingResponse } from "~~/shared/types/map";
 
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
@@ -23,7 +18,7 @@ export function useMap() {
    * @param container HTMLElement - The container to attach the map to
    * @returns The reused map instance or undefined if no map exists with this ID
    */
-  function resuseMap(container: HTMLElement, options: any, mapId: string) {
+  function resuseMap(container: HTMLElement, options: MapInitOptions, mapId: string): ExtendedMapTilerMap | undefined {
     const existingMapInstance = mapCache.get(mapId);
     if (!existingMapInstance) return undefined;
 
@@ -54,7 +49,7 @@ export function useMap() {
    * @param options options
    * @param mapId string
    */
-  function initNewMap(container: HTMLElement, options: any, mapId: string) {
+  function initNewMap(container: HTMLElement, options: MapOptions, mapId: string): ExtendedMapTilerMap {
     console.log("[Map] Creating new map instance");
 
     container.style.width = "100%";
@@ -70,7 +65,7 @@ export function useMap() {
         position: "top-right",
       },
       center: options.center,
-    });
+    }) as ExtendedMapTilerMap;
 
     // cache the map instance
     if (mapId) {
@@ -93,21 +88,21 @@ export function useMap() {
    * @param mapId string
    * @returns The map instance (either reused or newly created)
    */
-  function initMap(container: HTMLElement, options: any, mapId: string) {
+  function initMap(container: HTMLElement, options: MapOptions, mapId: string): ExtendedMapTilerMap {
     return resuseMap(container, options, mapId) ?? initNewMap(container, options, mapId);
   }
-  
+
   /**
    * Adds a marker to the map instance
    *
    * @param map The map to add the marker to
    * @param marker The marker to add
    */
-  function addMarker(map: any, marker: any) {
+  function addMarker(map: ExtendedMapTilerMap, marker: Array<{ lat: number; lon: number }> | null | undefined): Marker | undefined {
     const instance = findMapInstance(map);
-    if (!instance) {
-      console.error("[Map] Instance not found");
-      return;
+    if (!instance || !marker || marker.length === 0 || !marker[0]) {
+      console.error("[Map] Instance not found or invalid marker");
+      return undefined;
     }
     const newMarker = new sdk.Marker().setLngLat([marker[0].lon, marker[0].lat]);
     newMarker.addTo(map);
@@ -123,7 +118,7 @@ export function useMap() {
    * @param markers Array of markers to add
    * @returns Array of created marker objects
    */
-  function addMarkers(map: any, markers: any[]) {
+  function addMarkers(map: ExtendedMapTilerMap, markers: MapMarker[]): Marker[] {
     const instance = findMapInstance(map);
     if (!instance) {
       console.error("[Map] Instance not found");
@@ -143,6 +138,7 @@ export function useMap() {
       newMarker.addTo(map);
       instance.markers.push(newMarker);
     }
+    console.log("[Map] Added " + markers.length + " markers to map instance");
     return instance.markers;
   }
 
@@ -151,7 +147,7 @@ export function useMap() {
    *
    * @param map The map to clear markers from
    */
-  function clearMarkers(map: any) {
+  function clearMarkers(map: ExtendedMapTilerMap): void {
     const instance = findMapInstance(map);
     if (instance) {
       instance.markers.forEach((marker) => marker.remove());
@@ -189,12 +185,14 @@ export function useMap() {
   /**
    * Geocoding autocomplete
    */
-  async function autoComplete(query: string): Promise<any[]> {
+  async function autoComplete(query: string): Promise<GeocodingFeature[]> {
     if (!query) return [];
 
     try {
-      const res = await $fetch(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json`, { query: { key: sdk.config.apiKey, country: "gb" } });
-      return (res as any).features ?? [];
+      const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json`, {
+        query: { key: sdk.config.apiKey, country: "gb" },
+      });
+      return res.features ?? [];
     } catch (e) {
       console.error("[Map] Search error:", e);
       return [];
@@ -208,19 +206,20 @@ export function useMap() {
     clearMarkers,
     calculateZoomLevelFromRadius,
     autoComplete,
-  };
+  } as const;
 
   /**
    * !! Helper functions !!
    * These functions are not exported and are only used internally
    */
 
-  function setControls(existingMapInstance: MapInstance, map: any, options: any) {
+  function setControls(existingMapInstance: MapInstance, map: ExtendedMapTilerMap, options: MapOptions): boolean | void {
     const prevInteractive = existingMapInstance.interactive;
     const newInteractive = options.interactive;
 
     // Update navigation control
-    const navControl = new sdk.NavigationControl();
+    // Use type assertion since sdk's NavigationControl doesn't match the IControl interface exactly
+    const navControl = new sdk.NavigationControl() as any;
     const controls = map._controls ?? [];
 
     if (prevInteractive !== newInteractive) {
@@ -233,7 +232,7 @@ export function useMap() {
         map.boxZoom.enable();
 
         if (!controls.some((c: any) => c instanceof sdk.NavigationControl)) {
-          map.addControl(navControl, "top-right");
+          map.addControl(navControl as any, "top-right");
         }
       } else {
         map.dragPan.disable();
@@ -245,12 +244,13 @@ export function useMap() {
 
         for (const control of controls) {
           if (control instanceof sdk.NavigationControl) {
-            map.removeControl(control);
+            map.removeControl(control as any);
           }
         }
       }
 
-      return existingMapInstance.interactive = newInteractive;
+      existingMapInstance.interactive = newInteractive;
+      return newInteractive;
     }
   }
 
@@ -260,7 +260,7 @@ export function useMap() {
    * @param map The map object to find
    * @returns The MapInstance or undefined if not found
    */
-  function findMapInstance(map: any): MapInstance | undefined {
+  function findMapInstance(map: ExtendedMapTilerMap): MapInstance | undefined {
     for (const [_, instance] of mapCache) {
       if (instance.map === map) {
         return instance;
@@ -272,14 +272,17 @@ export function useMap() {
   /**
    * Render a price marker
    *
-   * @param price string
+   * @param price number | null
+   * @param hasNote boolean | undefined
+   * @param isFavorite boolean | undefined
+   * @returns HTMLElement
    */
-  function renderMarker(price: string, hasNote: boolean, isFavorite: boolean) {
+  function renderMarker(price: number | null, hasNote?: boolean, isFavorite?: boolean): HTMLElement {
     const markerWrapper = document.createElement("div");
     const MarkerComp = defineComponent({
       setup: () => () => {
         return h(MoleculesPriceMarker, {
-          price: price,
+          price,
           hasNote: Boolean(hasNote),
           isFavorite: Boolean(isFavorite),
         });
@@ -295,8 +298,11 @@ export function useMap() {
 
   /**
    * Render a popup for a marker
+   *
+   * @param marker MapMarker
+   * @returns Popup
    */
-  function renderPopup(marker: any) {
+  function renderPopup(marker: MapMarker): Popup {
     const popupWrapper = document.createElement("div");
 
     const PopupComp = defineComponent({
