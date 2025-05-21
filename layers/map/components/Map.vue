@@ -24,7 +24,6 @@ const props = withDefaults(defineProps<{
   mapId?: string;
   markers?: ListingCardType[];
   marker?: ListingCardType;
-  popups?: boolean;
   draw?: boolean;
   searchRadius?: number | null;
   searchCenter?: [number, number] | null;
@@ -32,7 +31,6 @@ const props = withDefaults(defineProps<{
   interactive: true,
   zoom: 12,
   mapId: GLOBAL_MAP_ID,
-  popups: true,
   center: () => [51.505, -0.09],
   draw: false,
   searchRadius: null,

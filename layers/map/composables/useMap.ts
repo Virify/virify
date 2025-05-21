@@ -3,14 +3,13 @@ import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, Geoco
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { setControls, findMapInstance, renderMarker, renderPopup, styles, calculateZoomLevelFromRadius } from "../utils/mapHelpers";
+import { bbox, area, length } from "@turf/turf";
 
 /**
  * State and Cache
  */
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
-const circleSourceId = 'search-radius-source';
-const circleLayerId = 'search-radius-layer';
 
 export function useMap() {
   const sdk = useNuxtApp().$maptilersdk;
@@ -207,6 +206,18 @@ export function useMap() {
     // Set cursor to crosshair only when in drawing mode
     map.on("draw.modechange", (e: any) => {
       map.getCanvas().style.cursor = e.mode === "draw_polygon" ? "crosshair" : "";
+    });
+
+    map.on('draw.create', (e: any) => {
+      const feature = e.features[0];
+      if (!feature) return;
+      const bounds = bbox(feature);
+      const polyArea = area(feature);
+      const areainMiles = length(feature, { units: 'miles' });
+      console.log("[Map] Drawn feature:", feature);
+      console.log("[Map] Drawn feature bounds:", bounds);
+      console.log("[Map] Drawn feature area:", polyArea);
+      console.log("[Map] Drawn feature area in miles:", areainMiles);
     });
   }
 
