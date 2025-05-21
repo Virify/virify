@@ -16,7 +16,8 @@
 
         }">
 
-        <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
+        <h2 v-if="price"
+          class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs">
           {{ price }}
 
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
@@ -24,6 +25,13 @@
           </AtomsPill>
         </h2>
 
+        <div role="presentation">
+          <h3 class="o-listing-mobile-banner__additional-info-subtitle | title-sm">At a glance</h3>
+
+          <OrganismsListingSidebarIcons class="o-listing-mobile-banner__additional-info-icons" />
+        </div>
+
+        <OrganismsListingAgent />
       </div>
     </div>
 
@@ -163,6 +171,33 @@ function closeExpanded() {
       transition-property: padding, height;
       padding: var(--size-12) 0;
     }
+
+    @include mq.tablet {
+      display: flex;
+      flex-direction: row-reverse;
+      gap: var(--size-24);
+      margin: 0;
+      width: 100%;
+      max-width: none;
+    }
+  }
+
+  &__additional-info-subtitle {
+    @include mq.not-tablet {
+      display: none;
+    }
+  }
+
+  &__additional-info-icons {
+    height: fit-content;
+
+    @include mq.not-tablet {
+      padding: var(--size-12) var(--size-16);
+
+      .o-listing-sidebar-icons__row {
+        justify-content: center;
+      }
+    }
   }
 
   &__additional-info-backdrop {
@@ -206,6 +241,10 @@ function closeExpanded() {
 
     @include mq.tablet {
       justify-content: flex-start;
+
+      &--mobile-only {
+        display: none;
+      }
     }
   }
 
