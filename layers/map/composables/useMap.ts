@@ -1,16 +1,14 @@
 import { Marker } from "@maptiler/sdk";
-import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, GeocodingFeature, GeocodingResponse, BBox } from "~~/shared/types/map";
+import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, GeocodingFeature, GeocodingResponse } from "~~/shared/types/map";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { setControls, findMapInstance, renderMarker, renderPopup, styles, calculateZoomLevelFromRadius } from "../utils/mapHelpers";
-import { bbox } from "@turf/turf";
 
 /**
  * State and Cache
  */
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
-const searchArea = ref<BBox>([]);
 
 export function useMap() {
   const sdk = useNuxtApp().$maptilersdk;
@@ -136,11 +134,12 @@ export function useMap() {
     // so we need to create a wrapper for each marker
     for (const marker of markers) {
       const markerWrapper = renderMarker(marker.price, marker.hasNote, marker.isFavorite, vueApp);
-
+      // Remove absolute positioning, let Mapbox/MapTiler handle marker placement
+      // Only set anchor to 'bottom' for correct vertical alignment
       const newMarker = new sdk.Marker({
         element: markerWrapper,
+        anchor: "bottom",
       });
-
       newMarker.setLngLat([marker.lon, marker.lat]);
       const popup = renderPopup(marker, vueApp);
       newMarker.setPopup(popup);
@@ -201,22 +200,19 @@ export function useMap() {
     instance.drawControl = drawControl;
 
     // Patch classes for Mapbox Draw control (Maplibre compatibility)
-    document.querySelectorAll(".mapboxgl-ctrl-group.mapboxgl-ctrl")
-      .forEach(elem => elem.classList.add("maplibregl-ctrl", "maplibregl-ctrl-group"));
+    document.querySelectorAll(".mapboxgl-ctrl-group.mapboxgl-ctrl").forEach((elem) => elem.classList.add("maplibregl-ctrl", "maplibregl-ctrl-group"));
 
     // Set cursor to crosshair only when in drawing mode
     map.on("draw.modechange", (e: any) => {
       map.getCanvas().style.cursor = e.mode === "draw_polygon" ? "crosshair" : "";
     });
 
-    map.on('draw.create', (e: any) => {
-      const feature = e.features[0];
-      if (!feature) return;
-      const bounds = bbox(feature);
-      console.log("[Map] Drawn feature:", feature);
-      console.log("[Map] Drawn feature bounds:", bounds);
-      searchArea.value.push(feature);
-      console.log("[Map] Search area updated:", searchArea.value);
+    map.on("draw.create", (e: any) => {
+      addBBox(e, map);
+    });
+
+    map.on("draw.delete", (e: any) => {
+      clearMarkers(map);
     });
   }
 
@@ -243,14 +239,10 @@ export function useMap() {
    * @param center The center coordinates [lon, lat]
    * @param radiusMiles The radius in miles
    */
-  function updateSearchRadiusVisualization(
-    map: ExtendedMapTilerMap,
-    center: [number, number],
-    radiusMiles: number
-  ) {
+  function updateSearchRadiusVisualization(map: ExtendedMapTilerMap, center: [number, number], radiusMiles: number) {
     // Remove any existing SVG overlay
     const mapContainer = map.getContainer();
-    let svgOverlay = mapContainer.querySelector('.search-radius-svg') as SVGSVGElement | null;
+    let svgOverlay = mapContainer.querySelector(".search-radius-svg") as SVGSVGElement | null;
     if (svgOverlay) {
       // Cleanup listeners if present
       if ((svgOverlay as any)._cleanup) (svgOverlay as any)._cleanup();
@@ -258,14 +250,14 @@ export function useMap() {
     }
 
     // Create SVG overlay
-    svgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgOverlay.classList.add('search-radius-svg');
-    svgOverlay.style.position = 'absolute';
-    svgOverlay.style.top = '0';
-    svgOverlay.style.left = '0';
-    svgOverlay.style.width = '100%';
-    svgOverlay.style.height = '100%';
-    svgOverlay.style.pointerEvents = 'none';
+    svgOverlay = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svgOverlay.classList.add("search-radius-svg");
+    svgOverlay.style.position = "absolute";
+    svgOverlay.style.top = "0";
+    svgOverlay.style.left = "0";
+    svgOverlay.style.width = "100%";
+    svgOverlay.style.height = "100%";
+    svgOverlay.style.pointerEvents = "none";
     mapContainer.appendChild(svgOverlay);
 
     // Helper to update the circle position/size
@@ -273,8 +265,8 @@ export function useMap() {
       // Get map size
       const width = mapContainer.offsetWidth;
       const height = mapContainer.offsetHeight;
-      (svgOverlay as SVGSVGElement).setAttribute('width', width.toString());
-      (svgOverlay as SVGSVGElement).setAttribute('height', height.toString());
+      (svgOverlay as SVGSVGElement).setAttribute("width", width.toString());
+      (svgOverlay as SVGSVGElement).setAttribute("height", height.toString());
 
       // Project center to pixel coordinates
       const mapAny = map as any; // project exists at runtime
@@ -285,39 +277,41 @@ export function useMap() {
       // Calculate pixel radius at current zoom
       // Use a point due east of center at the radius distance
       const earthRadius = 6378137;
-      const dLng = (radiusMeters / (earthRadius * Math.cos(Math.PI * center[1] / 180))) * 180 / Math.PI;
+      const dLng = ((radiusMeters / (earthRadius * Math.cos((Math.PI * center[1]) / 180))) * 180) / Math.PI;
       const edgeLng = center[0] + dLng;
       const edgePx = mapAny.project([edgeLng, center[1]]);
       const pixelRadius = Math.abs(edgePx.x - centerPx.x);
 
       // Clear previous SVG content
-      (svgOverlay as SVGSVGElement).innerHTML = '';
+      (svgOverlay as SVGSVGElement).innerHTML = "";
       // Draw the circle
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', centerPx.x.toString());
-      circle.setAttribute('cy', centerPx.y.toString());
-      circle.setAttribute('r', pixelRadius.toString());
-      circle.setAttribute('fill', '#326C96');
-      circle.setAttribute('fill-opacity', '0.15');
-      circle.setAttribute('stroke', '#326C96');
-      circle.setAttribute('stroke-width', '2');
-      circle.setAttribute('stroke-opacity', '0.4');
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", centerPx.x.toString());
+      circle.setAttribute("cy", centerPx.y.toString());
+      circle.setAttribute("r", pixelRadius.toString());
+      circle.setAttribute("fill", "#326C96");
+      circle.setAttribute("fill-opacity", "0.15");
+      circle.setAttribute("stroke", "#326C96");
+      circle.setAttribute("stroke-width", "2");
+      circle.setAttribute("stroke-opacity", "0.4");
       (svgOverlay as SVGSVGElement).appendChild(circle);
     }
 
     drawCircle();
 
     // Redraw on move/zoom/resize
-    function onMove() { drawCircle(); }
-    map.on('move', onMove);
-    map.on('zoom', onMove);
-    window.addEventListener('resize', onMove);
+    function onMove() {
+      drawCircle();
+    }
+    map.on("move", onMove);
+    map.on("zoom", onMove);
+    window.addEventListener("resize", onMove);
 
     // Store cleanup for this overlay
     (svgOverlay as any)._cleanup = () => {
-      map.off('move', onMove);
-      map.off('zoom', onMove);
-      window.removeEventListener('resize', onMove);
+      map.off("move", onMove);
+      map.off("zoom", onMove);
+      window.removeEventListener("resize", onMove);
     };
   }
 
@@ -328,11 +322,66 @@ export function useMap() {
   function removeSearchRadiusVisualization(map: ExtendedMapTilerMap) {
     if (!map || !map.getContainer) return;
     const mapContainer = map.getContainer();
-    const svgOverlay = mapContainer.querySelector('.search-radius-svg') as SVGSVGElement | null;
+    const svgOverlay = mapContainer.querySelector(".search-radius-svg") as SVGSVGElement | null;
     if (svgOverlay) {
       if ((svgOverlay as any)._cleanup) (svgOverlay as any)._cleanup();
       svgOverlay.remove();
     }
+  }
+
+  function addBBox(e: any, map: ExtendedMapTilerMap) {
+    const feature = e.features[0];
+    if (!feature) return;
+    // Ensure polygon coordinates are a closed loop if feature is a Polygon to avoid rendering issues on zoom
+    if (feature.geometry && feature.geometry.type === "Polygon") {
+      const coords = feature.geometry.coordinates[0];
+      if (coords.length > 2) {
+        const first = coords[0];
+        const last = coords[coords.length - 1];
+        if (first[0] !== last[0] || first[1] !== last[1]) {
+          coords.push([...first]);
+        }
+      }
+    }
+    // Send the full GeoJSON polygon geometry to the backend for strict-in-polygon search
+    const geometry = feature.geometry && feature.geometry.type === "Polygon" ? { type: "Polygon", coordinates: feature.geometry.coordinates } : undefined;
+
+    const result = $fetch<ListingCardType[]>("/api/search/listings", {
+      method: "POST",
+      body: {
+        geometry,
+        buyOrRent: "buy",
+      },
+    });
+    result
+      .then((data) => {
+        console.log("[Map] Search results:", data);
+        // Handle search results here
+        const listings = data.map((listing) => ({
+          id: listing.id,
+          lat: listing.property?.address?.lat ?? 0,
+          lon: listing.property?.address?.lon ?? 0,
+          title: listing.title ?? null,
+          bedrooms: listing.property?.numberBedrooms ?? null,
+          bathrooms: listing.property?.numberBathrooms ?? null,
+          price: listing.price ?? null,
+          propertyType: listing.property?.type?.name ?? null,
+          classification: listing.property?.classification?.name ?? null,
+          priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,
+          address: listing.property?.address
+            ? {
+                street: listing.property.address.street,
+                city: listing.property.address.city,
+                postcode: listing.property.address.postcode,
+              }
+            : null,
+          image: listing.property?.media ?? [],
+        }));
+        addMarkers(map, listings);
+      })
+      .catch((error) => {
+        console.error("[Map] Error fetching search results:", error);
+      });
   }
 
   return {
@@ -344,6 +393,6 @@ export function useMap() {
     autoComplete,
     initDrawing,
     updateSearchRadiusVisualization,
-    removeSearchRadiusVisualization
+    removeSearchRadiusVisualization,
   } as const;
 }

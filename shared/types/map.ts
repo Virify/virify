@@ -1,4 +1,4 @@
-import type { Map as MaptilerMap, Marker } from '@maptiler/sdk';
+import type { Map as MaptilerMap, Marker } from "@maptiler/sdk";
 
 /**
  * Map marker type for use with MapTiler maps
@@ -27,7 +27,7 @@ export type MapMarker = {
 /**
  * Drawing mode type (simplified for our current needs)
  */
-export type DrawingMode = 'polygon' | null;
+export type DrawingMode = "polygon" | null;
 
 /**
  * Shape drawn event type
@@ -110,5 +110,3 @@ export type GeocodingResponse = {
   features: GeocodingFeature[];
   attribution: string;
 };
-
-export type BBox = [number, number, number, number][];

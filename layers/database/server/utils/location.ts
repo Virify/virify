@@ -97,36 +97,20 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
 }
 
 /**
- * Get property IDs within any of the provided bounding boxes.
- *
- * Accepts an array of bboxes, each in [minLon, minLat, maxLon, maxLat] format (WGS84).
- * This uses PostGIS's && (bounding box intersection) operator for fast spatial filtering.
- *
- * @param bboxes Array of bounding boxes: [minLon, minLat, maxLon, maxLat][]
- * @returns List of nearby propertyID's
+ * Get property IDs strictly within a GeoJSON polygon (geometry).
+ * Uses PostGIS ST_Within and ST_GeomFromGeoJSON for strict-in-polygon filtering.
+ * @param geometry GeoJSON Polygon
+ * @returns List of property IDs strictly within the polygon
  */
-export async function getPropertyIdsByBoundingBoxes(
-  bboxes: BBox
-): Promise<PropertySearchResult> {
-  if (!bboxes || bboxes.length === 0) return [];
-
-  // Build SQL for multiple envelopes
-  const envelopes = bboxes.map((bbox) =>
-    `a.location && ST_MakeEnvelope(${bbox[0]}, ${bbox[1]}, ${bbox[2]}, ${bbox[3]}, 4326)`
-  );
-
-  // Join with OR for any bbox match
-  const whereClause = envelopes.join(' OR ');
-
-  // Use Prisma's $queryRawUnsafe for dynamic SQL
-  const query = `
+export async function getPropertyIdsByPolygon(geometry: { type: "Polygon"; coordinates: number[][][] }): Promise<PropertySearchResult> {
+  if (!geometry || geometry.type !== "Polygon" || !geometry.coordinates?.length) return [];
+  const geojson = JSON.stringify(geometry);
+  return await prisma.$queryRawUnsafe(`
     SELECT p.id as "propertyId"
     FROM "Property" p
     JOIN "Address" a ON p."addressId" = a.id
-    WHERE ${whereClause}
-  `;
-
-  return await prisma.$queryRawUnsafe(query);
+    WHERE ST_Within(a.location, ST_GeomFromGeoJSON('${geojson}'))
+  `);
 }
 
 /**

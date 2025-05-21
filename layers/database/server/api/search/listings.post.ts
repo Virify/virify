@@ -6,15 +6,22 @@ import { mapFeatureToFilters } from "../../utils/db-fields";
 
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
-  radius: z.coerce.number().min(0).max(40),
+  radius: z.coerce.number().min(0).max(40).optional(),
   propertyTypes: z.record(z.coerce.string(), z.array(z.coerce.number())).optional(),
   priceRange: z.array(z.coerce.number()).optional(),
   location: z.string().optional(),
-  coordinates: z.object({
-    lat: z.number(),
-    lon: z.number(),
-  }).optional(),
-  bbox: z.array(z.tuple([z.number(), z.number(), z.number(), z.number()])).optional(), 
+  coordinates: z
+    .object({
+      lat: z.number(),
+      lon: z.number(),
+    })
+    .optional(),
+  geometry: z
+    .object({
+      type: z.literal("Polygon"),
+      coordinates: z.array(z.array(z.array(z.number()))),
+    })
+    .optional(),
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
   addedToSite: z.enum(["0", "1", "3", "7", "14"]).optional(),
@@ -33,15 +40,15 @@ const searchSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const { buyOrRent, radius, coordinates, bbox, propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, coordinates, geometry, propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
 
     /**
      * Required for search
      */
     const listingSearch: ListingSearch = {
       coordinates,
-      bbox,
-      radius,
+      geometry,
+      radius: radius || undefined,
       type: buyOrRent,
     };
 

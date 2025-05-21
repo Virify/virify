@@ -3,7 +3,7 @@ import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } fr
 import { prisma } from "./prisma-client";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
-import { getPropertyIdsByBoundingBoxes, getPropertyIdsByDistance } from "./location";
+import { getPropertyIdsByDistance, getPropertyIdsByPolygon } from "./location";
 
 /**
  * Get a listing by ID
@@ -95,14 +95,14 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
 }
 
 export async function getListingByDistanceAndFilters(
-  { type, coordinates, radius, bbox }: ListingSearch,
+  { type, coordinates, radius, geometry }: ListingSearch,
   { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
 ): Promise<ListingCardType[]> {
   let nearbyProperties: PropertySearchResult = [];
 
-  if (bbox?.length) {
-    nearbyProperties = await getPropertyIdsByBoundingBoxes(bbox);
-  } else if (coordinates) {
+  if (geometry) {
+    nearbyProperties = await getPropertyIdsByPolygon(geometry);
+  } else if (coordinates && radius) {
     nearbyProperties = await getPropertyIdsByDistance(coordinates.lat, coordinates.lon, radius);
   }
 
