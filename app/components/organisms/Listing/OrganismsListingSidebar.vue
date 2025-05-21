@@ -12,25 +12,7 @@
       123 House, Somewhere Street
     </p>
 
-    <ul class="o-listing-sidebar__icons | body-sm">
-      <li class="o-listing-sidebar__icons-row o-listing-sidebar__icons-row--full">
-        <AtomsIcon icon="listings/property-type" aria-hidden class="o-listing-sidebar__icon" />
-        House / Student accommodation
-      </li>
-      <li class="o-listing-sidebar__icons-row">
-        <AtomsIcon icon="listings/beds" aria-hidden class="o-listing-sidebar__icon" />
-        2 beds
-      </li>
-      <li class="o-listing-sidebar__icons-row">
-        <AtomsIcon icon="listings/bathrooms" aria-hidden class="o-listing-sidebar__icon" />
-        3 bathrooms
-      </li>
-      <li class="o-listing-sidebar__icons-row">
-        <AtomsIcon icon="listings/contract" aria-hidden class="o-listing-sidebar__icon" />
-        Leasehold
-      </li>
-    </ul>
-
+    <OrganismsListingSidebarIcons />
     <OrganismsListingButtons :property-id="4" enquire-url="#" />
     <OrganismsListingAgent />
   </section>
@@ -61,33 +43,6 @@ defineProps<Props>()
 
   &__address {
     margin: 0;
-  }
-
-  &__icons {
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    padding: 0;
-    border-radius: var(--border-radius-2xl);
-    margin-inline: 0;
-    gap: var(--size-6);
-  }
-
-  &__icons-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--size-6);
-
-    &--full {
-      grid-column: span 3;
-    }
-  }
-
-  &__icon {
-    display: block;
-    width: var(--size-20);
-    height: var(--size-20);
   }
 }
 </style>
