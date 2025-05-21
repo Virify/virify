@@ -25,6 +25,8 @@
   grid-template-columns: 5em auto;
   gap: var(--size-16);
   align-items: flex-start;
+  text-align: left;
+  flex: 1 0 auto;
 
   &__logo {
     aspect-ratio: 1;
