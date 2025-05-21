@@ -346,6 +346,11 @@ export function useMap() {
     // Send the full GeoJSON polygon geometry to the backend for strict-in-polygon search
     const geometry = feature.geometry && feature.geometry.type === "Polygon" ? { type: "Polygon", coordinates: feature.geometry.coordinates } : undefined;
 
+    /**
+     * !! IMPORTANT !!
+     * 
+     * This is a temporary solution to fetch listings based on the drawn polygon. Needs to be moved into the main search function
+     */
     const result = $fetch<ListingCardType[]>("/api/search/listings", {
       method: "POST",
       body: {
