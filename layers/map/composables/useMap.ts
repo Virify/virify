@@ -1,10 +1,16 @@
-import { MoleculesMarkerPopup, MoleculesPriceMarker } from "#components";
-import { defineComponent, h, createVNode, render } from "vue";
-import { Marker, Popup } from "@maptiler/sdk";
+import { Marker } from "@maptiler/sdk";
 import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, GeocodingFeature, GeocodingResponse } from "~~/shared/types/map";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import { setControls, findMapInstance, renderMarker, renderPopup, styles, calculateZoomLevelFromRadius } from "../utils/mapHelpers";
 
+/**
+ * State and Cache
+ */
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
+const circleSourceId = 'search-radius-source';
+const circleLayerId = 'search-radius-layer';
 
 export function useMap() {
   const sdk = useNuxtApp().$maptilersdk;
@@ -74,6 +80,7 @@ export function useMap() {
         markers: [],
         markerMap: new Map(),
         interactive: options.interactive,
+        drawControl: null,
       });
     }
 
@@ -99,7 +106,7 @@ export function useMap() {
    * @param marker The marker to add
    */
   function addMarker(map: ExtendedMapTilerMap, marker: Array<{ lat: number; lon: number }> | null | undefined): Marker | undefined {
-    const instance = findMapInstance(map);
+    const instance = findMapInstance(map, mapCache);
     if (!instance || !marker || marker.length === 0 || !marker[0]) {
       console.error("[Map] Instance not found or invalid marker");
       return undefined;
@@ -107,7 +114,7 @@ export function useMap() {
     const newMarker = new sdk.Marker().setLngLat([marker[0].lon, marker[0].lat]);
     newMarker.addTo(map);
     instance.markers.push(newMarker);
-
+    console.log("[Map] Added marker to map instance");
     return newMarker;
   }
 
@@ -119,7 +126,7 @@ export function useMap() {
    * @returns Array of created marker objects
    */
   function addMarkers(map: ExtendedMapTilerMap, markers: MapMarker[]): Marker[] {
-    const instance = findMapInstance(map);
+    const instance = findMapInstance(map, mapCache);
     if (!instance) {
       console.error("[Map] Instance not found");
       return [];
@@ -128,12 +135,14 @@ export function useMap() {
     // each marker needs its own dom element
     // so we need to create a wrapper for each marker
     for (const marker of markers) {
-      const markerWrapper = renderMarker(marker.price, marker.hasNote, marker.isFavorite);
+      const markerWrapper = renderMarker(marker.price, marker.hasNote, marker.isFavorite, vueApp);
+
       const newMarker = new sdk.Marker({
         element: markerWrapper,
       });
+
       newMarker.setLngLat([marker.lon, marker.lat]);
-      const popup = renderPopup(marker);
+      const popup = renderPopup(marker, vueApp);
       newMarker.setPopup(popup);
       newMarker.addTo(map);
       instance.markers.push(newMarker);
@@ -148,38 +157,57 @@ export function useMap() {
    * @param map The map to clear markers from
    */
   function clearMarkers(map: ExtendedMapTilerMap): void {
-    const instance = findMapInstance(map);
+    const instance = findMapInstance(map, mapCache);
     if (instance) {
       instance.markers.forEach((marker) => marker.remove());
+      console.log("[Map] Cleared markers from map instance");
       instance.markers = [];
     }
   }
 
   /**
-   * Calculate zoom level based on search radius (in miles)
+   * Draw control for the map
+   *
+   * @param map The map to add the draw control to
+   * @param draw Boolean - whether to add the draw control
    */
-  function calculateZoomLevelFromRadius(radius?: number | null): number {
-    if (!radius) return 10;
-    const radiusNum = Number(radius);
-
-    switch (true) {
-      case radiusNum === 0:
-        return 16;
-      case radiusNum <= 0.25:
-        return 15;
-      case radiusNum <= 0.5:
-        return 14;
-      case radiusNum <= 1:
-        return 13;
-      case radiusNum <= 5:
-        return 12;
-      case radiusNum <= 10:
-        return 12;
-      case radiusNum <= 20:
-        return 11;
-      default:
-        return 10;
+  function initDrawing(map: ExtendedMapTilerMap, draw: boolean): void {
+    const instance = findMapInstance(map, mapCache);
+    if (!instance) {
+      console.error("[Map] Instance not found");
+      return;
     }
+
+    // Remove existing draw control and reset cursor
+    if (instance.drawControl) {
+      map.removeControl(instance.drawControl);
+      instance.drawControl = null;
+      map.getCanvas().style.cursor = "";
+    }
+
+    if (!draw) return;
+
+    console.log("[Map] Adding draw control");
+
+    const drawControl = new MapboxDraw({
+      displayControlsDefault: false,
+      controls: { polygon: true, trash: true },
+      defaultMode: "simple_select",
+      userProperties: true,
+      styles,
+    });
+
+    map.addControl(drawControl, "top-right");
+    instance.drawControl = drawControl;
+
+    // Patch classes for Mapbox Draw control (Maplibre compatibility)
+    document.querySelectorAll(".mapboxgl-ctrl-group.mapboxgl-ctrl")
+      .forEach(elem => elem.classList.add("maplibregl-ctrl", "maplibregl-ctrl-group"));
+
+    // Set cursor to crosshair only when in drawing mode
+    map.on("draw.modechange", (e: any) => {
+      map.getCanvas().style.cursor = e.mode === "draw_polygon" ? "crosshair" : "";
+    });
   }
 
   /**
@@ -187,7 +215,6 @@ export function useMap() {
    */
   async function autoComplete(query: string): Promise<GeocodingFeature[]> {
     if (!query) return [];
-
     try {
       const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json`, {
         query: { key: sdk.config.apiKey, country: "gb" },
@@ -199,6 +226,80 @@ export function useMap() {
     }
   }
 
+  /**
+   * Updates or adds a circle to visualize the search radius
+   *
+   * @param map The map instance
+   * @param center The center coordinates [lon, lat]
+   * @param radiusMiles The radius in miles
+   */
+  function updateSearchRadiusVisualization(
+    map: ExtendedMapTilerMap,
+    center: [number, number],
+    radiusMiles: number
+  ) {
+    // Remove existing circle layers and sources
+    [circleLayerId + '-outline', circleLayerId].forEach(layerId => {
+      if (map.getLayer(layerId)) map.removeLayer(layerId);
+    });
+    if (map.getSource(circleSourceId)) map.removeSource(circleSourceId);
+
+    // Create a circle polygon (approximate)
+    const points = 64;
+    const coordinates: [number, number][] = [];
+    const radiusKm = radiusMiles * 1.60934;
+    const lat = center[1];
+    const lon = center[0];
+    const latOffset = radiusKm / 111.32;
+    const lonOffset = (deg: number) => radiusKm / (111.32 * Math.cos(deg * Math.PI / 180));
+
+    for (let i = 0; i < points; i++) {
+      const angle = (i * 2 * Math.PI) / points;
+      coordinates.push([
+        lon + lonOffset(lat) * Math.cos(angle),
+        lat + latOffset * Math.sin(angle)
+      ]);
+    }
+    if (coordinates.length > 0 && coordinates[0] !== undefined) {
+      const [firstLon, firstLat] = coordinates[0];
+      coordinates.push([firstLon, firstLat]); // Close the circle
+    }
+
+    map.addSource(circleSourceId, {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: [coordinates]
+        }
+      }
+    });
+
+    map.addLayer({
+      id: circleLayerId,
+      type: 'fill',
+      source: circleSourceId,
+      paint: {
+        'fill-color': '#326C96',
+        'fill-opacity': 0.15,
+        'fill-outline-color': '#326C96'
+      }
+    });
+
+    map.addLayer({
+      id: circleLayerId + '-outline',
+      type: 'line',
+      source: circleSourceId,
+      paint: {
+        'line-color': '#326C96',
+        'line-width': 2,
+        'line-opacity': 0.4
+      }
+    });
+  }
+
   return {
     initMap,
     addMarkers,
@@ -206,119 +307,7 @@ export function useMap() {
     clearMarkers,
     calculateZoomLevelFromRadius,
     autoComplete,
+    initDrawing,
+    updateSearchRadiusVisualization
   } as const;
-
-  /**
-   * !! Helper functions !!
-   * These functions are not exported and are only used internally
-   */
-
-  function setControls(existingMapInstance: MapInstance, map: ExtendedMapTilerMap, options: MapOptions): boolean | void {
-    const prevInteractive = existingMapInstance.interactive;
-    const newInteractive = options.interactive;
-
-    // Update navigation control
-    // Use type assertion since sdk's NavigationControl doesn't match the IControl interface exactly
-    const navControl = new sdk.NavigationControl() as any;
-    const controls = map._controls ?? [];
-
-    if (prevInteractive !== newInteractive) {
-      if (newInteractive) {
-        map.dragPan.enable();
-        map.scrollZoom.enable();
-        map.doubleClickZoom.enable();
-        map.touchZoomRotate.enable();
-        map.keyboard.enable();
-        map.boxZoom.enable();
-
-        if (!controls.some((c: any) => c instanceof sdk.NavigationControl)) {
-          map.addControl(navControl as any, "top-right");
-        }
-      } else {
-        map.dragPan.disable();
-        map.scrollZoom.disable();
-        map.doubleClickZoom.disable();
-        map.touchZoomRotate.disable();
-        map.keyboard.disable();
-        map.boxZoom.disable();
-
-        for (const control of controls) {
-          if (control instanceof sdk.NavigationControl) {
-            map.removeControl(control as any);
-          }
-        }
-      }
-
-      existingMapInstance.interactive = newInteractive;
-      return newInteractive;
-    }
-  }
-
-  /**
-   * Find a MapInstance by its map object
-   *
-   * @param map The map object to find
-   * @returns The MapInstance or undefined if not found
-   */
-  function findMapInstance(map: ExtendedMapTilerMap): MapInstance | undefined {
-    for (const [_, instance] of mapCache) {
-      if (instance.map === map) {
-        return instance;
-      }
-    }
-    return undefined;
-  }
-
-  /**
-   * Render a price marker
-   *
-   * @param price number | null
-   * @param hasNote boolean | undefined
-   * @param isFavorite boolean | undefined
-   * @returns HTMLElement
-   */
-  function renderMarker(price: number | null, hasNote?: boolean, isFavorite?: boolean): HTMLElement {
-    const markerWrapper = document.createElement("div");
-    const MarkerComp = defineComponent({
-      setup: () => () => {
-        return h(MoleculesPriceMarker, {
-          price,
-          hasNote: Boolean(hasNote),
-          isFavorite: Boolean(isFavorite),
-        });
-      },
-    });
-
-    const markerNode = createVNode(MarkerComp);
-    markerNode.appContext = vueApp.vueApp._context;
-    render(markerNode, markerWrapper);
-
-    return markerWrapper;
-  }
-
-  /**
-   * Render a popup for a marker
-   *
-   * @param marker MapMarker
-   * @returns Popup
-   */
-  function renderPopup(marker: MapMarker): Popup {
-    const popupWrapper = document.createElement("div");
-
-    const PopupComp = defineComponent({
-      setup: () => () => {
-        return h(MoleculesMarkerPopup, {
-          marker,
-        });
-      },
-    });
-
-    const popupNode = createVNode(PopupComp);
-    popupNode.appContext = vueApp.vueApp._context;
-    render(popupNode, popupWrapper);
-
-    return new sdk.Popup({
-      offset: 25,
-    }).setDOMContent(popupWrapper);
-  }
 }

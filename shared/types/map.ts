@@ -38,18 +38,6 @@ export type ShapeDrawnEvent = {
 };
 
 /**
- * GeoJSON Feature type (simplified)
- */
-export type GeoJSONFeature = {
-  type: string;
-  geometry: {
-    type: string;
-    coordinates: number[][][] | number[][];
-  };
-  properties: Record<string, any>;
-};
-
-/**
  * Extended Map type to include properties that are in the SDK but not in the type definitions
  */
 export type ExtendedMapTilerMap = MaptilerMap & {
@@ -60,6 +48,15 @@ export type ExtendedMapTilerMap = MaptilerMap & {
   keyboard: { enable(): void; disable(): void };
   boxZoom: { enable(): void; disable(): void };
   _controls?: any[];
+  getSource(id: string): any;
+  addSource(id: string, source: any): void;
+  removeSource(id: string): void;
+  getLayer(id: string): any;
+  addLayer(layer: any): void;
+  removeLayer(id: string): void;
+  getStyle(): { layers: Array<{ id: string; source: string }> };
+  flyTo(options: { center?: [number, number]; zoom?: number; essential?: boolean; duration?: number }): void;
+  getCanvas(): HTMLCanvasElement;
 };
 
 /**
@@ -70,6 +67,7 @@ export type MapInstance = {
   markers: Marker[];
   markerMap: Map<string | number, Marker>;
   interactive: boolean;
+  drawControl: any | null;
 };
 
 /**
@@ -84,12 +82,6 @@ export type MapInitOptions = {
     position: string;
   };
 };
-
-export type MapOptions = {
-  interactive: boolean;
-  zoom?: number;
-  center: [number, number];
-}
 
 /**
  * Geocoding feature returned from MapTiler API

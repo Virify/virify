@@ -115,30 +115,13 @@ declare module '@maptiler/sdk' {
     id?: string | number;
   }
 
-  // Draw control for creating shapes
-  export interface DrawControlOptions {
-    displayControlsDefault?: boolean;
-    controls?: {
-      point?: boolean;
-      line_string?: boolean;
-      polygon?: boolean;
-      trash?: boolean;
-      combine_features?: boolean;
-      uncombine_features?: boolean;
-      rectangle?: boolean;
-      circle?: boolean;
-    };
-    defaultMode?: string;
-    styles?: any[];
-  }
+  // Drawing control is now handled by @mapbox/mapbox-gl-draw
+  import type { DrawCustomMode } from "@mapbox/mapbox-gl-draw";
 
-  export class DrawControl implements IControl {
-    constructor(options?: DrawControlOptions);
+  export interface IDrawControl extends IControl {
     getAll(): { features: GeoJSONFeature[] };
     delete(featureIds: string[]): void;
     deleteAll(): void;
     add(feature: GeoJSONFeature): void;
-    onAdd(map: Map): HTMLElement;
-    onRemove(map: Map): void;
   }
 }

@@ -18,9 +18,9 @@
 
       <div class="| relative" role="presentation">
         <div class="o-searchform-location | elevate-200" @click="showPopover">
-          <input type="search" placeholder="Location" aria-label="Location to search in"
+          <input type="search" :placeholder="isDrawMode ? `Draw on the map` : `Location`" aria-label="Location to search in"
             class="o-searchform-location-input" required @focus="showPopover" @input="showPopover"
-            v-model="suggestions.location" name="location" />
+            v-model="suggestions.location" name="location" :disabled="isDrawMode" />
 
           <!-- Search radius (desktop) -->
           <client-only>
@@ -28,6 +28,16 @@
               v-model="initialRadius"
               class="o-searchform-location-radius o-searchform-dropdown | text-input focus-visible" name="radius" />
           </client-only>
+
+          <!-- Draw mode toggle -->
+          <AtomsButton
+            v-show="popoverHidden && mapDraw"
+            type="button" 
+            class="o-searchform-draw-button" 
+            :class="{ 'o-searchform-draw-button-active': isDrawMode }"
+            @click.stop="toggleDrawMode">
+            <AtomsIcon title="Draw on map" icon="draw" class="o-searchform-draw-button-icon" />
+          </AtomsButton>
 
           <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
             :class="{
@@ -217,6 +227,15 @@ import type { PropertyTypeWithOptions } from "~~/shared/types/property-type";
 import type { SearchParams } from "~~/shared/types/search";
 
 /**
+ * Props
+ */
+defineProps({
+  mapDraw: {
+    type: Boolean,
+    default: false
+  }
+})
+/**
  *  a11y
  */
 const popoverId = useId()
@@ -273,6 +292,11 @@ const suggestions = ref({
     lon: 0,
   },
 });
+
+/**
+ * State
+ */
+const isDrawMode = ref(false);
 const bedroomRange = ref<[number, number]>([0, 0]);
 const bathroomRange = ref<[number, number]>([0, 0]);
 const initialRadius = ref(radiusOptions?.[0]?.value);
@@ -305,6 +329,21 @@ function hidePopover() {
 onClickOutside($form, () => {
   hidePopover();
 });
+
+/**
+ * Emits
+ */
+const emit = defineEmits<{
+ 'update:drawMode': [enabled: boolean];
+}>();
+
+const toggleDrawMode = () => {
+  isDrawMode.value = !isDrawMode.value;
+  suggestions.value.location = "";
+  emit("update:drawMode", isDrawMode.value);
+};
+
+
 
 /**
  *  Block native form validation on mount
@@ -344,8 +383,8 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyTypeWithOptions>("/api/property-type/all");
-const selectedPropertyTypes = reactive({})
+const propertyTypes = await $fetch<PropertyTypeWithOptions[]>("/api/property-type/all");
+const selectedPropertyTypes = reactive<Record<string, string[]>>({});
 
 /**
  * Auto Complete
@@ -366,7 +405,7 @@ watchDebounced(
       // Store the full geocoded results for later use
       geocodedResults.value = result;
       suggestionsMatches.value = result.map((item) => {
-        return item.place_name_en;
+        return item.place_name;
       });
     } else {
       suggestionsMatches.value = [];
@@ -675,6 +714,42 @@ async function sendForm(event: Event) {
   flex-shrink: 0;
   align-self: center;
   border-radius: var(--border-radius-pill);
+}
+
+.o-searchform-draw-button {
+  width: var(--size-40);
+  height: var(--size-40);
+  padding: 0;
+  flex-shrink: 0;
+  align-self: center;
+  border-radius: var(--border-radius-pill);
+  background: var(--background-300);
+  border: 1px solid var(--background-400);
+  color: var(--foreground-200);
+  transition: all var(--animation-medium) var(--ease-out);
+
+  &-active {
+    background: var(--primary-100);
+    border-color: var(--primary-200);
+    color: var(--primary-900);
+  }
+
+  &:hover {
+    background: var(--background-100);
+    border-color: var(--background-200);
+    color: var(--foreground-100);
+  
+  }
+
+  &-active:hover {
+    background: var(--primary-200);
+    color: var(--primary-900);
+  }
+}
+
+.o-searchform-draw-button-icon {
+  width: var(--size-20);
+  height: var(--size-20);
 }
 
 .o-searchform-location-button-icon {

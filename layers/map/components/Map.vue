@@ -11,34 +11,50 @@ const { hasNote } = useNotes();
  */
 const map = shallowRef();
 const mapContainer = ref<HTMLElement>();
-const { initMap, addMarkers, clearMarkers, addMarker } = useMap();
+const { initMap, addMarkers, clearMarkers, addMarker, initDrawing } = useMap();
+defineExpose({ map });
 
 /**
  * props
  */
 const props = withDefaults(defineProps<{
-  center?: [number, number];
+  center?: [number, number]; // [lon, lat]
   zoom?: number;
   interactive?: boolean;
   mapId?: string;
   markers?: ListingCardType[];
   marker?: ListingCardType;
   popups?: boolean;
+  draw?: boolean;
 }>(), {
   interactive: true,
   zoom: 12,
   mapId: GLOBAL_MAP_ID,
   popups: true,
   center: () => [51.505, -0.09],
+  draw: false,
 });
 
 onMounted(() => {
   loadMap();
   nextTick(() => {
-    if (map.value) map.value.resize();
+    removeCircle(map.value);
+    if (map.value) {
+      map.value.resize();
+      initDrawing(map.value, props.draw);
+    }
   });
 });
 
+// Watch for changes in draw prop to add/remove controls
+watch(
+  () => props.draw,
+  (newDrawValue) => {
+    if (map.value) {
+      initDrawing(map.value, newDrawValue);
+    }
+  }
+);
 
 /**
  * Watch for changes in markers list or favorite/note status
@@ -148,6 +164,21 @@ const formattedMarkers = computed(() => {
   if (props.marker) return [formatMarker(props.marker)];
   return [];
 });
+
+/**
+ * Update the search radius visualization on the map
+ * 
+ * @param {number} radius - The radius in meters
+ */
+function removeCircle(map: any) {
+  if (!map) return;
+  ['search-radius-layer-outline', 'search-radius-layer'].forEach(layerId => {
+    if (map.getLayer(layerId)) map.removeLayer(layerId);
+  });
+  if (map.getSource('search-radius-source')) {
+    map.removeSource('search-radius-source');
+  }
+}
 </script>
 <style>
 .map-container {
