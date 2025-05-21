@@ -3,7 +3,7 @@ import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } fr
 import { prisma } from "./prisma-client";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
-import { getPropertyIdsByDistance } from "./location";
+import { getPropertyIdsByBoundingBoxes, getPropertyIdsByDistance } from "./location";
 
 /**
  * Get a listing by ID
@@ -95,18 +95,23 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
 }
 
 export async function getListingByDistanceAndFilters(
-  { type, coordinates, radius }: ListingSearch,
+  { type, coordinates, radius, bbox }: ListingSearch,
   { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
 ): Promise<ListingCardType[]> {
+  let nearbyProperties: PropertySearchResult = [];
 
-  // Get the nearby properties with distance
-  const nearbyProperties = await getPropertyIdsByDistance(coordinates.lat, coordinates.lon, radius);
+  if (bbox?.length) {
+    nearbyProperties = await getPropertyIdsByBoundingBoxes(bbox);
+  } else if (coordinates) {
+    nearbyProperties = await getPropertyIdsByDistance(coordinates.lat, coordinates.lon, radius);
+  }
+
   const listingFilter = type === "rent" ? "rentalListing" : "saleListing";
 
   // Process the propertyTypes to create appropriate filters
   let propertyTypeFilter = {};
   let classificationFilter = {};
-  
+
   if (propertyTypes && Object.keys(propertyTypes).length > 0) {
     // Collect all propertyTypeIds
     const propertyTypeIds = Object.keys(propertyTypes);
@@ -114,26 +119,26 @@ export async function getListingByDistanceAndFilters(
       propertyTypeFilter = {
         type: {
           id: {
-            in: propertyTypeIds.map(id => parseInt(id, 10))
-          }
-        }
+            in: propertyTypeIds.map((id) => parseInt(id, 10)),
+          },
+        },
       };
-      
+
       // Collect all classification IDs per property type
       const allClassificationIds: number[] = [];
-      Object.values(propertyTypes).forEach(classIds => {
+      Object.values(propertyTypes).forEach((classIds) => {
         if (classIds && classIds.length > 0) {
           allClassificationIds.push(...classIds);
         }
       });
-      
+
       if (allClassificationIds.length > 0) {
         classificationFilter = {
           classification: {
             id: {
-              in: allClassificationIds
-            }
-          }
+              in: allClassificationIds,
+            },
+          },
         };
       }
     }
@@ -144,7 +149,7 @@ export async function getListingByDistanceAndFilters(
     where: {
       [listingFilter]: {
         availabilityStatus: {
-          in: availabilityOptions as (typeof type extends "rent" ? RentalAvailabilityStatus[] : SaleAvailabilityStatus[]),
+          in: availabilityOptions as typeof type extends "rent" ? RentalAvailabilityStatus[] : SaleAvailabilityStatus[],
         },
       },
       price: getPriceFilter(priceRange),
@@ -181,8 +186,8 @@ export async function getListingByDistanceAndFilters(
   });
 
   // Map the listings to include the distance
-  const listingsWithDistance = listings.map(listing => {
-    const property = nearbyProperties.find(p => p.propertyId === listing.property?.address?.id);
+  const listingsWithDistance = listings.map((listing) => {
+    const property = nearbyProperties.find((p) => p.propertyId === listing.property?.address?.id);
     return {
       ...listing,
       distanceMiles: property ? property.distanceMiles : 0,

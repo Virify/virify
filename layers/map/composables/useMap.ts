@@ -1,15 +1,16 @@
 import { Marker } from "@maptiler/sdk";
-import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, GeocodingFeature, GeocodingResponse } from "~~/shared/types/map";
+import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, GeocodingFeature, GeocodingResponse, BBox } from "~~/shared/types/map";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { setControls, findMapInstance, renderMarker, renderPopup, styles, calculateZoomLevelFromRadius } from "../utils/mapHelpers";
-import { bbox, area, length } from "@turf/turf";
+import { bbox } from "@turf/turf";
 
 /**
  * State and Cache
  */
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
+const searchArea = ref<BBox>([]);
 
 export function useMap() {
   const sdk = useNuxtApp().$maptilersdk;
@@ -212,12 +213,10 @@ export function useMap() {
       const feature = e.features[0];
       if (!feature) return;
       const bounds = bbox(feature);
-      const polyArea = area(feature);
-      const areainMiles = length(feature, { units: 'miles' });
       console.log("[Map] Drawn feature:", feature);
       console.log("[Map] Drawn feature bounds:", bounds);
-      console.log("[Map] Drawn feature area:", polyArea);
-      console.log("[Map] Drawn feature area in miles:", areainMiles);
+      searchArea.value.push(feature);
+      console.log("[Map] Search area updated:", searchArea.value);
     });
   }
 

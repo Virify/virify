@@ -3,7 +3,6 @@ import type { AddressLocation } from "~~/shared/types/location";
 import { prepareFullTextSearch } from "./address";
 import type { PropertySearchResult } from "~~/shared/types/property";
 import { Prisma } from "@prisma/client";
-
 /**
  * Convert meters to miles. For PostGIS, we need to convert meters to miles.
  *
@@ -95,6 +94,39 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
       )
     `
   );
+}
+
+/**
+ * Get property IDs within any of the provided bounding boxes.
+ *
+ * Accepts an array of bboxes, each in [minLon, minLat, maxLon, maxLat] format (WGS84).
+ * This uses PostGIS's && (bounding box intersection) operator for fast spatial filtering.
+ *
+ * @param bboxes Array of bounding boxes: [minLon, minLat, maxLon, maxLat][]
+ * @returns List of nearby propertyID's
+ */
+export async function getPropertyIdsByBoundingBoxes(
+  bboxes: BBox
+): Promise<PropertySearchResult> {
+  if (!bboxes || bboxes.length === 0) return [];
+
+  // Build SQL for multiple envelopes
+  const envelopes = bboxes.map((bbox) =>
+    `a.location && ST_MakeEnvelope(${bbox[0]}, ${bbox[1]}, ${bbox[2]}, ${bbox[3]}, 4326)`
+  );
+
+  // Join with OR for any bbox match
+  const whereClause = envelopes.join(' OR ');
+
+  // Use Prisma's $queryRawUnsafe for dynamic SQL
+  const query = `
+    SELECT p.id as "propertyId"
+    FROM "Property" p
+    JOIN "Address" a ON p."addressId" = a.id
+    WHERE ${whereClause}
+  `;
+
+  return await prisma.$queryRawUnsafe(query);
 }
 
 /**
