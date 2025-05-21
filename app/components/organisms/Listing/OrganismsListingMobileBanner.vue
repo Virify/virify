@@ -9,7 +9,7 @@
       </Transition>
 
       <Teleport to="body">
-        <button v-if="isDragging || isExpanded" :style="dragBackdropStyle"
+        <button v-show="isDragging || isExpanded" ref="$backdrop" :style="dragBackdropStyle"
           class="o-listing-mobile-banner__additional-info-backdrop" @click.prevent="closeExpanded"
           aria-label="Close additional information"></button>
       </Teleport>
@@ -73,33 +73,56 @@ withDefaults(defineProps<Props>(), {
 })
 
 /**
- *  Drag handle
+ *  Mobile banner additional information dragger
  */
+
+// Elements
 const $handle = useTemplateRef('$handle')
-const isExpanded = shallowRef(false)
+const $backdrop = useTemplateRef('$backdrop')
+
+// Drag handle styles
 const dragBackdropStyle = reactive({
   opacity: 0
 })
+
 const dragStyle = reactive({
   height: '0px',
   opacity: 0,
   overflow: 'hidden'
 })
 
-const { isDragging, dragDistance } = useVerticalDrag($handle)
+// Drag handle open state
+const isExpanded = shallowRef(false)
 
+// Drag events
+const { isDragging, dragDistance } = useVerticalDrag($handle)
+const { isDragging: backdropIsDragging, dragDistance: backdropDragDistance } = useVerticalDrag($backdrop)
+
+// Drag thresholds
+const DRAG_THRESHOLD = 60
+
+// Watchers
 watch(dragDistance, (newValue) => {
-  const dragPercent = clampNumber(newValue, { min: 0, max: 100 })
+  const clampedValue = clampNumber(newValue, { min: 0, max: DRAG_THRESHOLD })
 
   // Set styling
-  dragStyle.height = (dragPercent * 0.6) + 'px'
-  dragStyle.opacity = dragPercent / 200
-  dragBackdropStyle.opacity = dragPercent / 100
+  dragStyle.height = clampedValue + 'px'
+  dragStyle.opacity = clampedValue / DRAG_THRESHOLD
+  dragBackdropStyle.opacity = clampedValue / DRAG_THRESHOLD
 
   // Open
-  if (newValue > 100) openExpanded()
+  if (newValue > DRAG_THRESHOLD) openExpanded()
 })
 
+watch(backdropDragDistance, (newValue) => {
+  if (newValue < -DRAG_THRESHOLD) {
+    backdropIsDragging.value = false
+
+    closeExpanded()
+  }
+})
+
+// Other methods
 function openExpanded() {
   isDragging.value = true
   isExpanded.value = true
@@ -111,6 +134,9 @@ function openExpanded() {
 function closeExpanded() {
   isExpanded.value = false
   isDragging.value = false
+  dragStyle.height = '0px'
+  dragStyle.opacity = 0
+  dragBackdropStyle.opacity = 0
 }
 
 </script>
