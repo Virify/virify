@@ -20,7 +20,7 @@
             </skeleton-loader>
           </div>
 
-          <OrganismsListingOverview ref="$overview" :price="priceFormatted" />
+          <OrganismsListingOverview :price="priceFormatted" />
 
           <h3 class="| title-sm">Property</h3>
           <pre class="| body-sm">{{ property }}</pre>
@@ -39,7 +39,7 @@
     </div>
 
     <client-only>
-      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible" />
+      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" />
     </client-only>
 
     <AtomsDivider text="DEBUG" />
@@ -127,16 +127,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', parallaxCarousel)
-})
-
-/**
- *  Toggle overview scroll
- */
-const $overview = useTemplateRef('$overview')
-const isOverviewVisible = shallowRef(true)
-
-useIntersectionObserver($overview, ([entry]) => {
-  isOverviewVisible.value = !!entry?.isIntersecting
 })
 
 /**
