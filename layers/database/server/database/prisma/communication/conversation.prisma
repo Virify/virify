@@ -1,0 +1,12 @@
+model Conversation {
+  id         Int      @id @default(autoincrement())
+  listingId  Int
+  senderId   Int
+  receiverId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  messages   Message[]
+  sender     User     @relation("ConversationsAsSender", fields: [senderId], references: [id])
+  receiver   User     @relation("ConversationsAsReceiver", fields: [receiverId], references: [id])
+  listing    Listing  @relation(fields: [listingId], references: [id])
+}

@@ -5,7 +5,8 @@ export default defineNuxtConfig({
     "./layers/ui",
     "./layers/email",
     "./layers/database",
-    './layers/auth'
+    './layers/auth',
+    './layers/communication',
   ],
   future: {
     compatibilityVersion: 4,
@@ -18,10 +19,6 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   nitro: {
-    experimental: {
-      openAPI: true,
-      tasks: true,
-    },
     rollupConfig: {
       // @ts-ignore
       plugins: [vue()],
