@@ -3,11 +3,15 @@
     'o-listing-mobile-banner--expanded': isExpanded
   }">
     <div class="o-listing-mobile-banner__container | container" role="presentation">
-      <button ref="$handle" v-show="!isExpanded" type="button" class="o-listing-mobile-banner__drag-hangle"></button>
+      <Transition name="o-listing-mobile-banner">
+        <button ref="$handle" v-show="!overviewVisible && !isExpanded" type="button"
+          class="o-listing-mobile-banner__drag-hangle" aria-label="Show additional information"></button>
+      </Transition>
 
       <Teleport to="body">
         <button v-if="isDragging || isExpanded" :style="dragBackdropStyle"
-          class="o-listing-mobile-banner__additional-info-backdrop" @click.prevent="closeExpanded"></button>
+          class="o-listing-mobile-banner__additional-info-backdrop" @click.prevent="closeExpanded"
+          aria-label="Close additional information"></button>
       </Teleport>
 
       <div v-if="isDragging || isExpanded" :style="dragStyle"
@@ -61,9 +65,12 @@
  */
 interface Props {
   price: string
+  overviewVisible?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  overviewVisible: true
+})
 
 /**
  *  Drag handle
