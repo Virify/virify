@@ -89,7 +89,7 @@ export type MapInitOptions = {
 export type GeocodingFeature = {
   id: string;
   type: string;
-  place_name: string;
+  place_name_en: string;
   geometry: {
     type: string;
     coordinates: [number, number];

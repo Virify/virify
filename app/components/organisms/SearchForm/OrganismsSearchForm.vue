@@ -405,7 +405,7 @@ watchDebounced(
       // Store the full geocoded results for later use
       geocodedResults.value = result;
       suggestionsMatches.value = result.map((item) => {
-        return item.place_name;
+        return item.place_name_en;
       });
     } else {
       suggestionsMatches.value = [];

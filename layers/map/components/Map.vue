@@ -11,7 +11,7 @@ const { hasNote } = useNotes();
  */
 const map = shallowRef();
 const mapContainer = ref<HTMLElement>();
-const { initMap, addMarkers, clearMarkers, addMarker, initDrawing } = useMap();
+const { initMap, addMarkers, clearMarkers, addMarker, initDrawing, updateSearchRadiusVisualization, removeSearchRadiusVisualization } = useMap();
 defineExpose({ map });
 
 /**
@@ -26,6 +26,8 @@ const props = withDefaults(defineProps<{
   marker?: ListingCardType;
   popups?: boolean;
   draw?: boolean;
+  searchRadius?: number | null;
+  searchCenter?: [number, number] | null;
 }>(), {
   interactive: true,
   zoom: 12,
@@ -33,6 +35,8 @@ const props = withDefaults(defineProps<{
   popups: true,
   center: () => [51.505, -0.09],
   draw: false,
+  searchRadius: null,
+  searchCenter: null,
 });
 
 onMounted(() => {
@@ -90,6 +94,21 @@ watch(
       });
     }
   }
+);
+
+/**
+ * Watch for changes in search radius and center
+ * Update the map visualization accordingly
+ */
+watch(
+  [() => props.searchRadius, () => props.searchCenter, () => map.value],
+  ([radius, center, mapInstance]) => {
+    if (!mapInstance) return;
+    if (center) {
+      updateSearchRadiusVisualization(mapInstance, center, Number(radius));
+    }
+  },
+  { immediate: true }
 );
 
 /**
@@ -172,12 +191,8 @@ const formattedMarkers = computed(() => {
  */
 function removeCircle(map: any) {
   if (!map) return;
-  ['search-radius-layer-outline', 'search-radius-layer'].forEach(layerId => {
-    if (map.getLayer(layerId)) map.removeLayer(layerId);
-  });
-  if (map.getSource('search-radius-source')) {
-    map.removeSource('search-radius-source');
-  }
+  // Remove SVG overlay using composable util
+  removeSearchRadiusVisualization(map);
 }
 </script>
 <style>

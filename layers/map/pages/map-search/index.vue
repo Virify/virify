@@ -10,13 +10,15 @@
         :interactive="true"
         :mapId="GLOBAL_MAP_ID"
         :draw="drawMode"
+        :search-radius="searchRadius"
+        :search-center="mapCenterCoordinates"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const { calculateZoomLevelFromRadius, updateSearchRadiusVisualization } = useMap();
+const { calculateZoomLevelFromRadius } = useMap();
 
 /**
  * State
@@ -35,6 +37,11 @@ const mapZoomLevel = computed(() =>
   calculateZoomLevelFromRadius(searchParams.value?.radius)
 );
 
+const searchRadius = computed(() => {
+  const radius = searchParams.value?.radius;
+  return radius ? Number(radius) : null;
+});
+
 const mapCenterCoordinates = computed(() => {
   const coords = searchParams.value?.coordinates;
   return coords?.lon && coords?.lat ? 
@@ -49,23 +56,6 @@ const updateDrawMode = (mode: boolean) => {
   drawMode.value = mode;
 };
 
-/**
- * Update Map Radius Circle
- */
-const updateRadius = () => {
-  const coords = searchParams.value?.coordinates;
-  const radius = Number(searchParams.value?.radius);
-  const mapInstance = mapRef.value?.map;
-
-  if (mapInstance && coords?.lon && coords?.lat && !isNaN(radius)) {
-    updateSearchRadiusVisualization(
-      mapInstance,
-      [coords.lon, coords.lat],
-      radius
-    );
-  }
-};
-
 onMounted(() => {
   navigator.geolocation?.getCurrentPosition(
     ({ coords }) => {
@@ -73,19 +63,6 @@ onMounted(() => {
     }
   );
 });
-
-/**
- * Watch for changes in search parameters
- */
-watch(
-  [
-    () => searchParams.value?.coordinates,
-    () => searchParams.value?.radius,
-    () => mapRef.value?.map
-  ],
-  updateRadius,
-  { immediate: true }
-);
 </script>
 <style>
 .map-search-page {
