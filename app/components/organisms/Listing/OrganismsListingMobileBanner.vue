@@ -5,7 +5,7 @@
     <div class="o-listing-mobile-banner__container | container" role="presentation">
       <Transition name="o-listing-mobile-banner">
         <button ref="$handle" v-show="!overviewVisible && !isExpanded" type="button"
-          class="o-listing-mobile-banner__drag-hangle" aria-label="Show additional information"></button>
+          class="o-listing-mobile-banner__drag-handle" aria-label="Show additional information"></button>
       </Transition>
 
       <Teleport to="body">
@@ -164,7 +164,7 @@ function closeExpanded() {
     border-top-left-radius: var(--border-radius-3xl);
   }
 
-  &__drag-hangle {
+  &__drag-handle {
     display: flex;
     align-items: center;
     justify-content: center;
