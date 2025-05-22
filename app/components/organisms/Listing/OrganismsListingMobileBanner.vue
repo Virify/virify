@@ -165,10 +165,14 @@ function closeExpanded() {
   }
 
   &__drag-handle {
+    --touch-overlap: calc(0px - var(--size-8));
+
     display: flex;
     align-items: center;
     justify-content: center;
-    height: var(--size-16);
+    height: var(--size-32);
+    margin-top: var(--touch-overlap);
+    margin-bottom: var(--touch-overlap);
     width: 100%;
     flex-grow: 1;
     touch-action: none;
