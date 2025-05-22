@@ -2,7 +2,7 @@
   <div class="o-listing-mobile-banner" role="presentation" :class="{
     'o-listing-mobile-banner--expanded': isExpanded
   }">
-    <div class="o-listing-mobile-banner__container | container" role="presentation">
+    <div class="| container" role="presentation">
       <Transition name="o-listing-mobile-banner">
         <button ref="$handle" v-show="!overviewVisible && !isExpanded" type="button"
           class="o-listing-mobile-banner__drag-handle" aria-label="Show additional information"></button>
@@ -14,10 +14,9 @@
           aria-label="Close additional information"></button>
       </Teleport>
 
-      <div v-show="isDragging || isExpanded" ref="$additional"
-        class="o-listing-mobile-banner__additional-info | container" :class="{
-          'o-listing-mobile-banner__additional-info--expanded': isExpanded
-        }">
+      <div v-show="isDragging || isExpanded" ref="$additional" class="o-listing-mobile-banner__additional-info" :class="{
+        'o-listing-mobile-banner__additional-info--expanded': isExpanded
+      }">
 
         <h2 v-if="price"
           class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs">
@@ -36,24 +35,24 @@
 
         <OrganismsListingAgent />
       </div>
-    </div>
 
-    <div class="o-listing-mobile-banner__container | container" role="presentation">
-      <div class="o-listing-mobile-banner__overview" role="presentation">
-        <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
-          {{ price }}
+      <div class="o-listing-mobile-banner__grid" role="presentation">
+        <div class="o-listing-mobile-banner__overview" role="presentation">
+          <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
+            {{ price }}
 
-          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            Offers in excess of
-          </AtomsPill>
-        </h2>
+            <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+              Offers in excess of
+            </AtomsPill>
+          </h2>
 
-        <p role="presentation" class="o-listing-mobile-banner__address | body-sm">
-          123 House, Somewhere Street
-        </p>
+          <p role="presentation" class="o-listing-mobile-banner__address | body-sm">
+            123 House, Somewhere Street
+          </p>
+        </div>
+
+        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :property-id="4" enquire-url="#" />
       </div>
-
-      <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :property-id="4" enquire-url="#" />
     </div>
   </div>
 </template>
@@ -322,16 +321,14 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
       #{ fn.faded-color(70%, var(--monochrome-100))});
   }
 
-  &__container {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-wrap: wrap;
+  &__grid {
+    margin: var(--size-12) 0 0;
 
-    @include mq.not-tablet {
-      width: fit-content;
-      min-width: 325px;
-      text-align: center;
+    @include mq.tablet {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--size-24);
     }
   }
 
