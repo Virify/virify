@@ -25,11 +25,12 @@ model Listing {
   agents               Agent[]                @relation("AgentToListing")
   HiddenListing        HiddenListing[]
   UserFavouriteListing UserFavouriteListing[]
-  conversations         Conversation[]
+  conversations        Conversation[]
 
   @@index([userId])
   @@index([propertyId])
   @@index([price])
+  @@index([publishedAt])
 }
 
 enum ListingTier {
