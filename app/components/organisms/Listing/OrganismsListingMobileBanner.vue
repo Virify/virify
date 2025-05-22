@@ -9,15 +9,14 @@
       </Transition>
 
       <Teleport to="body">
-        <button v-show="isDragging || isExpanded" ref="$backdrop" :style="dragBackdropStyle"
+        <button v-show="isDragging || isExpanded" ref="$backdrop"
           class="o-listing-mobile-banner__additional-info-backdrop" @click.prevent="closeExpanded"
           aria-label="Close additional information"></button>
       </Teleport>
 
-      <div v-if="isDragging || isExpanded" :style="dragStyle"
+      <div v-show="isDragging || isExpanded" ref="$additional"
         class="o-listing-mobile-banner__additional-info | container" :class="{
           'o-listing-mobile-banner__additional-info--expanded': isExpanded
-
         }">
 
         <h2 v-if="price"
@@ -79,64 +78,128 @@ withDefaults(defineProps<Props>(), {
 // Elements
 const $handle = useTemplateRef('$handle')
 const $backdrop = useTemplateRef('$backdrop')
-
-// Drag handle styles
-const dragBackdropStyle = reactive({
-  opacity: 0
-})
-
-const dragStyle = reactive({
-  height: '0px',
-  opacity: 0,
-  overflow: 'hidden'
-})
+const $additional = useTemplateRef('$additional')
 
 // Drag handle open state
 const isExpanded = shallowRef(false)
+const additionalInfoHeight = shallowRef(0)
 
 // Drag events
 const { isDragging, dragDistance } = useVerticalDrag($handle)
 const { isDragging: backdropIsDragging, dragDistance: backdropDragDistance } = useVerticalDrag($backdrop)
 
 // Drag thresholds
-const DRAG_THRESHOLD = 60
+const DRAG_THRESHOLD = 80
 
 // Watchers
-watch(dragDistance, (newValue) => {
-  const clampedValue = clampNumber(newValue, { min: 0, max: DRAG_THRESHOLD })
+watch(dragDistance, (_distance) => {
+  const clampedValue = clampNumber(_distance, { min: 0, max: DRAG_THRESHOLD })
 
   // Set styling
-  dragStyle.height = clampedValue + 'px'
-  dragStyle.opacity = clampedValue / DRAG_THRESHOLD
-  dragBackdropStyle.opacity = clampedValue / DRAG_THRESHOLD
+  setStyle($additional, {
+    height: clampedValue + 'px',
+    opacity: clampedValue / DRAG_THRESHOLD,
+    overflow: 'hidden'
+  })
+  setStyle($backdrop, {
+    opacity: clampedValue / DRAG_THRESHOLD
+  })
 
   // Open
-  if (newValue > DRAG_THRESHOLD) openExpanded()
+  if (_distance > DRAG_THRESHOLD) openExpanded()
 })
 
-watch(backdropDragDistance, (newValue) => {
-  if (newValue < -DRAG_THRESHOLD) {
+watch(backdropDragDistance, (_distance) => {
+  const infoHeight = additionalInfoHeight.value
+  const reverseDifference = infoHeight + _distance
+  const reverseThreshold = infoHeight - DRAG_THRESHOLD
+
+  // Get clamp value
+  const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
+
+  // Close backdrop
+  if (clampedValue < reverseThreshold) {
     backdropIsDragging.value = false
 
-    closeExpanded()
+    return closeExpanded()
   }
+
+  // Set styling
+  setStyle($additional, {
+    height: clampedValue + 'px',
+    opacity: clampedValue / infoHeight,
+    overflow: 'hidden'
+  })
+  setStyle($additional, {
+    opacity: clampedValue / infoHeight,
+  })
 })
 
-// Other methods
+watch(backdropIsDragging, (_isDragging) => {
+  if (_isDragging) {
+    additionalInfoHeight.value = unref($additional)?.clientHeight || 0
+
+    return
+  }
+
+  // Once dragging has stopped, check if backdrop is above threshold
+  const infoHeight = additionalInfoHeight.value
+  const reverseDifference = infoHeight + backdropDragDistance.value
+  const reverseThreshold = infoHeight - DRAG_THRESHOLD
+
+  // Get clamp value
+  const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
+
+  // Close backdrop
+  if (clampedValue < reverseThreshold) {
+    backdropIsDragging.value = false
+
+    return closeExpanded()
+  }
+
+  openExpanded()
+})
+
+// Methods
 function openExpanded() {
   isDragging.value = true
   isExpanded.value = true
-  dragStyle.height = 'auto'
-  dragStyle.opacity = 1
-  dragBackdropStyle.opacity = 1
+
+  setStyle($additional, {
+    height: '',
+    opacity: 1,
+    overflow: ''
+  })
+  setStyle($backdrop, {
+    opacity: 1
+  })
 }
 
 function closeExpanded() {
   isExpanded.value = false
   isDragging.value = false
-  dragStyle.height = '0px'
-  dragStyle.opacity = 0
-  dragBackdropStyle.opacity = 0
+
+  setStyle($additional, {
+    height: '0px',
+    opacity: 0
+  })
+  setStyle($backdrop, {
+    opacity: 0
+  })
+}
+
+onMounted(() => {
+  closeExpanded()
+})
+
+function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, string | number>) {
+  const el = unref(_el)
+
+  if (!isElement(el)) return
+
+  for (let [attr, value] of Object.entries(styles)) {
+    el.style[attr] = value
+  }
 }
 
 </script>
