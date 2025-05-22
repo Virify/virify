@@ -114,10 +114,14 @@ useVerticalDrag($handle, {
     })
 
     // Open
-    if (relativeY > DRAG_OPEN_THRESHOLD) openExpanded()
+    if (relativeY > DRAG_OPEN_THRESHOLD) {
+      isDragging.value = false
+
+      openExpanded()
+    }
   },
   onDragEnd() {
-    console.log('Drag ended!')
+    isDragging.value = false
   }
 })
 
