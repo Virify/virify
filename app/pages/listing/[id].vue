@@ -20,7 +20,7 @@
             </skeleton-loader>
           </div>
 
-          <OrganismsListingOverview ref="$overview" :price="priceFormatted" />
+          <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" />
 
           <h3 class="| title-sm">Property</h3>
           <pre class="| body-sm">{{ property }}</pre>
@@ -203,6 +203,12 @@ const debugContent = computed(() => {
   /**
    *  Content wrappers
    */
+  &__mobile-overview {
+    @include mq.tablet {
+      display: none;
+    }
+  }
+
   &__content {
     overflow: hidden;
 
