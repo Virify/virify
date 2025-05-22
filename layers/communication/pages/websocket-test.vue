@@ -33,8 +33,6 @@ let send = (_msg: string) => { }
 let open = () => { }
 let close = () => { }
 
-const { user } = useUserSession()
-
 if (import.meta.client) {
   const socket = useWebSocket('ws://localhost:3000/api/_ws/conversation', {
     autoConnect: true,
