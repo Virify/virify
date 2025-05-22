@@ -1,11 +1,36 @@
 type MaybeElement = MaybeRef<HTMLElement | null>
 
-export function useVerticalDrag(maybeEl: MaybeElement) {
-  // Track existing dragging
-  const isDragging = shallowRef(false)
-  const startY = shallowRef(0)
-  const clientY = shallowRef(0)
-  const dragDistance = shallowRef(0)
+interface DragStart {
+  clientY: number
+}
+
+interface DragMove {
+  clientY: number
+  relativeY: number
+}
+
+interface DragEnd {
+  clientY: number
+  relativeY: number
+}
+
+interface DragMethods {
+  onDragMounted?: () => void
+  onDragStart?: (e: DragStart) => void
+  onDrag?: (e: DragMove) => void
+  onDragEnd?: (e: DragEnd) => void
+}
+
+export function useVerticalDrag(maybeEl: MaybeElement, methods: DragMethods) {
+  let isDragging = false
+  let startClientY = 0
+  let clientY = 0
+  let relativeY = 0
+
+  /**
+   *  Userland methods
+   */
+  const { onDragMounted, onDragStart, onDrag, onDragEnd } = asObject(methods)
 
   /**
    *  Utils
@@ -27,26 +52,33 @@ export function useVerticalDrag(maybeEl: MaybeElement) {
    *  Interaction methods
    */
   function dragStart(e: TouchEvent | MouseEvent) {
-    isDragging.value = true
+    isDragging = true
+    startClientY = getClientY(e)
 
-    const newClientY = getClientY(e)
-
-    startY.value = newClientY;
-    clientY.value = newClientY;
-    dragDistance.value = 0
+    if (isFunction(onDragStart)) {
+      onDragStart({ clientY: startClientY })
+    }
   }
 
   function dragMove(e: TouchEvent | MouseEvent) {
-    if (!isDragging.value) return
+    if (!isDragging) return
 
-    const newClientY = getClientY(e)
+    clientY = getClientY(e)
+    relativeY = startClientY - clientY
 
-    clientY.value = newClientY;
-    dragDistance.value = startY.value - newClientY;
+    if (isFunction(onDrag)) {
+      onDrag({ clientY, relativeY })
+    }
   }
 
   function dragStop() {
-    isDragging.value = false
+    if (!isDragging) return
+
+    isDragging = false
+
+    if (isFunction(onDragEnd)) {
+      onDragEnd({ clientY, relativeY })
+    }
   }
 
   // Mounted events
@@ -54,6 +86,10 @@ export function useVerticalDrag(maybeEl: MaybeElement) {
     const el = getElement(maybeEl)
 
     if (!el) return
+
+    if (isFunction(onDragMounted)) {
+      onDragMounted()
+    }
 
     el.addEventListener('touchstart', dragStart)
     el.addEventListener('mousedown', dragStart)
@@ -75,11 +111,4 @@ export function useVerticalDrag(maybeEl: MaybeElement) {
     window.removeEventListener('touchend', dragStop)
     window.removeEventListener('mouseup', dragStop)
   })
-
-  return {
-    isDragging,
-    startY,
-    clientY,
-    dragDistance
-  }
 }

@@ -80,84 +80,96 @@ const $handle = useTemplateRef('$handle')
 const $backdrop = useTemplateRef('$backdrop')
 const $additional = useTemplateRef('$additional')
 
+// Drag thresholds
+const DRAG_OPEN_THRESHOLD = 80
+const DRAG_CLOSE_THRESHOLD = 120
+
 // Drag handle open state
 const isExpanded = shallowRef(false)
 const additionalInfoHeight = shallowRef(0)
 
 // Drag events
-const { isDragging, dragDistance } = useVerticalDrag($handle)
-const { isDragging: backdropIsDragging, dragDistance: backdropDragDistance } = useVerticalDrag($backdrop)
+const isDragging = shallowRef(false)
+const backdropIsDragging = shallowRef(false)
 
-// Drag thresholds
-const DRAG_THRESHOLD = 80
+// Set up dragging
+useVerticalDrag($handle, {
+  onDragMounted() {
+    closeExpanded()
+  },
+  onDragStart() {
+    isDragging.value = true
+  },
+  onDrag({ relativeY }) {
+    const clampedValue = clampNumber(relativeY, { min: 0, max: DRAG_OPEN_THRESHOLD })
 
-// Watchers
-watch(dragDistance, (_distance) => {
-  const clampedValue = clampNumber(_distance, { min: 0, max: DRAG_THRESHOLD })
+    // Set styling
+    setStyle($additional, {
+      height: clampedValue + 'px',
+      opacity: clampedValue / DRAG_OPEN_THRESHOLD,
+      overflow: 'hidden'
+    })
 
-  // Set styling
-  setStyle($additional, {
-    height: clampedValue + 'px',
-    opacity: clampedValue / DRAG_THRESHOLD,
-    overflow: 'hidden'
-  })
-  setStyle($backdrop, {
-    opacity: clampedValue / DRAG_THRESHOLD
-  })
+    setStyle($backdrop, {
+      opacity: clampedValue / DRAG_OPEN_THRESHOLD
+    })
 
-  // Open
-  if (_distance > DRAG_THRESHOLD) openExpanded()
-})
-
-watch(backdropDragDistance, (_distance) => {
-  const infoHeight = additionalInfoHeight.value
-  const reverseDifference = infoHeight + _distance
-  const reverseThreshold = infoHeight - DRAG_THRESHOLD
-
-  // Get clamp value
-  const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
-
-  // Close backdrop
-  if (clampedValue < reverseThreshold) {
-    backdropIsDragging.value = false
-
-    return closeExpanded()
+    // Open
+    if (relativeY > DRAG_OPEN_THRESHOLD) openExpanded()
+  },
+  onDragEnd() {
+    console.log('Drag ended!')
   }
-
-  // Set styling
-  setStyle($additional, {
-    height: clampedValue + 'px',
-    opacity: clampedValue / infoHeight,
-    overflow: 'hidden'
-  })
-  setStyle($additional, {
-    opacity: clampedValue / infoHeight,
-  })
 })
 
-watch(backdropIsDragging, (_isDragging) => {
-  if (_isDragging) {
+useVerticalDrag($backdrop, {
+  onDragStart() {
     additionalInfoHeight.value = unref($additional)?.clientHeight || 0
+  },
+  onDrag({ relativeY }) {
+    const infoHeight = additionalInfoHeight.value
+    const reverseDifference = infoHeight + relativeY
+    const reverseThreshold = infoHeight - DRAG_CLOSE_THRESHOLD
 
-    return
+    // Get clamp value
+    const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
+
+    // Close backdrop
+    if (clampedValue < reverseThreshold) {
+      backdropIsDragging.value = false
+
+      return closeExpanded()
+    }
+
+    // Set styling
+    setStyle($additional, {
+      height: clampedValue + 'px',
+      opacity: clampedValue / infoHeight,
+      overflow: 'hidden'
+    })
+
+    setStyle($additional, {
+      opacity: clampedValue / infoHeight,
+    })
+  },
+  onDragEnd({ relativeY }) {
+    // Once dragging has stopped, check if backdrop is above threshold
+    const infoHeight = additionalInfoHeight.value
+    const reverseDifference = infoHeight + relativeY
+    const reverseThreshold = infoHeight - DRAG_CLOSE_THRESHOLD
+
+    // Get clamp value
+    const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
+
+    // Close backdrop
+    if (clampedValue < reverseThreshold) {
+      backdropIsDragging.value = false
+
+      return closeExpanded()
+    }
+
+    openExpanded()
   }
-
-  // Once dragging has stopped, check if backdrop is above threshold
-  const infoHeight = additionalInfoHeight.value
-  const reverseDifference = infoHeight + backdropDragDistance.value
-  const reverseThreshold = infoHeight - DRAG_THRESHOLD
-
-  // Get clamp value
-  const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
-
-  // Close backdrop
-  if (clampedValue < reverseThreshold) {
-    backdropIsDragging.value = false
-
-    return closeExpanded()
-  }
-
-  openExpanded()
 })
 
 // Methods
@@ -170,6 +182,7 @@ function openExpanded() {
     opacity: 1,
     overflow: ''
   })
+
   setStyle($backdrop, {
     opacity: 1
   })
@@ -183,14 +196,11 @@ function closeExpanded() {
     height: '0px',
     opacity: 0
   })
+
   setStyle($backdrop, {
     opacity: 0
   })
 }
-
-onMounted(() => {
-  closeExpanded()
-})
 
 function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, string | number>) {
   const el = unref(_el)
