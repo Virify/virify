@@ -1,22 +1,24 @@
 <template>
   <div class="| container">
-
+    <p class="| body-md">Enter a question or request further details below to enquire about this listing.</p>
+    <textarea type="text" v-model="enquiryMessage" placeholder="Can I get more information on this property please?" class="border" />
     <button @click="sendEnquiry" class="button button-sm">TEST ENQUIRY BUTTON</button>
     <AtomsDivider />
-    <h1 class="title-md">Conversations</h1>
+    <h1 class="title-md">Enquiries</h1>
     <!-- websocket log -->
-    <ClientOnly>
+    <!-- <ClientOnly>
+      <p class="| body-md">WebSocket Log</p>
       <ul>
         <li v-for="(msg, idx) in messages" :key="idx">{{ msg }}</li>
       </ul>
-    </ClientOnly>
+    </ClientOnly> -->
 
     <!-- conversations container -->
     <div class="pt-6 flex flex-col gap-2">
       <ul class="flex flex-col gap-2">
         <!-- conversations -->
         <li v-for="(conversation, index) in conversations" :key="index" class="flex flex-col gap-2 p-6 ">
-          <strong class="">Conversation {{ conversationPoV(conversation) }}:</strong>
+          <strong class="">Enquiry {{ conversationPoV(conversation) }}:</strong>
           <ul>
             <!-- messages in a conversation -->
             <li v-for="(convoMessage, msgIndex) in conversation.messages" :key="msgIndex">
@@ -25,7 +27,7 @@
             <!-- reply to message -->
             <input type="text" v-model="message" class="border" />
             <button @click="replyToMessage(conversation.id, conversation.receiver.id, message)"
-              :disabled="status !== 'OPEN'" class="| button button-sm">Send</button>
+              :disabled="status !== 'OPEN'" class="| button button-sm">Reply</button>
           </ul>
         </li>
       </ul>
@@ -87,6 +89,7 @@ if (import.meta.client) {
 // Import the conversation type
 import type { ConversationWithUserAndMessages } from '~~/shared/types/conversation'
 const conversations = ref<ConversationWithUserAndMessages[]>([])
+const enquiryMessage = ref('')
 
 const conversationPoV = (conversation: any) => {
   if (conversation.sender.id === user.value?.id) {
@@ -164,10 +167,12 @@ async function sendEnquiry() {
       body: {
         listingId,
         receiverId,
-        message: 'Hello, I am interested in this listing.',
+        message: enquiryMessage.value,
       },
     })
     console.log('Enquiry sent:', response)
+    send(enquiryMessage.value)
+    enquiryMessage.value = ''
   } catch (err) {
     console.error('Error sending enquiry:', err)
   }
