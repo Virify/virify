@@ -43,6 +43,9 @@ export default defineWebSocketHandler({
     console.log(`Message from user ${senderId}:`, message);
     console.log("Current peers:", Array.from(peers.keys()));
 
+    // TODO: Hadle the message parse and only send to the user specified in the message
+    // Example: {"to": 1, "message": "Hello"}
+
     // Forward the message to all connected users except the sender
     for (const [userId, userPeers] of peers.entries()) {
       if (userId !== senderId) {

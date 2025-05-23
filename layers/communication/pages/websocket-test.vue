@@ -32,7 +32,8 @@
             <!-- reply to message -->
             <div class="flex flex-row gap-2 justify-between">
               <input type="text" v-model="message" />
-              <button @click="replyToMessage(conversation.id, conversation.receiver.id, message)"
+              <!-- TODO Figure out logic for receiver vs sender the receiver will always be the opposite of the sender -->
+              <button @click="replyToMessage(conversation.id, conversation.sender.id, conversation.receiver.id, message)"
                 :disabled="status !== 'OPEN'" class="| button">Reply</button>
             </div>
 
@@ -77,6 +78,7 @@ if (import.meta.client) {
     if (incoming) {
       messages.value.push(`Received: ${incoming}`)
       // on receiving a message, fetch conversations
+      // TODO: Need fetch the messages frmo the conversation updating NOT ALL conversations every time.
       fetchConversations()
     }
   })
@@ -204,7 +206,14 @@ async function sendEnquiry() {
  * @param receiverId - The ID of the receiver
  * @param message - The message to send
  */
-async function replyToMessage(conversationId: number, receiverId: number, message: string) {
+async function replyToMessage(conversationId: number, receiverId: number, senderId: number, message: string) {
+  console.log('Replying to message:', {
+    conversationId,
+    receiverId,
+    senderId,
+    message,
+  })
+  
   try {
     const response = await $fetch('/api/conversation/reply', {
       method: 'POST',
@@ -215,7 +224,7 @@ async function replyToMessage(conversationId: number, receiverId: number, messag
       },
     })
     console.log('Reply sent:', response)
-    send(message)
+    send(String(message))
     fetchConversations()
   } catch (err) {
     console.error('Error sending reply:', err)
