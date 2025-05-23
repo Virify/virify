@@ -37,7 +37,6 @@ export default defineWebSocketHandler({
     if (String(message) === "ping") {
       return;
     }
-
     sendMessageToPeer(message);
   },
 });

@@ -22,23 +22,28 @@
       <ul class="flex flex-col gap-2">
         <!-- conversations -->
         <li v-for="(conversation, index) in conversations" :key="index" class="flex flex-col gap-2 p-6">
-          <strong>Enquiry {{ conversationPoV(conversation) }}:</strong>
-          <ul>
-            <!-- messages in a conversation -->
-            <li v-for="(convoMessage, msgIndex) in conversation.messages" :key="msgIndex"
-              :class="convoMessagePoV(convoMessage) === 'You' ? 'message-sender' : 'message-receiver'">
-              <p class="text-sm text-gray-500">
-                {{ messageFormattedTime(convoMessage.createdAt) }}
-              </p>
-              <strong>{{ convoMessagePoV(convoMessage) }}</strong>:<br> {{ convoMessage.content }}
-            </li>
-            <!-- reply to message -->
-            <div class="flex flex-row gap-2 justify-between">
-              <input type="text" v-model="message" @keydown.enter="replyToMessage(conversation.id, message)" />
-              <button @click="replyToMessage(conversation.id, message)" :disabled="status !== 'OPEN'"
-                class="| button">Reply</button>
-            </div>
-          </ul>
+          <div @click="toggleAccordion(index)" class="cursor-pointer flex items-center">
+            <strong>Enquiry {{ conversationPoV(conversation) }}:</strong>
+            <span class="ml-2">{{ activeAccordion === index ? '▼' : '▶' }}</span>
+          </div>
+          <div v-if="activeAccordion === index">
+            <ul>
+              <!-- messages in a conversation -->
+              <li v-for="(convoMessage, msgIndex) in conversation.messages" :key="msgIndex"
+                :class="convoMessagePoV(convoMessage) === 'You' ? 'message-sender' : 'message-receiver'">
+                <p class="text-sm text-gray-500">
+                  {{ messageFormattedTime(convoMessage.createdAt) }}
+                </p>
+                <strong>{{ convoMessagePoV(convoMessage) }}</strong>:<br> {{ convoMessage.content }}
+              </li>
+              <!-- reply to message -->
+              <div class="flex flex-row gap-2 justify-between">
+                <input type="text" v-model="message" @keydown.enter="replyToMessage(conversation.id, message)" />
+                <button @click="replyToMessage(conversation.id, message)" :disabled="status !== 'OPEN'"
+                  class="| button">Reply</button>
+              </div>
+            </ul>
+          </div>
         </li>
       </ul>
     </div>
@@ -61,6 +66,7 @@ const listing = ref<ListingWithFullProperty | null>(null)
 const conversations = ref<ConversationWithUserAndMessages[]>([])
 const enquiryMessage = ref('')
 const users = ref<User[]>([])
+const activeAccordion = ref<number | null>(null)
 
 let send = (_msg: string) => { }
 let open = () => { }
@@ -102,6 +108,15 @@ if (import.meta.client) {
 
   open = socket.open
   close = socket.close
+}
+
+/**
+ * Toggle accordion visibility
+ * 
+ * @param index - The index of the conversation
+ */
+function toggleAccordion(index: number) {
+  activeAccordion.value = activeAccordion.value === index ? null : index
 }
 
 /**
@@ -156,6 +171,7 @@ const fetchConversations = async () => {
     const data = await $fetch<ConversationWithUserAndMessages[]>('/api/conversation/all/user/all')
     if (data) {
       conversations.value = data
+      message.value = ''
       console.log('Conversations fetched:', conversations.value)
     } else {
       console.error('No conversations found')
@@ -283,13 +299,15 @@ async function replyToMessage(conversationId: number, message: string) {
     })
     console.log('Reply sent:', response)
 
-    // string already vaidated in the backend via zod
+    // string already validated in the backend via zod
     const messageToSend = {
       to: response.receiverId,
       message: message,
     }
 
     send(JSON.stringify(messageToSend))
+    // Clear the state message input after sending
+    
     // TODO: Update the conversation not ALL conversations
     fetchConversations()
   } catch (err) {
