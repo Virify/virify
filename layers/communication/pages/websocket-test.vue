@@ -1,19 +1,13 @@
 <template>
   <div class="| container">
+    <!-- enquiry -->
     <p class="| body-md">Enter a question or request further details below to enquire about this listing.</p>
     <textarea type="text" v-model="enquiryMessage" placeholder="Can I get more information on this property please?"
       class="border" />
     <button @click="sendEnquiry" class="button button-sm">TEST ENQUIRY BUTTON</button>
     <AtomsDivider />
+    <!-- end enquiry -->
     <h1 class="title-md">Enquiries</h1>
-    <!-- websocket log -->
-    <!-- <ClientOnly>
-      <p class="| body-md">WebSocket Log</p>
-      <ul>
-        <li v-for="(msg, idx) in messages" :key="idx">{{ msg }}</li>
-      </ul>
-    </ClientOnly> -->
-
     <!-- conversations container -->
     <div class="pt-6 flex flex-col gap-2">
       <ul class="flex flex-col gap-2">
@@ -32,11 +26,9 @@
             <!-- reply to message -->
             <div class="flex flex-row gap-2 justify-between">
               <input type="text" v-model="message" />
-              <!-- TODO Figure out logic for receiver vs sender the receiver will always be the opposite of the sender -->
-              <button @click="replyToMessage(conversation.id, conversation.sender.id, conversation.receiver.id, message)"
-                :disabled="status !== 'OPEN'" class="| button">Reply</button>
+              <button @click="replyToMessage(conversation.id, message)" :disabled="status !== 'OPEN'"
+                class="| button">Reply</button>
             </div>
-
           </ul>
         </li>
       </ul>
@@ -45,13 +37,20 @@
 </template>
 
 <script setup lang="ts">
+import type { ConversationWithUserAndMessages } from '~~/shared/types/conversation'
 import { useWebSocket } from '@vueuse/core'
 import type { ListingWithFullProperty } from '~~/shared/types/listing'
+
+/**
+ * State
+ */
 const { user } = useUserSession()
 const message = ref('')
 const messages = ref<string[]>([])
 const status = ref('DISCONNECTED')
 const listing = ref<ListingWithFullProperty | null>(null)
+const conversations = ref<ConversationWithUserAndMessages[]>([])
+const enquiryMessage = ref('')
 
 let send = (_msg: string) => { }
 let open = () => { }
@@ -76,30 +75,25 @@ if (import.meta.client) {
 
     const incoming = socket.data.value
     if (incoming) {
-      messages.value.push(`Received: ${incoming}`)
-      // on receiving a message, fetch conversations
+      console.log('Incoming message from WS:', incoming)
       // TODO: Need fetch the messages frmo the conversation updating NOT ALL conversations every time.
       fetchConversations()
     }
   })
 
   send = (msg: string) => {
-    if (!msg.trim()) return
-
     socket.send(msg)
-    messages.value.push(`Sent: ${msg}`)
-    message.value = ''
   }
 
   open = socket.open
   close = socket.close
 }
 
-// Import the conversation type
-import type { ConversationWithUserAndMessages } from '~~/shared/types/conversation'
-const conversations = ref<ConversationWithUserAndMessages[]>([])
-const enquiryMessage = ref('')
-
+/**
+ * Determine the sender/receiver of the conversation
+ * 
+ * @param conversation - The conversation to check
+ */
 const conversationPoV = (conversation: any) => {
   if (conversation.sender.id === user.value?.id) {
     return conversation.receiver.email
@@ -108,6 +102,11 @@ const conversationPoV = (conversation: any) => {
   }
 }
 
+/**
+ * Determine the sender of the message
+ * 
+ * @param convoMessage - The message to check
+ */
 const convoMessagePoV = (convoMessage: any) => {
   if (convoMessage.sender.id === user.value?.id) {
     return 'You'
@@ -116,6 +115,12 @@ const convoMessagePoV = (convoMessage: any) => {
   }
 }
 
+/**
+ * Formatted Date for messages
+ * 
+ * @param createdAt - The date to format
+ * @returns formatted date string
+ */
 const messageFormattedTime = (createdAt: any) => {
   // if the day is today, show time only
   const date = new Date(createdAt)
@@ -162,7 +167,10 @@ const fetchListing = async () => {
   }
 }
 
-// Wrap in onMounted to ensure it only runs on the client side
+/**
+ * Fetch listing data for test enquiry button
+ * Fetch conversations
+ */
 onMounted(() => {
   fetchListing()
   fetchConversations()
@@ -206,25 +214,30 @@ async function sendEnquiry() {
  * @param receiverId - The ID of the receiver
  * @param message - The message to send
  */
-async function replyToMessage(conversationId: number, receiverId: number, senderId: number, message: string) {
+async function replyToMessage(conversationId: number, message: string) {
   console.log('Replying to message:', {
     conversationId,
-    receiverId,
-    senderId,
     message,
   })
-  
+
   try {
     const response = await $fetch('/api/conversation/reply', {
       method: 'POST',
       body: {
         message,
         conversationId,
-        receiverId,
       },
     })
     console.log('Reply sent:', response)
-    send(String(message))
+
+    // string already vaidated in the backend via zod
+    const messageToSend = {
+      to: response.receiverId,
+      message: message,
+    }
+
+    send(JSON.stringify(messageToSend))
+    // TODO: Update the conversation not ALL conversations
     fetchConversations()
   } catch (err) {
     console.error('Error sending reply:', err)

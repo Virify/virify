@@ -34,27 +34,11 @@ export default defineWebSocketHandler({
   async message(peer, message) {
     const { user } = await requireUserSession(peer);
     // ignore the heartbeat ping messages
-    if(String(message)==='ping') {
-      return
+    if (String(message) === "ping") {
+      return;
     }
-    
-    const senderId = user.id!;
 
-    console.log(`Message from user ${senderId}:`, message);
-    console.log("Current peers:", Array.from(peers.keys()));
-
-    // TODO: Hadle the message parse and only send to the user specified in the message
-    // Example: {"to": 1, "message": "Hello"}
-
-    // Forward the message to all connected users except the sender
-    for (const [userId, userPeers] of peers.entries()) {
-      if (userId !== senderId) {
-        console.log(`Forwarding message to user ${userId}`);
-        for (const p of userPeers) {
-          p.send(String(message));
-        }
-      }
-    }
+    sendMessageToPeer(message);
   },
 });
 
@@ -80,4 +64,26 @@ function addPeer(userId: number, peer: Peer) {
  */
 function findPeers(userId: number): Set<Peer> | undefined {
   return peers.get(userId);
+}
+
+/**
+ * Send a message to a specific peer.
+ *
+ * @param message
+ */
+function sendMessageToPeer(message: any) {
+  const parsedMessage = JSON.parse(message);
+  const recipientId = parsedMessage.to;
+  const messageContent = parsedMessage.message;
+  // find the recipient peers in the map
+  const recipientPeers = findPeers(recipientId);
+  if (!recipientPeers) {
+    console.log(`No peers found for recipient ${recipientId}`);
+    return;
+  }
+  // get all peers that are connected to the recipient (different tabs/windwow etc)
+  console.log(`Sending message to peer ${recipientId}: ${messageContent}`);
+  for (const peer of recipientPeers) {
+    peer.send(messageContent);
+  }
 }

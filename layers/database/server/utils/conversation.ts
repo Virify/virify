@@ -33,22 +33,42 @@ export async function createConversation(listingId: number, senderId: number, re
  * @param conversationId conversation ID
  * @param senderId message sender ID
  * @param messageContent string message content
- * @param receiverId the receiver ID
- * @returns
+ * @returns the receiver ID to be used in the websocket
  */
-export async function replyToConversation(conversationId: number, senderId: number, receiverId: number, messageContent: string) {
-  return await prisma.conversation.update({
-    where: { id: conversationId },
-    data: {
-      messages: {
-        create: {
-          senderId,
-          receiverId,
-          content: messageContent,
+export async function replyToConversation(conversationId: number, messageContent: string, senderId: number) {
+  return await prisma.$transaction(async (tx) => {
+    // First get the conversation for validation and to determine the receiver
+    const conversation = await tx.conversation.findUnique({
+      where: { id: conversationId },
+      select: {
+        senderId: true,
+        receiverId: true,
+      },
+    });
+
+    if (!conversation) {
+      throw new Error(`Conversation with ID ${conversationId} not found`);
+    }
+
+    // Set the receiverId as the opposite of the sender
+    const receiverId = senderId === conversation.senderId ? conversation.receiverId : conversation.senderId;
+
+    // Now update the conversation with the new message
+    const message = await tx.conversation.update({
+      where: { id: conversationId },
+      data: {
+        messages: {
+          create: {
+            senderId,
+            receiverId,
+            content: messageContent,
+          },
         },
       },
-    },
-    include: { messages: true },
+    });
+    return {
+      receiverId,
+    };
   });
 }
 
@@ -111,4 +131,69 @@ export async function getConversationsByUserId(userId: number): Promise<Conversa
       updatedAt: "desc",
     },
   });
+}
+
+/**
+ * Get a conversation by ID, ensuring the user is a participant
+ *
+ * @param conversationId The ID of the conversation to fetch
+ * @param userId The ID of the user requesting the conversation
+ * @returns The conversation if the user is a participant, otherwise null
+ */
+export async function getConversationById(conversationId: number, userId: number): Promise<ConversationWithUserAndMessages | null> {
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      id: conversationId,
+      OR: [
+        { senderId: userId },
+        { receiverId: userId }
+      ]
+    },
+    select: {
+      id: true,
+      listingId: true,
+      createdAt: true,
+      updatedAt: true,
+      messages: {
+        select: {
+          id: true,
+          senderId: true,
+          receiverId: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          sender: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+          receiver: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+        },
+      },
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+      receiver: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  return conversation;
 }
