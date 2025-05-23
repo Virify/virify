@@ -29,12 +29,12 @@ export async function createConversation(listingId: number, senderId: number, re
 }
 
 /**
- * 
+ *
  * @param conversationId conversation ID
  * @param senderId message sender ID
  * @param messageContent string message content
  * @param receiverId the receiver ID
- * @returns 
+ * @returns
  */
 export async function replyToConversation(conversationId: number, senderId: number, receiverId: number, messageContent: string) {
   return await prisma.conversation.update({
@@ -68,7 +68,30 @@ export async function getConversationsByUserId(userId: number): Promise<Conversa
       listingId: true,
       createdAt: true,
       updatedAt: true,
-      messages: true,
+      messages: {
+        select: {
+          id: true,
+          senderId: true,
+          receiverId: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          sender: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+          receiver: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+        },
+      },
       sender: {
         select: {
           id: true,

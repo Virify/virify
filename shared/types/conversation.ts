@@ -1,4 +1,4 @@
-import type { Message, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export type ConversationWithMessages = Prisma.ConversationGetPayload<{
   include: {
@@ -11,7 +11,24 @@ export type ConversationWithUserAndMessages = {
   listingId: number;
   createdAt: Date;
   updatedAt: Date;
-  messages: Message[];
+  messages: {
+    id: number;
+    senderId: number;
+    receiverId: number;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+    sender: {
+      id: number;
+      username: string | null;
+      email: string;
+    },
+    receiver: {
+      id: number;
+      username: string | null;
+      email: string;
+    },
+  }[];
   sender: {
     id: number;
     username: string | null;

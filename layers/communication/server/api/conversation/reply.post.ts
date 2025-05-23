@@ -12,16 +12,16 @@ export default defineEventHandler(async (event) => {
   try {
     const { conversationId, receiverId, message } = await readValidatedBody(event, replySchema.parse);
 
-    const userId = session.user.id;
+    const senderId = session.user.id;
 
-    if (!userId) {
+    if (!senderId) {
       throw createError({
         statusCode: 401,
         statusMessage: "Unauthorized",
       });
     }
 
-    const conversation = await replyToConversation(conversationId, userId, receiverId, message);
+    const conversation = await replyToConversation(conversationId, senderId, receiverId, message);
 
     return conversation;
   } catch (error) {

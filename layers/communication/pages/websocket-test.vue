@@ -1,29 +1,42 @@
 <template>
-  <div class="websocket-test-page">
-    <h1>VueUse WebSocket Chat</h1>
+  <div class="| container">
 
     <button @click="sendEnquiry" class="button button-sm">TEST ENQUIRY BUTTON</button>
-
+    <AtomsDivider />
+    <h1 class="title-md">Conversations</h1>
+    <!-- websocket log -->
     <ClientOnly>
-      <div>Status: {{ status }}</div>
-      <div>
-        <label for="message">Send Message:</label>
-        <input type="text" id="message" v-model="message" />
-        <button @click="send(message)" :disabled="status !== 'OPEN'">Send</button>
-      </div>
-
-      <hr />
-
       <ul>
         <li v-for="(msg, idx) in messages" :key="idx">{{ msg }}</li>
       </ul>
     </ClientOnly>
+
+    <!-- conversations container -->
+    <div class="pt-6 flex flex-col gap-2">
+      <ul class="flex flex-col gap-2">
+        <!-- conversations -->
+        <li v-for="(conversation, index) in conversations" :key="index" class="flex flex-col gap-2 p-6 ">
+          <strong class="">Conversation {{ conversationPoV(conversation) }}:</strong>
+          <ul>
+            <!-- messages in a conversation -->
+            <li v-for="(convoMessage, msgIndex) in conversation.messages" :key="msgIndex">
+              {{ convoMessagePoV(convoMessage) }} {{ convoMessage.content }}
+            </li>
+            <!-- reply to message -->
+            <input type="text" v-model="message" class="border" />
+            <button @click="replyToMessage(conversation.id, conversation.receiver.id, message)"
+              :disabled="status !== 'OPEN'" class="| button button-sm">Send</button>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useWebSocket } from '@vueuse/core'
 import type { ListingWithFullProperty } from '~~/shared/types/listing'
+const { user } = useUserSession()
 
 const message = ref('')
 const messages = ref<string[]>([])
@@ -54,6 +67,8 @@ if (import.meta.client) {
     const incoming = socket.data.value
     if (incoming) {
       messages.value.push(`Received: ${incoming}`)
+      // on receiving a message, fetch conversations
+      fetchConversations()
     }
   })
 
@@ -67,6 +82,43 @@ if (import.meta.client) {
 
   open = socket.open
   close = socket.close
+}
+
+// Import the conversation type
+import type { ConversationWithUserAndMessages } from '~~/shared/types/conversation'
+const conversations = ref<ConversationWithUserAndMessages[]>([])
+
+const conversationPoV = (conversation: any) => {
+  if (conversation.sender.id === user.value?.id) {
+    return conversation.receiver.email
+  } else {
+    return conversation.sender.email
+  }
+}
+
+const convoMessagePoV = (convoMessage: any) => {
+  if (convoMessage.sender.id === user.value?.id) {
+    return 'You'
+  } else {
+    return convoMessage.sender.email
+  }
+}
+
+/**
+ * Fetch conversations
+ */
+const fetchConversations = async () => {
+  try {
+    const data = await $fetch<ConversationWithUserAndMessages[]>('/api/conversation/all/user/all')
+    if (data) {
+      conversations.value = data
+      console.log('Conversations fetched:', conversations.value)
+    } else {
+      console.error('No conversations found')
+    }
+  } catch (err) {
+    console.error('Error fetching conversations:', err)
+  }
 }
 
 /**
@@ -87,7 +139,10 @@ const fetchListing = async () => {
 }
 
 // Wrap in onMounted to ensure it only runs on the client side
-onMounted(fetchListing)
+onMounted(() => {
+  fetchListing()
+  fetchConversations()
+})
 
 /**
  * Send enquiry
@@ -99,10 +154,10 @@ async function sendEnquiry() {
     console.error('No listing data available')
     return
   }
-  
+
   const listingId = listing.value.id
   const receiverId = listing.value.userId
-  
+
   try {
     const response = await $fetch('/api/conversation/create', {
       method: 'POST',
@@ -117,10 +172,35 @@ async function sendEnquiry() {
     console.error('Error sending enquiry:', err)
   }
 }
+
+/**
+ * Reply to a message in a conversation
+ * 
+ * @param conversationId - The ID of the conversation
+ * @param receiverId - The ID of the receiver
+ * @param message - The message to send
+ */
+async function replyToMessage(conversationId: number, receiverId: number, message: string) {
+  try {
+    const response = await $fetch('/api/conversation/reply', {
+      method: 'POST',
+      body: {
+        message,
+        conversationId,
+        receiverId,
+      },
+    })
+    console.log('Reply sent:', response)
+    send(message)
+    fetchConversations()
+  } catch (err) {
+    console.error('Error sending reply:', err)
+  }
+}
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 .websocket-test-page div {
   margin-bottom: 0.75em;
 }
@@ -149,25 +229,16 @@ async function sendEnquiry() {
   opacity: 0.7;
 }
 
-.websocket-test-page ul {
+ul {
   list-style-type: none;
-  padding-left: 0;
-  max-height: 300px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  padding: 10px;
-}
+  margin: 0;
+  padding: 0;
 
-.websocket-test-page li {
-  padding: 5px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.websocket-test-page li:last-child {
-  border-bottom: none;
-}
-
-hr {
-  margin: 1.5em 0;
+  li {
+    margin-bottom: 0.5em;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
 }
 </style>
