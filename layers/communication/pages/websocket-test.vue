@@ -1,7 +1,8 @@
 <template>
   <div class="| container">
     <p class="| body-md">Enter a question or request further details below to enquire about this listing.</p>
-    <textarea type="text" v-model="enquiryMessage" placeholder="Can I get more information on this property please?" class="border" />
+    <textarea type="text" v-model="enquiryMessage" placeholder="Can I get more information on this property please?"
+      class="border" />
     <button @click="sendEnquiry" class="button button-sm">TEST ENQUIRY BUTTON</button>
     <AtomsDivider />
     <h1 class="title-md">Enquiries</h1>
@@ -17,17 +18,24 @@
     <div class="pt-6 flex flex-col gap-2">
       <ul class="flex flex-col gap-2">
         <!-- conversations -->
-        <li v-for="(conversation, index) in conversations" :key="index" class="flex flex-col gap-2 p-6 ">
-          <strong class="">Enquiry {{ conversationPoV(conversation) }}:</strong>
+        <li v-for="(conversation, index) in conversations" :key="index" class="flex flex-col gap-2 p-6">
+          <strong>Enquiry {{ conversationPoV(conversation) }}:</strong>
           <ul>
             <!-- messages in a conversation -->
-            <li v-for="(convoMessage, msgIndex) in conversation.messages" :key="msgIndex">
-              {{ convoMessagePoV(convoMessage) }} {{ convoMessage.content }}
+            <li v-for="(convoMessage, msgIndex) in conversation.messages" :key="msgIndex"
+              :class="convoMessagePoV(convoMessage) === 'You' ? 'message-sender' : 'message-receiver'">
+              <p class="text-sm text-gray-500">
+                {{ messageFormattedTime(convoMessage.createdAt) }}
+              </p>
+              <strong>{{ convoMessagePoV(convoMessage) }}</strong>:<br> {{ convoMessage.content }}
             </li>
             <!-- reply to message -->
-            <input type="text" v-model="message" class="border" />
-            <button @click="replyToMessage(conversation.id, conversation.receiver.id, message)"
-              :disabled="status !== 'OPEN'" class="| button button-sm">Reply</button>
+            <div class="flex flex-row gap-2 justify-between">
+              <input type="text" v-model="message" />
+              <button @click="replyToMessage(conversation.id, conversation.receiver.id, message)"
+                :disabled="status !== 'OPEN'" class="| button">Reply</button>
+            </div>
+
           </ul>
         </li>
       </ul>
@@ -39,7 +47,6 @@
 import { useWebSocket } from '@vueuse/core'
 import type { ListingWithFullProperty } from '~~/shared/types/listing'
 const { user } = useUserSession()
-
 const message = ref('')
 const messages = ref<string[]>([])
 const status = ref('DISCONNECTED')
@@ -105,6 +112,18 @@ const convoMessagePoV = (convoMessage: any) => {
   } else {
     return convoMessage.sender.email
   }
+}
+
+const messageFormattedTime = (createdAt: any) => {
+  // if the day is today, show time only
+  const date = new Date(createdAt)
+  return date.toLocaleString('en-GB', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 /**
@@ -242,8 +261,28 @@ ul {
   li {
     margin-bottom: 0.5em;
     padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
+}
+
+input {
+  width: 90%;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid var(--foreground-200);
+}
+
+.message-sender {
+  border: 1px solid var(--secondary-300);
+  width: 60%;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.message-receiver {
+  border: 1px solid var(--primary-300);
+  width: 60%;
+  margin-left: auto;
+  padding: 20px;
+  border-radius: 5px;
 }
 </style>
