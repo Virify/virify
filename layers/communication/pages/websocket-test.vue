@@ -23,11 +23,12 @@
 
 <script setup lang="ts">
 import { useWebSocket } from '@vueuse/core'
+import type { ListingWithFullProperty } from '~~/shared/types/listing'
 
 const message = ref('')
 const messages = ref<string[]>([])
 const status = ref('DISCONNECTED')
-const listing = ref<ListingWithFullProperty>()
+const listing = ref<ListingWithFullProperty | null>(null)
 
 let send = (_msg: string) => { }
 let open = () => { }
@@ -38,11 +39,6 @@ if (import.meta.client) {
     autoConnect: true,
     immediate: true,
     autoClose: false,
-    heartbeat: {
-      message: JSON.stringify({ type: 'ping' }),
-      interval: 30000,
-      pongTimeout: 10000,
-    },
     autoReconnect: {
       retries: 3,
       delay: 1000,
@@ -76,19 +72,22 @@ if (import.meta.client) {
 /**
  * Fetch listing data for test enquiry button
  */
-await $fetch('/api/listing/1')
-  .then((data) => {
+const fetchListing = async () => {
+  try {
+    const data = await $fetch('/api/listing/1')
     if (data) {
       listing.value = data as unknown as ListingWithFullProperty
       console.log('Listing fetched:', listing.value)
     } else {
       console.error('No listing found')
     }
-  })
-  .catch((err) => {
+  } catch (err) {
     console.error('Error fetching listing:', err)
-    return null
-  })
+  }
+}
+
+// Wrap in onMounted to ensure it only runs on the client side
+onMounted(fetchListing)
 
 /**
  * Send enquiry
@@ -96,17 +95,27 @@ await $fetch('/api/listing/1')
  * Update the conversation if it does exist
  */
 async function sendEnquiry() {
-  const listingId = listing.value?.id
-  const receiverId = listing.value?.userId
-  const message = await $fetch('/api/conversation/create-or-update', {
-    method: 'POST',
-    body: {
-      listingId,
-      receiverId,
-      message: 'Hello, I am interested in this listing.',
-    },
-  })
-  console.log('Enquiry sent:', message)
+  if (!listing.value) {
+    console.error('No listing data available')
+    return
+  }
+  
+  const listingId = listing.value.id
+  const receiverId = listing.value.userId
+  
+  try {
+    const response = await $fetch('/api/conversation/create', {
+      method: 'POST',
+      body: {
+        listingId,
+        receiverId,
+        message: 'Hello, I am interested in this listing.',
+      },
+    })
+    console.log('Enquiry sent:', response)
+  } catch (err) {
+    console.error('Error sending enquiry:', err)
+  }
 }
 </script>
 
