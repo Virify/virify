@@ -10,10 +10,10 @@ import type { ConversationWithMessages, ConversationWithUserAndMessages } from "
  * @param messageContent Message content
  * @returns
  */
-export async function createConversation(listingId: number, senderId: number, receiverId: number, messageContent: string): Promise<ConversationWithMessages | Message> {
+export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number,): Promise<ConversationWithMessages | Message> {
   return await prisma.conversation.create({
     data: {
-      listing: { connect: { id: listingId } },
+      ...( listingId ? { listing: { connect: { id: listingId } } } : {} ),
       sender: { connect: { id: senderId } },
       receiver: { connect: { id: receiverId } },
       messages: {

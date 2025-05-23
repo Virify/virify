@@ -8,7 +8,7 @@ export type ConversationWithMessages = Prisma.ConversationGetPayload<{
 
 export type ConversationWithUserAndMessages = {
   id: number;
-  listingId: number;
+  listingId: number | null;
   createdAt: Date;
   updatedAt: Date;
   messages: {

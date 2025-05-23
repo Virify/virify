@@ -6,6 +6,15 @@
       class="border" />
     <button @click="sendEnquiry" class="button button-sm">TEST ENQUIRY BUTTON</button>
     <AtomsDivider />
+    <!-- users -->
+    <h1>Users</h1>
+    <ul>
+      <li v-for="(user, index) in users" :key="index">
+        <strong>{{ user.email }}</strong> - {{ user.firstName }} {{ user.lastName }}
+        <button @click="chatToUser(user.id)" class="button button-sm">Chat</button>
+      </li>
+    </ul>
+    <AtomsDivider />
     <!-- end enquiry -->
     <h1 class="title-md">Enquiries</h1>
     <!-- conversations container -->
@@ -25,7 +34,7 @@
             </li>
             <!-- reply to message -->
             <div class="flex flex-row gap-2 justify-between">
-              <input type="text" v-model="message" />
+              <input type="text" v-model="message" @keydown.enter="replyToMessage(conversation.id, message)" />
               <button @click="replyToMessage(conversation.id, message)" :disabled="status !== 'OPEN'"
                 class="| button">Reply</button>
             </div>
@@ -51,6 +60,7 @@ const status = ref('DISCONNECTED')
 const listing = ref<ListingWithFullProperty | null>(null)
 const conversations = ref<ConversationWithUserAndMessages[]>([])
 const enquiryMessage = ref('')
+const users = ref<User[]>([])
 
 let send = (_msg: string) => { }
 let open = () => { }
@@ -72,13 +82,18 @@ if (import.meta.client) {
 
   watchEffect(() => {
     status.value = socket.status.value
-
     const incoming = socket.data.value
     if (incoming) {
       console.log('Incoming message from WS:', incoming)
       // TODO: Need fetch the messages frmo the conversation updating NOT ALL conversations every time.
       fetchConversations()
     }
+    nextTick(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    });
   })
 
   send = (msg: string) => {
@@ -168,13 +183,51 @@ const fetchListing = async () => {
 }
 
 /**
+ * Fetch all users
+ * Filter out the current user
+ */
+const fetchUsers = async () => {
+  try {
+    const data = await $fetch<User[]>('/api/user/get/all')
+    if (data) {
+      const filteredUsers = data.filter((item) => item.id !== user.value?.id)
+      users.value = filteredUsers
+      console.log('Users fetched:', users.value)
+    } else {
+      console.error('No users found')
+    }
+  } catch (err) {
+    console.error('Error fetching users:', err)
+  }
+}
+/**
  * Fetch listing data for test enquiry button
  * Fetch conversations
  */
 onMounted(() => {
   fetchListing()
+  fetchUsers()
   fetchConversations()
 })
+
+async function chatToUser(userId: number) {
+  try {
+    const data = await $fetch('/api/conversation/create', {
+      method: 'POST',
+      body: {
+        receiverId: userId,
+        message: 'Chat initiated',
+      },
+    })
+    if (data) {
+      fetchConversations()
+    } else {
+      console.error('No chat found')
+    }
+  } catch (err) {
+    console.error('Error creating chat:', err)
+  }
+}
 
 /**
  * Send enquiry

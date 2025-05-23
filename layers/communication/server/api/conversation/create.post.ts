@@ -2,7 +2,7 @@ import * as z from "zod";
 import { createConversation } from "~~/layers/database/server/utils/conversation";
 
 const conversationSchema = z.object({
-  listingId: z.coerce.number(),
+  listingId: z.coerce.number().optional(),
   receiverId: z.coerce.number(),
   message: z.string(),
 });
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Unauthorized",
     });
   }
-  const conversation = await createConversation(listingId, userId, receiverId, message);
+  const conversation = await createConversation(userId, receiverId, message, listingId,);
   return conversation;
   } catch (error) {
     console.error("Error creating or updating conversation:", error);
