@@ -10,7 +10,7 @@ import type { ConversationWithMessages, ConversationWithUserAndMessages } from "
  * @param messageContent Message content
  * @returns
  */
-export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number,): Promise<ConversationWithMessages | Message> {
+export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number,): Promise<ConversationWithUserAndMessages | Message> {
   return await prisma.conversation.create({
     data: {
       ...( listingId ? { listing: { connect: { id: listingId } } } : {} ),
@@ -24,7 +24,50 @@ export async function createConversation(senderId: number, receiverId: number, m
         },
       },
     },
-    include: { messages: true },
+    select: {
+      id: true,
+      listingId: true,
+      createdAt: true,
+      updatedAt: true,
+      messages: {
+        select: {
+          id: true,
+          senderId: true,
+          receiverId: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          sender: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+          receiver: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+        },
+      },
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+      receiver: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+    },
   });
 }
 

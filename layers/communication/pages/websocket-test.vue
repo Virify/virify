@@ -260,7 +260,7 @@ async function sendEnquiry() {
   const receiverId = listing.value.userId
 
   try {
-    const response = await $fetch('/api/conversation/create', {
+    const response = await $fetch<ConversationWithUserAndMessages>('/api/conversation/create', {
       method: 'POST',
       body: {
         listingId,
@@ -269,7 +269,10 @@ async function sendEnquiry() {
       },
     })
     console.log('Enquiry sent:', response)
-    send(enquiryMessage.value)
+    send(JSON.stringify({
+      to: response.receiver.id,
+      message: enquiryMessage.value,
+    }))
     enquiryMessage.value = ''
   } catch (err) {
     console.error('Error sending enquiry:', err)

@@ -37,6 +37,21 @@ export default defineWebSocketHandler({
     if (String(message) === "ping") {
       return;
     }
+    console.log(`Received message from user ${user.id}: ${message}`);
+    // Handle typing event
+    try {
+      const parsed = JSON.parse(String(message));
+      if (parsed.type === "typing" && parsed.to) {
+        sendTypingEventToPeer(user.id!, parsed.to);
+        return;
+      }
+      if (parsed.type === "read" && parsed.to && parsed.messageId) {
+        sendReadReceiptToPeer(user.id!, parsed.to, parsed.messageId);
+        return;
+      }
+    } catch (e) {
+      // Not JSON or not a typing/read event, continue
+    }
     sendMessageToPeer(message);
   },
 });
@@ -84,5 +99,42 @@ function sendMessageToPeer(message: any) {
   console.log(`Sending message to peer ${recipientId}: ${messageContent}`);
   for (const peer of recipientPeers) {
     peer.send(messageContent);
+  }
+}
+
+/**
+ * Send a typing event to a specific peer.
+ *
+ * @param fromUserId Sender's user ID
+ * @param recipientId Recipient's user ID
+ */
+function sendTypingEventToPeer(fromUserId: number, recipientId: number) {
+  const recipientPeers = findPeers(recipientId);
+  if (!recipientPeers) {
+    console.log(`No peers found for recipient ${recipientId}`);
+    return;
+  }
+  const typingPayload = JSON.stringify({ type: "typing", from: fromUserId });
+  for (const peer of recipientPeers) {
+    peer.send(typingPayload);
+  }
+}
+
+/**
+ * Send a read receipt to a specific peer.
+ *
+ * @param fromUserId Sender's user ID
+ * @param recipientId Recipient's user ID
+ * @param messageId The ID of the message that was read
+ */
+function sendReadReceiptToPeer(fromUserId: number, recipientId: number, messageId: string) {
+  const recipientPeers = findPeers(recipientId);
+  if (!recipientPeers) {
+    console.log(`No peers found for recipient ${recipientId}`);
+    return;
+  }
+  const readPayload = JSON.stringify({ type: "read", from: fromUserId, messageId });
+  for (const peer of recipientPeers) {
+    peer.send(readPayload);
   }
 }
