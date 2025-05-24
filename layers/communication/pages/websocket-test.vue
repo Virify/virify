@@ -216,6 +216,7 @@ const fetchUsers = async () => {
     console.error('Error fetching users:', err)
   }
 }
+
 /**
  * Fetch listing data for test enquiry button
  * Fetch conversations
@@ -228,7 +229,7 @@ onMounted(() => {
 
 async function chatToUser(userId: number) {
   try {
-    const data = await $fetch('/api/conversation/create', {
+    const data = await $fetch<ConversationWithUserAndMessages>('/api/conversation/create', {
       method: 'POST',
       body: {
         receiverId: userId,
@@ -236,7 +237,11 @@ async function chatToUser(userId: number) {
       },
     })
     if (data) {
-      fetchConversations()
+      const messageToSend = {
+        to: data.receiver.id,
+        message: 'Chat initiated',
+      }
+      send(JSON.stringify(messageToSend))
     } else {
       console.error('No chat found')
     }
@@ -309,10 +314,6 @@ async function replyToMessage(conversationId: number, message: string) {
     }
 
     send(JSON.stringify(messageToSend))
-    // Clear the state message input after sending
-    
-    // TODO: Update the conversation not ALL conversations
-    fetchConversations()
   } catch (err) {
     console.error('Error sending reply:', err)
   }
