@@ -1,4 +1,3 @@
-// MapTiler SDK initialization plugin
 import * as maptilersdk from '@maptiler/sdk';
 
 export default defineNuxtPlugin(() => {

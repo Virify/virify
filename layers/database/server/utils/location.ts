@@ -3,7 +3,6 @@ import type { AddressLocation } from "~~/shared/types/location";
 import { prepareFullTextSearch } from "./address";
 import type { PropertySearchResult } from "~~/shared/types/property";
 import { Prisma } from "@prisma/client";
-
 /**
  * Convert meters to miles. For PostGIS, we need to convert meters to miles.
  *
@@ -95,6 +94,23 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
       )
     `
   );
+}
+
+/**
+ * Get property IDs strictly within a GeoJSON polygon (geometry).
+ * Uses PostGIS ST_Within and ST_GeomFromGeoJSON for strict-in-polygon filtering.
+ * @param geometry GeoJSON Polygon
+ * @returns List of property IDs strictly within the polygon
+ */
+export async function getPropertyIdsByPolygon(geometry: { type: "Polygon"; coordinates: number[][][] }): Promise<PropertySearchResult> {
+  if (!geometry || geometry.type !== "Polygon" || !geometry.coordinates?.length) return [];
+  const geojson = JSON.stringify(geometry);
+  return await prisma.$queryRawUnsafe(`
+    SELECT p.id as "propertyId"
+    FROM "Property" p
+    JOIN "Address" a ON p."addressId" = a.id
+    WHERE ST_Within(a.location, ST_GeomFromGeoJSON('${geojson}'))
+  `);
 }
 
 /**

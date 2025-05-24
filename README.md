@@ -1,174 +1,154 @@
-# Virify API
+# Virify
 
-## System setup with Docker
+A modern property management and listing platform built with Nuxt 3, featuring an extensible layer-based architecture.
 
-If using Docker you have a one-step setup to get up and running. Simply populate your `.env` file and run:
-```shell
+## 📋 Overview
+
+Virify is a comprehensive property management system that allows users to:
+- List and manage properties
+- Search properties with interactive maps
+- Save favorites and add notes
+- Handle user authentication
+- Send automated emails
+- Process and display property media
+
+## 🏗 Architecture
+
+The application is built using a modular layer architecture for better separation of concerns and maintainability:
+
+### Core Layers
+- [Auth Layer](./layers/auth/README.md) - Authentication and authorization
+- [Database Layer](./layers/database/README.md) - Prisma ORM and PostgreSQL integration
+- [Email Layer](./layers/email/README.md) - Transactional emails with Vue Email and AWS SES
+- [Map Layer](./layers/map/README.md) - MapTiler integration for property locations
+- [UI Layer](./layers/ui/README.md) - Reusable component library and design system
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- PostgreSQL
+- pnpm
+- Docker (optional)
+
+### Quick Start with Docker
+
+1. Create and configure your `.env` file:
+```bash
+cp .env.example .env
+```
+
+2. Start the application:
+```bash
 make up
 ```
-To get started. You can then enter the container by running:
-```shell
+
+3. Access the container shell:
+```bash
 make exec
 ```
-Or to enter the database container by running:
-```shell
-make exec-db
-```
-From here you can run the normal commands for working with Nuxt and Postgres.
 
-## Non-Docker System Dependencies
+### Manual Setup
 
-*Node*
-[WSL Install](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl#install-nvm-nodejs-and-npm)  
-[windows install](https://nodejs.org/en/download)
-[brew install](https://formulae.brew.sh/formula/node)
-
-*Postgresql*
-Guide below
-
-## Nuxt Server
-
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
-### Setup
-
-Make sure to install dependencies:
-
+1. Install dependencies:
 ```bash
-# pnpm
 pnpm install
 ```
 
-### Development Server
-
-Start the development server on `http://localhost:3000`:
-
+2. Set up your database:
 ```bash
-# pnpm
+# Generate Prisma client
+pnpm pgen
+
+# Run migrations
+pnpm prisma migrate dev
+
+# Seed the database
+pnpm seed
+```
+
+3. Start the development server:
+```bash
 pnpm dev
-
 ```
 
-### Production
+## 🛠 Development
 
-Build the application for production:
+### Available Scripts
 
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm preview` - Preview production build
+- `pnpm test` - Run tests
+- `pnpm test:full` - Run all tests including E2E
+- `pnpm pgen` - Generate Prisma client
+- `pnpm db-push` - Push database changes
+- `pnpm seed` - Seed the database
+
+### Docker Commands
+
+- `make up` - Start containers
+- `make down` - Stop containers
+- `make exec` - Enter app container
+- `make exec-db` - Enter database container
+
+## 📁 Project Structure
+
+```
+├── app/                  # Main application code
+│   ├── components/       # Vue components (atoms, molecules, organisms)
+│   ├── composables/      # Vue composables
+│   ├── pages/           # Page components
+│   └── plugins/         # Nuxt plugins
+├── layers/              # Feature layers
+│   ├── auth/           # Authentication layer
+│   ├── database/       # Database layer
+│   ├── email/          # Email functionality
+│   ├── map/            # Map integration
+│   └── ui/             # UI components
+├── server/             # Server-side code
+├── shared/             # Shared types and utilities
+└── public/             # Static assets
+```
+
+## 🧪 Testing
+
+Run tests using:
 ```bash
-# pnpm
-pnpm build
+# Unit tests
+pnpm test
 
+# Full test suite including E2E
+pnpm test:full
 ```
 
-Locally preview production build:
+## 📚 Documentation
 
-```bash
-# pnpm
-pnpm preview
+Each layer contains its own documentation:
+- [Auth Layer Documentation](./layers/auth/README.md)
+- [Database Layer Documentation](./layers/database/README.md)
+- [Email Layer Documentation](./layers/email/README.md)
+- [Map Layer Documentation](./layers/map/README.md)
+- [UI Layer Documentation](./layers/ui/README.md)
 
-```
+## 🔐 Environment Variables
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information
+Required environment variables:
+- `DATABASE_URL` - PostgreSQL connection string
+- `MAPTILER_API_KEY` - MapTiler API key
+- `AWS_ACCESS_KEY_ID` - AWS access key for SES
+- `AWS_SECRET_ACCESS_KEY` - AWS secret for SES
+- `AWS_REGION` - AWS region for SES
+- `SESSION_SECRET` - Secret for session management
 
-## Prisma
+## 🤝 Contributing
 
-We are using postgresql for our database. Before moving ahead with running migrations etc, you need to have postgresql installed (brew, linux, windows - does not matter)
+1. Ensure you have the required dependencies installed
+2. Create a feature branch
+3. Make your changes
+4. Write/update tests
+5. Update documentation
+6. Submit a pull request
 
-### Install Postgres
+## 📜 License
 
-#### MacOS
-
-Install via homebrew - and follow instructions in terminal
-
-```bash
-brew install postgresql
-```
-
-#### Windows / WSL
-
-Install postgres via Ubnuntu:
-
-```bash
-sudo apt-get install postgresql
-```
-
-Start the service:
-
-```bash
-sudo service postgresql start
-```
-
-#### Create user and database
-
-Create a new user and database:
-
-```bash
-sudo -u postgres psql postgres
-create role NAME with password 'PASSWORD' superuser login;
-create database DATABASE_NAME;
-```
-
-You now have created a database and user ready for Prisma.
-
-#### Add connection url
-
-You connect to the database in Prisma via connectionUrl. This is in project root `./env`
-
-`DATABASE_URL="postgres://USER@PASSWORDlocalhost:5432/DATABASENAME"`
-
-Now Prisma can connect to the database
-
-### CLI and Migrations
-
-Check our the migrations fundementals [here](https://www.prisma.io/docs/orm/prisma-migrate/getting-started)
-
-### Run Migrations
-
-```bash
-pnpm migrations-run
-```
-
-### Create a migration
-
-When you make any changes to the database and structure, create a new migration
-
-```bash
-pnpm migrations-run --name NEW_MIGRATION_NAME
-```
-
-### Schemaa
-
-Schemas are models that are used to map tables and columns. The schemas can be located here: `./server/prisma/`.
-
-**note**: They are auto imported and loaded via Prisma
-
-### Prisma Client
-
-Prisma as a ORM generates a client very specific to your schemas, before you make queries you need to generate a new client and if there are changes to the model/schema.
-
-Example:
-
-```bash
-pnpm prisma-generate
-```
-
-This will generate a client to be used then you can build the application and use it globally
-
-```bash
-pnpm run dev
-```
-
-Once generated the client becomes available globally. This is auto-imported into your nuxt application so call it by `prisma`
-
-```typescript
-const users = await prisma.user.findMany();
-```
-
-### Prisma Studio
-
-Prisma offer visual application [here](https://github.com/prisma/studio)
-
-This is disabled on build due to changes to our structure but you can run it by:
-
-```bash
-pnpm pnpm prisma-studio
-```
+Proprietary - All rights reserved
