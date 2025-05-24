@@ -54,6 +54,7 @@
 import type { ConversationWithUserAndMessages } from '~~/shared/types/conversation'
 import { useWebSocket } from '@vueuse/core'
 import type { ListingWithFullProperty } from '~~/shared/types/listing'
+const config = useRuntimeConfig();
 
 /**
  * State
@@ -73,7 +74,8 @@ let open = () => { }
 let close = () => { }
 
 if (import.meta.client) {
-  const socket = useWebSocket('ws://localhost:3000/api/_ws/conversation', {
+  // TODO: Add the BASE_URL to the WebSocket URL
+  const socket = useWebSocket(config.public.WS_BASE_URL + '/api/_ws/conversation', {
     autoConnect: true,
     immediate: true,
     autoClose: false,
