@@ -33,15 +33,16 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
 }>;
 
 /**
- * Buy or Rent 
+ * Buy or Rent
  */
 export type ListingSearch = {
   type: "buy" | "rent";
-  coordinates: {
+  coordinates?: {
     lat: number;
     lon: number;
   };
-  radius: number;
+  radius?: number;
+  geometry?: GeoJSONPolygon; // Add support for strict polygon search
 };
 
 /**
@@ -57,10 +58,9 @@ export type ListingSearchOptional = {
   featured?: Record<string, Record<string, boolean>>;
   take?: number | undefined;
   skip?: number | undefined;
-}
+};
 
 export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilityStatus | (SaleAvailabilityStatus | RentalAvailabilityStatus)[];
-
 
 /**
  * Listing Card Select Object
@@ -141,4 +141,9 @@ export type ListingCardType = Prisma.ListingGetPayload<{
   select: typeof listingCardFields;
 }> & {
   distanceMiles?: number;
+};
+
+export type GeoJSONPolygon = {
+  type: "Polygon";
+  coordinates: number[][][];
 };

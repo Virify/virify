@@ -73,16 +73,16 @@
       <!-- Map -->
       <div class="p-listing-map-container">
         <h2 class="title-md">Map</h2>
-        <OrganismsMap
-          v-if="property?.address?.lat && property?.address?.lon"
-          :markers="propertyMarkers"
-          :zoom="15"
-          :center="{ lat: property.address.lat, lon: property.address.lon }"
-          :interactive="false"
-          :mapId="GLOBAL_MAP_ID"
-          customClass="p-listing-map-inner"
-          :displayPopups="false"
-        />
+        <div v-if="property?.address?.lat && property?.address?.lon" class="p-listing-map-inner">
+          <Map
+            ref="mapRef"
+            :marker="listing"
+            :zoom="15"
+            :center="[property.address.lon, property.address.lat]"
+            :interactive="false"
+            :mapId="GLOBAL_MAP_ID"
+          />
+        </div>
       </div>
 
       <!-- Descriptions -->
@@ -380,17 +380,19 @@
 </template>
 
 <script setup lang="ts">
-import type { ListingWithFullProperty } from "~~/shared/types/listing";
-import { formatMDY } from "~~/shared/utils/format-date";
+import type { MapMarker } from '~~/shared/types/map';
 
 const route = useRoute();
 const listingId = route.params.id as string;
+const listing = ref<ListingWithFullProperty | null>(null);
 const url: string = `/api/listing/${listingId}`;
 const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullProperty>(url));
-const listing = computed(() => data.value);
+if (data.value) {
+  listing.value = data.value;
+}
 const property = computed(() => {
-  if (!data.value || !data.value.property) return undefined;
-  return data.value.property as typeof data.value.property & { Land?: any };
+  if (!listing.value || !listing.value.property) return undefined;
+  return listing.value.property as typeof listing.value.property & { Land?: any };
 });
 const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
 
@@ -493,13 +495,11 @@ const propertyMarkers = computed<MapMarker[]>(() => {
 }
 
 .p-listing-map-inner {
-  min-height: 300px;
-  height: 40vh;
-  max-height: 500px;
+  height:300px;
   width: 100%;
   border-radius: var(--border-radius-lg);
-  overflow: hidden;
   border: 1px solid var(--background-300);
+  position: relative;
 }
 
 /* Feature sections container */

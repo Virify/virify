@@ -5,7 +5,8 @@ export default defineNuxtConfig({
     "./layers/ui",
     "./layers/email",
     "./layers/database",
-    './layers/auth'
+    './layers/auth',
+    './layers/map'
   ],
   future: {
     compatibilityVersion: 4,
@@ -13,7 +14,7 @@ export default defineNuxtConfig({
   modules: ["@nuxt/image", "@nuxt/icon"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  css: ["~/assets/css/main.css", "@maptiler/sdk/dist/maptiler-sdk.css"],
+  css: ["~/assets/css/main.css"],
   vite: {
     plugins: [tailwindcss()],
   },
@@ -26,12 +27,5 @@ export default defineNuxtConfig({
       // @ts-ignore
       plugins: [vue()],
     }
-  },
-  runtimeConfig: {
-    public: {
-      NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
-      MAPTILER_API_KEY: process.env.MAPTILER_API_KEY,
-      MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
-    },
   },
 });

@@ -2,7 +2,9 @@
   <div class="| container flow flow-lg">
     <h1 class="| title-md">Form tests</h1>
 
-    <p>Testing interactive form elements</p>
+    <div class="| flow">
+      <p>Testing interactive form elements and components</p>
+    </div>
 
     <h2 class="| title-sm">Multi-select</h2>
 
@@ -44,7 +46,39 @@ function allSelected() {
   console.log('Selected')
 }
 
-function toggleExpanded(newValue) {
+function toggleExpanded(newValue: any) {
   console.log('Accordion expanded', newValue)
 }
 </script>
+
+<style scoped>
+.demo-nav {
+  margin-top: var(--size-16);
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: #3388ff;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #2779e4;
+}
+</style>
