@@ -13,6 +13,11 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   nitro: {
+    preset: "cloudflare_module",
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true
+    },
     experimental: {
       openAPI: true,
       tasks: true,
