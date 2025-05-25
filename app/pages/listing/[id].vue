@@ -23,10 +23,7 @@
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" />
 
           <OrganismsListingSection v-if="property">
-            <h3 class="| title-xs">Map and location</h3>
-
-            <OrganismsMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat"
-              :lon="property.address.lon" :zoom="15" :interactive="false" />
+            <OrganismsListingSectionLocation :lat="property?.address?.lat" :lon="property?.address?.lon" />
           </OrganismsListingSection>
 
           <OrganismsListingSection v-if="bedroomFeatures" accordion-label="Bedroom Features" start-expanded>
