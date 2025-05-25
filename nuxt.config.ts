@@ -1,13 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 export default defineNuxtConfig({
-  extends: [
-    "./layers/ui",
-    "./layers/email",
-    "./layers/database",
-    './layers/auth',
-    './layers/map'
-  ],
+  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map"],
   future: {
     compatibilityVersion: 4,
   },
@@ -23,9 +17,14 @@ export default defineNuxtConfig({
       openAPI: true,
       tasks: true,
     },
+    preset: "cloudflare_module",
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true,
+    },
     rollupConfig: {
       // @ts-ignore
       plugins: [vue()],
-    }
+    },
   },
 });
