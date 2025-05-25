@@ -174,7 +174,7 @@ const debugContent = computed(() => {
   &__grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--size-32);
+    gap: calc(var(--container-padding) / 2);
     align-items: flex-start;
 
     @include mq.not-notebook {
@@ -190,12 +190,10 @@ const debugContent = computed(() => {
     }
 
     @include mq.notebook {
-      gap: var(--size-40);
       grid-template-columns: 1fr 18em;
     }
 
     @include mq.desktop {
-      gap: var(--size-56);
       grid-template-columns: 1fr 20em;
     }
   }
