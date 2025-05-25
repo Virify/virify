@@ -12,7 +12,7 @@
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
-        <div class="p-listing__content | flow flow-2xl">
+        <div class="p-listing__content | flow flow-sm">
           <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
             role="presentation">
             <skeleton-loader class="p-listing__main-carousel-skeleton">
@@ -22,8 +22,34 @@
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" />
 
-          <h3 class="| title-sm">Property</h3>
-          <pre class="| body-sm">{{ property }}</pre>
+          <OrganismsListingSection v-if="property">
+            <h3 class="| title-xs">Map and location</h3>
+
+            <OrganismsMap v-if="property?.address?.lat && property?.address?.lon" :lat="property.address.lat"
+              :lon="property.address.lon" :zoom="15" :interactive="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="bedroomFeatures" accordion-label="Bedroom Features" start-expanded>
+            <pre>{{ bedroomFeatures }}</pre>
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="bathroomFeatures" accordion-label="Bathroom Features">
+            <pre>{{ bathroomFeatures }}</pre>
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="additionalFeatures" accordion-label="Additional Features">
+            <pre>{{ additionalFeatures }}</pre>
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="accessibilityFeatures" accordion-label="Accessibility Features">
+            <pre>{{ accessibilityFeatures }}</pre>
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="energyAndUtilities">
+            <h3 class="| title-xs">Energy and Utilities</h3>
+
+            <pre>{{ energyAndUtilities }}</pre>
+          </OrganismsListingSection>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
@@ -79,6 +105,36 @@ const priceFormatted = computed(() => {
   const { price } = asObject(listing.value)
 
   return isNumber(price) ? numberToCurrency(price) : ''
+})
+
+const bedroomFeatures = computed(() => {
+  const { bedroomFeatures } = asObject(listing.value?.property)
+
+  return Array.isArray(bedroomFeatures) && bedroomFeatures
+})
+
+const bathroomFeatures = computed(() => {
+  const { bathroomFeatures } = asObject(listing.value?.property)
+
+  return Array.isArray(bathroomFeatures) && bathroomFeatures
+})
+
+const additionalFeatures = computed(() => {
+  const { additionalFeatures } = asObject(listing.value?.property)
+
+  return isObject(additionalFeatures) && additionalFeatures
+})
+
+const accessibilityFeatures = computed(() => {
+  const { accessibilityFeatures } = asObject(listing.value?.property)
+
+  return isObject(accessibilityFeatures) && accessibilityFeatures
+})
+
+const energyAndUtilities = computed(() => {
+  const { energyAndUtilities } = asObject(listing.value?.property)
+
+  return isObject(energyAndUtilities) && energyAndUtilities
 })
 
 /**
@@ -159,7 +215,7 @@ const debugContent = computed(() => {
 
   return {
     ...data,
-    property: excludeKeys(data?.property || {}, ['media'])
+    property: excludeKeys(data?.property || {}, ['media', 'bedroomFeatures', 'bathroomFeatures', 'additionalFeatures', 'accessibilityFeatures'])
   }
 })
 
