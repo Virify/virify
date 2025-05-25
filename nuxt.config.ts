@@ -17,11 +17,6 @@ export default defineNuxtConfig({
       openAPI: true,
       tasks: true,
     },
-    preset: "cloudflare_module",
-    cloudflare: {
-      deployConfig: true,
-      nodeCompat: true,
-    },
     rollupConfig: {
       // @ts-ignore
       plugins: [vue()],
