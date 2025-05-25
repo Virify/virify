@@ -33,6 +33,8 @@ const validatedSlides = computed(() => {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .o-listing-carousel {
 
   &__image {
@@ -40,6 +42,10 @@ const validatedSlides = computed(() => {
     object-fit: cover;
     aspect-ratio: var(--aspect-ratio);
     max-height: 70vh;
+
+    @include mq.notebook {
+      max-height: none;
+    }
   }
 }
 </style>

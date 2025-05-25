@@ -202,7 +202,7 @@ const debugContent = computed(() => {
    *  Content wrappers
    */
   &__mobile-overview {
-    @include mq.tablet {
+    @include mq.notebook {
       display: none;
     }
   }
