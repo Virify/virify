@@ -2,7 +2,6 @@
   "name": "virify",
   "private": true,
   "type": "module",
-  "engines:node": ">=22.0.0",
   "scripts": {
     "build": "prisma generate && nuxt build",
     "dev": "nuxt dev",
@@ -13,7 +12,8 @@
     "db-push": "prisma db push",
     "seed": "tsx ./layers/database/server/database/prisma/seed.ts",
     "test": "vitest run --exclude=\"**/*.e2e.test.ts\"",
-    "test:full": "vitest run"
+    "test:full": "vitest run",
+    "start":"node .output/server/index.mjs"
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/",
