@@ -2,6 +2,7 @@ import { Marker } from "@maptiler/sdk";
 import type { MapMarker, ExtendedMapTilerMap, MapInstance, MapInitOptions, GeocodingFeature, GeocodingResponse } from "~~/shared/types/map";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import "@maptiler/sdk/dist/maptiler-sdk.css";
 import { setControls, findMapInstance, renderMarker, renderPopup, styles, calculateZoomLevelFromRadius } from "../utils/mapHelpers";
 
 /**

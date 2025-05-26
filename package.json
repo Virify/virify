@@ -12,7 +12,8 @@
     "db-push": "prisma db push",
     "seed": "tsx ./layers/database/server/database/prisma/seed.ts",
     "test": "vitest run --exclude=\"**/*.e2e.test.ts\"",
-    "test:full": "vitest run"
+    "test:full": "vitest run",
+    "start":"node .output/server/index.mjs"
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/",
@@ -22,7 +23,6 @@
     "@aws-sdk/client-ses": "^3.799.0",
     "@mapbox/mapbox-gl-draw": "^1.5.0",
     "@maptiler/sdk": "^3.2.2",
-    "@nuxt/icon": "1.12.0",
     "@nuxt/image": "1.10.0",
     "@nuxtjs/fontaine": "0.5.0",
     "@prisma/client": "6.4.1",
