@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      WS_BASE_URL: process.env.WS_BASE_URL || process.env.PREVIEW_WS_BASE_URL,
+      WS_BASE_URL: process.env.RAILWAY_PUBLIC_DOMAIN ? 'wss://' + process.env.RAILWAY_PUBLIC_DOMAIN : process.env.WS_BASE_URL,
     }
   }
 });
