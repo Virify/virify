@@ -88,17 +88,18 @@ function findPeers(userId: number): Set<Peer> | undefined {
 function sendMessageToPeer(message: any) {
   const parsedMessage = JSON.parse(message);
   const recipientId = parsedMessage.to;
-  const messageContent = parsedMessage.message;
+  
   // find the recipient peers in the map
   const recipientPeers = findPeers(recipientId);
   if (!recipientPeers) {
     console.log(`No peers found for recipient ${recipientId}`);
     return;
   }
-  // get all peers that are connected to the recipient (different tabs/windwow etc)
-  console.log(`Sending message to peer ${recipientId}: ${messageContent}`);
+  
+  // Send the complete message object instead of just the content
+  console.log(`Sending message to peer ${recipientId}:`, parsedMessage);
   for (const peer of recipientPeers) {
-    peer.send(messageContent);
+    peer.send(JSON.stringify(parsedMessage));
   }
 }
 

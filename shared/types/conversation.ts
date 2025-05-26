@@ -22,12 +22,12 @@ export type ConversationWithUserAndMessages = {
       id: number;
       username: string | null;
       email: string;
-    },
+    };
     receiver: {
       id: number;
       username: string | null;
       email: string;
-    },
+    };
   }[];
   sender: {
     id: number;
@@ -38,5 +38,24 @@ export type ConversationWithUserAndMessages = {
     id: number;
     username: string | null;
     email: string;
-  };  
-}
+  };
+};
+
+export type MessageWithUser = {
+  id: number;
+  senderId: number;
+  receiverId: number;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  sender: {
+    id: number;
+    username: string | null;
+    email: string;
+  };
+  receiver: {
+    id: number;
+    username: string | null;
+    email: string;
+  };
+};

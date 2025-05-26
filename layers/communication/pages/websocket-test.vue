@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ConversationWithUserAndMessages } from '~~/shared/types/conversation'
+import { type ConversationWithUserAndMessages, type MessageWithUser } from '~~/shared/types/conversation'
 import { useWebSocket } from '@vueuse/core'
 import type { ListingWithFullProperty } from '~~/shared/types/listing'
 const config = useRuntimeConfig();
@@ -74,7 +74,6 @@ let open = () => { }
 let close = () => { }
 
 if (import.meta.client) {
-  // TODO: Add the BASE_URL to the WebSocket URL
   const socket = useWebSocket(config.public.WS_BASE_URL + '/api/_ws/conversation', {
     autoConnect: true,
     immediate: true,
@@ -88,13 +87,21 @@ if (import.meta.client) {
     },
   })
 
+  /**
+   * When we get a message from the WebSocket we update the specific conversation
+   */
   watchEffect(() => {
     status.value = socket.status.value
     const incoming = socket.data.value
     if (incoming) {
       console.log('Incoming message from WS:', incoming)
-      // TODO: Need fetch the messages frmo the conversation updating NOT ALL conversations every time.
-      fetchConversations()
+      try {
+        // Parse the JSON message from WebSocket
+        const messageData = JSON.parse(incoming)
+        handleIncomingMessage(messageData)
+      } catch (error) {
+        console.error('Error parsing incoming message:', error)
+      }
     }
     nextTick(() => {
       window.scrollTo({
@@ -163,6 +170,48 @@ const messageFormattedTime = (createdAt: any) => {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+/**
+ * Handle incoming WebSocket message by updating the conversation locally
+ * 
+ * @param messageData - The parsed message data from WebSocket
+ */
+const handleIncomingMessage = (messageData: any) => {
+  console.log('Handling incoming message:', messageData)
+  
+  if (messageData.type === 'typing') {
+    // Handle typing indicators
+    console.log('User is typing:', messageData)
+  } else if (messageData.type === 'read') {
+    // Handle read receipts
+    console.log('Message read:', messageData)
+  } else if (messageData.conversationId && messageData.newConversation) {
+    // Handle new conversation creation
+    console.log('Adding new conversation:', messageData.conversationId)
+    conversations.value.unshift(messageData.newConversation)
+  } else if (messageData.conversationId && messageData.messageData) {
+    // Handle complete message objects - update the specific conversation
+    console.log('Updating conversation locally:', messageData.conversationId)
+    updateConversationWithMessage(messageData)
+  } else {
+    console.log('Unknown message format:', messageData)
+  }
+}
+
+/**
+ * Update a specific conversation with a new message
+ * 
+ * @param messageData - The complete message data
+ */
+const updateConversationWithMessage = (messageData: any) => {
+  const conversation = conversations.value.find(convo => convo.id === messageData.conversationId)
+  if (conversation) {
+    console.log('Found conversation, adding message:', messageData.messageData)
+    conversation.messages.push(messageData.messageData)
+  } else {
+    console.log('Conversation not found, ID:', messageData.conversationId)
+  }
 }
 
 /**
@@ -239,11 +288,21 @@ async function chatToUser(userId: number) {
       },
     })
     if (data) {
+      // Get the first message from the newly created conversation
+      const firstMessage = data.messages[0]
+      
       const messageToSend = {
         to: data.receiver.id,
         message: 'Chat initiated',
+        conversationId: data.id,
+        messageData: firstMessage,
+        newConversation: data // Include the full conversation for new conversations
       }
       send(JSON.stringify(messageToSend))
+
+      // Add the new conversation to the list
+      conversations.value.push(data)
+
     } else {
       console.error('No chat found')
     }
@@ -276,9 +335,19 @@ async function sendEnquiry() {
       },
     })
     console.log('Enquiry sent:', response)
+
+    // Update the conversation with the new message
+    conversations.value.push(response)
+
+    // Get the first message from the newly created conversation
+    const firstMessage = response.messages[0]
+    
     send(JSON.stringify({
       to: response.receiver.id,
       message: enquiryMessage.value,
+      conversationId: response.id,
+      messageData: firstMessage,
+      newConversation: response // Include the full conversation for new conversations
     }))
     enquiryMessage.value = ''
   } catch (err) {
@@ -293,29 +362,38 @@ async function sendEnquiry() {
  * @param receiverId - The ID of the receiver
  * @param message - The message to send
  */
-async function replyToMessage(conversationId: number, message: string) {
+async function replyToMessage(conversationId: number, content: string) {
   console.log('Replying to message:', {
     conversationId,
-    message,
+    message: content,
   })
 
   try {
-    const response = await $fetch('/api/conversation/reply', {
+    const response = await $fetch<MessageWithUser>('/api/conversation/reply', {
       method: 'POST',
       body: {
-        message,
+        message: content,
         conversationId,
       },
     })
-    console.log('Reply sent:', response)
+    const formattedResponse = {
+      ...response
+    }
+
+    // Update the conversation with the new message
+    conversations.value.find(convo => convo.id === conversationId)?.messages.push(formattedResponse)
+
 
     // string already validated in the backend via zod
     const messageToSend = {
       to: response.receiverId,
-      message: message,
+      message: content,
+      conversationId: conversationId,
+      messageData: formattedResponse
     }
 
     send(JSON.stringify(messageToSend))
+    message.value = ''
   } catch (err) {
     console.error('Error sending reply:', err)
   }

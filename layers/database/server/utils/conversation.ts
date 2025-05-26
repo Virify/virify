@@ -1,5 +1,5 @@
 import type { Message } from "@prisma/client";
-import type { ConversationWithMessages, ConversationWithUserAndMessages } from "~~/shared/types/conversation";
+import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
 
 /**
  * Create a conversation
@@ -76,17 +76,16 @@ export async function createConversation(senderId: number, receiverId: number, m
  * @param conversationId conversation ID
  * @param senderId message sender ID
  * @param messageContent string message content
- * @returns the receiver ID to be used in the websocket
+ * @returns The message created in the conversation
  */
-export async function replyToConversation(conversationId: number, messageContent: string, senderId: number) {
+export async function replyToConversation(conversationId: number, messageContent: string, senderId: number): Promise<MessageWithUser> {
   return await prisma.$transaction(async (tx) => {
     // First get the conversation for validation and to determine the receiver
     const conversation = await tx.conversation.findUnique({
       where: { id: conversationId },
       select: {
-        senderId: true,
-        receiverId: true,
-      },
+        ...conversationWithUserAndMessages
+      }
     });
 
     if (!conversation) {
@@ -94,24 +93,41 @@ export async function replyToConversation(conversationId: number, messageContent
     }
 
     // Set the receiverId as the opposite of the sender
-    const receiverId = senderId === conversation.senderId ? conversation.receiverId : conversation.senderId;
+    const receiverId = senderId === conversation.sender.id ? conversation.receiver.id : conversation.sender.id;
 
-    // Now update the conversation with the new message
-    const message = await tx.conversation.update({
-      where: { id: conversationId },
+    // Create the message directly
+    const newMessage = await tx.message.create({
       data: {
-        messages: {
-          create: {
-            senderId,
-            receiverId,
-            content: messageContent,
+        senderId,
+        receiverId,
+        content: messageContent,
+        conversationId,
+      },
+      select: {
+        id: true,
+        senderId: true,
+        receiverId: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
           },
         },
       },
     });
-    return {
-      receiverId,
-    };
+
+    return newMessage
   });
 }
 
@@ -127,48 +143,7 @@ export async function getConversationsByUserId(userId: number): Promise<Conversa
       OR: [{ senderId: userId }, { receiverId: userId }],
     },
     select: {
-      id: true,
-      listingId: true,
-      createdAt: true,
-      updatedAt: true,
-      messages: {
-        select: {
-          id: true,
-          senderId: true,
-          receiverId: true,
-          content: true,
-          createdAt: true,
-          updatedAt: true,
-          sender: {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-            },
-          },
-          receiver: {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-      sender: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-        },
-      },
-      receiver: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-        },
-      },
+      ...conversationWithUserAndMessages,
     },
     orderBy: {
       updatedAt: "desc",
@@ -193,7 +168,15 @@ export async function getConversationById(conversationId: number, userId: number
       ]
     },
     select: {
-      id: true,
+      ...conversationWithUserAndMessages,
+    },
+  });
+
+  return conversation;
+}
+
+export const conversationWithUserAndMessages = {
+  id: true,
       listingId: true,
       createdAt: true,
       updatedAt: true,
@@ -235,8 +218,4 @@ export async function getConversationById(conversationId: number, userId: number
           email: true,
         },
       },
-    },
-  });
-
-  return conversation;
 }
