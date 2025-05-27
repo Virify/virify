@@ -30,7 +30,7 @@
         </button>
       </div>
     </div>
-    <div v-else class="o-messages-panel-placeholder | box text-center p-8">
+    <div v-else class="o-messages-panel-placeholder">
       <p class="body-lg">Select a conversation to view messages.</p>
     </div>
   </div>
@@ -144,10 +144,11 @@ defineExpose({ scrollToBottom });
 
 .o-messages-panel-placeholder {
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: center;
   height: 200px;
+  padding: 32px;
+  text-align: center;
   background-color: var(--background-100);
-  border-radius: var(--border-radius-lg);
 }
 </style>

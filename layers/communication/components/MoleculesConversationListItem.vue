@@ -1,6 +1,6 @@
 <template>
   <li
-    class="m-conversation-list-item | body-md box cursor-pointer"
+    class="m-conversation-list-item | body-md box"
     :class="{ 'active': isActive }"
     @click="emitSelectConversation"
   >
@@ -11,7 +11,7 @@
         <p class="body-xs m-last-message-content">{{ lastMessageContent }}</p>
       </div>
     </div>
-    <p class="body-sm m-conversation-time">{{ lastMessageTime }}</p>
+    <p class="m-conversation-time | body-sm ">{{ lastMessageTime }}</p>
   </li>
 </template>
 

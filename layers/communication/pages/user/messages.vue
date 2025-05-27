@@ -1,6 +1,6 @@
 <template>
   <div class="p-messages | container">
-    <h1 class="title-md">Messages</h1>
+    <h1 class="| title-md">Messages</h1>
     <div class="p-messages-layout">
       <!-- Left Column: Conversations List -->
       <ul class="p-conversations-column">
@@ -31,9 +31,7 @@
 <script setup lang="ts">
 import { type ConversationWithUserAndMessages, type MessageWithUser } from '~~/shared/types/conversation'
 import { useWebSocket } from '@vueuse/core'
-
 import { parseWebSocketMessage, processIncomingMessage, type MessageHandlerResult } from '../../utils/websocket';
-
 const config = useRuntimeConfig();
 
 /**
