@@ -10,10 +10,10 @@ import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared
  * @param messageContent Message content
  * @returns
  */
-export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number,): Promise<ConversationWithUserAndMessages | Message> {
+export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number): Promise<ConversationWithUserAndMessages | Message> {
   return await prisma.conversation.create({
     data: {
-      ...( listingId ? { listing: { connect: { id: listingId } } } : {} ),
+      ...(listingId ? { listing: { connect: { id: listingId } } } : {}),
       sender: { connect: { id: senderId } },
       receiver: { connect: { id: receiverId } },
       messages: {
@@ -84,8 +84,8 @@ export async function replyToConversation(conversationId: number, messageContent
     const conversation = await tx.conversation.findUnique({
       where: { id: conversationId },
       select: {
-        ...conversationWithUserAndMessages
-      }
+        ...conversationWithUserAndMessages,
+      },
     });
 
     if (!conversation) {
@@ -127,7 +127,7 @@ export async function replyToConversation(conversationId: number, messageContent
       },
     });
 
-    return newMessage
+    return newMessage;
   });
 }
 
@@ -162,10 +162,7 @@ export async function getConversationById(conversationId: number, userId: number
   const conversation = await prisma.conversation.findFirst({
     where: {
       id: conversationId,
-      OR: [
-        { senderId: userId },
-        { receiverId: userId }
-      ]
+      OR: [{ senderId: userId }, { receiverId: userId }],
     },
     select: {
       ...conversationWithUserAndMessages,
@@ -177,33 +174,17 @@ export async function getConversationById(conversationId: number, userId: number
 
 export const conversationWithUserAndMessages = {
   id: true,
-      listingId: true,
+  listingId: true,
+  createdAt: true,
+  updatedAt: true,
+  messages: {
+    select: {
+      id: true,
+      senderId: true,
+      receiverId: true,
+      content: true,
       createdAt: true,
       updatedAt: true,
-      messages: {
-        select: {
-          id: true,
-          senderId: true,
-          receiverId: true,
-          content: true,
-          createdAt: true,
-          updatedAt: true,
-          sender: {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-            },
-          },
-          receiver: {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
       sender: {
         select: {
           id: true,
@@ -218,4 +199,25 @@ export const conversationWithUserAndMessages = {
           email: true,
         },
       },
-}
+    },
+  },
+  sender: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  },
+  receiver: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  },
+  listing: {
+    select: {
+      ...listingCardFields,
+    }
+  }
+};

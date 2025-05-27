@@ -2,6 +2,19 @@
   <div class="o-active-chat-panel">
     <div v-if="conversation" class="o-messages-panel-content">
       <ul ref="messagesListRef" class="o-messages-list">
+        <div v-if="conversation.listing" class="o-conversation-header">
+          <NuxtLink
+            :to="`/listing/${conversation.listing.id}`"
+            class="o-conversation-link | body-sm"
+            target="_blank"
+            >
+            <h2 class="| title-xs">Enquiry: {{ conversation.listing?.property?.address?.fullAddress || 'No address provided' }}</h2>
+          </NuxtLink>
+          <div class="o-conversation-price-type">
+            <p class="title-xs">{{ formattedPrice }}</p>
+            <p class="body-xs">{{ convertEnumToString(priceType) }}</p>
+          </div>
+        </div>
         <MoleculesMessageBubble
           v-for="(message) in conversation.messages"
           :key="message.id"
@@ -66,6 +79,14 @@ const scrollToBottom = () => {
   });
 };
 
+const priceType = computed(() => {
+  return props.conversation?.listing?.saleListing?.priceType ?? props.conversation?.listing?.rentalListing?.rentFrequency;
+});
+
+const formattedPrice = computed(() => {
+  return `£${parseInt(String(props.conversation.listing.price)).toLocaleString()}`
+});
+
 watch(() => props.conversation, (newConversation) => {
   if (newConversation) {
     scrollToBottom();
@@ -99,6 +120,22 @@ defineExpose({ scrollToBottom });
   flex-direction: column;
   overflow: hidden; 
   padding: 0 16px;
+}
+
+.o-conversation-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  .o-conversation-price-type {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
 }
 
 .o-messages-list {

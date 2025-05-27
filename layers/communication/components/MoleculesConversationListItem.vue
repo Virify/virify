@@ -1,17 +1,14 @@
 <template>
-  <li
-    class="m-conversation-list-item | body-md box"
-    :class="{ 'active': isActive }"
-    @click="emitSelectConversation"
-  >
+  <li class="m-conversation-list-item | body-md box" :class="{ 'active': isActive }" @click="emitSelectConversation">
     <div class="m-conversation-info">
       <AtomsIcon name="profile" icon="profile" height="24" width="24" class="m-conversation-avatar" />
       <div class="m-conversation-details">
         <strong class="body-sm">{{ conversationPartnerName }}</strong>
-        <p class="body-xs m-last-message-content">{{ lastMessageContent }}</p>
+        <p class="body-sm m-last-message-content">{{ lastMessageContent }}</p>
+        <p class="m-conversation-listing-link | body-xs">{{ conversationAddress }}</p>
       </div>
+      <p class="m-conversation-time | body-sm ">{{ lastMessageTime }}</p>
     </div>
-    <p class="m-conversation-time | body-sm ">{{ lastMessageTime }}</p>
   </li>
 </template>
 
@@ -52,6 +49,10 @@ const lastMessageTime = computed(() => {
   return lastMessage.value ? formatMessageTimestampToTime(lastMessage.value.createdAt) : '';
 });
 
+const conversationAddress = computed(() => {
+  return props.conversation.listing?.property?.address?.fullAddress || 'Direct Message';
+});
+
 function emitSelectConversation() {
   emit('select-conversation', props.conversation);
 }
@@ -60,11 +61,12 @@ function emitSelectConversation() {
 <style lang="scss" scoped>
 .m-conversation-list-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
   padding: 16px;
   background-color: var(--background-200);
-  color: var(--foreground-100);
+  color: var(--foreground-900);
   cursor: pointer;
   border-radius: var(--border-radius-md);
   gap: 8px;
@@ -72,7 +74,7 @@ function emitSelectConversation() {
 
   .m-conversation-info {
     display: flex;
-    align-items: center;
+    align-items: start;
     gap: 8px;
     flex-grow: 1;
     min-width: 0;
@@ -86,7 +88,6 @@ function emitSelectConversation() {
   }
 
   .m-last-message-content {
-    color: var(--foreground-600);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -94,7 +95,7 @@ function emitSelectConversation() {
 
   .m-conversation-time {
     white-space: nowrap;
-    margin-left: auto; 
+    margin-left: auto;
     flex-shrink: 0;
   }
 
@@ -104,18 +105,24 @@ function emitSelectConversation() {
     flex-shrink: 0;
   }
 
+  .m-conversation-listing-link {
+    padding-top: 8px;
+    text-decoration: none;
+    display: inline-block;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   &:hover {
-    background-color: var(--primary-200);
-    color: var(--foreground-900);
+    background-color: var(--primary-300);
+    color: var(--monochrome-200);
   }
 
   &.active {
     background-color: var(--primary-300);
-    color: var(--background-100);
-
-    .m-last-message-content {
-      color: var(--background-200);
-    }
+    color: var(--monochrome-100);
   }
 }
 </style>

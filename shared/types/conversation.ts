@@ -39,6 +39,9 @@ export type ConversationWithUserAndMessages = {
     username: string | null;
     email: string;
   };
+}
+& {
+  listing?: ListingCardType | null;
 };
 
 export type MessageWithUser = {

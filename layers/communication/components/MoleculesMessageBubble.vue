@@ -4,7 +4,7 @@
     class="m-message-bubble | box"
   >
     <div class="m-message-header">
-      <p class="| body-xs font-bold">{{ messageSenderName }}</p>
+      <p class="| body-xs">{{ messageSenderName }}</p>
       <p class="| body-xs">{{ formattedTimestamp }}</p>
     </div>
     <p class="| body-md">{{ message.content }}</p>
@@ -71,20 +71,17 @@ const messageClass = computed(() => {
 
 .m-message-sender {
   background: var(--background-200);
-  color: var(--foreground-100);
+  color: var(--foreground-200);
   margin-left: auto;
+  font-weight: 400; 
   border-bottom-right-radius: 0;
 }
 
 .m-message-receiver {
   background: var(--primary-300);
-  color: var(--background-100);
-  font-weight: 600; 
+  color: var(--monochrome-200);
+  font-weight: 400; 
   margin-right: auto; 
   border-bottom-left-radius: 0; 
-
-  .m-message-header p {
-    color: var(--background-200);
-  }
 }
 </style>

@@ -4,25 +4,22 @@
     <div class="p-messages-layout">
       <!-- Left Column: Conversations List -->
       <ul class="p-conversations-column">
-        <MoleculesConversationListItem
-          v-for="conversation in conversations"
+        <MoleculesConversationListItem v-for="conversation in conversations"
           :key="conversation.id"
-          :conversation="conversation"
+          :conversation="conversation" 
           :current-user-id="user?.id"
           :is-active="!!(activeConversation && activeConversation.id === conversation.id)"
-          @select-conversation="setActiveConversation"
-        />
+          @select-conversation="setActiveConversation" />
       </ul>
 
       <!-- Right Column: Active Conversation Messages -->
       <div class="p-active-chat-column">
-        <OrganismsActiveChat
-          :conversation="activeConversation"
+        <OrganismsActiveChat 
+          :conversation="activeConversation" 
           :current-user-id="user?.id"
           v-model:reply-message="message" 
           :is-send-disabled="status !== 'OPEN'"
-          @send-reply="replyToActiveConversation"
-        />
+          @send-reply="replyToActiveConversation" />
       </div>
     </div>
   </div>
@@ -94,7 +91,8 @@ if (import.meta.client) {
  */
 function setActiveConversation(conversation: ConversationWithUserAndMessages) {
   activeConversation.value = conversation
-  message.value = '' 
+  message.value = ''
+  console.log('Active conversation set:', activeConversation.value);
 }
 
 /**
@@ -222,14 +220,14 @@ async function replyToActiveConversation() {
 
     // Prepare message for WebSocket to notify other participants
     const messageToSend = {
-      to: response.receiverId, 
+      to: response.receiverId,
       message: content,
       conversationId: conversationId,
       messageData: response
     }
 
     send(JSON.stringify(messageToSend))
-    message.value = '' 
+    message.value = ''
   } catch (err) {
     console.error('Error sending reply:', err)
   }
@@ -258,7 +256,7 @@ ul {
   height: calc(100vh - 244px);
 
   @media (min-width: 768px) {
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 3fr;
   }
 }
 
