@@ -13,7 +13,7 @@
     "seed": "tsx ./layers/database/server/database/prisma/seed.ts",
     "test": "vitest run --exclude=\"**/*.e2e.test.ts\"",
     "test:full": "vitest run",
-    "start":"node .output/server/index.mjs"
+    "start": "node .output/server/index.mjs"
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/",
@@ -39,6 +39,7 @@
     "nuxi": "^3.25.0",
     "nuxt": "^3.17.1",
     "nuxt-auth-utils": "^0.5.20",
+    "nuxt-gtag": "3.0.2",
     "pg": "^8.15.6",
     "reka-ui": "^2.2.0",
     "tailwindcss": "^4.1.4",
