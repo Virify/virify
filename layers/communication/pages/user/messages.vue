@@ -235,37 +235,56 @@ async function replyToActiveConversation() {
 </script>
 
 <style lang="scss" scoped>
-p-messages div {
-  margin-bottom: 0.75em;
+.p-messages {
+  padding-top: 1rem;
+  
+  h1 {
+    margin-bottom: 1.5rem;
+  }
 }
 
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
-
-  li {
-    padding: 12px;
-  }
 }
 
 .p-messages-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
   height: calc(100vh - 244px);
-
+  
   @media (min-width: 768px) {
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 300px 1fr;
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: 350px 1fr;
   }
 }
 
 .p-conversations-column {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
   overflow-y: auto;
   height: 100%;
+  padding-right: 0.5rem;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--background-200);
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--background-300);
+    border-radius: 10px;
+  }
 }
 
 .p-active-chat-column {
