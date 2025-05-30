@@ -381,7 +381,7 @@
 
 <script setup lang="ts">
 import type { MapMarker } from '~~/shared/types/map';
-
+const { trackListingView } = useAnalytics()
 const route = useRoute();
 const listingId = route.params.id as string;
 const listing = ref<ListingWithFullProperty | null>(null);
@@ -408,6 +408,12 @@ const propertyMarkers = computed<MapMarker[]>(() => {
     hasNote: false,
     isFavorite: false
   }];
+});
+
+onMounted(() => {
+  if (route.params.id) {
+    trackListingView(route.params.id as string);
+  }
 });
 </script>
 

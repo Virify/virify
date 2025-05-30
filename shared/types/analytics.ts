@@ -38,4 +38,6 @@ export interface UserAnalyticsSummary {
   totalViews: number;
   previousMonthViews: number;
   percentageChange: number;
+  favoritedByOthersCount: number;
+  totalConversations: number;
 }

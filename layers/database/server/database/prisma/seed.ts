@@ -30,7 +30,7 @@ const seed = async () => {
     await generateRentalListing(property.id);
   }
 
-  await seedFakeUsers(200);
+  await seedFakeUsers(20);
 };
 
 seed().catch((e) => {

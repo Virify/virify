@@ -6,8 +6,7 @@
         <h2 class="| title-sm cursor-pointer" @click.prevent="navToggle = !navToggle">Account</h2>
         <ul v-show="navToggle">
           <li v-for="item in accountNavigation" :key="item.name" class="account-navigation-item">
-            <AtomsIcon :name="item.icon" :icon="item.icon" height="16" width="16"
-              class="account-navigation-item-icon" />
+            <AtomsIcon :name="item.icon" :icon="item.icon" height="16" width="16" class="account-navigation-item-icon" />
             <NuxtLink :to="item.url">
               <p class="body-sm">{{ item.name }}</p>
             </NuxtLink>
@@ -19,24 +18,23 @@
     <!-- Middle Column - Main Content -->
     <div class="account-profile-content">
       <div v-if="loggedIn">
-
         <h2 class="title-sm">Weclome back, {{ user?.firstName ?? user?.username }}!</h2>
         <!-- Analytics Dashboard -->
         <div class="analytics-dashboard">
           <div class="analytics-card | box">
-            <h3 class="| title-xs">Total Listing Views</h3>
-            <p class="| title-lg text-primary-500">1,245</p>
-            <p class="| body-xs">+15% from last month</p>
+            <h3 class="| title-xs">Total Listings Views</h3>
+            <p class="| title-lg text-primary-500">{{ listingViews?.totalViews }}</p>
+            <p class="| body-xs">+{{ listingViews?.percentageChange }}% from last month</p>
           </div>
           <div class="analytics-card | box">
-            <h3 class="| title-xs">Liked Listings</h3>
-            <p class="| title-lg text-primary-500">{{ favourites?.length || 0 }}</p>
-            <p class="| body-xs">Properties saved</p>
+            <h3 class="| title-xs">Listings Favourited</h3>
+            <p class="| title-lg text-primary-500">{{ listingViews?.favoritedByOthersCount }}</p>
+            <p class="| body-xs">Listings saved by users</p>
           </div>
           <div class="analytics-card | box">
             <h3 class="| title-xs">Total Enquiries</h3>
-            <p class="| title-lg text-primary-500">8</p>
-            <p class="| body-xs">2 new this week</p>
+            <p class="| title-lg text-primary-500">{{ listingViews?.totalConversations }}</p>
+            <p class="| body-xs">Enquiries on your listings</p>
           </div>
         </div>
 
@@ -73,14 +71,15 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { accountNavigation } from '~/utils/account/navigation';
+import { accountNavigation } from "~/utils/account/navigation";
+import { useAnalytics } from "~~/layers/analytics/composables/useAnalytics";
+const { getUserAnalytics } = useAnalytics();
 definePageMeta({
-  middleware: ['authenticated'],
+  middleware: ["authenticated"],
   head: {
     title: "Account",
     meta: [
@@ -89,9 +88,10 @@ definePageMeta({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
     ],
   },
-})
+});
 const { user, clear, loggedIn } = useUserSession();
 const favourites = useState<ListingCardType[]>("favourites");
+const listingViews = ref<UserAnalyticsSummary>();
 const { getAllFavourites } = useFavourites();
 const navToggle = ref(true);
 
@@ -113,6 +113,9 @@ const handleResize = () => {
 onMounted(() => {
   getAllFavourites();
   handleResize();
+  getUserAnalytics().then((result) => {
+    listingViews.value = result;
+  });
 });
 
 onBeforeMount(() => {
@@ -149,7 +152,6 @@ async function logout() {
 <style lang="scss" scoped>
 ul {
   list-style: none;
-  ;
   margin: 0;
   padding: 0;
 }
@@ -171,7 +173,6 @@ a {
 
   @media screen and (max-width: 768px) {
     grid-template-columns: 1fr;
-
   }
 }
 
@@ -189,9 +190,8 @@ a {
 .account-navigation {
   padding: var(--size-12) var(--size-16);
   border-radius: var(--border-radius-lg);
-  background:
-    url('/img/logo-background.svg') no-repeat top left, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-    background-size: auto 200%, cover;
+  background: url("/img/logo-background.svg") no-repeat top left, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+  background-size: auto 200%, cover;
   color: var(--monochrome-900);
 
   @media screen and (max-width: 768px) {
@@ -222,7 +222,6 @@ a {
 
   @media screen and (max-width: 768px) {
     grid-template-columns: 1fr;
-
   }
 
   .analytics-card {
@@ -231,10 +230,9 @@ a {
 }
 
 .box {
-  background:
-    url('/img/logo-background.svg') no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-    background-size: auto 200%, cover;
-    color: var(--monochrome-900);
+  background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+  background-size: auto 200%, cover;
+  color: var(--monochrome-900);
   &-xl {
     background: none;
     background-color: var(--background-200);
@@ -263,7 +261,6 @@ a {
     flex-direction: column;
     align-items: center;
     padding: 10px;
-
   }
 }
 </style>

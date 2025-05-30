@@ -46,7 +46,7 @@ export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInpu
 }
 
 const generateRandomViews = () => {
-  return faker.number.int({ min: 0, max: 100 });
+  return faker.number.int({ min: 0, max: 50 });
 };
 
 /**

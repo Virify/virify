@@ -9,7 +9,6 @@ import type { TrackListingViewBody } from '../../../shared/types/analytics'
  * Provides methods for tracking user interactions and events
  */
 export function useAnalytics() {
-  // Use a session ID to track unique views within a session
   const sessionId = useState('analytics-session-id', () => nanoid())
 
   /**
@@ -18,31 +17,47 @@ export function useAnalytics() {
    */
   const trackListingView = async (listingId: number | string) => {
     try {
-      // Debounce views to avoid over-counting when users reload or navigate back and forth
-      const viewHistory = useState<Record<string, number>>('listing-view-history', () => ({}))
-      const listingKey = `listing-${listingId}`
-      const now = Date.now()
+      const viewHistoryKey = 'listing-view-history';
+      let viewHistory: Record<string, number> = {};
+      
+      // Try to get existing view history from localStorage
+      try {
+        const storedHistory = localStorage.getItem(viewHistoryKey);
+        if (storedHistory) {
+          viewHistory = JSON.parse(storedHistory);
+        }
+      } catch (e) {
+        console.log('Unable to access localStorage, fallback to session');
+      }
+      
+      const listingKey = `listing-${listingId}`;
+      const now = Date.now();
       
       // Only count a view once every 30 minutes per listing
-      if (viewHistory.value[listingKey] && now - viewHistory.value[listingKey] < 30 * 60 * 1000) {
-        return
+      if (viewHistory[listingKey] && now - viewHistory[listingKey] < 30 * 60 * 1000) {
+        console.log('Skipping duplicate view', listingKey);
+        return;
       }
-      
-      // Update view history
-      viewHistory.value = {
-        ...viewHistory.value,
+    
+      viewHistory = {
+        ...viewHistory,
         [listingKey]: now
+      };
+      
+      // Save to localStorage immediately to prevent duplicate tracking
+      try {
+        localStorage.setItem(viewHistoryKey, JSON.stringify(viewHistory));
+      } catch (e) {
+        console.log('Unable to save to localStorage');
       }
       
-      // Create payload
       const payload: TrackListingViewBody = {
         listingId,
         sessionId: sessionId.value
-      }
+      };
       
-      // Track the view using SendBeacon API for better reliability
-      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
-      navigator.sendBeacon('/api/analytics/user-listing-view', blob)
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      navigator.sendBeacon('/api/analytics/track-listing-view', blob)
     } catch (error) {
       // Silently fail to not disturb user experience
       console.error('Failed to track listing view:', error)
@@ -55,13 +70,15 @@ export function useAnalytics() {
    */
   const getUserAnalytics = async () => {
     try {
-      return await $fetch('/api/analytics/user-listing-views')
+      return await $fetch('/api/analytics/user-listings')
     } catch (error) {
       console.error('Failed to fetch user analytics:', error)
       return {
         totalViews: 0,
         previousMonthViews: 0,
-        percentageChange: 0
+        percentageChange: 0,
+        favoritedByOthersCount: 0,
+        totalConversations: 0,
       }
     }
   }

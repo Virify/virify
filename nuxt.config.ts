@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxt/image", "nuxt-gtag"],
+  modules: ["@nuxt/image"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
@@ -17,8 +17,5 @@ export default defineNuxtConfig({
       // @ts-ignore
       plugins: [vue()],
     },
-  },
-  gtag: {
-    id: process.env.G_TAG,
   },
 });

@@ -46,6 +46,9 @@ export async function seedFakeUsers(count = 1): Promise<void> {
   }
 
   // Create users with unique favorites if listings exist
+  const createdUsers = [];
+  
+  // First, create all users with their favorites
   for (const user of users) {
     try {
       // Get 3 unique random listing IDs for this user
@@ -53,7 +56,7 @@ export async function seedFakeUsers(count = 1): Promise<void> {
       const shuffledIds = availableIds.sort(() => Math.random() - 0.5);
       const selectedIds = shuffledIds.slice(0, Math.min(3, listingCount));
 
-      await prisma.user.create({
+      const createdUser = await prisma.user.create({
         data: {
           ...user,
           verification: {
@@ -61,7 +64,7 @@ export async function seedFakeUsers(count = 1): Promise<void> {
               activated: true,
             },
           },
-          favourites: {
+          preferences: {
             create: {
               favourites: {
                 create: selectedIds.map((id) => ({ listingId: id })),
@@ -69,11 +72,54 @@ export async function seedFakeUsers(count = 1): Promise<void> {
             },
           },
         },
+        // Return the created user ID and the selected listing IDs
+        select: {
+          id: true,
+        },
       });
-
-      console.log(`Created user with ${selectedIds.length} favorites`);
+      
+      // Store the created user and their selected listings for conversation creation
+      createdUsers.push({ userId: createdUser.id, selectedListingIds: selectedIds });
+      console.log(`Created user ${createdUser.id} with ${selectedIds.length} favorites`);
     } catch (error) {
       console.error("Error creating user with favorites:", error);
+    }
+  }
+  
+  // Now create conversations for all users after they've been created
+  console.log("Creating conversations for users...");
+  for (const { userId, selectedListingIds } of createdUsers) {
+    try {
+      // Create a conversation for each favorite listing
+      for (const listingId of selectedListingIds) {
+        // Create the conversation
+        const conversation = await prisma.conversation.create({
+          data: {
+            listingId,
+            senderId: userId,
+            receiverId: 1,
+          },
+        });
+        
+        // Add an initial message to the conversation
+        await prisma.message.create({
+          data: {
+            content: faker.lorem.sentence(),
+            conversation: {
+              connect: { id: conversation.id },
+            },
+            sender: {
+              connect: { id: userId },
+            },
+            receiver: {
+              connect: { id: 1 }, // Admin is the receiver of the message
+            },
+          },
+        });
+      }
+      console.log(`Created conversations and messages for user ${userId}`);
+    } catch (error) {
+      console.error(`Error creating conversations for user ${userId}:`, error);
     }
   }
 }
