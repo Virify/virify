@@ -65,6 +65,9 @@ importers:
       nuxt-auth-utils:
         specifier: ^0.5.20
         version: 0.5.20(magicast@0.3.5)
+      nuxt-gtag:
+        specifier: 3.0.2
+        version: 3.0.2(magicast@0.3.5)
       pg:
         specifier: ^8.15.6
         version: 8.15.6
@@ -4351,6 +4354,9 @@ packages:
         optional: true
       '@simplewebauthn/server':
         optional: true
+
+  nuxt-gtag@3.0.2:
+    resolution: {integrity: sha512-0Spu/rffPxW7REebkjE22qQOuVZIQuyIuvd61InDdJU+d+gRIqWhrUuKBWdk43N/J1elj+cTK2kEdk5FQX7vdQ==}
 
   nuxt@3.17.1:
     resolution: {integrity: sha512-RFUamVkXw86Kn9l3jeHLNnctsNf5Dp5pQY2bal9uZFiq1Wc9VyMdzou70DbMUjDe1yAoUbD6qz65FOEq+abesQ==}
@@ -11829,6 +11835,15 @@ snapshots:
     transitivePeerDependencies:
       - argon2
       - bcrypt
+      - magicast
+
+  nuxt-gtag@3.0.2(magicast@0.3.5):
+    dependencies:
+      '@nuxt/kit': 3.17.1(magicast@0.3.5)
+      defu: 6.1.4
+      pathe: 1.1.2
+      ufo: 1.6.1
+    transitivePeerDependencies:
       - magicast
 
   nuxt@3.17.1(@netlify/blobs@8.2.0)(@parcel/watcher@2.5.1)(@types/node@22.15.3)(db0@0.3.2)(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(rollup@4.40.1)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.4)(typescript@5.8.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.7.1))(yaml@2.7.1):
