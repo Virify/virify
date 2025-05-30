@@ -37,6 +37,8 @@ function openForgotPassword() {
 
 const accountOptions = [
   { to: '/account', label: 'My Account' },
+  { to: '/user/messages', label: 'Messages' },
+  
 ]
 </script>
 

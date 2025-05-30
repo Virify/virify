@@ -1,7 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 export default defineNuxtConfig({
-  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics"],
+  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics" , "./layers/communication"],
   future: {
     compatibilityVersion: 4,
   },
@@ -13,10 +13,6 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   nitro: {
-    experimental: {
-      openAPI: true,
-      tasks: true,
-    },
     rollupConfig: {
       // @ts-ignore
       plugins: [vue()],

@@ -29,6 +29,10 @@ export async function findUserById(id: number): Promise<User | null> {
   });
 }
 
+export async function getAllUsers(): Promise<User[]> {
+  return prisma.user.findMany();
+}
+
 /**
  * Find the first user
  * @returns The user

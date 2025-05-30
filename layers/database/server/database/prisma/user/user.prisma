@@ -17,10 +17,16 @@ model User {
   listings                 Listing[]
   properties               Property[]
   verification             Verification?
-  favourites               UserPreferences[]
+  preferences              UserPreferences[]
   address                  Address?          @relation(fields: [addressId], references: [id])
   addressId                Int?
   ListingView              ListingView[]
+  messagesSent             Message[]         @relation("SenderMessages")
+  messagesReceived         Message[]         @relation("ReceiverMessages")
+  conversationsAsSender    Conversation[]    @relation("ConversationsAsSender")
+  conversationsAsReceiver  Conversation[]    @relation("ConversationsAsReceiver")
 
   @@index([addressId])
+  @@index([email])
+  @@index([username])
 }
