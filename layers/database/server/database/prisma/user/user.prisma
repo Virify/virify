@@ -20,6 +20,7 @@ model User {
   favourites               UserPreferences[]
   address                  Address?          @relation(fields: [addressId], references: [id])
   addressId                Int?
+  ListingView              ListingView[]
 
   @@index([addressId])
 }

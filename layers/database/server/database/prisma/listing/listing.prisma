@@ -25,6 +25,7 @@ model Listing {
   agents               Agent[]                @relation("AgentToListing")
   HiddenListing        HiddenListing[]
   UserFavouriteListing UserFavouriteListing[]
+  ListingView          ListingView[]
 
   @@index([userId])
   @@index([propertyId])
