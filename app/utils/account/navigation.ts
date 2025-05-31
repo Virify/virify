@@ -1,4 +1,6 @@
-export const accountNavigation = [
+import type { NavigationItem } from './types';
+
+export const accountNavigation: NavigationItem[] = [
   {
     name: "Dashboard",
     url: "#",
@@ -7,18 +9,19 @@ export const accountNavigation = [
   {
     name: "Notifications",
     url: "#",
-    icon: "",
+    icon: "account/notifications",
+    countKey: "notifications",
   },
   {
     name: "Profile",
     url: "#",
     icon: "profile",
   },
-
   {
     name: "Favourites",
     url: "#",
     icon: "cards/favourite-filled",
+    countKey: "favourites",
   },
   {
     name: "List New Property",
@@ -28,37 +31,48 @@ export const accountNavigation = [
   {
     name: "Offers",
     url: "#",
-    icon: "cards/offer",
+    icon: "account/offers",
+    countKey: "offers",
   },
   {
     name: "My Listings",
     url: "#",
     icon: "read-more",
+    countKey: "listings",
   },
   {
     name: "Notes",
     url: "#",
     icon: "cards/notes",
+    countKey: "notes",
   },
   {
     name: "Messages",
+    url: "/user/messages",
+    icon: "account/chat",
+    countKey: "messages",
+  },
+  {
+    name: "Viewings",
     url: "#",
-    icon: "",
+    icon: "account/viewing",
+    countKey: "viewings",
   },
   {
     name: "Enquiries",
-    url: "#",
-    icon: "",
+    url: "/user/messages",
+    icon: "account/enquiry",
+    countKey: "enquiries",
   },
   {
     name: "Biilling & Plans",
     url: "#",
-    icon: "",
+    icon: "account/billing",
   },
   {
     name: "Preferences",
     url: "#",
-    icon: "",
+    icon: "account/account-preferences",
   },
   {
     name: "Analytics",
@@ -73,16 +87,18 @@ export const accountNavigation = [
   {
     name: "Settings",
     url: "#",
-    icon: "settings",
+    icon: "account/settings",
   },
   {
     name: "Logout",
     url: "#",
     icon: "arrow-right",
+    action: "logout",  // Add an action identifier
   },
   {
     name: "Delete Account",
     url: "#",
     icon: "cross",
+    action: "delete",
   },
 ];

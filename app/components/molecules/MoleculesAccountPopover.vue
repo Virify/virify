@@ -1,7 +1,7 @@
 <template>
-  <ul v-if="hasMenuItems" popover :id="popoverId" class="m-account-popover | box">
+  <ul v-if="hasMenuItems" popover :id="popoverId" ref="popoverEl" class="m-account-popover | box">
     <li class="m-account-popover-listitem" v-for="{ to, label } of options" :key="label">
-      <nuxt-link :to="to" class="m-account-popover-link | body-sm">{{ label }}</nuxt-link>
+      <nuxt-link :to="to" @click="closePopover" class="m-account-popover-link | body-sm">{{ label }}</nuxt-link>
     </li>
     <li class="m-account-popover-listitem">
       <button type="button" @click.prevent="logout" class="m-account-popover-link | body-sm">Log out</button>
@@ -53,6 +53,16 @@ const popoverId = useId()
  *  Elements
  */
 const $button = useTemplateRef('button')
+const popoverEl = useTemplateRef('popoverEl')
+
+/**
+ * Close the popover when a link is clicked
+ */
+function closePopover() {
+  if (popoverEl.value) {
+    popoverEl.value.hidePopover()
+  }
+}
 </script>
 
 <style scoped lang="scss">

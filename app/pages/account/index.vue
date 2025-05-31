@@ -7,9 +7,22 @@
         <ul v-show="navToggle">
           <li v-for="item in accountNavigation" :key="item.name" class="account-navigation-item">
             <AtomsIcon :name="item.icon" :icon="item.icon" height="16" width="16" class="account-navigation-item-icon" />
-            <NuxtLink :to="item.url">
-              <p class="body-sm">{{ item.name }}</p>
+            <!-- Use NuxtLink for items with URLs and no action -->
+            <NuxtLink v-if="!item.action" :to="item.url" class="account-item-link">
+              <p class="body-sm">
+                {{ item.name }}
+                <span v-if="item.countKey && getCount(item.countKey)" class="| body-xs font-bold">
+                  ({{ getCount(item.countKey) }})
+                </span>
+              </p>
             </NuxtLink>
+            <!-- Use button for items with actions -->
+            <button 
+              v-else 
+              class="account-action-button" 
+              @click="handleNavAction(item.action)">
+              <p class="body-sm">{{ item.name }}</p>
+            </button>
           </li>
         </ul>
       </div>
@@ -93,14 +106,9 @@ const { user, clear, loggedIn } = useUserSession();
 const favourites = useState<ListingCardType[]>("favourites");
 const listingViews = ref<UserAnalyticsSummary>();
 const { getAllFavourites } = useFavourites();
+// Set up account counts with auto-refresh every 30 seconds
+const { fetchAccountCounts, getCount } = useAccountCounts();
 const navToggle = ref(true);
-
-const recentFavourites = computed(() => {
-  if (favourites.value.length === 0) {
-    return [];
-  }
-  return favourites.value.slice(0, 3);
-});
 
 const handleResize = () => {
   if (window.innerWidth < 768) {
@@ -116,6 +124,7 @@ onMounted(() => {
   getUserAnalytics().then((result) => {
     listingViews.value = result;
   });
+  fetchAccountCounts();
 });
 
 onBeforeMount(() => {
@@ -147,6 +156,23 @@ async function deleteAccount() {
 async function logout() {
   await clear();
   navigateTo("/");
+}
+
+/**
+ * Handle navigation actions
+ * @param {string} action - The action to perform
+ */
+function handleNavAction(action: string) {
+  switch(action) {
+    case 'logout':
+      logout();
+      break;
+    case 'delete':
+      deleteAccount();
+      break;
+    default:
+      console.warn(`Action '${action}' not implemented`);
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -212,6 +238,28 @@ a {
     width: 24px;
     height: 24px;
   }
+}
+
+.account-action-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+  
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--primary-400);
+    text-decoration-thickness: 2px;
+  }
+}
+
+.account-item-link {
+  display: flex;
+  width: 100%;
 }
 
 .analytics-dashboard {
