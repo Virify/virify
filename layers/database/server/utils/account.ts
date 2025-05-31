@@ -1,6 +1,6 @@
 /**
  * Get the counts of various account items for a user.
- * 
+ *
  * @param userId - The ID of the user for whom to get account counts
  * @returns AccountCounts - An object containing counts of various account items
  */
@@ -16,19 +16,17 @@ export async function getAccountCounts(userId: number): Promise<AccountCounts> {
         userId: userId,
       },
     }),
-    prisma.userPreferences.count({
+    prisma.userFavouriteListing.count({
       where: {
-        userId: userId,
-        favourites: {
-          some: {},
+        userPreferences: {
+          userId: userId,
         },
       },
     }),
-    prisma.userPreferences.count({
+    prisma.userNote.count({
       where: {
-        userId: userId,
-        notes: {
-          some: {},
+        userPreferences: {
+          userId: userId,
         },
       },
     }),
