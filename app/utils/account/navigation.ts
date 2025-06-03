@@ -95,29 +95,28 @@ export const listingsNavigation: NavigationItem[] = [
 ];
 
 export const searchNavigation: NavigationItem[] = [
-      {
-        name: "Search Properties",
-        url: "/",
-        icon: "search",
-      },
-      {
-        name: "Map Search",
-        url: "/map-search",
-        icon: "search",
-      },
-      {
-        name: "Saved Searches",
-        url: "#",
-        icon: "cards/favourite-filled",
-        countKey: "savedSearches",
-      },
-  ]
+  {
+    name: "Search Properties",
+    url: "/",
+    icon: "search",
+  },
+  {
+    name: "Map Search",
+    url: "/map-search",
+    icon: "search",
+  },
+  {
+    name: "Saved Searches",
+    url: "#",
+    icon: "cards/favourite-filled",
+    countKey: "savedSearches",
+  },
+];
 
 export const navigationGroups: NavigationGroup[] = [
   {
-    title: "Search",
-    icon: "search",
-    items: searchNavigation
+    title: "Nofications",
+    icon: "account/notifications",
   },
   {
     title: "Listings",
@@ -130,6 +129,8 @@ export const navigationGroups: NavigationGroup[] = [
     items: accountNavigation,
   },
   {
-    icon: "account/notifications",
-  }
+    title: "Search",
+    icon: "search",
+    items: searchNavigation,
+  },
 ];
