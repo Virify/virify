@@ -23,6 +23,15 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  title: "Messages",
+  meta: [
+    {
+      name: "description",
+      content: "View and manage your messages and conversations.",
+    },
+  ],
+});
 import { type ConversationWithUserAndMessages, type MessageWithUser } from "~~/shared/types/conversation";
 import { useWebSocket } from "@vueuse/core";
 import { parseWebSocketMessage, processIncomingMessage, type MessageHandlerResult } from "../../utils/websocket";

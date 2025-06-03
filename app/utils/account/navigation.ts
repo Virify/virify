@@ -1,10 +1,13 @@
-import type { NavigationItem } from './types';
-
 export const accountNavigation: NavigationItem[] = [
   {
     name: "Dashboard",
-    url: "#",
+    url: "/account",
     icon: "property/house",
+  },
+  {
+    name: "Profile",
+    url: "#",
+    icon: "profile",
   },
   {
     name: "Notifications",
@@ -13,15 +16,44 @@ export const accountNavigation: NavigationItem[] = [
     countKey: "notifications",
   },
   {
-    name: "Profile",
+    name: "Biilling & Plans",
     url: "#",
-    icon: "profile",
+    icon: "account/billing",
   },
   {
-    name: "Favourites",
+    name: "Analytics",
     url: "#",
-    icon: "cards/favourite-filled",
-    countKey: "favourites",
+    icon: "explore/hot",
+  },
+  {
+    name: "Contact Support",
+    url: "#",
+    icon: "cards/verified",
+  },
+  {
+    name: "Preferences",
+    url: "#",
+    icon: "account/account-preferences",
+  },
+  {
+    name: "Settings",
+    url: "#",
+    icon: "account/settings",
+  },
+  {
+    name: "Logout",
+    url: "#",
+    icon: "arrow-right",
+    action: "logout",
+  },
+];
+
+export const listingsNavigation: NavigationItem[] = [
+  {
+    name: "My Listings",
+    url: "#",
+    icon: "read-more",
+    countKey: "listings",
   },
   {
     name: "List New Property",
@@ -35,28 +67,10 @@ export const accountNavigation: NavigationItem[] = [
     countKey: "offers",
   },
   {
-    name: "My Listings",
+    name: "Favourites",
     url: "#",
-    icon: "read-more",
-    countKey: "listings",
-  },
-  {
-    name: "Notes",
-    url: "#",
-    icon: "cards/notes",
-    countKey: "notes",
-  },
-  {
-    name: "Messages",
-    url: "/user/messages",
-    icon: "account/chat",
-    countKey: "messages",
-  },
-  {
-    name: "Viewings",
-    url: "#",
-    icon: "account/viewing",
-    countKey: "viewings",
+    icon: "cards/favourite-filled",
+    countKey: "favourites",
   },
   {
     name: "Enquiries",
@@ -64,41 +78,58 @@ export const accountNavigation: NavigationItem[] = [
     icon: "account/enquiry",
     countKey: "enquiries",
   },
+
   {
-    name: "Biilling & Plans",
+    name: "Viewings",
     url: "#",
-    icon: "account/billing",
+    icon: "account/viewing",
+    countKey: "viewings",
+  },
+
+  {
+    name: "Notes",
+    url: "#",
+    icon: "cards/notes",
+    countKey: "notes",
+  },
+];
+
+export const searchNavigation: NavigationItem[] = [
+      {
+        name: "Search Properties",
+        url: "/",
+        icon: "search",
+      },
+      {
+        name: "Map Search",
+        url: "/map-search",
+        icon: "search",
+      },
+      {
+        name: "Saved Searches",
+        url: "#",
+        icon: "cards/favourite-filled",
+        countKey: "savedSearches",
+      },
+  ]
+
+export const navigationGroups: NavigationGroup[] = [
+  {
+    title: "Search",
+    icon: "search",
+    items: searchNavigation
   },
   {
-    name: "Preferences",
-    url: "#",
-    icon: "account/account-preferences",
+    title: "Listings",
+    icon: "property/house",
+    items: listingsNavigation,
   },
   {
-    name: "Analytics",
-    url: "#",
-    icon: "explore/hot",
+    title: "Account",
+    icon: "profile",
+    items: accountNavigation,
   },
   {
-    name: "Contact Support",
-    url: "#",
-    icon: "cards/verified",
-  },
-  {
-    name: "Settings",
-    url: "#",
-    icon: "account/settings",
-  },
-  {
-    name: "Logout",
-    url: "#",
-    icon: "arrow-right",
-    action: "logout",  // Add an action identifier
-  },
-  {
-    name: "Delete Account",
-    url: "#",
-    icon: "cross",
-    action: "delete",
-  },
+    icon: "account/notifications",
+  }
 ];

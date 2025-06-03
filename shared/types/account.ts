@@ -1,4 +1,4 @@
-export interface NavigationItem {
+export type NavigationItem = {
   name: string;
   url: string;
   icon: string;
@@ -6,7 +6,13 @@ export interface NavigationItem {
   countKey?: string;
 }
 
-export interface AccountCounts {
+export type NavigationGroup = {
+  title?: string;
+  icon: string;
+  items?: NavigationItem[];
+}
+
+export type AccountCounts = {
   notifications?: number;
   messages?: number;
   enquiries?: number;
