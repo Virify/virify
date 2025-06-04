@@ -5,8 +5,7 @@ const updateSchema = zod.object({
 });
 
 /**
- * Update a user's favourite listing
- *
+ * Save a listing to user's favourites
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();

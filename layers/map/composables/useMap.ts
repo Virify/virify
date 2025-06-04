@@ -350,7 +350,7 @@ export function useMap() {
      * 
      * This is a temporary solution to fetch listings based on the drawn polygon. Needs to be moved into the main search function
      */
-    const result = $fetch<ListingCardType[]>("/api/search/listings", {
+    const result = $fetch<ListingCardType[]>("/api/search/listings/", {
       method: "POST",
       body: {
         geometry,

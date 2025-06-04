@@ -2,7 +2,6 @@ import * as z from "zod";
 import type { ListingSearch, ListingSearchOptional } from "~~/shared/types/listing";
 import { calculateDateFromDays } from "~~/shared/utils/format-date";
 import { convertToValidEnum } from "~~/shared/utils/enums";
-import { mapFeatureToFilters } from "../../utils/db-fields";
 
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),

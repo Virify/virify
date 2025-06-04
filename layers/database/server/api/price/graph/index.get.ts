@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { hash } from "ohash"
-import { getAllPricesCached } from "../../utils/price";
+
 
 const buyOrRentSchema = z.object({
   listingType: z.enum(["buy", "rent"]),

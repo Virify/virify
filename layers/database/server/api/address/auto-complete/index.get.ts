@@ -1,4 +1,3 @@
-import { autocompleteAddresses } from "../../utils/address";
 import * as z from "zod";
 
 // zod schema for validating query parameters

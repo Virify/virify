@@ -385,7 +385,7 @@ const { trackListingView } = useAnalytics()
 const route = useRoute();
 const listingId = route.params.id as string;
 const listing = ref<ListingWithFullProperty | null>(null);
-const url: string = `/api/listing/${listingId}`;
+const url: string = `/api/listing/${listingId}/`;
 const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullProperty>(url));
 if (data.value) {
   listing.value = data.value;

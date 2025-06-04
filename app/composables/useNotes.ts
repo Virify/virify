@@ -51,7 +51,7 @@ export const useNotes = createSharedComposable(() => {
     }
 
     try {
-      await $fetch(`/api/user/notes/update/${listingId}`, {
+      await $fetch(`/api/user/notes/${listingId}/`, {
         method: "POST",
         body: {
           listingId,
@@ -81,7 +81,7 @@ export const useNotes = createSharedComposable(() => {
     }
 
     try {
-      await $fetch(`/api/user/notes/delete/${listingId}`, {
+      await $fetch(`/api/user/notes/${listingId}/`, {
         method: "DELETE",
         body: { listingId },
       });
@@ -102,7 +102,7 @@ export const useNotes = createSharedComposable(() => {
     if (!loggedIn.value) return;
 
     try {
-      const result = await $fetch<NoteData[]>("/api/user/notes/get/all");
+      const result = await $fetch<NoteData[]>("/api/user/notes/");
       propertyNotes.value.clear();
 
       if (result && Array.isArray(result)) {

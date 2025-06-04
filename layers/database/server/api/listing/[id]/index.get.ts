@@ -1,5 +1,4 @@
 import type { ListingWithFullProperty } from "~~/shared/types/listing";
-import { getFullListingById } from "../../utils/listing";
 
 export default defineEventHandler(async (event): Promise<ListingWithFullProperty> => {
   const id = getRouterParam(event, "id");

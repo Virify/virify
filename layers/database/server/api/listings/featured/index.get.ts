@@ -1,6 +1,4 @@
 import * as z from "zod";
-import { getAllFeaturedListings } from "../../utils/listing";
-import { caluclatePagination } from "../../utils/pagination";
 
 const querySchema = z.object({
   pageSize: z.coerce.number().min(1).max(100).optional(),

@@ -164,7 +164,7 @@ function stopTyping() {
 /**
  * Fetch conversations
  */
-const { data: conversations, refresh: refreshConversations } = useAsyncData<ConversationWithUserAndMessages[]>("conversations", () => useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/all"));
+const { data: conversations, refresh: refreshConversations } = useAsyncData<ConversationWithUserAndMessages[]>("conversations", () => useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/"));
 
 /**
  * Process incoming WebSocket messages with proper typing
@@ -287,7 +287,7 @@ async function replyToActiveConversation() {
   const content = message.value;
 
   try {
-    const response = await $fetch<MessageWithUser>("/api/conversation/reply", {
+    const response = await $fetch<MessageWithUser>("/api/conversation/reply/", {
       method: "POST",
       body: {
         message: content,

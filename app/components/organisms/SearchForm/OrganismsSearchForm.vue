@@ -352,7 +352,7 @@ onMounted(async () => {
   if ($form.value) {
     $form.value.setAttribute("novalidate", "novalidate");
   }
-  priceRange.value = await $fetch<MinMaxPriceResponse>("/api/price/min-max");
+  priceRange.value = await $fetch<MinMaxPriceResponse>("/api/price/min-max/");
 });
 
 /**
@@ -383,7 +383,7 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyTypeWithOptions[]>("/api/property-type/all");
+const propertyTypes = await $fetch<PropertyTypeWithOptions[]>("/api/property-type/");
 const selectedPropertyTypes = reactive<Record<string, string[]>>({});
 
 /**
@@ -418,7 +418,7 @@ watchDebounced(
  * Price range
  */
 const { data: priceRangeGraph } = useAsyncData('price-graph', () => {
-  return $fetch<string[]>("/api/price/graph", {
+  return $fetch<string[]>("/api/price/graph/", {
     params: {
       listingType: buyOrRent.value
     }
@@ -510,7 +510,7 @@ async function sendForm(event: Event) {
 
   // Perform fetch for properties
   const searchResult = await setPendingWhile<ListingCardType[]>(() => {
-    return $fetch<ListingCardType[]>("/api/search/listings", {
+    return $fetch<ListingCardType[]>("/api/search/listings/", {
       method: "POST",
       body: searchParams.value,
     });

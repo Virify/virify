@@ -1,5 +1,4 @@
 import type { Fullproperty } from "~~/shared/types/property";
-import { getFullPropertyById } from "../../utils/property";
 
 export default defineEventHandler(async (event): Promise<Fullproperty> => {
   const id = getRouterParam(event, "id");

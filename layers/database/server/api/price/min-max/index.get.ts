@@ -1,5 +1,4 @@
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
-import { getMinMaxPrice } from "../../utils/price";
 
 /**
  * Retrieves the minimum and maximum price of sale and rental listings from the database.

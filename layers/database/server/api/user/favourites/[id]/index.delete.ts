@@ -4,6 +4,9 @@ const deleteSchema = zod.object({
   listingId: zod.number().int().positive(),
 });
 
+/**
+ * Remove a specific saved listing from user's favourites
+ */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const session = await requireUserSession(event);
@@ -24,5 +27,4 @@ export default defineEventHandler(async (event) => {
     console.log(error);
     return errorResponse(error, event);
   }
-}
-);
+});
