@@ -16,13 +16,20 @@
 
       <!-- Right Column: Active Conversation Messages -->
       <div class="p-active-chat-column">
-        <OrganismsActiveChat :conversation="activeConversation" :current-user-id="user?.id" v-model:reply-message="message" :is-send-disabled="status !== 'OPEN'" @send-reply="replyToActiveConversation" />
+        <OrganismsActiveChat :conversation="activeConversation" 
+        :current-user-id="user?.id" 
+        v-model:reply-message="message" 
+        :is-send-disabled="status !== 'OPEN'" 
+        @send-reply="replyToActiveConversation" 
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useWebSocket } from "@vueuse/core";
+
 definePageMeta({
   middleware: ["authenticated"],
   title: "Messages",
@@ -33,60 +40,32 @@ definePageMeta({
     },
   ],
 });
-import { useWebSocket } from "@vueuse/core";
-const config = useRuntimeConfig();
-
 /**
  * State
  */
 const { user } = useUserSession();
 const message = ref("");
-const status = ref("DISCONNECTED");
 const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
-// Removed activeMessagesListRef as scrolling is handled by ActiveChat.vue
 
-let send = (_msg: string) => {};
-let open = () => {};
-let close = () => {};
+// Hook into the existing WebSocket connection
+const config = useRuntimeConfig();
+const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/conversation", {
+  autoConnect: false,
+  immediate: false,
+});
 
-if (import.meta.client) {
-  const socket = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/conversation", {
-    autoConnect: true,
-    immediate: true,
-    autoClose: false,
-    autoReconnect: {
-      retries: 3,
-      delay: 1000,
-      onFailed() {
-        console.warn("Failed to reconnect after 3 attempts.");
-      },
-    },
-  });
-
-  /**
-   * When we get a message from the WebSocket we update the specific conversation
-   */
-  watchEffect(() => {
-    status.value = socket.status.value;
-    const incomingRaw = socket.data.value;
-    if (incomingRaw) {
-      console.log("Incoming raw message from WS:", incomingRaw);
-      // parse the incoming message
-      const parsedMessage = parseWebSocketMessage(incomingRaw);
-      // process the parsed message
-      const result = processIncomingMessage(parsedMessage);
-      // do things with the processed message
-      handleProcessedMessage(result);
-    }
-  });
-
-  send = (msg: string) => {
-    socket.send(msg);
-  };
-
-  open = socket.open;
-  close = socket.close;
-}
+// Process incoming WebSocket messages
+watchEffect(() => {
+  const incomingRaw = data.value;
+  if (incomingRaw) {
+    console.log("Incoming raw message from WS in messages:", incomingRaw);
+    // Parse and process the message
+    const parsedMessage = parseWebSocketMessage(incomingRaw);
+    const result = processIncomingMessage(parsedMessage);
+    // Handle the processed message
+    handleProcessedMessage(result);
+  }
+});
 
 /**
  * Set the active conversation to display its messages
