@@ -1,4 +1,3 @@
-import type { Message } from "@prisma/client";
 import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
 
 /**
@@ -10,7 +9,7 @@ import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared
  * @param messageContent Message content
  * @returns
  */
-export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number): Promise<ConversationWithUserAndMessages | Message> {
+export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number): Promise<ConversationWithUserAndMessages> {
   return await prisma.conversation.create({
     data: {
       ...(listingId ? { listing: { connect: { id: listingId } } } : {}),

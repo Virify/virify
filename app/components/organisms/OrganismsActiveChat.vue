@@ -22,15 +22,13 @@
           :current-user-id="currentUserId"
         />
       </ul>
-      <div v-if="isTyping" class="o-typing-indicator | body-sm">
-        <p>typing...</p>
-      </div>
+      <MoleculesTypingIndicator :is-visible="!!isTyping" />
       <div class="o-reply-bar-container">
         <input
           type="text"
           :value="replyMessage"
           @input="handleInput"
-          @keydown.enter="$emit('send-reply')"
+          @keydown.enter="handleEnterKey"
           class="o-message-input"
           placeholder="Reply..."
         />
@@ -71,10 +69,26 @@ const handleInput = (event: Event) => {
   emit('user-typing');
 };
 
+const handleEnterKey = () => {
+  emit('send-reply');
+};
+
 const scrollToBottom = () => {
   nextTick(() => {
     if (messagesListRef.value) {
-      messagesListRef.value.scrollTop = messagesListRef.value.scrollHeight;
+      const element = messagesListRef.value;
+      
+      // Force scroll to bottom with multiple attempts
+      const forceScroll = () => {
+        element.scrollTop = element.scrollHeight;
+      };
+      
+      forceScroll();
+      
+      // Try again after short delays to ensure DOM updates are complete
+      setTimeout(forceScroll, 10);
+      setTimeout(forceScroll, 50);
+      setTimeout(forceScroll, 100);
     }
   });
 };
@@ -93,11 +107,23 @@ watch(() => props.conversation, (newConversation) => {
   }
 }, { deep: true });
 
-watch(() => props.conversation?.messages, () => {
-  if (props.conversation) {
-    scrollToBottom();
+watch(() => props.conversation?.messages?.length, (newLength, oldLength) => {
+  if (props.conversation && newLength && newLength > (oldLength || 0)) {
+    // New message added, scroll to bottom
+    setTimeout(() => {
+      scrollToBottom();
+    }, 100);
   }
-}, { deep: true });
+});
+
+// Also watch for when the conversation changes
+watch(() => props.conversation?.id, () => {
+  if (props.conversation) {
+    setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+  }
+});
 
 // Expose scrollToBottom for parent component if needed, though internal watches should handle most cases.
 defineExpose({ scrollToBottom });
@@ -145,13 +171,6 @@ defineExpose({ scrollToBottom });
   flex-grow: 1; 
   overflow-y: auto; 
   padding-right: 8px;
-}
-
-.o-typing-indicator {
-  padding: 0.5rem 1rem;
-  color: var(--foreground-500);
-  text-align: left;
-  height: 2.5rem;
 }
 
 .o-reply-bar-container {

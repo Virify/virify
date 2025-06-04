@@ -16,11 +16,15 @@
 
       <!-- Right Column: Active Conversation Messages -->
       <div class="p-active-chat-column">
-        <OrganismsActiveChat :conversation="activeConversation" 
-        :current-user-id="user?.id" 
-        v-model:reply-message="message" 
-        :is-send-disabled="status !== 'OPEN'" 
-        @send-reply="replyToActiveConversation" 
+        <OrganismsActiveChat
+          ref="activeChatRef"
+          :conversation="activeConversation"
+          :current-user-id="user?.id"
+          v-model:reply-message="message"
+          :is-send-disabled="status !== 'OPEN'"
+          :is-typing="isOtherUserTyping"
+          @send-reply="replyToActiveConversation"
+          @user-typing="handleUserTyping"
         />
       </div>
     </div>
@@ -29,6 +33,9 @@
 
 <script setup lang="ts">
 import { useWebSocket } from "@vueuse/core";
+import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
+import type { NewMessageEvent, NewConversationEvent, TypingEvent, MessageReadEvent } from "~~/shared/types/websocket";
+import { useWebSocketMessageHandler } from "~/composables/useWebSocketMessageHandler";
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -40,131 +47,251 @@ definePageMeta({
     },
   ],
 });
+
 /**
  * State
  */
 const { user } = useUserSession();
 const message = ref("");
 const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
+const { handleWebSocketMessage } = useWebSocketMessageHandler();
+const activeChatRef = ref<{ scrollToBottom: () => void } | null>(null);
 
-// Hook into the existing WebSocket connection
+// Typing indicators state
+const typingUsers = ref<Record<number, { userId: number; isTyping: boolean; timeoutId?: number }>>({});
+const typingTimeoutDuration = 3000; // 3 seconds
+
+// WebSocket connection
 const config = useRuntimeConfig();
-const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/conversation", {
-  autoConnect: false,
-  immediate: false,
+const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/conversation");
+
+// Debug WebSocket connection status
+watch(status, (newStatus) => {
+  if (newStatus === "CLOSED" || newStatus === "CONNECTING") {
+    console.log("WebSocket status changed:", newStatus);
+  }
 });
 
-// Process incoming WebSocket messages
+// Debug incoming WebSocket data - only log when there are issues
+watch(data, (newData) => {
+  if (newData && !newData.includes("ping")) {
+    // Only log non-ping messages for debugging
+    console.log("WebSocket message received");
+  }
+});
+
+/**
+ * Computed properties
+ */
+
+// Check if any other user is typing in the active conversation
+const isOtherUserTyping = computed(() => {
+  if (!activeConversation.value || !user.value) return false;
+
+  return Object.values(typingUsers.value).some((typingUser) => typingUser.isTyping && typingUser.userId !== user.value!.id);
+});
+
+/**
+ * Typing notification with manual cancellation
+ */
+let typingTimeout: NodeJS.Timeout | null = null;
+
+const sendTypingNotification = (isTyping: boolean) => {
+  // Clear any existing timeout
+  if (typingTimeout) {
+    clearTimeout(typingTimeout);
+    typingTimeout = null;
+  }
+
+  // If we're setting typing to true, debounce it
+  if (isTyping) {
+    typingTimeout = setTimeout(() => {
+      if (activeConversation.value && user.value) {
+        const otherUserId = getOtherUserId(activeConversation.value, user.value.id!);
+        if (otherUserId) {
+          const notification = {
+            type: "typing",
+            conversationId: activeConversation.value.id,
+            toUserId: otherUserId,
+            isTyping: true,
+          };
+          send(JSON.stringify(notification));
+        }
+      }
+    }, 300);
+  } else {
+    // Send stop typing immediately
+    if (activeConversation.value && user.value) {
+      const otherUserId = getOtherUserId(activeConversation.value, user.value.id!);
+      if (otherUserId) {
+        const notification = {
+          type: "typing",
+          conversationId: activeConversation.value.id,
+          toUserId: otherUserId,
+          isTyping: false,
+        };
+        send(JSON.stringify(notification));
+      }
+    }
+  }
+};
+
+/**
+ * Get the other user ID in a conversation
+ */
+function getOtherUserId(conversation: ConversationWithUserAndMessages, currentUserId: number): number | null {
+  if (conversation.sender.id === currentUserId) {
+    return conversation.receiver.id;
+  } else if (conversation.receiver.id === currentUserId) {
+    return conversation.sender.id;
+  }
+  return null;
+}
+
+/**
+ * Handle user typing events
+ */
+function handleUserTyping() {
+  sendTypingNotification(true);
+}
+
+/**
+ * Stop typing notification immediately
+ */
+function stopTyping() {
+  // Clear any pending typing timeout
+  if (typingTimeout) {
+    clearTimeout(typingTimeout);
+    typingTimeout = null;
+  }
+  // Send immediate stop typing notification
+  sendTypingNotification(false);
+}
+
+/**
+ * Fetch conversations
+ */
+const { data: conversations, refresh: refreshConversations } = useAsyncData<ConversationWithUserAndMessages[]>("conversations", () => useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/all"));
+
+/**
+ * Process incoming WebSocket messages with proper typing
+ */
 watchEffect(() => {
   const incomingRaw = data.value;
   if (incomingRaw) {
-    console.log("Incoming raw message from WS in messages:", incomingRaw);
-    // Parse and process the message
-    const parsedMessage = parseWebSocketMessage(incomingRaw);
-    const result = processIncomingMessage(parsedMessage);
-    // Handle the processed message
-    handleProcessedMessage(result);
+    handleWebSocketMessage(incomingRaw, {
+      onNewMessage: (messageEvent: NewMessageEvent) => {
+        // Add message to the appropriate conversation
+        const conversation = conversations.value?.find((convo) => convo.id === messageEvent.data.conversationId);
+
+        if (conversation) {
+          // Check if message already exists to prevent duplicates
+          const messageExists = conversation.messages.some((msg) => msg.id === messageEvent.data.message.id);
+
+          if (!messageExists) {
+            // Optimized approach: Update only the specific conversation
+            // instead of recreating the entire array
+
+            // 1. Create updated conversation object
+            const updatedConversation = {
+              ...conversation,
+              messages: [...conversation.messages, messageEvent.data.message],
+              updatedAt: new Date(messageEvent.timestamp),
+            };
+
+            // 2. Update the conversation in place (more efficient than findIndex)
+            const conversationIndex = conversations.value!.findIndex((convo) => convo.id === messageEvent.data.conversationId);
+
+            if (conversationIndex !== -1) {
+              // 3. Update only the changed conversation
+              conversations.value![conversationIndex] = updatedConversation;
+
+              // 4. Optimized sorting: Only move to top if not already first
+              if (conversationIndex !== 0) {
+                // Remove from current position and add to front
+                conversations.value!.splice(conversationIndex, 1);
+                conversations.value!.unshift(updatedConversation);
+              }
+
+              // 5. Update activeConversation reference if needed
+              if (activeConversation.value && activeConversation.value.id === messageEvent.data.conversationId) {
+                activeConversation.value = updatedConversation;
+
+                nextTick(() => {
+                  activeChatRef.value?.scrollToBottom();
+                });
+              }
+            }
+          }
+        }
+      },
+
+      onNewConversation: (conversationEvent: NewConversationEvent) => {
+        // Add new conversation to the list and refresh to ensure proper reactivity
+        if (conversations.value) {
+          conversations.value.unshift(conversationEvent.data.conversation);
+          refreshConversations();
+        }
+      },
+
+      onTyping: (typingEvent: TypingEvent) => {
+        const { conversationId, isTyping, userId } = typingEvent.data;
+        if (activeConversation.value && activeConversation.value.id === conversationId) {
+          // Update local typing indicator state
+          if (isTyping) {
+            typingUsers.value[userId] = { userId, isTyping };
+          } else {
+            delete typingUsers.value[userId];
+          }
+
+          // Remove typing indicator after timeout as fallback
+          if (isTyping) {
+            setTimeout(() => {
+              delete typingUsers.value[userId];
+            }, typingTimeoutDuration);
+          }
+        }
+      },
+
+      onMessageRead: (readEvent: MessageReadEvent) => {
+        // Read receipt functionality removed
+      },
+    });
   }
 });
 
 /**
  * Set the active conversation to display its messages
- *
- * @param conversation - The conversation object to set as active
  */
 function setActiveConversation(conversation: ConversationWithUserAndMessages) {
   activeConversation.value = conversation;
   message.value = "";
-  console.log("Active conversation set:", activeConversation.value);
+
+  // Scroll to bottom when switching conversations
+  nextTick(() => {
+    activeChatRef.value?.scrollToBottom();
+  });
 }
 
 /**
- * Handle the processed message result from the utility function
- * to update the component's state.
- *
- * @param result - The result object from processIncomingMessage
- */
-const handleProcessedMessage = (result: MessageHandlerResult) => {
-  console.log("Handling processed message result in component:", result);
-
-  switch (result.action) {
-    case "USER_TYPING":
-      // Handle typing indicators
-      console.log("User is typing:", result.payload, "in conversation:", result.conversationId);
-      // TODO: Implement typing indicator UI
-      break;
-    case "MESSAGE_READ":
-      // Handle read receipts
-      console.log("Message read:", result.payload, "in conversation:", result.conversationId);
-      // TODO: Implement read receipt UI update
-      break;
-    case "ADD_CONVERSATION":
-      if (result.conversationId && result.payload) {
-        console.log("Adding new conversation to component state:", result.conversationId);
-        conversations.value?.unshift(result.payload as ConversationWithUserAndMessages);
-      } else {
-        console.warn("ADD_CONVERSATION action missing conversationId or payload:", result);
-      }
-      break;
-    case "ADD_MESSAGE_TO_CONVERSATION":
-      if (result.conversationId && result.payload) {
-        console.log("Updating conversation in component state with new message:", result.conversationId);
-        updateConversationWithMessage({
-          conversationId: result.conversationId,
-          messageData: result.payload as MessageWithUser,
-        });
-      } else {
-        console.warn("ADD_MESSAGE_TO_CONVERSATION action missing conversationId or payload:", result);
-      }
-      break;
-    case "UNKNOWN_MESSAGE":
-      console.log("Unknown or unhandled message type in component:", result.payload);
-      break;
-    case "NO_ACTION":
-      console.log("No action to take for message:", result.originalMessage);
-      break;
-    default:
-      console.log("Unhandled action type in component:", result.action);
-      break;
-  }
-};
-
-/**
- * Update a specific conversation with a new message
- *
- * @param messageData - The complete message data
- */
-const updateConversationWithMessage = (messageData: any) => {
-  const conversation = conversations.value?.find((convo) => String(convo.id) === String(messageData.conversationId));
-  if (conversation) {
-    console.log("Found conversation, adding message:", messageData.messageData);
-    conversation.messages.push(messageData.messageData);
-  } else {
-    console.log("Conversation not found, ID:", messageData.conversationId);
-  }
-};
-
-/**
- * Fetch conversations
- */
-  const { data: conversations } = useAsyncData<ConversationWithUserAndMessages[]>("conversations", () => useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/all"))
-
-/**
- * Reply to the active message in a conversation
+ * Reply to the active conversation
  */
 async function replyToActiveConversation() {
+  // Stop typing indicator immediately to prevent any interference
+  stopTyping();
+
   if (!activeConversation.value || !message.value.trim()) {
-    console.log("No active conversation or message is empty");
+    return;
+  }
+
+  // Check WebSocket connection status
+  if (status.value !== "OPEN") {
+    console.error("WebSocket connection not open:", status.value);
     return;
   }
 
   const conversationId = activeConversation.value.id;
   const content = message.value;
-
-  console.log("Replying to message:", {
-    conversationId,
-    message: content,
-  });
 
   try {
     const response = await $fetch<MessageWithUser>("/api/conversation/reply", {
@@ -175,21 +302,11 @@ async function replyToActiveConversation() {
       },
     });
 
-    // Add the message to the sender's active conversation UI immediately
-    if (activeConversation.value && activeConversation.value.id === conversationId) {
-      activeConversation.value.messages.push(response);
-    }
-
-    // Prepare message for WebSocket to notify other participants
-    const messageToSend = {
-      to: response.receiverId,
-      message: content,
-      conversationId: conversationId,
-      messageData: response,
-    };
-
-    send(JSON.stringify(messageToSend));
+    // Clear the message input immediately for better UX
     message.value = "";
+
+    // Note: The message will be added to UI via WebSocket broadcast
+    // This prevents double messages on sender side
   } catch (err) {
     console.error("Error sending reply:", err);
   }

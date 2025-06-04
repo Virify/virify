@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { broadcastNewMessage } from "~~/layers/communication/server/utils/websocket-broadcaster";
 
 const replySchema = z.object({
   conversationId: z.coerce.number(),
@@ -20,9 +21,12 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const conversation = await replyToConversation(conversationId, message, senderId);
+    const newMessage = await replyToConversation(conversationId, message, senderId);
 
-    return conversation;
+    // Broadcast the new message to all conversation participants via WebSocket
+    broadcastNewMessage(conversationId, newMessage);
+
+    return newMessage;
   } catch (error) {
     console.error("Error replying to conversation:", error);
     throw createError({
