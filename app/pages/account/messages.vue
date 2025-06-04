@@ -68,7 +68,7 @@ const config = useRuntimeConfig();
 const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
 
 // Create typed message sender using websocket utilities
-const { sendTypingNotification: sendTypingMsg, sendMessageReadNotification } = createMessageSender(send);
+const { sendTypingStatusToServer } = createMessageSender(send);
 
 // Debug WebSocket connection status
 watch(status, (newStatus) => {
@@ -101,7 +101,7 @@ const isOtherUserTyping = computed(() => {
  */
 let typingTimeout: NodeJS.Timeout | null = null;
 
-const sendTypingNotification = (isTyping: boolean) => {
+const handleTypingStatus = (isTyping: boolean) => {
   // Clear any existing timeout
   if (typingTimeout) {
     clearTimeout(typingTimeout);
@@ -114,7 +114,7 @@ const sendTypingNotification = (isTyping: boolean) => {
       if (activeConversation.value && user.value) {
         const otherUserId = getOtherUserId(activeConversation.value, user.value.id!);
         if (otherUserId) {
-          sendTypingMsg(activeConversation.value.id, otherUserId, true);
+          sendTypingStatusToServer(activeConversation.value.id, otherUserId, true);
         }
       }
     }, 300);
@@ -123,7 +123,7 @@ const sendTypingNotification = (isTyping: boolean) => {
     if (activeConversation.value && user.value) {
       const otherUserId = getOtherUserId(activeConversation.value, user.value.id!);
       if (otherUserId) {
-        sendTypingMsg(activeConversation.value.id, otherUserId, false);
+        sendTypingStatusToServer(activeConversation.value.id, otherUserId, false);
       }
     }
   }
@@ -145,7 +145,7 @@ function getOtherUserId(conversation: ConversationWithUserAndMessages, currentUs
  * Handle user typing events
  */
 function handleUserTyping() {
-  sendTypingNotification(true);
+  handleTypingStatus(true);
 }
 
 /**
@@ -158,7 +158,7 @@ function stopTyping() {
     typingTimeout = null;
   }
   // Send immediate stop typing notification
-  sendTypingNotification(false);
+  handleTypingStatus(false);
 }
 
 /**

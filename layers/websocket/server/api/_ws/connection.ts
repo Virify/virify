@@ -1,4 +1,4 @@
-import { addPeer, removePeer, sendTypingNotification, sendMessageReadNotification } from "../../utils/websocket-broadcaster";
+import { addPeer, removePeer, broadcastTypingStatus, broadcastMessageReadStatus } from "../../utils/websocket-broadcaster";
 import type { OutgoingWebSocketMessage } from "~~/shared/types/websocket";
 
 export type Peer = {
@@ -51,13 +51,13 @@ export default defineWebSocketHandler({
       switch (parsed.type) {
         case "typing":
           if (parsed.conversationId && parsed.toUserId !== undefined && parsed.isTyping !== undefined) {
-            sendTypingNotification(parsed.conversationId, user.id!, parsed.toUserId, parsed.isTyping);
+            broadcastTypingStatus(parsed.conversationId, user.id!, parsed.toUserId, parsed.isTyping);
           }
           break;
 
         case "message_read":
           if (parsed.conversationId && parsed.messageId && parsed.toUserId !== undefined) {
-            sendMessageReadNotification(parsed.conversationId, parsed.messageId, user.id!, parsed.toUserId);
+            broadcastMessageReadStatus(parsed.conversationId, parsed.messageId, user.id!, parsed.toUserId);
           }
           break;
 

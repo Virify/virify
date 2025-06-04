@@ -30,7 +30,7 @@ export const useWebSocketUtils = () => {
       return send(JSON.stringify(message));
     };
 
-    const sendTypingNotification = (conversationId: number, toUserId: number, isTyping: boolean) => {
+    const sendTypingStatusToServer = (conversationId: number, toUserId: number, isTyping: boolean) => {
       return sendMessage({
         type: "typing",
         conversationId,
@@ -39,7 +39,7 @@ export const useWebSocketUtils = () => {
       });
     };
 
-    const sendMessageReadNotification = (conversationId: number, messageId: number, toUserId: number) => {
+    const sendMessageReadStatusToServer = (conversationId: number, messageId: number, toUserId: number) => {
       return sendMessage({
         type: "message_read",
         conversationId,
@@ -50,8 +50,8 @@ export const useWebSocketUtils = () => {
 
     return {
       sendMessage,
-      sendTypingNotification,
-      sendMessageReadNotification,
+      sendTypingStatusToServer,
+      sendMessageReadStatusToServer,
     };
   };
 

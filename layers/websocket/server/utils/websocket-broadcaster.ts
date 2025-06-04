@@ -98,9 +98,9 @@ export function broadcastNewConversation(conversation: ConversationWithUserAndMe
 }
 
 /**
- * Send typing notification to conversation participants
+ * Broadcast typing status to conversation participants
  */
-export function sendTypingNotification(conversationId: number, fromUserId: number, toUserId: number, isTyping: boolean) {
+export function broadcastTypingStatus(conversationId: number, fromUserId: number, toUserId: number, isTyping: boolean) {
   const event: TypingEvent = {
     type: "typing",
     timestamp: new Date().toISOString(),
@@ -115,9 +115,9 @@ export function sendTypingNotification(conversationId: number, fromUserId: numbe
 }
 
 /**
- * Send message read notification to conversation participants
+ * Broadcast message read status to conversation participants
  */
-export function sendMessageReadNotification(conversationId: number, messageId: number, readByUserId: number, toUserId: number) {
+export function broadcastMessageReadStatus(conversationId: number, messageId: number, readByUserId: number, toUserId: number) {
   const event: MessageReadEvent = {
     type: "message_read",
     timestamp: new Date().toISOString(),
