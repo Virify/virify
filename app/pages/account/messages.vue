@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 definePageMeta({
+  middleware: ["authenticated"],
   title: "Messages",
   meta: [
     {
@@ -32,9 +33,7 @@ definePageMeta({
     },
   ],
 });
-import { type ConversationWithUserAndMessages, type MessageWithUser } from "~~/shared/types/conversation";
 import { useWebSocket } from "@vueuse/core";
-import { parseWebSocketMessage, processIncomingMessage, type MessageHandlerResult } from "../../utils/websocket";
 const config = useRuntimeConfig();
 
 /**
@@ -171,7 +170,7 @@ const updateConversationWithMessage = (messageData: any) => {
  */
   const { data: conversations } = await useAsyncData<ConversationWithUserAndMessages[]>(
   "conversations", 
-  () => $fetch<ConversationWithUserAndMessages[]>("/api/conversation/all/user/all"), {
+  () => $fetch<ConversationWithUserAndMessages[]>("/api/conversation/all"), {
     server: false,
     immediate: true,
   })
@@ -224,10 +223,6 @@ async function replyToActiveConversation() {
 </script>
 
 <style lang="scss" scoped>
-p-messages div {
-  margin-bottom: 0.75em;
-}
-
 ul {
   list-style-type: none;
   margin: 0;
@@ -236,6 +231,10 @@ ul {
   li {
     padding: 12px;
   }
+}
+
+.p-messages {
+  margin-top: -3rem;
 }
 
 .p-messages-layout {

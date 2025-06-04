@@ -71,28 +71,19 @@ definePageMeta({
     ],
   },
 });
-const { user, clear, loggedIn } = useUserSession();
-const favourites = useState<ListingCardType[]>("favourites");
+const { user, loggedIn } = useUserSession();
 const listingViews = ref<UserAnalyticsSummary>();
-const { getAllFavourites } = useFavourites();
 
 onMounted(() => {
-  getAllFavourites();
   getUserAnalytics().then((result) => {
     listingViews.value = result;
   });
 });
 </script>
 <style lang="scss" scoped>
-.account-profile-info {
-  display: flex;
-  align-items: center;
-  gap: 5px;
 
-  .account-profile-avatar {
-    width: 40px;
-    height: 40px;
-  }
+.account-profile-content {
+  margin-top: -3rem;
 }
 
 .analytics-dashboard {

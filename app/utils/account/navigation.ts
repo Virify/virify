@@ -10,12 +10,6 @@ export const accountNavigation: NavigationItem[] = [
     icon: "profile",
   },
   {
-    name: "Notifications",
-    url: "#",
-    icon: "account/notifications",
-    countKey: "notifications",
-  },
-  {
     name: "Biilling & Plans",
     url: "#",
     icon: "account/billing",
@@ -36,11 +30,6 @@ export const accountNavigation: NavigationItem[] = [
     icon: "account/account-preferences",
   },
   {
-    name: "Settings",
-    url: "#",
-    icon: "account/settings",
-  },
-  {
     name: "Logout",
     url: "#",
     icon: "arrow-right",
@@ -56,15 +45,22 @@ export const listingsNavigation: NavigationItem[] = [
     countKey: "listings",
   },
   {
-    name: "List New Property",
-    url: "#",
-    icon: "draw",
-  },
-  {
     name: "Offers",
     url: "#",
     icon: "account/offers",
     countKey: "offers",
+  },
+  {
+    name: "Enquiries",
+    url: "/account/messages",
+    icon: "account/enquiry",
+    countKey: "enquiries",
+  },
+  {
+    name: "Viewings",
+    url: "#",
+    icon: "account/viewing",
+    countKey: "viewings",
   },
   {
     name: "Favourites",
@@ -73,28 +69,25 @@ export const listingsNavigation: NavigationItem[] = [
     countKey: "favourites",
   },
   {
-    name: "Enquiries",
-    url: "/user/messages",
-    icon: "account/enquiry",
-    countKey: "enquiries",
-  },
-
-  {
-    name: "Viewings",
-    url: "#",
-    icon: "account/viewing",
-    countKey: "viewings",
-  },
-
-  {
     name: "Notes",
     url: "#",
     icon: "cards/notes",
     countKey: "notes",
   },
+  {
+    name: "List New Property",
+    url: "#",
+    icon: "draw",
+  },
 ];
 
 export const searchNavigation: NavigationItem[] = [
+  {
+    name: "Saved Searches",
+    url: "#",
+    icon: "cards/favourite-filled",
+    countKey: "savedSearches",
+  },
   {
     name: "Search Properties",
     url: "/",
@@ -105,21 +98,11 @@ export const searchNavigation: NavigationItem[] = [
     url: "/map-search",
     icon: "search",
   },
-  {
-    name: "Saved Searches",
-    url: "#",
-    icon: "cards/favourite-filled",
-    countKey: "savedSearches",
-  },
 ];
 
 export const navigationGroups: NavigationGroup[] = [
   {
-    title: "Nofications",
-    icon: "account/notifications",
-  },
-  {
-    title: "Listings",
+    title: "My Listings",
     icon: "property/house",
     items: listingsNavigation,
   },

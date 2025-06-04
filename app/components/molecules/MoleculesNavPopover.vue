@@ -22,7 +22,7 @@
     <!-- Menu Container -->
     <div class="m-menu-container" :class="{ 'open': menuOpen }">
       <div class="m-menu-container-header">
-        <h2 class="| body-md font-bold">Menu</h2>
+        <h2 class="| body-sm font-bold">Menu</h2>
         <button 
           type="button"
           class="m-menu-close-button"
@@ -79,11 +79,11 @@ const props = defineProps({
   },
 });
 
-const { fetchAccountCounts, getCount } = useAccountCounts();
 /**
  * Composables
  */
 const { clear, user } = useUserSession();
+const { fetchAccountCounts, getCount } = useAccountCounts();
 
 /**
  * Menu State
@@ -316,7 +316,6 @@ function handleNavAction(action: string) {
   background: none;
   border: none;
   cursor: pointer;
-  padding: var(--size-8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -346,7 +345,7 @@ function handleNavAction(action: string) {
   align-items: center;
   gap: var(--size-8);
   margin-bottom: var(--size-8);
-  padding: var(--size-8);
+  padding: var(--size-2);
   width: 100%;
   background: none;
   border: none;

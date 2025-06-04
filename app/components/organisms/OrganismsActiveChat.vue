@@ -84,7 +84,7 @@ const priceType = computed(() => {
 });
 
 const formattedPrice = computed(() => {
-  return `£${parseInt(String(props.conversation.listing.price)).toLocaleString()}`
+  return `£${parseInt(String(props.conversation?.listing?.price)).toLocaleString()}`
 });
 
 watch(() => props.conversation, (newConversation) => {

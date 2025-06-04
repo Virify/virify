@@ -16,7 +16,6 @@
 
 <script setup lang="ts">
 import type { MessageWithUser } from '~~/shared/types/conversation';
-import { getConvoMessagePoV, formatMessageTimestamp, formatMessageTimestampToTime } from '../utils/message';
 
 interface Props {
   message: MessageWithUser & { readAt?: string | Date };
