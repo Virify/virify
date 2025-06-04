@@ -2,7 +2,6 @@
  * Composable for tracking analytics events like listing views
  */
 import { nanoid } from 'nanoid'
-import { type UserAnalyticsSummary, type TrackListingViewBody } from '../../../shared/types/analytics'
 
 /**
  * Analytics tracking composable
