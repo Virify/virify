@@ -1,18 +1,23 @@
 import type { TrackListingViewBody } from "~~/shared/types/analytics";
-import { recordListingView } from "../../utils/analytics";
+import { recordListingView } from "~~/layers/database/server/utils/analytics";
+import * as z from "zod";
 
+const trackListingViewSchema = z.object({
+  listingId: z.string().min(1, "listingId is required"),
+  sessionId: z.string().optional(),
+});
+/**
+ * Handler for POST /api/analytics/listing/track-view
+ * Tracks a listing view event
+ */
 export default defineEventHandler(async (event) => {
+  const { user } = await getUserSession(event);
   try {
-    const { listingId, sessionId } = await readBody<TrackListingViewBody>(event);
-
-    if (!listingId) {
-      console.error("Missing listingId in analytics tracking");
-      return { success: false };
-    }
+    const { listingId, sessionId } = await readValidatedBody(event, trackListingViewSchema.parse);
 
     let userId = null;
-    const { user } = await getUserSession(event);
     userId = user?.id || null;
+    
     // Record the view in the database using the utility function
     await recordListingView(listingId, userId, sessionId?.toString() || null);
 

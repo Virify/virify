@@ -55,8 +55,8 @@
             <AtomsIcon :name="item.icon" :icon="item.icon" height="22" width="22" class="m-menu-item-icon" />
             <NuxtLink v-if="!item.action" :to="item.url" class="m-menu-link | body-sm">
               {{ item.name }}
-              <span v-if="item.countKey && getCount(item.countKey)" class="| body-xs font-bold">
-                ({{ getCount(item.countKey) }})
+              <span v-if="item.countKey && getAggregateCount(item.countKey)" class="| body-xs font-bold">
+                ({{ getAggregateCount(item.countKey) }})
               </span>
             </NuxtLink>
             <button v-else @click="handleMenuNavAction(item.action)" class="m-menu-link | body-sm">
@@ -83,7 +83,7 @@ const props = defineProps({
  * Composables
  */
 const { clear, user } = useUserSession();
-const { fetchAccountCounts, getCount } = useAccountCounts();
+const { fetchAnalyticsAggregates, getAggregateCount } = useAnalytics();
 
 /**
  * Menu State
@@ -96,7 +96,7 @@ const expandedGroups = ref<Record<number, boolean>>({});
  */
 onMounted(() => {
   // Fetch account counts when the component is mounted
-  fetchAccountCounts();
+  fetchAnalyticsAggregates();
   
   // Set all menu groups to expanded by default
   if (props.options && Array.isArray(props.options)) {

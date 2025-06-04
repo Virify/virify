@@ -396,20 +396,6 @@ const property = computed(() => {
 });
 const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
 
-const propertyMarkers = computed<MapMarker[]>(() => {
-  if (!property.value?.address?.lat || !property.value.address.lon) return [];
-  return [{
-    id: property.value.id,
-    lat: property.value.address.lat,
-    lon: property.value.address.lon,
-    bedrooms: property.value.bedroomFeatures?.length ?? null,
-    bathrooms: property.value.bathroomFeatures?.length ?? null,
-    price: listing.value?.price ?? null,
-    hasNote: false,
-    isFavorite: false
-  }];
-});
-
 onMounted(() => {
   if (route.params.id) {
     trackListingView(route.params.id as string);
@@ -477,7 +463,7 @@ onMounted(() => {
   @include mq.tablet {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .box {
     height: 100%;
     transition: transform var(--animation-fast), box-shadow var(--animation-fast);

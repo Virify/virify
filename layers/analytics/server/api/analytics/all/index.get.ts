@@ -1,7 +1,11 @@
-import { getUserListingAnalytics } from "../../utils/analytics";
-import type { UserAnalyticsSummary } from "../../../../../shared/types/analytics";
+import { getUserListingAnalytics } from "~~/layers/database/server/utils/analytics";
+import type { UserAnalyticsSummary } from "~~/shared/types/analytics";
 
-export default defineEventHandler(async (event) => {
+/**
+ * Handler for GET /api/analytics/all/
+ * Returns all analytics data for the user
+ */
+export default defineEventHandler(async (event): Promise<UserAnalyticsSummary> => {
   const { user } = await requireUserSession(event);
   try {
     if(!user.id) throw createError({

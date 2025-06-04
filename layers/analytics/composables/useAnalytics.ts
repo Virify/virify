@@ -2,6 +2,7 @@
  * Composable for tracking analytics events like listing views
  */
 import { nanoid } from 'nanoid'
+import type { UserAnalyticsSummary, AnalyticsAggregates } from '~~/shared/types/analytics'
 
 /**
  * Analytics tracking composable
@@ -14,7 +15,42 @@ export function useAnalytics() {
    * !! Important: useRequestFetch is required for SSR authenticated requests
    */
   const { data: analytics } = useAsyncData('user-analytics', () =>
-    useRequestFetch()<UserAnalyticsSummary>('/api/analytics/user-listings'))
+    useRequestFetch()<UserAnalyticsSummary>('/api/analytics/all'))
+
+  /**
+   * Analytics aggregates (formerly account counts)
+   */
+  const aggregates = ref<AnalyticsAggregates>({});
+  const aggregatesLoading = ref(false);
+  const aggregatesError = ref<Error | null>(null);
+
+  /**
+   * Fetch analytics aggregates from the API
+   */
+  async function fetchAnalyticsAggregates() {
+    aggregatesLoading.value = true;
+    aggregatesError.value = null;
+
+    try {
+      const data = await $fetch<AnalyticsAggregates>('/api/analytics/aggregates');
+      aggregates.value = data;
+    } catch (err) {
+      console.error('Failed to fetch analytics aggregates:', err);
+      aggregatesError.value = err as Error;
+    } finally {
+      aggregatesLoading.value = false;
+    }
+  }
+
+  /**
+   * Get aggregate count for a specific category
+   * @param key - The category key 
+   * @returns The count for the category or undefined
+   */
+  function getAggregateCount(key?: string): number | undefined {
+    if (!key) return undefined;
+    return aggregates.value[key as keyof AnalyticsAggregates];
+  }
 
   /**
    * Track when a user views a listing
@@ -62,7 +98,7 @@ export function useAnalytics() {
       };
       
       const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      navigator.sendBeacon('/api/analytics/track-listing-view', blob)
+      navigator.sendBeacon('/api/analytics/listing/track-view', blob)
     } catch (error) {
       // Silently fail to not disturb user experience
       console.error('Failed to track listing view:', error)
@@ -72,5 +108,10 @@ export function useAnalytics() {
   return {
     analytics,
     trackListingView,
+    aggregates,
+    aggregatesLoading,
+    aggregatesError,
+    fetchAnalyticsAggregates,
+    getAggregateCount,
   }
 }
