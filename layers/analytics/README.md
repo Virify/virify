@@ -1,43 +1,48 @@
 # Analytics Layer
 
-This layer provides analytics tracking functionality for the Virify application.
+This layer provides comprehensive analytics functionality for the Virify application, including tracking user interactions, aggregating metrics, and providing insights.
 
-## Structure
+## Features
 
-- **Composables**: Client-side utilities for tracking events
-  - `useAnalytics`: Tracks listing views and fetches analytics data
+- **Analytics Aggregates**: Replaces the old "account counts" with proper analytics terminology
+- **Listing View Tracking**: Track and record when users view listings
+- **User Analytics Summary**: Comprehensive analytics for user's listings performance
 
-## Usage
+## API Endpoints
 
-### Track a listing view
+### Analytics Aggregates
+- `GET /api/analytics/aggregates/` - Get analytics aggregates (counts) for the authenticated user
+
+### Analytics Data
+- `GET /api/analytics/all/` - Get all analytics data for the authenticated user
+
+### Listing Analytics
+- `GET /api/analytics/listing/all/` - Get analytics summary for all user's listings
+- `POST /api/analytics/listing/track-view` - Track a listing view event
+
+## Composables
+
+### `useAnalytics()`
+
+The main composable providing analytics functionality:
 
 ```typescript
-import { useAnalytics } from '#imports'
-
-// In your component setup or method
-const { trackListingView } = useAnalytics()
-
-// When viewing a listing
-onMounted(() => {
-  if (route.params.id) {
-    trackListingView(route.params.id)
-  }
-})
+const {
+  analytics,              // User analytics summary
+  aggregates,            // Analytics aggregates (counts)
+  aggregatesLoading,     // Loading state for aggregates
+  aggregatesError,       // Error state for aggregates
+  trackListingView,      // Function to track listing views
+  fetchAnalyticsAggregates, // Function to fetch aggregates
+  getAggregateCount      // Function to get specific aggregate count
+} = useAnalytics()
 ```
 
-### Get user analytics
+## Migration from Account Counts
 
-```typescript
-import { useAnalytics } from '#imports'
-
-// In your component setup
-const { getUserAnalytics } = useAnalytics()
-const analytics = ref(null)
-
-// Fetch analytics data
-async function fetchAnalytics() {
-  analytics.value = await getUserAnalytics()
-}
-
-onMounted(fetchAnalytics)
-```
+This layer replaces the old account counts functionality:
+- `useAccountCounts` → `useAnalytics`
+- `AccountCounts` type → `AnalyticsAggregates` type
+- `/api/account/counts` → `/api/analytics/aggregates/`
+- `getCount()` → `getAggregateCount()`
+- `fetchAccountCounts()` → `fetchAnalyticsAggregates()`

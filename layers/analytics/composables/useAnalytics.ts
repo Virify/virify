@@ -2,7 +2,7 @@
  * Composable for tracking analytics events like listing views
  */
 import { nanoid } from 'nanoid'
-import type { TrackListingViewBody } from '../../../shared/types/analytics'
+import type { UserAnalyticsSummary, AnalyticsAggregates } from '~~/shared/types/analytics'
 
 /**
  * Analytics tracking composable
@@ -10,6 +10,47 @@ import type { TrackListingViewBody } from '../../../shared/types/analytics'
  */
 export function useAnalytics() {
   const sessionId = useState('analytics-session-id', () => nanoid())
+
+  /**
+   * !! Important: useRequestFetch is required for SSR authenticated requests
+   */
+  const { data: analytics } = useAsyncData('user-analytics', () =>
+    useRequestFetch()<UserAnalyticsSummary>('/api/analytics/all'))
+
+  /**
+   * Analytics aggregates (formerly account counts)
+   */
+  const aggregates = ref<AnalyticsAggregates>({});
+  const aggregatesLoading = ref(false);
+  const aggregatesError = ref<Error | null>(null);
+
+  /**
+   * Fetch analytics aggregates from the API
+   */
+  async function fetchAnalyticsAggregates() {
+    aggregatesLoading.value = true;
+    aggregatesError.value = null;
+
+    try {
+      const data = await $fetch<AnalyticsAggregates>('/api/analytics/aggregates');
+      aggregates.value = data;
+    } catch (err) {
+      console.error('Failed to fetch analytics aggregates:', err);
+      aggregatesError.value = err as Error;
+    } finally {
+      aggregatesLoading.value = false;
+    }
+  }
+
+  /**
+   * Get aggregate count for a specific category
+   * @param key - The category key 
+   * @returns The count for the category or undefined
+   */
+  function getAggregateCount(key?: string): number | undefined {
+    if (!key) return undefined;
+    return aggregates.value[key as keyof AnalyticsAggregates];
+  }
 
   /**
    * Track when a user views a listing
@@ -57,34 +98,20 @@ export function useAnalytics() {
       };
       
       const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      navigator.sendBeacon('/api/analytics/track-listing-view', blob)
+      navigator.sendBeacon('/api/analytics/listing/track-view', blob)
     } catch (error) {
       // Silently fail to not disturb user experience
       console.error('Failed to track listing view:', error)
     }
   }
   
-  /**
-   * Get the current user's analytics data
-   * @returns Analytics data for the current user's listings
-   */
-  const getUserAnalytics = async () => {
-    try {
-      return await $fetch('/api/analytics/user-listings')
-    } catch (error) {
-      console.error('Failed to fetch user analytics:', error)
-      return {
-        totalViews: 0,
-        previousMonthViews: 0,
-        percentageChange: 0,
-        favoritedByOthersCount: 0,
-        totalConversations: 0,
-      }
-    }
-  }
-  
   return {
+    analytics,
     trackListingView,
-    getUserAnalytics
+    aggregates,
+    aggregatesLoading,
+    aggregatesError,
+    fetchAnalyticsAggregates,
+    getAggregateCount,
   }
 }

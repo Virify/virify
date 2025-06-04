@@ -12,14 +12,4 @@ export type NavigationGroup = {
   items?: NavigationItem[];
 }
 
-export type AccountCounts = {
-  notifications?: number;
-  messages?: number;
-  enquiries?: number;
-  listings?: number;
-  favourites?: number;
-  notes?: number;
-  offers?: number;
-  viewings?: number;
-  // Add more count types as needed
-}
+// AccountCounts has been moved to AnalyticsAggregates in ~/shared/types/analytics.ts

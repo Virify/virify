@@ -385,7 +385,7 @@ const { trackListingView } = useAnalytics()
 const route = useRoute();
 const listingId = route.params.id as string;
 const listing = ref<ListingWithFullProperty | null>(null);
-const url: string = `/api/listing/${listingId}`;
+const url: string = `/api/listing/${listingId}/`;
 const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullProperty>(url));
 if (data.value) {
   listing.value = data.value;
@@ -395,20 +395,6 @@ const property = computed(() => {
   return listing.value.property as typeof listing.value.property & { Land?: any };
 });
 const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
-
-const propertyMarkers = computed<MapMarker[]>(() => {
-  if (!property.value?.address?.lat || !property.value.address.lon) return [];
-  return [{
-    id: property.value.id,
-    lat: property.value.address.lat,
-    lon: property.value.address.lon,
-    bedrooms: property.value.bedroomFeatures?.length ?? null,
-    bathrooms: property.value.bathroomFeatures?.length ?? null,
-    price: listing.value?.price ?? null,
-    hasNote: false,
-    isFavorite: false
-  }];
-});
 
 onMounted(() => {
   if (route.params.id) {
@@ -477,7 +463,7 @@ onMounted(() => {
   @include mq.tablet {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .box {
     height: 100%;
     transition: transform var(--animation-fast), box-shadow var(--animation-fast);

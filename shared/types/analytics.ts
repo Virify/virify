@@ -3,6 +3,21 @@
  */
 
 /**
+ * Analytics aggregates interface (formerly AccountCounts)
+ * Contains counts for various user metrics and activities
+ */
+export interface AnalyticsAggregates {
+  notifications?: number;
+  messages?: number;
+  enquiries?: number;
+  listings?: number;
+  favourites?: number;
+  notes?: number;
+  offers?: number;
+  viewings?: number;
+}
+
+/**
  * Analytics event interface
  */
 export interface AnalyticsEvent {
@@ -40,4 +55,20 @@ export interface UserAnalyticsSummary {
   percentageChange: number;
   favoritedByOthersCount: number;
   totalConversations: number;
+}
+
+/**
+ * Analytics aggregates for various user metrics
+ * Renamed from AccountCounts to better reflect analytics nature
+ */
+export interface AnalyticsAggregates {
+  notifications?: number;
+  messages?: number;
+  enquiries?: number;
+  listings?: number;
+  favourites?: number;
+  notes?: number;
+  offers?: number;
+  viewings?: number;
+  // Add more aggregate types as needed
 }

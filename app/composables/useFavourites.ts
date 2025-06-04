@@ -24,7 +24,7 @@ export const useFavourites = createSharedComposable(() => {
    */
   const getAllFavourites = async () => {
     if (loggedIn.value) {
-      const result = await $fetch<UserFavouriteListingCard[]>("/api/user/saved/listing/get/all");
+      const result = await $fetch<UserFavouriteListingCard[]>("/api/user/favourites/");
       favourites.value = result.map((fav) => fav.listing) || [];
     }
   };
@@ -55,7 +55,7 @@ export const useFavourites = createSharedComposable(() => {
       return;
     }
 
-    await $fetch<UserFavouriteListingCard[]>(`/api/user/saved/listing/update/${listingId}`, {
+    await $fetch<UserFavouriteListingCard[]>(`/api/user/favourites/${listingId}/`, {
       method: "POST",
       body: { listingId },
     });
@@ -70,7 +70,7 @@ export const useFavourites = createSharedComposable(() => {
    * @returns Array of remaining favourite listing IDs or empty array on error
    */
   const removeFromFavourite = async (listingId: number) => {
-    const result = await $fetch<number[]>(`/api/user/saved/listing/delete/${listingId}`, {
+    const result = await $fetch<number[]>(`/api/user/favourites/${listingId}/`, {
       method: "DELETE",
       body: { listingId },
     });

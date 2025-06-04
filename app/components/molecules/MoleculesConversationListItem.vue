@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
+import { getConversationPoV, formatMessageTimestampToTime } from "~/utils/conversation";
 
 interface Props {
   conversation: ConversationWithUserAndMessages;

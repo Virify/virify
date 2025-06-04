@@ -8,9 +8,6 @@
       <p class="| body-xs">{{ formattedTimestamp }}</p>
     </div>
     <p class="| body-md">{{ message.content }}</p>
-    <div v-if="message.readAt && messageSenderName === 'You'" class="m-read-receipt | body-xs">
-      Read {{ formatReadTimestamp(message.readAt) }}
-    </div>
   </li>
 </template>
 
@@ -18,7 +15,7 @@
 import type { MessageWithUser } from '~~/shared/types/conversation';
 
 interface Props {
-  message: MessageWithUser & { readAt?: string | Date };
+  message: MessageWithUser;
   currentUserId?: string | number;
 }
 
@@ -31,10 +28,6 @@ const messageSenderName = computed(() => {
 const formattedTimestamp = computed(() => {
   return formatMessageTimestamp(props.message.createdAt);
 });
-
-const formatReadTimestamp = (timestamp: string | Date) => {
-  return formatMessageTimestampToTime(timestamp);
-};
 
 const messageClass = computed(() => {
   return getConvoMessagePoV(props.message, props.currentUserId) === 'You' ? 'm-message-sender' : 'm-message-receiver';
@@ -51,12 +44,6 @@ const messageClass = computed(() => {
   margin-bottom: 16px;
   max-width: 70%;
   word-wrap: break-word;
-}
-
-.m-read-receipt {
-  text-align: right;
-  color: var(--foreground-500);
-  margin-top: 4px;
 }
 
 .m-message-header {

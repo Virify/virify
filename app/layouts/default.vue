@@ -48,25 +48,31 @@ useHead({
 const config = useRuntimeConfig();
 const { user } = useUserSession();
 
+const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
+  autoConnect: false,
+  immediate: false,
+  autoClose: false,
+  autoReconnect: {
+    retries: 3,
+    delay: 1000,
+    onFailed() {
+      console.warn("Failed to reconnect WebSocket after 3 attempts.");
+    },
+  },
+});
+
+// Connect when user logs in
 if (import.meta.client) {
-  // Connect to WebSocket when user is authenticated
-  watch(() => user.value, (newUser) => {
-    if (newUser) {
-      useWebSocket(config.public.WS_BASE_URL + "/api/_ws/conversation", {
-        autoConnect: true,
-        immediate: true,
-        autoClose: false,
-        autoReconnect: {
-          retries: 3,
-          delay: 1000,
-          onFailed() {
-            console.warn("Failed to reconnect WebSocket after 3 attempts.");
-          },
-        },
-      });
-      console.log("WebSocket connection established in default layout");
-    }
-  }, { immediate: true });
+  watch(
+    () => user.value,
+    (newUser) => {
+      if (newUser && ws.status.value === 'CLOSED') {
+        ws.open(); // Manually open connection
+        console.log("WebSocket connection established in default layout");
+      }
+    },
+    { immediate: true }
+  );
 }
 </script>
 
