@@ -45,6 +45,45 @@ export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInpu
   }
 }
 
+const generateRandomViews = () => {
+  return faker.number.int({ min: 0, max: 50 });
+};
+
+/**
+ * Generate random listing views for a listing
+ * 
+ * @param listingId ID of the listing to create views for
+ * @returns Promise resolving to the number of views created
+ */
+export const generateListingViews = async (listingId: number): Promise<number> => {
+  const viewCount = generateRandomViews();
+  const views = [];
+  
+  // Generate views spread out over the past 30 days
+  for (let i = 0; i < viewCount; i++) {
+    const daysAgo = faker.number.int({ min: 0, max: 30 });
+    const viewDate = new Date();
+    viewDate.setDate(viewDate.getDate() - daysAgo);
+    
+    views.push({
+      listingId,
+      sessionId: faker.string.uuid(),
+      createdAt: viewDate
+    });
+  }
+  
+  // Create the views in batches for better performance
+  const batchSize = 100;
+  for (let i = 0; i < views.length; i += batchSize) {
+    const batch = views.slice(i, i + batchSize);
+    await prisma.listingView.createMany({
+      data: batch
+    });
+  }
+  
+  return viewCount;
+};
+
 /**
  * Gnerate a full random SALE Listing object
  *
@@ -78,9 +117,13 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
         connect: {
           id: 1, // admin user
         },
-      }
+      },
     },
   });
+
+  // Generate random views for this listing
+  const viewsGenerated = await generateListingViews(listing.id);
+  console.log(`Generated ${viewsGenerated} views for rental listing ${listing.id}`);
 
   return listing;
 };
@@ -121,6 +164,10 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
       }
     },
   });
+
+  // Generate random views for this listing
+  const viewsGenerated = await generateListingViews(listing.id);
+  console.log(`Generated ${viewsGenerated} views for sale listing ${listing.id}`);
 
   return listing;
 };

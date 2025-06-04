@@ -2,6 +2,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { saleAddress, rentalAddress, cityCenters } from "../../utils/seed/address-to-seed.ts";
+import { seedFakeUsers } from "../../utils/seed/user-faker.ts";
 import { generateProperty } from "../../utils/seed/property-faker.ts";
 import { generateRentalListing, generateSaleListing } from "../../utils/seed/listing-faker.ts";
 import { updateLocationsByAddressListForSeed } from "../../utils/seed/location-for-seed.ts";
@@ -28,6 +29,8 @@ const seed = async () => {
     let property = await generateProperty(addr);
     await generateRentalListing(property.id);
   }
+
+  await seedFakeUsers(20);
 };
 
 seed().catch((e) => {

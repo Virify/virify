@@ -1,64 +1,18 @@
-export const accountNavigation = [
+export const accountNavigation: NavigationItem[] = [
   {
     name: "Dashboard",
-    url: "#",
+    url: "/account",
     icon: "property/house",
-  },
-  {
-    name: "Notifications",
-    url: "#",
-    icon: "",
   },
   {
     name: "Profile",
     url: "#",
     icon: "profile",
   },
-
-  {
-    name: "Favourites",
-    url: "#",
-    icon: "cards/favourite-filled",
-  },
-  {
-    name: "List New Property",
-    url: "#",
-    icon: "draw",
-  },
-  {
-    name: "Offers",
-    url: "#",
-    icon: "cards/offer",
-  },
-  {
-    name: "My Listings",
-    url: "#",
-    icon: "read-more",
-  },
-  {
-    name: "Notes",
-    url: "#",
-    icon: "cards/notes",
-  },
-  {
-    name: "Messages",
-    url: "#",
-    icon: "",
-  },
-  {
-    name: "Enquiries",
-    url: "#",
-    icon: "",
-  },
   {
     name: "Biilling & Plans",
     url: "#",
-    icon: "",
-  },
-  {
-    name: "Preferences",
-    url: "#",
-    icon: "",
+    icon: "account/billing",
   },
   {
     name: "Analytics",
@@ -71,18 +25,95 @@ export const accountNavigation = [
     icon: "cards/verified",
   },
   {
-    name: "Settings",
+    name: "Preferences",
     url: "#",
-    icon: "settings",
+    icon: "account/account-preferences",
   },
   {
     name: "Logout",
     url: "#",
     icon: "arrow-right",
+    action: "logout",
+  },
+];
+
+export const listingsNavigation: NavigationItem[] = [
+  {
+    name: "My Listings",
+    url: "#",
+    icon: "read-more",
+    countKey: "listings",
   },
   {
-    name: "Delete Account",
+    name: "Offers",
     url: "#",
-    icon: "cross",
+    icon: "account/offers",
+    countKey: "offers",
+  },
+  {
+    name: "Enquiries",
+    url: "/account/messages",
+    icon: "account/enquiry",
+    countKey: "enquiries",
+  },
+  {
+    name: "Viewings",
+    url: "#",
+    icon: "account/viewing",
+    countKey: "viewings",
+  },
+  {
+    name: "Favourites",
+    url: "#",
+    icon: "cards/favourite-filled",
+    countKey: "favourites",
+  },
+  {
+    name: "Notes",
+    url: "#",
+    icon: "cards/notes",
+    countKey: "notes",
+  },
+  {
+    name: "List New Property",
+    url: "#",
+    icon: "draw",
+  },
+];
+
+export const searchNavigation: NavigationItem[] = [
+  {
+    name: "Saved Searches",
+    url: "#",
+    icon: "cards/favourite-filled",
+    countKey: "savedSearches",
+  },
+  {
+    name: "Search Properties",
+    url: "/",
+    icon: "search",
+  },
+  {
+    name: "Map Search",
+    url: "/map-search",
+    icon: "search",
+  },
+];
+
+export const navigationGroups: NavigationGroup[] = [
+  {
+    title: "My Listings",
+    icon: "property/house",
+    items: listingsNavigation,
+  },
+  {
+    title: "Account",
+    icon: "profile",
+    items: accountNavigation,
+  },
+  {
+    title: "Search",
+    icon: "search",
+    items: searchNavigation,
   },
 ];
