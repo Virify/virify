@@ -147,12 +147,7 @@ const updateConversationWithMessage = (messageData: any) => {
 /**
  * Fetch conversations
  */
-  const { data: conversations } = await useAsyncData<ConversationWithUserAndMessages[]>(
-  "conversations", 
-  () => $fetch<ConversationWithUserAndMessages[]>("/api/conversation/all"), {
-    server: false,
-    immediate: true,
-  })
+  const { data: conversations } = useAsyncData<ConversationWithUserAndMessages[]>("conversations", () => useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/all"))
 
 /**
  * Reply to the active message in a conversation

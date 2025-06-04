@@ -7,22 +7,21 @@
       <div class="analytics-dashboard">
         <div class="analytics-card | box">
           <h3 class="| title-xs">Total Listings Views</h3>
-          <p class="| title-lg text-primary-500">{{ listingViews?.totalViews }}</p>
-          <p class="| body-xs">+{{ listingViews?.percentageChange }}% from last month</p>
+          <p class="| title-lg text-primary-500">{{ analytics?.totalViews }}</p>
+          <p class="| body-xs">+{{ analytics?.percentageChange }}% from last month</p>
         </div>
         <div class="analytics-card | box">
           <h3 class="| title-xs">Listings Favourited</h3>
-          <p class="| title-lg text-primary-500">{{ listingViews?.favoritedByOthersCount }}</p>
+          <p class="| title-lg text-primary-500">{{ analytics?.favoritedByOthersCount }}</p>
           <p class="| body-xs">Listings saved by users</p>
         </div>
         <div class="analytics-card | box">
           <h3 class="| title-xs">Total Enquiries</h3>
-          <p class="| title-lg text-primary-500">{{ listingViews?.totalConversations }}</p>
+          <p class="| title-lg text-primary-500">{{ analytics?.totalConversations }}</p>
           <p class="| body-xs">Enquiries on your listings</p>
         </div>
       </div>
-      
-
+    
       <!-- notifications -->
       <div class="account-notifications">
         <h3 class="title-sm">Notifications</h3>
@@ -59,7 +58,6 @@
 </template>
 
 <script setup lang="ts">
-const { getUserAnalytics } = useAnalytics();
 definePageMeta({
   middleware: ["authenticated"],
   head: {
@@ -72,13 +70,7 @@ definePageMeta({
   },
 });
 const { user, loggedIn } = useUserSession();
-const listingViews = ref<UserAnalyticsSummary>();
-
-onMounted(() => {
-  getUserAnalytics().then((result) => {
-    listingViews.value = result;
-  });
-});
+const { analytics } = useAnalytics();
 </script>
 <style lang="scss" scoped>
 

@@ -2,7 +2,7 @@
  * Composable for tracking analytics events like listing views
  */
 import { nanoid } from 'nanoid'
-import type { TrackListingViewBody } from '../../../shared/types/analytics'
+import { type UserAnalyticsSummary, type TrackListingViewBody } from '../../../shared/types/analytics'
 
 /**
  * Analytics tracking composable
@@ -10,6 +10,12 @@ import type { TrackListingViewBody } from '../../../shared/types/analytics'
  */
 export function useAnalytics() {
   const sessionId = useState('analytics-session-id', () => nanoid())
+
+  /**
+   * !! Important: useRequestFetch is required for SSR authenticated requests
+   */
+  const { data: analytics } = useAsyncData('user-analytics', () =>
+    useRequestFetch()<UserAnalyticsSummary>('/api/analytics/user-listings'))
 
   /**
    * Track when a user views a listing
@@ -64,27 +70,8 @@ export function useAnalytics() {
     }
   }
   
-  /**
-   * Get the current user's analytics data
-   * @returns Analytics data for the current user's listings
-   */
-  const getUserAnalytics = async () => {
-    try {
-      return await $fetch('/api/analytics/user-listings')
-    } catch (error) {
-      console.error('Failed to fetch user analytics:', error)
-      return {
-        totalViews: 0,
-        previousMonthViews: 0,
-        percentageChange: 0,
-        favoritedByOthersCount: 0,
-        totalConversations: 0,
-      }
-    }
-  }
-  
   return {
+    analytics,
     trackListingView,
-    getUserAnalytics
   }
 }
