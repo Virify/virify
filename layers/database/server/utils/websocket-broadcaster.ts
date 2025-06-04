@@ -1,4 +1,4 @@
-import type { Peer } from "../api/_ws/conversation";
+import type { Peer } from "~~/layers/websocket/server/api/_ws/connection";
 import type { IncomingWebSocketMessage, NewMessageEvent, NewConversationEvent, TypingEvent, MessageReadEvent } from "~~/shared/types/websocket";
 import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
 

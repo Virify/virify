@@ -36,6 +36,7 @@ import { useWebSocket } from "@vueuse/core";
 import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
 import type { NewMessageEvent, NewConversationEvent, TypingEvent, MessageReadEvent } from "~~/shared/types/websocket";
 import { useWebSocketMessageHandler } from "~/composables/useWebSocketMessageHandler";
+import { useWebSocketUtils } from "~~/layers/websocket/composables/useWebSocketConnection";
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -55,6 +56,7 @@ const { user } = useUserSession();
 const message = ref("");
 const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
 const { handleWebSocketMessage } = useWebSocketMessageHandler();
+const { createMessageSender } = useWebSocketUtils();
 const activeChatRef = ref<{ scrollToBottom: () => void } | null>(null);
 
 // Typing indicators state
@@ -63,7 +65,10 @@ const typingTimeoutDuration = 3000; // 3 seconds
 
 // WebSocket connection
 const config = useRuntimeConfig();
-const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/conversation");
+const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
+
+// Create typed message sender using websocket utilities
+const { sendTypingNotification: sendTypingMsg, sendMessageReadNotification } = createMessageSender(send);
 
 // Debug WebSocket connection status
 watch(status, (newStatus) => {
@@ -109,13 +114,7 @@ const sendTypingNotification = (isTyping: boolean) => {
       if (activeConversation.value && user.value) {
         const otherUserId = getOtherUserId(activeConversation.value, user.value.id!);
         if (otherUserId) {
-          const notification = {
-            type: "typing",
-            conversationId: activeConversation.value.id,
-            toUserId: otherUserId,
-            isTyping: true,
-          };
-          send(JSON.stringify(notification));
+          sendTypingMsg(activeConversation.value.id, otherUserId, true);
         }
       }
     }, 300);
@@ -124,13 +123,7 @@ const sendTypingNotification = (isTyping: boolean) => {
     if (activeConversation.value && user.value) {
       const otherUserId = getOtherUserId(activeConversation.value, user.value.id!);
       if (otherUserId) {
-        const notification = {
-          type: "typing",
-          conversationId: activeConversation.value.id,
-          toUserId: otherUserId,
-          isTyping: false,
-        };
-        send(JSON.stringify(notification));
+        sendTypingMsg(activeConversation.value.id, otherUserId, false);
       }
     }
   }

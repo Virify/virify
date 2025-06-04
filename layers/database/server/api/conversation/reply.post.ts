@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { broadcastNewMessage } from "~~/layers/communication/server/utils/websocket-broadcaster";
+import { broadcastNewMessage } from "~~/layers/websocket/server/utils/websocket-broadcaster";
 
 const replySchema = z.object({
   conversationId: z.coerce.number(),

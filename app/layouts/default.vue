@@ -48,7 +48,7 @@ useHead({
 const config = useRuntimeConfig();
 const { user } = useUserSession();
 
-const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/conversation", {
+const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
   autoConnect: false,
   immediate: false,
   autoClose: false,

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { createConversation } from "~~/layers/database/server/utils/conversation";
-import { broadcastNewConversation } from "~~/layers/communication/server/utils/websocket-broadcaster";
+import { broadcastNewConversation } from "~~/layers/websocket/server/utils/websocket-broadcaster";
 import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
 
 const conversationSchema = z.object({

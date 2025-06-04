@@ -1,4 +1,4 @@
-import { addPeer, removePeer, sendTypingNotification, sendMessageReadNotification } from "~~/layers/communication/server/utils/websocket-broadcaster";
+import { addPeer, removePeer, sendTypingNotification, sendMessageReadNotification } from "../../utils/websocket-broadcaster";
 import type { OutgoingWebSocketMessage } from "~~/shared/types/websocket";
 
 export type Peer = {
@@ -50,18 +50,22 @@ export default defineWebSocketHandler({
 
       switch (parsed.type) {
         case "typing":
-          sendTypingNotification(parsed.conversationId, user.id!, parsed.toUserId, parsed.isTyping);
+          if (parsed.conversationId && parsed.toUserId !== undefined && parsed.isTyping !== undefined) {
+            sendTypingNotification(parsed.conversationId, user.id!, parsed.toUserId, parsed.isTyping);
+          }
           break;
 
         case "message_read":
-          sendMessageReadNotification(parsed.conversationId, parsed.messageId, user.id!, parsed.toUserId);
+          if (parsed.conversationId && parsed.messageId && parsed.toUserId !== undefined) {
+            sendMessageReadNotification(parsed.conversationId, parsed.messageId, user.id!, parsed.toUserId);
+          }
           break;
 
         default:
-          console.warn(`Unknown WebSocket message type from user ${user.id}:`, parsed);
+          console.warn("Unknown WebSocket message type:", (parsed as any).type);
       }
     } catch (error) {
-      console.error(`Error parsing WebSocket message from user ${user.id}:`, error);
+      console.error("Error parsing WebSocket message:", error);
     }
   },
 });
