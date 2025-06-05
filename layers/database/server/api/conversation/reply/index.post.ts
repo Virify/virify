@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { broadcastNewMessage } from "~~/layers/websocket/server/utils/websocket-broadcaster";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 
 const replySchema = z.object({
   conversationId: z.coerce.number(),
@@ -7,12 +7,12 @@ const replySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event);
+  const { user } = await requireUserSession(event);
+  const { sendMessage, createNewMessageMessage } = useWebSocketServer();
 
   try {
     const { conversationId, message } = await readValidatedBody(event, replySchema.parse);
-
-    const senderId = session.user.id;
+    const senderId = user.id;
 
     if (!senderId) {
       throw createError({
@@ -23,8 +23,11 @@ export default defineEventHandler(async (event) => {
 
     const newMessage = await replyToConversation(conversationId, message, senderId);
 
-    // Broadcast the new message to all conversation participants via WebSocket
-    broadcastNewMessage(conversationId, newMessage);
+    const receiverId = newMessage.senderId === senderId ? newMessage.receiverId : newMessage.senderId;
+
+    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId);
+
+    sendMessage(messageToSend);
 
     return newMessage;
   } catch (error) {

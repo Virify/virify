@@ -21,7 +21,7 @@
           <p class="| body-xs">Enquiries on your listings</p>
         </div>
       </div>
-    
+
       <!-- notifications -->
       <div class="account-notifications">
         <h3 class="title-sm">Notifications</h3>
@@ -73,7 +73,6 @@ const { user, loggedIn } = useUserSession();
 const { analytics } = useAnalytics();
 </script>
 <style lang="scss" scoped>
-
 .account-profile-content {
   margin-top: -3rem;
 }

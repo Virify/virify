@@ -1,78 +1,73 @@
-import type { ConversationWithUserAndMessages, MessageWithUser } from './conversation';
+import type { ConversationWithUserAndMessages, MessageWithUser } from "./conversation";
 
-// Base WebSocket message structure
+/**
+ * Base WebSocket message structure
+ */
 export interface BaseWebSocketMessage {
-  type: string;
-  timestamp: string;
+  type: WebSocketMessageType;
+  to?: number | number[] | "all";
+  from?: number;
+  timestamp?: string;
 }
 
-// Incoming message types (from server to client)
-export interface NewMessageEvent extends BaseWebSocketMessage {
-  type: 'new_message';
-  data: {
-    conversationId: number;
-    message: MessageWithUser;
-  };
-}
-
-export interface NewConversationEvent extends BaseWebSocketMessage {
-  type: 'new_conversation';
-  data: {
-    conversation: ConversationWithUserAndMessages;
-  };
-}
-
-export interface TypingEvent extends BaseWebSocketMessage {
-  type: 'typing';
-  data: {
-    conversationId: number;
-    userId: number;
-    isTyping: boolean;
-  };
-}
-
-export interface MessageReadEvent extends BaseWebSocketMessage {
-  type: 'message_read';
-  data: {
-    conversationId: number;
-    messageId: number;
-    readByUserId: number;
-  };
-}
-
-// Union type for all incoming WebSocket messages
-export type IncomingWebSocketMessage = 
-  | NewMessageEvent 
-  | NewConversationEvent 
-  | TypingEvent 
-  | MessageReadEvent;
-
-// Outgoing message types (from client to server)
-export interface TypingNotification {
-  type: 'typing';
+/**
+ * Specific message interfaces for each type
+ */
+export interface TypingMessage extends BaseWebSocketMessage {
+  type: "typing";
   conversationId: number;
-  toUserId: number; // Added this field for proper routing
   isTyping: boolean;
+  to: number;
 }
 
-export interface MessageReadNotification {
-  type: 'message_read';
-  conversationId: number; // Added this field for proper routing
+export interface NewMessageMessage extends BaseWebSocketMessage {
+  type: "new_message";
+  conversationId: number;
+  message: MessageWithUser;
+  to: number | number[];
+}
+
+export interface NewConversationMessage extends BaseWebSocketMessage {
+  type: "new_conversation";
+  conversation: ConversationWithUserAndMessages;
+  to: number | number[];
+}
+
+export interface MessageReadMessage extends BaseWebSocketMessage {
+  type: "message_read";
+  conversationId: number;
   messageId: number;
-  toUserId: number; // Added this field for proper routing
+  to: number;
 }
 
-// Union type for all outgoing WebSocket messages
-export type OutgoingWebSocketMessage = 
-  | TypingNotification 
-  | MessageReadNotification;
-
-// Helper types for message handling
-export type WebSocketMessageHandler<T extends IncomingWebSocketMessage> = (message: T) => void;
-
-export interface WebSocketHandlers {
-  onNewMessage: WebSocketMessageHandler<NewMessageEvent>;
-  onNewConversation: WebSocketMessageHandler<NewConversationEvent>;
-  onTyping: WebSocketMessageHandler<TypingEvent>;
-  onMessageRead: WebSocketMessageHandler<MessageReadEvent>;
+export interface HeartbeatMessage extends BaseWebSocketMessage {
+  type: "heartbeat";
+  to?: "all";
 }
+
+export interface ConnectionStatusMessage extends BaseWebSocketMessage {
+  type: "connection_status";
+  userId: number;
+  isOnline: boolean;
+  to: number | number[] | "all";
+}
+
+/**
+ * Union type of all possible WebSocket messages
+ */
+export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | HeartbeatMessage | ConnectionStatusMessage;
+
+/**
+ * Message types - determined by the 'type' field
+ */
+export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "heartbeat" | "connection_status";
+
+/**
+ * Handler function type for processing messages
+ */
+export type WebSocketMessageHandler = (message: WebSocketMessage) => void | Promise<void>;
+
+/**
+ * Handlers map for different message types
+ */
+export type WebSocketHandlers = Partial<Record<WebSocketMessageType, WebSocketMessageHandler>>;

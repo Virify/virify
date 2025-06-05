@@ -17,36 +17,36 @@
 import { useWebSocket } from "@vueuse/core";
 
 useServerSeoMeta({
-  title: 'Virify | Welcome',
-  description: 'New website coming soon...'
-})
+  title: "Virify | Welcome",
+  description: "New website coming soon...",
+});
 
 useHead({
   htmlAttrs: {
-    lang: 'en-GB',
+    lang: "en-GB",
   },
   link: [
     {
-      rel: 'preconnect',
-      href: 'https://fonts.googleapis.com'
+      rel: "preconnect",
+      href: "https://fonts.googleapis.com",
     },
     {
-      rel: 'preconnect',
-      href: 'https://fonts.gstatic.com',
-      crossorigin: 'anonymous'
+      rel: "preconnect",
+      href: "https://fonts.gstatic.com",
+      crossorigin: "anonymous",
     },
     {
-      rel: 'preload',
-      as: 'style',
-      href: 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap',
-      onload: 'this.onload=null; this.rel="stylesheet"'
-    }
-  ]
-})
+      rel: "preload",
+      as: "style",
+      href: "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap",
+      onload: 'this.onload=null; this.rel="stylesheet"',
+    },
+  ],
+});
 
 // Global WebSocket connection - establish connection when user logs in
 const config = useRuntimeConfig();
-const { user } = useUserSession();
+const { loggedIn } = useUserSession();
 
 const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
   autoConnect: false,
@@ -64,10 +64,10 @@ const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
 // Connect when user logs in
 if (import.meta.client) {
   watch(
-    () => user.value,
+    () => loggedIn.value,
     (newUser) => {
-      if (newUser && ws.status.value === 'CLOSED') {
-        ws.open(); // Manually open connection
+      if (newUser && ws.status.value === "CLOSED") {
+        ws.open();
         console.log("WebSocket connection established in default layout");
       }
     },

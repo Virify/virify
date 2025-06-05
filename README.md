@@ -1,16 +1,17 @@
 # Virify
 
-A modern property management and listing platform built with Nuxt 3, featuring an extensible layer-based architecture.
+A modern property management and listing platform built with Nuxt 3, featuring an extensible layer-based architecture and real-time messaging capabilities.
 
 ## 📋 Overview
 
 Virify is a comprehensive property management system that allows users to:
-- List and manage properties
-- Search properties with interactive maps
-- Save favorites and add notes
-- Handle user authentication
-- Send automated emails
-- Process and display property media
+- List and manage properties with detailed information
+- Search properties with interactive maps and advanced filtering
+- Save favorites and add personal notes
+- Real-time messaging between users
+- Secure user authentication and authorization
+- Send automated transactional emails
+- Process and display property media with analytics
 
 ## 🏗 Architecture
 
@@ -22,6 +23,8 @@ The application is built using a modular layer architecture for better separatio
 - [Email Layer](./layers/email/README.md) - Transactional emails with Vue Email and AWS SES
 - [Map Layer](./layers/map/README.md) - MapTiler integration for property locations
 - [UI Layer](./layers/ui/README.md) - Reusable component library and design system
+- [WebSocket Layer](./layers/websocket/README.md) - Real-time messaging and notifications
+- [Analytics Layer](./layers/analytics/README.md) - User behavior tracking and insights
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -98,15 +101,20 @@ pnpm dev
 │   ├── components/       # Vue components (atoms, molecules, organisms)
 │   ├── composables/      # Vue composables
 │   ├── pages/           # Page components
-│   └── plugins/         # Nuxt plugins
+│   ├── middleware/      # Route middleware
+│   ├── layouts/         # Page layouts
+│   └── utils/           # Utility functions
 ├── layers/              # Feature layers
+│   ├── analytics/      # Analytics and tracking
 │   ├── auth/           # Authentication layer
 │   ├── database/       # Database layer
 │   ├── email/          # Email functionality
 │   ├── map/            # Map integration
-│   └── ui/             # UI components
-├── server/             # Server-side code
+│   ├── ui/             # UI components
+│   └── websocket/      # Real-time messaging
 ├── shared/             # Shared types and utilities
+│   ├── types/          # TypeScript type definitions
+│   └── utils/          # Shared utility functions
 └── public/             # Static assets
 ```
 
@@ -125,20 +133,24 @@ pnpm test:full
 
 Each layer contains its own documentation:
 - [Auth Layer Documentation](./layers/auth/README.md)
-- [Database Layer Documentation](./layers/database/README.md)
+- [Database Layer Documentation](./layers/database/README.md) 
 - [Email Layer Documentation](./layers/email/README.md)
 - [Map Layer Documentation](./layers/map/README.md)
 - [UI Layer Documentation](./layers/ui/README.md)
+- [WebSocket Layer Documentation](./layers/websocket/README.md)
+- [Analytics Layer Documentation](./layers/analytics/README.md)
 
 ## 🔐 Environment Variables
 
 Required environment variables:
 - `DATABASE_URL` - PostgreSQL connection string
-- `MAPTILER_API_KEY` - MapTiler API key
-- `AWS_ACCESS_KEY_ID` - AWS access key for SES
-- `AWS_SECRET_ACCESS_KEY` - AWS secret for SES
-- `AWS_REGION` - AWS region for SES
-- `SESSION_SECRET` - Secret for session management
+- `MAPTILER_API_KEY` - MapTiler API key for maps
+- `AWS_ACCESS_KEY_ID` - AWS access key for SES email service
+- `AWS_SECRET_ACCESS_KEY` - AWS secret for SES email service
+- `AWS_REGION` - AWS region for SES (e.g., us-east-1)
+- `SESSION_SECRET` - Secret for session management (generate random string)
+- `WS_BASE_URL` - WebSocket server URL (e.g., ws://localhost:3000)
+- `NUXT_SECRET_KEY` - Nuxt secret key for encryption
 
 ## 🤝 Contributing
 

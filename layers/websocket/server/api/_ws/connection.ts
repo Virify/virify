@@ -1,10 +1,8 @@
-import { addPeer, removePeer, broadcastTypingStatus, broadcastMessageReadStatus } from "../../utils/websocket-broadcaster";
-import type { OutgoingWebSocketMessage } from "~~/shared/types/websocket";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
+import type { WebSocketMessage } from "~~/shared/types/websocket";
 
-export type Peer = {
-  send: (message: string) => void;
-  close: () => void;
-};
+// Initialize the WebSocket server composable
+const { addPeer, removePeer, handleIncomingMessages } = useWebSocketServer();
 
 export default defineWebSocketHandler({
   /**
@@ -18,7 +16,9 @@ export default defineWebSocketHandler({
    * Open a new WebSocket connection
    */
   async open(peer) {
+    console.log("🚀 WebSocket connection opened");
     const { user } = await requireUserSession(peer);
+    console.log("👤 User connected:", user.id);
     addPeer(user.id!, peer);
   },
 
@@ -30,7 +30,8 @@ export default defineWebSocketHandler({
       const { user } = await requireUserSession(peer);
       removePeer(user.id!, peer);
     } catch (error) {
-      // User session expired or invalid
+      // User session expired or invalid - ignore
+      console.warn("Failed to remove peer on close:", error);
     }
   },
 
@@ -45,27 +46,7 @@ export default defineWebSocketHandler({
       return;
     }
 
-    try {
-      const parsed: OutgoingWebSocketMessage = JSON.parse(String(message));
-
-      switch (parsed.type) {
-        case "typing":
-          if (parsed.conversationId && parsed.toUserId !== undefined && parsed.isTyping !== undefined) {
-            broadcastTypingStatus(parsed.conversationId, user.id!, parsed.toUserId, parsed.isTyping);
-          }
-          break;
-
-        case "message_read":
-          if (parsed.conversationId && parsed.messageId && parsed.toUserId !== undefined) {
-            broadcastMessageReadStatus(parsed.conversationId, parsed.messageId, user.id!, parsed.toUserId);
-          }
-          break;
-
-        default:
-          console.warn("Unknown WebSocket message type:", (parsed as any).type);
-      }
-    } catch (error) {
-      console.error("Error parsing WebSocket message:", error);
-    }
+    // Process the message through the unified handler
+    handleIncomingMessages(String(message), user.id!);
   },
 });
