@@ -6,11 +6,10 @@ export default defineEventHandler(async (event) => {
   // Ensure user is authenticated
   await requireUserSession(event);
 
-  const { peers } = await import("../../../utils/websocket-broadcaster");
-  
+  // For now, return basic status - we could enhance this later
   return {
     status: "active",
-    activeUsers: peers.size,
+    activeUsers: 0, // Could implement this in the composable if needed
     timestamp: new Date().toISOString(),
   };
 });
