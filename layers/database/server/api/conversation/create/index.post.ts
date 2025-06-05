@@ -10,11 +10,12 @@ const conversationSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { user } = await requireUserSession(event);
+  const { sendMessage, createNewConversationMessage } = useWebSocketServer();
   try {
-    const session = await requireUserSession(event);
     const { listingId, receiverId, message } = await readValidatedBody(event, conversationSchema.parse);
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     if (!userId) {
       throw createError({
@@ -25,15 +26,8 @@ export default defineEventHandler(async (event) => {
 
     const conversation = (await createConversation(userId, receiverId, message, listingId)) as ConversationWithUserAndMessages;
 
-    // Get WebSocket server instance
-    const { sendMessage, createNewConversationMessage } = useWebSocketServer();
-
     // Send the new conversation to the receiver (exclude creator)
-    const messageToSend = createNewConversationMessage(
-      conversation,
-      [receiverId],
-      userId
-    );
+    const messageToSend = createNewConversationMessage(conversation, [receiverId], userId);
 
     sendMessage(messageToSend);
 

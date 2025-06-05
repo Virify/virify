@@ -56,7 +56,7 @@ const config = useRuntimeConfig();
 const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
 
 // WebSocket composable
-const { createTypingMessage, createNewMessageMessage, handleOutgoingMessages } = useWebSocketServer();
+const { createTypingMessage, handleOutgoingMessages } = useWebSocketServer();
 
 // Fetch conversations with secure session handling
 const conversationsData = await useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/");
@@ -68,7 +68,7 @@ const conversations = ref<ConversationWithUserAndMessages[]>(conversationsData |
  */
 const webSocketEvents: WebSocketEvents = {
   /**
-   * Handles incoming new message events from other users
+   * Handles incoming new message events from all participants
    * Updates the conversation and moves it to the top of the list
    * @param conversationId - ID of the conversation the message belongs to
    * @param message - The new message object from the server
@@ -193,11 +193,11 @@ async function sendReply() {
       method: "POST",
       body: { message: content, conversationId },
     });
-    
+
     // UI will be updated automatically when WebSocket receives the message
   } catch (error) {
     console.error("Error sending message:", error);
-    
+
     // Restore original message content for retry
     message.value = content;
   }

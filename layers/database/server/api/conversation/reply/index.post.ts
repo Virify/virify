@@ -7,11 +7,12 @@ const replySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event);
+  const { user } = await requireUserSession(event);
+  const { sendMessage, createNewMessageMessage } = useWebSocketServer();
 
   try {
     const { conversationId, message } = await readValidatedBody(event, replySchema.parse);
-    const senderId = session.user.id;
+    const senderId = user.id;
 
     if (!senderId) {
       throw createError({
@@ -22,16 +23,9 @@ export default defineEventHandler(async (event) => {
 
     const newMessage = await replyToConversation(conversationId, message, senderId);
 
-    // Send WebSocket notification to all participants (sender and receiver)
-    const { sendMessage, createNewMessageMessage } = useWebSocketServer();
     const receiverId = newMessage.senderId === senderId ? newMessage.receiverId : newMessage.senderId;
 
-    const messageToSend = createNewMessageMessage(
-      conversationId,
-      newMessage,
-      [senderId, receiverId], // Send to both participants
-      senderId
-    );
+    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId);
 
     sendMessage(messageToSend);
 

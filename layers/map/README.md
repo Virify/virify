@@ -1,7 +1,7 @@
 # Map Layer
 
 ## Overview
-The map layer integrates MapTiler SDK for interactive property mapping functionality in the Virify platform. It provides features for displaying property locations, custom markers with pricing information, and interactive property details popups.
+The map layer integrates MapTiler SDK for interactive property mapping functionality in the Virify platform. It provides comprehensive mapping features including property visualization, custom markers, interactive popups, and polygon drawing capabilities for area-based searches.
 
 ## Features
 - 🗺️ Interactive property maps with MapTiler SDK integration
@@ -10,17 +10,25 @@ The map layer integrates MapTiler SDK for interactive property mapping functiona
 - 🎯 Smart map positioning and zoom based on search radius
 - 📱 Responsive map controls with zoom functionality
 - 🔄 Efficient marker caching and map instance reuse
+- ✏️ Polygon drawing for area-based property searches
+- 🔍 Geocoding and address autocomplete
+- 📐 Distance and area calculations
 
 ## Directory Structure
 - `components/`: Map-related Vue components
   - `molecules/`: Reusable map components
     - `MoleculesMarkerPopup.vue`: Property details popup component
     - `MoleculesPriceMarker.vue`: Custom price marker component
-  - `OrganismsMap.vue`: Main map component
+  - `OrganismsMap.vue`: Main map component with drawing support
 - `composables/`: Map utility functions
   - `useMapTiler.ts`: Core map functionality composable
 - `plugins/`: MapTiler SDK integration
   - `maptiler.client.ts`: Client-side MapTiler initialization
+- `pages/`: Map-specific pages
+  - Map search and area selection pages
+- `utils/`: Map utility functions
+  - Geocoding helpers
+  - Coordinate calculations
 
 ## Setup
 
@@ -37,7 +45,7 @@ MAPTILER_API_KEY=your_api_key
 
 ## Usage
 
-### Basic Map Integration
+### Advanced Map with Drawing
 ```vue
 <template>
   <OrganismsMap
@@ -45,10 +53,24 @@ MAPTILER_API_KEY=your_api_key
     :zoom="12"
     :interactive="true"
     :display-popups="true"
+    :drawing-enabled="true"
+    :drawing-mode="'polygon'"
     @property-note="handleNote"
     @property-favourite="handleFavorite"
+    @shape-drawn="handleAreaSearch"
+    @shape-updated="handleAreaUpdate"
+    @shape-deleted="handleAreaClear"
   />
 </template>
+
+<script setup>
+function handleAreaSearch(feature) {
+  // Perform property search within drawn polygon
+  const coordinates = feature.geometry.coordinates[0];
+  searchPropertiesInArea(coordinates);
+}
+</script>
+```
 ```
 
 ### Map Marker Structure
@@ -74,22 +96,40 @@ const mapMarker = {
 ### Map Composable Functions
 ```ts
 const { 
-  initializeMap,    // Create or reuse a map instance
-  addMarker,        // Add a property marker to the map
-  clearMarkers,     // Remove all markers from the map
-  centerMap,        // Center map on specific coordinates
-  autoComplete,     // Geocoding search functionality
-  calculateZoomLevelFromRadius  // Calculate appropriate zoom level
+  initializeMap,                    // Create or reuse a map instance
+  addMarker,                        // Add a property marker to the map
+  clearMarkers,                     // Remove all markers from the map
+  centerMap,                        // Center map on specific coordinates
+  autoComplete,                     // Geocoding search functionality
+  calculateZoomLevelFromRadius,     // Calculate appropriate zoom level
+  initDrawing,                      // Enable/disable polygon drawing
+  getDrawnShapes,                   // Get all drawn polygon shapes
+  clearDrawnShapes                  // Clear all drawn shapes
 } = useMapTiler()
 ```
 
+### Geocoding and Search
+```ts
+// Address autocomplete
+const suggestions = await autoComplete(searchQuery);
+
+// Reverse geocoding
+const address = await reverseGeocode(latitude, longitude);
+
+// Area-based property search
+const properties = await searchPropertiesInPolygon(polygonCoordinates);
+```
+
 ## Best Practices
-- Use the `GLOBAL_MAP_ID` constant to share map instances across pages
-- Handle map visibility changes by resizing the map appropriately
-- Provide fallback UI for when coordinates are not available
-- Properly clean up markers before adding new ones
-- Use the marker cache to optimize performance
-- Always validate coordinates before displaying them
+- **Map Instance Management**: Use the `GLOBAL_MAP_ID` constant to share map instances across pages
+- **Performance**: Handle map visibility changes by resizing the map appropriately
+- **Error Handling**: Provide fallback UI for when coordinates are not available
+- **Memory Management**: Properly clean up markers before adding new ones
+- **Caching**: Use the marker cache to optimize performance
+- **Validation**: Always validate coordinates before displaying them
+- **User Experience**: Provide clear drawing instructions and feedback
+- **Responsive Design**: Ensure maps work well on all device sizes
+- **Accessibility**: Include appropriate ARIA labels and keyboard navigation
 
 # Map Drawing Implementation
 

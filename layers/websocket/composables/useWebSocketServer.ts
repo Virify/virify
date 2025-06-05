@@ -37,7 +37,7 @@ export const useWebSocketServer = () => {
 
   /**
    * Removes a WebSocket peer for a user
-   * @param userId - The ID of the user  
+   * @param userId - The ID of the user
    * @param peer - The WebSocket peer connection object to remove
    */
   const removePeer = (userId: number, peer: { send: (data: string) => void; close: () => void }) => {
@@ -91,12 +91,12 @@ export const useWebSocketServer = () => {
   /**
    * Routes messages to appropriate WebSocket peers based on message content
    * This is the main message distribution function that determines where messages go
-   * 
+   *
    * @param message - The message object to send (must include 'to' field for routing)
-   * 
+   *
    * Routing Logic:
    * - `to: "all"` → Broadcasts to every connected user (rare, used for system announcements)
-   * - `to: [1,2,3]` → Sends to specific user IDs (typical for group chats)  
+   * - `to: [1,2,3]` → Sends to specific user IDs (typical for group chats)
    * - `to: 123` → Sends to single user ID (typical for direct messages)
    */
   const sendMessage = (message: any) => {
@@ -200,11 +200,11 @@ export const useWebSocketServer = () => {
     }
   };
 
- /**
-  * Checks if a user is currently online and has active WebSocket connections
-  * @param userId - The ID of the user to check
-  * @returns True if the user has active connections, false otherwise
-  */
+  /**
+   * Checks if a user is currently online and has active WebSocket connections
+   * @param userId - The ID of the user to check
+   * @returns True if the user has active connections, false otherwise
+   */
   const isUserOnline = (userId: number) => {
     return peers.has(userId) && peers.get(userId)!.size > 0;
   };
@@ -233,7 +233,7 @@ export const useWebSocketServer = () => {
             message: wsMessage.message!,
           });
           break;
-          
+
         /**
          * New conversation created - Updates UI when a new chat conversation starts
          * Triggers: Conversation list refresh, navigation to new chat
@@ -244,7 +244,7 @@ export const useWebSocketServer = () => {
             conversation: wsMessage.conversation!,
           });
           break;
-          
+
         /**
          * Typing indicator received - Shows/hides "user is typing" UI elements
          * Triggers: Typing indicator animations, status text updates
@@ -257,7 +257,7 @@ export const useWebSocketServer = () => {
             isTyping: wsMessage.isTyping!,
           });
           break;
-          
+
         /**
          * Message read confirmation - Updates message status when read by recipient
          * Triggers: Read receipt indicators, message status icons
@@ -270,7 +270,7 @@ export const useWebSocketServer = () => {
             messageId: wsMessage.messageId!,
           });
           break;
-          
+
         default:
           console.warn("Unknown message type:", wsMessage.type);
       }
@@ -327,12 +327,7 @@ export const useWebSocketServer = () => {
    * @param from - The user ID who sent the message (optional, will be set by server)
    * @returns Formatted new message notification object
    */
-  const createNewMessageMessage = (
-    conversationId: number, 
-    message: any, 
-    to: number | number[], 
-    from?: number
-  ): NewMessageMessage => ({
+  const createNewMessageMessage = (conversationId: number, message: any, to: number | number[], from?: number): NewMessageMessage => ({
     type: "new_message",
     conversationId,
     message,
@@ -349,11 +344,7 @@ export const useWebSocketServer = () => {
    * @param from - The user ID who created the conversation (optional, will be set by server)
    * @returns Formatted new conversation notification object
    */
-  const createNewConversationMessage = (
-    conversation: any, 
-    to: number | number[], 
-    from?: number
-  ): NewConversationMessage => ({
+  const createNewConversationMessage = (conversation: any, to: number | number[], from?: number): NewConversationMessage => ({
     type: "new_conversation",
     conversation,
     to,
@@ -369,11 +360,7 @@ export const useWebSocketServer = () => {
    * @param to - Who to notify (defaults to "all" for global status updates)
    * @returns Formatted connection status message object
    */
-  const createConnectionStatusMessage = (
-    userId: number, 
-    isOnline: boolean, 
-    to: number | number[] | "all" = "all"
-  ): ConnectionStatusMessage => ({
+  const createConnectionStatusMessage = (userId: number, isOnline: boolean, to: number | number[] | "all" = "all"): ConnectionStatusMessage => ({
     type: "connection_status",
     userId,
     isOnline,
