@@ -26,16 +26,14 @@ export default defineEventHandler(async (event) => {
     const conversation = (await createConversation(userId, receiverId, message, listingId)) as ConversationWithUserAndMessages;
 
     // Get WebSocket server instance
-    const { sendMessage } = useWebSocketServer();
+    const { sendMessage, createNewConversationMessage } = useWebSocketServer();
 
-    // Send the new conversation to the receiver (exclude creator) - use format expected by client
-    const messageToSend = {
-      type: "new_conversation",
-      to: [receiverId],
-      from: userId,
-      conversation: conversation,
-      timestamp: new Date().toISOString(),
-    };
+    // Send the new conversation to the receiver (exclude creator)
+    const messageToSend = createNewConversationMessage(
+      conversation,
+      [receiverId],
+      userId
+    );
 
     sendMessage(messageToSend);
 

@@ -56,110 +56,125 @@ const config = useRuntimeConfig();
 const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
 
 // WebSocket composable
-const { createTypingMessage, handleIncomingMessage } = useWebSocketServer();
+const { createTypingMessage, createNewMessageMessage, handleOutgoingMessages } = useWebSocketServer();
 
 // Fetch conversations with secure session handling
 const conversationsData = await useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/");
 const conversations = ref<ConversationWithUserAndMessages[]>(conversationsData || []);
 
-// Computed: Check if other user is typing
-const isOtherUserTyping = computed(() => {
-  if (!user.value) return false;
-  return Object.entries(typingUsers.value).some(([userId, isTyping]) => isTyping && Number(userId) !== user.value!.id);
-});
-
-// Define WebSocket event handlers
+/**
+ * WebSocket event handlers - Called when WebSocket messages are received
+ * These handle real-time updates to the chat interface
+ */
 const webSocketEvents: WebSocketEvents = {
+  /**
+   * Handles incoming new message events from other users
+   * Updates the conversation and moves it to the top of the list
+   * @param conversationId - ID of the conversation the message belongs to
+   * @param message - The new message object from the server
+   */
   onNewMessage: ({ conversationId, message: newMessage }) => {
-    console.log("📨 New message received:", { conversationId, message: newMessage });
-    console.log("👤 Current user ID:", user.value?.id);
-    console.log("📧 Message sender ID:", newMessage.senderId);
-
     if (!conversations.value || !user.value) return;
 
     const conversation = conversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
-    if (!conversation) {
-      console.log("❌ Conversation not found:", conversationId);
-      return;
-    }
+    if (!conversation) return;
 
-    // Check for duplicates
-    if (conversation.messages.some((m: MessageWithUser) => m.id === newMessage.id)) {
-      console.log("⚠️ Duplicate message detected, skipping");
-      return;
-    }
+    // Prevent duplicate messages
+    if (conversation.messages.some((m: MessageWithUser) => m.id === newMessage.id)) return;
 
-    // Add message directly
+    // Add message and update conversation timestamp
     conversation.messages.push(newMessage);
     conversation.updatedAt = new Date();
 
-    // Move conversation to top
+    // Move conversation to top of list and trigger reactivity
     const index = conversations.value.indexOf(conversation);
     if (index > 0) {
       conversations.value.splice(index, 1);
       conversations.value.unshift(conversation);
     }
-
-    // Force reactivity update for receiver UI
     triggerRef(conversations);
 
-    // Scroll if active conversation
+    // Auto-scroll to new message if this conversation is active
     if (activeConversation.value?.id === conversationId) {
       nextTick(() => activeChatRef.value?.scrollToBottom());
     }
-
-    console.log("✅ Message added successfully");
   },
 
+  /**
+   * Handles new conversation creation events
+   * Adds the new conversation to the top of the conversations list
+   * @param conversation - The new conversation object
+   */
   onNewConversation: ({ conversation }) => {
-    console.log("🆕 New conversation received:", conversation);
     if (conversations.value) {
       conversations.value.unshift(conversation);
     }
   },
 
+  /**
+   * Handles typing indicator events from other users
+   * Shows/hides "user is typing" indicators in the active conversation
+   * @param from - User ID who is typing
+   * @param conversationId - ID of the conversation where typing is happening
+   * @param isTyping - Whether the user is currently typing
+   */
   onTyping: ({ from, conversationId, isTyping }) => {
-    console.log("⌨️ Typing received:", { from, conversationId, isTyping });
-
     if (!activeConversation.value || activeConversation.value.id !== conversationId) return;
 
     if (isTyping) {
       typingUsers.value[from] = true;
-      // Clear after 3 seconds
-      setTimeout(() => {
-        delete typingUsers.value[from];
-      }, 3000);
+      // Auto-clear typing indicator after 3 seconds
+      setTimeout(() => delete typingUsers.value[from], 3000);
     } else {
       delete typingUsers.value[from];
     }
   },
 
+  /**
+   * Handles message read status events
+   * Updates message read receipts and status indicators
+   * @param from - User ID who read the message
+   * @param conversationId - ID of the conversation
+   * @param messageId - ID of the message that was read
+   */
   onMessageRead: ({ from, conversationId, messageId }) => {
-    console.log("📖 Message read received:", { from, conversationId, messageId });
-    // Handle message read status if needed
+    // TODO: Implement read receipt functionality
   },
 };
 
-// Watch WebSocket status for debugging
-watch(status, (newStatus) => {
-  console.log("🔌 WebSocket status changed:", newStatus);
+/**
+ * Computed property to check if another user is currently typing
+ * Excludes the current user from typing indicators
+ */
+const isOtherUserTyping = computed(() => {
+  if (!user.value) return false;
+  return Object.entries(typingUsers.value).some(([userId, isTyping]) => isTyping && Number(userId) !== user.value!.id);
 });
 
-// Watch WebSocket data and handle through composable
+/**
+ * Watch WebSocket data and route messages through the composable's event handler
+ */
 watchEffect(() => {
   if (data.value) {
-    handleIncomingMessage(data.value, webSocketEvents);
+    handleOutgoingMessages(data.value, webSocketEvents);
   }
 });
 
-// Set active conversation
+/**
+ * Sets the active conversation and resets the input field
+ * @param conversation - The conversation to make active
+ */
 function setActiveConversation(conversation: ConversationWithUserAndMessages) {
   activeConversation.value = conversation;
   message.value = "";
   nextTick(() => activeChatRef.value?.scrollToBottom());
 }
 
-// Send message with optimistic update
+/**
+ * Sends a reply message and lets WebSocket handle UI updates
+ * Server will broadcast the message to all participants (including sender)
+ * The onNewMessage event handler will update the UI when the message comes back
+ */
 async function sendReply() {
   if (!activeConversation.value || !message.value.trim() || status.value !== "OPEN" || !user.value) {
     return;
@@ -168,79 +183,43 @@ async function sendReply() {
   const content = message.value;
   const conversationId = activeConversation.value.id;
 
-  // Clear input and stop typing
+  // Clear input and stop typing indicator
   message.value = "";
   sendTypingStatus(false);
 
-  // Optimistic update - add message immediately for sender
-  const optimisticMessage: MessageWithUser = {
-    id: Date.now(), // Temporary ID
-    senderId: user.value.id!,
-    receiverId: getOtherUserId(activeConversation.value, user.value.id!)!,
-    content,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    sender: {
-      id: user.value.id!,
-      username: user.value.username || null,
-      email: user.value.email,
-    },
-    receiver: activeConversation.value.sender.id === user.value.id ? activeConversation.value.receiver : activeConversation.value.sender,
-  };
-
-  // Add to conversation immediately
-  activeConversation.value.messages.push(optimisticMessage);
-  activeConversation.value.updatedAt = new Date();
-
-  // Move conversation to top
-  const conversationIndex = conversations.value?.findIndex((c: ConversationWithUserAndMessages) => c.id === conversationId) ?? -1;
-  if (conversationIndex > 0 && conversations.value) {
-    conversations.value.splice(conversationIndex, 1);
-    conversations.value.unshift(activeConversation.value);
-  }
-
-  // Scroll to bottom
-  nextTick(() => activeChatRef.value?.scrollToBottom());
-
   try {
-    // Send to server - this will broadcast to the receiver via WebSocket
-    console.log("🚀 CLIENT: About to send message to API:", { content, conversationId });
-
-    const serverMessage = await $fetch<MessageWithUser>("/api/conversation/reply/", {
+    // Send message to server (will broadcast to all participants via WebSocket)
+    await $fetch<MessageWithUser>("/api/conversation/reply/", {
       method: "POST",
       body: { message: content, conversationId },
     });
-
-    console.log("✅ CLIENT: API response received:", serverMessage);
-
-    // Replace optimistic message with server response
-    const messageIndex = activeConversation.value.messages.findIndex((m: MessageWithUser) => m.id === optimisticMessage.id);
-    if (messageIndex !== -1) {
-      activeConversation.value.messages[messageIndex] = serverMessage;
-    }
+    
+    // UI will be updated automatically when WebSocket receives the message
   } catch (error) {
-    console.error("❌ CLIENT: Error sending message:", error);
-
-    // Remove optimistic message on error
-    const messageIndex = activeConversation.value.messages.findIndex((m: MessageWithUser) => m.id === optimisticMessage.id);
-    if (messageIndex !== -1) {
-      activeConversation.value.messages.splice(messageIndex, 1);
-    }
-
-    // Restore message
+    console.error("Error sending message:", error);
+    
+    // Restore original message content for retry
     message.value = content;
   }
 }
 
-// Typing handlers
+/**
+ * Handles user typing events from the input field
+ * Triggers typing status broadcast to other users
+ */
 function handleUserTyping() {
   sendTypingStatus(true);
 }
 
+/**
+ * Sends typing status to other users in the conversation
+ * Debounces typing start events and immediately sends stop events
+ * @param isTyping - Whether the user is currently typing
+ */
 function sendTypingStatus(isTyping: boolean) {
   if (!activeConversation.value || !user.value) return;
 
-  // Clear existing timeout
+  // Clear any existing typing timeout
   if (typingTimeout) {
     clearTimeout(typingTimeout);
     typingTimeout = null;
@@ -250,19 +229,24 @@ function sendTypingStatus(isTyping: boolean) {
   if (!otherUserId) return;
 
   if (isTyping) {
-    // Debounce typing
+    // Debounce typing start to avoid spam
     typingTimeout = setTimeout(() => {
       const typingMessage = createTypingMessage(activeConversation.value!.id, otherUserId, true);
       send(JSON.stringify(typingMessage));
     }, 300);
   } else {
-    // Send stop typing immediately
+    // Send stop typing immediately for responsive UX
     const typingMessage = createTypingMessage(activeConversation.value.id, otherUserId, false);
     send(JSON.stringify(typingMessage));
   }
 }
 
-// Utility: Get other user ID in conversation
+/**
+ * Gets the other user's ID in a conversation (not the current user)
+ * @param conversation - The conversation object
+ * @param currentUserId - The current user's ID
+ * @returns The other user's ID, or null if not found
+ */
 function getOtherUserId(conversation: ConversationWithUserAndMessages, currentUserId: number): number | null {
   return conversation.sender.id === currentUserId ? conversation.receiver.id : conversation.sender.id;
 }

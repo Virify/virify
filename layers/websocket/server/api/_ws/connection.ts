@@ -2,7 +2,7 @@ import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocket
 import type { WebSocketMessage } from "~~/shared/types/websocket";
 
 // Initialize the WebSocket server composable
-const { addPeer, removePeer, handleMessage } = useWebSocketServer();
+const { addPeer, removePeer, handleIncomingMessages } = useWebSocketServer();
 
 export default defineWebSocketHandler({
   /**
@@ -47,6 +47,6 @@ export default defineWebSocketHandler({
     }
 
     // Process the message through the unified handler
-    handleMessage(String(message), user.id!);
+    handleIncomingMessages(String(message), user.id!);
   },
 });
