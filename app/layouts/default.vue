@@ -44,7 +44,6 @@ useHead({
   ],
 });
 
-// Global WebSocket connection - establish connection when user logs in
 const config = useRuntimeConfig();
 const { loggedIn } = useUserSession();
 
@@ -59,6 +58,11 @@ const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
       console.warn("Failed to reconnect WebSocket after 3 attempts.");
     },
   },
+  heartbeat: {
+    message: "ping",
+    interval: 30000,
+    pongTimeout: 5000,
+  },
 });
 
 // Connect when user logs in
@@ -68,7 +72,6 @@ if (import.meta.client) {
     (newUser) => {
       if (newUser && ws.status.value === "CLOSED") {
         ws.open();
-        console.log("WebSocket connection established in default layout");
       }
     },
     { immediate: true }

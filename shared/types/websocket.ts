@@ -41,11 +41,6 @@ export interface MessageReadMessage extends BaseWebSocketMessage {
   to: number;
 }
 
-export interface HeartbeatMessage extends BaseWebSocketMessage {
-  type: "heartbeat";
-  to?: "all";
-}
-
 export interface ConnectionStatusMessage extends BaseWebSocketMessage {
   type: "connection_status";
   userId: number;
@@ -63,12 +58,12 @@ export interface AggregateUpdateMessage extends BaseWebSocketMessage {
 /**
  * Union type of all possible WebSocket messages
  */
-export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | HeartbeatMessage | ConnectionStatusMessage | AggregateUpdateMessage;
+export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | ConnectionStatusMessage | AggregateUpdateMessage;
 
 /**
  * Message types - determined by the 'type' field
  */
-export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "heartbeat" | "connection_status" | "aggregate_update";
+export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "connection_status" | "aggregate_update";
 
 /**
  * Handler function type for processing messages

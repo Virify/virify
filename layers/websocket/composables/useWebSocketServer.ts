@@ -176,21 +176,6 @@ export const useWebSocketServer = () => {
           break;
         }
 
-        /**
-         * Heartbeat/ping message - Keeps WebSocket connection alive
-         * Prevents connection timeouts and confirms client is still active
-         * Used for: Connection keep-alive, detecting disconnected clients
-         */
-        case "heartbeat": {
-          const heartbeatMsg: HeartbeatMessage = {
-            type: "heartbeat",
-            from: fromUserId,
-            timestamp: new Date().toISOString(),
-          };
-          sendMessage(heartbeatMsg);
-          break;
-        }
-
         default:
           console.warn("Unknown message type:", message.type);
       }
@@ -321,15 +306,6 @@ export const useWebSocketServer = () => {
   });
 
   /**
-   * Creates a heartbeat message for connection keep-alive
-   * @returns Formatted heartbeat message object
-   */
-  const createHeartbeatMessage = (): HeartbeatMessage => ({
-    type: "heartbeat",
-    timestamp: new Date().toISOString(),
-  });
-
-  /**
    * Creates a type-safe new message notification for WebSocket transmission
    * Used when a new chat message is sent between users
    * @param conversationId - The ID of the conversation
@@ -404,7 +380,6 @@ export const useWebSocketServer = () => {
     // Type-safe message creators
     createTypingMessage,
     createMessageReadMessage,
-    createHeartbeatMessage,
     createNewMessageMessage,
     createNewConversationMessage,
     createConnectionStatusMessage,

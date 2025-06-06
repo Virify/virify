@@ -1,5 +1,4 @@
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
-import type { WebSocketMessage } from "~~/shared/types/websocket";
 
 // Initialize the WebSocket server composable
 const { addPeer, removePeer, handleIncomingMessages } = useWebSocketServer();
@@ -16,9 +15,7 @@ export default defineWebSocketHandler({
    * Open a new WebSocket connection
    */
   async open(peer) {
-    console.log("🚀 WebSocket connection opened");
     const { user } = await requireUserSession(peer);
-    console.log("👤 User connected:", user.id);
     addPeer(user.id!, peer);
   },
 
@@ -30,7 +27,6 @@ export default defineWebSocketHandler({
       const { user } = await requireUserSession(peer);
       removePeer(user.id!, peer);
     } catch (error) {
-      // User session expired or invalid - ignore
       console.warn("Failed to remove peer on close:", error);
     }
   },
@@ -39,12 +35,15 @@ export default defineWebSocketHandler({
    * Handle incoming WebSocket messages
    */
   async message(peer, message) {
-    const { user } = await requireUserSession(peer);
 
-    // Ignore heartbeat ping messages
+    // manage ping/pong before authentication - we don't want to block the connection
     if (String(message) === "ping") {
+      peer.send("pong");
       return;
     }
+    const { user } = await requireUserSession(peer);
+
+    // Handle heartbeat ping messages with pong response
 
     // Process the message through the unified handler
     handleIncomingMessages(String(message), user.id!);
