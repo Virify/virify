@@ -106,23 +106,17 @@ export function useAnalytics() {
 
   /**
    * Handle real-time aggregate updates via WebSocket
-   * Favourites: optimistic local updates (+1/-1)
-   * Others: full refresh from server
+   * Optimistic local updates (+1/-1) for all aggregate types
    */
-  async function handleAggregateUpdate(data: { aggregateType: keyof AnalyticsAggregates; operation?: "add" | "remove" }) {
-    if (data.aggregateType === "favourites" && data.operation) {
-      // Optimistic update for favourites
-      const currentCount = aggregates.value.favourites || 0;
-      const newCount = data.operation === "add" ? currentCount + 1 : Math.max(0, currentCount - 1);
+  async function handleAggregateUpdate(data: { aggregateType: keyof AnalyticsAggregates; operation: "add" | "remove" }) {
+    // Optimistic update for any aggregate type
+    const currentCount = aggregates.value[data.aggregateType] || 0;
+    const newCount = data.operation === "add" ? currentCount + 1 : Math.max(0, currentCount - 1);
 
-      aggregates.value = {
-        ...aggregates.value,
-        favourites: newCount,
-      };
-    } else {
-      // Full refetch for other aggregate types or if operation is not specified
-      await fetchAnalyticsAggregates();
-    }
+    aggregates.value = {
+      ...aggregates.value,
+      [data.aggregateType]: newCount,
+    };
   }
 
   return {

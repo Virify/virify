@@ -1,4 +1,5 @@
 import * as zod from "zod";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 import { updateUserNote } from "../../../../utils/user-note";
 
 /**
@@ -14,17 +15,22 @@ const updateSchema = zod.object({
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
-  const session = await requireUserSession(event);
+  const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer();
+  const { user } = await requireUserSession(event);
   const { listingId, note } = await readValidatedBody(event, updateSchema.parse);
 
   try {
-    const userId = session?.user?.id;
-
-    if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    if (!user.id) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
 
     if (!listingId) throw createError({ statusCode: 400, statusMessage: "Bad Request", message: "No listing ID provided" });
 
-    return await updateUserNote(userId, listingId, note);
+    const result = await updateUserNote(user.id, listingId, note);
+
+    // Broadcast aggregate update via WebSocket
+    const aggregateMessage = createAggregateUpdateMessage("notes", "add", user.id);
+    sendMessage(aggregateMessage);
+
+    return result;
   } catch (error) {
     console.error(error);
     return errorResponse(error, event);
