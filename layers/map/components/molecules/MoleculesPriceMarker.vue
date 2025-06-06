@@ -1,18 +1,25 @@
 <template>
-  <div class="price-marker">
+  <div class="price-marker-container">
+    <!-- SVG Marker Shape -->
+    <!-- Regular teardrop marker -->
+    <AtomsIcon 
+      v-if="isFavorite === false || isFavorite === null"
+      icon="map/marker" 
+      class="marker-shape teardrop-marker"
+    />
+    
+    <!-- Heart marker for favorites -->
+    <AtomsIcon 
+      v-else
+      icon="map/fav-marker" 
+      class="marker-shape heart-marker"
+    />
+    
+    <!-- Content overlay -->
     <div class="price-marker-content">
-      <span class="price-marker-price">{{ priceDisplay }}</span>
-      <div v-if="isFavorite || hasNote" class="marker-status-container">
-        <div v-if="isFavorite" class="marker-favorite-indicator">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="white" stroke="white">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
-        </div>
-        <div v-if="hasNote" class="marker-note-indicator">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="white" stroke="white">
-            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-          </svg>
-        </div>
+      <span class="price-marker-price | body-xs font-bold">{{ priceDisplay }}</span>
+      <div v-if="hasNote && !isFavorite" class="marker-note-indicator">
+        <AtomsIcon icon="cards/notes" class="note-button-icon" />
       </div>
     </div>
   </div>
@@ -27,6 +34,15 @@ interface MarkerProps {
 
 const props = defineProps<MarkerProps>();
 
+// Debug log to see what's happening
+console.log('MoleculesPriceMarker props:', { 
+  price: props.price, 
+  hasNote: props.hasNote, 
+  isFavorite: props.isFavorite,
+  isFavoriteType: typeof props.isFavorite,
+  isFavoriteString: String(props.isFavorite)
+});
+
 // Format price as £XXk if >= 10000, otherwise just format with commas
 const priceDisplay = computed(() => {
   if (props.price === null || props.price === undefined) {
@@ -36,52 +52,44 @@ const priceDisplay = computed(() => {
     ? `£${Math.round(props.price / 1000)}k` 
     : `£${props.price.toLocaleString()}`;
 });
+
 </script>
 
 <style scoped>
-.price-marker {
-  border-radius: 8px;
-  border: 1px solid black;
-  background: var(--secondary-400);
-  color: white;
-  padding: 6px 12px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+/* Container for the SVG marker */
+.price-marker-container {
   position: relative;
-}
-
-.price-marker-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-.marker-status-container {
-  display: flex;
-  gap: 4px;
-  margin-left: 4px;
-}
-
-.marker-favorite-indicator,
-.marker-note-indicator {
-  width: 14px;
-  height: 14px;
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Add pointer triangle at bottom */
-.price-marker:after {
-  content: '';
+.marker-shape {
   position: absolute;
-  bottom: -8px;
-  left: calc(50% - 8px);
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid var(--secondary-400);
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 70px;
+  color: var(--secondary-400);
+}
+
+.marker-shape.heart-marker {
+  color: var(--favourite-colour);
+}
+
+.teardrop-marker {
+  transform: rotate(180deg);
+}
+
+/* Content overlay positioned on top of the SVG */
+.price-marker-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%); /* Adjusted for new SVG positioning */
+  color: var(--monochrome-100);
+  z-index: 1;
 }
 </style>
