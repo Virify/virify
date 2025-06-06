@@ -400,7 +400,8 @@ watchDebounced(
       suppressSuggestionFetch.value = false
       return
     }
-    if (suggestionsLower && suggestionsLower.length > 4) {
+    // lower debounce for postcodes
+    if (suggestionsLower && suggestionsLower.length > 2) {
       const result = await autoComplete(suggestionsLower);
       // Store the full geocoded results for later use
       geocodedResults.value = result;

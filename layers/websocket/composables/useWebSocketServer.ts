@@ -1,6 +1,3 @@
-import type { TypingMessage, NewMessageMessage, MessageReadMessage, HeartbeatMessage, WebSocketMessage, NewConversationMessage, ConnectionStatusMessage, AggregateUpdateMessage } from "../../../shared/types/websocket";
-import type { AnalyticsAggregates } from "~~/shared/types/analytics";
-
 /**
  * Client-side event handlers interface
  */
@@ -9,7 +6,7 @@ export interface WebSocketEvents {
   onNewConversation?: (data: { conversation: any }) => void;
   onTyping?: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
   onMessageRead?: (data: { conversationId: number; messageId: number; from: number }) => void;
-  onAggregateUpdate?: (data: { aggregateType: keyof AnalyticsAggregates; operation: "add" | "remove" }) => void;
+  onAggregateUpdate?: (data: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" }) => void;
 }
 
 /**
@@ -280,7 +277,7 @@ export const useWebSocketServer = () => {
          */
         case "aggregate_update":
           events.onAggregateUpdate?.({
-            aggregateType: wsMessage.aggregateType as keyof AnalyticsAggregates,
+            aggregateType: wsMessage.aggregateType as keyof UserItemsAggregates,
             operation: wsMessage.operation!,
           });
           break;
@@ -388,7 +385,7 @@ export const useWebSocketServer = () => {
    * @param operation - "add" or "remove" for optimized UI updates
    * @param to - User to notify about the aggregate change
    */
-  const createAggregateUpdateMessage = (aggregateType: keyof AnalyticsAggregates, operation: "add" | "remove", to: number): AggregateUpdateMessage => ({
+  const createAggregateUpdateMessage = (aggregateType: keyof UserItemsAggregates, operation: "add" | "remove", to: number): AggregateUpdateMessage => ({
     type: "aggregate_update",
     aggregateType,
     operation,

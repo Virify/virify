@@ -49,7 +49,6 @@
 </template>
 
 <script setup lang="ts">
-import type { NavigationGroup } from "~~/shared/types/account";
 import { useWebSocket } from "@vueuse/core";
 
 const props = defineProps({
@@ -65,7 +64,7 @@ const props = defineProps({
 const config = useRuntimeConfig();
 const { data } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
 const { clear } = useUserSession();
-const { fetchAnalyticsAggregates, getAggregateCount, handleAggregateUpdate } = useAnalytics();
+const { fetchUserItemsAggregates, getAggregateCount, handleAggregateUpdate } = useNotifications();
 const { handleOutgoingMessages } = useWebSocketServer();
 
 /**
@@ -78,8 +77,14 @@ const expandedGroups = ref<Record<number, boolean>>({});
  * WebSocket Events
  */
 const navigationWebSocketEvents = {
-  onAggregateUpdate: ({ aggregateType, operation }: { aggregateType: keyof AnalyticsAggregates; operation: "add" | "remove" }) => {
-    handleAggregateUpdate({ aggregateType, operation });
+  onAggregateUpdate: ({ aggregateType, operation }: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" }) => {
+    handleAggregateUpdate({ 
+      type: "aggregate_update",
+      aggregateType, 
+      operation,
+      to: 0, // Will be set by WebSocket layer
+      timestamp: new Date().toISOString()
+    });
   },
 };
 
@@ -97,7 +102,7 @@ watchEffect(() => {
  */
 onMounted(() => {
   // Fetch account counts when the component is mounted
-  fetchAnalyticsAggregates();
+  fetchUserItemsAggregates();
 
   // Set all menu groups to expanded by default
   if (props.options && Array.isArray(props.options)) {

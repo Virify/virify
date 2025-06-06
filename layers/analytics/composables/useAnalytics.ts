@@ -1,12 +1,13 @@
 /**
- * Composable for tracking analytics events like listing views
+ * Composable for tracking analytics events and business intelligence
+ * Pure analytics functionality - separate from user notifications
  */
 import { nanoid } from "nanoid";
-import type { UserAnalyticsSummary, AnalyticsAggregates } from "~~/shared/types/analytics";
 
 /**
  * Analytics tracking composable
- * Provides methods for tracking user interactions and events
+ * Provides methods for tracking user interactions and business analytics
+ * Note: User notification counts are handled by the notifications layer
  */
 export function useAnalytics() {
   const sessionId = useState("analytics-session-id", () => nanoid());
@@ -14,42 +15,7 @@ export function useAnalytics() {
   /**
    * !! Important: useRequestFetch is required for SSR authenticated requests
    */
-  const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all"));
-
-  /**
-   * Analytics aggregates (formerly account counts)
-   */
-  const aggregates = ref<AnalyticsAggregates>({});
-  const aggregatesLoading = ref(false);
-  const aggregatesError = ref<Error | null>(null);
-
-  /**
-   * Fetch analytics aggregates from the API
-   */
-  async function fetchAnalyticsAggregates() {
-    aggregatesLoading.value = true;
-    aggregatesError.value = null;
-
-    try {
-      const data = await $fetch<AnalyticsAggregates>("/api/analytics/aggregates");
-      aggregates.value = data;
-    } catch (err) {
-      console.error("Failed to fetch analytics aggregates:", err);
-      aggregatesError.value = err as Error;
-    } finally {
-      aggregatesLoading.value = false;
-    }
-  }
-
-  /**
-   * Get aggregate count for a specific category
-   * @param key - The category key
-   * @returns The count for the category or undefined
-   */
-  function getAggregateCount(key?: string): number | undefined {
-    if (!key) return undefined;
-    return aggregates.value[key as keyof AnalyticsAggregates];
-  }
+  const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<AnalyticsAggregates>("/api/analytics/all"));
 
   /**
    * Track when a user views a listing
@@ -104,29 +70,8 @@ export function useAnalytics() {
     }
   };
 
-  /**
-   * Handle real-time aggregate updates via WebSocket
-   * Optimistic local updates (+1/-1) for all aggregate types
-   */
-  async function handleAggregateUpdate(data: { aggregateType: keyof AnalyticsAggregates; operation: "add" | "remove" }) {
-    // Optimistic update for any aggregate type
-    const currentCount = aggregates.value[data.aggregateType] || 0;
-    const newCount = data.operation === "add" ? currentCount + 1 : Math.max(0, currentCount - 1);
-
-    aggregates.value = {
-      ...aggregates.value,
-      [data.aggregateType]: newCount,
-    };
-  }
-
   return {
     analytics,
     trackListingView,
-    aggregates,
-    aggregatesLoading,
-    aggregatesError,
-    fetchAnalyticsAggregates,
-    getAggregateCount,
-    handleAggregateUpdate,
   };
 }

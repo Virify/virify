@@ -1,5 +1,5 @@
 import type { ConversationWithUserAndMessages, MessageWithUser } from "./conversation";
-import type { AnalyticsAggregates } from "./analytics";
+import type { UserItemsAggregates } from "./notifications";
 
 /**
  * Base WebSocket message structure
@@ -55,7 +55,7 @@ export interface ConnectionStatusMessage extends BaseWebSocketMessage {
 
 export interface AggregateUpdateMessage extends BaseWebSocketMessage {
   type: "aggregate_update";
-  aggregateType: keyof AnalyticsAggregates;
+  aggregateType: keyof UserItemsAggregates;
   operation: "add" | "remove";
   to: number;
 }
