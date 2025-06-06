@@ -56,7 +56,9 @@ export type ExtendedMapTilerMap = MaptilerMap & {
   removeLayer(id: string): void;
   getStyle(): { layers: Array<{ id: string; source: string }> };
   flyTo(options: { center?: [number, number]; zoom?: number; essential?: boolean; duration?: number }): void;
+  jumpTo(options: { center?: [number, number]; zoom?: number; animate?: boolean }): void;
   getCanvas(): HTMLCanvasElement;
+  queryRenderedFeatures(pointOrBox?: any, options?: any): any[];
 };
 
 /**
@@ -68,6 +70,7 @@ export type MapInstance = {
   markerMap: Map<string | number, Marker>;
   interactive: boolean;
   drawControl: any | null;
+  featureMarkers: Map<string, Marker[]>; // Track markers by feature ID
 };
 
 /**

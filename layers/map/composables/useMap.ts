@@ -78,6 +78,7 @@ export function useMap() {
         markerMap: new Map(),
         interactive: options.interactive,
         drawControl: null,
+        featureMarkers: new Map(), // Initialize feature markers tracking
       });
     }
 
@@ -94,6 +95,23 @@ export function useMap() {
    */
   function initMap(container: HTMLElement, options: MapOptions, mapId: string): ExtendedMapTilerMap {
     return resuseMap(container, options, mapId) ?? initNewMap(container, options, mapId);
+  }
+
+  /**
+   * Private helper to create and add a single SDK marker to the map and instance.
+   */
+  function _createAndAddSdkMarker(map: ExtendedMapTilerMap, markerData: MapMarker, instance: MapInstance): Marker {
+    const markerWrapper = renderMarker(markerData.price, markerData.hasNote, markerData.isFavorite, vueApp);
+    const newSdkMarker = new sdk.Marker({
+      element: markerWrapper,
+      anchor: "bottom",
+    });
+    newSdkMarker.setLngLat([markerData.lon, markerData.lat]);
+    const popup = renderPopup(markerData, vueApp);
+    newSdkMarker.setPopup(popup);
+    newSdkMarker.addTo(map);
+    instance.markers.push(newSdkMarker); // Add to the main list of all markers
+    return newSdkMarker;
   }
 
   /**
@@ -116,37 +134,55 @@ export function useMap() {
   }
 
   /**
-   * Adds multiple markers to the map instance (from a search result)
+   * Adds multiple markers to the map instance for a specific feature
    *
    * @param map The map to add markers to
    * @param markers Array of markers to add
+   * @param featureId The ID of the feature these markers belong to
    * @returns Array of created marker objects
    */
-  function addMarkers(map: ExtendedMapTilerMap, markers: MapMarker[]): Marker[] {
+  function addMarkersForFeature(map: ExtendedMapTilerMap, markersData: MapMarker[], featureId: string): Marker[] {
     const instance = findMapInstance(map, mapCache);
     if (!instance) {
       console.error("[Map] Instance not found");
       return [];
     }
 
-    // each marker needs its own dom element
-    // so we need to create a wrapper for each marker
-    for (const marker of markers) {
-      const markerWrapper = renderMarker(marker.price, marker.hasNote, marker.isFavorite, vueApp);
-      // Remove absolute positioning, let Mapbox/MapTiler handle marker placement
-      // Only set anchor to 'bottom' for correct vertical alignment
-      const newMarker = new sdk.Marker({
-        element: markerWrapper,
-        anchor: "bottom",
-      });
-      newMarker.setLngLat([marker.lon, marker.lat]);
-      const popup = renderPopup(marker, vueApp);
-      newMarker.setPopup(popup);
-      newMarker.addTo(map);
-      instance.markers.push(newMarker);
+    const addedSdkMarkers: Marker[] = [];
+    for (const markerData of markersData) {
+      const newSdkMarker = _createAndAddSdkMarker(map, markerData, instance);
+      addedSdkMarkers.push(newSdkMarker);
     }
-    console.log("[Map] Added " + markers.length + " markers to map instance");
-    return instance.markers;
+
+    // Store the markers for this feature
+    instance.featureMarkers.set(featureId, addedSdkMarkers);
+
+    console.log(`[Map] Added ${addedSdkMarkers.length} markers for feature ${featureId}`);
+    return addedSdkMarkers;
+  }
+
+  /**
+   * Adds multiple markers to the map instance (from a search result or general purpose)
+   *
+   * @param map The map to add markers to
+   * @param markers Array of markers to add
+   * @returns Array of newly created marker objects
+   */
+  function addMarkers(map: ExtendedMapTilerMap, markersData: MapMarker[]): Marker[] {
+    const instance = findMapInstance(map, mapCache);
+    if (!instance) {
+      console.error("[Map] Instance not found");
+      return [];
+    }
+
+    const addedSdkMarkers: Marker[] = [];
+    for (const markerData of markersData) {
+      const newSdkMarker = _createAndAddSdkMarker(map, markerData, instance);
+      addedSdkMarkers.push(newSdkMarker);
+    }
+
+    console.log(`[Map] Added ${addedSdkMarkers.length} general markers to map instance`);
+    return addedSdkMarkers; // Return only the newly added markers
   }
 
   /**
@@ -160,6 +196,32 @@ export function useMap() {
       instance.markers.forEach((marker) => marker.remove());
       console.log("[Map] Cleared markers from map instance");
       instance.markers = [];
+      instance.featureMarkers.clear(); // Clear feature marker tracking too
+    }
+  }
+
+  /**
+   * Clears markers for a specific feature
+   *
+   * @param map The map to clear markers from
+   * @param featureId The ID of the feature whose markers should be cleared
+   */
+  function clearMarkersForFeature(map: ExtendedMapTilerMap, featureId: string): void {
+    const instance = findMapInstance(map, mapCache);
+    if (!instance) return;
+
+    const featureMarkers = instance.featureMarkers.get(featureId);
+    if (featureMarkers) {
+      // Remove these markers from the map
+      featureMarkers.forEach((marker) => marker.remove());
+
+      // Remove these markers from the main markers array
+      instance.markers = instance.markers.filter((marker) => !featureMarkers.includes(marker));
+
+      // Remove the feature from tracking
+      instance.featureMarkers.delete(featureId);
+
+      console.log("[Map] Cleared " + featureMarkers.length + " markers for feature " + featureId);
     }
   }
 
@@ -187,12 +249,25 @@ export function useMap() {
 
     console.log("[Map] Adding draw control");
 
+    // Clear existing markers and search radius when entering draw mode
+    clearMarkers(map);
+    removeSearchRadiusVisualization(map);
+
     const drawControl = new MapboxDraw({
       displayControlsDefault: false,
       controls: { polygon: true, trash: true },
       defaultMode: "simple_select",
       userProperties: true,
       styles,
+      modes: {
+        ...MapboxDraw.modes,
+        // Override simple_select to disable dragging
+        simple_select: {
+          ...MapboxDraw.modes.simple_select,
+          onDrag: () => {}, // Disable dragging
+          onTouchMove: () => {}, // Disable touch dragging
+        },
+      },
     });
 
     map.addControl(drawControl, "top-right");
@@ -207,11 +282,18 @@ export function useMap() {
     });
 
     map.on("draw.create", (e: any) => {
+      // Process the drawn polygon
       addBBox(e, map);
+      console.log("[Map] Polygon created and processed - dragging disabled");
     });
 
     map.on("draw.delete", (e: any) => {
-      clearMarkers(map);
+      // Clear markers only for the deleted features
+      e.features.forEach((feature: any) => {
+        if (feature.id) {
+          clearMarkersForFeature(map, feature.id);
+        }
+      });
     });
   }
 
@@ -331,6 +413,10 @@ export function useMap() {
   function addBBox(e: any, map: ExtendedMapTilerMap) {
     const feature = e.features[0];
     if (!feature) return;
+
+    // Get or generate a feature ID
+    const featureId = feature.id || `feature_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     // Ensure polygon coordinates are a closed loop if feature is a Polygon to avoid rendering issues on zoom
     if (feature.geometry && feature.geometry.type === "Polygon") {
       const coords = feature.geometry.coordinates[0];
@@ -347,7 +433,7 @@ export function useMap() {
 
     /**
      * !! IMPORTANT !!
-     * 
+     *
      * This is a temporary solution to fetch listings based on the drawn polygon. Needs to be moved into the main search function
      */
     const result = $fetch<ListingCardType[]>("/api/search/listings/", {
@@ -381,7 +467,9 @@ export function useMap() {
             : null,
           image: listing.property?.media ?? [],
         }));
-        addMarkers(map, listings);
+
+        // Add markers specifically for this feature
+        addMarkersForFeature(map, listings, featureId.toString());
       })
       .catch((error) => {
         console.error("[Map] Error fetching search results:", error);
@@ -393,6 +481,8 @@ export function useMap() {
     addMarkers,
     addMarker,
     clearMarkers,
+    clearMarkersForFeature,
+    addMarkersForFeature,
     calculateZoomLevelFromRadius,
     autoComplete,
     initDrawing,

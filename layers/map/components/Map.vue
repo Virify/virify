@@ -68,28 +68,46 @@ watchEffect(() => {
 
 /**
  * Watch for changes in the zoom or center
- * Use flyTo for smoother transitions between locations
+ * Use jumpTo for initial positioning, flyTo for subsequent updates
  */
+const isInitialLoad = ref(true);
+
 watch(
   [() => props.zoom, () => props.center],
   ([newZoom, newCenter]) => {
     if (!map.value) return;
     
     if (newCenter !== undefined) {
-      // Use flyTo for smooth animation when center or zoom changes
-      map.value.flyTo({
-        center: newCenter,
-        zoom: newZoom !== undefined ? newZoom : map.value.getZoom(),
-        essential: true, // This animation is considered essential for the user experience
-        duration: 1000  // Animation duration in milliseconds
-      });
+      if (isInitialLoad.value) {
+        // Use jumpTo for immediate positioning on initial load (no animation)
+        map.value.jumpTo({
+          center: newCenter,
+          zoom: newZoom !== undefined ? newZoom : map.value.getZoom(),
+          animate: false
+        });
+        isInitialLoad.value = false;
+      } else {
+        // Use flyTo for smooth animation on subsequent changes
+        map.value.flyTo({
+          center: newCenter,
+          zoom: newZoom !== undefined ? newZoom : map.value.getZoom(),
+          essential: true,
+          duration: 600  // Reduced duration for faster transitions
+        });
+      }
     } else if (newZoom !== undefined) {
-      // If only zoom changed, just animate zoom
-      map.value.flyTo({
-        zoom: newZoom,
-        essential: true,
-        duration: 800
-      });
+      if (isInitialLoad.value) {
+        // Use setZoom for immediate zoom on initial load
+        map.value.setZoom(newZoom);
+        isInitialLoad.value = false;
+      } else {
+        // Use flyTo for smooth zoom animation on subsequent changes
+        map.value.flyTo({
+          zoom: newZoom,
+          essential: true,
+          duration: 400  // Reduced duration for faster zoom
+        });
+      }
     }
   }
 );
@@ -123,6 +141,13 @@ function loadMap() {
       },
       props.mapId ?? GLOBAL_MAP_ID,
     );
+    
+    // Reset the initial load flag after a short delay to allow the watcher to handle initial positioning
+    nextTick(() => {
+      setTimeout(() => {
+        isInitialLoad.value = false;
+      }, 100);
+    });
   }
 }
 
