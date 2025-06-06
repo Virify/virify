@@ -1,50 +1,43 @@
-import type { AnalyticsAggregates } from "~~/shared/types/analytics";
-
 /**
- * Get the analytics aggregates for various user metrics.
- * This replaces the old account counts functionality with proper analytics naming.
+ * Get actual analytics aggregates for business intelligence
+ * This returns real analytics data, not user notification counts
  *
  * @param userId - The ID of the user for whom to get analytics aggregates
- * @returns AnalyticsAggregates - An object containing counts of various user metrics
+ * @returns AnalyticsAggregates - An object containing business analytics metrics
  */
 export async function getAnalyticsAggregates(userId: number): Promise<AnalyticsAggregates> {
-  const [enquiries, listings, favourites, notes] = await prisma.$transaction([
-    prisma.conversation.count({
-      where: {
-        receiverId: userId,
-      },
-    }),
+  // TODO: Implement actual analytics queries
+  // This should return business intelligence metrics, not user notification counts
+  
+  const [totalListings, totalEnquiries] = await prisma.$transaction([
     prisma.listing.count({
       where: {
         userId: userId,
       },
     }),
-    prisma.userFavouriteListing.count({
+    prisma.conversation.count({
       where: {
-        userPreferences: {
-          userId: userId,
-        },
-      },
-    }),
-    prisma.userNote.count({
-      where: {
-        userPreferences: {
-          userId: userId,
-        },
+        receiverId: userId,
       },
     }),
   ]);
 
   return {
-    enquiries,
-    listings,
-    favourites,
-    notes,
-    // TODO: Implement these when the features are available
-    notifications: 0,
-    messages: 0,
-    offers: 0,
-    viewings: 0,
+    // Business metrics
+    totalListings,
+    totalEnquiries,
+    
+    // TODO: Implement these analytics when available
+    totalPageViews: 0,
+    uniqueVisitors: 0,
+    averageSessionDuration: 0,
+    activeListings: 0,
+    totalUsers: 0,
+    activeUsers: 0,
+    totalSearches: 0,
+    conversionRate: 0,
+    newUsersThisMonth: 0,
+    newListingsThisMonth: 0,
   };
 }
 

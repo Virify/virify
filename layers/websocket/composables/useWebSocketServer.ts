@@ -1,13 +1,12 @@
-import type { TypingMessage, NewMessageMessage, MessageReadMessage, HeartbeatMessage, WebSocketMessage, NewConversationMessage, ConnectionStatusMessage } from "../../../shared/types/websocket";
-
 /**
  * Client-side event handlers interface
  */
 export interface WebSocketEvents {
-  onNewMessage: (data: { conversationId: number; message: any }) => void;
-  onNewConversation: (data: { conversation: any }) => void;
-  onTyping: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
-  onMessageRead: (data: { conversationId: number; messageId: number; from: number }) => void;
+  onNewMessage?: (data: { conversationId: number; message: any }) => void;
+  onNewConversation?: (data: { conversation: any }) => void;
+  onTyping?: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
+  onMessageRead?: (data: { conversationId: number; messageId: number; from: number }) => void;
+  onAggregateUpdate?: (data: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" }) => void;
 }
 
 /**
@@ -177,21 +176,6 @@ export const useWebSocketServer = () => {
           break;
         }
 
-        /**
-         * Heartbeat/ping message - Keeps WebSocket connection alive
-         * Prevents connection timeouts and confirms client is still active
-         * Used for: Connection keep-alive, detecting disconnected clients
-         */
-        case "heartbeat": {
-          const heartbeatMsg: HeartbeatMessage = {
-            type: "heartbeat",
-            from: fromUserId,
-            timestamp: new Date().toISOString(),
-          };
-          sendMessage(heartbeatMsg);
-          break;
-        }
-
         default:
           console.warn("Unknown message type:", message.type);
       }
@@ -228,7 +212,7 @@ export const useWebSocketServer = () => {
          * UI Effect: Adds message to conversation, scrolls to bottom, shows notification
          */
         case "new_message":
-          events.onNewMessage({
+          events.onNewMessage?.({
             conversationId: wsMessage.conversationId!,
             message: wsMessage.message!,
           });
@@ -240,7 +224,7 @@ export const useWebSocketServer = () => {
          * UI Effect: Adds conversation to sidebar, opens chat window
          */
         case "new_conversation":
-          events.onNewConversation({
+          events.onNewConversation?.({
             conversation: wsMessage.conversation!,
           });
           break;
@@ -251,7 +235,7 @@ export const useWebSocketServer = () => {
          * UI Effect: Shows "John is typing..." text or animated dots
          */
         case "typing":
-          events.onTyping({
+          events.onTyping?.({
             from: wsMessage.from!,
             conversationId: wsMessage.conversationId!,
             isTyping: wsMessage.isTyping!,
@@ -264,10 +248,22 @@ export const useWebSocketServer = () => {
          * UI Effect: Shows checkmarks, "Read" status, read timestamps
          */
         case "message_read":
-          events.onMessageRead({
+          events.onMessageRead?.({
             from: wsMessage.from!,
             conversationId: wsMessage.conversationId!,
             messageId: wsMessage.messageId!,
+          });
+          break;
+
+        /**
+         * Heartbeat message - Used to keep connection alive, no UI effect
+         * Triggers: Connection keep-alive, no direct UI changes
+         * UI Effect: None, just confirms connection is still active
+         */
+        case "aggregate_update":
+          events.onAggregateUpdate?.({
+            aggregateType: wsMessage.aggregateType as keyof UserItemsAggregates,
+            operation: wsMessage.operation!,
           });
           break;
 
@@ -306,15 +302,6 @@ export const useWebSocketServer = () => {
     conversationId,
     messageId,
     to,
-    timestamp: new Date().toISOString(),
-  });
-
-  /**
-   * Creates a heartbeat message for connection keep-alive
-   * @returns Formatted heartbeat message object
-   */
-  const createHeartbeatMessage = (): HeartbeatMessage => ({
-    type: "heartbeat",
     timestamp: new Date().toISOString(),
   });
 
@@ -368,6 +355,20 @@ export const useWebSocketServer = () => {
     timestamp: new Date().toISOString(),
   });
 
+  /**
+   * Creates aggregate update message for WebSocket transmission
+   * @param aggregateType - Type of aggregate ('favourites', 'messages', etc.)
+   * @param operation - "add" or "remove" for optimized UI updates
+   * @param to - User to notify about the aggregate change
+   */
+  const createAggregateUpdateMessage = (aggregateType: keyof UserItemsAggregates, operation: "add" | "remove", to: number): AggregateUpdateMessage => ({
+    type: "aggregate_update",
+    aggregateType,
+    operation,
+    to,
+    timestamp: new Date().toISOString(),
+  });
+
   return {
     addPeer,
     removePeer,
@@ -379,10 +380,10 @@ export const useWebSocketServer = () => {
     // Type-safe message creators
     createTypingMessage,
     createMessageReadMessage,
-    createHeartbeatMessage,
     createNewMessageMessage,
     createNewConversationMessage,
     createConnectionStatusMessage,
+    createAggregateUpdateMessage,
     // Client-side handling
     handleOutgoingMessages,
   };

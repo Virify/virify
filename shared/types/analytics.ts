@@ -1,42 +1,7 @@
 /**
  * Types related to analytics functionality
+ * Pure analytics data for business intelligence and performance metrics
  */
-
-/**
- * Analytics aggregates interface (formerly AccountCounts)
- * Contains counts for various user metrics and activities
- */
-export interface AnalyticsAggregates {
-  notifications?: number;
-  messages?: number;
-  enquiries?: number;
-  listings?: number;
-  favourites?: number;
-  notes?: number;
-  offers?: number;
-  viewings?: number;
-}
-
-/**
- * Analytics event interface
- */
-export interface AnalyticsEvent {
-  eventType: string;
-  timestamp: Date;
-  userId?: number | null;
-  sessionId?: string | null;
-  metadata: Record<string, any>;
-}
-
-/**
- * Listing view event interface
- */
-export interface ListingViewEvent extends AnalyticsEvent {
-  eventType: 'listing_view';
-  metadata: {
-    listingId: number;
-  };
-}
 
 /**
  * Request body for tracking a listing view
@@ -48,6 +13,7 @@ export interface TrackListingViewBody {
 
 /**
  * User analytics summary for dashboard display
+ * Pure analytics data about user activity and performance
  */
 export interface UserAnalyticsSummary {
   totalViews: number;
@@ -58,17 +24,29 @@ export interface UserAnalyticsSummary {
 }
 
 /**
- * Analytics aggregates for various user metrics
- * Renamed from AccountCounts to better reflect analytics nature
+ * Pure analytics aggregates for business intelligence
+ * This is for actual analytics/reporting, not user notification counts
  */
 export interface AnalyticsAggregates {
-  notifications?: number;
-  messages?: number;
-  enquiries?: number;
-  listings?: number;
-  favourites?: number;
-  notes?: number;
-  offers?: number;
-  viewings?: number;
-  // Add more aggregate types as needed
+  // Performance metrics
+  totalPageViews?: number;
+  uniqueVisitors?: number;
+  averageSessionDuration?: number;
+  
+  // Business metrics  
+  totalListings?: number;
+  activeListings?: number;
+  totalUsers?: number;
+  activeUsers?: number;
+  
+  // Engagement metrics
+  totalSearches?: number;
+  totalEnquiries?: number;
+  conversionRate?: number;
+  
+  // Growth metrics
+  newUsersThisMonth?: number;
+  newListingsThisMonth?: number;
+  
+  // Add more analytics metrics as needed
 }

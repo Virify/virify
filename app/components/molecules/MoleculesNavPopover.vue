@@ -1,14 +1,8 @@
 <template>
   <div v-if="hasMenuItems" class="m-menu-wrapper">
     <!-- Menu Toggle Button -->
-    <button 
-      type="button" 
-      class="m-burger-menu-toggle"
-      :class="{ 'hidden': menuOpen }"
-      @click="toggleMenu"
-      aria-label="Toggle menu"
-      :aria-expanded="menuOpen"
-    >
+    <button type="button" class="m-burger-menu-toggle" :class="{ hidden: menuOpen }" @click="toggleMenu"
+      aria-label="Toggle menu" :aria-expanded="menuOpen">
       <div class="m-burger-menu-icon">
         <span></span>
         <span></span>
@@ -17,47 +11,32 @@
     </button>
 
     <!-- Menu Overlay -->
-    <div class="m-menu-overlay" :class="{ 'active': menuOpen }" @click="closeMenu"></div>
-    
+    <div class="m-menu-overlay" :class="{ active: menuOpen }" @click="closeMenu"></div>
+
     <!-- Menu Container -->
-    <div class="m-menu-container" :class="{ 'open': menuOpen }">
+    <div class="m-menu-container" :class="{ open: menuOpen }">
       <div class="m-menu-container-header">
         <h2 class="| body-sm font-bold">Menu</h2>
-        <button 
-          type="button"
-          class="m-menu-close-button"
-          @click="closeMenu"
-          aria-label="Close menu"
-        >
+        <button type="button" class="m-menu-close-button" @click="closeMenu" aria-label="Close menu">
           <AtomsIcon width="20" height="20" icon="cross" />
         </button>
       </div>
       <div v-for="(group, index) in options" :key="`menu-${index}`" class="m-menu-group">
-        <button 
-          @click="toggleGroup(index)"
-          class="m-menu-header" 
-          :class="{ 'expanded': expandedGroups[index] }" 
-          type="button" 
-          :aria-expanded="expandedGroups[index] ? 'true' : 'false'"
-          :aria-controls="`menu-group-${index}`"
-        >
+        <button @click="toggleGroup(index)" class="m-menu-header" :class="{ expanded: expandedGroups[index] }"
+          type="button" :aria-expanded="expandedGroups[index] ? 'true' : 'false'"
+          :aria-controls="`menu-group-${index}`">
           <AtomsIcon width="24" height="24" :icon="group.icon" class="m-menu-icon" />
           <h3 class="| body-sm font-bold">{{ group.title }}</h3>
           <AtomsIcon width="16" height="16" icon="arrow-right" class="m-menu-chevron" />
         </button>
-        <ul 
-          :id="`menu-group-${index}`" 
-          class="m-menu-list" 
-          :class="{ 'expanded': expandedGroups[index] }" 
-          v-show="expandedGroups[index]"
-        >
+        <ul :id="`menu-group-${index}`" class="m-menu-list" :class="{ expanded: expandedGroups[index] }"
+          v-show="expandedGroups[index]">
           <li v-for="(item, idx) in group.items" :key="`menu-item-${idx}`" class="m-menu-item">
             <AtomsIcon :name="item.icon" :icon="item.icon" height="22" width="22" class="m-menu-item-icon" />
             <NuxtLink v-if="!item.action" :to="item.url" class="m-menu-link | body-sm">
               {{ item.name }}
-              <span v-if="item.countKey && getAggregateCount(item.countKey)" class="| body-xs font-bold">
-                ({{ getAggregateCount(item.countKey) }})
-              </span>
+              <span v-if="item.countKey && getAggregateCount(item.countKey)" class="| body-xs font-bold"> ({{
+                getAggregateCount(item.countKey) }}) </span>
             </NuxtLink>
             <button v-else @click="handleMenuNavAction(item.action)" class="m-menu-link | body-sm">
               {{ item.name }}
@@ -70,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NavigationGroup } from "~~/shared/types/account";
+import { useWebSocket } from "@vueuse/core";
 
 const props = defineProps({
   options: {
@@ -82,8 +61,11 @@ const props = defineProps({
 /**
  * Composables
  */
-const { clear, user } = useUserSession();
-const { fetchAnalyticsAggregates, getAggregateCount } = useAnalytics();
+const config = useRuntimeConfig();
+const { data } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
+const { clear } = useUserSession();
+const { fetchUserItemsAggregates, getAggregateCount, handleAggregateUpdate } = useNotifications();
+const { handleOutgoingMessages } = useWebSocketServer();
 
 /**
  * Menu State
@@ -92,12 +74,36 @@ const menuOpen = ref(false);
 const expandedGroups = ref<Record<number, boolean>>({});
 
 /**
+ * WebSocket Events
+ */
+const navigationWebSocketEvents = {
+  onAggregateUpdate: ({ aggregateType, operation }: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" }) => {
+    handleAggregateUpdate({ 
+      type: "aggregate_update",
+      aggregateType, 
+      operation,
+      to: 0, // Will be set by WebSocket layer
+      timestamp: new Date().toISOString()
+    });
+  },
+};
+
+/**
+ * WebSocket Message Handlers
+ */
+watchEffect(() => {
+  if (data.value) {
+    handleOutgoingMessages(data.value, navigationWebSocketEvents);
+  }
+});
+
+/**
  * Set all groups expanded by default
  */
 onMounted(() => {
   // Fetch account counts when the component is mounted
-  fetchAnalyticsAggregates();
-  
+  fetchUserItemsAggregates();
+
   // Set all menu groups to expanded by default
   if (props.options && Array.isArray(props.options)) {
     props.options.forEach((_, index) => {
@@ -112,7 +118,7 @@ onMounted(() => {
 function toggleGroup(index: number) {
   expandedGroups.value = {
     ...expandedGroups.value,
-    [index]: !expandedGroups.value[index]
+    [index]: !expandedGroups.value[index],
   };
 }
 
@@ -122,9 +128,9 @@ function toggleGroup(index: number) {
 function toggleMenu() {
   menuOpen.value = !menuOpen.value;
   if (menuOpen.value) {
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   } else {
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
   }
 }
 
@@ -133,7 +139,7 @@ function toggleMenu() {
  */
 function closeMenu() {
   menuOpen.value = false;
-  document.body.style.overflow = '';
+  document.body.style.overflow = "";
 }
 
 /**
@@ -223,7 +229,7 @@ function handleNavAction(action: string) {
   margin: 0;
   z-index: 1001;
   transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
-  
+
   &.hidden {
     opacity: 0;
     visibility: hidden;
@@ -234,7 +240,7 @@ function handleNavAction(action: string) {
   width: 30px;
   height: 24px;
   position: relative;
-  
+
   span {
     display: block;
     position: absolute;
@@ -245,21 +251,20 @@ function handleNavAction(action: string) {
     opacity: 1;
     left: 0;
     transform: rotate(0deg);
-    transition: .25s ease-in-out;
-    
+    transition: 0.25s ease-in-out;
+
     &:nth-child(1) {
       top: 0px;
     }
-    
+
     &:nth-child(2) {
       top: 10px;
     }
-    
+
     &:nth-child(3) {
       top: 20px;
     }
   }
-  
 }
 
 /* Menu Overlay */
@@ -275,7 +280,7 @@ function handleNavAction(action: string) {
   opacity: 0;
   visibility: hidden;
   transition: opacity var(--animation-fast) ease-out;
-  
+
   &.active {
     opacity: 1;
     visibility: visible;
@@ -297,7 +302,7 @@ function handleNavAction(action: string) {
   overflow-y: auto;
   transform: translateX(100%);
   transition: transform var(--animation-fast) ease-out;
-  
+
   &.open {
     transform: translateX(0);
   }
@@ -324,7 +329,7 @@ function handleNavAction(action: string) {
   color: var(--foreground-100);
   position: relative;
   z-index: 1002;
-  
+
   &:hover {
     background-color: var(--background-100);
   }
@@ -334,7 +339,7 @@ function handleNavAction(action: string) {
   margin-bottom: var(--size-16);
   padding-bottom: var(--size-16);
   border-bottom: 1px solid var(--border-color, #eee);
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -353,17 +358,17 @@ function handleNavAction(action: string) {
   cursor: pointer;
   position: relative;
   border-radius: var(--border-radius-md);
-  
+
   &:hover {
     background-color: var(--background-100);
   }
-  
+
   &.expanded {
     .m-menu-chevron {
       transform: rotate(90deg);
     }
   }
-  
+
   h3 {
     margin: 0;
     flex-grow: 1;
@@ -391,7 +396,7 @@ function handleNavAction(action: string) {
   width: 100%;
   margin: var(--size-2) 0;
   border-radius: var(--border-radius-md);
-  
+
   &:hover {
     background: var(--background-100);
   }

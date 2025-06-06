@@ -1,4 +1,5 @@
 import * as zod from "zod";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 
 const deleteSchema = zod.object({
   listingId: zod.number().int().positive(),
@@ -9,18 +10,21 @@ const deleteSchema = zod.object({
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
-  const session = await requireUserSession(event);
-  const userId = session?.user?.id;
+  const { user } = await requireUserSession(event);
+  const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer();
 
   try {
+    if (!user.id) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
 
-    if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-    
     const { listingId } = await readValidatedBody(event, deleteSchema.parse);
 
     if (!listingId) throw createError({ statusCode: 400, statusMessage: "Bad Request", message: "No listing provided" });
 
-    const result = await deleteFavouriteListing(userId as number, listingId);
+    const result = await deleteFavouriteListing(user.id as number, listingId);
+
+    // Broadcast aggregate update via WebSocket
+    const aggregateMessage = createAggregateUpdateMessage("favourites", "remove", user.id);
+    sendMessage(aggregateMessage);
 
     return result;
   } catch (error) {

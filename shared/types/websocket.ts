@@ -1,4 +1,5 @@
 import type { ConversationWithUserAndMessages, MessageWithUser } from "./conversation";
+import type { UserItemsAggregates } from "./notifications";
 
 /**
  * Base WebSocket message structure
@@ -40,11 +41,6 @@ export interface MessageReadMessage extends BaseWebSocketMessage {
   to: number;
 }
 
-export interface HeartbeatMessage extends BaseWebSocketMessage {
-  type: "heartbeat";
-  to?: "all";
-}
-
 export interface ConnectionStatusMessage extends BaseWebSocketMessage {
   type: "connection_status";
   userId: number;
@@ -52,15 +48,22 @@ export interface ConnectionStatusMessage extends BaseWebSocketMessage {
   to: number | number[] | "all";
 }
 
+export interface AggregateUpdateMessage extends BaseWebSocketMessage {
+  type: "aggregate_update";
+  aggregateType: keyof UserItemsAggregates;
+  operation: "add" | "remove";
+  to: number;
+}
+
 /**
  * Union type of all possible WebSocket messages
  */
-export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | HeartbeatMessage | ConnectionStatusMessage;
+export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | ConnectionStatusMessage | AggregateUpdateMessage;
 
 /**
  * Message types - determined by the 'type' field
  */
-export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "heartbeat" | "connection_status";
+export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "connection_status" | "aggregate_update";
 
 /**
  * Handler function type for processing messages
