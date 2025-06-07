@@ -123,8 +123,7 @@ onMounted(() => {
 /* Map-only view container */
 .map-only-container {
   width: 100vw;
-  height: calc(100vh - var(--header-height) - 45px);
-  /* Adjusted to account for tab height */
+  height: calc(100vh - var(--header-expanded-height));
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   position: relative;
@@ -134,6 +133,7 @@ onMounted(() => {
 .map-fullscreen {
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 /* Dual view layout */
@@ -142,7 +142,7 @@ onMounted(() => {
   grid-template-columns: 1fr 1fr;
   gap: 0;
   width: 100vw;
-  height: calc(100vh - var(--header-height) - 45px);
+  height: calc(100vh - var(--header-expanded-height));
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding: 0;
@@ -159,7 +159,7 @@ onMounted(() => {
   grid-column: 1 / -1;
   width: 100vw;
   height: 100vh;
-  min-height: 400px;
+  min-height: 0;
   z-index: 2;
 }
 
@@ -189,7 +189,7 @@ onMounted(() => {
   }
   .dual-view-map.map-fullscreen {
     height: 100vh;
-    min-height: 400px;
+    min-height: 0;
   }
 }
 

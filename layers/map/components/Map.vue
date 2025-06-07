@@ -1,6 +1,17 @@
 <template>
   <div ref="mapContainer" class="map-container">
     <!-- map here -->
+    
+    <!-- Custom Draw Controls -->
+    <MoleculesMapDrawControls
+      :draw-enabled="props.draw"
+      :is-drawing="drawingState.isDrawing"
+      :has-drawn-shapes="drawingState.hasShapes"
+      :has-selected-shape="drawingState.hasSelectedShape"
+      @toggle-polygon-drawing="handleTogglePolygonDrawing"
+      @delete-all-shapes="handleDeleteAllShapes"
+      @delete-selected-shape="handleDeleteSelectedShape"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -11,8 +22,23 @@ const { hasNote } = useNotes();
  */
 const map = shallowRef();
 const mapContainer = ref<HTMLElement>();
-const { initMap, addMarkers, clearMarkers, addMarker, initDrawing, updateSearchRadiusVisualization, removeSearchRadiusVisualization } = useMap();
-defineExpose({ map });
+const { initMap, addMarkers, clearMarkers, addMarker, initDrawing, getDrawControl, updateSearchRadiusVisualization, removeSearchRadiusVisualization, clearMarkersForFeature } = useMap();
+
+// Drawing state management
+const drawingState = reactive({
+  isDrawing: false,
+  hasShapes: false,
+  hasSelectedShape: false,
+});
+
+defineExpose({ 
+  map, 
+  mapContainer, 
+  drawingState, 
+  handleTogglePolygonDrawing, 
+  handleDeleteAllShapes,
+  handleDeleteSelectedShape 
+});
 
 /**
  * props
@@ -29,9 +55,9 @@ const props = withDefaults(defineProps<{
   searchCenter?: [number, number] | null;
 }>(), {
   interactive: true,
-  zoom: 12,
+  zoom: 5, // Zoom level to show entire UK
   mapId: GLOBAL_MAP_ID,
-  center: () => [51.505, -0.09],
+  center: () => [-2.5, 54.7], // Geographic center of UK [lon, lat]
   draw: false,
   searchRadius: null,
   searchCenter: null,
@@ -54,6 +80,39 @@ watch(
   (newDrawValue) => {
     if (map.value) {
       initDrawing(map.value, newDrawValue);
+      
+      if (newDrawValue) {
+        // Add event listeners for draw events to sync state
+        map.value.on('draw.create', (e: any) => {
+          drawingState.hasShapes = true;
+          drawingState.isDrawing = false; // Exit draw mode after creating
+        });
+        
+        map.value.on('draw.delete', (e: any) => {
+          // Clear markers for deleted features
+          e.features.forEach((feature: any) => {
+            if (feature.id) {
+              clearMarkersForFeature(map.value, feature.id);
+            }
+          });
+          
+          const drawControl = getDrawControl(map.value);
+          if (drawControl) {
+            const allFeatures = drawControl.getAll();
+            drawingState.hasShapes = allFeatures.features.length > 0;
+            drawingState.hasSelectedShape = false; // Reset selection after delete
+          }
+        });
+        
+        map.value.on('draw.modechange', (e: any) => {
+          drawingState.isDrawing = e.mode === 'draw_polygon';
+        });
+
+        // Track selection changes
+        map.value.on('draw.selectionchange', (e: any) => {
+          drawingState.hasSelectedShape = e.features && e.features.length > 0;
+        });
+      }
     }
   }
 );
@@ -216,6 +275,79 @@ function removeCircle(map: any) {
   if (!map) return;
   // Remove SVG overlay using composable util
   removeSearchRadiusVisualization(map);
+}
+
+/**
+ * Handle polygon drawing toggle from custom controls
+ */
+function handleTogglePolygonDrawing() {
+  if (!map.value) return;
+  
+  const drawControl = getDrawControl(map.value);
+  if (!drawControl) return;
+  
+  drawingState.isDrawing = !drawingState.isDrawing;
+  
+  if (drawingState.isDrawing) {
+    drawControl.changeMode('draw_polygon');
+  } else {
+    drawControl.changeMode('simple_select');
+  }
+}
+
+/**
+ * Handle delete all shapes from custom controls
+ */
+function handleDeleteAllShapes() {
+  if (!map.value) return;
+  
+  const drawControl = getDrawControl(map.value);
+  if (!drawControl) return;
+  
+  // Get all features before deleting to clear their markers
+  const allFeatures = drawControl.getAll();
+  allFeatures.features.forEach((feature: any) => {
+    if (feature.id) {
+      clearMarkersForFeature(map.value, feature.id);
+    }
+  });
+  
+  // Also clear all general markers on the map
+  clearMarkers(map.value);
+  
+  drawControl.deleteAll();
+  drawingState.hasShapes = false;
+  drawingState.hasSelectedShape = false;
+}
+
+/**
+ * Handle delete selected shape from custom controls
+ */
+function handleDeleteSelectedShape() {
+  if (!map.value) return;
+  
+  const drawControl = getDrawControl(map.value);
+  if (!drawControl) return;
+  
+  // Get selected features
+  const selectedFeatures = drawControl.getSelected();
+  if (selectedFeatures.features && selectedFeatures.features.length > 0) {
+    // Clear markers for selected features
+    selectedFeatures.features.forEach((feature: any) => {
+      if (feature.id) {
+        clearMarkersForFeature(map.value, feature.id);
+      }
+    });
+    
+    // Delete selected features
+    const selectedIds = selectedFeatures.features.map((f: any) => f.id);
+    drawControl.delete(selectedIds);
+    
+    // Update state
+    const remainingFeatures = drawControl.getAll();
+    drawingState.hasShapes = remainingFeatures.features.length > 0;
+    drawingState.hasSelectedShape = false;
+  }
 }
 </script>
 <style>

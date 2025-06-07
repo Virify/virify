@@ -730,21 +730,21 @@ async function sendForm(event: Event) {
   transition: all var(--animation-medium) var(--ease-out);
 
   &-active {
-    background: var(--primary-100);
+    background: var(--secondary-400);
     border-color: var(--primary-200);
-    color: var(--primary-900);
+    color: var(--monochrome-100);
   }
 
   &:hover {
     background: var(--background-100);
     border-color: var(--background-200);
-    color: var(--foreground-100);
+    color: var(--monochrome-100);
   
   }
 
   &-active:hover {
-    background: var(--primary-200);
-    color: var(--primary-900);
+    background: var(--secondary-500);
+    color: var(--monochrome-100);
   }
 }
 

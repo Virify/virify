@@ -37,7 +37,7 @@ export function useMap() {
 
     // reset map controls and options
     setControls(existingMapInstance, map, options);
-    map.setZoom(options.zoom ?? 12);
+    map.setZoom(options.zoom ?? 6);
     map.setCenter(options.center);
 
     console.log("[Map] Reusing existing map instance");
@@ -62,7 +62,7 @@ export function useMap() {
       container,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${sdk.config.apiKey}`,
       interactive: options.interactive,
-      zoom: options.zoom ?? 12,
+      zoom: options.zoom ?? 6,
       navigationControl: options.interactive,
       navigationControlOptions: {
         position: "top-right",
@@ -255,7 +255,7 @@ export function useMap() {
 
     const drawControl = new MapboxDraw({
       displayControlsDefault: false,
-      controls: { polygon: true, trash: true },
+      controls: {}, // Remove all default controls for completely custom implementation
       defaultMode: "simple_select",
       userProperties: true,
       styles,
@@ -270,11 +270,9 @@ export function useMap() {
       },
     });
 
+    // Add the draw control but without displaying any default UI
     map.addControl(drawControl, "top-right");
     instance.drawControl = drawControl;
-
-    // Patch classes for Mapbox Draw control (Maplibre compatibility)
-    document.querySelectorAll(".mapboxgl-ctrl-group.mapboxgl-ctrl").forEach((elem) => elem.classList.add("maplibregl-ctrl", "maplibregl-ctrl-group"));
 
     // Set cursor to crosshair only when in drawing mode
     map.on("draw.modechange", (e: any) => {
@@ -430,6 +428,8 @@ export function useMap() {
     }
     // Send the full GeoJSON polygon geometry to the backend for strict-in-polygon search
     const geometry = feature.geometry && feature.geometry.type === "Polygon" ? { type: "Polygon", coordinates: feature.geometry.coordinates } : undefined;
+    const { isFavourite } = useFavourites();
+    const { hasNote } = useNotes();
 
     /**
      * !! IMPORTANT !!
@@ -466,6 +466,8 @@ export function useMap() {
               }
             : null,
           image: listing.property?.media ?? [],
+          hasNote: hasNote(listing.id),
+          isFavorite: isFavourite(listing.id),
         }));
 
         // Add markers specifically for this feature
@@ -474,6 +476,17 @@ export function useMap() {
       .catch((error) => {
         console.error("[Map] Error fetching search results:", error);
       });
+  }
+
+  /**
+   * Get the draw control instance for a specific map
+   *
+   * @param map The map to get the draw control from
+   * @returns The MapboxDraw instance or null if not found
+   */
+  function getDrawControl(map: ExtendedMapTilerMap): any | null {
+    const instance = findMapInstance(map, mapCache);
+    return instance?.drawControl || null;
   }
 
   return {
@@ -486,6 +499,7 @@ export function useMap() {
     calculateZoomLevelFromRadius,
     autoComplete,
     initDrawing,
+    getDrawControl,
     updateSearchRadiusVisualization,
     removeSearchRadiusVisualization,
   } as const;
