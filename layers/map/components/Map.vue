@@ -1,6 +1,12 @@
 <template>
   <div ref="mapContainer" class="map-container">
     <!-- map here -->
+    
+    <!-- Custom Draw Controls -->
+    <MoleculesMapDrawControls
+      :draw-enabled="props.draw"
+      :map="map"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -11,8 +17,21 @@ const { hasNote } = useNotes();
  */
 const map = shallowRef();
 const mapContainer = ref<HTMLElement>();
-const { initMap, addMarkers, clearMarkers, addMarker, initDrawing, updateSearchRadiusVisualization, removeSearchRadiusVisualization } = useMap();
-defineExpose({ map });
+const { 
+  initMap, 
+  addMarkers, 
+  clearMarkers, 
+  addMarker, 
+  initDrawing, 
+  getDrawControl, 
+  updateSearchRadiusVisualization, 
+  removeSearchRadiusVisualization, 
+  clearMarkersForFeature
+} = useMap();
+
+defineExpose({ 
+  map
+});
 
 /**
  * props
@@ -29,9 +48,9 @@ const props = withDefaults(defineProps<{
   searchCenter?: [number, number] | null;
 }>(), {
   interactive: true,
-  zoom: 12,
+  zoom: 5, // Zoom level to show entire UK
   mapId: GLOBAL_MAP_ID,
-  center: () => [51.505, -0.09],
+  center: () => [-2.5, 54.7], // Geographic center of UK [lon, lat]
   draw: false,
   searchRadius: null,
   searchCenter: null,

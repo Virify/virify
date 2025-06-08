@@ -15,11 +15,11 @@ const searchSchema = z.object({
       lon: z.number(),
     })
     .optional(),
-  geometry: z
-    .object({
+  geometries: z
+    .array(z.object({
       type: z.literal("Polygon"),
       coordinates: z.array(z.array(z.array(z.number()))),
-    })
+    }))
     .optional(),
   bedrooms: z.array(z.coerce.number()).optional(),
   bathrooms: z.array(z.coerce.number()).optional(),
@@ -39,14 +39,14 @@ const searchSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   try {
-    const { buyOrRent, radius, coordinates, geometry, propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
+    const { buyOrRent, radius, coordinates, geometries, propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, page, pageSize } = await readValidatedBody(event, searchSchema.parse);
 
     /**
      * Required for search
      */
     const listingSearch: ListingSearch = {
       coordinates,
-      geometry,
+      geometries,
       radius: radius || undefined,
       type: buyOrRent,
     };

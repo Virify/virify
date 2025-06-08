@@ -33,9 +33,14 @@ provide("searchListings", searchListings);
 /**
  * Computed
  */
-const mapZoomLevel = computed(() => 
-  calculateZoomLevelFromRadius(searchParams.value?.radius)
-);
+const mapZoomLevel = computed(() => {
+  const radius = searchParams.value?.radius;
+  if (radius) {
+    return calculateZoomLevelFromRadius(radius);
+  }
+  // Don't return anything - let Map component use its defaults (zoom 6 for UK)
+  return undefined;
+});
 
 const searchRadius = computed(() => {
   const radius = searchParams.value?.radius;
@@ -44,9 +49,14 @@ const searchRadius = computed(() => {
 
 const mapCenterCoordinates = computed(() => {
   const coords = searchParams.value?.coordinates;
-  return coords?.lon && coords?.lat ? 
-    [coords.lon, coords.lat] as [number, number] : 
-    userLocation.value ?? undefined;
+  if (coords?.lon && coords?.lat) {
+    return [coords.lon, coords.lat] as [number, number];
+  }
+  if (userLocation.value) {
+    return userLocation.value;
+  }
+  // Don't return anything - let Map component use its defaults (UK center)
+  return undefined;
 });
 
 /**
@@ -65,10 +75,13 @@ onMounted(() => {
 });
 </script>
 <style>
+/* Oli to fix the stupid header height issues */
 .map-search-page {
+  margin-top: -1.3rem;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 64px);
+  height: calc(100vh - var(--header-expanded-height));
+  overflow: hidden;
 }
 .map-fullscreen {
   flex: 1;
