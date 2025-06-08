@@ -42,7 +42,7 @@ export type ListingSearch = {
     lon: number;
   };
   radius?: number;
-  geometry?: GeoJSONPolygon; // Add support for strict polygon search
+  geometries?: GeoJSONPolygon[]; // Support for single or multiple polygon search
 };
 
 /**

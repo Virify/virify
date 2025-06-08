@@ -7,28 +7,28 @@
           :class="[
             'button-overlay',
             'm-map-draw-controls-button',
-            { 'm-map-draw-controls-button-active': isDrawing }
+            { 'm-map-draw-controls-button-active': drawingState.isDrawing }
           ]"
-          :aria-pressed="isDrawing"
-          :aria-label="isDrawing ? 'Stop drawing polygon' : 'Start drawing polygon'"
-          @click="togglePolygonDrawing"
+          :aria-pressed="drawingState.isDrawing"
+          :aria-label="drawingState.isDrawing ? 'Stop drawing polygon' : 'Start drawing polygon'"
+          @click="handleTogglePolygonDrawing"
         >
           <AtomsIcon 
             icon="draw" 
-            :title="isDrawing ? 'Stop drawing' : 'Draw new shape'"
+            :title="drawingState.isDrawing ? 'Stop drawing' : 'Draw new shape'"
           />
         </AtomsButton>
         <div class="m-map-draw-controls-label | body-xs font-medium">
-          {{ isDrawing ? 'Stop drawing' : 'Draw new shape' }}
+          {{ drawingState.isDrawing ? 'Stop drawing' : 'Draw new shape' }}
         </div>
       </div>
 
       <!-- Delete Selected Shape Button (only show when a shape is selected) -->
-      <div v-if="hasSelectedShape" class="m-map-draw-controls-item">
+      <div v-if="drawingState.hasSelectedShape" class="m-map-draw-controls-item">
         <AtomsButton
           class="button-overlay m-map-draw-controls-button"
           :aria-label="'Delete selected shape'"
-          @click="deleteSelectedShape"
+          @click="handleDeleteSelectedShape"
         >
           <AtomsIcon 
             icon="cross" 
@@ -42,9 +42,9 @@
       <div v-else class="m-map-draw-controls-item">
         <AtomsButton
           class="button-overlay m-map-draw-controls-button"
-          :disabled="!hasDrawnShapes"
-          :aria-label="hasDrawnShapes ? 'Delete all shapes' : 'No shapes to delete'"
-          @click="deleteAllShapes"
+          :disabled="!drawingState.hasShapes"
+          :aria-label="drawingState.hasShapes ? 'Delete all shapes' : 'No shapes to delete'"
+          @click="handleDeleteAllShapes"
         >
           <AtomsIcon 
             icon="cross" 
@@ -52,7 +52,7 @@
           />
         </AtomsButton>
         <div class="m-map-draw-controls-label | body-xs font-medium">
-          {{ hasDrawnShapes ? 'Delete all' : 'No shapes' }}
+          {{ drawingState.hasShapes ? 'Delete all' : 'No shapes' }}
         </div>
       </div>
     </div>
@@ -60,48 +60,45 @@
 </template>
 
 <script setup lang="ts">
+import type { ExtendedMapTilerMap } from "~~/shared/types/map";
+
 interface Props {
   drawEnabled: boolean;
-  isDrawing?: boolean;
-  hasDrawnShapes?: boolean;
-  hasSelectedShape?: boolean;
+  map?: ExtendedMapTilerMap | null;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  isDrawing: false,
-  hasDrawnShapes: false,
-  hasSelectedShape: false,
-});
+const props = defineProps<Props>();
 
-interface Emits {
-  (e: 'toggle-polygon-drawing'): void;
-  (e: 'delete-all-shapes'): void;
-  (e: 'delete-selected-shape'): void;
-}
-
-const emit = defineEmits<Emits>();
+// Use the map composable directly for drawing state and functions
+const { 
+  drawingState,
+  togglePolygonDrawing,
+  deleteAllShapes,
+  deleteSelectedShape
+} = useMap();
 
 /**
  * Handle polygon drawing toggle
  */
-function togglePolygonDrawing() {
-  emit('toggle-polygon-drawing');
+function handleTogglePolygonDrawing() {
+  if (!props.map) return;
+  togglePolygonDrawing(props.map);
 }
 
 /**
  * Handle delete all shapes
  */
-function deleteAllShapes() {
-  if (props.hasDrawnShapes) {
-    emit('delete-all-shapes');
-  }
+function handleDeleteAllShapes() {
+  if (!props.map || !drawingState.hasShapes) return;
+  deleteAllShapes(props.map);
 }
 
 /**
  * Handle delete selected shape
  */
-function deleteSelectedShape() {
-  emit('delete-selected-shape');
+function handleDeleteSelectedShape() {
+  if (!props.map) return;
+  deleteSelectedShape(props.map);
 }
 </script>
 

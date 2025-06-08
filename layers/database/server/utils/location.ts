@@ -97,19 +97,43 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
 }
 
 /**
- * Get property IDs strictly within a GeoJSON polygon (geometry).
- * Uses PostGIS ST_Within and ST_GeomFromGeoJSON for strict-in-polygon filtering.
- * @param geometry GeoJSON Polygon
- * @returns List of property IDs strictly within the polygon
+ * Get property IDs strictly within one or more GeoJSON polygons.
+ * Uses PostGIS ST_Within and ST_Union for efficient multi-polygon filtering.
+ * @param geometries Array of GeoJSON Polygons (or single polygon)
+ * @returns List of property IDs strictly within any of the polygons
  */
-export async function getPropertyIdsByPolygon(geometry: { type: "Polygon"; coordinates: number[][][] }): Promise<PropertySearchResult> {
-  if (!geometry || geometry.type !== "Polygon" || !geometry.coordinates?.length) return [];
-  const geojson = JSON.stringify(geometry);
+export async function getPropertyIdsByPolygons(geometries: { type: "Polygon"; coordinates: number[][][] }[]): Promise<PropertySearchResult> {
+  if (!geometries || geometries.length === 0) return [];
+  
+  // Filter out invalid geometries
+  const validGeometries = geometries.filter(geometry => 
+    geometry && geometry.type === "Polygon" && geometry.coordinates?.length
+  );
+  
+  if (validGeometries.length === 0) return [];
+  
+  // Create ST_GeomFromGeoJSON calls for each polygon
+  const polygonGeoms = validGeometries.map(geometry => {
+    const geojson = JSON.stringify(geometry);
+    return `ST_GeomFromGeoJSON('${geojson}')`;
+  }).join(', ');
+  
+  // For single polygon, no need for ST_Union
+  if (validGeometries.length === 1) {
+    return await prisma.$queryRawUnsafe(`
+      SELECT p.id as "propertyId"
+      FROM "Property" p
+      JOIN "Address" a ON p."addressId" = a.id
+      WHERE ST_Within(a.location, ${polygonGeoms})
+    `);
+  }
+  
+  // For multiple polygons, use ST_Union
   return await prisma.$queryRawUnsafe(`
     SELECT p.id as "propertyId"
     FROM "Property" p
     JOIN "Address" a ON p."addressId" = a.id
-    WHERE ST_Within(a.location, ST_GeomFromGeoJSON('${geojson}'))
+    WHERE ST_Within(a.location, ST_Union(ARRAY[${polygonGeoms}]))
   `);
 }
 

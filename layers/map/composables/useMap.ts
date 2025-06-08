@@ -9,6 +9,16 @@ import { setControls, findMapInstance, renderMarker, renderPopup, styles, calcul
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
 
+// Global drawing state for all map instances
+const drawingState = reactive({
+  isDrawing: false,
+  hasShapes: false,
+  hasSelectedShape: false,
+});
+
+// Global polygon geometry storage - support multiple polygons
+const polygonGeometries = ref<any[]>([]);
+
 export function useMap() {
   const sdk = useNuxtApp().$maptilersdk;
   const vueApp = useNuxtApp();
@@ -277,11 +287,19 @@ export function useMap() {
     // Set cursor to crosshair only when in drawing mode
     map.on("draw.modechange", (e: any) => {
       map.getCanvas().style.cursor = e.mode === "draw_polygon" ? "crosshair" : "";
+      drawingState.isDrawing = e.mode === 'draw_polygon';
+    });
+
+    // Track selection changes
+    map.on('draw.selectionchange', (e: any) => {
+      drawingState.hasSelectedShape = e.features && e.features.length > 0;
     });
 
     map.on("draw.create", (e: any) => {
       // Process the drawn polygon
       addBBox(e, map);
+      drawingState.hasShapes = true;
+      drawingState.isDrawing = false; // Exit draw mode after creating
       console.log("[Map] Polygon created and processed - dragging disabled");
     });
 
@@ -290,8 +308,24 @@ export function useMap() {
       e.features.forEach((feature: any) => {
         if (feature.id) {
           clearMarkersForFeature(map, feature.id);
+          // Remove geometry from stored array
+          polygonGeometries.value = polygonGeometries.value.filter(
+            (geom: any) => geom.id !== feature.id
+          );
         }
       });
+      
+      const drawControl = getDrawControl(map);
+      if (drawControl) {
+        const allFeatures = drawControl.getAll();
+        drawingState.hasShapes = allFeatures.features.length > 0;
+        drawingState.hasSelectedShape = false; // Reset selection after delete
+        
+        // Clear stored polygon geometries if no shapes remain
+        if (!drawingState.hasShapes) {
+          polygonGeometries.value = [];
+        }
+      }
     });
   }
 
@@ -412,8 +446,12 @@ export function useMap() {
     const feature = e.features[0];
     if (!feature) return;
 
-    // Get or generate a feature ID
-    const featureId = feature.id || `feature_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Use the actual feature ID from MapboxDraw - don't generate custom IDs
+    const featureId = feature.id;
+    if (!featureId) {
+      console.error("[Map] Feature has no ID from MapboxDraw");
+      return;
+    }
 
     // Ensure polygon coordinates are a closed loop if feature is a Polygon to avoid rendering issues on zoom
     if (feature.geometry && feature.geometry.type === "Polygon") {
@@ -426,56 +464,40 @@ export function useMap() {
         }
       }
     }
-    // Send the full GeoJSON polygon geometry to the backend for strict-in-polygon search
-    const geometry = feature.geometry && feature.geometry.type === "Polygon" ? { type: "Polygon", coordinates: feature.geometry.coordinates } : undefined;
-    const { isFavourite } = useFavourites();
-    const { hasNote } = useNotes();
+    
+    // Store the polygon geometry for search integration
+    const geometry = feature.geometry && feature.geometry.type === "Polygon" ? { 
+      id: featureId,
+      type: "Polygon", 
+      coordinates: feature.geometry.coordinates 
+    } : undefined;
+    
+    if (geometry) {
+      // Add to array of polygon geometries
+      polygonGeometries.value.push(geometry);
+      console.log("[Map] Polygon geometry stored for search:", geometry);
+    }
+  }
 
-    /**
-     * !! IMPORTANT !!
-     *
-     * This is a temporary solution to fetch listings based on the drawn polygon. Needs to be moved into the main search function
-     */
-    const result = $fetch<ListingCardType[]>("/api/search/listings/", {
-      method: "POST",
-      body: {
-        geometry,
-        buyOrRent: "buy",
-      },
-    });
-    result
-      .then((data) => {
-        console.log("[Map] Search results:", data);
-        // Handle search results here
-        const listings = data.map((listing) => ({
-          id: listing.id,
-          lat: listing.property?.address?.lat ?? 0,
-          lon: listing.property?.address?.lon ?? 0,
-          title: listing.title ?? null,
-          bedrooms: listing.property?.numberBedrooms ?? null,
-          bathrooms: listing.property?.numberBathrooms ?? null,
-          price: listing.price ?? null,
-          propertyType: listing.property?.type?.name ?? null,
-          classification: listing.property?.classification?.name ?? null,
-          priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,
-          address: listing.property?.address
-            ? {
-                street: listing.property.address.street,
-                city: listing.property.address.city,
-                postcode: listing.property.address.postcode,
-              }
-            : null,
-          image: listing.property?.media ?? [],
-          hasNote: hasNote(listing.id),
-          isFavorite: isFavourite(listing.id),
-        }));
+  /**
+   * Get the current polygon geometries for search integration
+   */
+  function getBBox() {
+    return polygonGeometries.value;
+  }
 
-        // Add markers specifically for this feature
-        addMarkersForFeature(map, listings, featureId.toString());
-      })
-      .catch((error) => {
-        console.error("[Map] Error fetching search results:", error);
-      });
+  /**
+   * Set polygon geometries for search integration
+   */
+  function setBBox(geometries: any[]) {
+    polygonGeometries.value = geometries;
+  }
+
+  /**
+   * Clear polygon geometries
+   */
+  function clearBBox() {
+    polygonGeometries.value = [];
   }
 
   /**
@@ -487,6 +509,91 @@ export function useMap() {
   function getDrawControl(map: ExtendedMapTilerMap): any | null {
     const instance = findMapInstance(map, mapCache);
     return instance?.drawControl || null;
+  }
+
+  /**
+   * Handle polygon drawing toggle - manages drawing state
+   */
+  function togglePolygonDrawing(map: ExtendedMapTilerMap) {
+    if (!map) return;
+    
+    const drawControl = getDrawControl(map);
+    if (!drawControl) return;
+    
+    drawingState.isDrawing = !drawingState.isDrawing;
+    
+    if (drawingState.isDrawing) {
+      drawControl.changeMode('draw_polygon');
+    } else {
+      drawControl.changeMode('simple_select');
+    }
+  }
+
+  /**
+   * Handle delete all shapes - clears all drawn shapes and markers
+   */
+  function deleteAllShapes(map: ExtendedMapTilerMap) {
+    if (!map) return;
+    
+    const drawControl = getDrawControl(map);
+    if (!drawControl) return;
+    
+    // Get all features before deleting to clear their markers
+    const allFeatures = drawControl.getAll();
+    allFeatures.features.forEach((feature: any) => {
+      if (feature.id) {
+        clearMarkersForFeature(map, feature.id);
+      }
+    });
+    
+    // Also clear all general markers on the map
+    clearMarkers(map);
+    
+    drawControl.deleteAll();
+    drawingState.hasShapes = false;
+    drawingState.hasSelectedShape = false;
+    
+    // Clear stored polygon geometries
+    polygonGeometries.value = [];
+  }
+
+  /**
+   * Handle delete selected shape - removes selected shapes
+   */
+  function deleteSelectedShape(map: ExtendedMapTilerMap) {
+    if (!map) return;
+    
+    const drawControl = getDrawControl(map);
+    if (!drawControl) return;
+    
+    // Get selected features
+    const selectedFeatures = drawControl.getSelected();
+    if (selectedFeatures.features && selectedFeatures.features.length > 0) {
+      // Clear markers for selected features
+      selectedFeatures.features.forEach((feature: any) => {
+        if (feature.id) {
+          clearMarkersForFeature(map, feature.id);
+          // Remove geometry from stored array
+          polygonGeometries.value = polygonGeometries.value.filter(
+            (geom: any) => geom.id !== feature.id
+          );
+        }
+      });
+      
+      // Delete selected features
+      const selectedIds = selectedFeatures.features.map((f: any) => f.id);
+      drawControl.delete(selectedIds);
+      
+      // Update state
+      const remainingFeatures = drawControl.getAll();
+      drawingState.hasShapes = remainingFeatures.features.length > 0;
+      drawingState.hasSelectedShape = false;
+      
+      // Clear stored polygon geometries if no shapes remain
+      if (!drawingState.hasShapes) {
+        polygonGeometries.value = [];
+      }
+    }
   }
 
   return {
@@ -502,5 +609,15 @@ export function useMap() {
     getDrawControl,
     updateSearchRadiusVisualization,
     removeSearchRadiusVisualization,
+    // Drawing state and functions
+    drawingState: readonly(drawingState),
+    polygonGeometries: readonly(polygonGeometries),
+    togglePolygonDrawing,
+    deleteAllShapes,
+    deleteSelectedShape,
+    // Polygon geometry management
+    getBBox,
+    setBBox,
+    clearBBox,
   } as const;
 }

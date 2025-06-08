@@ -265,7 +265,7 @@ const isContracted = computed(() => {
  *  Get search form config
  */
 const { radiusOptions, bedroomOptions, bathroomOptions, dateOptions, saleAvailabilityOptions, rentAvailabilityOptions, propertyFeatures, buyOrRentOptions } = getSearchFormConfig();
-const { autoComplete } = useMap();
+const { autoComplete, getBBox } = useMap();
 
 /**
  *  Popover management
@@ -490,15 +490,26 @@ async function sendForm(event: Event) {
   }
 
   /**
+   * Check for polygon geometry from map drawing
+   */
+  const polygonGeometries = getBBox();
+
+  /**
    * Save search params to state
    */
   searchParams.value = {
     location: suggestions.value.location, // Use the display name for location
-    coordinates: {
-      lat: suggestions.value.geo.lat,
-      lon: suggestions.value.geo.lon
-    }, // Add coordinates for the search
-    radius,
+    // Use polygon geometries if available, otherwise use coordinates and radius
+    ...(polygonGeometries && polygonGeometries.length > 0
+      ? { geometries: polygonGeometries.map(g => ({ type: g.type, coordinates: g.coordinates })) }
+      : {
+          coordinates: {
+            lat: suggestions.value.geo.lat,
+            lon: suggestions.value.geo.lon
+          },
+          radius
+        }
+    ),
     buyOrRent,
     propertyTypes: removeObjectEmptyArrays(unref(selectedPropertyTypes)),
     priceRange: selectedPriceRange.value,
