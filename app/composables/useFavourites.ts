@@ -1,5 +1,4 @@
 import { ViewsDialogLogin } from "#components";
-import { fa } from "@faker-js/faker";
 import { createSharedComposable } from "@vueuse/core";
 import type { UserFavouriteListingCard } from "~~/shared/types/user-favourite-listing";
 
@@ -15,37 +14,17 @@ export const useFavourites = createSharedComposable(() => {
   /**
    * State Management
    */
-  const favourites = useState<UserFavouriteListingCard[]>("favourites", () => []);
-  const recentFavourites = useState<UserFavouriteListingCard[]>("recentFavourites", () => []);
+  const { data: favourites, refresh: refreshFavourites } = useAsyncData<UserFavouriteListingCard[]>("favourites", () => useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/"), { default: () => [], watch: [loggedIn] });
 
-  /**
-   * Get all favourite listings for the user
-   * This triggers onMount of user Login
-   *
-   * @returns Array of ListingCardType empty array on error
-   */
-  const getAllFavourites = async () => {
-    if (loggedIn.value) {
-      const result = await $fetch<UserFavouriteListingCard[]>("/api/user/favourites/");
-      favourites.value = result
-      getRecentFavourites();
-    }
-  };
-
-  /**
-   * Get recent favourite listings for the user
-   */
-  const getRecentFavourites = async () => {
-    if (loggedIn.value) {
-      recentFavourites.value = favourites.value
-        .filter((item) => {
-          const createdAt = new Date(item.createdAt);
-          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          return createdAt >= sevenDaysAgo;
-        })
-        .slice(0, 5); // Get only the most recent 5
-    }
-  };
+  const recentFavourites = computed(() => {
+    return favourites.value
+      .filter((item) => {
+        const createdAt = new Date(item.createdAt);
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        return createdAt >= sevenDaysAgo;
+      })
+      .slice(0, 5);
+  });
 
   /**
    * Is a listing a favourite
@@ -77,7 +56,7 @@ export const useFavourites = createSharedComposable(() => {
       method: "POST",
       body: { listingId },
     });
-    await getAllFavourites();
+    await refreshFavourites();
   };
 
   /**
@@ -93,7 +72,7 @@ export const useFavourites = createSharedComposable(() => {
       body: { listingId },
     });
     if (result) {
-      favourites.value = removeListingFromArray(listingId) || [];
+      await refreshFavourites();
     }
   };
 
@@ -103,28 +82,6 @@ export const useFavourites = createSharedComposable(() => {
   function removeListingFromArray(dToRemove: number) {
     return favourites.value?.filter((d) => d.listing.id !== dToRemove);
   }
-
-  /**
-   * Watch for changes in the loggedIn state
-   * This is already under a provided composable via isLoggedIn, I think this is fine
-   */
-  watch(loggedIn, async (isLoggedIn) => {
-    if (isLoggedIn) {
-      await getAllFavourites();
-    }
-    if (!isLoggedIn) {
-      favourites.value = [];
-    }
-  });
-
-  /**
-   * On mount, check if the user is logged in and fetch favourites
-   */
-  onMounted(async () => {
-    if (loggedIn.value) {
-      await getAllFavourites();
-    }
-  });
 
   // Add a toggleFavourite method to useFavourites composable
   const toggleFavourite = async (listingId: number) => {
@@ -141,8 +98,6 @@ export const useFavourites = createSharedComposable(() => {
 
   return {
     addToFavourite,
-    getAllFavourites,
-    getRecentFavourites,
     isFavourite,
     removeFromFavourite,
     removeListingFromArray,

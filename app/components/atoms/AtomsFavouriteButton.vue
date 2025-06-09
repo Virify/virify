@@ -37,7 +37,7 @@ import { watchOnce } from '@vueuse/core';
 const { isFavourite, addToFavourite, removeFromFavourite } = useFavourites();
 
 interface Props {
-  propertyId: number
+  listingId: number
   confirmRemoval?: boolean
   iconClass?: string
 }
@@ -46,7 +46,7 @@ interface Props {
 // removing a listing from favourites (e.g. on the profile page where
 // it is hard to then re-add after removing)
 const props = withDefaults(defineProps<Props>(), {
-  propertyid: 0,
+  listingId: 0,
   confirmRemoval: true
 })
 
@@ -57,7 +57,7 @@ const isSelected = ref(false)
 const isInteracted = ref(false)
 
 const isCurrentFavourite = computed(() => {
-  return isFavourite(props.propertyId)
+  return isFavourite(props.listingId)
 });
 
 watchOnce(isSelected, () => {
@@ -84,10 +84,10 @@ function toggle() {
     // just a tad delayed to allow the animation to finish when removing from a list of favourites
     setTimeout(() => {
       isSelected.value = false
-      removeFromFavourite(props.propertyId)
+      removeFromFavourite(props.listingId)
     }, 100) 
   } else {
-    addToFavourite(props.propertyId)
+    addToFavourite(props.listingId)
   }
 }
 </script>

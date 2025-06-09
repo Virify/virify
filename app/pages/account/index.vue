@@ -34,7 +34,7 @@
       <div class="account-activity">
         <h3 class="title-sm">Recent Activity</h3>
         <div class="box-xl | box">
-          <p class="body-md">You have no recent activity.</p>
+          <p class="body-md">{{ recentlyViewedListings }}</p>
         </div>
       </div>
 
@@ -70,16 +70,8 @@ definePageMeta({
   },
 });
 const { user, loggedIn } = useUserSession();
-const { analytics } = useAnalytics();
-const { recentFavourites } = useFavourites();
-const { recentUserNotes } = useNotes();
+const { analytics, recentUserNotes, recentFavourites, recentlyViewedListings } = useAnalytics();
 
-onMounted(async () => {
-  if (loggedIn.value) {
-    console.log(recentUserNotes.value);
-    console.log(recentFavourites.value);
-  }
-});
 </script>
 <style lang="scss" scoped>
 .account-profile-content {

@@ -13,23 +13,21 @@ export const useNotes = createSharedComposable(() => {
    * State Management
    * Store notes as an array with listing relationship
    */
-  const userNotes = useState<NoteData[]>("userNotes", () => []);
-  const recentUserNotes = useState<NoteData[]>("recentUserNotes", () => []);
-  
-  /**
-   * Recent notes (last 7 days) - computed from userNotes
-   */
-  const getRecentNotes = async () => {
-    if (loggedIn.value) {
-      recentUserNotes.value = userNotes.value
-        .filter((item) => {
-          const createdAt = new Date(item.createdAt);
-          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          return createdAt >= sevenDaysAgo;
-        })
-        .slice(0, 5);
-    }
-  };
+  const { data: userNotes, refresh: refreshUserNotes } = useAsyncData<NoteData[]>("userNotes", () => useRequestFetch()<NoteData[]>("/api/user/notes/"), {
+    default: () => [],
+    watch: [loggedIn],
+    immediate: true,
+  });
+
+  const recentUserNotes = computed(() => {
+    return userNotes.value
+      .filter((item) => {
+        const createdAt = new Date(item.createdAt);
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        return createdAt >= sevenDaysAgo;
+      })
+      .slice(0, 5);
+  });
 
   /**
    * Check if a property has a note
@@ -38,7 +36,7 @@ export const useNotes = createSharedComposable(() => {
    * @returns boolean indicating if the listing has a note
    */
   const hasNote = (listingId: number): boolean => {
-    return userNotes.value.some(note => note.listingId === listingId);
+    return userNotes.value.some((note) => note.listingId === listingId);
   };
 
   /**
@@ -48,7 +46,7 @@ export const useNotes = createSharedComposable(() => {
    * @returns note string or undefined
    */
   const getNote = (listingId: number): string | undefined => {
-    const noteData = userNotes.value.find(note => note.listingId === listingId);
+    const noteData = userNotes.value.find((note) => note.listingId === listingId);
     return noteData?.note;
   };
 
@@ -76,12 +74,12 @@ export const useNotes = createSharedComposable(() => {
       });
 
       // Update the state after successful API call
-      const existingIndex = userNotes.value.findIndex(n => n.listingId === listingId);
+      const existingIndex = userNotes.value.findIndex((n) => n.listingId === listingId);
       if (existingIndex >= 0 && userNotes.value[existingIndex]) {
         userNotes.value[existingIndex].note = note;
       } else {
         // If note doesn't exist, we should refetch all notes to get the complete data
-        await getAllNotes();
+        refreshUserNotes();
       }
     } catch (error) {
       console.error("Error updating note:", error);
@@ -109,26 +107,10 @@ export const useNotes = createSharedComposable(() => {
       });
 
       // Remove from state after successful API call
-      userNotes.value = userNotes.value.filter(note => note.listingId !== listingId);
+      userNotes.value = userNotes.value.filter((note) => note.listingId !== listingId);
     } catch (error) {
       console.error("Error deleting note:", error);
       throw error;
-    }
-  };
-
-  /**
-   * Fetch all notes for the user
-   * This prefetches all notes and stores in local state
-   */
-  const getAllNotes = async () => {
-    if (!loggedIn.value) return;
-
-    try {
-      const result = await $fetch<NoteData[]>("/api/user/notes/");
-      userNotes.value = result || [];
-      getRecentNotes();
-    } catch (error) {
-      console.error("Error fetching all notes:", error);
     }
   };
 
@@ -139,7 +121,7 @@ export const useNotes = createSharedComposable(() => {
    */
   watch(loggedIn, async (isLoggedIn) => {
     if (isLoggedIn) {
-      await getAllNotes();
+      await refreshUserNotes();
     } else {
       userNotes.value = [];
     }
@@ -151,7 +133,7 @@ export const useNotes = createSharedComposable(() => {
    */
   onMounted(async () => {
     if (loggedIn.value) {
-      await getAllNotes();
+      await refreshUserNotes();
     }
   });
 
@@ -161,6 +143,7 @@ export const useNotes = createSharedComposable(() => {
    * @param listingId - ID of the listing
    */
   const showNoteDialog = (listingId: number) => {
+    console.log("showNoteDialog", listingId);
     if (!loggedIn.value) {
       showDialog({ component: ViewsDialogLogin });
       return;
@@ -176,9 +159,7 @@ export const useNotes = createSharedComposable(() => {
     updateNote,
     deleteNote,
     hasNote,
-    getAllNotes,
     showNoteDialog,
-    getRecentNotes,
     userNotes,
     recentUserNotes,
   };

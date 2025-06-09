@@ -17,7 +17,7 @@
     </div>
 
     <MoleculesListingCardButtons :controls-id="controlsId" class="m-listing-card-buttons-parent" :is-expanded="isHover"
-      :property-id @toggle-content="toggleHover" />
+      :listing-id @toggle-content="toggleHover" />
 
     <div class="| flow flow-lg" role="presentation">
       <ul class="m-listing-card-icons">
@@ -66,7 +66,7 @@ interface Props {
   bedrooms?: number | undefined | null
   bathrooms?: number | undefined | null
   description: string
-  propertyId: number
+  listingId: number
   propertyType?: string
   classification?: string
   listingTier?: string
@@ -133,9 +133,9 @@ const addressString = computed(() => {
 })
 
 const propertyUrl = computed(() => {
-  const { propertyId } = props
+  const { listingId } = props
 
-  return `/listing/${propertyId}`
+  return `/listing/${listingId}`
 })
 
 /**

@@ -9,12 +9,12 @@
     </AtomsTooltip>
 
     <AtomsTooltip>
-      <AtomsNoteButton :property-id="props.propertyId" />
+      <AtomsNoteButton :listing-id="props.listingId" />
       <template #tooltip>Add/Edit Notes</template>
     </AtomsTooltip>
 
     <AtomsTooltip>
-      <AtomsFavouriteButton class="| button-none" :property-id icon-class="m-listing-card-button-icon" />
+      <AtomsFavouriteButton class="| button-none" :listing-id icon-class="m-listing-card-button-icon" />
       <template #tooltip>Add to favourites</template>
     </AtomsTooltip>
   </div>
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 
 interface Props {
-  propertyId: number,
+  listingId: number,
   controlsId: string
   isExpanded?: boolean
 }

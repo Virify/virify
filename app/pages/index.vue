@@ -7,7 +7,7 @@
         <MoleculesListingCard
           v-for="listing in searchListings"
           :key="listing.id"
-          :property-id="listing.id"
+          :listing-id="listing.id"
           :listing-tier="listing.listingTier"
           :price-type="listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency"
           :image="listing.property?.media"
@@ -34,7 +34,7 @@
           <MoleculesListingCardHorizontal
             v-for="listing in searchListings"
             :key="listing.id"
-            :property-id="listing.id"
+            :listing-id="listing.id"
             :listing-tier="listing.listingTier"
             :price-type="listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency"
             :image="listing.property?.media"
