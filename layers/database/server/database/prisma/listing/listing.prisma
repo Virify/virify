@@ -27,6 +27,7 @@ model Listing {
   UserFavouriteListing UserFavouriteListing[]
   ListingView          ListingView[]
   conversations        Conversation[]
+  UserNote             UserNote[]
 
   @@index([userId])
   @@index([propertyId])

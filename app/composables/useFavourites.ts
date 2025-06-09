@@ -1,4 +1,5 @@
 import { ViewsDialogLogin } from "#components";
+import { fa } from "@faker-js/faker";
 import { createSharedComposable } from "@vueuse/core";
 import type { UserFavouriteListingCard } from "~~/shared/types/user-favourite-listing";
 
@@ -36,11 +37,13 @@ export const useFavourites = createSharedComposable(() => {
    */
   const getRecentFavourites = async () => {
     if (loggedIn.value) {
-      recentFavourites.value = favourites.value.filter((item) => {
-        const createdAt = new Date(item.createdAt);
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        return createdAt >= sevenDaysAgo;
-      });
+      recentFavourites.value = favourites.value
+        .filter((item) => {
+          const createdAt = new Date(item.createdAt);
+          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          return createdAt >= sevenDaysAgo;
+        })
+        .slice(0, 5); // Get only the most recent 5
     }
   };
 

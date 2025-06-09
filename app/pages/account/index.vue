@@ -51,7 +51,7 @@
     <div class="account-notes">
       <h3 class="title-sm">Recent Notes</h3>
       <div class="box-xl | box">
-        <p class="body-md">{{ recentNotes }}</p>
+        <p class="body-md">{{ recentUserNotes }}</p>
       </div>
     </div>
   </div>
@@ -72,12 +72,11 @@ definePageMeta({
 const { user, loggedIn } = useUserSession();
 const { analytics } = useAnalytics();
 const { recentFavourites } = useFavourites();
-const { recentNotes, getRecentNotes } = useNotes();
+const { recentUserNotes } = useNotes();
 
 onMounted(async () => {
   if (loggedIn.value) {
-    await getRecentNotes();
-    console.log(recentNotes.value);
+    console.log(recentUserNotes.value);
     console.log(recentFavourites.value);
   }
 });

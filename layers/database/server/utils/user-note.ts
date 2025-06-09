@@ -1,5 +1,5 @@
-import type { NoteData, NoteResponse } from "~~/shared/types/note";
-
+import type { NoteResponse, NoteData } from "~~/shared/types/note";
+import { listingCardFields } from "~~/shared/types/listing";
 /**
  * Get all notes for a user
  *
@@ -7,23 +7,25 @@ import type { NoteData, NoteResponse } from "~~/shared/types/note";
  * @returns Array of notes with propertyId and note text
  */
 export async function getAllUserNotes(userId: number): Promise<NoteData[]> {
-  const userNotes = await prisma.userNote.findMany({
+  return await prisma.userNote.findMany({
     where: {
       userPreferences: {
         userId: userId,
       },
     },
     select: {
+      id: true,
+      userPreferencesId: true,
+      listing: {
+        select: {
+          ...listingCardFields,
+        },
+      },
       listingId: true,
       note: true,
+      createdAt: true,
     },
   });
-
-  // Map the notes to the expected format
-  return userNotes.map((note) => ({
-    propertyId: note.listingId,
-    note: note.note,
-  }));
 }
 
 /**
@@ -91,7 +93,9 @@ export async function updateUserNote(userId: number, listingId: number, note: st
           create: { userId },
         },
       },
-      listingId,
+      listing: {
+        connect: { id: listingId },
+      },
       note,
     },
     update: {
