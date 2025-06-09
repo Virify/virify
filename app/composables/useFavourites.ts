@@ -14,8 +14,8 @@ export const useFavourites = createSharedComposable(() => {
   /**
    * State Management
    */
-  const favourites = useState<ListingCardType[]>("favourites", () => []);
-  const recentFavourites = useState<ListingCardType[]>("recentFavourites", () => []);
+  const favourites = useState<UserFavouriteListingCard[]>("favourites", () => []);
+  const recentFavourites = useState<UserFavouriteListingCard[]>("recentFavourites", () => []);
 
   /**
    * Get all favourite listings for the user
@@ -26,7 +26,8 @@ export const useFavourites = createSharedComposable(() => {
   const getAllFavourites = async () => {
     if (loggedIn.value) {
       const result = await $fetch<UserFavouriteListingCard[]>("/api/user/favourites/");
-      favourites.value = result.map((fav) => fav.listing) || [];
+      favourites.value = result
+      getRecentFavourites();
     }
   };
 
@@ -35,8 +36,11 @@ export const useFavourites = createSharedComposable(() => {
    */
   const getRecentFavourites = async () => {
     if (loggedIn.value) {
-      const result = await $fetch<UserFavouriteListingCard[]>("/api/user/favourites/recent/");
-      recentFavourites.value = result.map((fav) => fav.listing) || [];
+      recentFavourites.value = favourites.value.filter((item) => {
+        const createdAt = new Date(item.createdAt);
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        return createdAt >= sevenDaysAgo;
+      });
     }
   };
 
@@ -47,7 +51,7 @@ export const useFavourites = createSharedComposable(() => {
    * @returns
    */
   function isFavourite(listingId: number): boolean {
-    return favourites.value.some((listing) => listing.id === listingId);
+    return favourites.value.some((listing) => listing.listing.id === listingId);
   }
 
   /**
@@ -94,7 +98,7 @@ export const useFavourites = createSharedComposable(() => {
    * Remove a listing from an array of favourite Listings
    */
   function removeListingFromArray(dToRemove: number) {
-    return favourites.value?.filter((d) => d.id !== dToRemove);
+    return favourites.value?.filter((d) => d.listing.id !== dToRemove);
   }
 
   /**

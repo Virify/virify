@@ -71,15 +71,14 @@ definePageMeta({
 });
 const { user, loggedIn } = useUserSession();
 const { analytics } = useAnalytics();
-const { recentFavourites, getRecentFavourites } = useFavourites();
+const { recentFavourites } = useFavourites();
 const { recentNotes, getRecentNotes } = useNotes();
 
 onMounted(async () => {
   if (loggedIn.value) {
-    await getRecentFavourites();
-    console.log(recentFavourites.value);
     await getRecentNotes();
     console.log(recentNotes.value);
+    console.log(recentFavourites.value);
   }
 });
 </script>

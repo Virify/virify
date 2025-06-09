@@ -12,6 +12,10 @@ export async function getUserFavourites(userId: number): Promise<UserFavouriteLi
       },
     },
     select: {
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      userPreferencesId: true,
       listing: {
         select: listingCardFields,
       },
@@ -39,6 +43,10 @@ export async function getRecentFavourites(userId: number): Promise<UserFavourite
       createdAt: "desc",
     },
     select: {
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      userPreferencesId: true,
       listing: {
         select: listingCardFields,
       },
