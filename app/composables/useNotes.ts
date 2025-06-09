@@ -14,6 +14,7 @@ export const useNotes = createSharedComposable(() => {
    * Store property IDs and their associated notes
    */
   const propertyNotes = useState<Map<number, string>>("propertyNotes", () => new Map());
+  const recentNotes = useState<NoteData[]>("recentNotes", () => []);
 
   /**
    * Check if a property has a note
@@ -117,6 +118,17 @@ export const useNotes = createSharedComposable(() => {
     }
   };
 
+  const getRecentNotes = async () => {
+    if (!loggedIn.value) return;
+
+    try {
+      const result = await $fetch<NoteData[]>("/api/user/notes/recent/");
+      recentNotes.value = result
+    } catch (error) {
+      console.error("Error fetching recent notes:", error);
+    }
+  };
+
   /**
    * Watch for changes in the loggedIn state
    * When the user logs out, clear cached notes state
@@ -163,5 +175,7 @@ export const useNotes = createSharedComposable(() => {
     hasNote,
     getAllNotes,
     showNoteDialog,
+    getRecentNotes,
+    recentNotes,
   };
 });

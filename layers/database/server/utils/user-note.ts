@@ -50,6 +50,25 @@ export async function getUserNote(userId: number, listingId: number): Promise<No
 }
 
 /**
+ * 
+ * @param userId - The ID of the user
+ * @description Fetch recent user notes created in the last 7 days
+ * @returns Array of recent user notes
+ */
+export async function getRecentUserNotes(userId: number) {
+  return await prisma.userNote.findMany({
+    where: {
+      userPreferences: {
+        userId: userId,
+      },
+      createdAt: {
+        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+      },
+    },
+  });
+}
+
+/**
  * Create or update a user's note for a listing
  *
  * @param userId - The ID of the user

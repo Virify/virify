@@ -20,6 +20,33 @@ export async function getUserFavourites(userId: number): Promise<UserFavouriteLi
 }
 
 /**
+ * Get recent favourites for a user
+ * 
+ * @param userId number
+ * @returns UserFavouriteListingCard[]
+ */
+export async function getRecentFavourites(userId: number): Promise<UserFavouriteListingCard[]> {
+  return await prisma.userFavouriteListing.findMany({
+    where: {
+      userPreferences: {
+        userId,
+      },
+      createdAt: {
+        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      listing: {
+        select: listingCardFields,
+      },
+    },
+  });
+}
+
+/**
  * Add a listing to user favourites
  *
  * @param userId number

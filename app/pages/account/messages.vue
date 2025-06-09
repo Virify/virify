@@ -1,31 +1,27 @@
 <template>
   <div class="p-messages | container">
     <h1 class="| title-md">Messages</h1>
+    <div class="">
+      <MoleculesFormField label="Search">
+        <input v-model="conversationsSearch" class="| text-input focus-visible" name="Search"
+          placeholder="Search conversations..." />
+      </MoleculesFormField>
+      
+    </div>
+    <AtomsDivider />
     <div class="p-messages-layout">
       <!-- Left Column: Conversations List -->
       <ul class="p-conversations-column">
-        <MoleculesConversationListItem
-          v-for="conversation in conversations"
-          :key="conversation.id"
-          :conversation="conversation"
-          :current-user-id="user?.id"
-          :is-active="activeConversation?.id === conversation.id"
-          @select-conversation="setActiveConversation"
-        />
+        <MoleculesConversationListItem v-for="conversation in searchedConversations" :key="conversation.id"
+          :conversation="conversation" :current-user-id="user?.id"
+          :is-active="activeConversation?.id === conversation.id" @select-conversation="setActiveConversation" />
       </ul>
 
       <!-- Right Column: Active Conversation Messages -->
       <div class="p-active-chat-column">
-        <OrganismsActiveChat
-          ref="activeChatRef"
-          :conversation="activeConversation"
-          :current-user-id="user?.id"
-          v-model:reply-message="message"
-          :is-send-disabled="status !== 'OPEN'"
-          :is-typing="isOtherUserTyping"
-          @send-reply="sendReply"
-          @user-typing="handleUserTyping"
-        />
+        <OrganismsActiveChat ref="activeChatRef" :conversation="activeConversation" :current-user-id="user?.id"
+          v-model:reply-message="message" :is-send-disabled="status !== 'OPEN'" :is-typing="isOtherUserTyping"
+          @send-reply="sendReply" @user-typing="handleUserTyping" />
       </div>
     </div>
   </div>
@@ -46,6 +42,27 @@ const { user } = useUserSession();
 const message = ref("");
 const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
 const activeChatRef = ref<{ scrollToBottom: () => void } | null>(null);
+const conversationsSearch = ref("");
+
+/**
+ * Computed property to filter conversations based on search input
+ */
+const searchedConversations = computed(() => {
+  if (!conversations.value) return [];
+  const searchTerm = conversationsSearch.value.toLowerCase();
+  return conversations.value.filter((conversation: ConversationWithUserAndMessages) => {
+    return (
+      conversation.sender.email.toLowerCase().includes(searchTerm) ||
+      conversation.receiver.email.toLowerCase().includes(searchTerm) ||
+      conversation.sender?.username?.toLowerCase().includes(searchTerm) ||
+      conversation.receiver?.username?.toLowerCase().includes(searchTerm) ||
+      conversation.listing?.property?.address?.fullAddress?.toLowerCase().includes(searchTerm) ||
+      conversation.messages.some((message: MessageWithUser) =>
+        message.content.toLowerCase().includes(searchTerm)
+      )
+    );
+  });
+});
 
 // Typing state
 const typingUsers = ref<Record<number, boolean>>({});

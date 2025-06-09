@@ -15,6 +15,7 @@ export const useFavourites = createSharedComposable(() => {
    * State Management
    */
   const favourites = useState<ListingCardType[]>("favourites", () => []);
+  const recentFavourites = useState<ListingCardType[]>("recentFavourites", () => []);
 
   /**
    * Get all favourite listings for the user
@@ -26,6 +27,16 @@ export const useFavourites = createSharedComposable(() => {
     if (loggedIn.value) {
       const result = await $fetch<UserFavouriteListingCard[]>("/api/user/favourites/");
       favourites.value = result.map((fav) => fav.listing) || [];
+    }
+  };
+
+  /**
+   * Get recent favourite listings for the user
+   */
+  const getRecentFavourites = async () => {
+    if (loggedIn.value) {
+      const result = await $fetch<UserFavouriteListingCard[]>("/api/user/favourites/recent/");
+      recentFavourites.value = result.map((fav) => fav.listing) || [];
     }
   };
 
@@ -124,9 +135,12 @@ export const useFavourites = createSharedComposable(() => {
   return {
     addToFavourite,
     getAllFavourites,
+    getRecentFavourites,
     isFavourite,
     removeFromFavourite,
     removeListingFromArray,
     toggleFavourite,
+    favourites,
+    recentFavourites,
   };
 });

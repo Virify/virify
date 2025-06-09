@@ -42,7 +42,7 @@
       <div class="account-favourites">
         <h3 class="title-sm">Recent Favourites</h3>
         <div class="box-xl | box">
-          <p class="body-md">You have no recent favourties.</p>
+          <p class="body-md">{{ recentFavourites }}</p>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@
     <div class="account-notes">
       <h3 class="title-sm">Recent Notes</h3>
       <div class="box-xl | box">
-        <p class="body-md">You have no recent notes.</p>
+        <p class="body-md">{{ recentNotes }}</p>
       </div>
     </div>
   </div>
@@ -71,6 +71,17 @@ definePageMeta({
 });
 const { user, loggedIn } = useUserSession();
 const { analytics } = useAnalytics();
+const { recentFavourites, getRecentFavourites } = useFavourites();
+const { recentNotes, getRecentNotes } = useNotes();
+
+onMounted(async () => {
+  if (loggedIn.value) {
+    await getRecentFavourites();
+    console.log(recentFavourites.value);
+    await getRecentNotes();
+    console.log(recentNotes.value);
+  }
+});
 </script>
 <style lang="scss" scoped>
 .account-profile-content {

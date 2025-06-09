@@ -15,7 +15,7 @@ export function useAnalytics() {
   /**
    * !! Important: useRequestFetch is required for SSR authenticated requests
    */
-  const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<AnalyticsAggregates>("/api/analytics/all"));
+  const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all"));
 
   /**
    * Track when a user views a listing
