@@ -14,7 +14,6 @@ export default defineEventHandler(async (event) => {
   const { user } = await getUserSession(event);
   try {
     const { listingId, sessionId } = await readValidatedBody(event, trackListingViewSchema.parse);
-
     let userId = null;
     userId = user?.id || null;
     

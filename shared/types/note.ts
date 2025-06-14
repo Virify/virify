@@ -1,14 +1,19 @@
 /**
  * Type definitions for user notes
  */
+import type { ListingCardType } from "./listing";
 
 export type NoteData = {
-  propertyId: number;
+  id: number;
+  userPreferencesId: number;
+  listing: ListingCardType | null;
+  listingId: number;
   note: string;
-};
+  createdAt: Date | string;
+}
 
-export type NoteUpdateRespons = {
-  propertyId: number;
+export type NoteUpdateResponse = {
+  id: number;
   hasNote: boolean;
 };
 

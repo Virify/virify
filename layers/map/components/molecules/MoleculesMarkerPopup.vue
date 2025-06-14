@@ -42,8 +42,8 @@
     </div>
 
     <!-- Action buttons -->
-    <div v-if="propertyId !== null" class="marker-popup-actions" @click.stop>
-      <NuxtLink :to="`/listing/${propertyId}`" class="marker-popup-view-link" @click.stop>
+    <div v-if="listingId !== null" class="marker-popup-actions" @click.stop>
+      <NuxtLink :to="`/listing/${listingId}`" class="marker-popup-view-link" @click.stop>
         View Listing
       </NuxtLink>
 
@@ -56,7 +56,7 @@
       </div>
 
       <!-- Favorite button -->
-      <AtomsFavouriteButton :property-id="propertyId" class="marker-popup-favorite-button" @click.stop />
+      <AtomsFavouriteButton :listing-id="listingId" class="marker-popup-favorite-button" @click.stop />
     </div>
   </div>
 </template>
@@ -76,7 +76,7 @@ const hasBedrooms = computed(() =>
 const hasBathrooms = computed(() =>
   props.marker.bathrooms !== null && props.marker.bathrooms !== undefined
 );
-const propertyId = computed(() =>
+const listingId = computed(() =>
   typeof props.marker.id === "number" ? props.marker.id : null
 );
 const addressParts = computed(() =>
@@ -99,8 +99,9 @@ const hasImage = computed(() =>
 // Event handlers
 const { showNoteDialog } = useNotes();
 const onNoteClick = () => {
-  if (propertyId.value) {
-    showNoteDialog(propertyId.value);
+  console.log("Note button clicked for marker:", props.marker.id);
+  if (props.marker.id as number) {
+    showNoteDialog(props.marker.id as number);
   }
 };
 </script>

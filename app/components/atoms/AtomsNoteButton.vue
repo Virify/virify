@@ -36,13 +36,13 @@ import ViewsDialogNotes from '~/components/views/Dialog/ViewsDialogNotes.vue';
 import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
 
 const props = defineProps({
-  propertyId: {
+  listingId: {
     type: Number,
     required: true
   }
 })
 
-const { hasNote: propertyHasNote, getNote } = useNotes()
+const { hasNote: propertyHasNote } = useNotes()
 const { showDialog } = useDialog()
 const { loggedIn } = useUserSession()
 
@@ -50,7 +50,7 @@ const { loggedIn } = useUserSession()
  * Computed property to check if the note exists for the given property ID
  */
 const hasNote = computed(() => {
-  return propertyHasNote(props.propertyId)
+  return propertyHasNote(props.listingId)
 })
 
 /**
@@ -81,7 +81,7 @@ function handleClick() {
   showDialog({
     component: ViewsDialogNotes,
     props: {
-      propertyId: props.propertyId
+      listingId: props.listingId
     }
   })
 }

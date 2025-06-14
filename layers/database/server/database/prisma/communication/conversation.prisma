@@ -8,7 +8,7 @@ model Conversation {
   messages   Message[]
   sender     User      @relation("ConversationsAsSender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver   User      @relation("ConversationsAsReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  listing    Listing?   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listing    Listing?  @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([senderId])
   @@index([receiverId])

@@ -34,7 +34,7 @@
       <div class="account-activity">
         <h3 class="title-sm">Recent Activity</h3>
         <div class="box-xl | box">
-          <p class="body-md">You have no recent activity.</p>
+          <p class="body-md">{{ recentlyViewedListings }}</p>
         </div>
       </div>
 
@@ -42,7 +42,7 @@
       <div class="account-favourites">
         <h3 class="title-sm">Recent Favourites</h3>
         <div class="box-xl | box">
-          <p class="body-md">You have no recent favourties.</p>
+          <p class="body-md">{{ recentFavourites }}</p>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@
     <div class="account-notes">
       <h3 class="title-sm">Recent Notes</h3>
       <div class="box-xl | box">
-        <p class="body-md">You have no recent notes.</p>
+        <p class="body-md">{{ recentUserNotes }}</p>
       </div>
     </div>
   </div>
@@ -70,7 +70,8 @@ definePageMeta({
   },
 });
 const { user, loggedIn } = useUserSession();
-const { analytics } = useAnalytics();
+const { analytics, recentUserNotes, recentFavourites, recentlyViewedListings } = useAnalytics();
+
 </script>
 <style lang="scss" scoped>
 .account-profile-content {

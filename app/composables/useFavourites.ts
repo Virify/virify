@@ -14,20 +14,17 @@ export const useFavourites = createSharedComposable(() => {
   /**
    * State Management
    */
-  const favourites = useState<ListingCardType[]>("favourites", () => []);
+  const { data: favourites, refresh: refreshFavourites } = useAsyncData<UserFavouriteListingCard[]>("favourites", () => useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/"), { default: () => [], watch: [loggedIn] });
 
-  /**
-   * Get all favourite listings for the user
-   * This triggers onMount of user Login
-   *
-   * @returns Array of ListingCardType empty array on error
-   */
-  const getAllFavourites = async () => {
-    if (loggedIn.value) {
-      const result = await $fetch<UserFavouriteListingCard[]>("/api/user/favourites/");
-      favourites.value = result.map((fav) => fav.listing) || [];
-    }
-  };
+  const recentFavourites = computed(() => {
+    return favourites.value
+      .filter((item) => {
+        const createdAt = new Date(item.createdAt);
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        return createdAt >= sevenDaysAgo;
+      })
+      .slice(0, 5);
+  });
 
   /**
    * Is a listing a favourite
@@ -36,7 +33,7 @@ export const useFavourites = createSharedComposable(() => {
    * @returns
    */
   function isFavourite(listingId: number): boolean {
-    return favourites.value.some((listing) => listing.id === listingId);
+    return favourites.value.some((listing) => listing.listing.id === listingId);
   }
 
   /**
@@ -59,7 +56,7 @@ export const useFavourites = createSharedComposable(() => {
       method: "POST",
       body: { listingId },
     });
-    await getAllFavourites();
+    await refreshFavourites();
   };
 
   /**
@@ -75,7 +72,7 @@ export const useFavourites = createSharedComposable(() => {
       body: { listingId },
     });
     if (result) {
-      favourites.value = removeListingFromArray(listingId) || [];
+      await refreshFavourites();
     }
   };
 
@@ -83,30 +80,8 @@ export const useFavourites = createSharedComposable(() => {
    * Remove a listing from an array of favourite Listings
    */
   function removeListingFromArray(dToRemove: number) {
-    return favourites.value?.filter((d) => d.id !== dToRemove);
+    return favourites.value?.filter((d) => d.listing.id !== dToRemove);
   }
-
-  /**
-   * Watch for changes in the loggedIn state
-   * This is already under a provided composable via isLoggedIn, I think this is fine
-   */
-  watch(loggedIn, async (isLoggedIn) => {
-    if (isLoggedIn) {
-      await getAllFavourites();
-    }
-    if (!isLoggedIn) {
-      favourites.value = [];
-    }
-  });
-
-  /**
-   * On mount, check if the user is logged in and fetch favourites
-   */
-  onMounted(async () => {
-    if (loggedIn.value) {
-      await getAllFavourites();
-    }
-  });
 
   // Add a toggleFavourite method to useFavourites composable
   const toggleFavourite = async (listingId: number) => {
@@ -123,10 +98,11 @@ export const useFavourites = createSharedComposable(() => {
 
   return {
     addToFavourite,
-    getAllFavourites,
     isFavourite,
     removeFromFavourite,
     removeListingFromArray,
     toggleFavourite,
+    favourites,
+    recentFavourites,
   };
 });

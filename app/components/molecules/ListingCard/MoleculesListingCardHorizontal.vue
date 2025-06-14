@@ -29,7 +29,7 @@
         </nuxt-link>
 
         <div class="m-listing-card-buttons-horizontal">
-          <MoleculesListingCardButtons :controls-id="controlsId" :is-expanded="isHover" :property-id @toggle-content="toggleHover" />
+          <MoleculesListingCardButtons :controls-id="controlsId" :is-expanded="isHover" :listing-id @toggle-content="toggleHover" />
         </div>
       </div>
 
@@ -71,7 +71,7 @@ interface Props {
   bedrooms?: number | undefined | null
   bathrooms?: number | undefined | null
   description: string
-  propertyId: number
+  listingId: number
   propertyType?: string
   classification?: string
   listingTier?: string
@@ -138,9 +138,9 @@ const addressString = computed(() => {
 })
 
 const propertyUrl = computed(() => {
-  const { propertyId } = props
+  const { listingId } = props
 
-  return `/listing/${propertyId}`
+  return `/listing/${listingId}`
 })
 
 /**

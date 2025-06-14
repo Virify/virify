@@ -11,11 +11,13 @@ import { nanoid } from "nanoid";
  */
 export function useAnalytics() {
   const sessionId = useState("analytics-session-id", () => nanoid());
-
+  const { data: recentlyViewedListings } = useAsyncData("recently-viewed-listings", () => useRequestFetch()<number[]>("/api/analytics/listing/track-view"));
+  const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all"));
+  const { recentFavourites } = useFavourites();
+  const { recentUserNotes } = useNotes();
   /**
    * !! Important: useRequestFetch is required for SSR authenticated requests
    */
-  const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<AnalyticsAggregates>("/api/analytics/all"));
 
   /**
    * Track when a user views a listing
@@ -73,5 +75,8 @@ export function useAnalytics() {
   return {
     analytics,
     trackListingView,
+    recentFavourites,
+    recentUserNotes,
+    recentlyViewedListings,
   };
 }
