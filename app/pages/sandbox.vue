@@ -9,6 +9,17 @@
 
     <h2 class="| title-sm">Search Properties</h2>
 
+    <!-- Search Suggestions -->
+    <div class="search-suggestions">
+      <h2 class="title-xs">Suggestion searches</h2>
+      <div class="suggestions-grid">
+        <button v-for="suggestion in allSuggestions" :key="suggestion" @click="selectExampleQuery(suggestion)"
+          class="suggestion-item">
+          {{ suggestion }}
+        </button>
+      </div>
+    </div>
+
     <div class="search-container">
       <form @submit.prevent="searchProperties" class="search-form">
         <div class="input-group">
@@ -28,20 +39,21 @@
           </p>
         </div>
       </form>
+    </div>
 
-      <!-- Search Suggestions -->
-      <div class="search-suggestions">
-        <h2 class="title-xs">Suggestion searches</h2>
-        <div class="suggestions-grid">
-          <button v-for="suggestion in allSuggestions" :key="suggestion" @click="selectExampleQuery(suggestion)"
-            class="suggestion-item">
-            {{ suggestion }}
-          </button>
-        </div>
+    <!-- Loading State -->
+    <div v-if="isSearching" class="loading-section">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+      <h3 class="| title-xs">Searching Properties...</h3>
+      <p class="loading-text">AI is analyzing your query and finding matching properties</p>
+      <div class="loading-details">
+        <span class="loading-query">"{{ searchQuery }}"</span>
       </div>
     </div>
 
-    <div v-if="searchResults.length > 0" class="results-section">
+    <div v-else-if="searchResults.length > 0" class="results-section">
       <div class="results-header">
         <h3 class="| title-xs">Search Results ({{ searchResults.length }})</h3>
         <span v-if="detectedListingType" class="detected-type">
@@ -223,58 +235,34 @@ const detectedPriceRange = ref<{ minPrice?: number, maxPrice?: number } | null>(
 
 // All search suggestions in a flat list
 const allSuggestions = [
-  // Basic searches
+  // Basic property types
   '3 bedroom house',
-  'studio flat',
-  'house with garage',
-  'flat with balcony',
-  'house with garden',
-
-  // Sale/Rental specific searches
-  '3 bedroom house for sale',
-  'flat to rent with parking',
-  'detached house for sale in Cardiff',
-  'studio flat to let in Newport',
-  'house for sale with garden',
-  'property to rent with pets allowed',
-
-  // Price-based searches
-  'house for sale under £300k',
-  'flat to rent under £1000 per month',
-  '3 bedroom house for sale over £250000',
-  'property to rent under £800 pcm',
-  'house for sale between £200k and £400k',
-  'flat to rent under £250 per week',
-  'detached house for sale over £500k',
-  'studio flat to rent under £600 per month',
-
-  // Feature-based searches
-  'house with washing machine in utility',
-  'pet friendly house with garden',
+  'studio flat to rent',
+  
+  // Property types with prices
+  'detached house for sale under £400k',
+  'penthouse flat over £1500 per month',
+  
+  // Feature-focused searches
   'house with modern kitchen and breakfast bar',
-  'flat with allocated parking and intercom',
-  'house with fireplace and patio',
-
-  // Location-based searches (only valid locations)
-  'house with 3 bedrooms 10 miles in Cardiff',
-  'all properties within 40 miles of Cardiff',
-  'detached house in Newport',
-  'flat within 5 miles of Cardiff',
+  'flat with balcony and parking',
+  'property with garden and garage',
+  
+  // Location-based searches
   'house in Cardiff city centre',
-
-  // Premium searches
-  'mansion with gated community and concierge',
-  'penthouse with home cinema and balcony',
-  'house with pool and summer house and garden office',
-  'luxury flat with elevator and wet room',
-  'gated community with CCTV and security and intercom',
-
-  // Advanced searches
-  'wheelchair accessible flat with elevator and wet room',
-  'house with solar panels and EV charging and smart meter',
-  'eco house with biomass heating and solar PV and EPC rating A',
-  'family house with 4 bedrooms and 3 bathrooms with front and rear garden',
-  'chain free vacant house with garage and driveway and basement storage'
+  'flat near Newport with parking',
+  
+  // Lifestyle/accessibility searches
+  'pet friendly house with garden',
+  'wheelchair accessible flat with elevator',
+  
+  // Advanced/eco searches
+  'eco house with solar panels and EPC rating A',
+  
+  // Additional varied searches
+  'furnished flat with bills included',
+  'chain free house with driveway',
+  'cottage with fireplace and patio'
 ]
 
 async function searchProperties() {
@@ -634,6 +622,67 @@ function toggleExpanded(newValue: any) {
   background-color: #f0f9ff;
   border-radius: 6px;
   border: 1px solid #0ea5e9;
+}
+
+/* Loading styles */
+.loading-section {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  margin: 2rem 0;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-section h3 {
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.loading-text {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.loading-details {
+  margin-top: 1rem;
+}
+
+.loading-query {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Search button loading state */
+.search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .location-note {
