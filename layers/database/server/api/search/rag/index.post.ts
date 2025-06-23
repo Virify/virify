@@ -1,18 +1,18 @@
 import * as z from "zod";
-import { PrismaClient, FurnishedStatus, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus } from '@prisma/client';
-import OpenAI from 'openai';
-import { getPropertyIdsByDistance, getNearbyPropertiesByTextQuery } from '../../../utils/location';
+import { PrismaClient, FurnishedStatus, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus } from "@prisma/client";
+import OpenAI from "openai";
+import { getPropertyIdsByDistance, getNearbyPropertiesByTextQuery } from "../../../utils/location";
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const ragSearchSchema = z.object({
   query: z.string().min(1, "Search query is required"),
   limit: z.coerce.number().min(1).max(1000).optional().default(1000), // Much higher default and max
   lat: z.coerce.number().optional(),
-  lon: z.coerce.number().optional(), 
+  lon: z.coerce.number().optional(),
   radius: z.coerce.number().optional().default(40), // Default 40 miles
 });
 
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
     if (!process.env.OPENAI_API_KEY) {
       throw createError({
         statusCode: 500,
-        statusMessage: 'AI search is not configured. Please contact support.'
+        statusMessage: "AI search is not configured. Please contact support.",
       });
     }
 
@@ -40,43 +40,50 @@ export default defineEventHandler(async (event) => {
 
     // Check if this is a location-based query
     let propertyIds: number[] | null = null;
-    let locationContext = '';
+    let locationContext = "";
     let searchRadius = radius; // Default from API parameter
 
     // If lat/lon provided, use location filtering
     if (lat && lon) {
       const nearbyProperties = await getPropertyIdsByDistance(lat, lon, searchRadius);
-      propertyIds = nearbyProperties.map(p => p.propertyId);
+      propertyIds = nearbyProperties.map((p) => p.propertyId);
       locationContext = `within ${searchRadius} miles of ${lat}, ${lon}`;
-    } 
+    }
     // If query contains location terms but no lat/lon, try to extract location
-    else if (query.toLowerCase().includes('near') || query.toLowerCase().includes(' in cardiff') || 
-             query.toLowerCase().includes(' in newport') || query.toLowerCase().includes(' in london') ||
-             query.toLowerCase().includes(' in birmingham') || query.toLowerCase().includes('cardiff') || 
-             query.toLowerCase().includes('newport') || query.toLowerCase().includes('london') || 
-             query.toLowerCase().includes('birmingham') || query.toLowerCase().includes('of cardiff') ||
-             query.toLowerCase().includes('of newport') || query.toLowerCase().includes('of london') ||
-             query.toLowerCase().includes('of birmingham')) {
-      
+    else if (
+      query.toLowerCase().includes("near") ||
+      query.toLowerCase().includes(" in cardiff") ||
+      query.toLowerCase().includes(" in newport") ||
+      query.toLowerCase().includes(" in london") ||
+      query.toLowerCase().includes(" in birmingham") ||
+      query.toLowerCase().includes("cardiff") ||
+      query.toLowerCase().includes("newport") ||
+      query.toLowerCase().includes("london") ||
+      query.toLowerCase().includes("birmingham") ||
+      query.toLowerCase().includes("of cardiff") ||
+      query.toLowerCase().includes("of newport") ||
+      query.toLowerCase().includes("of london") ||
+      query.toLowerCase().includes("of birmingham")
+    ) {
       // Extract radius from query if specified (e.g., "5 miles", "10 miles")
       const radiusMatch = query.match(/(\d+)\s*miles?/i);
       if (radiusMatch && radiusMatch[1]) {
         const extractedRadius = parseInt(radiusMatch[1]);
-        if (extractedRadius > 0 && extractedRadius <= 50) { // Reasonable limits
+        if (extractedRadius > 0 && extractedRadius <= 50) {
+          // Reasonable limits
           searchRadius = extractedRadius;
         }
       }
-      
+
       // Extract potential location from query - more specific regex for actual locations
-      const locationMatch = query.match(/(?:near|in|of)\s+(cardiff|newport|london|birmingham)/i) || 
-                           query.match(/(cardiff|newport|london|birmingham)/i);
-      
+      const locationMatch = query.match(/(?:near|in|of)\s+(cardiff|newport|london|birmingham)/i) || query.match(/(cardiff|newport|london|birmingham)/i);
+
       if (locationMatch && locationMatch[1]) {
         const locationQuery = locationMatch[1].trim();
         try {
           console.log(`Attempting location search for: "${locationQuery}" within ${searchRadius} miles`);
           const nearbyProperties = await getNearbyPropertiesByTextQuery(locationQuery, searchRadius);
-          propertyIds = nearbyProperties.map(p => p.propertyId);
+          propertyIds = nearbyProperties.map((p) => p.propertyId);
           locationContext = `near ${locationQuery} within ${searchRadius} miles`;
           console.log(`Found ${propertyIds.length} properties ${locationContext}`);
         } catch (error) {
@@ -373,7 +380,7 @@ Return ONLY the JSON object, no other text.
       model: "gpt-4o",
       messages: [
         { role: "system", content: schemaPrompt },
-        { role: "user", content: `Convert this search query to Prisma WHERE conditions: "${query}"` }
+        { role: "user", content: `Convert this search query to Prisma WHERE conditions: "${query}"` },
       ],
       temperature: 0,
     });
@@ -382,7 +389,7 @@ Return ONLY the JSON object, no other text.
     if (!aiResponse) {
       throw createError({
         statusCode: 500,
-        statusMessage: 'Failed to generate search conditions'
+        statusMessage: "Failed to generate search conditions",
       });
     }
 
@@ -390,27 +397,27 @@ Return ONLY the JSON object, no other text.
 
     // Clean up the AI response - remove markdown code blocks if present
     let cleanedResponse = aiResponse;
-    if (cleanedResponse.startsWith('```json')) {
-      cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-    } else if (cleanedResponse.startsWith('```')) {
-      cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    if (cleanedResponse.startsWith("```json")) {
+      cleanedResponse = cleanedResponse.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+    } else if (cleanedResponse.startsWith("```")) {
+      cleanedResponse = cleanedResponse.replace(/^```\s*/, "").replace(/\s*```$/, "");
     }
 
     let whereConditions;
     try {
       whereConditions = JSON.parse(cleanedResponse);
     } catch (error) {
-      console.error('Failed to parse AI response:', aiResponse);
-      console.error('Cleaned response:', cleanedResponse);
-      console.error('Parse error:', error);
+      console.error("Failed to parse AI response:", aiResponse);
+      console.error("Cleaned response:", cleanedResponse);
+      console.error("Parse error:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: `Invalid search conditions generated. AI response: ${aiResponse}`
+        statusMessage: `Invalid search conditions generated. AI response: ${aiResponse}`,
       });
     }
 
     // Extract listing type preference
-    const listingType = whereConditions._listingType || 'both';
+    const listingType = whereConditions._listingType || "both";
     delete whereConditions._listingType; // Remove from property conditions
 
     // Extract price range preferences
@@ -453,7 +460,7 @@ Return ONLY the JSON object, no other text.
     // Execute the search with AI-generated conditions
     const whereClause: any = {
       published: true,
-      property: whereConditions
+      property: whereConditions,
     };
 
     // Add price filtering
@@ -478,33 +485,42 @@ Return ONLY the JSON object, no other text.
           generatedConditions: whereConditions,
           locationContext,
           detectedListingType: listingType,
-          detectedPriceRange: (minPrice !== undefined || maxPrice !== undefined) ? {
-            minPrice,
-            maxPrice
-          } : undefined,
-          detectedRentalFeatures: (rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability) ? {
-            billsIncluded: rentalBillsIncluded,
-            furnishedStatus: rentalFurnishedStatus,
-            availabilityStatus: rentalAvailability
-          } : undefined,
-          detectedSaleFeatures: (saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined) ? {
-            ownershipType: saleOwnershipType,
-            tenureType: saleTenureType,
-            priceType: salePriceType,
-            availabilityStatus: saleAvailability,
-            chainFree: saleChainFree
-          } : undefined,
+          detectedPriceRange:
+            minPrice !== undefined || maxPrice !== undefined
+              ? {
+                  minPrice,
+                  maxPrice,
+                }
+              : undefined,
+          detectedRentalFeatures:
+            rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability
+              ? {
+                  billsIncluded: rentalBillsIncluded,
+                  furnishedStatus: rentalFurnishedStatus,
+                  availabilityStatus: rentalAvailability,
+                }
+              : undefined,
+          detectedSaleFeatures:
+            saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined
+              ? {
+                  ownershipType: saleOwnershipType,
+                  tenureType: saleTenureType,
+                  priceType: salePriceType,
+                  availabilityStatus: saleAvailability,
+                  chainFree: saleChainFree,
+                }
+              : undefined,
           count: 0,
-          searchType: 'rag_sql'
+          searchType: "rag_sql",
         };
       }
       whereClause.property.id = { in: propertyIds };
     }
 
     // Add listing type filtering with specific features
-    if (listingType === 'sale') {
+    if (listingType === "sale") {
       const saleFilter: any = { isNot: null };
-      
+
       // Add sale-specific filters
       if (saleOwnershipType) {
         // Ensure the value is a valid enum
@@ -512,130 +528,128 @@ Return ONLY the JSON object, no other text.
           saleFilter.ownershipType = saleOwnershipType as OwnershipType;
         }
       }
-      
+
       if (saleTenureType) {
         // Ensure the value is a valid enum
         if (Object.values(TenureType).includes(saleTenureType as TenureType)) {
           saleFilter.tenureType = saleTenureType as TenureType;
         }
       }
-      
+
       if (salePriceType) {
         // Ensure the value is a valid enum
         if (Object.values(SalePriceType).includes(salePriceType as SalePriceType)) {
           saleFilter.priceType = salePriceType as SalePriceType;
         }
       }
-      
+
       if (saleAvailability) {
         // Ensure the value is a valid enum
         if (Object.values(SaleAvailabilityStatus).includes(saleAvailability as SaleAvailabilityStatus)) {
           saleFilter.availabilityStatus = saleAvailability as SaleAvailabilityStatus;
         }
       }
-      
+
       if (saleChainFree !== undefined) {
         saleFilter.chain = !saleChainFree; // Note: chain=true means NOT chain free
       }
-      
+
       whereClause.saleListing = saleFilter;
-      
-    } else if (listingType === 'rental') {
+    } else if (listingType === "rental") {
       const rentalFilter: any = { isNot: null };
-      
+
       // Add rental-specific filters
       if (rentalBillsIncluded !== undefined) {
         rentalFilter.isBillsIncluded = rentalBillsIncluded;
       }
-      
+
       if (rentalFurnishedStatus) {
         // Ensure the value is a valid enum
         if (Object.values(FurnishedStatus).includes(rentalFurnishedStatus as FurnishedStatus)) {
           rentalFilter.furnishedStatus = rentalFurnishedStatus as FurnishedStatus;
         }
       }
-      
+
       if (rentalAvailability) {
         // Ensure the value is a valid enum
         if (Object.values(RentalAvailabilityStatus).includes(rentalAvailability as RentalAvailabilityStatus)) {
           rentalFilter.availabilityStatus = rentalAvailability as RentalAvailabilityStatus;
         }
       }
-      
+
       whereClause.rentalListing = rentalFilter;
-      
-    } else if (listingType === 'both') {
+    } else if (listingType === "both") {
       // For 'both', we need complex OR logic only if we have specific filters
       const hasRentalFilters = rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability;
       const hasSaleFilters = saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined;
-      
+
       if (hasRentalFilters || hasSaleFilters) {
         const orClauses: any[] = [];
-        
+
         // Add sale clause
         if (hasSaleFilters) {
           const saleFilter: any = { isNot: null };
-          
+
           if (saleOwnershipType) {
             if (Object.values(OwnershipType).includes(saleOwnershipType as OwnershipType)) {
               saleFilter.ownershipType = saleOwnershipType as OwnershipType;
             }
           }
-          
+
           if (saleTenureType) {
             if (Object.values(TenureType).includes(saleTenureType as TenureType)) {
               saleFilter.tenureType = saleTenureType as TenureType;
             }
           }
-          
+
           if (salePriceType) {
             if (Object.values(SalePriceType).includes(salePriceType as SalePriceType)) {
               saleFilter.priceType = salePriceType as SalePriceType;
             }
           }
-          
+
           if (saleAvailability) {
             if (Object.values(SaleAvailabilityStatus).includes(saleAvailability as SaleAvailabilityStatus)) {
               saleFilter.availabilityStatus = saleAvailability as SaleAvailabilityStatus;
             }
           }
-          
+
           if (saleChainFree !== undefined) {
             saleFilter.chain = !saleChainFree;
           }
-          
+
           orClauses.push({ saleListing: saleFilter });
         } else {
           // No sale filters, just include any sale listing
           orClauses.push({ saleListing: { isNot: null } });
         }
-        
+
         // Add rental clause
         if (hasRentalFilters) {
           const rentalFilter: any = { isNot: null };
-          
+
           if (rentalBillsIncluded !== undefined) {
             rentalFilter.isBillsIncluded = rentalBillsIncluded;
           }
-          
+
           if (rentalFurnishedStatus) {
             if (Object.values(FurnishedStatus).includes(rentalFurnishedStatus as FurnishedStatus)) {
               rentalFilter.furnishedStatus = rentalFurnishedStatus as FurnishedStatus;
             }
           }
-          
+
           if (rentalAvailability) {
             if (Object.values(RentalAvailabilityStatus).includes(rentalAvailability as RentalAvailabilityStatus)) {
               rentalFilter.availabilityStatus = rentalAvailability as RentalAvailabilityStatus;
             }
           }
-          
+
           orClauses.push({ rentalListing: rentalFilter });
         } else {
           // No rental filters, just include any rental listing
           orClauses.push({ rentalListing: { isNot: null } });
         }
-        
+
         whereClause.OR = orClauses;
       }
       // If no specific filters for 'both', don't add any listing type filter (include both)
@@ -666,23 +680,20 @@ Return ONLY the JSON object, no other text.
             energyAndUtilities: true,
             securityFeatures: true,
             storageFeatures: true,
-            runningCosts: true
-          }
+            runningCosts: true,
+          },
         },
         rentalListing: true,
-        saleListing: true
+        saleListing: true,
       },
       // Don't apply limit if query contains "all properties" or similar broad terms
-      ...(query.toLowerCase().includes('all properties') || 
-          query.toLowerCase().includes('all houses') ||
-          query.toLowerCase().includes('all flats') ||
-          limit >= 1000 ? {} : { take: limit })
+      ...(query.toLowerCase().includes("all properties") || query.toLowerCase().includes("all houses") || query.toLowerCase().includes("all flats") || limit >= 1000 ? {} : { take: limit }),
     });
 
     console.log(`Found ${listings.length} listings matching conditions`);
 
     // Format results
-    const formattedResults = listings.map(listing => ({
+    const formattedResults = listings.map((listing) => ({
       id: listing.id,
       title: listing.title,
       description: listing.description,
@@ -691,51 +702,57 @@ Return ONLY the JSON object, no other text.
       listingTier: listing.listingTier,
       moveInDate: listing.moveInDate,
       similarity: 1.0, // Perfect match since it's exact SQL filtering
-      property: listing.property ? {
-        id: listing.property.id,
-        numberBedrooms: listing.property.numberBedrooms,
-        numberBathrooms: listing.property.numberBathrooms,
-        numberReceptions: listing.property.numberReceptions,
-        size: listing.property.size,
-        yearBuilt: listing.property.yearBuilt,
-        chainFree: listing.property.chainFree,
-        vacant: listing.property.vacant,
-        address: listing.property.address ? {
-          city: listing.property.address.city,
-          county: listing.property.address.county,
-          postcode: listing.property.address.postcode,
-          street: listing.property.address.street,
-          lat: listing.property.address.lat,
-          lon: listing.property.address.lon
-        } : undefined,
-        type: listing.property.type ? {
-          name: listing.property.type.name
-        } : undefined,
-        classification: listing.property.classification ? {
-          name: listing.property.classification.name
-        } : undefined,
-        // Include all property features
-        bedroomFeatures: listing.property.bedroomFeatures,
-        bathroomFeatures: listing.property.bathroomFeatures,
-        parking: listing.property.parking,
-        amenities: listing.property.amenities,
-        additionalFeatures: listing.property.additionalFeatures,
-        accessibilityFeatures: listing.property.accessibilityFeatures,
-        diningroomFeatures: listing.property.diningroomFeatures,
-        kitchenFeatures: listing.property.kitchenFeatures,
-        livingAreaFeatures: listing.property.livingAreaFeatures,
-        reception: listing.property.reception,
-        utility: listing.property.utility,
-        additionalToilet: listing.property.additionalToilet,
-        outdoorSpace: listing.property.outdoorSpace,
-        energyAndUtilities: listing.property.energyAndUtilities,
-        securityFeatures: listing.property.securityFeatures,
-        storageFeatures: listing.property.storageFeatures,
-        runningCosts: listing.property.runningCosts
-      } : undefined,
-      listingType: listing.rentalListing ? 'rent' as const : 
-                  listing.saleListing ? 'buy' as const : 
-                  'unknown' as const
+      property: listing.property
+        ? {
+            id: listing.property.id,
+            numberBedrooms: listing.property.numberBedrooms,
+            numberBathrooms: listing.property.numberBathrooms,
+            numberReceptions: listing.property.numberReceptions,
+            size: listing.property.size,
+            yearBuilt: listing.property.yearBuilt,
+            chainFree: listing.property.chainFree,
+            vacant: listing.property.vacant,
+            address: listing.property.address
+              ? {
+                  city: listing.property.address.city,
+                  county: listing.property.address.county,
+                  postcode: listing.property.address.postcode,
+                  street: listing.property.address.street,
+                  lat: listing.property.address.lat,
+                  lon: listing.property.address.lon,
+                }
+              : undefined,
+            type: listing.property.type
+              ? {
+                  name: listing.property.type.name,
+                }
+              : undefined,
+            classification: listing.property.classification
+              ? {
+                  name: listing.property.classification.name,
+                }
+              : undefined,
+            // Include all property features
+            bedroomFeatures: listing.property.bedroomFeatures,
+            bathroomFeatures: listing.property.bathroomFeatures,
+            parking: listing.property.parking,
+            amenities: listing.property.amenities,
+            additionalFeatures: listing.property.additionalFeatures,
+            accessibilityFeatures: listing.property.accessibilityFeatures,
+            diningroomFeatures: listing.property.diningroomFeatures,
+            kitchenFeatures: listing.property.kitchenFeatures,
+            livingAreaFeatures: listing.property.livingAreaFeatures,
+            reception: listing.property.reception,
+            utility: listing.property.utility,
+            additionalToilet: listing.property.additionalToilet,
+            outdoorSpace: listing.property.outdoorSpace,
+            energyAndUtilities: listing.property.energyAndUtilities,
+            securityFeatures: listing.property.securityFeatures,
+            storageFeatures: listing.property.storageFeatures,
+            runningCosts: listing.property.runningCosts,
+          }
+        : undefined,
+      listingType: listing.rentalListing ? ("rent" as const) : listing.saleListing ? ("buy" as const) : ("unknown" as const),
     }));
 
     return {
@@ -744,32 +761,40 @@ Return ONLY the JSON object, no other text.
       generatedConditions: whereConditions,
       locationContext,
       detectedListingType: listingType,
-      detectedPriceRange: (minPrice !== undefined || maxPrice !== undefined) ? {
-        minPrice,
-        maxPrice
-      } : undefined,
-      detectedRentalFeatures: (rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability) ? {
-        billsIncluded: rentalBillsIncluded,
-        furnishedStatus: rentalFurnishedStatus,
-        availabilityStatus: rentalAvailability
-      } : undefined,
-      detectedSaleFeatures: (saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined) ? {
-        ownershipType: saleOwnershipType,
-        tenureType: saleTenureType,
-        priceType: salePriceType,
-        availabilityStatus: saleAvailability,
-        chainFree: saleChainFree
-      } : undefined,
+      detectedPriceRange:
+        minPrice !== undefined || maxPrice !== undefined
+          ? {
+              minPrice,
+              maxPrice,
+            }
+          : undefined,
+      detectedRentalFeatures:
+        rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability
+          ? {
+              billsIncluded: rentalBillsIncluded,
+              furnishedStatus: rentalFurnishedStatus,
+              availabilityStatus: rentalAvailability,
+            }
+          : undefined,
+      detectedSaleFeatures:
+        saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined
+          ? {
+              ownershipType: saleOwnershipType,
+              tenureType: saleTenureType,
+              priceType: salePriceType,
+              availabilityStatus: saleAvailability,
+              chainFree: saleChainFree,
+            }
+          : undefined,
       count: formattedResults.length,
-      searchType: 'rag_sql'
+      searchType: "rag_sql",
     };
-
   } catch (error: any) {
     console.error("Error performing RAG search:", error);
-    
+
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.statusMessage || error.message || 'Internal server error during RAG search'
+      statusMessage: error.statusMessage || error.message || "Internal server error during RAG search",
     });
   }
 });

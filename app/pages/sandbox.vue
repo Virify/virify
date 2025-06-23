@@ -3,48 +3,38 @@
     <h1 class="| title-md">AI Search Test</h1>
 
     <div class="| flow">
-      <p>Test AI-powered property search using RAG (Retrieval-Augmented Generation) where AI generates exact SQL filters for perfect matching.</p>
+      <p>Test AI-powered property search using RAG (Retrieval-Augmented Generation) where AI generates exact SQL filters
+        for perfect matching.</p>
     </div>
 
     <h2 class="| title-sm">Search Properties</h2>
-    
+
     <div class="search-container">
       <form @submit.prevent="searchProperties" class="search-form">
         <div class="input-group">
-          <input 
-            v-model="searchQuery"
-            type="text" 
-            placeholder="Try: '3 bedroom house in Cardiff', 'detached house near Newport'"
-            class="search-input"
-            :disabled="isSearching"
-          />
-          <button 
-            type="submit" 
-            class="search-button"
-            :disabled="isSearching || !searchQuery.trim()"
-          >
+          <input v-model="searchQuery" type="text"
+            placeholder="Try: '3 bedroom house in Cardiff', 'detached house near Newport'" class="search-input"
+            :disabled="isSearching" />
+          <button type="submit" class="search-button" :disabled="isSearching || !searchQuery.trim()">
             {{ isSearching ? 'Searching...' : 'Search' }}
           </button>
         </div>
-        
+
         <!-- Location info -->
         <div class="location-info">
           <p class="location-note">
-            <strong>Demo searching Cardiff & Newport properties</strong> - Use location terms in your query (e.g., "in Cardiff", "near Newport city centre")
+            <strong>Demo searching Cardiff & Newport properties</strong> - Use location terms in your query (e.g., "in
+            Cardiff", "near Newport city centre")
           </p>
         </div>
       </form>
-      
+
       <!-- Search Suggestions -->
       <div class="search-suggestions">
         <h2 class="title-xs">Suggestion searches</h2>
         <div class="suggestions-grid">
-          <button
-            v-for="suggestion in allSuggestions"
-            :key="suggestion"
-            @click="selectExampleQuery(suggestion)"
-            class="suggestion-item"
-          >
+          <button v-for="suggestion in allSuggestions" :key="suggestion" @click="selectExampleQuery(suggestion)"
+            class="suggestion-item">
             {{ suggestion }}
           </button>
         </div>
@@ -55,15 +45,15 @@
       <div class="results-header">
         <h3 class="| title-xs">Search Results ({{ searchResults.length }})</h3>
         <span v-if="detectedListingType" class="detected-type">
-          Searching for: 
+          Searching for:
           <span class="type-badge" :class="`type-${detectedListingType}`">
-            {{ detectedListingType === 'sale' ? 'Sale Properties' : 
-               detectedListingType === 'rental' ? 'Rental Properties' : 
-               'Sale & Rental Properties' }}
+            {{ detectedListingType === 'sale' ? 'Sale Properties' :
+              detectedListingType === 'rental' ? 'Rental Properties' :
+                'Sale & Rental Properties' }}
           </span>
         </span>
         <span v-if="detectedPriceRange" class="detected-price">
-          Price range: 
+          Price range:
           <span class="price-badge">
             <span v-if="detectedPriceRange.minPrice && detectedPriceRange.maxPrice">
               £{{ detectedPriceRange.minPrice.toLocaleString() }} - £{{ detectedPriceRange.maxPrice.toLocaleString() }}
@@ -77,13 +67,9 @@
           </span>
         </span>
       </div>
-      
+
       <div class="results-grid">
-        <div 
-          v-for="result in searchResults" 
-          :key="result.id"
-          class="result-card"
-        >
+        <div v-for="result in searchResults" :key="result.id" class="result-card">
           <div class="result-header">
             <h4 class="result-title">{{ result.title }}</h4>
             <span class="similarity-score">{{ Math.round(result.similarity * 100) }}% match</span>
@@ -107,16 +93,12 @@
               {{ result.listingType === 'rent' ? 'Rental' : 'Sale' }}
             </span>
           </div>
-          
+
           <!-- Property Features -->
           <div v-if="getPropertyFeatures(result).length > 0" class="result-features">
             <h5 class="features-title">Features:</h5>
             <div class="features-list">
-              <span 
-                v-for="feature in getPropertyFeatures(result)" 
-                :key="feature"
-                class="feature-tag"
-              >
+              <span v-for="feature in getPropertyFeatures(result)" :key="feature" class="feature-tag">
                 {{ feature }}
               </span>
             </div>
@@ -127,7 +109,8 @@
 
     <div v-else-if="hasSearched && !isSearching" class="no-results">
       <h3 class="| title-xs">No Results Found</h3>
-      <p>Sorry, we couldn't find any properties matching your search criteria for <strong>"{{ lastSearchQuery }}"</strong>.</p>
+      <p>Sorry, we couldn't find any properties matching your search criteria for <strong>"{{ lastSearchQuery
+          }}"</strong>.</p>
       <p class="suggestions">Try:</p>
       <ul class="suggestions-list">
         <li>Removing some specific requirements</li>
@@ -236,7 +219,7 @@ const hasSearched = ref(false)
 const lastSearchQuery = ref('')
 const searchError = ref('')
 const detectedListingType = ref('')
-const detectedPriceRange = ref<{minPrice?: number, maxPrice?: number} | null>(null)
+const detectedPriceRange = ref<{ minPrice?: number, maxPrice?: number } | null>(null)
 
 // All search suggestions in a flat list
 const allSuggestions = [
@@ -246,7 +229,7 @@ const allSuggestions = [
   'house with garage',
   'flat with balcony',
   'house with garden',
-  
+
   // Sale/Rental specific searches
   '3 bedroom house for sale',
   'flat to rent with parking',
@@ -254,7 +237,7 @@ const allSuggestions = [
   'studio flat to let in Newport',
   'house for sale with garden',
   'property to rent with pets allowed',
-  
+
   // Price-based searches
   'house for sale under £300k',
   'flat to rent under £1000 per month',
@@ -264,28 +247,28 @@ const allSuggestions = [
   'flat to rent under £250 per week',
   'detached house for sale over £500k',
   'studio flat to rent under £600 per month',
-  
+
   // Feature-based searches
   'house with washing machine in utility',
   'pet friendly house with garden',
   'house with modern kitchen and breakfast bar',
   'flat with allocated parking and intercom',
   'house with fireplace and patio',
-  
+
   // Location-based searches (only valid locations)
   'house with 3 bedrooms 10 miles in Cardiff',
   'all properties within 40 miles of Cardiff',
   'detached house in Newport',
   'flat within 5 miles of Cardiff',
   'house in Cardiff city centre',
-  
+
   // Premium searches
   'mansion with gated community and concierge',
   'penthouse with home cinema and balcony',
   'house with pool and summer house and garden office',
   'luxury flat with elevator and wet room',
   'gated community with CCTV and security and intercom',
-  
+
   // Advanced searches
   'wheelchair accessible flat with elevator and wet room',
   'house with solar panels and EV charging and smart meter',
@@ -296,52 +279,52 @@ const allSuggestions = [
 
 async function searchProperties() {
   if (!searchQuery.value.trim()) return
-  
+
   isSearching.value = true
   searchError.value = ''
   lastSearchQuery.value = searchQuery.value
-  
+
   try {
     const endpoint = '/api/search/rag/'
     console.log('Making RAG search request with query:', searchQuery.value)
-    
+
     const requestBody = {
       query: searchQuery.value
     }
-    
+
     const response = await $fetch(endpoint, {
       method: 'POST',
       body: requestBody
     })
-    
+
     console.log('RAG search response:', response)
     console.log('Response type:', typeof response)
     console.log('Results array:', (response as any)?.results)
     console.log('Results length:', (response as any)?.results?.length)
-    
+
     if ((response as any)?.generatedConditions) {
       console.log('Generated SQL conditions:', (response as any).generatedConditions)
     }
-    
+
     // Check if response has results
     if (!response || typeof response !== 'object') {
       throw new Error('Invalid response from server')
     }
-    
+
     // Type-safe assignment
     const results = Array.isArray((response as any).results) ? (response as any).results : []
     searchResults.value = results as SearchResult[]
     hasSearched.value = true
     detectedListingType.value = (response as any).detectedListingType || 'both'
     detectedPriceRange.value = (response as any).detectedPriceRange || null
-    
+
     console.log('Final searchResults.value:', searchResults.value)
     console.log('Final searchResults.value.length:', searchResults.value.length)
-    
+
     if (searchResults.value.length === 0) {
       console.log('No results found for query:', searchQuery.value)
     }
-    
+
   } catch (error: any) {
     console.error('Search error:', error)
     console.error('Error details:', {
@@ -350,7 +333,7 @@ async function searchProperties() {
       statusMessage: error.statusMessage,
       data: error.data
     })
-    
+
     searchError.value = error.statusMessage || error.message || 'Failed to search properties'
     searchResults.value = []
   } finally {
@@ -368,17 +351,17 @@ function selectExampleQuery(example: string) {
 // Extract property features for display - now grouped by category
 function getPropertyFeatures(result: SearchResult): string[] {
   const features: string[] = []
-  
+
   if (!result.property) return features
-  
+
   // Type and classification
   if (result.property.type?.name) features.push(result.property.type.name)
   if (result.property.classification?.name) features.push(result.property.classification.name)
-  
+
   // Basic property features
   if (result.property.chainFree) features.push('Chain Free')
   if (result.property.vacant) features.push('Vacant')
-  
+
   // Outdoor features (grouped)
   if (result.property.outdoorSpace) {
     const outdoor = result.property.outdoorSpace as any
@@ -392,7 +375,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Outdoor: ${outdoorItems.join(', ')}`)
     }
   }
-  
+
   // Parking features (grouped)
   if (result.property.parking) {
     const parking = result.property.parking as any
@@ -405,7 +388,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Parking: ${parkingItems.join(', ')}`)
     }
   }
-  
+
   // Additional features (grouped)
   if (result.property.additionalFeatures) {
     const additional = result.property.additionalFeatures as any
@@ -424,7 +407,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Special: ${additionalItems.join(', ')}`)
     }
   }
-  
+
   // Accessibility features (grouped)
   if (result.property.accessibilityFeatures) {
     const accessibility = result.property.accessibilityFeatures as any
@@ -436,7 +419,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Accessibility: ${accessibilityItems.join(', ')}`)
     }
   }
-  
+
   // Security features (grouped)
   if (result.property.securityFeatures) {
     const security = result.property.securityFeatures as any
@@ -452,7 +435,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Security: ${securityItems.join(', ')}`)
     }
   }
-  
+
   // Kitchen features (grouped)
   if (result.property.kitchenFeatures) {
     const kitchen = result.property.kitchenFeatures as any
@@ -464,7 +447,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Kitchen: ${kitchenItems.join(', ')}`)
     }
   }
-  
+
   // Living area features (grouped)
   if (result.property.livingAreaFeatures) {
     const living = result.property.livingAreaFeatures as any
@@ -476,7 +459,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Living: ${livingItems.join(', ')}`)
     }
   }
-  
+
   // Bathroom features (grouped)
   if (result.property.bathroomFeatures && Array.isArray(result.property.bathroomFeatures)) {
     const bathroomItems = new Set<string>() // Use Set to prevent duplicates
@@ -491,7 +474,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Bathroom: ${Array.from(bathroomItems).join(', ')}`)
     }
   }
-  
+
   // Bedroom features (grouped)
   if (result.property.bedroomFeatures && Array.isArray(result.property.bedroomFeatures)) {
     const bedroomItems = new Set<string>() // Use Set to prevent duplicates
@@ -519,7 +502,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Bedroom: ${Array.from(bedroomItems).join(', ')}`)
     }
   }
-  
+
   // Reception features (grouped)
   if (result.property.reception && Array.isArray(result.property.reception)) {
     const receptionItems = new Set<string>() // Use Set to prevent duplicates
@@ -533,7 +516,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Reception: ${Array.from(receptionItems).join(', ')}`)
     }
   }
-  
+
   // Storage features (grouped)
   if (result.property.storageFeatures) {
     const storage = result.property.storageFeatures as any
@@ -545,7 +528,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Storage: ${storageItems.join(', ')}`)
     }
   }
-  
+
   // Dining room features (grouped)
   if (result.property.diningroomFeatures) {
     const dining = result.property.diningroomFeatures as any
@@ -555,7 +538,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Dining: ${diningItems.join(', ')}`)
     }
   }
-  
+
   // Utility features (grouped)
   if (result.property.utility) {
     const utility = result.property.utility as any
@@ -570,7 +553,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Utility: ${utilityItems.join(', ')}`)
     }
   }
-  
+
   // Energy and utilities (grouped)
   if (result.property.energyAndUtilities) {
     const energy = result.property.energyAndUtilities as any
@@ -582,7 +565,7 @@ function getPropertyFeatures(result: SearchResult): string[] {
       features.push(`Energy: ${energyItems.join(', ')}`)
     }
   }
-  
+
   return features
 }
 
@@ -833,7 +816,11 @@ function toggleExpanded(newValue: any) {
   font-size: 1.125rem;
 }
 
-.bedrooms, .bathrooms, .location, .property-type, .listing-type {
+.bedrooms,
+.bathrooms,
+.location,
+.property-type,
+.listing-type {
   background-color: #f3f4f6;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
