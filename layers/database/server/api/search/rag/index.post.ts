@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
 
     // Define the schema for the AI to understand
     const schemaPrompt = `
-You are an AI that converts natural language property search queries into Prisma WHERE clause conditions.
+You are an AI that converts natural language property search queries into complete Prisma WHERE clause conditions.
 
 Available property types:
 - House, Cottage, Bungalow, Flat, Land, Farms, Specialty, Student Accommodation
@@ -122,7 +122,7 @@ Property fields available:
 
 COMPREHENSIVE PROPERTY FEATURES (use nested objects):
 
-PARKING features (parking.{field}):
+PARKING features (property.parking.{field}):
 - garage (boolean) - "garage", "with garage"
 - driveway (boolean) - "driveway", "with driveway"
 - permitParking (boolean) - "permit parking"
@@ -132,7 +132,7 @@ PARKING features (parking.{field}):
 - allocatedParking (boolean) - "allocated parking"
 - evCharging (boolean) - "EV charging", "electric car charging"
 
-ACCESSIBILITY features (accessibilityFeatures.{field}):
+ACCESSIBILITY features (property.accessibilityFeatures.{field}):
 - wheelchairFriendly (boolean) - "wheelchair access", "wheelchair friendly"
 - stepFreeAccess (boolean) - "step free", "step free access"
 - wideDoorways (boolean) - "wide doorways"
@@ -142,7 +142,7 @@ ACCESSIBILITY features (accessibilityFeatures.{field}):
 - stairs (boolean) - "stairs"
 - accessibleParking (boolean) - "accessible parking"
 
-SECURITY features (securityFeatures.{field}):
+SECURITY features (property.securityFeatures.{field}):
 - gatedCommunity (boolean) - "gated community", "gated"
 - cctv (boolean) - "CCTV", "security cameras"
 - alarmSystem (boolean) - "alarm", "security alarm"
@@ -151,7 +151,7 @@ SECURITY features (securityFeatures.{field}):
 - security (boolean) - "security", "24/7 security"
 - reception (boolean) - "reception", "concierge"
 
-ADDITIONAL features (additionalFeatures.{field}):
+ADDITIONAL features (property.additionalFeatures.{field}):
 - petFriendly (boolean) - "pet friendly", "pets allowed"
 - homeOffice (boolean) - "home office", "office space"
 - pool (boolean) - "pool", "swimming pool"
@@ -163,7 +163,7 @@ ADDITIONAL features (additionalFeatures.{field}):
 - shop (boolean) - "shop", "convenience store"
 - gym (boolean) - "gym", "fitness"
 
-KITCHEN features (kitchenFeatures.{field}):
+KITCHEN features (property.kitchenFeatures.{field}):
 - modern (boolean) - "modern kitchen"
 - openPlan (boolean) - "open plan kitchen"
 - whiteGoods (boolean) - "white goods", "appliances included"
@@ -172,28 +172,28 @@ KITCHEN features (kitchenFeatures.{field}):
 - utilityAccess (boolean) - "utility access"
 - pantry (boolean) - "pantry"
 
-LIVING AREA features (livingAreaFeatures.{field}):
+LIVING AREA features (property.livingAreaFeatures.{field}):
 - fireplace (string) - "fireplace" -> use "OPEN_FIRE" or "LOG_BURNER"
 - balcony (boolean) - "balcony"
 - openPlan (boolean) - "open plan living"
 
-DINING ROOM features (diningroomFeatures.{field}):
+DINING ROOM features (property.diningroomFeatures.{field}):
 - openConcept (boolean) - "open concept dining"
 
-BEDROOM features (bedroomFeatures array - check individual bedroom):
+BEDROOM features (property.bedroomFeatures array - check individual bedroom):
 - bed (array) - "double bed" -> ["DOUBLE"], "king bed" -> ["KING"], etc.
 - enSuite (boolean) - "en-suite", "ensuite"
 - builtInStorage (boolean) - "built in storage"
 - walkInWardrobe (boolean) - "walk in wardrobe"
 
-BATHROOM features (bathroomFeatures array):
+BATHROOM features (property.bathroomFeatures array):
 - enSuite (boolean) - "en-suite bathroom"
 - bathtub (boolean) - "bathtub", "bath"
 - walkInShower (boolean) - "walk in shower"
 - downstairs (boolean) - "downstairs bathroom"
 - upstairs (boolean) - "upstairs bathroom"
 
-OUTDOOR features (outdoorSpace.{field}):
+OUTDOOR features (property.outdoorSpace.{field}):
 - frontGarden (boolean) - "front garden"
 - rearGarden (boolean) - "garden", "rear garden", "back garden"
 - sunTerrace (boolean) - "sun terrace"
@@ -206,14 +206,14 @@ OUTDOOR features (outdoorSpace.{field}):
 - gardenOffice (boolean) - "garden office"
 - pool (boolean) - "pool", "swimming pool"
 
-STORAGE features (storageFeatures.{field}):
+STORAGE features (property.storageFeatures.{field}):
 - attic (boolean) - "attic", "loft storage"
 - basement (boolean) - "basement"
 - separateDressing (boolean) - "separate dressing room"
 - underStairsStorage (boolean) - "under stairs storage"
 - pantry (boolean) - "pantry storage"
 
-ENERGY AND UTILITIES features (energyAndUtilities.{field}):
+ENERGY AND UTILITIES features (property.energyAndUtilities.{field}):
 - epcRating (string) - "EPC A", "energy rating B" -> "A", "B", etc.
 - primaryHeatingType (array) - "gas central heating" -> {"has": "GAS_CENTRAL"}
 - secondaryHeatingType (array) - "electric heating" -> {"has": "ELECTRIC"}
@@ -224,163 +224,233 @@ ENERGY AND UTILITIES features (energyAndUtilities.{field}):
 - broadbandType (string) - "fibre" -> "FTTP"
 - fullFibreAvailable (boolean) - "full fibre available"
 
-UTILITY features (utility.{field}):
+UTILITY features (property.utility.{field}):
 - appliances (array) - "washing machine" -> {"has": "Washing Machine"}
 - storage (boolean) - "utility storage"
 - sink (boolean) - "utility sink"
 - plumbing (boolean) - "utility plumbing"
 
-ADDITIONAL TOILET features (additionalToilet.{field}):
+ADDITIONAL TOILET features (property.additionalToilet.{field}):
 - downstairs (boolean) - "downstairs toilet"
 - upstairs (boolean) - "upstairs toilet"
 - guestCloakroom (boolean) - "guest cloakroom"
 
-RECEPTION features (reception array):
+RECEPTION features (property.reception array):
 - openPlan (boolean) - "open plan reception"
 - fireplace (string) - "reception fireplace"
 - gamesRoom (boolean) - "games room"
 - homeCinema (boolean) - "home cinema"
 
-AMENITIES (nearby amenities - amenities array with type/subtype):
+AMENITIES (property.amenities array with type/subtype):
 - type: "TRANSPORT", "EDUCATION", "HEALTHCARE", "SHOPPING_ENTERTAINMENT", "GREEN_SPACE"
 - subtype: "TRAIN_STATION", "BUS_STOP", "MOTORWAY_ACCESS", "SCHOOL", "UNIVERSITY", "HOSPITAL", "MEDICAL_CENTRE", "SHOP", "RESTAURANT", "CINEMA", "GYM", "PARK", "TRAIL", "PLAYGROUND", "OTHER"
-- "near train station" -> amenities: {some: {type: "TRANSPORT", subtype: "TRAIN_STATION"}}
-- "close to school" -> amenities: {some: {type: "EDUCATION", subtype: "SCHOOL"}}
-- "near shops" -> amenities: {some: {type: "SHOPPING_ENTERTAINMENT", subtype: "SHOP"}}
-- "near park" -> amenities: {some: {type: "GREEN_SPACE", subtype: "PARK"}}
-- "hospital nearby" -> amenities: {some: {type: "HEALTHCARE", subtype: "HOSPITAL"}}
+- "near train station" -> property: {amenities: {some: {type: "TRANSPORT", subtype: "TRAIN_STATION"}}}
+- "close to school" -> property: {amenities: {some: {type: "EDUCATION", subtype: "SCHOOL"}}}
+- "near shops" -> property: {amenities: {some: {type: "SHOPPING_ENTERTAINMENT", subtype: "SHOP"}}}
+- "near park" -> property: {amenities: {some: {type: "GREEN_SPACE", subtype: "PARK"}}}
+- "hospital nearby" -> property: {amenities: {some: {type: "HEALTHCARE", subtype: "HOSPITAL"}}}
 
-RUNNING COSTS features (runningCosts.{field}):
+RUNNING COSTS features (property.runningCosts.{field}):
 - councilTaxBand (string) - "council tax band A" -> "A", "council tax band B" -> "B", etc.
 - serviceCharges (number) - "low service charges", "service charges under 100"
 - groundRent (number) - "low ground rent", "no ground rent" -> 0
 
-Convert the user query into a JSON object with Prisma WHERE conditions.
+Convert the user query into a complete Prisma WHERE clause JSON object.
 IGNORE location terms like "in Cardiff", "near Newport" - these are handled separately.
 Only include conditions that are explicitly mentioned or strongly implied in the query.
 
 IMPORTANT: Extract bedroom numbers from common variations:
-- "1 bed", "1 bedroom", "1-bed", "one bedroom" -> numberBedrooms: 1
-- "2 bed", "2 bedroom", "2-bed", "two bedroom" -> numberBedrooms: 2
-- "3 bed", "3 bedroom", "3-bed", "three bedroom" -> numberBedrooms: 3
-- "4 bed", "4 bedroom", "4-bed", "four bedroom" -> numberBedrooms: 4
-- "5 bed", "5 bedroom", "5-bed", "five bedroom" -> numberBedrooms: 5
-- "studio" -> numberBedrooms: 0 (and type: Flat, classification: Studio flat)
+- "1 bed", "1 bedroom", "1-bed", "one bedroom" -> property: {numberBedrooms: 1}
+- "2 bed", "2 bedroom", "2-bed", "two bedroom" -> property: {numberBedrooms: 2}
+- "3 bed", "3 bedroom", "3-bed", "three bedroom" -> property: {numberBedrooms: 3}
+- "4 bed", "4 bedroom", "4-bed", "four bedroom" -> property: {numberBedrooms: 4}
+- "5 bed", "5 bedroom", "5-bed", "five bedroom" -> property: {numberBedrooms: 5}
+- "studio" -> property: {numberBedrooms: 0, type: {name: "Flat"}, classification: {name: "Studio flat"}}
 
-IMPORTANT: Detect listing type (REQUIRED):
-- "for sale", "to buy", "buy", "purchase", "buying" -> Add: "_listingType": "sale"
-- "to rent", "rental", "rent", "renting", "let", "to let" -> Add: "_listingType": "rental"
-- If no listing type mentioned -> Add: "_listingType": "both" (search both sale and rental)
+CRITICAL: Generate complete Prisma WHERE clause structure including ALL conditions:
 
-LISTING TYPE EXAMPLES:
-- "3 bedroom house for sale" -> {"numberBedrooms": 3, "type": {"name": "House"}, "_listingType": "sale"}
-- "flat to rent in Cardiff" -> {"type": {"name": "Flat"}, "_listingType": "rental"}
-- "3 bedroom house" -> {"numberBedrooms": 3, "type": {"name": "House"}, "_listingType": "both"}
+BASIC STRUCTURE:
+{
+  "published": true,
+  "property": { /* all property conditions go here */ },
+  "saleListing": { /* sale listing conditions or null check */ },
+  "rentalListing": { /* rental listing conditions or null check */ },
+  "price": { /* price range conditions */ }
+}
 
-IMPORTANT: Extract price ranges (OPTIONAL):
-- For sales: "under £200k", "under £200000", "under 200k", "below £300000" -> Add: "_maxPrice": 200000
-- For sales: "over £500k", "above £500000", "more than 500k" -> Add: "_minPrice": 500000
-- For sales: "between £200k and £400k", "£200k-£400k" -> Add: "_minPrice": 200000, "_maxPrice": 400000
-- For rentals: "under £1000 per month", "under £1000 pcm", "under £1000/month" -> Add: "_maxPrice": 1000
-- For rentals: "over £800 per month", "above £800 pcm" -> Add: "_minPrice": 800
-- For rentals: "between £800-£1200 per month" -> Add: "_minPrice": 800, "_maxPrice": 1200
-- For rentals: "under £250 per week", "under £250 pw" -> Add: "_maxPrice": 1083 (converted to monthly)
-- For rentals: "over £200 per week", "above £200 pw" -> Add: "_minPrice": 867 (converted to monthly)
+LISTING TYPE FILTERING:
+- For sale properties: "saleListing": {"isNot": null}
+- For rental properties: "rentalListing": {"isNot": null}  
+- For both sale and rental: omit both saleListing and rentalListing filters
+- For specific rental features: "rentalListing": {"furnishedStatus": "FURNISHED", "isBillsIncluded": true}
+- For specific sale features: "saleListing": {"tenureType": "FREEHOLD", "chain": false}
 
-PRICE CONVERSION NOTES:
+PRICE FILTERING:
+- Sales under £300k: "price": {"lte": 300000}
+- Sales over £500k: "price": {"gte": 500000}
+- Sales £200k-£400k: "price": {"gte": 200000, "lte": 400000}
+- Rentals under £1000/month: "price": {"lte": 1000}
+- Rentals £800-£1200/month: "price": {"gte": 800, "lte": 1200}
 - Convert weekly rental prices to monthly: weekly * 52 / 12 = monthly
 - Sales prices in k = thousands (£200k = £200000)
-- All prices stored as numbers without currency symbols
 
-PRICE EXAMPLES:
-- "house for sale under £300k" -> {"type": {"name": "House"}, "_listingType": "sale", "_maxPrice": 300000}
-- "flat to rent under £1000 per month" -> {"type": {"name": "Flat"}, "_listingType": "rental", "_maxPrice": 1000}
-- "3 bed house for sale over £400000" -> {"numberBedrooms": 3, "type": {"name": "House"}, "_listingType": "sale", "_minPrice": 400000}
-- "rental property under £250 per week" -> {"_listingType": "rental", "_maxPrice": 1083}
+RENTAL FEATURES (rentalListing object):
+- furnishedStatus: "FURNISHED", "UNFURNISHED", "PART_FURNISHED"
+- availabilityStatus: "AVAILABLE", "LET_AGREED", "LET"
+- isBillsIncluded: true/false
 
-RENTAL-SPECIFIC FEATURES (only for rental listings):
-Extract these features for rental properties and add them with "rental" prefix:
+SALE FEATURES (saleListing object):
+- tenureType: "FREEHOLD", "LEASEHOLD", "COMMONHOLD", "SHARE_OF_FREEHOLD"
+- ownershipType: "FULL_OWNERSHIP", "SHARED_OWNERSHIP", "PARTIAL_OWNERSHIP", "JOINT_OWNERSHIP"
+- priceType: "FIXED", "OFFERS_OVER", "GUIDE_PRICE"
+- availabilityStatus: "AVAILABLE", "UNDER_OFFER", "SOLD"
+- chain: false (for chain free properties)
 
-BILLS INCLUDED (rentalListing.isBillsIncluded):
-- "bills included", "all bills included", "including bills" -> Add: "_rentalBillsIncluded": true
-- "bills excluded", "excluding bills", "bills not included" -> Add: "_rentalBillsIncluded": false
+COMPLETE EXAMPLES:
 
-FURNISHED STATUS (rentalListing.furnishedStatus):
-- "furnished", "fully furnished" -> Add: "_rentalFurnishedStatus": "FURNISHED"
-- "unfurnished", "not furnished" -> Add: "_rentalFurnishedStatus": "UNFURNISHED"
-- "part furnished", "partly furnished", "semi furnished" -> Add: "_rentalFurnishedStatus": "PART_FURNISHED"
+"3 bedroom house" -> 
+{
+  "published": true,
+  "property": {
+    "numberBedrooms": 3,
+    "type": {"name": "House"}
+  }
+}
 
-RENTAL AVAILABILITY (rentalListing.availabilityStatus):
-- "available now", "available immediately", "ready to move in" -> Add: "_rentalAvailability": "AVAILABLE"
-- "let agreed", "agreed" -> Add: "_rentalAvailability": "LET_AGREED"
-- "let", "taken", "rented" -> Add: "_rentalAvailability": "LET"
+"flat for sale under £300k" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "Flat"}
+  },
+  "saleListing": {"isNot": null},
+  "price": {"lte": 300000}
+}
 
-RENTAL EXAMPLES:
-- "furnished flat to rent" -> {"type": {"name": "Flat"}, "_listingType": "rental", "_rentalFurnishedStatus": "FURNISHED"}
-- "unfurnished house with bills included" -> {"type": {"name": "House"}, "_listingType": "rental", "_rentalFurnishedStatus": "UNFURNISHED", "_rentalBillsIncluded": true}
-- "available rental property" -> {"_listingType": "rental", "_rentalAvailability": "AVAILABLE"}
+"furnished flat to rent under £1000 per month" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "Flat"}
+  },
+  "rentalListing": {
+    "furnishedStatus": "FURNISHED"
+  },
+  "price": {"lte": 1000}
+}
 
-SALE-SPECIFIC FEATURES (only for sale listings):
-Extract these features for sale properties and add them with "sale" prefix:
+"freehold house for sale over £500k with garage" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"},
+    "parking": {"garage": true}
+  },
+  "saleListing": {
+    "tenureType": "FREEHOLD"
+  },
+  "price": {"gte": 500000}
+}
 
-OWNERSHIP TYPE (saleListing.ownershipType):
-- "full ownership" -> Add: "_saleOwnershipType": "FULL_OWNERSHIP"
-- "partial ownership" -> Add: "_saleOwnershipType": "PARTIAL_OWNERSHIP"
-- "shared ownership" -> Add: "_saleOwnershipType": "SHARED_OWNERSHIP"
-- "joint ownership" -> Add: "_saleOwnershipType": "JOINT_OWNERSHIP"
+"chain free property for sale" -> 
+{
+  "published": true,
+  "property": {},
+  "saleListing": {
+    "chain": false
+  }
+}
 
-TENURE TYPE (saleListing.tenureType):
-- "freehold" -> Add: "_saleTenureType": "FREEHOLD"
-- "leasehold" -> Add: "_saleTenureType": "LEASEHOLD"
-- "commonhold" -> Add: "_saleTenureType": "COMMONHOLD"
-- "share of freehold" -> Add: "_saleTenureType": "SHARE_OF_FREEHOLD"
+"detached house with garage and CCTV" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"},
+    "classification": {"name": "Detached"},
+    "parking": {"garage": true},
+    "securityFeatures": {"cctv": true}
+  }
+}
 
-SALE PRICE TYPE (saleListing.priceType):
-- "fixed price", "asking price" -> Add: "_salePriceType": "FIXED"
-- "offers over", "oiro" -> Add: "_salePriceType": "OFFERS_OVER"
-- "guide price", "guide" -> Add: "_salePriceType": "GUIDE_PRICE"
+"wheelchair accessible flat with elevator" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "Flat"},
+    "accessibilityFeatures": {
+      "wheelchairFriendly": true,
+      "elevator": true
+    }
+  }
+}
 
-SALE AVAILABILITY (saleListing.availabilityStatus):
-- "available", "for sale" -> Add: "_saleAvailability": "AVAILABLE"
-- "under offer", "stc", "subject to contract" -> Add: "_saleAvailability": "UNDER_OFFER"
-- "sold", "completion" -> Add: "_saleAvailability": "SOLD"
+"house with solar panels and EV charging" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"},
+    "energyAndUtilities": {
+      "renewables": {"has": "SOLAR_PV"}
+    },
+    "parking": {"evCharging": true}
+  }
+}
 
-CHAIN STATUS (saleListing.chain):
-- "chain free", "no chain", "no onward chain" -> Add: "_saleChainFree": true
-- "chain", "part of chain" -> Add: "_saleChainFree": false
+"house near train station" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"},
+    "amenities": {
+      "some": {
+        "type": "TRANSPORT",
+        "subtype": "TRAIN_STATION"
+      }
+    }
+  }
+}
 
-SALE EXAMPLES:
-- "freehold house for sale" -> {"type": {"name": "House"}, "_listingType": "sale", "_saleTenureType": "FREEHOLD"}
-- "chain free property" -> {"_listingType": "sale", "_saleChainFree": true}
-- "shared ownership flat" -> {"type": {"name": "Flat"}, "_listingType": "sale", "_saleOwnershipType": "SHARED_OWNERSHIP"}
-- "leasehold property under offer" -> {"_listingType": "sale", "_saleTenureType": "LEASEHOLD", "_saleAvailability": "UNDER_OFFER"}
+"property with council tax band A and low service charges" -> 
+{
+  "published": true,
+  "property": {
+    "runningCosts": {
+      "councilTaxBand": "A",
+      "serviceCharges": {"lt": 200}
+    }
+  }
+}
 
-Examples:
-"3 bedroom house" -> {"numberBedrooms": 3, "type": {"name": "House"}}
-"3 bed house in Cardiff" -> {"numberBedrooms": 3, "type": {"name": "House"}}
-"detached house with garage and CCTV" -> {"type": {"name": "House"}, "classification": {"name": "Detached"}, "parking": {"garage": true}, "securityFeatures": {"cctv": true}}
-"pet friendly apartment with pool and gym" -> {"type": {"name": "Flat"}, "additionalFeatures": {"petFriendly": true, "pool": true, "gym": true}}
-"house with modern kitchen and breakfast bar" -> {"type": {"name": "House"}, "kitchenFeatures": {"modern": true, "breakfastBar": true}}
-"wheelchair accessible flat with elevator and wet room" -> {"type": {"name": "Flat"}, "accessibilityFeatures": {"wheelchairFriendly": true, "elevator": true, "wetRoom": true}}
-"house with solar panels and EV charging" -> {"type": {"name": "House"}, "energyAndUtilities": {"renewables": {"has": "SOLAR_PV"}}, "parking": {"evCharging": true}}
-"property with garden office and summer house" -> {"outdoorSpace": {"gardenOffice": true, "summerHouse": true}}
-"house near train station and school" -> {"type": {"name": "House"}, "amenities": {"some": {"type": "TRANSPORT", "subtype": "TRAIN_STATION"}}}
-"flat close to shops and restaurants" -> {"type": {"name": "Flat"}, "amenities": {"some": {"type": "SHOPPING_ENTERTAINMENT", "subtype": "SHOP"}}}
-"property with council tax band A" -> {"runningCosts": {"councilTaxBand": "A"}}
-"house with low service charges" -> {"type": {"name": "House"}, "runningCosts": {"serviceCharges": {"lt": 200}}}
-"house with en-suite bedroom" -> {"type": {"name": "House"}, "bedroomFeatures": {"some": {"enSuite": true}}}
-"property with washing machine" -> {"utility": {"appliances": {"has": "Washing Machine"}}}
-"house with gas central heating" -> {"type": {"name": "House"}, "energyAndUtilities": {"primaryHeatingType": {"has": "GAS_CENTRAL"}}}
+"house with en-suite bedroom" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"},
+    "bedroomFeatures": {
+      "some": {"enSuite": true}
+    }
+  }
+}
 
-Return ONLY the JSON object, no other text.
+"bills included rental under £250 per week" -> 
+{
+  "published": true,
+  "property": {},
+  "rentalListing": {
+    "isBillsIncluded": true
+  },
+  "price": {"lte": 1083}
+}
+
+Return ONLY the complete JSON Prisma WHERE clause object, no other text.
 `;
 
-    // Get AI to generate the WHERE clause
+    // Get AI to generate the complete WHERE clause
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         { role: "system", content: schemaPrompt },
-        { role: "user", content: `Convert this search query to Prisma WHERE conditions: "${query}"` },
+        { role: "user", content: `Convert this search query to a complete Prisma WHERE clause: "${query}"` },
       ],
       temperature: 0,
     });
@@ -393,7 +463,7 @@ Return ONLY the JSON object, no other text.
       });
     }
 
-    console.log(`AI generated conditions: ${aiResponse}`);
+    console.log(`AI generated WHERE clause: ${aiResponse}`);
 
     // Clean up the AI response - remove markdown code blocks if present
     let cleanedResponse = aiResponse;
@@ -403,76 +473,22 @@ Return ONLY the JSON object, no other text.
       cleanedResponse = cleanedResponse.replace(/^```\s*/, "").replace(/\s*```$/, "");
     }
 
-    let whereConditions;
+    let whereClause;
     try {
-      whereConditions = JSON.parse(cleanedResponse);
+      whereClause = JSON.parse(cleanedResponse);
     } catch (error) {
       console.error("Failed to parse AI response:", aiResponse);
       console.error("Cleaned response:", cleanedResponse);
       console.error("Parse error:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: `Invalid search conditions generated. AI response: ${aiResponse}`,
+        statusMessage: `Invalid WHERE clause generated. AI response: ${aiResponse}`,
       });
     }
 
-    // Extract listing type preference
-    const listingType = whereConditions._listingType || "both";
-    delete whereConditions._listingType; // Remove from property conditions
-
-    // Extract price range preferences
-    const minPrice = whereConditions._minPrice;
-    const maxPrice = whereConditions._maxPrice;
-    delete whereConditions._minPrice;
-    delete whereConditions._maxPrice;
-
-    // Extract rental-specific features
-    const rentalBillsIncluded = whereConditions._rentalBillsIncluded;
-    const rentalFurnishedStatus = whereConditions._rentalFurnishedStatus;
-    const rentalAvailability = whereConditions._rentalAvailability;
-    delete whereConditions._rentalBillsIncluded;
-    delete whereConditions._rentalFurnishedStatus;
-    delete whereConditions._rentalAvailability;
-
-    // Extract sale-specific features
-    const saleOwnershipType = whereConditions._saleOwnershipType;
-    const saleTenureType = whereConditions._saleTenureType;
-    const salePriceType = whereConditions._salePriceType;
-    const saleAvailability = whereConditions._saleAvailability;
-    const saleChainFree = whereConditions._saleChainFree;
-    delete whereConditions._saleOwnershipType;
-    delete whereConditions._saleTenureType;
-    delete whereConditions._salePriceType;
-    delete whereConditions._saleAvailability;
-    delete whereConditions._saleChainFree;
-
-    console.log(`Detected listing type: ${listingType}`);
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      console.log(`Detected price range: min=${minPrice}, max=${maxPrice}`);
-    }
-    if (rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability) {
-      console.log(`Detected rental features: bills=${rentalBillsIncluded}, furnished=${rentalFurnishedStatus}, availability=${rentalAvailability}`);
-    }
-    if (saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined) {
-      console.log(`Detected sale features: ownership=${saleOwnershipType}, tenure=${saleTenureType}, priceType=${salePriceType}, availability=${saleAvailability}, chainFree=${saleChainFree}`);
-    }
-
-    // Execute the search with AI-generated conditions
-    const whereClause: any = {
-      published: true,
-      property: whereConditions,
-    };
-
-    // Add price filtering
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      const priceFilter: any = {};
-      if (minPrice !== undefined) {
-        priceFilter.gte = minPrice;
-      }
-      if (maxPrice !== undefined) {
-        priceFilter.lte = maxPrice;
-      }
-      whereClause.price = priceFilter;
+    // Ensure the basic structure is correct
+    if (!whereClause.published) {
+      whereClause.published = true;
     }
 
     // Add location filtering if we have property IDs
@@ -482,178 +498,24 @@ Return ONLY the JSON object, no other text.
         return {
           results: [],
           query,
-          generatedConditions: whereConditions,
+          generatedWhereClause: whereClause,
           locationContext,
-          detectedListingType: listingType,
-          detectedPriceRange:
-            minPrice !== undefined || maxPrice !== undefined
-              ? {
-                  minPrice,
-                  maxPrice,
-                }
-              : undefined,
-          detectedRentalFeatures:
-            rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability
-              ? {
-                  billsIncluded: rentalBillsIncluded,
-                  furnishedStatus: rentalFurnishedStatus,
-                  availabilityStatus: rentalAvailability,
-                }
-              : undefined,
-          detectedSaleFeatures:
-            saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined
-              ? {
-                  ownershipType: saleOwnershipType,
-                  tenureType: saleTenureType,
-                  priceType: salePriceType,
-                  availabilityStatus: saleAvailability,
-                  chainFree: saleChainFree,
-                }
-              : undefined,
           count: 0,
           searchType: "rag_sql",
         };
       }
+      
+      // Ensure property object exists
+      if (!whereClause.property) {
+        whereClause.property = {};
+      }
+      
+      // Add location filter to property conditions
       whereClause.property.id = { in: propertyIds };
     }
 
-    // Add listing type filtering with specific features
-    if (listingType === "sale") {
-      const saleFilter: any = { isNot: null };
-
-      // Add sale-specific filters
-      if (saleOwnershipType) {
-        // Ensure the value is a valid enum
-        if (Object.values(OwnershipType).includes(saleOwnershipType as OwnershipType)) {
-          saleFilter.ownershipType = saleOwnershipType as OwnershipType;
-        }
-      }
-
-      if (saleTenureType) {
-        // Ensure the value is a valid enum
-        if (Object.values(TenureType).includes(saleTenureType as TenureType)) {
-          saleFilter.tenureType = saleTenureType as TenureType;
-        }
-      }
-
-      if (salePriceType) {
-        // Ensure the value is a valid enum
-        if (Object.values(SalePriceType).includes(salePriceType as SalePriceType)) {
-          saleFilter.priceType = salePriceType as SalePriceType;
-        }
-      }
-
-      if (saleAvailability) {
-        // Ensure the value is a valid enum
-        if (Object.values(SaleAvailabilityStatus).includes(saleAvailability as SaleAvailabilityStatus)) {
-          saleFilter.availabilityStatus = saleAvailability as SaleAvailabilityStatus;
-        }
-      }
-
-      if (saleChainFree !== undefined) {
-        saleFilter.chain = !saleChainFree; // Note: chain=true means NOT chain free
-      }
-
-      whereClause.saleListing = saleFilter;
-    } else if (listingType === "rental") {
-      const rentalFilter: any = { isNot: null };
-
-      // Add rental-specific filters
-      if (rentalBillsIncluded !== undefined) {
-        rentalFilter.isBillsIncluded = rentalBillsIncluded;
-      }
-
-      if (rentalFurnishedStatus) {
-        // Ensure the value is a valid enum
-        if (Object.values(FurnishedStatus).includes(rentalFurnishedStatus as FurnishedStatus)) {
-          rentalFilter.furnishedStatus = rentalFurnishedStatus as FurnishedStatus;
-        }
-      }
-
-      if (rentalAvailability) {
-        // Ensure the value is a valid enum
-        if (Object.values(RentalAvailabilityStatus).includes(rentalAvailability as RentalAvailabilityStatus)) {
-          rentalFilter.availabilityStatus = rentalAvailability as RentalAvailabilityStatus;
-        }
-      }
-
-      whereClause.rentalListing = rentalFilter;
-    } else if (listingType === "both") {
-      // For 'both', we need complex OR logic only if we have specific filters
-      const hasRentalFilters = rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability;
-      const hasSaleFilters = saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined;
-
-      if (hasRentalFilters || hasSaleFilters) {
-        const orClauses: any[] = [];
-
-        // Add sale clause
-        if (hasSaleFilters) {
-          const saleFilter: any = { isNot: null };
-
-          if (saleOwnershipType) {
-            if (Object.values(OwnershipType).includes(saleOwnershipType as OwnershipType)) {
-              saleFilter.ownershipType = saleOwnershipType as OwnershipType;
-            }
-          }
-
-          if (saleTenureType) {
-            if (Object.values(TenureType).includes(saleTenureType as TenureType)) {
-              saleFilter.tenureType = saleTenureType as TenureType;
-            }
-          }
-
-          if (salePriceType) {
-            if (Object.values(SalePriceType).includes(salePriceType as SalePriceType)) {
-              saleFilter.priceType = salePriceType as SalePriceType;
-            }
-          }
-
-          if (saleAvailability) {
-            if (Object.values(SaleAvailabilityStatus).includes(saleAvailability as SaleAvailabilityStatus)) {
-              saleFilter.availabilityStatus = saleAvailability as SaleAvailabilityStatus;
-            }
-          }
-
-          if (saleChainFree !== undefined) {
-            saleFilter.chain = !saleChainFree;
-          }
-
-          orClauses.push({ saleListing: saleFilter });
-        } else {
-          // No sale filters, just include any sale listing
-          orClauses.push({ saleListing: { isNot: null } });
-        }
-
-        // Add rental clause
-        if (hasRentalFilters) {
-          const rentalFilter: any = { isNot: null };
-
-          if (rentalBillsIncluded !== undefined) {
-            rentalFilter.isBillsIncluded = rentalBillsIncluded;
-          }
-
-          if (rentalFurnishedStatus) {
-            if (Object.values(FurnishedStatus).includes(rentalFurnishedStatus as FurnishedStatus)) {
-              rentalFilter.furnishedStatus = rentalFurnishedStatus as FurnishedStatus;
-            }
-          }
-
-          if (rentalAvailability) {
-            if (Object.values(RentalAvailabilityStatus).includes(rentalAvailability as RentalAvailabilityStatus)) {
-              rentalFilter.availabilityStatus = rentalAvailability as RentalAvailabilityStatus;
-            }
-          }
-
-          orClauses.push({ rentalListing: rentalFilter });
-        } else {
-          // No rental filters, just include any rental listing
-          orClauses.push({ rentalListing: { isNot: null } });
-        }
-
-        whereClause.OR = orClauses;
-      }
-      // If no specific filters for 'both', don't add any listing type filter (include both)
-    }
+    // Execute the search with AI-generated WHERE clause
+    console.log("Executing search with WHERE clause:", JSON.stringify(whereClause, null, 2));
 
     const listings = await prisma.listing.findMany({
       where: whereClause,
@@ -758,34 +620,8 @@ Return ONLY the JSON object, no other text.
     return {
       results: formattedResults,
       query,
-      generatedConditions: whereConditions,
+      generatedWhereClause: whereClause,
       locationContext,
-      detectedListingType: listingType,
-      detectedPriceRange:
-        minPrice !== undefined || maxPrice !== undefined
-          ? {
-              minPrice,
-              maxPrice,
-            }
-          : undefined,
-      detectedRentalFeatures:
-        rentalBillsIncluded !== undefined || rentalFurnishedStatus || rentalAvailability
-          ? {
-              billsIncluded: rentalBillsIncluded,
-              furnishedStatus: rentalFurnishedStatus,
-              availabilityStatus: rentalAvailability,
-            }
-          : undefined,
-      detectedSaleFeatures:
-        saleOwnershipType || saleTenureType || salePriceType || saleAvailability || saleChainFree !== undefined
-          ? {
-              ownershipType: saleOwnershipType,
-              tenureType: saleTenureType,
-              priceType: salePriceType,
-              availabilityStatus: saleAvailability,
-              chainFree: saleChainFree,
-            }
-          : undefined,
       count: formattedResults.length,
       searchType: "rag_sql",
     };
