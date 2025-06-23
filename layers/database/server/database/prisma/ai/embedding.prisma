@@ -1,0 +1,17 @@
+/**
+ * This is AI Embedding model for storing vector embeddings of listings.
+ * It uses the `vector` type from the Postgres vector extension.
+ * text-embedding-3-small is the default model used for generating embeddings.
+ */
+model Embedding {
+  id             String                      @id @default(cuid())
+  vector         Unsupported("vector(1536)") // This must match your model
+  embeddingModel String                      @default("text-embedding-3-small") // Track model used for embedding
+  listingId      Int                         @unique
+  listing        Listing                     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  @@index([listingId])
+  @@map("embeddings")
+}

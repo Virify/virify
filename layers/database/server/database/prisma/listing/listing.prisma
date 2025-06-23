@@ -28,6 +28,7 @@ model Listing {
   ListingView          ListingView[]
   conversations        Conversation[]
   UserNote             UserNote[]
+  Embedding            Embedding?
 
   @@index([userId])
   @@index([propertyId])
