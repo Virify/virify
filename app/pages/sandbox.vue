@@ -41,6 +41,21 @@
       </form>
     </div>
 
+    <!-- Applied Filters -->
+    <div v-if="appliedFilters.length > 0" class="applied-filters-section">
+      <h3 class="filters-title">Applied Filters:</h3>
+      <div class="filters-container">
+        <div v-for="filter in appliedFilters" :key="filter.key" class="filter-chip">
+          <span class="filter-label">{{ filter.label }}</span>
+          <span class="filter-value">{{ filter.value }}</span>
+          <button @click="removeFilter(filter.key)" class="filter-remove" title="Remove filter">×</button>
+        </div>
+        <button @click="clearAllFilters" class="clear-all-button" v-if="appliedFilters.length > 1">
+          Clear All
+        </button>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div v-if="isSearching" class="loading-section">
       <div class="loading-spinner">
@@ -233,6 +248,505 @@ const searchError = ref('')
 const detectedListingType = ref('')
 const detectedPriceRange = ref<{ minPrice?: number, maxPrice?: number } | null>(null)
 
+// Applied filters functionality
+interface AppliedFilter {
+  key: string
+  label: string
+  value: string
+  originalField: string
+  originalValue: any
+}
+
+const appliedFilters = ref<AppliedFilter[]>([])
+const currentWhereClause = ref<any>(null)
+
+// Extract filters from AI-generated where clause
+function extractFiltersFromWhereClause(whereClause: any) {
+  const filters: AppliedFilter[] = []
+  
+  if (!whereClause || !whereClause.property) return filters
+
+  const property = whereClause.property
+
+  // Property type
+  if (property.type?.name) {
+    filters.push({
+      key: 'property-type',
+      label: 'Property Type',
+      value: property.type.name,
+      originalField: 'property.type.name',
+      originalValue: property.type.name
+    })
+  }
+
+  // Classification
+  if (property.classification?.name) {
+    filters.push({
+      key: 'classification',
+      label: 'Classification',
+      value: property.classification.name,
+      originalField: 'property.classification.name',
+      originalValue: property.classification.name
+    })
+  }
+
+  // Number of bedrooms
+  if (property.numberBedrooms !== undefined) {
+    filters.push({
+      key: 'bedrooms',
+      label: 'Bedrooms',
+      value: property.numberBedrooms === 0 ? 'Studio' : `${property.numberBedrooms} bed`,
+      originalField: 'property.numberBedrooms',
+      originalValue: property.numberBedrooms
+    })
+  }
+
+  // Number of bathrooms
+  if (property.numberBathrooms !== undefined) {
+    filters.push({
+      key: 'bathrooms',
+      label: 'Bathrooms',
+      value: `${property.numberBathrooms} bath`,
+      originalField: 'property.numberBathrooms',
+      originalValue: property.numberBathrooms
+    })
+  }
+
+  // Price range
+  if (whereClause.price) {
+    let priceText = ''
+    if (whereClause.price.gte && whereClause.price.lte) {
+      priceText = `£${whereClause.price.gte.toLocaleString()} - £${whereClause.price.lte.toLocaleString()}`
+    } else if (whereClause.price.gte) {
+      priceText = `Over £${whereClause.price.gte.toLocaleString()}`
+    } else if (whereClause.price.lte) {
+      priceText = `Under £${whereClause.price.lte.toLocaleString()}`
+    }
+    
+    if (priceText) {
+      filters.push({
+        key: 'price',
+        label: 'Price',
+        value: priceText,
+        originalField: 'price',
+        originalValue: whereClause.price
+      })
+    }
+  }
+
+  // Listing type (sale/rental)
+  if (whereClause.saleListing && !whereClause.rentalListing) {
+    filters.push({
+      key: 'listing-type',
+      label: 'Listing Type',
+      value: 'For Sale',
+      originalField: 'saleListing',
+      originalValue: whereClause.saleListing
+    })
+  } else if (whereClause.rentalListing && !whereClause.saleListing) {
+    filters.push({
+      key: 'listing-type',
+      label: 'Listing Type',
+      value: 'To Rent',
+      originalField: 'rentalListing',
+      originalValue: whereClause.rentalListing
+    })
+  }
+
+  // Rental features
+  if (whereClause.rentalListing) {
+    if (whereClause.rentalListing.furnishedStatus) {
+      const status = whereClause.rentalListing.furnishedStatus
+      const statusText = status === 'FURNISHED' ? 'Furnished' : 
+                        status === 'UNFURNISHED' ? 'Unfurnished' : 'Part Furnished'
+      filters.push({
+        key: 'furnished',
+        label: 'Furnished',
+        value: statusText,
+        originalField: 'rentalListing.furnishedStatus',
+        originalValue: status
+      })
+    }
+    
+    if (whereClause.rentalListing.isBillsIncluded !== undefined) {
+      filters.push({
+        key: 'bills',
+        label: 'Bills',
+        value: whereClause.rentalListing.isBillsIncluded ? 'Included' : 'Excluded',
+        originalField: 'rentalListing.isBillsIncluded',
+        originalValue: whereClause.rentalListing.isBillsIncluded
+      })
+    }
+  }
+
+  // Sale features
+  if (whereClause.saleListing) {
+    if (whereClause.saleListing.tenureType) {
+      filters.push({
+        key: 'tenure',
+        label: 'Tenure',
+        value: whereClause.saleListing.tenureType.charAt(0) + whereClause.saleListing.tenureType.slice(1).toLowerCase().replace('_', ' '),
+        originalField: 'saleListing.tenureType',
+        originalValue: whereClause.saleListing.tenureType
+      })
+    }
+    
+    if (whereClause.saleListing.chain === false) {
+      filters.push({
+        key: 'chain',
+        label: 'Chain Status',
+        value: 'Chain Free',
+        originalField: 'saleListing.chain',
+        originalValue: false
+      })
+    }
+  }
+
+  // Property features (simplified - just show if any are present)
+  const featureCategories = ['parking', 'accessibilityFeatures', 'securityFeatures', 'additionalFeatures', 
+                            'kitchenFeatures', 'outdoorSpace', 'energyAndUtilities']
+  
+  featureCategories.forEach(category => {
+    if (property[category] && Object.keys(property[category]).length > 0) {
+      const features = Object.entries(property[category])
+        .filter(([_, value]) => value === true)
+        .map(([key, _]) => key.replace(/([A-Z])/g, ' $1').toLowerCase())
+        .join(', ')
+      
+      if (features) {
+        filters.push({
+          key: category,
+          label: category.charAt(0).toUpperCase() + category.slice(1).replace(/([A-Z])/g, ' $1'),
+          value: features,
+          originalField: `property.${category}`,
+          originalValue: property[category]
+        })
+      }
+    }
+  })
+
+  return filters
+}
+
+// Update search query by removing words related to the removed filter
+function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
+  let currentQuery = searchQuery.value.toLowerCase()
+  
+  // Define patterns to remove based on filter type
+  const patternsToRemove: string[] = []
+  
+  switch (removedFilter.key) {
+    case 'property-type':
+      // Remove property type words
+      const propertyType = removedFilter.value.toLowerCase()
+      patternsToRemove.push(propertyType, `${propertyType}s`) // singular and plural
+      break
+      
+    case 'classification':
+      // Remove classification words
+      const classification = removedFilter.value.toLowerCase()
+      patternsToRemove.push(classification)
+      if (classification === 'detached') patternsToRemove.push('detached')
+      if (classification === 'semi-detached') patternsToRemove.push('semi-detached', 'semi detached')
+      if (classification === 'terraced') patternsToRemove.push('terraced')
+      if (classification === 'studio flat') patternsToRemove.push('studio', 'studio flat')
+      break
+      
+    case 'bedrooms':
+      // Remove bedroom-related words
+      const bedroomCount = removedFilter.originalValue
+      if (bedroomCount === 0) {
+        patternsToRemove.push('studio')
+      } else {
+        patternsToRemove.push(
+          `${bedroomCount} bedroom`,
+          `${bedroomCount} bed`,
+          `${bedroomCount}-bedroom`,
+          `${bedroomCount}-bed`,
+          `${bedroomCount}bed`,
+          `${bedroomCount}bedroom`
+        )
+        // Handle written numbers
+        const numberWords = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+        if (bedroomCount <= 10) {
+          const wordNumber = numberWords[bedroomCount - 1]
+          patternsToRemove.push(`${wordNumber} bedroom`, `${wordNumber} bed`)
+        }
+      }
+      break
+      
+    case 'bathrooms':
+      // Remove bathroom-related words
+      const bathroomCount = removedFilter.originalValue
+      patternsToRemove.push(
+        `${bathroomCount} bathroom`,
+        `${bathroomCount} bath`,
+        `${bathroomCount}-bathroom`,
+        `${bathroomCount}-bath`
+      )
+      break
+      
+    case 'price':
+      // Remove price-related words
+      patternsToRemove.push(
+        'under £\\d+[k,\\d]*',
+        'over £\\d+[k,\\d]*',
+        'above £\\d+[k,\\d]*',
+        'below £\\d+[k,\\d]*',
+        'between £\\d+[k,\\d]* and £\\d+[k,\\d]*',
+        '£\\d+[k,\\d]*-£\\d+[k,\\d]*',
+        'per month',
+        'pcm',
+        'per week',
+        'pw'
+      )
+      break
+      
+    case 'listing-type':
+      // Remove listing type words
+      if (removedFilter.value === 'For Sale') {
+        patternsToRemove.push('for sale', 'to buy', 'sale')
+      } else if (removedFilter.value === 'To Rent') {
+        patternsToRemove.push('to rent', 'for rent', 'to let', 'rental')
+      }
+      break
+      
+    case 'furnished':
+      // Remove furnished status words
+      const furnishedStatus = removedFilter.value.toLowerCase()
+      patternsToRemove.push(furnishedStatus, 'furnished', 'unfurnished', 'part furnished')
+      break
+      
+    case 'bills':
+      // Remove bills-related words
+      patternsToRemove.push('bills included', 'bills excluded', 'including bills', 'excluding bills', 'with bills', 'bills')
+      break
+      
+    case 'tenure':
+      // Remove tenure words
+      const tenure = removedFilter.value.toLowerCase()
+      patternsToRemove.push(tenure, 'freehold', 'leasehold')
+      break
+      
+    case 'chain':
+      // Remove chain status words
+      patternsToRemove.push('chain free', 'no chain', 'no onward chain')
+      break
+      
+    default:
+      // For property features, try to remove related words
+      if (removedFilter.key === 'parking') {
+        patternsToRemove.push('garage', 'parking', 'driveway', 'carport')
+      } else if (removedFilter.key === 'outdoorSpace') {
+        patternsToRemove.push('garden', 'balcony', 'patio', 'terrace')
+      } else if (removedFilter.key === 'accessibilityFeatures') {
+        patternsToRemove.push('wheelchair accessible', 'elevator', 'lift', 'wet room')
+      } else if (removedFilter.key === 'securityFeatures') {
+        patternsToRemove.push('cctv', 'security', 'alarm', 'gated')
+      } else if (removedFilter.key === 'kitchenFeatures') {
+        patternsToRemove.push('modern kitchen', 'breakfast bar', 'kitchen island')
+      } else if (removedFilter.key === 'energyAndUtilities') {
+        patternsToRemove.push('solar panels', 'epc rating', 'biomass', 'heating')
+      }
+      break
+  }
+  
+  // Apply removals to the query
+  let updatedQuery = currentQuery
+  
+  patternsToRemove.forEach(pattern => {
+    // Use regex for more flexible matching
+    const regex = new RegExp(`\\b${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
+    updatedQuery = updatedQuery.replace(regex, '')
+  })
+  
+  // Clean up extra spaces and trim
+  updatedQuery = updatedQuery
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .replace(/\s+and\s+/g, ' ') // Remove standalone 'and' words
+    .replace(/\s+with\s+/g, ' ') // Remove standalone 'with' words  
+    .replace(/^\s+|\s+$/g, '') // Trim start and end
+    .replace(/^and\s+|^with\s+/, '') // Remove leading 'and' or 'with'
+    .replace(/\s+and$|\s+with$/, '') // Remove trailing 'and' or 'with'
+  
+  // Update the search query
+  searchQuery.value = updatedQuery
+}
+
+// Remove a specific filter
+function removeFilter(filterKey: string) {
+  const filterIndex = appliedFilters.value.findIndex(f => f.key === filterKey)
+  if (filterIndex === -1) return
+
+  const filter = appliedFilters.value[filterIndex]
+  if (!filter) return
+  
+  // Remove the corresponding words from the search query
+  updateSearchQueryAfterFilterRemoval(filter)
+  
+  // Remove the filter from our list
+  appliedFilters.value.splice(filterIndex, 1)
+  
+  // If no filters remain, clear the search
+  if (appliedFilters.value.length === 0) {
+    searchResults.value = []
+    hasSearched.value = false
+    currentWhereClause.value = null
+    return
+  }
+  
+  // Modify the current WHERE clause by removing this filter
+  if (currentWhereClause.value) {
+    const newWhereClause = JSON.parse(JSON.stringify(currentWhereClause.value)) // Deep clone
+    
+    // Remove the specific filter from the WHERE clause
+    switch (filter.key) {
+      case 'property-type':
+        if (newWhereClause.property?.type) delete newWhereClause.property.type
+        break
+      case 'classification':
+        if (newWhereClause.property?.classification) delete newWhereClause.property.classification
+        break
+      case 'bedrooms':
+        if (newWhereClause.property?.numberBedrooms !== undefined) delete newWhereClause.property.numberBedrooms
+        break
+      case 'bathrooms':
+        if (newWhereClause.property?.numberBathrooms !== undefined) delete newWhereClause.property.numberBathrooms
+        break
+      case 'price':
+        if (newWhereClause.price) delete newWhereClause.price
+        break
+      case 'listing-type':
+        if (newWhereClause.saleListing) delete newWhereClause.saleListing
+        if (newWhereClause.rentalListing) delete newWhereClause.rentalListing
+        break
+      case 'furnished':
+        if (newWhereClause.rentalListing?.furnishedStatus) delete newWhereClause.rentalListing.furnishedStatus
+        break
+      case 'bills':
+        if (newWhereClause.rentalListing?.isBillsIncluded !== undefined) delete newWhereClause.rentalListing.isBillsIncluded
+        break
+      case 'tenure':
+        if (newWhereClause.saleListing?.tenureType) delete newWhereClause.saleListing.tenureType
+        break
+      case 'chain':
+        if (newWhereClause.saleListing?.chain !== undefined) delete newWhereClause.saleListing.chain
+        break
+      default:
+        // Handle property feature categories
+        if (filter.originalField.startsWith('property.')) {
+          const fieldPath = filter.originalField.replace('property.', '')
+          if (newWhereClause.property?.[fieldPath]) {
+            delete newWhereClause.property[fieldPath]
+          }
+        }
+        break
+    }
+    
+    // Clean up empty objects
+    if (newWhereClause.property && Object.keys(newWhereClause.property).length === 0) {
+      delete newWhereClause.property
+    }
+    if (newWhereClause.rentalListing && Object.keys(newWhereClause.rentalListing).length === 0) {
+      delete newWhereClause.rentalListing
+    }
+    if (newWhereClause.saleListing && Object.keys(newWhereClause.saleListing).length === 0) {
+      delete newWhereClause.saleListing
+    }
+    
+    // Execute search with modified WHERE clause
+    executeSearchWithWhereClause(newWhereClause)
+  }
+}
+
+// Execute search directly with a WHERE clause
+async function executeSearchWithWhereClause(whereClause: any) {
+  isSearching.value = true
+  searchError.value = ''
+  
+  try {
+    // Make direct API call with the WHERE clause
+    const response = await $fetch('/api/search/direct/', {
+      method: 'POST',
+      body: { whereClause }
+    })
+    
+    if (response && typeof response === 'object') {
+      const results = Array.isArray((response as any).results) ? (response as any).results : []
+      searchResults.value = results as SearchResult[]
+      currentWhereClause.value = whereClause
+      
+      console.log('Updated search results:', searchResults.value.length)
+    }
+    
+  } catch (error: any) {
+    console.error('Direct search error:', error)
+    // Fallback: try to regenerate the search query and use RAG
+    fallbackToRAGSearch()
+  } finally {
+    isSearching.value = false
+  }
+}
+
+// Fallback method: reconstruct query from remaining filters and use RAG search
+async function fallbackToRAGSearch() {
+  const remainingFilters = appliedFilters.value
+  let newQuery = ''
+  
+  // Build a query from remaining filters
+  const propertyType = remainingFilters.find(f => f.key === 'property-type')?.value
+  const bedrooms = remainingFilters.find(f => f.key === 'bedrooms')?.originalValue
+  const listingType = remainingFilters.find(f => f.key === 'listing-type')?.value
+  const price = remainingFilters.find(f => f.key === 'price')?.value
+  
+  // Construct query parts
+  const queryParts: string[] = []
+  
+  if (bedrooms !== undefined && propertyType) {
+    queryParts.push(`${bedrooms === 0 ? 'studio' : bedrooms + ' bedroom'} ${propertyType.toLowerCase()}`)
+  } else if (propertyType) {
+    queryParts.push(propertyType.toLowerCase())
+  }
+  
+  if (listingType) {
+    queryParts.push(listingType === 'For Sale' ? 'for sale' : 'to rent')
+  }
+  
+  if (price) {
+    queryParts.push(price.toLowerCase())
+  }
+  
+  // Add other features
+  const features = remainingFilters
+    .filter(f => !['property-type', 'bedrooms', 'listing-type', 'price'].includes(f.key))
+    .map(f => f.value.toLowerCase())
+  
+  if (features.length > 0) {
+    queryParts.push(`with ${features.join(' and ')}`)
+  }
+  
+  newQuery = queryParts.join(' ')
+  
+  if (newQuery.trim()) {
+    searchQuery.value = newQuery
+    searchProperties()
+  } else {
+    // No meaningful query could be constructed
+    searchResults.value = []
+    hasSearched.value = false
+    currentWhereClause.value = null
+  }
+}
+
+// Clear all filters
+function clearAllFilters() {
+  appliedFilters.value = []
+  searchResults.value = []
+  hasSearched.value = false
+  currentWhereClause.value = null
+  searchQuery.value = ''
+}
+
 // All search suggestions in a flat list
 const allSuggestions = [
   // Basic property types
@@ -306,8 +820,16 @@ async function searchProperties() {
     detectedListingType.value = (response as any).detectedListingType || 'both'
     detectedPriceRange.value = (response as any).detectedPriceRange || null
 
+    // Extract and store the applied filters from the generated where clause
+    const whereClause = (response as any).generatedWhereClause
+    if (whereClause) {
+      currentWhereClause.value = whereClause
+      appliedFilters.value = extractFiltersFromWhereClause(whereClause)
+    }
+
     console.log('Final searchResults.value:', searchResults.value)
     console.log('Final searchResults.value.length:', searchResults.value.length)
+    console.log('Applied filters:', appliedFilters.value)
 
     if (searchResults.value.length === 0) {
       console.log('No results found for query:', searchQuery.value)
@@ -683,6 +1205,92 @@ function toggleExpanded(newValue: any) {
 .search-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Applied Filters styles */
+.applied-filters-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.filters-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 0.75rem 0;
+}
+
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.filter-label {
+  font-weight: 500;
+  color: #64748b;
+  margin-right: 0.25rem;
+}
+
+.filter-label::after {
+  content: ':';
+}
+
+.filter-value {
+  color: #1e293b;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.filter-remove {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.2s;
+}
+
+.filter-remove:hover {
+  background: #dc2626;
+}
+
+.clear-all-button {
+  background: #64748b;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.clear-all-button:hover {
+  background: #475569;
 }
 
 .location-note {

@@ -9,21 +9,147 @@ const openai = new OpenAI({
 });
 
 const ragSearchSchema = z.object({
-  query: z.string().min(1, "Search query is required"),
-  limit: z.coerce.number().min(1).max(1000).optional().default(1000), // Much higher default and max
+  query: z.string().optional(),
+  whereClause: z.record(z.any()).optional(), // Allow direct WHERE clause
+  limit: z.coerce.number().min(1).max(1000).optional().default(1000),
   lat: z.coerce.number().optional(),
   lon: z.coerce.number().optional(),
-  radius: z.coerce.number().optional().default(40), // Default 40 miles
+  radius: z.coerce.number().optional().default(40),
+}).refine(data => data.query || data.whereClause, {
+  message: "Either query or whereClause must be provided"
 });
 
-/**
- * RAG-based search: AI generates SQL filters from natural language query
- */
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
     const validatedData = ragSearchSchema.parse(body);
-    const { query, limit, lat, lon, radius } = validatedData;
+    const { query, whereClause: inputWhereClause, limit, lat, lon, radius } = validatedData;
+
+    // If whereClause is provided, skip AI generation and use it directly
+    if (inputWhereClause) {
+      console.log(`Direct search with provided WHERE clause:`, JSON.stringify(inputWhereClause, null, 2));
+      
+      // Ensure published is always true
+      const finalWhereClause = {
+        published: true,
+        ...inputWhereClause,
+      };
+
+      const listings = await prisma.listing.findMany({
+        where: finalWhereClause,
+        include: {
+          property: {
+            include: {
+              address: true,
+              media: true,
+              type: true,
+              classification: true,
+              bedroomFeatures: true,
+              bathroomFeatures: true,
+              parking: true,
+              amenities: true,
+              additionalFeatures: true,
+              accessibilityFeatures: true,
+              diningroomFeatures: true,
+              kitchenFeatures: true,
+              livingAreaFeatures: true,
+              reception: true,
+              utility: true,
+              additionalToilet: true,
+              outdoorSpace: true,
+              energyAndUtilities: true,
+              securityFeatures: true,
+              storageFeatures: true,
+              runningCosts: true,
+            },
+          },
+          rentalListing: true,
+          saleListing: true,
+        },
+        take: limit,
+      });
+
+      console.log(`Found ${listings.length} listings with direct WHERE clause`);
+
+      // Format results (reuse existing formatting logic)
+      const formattedResults = listings.map((listing) => ({
+        id: listing.id,
+        title: listing.title,
+        description: listing.description,
+        price: listing.price,
+        publishedAt: listing.publishedAt,
+        listingTier: listing.listingTier,
+        moveInDate: listing.moveInDate,
+        similarity: 1.0,
+        property: listing.property
+          ? {
+              id: listing.property.id,
+              numberBedrooms: listing.property.numberBedrooms,
+              numberBathrooms: listing.property.numberBathrooms,
+              numberReceptions: listing.property.numberReceptions,
+              size: listing.property.size,
+              yearBuilt: listing.property.yearBuilt,
+              chainFree: listing.property.chainFree,
+              vacant: listing.property.vacant,
+              address: listing.property.address
+                ? {
+                    city: listing.property.address.city,
+                    county: listing.property.address.county,
+                    postcode: listing.property.address.postcode,
+                    street: listing.property.address.street,
+                    lat: listing.property.address.lat,
+                    lon: listing.property.address.lon,
+                  }
+                : undefined,
+              type: listing.property.type
+                ? {
+                    name: listing.property.type.name,
+                  }
+                : undefined,
+              classification: listing.property.classification
+                ? {
+                    name: listing.property.classification.name,
+                  }
+                : undefined,
+              // Include all property features
+              bedroomFeatures: listing.property.bedroomFeatures,
+              bathroomFeatures: listing.property.bathroomFeatures,
+              parking: listing.property.parking,
+              amenities: listing.property.amenities,
+              additionalFeatures: listing.property.additionalFeatures,
+              accessibilityFeatures: listing.property.accessibilityFeatures,
+              diningroomFeatures: listing.property.diningroomFeatures,
+              kitchenFeatures: listing.property.kitchenFeatures,
+              livingAreaFeatures: listing.property.livingAreaFeatures,
+              reception: listing.property.reception,
+              utility: listing.property.utility,
+              additionalToilet: listing.property.additionalToilet,
+              outdoorSpace: listing.property.outdoorSpace,
+              energyAndUtilities: listing.property.energyAndUtilities,
+              securityFeatures: listing.property.securityFeatures,
+              storageFeatures: listing.property.storageFeatures,
+              runningCosts: listing.property.runningCosts,
+            }
+          : undefined,
+        listingType: listing.rentalListing ? ("rent" as const) : listing.saleListing ? ("buy" as const) : ("unknown" as const),
+      }));
+
+      return {
+        results: formattedResults,
+        query: "Direct WHERE clause search",
+        generatedWhereClause: finalWhereClause,
+        count: formattedResults.length,
+        searchType: "direct_sql",
+      };
+    }
+
+    // Original AI-powered search logic (query is guaranteed to exist here)
+    if (!query) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Query is required for AI search",
+      });
+    }
 
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY) {
@@ -473,7 +599,7 @@ Return ONLY the complete JSON Prisma WHERE clause object, no other text.
       cleanedResponse = cleanedResponse.replace(/^```\s*/, "").replace(/\s*```$/, "");
     }
 
-    let whereClause;
+    let whereClause: any = {};
     try {
       whereClause = JSON.parse(cleanedResponse);
     } catch (error) {
