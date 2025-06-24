@@ -35,7 +35,8 @@
 
     <!-- Advanced Search Capabilities -->
     <div class="ai-capabilities | flow">
-      <h2 class="| title-lg text-center">Search By Anything You Can <GradientText>Imagine</GradientText></h2>
+      <h2 class="| title-lg text-center">Search By Anything You Can <GradientText>Imagine</GradientText>
+      </h2>
       <p class="| body-lg text-center max-width-prose">
         Our AI understands hundreds of property features and can search by size, style, amenities, and lifestyle
         requirements.
@@ -67,46 +68,30 @@
       <h2 class="| title-lg text-center">Frequently Asked Questions</h2>
 
       <div class="ai-faq-list">
-        <FAQItem 
-          question="How does AI property search work?"
+        <FAQItem question="How does AI property search work?"
           answer="Our AI analyzes your natural language description and converts it into precise database queries. It understands context, synonyms, and relationships between different property features to find exactly what you're looking for."
-          :is-open="true"
-        />
+          :is-open="true" />
 
-        <FAQItem 
-          question="Can I search by specific room sizes?"
-          answer="Yes! You can search by bedroom sizes, kitchen area, garden dimensions, total property size, and more. Try searches like 'house with master bedroom over 20 sqm' or 'flat with garden over 50 sqm'."
-        />
+        <FAQItem question="Can I search by specific room sizes?"
+          answer="Yes! You can search by bedroom sizes, kitchen area, garden dimensions, total property size, and more. Try searches like 'house with master bedroom over 20 sqm' or 'flat with garden over 50 sqm'." />
 
-        <FAQItem 
-          question="What locations can I search?"
-          answer="Currently featuring properties in Cardiff and Newport with intelligent location matching. You can search by city, postcode, or proximity to landmarks like 'near Cardiff city centre' or 'close to Newport train station'."
-        />
+        <FAQItem question="What locations can I search?"
+          answer="Currently featuring properties in Cardiff and Newport with intelligent location matching. You can search by city, postcode, or proximity to landmarks like 'near Cardiff city centre' or 'close to Newport train station'." />
 
-        <FAQItem 
-          question="How specific can my search be?"
-          answer="Very specific! Our AI understands complex queries like '3 bedroom detached house with double garage, EV charging, large kitchen, and pet-friendly garden under £400,000 in Cardiff'. The more detail you provide, the better the matches."
-        />
+        <FAQItem question="How specific can my search be?"
+          answer="Very specific! Our AI understands complex queries like '3 bedroom detached house with double garage, EV charging, large kitchen, and pet-friendly garden under £400,000 in Cardiff'. The more detail you provide, the better the matches." />
 
-        <FAQItem 
-          question="What makes this different from traditional search?"
-          answer="Traditional search uses dropdown filters and checkboxes. Our AI search understands natural language, context, and relationships between features. Instead of clicking dozens of filters, just describe your ideal home in your own words."
-        />
+        <FAQItem question="What makes this different from traditional search?"
+          answer="Traditional search uses dropdown filters and checkboxes. Our AI search understands natural language, context, and relationships between features. Instead of clicking dozens of filters, just describe your ideal home in your own words." />
 
-        <FAQItem 
-          question="How many manual filters does AI search replace?"
-          answer="Traditional property searches often require 50+ separate filters for detailed searches - property type, bedrooms, bathrooms, price ranges, features, location radius, parking, garden size, accessibility options, and more. Our AI understands all of these from a single sentence."
-        />
+        <FAQItem question="How many manual filters does AI search replace?"
+          answer="Traditional property searches often require 50+ separate filters for detailed searches - property type, bedrooms, bathrooms, price ranges, features, location radius, parking, garden size, accessibility options, and more. Our AI understands all of these from a single sentence." />
 
-        <FAQItem 
-          question="Can I perform complex searches without using any filters?"
-          answer="Absolutely! Try 'Victorian terrace house with original features, modern kitchen, off-street parking, small garden, near primary school, under £350k in Cardiff suburbs' - our AI handles all the complexity automatically."
-        />
+        <FAQItem question="Can I perform complex searches without using any filters?"
+          answer="Absolutely! Try 'Victorian terrace house with original features, modern kitchen, off-street parking, small garden, near primary school, under £350k in Cardiff suburbs' - our AI handles all the complexity automatically." />
 
-        <FAQItem 
-          question="What if I have very specific requirements?"
-          answer="The more specific, the better! Our AI excels at complex requirements like 'ground floor flat with level access, wet room, lift access, allocated parking space, south-facing balcony, pet-friendly building, near bus route' - no manual filter combinations needed."
-        />
+        <FAQItem question="What if I have very specific requirements?"
+          answer="The more specific, the better! Our AI excels at complex requirements like 'ground floor flat with level access, wet room, lift access, allocated parking space, south-facing balcony, pet-friendly building, near bus route' - no manual filter combinations needed." />
       </div>
     </div>
 
@@ -117,7 +102,7 @@
           <GradientText>Home</GradientText>?
         </h2>
         <p class="ai-cta-subtitle | body-lg">Start your search above and experience the future of property discovery</p>
-        <a href="/search" class="ai-cta-button">Try AI Search Now</a>
+        <a href="/search/ai" class="ai-cta-button">Try AI Search Now</a>
       </div>
     </div>
   </div>
@@ -138,8 +123,8 @@ useHead({
 
 // Handle suggestion clicks from hero component
 const handleSuggestionSelect = (suggestion) => {
-  // Navigate to the main search page with the suggestion as a query parameter
-  navigateTo(`/search?q=${encodeURIComponent(suggestion)}`)
+  // Navigate to the AI search page with the suggestion as a query parameter
+  navigateTo(`/search/ai/?q=${encodeURIComponent(suggestion)}`)
 }
 </script>
 

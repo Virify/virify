@@ -137,7 +137,7 @@
     <div v-else-if="hasSearched && !isSearching" class="no-results">
       <h3 class="| title-xs">No Results Found</h3>
       <p>Sorry, we couldn't find any properties matching your search criteria for <strong>"{{ lastSearchQuery
-          }}"</strong>.</p>
+      }}"</strong>.</p>
       <p class="suggestions">Try:</p>
       <ul class="suggestions-list">
         <li>Removing some specific requirements</li>
@@ -154,6 +154,9 @@
 </template>
 
 <script setup lang="ts">
+// Nuxt composables
+const route = useRoute()
+
 // Types
 interface SearchResult {
   id: number
@@ -226,6 +229,61 @@ const searchError = ref('')
 const detectedListingType = ref('')
 const detectedPriceRange = ref<{ minPrice?: number, maxPrice?: number } | null>(null)
 
+// Track the last executed search to prevent duplicates
+const lastExecutedQuery = ref('')
+const isInitialLoad = ref(true)
+let searchTimeout: NodeJS.Timeout | null = null
+
+// Check for query parameter on page load and auto-search
+onMounted(() => {
+  const queryParam = route.query.q as string
+  if (queryParam) {
+    const decodedQuery = decodeURIComponent(queryParam)
+    searchQuery.value = decodedQuery
+    lastExecutedQuery.value = decodedQuery
+    // Auto-search after a brief delay to ensure the page is fully loaded
+    nextTick(() => {
+      searchProperties() // Auto-search on page load
+    })
+  }
+  isInitialLoad.value = false
+})
+
+// Page metadata that updates based on search query
+useHead(() => ({
+  title: searchQuery.value
+    ? `AI Search: ${searchQuery.value} | Property Search`
+    : 'AI Property Search - Smart Property Discovery',
+  meta: [
+    {
+      name: 'description',
+      content: searchQuery.value
+        ? `AI search results for "${searchQuery.value}" - Advanced property search with intelligent filtering and natural language understanding.`
+        : 'Revolutionary AI-powered property search. Use natural language to find your perfect home with intelligent filtering and smart matching.'
+    }
+  ]
+}))
+
+// Watch for route changes (if user navigates with different query)
+watch(() => route.query.q, (newQuery) => {
+  if (newQuery && typeof newQuery === 'string' && !isInitialLoad.value) {
+    const decodedQuery = decodeURIComponent(newQuery)
+    // Only search if this is a different query than what we just executed
+    if (decodedQuery !== lastExecutedQuery.value) {
+      searchQuery.value = decodedQuery
+      lastExecutedQuery.value = decodedQuery
+      searchProperties()
+    }
+  }
+})
+
+// Cleanup search timeout on component unmount
+onUnmounted(() => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+})
+
 // Applied filters functionality
 interface AppliedFilter {
   key: string
@@ -241,7 +299,7 @@ const currentWhereClause = ref<any>(null)
 // Extract filters from AI-generated where clause
 function extractFiltersFromWhereClause(whereClause: any) {
   const filters: AppliedFilter[] = []
-  
+
   if (!whereClause || !whereClause.property) return filters
 
   const property = whereClause.property
@@ -300,7 +358,7 @@ function extractFiltersFromWhereClause(whereClause: any) {
     } else if (whereClause.price.lte) {
       priceText = `Under £${whereClause.price.lte.toLocaleString()}`
     }
-    
+
     if (priceText) {
       filters.push({
         key: 'price',
@@ -335,8 +393,8 @@ function extractFiltersFromWhereClause(whereClause: any) {
   if (whereClause.rentalListing) {
     if (whereClause.rentalListing.furnishedStatus) {
       const status = whereClause.rentalListing.furnishedStatus
-      const statusText = status === 'FURNISHED' ? 'Furnished' : 
-                        status === 'UNFURNISHED' ? 'Unfurnished' : 'Part Furnished'
+      const statusText = status === 'FURNISHED' ? 'Furnished' :
+        status === 'UNFURNISHED' ? 'Unfurnished' : 'Part Furnished'
       filters.push({
         key: 'furnished',
         label: 'Furnished',
@@ -345,7 +403,7 @@ function extractFiltersFromWhereClause(whereClause: any) {
         originalValue: status
       })
     }
-    
+
     if (whereClause.rentalListing.isBillsIncluded !== undefined) {
       filters.push({
         key: 'bills',
@@ -368,7 +426,7 @@ function extractFiltersFromWhereClause(whereClause: any) {
         originalValue: whereClause.saleListing.tenureType
       })
     }
-    
+
     if (whereClause.saleListing.chain === false) {
       filters.push({
         key: 'chain',
@@ -381,16 +439,16 @@ function extractFiltersFromWhereClause(whereClause: any) {
   }
 
   // Property features (simplified - just show if any are present)
-  const featureCategories = ['parking', 'accessibilityFeatures', 'securityFeatures', 'additionalFeatures', 
-                            'kitchenFeatures', 'outdoorSpace', 'energyAndUtilities']
-  
+  const featureCategories = ['parking', 'accessibilityFeatures', 'securityFeatures', 'additionalFeatures',
+    'kitchenFeatures', 'outdoorSpace', 'energyAndUtilities']
+
   featureCategories.forEach(category => {
     if (property[category] && Object.keys(property[category]).length > 0) {
       const features = Object.entries(property[category])
         .filter(([_, value]) => value === true)
         .map(([key, _]) => key.replace(/([A-Z])/g, ' $1').toLowerCase())
         .join(', ')
-      
+
       if (features) {
         filters.push({
           key: category,
@@ -409,17 +467,17 @@ function extractFiltersFromWhereClause(whereClause: any) {
 // Update search query by removing words related to the removed filter
 function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
   let currentQuery = searchQuery.value.toLowerCase()
-  
+
   // Define patterns to remove based on filter type
   const patternsToRemove: string[] = []
-  
+
   switch (removedFilter.key) {
     case 'property-type':
       // Remove property type words
       const propertyType = removedFilter.value.toLowerCase()
       patternsToRemove.push(propertyType, `${propertyType}s`) // singular and plural
       break
-      
+
     case 'classification':
       // Remove classification words
       const classification = removedFilter.value.toLowerCase()
@@ -429,7 +487,7 @@ function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
       if (classification === 'terraced') patternsToRemove.push('terraced')
       if (classification === 'studio flat') patternsToRemove.push('studio', 'studio flat')
       break
-      
+
     case 'bedrooms':
       // Remove bedroom-related words
       const bedroomCount = removedFilter.originalValue
@@ -452,7 +510,7 @@ function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
         }
       }
       break
-      
+
     case 'bathrooms':
       // Remove bathroom-related words
       const bathroomCount = removedFilter.originalValue
@@ -463,7 +521,7 @@ function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
         `${bathroomCount}-bath`
       )
       break
-      
+
     case 'price':
       // Remove price-related words
       patternsToRemove.push(
@@ -479,7 +537,7 @@ function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
         'pw'
       )
       break
-      
+
     case 'listing-type':
       // Remove listing type words
       if (removedFilter.value === 'For Sale') {
@@ -488,29 +546,29 @@ function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
         patternsToRemove.push('to rent', 'for rent', 'to let', 'rental')
       }
       break
-      
+
     case 'furnished':
       // Remove furnished status words
       const furnishedStatus = removedFilter.value.toLowerCase()
       patternsToRemove.push(furnishedStatus, 'furnished', 'unfurnished', 'part furnished')
       break
-      
+
     case 'bills':
       // Remove bills-related words
       patternsToRemove.push('bills included', 'bills excluded', 'including bills', 'excluding bills', 'with bills', 'bills')
       break
-      
+
     case 'tenure':
       // Remove tenure words
       const tenure = removedFilter.value.toLowerCase()
       patternsToRemove.push(tenure, 'freehold', 'leasehold')
       break
-      
+
     case 'chain':
       // Remove chain status words
       patternsToRemove.push('chain free', 'no chain', 'no onward chain')
       break
-      
+
     default:
       // For property features, try to remove related words
       if (removedFilter.key === 'parking') {
@@ -528,16 +586,16 @@ function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
       }
       break
   }
-  
+
   // Apply removals to the query
   let updatedQuery = currentQuery
-  
+
   patternsToRemove.forEach(pattern => {
     // Use regex for more flexible matching
     const regex = new RegExp(`\\b${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
     updatedQuery = updatedQuery.replace(regex, '')
   })
-  
+
   // Clean up extra spaces and trim
   updatedQuery = updatedQuery
     .replace(/\s+/g, ' ') // Replace multiple spaces with single space
@@ -546,7 +604,7 @@ function updateSearchQueryAfterFilterRemoval(removedFilter: AppliedFilter) {
     .replace(/^\s+|\s+$/g, '') // Trim start and end
     .replace(/^and\s+|^with\s+/, '') // Remove leading 'and' or 'with'
     .replace(/\s+and$|\s+with$/, '') // Remove trailing 'and' or 'with'
-  
+
   // Update the search query
   searchQuery.value = updatedQuery
 }
@@ -558,13 +616,13 @@ function removeFilter(filterKey: string) {
 
   const filter = appliedFilters.value[filterIndex]
   if (!filter) return
-  
+
   // Remove the corresponding words from the search query
   updateSearchQueryAfterFilterRemoval(filter)
-  
+
   // Remove the filter from our list
   appliedFilters.value.splice(filterIndex, 1)
-  
+
   // If no filters remain, clear the search
   if (appliedFilters.value.length === 0) {
     searchResults.value = []
@@ -572,11 +630,11 @@ function removeFilter(filterKey: string) {
     currentWhereClause.value = null
     return
   }
-  
+
   // Modify the current WHERE clause by removing this filter
   if (currentWhereClause.value) {
     const newWhereClause = JSON.parse(JSON.stringify(currentWhereClause.value)) // Deep clone
-    
+
     // Remove the specific filter from the WHERE clause
     switch (filter.key) {
       case 'property-type':
@@ -620,7 +678,7 @@ function removeFilter(filterKey: string) {
         }
         break
     }
-    
+
     // Clean up empty objects
     if (newWhereClause.property && Object.keys(newWhereClause.property).length === 0) {
       delete newWhereClause.property
@@ -631,7 +689,7 @@ function removeFilter(filterKey: string) {
     if (newWhereClause.saleListing && Object.keys(newWhereClause.saleListing).length === 0) {
       delete newWhereClause.saleListing
     }
-    
+
     // Execute search with modified WHERE clause
     executeSearchWithWhereClause(newWhereClause)
   }
@@ -641,22 +699,22 @@ function removeFilter(filterKey: string) {
 async function executeSearchWithWhereClause(whereClause: any) {
   isSearching.value = true
   searchError.value = ''
-  
+
   try {
     // Make direct API call with the WHERE clause
     const response = await $fetch('/api/search/direct/', {
       method: 'POST',
       body: { whereClause }
     })
-    
+
     if (response && typeof response === 'object') {
       const results = Array.isArray((response as any).results) ? (response as any).results : []
       searchResults.value = results as SearchResult[]
       currentWhereClause.value = whereClause
-      
+
       console.log('Updated search results:', searchResults.value.length)
     }
-    
+
   } catch (error: any) {
     console.error('Direct search error:', error)
     // Fallback: try to regenerate the search query and use RAG
@@ -670,41 +728,41 @@ async function executeSearchWithWhereClause(whereClause: any) {
 async function fallbackToRAGSearch() {
   const remainingFilters = appliedFilters.value
   let newQuery = ''
-  
+
   // Build a query from remaining filters
   const propertyType = remainingFilters.find(f => f.key === 'property-type')?.value
   const bedrooms = remainingFilters.find(f => f.key === 'bedrooms')?.originalValue
   const listingType = remainingFilters.find(f => f.key === 'listing-type')?.value
   const price = remainingFilters.find(f => f.key === 'price')?.value
-  
+
   // Construct query parts
   const queryParts: string[] = []
-  
+
   if (bedrooms !== undefined && propertyType) {
     queryParts.push(`${bedrooms === 0 ? 'studio' : bedrooms + ' bedroom'} ${propertyType.toLowerCase()}`)
   } else if (propertyType) {
     queryParts.push(propertyType.toLowerCase())
   }
-  
+
   if (listingType) {
     queryParts.push(listingType === 'For Sale' ? 'for sale' : 'to rent')
   }
-  
+
   if (price) {
     queryParts.push(price.toLowerCase())
   }
-  
+
   // Add other features
   const features = remainingFilters
     .filter(f => !['property-type', 'bedrooms', 'listing-type', 'price'].includes(f.key))
     .map(f => f.value.toLowerCase())
-  
+
   if (features.length > 0) {
     queryParts.push(`with ${features.join(' and ')}`)
   }
-  
+
   newQuery = queryParts.join(' ')
-  
+
   if (newQuery.trim()) {
     searchQuery.value = newQuery
     searchProperties()
@@ -730,27 +788,27 @@ const allSuggestions = [
   // Basic property types
   '3 bedroom house',
   'studio flat to rent',
-  
+
   // Property types with prices
   'detached house for sale under £400k',
   'penthouse flat over £1500 per month',
-  
+
   // Feature-focused searches
   'house with modern kitchen and breakfast bar',
   'flat with balcony and parking',
   'property with garden and garage',
-  
+
   // Location-based searches
   'house in Cardiff city centre',
   'flat near Newport with parking',
-  
+
   // Lifestyle/accessibility searches
   'pet friendly house with garden',
   'wheelchair accessible flat with elevator',
-  
+
   // Advanced/eco searches
   'eco house with solar panels and EPC rating A',
-  
+
   // Additional varied searches
   'furnished flat with bills included',
   'chain free house with driveway',
@@ -760,13 +818,40 @@ const allSuggestions = [
 async function searchProperties() {
   if (!searchQuery.value.trim()) return
 
+  // Clear any existing search timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+    searchTimeout = null
+  }
+
+  // Prevent duplicate searches
+  if (searchQuery.value === lastExecutedQuery.value && hasSearched.value) {
+    console.log('Skipping duplicate search for:', searchQuery.value)
+    return
+  }
+
+  // Update URL with current search query only if it's different from current URL
+  const currentUrlQuery = route.query.q as string
+  const encodedQuery = encodeURIComponent(searchQuery.value)
+  if (currentUrlQuery !== encodedQuery) {
+    await navigateTo({
+      path: '/search/ai',
+      query: { q: encodedQuery }
+    }, { replace: true })
+  }
+
+  // Update tracking variables
+  lastExecutedQuery.value = searchQuery.value
   isSearching.value = true
   searchError.value = ''
   lastSearchQuery.value = searchQuery.value
 
+  console.log('Executing search for:', searchQuery.value)
+
   try {
     const endpoint = '/api/search/rag/'
     console.log('Making RAG search request with query:', searchQuery.value)
+    console.log('Last executed query was:', lastExecutedQuery.value)
 
     const requestBody = {
       query: searchQuery.value
@@ -1150,8 +1235,13 @@ function toggleExpanded(newValue: any) {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-section h3 {
