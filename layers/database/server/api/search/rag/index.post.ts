@@ -254,12 +254,25 @@ Property fields available:
 - numberBedrooms (1-10+)
 - numberBathrooms (1-10+)
 - numberReceptions (1-10+)
-- size (square meters)
+- size (total property size in square meters)
 - yearBuilt (string)
 - chainFree (boolean)
 - vacant (boolean)
 - type.name (property type)
 - classification.name (classification)
+
+SIZE AND AREA SEARCHES:
+- Property size: property.size (total property in sqm) - "house over 150 sqm", "property size under 200 square meters"
+- Garden areas: property.outdoorSpace.rearGardenSize, property.outdoorSpace.frontGardenSize, property.outdoorSpace.totalSize - "garden over 50 sqm", "large garden area"
+- Room sizes: property.bedroomFeatures[].size, property.kitchenFeatures.size, property.livingAreaFeatures.size, property.diningroomFeatures.size, property.bathroomFeatures[].size, property.utility.size - "large kitchen over 15 sqm", "master bedroom size over 20 sqm"
+- Land size: property.land.landSize - "land over 1000 sqm", "large plot"
+
+SIZE QUERY EXAMPLES:
+- "house over 150 sqm" -> property: {size: {gt: 150}}
+- "garden over 50 square meters" -> property: {outdoorSpace: {rearGardenSize: {gt: 50}}}
+- "large kitchen" -> property: {kitchenFeatures: {size: {gt: 15}}}
+- "spacious master bedroom" -> property: {bedroomFeatures: {some: {size: {gt: 20}}}}
+- "property under 100 sqm" -> property: {size: {lt: 100}}
 
 COMPREHENSIVE PROPERTY FEATURES (use nested objects):
 
