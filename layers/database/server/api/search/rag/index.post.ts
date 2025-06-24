@@ -8,16 +8,18 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const ragSearchSchema = z.object({
-  query: z.string().optional(),
-  whereClause: z.record(z.any()).optional(), // Allow direct WHERE clause
-  limit: z.coerce.number().min(1).max(1000).optional().default(1000),
-  lat: z.coerce.number().optional(),
-  lon: z.coerce.number().optional(),
-  radius: z.coerce.number().optional().default(40),
-}).refine(data => data.query || data.whereClause, {
-  message: "Either query or whereClause must be provided"
-});
+const ragSearchSchema = z
+  .object({
+    query: z.string().optional(),
+    whereClause: z.record(z.any()).optional(), // Allow direct WHERE clause
+    limit: z.coerce.number().min(1).max(1000).optional().default(1000),
+    lat: z.coerce.number().optional(),
+    lon: z.coerce.number().optional(),
+    radius: z.coerce.number().optional().default(40),
+  })
+  .refine((data) => data.query || data.whereClause, {
+    message: "Either query or whereClause must be provided",
+  });
 
 export default defineEventHandler(async (event) => {
   try {
@@ -28,7 +30,7 @@ export default defineEventHandler(async (event) => {
     // If whereClause is provided, skip AI generation and use it directly
     if (inputWhereClause) {
       console.log(`Direct search with provided WHERE clause:`, JSON.stringify(inputWhereClause, null, 2));
-      
+
       // Ensure published is always true
       const finalWhereClause = {
         published: true,
@@ -177,19 +179,11 @@ export default defineEventHandler(async (event) => {
     }
     // If query contains location terms but no lat/lon, try to extract location
     else if (
-      query.toLowerCase().includes("near") ||
-      query.toLowerCase().includes(" in cardiff") ||
-      query.toLowerCase().includes(" in newport") ||
-      query.toLowerCase().includes(" in london") ||
-      query.toLowerCase().includes(" in birmingham") ||
-      query.toLowerCase().includes("cardiff") ||
-      query.toLowerCase().includes("newport") ||
-      query.toLowerCase().includes("london") ||
-      query.toLowerCase().includes("birmingham") ||
-      query.toLowerCase().includes("of cardiff") ||
-      query.toLowerCase().includes("of newport") ||
-      query.toLowerCase().includes("of london") ||
-      query.toLowerCase().includes("of birmingham")
+      /\b(near|in|around|close to|within.*of)\b/i.test(query) ||
+      /\b(cardiff|newport|london|birmingham|bristol|manchester|liverpool|glasgow|edinburgh|leeds|sheffield|coventry|leicester|nottingham|portsmouth|southampton|reading|derby|plymouth|wolverhampton|stoke|preston|brighton|hull|swansea|oxford|cambridge|york|bath|exeter|chester|worcester|gloucester|canterbury|lincoln|winchester|norwich|bradford|wakefield|salford|sunderland|oldham|blackpool|middlesbrough|bolton|stockport|rotherham|luton|blackburn|huddersfield|peterborough|york|doncaster|telford|burnley|hastings|gloucester|scunthorpe|mansfield|chesterfield|basildon|colchester|crawley|gillingham|solihull|sutton|ipswich|dartford|hartlepool|st albans|worcester|redditch|nuneaton|lowestoft|bangor|wrexham|rhyl|llandudno|caerphilly|merthyr|aberdare|pontypridd|bridgend|neath|port talbot|swansea|pembroke|haverfordwest|aberystwyth|bangor|conwy|pwllheli|dolgellau|machynlleth|newtown|welshpool|brecon|abergavenny|monmouth|chepstow|caldicot|cwmbran|torfaen|blackwood|bargoed|caerphilly|maesteg|porthcawl|barry|penarth|llanelli|carmarthen|lampeter|cardigan|fishguard|tenby|milford haven)\b/i.test(
+        query
+      ) ||
+      /\b[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2}\b/i.test(query) // UK postcode pattern
     ) {
       // Extract radius from query if specified (e.g., "5 miles", "10 miles")
       const radiusMatch = query.match(/(\d+)\s*miles?/i);
@@ -201,17 +195,38 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      // Extract potential location from query - more specific regex for actual locations
-      const locationMatch = query.match(/(?:near|in|of)\s+(cardiff|newport|london|birmingham)/i) || query.match(/(cardiff|newport|london|birmingham)/i);
+      // Extract potential location from query - more flexible regex including postcodes
+      const locationMatch =
+        query.match(/(?:near|in|around|close to|within.*of)\s+([a-zA-Z\s\d]+?)(?:\s+within|\s+under|\s+over|\s*$)/i) ||
+        query.match(
+          /\b(cardiff|newport|london|birmingham|bristol|manchester|liverpool|glasgow|edinburgh|leeds|sheffield|coventry|leicester|nottingham|portsmouth|southampton|reading|derby|plymouth|wolverhampton|stoke|preston|brighton|hull|swansea|oxford|cambridge|york|bath|exeter|chester|worcester|gloucester|canterbury|lincoln|winchester|norwich|bradford|wakefield|salford|sunderland|oldham|blackpool|middlesbrough|bolton|stockport|rotherham|luton|blackburn|huddersfield|peterborough|doncaster|telford|burnley|hastings|scunthorpe|mansfield|chesterfield|basildon|colchester|crawley|gillingham|solihull|sutton|ipswich|dartford|hartlepool|st albans|redditch|nuneaton|lowestoft|bangor|wrexham|rhyl|llandudno|caerphilly|merthyr|aberdare|pontypridd|bridgend|neath|port talbot|pembroke|haverfordwest|aberystwyth|conwy|pwllheli|dolgellau|machynlleth|newtown|welshpool|brecon|abergavenny|monmouth|chepstow|caldicot|cwmbran|torfaen|blackwood|bargoed|maesteg|porthcawl|barry|penarth|llanelli|carmarthen|lampeter|cardigan|fishguard|tenby|milford haven)\b/i
+        ) ||
+        query.match(/\b([A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2})\b/i); // UK postcode pattern
 
       if (locationMatch && locationMatch[1]) {
         const locationQuery = locationMatch[1].trim();
         try {
           console.log(`Attempting location search for: "${locationQuery}" within ${searchRadius} miles`);
+
+          // First try our database search
           const nearbyProperties = await getNearbyPropertiesByTextQuery(locationQuery, searchRadius);
-          propertyIds = nearbyProperties.map((p) => p.propertyId);
-          locationContext = `near ${locationQuery} within ${searchRadius} miles`;
-          console.log(`Found ${propertyIds.length} properties ${locationContext}`);
+
+          if (nearbyProperties.length > 0) {
+            propertyIds = nearbyProperties.map((p) => p.propertyId);
+            locationContext = `near ${locationQuery} within ${searchRadius} miles`;
+            console.log(`Found ${propertyIds.length} properties ${locationContext}`);
+          } else {
+            // Fallback to MapTiler geocoding for unknown locations
+            console.log(`No properties found in database for "${locationQuery}", trying MapTiler geocoding`);
+            const coords = await geocodeLocation(locationQuery);
+
+            if (coords) {
+              const geocodedProperties = await getPropertyIdsByDistance(coords.lat, coords.lon, searchRadius);
+              propertyIds = geocodedProperties.map((p) => p.propertyId);
+              locationContext = `near ${locationQuery} (geocoded: ${coords.lat}, ${coords.lon}) within ${searchRadius} miles`;
+              console.log(`Found ${propertyIds.length} properties via MapTiler geocoding`);
+            }
+          }
         } catch (error) {
           console.log(`Could not find location: ${locationQuery}`, error);
         }
@@ -239,12 +254,25 @@ Property fields available:
 - numberBedrooms (1-10+)
 - numberBathrooms (1-10+)
 - numberReceptions (1-10+)
-- size (square meters)
+- size (total property size in square meters)
 - yearBuilt (string)
 - chainFree (boolean)
 - vacant (boolean)
 - type.name (property type)
 - classification.name (classification)
+
+SIZE AND AREA SEARCHES:
+- Property size: property.size (total property in sqm) - "house over 150 sqm", "property size under 200 square meters"
+- Garden areas: property.outdoorSpace.rearGardenSize, property.outdoorSpace.frontGardenSize, property.outdoorSpace.totalSize - "garden over 50 sqm", "large garden area"
+- Room sizes: property.bedroomFeatures[].size, property.kitchenFeatures.size, property.livingAreaFeatures.size, property.diningroomFeatures.size, property.bathroomFeatures[].size, property.utility.size - "large kitchen over 15 sqm", "master bedroom size over 20 sqm"
+- Land size: property.land.landSize - "land over 1000 sqm", "large plot"
+
+SIZE QUERY EXAMPLES:
+- "house over 150 sqm" -> property: {size: {gt: 150}}
+- "garden over 50 square meters" -> property: {outdoorSpace: {rearGardenSize: {gt: 50}}}
+- "large kitchen" -> property: {kitchenFeatures: {size: {gt: 15}}}
+- "spacious master bedroom" -> property: {bedroomFeatures: {some: {size: {gt: 20}}}}
+- "property under 100 sqm" -> property: {size: {lt: 100}}
 
 COMPREHENSIVE PROPERTY FEATURES (use nested objects):
 
@@ -332,6 +360,11 @@ OUTDOOR features (property.outdoorSpace.{field}):
 - gardenOffice (boolean) - "garden office"
 - pool (boolean) - "pool", "swimming pool"
 
+IMPORTANT: There is NO field called "garden" - use "rearGarden" for general garden references
+- summerHouse (boolean) - "summer house"
+- gardenOffice (boolean) - "garden office"
+- pool (boolean) - "pool", "swimming pool"
+
 STORAGE features (property.storageFeatures.{field}):
 - attic (boolean) - "attic", "loft storage"
 - basement (boolean) - "basement"
@@ -367,22 +400,37 @@ RECEPTION features (property.reception array):
 - gamesRoom (boolean) - "games room"
 - homeCinema (boolean) - "home cinema"
 
-AMENITIES (property.amenities array with type/subtype):
+AMENITIES (property.amenities single object with type/subtype):
+- ONLY include amenities when explicitly mentioned in the query
 - type: "TRANSPORT", "EDUCATION", "HEALTHCARE", "SHOPPING_ENTERTAINMENT", "GREEN_SPACE"
 - subtype: "TRAIN_STATION", "BUS_STOP", "MOTORWAY_ACCESS", "SCHOOL", "UNIVERSITY", "HOSPITAL", "MEDICAL_CENTRE", "SHOP", "RESTAURANT", "CINEMA", "GYM", "PARK", "TRAIL", "PLAYGROUND", "OTHER"
-- "near train station" -> property: {amenities: {some: {type: "TRANSPORT", subtype: "TRAIN_STATION"}}}
-- "close to school" -> property: {amenities: {some: {type: "EDUCATION", subtype: "SCHOOL"}}}
-- "near shops" -> property: {amenities: {some: {type: "SHOPPING_ENTERTAINMENT", subtype: "SHOP"}}}
-- "near park" -> property: {amenities: {some: {type: "GREEN_SPACE", subtype: "PARK"}}}
-- "hospital nearby" -> property: {amenities: {some: {type: "HEALTHCARE", subtype: "HOSPITAL"}}}
+- "near train station" -> property: {amenities: {type: "TRANSPORT", subtype: "TRAIN_STATION"}}
+- "close to school" -> property: {amenities: {type: "EDUCATION", subtype: "SCHOOL"}}
+- "near shops" -> property: {amenities: {type: "SHOPPING_ENTERTAINMENT", subtype: "SHOP"}}
+- "near park" -> property: {amenities: {type: "GREEN_SPACE", subtype: "PARK"}}
+- "hospital nearby" -> property: {amenities: {type: "HEALTHCARE", subtype: "HOSPITAL"}}
+
+IMPORTANT: Do NOT add amenities for general location queries like "near Cardiff", "near CF37 1LN", or "in London". Only add amenities when specific amenities are explicitly mentioned.
 
 RUNNING COSTS features (property.runningCosts.{field}):
 - councilTaxBand (string) - "council tax band A" -> "A", "council tax band B" -> "B", etc.
 - serviceCharges (number) - "low service charges", "service charges under 100"
 - groundRent (number) - "low ground rent", "no ground rent" -> 0
 
+CRITICAL: ALL property features MUST be nested under "property":
+- runningCosts, energyAndUtilities, accessibilityFeatures, parking, etc. are ALL property features
+- NEVER put property features at the listing level
+
 Convert the user query into a complete Prisma WHERE clause JSON object.
-IGNORE location terms like "in Cardiff", "near Newport" - these are handled separately.
+IGNORE location terms like "in Cardiff", "near Newport", "near CF37 1LN" - these are handled separately by the location system.
+Only include property features and conditions that are explicitly mentioned in the query.
+
+CRITICAL: Do NOT confuse location queries with amenity queries:
+- "house near Cardiff" = NO amenities filter (location handled separately)
+- "house near CF37 1LN" = NO amenities filter (location handled separately) 
+- "house near train station" = amenities filter for TRAIN_STATION
+- "house in London near school" = amenities filter for SCHOOL (location "London" ignored)
+
 Only include conditions that are explicitly mentioned or strongly implied in the query.
 
 IMPORTANT: Extract bedroom numbers from common variations:
@@ -528,11 +576,25 @@ COMPLETE EXAMPLES:
   "property": {
     "type": {"name": "House"},
     "amenities": {
-      "some": {
-        "type": "TRANSPORT",
-        "subtype": "TRAIN_STATION"
-      }
+      "type": "TRANSPORT",
+      "subtype": "TRAIN_STATION"
     }
+  }
+}
+
+"house near Cardiff" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"}
+  }
+}
+
+"house near CF37 1LN" -> 
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"}
   }
 }
 
@@ -543,6 +605,20 @@ COMPLETE EXAMPLES:
     "runningCosts": {
       "councilTaxBand": "A",
       "serviceCharges": {"lt": 200}
+    }
+  }
+}
+
+"eco-friendly house with solar panels and low council tax" ->
+{
+  "published": true,
+  "property": {
+    "type": {"name": "House"},
+    "energyAndUtilities": {
+      "renewables": {"has": "SOLAR_PV"}
+    },
+    "runningCosts": {
+      "councilTaxBand": {"in": ["A", "B"]}
     }
   }
 }
@@ -573,7 +649,7 @@ Return ONLY the complete JSON Prisma WHERE clause object, no other text.
 
     // Get AI to generate the complete WHERE clause
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: schemaPrompt },
         { role: "user", content: `Convert this search query to a complete Prisma WHERE clause: "${query}"` },
@@ -630,12 +706,12 @@ Return ONLY the complete JSON Prisma WHERE clause object, no other text.
           searchType: "rag_sql",
         };
       }
-      
+
       // Ensure property object exists
       if (!whereClause.property) {
         whereClause.property = {};
       }
-      
+
       // Add location filter to property conditions
       whereClause.property.id = { in: propertyIds };
     }
@@ -760,3 +836,45 @@ Return ONLY the complete JSON Prisma WHERE clause object, no other text.
     });
   }
 });
+
+// MapTiler geocoding function
+async function geocodeLocation(locationQuery: string): Promise<{ lat: number; lon: number } | null> {
+  if (!process.env.MAPTILER_API_KEY) {
+    console.log("MapTiler API key not configured");
+    return null;
+  }
+
+  try {
+    const encodedQuery = encodeURIComponent(locationQuery);
+    const response = await fetch(`https://api.maptiler.com/geocoding/${encodedQuery}.json?key=${process.env.MAPTILER_API_KEY}&limit=1&country=GB`);
+
+    if (!response.ok) {
+      console.log(`MapTiler API error: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    if (data.features && data.features.length > 0) {
+      const feature = data.features[0];
+      const [lon, lat] = feature.center;
+      console.log(`MapTiler geocoded "${locationQuery}" to ${lat}, ${lon}`);
+      return { lat, lon };
+    }
+
+    return null;
+  } catch (error) {
+    console.log(`MapTiler geocoding error:`, error);
+    return null;
+  }
+}
+
+// Add to your RAG endpoint after the location handling
+
+// Advanced: Support for polygon-based location queries (e.g., "in central london", "north cardiff")
+async function getLocationPolygon(locationQuery: string): Promise<{ type: "Polygon"; coordinates: number[][][] } | null> {
+  // This could be enhanced to fetch predefined area polygons from your database
+  // or use MapTiler's administrative boundaries API
+  // For now, return null to fall back to radius-based search
+  return null;
+}

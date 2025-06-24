@@ -8,7 +8,7 @@
       <AtomsDivider text="or" class="o-hero-home-divider" />
 
       <div role="presentation" class="o-hero-home-footer-links">
-        <MoleculesIconLink class="o-hero-home-footer-link" to="#" icon="explore/ai" content="Search using AI"
+        <MoleculesIconLink class="o-hero-home-footer-link" to="/" icon="explore/ai" content="Search using AI"
           icon-inline />
         <MoleculesIconLink class="o-hero-home-footer-link" to="/map-search/" icon="explore/map" content="Search by map"
           icon-inline />
