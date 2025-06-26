@@ -368,14 +368,15 @@ amenities (property.amenities):
 ARRAY/RELATION/ENUM RULES:
 - For model arrays (bedroomFeatures, bathroomFeatures, reception): use {"some": {field: value}} for filtering
 - For enum arrays (primaryHeatingType, renewables, connectedUtilities, bed): use {"has": "ENUM_VALUE"}
-- For single object relations (kitchenFeatures, outdoorSpace, etc.): access fields directly (e.g., property.kitchenFeatures.modern: true)
+- For single-value enums (e.g., broadbandType, boilerType, hotWaterSource): filter as { field: "ENUM_VALUE" } (e.g., { "broadbandType": "FTTP" })
+- NEVER use { "has": ... } for single-value enums. Only use { "has": ... } for enum arrays (e.g., primaryHeatingType, renewables, connectedUtilities, bed).
+- For single object relations (kitchenFeatures, outdoorSpace, etc.): you MUST use the Prisma relation filter syntax: { relationName: { is: { field: value } } } (e.g., property.outdoorSpace: { is: { rearGarden: true } })
+- DO NOT use additionalFeatures as a filter in the query. The additionalFeatures relation is NOT available as a filter in the Prisma PropertyWhereInput type. Any query that attempts to filter by property.additionalFeatures will cause a FATAL ERROR and must be rejected.
 - For type/classification: use {name: "..."} (e.g., property.type: {name: "House"})
 - NEVER use invented fields (e.g., garden: true is INVALID; use property.outdoorSpace.rearGarden: true)
 - NEVER use "has" for object relations; only for enum arrays
 - saleListing and rentalListing (and all their fields, e.g. furnished) MUST ONLY appear at the ROOT level of the query, NEVER inside property or any nested object. Any query with saleListing or rentalListing inside property is INVALID.
 - Respond with ONLY valid JSON, no comments, no markdown
-
-EXAMPLES:
 "3 bedroom detached house for sale" →
 {
   "whereClause": {
@@ -468,11 +469,64 @@ EXAMPLES:
   "queryAnalysis": {"usedTerms": ["flat", "FTTP", "broadband", "balcony"], "ignoredTerms": []}
 }
 
-REMEMBER:
-- Use only the fields, enums, and relations as listed above.
-- Do NOT invent or generalize field names.
-- Use correct Prisma syntax for arrays, enums, and object relations.
-- saleListing and rentalListing (and all their fields, e.g. furnished) MUST ONLY appear at the ROOT level of the query, NEVER inside property or any nested object. Any query with saleListing or rentalListing inside property is INVALID.
-- Respond with valid JSON only, no markdown or comments.
+"furnished flat with bills included" →
+{
+  "whereClause": {
+    "published": true,
+    "rentalListing": { "isNot": null },
+    "property": {
+      "type": { "name": "Flat" }
+    },
+    "rentalListing": { "is": { "furnishedStatus": "FURNISHED", "isBillsIncluded": true } }
+  },
+  "queryAnalysis": { "usedTerms": ["furnished", "flat", "bills included"], "ignoredTerms": [] }
+}
+
+"pet friendly house with garden" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "type": { "name": "House" },
+      "additionalFeatures": { "is": { "petFriendly": true } },
+      "outdoorSpace": { "is": { "rearGarden": true } }
+    }
+  },
+  "queryAnalysis": { "usedTerms": ["pet friendly", "house", "garden"], "ignoredTerms": [] }
+}
+
+"pet friendly house with gardens" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "type": { "name": "House" },
+      "additionalFeatures": { "is": { "petFriendly": true } },
+      "outdoorSpace": { "is": { "frontGarden": true, "rearGarden": true } }
+    }
+  },
+  "queryAnalysis": { "usedTerms": ["pet friendly", "house", "gardens"], "ignoredTerms": [] }
+}
+
+// SPECIAL MAPPING: "fast broadband" or similar phrases should NOT be mapped to broadbandType: "UNKNOWN". Instead, map as follows:
+// - If the user requests "fast broadband", map to property.energyAndUtilities.fullFibreAvailable: true OR property.energyAndUtilities.maxDownloadSpeedMbps >= 100 (or another suitable threshold for fast broadband).
+// - Do NOT use broadbandType: "UNKNOWN" for "fast broadband" or similar queries.
+//
+// EXAMPLES:
+// "house with home office and fast broadband" →
+// {
+//   "whereClause": {
+//     "published": true,
+//     "property": {
+//       "type": { "name": "House" },
+//       "additionalFeatures": { "is": { "homeOffice": true } },
+//       "energyAndUtilities": {
+//         "fullFibreAvailable": true
+//         // Optionally, you may also include: "maxDownloadSpeedMbps": { "gte": 100 }
+//       }
+//     }
+//   },
+//   "queryAnalysis": { "usedTerms": ["house", "home", "office", "fast", "broadband"], "ignoredTerms": [] }
+// }
 `;
 }
