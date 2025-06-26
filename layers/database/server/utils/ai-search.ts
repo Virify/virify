@@ -370,7 +370,7 @@ ARRAY/RELATION/ENUM RULES:
 - For single-value enums (e.g., broadbandType, boilerType, hotWaterSource): filter as { field: "ENUM_VALUE" } (e.g., { "broadbandType": "FTTP" })
 - NEVER use { "has": ... } for single-value enums. Only use { "has": ... } for enum arrays (e.g., primaryHeatingType, renewables, connectedUtilities, bed).
 - For single object relations (kitchenFeatures, outdoorSpace, etc.): you MUST use the Prisma relation filter syntax: { relationName: { is: { field: value } } } (e.g., property.outdoorSpace: { is: { rearGarden: true } })
-- DO NOT use additionalFeatures as a filter in the query. The additionalFeatures relation is NOT available as a filter in the Prisma PropertyWhereInput type. Any query that attempts to filter by property.additionalFeatures will cause a FATAL ERROR and must be rejected.
+- DO NOT use additionalFeatures as a filter in the query. The additionalFeatures relation is NOT available as a filter in the Prisma PropertyWhereInput type. Any query that attempts to filter by property.additionalFeatures will cause a FATAL ERROR and must be rejected. This includes filtering for petFriendly, homeOffice, or any other field inside additionalFeatures. These cannot be filtered directly and must be ignored in the query.
 - For type/classification: use {name: "..."} (e.g., property.type: {name: "House"})
 - NEVER use invented fields (e.g., garden: true is INVALID; use property.outdoorSpace.rearGarden: true)
 - NEVER use "has" for object relations; only for enum arrays
@@ -481,32 +481,6 @@ ARRAY/RELATION/ENUM RULES:
   "queryAnalysis": { "usedTerms": ["furnished", "flat", "bills included"], "ignoredTerms": [] }
 }
 
-"pet friendly house with garden" →
-{
-  "whereClause": {
-    "published": true,
-    "property": {
-      "type": { "name": "House" },
-      "additionalFeatures": { "is": { "petFriendly": true } },
-      "outdoorSpace": { "is": { "rearGarden": true } }
-    }
-  },
-  "queryAnalysis": { "usedTerms": ["pet friendly", "house", "garden"], "ignoredTerms": [] }
-}
-
-"pet friendly house with gardens" →
-{
-  "whereClause": {
-    "published": true,
-    "property": {
-      "type": { "name": "House" },
-      "additionalFeatures": { "is": { "petFriendly": true } },
-      "outdoorSpace": { "is": { "frontGarden": true, "rearGarden": true } }
-    }
-  },
-  "queryAnalysis": { "usedTerms": ["pet friendly", "house", "gardens"], "ignoredTerms": [] }
-}
-
 // SPECIAL MAPPING: "fast broadband" or similar phrases should NOT be mapped to broadbandType: "UNKNOWN". Instead, map as follows:
 // - If the user requests "fast broadband", map to property.energyAndUtilities.fullFibreAvailable: true OR property.energyAndUtilities.maxDownloadSpeedMbps >= 100 (or another suitable threshold for fast broadband).
 // - Do NOT use broadbandType: "UNKNOWN" for "fast broadband" or similar queries.
@@ -526,6 +500,32 @@ ARRAY/RELATION/ENUM RULES:
 //     }
 //   },
 //   "queryAnalysis": { "usedTerms": ["house", "home", "office", "fast", "broadband"], "ignoredTerms": [] }
+// }
+//
+// "pet friendly house with garden" →
+// {
+//   "whereClause": {
+//     "published": true,
+//     "property": {
+//       "type": { "name": "House" },
+//       // petFriendly cannot be filtered directly due to Prisma limitations
+//       "outdoorSpace": { "is": { "rearGarden": true } }
+//     }
+//   },
+//   "queryAnalysis": { "usedTerms": ["pet friendly", "house", "garden"], "ignoredTerms": ["pet friendly"] }
+// }
+//
+// "pet friendly house with gardens" →
+// {
+//   "whereClause": {
+//     "published": true,
+//     "property": {
+//       "type": { "name": "House" },
+//       // petFriendly cannot be filtered directly due to Prisma limitations
+//       "outdoorSpace": { "is": { "frontGarden": true, "rearGarden": true } }
+//     }
+//   },
+//   "queryAnalysis": { "usedTerms": ["pet friendly", "house", "gardens"], "ignoredTerms": ["pet friendly"] }
 // }
 `;
 }

@@ -68,13 +68,6 @@
             {{ isSearching ? "Searching..." : "Search" }}
           </button>
         </div>
-
-        <!-- Selected Location Info -->
-        <div v-if="selectedLocation" class="location-info">
-          <p class="location-note">
-            <strong>Searching within {{ searchRadius }} miles of {{ selectedLocation.place_name_en }}</strong>
-          </p>
-        </div>
       </form>
     </div>
 
@@ -93,20 +86,6 @@
     <div v-else-if="searchResults.length > 0" class="results-section">
       <div class="results-header">
         <h3 class="| title-xs">Search Results ({{ searchResults.length }})</h3>
-        <span v-if="detectedListingType" class="detected-type">
-          Searching for:
-          <span class="type-badge" :class="`type-${detectedListingType}`">
-            {{ detectedListingType === "sale" ? "Sale Properties" : detectedListingType === "rental" ? "Rental Properties" : "Sale & Rental Properties" }}
-          </span>
-        </span>
-        <span v-if="detectedPriceRange" class="detected-price">
-          Price range:
-          <span class="price-badge">
-            <span v-if="detectedPriceRange.minPrice && detectedPriceRange.maxPrice"> £{{ detectedPriceRange.minPrice.toLocaleString() }} - £{{ detectedPriceRange.maxPrice.toLocaleString() }} </span>
-            <span v-else-if="detectedPriceRange.minPrice"> Over £{{ detectedPriceRange.minPrice.toLocaleString() }} </span>
-            <span v-else-if="detectedPriceRange.maxPrice"> Under £{{ detectedPriceRange.maxPrice.toLocaleString() }} </span>
-          </span>
-        </span>
       </div>
 
       <div class="results-grid">
@@ -187,14 +166,11 @@ const isSearching = ref(false);
 const hasSearched = ref(false);
 const lastSearchQuery = ref("");
 const searchError = ref("");
-const detectedListingType = ref("");
-const detectedPriceRange = ref<{ minPrice?: number; maxPrice?: number } | null>(null);
 const queryAnalysis = ref<{ usedTerms: string[]; ignoredTerms: string[] } | null>(null);
 const locationQuery = ref("");
 const locationSuggestions = ref<any[]>([]);
 const selectedLocation = ref<any>(null);
 const searchRadius = ref(10);
-const geocodedResults = ref<any[]>([]);
 const suppressLocationFetch = ref(false);
 const lastExecutedQuery = ref("");
 const lastSearchRadius = ref(searchRadius.value);
@@ -263,7 +239,6 @@ async function onLocationInput() {
     if (query && query.length > 2) {
       try {
         const results = await autoComplete(query);
-        geocodedResults.value = results;
         locationSuggestions.value = results;
       } catch {
         locationSuggestions.value = [];
@@ -357,8 +332,6 @@ async function searchProperties() {
     const typedResponse = response as any;
     searchResults.value = Array.isArray(typedResponse.results) ? typedResponse.results : [];
     hasSearched.value = true;
-    detectedListingType.value = typedResponse.detectedListingType || "both";
-    detectedPriceRange.value = typedResponse.detectedPriceRange || null;
     queryAnalysis.value = typedResponse.queryAnalysis || null;
   } catch (error: any) {
     searchError.value = error.statusMessage || error.message || "Failed to search properties";
