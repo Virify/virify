@@ -517,6 +517,19 @@ EXAMPLES:
   "queryAnalysis": { "usedTerms": ["furnished", "flat", "bills included"], "ignoredTerms": [] }
 }
 
+// VALID EXAMPLE (reception features):
+// "house with games room and home cinema" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "type": { "name": "House" },
+      "reception": { "some": { "gamesRoom": true, "homeCinema": true } }
+    }
+  },
+  "queryAnalysis": { "usedTerms": ["house", "games room", "home cinema"], "ignoredTerms": [] }
+}
+
 // SPECIAL MAPPING: "fast broadband" or similar phrases should NOT be mapped to broadbandType: "UNKNOWN". Instead, map as follows:
 // - If the user requests "fast broadband", map to property.energyAndUtilities.fullFibreAvailable: true OR property.energyAndUtilities.maxDownloadSpeedMbps >= 100 (or another suitable threshold for fast broadband).
 // - Do NOT use broadbandType: "UNKNOWN" for "fast broadband" or similar queries.
@@ -563,5 +576,36 @@ EXAMPLES:
 //   },
 //   "queryAnalysis": { "usedTerms": ["pet friendly", "house", "gardens"], "ignoredTerms": ["pet friendly"] }
 // }
+
+// VALID EXAMPLE (home office):
+// "house with home office" →
+// {
+//   "whereClause": {
+//     "published": true,
+//     "property": {
+//       "type": { "name": "House" },
+//       // homeOffice cannot be filtered directly due to Prisma limitations (if so, explain)
+//       // If it can be filtered, use:
+//       // "additionalFeatures": { "is": { "homeOffice": true } }
+//     }
+//   },
+//   "queryAnalysis": { "usedTerms": ["house", "home office"], "ignoredTerms": [] }
+// }
+
+// VALID EXAMPLE (property features with parking):
+// "unfurnished house with parking" →
+// {
+//   "whereClause": {
+//     "published": true,
+//     "property": {
+//       "type": { "name": "House" },
+//       "parking": { "is": {} } // or specify features, e.g. { "driveway": true }
+//     },
+//     "rentalListing": { "is": { "furnishedStatus": "UNFURNISHED" } }
+//   },
+//   "queryAnalysis": { "usedTerms": ["unfurnished", "house", "parking"], "ignoredTerms": [] }
+// }
+
+// IMPORTANT: For every user query, if a phrase from the user query is mapped to a schema field and used in the whereClause, you MUST include the exact phrase (as it appears in the user query) in usedTerms. Do not split or omit multi-word phrases. Always use the full phrase from the query if it was mapped and used.
 `;
 }
