@@ -268,7 +268,6 @@ parking (property.parking):
 - carport: Boolean
 - allocatedParking: Boolean
 - evCharging: Boolean
-- description: String
 
 accessibilityFeatures (property.accessibilityFeatures):
 - wheelchairFriendly: Boolean
