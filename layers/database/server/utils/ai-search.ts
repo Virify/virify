@@ -376,7 +376,36 @@ ARRAY/RELATION/ENUM RULES:
 - NEVER use "has" for object relations; only for enum arrays
 - saleListing and rentalListing (and all their fields, e.g. furnished) MUST ONLY appear at the ROOT level of the query, NEVER inside property or any nested object. Any query with saleListing or rentalListing inside property is INVALID.
 - Respond with ONLY valid JSON, no comments, no markdown
-"3 bedroom detached house for sale" →
+
+IMPORTANT: For every user query, you MUST return a queryAnalysis object with two arrays:
+- usedTerms: all terms/phrases from the user query that were mapped to valid schema fields and used in the whereClause
+- ignoredTerms: all terms/phrases from the user query that were NOT mapped to any schema field and NOT used in the whereClause (including any words, phrases, or objects not present in the schema)
+
+You MUST parse the user query into all meaningful terms and phrases. For each, if it is not mapped to a valid schema field, add it to ignoredTerms. This includes any invented, irrelevant, or non-schema terms (e.g., 'jukebox', 'slide', 'castle', etc). This ensures the frontend can cross out all non-schema terms in the query analysis UI.
+
+EXAMPLES:
+
+"house with underfloor heating and smart meter and a jukebox and 2 bathrooms, one upstairs and one downstairs" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "type": { "name": "House" },
+      "energyAndUtilities": {
+        "primaryHeatingType": { "has": "UNDERFLOOR" },
+        "renewables": { "has": "SMART_METER" }
+      },
+      "bathroomFeatures": { "some": { "roomNumber": 2, "upstairs": true, "downstairs": true } }
+    }
+  },
+  "queryAnalysis": {
+    "usedTerms": ["house", "underfloor heating", "smart meter", "2 bathrooms", "upstairs", "downstairs"],
+    "ignoredTerms": ["jukebox"]
+  }
+}
+
+// VALID EXAMPLE (all terms mapped):
+// "3 bedroom detached house for sale" →
 {
   "whereClause": {
     "published": true,
@@ -390,7 +419,8 @@ ARRAY/RELATION/ENUM RULES:
   "queryAnalysis": {"usedTerms": ["3", "bedroom", "detached", "house", "sale"], "ignoredTerms": []}
 }
 
-"cottage with log burner" →
+// VALID EXAMPLE (some terms ignored):
+// "cottage with log burner and jukebox" →
 {
   "whereClause": {
     "published": true,
@@ -399,10 +429,11 @@ ARRAY/RELATION/ENUM RULES:
       "livingAreaFeatures": {"fireplace": "LOG_BURNER"}
     }
   },
-  "queryAnalysis": {"usedTerms": ["cottage", "log", "burner"], "ignoredTerms": []}
+  "queryAnalysis": {"usedTerms": ["cottage", "log", "burner"], "ignoredTerms": ["jukebox"]}
 }
 
-"rental under £2000" →
+// VALID EXAMPLE (no ignored terms):
+// "rental under £2000" →
 {
   "whereClause": {
     "published": true,
@@ -412,7 +443,8 @@ ARRAY/RELATION/ENUM RULES:
   "queryAnalysis": {"usedTerms": ["rental", "under", "2000"], "ignoredTerms": []}
 }
 
-"house with solar panels and EV charger" →
+// VALID EXAMPLE (multiple ignored terms):
+// "house with solar panels, EV charger, and jukebox" →
 {
   "whereClause": {
     "published": true,
@@ -424,10 +456,11 @@ ARRAY/RELATION/ENUM RULES:
       }
     }
   },
-  "queryAnalysis": {"usedTerms": ["house", "solar", "panels", "EV", "charger"], "ignoredTerms": []}
+  "queryAnalysis": {"usedTerms": ["house", "solar", "panels", "EV", "charger"], "ignoredTerms": ["jukebox"]}
 }
 
-"bedroom with en suite and walk-in wardrobe" →
+// VALID EXAMPLE (complex query with all features):
+// "bedroom with en suite and walk-in wardrobe" →
 {
   "whereClause": {
     "published": true,
@@ -443,7 +476,8 @@ ARRAY/RELATION/ENUM RULES:
   "queryAnalysis": {"usedTerms": ["bedroom", "en suite", "walk-in", "wardrobe"], "ignoredTerms": []}
 }
 
-"property with rear garden and driveway" →
+// VALID EXAMPLE (property features):
+// "property with rear garden and driveway" →
 {
   "whereClause": {
     "published": true,
@@ -455,7 +489,8 @@ ARRAY/RELATION/ENUM RULES:
   "queryAnalysis": {"usedTerms": ["rear", "garden", "driveway"], "ignoredTerms": []}
 }
 
-"flat with FTTP broadband and balcony" →
+// VALID EXAMPLE (flat features):
+// "flat with FTTP broadband and balcony" →
 {
   "whereClause": {
     "published": true,
@@ -468,7 +503,8 @@ ARRAY/RELATION/ENUM RULES:
   "queryAnalysis": {"usedTerms": ["flat", "FTTP", "broadband", "balcony"], "ignoredTerms": []}
 }
 
-"furnished flat with bills included" →
+// VALID EXAMPLE (rental features):
+// "furnished flat with bills included" →
 {
   "whereClause": {
     "published": true,
