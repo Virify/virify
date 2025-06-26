@@ -1,11 +1,8 @@
 import * as z from "zod";
-import { PrismaClient } from "@prisma/client";
 import type { SearchResult } from "~~/shared/types/search";
 import { generateWhereClauseFromQuery } from "../../../utils/ai-search";
 import { getPropertyIdsByDistance } from "../../../utils/location";
 import { propertyInclude } from "../../../utils/property";
-
-const prisma = new PrismaClient();
 
 const ragSearchSchema = z.object({
   query: z.string().min(1, "Query is required"),
@@ -41,7 +38,7 @@ export default defineEventHandler(async (event) => {
     }
 
     console.log(`RAG Search query: "${query}"`);
-    
+
     // Handle location filtering first
     let propertyIds: number[] | null = null;
     let locationContext = "";
@@ -61,7 +58,7 @@ export default defineEventHandler(async (event) => {
 
     // Generate AI-powered WHERE clause
     const { whereClause, queryAnalysis } = await generateWhereClauseFromQuery(query, null);
-    
+
     console.log("AI WHERE clause:", JSON.stringify(whereClause, null, 2));
 
     // Add location filtering if we have property IDs
@@ -78,7 +75,7 @@ export default defineEventHandler(async (event) => {
           searchType: "rag_sql",
         };
       }
-      
+
       // Add property ID constraint to WHERE clause
       if (!whereClause.property) {
         whereClause.property = {};
@@ -98,62 +95,72 @@ export default defineEventHandler(async (event) => {
     });
 
     console.log(`Found ${listings.length} listings matching conditions`);
-    
+
     // Format results
-    const formattedResults = listings.map((listing): SearchResult => ({
-      id: listing.id,
-      title: listing.title,
-      description: listing.description,
-      price: listing.price,
-      publishedAt: listing.publishedAt || undefined,
-      listingTier: listing.listingTier,
-      moveInDate: listing.moveInDate,
-      similarity: 1.0,
-      listingType: listing.rentalListing ? "rent" : listing.saleListing ? "buy" : "unknown",
-      property: listing.property ? {
-        id: listing.property.id,
-        numberBedrooms: listing.property.numberBedrooms,
-        numberBathrooms: listing.property.numberBathrooms,
-        numberReceptions: listing.property.numberReceptions,
-        size: listing.property.size,
-        yearBuilt: listing.property.yearBuilt,
-        chainFree: listing.property.chainFree,
-        vacant: listing.property.vacant,
-        constructionType: listing.property.constructionType,
-        floorLevel: listing.property.floorLevel,
-        address: listing.property.address ? {
-          city: listing.property.address.city,
-          county: listing.property.address.county,
-          postcode: listing.property.address.postcode,
-          street: listing.property.address.street,
-          lat: listing.property.address.lat,
-          lon: listing.property.address.lon,
-        } : undefined,
-        type: listing.property.type ? {
-          name: listing.property.type.name,
-        } : undefined,
-        classification: listing.property.classification ? {
-          name: listing.property.classification.name,
-        } : undefined,
-        bedroomFeatures: listing.property.bedroomFeatures,
-        bathroomFeatures: listing.property.bathroomFeatures,
-        parking: listing.property.parking,
-        amenities: listing.property.amenities ? [listing.property.amenities] : undefined,
-        additionalFeatures: listing.property.additionalFeatures,
-        accessibilityFeatures: listing.property.accessibilityFeatures,
-        diningroomFeatures: listing.property.diningroomFeatures,
-        kitchenFeatures: listing.property.kitchenFeatures,
-        livingAreaFeatures: listing.property.livingAreaFeatures,
-        reception: listing.property.reception,
-        utility: listing.property.utility,
-        additionalToilet: listing.property.additionalToilet,
-        outdoorSpace: listing.property.outdoorSpace,
-        energyAndUtilities: listing.property.energyAndUtilities,
-        securityFeatures: listing.property.securityFeatures,
-        storageFeatures: listing.property.storageFeatures,
-      } : undefined,
-    }));
-    
+    const formattedResults = listings.map(
+      (listing): SearchResult => ({
+        id: listing.id,
+        title: listing.title,
+        description: listing.description,
+        price: listing.price,
+        publishedAt: listing.publishedAt || undefined,
+        listingTier: listing.listingTier,
+        moveInDate: listing.moveInDate,
+        similarity: 1.0,
+        listingType: listing.rentalListing ? "rent" : listing.saleListing ? "buy" : "unknown",
+        property: listing.property
+          ? {
+              id: listing.property.id,
+              numberBedrooms: listing.property.numberBedrooms,
+              numberBathrooms: listing.property.numberBathrooms,
+              numberReceptions: listing.property.numberReceptions,
+              size: listing.property.size,
+              yearBuilt: listing.property.yearBuilt,
+              chainFree: listing.property.chainFree,
+              vacant: listing.property.vacant,
+              constructionType: listing.property.constructionType,
+              floorLevel: listing.property.floorLevel,
+              address: listing.property.address
+                ? {
+                    city: listing.property.address.city,
+                    county: listing.property.address.county,
+                    postcode: listing.property.address.postcode,
+                    street: listing.property.address.street,
+                    lat: listing.property.address.lat,
+                    lon: listing.property.address.lon,
+                  }
+                : undefined,
+              type: listing.property.type
+                ? {
+                    name: listing.property.type.name,
+                  }
+                : undefined,
+              classification: listing.property.classification
+                ? {
+                    name: listing.property.classification.name,
+                  }
+                : undefined,
+              bedroomFeatures: listing.property.bedroomFeatures,
+              bathroomFeatures: listing.property.bathroomFeatures,
+              parking: listing.property.parking,
+              amenities: listing.property.amenities ? [listing.property.amenities] : undefined,
+              additionalFeatures: listing.property.additionalFeatures,
+              accessibilityFeatures: listing.property.accessibilityFeatures,
+              diningroomFeatures: listing.property.diningroomFeatures,
+              kitchenFeatures: listing.property.kitchenFeatures,
+              livingAreaFeatures: listing.property.livingAreaFeatures,
+              reception: listing.property.reception,
+              utility: listing.property.utility,
+              additionalToilet: listing.property.additionalToilet,
+              outdoorSpace: listing.property.outdoorSpace,
+              energyAndUtilities: listing.property.energyAndUtilities,
+              securityFeatures: listing.property.securityFeatures,
+              storageFeatures: listing.property.storageFeatures,
+            }
+          : undefined,
+      })
+    );
+
     return {
       results: formattedResults,
       query,
@@ -178,7 +185,7 @@ export default defineEventHandler(async (event) => {
 function shouldApplyLimit(query: string, limit: number): boolean {
   const broadTerms = ["all properties", "all houses", "all flats"];
   const queryLower = query.toLowerCase();
-  
+
   if (limit >= 1000) return false;
-  return !broadTerms.some(term => queryLower.includes(term));
+  return !broadTerms.some((term) => queryLower.includes(term));
 }

@@ -3,8 +3,7 @@
     <h1 class="| title-md">AI Search Test</h1>
 
     <div class="| flow">
-      <p>Test AI-powered property search using RAG (Retrieval-Augmented Generation) where AI generates exact SQL filters
-        for perfect matching.</p>
+      <p>Test AI-powered property search using RAG (Retrieval-Augmented Generation) where AI generates exact SQL filters for perfect matching.</p>
     </div>
 
     <h2 class="| title-sm">Search Properties</h2>
@@ -13,8 +12,7 @@
     <div class="search-suggestions">
       <h2 class="title-xs">Suggestion searches</h2>
       <div class="suggestions-grid">
-        <button v-for="suggestion in allSuggestions" :key="suggestion" @click="selectExampleQuery(suggestion)"
-          class="suggestion-item">
+        <button v-for="suggestion in allSuggestions" :key="suggestion" @click="selectExampleQuery(suggestion)" class="suggestion-item">
           {{ suggestion }}
         </button>
       </div>
@@ -26,21 +24,9 @@
         <div class="location-radius-row">
           <div class="location-input-wrapper">
             <label for="location-input" class="location-label">Location</label>
-            <input 
-              id="location-input"
-              v-model="locationQuery" 
-              type="text"
-              placeholder="Enter location (e.g., Cardiff, Newport, CF37 1LN)" 
-              class="location-input"
-              :disabled="isSearching"
-              @input="onLocationInput" />
+            <input id="location-input" v-model="locationQuery" type="text" placeholder="Enter location (e.g., Cardiff, Newport, CF37 1LN)" class="location-input" :disabled="isSearching" autocomplete="off" @input="onLocationInput" />
             <div v-if="locationSuggestions.length > 0" class="location-suggestions">
-              <button 
-                v-for="suggestion in locationSuggestions" 
-                :key="suggestion.place_name_en"
-                type="button"
-                @click="selectLocation(suggestion)"
-                class="suggestion-item">
+              <button v-for="suggestion in locationSuggestions" :key="suggestion.place_name_en" type="button" @click="selectLocation(suggestion)" class="suggestion-item">
                 {{ suggestion.place_name_en }}
               </button>
             </div>
@@ -48,11 +34,7 @@
 
           <div class="radius-input-wrapper">
             <label for="radius-select" class="radius-label">Radius</label>
-            <select 
-              id="radius-select"
-              v-model="searchRadius" 
-              class="radius-select"
-              :disabled="isSearching">
+            <select id="radius-select" v-model="searchRadius" class="radius-select" :disabled="isSearching">
               <option value="5">5 miles</option>
               <option value="10">10 miles</option>
               <option value="15">15 miles</option>
@@ -70,23 +52,20 @@
           <div class="search-input-wrapper">
             <label for="search-input" class="search-label">What are you looking for?</label>
             <div class="styled-input-container">
-              <div 
-                v-if="hasSearched && queryAnalysis"
-                class="input-background-text"
-                v-html="getAnalyzedQuery()">
-              </div>
-              <input 
+              <div v-if="hasSearched && queryAnalysis" class="input-background-text" v-html="getAnalyzedQuery()"></div>
+              <input
                 id="search-input"
-                v-model="searchQuery" 
+                v-model="searchQuery"
                 type="text"
-                placeholder="e.g., '3 bedroom house with modern kitchen', 'furnished flat with parking'" 
+                placeholder="e.g., '3 bedroom house with modern kitchen', 'furnished flat with parking'"
                 class="search-input"
                 :class="{ 'has-styling': hasSearched && queryAnalysis }"
-                :disabled="isSearching" />
+                :disabled="isSearching"
+              />
             </div>
           </div>
           <button type="submit" class="search-button" :disabled="isSearching || !searchQuery.trim() || !selectedLocation">
-            {{ isSearching ? 'Searching...' : 'Search' }}
+            {{ isSearching ? "Searching..." : "Search" }}
           </button>
         </div>
 
@@ -98,8 +77,6 @@
         </div>
       </form>
     </div>
-
-
 
     <!-- Loading State -->
     <div v-if="isSearching" class="loading-section">
@@ -119,23 +96,15 @@
         <span v-if="detectedListingType" class="detected-type">
           Searching for:
           <span class="type-badge" :class="`type-${detectedListingType}`">
-            {{ detectedListingType === 'sale' ? 'Sale Properties' :
-              detectedListingType === 'rental' ? 'Rental Properties' :
-                'Sale & Rental Properties' }}
+            {{ detectedListingType === "sale" ? "Sale Properties" : detectedListingType === "rental" ? "Rental Properties" : "Sale & Rental Properties" }}
           </span>
         </span>
         <span v-if="detectedPriceRange" class="detected-price">
           Price range:
           <span class="price-badge">
-            <span v-if="detectedPriceRange.minPrice && detectedPriceRange.maxPrice">
-              £{{ detectedPriceRange.minPrice.toLocaleString() }} - £{{ detectedPriceRange.maxPrice.toLocaleString() }}
-            </span>
-            <span v-else-if="detectedPriceRange.minPrice">
-              Over £{{ detectedPriceRange.minPrice.toLocaleString() }}
-            </span>
-            <span v-else-if="detectedPriceRange.maxPrice">
-              Under £{{ detectedPriceRange.maxPrice.toLocaleString() }}
-            </span>
+            <span v-if="detectedPriceRange.minPrice && detectedPriceRange.maxPrice"> £{{ detectedPriceRange.minPrice.toLocaleString() }} - £{{ detectedPriceRange.maxPrice.toLocaleString() }} </span>
+            <span v-else-if="detectedPriceRange.minPrice"> Over £{{ detectedPriceRange.minPrice.toLocaleString() }} </span>
+            <span v-else-if="detectedPriceRange.maxPrice"> Under £{{ detectedPriceRange.maxPrice.toLocaleString() }} </span>
           </span>
         </span>
       </div>
@@ -150,12 +119,8 @@
             <p class="result-description">{{ result.description }}</p>
             <div class="result-details">
               <span class="price">£{{ result.price?.toLocaleString() }}</span>
-              <span v-if="result.property?.numberBedrooms" class="bedrooms">
-                {{ result.property.numberBedrooms }} bed
-              </span>
-              <span v-if="result.property?.numberBathrooms" class="bathrooms">
-                {{ result.property.numberBathrooms }} bath
-              </span>
+              <span v-if="result.property?.numberBedrooms" class="bedrooms"> {{ result.property.numberBedrooms }} bed </span>
+              <span v-if="result.property?.numberBathrooms" class="bathrooms"> {{ result.property.numberBathrooms }} bath </span>
               <span v-if="result.property?.address?.city" class="location">
                 {{ result.property.address.city }}
               </span>
@@ -163,7 +128,7 @@
                 {{ result.property.type.name }}
               </span>
               <span class="listing-type" :class="`type-${result.listingType}`">
-                {{ result.listingType === 'rent' ? 'Rental' : 'Sale' }}
+                {{ result.listingType === "rent" ? "Rental" : "Sale" }}
               </span>
             </div>
 
@@ -183,8 +148,9 @@
 
     <div v-else-if="hasSearched && !isSearching" class="no-results">
       <h3 class="| title-xs">No Results Found</h3>
-      <p>Sorry, we couldn't find any properties matching your search criteria for <strong>"{{ lastSearchQuery
-      }}"</strong>.</p>
+      <p>
+        Sorry, we couldn't find any properties matching your search criteria for <strong>"{{ lastSearchQuery }}"</strong>.
+      </p>
       <p class="suggestions">Try:</p>
       <ul class="suggestions-list">
         <li>Removing some specific requirements</li>
@@ -201,297 +167,254 @@
 </template>
 
 <script setup lang="ts">
-// Nuxt composables
-const route = useRoute()
+/**
+ * AI Search Page Logic
+ *
+ * - Handles user input, location autocomplete, and search suggestions.
+ * - Calls backend API to perform AI-driven property search.
+ * - Displays results, highlights query analysis, and manages UI state.
+ * - Uses shared property feature extraction utility for result display.
+ */
 
-// Import property features utility
-import { extractPropertyFeatures } from '~~/shared/utils/property-features'
-// Import shared search types
-import type { SearchResult, SearchResponse } from '~~/shared/types/search'
+const route = useRoute();
 
-// Import map utilities for location autocomplete
-const { autoComplete } = useMap()
+import { extractPropertyFeatures } from "~~/shared/utils/property-features";
+import type { SearchResult } from "~~/shared/types/search";
+const { autoComplete } = useMap();
+const searchQuery = ref("");
+const searchResults = ref<SearchResult[]>([]);
+const isSearching = ref(false);
+const hasSearched = ref(false);
+const lastSearchQuery = ref("");
+const searchError = ref("");
+const detectedListingType = ref("");
+const detectedPriceRange = ref<{ minPrice?: number; maxPrice?: number } | null>(null);
+const queryAnalysis = ref<{ usedTerms: string[]; ignoredTerms: string[] } | null>(null);
+const locationQuery = ref("");
+const locationSuggestions = ref<any[]>([]);
+const selectedLocation = ref<any>(null);
+const searchRadius = ref(10);
+const geocodedResults = ref<any[]>([]);
+const suppressLocationFetch = ref(false);
+const lastExecutedQuery = ref("");
+const lastSearchRadius = ref(searchRadius.value);
+const isInitialLoad = ref(true);
+let searchTimeout: NodeJS.Timeout | null = null;
+let locationTimeout: NodeJS.Timeout | null = null;
 
-// Search functionality
-const searchQuery = ref('')
-const searchResults = ref<SearchResult[]>([])
-const isSearching = ref(false)
-const hasSearched = ref(false)
-const lastSearchQuery = ref('')
-const searchError = ref('')
-const detectedListingType = ref('')
-const detectedPriceRange = ref<{ minPrice?: number, maxPrice?: number } | null>(null)
-const queryAnalysis = ref<{ usedTerms: string[], ignoredTerms: string[] } | null>(null)
-
-// Location functionality
-const locationQuery = ref('')
-const locationSuggestions = ref<any[]>([])
-const selectedLocation = ref<any>(null)
-const searchRadius = ref(10) // Default 10 miles
-const geocodedResults = ref<any[]>([])
-const suppressLocationFetch = ref(false)
-
-// Track the last executed search to prevent duplicates
-const lastExecutedQuery = ref('')
-const lastSearchRadius = ref(searchRadius.value)
-const isInitialLoad = ref(true)
-let searchTimeout: NodeJS.Timeout | null = null
-
-// Check for query parameter on page load and auto-search
+// Reactive references for location and search state
 onMounted(() => {
-  const queryParam = route.query.q as string
+  const queryParam = route.query.q as string;
   if (queryParam) {
-    const decodedQuery = decodeURIComponent(queryParam)
-    searchQuery.value = decodedQuery
-    lastExecutedQuery.value = decodedQuery
-    nextTick(() => searchProperties())
+    const decodedQuery = decodeURIComponent(queryParam);
+    searchQuery.value = decodedQuery;
+    lastExecutedQuery.value = decodedQuery;
+    nextTick(() => searchProperties());
   }
-  isInitialLoad.value = false
-})
+  isInitialLoad.value = false;
+});
 
-// Page metadata that updates based on search query
+
 useHead(() => ({
-  title: searchQuery.value
-    ? `AI Search: ${searchQuery.value} | Property Search`
-    : 'AI Property Search - Smart Property Discovery',
+  title: searchQuery.value ? `AI Search: ${searchQuery.value} | Property Search` : "AI Property Search - Smart Property Discovery",
   meta: [
     {
-      name: 'description',
+      name: "description",
       content: searchQuery.value
         ? `AI search results for "${searchQuery.value}" - Advanced property search with intelligent filtering and natural language understanding.`
-        : 'Revolutionary AI-powered property search. Use natural language to find your perfect home with intelligent filtering and smart matching.'
-    }
-  ]
-}))
+        : "Revolutionary AI-powered property search. Use natural language to find your perfect home with intelligent filtering and smart matching.",
+    },
+  ],
+}));
 
-// Watch for route changes (if user navigates with different query)
-watch(() => route.query.q, (newQuery) => {
-  if (newQuery && typeof newQuery === 'string' && !isInitialLoad.value) {
-    const decodedQuery = decodeURIComponent(newQuery)
-    // Only search if this is a different query than what we just executed
-    if (decodedQuery !== lastExecutedQuery.value) {
-      searchQuery.value = decodedQuery
-      lastExecutedQuery.value = decodedQuery
-      searchProperties()
+// Watch for changes in the search query from the URL
+watch(
+  () => route.query.q,
+  (newQuery) => {
+    if (newQuery && typeof newQuery === "string" && !isInitialLoad.value) {
+      const decodedQuery = decodeURIComponent(newQuery);
+      if (decodedQuery !== lastExecutedQuery.value) {
+        searchQuery.value = decodedQuery;
+        lastExecutedQuery.value = decodedQuery;
+        searchProperties();
+      }
     }
   }
-})
+);
 
-// Cleanup search timeout on component unmount
+// Cleanup on unmount
 onUnmounted(() => {
-  if (searchTimeout) clearTimeout(searchTimeout)
-  if (locationTimeout) clearTimeout(locationTimeout)
-})
+  if (searchTimeout) clearTimeout(searchTimeout);
+  if (locationTimeout) clearTimeout(locationTimeout);
+});
 
-// Location autocomplete functionality
-let locationTimeout: NodeJS.Timeout | null = null
-
+/**
+ * Handles location input changes and fetches autocomplete suggestions.
+ * Uses a debounce mechanism to avoid excessive API calls.
+ */
 async function onLocationInput() {
   if (suppressLocationFetch.value) {
-    suppressLocationFetch.value = false
-    return
+    suppressLocationFetch.value = false;
+    return;
   }
-  
-  // Clear existing timeout
-  if (locationTimeout) {
-    clearTimeout(locationTimeout)
-  }
-  
-  // Debounce the location search
+  if (locationTimeout) clearTimeout(locationTimeout);
   locationTimeout = setTimeout(async () => {
-    const query = locationQuery.value.toLowerCase().trim()
+    const query = locationQuery.value.toLowerCase().trim();
     if (query && query.length > 2) {
       try {
-        const results = await autoComplete(query)
-        geocodedResults.value = results
-        locationSuggestions.value = results
-      } catch (error) {
-        console.error('Location autocomplete error:', error)
-        locationSuggestions.value = []
+        const results = await autoComplete(query);
+        geocodedResults.value = results;
+        locationSuggestions.value = results;
+      } catch {
+        locationSuggestions.value = [];
       }
     } else {
-      locationSuggestions.value = []
+      locationSuggestions.value = [];
     }
-  }, 300)
+  }, 300);
 }
 
+/**
+ * Selects a location suggestion and updates the input field.
+ * Suppresses further location fetches to avoid flickering.
+ */
 function selectLocation(suggestion: any) {
-  suppressLocationFetch.value = true
-  locationQuery.value = suggestion.place_name_en
-  selectedLocation.value = suggestion
-  locationSuggestions.value = []
-  console.log('Selected location:', suggestion)
+  suppressLocationFetch.value = true;
+  locationQuery.value = suggestion.place_name_en;
+  selectedLocation.value = suggestion;
+  locationSuggestions.value = [];
 }
 
-// Watch location input
-watch(() => locationQuery.value, onLocationInput)
+watch(() => locationQuery.value, onLocationInput);
+
+// Predefined search suggestions for quick access
 const allSuggestions = [
-  // Basic property types
-  '3 bedroom house',
-  'studio flat to rent',
-  '2 bed cottage',
-  'detached house for sale',
+  "3 bedroom house",
+  "studio flat to rent",
+  "2 bed cottage",
+  "detached house for sale",
+  "house under £400k",
+  "rental under £1500 per month",
+  "penthouse flat over £2000 per month",
+  "bungalow under £350k",
+  "house with modern kitchen and breakfast bar",
+  "flat with balcony and parking",
+  "property with garden and garage",
+  "house with home office and fast broadband",
+  "pet friendly house with garden",
+  "wheelchair accessible flat with elevator",
+  "furnished flat with bills included",
+  "unfurnished house with parking",
+  "eco house with solar panels and EPC rating A",
+  "house with underfloor heating and smart meter",
+  "chain free house with driveway",
+  "cottage with fireplace and large garden",
+  "flat with ensuite bathroom and built-in storage",
+  "house with games room and home cinema",
+];
 
-  // Property types with prices
-  'house under £400k',
-  'rental under £1500 per month',
-  'penthouse flat over £2000 per month',
-  'bungalow under £350k',
-
-  // Feature-focused searches
-  'house with modern kitchen and breakfast bar',
-  'flat with balcony and parking',
-  'property with garden and garage',
-  'house with home office and fast broadband',
-
-  // Lifestyle/accessibility searches
-  'pet friendly house with garden',
-  'wheelchair accessible flat with elevator',
-  'furnished flat with bills included',
-  'unfurnished house with parking',
-
-  // Advanced/eco searches
-  'eco house with solar panels and EPC rating A',
-  'house with underfloor heating and smart meter',
-
-  // Specific feature searches
-  'chain free house with driveway',
-  'cottage with fireplace and large garden',
-  'flat with ensuite bathroom and built-in storage',
-  'house with games room and home cinema'
-]
-
+/**
+ * Performs the property search based on user input.
+ */
 async function searchProperties() {
-  if (!searchQuery.value.trim() || !selectedLocation.value) return
-
-  // Clear any existing search timeout
+  if (!searchQuery.value.trim() || !selectedLocation.value) return;
   if (searchTimeout) {
-    clearTimeout(searchTimeout)
-    searchTimeout = null
+    clearTimeout(searchTimeout);
+    searchTimeout = null;
   }
-
-  // Prevent duplicate searches (only block if both query and radius are unchanged)
-  if (
-    searchQuery.value === lastExecutedQuery.value &&
-    searchRadius.value === lastSearchRadius.value &&
-    hasSearched.value
-  ) {
-    return
+  if (searchQuery.value === lastExecutedQuery.value && searchRadius.value === lastSearchRadius.value && hasSearched.value) {
+    return;
   }
-  // Track last search radius
-  lastSearchRadius.value = searchRadius.value
-
-  // Update URL with current search query only if it's different from current URL
-  const currentUrlQuery = route.query.q as string
-  const encodedQuery = encodeURIComponent(searchQuery.value)
+  lastSearchRadius.value = searchRadius.value;
+  const currentUrlQuery = route.query.q as string;
+  const encodedQuery = encodeURIComponent(searchQuery.value);
   if (currentUrlQuery !== encodedQuery) {
-    await navigateTo({
-      path: '/search/ai',
-      query: { q: encodedQuery }
-    }, { replace: true })
+    await navigateTo(
+      {
+        path: "/search/ai",
+        query: { q: encodedQuery },
+      },
+      { replace: true }
+    );
   }
-
-  // Update tracking variables
-  lastExecutedQuery.value = searchQuery.value
-  isSearching.value = true
-  searchError.value = ''
-  lastSearchQuery.value = searchQuery.value
-
+  lastExecutedQuery.value = searchQuery.value;
+  isSearching.value = true;
+  searchError.value = "";
+  lastSearchQuery.value = searchQuery.value;
   try {
-    const response = await $fetch('/api/search/rag/', {
-      method: 'POST',
-      body: { 
+    const response = await $fetch("/api/search/rag/", {
+      method: "POST",
+      body: {
         query: searchQuery.value,
-        lat: selectedLocation.value.center[1], // MapTiler format: [lon, lat]
+        lat: selectedLocation.value.center[1],
         lon: selectedLocation.value.center[0],
-        radius: searchRadius.value
-      }
-    })
-
-    // Validate response
-    if (!response || typeof response !== 'object') {
-      throw new Error('Invalid response from server')
+        radius: searchRadius.value,
+      },
+    });
+    if (!response || typeof response !== "object") {
+      throw new Error("Invalid response from server");
     }
-
-    // Type-safe assignment
-    const typedResponse = response as any
-    searchResults.value = Array.isArray(typedResponse.results) ? typedResponse.results : []
-    hasSearched.value = true
-    detectedListingType.value = typedResponse.detectedListingType || 'both'
-    detectedPriceRange.value = typedResponse.detectedPriceRange || null
-    queryAnalysis.value = typedResponse.queryAnalysis || null
-
+    const typedResponse = response as any;
+    searchResults.value = Array.isArray(typedResponse.results) ? typedResponse.results : [];
+    hasSearched.value = true;
+    detectedListingType.value = typedResponse.detectedListingType || "both";
+    detectedPriceRange.value = typedResponse.detectedPriceRange || null;
+    queryAnalysis.value = typedResponse.queryAnalysis || null;
   } catch (error: any) {
-    console.error('Search error:', error)
-    searchError.value = error.statusMessage || error.message || 'Failed to search properties'
-    searchResults.value = []
+    searchError.value = error.statusMessage || error.message || "Failed to search properties";
+    searchResults.value = [];
   } finally {
-    isSearching.value = false
+    isSearching.value = false;
   }
 }
 
-// Handle example query clicks
+/**
+ * Selects an example query from the predefined suggestions.
+ */
 function selectExampleQuery(example: string) {
-  searchQuery.value = example
-  searchProperties()
+  searchQuery.value = example;
+  searchProperties();
 }
 
-// Extract property features for display - now using shared utility
+/**
+ * Extracts property features from a search result.
+ * Uses the shared utility function to get features from the property object.
+ */
 function getPropertyFeatures(result: SearchResult): string[] {
   return extractPropertyFeatures(result.property);
 }
 
-// Analyze user query using AI-provided feedback on used vs ignored terms
+/**
+ * Generates an HTML string with highlighted terms based on query analysis.
+ * Terms are styled based on whether they were used or ignored in the search.
+ */
 function getAnalyzedQuery(): string {
-  if (!searchQuery.value) return ''
-
-  // If no analysis yet, show plain text in default color
+  if (!searchQuery.value) return "";
   if (!queryAnalysis.value) {
-    return `<span style="color: #1e293b;">${searchQuery.value}</span>`
+    return `<span style="color: #1e293b;">${searchQuery.value}</span>`;
   }
-
-  const { usedTerms, ignoredTerms } = queryAnalysis.value
-  
-  // Create a map to track what should be highlighted and how
-  const termMap = new Map<string, 'used' | 'ignored'>()
-  
-  // Add ignored terms first (lower priority)
-  ignoredTerms.forEach(term => termMap.set(term.toLowerCase(), 'ignored'))
-  
-  // Add used terms (higher priority - will override ignored)
-  usedTerms.forEach(term => termMap.set(term.toLowerCase(), 'used'))
-  
-  // Sort all terms by length (longest first) to handle multi-word phrases first
-  const allTerms = [...usedTerms, ...ignoredTerms].sort((a, b) => b.length - a.length)
-  
-  let highlightedQuery = searchQuery.value
-  
-  // Apply highlighting for each term (phrases first, then individual words)
-  allTerms.forEach(term => {
-    const termType = termMap.get(term.toLowerCase())
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    // Use word boundaries for single words, but not for phrases with spaces
-    const pattern = term.includes(' ') 
-      ? new RegExp(`${escapedTerm}`, 'gi')
-      : new RegExp(`\\b${escapedTerm}\\b`, 'gi')
-    
+  const { usedTerms, ignoredTerms } = queryAnalysis.value;
+  const termMap = new Map<string, "used" | "ignored">();
+  ignoredTerms.forEach((term) => termMap.set(term.toLowerCase(), "ignored"));
+  usedTerms.forEach((term) => termMap.set(term.toLowerCase(), "used"));
+  const allTerms = [...usedTerms, ...ignoredTerms].sort((a, b) => b.length - a.length);
+  let highlightedQuery = searchQuery.value;
+  allTerms.forEach((term) => {
+    const termType = termMap.get(term.toLowerCase());
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = term.includes(" ") ? new RegExp(`${escapedTerm}`, "gi") : new RegExp(`\\b${escapedTerm}\\b`, "gi");
     const styleMap = {
-      used: 'color: #ea580c;',
-      ignored: 'text-decoration: line-through; color: #6b7280; opacity: 0.7;'
-    }
-    
+      used: "color: #ea580c;",
+      ignored: "text-decoration: line-through; color: #6b7280; opacity: 0.7;",
+    };
     if (termType && styleMap[termType]) {
-      highlightedQuery = highlightedQuery.replace(pattern, `<span style="${styleMap[termType]}">$&</span>`)
+      highlightedQuery = highlightedQuery.replace(pattern, `<span style="${styleMap[termType]}">$&</span>`);
     }
-  })
-  
-  // Wrap any remaining unhighlighted words in default color
-  // This regex finds words not already inside HTML tags
-  highlightedQuery = highlightedQuery.replace(/(?![^<]*>)(\b[A-Za-z0-9]+\b)(?![^<]*<)/g, (match) => {
-    return `<span style="color: #1e293b;">${match}</span>`
-  })
-
-  return highlightedQuery
+  });
+  highlightedQuery = highlightedQuery.replace(/(?![^<]*>)(\b[A-ZaZ0-9]+\b)(?![^<]*<)/g, (match) => {
+    return `<span style="color: #1e293b;">${match}</span>`;
+  });
+  return highlightedQuery;
 }
 </script>
 
@@ -643,7 +566,8 @@ function getAnalyzedQuery(): string {
   text-overflow: ellipsis;
   pointer-events: none;
   z-index: 0;
-  color: #1e293b; /* Default text color, will be overridden by inline styles */
+  color: #1e293b;
+  /* Default text color, will be overridden by inline styles */
 }
 
 .search-input {
@@ -755,16 +679,12 @@ function getAnalyzedQuery(): string {
   cursor: not-allowed;
 }
 
-
-
 .location-note {
   font-size: 0.875rem;
   color: #0369a1;
   margin: 0;
   text-align: center;
 }
-
-
 
 .search-button {
   padding: 0.75rem 1.5rem;

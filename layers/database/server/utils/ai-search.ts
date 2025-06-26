@@ -1,3 +1,15 @@
+/**
+ * AI-driven Prisma WHERE clause generator for property search.
+ *
+ * This module provides a function to convert natural language queries into
+ * valid, schema-accurate Prisma WHERE clauses for property listings, using OpenAI.
+ *
+ * - Ensures all generated queries match the real Prisma schema (no invented fields).
+ * - Handles all property, saleListing, rentalListing, and nested feature fields.
+ * - Expects clean, valid JSON from the AI (no post-processing or fixups).
+ * - Includes a comprehensive, explicit schema prompt for the AI.
+ *
+ */
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -5,7 +17,12 @@ const openai = new OpenAI({
 });
 
 /**
- * Generate a Prisma WHERE clause from natural language query using OpenAI
+ * Generate a Prisma WHERE clause from a natural language query using OpenAI.
+ *
+ * @param query - The user's natural language search query.
+ * @param propertyIds - (Optional) Restrict search to these property IDs.
+ * @returns An object with a valid Prisma WHERE clause and query analysis.
+ * @throws 500 error if AI is not configured or response is invalid.
  */
 export async function generateWhereClauseFromQuery(
   query: string,
@@ -24,23 +41,18 @@ export async function generateWhereClauseFromQuery(
     });
   }
 
-  const schemaPrompt = getPrismaSchemaPrompt();
-  
-  // Build the user message - don't include property constraints in the AI prompt
-  let userMessage = `Convert this search query to a complete Prisma WHERE clause: "${query}"`;
-  
-  // Note: propertyIds will be handled separately in the API layer
-
+  // Get AI response
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: schemaPrompt },
-      { role: "user", content: userMessage },
+      { role: "system", content: getPrismaSchemaPrompt() },
+      { role: "user", content: `Convert this search query to a complete Prisma WHERE clause: "${query}"` },
     ],
     temperature: 0,
   });
 
-  const aiResponse = completion.choices[0]?.message?.content?.trim();
+  // Expect valid, clean JSON from the AI (no markdown, no comments)
+  let aiResponse = completion.choices[0]?.message?.content?.trim();
   if (!aiResponse) {
     throw createError({
       statusCode: 500,
@@ -48,111 +60,45 @@ export async function generateWhereClauseFromQuery(
     });
   }
 
-  console.log(`AI generated response: ${aiResponse}`);
-
-  // Clean up the AI response - more robust JSON extraction
-  let cleanedResponse = aiResponse.trim();
-  
-  // Remove markdown code blocks
-  if (cleanedResponse.startsWith("```json")) {
-    cleanedResponse = cleanedResponse.replace(/^```json\s*/, "").replace(/\s*```.*$/s, "");
-  } else if (cleanedResponse.startsWith("```")) {
-    cleanedResponse = cleanedResponse.replace(/^```\s*/, "").replace(/\s*```.*$/s, "");
-  }
-  
-  // Extract just the JSON object - find the first { and matching }
-  const firstBraceIndex = cleanedResponse.indexOf('{');
-  if (firstBraceIndex !== -1) {
-    let braceCount = 0;
-    let jsonEndIndex = firstBraceIndex;
-    
-    for (let i = firstBraceIndex; i < cleanedResponse.length; i++) {
-      if (cleanedResponse[i] === '{') braceCount++;
-      if (cleanedResponse[i] === '}') braceCount--;
-      if (braceCount === 0) {
-        jsonEndIndex = i;
-        break;
-      }
-    }
-    
-    cleanedResponse = cleanedResponse.substring(firstBraceIndex, jsonEndIndex + 1);
-  }
-  
-  // Remove JSON comments (both // and /* */ style)
-  cleanedResponse = cleanedResponse.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  
-  // Clean up any trailing commas that might be left after removing comments
-  cleanedResponse = cleanedResponse.replace(/,(\s*[}\]])/g, '$1');
-
-  let parsedResponse: any = {};
+  // Parse the response directly
+  let parsedResponse: any;
   try {
-    parsedResponse = JSON.parse(cleanedResponse);
-    console.log("Parsed AI response:", JSON.stringify(parsedResponse, null, 2));
+    parsedResponse = JSON.parse(aiResponse);
   } catch (error) {
-    console.error("Failed to parse AI response:", aiResponse);
-    console.error("Cleaned response:", cleanedResponse);
-    console.error("Parse error:", error);
     throw createError({
       statusCode: 500,
       statusMessage: `Invalid response generated. AI response: ${aiResponse.substring(0, 500)}...`,
     });
   }
 
-  // Validate response structure and extract whereClause
-  let whereClause: any = {};
-  let queryAnalysis = {
-    usedTerms: [] as string[],
-    ignoredTerms: [] as string[],
-  };
-
-  // Check if response has the expected structure
-  if (parsedResponse && typeof parsedResponse === 'object') {
-    if (parsedResponse.whereClause && parsedResponse.queryAnalysis) {
-      // New format with query analysis - this is the expected format
-      whereClause = parsedResponse.whereClause;
-      queryAnalysis = parsedResponse.queryAnalysis;
-      console.log("Using structured response format");
-    } else if (parsedResponse.published !== undefined || parsedResponse.property !== undefined) {
-      // Old format - the response IS the WHERE clause
-      whereClause = parsedResponse;
-      console.log("Using legacy direct WHERE clause format");
-    } else {
-      // Invalid format
-      console.error("Invalid AI response structure:", parsedResponse);
-      throw createError({
-        statusCode: 500,
-        statusMessage: "AI returned invalid response structure",
-      });
-    }
+  // Accept either { whereClause, queryAnalysis } or a direct whereClause
+  let whereClause: any;
+  let queryAnalysis = { usedTerms: [], ignoredTerms: [] };
+  if (parsedResponse.whereClause && parsedResponse.queryAnalysis) {
+    whereClause = parsedResponse.whereClause;
+    queryAnalysis = parsedResponse.queryAnalysis;
   } else {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "AI response is not a valid object",
-    });
+    whereClause = parsedResponse;
   }
 
-  // Ensure the basic structure is correct
+  // Always ensure published is true
   if (!whereClause.published) {
     whereClause.published = true;
   }
-
-  // Validate that whereClause is actually a valid Prisma WHERE clause
-  if (typeof whereClause !== 'object' || Array.isArray(whereClause)) {
-    console.error("Invalid whereClause type:", typeof whereClause, whereClause);
-    throw createError({
-      statusCode: 500,
-      statusMessage: "AI generated invalid WHERE clause structure",
-    });
-  }
-
-  console.log("Final whereClause being returned:", JSON.stringify(whereClause, null, 2));
-  console.log("Final queryAnalysis being returned:", JSON.stringify(queryAnalysis, null, 2));
 
   return { whereClause, queryAnalysis };
 }
 
 /**
- * Get the comprehensive Prisma schema prompt for AI
+ * Get the comprehensive Prisma schema prompt for AI.
+ *
+ * This prompt:
+ * - Explicitly lists all valid fields, enums, and relations for Listing, Property, and all nested features.
+ * - Provides strong rules and examples to prevent invalid query structures.
+ * - Ensures the AI never invents fields or nests saleListing/rentalListing incorrectly.
+ * - Is the single source of truth for valid Prisma WHERE clause generation.
+ *
+ * @returns The full system prompt string for OpenAI.
  */
 function getPrismaSchemaPrompt(): string {
   return `
