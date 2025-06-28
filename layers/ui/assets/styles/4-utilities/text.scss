@@ -126,3 +126,31 @@
 .lineheight-lg {
   line-height: var(--lineheight-lg);
 }
+
+/**
+ *  Styled text
+ */
+.gradient-text {
+  position: relative;
+  display: inline-block;
+  color: var(--primary-600);
+
+  @supports (-webkit-text-fill-color: transparent) {
+    background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &-ai::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -0.15em;
+    right: -0.5em;
+    width: 0.6em;
+    height: 0.6em;
+    background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
+    mask-image: url('/img/ai-star.svg');
+    mask-size: contain;
+  }
+}
