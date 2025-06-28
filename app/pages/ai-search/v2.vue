@@ -6,8 +6,6 @@
       enhanced property search
     </h1>
 
-    <hr class="| divider" style="margin: 2em 0">
-
     <div class="filters-group">
       <h2 class="| title-xs">Location</h2>
 
