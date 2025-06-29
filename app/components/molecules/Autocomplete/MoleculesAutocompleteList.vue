@@ -56,7 +56,7 @@ withDefaults(defineProps<Props>(), {
     border: 0;
     background: transparent;
     color: currentColor;
-    transition: background-color 0.15s;
+    transition: background-color var(--animation-fast);
   }
 
   &__select {
@@ -67,9 +67,17 @@ withDefaults(defineProps<Props>(), {
     text-align: left;
   }
 
-  &__action svg {
-    width: var(--size-24);
-    height: var(--size-24);
+  &__action {
+    transition: color var(--animation-fast);
+
+    &:hover {
+      color: var(--secondary-400);
+    }
+
+    svg {
+      width: var(--size-24);
+      height: var(--size-24);
+    }
   }
 }
 </style>

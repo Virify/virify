@@ -1,5 +1,5 @@
 <template>
-  <div class="m-autocomplete-popover | flow">
+  <div class="m-autocomplete-popover | flow elevate-200">
     <MoleculesAutocompleteSection v-if="mockAutoComplete" title="Suggestions">
       <MoleculesAutocompleteList :options="mockAutoComplete" icon="search/pin" />
     </MoleculesAutocompleteSection>
@@ -59,7 +59,7 @@ const mockTrending = [
 .m-autocomplete-popover {
   background-color: var(--background-200);
   padding: var(--size-32);
-  border-radius: var(--border-radius-xl);
+  border-radius: var(--border-radius-2xl);
 
   &__spacer {
     margin-bottom: var(--size-32);
