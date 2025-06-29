@@ -29,7 +29,7 @@
       </div>
       <!-- radius -->
       <select name="radius" id="radius" class="radius-select" v-model="selectedRadius">
-        <option v-for="option in radiusOptions" :key="option.value" :value="{ value: option.value, key: option.key }">
+        <option v-for="option in radiusOptions" :key="option.value" :value="option.value">
           {{ option.key }}
         </option>
       </select>
@@ -64,7 +64,7 @@ const locationQuery = ref("")
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const selectedLocation = ref<GeocodingFeature | null>(null)
 
-const radiusOptions: { value: number; key: string }[] = [
+const radiusOptions = [
   { value: 0, key: "This location only" },
   { value: 0.25, key: "Within 0.25 miles" },
   { value: 0.5, key: "Within 0.5 miles" },
@@ -76,7 +76,7 @@ const radiusOptions: { value: number; key: string }[] = [
   { value: 40, key: "Within 40 miles" },
 ];
 
-const selectedRadius = ref<{ value: number; key: string }>(radiusOptions[0]!)
+const selectedRadius = ref(0)
 
 /**
  * Handle location input changes

@@ -12,14 +12,14 @@ export default function useAi() {
    * @param radius The search radius
    * @returns The search results
    */
-  async function aiSearch(location: GeocodingFeature, radius: { value: number, key: string }) {
+  async function aiSearch(location: GeocodingFeature, radius: number) {
     const response = await $fetch("/api/search/rag/", {
       method: "POST",
       body: {
         query: searchQuery.value,
         lat: location.geometry.coordinates[1],
         lon: location.geometry.coordinates[0],
-        radius: radius.value,
+        radius: radius,
       },
     });
 
