@@ -9,20 +9,13 @@
     <!-- location group -->
     <div class="location-input-group">
       <div class="location-input-wrapper">
-        <input type="text"
-          class="location-input" 
-          placeholder="Search for properties, locations, or features..."
-          aria-label="Search for properties, locations, or features" 
-          v-model="locationQuery"
-          @input="onLocationInput()"
-        />
+        <input type="text" class="location-input" placeholder="Search for properties, locations, or features..."
+          aria-label="Search for properties, locations, or features" v-model="locationQuery"
+          @input="onLocationInput()" />
         <!-- location suggestion -->
         <ul v-if="locationSuggestions.length" class="location-suggestions">
-          <li v-for="suggestion in locationSuggestions" 
-            :key="suggestion.place_name_en" 
-            class="suggestion-item"
-            @click="selectLocation(suggestion)"
-          >
+          <li v-for="suggestion in locationSuggestions" :key="suggestion.place_name_en" class="suggestion-item"
+            @click="selectLocation(suggestion)">
             {{ suggestion.place_name_en }}
           </li>
         </ul>
@@ -35,16 +28,28 @@
       </select>
     </div>
 
+    <!-- location history -->
+    <div v-if="locationHistory.length > 0">
+      <h2 class="| title-xs">Location History</h2>
+      <ul class="filters-list">
+        <li v-for="location of locationHistory" :key="location.place_name_en">
+          <AtomsButtonPill variant="ghost" :content="location.place_name_en" icon="ai/prompt" icon-start
+            @click.prevent="selectLocation(location)" />
+        </li>
+        <li v-if="locationHistory.length > 0">
+          <AtomsButtonPill variant="ghost" content="Clear history" icon="cross" icon-start
+            @click.prevent="locationHistory = []" />
+        </li>
+      </ul>
+    </div>
+
+
     <!-- description title -->
     <h2 class="| title-xs">Description</h2>
 
     <!-- description query -->
-    <MoleculesPromptbox
-      :id="textareaId"
-      placeholder="Describe your ideal property here..."
-      v-model="searchQuery"
-      @submit="handleSearch()"
-    />
+    <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
+      @submit="handleSearch()" />
 
     <!-- example prompts -->
     <ul class="filters-list">
@@ -57,12 +62,14 @@
 </template>
 
 <script setup lang="ts">
+import { useStorage } from '@vueuse/core'
 const { autoComplete } = useMap()
 const { aiSearch, searchQuery } = useAi()
 const textareaId = useId()
 const locationQuery = ref("")
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const selectedLocation = ref<GeocodingFeature | null>(null)
+const locationHistory = useStorage<GeocodingFeature[]>('searchLocationHistory', []);
 
 const radiusOptions = [
   { value: 0, key: "This location only" },
@@ -96,10 +103,16 @@ const onLocationInput = async () => {
  * Select a location suggestion
  * @param suggestion Selected location suggestion
  */
-function selectLocation(suggestion: any) {
+function selectLocation(suggestion: GeocodingFeature) {
   locationQuery.value = suggestion.place_name_en;
   selectedLocation.value = suggestion;
   locationSuggestions.value = [];
+  if (!locationHistory.value.some(loc => loc.place_name_en === suggestion.place_name_en)) {
+    if( locationHistory.value.length >= 5) {
+      locationHistory.value.shift();
+    }
+    locationHistory.value.push(suggestion);
+  }
 }
 
 /**
@@ -177,7 +190,7 @@ ul {
   padding: var(--size-10) var(--size-14);
   background: var(--background-200);
   cursor: pointer;
-  
+
   &:hover {
     background: var(--secondary-400);
     color: var(--monochrome-900);
