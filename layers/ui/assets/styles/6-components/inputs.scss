@@ -1,3 +1,5 @@
+@use '../_utils/functions' as fn;
+
 /**
  *  Generic inputs
  */
@@ -16,4 +18,24 @@
 .text-input:user-invalid {
   color: var(--text-input-error-color);
   border-color: var(--text-input-error-border);
+}
+
+/**
+ *  Dynamic-width inputs
+ */
+.dynamic-input {
+  display: inline-block;
+  padding: 0.1em 0.35em;
+  margin: 1px 0;
+  border: 2px solid #{fn.faded-color(40%, var(--secondary-500))};
+  border-radius: var(--border-radius-md);
+  white-space: nowrap;
+  min-width: 4ch;
+  text-align: center;
+  field-sizing: content;
+
+  &:focus {
+    border-color: var(--secondary-500);
+    outline: none;
+  }
 }
