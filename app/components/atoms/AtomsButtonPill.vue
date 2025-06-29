@@ -4,7 +4,8 @@
     'a-pill-button--ghost': variant === 'ghost',
     'a-pill-button--filled': variant === 'solid',
     'a-pill-button--reversed': !!iconEnd
-  }" class="| body-sm">
+  }" class="| body-sm"
+    @click="$emit('delete')">
     {{ content }}
 
     <AtomsIcon v-if="icon" :icon aria-hidden />
@@ -22,6 +23,11 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   iconEnd: true
 })
+
+const emit = defineEmits<{
+  (e: 'delete'): void
+}>()
+
 </script>
 
 <style lang="scss">

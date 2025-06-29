@@ -1,26 +1,35 @@
 <template>
-  <div class="m-promptbox">
-    <textarea :id class="m-promptbox__textarea" :placeholder :aria-label="label" v-model="textarea"></textarea>
-
-    <button type="submit" class="m-promptbox__button" aria-label="Submit">
+  <div class="m-promptbox m-promptbox--overlay">
+    <!-- analysed query overlays the textarea -->
+    <div class="m-promptbox__overlay" v-if="queryAnalysis" v-html="getAnalyzedQuery()"></div>
+    <textarea
+      :id
+      class="m-promptbox__textarea"
+      :placeholder
+      :aria-label="props.label"
+      v-model="textarea"
+      :style="queryAnalysis ? 'color: transparent; caret-color: var(--color-300);' : ''"
+    ></textarea>
+    <button type="submit" class="m-promptbox__button" aria-label="Submit" @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-interface Props {
-  id?: string
-  placeholder?: string
-  label?: string
-}
+const { getAnalyzedQuery, queryAnalysis } = useAi()
 
-withDefaults(defineProps<Props>(), {
-  label: 'Enter your prompt here'
+const props = defineProps({
+  id: String,
+  placeholder: String,
+  label: { type: String, default: 'Enter your prompt here' }
 })
 
-const textarea = defineModel({ default: '' })
+defineEmits<{
+  (e: 'submit', value: string): void
+}>()
 
+const textarea = defineModel({ default: '' })
 </script>
 
 <style lang="scss">
@@ -38,6 +47,7 @@ const textarea = defineModel({ default: '' })
   }
 
   &__textarea {
+    position: relative;
     border: none;
     background: transparent;
     color: inherit;
@@ -47,6 +57,7 @@ const textarea = defineModel({ default: '' })
     min-height: 8ch;
     resize: none;
     outline: none;
+    z-index: 2;
   }
 
   &__button {
@@ -74,5 +85,30 @@ const textarea = defineModel({ default: '' })
       height: var(--size-24);
     }
   }
+
+  &__analysis {
+    margin-top: var(--size-6);
+    color: var(--color-300);
+    font-size: 0.95em;
+    font-style: italic;
+  }
+}
+
+.m-promptbox--overlay {
+  position: relative;
+}
+
+.m-promptbox__overlay {
+  position: absolute;
+  top: var(--size-10);
+  left: var(--size-14);
+  right: var(--size-48);
+  bottom: var(--size-10);
+  pointer-events: none;
+  color: inherit;
+  font: inherit;
+  white-space: pre-wrap;
+  z-index: 1;
+  overflow: hidden;
 }
 </style>

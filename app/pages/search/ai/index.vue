@@ -156,17 +156,15 @@
  */
 
 const route = useRoute();
-
+const { searchQuery, queryAnalysis, getAnalyzedQuery } = useAi();
 import { extractPropertyFeatures } from "~~/shared/utils/property-features";
-import type { SearchResult } from "~~/shared/types/search";
 const { autoComplete } = useMap();
-const searchQuery = ref("");
+import type { SearchResult } from "~~/shared/types/search";
 const searchResults = ref<SearchResult[]>([]);
 const isSearching = ref(false);
 const hasSearched = ref(false);
 const lastSearchQuery = ref("");
 const searchError = ref("");
-const queryAnalysis = ref<{ usedTerms: string[]; ignoredTerms: string[] } | null>(null);
 const locationQuery = ref("");
 const locationSuggestions = ref<any[]>([]);
 const selectedLocation = ref<any>(null);
@@ -357,38 +355,6 @@ function getPropertyFeatures(result: SearchResult): string[] {
   return extractPropertyFeatures(result.property);
 }
 
-/**
- * Generates an HTML string with highlighted terms based on query analysis.
- * Terms are styled based on whether they were used or ignored in the search.
- */
-function getAnalyzedQuery(): string {
-  if (!searchQuery.value) return "";
-  if (!queryAnalysis.value) {
-    return `<span style="color: #1e293b;">${searchQuery.value}</span>`;
-  }
-  const { usedTerms, ignoredTerms } = queryAnalysis.value;
-  const termMap = new Map<string, "used" | "ignored">();
-  ignoredTerms.forEach((term) => termMap.set(term.toLowerCase(), "ignored"));
-  usedTerms.forEach((term) => termMap.set(term.toLowerCase(), "used"));
-  const allTerms = [...usedTerms, ...ignoredTerms].sort((a, b) => b.length - a.length);
-  let highlightedQuery = searchQuery.value;
-  allTerms.forEach((term) => {
-    const termType = termMap.get(term.toLowerCase());
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const pattern = term.includes(" ") ? new RegExp(`${escapedTerm}`, "gi") : new RegExp(`\\b${escapedTerm}\\b`, "gi");
-    const styleMap = {
-      used: "color: #ea580c;",
-      ignored: "text-decoration: line-through; color: #6b7280; opacity: 0.7;",
-    };
-    if (termType && styleMap[termType]) {
-      highlightedQuery = highlightedQuery.replace(pattern, `<span style="${styleMap[termType]}">$&</span>`);
-    }
-  });
-  highlightedQuery = highlightedQuery.replace(/(?![^<]*>)(\b[A-ZaZ0-9]+\b)(?![^<]*<)/g, (match) => {
-    return `<span style="color: #1e293b;">${match}</span>`;
-  });
-  return highlightedQuery;
-}
 </script>
 
 <style scoped>
