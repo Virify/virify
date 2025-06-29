@@ -30,30 +30,34 @@
     </div>
 
     <!-- location history -->
-    <div v-if="locationHistory.length > 0">
-      <h2 class="| title-xs">Location History</h2>
-      <ul class="filters-list">
-        <li v-for="location of locationHistory" :key="location.place_name_en">
-          <AtomsButtonPill variant="ghost" :content="location.place_name_en" icon="ai/prompt" icon-start
-            @click.prevent="selectLocation(location)" />
-        </li>
-        <li>
-          <AtomsButtonPill variant="ghost" content="Clear history" icon="cross" icon-start
-            @click.prevent="locationHistory = []" />
-        </li>
-      </ul>
-    </div>
+    <client-only>
+      <div v-if="locationHistory.length > 0">
+        <h2 class="| title-xs">Location History</h2>
+        <ul class="filters-list">
+          <li v-for="location of locationHistory" :key="location.place_name_en">
+            <AtomsButtonPill variant="ghost" :content="location.place_name_en" icon="ai/prompt" icon-start
+              @click.prevent="selectLocation(location)" />
+          </li>
+          <li>
+            <AtomsButtonPill variant="ghost" content="Clear history" icon="cross" icon-start
+              @click.prevent="locationHistory = []" />
+          </li>
+        </ul>
+      </div>
+    </client-only>
 
     <!-- saved locations -->
-    <div class="saved-locations" v-if="userSavedLocations.length > 0">
-      <h2 class="| title-xs">Saved Locations</h2>
-      <ul class="filters-list">
-        <li v-for="location of userSavedLocations" :key="location.id">
-          <AtomsButtonPill variant="ghost" :content="location.location" icon="ai/prompt" icon-start
+    <client-only>
+      <div class="saved-locations" v-if="userSavedLocations.length > 0">
+        <h2 class="| title-xs">Saved Locations</h2>
+        <ul class="filters-list">
+          <li v-for="location of userSavedLocations" :key="location.id">
+            <AtomsButtonPill variant="ghost" :content="location.location" icon="ai/prompt" icon-start
             @click.prevent="selectLocation(location.geocodingFeature)" />
         </li>
       </ul>
     </div>
+    </client-only>
 
 
     <!-- description title -->
