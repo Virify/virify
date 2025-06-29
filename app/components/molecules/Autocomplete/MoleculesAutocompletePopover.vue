@@ -49,7 +49,7 @@ const mockHistory = [
   'Camden High Street, Camden, London, United Kingdom'
 ]
 
-const mockSavedLocations: string[] = [
+const mockSavedLocations: { name: string, location: string }[] = [
   // { name: 'Home', location: '123 Home Street, United Kingdom' },
   // { name: 'Near work', location: '123 Work Street, United Kingdom' },
   // { name: 'Amazing place 1', location: 'Amazing Place 1' },
