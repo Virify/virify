@@ -59,6 +59,13 @@
 /**
  *  Headers
  */
+.title-3xs {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-sm);
+  line-height: var(--lineheight-sm);
+  margin-bottom: var(--size-8);
+}
+
 .title-2xs {
   font-weight: var(--font-bold);
   font-size: var(--font-md);

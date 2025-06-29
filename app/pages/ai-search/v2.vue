@@ -29,6 +29,8 @@
       </select>
     </div>
 
+    <MoleculesAutocompletePopover />
+
     <!-- location history -->
     <client-only>
       <div v-if="locationHistory.length > 0">
