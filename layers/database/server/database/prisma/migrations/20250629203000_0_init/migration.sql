@@ -89,6 +89,7 @@ CREATE TABLE "Address" (
     "postcode" TEXT NOT NULL,
     "country" TEXT,
     "county" TEXT,
+    "fullAddress" TEXT,
     "lat" DOUBLE PRECISION,
     "lon" DOUBLE PRECISION,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -96,6 +97,31 @@ CREATE TABLE "Address" (
     "location" geometry,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Conversation" (
+    "id" SERIAL NOT NULL,
+    "listingId" INTEGER,
+    "senderId" INTEGER NOT NULL,
+    "receiverId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Conversation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" SERIAL NOT NULL,
+    "senderId" INTEGER NOT NULL,
+    "receiverId" INTEGER NOT NULL,
+    "conversationId" INTEGER NOT NULL,
+    "content" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -165,6 +191,18 @@ CREATE TABLE "Listing" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Listing_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ListingView" (
+    "id" SERIAL NOT NULL,
+    "listingId" INTEGER NOT NULL,
+    "userId" INTEGER,
+    "sessionId" TEXT,
+    "ip" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ListingView_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -573,6 +611,29 @@ CREATE TABLE "Utility" (
 );
 
 -- CreateTable
+CREATE TABLE "HiddenListing" (
+    "id" SERIAL NOT NULL,
+    "userPreferencesId" INTEGER NOT NULL,
+    "listingId" INTEGER NOT NULL,
+    "reason" TEXT,
+    "hiddenAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "HiddenListing_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SavedSearch" (
+    "id" SERIAL NOT NULL,
+    "userPreferencesId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "criteria" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SavedSearch_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "firstName" TEXT,
@@ -595,13 +656,52 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "UserFavourites" (
+CREATE TABLE "UserFavouriteListing" (
+    "id" SERIAL NOT NULL,
+    "userPreferencesId" INTEGER NOT NULL,
+    "listingId" INTEGER NOT NULL,
+    "note" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "UserFavouriteListing_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserLocation" (
+    "id" SERIAL NOT NULL,
+    "userPreferencesId" INTEGER NOT NULL,
+    "geocodingFeature" JSONB NOT NULL,
+    "location" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "lat" DOUBLE PRECISION NOT NULL,
+    "lon" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "UserLocation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserNote" (
+    "id" SERIAL NOT NULL,
+    "userPreferencesId" INTEGER NOT NULL,
+    "listingId" INTEGER NOT NULL,
+    "note" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "UserNote_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserPreferences" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "UserFavourites_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "UserPreferences_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -642,14 +742,6 @@ CREATE TABLE "_AgentToProperty" (
     CONSTRAINT "_AgentToProperty_AB_pkey" PRIMARY KEY ("A","B")
 );
 
--- CreateTable
-CREATE TABLE "_ListingToUserFavourites" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
-
-    CONSTRAINT "_ListingToUserFavourites_AB_pkey" PRIMARY KEY ("A","B")
-);
-
 -- CreateIndex
 CREATE INDEX "address_location_idx" ON "Address" USING GIST ("location");
 
@@ -667,6 +759,30 @@ CREATE INDEX "address_autocomplete_idx" ON "Address"("street", "city", "postcode
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Address_street_city_postcode_country_key" ON "Address"("street", "city", "postcode", "country");
+
+-- CreateIndex
+CREATE INDEX "Conversation_senderId_idx" ON "Conversation"("senderId");
+
+-- CreateIndex
+CREATE INDEX "Conversation_receiverId_idx" ON "Conversation"("receiverId");
+
+-- CreateIndex
+CREATE INDEX "Conversation_listingId_idx" ON "Conversation"("listingId");
+
+-- CreateIndex
+CREATE INDEX "Conversation_createdAt_idx" ON "Conversation"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "Message_conversationId_idx" ON "Message"("conversationId");
+
+-- CreateIndex
+CREATE INDEX "Message_senderId_idx" ON "Message"("senderId");
+
+-- CreateIndex
+CREATE INDEX "Message_receiverId_idx" ON "Message"("receiverId");
+
+-- CreateIndex
+CREATE INDEX "Message_createdAt_idx" ON "Message"("createdAt");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Agent_email_key" ON "Agent"("email");
@@ -691,6 +807,21 @@ CREATE INDEX "Listing_propertyId_idx" ON "Listing"("propertyId");
 
 -- CreateIndex
 CREATE INDEX "Listing_price_idx" ON "Listing"("price");
+
+-- CreateIndex
+CREATE INDEX "Listing_publishedAt_idx" ON "Listing"("publishedAt");
+
+-- CreateIndex
+CREATE INDEX "ListingView_listingId_idx" ON "ListingView"("listingId");
+
+-- CreateIndex
+CREATE INDEX "ListingView_userId_idx" ON "ListingView"("userId");
+
+-- CreateIndex
+CREATE INDEX "ListingView_sessionId_idx" ON "ListingView"("sessionId");
+
+-- CreateIndex
+CREATE INDEX "ListingView_createdAt_idx" ON "ListingView"("createdAt");
 
 -- CreateIndex
 CREATE INDEX "RentalListing_id_idx" ON "RentalListing"("id");
@@ -807,6 +938,9 @@ CREATE UNIQUE INDEX "Utility_propertyId_key" ON "Utility"("propertyId");
 CREATE INDEX "Utility_propertyId_idx" ON "Utility"("propertyId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "HiddenListing_userPreferencesId_listingId_key" ON "HiddenListing"("userPreferencesId", "listingId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
@@ -819,10 +953,22 @@ CREATE UNIQUE INDEX "User_passwordResetToken_key" ON "User"("passwordResetToken"
 CREATE INDEX "User_addressId_idx" ON "User"("addressId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserFavourites_userId_key" ON "UserFavourites"("userId");
+CREATE INDEX "User_email_idx" ON "User"("email");
 
 -- CreateIndex
-CREATE INDEX "UserFavourites_userId_idx" ON "UserFavourites"("userId");
+CREATE INDEX "User_username_idx" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserFavouriteListing_userPreferencesId_listingId_key" ON "UserFavouriteListing"("userPreferencesId", "listingId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserNote_userPreferencesId_listingId_key" ON "UserNote"("userPreferencesId", "listingId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserPreferences_userId_key" ON "UserPreferences"("userId");
+
+-- CreateIndex
+CREATE INDEX "UserPreferences_userId_idx" ON "UserPreferences"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Verification_userId_key" ON "Verification"("userId");
@@ -842,8 +988,23 @@ CREATE INDEX "_AgentToListing_B_index" ON "_AgentToListing"("B");
 -- CreateIndex
 CREATE INDEX "_AgentToProperty_B_index" ON "_AgentToProperty"("B");
 
--- CreateIndex
-CREATE INDEX "_ListingToUserFavourites_B_index" ON "_ListingToUserFavourites"("B");
+-- AddForeignKey
+ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_listingId_fkey" FOREIGN KEY ("listingId") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Agent" ADD CONSTRAINT "Agent_estateAgentId_fkey" FOREIGN KEY ("estateAgentId") REFERENCES "EstateAgent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -859,6 +1020,12 @@ ALTER TABLE "Listing" ADD CONSTRAINT "Listing_propertyId_fkey" FOREIGN KEY ("pro
 
 -- AddForeignKey
 ALTER TABLE "Listing" ADD CONSTRAINT "Listing_estateAgentId_fkey" FOREIGN KEY ("estateAgentId") REFERENCES "EstateAgent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ListingView" ADD CONSTRAINT "ListingView_listingId_fkey" FOREIGN KEY ("listingId") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ListingView" ADD CONSTRAINT "ListingView_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RentalListing" ADD CONSTRAINT "RentalListing_id_fkey" FOREIGN KEY ("id") REFERENCES "Listing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -942,10 +1109,34 @@ ALTER TABLE "AdditionalToilet" ADD CONSTRAINT "AdditionalToilet_propertyId_fkey"
 ALTER TABLE "Utility" ADD CONSTRAINT "Utility_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "HiddenListing" ADD CONSTRAINT "HiddenListing_listingId_fkey" FOREIGN KEY ("listingId") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HiddenListing" ADD CONSTRAINT "HiddenListing_userPreferencesId_fkey" FOREIGN KEY ("userPreferencesId") REFERENCES "UserPreferences"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SavedSearch" ADD CONSTRAINT "SavedSearch_userPreferencesId_fkey" FOREIGN KEY ("userPreferencesId") REFERENCES "UserPreferences"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserFavourites" ADD CONSTRAINT "UserFavourites_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "UserFavouriteListing" ADD CONSTRAINT "UserFavouriteListing_listingId_fkey" FOREIGN KEY ("listingId") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserFavouriteListing" ADD CONSTRAINT "UserFavouriteListing_userPreferencesId_fkey" FOREIGN KEY ("userPreferencesId") REFERENCES "UserPreferences"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserLocation" ADD CONSTRAINT "UserLocation_userPreferencesId_fkey" FOREIGN KEY ("userPreferencesId") REFERENCES "UserPreferences"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserNote" ADD CONSTRAINT "UserNote_listingId_fkey" FOREIGN KEY ("listingId") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserNote" ADD CONSTRAINT "UserNote_userPreferencesId_fkey" FOREIGN KEY ("userPreferencesId") REFERENCES "UserPreferences"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserPreferences" ADD CONSTRAINT "UserPreferences_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Verification" ADD CONSTRAINT "Verification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -964,9 +1155,3 @@ ALTER TABLE "_AgentToProperty" ADD CONSTRAINT "_AgentToProperty_A_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "_AgentToProperty" ADD CONSTRAINT "_AgentToProperty_B_fkey" FOREIGN KEY ("B") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ListingToUserFavourites" ADD CONSTRAINT "_ListingToUserFavourites_A_fkey" FOREIGN KEY ("A") REFERENCES "Listing"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ListingToUserFavourites" ADD CONSTRAINT "_ListingToUserFavourites_B_fkey" FOREIGN KEY ("B") REFERENCES "UserFavourites"("id") ON DELETE CASCADE ON UPDATE CASCADE;
