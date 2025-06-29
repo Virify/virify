@@ -6,9 +6,9 @@
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         No matches for "search params"
       </p>
-    </MoleculesAutocompleteSection>
 
-    <div role="separator" class="m-autocomplete-popover__spacer" />
+      <div role="separator" class="m-autocomplete-popover__spacer" />
+    </MoleculesAutocompleteSection>
 
     <MoleculesAutocompleteSection title="Saved locations">
       <MoleculesAutocompletePills v-if="mockSavedLocations?.length" :options="mockSavedLocations" icon="search/pin"
@@ -17,15 +17,17 @@
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         You do not currently have any saved locations
       </p>
+
+      <div role="separator" class="m-autocomplete-popover__spacer" />
     </MoleculesAutocompleteSection>
 
-    <div role="separator" class="m-autocomplete-popover__spacer" />
 
     <MoleculesAutocompleteSection v-if="mockHistory?.length" title="History">
       <MoleculesAutocompleteList :options="mockHistory" icon="search/remove" variant="faded-icon" />
+
+      <div role="separator" class="m-autocomplete-popover__spacer" />
     </MoleculesAutocompleteSection>
 
-    <div role="separator" class="m-autocomplete-popover__spacer" />
 
     <MoleculesAutocompleteSection v-if="mockTrending?.length" title="Trending locations">
       <MoleculesAutocompletePills :options="mockTrending" icon="search/trending" pill-variant="trending" />
