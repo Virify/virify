@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
     if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
 
     const result = await getUserSavedLocations(userId as number);
-    console.log("User saved locations:", result);
     return result;
   } catch (error) {
     console.log(error)
