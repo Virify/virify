@@ -47,7 +47,6 @@
     </client-only>
 
     <!-- saved locations -->
-    <client-only>
       <div class="saved-locations" v-if="userSavedLocations.length > 0">
         <h2 class="| title-xs">Saved Locations</h2>
         <ul class="filters-list">
@@ -57,7 +56,6 @@
         </li>
       </ul>
     </div>
-    </client-only>
 
 
     <!-- description title -->

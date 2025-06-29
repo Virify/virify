@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import type { UserSavedLocation } from "~~/shared/types/userLocation";
 
 export const useSavedLocation = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
@@ -7,9 +8,9 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * State Management
    */
-  const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<any[]>(
+  const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<UserSavedLocation[]>(
     "userSavedLocations",
-    () => useRequestFetch()<any[]>("/api/user/locations/"),
+    () => useRequestFetch()<UserSavedLocation[]>("/api/user/locations/"),
     {
       default: () => [],
       watch: [loggedIn],
