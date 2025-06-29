@@ -35,24 +35,6 @@
       </select>
     </div>
 
-    <!-- filters group -->
-    <div class="filters-group" v-if="selectedLocation">
-      <h2 class="| title-xs">Location</h2>
-      <!-- filter pills -->
-      <ul v-if="selectedLocation && selectedRadius" class="filters-list">
-        <li>
-          <AtomsButtonPill :content="selectedLocation.place_name_en" icon="cross" icon-start
-            @delete="handlePillDelete(selectedLocation.place_name_en)" />
-        </li>
-        <li v-if="selectedRadius">
-          <AtomsButtonPill :content="selectedRadius.key" icon="cross" icon-start @delete="handlePillDelete(selectedRadius.key)" />
-        </li>
-        <li>
-          <AtomsButtonPill variant="solid" content="Edit" icon="ai/edit" icon-start />
-        </li>
-      </ul>
-    </div>
-
     <!-- description title -->
     <h2 class="| title-xs">Description</h2>
 
@@ -118,20 +100,6 @@ function selectLocation(suggestion: any) {
   locationQuery.value = suggestion.place_name_en;
   selectedLocation.value = suggestion;
   locationSuggestions.value = [];
-}
-
-/**
- * Handle pill delete action
- * Clears the selected location and resets the query
- */
-function handlePillDelete(content: any) {
-  if (selectedLocation.value && content === selectedLocation.value.place_name_en) {
-    selectedLocation.value = null;
-    locationQuery.value = '';
-  }
-  if (selectedRadius.value && content === selectedRadius.value.key) {
-    selectedRadius.value = radiusOptions[0]!;
-  }
 }
 
 /**

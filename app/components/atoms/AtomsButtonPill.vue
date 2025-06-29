@@ -5,9 +5,8 @@
     'a-pill-button--filled': variant === 'solid',
     'a-pill-button--reversed': !!iconEnd
   }" class="| body-sm"
-    @click="$emit('delete')">
+  >
     {{ content }}
-
     <AtomsIcon v-if="icon" :icon aria-hidden />
   </button>
 </template>
@@ -24,9 +23,6 @@ withDefaults(defineProps<Props>(), {
   iconEnd: true
 })
 
-const emit = defineEmits<{
-  (e: 'delete'): void
-}>()
 
 </script>
 
