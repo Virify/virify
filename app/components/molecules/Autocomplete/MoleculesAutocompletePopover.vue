@@ -1,10 +1,10 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
-    <MoleculesAutocompleteSection title="Suggestions">
+    <MoleculesAutocompleteSection v-if="searchValue" title="Suggestions">
       <MoleculesAutocompleteList v-if="mockAutoComplete?.length" :options="mockAutoComplete" icon="search/pin" />
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
-        No matches for "search params"
+        No matches for "{{ searchValue }}"
       </p>
 
       <div role="separator" class="m-autocomplete-popover__spacer" />
@@ -36,6 +36,12 @@
 </template>
 
 <script setup lang="ts">
+interface Props {
+  searchValue: string
+}
+
+defineProps<Props>()
+
 const mockAutoComplete = [
   'Cardiff, Castle, Cardiff, United Kingdom',
   'Cardigan, Cardigan, Ceredigion, United Kingdom',
