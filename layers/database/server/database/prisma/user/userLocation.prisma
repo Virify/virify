@@ -1,6 +1,7 @@
 model UserLocation {
   id                Int             @id @default(autoincrement())
   userPreferencesId Int
+  geocodingFeature  Json
   location          String
   name              String
   lat               Float
