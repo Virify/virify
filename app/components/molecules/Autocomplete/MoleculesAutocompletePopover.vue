@@ -1,24 +1,33 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
-    <MoleculesAutocompleteSection v-if="mockAutoComplete" title="Suggestions">
-      <MoleculesAutocompleteList :options="mockAutoComplete" icon="search/pin" />
+    <MoleculesAutocompleteSection title="Suggestions">
+      <MoleculesAutocompleteList v-if="mockAutoComplete?.length" :options="mockAutoComplete" icon="search/pin" />
+
+      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
+        No matches for "search params"
+      </p>
     </MoleculesAutocompleteSection>
 
     <div role="separator" class="m-autocomplete-popover__spacer" />
 
-    <MoleculesAutocompleteSection v-if="mockSavedLocations" title="Saved locations">
-      <MoleculesAutocompletePills :options="mockSavedLocations" icon="search/pin" pill-variant="pin" />
+    <MoleculesAutocompleteSection title="Saved locations">
+      <MoleculesAutocompletePills v-if="mockSavedLocations?.length" :options="mockSavedLocations" icon="search/pin"
+        pill-variant="pin" />
+
+      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
+        You do not currently have any saved locations
+      </p>
     </MoleculesAutocompleteSection>
 
     <div role="separator" class="m-autocomplete-popover__spacer" />
 
-    <MoleculesAutocompleteSection v-if="mockHistory" title="History">
+    <MoleculesAutocompleteSection v-if="mockHistory?.length" title="History">
       <MoleculesAutocompleteList :options="mockHistory" icon="search/remove" variant="faded-icon" />
     </MoleculesAutocompleteSection>
 
     <div role="separator" class="m-autocomplete-popover__spacer" />
 
-    <MoleculesAutocompleteSection v-if="mockTrending" title="Trending">
+    <MoleculesAutocompleteSection v-if="mockTrending?.length" title="Trending locations">
       <MoleculesAutocompletePills :options="mockTrending" icon="search/trending" pill-variant="trending" />
     </MoleculesAutocompleteSection>
   </div>
@@ -38,11 +47,11 @@ const mockHistory = [
   'Camden High Street, Camden, London, United Kingdom'
 ]
 
-const mockSavedLocations = [
-  { name: 'Home', location: '123 Home Street, United Kingdom' },
-  { name: 'Near work', location: '123 Work Street, United Kingdom' },
-  { name: 'Amazing place 1', location: 'Amazing Place 1' },
-  { name: 'And another', location: 'Another Place' },
+const mockSavedLocations: string[] = [
+  // { name: 'Home', location: '123 Home Street, United Kingdom' },
+  // { name: 'Near work', location: '123 Work Street, United Kingdom' },
+  // { name: 'Amazing place 1', location: 'Amazing Place 1' },
+  // { name: 'And another', location: 'Another Place' },
 ]
 
 const mockTrending = [
@@ -63,6 +72,13 @@ const mockTrending = [
 
   &__spacer {
     margin-bottom: var(--size-32);
+  }
+
+  &__empty {
+    padding: var(--size-16);
+    background: var(--background-100);
+    border-radius: var(--border-radius-xl);
+    text-align: center;
   }
 }
 </style>
