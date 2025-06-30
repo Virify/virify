@@ -11,15 +11,17 @@ export const useSavedLocation = createSharedComposable(() => {
    * State Management
    */
   const locationHistory = useStorage<GeocodingFeature[]>('searchLocationHistory', []);
-  const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<UserSavedLocation[]>(
-    "userSavedLocations",
-    () => useRequestFetch()<UserSavedLocation[]>("/api/user/locations/"),
-    {
-      default: () => [],
-      watch: [loggedIn],
-      immediate: true,
-    }
-  );
+ const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<UserSavedLocation[]>(
+  "userSavedLocations",
+  async () => {
+    if (!loggedIn.value) return [];
+    return await useRequestFetch()<UserSavedLocation[]>("/api/user/locations/");
+  },
+  {
+    default: () => [],
+    watch: [loggedIn],
+  }
+);
 
   /**
    * 
