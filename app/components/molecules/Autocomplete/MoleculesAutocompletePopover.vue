@@ -28,7 +28,7 @@
 
     <ClientOnly>
       <MoleculesAutocompleteSection v-if="locationHistory.length" title="History">
-        <MoleculesAutocompleteList :options="locationHistory" icon="search/remove" variant="faded-icon" @removeHistory="removeFromLocationHistory" />
+        <MoleculesAutocompleteList :options="locationHistory" icon="search/remove" variant="faded-icon" @removeHistory="removeFromLocationHistory" @selected-location="selectLocation" />
 
         <div role="separator" class="m-autocomplete-popover__spacer" />
       </MoleculesAutocompleteSection>
@@ -85,6 +85,7 @@ const selectLocation = (location: GeocodingFeature) => {
  */
 const selectSavedLocation = (location: UserSavedLocation | { name: string; location: string }) => {
   emit('selectedSavedLocation', location);
+  suppressAutocomplete.value = true;
 }
 
 /**

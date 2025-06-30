@@ -103,6 +103,11 @@ function handleLocation(location: GeocodingFeature) {
 function handleSavedLocation(location: UserSavedLocation | { name: string; location: string }) {
   console.log('Selected saved location:', location)
   locationQuery.value = location.location
+  if ('geocodingFeature' in location) {
+    selectedLocation.value = location.geocodingFeature
+  } else {
+    selectedLocation.value = null
+  }
 }
 
 /**
