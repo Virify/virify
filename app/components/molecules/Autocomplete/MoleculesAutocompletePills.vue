@@ -1,14 +1,15 @@
 <template>
   <ul class="m-autocomplete-pills">
-    <li v-for="{ name } of options" key="option">
-      <AtomsButtonPill :content="name" variant="ghost" :icon="icon" :icon-end="pillVariant === 'pin'" />
+    <li v-for="{ name, location } of options" key="option">
+      <AtomsButtonPill :content="location" variant="ghost" :icon="icon" :icon-end="pillVariant === 'pin'" />
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
+
 interface Props {
-  options: { name: string, location: string }[]
+  options: UserSavedLocation[] | { name: string, location: string }[]
   icon?: string
   pillVariant?: 'trending' | 'pin'
 }

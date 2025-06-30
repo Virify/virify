@@ -2,7 +2,7 @@
   <ul class="m-autocomplete-list | body-md">
     <li v-for="option of options" class="m-autocomplete-list__row" key="option">
       <button type="button" class="m-autocomplete-list__select">
-        {{ option }}
+        {{ option.place_name_en }}
       </button>
 
       <button type="button" aria-label="Save pin" class="m-autocomplete-list__action" :class="{
@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 interface Props {
-  options: string[]
+  options: GeocodingFeature[]
   icon?: string
   variant?: 'faded-icon'
 }
@@ -24,6 +24,10 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   icon: 'search/ping'
 })
+
+defineEmits<{
+  (e: 'click', value: GeocodingFeature): void
+}>()
 </script>
 
 <style lang="scss">

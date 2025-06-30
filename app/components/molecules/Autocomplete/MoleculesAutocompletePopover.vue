@@ -1,7 +1,7 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
     <MoleculesAutocompleteSection v-if="searchValue" title="Suggestions">
-      <MoleculesAutocompleteList v-if="mockAutoComplete?.length" :options="mockAutoComplete" icon="search/pin" />
+      <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions" icon="search/pin" />
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         No matches for "{{ searchValue }}"
@@ -11,7 +11,7 @@
     </MoleculesAutocompleteSection>
 
     <MoleculesAutocompleteSection title="Saved locations">
-      <MoleculesAutocompletePills v-if="mockSavedLocations?.length" :options="mockSavedLocations" icon="search/pin"
+      <MoleculesAutocompletePills v-if="userSavedLocations?.length" :options="userSavedLocations" icon="search/pin"
         pill-variant="pin" />
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
@@ -22,8 +22,8 @@
     </MoleculesAutocompleteSection>
 
 
-    <MoleculesAutocompleteSection v-if="mockHistory?.length" title="History">
-      <MoleculesAutocompleteList :options="mockHistory" icon="search/remove" variant="faded-icon" />
+    <MoleculesAutocompleteSection v-if="locationHistory.length" title="History">
+      <MoleculesAutocompleteList :options="locationHistory" icon="search/remove" variant="faded-icon" />
 
       <div role="separator" class="m-autocomplete-popover__spacer" />
     </MoleculesAutocompleteSection>
@@ -36,39 +36,21 @@
 </template>
 
 <script setup lang="ts">
+const { userSavedLocations } = useSavedLocation()
+
 interface Props {
   searchValue: string
+  locationSuggestions: GeocodingFeature[]
+  locationHistory: GeocodingFeature[]
 }
 
 defineProps<Props>()
 
-const mockAutoComplete = [
-  'Cardiff, Castle, Cardiff, United Kingdom',
-  'Cardigan, Cardigan, Ceredigion, United Kingdom',
-  'Cardross, Argyll and Bute, United Kingdom',
-  'Cardonald, Glasgow City, United Kingdom',
-  'Cardiff, United Kingdom'
-]
-
-const mockHistory = [
-  'Lonsdale Road, Stevenage, Hertfordshire, United Kingdom',
-  'Camden High Street, Camden, London, United Kingdom'
-]
-
-const mockSavedLocations: { name: string, location: string }[] = [
-  // { name: 'Home', location: '123 Home Street, United Kingdom' },
-  // { name: 'Near work', location: '123 Work Street, United Kingdom' },
-  // { name: 'Amazing place 1', location: 'Amazing Place 1' },
-  // { name: 'And another', location: 'Another Place' },
-]
-
 const mockTrending = [
-  { name: 'London', location: 'London, United Kingdom' },
-  { name: 'Camden', location: 'Camden, United Kingdom' },
-  { name: 'Edinburgh', location: 'Edinburgh, United Kingdom' },
-  { name: 'PO19 1FE', location: 'PO19 1FE' },
-  { name: 'Manchester', location: 'Manchester, United Kingdom' },
-  { name: 'Bristol', location: 'Bristol, United Kingdom' }
+  { name: 'London', location: 'London, UK' },
+  { name: 'New York', location: 'New York, USA' },
+  { name: 'Tokyo', location: 'Tokyo, Japan' },
+  { name: 'Sydney', location: 'Sydney, Australia' }
 ]
 </script>
 

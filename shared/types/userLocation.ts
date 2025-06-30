@@ -5,5 +5,5 @@ export type UserSavedLocation = {
   geocodingFeature: GeocodingFeature;
   lat: number;
   lon: number;
-  name?: string;
+  name: string;
 };
