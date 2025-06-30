@@ -11,15 +11,7 @@
       <div class="location-input-wrapper">
         <!-- location input -->
         <input type="text" class="location-input" placeholder="Search for properties, locations, or features..."
-          aria-label="Search for properties, locations, or features" v-model="locationQuery"
-          @input="onLocationInput()" />
-        <!-- location suggestion -->
-        <ul v-if="locationSuggestions.length" class="location-suggestions">
-          <li v-for="suggestion in locationSuggestions" :key="suggestion.place_name_en" class="suggestion-item"
-            @click="selectLocation(suggestion)">
-            {{ suggestion.place_name_en }}
-          </li>
-        </ul>
+          aria-label="Search for properties, locations, or features" v-model="locationQuery" />
       </div>
       <!-- radius -->
       <select name="radius" id="radius" class="radius-select" v-model="selectedRadius">
@@ -29,7 +21,7 @@
       </select>
     </div>
 
-    <MoleculesAutocompletePopover :searchValue="locationQuery" :locationSuggestions="locationSuggestions" :location-history="locationHistory" />
+    <MoleculesAutocompletePopover :searchValue="locationQuery" @selected-location="handleLocation" @selected-saved-location="handleSavedLocation" />
 
 
     <!-- description title -->
@@ -50,14 +42,10 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
-const { autoComplete } = useMap()
+const selectedLocation = ref<GeocodingFeature | null>(null)
 const { aiSearch, searchQuery } = useAi()
 const textareaId = useId()
 const locationQuery = ref("")
-const locationSuggestions = ref<GeocodingFeature[]>([]);
-const selectedLocation = ref<GeocodingFeature | null>(null)
-const locationHistory = useStorage<GeocodingFeature[]>('searchLocationHistory', []);
 
 const radiusOptions = [
   { value: 0, key: "This location only" },
@@ -72,36 +60,6 @@ const radiusOptions = [
 ];
 
 const selectedRadius = ref(0)
-
-/**
- * Handle location input changes
- * Fetches location suggestions based on the input query
- * Only triggers if the query is longer than 2 characters
- */
-const onLocationInput = async () => {
-  // Handle location input changes if needed
-  const query = locationQuery.value.trim()
-  if (query && query.length > 2) {
-    const results = await autoComplete(query)
-    locationSuggestions.value = results
-  }
-}
-
-/**
- * Select a location suggestion
- * @param suggestion Selected location suggestion
- */
-function selectLocation(suggestion: GeocodingFeature) {
-  locationQuery.value = suggestion.place_name_en;
-  selectedLocation.value = suggestion;
-  locationSuggestions.value = [];
-  if (!locationHistory.value.some(loc => loc.place_name_en === suggestion.place_name_en)) {
-    if( locationHistory.value.length >= 5) {
-      locationHistory.value.shift();
-    }
-    locationHistory.value.push(suggestion);
-  }
-}
 
 /**
  * Add a prompt to the textarea
@@ -124,6 +82,27 @@ function addPrompt(prompt: string) {
   searchQuery.value = prompt
 
   document?.getElementById(textareaId)?.focus()
+}
+
+/**
+ * Handle location selection
+ * @param location Selected location from autocomplete
+ * Sets the selected location and updates the location query
+ */
+function handleLocation(location: GeocodingFeature) {
+  selectedLocation.value = location
+  locationQuery.value = location.place_name_en
+}
+
+/**
+ * 
+ * @param location Selected saved location
+ * Handles the selection of a saved location
+ * @returns void
+ */
+function handleSavedLocation(location: UserSavedLocation | { name: string; location: string }) {
+  console.log('Selected saved location:', location)
+  locationQuery.value = location.location
 }
 
 /**

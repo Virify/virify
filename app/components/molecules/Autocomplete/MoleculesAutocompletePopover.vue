@@ -1,7 +1,12 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
     <MoleculesAutocompleteSection v-if="searchValue" title="Suggestions">
-      <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions" icon="search/pin" />
+      <MoleculesAutocompleteList
+        v-if="locationSuggestions?.length"
+        :options="locationSuggestions"
+        icon="search/pin"
+        @selectedLocation="selectLocation"
+      />
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         No matches for "{{ searchValue }}"
@@ -12,7 +17,7 @@
 
     <MoleculesAutocompleteSection title="Saved locations">
       <MoleculesAutocompletePills v-if="userSavedLocations?.length" :options="userSavedLocations" icon="search/pin"
-        pill-variant="pin" />
+        pill-variant="pin" @selected-saved-location="selectSavedLocation" />
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         You do not currently have any saved locations
@@ -21,12 +26,13 @@
       <div role="separator" class="m-autocomplete-popover__spacer" />
     </MoleculesAutocompleteSection>
 
+    <ClientOnly>
+      <MoleculesAutocompleteSection v-if="locationHistory.length" title="History">
+        <MoleculesAutocompleteList :options="locationHistory" icon="search/remove" variant="faded-icon" @removeHistory="removeFromLocationHistory" />
 
-    <MoleculesAutocompleteSection v-if="locationHistory.length" title="History">
-      <MoleculesAutocompleteList :options="locationHistory" icon="search/remove" variant="faded-icon" />
-
-      <div role="separator" class="m-autocomplete-popover__spacer" />
-    </MoleculesAutocompleteSection>
+        <div role="separator" class="m-autocomplete-popover__spacer" />
+      </MoleculesAutocompleteSection>
+    </ClientOnly>
 
 
     <MoleculesAutocompleteSection v-if="mockTrending?.length" title="Trending locations">
@@ -36,15 +42,21 @@
 </template>
 
 <script setup lang="ts">
-const { userSavedLocations } = useSavedLocation()
+const { userSavedLocations, locationHistory, addLocationToHistory, removeFromLocationHistory } = useSavedLocation();
+const { autoComplete } = useMap();
+const locationSuggestions = ref<GeocodingFeature[]>([]);
+const suppressAutocomplete = ref(false);
 
 interface Props {
   searchValue: string
-  locationSuggestions: GeocodingFeature[]
-  locationHistory: GeocodingFeature[]
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  (e: 'selectedLocation', value: GeocodingFeature): void
+  (e: 'selectedSavedLocation', value: UserSavedLocation | { name: string; location: string }): void
+}>()
 
 const mockTrending = [
   { name: 'London', location: 'London, UK' },
@@ -52,6 +64,48 @@ const mockTrending = [
   { name: 'Tokyo', location: 'Tokyo, Japan' },
   { name: 'Sydney', location: 'Sydney, Australia' }
 ]
+
+/**
+ * Select a location from the autocomplete suggestions
+ * @param location The selected location from the autocomplete
+ * Clears the suggestions and adds the location to history
+ * Emits the selected location to the parent component
+ */
+const selectLocation = (location: GeocodingFeature) => {
+  locationSuggestions.value = [];
+  addLocationToHistory(location);
+  emit('selectedLocation', location);
+  suppressAutocomplete.value = true;
+}
+
+/**
+ * Select a saved location from the pills
+ * @param location The selected saved location
+ * Emits the selected saved location to the parent component
+ */
+const selectSavedLocation = (location: UserSavedLocation | { name: string; location: string }) => {
+  emit('selectedSavedLocation', location);
+}
+
+/**
+ * Remove a location from the history
+ * @param location The location to remove
+ */
+watch(
+  () => props.searchValue,
+  async (newVal, oldVal) => {
+    if (suppressAutocomplete.value) {
+      suppressAutocomplete.value = false;
+      return;
+    }
+    if (newVal && newVal.trim().length > 2) {
+      locationSuggestions.value = await autoComplete(newVal)
+    } else {
+      locationSuggestions.value = []
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="scss">

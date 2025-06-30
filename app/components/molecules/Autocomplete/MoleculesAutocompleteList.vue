@@ -1,14 +1,14 @@
 <template>
   <ul class="m-autocomplete-list | body-md">
     <li v-for="option of options" class="m-autocomplete-list__row" key="option">
-      <button type="button" class="m-autocomplete-list__select">
+      <button type="button" class="m-autocomplete-list__select" @click="$emit('selectedLocation', option)">
         {{ option.place_name_en }}
       </button>
 
       <button type="button" aria-label="Save pin" class="m-autocomplete-list__action" :class="{
         '| faded-text': variant === 'faded-icon'
       }">
-        <AtomsIcon :icon />
+        <AtomsIcon :icon @click="$emit('removeHistory', option)" />
       </button>
     </li>
   </ul>
@@ -26,7 +26,8 @@ withDefaults(defineProps<Props>(), {
 })
 
 defineEmits<{
-  (e: 'click', value: GeocodingFeature): void
+  (e: 'removeHistory', value: GeocodingFeature): void
+  (e: 'selectedLocation', value: GeocodingFeature): void
 }>()
 </script>
 

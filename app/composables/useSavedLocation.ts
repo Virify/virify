@@ -1,5 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { UserSavedLocation } from "~~/shared/types/userLocation";
+import { useStorage } from '@vueuse/core'
+
 
 export const useSavedLocation = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
@@ -8,6 +10,7 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * State Management
    */
+  const locationHistory = useStorage<GeocodingFeature[]>('searchLocationHistory', []);
   const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<UserSavedLocation[]>(
     "userSavedLocations",
     () => useRequestFetch()<UserSavedLocation[]>("/api/user/locations/"),
@@ -17,6 +20,39 @@ export const useSavedLocation = createSharedComposable(() => {
       immediate: true,
     }
   );
+
+  /**
+   * 
+   * @param location The location to add to history
+   * Adds a location to the search history if it doesn't already exist
+   * @returns void
+   */
+  function addLocationToHistory(location: GeocodingFeature) {
+    if(locationHistory.value.length >= 5) {
+      // If we have 5 locations, remove the oldest one
+      locationHistory.value.shift();
+    }
+    const exists = locationHistory.value.some(
+      (loc) => loc.id === location.id || loc.place_name_en === location.place_name_en
+    );
+
+    if (!exists) {
+      locationHistory.value.push(location);
+    }
+  }
+
+  function removeFromLocationHistory(location: GeocodingFeature) {
+    locationHistory.value = locationHistory.value.filter(
+      (loc) => loc.id !== location.id && loc.place_name_en !== location.place_name_en
+    );
+  }
+
+  /**
+   * Clear the location history
+   */
+  function clearLocationHistory() {
+    locationHistory.value = [];
+  }
 
   /**
    * Watch for changes in the loggedIn state
@@ -43,6 +79,10 @@ export const useSavedLocation = createSharedComposable(() => {
 
   return {
     userSavedLocations,
-    refreshUserLocations
+    locationHistory,
+    refreshUserLocations,
+    addLocationToHistory,
+    clearLocationHistory,
+    removeFromLocationHistory,
   }
 });

@@ -1,7 +1,7 @@
 <template>
   <ul class="m-autocomplete-pills">
-    <li v-for="{ name, location } of options" key="option">
-      <AtomsButtonPill :content="location" variant="ghost" :icon="icon" :icon-end="pillVariant === 'pin'" />
+    <li v-for="option of options" :key="option.name">
+      <AtomsButtonPill :content="option.name" variant="ghost" :icon="icon" :icon-end="pillVariant === 'pin'" @click="$emit('selectedSavedLocation', option)" />
     </li>
   </ul>
 </template>
@@ -18,6 +18,10 @@ withDefaults(defineProps<Props>(), {
   icon: 'search/pin',
   pillVariant: 'trending'
 })
+
+defineEmits<{
+  (e: 'selectedSavedLocation', value: UserSavedLocation | { name: string; location: string }): void
+}>();
 </script>
 
 <style lang="scss">
