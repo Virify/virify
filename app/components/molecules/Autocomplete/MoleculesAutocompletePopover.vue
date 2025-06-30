@@ -1,6 +1,6 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
-    <MoleculesAutocompleteSection v-if="searchValue" title="Suggestions">
+    <MoleculesAutocompleteSection v-if="searchValue && !suppressAutocomplete" title="Suggestions">
       <MoleculesAutocompleteList
         v-if="locationSuggestions?.length"
         :options="locationSuggestions"
@@ -72,10 +72,10 @@ const mockTrending = [
  * Emits the selected location to the parent component
  */
 const selectLocation = (location: GeocodingFeature) => {
+  suppressAutocomplete.value = true;
   locationSuggestions.value = [];
   addLocationToHistory(location);
   emit('selectedLocation', location);
-  suppressAutocomplete.value = true;
 }
 
 /**
@@ -95,7 +95,8 @@ const selectSavedLocation = (location: UserSavedLocation | { name: string; locat
 watch(
   () => props.searchValue,
   async (newVal, oldVal) => {
-    if (suppressAutocomplete.value) {
+    // Only reset suppressAutocomplete if the input is cleared
+    if (suppressAutocomplete.value && (!newVal || newVal.trim() === '')) {
       suppressAutocomplete.value = false;
       return;
     }
