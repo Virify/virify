@@ -1,27 +1,17 @@
 <template>
   <ul class="m-autocomplete-pills">
     <li v-for="option of options" :key="option.name">
-      <AtomsButtonPill :content="option.name" variant="ghost" :icon="icon" :icon-end="pillVariant === 'pin'" @click="$emit('selectedSavedLocation', option)" />
+      <slot v-bind="{ option }"></slot>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
-
 interface Props {
   options: UserSavedLocation[] | { name: string, location: string }[]
-  icon?: string
-  pillVariant?: 'trending' | 'pin'
 }
 
-withDefaults(defineProps<Props>(), {
-  icon: 'search/pin',
-  pillVariant: 'trending'
-})
-
-defineEmits<{
-  (e: 'selectedSavedLocation', value: UserSavedLocation | { name: string; location: string }): void
-}>();
+defineProps<Props>()
 </script>
 
 <style lang="scss">

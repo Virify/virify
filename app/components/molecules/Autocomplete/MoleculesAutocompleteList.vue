@@ -1,15 +1,11 @@
 <template>
   <ul class="m-autocomplete-list | body-md">
     <li v-for="option of options" class="m-autocomplete-list__row" key="option">
-      <button type="button" class="m-autocomplete-list__select" @click="$emit('selectedLocation', option)">
-        {{ option.place_name_en }}
-      </button>
-
-      <button type="button" aria-label="Save pin" class="m-autocomplete-list__action" :class="{
-        '| faded-text': variant === 'faded-icon'
-      }">
-        <AtomsIcon :icon @click="$emit('removeHistory', option)" />
-      </button>
+      <slot v-bind="{
+        option,
+        rowClass: 'm-autocomplete-list__select',
+        actionClass: 'm-autocomplete-list__action'
+      }"></slot>
     </li>
   </ul>
 </template>
@@ -17,18 +13,9 @@
 <script setup lang="ts">
 interface Props {
   options: GeocodingFeature[]
-  icon?: string
-  variant?: 'faded-icon'
 }
 
-withDefaults(defineProps<Props>(), {
-  icon: 'search/ping'
-})
-
-defineEmits<{
-  (e: 'removeHistory', value: GeocodingFeature): void
-  (e: 'selectedLocation', value: GeocodingFeature): void
-}>()
+defineProps<Props>()
 </script>
 
 <style lang="scss">

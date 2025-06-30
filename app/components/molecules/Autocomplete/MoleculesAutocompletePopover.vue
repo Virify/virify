@@ -1,12 +1,16 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
     <MoleculesAutocompleteSection v-if="searchValue && !suppressAutocomplete" title="Suggestions">
-      <MoleculesAutocompleteList
-        v-if="locationSuggestions?.length"
-        :options="locationSuggestions"
-        icon="search/pin"
-        @selectedLocation="selectLocation"
-      />
+      <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
+        v-slot="{ option, rowClass, actionClass }">
+        <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
+          {{ option.place_name_en }}
+        </button>
+
+        <button type="button" aria-label="Save pin" :class="actionClass" @click.prevent="addSavedLocation(option)">
+          <AtomsIcon icon="search/pin" />
+        </button>
+      </MoleculesAutocompleteList>
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         No matches for "{{ searchValue }}"
@@ -16,8 +20,10 @@
     </MoleculesAutocompleteSection>
 
     <MoleculesAutocompleteSection title="Saved locations">
-      <MoleculesAutocompletePills v-if="userSavedLocations?.length" :options="userSavedLocations" icon="search/pin"
-        pill-variant="pin" @selected-saved-location="selectSavedLocation" />
+      <MoleculesAutocompletePills v-if="userSavedLocations?.length" :options="userSavedLocations" v-slot="{ option }">
+        <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
+          @click.prevent="setLocation(option)" />
+      </MoleculesAutocompletePills>
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         You do not currently have any saved locations
@@ -28,15 +34,26 @@
 
     <ClientOnly>
       <MoleculesAutocompleteSection v-if="locationHistory.length" title="History">
-        <MoleculesAutocompleteList :options="locationHistory" icon="search/remove" variant="faded-icon" @removeHistory="removeFromLocationHistory" @selected-location="selectLocation" />
+        <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
+          <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
+            {{ option.place_name_en }}
+          </button>
+
+          <button type="button" aria-label="Remove saved location" :class="actionClass" class="| faded-icon"
+            @click.prevent="removeSavedLocation(option)">
+            <AtomsIcon icon="search/remove" />
+          </button>
+        </MoleculesAutocompleteList>
 
         <div role="separator" class="m-autocomplete-popover__spacer" />
       </MoleculesAutocompleteSection>
     </ClientOnly>
 
-
     <MoleculesAutocompleteSection v-if="mockTrending?.length" title="Trending locations">
-      <MoleculesAutocompletePills :options="mockTrending" icon="search/trending" pill-variant="trending" />
+      <MoleculesAutocompletePills :options="mockTrending" v-slot="{ option }">
+        <AtomsButtonPill :content="option.name" variant="ghost" icon="search/trending" :icon-end="false"
+          @click.prevent="setLocation(option)" />
+      </MoleculesAutocompletePills>
     </MoleculesAutocompleteSection>
   </div>
 </template>
@@ -64,6 +81,21 @@ const mockTrending = [
   { name: 'Tokyo', location: 'Tokyo, Japan' },
   { name: 'Sydney', location: 'Sydney, Australia' }
 ]
+
+/**
+ *  Actions
+ */
+function setLocation(option: unknown) {
+  console.log('Set', option)
+}
+
+function addSavedLocation(option: unknown) {
+  console.log('Add saved', option)
+}
+
+function removeSavedLocation(option: unknown) {
+  console.log('Remove saved', option)
+}
 
 /**
  * Select a location from the autocomplete suggestions
