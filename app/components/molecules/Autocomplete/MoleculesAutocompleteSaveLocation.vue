@@ -7,9 +7,10 @@
     <form :id="popoverId" popover class="m-autocomplete-save-location__popover | flow" novalidate autocomplete="off"
       @submit.prevent="saveLocation">
       <label class="| body-xs flow flow-sm faded-text">
-        Location nickname
+        Location name
 
-        <input type="text" class="m-autocomplete-save-location__popover-input | body-sm" v-model="locationName" />
+        <input type="text" class="m-autocomplete-save-location__popover-input | body-sm" v-model="locationName"
+          placeholder="e.g. Home" />
       </label>
 
       <div role="presentation" class="m-autocomplete-save-location__popover-buttons">
