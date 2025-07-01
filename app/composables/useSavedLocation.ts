@@ -1,130 +1,58 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { UserSavedLocation } from "~~/shared/types/userLocation";
-import { ViewsDialogLogin, ViewsDialogUserLocation } from "#components";
 import type { UserLocation } from "@prisma/client";
 
 export const useSavedLocation = createSharedComposable(() => {
-  const { loggedIn } = useUserSession();
-  const { showDialog } = useDialog();
+  const entries = useState<UserLocation[]>('saved-locations', () => [])
 
   /**
-   * Fetch initial state
+   *  Get all entries
    */
-  const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<UserSavedLocation[]>(
-    "userSavedLocations",
-    async () => {
-      if (!loggedIn.value) return [];
-      return await useRequestFetch()<UserSavedLocation[]>("/api/user/locations/");
-    },
-    {
-      default: () => [],
-      watch: [loggedIn],
-    }
-  );
-
+  function getEntries() {
+    return addEntry()
+  }
 
   /**
-   * Adds a user saved location to the database
-   *
-   * @param location The location to add to saved locations
-   * @returns void
+   * Fetch location entries
    */
-  async function updateUserSavedLocation(location: GeocodingFeature, name: string, id?: number) {
-    console.log("Adding user saved location", location, name, id);
-    const UserSavedLocation = {
-      id: id || undefined,
-      name: name,
-      geocodingFeature: location,
-      lat: location.geometry.coordinates[1],
-      lon: location.geometry.coordinates[0],
-      location: location.place_name_en,
-    } as UserSavedLocation;
-
-    await $fetch<UserLocation>(`/api/user/locations/${location.id}`, {
+  async function addEntry(newLocation?: Record<string, any>) {
+    await $fetch<UserLocation>(`/api/user/locations/`, {
       method: "POST",
-      body: UserSavedLocation,
-    });
+      body: newLocation,
+    }).then((response) => {
+      if (!Array.isArray(response)) {
+        throw createError({
+          status: 500,
+          statusMessage: 'Invalid response from server'
+        })
+      }
 
-    // Refresh the user saved locations after adding a new one
-    await refreshUserLocations();
+      entries.value = response
+    })
   }
 
   /**
-   * Deletes a user saved location from the database
-   * @param location The user saved location to delete
-   * @returns void
+   * Check if an entry exists
    */
-  async function deleteUserSavedLocation(location: UserSavedLocation) {
-    console.log("Deleting user saved location", location);
-    await $fetch<UserLocation>(`/api/user/locations/${location.id}`, {
-      method: "DELETE",
-    });
+  function checkEntry(location: unknown) {
+    const { place_name_en } = asObject(location)
 
-    await refreshUserLocations();
-  }
-
-  /**
-   * Checks if a location is saved
-   *
-   * @param location The location to check if it is saved
-   * @returns boolean
-   */
-  function isSavedLocation(location: GeocodingFeature): boolean {
-    return userSavedLocations.value?.some((loc) => loc.geocodingFeature?.id === location.id);
-  }
-
-  /**
-   * Shows a dialog to save a location
-   *
-   * @param location The location to show in the dialog
-   * Opens a dialog to save the location if the user is logged in
-   * If the user is not logged in, it shows the login dialog
-   * @returns void
-   */
-  function showLocationDialog(location: GeocodingFeature): void {
-    if (!loggedIn.value) {
-      showDialog({ component: ViewsDialogLogin });
-      return;
-    }
-
-    // if location.place_name_en matches a saved location, pass the usrSavedLocation
-    const existingLocation = userSavedLocations.value.find((loc) => loc.location === location.place_name_en);
-    showDialog({
-      component: ViewsDialogUserLocation,
-      props: { geocodingLocation: location, userSavedLocation: existingLocation },
+    return entries.value.find((entry) => {
+      return entry.location === place_name_en
     });
   }
 
   /**
-   * Watch for changes in the loggedIn state
-   * When the user logs out, clear cached notes state
-   * When the user logs in, prefetch notes
+   * Remove a location entry
    */
-  watch(loggedIn, async (isLoggedIn) => {
-    if (isLoggedIn) {
-      await refreshUserLocations();
-    } else {
-      userSavedLocations.value = [];
-    }
-  });
-
-  /**
-   * On mount, check if the user is logged in and fetch notes
-   * This ensures we have all notes available at once, preventing individual API calls
-   */
-  onMounted(async () => {
-    if (loggedIn.value) {
-      await refreshUserLocations();
-      console.log("User saved locations fetched on mount:", userSavedLocations.value);
-    }
-  });
+  function deleteEntry() {
+    console.log('Delete entry')
+  }
 
   return {
-    userSavedLocations,
-    refreshUserLocations,
-    updateUserSavedLocation,
-    deleteUserSavedLocation,
-    showLocationDialog,
-    isSavedLocation,
-  };
+    entries,
+    getEntries,
+    checkEntry,
+    deleteEntry,
+    addEntry
+  }
 });

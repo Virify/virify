@@ -18,9 +18,9 @@
     </MoleculesAutocompleteSection>
 
     <MoleculesAutocompleteSection title="Saved locations">
-      <MoleculesAutocompletePills v-if="userSavedLocations?.length" :options="userSavedLocations" v-slot="{ option }">
+      <MoleculesAutocompletePills v-if="entries?.length" :options="entries" v-slot="{ option }">
         <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
-          @click.prevent="setLocation(option)" />
+          @click.prevent="setLocationFromSaved(option)" />
       </MoleculesAutocompletePills>
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
@@ -57,11 +57,10 @@
 </template>
 
 <script setup lang="ts">
-const { userSavedLocations, showLocationDialog, isSavedLocation } = useSavedLocation();
+const { entries, getEntries } = useSavedLocation();
 const { autoComplete } = useMap();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
-
 
 interface Props {
   searchValue: string
@@ -82,6 +81,11 @@ const mockTrending = [
 ]
 
 /**
+ *  Saved entries
+ */
+getEntries()
+
+/**
  *  History state
  */
 const {
@@ -93,6 +97,12 @@ const {
 /**
  *  Actions
  */
+function setLocationFromSaved(option: UserSavedLocation) {
+  const { geocodingFeature } = asObject(option)
+
+  geocodingFeature && setLocation(geocodingFeature as GeocodingFeature)
+}
+
 function setLocation(option: GeocodingFeature) {
   addLocationToHistory(option)
 

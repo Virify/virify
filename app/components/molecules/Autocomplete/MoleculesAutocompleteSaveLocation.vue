@@ -1,5 +1,5 @@
 <template>
-  <div class="m-autocomplete-save-location" :tabindex="-1">
+  <div v-if="!entryExists" class="m-autocomplete-save-location" :tabindex="-1">
     <button type="button" aria-label="Save pin" :class="customClass" :popovertarget="popoverId">
       <AtomsIcon icon="search/pin" />
     </button>
@@ -13,16 +13,20 @@
       </label>
 
       <div role="presentation" class="m-autocomplete-save-location__popover-buttons">
-        <button type="button" class="| button button-ghost button-xs" @click.prevent="closePopover">
+        <button type="button" class="| button button-ghost button-xs" :disabled="isPending"
+          @click.prevent="closePopover">
           Cancel
         </button>
 
-        <button type="submit" class="| button button-secondary button-xs">
+        <button type="submit" class="| button button-secondary button-xs" :disabled="!locationName || isPending">
           Save
         </button>
       </div>
     </form>
   </div>
+  <span v-else class="m-autocomplete-save-location__existing | body-xs">
+    {{ entryExists.name }}
+  </span>
 </template>
 
 <script setup lang="ts">
@@ -47,15 +51,42 @@ function closePopover() {
 }
 
 /**
+ *  Check if entry already exists
+ */
+const entryExists = computed(() => {
+  const { option } = props
+
+  return checkSavedLocation(option)
+})
+
+/**
  *  Saving locations
  */
 const locationName = ref('')
 
-function saveLocation() {
-  console.log({
-    name: locationName.value,
-    location: props.option
-  })
+const { checkEntry: checkSavedLocation, addEntry: addSavedLocation } = useSavedLocation()
+const { isPending, setPendingWhile } = usePending()
+
+async function saveLocation() {
+  const name = locationName.value.trim();
+
+  if (!name) return;
+
+  await setPendingWhile(async () => {
+    const { option } = props
+    const { geometry, place_name_en } = asObject(option)
+    const { coordinates = [] } = asObject(geometry)
+
+    await addSavedLocation({
+      name,
+      lat: (coordinates as number[])[0],
+      lon: (coordinates as number[])[1],
+      location: place_name_en,
+      geocodingFeature: option
+    });
+
+    closePopover()
+  });
 }
 </script>
 
@@ -95,6 +126,16 @@ function saveLocation() {
     align-items: center;
     justify-content: flex-end;
     gap: var(--size-8);
+  }
+
+  &__existing {
+    background: var(--background-300);
+    padding: var(--size-6) var(--size-12);
+    border-radius: var(--border-radius-pill);
+    max-width: 15ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>
