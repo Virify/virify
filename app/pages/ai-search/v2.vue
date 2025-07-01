@@ -21,8 +21,7 @@
       </select>
     </div>
 
-    <MoleculesAutocompletePopover :searchValue="locationQuery" @selected-location="handleLocation" @selected-saved-location="handleSavedLocation" />
-
+    <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
 
     <!-- description title -->
     <h2 class="| title-xs">Description</h2>
@@ -92,22 +91,6 @@ function addPrompt(prompt: string) {
 function handleLocation(location: GeocodingFeature) {
   selectedLocation.value = location
   locationQuery.value = location.place_name_en
-}
-
-/**
- * 
- * @param location Selected saved location
- * Handles the selection of a saved location
- * @returns void
- */
-function handleSavedLocation(location: UserSavedLocation | { name: string; location: string }) {
-  console.log('Selected saved location:', location)
-  locationQuery.value = location.location
-  if ('geocodingFeature' in location) {
-    selectedLocation.value = location.geocodingFeature
-  } else {
-    selectedLocation.value = null
-  }
 }
 
 /**

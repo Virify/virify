@@ -95,22 +95,24 @@ const {
 /**
  *  Set locations
  */
-function setLocationFromSaved(option: Partial<UserSavedLocation>) {
-  const { geocodingFeature } = asObject(option)
-
-  if (!geocodingFeature) {
-    setLocation(geocodingFeature as GeocodingFeature)
-  }
-}
+const emits = defineEmits(['location-selected'])
 
 function setLocationFromTrending(option: Partial<GeocodingFeature>) {
   console.log('Set from trending', option)
 }
 
+function setLocationFromSaved(option: Partial<UserSavedLocation>) {
+  const { geocodingFeature } = asObject(option)
+
+  if (geocodingFeature) {
+    addLocationToHistory(geocodingFeature as GeocodingFeature)
+    emits('location-selected', geocodingFeature)
+  }
+}
+
 function setLocation(option: GeocodingFeature) {
   addLocationToHistory(option)
-
-  console.log('Set', JSON.parse(JSON.stringify(option)))
+  emits('location-selected', option)
 }
 
 /**
