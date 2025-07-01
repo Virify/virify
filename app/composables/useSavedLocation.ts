@@ -2,6 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import type { UserSavedLocation } from "~~/shared/types/userLocation";
 import { useStorage } from "@vueuse/core";
 import { ViewsDialogLogin, ViewsDialogUserLocation } from "#components";
+import type { UserLocation } from "@prisma/client";
 
 export const useSavedLocation = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
@@ -40,7 +41,7 @@ export const useSavedLocation = createSharedComposable(() => {
       location: location.place_name_en,
     } as UserSavedLocation;
 
-    await $fetch(`/api/user/locations/${location.id}`, {
+    await $fetch<UserLocation>(`/api/user/locations/${location.id}`, {
       method: "POST",
       body: UserSavedLocation,
     });
@@ -50,12 +51,26 @@ export const useSavedLocation = createSharedComposable(() => {
   }
 
   /**
+   * Deletes a user saved location from the database
+   * @param location The user saved location to delete
+   * @returns void
+   */
+  async function deleteUserSavedLocation(location: UserSavedLocation) {
+    console.log("Deleting user saved location", location);
+    await $fetch<UserLocation>(`/api/user/locations/${location.id}`, {
+      method: "DELETE",
+    });
+
+    await refreshUserLocations();
+  }
+
+  /**
    * Checks if a location is saved
    *
    * @param location The location to check if it is saved
    * @returns boolean
    */
-  function isSavedLocation(location: any) {
+  function isSavedLocation(location: GeocodingFeature): boolean {
     return userSavedLocations.value?.some((loc) => loc.geocodingFeature?.id === location.id);
   }
 
@@ -67,7 +82,7 @@ export const useSavedLocation = createSharedComposable(() => {
    * If the user is not logged in, it shows the login dialog
    * @returns void
    */
-  function showLocationDialog(location: GeocodingFeature) {
+  function showLocationDialog(location: GeocodingFeature): void {
     if (!loggedIn.value) {
       showDialog({ component: ViewsDialogLogin });
       return;
@@ -149,6 +164,7 @@ export const useSavedLocation = createSharedComposable(() => {
     clearLocationHistory,
     removeFromLocationHistory,
     updateUserSavedLocation,
+    deleteUserSavedLocation,
     showLocationDialog,
     isSavedLocation,
   };

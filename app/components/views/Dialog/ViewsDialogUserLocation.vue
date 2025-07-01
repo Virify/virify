@@ -6,7 +6,10 @@
     <div class="| flow flow-md">
       <textarea v-model="locationInput" class="| body-sm" rows="4"
         placeholder="Enter your location name here..."></textarea>
-
+      <button v-if="userSavedLocation" class="| button button-ghost button-sm" @click="handleDelete"
+          :disabled="isPending">
+          {{ isPending ? 'Deleting...' : 'Delete Location' }}
+        </button>
       <div class="| flex justify-between">
         <div class="| flex gap-2">
           <button class="| button button-ghost button-sm" @click="() => hideDialog()" :disabled="isPending">
@@ -29,14 +32,16 @@ const props = defineProps<{
 }>()
 
 const { hideDialog } = useDialog()
-const { updateUserSavedLocation } = useSavedLocation()
+const { updateUserSavedLocation, deleteUserSavedLocation } = useSavedLocation()
 const { isPending, setPendingWhile } = usePending()
 const locationInput = ref('')
 
 /**
  * Dynamic title based on whether we're editing or creating a note
  */
-const title = 'Add Location'
+const title = computed(() => {
+  return props.userSavedLocation ? 'Edit Location' : 'Add Location'
+})
 
 /**
  * Load existing note when the component is mounted
@@ -70,8 +75,11 @@ async function saveLocation() {
 /**
  * Delete the location from the server
  */
-async function handleDeleteNote() {
-  // TODO: Implement delete functionality if needed
+async function handleDelete() {
+  await setPendingWhile(async () => {
+    await deleteUserSavedLocation(props.userSavedLocation!);
+  });
+
   hideDialog()
 }
 </script>

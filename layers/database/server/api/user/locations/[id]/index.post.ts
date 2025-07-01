@@ -31,9 +31,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
     }
 
-    console.log("User ID:", user.id);
-    console.log(id);
-
     // Create the user saved location in the database
     const result = await updateUserSavedLocation(id, user.id, {
       name,
@@ -42,8 +39,6 @@ export default defineEventHandler(async (event) => {
       lon,
       location,
     });
-
-    console.log(result)
 
     // Send a WebSocket message to update the user's locations count
     const aggregateMessage = createAggregateUpdateMessage("locations", "add", user.id);

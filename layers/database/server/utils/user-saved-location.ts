@@ -1,9 +1,11 @@
+import type { UserLocation } from "@prisma/client";
+
 /**
  * Get user saved locations
  * @param userId - The ID of the user
  * @returns A promise that resolves to an array of user saved locations
  */
-export function getUserSavedLocations(userId: number) {
+export function getUserSavedLocations(userId: number): Promise<UserLocation[]> {
   return prisma.userLocation.findMany({
     where: {
       userPreferences: {
@@ -20,7 +22,7 @@ export function getUserSavedLocations(userId: number) {
  * @param id - The ID of the location
  * @returns A promise that resolves to the user saved location
  */
-export function getUserLocation(userId: number, location: string) {
+export function getUserLocation(userId: number, location: string): Promise<UserLocation | null> {
   return prisma.userLocation.findFirst({
     where: {
       userPreferences: {
@@ -52,7 +54,7 @@ export function updateUserSavedLocation(
     lon: number;
     location: string;
   }
-) {
+): Promise<UserLocation> {
   if (id) {
     return prisma.userLocation.upsert({
       where: { id },
@@ -69,4 +71,22 @@ export function updateUserSavedLocation(
       },
     });
   }
+}
+
+/**
+ * Deletes a user saved location from the database
+ * 
+ * @param id - The ID of the user saved location to delete
+ * @param userId - The ID of the user
+ * @returns A promise that resolves to the deleted user saved location
+ */
+export function deleteUserSavedLocation(id: number, userId: number): Promise<UserLocation> {
+  return prisma.userLocation.delete({
+    where: {
+      id: id,
+      userPreferences: {
+        userId: userId,
+      },
+    },
+  });
 }
