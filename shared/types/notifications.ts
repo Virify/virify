@@ -15,6 +15,7 @@ export interface UserItemsAggregates {
   messages?: number;
   offers?: number;
   viewings?: number;
+  locations?: number;
 }
 
 /**
