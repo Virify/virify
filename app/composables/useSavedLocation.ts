@@ -1,6 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { UserSavedLocation } from "~~/shared/types/userLocation";
-import { useStorage } from "@vueuse/core";
 import { ViewsDialogLogin, ViewsDialogUserLocation } from "#components";
 import type { UserLocation } from "@prisma/client";
 
@@ -9,9 +8,8 @@ export const useSavedLocation = createSharedComposable(() => {
   const { showDialog } = useDialog();
 
   /**
-   * State Management
+   * Fetch initial state
    */
-  const locationHistory = useStorage<GeocodingFeature[]>("searchLocationHistory", []);
   const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<UserSavedLocation[]>(
     "userSavedLocations",
     async () => {
@@ -23,6 +21,7 @@ export const useSavedLocation = createSharedComposable(() => {
       watch: [loggedIn],
     }
   );
+
 
   /**
    * Adds a user saved location to the database
@@ -97,42 +96,6 @@ export const useSavedLocation = createSharedComposable(() => {
   }
 
   /**
-   *
-   * @param location The location to add to history
-   * Adds a location to the search history if it doesn't already exist
-   * @returns void
-   */
-  function addLocationToHistory(location: GeocodingFeature) {
-    if (locationHistory.value.length >= 5) {
-      // If we have 5 locations, remove the oldest one
-      locationHistory.value.shift();
-    }
-    const exists = locationHistory.value.some((loc) => loc.id === location.id || loc.place_name_en === location.place_name_en);
-
-    if (!exists) {
-      locationHistory.value.push(location);
-    }
-  }
-
-  /**
-   * Remove a location from the search history
-   *
-   * @param location The location to remove from history
-   * Removes a location from the search history if it exists
-   * @returns void
-   */
-  function removeFromLocationHistory(location: GeocodingFeature) {
-    locationHistory.value = locationHistory.value.filter((loc) => loc.id !== location.id && loc.place_name_en !== location.place_name_en);
-  }
-
-  /**
-   * Clear the location history
-   */
-  function clearLocationHistory() {
-    locationHistory.value = [];
-  }
-
-  /**
    * Watch for changes in the loggedIn state
    * When the user logs out, clear cached notes state
    * When the user logs in, prefetch notes
@@ -158,11 +121,7 @@ export const useSavedLocation = createSharedComposable(() => {
 
   return {
     userSavedLocations,
-    locationHistory,
     refreshUserLocations,
-    addLocationToHistory,
-    clearLocationHistory,
-    removeFromLocationHistory,
     updateUserSavedLocation,
     deleteUserSavedLocation,
     showLocationDialog,

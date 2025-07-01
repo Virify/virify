@@ -38,7 +38,7 @@
           </button>
 
           <button type="button" aria-label="Remove saved location" :class="actionClass" class="| faded-icon"
-            @click.prevent="removeSavedLocation(option)">
+            @click.prevent="removeLocationFromHistory(option)">
             <AtomsIcon icon="search/remove" />
           </button>
         </MoleculesAutocompleteList>
@@ -57,10 +57,11 @@
 </template>
 
 <script setup lang="ts">
-const { userSavedLocations, locationHistory, addLocationToHistory, removeFromLocationHistory, showLocationDialog, isSavedLocation } = useSavedLocation();
+const { userSavedLocations, showLocationDialog, isSavedLocation } = useSavedLocation();
 const { autoComplete } = useMap();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
+
 
 interface Props {
   searchValue: string
@@ -81,9 +82,20 @@ const mockTrending = [
 ]
 
 /**
+ *  History state
+ */
+const {
+  entries: locationHistory,
+  addEntry: addLocationToHistory,
+  removeEntry: removeLocationFromHistory
+} = useLocationHistory()
+
+/**
  *  Actions
  */
-function setLocation(option: unknown) {
+function setLocation(option: GeocodingFeature) {
+  addLocationToHistory(option)
+
   console.log('Set', option)
 }
 
