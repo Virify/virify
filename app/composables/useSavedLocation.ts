@@ -5,7 +5,7 @@ export const useSavedLocation = createSharedComposable(() => {
   const entries = useState<UserLocation[]>('saved-locations', () => [])
 
   /**
-   *  Get all entries
+   *  Get all entries (alias of addEntry, but with no arguments)
    */
   function getEntries() {
     return addEntry()
@@ -42,6 +42,13 @@ export const useSavedLocation = createSharedComposable(() => {
   }
 
   /**
+   *  Clear entries
+   */
+  function clearEntries() {
+    entries.value = []
+  }
+
+  /**
    * Remove a location entry
    */
   function deleteEntry() {
@@ -52,6 +59,7 @@ export const useSavedLocation = createSharedComposable(() => {
     entries,
     getEntries,
     checkEntry,
+    clearEntries,
     deleteEntry,
     addEntry
   }
