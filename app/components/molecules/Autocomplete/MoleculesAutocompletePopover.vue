@@ -50,14 +50,13 @@
     <MoleculesAutocompleteSection v-if="mockTrending?.length" title="Trending locations">
       <MoleculesAutocompletePills :options="mockTrending" v-slot="{ option }">
         <AtomsButtonPill :content="option.name" variant="ghost" icon="search/trending" :icon-end="false"
-          @click.prevent="setLocation(option)" />
+          @click.prevent="setLocationFromTrending(option)" />
       </MoleculesAutocompletePills>
     </MoleculesAutocompleteSection>
   </div>
 </template>
 
 <script setup lang="ts">
-const { autoComplete } = useMap();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
 
@@ -66,18 +65,6 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
-const emit = defineEmits<{
-  (e: 'selectedLocation', value: GeocodingFeature): void
-  (e: 'selectedSavedLocation', value: UserSavedLocation | { name: string; location: string }): void
-}>()
-
-const mockTrending = [
-  { name: 'London', location: 'London, UK' },
-  { name: 'New York', location: 'New York, USA' },
-  { name: 'Tokyo', location: 'Tokyo, Japan' },
-  { name: 'Sydney', location: 'Sydney, Australia' }
-]
 
 /**
  *  Saved locations
@@ -106,12 +93,18 @@ const {
 } = useLocationHistory()
 
 /**
- *  Actions
+ *  Set locations
  */
-function setLocationFromSaved(option: UserSavedLocation) {
+function setLocationFromSaved(option: Partial<UserSavedLocation>) {
   const { geocodingFeature } = asObject(option)
 
-  geocodingFeature && setLocation(geocodingFeature as GeocodingFeature)
+  if (!geocodingFeature) {
+    setLocation(geocodingFeature as GeocodingFeature)
+  }
+}
+
+function setLocationFromTrending(option: Partial<GeocodingFeature>) {
+  console.log('Set from trending', option)
 }
 
 function setLocation(option: GeocodingFeature) {
@@ -121,9 +114,10 @@ function setLocation(option: GeocodingFeature) {
 }
 
 /**
- * Remove a location from the history
- * @param location The location to remove
+ * Autocompletion
  */
+const { autoComplete } = useMap();
+
 watch(
   () => props.searchValue,
   async (newVal, oldVal) => {
@@ -140,6 +134,16 @@ watch(
   },
   { immediate: true }
 )
+
+/**
+ * Trending locations
+ */
+const mockTrending = [
+  { name: 'London', location: 'London, UK' },
+  { name: 'New York', location: 'New York, USA' },
+  { name: 'Tokyo', location: 'Tokyo, Japan' },
+  { name: 'Sydney', location: 'Sydney, Australia' }
+]
 </script>
 
 <style lang="scss">
