@@ -7,8 +7,8 @@
           {{ option.place_name_en }}
         </button>
 
-        <button type="button" aria-label="Save pin" :class="actionClass" @click.prevent="addSavedLocation(option)">
-          <AtomsIcon icon="search/pin" />
+        <button type="button" aria-label="Save pin" :class="actionClass" @click.prevent="showLocationDialog(option)">
+          <AtomsIcon icon="search/pin" :class="{ 'pin--saved': isSavedLocation(option) }" />
         </button>
       </MoleculesAutocompleteList>
 
@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-const { userSavedLocations, locationHistory, addLocationToHistory, removeFromLocationHistory } = useSavedLocation();
+const { userSavedLocations, locationHistory, addLocationToHistory, removeFromLocationHistory, showLocationDialog, isSavedLocation } = useSavedLocation();
 const { autoComplete } = useMap();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
@@ -158,5 +158,9 @@ watch(
     border-radius: var(--border-radius-xl);
     text-align: center;
   }
+}
+
+.pin--saved {
+  color: var(--color-accent, #f39c12); // Use your accent color or any color you want for saved pins
 }
 </style>

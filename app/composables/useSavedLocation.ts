@@ -1,6 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { UserSavedLocation } from "~~/shared/types/userLocation";
 import { useStorage } from "@vueuse/core";
+import { ViewsDialogLogin, ViewsDialogUserLocation } from "#components";
 
 export const useSavedLocation = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
@@ -24,14 +25,14 @@ export const useSavedLocation = createSharedComposable(() => {
 
   /**
    * Adds a user saved location to the database
-   * 
+   *
    * @param location The location to add to saved locations
    * @returns void
    */
-  async function adduserSavedLocation(location: GeocodingFeature, name: string) {
-
-    // TODO: need to open dialog to get the name of the location to save here
+  async function updateUserSavedLocation(location: GeocodingFeature, name: string, id?: number) {
+    console.log("Adding user saved location", location, name, id);
     const UserSavedLocation = {
+      id: id || undefined,
       name: name,
       geocodingFeature: location,
       lat: location.geometry.coordinates[1],
@@ -47,7 +48,39 @@ export const useSavedLocation = createSharedComposable(() => {
     // Refresh the user saved locations after adding a new one
     await refreshUserLocations();
   }
-  
+
+  /**
+   * Checks if a location is saved
+   *
+   * @param location The location to check if it is saved
+   * @returns boolean
+   */
+  function isSavedLocation(location: any) {
+    return userSavedLocations.value?.some((loc) => loc.geocodingFeature?.id === location.id);
+  }
+
+  /**
+   * Shows a dialog to save a location
+   *
+   * @param location The location to show in the dialog
+   * Opens a dialog to save the location if the user is logged in
+   * If the user is not logged in, it shows the login dialog
+   * @returns void
+   */
+  function showLocationDialog(location: GeocodingFeature) {
+    if (!loggedIn.value) {
+      showDialog({ component: ViewsDialogLogin });
+      return;
+    }
+
+    // if location.place_name_en matches a saved location, pass the usrSavedLocation
+    const existingLocation = userSavedLocations.value.find((loc) => loc.location === location.place_name_en);
+    showDialog({
+      component: ViewsDialogUserLocation,
+      props: { geocodingLocation: location, userSavedLocation: existingLocation },
+    });
+  }
+
   /**
    *
    * @param location The location to add to history
@@ -104,6 +137,7 @@ export const useSavedLocation = createSharedComposable(() => {
   onMounted(async () => {
     if (loggedIn.value) {
       await refreshUserLocations();
+      console.log("User saved locations fetched on mount:", userSavedLocations.value);
     }
   });
 
@@ -114,6 +148,8 @@ export const useSavedLocation = createSharedComposable(() => {
     addLocationToHistory,
     clearLocationHistory,
     removeFromLocationHistory,
-    adduserSavedLocation,
+    updateUserSavedLocation,
+    showLocationDialog,
+    isSavedLocation,
   };
 });
