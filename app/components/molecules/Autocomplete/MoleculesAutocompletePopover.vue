@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-const { userSavedLocations, locationHistory, addLocationToHistory, removeFromLocationHistory } = useSavedLocation();
+const { userSavedLocations, locationHistory, addLocationToHistory, removeFromLocationHistory, showLocationDialog, isSavedLocation } = useSavedLocation();
 const { autoComplete } = useMap();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
@@ -156,5 +156,9 @@ watch(
     border-radius: var(--border-radius-xl);
     text-align: center;
   }
+}
+
+.pin--saved {
+  color: var(--color-accent, #f39c12); // Use your accent color or any color you want for saved pins
 }
 </style>

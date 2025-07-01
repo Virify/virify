@@ -1,6 +1,6 @@
 <template>
   <ul class="m-autocomplete-list | body-md">
-    <li v-for="option of options" class="m-autocomplete-list__row" key="option">
+    <li v-for="option of options" class="m-autocomplete-list__row" :key="option.place_name_en">
       <slot v-bind="{
         option,
         rowClass: 'm-autocomplete-list__select',

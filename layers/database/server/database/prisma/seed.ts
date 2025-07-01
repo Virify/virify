@@ -69,21 +69,6 @@ async function seedAdminUser() {
           country: "Admin Country",
         },
       },
-      preferences: {
-        create: {
-          savedLocation: {
-            create: [
-              {
-                location: geocodingFeature.place_name_en,
-                geocodingFeature: geocodingFeature,
-                lat: Number(geocodingFeature.geometry.coordinates[1]),
-                lon: Number(geocodingFeature.geometry.coordinates[0]),
-                name: "my home location",
-              },
-            ],
-          },
-        },
-      },
     },
   });
 }
