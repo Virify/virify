@@ -1,6 +1,6 @@
 <template>
   <div v-if="!entryExists" class="m-autocomplete-save-location" :tabindex="-1">
-    <button type="button" aria-label="Save pin" :class="customClass" :popovertarget="popoverId">
+    <button type="button" aria-label="Save pin" :class="customClass" :popovertarget="popoverId" @click="validUser">
       <AtomsIcon icon="search/pin" />
     </button>
 
@@ -31,12 +31,31 @@
 </template>
 
 <script setup lang="ts">
+import { ViewsDialogLogin } from '#components';
+
 interface Props {
   option: unknown
   customClass: string
 }
 
 const props = defineProps<Props>()
+
+/**
+ *  Check if user is logged in
+ */
+const { loggedIn } = useUserSession();
+const { showDialog } = useDialog()
+
+function validUser(e: Event) {
+  if (!loggedIn.value) {
+    e.preventDefault()
+
+    showDialog({
+      component: ViewsDialogLogin,
+    });
+  }
+}
+
 
 /**
  *  Expanding popover
