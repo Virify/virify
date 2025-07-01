@@ -17,7 +17,7 @@
       <div role="separator" class="m-autocomplete-popover__spacer" />
     </MoleculesAutocompleteSection>
 
-    <MoleculesAutocompleteSection title="Saved locations">
+    <MoleculesAutocompleteSection v-if="loggedIn" title="Saved locations">
       <MoleculesAutocompletePills v-if="entries?.length" :options="entries" v-slot="{ option }">
         <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
           @click.prevent="setLocationFromSaved(option)" />
