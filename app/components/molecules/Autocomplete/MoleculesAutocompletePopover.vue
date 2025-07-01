@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-const { entries, getEntries } = useSavedLocation();
 const { autoComplete } = useMap();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
@@ -81,9 +80,21 @@ const mockTrending = [
 ]
 
 /**
- *  Saved entries
+ *  Saved locations
  */
-getEntries()
+const { loggedIn } = useUserSession();
+const { entries, getEntries, clearEntries } = useSavedLocation();
+
+watch(loggedIn, (isAuthenticated) => {
+  if (isAuthenticated) {
+    getEntries()
+
+    return
+  }
+
+  clearEntries()
+}, { immediate: true })
+
 
 /**
  *  History state
