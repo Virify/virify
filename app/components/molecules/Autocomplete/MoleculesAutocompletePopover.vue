@@ -117,38 +117,7 @@ function setLocationFromSaved(option: UserSavedLocation) {
 function setLocation(option: GeocodingFeature) {
   addLocationToHistory(option)
 
-  console.log('Set', option)
-}
-
-function addSavedLocation(option: unknown) {
-  console.log('Add saved', option)
-}
-
-function removeSavedLocation(option: unknown) {
-  console.log('Remove saved', option)
-}
-
-/**
- * Select a location from the autocomplete suggestions
- * @param location The selected location from the autocomplete
- * Clears the suggestions and adds the location to history
- * Emits the selected location to the parent component
- */
-const selectLocation = (location: GeocodingFeature) => {
-  suppressAutocomplete.value = true;
-  locationSuggestions.value = [];
-  addLocationToHistory(location);
-  emit('selectedLocation', location);
-}
-
-/**
- * Select a saved location from the pills
- * @param location The selected saved location
- * Emits the selected saved location to the parent component
- */
-const selectSavedLocation = (location: UserSavedLocation | { name: string; location: string }) => {
-  emit('selectedSavedLocation', location);
-  suppressAutocomplete.value = true;
+  console.log('Set', JSON.parse(JSON.stringify(option)))
 }
 
 /**
