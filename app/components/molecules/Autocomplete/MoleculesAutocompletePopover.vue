@@ -7,9 +7,7 @@
           {{ option.place_name_en }}
         </button>
 
-        <button type="button" aria-label="Save pin" :class="actionClass" @click.prevent="addSavedLocation(option)">
-          <AtomsIcon icon="search/pin" />
-        </button>
+        <MoleculesAutocompleteSaveLocation :option :custom-class="actionClass" />
       </MoleculesAutocompleteList>
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
