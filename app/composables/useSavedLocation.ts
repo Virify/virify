@@ -8,6 +8,8 @@ export const useSavedLocation = createSharedComposable(() => {
    *  Get all entries (alias of addEntry, but with no arguments)
    */
   async function getEntries() {
+    if (import.meta.server) return
+
     await $fetch<UserLocation>(`/api/user/locations/`).then((response) => {
       if (!Array.isArray(response)) {
         throw createError({
