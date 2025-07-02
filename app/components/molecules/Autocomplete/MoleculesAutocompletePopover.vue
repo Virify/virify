@@ -107,9 +107,11 @@ function setLocationFromSaved(option: Partial<UserSavedLocation>) {
   if (geocodingFeature) {
     addLocationToHistory(geocodingFeature as GeocodingFeature)
     emits('location-selected', geocodingFeature)
+    suppressAutocomplete.value = true
   }
 }
 
+//TODO: need a handle history fpr surpressing the autocomplete
 function setLocation(option: GeocodingFeature) {
   addLocationToHistory(option)
   emits('location-selected', option)
