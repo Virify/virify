@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { getUserSavedLocations, updateUserSavedLocation } from "~~/layers/database/server/utils/user-saved-location";
+import { updateUserSavedLocation } from "~~/layers/database/server/utils/user-saved-location";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 
 const LocationSchema = z.object({
@@ -48,8 +48,6 @@ export default defineEventHandler(async (event) => {
     const aggregateMessage = createAggregateUpdateMessage("locations", "add", user.id);
 
     sendMessage(aggregateMessage);
-
-    return await getUserSavedLocations(user.id);
   } catch (error) {
     console.log(error);
     return errorResponse(error, event);
