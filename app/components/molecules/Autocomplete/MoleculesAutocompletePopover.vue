@@ -18,9 +18,15 @@
     </MoleculesAutocompleteSection>
 
     <MoleculesAutocompleteSection v-if="loggedIn" title="Saved locations">
-      <MoleculesAutocompletePills v-if="entries?.length" :options="entries" v-slot="{ option }">
-        <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
-          @click.prevent="setLocationFromSaved(option)" />
+      <MoleculesAutocompletePills v-if="entries?.length" :options="entries">
+        <template v-slot="{ option }">
+          <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
+            @click.prevent="setLocationFromSaved(option)" />
+        </template>
+
+        <template v-slot:addendum>
+          <AtomsButtonPill content="Edit" variant="solid" icon="ai/edit" />
+        </template>
       </MoleculesAutocompletePills>
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">

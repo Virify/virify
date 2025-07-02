@@ -3,6 +3,10 @@
     <li v-for="option of options" :key="option.name">
       <slot v-bind="{ option }"></slot>
     </li>
+
+    <li v-if="$slots.addendum">
+      <slot name="addendum"></slot>
+    </li>
   </ul>
 </template>
 
