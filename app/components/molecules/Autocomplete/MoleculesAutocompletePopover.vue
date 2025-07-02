@@ -97,7 +97,7 @@ const {
  */
 const emits = defineEmits(['location-selected'])
 
-function setLocationFromTrending(option: Partial<GeocodingFeature>) {
+function setLocationFromTrending(option: unknown) {
   console.log('Set from trending', option)
 }
 
