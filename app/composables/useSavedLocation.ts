@@ -61,7 +61,7 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * Check if an entry exists
    */
-  function checkEntry(location: unknown) {
+  function checkEntry(location: Partial<UserLocation>) {
     const { place_name_en } = asObject(location)
 
     return entries.value.find((entry) => {
@@ -79,8 +79,8 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * Remove a location entry
    */
-  function deleteEntry() {
-    console.log('Delete entry')
+  function deleteEntry(entry: Partial<UserLocation>) {
+    console.log('Delete entry', entry)
   }
 
   return {

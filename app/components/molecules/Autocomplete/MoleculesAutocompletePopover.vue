@@ -25,7 +25,7 @@
         </template>
 
         <template v-slot:addendum>
-          <AtomsButtonPill content="Edit" variant="solid" icon="ai/edit" />
+          <AtomsButtonPill content="Edit" variant="solid" icon="ai/edit" @click.prevent="updateSavedLocations" />
         </template>
       </MoleculesAutocompletePills>
 
@@ -63,6 +63,8 @@
 </template>
 
 <script setup lang="ts">
+import { ViewsDialogSavedLocations } from '#components';
+
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
 
@@ -88,6 +90,16 @@ watch(loggedIn, (isAuthenticated) => {
   clearEntries()
 }, { immediate: true })
 
+/**
+ *  Edit saved locations
+ */
+const { showDialog } = useDialog()
+
+function updateSavedLocations() {
+  showDialog({
+    component: ViewsDialogSavedLocations
+  })
+}
 
 /**
  *  History state
