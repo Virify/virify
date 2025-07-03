@@ -1,18 +1,19 @@
 <template>
   <label class="| body-sm faded-text">
     Name
-    <input ref="$input" type="text" v-model="locationValue" class="| text-input body-md" required />
+    <input ref="$input" type="text" v-model="locationValue" class="| text-input body-md" required
+      :disabled="isPending" />
   </label>
 
   <p class="| body-sm">
     {{ entry.location }}
   </p>
 
-  <button type="button" class="| button button-xs button-ghost" @click.prevent="removeLocation">
+  <button type="button" class="| button button-xs button-ghost" :disabled="isPending" @click.prevent="removeLocation">
     Delete
   </button>
 
-  <button type="button" class="| button button-xs button-secondary" :disabled="!isUpdated"
+  <button type="button" class="| button button-xs button-secondary" :disabled="isPending || !isUpdated"
     @click.prevent="updateLocation">
     Update
   </button>
@@ -45,6 +46,7 @@ const isUpdated = computed(() => {
 /**
  *  Manage entries
  */
+const { isPending, setPendingWhile } = usePending()
 const { addEntry, deleteEntry } = useSavedLocation();
 
 const $input = useTemplateRef('$input')
@@ -52,7 +54,9 @@ const $input = useTemplateRef('$input')
 function removeLocation() {
   const { id } = asObject(props.entry)
 
-  deleteEntry(id as number)
+  setPendingWhile(async () => {
+    await deleteEntry(id as number)
+  })
 }
 
 /**
@@ -72,6 +76,8 @@ function updateLocation() {
     return
   }
 
-  addEntry({ ...entry, ...{ name } } as UserSavedLocation)
+  setPendingWhile(async () => {
+    await addEntry({ ...entry, ...{ name } } as UserSavedLocation)
+  })
 }
 </script>
