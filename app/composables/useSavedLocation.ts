@@ -44,8 +44,9 @@ export const useSavedLocation = createSharedComposable(() => {
     await $fetch<UserSavedLocation>(`/api/user/locations/`, {
       method: "POST",
       body: newLocation,
-    }).then(() => {
-      entries.value.push(newLocation)
+    }).then(async () => {
+      // Refresh entries
+      await getEntries()
     }).catch(() => {
       throw createError({
         status: 500,
