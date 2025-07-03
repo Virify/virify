@@ -2,9 +2,9 @@
   <div class="| flow dialog-container dialog-container-xs">
     <h2 class="| title-sm">Saved locations</h2>
 
-    <ul v-if="entriesFormatted.length" class="v-dialog-saved-locations__list | flow">
-      <li v-for="{ id, name, location } of entriesFormatted" :key="id">
-        <MoleculesAutocompleteEditSavedLocation :id :name :location />
+    <ul v-if="entries.length" class="v-dialog-saved-locations__list | flow">
+      <li v-for="option in entries" :key="option.id">
+        <MoleculesAutocompleteEditSavedLocation :option="option" />
       </li>
     </ul>
 
@@ -16,21 +16,6 @@
 
 <script setup lang="ts">
 const { entries } = useSavedLocation();
-
-const entriesFormatted = computed(() => {
-  if (!Array.isArray(entries.value)) return []
-
-  return entries.value.map((entry) => {
-    const { name, id, geocodingFeature } = asObject(entry)
-    const { place_name_en } = asObject(geocodingFeature)
-
-    return {
-      id,
-      name,
-      location: place_name_en
-    } as { id: number, name: string, location: string }
-  })
-})
 </script>
 
 <style lang="scss">

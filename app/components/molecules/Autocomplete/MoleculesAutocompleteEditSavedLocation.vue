@@ -1,11 +1,11 @@
 <template>
   <label class="| body-sm faded-text">
     Name
-    <input ref="$input" type="text" :value="name" class="| text-input body-md" required />
+    <input ref="$input" type="text" :value="option.name" class="| text-input body-md" required />
   </label>
 
   <p class="| body-sm">
-    {{ location }}
+    {{ option.location }}
   </p>
 
   <button type="button" class="| button button-xs button-ghost" @click.prevent="removeLocation">
@@ -19,9 +19,7 @@
 
 <script setup lang="ts">
 interface Props {
-  id: number
-  name: string
-  location: string
+  option: UserSavedLocation
 }
 
 const props = defineProps<Props>()
@@ -29,14 +27,14 @@ const props = defineProps<Props>()
 /**
  *  Manage entries
  */
-const { deleteEntry } = useSavedLocation();
+const { deleteEntry, updateEntry } = useSavedLocation();
 
 /**
  *  Delete entry
  */
 
 function removeLocation() {
-  const { id, name, location } = props
+  const { id, name, location } = props.option
 
   deleteEntry({ id, name, location })
 }
@@ -47,7 +45,6 @@ function removeLocation() {
 const $input = useTemplateRef('$input')
 
 function updateLocation() {
-  const { id, location } = props
 
   // Get new name
   const newName = unref($input)?.value
@@ -59,6 +56,10 @@ function updateLocation() {
     return
   }
 
-  console.log('Update', { id, name: newName, location })
+  // Update entry
+  updateEntry(props.option, newName)
+    .catch((error) => {
+      console.error('Failed to update saved location', error)
+    })
 }
 </script>
