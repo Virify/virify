@@ -93,7 +93,7 @@ export type GeocodingFeature = {
   id: string;
   type: string;
   place_name_en: string;
-  text?: string;
+  text: string;
   geometry: {
     type: string;
     coordinates: [number, number];
@@ -114,3 +114,13 @@ export type GeocodingResponse = {
   features: GeocodingFeature[];
   attribution: string;
 };
+
+/**
+ * Trending location type for tracking popular search locations
+ */
+export type TrendingLocation = {
+  id: string;
+  aiQuery: string;
+  location: GeocodingFeature;
+  count: number;
+}

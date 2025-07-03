@@ -5,6 +5,7 @@ const trackSearchSchema = z.object({
   location: z.object({
     id: z.string(),
     type: z.string(),
+    text: z.string(),
     place_name_en: z.string(),
     geometry: z.object({
       type: z.string(),
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
     return { success: true };
   } catch (error) {
-    console.error("Error tracking listing view:", error);
+    console.error("Error tracking search:", error);
     return { success: false };
   }
 });

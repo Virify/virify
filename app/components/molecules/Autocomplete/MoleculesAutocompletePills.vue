@@ -1,6 +1,6 @@
 <template>
   <ul class="m-autocomplete-pills">
-    <li v-for="option of options" :key="option.name">
+    <li v-for="option of options" :key="option.id">
       <slot v-bind="{ option }"></slot>
     </li>
 
@@ -11,8 +11,9 @@
 </template>
 
 <script setup lang="ts">
+
 interface Props {
-  options: UserSavedLocation[] | { name: string, location: string }[]
+  options: UserSavedLocation[] | TrendingLocation[]
 }
 
 defineProps<Props>()

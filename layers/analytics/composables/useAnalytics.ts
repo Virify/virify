@@ -2,7 +2,6 @@
  * Composable for tracking analytics events and business intelligence
  * Pure analytics functionality - separate from user notifications
  */
-import type { TrackSearch } from "@prisma/client";
 import { nanoid } from "nanoid";
 
 /**
@@ -14,7 +13,7 @@ export function useAnalytics() {
   const sessionId = useState("analytics-session-id", () => nanoid());
   const { data: recentlyViewedListings } = useAsyncData("recently-viewed-listings", () => useRequestFetch()<number[]>("/api/analytics/listing/track-view"));
   const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all"));
-  const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrackSearch[]>("/api/analytics/ai-search"), {
+  const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/ai-search"), {
     immediate: true,
   });
   const { recentFavourites } = useFavourites();
