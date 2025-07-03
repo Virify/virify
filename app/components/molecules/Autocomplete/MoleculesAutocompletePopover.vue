@@ -64,7 +64,8 @@
 
 <script setup lang="ts">
 import { ViewsDialogSavedLocations } from '#components';
-
+const { trendingLocations } = useAnalytics();
+console.log('Trending locations', trendingLocations.value);
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
 

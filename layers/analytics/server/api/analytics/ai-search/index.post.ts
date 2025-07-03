@@ -18,13 +18,10 @@ const trackSearchSchema = z.object({
  * Tracks a listing view event
  */
 export default defineEventHandler(async (event) => {
-  const { user } = await getUserSession(event);
   try {
     const { aiQuery, location } = await readValidatedBody(event, trackSearchSchema.parse);
-    let userId = null;
-    userId = user?.id || null;
 
-    await trackAiSearch(aiQuery, userId, location);
+    await trackAiSearch(aiQuery, location);
 
     return { success: true };
   } catch (error) {
