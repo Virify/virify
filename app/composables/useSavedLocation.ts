@@ -1,5 +1,4 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { UserLocation } from "@prisma/client";
 
 export const useSavedLocation = createSharedComposable(() => {
   const entries = useState<UserSavedLocation[]>('saved-locations', () => [])
