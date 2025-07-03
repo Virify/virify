@@ -16,7 +16,6 @@
 
 <script setup lang="ts">
 const { entries } = useSavedLocation();
-
 </script>
 
 <style lang="scss">

@@ -10,6 +10,7 @@ const LocationSchema = z.object({
   location: z.string(),
   geocodingFeature: z.object({
     id: z.string(),
+    text: z.string(),
     type: z.string(),
     place_name_en: z.string(),
     geometry: z.object({

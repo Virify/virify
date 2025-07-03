@@ -66,7 +66,6 @@
 import { ViewsDialogSavedLocations } from '#components';
 import type { UserLocation } from '@prisma/client';
 const { trendingLocations } = useAnalytics();
-console.log('Trending locations', trendingLocations.value);
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
 
@@ -118,7 +117,12 @@ const {
 const emits = defineEmits(['location-selected'])
 
 function setLocationFromTrending(option: Partial<TrendingLocation>) {
-  console.log('Set from trending', option)
+  const { location } = asObject(option)
+  if (location) {
+    addLocationToHistory(location as GeocodingFeature)
+    emits('location-selected', location)
+    suppressAutocomplete.value = true
+  }
 }
 
 function setLocationFromSaved(option: Partial<UserLocation>) {
@@ -131,10 +135,10 @@ function setLocationFromSaved(option: Partial<UserLocation>) {
   }
 }
 
-//TODO: need a handle history fpr surpressing the autocomplete
 function setLocation(option: GeocodingFeature) {
   addLocationToHistory(option)
   emits('location-selected', option)
+  suppressAutocomplete.value = true
 }
 
 /**
@@ -158,16 +162,6 @@ watch(
   },
   { immediate: true }
 )
-
-/**
- * Trending locations
- */
-const mockTrending = [
-  { name: 'London', location: 'London, UK' },
-  { name: 'New York', location: 'New York, USA' },
-  { name: 'Tokyo', location: 'Tokyo, Japan' },
-  { name: 'Sydney', location: 'Sydney, Australia' }
-]
 </script>
 
 <style lang="scss">
