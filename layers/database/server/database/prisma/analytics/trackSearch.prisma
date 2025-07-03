@@ -2,6 +2,7 @@ model TrackSearch {
   id        Int      @id @default(autoincrement())
   aiQuery   String
   userId    Int?
+  name      String
   location  Json
   createdAt DateTime @default(now())
   count     Int      @default(1)

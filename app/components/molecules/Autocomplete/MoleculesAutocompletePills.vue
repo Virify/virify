@@ -1,6 +1,6 @@
 <template>
   <ul class="m-autocomplete-pills">
-    <li v-for="option of options" :key="option.id">
+    <li v-for="option of options" :key="option.name">
       <slot v-bind="{ option }"></slot>
     </li>
 

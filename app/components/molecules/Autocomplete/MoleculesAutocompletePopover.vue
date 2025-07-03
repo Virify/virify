@@ -55,7 +55,7 @@
 
     <MoleculesAutocompleteSection v-if="trendingLocations" title="Trending locations">
       <MoleculesAutocompletePills :options="trendingLocations" v-slot="{ option }">
-        <AtomsButtonPill :content="option.location.text" variant="ghost" icon="search/trending" :icon-end="false"
+        <AtomsButtonPill :content="option.name" variant="ghost" icon="search/trending" :icon-end="false"
           @click.prevent="setLocationFromTrending(option)" />
       </MoleculesAutocompletePills>
     </MoleculesAutocompleteSection>

@@ -293,6 +293,7 @@ export async function trackAiSearch(aiQuery: string, location: GeocodingFeature)
     create: {
       aiQuery,
       location: location,
+      name: location.text,
       count: 1,
     },
     update: {
