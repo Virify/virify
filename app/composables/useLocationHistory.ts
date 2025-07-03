@@ -22,11 +22,18 @@ export function useLocationHistory() {
    * @returns void
    */
   function addEntry(location: GeocodingFeature) {
-    const exists = locationHistory.value.find(({ id, place_name_en }) => {
+    const existingIndex = locationHistory.value.findIndex(({ id, place_name_en }) => {
       return id === location.id || place_name_en === location.place_name_en
     });
 
-    if (exists) return
+    if (existingIndex >= 0) {
+      const existingLocation = locationHistory.value[existingIndex]
+
+      locationHistory.value.splice(existingIndex, 1);
+      locationHistory.value.unshift(existingLocation!);
+
+      return
+    }
 
     locationHistory.value.unshift(location);
     locationHistory.value.splice(5, 1);
