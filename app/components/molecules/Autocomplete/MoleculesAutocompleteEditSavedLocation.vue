@@ -1,7 +1,7 @@
 <template>
   <label class="| body-sm faded-text">
     Name
-    <input ref="$input" type="text" :value="name" class="| text-input body-md" required />
+    <input ref="$input" type="text" v-model="locationValue" class="| text-input body-md" required />
   </label>
 
   <p class="| body-sm">
@@ -12,7 +12,8 @@
     Delete
   </button>
 
-  <button type="button" class="| button button-xs button-secondary" @click.prevent="updateLocation">
+  <button type="button" class="| button button-xs button-secondary" :disabled="!isUpdated"
+    @click.prevent="updateLocation">
     Update
   </button>
 </template>
@@ -25,6 +26,19 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+/**
+ *  Check if location name is updated
+ */
+const locationValue = defineModel({
+  default: (props) => props.name
+})
+
+const isUpdated = computed(() => {
+  const { name } = props
+
+  return locationValue.value !== name
+})
 
 /**
  *  Manage entries
