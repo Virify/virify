@@ -20,16 +20,16 @@
     <template v-if="loggedIn">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Saved locations</h3>
 
-      <MoleculesAutocompletePills v-if="entries?.length" :user-saved-locations="entries">
-        <template v-slot="{ option }">
-          <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
-            @click.prevent="setLocationFromSaved(option as UserSavedLocation)" />
-        </template>
+      <ul class="m-autocomplete-popover__pill-list" v-if="entries?.length">
+        <li v-for="entry of entries" :key="entry.name">
+          <AtomsButtonPill :content="entry.name" variant="ghost" icon="search/pin"
+            @click.prevent="setLocationFromSaved(entry as UserSavedLocation)" />
+        </li>
 
-        <template v-slot:addendum>
+        <li>
           <AtomsButtonPill content="Edit" variant="solid" icon="ai/edit" @click.prevent="updateSavedLocations" />
-        </template>
-      </MoleculesAutocompletePills>
+        </li>
+      </ul>
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         You do not currently have any saved locations
@@ -56,10 +56,12 @@
     <template v-if="trendingLocations">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Trending locations</h3>
 
-      <MoleculesAutocompletePills :trending-locations="trendingLocations" v-slot="{ option }">
-        <AtomsButtonPill :content="option.name" variant="ghost" icon="search/trending" :icon-end="false"
-          @click.prevent="setLocationFromTrending(option as TrendingLocation)" />
-      </MoleculesAutocompletePills>
+      <ul class="m-autocomplete-popover__pill-list">
+        <li v-for="entry of trendingLocations" :key="entry.name">
+          <AtomsButtonPill :content="entry.name" variant="ghost" icon="search/trending" :icon-end="false"
+            @click.prevent="setLocationFromTrending(entry as TrendingLocation)" />
+        </li>
+      </ul>
     </template>
   </div>
 </template>
@@ -67,6 +69,7 @@
 <script setup lang="ts">
 import { ViewsDialogSavedLocations } from '#components';
 import type { UserLocation } from '@prisma/client';
+
 const { trendingLocations } = useAnalytics();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
@@ -178,6 +181,17 @@ watch(
     &:not(:first-of-type) {
       margin-top: var(--size-32);
     }
+  }
+
+  &__pill-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: var(--size-8);
   }
 
   &__empty {
