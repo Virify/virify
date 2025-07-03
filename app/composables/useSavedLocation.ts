@@ -2,7 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import type { UserLocation } from "@prisma/client";
 
 export const useSavedLocation = createSharedComposable(() => {
-  const entries = useState<UserLocation[]>('saved-locations', () => [])
+  const entries = useState<UserSavedLocation[]>('saved-locations', () => [])
 
   /**
    *  Get all entries (alias of addEntry, but with no arguments)
@@ -10,7 +10,7 @@ export const useSavedLocation = createSharedComposable(() => {
   async function getEntries() {
     if (import.meta.server) return
 
-    await $fetch<UserLocation>(`/api/user/locations/`).then((response) => {
+    await $fetch<UserSavedLocation>(`/api/user/locations/`).then((response) => {
       if (!Array.isArray(response)) {
         throw createError({
           status: 500,
@@ -27,7 +27,7 @@ export const useSavedLocation = createSharedComposable(() => {
    */
   const isPending = ref(false)
 
-  async function addEntry(newLocation: UserLocation) {
+  async function addEntry(newLocation: UserSavedLocation) {
     if (isPending.value) return
 
     // Ensure a location is provided
@@ -42,7 +42,7 @@ export const useSavedLocation = createSharedComposable(() => {
     isPending.value = true
 
     // Post new location
-    await $fetch<UserLocation>(`/api/user/locations/`, {
+    await $fetch<UserSavedLocation>(`/api/user/locations/`, {
       method: "POST",
       body: newLocation,
     }).then(() => {
@@ -61,7 +61,7 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * Check if an entry exists
    */
-  function checkEntry(location: Partial<UserLocation>) {
+  function checkEntry(location: Partial<UserSavedLocation>) {
     const { place_name_en } = asObject(location)
 
     return entries.value.find((entry) => {
@@ -79,7 +79,7 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * Remove a location entry
    */
-  function deleteEntry(entry: Partial<UserLocation>) {
+  function deleteEntry(entry: Partial<UserSavedLocation>) {
     console.log('Delete entry', entry)
   }
 

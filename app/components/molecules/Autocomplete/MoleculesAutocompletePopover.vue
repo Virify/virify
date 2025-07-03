@@ -18,10 +18,10 @@
     </MoleculesAutocompleteSection>
 
     <MoleculesAutocompleteSection v-if="loggedIn" title="Saved locations">
-      <MoleculesAutocompletePills v-if="entries?.length" :options="entries">
+      <MoleculesAutocompletePills v-if="entries?.length" :user-saved-locations="entries">
         <template v-slot="{ option }">
           <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
-            @click.prevent="setLocationFromSaved(option)" />
+            @click.prevent="setLocationFromSaved(option as UserSavedLocation)" />
         </template>
 
         <template v-slot:addendum>
@@ -54,9 +54,9 @@
     </ClientOnly>
 
     <MoleculesAutocompleteSection v-if="trendingLocations" title="Trending locations">
-      <MoleculesAutocompletePills :options="trendingLocations" v-slot="{ option }">
+      <MoleculesAutocompletePills :trending-locations="trendingLocations" v-slot="{ option }">
         <AtomsButtonPill :content="option.name" variant="ghost" icon="search/trending" :icon-end="false"
-          @click.prevent="setLocationFromTrending(option)" />
+          @click.prevent="setLocationFromTrending(option as TrendingLocation)" />
       </MoleculesAutocompletePills>
     </MoleculesAutocompleteSection>
   </div>
@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 import { ViewsDialogSavedLocations } from '#components';
+import type { UserLocation } from '@prisma/client';
 const { trendingLocations } = useAnalytics();
 console.log('Trending locations', trendingLocations.value);
 const locationSuggestions = ref<GeocodingFeature[]>([]);
@@ -120,7 +121,7 @@ function setLocationFromTrending(option: Partial<TrendingLocation>) {
   console.log('Set from trending', option)
 }
 
-function setLocationFromSaved(option: Partial<UserSavedLocation>) {
+function setLocationFromSaved(option: Partial<UserLocation>) {
   const { geocodingFeature } = asObject(option)
 
   if (geocodingFeature) {

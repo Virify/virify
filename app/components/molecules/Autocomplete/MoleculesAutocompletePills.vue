@@ -12,11 +12,23 @@
 
 <script setup lang="ts">
 
+
 interface Props {
-  options: UserSavedLocation[] | TrendingLocation[]
+  userSavedLocations?: UserSavedLocation[]
+  trendingLocations?: TrendingLocation[]
 }
 
-defineProps<Props>()
+const { userSavedLocations, trendingLocations } = defineProps<Props>()
+
+const options = computed(() => {
+  if (userSavedLocations) {
+    return userSavedLocations
+  } else if (trendingLocations) {
+    return trendingLocations
+  }
+  return []
+})
+
 </script>
 
 <style lang="scss">
