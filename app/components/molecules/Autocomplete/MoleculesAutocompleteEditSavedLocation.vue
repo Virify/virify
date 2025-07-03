@@ -1,22 +1,23 @@
 <template>
-  <label class="| body-sm faded-text">
-    Name
-    <input ref="$input" type="text" v-model="locationValue" class="| text-input body-md" required
-      :disabled="isPending" />
-  </label>
+  <form @submit.prevent="updateLocation">
+    <label class="| body-sm faded-text">
+      Name
+      <input ref="$input" type="text" v-model="locationValue" class="| text-input body-md" required
+        :disabled="isPending" />
+    </label>
 
-  <p class="| body-sm">
-    {{ entry.location }}
-  </p>
+    <p class="| body-sm">
+      {{ entry.location }}
+    </p>
 
-  <button type="button" class="| button button-xs button-ghost" :disabled="isPending" @click.prevent="removeLocation">
-    Delete
-  </button>
+    <button type="button" class="| button button-xs button-ghost" :disabled="isPending" @click.prevent="removeLocation">
+      Delete
+    </button>
 
-  <button type="button" class="| button button-xs button-secondary" :disabled="isPending || !isUpdated"
-    @click.prevent="updateLocation">
-    Update
-  </button>
+    <button type="submit" class="| button button-xs button-secondary" :disabled="isPending || !isUpdated">
+      Update
+    </button>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -33,14 +34,14 @@ const locationValue = defineModel({
   default: (props) => {
     const { name } = asObject(props.entry)
 
-    return name
+    return name as string
   }
 })
 
 const isUpdated = computed(() => {
   const { name } = asObject(props.entry)
 
-  return locationValue.value !== name
+  return locationValue.value.length && locationValue.value !== name
 })
 
 /**
