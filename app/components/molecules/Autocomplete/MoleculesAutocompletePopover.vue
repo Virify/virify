@@ -1,6 +1,8 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
-    <MoleculesAutocompleteSection v-if="searchValue && !suppressAutocomplete" title="Suggestions">
+    <template v-if="searchValue && !suppressAutocomplete">
+      <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Suggestions</h3>
+
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
         v-slot="{ option, rowClass, actionClass }">
         <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
@@ -13,11 +15,11 @@
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         No matches for "{{ searchValue }}"
       </p>
+    </template>
 
-      <div role="separator" class="m-autocomplete-popover__spacer" />
-    </MoleculesAutocompleteSection>
+    <template v-if="loggedIn">
+      <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Saved locations</h3>
 
-    <MoleculesAutocompleteSection v-if="loggedIn" title="Saved locations">
       <MoleculesAutocompletePills v-if="entries?.length" :user-saved-locations="entries">
         <template v-slot="{ option }">
           <AtomsButtonPill :content="option.name" variant="ghost" icon="search/pin"
@@ -32,12 +34,12 @@
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         You do not currently have any saved locations
       </p>
-
-      <div role="separator" class="m-autocomplete-popover__spacer" />
-    </MoleculesAutocompleteSection>
+    </template>
 
     <ClientOnly>
-      <MoleculesAutocompleteSection v-if="locationHistory.length" title="History">
+      <template v-if="locationHistory.length">
+        <h3 class="m-autocomplete-popover__title | title-3xs faded-text">History</h3>
+
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
           <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
             {{ option.place_name_en }}
@@ -48,17 +50,17 @@
             <AtomsIcon icon="search/remove" />
           </button>
         </MoleculesAutocompleteList>
-
-        <div role="separator" class="m-autocomplete-popover__spacer" />
-      </MoleculesAutocompleteSection>
+      </template>
     </ClientOnly>
 
-    <MoleculesAutocompleteSection v-if="trendingLocations" title="Trending locations">
+    <template v-if="trendingLocations">
+      <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Trending locations</h3>
+
       <MoleculesAutocompletePills :trending-locations="trendingLocations" v-slot="{ option }">
         <AtomsButtonPill :content="option.name" variant="ghost" icon="search/trending" :icon-end="false"
           @click.prevent="setLocationFromTrending(option as TrendingLocation)" />
       </MoleculesAutocompletePills>
-    </MoleculesAutocompleteSection>
+    </template>
   </div>
 </template>
 
@@ -170,8 +172,12 @@ watch(
   padding: var(--size-32);
   border-radius: var(--border-radius-2xl);
 
-  &__spacer {
-    margin-bottom: var(--size-32);
+  &__title {
+    margin-bottom: var(--size-16);
+
+    &:not(:first-of-type) {
+      margin-top: var(--size-32);
+    }
   }
 
   &__empty {
