@@ -88,12 +88,8 @@ export const useSavedLocation = createSharedComposable(() => {
 
     await $fetch<UserSavedLocation>(`/api/user/locations/${entryId}`, {
       method: "DELETE"
-    }).then(() => {
-      const indexToRemove = entries.value.findIndex(entry => {
-        return entry.id === entryId
-      })
-
-      entries.value.splice(indexToRemove, 1)
+    }).then(async () => {
+      await getEntries()
     })
   }
 
