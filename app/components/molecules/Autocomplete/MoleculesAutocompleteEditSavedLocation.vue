@@ -5,7 +5,7 @@
   </label>
 
   <p class="| body-sm">
-    {{ location }}
+    {{ entry.location }}
   </p>
 
   <button type="button" class="| button button-xs button-ghost" @click.prevent="removeLocation">
@@ -20,9 +20,7 @@
 
 <script setup lang="ts">
 interface Props {
-  id: number
-  name: string
-  location: string
+  entry: UserSavedLocation
 }
 
 const props = defineProps<Props>()
@@ -31,11 +29,15 @@ const props = defineProps<Props>()
  *  Check if location name is updated
  */
 const locationValue = defineModel({
-  default: (props) => props.name
+  default: (props) => {
+    const { name } = asObject(props.entry)
+
+    return name
+  }
 })
 
 const isUpdated = computed(() => {
-  const { name } = props
+  const { name } = asObject(props.entry)
 
   return locationValue.value !== name
 })
@@ -43,30 +45,33 @@ const isUpdated = computed(() => {
 /**
  *  Manage entries
  */
-const { deleteEntry } = useSavedLocation();
+const { addEntry, deleteEntry } = useSavedLocation();
+
+const $input = useTemplateRef('$input')
 
 function removeLocation() {
-  deleteEntry(props.id)
+  const { id } = asObject(props.entry)
+
+  deleteEntry(id as number)
 }
 
 /**
  *  Update entry
  */
-const $input = useTemplateRef('$input')
 
 function updateLocation() {
-  const { id, location } = props
+  const { entry = {} }: { entry?: Record<string, unknown> } = asObject(props)
 
   // Get new name
-  const newName = unref($input)?.value
+  const name = unref($input)?.value
 
   // Check name has a length
-  if (!newName || !newName.length) {
+  if (!name || !name.length) {
     console.error('Name is required')
 
     return
   }
 
-  console.log('Update', { id, name: newName, location })
+  addEntry({ ...entry, ...{ name } } as UserSavedLocation)
 }
 </script>
