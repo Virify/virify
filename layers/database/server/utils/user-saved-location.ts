@@ -12,6 +12,9 @@ export function getUserSavedLocations(userId: number): Promise<UserLocation[]> {
         userId: userId,
       },
     },
+    orderBy: {
+      createdAt: 'asc'
+    }
   });
 }
 
