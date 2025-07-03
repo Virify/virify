@@ -4,5 +4,5 @@
  * based on the number of times they have been performed.
  */
 export default defineEventHandler(async (event) => {
-  return await getTrendingAiSearches();
+  return await getTrendingLocations();
 });

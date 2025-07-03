@@ -13,7 +13,7 @@ export function useAnalytics() {
   const sessionId = useState("analytics-session-id", () => nanoid());
   const { data: recentlyViewedListings } = useAsyncData("recently-viewed-listings", () => useRequestFetch()<number[]>("/api/analytics/listing/track-view"));
   const { data: analytics } = useAsyncData("user-analytics", () => useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all"));
-  const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/ai-search"), {
+  const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/search/location"), {
     immediate: true,
   });
   const { recentFavourites } = useFavourites();
@@ -83,7 +83,7 @@ export function useAnalytics() {
       };
 
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-      navigator.sendBeacon("/api/analytics/ai-search", blob);
+      navigator.sendBeacon("/api/analytics/search", blob);
     } catch (error) {
       console.error("Failed to track AI search:", error);
     }

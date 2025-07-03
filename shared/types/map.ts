@@ -120,7 +120,6 @@ export type GeocodingResponse = {
  */
 export type TrendingLocation = {
   id: string;
-  aiQuery: string;
   name: string;
   location: GeocodingFeature;
   count: number;
