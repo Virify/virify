@@ -1,0 +1,7 @@
+model TrackSearch {
+  id         Int      @id @default(autoincrement())
+  aiQuery    String
+  userId     Int?
+  location   Json
+  createdAt  DateTime @default(now())
+}

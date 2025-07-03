@@ -72,11 +72,26 @@ export function useAnalytics() {
     }
   };
 
+  const trackAiSearch = async (aiQuery: string, location: GeocodingFeature) => {
+    try {
+      const payload: { aiQuery: string; location: GeocodingFeature } = {
+        aiQuery,
+        location,
+      };
+
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+      navigator.sendBeacon("/api/analytics/ai-search", blob);
+    } catch (error) {
+      console.error("Failed to track AI search:", error);
+    }
+  };
+
   return {
     analytics,
     trackListingView,
     recentFavourites,
     recentUserNotes,
     recentlyViewedListings,
+    trackAiSearch,
   };
 }

@@ -272,3 +272,20 @@ export async function getRecentViewedListings(userId: number, limit: number = 5)
     },
   });
 }
+
+/**
+ * Tracks an AI search event
+ * @param aiQuery The AI search query string
+ * @param userId The ID of the user performing the search
+ * @param location The location data associated with the search
+ * @returns The created TrackSearch record
+ */
+export async function trackAiSearch(aiQuery: string, userId: number | null, location: GeocodingFeature) {
+  return prisma.trackSearch.create({
+    data: {
+      aiQuery,
+      userId,
+      location: location,
+    },
+  });
+}
