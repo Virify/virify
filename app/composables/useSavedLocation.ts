@@ -79,8 +79,22 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * Remove a location entry
    */
-  function deleteEntry(entry: Partial<UserSavedLocation>) {
-    console.log('Delete entry', entry)
+  async function deleteEntry(entryId: number) {
+    if (!Number.isInteger(entryId)) {
+      console.error('Entry ID is not a number')
+
+      return
+    }
+
+    await $fetch<UserSavedLocation>(`/api/user/locations/${entryId}`, {
+      method: "DELETE"
+    }).then(() => {
+      const indexToRemove = entries.value.findIndex(entry => {
+        return entry.id === entryId
+      })
+
+      entries.value.splice(indexToRemove, 1)
+    })
   }
 
   return {

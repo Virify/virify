@@ -45,14 +45,8 @@ const isUpdated = computed(() => {
  */
 const { deleteEntry } = useSavedLocation();
 
-/**
- *  Delete entry
- */
-
 function removeLocation() {
-  const { id, name, location } = props
-
-  deleteEntry({ id, name, location })
+  deleteEntry(props.id)
 }
 
 /**
