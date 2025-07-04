@@ -31,7 +31,7 @@
       @submit="handleSearch()" />
 
     <!-- example prompts -->
-    <ul class="filters-list">
+    <ul class="p-ai-search__filters-list">
       <li v-for="prompt of examplePrompts">
         <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
           @click.prevent="addPrompt(prompt)" />
@@ -183,6 +183,11 @@ ul {
     padding-right: var(--size-40);
     margin: 0;
   }
+
+  &__filters-list {
+    margin: var(--size-24) 0;
+    gap: var(--size-8);
+  }
 }
 
 .suggestion-item {
@@ -195,9 +200,5 @@ ul {
     background: var(--secondary-400);
     color: var(--monochrome-900);
   }
-}
-
-.filters-list {
-  gap: var(--size-8);
 }
 </style>
