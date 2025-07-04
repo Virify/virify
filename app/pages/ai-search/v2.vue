@@ -12,9 +12,8 @@
       <fieldset class="p-ai-search__location | elevate-200">
         <legend class="| visually-hidden">Location</legend>
 
-        <input type="text" class="p-ai-search__location-input | body-md"
-          placeholder="Search for properties, locations, or features..." aria-label="Location" v-model="locationQuery"
-          @input="showPopover" @focus="showPopover" />
+        <input type="text" class="p-ai-search__location-input | body-md" placeholder="Where do you want to live?"
+          aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="p-ai-search__location-radius | body-md" v-model="selectedRadius" :options="radiusOptions" />

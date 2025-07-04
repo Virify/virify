@@ -2,8 +2,10 @@
   <div class="m-promptbox m-promptbox--overlay | elevate-200">
     <!-- analysed query overlays the textarea -->
     <div class="m-promptbox__overlay" v-if="queryAnalysis" v-html="getAnalyzedQuery()"></div>
-    <textarea :id class="m-promptbox__textarea" :placeholder :aria-label="props.label" v-model="textarea"
+
+    <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
       :style="queryAnalysis ? 'color: transparent; caret-color: var(--color-300);' : ''"></textarea>
+
     <button type="submit" class="m-promptbox__button" aria-label="Submit" @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
     </button>
@@ -51,8 +53,7 @@ const textarea = defineModel({ default: '' })
     border: none;
     background: transparent;
     color: inherit;
-    font: inherit;
-    padding: 0;
+    padding: 0 var(--size-6);
     margin: 0;
     min-height: 8ch;
     resize: none;
