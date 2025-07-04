@@ -51,7 +51,7 @@ export interface ConnectionStatusMessage extends BaseWebSocketMessage {
 export interface AggregateUpdateMessage extends BaseWebSocketMessage {
   type: "aggregate_update";
   aggregateType: keyof UserItemsAggregates;
-  operation: "add" | "remove";
+  operation: "add" | "remove" | "update";
   to: number;
 }
 
