@@ -1,171 +1,104 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { UserSavedLocation } from "~~/shared/types/userLocation";
-import { useStorage } from "@vueuse/core";
-import { ViewsDialogLogin, ViewsDialogUserLocation } from "#components";
-import type { UserLocation } from "@prisma/client";
 
 export const useSavedLocation = createSharedComposable(() => {
-  const { loggedIn } = useUserSession();
-  const { showDialog } = useDialog();
+  const entries = useState<UserSavedLocation[]>('saved-locations', () => [])
 
   /**
-   * State Management
+   *  Get all entries (alias of addEntry, but with no arguments)
    */
-  const locationHistory = useStorage<GeocodingFeature[]>("searchLocationHistory", []);
-  const { data: userSavedLocations, refresh: refreshUserLocations } = useAsyncData<UserSavedLocation[]>(
-    "userSavedLocations",
-    async () => {
-      if (!loggedIn.value) return [];
-      return await useRequestFetch()<UserSavedLocation[]>("/api/user/locations/");
-    },
-    {
-      default: () => [],
-      watch: [loggedIn],
+  async function getEntries() {
+    if (import.meta.server) return
+
+    await $fetch<UserSavedLocation>(`/api/user/locations/`).then((response) => {
+      if (!Array.isArray(response)) {
+        throw createError({
+          status: 500,
+          statusMessage: 'Invalid response from server'
+        })
+      }
+
+      entries.value = response
+    })
+  }
+
+  /**
+   * Fetch location entries
+   */
+  const isPending = ref(false)
+
+  async function addEntry(newLocation: UserSavedLocation) {
+    if (isPending.value) return
+
+    // Ensure a location is provided
+    if (!newLocation) {
+      throw createError({
+        status: 400,
+        statusMessage: 'No location provided'
+      })
     }
-  );
 
-  /**
-   * Adds a user saved location to the database
-   *
-   * @param location The location to add to saved locations
-   * @returns void
-   */
-  async function updateUserSavedLocation(location: GeocodingFeature, name: string, id?: number) {
-    console.log("Adding user saved location", location, name, id);
-    const UserSavedLocation = {
-      id: id || undefined,
-      name: name,
-      geocodingFeature: location,
-      lat: location.geometry.coordinates[1],
-      lon: location.geometry.coordinates[0],
-      location: location.place_name_en,
-    } as UserSavedLocation;
+    // Prevent multiple locations being saved at the same time
+    isPending.value = true
 
-    await $fetch<UserLocation>(`/api/user/locations/${location.id}`, {
+    // Post new location
+    await $fetch<UserSavedLocation>(`/api/user/locations/`, {
       method: "POST",
-      body: UserSavedLocation,
-    });
-
-    // Refresh the user saved locations after adding a new one
-    await refreshUserLocations();
+      body: newLocation,
+    }).then(async () => {
+      // Refresh entries
+      await getEntries()
+    }).catch(() => {
+      throw createError({
+        status: 500,
+        statusMessage: 'Unable to save new location'
+      })
+    }).finally(() => {
+      // Re-allow location saving
+      isPending.value = false
+    })
   }
 
   /**
-   * Deletes a user saved location from the database
-   * @param location The user saved location to delete
-   * @returns void
+   * Check if an entry exists
    */
-  async function deleteUserSavedLocation(location: UserSavedLocation) {
-    console.log("Deleting user saved location", location);
-    await $fetch<UserLocation>(`/api/user/locations/${location.id}`, {
-      method: "DELETE",
-    });
+  function checkEntry(location: Partial<UserSavedLocation>) {
+    const { place_name_en } = asObject(location)
 
-    await refreshUserLocations();
-  }
-
-  /**
-   * Checks if a location is saved
-   *
-   * @param location The location to check if it is saved
-   * @returns boolean
-   */
-  function isSavedLocation(location: GeocodingFeature): boolean {
-    return userSavedLocations.value?.some((loc) => loc.geocodingFeature?.id === location.id);
-  }
-
-  /**
-   * Shows a dialog to save a location
-   *
-   * @param location The location to show in the dialog
-   * Opens a dialog to save the location if the user is logged in
-   * If the user is not logged in, it shows the login dialog
-   * @returns void
-   */
-  function showLocationDialog(location: GeocodingFeature): void {
-    if (!loggedIn.value) {
-      showDialog({ component: ViewsDialogLogin });
-      return;
-    }
-
-    // if location.place_name_en matches a saved location, pass the usrSavedLocation
-    const existingLocation = userSavedLocations.value.find((loc) => loc.location === location.place_name_en);
-    showDialog({
-      component: ViewsDialogUserLocation,
-      props: { geocodingLocation: location, userSavedLocation: existingLocation },
+    return entries.value.find((entry) => {
+      return entry.location === place_name_en
     });
   }
 
   /**
-   *
-   * @param location The location to add to history
-   * Adds a location to the search history if it doesn't already exist
-   * @returns void
+   *  Clear entries
    */
-  function addLocationToHistory(location: GeocodingFeature) {
-    if (locationHistory.value.length >= 5) {
-      // If we have 5 locations, remove the oldest one
-      locationHistory.value.shift();
-    }
-    const exists = locationHistory.value.some((loc) => loc.id === location.id || loc.place_name_en === location.place_name_en);
-
-    if (!exists) {
-      locationHistory.value.push(location);
-    }
+  function clearEntries() {
+    entries.value = []
   }
 
   /**
-   * Remove a location from the search history
-   *
-   * @param location The location to remove from history
-   * Removes a location from the search history if it exists
-   * @returns void
+   * Remove a location entry
    */
-  function removeFromLocationHistory(location: GeocodingFeature) {
-    locationHistory.value = locationHistory.value.filter((loc) => loc.id !== location.id && loc.place_name_en !== location.place_name_en);
-  }
+  async function deleteEntry(entryId: number) {
+    if (!Number.isInteger(entryId)) {
+      console.error('Entry ID is not a number')
 
-  /**
-   * Clear the location history
-   */
-  function clearLocationHistory() {
-    locationHistory.value = [];
-  }
-
-  /**
-   * Watch for changes in the loggedIn state
-   * When the user logs out, clear cached notes state
-   * When the user logs in, prefetch notes
-   */
-  watch(loggedIn, async (isLoggedIn) => {
-    if (isLoggedIn) {
-      await refreshUserLocations();
-    } else {
-      userSavedLocations.value = [];
+      return
     }
-  });
 
-  /**
-   * On mount, check if the user is logged in and fetch notes
-   * This ensures we have all notes available at once, preventing individual API calls
-   */
-  onMounted(async () => {
-    if (loggedIn.value) {
-      await refreshUserLocations();
-      console.log("User saved locations fetched on mount:", userSavedLocations.value);
-    }
-  });
+    await $fetch<UserSavedLocation>(`/api/user/locations/${entryId}`, {
+      method: "DELETE"
+    }).then(async () => {
+      await getEntries()
+    })
+  }
 
   return {
-    userSavedLocations,
-    locationHistory,
-    refreshUserLocations,
-    addLocationToHistory,
-    clearLocationHistory,
-    removeFromLocationHistory,
-    updateUserSavedLocation,
-    deleteUserSavedLocation,
-    showLocationDialog,
-    isSavedLocation,
-  };
+    entries,
+    getEntries,
+    checkEntry,
+    clearEntries,
+    deleteEntry,
+    addEntry
+  }
 });

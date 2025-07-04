@@ -1,4 +1,5 @@
 export default function useAi() {
+  const { trackAiSearch } = useAnalytics();
   // Global state for query analysis and search query
   const queryAnalysis = useState<{ usedTerms: string[]; ignoredTerms: string[] } | null>(
     "ai-query-analysis",
@@ -22,6 +23,8 @@ export default function useAi() {
         radius: radius,
       },
     });
+
+    trackAiSearch(searchQuery.value, location);
 
     if (response.queryAnalysis) {
       queryAnalysis.value = response.queryAnalysis;

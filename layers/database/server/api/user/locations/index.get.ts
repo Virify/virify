@@ -1,20 +1,16 @@
-import { getUserSavedLocations } from "../../../utils/user-saved-location";
+import { getUserSavedLocations } from "~~/layers/database/server/utils/user-saved-location";
 
-/**
- * Get user saved listings (favourites)
- */
 export default defineEventHandler(async (event) => {
+  const { user } = await requireUserSession(event);
   const { errorResponse } = useResponse();
-  const session = await requireUserSession(event);
   try {
-    const userId = session?.user?.id;
+    if (!user.id) {
+      throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    }
 
-    if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-
-    const result = await getUserSavedLocations(userId as number);
-    return result;
+    return await getUserSavedLocations(user.id);
   } catch (error) {
-    console.log(error)
-    errorResponse(error, event);
+    console.log(error);
+    return errorResponse(error, event);
   }
 });

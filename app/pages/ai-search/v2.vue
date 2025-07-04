@@ -6,23 +6,25 @@
       <span class="| gradient-text gradient-text-ai">AI</span>
       enhanced property search
     </h1>
+
     <!-- location group -->
-    <div class="location-input-group">
-      <div class="location-input-wrapper">
-        <!-- location input -->
-        <input type="text" class="location-input" placeholder="Search for properties, locations, or features..."
-          aria-label="Search for properties, locations, or features" v-model="locationQuery" />
-      </div>
-      <!-- radius -->
-      <select name="radius" id="radius" class="radius-select" v-model="selectedRadius">
-        <option v-for="option in radiusOptions" :key="option.value" :value="option.value">
-          {{ option.key }}
-        </option>
-      </select>
+    <div role="presentation" ref="$location" class="| flow flow-lg">
+      <fieldset class="p-ai-search__location | elevate-200">
+        <legend class="| visually-hidden">Location</legend>
+
+        <input type="text" class="p-ai-search__location-input | body-md" placeholder="Where do you want to live?"
+          aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
+
+        <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+          class="p-ai-search__location-radius | body-md" v-model="selectedRadius" :options="radiusOptions" />
+      </fieldset>
+
+      <Transition name="p-ai-search__location">
+        <div role="presentation" v-show="popoverExpanded">
+          <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+        </div>
+      </Transition>
     </div>
-
-    <MoleculesAutocompletePopover :searchValue="locationQuery" @selected-location="handleLocation" @selected-saved-location="handleSavedLocation" />
-
 
     <!-- description title -->
     <h2 class="| title-xs">Description</h2>
@@ -32,7 +34,7 @@
       @submit="handleSearch()" />
 
     <!-- example prompts -->
-    <ul class="filters-list">
+    <ul class="p-ai-search__filters-list">
       <li v-for="prompt of examplePrompts">
         <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
           @click.prevent="addPrompt(prompt)" />
@@ -42,6 +44,8 @@
 </template>
 
 <script setup lang="ts">
+import { onClickOutside, useEventListener } from '@vueuse/core'
+
 const selectedLocation = ref<GeocodingFeature | null>(null)
 const { aiSearch, searchQuery } = useAi()
 const textareaId = useId()
@@ -92,22 +96,8 @@ function addPrompt(prompt: string) {
 function handleLocation(location: GeocodingFeature) {
   selectedLocation.value = location
   locationQuery.value = location.place_name_en
-}
 
-/**
- * 
- * @param location Selected saved location
- * Handles the selection of a saved location
- * @returns void
- */
-function handleSavedLocation(location: UserSavedLocation | { name: string; location: string }) {
-  console.log('Selected saved location:', location)
-  locationQuery.value = location.location
-  if ('geocodingFeature' in location) {
-    selectedLocation.value = location.geocodingFeature
-  } else {
-    selectedLocation.value = null
-  }
+  hidePopover()
 }
 
 /**
@@ -122,10 +112,37 @@ async function handleSearch() {
     console.warn('No location selected for search.')
   }
 }
+
+/**
+ *  Popover toggle
+ */
+const popoverExpanded = ref(false)
+const $location = useTemplateRef('$location')
+
+function showPopover() {
+  popoverExpanded.value = true
+}
+
+function hidePopover() {
+  popoverExpanded.value = false
+}
+
+const { cancel } = onClickOutside($location, () => {
+  hidePopover()
+}, { controls: true })
+
+// Prevent click outside if clicking in modal
+useEventListener('mousedown', ({ target }) => {
+  const teleports = document.getElementById('teleports')
+
+  if (!isElement(teleports) || !isElement(target)) return
+  if (teleports.contains(target)) cancel()
+})
 </script>
 
 <style lang="scss" scoped>
 @use '#styles/_utils/functions' as fn;
+@use '#styles/_utils/media' as mq;
 
 h2 {
   max-width: 42ch;
@@ -139,22 +156,56 @@ ul {
   margin: var(--size-10) 0;
 }
 
-.location-input-group {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  gap: var(--size-10);
-  margin-bottom: var(--size-20);
-  align-items: flex-start;
-}
+.p-ai-search {
 
-.location-input {
-  padding: var(--size-10) var(--size-14);
-  border: 1px solid var(--border-color-200);
-  border-radius: var(--border-radius-lg);
-  background: var(--background-200);
-  width: 100%;
-  color: inherit;
-  font: inherit;
+  &__location {
+    display: grid;
+    padding: var(--size-16);
+    gap: var(--size-16);
+    background: var(--background-200);
+    color: var(--foreground-100);
+    border-radius: var(--border-radius-xl);
+    align-items: stretch;
+
+    @include mq.small-tablet {
+      grid-template-columns: 1fr auto;
+      border-radius: var(--border-radius-2xl);
+    }
+
+    &:has(input:focus) {
+      outline: var(--focus-outline);
+    }
+  }
+
+  &__location-radius,
+  &__location-input {
+    background-color: transparent;
+    color: currentColor;
+    border-radius: var(--border-radius-lg);
+    padding: var(--size-14) var(--size-16);
+
+    @include mq.small-tablet {
+      border-radius: var(--border-radius-xl);
+    }
+  }
+
+  &__location-input {
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__location-radius {
+    border: 1px solid var(--border-color-200);
+    padding-right: var(--size-40);
+    margin: 0;
+  }
+
+  &__filters-list {
+    margin: var(--size-24) 0;
+    gap: var(--size-8);
+  }
 }
 
 .suggestion-item {
@@ -169,16 +220,34 @@ ul {
   }
 }
 
-.radius-select {
-  padding: var(--size-12) var(--size-14);
-  border: 1px solid var(--border-color-200);
-  border-radius: var(--border-radius-lg);
-  background: var(--background-200);
-  color: inherit;
-  font: inherit;
+/**
+ *  Transitions
+ */
+.p-ai-search__location-enter-active,
+.p-ai-search__location-leave-active {
+  interpolate-size: allow-keywords;
+
+  height: calc-size(max-content, size);
+  transition-property: height, margin;
+  transition-duration: var(--animation-slow);
+  transition-timing-function: var(--ease-out);
+  overflow: hidden;
+  box-sizing: border-box;
+
+  >* {
+    transition-property: opacity;
+    transition-duration: var(--animation-slow);
+    transition-timing-function: var(--ease-out);
+  }
 }
 
-.filters-list {
-  gap: var(--size-8);
+.p-ai-search__location-leave-to,
+.p-ai-search__location-enter-from {
+  height: 0;
+  margin: 0;
+
+  >* {
+    opacity: 0;
+  }
 }
 </style>
