@@ -1,15 +1,9 @@
 <template>
-  <div class="m-promptbox m-promptbox--overlay">
+  <div class="m-promptbox m-promptbox--overlay | elevate-200">
     <!-- analysed query overlays the textarea -->
     <div class="m-promptbox__overlay" v-if="queryAnalysis" v-html="getAnalyzedQuery()"></div>
-    <textarea
-      :id
-      class="m-promptbox__textarea"
-      :placeholder
-      :aria-label="props.label"
-      v-model="textarea"
-      :style="queryAnalysis ? 'color: transparent; caret-color: var(--color-300);' : ''"
-    ></textarea>
+    <textarea :id class="m-promptbox__textarea" :placeholder :aria-label="props.label" v-model="textarea"
+      :style="queryAnalysis ? 'color: transparent; caret-color: var(--color-300);' : ''"></textarea>
     <button type="submit" class="m-promptbox__button" aria-label="Submit" @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
     </button>
@@ -33,14 +27,20 @@ const textarea = defineModel({ default: '' })
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .m-promptbox {
   display: flex;
   align-items: flex-end;
   gap: 0;
-  border: 1px solid var(--border-color-200);
   background: var(--background-200);
-  border-radius: var(--border-radius-lg);
-  padding: var(--size-10) var(--size-14);
+  border-radius: var(--border-radius-xl);
+  padding: var(--size-16);
+
+  @include mq.small-tablet {
+    border-radius: var(--border-radius-2xl);
+    padding: var(--size-18);
+  }
 
   &:has(textarea:focus) {
     outline: var(--focus-outline);

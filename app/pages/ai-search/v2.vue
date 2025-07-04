@@ -6,20 +6,18 @@
       <span class="| gradient-text gradient-text-ai">AI</span>
       enhanced property search
     </h1>
+
     <!-- location group -->
-    <div class="location-input-group">
-      <div class="location-input-wrapper">
-        <!-- location input -->
-        <input type="text" class="location-input" placeholder="Search for properties, locations, or features..."
-          aria-label="Search for properties, locations, or features" v-model="locationQuery" />
-      </div>
-      <!-- radius -->
-      <select name="radius" id="radius" class="radius-select" v-model="selectedRadius">
-        <option v-for="option in radiusOptions" :key="option.value" :value="option.value">
-          {{ option.key }}
-        </option>
-      </select>
-    </div>
+    <fieldset class="p-ai-search__location | elevate-200">
+      <legend class="| visually-hidden">Location</legend>
+
+      <input type="text" class="p-ai-search__location-input | body-md"
+        placeholder="Search for properties, locations, or features..." aria-label="Location" v-model="locationQuery" />
+
+      <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="p-ai-search__location-radius | body-md"
+        v-model="selectedRadius" :options="radiusOptions" />
+
+    </fieldset>
 
     <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
 
@@ -109,6 +107,7 @@ async function handleSearch() {
 
 <style lang="scss" scoped>
 @use '#styles/_utils/functions' as fn;
+@use '#styles/_utils/media' as mq;
 
 h2 {
   max-width: 42ch;
@@ -122,22 +121,51 @@ ul {
   margin: var(--size-10) 0;
 }
 
-.location-input-group {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  gap: var(--size-10);
-  margin-bottom: var(--size-20);
-  align-items: flex-start;
-}
+.p-ai-search {
 
-.location-input {
-  padding: var(--size-10) var(--size-14);
-  border: 1px solid var(--border-color-200);
-  border-radius: var(--border-radius-lg);
-  background: var(--background-200);
-  width: 100%;
-  color: inherit;
-  font: inherit;
+  &__location {
+    display: grid;
+    padding: var(--size-16);
+    gap: var(--size-16);
+    background: var(--background-200);
+    color: var(--foreground-100);
+    border-radius: var(--border-radius-xl);
+    align-items: stretch;
+
+    @include mq.small-tablet {
+      grid-template-columns: 1fr auto;
+      border-radius: var(--border-radius-2xl);
+    }
+
+    &:has(input:focus) {
+      outline: var(--focus-outline);
+    }
+  }
+
+  &__location-radius,
+  &__location-input {
+    background-color: transparent;
+    color: currentColor;
+    border-radius: var(--border-radius-lg);
+    padding: var(--size-14) var(--size-16);
+
+    @include mq.small-tablet {
+      border-radius: var(--border-radius-xl);
+    }
+  }
+
+  &__location-input {
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__location-radius {
+    border: 1px solid var(--border-color-200);
+    padding-right: var(--size-40);
+    margin: 0;
+  }
 }
 
 .suggestion-item {
@@ -150,15 +178,6 @@ ul {
     background: var(--secondary-400);
     color: var(--monochrome-900);
   }
-}
-
-.radius-select {
-  padding: var(--size-12) var(--size-14);
-  border: 1px solid var(--border-color-200);
-  border-radius: var(--border-radius-lg);
-  background: var(--background-200);
-  color: inherit;
-  font: inherit;
 }
 
 .filters-list {

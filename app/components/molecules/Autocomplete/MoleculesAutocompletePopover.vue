@@ -170,10 +170,17 @@ watch(
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .m-autocomplete-popover {
   background-color: var(--background-200);
-  padding: var(--size-32);
-  border-radius: var(--border-radius-2xl);
+  border-radius: var(--border-radius-xl);
+  padding: var(--size-18);
+
+  @include mq.small-tablet {
+    padding: var(--size-32);
+    border-radius: var(--border-radius-2xl);
+  }
 
   &__title {
     margin-bottom: var(--size-16);
