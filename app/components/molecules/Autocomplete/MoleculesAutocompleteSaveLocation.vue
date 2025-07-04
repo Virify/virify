@@ -34,7 +34,7 @@
 import { ViewsDialogLogin } from '#components';
 
 interface Props {
-  option: unknown
+  option: GeocodingFeature
   customClass: string
 }
 
@@ -95,15 +95,15 @@ async function saveLocation() {
   await setPendingWhile(async () => {
     const { option } = props
     const { geometry, place_name_en } = asObject(option)
-    const { coordinates = [] } = asObject(geometry)
+    const { coordinates } = asObject(geometry)
 
     await addSavedLocation({
       name,
-      lat: (coordinates as number[])[0],
-      lon: (coordinates as number[])[1],
+      lat: (coordinates as [number, number])[0],
+      lon: (coordinates as [number, number])[1],
       location: place_name_en,
       geocodingFeature: option
-    });
+    } as UserSavedLocation);
 
     closePopover()
   });

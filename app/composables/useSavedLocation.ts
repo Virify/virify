@@ -61,7 +61,7 @@ export const useSavedLocation = createSharedComposable(() => {
   /**
    * Check if an entry exists
    */
-  function checkEntry(location: Partial<UserSavedLocation>) {
+  function checkEntry(location: GeocodingFeature) {
     const { place_name_en } = asObject(location)
 
     return entries.value.find((entry) => {
