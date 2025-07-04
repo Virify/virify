@@ -19,8 +19,11 @@
           class="p-ai-search__location-radius | body-md" v-model="selectedRadius" :options="radiusOptions" />
       </fieldset>
 
-      <MoleculesAutocompletePopover :hidden="!popoverExpanded" :searchValue="locationQuery"
-        @location-selected="handleLocation" />
+      <Transition name="p-ai-search__location">
+        <div role="presentation" v-show="popoverExpanded">
+          <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+        </div>
+      </Transition>
     </div>
 
     <!-- description title -->
@@ -214,6 +217,37 @@ ul {
   &:hover {
     background: var(--secondary-400);
     color: var(--monochrome-900);
+  }
+}
+
+/**
+ *  Transitions
+ */
+.p-ai-search__location-enter-active,
+.p-ai-search__location-leave-active {
+  interpolate-size: allow-keywords;
+
+  height: calc-size(max-content, size);
+  transition-property: height, margin;
+  transition-duration: var(--animation-slow);
+  transition-timing-function: var(--ease-out);
+  overflow: hidden;
+  box-sizing: border-box;
+
+  >* {
+    transition-property: opacity;
+    transition-duration: var(--animation-slow);
+    transition-timing-function: var(--ease-out);
+  }
+}
+
+.p-ai-search__location-leave-to,
+.p-ai-search__location-enter-from {
+  height: 0;
+  margin: 0;
+
+  >* {
+    opacity: 0;
   }
 }
 </style>
