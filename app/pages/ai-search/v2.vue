@@ -12,14 +12,16 @@
       <legend class="| visually-hidden">Location</legend>
 
       <input type="text" class="p-ai-search__location-input | body-md"
-        placeholder="Search for properties, locations, or features..." aria-label="Location" v-model="locationQuery" />
+        placeholder="Search for properties, locations, or features..." aria-label="Location" v-model="locationQuery"
+        @input="showPopover" @focus="showPopover" />
 
       <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="p-ai-search__location-radius | body-md"
         v-model="selectedRadius" :options="radiusOptions" />
 
     </fieldset>
 
-    <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+    <MoleculesAutocompletePopover :hidden="!popoverExpanded" :searchValue="locationQuery"
+      @location-selected="handleLocation" />
 
     <!-- description title -->
     <h2 class="| title-xs">Description</h2>
@@ -89,6 +91,8 @@ function addPrompt(prompt: string) {
 function handleLocation(location: GeocodingFeature) {
   selectedLocation.value = location
   locationQuery.value = location.place_name_en
+
+  hidePopover()
 }
 
 /**
@@ -102,6 +106,19 @@ async function handleSearch() {
   } else {
     console.warn('No location selected for search.')
   }
+}
+
+/**
+ *  Popover toggle
+ */
+const popoverExpanded = ref(false)
+
+function showPopover() {
+  popoverExpanded.value = true
+}
+
+function hidePopover() {
+  popoverExpanded.value = false
 }
 </script>
 
