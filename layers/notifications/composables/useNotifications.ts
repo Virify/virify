@@ -10,6 +10,7 @@ export function useNotifications() {
     favourites: 0,
     notes: 0,
     enquiries: 0,
+    locations: 0,
     notifications: 0,
     messages: 0,
     offers: 0,
@@ -28,6 +29,7 @@ export function useNotifications() {
     try {
       const data = await $fetch<UserItemsAggregates>("/api/notifications/aggregates");
       aggregates.value = data;
+      console.log("Fetched user items aggregates:", data);
     } catch (err) {
       console.error("Failed to fetch user items aggregates:", err);
       aggregatesError.value = err as Error;
