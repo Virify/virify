@@ -7,7 +7,7 @@
         class="listing-card__image"
       >
       <div class="listing-card__image-overlay">
-        <div class="listing-card__image-counter">
+        <div class="listing-card__image-counter body-xs">
           1/15
         </div>
         <div class="listing-card__image-actions">
@@ -109,7 +109,7 @@ defineProps({
 
 <style scoped>
 .listing-card {
-  --card-padding: var(--size-24);
+  --card-padding: var(--size-16);
   --image-width: 45%;
 
   background-color: var(--background-100);
