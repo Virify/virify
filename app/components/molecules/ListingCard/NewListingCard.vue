@@ -113,7 +113,7 @@ defineProps({
   --image-width: 45%;
 
   background-color: var(--background-100);
-  border: var(--size-2) solid var(--blue-200);
+  border: var(--size-2) solid var(--secondary-400);
   border-radius: var(--border-radius-2xl);
   display: flex;
   max-width: 960px;
@@ -202,7 +202,7 @@ defineProps({
 }
 
 .listing-card__content {
-  color: var(--blue-200);
+  color: var(--text-color);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
