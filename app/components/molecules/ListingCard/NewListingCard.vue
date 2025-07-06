@@ -19,24 +19,24 @@
           </button>
         </div>
         <button class="listing-card__arrow listing-card__arrow--left">
-          &lt;
+          <AtomsIcon name="chevron-left" icon="chevron-left" />
         </button>
         <button class="listing-card__arrow listing-card__arrow--right">
-          &gt;
+          <AtomsIcon name="chevron-right" icon="chevron-right" />
         </button>
       </div>
     </div>
     <div class="listing-card__content">
       <div class="listing-card__details">
         <div class="listing-card__header">
-          <p class="listing-card__price title-lg">
+          <p class="listing-card__price title-md">
             £1,000,000
           </p>
-          <p class="listing-card__price-qualifier body-sm faded-text">
+          <p class="listing-card__price-qualifier body-xs faded-text">
             Guide Price
           </p>
         </div>
-        <h3 class="listing-card__title title-sm">
+        <h3 class="listing-card__title body-md font-semibold">
           Detached House
         </h3>
         <p class="listing-card__location body-sm faded-text">
@@ -61,24 +61,16 @@
           <span class="listing-card__tag body-xs">Reduced</span>
           <span class="listing-card__tag body-xs">Chain Free</span>
         </div>
-        <div v-if="extraInfoVisible" class="listing-card__extra-info">
-          <p class="listing-card__extra-info-title title-2xs">
-            Additional Information:
-          </p>
-          <p class="body-xs faded-text">
-            Lorem ipsum dolor sit amet consectetur. Ornare diam vel nunc ultrices malesuada ultrices...
-          </p>
-        </div>
       </div>
       <div class="listing-card__footer">
         <div class="listing-card__agent font-semibold">
           <div class="listing-card__agent-logo">
             <AtomsIcon name="check" icon="tick-solid" />
           </div>
-          <p>MaggotBalls</p>
+          <p class="body-sm">MaggotBalls</p>
         </div>
         <div class="listing-card__actions">
-          <button class="listing-card__button body-sm font-bold">
+          <button class="listing-card__button body-sm font-bold ghost">
             View
           </button>
           <button class="listing-card__button body-sm font-bold">
@@ -100,20 +92,16 @@ defineProps({
     type: String,
     default: 'Detached House'
   },
-  extraInfoVisible: {
-    type: Boolean,
-    default: false
-  }
 })
 </script>
 
-<style scoped>
+<style lang="scss">
 .listing-card {
   --card-padding: var(--size-16);
   --image-width: 45%;
 
   background-color: var(--background-100);
-  border: var(--size-2) solid var(--secondary-400);
+  border: var(--size-2) solid var(--monochrome-100);
   border-radius: var(--border-radius-2xl);
   display: flex;
   max-width: 960px;
@@ -141,26 +129,34 @@ defineProps({
   top: 0;
 }
 
+.listing-card__image-overlay > * {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.listing-card__image-container:hover .listing-card__arrow {
+  opacity: 1;
+}
+
 .listing-card__image-counter {
   background-color: var(--secondary-400);
   border-radius: var(--border-radius-xl);
   color: var(--monochrome-900);
-  right: var(--size-16);
   padding: var(--size-4) var(--size-12);
   position: absolute;
-  top: var(--size-16);
+  bottom: var(--size-16);
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .listing-card__image-actions {
   background-color: var(--secondary-400);
   border-radius: var(--border-radius-pill);
-  bottom: var(--size-16);
   display: flex;
   gap: var(--size-4);
-  left: 50%;
   padding: var(--size-4) var(--size-8);
   position: absolute;
-  transform: translateX(-50%);
+  top: var(--size-16);
+  right: var(--size-16);
 }
 
 .listing-card__icon-button {
@@ -187,6 +183,7 @@ defineProps({
   font-size: var(--font-2xl);
   height: var(--size-40);
   justify-content: center;
+  opacity: 0;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -225,52 +222,36 @@ defineProps({
   margin: 0;
 }
 
-.listing-card__title {
-  margin: var(--size-4) 0;
-}
-
 .listing-card__location {
-  margin: 0 0 var(--size-16);
+  margin-bottom: var(--size-8);
 }
 
 .listing-card__features {
   display: flex;
   gap: var(--size-16);
-  margin-bottom: var(--size-16);
+  margin-bottom: var(--size-8);
 }
 
 .listing-card__feature {
   align-items: center;
-  border: var(--size-2) solid var(--secondary-400);
-  border-radius: var(--border-radius-lg);
   display: flex;
   font-weight: var(--font-semibold);
-  gap: var(--size-4);
-  padding: var(--size-4) var(--size-8);
+  font-size: var(--font-2xl);
+  gap: var(--size-1);
+  padding: var(--size-4);
 }
 
 .listing-card__tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--size-4);
-  margin-bottom: var(--size-16);
+  margin-bottom: var(--size-8);
 }
 
 .listing-card__tag {
   background-color: var(--background-300);
   border-radius: var(--size-20);
   padding: var(--size-6) var(--size-16);
-}
-
-.listing-card__extra-info {
-  background-color: var(--background-300);
-  border-radius: var(--border-radius-lg);
-  padding: var(--size-16);
-  margin-bottom: var(--size-16);
-}
-
-.listing-card__extra-info-title {
-  margin: 0 0 var(--size-8);
 }
 
 .listing-card__extra-info p {
@@ -298,7 +279,7 @@ defineProps({
   border-radius: 50%;
   color: var(--monochrome-900);
   display: flex;
-  font-size: var(--font-2xl);
+  font-size: var(--font-21xl);
   height: var(--size-32);
   justify-content: center;
   width: var(--size-32);
@@ -307,7 +288,7 @@ defineProps({
 .listing-card__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--size-16);
+  gap: var(--size-8);
   width: 100%;
 }
 
@@ -317,8 +298,14 @@ defineProps({
   border-radius: var(--border-radius-lg);
   color: var(--monochrome-900);
   cursor: pointer;
-  padding: var(--size-8);
+  padding: var(--size-4);
   width: 100%;
+
+  &.ghost {
+    background-color: transparent;
+    color: var(--monochrome-100);
+    border: 1px solid var(--secondary-400);
+  } 
 }
 
 .listing-card__problem-tab {

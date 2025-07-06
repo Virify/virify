@@ -1,13 +1,16 @@
 <template>
   <div class="| container">
     <h1 class="| title-md">Component Testing Sandbox</h1>
-
-    <h2 class="| title-sm">Listing Card Demo</h2>
+    
     <div class="listing-grid">
       <NewListingCard />
       <NewListingCard />
-      <NewListingCard :extra-info-visible="true" />
-      <NewListingCard :extra-info-visible="true" />
+      <NewListingCard />
+      <NewListingCard />
+      <NewListingCard />
+      <NewListingCard />
+      <NewListingCard />
+      <NewListingCard />
     </div>
 
     <AtomsDivider />
