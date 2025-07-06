@@ -101,7 +101,7 @@ defineProps({
   --image-width: 45%;
 
   background-color: var(--background-100);
-  border: var(--size-2) solid var(--monochrome-100);
+  border: var(--size-2) solid var(--foreground-100);
   border-radius: var(--border-radius-2xl);
   display: flex;
   max-width: 960px;
@@ -109,7 +109,7 @@ defineProps({
 }
 
 .listing-card__image-container {
-  border-radius: calc(var(--border-radius-2xl) - var(--size-2)) 0 0 calc(var(--border-radius-2xl) - var(--size-2));
+  border-radius: var(--border-radius-2xl);
   overflow: hidden;
   position: relative;
   width: var(--image-width);
@@ -296,14 +296,14 @@ defineProps({
   background-color: var(--secondary-400);
   border: none;
   border-radius: var(--border-radius-lg);
-  color: var(--monochrome-900);
+  color: var(--monochrome-100);
   cursor: pointer;
   padding: var(--size-4);
   width: 100%;
 
   &.ghost {
     background-color: transparent;
-    color: var(--monochrome-100);
+    color: var(--foreground-900);
     border: 1px solid var(--secondary-400);
   } 
 }
