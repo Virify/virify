@@ -4,17 +4,17 @@
       <AtomsIcon icon="search/pin" />
     </button>
 
-    <form :id="popoverId" popover class="m-autocomplete-save-location__popover | flow" novalidate autocomplete="off"
-      @submit.prevent="saveLocation">
-      <label class="| body-xs flow flow-sm faded-text">
-        Location name
+    <form :id="popoverId" popover class="m-autocomplete-save-location__popover | elevate-200" novalidate
+      autocomplete="off" @submit.prevent="saveLocation">
+      <label class="m-autocomplete-save-location__popover-label | body-xs faded-text">
+        Name
 
-        <input type="text" class="m-autocomplete-save-location__popover-input | body-sm" v-model="locationName"
-          placeholder="e.g. Home" />
+        <input type="text" class="m-autocomplete-save-location__popover-input | text-input body-sm"
+          v-model="locationName" placeholder="e.g. Home" />
       </label>
 
       <div role="presentation" class="m-autocomplete-save-location__popover-buttons">
-        <button type="button" class="| button button-ghost button-xs" :disabled="isPending"
+        <button type="button" class="| button button-bordered button-xs" :disabled="isPending"
           @click.prevent="closePopover">
           Cancel
         </button>
@@ -111,6 +111,8 @@ async function saveLocation() {
 </script>
 
 <style lang="scss">
+@use 'sass:math';
+
 .m-autocomplete-save-location {
   position: relative;
 
@@ -122,30 +124,61 @@ async function saveLocation() {
     position: absolute;
     inset: unset;
     background: var(--background-200);
-    padding: var(--size-12);
-    border-radius: var(--border-radius-md);
+    padding: var(--size-14) var(--size-16) var(--size-16);
+    border-radius: var(--border-radius-lg);
     border: 1px solid var(--border-color-200);
-    top: calc(anchor(bottom) + var(--size-10));
-    right: anchor(right);
+    top: calc(anchor(bottom) + var(--size-14));
+    right: calc(anchor(right) - var(--size-14));
     width: fit-content;
+    overflow: visible;
     z-index: 2;
+    gap: var(--size-10);
+    flex-direction: column;
+
+    &:popover-open {
+      display: flex;
+    }
+
+    &::before {
+      $arrow-size: 12px;
+      $arrow-size-half: math.div($arrow-size, 2);
+
+      content: '';
+      position: absolute;
+      top: -#{ $arrow-size-half };
+      right: calc(var(--size-12) + #{ $arrow-size-half });
+      width: $arrow-size;
+      height: $arrow-size;
+      transform: rotate(45deg);
+      background: var(--background-200);
+      border-top: 1px solid var(--border-color-200);
+      border-left: 1px solid var(--border-color-200);
+      border-top-left-radius: 2px;
+    }
+  }
+
+  &__popover-label {
+    line-height: var(--lineheight-md);
+    display: flex;
+    flex-direction: column;
   }
 
   &__popover-input {
     display: block;
     width: 20ch;
     height: 2.8em;
-    background: var(--background-300);
-    border: 0;
     padding-inline: var(--size-12);
-    border-radius: var(--border-radius-ui);
   }
 
   &__popover-buttons {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: var(--size-8);
+    gap: var(--size-10);
+
+    button {
+      flex-grow: 1;
+      border-radius: var(--border-radius-ui);
+    }
   }
 
   &__existing {
