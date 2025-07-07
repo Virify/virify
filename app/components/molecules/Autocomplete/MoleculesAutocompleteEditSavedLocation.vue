@@ -1,22 +1,27 @@
 <template>
-  <form @submit.prevent="updateLocation">
-    <label class="| body-sm faded-text">
+  <form class="m-autocomplete-edit-saved-location | flow flow-sm elevate-200" @submit.prevent="updateLocation">
+    <label class="| body-xs faded-text">
       Name
       <input ref="$input" type="text" v-model="locationValue" class="| text-input body-md" required
         :disabled="isPending" />
     </label>
 
-    <p class="| body-sm">
+    <p class="m-autocomplete-edit-saved-location__address | body-sm">
+      <AtomsIcon icon="explore/map" />
       {{ entry.location }}
     </p>
 
-    <button type="button" class="| button button-xs button-ghost" :disabled="isPending" @click.prevent="removeLocation">
-      Delete
-    </button>
+    <div class="m-autocomplete-edit-saved-location__buttons">
+      <AtomsButton type="button" class="| button button-xs button-delete" :disabled="isPending"
+        @click.prevent="removeLocation">
+        Delete
+      </AtomsButton>
 
-    <button type="submit" class="| button button-xs button-secondary" :disabled="isPending || !isUpdated">
-      Update
-    </button>
+      <AtomsButton type="submit" class="| button button-xs button-secondary" :pending="isPending"
+        :disabled="isPending || !isUpdated">
+        Rename
+      </AtomsButton>
+    </div>
   </form>
 </template>
 
@@ -82,3 +87,47 @@ function updateLocation() {
   })
 }
 </script>
+
+<style lang="scss">
+.m-autocomplete-edit-saved-location {
+  padding: var(--size-16);
+  border: 1px solid var(--border-color-200);
+  border-radius: var(--border-radius-xl);
+  background-color: var(--background-200);
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4);
+  }
+
+  &__address {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: var(--size-10);
+    line-height: var(--lineheight-sm);
+    padding-inline: var(--size-8);
+
+    svg {
+      width: var(--size-20);
+      height: var(--size-20);
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    gap: var(--size-10);
+    align-items: stretch;
+    justify-content: flex-end;
+
+    button {
+      white-space: nowrap;
+    }
+
+    button[type="submit"] {
+      min-width: 8ch;
+    }
+  }
+}
+</style>
