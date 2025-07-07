@@ -14,14 +14,15 @@
       </label>
 
       <div role="presentation" class="m-autocomplete-save-location__popover-buttons">
-        <button type="button" class="| button button-bordered button-xs" :disabled="isPending"
+        <AtomsButton type="button" class="| button button-bordered button-xs" :disabled="isPending"
           @click.prevent="closePopover">
           Cancel
-        </button>
+        </AtomsButton>
 
-        <button type="submit" class="| button button-secondary button-xs" :disabled="!locationName || isPending">
+        <AtomsButton type="submit" class="| button button-secondary button-xs" :disabled="!locationName || isPending"
+          :pending="isPending">
           Save
-        </button>
+        </AtomsButton>
       </div>
     </form>
   </div>
@@ -172,11 +173,11 @@ async function saveLocation() {
 
   &__popover-buttons {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: var(--size-10);
 
     button {
-      flex-grow: 1;
+      flex: 1 1 50%;
       border-radius: var(--border-radius-ui);
     }
   }
