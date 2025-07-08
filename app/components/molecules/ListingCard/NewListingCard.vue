@@ -147,7 +147,7 @@ watch(emblaApi, (newApi, oldApi) => {
   --image-width: 45%;
 
   background-color: var(--background-100);
-  border: var(--size-2) solid var(--foreground-100);
+  border: 1px solid var(--foreground-100);
   border-radius: var(--border-radius-2xl);
   display: flex;
   max-width: 960px;
@@ -158,7 +158,9 @@ watch(emblaApi, (newApi, oldApi) => {
     border-width: var(--size-4);
 
     .image-container {
-      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 0 calc(var(--border-radius-2xl) - var(--size-4));
+      margin: calc(var(--size-4) * -1);
+      width: calc(var(--image-width) + var(--size-4));
+      border-radius: var(--border-radius-2xl);
     }
 
     .featured-banner {
@@ -169,15 +171,16 @@ watch(emblaApi, (newApi, oldApi) => {
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
+      z-index: 3;
     }
   }
 
   .image-container {
-    border-radius: calc(var(--border-radius-2xl) - var(--size-2)) 0 0 calc(var(--border-radius-2xl) - var(--size-2));
+    border-radius: var(--border-radius-2xl);
     overflow: hidden;
     position: relative;
     width: var(--image-width);
+    z-index: 1;
 
     &:hover .arrow-button {
       opacity: 1;
@@ -207,8 +210,9 @@ watch(emblaApi, (newApi, oldApi) => {
     position: absolute;
     right: 0;
     top: 0;
+    z-index: 2;
 
-    > * {
+    >* {
       transition: opacity 0.2s ease-in-out;
     }
   }
@@ -324,10 +328,10 @@ watch(emblaApi, (newApi, oldApi) => {
   .tags {
     display: flex;
     flex-wrap: wrap;
+    width: fit-content;
     gap: var(--size-4);
     margin-bottom: var(--size-8);
     background-color: var(--background-300);
-    justify-content: space-between;
   }
 
   .tag {
@@ -391,12 +395,16 @@ watch(emblaApi, (newApi, oldApi) => {
 
     .image-container {
       width: 100%;
-      height: 300px;
       border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
+      margin: 0;
+      aspect-ratio: 4 / 3;
     }
 
-    &[data-tier='featured'] .image-container {
-        border-radius: calc(var(--border-radius-2xl) - var(--size-4)) calc(var(--border-radius-2xl) - var(--size-4)) 0 0;
+    &[data-tier='featured'] {
+      .image-container {
+        width: 100%;
+        margin: 0;
+      }
     }
 
     .content {
@@ -412,16 +420,12 @@ watch(emblaApi, (newApi, oldApi) => {
 
 @media (max-width: 768px) {
   .listing-card {
-    flex-direction: column;
-
     .image-container {
-      width: 100%;
-      height: 250px;
-      border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
     }
 
     &[data-tier='featured'] .image-container {
-      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) calc(var(--border-radius-2xl) - var(--size-4)) 0 0;
+      width: 100%;
+      margin: 0;
     }
 
     .content {
@@ -437,7 +441,7 @@ watch(emblaApi, (newApi, oldApi) => {
     }
 
     .actions {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
     }
   }
 }
