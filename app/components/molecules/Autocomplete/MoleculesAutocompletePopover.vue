@@ -13,7 +13,7 @@
       </MoleculesAutocompleteList>
 
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
-        No matches for "{{ searchValue }}"
+        {{ autocompleteFeedback }}
       </p>
     </template>
 
@@ -167,6 +167,16 @@ watch(
   },
   { immediate: true }
 )
+
+const autocompleteFeedback = computed(() => {
+  const { searchValue } = props
+
+  if (searchValue.length < 4) {
+    return 'Keep typing for location suggestions...'
+  }
+
+  return `No matches for "${searchValue}"`
+})
 </script>
 
 <style lang="scss">
