@@ -9,7 +9,6 @@ body {
   font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: var(--font-light);
   line-height: var(--lineheight-md);
-  scrollbar-gutter: stable;
 
   @include mq.motion {
     scroll-behavior: smooth;
