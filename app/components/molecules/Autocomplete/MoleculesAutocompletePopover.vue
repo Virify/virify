@@ -208,8 +208,4 @@ watch(
     text-align: center;
   }
 }
-
-.pin--saved {
-  color: var(--color-accent, #f39c12); // Use your accent color or any color you want for saved pins
-}
 </style>
