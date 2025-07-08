@@ -182,7 +182,6 @@ ul {
     background-color: transparent;
     color: currentColor;
     border-radius: var(--border-radius-lg);
-    padding: var(--size-14) var(--size-16);
 
     @include mq.small-tablet {
       border-radius: var(--border-radius-xl);
@@ -190,6 +189,7 @@ ul {
   }
 
   &__location-input {
+    padding: var(--size-14) var(--size-16);
 
     &:focus {
       outline: none;
@@ -198,7 +198,8 @@ ul {
 
   &__location-radius {
     border: 1px solid var(--border-color-200);
-    padding-right: var(--size-40);
+    padding: var(--size-14) var(--size-18);
+    padding-right: var(--size-48);
     margin: 0;
   }
 
