@@ -41,7 +41,6 @@ const textarea = defineModel({ default: '' })
 
   @include mq.small-tablet {
     border-radius: var(--border-radius-2xl);
-    padding: var(--size-18);
   }
 
   &:has(textarea:focus) {
@@ -53,9 +52,9 @@ const textarea = defineModel({ default: '' })
     border: none;
     background: transparent;
     color: inherit;
-    padding: 0 var(--size-6);
+    padding: var(--size-16);
     margin: 0;
-    min-height: 8ch;
+    min-height: 12ch;
     resize: none;
     outline: none;
     z-index: 2;
@@ -74,6 +73,7 @@ const textarea = defineModel({ default: '' })
     width: var(--size-48);
     height: var(--size-48);
     transition: background-color var(--animation-fast);
+    flex: 0 0 auto;
 
     &:hover {
       color: var(--monochrome-900);

@@ -26,12 +26,13 @@
       </Transition>
     </div>
 
-    <!-- description title -->
-    <h2 class="| title-xs">Description</h2>
+    <div role="fieldset">
+      <legend class="| visually-hidden">The property</legend>
 
-    <!-- description query -->
-    <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-      @submit="handleSearch()" />
+      <!-- description query -->
+      <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
+        @submit="handleSearch()" />
+    </div>
 
     <!-- example prompts -->
     <ul class="p-ai-search__filters-list">
