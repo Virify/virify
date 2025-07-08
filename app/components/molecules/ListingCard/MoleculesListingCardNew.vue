@@ -1,82 +1,82 @@
 <template>
-  <div class="listing-card" :data-tier="listing_tier === 'FEATURED' ? 'featured' : null">
-    <div v-if="listing_tier === 'FEATURED'" class="featured-banner | body-sm font-bold">
+  <div class="m-listing-card" :data-tier="listing_tier === 'FEATURED' ? 'featured' : null">
+    <div v-if="listing_tier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
       Featured
     </div>
-    <div ref="emblaNode" class="image-container">
-      <div class="image-slides">
-        <div v-for="(img, index) in images" :key="index" class="image-slide">
-          <nuxt-img :src="img" alt="Listing image" class="image" />
+    <div ref="emblaNode" class="m-listing-card-image-container">
+      <div class="m-listing-card-image-slides">
+        <div v-for="(img, index) in images" :key="index" class="m-listing-card-image-slide">
+          <nuxt-img :src="img" alt="Listing image" class="m-listing-card-image" />
         </div>
       </div>
-      <div class="image-overlay">
-        <div class="image-counter | body-xs">
+      <div class="m-listing-card-image-overlay">
+        <div class="m-listing-card-image-counter | body-xs">
           {{ selectedIndex + 1 }}/{{ images.length }}
         </div>
-        <div class="image-actions">
-          <button class="icon-button">
+        <div class="m-listing-card-image-actions">
+          <button class="m-listing-card-icon-button">
             <AtomsIcon name="heart" icon="cards/favourite" />
           </button>
-          <button class="icon-button">
+          <button class="m-listing-card-icon-button">
             <AtomsIcon name="edit" icon="cards/notes" />
           </button>
         </div>
-        <button class="arrow-button arrow-button--left" @click="scrollPrev">
+        <button class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev">
           <AtomsIcon name="chevron-left" icon="chevron-left" />
         </button>
-        <button class="arrow-button arrow-button--right" @click="scrollNext">
+        <button class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext">
           <AtomsIcon name="chevron-right" icon="chevron-right" />
         </button>
       </div>
     </div>
-    <div class="content">
-      <div class="details">
-        <div class="header">
-          <p class="price | title-sm">
+    <div class="m-listing-card-content">
+      <div class="m-listing-card-details">
+        <div class="m-listing-card-header">
+          <p class="m-listing-card-price | title-sm">
             £1,000,000
           </p>
-          <p class="price-qualifier | body-xs font-bold faded-text">
+          <p class="m-listing-card-price-qualifier | body-xs font-bold faded-text">
             Guide Price
           </p>
         </div>
-        <h3 class="title | body-md font-semibold">
+        <h3 class="m-listing-card-title | body-md font-semibold">
           Detached House
         </h3>
-        <p class="location | body-xs faded-text">
+        <p class="m-listing-card-location | body-xs faded-text">
           Cardiff, CF15
         </p>
-        <div class="features">
-          <div class="feature">
+        <div class="m-listing-card-features">
+          <div class="m-listing-card-feature">
             <AtomsIcon name="bed" icon="property/bedrooms" />
             <span class="body-sm">1</span>
           </div>
-          <div class="feature">
+          <div class="m-listing-card-feature">
             <AtomsIcon name="bath" icon="property/bathrooms" />
             <span class="body-sm">2</span>
           </div>
-          <div class="feature">
+          <div class="m-listing-card-feature">
             <AtomsIcon name="ruler" icon="property/receptions" />
             <span class="body-sm">3</span>
           </div>
         </div>
-        <div class="tags | box">
-          <span class="tag | body-xs">Recently Added</span>
-          <span class="tag | body-xs">Reduced</span>
-          <span class="tag | body-xs">Chain Free</span>
+        <div class="m-listing-card-tags">
+          <span class="m-listing-card-tag | body-xs">Recently Added</span>
+          <span class="m-listing-card-tag | body-xs">Reduced</span>
+          <span class="m-listing-card-tag | body-xs">Chain Free</span>
         </div>
       </div>
-      <div class="footer">
-        <div class="agent">
-          <div class="agent-logo">
+      <div class="m-listing-card-footer">
+        <div class="m-listing-card-agent">
+          <div class="m-listing-card-agent-logo">
             <AtomsIcon name="check" icon="tick-solid" />
           </div>
           <p class="body-xs font-semibold">MaggotBalls</p>
         </div>
-        <div class="actions">
-          <button class="button | ghost body-sm font-bold">
+        <div class="m-listing-card-actions">
+          <button class="m-listing-card-button | ghost body-sm font-bold">
             View
           </button>
-          <button class="button | body-sm font-bold">
+          <button class="m-listing-card-button | body-sm font-bold">
             Enquire
           </button>
         </div>
@@ -142,7 +142,7 @@ watch(emblaApi, (newApi, oldApi) => {
 </script>
 
 <style lang="scss">
-.listing-card {
+.m-listing-card {
   --card-padding: var(--size-16);
   --image-width: 45%;
 
@@ -156,55 +156,58 @@ watch(emblaApi, (newApi, oldApi) => {
   &[data-tier='featured'] {
     border-color: var(--secondary-400);
     border-width: var(--size-4);
+    padding: 0;
 
-    .image-container {
-      margin: calc(var(--size-4) * -1);
-      width: calc(var(--image-width) + var(--size-4));
-      border-radius: var(--border-radius-2xl);
+    .m-listing-card-image-container {
+      border-radius: var(--border-radius-2xl)
     }
 
-    .featured-banner {
+    .m-listing-card-content {
+      padding: var(--card-padding);
+    }
+
+    .m-listing-card-featured-banner {
       background-color: var(--secondary-400);
       border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 var(--border-radius-lg) 0;
       color: var(--monochrome-900);
       padding: var(--size-8) var(--size-24);
       position: absolute;
       top: 0;
-      left: 0;
+      left: -2px;
       z-index: 3;
     }
   }
 
-  .image-container {
+  .m-listing-card-image-container {
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
     position: relative;
     width: var(--image-width);
     z-index: 1;
 
-    &:hover .arrow-button {
+    &:hover .m-listing-card-arrow-button {
       opacity: 1;
     }
   }
 
-  .image-slides {
+  .m-listing-card-image-slides {
     display: flex;
     height: 100%;
   }
 
-  .image-slide {
+  .m-listing-card-image-slide {
     flex: 0 0 100%;
     min-width: 0;
     position: relative;
   }
 
-  .image {
+  .m-listing-card-image {
     height: 100%;
     object-fit: cover;
     width: 100%;
   }
 
-  .image-overlay {
+  .m-listing-card-image-overlay {
     bottom: 0;
     left: 0;
     position: absolute;
@@ -217,7 +220,7 @@ watch(emblaApi, (newApi, oldApi) => {
     }
   }
 
-  .image-counter {
+  .m-listing-card-image-counter {
     background-color: var(--secondary-400);
     border-radius: var(--border-radius-xl);
     color: var(--monochrome-900);
@@ -228,7 +231,7 @@ watch(emblaApi, (newApi, oldApi) => {
     transform: translateX(-50%);
   }
 
-  .image-actions {
+  .m-listing-card-image-actions {
     background-color: var(--secondary-400);
     border-radius: var(--border-radius-pill);
     display: flex;
@@ -239,7 +242,7 @@ watch(emblaApi, (newApi, oldApi) => {
     right: var(--size-16);
   }
 
-  .icon-button {
+  .m-listing-card-icon-button {
     align-items: center;
     background-color: transparent;
     border: none;
@@ -252,7 +255,7 @@ watch(emblaApi, (newApi, oldApi) => {
     width: var(--size-32);
   }
 
-  .arrow-button {
+  .m-listing-card-arrow-button {
     align-items: center;
     background-color: var(--secondary-400);
     border: none;
@@ -278,7 +281,7 @@ watch(emblaApi, (newApi, oldApi) => {
     }
   }
 
-  .content {
+  .m-listing-card-content {
     color: var(--text-color);
     display: flex;
     flex-direction: column;
@@ -287,32 +290,32 @@ watch(emblaApi, (newApi, oldApi) => {
     width: calc(100% - var(--image-width));
   }
 
-  .header {
+  .m-listing-card-header {
     align-items: baseline;
     display: flex;
     column-gap: var(--size-8);
     flex-wrap: wrap;
   }
 
-  .price {
+  .m-listing-card-price {
     margin: 0;
   }
 
-  .price-qualifier {
+  .m-listing-card-price-qualifier {
     margin: 0;
   }
 
-  .location {
+  .m-listing-card-location {
     margin-bottom: var(--size-8);
   }
 
-  .features {
+  .m-listing-card-features {
     display: flex;
     gap: var(--size-8);
     margin-bottom: var(--size-8);
   }
 
-  .feature {
+  .m-listing-card-feature {
     align-items: center;
     display: flex;
     font-weight: var(--font-semibold);
@@ -325,20 +328,21 @@ watch(emblaApi, (newApi, oldApi) => {
     }
   }
 
-  .tags {
+  .m-listing-card-tags {
     display: flex;
     flex-wrap: wrap;
-    width: fit-content;
-    gap: var(--size-4);
+    gap: var(--size-8);
     margin-bottom: var(--size-8);
-    background-color: var(--background-300);
   }
 
-  .tag {
+  .m-listing-card-tag {
     padding-right: var(--size-8);
+    background-color: var(--background-300);
+    padding: var(--size-8);
+    border-radius: var(--border-radius-lg);
   }
 
-  .footer {
+  .m-listing-card-footer {
     align-items: flex-start;
     display: flex;
     flex-direction: column;
@@ -346,13 +350,13 @@ watch(emblaApi, (newApi, oldApi) => {
     justify-content: space-between;
   }
 
-  .agent {
+  .m-listing-card-agent {
     align-items: center;
     display: flex;
     gap: var(--size-8);
   }
 
-  .agent-logo {
+  .m-listing-card-agent-logo {
     align-items: center;
     background-color: var(--secondary-400);
     border-radius: 50%;
@@ -364,14 +368,14 @@ watch(emblaApi, (newApi, oldApi) => {
     width: var(--size-32);
   }
 
-  .actions {
+  .m-listing-card-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--size-8);
     width: 100%;
   }
 
-  .button {
+  .m-listing-card-button {
     background-color: var(--secondary-400);
     border: none;
     border-radius: var(--border-radius-lg);
@@ -389,29 +393,30 @@ watch(emblaApi, (newApi, oldApi) => {
 }
 
 @media (max-width: 1200px) {
-  .listing-card {
+  .m-listing-card {
     flex-direction: column;
     max-width: 100%;
+    padding: 0;
 
-    .image-container {
+    .m-listing-card-image-container {
       width: 100%;
-      border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
+      border-radius: var(--border-radius-2xl);
       margin: 0;
       aspect-ratio: 4 / 3;
     }
 
     &[data-tier='featured'] {
-      .image-container {
-        width: 100%;
-        margin: 0;
+      .m-listing-card-content {
+        padding: var(--card-padding);
       }
     }
 
-    .content {
+    .m-listing-card-content {
       width: 100%;
+      padding: var(--card-padding);
     }
 
-    .image-actions {
+    .m-listing-card-image-actions {
       top: var(--size-8);
       right: var(--size-8);
     }
@@ -419,28 +424,29 @@ watch(emblaApi, (newApi, oldApi) => {
 }
 
 @media (max-width: 768px) {
-  .listing-card {
-    .image-container {
+  .m-listing-card {
+    .m-listing-card-image-container {
+      border-radius: var(--border-radius-2xl);
     }
 
-    &[data-tier='featured'] .image-container {
+    &[data-tier='featured'] .m-listing-card-image-container {
       width: 100%;
       margin: 0;
     }
 
-    .content {
+    .m-listing-card-content {
       width: 100%;
     }
 
-    .title {
+    .m-listing-card-title {
       font-size: var(--font-lg);
     }
 
-    .tags {
+    .m-listing-card-tags {
       display: none;
     }
 
-    .actions {
+    .m-listing-card-actions {
       grid-template-columns: 1fr 1fr;
     }
   }

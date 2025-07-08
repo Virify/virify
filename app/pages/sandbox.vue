@@ -3,14 +3,14 @@
     <h1 class="| title-md">Component Testing Sandbox</h1>
 
     <div class="listing-grid">
-      <NewListingCard listing_tier="FEATURED" />
-      <NewListingCard />
-      <NewListingCard listing_tier="FEATURED" />
-      <NewListingCard />
-      <NewListingCard />
-      <NewListingCard listing_tier="FEATURED" />
-      <NewListingCard />
-      <NewListingCard />
+      <MoleculesListingCardNew listing_tier="FEATURED" />
+      <MoleculesListingCardNew />
+      <MoleculesListingCardNew listing_tier="FEATURED" />
+      <MoleculesListingCardNew />
+      <MoleculesListingCardNew />
+      <MoleculesListingCardNew listing_tier="FEATURED" />
+      <MoleculesListingCardNew />
+      <MoleculesListingCardNew />
     </div>
 
     <AtomsDivider />
@@ -37,7 +37,6 @@
 </template>
 
 <script setup lang="ts">
-import NewListingCard from '~/components/molecules/ListingCard/NewListingCard.vue'
 
 // Form component testing
 const selected = ref([])
