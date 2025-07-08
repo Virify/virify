@@ -12,6 +12,10 @@
         <MoleculesAutocompleteSaveLocation :option :custom-class="actionClass" />
       </MoleculesAutocompleteList>
 
+      <MoleculesAutocompleteList v-else-if="isPending" :options="Array.from({ length: 5 })">
+        <span class="m-autocomplete-popover__empty-suggestion | skeleton"></span>
+      </MoleculesAutocompleteList>
+
       <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         {{ autocompleteFeedback }}
       </p>
@@ -155,36 +159,28 @@ const { autoComplete } = useMap();
 watch(
   () => props.searchValue,
   async (newVal, oldVal) => {
-    // Only reset suppressAutocomplete if the input is cleared
-    if (suppressAutocomplete.value && (!newVal || newVal.trim() === '')) {
-      suppressAutocomplete.value = false;
-      return;
-    }
-    if (newVal && newVal.trim().length > 2) {
-      setPendingWhile(async () => {
+    setPendingWhile(async () => {
+      // Only reset suppressAutocomplete if the input is cleared
+      if (suppressAutocomplete.value && (!newVal || newVal.trim() === '')) {
+        suppressAutocomplete.value = false;
+        return;
+      }
+      if (newVal && newVal.trim().length > 2) {
         locationSuggestions.value = await autoComplete(newVal)
-      })
-    } else {
-      locationSuggestions.value = []
-    }
+      } else {
+        locationSuggestions.value = []
+      }
+    })
   },
   { immediate: true }
 )
 
 const autocompleteFeedback = computed(() => {
   const { searchValue } = props
+  const MIN_SEARCH_LENGTH = 4
 
-  if (searchValue.length < 4) {
+  if (searchValue.length < MIN_SEARCH_LENGTH) {
     return 'Keep typing for location suggestions...'
-  }
-
-  if (isPending) {
-    /**
-     *  @TODO
-     *  Maybe add bounding dots or just some nicer loading screen here
-     *  rather than just some normal text?
-     */
-    return 'Fetching suggested locations...'
   }
 
   return `No matches for "${searchValue}"`
@@ -229,6 +225,10 @@ const autocompleteFeedback = computed(() => {
     background: var(--background-100);
     border-radius: var(--border-radius-xl);
     text-align: center;
+  }
+
+  &__empty-suggestion {
+    width: min(70%, 40ch);
   }
 }
 </style>
