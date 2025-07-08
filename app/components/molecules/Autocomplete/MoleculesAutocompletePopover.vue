@@ -149,6 +149,7 @@ function setLocation(option: GeocodingFeature) {
 /**
  * Autocompletion
  */
+const { isPending, setPendingWhile } = usePending()
 const { autoComplete } = useMap();
 
 watch(
@@ -160,7 +161,9 @@ watch(
       return;
     }
     if (newVal && newVal.trim().length > 2) {
-      locationSuggestions.value = await autoComplete(newVal)
+      setPendingWhile(async () => {
+        locationSuggestions.value = await autoComplete(newVal)
+      })
     } else {
       locationSuggestions.value = []
     }
@@ -173,6 +176,15 @@ const autocompleteFeedback = computed(() => {
 
   if (searchValue.length < 4) {
     return 'Keep typing for location suggestions...'
+  }
+
+  if (isPending) {
+    /**
+     *  @TODO
+     *  Maybe add bounding dots or just some nicer loading screen here
+     *  rather than just some normal text?
+     */
+    return 'Fetching suggested locations...'
   }
 
   return `No matches for "${searchValue}"`
