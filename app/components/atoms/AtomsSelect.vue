@@ -95,8 +95,13 @@ const selected = defineModel({
       }
 
       &:checked {
-        background: var(--secondary-400);
+        background: var(--secondary-500);
         color: var(--monochrome-100);
+      }
+
+      &:focus:not(:checked),
+      &:hover:not(:checked) {
+        background: var(--background-300);
       }
     }
   }
