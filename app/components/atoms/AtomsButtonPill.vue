@@ -4,8 +4,7 @@
     'a-pill-button--ghost': variant === 'ghost',
     'a-pill-button--filled': variant === 'solid',
     'a-pill-button--reversed': !!iconEnd
-  }" class="| body-sm"
-  >
+  }" class="| body-xs">
     {{ content }}
     <AtomsIcon v-if="icon" :icon aria-hidden />
   </button>
