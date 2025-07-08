@@ -1,14 +1,14 @@
 <template>
   <div class="| container">
     <h1 class="| title-md">Component Testing Sandbox</h1>
-    
+
     <div class="listing-grid">
+      <NewListingCard listing_tier="FEATURED" />
+      <NewListingCard />
+      <NewListingCard listing_tier="FEATURED" />
       <NewListingCard />
       <NewListingCard />
-      <NewListingCard />
-      <NewListingCard />
-      <NewListingCard />
-      <NewListingCard />
+      <NewListingCard listing_tier="FEATURED" />
       <NewListingCard />
       <NewListingCard />
     </div>
@@ -123,8 +123,13 @@ function toggleExpanded(newValue: any) {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-section h3 {

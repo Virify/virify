@@ -1,14 +1,21 @@
 <template>
-  <div class="listing-card">
-    <div class="listing-card__image-container">
-      <img
-        :src="image"
-        alt="Listing image"
-        class="listing-card__image"
-      >
+  <div class="listing-card" :class="{ 'listing-card--featured': listing_tier === 'FEATURED' }">
+    <div v-if="listing_tier === 'FEATURED'" class="listing-card__featured-banner body-sm font-bold">
+      Featured
+    </div>
+    <div ref="emblaNode" class="listing-card__image-container">
+      <div class="listing-card__image-slides">
+        <div v-for="(img, index) in images" :key="index" class="listing-card__image-slide">
+          <nuxt-img
+            :src="img"
+            alt="Listing image"
+            class="listing-card__image"
+          />
+        </div>
+      </div>
       <div class="listing-card__image-overlay">
         <div class="listing-card__image-counter body-xs">
-          1/15
+          {{ selectedIndex + 1 }}/{{ images.length }}
         </div>
         <div class="listing-card__image-actions">
           <button class="listing-card__icon-button">
@@ -18,10 +25,10 @@
             <AtomsIcon name="edit" icon="cards/notes" />
           </button>
         </div>
-        <button class="listing-card__arrow listing-card__arrow--left">
+        <button class="listing-card__arrow listing-card__arrow--left" @click="scrollPrev">
           <AtomsIcon name="chevron-left" icon="chevron-left" />
         </button>
-        <button class="listing-card__arrow listing-card__arrow--right">
+        <button class="listing-card__arrow listing-card__arrow--right" @click="scrollNext">
           <AtomsIcon name="chevron-right" icon="chevron-right" />
         </button>
       </div>
@@ -29,17 +36,17 @@
     <div class="listing-card__content">
       <div class="listing-card__details">
         <div class="listing-card__header">
-          <p class="listing-card__price title-md">
+          <p class="listing-card__price title-sm">
             £1,000,000
           </p>
-          <p class="listing-card__price-qualifier body-xs faded-text">
+          <p class="listing-card__price-qualifier body-xs font-bold faded-text">
             Guide Price
           </p>
         </div>
         <h3 class="listing-card__title body-md font-semibold">
           Detached House
         </h3>
-        <p class="listing-card__location body-sm faded-text">
+        <p class="listing-card__location body-xs faded-text">
           Cardiff, CF15
         </p>
         <div class="listing-card__features">
@@ -56,7 +63,7 @@
             <span class="body-sm">3</span>
           </div>
         </div>
-        <div class="listing-card__tags">
+        <div class="listing-card__tags box">
           <span class="listing-card__tag body-xs">Recently Added</span>
           <span class="listing-card__tag body-xs">Reduced</span>
           <span class="listing-card__tag body-xs">Chain Free</span>
@@ -67,7 +74,7 @@
           <div class="listing-card__agent-logo">
             <AtomsIcon name="check" icon="tick-solid" />
           </div>
-          <p class="body-sm">MaggotBalls</p>
+          <p class="body-xs">MaggotBalls</p>
         </div>
         <div class="listing-card__actions">
           <button class="listing-card__button body-sm font-bold ghost">
@@ -83,15 +90,58 @@
 </template>
 
 <script lang="ts" setup>
-defineProps({
-  image: {
-    type: String,
-    default: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+import emblaCarouselVue from 'embla-carousel-vue'
+
+const props = defineProps({
+  images: {
+    type: Array as () => string[],
+    default: () => [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    ]
   },
   title: {
     type: String,
     default: 'Detached House'
   },
+  listing_tier: {
+    type: String,
+    default: ''
+  },
+})
+
+const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: Math.floor(Math.random() * props.images.length) })
+const selectedIndex = ref(0)
+
+const scrollPrev = () => {
+  emblaApi.value?.scrollPrev()
+}
+
+const scrollNext = () => {
+  emblaApi.value?.scrollNext()
+}
+
+const onSelect = () => {
+  if (!emblaApi.value) return
+  selectedIndex.value = emblaApi.value.selectedScrollSnap()
+}
+
+onMounted(() => {
+  if (emblaApi.value) {
+    emblaApi.value.on('select', onSelect)
+    onSelect()
+  }
+})
+
+watch(emblaApi, (newApi, oldApi) => {
+  if (oldApi) {
+    oldApi.off('select', onSelect)
+  }
+  if (newApi) {
+    newApi.on('select', onSelect)
+    onSelect()
+  }
 })
 </script>
 
@@ -106,13 +156,29 @@ defineProps({
   display: flex;
   max-width: 960px;
   position: relative;
+
+  &--featured {
+    border-color: var(--secondary-400);
+    border-width: var(--size-4);
+  }
 }
 
 .listing-card__image-container {
-  border-radius: var(--border-radius-2xl);
+  border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 0 calc(var(--border-radius-2xl) - var(--size-4));
   overflow: hidden;
   position: relative;
   width: var(--image-width);
+}
+
+.listing-card__image-slides {
+  display: flex;
+  height: 100%;
+}
+
+.listing-card__image-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  position: relative;
 }
 
 .listing-card__image {
@@ -146,6 +212,17 @@ defineProps({
   bottom: var(--size-16);
   left: 50%;
   transform: translateX(-50%);
+}
+
+.listing-card__featured-banner {
+  background-color: var(--secondary-400);
+  border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 var(--border-radius-lg) 0;
+  color: var(--monochrome-900);
+  padding: var(--size-8) var(--size-24);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
 .listing-card__image-actions {
@@ -228,7 +305,7 @@ defineProps({
 
 .listing-card__features {
   display: flex;
-  gap: var(--size-16);
+  gap: var(--size-8);
   margin-bottom: var(--size-8);
 }
 
@@ -239,19 +316,24 @@ defineProps({
   font-size: var(--font-2xl);
   gap: var(--size-1);
   padding: var(--size-4);
+
+  & span {
+    margin-left: var(--size-4);
+  }
 }
 
 .listing-card__tags {
+  
   display: flex;
   flex-wrap: wrap;
   gap: var(--size-4);
   margin-bottom: var(--size-8);
+  background-color: var(--background-300);
+  justify-content: space-between;
 }
 
 .listing-card__tag {
-  background-color: var(--background-300);
-  border-radius: var(--size-20);
-  padding: var(--size-6) var(--size-16);
+  padding-right: var(--size-8);
 }
 
 .listing-card__extra-info p {
@@ -318,6 +400,28 @@ defineProps({
   top: 50%;
   transform: translateY(-50%) rotate(90deg);
   transform-origin: center;
+}
+
+@media (max-width: 1200px) {
+  .listing-card {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .listing-card__image-container {
+    width: 100%;
+    height: 300px;
+    border-radius: calc(var(--border-radius-2xl) - var(--size-2)) calc(var(--border-radius-2xl) - var(--size-2)) 0 0;
+  }
+
+  .listing-card__content {
+    width: 100%;
+  }
+
+  .listing-card__image-actions {
+    top: var(--size-8);
+    right: var(--size-8);
+  }
 }
 
 @media (max-width: 768px) {
