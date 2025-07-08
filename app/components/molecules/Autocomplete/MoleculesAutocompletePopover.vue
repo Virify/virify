@@ -176,6 +176,7 @@ watch(
   background-color: var(--background-200);
   border-radius: var(--border-radius-xl);
   padding: var(--size-18);
+  border: 1px solid var(--border-color-100);
 
   @include mq.small-tablet {
     padding: var(--size-32);

@@ -1,7 +1,7 @@
 <template>
-  <div class="| container container-sm flow flow-lg">
+  <div class="p-ai-search | container container-sm flow flow-lg elevate-300">
     <!-- main header -->
-    <h1 class="| title-xl font-bold">
+    <h1 class="| title-lg font-bold">
       Find your perfect home with
       <span class="| gradient-text gradient-text-ai">AI</span>
       enhanced property search
@@ -145,8 +145,19 @@ useEventListener('mousedown', ({ target }) => {
 @use '#styles/_utils/functions' as fn;
 @use '#styles/_utils/media' as mq;
 
-h2 {
-  max-width: 42ch;
+.p-ai-search {
+  background: var(--background-200);
+  border-radius: var(--border-radius-3xl);
+  padding: var(--size-24);
+  max-width: 58ch;
+
+  @include mq.tablet {
+    padding: var(--size-32);
+  }
+
+  @include mq.desktop {
+    padding: var(--size-40);
+  }
 }
 
 ul {
@@ -167,8 +178,9 @@ ul {
     color: var(--foreground-100);
     border-radius: var(--border-radius-xl);
     align-items: stretch;
+    border: 1px solid var(--border-color-100);
 
-    @include mq.small-tablet {
+    @include mq.tablet {
       grid-template-columns: 1fr auto;
       border-radius: var(--border-radius-2xl);
     }
@@ -184,20 +196,25 @@ ul {
     color: currentColor;
     border-radius: var(--border-radius-lg);
 
-    @include mq.small-tablet {
+    @include mq.tablet {
       border-radius: var(--border-radius-xl);
     }
   }
 
   &__location-input {
-    padding: var(--size-14) var(--size-16);
+    padding: var(--size-4) var(--size-8);
 
     &:focus {
       outline: none;
     }
+
+    @include mq.tablet {
+      padding: var(--size-14) var(--size-16);
+    }
   }
 
   &__location-radius {
+    background-color: var(--background-100);
     border: 1px solid var(--border-color-200);
     padding: var(--size-14) var(--size-18);
     padding-right: var(--size-48);

@@ -38,6 +38,7 @@ const textarea = defineModel({ default: '' })
   background: var(--background-200);
   border-radius: var(--border-radius-xl);
   padding: var(--size-16);
+  border: 1px solid var(--border-color-100);
 
   @include mq.small-tablet {
     border-radius: var(--border-radius-2xl);
@@ -52,12 +53,16 @@ const textarea = defineModel({ default: '' })
     border: none;
     background: transparent;
     color: inherit;
-    padding: var(--size-16);
+    padding: var(--size-8);
     margin: 0;
     min-height: 12ch;
     resize: none;
     outline: none;
     z-index: 2;
+
+    @include mq.tablet {
+      padding: var(--size-16);
+    }
   }
 
   &__button {
