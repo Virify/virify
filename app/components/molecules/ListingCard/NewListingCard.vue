@@ -1,86 +1,82 @@
 <template>
-  <div class="listing-card" :class="{ 'listing-card--featured': listing_tier === 'FEATURED' }">
-    <div v-if="listing_tier === 'FEATURED'" class="listing-card__featured-banner body-sm font-bold">
+  <div class="listing-card" :data-tier="listing_tier === 'FEATURED' ? 'featured' : null">
+    <div v-if="listing_tier === 'FEATURED'" class="featured-banner | body-sm font-bold">
       Featured
     </div>
-    <div ref="emblaNode" class="listing-card__image-container">
-      <div class="listing-card__image-slides">
-        <div v-for="(img, index) in images" :key="index" class="listing-card__image-slide">
-          <nuxt-img
-            :src="img"
-            alt="Listing image"
-            class="listing-card__image"
-          />
+    <div ref="emblaNode" class="image-container">
+      <div class="image-slides">
+        <div v-for="(img, index) in images" :key="index" class="image-slide">
+          <nuxt-img :src="img" alt="Listing image" class="image" />
         </div>
       </div>
-      <div class="listing-card__image-overlay">
-        <div class="listing-card__image-counter body-xs">
+      <div class="image-overlay">
+        <div class="image-counter | body-xs">
           {{ selectedIndex + 1 }}/{{ images.length }}
         </div>
-        <div class="listing-card__image-actions">
-          <button class="listing-card__icon-button">
+        <div class="image-actions">
+          <button class="icon-button">
             <AtomsIcon name="heart" icon="cards/favourite" />
           </button>
-          <button class="listing-card__icon-button">
+          <button class="icon-button">
             <AtomsIcon name="edit" icon="cards/notes" />
           </button>
         </div>
-        <button class="listing-card__arrow listing-card__arrow--left" @click="scrollPrev">
+        <button class="arrow-button arrow-button--left" @click="scrollPrev">
           <AtomsIcon name="chevron-left" icon="chevron-left" />
         </button>
-        <button class="listing-card__arrow listing-card__arrow--right" @click="scrollNext">
+        <button class="arrow-button arrow-button--right" @click="scrollNext">
           <AtomsIcon name="chevron-right" icon="chevron-right" />
         </button>
       </div>
     </div>
-    <div class="listing-card__content">
-      <div class="listing-card__details">
-        <div class="listing-card__header">
-          <p class="listing-card__price title-sm">
+    <div class="content">
+      <div class="details">
+        <div class="header">
+          <p class="price | title-sm">
             £1,000,000
           </p>
-          <p class="listing-card__price-qualifier body-xs font-bold faded-text">
+          <p class="price-qualifier | body-xs font-bold faded-text">
             Guide Price
           </p>
         </div>
-        <h3 class="listing-card__title body-md font-semibold">
+        <h3 class="title | body-md font-semibold">
           Detached House
         </h3>
-        <p class="listing-card__location body-xs faded-text">
+        <p class="location | body-xs faded-text">
           Cardiff, CF15
         </p>
-        <div class="listing-card__features">
-          <div class="listing-card__feature">
+        <div class="features">
+          <div class="feature">
             <AtomsIcon name="bed" icon="property/bedrooms" />
             <span class="body-sm">1</span>
           </div>
-          <div class="listing-card__feature">
+          <div class="feature">
             <AtomsIcon name="bath" icon="property/bathrooms" />
             <span class="body-sm">2</span>
           </div>
-          <div class="listing-card__feature">
+          <div class="feature">
             <AtomsIcon name="ruler" icon="property/receptions" />
             <span class="body-sm">3</span>
           </div>
         </div>
-        <div class="listing-card__tags box">
-          <span class="listing-card__tag body-xs">Recently Added</span>
-          <span class="listing-card__tag body-xs">Reduced</span>
-          <span class="listing-card__tag body-xs">Chain Free</span>
+        <div class="tags | box">
+          <span class="tag | body-xs">Recently Added</span>
+          <span class="tag | body-xs">Reduced</span>
+          <span class="tag | body-xs">Chain Free</span>
         </div>
       </div>
-      <div class="listing-card__footer">
-        <div class="listing-card__agent font-semibold">
-          <div class="listing-card__agent-logo">
+      <div class="footer">
+        <div class="agent">
+          <div class="agent-logo">
             <AtomsIcon name="check" icon="tick-solid" />
           </div>
-          <p class="body-xs">MaggotBalls</p>
+          <p class="body-xs font-semibold">MaggotBalls</p>
         </div>
-        <div class="listing-card__actions">
-          <button class="listing-card__button body-sm font-bold ghost">
+        <div class="actions">
+          <button class="button | ghost body-sm font-bold">
             View
           </button>
-          <button class="listing-card__button body-sm font-bold">
+          <button class="button | body-sm font-bold">
             Enquire
           </button>
         </div>
@@ -157,305 +153,292 @@ watch(emblaApi, (newApi, oldApi) => {
   max-width: 960px;
   position: relative;
 
-  &--featured {
+  &[data-tier='featured'] {
     border-color: var(--secondary-400);
     border-width: var(--size-4);
+
+    .image-container {
+      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 0 calc(var(--border-radius-2xl) - var(--size-4));
+    }
+
+    .featured-banner {
+      background-color: var(--secondary-400);
+      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 var(--border-radius-lg) 0;
+      color: var(--monochrome-900);
+      padding: var(--size-8) var(--size-24);
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
   }
-}
 
-.listing-card__image-container {
-  border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 0 calc(var(--border-radius-2xl) - var(--size-4));
-  overflow: hidden;
-  position: relative;
-  width: var(--image-width);
-}
+  .image-container {
+    border-radius: calc(var(--border-radius-2xl) - var(--size-2)) 0 0 calc(var(--border-radius-2xl) - var(--size-2));
+    overflow: hidden;
+    position: relative;
+    width: var(--image-width);
 
-.listing-card__image-slides {
-  display: flex;
-  height: 100%;
-}
-
-.listing-card__image-slide {
-  flex: 0 0 100%;
-  min-width: 0;
-  position: relative;
-}
-
-.listing-card__image {
-  height: 100%;
-  object-fit: cover;
-  width: 100%;
-}
-
-.listing-card__image-overlay {
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.listing-card__image-overlay > * {
-  transition: opacity 0.2s ease-in-out;
-}
-
-.listing-card__image-container:hover .listing-card__arrow {
-  opacity: 1;
-}
-
-.listing-card__image-counter {
-  background-color: var(--secondary-400);
-  border-radius: var(--border-radius-xl);
-  color: var(--monochrome-900);
-  padding: var(--size-4) var(--size-12);
-  position: absolute;
-  bottom: var(--size-16);
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.listing-card__featured-banner {
-  background-color: var(--secondary-400);
-  border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 var(--border-radius-lg) 0;
-  color: var(--monochrome-900);
-  padding: var(--size-8) var(--size-24);
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-.listing-card__image-actions {
-  background-color: var(--secondary-400);
-  border-radius: var(--border-radius-pill);
-  display: flex;
-  gap: var(--size-4);
-  padding: var(--size-4) var(--size-8);
-  position: absolute;
-  top: var(--size-16);
-  right: var(--size-16);
-}
-
-.listing-card__icon-button {
-  align-items: center;
-  background-color: transparent;
-  border: none;
-  color: var(--monochrome-900);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--font-xl);
-  height: var(--size-32);
-  justify-content: center;
-  width: var(--size-32);
-}
-
-.listing-card__arrow {
-  align-items: center;
-  background-color: var(--secondary-400);
-  border: none;
-  border-radius: 50%;
-  color: var(--monochrome-900);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--font-2xl);
-  height: var(--size-40);
-  justify-content: center;
-  opacity: 0;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: var(--size-40);
-}
-
-.listing-card__arrow--left {
-  left: var(--size-16);
-}
-
-.listing-card__arrow--right {
-  right: var(--size-16);
-}
-
-.listing-card__content {
-  color: var(--text-color);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: var(--card-padding);
-  width: calc(100% - var(--image-width));
-}
-
-.listing-card__header {
-  align-items: baseline;
-  display: flex;
-  column-gap: var(--size-8);
-  flex-wrap: wrap;
-}
-
-.listing-card__price {
-  margin: 0;
-}
-
-.listing-card__price-qualifier {
-  margin: 0;
-}
-
-.listing-card__location {
-  margin-bottom: var(--size-8);
-}
-
-.listing-card__features {
-  display: flex;
-  gap: var(--size-8);
-  margin-bottom: var(--size-8);
-}
-
-.listing-card__feature {
-  align-items: center;
-  display: flex;
-  font-weight: var(--font-semibold);
-  font-size: var(--font-2xl);
-  gap: var(--size-1);
-  padding: var(--size-4);
-
-  & span {
-    margin-left: var(--size-4);
+    &:hover .arrow-button {
+      opacity: 1;
+    }
   }
-}
 
-.listing-card__tags {
-  
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--size-4);
-  margin-bottom: var(--size-8);
-  background-color: var(--background-300);
-  justify-content: space-between;
-}
+  .image-slides {
+    display: flex;
+    height: 100%;
+  }
 
-.listing-card__tag {
-  padding-right: var(--size-8);
-}
+  .image-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    position: relative;
+  }
 
-.listing-card__extra-info p {
-  line-height: 1.5;
-  margin: 0;
-}
+  .image {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
 
-.listing-card__footer {
-  align-items: flex-start;
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-16);
-  justify-content: space-between;
-}
+  .image-overlay {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
 
-.listing-card__agent {
-  align-items: center;
-  display: flex;
-  gap: var(--size-8);
-}
+    > * {
+      transition: opacity 0.2s ease-in-out;
+    }
+  }
 
-.listing-card__agent-logo {
-  align-items: center;
-  background-color: var(--secondary-400);
-  border-radius: 50%;
-  color: var(--monochrome-900);
-  display: flex;
-  font-size: var(--font-21xl);
-  height: var(--size-32);
-  justify-content: center;
-  width: var(--size-32);
-}
+  .image-counter {
+    background-color: var(--secondary-400);
+    border-radius: var(--border-radius-xl);
+    color: var(--monochrome-900);
+    padding: var(--size-4) var(--size-12);
+    position: absolute;
+    bottom: var(--size-16);
+    left: 50%;
+    transform: translateX(-50%);
+  }
 
-.listing-card__actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--size-8);
-  width: 100%;
-}
+  .image-actions {
+    background-color: var(--secondary-400);
+    border-radius: var(--border-radius-pill);
+    display: flex;
+    gap: var(--size-4);
+    padding: var(--size-4) var(--size-8);
+    position: absolute;
+    top: var(--size-16);
+    right: var(--size-16);
+  }
 
-.listing-card__button {
-  background-color: var(--secondary-400);
-  border: none;
-  border-radius: var(--border-radius-lg);
-  color: var(--monochrome-100);
-  cursor: pointer;
-  padding: var(--size-4);
-  width: 100%;
-
-  &.ghost {
+  .icon-button {
+    align-items: center;
     background-color: transparent;
-    color: var(--foreground-900);
-    border: 1px solid var(--secondary-400);
-  } 
-}
+    border: none;
+    color: var(--monochrome-900);
+    cursor: pointer;
+    display: flex;
+    font-size: var(--font-xl);
+    height: var(--size-32);
+    justify-content: center;
+    width: var(--size-32);
+  }
 
-.listing-card__problem-tab {
-  background-color: var(--secondary-400);
-  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
-  color: var(--monochrome-900);
-  padding: var(--size-8) var(--size-16);
-  position: absolute;
-  right: -40px;
-  top: 50%;
-  transform: translateY(-50%) rotate(90deg);
-  transform-origin: center;
+  .arrow-button {
+    align-items: center;
+    background-color: var(--secondary-400);
+    border: none;
+    border-radius: 50%;
+    color: var(--monochrome-900);
+    cursor: pointer;
+    display: flex;
+    font-size: var(--font-2xl);
+    height: var(--size-40);
+    justify-content: center;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--size-40);
+
+    &--left {
+      left: var(--size-16);
+    }
+
+    &--right {
+      right: var(--size-16);
+    }
+  }
+
+  .content {
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--card-padding);
+    width: calc(100% - var(--image-width));
+  }
+
+  .header {
+    align-items: baseline;
+    display: flex;
+    column-gap: var(--size-8);
+    flex-wrap: wrap;
+  }
+
+  .price {
+    margin: 0;
+  }
+
+  .price-qualifier {
+    margin: 0;
+  }
+
+  .location {
+    margin-bottom: var(--size-8);
+  }
+
+  .features {
+    display: flex;
+    gap: var(--size-8);
+    margin-bottom: var(--size-8);
+  }
+
+  .feature {
+    align-items: center;
+    display: flex;
+    font-weight: var(--font-semibold);
+    font-size: var(--font-2xl);
+    gap: var(--size-1);
+    padding: var(--size-4);
+
+    & span {
+      margin-left: var(--size-4);
+    }
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-4);
+    margin-bottom: var(--size-8);
+    background-color: var(--background-300);
+    justify-content: space-between;
+  }
+
+  .tag {
+    padding-right: var(--size-8);
+  }
+
+  .footer {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-16);
+    justify-content: space-between;
+  }
+
+  .agent {
+    align-items: center;
+    display: flex;
+    gap: var(--size-8);
+  }
+
+  .agent-logo {
+    align-items: center;
+    background-color: var(--secondary-400);
+    border-radius: 50%;
+    color: var(--monochrome-900);
+    display: flex;
+    font-size: var(--font-21xl);
+    height: var(--size-32);
+    justify-content: center;
+    width: var(--size-32);
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--size-8);
+    width: 100%;
+  }
+
+  .button {
+    background-color: var(--secondary-400);
+    border: none;
+    border-radius: var(--border-radius-lg);
+    color: var(--monochrome-100);
+    cursor: pointer;
+    padding: var(--size-4);
+    width: 100%;
+
+    &.ghost {
+      background-color: transparent;
+      color: var(--foreground-900);
+      border: 1px solid var(--secondary-400);
+    }
+  }
 }
 
 @media (max-width: 1200px) {
   .listing-card {
     flex-direction: column;
     max-width: 100%;
-  }
 
-  .listing-card__image-container {
-    width: 100%;
-    height: 300px;
-    border-radius: calc(var(--border-radius-2xl) - var(--size-2)) calc(var(--border-radius-2xl) - var(--size-2)) 0 0;
-  }
+    .image-container {
+      width: 100%;
+      height: 300px;
+      border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
+    }
 
-  .listing-card__content {
-    width: 100%;
-  }
+    &[data-tier='featured'] .image-container {
+        border-radius: calc(var(--border-radius-2xl) - var(--size-4)) calc(var(--border-radius-2xl) - var(--size-4)) 0 0;
+    }
 
-  .listing-card__image-actions {
-    top: var(--size-8);
-    right: var(--size-8);
+    .content {
+      width: 100%;
+    }
+
+    .image-actions {
+      top: var(--size-8);
+      right: var(--size-8);
+    }
   }
 }
 
 @media (max-width: 768px) {
   .listing-card {
     flex-direction: column;
-  }
 
-  .listing-card__image-container {
-    width: 100%;
-    height: 250px;
-    border-radius: calc(var(--border-radius-2xl) - var(--size-2)) calc(var(--border-radius-2xl) - var(--size-2)) 0 0;
-  }
+    .image-container {
+      width: 100%;
+      height: 250px;
+      border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
+    }
 
-  .listing-card__content {
-    width: 100%;
-  }
+    &[data-tier='featured'] .image-container {
+      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) calc(var(--border-radius-2xl) - var(--size-4)) 0 0;
+    }
 
-  .listing-card__title {
-    font-size: var(--font-lg);
-  }
+    .content {
+      width: 100%;
+    }
 
-  .listing-card__tags {
-    display: none;
-  }
+    .title {
+      font-size: var(--font-lg);
+    }
 
-  .listing-card__actions {
-    grid-template-columns: 1fr;
-  }
+    .tags {
+      display: none;
+    }
 
-  .listing-card__problem-tab {
-    display: none;
-  }
-  .listing-card__extra-info {
-    display: none;
+    .actions {
+      grid-template-columns: 1fr;
+    }
   }
 }
 </style>
