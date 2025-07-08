@@ -33,13 +33,14 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: center;
   gap: var(--size-6);
-  padding: var(--size-4) var(--size-14);
+  padding: var(--size-6) var(--size-14);
   border: 1px solid fn.faded-color(15%);
   background: var(--background-300);
   color: var(--color-200);
   border-radius: var(--border-radius-2xl);
   text-align: left;
   transition: background-color var(--animation-fast);
+  line-height: var(--lineheight-sm);
   cursor: pointer;
 
   &:hover {
@@ -47,9 +48,10 @@ withDefaults(defineProps<Props>(), {
   }
 
   svg {
+    align-self: flex-start;
     flex-shrink: 0;
     width: var(--size-18);
-    height: var(--size-18);
+    height: var(--lineheight-sm);
     color: var(--secondary-400);
   }
 
