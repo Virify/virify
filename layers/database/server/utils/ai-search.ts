@@ -160,11 +160,20 @@ PROPERTY TYPES AND CLASSIFICATIONS (use these exact values):
 - Specialty: Shared Ownership, Retirement Home, New Build Home
 - Student Accommodation: Flat, House, House-share
 
-To filter for a studio flat, use:
+To filter for a single property type (e.g., a studio flat), use:
 {
   "property": {
     "type": { "name": "Flat" },
     "classification": { "name": "Studio flat" }
+  }
+}
+
+To filter for MULTIPLE property types (e.g., "house or flat"), you MUST use the "in" operator on the type name:
+{
+  "property": {
+    "type": {
+      "name": { "in": ["House", "Flat"] }
+    }
   }
 }
 

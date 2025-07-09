@@ -1,23 +1,25 @@
 <template>
   <div class="flow flow-lg">
     <!-- Collapsible Search Header -->
-    <div class="container container-sm">
-      <MoleculesCollapsedSearchBar v-if="hasSearched && !isSearchFormOpen" 
-        key="collapsed" 
-        :query="lastSearchQuery" 
-        @edit="isSearchFormOpen = true" 
-      />
-      <!-- Search Form -->
-      <div v-else key="form" class="p-ai-search">
-        <OrganismsAiSearchForm @submit-search="handleSearch" 
-          :is-searching="isSearching" 
-          :initial-query="lastSearchQuery" 
-          :initial-location="lastLocation" 
-          :initial-radius="lastRadius" 
+    <div class="search-header-container" :class="{ 'is-sticky': hasSearched }">
+      <div class="container container-sm">
+        <MoleculesCollapsedSearchBar v-if="hasSearched && !isSearchFormOpen" 
+          key="collapsed" 
+          @edit="isSearchFormOpen = true" 
+          @click="isSearchFormOpen = true"
         />
-        <button v-if="hasSearched" @click="isSearchFormOpen = false" class="collapse-button | button button-secondary">
-          <AtomsIcon name="arrow-up" icon="collapse" />
-        </button>
+        <!-- Search Form -->
+        <div v-else key="form" class="p-ai-search">
+          <OrganismsAiSearchForm @submit-search="handleSearch" 
+            :is-searching="isSearching" 
+            :initial-query="lastSearchQuery" 
+            :initial-location="lastLocation" 
+            :initial-radius="lastRadius" 
+          />
+          <button v-if="hasSearched" @click="isSearchFormOpen = false" class="collapse-button | button button-secondary">
+            <AtomsIcon name="arrow-up" icon="collapse" />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -94,6 +96,22 @@ async function handleSearch(payload: SearchPayload) {
 
 <style lang="scss">
 @use "#styles/_utils/functions" as fn;
+
+.search-header-container {
+  &.is-sticky {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 10;
+    background-color: var(--background-color);
+    padding: var(--size-16) 0;
+    margin-bottom: var(--size-24);
+
+    .p-ai-search {
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+  }
+}
 
 .p-ai-search {
   background: var(--background-200);

@@ -542,7 +542,6 @@ async function sendForm(event: Event) {
 @use "#styles/_utils/media" as mq;
 
 .o-searchform-fixed {
-  position: fixed;
   top: 0;
   left: 0;
   width: 100%;

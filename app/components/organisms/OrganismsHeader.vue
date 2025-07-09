@@ -28,7 +28,7 @@
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    margin-bottom: calc(var(--header-offset) + var(--size-24));
+    margin-bottom: var(--size-32);
   }
 
   &-homelink {

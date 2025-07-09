@@ -1,7 +1,11 @@
 <template>
   <div class="collapsed-search-bar">
     <div class="query-info">
-      <span class="query-text body-sm">"{{ query }}"</span>
+      <p class="query-text body-md font-semibold">
+        <template v-for="(segment, index) in segments" :key="index">
+          <span :class="`segment--${segment.type}`">{{ segment.text }}</span>
+        </template>
+      </p>
     </div>
     <button @click="$emit('edit')" class="expand-button | button button-secondary button-md">
       <AtomsIcon name="arrow-down" icon="expand" />
@@ -10,9 +14,8 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  query: string;
-}>();
+const { getAnalyzedQuery } = useAi();
+const segments = computed(() => getAnalyzedQuery());
 
 defineEmits(['edit']);
 </script>
@@ -41,6 +44,15 @@ defineEmits(['edit']);
   text-overflow: ellipsis;
   overflow: hidden;
   display: block;
+
+  .segment--used {
+    color: var(--secondary-400);
+  }
+
+  .segment--ignored {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
 }
 
 .expand-button {

@@ -15,7 +15,7 @@
 <script setup lang="ts">
 defineProps<{
   results: ListingWithFullProperty[];
-  queryAnalysis: QueryAnalysis;
+  queryAnalysis: QueryAnalysis | null;
 }>();
 </script>
 

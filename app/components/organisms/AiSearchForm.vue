@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside, useEventListener, templateRef } from '@vueuse/core'
+import { onClickOutside, templateRef } from '@vueuse/core'
 
 const props = defineProps<{
   initialQuery?: string
@@ -156,7 +156,7 @@ ul {
     color: var(--foreground-100);
     border-radius: var(--border-radius-xl);
     align-items: stretch;
-    border: 1px solid var(--border-color-100);
+    border: 1px solid var(--border-color-200);
 
     @include mq.tablet {
       grid-template-columns: 1fr auto;
