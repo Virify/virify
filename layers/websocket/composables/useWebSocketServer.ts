@@ -6,7 +6,7 @@ export interface WebSocketEvents {
   onNewConversation?: (data: { conversation: any }) => void;
   onTyping?: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
   onMessageRead?: (data: { conversationId: number; messageId: number; from: number }) => void;
-  onAggregateUpdate?: (data: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" }) => void;
+  onAggregateUpdate?: (data: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" | "update" }) => void;
 }
 
 /**
@@ -361,7 +361,7 @@ export const useWebSocketServer = () => {
    * @param operation - "add" or "remove" for optimized UI updates
    * @param to - User to notify about the aggregate change
    */
-  const createAggregateUpdateMessage = (aggregateType: keyof UserItemsAggregates, operation: "add" | "remove", to: number): AggregateUpdateMessage => ({
+  const createAggregateUpdateMessage = (aggregateType: keyof UserItemsAggregates, operation: "add" | "remove" | "update", to: number): AggregateUpdateMessage => ({
     type: "aggregate_update",
     aggregateType,
     operation,

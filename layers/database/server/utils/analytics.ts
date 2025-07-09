@@ -1,3 +1,5 @@
+import type { TrackLocation, TrackQuery } from "@prisma/client";
+
 /**
  * Get actual analytics aggregates for business intelligence
  * This returns real analytics data, not user notification counts
@@ -270,5 +272,61 @@ export async function getRecentViewedListings(userId: number, limit: number = 5)
         select: listingCardFields,
       },
     },
+  });
+}
+
+/**
+ * Tracks an AI search query and its associated location
+ * 
+ * @param aiQuery The AI search query
+ * @param location The location associated with the search
+ * @returns The created or updated track records
+ */
+export async function trackAiSearch(aiQuery: string, location: GeocodingFeature): Promise<[TrackLocation, TrackQuery]> {
+  return prisma.$transaction([
+    prisma.trackLocation.upsert({
+      where: {
+        location: location,
+      },
+      create: {
+        location: location,
+        name: location.text,
+        count: 1,
+      },
+      update: {
+        count: {
+          increment: 1,
+        },
+      },
+    }),
+    prisma.trackQuery.upsert({
+      where: {
+        query: aiQuery,
+      },
+      create: {
+        query: aiQuery,
+        count: 1,
+      },
+      update: {
+        count: {
+          increment: 1,
+        },
+      },
+    }),
+  ]);
+}
+
+
+/**
+ * Get trending AI searches based on the number of times they have been performed
+ * @param limit Maximum number of trending AI searches to return
+ * @returns 
+ */
+export async function getTrendingLocations(limit: number = 5): Promise<TrackLocation[]> {
+  return prisma.trackLocation.findMany({
+    orderBy: {
+      count: "desc",
+    },
+    take: limit,
   });
 }

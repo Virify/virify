@@ -10,6 +10,7 @@ export interface UserItemsAggregates {
   favourites: number;
   notes: number;
   enquiries: number;
+  locations: number;
   // Keep all the original ones even if not used yet
   notifications?: number;
   messages?: number;

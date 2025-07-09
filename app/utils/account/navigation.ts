@@ -89,6 +89,12 @@ export const searchNavigation: NavigationItem[] = [
     countKey: "savedSearches",
   },
   {
+    name: "Saved Locations",
+    url: "#",
+    icon: "cards/favourite-filled",
+    countKey: "locations",
+  },
+  {
     name: "Search Properties",
     url: "/",
     icon: "search",

@@ -19,7 +19,7 @@
  *  Font styles
  */
 .faded-text {
-  color: #{fn.faded-color(60%)};
+  color: #{fn.faded-color(50%)};
 }
 
 /**
@@ -59,6 +59,13 @@
 /**
  *  Headers
  */
+.title-3xs {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-sm);
+  line-height: var(--lineheight-sm);
+  margin-bottom: var(--size-8);
+}
+
 .title-2xs {
   font-weight: var(--font-bold);
   font-size: var(--font-md);
@@ -125,4 +132,36 @@
 
 .lineheight-lg {
   line-height: var(--lineheight-lg);
+}
+
+/**
+ *  Styled text
+ */
+.gradient-text {
+  position: relative;
+  display: inline-block;
+  color: var(--primary-600);
+
+  @supports (-webkit-text-fill-color: transparent) {
+    background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &-ai {
+    margin-right: 0.2ch;
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -0.15em;
+      right: -0.5em;
+      width: 0.6em;
+      height: 0.6em;
+      background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
+      mask-image: url('/img/ai-star.svg');
+      mask-size: contain;
+    }
+  }
 }

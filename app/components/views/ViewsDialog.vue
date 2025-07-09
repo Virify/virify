@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#teleports">
     <dialog ref="$dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
       <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="close"></button>
 

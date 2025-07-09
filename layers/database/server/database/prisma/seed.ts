@@ -2,15 +2,13 @@
 
 import { PrismaClient } from "@prisma/client";
 import { saleAddress, rentalAddress, cityCenters } from "../../utils/seed/address-to-seed.ts";
-import { seedFakeUsers } from "../../utils/seed/user-faker.ts";
+import { geocodingFeature, seedFakeUsers } from "../../utils/seed/user-faker.ts";
 import { generateProperty } from "../../utils/seed/property-faker.ts";
 import { generateRentalListing, generateSaleListing } from "../../utils/seed/listing-faker.ts";
 import { updateLocationsByAddressListForSeed } from "../../utils/seed/location-for-seed.ts";
 const prisma = new PrismaClient();
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-
-
 
 /**
  * Seeding function to populate the database with initial data.
@@ -49,7 +47,7 @@ async function seedAdminUser() {
     username: process.env.ADMIN_USERNAME || "default_admin_username",
     firstName: "Virify",
     lastName: "Admin",
-  }
+  };
 
   await prisma.user.create({
     data: {
@@ -70,11 +68,11 @@ async function seedAdminUser() {
           postcode: "12345",
           country: "Admin Country",
         },
-      }
-    }
-  })
+      },
+    },
+  });
 }
-    
+
 /**
  * Seeding function to populate city center addresses in the database.
  */
@@ -96,11 +94,13 @@ async function seedCityCenters() {
     )
   );
 
-  await updateLocationsByAddressListForSeed(created as {
-    id: number;
-    lat: number;
-    lon: number;
-  }[]);
+  await updateLocationsByAddressListForSeed(
+    created as {
+      id: number;
+      lat: number;
+      lon: number;
+    }[]
+  );
 }
 
 /**
@@ -117,7 +117,6 @@ async function seedPropertyTypes() {
     Specialty: ["Shared Ownership", "Retirement Home", "New Build Home"],
     "Student Accommodation": ["Flat", "House", "House-share"],
   };
-
 
   for (const [typeName, classification] of Object.entries(types)) {
     const createTypes = await prisma.propertyType.create({
