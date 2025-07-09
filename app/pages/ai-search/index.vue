@@ -68,6 +68,31 @@ const searchError = ref<string | null>(null)
 const lastSearchQuery = ref('')
 const wittyLoadingMessage = ref('')
 
+// Test states for UI development
+const route = useRoute()
+
+function applyTestState(test: string | undefined) {
+  if (test === 'loading') {
+    isSearching.value = true
+    lastSearchQuery.value = 'Show me a house with a garden and a sea view in Cornwall'
+    const randomIndex = Math.floor(Math.random() * wittyLoadingMessages.length)
+    wittyLoadingMessage.value = wittyLoadingMessages[randomIndex] ?? 'Searching for properties...'
+  }
+  else if (test === 'no-results') {
+    hasSearched.value = true
+    searchResults.value = []
+    lastSearchQuery.value = 'A house on the moon'
+  }
+}
+
+onMounted(() => {
+  applyTestState(route.query.test as string | undefined)
+})
+
+watch(() => route.query.test, (newTest) => {
+  applyTestState(newTest as string | undefined)
+})
+
 const wittyLoadingMessages = [
   "Please wait while the AI does your work",
   "Our premium plan is faster",
