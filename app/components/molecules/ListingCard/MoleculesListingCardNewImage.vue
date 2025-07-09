@@ -63,16 +63,6 @@ onMounted(() => {
     onSelect()
   }
 })
-
-watch(emblaApi, (newApi, oldApi) => {
-  if (oldApi) {
-    oldApi.off('select', onSelect)
-  }
-  if (newApi) {
-    newApi.on('select', onSelect)
-    onSelect()
-  }
-})
 </script>
 
 <style lang="scss">

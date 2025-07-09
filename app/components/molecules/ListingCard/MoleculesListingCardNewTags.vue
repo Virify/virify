@@ -1,17 +1,30 @@
 <template>
-  <div class="m-listing-card-tags">
-    <span class="m-listing-card-tag | body-xs">Recently Added</span>
-    <span class="m-listing-card-tag | body-xs">Reduced</span>
-    <span class="m-listing-card-tag | body-xs">Chain Free</span>
-  </div>
+  <ul class="m-listing-card-tags">
+    <li v-for="tag in tags" :key="tag" class="m-listing-card-tag | body-xs">
+      {{ tag }}
+    </li>
+  </ul>
 </template>
+<script setup lang="ts">
+const tags = [
+  'Recently Added',
+  'Reduced',
+  'Chain Free'
+]
+</script>
 
 <style lang="scss">
+ul {
+  margin: 0;
+}
+
 .m-listing-card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--size-8);
+  list-style: none;
   margin-bottom: var(--size-8);
+  padding: 0;
 }
 
 .m-listing-card-tag {

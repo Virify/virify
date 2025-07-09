@@ -1,37 +1,41 @@
 <template>
-  <div class="m-listing-card-features">
-    <div class="m-listing-card-feature">
-      <AtomsIcon name="bed" icon="property/bedrooms" />
-      <span class="body-sm">1</span>
-    </div>
-    <div class="m-listing-card-feature">
-      <AtomsIcon name="bath" icon="property/bathrooms" />
-      <span class="body-sm">2</span>
-    </div>
-    <div class="m-listing-card-feature">
-      <AtomsIcon name="ruler" icon="property/receptions" />
-      <span class="body-sm">3</span>
-    </div>
-  </div>
+  <ul class="m-listing-card-features">
+    <li v-for="{ count, icon, iconTitle } of iconList" :key="iconTitle" class="m-listing-card-feature">
+      <AtomsIcon :name="iconTitle" :icon="icon" class="icon" />
+      <p class="| body-sm">{{ count }}</p>
+    </li>
+  </ul>
 </template>
 
+<script setup lang="ts">
+const iconList = computed(() => [
+  { count: 1, icon: 'property/bedrooms', iconTitle: 'bedrooms' },
+  { count: 2, icon: 'property/bathrooms', iconTitle: 'bathrooms' },
+  { count: 3, icon: 'property/receptions', iconTitle: 'receptions' }
+])
+</script>
+
 <style lang="scss">
+ul {
+  margin: 0;
+}
+
 .m-listing-card-features {
   display: flex;
-  gap: var(--size-8);
+  gap: var(--size-12);
+  list-style: none;
   margin-bottom: var(--size-8);
+  padding: 0;
 }
 
 .m-listing-card-feature {
   align-items: center;
   display: flex;
   font-weight: var(--font-semibold);
-  font-size: var(--font-2xl);
-  gap: var(--size-1);
-  padding: var(--size-4);
+  gap: var(--size-4);
 
-  & span {
-    margin-left: var(--size-4);
+  .icon {
+    font-size: var(--font-2xl);
   }
 }
 </style>

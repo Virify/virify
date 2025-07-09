@@ -20,7 +20,7 @@
   border-radius: 50%;
   color: var(--monochrome-900);
   display: flex;
-  font-size: var(--font-21xl);
+  font-size: var(--font-2xl);
   height: var(--size-32);
   justify-content: center;
   width: var(--size-32);
