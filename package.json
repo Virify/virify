@@ -10,14 +10,13 @@
     "postinstall": "nuxt prepare",
     "pgen": "prisma generate",
     "db-push": "prisma db push",
-    "seed": "tsx ./layers/database/server/database/prisma/seed.ts",
+    "seed": "npx nuxi run seed:database",
     "test": "vitest run --exclude=\"**/*.e2e.test.ts\"",
     "test:full": "vitest run",
     "start": "node .output/server/index.mjs"
   },
   "prisma": {
-    "schema": "./layers/database/server/database/prisma/",
-    "seed": "tsx ./layers/database/server/database/prisma/seed.ts"
+    "schema": "./layers/database/server/database/prisma/"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.799.0",
