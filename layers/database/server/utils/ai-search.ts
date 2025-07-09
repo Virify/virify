@@ -1,15 +1,3 @@
-/**
- * AI-driven Prisma WHERE clause generator for property search.
- *
- * This module provides a function to convert natural language queries into
- * valid, schema-accurate Prisma WHERE clauses for property listings, using OpenAI.
- *
- * - Ensures all generated queries match the real Prisma schema (no invented fields).
- * - Handles all property, saleListing, rentalListing, and nested feature fields.
- * - Expects clean, valid JSON from the AI (no post-processing or fixups).
- * - Includes a comprehensive, explicit schema prompt for the AI.
- *
- */
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -17,31 +5,43 @@ const openai = new OpenAI({
 });
 
 /**
- * Generate a Prisma WHERE clause from a natural language query using OpenAI.
- *
- * @param query - The user's natural language search query.
- * @param propertyIds - (Optional) Restrict search to these property IDs.
- * @returns An object with a valid Prisma WHERE clause and query analysis.
- * @throws 500 error if AI is not configured or response is invalid.
+ * Checks if the required AI configuration is present.
  */
-export async function generateWhereClauseFromQuery(
-  query: string,
-  propertyIds?: number[] | null
-): Promise<{
-  whereClause: any;
-  queryAnalysis: {
-    usedTerms: string[];
-    ignoredTerms: string[];
-  };
-}> {
+export function checkAiConfiguration() {
   if (!process.env.OPENAI_API_KEY) {
     throw createError({
       statusCode: 500,
       statusMessage: "AI search is not configured. Please contact support.",
     });
   }
+}
 
-  // Get AI response
+/**
+ * Constructs the Prisma WHERE clause from the query and location filters.
+ */
+export async function constructPrismaWhereClause(query: string, propertyIds: number[] | null) {
+  const { whereClause, queryAnalysis } = await generateWhereClauseFromQuery(query);
+
+  if (propertyIds !== null) {
+    if (propertyIds.length === 0) {
+      // If no properties are in the area, we can short-circuit
+      return { whereClause: { property: { id: { in: [] } } }, queryAnalysis };
+    }
+    if (!whereClause.property) {
+      whereClause.property = {};
+    }
+    whereClause.property.id = { in: propertyIds };
+  }
+
+  return { whereClause, queryAnalysis };
+}
+
+/**
+ * Fetches a completion from the OpenAI API for a given search query.
+ * @param query The user's natural language search query.
+ * @returns The AI's response as a string.
+ */
+async function getAiSearchCompletion(query: string): Promise<string> {
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -51,29 +51,42 @@ export async function generateWhereClauseFromQuery(
     temperature: 0,
   });
 
-  // Expect valid, clean JSON from the AI (no markdown, no comments)
-  let aiResponse = completion.choices[0]?.message?.content?.trim();
+  const aiResponse = completion.choices[0]?.message?.content?.trim();
   if (!aiResponse) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to generate search conditions",
+      statusMessage: "Failed to generate search conditions from AI.",
     });
   }
+  return aiResponse;
+}
 
-  // Parse the response directly
-  let parsedResponse: any;
+/**
+ * Parses the AI's JSON response string.
+ * @param aiResponse The raw string response from the AI.
+ * @returns The parsed JSON object.
+ */
+function parseAiCompletion(aiResponse: string): any {
   try {
-    parsedResponse = JSON.parse(aiResponse);
+    return JSON.parse(aiResponse);
   } catch (error) {
     throw createError({
       statusCode: 500,
-      statusMessage: `Invalid response generated. AI response: ${aiResponse.substring(0, 500)}...`,
+      statusMessage: `Invalid JSON response from AI: ${aiResponse.substring(0, 200)}...`,
     });
   }
+}
 
-  // Accept either { whereClause, queryAnalysis } or a direct whereClause
+/**
+ * Normalizes the parsed AI response to extract the where clause and query analysis,
+ * and ensures the 'published' flag is set.
+ * @param parsedResponse The parsed object from the AI's response.
+ * @returns A structured object containing the where clause and query analysis.
+ */
+function normalizeWhereClause(parsedResponse: any): aiSearchResult {
   let whereClause: any;
   let queryAnalysis = { usedTerms: [], ignoredTerms: [] };
+
   if (parsedResponse.whereClause && parsedResponse.queryAnalysis) {
     whereClause = parsedResponse.whereClause;
     queryAnalysis = parsedResponse.queryAnalysis;
@@ -87,6 +100,20 @@ export async function generateWhereClauseFromQuery(
   }
 
   return { whereClause, queryAnalysis };
+}
+
+/**
+ * Generate a Prisma WHERE clause from a natural language query using OpenAI.
+ *
+ * @param query - The user's natural language search query.
+ * @returns An object with a valid Prisma WHERE clause and query analysis.
+ * @throws 500 error if AI is not configured or response is invalid.
+ */
+export async function generateWhereClauseFromQuery(query: string): Promise<aiSearchResult> {
+  checkAiConfiguration();
+  const aiResponse = await getAiSearchCompletion(query);
+  const parsedResponse = parseAiCompletion(aiResponse);
+  return normalizeWhereClause(parsedResponse);
 }
 
 /**

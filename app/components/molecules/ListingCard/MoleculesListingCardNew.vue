@@ -1,6 +1,6 @@
 <template>
-  <div class="m-listing-card" :data-tier="listing_tier === 'FEATURED' ? 'featured' : null">
-    <div v-if="listing_tier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
+  <div class="m-listing-card" :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null">
+    <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
       Featured
     </div>
     <MoleculesListingCardNewImage :images="images" />
@@ -37,6 +37,14 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  listing: {
+    type: Object as () => ListingWithFullProperty,
+    default: () => ({})
+  }
+})
+
+onMounted(() => {
+  console.log(props.listing)
 })
 </script>
 

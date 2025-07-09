@@ -1,10 +1,16 @@
 <template>
-  <div class="m-promptbox m-promptbox--overlay | elevate-200">
-    <!-- analysed query overlays the textarea -->
-    <div class="m-promptbox__overlay" v-if="queryAnalysis" v-html="getAnalyzedQuery()"></div>
+  <div class="m-promptbox | elevate-200">
+    <div class="m-promptbox__input-wrapper">
+      <!-- analysed query overlays the textarea -->
+      <div class="m-promptbox__overlay" v-if="queryAnalysis" aria-hidden="true">
+        <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type}`">
+          {{ segment.text }}
+        </span>
+      </div>
 
-    <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
-      :style="queryAnalysis ? 'color: transparent; caret-color: var(--color-300);' : ''"></textarea>
+      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
+        :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
+    </div>
 
     <button type="submit" class="m-promptbox__button" aria-label="Submit" @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
@@ -34,7 +40,7 @@ const textarea = defineModel({ default: '' })
 .m-promptbox {
   display: flex;
   align-items: flex-end;
-  gap: 0;
+  gap: var(--size-16);
   background: var(--background-200);
   border-radius: var(--border-radius-xl);
   padding: var(--size-16);
@@ -47,74 +53,93 @@ const textarea = defineModel({ default: '' })
   &:has(textarea:focus) {
     outline: var(--focus-outline);
   }
+}
 
-  &__textarea {
-    position: relative;
-    border: none;
-    background: transparent;
-    color: inherit;
-    padding: var(--size-8);
-    margin: 0;
-    min-height: 12ch;
-    resize: none;
-    outline: none;
-    z-index: 2;
+.m-promptbox__input-wrapper {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-areas: "input";
+}
 
-    @include mq.tablet {
-      padding: var(--size-16);
-    }
-  }
+.m-promptbox__overlay,
+.m-promptbox__textarea {
+  grid-area: input;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: var(--size-8);
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
 
-  &__button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    border-radius: var(--border-radius-lg);
-    color: var(--monochrome-900);
-    background: var(--monochrome-100);
-    width: var(--size-48);
-    height: var(--size-48);
-    transition: background-color var(--animation-fast);
-    flex: 0 0 auto;
-
-    &:hover {
-      color: var(--monochrome-900);
-      background: var(--secondary-400);
-    }
-
-    svg {
-      display: block;
-      width: var(--size-24);
-      height: var(--size-24);
-    }
-  }
-
-  &__analysis {
-    margin-top: var(--size-6);
-    color: var(--color-300);
-    font-size: 0.95em;
-    font-style: italic;
+  @include mq.tablet {
+    padding: var(--size-16);
   }
 }
 
-.m-promptbox--overlay {
+.m-promptbox__textarea {
   position: relative;
+  border: none;
+  background: transparent;
+  color: inherit;
+  margin: 0;
+  min-height: 12ch;
+  resize: none;
+  outline: none;
+  z-index: 2;
 }
 
 .m-promptbox__overlay {
-  position: absolute;
-  top: var(--size-10);
-  left: var(--size-14);
-  right: var(--size-48);
-  bottom: var(--size-10);
   pointer-events: none;
-  color: inherit;
-  font: inherit;
-  white-space: pre-wrap;
   z-index: 1;
   overflow: hidden;
+}
+
+.m-promptbox__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: var(--border-radius-lg);
+  color: var(--monochrome-900);
+  background: var(--monochrome-100);
+  width: var(--size-48);
+  height: var(--size-48);
+  transition: background-color var(--animation-fast);
+  flex: 0 0 auto;
+
+  &:hover {
+    color: var(--monochrome-900);
+    background: var(--secondary-400);
+  }
+
+  svg {
+    display: block;
+    width: var(--size-24);
+    height: var(--size-24);
+  }
+}
+
+.m-promptbox__analysis {
+  margin-top: var(--size-6);
+  color: var(--color-300);
+  font-size: 0.95em;
+  font-style: italic;
+}
+
+.segment--used {
+  color: #ea580c;
+}
+
+.segment--ignored {
+  text-decoration: line-through;
+  color: #6b7280;
+  opacity: 0.7;
+}
+
+.segment--normal {
+  color: var(--foreground-100);
 }
 </style>

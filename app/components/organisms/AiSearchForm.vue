@@ -1,5 +1,5 @@
 <template>
-  <div class="p-ai-search | container container-sm flow flow-lg elevate-300">
+  <form @submit.prevent="submitSearch" class="flow flow-lg">
     <!-- main header -->
     <h1 class="| title-lg font-bold">
       Find your perfect home with
@@ -31,7 +31,7 @@
 
       <!-- description query -->
       <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-        @submit="handleSearch()" />
+        @submit="submitSearch" />
     </div>
 
     <!-- example prompts -->
@@ -41,20 +41,16 @@
           @click.prevent="addPrompt(prompt)" />
       </li>
     </ul>
-  </div>
-  <OrganismsAiSearchResults v-if="searchResults" :results="searchResults" :query-analysis="queryAnalysis" />
+  </form>
 </template>
 
 <script setup lang="ts">
 import { onClickOutside, useEventListener, templateRef } from '@vueuse/core'
-import type { ListingWithFullProperty } from '~~/shared/types/listing';
-import type { GeocodingFeature } from '~~/shared/types/map';
-import type { QueryAnalysis } from '~~/shared/types/ai';
 
-const searchResults = ref<ListingWithFullProperty[] | null>(null)
-const queryAnalysis = ref<QueryAnalysis | null>(null);
+const emit = defineEmits(['submit-search'])
+
+const { searchQuery } = useAi()
 const selectedLocation = ref<GeocodingFeature | null>(null)
-const { aiSearch, searchQuery } = useAi()
 const textareaId = useId()
 const locationQuery = ref("")
 
@@ -72,10 +68,6 @@ const radiusOptions = [
 
 const selectedRadius = ref(0)
 
-/**
- * Add a prompt to the textarea
- * @param prompt Prompt to add
- */
 const examplePrompts = [
   '4 bedroom house with a garden',
   'Studio flat with a balcony',
@@ -85,45 +77,30 @@ const examplePrompts = [
   '3 bedroom house with a garden and a garage'
 ]
 
-/**
- * Add a prompt to the textarea
- * @param prompt Prompt to add
- */
 function addPrompt(prompt: string) {
   searchQuery.value = prompt
-
   document?.getElementById(textareaId)?.focus()
 }
 
-/**
- * Handle location selection
- * @param location Selected location from autocomplete
- * Sets the selected location and updates the location query
- */
 function handleLocation(location: GeocodingFeature) {
   selectedLocation.value = location
   locationQuery.value = location.place_name_en
-
   hidePopover()
 }
 
-/**
- * Handle search action
- * Calls the AI search function with the selected location and radius
- */
-async function handleSearch() {
-  if (selectedLocation.value) {
-    const response = await aiSearch(selectedLocation.value, selectedRadius.value)
-    searchResults.value = response.results
-    queryAnalysis.value = response.queryAnalysis
+function submitSearch() {
+  if (selectedLocation.value && searchQuery.value.trim()) {
+    emit('submit-search', {
+      location: selectedLocation.value,
+      radius: selectedRadius.value,
+      query: searchQuery.value
+    })
   } else {
-    console.warn('No location selected for search.')
+    // Optional: handle form validation feedback
+    console.warn('Please select a location and enter a search query.')
   }
 }
 
-/**
- *  Popover toggle
- */
 const popoverExpanded = ref(false)
 const $location = templateRef<HTMLElement>('$location')
 
@@ -135,37 +112,12 @@ function hidePopover() {
   popoverExpanded.value = false
 }
 
-const { cancel } = onClickOutside($location, () => {
-  hidePopover()
-}, { controls: true })
-
-// Prevent click outside if clicking in modal
-useEventListener('mousedown', ({ target }) => {
-  const teleports = document.getElementById('teleports')
-
-  if (!(target instanceof Element) || !teleports) return
-  if (teleports.contains(target)) cancel()
-})
+onClickOutside($location, hidePopover)
 </script>
 
 <style lang="scss" scoped>
 @use '#styles/_utils/functions' as fn;
 @use '#styles/_utils/media' as mq;
-
-.p-ai-search {
-  background: var(--background-200);
-  border-radius: var(--border-radius-3xl);
-  padding: var(--size-24);
-  max-width: 58ch;
-
-  @include mq.tablet {
-    padding: var(--size-32);
-  }
-
-  @include mq.desktop {
-    padding: var(--size-40);
-  }
-}
 
 ul {
   list-style: none;

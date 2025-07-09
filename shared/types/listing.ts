@@ -32,6 +32,11 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   };
 }>;
 
+export type AiSearchResponse = {
+  results: ListingWithFullProperty[];
+  queryAnalysis: QueryAnalysis;
+};
+
 /**
  * Buy or Rent
  */
