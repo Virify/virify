@@ -23,6 +23,6 @@
 
   // Focus states
   --outline-size: 3px;
-  --outline-color: #{fn.faded-color(70%, var(--primary-300))};
+  --outline-color: #{fn.faded-color(60%, var(--secondary-400))};
   --focus-outline: var(--outline-size) solid var(--outline-color);
 }

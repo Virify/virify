@@ -1,6 +1,6 @@
 <template>
   <ul class="m-autocomplete-list | body-md">
-    <li v-for="option of options" class="m-autocomplete-list__row" :key="option.place_name_en">
+    <li v-for="option, index of options" class="m-autocomplete-list__row" :key="index">
       <slot v-bind="{
         option,
         rowClass: 'm-autocomplete-list__select',
@@ -10,12 +10,12 @@
   </ul>
 </template>
 
-<script setup lang="ts">
-interface Props {
-  options: GeocodingFeature[]
+<script setup lang="ts" generic="T">
+interface Props<T> {
+  options: T[]
 }
 
-defineProps<Props>()
+defineProps<Props<T>>()
 </script>
 
 <style lang="scss">

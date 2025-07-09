@@ -1,5 +1,5 @@
 <template>
-  <div class="| flow dialog-container dialog-container-xs">
+  <div class="v-dialog-saved-locations | flow dialog-container dialog-container-xs">
     <h2 class="| title-sm">Saved locations</h2>
 
     <ul v-if="entries.length" class="v-dialog-saved-locations__list | flow">
@@ -20,6 +20,7 @@ const { entries } = useSavedLocation();
 
 <style lang="scss">
 .v-dialog-saved-locations {
+  background-color: var(--background-100);
 
   &__list {
     list-style: none;

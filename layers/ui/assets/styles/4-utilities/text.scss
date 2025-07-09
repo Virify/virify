@@ -148,16 +148,20 @@
     -webkit-text-fill-color: transparent;
   }
 
-  &-ai::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: -0.15em;
-    right: -0.5em;
-    width: 0.6em;
-    height: 0.6em;
-    background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
-    mask-image: url('/img/ai-star.svg');
-    mask-size: contain;
+  &-ai {
+    margin-right: 0.2ch;
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -0.15em;
+      right: -0.5em;
+      width: 0.6em;
+      height: 0.6em;
+      background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
+      mask-image: url('/img/ai-star.svg');
+      mask-size: contain;
+    }
   }
 }
