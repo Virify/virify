@@ -196,3 +196,53 @@ export async function getListingByDistanceAndFilters(
 
   return listingsWithDistance;
 }
+
+/**
+ * Get listings by location and AI-generated filters
+ * First applies location filtering to get property IDs, then applies AI filters
+ *
+ * @param lat number - latitude
+ * @param lng number - longitude  
+ * @param radius number - radius in miles
+ * @param whereClause object - AI-generated WHERE clause
+ * @param includeClause object - Prisma include clause
+ * @param limit number - optional limit
+ * @returns ListingWithFullProperty[]
+ */
+export async function getListingsByLocationAndAIFilters(
+  lat: number,
+  lng: number,
+  radius: number,
+  whereClause: any,
+  includeClause: any,
+  limit?: number
+) {
+  // First get property IDs within the specified location/radius
+  const nearbyProperties = await getPropertyIdsByDistance(lat, lng, radius);
+  const propertyIds = nearbyProperties.map(p => p.propertyId);
+
+  // If no properties found in the area, return empty array
+  if (propertyIds.length === 0) {
+    return [];
+  }
+
+  // Apply location filter to the WHERE clause
+  const locationFilteredWhereClause = {
+    ...whereClause,
+    property: {
+      ...whereClause.property,
+      id: {
+        in: propertyIds,
+      },
+    },
+  };
+
+  // Execute the query with both location and AI filters
+  const listings = await prisma.listing.findMany({
+    where: locationFilteredWhereClause,
+    include: includeClause,
+    ...(limit ? { take: limit } : {}),
+  });
+
+  return listings;
+}

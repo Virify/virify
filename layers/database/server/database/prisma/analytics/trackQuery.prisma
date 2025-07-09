@@ -1,0 +1,6 @@
+model TrackQuery {
+  id        Int      @id @default(autoincrement())
+  query     String   @unique
+  createdAt DateTime @default(now())
+  count     Int      @default(1)
+}

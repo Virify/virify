@@ -105,6 +105,16 @@
       color: currentColor;
     }
   }
+
+  &-delete {
+    background: var(--error-background);
+    color: var(--error-foreground);
+
+    &:hover {
+      background: var(--error-foreground);
+      color: var(--error-background);
+    }
+  }
 }
 
 /**

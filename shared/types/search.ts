@@ -11,3 +11,66 @@ export type SearchParams = {
   featured?: any;
   coordinates?: { lat: number; lon: number } | null;
 }
+
+export interface SearchResult {
+  id: number
+  title: string
+  description: string
+  price?: number | null
+  similarity: number
+  listingType: 'rent' | 'buy' | 'unknown'
+  publishedAt?: Date | string
+  listingTier?: string
+  moveInDate?: Date | string | null
+  property?: {
+    id: number
+    numberBedrooms?: number | null
+    numberBathrooms?: number | null
+    numberReceptions?: number | null
+    size?: number | null
+    yearBuilt?: string | null
+    chainFree?: boolean
+    vacant?: boolean
+    constructionType?: string | null
+    floorLevel?: number | null
+    address?: {
+      city?: string | null
+      county?: string | null
+      postcode?: string
+      street?: string
+      lat?: number | null
+      lon?: number | null
+    }
+    type?: {
+      name?: string
+    }
+    classification?: {
+      name?: string
+    }
+    // All property features for comprehensive AI search
+    bedroomFeatures?: any
+    bathroomFeatures?: any
+    parking?: any
+    amenities?: any[]
+    additionalFeatures?: any
+    accessibilityFeatures?: any
+    diningroomFeatures?: any
+    kitchenFeatures?: any
+    livingAreaFeatures?: any
+    reception?: any
+    utility?: any
+    additionalToilet?: any
+    outdoorSpace?: any
+    energyAndUtilities?: any
+    securityFeatures?: any
+    storageFeatures?: any
+  }
+}
+
+export interface SearchResponse {
+  results: SearchResult[]
+  query: string
+  count: number
+  searchType: string
+  generatedConditions?: any  // For RAG search
+}
