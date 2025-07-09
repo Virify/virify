@@ -47,6 +47,12 @@
 <script setup lang="ts">
 import { onClickOutside, useEventListener, templateRef } from '@vueuse/core'
 
+const props = defineProps<{
+  initialQuery?: string
+  initialLocation?: GeocodingFeature | null
+  initialRadius?: number | null
+}>()
+
 const emit = defineEmits(['submit-search'])
 
 const { searchQuery } = useAi()
@@ -67,6 +73,19 @@ const radiusOptions = [
 ];
 
 const selectedRadius = ref(0)
+
+onMounted(() => {
+  if (props.initialQuery) {
+    searchQuery.value = props.initialQuery
+  }
+  if (props.initialLocation) {
+    selectedLocation.value = props.initialLocation
+    locationQuery.value = props.initialLocation.place_name_en
+  }
+  if (props.initialRadius) {
+    selectedRadius.value = props.initialRadius
+  }
+})
 
 const examplePrompts = [
   '4 bedroom house with a garden',
