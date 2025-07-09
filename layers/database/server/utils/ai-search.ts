@@ -70,9 +70,11 @@ function parseAiCompletion(aiResponse: string): any {
   try {
     return JSON.parse(aiResponse);
   } catch (error) {
+    console.error("Failed to parse AI response:", aiResponse, error);
     throw createError({
       statusCode: 500,
       statusMessage: `Invalid JSON response from AI: ${aiResponse.substring(0, 200)}...`,
+      message: `Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`,
     });
   }
 }
@@ -130,6 +132,11 @@ export async function generateWhereClauseFromQuery(query: string): Promise<aiSea
 function getPrismaSchemaPrompt(): string {
   return `
 CRITICAL: DO NOT NEST saleListing or rentalListing (or any of their fields) inside property or any nested object. This is a SCHEMA VIOLATION and will cause a FATAL ERROR. These fields MUST ONLY appear at the ROOT level of the query.
+
+CRITICAL: NEVER add Comments or quotes or markdown formatting to the AI response. The response MUST be a valid JSON object with a "whereClause" and "queryAnalysis" field. Any comments, quotes, or markdown will cause a FATAL ERROR.
+
+NEVER DO THIS: "landSize": { "gte": 1000 } // Assuming "large" refers to a size greater than 1000 square meters - the quotes around large breaks
+
 
 IMPORTANT: To filter by fields of rentalListing or saleListing, you MUST use the correct Prisma relation filter syntax:
 - To filter for existence: { rentalListing: { isNot: null } }
