@@ -52,7 +52,7 @@ const hasSearched = ref(false);
 const searchError = ref<string | null>(null);
 const lastSearchQuery = ref("");
 const lastLocation = ref<GeocodingFeature | null>(null);
-const lastRadius = ref<number>(10);
+const lastRadius = ref<number>(0);
 const isSearchFormOpen = ref(true);
 
 interface SearchPayload {
