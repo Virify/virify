@@ -1,6 +1,6 @@
 <template>
   <div class="m-listing-card-actions">
-    <nuxt-link to="#" class="| button button-ghost body-sm">
+    <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-ghost body-sm">
       View
     </nuxt-link>
     <button class="| button button-secondary body-sm">
@@ -8,7 +8,14 @@
     </button>
   </div>
 </template>
-
+<script setup lang="ts">
+defineProps({
+  listingId: {
+    type: Number,
+    required: true
+  }
+})
+</script>
 <style lang="scss">
 .m-listing-card-actions {
   display: grid;

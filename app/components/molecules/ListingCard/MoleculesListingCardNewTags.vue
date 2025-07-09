@@ -6,11 +6,30 @@
   </ul>
 </template>
 <script setup lang="ts">
-const tags = [
-  'Recently Added',
-  'Reduced',
-  'Chain Free'
-]
+
+const props = defineProps<{
+  chainFree?: boolean;
+  listedDate: Date | string;
+  reduced?: boolean;
+}>();
+
+const tags: string[] = [];
+const createdAt = new Date(props.listedDate);
+const now = new Date();
+const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+
+if (createdAt >= threeDaysAgo) {
+  tags.push('Recently Added');
+}
+
+if (props.reduced) {
+  tags.push('Reduced');
+}
+if (props.chainFree) {
+  tags.push('Chain Free');
+}
+
+
 </script>
 
 <style lang="scss">

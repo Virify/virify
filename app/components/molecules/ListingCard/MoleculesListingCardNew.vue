@@ -3,49 +3,52 @@
     <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
       Featured
     </div>
-    <MoleculesListingCardNewImage :images="images" />
+    <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     <div class="m-listing-card-content">
       <div class="m-listing-card-details">
-        <MoleculesListingCardNewHeader />
-        <MoleculesListingCardNewTitle />
-        <MoleculesListingCardNewFeatures />
-        <MoleculesListingCardNewTags />
+        <MoleculesListingCardNewHeader 
+          :price="listing.price" 
+          :price-type="priceType" 
+        />
+        <MoleculesListingCardNewTitle
+          v-if="listing.property?.address"
+          :address="listing.property.address"
+          :type="listing.property?.type.name" 
+          :classification="listing.property?.classification.name" 
+        />
+        <MoleculesListingCardNewFeatures
+          :bedrooms="listing.property?.numberBedrooms"
+          :bathrooms="listing.property?.numberBathrooms"
+          :receptions="listing.property?.numberReceptions"
+        />
+        <MoleculesListingCardNewTags :chain-free="listing.property?.chainFree" :listed-date="listing.property?.createdAt!" :reduced="true" />
       </div>
       <div class="m-listing-card-footer">
-        <MoleculesListingCardNewAgent />
-        <MoleculesListingCardNewActions />
+        <MoleculesListingCardNewAgent :username="(userName as string)" :id="listing.user?.id!" />
+        <MoleculesListingCardNewActions :listing-id="listing.id" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-  images: {
-    type: Array as () => string[],
-    default: () => [
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    ]
-  },
-  title: {
-    type: String,
-    default: 'Detached House'
-  },
-  listing_tier: {
-    type: String,
-    default: ''
-  },
-  listing: {
-    type: Object as () => ListingWithFullProperty,
-    default: () => ({})
-  }
+
+interface Props {
+  listing: ListingWithFullProperty;
+}
+const props = defineProps<Props>()
+
+const image_urls = computed(() => {
+  return props.listing.property?.media?.map((m: any) => m.image) ?? []
 })
 
-onMounted(() => {
-  console.log(props.listing)
-})
+const priceType = computed(() => {
+  return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
+});
+
+const userName = computed(() => {
+  return props.listing.user?.username ?? props.listing.user?.email;
+});
 </script>
 
 <style lang="scss">

@@ -38,6 +38,13 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
           ...propertyInclude,
         },
       },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
     },
   });
 }
@@ -88,6 +95,13 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
       property: {
         include: {
           ...propertyInclude,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
         },
       },
     },
@@ -253,6 +267,13 @@ const fullListingInclude = {
   property: {
     include: {
       ...propertyInclude,
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
     },
   },
 };

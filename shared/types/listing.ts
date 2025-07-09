@@ -29,6 +29,13 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         runningCosts: true;
       };
     };
+    user: {
+      select: {
+        id: true;
+        username: true;
+        email: true;
+      };
+    }
   };
 }>;
 
@@ -123,6 +130,7 @@ export const listingCardFields = {
       },
       numberBedrooms: true,
       numberBathrooms: true,
+      numberReceptions: true,
       parking: {
         select: {
           evCharging: true,
@@ -135,6 +143,13 @@ export const listingCardFields = {
           rearGarden: true,
         },
       },
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
     },
   },
 };

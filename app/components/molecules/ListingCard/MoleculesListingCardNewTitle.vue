@@ -1,15 +1,25 @@
 <template>
   <div>
     <h3 class="m-listing-card-title | body-md font-semibold">
-      Detached House
+      {{ props.classification}} {{ props.type }} 
     </h3>
     <p class="m-listing-card-location | body-xs faded-text">
-      Cardiff, CF15
+      {{ props.address.street }}, {{ props.address.city }}, {{ props.address.postcode }}
     </p>
   </div>
 </template>
 
 <script lang="ts" setup>
+const props = defineProps<{
+address: {
+  street: string;
+  city: string;
+  postcode: string;
+};
+type: string;
+classification: string;
+}>();
+
 </script>
 
 <style lang="scss">
