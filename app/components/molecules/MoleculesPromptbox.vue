@@ -68,7 +68,6 @@ const textarea = defineModel({ default: '' })
   white-space: pre-wrap;
   word-wrap: break-word;
   padding: var(--size-8);
-  font: inherit;
   letter-spacing: inherit;
   line-height: inherit;
 

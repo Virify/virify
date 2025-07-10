@@ -56,6 +56,23 @@
   line-height: var(--lineheight-lg);
 }
 
+@media (max-width: 600px) {
+  .body-sm {
+    font-size: var(--font-xs);
+    line-height: var(--lineheight-xs);
+  }
+
+  .body-md {
+    font-size: var(--font-sm);
+    line-height: var(--lineheight-sm);
+  }
+
+  .body-lg {
+    font-size: var(--font-md);
+    line-height: var(--lineheight-md);
+  }
+}
+
 /**
  *  Headers
  */
@@ -113,6 +130,58 @@
   font-size: var(--font-5xl);
   line-height: var(--lineheight-sm);
   margin-bottom: var(--size-24);
+}
+
+@media (max-width: 600px) {
+
+  // create the size DOWN for titles on mobile
+  .title-3xs {
+    font-size: var(--font-xs);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-8);
+  }
+
+  .title-2xs {
+    font-size: var(--font-sm);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-8);
+  }
+
+  .title-xs {
+    font-size: var(--font-md);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-8);
+  }
+
+  .title-sm {
+    font-size: var(--font-lg);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-8);
+  }
+
+  .title-md {
+    font-size: var(--font-xl);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-16);
+  }
+
+  .title-lg {
+    font-size: var(--font-2xl);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-16);
+  }
+
+  .title-xl {
+    font-size: var(--font-3xl);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-16);
+  }
+
+  .title-2xl {
+    font-size: var(--font-4xl);
+    line-height: var(--lineheight-xs);
+    margin-bottom: var(--size-24);
+  }
 }
 
 /**
