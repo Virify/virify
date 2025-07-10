@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h3 class="m-listing-card-title | body-md font-semibold">
+    <h3 class="m-listing-card-no-wrap | body-md font-semibold">
       {{ props.classification}} {{ props.type }} 
     </h3>
-    <p class="m-listing-card-location | body-xs faded-text">
+    <p class="m-listing-card-location m-listing-card-no-wrap | body-xs faded-text">
       {{ props.address.street }}, {{ props.address.city }}, {{ props.address.postcode }}
     </p>
   </div>
@@ -27,15 +27,14 @@ classification: string;
   margin-bottom: var(--size-8);
 }
 
-.m-listing-card-title {
+.m-listing-card-no-wrap {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 @media (max-width: 768px) {
-  .m-listing-card-title {
-    font-size: var(--font-lg);
+  .m-listing-card-no-wrap {
     white-space: normal;
   }
 }
