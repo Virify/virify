@@ -27,9 +27,16 @@ classification: string;
   margin-bottom: var(--size-8);
 }
 
+.m-listing-card-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 768px) {
   .m-listing-card-title {
     font-size: var(--font-lg);
+    white-space: normal;
   }
 }
 </style>

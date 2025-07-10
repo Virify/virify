@@ -49,7 +49,7 @@ const userName = computed(() => {
 
   background-color: var(--background-200);
   border: 1px solid var(--foreground-100);
-  border-radius: var(--border-radius-2xl);
+  border-radius: calc(var(--border-radius-2xl) + var(--size-2));
   display: flex;
   max-width: 960px;
   position: relative;
@@ -61,7 +61,7 @@ const userName = computed(() => {
     padding: 0;
 
     .m-listing-card-image-container {
-      border-radius: var(--border-radius-2xl)
+      border-radius: calc(var(--border-radius-2xl) - var(--size-1));
     }
 
     .m-listing-card-content {
