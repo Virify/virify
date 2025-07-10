@@ -38,7 +38,7 @@ defineProps<{
 .p-ai-search-results__list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--size-16);
+  gap: var(--size-32);
 }
 
 ul {
