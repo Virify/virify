@@ -1,17 +1,25 @@
 <template>
-  <div class="m-listing-card-agent">
+  <NuxtLink to="#" class="m-listing-card-agent">
     <div class="m-listing-card-agent-logo">
       <AtomsIcon name="check" icon="tick-solid" />
     </div>
-    <p class="body-xs font-semibold">MaggotBalls</p>
-  </div>
+    <p class="body-xs font-semibold">{{ username }}</p>
+  </NuxtLink>
 </template>
+<script setup lang="ts">
+defineProps<{
+  username: string,
+  id: string | number,
+}>();
+</script>
 
 <style lang="scss">
 .m-listing-card-agent {
   align-items: center;
   display: flex;
   gap: var(--size-8);
+  text-decoration: none;
+  color: inherit;
 }
 
 .m-listing-card-agent-logo {

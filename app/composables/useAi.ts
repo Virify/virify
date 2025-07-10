@@ -1,7 +1,7 @@
 export default function useAi() {
   const { trackAiSearch } = useAnalytics();
   // Global state for query analysis and search query
-  const queryAnalysis = useState<{ usedTerms: string[]; ignoredTerms: string[] } | null>(
+  const queryAnalysis = useState<QueryAnalysis | null>(
     "ai-query-analysis",
     () => null
   );
@@ -11,20 +11,22 @@ export default function useAi() {
    * Perform an AI search with the given location and radius
    * @param location The location to search
    * @param radius The search radius
+   * @param query The search query
    * @returns The search results
    */
-  async function aiSearch(location: GeocodingFeature, radius: number) {
-    const response = await $fetch("/api/search/rag/", {
+  async function aiSearch(location: GeocodingFeature, radius: number, query: string) {
+    searchQuery.value = query; // Update state for analysis function
+    const response = await $fetch<AiSearchResponse>("/api/search/rag/", {
       method: "POST",
       body: {
-        query: searchQuery.value,
+        query: query,
         lat: location.geometry.coordinates[1],
         lon: location.geometry.coordinates[0],
         radius: radius,
       },
     });
 
-    trackAiSearch(searchQuery.value, location);
+    trackAiSearch(query, location);
 
     if (response.queryAnalysis) {
       queryAnalysis.value = response.queryAnalysis;
@@ -34,52 +36,54 @@ export default function useAi() {
   }
 
   /**
-   * Generate highlighted HTML for the analyzed query
-   * @returns HTML string with highlighted terms based on query analysis
+   * Generate a structured array of query segments for highlighting.
+   * @returns An array of objects with text and type ('used', 'ignored', 'normal').
    */
-  function getAnalyzedQuery() {
-    const { usedTerms, ignoredTerms } = queryAnalysis.value || { usedTerms: [], ignoredTerms: [] };
-    const termMap = new Map<string, "used" | "ignored">();
-
-    if (!searchQuery.value) return "";
-
+  function getAnalyzedQuerySegments() {
+    if (!searchQuery.value) return [];
     if (!queryAnalysis.value) {
-      return `<span style="color: #1e293b;">${searchQuery.value}</span>`;
+      return [{ text: searchQuery.value, type: "normal" }];
     }
 
-    ignoredTerms.forEach((term) => termMap.set(term.toLowerCase(), "ignored"));
-    usedTerms.forEach((term) => termMap.set(term.toLowerCase(), "used"));
-
-    // Sort by length descending to match longer terms first
+    const { usedTerms, ignoredTerms } = queryAnalysis.value;
     const allTerms = [...usedTerms, ...ignoredTerms].sort((a, b) => b.length - a.length);
 
-    let highlightedQuery = searchQuery.value;
+    const segments: { text: string; type: "used" | "ignored" | "normal" }[] = [];
+    let lastIndex = 0;
 
-    allTerms.forEach((term) => {
-      const termType = termMap.get(term.toLowerCase());
-      const escapedTerm = term.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
-      // Always use a global, case-insensitive regex for all terms (no word boundaries)
-      const pattern = new RegExp(`${escapedTerm}`, "gi");
-      const styleMap = {
-        used: "color: #ea580c;",
-        ignored: "text-decoration: line-through; color: #6b7280; opacity: 0.7;",
-      };
-      if (termType && styleMap[termType]) {
-        highlightedQuery = highlightedQuery.replace(pattern, `<span style="${styleMap[termType]}">$&</span>`);
+    const termMap = new Map<string, "used" | "ignored">();
+    usedTerms.forEach(term => termMap.set(term.toLowerCase(), "used"));
+    ignoredTerms.forEach(term => termMap.set(term.toLowerCase(), "ignored"));
+
+    const regex = new RegExp(allTerms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "gi");
+
+    searchQuery.value.replace(regex, (match, offset) => {
+      // Add the text before the current match as a normal segment
+      if (offset > lastIndex) {
+        segments.push({ text: searchQuery.value.substring(lastIndex, offset), type: "normal" });
       }
+
+      // Add the matched term with its type
+      const type = termMap.get(match.toLowerCase());
+      if (type) {
+        segments.push({ text: match, type });
+      }
+
+      lastIndex = offset + match.length;
+      return match; // Required by replace function
     });
 
-    // Default styling for any remaining unstyled text (not inside a span)
-    highlightedQuery = highlightedQuery.replace(/(?![^<]*>)(\b[A-Za-z0-9]+\b)(?![^<]*<)/g, (match) => {
-      return `<span style="color: #1e293b;">${match}</span>`;
-    });
+    // Add any remaining text after the last match
+    if (lastIndex < searchQuery.value.length) {
+      segments.push({ text: searchQuery.value.substring(lastIndex), type: "normal" });
+    }
 
-    return highlightedQuery;
+    return segments;
   }
 
   return {
     aiSearch,
-    getAnalyzedQuery,
+    getAnalyzedQuery: getAnalyzedQuerySegments, // Rename for compatibility
     queryAnalysis,
     searchQuery,
   };

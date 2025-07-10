@@ -74,3 +74,9 @@ export interface SearchResponse {
   searchType: string
   generatedConditions?: any  // For RAG search
 }
+
+// ai search result
+export type aiSearchResult = {
+  whereClause: any
+  queryAnalysis: QueryAnalysis
+}

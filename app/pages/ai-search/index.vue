@@ -1,328 +1,204 @@
 <template>
-  <div class="container">
-    <!-- AI Search Hero -->
-    <OrganismsHeroAISearchHero @selectSuggestion="handleSuggestionSelect" />
-
-    <!-- How It Works Section -->
-    <div class="ai-how-it-works | flow">
-      <h2 class="| title-lg text-center">Revolutionary <GradientText>AI-Powered</GradientText> Property Search
-      </h2>
-      <p class="| body-lg text-center max-width-prose">
-        The most advanced property search technology ever created. Simply describe your dream home in natural language,
-        and our AI will find perfect matches using intelligent filtering and location awareness.
-      </p>
-
-      <div class="ai-how-it-works-grid">
-        <GradientBox>
-          <h3 class="| title-sm">Natural Language Search</h3>
-          <p class="| body-md">Describe exactly what you want: "3 bedroom house with large garden near good schools" -
-            our AI understands context and intent.</p>
-        </GradientBox>
-
-        <GradientBox>
-          <h3 class="| title-sm">Intelligent Filtering</h3>
-          <p class="| body-md">Advanced filters for every detail: room sizes, garden dimensions, accessibility
-            features, EV charging, and hundreds more criteria.</p>
-        </GradientBox>
-
-        <GradientBox>
-          <h3 class="| title-sm">Location Intelligence</h3>
-          <p class="| body-md">Smart location matching with radius search, postcode recognition, and proximity to
-            amenities like transport and schools.</p>
-        </GradientBox>
-      </div>
+  <div class="ai-search-page-wrapper"
+    :class="{ 'initial-state': !hasSearched, 'search-expanded': !isSearchFormCollapsed && hasSearched }">
+    <!-- Collapsible Search Header -->
+    <div class="search-header-container" :class="{ 'is-sticky': hasSearched }">
+        <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched"
+          :initial-query="lastSearchQuery" :initial-location="lastLocation" :initial-radius="lastRadius"
+          @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" />
     </div>
 
-    <!-- Advanced Search Capabilities -->
-    <div class="ai-capabilities | flow">
-      <h2 class="| title-lg text-center">Search By Anything You Can <GradientText>Imagine</GradientText></h2>
-      <p class="| body-lg text-center max-width-prose">
-        Our AI understands hundreds of property features and can search by size, style, amenities, and lifestyle
-        requirements.
-      </p>
+    <!-- Search Feedback Section: Loading, No Results, Error -->
+    <div v-if="isSearching || (hasSearched && (!searchResults || searchResults.length === 0)) || searchError"
+      class="search-feedback-section | container container-sm">
+      <!-- Loading State -->
+      <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
 
-      <div class="ai-capabilities-list">
-        <div class="ai-capabilities-category">
-          <h3 class="| title-sm">Property & Location</h3>
-          <p class="| body-md">Houses, flats, penthouses, studios • Room sizes, garden area • Near schools, stations,
-            city centre</p>
-        </div>
+      <!-- No Results State -->
+      <OrganismsAiSearchNoResults v-else-if="hasSearched && (!searchResults || searchResults.length === 0)"
+        :last-search-query="lastSearchQuery" />
 
-        <div class="ai-capabilities-category">
-          <h3 class="| title-sm">Features & Amenities</h3>
-          <p class="| body-md">Parking, garages, EV charging • Gardens, balconies, patios • Home office, study spaces
-          </p>
-        </div>
-
-        <div class="ai-capabilities-category">
-          <h3 class="| title-sm">Accessibility & Lifestyle</h3>
-          <p class="| body-md">Wheelchair access, lifts, step-free • Pet-friendly, eco features • Solar panels, EPC
-            ratings</p>
-        </div>
+      <!-- Error State -->
+      <div v-else-if="searchError" class="error-content | flow flow-sm">
+        <h2 class="title-md">An Error Occurred</h2>
+        <p class="body-sm">{{ searchError }}</p>
       </div>
     </div>
-
-    <!-- FAQ Section -->
-    <div class="ai-faq">
-      <h2 class="| title-lg text-center">Frequently Asked Questions</h2>
-
-      <div class="ai-faq-list">
-        <FAQItem 
-          question="How does AI property search work?"
-          answer="Our AI analyzes your natural language description and converts it into precise database queries. It understands context, synonyms, and relationships between different property features to find exactly what you're looking for."
-          :is-open="true"
-        />
-
-        <FAQItem 
-          question="Can I search by specific room sizes?"
-          answer="Yes! You can search by bedroom sizes, kitchen area, garden dimensions, total property size, and more. Try searches like 'house with master bedroom over 20 sqm' or 'flat with garden over 50 sqm'."
-        />
-
-        <FAQItem 
-          question="What locations can I search?"
-          answer="Currently featuring properties in Cardiff and Newport with intelligent location matching. You can search by city, postcode, or proximity to landmarks like 'near Cardiff city centre' or 'close to Newport train station'."
-        />
-
-        <FAQItem 
-          question="How specific can my search be?"
-          answer="Very specific! Our AI understands complex queries like '3 bedroom detached house with double garage, EV charging, large kitchen, and pet-friendly garden under £400,000 in Cardiff'. The more detail you provide, the better the matches."
-        />
-
-        <FAQItem 
-          question="What makes this different from traditional search?"
-          answer="Traditional search uses dropdown filters and checkboxes. Our AI search understands natural language, context, and relationships between features. Instead of clicking dozens of filters, just describe your ideal home in your own words."
-        />
-
-        <FAQItem 
-          question="How many manual filters does AI search replace?"
-          answer="Traditional property searches often require 50+ separate filters for detailed searches - property type, bedrooms, bathrooms, price ranges, features, location radius, parking, garden size, accessibility options, and more. Our AI understands all of these from a single sentence."
-        />
-
-        <FAQItem 
-          question="Can I perform complex searches without using any filters?"
-          answer="Absolutely! Try 'Victorian terrace house with original features, modern kitchen, off-street parking, small garden, near primary school, under £350k in Cardiff suburbs' - our AI handles all the complexity automatically."
-        />
-
-        <FAQItem 
-          question="What if I have very specific requirements?"
-          answer="The more specific, the better! Our AI excels at complex requirements like 'ground floor flat with level access, wet room, lift access, allocated parking space, south-facing balcony, pet-friendly building, near bus route' - no manual filter combinations needed."
-        />
-      </div>
-    </div>
-
-    <!-- Call to Action -->
-    <div class="ai-cta">
-      <div class="ai-cta-content">
-        <h2 class="ai-cta-title | title-lg">Ready to Find Your Perfect
-          <GradientText>Home</GradientText>?
-        </h2>
-        <p class="ai-cta-subtitle | body-lg">Start your search above and experience the future of property discovery</p>
-        <a href="/search" class="ai-cta-button">Try AI Search Now</a>
-      </div>
+    <div class="| container">
+      <!-- Results -->
+      <OrganismsAiSearchResults v-if="!isSearching && searchResults && searchResults.length > 0"
+        :results="sortedResults" :query-analysis="queryAnalysis" />
     </div>
   </div>
 </template>
 
-<script setup>
-import GradientBox from '~/components/atoms/GradientBox.vue';
-import GradientText from '~/components/atoms/GradientText.vue';
-import FAQItem from '~/components/molecules/FAQItem.vue';
+<script setup lang="ts">
+const { aiSearch } = useAi();
 
-// Page metadata
-useHead({
-  title: 'AI Property Search - Find Your Perfect Home',
-  meta: [
-    { name: 'description', content: 'Revolutionary AI-powered property search. Simply describe your ideal home and let our intelligent system find perfect matches using natural language processing.' }
-  ]
-})
+const searchResults = ref<ListingWithFullProperty[] | null>(null);
+const queryAnalysis = ref<QueryAnalysis | null>(null);
+const isSearching = ref(false);
+const hasSearched = ref(false);
+const searchError = ref<string | null>(null);
+const lastSearchQuery = ref("");
+const lastLocation = ref<GeocodingFeature | null>(null);
+const lastRadius = ref<number>(0);
+const isSearchFormCollapsed = ref(true);
+const currentSort = ref('relevance');
 
-// Handle suggestion clicks from hero component
-const handleSuggestionSelect = (suggestion) => {
-  // Navigate to the main search page with the suggestion as a query parameter
-  navigateTo(`/search?q=${encodeURIComponent(suggestion)}`)
+interface SearchPayload {
+  location: GeocodingFeature;
+  radius: number;
+  query: string;
+}
+
+watch(isSearchFormCollapsed, (isCollapsed) => {
+  if (hasSearched.value) {
+    document.body.style.overflow = isCollapsed ? '' : 'hidden';
+  }
+});
+
+const sortedResults = computed(() => {
+  if (!searchResults.value) return [];
+  const listings = [...searchResults.value];
+  switch (currentSort.value) {
+    case 'price-asc':
+      return listings.sort((a, b) => (a.price || 0) - (b.price || 0));
+    case 'price-desc':
+      return listings.sort((a, b) => (b.price || 0) - (a.price || 0));
+    case 'date-asc':
+      return listings.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    case 'date-desc':
+      return listings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    case 'relevance':
+    default:
+      return listings;
+  }
+});
+
+function handleSort(sortBy: string) {
+  currentSort.value = sortBy;
+}
+
+async function handleSearch(payload: SearchPayload) {
+  isSearchFormCollapsed.value = true;
+  hasSearched.value = true;
+  isSearching.value = true;
+  searchError.value = null;
+  searchResults.value = null;
+  queryAnalysis.value = null;
+  lastSearchQuery.value = payload.query;
+  lastLocation.value = payload.location;
+  lastRadius.value = payload.radius;
+
+  await nextTick(() => {
+    const feedbackElement = document.querySelector(".search-feedback-section");
+    if (feedbackElement) {
+      feedbackElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  try {
+    const response = await aiSearch(payload.location, payload.radius, payload.query);
+    searchResults.value = response.results;
+    queryAnalysis.value = response.queryAnalysis;
+  } catch (error: any) {
+    searchError.value = error.message || "An unexpected error occurred.";
+    console.error("AI Search Error:", error);
+  } finally {
+    isSearching.value = false;
+  }
 }
 </script>
 
-<style scoped lang="scss">
-@use '#styles/_utils/media' as mq;
-@use '#styles/_utils/functions' as fn;
+<style lang="scss">
+@use "#styles/_utils/functions" as fn;
 
-// Section spacing
-.ai-how-it-works,
-.ai-how-it-works-grid,
-.ai-capabilities,
-.ai-faq,
-.ai-faq-list {
-  margin: var(--size-64) 0;
-  padding: var(--size-40) 0;
+.ai-search-page-wrapper.search-expanded {
+  .search-header-container {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-16);
+    margin-bottom: 0;
 
-  @include mq.tablet {
-    margin: var(--size-80) 0;
   }
 }
 
-// How It Works Section - Enhanced styling
-.ai-how-it-works {
-  position: relative;
-  padding: var(--size-40) 0;
-}
+.search-header-container {
+  &.is-sticky {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 10;
+    background-color: var(--background-color);
+    margin-bottom: var(--size-24);
 
-// Capabilities section with hero-style background
-.ai-capabilities {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-  border-radius: var(--border-radius-3xl);
-  padding: var(--size-56) var(--size-20);
-  margin: var(--size-64) 0;
-  color: var(--monochrome-900);
-
-  @include mq.tablet {
-    padding: var(--size-72) var(--size-32);
-    margin: var(--size-80) 0;
-    background:
-      url('/img/logo-background.svg') no-repeat top right,
-      linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-    background-size: auto 120%, cover;
-  }
-
-  .title-lg {
-    color: var(--monochrome-900);
-  }
-
-  .body-lg {
-    color: var(--monochrome-700);
-  }
-}
-
-// Centered content with max width
-.max-width-prose {
-  max-width: 65ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-
-
-// How It Works Grid
-.ai-how-it-works-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--size-24);
-  padding: var(--size-40) 0;
-
-  @include mq.tablet {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .title-sm {
-    color: var(--foreground-100);
-    font-weight: 700;
-    margin-bottom: var(--size-16);
-    font-size: 1.25rem;
-  }
-
-  .body-md {
-    color: var(--foreground-200);
-    line-height: 1.6;
-  }
-}
-
-// Capabilities List
-.ai-capabilities-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-32);
-  padding: var(--size-40) 0;
-  max-width: 800px;
-  margin: 0 auto;
-
-  @include mq.tablet {
-    gap: var(--size-40);
-  }
-}
-
-.ai-capabilities-category {
-  text-align: center;
-
-  .title-sm {
-    color: var(--monochrome-900);
-    font-weight: 700;
-    margin-bottom: var(--size-12);
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 2px;
-      background: var(--primary-600);
+    .p-ai-search {
+      max-height: 85vh;
+      overflow-y: auto;
     }
   }
+}
 
-  .body-md {
-    color: var(--monochrome-700);
-    line-height: 1.6;
-    max-width: 600px;
-    margin: 0 auto;
+.p-ai-search {
+  background: var(--background-200);
+  border-radius: var(--border-radius-3xl);
+  padding: var(--size-24);
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .p-ai-search {
+    padding: var(--size-32);
+  }
+
+  .collapse-button {
+    bottom: var(--size-32);
+    right: var(--size-32);
   }
 }
 
-// FAQ List
-.ai-faq-list {
+@media (min-width: 1024px) {
+  .p-ai-search {
+    padding: var(--size-40);
+  }
+
+}
+
+/* Search Feedback Section */
+.search-feedback-section {
   display: flex;
   flex-direction: column;
-  gap: var(--size-16);
-}
-
-// Call to Action - Hero Style
-.ai-cta {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-  color: var(--monochrome-900);
-  border-radius: var(--border-radius-3xl);
-  min-height: max(300px, 40vh);
-  margin-bottom: var(--size-32);
-  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--size-56) var(--size-20);
-
-  @include mq.tablet {
-    padding: var(--size-72) var(--size-32);
-    background:
-      url('/img/logo-background.svg') no-repeat top right,
-      linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-    background-size: auto 120%, cover;
-  }
-}
-
-.ai-cta-content {
+  gap: var(--size-32);
   text-align: center;
-  max-width: 600px;
+  padding: var(--size-40);
+  background: var(--background-200);
+  border-radius: var(--border-radius-3xl);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.ai-cta-title {
-  margin: 0 auto var(--size-16);
+.error-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--size-32);
 }
 
-.ai-cta-subtitle {
-  margin-bottom: var(--size-32);
-  line-height: 1.6;
-}
+/* Error Content */
+.error-content {
+  .title-md {
+    color: var(--danger-heading);
+  }
 
-.ai-cta-button {
-  display: inline-block;
-  background-color: fn.faded-color(12%, var(--monochrome-600));
-  color: var(--monochrome-900);
-  padding: var(--size-12) var(--size-24);
-  border-radius: var(--border-radius-lg);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: fn.faded-color(24%, var(--monochrome-600));
+  .body-sm {
+    color: var(--danger-text);
   }
 }
 </style>

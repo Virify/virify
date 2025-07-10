@@ -184,3 +184,22 @@ export async function getNearbyPropertiesByTextQuery(query: string, distanceMile
   )
 `;
 }
+
+/**
+ * Handles location filtering by fetching property IDs within a given radius.
+ */
+export async function handleLocationFilter(lat?: number, lon?: number, radius?: number) {
+  if (!lat || !lon) {
+    return { propertyIds: null, locationContext: "" };
+  }
+
+  console.log(`Location: ${lat}, ${lon} within ${radius} miles`);
+  try {
+    const nearbyProperties = await getPropertyIdsByDistance(lat, lon, radius!);
+    const propertyIds = nearbyProperties.map((p) => p.propertyId);
+    const locationContext = `within ${radius} miles of ${lat}, ${lon}`;
+    return { propertyIds, locationContext };
+  } catch (error) {
+    return { propertyIds: [], locationContext: "" };
+  }
+}

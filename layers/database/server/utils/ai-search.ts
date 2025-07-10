@@ -1,15 +1,3 @@
-/**
- * AI-driven Prisma WHERE clause generator for property search.
- *
- * This module provides a function to convert natural language queries into
- * valid, schema-accurate Prisma WHERE clauses for property listings, using OpenAI.
- *
- * - Ensures all generated queries match the real Prisma schema (no invented fields).
- * - Handles all property, saleListing, rentalListing, and nested feature fields.
- * - Expects clean, valid JSON from the AI (no post-processing or fixups).
- * - Includes a comprehensive, explicit schema prompt for the AI.
- *
- */
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -17,31 +5,43 @@ const openai = new OpenAI({
 });
 
 /**
- * Generate a Prisma WHERE clause from a natural language query using OpenAI.
- *
- * @param query - The user's natural language search query.
- * @param propertyIds - (Optional) Restrict search to these property IDs.
- * @returns An object with a valid Prisma WHERE clause and query analysis.
- * @throws 500 error if AI is not configured or response is invalid.
+ * Checks if the required AI configuration is present.
  */
-export async function generateWhereClauseFromQuery(
-  query: string,
-  propertyIds?: number[] | null
-): Promise<{
-  whereClause: any;
-  queryAnalysis: {
-    usedTerms: string[];
-    ignoredTerms: string[];
-  };
-}> {
+export function checkAiConfiguration() {
   if (!process.env.OPENAI_API_KEY) {
     throw createError({
       statusCode: 500,
       statusMessage: "AI search is not configured. Please contact support.",
     });
   }
+}
 
-  // Get AI response
+/**
+ * Constructs the Prisma WHERE clause from the query and location filters.
+ */
+export async function constructPrismaWhereClause(query: string, propertyIds: number[] | null) {
+  const { whereClause, queryAnalysis } = await generateWhereClauseFromQuery(query);
+
+  if (propertyIds !== null) {
+    if (propertyIds.length === 0) {
+      // If no properties are in the area, we can short-circuit
+      return { whereClause: { property: { id: { in: [] } } }, queryAnalysis };
+    }
+    if (!whereClause.property) {
+      whereClause.property = {};
+    }
+    whereClause.property.id = { in: propertyIds };
+  }
+
+  return { whereClause, queryAnalysis };
+}
+
+/**
+ * Fetches a completion from the OpenAI API for a given search query.
+ * @param query The user's natural language search query.
+ * @returns The AI's response as a string.
+ */
+async function getAiSearchCompletion(query: string): Promise<string> {
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -51,29 +51,44 @@ export async function generateWhereClauseFromQuery(
     temperature: 0,
   });
 
-  // Expect valid, clean JSON from the AI (no markdown, no comments)
-  let aiResponse = completion.choices[0]?.message?.content?.trim();
+  const aiResponse = completion.choices[0]?.message?.content?.trim();
   if (!aiResponse) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to generate search conditions",
+      statusMessage: "Failed to generate search conditions from AI.",
     });
   }
+  return aiResponse;
+}
 
-  // Parse the response directly
-  let parsedResponse: any;
+/**
+ * Parses the AI's JSON response string.
+ * @param aiResponse The raw string response from the AI.
+ * @returns The parsed JSON object.
+ */
+function parseAiCompletion(aiResponse: string): any {
   try {
-    parsedResponse = JSON.parse(aiResponse);
+    return JSON.parse(aiResponse);
   } catch (error) {
+    console.error("Failed to parse AI response:", aiResponse, error);
     throw createError({
       statusCode: 500,
-      statusMessage: `Invalid response generated. AI response: ${aiResponse.substring(0, 500)}...`,
+      statusMessage: `Invalid JSON response from AI: ${aiResponse.substring(0, 200)}...`,
+      message: `Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`,
     });
   }
+}
 
-  // Accept either { whereClause, queryAnalysis } or a direct whereClause
+/**
+ * Normalizes the parsed AI response to extract the where clause and query analysis,
+ * and ensures the 'published' flag is set.
+ * @param parsedResponse The parsed object from the AI's response.
+ * @returns A structured object containing the where clause and query analysis.
+ */
+function normalizeWhereClause(parsedResponse: any): aiSearchResult {
   let whereClause: any;
   let queryAnalysis = { usedTerms: [], ignoredTerms: [] };
+
   if (parsedResponse.whereClause && parsedResponse.queryAnalysis) {
     whereClause = parsedResponse.whereClause;
     queryAnalysis = parsedResponse.queryAnalysis;
@@ -90,6 +105,20 @@ export async function generateWhereClauseFromQuery(
 }
 
 /**
+ * Generate a Prisma WHERE clause from a natural language query using OpenAI.
+ *
+ * @param query - The user's natural language search query.
+ * @returns An object with a valid Prisma WHERE clause and query analysis.
+ * @throws 500 error if AI is not configured or response is invalid.
+ */
+export async function generateWhereClauseFromQuery(query: string): Promise<aiSearchResult> {
+  checkAiConfiguration();
+  const aiResponse = await getAiSearchCompletion(query);
+  const parsedResponse = parseAiCompletion(aiResponse);
+  return normalizeWhereClause(parsedResponse);
+}
+
+/**
  * Get the comprehensive Prisma schema prompt for AI.
  *
  * This prompt:
@@ -103,6 +132,11 @@ export async function generateWhereClauseFromQuery(
 function getPrismaSchemaPrompt(): string {
   return `
 CRITICAL: DO NOT NEST saleListing or rentalListing (or any of their fields) inside property or any nested object. This is a SCHEMA VIOLATION and will cause a FATAL ERROR. These fields MUST ONLY appear at the ROOT level of the query.
+
+CRITICAL: NEVER add Comments or quotes or markdown formatting to the AI response. The response MUST be a valid JSON object with a "whereClause" and "queryAnalysis" field. Any comments, quotes, or markdown will cause a FATAL ERROR.
+
+NEVER DO THIS: "landSize": { "gte": 1000 } // Assuming "large" refers to a size greater than 1000 square meters - the quotes around large breaks
+
 
 IMPORTANT: To filter by fields of rentalListing or saleListing, you MUST use the correct Prisma relation filter syntax:
 - To filter for existence: { rentalListing: { isNot: null } }
@@ -133,11 +167,20 @@ PROPERTY TYPES AND CLASSIFICATIONS (use these exact values):
 - Specialty: Shared Ownership, Retirement Home, New Build Home
 - Student Accommodation: Flat, House, House-share
 
-To filter for a studio flat, use:
+To filter for a single property type (e.g., a studio flat), use:
 {
   "property": {
     "type": { "name": "Flat" },
     "classification": { "name": "Studio flat" }
+  }
+}
+
+To filter for MULTIPLE property types (e.g., "house or flat"), you MUST use the "in" operator on the type name:
+{
+  "property": {
+    "type": {
+      "name": { "in": ["House", "Flat"] }
+    }
   }
 }
 

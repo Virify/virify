@@ -6,12 +6,18 @@
     </li>
   </ul>
 </template>
-
 <script setup lang="ts">
+
+const props = defineProps<{
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  receptions?: number | null;
+}>();
+
 const iconList = computed(() => [
-  { count: 1, icon: 'property/bedrooms', iconTitle: 'bedrooms' },
-  { count: 2, icon: 'property/bathrooms', iconTitle: 'bathrooms' },
-  { count: 3, icon: 'property/receptions', iconTitle: 'receptions' }
+  { count: props.bedrooms, icon: 'property/bedrooms', iconTitle: 'bedrooms' },
+  { count: props.bathrooms, icon: 'property/bathrooms', iconTitle: 'bathrooms' },
+  { count: props.receptions, icon: 'property/receptions', iconTitle: 'receptions' }
 ])
 </script>
 

@@ -1,5 +1,4 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import type { AddressLocation } from "~~/shared/types/location";
 const prisma = new PrismaClient();
 
 /**

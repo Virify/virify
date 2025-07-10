@@ -10,11 +10,19 @@
         {{ selectedIndex + 1 }}/{{ images.length }}
       </div>
       <div class="m-listing-card-image-actions">
-        <button class="m-listing-card-icon-button">
-          <AtomsIcon name="heart" icon="cards/favourite" />
+        <button 
+          class="m-listing-card-icon-button" 
+          :class="{ 'is-active': isFavourite(listingId) }"
+          @click="toggleFavourite(listingId)"
+        >
+          <AtomsIcon name="heart" icon="cards/favourite" class="icon-heart" />
         </button>
-        <button class="m-listing-card-icon-button">
-          <AtomsIcon name="edit" icon="cards/notes" />
+        <button 
+          class="m-listing-card-icon-button" 
+          :class="{ 'is-active': hasNote(listingId) }"
+          @click="showNoteDialog(listingId)"
+        >
+          <AtomsIcon name="edit" icon="cards/notes" class="icon-edit" />
         </button>
       </div>
       <button class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev">
@@ -29,19 +37,24 @@
 
 <script lang="ts" setup>
 import emblaCarouselVue from 'embla-carousel-vue'
+import { useFavourites } from '~/composables/useFavourites';
+import { useNotes } from '~/composables/useNotes';
 
 const props = defineProps({
   images: {
     type: Array as () => string[],
-    default: () => [
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    ]
+    required: true,
   },
+  listingId: {
+    type: Number,
+    required: true,
+  }
 })
 
-const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: Math.floor(Math.random() * props.images.length) })
+const { isFavourite, toggleFavourite } = useFavourites();
+const { showNoteDialog, hasNote } = useNotes();
+
+const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: 0 })
 const selectedIndex = ref(0)
 
 const scrollPrev = () => {
@@ -134,13 +147,32 @@ onMounted(() => {
   align-items: center;
   background-color: transparent;
   border: none;
-  color: var(--monochrome-900);
+  color: var(--monochrome-100);
   cursor: pointer;
   display: flex;
   font-size: var(--font-xl);
   height: var(--size-32);
   justify-content: center;
   width: var(--size-32);
+  transition: color 0.2s ease-in-out;
+
+  .icon {
+    transition: fill 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+
+  .icon-heart {
+    fill: transparent;
+  }
+
+  &.is-active {
+    .icon-heart,
+    .icon-edit {
+      color: var(--monochrome-900);
+    }
+    .icon-heart {
+      fill: var(--monochrome-900);
+    }
+  }
 }
 
 .m-listing-card-arrow-button {

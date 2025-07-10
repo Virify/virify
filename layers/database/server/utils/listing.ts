@@ -1,4 +1,4 @@
-import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "@prisma/client";
+import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing, type Prisma } from "@prisma/client";
 import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
 import { prisma } from "./prisma-client";
 import { propertyInclude } from "./property";
@@ -36,6 +36,13 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
       property: {
         include: {
           ...propertyInclude,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
         },
       },
     },
@@ -88,6 +95,13 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
       property: {
         include: {
           ...propertyInclude,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
         },
       },
     },
@@ -244,5 +258,33 @@ export async function getListingsByLocationAndAIFilters(
     ...(limit ? { take: limit } : {}),
   });
 
+  return listings;
+}
+
+const fullListingInclude = {
+  rentalListing: true,
+  saleListing: true,
+  property: {
+    include: {
+      ...propertyInclude,
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  },
+};
+
+/**
+ * Fetches listings from the database.
+ */
+export async function fetchListings(where: Prisma.ListingWhereInput): Promise<ListingWithFullProperty[]> {
+  const listings = await prisma.listing.findMany({
+    where,
+    include: fullListingInclude,
+  });
   return listings;
 }

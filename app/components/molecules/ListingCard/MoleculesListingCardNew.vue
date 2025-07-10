@@ -1,43 +1,49 @@
 <template>
-  <div class="m-listing-card" :data-tier="listing_tier === 'FEATURED' ? 'featured' : null">
-    <div v-if="listing_tier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
+  <div class="m-listing-card" :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null">
+    <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
       Featured
     </div>
-    <MoleculesListingCardNewImage :images="images" />
+    <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     <div class="m-listing-card-content">
       <div class="m-listing-card-details">
-        <MoleculesListingCardNewHeader />
-        <MoleculesListingCardNewTitle />
-        <MoleculesListingCardNewFeatures />
-        <MoleculesListingCardNewTags />
+        <div class="m-listing-card-header-row m-listing-card-price-group">
+          <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+          <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
+          <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
+        </div>
+        <MoleculesListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
+          :type="listing.property?.type.name" :classification="listing.property?.classification.name" />
+        <MoleculesListingCardNewFeatures :bedrooms="listing.property?.numberBedrooms"
+          :bathrooms="listing.property?.numberBathrooms" :receptions="listing.property?.numberReceptions" />
+        <MoleculesListingCardNewTags :chain-free="listing.property?.chainFree"
+          :listed-date="listing.property?.createdAt!" :reduced="true" />
       </div>
       <div class="m-listing-card-footer">
-        <MoleculesListingCardNewAgent />
-        <MoleculesListingCardNewActions />
+        <MoleculesListingCardNewAgent :username="(userName as string)" :id="listing.user?.id!" />
+        <MoleculesListingCardNewActions :listing-id="listing.id" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-  images: {
-    type: Array as () => string[],
-    default: () => [
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    ]
-  },
-  title: {
-    type: String,
-    default: 'Detached House'
-  },
-  listing_tier: {
-    type: String,
-    default: ''
-  },
+
+interface Props {
+  listing: ListingWithFullProperty;
+}
+const props = defineProps<Props>()
+
+const image_urls = computed(() => {
+  return props.listing.property?.media?.map((m: any) => m.image) ?? []
 })
+
+const priceType = computed(() => {
+  return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
+});
+
+const userName = computed(() => {
+  return props.listing.user?.username ?? props.listing.user?.email;
+});
 </script>
 
 <style lang="scss">
@@ -45,12 +51,13 @@ const props = defineProps({
   --card-padding: var(--size-16);
   --image-width: 45%;
 
-  background-color: var(--background-100);
+  background-color: var(--background-200);
   border: 1px solid var(--foreground-100);
-  border-radius: var(--border-radius-2xl);
+  border-radius: calc(var(--border-radius-2xl) + var(--size-2));
   display: flex;
   max-width: 960px;
   position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   &[data-tier='featured'] {
     border-color: var(--secondary-400);
@@ -58,7 +65,7 @@ const props = defineProps({
     padding: 0;
 
     .m-listing-card-image-container {
-      border-radius: var(--border-radius-2xl)
+      border-radius: calc(var(--border-radius-2xl) - var(--size-1));
     }
 
     .m-listing-card-content {
@@ -92,6 +99,32 @@ const props = defineProps({
     flex-direction: column;
     gap: var(--size-16);
     justify-content: space-between;
+  }
+
+  .m-listing-card-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--size-8);
+    margin-bottom: var(--size-8);
+  }
+
+  .m-listing-card-price-group {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-12);
+  }
+
+  .m-listing-card-type-indicator {
+    min-width: 60px;
+    text-align: center;
+    padding-right: var(--size-8);
+    background-color: var(--background-300);
+    padding: var(--size-8);
+    border-radius: var(--border-radius-lg);
+
   }
 }
 
