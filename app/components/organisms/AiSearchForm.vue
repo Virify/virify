@@ -198,10 +198,17 @@ onClickOutside($location, hidePopover);
   background: var(--background-200);
   border-radius: var(--border-radius-2xl);
   display: flex;
-  align-items: center;
-  padding: var(--size-16) var(--size-24);
+  flex-direction: column;
+  padding: var(--size-16);
   cursor: pointer;
   gap: var(--size-16);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  @include mq.tablet {
+    flex-direction: row;
+    align-items: center;
+    padding: var(--size-16) var(--size-24);
+  }
 }
 
 .p-ai-search {
@@ -327,6 +334,11 @@ ul {
   align-items: center;
   gap: var(--size-16);
   flex-shrink: 0;
+  width: 100%;
+
+  @include mq.tablet {
+    width: auto;
+  }
 }
 
 .sort-select {
@@ -337,6 +349,11 @@ ul {
   padding-right: var(--size-48);
   margin: 0;
   border-radius: var(--border-radius-lg);
+  flex-grow: 1;
+
+  @include mq.tablet {
+    flex-grow: 0;
+  }
 }
 
 @media (min-width: 768px) {
@@ -357,6 +374,7 @@ ul {
   justify-content: space-between;
   overflow: hidden;
   min-width: 0;
+  width: 100%;
 }
 
 .query-text,
@@ -385,6 +403,16 @@ ul {
 /**
  *  Transitions
  */
+.form-fade-enter-active,
+.form-fade-leave-active {
+  transition: opacity var(--animation-slow) var(--ease-out), transform var(--animation-slow) var(--ease-out);
+}
+.form-fade-enter-from,
+.form-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 .form-popover-enter-active,
 .form-popover-leave-active {
   transition: transform var(--animation-slow) var(--ease-out), opacity var(--animation-slow) var(--ease-out);
