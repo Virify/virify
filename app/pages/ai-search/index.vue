@@ -1,35 +1,24 @@
 <template>
-  <div class="flow flow-lg">
+  <div class="ai-search-page-wrapper"
+    :class="{ 'initial-state': !hasSearched, 'search-expanded': !isSearchFormCollapsed && hasSearched }">
     <!-- Collapsible Search Header -->
     <div class="search-header-container" :class="{ 'is-sticky': hasSearched }">
       <div class="container container-sm">
-        <MoleculesCollapsedSearchBar v-if="hasSearched && !isSearchFormOpen" 
-          key="collapsed" 
-          @edit="isSearchFormOpen = true" 
-          @click="isSearchFormOpen = true"
-        />
-        <!-- Search Form -->
-        <div v-else key="form" class="p-ai-search">
-          <OrganismsAiSearchForm @submit-search="handleSearch" 
-            :is-searching="isSearching" 
-            :initial-query="lastSearchQuery" 
-            :initial-location="lastLocation" 
-            :initial-radius="lastRadius" 
-          />
-          <button v-if="hasSearched" @click="isSearchFormOpen = false" class="collapse-button | button button-secondary">
-            <AtomsIcon name="arrow-up" icon="collapse" />
-          </button>
-        </div>
+        <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched"
+          :initial-query="lastSearchQuery" :initial-location="lastLocation" :initial-radius="lastRadius"
+          @update:collapsed="isSearchFormCollapsed = $event" />
       </div>
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
-    <div v-if="isSearching || (hasSearched && (!searchResults || searchResults.length === 0)) || searchError" class="search-feedback-section | container container-sm">
+    <div v-if="isSearching || (hasSearched && (!searchResults || searchResults.length === 0)) || searchError"
+      class="search-feedback-section | container container-sm">
       <!-- Loading State -->
       <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
 
       <!-- No Results State -->
-      <OrganismsAiSearchNoResults v-else-if="hasSearched && (!searchResults || searchResults.length === 0)" :last-search-query="lastSearchQuery" />
+      <OrganismsAiSearchNoResults v-else-if="hasSearched && (!searchResults || searchResults.length === 0)"
+        :last-search-query="lastSearchQuery" />
 
       <!-- Error State -->
       <div v-else-if="searchError" class="error-content | flow flow-sm">
@@ -39,12 +28,14 @@
     </div>
     <div class="| container">
       <!-- Results -->
-      <OrganismsAiSearchResults v-if="!isSearching && searchResults && searchResults.length > 0" :results="searchResults" :query-analysis="queryAnalysis" />
+      <OrganismsAiSearchResults v-if="!isSearching && searchResults && searchResults.length > 0"
+        :results="searchResults" :query-analysis="queryAnalysis" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { watch } from "vue";
 const { aiSearch } = useAi();
 
 const searchResults = ref<ListingWithFullProperty[] | null>(null);
@@ -55,7 +46,7 @@ const searchError = ref<string | null>(null);
 const lastSearchQuery = ref("");
 const lastLocation = ref<GeocodingFeature | null>(null);
 const lastRadius = ref<number>(0);
-const isSearchFormOpen = ref(true);
+const isSearchFormCollapsed = ref(true);
 
 interface SearchPayload {
   location: GeocodingFeature;
@@ -64,7 +55,7 @@ interface SearchPayload {
 }
 
 async function handleSearch(payload: SearchPayload) {
-  isSearchFormOpen.value = false;
+  isSearchFormCollapsed.value = true;
   hasSearched.value = true;
   isSearching.value = true;
   searchError.value = null;
@@ -120,20 +111,6 @@ async function handleSearch(payload: SearchPayload) {
   position: relative;
 }
 
-.collapse-button {
-  position: absolute;
-  color: var(--monochrome-900);
-  bottom: var(--size-24);
-  right: var(--size-24);
-  width: var(--size-48);
-  height: var(--size-48);
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--border-radius-lg);
-}
-
 @media (min-width: 768px) {
   .p-ai-search {
     padding: var(--size-32);
@@ -150,10 +127,6 @@ async function handleSearch(payload: SearchPayload) {
     padding: var(--size-40);
   }
 
-  .collapse-button {
-    bottom: var(--size-40);
-    right: var(--size-40);
-  }
 }
 
 /* Search Feedback Section */
