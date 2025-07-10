@@ -19,54 +19,54 @@
     </div>
 
     <!-- Expanded Form View -->
-      <form v-show="!isCollapsed" @submit.prevent="submitSearch" class="p-ai-search flow flow-lg">
-        <div class="p-ai-search__header">
-          <h1 class="| title-lg font-bold">
-            Find your perfect home with
-            <span class="| gradient-text gradient-text-ai">AI</span>
-            enhanced property search
-          </h1>
-          <button v-if="hasSearched" @click="isCollapsed = true" type="button"
-            class="collapse-button | button button-secondary">
-            <AtomsIcon name="arrow-up" icon="collapse" />
-          </button>
-        </div>
+    <form v-show="!isCollapsed" @submit.prevent="submitSearch" class="p-ai-search flow flow-lg">
+      <div class="p-ai-search__header">
+        <h1 class="| title-lg font-bold">
+          Find your perfect home with
+          <span class="| gradient-text gradient-text-ai">AI</span>
+          enhanced property search
+        </h1>
+        <button v-if="hasSearched" @click="isCollapsed = true" type="button"
+          class="collapse-button | button button-secondary">
+          <AtomsIcon name="arrow-up" icon="collapse" />
+        </button>
+      </div>
 
-        <!-- location group -->
-        <div role="presentation" ref="$location" class="| flow flow-lg">
-          <fieldset class="p-ai-search__location | elevate-200">
-            <legend class="| visually-hidden">Location</legend>
+      <!-- location group -->
+      <div role="presentation" ref="$location" class="| flow flow-lg">
+        <fieldset class="p-ai-search__location | elevate-200">
+          <legend class="| visually-hidden">Location</legend>
 
-            <input type="text" class="p-ai-search__location-input | body-md" placeholder="Where do you want to live?"
-              aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
+          <input type="text" class="p-ai-search__location-input | body-md" placeholder="Where do you want to live?"
+            aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
 
-            <AtomsSelect name="radius" id="radius" aria-label="Location radius"
-              class="p-ai-search__location-radius | body-md" v-model="selectedRadius" :options="radiusOptions" />
-          </fieldset>
+          <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+            class="p-ai-search__location-radius | body-md" v-model="selectedRadius" :options="radiusOptions" />
+        </fieldset>
 
-          <Transition name="p-ai-search__location">
-            <div role="presentation" v-show="popoverExpanded">
-              <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
-            </div>
-          </Transition>
-        </div>
+        <Transition name="p-ai-search__location">
+          <div role="presentation" v-show="popoverExpanded">
+            <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+          </div>
+        </Transition>
+      </div>
 
-        <div role="fieldset">
-          <legend class="| visually-hidden">The property</legend>
+      <div role="fieldset">
+        <legend class="| visually-hidden">The property</legend>
 
-          <!-- description query -->
-          <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-            @submit="submitSearch" />
-        </div>
+        <!-- description query -->
+        <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
+          @submit="submitSearch" />
+      </div>
 
-        <!-- example prompts -->
-        <ul class="p-ai-search__filters-list">
-          <li v-for="prompt of examplePrompts">
-            <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
-              @click.prevent="addPrompt(prompt)" />
-          </li>
-        </ul>
-      </form>
+      <!-- example prompts -->
+      <ul class="p-ai-search__filters-list">
+        <li v-for="prompt of examplePrompts">
+          <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
+            @click.prevent="addPrompt(prompt)" />
+        </li>
+      </ul>
+    </form>
   </div>
 </template>
 
