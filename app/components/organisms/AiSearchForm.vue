@@ -32,7 +32,7 @@
     <!-- Expanded Form View -->
     <form v-show="!isCollapsed" @submit.prevent="submitSearch" class="p-ai-search | container container-sm flow flow-lg">
       <div class="p-ai-search__header">
-        <h1 class="| title-lg font-bold">
+        <h1 v-show="!hasSearched" class="| title-lg font-bold">
           Find your perfect home with
           <span class="| gradient-text gradient-text-ai">AI</span>
           enhanced property search
@@ -192,6 +192,7 @@ onClickOutside($location, hidePopover);
 
 .ai-search-form-wrapper {
   position: relative;
+  overflow-x: hidden; // Prevent horizontal scroll as a safety net
 }
 
 .collapsed-search-bar {
@@ -199,23 +200,36 @@ onClickOutside($location, hidePopover);
   border-radius: var(--border-radius-2xl);
   display: flex;
   flex-direction: column;
-  padding: var(--size-16);
+  padding: var(--size-12) var(--size-8); // Reduce padding on mobile
   cursor: pointer;
-  gap: var(--size-16);
+  gap: var(--size-12);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 100vw;
+  box-sizing: border-box;
 
   @include mq.tablet {
     flex-direction: row;
     align-items: center;
     padding: var(--size-16) var(--size-24);
+    gap: var(--size-16);
   }
 }
 
 .p-ai-search {
   background: var(--background-200);
   border-radius: var(--border-radius-3xl);
-  padding: var(--size-24);
+  margin-bottom: var(--size-24);
   position: relative;
+  max-width: 100vw;
+  box-sizing: border-box;
+
+  @include mq.tablet {
+    padding: var(--size-32);
+  }
+
+  @include mq.desktop {
+    padding: var(--size-40);
+  }
 }
 
 .collapse-button {
@@ -332,9 +346,11 @@ ul {
 .collapsed-actions {
   display: flex;
   align-items: center;
-  gap: var(--size-16);
+  gap: var(--size-12);
   flex-shrink: 0;
   width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
 
   @include mq.tablet {
     width: auto;
@@ -342,16 +358,23 @@ ul {
 }
 
 .sort-select {
-  min-width: 200px;
+  min-width: 0; // Remove min-width for mobile
+  width: 100%; // Take available width on mobile
   background-color: var(--background-100);
   border: 1px solid var(--border-color-200);
-  padding: var(--size-14) var(--size-18);
-  padding-right: var(--size-48);
+  padding: var(--size-10) var(--size-12); // Reduce padding for mobile
+  padding-right: var(--size-36);
   margin: 0;
   border-radius: var(--border-radius-lg);
   flex-grow: 1;
+  box-sizing: border-box;
+  max-width: 100%;
 
   @include mq.tablet {
+    min-width: 200px;
+    width: auto;
+    padding: var(--size-14) var(--size-18);
+    padding-right: var(--size-48);
     flex-grow: 0;
   }
 }
