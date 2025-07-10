@@ -6,7 +6,13 @@
     <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     <div class="m-listing-card-content">
       <div class="m-listing-card-details">
-        <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+        <div class="m-listing-card-header-row">
+          <div class="m-listing-card-price-group">
+            <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+            <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
+            <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
+          </div>
+        </div>
         <MoleculesListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
           :type="listing.property?.type.name" :classification="listing.property?.classification.name" />
         <MoleculesListingCardNewFeatures :bedrooms="listing.property?.numberBedrooms"
@@ -95,6 +101,32 @@ const userName = computed(() => {
     flex-direction: column;
     gap: var(--size-16);
     justify-content: space-between;
+  }
+
+  .m-listing-card-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--size-8);
+    margin-bottom: var(--size-8);
+  }
+
+  .m-listing-card-price-group {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-12);
+  }
+
+  .m-listing-card-type-indicator {
+    min-width: 60px;
+    text-align: center;
+    padding-right: var(--size-8);
+    background-color: var(--background-300);
+    padding: var(--size-8);
+    border-radius: var(--border-radius-lg);
+
   }
 }
 

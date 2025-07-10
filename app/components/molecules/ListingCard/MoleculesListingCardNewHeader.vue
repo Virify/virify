@@ -26,6 +26,7 @@ const priceType = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: var(--size-8);
+  margin-bottom: 0;
 }
 
 .m-listing-card-price-type {
