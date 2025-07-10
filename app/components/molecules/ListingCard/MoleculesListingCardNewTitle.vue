@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="m-listing-card-no-wrap | body-md font-semibold">
-      {{ props.classification}} {{ props.type }} 
+      {{ props.classification }} {{ props.type }}
     </h3>
     <p class="m-listing-card-location m-listing-card-no-wrap | body-xs faded-text">
       {{ props.address.street }}, {{ props.address.city }}, {{ props.address.postcode }}
@@ -11,13 +11,13 @@
 
 <script lang="ts" setup>
 const props = defineProps<{
-address: {
-  street: string;
-  city: string;
-  postcode: string;
-};
-type: string;
-classification: string;
+  address: {
+    street: string;
+    city: string;
+    postcode: string;
+  };
+  type: string;
+  classification: string;
 }>();
 
 </script>

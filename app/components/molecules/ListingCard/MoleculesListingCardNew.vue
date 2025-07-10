@@ -6,12 +6,10 @@
     <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     <div class="m-listing-card-content">
       <div class="m-listing-card-details">
-        <div class="m-listing-card-header-row">
-          <div class="m-listing-card-price-group">
-            <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
-            <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
-            <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
-          </div>
+        <div class="m-listing-card-header-row m-listing-card-price-group">
+          <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+          <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
+          <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
         </div>
         <MoleculesListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
           :type="listing.property?.type.name" :classification="listing.property?.classification.name" />
