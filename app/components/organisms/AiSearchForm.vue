@@ -268,6 +268,10 @@ ul {
     padding-right: var(--size-48);
     margin: 0;
   }
+  
+  &__filters-list {
+    gap: var(--size-8);
+  }
 }
 
 .collapsed-search-bar {
@@ -277,7 +281,7 @@ ul {
   padding: var(--size-24);
   background: var(--background-200);
   border-radius: var(--border-radius-3xl);
-  box-shadow: 0 4px 12px 0 rgba(0,0,0,0.5);
+  box-shadow: 0 2px 2px #00000040;
   cursor: pointer;
 }
 

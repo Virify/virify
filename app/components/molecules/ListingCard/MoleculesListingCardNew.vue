@@ -62,7 +62,7 @@ const userName = computed(() => {
   display: flex;
   max-width: 960px;
   position: relative;
-  box-shadow: 0 4px 12px 0 rgba(0,0,0,0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   &[data-tier='featured'] {
     border-color: var(--secondary-400);

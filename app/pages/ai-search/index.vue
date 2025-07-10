@@ -139,6 +139,7 @@ async function handleSearch(payload: SearchPayload) {
   padding: var(--size-40);
   background: var(--background-200);
   border-radius: var(--border-radius-3xl);
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .error-content {
