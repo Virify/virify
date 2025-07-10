@@ -56,12 +56,13 @@ const userName = computed(() => {
   --card-padding: var(--size-16);
   --image-width: 45%;
 
-  background-color: var(--background-100);
+  background-color: var(--background-200);
   border: 1px solid var(--foreground-100);
   border-radius: var(--border-radius-2xl);
   display: flex;
   max-width: 960px;
   position: relative;
+  box-shadow: 0 4px 12px 0 rgba(0,0,0,0.5);
 
   &[data-tier='featured'] {
     border-color: var(--secondary-400);
