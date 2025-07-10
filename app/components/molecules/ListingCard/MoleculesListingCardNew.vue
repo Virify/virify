@@ -6,22 +6,13 @@
     <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     <div class="m-listing-card-content">
       <div class="m-listing-card-details">
-        <MoleculesListingCardNewHeader 
-          :price="listing.price" 
-          :price-type="priceType" 
-        />
-        <MoleculesListingCardNewTitle
-          v-if="listing.property?.address"
-          :address="listing.property.address"
-          :type="listing.property?.type.name" 
-          :classification="listing.property?.classification.name" 
-        />
-        <MoleculesListingCardNewFeatures
-          :bedrooms="listing.property?.numberBedrooms"
-          :bathrooms="listing.property?.numberBathrooms"
-          :receptions="listing.property?.numberReceptions"
-        />
-        <MoleculesListingCardNewTags :chain-free="listing.property?.chainFree" :listed-date="listing.property?.createdAt!" :reduced="true" />
+        <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+        <MoleculesListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
+          :type="listing.property?.type.name" :classification="listing.property?.classification.name" />
+        <MoleculesListingCardNewFeatures :bedrooms="listing.property?.numberBedrooms"
+          :bathrooms="listing.property?.numberBathrooms" :receptions="listing.property?.numberReceptions" />
+        <MoleculesListingCardNewTags :chain-free="listing.property?.chainFree"
+          :listed-date="listing.property?.createdAt!" :reduced="true" />
       </div>
       <div class="m-listing-card-footer">
         <MoleculesListingCardNewAgent :username="(userName as string)" :id="listing.user?.id!" />

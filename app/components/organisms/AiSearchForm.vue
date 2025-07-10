@@ -1,25 +1,36 @@
 <template>
   <div class="ai-search-form-wrapper">
     <!-- Collapsed View -->
-    <div v-show="isCollapsed" class="collapsed-search-bar" @click="isCollapsed = false">
-      <div class="query-info">
-        <p class="query-text body-md font-semibold">
-          <template v-for="(segment, index) in segments" :key="index">
-            <span :class="`segment--${segment.type}`">{{ segment.text }}</span>
-          </template>
-        </p>
-        <p v-if="selectedLocation" class="location-text body-sm">
-          {{ selectedLocation.place_name_en }}
-          <span v-if="selectedRadius > 0"> (within {{ selectedRadius }} miles)</span>
-        </p>
+      <div v-show="isCollapsed" class="collapsed-search-bar | container">
+        <div class="query-info" @click="isCollapsed = false">
+          <p class="query-text body-md font-semibold">
+            <template v-for="(segment, index) in segments" :key="index">
+              <span :class="`segment--${segment.type}`">{{ segment.text }}</span>
+            </template>
+          </p>
+          <p v-if="selectedLocation" class="location-text body-sm">
+            {{ selectedLocation.place_name_en }}
+            <span v-if="selectedRadius > 0"> (within {{ selectedRadius }} miles)</span>
+          </p>
+        </div>
+        <div class="collapsed-actions | body-md">
+          <AtomsSelect
+            v-if="hasSearched"
+            id="sort-by"
+            v-model="sortBy"
+            :options="sortOptions"
+            aria-label="Sort results by"
+            class="sort-select"
+            @click.stop
+          />
+          <button @click.stop="isCollapsed = false" class="collapse-button | button button-secondary">
+            <AtomsIcon name="arrow-down" icon="expand" />
+          </button>
+        </div>
       </div>
-      <button @click.stop="isCollapsed = false" class="collapse-button | button button-secondary">
-        <AtomsIcon name="arrow-down" icon="expand" />
-      </button>
-    </div>
 
     <!-- Expanded Form View -->
-    <form v-show="!isCollapsed" @submit.prevent="submitSearch" class="p-ai-search flow flow-lg">
+    <form v-show="!isCollapsed" @submit.prevent="submitSearch" class="p-ai-search | container container-sm flow flow-lg">
       <div class="p-ai-search__header">
         <h1 class="| title-lg font-bold">
           Find your perfect home with
@@ -80,14 +91,19 @@ const props = defineProps<{
   hasSearched: boolean;
 }>();
 
-const emit = defineEmits(["submit-search", "update:collapsed"]);
+const emit = defineEmits(["submit-search", "update:collapsed", "sort"]);
 
 const { searchQuery, getAnalyzedQuery } = useAi();
 const segments = computed(() => getAnalyzedQuery());
 const isCollapsed = ref(props.hasSearched);
+const sortBy = ref("relevance");
 
 watch(isCollapsed, (newVal) => {
   emit("update:collapsed", newVal);
+});
+
+watch(sortBy, (newVal) => {
+  emit("sort", newVal);
 });
 
 const selectedLocation = ref<GeocodingFeature | null>(null);
@@ -104,6 +120,14 @@ const radiusOptions = [
   { value: 10, key: "Within 10 miles" },
   { value: 20, key: "Within 20 miles" },
   { value: 40, key: "Within 40 miles" },
+];
+
+const sortOptions = [
+  { value: "relevance", key: "Sort by Relevance" },
+  { value: "price-asc", key: "Price: Low to High" },
+  { value: "price-desc", key: "Price: High to Low" },
+  { value: "date-desc", key: "Newest First" },
+  { value: "date-asc", key: "Oldest First" },
 ];
 
 const selectedRadius = ref(0);
@@ -168,6 +192,16 @@ onClickOutside($location, hidePopover);
 
 .ai-search-form-wrapper {
   position: relative;
+}
+
+.collapsed-search-bar {
+  background: var(--background-200);
+  border-radius: var(--border-radius-2xl);
+  display: flex;
+  align-items: center;
+  padding: var(--size-16) var(--size-24);
+  cursor: pointer;
+  gap: var(--size-16);
 }
 
 .p-ai-search {
@@ -268,32 +302,52 @@ ul {
     padding-right: var(--size-48);
     margin: 0;
   }
-  
+
   &__filters-list {
-    gap: var(--size-8);
+    gap: 8px;
   }
+}
+
+.collapsed-search-bar-wrapper {
+  background: var(--background-200);
+  margin-bottom: 0;
 }
 
 .collapsed-search-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--size-24);
-  background: var(--background-200);
-  border-radius: var(--border-radius-3xl);
-  box-shadow: 0 2px 2px #00000040;
+  padding: var(--size-16) var(--size-24);
   cursor: pointer;
+  gap: var(--size-16);
+}
+
+.collapsed-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--size-16);
+  flex-shrink: 0;
+}
+
+.sort-select {
+  min-width: 200px;
+  background-color: var(--background-100);
+  border: 1px solid var(--border-color-200);
+  padding: var(--size-14) var(--size-18);
+  padding-right: var(--size-48);
+  margin: 0;
+  border-radius: var(--border-radius-lg);
 }
 
 @media (min-width: 768px) {
   .collapsed-search-bar {
-    padding: var(--size-32);
+    padding: var(--size-32) var(--size-32);
   }
 }
 
 @media (min-width: 1024px) {
   .collapsed-search-bar {
-    padding: var(--size-40);
+    padding: var(--size-40) var(--size-40);
   }
 }
 
