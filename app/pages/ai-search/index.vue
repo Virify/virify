@@ -201,15 +201,4 @@ async function handleSearch(payload: SearchPayload) {
     color: var(--danger-text);
   }
 }
-
-.is-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  width: calc(100% - (var(--size-32) * 2));
-  max-width: var(--container-sm);
-  margin-bottom: 0;
-}
 </style>
