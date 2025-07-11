@@ -1,18 +1,23 @@
 <template>
   <div class="price-marker-container">
     <!-- SVG Marker Shape -->
-    <!-- Regular teardrop marker -->
-    <AtomsIcon 
-      v-if="isFavorite === false || isFavorite === null"
-      icon="map/map-marker" 
-      class="marker-shape teardrop-marker"
-    />
-    
     <!-- Heart marker for favorites -->
     <AtomsIcon 
-      v-else
+      v-if="isFavorite"
       icon="map/fav-marker" 
       class="marker-shape heart-marker"
+    />
+    <!-- Basic marker for BASIC tier -->
+    <AtomsIcon 
+      v-else-if="tier === 'BASIC'"
+      icon="map/map-marker-basic" 
+      class="marker-shape teardrop-marker"
+    />
+    <!-- Featured marker for FEATURED or PREMIUM -->
+    <AtomsIcon 
+      v-else
+      icon="map/map-marker-featured" 
+      class="marker-shape teardrop-marker"
     />
     
     <!-- Content overlay -->
@@ -30,6 +35,7 @@ interface MarkerProps {
   price: number | null;
   hasNote?: boolean | null;
   isFavorite?: boolean | null;
+  tier?: 'FEATURED' | 'BASIC' | 'PREMIUM';
 }
 
 const props = defineProps<MarkerProps>();

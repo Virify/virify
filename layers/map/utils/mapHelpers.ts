@@ -141,10 +141,11 @@ export function findMapInstance(map: ExtendedMapTilerMap, mapCache: Map<string, 
  * @param price number | null
  * @param hasNote boolean | undefined
  * @param isFavorite boolean | undefined
+ * @param tier string | undefined
  * @param vueApp optional Vue app context
  * @returns HTMLElement
  */
-export function renderMarker(price: number | null, hasNote?: boolean, isFavorite?: boolean, vueApp?: any): HTMLElement {
+export function renderMarker(price: number | null, hasNote?: boolean, isFavorite?: boolean, tier?: string, vueApp?: any): HTMLElement {
   const markerWrapper = document.createElement("div");
   const MarkerComp = defineComponent({
     setup: () => () => {
@@ -152,6 +153,7 @@ export function renderMarker(price: number | null, hasNote?: boolean, isFavorite
         price,
         hasNote: Boolean(hasNote),
         isFavorite: Boolean(isFavorite),
+        tier: tier === "FEATURED" || tier === "BASIC" || tier === "PREMIUM" ? tier : "BASIC", // Default to BASIC if not specified
       });
     },
   });

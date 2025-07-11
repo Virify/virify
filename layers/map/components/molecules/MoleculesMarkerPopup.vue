@@ -1,8 +1,8 @@
 <template>
   <div class="popup-wrapper">
-    <div class="m-listing-card-map" :data-tier="isFeatured ? 'featured' : null" @click.stop>
-      <div v-if="isFeatured" class="m-listing-card-map-featured-banner | body-sm font-bold">
-        Featured
+    <div class="m-listing-card-map" :data-tier="isFeaturedOrPremium ? 'featured' : null" @click.stop>
+      <div v-if="isFeaturedOrPremium" class="m-listing-card-map-featured-banner | body-sm font-bold">
+        {{ isPremium ? 'Premium' : 'Featured' }}
       </div>
       <!-- Single image (no carousel) -->
       <div class="m-listing-card-map-image-container">
@@ -94,9 +94,10 @@ const hasImage = computed(() =>
   props.marker.image[0] &&
   props.marker.image[0].image
 );
-const isFeatured = computed(() => {
-  return props.marker.tier === 'FEATURED';
-});
+
+const isFeatured = computed(() => props.marker.tier === 'FEATURED');
+const isPremium = computed(() => props.marker.tier === 'PREMIUM');
+const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
 // Event handlers
 const { showNoteDialog } = useNotes();
