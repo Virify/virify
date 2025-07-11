@@ -1,0 +1,14 @@
+/**
+ *  Colours
+ */
+.secondary-400 {
+  color: var(--secondary-400);
+}
+
+.secondary-500 {
+  color: var(--secondary-500);
+}
+
+.grey-500 {
+  color: light-dark(var(--monochrome-500), var(--monochrome-400));
+}
