@@ -1,6 +1,6 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
-    <template v-if="searchValue && !suppressAutocomplete">
+    <template v-if="searchValue && !suppressAutocomplete && !hideAutocomplete">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Suggestions</h3>
 
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
@@ -91,10 +91,21 @@ const { loggedIn } = useUserSession();
 const { entries, getEntries, clearEntries } = useSavedLocation();
 
 /**
- * Show history only if there are no suggestions or the current input is in the suggestedLocations
+ * Hide autocomplete if current search value exactly matches one of the suggestions
+ */
+const hideAutocomplete = computed(() => {
+  if (!locationSuggestions.value.length || !props.searchValue) return false;
+  
+  return locationSuggestions.value.some(option => 
+    option.place_name_en === props.searchValue
+  );
+});
+
+/**
+ * Show history when there are no suggestions OR when we're hiding autocomplete
  */
 const showHistory = computed(() => {
-  return !locationSuggestions.value.length || locationSuggestions.value.some((option => option.place_name_en === props.searchValue));
+  return !locationSuggestions.value.length || hideAutocomplete.value;
 })
 
 watch(loggedIn, (isAuthenticated) => {
