@@ -37,9 +37,36 @@
       </div>
     </div>
     <div v-else class="results-container">
-      <OrganismsAiSearchResults v-if="hasResults" :results="sortedResults" :query-analysis="queryAnalysis" 
-        :current-page="currentPage" :total-pages="totalPages" :total-results="totalResults"
-        @page-change="handlePageChange" />
+      <div v-if="hasResults" class="results-with-toggle">
+        <!-- View Toggle Button -->
+        <div class="view-toggle-container">
+          <button 
+            @click="toggleView" 
+            class="view-toggle-button | button button-secondary button-sm"
+          >
+            {{ isMapView ? 'Show List' : 'Show Map' }}
+          </button>
+        </div>
+        
+        <!-- List View -->
+        <OrganismsAiSearchResults 
+          v-if="!isMapView"
+          :results="sortedResults" 
+          :query-analysis="queryAnalysis" 
+          :current-page="currentPage" 
+          :total-pages="totalPages" 
+          :total-results="totalResults"
+          @page-change="handlePageChange" 
+        />
+        
+        <!-- Map View -->
+        <OrganismsAiSearchMapView 
+          v-else
+          :results="sortedResults"
+          :location="lastLocation"
+          :radius="lastRadius"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -95,6 +122,13 @@ const hasResults = computed(() =>
 const hasSavedState = computed(() =>
   !!(lastSearchQuery.value || lastLocation.value || lastRadius.value)
 );
+
+// Map view state
+const isMapView = ref(false);
+
+const toggleView = () => {
+  isMapView.value = !isMapView.value;
+};
 
 const sortedResults = computed(() => {
   if (!searchResults.value) return [];
@@ -361,5 +395,22 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
   .body-sm {
     color: var(--danger-text);
   }
+}
+
+// Results with toggle
+.results-with-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-24);
+}
+
+.view-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--size-16);
+}
+
+.view-toggle-button {
+  min-width: 120px;
 }
 </style>

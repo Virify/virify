@@ -254,14 +254,11 @@ const submitSearch = async () => {
 
   // If no location is selected but we have a location query, try to geocode it
   if (!selectedLocation.value && locationQuery.value.trim()) {
-    console.log('[SUBMIT] No location selected, trying fallback geocoding for:', locationQuery.value);
     const geocodedLocation = await geocodeAndSelectBest(locationQuery.value);
     if (geocodedLocation) {
-      console.log('[SUBMIT] Fallback geocoding successful:', geocodedLocation.place_name_en);
       selectedLocation.value = geocodedLocation;
       locationError.value = ""; // Clear any previous error
     } else {
-      console.log('[SUBMIT] Fallback geocoding failed');
       // Could not geocode the location, show error and don't proceed
       locationError.value = `Could not find location "${locationQuery.value}". Please select from suggestions or try a different location.`;
       return;
@@ -270,13 +267,11 @@ const submitSearch = async () => {
 
   // Ensure we have a location before submitting
   if (!selectedLocation.value) {
-    console.log('[SUBMIT] Still no location, showing error');
     locationError.value = "Please enter and select a location.";
     return;
   }
 
   // Clear any previous error and submit
-  console.log('[SUBMIT] Submitting with location:', selectedLocation.value.place_name_en);
   locationError.value = "";
   emit("submit-search", {
     location: selectedLocation.value,
