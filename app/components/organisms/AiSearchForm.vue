@@ -381,41 +381,6 @@ onClickOutside($form, () => {
   }
 }
 
-// Form controls
-.expand-button {
-  color: var(--secondary-400);
-  width: var(--size-48);
-  height: var(--size-48);
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent !important;
-  border: none !important;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-.expand-button-mobile {
-  display: none; // Hidden on desktop
-
-  @media (max-width: 768px) {
-    display: flex;
-    position: absolute;
-    top: -15px;
-    right: -10px;
-    width: var(--size-48);
-    height: var(--size-48);
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-    background: transparent !important;
-    border: none !important;
-    color: var(--secondary-400);
-    z-index: 1;
-  }
-}
-
 .close-button {
   position: absolute;
   top: -20px;
@@ -475,86 +440,6 @@ onClickOutside($form, () => {
   @media (max-width: 768px) {
     justify-content: flex-start;
     width: 100%;
-
-    .expand-button {
-      display: none;
-    }
-  }
-}
-
-.sort-select {
-  min-width: 120px;
-  width: auto;
-  background-color: var(--background-100);
-  border: 1px solid var(--border-color-200);
-  padding: var(--size-10) var(--size-12);
-  padding-right: var(--size-36);
-  margin: 0;
-  border-radius: var(--border-radius-lg);
-}
-
-.radius-select {
-  min-width: 140px;
-  width: auto;
-  background-color: var(--background-100);
-  border: 1px solid var(--border-color-200);
-  padding: var(--size-10) var(--size-12);
-  padding-right: var(--size-36);
-  margin: 0;
-  border-radius: var(--border-radius-lg);
-}
-
-
-.query-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-  min-width: 0;
-  flex: 1;
-  gap: var(--size-4);
-}
-
-// Query display text
-.query-info,
-.location-text {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  display: block;
-
-  @media (max-width: 768px) {
-    white-space: normal;
-  }
-}
-
-.query-text {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  display: block;
-
-  .segment--used {
-    color: var(--secondary-400);
-  }
-
-  .segment--ignored {
-    text-decoration: line-through;
-    opacity: 0.5;
-  }
-
-  @media(max-width: 768px) {
-    white-space: normal;
-    line-height: var(--text-sm--line-height);
-    padding-right: var(--size-32);
-  }
-}
-
-.location-text {
-  opacity: 0.7;
-
-  @media(max-width: 768px) {
-    margin-top: var(--size-4);
   }
 }
 
