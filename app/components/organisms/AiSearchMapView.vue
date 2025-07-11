@@ -89,11 +89,6 @@ onMounted(() => {
     setTimeout(() => {
       if (mapRef.value?.map && props.location && props.radius) {
         const center = [props.location.geometry.coordinates[0], props.location.geometry.coordinates[1]] as [number, number];
-        console.log('[AiSearchMapView] Manually adding radius visualization:', {
-          center,
-          radius: props.radius,
-          mapInstance: mapRef.value.map
-        });
         updateSearchRadiusVisualization(mapRef.value.map, center, props.radius);
       }
     }, 500); // Give map time to fully initialize
@@ -120,7 +115,7 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
 
 @media (max-width: 768px) {
   .ai-search-map-view {
-    height: 60vh;
+    height: calc(100vh - var(--header-height) - var(--size-72));
     min-height: 400px;
   }
 }

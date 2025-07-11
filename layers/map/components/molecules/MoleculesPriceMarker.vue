@@ -63,7 +63,7 @@ const priceDisplay = computed(() => {
   left: 0;
   width: 70px;
   height: 70px;
-  color: var(--foreground-200);
+  color: var(--monochrome-300);
 }
 
 .marker-shape.heart-marker {
@@ -76,7 +76,7 @@ const priceDisplay = computed(() => {
   top: 34%; /* Adjusted to center in the circular part of the teardrop */
   left: 50%;
   transform: translate(-50%, -50%);
-  color: var(--background-200);
+  color: var(--monochrome-900);
   z-index: 1;
   display: flex;
   align-items: center;

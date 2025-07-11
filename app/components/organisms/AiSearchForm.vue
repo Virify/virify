@@ -176,30 +176,20 @@ const handleLocation = (location: GeocodingFeature) => {
 };
 
 const handleLocationEnter = async () => {
-  console.log('[LOCATION ENTER] Pressed enter, locationQuery:', locationQuery.value);
-  console.log('[LOCATION ENTER] Current selectedLocation:', selectedLocation.value);
-
   if (!selectedLocation.value && locationQuery.value.trim()) {
-    console.log('[LOCATION ENTER] Attempting fallback geocoding');
     const geocodedLocation = await geocodeAndSelectBest(locationQuery.value);
     if (geocodedLocation) {
-      console.log('[LOCATION ENTER] Geocoding successful:', geocodedLocation.place_name_en);
       selectedLocation.value = geocodedLocation;
       locationQuery.value = geocodedLocation.place_name_en;
       locationError.value = "";
       hidePopover();
     } else {
-      console.log('[LOCATION ENTER] Geocoding failed');
       locationError.value = `Could not find location "${locationQuery.value}". Please select from suggestions or try a different location.`;
     }
   }
 };
 
 const submitSearch = async () => {
-  console.log('[SUBMIT] Starting submit, searchQuery:', searchQuery.value);
-  console.log('[SUBMIT] selectedLocation:', selectedLocation.value);
-  console.log('[SUBMIT] locationQuery:', locationQuery.value);
-
   if (!searchQuery.value.trim()) return;
 
   // If no location is selected but we have a location query, try to geocode it
