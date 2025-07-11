@@ -83,7 +83,7 @@
                 @click.prevent="addPrompt(prompt)" />
             </li>
           </ul>
-          <button v-if="hasSearched || hasSavedState" @click="handleReset" type="button" class="reset-link | r-body-sm-xs">
+          <button v-if="hasSearched && hasSavedState" @click="handleReset" type="button" class="reset-link | r-body-sm-xs">
             Reset form
           </button>
         </div>
