@@ -21,7 +21,7 @@
       </h1>
 
       <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched" :initial-query="lastSearchQuery"
-        :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSearched"
+        :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState"
         @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="resetForm" />
     </div>
 
@@ -90,6 +90,10 @@ const hasNoResults = computed(() =>
 
 const hasResults = computed(() =>
   !isSearching.value && searchResults.value && searchResults.value.length > 0
+);
+
+const hasSavedState = computed(() =>
+  !!(lastSearchQuery.value || lastLocation.value || lastRadius.value)
 );
 
 const sortedResults = computed(() => {

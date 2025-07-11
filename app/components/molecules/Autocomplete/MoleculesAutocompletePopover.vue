@@ -167,11 +167,17 @@ watch(
   () => props.searchValue,
   async (newVal, oldVal) => {
     setPendingWhile(async () => {
+      // Reset suppressAutocomplete if user is typing new content
+      if (suppressAutocomplete.value && newVal && oldVal && newVal !== oldVal) {
+        suppressAutocomplete.value = false;
+      }
+      
       // Only reset suppressAutocomplete if the input is cleared
       if (suppressAutocomplete.value && (!newVal || newVal.trim() === '')) {
         suppressAutocomplete.value = false;
         return;
       }
+      
       if (newVal && newVal.trim().length > 2) {
         locationSuggestions.value = await autoComplete(newVal)
       } else {

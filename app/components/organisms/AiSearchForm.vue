@@ -56,7 +56,7 @@
             <legend class="| visually-hidden">Location</legend>
 
             <input type="text" class="location-input | r-body-md-xs" placeholder="Where do you want to live?"
-              aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
+              aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" @keydown.enter="handleLocationEnter" />
 
             <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="location-radius | r-body-md-xs"
               v-model="selectedRadius" :options="radiusOptions" />
@@ -67,24 +67,28 @@
               <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
             </div>
           </Transition>
+          
+          <p v-if="locationError" class="location-error | r-body-sm-xs" style="color: var(--error-color, #dc2626); margin-top: var(--size-8);">
+            {{ locationError }}
+          </p>
         </div>
 
         <div role="fieldset">
           <legend class="| visually-hidden">The property</legend>
           <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-            @submit="submitSearch" />
+            :disabled="!isFormValid" @submit="submitSearch" />
             <p class="description-hint | body-sm">Don’t forget to say whether you’re looking to buy or rent!</p>
         </div>
 
         <!-- example prompts -->
         <div class="form-footer">
           <ul class="example-prompts">
-            <li v-for="prompt of examplePrompts">
+            <li v-for="(prompt, index) of examplePrompts" :key="index">
               <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
                 @click.prevent="addPrompt(prompt)" />
             </li>
           </ul>
-          <button v-if="hasSearched && hasSavedState" @click="handleReset" type="button" class="reset-link | r-body-sm-xs">
+          <button v-if="hasSavedState" @click="handleReset" type="button" class="reset-link | r-body-sm-xs">
             Reset form
           </button>
         </div>
@@ -95,6 +99,8 @@
 
 <script setup lang="ts">
 import { onClickOutside, templateRef } from "@vueuse/core";
+
+const { geocodeAndSelectBest } = useMap();
 
 const props = defineProps<{
   initialQuery?: string;
@@ -119,6 +125,7 @@ const segments = computed(() => getAnalyzedQuery());
 const isCollapsed = ref(props.hasSearched);
 const sortBy = ref("relevance");
 const popoverExpanded = ref(false);
+const locationError = ref("");
 const textareaId = useId();
 const $location = templateRef<HTMLElement>("$location");
 const $form = templateRef<HTMLElement>("$form");
@@ -127,6 +134,9 @@ const $form = templateRef<HTMLElement>("$form");
 const selectedLocation = ref<GeocodingFeature | null>(null);
 const locationQuery = ref("");
 const selectedRadius = ref(0);
+
+// Form validation
+const isFormValid = computed(() => !!selectedLocation.value && !!searchQuery.value.trim());
 
 // Options data
 const radiusOptions = [
@@ -161,6 +171,14 @@ const examplePrompts = [
 // Watchers
 watch(isCollapsed, (value) => emit("update:collapsed", value));
 watch(sortBy, (value) => emit("sort", value));
+
+// Clear location error and reset selection when user types in location field
+watch(locationQuery, () => {
+  locationError.value = "";
+  if (selectedLocation.value && locationQuery.value !== selectedLocation.value.place_name_en) {
+    selectedLocation.value = null;
+  }
+});
 
 // Initialize with props
 const initializeFromProps = () => {
@@ -203,12 +221,63 @@ const addPrompt = (prompt: string) => {
 const handleLocation = (location: GeocodingFeature) => {
   selectedLocation.value = location;
   locationQuery.value = location.place_name_en;
+  locationError.value = ""; // Clear any location error
   hidePopover();
 };
 
-const submitSearch = () => {
-  if (!selectedLocation.value || !searchQuery.value.trim()) return;
+const handleLocationEnter = async () => {
+  console.log('[LOCATION ENTER] Pressed enter, locationQuery:', locationQuery.value);
+  console.log('[LOCATION ENTER] Current selectedLocation:', selectedLocation.value);
+  
+  if (!selectedLocation.value && locationQuery.value.trim()) {
+    console.log('[LOCATION ENTER] Attempting fallback geocoding');
+    const geocodedLocation = await geocodeAndSelectBest(locationQuery.value);
+    if (geocodedLocation) {
+      console.log('[LOCATION ENTER] Geocoding successful:', geocodedLocation.place_name_en);
+      selectedLocation.value = geocodedLocation;
+      locationQuery.value = geocodedLocation.place_name_en;
+      locationError.value = "";
+      hidePopover();
+    } else {
+      console.log('[LOCATION ENTER] Geocoding failed');
+      locationError.value = `Could not find location "${locationQuery.value}". Please select from suggestions or try a different location.`;
+    }
+  }
+};
 
+const submitSearch = async () => {
+  console.log('[SUBMIT] Starting submit, searchQuery:', searchQuery.value);
+  console.log('[SUBMIT] selectedLocation:', selectedLocation.value);
+  console.log('[SUBMIT] locationQuery:', locationQuery.value);
+  
+  if (!searchQuery.value.trim()) return;
+
+  // If no location is selected but we have a location query, try to geocode it
+  if (!selectedLocation.value && locationQuery.value.trim()) {
+    console.log('[SUBMIT] No location selected, trying fallback geocoding for:', locationQuery.value);
+    const geocodedLocation = await geocodeAndSelectBest(locationQuery.value);
+    if (geocodedLocation) {
+      console.log('[SUBMIT] Fallback geocoding successful:', geocodedLocation.place_name_en);
+      selectedLocation.value = geocodedLocation;
+      locationError.value = ""; // Clear any previous error
+    } else {
+      console.log('[SUBMIT] Fallback geocoding failed');
+      // Could not geocode the location, show error and don't proceed
+      locationError.value = `Could not find location "${locationQuery.value}". Please select from suggestions or try a different location.`;
+      return;
+    }
+  }
+
+  // Ensure we have a location before submitting
+  if (!selectedLocation.value) {
+    console.log('[SUBMIT] Still no location, showing error');
+    locationError.value = "Please enter and select a location.";
+    return;
+  }
+
+  // Clear any previous error and submit
+  console.log('[SUBMIT] Submitting with location:', selectedLocation.value.place_name_en);
+  locationError.value = "";
   emit("submit-search", {
     location: selectedLocation.value,
     radius: selectedRadius.value,
@@ -224,6 +293,7 @@ const handleReset = () => {
   selectedLocation.value = null;
   selectedRadius.value = 0;
   locationQuery.value = "";
+  locationError.value = "";
   
   emit("reset");
 };
