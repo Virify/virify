@@ -73,6 +73,7 @@
           <legend class="| visually-hidden">The property</legend>
           <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
             @submit="submitSearch" />
+            <p class="description-hint | body-sm">Don’t forget to say whether you’re looking to buy or rent!</p>
         </div>
 
         <!-- example prompts -->
@@ -141,7 +142,7 @@ const radiusOptions = [
 ];
 
 const sortOptions = [
-  { value: "relevance", key: "Sort by Relevance" },
+  { value: "relevance", key: "Relevance" },
   { value: "price-asc", key: "Price: Low to High" },
   { value: "price-desc", key: "Price: High to Low" },
   { value: "date-desc", key: "Newest First" },
@@ -151,7 +152,7 @@ const sortOptions = [
 const examplePrompts = [
   "4 bedroom house with a garden for sale",
   "Studio flat with a balcony to rent",
-  "2+ bedroom property",
+  "2+ bedroom property to buy",
   "3 bedroom detached cottage with a downstairs bathroom for sale",
   "A large parcel of land",
   "3 bedroom house with a garden and a garage"
@@ -403,6 +404,12 @@ onClickOutside($form, () => {
     margin: 0;
   }
 }
+
+.description-hint {
+    margin-top: var(--size-8);
+    padding-left: var(--size-8);
+    color: var(--secondary-400);
+  }
 
 // Form controls
 .expand-button {
