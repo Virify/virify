@@ -252,6 +252,11 @@ onClickOutside($form, () => {
     -webkit-overflow-scrolling: touch;
     padding-right: var(--size-12);
 
+    // Mobile: pin to navigation (remove margin)
+    @media (max-width: 768px) {
+      margin-top: 0;
+    }
+
     // Custom scrollbar styling
     &::-webkit-scrollbar {
       width: 8px;

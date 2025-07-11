@@ -26,22 +26,23 @@
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
-    <div v-if="shouldShowFeedback" class="search-feedback-section | container container-sm">
+    <div v-if="shouldShowFeedback" class="search-feedback-wrapper">
+      <div class="search-feedback-section | container container-sm">
       <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
       <OrganismsAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
       <div v-else-if="searchError" class="error-content | flow flow-sm">
         <h2 class="title-md">An Error Occurred</h2>
         <p class="body-sm">{{ searchError }}</p>
       </div>
+      </div>
     </div>
-    <div class="results-container | container">
+    <div v-else class="results-container">
       <OrganismsAiSearchResults v-if="hasResults" :results="sortedResults" :query-analysis="queryAnalysis" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import GradientText from '~/components/atoms/GradientText.vue';
 
 interface SearchPayload {
   location: GeocodingFeature;
@@ -97,6 +98,22 @@ const handleSort = (sortBy: string) => {
   currentSort.value = sortBy;
 };
 
+// Disable body scroll when form is expanded and there are results
+watch([isSearchFormCollapsed, hasResults], ([collapsed, results]) => {
+  if (!collapsed && results) {
+    // Form is expanded and we have results - disable body scroll
+    document.body.style.overflow = 'hidden';
+  } else {
+    // Form is collapsed or no results - restore body scroll
+    document.body.style.overflow = '';
+  }
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
+
 const handleSearch = async (payload: SearchPayload) => {
   // Reset state
   isSearchFormCollapsed.value = true;
@@ -141,6 +158,7 @@ const handleSearch = async (payload: SearchPayload) => {
     transition: filter 0.3s ease;
     opacity: 0.7;
   }
+
 }
 
 // Hero section
@@ -211,18 +229,24 @@ const handleSearch = async (payload: SearchPayload) => {
 }
 
 
+// Search feedback wrapper - centers the entire section on the page
+.search-feedback-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: var(--size-24) 0;
+}
+
 // Search feedback section
 .search-feedback-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: var(--size-32);
   text-align: center;
   padding: var(--size-40);
-  padding-top: calc(var(--size-40) + var(--size-24));
-  min-height: 40vh;
-  margin-top: var(--size-24);
   background: var(--background-200);
   border-radius: var(--border-radius-3xl);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
