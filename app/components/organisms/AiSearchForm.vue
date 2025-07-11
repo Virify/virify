@@ -52,7 +52,7 @@
 
       <!-- example prompts -->
       <ul class="example-prompts">
-        <li v-for="prompt of examplePrompts">
+        <li v-for="(prompt, index) of examplePrompts" :key="index">
           <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
             @click.prevent="addPrompt(prompt)" />
         </li>
