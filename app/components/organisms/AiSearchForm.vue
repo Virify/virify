@@ -8,8 +8,8 @@
     <!-- Collapsed State Content -->
     <MoleculesSearchFormCollapsed v-show="isCollapsed" :query="segments"
       :query-location="selectedLocation?.place_name_en" :query-radius="selectedRadius" v-model:sort-order="sortOrder"
-      v-model:search-radius="selectedRadius" :radius-options="radiusOptions" :sort-options="sortOptions"
-      @update-search-radius="submitSearch" @update-sort-order="updateSortOrder" @expand-form="isCollapsed = false" />
+      v-model:search-radius="selectedRadius" @update-search-radius="submitSearch" @update-sort-order="updateSortOrder"
+      @expand-form="isCollapsed = false" />
 
     <!-- Expanded State Content -->
     <div v-show="!isCollapsed" class="expanded-content">
@@ -33,7 +33,7 @@
             aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
 
           <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="location-radius | r-body-md-xs"
-            v-model="selectedRadius" :options="radiusOptions" />
+            v-model="selectedRadius" :options="selectOptionRadius" />
         </fieldset>
 
         <Transition name="location-popover">
@@ -106,27 +106,6 @@ const selectedRadius = ref(props.initialRadius || 0);
 
 // Form validation
 const isFormValid = computed(() => !!selectedLocation.value && !!searchQuery.value.trim());
-
-// Options data
-const radiusOptions = [
-  { value: 0, key: "This location only" },
-  { value: 0.25, key: "Within 0.25 miles" },
-  { value: 0.5, key: "Within 0.5 miles" },
-  { value: 1, key: "Within 1 mile" },
-  { value: 2, key: "Within 2 miles" },
-  { value: 5, key: "Within 5 miles" },
-  { value: 10, key: "Within 10 miles" },
-  { value: 20, key: "Within 20 miles" },
-  { value: 40, key: "Within 40 miles" },
-];
-
-const sortOptions = [
-  { value: "relevance", key: "Relevance" },
-  { value: "price-asc", key: "Price: Low to High" },
-  { value: "price-desc", key: "Price: High to Low" },
-  { value: "date-desc", key: "Newest First" },
-  { value: "date-asc", key: "Oldest First" },
-];
 
 const examplePrompts = [
   "4 bedroom house with a garden for sale",

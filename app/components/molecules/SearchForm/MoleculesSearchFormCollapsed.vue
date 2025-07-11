@@ -15,11 +15,11 @@
     </button>
 
     <!-- Update radius -->
-    <AtomsSelect id="radius-quick" v-model="searchRadius" :options="radiusOptions" aria-label="Search radius"
+    <AtomsSelect id="radius-quick" v-model="searchRadius" :options="selectOptionRadius" aria-label="Search radius"
       class="m-search-form-collapsed__select" @click.stop @change="updateSearchRadius" />
 
     <!-- Sorting -->
-    <AtomsSelect id="sort-by" v-model="sortOrder" :options="sortOptions" aria-label="Sort results by"
+    <AtomsSelect id="sort-by" v-model="sortOrder" :options="selectOptionSortOrder" aria-label="Sort results by"
       class="m-search-form-collapsed__select" @change="updateSortOrder" />
 
     <!-- Mobile expand button -->
@@ -34,8 +34,6 @@ interface Props {
   query?: { type: string, text: string }[]
   queryLocation?: string
   queryRadius?: number
-  sortOptions?: { key: string, value: string }[]
-  radiusOptions?: { key: string, value: number }[]
 }
 
 defineProps<Props>()
