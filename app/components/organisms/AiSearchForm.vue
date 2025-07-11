@@ -34,7 +34,8 @@
             @keydown.enter="handleLocationEnter" />
 
           <AtomsSelect name="radius" id="radius" aria-label="Location radius"
-            class="location-radius location-radius--desktop" v-model="selectedRadius" :options="selectOptionRadius" />
+            class="location-radius location-radius--desktop | body-md" v-model="selectedRadius"
+            :options="selectOptionRadius" />
         </fieldset>
 
         <Transition name="location-popover">
@@ -312,13 +313,16 @@ onClickOutside($form, () => {
   &.is-expanded {
     border-radius: var(--border-radius-3xl);
     margin-bottom: var(--size-24);
-    max-width: var(--container-width, 1200px);
     padding: var(--size-36) var(--size-16) var(--size-16);
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    max-height: 80vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+
+    &.has-searched {
+      max-height: calc(100vh - var(--header-height) - var(--size-32));
+    }
 
     // Mobile: pin to navigation (remove margin)
     @media (max-width: 768px) {
@@ -349,10 +353,6 @@ onClickOutside($form, () => {
 
     @include mq.tablet {
       padding: var(--size-32);
-    }
-
-    @include mq.desktop {
-      max-width: 800px;
     }
 
     .expanded-content {
