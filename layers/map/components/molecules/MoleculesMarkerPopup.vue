@@ -65,7 +65,6 @@
 </template>
 
 <script setup lang="ts">
-import { ListingTier } from '@prisma/client';
 
 const props = defineProps<{
   marker: MapMarker;
@@ -96,7 +95,7 @@ const hasImage = computed(() =>
   props.marker.image[0].image
 );
 const isFeatured = computed(() => {
-  return props.marker.tier === ListingTier.FEATURED;
+  return props.marker.tier === 'FEATURED';
 });
 
 // Event handlers
