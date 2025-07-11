@@ -1,96 +1,67 @@
 <template>
-  <div class="ai-search-form-wrapper">
-    <form ref="$form" @submit.prevent="submitSearch" class="unified-search-form" :class="{
-      'is-collapsed': isCollapsed,
-      'is-expanded': !isCollapsed,
-      'has-searched': hasSearched
-    }">
+  <form ref="$form" @submit.prevent="submitSearch" class="unified-search-form" :class="{
+    'is-collapsed': isCollapsed,
+    'is-expanded': !isCollapsed,
+    'has-searched': hasSearched
+  }">
 
-      <!-- Collapsed State Content -->
-      <div v-show="isCollapsed" class="collapsed-content">
-        <div class="collapsed-top-row">
-          <!-- Mobile expand button -->
-          <button @click.stop="isCollapsed = false" type="button"
-            class="expand-button-mobile | button button-secondary">
-            <AtomsIcon name="arrow-down" icon="expand" />
-          </button>
+    <!-- Collapsed State Content -->
+    <MoleculesSearchFormCollapsed v-show="isCollapsed" @expand-form="isCollapsed = false" :query="segments"
+      :query-location="selectedLocation?.place_name_en" :query-radius="selectedRadius" :sort-options="sortOptions"
+      v-model="sortBy" />
 
-          <div class="query-info" @click="isCollapsed = false">
-            <p class="query-text r-body-md-xs font-semibold">
-              <template v-for="segment in segments" :key="segment.text">
-                <span :class="`segment--${segment.type}`">{{ segment.text }}</span>
-              </template>
-            </p>
-            <p v-if="selectedLocation" class="location-text r-body-sm-xs">
-              {{ selectedLocation.place_name_en }}
-              <span v-if="selectedRadius > 0"> (within {{ selectedRadius }} miles)</span>
-            </p>
-          </div>
-          <div class="collapsed-actions | r-body-md-xs">
-            <AtomsSelect v-if="hasSearched" id="radius-quick" v-model="selectedRadius" :options="radiusOptions"
-              aria-label="Search radius" class="radius-select" @click.stop @change="submitSearch" />
-            <AtomsSelect v-if="hasSearched" id="sort-by" v-model="sortBy" :options="sortOptions"
-              aria-label="Sort results by" class="sort-select" @click.stop />
-            <button @click.stop="isCollapsed = false" type="button" class="expand-button | button button-secondary">
-              <AtomsIcon name="arrow-down" icon="expand" />
-            </button>
-          </div>
-        </div>
+    <!-- Expanded State Content -->
+    <div v-show="!isCollapsed" class="expanded-content">
+      <div class="form-header">
+        <h1 v-show="!hasSearched" class="| title-sm font-bold">
+          Describe your dream home, let
+          <span class="| gradient-text gradient-text-ai">AI</span>
+          do the rest
+        </h1>
+        <button v-if="hasSearched" @click="isCollapsed = true" type="button" class="close-button">
+          ✕
+        </button>
       </div>
 
-      <!-- Expanded State Content -->
-      <div v-show="!isCollapsed" class="expanded-content">
-        <div class="form-header">
-          <h1 v-show="!hasSearched" class="| title-sm font-bold">
-            Describe your dream home, let
-            <span class="| gradient-text gradient-text-ai">AI</span>
-            do the rest
-          </h1>
-          <button v-if="hasSearched" @click="isCollapsed = true" type="button" class="close-button">
-            ✕
-          </button>
-        </div>
+      <!-- location group -->
+      <div role="presentation" ref="$location" class="location-group | flow flow-lg">
+        <fieldset class="location-fieldset | elevate-200">
+          <legend class="| visually-hidden">Location</legend>
 
-        <!-- location group -->
-        <div role="presentation" ref="$location" class="location-group | flow flow-lg">
-          <fieldset class="location-fieldset | elevate-200">
-            <legend class="| visually-hidden">Location</legend>
+          <input type="text" class="location-input | r-body-md-xs" placeholder="Where do you want to live?"
+            aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
 
-            <input type="text" class="location-input | r-body-md-xs" placeholder="Where do you want to live?"
-              aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
+          <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="location-radius | r-body-md-xs"
+            v-model="selectedRadius" :options="radiusOptions" />
+        </fieldset>
 
-            <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="location-radius | r-body-md-xs"
-              v-model="selectedRadius" :options="radiusOptions" />
-          </fieldset>
-
-          <Transition name="location-popover">
-            <div role="presentation" v-show="popoverExpanded">
-              <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
-            </div>
-          </Transition>
-        </div>
-
-        <div role="fieldset">
-          <legend class="| visually-hidden">The property</legend>
-          <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-            @submit="submitSearch" />
-        </div>
-
-        <!-- example prompts -->
-        <ul class="example-prompts">
-          <li v-for="prompt of examplePrompts">
-            <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
-              @click.prevent="addPrompt(prompt)" />
-          </li>
-        </ul>
-
-        <AtomsButton v-if="hasSearched || hasSavedState" @click.prevent="handleReset" type="reset"
-          class="| button button-xs button-delete button-full button-bordered">
-          Reset form
-        </AtomsButton>
+        <Transition name="location-popover">
+          <div role="presentation" v-show="popoverExpanded">
+            <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+          </div>
+        </Transition>
       </div>
-    </form>
-  </div>
+
+      <div role="fieldset">
+        <legend class="| visually-hidden">The property</legend>
+        <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
+          @submit="submitSearch" />
+      </div>
+
+      <!-- example prompts -->
+      <ul class="example-prompts">
+        <li v-for="prompt of examplePrompts">
+          <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
+            @click.prevent="addPrompt(prompt)" />
+        </li>
+      </ul>
+
+      <AtomsButton v-if="hasSearched || hasSavedState" @click.prevent="handleReset" type="reset"
+        class="| button button-xs button-delete button-full button-bordered">
+        Reset form
+      </AtomsButton>
+    </div>
+  </form>
 </template>
 
 <script setup lang="ts">
