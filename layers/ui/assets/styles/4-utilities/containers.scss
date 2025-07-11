@@ -6,7 +6,7 @@
  */
 .container {
   --container-width: 82rem;
-  --container-padding: var(--size-48);
+  --container-padding: var(--size-16);
 
   width: min(100% - var(--container-padding), var(--container-width));
   margin-inline: auto;
@@ -26,7 +26,6 @@
 
 .container-xs {
   --container-width: 36rem;
-  --container-padding: var(--size-20);
 
   @include mq.tablet {
     --container-padding: var(--size-36);
@@ -35,7 +34,6 @@
 
 .container-2xs {
   --container-width: 24rem;
-  --container-padding: var(--size-20);
 
   @include mq.tablet {
     --container-padding: var(--size-36);

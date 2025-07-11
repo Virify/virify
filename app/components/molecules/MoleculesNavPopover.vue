@@ -208,6 +208,7 @@ function handleNavAction(action: string) {
 
 <style scoped lang="scss">
 @use "#styles/_utils/functions" as fn;
+@use 'sass:math';
 
 .m-menu-wrapper {
   display: flex;
@@ -237,32 +238,31 @@ function handleNavAction(action: string) {
 }
 
 .m-burger-menu-icon {
-  width: 30px;
-  height: 24px;
+  $burger-size: 36px;
+  $border-icon-size: 22px;
+
   position: relative;
+  width: $burger-size;
+  height: $burger-size;
 
   span {
     display: block;
     position: absolute;
-    height: 3px;
-    width: 100%;
+    height: 2px;
+    width: $border-icon-size;
     background: var(--foreground-100);
     border-radius: 3px;
     opacity: 1;
-    left: 0;
-    transform: rotate(0deg);
+    top: calc(50% - 1px);
+    left: calc(50% - #{ math.div($border-icon-size, 2) });
     transition: 0.25s ease-in-out;
 
     &:nth-child(1) {
-      top: 0px;
-    }
-
-    &:nth-child(2) {
-      top: 10px;
+      transform: translateY(#{ math.div(-$border-icon-size, 3) })
     }
 
     &:nth-child(3) {
-      top: 20px;
+      transform: translateY(#{ math.div($border-icon-size, 3) })
     }
   }
 }

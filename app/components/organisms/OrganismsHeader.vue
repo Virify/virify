@@ -28,11 +28,16 @@
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
+    padding: 0 var(--size-8);
   }
 
   &-homelink {
     display: block;
     width: min(60%, 120px);
+
+    @include mq.small-tablet {
+      width: min(60%, 180px);
+    }
   }
 
   &-logo {
