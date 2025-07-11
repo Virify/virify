@@ -3,13 +3,12 @@
 
     <!-- Preview query -->
     <button class="| body-sm button-none font-semibold" @click.prevent="openForm">
-      <template v-for="option in query" :key="option.text">
-        <span :class="`segment--${option.type}`">{{ option.text }}</span>
-      </template>
-      <div v-if="queryLocation" class="| faded-text">
+      <span v-for="option in query" :key="option.text" :class="`segment--${option.type}`">{{ option.text }}</span>
+
+      <span v-if="queryLocation" class="| faded-text">
         {{ queryLocation }}
         <template v-if="!!queryRadius"> (within {{ queryRadius }} miles)</template>
-      </div>
+      </span>
     </button>
 
     <!-- Sorting -->
