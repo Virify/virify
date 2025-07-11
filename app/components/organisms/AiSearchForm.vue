@@ -10,10 +10,11 @@
       <div v-show="isCollapsed" class="collapsed-content">
         <div class="collapsed-top-row">
           <!-- Mobile expand button -->
-          <button @click.stop="isCollapsed = false" type="button" class="expand-button-mobile | button button-secondary">
+          <button @click.stop="isCollapsed = false" type="button"
+            class="expand-button-mobile | button button-secondary">
             <AtomsIcon name="arrow-down" icon="expand" />
           </button>
-          
+
           <div class="query-info" @click="isCollapsed = false">
             <p class="query-text r-body-md-xs font-semibold">
               <template v-for="segment in segments" :key="segment.text">
@@ -83,10 +84,12 @@
                 @click.prevent="addPrompt(prompt)" />
             </li>
           </ul>
-          <button v-if="hasSearched || hasSavedState" @click="handleReset" type="button" class="reset-link | r-body-sm-xs">
-            Reset form
-          </button>
         </div>
+
+        <AtomsButton v-if="hasSearched || hasSavedState" @click.prevent="handleReset" type="reset"
+          class="| button button-xs button-delete button-full button-bordered">
+          Reset form
+        </AtomsButton>
       </div>
     </form>
   </div>
@@ -223,7 +226,7 @@ const handleReset = () => {
   selectedLocation.value = null;
   selectedRadius.value = 0;
   locationQuery.value = "";
-  
+
   emit("reset");
 };
 
@@ -421,7 +424,7 @@ onClickOutside($form, () => {
 
 .expand-button-mobile {
   display: none; // Hidden on desktop
-  
+
   @media (max-width: 768px) {
     display: flex;
     position: absolute;
@@ -466,7 +469,7 @@ onClickOutside($form, () => {
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--size-16);
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: var(--size-12);
@@ -481,28 +484,6 @@ onClickOutside($form, () => {
   margin: 0;
   gap: 8px;
   flex: 1;
-}
-
-.reset-link {
-  background: none;
-  border: none;
-  color: var(--text-color-muted);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  align-self: flex-end;
-  margin-top: var(--size-4);
-  padding-right: var(--size-8);
-  
-  &:hover {
-    color: var(--text-color);
-  }
-  
-  @media (max-width: 768px) {
-    align-self: flex-end;
-    text-align: right;
-    width: 100%;
-  }
 }
 
 // Collapsed state styles
@@ -610,6 +591,7 @@ onClickOutside($form, () => {
 
 .location-text {
   opacity: 0.7;
+
   @media(max-width: 768px) {
     margin-top: var(--size-4);
   }
