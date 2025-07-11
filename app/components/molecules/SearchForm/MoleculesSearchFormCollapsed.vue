@@ -81,12 +81,19 @@ function updateSearchRadius() {
     padding-right: var(--size-48);
     font-size: var(--font-xs);
     line-height: var(--lineheight-md);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
   }
 
   &__summary-location {
     display: block;
     line-height: var(--lineheight-sm);
     font-weight: var(--font-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__select {
@@ -110,6 +117,7 @@ function updateSearchRadius() {
     padding: 0;
     width: var(--size-40);
     height: var(--size-40);
+    flex: 0 0 auto;
 
     svg {
       width: var(--size-20);
@@ -123,7 +131,7 @@ function updateSearchRadius() {
     }
   }
 
-  @include mq.tablet {
+  @include mq.notebook {
     display: flex;
 
     &__summary {
@@ -133,6 +141,7 @@ function updateSearchRadius() {
 
     &__select {
       font-size: var(--font-sm);
+      flex-shrink: 0;
     }
 
     &__close {
