@@ -30,7 +30,8 @@
           <legend class="| visually-hidden">Location</legend>
 
           <input type="text" class="location-input | r-body-md-xs" placeholder="Where do you want to live?"
-            aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
+            aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover"
+            @keydown.enter="handleLocationEnter" />
 
           <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="location-radius | r-body-md-xs"
             v-model="selectedRadius" :options="selectOptionRadius" />
@@ -46,7 +47,7 @@
       <div role="fieldset">
         <legend class="| visually-hidden">The property</legend>
         <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-          @submit="submitSearch" />
+          :disabled="!isFormValid" @submit="submitSearch" />
       </div>
 
       <!-- example prompts -->
