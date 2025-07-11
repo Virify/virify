@@ -217,10 +217,10 @@ const autocompleteFeedback = computed(() => {
 .m-autocomplete-popover {
   background-color: var(--background-200);
   border-radius: var(--border-radius-xl);
-  padding: var(--size-18);
+  padding: var(--size-16);
   border: 1px solid var(--border-color-100);
 
-  @include mq.small-tablet {
+  @include mq.tablet {
     padding: var(--size-32);
     border-radius: var(--border-radius-2xl);
   }
