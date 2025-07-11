@@ -1,8 +1,15 @@
+@use '../_utils/media' as mq;
+
 /**
  *  Offsets for headers
  */
 :root {
-  --header-height: 4rem;
-  --header-expanded-height: 8rem;
+  --header-height: 3.2rem;
+  --header-expanded-height: 7.2rem;
   --header-offset: calc(var(--header-expanded-height) - var(--header-height));
+
+  @include mq.small-tablet {
+    --header-height: 4rem;
+    --header-expanded-height: 8rem;
+  }
 }

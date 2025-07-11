@@ -28,22 +28,24 @@
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    padding: 0 var(--size-8);
+    padding: 0;
   }
 
   &-homelink {
     display: block;
-    width: min(60%, 120px);
-
-    @include mq.small-tablet {
-      width: min(60%, 180px);
-    }
+    width: fit-content;
   }
 
   &-logo {
     display: block;
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 1.7rem;
+    width: 6.4rem;
+
+    @include mq.tablet {
+      height: 2rem;
+      width: auto;
+    }
   }
 }
 </style>
