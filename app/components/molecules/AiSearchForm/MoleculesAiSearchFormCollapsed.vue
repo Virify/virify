@@ -3,7 +3,7 @@
 
     <!-- Preview query -->
     <AtomsButtonUnstyled class="m-search-form-collapsed__summary | font-semibold" @click.prevent="openForm">
-      <span v-for="option in query" :key="option.text" :class="{
+      <span v-for="(option, index) in query" :key="index" :class="{
         '| secondary-400': option.type === 'used',
         '| grey-500 line-through': option.type === 'ignored'
       }">{{ option.text }}</span>
