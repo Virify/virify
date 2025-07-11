@@ -6,9 +6,9 @@
   }">
 
     <!-- Collapsed State Content -->
-    <MoleculesSearchFormCollapsed v-show="isCollapsed" @expand-form="isCollapsed = false" :query="segments"
-      :query-location="selectedLocation?.place_name_en" :query-radius="selectedRadius" :sort-options="sortOptions"
-      v-model="sortBy" />
+    <MoleculesSearchFormCollapsed v-show="isCollapsed" :query="segments"
+      :query-location="selectedLocation?.place_name_en" :query-radius="selectedRadius" v-model:sort-order="sortOrder"
+      :sort-options="sortOptions" @update-sort-order="updateSortOrder" @expand-form="isCollapsed = false" />
 
     <!-- Expanded State Content -->
     <div v-show="!isCollapsed" class="expanded-content">
@@ -82,13 +82,14 @@ const emit = defineEmits<{
   "reset": [];
 }>();
 
+
 // AI and query state
 const { searchQuery, getAnalyzedQuery } = useAi();
 const segments = computed(() => getAnalyzedQuery());
 
 // UI state
 const isCollapsed = ref(props.hasSearched);
-const sortBy = ref("relevance");
+
 const popoverExpanded = ref(false);
 const textareaId = useId();
 const $location = templateRef<HTMLElement>("$location");
@@ -131,7 +132,6 @@ const examplePrompts = [
 
 // Watchers
 watch(isCollapsed, (value) => emit("update:collapsed", value));
-watch(sortBy, (value) => emit("sort", value));
 
 // Initialize with props
 const initializeFromProps = () => {
@@ -199,7 +199,18 @@ const handleReset = () => {
   emit("reset");
 };
 
-// Popover controls
+/**
+ *  Manage sort order
+ */
+const sortOrder = ref("relevance");
+
+function updateSortOrder() {
+  emit("sort", sortOrder.value)
+}
+
+/**
+ *  Popover controls
+ */
 const showPopover = () => { popoverExpanded.value = true; };
 const hidePopover = () => { popoverExpanded.value = false; };
 

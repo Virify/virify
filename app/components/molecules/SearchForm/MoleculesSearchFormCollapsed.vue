@@ -17,8 +17,8 @@
     </button>
 
     <!-- Sorting -->
-    <AtomsSelect id="sort-by" v-model="sortBy" :options="sortOptions" aria-label="Sort results by" class="sort-select"
-      @click.stop />
+    <AtomsSelect id="sort-by" v-model="sortOrder" :options="sortOptions" aria-label="Sort results by"
+      class="sort-select" @change="updateSortOrder" />
   </div>
 </template>
 
@@ -33,9 +33,13 @@ interface Props {
 defineProps<Props>()
 
 /**
+ *  Emits
+ */
+const emits = defineEmits(['expand-form', 'update-sort-order'])
+
+/**
  *  Toggle form open/closed
  */
-const emits = defineEmits(['expand-form'])
 
 function openForm() {
   emits('expand-form')
@@ -44,5 +48,9 @@ function openForm() {
 /**
  *  Search radius
  */
-const sortBy = defineModel()
+const sortOrder = defineModel('sortOrder')
+
+function updateSortOrder() {
+  emits('update-sort-order')
+}
 </script>
