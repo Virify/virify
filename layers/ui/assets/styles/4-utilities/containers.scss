@@ -6,7 +6,7 @@
  */
 .container {
   --container-width: 82rem;
-  --container-padding: var(--size-24);
+  --container-padding: var(--size-64);
 
   width: min(100% - var(--container-padding), var(--container-width));
   margin-inline: auto;

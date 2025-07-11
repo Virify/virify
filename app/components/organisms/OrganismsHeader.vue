@@ -28,7 +28,6 @@
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    margin-bottom: var(--size-32);
   }
 
   &-homelink {

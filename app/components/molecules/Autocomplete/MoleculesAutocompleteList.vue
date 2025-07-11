@@ -1,5 +1,5 @@
 <template>
-  <ul class="m-autocomplete-list | body-md">
+  <ul class="m-autocomplete-list | r-body-md-xs">
     <li v-for="option, index of options" class="m-autocomplete-list__row" :key="index">
       <slot v-bind="{
         option,

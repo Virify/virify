@@ -16,7 +16,7 @@
         <span class="m-autocomplete-popover__empty-suggestion | skeleton"></span>
       </MoleculesAutocompleteList>
 
-      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
+      <p v-else class="m-autocomplete-popover__empty | faded-text r-body-md-xs">
         {{ autocompleteFeedback }}
       </p>
     </template>
@@ -35,7 +35,7 @@
         </li>
       </ul>
 
-      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
+      <p v-else class="m-autocomplete-popover__empty | faded-text r-body-md-xs">
         You do not currently have any saved locations
       </p>
     </template>

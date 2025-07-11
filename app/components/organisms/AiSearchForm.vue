@@ -1,82 +1,79 @@
 <template>
   <div class="ai-search-form-wrapper">
-    <!-- Collapsed View -->
-      <div v-show="isCollapsed" class="collapsed-search-bar | container">
+    <form ref="$form" @submit.prevent="submitSearch" class="unified-search-form" :class="{
+      'is-collapsed': isCollapsed,
+      'is-expanded': !isCollapsed,
+      'has-searched': hasSearched
+    }">
+
+      <!-- Collapsed State Content -->
+      <div v-show="isCollapsed" class="collapsed-content">
         <div class="query-info" @click="isCollapsed = false">
-          <p class="query-text body-md font-semibold">
-            <template v-for="(segment, index) in segments" :key="index">
+          <p class="query-text r-body-md-xs font-semibold">
+            <template v-for="segment in segments" :key="segment.text">
               <span :class="`segment--${segment.type}`">{{ segment.text }}</span>
             </template>
           </p>
-          <p v-if="selectedLocation" class="location-text body-sm">
+          <p v-if="selectedLocation" class="location-text r-body-sm-xs">
             {{ selectedLocation.place_name_en }}
             <span v-if="selectedRadius > 0"> (within {{ selectedRadius }} miles)</span>
           </p>
         </div>
-        <div class="collapsed-actions | body-md">
-          <AtomsSelect
-            v-if="hasSearched"
-            id="sort-by"
-            v-model="sortBy"
-            :options="sortOptions"
-            aria-label="Sort results by"
-            class="sort-select"
-            @click.stop
-          />
-          <button @click.stop="isCollapsed = false" class="collapse-button | button button-secondary">
+        <div class="collapsed-actions | r-body-md-xs">
+          <AtomsSelect v-if="hasSearched" id="sort-by" v-model="sortBy" :options="sortOptions"
+            aria-label="Sort results by" class="sort-select" @click.stop />
+          <button @click.stop="isCollapsed = false" type="button" class="expand-button | button button-secondary">
             <AtomsIcon name="arrow-down" icon="expand" />
           </button>
         </div>
       </div>
 
-    <!-- Expanded Form View -->
-    <form v-show="!isCollapsed" @submit.prevent="submitSearch" class="p-ai-search | container container-sm flow flow-lg">
-      <div class="p-ai-search__header">
-        <h1 v-show="!hasSearched" class="| title-lg font-bold">
-          Find your perfect home with
-          <span class="| gradient-text gradient-text-ai">AI</span>
-          enhanced property search
-        </h1>
-        <button v-if="hasSearched" @click="isCollapsed = true" type="button"
-          class="collapse-button | button button-secondary">
-          <AtomsIcon name="arrow-up" icon="collapse" />
-        </button>
+      <!-- Expanded State Content -->
+      <div v-show="!isCollapsed" class="expanded-content">
+        <div class="form-header">
+          <h1 v-show="!hasSearched" class="| title-sm font-bold">
+            Describe your dream home, let
+            <span class="| gradient-text gradient-text-ai">AI</span>
+            do the rest
+          </h1>
+          <button v-if="hasSearched" @click="isCollapsed = true" type="button" class="close-button">
+            ✕
+          </button>
+        </div>
+
+        <!-- location group -->
+        <div role="presentation" ref="$location" class="location-group | flow flow-lg">
+          <fieldset class="location-fieldset | elevate-200">
+            <legend class="| visually-hidden">Location</legend>
+
+            <input type="text" class="location-input | r-body-md-xs" placeholder="Where do you want to live?"
+              aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
+
+            <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="location-radius | r-body-md-xs"
+              v-model="selectedRadius" :options="radiusOptions" />
+          </fieldset>
+
+          <Transition name="location-popover">
+            <div role="presentation" v-show="popoverExpanded">
+              <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+            </div>
+          </Transition>
+        </div>
+
+        <div role="fieldset">
+          <legend class="| visually-hidden">The property</legend>
+          <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
+            @submit="submitSearch" />
+        </div>
+
+        <!-- example prompts -->
+        <ul class="example-prompts">
+          <li v-for="prompt of examplePrompts">
+            <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
+              @click.prevent="addPrompt(prompt)" />
+          </li>
+        </ul>
       </div>
-
-      <!-- location group -->
-      <div role="presentation" ref="$location" class="| flow flow-lg">
-        <fieldset class="p-ai-search__location | elevate-200">
-          <legend class="| visually-hidden">Location</legend>
-
-          <input type="text" class="p-ai-search__location-input | body-md" placeholder="Where do you want to live?"
-            aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover" />
-
-          <AtomsSelect name="radius" id="radius" aria-label="Location radius"
-            class="p-ai-search__location-radius | body-md" v-model="selectedRadius" :options="radiusOptions" />
-        </fieldset>
-
-        <Transition name="p-ai-search__location">
-          <div role="presentation" v-show="popoverExpanded">
-            <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
-          </div>
-        </Transition>
-      </div>
-
-      <div role="fieldset">
-        <legend class="| visually-hidden">The property</legend>
-
-        <!-- description query -->
-        <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-          @submit="submitSearch" />
-      </div>
-
-      <!-- example prompts -->
-      <ul class="p-ai-search__filters-list">
-        <li v-for="prompt of examplePrompts">
-          <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
-            @click.prevent="addPrompt(prompt)" />
-        </li>
-      </ul>
     </form>
   </div>
 </template>
@@ -91,25 +88,30 @@ const props = defineProps<{
   hasSearched: boolean;
 }>();
 
-const emit = defineEmits(["submit-search", "update:collapsed", "sort"]);
+const emit = defineEmits<{
+  "submit-search": [payload: { location: GeocodingFeature; radius: number; query: string }];
+  "update:collapsed": [value: boolean];
+  "sort": [value: string];
+}>();
 
+// AI and query state
 const { searchQuery, getAnalyzedQuery } = useAi();
 const segments = computed(() => getAnalyzedQuery());
+
+// UI state
 const isCollapsed = ref(props.hasSearched);
 const sortBy = ref("relevance");
-
-watch(isCollapsed, (newVal) => {
-  emit("update:collapsed", newVal);
-});
-
-watch(sortBy, (newVal) => {
-  emit("sort", newVal);
-});
-
-const selectedLocation = ref<GeocodingFeature | null>(null);
+const popoverExpanded = ref(false);
 const textareaId = useId();
-const locationQuery = ref("");
+const $location = templateRef<HTMLElement>("$location");
+const $form = templateRef<HTMLElement>("$form");
 
+// Location state
+const selectedLocation = ref<GeocodingFeature | null>(null);
+const locationQuery = ref("");
+const selectedRadius = ref(0);
+
+// Options data
 const radiusOptions = [
   { value: 0, key: "This location only" },
   { value: 0.25, key: "Within 0.25 miles" },
@@ -130,150 +132,178 @@ const sortOptions = [
   { value: "date-asc", key: "Oldest First" },
 ];
 
-const selectedRadius = ref(0);
+const examplePrompts = [
+  "4 bedroom house with a garden for sale",
+  "Studio flat with a balcony to rent",
+  "2+ bedroom property",
+  "3 bedroom detached cottage with a downstairs bathroom for sale",
+  "A large parcel of land",
+  "3 bedroom house with a garden and a garage"
+];
 
+// Watchers
+watch(isCollapsed, (value) => emit("update:collapsed", value));
+watch(sortBy, (value) => emit("sort", value));
+
+// Initialize with props
 onMounted(() => {
-  if (props.initialQuery) {
-    searchQuery.value = props.initialQuery;
-  }
+  if (props.initialQuery) searchQuery.value = props.initialQuery;
   if (props.initialLocation) {
     selectedLocation.value = props.initialLocation;
     locationQuery.value = props.initialLocation.place_name_en;
   }
-  if (props.initialRadius) {
-    selectedRadius.value = props.initialRadius;
-  }
+  if (props.initialRadius) selectedRadius.value = props.initialRadius;
 });
 
-const examplePrompts = ["4 bedroom house with a garden for sale", "Studio flat with a balcony to rent", "2+ bedroom property", "3 bedroom detached cottage with a downstairs bathroom for sale", "A large parcel of land", "3 bedroom house with a garden and a garage"];
-
-function addPrompt(prompt: string) {
+// Event handlers
+const addPrompt = (prompt: string) => {
   searchQuery.value = prompt;
   document?.getElementById(textareaId)?.focus();
-}
+};
 
-function handleLocation(location: GeocodingFeature) {
+const handleLocation = (location: GeocodingFeature) => {
   selectedLocation.value = location;
   locationQuery.value = location.place_name_en;
   hidePopover();
-}
+};
 
-function submitSearch() {
-  if (selectedLocation.value && searchQuery.value.trim()) {
-    emit("submit-search", {
-      location: selectedLocation.value,
-      radius: selectedRadius.value,
-      query: searchQuery.value,
-    });
-    isCollapsed.value = true;
-  } else {
-    // Optional: handle form validation feedback
-    console.warn("Please select a location and enter a search query.");
-  }
-}
+const submitSearch = () => {
+  if (!selectedLocation.value || !searchQuery.value.trim()) return;
 
-const popoverExpanded = ref(false);
-const $location = templateRef<HTMLElement>("$location");
+  emit("submit-search", {
+    location: selectedLocation.value,
+    radius: selectedRadius.value,
+    query: searchQuery.value,
+  });
 
-function showPopover() {
-  popoverExpanded.value = true;
-}
+  isCollapsed.value = true;
+};
 
-function hidePopover() {
-  popoverExpanded.value = false;
-}
+// Popover controls
+const showPopover = () => { popoverExpanded.value = true; };
+const hidePopover = () => { popoverExpanded.value = false; };
 
 onClickOutside($location, hidePopover);
+onClickOutside($form, () => {
+  if (!isCollapsed.value && props.hasSearched) {
+    isCollapsed.value = true;
+  }
+});
 </script>
 
 <style lang="scss" scoped>
 @use "#styles/_utils/functions" as fn;
 @use "#styles/_utils/media" as mq;
 
+// Form wrapper
 .ai-search-form-wrapper {
   position: relative;
-  overflow-x: hidden; // Prevent horizontal scroll as a safety net
+  overflow-x: hidden;
+  padding: var(--size-8);
+  margin: calc(-1 * var(--size-8));
 }
 
-.collapsed-search-bar {
+// Unified form that transitions between states
+.unified-search-form {
   background: var(--background-200);
   border-radius: var(--border-radius-2xl);
-  display: flex;
-  flex-direction: column;
-  padding: var(--size-12) var(--size-8); // Reduce padding on mobile
-  cursor: pointer;
-  gap: var(--size-12);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  max-width: 100vw;
   box-sizing: border-box;
+  border: 1px solid var(--border-color-200);
+  transition: all 0.3s ease;
+  overflow: hidden;
 
-  @include mq.tablet {
-    flex-direction: row;
-    align-items: center;
-    padding: var(--size-16) var(--size-24);
-    gap: var(--size-16);
+  // Collapsed state
+  &.is-collapsed {
+    width: 100%;
+    padding: var(--size-16);
+    border-radius: var(--border-radius-2xl);
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    @include mq.tablet {
+      padding: var(--size-16) var(--size-24);
+    }
+
+    .collapsed-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--size-12);
+      cursor: pointer;
+      min-height: var(--size-48);
+
+      @include mq.tablet {
+        gap: var(--size-16);
+      }
+    }
   }
-}
 
-.p-ai-search {
-  background: var(--background-200);
-  border-radius: var(--border-radius-3xl);
-  margin-bottom: var(--size-24);
-  position: relative;
-  max-width: 100vw;
-  box-sizing: border-box;
+  // Expanded state
+  &.is-expanded {
+    border-radius: var(--border-radius-3xl);
+    padding: var(--size-24);
+    margin-top: var(--size-24);
+    margin-bottom: var(--size-24);
+    max-width: var(--container-width, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: var(--size-12);
 
-  @include mq.tablet {
-    padding: var(--size-32);
+    // Custom scrollbar styling
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      margin: var(--size-8) 0;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color-200);
+      border-radius: 4px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--border-color-300);
+      background-clip: content-box;
+    }
+
+    @include mq.tablet {
+      padding: var(--size-32);
+      margin-top: var(--size-32);
+    }
+
+    @include mq.desktop {
+      padding: var(--size-40);
+      max-width: 800px;
+      margin: var(--size-40) auto var(--size-24) auto;
+    }
+
+    .expanded-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-24);
+    }
   }
 
-  @include mq.desktop {
-    padding: var(--size-40);
-  }
-}
 
-.collapse-button {
-  color: var(--monochrome-900);
-  width: var(--size-48);
-  height: var(--size-48);
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--border-radius-lg);
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-@media (min-width: 768px) {
-  .p-ai-search {
-    padding: var(--size-32);
-  }
-}
-
-@media (min-width: 1024px) {
-  .p-ai-search {
-    padding: var(--size-40);
-  }
-}
-
-ul {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0;
-  margin: var(--size-10) 0;
-}
-
-.p-ai-search {
-  &__header {
+  // Form header
+  .form-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: var(--size-16);
+    position: relative;
   }
 
-  &__location {
+  // Location fieldset
+  .location-fieldset {
     display: grid;
     padding: var(--size-16);
     gap: var(--size-16);
@@ -293,8 +323,8 @@ ul {
     }
   }
 
-  &__location-radius,
-  &__location-input {
+  .location-radius,
+  .location-input {
     background-color: transparent;
     color: currentColor;
     border-radius: var(--border-radius-lg);
@@ -304,7 +334,7 @@ ul {
     }
   }
 
-  &__location-input {
+  .location-input {
     padding: var(--size-4) var(--size-8);
 
     &:focus {
@@ -316,90 +346,100 @@ ul {
     }
   }
 
-  &__location-radius {
+  .location-radius {
     background-color: var(--background-100);
     border: 1px solid var(--border-color-200);
     padding: var(--size-14) var(--size-18);
     padding-right: var(--size-48);
     margin: 0;
   }
+}
 
-  &__filters-list {
-    gap: 8px;
+// Form controls
+.expand-button {
+  color: var(--monochrome-900);
+  width: var(--size-48);
+  height: var(--size-48);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-lg);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.close-button {
+  position: absolute;
+  top: -20px;
+  right: 10px;
+  width: var(--size-32);
+  height: var(--size-32);
+  padding: 0;
+  background-color: var(--background-200);
+  color: var(--foreground-100);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+
+  @media(max-width: 660px) {
+    top: -15px;
   }
 }
 
-.collapsed-search-bar-wrapper {
-  background: var(--background-200);
-  margin-bottom: 0;
-}
-
-.collapsed-search-bar {
+.example-prompts {
+  list-style: none;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--size-16) var(--size-24);
-  cursor: pointer;
-  gap: var(--size-16);
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+  gap: 8px;
 }
 
+// Collapsed state styles
 .collapsed-actions {
   display: flex;
   align-items: center;
   gap: var(--size-12);
   flex-shrink: 0;
-  width: 100%;
-  max-width: 100vw;
-  box-sizing: border-box;
 
   @include mq.tablet {
-    width: auto;
+    gap: var(--size-16);
   }
 }
 
 .sort-select {
-  min-width: 0; // Remove min-width for mobile
-  width: 100%; // Take available width on mobile
+  min-width: 120px;
+  width: auto;
   background-color: var(--background-100);
   border: 1px solid var(--border-color-200);
-  padding: var(--size-10) var(--size-12); // Reduce padding for mobile
+  padding: var(--size-10) var(--size-12);
   padding-right: var(--size-36);
   margin: 0;
   border-radius: var(--border-radius-lg);
-  flex-grow: 1;
   box-sizing: border-box;
-  max-width: 100%;
 
   @include mq.tablet {
     min-width: 200px;
-    width: auto;
     padding: var(--size-14) var(--size-18);
     padding-right: var(--size-48);
-    flex-grow: 0;
-  }
-}
-
-@media (min-width: 768px) {
-  .collapsed-search-bar {
-    padding: var(--size-32) var(--size-32);
-  }
-}
-
-@media (min-width: 1024px) {
-  .collapsed-search-bar {
-    padding: var(--size-40) var(--size-40);
   }
 }
 
 .query-info {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   overflow: hidden;
   min-width: 0;
-  width: 100%;
+  flex: 1;
+  gap: var(--size-4);
 }
 
+// Query display text
 .query-text,
 .location-text {
   white-space: nowrap;
@@ -423,35 +463,10 @@ ul {
   opacity: 0.7;
 }
 
-/**
- *  Transitions
- */
-.form-fade-enter-active,
-.form-fade-leave-active {
-  transition: opacity var(--animation-slow) var(--ease-out), transform var(--animation-slow) var(--ease-out);
-}
-.form-fade-enter-from,
-.form-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-.form-popover-enter-active,
-.form-popover-leave-active {
-  transition: transform var(--animation-slow) var(--ease-out), opacity var(--animation-slow) var(--ease-out);
-  transform-origin: top;
-}
-
-.form-popover-enter-from,
-.form-popover-leave-to {
-  transform: scaleY(0.9) translateY(-20px);
-  opacity: 0;
-}
-
-.p-ai-search__location-enter-active,
-.p-ai-search__location-leave-active {
+// Location popover transitions
+.location-popover-enter-active,
+.location-popover-leave-active {
   interpolate-size: allow-keywords;
-
   height: calc-size(max-content, size);
   transition-property: height, margin;
   transition-duration: var(--animation-slow);
@@ -466,8 +481,8 @@ ul {
   }
 }
 
-.p-ai-search__location-leave-to,
-.p-ai-search__location-enter-from {
+.location-popover-leave-to,
+.location-popover-enter-from {
   height: 0;
   margin: 0;
 
