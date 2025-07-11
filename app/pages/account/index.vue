@@ -65,7 +65,6 @@ definePageMeta({
     meta: [
       { name: "description", content: "Manage your account settings and preferences." },
       { name: "keywords", content: "account, settings, preferences, user" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
     ],
   },
 });
