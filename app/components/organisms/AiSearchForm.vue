@@ -29,12 +29,12 @@
         <fieldset class="location-fieldset | elevate-200">
           <legend class="| visually-hidden">Location</legend>
 
-          <input type="text" class="location-input | r-body-md-xs" placeholder="Where do you want to live?"
+          <input type="text" class="location-input | body-md" placeholder="Where do you want to live?"
             aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover"
             @keydown.enter="handleLocationEnter" />
 
-          <AtomsSelect name="radius" id="radius" aria-label="Location radius" class="location-radius | r-body-md-xs"
-            v-model="selectedRadius" :options="selectOptionRadius" />
+          <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+            class="location-radius location-radius--desktop" v-model="selectedRadius" :options="selectOptionRadius" />
         </fieldset>
 
         <Transition name="location-popover">
@@ -43,6 +43,10 @@
           </div>
         </Transition>
       </div>
+
+      <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+        class="location-radius location-radius--mobile | body-md" v-model="selectedRadius"
+        :options="selectOptionRadius" />
 
       <div role="fieldset">
         <legend class="| visually-hidden">The property</legend>
@@ -355,7 +359,11 @@ onClickOutside($form, () => {
     .expanded-content {
       display: flex;
       flex-direction: column;
-      gap: var(--size-24);
+      gap: var(--size-14);
+
+      @include mq.tablet {
+        gap: var(--size-24);
+      }
     }
   }
 
@@ -371,9 +379,6 @@ onClickOutside($form, () => {
 
   // Location fieldset
   .location-fieldset {
-    display: grid;
-    padding: var(--size-16);
-    gap: var(--size-16);
     background: var(--background-200);
     color: var(--foreground-100);
     border-radius: var(--border-radius-xl);
@@ -381,12 +386,15 @@ onClickOutside($form, () => {
     border: 1px solid var(--border-color-200);
 
     @include mq.tablet {
+      display: grid;
+      padding: var(--size-16);
+      gap: var(--size-16);
       grid-template-columns: 1fr auto;
       border-radius: var(--border-radius-2xl);
-    }
 
-    &:has(input:focus) {
-      outline: var(--focus-outline);
+      &:has(input:focus) {
+        outline: var(--focus-outline);
+      }
     }
   }
 
@@ -402,23 +410,44 @@ onClickOutside($form, () => {
   }
 
   .location-input {
-    padding: var(--size-4) var(--size-8);
-
-    &:focus {
-      outline: none;
-    }
+    padding: var(--size-14) var(--size-16);
+    width: 100%;
 
     @include mq.tablet {
-      padding: var(--size-14) var(--size-16);
+      width: auto;
+
+      &:focus {
+        outline: none;
+      }
     }
   }
 
   .location-radius {
     background-color: var(--background-100);
     border: 1px solid var(--border-color-200);
-    padding: var(--size-14) var(--size-18);
+    padding: var(--size-10) var(--size-18);
     padding-right: var(--size-48);
     margin: 0;
+
+    &--mobile {
+      display: unset;
+    }
+
+    &--desktop {
+      display: none;
+      padding: var(--size-14) var(--size-18);
+      padding-right: var(--size-48);
+    }
+
+    @include mq.tablet {
+      &--mobile {
+        display: none;
+      }
+
+      &--desktop {
+        display: unset;
+      }
+    }
   }
 }
 
