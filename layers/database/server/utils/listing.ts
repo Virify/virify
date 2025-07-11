@@ -288,3 +288,26 @@ export async function fetchListings(where: Prisma.ListingWhereInput): Promise<Li
   });
   return listings;
 }
+
+/**
+ * Fetches paginated listings from the database with total count.
+ */
+export async function fetchPaginatedListings(
+  where: Prisma.ListingWhereInput, 
+  page: number = 1, 
+  limit: number = 20
+): Promise<{ listings: ListingWithFullProperty[], totalCount: number }> {
+  const skip = (page - 1) * limit;
+  
+  const [listings, totalCount] = await Promise.all([
+    prisma.listing.findMany({
+      where,
+      include: fullListingInclude,
+      skip,
+      take: limit,
+    }),
+    prisma.listing.count({ where })
+  ]);
+  
+  return { listings, totalCount };
+}

@@ -1,7 +1,8 @@
 <template>
   <div class="p-ai-search-results | container flow" v-if="results">
-    <h2 class="title-md">
-      Found {{ results.length }} result<span v-if="results.length !== 1">s</span>
+    <h2 class="results-title | title-md">
+      Found {{ totalResults }} results
+      <span v-if="totalPages > 1" class="body-sm"> (Page {{ currentPage }} of {{ totalPages }})</span>
     </h2>
 
     <ul class="p-ai-search-results__list">
@@ -9,6 +10,29 @@
         <MoleculesListingCardNew :listing="listing" />
       </li>
     </ul>
+
+    <!-- Pagination -->
+    <div v-if="totalPages > 1" class="pagination | body-sm font-bold">
+      <button 
+        @click="$emit('page-change', currentPage - 1)"
+        :disabled="currentPage === 1"
+        class="button button-ghost button-sm"
+      >
+        Previous
+      </button>
+      
+      <span class="pagination-info">
+        Page {{ currentPage }} of {{ totalPages }}
+      </span>
+      
+      <button 
+        @click="$emit('page-change', currentPage + 1)"
+        :disabled="currentPage === totalPages"
+        class="button button-secondary button-sm"
+      >
+        Next
+      </button>
+    </div>
   </div>
 </template>
 
@@ -16,40 +40,50 @@
 defineProps<{
   results: ListingWithFullProperty[];
   queryAnalysis: QueryAnalysis | null;
+  currentPage: number;
+  totalPages: number;
+  totalResults: number;
+}>();
+
+defineEmits<{
+  'page-change': [page: number];
 }>();
 </script>
 
 <style lang="scss">
 .p-ai-search-results {
-  padding: var(--size-32) 0;
   &__list {
-    gap: var(--size-16);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--size-32);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
   }
 }
 
-.query-analysis {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: var(--background-100);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color-200);
-}
-
-.p-ai-search-results__list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--size-32);
-}
-
-ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (max-width: 768px) {
-  .p-ai-search-results__list {
-    grid-template-columns: 1fr;
+ .results-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
   }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--size-16);
+  margin-top: var(--size-32);
+  margin-bottom: var(--size-48);
+}
+
+.pagination-info {
+  font-size: var(--font-size-sm);
+  color: var(--foreground-200);
+  font-weight: var(--font-medium);
 }
 </style>

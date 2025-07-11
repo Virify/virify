@@ -8,23 +8,32 @@
 
       <!-- Collapsed State Content -->
       <div v-show="isCollapsed" class="collapsed-content">
-        <div class="query-info" @click="isCollapsed = false">
-          <p class="query-text r-body-md-xs font-semibold">
-            <template v-for="segment in segments" :key="segment.text">
-              <span :class="`segment--${segment.type}`">{{ segment.text }}</span>
-            </template>
-          </p>
-          <p v-if="selectedLocation" class="location-text r-body-sm-xs">
-            {{ selectedLocation.place_name_en }}
-            <span v-if="selectedRadius > 0"> (within {{ selectedRadius }} miles)</span>
-          </p>
-        </div>
-        <div class="collapsed-actions | r-body-md-xs">
-          <AtomsSelect v-if="hasSearched" id="sort-by" v-model="sortBy" :options="sortOptions"
-            aria-label="Sort results by" class="sort-select" @click.stop />
-          <button @click.stop="isCollapsed = false" type="button" class="expand-button | button button-secondary">
+        <div class="collapsed-top-row">
+          <!-- Mobile expand button -->
+          <button @click.stop="isCollapsed = false" type="button" class="expand-button-mobile | button button-secondary">
             <AtomsIcon name="arrow-down" icon="expand" />
           </button>
+          
+          <div class="query-info" @click="isCollapsed = false">
+            <p class="query-text r-body-md-xs font-semibold">
+              <template v-for="segment in segments" :key="segment.text">
+                <span :class="`segment--${segment.type}`">{{ segment.text }}</span>
+              </template>
+            </p>
+            <p v-if="selectedLocation" class="location-text r-body-sm-xs">
+              {{ selectedLocation.place_name_en }}
+              <span v-if="selectedRadius > 0"> (within {{ selectedRadius }} miles)</span>
+            </p>
+          </div>
+          <div class="collapsed-actions | r-body-md-xs">
+            <AtomsSelect v-if="hasSearched" id="radius-quick" v-model="selectedRadius" :options="radiusOptions"
+              aria-label="Search radius" class="radius-select" @click.stop @change="submitSearch" />
+            <AtomsSelect v-if="hasSearched" id="sort-by" v-model="sortBy" :options="sortOptions"
+              aria-label="Sort results by" class="sort-select" @click.stop />
+            <button @click.stop="isCollapsed = false" type="button" class="expand-button | button button-secondary">
+              <AtomsIcon name="arrow-down" icon="expand" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -67,12 +76,17 @@
         </div>
 
         <!-- example prompts -->
-        <ul class="example-prompts">
-          <li v-for="prompt of examplePrompts">
-            <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
-              @click.prevent="addPrompt(prompt)" />
-          </li>
-        </ul>
+        <div class="form-footer">
+          <ul class="example-prompts">
+            <li v-for="prompt of examplePrompts">
+              <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
+                @click.prevent="addPrompt(prompt)" />
+            </li>
+          </ul>
+          <button v-if="hasSearched || hasSavedState" @click="handleReset" type="button" class="reset-link | r-body-sm-xs">
+            Reset form
+          </button>
+        </div>
       </div>
     </form>
   </div>
@@ -86,12 +100,14 @@ const props = defineProps<{
   initialLocation?: GeocodingFeature | null;
   initialRadius?: number | null;
   hasSearched: boolean;
+  hasSavedState?: boolean;
 }>();
 
 const emit = defineEmits<{
   "submit-search": [payload: { location: GeocodingFeature; radius: number; query: string }];
   "update:collapsed": [value: boolean];
   "sort": [value: string];
+  "reset": [];
 }>();
 
 // AI and query state
@@ -146,13 +162,35 @@ watch(isCollapsed, (value) => emit("update:collapsed", value));
 watch(sortBy, (value) => emit("sort", value));
 
 // Initialize with props
-onMounted(() => {
+const initializeFromProps = () => {
   if (props.initialQuery) searchQuery.value = props.initialQuery;
   if (props.initialLocation) {
     selectedLocation.value = props.initialLocation;
     locationQuery.value = props.initialLocation.place_name_en;
   }
   if (props.initialRadius) selectedRadius.value = props.initialRadius;
+};
+
+onMounted(() => {
+  initializeFromProps();
+});
+
+// Watch for prop changes (when values are restored from localStorage)
+watch(() => props.initialQuery, (newQuery) => {
+  if (newQuery) searchQuery.value = newQuery;
+});
+
+watch(() => props.initialLocation, (newLocation) => {
+  if (newLocation) {
+    selectedLocation.value = newLocation;
+    locationQuery.value = newLocation.place_name_en;
+  }
+});
+
+watch(() => props.initialRadius, (newRadius) => {
+  if (newRadius !== null && newRadius !== undefined) {
+    selectedRadius.value = newRadius;
+  }
 });
 
 // Event handlers
@@ -177,6 +215,16 @@ const submitSearch = () => {
   });
 
   isCollapsed.value = true;
+};
+
+const handleReset = () => {
+  // Reset form fields
+  searchQuery.value = "";
+  selectedLocation.value = null;
+  selectedRadius.value = 0;
+  locationQuery.value = "";
+  
+  emit("reset");
 };
 
 // Popover controls
@@ -242,7 +290,6 @@ onClickOutside($form, () => {
   &.is-expanded {
     border-radius: var(--border-radius-3xl);
     padding: var(--size-24);
-    margin-top: var(--size-24);
     margin-bottom: var(--size-24);
     max-width: var(--container-width, 1200px);
     margin-left: auto;
@@ -281,13 +328,10 @@ onClickOutside($form, () => {
 
     @include mq.tablet {
       padding: var(--size-32);
-      margin-top: var(--size-32);
     }
 
     @include mq.desktop {
-      padding: var(--size-40);
       max-width: 800px;
-      margin: var(--size-40) auto var(--size-24) auto;
     }
 
     .expanded-content {
@@ -362,16 +406,37 @@ onClickOutside($form, () => {
 
 // Form controls
 .expand-button {
-  color: var(--monochrome-900);
+  color: var(--secondary-400);
   width: var(--size-48);
   height: var(--size-48);
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--border-radius-lg);
+  background: transparent !important;
+  border: none !important;
   margin-left: auto;
   flex-shrink: 0;
+}
+
+.expand-button-mobile {
+  display: none; // Hidden on desktop
+  
+  @media (max-width: 768px) {
+    display: flex;
+    position: absolute;
+    top: -15px;
+    right: -10px;
+    width: var(--size-48);
+    height: var(--size-48);
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    border: none !important;
+    color: var(--secondary-400);
+    z-index: 1;
+  }
 }
 
 .close-button {
@@ -395,6 +460,19 @@ onClickOutside($form, () => {
   }
 }
 
+// Form footer
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--size-16);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--size-12);
+  }
+}
+
 .example-prompts {
   list-style: none;
   display: flex;
@@ -402,9 +480,46 @@ onClickOutside($form, () => {
   padding: 0;
   margin: 0;
   gap: 8px;
+  flex: 1;
+}
+
+.reset-link {
+  background: none;
+  border: none;
+  color: var(--text-color-muted);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-end;
+  margin-top: var(--size-4);
+  padding-right: var(--size-8);
+  
+  &:hover {
+    color: var(--text-color);
+  }
+  
+  @media (max-width: 768px) {
+    align-self: flex-end;
+    text-align: right;
+    width: 100%;
+  }
 }
 
 // Collapsed state styles
+.collapsed-top-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-16);
+  width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--size-12);
+    align-items: stretch;
+    position: relative;
+  }
+}
+
 .collapsed-actions {
   display: flex;
   align-items: center;
@@ -413,6 +528,15 @@ onClickOutside($form, () => {
 
   @include mq.tablet {
     gap: var(--size-16);
+  }
+
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+    width: 100%;
+
+    .expand-button {
+      display: none;
+    }
   }
 }
 
@@ -425,14 +549,19 @@ onClickOutside($form, () => {
   padding-right: var(--size-36);
   margin: 0;
   border-radius: var(--border-radius-lg);
-  box-sizing: border-box;
-
-  @include mq.tablet {
-    min-width: 200px;
-    padding: var(--size-14) var(--size-18);
-    padding-right: var(--size-48);
-  }
 }
+
+.radius-select {
+  min-width: 140px;
+  width: auto;
+  background-color: var(--background-100);
+  border: 1px solid var(--border-color-200);
+  padding: var(--size-10) var(--size-12);
+  padding-right: var(--size-36);
+  margin: 0;
+  border-radius: var(--border-radius-lg);
+}
+
 
 .query-info {
   display: flex;
@@ -445,15 +574,24 @@ onClickOutside($form, () => {
 }
 
 // Query display text
-.query-text,
+.query-info,
 .location-text {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   display: block;
+
+  @media (max-width: 768px) {
+    white-space: normal;
+  }
 }
 
 .query-text {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: block;
+
   .segment--used {
     color: var(--secondary-400);
   }
@@ -462,10 +600,19 @@ onClickOutside($form, () => {
     text-decoration: line-through;
     opacity: 0.5;
   }
+
+  @media(max-width: 768px) {
+    white-space: normal;
+    line-height: var(--text-sm--line-height);
+    padding-right: var(--size-32);
+  }
 }
 
 .location-text {
   opacity: 0.7;
+  @media(max-width: 768px) {
+    margin-top: var(--size-4);
+  }
 }
 
 // Location popover transitions

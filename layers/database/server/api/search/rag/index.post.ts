@@ -6,13 +6,15 @@ const ragSearchSchema = z.object({
   lat: z.coerce.number().optional(),
   lon: z.coerce.number().optional(),
   radius: z.coerce.number().optional().default(40),
+  page: z.coerce.number().min(1).optional().default(1),
+  limit: z.coerce.number().min(1).max(100).optional().default(20),
 });
 
 export default defineEventHandler(async (event) => {
   try {
     checkAiConfiguration();
 
-    const { query, lat, lon, radius } = await readValidatedBody(event, ragSearchSchema.parse);
+    const { query, lat, lon, radius, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
 
     const { propertyIds, locationContext } = await handleLocationFilter(lat, lon, radius);
 
@@ -28,15 +30,20 @@ export default defineEventHandler(async (event) => {
         locationContext,
         count: 0,
         searchType: "rag_sql",
+        totalPages: 0,
+        currentPage: page,
+        totalResults: 0,
       };
     }
 
-    const listings = await fetchListings(whereClause);
+    const { listings, totalCount } = await fetchPaginatedListings(whereClause, page, limit);
 
     const resultsWithListingType = listings.map((listing) => ({
       ...listing,
       listingType: listing.rentalListing ? "rent" : "buy",
     }));
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     return {
       results: resultsWithListingType,
@@ -46,6 +53,9 @@ export default defineEventHandler(async (event) => {
       locationContext,
       count: listings.length,
       searchType: "rag_sql",
+      totalPages,
+      currentPage: page,
+      totalResults: totalCount,
     };
   } catch (error: any) {
     console.error("Error performing RAG search:", error);

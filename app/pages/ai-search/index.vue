@@ -21,8 +21,8 @@
       </h1>
 
       <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched" :initial-query="lastSearchQuery"
-        :initial-location="lastLocation" :initial-radius="lastRadius" @update:collapsed="isSearchFormCollapsed = $event"
-        @sort="handleSort" />
+        :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSearched"
+        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="resetForm" />
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
@@ -37,7 +37,9 @@
       </div>
     </div>
     <div v-else class="results-container">
-      <OrganismsAiSearchResults v-if="hasResults" :results="sortedResults" :query-analysis="queryAnalysis" />
+      <OrganismsAiSearchResults v-if="hasResults" :results="sortedResults" :query-analysis="queryAnalysis" 
+        :current-page="currentPage" :total-pages="totalPages" :total-results="totalResults"
+        @page-change="handlePageChange" />
     </div>
   </div>
 </template>
@@ -50,21 +52,34 @@ interface SearchPayload {
   query: string;
 }
 
-const { aiSearch } = useAi();
+// Use composables for state management
+const {
+  // State
+  searchResults,
+  queryAnalysis,
+  isSearching,
+  hasSearched,
+  searchError,
+  lastSearchQuery,
+  lastLocation,
+  lastRadius,
+  isSearchFormCollapsed,
+  currentSort,
+  currentPage,
+  totalPages,
+  totalResults,
+  lastWhereClause,
+  lastLocationContext,
+  
+  // Methods
+  initializeFromSavedState,
+  resetForm,
+  saveCurrentState,
+  aiSearch,
+  paginateSearch
+} = useAiSearchPage();
 
-// State
-const searchResults = ref<ListingWithFullProperty[] | null>(null);
-const queryAnalysis = ref<QueryAnalysis | null>(null);
-const isSearching = ref(false);
-const hasSearched = ref(false);
-const searchError = ref<string | null>(null);
-const lastSearchQuery = ref("");
-const lastLocation = ref<GeocodingFeature | null>(null);
-const lastRadius = ref<number>(0);
-const isSearchFormCollapsed = ref(true);
-const currentSort = ref('relevance');
-
-// Computed properties
+// Computed properties (belong in template, not composable)
 const shouldShowFeedback = computed(() =>
   isSearching.value || (hasSearched.value && (!searchResults.value || searchResults.value.length === 0)) || searchError.value
 );
@@ -79,23 +94,64 @@ const hasResults = computed(() =>
 
 const sortedResults = computed(() => {
   if (!searchResults.value) return [];
-
-  const listings = [...searchResults.value];
-  const sortFunctions = {
-    'price-asc': (a: ListingWithFullProperty, b: ListingWithFullProperty) => (a.price || 0) - (b.price || 0),
-    'price-desc': (a: ListingWithFullProperty, b: ListingWithFullProperty) => (b.price || 0) - (a.price || 0),
-    'date-asc': (a: ListingWithFullProperty, b: ListingWithFullProperty) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    'date-desc': (a: ListingWithFullProperty, b: ListingWithFullProperty) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    'relevance': () => 0
-  };
-
-  const sortFn = sortFunctions[currentSort.value as keyof typeof sortFunctions];
-  return sortFn ? listings.sort(sortFn) : listings;
+  return applySortToResults(searchResults.value, currentSort.value);
 });
 
+// Import utility functions
+import { scrollToTop } from '~/utils/navigation';
+import { applySortToResults } from '~/utils/searchSort';
 
+// Initialize state on mount
+onMounted(() => {
+  initializeFromSavedState();
+});
+
+// Handle sort changes
 const handleSort = (sortBy: string) => {
   currentSort.value = sortBy;
+  saveCurrentState();
+};
+
+const handlePageChange = async (page: number) => {
+  if (page === currentPage.value || page < 1 || page > totalPages.value) return;
+  
+  // Scroll to top immediately
+  scrollToTop();
+  
+  // Use cached WHERE clause for faster pagination
+  if (lastWhereClause.value) {
+    try {
+      const response = await paginateSearch(
+        lastWhereClause.value,
+        page,
+        20,
+        lastSearchQuery.value,
+        queryAnalysis.value,
+        lastLocationContext.value
+      );
+      
+      searchResults.value = response.results;
+      currentPage.value = response.currentPage;
+      totalPages.value = response.totalPages;
+      totalResults.value = response.totalResults;
+      
+      // Apply current sort order to results
+      searchResults.value = applySortToResults(searchResults.value, currentSort.value);
+      
+      // Save current state
+      saveCurrentState();
+      
+    } catch (error: any) {
+      searchError.value = error.message || "An unexpected error occurred.";
+    }
+  } else {
+    // Fallback to full search if WHERE clause not available
+    await handleSearch({
+      location: lastLocation.value!,
+      radius: lastRadius.value,
+      query: lastSearchQuery.value
+    }, page);
+  }
 };
 
 // Disable body scroll when form is expanded and there are results
@@ -114,19 +170,22 @@ onUnmounted(() => {
   document.body.style.overflow = '';
 });
 
-const handleSearch = async (payload: SearchPayload) => {
+const handleSearch = async (payload: SearchPayload, page: number = 1) => {
   // Reset state
   isSearchFormCollapsed.value = true;
   hasSearched.value = true;
   isSearching.value = true;
   searchError.value = null;
-  searchResults.value = null;
-  queryAnalysis.value = null;
+  if (page === 1) {
+    searchResults.value = null;
+    queryAnalysis.value = null;
+  }
 
   // Store search parameters
   lastSearchQuery.value = payload.query;
   lastLocation.value = payload.location;
   lastRadius.value = payload.radius;
+  currentPage.value = page;
 
   // Scroll to feedback section
   await nextTick(() => {
@@ -137,9 +196,25 @@ const handleSearch = async (payload: SearchPayload) => {
   });
 
   try {
-    const response = await aiSearch(payload.location, payload.radius, payload.query);
+    const response = await aiSearch(payload.location, payload.radius, payload.query, page);
     searchResults.value = response.results;
     queryAnalysis.value = response.queryAnalysis;
+    
+    // Use pagination info from backend
+    totalResults.value = response.totalResults;
+    totalPages.value = response.totalPages;
+    currentPage.value = response.currentPage;
+    
+    // Cache WHERE clause and context for efficient pagination
+    lastWhereClause.value = response.generatedWhereClause;
+    lastLocationContext.value = response.locationContext;
+    
+    // Apply current sort order to results
+    searchResults.value = applySortToResults(searchResults.value, currentSort.value);
+    
+    // Save current state
+    saveCurrentState();
+    
   } catch (error: any) {
     searchError.value = error.message || "An unexpected error occurred.";
   } finally {
@@ -159,6 +234,29 @@ const handleSearch = async (payload: SearchPayload) => {
     opacity: 0.7;
   }
 
+}
+
+// Common margin adjustments for fixed search bar
+.results-container,
+.search-feedback-wrapper {
+  margin-top: calc(var(--header-height) + 80px);
+  
+  @media (max-width: 768px) and (min-width: 600px) {
+    margin-top: calc(var(--header-height) + 120px);
+  }
+  
+  @media (max-width: 600px) {
+    margin-top: calc(var(--header-height) + 140px);
+  }
+}
+
+// Search feedback wrapper specifics
+.search-feedback-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: var(--size-24) 0;
 }
 
 // Hero section
@@ -194,8 +292,10 @@ const handleSearch = async (payload: SearchPayload) => {
 
 .search-header-container {
   &.is-sticky {
-    position: sticky;
-    top: var(--header-height);
+    position: fixed;
+    top: calc(var(--header-height) + var(--size-16));
+    left: 0;
+    right: 0;
     z-index: 20;
     margin-bottom: var(--size-24);
     background: var(--background-color);
@@ -217,25 +317,14 @@ const handleSearch = async (payload: SearchPayload) => {
   text-align: center;
   color: var(--monochrome-900);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  margin: 0;
+  margin: var(--size-40) 0 var(--size-40) 0;
   line-height: var(--lineheight-md);
-  margin-top: var(--size-24);
 }
 
 .viri-ai-text {
   color: var(--secondary-400);
   font-weight: var(--font-bold);
   border-radius: var(--border-radius-lg);
-}
-
-
-// Search feedback wrapper - centers the entire section on the page
-.search-feedback-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  padding: var(--size-24) 0;
 }
 
 // Search feedback section
