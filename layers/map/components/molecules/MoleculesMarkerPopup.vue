@@ -1,75 +1,82 @@
 <template>
-  <div class="marker-popup" @click.stop>
-    <!-- Property image -->
-    <div v-if="hasImage" class="marker-popup-image-container">
-      <img class="marker-popup-image" :src="marker.image?.[0]?.image"
-        :alt="marker.image?.[0]?.metadata || marker.title || 'Property image'" @click.stop />
-    </div>
-
-    <!-- Title -->
-    <strong v-if="marker.title" class="marker-popup-title">{{ marker.title }}</strong>
-
-    <!-- Address -->
-    <div v-if="addressParts.length > 0" class="marker-popup-address">
-      {{ addressParts.join(', ') }}
-    </div>
-
-    <!-- Info container: price & details -->
-    <div class="marker-popup-info-container">
-      <!-- Price column -->
-      <div class="marker-popup-price-column">
-        <div v-if="marker.price !== null && marker.price !== undefined" class="marker-popup-price">
-          £{{ marker.price.toLocaleString() }}
-        </div>
-        <div v-if="marker.priceType" class="marker-popup-price-type">
-          {{ priceTypeFormatted }}
+  <div class="popup-wrapper">
+    <div class="m-listing-card-map" :data-tier="isFeatured ? 'featured' : null" @click.stop>
+      <div v-if="isFeatured" class="m-listing-card-map-featured-banner | body-sm font-bold">
+        Featured
+      </div>
+      <!-- Single image (no carousel) -->
+      <div class="m-listing-card-map-image-container">
+        <nuxt-img v-if="hasImage" :src="marker.image?.[0]?.image" alt="Listing image"
+          class="m-listing-card-map-image" />
+        <div class="m-listing-card-map-image-overlay">
+          <div class="m-listing-card-map-image-actions">
+            <button class="m-listing-card-map-icon-button" :class="{ 'is-active': marker.isFavorite }"
+              @click="toggleFavourite">
+              <AtomsIcon name="heart" icon="cards/favourite" class="icon-heart" />
+            </button>
+            <button class="m-listing-card-map-icon-button" :class="{ 'is-active': marker.hasNote }"
+              @click="onNoteClick">
+              <AtomsIcon name="edit" icon="cards/notes" class="icon-edit" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Details column -->
-      <div class="marker-popup-details-column">
-        <div v-if="typeText" class="marker-popup-property-type">{{ typeText }}</div>
-        <div v-if="hasBedrooms || hasBathrooms" class="marker-popup-features">
-          <span v-if="hasBedrooms" class="marker-popup-bedrooms">
-            {{ marker.bedrooms }} bed{{ marker.bedrooms !== 1 ? 's' : '' }}
-          </span>
-          <span v-if="hasBedrooms && hasBathrooms"> • </span>
-          <span v-if="hasBathrooms" class="marker-popup-bathrooms">
-            {{ marker.bathrooms }} bath{{ marker.bathrooms !== 1 ? 's' : '' }}
-          </span>
+      <div class="m-listing-card-map-content">
+        <div class="m-listing-card-map-details">
+          <!-- Header row with price (no price type) -->
+          <div class="m-listing-card-map-header-row m-listing-card-map-price-group">
+            <div class="m-listing-card-map-price">
+              <span class="m-listing-card-map-price-amount | title-md">
+                {{ formattedPrice }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Property type and classification -->
+          <div v-if="typeText" class="m-listing-card-map-subtitle | title-xs">
+            {{ typeText }}
+          </div>
+
+          <!-- Features (only bedrooms and bathrooms) -->
+          <div v-if="hasBedrooms || hasBathrooms" class="m-listing-card-map-features">
+            <div v-if="hasBedrooms" class="m-listing-card-map-feature">
+              <AtomsIcon name="bedrooms" icon="property/bedrooms" class="icon" />
+              <p class="| body-sm">{{ marker.bedrooms }}</p>
+            </div>
+            <div v-if="hasBathrooms" class="m-listing-card-map-feature">
+              <AtomsIcon name="bathrooms" icon="property/bathrooms" class="icon" />
+              <p class="| body-sm">{{ marker.bathrooms }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-listing-card-map-footer">
+          <!-- Only view button (no enquiry) -->
+          <div class="m-listing-card-map-actions">
+            <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-secondary body-sm">
+              View
+            </nuxt-link>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Action buttons -->
-    <div v-if="listingId !== null" class="marker-popup-actions" @click.stop>
-      <NuxtLink :to="`/listing/${listingId}`" class="marker-popup-view-link" @click.stop>
-        View Listing
-      </NuxtLink>
-
-      <!-- Notes button -->
-      <div class="marker-popup-notes-button-container">
-        <button type="button" role="switch" aria-label="Add/Edit Notes" class="marker-popup-notes-button note-button"
-          :class="{ 'has-note': marker.hasNote }" @click.stop="onNoteClick">
-          <AtomsIcon icon="cards/notes" class="note-button-icon" />
-        </button>
-      </div>
-
-      <!-- Favorite button -->
-      <AtomsFavouriteButton :listing-id="listingId" class="marker-popup-favorite-button" @click.stop />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { MapMarker } from '~~/shared/types/map';
-import { useNotes } from '~/composables/useNotes';
+import { ListingTier } from '@prisma/client';
 
 const props = defineProps<{
   marker: MapMarker;
 }>();
 
 // Computed properties
+
+const formattedPrice = computed(() => {
+  return `£${parseInt(String(props.marker.price)).toLocaleString()}`;
+});
+
 const hasBedrooms = computed(() =>
   props.marker.bedrooms !== null && props.marker.bedrooms !== undefined
 );
@@ -79,239 +86,289 @@ const hasBathrooms = computed(() =>
 const listingId = computed(() =>
   typeof props.marker.id === "number" ? props.marker.id : null
 );
-const addressParts = computed(() =>
-  props.marker.address ?
-    [props.marker.address.street, props.marker.address.city, props.marker.address.postcode].filter(Boolean) :
-    []
-);
+
 const typeText = computed(() =>
   [props.marker.propertyType, props.marker.classification].filter(Boolean).join(" - ")
-);
-const priceTypeFormatted = computed(() =>
-  props.marker.priceType ? props.marker.priceType.replace(/_/g, " ").toLowerCase() : ''
 );
 const hasImage = computed(() =>
   props.marker.image &&
   props.marker.image[0] &&
   props.marker.image[0].image
 );
+const isFeatured = computed(() => {
+  return props.marker.tier === ListingTier.FEATURED;
+});
 
 // Event handlers
 const { showNoteDialog } = useNotes();
 const onNoteClick = () => {
-  console.log("Note button clicked for marker:", props.marker.id);
   if (props.marker.id as number) {
     showNoteDialog(props.marker.id as number);
   }
 };
+
+const toggleFavourite = () => {
+  // Add favourite toggle logic here
+  console.log("Toggle favourite for:", props.marker.id);
+};
 </script>
 
-<style scoped>
-/* Override MapTiler popup styles */
-:global(.maplibregl-popup-content) {
+<style lang="scss">
+/* Style MapLibre popup to work with our design */
+.maplibregl-popup-content {
+  background: transparent !important;
+  width: 280px !important;
+  /* Match card width */
+  max-width: 280px !important;
+  /* Match card max-width */
+  min-width: 280px !important;
+  /* Ensure consistent width */
+  padding: 0 !important;
+  /* Remove default padding */
+  margin: 0 !important;
+  /* Remove default margin */
+  border: none !important;
+  /* Remove default border */
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  pointer-events: auto !important;
+}
+
+/* Style MapLibre's popup tip for all anchor positions */
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--secondary-400) !important;
+}
+
+/* Hide diagonal anchor tips to force MapLibre to use straight anchors */
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  display: none !important;
+}
+
+.maplibregl-popup-close-button {
+  display: none !important;
+}
+
+/* Target the popup element directly to override inline styles */
+.maplibregl-popup[style] {
+  max-width: none !important;
+}
+
+.maplibregl-popup-content[style] {
+  max-width: 280px !important;
+  width: 280px !important;
+}
+
+.popup-wrapper {
+  position: relative;
+  background: transparent;
   padding: 0;
-  background: none;
-  border-radius: 0;
+  margin: 0;
+  border: none;
   box-shadow: none;
 }
 
-:global(.maplibregl-popup-tip) {
-  display: none;
-}
+.m-listing-card-map {
+  --card-padding: var(--size-12);
+  --image-height: 140px;
 
-/* Main popup styles */
-.marker-popup {
-  padding: 0;
-  max-width: 250px !important; /* Reduced width */
-  font-family: var(--font-family, system-ui, sans-serif);
-  border-radius: var(--border-radius-md, 8px);
-  overflow: hidden;
-  width: 250px !important; /* Reduced width */
-  background-color: var(--background-100);
-  color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.marker-popup-image-container {
-  width: 100%;
-  height: 140px; /* Reduced height */
-  overflow: hidden;
-  position: relative;
-}
-
-.marker-popup-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.marker-popup-image:hover {
-  transform: scale(1.05);
-}
-
-.marker-popup-title {
-  font-size: 14px; /* Reduced font size */
-  font-weight: 600;
-  display: block;
-  margin-bottom: 4px; /* Reduced margin */
-  color: var(--text-primary);
-  padding: 10px 10px 0; /* Reduced padding */
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.marker-popup-address {
-  font-size: 11px; /* Reduced font size */
-  margin-bottom: 8px; /* Reduced margin */
-  color: var(--text-secondary);
-  font-style: italic;
-  padding: 0 10px; /* Reduced padding */
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.marker-popup-info-container {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px; /* Reduced padding */
-  margin: 6px 0; /* Reduced margin */
-  gap: 8px; /* Reduced gap */
-}
-
-.marker-popup-price-column {
-  flex: 1;
-}
-
-.marker-popup-details-column {
-  flex: 2;
+  background-color: var(--background-200);
+  border: var(--size-4) solid var(--secondary-400);
+  border-radius: calc(var(--border-radius-2xl) + var(--size-2));
   display: flex;
   flex-direction: column;
-  justify-content: center;
-}
-
-.marker-popup-price {
-  font-size: 16px; /* Reduced font size */
-  font-weight: 700;
-  color: var(--secondary-500);
-  margin-bottom: 0;
-}
-
-.marker-popup-price-type {
-  font-size: 10px; /* Reduced font size */
-  color: var(--text-secondary);
-  text-transform: capitalize;
-}
-
-.marker-popup-property-type {
-  font-size: 12px; /* Reduced font size */
-  margin-bottom: 2px; /* Reduced margin */
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.marker-popup-features {
-  font-size: 11px; /* Reduced font size */
-  color: var(--text-secondary);
-  margin-bottom: 0;
-}
-
-.marker-popup-actions {
-  display: flex;
-  gap: 6px; /* Reduced gap */
-  margin: 8px 0 0; /* Reduced margin */
-  padding: 0 10px 10px; /* Reduced padding */
-}
-
-.marker-popup-view-link {
-  display: block;
-  padding: 6px 10px; /* Reduced padding */
-  background-color: var(--secondary-500);
-  color: white;
-  text-decoration: none;
-  border-radius: var(--border-radius-sm, 4px);
-  text-align: center;
-  font-size: 12px; /* Reduced font size */
-  font-weight: 500;
-  transition: all 0.2s;
-  flex-grow: 1;
-}
-
-.marker-popup-view-link:hover {
-  background-color: var(--secondary-600);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
-}
-
-.marker-popup-notes-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px; /* Reduced size */
-  height: 30px; /* Reduced size */
-  background-color: var(--background-200);
-  border: none;
-  border-radius: var(--border-radius-sm, 4px);
-  cursor: pointer;
-  transition: all 0.2s;
+  max-width: 280px;
+  width: 280px;
   position: relative;
-}
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin: 0;
+  padding: 0;
 
-.marker-popup-notes-button:hover {
-  background-color: var(--background-300);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
-}
 
-/* Selected state for favorites button */
-.marker-popup-favorite-button.selected {
-  background-color: var(--pink-100);
-}
+  &[data-tier='featured'] {
+    border-color: var(--secondary-400);
+    border-width: var(--size-4);
+    padding: 0;
 
-.marker-popup-favorite-button.selected svg {
-  fill: var(--pink-500);
-  color: var(--pink-500);
-}
+    .m-listing-card-map-image-container {
+      border-radius: calc(var(--border-radius-2xl) - var(--size-1));
+    }
 
-.marker-popup-button-icon,
-.note-button-icon {
-  width: 16px; /* Reduced size */
-  height: 16px; /* Reduced size */
-  color: var(--text-secondary);
-}
+    .m-listing-card-map-content {
+      padding: var(--card-padding);
+    }
 
-/* Note button styles */
-.note-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .m-listing-card-map-featured-banner {
+      background-color: var(--secondary-400);
+      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 var(--border-radius-lg) 0;
+      color: var(--monochrome-900);
+      padding: var(--size-6) var(--size-16);
+      position: absolute;
+      top: 0;
+      left: -2px;
+      z-index: 3;
+    }
+  }
 
-/* Has note styling */
-.marker-popup-notes-button.has-note {
-  background-color: var(--background-200);
-}
+  .m-listing-card-map-image-container {
+    border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
+    overflow: hidden;
+    position: relative;
+    height: var(--image-height);
+    z-index: 1;
+    margin: 0;
+  }
 
-.marker-popup-notes-button.has-note svg {
-  color: var(--secondary-600);
-}
+  .m-listing-card-map-image {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
 
-/* Has note animation (same as original component) */
-.marker-popup-notes-button.has-note .note-button-confetti {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-}
+  .m-listing-card-map-image-overlay {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+  }
 
-.marker-popup-notes-button-container,
-.marker-popup-favorite-button-container {
-  position: relative;
+  .m-listing-card-map-image-actions {
+    background-color: var(--secondary-400);
+    border-radius: var(--border-radius-pill);
+    display: flex;
+    gap: var(--size-4);
+    padding: var(--size-4) var(--size-8);
+    position: absolute;
+    top: var(--size-12);
+    right: var(--size-12);
+  }
+
+  .m-listing-card-map-icon-button {
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    color: var(--monochrome-100);
+    cursor: pointer;
+    display: flex;
+    font-size: var(--font-lg);
+    height: var(--size-24);
+    justify-content: center;
+    width: var(--size-24);
+    transition: color 0.2s ease-in-out;
+
+    .icon {
+      transition: fill 0.2s ease-in-out, color 0.2s ease-in-out;
+    }
+
+    .icon-heart {
+      fill: transparent;
+    }
+
+    &.is-active {
+
+      .icon-heart,
+      .icon-edit {
+        color: var(--monochrome-900);
+      }
+
+      .icon-heart {
+        fill: var(--monochrome-900);
+      }
+    }
+  }
+
+  .m-listing-card-map-content {
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--card-padding);
+    flex: 1;
+  }
+
+  .m-listing-card-map-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .m-listing-card-map-price-group {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .m-listing-card-map-price-amount {
+    color: var(--secondary-500);
+  }
+
+  .m-listing-card-map-type-indicator {
+    min-width: 40px;
+    text-align: center;
+    background-color: var(--background-300);
+    padding: var(--size-4) var(--size-8);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .m-listing-card-map-title {
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .m-listing-card-map-subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .m-listing-card-map-features {
+    display: flex;
+    gap: var(--size-8);
+    list-style: none;
+    margin-bottom: var(--size-12);
+    padding: 0;
+  }
+
+  .m-listing-card-map-feature {
+    align-items: center;
+    display: flex;
+    font-weight: var(--font-semibold);
+    gap: var(--size-4);
+
+    .icon {
+      font-size: var(--font-lg);
+      color: var(--text-secondary);
+    }
+  }
+
+  .m-listing-card-map-actions {
+    width: 100%;
+
+    .button {
+      width: 100%;
+      padding: var(--size-8);
+      border-radius: var(--border-radius-lg);
+      border-color: var(--secondary-400);
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+  }
 }
 </style>

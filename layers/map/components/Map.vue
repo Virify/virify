@@ -213,6 +213,7 @@ function formatMarker(listing: ListingCardType) {
     image: listing.property?.media ?? [],
     isFavorite: isFavourite(listing.id),
     hasNote: hasNote(listing.id),
+    tier: listing.listingTier,
   };
 }
 

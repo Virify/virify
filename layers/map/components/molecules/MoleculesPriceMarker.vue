@@ -55,6 +55,8 @@ const priceDisplay = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Ensure the bottom of the container is the precise anchor point */
+  transform-origin: center bottom;
 }
 
 .marker-shape {

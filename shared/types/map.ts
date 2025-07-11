@@ -1,4 +1,5 @@
 import type { Map as MaptilerMap, Marker } from "@maptiler/sdk";
+import type { ListingTier } from "@prisma/client";
 
 /**
  * Map marker type for use with MapTiler maps
@@ -22,6 +23,7 @@ export type MapMarker = {
   image?: any[]; // TODO: Define a proper image type
   hasNote?: boolean;
   isFavorite?: boolean;
+  tier: ListingTier; // Use string literals for tier
 };
 
 /**

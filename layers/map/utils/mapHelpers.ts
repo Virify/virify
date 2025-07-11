@@ -181,7 +181,19 @@ export function renderPopup(marker: MapMarker, vueApp?: any): any {
   const popupNode = createVNode(PopupComp);
   if (vueApp) popupNode.appContext = vueApp.vueApp._context;
   render(popupNode, popupWrapper);
-  return new sdk.Popup({ offset: 25 }).setDOMContent(popupWrapper);
+  
+  const popup = new sdk.Popup({ 
+    closeButton: false,
+    closeOnClick: true,
+    offset: {
+      'top': [0, 0],
+      'bottom': [0, 0],
+      'left': [0, 0],
+      'right': [0, 0]
+    }
+  }).setDOMContent(popupWrapper);
+
+  return popup;
 }
 
 /**
