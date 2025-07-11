@@ -3,7 +3,10 @@
 
     <!-- Preview query -->
     <button class="m-search-form-collapsed__summary | button-none font-semibold" @click.prevent="openForm">
-      <span v-for="option in query" :key="option.text" :class="`segment--${option.type}`">{{ option.text }}</span>
+      <span v-for="option in query" :key="option.text" :class="{
+        '| secondary-400': option.type === 'used',
+        '| grey-500 line-through': option.type === 'ignored'
+      }">{{ option.text }}</span>
 
       <span v-if="queryLocation" class="m-search-form-collapsed__summary-location | faded-text">
         <template v-if="!!queryRadius">Within {{ queryRadius }} miles of</template>
