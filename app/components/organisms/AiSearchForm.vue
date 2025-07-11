@@ -6,7 +6,7 @@
   }">
 
     <!-- Collapsed State Content -->
-    <MoleculesSearchFormCollapsed v-show="isCollapsed" :query="segments"
+    <MoleculesAiSearchFormCollapsed v-show="isCollapsed" :query="segments"
       :query-location="selectedLocation?.place_name_en" :query-radius="selectedRadius" v-model:sort-order="sortOrder"
       v-model:search-radius="selectedRadius" @update-search-radius="submitSearch" @update-sort-order="updateSortOrder"
       @expand-form="isCollapsed = false" />

@@ -2,7 +2,7 @@
   <div class="m-search-form-collapsed | flex">
 
     <!-- Preview query -->
-    <button class="m-search-form-collapsed__summary | button-none font-semibold" @click.prevent="openForm">
+    <AtomsButtonUnstyled class="m-search-form-collapsed__summary | font-semibold" @click.prevent="openForm">
       <span v-for="option in query" :key="option.text" :class="{
         '| secondary-400': option.type === 'used',
         '| grey-500 line-through': option.type === 'ignored'
@@ -12,7 +12,7 @@
         <template v-if="!!queryRadius">Within {{ queryRadius }} miles of</template>
         {{ queryLocation }}
       </span>
-    </button>
+    </AtomsButtonUnstyled>
 
     <!-- Update radius -->
     <AtomsSelect id="radius-quick" v-model="searchRadius" :options="selectOptionRadius" aria-label="Search radius"
