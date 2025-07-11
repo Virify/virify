@@ -8,7 +8,8 @@
     <!-- Collapsed State Content -->
     <MoleculesSearchFormCollapsed v-show="isCollapsed" :query="segments"
       :query-location="selectedLocation?.place_name_en" :query-radius="selectedRadius" v-model:sort-order="sortOrder"
-      :sort-options="sortOptions" @update-sort-order="updateSortOrder" @expand-form="isCollapsed = false" />
+      v-model:search-radius="selectedRadius" :radius-options="radiusOptions" :sort-options="sortOptions"
+      @update-search-radius="submitSearch" @update-sort-order="updateSortOrder" @expand-form="isCollapsed = false" />
 
     <!-- Expanded State Content -->
     <div v-show="!isCollapsed" class="expanded-content">
@@ -98,7 +99,7 @@ const $form = templateRef<HTMLElement>("$form");
 // Location state
 const selectedLocation = ref<GeocodingFeature | null>(null);
 const locationQuery = ref("");
-const selectedRadius = ref(0);
+const selectedRadius = ref(props.initialRadius || 0);
 
 // Options data
 const radiusOptions = [
@@ -140,7 +141,6 @@ const initializeFromProps = () => {
     selectedLocation.value = props.initialLocation;
     locationQuery.value = props.initialLocation.place_name_en;
   }
-  if (props.initialRadius) selectedRadius.value = props.initialRadius;
 };
 
 onMounted(() => {
@@ -156,12 +156,6 @@ watch(() => props.initialLocation, (newLocation) => {
   if (newLocation) {
     selectedLocation.value = newLocation;
     locationQuery.value = newLocation.place_name_en;
-  }
-});
-
-watch(() => props.initialRadius, (newRadius) => {
-  if (newRadius !== null && newRadius !== undefined) {
-    selectedRadius.value = newRadius;
   }
 });
 

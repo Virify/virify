@@ -11,6 +11,10 @@
       </span>
     </button>
 
+    <!-- Update radius -->
+    <AtomsSelect id="radius-quick" v-model="searchRadius" :options="radiusOptions" aria-label="Search radius"
+      class="radius-select" @click.stop @change="updateSearchRadius" />
+
     <!-- Sorting -->
     <AtomsSelect id="sort-by" v-model="sortOrder" :options="sortOptions" aria-label="Sort results by"
       class="sort-select" @change="updateSortOrder" />
@@ -28,6 +32,7 @@ interface Props {
   queryLocation?: string
   queryRadius?: number
   sortOptions?: { key: string, value: string }[]
+  radiusOptions?: { key: string, value: number }[]
 }
 
 defineProps<Props>()
@@ -35,7 +40,7 @@ defineProps<Props>()
 /**
  *  Emits
  */
-const emits = defineEmits(['expand-form', 'update-sort-order'])
+const emits = defineEmits(['expand-form', 'update-sort-order', 'update-search-radius'])
 
 /**
  *  Toggle form open/closed
@@ -46,11 +51,16 @@ function openForm() {
 }
 
 /**
- *  Search radius
+ *  Sort order, search radius
  */
 const sortOrder = defineModel('sortOrder')
+const searchRadius = defineModel('searchRadius')
 
 function updateSortOrder() {
   emits('update-sort-order')
+}
+
+function updateSearchRadius() {
+  emits('update-search-radius')
 }
 </script>
