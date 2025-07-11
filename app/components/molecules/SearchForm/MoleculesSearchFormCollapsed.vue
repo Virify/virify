@@ -1,9 +1,5 @@
 <template>
-  <div class="m-search-form-collapsed">
-    <!-- Mobile expand button -->
-    <AtomsButton @click.prevent="openForm" type="button" class="| button button-ghost">
-      <AtomsIcon name="arrow-down" icon="expand" />
-    </AtomsButton>
+  <div class="m-search-form-collapsed | flex">
 
     <!-- Preview query -->
     <button class="| body-sm button-none font-semibold" @click.prevent="openForm">
@@ -19,6 +15,11 @@
     <!-- Sorting -->
     <AtomsSelect id="sort-by" v-model="sortOrder" :options="sortOptions" aria-label="Sort results by"
       class="sort-select" @change="updateSortOrder" />
+
+    <!-- Mobile expand button -->
+    <AtomsButton @click.prevent="openForm" type="button" class="| button button-ghost">
+      <AtomsIcon name="arrow-down" icon="expand" />
+    </AtomsButton>
   </div>
 </template>
 
