@@ -135,6 +135,9 @@ const initializeFromProps = () => {
     selectedLocation.value = props.initialLocation;
     locationQuery.value = props.initialLocation.place_name_en;
   }
+  if (props.initialRadius !== null && props.initialRadius !== undefined) {
+    selectedRadius.value = props.initialRadius;
+  }
 };
 
 onMounted(() => {
@@ -150,6 +153,12 @@ watch(() => props.initialLocation, (newLocation) => {
   if (newLocation) {
     selectedLocation.value = newLocation;
     locationQuery.value = newLocation.place_name_en;
+  }
+});
+
+watch(() => props.initialRadius, (newRadius) => {
+  if (newRadius !== null && newRadius !== undefined) {
+    selectedRadius.value = newRadius;
   }
 });
 

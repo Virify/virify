@@ -16,7 +16,7 @@ export default function useAi() {
    * @param limit The number of results per page (optional, defaults to 20)
    * @returns The search results
    */
-  async function aiSearch(location: GeocodingFeature, radius: number, query: string, page: number = 1, limit: number = 20) {
+  async function aiSearch(location: GeocodingFeature, radius: number, query: string, page?: number, limit?: number) {
     searchQuery.value = query; // Update state for analysis function
     const response = await $fetch<AISearchResponse>("/api/search/rag/", {
       method: "POST",
@@ -25,8 +25,6 @@ export default function useAi() {
         lat: location.geometry.coordinates[1],
         lon: location.geometry.coordinates[0],
         radius: radius,
-        page: page,
-        limit: limit,
       },
     });
 

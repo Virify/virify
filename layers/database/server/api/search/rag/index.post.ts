@@ -6,8 +6,8 @@ const ragSearchSchema = z.object({
   lat: z.coerce.number().optional(),
   lon: z.coerce.number().optional(),
   radius: z.coerce.number().optional().default(40),
-  page: z.coerce.number().min(1).optional().default(1),
-  limit: z.coerce.number().min(1).max(100).optional().default(20),
+  page: z.coerce.number().min(1).optional(),
+  limit: z.coerce.number().min(1).max(100).optional()
 });
 
 export default defineEventHandler(async (event) => {
@@ -36,14 +36,18 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    const { listings, totalCount } = await fetchPaginatedListings(whereClause, page, limit);
+    // Fetch listings with or without pagination
+    const shouldPaginate = page && limit;
+    const listings = shouldPaginate 
+      ? await fetchPaginatedListings(whereClause, page, limit)
+      : await fetchListings(whereClause);
 
     const resultsWithListingType = listings.map((listing) => ({
       ...listing,
       listingType: listing.rentalListing ? "rent" : "buy",
     }));
 
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalCount = resultsWithListingType.length;
 
     return {
       results: resultsWithListingType,
@@ -53,7 +57,6 @@ export default defineEventHandler(async (event) => {
       locationContext,
       count: listings.length,
       searchType: "rag_sql",
-      totalPages,
       currentPage: page,
       totalResults: totalCount,
     };

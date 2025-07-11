@@ -1,8 +1,8 @@
 <template>
   <div class="p-ai-search-results | container flow" v-if="results">
     <h2 class="results-title | title-md">
-      Found {{ totalResults }} results
-      <span v-if="totalPages > 1" class="body-sm"> (Page {{ currentPage }} of {{ totalPages }})</span>
+      Found {{ props.totalResults }} results
+      <span v-if="hasPagination" class="body-sm"> (Page {{ props.currentPage }} of {{ props.totalPages }})</span>
     </h2>
 
     <ul class="p-ai-search-results__list">
@@ -12,22 +12,22 @@
     </ul>
 
     <!-- Pagination -->
-    <div v-if="totalPages > 1" class="pagination | body-sm font-bold">
+    <div v-if="hasPagination" class="pagination | body-sm font-bold">
       <button 
-        @click="$emit('page-change', currentPage - 1)"
-        :disabled="currentPage === 1"
+        @click="$emit('page-change', props.currentPage - 1)"
+        :disabled="props.currentPage === 1"
         class="button button-ghost button-sm"
       >
         Previous
       </button>
       
       <span class="pagination-info">
-        Page {{ currentPage }} of {{ totalPages }}
+        Page {{ props.currentPage }} of {{ props.totalPages }}
       </span>
       
       <button 
-        @click="$emit('page-change', currentPage + 1)"
-        :disabled="currentPage === totalPages"
+        @click="$emit('page-change', props.currentPage + 1)"
+        :disabled="props.currentPage === props.totalPages"
         class="button button-secondary button-sm"
       >
         Next
@@ -37,17 +37,23 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = withDefaults(defineProps<{
   results: ListingWithFullProperty[];
   queryAnalysis: QueryAnalysis | null;
-  currentPage: number;
-  totalPages: number;
-  totalResults: number;
-}>();
+  currentPage?: number;
+  totalPages?: number;
+  totalResults?: number;
+}>(), {
+  currentPage: 1,
+  totalPages: 1,
+  totalResults: 0
+});
 
 defineEmits<{
   'page-change': [page: number];
 }>();
+
+const hasPagination = computed(() => props.totalPages > 1);
 </script>
 
 <style lang="scss">
@@ -59,6 +65,7 @@ defineEmits<{
     margin: 0;
     padding: 0;
     list-style: none;
+    margin-bottom: var(--size-40);
     
     @media (max-width: 768px) {
       grid-template-columns: 1fr;

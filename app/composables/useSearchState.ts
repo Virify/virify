@@ -8,8 +8,8 @@ interface SearchState {
   hasSearched: boolean
   results: ListingWithFullProperty[] | null
   queryAnalysis: QueryAnalysis | null
-  currentPage: number
-  totalPages: number
+  currentPage: number | null
+  totalPages: number | null
   totalResults: number
   whereClause: any
   locationContext: any
@@ -23,8 +23,8 @@ const defaultState: SearchState = {
   hasSearched: false,
   results: null,
   queryAnalysis: null,
-  currentPage: 1,
-  totalPages: 0,
+  currentPage: null,
+  totalPages: null,
   totalResults: 0,
   whereClause: null,
   locationContext: null

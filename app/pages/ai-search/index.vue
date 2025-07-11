@@ -238,10 +238,10 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
     searchResults.value = response.results;
     queryAnalysis.value = response.queryAnalysis;
     
-    // Use pagination info from backend
-    totalResults.value = response.totalResults;
-    totalPages.value = response.totalPages;
-    currentPage.value = response.currentPage;
+    // Use pagination info from backend (fallback to defaults if pagination removed)
+    totalResults.value = response.totalResults ?? searchResults.value?.length ?? 0;
+    totalPages.value = response.totalPages ?? 1;
+    currentPage.value = response.currentPage ?? 1;
     
     // Cache WHERE clause and context for efficient pagination
     lastWhereClause.value = response.generatedWhereClause;
