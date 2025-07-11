@@ -19,8 +19,8 @@
           <span class="| gradient-text gradient-text-ai">AI</span>
           do the rest
         </h1>
-        <button v-if="hasSearched" @click="isCollapsed = true" type="button" class="close-button">
-          ✕
+        <button v-if="hasSearched" @click="isCollapsed = true" type="button" class="close-button | button button-quiet">
+          <AtomsIcon icon="cross" title="Close" />
         </button>
       </div>
 
@@ -311,15 +311,14 @@ onClickOutside($form, () => {
   // Expanded state
   &.is-expanded {
     border-radius: var(--border-radius-3xl);
-    padding: var(--size-24);
     margin-bottom: var(--size-24);
     max-width: var(--container-width, 1200px);
+    padding: var(--size-36) var(--size-16) var(--size-16);
     margin-left: auto;
     margin-right: auto;
     max-height: 80vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding-right: var(--size-12);
 
     // Mobile: pin to navigation (remove margin)
     @media (max-width: 768px) {
@@ -453,22 +452,27 @@ onClickOutside($form, () => {
 
 .close-button {
   position: absolute;
-  top: -20px;
-  right: 10px;
-  width: var(--size-32);
-  height: var(--size-32);
+  top: calc(0px - var(--size-28));
+  right: calc(0px - var(--size-8));
+  width: var(--size-36);
+  height: var(--size-36);
   padding: 0;
-  background-color: var(--background-200);
-  color: var(--foreground-100);
-  cursor: pointer;
+  border-radius: var(--border-radius-pill);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: none;
 
-  @media(max-width: 660px) {
-    top: -15px;
+  svg {
+    width: var(--size-24);
+    height: var(--size-24);
+  }
+
+  @include mq.tablet {
+    top: calc(0px - var(--size-24));
+    right: calc(0px - var(--size-24));
+    width: var(--size-40);
+    height: var(--size-40);
   }
 }
 
