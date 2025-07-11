@@ -77,14 +77,12 @@
         </div>
 
         <!-- example prompts -->
-        <div class="form-footer">
-          <ul class="example-prompts">
-            <li v-for="prompt of examplePrompts">
-              <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
-                @click.prevent="addPrompt(prompt)" />
-            </li>
-          </ul>
-        </div>
+        <ul class="example-prompts">
+          <li v-for="prompt of examplePrompts">
+            <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
+              @click.prevent="addPrompt(prompt)" />
+          </li>
+        </ul>
 
         <AtomsButton v-if="hasSearched || hasSavedState" @click.prevent="handleReset" type="reset"
           class="| button button-xs button-delete button-full button-bordered">
@@ -460,19 +458,6 @@ onClickOutside($form, () => {
 
   @media(max-width: 660px) {
     top: -15px;
-  }
-}
-
-// Form footer
-.form-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--size-16);
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: var(--size-12);
   }
 }
 
