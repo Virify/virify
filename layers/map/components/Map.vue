@@ -138,6 +138,7 @@ watch(
 watch(
   [() => props.searchRadius, () => props.searchCenter, () => map.value],
   ([radius, center, mapInstance]) => {
+    
     if (!mapInstance) return;
     if (center) {
       updateSearchRadiusVisualization(mapInstance, center, Number(radius));

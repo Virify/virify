@@ -12,7 +12,7 @@
         :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
     </div>
 
-    <button type="submit" class="m-promptbox__button" aria-label="Submit" @click.prevent="$emit('submit', textarea)">
+    <button type="submit" class="m-promptbox__button" aria-label="Submit" :disabled="disabled" @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
     </button>
   </div>
@@ -24,7 +24,8 @@ const { getAnalyzedQuery, queryAnalysis } = useAi()
 const props = defineProps({
   id: String,
   placeholder: String,
-  label: { type: String, default: 'Enter your prompt here' }
+  label: { type: String, default: 'Enter your prompt here' },
+  disabled: { type: Boolean, default: false }
 })
 
 defineEmits<{
@@ -109,9 +110,15 @@ const textarea = defineModel({ default: '' })
   transition: background-color var(--animation-fast);
   flex: 0 0 auto;
 
-  &:hover {
+  &:hover:not(:disabled) {
     color: var(--monochrome-900);
     background: var(--secondary-400);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--monochrome-300);
   }
 
   svg {

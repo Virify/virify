@@ -1,11 +1,10 @@
 <template>
-  <button :class="{
-    'a-pill-button': true,
-    'a-pill-button--ghost': variant === 'ghost',
-    'a-pill-button--filled': variant === 'solid',
-    'a-pill-button--reversed': !!iconEnd
-  }" class="| body-xs">
-    {{ content }}
+  <button 
+    :class="buttonClasses"
+    :data-highlight="shouldHighlight"
+    class="body-xs"
+  >
+    <span v-html="contentFormatted"></span>
     <AtomsIcon v-if="icon" :icon aria-hidden />
   </button>
 </template>
@@ -18,11 +17,40 @@ interface Props {
   iconEnd?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   iconEnd: true
 })
 
+// More maintainable highlight terms
+const HIGHLIGHT_TERMS = [
+  'to buy', 'to rent', 'for sale', 'to let', 'for rent',
+] as const
 
+const shouldHighlight = computed(() => 
+  HIGHLIGHT_TERMS.some(term => 
+    props.content.toLowerCase().includes(term.toLowerCase())
+  )
+)
+
+const buttonClasses = computed(() => ({
+  'a-pill-button': true,
+  'a-pill-button--ghost': props.variant === 'ghost',
+  'a-pill-button--filled': props.variant === 'solid',
+  'a-pill-button--reversed': !!props.iconEnd
+}))
+
+const contentFormatted = computed(() => {
+  if (!shouldHighlight.value) return props.content
+  
+  const regex = new RegExp(
+    `(${HIGHLIGHT_TERMS.map(term => 
+      term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    ).join('|')})`, 
+    'gi'
+  )
+  
+  return props.content.replace(regex, '<mark>$1</mark>')
+})
 </script>
 
 <style lang="scss">
@@ -54,9 +82,14 @@ withDefaults(defineProps<Props>(), {
     color: var(--secondary-400);
   }
 
-  /**
-   *  Colour variants
-   */
+  // Use semantic mark element instead of span
+  mark {
+    background: transparent;
+    color: var(--secondary-400);
+    font-weight: 600;
+  }
+
+  // Variants
   &--filled {
     background: var(--secondary-400);
     border-color: var(--secondary-300);
@@ -79,9 +112,6 @@ withDefaults(defineProps<Props>(), {
     }
   }
 
-  /**
-   *  Ordering
-   */
   &--reversed {
     flex-direction: row-reverse;
   }

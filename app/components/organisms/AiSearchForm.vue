@@ -68,6 +68,8 @@
 <script setup lang="ts">
 import { onClickOutside, templateRef } from "@vueuse/core";
 
+const { geocodeAndSelectBest } = useMap();
+
 const props = defineProps<{
   initialQuery?: string;
   initialLocation?: GeocodingFeature | null;
@@ -92,6 +94,7 @@ const segments = computed(() => getAnalyzedQuery());
 const isCollapsed = ref(props.hasSearched);
 
 const popoverExpanded = ref(false);
+const locationError = ref("");
 const textareaId = useId();
 const $location = templateRef<HTMLElement>("$location");
 const $form = templateRef<HTMLElement>("$form");
@@ -100,6 +103,9 @@ const $form = templateRef<HTMLElement>("$form");
 const selectedLocation = ref<GeocodingFeature | null>(null);
 const locationQuery = ref("");
 const selectedRadius = ref(props.initialRadius || 0);
+
+// Form validation
+const isFormValid = computed(() => !!selectedLocation.value && !!searchQuery.value.trim());
 
 // Options data
 const radiusOptions = [
@@ -115,7 +121,7 @@ const radiusOptions = [
 ];
 
 const sortOptions = [
-  { value: "relevance", key: "Sort by Relevance" },
+  { value: "relevance", key: "Relevance" },
   { value: "price-asc", key: "Price: Low to High" },
   { value: "price-desc", key: "Price: High to Low" },
   { value: "date-desc", key: "Newest First" },
@@ -125,7 +131,7 @@ const sortOptions = [
 const examplePrompts = [
   "4 bedroom house with a garden for sale",
   "Studio flat with a balcony to rent",
-  "2+ bedroom property",
+  "2+ bedroom property to buy",
   "3 bedroom detached cottage with a downstairs bathroom for sale",
   "A large parcel of land",
   "3 bedroom house with a garden and a garage"
@@ -133,6 +139,14 @@ const examplePrompts = [
 
 // Watchers
 watch(isCollapsed, (value) => emit("update:collapsed", value));
+
+// Clear location error and reset selection when user types in location field
+watch(locationQuery, () => {
+  locationError.value = "";
+  if (selectedLocation.value && locationQuery.value !== selectedLocation.value.place_name_en) {
+    selectedLocation.value = null;
+  }
+});
 
 // Initialize with props
 const initializeFromProps = () => {
@@ -168,12 +182,58 @@ const addPrompt = (prompt: string) => {
 const handleLocation = (location: GeocodingFeature) => {
   selectedLocation.value = location;
   locationQuery.value = location.place_name_en;
+  locationError.value = ""; // Clear any location error
   hidePopover();
 };
 
-const submitSearch = () => {
-  if (!selectedLocation.value || !searchQuery.value.trim()) return;
+const handleLocationEnter = async () => {
+  console.log('[LOCATION ENTER] Pressed enter, locationQuery:', locationQuery.value);
+  console.log('[LOCATION ENTER] Current selectedLocation:', selectedLocation.value);
 
+  if (!selectedLocation.value && locationQuery.value.trim()) {
+    console.log('[LOCATION ENTER] Attempting fallback geocoding');
+    const geocodedLocation = await geocodeAndSelectBest(locationQuery.value);
+    if (geocodedLocation) {
+      console.log('[LOCATION ENTER] Geocoding successful:', geocodedLocation.place_name_en);
+      selectedLocation.value = geocodedLocation;
+      locationQuery.value = geocodedLocation.place_name_en;
+      locationError.value = "";
+      hidePopover();
+    } else {
+      console.log('[LOCATION ENTER] Geocoding failed');
+      locationError.value = `Could not find location "${locationQuery.value}". Please select from suggestions or try a different location.`;
+    }
+  }
+};
+
+const submitSearch = async () => {
+  console.log('[SUBMIT] Starting submit, searchQuery:', searchQuery.value);
+  console.log('[SUBMIT] selectedLocation:', selectedLocation.value);
+  console.log('[SUBMIT] locationQuery:', locationQuery.value);
+
+  if (!searchQuery.value.trim()) return;
+
+  // If no location is selected but we have a location query, try to geocode it
+  if (!selectedLocation.value && locationQuery.value.trim()) {
+    const geocodedLocation = await geocodeAndSelectBest(locationQuery.value);
+    if (geocodedLocation) {
+      selectedLocation.value = geocodedLocation;
+      locationError.value = ""; // Clear any previous error
+    } else {
+      // Could not geocode the location, show error and don't proceed
+      locationError.value = `Could not find location "${locationQuery.value}". Please select from suggestions or try a different location.`;
+      return;
+    }
+  }
+
+  // Ensure we have a location before submitting
+  if (!selectedLocation.value) {
+    locationError.value = "Please enter and select a location.";
+    return;
+  }
+
+  // Clear any previous error and submit
+  locationError.value = "";
   emit("submit-search", {
     location: selectedLocation.value,
     radius: selectedRadius.value,
@@ -189,6 +249,7 @@ const handleReset = () => {
   selectedLocation.value = null;
   selectedRadius.value = 0;
   locationQuery.value = "";
+  locationError.value = "";
 
   emit("reset");
 };

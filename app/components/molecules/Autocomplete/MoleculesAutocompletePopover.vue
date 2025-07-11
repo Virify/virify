@@ -41,7 +41,7 @@
     </template>
 
     <ClientOnly>
-      <template v-if="locationHistory.length">
+      <template v-if="showHistory">
         <h3 class="m-autocomplete-popover__title | title-3xs faded-text">History</h3>
 
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
@@ -89,6 +89,13 @@ const props = defineProps<Props>()
  */
 const { loggedIn } = useUserSession();
 const { entries, getEntries, clearEntries } = useSavedLocation();
+
+/**
+ * Show history only if there are no suggestions or the current input is in the suggestedLocations
+ */
+const showHistory = computed(() => {
+  return !locationSuggestions.value.length || locationSuggestions.value.some((option => option.place_name_en === props.searchValue));
+})
 
 watch(loggedIn, (isAuthenticated) => {
   if (isAuthenticated) {
@@ -160,11 +167,17 @@ watch(
   () => props.searchValue,
   async (newVal, oldVal) => {
     setPendingWhile(async () => {
+      // Reset suppressAutocomplete if user is typing new content
+      if (suppressAutocomplete.value && newVal && oldVal && newVal !== oldVal) {
+        suppressAutocomplete.value = false;
+      }
+      
       // Only reset suppressAutocomplete if the input is cleared
       if (suppressAutocomplete.value && (!newVal || newVal.trim() === '')) {
         suppressAutocomplete.value = false;
         return;
       }
+      
       if (newVal && newVal.trim().length > 2) {
         locationSuggestions.value = await autoComplete(newVal)
       } else {

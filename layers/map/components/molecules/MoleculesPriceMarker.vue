@@ -4,7 +4,7 @@
     <!-- Regular teardrop marker -->
     <AtomsIcon 
       v-if="isFavorite === false || isFavorite === null"
-      icon="map/marker" 
+      icon="map/map-marker" 
       class="marker-shape teardrop-marker"
     />
     
@@ -17,7 +17,7 @@
     
     <!-- Content overlay -->
     <div class="price-marker-content">
-      <span class="price-marker-price | body-xs font-bold">{{ priceDisplay }}</span>
+      <span class="price-marker-price | body-xs font-semibold">{{ priceDisplay }}</span>
       <div v-if="hasNote && !isFavorite" class="marker-note-indicator">
         <AtomsIcon icon="cards/notes" class="note-button-icon" />
       </div>
@@ -33,15 +33,6 @@ interface MarkerProps {
 }
 
 const props = defineProps<MarkerProps>();
-
-// Debug log to see what's happening
-console.log('MoleculesPriceMarker props:', { 
-  price: props.price, 
-  hasNote: props.hasNote, 
-  isFavorite: props.isFavorite,
-  isFavoriteType: typeof props.isFavorite,
-  isFavoriteString: String(props.isFavorite)
-});
 
 // Format price as £XXk if >= 10000, otherwise just format with commas
 const priceDisplay = computed(() => {
@@ -72,24 +63,25 @@ const priceDisplay = computed(() => {
   left: 0;
   width: 70px;
   height: 70px;
-  color: var(--secondary-400);
+  color: var(--foreground-200);
 }
 
 .marker-shape.heart-marker {
   color: var(--favourite-colour);
 }
 
-.teardrop-marker {
-  transform: rotate(180deg);
-}
-
 /* Content overlay positioned on top of the SVG */
 .price-marker-content {
   position: absolute;
-  top: 50%;
+  top: 34%; /* Adjusted to center in the circular part of the teardrop */
   left: 50%;
-  transform: translate(-50%, -60%); /* Adjusted for new SVG positioning */
-  color: var(--monochrome-100);
+  transform: translate(-50%, -50%);
+  color: var(--background-200);
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
 }
 </style>
