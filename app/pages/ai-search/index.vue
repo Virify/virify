@@ -331,11 +331,10 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
 .search-header-container {
   &.is-sticky {
     position: fixed;
-    top: calc(var(--header-height) + var(--size-16));
+    top: var(--header-height);
     left: 0;
     right: 0;
     z-index: 20;
-    margin-bottom: var(--size-24);
     background: var(--background-color);
   }
 

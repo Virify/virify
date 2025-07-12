@@ -68,9 +68,13 @@ const textarea = defineModel({ default: '' })
   grid-area: input;
   white-space: pre-wrap;
   word-wrap: break-word;
-  padding: var(--size-8);
   letter-spacing: inherit;
   line-height: inherit;
+  padding: 0;
+
+  @include mq.small-tablet {
+    padding: var(--size-8);
+  }
 
   @include mq.tablet {
     padding: var(--size-16);

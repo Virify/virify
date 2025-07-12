@@ -39,12 +39,10 @@
   &-logo {
     display: block;
     width: auto;
-    height: 1.7rem;
-    width: 6.4rem;
+    height: 1.8rem;
 
     @include mq.tablet {
       height: 2rem;
-      width: auto;
     }
   }
 }

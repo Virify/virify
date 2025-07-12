@@ -238,7 +238,7 @@ function handleNavAction(action: string) {
 }
 
 .m-burger-menu-icon {
-  $burger-size: 36px;
+  $burger-size: 32px;
   $border-icon-size: 22px;
 
   position: relative;
