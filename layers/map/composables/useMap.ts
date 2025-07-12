@@ -185,8 +185,21 @@ export function useMap() {
       return [];
     }
 
+    // Sort markers by tier priority: BASIC first (bottom), then FEATURED, then PREMIUM last (top)
+    const sortedMarkersData = [...markersData].sort((a, b) => {
+      const getTierPriority = (tier?: string) => {
+        switch (tier) {
+          case "BASIC": return 1;
+          case "FEATURED": return 2;
+          case "PREMIUM": return 3;
+          default: return 1; // Default to BASIC priority
+        }
+      };
+      return getTierPriority(a.tier) - getTierPriority(b.tier);
+    });
+
     const addedSdkMarkers: Marker[] = [];
-    for (const markerData of markersData) {
+    for (const markerData of sortedMarkersData) {
       const newSdkMarker = _createAndAddSdkMarker(map, markerData, instance);
       addedSdkMarkers.push(newSdkMarker);
     }

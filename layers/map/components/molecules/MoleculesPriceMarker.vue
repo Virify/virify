@@ -1,25 +1,12 @@
 <template>
   <div class="price-marker-container">
     <!-- SVG Marker Shape -->
-    <!-- Heart marker for favorites -->
+    <!-- Dynamic marker based on favorite status and tier -->
     <AtomsIcon 
-      v-if="isFavorite"
-      icon="map/fav-marker" 
-      class="marker-shape heart-marker"
+      :icon="markerIcon"
+      :class="markerClass"
     />
-    <!-- Basic marker for BASIC tier -->
-    <AtomsIcon 
-      v-else-if="tier === 'BASIC'"
-      icon="map/map-marker-basic" 
-      class="marker-shape teardrop-marker"
-    />
-    <!-- Featured marker for FEATURED or PREMIUM -->
-    <AtomsIcon 
-      v-else
-      icon="map/map-marker-featured" 
-      class="marker-shape teardrop-marker"
-    />
-    
+
     <!-- Content overlay -->
     <div class="price-marker-content">
       <span class="price-marker-price | body-xs font-semibold">{{ priceDisplay }}</span>
@@ -50,6 +37,25 @@ const priceDisplay = computed(() => {
     : `£${props.price.toLocaleString()}`;
 });
 
+// Computed marker icon based on favorite status and tier
+const markerIcon = computed(() => {
+  if (props.isFavorite) return "map/fav-marker";
+  
+  switch (props.tier) {
+    case "PREMIUM": return "map/marker-premium";
+    case "FEATURED": return "map/marker-featured";
+    case "BASIC": 
+    default: return "map/marker-basic";
+  }
+});
+
+// Computed marker class based on favorite status and tier
+const markerClass = computed(() => {
+  if (props.isFavorite) return "marker-shape heart-marker";
+  if (props.tier === "PREMIUM") return "marker-shape teardrop-marker premium-marker";
+  return "marker-shape teardrop-marker";
+});
+
 </script>
 
 <style scoped>
@@ -63,6 +69,10 @@ const priceDisplay = computed(() => {
   justify-content: center;
   /* Ensure the bottom of the container is the precise anchor point */
   transform-origin: center bottom;
+  /* Inherit z-index from parent wrapper for proper stacking */
+  z-index: inherit;
+  /* Make container non-clickable, only the actual marker content should be clickable */
+  pointer-events: none;
 }
 
 .marker-shape {
@@ -72,6 +82,8 @@ const priceDisplay = computed(() => {
   width: 70px;
   height: 70px;
   color: var(--monochrome-300);
+  /* Allow clicking on the actual marker shape */
+  pointer-events: auto;
 }
 
 .marker-shape.heart-marker {
@@ -91,5 +103,7 @@ const priceDisplay = computed(() => {
   justify-content: center;
   text-align: center;
   width: 100%;
+  /* Allow clicking on the price content */
+  pointer-events: auto;
 }
 </style>

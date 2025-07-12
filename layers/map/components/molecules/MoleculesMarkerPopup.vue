@@ -1,63 +1,71 @@
 <template>
   <div class="popup-wrapper">
-    <div class="m-listing-card-map" :data-tier="isFeaturedOrPremium ? 'featured' : null" @click.stop>
-      <div v-if="isFeaturedOrPremium" class="m-listing-card-map-featured-banner | body-sm font-bold">
+    <div 
+      class="listing-card"
+      :class="{
+        'listing-card--featured': isFeatured,
+        'listing-card--premium': isPremium
+      }"
+      @click.stop
+    >
+      <!-- Banner -->
+      <div v-if="isFeaturedOrPremium" class="listing-card__banner | body-sm font-bold">
         {{ isPremium ? 'Premium' : 'Featured' }}
       </div>
-      <!-- Single image (no carousel) -->
-      <div class="m-listing-card-map-image-container">
-        <nuxt-img v-if="hasImage" :src="marker.image?.[0]?.image" alt="Listing image"
-          class="m-listing-card-map-image" />
-        <div class="m-listing-card-map-image-overlay">
-          <div class="m-listing-card-map-image-actions">
-            <button class="m-listing-card-map-icon-button" :class="{ 'is-active': marker.isFavorite }"
-              @click="toggleFavourite">
-              <AtomsIcon name="heart" icon="cards/favourite" class="icon-heart" />
-            </button>
-            <button class="m-listing-card-map-icon-button" :class="{ 'is-active': marker.hasNote }"
-              @click="onNoteClick">
-              <AtomsIcon name="edit" icon="cards/notes" class="icon-edit" />
-            </button>
-          </div>
-        </div>
+      
+      <!-- Image -->
+      <div class="listing-card__image-container">
+        <nuxt-img 
+          v-if="hasImage" 
+          :src="marker.image?.[0]?.image" 
+          alt="Listing image"
+          class="listing-card__image" 
+        />
       </div>
 
-      <div class="m-listing-card-map-content">
-        <div class="m-listing-card-map-details">
-          <!-- Header row with price (no price type) -->
-          <div class="m-listing-card-map-header-row m-listing-card-map-price-group">
-            <div class="m-listing-card-map-price">
-              <span class="m-listing-card-map-price-amount | title-md">
-                {{ formattedPrice }}
-              </span>
-            </div>
+      <!-- Content -->
+      <div class="listing-card__content">
+        <!-- Price and Actions -->
+        <div class="listing-card__header">
+          <div class="listing-card__price | title-md">{{ formattedPrice }}</div>
+          <div class="listing-card__actions">
+            <button 
+              class="listing-card__action-btn" 
+              :class="{ 'is-active': marker.isFavorite }"
+              @click="toggleFavourite"
+            >
+              <AtomsIcon name="heart" icon="cards/favourite" />
+            </button>
+            <button 
+              class="listing-card__action-btn" 
+              :class="{ 'is-active': marker.hasNote }"
+              @click="onNoteClick"
+            >
+              <AtomsIcon name="edit" icon="cards/notes" />
+            </button>
           </div>
+        </div>
+        
+        <!-- Property type -->
+        <div v-if="typeText" class="listing-card__type | title-xs">{{ typeText }}</div>
 
-          <!-- Property type and classification -->
-          <div v-if="typeText" class="m-listing-card-map-subtitle | title-xs">
-            {{ typeText }}
+        <!-- Features -->
+        <div v-if="hasBedrooms || hasBathrooms" class="listing-card__features">
+          <div v-if="hasBedrooms" class="listing-card__feature | body-sm font-semibold">
+            <AtomsIcon name="bedrooms" icon="property/bedrooms" />
+            <span>{{ marker.bedrooms }}</span>
           </div>
-
-          <!-- Features (only bedrooms and bathrooms) -->
-          <div v-if="hasBedrooms || hasBathrooms" class="m-listing-card-map-features">
-            <div v-if="hasBedrooms" class="m-listing-card-map-feature">
-              <AtomsIcon name="bedrooms" icon="property/bedrooms" class="icon" />
-              <p class="| body-sm">{{ marker.bedrooms }}</p>
-            </div>
-            <div v-if="hasBathrooms" class="m-listing-card-map-feature">
-              <AtomsIcon name="bathrooms" icon="property/bathrooms" class="icon" />
-              <p class="| body-sm">{{ marker.bathrooms }}</p>
-            </div>
+          <div v-if="hasBathrooms" class="listing-card__feature | body-sm font-semibold">
+            <AtomsIcon name="bathrooms" icon="property/bathrooms" />
+            <span>{{ marker.bathrooms }}</span>
           </div>
         </div>
 
-        <div class="m-listing-card-map-footer">
-          <!-- Only view button (no enquiry) -->
-          <div class="m-listing-card-map-actions">
-            <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-secondary body-sm">
-              View
-            </nuxt-link>
-          </div>
+        <!-- View button -->
+        <div class="listing-card__footer">
+          <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="listing-card__view-btn | button button-secondary body-sm">
+            View
+          </nuxt-link>
         </div>
       </div>
     </div>
@@ -114,44 +122,70 @@ const toggleFavourite = () => {
 </script>
 
 <style lang="scss">
-/* Style MapLibre popup to work with our design */
+/* MapLibre popup overrides */
 .maplibregl-popup-content {
   background: transparent !important;
-  width: 280px !important;
-  /* Match card width */
-  max-width: 280px !important;
-  /* Match card max-width */
-  min-width: 280px !important;
-  /* Ensure consistent width */
+  width: var(--size-280) !important;
+  max-width: var(--size-280) !important;
+  min-width: var(--size-280) !important;
   padding: 0 !important;
-  /* Remove default padding */
   margin: 0 !important;
-  /* Remove default margin */
   border: none !important;
-  /* Remove default border */
   border-radius: 0 !important;
   box-shadow: none !important;
   pointer-events: auto !important;
 }
 
-/* Style MapLibre's popup tip for all anchor positions */
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-  border-bottom-color: var(--secondary-400) !important;
+  border-bottom-color: var(--monochrome-300) !important;
 }
 
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-  border-top-color: var(--secondary-400) !important;
+  border-top-color: var(--monochrome-300) !important;
 }
 
 .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-  border-right-color: var(--secondary-400) !important;
+  border-right-color: var(--monochrome-300) !important;
 }
 
 .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--monochrome-300) !important;
+}
+
+/* Featured popup tip colors */
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-right .maplibregl-popup-tip {
   border-left-color: var(--secondary-400) !important;
 }
 
-/* Hide diagonal anchor tips to force MapLibre to use straight anchors */
+/* Premium popup tip colors - specific to each anchor position */
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--primary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--primary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--primary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--primary-400) !important;
+}
+
 .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
 .maplibregl-popup-anchor-top-right .maplibregl-popup-tip,
 .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
@@ -163,6 +197,7 @@ const toggleFavourite = () => {
   display: none !important;
 }
 
+
 /* Target the popup element directly to override inline styles */
 .maplibregl-popup[style] {
   max-width: none !important;
@@ -173,6 +208,7 @@ const toggleFavourite = () => {
   width: 280px !important;
 }
 
+
 .popup-wrapper {
   position: relative;
   background: transparent;
@@ -182,193 +218,209 @@ const toggleFavourite = () => {
   box-shadow: none;
 }
 
-.m-listing-card-map {
-  --card-padding: var(--size-12);
-  --image-height: 140px;
+/* ============================================
+   CARD BASE STYLES
+   ============================================ */
 
+.listing-card {
   background-color: var(--background-200);
-  border: var(--size-4) solid var(--secondary-400);
-  border-radius: calc(var(--border-radius-2xl) + var(--size-2));
+  border: var(--size-2) solid var(--monochrome-300);
+  border-radius: var(--border-radius-2xl);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  max-width: 280px;
-  width: 280px;
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin: 0;
+  max-width: 280px;
   padding: 0;
+  position: relative;
+  width: 280px;
+}
 
+/* ============================================
+   CARD TIER VARIANTS
+   ============================================ */
 
-  &[data-tier='featured'] {
-    border-color: var(--secondary-400);
-    border-width: var(--size-4);
-    padding: 0;
+.listing-card--featured {
+  border-color: var(--secondary-400);
+}
 
-    .m-listing-card-map-image-container {
-      border-radius: calc(var(--border-radius-2xl) - var(--size-1));
-    }
+.listing-card--premium {
+  background: var(--monochrome-300);
+  border-color: var(--primary-400);
+  color: var(--monochrome-100);
+}
 
-    .m-listing-card-map-content {
-      padding: var(--card-padding);
-    }
+/* ============================================
+   BANNER
+   ============================================ */
 
-    .m-listing-card-map-featured-banner {
-      background-color: var(--secondary-400);
-      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 var(--border-radius-lg) 0;
-      color: var(--monochrome-900);
-      padding: var(--size-6) var(--size-16);
-      position: absolute;
-      top: 0;
-      left: -2px;
-      z-index: 3;
-    }
-  }
+.listing-card__banner {
+  background-color: var(--secondary-400);
+  border-radius: calc(var(--border-radius-2xl) - var(--size-2)) 0 var(--border-radius-lg) 0;
+  color: var(--monochrome-900);
+  left: -2px;
+  padding: 6px 16px;
+  position: absolute;
+  top: 0;
+  z-index: 3;
+}
 
-  .m-listing-card-map-image-container {
-    border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
-    overflow: hidden;
-    position: relative;
-    height: var(--image-height);
-    z-index: 1;
-    margin: 0;
-  }
+.listing-card--premium .listing-card__banner {
+  background-color: var(--primary-400);
+  color: var(--monochrome-300);
+}
 
-  .m-listing-card-map-image {
-    height: 100%;
-    object-fit: cover;
-    width: 100%;
-  }
+/* ============================================
+   IMAGE
+   ============================================ */
 
-  .m-listing-card-map-image-overlay {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 2;
-  }
+.listing-card__image-container {
+  border-radius: calc(var(--border-radius-2xl) - var(--size-2)) calc(var(--border-radius-2xl) - var(--size-2)) 0 0;
+  height: 140px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
 
-  .m-listing-card-map-image-actions {
-    background-color: var(--secondary-400);
-    border-radius: var(--border-radius-pill);
-    display: flex;
-    gap: var(--size-4);
-    padding: var(--size-4) var(--size-8);
-    position: absolute;
-    top: var(--size-12);
-    right: var(--size-12);
-  }
+.listing-card__image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
 
-  .m-listing-card-map-icon-button {
-    align-items: center;
-    background-color: transparent;
-    border: none;
-    color: var(--monochrome-100);
-    cursor: pointer;
-    display: flex;
-    font-size: var(--font-lg);
-    height: var(--size-24);
-    justify-content: center;
-    width: var(--size-24);
-    transition: color 0.2s ease-in-out;
+/* ============================================
+   CONTENT AREA
+   ============================================ */
 
-    .icon {
-      transition: fill 0.2s ease-in-out, color 0.2s ease-in-out;
-    }
+.listing-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--size-4);
+  padding: var(--size-12);
+}
 
-    .icon-heart {
-      fill: transparent;
-    }
+/* Header with price and actions */
+.listing-card__header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
 
-    &.is-active {
+/* Price */
+.listing-card__price {
+  color: var(--secondary-500);
+  margin: 0;
+}
 
-      .icon-heart,
-      .icon-edit {
-        color: var(--monochrome-900);
-      }
+.listing-card--premium .listing-card__price {
+  color: var(--primary-500);
+}
 
-      .icon-heart {
-        fill: var(--monochrome-900);
-      }
-    }
-  }
+/* Property type */
+.listing-card__type {
+  color: var(--text-secondary);
+  margin: 0;
+}
 
-  .m-listing-card-map-content {
-    color: var(--text-color);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: var(--card-padding);
-    flex: 1;
-  }
+.listing-card--premium .listing-card__type {
+  color: var(--monochrome-900);
+}
 
-  .m-listing-card-map-header-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
+/* Features */
+.listing-card__features {
+  display: flex;
+  gap: var(--size-8);
+  margin-bottom: var(--size-8);
+}
 
-  .m-listing-card-map-price-group {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+.listing-card__feature {
+  align-items: center;
+  color: var(--text-color);
+  display: flex;
+  gap: var(--size-4);
+}
 
-  .m-listing-card-map-price-amount {
-    color: var(--secondary-500);
-  }
+.listing-card--premium .listing-card__feature {
+  color: var(--monochrome-900);
+}
 
-  .m-listing-card-map-type-indicator {
-    min-width: 40px;
-    text-align: center;
-    background-color: var(--background-300);
-    padding: var(--size-4) var(--size-8);
-    border-radius: var(--border-radius-lg);
-  }
+.listing-card__feature svg {
+  color: var(--text-secondary);
+}
 
-  .m-listing-card-map-title {
-    color: var(--text-primary);
-    margin: 0;
-  }
+.listing-card--premium .listing-card__feature svg {
+  color: var(--monochrome-900);
+}
 
-  .m-listing-card-map-subtitle {
-    margin: 0;
-    color: var(--text-secondary);
-  }
+/* ============================================
+   ACTION BUTTONS (HEART/NOTES)
+   ============================================ */
 
-  .m-listing-card-map-features {
-    display: flex;
-    gap: var(--size-8);
-    list-style: none;
-    margin-bottom: var(--size-12);
-    padding: 0;
-  }
+.listing-card__actions {
+  background-color: var(--secondary-400);
+  border-radius: var(--border-radius-pill);
+  display: flex;
+  gap: var(--size-8);
+  padding: var(--size-8);
+}
 
-  .m-listing-card-map-feature {
-    align-items: center;
-    display: flex;
-    font-weight: var(--font-semibold);
-    gap: var(--size-4);
+.listing-card--premium .listing-card__actions {
+  background-color: var(--primary-400);
+}
 
-    .icon {
-      font-size: var(--font-lg);
-      color: var(--text-secondary);
-    }
-  }
+.listing-card__action-btn {
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--monochrome-100);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-xl);
+  height: var(--size-24);
+  justify-content: center;
+  transition: color 0.2s ease-in-out;
+  width: var(--size-24);
+}
 
-  .m-listing-card-map-actions {
-    width: 100%;
+.listing-card__action-btn.is-active {
+  color: var(--monochrome-900);
+}
 
-    .button {
-      width: 100%;
-      padding: var(--size-8);
-      border-radius: var(--border-radius-lg);
-      border-color: var(--secondary-400);
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-    }
-  }
+/* ============================================
+   VIEW BUTTON
+   ============================================ */
+
+.listing-card__footer {
+  margin-top: auto;
+}
+
+.listing-card__view-btn {
+  background: var(--secondary-400);
+  border: none;
+  border-radius: var(--border-radius-lg);
+  color: var(--monochrome-900);
+  display: inline-block;
+  padding: var(--size-8);
+  text-align: center;
+  text-decoration: none;
+  transition: none;
+  width: 100%;
+}
+
+.listing-card__view-btn:hover {
+  background: var(--secondary-400);
+  color: var(--monochrome-900);
+}
+
+.listing-card--premium .listing-card__view-btn {
+  background: var(--primary-400);
+  color: var(--monochrome-300);
+}
+
+.listing-card--featured .listing-card__view-btn:hover {
+  background: var(--secondary-400);
+  color: var(--monochrome-900);
 }
 </style>

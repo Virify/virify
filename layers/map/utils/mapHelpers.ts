@@ -147,13 +147,16 @@ export function findMapInstance(map: ExtendedMapTilerMap, mapCache: Map<string, 
  */
 export function renderMarker(price: number | null, hasNote?: boolean, isFavorite?: boolean, tier?: string, vueApp?: any): HTMLElement {
   const markerWrapper = document.createElement("div");
+  
+  const resolvedTier = tier === "FEATURED" || tier === "BASIC" || tier === "PREMIUM" ? tier : "BASIC";
+  
   const MarkerComp = defineComponent({
     setup: () => () => {
       return h(MoleculesPriceMarker, {
         price,
         hasNote: Boolean(hasNote),
         isFavorite: Boolean(isFavorite),
-        tier: tier === "FEATURED" || tier === "BASIC" || tier === "PREMIUM" ? tier : "BASIC", // Default to BASIC if not specified
+        tier: resolvedTier,
       });
     },
   });
