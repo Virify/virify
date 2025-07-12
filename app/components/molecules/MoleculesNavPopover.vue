@@ -77,7 +77,7 @@ const expandedGroups = ref<Record<number, boolean>>({});
  * WebSocket Events
  */
 const navigationWebSocketEvents = {
-  onAggregateUpdate: ({ aggregateType, operation }: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" }) => {
+  onAggregateUpdate: ({ aggregateType, operation }: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" | "update" }) => {
     handleAggregateUpdate({ 
       type: "aggregate_update",
       aggregateType, 

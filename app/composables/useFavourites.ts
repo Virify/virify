@@ -14,7 +14,21 @@ export const useFavourites = createSharedComposable(() => {
   /**
    * State Management
    */
-  const { data: favourites, refresh: refreshFavourites } = useAsyncData<UserFavouriteListingCard[]>("favourites", () => useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/"), { default: () => [], watch: [loggedIn] });
+  const { data: favourites, refresh: refreshFavourites } = useAsyncData<UserFavouriteListingCard[]>(
+    "favourites", 
+    () => {
+      // Only make API call if user is logged in
+      if (!loggedIn.value) {
+        return Promise.resolve([]);
+      }
+      return useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/");
+    }, 
+    { 
+      default: () => [], 
+      watch: [loggedIn],
+      server: false // Prevent server-side execution
+    }
+  );
 
   const recentFavourites = computed(() => {
     return favourites.value

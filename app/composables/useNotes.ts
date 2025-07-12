@@ -13,11 +13,21 @@ export const useNotes = createSharedComposable(() => {
    * State Management
    * Store notes as an array with listing relationship
    */
-  const { data: userNotes, refresh: refreshUserNotes } = useAsyncData<NoteData[]>("userNotes", () => useRequestFetch()<NoteData[]>("/api/user/notes/"), {
-    default: () => [],
-    watch: [loggedIn],
-    immediate: true,
-  });
+  const { data: userNotes, refresh: refreshUserNotes } = useAsyncData<NoteData[]>(
+    "userNotes", 
+    () => {
+      // Only make API call if user is logged in
+      if (!loggedIn.value) {
+        return Promise.resolve([]);
+      }
+      return useRequestFetch()<NoteData[]>("/api/user/notes/");
+    }, 
+    {
+      default: () => [],
+      watch: [loggedIn],
+      server: false // Prevent server-side execution
+    }
+  );
 
   const recentUserNotes = computed(() => {
     return userNotes.value
