@@ -1,10 +1,8 @@
-import { applySortToResults } from '~/utils/searchSort';
-
 /**
  * Composable for managing AI search page state and functionality
  */
 export const useAiSearchPage = () => {
-  const { aiSearch, paginateSearch } = useAi();
+  const { aiSearch, paginateSearch, searchQuery, queryAnalysis: globalQueryAnalysis } = useAi();
   const { saveSearchState, restoreSearchState, clearSearchState } = useSearchState();
 
   // Core search state
@@ -58,6 +56,8 @@ export const useAiSearchPage = () => {
     totalResults.value = 0;
     lastWhereClause.value = null;
     lastLocationContext.value = null;
+    searchQuery.value = ''; // Reset the global search query
+    globalQueryAnalysis.value = null; // Reset the global query analysis
     clearSearchState();
   };
 
