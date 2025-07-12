@@ -4,6 +4,10 @@
     <!-- Dynamic marker based on favorite status and tier -->
     <AtomsIcon :icon="markerIcon" :class="markerClass" />
 
+    <!-- Favorite indicator -->
+    <div v-if="isCurrentlyFavorite" class="favorite-indicator">
+      <AtomsIcon icon="heart" class="favorite-icon" />
+    </div>
 
     <!-- Content overlay -->
     <div class="price-marker-content">
@@ -23,7 +27,11 @@ interface MarkerProps {
 
 const props = defineProps<MarkerProps>();
 
-// Remove reactive favorite status - use prop instead
+// Use composables for live favorite status (separate from props to avoid re-renders)
+const { isFavourite } = useFavourites();
+
+// Get live favorite status
+const isCurrentlyFavorite = computed(() => isFavourite(props.id as number));
 
 // Format price as £XXk if >= 10000, otherwise just format with commas
 const priceDisplay = computed(() => {
@@ -37,7 +45,6 @@ const priceDisplay = computed(() => {
 
 // Computed marker icon based on favorite status and tier
 const markerIcon = computed(() => {
-  // if (props.isFavorite) return "map/fav-marker";
 
   switch (props.tier) {
     case "PREMIUM": return "map/marker-premium";
@@ -49,7 +56,6 @@ const markerIcon = computed(() => {
 
 // Computed marker class based on favorite status and tier
 const markerClass = computed(() => {
-  // if (props.isFavorite) return "marker-shape heart-marker";
   if (props.tier === "PREMIUM") return "marker-shape teardrop-marker premium-marker";
   return "marker-shape teardrop-marker";
 });
