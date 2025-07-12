@@ -111,7 +111,7 @@ export function useMap() {
    * Private helper to create and add a single SDK marker to the map and instance.
    */
   function _createAndAddSdkMarker(map: ExtendedMapTilerMap, markerData: MapMarker, instance: MapInstance): Marker {
-    const markerWrapper = renderMarker(markerData.price, markerData.hasNote, markerData.isFavorite, markerData.tier, vueApp);
+    const markerWrapper = renderMarker(markerData.price, markerData.hasNote, markerData.isFavorite, markerData.tier, vueApp, markerData.id);
     const newSdkMarker = new sdk.Marker({
       element: markerWrapper,
       anchor: "bottom",

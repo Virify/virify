@@ -21,8 +21,8 @@ export type MapMarker = {
     postcode?: string;
   } | null;
   image?: any[]; // TODO: Define a proper image type
-  hasNote?: boolean;
-  isFavorite?: boolean;
+  hasNote?: boolean; // Optional - popup gets this independently
+  isFavorite?: boolean; // Optional - popup gets this independently  
   tier: ListingTier; // Use string literals for tier
 };
 

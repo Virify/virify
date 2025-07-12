@@ -1,26 +1,17 @@
 <template>
   <div class="popup-wrapper">
-    <div 
-      class="listing-card"
-      :class="{
-        'listing-card--featured': isFeatured,
-        'listing-card--premium': isPremium
-      }"
-      @click.stop
-    >
+    <div class="listing-card" :class="{
+      'listing-card--featured': isFeatured,
+      'listing-card--premium': isPremium
+    }" @click.stop>
       <!-- Banner -->
       <div v-if="isFeaturedOrPremium" class="listing-card__banner | body-sm font-bold">
         {{ isPremium ? 'Premium' : 'Featured' }}
       </div>
-      
+
       <!-- Image -->
       <div class="listing-card__image-container">
-        <nuxt-img 
-          v-if="hasImage" 
-          :src="marker.image?.[0]?.image" 
-          alt="Listing image"
-          class="listing-card__image" 
-        />
+        <nuxt-img v-if="hasImage" :src="marker.image?.[0]?.image" alt="Listing image" class="listing-card__image" />
       </div>
 
       <!-- Content -->
@@ -29,23 +20,16 @@
         <div class="listing-card__header">
           <div class="listing-card__price | title-md">{{ formattedPrice }}</div>
           <div class="listing-card__actions">
-            <button 
-              class="listing-card__action-btn" 
-              :class="{ 'is-active': marker.isFavorite }"
-              @click="toggleFavourite"
-            >
+            <button class="listing-card__action-btn" :class="{ 'is-active': isCurrentlyFavorite }"
+              @click="toggleFavourite">
               <AtomsIcon name="heart" icon="cards/favourite" />
             </button>
-            <button 
-              class="listing-card__action-btn" 
-              :class="{ 'is-active': marker.hasNote }"
-              @click="onNoteClick"
-            >
+            <button class="listing-card__action-btn" :class="{ 'is-active': currentlyHasNote }" @click="onNoteClick">
               <AtomsIcon name="edit" icon="cards/notes" />
             </button>
           </div>
         </div>
-        
+
         <!-- Property type -->
         <div v-if="typeText" class="listing-card__type | title-xs">{{ typeText }}</div>
 
@@ -63,7 +47,8 @@
 
         <!-- View button -->
         <div class="listing-card__footer">
-          <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="listing-card__view-btn | button button-secondary body-sm">
+          <nuxt-link :to="`/listing/${listingId}`" target="_blank"
+            class="listing-card__view-btn | button button-secondary body-sm">
             View
           </nuxt-link>
         </div>
@@ -108,7 +93,13 @@ const isPremium = computed(() => props.marker.tier === 'PREMIUM');
 const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
 // Event handlers
-const { showNoteDialog } = useNotes();
+const { showNoteDialog, hasNote } = useNotes();
+const { toggleFavourite: toggleFav, isFavourite } = useFavourites();
+
+// Get live favorite/note status (separate from marker data to avoid re-renders)
+const isCurrentlyFavorite = computed(() => isFavourite(props.marker.id as number));
+const currentlyHasNote = computed(() => hasNote(props.marker.id as number));
+
 const onNoteClick = () => {
   if (props.marker.id as number) {
     showNoteDialog(props.marker.id as number);
@@ -116,8 +107,9 @@ const onNoteClick = () => {
 };
 
 const toggleFavourite = () => {
-  // Add favourite toggle logic here
-  console.log("Toggle favourite for:", props.marker.id);
+  if (props.marker.id as number) {
+    toggleFav(props.marker.id as number);
+  }
 };
 </script>
 

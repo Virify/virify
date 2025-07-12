@@ -10,8 +10,6 @@
   </div>
 </template>
 <script setup lang="ts">
-const { isFavourite } = useFavourites();
-const { hasNote } = useNotes();
 /**
  * state
  */
@@ -211,8 +209,6 @@ function formatMarker(listing: ListingCardType) {
         }
       : null,
     image: listing.property?.media ?? [],
-    isFavorite: isFavourite(listing.id),
-    hasNote: hasNote(listing.id),
     tier: listing.listingTier,
   };
 }
@@ -223,7 +219,7 @@ function formatMarker(listing: ListingCardType) {
  * @returns {Array} - Array of formatted markers
  */
 const formattedMarkers = computed(() => {
-  if (props.markers) return props.markers.map(formatMarker);
+  if (props.markers) return props.markers.map(listing => formatMarker(listing));
   if (props.marker) return [formatMarker(props.marker)];
   return [];
 });
