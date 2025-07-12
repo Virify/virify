@@ -248,7 +248,7 @@ const toggleFavourite = () => {
 
 .listing-card__banner {
   background-color: var(--secondary-400);
-  border-radius: calc(var(--border-radius-2xl) - var(--size-2)) 0 var(--border-radius-lg) 0;
+  border-radius: calc(var(--border-radius-2xl) - 4px) 0 var(--border-radius-lg) 0;
   color: var(--monochrome-900);
   left: -2px;
   padding: 6px 16px;
@@ -257,9 +257,16 @@ const toggleFavourite = () => {
   z-index: 3;
 }
 
+.listing-card--featured .listing-card__banner {
+  left: -1px;
+  top: -1px;
+}
+
 .listing-card--premium .listing-card__banner {
   background-color: var(--primary-400);
   color: var(--monochrome-300);
+  left: -1px;
+  top: -1px;
 }
 
 /* ============================================
