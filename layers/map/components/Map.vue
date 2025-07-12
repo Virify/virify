@@ -189,7 +189,7 @@ function updateMarkers() {
  * 
  * @param listing
  */
-function formatMarker(listing: ListingCardType) {
+function formatMarker(listing: ListingCardType): MapMarker {
   return {
     id: listing.id,
     lat: listing.property?.address?.lat ?? 0,
@@ -197,6 +197,7 @@ function formatMarker(listing: ListingCardType) {
     title: listing.title ?? null,
     bedrooms: listing.property?.numberBedrooms ?? null,
     bathrooms: listing.property?.numberBathrooms ?? null,
+    receptions: listing.property?.numberReceptions ?? null,
     price: listing.price ?? null,
     propertyType: listing.property?.type?.name ?? null,
     classification: listing.property?.classification?.name ?? null,

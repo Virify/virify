@@ -145,7 +145,7 @@ export function findMapInstance(map: ExtendedMapTilerMap, mapCache: Map<string, 
  * @param vueApp optional Vue app context
  * @returns HTMLElement
  */
-export function renderMarker(price: number | null, hasNote?: boolean, isFavorite?: boolean, tier?: string, vueApp?: any, id?: string | number | null, priceType?: string | null): HTMLElement {
+export function renderMarker(id: string | number | null, price: number | null, tier?: string, vueApp?: any, priceType?: string | null): HTMLElement {
   const markerWrapper = document.createElement("div");
   
   const resolvedTier = tier === "FEATURED" || tier === "BASIC" || tier === "PREMIUM" ? tier : "BASIC";
@@ -155,8 +155,6 @@ export function renderMarker(price: number | null, hasNote?: boolean, isFavorite
       return h(MoleculesPriceMarker, {
         id,
         price,
-        hasNote: Boolean(hasNote),
-        isFavorite: Boolean(isFavorite),
         tier: resolvedTier,
         priceType,
       });

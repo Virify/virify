@@ -38,13 +38,17 @@
 
         <!-- Features -->
         <div v-if="hasBedrooms || hasBathrooms" class="listing-card__features">
-          <div v-if="hasBedrooms" class="listing-card__feature | body-sm font-semibold">
+          <div v-if="hasBedrooms" class="listing-card__feature | font-semibold">
             <AtomsIcon name="bedrooms" icon="property/bedrooms" />
-            <span>{{ marker.bedrooms }}</span>
+            <span class="body-sm">{{ marker.bedrooms }}</span>
           </div>
           <div v-if="hasBathrooms" class="listing-card__feature | body-sm font-semibold">
             <AtomsIcon name="bathrooms" icon="property/bathrooms" />
-            <span>{{ marker.bathrooms }}</span>
+            <span class="body-sm">{{ marker.bathrooms }}</span>
+          </div>
+          <div v-if="hasReceptions" class="listing-card__feature | body-sm font-semibold">
+            <AtomsIcon name="receptions" icon="property/receptions" />
+            <span class="body-sm">{{ marker.receptions }}</span>
           </div>
         </div>
 
@@ -77,6 +81,9 @@ const hasBedrooms = computed(() =>
 );
 const hasBathrooms = computed(() =>
   props.marker.bathrooms !== null && props.marker.bathrooms !== undefined
+);
+const hasReceptions = computed(() =>
+  props.marker.receptions !== null && props.marker.receptions !== undefined
 );
 const listingId = computed(() =>
   typeof props.marker.id === "number" ? props.marker.id : null
@@ -114,6 +121,11 @@ const toggleFavourite = () => {
     toggleFav(props.marker.id as number);
   }
 };
+
+onMounted(() => {
+  // Ensure the marker is rendered correctly on mount
+ console.log('Marker mounted:', props.marker);
+});
 </script>
 
 <style lang="scss">
@@ -345,6 +357,7 @@ const toggleFavourite = () => {
 .listing-card__feature {
   align-items: center;
   color: var(--text-color);
+  font-size: var(--font-2xl);
   display: flex;
   gap: var(--size-4);
 }
@@ -352,6 +365,7 @@ const toggleFavourite = () => {
 .listing-card--premium .listing-card__feature {
   color: var(--monochrome-900);
 }
+
 
 .listing-card__feature svg {
   color: var(--text-secondary);

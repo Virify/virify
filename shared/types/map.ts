@@ -11,6 +11,7 @@ export type MapMarker = {
   title?: string | null;
   bedrooms: number | null;
   bathrooms: number | null;
+  receptions: number | null;
   price: number | null;
   propertyType?: string | null;
   classification?: string | null;
