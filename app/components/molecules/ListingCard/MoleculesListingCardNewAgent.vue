@@ -8,8 +8,8 @@
 </template>
 <script setup lang="ts">
 defineProps<{
-  username: string,
-  id: string | number,
+  username: string;
+  id: string | number;
 }>();
 </script>
 

@@ -1,20 +1,66 @@
 <template>
   <div class="m-listing-card-actions">
-    <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-ghost body-sm">
+    <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-secondary body-sm">
       View
     </nuxt-link>
-    <button class="| button button-secondary body-sm">
-      Enquire
+    <button
+      class="| button button-ghost body-sm"
+      :disabled="isEnquiryDisabled"
+      @click="onEnquire"
+    >
+      {{ enquiryLabel }}
     </button>
   </div>
 </template>
+
 <script setup lang="ts">
-defineProps({
-  listingId: {
-    type: Number,
-    required: true
+import ViewsDialogEnquiry from '~/components/views/ViewsDialogEnquiry.vue';
+import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
+import { useEnquiry } from '~/composables/useEnquiry';
+
+interface Props {
+  listingId: number;
+  userId: number;
+}
+const props = defineProps<Props>();
+
+const { hasEnquired, loadingEnquiries } = useEnquiry();
+const { showDialog } = useDialog();
+const { user } = useUserSession();
+
+const safeUserId = computed(() =>
+  typeof props.userId === 'number' && !isNaN(props.userId) ? props.userId : null
+);
+
+const isSelf = computed(() => safeUserId.value !== null && user.value?.id === safeUserId.value);
+
+const isEnquiryDisabled = computed(() =>
+  !safeUserId.value || hasEnquired(safeUserId.value) || loadingEnquiries.value || isSelf.value
+);
+const enquiryLabel = computed(() =>
+  isSelf.value
+    ? 'Enquire'
+    : (safeUserId.value && hasEnquired(safeUserId.value))
+      ? 'Enquiry Sent'
+      : 'Enquire'
+);
+
+function onEnquire() {
+  if (!user.value || !user.value.id) {
+    showDialog({
+      component: ViewsDialogLogin,
+    });
+    return;
   }
-})
+  if (safeUserId.value !== null && !isSelf.value) {
+    showDialog({
+      component: ViewsDialogEnquiry,
+      props: { receiverId: safeUserId.value },
+    });
+  } else {
+    console.error('Invalid userId for enquiry:', props.userId);
+  }
+}
 </script>
 <style lang="scss">
 .m-listing-card-actions {

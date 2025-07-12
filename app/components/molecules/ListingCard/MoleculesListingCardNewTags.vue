@@ -8,17 +8,17 @@
 <script setup lang="ts">
 
 const props = defineProps<{
-  chainFree?: boolean;
+  chainFree: boolean;
   listedDate: Date | string;
-  reduced?: boolean;
+  reduced: boolean;
 }>();
 
 const tags: string[] = [];
 const createdAt = new Date(props.listedDate);
 const now = new Date();
-const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-if (createdAt >= threeDaysAgo) {
+if (createdAt >= oneWeekAgo) {
   tags.push('Recently Added');
 }
 
