@@ -1,6 +1,6 @@
 <template>
   <div class="m-autocomplete-popover | flow elevate-200">
-    <template v-if="searchValue && !suppressAutocomplete">
+    <template v-if="searchValue && !suppressAutocomplete && !hideAutocomplete">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Suggestions</h3>
 
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
@@ -16,7 +16,7 @@
         <span class="m-autocomplete-popover__empty-suggestion | skeleton"></span>
       </MoleculesAutocompleteList>
 
-      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
+      <p v-else class="m-autocomplete-popover__empty | faded-text r-body-md-xs">
         {{ autocompleteFeedback }}
       </p>
     </template>
@@ -35,13 +35,13 @@
         </li>
       </ul>
 
-      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
+      <p v-else class="m-autocomplete-popover__empty | faded-text r-body-md-xs">
         You do not currently have any saved locations
       </p>
     </template>
 
     <ClientOnly>
-      <template v-if="locationHistory.length">
+      <template v-if="showHistory">
         <h3 class="m-autocomplete-popover__title | title-3xs faded-text">History</h3>
 
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
@@ -89,6 +89,24 @@ const props = defineProps<Props>()
  */
 const { loggedIn } = useUserSession();
 const { entries, getEntries, clearEntries } = useSavedLocation();
+
+/**
+ * Hide autocomplete if current search value exactly matches one of the suggestions
+ */
+const hideAutocomplete = computed(() => {
+  if (!locationSuggestions.value.length || !props.searchValue) return false;
+  
+  return locationSuggestions.value.some(option => 
+    option.place_name_en === props.searchValue
+  );
+});
+
+/**
+ * Show history when there are no suggestions OR when we're hiding autocomplete
+ */
+const showHistory = computed(() => {
+  return !locationSuggestions.value.length || hideAutocomplete.value;
+})
 
 watch(loggedIn, (isAuthenticated) => {
   if (isAuthenticated) {
@@ -160,11 +178,17 @@ watch(
   () => props.searchValue,
   async (newVal, oldVal) => {
     setPendingWhile(async () => {
+      // Reset suppressAutocomplete if user is typing new content
+      if (suppressAutocomplete.value && newVal && oldVal && newVal !== oldVal) {
+        suppressAutocomplete.value = false;
+      }
+      
       // Only reset suppressAutocomplete if the input is cleared
       if (suppressAutocomplete.value && (!newVal || newVal.trim() === '')) {
         suppressAutocomplete.value = false;
         return;
       }
+      
       if (newVal && newVal.trim().length > 2) {
         locationSuggestions.value = await autoComplete(newVal)
       } else {
@@ -193,10 +217,10 @@ const autocompleteFeedback = computed(() => {
 .m-autocomplete-popover {
   background-color: var(--background-200);
   border-radius: var(--border-radius-xl);
-  padding: var(--size-18);
+  padding: var(--size-16);
   border: 1px solid var(--border-color-100);
 
-  @include mq.small-tablet {
+  @include mq.tablet {
     padding: var(--size-32);
     border-radius: var(--border-radius-2xl);
   }

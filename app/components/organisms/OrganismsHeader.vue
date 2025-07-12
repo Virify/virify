@@ -16,7 +16,7 @@
 .o-header {
   position: sticky;
   top: 0;
-  z-index: 4;
+  z-index: 30;
   background: var(--background-100);
 
   @include mq.mobile-only {
@@ -28,7 +28,6 @@
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    margin-bottom: var(--size-32);
   }
 
   &-homelink {

@@ -216,24 +216,17 @@ export async function getListingByDistanceAndFilters(
  * First applies location filtering to get property IDs, then applies AI filters
  *
  * @param lat number - latitude
- * @param lng number - longitude  
+ * @param lng number - longitude
  * @param radius number - radius in miles
  * @param whereClause object - AI-generated WHERE clause
  * @param includeClause object - Prisma include clause
  * @param limit number - optional limit
  * @returns ListingWithFullProperty[]
  */
-export async function getListingsByLocationAndAIFilters(
-  lat: number,
-  lng: number,
-  radius: number,
-  whereClause: any,
-  includeClause: any,
-  limit?: number
-) {
+export async function getListingsByLocationAndAIFilters(lat: number, lng: number, radius: number, whereClause: any, includeClause: any, limit?: number) {
   // First get property IDs within the specified location/radius
   const nearbyProperties = await getPropertyIdsByDistance(lat, lng, radius);
-  const propertyIds = nearbyProperties.map(p => p.propertyId);
+  const propertyIds = nearbyProperties.map((p) => p.propertyId);
 
   // If no properties found in the area, return empty array
   if (propertyIds.length === 0) {
@@ -287,4 +280,18 @@ export async function fetchListings(where: Prisma.ListingWhereInput): Promise<Li
     include: fullListingInclude,
   });
   return listings;
+}
+
+/**
+ * Fetches paginated listings from the database with total count.
+ */
+export async function fetchPaginatedListings(where: Prisma.ListingWhereInput, page: number = 1, limit: number = 20): Promise<ListingWithFullProperty[]> {
+  const skip = (page - 1) * limit;
+
+  return await prisma.listing.findMany({
+    where,
+    include: fullListingInclude,
+    skip,
+    take: limit,
+  });
 }

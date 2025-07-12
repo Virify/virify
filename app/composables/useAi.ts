@@ -12,11 +12,13 @@ export default function useAi() {
    * @param location The location to search
    * @param radius The search radius
    * @param query The search query
+   * @param page The page number (optional, defaults to 1)
+   * @param limit The number of results per page (optional, defaults to 20)
    * @returns The search results
    */
-  async function aiSearch(location: GeocodingFeature, radius: number, query: string) {
+  async function aiSearch(location: GeocodingFeature, radius: number, query: string, page?: number, limit?: number) {
     searchQuery.value = query; // Update state for analysis function
-    const response = await $fetch<AiSearchResponse>("/api/search/rag/", {
+    const response = await $fetch<AISearchResponse>("/api/search/rag/", {
       method: "POST",
       body: {
         query: query,
@@ -31,6 +33,39 @@ export default function useAi() {
     if (response.queryAnalysis) {
       queryAnalysis.value = response.queryAnalysis;
     }
+
+    return response;
+  }
+
+  /**
+   * Paginate existing search results without re-querying AI
+   * @param whereClause The previously generated WHERE clause
+   * @param page The page number
+   * @param limit The number of results per page
+   * @param query The original query (for metadata)
+   * @param queryAnalysis The original query analysis
+   * @param locationContext The original location context
+   * @returns The paginated search results
+   */
+  async function paginateSearch(
+    whereClause: any, 
+    page: number, 
+    limit: number = 20, 
+    query: string, 
+    queryAnalysis: any = null, 
+    locationContext: any = null
+  ) {
+    const response = await $fetch<AISearchResponse>("/api/search/paginate/", {
+      method: "POST",
+      body: {
+        whereClause,
+        page,
+        limit,
+        query,
+        queryAnalysis,
+        locationContext,
+      },
+    });
 
     return response;
   }
@@ -83,6 +118,7 @@ export default function useAi() {
 
   return {
     aiSearch,
+    paginateSearch,
     getAnalyzedQuery: getAnalyzedQuerySegments, // Rename for compatibility
     queryAnalysis,
     searchQuery,

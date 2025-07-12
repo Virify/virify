@@ -3,16 +3,16 @@
     <div class="m-promptbox__input-wrapper">
       <!-- analysed query overlays the textarea -->
       <div class="m-promptbox__overlay" v-if="queryAnalysis" aria-hidden="true">
-        <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type}`">
+        <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type} r-body-md-xs`">
           {{ segment.text }}
         </span>
       </div>
 
-      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
+      <textarea :id class="m-promptbox__textarea | r-body-md-xs" :placeholder :aria-label="props.label" v-model="textarea"
         :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
     </div>
 
-    <button type="submit" class="m-promptbox__button" aria-label="Submit" @click.prevent="$emit('submit', textarea)">
+    <button type="submit" class="m-promptbox__button" aria-label="Submit" :disabled="disabled" @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
     </button>
   </div>
@@ -24,7 +24,8 @@ const { getAnalyzedQuery, queryAnalysis } = useAi()
 const props = defineProps({
   id: String,
   placeholder: String,
-  label: { type: String, default: 'Enter your prompt here' }
+  label: { type: String, default: 'Enter your prompt here' },
+  disabled: { type: Boolean, default: false }
 })
 
 defineEmits<{
@@ -68,7 +69,6 @@ const textarea = defineModel({ default: '' })
   white-space: pre-wrap;
   word-wrap: break-word;
   padding: var(--size-8);
-  font: inherit;
   letter-spacing: inherit;
   line-height: inherit;
 
@@ -110,9 +110,15 @@ const textarea = defineModel({ default: '' })
   transition: background-color var(--animation-fast);
   flex: 0 0 auto;
 
-  &:hover {
+  &:hover:not(:disabled) {
     color: var(--monochrome-900);
     background: var(--secondary-400);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--monochrome-300);
   }
 
   svg {

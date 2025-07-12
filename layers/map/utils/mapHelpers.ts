@@ -141,17 +141,22 @@ export function findMapInstance(map: ExtendedMapTilerMap, mapCache: Map<string, 
  * @param price number | null
  * @param hasNote boolean | undefined
  * @param isFavorite boolean | undefined
+ * @param tier string | undefined
  * @param vueApp optional Vue app context
  * @returns HTMLElement
  */
-export function renderMarker(price: number | null, hasNote?: boolean, isFavorite?: boolean, vueApp?: any): HTMLElement {
+export function renderMarker(id: string | number | null, price: number | null, tier?: string, vueApp?: any, priceType?: string | null): HTMLElement {
   const markerWrapper = document.createElement("div");
+  
+  const resolvedTier = tier === "FEATURED" || tier === "BASIC" || tier === "PREMIUM" ? tier : "BASIC";
+  
   const MarkerComp = defineComponent({
     setup: () => () => {
       return h(MoleculesPriceMarker, {
+        id,
         price,
-        hasNote: Boolean(hasNote),
-        isFavorite: Boolean(isFavorite),
+        tier: resolvedTier,
+        priceType,
       });
     },
   });
@@ -181,7 +186,19 @@ export function renderPopup(marker: MapMarker, vueApp?: any): any {
   const popupNode = createVNode(PopupComp);
   if (vueApp) popupNode.appContext = vueApp.vueApp._context;
   render(popupNode, popupWrapper);
-  return new sdk.Popup({ offset: 25 }).setDOMContent(popupWrapper);
+  
+  const popup = new sdk.Popup({ 
+    closeButton: false,
+    closeOnClick: true,
+    offset: {
+      'top': [0, 0],
+      'bottom': [0, 0],
+      'left': [0, 0],
+      'right': [0, 0]
+    }
+  }).setDOMContent(popupWrapper);
+
+  return popup;
 }
 
 /**

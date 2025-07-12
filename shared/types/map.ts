@@ -1,4 +1,5 @@
 import type { Map as MaptilerMap, Marker } from "@maptiler/sdk";
+import type { ListingTier } from "@prisma/client";
 
 /**
  * Map marker type for use with MapTiler maps
@@ -10,6 +11,7 @@ export type MapMarker = {
   title?: string | null;
   bedrooms: number | null;
   bathrooms: number | null;
+  receptions: number | null;
   price: number | null;
   propertyType?: string | null;
   classification?: string | null;
@@ -20,8 +22,9 @@ export type MapMarker = {
     postcode?: string;
   } | null;
   image?: any[]; // TODO: Define a proper image type
-  hasNote?: boolean;
-  isFavorite?: boolean;
+  hasNote?: boolean; // Optional - popup gets this independently
+  isFavorite?: boolean; // Optional - popup gets this independently  
+  tier: ListingTier; // Use string literals for tier
 };
 
 /**

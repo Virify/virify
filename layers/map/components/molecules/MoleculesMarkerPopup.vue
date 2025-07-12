@@ -1,94 +1,96 @@
 <template>
-  <div class="marker-popup" @click.stop>
-    <!-- Property image -->
-    <div v-if="hasImage" class="marker-popup-image-container">
-      <img class="marker-popup-image" :src="marker.image?.[0]?.image"
-        :alt="marker.image?.[0]?.metadata || marker.title || 'Property image'" @click.stop />
-    </div>
+  <div class="popup-wrapper">
+    <div class="listing-card" :class="{
+      'listing-card--featured': isFeatured,
+      'listing-card--premium': isPremium
+    }" @click.stop>
+      <!-- Banner -->
+      <div v-if="isFeaturedOrPremium" class="listing-card__banner | body-sm font-bold">
+        {{ isPremium ? 'Premium' : 'Featured' }}
+      </div>
+      <!-- Image -->
+      <div class="listing-card__image-container">
 
-    <!-- Title -->
-    <strong v-if="marker.title" class="marker-popup-title">{{ marker.title }}</strong>
+        <nuxt-img v-if="hasImage" :src="marker.image?.[0]?.image" alt="Listing image" class="listing-card__image" />
+      </div>
+      <!-- Content -->
+      <div class="listing-card__content">
 
-    <!-- Address -->
-    <div v-if="addressParts.length > 0" class="marker-popup-address">
-      {{ addressParts.join(', ') }}
-    </div>
-
-    <!-- Info container: price & details -->
-    <div class="marker-popup-info-container">
-      <!-- Price column -->
-      <div class="marker-popup-price-column">
-        <div v-if="marker.price !== null && marker.price !== undefined" class="marker-popup-price">
-          £{{ marker.price.toLocaleString() }}
+        <!-- Price and Actions -->
+        <div class="listing-card__header">
+          <div class="listing-card__price | title-md">
+            <p class="listing-card__price-value">{{ formattedPrice }}</p>
+            <p class="listing-card__price-type | body-xs">{{ props.marker.priceType }}</p>
+          </div>
+          <div class="listing-card__actions">
+            <button class="listing-card__action-btn" :class="{ 'is-active': isCurrentlyFavorite }"
+              @click="toggleFavourite">
+              <AtomsIcon name="heart" icon="cards/favourite" />
+            </button>
+            <button class="listing-card__action-btn" :class="{ 'is-active': currentlyHasNote }" @click="onNoteClick">
+              <AtomsIcon name="edit" icon="cards/notes" />
+            </button>
+          </div>
         </div>
-        <div v-if="marker.priceType" class="marker-popup-price-type">
-          {{ priceTypeFormatted }}
+
+        <!-- Property type -->
+        <div v-if="typeText" class="listing-card__type | title-xs">{{ typeText }}</div>
+
+        <!-- Features -->
+        <div v-if="hasBedrooms || hasBathrooms" class="listing-card__features">
+          <div v-if="hasBedrooms" class="listing-card__feature | font-semibold">
+            <AtomsIcon name="bedrooms" icon="property/bedrooms" />
+            <span class="body-sm">{{ marker.bedrooms }}</span>
+          </div>
+          <div v-if="hasBathrooms" class="listing-card__feature | body-sm font-semibold">
+            <AtomsIcon name="bathrooms" icon="property/bathrooms" />
+            <span class="body-sm">{{ marker.bathrooms }}</span>
+          </div>
+          <div v-if="hasReceptions" class="listing-card__feature | body-sm font-semibold">
+            <AtomsIcon name="receptions" icon="property/receptions" />
+            <span class="body-sm">{{ marker.receptions }}</span>
+          </div>
+        </div>
+
+        <!-- View button -->
+        <div class="listing-card__footer">
+          <nuxt-link :to="`/listing/${listingId}`" target="_blank"
+            class="listing-card__view-btn | button button-secondary body-sm">
+            View
+          </nuxt-link>
         </div>
       </div>
-
-      <!-- Details column -->
-      <div class="marker-popup-details-column">
-        <div v-if="typeText" class="marker-popup-property-type">{{ typeText }}</div>
-        <div v-if="hasBedrooms || hasBathrooms" class="marker-popup-features">
-          <span v-if="hasBedrooms" class="marker-popup-bedrooms">
-            {{ marker.bedrooms }} bed{{ marker.bedrooms !== 1 ? 's' : '' }}
-          </span>
-          <span v-if="hasBedrooms && hasBathrooms"> • </span>
-          <span v-if="hasBathrooms" class="marker-popup-bathrooms">
-            {{ marker.bathrooms }} bath{{ marker.bathrooms !== 1 ? 's' : '' }}
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Action buttons -->
-    <div v-if="listingId !== null" class="marker-popup-actions" @click.stop>
-      <NuxtLink :to="`/listing/${listingId}`" class="marker-popup-view-link" @click.stop>
-        View Listing
-      </NuxtLink>
-
-      <!-- Notes button -->
-      <div class="marker-popup-notes-button-container">
-        <button type="button" role="switch" aria-label="Add/Edit Notes" class="marker-popup-notes-button note-button"
-          :class="{ 'has-note': marker.hasNote }" @click.stop="onNoteClick">
-          <AtomsIcon icon="cards/notes" class="note-button-icon" />
-        </button>
-      </div>
-
-      <!-- Favorite button -->
-      <AtomsFavouriteButton :listing-id="listingId" class="marker-popup-favorite-button" @click.stop />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { MapMarker } from '~~/shared/types/map';
-import { useNotes } from '~/composables/useNotes';
 
 const props = defineProps<{
   marker: MapMarker;
 }>();
 
 // Computed properties
+
+const formattedPrice = computed(() => {
+  return `£${parseInt(String(props.marker.price)).toLocaleString()}`;
+});
+
 const hasBedrooms = computed(() =>
   props.marker.bedrooms !== null && props.marker.bedrooms !== undefined
 );
 const hasBathrooms = computed(() =>
   props.marker.bathrooms !== null && props.marker.bathrooms !== undefined
 );
+const hasReceptions = computed(() =>
+  props.marker.receptions !== null && props.marker.receptions !== undefined
+);
 const listingId = computed(() =>
   typeof props.marker.id === "number" ? props.marker.id : null
 );
-const addressParts = computed(() =>
-  props.marker.address ?
-    [props.marker.address.street, props.marker.address.city, props.marker.address.postcode].filter(Boolean) :
-    []
-);
+
 const typeText = computed(() =>
   [props.marker.propertyType, props.marker.classification].filter(Boolean).join(" - ")
-);
-const priceTypeFormatted = computed(() =>
-  props.marker.priceType ? props.marker.priceType.replace(/_/g, " ").toLowerCase() : ''
 );
 const hasImage = computed(() =>
   props.marker.image &&
@@ -96,222 +98,350 @@ const hasImage = computed(() =>
   props.marker.image[0].image
 );
 
+const isFeatured = computed(() => props.marker.tier === 'FEATURED');
+const isPremium = computed(() => props.marker.tier === 'PREMIUM');
+const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
+
 // Event handlers
-const { showNoteDialog } = useNotes();
+const { showNoteDialog, hasNote } = useNotes();
+const { toggleFavourite: toggleFav, isFavourite } = useFavourites();
+
+// Get live favorite/note status (separate from marker data to avoid re-renders)
+const isCurrentlyFavorite = computed(() => isFavourite(props.marker.id as number));
+const currentlyHasNote = computed(() => hasNote(props.marker.id as number));
+
 const onNoteClick = () => {
-  console.log("Note button clicked for marker:", props.marker.id);
   if (props.marker.id as number) {
     showNoteDialog(props.marker.id as number);
   }
 };
+
+const toggleFavourite = () => {
+  if (props.marker.id as number) {
+    toggleFav(props.marker.id as number);
+  }
+};
+
+onMounted(() => {
+  // Ensure the marker is rendered correctly on mount
+ console.log('Marker mounted:', props.marker);
+});
 </script>
 
-<style scoped>
-/* Override MapTiler popup styles */
-:global(.maplibregl-popup-content) {
+<style lang="scss">
+/* MapLibre popup overrides */
+.maplibregl-popup-content {
+  background: transparent !important;
+  width: var(--size-280) !important;
+  max-width: var(--size-280) !important;
+  min-width: var(--size-280) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  pointer-events: auto !important;
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--monochrome-300) !important;
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--monochrome-300) !important;
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--monochrome-300) !important;
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--monochrome-300) !important;
+}
+
+/* Featured popup tip colors */
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--secondary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--featured).maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--secondary-400) !important;
+}
+
+/* Premium popup tip colors - specific to each anchor position */
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--primary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--primary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--primary-400) !important;
+}
+
+.maplibregl-popup:has(.listing-card--premium).maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--primary-400) !important;
+}
+
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  display: none !important;
+}
+
+.maplibregl-popup-close-button {
+  display: none !important;
+}
+
+
+/* Target the popup element directly to override inline styles */
+.maplibregl-popup[style] {
+  max-width: none !important;
+}
+
+.maplibregl-popup-content[style] {
+  max-width: 280px !important;
+  width: 280px !important;
+}
+
+
+.popup-wrapper {
+  position: relative;
+  background: transparent;
   padding: 0;
-  background: none;
-  border-radius: 0;
+  margin: 0;
+  border: none;
   box-shadow: none;
 }
 
-:global(.maplibregl-popup-tip) {
-  display: none;
-}
+/* ============================================
+   CARD BASE STYLES
+   ============================================ */
 
-/* Main popup styles */
-.marker-popup {
-  padding: 0;
-  max-width: 250px !important; /* Reduced width */
-  font-family: var(--font-family, system-ui, sans-serif);
-  border-radius: var(--border-radius-md, 8px);
-  overflow: hidden;
-  width: 250px !important; /* Reduced width */
-  background-color: var(--background-100);
-  color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.marker-popup-image-container {
-  width: 100%;
-  height: 140px; /* Reduced height */
-  overflow: hidden;
-  position: relative;
-}
-
-.marker-popup-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.marker-popup-image:hover {
-  transform: scale(1.05);
-}
-
-.marker-popup-title {
-  font-size: 14px; /* Reduced font size */
-  font-weight: 600;
-  display: block;
-  margin-bottom: 4px; /* Reduced margin */
-  color: var(--text-primary);
-  padding: 10px 10px 0; /* Reduced padding */
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.marker-popup-address {
-  font-size: 11px; /* Reduced font size */
-  margin-bottom: 8px; /* Reduced margin */
-  color: var(--text-secondary);
-  font-style: italic;
-  padding: 0 10px; /* Reduced padding */
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.marker-popup-info-container {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px; /* Reduced padding */
-  margin: 6px 0; /* Reduced margin */
-  gap: 8px; /* Reduced gap */
-}
-
-.marker-popup-price-column {
-  flex: 1;
-}
-
-.marker-popup-details-column {
-  flex: 2;
+.listing-card {
+  background-color: var(--background-200);
+  border: var(--size-2) solid var(--monochrome-300);
+  border-radius: var(--border-radius-2xl);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-}
-
-.marker-popup-price {
-  font-size: 16px; /* Reduced font size */
-  font-weight: 700;
-  color: var(--secondary-500);
-  margin-bottom: 0;
-}
-
-.marker-popup-price-type {
-  font-size: 10px; /* Reduced font size */
-  color: var(--text-secondary);
-  text-transform: capitalize;
-}
-
-.marker-popup-property-type {
-  font-size: 12px; /* Reduced font size */
-  margin-bottom: 2px; /* Reduced margin */
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.marker-popup-features {
-  font-size: 11px; /* Reduced font size */
-  color: var(--text-secondary);
-  margin-bottom: 0;
-}
-
-.marker-popup-actions {
-  display: flex;
-  gap: 6px; /* Reduced gap */
-  margin: 8px 0 0; /* Reduced margin */
-  padding: 0 10px 10px; /* Reduced padding */
-}
-
-.marker-popup-view-link {
-  display: block;
-  padding: 6px 10px; /* Reduced padding */
-  background-color: var(--secondary-500);
-  color: white;
-  text-decoration: none;
-  border-radius: var(--border-radius-sm, 4px);
-  text-align: center;
-  font-size: 12px; /* Reduced font size */
-  font-weight: 500;
-  transition: all 0.2s;
-  flex-grow: 1;
-}
-
-.marker-popup-view-link:hover {
-  background-color: var(--secondary-600);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
-}
-
-.marker-popup-notes-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px; /* Reduced size */
-  height: 30px; /* Reduced size */
-  background-color: var(--background-200);
-  border: none;
-  border-radius: var(--border-radius-sm, 4px);
-  cursor: pointer;
-  transition: all 0.2s;
+  margin: 0;
+  max-width: 280px;
+  padding: 0;
   position: relative;
+  width: 280px;
 }
 
-.marker-popup-notes-button:hover {
-  background-color: var(--background-300);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px var(--shadow-subtle, rgba(0, 0, 0, 0.2));
+/* ============================================
+   CARD TIER VARIANTS
+   ============================================ */
+
+.listing-card--featured {
+  border-color: var(--secondary-400);
 }
 
-/* Selected state for favorites button */
-.marker-popup-favorite-button.selected {
-  background-color: var(--pink-100);
+.listing-card--premium {
+  background: var(--monochrome-300);
+  border-color: var(--primary-400);
+  color: var(--monochrome-100);
 }
 
-.marker-popup-favorite-button.selected svg {
-  fill: var(--pink-500);
-  color: var(--pink-500);
-}
+/* ============================================
+   BANNER
+   ============================================ */
 
-.marker-popup-button-icon,
-.note-button-icon {
-  width: 16px; /* Reduced size */
-  height: 16px; /* Reduced size */
-  color: var(--text-secondary);
-}
-
-/* Note button styles */
-.note-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Has note styling */
-.marker-popup-notes-button.has-note {
-  background-color: var(--background-200);
-}
-
-.marker-popup-notes-button.has-note svg {
-  color: var(--secondary-600);
-}
-
-/* Has note animation (same as original component) */
-.marker-popup-notes-button.has-note .note-button-confetti {
+.listing-card__banner {
+  background-color: var(--secondary-400);
+  border-radius: calc(var(--border-radius-2xl) - 4px) 0 var(--border-radius-lg) 0;
+  color: var(--monochrome-900);
+  left: -2px;
+  padding: 6px 16px;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
+  top: 0;
+  z-index: 3;
 }
 
-.marker-popup-notes-button-container,
-.marker-popup-favorite-button-container {
+.listing-card--featured .listing-card__banner {
+  left: -1px;
+  top: -1px;
+}
+
+.listing-card--premium .listing-card__banner {
+  background-color: var(--primary-400);
+  color: var(--monochrome-300);
+  left: -1px;
+  top: -1px;
+}
+
+/* ============================================
+   IMAGE
+   ============================================ */
+
+.listing-card__image-container {
+  border-radius: calc(var(--border-radius-2xl) - var(--size-2)) calc(var(--border-radius-2xl) - var(--size-2)) 0 0;
+  height: 140px;
+  overflow: hidden;
   position: relative;
+  z-index: 1;
+}
+
+.listing-card__image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* ============================================
+   CONTENT AREA
+   ============================================ */
+
+.listing-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--size-4);
+  padding: var(--size-12);
+}
+
+/* Header with price and actions */
+.listing-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+
+/* Price */
+.listing-card__price {
+  color: var(--secondary-500);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.listing-card__price-type {
+  margin-top: 0;
+  text-transform: lowercase;
+  color: var(--monochrome-600);
+}
+
+
+.listing-card--premium .listing-card__price {
+  color: var(--primary-500);
+}
+
+.listing-card--premium .listing-card__type {
+  color: var(--monochrome-900);
+}
+
+/* Features */
+.listing-card__features {
+  display: flex;
+  gap: var(--size-8);
+  margin-bottom: var(--size-8);
+}
+
+.listing-card__feature {
+  align-items: center;
+  color: var(--text-color);
+  font-size: var(--font-2xl);
+  display: flex;
+  gap: var(--size-4);
+}
+
+.listing-card--premium .listing-card__feature {
+  color: var(--monochrome-900);
+}
+
+
+.listing-card__feature svg {
+  color: var(--text-secondary);
+}
+
+.listing-card--premium .listing-card__feature svg {
+  color: var(--monochrome-900);
+}
+
+/* ============================================
+   ACTION BUTTONS (HEART/NOTES)
+   ============================================ */
+
+.listing-card__actions {
+  background-color: var(--secondary-400);
+  border-radius: var(--border-radius-pill);
+  display: flex;
+  gap: var(--size-8);
+  padding: var(--size-8);
+}
+
+.listing-card--premium .listing-card__actions {
+  background-color: var(--primary-400);
+}
+
+.listing-card__action-btn {
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--monochrome-100);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-xl);
+  height: var(--size-24);
+  justify-content: center;
+  transition: color 0.2s ease-in-out;
+  width: var(--size-24);
+}
+
+.listing-card__action-btn.is-active {
+  color: var(--monochrome-900);
+}
+
+/* ============================================
+   VIEW BUTTON
+   ============================================ */
+
+.listing-card__footer {
+  margin-top: auto;
+}
+
+.listing-card__view-btn {
+  background: var(--secondary-400);
+  border: none;
+  border-radius: var(--border-radius-lg);
+  color: var(--monochrome-900);
+  display: inline-block;
+  padding: var(--size-8);
+  text-align: center;
+  text-decoration: none;
+  transition: none;
+  width: 100%;
+}
+
+.listing-card__view-btn:hover {
+  background: var(--secondary-400);
+  color: var(--monochrome-900);
+}
+
+.listing-card--premium .listing-card__view-btn {
+  background: var(--primary-400);
+  color: var(--monochrome-300);
+}
+
+.listing-card--featured .listing-card__view-btn:hover {
+  background: var(--secondary-400);
+  color: var(--monochrome-900);
 }
 </style>

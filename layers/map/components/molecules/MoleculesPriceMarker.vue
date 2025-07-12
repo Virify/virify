@@ -1,56 +1,78 @@
 <template>
   <div class="price-marker-container">
     <!-- SVG Marker Shape -->
-    <!-- Regular teardrop marker -->
-    <AtomsIcon 
-      v-if="isFavorite === false || isFavorite === null"
-      icon="map/marker" 
-      class="marker-shape teardrop-marker"
-    />
-    
-    <!-- Heart marker for favorites -->
-    <AtomsIcon 
-      v-else
-      icon="map/fav-marker" 
-      class="marker-shape heart-marker"
-    />
-    
+    <!-- Dynamic marker based on favorite status and tier -->
+    <AtomsIcon :icon="markerIcon" :class="markerClass" />
+
+    <!-- Favorite indicator -->
+    <div v-if="isCurrentlyFavorite" class="favorite-indicator">
+      <AtomsIcon icon="heart" class="favorite-icon" />
+    </div>
+
     <!-- Content overlay -->
     <div class="price-marker-content">
-      <span class="price-marker-price | body-xs font-bold">{{ priceDisplay }}</span>
-      <div v-if="hasNote && !isFavorite" class="marker-note-indicator">
-        <AtomsIcon icon="cards/notes" class="note-button-icon" />
-      </div>
+      <span class="price-marker-price | body-xs font-semibold">{{ priceDisplay }}</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 interface MarkerProps {
+  id: string | number | null;
   price: number | null;
   hasNote?: boolean | null;
   isFavorite?: boolean | null;
+  tier?: 'FEATURED' | 'BASIC' | 'PREMIUM';
+  priceType?: string | null;
 }
 
 const props = defineProps<MarkerProps>();
 
-// Debug log to see what's happening
-console.log('MoleculesPriceMarker props:', { 
-  price: props.price, 
-  hasNote: props.hasNote, 
-  isFavorite: props.isFavorite,
-  isFavoriteType: typeof props.isFavorite,
-  isFavoriteString: String(props.isFavorite)
-});
+// Use composables for live favorite status (separate from props to avoid re-renders)
+const { isFavourite } = useFavourites();
 
-// Format price as £XXk if >= 10000, otherwise just format with commas
+// Get live favorite status
+const isCurrentlyFavorite = computed(() => isFavourite(props.id as number));
+
+// Format price based on property type (sale vs rental)
 const priceDisplay = computed(() => {
   if (props.price === null || props.price === undefined) {
     return "";
   }
-  return props.price >= 10000 
-    ? `£${Math.round(props.price / 1000)}k` 
-    : `£${props.price.toLocaleString()}`;
+  
+  // Check if it's a rental property based on priceType
+  const isRental = props.priceType && 
+    (props.priceType.toLowerCase().includes('month') || 
+     props.priceType.toLowerCase().includes('week') || 
+     props.priceType.toLowerCase().includes('pcm') ||
+     props.priceType.toLowerCase().includes('pw'));
+  
+  if (isRental) {
+    // For rentals, just remove pennies (round to nearest pound)
+    return `£${Math.round(props.price).toLocaleString()}`;
+  } else {
+    // For sales, use higher threshold (£10000+ becomes £10k)
+    return props.price >= 10000
+      ? `£${Math.round(props.price / 1000)}k`
+      : `£${props.price.toLocaleString()}`;
+  }
+});
+
+// Computed marker icon based on favorite status and tier
+const markerIcon = computed(() => {
+
+  switch (props.tier) {
+    case "PREMIUM": return "map/marker-premium";
+    case "FEATURED": return "map/marker-featured";
+    case "BASIC":
+    default: return "map/marker-basic";
+  }
+});
+
+// Computed marker class based on favorite status and tier
+const markerClass = computed(() => {
+  if (props.tier === "PREMIUM") return "marker-shape teardrop-marker premium-marker";
+  return "marker-shape teardrop-marker";
 });
 
 </script>
@@ -64,6 +86,12 @@ const priceDisplay = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Ensure the bottom of the container is the precise anchor point */
+  transform-origin: center bottom;
+  /* Inherit z-index from parent wrapper for proper stacking */
+  z-index: inherit;
+  /* Make container non-clickable, only the actual marker content should be clickable */
+  pointer-events: none;
 }
 
 .marker-shape {
@@ -72,24 +100,53 @@ const priceDisplay = computed(() => {
   left: 0;
   width: 70px;
   height: 70px;
-  color: var(--secondary-400);
+  color: var(--monochrome-300);
+  /* Allow clicking on the actual marker shape */
+  pointer-events: auto;
 }
 
 .marker-shape.heart-marker {
   color: var(--favourite-colour);
 }
 
-.teardrop-marker {
-  transform: rotate(180deg);
-}
-
 /* Content overlay positioned on top of the SVG */
 .price-marker-content {
   position: absolute;
-  top: 50%;
+  top: 34%;
+  /* Adjusted to center in the circular part of the teardrop */
   left: 50%;
-  transform: translate(-50%, -60%); /* Adjusted for new SVG positioning */
-  color: var(--monochrome-100);
+  transform: translate(-50%, -50%);
+  color: var(--monochrome-900);
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  /* Allow clicking on the price content */
+  pointer-events: auto;
+  font: inherit;
+}
+
+/* Favorite indicator */
+.favorite-indicator {
+  position: absolute;
+  top: var(--size-4);
+  right: var(--size-4);
+  z-index: 2;
+  background-color: var(--favourite-colour);
+  border-radius: 50%;
+  width: var(--size-16);
+  height: var(--size-16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 var(--size-2) var(--size-4) rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+}
+
+.favorite-icon {
+  color: var(--monochrome-100);
+  font-size: var(--font-xs);
 }
 </style>

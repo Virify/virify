@@ -10,8 +10,6 @@
   </div>
 </template>
 <script setup lang="ts">
-const { isFavourite } = useFavourites();
-const { hasNote } = useNotes();
 /**
  * state
  */
@@ -138,6 +136,7 @@ watch(
 watch(
   [() => props.searchRadius, () => props.searchCenter, () => map.value],
   ([radius, center, mapInstance]) => {
+    
     if (!mapInstance) return;
     if (center) {
       updateSearchRadiusVisualization(mapInstance, center, Number(radius));
@@ -190,7 +189,7 @@ function updateMarkers() {
  * 
  * @param listing
  */
-function formatMarker(listing: ListingCardType) {
+function formatMarker(listing: ListingCardType): MapMarker {
   return {
     id: listing.id,
     lat: listing.property?.address?.lat ?? 0,
@@ -198,6 +197,7 @@ function formatMarker(listing: ListingCardType) {
     title: listing.title ?? null,
     bedrooms: listing.property?.numberBedrooms ?? null,
     bathrooms: listing.property?.numberBathrooms ?? null,
+    receptions: listing.property?.numberReceptions ?? null,
     price: listing.price ?? null,
     propertyType: listing.property?.type?.name ?? null,
     classification: listing.property?.classification?.name ?? null,
@@ -210,8 +210,7 @@ function formatMarker(listing: ListingCardType) {
         }
       : null,
     image: listing.property?.media ?? [],
-    isFavorite: isFavourite(listing.id),
-    hasNote: hasNote(listing.id),
+    tier: listing.listingTier,
   };
 }
 
@@ -221,7 +220,7 @@ function formatMarker(listing: ListingCardType) {
  * @returns {Array} - Array of formatted markers
  */
 const formattedMarkers = computed(() => {
-  if (props.markers) return props.markers.map(formatMarker);
+  if (props.markers) return props.markers.map(listing => formatMarker(listing));
   if (props.marker) return [formatMarker(props.marker)];
   return [];
 });
