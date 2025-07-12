@@ -8,17 +8,20 @@
       <div v-if="isFeaturedOrPremium" class="listing-card__banner | body-sm font-bold">
         {{ isPremium ? 'Premium' : 'Featured' }}
       </div>
-
       <!-- Image -->
       <div class="listing-card__image-container">
+
         <nuxt-img v-if="hasImage" :src="marker.image?.[0]?.image" alt="Listing image" class="listing-card__image" />
       </div>
-
       <!-- Content -->
       <div class="listing-card__content">
+
         <!-- Price and Actions -->
         <div class="listing-card__header">
-          <div class="listing-card__price | title-md">{{ formattedPrice }}</div>
+          <div class="listing-card__price | title-md">
+            <p class="listing-card__price-value">{{ formattedPrice }}</p>
+            <p class="listing-card__price-type | body-xs">{{ props.marker.priceType }}</p>
+          </div>
           <div class="listing-card__actions">
             <button class="listing-card__action-btn" :class="{ 'is-active': isCurrentlyFavorite }"
               @click="toggleFavourite">
@@ -301,26 +304,31 @@ const toggleFavourite = () => {
 
 /* Header with price and actions */
 .listing-card__header {
-  align-items: center;
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
 }
+
 
 /* Price */
 .listing-card__price {
   color: var(--secondary-500);
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
+
+.listing-card__price-type {
+  margin-top: 0;
+  text-transform: lowercase;
+  color: var(--monochrome-600);
+}
+
 
 .listing-card--premium .listing-card__price {
   color: var(--primary-500);
-}
-
-/* Property type */
-.listing-card__type {
-  color: var(--text-secondary);
-  margin: 0;
 }
 
 .listing-card--premium .listing-card__type {

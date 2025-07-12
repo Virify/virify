@@ -1,8 +1,14 @@
 <template>
   <div v-if="hasMenuItems" class="m-menu-wrapper">
     <!-- Menu Toggle Button -->
-    <button type="button" class="m-burger-menu-toggle" :class="{ hidden: menuOpen }" @click="toggleMenu"
-      aria-label="Toggle menu" :aria-expanded="menuOpen">
+    <button 
+      type="button" 
+      class="m-burger-menu-toggle" 
+      :class="{ hidden: menuOpen }" 
+      @click="toggleMenu"
+      aria-label="Toggle menu" 
+      :aria-expanded="menuOpen"
+    >
       <div class="m-burger-menu-icon">
         <span></span>
         <span></span>
@@ -11,34 +17,57 @@
     </button>
 
     <!-- Menu Overlay -->
-    <div class="m-menu-overlay" :class="{ active: menuOpen }" @click="closeMenu"></div>
+    <div 
+      class="m-menu-overlay" 
+      :class="{ active: menuOpen }" 
+      @click="closeMenu"
+    ></div>
 
     <!-- Menu Container -->
     <div class="m-menu-container" :class="{ open: menuOpen }">
       <div class="m-menu-container-header">
-        <h2 class="| body-sm font-bold">Menu</h2>
-        <button type="button" class="m-menu-close-button" @click="closeMenu" aria-label="Close menu">
+        <h2 class="body-sm font-bold">Menu</h2>
+        <button 
+          type="button" 
+          class="m-menu-close-button" 
+          @click="closeMenu" 
+          aria-label="Close menu"
+        >
           <AtomsIcon width="20" height="20" icon="cross" />
         </button>
       </div>
+      
       <div v-for="(group, index) in options" :key="`menu-${index}`" class="m-menu-group">
-        <button @click="toggleGroup(index)" class="m-menu-header" :class="{ expanded: expandedGroups[index] }"
-          type="button" :aria-expanded="expandedGroups[index] ? 'true' : 'false'"
-          :aria-controls="`menu-group-${index}`">
+        <button 
+          @click="toggleGroup(index)" 
+          class="m-menu-header" 
+          :class="{ expanded: expandedGroups[index] }"
+          type="button" 
+          :aria-expanded="expandedGroups[index] ? 'true' : 'false'"
+          :aria-controls="`menu-group-${index}`"
+        >
           <AtomsIcon width="24" height="24" :icon="group.icon" class="m-menu-icon" />
-          <h3 class="| body-sm font-bold">{{ group.title }}</h3>
+          <h3 class="body-sm font-bold">{{ group.title }}</h3>
           <AtomsIcon width="16" height="16" icon="arrow-right" class="m-menu-chevron" />
         </button>
-        <ul :id="`menu-group-${index}`" class="m-menu-list" :class="{ expanded: expandedGroups[index] }"
-          v-show="expandedGroups[index]">
+        
+        <ul 
+          :id="`menu-group-${index}`" 
+          class="m-menu-list" 
+          :class="{ expanded: expandedGroups[index] }"
+          v-show="expandedGroups[index]"
+        >
           <li v-for="(item, idx) in group.items" :key="`menu-item-${idx}`" class="m-menu-item">
             <AtomsIcon :name="item.icon" :icon="item.icon" height="22" width="22" class="m-menu-item-icon" />
-            <NuxtLink v-if="!item.action" :to="item.url" class="m-menu-link | body-sm">
+            
+            <NuxtLink v-if="!item.action" :to="item.url" class="m-menu-link body-sm">
               {{ item.name }}
-              <span v-if="item.countKey && getAggregateCount(item.countKey)" class="| body-xs font-bold"> ({{
-                getAggregateCount(item.countKey) }}) </span>
+              <span v-if="item.countKey && getAggregateCount(item.countKey)" class="body-xs font-bold">
+                ({{ getAggregateCount(item.countKey) }})
+              </span>
             </NuxtLink>
-            <button v-else @click="handleMenuNavAction(item.action)" class="m-menu-link | body-sm">
+            
+            <button v-else @click="handleMenuNavAction(item.action)" class="m-menu-link body-sm">
               {{ item.name }}
             </button>
           </li>
@@ -51,6 +80,7 @@
 <script setup lang="ts">
 import { useWebSocket } from "@vueuse/core";
 
+// Props
 const props = defineProps({
   options: {
     type: Array as PropType<NavigationGroup[]>,
@@ -58,63 +88,71 @@ const props = defineProps({
   },
 });
 
-/**
- * Composables
- */
+// Composables
 const config = useRuntimeConfig();
 const { data } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
 const { clear } = useUserSession();
 const { fetchUserItemsAggregates, getAggregateCount, handleAggregateUpdate } = useNotifications();
 const { handleOutgoingMessages } = useWebSocketServer();
 
-/**
- * Menu State
- */
+// State
 const menuOpen = ref(false);
 const expandedGroups = ref<Record<number, boolean>>({});
 
-/**
- * WebSocket Events
- */
+// Computed
+const hasMenuItems = computed(() => {
+  return Array.isArray(props.options) && props.options.length > 0;
+});
+
+// WebSocket Events
 const navigationWebSocketEvents = {
-  onAggregateUpdate: ({ aggregateType, operation }: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" | "update" }) => {
+  onAggregateUpdate: ({ 
+    aggregateType, 
+    operation 
+  }: { 
+    aggregateType: keyof UserItemsAggregates; 
+    operation: "add" | "remove" | "update" 
+  }) => {
     handleAggregateUpdate({ 
       type: "aggregate_update",
       aggregateType, 
       operation,
-      to: 0, // Will be set by WebSocket layer
+      to: 0,
       timestamp: new Date().toISOString()
     });
   },
 };
 
-/**
- * WebSocket Message Handlers
- */
+// WebSocket Message Handlers
 watchEffect(() => {
   if (data.value) {
     handleOutgoingMessages(data.value, navigationWebSocketEvents);
   }
 });
 
-/**
- * Set all groups expanded by default
- */
+// Lifecycle
 onMounted(() => {
-  // Fetch account counts when the component is mounted
   fetchUserItemsAggregates();
-
+  
   // Set all menu groups to expanded by default
-  if (props.options && Array.isArray(props.options)) {
+  if (props.options?.length) {
     props.options.forEach((_, index) => {
       expandedGroups.value[index] = true;
     });
   }
 });
 
-/**
- * Toggle group expansion
- */
+// Menu Functions
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value;
+  document.body.style.overflow = menuOpen.value ? "hidden" : "";
+}
+
+function closeMenu() {
+  menuOpen.value = false;
+  document.body.style.overflow = "";
+}
+
 function toggleGroup(index: number) {
   expandedGroups.value = {
     ...expandedGroups.value,
@@ -122,74 +160,32 @@ function toggleGroup(index: number) {
   };
 }
 
-/**
- * Toggle menu
- */
-function toggleMenu() {
-  menuOpen.value = !menuOpen.value;
-  if (menuOpen.value) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "";
-  }
-}
-
-/**
- * Close menu
- */
-function closeMenu() {
-  menuOpen.value = false;
-  document.body.style.overflow = "";
-}
-
-/**
- * Handle navigation actions with menu closure
- */
 function handleMenuNavAction(action: string) {
   handleNavAction(action);
   closeMenu();
 }
 
-/**
- *  Check options length
- */
-const hasMenuItems = computed(() => {
-  const { options } = props;
-
-  return Array.isArray(options) && options.length;
-});
-
-/**
- * Logout
- */
+// Navigation Actions
 async function logout() {
   await clear();
-  navigateTo("/");
+  
+  // Only redirect to homepage if currently on /account routes
+  const route = useRoute();
+  if (route.path.startsWith('/account')) {
+    navigateTo("/");
+  }
 }
 
-/**
- * Deletes the user account
- * Redirects to the home page after successful deletion
- * Shows an error notification if deletion fails
- * Shows a success notification if deletion is successful
- */
 async function deleteAccount() {
-  await $fetch("/auth/delete", {
-    method: "DELETE",
-  })
-    .then(() => {
-      clear();
-      navigateTo("/");
-    })
-    .catch((error) => {
-      console.error("Error deleting account:", error);
-    });
+  try {
+    await $fetch("/auth/delete", { method: "DELETE" });
+    await clear();
+    navigateTo("/");
+  } catch (error) {
+    console.error("Error deleting account:", error);
+  }
 }
 
-/**
- * Handle navigation actions
- * @param {string} action - The action to perform
- */
 function handleNavAction(action: string) {
   switch (action) {
     case "logout":
@@ -202,8 +198,6 @@ function handleNavAction(action: string) {
       console.warn(`Action '${action}' not implemented`);
   }
 }
-
-// onMounted hook moved to menu state section above for better organization
 </script>
 
 <style scoped lang="scss">
@@ -287,7 +281,7 @@ function handleNavAction(action: string) {
   }
 }
 
-/* Menu */
+/* Menu Container */
 .m-menu-container {
   display: block;
   position: fixed;
@@ -335,6 +329,7 @@ function handleNavAction(action: string) {
   }
 }
 
+/* Menu Groups */
 .m-menu-group {
   margin-bottom: var(--size-16);
   padding-bottom: var(--size-16);
@@ -381,6 +376,13 @@ function handleNavAction(action: string) {
   color: var(--foreground-80, #666);
 }
 
+.m-menu-icon {
+  display: block;
+  width: var(--size-28);
+  height: var(--size-28);
+}
+
+/* Menu Items */
 .m-menu-list {
   list-style: none;
   padding: 0;
@@ -421,11 +423,5 @@ function handleNavAction(action: string) {
   cursor: pointer;
   width: 100%;
   text-align: left;
-}
-
-.m-menu-icon {
-  display: block;
-  width: var(--size-28);
-  height: var(--size-28);
 }
 </style>

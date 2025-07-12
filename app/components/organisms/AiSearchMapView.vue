@@ -109,7 +109,7 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
   width: 100%;
   height: 70vh;
   min-height: 500px;
-  border-radius: var(--border-radius-2xl);
+  border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
   overflow: hidden;
 }
 

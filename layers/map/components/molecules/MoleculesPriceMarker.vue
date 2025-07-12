@@ -23,6 +23,7 @@ interface MarkerProps {
   hasNote?: boolean | null;
   isFavorite?: boolean | null;
   tier?: 'FEATURED' | 'BASIC' | 'PREMIUM';
+  priceType?: string | null;
 }
 
 const props = defineProps<MarkerProps>();
@@ -33,14 +34,28 @@ const { isFavourite } = useFavourites();
 // Get live favorite status
 const isCurrentlyFavorite = computed(() => isFavourite(props.id as number));
 
-// Format price as £XXk if >= 10000, otherwise just format with commas
+// Format price based on property type (sale vs rental)
 const priceDisplay = computed(() => {
   if (props.price === null || props.price === undefined) {
     return "";
   }
-  return props.price >= 10000
-    ? `£${Math.round(props.price / 1000)}k`
-    : `£${props.price.toLocaleString()}`;
+  
+  // Check if it's a rental property based on priceType
+  const isRental = props.priceType && 
+    (props.priceType.toLowerCase().includes('month') || 
+     props.priceType.toLowerCase().includes('week') || 
+     props.priceType.toLowerCase().includes('pcm') ||
+     props.priceType.toLowerCase().includes('pw'));
+  
+  if (isRental) {
+    // For rentals, just remove pennies (round to nearest pound)
+    return `£${Math.round(props.price).toLocaleString()}`;
+  } else {
+    // For sales, use higher threshold (£10000+ becomes £10k)
+    return props.price >= 10000
+      ? `£${Math.round(props.price / 1000)}k`
+      : `£${props.price.toLocaleString()}`;
+  }
 });
 
 // Computed marker icon based on favorite status and tier
@@ -110,6 +125,7 @@ const markerClass = computed(() => {
   width: 100%;
   /* Allow clicking on the price content */
   pointer-events: auto;
+  font: inherit;
 }
 
 /* Favorite indicator */
