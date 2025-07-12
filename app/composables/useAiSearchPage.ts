@@ -39,8 +39,12 @@ export const useAiSearchPage = () => {
     }
   };
 
-  // Reset all state
+  // Reset all state but preserve view mode
   const resetForm = () => {
+    // Preserve the current view mode before clearing
+    const { searchState } = useSearchState();
+    const currentViewMode = searchState.value.viewMode;
+    
     searchResults.value = null;
     queryAnalysis.value = null;
     isSearching.value = false;
@@ -59,6 +63,9 @@ export const useAiSearchPage = () => {
     searchQuery.value = ''; // Reset the global search query
     globalQueryAnalysis.value = null; // Reset the global query analysis
     clearSearchState();
+    
+    // Restore the view mode after clearing
+    saveSearchState({ viewMode: currentViewMode });
   };
 
   // Save current form state

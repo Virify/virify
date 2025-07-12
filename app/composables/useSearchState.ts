@@ -13,6 +13,7 @@ interface SearchState {
   totalResults: number
   whereClause: any
   locationContext: any
+  viewMode: 'list' | 'map'
 }
 
 const defaultState: SearchState = {
@@ -27,7 +28,8 @@ const defaultState: SearchState = {
   totalPages: null,
   totalResults: 0,
   whereClause: null,
-  locationContext: null
+  locationContext: null,
+  viewMode: 'list'
 }
 
 export const useSearchState = () => {

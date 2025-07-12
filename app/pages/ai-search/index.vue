@@ -106,6 +106,9 @@ const {
   paginateSearch
 } = useAiSearchPage();
 
+// Access search state for view mode persistence
+const { saveSearchState, restoreSearchState } = useSearchState();
+
 // Computed properties (belong in template, not composable)
 const shouldShowFeedback = computed(() =>
   isSearching.value || (hasSearched.value && (!searchResults.value || searchResults.value.length === 0)) || searchError.value
@@ -123,11 +126,21 @@ const hasSavedState = computed(() =>
   !!(lastSearchQuery.value || lastLocation.value || lastRadius.value)
 );
 
-// Map view state
+// Map view state - initialize from saved state
 const isMapView = ref(false);
+
+// Initialize view state from localStorage
+const initializeViewState = () => {
+  if (import.meta.client) {
+    const restored = restoreSearchState();
+    isMapView.value = restored.viewMode === 'map';
+  }
+};
 
 const toggleView = () => {
   isMapView.value = !isMapView.value;
+  // Save the new view mode to localStorage
+  saveSearchState({ viewMode: isMapView.value ? 'map' : 'list' });
 };
 
 const sortedResults = computed(() => {
@@ -142,6 +155,7 @@ import { applySortToResults } from '~/utils/searchSort';
 // Initialize state on mount
 onMounted(() => {
   initializeFromSavedState();
+  initializeViewState();
 });
 
 // Handle sort changes
