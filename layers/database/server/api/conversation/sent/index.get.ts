@@ -1,5 +1,5 @@
 /**
- * Fetch conversations for the authenticated user
+ * Fetch csent conversations for the authenticated user
  */
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
@@ -8,5 +8,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
   }
 
-  return await getConversationsByUserId(user.id);
+  return await getSentEnquiryListingIds(user.id);
 });

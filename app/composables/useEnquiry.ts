@@ -9,14 +9,14 @@ export const useEnquiry = createSharedComposable(() => {
   const requestFetch = useRequestFetch();
 
   // State
-  const sentEnquiries = ref<number[]>([]); // User IDs already enquired
+  const sentEnquiries = ref<number[]>([]); // Listing IDs already enquired
   const loadingEnquiries = ref(false);
 
   // Get current userId safely
   const currentUserId = computed(() => user.value?.id ?? null);
 
   /**
-   * Hydrate sentEnquiries from backend conversations
+   * Hydrate sentEnquiries from backend - optimized to fetch only listing IDs
    */
   async function hydrateEnquiries() {
     if (!loggedIn.value || !currentUserId.value) {
@@ -25,13 +25,8 @@ export const useEnquiry = createSharedComposable(() => {
     }
     loadingEnquiries.value = true;
     try {
-      const conversations = await requestFetch<any[]>('/api/conversation');
-      const userIds = new Set<number>();
-      conversations.forEach((conv) => {
-        if (conv.senderId && conv.senderId !== currentUserId.value) userIds.add(conv.senderId);
-        if (conv.receiverId && conv.receiverId !== currentUserId.value) userIds.add(conv.receiverId);
-      });
-      sentEnquiries.value = Array.from(userIds);
+      const listingIds = await requestFetch<number[]>('/api/conversation/sent');
+      sentEnquiries.value = listingIds;
     } catch (error) {
       console.error('Error hydrating enquiries:', error);
     } finally {
@@ -51,29 +46,29 @@ export const useEnquiry = createSharedComposable(() => {
   }
 
   /**
-   * Check if an enquiry has already been sent to a user
+   * Check if an enquiry has already been sent for a listing
    */
-  function hasEnquired(targetUserId: number): boolean {
-    return sentEnquiries.value.includes(targetUserId);
+  function hasEnquired(listingId: number): boolean {
+    return sentEnquiries.value.includes(listingId);
   }
 
   /**
-   * Send an enquiry (create a conversation) to a user
+   * Send an enquiry (create a conversation) about a listing
    */
-  async function sendEnquiry(receiverId: number, message: string) {
+  async function sendEnquiry(listingId: number, receiverId: number, message: string) {
     if (!currentUserId.value || receiverId === currentUserId.value) {
       // Don't allow sending to self or without a valid user
       return;
     }
-    if (hasEnquired(receiverId)) {
+    if (hasEnquired(listingId)) {
       return;
     }
     try {
       await requestFetch('/api/conversation/create', {
         method: 'POST',
-        body: { receiverId, message },
+        body: { listingId, receiverId, message },
       });
-      sentEnquiries.value.push(receiverId);
+      sentEnquiries.value.push(listingId);
     } catch (error) {
       console.error('Error sending enquiry:', error);
       throw error;

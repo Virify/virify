@@ -8,7 +8,7 @@
         <button class="| button button-ghost button-sm" type="button" @click="onClose" :disabled="sending">
           Cancel
         </button>
-        <button class="| button button-primary button-sm" type="submit" @click="onSend" :disabled="sending || !message.trim()">
+        <button class="| button button-secondary button-sm" type="submit" @click="onSend" :disabled="sending || !message.trim()">
           {{ sending ? 'Sending...' : 'Send' }}
         </button>
       </div>
@@ -19,29 +19,31 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const props = defineProps<{ receiverId: number }>();
-const emit = defineEmits(['close', 'sent']);
+const props = defineProps<{ listingId: number; receiverId: number }>();
 
 const message = ref('');
 const sending = ref(false);
 const { sendEnquiry } = useEnquiry();
+const { hideDialog } = useDialog();
+const { showToast } = useToast();
 
 async function onSend() {
   if (!message.value.trim()) return;
   sending.value = true;
   try {
-    await sendEnquiry(props.receiverId, message.value.trim());
-    emit('sent');
-    emit('close');
+    await sendEnquiry(props.listingId, props.receiverId, message.value.trim());
+    showToast('Enquiry sent successfully!', { type: 'success' });
+    hideDialog();
   } catch (e) {
-    // Optionally show error
+    showToast('Failed to send enquiry. Please try again.', { type: 'error' });
+    console.error('Error sending enquiry:', e);
   } finally {
     sending.value = false;
   }
 }
 
 function onClose() {
-  emit('close');
+  hideDialog();
 }
 </script>
 

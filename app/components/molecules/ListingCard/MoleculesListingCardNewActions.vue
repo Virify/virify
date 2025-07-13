@@ -3,18 +3,14 @@
     <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-secondary body-sm">
       View
     </nuxt-link>
-    <button
-      class="| button button-ghost body-sm"
-      :disabled="isEnquiryDisabled"
-      @click="onEnquire"
-    >
+    <button class="| button button-ghost body-sm" :disabled="isEnquiryDisabled" @click="onEnquire">
       {{ enquiryLabel }}
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import ViewsDialogEnquiry from '~/components/views/ViewsDialogEnquiry.vue';
+import ViewsDialogEnquiry from '~/components/views/Dialog/ViewsDialogEnquiry.vue';
 import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
 import { useEnquiry } from '~/composables/useEnquiry';
 
@@ -35,12 +31,13 @@ const safeUserId = computed(() =>
 const isSelf = computed(() => safeUserId.value !== null && user.value?.id === safeUserId.value);
 
 const isEnquiryDisabled = computed(() =>
-  !safeUserId.value || hasEnquired(safeUserId.value) || loadingEnquiries.value || isSelf.value
+  !safeUserId.value || hasEnquired(props.listingId) || loadingEnquiries.value || isSelf.value
 );
+
 const enquiryLabel = computed(() =>
   isSelf.value
     ? 'Enquire'
-    : (safeUserId.value && hasEnquired(safeUserId.value))
+    : hasEnquired(props.listingId)
       ? 'Enquiry Sent'
       : 'Enquire'
 );
@@ -55,10 +52,8 @@ function onEnquire() {
   if (safeUserId.value !== null && !isSelf.value) {
     showDialog({
       component: ViewsDialogEnquiry,
-      props: { receiverId: safeUserId.value },
+      props: { listingId: props.listingId, receiverId: safeUserId.value },
     });
-  } else {
-    console.error('Invalid userId for enquiry:', props.userId);
   }
 }
 </script>
