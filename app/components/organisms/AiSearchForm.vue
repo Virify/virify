@@ -9,7 +9,7 @@
     <MoleculesAiSearchFormCollapsed v-show="isCollapsed" :query="segments"
       :query-location="selectedLocation?.place_name_en" :query-radius="selectedRadius" v-model:sort-order="sortOrder"
       v-model:search-radius="selectedRadius" @update-search-radius="submitSearch" @update-sort-order="updateSortOrder"
-      @expand-form="isCollapsed = false" />
+      @expand-form="isCollapsed = false" @toggle-view="emit('toggle-view')" />
 
     <!-- Expanded State Content -->
     <div v-show="!isCollapsed" class="expanded-content">
@@ -63,6 +63,12 @@
         </li>
       </ul>
 
+      <!-- View Toggle Button -->
+      <AtomsButton v-if="hasSearched" @click="emit('toggle-view')" type="button"
+        class="view-toggle | button button-xs button-secondary button-full button-bordered">
+        {{ props.isMapView ? 'Show List' : 'Show Map' }}
+      </AtomsButton>
+
       <AtomsButton v-if="hasSearched || hasSavedState" @click.prevent="handleReset" type="reset"
         class="| button button-xs button-delete button-full button-bordered">
         Reset form
@@ -82,6 +88,7 @@ const props = defineProps<{
   initialRadius?: number | null;
   hasSearched: boolean;
   hasSavedState?: boolean;
+  isMapView?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -89,6 +96,7 @@ const emit = defineEmits<{
   "update:collapsed": [value: boolean];
   "sort": [value: string];
   "reset": [];
+  "toggle-view": [];
 }>();
 
 
@@ -367,10 +375,6 @@ onClickOutside($form, () => {
       display: flex;
       flex-direction: column;
       gap: var(--size-14);
-
-      @include mq.tablet {
-        gap: var(--size-24);
-      }
     }
   }
 
@@ -438,6 +442,12 @@ onClickOutside($form, () => {
 
     &--mobile {
       display: unset;
+      
+      // Make it span full width on mobile by using grid-column
+      @media (max-width: 600px) {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
     }
 
     &--desktop {
@@ -456,6 +466,10 @@ onClickOutside($form, () => {
       }
     }
   }
+}
+
+.view-toggle {
+  display: flex;
 }
 
 .close-button {

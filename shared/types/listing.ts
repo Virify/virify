@@ -39,6 +39,17 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   };
 }>;
 
+export type ListingCardData = Omit<ListingWithFullProperty, 'property' | 'user'> & {
+  property: NonNullable<ListingWithFullProperty['property']> & {
+    address: NonNullable<ListingWithFullProperty['property']>['address'];
+    type: NonNullable<ListingWithFullProperty['property']>['type'];
+    classification: NonNullable<ListingWithFullProperty['property']>['classification'];
+  };
+  user: NonNullable<ListingWithFullProperty['user']> & {
+    username: string;
+  };
+};
+
 export type AiSearchResponse = {
   results: ListingWithFullProperty[];
   queryAnalysis: QueryAnalysis;

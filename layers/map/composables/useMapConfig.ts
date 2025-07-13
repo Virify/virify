@@ -1,5 +1,3 @@
-import type { ExtendedMapTilerMap, MapInstance, MapInitOptions } from "~~/shared/types/map";
-
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
 
@@ -56,12 +54,18 @@ export function useMapConfig() {
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${sdk.config.apiKey}`,
       interactive: options.interactive,
       zoom: options.zoom ?? 6,
-      navigationControl: options.interactive,
-      navigationControlOptions: {
-        position: "top-right",
-      },
+      navigationControl: false, // We'll add it manually in bottom-right
+      geolocateControl: false, // We'll add it manually in bottom-right
       center: options.center,
     }) as ExtendedMapTilerMap;
+
+    // Add controls manually in bottom-right position
+    if (options.interactive) {
+      const navControl = new sdk.NavigationControl() as any;
+      const geolocateControl = new sdk.GeolocateControl() as any;
+      map.addControl(navControl, "bottom-right");
+      map.addControl(geolocateControl, "bottom-right");
+    }
 
     // cache the map instance
     if (mapId) {

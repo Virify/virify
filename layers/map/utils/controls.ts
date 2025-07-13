@@ -14,7 +14,6 @@ export function setControls(existingMapInstance: MapInstance, map: ExtendedMapTi
   const prevInteractive = existingMapInstance.interactive;
   const newInteractive = options.interactive;
   const sdk = useNuxtApp().$maptilersdk;
-  const navControl = new sdk.NavigationControl() as any;
   const controls = map._controls ?? [];
 
   if (prevInteractive !== newInteractive) {
@@ -25,9 +24,18 @@ export function setControls(existingMapInstance: MapInstance, map: ExtendedMapTi
       map.touchZoomRotate.enable();
       map.keyboard.enable();
       map.boxZoom.enable();
-      // Add navigation control if not present
-      if (!controls.some((c: any) => c instanceof sdk.NavigationControl)) {
-        map.addControl(navControl as any, "top-right");
+      
+      // Only add controls if they don't exist
+      const hasNavControl = controls.some((c: any) => c instanceof sdk.NavigationControl);
+      const hasGeoControl = controls.some((c: any) => c instanceof sdk.GeolocateControl);
+      
+      if (!hasNavControl) {
+        const navControl = new sdk.NavigationControl() as any;
+        map.addControl(navControl, "bottom-right");
+      }
+      if (!hasGeoControl) {
+        const geolocateControl = new sdk.GeolocateControl() as any;
+        map.addControl(geolocateControl, "bottom-right");
       }
     } else {
       map.dragPan.disable();
@@ -36,9 +44,10 @@ export function setControls(existingMapInstance: MapInstance, map: ExtendedMapTi
       map.touchZoomRotate.disable();
       map.keyboard.disable();
       map.boxZoom.disable();
-      // Remove navigation control if present
+      
+      // Remove controls when disabling interactivity
       for (const control of controls) {
-        if (control instanceof sdk.NavigationControl) {
+        if (control instanceof sdk.NavigationControl || control instanceof sdk.GeolocateControl) {
           map.removeControl(control as any);
         }
       }
@@ -89,7 +98,7 @@ export function addNavigationControl(map: ExtendedMapTilerMap, position: 'top-le
 }
 
 /**
- * Remove navigation control from map
+ * Remove navigation and geolocation controls from map
  * 
  * @param map The map object
  */
@@ -97,7 +106,7 @@ export function removeNavigationControl(map: ExtendedMapTilerMap) {
   const sdk = useNuxtApp().$maptilersdk;
   const controls = map._controls ?? [];
   for (const control of controls) {
-    if (control instanceof sdk.NavigationControl) {
+    if (control instanceof sdk.NavigationControl || control instanceof sdk.GeolocateControl) {
       map.removeControl(control as any);
     }
   }
