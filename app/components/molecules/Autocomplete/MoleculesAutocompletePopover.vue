@@ -6,7 +6,7 @@
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
         v-slot="{ option, rowClass, actionClass }">
         <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-          {{ option.place_name_en }}
+          {{ option.display_name || option.place_name_en }}
         </button>
 
         <MoleculesAutocompleteSaveLocation :option :custom-class="actionClass" />
@@ -46,7 +46,7 @@
 
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
           <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-            {{ option.place_name_en }}
+            {{ option.display_name || option.place_name_en }}
           </button>
 
           <button type="button" aria-label="Remove saved location" :class="actionClass" class="| faded-icon"
@@ -97,7 +97,7 @@ const hideAutocomplete = computed(() => {
   if (!locationSuggestions.value.length || !props.searchValue) return false;
   
   return locationSuggestions.value.some(option => 
-    option.place_name_en === props.searchValue
+    option.display_name === props.searchValue
   );
 });
 

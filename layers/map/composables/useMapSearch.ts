@@ -13,37 +13,36 @@ export function useMapSearch() {
           country: "gb",
         },
       });
-      
-      // Sort results by priority: region -> county -> postal_code -> address
-      // Using MapTiler's actual place type names - putting 'place' last to avoid POIs like castles
-      
-      const sortedFeatures = (res.features ?? []).sort((a, b) => {
-        // Since place_type is empty, use simple heuristics based on place names
-        const aName = a.place_name_en.toLowerCase();
-        const bName = b.place_name_en.toLowerCase();
-        
-        // Higher priority for shorter, simpler names (likely cities/regions)
-        // Lower priority for names with "castle", "road", "cycleway", etc.
-        const getPriority = (name: string) => {
-          if (name.includes('castle')) return 100; // Very low priority for castles
-          if (name.includes('road') || name.includes('street') || name.includes('avenue')) return 90; // Addresses
-          if (name.includes('cycleway') || name.includes('path') || name.includes('lane')) return 85; // Paths/routes
-          if (name.match(/\b[a-z]{1,2}\d+\s+\d[a-z]{2}\b/)) return 80; // Postcodes (pattern like CF24 0AB)
-          
-          // Shorter names are likely cities/regions
-          const parts = name.split(',').length;
-          if (parts <= 2) return 10; // Likely city or region
-          if (parts === 3) return 20; // Could be district
-          return 30; // Longer names are likely more specific addresses
+      // Add display_name: for postal_code use text, for others use place_name_en
+      const features = (res.features ?? []).map((feature) => {
+        // MapTiler API: type (string) or place_type (array of string)
+        let type = '';
+        if ('place_type' in feature && Array.isArray((feature as any).place_type)) {
+          type = (feature as any).place_type[0];
+        } else if ('type' in feature && typeof (feature as any).type === 'string') {
+          type = (feature as any).type;
+        }
+        let display_name = feature.place_name_en;
+        if (type === 'postal_code') {
+          if (feature.text && typeof feature.text === 'string') {
+            display_name = feature.text;
+          } else if (feature.place_name_en && typeof feature.place_name_en === 'string') {
+            // Fallback: extract postcode from place_name_en using UK postcode regex
+            const match = feature.place_name_en.match(/\b([A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2})\b/i);
+            if (match && match[1]) {
+              display_name = match[1].toUpperCase();
+            }
+          }
+        } else if (type === 'address') {
+          // For addresses, use the full place_name_en (rich, hierarchical address)
+          display_name = feature.place_name_en;
+        }
+        return {
+          ...feature,
+          display_name,
         };
-        
-        const aPriority = getPriority(aName);
-        const bPriority = getPriority(bName);
-        
-        return aPriority - bPriority;
       });
-      
-      return sortedFeatures;
+      return features;
     } catch (e) {
       console.error("[Map] Search error:", e);
       return [];

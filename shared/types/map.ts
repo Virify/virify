@@ -97,6 +97,7 @@ export type GeocodingFeature = {
   type: string;
   place_name_en: string;
   text: string;
+  display_name?: string;
   geometry: {
     type: string;
     coordinates: [number, number];

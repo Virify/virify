@@ -181,7 +181,7 @@ const handleLocation = async (location: GeocodingFeature) => {
   } catch (error) {
     selectedLocation.value = location;
   }
-  locationQuery.value = location.place_name_en;
+  locationQuery.value = location.display_name || location.place_name_en;
   locationError.value = ""; // Clear any location error
   hidePopover();
 };
