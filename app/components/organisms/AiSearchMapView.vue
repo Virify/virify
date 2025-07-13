@@ -176,8 +176,7 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
 .ai-search-map-view {
   position: relative;
   width: 100%;
-  height: 70vh;
-  min-height: 500px;
+  height: calc(100vh - var(--header-height));
   border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
   overflow: hidden;
 }
@@ -185,7 +184,7 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
 .loading-overlay,
 .no-results-overlay {
   position: absolute;
-  top: 20px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;

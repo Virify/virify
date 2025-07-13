@@ -21,8 +21,8 @@
       </h1>
 
       <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched" :initial-query="lastSearchQuery"
-        :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState"
-        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="resetForm" />
+        :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState" :is-map-view="isMapView"
+        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
@@ -33,38 +33,25 @@
       </div>
     </div>
     <div v-else-if="hasSearched" class="results-container">
-      <div class="results-with-toggle">
-        <!-- View Toggle Button -->
-        <div class="view-toggle-container">
-          <button 
-            @click="toggleView" 
-            class="view-toggle-button | button button-secondary button-sm"
-          >
-            {{ isMapView ? 'Show List' : 'Show Map' }}
-          </button>
-        </div>
-        
-        <!-- List View -->
-        <OrganismsAiSearchResults 
-          v-if="!isMapView && hasResults"
-          :results="sortedResults" 
-          :query-analysis="queryAnalysis" 
-          :current-page="currentPage" 
-          :total-pages="totalPages" 
-          :total-results="totalResults"
-          @page-change="handlePageChange" 
-        />
-        
-        
-        <!-- Map View (shown even with no results) -->
-        <OrganismsAiSearchMapView 
-          v-if="isMapView"
-          :results="sortedResults"
-          :location="lastLocation"
-          :radius="lastRadius"
-          :is-searching="isSearching"
-        />
-      </div>
+      <!-- List View -->
+      <OrganismsAiSearchResults 
+        v-if="!isMapView && hasResults"
+        :results="sortedResults" 
+        :query-analysis="queryAnalysis" 
+        :current-page="currentPage" 
+        :total-pages="totalPages" 
+        :total-results="totalResults"
+        @page-change="handlePageChange" 
+      />
+      
+      <!-- Map View (shown even with no results) -->
+      <OrganismsAiSearchMapView 
+        v-if="isMapView"
+        :results="sortedResults"
+        :location="lastLocation"
+        :radius="lastRadius"
+        :is-searching="isSearching"
+      />
     </div>
   </div>
 </template>
@@ -140,6 +127,20 @@ const toggleView = () => {
   // Save the new view mode to localStorage
   saveSearchState({ viewMode: isMapView.value ? 'map' : 'list' });
 };
+
+const handleReset = async () => {
+  resetForm();
+  // Reset view to list when form is reset
+  isMapView.value = false;
+  // Clear any stored view mode and set to list
+  if (import.meta.client) {
+    localStorage.removeItem('search-state');
+  }
+  saveSearchState({ viewMode: 'list' });
+  // Ensure state is updated
+  await nextTick();
+};
+
 
 const sortedResults = computed(() => {
   if (!searchResults.value) return [];
@@ -297,6 +298,17 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
   }
 }
 
+// Map view doesn't need fixed positioning - allow natural scroll
+.results-container:has(.ai-search-map-view) {
+  position: relative;
+  margin-top: 0;
+
+  // Add header height spacing on mobile for map view
+  @media (max-width: 768px) {
+    margin-top: var(--header-height);
+  }
+}
+
 // Search feedback wrapper specifics
 .search-feedback-wrapper {
   display: flex;
@@ -406,22 +418,6 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
   }
 }
 
-// Results with toggle
-.results-with-toggle {
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-24);
-}
-
-.view-toggle-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: var(--size-16);
-}
-
-.view-toggle-button {
-  min-width: 120px;
-}
 
 // No results in list view
 .no-results-list-view {
