@@ -1,5 +1,5 @@
 <template>
-  <select v-if="!disabled" class="a-select" v-model="selected">
+  <select v-show="!disabled" class="a-select" v-model="selected">
     <slot v-bind="{ options: validOptions }">
       <option v-for="({ key, value }) of validOptions" :key="value" :value>
         {{ key }}
