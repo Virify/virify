@@ -1,4 +1,3 @@
-import { calculateZoomLevelFromRadius } from "../utils/mapHelpers";
 import { useMapConfig } from "./useMapConfig";
 import { useMapMarkers } from "./useMapMarkers";
 import { useMapDraw } from "./useMapDraw";
@@ -31,7 +30,7 @@ export function useMap() {
     polygonGeometries
   } = useMapDraw(mapCache);
   
-  const { autoComplete, geocodeAndSelectBest } = useMapSearch();
+  const { autoComplete, geocodeAndSelectBest, enhanceWithBoundaryPolygon } = useMapSearch();
   const { updateSearchRadiusVisualization, removeSearchRadiusVisualization } = useMapVisualization();
 
   // Wrap draw functions to pass required dependencies
@@ -74,6 +73,7 @@ export function useMap() {
     // Search functionality
     autoComplete,
     geocodeAndSelectBest,
+    enhanceWithBoundaryPolygon,
     
     // Visualization
     updateSearchRadiusVisualization,

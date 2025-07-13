@@ -1,6 +1,4 @@
 import { Marker } from "@maptiler/sdk";
-import type { MapMarker, ExtendedMapTilerMap, MapInstance } from "~~/shared/types/map";
-import { findMapInstance, renderMarker, renderPopup } from "../utils/mapHelpers";
 
 export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   const vueApp = useNuxtApp();

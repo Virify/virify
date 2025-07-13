@@ -8,15 +8,36 @@
       :interactive="true"
       :mapId="GLOBAL_MAP_ID"
     />
+    
+    <!-- Loading overlay for map view -->
+    <div v-if="isSearching" class="loading-overlay">
+      <div class="loading-message">
+        {{ loadingMessage }}
+      </div>
+    </div>
+    
+    <!-- No results overlay for map view -->
+    <div v-else-if="!results || results.length === 0" class="no-results-overlay">
+      <div class="no-results-message">
+        No results found
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { loadingMessages } from '~/utils/search-form/loading-messages';
+
+const loadingMessage = computed(() => {
+  const randomIndex = Math.floor(Math.random() * loadingMessages.length);
+  return loadingMessages[randomIndex] ?? 'Searching for properties...';
+});
 
 interface Props {
   results: ListingWithFullProperty[];
   location: GeocodingFeature | null;
   radius: number;
+  isSearching?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -66,18 +87,43 @@ const convertedMarkers = computed((): ListingCardType[] => {
     } as ListingCardType));
 });
 
-// Calculate map center from location
+// Calculate map center from location or bbox
 const mapCenter = computed(() => {
   if (props.location) {
+    // For location-only searches (radius = 0), use bbox center
+    if (props.radius === 0 && props.location.bbox) {
+      const [west, south, east, north] = props.location.bbox;
+      const centerLon = (west + east) / 2;
+      const centerLat = (south + north) / 2;
+      return [centerLon, centerLat] as [number, number];
+    }
+    // For radius searches, use geometry coordinates
     return [props.location.geometry.coordinates[0], props.location.geometry.coordinates[1]] as [number, number];
   }
   return undefined; // Let Map component use defaults
 });
 
-// Calculate zoom from radius
+// Calculate zoom from radius or bbox
 const mapZoom = computed(() => {
-  if (props.location && props.radius) {
-    return calculateZoomLevelFromRadius(props.radius);
+  if (props.location) {
+    // For location-only searches (radius = 0), calculate zoom from bbox
+    if (props.radius === 0 && props.location.bbox) {
+      const [west, south, east, north] = props.location.bbox;
+      const latDiff = Math.abs(north - south);
+      const lonDiff = Math.abs(east - west);
+      const maxDiff = Math.max(latDiff, lonDiff);
+      
+      // Calculate zoom based on bbox size
+      if (maxDiff < 0.01) return 15; // Very small area
+      if (maxDiff < 0.05) return 13; // Small area  
+      if (maxDiff < 0.1) return 12;  // Medium area
+      if (maxDiff < 0.5) return 10;  // Large area
+      return 8; // Very large area
+    }
+    // For radius searches, use existing calculation
+    if (props.radius && props.radius > 0) {
+      return calculateZoomLevelFromRadius(props.radius);
+    }
   }
   return undefined; // Let Map component use defaults
 });
@@ -87,9 +133,23 @@ onMounted(() => {
   // Wait for map to be fully mounted
   nextTick(() => {
     setTimeout(() => {
-      if (mapRef.value?.map && props.location && props.radius) {
-        const center = [props.location.geometry.coordinates[0], props.location.geometry.coordinates[1]] as [number, number];
-        updateSearchRadiusVisualization(mapRef.value.map, center, props.radius);
+      if (mapRef.value?.map && props.location) {
+        // Use bbox center for location-only searches
+        let center: [number, number];
+        if (props.radius === 0 && props.location.bbox) {
+          const [west, south, east, north] = props.location.bbox;
+          center = [(west + east) / 2, (south + north) / 2];
+        } else {
+          center = [props.location.geometry.coordinates[0], props.location.geometry.coordinates[1]];
+        }
+        
+        console.log('Map visualization - Location:', props.location.place_name_en);
+        console.log('Map visualization - Radius:', props.radius);
+        console.log('Map visualization - Bbox:', props.location.bbox);
+        console.log('Map visualization - Boundary polygon:', props.location.boundaryPolygon);
+        console.log('Map visualization - Center:', center);
+        
+        updateSearchRadiusVisualization(mapRef.value.map, center, props.radius, props.location.bbox, props.location.boundaryPolygon);
       }
     }, 500); // Give map time to fully initialize
   });
@@ -97,20 +157,51 @@ onMounted(() => {
 
 // Watch for prop changes and update radius
 watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => {
-  if (mapRef.value?.map && newLocation && newRadius) {
-    const center = [newLocation.geometry.coordinates[0], newLocation.geometry.coordinates[1]] as [number, number];
-    updateSearchRadiusVisualization(mapRef.value.map, center, newRadius);
+  if (mapRef.value?.map && newLocation) {
+    // Use bbox center for location-only searches
+    let center: [number, number];
+    if (newRadius === 0 && newLocation.bbox) {
+      const [west, south, east, north] = newLocation.bbox;
+      center = [(west + east) / 2, (south + north) / 2];
+    } else {
+      center = [newLocation.geometry.coordinates[0], newLocation.geometry.coordinates[1]];
+    }
+    
+    updateSearchRadiusVisualization(mapRef.value.map, center, newRadius, newLocation.bbox, newLocation.boundaryPolygon);
   }
 });
 </script>
 
 <style lang="scss">
 .ai-search-map-view {
+  position: relative;
   width: 100%;
   height: 70vh;
   min-height: 500px;
   border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
   overflow: hidden;
+}
+
+.loading-overlay,
+.no-results-overlay {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.loading-message,
+.no-results-message {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-text-primary);
+  padding: var(--size-12) var(--size-20);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid var(--color-border-light);
 }
 
 @media (max-width: 768px) {

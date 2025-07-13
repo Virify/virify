@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { onClickOutside, templateRef } from "@vueuse/core";
 
-const { geocodeAndSelectBest } = useMap();
+const { geocodeAndSelectBest, enhanceWithBoundaryPolygon } = useMap();
 
 const props = defineProps<{
   initialQuery?: string;
@@ -173,8 +173,14 @@ const addPrompt = (prompt: string) => {
   document?.getElementById(textareaId)?.focus();
 };
 
-const handleLocation = (location: GeocodingFeature) => {
-  selectedLocation.value = location;
+const handleLocation = async (location: GeocodingFeature) => {
+  // Always fetch boundary polygon for any location selection
+  try {
+    const enhancedLocation = await enhanceWithBoundaryPolygon(location);
+    selectedLocation.value = enhancedLocation;
+  } catch (error) {
+    selectedLocation.value = location;
+  }
   locationQuery.value = location.place_name_en;
   locationError.value = ""; // Clear any location error
   hidePopover();

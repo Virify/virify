@@ -102,13 +102,28 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
  * @param geometries Array of GeoJSON Polygons (or single polygon)
  * @returns List of property IDs strictly within any of the polygons
  */
-export async function getPropertyIdsByPolygons(geometries: { type: "Polygon"; coordinates: number[][][] }[]): Promise<PropertySearchResult> {
+export async function getPropertyIdsByPolygons(geometries: { type: "Polygon" | "MultiPolygon"; coordinates: number[][][] | number[][][][] }[]): Promise<PropertySearchResult> {
   if (!geometries || geometries.length === 0) return [];
   
-  // Filter out invalid geometries
-  const validGeometries = geometries.filter(geometry => 
-    geometry && geometry.type === "Polygon" && geometry.coordinates?.length
-  );
+  // Filter out invalid geometries and flatten MultiPolygons to individual Polygons
+  const validGeometries: { type: "Polygon"; coordinates: number[][][] }[] = [];
+  
+  geometries.forEach(geometry => {
+    if (!geometry || !geometry.coordinates?.length) return;
+    
+    if (geometry.type === "Polygon") {
+      validGeometries.push(geometry as { type: "Polygon"; coordinates: number[][][] });
+    } else if (geometry.type === "MultiPolygon") {
+      // Convert MultiPolygon to individual Polygons
+      const multiPolygonCoords = geometry.coordinates as number[][][][];
+      multiPolygonCoords.forEach(polygonCoords => {
+        validGeometries.push({
+          type: "Polygon",
+          coordinates: polygonCoords
+        });
+      });
+    }
+  });
   
   if (validGeometries.length === 0) return [];
   
@@ -186,20 +201,60 @@ export async function getNearbyPropertiesByTextQuery(query: string, distanceMile
 }
 
 /**
- * Handles location filtering by fetching property IDs within a given radius.
+ * Converts a bounding box to a GeoJSON polygon
  */
-export async function handleLocationFilter(lat?: number, lon?: number, radius?: number) {
+export function bboxToPolygon(bbox: [number, number, number, number]) {
+  const [west, south, east, north] = bbox;
+  return {
+    type: "Polygon" as const,
+    coordinates: [[
+      [west, south],
+      [east, south], 
+      [east, north],
+      [west, north],
+      [west, south]
+    ]]
+  };
+}
+
+/**
+ * Handles location filtering by fetching property IDs within a given radius, bbox, or boundary polygon.
+ */
+export async function handleLocationFilter(lat?: number, lon?: number, radius?: number, bbox?: [number, number, number, number], boundaryPolygon?: { type: "Polygon" | "MultiPolygon"; coordinates: number[][][] | number[][][][] }) {
   if (!lat || !lon) {
     return { propertyIds: null, locationContext: "" };
   }
 
-  console.log(`Location: ${lat}, ${lon} within ${radius} miles`);
-  try {
-    const nearbyProperties = await getPropertyIdsByDistance(lat, lon, radius!);
-    const propertyIds = nearbyProperties.map((p) => p.propertyId);
-    const locationContext = `within ${radius} miles of ${lat}, ${lon}`;
-    return { propertyIds, locationContext };
-  } catch (error) {
-    return { propertyIds: [], locationContext: "" };
+  // For location-only searches (radius = 0), use boundary polygon or bbox
+  if (radius === 0) {
+    if (boundaryPolygon) {
+      try {
+        const nearbyProperties = await getPropertyIdsByPolygons([boundaryPolygon]);
+        const propertyIds = nearbyProperties.map((p) => p.propertyId);
+        return { propertyIds, locationContext: "within administrative boundary" };
+      } catch (error) {
+        console.error('Boundary polygon search failed:', error);
+      }
+    }
+    
+    if (bbox) {
+      try {
+        const polygon = bboxToPolygon(bbox);
+        const nearbyProperties = await getPropertyIdsByPolygons([polygon]);
+        const propertyIds = nearbyProperties.map((p) => p.propertyId);
+        return { propertyIds, locationContext: "within selected area" };
+      } catch (error) {
+        console.error('Bbox search failed:', error);
+      }
+    }
+    
+    // No boundary data available for location-only search
+    return { propertyIds: [], locationContext: "no boundary data available" };
   }
+
+  // Regular radius search
+  const nearbyProperties = await getPropertyIdsByDistance(lat, lon, radius!);
+  const propertyIds = nearbyProperties.map((p) => p.propertyId);
+  const locationContext = `within ${radius} miles of ${lat}, ${lon}`;
+  return { propertyIds, locationContext };
 }

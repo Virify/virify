@@ -1,6 +1,4 @@
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import type { ExtendedMapTilerMap, MapInstance } from "~~/shared/types/map";
-import { findMapInstance, styles } from "../utils/mapHelpers";
 
 // Global drawing state for all map instances
 const drawingState = reactive({

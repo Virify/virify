@@ -25,6 +25,8 @@ export default function useAi() {
         lat: location.geometry.coordinates[1],
         lon: location.geometry.coordinates[0],
         radius: radius,
+        bbox: location.bbox,
+        boundaryPolygon: location.boundaryPolygon,
       },
     });
 

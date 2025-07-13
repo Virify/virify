@@ -1,5 +1,4 @@
 import type { ExtendedMapTilerMap, MapInstance, MapInitOptions } from "~~/shared/types/map";
-import { setControls } from "../utils/mapHelpers";
 
 const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";

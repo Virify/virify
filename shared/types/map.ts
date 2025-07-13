@@ -107,6 +107,11 @@ export type GeocodingFeature = {
     place_type?: string[];
     [key: string]: any;
   };
+  bbox?: [number, number, number, number];
+  boundaryPolygon?: {
+    type: "Polygon" | "MultiPolygon";
+    coordinates: number[][][] | number[][][][];
+  };
 };
 
 /**

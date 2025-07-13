@@ -1,5 +1,3 @@
-import type { GeocodingFeature, GeocodingResponse } from "~~/shared/types/map";
-
 export function useMapSearch() {
   const sdk = useNuxtApp().$maptilersdk;
 
@@ -67,8 +65,49 @@ export function useMapSearch() {
     }
   }
 
+  /**
+   * Fetch boundary polygon for a geocoding feature
+   */
+  async function getBoundaryPolygon(featureId: string): Promise<any | null> {
+    if (!featureId) return null;
+    try {
+      const res = await $fetch<any>(`https://api.maptiler.com/geocoding/${encodeURIComponent(featureId)}.json`, {
+        query: { 
+          key: sdk.config.apiKey,
+        },
+      });
+      
+      if (res.features && res.features.length > 0) {
+        const feature = res.features[0];
+        if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
+          return {
+            type: feature.geometry.type,
+            coordinates: feature.geometry.coordinates
+          };
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      console.error("[Map] Error fetching boundary polygon:", e);
+      return null;
+    }
+  }
+
+  /**
+   * Enhance location with boundary polygon for location-only searches
+   */
+  async function enhanceWithBoundaryPolygon(feature: GeocodingFeature): Promise<GeocodingFeature> {
+    const boundaryPolygon = await getBoundaryPolygon(feature.id);
+    return {
+      ...feature,
+      boundaryPolygon: boundaryPolygon || undefined
+    };
+  }
+
   return {
     autoComplete,
     geocodeAndSelectBest,
+    enhanceWithBoundaryPolygon,
   } as const;
 }

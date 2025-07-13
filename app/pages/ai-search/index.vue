@@ -26,18 +26,14 @@
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
-    <div v-if="shouldShowFeedback" class="search-feedback-wrapper">
+    <div v-if="shouldShowFeedback && !isMapView" class="search-feedback-wrapper">
       <div class="search-feedback-section | container container-sm">
       <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
       <OrganismsAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
-      <div v-else-if="searchError" class="error-content | flow flow-sm">
-        <h2 class="title-md">An Error Occurred</h2>
-        <p class="body-sm">{{ searchError }}</p>
-      </div>
       </div>
     </div>
     <div v-else class="results-container">
-      <div v-if="hasResults" class="results-with-toggle">
+      <div class="results-with-toggle">
         <!-- View Toggle Button -->
         <div class="view-toggle-container">
           <button 
@@ -50,7 +46,7 @@
         
         <!-- List View -->
         <OrganismsAiSearchResults 
-          v-if="!isMapView"
+          v-if="!isMapView && hasResults"
           :results="sortedResults" 
           :query-analysis="queryAnalysis" 
           :current-page="currentPage" 
@@ -59,12 +55,14 @@
           @page-change="handlePageChange" 
         />
         
-        <!-- Map View -->
+        
+        <!-- Map View (shown even with no results) -->
         <OrganismsAiSearchMapView 
-          v-else
+          v-if="isMapView"
           :results="sortedResults"
           :location="lastLocation"
           :radius="lastRadius"
+          :is-searching="isSearching"
         />
       </div>
     </div>
@@ -426,5 +424,12 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
 
 .view-toggle-button {
   min-width: 120px;
+}
+
+// No results in list view
+.no-results-list-view {
+  display: flex;
+  justify-content: center;
+  padding: var(--size-40);
 }
 </style>

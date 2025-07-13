@@ -6,6 +6,11 @@ const ragSearchSchema = z.object({
   lat: z.coerce.number().optional(),
   lon: z.coerce.number().optional(),
   radius: z.coerce.number().optional().default(40),
+  bbox: z.array(z.number()).length(4).optional(),
+  boundaryPolygon: z.object({
+    type: z.enum(["Polygon", "MultiPolygon"]),
+    coordinates: z.array(z.any())
+  }).optional(),
   page: z.coerce.number().min(1).optional(),
   limit: z.coerce.number().min(1).max(100).optional()
 });
@@ -14,9 +19,9 @@ export default defineEventHandler(async (event) => {
   try {
     checkAiConfiguration();
 
-    const { query, lat, lon, radius, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
+    const { query, lat, lon, radius, bbox, boundaryPolygon, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
 
-    const { propertyIds, locationContext } = await handleLocationFilter(lat, lon, radius);
+    const { propertyIds, locationContext } = await handleLocationFilter(lat, lon, radius, bbox as [number, number, number, number] | undefined, boundaryPolygon);
 
     const { whereClause, queryAnalysis } = await constructPrismaWhereClause(query, propertyIds);
 
