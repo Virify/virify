@@ -7,7 +7,8 @@
 
     <ul class="p-ai-search-results__list">
       <li v-for="listing in results" :key="listing.id">
-        <MoleculesListingCardNew :listing="listing" />
+        <MoleculesListingCardFeatured v-if="listing.listingTier === 'FEATURED'" :listing="listing as ListingCardData" />
+        <MoleculesListingCardBase v-else :listing="listing as ListingCardData" />
       </li>
     </ul>
 
