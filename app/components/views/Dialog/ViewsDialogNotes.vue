@@ -7,7 +7,7 @@
       <textarea v-model="notes" class="| body-sm" rows="4" placeholder="Enter your notes here..."></textarea>
 
       <div class="| flex justify-between">
-        <button v-if="hasExistingNote" class="| button button-ghost button-sm" @click="handleDeleteNote"
+        <button v-if="hasExistingNote" class="| button button-delete button-sm" @click="handleDeleteNote"
           :disabled="isPending">
           {{ isPending ? 'Deleting...' : 'Delete note' }}
         </button>
@@ -15,8 +15,8 @@
           <button class="| button button-ghost button-sm" @click="() => hideDialog()" :disabled="isPending">
             Cancel
           </button>
-          <button class="| button button-primary button-sm" @click="saveNotes" :disabled="isPending || !notes.trim()">
-            {{ isPending ? 'Saving...' : 'Save notes' }}
+          <button class="| button button-secondary button-sm" @click="saveNotes" :disabled="isPending || !notes.trim()">
+            {{ isPending ? 'Saving...' : hasExistingNote ? 'Update note' : 'Create notes' }}
           </button>
         </div>
       </div>
@@ -32,6 +32,7 @@ const props = defineProps<{
 const { hideDialog } = useDialog()
 const { getNote, updateNote, deleteNote, hasNote } = useNotes()
 const { isPending, setPendingWhile } = usePending()
+const { showToast } = useToast()
 const notes = ref('')
 
 /**
@@ -60,9 +61,12 @@ onMounted(() => {
 async function saveNotes() {
   if (!notes.value.trim()) return
 
+  const isUpdating = hasExistingNote.value
+
   await setPendingWhile(async () => {
     await updateNote(props.listingId, notes.value.trim())
 
+    showToast(isUpdating ? 'Note updated' : 'Note added', { type: 'success' })
     hideDialog()
   })
 }
@@ -74,6 +78,7 @@ async function handleDeleteNote() {
   await setPendingWhile(async () => {
     await deleteNote(props.listingId)
 
+    showToast('Note deleted', { type: 'success' })
     hideDialog()
   })
 }
@@ -90,7 +95,7 @@ textarea {
 
   &:focus {
     outline: none;
-    border-color: var(--primary-500);
+    border-color: var(--secondary-400);
   }
 }
 </style>
