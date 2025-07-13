@@ -95,6 +95,7 @@ export type MapInitOptions = {
 export type GeocodingFeature = {
   id: string;
   type: string;
+  place_name: string;
   place_name_en: string;
   text: string;
   display_name?: string;

@@ -13,36 +13,7 @@ export function useMapSearch() {
           country: "gb",
         },
       });
-      // Add display_name: for postal_code use text, for others use place_name_en
-      const features = (res.features ?? []).map((feature) => {
-        // MapTiler API: type (string) or place_type (array of string)
-        let type = '';
-        if ('place_type' in feature && Array.isArray((feature as any).place_type)) {
-          type = (feature as any).place_type[0];
-        } else if ('type' in feature && typeof (feature as any).type === 'string') {
-          type = (feature as any).type;
-        }
-        let display_name = feature.place_name_en;
-        if (type === 'postal_code') {
-          if (feature.text && typeof feature.text === 'string') {
-            display_name = feature.text;
-          } else if (feature.place_name_en && typeof feature.place_name_en === 'string') {
-            // Fallback: extract postcode from place_name_en using UK postcode regex
-            const match = feature.place_name_en.match(/\b([A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2})\b/i);
-            if (match && match[1]) {
-              display_name = match[1].toUpperCase();
-            }
-          }
-        } else if (type === 'address') {
-          // For addresses, use the full place_name_en (rich, hierarchical address)
-          display_name = feature.place_name_en;
-        }
-        return {
-          ...feature,
-          display_name,
-        };
-      });
-      return features;
+      return res.features ?? [];
     } catch (e) {
       console.error("[Map] Search error:", e);
       return [];
