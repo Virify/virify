@@ -32,7 +32,7 @@
       <OrganismsAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
       </div>
     </div>
-    <div v-else class="results-container">
+    <div v-else-if="hasSearched" class="results-container">
       <div class="results-with-toggle">
         <!-- View Toggle Button -->
         <div class="view-toggle-container">
@@ -146,9 +146,6 @@ const sortedResults = computed(() => {
   return applySortToResults(searchResults.value, currentSort.value);
 });
 
-// Import utility functions
-import { scrollToTop } from '~/utils/navigation';
-import { applySortToResults } from '~/utils/searchSort';
 
 // Initialize state on mount
 onMounted(() => {

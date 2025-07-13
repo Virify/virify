@@ -20,7 +20,7 @@
 
     <!-- Sorting -->
     <AtomsSelect id="sort-by" v-model="sortOrder" :options="selectOptionSortOrder" aria-label="Sort results by"
-      class="m-search-form-collapsed__select" @change="updateSortOrder" />
+      class="m-search-form-collapsed__select" @change="updateSortOrder" :disabled="isMapView" />
 
     <!-- Mobile expand button -->
     <AtomsButton @click.prevent="openForm" type="button" class="m-search-form-collapsed__close | button button-ghost">
@@ -30,6 +30,9 @@
 </template>
 
 <script setup lang="ts">
+
+const { searchState } = useSearchState();
+
 interface Props {
   query?: { type: string, text: string }[]
   queryLocation?: string
@@ -56,6 +59,10 @@ function openForm() {
  */
 const sortOrder = defineModel('sortOrder')
 const searchRadius = defineModel('searchRadius')
+
+const isMapView = computed(() => {
+  return searchState.value?.viewMode === 'map' || false;
+});
 
 function updateSortOrder() {
   emits('update-sort-order')

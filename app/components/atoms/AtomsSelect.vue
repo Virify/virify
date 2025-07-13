@@ -1,5 +1,5 @@
 <template>
-  <select class="a-select" v-model="selected">
+  <select v-if="!disabled" class="a-select" v-model="selected">
     <slot v-bind="{ options: validOptions }">
       <option v-for="({ key, value }) of validOptions" :key="value" :value>
         {{ key }}
@@ -17,6 +17,7 @@ type Option = {
 interface Props {
   options?: (string | number)[] | Option[]
   modelValue?: any
+  disabled?: boolean
 }
 
 const props = defineProps<Props>()
