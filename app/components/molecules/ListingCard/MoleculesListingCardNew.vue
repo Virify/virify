@@ -1,5 +1,7 @@
 <template>
-  <div class="m-listing-card" :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null">
+  <div
+    v-if="listing.property && listing.property.address && listing.property.type && listing.property.classification && listing.property.createdAt && listing.user && listing.user.id && listing.user.username"
+    class="m-listing-card" :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null">
     <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
       Featured
     </div>
@@ -12,15 +14,15 @@
           <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
         </div>
         <MoleculesListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
-          :type="listing.property?.type.name" :classification="listing.property?.classification.name" />
-        <MoleculesListingCardNewFeatures :bedrooms="listing.property?.numberBedrooms"
-          :bathrooms="listing.property?.numberBathrooms" :receptions="listing.property?.numberReceptions" />
-        <MoleculesListingCardNewTags :chain-free="listing.property?.chainFree"
-          :listed-date="listing.property?.createdAt!" :reduced="true" />
+          :type="listing.property.type.name" :classification="listing.property.classification.name" />
+        <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
+          :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
+        <MoleculesListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
+          :reduced="true" />
       </div>
       <div class="m-listing-card-footer">
-        <MoleculesListingCardNewAgent :username="(userName as string)" :id="listing.user?.id!" />
-        <MoleculesListingCardNewActions :listing-id="listing.id" />
+        <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+        <MoleculesListingCardNewActions :listing-id="listing.id" :user-id="listing.user.id" />
       </div>
     </div>
   </div>
@@ -39,10 +41,6 @@ const image_urls = computed(() => {
 
 const priceType = computed(() => {
   return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
-});
-
-const userName = computed(() => {
-  return props.listing.user?.username ?? props.listing.user?.email;
 });
 </script>
 

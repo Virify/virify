@@ -10,6 +10,7 @@ const conversationSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
   const { sendMessage, createNewConversationMessage, createAggregateUpdateMessage } = useWebSocketServer();
   try {
@@ -21,6 +22,13 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 401,
         statusMessage: "Unauthorized",
+      });
+    }
+
+    if(userId === receiverId) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Cannot create a conversation with yourself",
       });
     }
 
@@ -37,9 +45,6 @@ export default defineEventHandler(async (event) => {
     return conversation;
   } catch (error) {
     console.error("Error creating or updating conversation:", error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Internal Server Error",
-    });
+    return errorResponse(error, event);
   }
 });

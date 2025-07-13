@@ -10,6 +10,7 @@
     <!-- <OrganismsFooter /> -->
 
     <ViewsDialog />
+    <MoleculesToastContainer />
   </div>
 </template>
 
