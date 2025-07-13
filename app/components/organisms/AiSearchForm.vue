@@ -128,7 +128,10 @@ watch(isCollapsed, (value) => emit("update:collapsed", value));
 // Clear location error and reset selection when user types in location field
 watch(locationQuery, () => {
   locationError.value = "";
-  if (selectedLocation.value && locationQuery.value !== selectedLocation.value.place_name_en) {
+  if (
+    selectedLocation.value &&
+    locationQuery.value !== (selectedLocation.value.display_name || selectedLocation.value.place_name_en)
+  ) {
     selectedLocation.value = null;
   }
 });
@@ -138,7 +141,7 @@ const initializeFromProps = () => {
   if (props.initialQuery) searchQuery.value = props.initialQuery;
   if (props.initialLocation) {
     selectedLocation.value = props.initialLocation;
-    locationQuery.value = props.initialLocation.place_name_en;
+    locationQuery.value = props.initialLocation.display_name || props.initialLocation.place_name_en;
   }
   if (props.initialRadius !== null && props.initialRadius !== undefined) {
     selectedRadius.value = props.initialRadius;
@@ -157,7 +160,7 @@ watch(() => props.initialQuery, (newQuery) => {
 watch(() => props.initialLocation, (newLocation) => {
   if (newLocation) {
     selectedLocation.value = newLocation;
-    locationQuery.value = newLocation.place_name_en;
+    locationQuery.value = newLocation.display_name || newLocation.place_name_en;
   }
 });
 
