@@ -17,14 +17,13 @@ const map = shallowRef();
 const mapContainer = ref<HTMLElement>();
 const { 
   initMap, 
-  addMarkers, 
+  addMarkers,
   clearMarkers, 
   addMarker, 
   initDrawing, 
   getDrawControl, 
   updateSearchRadiusVisualization, 
-  removeSearchRadiusVisualization, 
-  clearMarkersForFeature
+  removeSearchRadiusVisualization
 } = useMap();
 
 defineExpose({ 
@@ -226,9 +225,7 @@ const formattedMarkers = computed(() => {
 });
 
 /**
- * Update the search radius visualization on the map
- * 
- * @param {number} radius - The radius in meters
+ * Remove the search radius visualization from the map
  */
 function removeCircle(map: any) {
   if (!map) return;

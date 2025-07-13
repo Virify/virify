@@ -6,7 +6,7 @@
 
     <!-- Favorite indicator -->
     <div v-if="isCurrentlyFavorite" class="favorite-indicator">
-      <AtomsIcon icon="heart" class="favorite-icon" />
+      <AtomsIcon icon="map/marker-fav" class="favorite-icon" />
     </div>
 
     <!-- Content overlay -->
@@ -39,14 +39,14 @@ const priceDisplay = computed(() => {
   if (props.price === null || props.price === undefined) {
     return "";
   }
-  
+
   // Check if it's a rental property based on priceType
-  const isRental = props.priceType && 
-    (props.priceType.toLowerCase().includes('month') || 
-     props.priceType.toLowerCase().includes('week') || 
-     props.priceType.toLowerCase().includes('pcm') ||
-     props.priceType.toLowerCase().includes('pw'));
-  
+  const isRental = props.priceType &&
+    (props.priceType.toLowerCase().includes('month') ||
+      props.priceType.toLowerCase().includes('week') ||
+      props.priceType.toLowerCase().includes('pcm') ||
+      props.priceType.toLowerCase().includes('pw'));
+
   if (isRental) {
     // For rentals, just remove pennies (round to nearest pound)
     return `£${Math.round(props.price).toLocaleString()}`;
@@ -131,22 +131,21 @@ const markerClass = computed(() => {
 /* Favorite indicator */
 .favorite-indicator {
   position: absolute;
-  top: var(--size-4);
-  right: var(--size-4);
+  top: var(--size-2);
+  right: var(--size-2);
   z-index: 2;
-  background-color: var(--favourite-colour);
-  border-radius: 50%;
-  width: var(--size-16);
-  height: var(--size-16);
+  width: var(--size-20);
+  height: var(--size-20);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 var(--size-2) var(--size-4) rgba(0, 0, 0, 0.2);
   pointer-events: auto;
 }
 
 .favorite-icon {
-  color: var(--monochrome-100);
-  font-size: var(--font-xs);
+  width: 100%;
+  height: 100%;
+  color: var(--favourite-colour);
+  filter: drop-shadow(0 var(--size-1) var(--size-2) rgba(0, 0, 0, 0.3));
 }
 </style>
