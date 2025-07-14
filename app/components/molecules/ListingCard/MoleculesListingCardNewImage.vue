@@ -74,7 +74,8 @@ onMounted(() => {
   border-radius: var(--border-radius-2xl);
   overflow: hidden;
   position: relative;
-  width: var(--image-width);
+  width: 100%;
+  aspect-ratio: 4 / 3;
   z-index: 1;
 
   &:hover .m-listing-card-arrow-button {
@@ -85,6 +86,7 @@ onMounted(() => {
 .m-listing-card-image-slides {
   display: flex;
   height: 100%;
+  width: 100%;
 }
 
 .m-listing-card-image-slide {
@@ -224,7 +226,7 @@ onMounted(() => {
 
 @media (max-width: 1200px) {
   .m-listing-card-image-container {
-    width: 100%;
+    width: var(--image-width);
     aspect-ratio: 4 / 3;
   }
 }
@@ -232,6 +234,7 @@ onMounted(() => {
 @media (max-width: 768px) {
   .m-listing-card-image-container {
     border-radius: var(--border-radius-2xl);
+    aspect-ratio: 4 / 3;
   }
 }
 </style>

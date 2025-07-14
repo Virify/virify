@@ -53,20 +53,20 @@ const priceType = computed(() => {
 <style lang="scss" scoped>
 .m-listing-card {
   --card-padding: var(--size-16);
-  --image-width: 45%;
 
   background-color: var(--background-200);
   border: 1px solid var(--foreground-100);
   border-radius: calc(var(--border-radius-2xl) + var(--size-2));
   display: flex;
-  max-width: 960px;
+  width: 100%;
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   .m-listing-card-content-wrapper {
     display: flex;
     flex-direction: column;
-    width: calc(100% - var(--image-width));
+    gap: var(--size-16);
+    width: 100%;
   }
 
   .m-listing-card-content {
@@ -130,6 +130,7 @@ const priceType = computed(() => {
 
 @media (max-width: 1200px) {
   .m-listing-card {
+    --image-width: 100%;
     flex-direction: column;
     max-width: 100%;
     padding: 0;
@@ -146,8 +147,18 @@ const priceType = computed(() => {
 
 @media (max-width: 768px) {
   .m-listing-card {
+    flex-direction: column;
+    max-width: 100%;
+    padding: 0;
+
     .m-listing-card-content-wrapper {
-      width: 100%;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      width: 100% !important;
+    }
+
+    .m-listing-card-content {
+      padding: var(--card-padding);
     }
   }
 }

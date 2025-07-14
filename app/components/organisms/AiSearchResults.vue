@@ -5,28 +5,34 @@
       <span v-if="hasPagination" class="body-sm"> (Page {{ props.currentPage }} of {{ props.totalPages }})</span>
     </h2>
 
-    <ul class="p-ai-search-results__list">
-      <li
-        v-for="listing in results"
-        :key="listing.id"
-        :class="{
-          'premium-listing-wrapper': listing.listingTier === 'PREMIUM',
-        }"
-      >
-        <MoleculesListingCardPremium
-          v-if="listing.listingTier === 'PREMIUM'"
-          :listing="listing as ListingCardData"
-        />
-        <MoleculesListingCardFeatured
-          v-else-if="listing.listingTier === 'FEATURED'"
-          :listing="listing as ListingCardData"
-        />
-        <MoleculesListingCardBase
-          v-else
-          :listing="listing as ListingCardData"
-        />
-      </li>
-    </ul>
+    <!-- Sorted results with proper interleaving -->
+    <div class="p-ai-search-results__sorted-content">
+      <template v-for="section in sortedResults" :key="section.type + (section.item?.id || section.items?.[0]?.id)">
+        <!-- Premium card row -->
+        <div v-if="section.type === 'premium'" class="p-ai-search-results__premium-row">
+          <MoleculesListingCardPremium
+            :listing="(section.item as ListingCardData)"
+          />
+        </div>
+        
+        <!-- Grid row with basic/featured cards -->
+        <ul v-else-if="section.type === 'grid-row'" class="p-ai-search-results__grid-row">
+          <li
+            v-for="listing in section.items!"
+            :key="listing.id"
+          >
+            <MoleculesListingCardFeatured
+              v-if="listing.listingTier === 'FEATURED'"
+              :listing="(listing as ListingCardData)"
+            />
+            <MoleculesListingCardBase
+              v-else
+              :listing="(listing as ListingCardData)"
+            />
+          </li>
+        </ul>
+      </template>
+    </div>
 
     <!-- Pagination -->
     <div v-if="hasPagination" class="pagination | body-sm font-bold">
@@ -54,7 +60,9 @@
 </template>
 
 <script setup lang="ts">
+import { distributePremiumListings } from '~~/utils/listingDistribution';
 
+  
 const props = withDefaults(defineProps<{
   results: ListingWithFullProperty[];
   queryAnalysis: QueryAnalysis | null;
@@ -67,33 +75,38 @@ const props = withDefaults(defineProps<{
   totalResults: 0
 });
 
-// Auto-imported in Nuxt, but if needed:
-// import MoleculesListingCardPremium from '~/components/molecules/ListingCard/MoleculesListingCardPremium.vue';
-
 defineEmits<{
   'page-change': [page: number];
 }>();
 
 const hasPagination = computed(() => props.totalPages > 1);
+
+const sortedResults = computed(() => distributePremiumListings(props.results));
 </script>
 
 <style lang="scss">
 .p-ai-search-results {
-  &__list {
+  &__sorted-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-32);
+    margin-bottom: var(--size-40);
+  }
+
+  &__premium-row {
+    width: 100%;
+  }
+
+  &__grid-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--size-32);
     margin: 0;
     padding: 0;
     list-style: none;
-    margin-bottom: var(--size-40);
     
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
-    }
-    .premium-listing-wrapper {
-      grid-column: span 2;
-      /* Ensure full width for premium cards */
     }
   }
 }

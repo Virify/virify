@@ -132,6 +132,8 @@ const images = computed(() => {
     .m-listing-card-image-container {
       --image-width: 100%;
     }
+
+    // (reverted) No mobile grid override for .m-listing-card-content-wrapper
   }
 }
 
