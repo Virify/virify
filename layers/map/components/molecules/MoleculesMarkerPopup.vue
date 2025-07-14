@@ -36,16 +36,19 @@
 
         <!-- Features -->
         <div v-if="hasBedrooms || hasBathrooms" class="listing-card__features">
-          <div v-if="hasBedrooms" class="listing-card__feature | font-semibold">
-            <AtomsIcon name="bedrooms" icon="property/bedrooms" />
+          <div v-if="hasBedrooms" class="listing-card__feature | font-semibold" 
+               :aria-label="`${marker.bedrooms} bedrooms`" :title="`${marker.bedrooms} bedrooms`">
+            <AtomsIcon name="bedrooms" icon="property/bedrooms" aria-hidden="true" />
             <span class="body-sm">{{ marker.bedrooms }}</span>
           </div>
-          <div v-if="hasBathrooms" class="listing-card__feature | body-sm font-semibold">
-            <AtomsIcon name="bathrooms" icon="property/bathrooms" />
+          <div v-if="hasBathrooms" class="listing-card__feature | body-sm font-semibold"
+               :aria-label="`${marker.bathrooms} bathrooms`" :title="`${marker.bathrooms} bathrooms`">
+            <AtomsIcon name="bathrooms" icon="property/bathrooms" aria-hidden="true" />
             <span class="body-sm">{{ marker.bathrooms }}</span>
           </div>
-          <div v-if="hasReceptions" class="listing-card__feature | body-sm font-semibold">
-            <AtomsIcon name="receptions" icon="property/receptions" />
+          <div v-if="hasReceptions" class="listing-card__feature | body-sm font-semibold"
+               :aria-label="`${marker.receptions} receptions`" :title="`${marker.receptions} receptions`">
+            <AtomsIcon name="receptions" icon="property/receptions" aria-hidden="true" />
             <span class="body-sm">{{ marker.receptions }}</span>
           </div>
         </div>
@@ -53,7 +56,8 @@
         <!-- View button -->
         <div class="listing-card__footer">
           <nuxt-link :to="`/listing/${listingId}`" target="_blank"
-            class="listing-card__view-btn | button button-secondary body-sm">
+            class="listing-card__view-btn | button button-secondary body-sm"
+            aria-label="View property details" title="View property details">
             View
           </nuxt-link>
         </div>

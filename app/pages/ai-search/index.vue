@@ -4,7 +4,7 @@
 
     <!-- Hero Image (shown in initial state, even when form expanded) -->
     <div v-if="!hasSearched" class="hero-section">
-      <img src="/img/ai-search-cover.png" alt="AI Search Cover" class="hero-image" />
+      <img src="/img/ai-search-cover.png" alt="Modern residential properties showcasing AI-powered search" class="hero-image" />
     </div>
 
     <!-- Collapsible Search Header -->

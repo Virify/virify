@@ -1,8 +1,9 @@
 <template>
-  <ul class="m-listing-card-features">
-    <li v-for="{ count, icon, iconTitle } of iconList" :key="iconTitle" class="m-listing-card-feature">
-      <AtomsIcon :name="iconTitle" :icon="icon" class="icon" />
-      <p class="| body-sm">{{ count }}</p>
+  <ul class="m-listing-card-features" aria-label="Property features">
+    <li v-for="{ count, icon, iconTitle } of iconList.filter(item => item.count)" :key="iconTitle" class="m-listing-card-feature" 
+        :aria-label="`${count} ${iconTitle}`">
+      <AtomsIcon :name="iconTitle" :icon="icon" class="icon" :aria-hidden="true" :title="`${count} ${iconTitle}`" />
+      <p class="| body-sm" :title="`${count} ${iconTitle}`">{{ count }}</p>
     </li>
   </ul>
 </template>

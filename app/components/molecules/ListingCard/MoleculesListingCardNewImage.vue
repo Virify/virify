@@ -1,12 +1,12 @@
 <template>
-  <div ref="emblaNode" class="m-listing-card-image-container">
+  <div ref="emblaNode" class="m-listing-card-image-container" role="region" aria-label="Property images">
     <div class="m-listing-card-image-slides">
       <div v-for="(img, index) in images" :key="index" class="m-listing-card-image-slide">
-        <nuxt-img :src="img" alt="Listing image" class="m-listing-card-image" />
+        <nuxt-img :src="img" :alt="`Property image ${index + 1} of ${images.length}`" class="m-listing-card-image" />
       </div>
     </div>
     <div class="m-listing-card-image-overlay">
-      <div class="m-listing-card-image-counter | body-xs">
+      <div class="m-listing-card-image-counter | body-xs" aria-label="Image counter">
         {{ selectedIndex + 1 }}/{{ images.length }}
       </div>
       <div class="m-listing-card-image-actions">
@@ -17,11 +17,13 @@
         />
         <AtomsNoteButton :listing-id="listingId" />
       </div>
-      <button class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev">
-        <AtomsIcon name="chevron-left" icon="chevron-left" />
+      <button class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev" 
+              aria-label="Previous image" title="Previous image">
+        <AtomsIcon name="chevron-left" icon="chevron-left" aria-hidden="true" />
       </button>
-      <button class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext">
-        <AtomsIcon name="chevron-right" icon="chevron-right" />
+      <button class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext" 
+              aria-label="Next image" title="Next image">
+        <AtomsIcon name="chevron-right" icon="chevron-right" aria-hidden="true" />
       </button>
     </div>
   </div>

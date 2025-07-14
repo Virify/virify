@@ -1,8 +1,9 @@
 <template>
-  <div
+  <article
     v-if="listing.property && listing.property.address && listing.property.type && listing.property.classification && listing.property.createdAt && listing.user && listing.user.id && listing.user.username"
-    class="m-listing-card" :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null">
-    <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold">
+    class="m-listing-card" :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null"
+    :aria-label="`Property listing: ${listing.property.type.name} in ${listing.property.address.fullAddress}`">
+    <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold" aria-label="Featured listing">
       Featured
     </div>
     <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
@@ -10,8 +11,8 @@
       <div class="m-listing-card-details">
         <div class="m-listing-card-header-row m-listing-card-price-group">
           <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
-          <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
-          <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
+          <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs" aria-label="Property for rent">Rent</span>
+          <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs" aria-label="Property for sale">Sale</span>
         </div>
         <MoleculesListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
           :type="listing.property.type.name" :classification="listing.property.classification.name" />
@@ -25,7 +26,7 @@
         <MoleculesListingCardNewActions :listing-id="listing.id" :user-id="listing.user.id" />
       </div>
     </div>
-  </div>
+  </article>
 </template>
 
 <script lang="ts" setup>

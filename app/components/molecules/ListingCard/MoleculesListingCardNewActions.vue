@@ -1,9 +1,12 @@
 <template>
-  <div class="m-listing-card-actions">
-    <nuxt-link :to="`/listing/${listingId}`" class="| button button-secondary body-sm">
+  <div class="m-listing-card-actions" role="group" aria-label="Property actions">
+    <nuxt-link :to="`/listing/${listingId}`" class="| button button-secondary body-sm" 
+               aria-label="View property details" title="View property details">
       View
     </nuxt-link>
-    <button class="| button button-ghost body-sm" :disabled="isEnquiryDisabled" @click="onEnquire">
+    <button class="| button button-ghost body-sm" :disabled="isEnquiryDisabled" @click="onEnquire" 
+            :aria-label="isSelf ? 'Cannot enquire about your own property' : hasEnquired(listingId) ? 'Enquiry already sent' : 'Send enquiry about this property'"
+            :title="isSelf ? 'Cannot enquire about your own property' : hasEnquired(listingId) ? 'Enquiry already sent' : 'Send enquiry about this property'">
       {{ enquiryLabel }}
     </button>
   </div>

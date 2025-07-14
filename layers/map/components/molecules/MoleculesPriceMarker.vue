@@ -1,17 +1,19 @@
 <template>
-  <div class="price-marker-container">
+  <div class="price-marker-container" role="button" 
+       :aria-label="`Property marker: ${priceDisplay} ${tier ? tier.toLowerCase() : 'basic'} listing${isCurrentlyFavorite ? ', favorited' : ''}`"
+       :title="`Property: ${priceDisplay} ${tier ? tier.toLowerCase() : 'basic'} listing${isCurrentlyFavorite ? ', favorited' : ''}`">
     <!-- SVG Marker Shape -->
     <!-- Dynamic marker based on favorite status and tier -->
-    <AtomsIcon :icon="markerIcon" :class="markerClass" />
+    <AtomsIcon :icon="markerIcon" :class="markerClass" aria-hidden="true" />
 
     <!-- Favorite indicator -->
-    <div v-if="isCurrentlyFavorite" class="favorite-indicator">
-      <AtomsIcon icon="map/marker-fav" class="favorite-icon" />
+    <div v-if="isCurrentlyFavorite" class="favorite-indicator" aria-label="Favorited property">
+      <AtomsIcon icon="map/marker-fav" class="favorite-icon" aria-hidden="true" />
     </div>
 
     <!-- Content overlay -->
     <div class="price-marker-content">
-      <span class="price-marker-price | body-xs font-semibold">{{ priceDisplay }}</span>
+      <span class="price-marker-price | body-xs font-semibold" aria-hidden="true">{{ priceDisplay }}</span>
     </div>
   </div>
 </template>
