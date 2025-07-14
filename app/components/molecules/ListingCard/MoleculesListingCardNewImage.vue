@@ -26,6 +26,7 @@
         <AtomsIcon name="chevron-right" icon="chevron-right" aria-hidden="true" />
       </button>
     </div>
+    <slot name="side-images" />
   </div>
 </template>
 

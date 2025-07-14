@@ -6,9 +6,25 @@
     </h2>
 
     <ul class="p-ai-search-results__list">
-      <li v-for="listing in results" :key="listing.id">
-        <MoleculesListingCardFeatured v-if="listing.listingTier === 'FEATURED'" :listing="listing as ListingCardData" />
-        <MoleculesListingCardBase v-else :listing="listing as ListingCardData" />
+      <li
+        v-for="listing in results"
+        :key="listing.id"
+        :class="{
+          'premium-listing-wrapper': listing.listingTier === 'PREMIUM',
+        }"
+      >
+        <MoleculesListingCardPremium
+          v-if="listing.listingTier === 'PREMIUM'"
+          :listing="listing as ListingCardData"
+        />
+        <MoleculesListingCardFeatured
+          v-else-if="listing.listingTier === 'FEATURED'"
+          :listing="listing as ListingCardData"
+        />
+        <MoleculesListingCardBase
+          v-else
+          :listing="listing as ListingCardData"
+        />
       </li>
     </ul>
 
@@ -38,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+
 const props = withDefaults(defineProps<{
   results: ListingWithFullProperty[];
   queryAnalysis: QueryAnalysis | null;
@@ -49,6 +66,9 @@ const props = withDefaults(defineProps<{
   totalPages: 1,
   totalResults: 0
 });
+
+// Auto-imported in Nuxt, but if needed:
+// import MoleculesListingCardPremium from '~/components/molecules/ListingCard/MoleculesListingCardPremium.vue';
 
 defineEmits<{
   'page-change': [page: number];
@@ -70,6 +90,10 @@ const hasPagination = computed(() => props.totalPages > 1);
     
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
+    }
+    .premium-listing-wrapper {
+      grid-column: span 2;
+      /* Ensure full width for premium cards */
     }
   }
 }

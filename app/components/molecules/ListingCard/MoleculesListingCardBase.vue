@@ -1,25 +1,38 @@
 <template>
   <div class="m-listing-card" :data-tier="listing.listingTier">
     <slot name="featured-banner" />
-    <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
-    <div class="m-listing-card-content">
-      <div class="m-listing-card-details">
-        <div class="m-listing-card-header-row m-listing-card-price-group">
-          <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
-          <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
-          <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
+    <slot name="image">
+      <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
+    </slot>
+    <div class="m-listing-card-content-wrapper">
+      <slot name="content-header" />
+      <div class="m-listing-card-content">
+        <div class="m-listing-card-details">
+          <div class="m-listing-card-header-row m-listing-card-price-group">
+            <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+            <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
+            <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
+          </div>
+          <MoleculesListingCardNewTitle :address="listing.property.address"
+            :type="listing.property.type.name" :classification="listing.property.classification.name" />
+          <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
+            :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
+          <MoleculesListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
+            :reduced="true" />
         </div>
-        <MoleculesListingCardNewTitle :address="listing.property.address"
-          :type="listing.property.type.name" :classification="listing.property.classification.name" />
-        <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
-          :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
-        <MoleculesListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
-          :reduced="true" />
+        <div class="m-listing-card-footer">
+          <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+          <slot name="actions">
+            <div class="m-listing-card-actions">
+              <!-- Placeholder for additional actions if needed -->
+              <MoleculesListingCardNewView :listing-id="listing.id" />
+              <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id" />
+            </div>
+            
+          </slot>
+        </div>
       </div>
-      <div class="m-listing-card-footer">
-        <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
-        <MoleculesListingCardNewActions :listing-id="listing.id" :user-id="listing.user.id" />
-      </div>
+      <slot name="additional-content" />
     </div>
   </div>
 </template>
@@ -52,13 +65,19 @@ const priceType = computed(() => {
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
+  .m-listing-card-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - var(--image-width));
+  }
+
   .m-listing-card-content {
     color: var(--text-color);
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: var(--card-padding);
-    width: calc(100% - var(--image-width));
   }
 
   .m-listing-card-footer {
@@ -101,8 +120,11 @@ const priceType = computed(() => {
     max-width: 100%;
     padding: 0;
 
-    .m-listing-card-content {
+    .m-listing-card-content-wrapper {
       width: 100%;
+    }
+    
+    .m-listing-card-content {
       padding: var(--card-padding);
     }
   }
@@ -110,7 +132,7 @@ const priceType = computed(() => {
 
 @media (max-width: 768px) {
   .m-listing-card {
-    .m-listing-card-content {
+    .m-listing-card-content-wrapper {
       width: 100%;
     }
   }
