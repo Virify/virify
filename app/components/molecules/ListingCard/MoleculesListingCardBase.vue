@@ -1,27 +1,46 @@
 <template>
+  <!-- Base listing card component with flexible slot system for customization -->
   <div class="m-listing-card" :data-tier="listing.listingTier">
+    <!-- Optional featured banner slot (used for premium/featured indicators) -->
     <slot name="featured-banner" />
+    
+    <!-- Image slot with default property image component -->
     <slot name="image">
       <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     </slot>
+    
     <div class="m-listing-card-content-wrapper">
-      <slot name="content-header" />
+      <!-- Premium Header  -->
+      <slot name="premium-header" />
+      
       <div class="m-listing-card-content">
+        <!-- Main listing details section -->
         <div class="m-listing-card-details">
+          <!-- Price and listing type indicator row -->
           <div class="m-listing-card-header-row m-listing-card-price-group">
             <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
             <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
             <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
           </div>
+          
+          <!-- Property title with address, type, and classification -->
           <MoleculesListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
             :classification="listing.property.classification.name" />
+          
+          <!-- Property features (bedrooms, bathrooms, receptions) -->
           <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
             :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
+          
+          <!-- Property tags (chain-free, listing date, reduced status) -->
           <MoleculesListingCardNewTags :chain-free="listing.property.chainFree"
             :listed-date="listing.property.createdAt" :reduced="true" />
         </div>
+        
+        <!-- Footer with agent info and action buttons -->
         <div class="m-listing-card-footer">
           <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+          
+          <!-- Actions slot with default view/enquire buttons -->
           <slot name="actions">
             <div class="m-listing-card-actions">
               <MoleculesListingCardNewView :listing-id="listing.id" />
@@ -30,7 +49,9 @@
           </slot>
         </div>
       </div>
-      <slot name="additional-content" />
+      
+      <!-- Optional additional content slot (for extra content below main card) -->
+      <slot name="premium-content" />
     </div>
   </div>
 </template>

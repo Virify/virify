@@ -1,7 +1,7 @@
 <template>
   <MoleculesListingCardBase :listing="listing">
 
-    <template #content-header>
+    <template #premium-header>
       <div class="premium-content-header">
         <div class="premium-header-line"></div>
         <span class="premium-header-title">Premium</span>
@@ -27,7 +27,7 @@
       </div>
     </template>
 
-    <template #additional-content>
+    <template #premium-content>
       <div class="premium-additional-content">
         <div class="premium-features-list">
           <div class="premium-feature-check">
@@ -132,8 +132,6 @@ const images = computed(() => {
     .m-listing-card-image-container {
       --image-width: 100%;
     }
-
-    // (reverted) No mobile grid override for .m-listing-card-content-wrapper
   }
 }
 
