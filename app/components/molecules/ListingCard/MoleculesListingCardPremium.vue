@@ -11,10 +11,11 @@
 
     <template #image>
       <MoleculesListingCardNewImage :images="images" :listing-id="listing.id">
-        <template #side-images>
+        <template #side-images="{ selectedIndex, goToSlide, images: allImages }">
           <div class="premium-side-images">
-            <img v-if="images[1]" :src="images[1]" class="premium-side-image" alt="Property image 2" />
-            <img v-if="images[2]" :src="images[2]" class="premium-side-image" alt="Property image 3" />
+            <img v-for="(image, index) in allImages" :key="index" :src="image" class="premium-side-image"
+              :class="{ 'active': index === selectedIndex }" :alt="`Property thumbnail ${index + 1}`"
+              @click="goToSlide(index)" />
           </div>
         </template>
       </MoleculesListingCardNewImage>
@@ -71,9 +72,22 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Images for carousel and side thumbnails
+// Use all images for carousel
 const images = computed(() => {
-  return props.listing.property?.media?.map((m: any) => m.image) ?? []
+  const allImages = props.listing.property?.media?.map((m: any) => m.image) ?? []
+  const mockImages = [
+    'https://picsum.photos/400/300?random=1',
+    'https://picsum.photos/400/300?random=2',
+    'https://picsum.photos/400/300?random=3',
+    'https://picsum.photos/400/300?random=4'
+  ]
+
+  // Ensure we have exactly 4 images total
+  if (allImages.length > 0) {
+    return allImages.length >= 4 ? allImages.slice(0, 4) : [...allImages, ...mockImages.slice(0, 4 - allImages.length)]
+  }
+
+  return mockImages
 })
 </script>
 
@@ -84,16 +98,26 @@ const images = computed(() => {
   grid-column: span 2;
   width: 100%;
   max-width: none;
+  height: 100%;
 
   // Premium styling
   border: 3px solid var(--primary-400);
 
   // Adjust image container to accommodate side images
-  .m-listing-card-image-container {
+  .m-listing-card-image-wrapper {
     display: flex;
+    width: 65%;
+    align-items: stretch;
+    padding: var(--size-8);
+  }
 
-    // Override the base image width for premium layout (smaller to accommodate equal content widths)
-    --image-width: 45%;
+  .m-listing-card-image-container {
+    flex: 1;
+    aspect-ratio: unset;
+    border-top-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+    border-bottom-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   // Override content wrapper to be a proper grid
@@ -101,7 +125,6 @@ const images = computed(() => {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
-    gap: var(--size-16);
 
     // Header spans full width
     .premium-content-header {
@@ -164,7 +187,7 @@ const images = computed(() => {
   align-items: center;
   gap: var(--size-16);
   padding: var(--size-16) var(--size-24);
-  background: var(--background-200);
+  background: inherit;
 }
 
 .premium-header-line {
@@ -185,27 +208,40 @@ const images = computed(() => {
 .premium-side-images {
   display: flex;
   flex-direction: column;
-  gap: var(--size-4);
-  padding: var(--size-8);
-  width: 20%;
+  gap: var(--size-8);
+  padding: 0;
+  width: 25%;
 }
 
 .premium-side-image {
   width: 100%;
-  height: 80px;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   cursor: pointer;
-  border-radius: var(--border-radius-md);
-  transition: opacity 0.2s ease-in-out;
+  border-radius: 0;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+
+  &:first-child {
+    border-top-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+  }
+
+  &:last-child {
+    border-bottom-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+  }
 
   &:hover {
     opacity: 0.8;
+    transform: scale(1.02);
+  }
+
+  &.active {
+    opacity: 1;
   }
 }
 
 // Premium additional content wrapper
 .premium-additional-content {
-  background: var(--background-200);
+  background: inherit;
   padding: var(--size-16) var(--size-24);
 }
 
