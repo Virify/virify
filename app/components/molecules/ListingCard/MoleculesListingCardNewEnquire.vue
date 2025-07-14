@@ -1,9 +1,9 @@
 <template>
-  <button class="| button button-ghost body-sm" :disabled="isEnquiryDisabled" @click="onEnquire" 
-          :aria-label="isSelf ? 'Cannot enquire about your own property' : hasEnquired(listingId) ? 'Enquiry already sent' : 'Send enquiry about this property'"
-          :title="isSelf ? 'Cannot enquire about your own property' : hasEnquired(listingId) ? 'Enquiry already sent' : 'Send enquiry about this property'">
-    {{ enquiryLabel }}
-  </button>
+  <div @click="handleEnquire">
+    <slot :disabled="isEnquiryDisabled" :enquiry-label="enquiryLabel">
+      <button class="| button button-ghost button-full body-sm" :disabled="isEnquiryDisabled">{{ enquiryLabel }}</button>
+    </slot>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -38,7 +38,9 @@ const enquiryLabel = computed(() =>
       : 'Enquire'
 );
 
-function onEnquire() {
+function handleEnquire() {
+  if (isEnquiryDisabled.value) return;
+  
   if (!user.value || !user.value.id) {
     showDialog({
       component: ViewsDialogLogin,
@@ -53,5 +55,11 @@ function onEnquire() {
   }
 }
 </script>
-
-
+<style scoped lang="scss">
+.button {
+  width: 100%;
+  padding: var(--size-8);
+  border-radius: var(--border-radius-lg);
+  box-sizing: border-box;
+}
+</style>

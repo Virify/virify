@@ -4,7 +4,7 @@
     <template #premium-header>
       <div class="premium-content-header">
         <div class="premium-header-line"></div>
-        <span class="premium-header-title">Premium</span>
+        <h1 class="premium-header-title | title-xl">Premium</h1>
         <div class="premium-header-line"></div>
       </div>
     </template>
@@ -13,9 +13,12 @@
       <MoleculesListingCardNewImage :images="images" :listing-id="listing.id">
         <template #side-images="{ selectedIndex, goToSlide, images: allImages }">
           <div class="premium-side-images">
-            <img v-for="(image, index) in allImages" :key="index" :src="image" class="premium-side-image"
-              :class="{ 'active': index === selectedIndex }" :alt="`Property thumbnail ${index + 1}`"
-              @click="goToSlide(index)" />
+            <img v-for="(image, index) in getRotatedImages(allImages, selectedIndex)" :key="`${selectedIndex}-${index}`" 
+                 :src="image.src" 
+                 class="premium-side-image"
+                 :class="{ 'active': image.isActive }" 
+                 :alt="`Property thumbnail ${index + 1}`"
+                 @click="goToSlide(image.originalIndex)" />
           </div>
         </template>
       </MoleculesListingCardNewImage>
@@ -24,7 +27,9 @@
     <template #actions>
       <!-- View button only under main content -->
       <div class="premium-single-action">
-        <MoleculesListingCardNewView :listing-id="listing.id" />
+        <MoleculesListingCardNewView :listing-id="listing.id">
+          <span class="| button button-primary button-bordered button-full">View</span>
+        </MoleculesListingCardNewView>
       </div>
     </template>
 
@@ -58,7 +63,11 @@
         </div>
         <!-- Enquire button using individual component -->
         <div class="premium-single-action">
-          <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id" />
+          <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id">
+            <template #default="{ disabled, enquiryLabel }">
+              <button class="| button button-primary button-full body-sm" :disabled="disabled">{{ enquiryLabel }}</button>
+            </template>
+          </MoleculesListingCardNewEnquire>
         </div>
       </div>
     </template>
@@ -79,16 +88,38 @@ const images = computed(() => {
     'https://picsum.photos/400/300?random=1',
     'https://picsum.photos/400/300?random=2',
     'https://picsum.photos/400/300?random=3',
-    'https://picsum.photos/400/300?random=4'
+    'https://picsum.photos/400/300?random=4',
+    'https://picsum.photos/400/300?random=5',
+    'https://picsum.photos/400/300?random=6',
+    'https://picsum.photos/400/300?random=7',
+    'https://picsum.photos/400/300?random=8'
   ]
 
-  // Ensure we have exactly 4 images total
-  if (allImages.length > 0) {
-    return allImages.length >= 4 ? allImages.slice(0, 4) : [...allImages, ...mockImages.slice(0, 4 - allImages.length)]
+  // Always ensure we have at least 8 images for testing rotation
+  if (allImages.length >= 8) {
+    return allImages
+  } else {
+    // Supplement real images with mock images to reach 8 total
+    return [...allImages, ...mockImages.slice(0, 8 - allImages.length)]
   }
-
-  return mockImages
 })
+
+// Function to get 4 rotating side images based on the selected index
+const getRotatedImages = (allImages: string[], selectedIndex: number) => {
+  const sideImages = []
+  
+  // Always show exactly 4 side images, cycling through all available images
+  for (let i = 0; i < 4; i++) {
+    const imageIndex = (selectedIndex + i) % allImages.length
+    sideImages.push({
+      src: allImages[imageIndex],
+      originalIndex: imageIndex,
+      isActive: imageIndex === selectedIndex
+    })
+  }
+  
+  return sideImages
+}
 </script>
 
 <style lang="scss">
@@ -101,12 +132,15 @@ const images = computed(() => {
   height: 100%;
 
   // Premium styling
-  border: 3px solid var(--primary-400);
+  border: 5px solid var(--primary-400);
+  background-color: var(--blue-400);
+  color: var(--primary-400);
 
   // Adjust image container to accommodate side images
   .m-listing-card-image-wrapper {
     display: flex;
-    width: 65%;
+    width: 80%;
+    aspect-ratio: 16/9;
     align-items: stretch;
     padding: var(--size-8);
   }
@@ -125,6 +159,7 @@ const images = computed(() => {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
+    gap: var(--size-8);
 
     // Header spans full width
     .premium-content-header {
@@ -136,6 +171,7 @@ const images = computed(() => {
     .m-listing-card-content {
       grid-column: 1;
       grid-row: 2;
+      padding: 0 0 var(--size-16) var(--size-16)
     }
 
     // Additional content takes right column
@@ -148,6 +184,11 @@ const images = computed(() => {
 
     }
   }
+  
+  // Make tags slightly transparent on premium cards
+  .m-listing-card-type-indicator {
+    opacity: 0.8;
+  }
 
   @media (max-width: 768px) {
     grid-column: span 1;
@@ -158,48 +199,26 @@ const images = computed(() => {
   }
 }
 
-// Premium banner
-.premium-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--size-16);
-  padding: var(--size-16) var(--size-24) 0 var(--size-24);
-}
-
-.premium-label {
-  color: var(--primary-400);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.premium-divider {
-  flex: 1;
-  height: 2px;
-  background: var(--primary-400);
-  border-radius: 1px;
-}
-
 // Premium content header
 .premium-content-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--size-16);
-  padding: var(--size-16) var(--size-24);
+  padding-top: var(--size-16);
   background: inherit;
 }
 
 .premium-header-line {
-  flex: 1;
+  width: 150px;
   height: 1px;
-  background: var(--foreground-100);
+  background: var(--primary-400);
 }
 
 .premium-header-title {
-  color: var(--text-color);
-  font-size: var(--font-size-xl);
-  font-weight: 700;
+  color: var(--primary-400);
+  padding-bottom: 0;
+  margin: 0;
   text-align: center;
   white-space: nowrap;
 }
@@ -210,16 +229,20 @@ const images = computed(() => {
   flex-direction: column;
   gap: var(--size-8);
   padding: 0;
-  width: 25%;
+  height: 100%;
+  // Calculate width: remaining space after main image and gap
+  width: calc(100% - 72% - var(--size-8));
+  transition: all 0.3s ease-in-out;
 }
 
 .premium-side-image {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  // Dynamic height: (container height - 3 gaps) / 4 images
+  height: calc((100% - (var(--size-8) * 3)) / 4);
   object-fit: cover;
   cursor: pointer;
   border-radius: 0;
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
 
   &:first-child {
     border-top-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
@@ -242,7 +265,8 @@ const images = computed(() => {
 // Premium additional content wrapper
 .premium-additional-content {
   background: inherit;
-  padding: var(--size-16) var(--size-24);
+  padding: 0 var(--size-8) var(--size-16) 0;
+  color: inherit  
 }
 
 // Premium features list
@@ -262,9 +286,7 @@ const images = computed(() => {
 }
 
 .premium-check-icon {
-  background: var(--primary-400);
-  color: var(--monochrome-900);
-  border-radius: 50%;
+  color: var(--primary-400);
   width: var(--size-20);
   height: var(--size-20);
   display: flex;
@@ -283,7 +305,7 @@ const images = computed(() => {
     width: 100%;
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
-    border-color: var(--secondary-400);
+    box-sizing: border-box;
   }
 }
 

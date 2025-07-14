@@ -111,15 +111,13 @@ const priceType = computed(() => {
     gap: var(--size-8);
     grid-template-columns: 1fr 1fr;
     width: 100%;
-
-    // Match premium card button style
-    .button {
-      width: 100%;
-      padding: var(--size-8);
-      border-radius: var(--border-radius-lg);
-      border-color: var(--secondary-400);
-      box-sizing: border-box;
-    }
+  }
+  
+  // Apply border-radius to all buttons within the card
+  button,
+  .button,
+  span.button {
+    border-radius: var(--border-radius-lg) !important;
   }
 
   .m-listing-card-header-row {
