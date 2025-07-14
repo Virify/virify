@@ -80,13 +80,21 @@
 
     <template #description>
       <div class="premium-description | body-sm" v-if="listing.description">
-        <p>{{ listing.description }}</p>
+        <div class="premium-description-content" :class="{ 'collapsed': isDescriptionCollapsed }">
+          <p>{{ listing.description }}</p>
+        </div>
+        <button 
+          class="premium-description-toggle | body-xs" 
+          @click="toggleDescription"
+          v-if="shouldShowToggle">
+          {{ isDescriptionCollapsed ? 'Show more' : 'Show less' }}
+        </button>
       </div>
     </template>
 
     <template #agent>
       <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id">
-        <template #default="{ username, id }">
+        <template #default="{ username }">
           <NuxtLink to="#" class="premium-agent">
             <div class="premium-agent-logo">
               <AtomsIcon name="check" icon="tick-solid" />
@@ -110,53 +118,16 @@
       <div class="premium-additional-content">
         <div class="premium-features-wrapper">
           <div class="premium-features-list | body-sm">
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>En-suite</span>
+            <div v-for="feature in premiumFeatures" :key="feature.label" class="premium-feature-check">
+              <span class="premium-check-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z" />
+                </svg>
+              </span>
+              <span>{{ feature.label }}</span>
             </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Garage</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Pet Friendly</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>EV-Charging</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Garage</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Garage</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Garden</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Balcony</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Parking</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Furnished</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>Modern Kitchen</span>
-            </div>
-            <div class="premium-feature-check">
-              <i class="premium-check-icon">✓</i>
-              <span>High Ceilings</span>
+            <div v-if="premiumFeatures.length === 0" class="premium-feature-check">
+              <span>No premium features available</span>
             </div>
           </div>
         </div>
@@ -169,6 +140,40 @@
             </template>
           </MoleculesListingCardNewEnquire>
         </div>
+      </div>
+    </template>
+
+
+    <template #mobile-content>
+      <!-- Collapsible additional features for mobile -->
+      <div class="premium-mobile-features">
+        <div class="premium-features-list | body-sm">
+          <div v-for="feature in premiumFeaturesMobile" :key="feature.label" class="premium-feature-check">
+            <span class="premium-check-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z" />
+              </svg>
+            </span>
+            <span>{{ feature.label }}</span>
+          </div>
+          <div v-if="premiumFeaturesMobile.length === 0" class="premium-feature-check">
+            <span>No premium features available</span>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template #mobile-actions>
+      <!-- Enquiry button for mobile -->
+      <div class="premium-mobile-actions">
+        <MoleculesListingCardNewView :listing-id="listing.id">
+          <span class="| button button-primary button-full body-sm">View</span>
+        </MoleculesListingCardNewView>
+        <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id">
+          <template #default="{ disabled, enquiryLabel }">
+            <button class="| button button-primary button-full body-sm" :disabled="disabled">{{ enquiryLabel }}</button>
+          </template>
+        </MoleculesListingCardNewEnquire>
       </div>
     </template>
   </MoleculesListingCardBase>
@@ -185,27 +190,32 @@ const priceType = computed(() => {
   return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
 });
 
+// Description collapsible functionality
+const isDescriptionCollapsed = ref(true)
+const shouldShowToggle = ref(false)
+
+const toggleDescription = () => {
+  isDescriptionCollapsed.value = !isDescriptionCollapsed.value
+}
+
+// Check if toggle should be shown based on description length
+onMounted(() => {
+  if (props.listing.description && props.listing.description.length > 100) {
+    shouldShowToggle.value = true
+  }
+})
+
 // Use all images for carousel
 const images = computed(() => {
   const allImages = props.listing.property?.media?.map((m: any) => m.image) ?? []
-  const mockImages = [
-    'https://picsum.photos/400/300?random=1',
-    'https://picsum.photos/400/300?random=2',
-    'https://picsum.photos/400/300?random=3',
-    'https://picsum.photos/400/300?random=4',
-    'https://picsum.photos/400/300?random=5',
-    'https://picsum.photos/400/300?random=6',
-    'https://picsum.photos/400/300?random=7',
-    'https://picsum.photos/400/300?random=8'
-  ]
-
-  // Always ensure we have at least 8 images for testing rotation
-  if (allImages.length >= 8) {
-    return allImages
-  } else {
-    // Supplement real images with mock images to reach 8 total
-    return [...allImages, ...mockImages.slice(0, 8 - allImages.length)]
+  
+  // If we have no images, return empty array
+  if (allImages.length === 0) {
+    return []
   }
+  
+  // Just return the actual images - no fake ones
+  return allImages
 })
 
 // Function to get 4 rotating side images based on the selected index
@@ -224,6 +234,11 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
 
   return sideImages
 }
+
+import { getPremiumFeatures } from '~/utils/results/premium-features';
+
+const premiumFeatures = computed(() => getPremiumFeatures(props.listing, 16));
+const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 </script>
 
 <style lang="scss">
@@ -240,7 +255,7 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
   background-color: var(--blue-400);
   color: var(--primary-400);
 
-  // Adjust image container to accommodate side images
+  // Image section
   .m-listing-card-image-wrapper {
     display: flex;
     width: 80%;
@@ -258,12 +273,18 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
     border-bottom-right-radius: 0;
   }
 
-  // Override content wrapper to be a proper grid
+  // Content layout
   .m-listing-card-content-wrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
     gap: var(--size-8);
+
+    @media (max-width: 768px) {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
 
     // Header spans full width
     .premium-content-header {
@@ -275,7 +296,11 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
     .m-listing-card-content {
       grid-column: 1;
       grid-row: 2;
-      padding: 0 0 var(--size-16) var(--size-16)
+      padding: 0 0 var(--size-16) var(--size-16);
+
+      @media (max-width: 768px) {
+        padding: var(--size-16) var(--size-16) 0 var(--size-16);
+      }
     }
 
     // Additional content takes right column
@@ -287,10 +312,15 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
       justify-content: space-between;
       align-items: center;
 
+      @media (max-width: 768px) {
+        grid-column: 1;
+        grid-row: auto;
+        padding: 0 var(--size-16) var(--size-16);
+      }
     }
   }
 
-  // Position sale tag absolutely in top right corner for premium cards
+  // Sale tag positioning
   .m-listing-card-type-indicator {
     position: absolute;
     top: var(--size-16);
@@ -299,10 +329,19 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
     background-color: var(--primary-400);
     color: black;
     opacity: 1;
+
+    @media (max-width: 768px) {
+      position: absolute;
+      top: var(--size-20);
+      left: var(--size-24);
+      right: auto;
+      z-index: 20;
+      margin-left: 0;
+      align-self: auto;
+    }
   }
 
-
-  // Override arrow, counter, and action button colors for premium
+  // Image controls styling
   .m-listing-card-arrow-button {
     background-color: var(--primary-400);
     color: black;
@@ -320,7 +359,10 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
   .m-listing-card-image-actions {
     background-color: var(--primary-400);
 
-    .a-favourite-button,
+    .a-favourite-button {
+      background-color: var(--primary-400);
+    }
+
     .note-button {
       background-color: var(--primary-400);
       color: black;
@@ -333,10 +375,6 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
 
   @media (max-width: 768px) {
     grid-column: span 1;
-
-    .m-listing-card-image-container {
-      --image-width: 100%;
-    }
   }
 }
 
@@ -493,6 +531,37 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
     margin-bottom: var(--size-16);
     color: white;
     
+    &-content {
+      transition: max-height 0.3s ease-in-out;
+      overflow: hidden;
+      
+      &.collapsed {
+        max-height: 3em;
+        
+        @media (min-width: 769px) {
+          max-height: none;
+        }
+      }
+      
+      &:not(.collapsed) {
+        max-height: 20em;
+      }
+    }
+    
+    &-toggle {
+      background: none;
+      border: none;
+      color: var(--primary-400);
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      margin-top: var(--size-4);
+      
+      @media (min-width: 769px) {
+        display: none;
+      }
+    }
+    
     p {
       margin: 0;
       line-height: 1.5;
@@ -528,8 +597,12 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
   // Additional content section
   &-additional-content {
     background: inherit;
-    padding: 0 var(--size-8) var(--size-16) 0;
+    padding: 0 var(--size-16) var(--size-16) 0;
     color: inherit;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   // Features list in additional content
@@ -538,12 +611,19 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
     justify-content: center;
     align-items: center;
     flex: 1;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   &-features-list {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--size-8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &-feature-check {
@@ -566,38 +646,174 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
     font-weight: 700;
   }
 
+  &-mobile-features {
+    display: none;
+    padding-bottom: var(--size-16);
+    background: var(--blue-400);
+    color: var(--primary-400);
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+
   // Single action button styling
   &-single-action {
     width: 100%;
     margin-top: var(--size-16);
 
+    @media(max-width: 768px) {
+      display: none;
+    }
+
     .button {
       width: 100%;
-      padding: var(--size-8);
       border-radius: var(--border-radius-lg);
       box-sizing: border-box;
 
       &.button-bordered {
+        padding: var(--size-8);
         border-width: 2px;
         border-color: var(--primary-400);
       }
 
+      &:not(.button-bordered) {
+        padding: var(--size-10);
+      }
+
       &:disabled {
-        background: var(--primary-400);
+        background: var(--primary-500);
         opacity: 0.7;
+        color: var(--monochrome-400);
 
         &:hover {
-          background: var(--primary-400);
+          background: var(--primary-500);
+          color: var(--monochrome-400);
           opacity: 0.7;
         }
       }
     }
   }
+  
+  &-mobile-actions {
+    @media(max-width: 768px) {
+      
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--size-8);
+      margin-top: var(--size-16);
+
+      .button {
+        border-radius: var(--border-radius-lg);
+        box-sizing: border-box;
+        padding: var(--size-10);
+      }
+    }
+  }
 }
 
-@media (max-width: 1024px) {
-  .premium-side-images {
-    display: none;
+@media (max-width: 1200px) {
+  .m-listing-card[data-tier='PREMIUM'] {
+    .m-listing-card-image-wrapper {
+      // Take full width on tablet
+      width: 100%;
+    }
+    
+    .m-listing-card-image-container {
+      // Main image takes 50% of container
+      width: 50%;
+      aspect-ratio: 4/3 !important;
+    }
+    
+    .premium-side-images {
+      // Side images container takes 50% of container
+      width: 50%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: var(--size-8);
+      height: 100%;
+    }
+    
+    .premium-side-image {
+      // Each side image is square
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      
+      &:first-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+
+      &:nth-child(2) {
+        border-top-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+      }
+
+      &:nth-child(3) {
+        border-bottom-left-radius: 0;
+      }
+
+      &:last-child {
+        border-bottom-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .m-listing-card[data-tier='PREMIUM'] {
+    
+    .m-listing-card-image-wrapper {
+      // Stack images vertically on mobile
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .m-listing-card-image-container {
+      // Main image takes full width on mobile
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-top-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+      border-top-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    
+    .premium-side-images {
+      // Side images underneath, full width
+      width: 100%;
+      height: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-rows: 1fr;
+      gap: var(--size-8);
+    }
+    
+    .premium-side-image {
+      // Each side image in a row
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      object-fit: cover;
+      
+      // Reset all border radius for mobile
+      border-radius: 0;
+      
+      &:first-child {
+        border-bottom-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+      }
+      
+      &:nth-child(2) {
+        border-top-right-radius: 0;
+      }
+      
+      &:last-child {
+        border-bottom-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+      }
+    }
   }
 }
 </style>

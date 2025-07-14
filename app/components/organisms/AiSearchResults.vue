@@ -60,10 +60,10 @@
 </template>
 
 <script setup lang="ts">
-import { distributePremiumListings } from '~~/utils/listingDistribution';
+import { distributePremiumListings } from '~/utils/results/listing-distribution';
 
-  
-const props = withDefaults(defineProps<{
+
+  const props = withDefaults(defineProps<{
   results: ListingWithFullProperty[];
   queryAnalysis: QueryAnalysis | null;
   currentPage?: number;

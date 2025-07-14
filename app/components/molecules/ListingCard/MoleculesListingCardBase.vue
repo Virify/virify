@@ -45,6 +45,11 @@
           
           <!-- Description slot -->
           <slot name="description" />
+          
+          <!-- Mobile-only content slot -->
+          <div class="m-listing-card-mobile-content">
+            <slot name="mobile-content" />
+          </div>
         </div>
         
         <!-- Footer with agent info and action buttons -->
@@ -60,6 +65,11 @@
               <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id" />
             </div>
           </slot>
+          
+          <!-- Mobile actions slot -->
+          <div class="m-listing-card-mobile-actions">
+            <slot name="mobile-actions" />
+          </div>
         </div>
       </div>
       
@@ -156,6 +166,14 @@ const priceType = computed(() => {
     background-color: var(--background-300);
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
+  }
+
+  .m-listing-card-mobile-content,
+  .m-listing-card-mobile-actions {
+    width: 100%;
+    @media (min-width: 769px) {
+      display: none;
+    }
   }
 }
 
