@@ -1,9 +1,11 @@
 <template>
-  <ul class="m-listing-card-tags">
-    <li v-for="tag in tags" :key="tag" class="m-listing-card-tag | body-xs">
-      {{ tag }}
-    </li>
-  </ul>
+  <slot :tags="tags">
+    <ul class="m-listing-card-tags">
+      <li v-for="tag in tags" :key="tag" class="m-listing-card-tag | body-xs">
+        {{ tag }}
+      </li>
+    </ul>
+  </slot>
 </template>
 <script setup lang="ts">
 

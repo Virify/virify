@@ -1,10 +1,12 @@
 <template>
-  <NuxtLink to="#" class="m-listing-card-agent">
-    <div class="m-listing-card-agent-logo">
-      <AtomsIcon name="check" icon="tick-solid" />
-    </div>
-    <p class="body-xs font-semibold">{{ username }}</p>
-  </NuxtLink>
+  <slot :username="username" :id="id">
+    <NuxtLink to="#" class="m-listing-card-agent">
+      <div class="m-listing-card-agent-logo">
+        <AtomsIcon name="check" icon="tick-solid" />
+      </div>
+      <p class="body-xs font-semibold">{{ username }}</p>
+    </NuxtLink>
+  </slot>
 </template>
 <script setup lang="ts">
 defineProps<{

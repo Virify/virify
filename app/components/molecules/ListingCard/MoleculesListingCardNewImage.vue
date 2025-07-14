@@ -1,31 +1,34 @@
 <template>
-  <div ref="emblaNode" class="m-listing-card-image-container" role="region" aria-label="Property images">
-    <div class="m-listing-card-image-slides">
-      <div v-for="(img, index) in images" :key="index" class="m-listing-card-image-slide">
-        <nuxt-img :src="img" :alt="`Property image ${index + 1} of ${images.length}`" class="m-listing-card-image" />
+  <div class="m-listing-card-image-wrapper">
+    <div ref="emblaNode" class="m-listing-card-image-container" role="region" aria-label="Property images">
+      <div class="m-listing-card-image-slides">
+        <div v-for="(img, index) in images" :key="index" class="m-listing-card-image-slide">
+          <nuxt-img :src="img" :alt="`Property image ${index + 1} of ${images.length}`" class="m-listing-card-image" />
+        </div>
+      </div>
+      <div class="m-listing-card-image-overlay">
+        <div v-if="images.length > 1" class="m-listing-card-image-counter | body-xs" aria-label="Image counter">
+          {{ selectedIndex + 1 }}/{{ images.length }}
+        </div>
+        <div class="m-listing-card-image-actions">
+          <AtomsFavouriteButton 
+            :listing-id="listingId" 
+            :confirm-removal="false"
+            icon-class="icon-heart"
+          />
+          <AtomsNoteButton :listing-id="listingId" />
+        </div>
+        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev" 
+                aria-label="Previous image" title="Previous image">
+          <AtomsIcon name="chevron-left" icon="chevron-left" aria-hidden="true" />
+        </button>
+        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext" 
+                aria-label="Next image" title="Next image">
+          <AtomsIcon name="chevron-right" icon="chevron-right" aria-hidden="true" />
+        </button>
       </div>
     </div>
-    <div class="m-listing-card-image-overlay">
-      <div class="m-listing-card-image-counter | body-xs" aria-label="Image counter">
-        {{ selectedIndex + 1 }}/{{ images.length }}
-      </div>
-      <div class="m-listing-card-image-actions">
-        <AtomsFavouriteButton 
-          :listing-id="listingId" 
-          :confirm-removal="false"
-          icon-class="icon-heart"
-        />
-        <AtomsNoteButton :listing-id="listingId" />
-      </div>
-      <button class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev" 
-              aria-label="Previous image" title="Previous image">
-        <AtomsIcon name="chevron-left" icon="chevron-left" aria-hidden="true" />
-      </button>
-      <button class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext" 
-              aria-label="Next image" title="Next image">
-        <AtomsIcon name="chevron-right" icon="chevron-right" aria-hidden="true" />
-      </button>
-    </div>
+    <slot name="side-images" :selected-index="selectedIndex" :go-to-slide="goToSlide" :images="images" />
   </div>
 </template>
 
@@ -55,6 +58,10 @@ const scrollNext = () => {
   emblaApi.value?.scrollNext()
 }
 
+const goToSlide = (index: number) => {
+  emblaApi.value?.scrollTo(index)
+}
+
 const onSelect = () => {
   if (!emblaApi.value) return
   selectedIndex.value = emblaApi.value.selectedScrollSnap()
@@ -69,12 +76,20 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
+.m-listing-card-image-wrapper {
+  display: flex;
+  width: 100%;
+  gap: var(--size-8);
+}
+
 .m-listing-card-image-container {
   border-radius: var(--border-radius-2xl);
   overflow: hidden;
   position: relative;
-  width: var(--image-width);
+  width: 100%;
+  aspect-ratio: 4 / 3;
   z-index: 1;
+  flex-shrink: 0;
 
   &:hover .m-listing-card-arrow-button {
     opacity: 1;
@@ -84,6 +99,7 @@ onMounted(() => {
 .m-listing-card-image-slides {
   display: flex;
   height: 100%;
+  width: 100%;
 }
 
 .m-listing-card-image-slide {
@@ -223,7 +239,7 @@ onMounted(() => {
 
 @media (max-width: 1200px) {
   .m-listing-card-image-container {
-    width: 100%;
+    width: var(--image-width);
     aspect-ratio: 4 / 3;
   }
 }
@@ -231,6 +247,7 @@ onMounted(() => {
 @media (max-width: 768px) {
   .m-listing-card-image-container {
     border-radius: var(--border-radius-2xl);
+    aspect-ratio: 4 / 3;
   }
 }
 </style>

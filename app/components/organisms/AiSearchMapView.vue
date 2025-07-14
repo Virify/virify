@@ -143,12 +143,6 @@ onMounted(() => {
           center = [props.location.geometry.coordinates[0], props.location.geometry.coordinates[1]];
         }
         
-        console.log('Map visualization - Location:', props.location.place_name_en);
-        console.log('Map visualization - Radius:', props.radius);
-        console.log('Map visualization - Bbox:', props.location.bbox);
-        console.log('Map visualization - Boundary polygon:', props.location.boundaryPolygon);
-        console.log('Map visualization - Center:', center);
-        
         updateSearchRadiusVisualization(mapRef.value.map, center, props.radius, props.location.bbox, props.location.boundaryPolygon);
       }
     }, 500); // Give map time to fully initialize

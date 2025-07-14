@@ -57,6 +57,8 @@
 </template>
 
 <script setup lang="ts">
+import { applySortToResults } from '~/utils/results/search-sort';
+
 
 interface SearchPayload {
   location: GeocodingFeature;

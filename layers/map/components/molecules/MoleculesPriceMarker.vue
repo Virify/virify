@@ -94,6 +94,14 @@ const markerClass = computed(() => {
   z-index: inherit;
   /* Make container non-clickable, only the actual marker content should be clickable */
   pointer-events: none;
+  /* Smooth hover transitions */
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Hover effect to highlight the marker */
+.price-marker-container:hover {
+  transform: scale(1.1);
+  z-index: 999;
 }
 
 .marker-shape {
@@ -105,6 +113,14 @@ const markerClass = computed(() => {
   color: var(--monochrome-300);
   /* Allow clicking on the actual marker shape */
   pointer-events: auto;
+  /* Smooth color transition on hover */
+  transition: color 0.2s ease-in-out, filter 0.2s ease-in-out;
+}
+
+/* Enhanced hover effect for the marker shape */
+.price-marker-container:hover .marker-shape {
+  color: var(--monochrome-800);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 .marker-shape.heart-marker {
@@ -128,6 +144,13 @@ const markerClass = computed(() => {
   /* Allow clicking on the price content */
   pointer-events: auto;
   font: inherit;
+  /* Smooth color transition on hover */
+  transition: color 0.2s ease-in-out;
+}
+
+/* Change content color on hover */
+.price-marker-container:hover .price-marker-content {
+  color: var(--monochrome-100);
 }
 
 /* Favorite indicator */
