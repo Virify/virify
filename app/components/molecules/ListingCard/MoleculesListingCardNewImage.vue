@@ -10,20 +10,12 @@
         {{ selectedIndex + 1 }}/{{ images.length }}
       </div>
       <div class="m-listing-card-image-actions">
-        <button 
-          class="m-listing-card-icon-button" 
-          :class="{ 'is-active': isFavourite(listingId) }"
-          @click="toggleFavourite(listingId)"
-        >
-          <AtomsIcon name="heart" icon="cards/favourite" class="icon-heart" />
-        </button>
-        <button 
-          class="m-listing-card-icon-button" 
-          :class="{ 'is-active': hasNote(listingId) }"
-          @click="showNoteDialog(listingId)"
-        >
-          <AtomsIcon name="edit" icon="cards/notes" class="icon-edit" />
-        </button>
+        <AtomsFavouriteButton 
+          :listing-id="listingId" 
+          :confirm-removal="false"
+          icon-class="icon-heart"
+        />
+        <AtomsNoteButton :listing-id="listingId" />
       </div>
       <button class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev">
         <AtomsIcon name="chevron-left" icon="chevron-left" />
@@ -37,8 +29,6 @@
 
 <script lang="ts" setup>
 import emblaCarouselVue from 'embla-carousel-vue'
-import { useFavourites } from '~/composables/useFavourites';
-import { useNotes } from '~/composables/useNotes';
 
 const props = defineProps({
   images: {
@@ -51,8 +41,6 @@ const props = defineProps({
   }
 })
 
-const { isFavourite, toggleFavourite } = useFavourites();
-const { showNoteDialog, hasNote } = useNotes();
 
 const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: 0 })
 const selectedIndex = ref(0)
@@ -160,18 +148,48 @@ onMounted(() => {
     transition: fill 0.2s ease-in-out, color 0.2s ease-in-out;
   }
 
-  .icon-heart {
-    fill: transparent;
-  }
-
   &.is-active {
-    .icon-heart,
     .icon-edit {
       color: var(--monochrome-900);
     }
-    .icon-heart {
-      fill: var(--monochrome-900);
-    }
+  }
+}
+
+.a-favourite-button {
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  color: var(--monochrome-100);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-xl);
+  height: var(--size-32);
+  justify-content: center;
+  width: var(--size-32);
+  transition: color 0.2s ease-in-out;
+
+  .icon-heart {
+    width: var(--size-24);
+    height: var(--size-24);
+  }
+}
+
+.note-button {
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  color: var(--monochrome-100);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-xl);
+  height: var(--size-32);
+  justify-content: center;
+  width: var(--size-32);
+  transition: color 0.2s ease-in-out;
+
+  .note-button-icon {
+    width: var(--size-28);
+    height: var(--size-28);
   }
 }
 

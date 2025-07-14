@@ -108,15 +108,15 @@ function handleClick() {
 
 /* Specific styling for when note exists */
 .note-button.has-note .note-button-icon {
-  color: var(--primary-600) !important;
+  color: var(--monochrome-900) !important;
   filter: drop-shadow(0 0 2px rgba(var(--primary-rgb), 0.3));
 }
 
 /* Deeper selector to ensure we target the SVG elements */
 .note-button.has-note .note-icon-wrapper :deep(svg),
 .note-button.has-note .note-icon-wrapper :deep(path) {
-  color: var(--primary-600) !important;
-  fill: var(--primary-600) !important;
+  color: var(--monochrome-900) !important;
+  fill: var(--monochrome-900) !important;
 }
 
 .note-button-confetti {

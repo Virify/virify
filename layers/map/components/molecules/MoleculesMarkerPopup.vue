@@ -23,13 +23,11 @@
             <p class="listing-card__price-type | body-xs">{{ formattedPriceType }}</p>
           </div>
           <div class="listing-card__actions">
-            <button class="listing-card__action-btn" :class="{ 'is-active': isCurrentlyFavorite }"
-              @click="toggleFavourite">
-              <AtomsIcon name="heart" icon="cards/favourite" />
-            </button>
-            <button class="listing-card__action-btn" :class="{ 'is-active': currentlyHasNote }" @click="onNoteClick">
-              <AtomsIcon name="edit" icon="cards/notes" />
-            </button>
+            <AtomsFavouriteButton 
+              :listing-id="(marker.id as number)" 
+              :confirm-removal="false"
+            />
+            <AtomsNoteButton :listing-id="(marker.id as number)" />
           </div>
         </div>
 
@@ -108,25 +106,7 @@ const isFeatured = computed(() => props.marker.tier === 'FEATURED');
 const isPremium = computed(() => props.marker.tier === 'PREMIUM');
 const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
-// Event handlers
-const { showNoteDialog, hasNote } = useNotes();
-const { toggleFavourite: toggleFav, isFavourite } = useFavourites();
-
-// Get live favorite/note status (separate from marker data to avoid re-renders)
-const isCurrentlyFavorite = computed(() => isFavourite(props.marker.id as number));
-const currentlyHasNote = computed(() => hasNote(props.marker.id as number));
-
-const onNoteClick = () => {
-  if (props.marker.id as number) {
-    showNoteDialog(props.marker.id as number);
-  }
-};
-
-const toggleFavourite = () => {
-  if (props.marker.id as number) {
-    toggleFav(props.marker.id as number);
-  }
-};
+// Event handlers - removed as AtomsFavouriteButton and AtomsNoteButton handle this internally
 
 onMounted(() => {
   // Ensure the marker is rendered correctly on mount
@@ -396,22 +376,10 @@ onMounted(() => {
   background-color: var(--primary-400);
 }
 
-.listing-card__action-btn {
-  align-items: center;
-  background: transparent;
-  border: none;
-  color: var(--monochrome-100);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--font-xl);
+.listing-card__actions .a-favourite-button,
+.listing-card__actions .note-button {
   height: var(--size-24);
-  justify-content: center;
-  transition: color 0.2s ease-in-out;
   width: var(--size-24);
-}
-
-.listing-card__action-btn.is-active {
-  color: var(--monochrome-900);
 }
 
 /* ============================================
