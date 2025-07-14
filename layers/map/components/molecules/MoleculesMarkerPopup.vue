@@ -20,7 +20,7 @@
         <div class="listing-card__header">
           <div class="listing-card__price | title-md">
             <p class="listing-card__price-value">{{ formattedPrice }}</p>
-            <p class="listing-card__price-type | body-xs">{{ props.marker.priceType }}</p>
+            <p class="listing-card__price-type | body-xs">{{ formattedPriceType }}</p>
           </div>
           <div class="listing-card__actions">
             <button class="listing-card__action-btn" :class="{ 'is-active': isCurrentlyFavorite }"
@@ -74,6 +74,12 @@ const props = defineProps<{
 
 const formattedPrice = computed(() => {
   return `£${parseInt(String(props.marker.price)).toLocaleString()}`;
+});
+
+const formattedPriceType = computed(() => {
+  if(!props.marker.priceType) return '';
+  // Capitalize the first letter of priceType and replace underscores with spaces
+  return props.marker.priceType.slice(0).replace(/_/g, ' ');
 });
 
 const hasBedrooms = computed(() =>
@@ -334,7 +340,6 @@ onMounted(() => {
 
 .listing-card__price-type {
   margin-top: 0;
-  text-transform: lowercase;
   color: var(--monochrome-600);
 }
 
