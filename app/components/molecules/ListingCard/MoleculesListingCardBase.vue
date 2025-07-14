@@ -13,22 +13,20 @@
             <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
             <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
           </div>
-          <MoleculesListingCardNewTitle :address="listing.property.address"
-            :type="listing.property.type.name" :classification="listing.property.classification.name" />
+          <MoleculesListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
+            :classification="listing.property.classification.name" />
           <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
             :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
-          <MoleculesListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
-            :reduced="true" />
+          <MoleculesListingCardNewTags :chain-free="listing.property.chainFree"
+            :listed-date="listing.property.createdAt" :reduced="true" />
         </div>
         <div class="m-listing-card-footer">
           <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
           <slot name="actions">
             <div class="m-listing-card-actions">
-              <!-- Placeholder for additional actions if needed -->
               <MoleculesListingCardNewView :listing-id="listing.id" />
               <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id" />
             </div>
-            
           </slot>
         </div>
       </div>
@@ -52,7 +50,7 @@ const priceType = computed(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .m-listing-card {
   --card-padding: var(--size-16);
   --image-width: 45%;
@@ -86,6 +84,22 @@ const priceType = computed(() => {
     flex-direction: column;
     gap: var(--size-16);
     justify-content: space-between;
+  }
+
+  .m-listing-card-actions {
+    display: grid;
+    gap: var(--size-8);
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+
+    // Match premium card button style
+    .button {
+      width: 100%;
+      padding: var(--size-8);
+      border-radius: var(--border-radius-lg);
+      border-color: var(--secondary-400);
+      box-sizing: border-box;
+    }
   }
 
   .m-listing-card-header-row {
@@ -123,7 +137,7 @@ const priceType = computed(() => {
     .m-listing-card-content-wrapper {
       width: 100%;
     }
-    
+
     .m-listing-card-content {
       padding: var(--card-padding);
     }

@@ -91,10 +91,9 @@ const images = computed(() => {
   // Adjust image container to accommodate side images
   .m-listing-card-image-container {
     display: flex;
-    width: 100%;
 
     // Override the base image width for premium layout (smaller to accommodate equal content widths)
-    --image-width: 40%;
+    --image-width: 45%;
   }
 
   // Override content wrapper to be a proper grid
@@ -123,6 +122,7 @@ const images = computed(() => {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+
     }
   }
 
