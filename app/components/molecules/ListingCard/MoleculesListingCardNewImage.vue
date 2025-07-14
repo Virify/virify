@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="m-listing-card-image-overlay">
-        <div class="m-listing-card-image-counter | body-xs" aria-label="Image counter">
+        <div v-if="images.length > 1" class="m-listing-card-image-counter | body-xs" aria-label="Image counter">
           {{ selectedIndex + 1 }}/{{ images.length }}
         </div>
         <div class="m-listing-card-image-actions">
@@ -18,11 +18,11 @@
           />
           <AtomsNoteButton :listing-id="listingId" />
         </div>
-        <button class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev" 
+        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev" 
                 aria-label="Previous image" title="Previous image">
           <AtomsIcon name="chevron-left" icon="chevron-left" aria-hidden="true" />
         </button>
-        <button class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext" 
+        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext" 
                 aria-label="Next image" title="Next image">
           <AtomsIcon name="chevron-right" icon="chevron-right" aria-hidden="true" />
         </button>

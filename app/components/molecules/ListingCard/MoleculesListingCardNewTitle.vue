@@ -1,12 +1,14 @@
 <template>
-  <div>
-    <h3 class="m-listing-card-no-wrap | body-md font-semibold">
-      {{ props.classification }} {{ props.type }}
-    </h3>
-    <p class="m-listing-card-location m-listing-card-no-wrap | body-xs faded-text">
-      {{ props.address.street }}, {{ props.address.city }}, {{ props.address.postcode }}
-    </p>
-  </div>
+  <slot :address="props.address" :type="props.type" :classification="props.classification">
+    <div>
+      <h3 class="m-listing-card-no-wrap | body-md font-semibold">
+        {{ props.classification }} {{ props.type }}
+      </h3>
+      <p class="m-listing-card-location m-listing-card-no-wrap | body-xs faded-text">
+        {{ props.address.street }}, {{ props.address.city }}, {{ props.address.postcode }}
+      </p>
+    </div>
+  </slot>
 </template>
 
 <script lang="ts" setup>

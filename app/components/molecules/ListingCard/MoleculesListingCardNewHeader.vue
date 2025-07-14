@@ -1,10 +1,12 @@
 <template>
-  <h2 class="m-listing-card-header | title-sm">
-    {{ formattedPrice }}
-    <span class="m-listing-card-price-type | body-xs faded-text">
-      {{ priceType }}
-    </span>
-  </h2>
+  <slot :price="formattedPrice" :price-type="priceType">
+    <h2 class="m-listing-card-header | title-sm">
+      {{ formattedPrice }}
+      <span class="m-listing-card-price-type | body-xs faded-text">
+        {{ priceType }}
+      </span>
+    </h2>
+  </slot>
 </template>
 <script setup lang="ts">
 const props = defineProps<{

@@ -18,27 +18,40 @@
         <div class="m-listing-card-details">
           <!-- Price and listing type indicator row -->
           <div class="m-listing-card-header-row m-listing-card-price-group">
-            <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+            <slot name="header">
+              <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+            </slot>
             <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
             <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
           </div>
           
           <!-- Property title with address, type, and classification -->
-          <MoleculesListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
-            :classification="listing.property.classification.name" />
+          <slot name="title">
+            <MoleculesListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
+              :classification="listing.property.classification.name" />
+          </slot>
           
           <!-- Property features (bedrooms, bathrooms, receptions) -->
-          <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
-            :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
+          <slot name="features">
+            <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
+              :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
+          </slot>
           
           <!-- Property tags (chain-free, listing date, reduced status) -->
-          <MoleculesListingCardNewTags :chain-free="listing.property.chainFree"
-            :listed-date="listing.property.createdAt" :reduced="true" />
+          <slot name="tags">
+            <MoleculesListingCardNewTags :chain-free="listing.property.chainFree"
+              :listed-date="listing.property.createdAt" :reduced="true" />
+          </slot>
+          
+          <!-- Description slot -->
+          <slot name="description" />
         </div>
         
         <!-- Footer with agent info and action buttons -->
         <div class="m-listing-card-footer">
-          <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+          <slot name="agent">
+            <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+          </slot>
           
           <!-- Actions slot with default view/enquire buttons -->
           <slot name="actions">

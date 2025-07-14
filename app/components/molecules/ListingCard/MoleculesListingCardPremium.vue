@@ -4,7 +4,7 @@
     <template #premium-header>
       <div class="premium-content-header">
         <div class="premium-header-line"></div>
-        <h1 class="premium-header-title | title-xl">Premium</h1>
+        <h1 class="premium-header-title | title-lg">Premium</h1>
         <div class="premium-header-line"></div>
       </div>
     </template>
@@ -13,15 +13,88 @@
       <MoleculesListingCardNewImage :images="images" :listing-id="listing.id">
         <template #side-images="{ selectedIndex, goToSlide, images: allImages }">
           <div class="premium-side-images">
-            <img v-for="(image, index) in getRotatedImages(allImages, selectedIndex)" :key="`${selectedIndex}-${index}`" 
-                 :src="image.src" 
-                 class="premium-side-image"
-                 :class="{ 'active': image.isActive }" 
-                 :alt="`Property thumbnail ${index + 1}`"
-                 @click="goToSlide(image.originalIndex)" />
+            <img v-for="(image, index) in getRotatedImages(allImages, selectedIndex)" :key="`${selectedIndex}-${index}`"
+              :src="image.src" class="premium-side-image" :class="{ 'active': image.isActive }"
+              :alt="`Property thumbnail ${index + 1}`" @click="goToSlide(image.originalIndex)" />
           </div>
         </template>
       </MoleculesListingCardNewImage>
+    </template>
+
+    <template #header>
+      <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType">
+        <template #default="{ price, priceType }">
+          <h2 class="premium-header | title-md">
+            {{ price }}
+            <span class="premium-price-type | body-sm">
+              {{ priceType }}
+            </span>
+          </h2>
+        </template>
+      </MoleculesListingCardNewHeader>
+    </template>
+
+    <template #title>
+      <MoleculesListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
+        :classification="listing.property.classification.name">
+        <template #default="{ address, type, classification }">
+          <div class="premium-title">
+            <h3 class="premium-title-main | body-md font-semibold">
+              {{ classification }} {{ type }}
+            </h3>
+            <p class="premium-title-location | body-sm">
+              {{ address.street }}, {{ address.city }}, {{ address.postcode }}
+            </p>
+          </div>
+        </template>
+      </MoleculesListingCardNewTitle>
+    </template>
+
+    <template #features>
+      <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
+        :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions">
+        <template #default="{ features }">
+          <ul class="premium-features" aria-label="Property features">
+            <li v-for="{ count, icon, iconTitle } of features" :key="iconTitle" class="premium-feature" 
+                :aria-label="`${count} ${iconTitle}`">
+              <AtomsIcon :name="iconTitle" :icon="icon" class="premium-feature-icon" :aria-hidden="true" :title="`${count} ${iconTitle}`" />
+              <p class="premium-feature-count | body-sm" :title="`${count} ${iconTitle}`">{{ count }}</p>
+            </li>
+          </ul>
+        </template>
+      </MoleculesListingCardNewFeatures>
+    </template>
+
+    <template #tags>
+      <MoleculesListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
+        :reduced="true">
+        <template #default="{ tags }">
+          <ul class="premium-tags">
+            <li v-for="tag in tags" :key="tag" class="premium-tag | body-xs">
+              {{ tag }}
+            </li>
+          </ul>
+        </template>
+      </MoleculesListingCardNewTags>
+    </template>
+
+    <template #description>
+      <div class="premium-description | body-sm" v-if="listing.description">
+        <p>{{ listing.description }}</p>
+      </div>
+    </template>
+
+    <template #agent>
+      <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id">
+        <template #default="{ username, id }">
+          <NuxtLink to="#" class="premium-agent">
+            <div class="premium-agent-logo">
+              <AtomsIcon name="check" icon="tick-solid" />
+            </div>
+            <p class="premium-agent-text | body-xs font-semibold">{{ username }}</p>
+          </NuxtLink>
+        </template>
+      </MoleculesListingCardNewAgent>
     </template>
 
     <template #actions>
@@ -35,37 +108,64 @@
 
     <template #premium-content>
       <div class="premium-additional-content">
-        <div class="premium-features-list">
-          <div class="premium-feature-check">
-            <i class="premium-check-icon">✓</i>
-            <span>En-suite</span>
-          </div>
-          <div class="premium-feature-check">
-            <i class="premium-check-icon">✓</i>
-            <span>Garage</span>
-          </div>
-          <div class="premium-feature-check">
-            <i class="premium-check-icon">✓</i>
-            <span>Pet Friendly</span>
-          </div>
-          <div class="premium-feature-check">
-            <i class="premium-check-icon">✓</i>
-            <span>EV-Charging</span>
-          </div>
-          <div class="premium-feature-check">
-            <i class="premium-check-icon">✓</i>
-            <span>Garage</span>
-          </div>
-          <div class="premium-feature-check">
-            <i class="premium-check-icon">✓</i>
-            <span>Garage</span>
+        <div class="premium-features-wrapper">
+          <div class="premium-features-list | body-sm">
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>En-suite</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Garage</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Pet Friendly</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>EV-Charging</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Garage</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Garage</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Garden</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Balcony</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Parking</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Furnished</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>Modern Kitchen</span>
+            </div>
+            <div class="premium-feature-check">
+              <i class="premium-check-icon">✓</i>
+              <span>High Ceilings</span>
+            </div>
           </div>
         </div>
         <!-- Enquire button using individual component -->
         <div class="premium-single-action">
           <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id">
             <template #default="{ disabled, enquiryLabel }">
-              <button class="| button button-primary button-full body-sm" :disabled="disabled">{{ enquiryLabel }}</button>
+              <button class="| button button-primary button-full body-sm" :disabled="disabled">{{ enquiryLabel
+                }}</button>
             </template>
           </MoleculesListingCardNewEnquire>
         </div>
@@ -80,6 +180,10 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const priceType = computed(() => {
+  return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
+});
 
 // Use all images for carousel
 const images = computed(() => {
@@ -107,7 +211,7 @@ const images = computed(() => {
 // Function to get 4 rotating side images based on the selected index
 const getRotatedImages = (allImages: string[], selectedIndex: number) => {
   const sideImages = []
-  
+
   // Always show exactly 4 side images, cycling through all available images
   for (let i = 0; i < 4; i++) {
     const imageIndex = (selectedIndex + i) % allImages.length
@@ -117,7 +221,7 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
       isActive: imageIndex === selectedIndex
     })
   }
-  
+
   return sideImages
 }
 </script>
@@ -181,13 +285,50 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      align-items: center;
 
     }
   }
-  
-  // Make tags slightly transparent on premium cards
+
+  // Position sale tag absolutely in top right corner for premium cards
   .m-listing-card-type-indicator {
-    opacity: 0.8;
+    position: absolute;
+    top: var(--size-16);
+    right: var(--size-16);
+    z-index: 10;
+    background-color: var(--primary-400);
+    color: black;
+    opacity: 1;
+  }
+
+
+  // Override arrow, counter, and action button colors for premium
+  .m-listing-card-arrow-button {
+    background-color: var(--primary-400);
+    color: black;
+
+    svg {
+      color: black;
+    }
+  }
+
+  .m-listing-card-image-counter {
+    background-color: var(--primary-400);
+    color: black;
+  }
+
+  .m-listing-card-image-actions {
+    background-color: var(--primary-400);
+
+    .a-favourite-button,
+    .note-button {
+      background-color: var(--primary-400);
+      color: black;
+
+      svg {
+        color: black;
+      }
+    }
   }
 
   @media (max-width: 768px) {
@@ -262,50 +403,195 @@ const getRotatedImages = (allImages: string[], selectedIndex: number) => {
   }
 }
 
-// Premium additional content wrapper
-.premium-additional-content {
-  background: inherit;
-  padding: 0 var(--size-8) var(--size-16) 0;
-  color: inherit  
+// Premium component styles
+%text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-// Premium features list
-.premium-features-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-8);
-}
+.premium {
+  // Header section (price and type)
+  &-header {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-8);
+    margin-bottom: 0;
+    color: var(--primary-400);
+  }
 
-.premium-feature-check {
-  display: flex;
-  align-items: center;
-  gap: var(--size-8);
-  color: var(--text-color);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-}
+  &-price-type {
+    color: var(--primary-300);
+    text-transform: capitalize;
+    font-weight: normal;
+  }
 
-.premium-check-icon {
-  color: var(--primary-400);
-  width: var(--size-20);
-  height: var(--size-20);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-}
+  // Title section (property type and address)
+  &-title {
+    margin-bottom: var(--size-16);
 
-// Single action button styling
-.premium-single-action {
-  width: 100%;
-  margin-top: var(--size-16);
+    &-main {
+      @extend %text-truncate;
+      color: var(--primary-400);
 
-  .button {
-    width: 100%;
+    }
+
+    &-location {
+      @extend %text-truncate;
+      color: var(--primary-300);
+      margin-bottom: var(--size-8);
+    }
+  }
+
+  // Property features (bedrooms, bathrooms, etc.)
+  &-features {
+    display: flex;
+    gap: var(--size-12);
+    list-style: none;
+    margin-bottom: var(--size-16);
+    padding: 0;
+  }
+
+  &-feature {
+    align-items: center;
+    display: flex;
+    font-weight: var(--font-semibold);
+    gap: var(--size-4);
+    color: var(--primary-400);
+
+    &-icon {
+      font-size: var(--font-2xl);
+      color: white;
+    }
+
+    &-count {
+      color: white;
+    }
+  }
+
+  // Tags section
+  &-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-8);
+    list-style: none;
+    margin-bottom: var(--size-16);
+    padding: 0;
+  }
+
+  &-tag {
+    background-color: var(--blue-500);
+    opacity: 1;
+    color: var(--monochrome-900);
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
-    box-sizing: border-box;
+  }
+
+  // Description section
+  &-description {
+    margin-bottom: var(--size-16);
+    color: white;
+    
+    p {
+      margin: 0;
+      line-height: 1.5;
+      color: white;
+    }
+  }
+
+  // Agent section
+  &-agent {
+    align-items: center;
+    display: flex;
+    gap: var(--size-8);
+    text-decoration: none;
+    color: white;
+
+    &-logo {
+      align-items: center;
+      background-color: var(--primary-400);
+      border-radius: 50%;
+      color: black;
+      display: flex;
+      font-size: var(--font-2xl);
+      height: var(--size-32);
+      justify-content: center;
+      width: var(--size-32);
+    }
+
+    &-text {
+      color: white;
+    }
+  }
+
+  // Additional content section
+  &-additional-content {
+    background: inherit;
+    padding: 0 var(--size-8) var(--size-16) 0;
+    color: inherit;
+  }
+
+  // Features list in additional content
+  &-features-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+  }
+
+  &-features-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--size-8);
+  }
+
+  &-feature-check {
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+
+  &-check-icon {
+    color: var(--primary-400);
+    width: var(--size-20);
+    height: var(--size-20);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+  }
+
+  // Single action button styling
+  &-single-action {
+    width: 100%;
+    margin-top: var(--size-16);
+
+    .button {
+      width: 100%;
+      padding: var(--size-8);
+      border-radius: var(--border-radius-lg);
+      box-sizing: border-box;
+
+      &.button-bordered {
+        border-width: 2px;
+        border-color: var(--primary-400);
+      }
+
+      &:disabled {
+        background: var(--primary-400);
+        opacity: 0.7;
+
+        &:hover {
+          background: var(--primary-400);
+          opacity: 0.7;
+        }
+      }
+    }
   }
 }
 
