@@ -119,7 +119,7 @@ const markerClass = computed(() => {
 
 /* Enhanced hover effect for the marker shape */
 .price-marker-container:hover .marker-shape {
-  color: var(--background-200);
+  color: var(--monochrome-800);
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
@@ -150,7 +150,7 @@ const markerClass = computed(() => {
 
 /* Change content color on hover */
 .price-marker-container:hover .price-marker-content {
-  color: var(--foreground-200);
+  color: var(--monochrome-100);
 }
 
 /* Favorite indicator */
