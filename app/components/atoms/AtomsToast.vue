@@ -18,7 +18,7 @@
           <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm1 12H7V7h2v5zM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
         </svg>
       </div>
-      <div class="toast-message">
+      <div class="toast-message | body-sm">
         {{ message }}
       </div>
     </div>
@@ -50,15 +50,15 @@ withDefaults(defineProps<Props>(), {
   padding: var(--size-16);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateX(calc(100% + var(--size-20)));
-  transition: transform var(--animation-normal) ease-out;
+  transform: translateX(calc(100% + var(--size-20))) scale(0.8);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   z-index: 9999;
-  font-size: var(--font-sm);
-  font-weight: var(--font-medium);
 }
 
 .toast-visible {
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
+  opacity: 1;
 }
 
 .toast-content {
@@ -74,6 +74,22 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: toast-icon-bounce 0.6s ease-out 0.2s both;
+}
+
+@keyframes toast-icon-bounce {
+  0% {
+    transform: scale(0) rotate(-360deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(-180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 .toast-message {
@@ -107,11 +123,13 @@ withDefaults(defineProps<Props>(), {
     left: var(--size-12);
     min-width: auto;
     max-width: none;
-    transform: translateY(-100vh);
+    transform: translateX(calc(100% + var(--size-12))) scale(0.8);
+    opacity: 0;
   }
   
   .toast-visible {
-    transform: translateY(0);
+    transform: translateX(0) scale(1);
+    opacity: 1;
   }
 }
 </style>

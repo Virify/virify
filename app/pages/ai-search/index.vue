@@ -22,7 +22,7 @@
 
       <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched" :initial-query="lastSearchQuery"
         :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState" :is-map-view="isMapView"
-        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
+        :force-collapsed="hasSearched && (!!searchResults || isSearching)" @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
@@ -45,7 +45,7 @@
       />
       
       <!-- Map View (shown even with no results) -->
-      <OrganismsAiSearchMapView 
+      <LazyOrganismsAiSearchMapView 
         v-if="isMapView"
         :results="sortedResults"
         :location="lastLocation"
@@ -152,6 +152,13 @@ const sortedResults = computed(() => {
 onMounted(() => {
   initializeFromSavedState();
   initializeViewState();
+});
+
+// Save state when navigating away
+onBeforeUnmount(() => {
+  if (hasSearched.value && searchResults.value) {
+    saveCurrentState();
+  }
 });
 
 // Handle sort changes

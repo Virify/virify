@@ -38,11 +38,13 @@
             :options="selectOptionRadius" />
         </fieldset>
 
-        <Transition name="location-popover">
-          <div role="presentation" v-show="popoverExpanded">
-            <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
-          </div>
-        </Transition>
+        <ClientOnly>
+          <Transition name="location-popover">
+            <div role="presentation" v-show="popoverExpanded">
+              <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+            </div>
+          </Transition>
+        </ClientOnly>
       </div>
 
       <AtomsSelect name="radius" id="radius" aria-label="Location radius"
@@ -89,6 +91,7 @@ const props = defineProps<{
   hasSearched: boolean;
   hasSavedState?: boolean;
   isMapView?: boolean;
+  forceCollapsed?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -105,7 +108,14 @@ const { searchQuery, getAnalyzedQuery } = useAi();
 const segments = computed(() => getAnalyzedQuery());
 
 // UI state
-const isCollapsed = ref(props.hasSearched);
+const isCollapsed = ref(props.forceCollapsed ?? props.hasSearched);
+
+// Watch for forceCollapsed prop changes
+watch(() => props.forceCollapsed, (newValue) => {
+  if (newValue !== undefined) {
+    isCollapsed.value = newValue;
+  }
+}, { immediate: true });
 
 const popoverExpanded = ref(false);
 const locationError = ref("");
@@ -235,13 +245,15 @@ const submitSearch = async () => {
 
   // Clear any previous error and submit
   locationError.value = "";
+  
+  // Collapse form immediately before emitting search
+  isCollapsed.value = true;
+  
   emit("submit-search", {
     location: selectedLocation.value,
     radius: selectedRadius.value,
     query: searchQuery.value,
   });
-
-  isCollapsed.value = true;
 };
 
 const handleReset = () => {

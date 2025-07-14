@@ -32,7 +32,6 @@ const props = defineProps<{
 const { hideDialog } = useDialog()
 const { getNote, updateNote, deleteNote, hasNote } = useNotes()
 const { isPending, setPendingWhile } = usePending()
-const { showToast } = useToast()
 const notes = ref('')
 
 /**
@@ -61,12 +60,8 @@ onMounted(() => {
 async function saveNotes() {
   if (!notes.value.trim()) return
 
-  const isUpdating = hasExistingNote.value
-
   await setPendingWhile(async () => {
     await updateNote(props.listingId, notes.value.trim())
-
-    showToast(isUpdating ? 'Note updated' : 'Note added', { type: 'success' })
     hideDialog()
   })
 }
@@ -77,8 +72,6 @@ async function saveNotes() {
 async function handleDeleteNote() {
   await setPendingWhile(async () => {
     await deleteNote(props.listingId)
-
-    showToast('Note deleted', { type: 'success' })
     hideDialog()
   })
 }

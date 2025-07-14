@@ -1,6 +1,6 @@
 <template>
   <div class="m-listing-card-actions">
-    <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-secondary body-sm">
+    <nuxt-link :to="`/listing/${listingId}`" class="| button button-secondary body-sm">
       View
     </nuxt-link>
     <button class="| button button-ghost body-sm" :disabled="isEnquiryDisabled" @click="onEnquire">
@@ -12,7 +12,6 @@
 <script setup lang="ts">
 import ViewsDialogEnquiry from '~/components/views/Dialog/ViewsDialogEnquiry.vue';
 import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
-import { useEnquiry } from '~/composables/useEnquiry';
 
 interface Props {
   listingId: number;
