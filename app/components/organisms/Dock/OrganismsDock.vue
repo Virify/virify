@@ -1,22 +1,24 @@
 <template>
-  <div ref="$popover" popover="auto" :id="popoverId" class="o-dock__popover o-dock-container | elevate-200" :class="{
-    'o-dock__popover--open': !!popover
-  }" tabindex="-1">
-    <AtomsButton class="o-dock__popover-close | button button-quiet" aria-label="Close popover"
-      :aria-controls="popoverId" @click.prevent="hidePopover">
-      <AtomsIcon icon="cross" aria-hidden class="o-dock__popover-close-icon" />
-    </AtomsButton>
+  <div class="o-dock">
+    <div ref="$popover" popover="auto" :id="popoverId" class="o-dock__popover o-dock-container | elevate-200" :class="{
+      'o-dock__popover--open': !!popover
+    }" tabindex="-1">
+      <AtomsButton class="o-dock__popover-close | button button-quiet" aria-label="Close popover"
+        :aria-controls="popoverId" @click.prevent="hidePopover">
+        <AtomsIcon icon="cross" aria-hidden class="o-dock__popover-close-icon" />
+      </AtomsButton>
 
-    <template v-if="popover">
-      <component :is="popover.component" />
+      <template v-if="popover">
+        <component :is="popover.component" />
 
-      <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
-        @close-popover="hidePopover" />
-    </template>
+        <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
+          @close-popover="hidePopover" />
+      </template>
+    </div>
+
+    <OrganismsDockMenu :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
+      class="o-dock__menu o-dock-container | elevate-300" />
   </div>
-
-  <OrganismsDockMenu :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
-    class="o-dock o-dock-container | elevate-300" />
 </template>
 
 <script setup lang="ts">
@@ -109,25 +111,34 @@ onMounted(() => {
 .o-dock {
   list-style: none;
   position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: var(--size-10);
-  padding: var(--size-8);
-  margin: 0;
-  z-index: 9;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
-  gap: var(--size-8);
   justify-content: center;
+  bottom: var(--size-10);
+  z-index: 9;
 
   @include mq.tablet {
     bottom: var(--size-16);
-    padding: var(--size-12);
-    gap: var(--size-12);
   }
 
   @include mq.notebook {
     bottom: var(--size-24);
+  }
+
+  &__menu {
+    padding: var(--size-8);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
+    justify-content: center;
+
+    @include mq.tablet {
+      padding: var(--size-12);
+      gap: var(--size-12);
+    }
   }
 
   &__popover {
