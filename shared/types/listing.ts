@@ -29,16 +29,43 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         runningCosts: true;
       };
     };
+    user: {
+      select: {
+        id: true;
+        username: true;
+        email: true;
+      };
+    }
   };
 }>;
 
+export type ListingCardData = Omit<ListingWithFullProperty, 'property' | 'user'> & {
+  property: NonNullable<ListingWithFullProperty['property']> & {
+    address: NonNullable<ListingWithFullProperty['property']>['address'];
+    type: NonNullable<ListingWithFullProperty['property']>['type'];
+    classification: NonNullable<ListingWithFullProperty['property']>['classification'];
+  };
+  user: NonNullable<ListingWithFullProperty['user']> & {
+    username: string;
+  };
+};
+
+export type AiSearchResponse = {
+  results: ListingWithFullProperty[];
+  queryAnalysis: QueryAnalysis;
+};
+
 /**
- * Buy or Rent 
+ * Buy or Rent
  */
 export type ListingSearch = {
   type: "buy" | "rent";
-  location: string;
-  radius: number;
+  coordinates?: {
+    lat: number;
+    lon: number;
+  };
+  radius?: number;
+  geometries?: GeoJSONPolygon[]; // Support for single or multiple polygon search
 };
 
 /**
@@ -54,13 +81,10 @@ export type ListingSearchOptional = {
   featured?: Record<string, Record<string, boolean>>;
   take?: number | undefined;
   skip?: number | undefined;
-}
+};
 
 export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilityStatus | (SaleAvailabilityStatus | RentalAvailabilityStatus)[];
 
-/**
- * ListingCardType
- */
 /**
  * Listing Card Select Object
  */
@@ -90,6 +114,7 @@ export const listingCardFields = {
           postcode: true,
           country: true,
           county: true,
+          fullAddress: true,
           lat: true,
           lon: true,
         },
@@ -116,6 +141,7 @@ export const listingCardFields = {
       },
       numberBedrooms: true,
       numberBathrooms: true,
+      numberReceptions: true,
       parking: {
         select: {
           evCharging: true,
@@ -130,6 +156,13 @@ export const listingCardFields = {
       },
     },
   },
+  user: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  },
 };
 
 /**
@@ -139,4 +172,9 @@ export type ListingCardType = Prisma.ListingGetPayload<{
   select: typeof listingCardFields;
 }> & {
   distanceMiles?: number;
+};
+
+export type GeoJSONPolygon = {
+  type: "Polygon";
+  coordinates: number[][][];
 };

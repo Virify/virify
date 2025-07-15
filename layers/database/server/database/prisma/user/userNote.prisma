@@ -5,6 +5,7 @@ model UserNote {
   note              String
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+  listing           Listing         @relation(fields: [listingId], references: [id], onDelete: Cascade)
   userPreferences   UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
 
   @@unique([userPreferencesId, listingId])

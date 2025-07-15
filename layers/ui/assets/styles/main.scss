@@ -29,6 +29,8 @@
 @use '4-utilities/position' as utilities-position;
 @use '4-utilities/animations' as utilities-animations;
 @use '4-utilities/pointer-events' as utilities-pointer-events;
+@use '4-utilities/skeletons' as utilities-skeletons;
+@use '4-utilities/colours' as utilities-colours;
 
 // Components
 @use '6-components/boxes' as components-boxes;

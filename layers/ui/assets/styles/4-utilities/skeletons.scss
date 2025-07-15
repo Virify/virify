@@ -1,0 +1,27 @@
+/**
+ *  Focus states
+ */
+
+.skeleton {
+  --gradient-start: var(--background-100);
+  --gradient-end: var(--background-300);
+
+  display: block;
+  height: var(--lineheight-md);
+  width: var(--lineheight-md);
+  border-radius: var(--border-radius-ui);
+  background: linear-gradient(-45deg,
+      var(--gradient-start),
+      var(--gradient-end),
+      var(--gradient-start),
+      var(--gradient-end),
+      var(--gradient-start)) repeat;
+  background-size: 200%;
+  animation: skeleton-load 1s infinite linear;
+}
+
+@keyframes skeleton-load {
+  from {
+    background-position: -100% 0;
+  }
+}

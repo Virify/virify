@@ -1,37 +1,31 @@
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 export default defineNuxtConfig({
-  extends: [
-    "./layers/ui",
-    "./layers/email",
-    "./layers/database",
-    './layers/auth'
-  ],
+  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed"],
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxt/image", "@nuxt/icon"],
-  compatibilityDate: "2024-11-01",
+  modules: ["@nuxt/image"],
+  compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
-  css: ["~/assets/css/main.css", "@maptiler/sdk/dist/maptiler-sdk.css"],
+  css: ["~/assets/css/main.css"],
+  app: {
+    head: {
+      meta: [
+        { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" }
+      ]
+    }
+  },
   vite: {
     plugins: [tailwindcss()],
   },
   nitro: {
     experimental: {
-      openAPI: true,
       tasks: true,
     },
     rollupConfig: {
       // @ts-ignore
       plugins: [vue()],
-    }
-  },
-  runtimeConfig: {
-    public: {
-      NOMINATIM_API_URL: process.env.NOMINATIM_API_URL,
-      MAPTILER_API_KEY: process.env.MAPTILER_API_KEY,
-      MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
     },
   },
 });

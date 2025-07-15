@@ -3,7 +3,6 @@ import type { AddressLocation } from "~~/shared/types/location";
 import { prepareFullTextSearch } from "./address";
 import type { PropertySearchResult } from "~~/shared/types/property";
 import { Prisma } from "@prisma/client";
-
 /**
  * Convert meters to miles. For PostGIS, we need to convert meters to miles.
  *
@@ -81,9 +80,9 @@ export async function updateLocationsByAddressList(locations: { id: number; lat:
  * @param distanceMeters Distance in meters for proximity filtering
  * @returns List of nearby propertyID's
  */
-export async function getPropertyIdsByDistance(lat: number, lon: number, distanceMiles: number): Promise<{ propertyId: number }[]> {
+export async function getPropertyIdsByDistance(lat: number, lon: number, distanceMiles: number): Promise<PropertySearchResult> {
   const meters = convertMilesToMeters(distanceMiles);
-  const nearbyProperties = await prisma.$queryRaw<PropertySearchResult>(
+  return await prisma.$queryRaw<PropertySearchResult>(
     Prisma.sql`
       SELECT p.id as "propertyId"
       FROM "Property" p
@@ -95,8 +94,62 @@ export async function getPropertyIdsByDistance(lat: number, lon: number, distanc
       )
     `
   );
+}
 
-  return nearbyProperties;
+/**
+ * Get property IDs strictly within one or more GeoJSON polygons.
+ * Uses PostGIS ST_Within and ST_Union for efficient multi-polygon filtering.
+ * @param geometries Array of GeoJSON Polygons (or single polygon)
+ * @returns List of property IDs strictly within any of the polygons
+ */
+export async function getPropertyIdsByPolygons(geometries: { type: "Polygon" | "MultiPolygon"; coordinates: number[][][] | number[][][][] }[]): Promise<PropertySearchResult> {
+  if (!geometries || geometries.length === 0) return [];
+  
+  // Filter out invalid geometries and flatten MultiPolygons to individual Polygons
+  const validGeometries: { type: "Polygon"; coordinates: number[][][] }[] = [];
+  
+  geometries.forEach(geometry => {
+    if (!geometry || !geometry.coordinates?.length) return;
+    
+    if (geometry.type === "Polygon") {
+      validGeometries.push(geometry as { type: "Polygon"; coordinates: number[][][] });
+    } else if (geometry.type === "MultiPolygon") {
+      // Convert MultiPolygon to individual Polygons
+      const multiPolygonCoords = geometry.coordinates as number[][][][];
+      multiPolygonCoords.forEach(polygonCoords => {
+        validGeometries.push({
+          type: "Polygon",
+          coordinates: polygonCoords
+        });
+      });
+    }
+  });
+  
+  if (validGeometries.length === 0) return [];
+  
+  // Create ST_GeomFromGeoJSON calls for each polygon
+  const polygonGeoms = validGeometries.map(geometry => {
+    const geojson = JSON.stringify(geometry);
+    return `ST_GeomFromGeoJSON('${geojson}')`;
+  }).join(', ');
+  
+  // For single polygon, no need for ST_Union
+  if (validGeometries.length === 1) {
+    return await prisma.$queryRawUnsafe(`
+      SELECT p.id as "propertyId"
+      FROM "Property" p
+      JOIN "Address" a ON p."addressId" = a.id
+      WHERE ST_Within(a.location, ${polygonGeoms})
+    `);
+  }
+  
+  // For multiple polygons, use ST_Union
+  return await prisma.$queryRawUnsafe(`
+    SELECT p.id as "propertyId"
+    FROM "Property" p
+    JOIN "Address" a ON p."addressId" = a.id
+    WHERE ST_Within(a.location, ST_Union(ARRAY[${polygonGeoms}]))
+  `);
 }
 
 /**
@@ -145,4 +198,63 @@ export async function getNearbyPropertiesByTextQuery(query: string, distanceMile
     ${meters}
   )
 `;
+}
+
+/**
+ * Converts a bounding box to a GeoJSON polygon
+ */
+export function bboxToPolygon(bbox: [number, number, number, number]) {
+  const [west, south, east, north] = bbox;
+  return {
+    type: "Polygon" as const,
+    coordinates: [[
+      [west, south],
+      [east, south], 
+      [east, north],
+      [west, north],
+      [west, south]
+    ]]
+  };
+}
+
+/**
+ * Handles location filtering by fetching property IDs within a given radius, bbox, or boundary polygon.
+ */
+export async function handleLocationFilter(lat?: number, lon?: number, radius?: number, bbox?: [number, number, number, number], boundaryPolygon?: { type: "Polygon" | "MultiPolygon"; coordinates: number[][][] | number[][][][] }) {
+  if (!lat || !lon) {
+    return { propertyIds: null, locationContext: "" };
+  }
+
+  // For location-only searches (radius = 0), use boundary polygon or bbox
+  if (radius === 0) {
+    if (boundaryPolygon) {
+      try {
+        const nearbyProperties = await getPropertyIdsByPolygons([boundaryPolygon]);
+        const propertyIds = nearbyProperties.map((p) => p.propertyId);
+        return { propertyIds, locationContext: "within administrative boundary" };
+      } catch (error) {
+        console.error('Boundary polygon search failed:', error);
+      }
+    }
+    
+    if (bbox) {
+      try {
+        const polygon = bboxToPolygon(bbox);
+        const nearbyProperties = await getPropertyIdsByPolygons([polygon]);
+        const propertyIds = nearbyProperties.map((p) => p.propertyId);
+        return { propertyIds, locationContext: "within selected area" };
+      } catch (error) {
+        console.error('Bbox search failed:', error);
+      }
+    }
+    
+    // No boundary data available for location-only search
+    return { propertyIds: [], locationContext: "no boundary data available" };
+  }
+
+  // Regular radius search
+  const nearbyProperties = await getPropertyIdsByDistance(lat, lon, radius!);
+  const propertyIds = nearbyProperties.map((p) => p.propertyId);
+  const locationContext = `within ${radius} miles of ${lat}, ${lon}`;
+  return { propertyIds, locationContext };
 }

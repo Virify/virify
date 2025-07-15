@@ -4,6 +4,7 @@
   --input-text-background: var(--background-200);
   --input-text-border: #{fn.faded-color(15%)};
   --input-text-color: var(--foreground-100);
+  --input-text-disabled: #{fn.faded-color(50%, var(--foreground-100))};
   --input-text-height: #{fn.toRem(52)};
 
   // Error colours
@@ -22,6 +23,6 @@
 
   // Focus states
   --outline-size: 3px;
-  --outline-color: #{fn.faded-color(70%, var(--primary-300))};
+  --outline-color: #{fn.faded-color(60%, var(--secondary-400))};
   --focus-outline: var(--outline-size) solid var(--outline-color);
 }

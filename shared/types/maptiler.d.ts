@@ -95,5 +95,33 @@ declare module '@maptiler/sdk' {
 
   export interface Map {
     addControl(control: IControl, position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'): this;
+    removeControl(control: IControl): this;
+    getContainer(): HTMLElement;
+    jumpTo(options: { center?: [number, number]; zoom?: number; animate?: boolean }): void;
+    resize(): void;
+    on(event: string, listener: Function): this;
+    off(event: string, listener: Function): this;
+    fire(event: string, data?: any): this;
+  }
+  
+  // GeoJSON related types
+  export interface GeoJSONFeature {
+    type: string;
+    geometry: {
+      type: string;
+      coordinates: any;
+    };
+    properties?: any;
+    id?: string | number;
+  }
+
+  // Drawing control is now handled by @mapbox/mapbox-gl-draw
+  import type { DrawCustomMode } from "@mapbox/mapbox-gl-draw";
+
+  export interface IDrawControl extends IControl {
+    getAll(): { features: GeoJSONFeature[] };
+    delete(featureIds: string[]): void;
+    deleteAll(): void;
+    add(feature: GeoJSONFeature): void;
   }
 }

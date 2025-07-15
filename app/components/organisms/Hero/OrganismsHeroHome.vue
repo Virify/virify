@@ -2,20 +2,28 @@
   <div class="o-hero-home | container">
     <div class="o-hero-home-content">
       <h1 class="o-hero-home-title | title-2xl lineheight-xs">
-        Property search on another level
+        {{ title }}
       </h1>
 
       <AtomsDivider text="or" class="o-hero-home-divider" />
 
       <div role="presentation" class="o-hero-home-footer-links">
-        <MoleculesIconLink class="o-hero-home-footer-link" to="#" icon="explore/ai" content="Search using AI"
+        <MoleculesIconLink class="o-hero-home-footer-link" to="/" icon="explore/ai" content="Search using AI"
           icon-inline />
-        <MoleculesIconLink class="o-hero-home-footer-link" to="#" icon="explore/map" content="Search by map"
+        <MoleculesIconLink class="o-hero-home-footer-link" to="/map-search/" icon="explore/map" content="Search by map"
           icon-inline />
       </div>
     </div>
   </div>
 </template>
+<script setup lang="ts">
+defineProps({
+  title: {
+    type: String,
+    default: 'Property search on another level',
+  },
+});
+</script>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;

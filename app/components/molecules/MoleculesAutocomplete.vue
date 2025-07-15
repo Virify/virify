@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+
 interface Props {
   input?: string
   matches?: string[]
@@ -25,15 +26,34 @@ const matchesComputed = computed(() => {
     return []
   }
 
-  // Create pattern for regex
-  const pattern = new RegExp(`^${input}`, 'i')
+  return matches.map((match: string) => {
+    // For exact matches we still want to show them, but highlight properly
+    const isExactMatch = match.toLowerCase() === input.toLowerCase()
 
-  // Get first match
-  return matches.map((match: string) => ({
-    current: input,
-    suggestion: match.replace(pattern, ''),
-    original: match
-  }))
+    if (isExactMatch) {
+      return {
+        current: input,
+        suggestion: match.substring(input.length),
+        original: match
+      }
+    }
+
+    // For partial matches, highlight the matching prefix
+    if (match.toLowerCase().startsWith(input.toLowerCase())) {
+      return {
+        current: match.substring(0, input.length),
+        suggestion: match.substring(input.length),
+        original: match
+      }
+    }
+
+    // For non-matching items, don't highlight anything
+    return {
+      current: '',
+      suggestion: match,
+      original: match
+    }
+  })
 })
 </script>
 

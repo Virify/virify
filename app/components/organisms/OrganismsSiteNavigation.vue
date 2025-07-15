@@ -12,7 +12,7 @@
       </template>
 
       <li v-else>
-        <MoleculesAccountPopover :options="accountOptions" />
+        <MoleculesNavPopover :options="navigationGroups" />
       </li>
     </ul>
   </nav>
@@ -22,6 +22,7 @@
 const { loggedIn } = useUserSession()
 const { showDialog } = useDialog()
 import { ViewsDialogSignup, ViewsDialogLogin } from '#components';
+import { navigationGroups } from '~/utils/account/navigation';
 
 function openLogin() {
   showDialog({
@@ -34,10 +35,6 @@ function openForgotPassword() {
     component: ViewsDialogSignup,
   });
 }
-
-const accountOptions = [
-  { to: '/account', label: 'My Account' },
-]
 </script>
 
 <style lang="scss">

@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  propertyId: number
+  listingId: number
 }>()
 
 const { hideDialog } = useDialog()
@@ -35,9 +35,9 @@ const { isPending, setPendingWhile } = usePending()
 const notes = ref('')
 
 /**
- * Computed property to check if the note exists for the given property ID
+ * Computed property to check if the note exists for the given listing ID
  */
-const hasExistingNote = computed(() => hasNote(props.propertyId))
+const hasExistingNote = computed(() => hasNote(props.listingId))
 
 /**
  * Dynamic title based on whether we're editing or creating a note
@@ -48,7 +48,7 @@ const title = computed(() => hasExistingNote.value ? 'Edit notes' : 'Add notes')
  * Load existing note when the component is mounted
  */
 onMounted(() => {
-  const existingNote = getNote(props.propertyId)
+  const existingNote = getNote(props.listingId)
   if (existingNote) {
     notes.value = existingNote
   }
@@ -61,7 +61,7 @@ async function saveNotes() {
   if (!notes.value.trim()) return
 
   await setPendingWhile(async () => {
-    await updateNote(props.propertyId, notes.value.trim())
+    await updateNote(props.listingId, notes.value.trim())
 
     hideDialog()
   })
@@ -72,7 +72,7 @@ async function saveNotes() {
  */
 async function handleDeleteNote() {
   await setPendingWhile(async () => {
-    await deleteNote(props.propertyId)
+    await deleteNote(props.listingId)
 
     hideDialog()
   })

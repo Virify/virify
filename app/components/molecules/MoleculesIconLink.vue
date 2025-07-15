@@ -14,7 +14,6 @@
 defineProps({
   to: {
     type: String,
-    required: true
   },
   icon: {
     type: String

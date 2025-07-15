@@ -1,9 +1,9 @@
-import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "@prisma/client";
+import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing, type Prisma } from "@prisma/client";
 import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
 import { prisma } from "./prisma-client";
 import { propertyInclude } from "./property";
 import { getPriceFilter } from "./price";
-import { getNearbyPropertiesByTextQuery } from "./location";
+import { getPropertyIdsByDistance, getPropertyIdsByPolygons } from "./location";
 
 /**
  * Get a listing by ID
@@ -36,6 +36,13 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
       property: {
         include: {
           ...propertyInclude,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
         },
       },
     },
@@ -90,23 +97,35 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
           ...propertyInclude,
         },
       },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
     },
   });
 }
 
 export async function getListingByDistanceAndFilters(
-  { type, location, radius }: ListingSearch,
+  { type, coordinates, radius, geometries }: ListingSearch,
   { propertyTypes, priceRange, bedrooms, bathrooms, addedToSite, availabilityOptions, featured, take, skip }: ListingSearchOptional
 ): Promise<ListingCardType[]> {
+  let nearbyProperties: PropertySearchResult = [];
 
-  // Get the nearby properties with distance
-  const nearbyProperties = await getNearbyPropertiesByTextQuery(location, radius);
+  if (geometries && geometries.length > 0) {
+    nearbyProperties = await getPropertyIdsByPolygons(geometries);
+  } else if (coordinates && radius) {
+    nearbyProperties = await getPropertyIdsByDistance(coordinates.lat, coordinates.lon, radius);
+  }
+
   const listingFilter = type === "rent" ? "rentalListing" : "saleListing";
 
   // Process the propertyTypes to create appropriate filters
   let propertyTypeFilter = {};
   let classificationFilter = {};
-  
+
   if (propertyTypes && Object.keys(propertyTypes).length > 0) {
     // Collect all propertyTypeIds
     const propertyTypeIds = Object.keys(propertyTypes);
@@ -114,26 +133,26 @@ export async function getListingByDistanceAndFilters(
       propertyTypeFilter = {
         type: {
           id: {
-            in: propertyTypeIds.map(id => parseInt(id, 10))
-          }
-        }
+            in: propertyTypeIds.map((id) => parseInt(id, 10)),
+          },
+        },
       };
-      
+
       // Collect all classification IDs per property type
       const allClassificationIds: number[] = [];
-      Object.values(propertyTypes).forEach(classIds => {
+      Object.values(propertyTypes).forEach((classIds) => {
         if (classIds && classIds.length > 0) {
           allClassificationIds.push(...classIds);
         }
       });
-      
+
       if (allClassificationIds.length > 0) {
         classificationFilter = {
           classification: {
             id: {
-              in: allClassificationIds
-            }
-          }
+              in: allClassificationIds,
+            },
+          },
         };
       }
     }
@@ -144,7 +163,7 @@ export async function getListingByDistanceAndFilters(
     where: {
       [listingFilter]: {
         availabilityStatus: {
-          in: availabilityOptions as (typeof type extends "rent" ? RentalAvailabilityStatus[] : SaleAvailabilityStatus[]),
+          in: availabilityOptions as typeof type extends "rent" ? RentalAvailabilityStatus[] : SaleAvailabilityStatus[],
         },
       },
       price: getPriceFilter(priceRange),
@@ -181,8 +200,8 @@ export async function getListingByDistanceAndFilters(
   });
 
   // Map the listings to include the distance
-  const listingsWithDistance = listings.map(listing => {
-    const property = nearbyProperties.find(p => p.propertyId === listing.property?.address?.id);
+  const listingsWithDistance = listings.map((listing) => {
+    const property = nearbyProperties.find((p) => p.propertyId === listing.property?.address?.id);
     return {
       ...listing,
       distanceMiles: property ? property.distanceMiles : 0,
@@ -190,4 +209,89 @@ export async function getListingByDistanceAndFilters(
   });
 
   return listingsWithDistance;
+}
+
+/**
+ * Get listings by location and AI-generated filters
+ * First applies location filtering to get property IDs, then applies AI filters
+ *
+ * @param lat number - latitude
+ * @param lng number - longitude
+ * @param radius number - radius in miles
+ * @param whereClause object - AI-generated WHERE clause
+ * @param includeClause object - Prisma include clause
+ * @param limit number - optional limit
+ * @returns ListingWithFullProperty[]
+ */
+export async function getListingsByLocationAndAIFilters(lat: number, lng: number, radius: number, whereClause: any, includeClause: any, limit?: number) {
+  // First get property IDs within the specified location/radius
+  const nearbyProperties = await getPropertyIdsByDistance(lat, lng, radius);
+  const propertyIds = nearbyProperties.map((p) => p.propertyId);
+
+  // If no properties found in the area, return empty array
+  if (propertyIds.length === 0) {
+    return [];
+  }
+
+  // Apply location filter to the WHERE clause
+  const locationFilteredWhereClause = {
+    ...whereClause,
+    property: {
+      ...whereClause.property,
+      id: {
+        in: propertyIds,
+      },
+    },
+  };
+
+  // Execute the query with both location and AI filters
+  const listings = await prisma.listing.findMany({
+    where: locationFilteredWhereClause,
+    include: includeClause,
+    ...(limit ? { take: limit } : {}),
+  });
+
+  return listings;
+}
+
+const fullListingInclude = {
+  rentalListing: true,
+  saleListing: true,
+  property: {
+    include: {
+      ...propertyInclude,
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  },
+};
+
+/**
+ * Fetches listings from the database.
+ */
+export async function fetchListings(where: Prisma.ListingWhereInput): Promise<ListingWithFullProperty[]> {
+  const listings = await prisma.listing.findMany({
+    where,
+    include: fullListingInclude,
+  });
+  return listings;
+}
+
+/**
+ * Fetches paginated listings from the database with total count.
+ */
+export async function fetchPaginatedListings(where: Prisma.ListingWhereInput, page: number = 1, limit: number = 20): Promise<ListingWithFullProperty[]> {
+  const skip = (page - 1) * limit;
+
+  return await prisma.listing.findMany({
+    where,
+    include: fullListingInclude,
+    skip,
+    take: limit,
+  });
 }

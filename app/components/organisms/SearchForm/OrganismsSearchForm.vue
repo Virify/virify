@@ -18,9 +18,9 @@
 
       <div class="| relative" role="presentation">
         <div class="o-searchform-location | elevate-200" @click="showPopover">
-          <input type="search" placeholder="Location" aria-label="Location to search in"
-            class="o-searchform-location-input" required @focus="showPopover" @input="showPopover" v-model="suggestions"
-            name="location" />
+          <input type="search" :placeholder="isDrawMode ? `Draw on the map` : `Location`" aria-label="Location to search in"
+            class="o-searchform-location-input" required @focus="showPopover" @input="showPopover"
+            v-model="suggestions.location" name="location" :disabled="isDrawMode" />
 
           <!-- Search radius (desktop) -->
           <client-only>
@@ -28,6 +28,16 @@
               v-model="initialRadius"
               class="o-searchform-location-radius o-searchform-dropdown | text-input focus-visible" name="radius" />
           </client-only>
+
+          <!-- Draw mode toggle -->
+          <AtomsButton
+            v-show="popoverHidden && mapDraw"
+            type="button" 
+            class="o-searchform-draw-button" 
+            :class="{ 'o-searchform-draw-button-active': isDrawMode }"
+            @click.stop="toggleDrawMode">
+            <AtomsIcon title="Draw on map" icon="draw" class="o-searchform-draw-button-icon" />
+          </AtomsButton>
 
           <AtomsButton type="submit" :pending="isPending" class="o-searchform-location-button | button-monochrome"
             :class="{
@@ -44,7 +54,7 @@
           <!-- Location -->
           <OrganismsSearchFormDividedRows v-if="suggestions">
             <OrganismsSearchFormTitleBlock title="Location">
-              <MoleculesAutocomplete :input="suggestions" :matches="suggestionsMatches"
+              <MoleculesAutocomplete :input="suggestions.location" :matches="suggestionsMatches"
                 v-slot="{ original, current, suggestion }">
                 <button class="o-searchform-autocomplete-button | body-md"
                   @click.prevent="setSelectedSuggestion(original)">
@@ -153,7 +163,7 @@
                     <AtomsSelect v-model="initialDate" class="o-searchform-dropdown | text-input focus-visible"
                       name="added-to-site">
                       <option v-for="({ key, value }) of dateOptions" :key="value" :value>{{ key
-                      }}</option>
+                        }}</option>
                     </AtomsSelect>
                   </MoleculesFormField>
                 </animate-in>
@@ -213,9 +223,18 @@
 <script setup lang="ts">
 import { onClickOutside, watchDebounced, watchImmediate, useMediaQuery } from "@vueuse/core";
 import type { MinMaxPriceResponse } from "~~/shared/types/price";
-import type { PropertyTypeWithClassifications } from "~~/shared/types/property-type";
+import type { PropertyTypeWithOptions } from "~~/shared/types/property-type";
 import type { SearchParams } from "~~/shared/types/search";
 
+/**
+ * Props
+ */
+defineProps({
+  mapDraw: {
+    type: Boolean,
+    default: false
+  }
+})
 /**
  *  a11y
  */
@@ -246,6 +265,7 @@ const isContracted = computed(() => {
  *  Get search form config
  */
 const { radiusOptions, bedroomOptions, bathroomOptions, dateOptions, saleAvailabilityOptions, rentAvailabilityOptions, propertyFeatures, buyOrRentOptions } = getSearchFormConfig();
+const { autoComplete, getBBox } = useMap();
 
 /**
  *  Popover management
@@ -265,7 +285,18 @@ function togglePopoverExpanded() {
  * state
  */
 const popoverHidden = ref(true);
-const suggestions = ref("");
+const suggestions = ref({
+  location: "",
+  geo: {
+    lat: 0,
+    lon: 0,
+  },
+});
+
+/**
+ * State
+ */
+const isDrawMode = ref(false);
 const bedroomRange = ref<[number, number]>([0, 0]);
 const bathroomRange = ref<[number, number]>([0, 0]);
 const initialRadius = ref(radiusOptions?.[0]?.value);
@@ -300,21 +331,48 @@ onClickOutside($form, () => {
 });
 
 /**
+ * Emits
+ */
+const emit = defineEmits<{
+ 'update:drawMode': [enabled: boolean];
+}>();
+
+const toggleDrawMode = () => {
+  isDrawMode.value = !isDrawMode.value;
+  suggestions.value.location = "";
+  emit("update:drawMode", isDrawMode.value);
+};
+
+
+
+/**
  *  Block native form validation on mount
  */
 onMounted(async () => {
   if ($form.value) {
     $form.value.setAttribute("novalidate", "novalidate");
   }
-  priceRange.value = await $fetch<MinMaxPriceResponse>("/api/price/min-max");
+  priceRange.value = await $fetch<MinMaxPriceResponse>("/api/price/min-max/");
 });
 
 /**
  *  Search typed
  */
 
-function setSelectedSuggestion(newValue: string) {
-  suggestions.value = newValue;
+// Store geocoded results to use when selecting a suggestion
+const geocodedResults = ref<any[]>([]);
+
+async function setSelectedSuggestion(newValue: string) {
+  suppressSuggestionFetch.value = true
+  suggestions.value.location = newValue;
+
+  // Find the selected suggestion in our cached geocoded results
+  const selecedLocation = geocodedResults.value.find(item => item.place_name_en === newValue);
+  if (selecedLocation) {
+    suggestions.value.geo.lat = selecedLocation.center[1];
+    suggestions.value.geo.lon = selecedLocation.center[0];
+    console.log("Selected coordinates:", suggestions.value.geo);
+  }
 }
 
 /**
@@ -325,34 +383,43 @@ const isBuy = computed(() => (buyOrRent.value === "buy" ? true : false));
 /**
  *  Property type
  */
-const propertyTypes = await $fetch<PropertyTypeWithClassifications[]>("/api/property-type/all");
-const selectedPropertyTypes = reactive({})
+const propertyTypes = await $fetch<PropertyTypeWithOptions[]>("/api/property-type/");
+const selectedPropertyTypes = reactive<Record<string, string[]>>({});
 
 /**
  * Auto Complete
  */
 const suggestionsMatches = ref<string[]>([]);
+const suppressSuggestionFetch = ref(false)
 
 watchDebounced(
-  () => suggestions.value.toLowerCase(),
+  () => suggestions.value.location.toLowerCase(),
   async (suggestionsLower) => {
-    if (suggestionsLower) {
-      const result = await $fetch<string[]>("/api/address/auto-complete", {
-        query: { location: suggestionsLower },
+    // stop request when selecting a suggestion
+    if (suppressSuggestionFetch.value) {
+      suppressSuggestionFetch.value = false
+      return
+    }
+    // lower debounce for postcodes
+    if (suggestionsLower && suggestionsLower.length > 2) {
+      const result = await autoComplete(suggestionsLower);
+      // Store the full geocoded results for later use
+      geocodedResults.value = result;
+      suggestionsMatches.value = result.map((item) => {
+        return item.place_name_en;
       });
-      suggestionsMatches.value = result;
     } else {
       suggestionsMatches.value = [];
     }
   },
-  { debounce: 150 }
+  { debounce: 300 }
 );
 
 /**
  * Price range
  */
 const { data: priceRangeGraph } = useAsyncData('price-graph', () => {
-  return $fetch<string[]>("/api/price/graph", {
+  return $fetch<string[]>("/api/price/graph/", {
     params: {
       listingType: buyOrRent.value
     }
@@ -378,10 +445,10 @@ const selectedPriceRange = ref<[number, number]>([priceMin.value, priceMax.value
 watchImmediate(buyOrRent, () => {
   if (buyOrRent.value === "rent") {
     includeOptions.value = rentAvailabilityOptions;
-    initialInclude.value = rentAvailabilityOptions[0].value;
+    initialInclude.value = rentAvailabilityOptions[0]?.value;
   } else if (buyOrRent.value === "buy") {
     includeOptions.value = saleAvailabilityOptions;
-    initialInclude.value = rentAvailabilityOptions[0].value;
+    initialInclude.value = rentAvailabilityOptions[0]?.value;
   }
 });
 
@@ -423,11 +490,26 @@ async function sendForm(event: Event) {
   }
 
   /**
+   * Check for polygon geometry from map drawing
+   */
+  const polygonGeometries = getBBox();
+
+  /**
    * Save search params to state
    */
   searchParams.value = {
-    location,
-    radius,
+    location: suggestions.value.location, // Use the display name for location
+    // Use polygon geometries if available, otherwise use coordinates and radius
+    ...(polygonGeometries && polygonGeometries.length > 0
+      ? { geometries: polygonGeometries.map(g => ({ type: g.type, coordinates: g.coordinates })) }
+      : {
+          coordinates: {
+            lat: suggestions.value.geo.lat,
+            lon: suggestions.value.geo.lon
+          },
+          radius
+        }
+    ),
     buyOrRent,
     propertyTypes: removeObjectEmptyArrays(unref(selectedPropertyTypes)),
     priceRange: selectedPriceRange.value,
@@ -440,7 +522,7 @@ async function sendForm(event: Event) {
 
   // Perform fetch for properties
   const searchResult = await setPendingWhile<ListingCardType[]>(() => {
-    return $fetch<ListingCardType[]>("/api/search/listings", {
+    return $fetch<ListingCardType[]>("/api/search/listings/", {
       method: "POST",
       body: searchParams.value,
     });
@@ -450,7 +532,7 @@ async function sendForm(event: Event) {
     searchListings.value = searchResult;
   }
 
-  // Hide popover when search is successful
+  // Hide when search is successful
   hidePopover();
 }
 </script>
@@ -460,7 +542,6 @@ async function sendForm(event: Event) {
 @use "#styles/_utils/media" as mq;
 
 .o-searchform-fixed {
-  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -646,6 +727,42 @@ async function sendForm(event: Event) {
   border-radius: var(--border-radius-pill);
 }
 
+.o-searchform-draw-button {
+  width: var(--size-40);
+  height: var(--size-40);
+  padding: 0;
+  flex-shrink: 0;
+  align-self: center;
+  border-radius: var(--border-radius-pill);
+  background: var(--background-300);
+  border: 1px solid var(--background-400);
+  color: var(--foreground-200);
+  transition: all var(--animation-medium) var(--ease-out);
+
+  &-active {
+    background: var(--secondary-400);
+    border-color: var(--primary-200);
+    color: var(--monochrome-100);
+  }
+
+  &:hover {
+    background: var(--background-100);
+    border-color: var(--background-200);
+    color: var(--monochrome-100);
+  
+  }
+
+  &-active:hover {
+    background: var(--secondary-500);
+    color: var(--monochrome-100);
+  }
+}
+
+.o-searchform-draw-button-icon {
+  width: var(--size-20);
+  height: var(--size-20);
+}
+
 .o-searchform-location-button-icon {
   width: var(--size-20);
   height: var(--size-20);
@@ -776,11 +893,6 @@ async function sendForm(event: Event) {
     width: 100%;
     height: calc(100% - var(--o-searchform-fixed-offset));
     transform: none;
-    // max-height: calc(100vh - var(--header-expanded-height) - var(--size-12));
-
-    // @supports (max-height: 100dvh) {
-    //   max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
-    // }
   }
 }
 </style>
