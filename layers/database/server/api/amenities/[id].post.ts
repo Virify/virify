@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 const AmenitySchema = z.object({
-  type: z.enum(['EDUCATION', 'HEALTHCARE', 'SHOPPING_ENTERTAINMENT']),
-  subtype: z.enum(['SCHOOL', 'HOSPITAL', 'SHOP']).optional(),
+  type: z.enum(['EDUCATION', 'HEALTHCARE', 'TRANSPORT']),
+  subtype: z.enum(['SCHOOL', 'HOSPITAL', 'TRAIN_STATION']).optional(),
   name: z.string(),
   distanceM: z.number(),
   description: z.string().optional().nullable(),

@@ -80,15 +80,15 @@ export function useMapSearch() {
   /**
    * Find nearby amenities (schools, hospitals, shops) based on lat/long coordinates
    */
-  async function findNearbyAmenities(lat: number, lon: number, radius: number = 5000): Promise<{
+  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000): Promise<{
     schools: Array<{ name: string; distance: number; type: string }>;
     hospitals: Array<{ name: string; distance: number; type: string }>;
-    shops: Array<{ name: string; distance: number; type: string }>;
+    train_stations: Array<{ name: string; distance: number; type: string }>;
   }> {
     const amenities = {
       schools: [] as Array<{ name: string; distance: number; type: string }>,
       hospitals: [] as Array<{ name: string; distance: number; type: string }>,
-      shops: [] as Array<{ name: string; distance: number; type: string }>
+      train_stations: [] as Array<{ name: string; distance: number; type: string }>
     };
 
     try {
@@ -96,7 +96,7 @@ export function useMapSearch() {
       const amenityTypes = [
         { category: 'schools', query: 'school' },
         { category: 'hospitals', query: 'hospital' },
-        { category: 'shops', query: 'shop' }
+        { category: 'train_stations', query: 'train station' }
       ];
 
       for (const amenityType of amenityTypes) {
@@ -106,11 +106,10 @@ export function useMapSearch() {
               key: sdk.config.apiKey,
               country: "gb",
               proximity: `${lon},${lat}`,
-              limit: 5,
+              limit: 3,
               types: "poi"
             },
           });
-
           if (res.features) {
             for (const feature of res.features) {
               if (feature.geometry && feature.geometry.type === 'Point') {
@@ -136,7 +135,7 @@ export function useMapSearch() {
       // Sort by distance and take closest 3 for each category
       amenities.schools = amenities.schools.sort((a, b) => a.distance - b.distance).slice(0, 3);
       amenities.hospitals = amenities.hospitals.sort((a, b) => a.distance - b.distance).slice(0, 3);
-      amenities.shops = amenities.shops.sort((a, b) => a.distance - b.distance).slice(0, 3);
+      amenities.train_stations = amenities.train_stations.sort((a, b) => a.distance - b.distance).slice(0, 3);
 
     } catch (e) {
       console.error("[Map] Error finding nearby amenities:", e);

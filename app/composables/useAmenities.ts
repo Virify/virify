@@ -4,7 +4,7 @@ export function useAmenities() {
   const amenities = ref({
     schools: [] as Array<{ name: string; distance: number; type: string }>,
     hospitals: [] as Array<{ name: string; distance: number; type: string }>,
-    shops: [] as Array<{ name: string; distance: number; type: string }>
+    train_stations: [] as Array<{ name: string; distance: number; type: string }>
   })
 
   const isLoading = ref(false)
@@ -24,23 +24,43 @@ export function useAmenities() {
       const existingAmenities = await checkExistingAmenities(propertyId)
       
       if (existingAmenities) {
-        // Use existing amenities from database (no API call needed)
-        amenities.value = existingAmenities
+        // Group amenities from flat array into the expected object structure
+        const groupedAmenities = {
+          schools: existingAmenities
+            .filter((a: any) => a.type === 'EDUCATION' && a.subtype === 'SCHOOL')
+            .map((a: any) => ({
+              name: a.name,
+              distance: a.distanceM,
+              type: 'SCHOOL'
+            })),
+          hospitals: existingAmenities
+            .filter((a: any) => a.type === 'HEALTHCARE' && a.subtype === 'HOSPITAL')
+            .map((a: any) => ({
+              name: a.name,
+              distance: a.distanceM,
+              type: 'HOSPITAL'
+            })),
+          train_stations: existingAmenities
+            .filter((a: any) => a.type === 'TRANSPORT' && a.subtype === 'TRAIN_STATION')
+            .map((a: any) => ({
+              name: a.name,
+              distance: a.distanceM,
+              type: 'TRAIN_STATION'
+            }))
+        }
+        amenities.value = groupedAmenities
         console.log('Using cached amenities from database')
         return
       }
       
       // Step 2: ONLY if no amenities exist - fetch from MapTiler API
-      console.log('No cached amenities found, fetching from MapTiler API')
       const nearbyAmenities = await findNearbyAmenities(lat, lon, radius)
       amenities.value = nearbyAmenities
       
       // Step 3: ONLY after fetching - save to database for future use
       await saveAmenitiesToDatabase(propertyId, nearbyAmenities)
-      console.log('Amenities saved to database for future use')
       
     } catch (err) {
-      error.value = 'Error fetching nearby amenities'
       console.error('Error fetching nearby amenities:', err)
     } finally {
       isLoading.value = false
@@ -85,11 +105,11 @@ export function useAmenities() {
           description: null,
           location: null
         })),
-        ...amenitiesData.shops.map(shop => ({
-          type: 'SHOPPING_ENTERTAINMENT' as const,
-          subtype: 'SHOP' as const,
-          name: shop.name,
-          distanceM: shop.distance,
+        ...amenitiesData.train_stations.map(station => ({
+          type: 'TRANSPORT' as const,
+          subtype: 'TRAIN_STATION' as const,
+          name: station.name,
+          distanceM: station.distance,
           description: null,
           location: null
         }))
@@ -119,7 +139,7 @@ export function useAmenities() {
     amenities.value = {
       schools: [],
       hospitals: [],
-      shops: []
+      train_stations: []
     }
     error.value = null
   }

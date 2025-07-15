@@ -2,32 +2,16 @@
   <div class="o-listing-section-location | flow flow-lg">
     <div class="o-listing-section-location__grid" role="presentation">
       <div class="o-listing-section-location__amenities">
-        <div v-if="groupedAmenities.schools.length > 0" class="o-listing-section-location__category">
-          <h5 class="o-listing-section-location__category-title | title-xs">Schools</h5>
-          <ul class="o-listing-section-location__list">
-            <li v-for="school in groupedAmenities.schools" :key="school.name">
-              {{ school.name }} - {{ formatDistance(school.distance) }}
-            </li>
-          </ul>
-        </div>
-
-        <div v-if="groupedAmenities.hospitals.length > 0" class="o-listing-section-location__category">
-          <h5 class="o-listing-section-location__category-title | title-xs">Hospitals</h5>
-          <ul class="o-listing-section-location__list">
-            <li v-for="hospital in groupedAmenities.hospitals" :key="hospital.name">
-              {{ hospital.name }} - {{ formatDistance(hospital.distance) }}
-            </li>
-          </ul>
-        </div>
-
-        <div v-if="groupedAmenities.shops.length > 0" class="o-listing-section-location__category">
-          <h5 class="o-listing-section-location__category-title | title-xs">Shops</h5>
-          <ul class="o-listing-section-location__list">
-            <li v-for="shop in groupedAmenities.shops" :key="shop.name">
-              {{ shop.name }} - {{ formatDistance(shop.distance) }}
-            </li>
-          </ul>
-        </div>
+        <template v-for="([key, items], idx) in Object.entries(groupedAmenities)" :key="key">
+          <div v-if="Array.isArray(items) && items.length > 0" class="o-listing-section-location__category | box">
+            <h5 class="o-listing-section-location__category-title | title-xs">{{ formatCategoryKey(key) }}</h5>
+            <ul class="o-listing-section-location__list">
+              <li v-for="item in items" :key="item.name">
+                {{ item.name }} - {{ formatDistance(item.distance) }}
+              </li>
+            </ul>
+          </div>
+        </template>
 
         <div v-if="isLoading" class="o-listing-section-location__loading">
           Loading nearby amenities...
@@ -37,63 +21,40 @@
           {{ error }}
         </div>
 
-        <div v-else-if="!groupedAmenities.schools.length && !groupedAmenities.hospitals.length && !groupedAmenities.shops.length" 
-             class="o-listing-section-location__empty">
+        <div
+          v-else-if="!groupedAmenities.schools.length && !groupedAmenities.hospitals.length && !groupedAmenities.train_stations.length"
+          class="o-listing-section-location__empty">
           No nearby amenities found
         </div>
       </div>
 
-      <Map v-if="lat && lon" :center="[lon, lat]" :zoom="12" :interactive="false"
-        :marker="mapMarker" class="o-listing-section-location__map" />
+      <Map v-if="lat && lon" :center="[lon, lat]" :zoom="12" :interactive="false" :marker="mapMarker"
+        class="o-listing-section-location__map" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+
 interface Props {
   lat: number
   lon: number
   listing?: any
-  amenities?: any[] | null
 }
 
 const props = defineProps<Props>()
 
 const mapMarker = computed(() => props.listing)
 
-const { amenities, isLoading, error, fetchAmenities, formatDistance } = useAmenities()
+function formatCategoryKey(key: string) {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
 
-// Convert database amenities to grouped format
-const groupedAmenities = computed(() => {
-  if (props.amenities && Array.isArray(props.amenities) && props.amenities.length > 0) {
-    return {
-      schools: props.amenities.filter(a => a.type === 'EDUCATION').map(a => ({
-        name: a.name,
-        distance: a.distanceM,
-        type: 'schools'
-      })),
-      hospitals: props.amenities.filter(a => a.type === 'HEALTHCARE').map(a => ({
-        name: a.name,
-        distance: a.distanceM,
-        type: 'hospitals'
-      })),
-      shops: props.amenities.filter(a => a.type === 'SHOPPING_ENTERTAINMENT').map(a => ({
-        name: a.name,
-        distance: a.distanceM,
-        type: 'shops'
-      }))
-    }
-  }
-  // Use amenities from composable if no prop provided
-  return amenities.value
-})
+const { amenities: groupedAmenities, isLoading, error, fetchAmenities, formatDistance } = useAmenities()
 
-// Fetch amenities if not provided as prop
 onMounted(async () => {
-  if (!props.amenities || !Array.isArray(props.amenities) || props.amenities.length === 0) {
-    if (props.lat && props.lon && props.listing?.property?.id) {
-      await fetchAmenities(props.listing.property.id, props.lat, props.lon, 5000)
-    }
+  if (props.lat && props.lon && props.listing?.property?.id) {
+    await fetchAmenities(props.listing.property.id, props.lat, props.lon, 5000)
   }
 })
 </script>
@@ -102,7 +63,6 @@ onMounted(async () => {
 @use '#styles/_utils/media' as mq;
 
 .o-listing-section-location {
-
   &__grid {
     display: grid;
     grid-gap: var(--size-16);
@@ -114,7 +74,7 @@ onMounted(async () => {
 
   &__map {
     border-radius: var(--border-radius-2xl);
-    height: min(20em, 50vh);
+    height: min(40em, 100vh);
   }
 
   &__amenities {
@@ -124,6 +84,7 @@ onMounted(async () => {
   }
 
   &__category {
+    background: var(--background-300);
     &-title {
       margin: 0 0 var(--size-8) 0;
       color: var(--foreground-700);
