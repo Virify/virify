@@ -3,66 +3,33 @@
     'o-dock__popover--open': !!popover
   }" tabindex="-1">
     <AtomsButton class="o-dock__popover-close | button button-quiet" aria-label="Close popover"
-      :aria-controls="popoverId" @click.prevent="closePopover">
+      :aria-controls="popoverId" @click.prevent="hidePopover">
       <AtomsIcon icon="cross" aria-hidden class="o-dock__popover-close-icon" />
     </AtomsButton>
 
     <template v-if="popover">
-      <component :is="popover.component" v-bind="popover.props" />
+      <component :is="popover.component" />
 
-      <div class="o-dock__popover-buttons">
-        <AtomsButton :popovertarget="popoverId" v-if="!isFilters" class="| button button-sm button-ghost"
-          @click.prevent="showFiltersDialog">
-          Filters
-        </AtomsButton>
-
-        <AtomsButton :popovertarget="popoverId" v-if="!isLocation" class="| button button-sm button-ghost"
-          @click.prevent="showLocationDialog">
-          Locations
-        </AtomsButton>
-
-        <AtomsButton class="| button button-sm button-secondary" @click.prevent="closePopover">
-          Show results
-        </AtomsButton>
-      </div>
+      <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
+        @close-popover="hidePopover" />
     </template>
   </div>
 
-  <ul class="o-dock o-dock-container | elevate-300">
-    <li class="o-dock__item">
-      <span class="o-dock__button-label | faded-text body-2xs">Location</span>
-
-      <button type="button" :popovertarget="popoverId" class="o-dock__button | body-md" :class="{
-        'o-dock__button--active': popover?.type === 'location'
-      }" @click.prevent="showLocationDialog">
-        <AtomsIcon icon="search/location" />
-
-        <span class="o-dock__button-text">Location</span>
-      </button>
-    </li>
-
-    <li class="o-dock__item">
-      <span class="o-dock__button-label | faded-text body-2xs">Filters</span>
-
-      <button type="button" :popovertarget="popoverId" class="o-dock__button | body-md" :class="{
-        'o-dock__button--active': popover?.type === 'filters'
-      }" @click.prevent="showFiltersDialog">
-        <AtomsIcon icon="search/filter" />
-
-        <span class="o-dock__button-text">AI search</span>
-      </button>
-    </li>
-  </ul>
+  <OrganismsDockMenu :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
+    class="o-dock o-dock-container | elevate-300" />
 </template>
-
 
 <script setup lang="ts">
 import { OrganismsDockViewsLocation, OrganismsDockViewsFilters } from '#components'
 
+export type PopoverType = 'location' | 'filters'
+export type PopoverEmits = {
+  (e: 'open-popover', value: PopoverType): void
+}
+
 interface Popover {
-  type: 'location' | 'filters'
+  type: PopoverType
   component: Component
-  props?: Record<string, unknown>
 }
 
 /**
@@ -76,7 +43,30 @@ const popover = shallowRef<null | Popover>(null)
  */
 const $popover = useTemplateRef('$popover')
 
-function showPopover() {
+function getValidPopoverType(type: PopoverType): boolean {
+  const validTypes: PopoverType[] = ['filters', 'location']
+
+  return validTypes.includes(type)
+}
+
+function getValidPopoverComponent(type: PopoverType): Component {
+  if (type === 'filters') {
+    return OrganismsDockViewsFilters
+  }
+
+  return OrganismsDockViewsLocation
+}
+
+function showPopover(type: PopoverType) {
+  if (!getValidPopoverType(type)) return
+
+  const component = getValidPopoverComponent(type)
+
+  popover.value = {
+    type,
+    component
+  }
+
   $popover.value?.showPopover()
   $popover.value?.focus()
 }
@@ -84,34 +74,6 @@ function showPopover() {
 function hidePopover() {
   $popover.value?.hidePopover()
 }
-
-function showLocationDialog() {
-  popover.value = {
-    type: 'location',
-    component: OrganismsDockViewsLocation,
-  }
-
-  showPopover()
-}
-
-function showFiltersDialog() {
-  popover.value = {
-    type: 'filters',
-    component: OrganismsDockViewsFilters,
-  }
-
-  showPopover()
-}
-
-function closePopover() {
-  hidePopover()
-}
-
-/**
- *  Check popover states
- */
-const isLocation = computed(() => popover.value?.type === 'location')
-const isFilters = computed(() => popover.value?.type === 'filters')
 
 /**
  *  Monitor close events
@@ -158,7 +120,6 @@ onMounted(() => {
   gap: var(--size-8);
   justify-content: center;
 
-
   @include mq.tablet {
     bottom: var(--size-16);
     padding: var(--size-12);
@@ -167,53 +128,6 @@ onMounted(() => {
 
   @include mq.notebook {
     bottom: var(--size-24);
-  }
-
-  &__item {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    justify-content: center;
-    gap: var(--size-4);
-  }
-
-  &__button-label {
-
-    @include mq.tablet {
-      display: none;
-    }
-  }
-
-  &__button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--size-10);
-    background: var(--background-300);
-    border-radius: var(--border-radius-lg);
-    padding: var(--size-10) var(--size-14);
-    line-height: var(--lineheight-md);
-
-    .a-icon {
-      width: var(--size-24);
-      height: var(--size-24);
-    }
-
-    @include mq.tablet {
-
-      &--active {
-        background: var(--secondary-400);
-        color: var(--monochrome-900);
-      }
-    }
-  }
-
-  &__button-text {
-    display: none;
-
-    @include mq.tablet {
-      display: unset;
-    }
   }
 
   &__popover {
@@ -249,10 +163,6 @@ onMounted(() => {
       bottom: calc(var(--size-24) + #{ $dock-height });
       max-height: calc(100dvh - var(--size-48) - #{ $dock-height });
     }
-
-    @include mq.motion {
-      animation: fadeDockPopover var(--animation-medium) var(--ease-out);
-    }
   }
 
   &__popover-close {
@@ -269,74 +179,60 @@ onMounted(() => {
     width: var(--size-24);
     height: var(--size-24);
   }
-
-  &__popover-buttons {
-    display: flex;
-    padding: var(--size-16) 0 0;
-    align-items: center;
-    justify-content: stretch;
-    gap: var(--size-8);
-
-    .button {
-      flex: 1 1 50%;
-    }
-
-    @include mq.tablet {
-      display: none;
-    }
-  }
 }
 
 /**
  *  Offset transitions on mobile
  *
- *  @TODO
- *  There is a bug in Safari where `:popover-open` is always true,
- *  meaning the popover opacity never gets removed. Temporarily
- *  using explicit `&--open` classname
  */
-.o-dock {
-  transition-property: opacity, transform;
-  transition-duration: var(--animation-fast);
-  transition-timing-function: var(--ease-out);
+@include mq.motion {
+  .o-dock {
+    transition-property: opacity, transform;
+    transition-duration: var(--animation-fast);
+    transition-timing-function: var(--ease-in);
 
-  &__popover--open {
-    display: block;
-  }
+    &__popover {
+      animation: fadeDockPopover var(--animation-medium) var(--ease-out);
 
-  &__popover--open+& {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-50%);
+      /*
+       *  @TODO
+       *  There is a bug in Safari where `:popover-open` is always true,
+       *  meaning the popover opacity never gets removed. Temporarily
+       *  using explicit `&--open` classname
+       */
+      &--open {
+        display: block;
+        animation-delay: var(--animation-fast);
+        animation-fill-mode: backwards;
 
-    @include mq.tablet {
-      opacity: unset;
-      transform: translateX(-50%);
-    }
+        @include mq.tablet {
+          animation-delay: 0ms;
+        }
+      }
 
-    &__popover--open {
-      animation-delay: var(--animation-fast);
-      animation-fill-mode: backwards;
+      &--open+.o-dock {
+        opacity: 0;
+        transform: translateX(-50%) translateY(var(--size-8));
 
-      @include mq.tablet {
-        animation-delay: 0ms;
+        @include mq.tablet {
+          opacity: unset;
+          transform: translateX(-50%);
+        }
       }
     }
   }
-}
 
-/**
- *  Show/hide animations for modals
- */
-@keyframes fadeDockPopover {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(var(--size-32));
+  @keyframes fadeDockPopover {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(var(--size-32));
+    }
   }
-}
 
-@keyframes faceDockBackdrop {
-  from {
-    opacity: 0;
+  @keyframes faceDockBackdrop {
+    from {
+      opacity: 0;
+    }
   }
 }
 </style>
