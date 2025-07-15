@@ -57,7 +57,7 @@
 
 
 <script setup lang="ts">
-import { LazyOrganismsDockViewsLocation, LazyOrganismsDockViewsFilters } from '#components'
+import { OrganismsDockViewsLocation, OrganismsDockViewsFilters } from '#components'
 
 interface Popover {
   type: 'location' | 'filters'
@@ -88,7 +88,7 @@ function hidePopover() {
 function showLocationDialog() {
   popover.value = {
     type: 'location',
-    component: LazyOrganismsDockViewsLocation,
+    component: OrganismsDockViewsLocation,
   }
 
   showPopover()
@@ -97,15 +97,13 @@ function showLocationDialog() {
 function showFiltersDialog() {
   popover.value = {
     type: 'filters',
-    component: LazyOrganismsDockViewsFilters,
+    component: OrganismsDockViewsFilters,
   }
 
   showPopover()
 }
 
 function closePopover() {
-
-
   hidePopover()
 }
 
