@@ -80,6 +80,17 @@ function updateSortOrder({ target }: Event) {
 @use '#styles/_utils/media' as mq;
 
 .o-dock-menu {
+  padding: var(--size-8);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--size-8);
+  justify-content: center;
+
+  @include mq.tablet {
+    padding: var(--size-12);
+  }
+
   &__item {
     display: flex;
     flex-direction: column;
@@ -101,7 +112,7 @@ function updateSortOrder({ target }: Event) {
     justify-content: center;
     gap: var(--size-10);
     background: var(--background-300);
-    border-radius: var(--border-radius-pill);
+    border-radius: var(--border-radius-xl);
     padding: var(--size-10) var(--size-16);
     line-height: var(--size-24);
     font-size: var(--font-md);
@@ -117,8 +128,9 @@ function updateSortOrder({ target }: Event) {
     @include mq.tablet {
       font-size: var(--font-sm);
 
+      &:open,
       &--active {
-        background: var(--secondary-400);
+        background-color: var(--secondary-400);
         color: var(--monochrome-900);
       }
     }

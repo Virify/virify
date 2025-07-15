@@ -98,6 +98,7 @@ onMounted(() => {
   background: var(--background-200);
   border-radius: var(--border-radius-2xl);
   width: calc(100% - var(--size-24));
+  border: 1px solid var(--border-color-200);
 
   @include mq.small-tablet {
     width: min(100% - var(--size-32), 450px);
@@ -125,20 +126,6 @@ onMounted(() => {
 
   @include mq.notebook {
     bottom: var(--size-24);
-  }
-
-  &__menu {
-    padding: var(--size-8);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--size-8);
-    justify-content: center;
-
-    @include mq.tablet {
-      padding: var(--size-12);
-      gap: var(--size-12);
-    }
   }
 
   &__popover {
