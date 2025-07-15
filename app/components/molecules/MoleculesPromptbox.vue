@@ -3,12 +3,12 @@
     <div class="m-promptbox__input-wrapper">
       <!-- analysed query overlays the textarea -->
       <div class="m-promptbox__overlay" v-if="queryAnalysis" aria-hidden="true">
-        <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type} r-body-md-xs`">
+        <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type}`">
           {{ segment.text }}
         </span>
       </div>
 
-      <textarea :id class="m-promptbox__textarea | r-body-md-xs" :placeholder :aria-label="props.label" v-model="textarea"
+      <textarea :id class="m-promptbox__textarea" :placeholder :aria-label="props.label" v-model="textarea"
         :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
     </div>
 
