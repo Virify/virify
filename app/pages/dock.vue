@@ -5,26 +5,28 @@
     <div ref="$popover" popover="auto" :id="popoverId" class="o-dock__popover o-dock-container | elevate-200" :class="{
       'o-dock__popover--open': !!popover
     }" tabindex="-1">
-      <button class="o-dock__popover-close | button button-quiet" aria-label="Close modal" aria-controls="modal"
-        @click.prevent="closePopover">
+      <AtomsButton class="o-dock__popover-close | button button-quiet" aria-label="Close popover"
+        :aria-controls="popoverId" @click.prevent="closePopover">
         <AtomsIcon icon="cross" aria-hidden class="o-dock__popover-close-icon" />
-      </button>
+      </AtomsButton>
 
       <template v-if="popover">
         <component :is="popover.component" v-bind="popover.props" />
 
         <div class="o-dock__popover-buttons">
-          <button :popovertarget="popoverId" v-if="!isFilters" class="| button button-sm button-ghost"
+          <AtomsButton :popovertarget="popoverId" v-if="!isFilters" class="| button button-sm button-ghost"
             @click.prevent="showFiltersDialog">
             Filters
-          </button>
-          <button :popovertarget="popoverId" v-if="!isLocation" class="| button button-sm button-ghost"
+          </AtomsButton>
+
+          <AtomsButton :popovertarget="popoverId" v-if="!isLocation" class="| button button-sm button-ghost"
             @click.prevent="showLocationDialog">
             Locations
-          </button>
-          <button class="| button button-sm button-secondary" @click.prevent="closePopover">
+          </AtomsButton>
+
+          <AtomsButton class="| button button-sm button-secondary" @click.prevent="closePopover">
             Show results
-          </button>
+          </AtomsButton>
         </div>
       </template>
     </div>
