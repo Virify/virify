@@ -27,7 +27,8 @@ const {
 } = useMap();
 
 defineExpose({ 
-  map
+  map,
+  recenterMap
 });
 
 /**
@@ -178,8 +179,8 @@ function updateMarkers() {
 
   if (props.markers?.length) {
     addMarkers(map.value, formattedMarkers.value);
-  } else if (props.marker) {
-    addMarker(map.value, formattedMarkers.value);
+  } else if (props.marker && formattedMarkers.value[0]) {
+    addMarker(map.value, [formattedMarkers.value[0]]);
   }
 }
 
@@ -231,6 +232,23 @@ function removeCircle(map: any) {
   if (!map) return;
   // Remove SVG overlay using composable util
   removeSearchRadiusVisualization(map);
+}
+
+/**
+ * Recenter the map to ensure marker is properly positioned
+ */
+function recenterMap() {
+  if (!map.value || !props.center) return;
+  
+  nextTick(() => {
+    map.value.resize();
+    map.value.flyTo({
+      center: props.center,
+      zoom: props.zoom || map.value.getZoom(),
+      essential: true,
+      duration: 800
+    });
+  });
 }
 </script>
 <style>

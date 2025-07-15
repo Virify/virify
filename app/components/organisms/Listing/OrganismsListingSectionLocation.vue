@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <Map v-if="lat && lon" :center="[lon, lat]" :zoom="12" :interactive="false" :marker="mapMarker"
+      <Map v-if="lat && lon" ref="mapRef" :center="[lon, lat]" :zoom="12" :interactive="false" :marker="mapMarker"
         class="o-listing-section-location__map" />
     </div>
   </div>
@@ -65,6 +65,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const mapRef = ref()
 const mapMarker = computed(() => props.listing)
 
 function formatCategoryKey(key: string) {
@@ -76,6 +77,15 @@ const { amenities: groupedAmenities, isLoading, error, fetchAmenities, formatDis
 onMounted(async () => {
   if (props.lat && props.lon && props.listing?.property?.id) {
     await fetchAmenities(props.listing.property.id, props.lat, props.lon, 5000)
+    
+    // Recenter map after amenities are loaded (content has changed the layout)
+    nextTick(() => {
+      if (mapRef.value?.recenterMap) {
+        setTimeout(() => {
+          mapRef.value.recenterMap()
+        }, 100)
+      }
+    })
   }
 })
 </script>
