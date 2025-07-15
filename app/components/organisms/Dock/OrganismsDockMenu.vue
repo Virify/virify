@@ -85,7 +85,7 @@ function updateSortOrder({ target }: Event) {
   display: flex;
   align-items: center;
   gap: var(--size-8);
-  justify-content: center;
+  justify-content: stretch;
 
   @include mq.tablet {
     padding: var(--size-12);
@@ -95,8 +95,9 @@ function updateSortOrder({ target }: Event) {
     display: flex;
     flex-direction: column;
     text-align: center;
-    justify-content: center;
+    justify-content: stretch;
     gap: var(--size-4);
+    flex: 1 0 auto;
   }
 
   &__mobile-label {
@@ -118,6 +119,8 @@ function updateSortOrder({ target }: Event) {
     font-size: var(--font-md);
     font-weight: var(--font-semibold);
     white-space: nowrap;
+    flex: 1 0 auto;
+    width: 100%;
 
     .a-icon {
       flex: 0 0 auto;

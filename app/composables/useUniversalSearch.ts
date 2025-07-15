@@ -2,6 +2,7 @@ export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 
 
 interface State {
   location?: Record<any, unknown>,
+  locationRadius: number,
   filters?: {
     ai: unknown,
     traditional: unknown
@@ -9,9 +10,17 @@ interface State {
   sortOrder?: SortOrder
 }
 
+// Get initial sort order from utils
+const initialSortOrder = selectOptionSortOrder[0]?.value as SortOrder
+
+/**
+ *  Composable for managing global search state
+ *
+ */
 export function useUniversalSearch() {
   const state = useState<State>('current-search', () => ({
-    sortOrder: selectOptionSortOrder[0]?.value as SortOrder
+    sortOrder: initialSortOrder,
+    locationRadius: 0
   }))
 
   function setState(key: keyof State, value: unknown) {
