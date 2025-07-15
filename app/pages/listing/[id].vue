@@ -22,28 +22,78 @@
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" :address="fullAddress" />
 
-          <OrganismsListingSection v-if="property">
-            <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!" :listing="listing" />
+          <!-- Location & Amenities (Most Important) -->
+          <OrganismsListingSection v-if="property" accordion-label="Map and Location" start-expanded>
+            <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!" :listing="listing" :amenities="amenitiesArray" />
           </OrganismsListingSection>
 
+          <!-- Core Room Features -->
           <OrganismsListingSection v-if="bedroomFeatures" accordion-label="Bedroom Features" start-expanded>
-           <pre>{{ bedroomFeatures }}</pre>
+            <MoleculesPropertyTable :data="bedroomFeatures" :fields="bedroomFields" title="Bedroom" />
           </OrganismsListingSection>
 
           <OrganismsListingSection v-if="bathroomFeatures" accordion-label="Bathroom Features">
-            <pre>{{ bathroomFeatures }}</pre>
+            <MoleculesPropertyTable :data="bathroomFeatures" :fields="bathroomFields" title="Bathroom" />
           </OrganismsListingSection>
 
+          <OrganismsListingSection v-if="kitchenFeatures" accordion-label="Kitchen">
+            <MoleculesPropertyTable :data="kitchenFeatures" :fields="kitchenFields" title="Kitchen" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="livingAreaFeatures" accordion-label="Living Area">
+            <MoleculesPropertyTable :data="livingAreaFeatures" :fields="livingAreaFields" title="Living Area" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="reception" accordion-label="Reception Rooms">
+            <MoleculesPropertyTable :data="reception" :fields="receptionFields" title="Reception" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="diningroomFeatures" accordion-label="Dining Room">
+            <MoleculesPropertyTable :data="diningroomFeatures" :fields="diningroomFields" title="Dining Room" :is-array="false" />
+          </OrganismsListingSection>
+
+          <!-- External Features -->
+
+          <OrganismsListingSection v-if="parking" accordion-label="Parking">
+            <MoleculesPropertyTable :data="parking" :fields="parkingFields" title="Parking" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="outdoorSpace" accordion-label="Outdoor Space">
+            <MoleculesPropertyTable :data="outdoorSpace" :fields="outdoorSpaceFields" title="Outdoor Space" :is-array="false" />
+          </OrganismsListingSection>
+
+          <!-- Property Features & Amenities -->
           <OrganismsListingSection v-if="additionalFeatures" accordion-label="Additional Features">
-            <pre>{{ additionalFeatures }}</pre>
+            <MoleculesPropertyTable :data="additionalFeatures" :fields="additionalFields" title="Features" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="storageFeatures" accordion-label="Storage Features">
+            <MoleculesPropertyTable :data="storageFeatures" :fields="storageFields" title="Storage" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="utility" accordion-label="Utility Room">
+            <MoleculesPropertyTable :data="utility" :fields="utilityFields" title="Utility" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="additionalToilet" accordion-label="Additional Toilet">
+            <MoleculesPropertyTable :data="additionalToilet" :fields="additionalToiletFields" title="Additional Toilet" :is-array="false" />
+          </OrganismsListingSection>
+
+          <!-- Technical & Financial -->
+          <OrganismsListingSection v-if="energyAndUtilities" accordion-label="Energy and Utilities">
+            <MoleculesPropertyTable :data="energyAndUtilities" :fields="energyAndUtilitiesFields" title="Energy & Utilities" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="runningCosts" accordion-label="Running Costs">
+            <MoleculesPropertyTable :data="runningCosts" :fields="runningCostsFields" title="Running Costs" :is-array="false" />
+          </OrganismsListingSection>
+
+          <OrganismsListingSection v-if="securityFeatures" accordion-label="Security Features">
+            <MoleculesPropertyTable :data="securityFeatures" :fields="securityFields" title="Security" :is-array="false" />
           </OrganismsListingSection>
 
           <OrganismsListingSection v-if="accessibilityFeatures" accordion-label="Accessibility Features">
-            <pre>{{ accessibilityFeatures }}</pre>
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="energyAndUtilities" accordion-label="Energy and Utilities">
-            <pre>{{ energyAndUtilities }}</pre>
+            <MoleculesPropertyTable :data="accessibilityFeatures" :fields="accessibilityFields" title="Accessibility" :is-array="false" />
           </OrganismsListingSection>
         </div>
 
@@ -73,8 +123,8 @@
 
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
-import type { ListingWithFullProperty } from "~~/shared/types/listing";
 import breakpoints from '#styles/_utils/breakpoints.module.scss'
+import { generateDynamicFields } from '~/utils/listing/dynamic-fields'
 
 const route = useRoute();
 
@@ -112,6 +162,45 @@ const bathroomFeatures = getPropertyFeature('bathroomFeatures', Array.isArray)
 const additionalFeatures = getPropertyFeature('additionalFeatures', isObject)
 const accessibilityFeatures = getPropertyFeature('accessibilityFeatures', isObject)
 const energyAndUtilities = getPropertyFeature('energyAndUtilities', isObject)
+const parking = getPropertyFeature('parking', isObject)
+const outdoorSpace = getPropertyFeature('outdoorSpace', isObject)
+const securityFeatures = getPropertyFeature('securityFeatures', isObject)
+const storageFeatures = getPropertyFeature('storageFeatures', isObject)
+const runningCosts = getPropertyFeature('runningCosts', isObject)
+const diningroomFeatures = getPropertyFeature('diningroomFeatures', isObject)
+const kitchenFeatures = getPropertyFeature('kitchenFeatures', isObject)
+const livingAreaFeatures = getPropertyFeature('livingAreaFeatures', isObject)
+const reception = getPropertyFeature('reception', Array.isArray)
+const utility = getPropertyFeature('utility', isObject)
+const additionalToilet = getPropertyFeature('additionalToilet', isObject)
+
+// Handle amenities array/object conversion
+const amenitiesArray = computed(() => {
+  const amenities = property.value?.amenities
+  if (!amenities) return null
+  return Array.isArray(amenities) ? amenities : [amenities]
+})
+
+/**
+ * Dynamic field generation from actual data
+ */
+const bedroomFields = computed(() => generateDynamicFields(bedroomFeatures.value))
+const bathroomFields = computed(() => generateDynamicFields(bathroomFeatures.value))
+const additionalFields = computed(() => generateDynamicFields(additionalFeatures.value))
+const accessibilityFields = computed(() => generateDynamicFields(accessibilityFeatures.value))
+const energyAndUtilitiesFields = computed(() => generateDynamicFields(energyAndUtilities.value))
+const parkingFields = computed(() => generateDynamicFields(parking.value))
+const outdoorSpaceFields = computed(() => generateDynamicFields(outdoorSpace.value))
+const securityFields = computed(() => generateDynamicFields(securityFeatures.value))
+const storageFields = computed(() => generateDynamicFields(storageFeatures.value))
+const runningCostsFields = computed(() => generateDynamicFields(runningCosts.value))
+const diningroomFields = computed(() => generateDynamicFields(diningroomFeatures.value))
+const kitchenFields = computed(() => generateDynamicFields(kitchenFeatures.value))
+const livingAreaFields = computed(() => generateDynamicFields(livingAreaFeatures.value))
+const receptionFields = computed(() => generateDynamicFields(reception.value))
+const utilityFields = computed(() => generateDynamicFields(utility.value))
+const additionalToiletFields = computed(() => generateDynamicFields(additionalToilet.value))
+
 
 /**
  *  Media
@@ -183,7 +272,7 @@ useIntersectionObserver($overview, ([entry]) => {
 const debugContent = computed(() => {
   if (!listing.value) return {}
   
-  const excludedKeys = ['media', 'bathroomFeatures', 'additionalFeatures', 'accessibilityFeatures']
+  const excludedKeys = ['']
   const { property, ...rest } = listing.value
   
   if (!property) return rest

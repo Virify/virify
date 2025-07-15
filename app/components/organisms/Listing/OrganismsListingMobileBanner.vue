@@ -51,7 +51,7 @@
           </p>
         </div>
 
-        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :property-id="4" enquire-url="#" />
+        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="4" enquire-url="#" />
       </div>
     </div>
   </div>
@@ -64,6 +64,7 @@
 interface Props {
   price: string
   overviewVisible?: boolean
+  address?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -217,7 +218,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
   if (!isElement(el)) return
 
   for (let [attr, value] of Object.entries(styles)) {
-    el.style[attr] = value
+    (el.style as any)[attr as string] = value
   }
 }
 

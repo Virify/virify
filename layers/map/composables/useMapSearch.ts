@@ -1,3 +1,5 @@
+import { calculateDistance, milesToMeters } from '../utils/calculate-zoom';
+
 export function useMapSearch() {
   const sdk = useNuxtApp().$maptilersdk;
 
@@ -75,9 +77,79 @@ export function useMapSearch() {
     };
   }
 
+  /**
+   * Find nearby amenities (schools, hospitals, shops) based on lat/long coordinates
+   */
+  async function findNearbyAmenities(lat: number, lon: number, radius: number = 5000): Promise<{
+    schools: Array<{ name: string; distance: number; type: string }>;
+    hospitals: Array<{ name: string; distance: number; type: string }>;
+    shops: Array<{ name: string; distance: number; type: string }>;
+  }> {
+    const amenities = {
+      schools: [] as Array<{ name: string; distance: number; type: string }>,
+      hospitals: [] as Array<{ name: string; distance: number; type: string }>,
+      shops: [] as Array<{ name: string; distance: number; type: string }>
+    };
+
+    try {
+      // Search for different types of amenities
+      const amenityTypes = [
+        { category: 'schools', query: 'school' },
+        { category: 'hospitals', query: 'hospital' },
+        { category: 'shops', query: 'shop' }
+      ];
+
+      for (const amenityType of amenityTypes) {
+        try {
+          const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(amenityType.query)}.json`, {
+            query: { 
+              key: sdk.config.apiKey,
+              country: "gb",
+              proximity: `${lon},${lat}`,
+              limit: 5,
+              types: "poi"
+            },
+          });
+
+          if (res.features) {
+            for (const feature of res.features) {
+              if (feature.geometry && feature.geometry.type === 'Point') {
+                const [featureLon, featureLat] = feature.geometry.coordinates;
+                const distanceInMiles = calculateDistance(lat, lon, featureLat, featureLon);
+                const distanceInMeters = milesToMeters(distanceInMiles);
+                
+                if (distanceInMeters <= radius) {
+                  amenities[amenityType.category as keyof typeof amenities].push({
+                    name: feature.text || 'Unknown',
+                    distance: Math.round(distanceInMeters),
+                    type: amenityType.category
+                  });
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error(`[Map] Error fetching ${amenityType.category}:`, e);
+        }
+      }
+
+      // Sort by distance and take closest 3 for each category
+      amenities.schools = amenities.schools.sort((a, b) => a.distance - b.distance).slice(0, 3);
+      amenities.hospitals = amenities.hospitals.sort((a, b) => a.distance - b.distance).slice(0, 3);
+      amenities.shops = amenities.shops.sort((a, b) => a.distance - b.distance).slice(0, 3);
+
+    } catch (e) {
+      console.error("[Map] Error finding nearby amenities:", e);
+    }
+
+    return amenities;
+  }
+
+
   return {
     autoComplete,
     geocodeAndSelectBest,
     enhanceWithBoundaryPolygon,
+    findNearbyAmenities,
   } as const;
 }
