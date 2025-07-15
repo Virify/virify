@@ -19,5 +19,8 @@ textarea {
   outline: none;
   z-index: 2;
   border: 1px solid var(--border-color-200);
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--border-radius-xl);
 }
 </style>

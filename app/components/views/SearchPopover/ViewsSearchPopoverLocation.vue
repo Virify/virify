@@ -2,10 +2,10 @@
   <div class="| flow">
     <h2 class="| title-md">Location</h2>
 
-    <div tabindex="-1" @focusin="showSuggestions" @focusout="hideSuggestions" class=" | flow">
+    <div tabindex="-1" @focusout="hideSuggestions" class=" | flow">
       <label class="| faded-text body-sm">
         Example input
-        <input type="text" class="| text-input body-md">
+        <input type="text" @keydown="showSuggestions" class="| text-input body-md">
       </label>
 
       <div :hidden="!isSuggestion" class="v-search-dialog-location__animate-height | flow">
@@ -31,11 +31,6 @@
       Another example
       <input type="text" class="| text-input body-md">
     </label>
-
-    <div class="v-search-dialog-location__buttons">
-      <button class="| button button-sm button-ghost">Filters</button>
-      <button class="| button button-sm button-secondary">Show results</button>
-    </div>
   </div>
 </template>
 
@@ -84,18 +79,6 @@ function hideSuggestions() {
   &__autocomplete-row {
     padding: var(--size-10) var(--size-16);
     border-bottom: 1px solid var(--border-color-200);
-  }
-
-  &__buttons {
-    display: flex;
-    padding: var(--size-8) 0 0;
-    align-items: center;
-    justify-content: flex-end;
-    gap: var(--size-8);
-
-    @include mq.tablet {
-      display: none;
-    }
   }
 }
 </style>
