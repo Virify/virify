@@ -79,6 +79,7 @@ export function useMapSearch() {
 
   /**
    * Find nearby amenities (schools, hospitals, shops) based on lat/long coordinates
+   * TODO: Batch these requests to reduce API calls
    */
   async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000): Promise<{
     schools: Array<{ name: string; distance: number; type: string }>;

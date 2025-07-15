@@ -3,6 +3,8 @@
  * This generates field definitions from the actual data structure to avoid tight coupling
  */
 
+import { util } from "zod"
+
 interface FieldConfig {
   key: string
   label: string
@@ -16,7 +18,7 @@ interface FieldConfig {
 const FIELD_METADATA: Record<string, Partial<FieldConfig>> = {
   // Common fields
   roomNumber: { label: 'Room Number', type: 'number', priority: 1 },
-  size: { label: 'Size', type: 'number', formatter: (value: number) => value ? `${value} m²` : '', priority: 2 },
+size: { label: 'Size', type: 'number', formatter: (value: number) => (typeof value === 'number' && !isNaN(value)) ? `${Math.round(value)} m²` : '', priority: 2 },
   description: { label: 'Description', type: 'string', priority: 100 },
   
   // Bedroom fields
@@ -137,6 +139,7 @@ const FIELD_METADATA: Record<string, Partial<FieldConfig>> = {
   fireplace: { label: 'Fireplace', type: 'string' },
   gamesRoom: { label: 'Games Room', type: 'boolean' },
   homeCinema: { label: 'Home Cinema', type: 'boolean' },
+
   
   // Dining
   openConcept: { label: 'Open Concept', type: 'boolean' },
