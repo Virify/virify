@@ -1,5 +1,5 @@
 <template>
-  <MoleculesListingCardBase :listing="listing">
+  <OrganismsListingCardBase :listing="listing">
     <!-- Premium Header Banner -->
     <template #premium-header>
       <div class="premium-content-header">
@@ -11,7 +11,7 @@
 
     <!-- Premium Image Gallery with Side Thumbnails -->
     <template #image>
-      <MoleculesListingCardNewImage :images="images" :listing-id="listing.id">
+      <OrganismsListingCardNewImage :images="images" :listing-id="listing.id">
         <template
           #side-images="{ selectedIndex, goToSlide, images: allImages }"
         >
@@ -30,12 +30,12 @@
             />
           </div>
         </template>
-      </MoleculesListingCardNewImage>
+      </OrganismsListingCardNewImage>
     </template>
 
     <!-- Price and Price Type -->
     <template #header>
-      <MoleculesListingCardNewHeader
+      <AtomsListingCardNewHeader
         :price="listing.price"
         :price-type="priceType"
       >
@@ -47,12 +47,12 @@
             </span>
           </h2>
         </template>
-      </MoleculesListingCardNewHeader>
+      </AtomsListingCardNewHeader>
     </template>
 
     <!-- Property Title and Address -->
     <template #title>
-      <MoleculesListingCardNewTitle
+      <AtomsListingCardNewTitle
         :address="listing.property.address"
         :type="listing.property.type.name"
         :classification="listing.property.classification.name"
@@ -67,12 +67,12 @@
             </p>
           </div>
         </template>
-      </MoleculesListingCardNewTitle>
+      </AtomsListingCardNewTitle>
     </template>
 
     <!-- Property Features (Bedrooms, Bathrooms, Receptions) -->
     <template #features>
-      <MoleculesListingCardNewFeatures
+      <AtomsListingCardNewFeatures
         :bedrooms="listing.property.numberBedrooms"
         :bathrooms="listing.property.numberBathrooms"
         :receptions="listing.property.numberReceptions"
@@ -101,12 +101,12 @@
             </li>
           </ul>
         </template>
-      </MoleculesListingCardNewFeatures>
+      </AtomsListingCardNewFeatures>
     </template>
 
     <!-- Property Tags (Chain Free, Listed Date, etc.) -->
     <template #tags>
-      <MoleculesListingCardNewTags
+      <AtomsListingCardNewTags
         :chain-free="listing.property.chainFree"
         :listed-date="listing.property.createdAt"
         :reduced="true"
@@ -118,7 +118,7 @@
             </li>
           </ul>
         </template>
-      </MoleculesListingCardNewTags>
+      </AtomsListingCardNewTags>
     </template>
 
     <!-- Property Description -->
@@ -142,7 +142,7 @@
 
     <!-- Agent Information -->
     <template #agent>
-      <MoleculesListingCardNewAgent
+      <AtomsListingCardNewAgent
         :username="listing.user.username"
         :id="listing.user.id"
       >
@@ -156,18 +156,18 @@
             </p>
           </NuxtLink>
         </template>
-      </MoleculesListingCardNewAgent>
+      </AtomsListingCardNewAgent>
     </template>
 
     <!-- Desktop Action Buttons -->
     <template #actions>
       <!-- View button only under main content -->
       <div class="premium-single-action">
-        <MoleculesListingCardNewView :listing-id="listing.id">
+        <OrganismsListingCardNewView :listing-id="listing.id">
           <span class="| button button-primary button-bordered button-full"
             >View</span
           >
-        </MoleculesListingCardNewView>
+        </OrganismsListingCardNewView>
       </div>
     </template>
 
@@ -205,7 +205,7 @@
         </div>
         <!-- Enquire button using individual component -->
         <div class="premium-single-action">
-          <MoleculesListingCardNewEnquire
+          <AtomsListingCardNewEnquire
             :listing-id="listing.id"
             :user-id="listing.user.id"
           >
@@ -217,7 +217,7 @@
                 {{ enquiryLabel }}
               </button>
             </template>
-          </MoleculesListingCardNewEnquire>
+          </AtomsListingCardNewEnquire>
         </div>
       </div>
     </template>
@@ -260,10 +260,10 @@
     <template #mobile-actions>
       <!-- Enquiry button for mobile -->
       <div class="premium-mobile-actions">
-        <MoleculesListingCardNewView :listing-id="listing.id">
+        <OrganismsListingCardNewView :listing-id="listing.id">
           <span class="| button button-primary button-full body-sm">View</span>
-        </MoleculesListingCardNewView>
-        <MoleculesListingCardNewEnquire
+        </OrganismsListingCardNewView>
+        <AtomsListingCardNewEnquire
           :listing-id="listing.id"
           :user-id="listing.user.id"
         >
@@ -275,10 +275,10 @@
               {{ enquiryLabel }}
             </button>
           </template>
-        </MoleculesListingCardNewEnquire>
+        </AtomsListingCardNewEnquire>
       </div>
     </template>
-  </MoleculesListingCardBase>
+  </OrganismsListingCardBase>
 </template>
 
 <script setup lang="ts">

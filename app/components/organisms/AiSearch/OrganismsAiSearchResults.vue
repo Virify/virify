@@ -10,7 +10,7 @@
       <template v-for="section in sortedResults" :key="section.type + (section.item?.id || section.items?.[0]?.id)">
         <!-- Premium card row -->
         <div v-if="section.type === 'premium'" class="p-ai-search-results__premium-row">
-          <MoleculesListingCardPremium
+          <OrganismsListingCardPremium
             :listing="(section.item as ListingCardData)"
           />
         </div>
@@ -21,11 +21,11 @@
             v-for="listing in section.items!"
             :key="listing.id"
           >
-            <MoleculesListingCardFeatured
+            <OrganismsListingCardFeatured
               v-if="listing.listingTier === 'FEATURED'"
               :listing="(listing as ListingCardData)"
             />
-            <MoleculesListingCardBase
+            <OrganismsListingCardBase
               v-else
               :listing="(listing as ListingCardData)"
             />

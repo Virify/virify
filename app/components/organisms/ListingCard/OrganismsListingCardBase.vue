@@ -6,7 +6,7 @@
     
     <!-- Image slot with default property image component -->
     <slot name="image">
-      <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
+      <OrganismsListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     </slot>
     
     <div class="m-listing-card-content-wrapper">
@@ -19,7 +19,7 @@
           <!-- Price and listing type indicator row -->
           <div class="m-listing-card-header-row m-listing-card-price-group">
             <slot name="header">
-              <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+              <AtomsListingCardNewHeader :price="listing.price" :price-type="priceType" />
             </slot>
             <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
             <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
@@ -27,19 +27,19 @@
           
           <!-- Property title with address, type, and classification -->
           <slot name="title">
-            <MoleculesListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
+            <AtomsListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
               :classification="listing.property.classification.name" />
           </slot>
           
           <!-- Property features (bedrooms, bathrooms, receptions) -->
           <slot name="features">
-            <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
+            <AtomsListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
               :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
           </slot>
           
           <!-- Property tags (chain-free, listing date, reduced status) -->
           <slot name="tags">
-            <MoleculesListingCardNewTags :chain-free="listing.property.chainFree"
+            <AtomsListingCardNewTags :chain-free="listing.property.chainFree"
               :listed-date="listing.property.createdAt" :reduced="true" />
           </slot>
           
@@ -53,14 +53,14 @@
           
           <!-- Agent info -->
           <slot name="agent">
-            <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+            <AtomsListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
           </slot>
           
           <!-- Actions slot with default view/enquire buttons -->
           <slot name="actions">
             <div class="m-listing-card-actions">
-              <MoleculesListingCardNewView :listing-id="listing.id" />
-              <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id" />
+              <OrganismsListingCardNewView :listing-id="listing.id" />
+              <AtomsListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id" />
             </div>
           </slot>
           

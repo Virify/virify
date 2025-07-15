@@ -25,8 +25,6 @@ const props = defineProps<{
 </script>
 
 <style lang="scss">
-.m-listing-card-location {
-}
 
 .m-listing-card-no-wrap {
   white-space: nowrap;

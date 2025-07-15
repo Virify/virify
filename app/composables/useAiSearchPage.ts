@@ -37,6 +37,10 @@ export const useAiSearchPage = () => {
         currentSort.value = restored.sortBy;
         hasSearched.value = true;
         
+        // Restore global search query and analysis for useAi composable
+        searchQuery.value = restored.query;
+        globalQueryAnalysis.value = restored.queryAnalysis;
+        
         // Restore results and pagination if available
         if (restored.results) {
           searchResults.value = restored.results;

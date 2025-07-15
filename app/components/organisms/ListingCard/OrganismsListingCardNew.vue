@@ -6,24 +6,24 @@
     <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold" aria-label="Featured listing">
       Featured
     </div>
-    <MoleculesListingCardNewImage :images="image_urls" :listing-id="listing.id" />
+    <OrganismsListingCardNewImage :images="image_urls" :listing-id="listing.id" />
     <div class="m-listing-card-content">
       <div class="m-listing-card-details">
         <div class="m-listing-card-header-row m-listing-card-price-group">
-          <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType" />
+          <AtomsListingCardNewHeader :price="listing.price" :price-type="priceType" />
           <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs" aria-label="Property for rent">Rent</span>
           <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs" aria-label="Property for sale">Sale</span>
         </div>
-        <MoleculesListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
+        <AtomsListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
           :type="listing.property.type.name" :classification="listing.property.classification.name" />
-        <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
+        <AtomsListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
           :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
-        <MoleculesListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
+        <AtomsListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
           :reduced="true" />
       </div>
       <div class="m-listing-card-footer">
-        <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
-        <MoleculesListingCardNewActions :listing-id="listing.id" :user-id="listing.user.id" />
+        <AtomsListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+        <AtomsListingCardNewActions :listing-id="listing.id" :user-id="listing.user.id" />
       </div>
     </div>
   </article>

@@ -28,8 +28,8 @@
     <!-- Search Feedback Section: Loading, No Results, Error -->
     <div v-if="shouldShowFeedback && !isMapView" class="search-feedback-wrapper">
       <div class="search-feedback-section | container container-sm">
-      <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
-      <OrganismsAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
+      <MoleculesAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
+      <MoleculesAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
       </div>
     </div>
     <div v-else-if="hasSearched" class="results-container">
