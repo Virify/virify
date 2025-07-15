@@ -1,26 +1,33 @@
 <template>
   <ul class="o-dock-menu">
     <li class="o-dock-menu__item">
-      <span class="o-dock-menu__button-label | faded-text body-2xs">Location</span>
+      <label :for="sortOrderId" class="o-dock-menu__mobile-label | faded-text body-2xs">Sort by</label>
 
-      <button type="button" :popovertarget="popoverId" class="o-dock-menu__button | body-md" :class="{
-        'o-dock-menu__button--active': currentlyOpen === 'location'
+      <AtomsSelect class="o-dock-menu__input" :id="sortOrderId" :options="selectOptionSortOrder"
+        @change="updateSortOrder" />
+    </li>
+
+    <li class="o-dock-menu__item">
+      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Location</span>
+
+      <button type="button" :popovertarget="popoverId" class="o-dock-menu__input | body-md" :class="{
+        'o-dock-menu__input--active': currentlyOpen === 'location'
       }" @click.prevent="showLocationDialog">
         <AtomsIcon icon="search/location" />
 
-        <span class="o-dock-menu__button-text">Location</span>
+        <span class="o-dock-menu__input-text">Location</span>
       </button>
     </li>
 
     <li class="o-dock-menu__item">
-      <span class="o-dock-menu__button-label | faded-text body-2xs">Filters</span>
+      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Filters</span>
 
-      <button type="button" :popovertarget="popoverId" class="o-dock-menu__button | body-md" :class="{
-        'o-dock-menu__button--active': currentlyOpen === 'filters'
+      <button type="button" :popovertarget="popoverId" class="o-dock-menu__input | body-md" :class="{
+        'o-dock-menu__input--active': currentlyOpen === 'filters'
       }" @click.prevent="showFiltersDialog">
         <AtomsIcon icon="search/filter" />
 
-        <span class="o-dock-menu__button-text">AI search</span>
+        <span class="o-dock-menu__input-text">AI search</span>
       </button>
     </li>
   </ul>
@@ -40,6 +47,11 @@ interface Props {
 defineProps<Props>()
 
 /**
+ *  a11y
+ */
+const sortOrderId = useId()
+
+/**
  *  Open popover
  */
 const emits = defineEmits<PopoverEmits>()
@@ -52,6 +64,16 @@ function showFiltersDialog() {
   emits('open-popover', 'filters')
 }
 
+/**
+ *  Update sort order
+ */
+const { setState } = useUniversalSearch()
+
+function updateSortOrder({ target }: Event) {
+  const { value } = asObject(target)
+
+  setState('sortOrder', value)
+}
 </script>
 
 <style lang="scss">
@@ -66,29 +88,34 @@ function showFiltersDialog() {
     gap: var(--size-4);
   }
 
-  &__button-label {
+  &__mobile-label {
 
     @include mq.tablet {
       display: none;
     }
   }
 
-  &__button {
+  &__input {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--size-10);
     background: var(--background-300);
-    border-radius: var(--border-radius-lg);
-    padding: var(--size-10) var(--size-14);
-    line-height: var(--lineheight-md);
+    border-radius: var(--border-radius-pill);
+    padding: var(--size-10) var(--size-16);
+    line-height: var(--size-24);
+    font-size: var(--font-md);
+    font-weight: var(--font-semibold);
+    white-space: nowrap;
 
     .a-icon {
+      flex: 0 0 auto;
       width: var(--size-24);
       height: var(--size-24);
     }
 
     @include mq.tablet {
+      font-size: var(--font-sm);
 
       &--active {
         background: var(--secondary-400);
@@ -97,11 +124,13 @@ function showFiltersDialog() {
     }
   }
 
-  &__button-text {
+  &__input-text {
     display: none;
 
     @include mq.tablet {
       display: unset;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }

@@ -51,6 +51,10 @@ const selected = defineModel({
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40' fill='white'><path d='M20 23.4L14 17.4L15.4 16L20 20.6L24.6 16L26 17.4L20 23.4Z'/></svg>");
   }
 
+  option {
+    font-weight: var(--font-medium);
+  }
+
   @supports (appearance: base-select) {
 
     &,
