@@ -2,8 +2,9 @@
   <div class="| container">
     <h1 class="| title-lg">Dock demo</h1>
 
-    <div ref="$popover" popover="auto" :id="popoverId" class="o-dock__popover o-dock-container | elevate-200"
-      tabindex="-1">
+    <div ref="$popover" popover="auto" :id="popoverId" class="o-dock__popover o-dock-container | elevate-200" :class="{
+      'o-dock__popover--open': !!popover
+    }" tabindex="-1">
       <button class="o-dock__popover-close | button button-quiet" aria-label="Close modal" aria-controls="modal"
         @click.prevent="closePopover">
         <AtomsIcon icon="cross" aria-hidden class="o-dock__popover-close-icon" />
@@ -293,33 +294,38 @@ onMounted(() => {
  *  Offset transitions on mobile
  *
  *  @TODO
- *  There is a bug in Safari where :popover-open is always true,
+ *  There is a bug in Safari where `:popover-open` is always true,
  *  meaning the popover opacity never gets removed. Temporarily
- *  disabling
+ *  using explicit `&--open` classname
  */
-// .o-dock {
-//   transition-property: opacity, transform;
-//   transition-duration: var(--animation-fast);
-//   transition-timing-function: var(--ease-out);
-//   &__popover:popover-open+.o-dock {
-//     opacity: 0;
-//     transform: translateX(-50%) translateY(-50%);
+.o-dock {
+  transition-property: opacity, transform;
+  transition-duration: var(--animation-fast);
+  transition-timing-function: var(--ease-out);
 
-//     @include mq.tablet {
-//       opacity: unset;
-//       transform: translateX(-50%);
-//     }
+  &__popover--open {
+    display: block;
+  }
 
-//     &__popover:popover-open {
-//       animation-delay: var(--animation-fast);
-//       animation-fill-mode: backwards;
+  &__popover--open+& {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50%);
 
-//       @include mq.tablet {
-//         animation-delay: 0ms;
-//       }
-//     }
-//   }
-// }
+    @include mq.tablet {
+      opacity: unset;
+      transform: translateX(-50%);
+    }
+
+    &__popover--open {
+      animation-delay: var(--animation-fast);
+      animation-fill-mode: backwards;
+
+      @include mq.tablet {
+        animation-delay: 0ms;
+      }
+    }
+  }
+}
 
 /**
  *  Show/hide animations for modals
