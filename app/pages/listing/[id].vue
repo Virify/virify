@@ -112,12 +112,6 @@
     <client-only>
       <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible" />
     </client-only>
-
-    <AtomsDivider text="DEBUG" />
-
-    <div style="overflow: hidden">
-      <pre class="| body-sm">{{ debugContent }}</pre>
-    </div>
   </main>
 </template>
 
@@ -264,24 +258,6 @@ const isOverviewVisible = shallowRef(true)
 
 useIntersectionObserver($overview, ([entry]) => {
   isOverviewVisible.value = !!entry?.isIntersecting
-})
-
-/**
- *  Debug content
- */
-const debugContent = computed(() => {
-  if (!listing.value) return {}
-  
-  const excludedKeys = ['']
-  const { property, ...rest } = listing.value
-  
-  if (!property) return rest
-  
-  const filteredProperty = Object.fromEntries(
-    Object.entries(property).filter(([key]) => !excludedKeys.includes(key))
-  )
-  
-  return { ...rest, property: filteredProperty }
 })
 
 </script>
