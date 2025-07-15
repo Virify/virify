@@ -1,7 +1,7 @@
 <template>
   <div class="o-listing-buttons" role="presentation">
-    <AtomsNoteButton class="| button button-square button-ghost" :property-id="propertyId" />
-    <AtomsFavouriteButton class="| button button-square button-ghost" :property-id="propertyId" />
+    <AtomsNoteButton class="| button button-square button-ghost" :listing-id="listingId" />
+    <AtomsFavouriteButton class="| button button-square button-ghost" :listing-id="listingId" />
 
     <nuxt-link :to="enquireUrl" class="o-listing-buttons__enquire | button button-secondary button-full">
       Enquire now
@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 interface Props {
-  propertyId: number
+  listingId: number
   enquireUrl: string
 }
 

@@ -20,14 +20,14 @@
             </skeleton-loader>
           </div>
 
-          <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" />
+          <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" :address="fullAddress" />
 
           <OrganismsListingSection v-if="property">
-            <OrganismsListingSectionLocation :lat="property?.address?.lat" :lon="property?.address?.lon" />
+            <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!" :listing="listing" />
           </OrganismsListingSection>
 
           <OrganismsListingSection v-if="bedroomFeatures" accordion-label="Bedroom Features" start-expanded>
-            <pre>{{ bedroomFeatures }}</pre>
+           <pre>{{ bedroomFeatures }}</pre>
           </OrganismsListingSection>
 
           <OrganismsListingSection v-if="bathroomFeatures" accordion-label="Bathroom Features">
@@ -42,9 +42,7 @@
             <pre>{{ accessibilityFeatures }}</pre>
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="energyAndUtilities">
-            <h3 class="| title-xs">Energy and Utilities</h3>
-
+          <OrganismsListingSection v-if="energyAndUtilities" accordion-label="Energy and Utilities">
             <pre>{{ energyAndUtilities }}</pre>
           </OrganismsListingSection>
         </div>
@@ -56,7 +54,7 @@
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="priceFormatted" />
+          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="fullAddress" />
         </div>
       </div>
     </div>
@@ -92,55 +90,42 @@ const { data: listing, status } = await useAsyncData("listing", () => {
 /**
  *  Content
  */
-const property = computed(() => {
-  const { property } = asObject(listing.value)
-
-  return property
-})
+const property = computed(() => listing.value?.property)
 
 const priceFormatted = computed(() => {
-  const { price } = asObject(listing.value)
-
+  const price = listing.value?.price
   return isNumber(price) ? numberToCurrency(price) : ''
 })
 
-const bedroomFeatures = computed(() => {
-  const { bedroomFeatures } = asObject(listing.value?.property)
+function getPropertyFeature(key: keyof NonNullable<typeof property.value>, validator: (value: any) => boolean) {
+  return computed(() => {
+    const feature = property.value?.[key]
+    return validator(feature) ? feature : false
+  })
+}
 
-  return Array.isArray(bedroomFeatures) && bedroomFeatures
+const fullAddress = computed(() => {
+  return property.value?.address?.fullAddress || "No address provided"
 })
-
-const bathroomFeatures = computed(() => {
-  const { bathroomFeatures } = asObject(listing.value?.property)
-
-  return Array.isArray(bathroomFeatures) && bathroomFeatures
-})
-
-const additionalFeatures = computed(() => {
-  const { additionalFeatures } = asObject(listing.value?.property)
-
-  return isObject(additionalFeatures) && additionalFeatures
-})
-
-const accessibilityFeatures = computed(() => {
-  const { accessibilityFeatures } = asObject(listing.value?.property)
-
-  return isObject(accessibilityFeatures) && accessibilityFeatures
-})
-
-const energyAndUtilities = computed(() => {
-  const { energyAndUtilities } = asObject(listing.value?.property)
-
-  return isObject(energyAndUtilities) && energyAndUtilities
-})
+const bedroomFeatures = getPropertyFeature('bedroomFeatures', Array.isArray)
+const bathroomFeatures = getPropertyFeature('bathroomFeatures', Array.isArray)
+const additionalFeatures = getPropertyFeature('additionalFeatures', isObject)
+const accessibilityFeatures = getPropertyFeature('accessibilityFeatures', isObject)
+const energyAndUtilities = getPropertyFeature('energyAndUtilities', isObject)
 
 /**
  *  Media
  */
 const images = computed(() => {
-  const { media } = asObject(property.value)
-
-  return Array.isArray(media) ? media : []
+  const media = property.value?.media
+  if (!Array.isArray(media)) return []
+  
+  return media
+    .filter(item => item.image !== null)
+    .map(item => ({
+      image: item.image!,
+      metadata: item.metadata
+    }))
 })
 
 /**
@@ -196,24 +181,18 @@ useIntersectionObserver($overview, ([entry]) => {
  *  Debug content
  */
 const debugContent = computed(() => {
-  const data = listing.value
-
-  if (!isObject(data)) return {}
-
-  function excludeKeys(obj: Record<string, unknown>, keys: string[] = []) {
-    const objClone = structuredClone(obj)
-
-    for (let key of keys) {
-      delete objClone[key]
-    }
-
-    return objClone
-  }
-
-  return {
-    ...data,
-    property: excludeKeys(data?.property || {}, ['media', 'bedroomFeatures', 'bathroomFeatures', 'additionalFeatures', 'accessibilityFeatures'])
-  }
+  if (!listing.value) return {}
+  
+  const excludedKeys = ['media', 'bathroomFeatures', 'additionalFeatures', 'accessibilityFeatures']
+  const { property, ...rest } = listing.value
+  
+  if (!property) return rest
+  
+  const filteredProperty = Object.fromEntries(
+    Object.entries(property).filter(([key]) => !excludedKeys.includes(key))
+  )
+  
+  return { ...rest, property: filteredProperty }
 })
 
 </script>

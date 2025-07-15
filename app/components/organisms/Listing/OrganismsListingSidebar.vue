@@ -9,11 +9,11 @@
     </h2>
 
     <p role="presentation" class="o-listing-sidebar__address | body-md font-bold">
-      123 House, Somewhere Street
+      {{ address }}
     </p>
 
     <OrganismsListingSidebarIcons />
-    <OrganismsListingButtons :property-id="4" enquire-url="#" />
+    <OrganismsListingButtons :listing-id="listingId" enquire-url="#" />
     <OrganismsListingAgent />
   </section>
 </template>
@@ -21,6 +21,8 @@
 <script setup lang="ts">
 interface Props {
   price?: string
+  listingId: number
+  address?: string
 }
 
 defineProps<Props>()
@@ -43,6 +45,7 @@ defineProps<Props>()
 
   &__address {
     margin: 0;
+    color: var(--secondary-400);
   }
 }
 </style>

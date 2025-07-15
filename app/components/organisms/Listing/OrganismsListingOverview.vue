@@ -10,7 +10,7 @@
 
 
     <p role="presentation" class="o-listing-overview__address | body-sm">
-      123 House, Somewhere Street
+      {{ address }}
     </p>
   </div>
 </template>
@@ -18,9 +18,11 @@
 <script setup lang="ts">
 interface Props {
   price?: string
+  address?: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+console.log("OrganismsListingOverview loaded with props:", props.address);
 </script>
 
 <style lang="scss">
@@ -44,6 +46,16 @@ defineProps<Props>()
     @include mq.notebook {
       align-items: flex-start;
       justify-content: flex-start;
+    }
+  }
+  &__address {
+    color: var(--secondary-400);
+    margin: 0;
+    font-weight: 500;
+    text-align: center;
+
+    @include mq.notebook {
+      text-align: left;
     }
   }
 }

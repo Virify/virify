@@ -10,8 +10,8 @@
         <li>etc.</li>
       </ul>
 
-      <OrganismsMap v-if="lat && lon" :lat :lon :zoom="15" :interactive="false"
-        class="o-listing-section-location__map" />
+       <Map v-if="lat && lon" :center="[lon, lat]" :zoom="12" :interactive="false"
+        :marker="mapMarker" class="o-listing-section-location__map" />
     </div>
   </div>
 </template>
@@ -20,9 +20,12 @@
 interface Props {
   lat: number
   lon: number
+  listing?: any
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const mapMarker = computed(() => props.listing)
 </script>
 
 <style lang="scss">
@@ -40,6 +43,7 @@ defineProps<Props>()
   }
 
   &__map {
+    border-radius: var(--border-radius-2xl);
     height: min(20em, 50vh);
   }
 }
