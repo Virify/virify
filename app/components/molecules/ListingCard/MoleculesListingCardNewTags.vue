@@ -44,8 +44,8 @@ ul {
   flex-wrap: wrap;
   gap: var(--size-8);
   list-style: none;
-  margin-bottom: var(--size-8);
   padding: 0;
+  align-items: center;
 }
 
 .m-listing-card-tag {

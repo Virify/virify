@@ -1,19 +1,43 @@
 <template>
-  <div class="price-marker-container" role="button" 
-       :aria-label="`Property marker: ${priceDisplay} ${tier ? tier.toLowerCase() : 'basic'} listing${isCurrentlyFavorite ? ', favorited' : ''}`"
-       :title="`Property: ${priceDisplay} ${tier ? tier.toLowerCase() : 'basic'} listing${isCurrentlyFavorite ? ', favorited' : ''}`">
+  <div
+    class="price-marker-container"
+    role="button"
+    :aria-label="`Property marker: ${priceDisplay} ${
+      tier ? tier.toLowerCase() : 'basic'
+    } listing${isCurrentlyFavorite ? ', favorited' : ''}`"
+    :title="`Property: ${priceDisplay} ${
+      tier ? tier.toLowerCase() : 'basic'
+    } listing${isCurrentlyFavorite ? ', favorited' : ''}`"
+  >
     <!-- SVG Marker Shape -->
     <!-- Dynamic marker based on favorite status and tier -->
     <AtomsIcon :icon="markerIcon" :class="markerClass" aria-hidden="true" />
 
     <!-- Favorite indicator -->
-    <div v-if="isCurrentlyFavorite" class="favorite-indicator" aria-label="Favorited property">
-      <AtomsIcon icon="map/marker-fav" class="favorite-icon" aria-hidden="true" />
+    <div
+      v-if="isCurrentlyFavorite"
+      class="favorite-indicator"
+      aria-label="Favorited property"
+    >
+      <AtomsIcon
+        icon="map/marker-fav"
+        class="favorite-icon"
+        aria-hidden="true"
+      />
+    </div>
+
+    <!-- Note indicator -->
+    <div v-if="hasNote" class="note-indicator" aria-label="Property has notes">
+      <div class="note-dot"></div>
     </div>
 
     <!-- Content overlay -->
     <div class="price-marker-content">
-      <span class="price-marker-price | body-xs font-semibold" aria-hidden="true">{{ priceDisplay }}</span>
+      <span
+        class="price-marker-price | body-xs font-semibold"
+        aria-hidden="true"
+        >{{ priceDisplay }}</span
+      >
     </div>
   </div>
 </template>
@@ -24,7 +48,7 @@ interface MarkerProps {
   price: number | null;
   hasNote?: boolean | null;
   isFavorite?: boolean | null;
-  tier?: 'FEATURED' | 'BASIC' | 'PREMIUM';
+  tier?: "FEATURED" | "BASIC" | "PREMIUM";
   priceType?: string | null;
 }
 
@@ -32,9 +56,13 @@ const props = defineProps<MarkerProps>();
 
 // Use composables for live favorite status (separate from props to avoid re-renders)
 const { isFavourite } = useFavourites();
+const { hasNote: propertyHasNote } = useNotes();
 
 // Get live favorite status
 const isCurrentlyFavorite = computed(() => isFavourite(props.id as number));
+
+// Get live note status
+const hasNote = computed(() => propertyHasNote(props.id as number));
 
 // Format price based on property type (sale vs rental)
 const priceDisplay = computed(() => {
@@ -43,11 +71,12 @@ const priceDisplay = computed(() => {
   }
 
   // Check if it's a rental property based on priceType
-  const isRental = props.priceType &&
-    (props.priceType.toLowerCase().includes('month') ||
-      props.priceType.toLowerCase().includes('week') ||
-      props.priceType.toLowerCase().includes('pcm') ||
-      props.priceType.toLowerCase().includes('pw'));
+  const isRental =
+    props.priceType &&
+    (props.priceType.toLowerCase().includes("month") ||
+      props.priceType.toLowerCase().includes("week") ||
+      props.priceType.toLowerCase().includes("pcm") ||
+      props.priceType.toLowerCase().includes("pw"));
 
   if (isRental) {
     // For rentals, just remove pennies (round to nearest pound)
@@ -62,21 +91,23 @@ const priceDisplay = computed(() => {
 
 // Computed marker icon based on favorite status and tier
 const markerIcon = computed(() => {
-
   switch (props.tier) {
-    case "PREMIUM": return "map/marker-premium";
-    case "FEATURED": return "map/marker-featured";
+    case "PREMIUM":
+      return "map/marker-premium";
+    case "FEATURED":
+      return "map/marker-featured";
     case "BASIC":
-    default: return "map/marker-basic";
+    default:
+      return "map/marker-basic";
   }
 });
 
 // Computed marker class based on favorite status and tier
 const markerClass = computed(() => {
-  if (props.tier === "PREMIUM") return "marker-shape teardrop-marker premium-marker";
+  if (props.tier === "PREMIUM")
+    return "marker-shape teardrop-marker premium-marker";
   return "marker-shape teardrop-marker";
 });
-
 </script>
 
 <style scoped>
@@ -171,6 +202,28 @@ const markerClass = computed(() => {
   width: 100%;
   height: 100%;
   color: var(--favourite-colour);
+  filter: drop-shadow(0 var(--size-1) var(--size-2) rgba(0, 0, 0, 0.3));
+}
+
+/* Note indicator */
+.note-indicator {
+  position: absolute;
+  top: var(--size-32);
+  z-index: 2;
+  width: var(--size-12);
+  height: var(--size-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.note-dot {
+  width: 100%;
+  height: 100%;
+  background-color: var(--error);
+  border-radius: 50%;
+  border: 1px solid var(--monochrome-100);
   filter: drop-shadow(0 var(--size-1) var(--size-2) rgba(0, 0, 0, 0.3));
 }
 </style>

@@ -50,10 +50,8 @@
           <div class="m-listing-card-mobile-content">
             <slot name="mobile-content" />
           </div>
-        </div>
-        
-        <!-- Footer with agent info and action buttons -->
-        <div class="m-listing-card-footer">
+          
+          <!-- Agent info -->
           <slot name="agent">
             <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
           </slot>
@@ -117,17 +115,15 @@ const priceType = computed(() => {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     padding: var(--card-padding);
   }
 
-  .m-listing-card-footer {
-    align-items: flex-start;
+  .m-listing-card-details {
     display: flex;
     flex-direction: column;
     gap: var(--size-16);
-    justify-content: space-between;
   }
+
 
   .m-listing-card-actions {
     display: grid;
@@ -148,7 +144,6 @@ const priceType = computed(() => {
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--size-8);
-    margin-bottom: var(--size-8);
   }
 
   .m-listing-card-price-group {
@@ -171,9 +166,15 @@ const priceType = computed(() => {
   .m-listing-card-mobile-content,
   .m-listing-card-mobile-actions {
     width: 100%;
+    
     @media (min-width: 769px) {
       display: none;
     }
+  }
+
+  .m-listing-card-mobile-content:empty,
+  .m-listing-card-mobile-actions:empty {
+    display: none;
   }
 }
 
@@ -198,16 +199,14 @@ const priceType = computed(() => {
   .m-listing-card {
     flex-direction: column;
     max-width: 100%;
+    height: 100%;
     padding: 0;
 
     .m-listing-card-content-wrapper {
       grid-template-columns: 1fr;
       grid-template-rows: auto 1fr;
       width: 100% !important;
-    }
-
-    .m-listing-card-content {
-      padding: var(--card-padding);
+      height: 100%;
     }
   }
 }

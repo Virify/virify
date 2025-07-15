@@ -33,7 +33,6 @@ ul {
   display: flex;
   gap: var(--size-12);
   list-style: none;
-  margin-bottom: var(--size-8);
   padding: 0;
 }
 
@@ -44,7 +43,7 @@ ul {
   gap: var(--size-4);
 
   .icon {
-    font-size: var(--font-2xl);
+    font-size: var(--font-3xl);
   }
 }
 </style>

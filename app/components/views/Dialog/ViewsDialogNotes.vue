@@ -1,7 +1,7 @@
 <template>
   <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">{{ title }}</h1>
-    <p class="| body-sm">Write your notes about this property below</p>
+    <p class="| body-sm">{{ content }}</p>
 
     <div class="| flow flow-md">
       <textarea v-model="notes" class="| body-sm" rows="4" placeholder="Enter your notes here..."></textarea>
@@ -42,7 +42,8 @@ const hasExistingNote = computed(() => hasNote(props.listingId))
 /**
  * Dynamic title based on whether we're editing or creating a note
  */
-const title = computed(() => hasExistingNote.value ? 'Edit notes' : 'Add notes')
+const title = computed(() => hasExistingNote.value ? 'Note' : 'Add notes')
+const content = computed(() => hasExistingNote.value ? 'View your note on this listing or update it below' : 'Add a new note for this listing.');
 
 /**
  * Load existing note when the component is mounted

@@ -1,6 +1,6 @@
 <template>
   <MoleculesListingCardBase :listing="listing">
-
+    <!-- Premium Header Banner -->
     <template #premium-header>
       <div class="premium-content-header">
         <div class="premium-header-line"></div>
@@ -9,20 +9,36 @@
       </div>
     </template>
 
+    <!-- Premium Image Gallery with Side Thumbnails -->
     <template #image>
       <MoleculesListingCardNewImage :images="images" :listing-id="listing.id">
-        <template #side-images="{ selectedIndex, goToSlide, images: allImages }">
+        <template
+          #side-images="{ selectedIndex, goToSlide, images: allImages }"
+        >
           <div class="premium-side-images">
-            <img v-for="(image, index) in getRotatedImages(allImages, selectedIndex)" :key="`${selectedIndex}-${index}`"
-              :src="image.src" class="premium-side-image" :class="{ 'active': image.isActive }"
-              :alt="`Property thumbnail ${index + 1}`" @click="goToSlide(image.originalIndex)" />
+            <img
+              v-for="(image, index) in getRotatedImages(
+                allImages,
+                selectedIndex
+              )"
+              :key="`${selectedIndex}-${index}`"
+              :src="image.src"
+              class="premium-side-image"
+              :class="{ active: image.isActive }"
+              :alt="`Property thumbnail ${index + 1}`"
+              @click="goToSlide(image.originalIndex)"
+            />
           </div>
         </template>
       </MoleculesListingCardNewImage>
     </template>
 
+    <!-- Price and Price Type -->
     <template #header>
-      <MoleculesListingCardNewHeader :price="listing.price" :price-type="priceType">
+      <MoleculesListingCardNewHeader
+        :price="listing.price"
+        :price-type="priceType"
+      >
         <template #default="{ price, priceType }">
           <h2 class="premium-header | title-md">
             {{ price }}
@@ -34,9 +50,13 @@
       </MoleculesListingCardNewHeader>
     </template>
 
+    <!-- Property Title and Address -->
     <template #title>
-      <MoleculesListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
-        :classification="listing.property.classification.name">
+      <MoleculesListingCardNewTitle
+        :address="listing.property.address"
+        :type="listing.property.type.name"
+        :classification="listing.property.classification.name"
+      >
         <template #default="{ address, type, classification }">
           <div class="premium-title">
             <h3 class="premium-title-main | body-md font-semibold">
@@ -50,24 +70,47 @@
       </MoleculesListingCardNewTitle>
     </template>
 
+    <!-- Property Features (Bedrooms, Bathrooms, Receptions) -->
     <template #features>
-      <MoleculesListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
-        :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions">
+      <MoleculesListingCardNewFeatures
+        :bedrooms="listing.property.numberBedrooms"
+        :bathrooms="listing.property.numberBathrooms"
+        :receptions="listing.property.numberReceptions"
+      >
         <template #default="{ features }">
           <ul class="premium-features" aria-label="Property features">
-            <li v-for="{ count, icon, iconTitle } of features" :key="iconTitle" class="premium-feature" 
-                :aria-label="`${count} ${iconTitle}`">
-              <AtomsIcon :name="iconTitle" :icon="icon" class="premium-feature-icon" :aria-hidden="true" :title="`${count} ${iconTitle}`" />
-              <p class="premium-feature-count | body-sm" :title="`${count} ${iconTitle}`">{{ count }}</p>
+            <li
+              v-for="{ count, icon, iconTitle } of features"
+              :key="iconTitle"
+              class="premium-feature"
+              :aria-label="`${count} ${iconTitle}`"
+            >
+              <AtomsIcon
+                :name="iconTitle"
+                :icon="icon"
+                class="premium-feature-icon"
+                :aria-hidden="true"
+                :title="`${count} ${iconTitle}`"
+              />
+              <p
+                class="premium-feature-count | body-sm"
+                :title="`${count} ${iconTitle}`"
+              >
+                {{ count }}
+              </p>
             </li>
           </ul>
         </template>
       </MoleculesListingCardNewFeatures>
     </template>
 
+    <!-- Property Tags (Chain Free, Listed Date, etc.) -->
     <template #tags>
-      <MoleculesListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
-        :reduced="true">
+      <MoleculesListingCardNewTags
+        :chain-free="listing.property.chainFree"
+        :listed-date="listing.property.createdAt"
+        :reduced="true"
+      >
         <template #default="{ tags }">
           <ul class="premium-tags">
             <li v-for="tag in tags" :key="tag" class="premium-tag | body-xs">
@@ -78,100 +121,159 @@
       </MoleculesListingCardNewTags>
     </template>
 
+    <!-- Property Description -->
     <template #description>
       <div class="premium-description | body-sm" v-if="listing.description">
-        <div class="premium-description-content" :class="{ 'collapsed': isDescriptionCollapsed }">
+        <div
+          class="premium-description-content"
+          :class="{ collapsed: isDescriptionCollapsed }"
+        >
           <p>{{ listing.description }}</p>
         </div>
-        <button 
-          class="premium-description-toggle | body-xs" 
+        <button
+          class="premium-description-toggle | body-xs"
           @click="toggleDescription"
-          v-if="shouldShowToggle">
-          {{ isDescriptionCollapsed ? 'Show more' : 'Show less' }}
+          v-if="shouldShowToggle"
+        >
+          {{ isDescriptionCollapsed ? "Show more" : "Show less" }}
         </button>
       </div>
     </template>
 
+    <!-- Agent Information -->
     <template #agent>
-      <MoleculesListingCardNewAgent :username="listing.user.username" :id="listing.user.id">
+      <MoleculesListingCardNewAgent
+        :username="listing.user.username"
+        :id="listing.user.id"
+      >
         <template #default="{ username }">
           <NuxtLink to="#" class="premium-agent">
             <div class="premium-agent-logo">
               <AtomsIcon name="check" icon="tick-solid" />
             </div>
-            <p class="premium-agent-text | body-xs font-semibold">{{ username }}</p>
+            <p class="premium-agent-text | body-xs font-semibold">
+              {{ username }}
+            </p>
           </NuxtLink>
         </template>
       </MoleculesListingCardNewAgent>
     </template>
 
+    <!-- Desktop Action Buttons -->
     <template #actions>
       <!-- View button only under main content -->
       <div class="premium-single-action">
         <MoleculesListingCardNewView :listing-id="listing.id">
-          <span class="| button button-primary button-bordered button-full">View</span>
+          <span class="| button button-primary button-bordered button-full"
+            >View</span
+          >
         </MoleculesListingCardNewView>
       </div>
     </template>
 
+    <!-- Premium Additional Content (Desktop Only) -->
     <template #premium-content>
       <div class="premium-additional-content">
         <div class="premium-features-wrapper">
           <div class="premium-features-list | body-sm">
-            <div v-for="feature in premiumFeatures" :key="feature.label" class="premium-feature-check">
+            <div
+              v-for="feature in premiumFeatures"
+              :key="feature.label"
+              class="premium-feature-check"
+            >
               <span class="premium-check-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z" />
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z"
+                  />
                 </svg>
               </span>
               <span>{{ feature.label }}</span>
             </div>
-            <div v-if="premiumFeatures.length === 0" class="premium-feature-check">
+            <div
+              v-if="premiumFeatures.length === 0"
+              class="premium-feature-check"
+            >
               <span>No premium features available</span>
             </div>
           </div>
         </div>
         <!-- Enquire button using individual component -->
         <div class="premium-single-action">
-          <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id">
+          <MoleculesListingCardNewEnquire
+            :listing-id="listing.id"
+            :user-id="listing.user.id"
+          >
             <template #default="{ disabled, enquiryLabel }">
-              <button class="| button button-primary button-full body-sm" :disabled="disabled">{{ enquiryLabel
-                }}</button>
+              <button
+                class="| button button-primary button-full body-sm"
+                :disabled="disabled"
+              >
+                {{ enquiryLabel }}
+              </button>
             </template>
           </MoleculesListingCardNewEnquire>
         </div>
       </div>
     </template>
 
-
+    <!-- Mobile Additional Features -->
     <template #mobile-content>
       <!-- Collapsible additional features for mobile -->
       <div class="premium-mobile-features">
         <div class="premium-features-list | body-sm">
-          <div v-for="feature in premiumFeaturesMobile" :key="feature.label" class="premium-feature-check">
+          <div
+            v-for="feature in premiumFeaturesMobile"
+            :key="feature.label"
+            class="premium-feature-check"
+          >
             <span class="premium-check-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z" />
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z"
+                />
               </svg>
             </span>
             <span>{{ feature.label }}</span>
           </div>
-          <div v-if="premiumFeaturesMobile.length === 0" class="premium-feature-check">
+          <div
+            v-if="premiumFeaturesMobile.length === 0"
+            class="premium-feature-check"
+          >
             <span>No premium features available</span>
           </div>
         </div>
       </div>
     </template>
 
+    <!-- Mobile Action Buttons -->
     <template #mobile-actions>
       <!-- Enquiry button for mobile -->
       <div class="premium-mobile-actions">
         <MoleculesListingCardNewView :listing-id="listing.id">
           <span class="| button button-primary button-full body-sm">View</span>
         </MoleculesListingCardNewView>
-        <MoleculesListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id">
+        <MoleculesListingCardNewEnquire
+          :listing-id="listing.id"
+          :user-id="listing.user.id"
+        >
           <template #default="{ disabled, enquiryLabel }">
-            <button class="| button button-primary button-full body-sm" :disabled="disabled">{{ enquiryLabel }}</button>
+            <button
+              class="| button button-primary button-full body-sm"
+              :disabled="disabled"
+            >
+              {{ enquiryLabel }}
+            </button>
           </template>
         </MoleculesListingCardNewEnquire>
       </div>
@@ -184,58 +286,62 @@ interface Props {
   listing: ListingCardData;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const priceType = computed(() => {
-  return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
+  return (
+    props.listing?.rentalListing?.rentFrequency ??
+    props.listing?.saleListing?.priceType
+  );
 });
 
 // Description collapsible functionality
-const isDescriptionCollapsed = ref(true)
-const shouldShowToggle = ref(false)
+const isDescriptionCollapsed = ref(true);
+const shouldShowToggle = ref(false);
 
 const toggleDescription = () => {
-  isDescriptionCollapsed.value = !isDescriptionCollapsed.value
-}
+  isDescriptionCollapsed.value = !isDescriptionCollapsed.value;
+};
 
 // Check if toggle should be shown based on description length
 onMounted(() => {
   if (props.listing.description && props.listing.description.length > 100) {
-    shouldShowToggle.value = true
+    shouldShowToggle.value = true;
   }
-})
+});
 
 // Use all images for carousel
 const images = computed(() => {
-  const allImages = props.listing.property?.media?.map((m: any) => m.image) ?? []
-  
+  const allImages =
+    props.listing.property?.media?.map((m: any) => m.image) ?? [];
+
   // If we have no images, return empty array
   if (allImages.length === 0) {
-    return []
+    return [];
   }
-  
+
   // Just return the actual images - no fake ones
-  return allImages
-})
+  return allImages;
+});
 
 // Function to get 4 rotating side images based on the selected index
 const getRotatedImages = (allImages: string[], selectedIndex: number) => {
-  const sideImages = []
+  const sideImages = [];
 
   // Always show exactly 4 side images, cycling through all available images
   for (let i = 0; i < 4; i++) {
-    const imageIndex = (selectedIndex + i) % allImages.length
+    const imageIndex = (selectedIndex + i) % allImages.length;
     sideImages.push({
       src: allImages[imageIndex],
       originalIndex: imageIndex,
-      isActive: imageIndex === selectedIndex
-    })
+      isActive: imageIndex === selectedIndex,
+    });
   }
 
-  return sideImages
-}
+  return sideImages;
+};
 
-import { getPremiumFeatures } from '~/utils/results/premium-features';
+import { getPremiumFeatures } from "~/utils/results/premium-features";
 
 const premiumFeatures = computed(() => getPremiumFeatures(props.listing, 16));
 const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
@@ -243,7 +349,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 
 <style lang="scss">
 // Premium card styling using data attribute selector
-.m-listing-card[data-tier='PREMIUM'] {
+.m-listing-card[data-tier="PREMIUM"] {
   // Full width premium
   grid-column: span 2;
   width: 100%;
@@ -267,8 +373,23 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   .m-listing-card-image-container {
     flex: 1;
     aspect-ratio: unset;
-    border-top-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
-    border-bottom-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+    border-top-left-radius: calc(
+      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+    );
+    border-bottom-left-radius: calc(
+      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+    );
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .m-listing-card-image {
+    border-top-left-radius: calc(
+      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+    );
+    border-bottom-left-radius: calc(
+      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+    );
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -327,7 +448,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     right: var(--size-16);
     z-index: 10;
     background-color: var(--primary-400);
-    color: black;
+    color: var(--monochrome-100);
     opacity: 1;
 
     @media (max-width: 768px) {
@@ -344,33 +465,20 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   // Image controls styling
   .m-listing-card-arrow-button {
     background-color: var(--primary-400);
-    color: black;
+    color: var(--monochrome-100);
 
     svg {
-      color: black;
+      color: var(--monochrome-100);
     }
   }
 
   .m-listing-card-image-counter {
     background-color: var(--primary-400);
-    color: black;
+    color: var(--monochrome-100);
   }
 
   .m-listing-card-image-actions {
     background-color: var(--primary-400);
-
-    .a-favourite-button {
-      background-color: var(--primary-400);
-    }
-
-    .note-button {
-      background-color: var(--primary-400);
-      color: black;
-
-      svg {
-        color: black;
-      }
-    }
   }
 
   @media (max-width: 768px) {
@@ -424,11 +532,15 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   transition: all 0.3s ease-in-out;
 
   &:first-child {
-    border-top-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+    border-top-right-radius: calc(
+      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+    );
   }
 
   &:last-child {
-    border-bottom-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+    border-bottom-right-radius: calc(
+      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+    );
   }
 
   &:hover {
@@ -467,18 +579,18 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 
   // Title section (property type and address)
   &-title {
-    margin-bottom: var(--size-16);
-
     &-main {
       @extend %text-truncate;
       color: var(--primary-400);
-
     }
 
     &-location {
       @extend %text-truncate;
       color: var(--primary-300);
-      margin-bottom: var(--size-8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 95%;
     }
   }
 
@@ -487,7 +599,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     display: flex;
     gap: var(--size-12);
     list-style: none;
-    margin-bottom: var(--size-16);
     padding: 0;
   }
 
@@ -496,15 +607,11 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     display: flex;
     font-weight: var(--font-semibold);
     gap: var(--size-4);
-    color: var(--primary-400);
+    color: var(--monochrome-900);
 
     &-icon {
-      font-size: var(--font-2xl);
-      color: white;
-    }
-
-    &-count {
-      color: white;
+      font-size: var(--font-3xl);
+      color: var(--monochrome-900);
     }
   }
 
@@ -514,7 +621,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     flex-wrap: wrap;
     gap: var(--size-8);
     list-style: none;
-    margin-bottom: var(--size-16);
     padding: 0;
   }
 
@@ -528,26 +634,25 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 
   // Description section
   &-description {
-    margin-bottom: var(--size-16);
     color: white;
-    
+
     &-content {
       transition: max-height 0.3s ease-in-out;
       overflow: hidden;
-      
+
       &.collapsed {
         max-height: 3em;
-        
+
         @media (min-width: 769px) {
           max-height: none;
         }
       }
-      
+
       &:not(.collapsed) {
         max-height: 20em;
       }
     }
-    
+
     &-toggle {
       background: none;
       border: none;
@@ -556,12 +661,12 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       cursor: pointer;
       padding: 0;
       margin-top: var(--size-4);
-      
+
       @media (min-width: 769px) {
         display: none;
       }
     }
-    
+
     p {
       margin: 0;
       line-height: 1.5;
@@ -581,7 +686,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       align-items: center;
       background-color: var(--primary-400);
       border-radius: 50%;
-      color: black;
+      color: var(--monochrome-100);
       display: flex;
       font-size: var(--font-2xl);
       height: var(--size-32);
@@ -648,7 +753,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 
   &-mobile-features {
     display: none;
-    padding-bottom: var(--size-16);
     background: var(--blue-400);
     color: var(--primary-400);
 
@@ -660,9 +764,8 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   // Single action button styling
   &-single-action {
     width: 100%;
-    margin-top: var(--size-16);
 
-    @media(max-width: 768px) {
+    @media (max-width: 768px) {
       display: none;
     }
 
@@ -694,10 +797,9 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       }
     }
   }
-  
+
   &-mobile-actions {
-    @media(max-width: 768px) {
-      
+    @media (max-width: 768px) {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--size-8);
@@ -713,18 +815,18 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 }
 
 @media (max-width: 1200px) {
-  .m-listing-card[data-tier='PREMIUM'] {
+  .m-listing-card[data-tier="PREMIUM"] {
     .m-listing-card-image-wrapper {
       // Take full width on tablet
       width: 100%;
     }
-    
+
     .m-listing-card-image-container {
       // Main image takes 50% of container
       width: 50%;
       aspect-ratio: 4/3 !important;
     }
-    
+
     .premium-side-images {
       // Side images container takes 50% of container
       width: 50%;
@@ -734,21 +836,23 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       gap: var(--size-8);
       height: 100%;
     }
-    
+
     .premium-side-image {
       // Each side image is square
       width: 100%;
       height: 100%;
       aspect-ratio: 1;
       object-fit: cover;
-      
+
       &:first-child {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
       }
 
       &:nth-child(2) {
-        border-top-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+        border-top-right-radius: calc(
+          var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+        );
       }
 
       &:nth-child(3) {
@@ -756,7 +860,9 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       }
 
       &:last-child {
-        border-bottom-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+        border-bottom-right-radius: calc(
+          var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+        );
         border-bottom-left-radius: 0;
       }
     }
@@ -764,24 +870,27 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 }
 
 @media (max-width: 768px) {
-  .m-listing-card[data-tier='PREMIUM'] {
-    
+  .m-listing-card[data-tier="PREMIUM"] {
     .m-listing-card-image-wrapper {
       // Stack images vertically on mobile
       flex-direction: column;
       width: 100%;
     }
-    
+
     .m-listing-card-image-container {
       // Main image takes full width on mobile
       width: 100%;
       aspect-ratio: 4/3;
-      border-top-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
-      border-top-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+      border-top-left-radius: calc(
+        var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+      );
+      border-top-right-radius: calc(
+        var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+      );
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
     }
-    
+
     .premium-side-images {
       // Side images underneath, full width
       width: 100%;
@@ -791,27 +900,31 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       grid-template-rows: 1fr;
       gap: var(--size-8);
     }
-    
+
     .premium-side-image {
       // Each side image in a row
       width: 100%;
       height: auto;
       aspect-ratio: 1;
       object-fit: cover;
-      
+
       // Reset all border radius for mobile
       border-radius: 0;
-      
+
       &:first-child {
-        border-bottom-left-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+        border-bottom-left-radius: calc(
+          var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+        );
       }
-      
+
       &:nth-child(2) {
         border-top-right-radius: 0;
       }
-      
+
       &:last-child {
-        border-bottom-right-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8));
+        border-bottom-right-radius: calc(
+          var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+        );
       }
     }
   }

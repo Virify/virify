@@ -26,7 +26,6 @@ const props = defineProps<{
 
 <style lang="scss">
 .m-listing-card-location {
-  margin-bottom: var(--size-8);
 }
 
 .m-listing-card-no-wrap {

@@ -11,19 +11,15 @@
           {{ selectedIndex + 1 }}/{{ images.length }}
         </div>
         <div class="m-listing-card-image-actions">
-          <AtomsFavouriteButton 
-            :listing-id="listingId" 
-            :confirm-removal="false"
-            icon-class="icon-heart"
-          />
+          <AtomsFavouriteButton :listing-id="listingId" :confirm-removal="false" icon-class="icon-heart" />
           <AtomsNoteButton :listing-id="listingId" />
         </div>
-        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--left" @click="scrollPrev" 
-                aria-label="Previous image" title="Previous image">
+        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--left"
+          @click="scrollPrev" aria-label="Previous image" title="Previous image">
           <AtomsIcon name="chevron-left" icon="chevron-left" aria-hidden="true" />
         </button>
-        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--right" @click="scrollNext" 
-                aria-label="Next image" title="Next image">
+        <button v-if="images.length > 1" class="m-listing-card-arrow-button m-listing-card-arrow-button--right"
+          @click="scrollNext" aria-label="Next image" title="Next image">
           <AtomsIcon name="chevron-right" icon="chevron-right" aria-hidden="true" />
         </button>
       </div>
@@ -33,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import emblaCarouselVue from 'embla-carousel-vue'
+import emblaCarouselVue from "embla-carousel-vue";
 
 const props = defineProps({
   images: {
@@ -43,36 +39,35 @@ const props = defineProps({
   listingId: {
     type: Number,
     required: true,
-  }
-})
+  },
+});
 
-
-const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: 0 })
-const selectedIndex = ref(0)
+const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: 0 });
+const selectedIndex = ref(0);
 
 const scrollPrev = () => {
-  emblaApi.value?.scrollPrev()
-}
+  emblaApi.value?.scrollPrev();
+};
 
 const scrollNext = () => {
-  emblaApi.value?.scrollNext()
-}
+  emblaApi.value?.scrollNext();
+};
 
 const goToSlide = (index: number) => {
-  emblaApi.value?.scrollTo(index)
-}
+  emblaApi.value?.scrollTo(index);
+};
 
 const onSelect = () => {
-  if (!emblaApi.value) return
-  selectedIndex.value = emblaApi.value.selectedScrollSnap()
-}
+  if (!emblaApi.value) return;
+  selectedIndex.value = emblaApi.value.selectedScrollSnap();
+};
 
 onMounted(() => {
   if (emblaApi.value) {
-    emblaApi.value.on('select', onSelect)
-    onSelect()
+    emblaApi.value.on("select", onSelect);
+    onSelect();
   }
-})
+});
 </script>
 
 <style lang="scss">
@@ -112,6 +107,7 @@ onMounted(() => {
   height: 100%;
   object-fit: cover;
   width: 100%;
+  border-radius: calc(var(--border-radius-2xl) + var(--size-2));
 }
 
 .m-listing-card-image-overlay {
@@ -196,7 +192,6 @@ onMounted(() => {
   align-items: center;
   background-color: transparent;
   border: none;
-  color: var(--monochrome-100);
   cursor: pointer;
   display: flex;
   font-size: var(--font-xl);
