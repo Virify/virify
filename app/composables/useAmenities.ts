@@ -1,3 +1,18 @@
+import { useStorage } from '@vueuse/core'
+  // Collapsed state for amenities categories (persisted)
+  const collapsedCategories = useStorage<Record<string, boolean>>('amenities-collapsed', {
+    schools: false,
+    hospitals: false,
+    train_stations: false
+  })
+
+  function isCategoryCollapsed(category: string) {
+    return !!collapsedCategories.value[category]
+  }
+
+  function setCategoryCollapsed(category: string, collapsed: boolean) {
+    collapsedCategories.value[category] = collapsed
+  }
 export function useAmenities() {
   const { findNearbyAmenities } = useMapSearch()
 
@@ -150,6 +165,8 @@ export function useAmenities() {
     error: readonly(error),
     fetchAmenities,
     formatDistance,
-    resetAmenities
+    resetAmenities,
+    isCategoryCollapsed,
+    setCategoryCollapsed
   }
 }
