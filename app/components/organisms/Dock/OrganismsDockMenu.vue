@@ -160,13 +160,7 @@ function updateLayout() {
       &:is(select)::picker(select) {
         @include mq.tablet {
           bottom: var(--size-24);
-          box-shadow: var(--elevate-200);
-          padding: var(--size-10);
         }
-      }
-
-      &:is(select) option {
-        padding: var(--size-10) var(--size-16);
       }
     }
   }

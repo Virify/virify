@@ -73,9 +73,10 @@ const selected = defineModel({
       gap: var(--size-4);
       background: var(--background-200);
       border-radius: var(--border-radius-2xl);
-      top: var(--size-4);
-      bottom: var(--size-4);
-      padding: var(--size-8);
+      top: var(--size-8);
+      bottom: var(--size-8);
+      box-shadow: var(--elevate-200);
+      padding: var(--size-10);
       margin: 0;
       scrollbar-width: thin;
       scrollbar-color: fn.faded-color(25%) transparent;
@@ -91,7 +92,7 @@ const selected = defineModel({
 
     /* Option styling */
     & option {
-      padding: var(--size-8) var(--size-16);
+      padding: var(--size-10) var(--size-16);
       border-radius: var(--border-radius-xl);
       flex-shrink: 0;
       cursor: pointer;
