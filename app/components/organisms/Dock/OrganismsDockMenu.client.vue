@@ -114,9 +114,13 @@ function updateLayout(newValue: string) {
   }
 
   &__fix-height {
-    height: var(--size-40);
+    height: var(--size-48);
     padding-top: 0;
     padding-bottom: 0;
+
+    @include mq.tablet {
+      height: var(--size-40);
+    }
   }
 }
 </style>

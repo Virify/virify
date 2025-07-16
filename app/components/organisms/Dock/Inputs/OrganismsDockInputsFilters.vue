@@ -52,12 +52,17 @@ defineProps<Props>()
   border-radius: var(--border-radius-2xl);
   padding: var(--size-6);
   padding-left: var(--size-12);
+  padding-right: var(--size-10);
   line-height: var(--size-24);
   font-size: var(--font-md);
   font-weight: var(--font-semibold);
   white-space: nowrap;
   flex: 1 0 auto;
   width: 100%;
+
+  @include mq.tablet {
+    padding-right: var(--size-6);
+  }
 
   .a-icon {
     flex: 0 0 auto;
