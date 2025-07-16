@@ -7,10 +7,10 @@
     </li>
 
     <li class="o-dock-menu__item">
-      <label :for="sortOrderId" class="o-dock-menu__mobile-label | faded-text body-2xs">Sort by</label>
+      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Sort by</span>
 
-      <AtomsSelect class="o-dock-menu__input o-dock-menu__input-height" :id="sortOrderId"
-        :options="selectOptionSortOrder" @change="updateSortOrder" />
+      <OrganismsDockInputsSort class="o-dock-menu__input-height" :model-value="state.sortOrder"
+        @update:model-value="updateSortOrder" />
     </li>
 
     <li class="o-dock-menu__item">
@@ -55,11 +55,6 @@ interface Props {
 defineProps<Props>()
 
 /**
- *  a11y
- */
-const sortOrderId = useId()
-
-/**
  *  Open popover
  */
 const emits = defineEmits<PopoverEmits>()
@@ -75,12 +70,10 @@ function showFiltersDialog() {
 /**
  *  Update sort order
  */
-const { setState } = useUniversalSearch()
+const { state, setState } = useUniversalSearch()
 
-function updateSortOrder({ target }: Event) {
-  const { value } = asObject(target)
-
-  setState('sortOrder', value)
+function updateSortOrder(newValue: SortOrder) {
+  setState('sortOrder', newValue)
 
   console.log('Re-order the results...')
 }
@@ -153,14 +146,6 @@ function updateLayout() {
       &--active {
         background-color: var(--secondary-400);
         color: var(--monochrome-900);
-      }
-    }
-
-    @supports (appearance: base-select) {
-      &:is(select)::picker(select) {
-        @include mq.tablet {
-          bottom: var(--size-24);
-        }
       }
     }
   }
