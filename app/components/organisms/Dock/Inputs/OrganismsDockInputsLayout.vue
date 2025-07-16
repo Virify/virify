@@ -6,7 +6,7 @@
 
     <label ref="$labels" v-for="{ key, value, icon } of options" :key
       class="o-dock-inputs-layout__label | font-semibold">
-      <input type="radio" class="| visually-hidden" :value="key" v-model="selected" name="results-layout"
+      <input type="radio" class="| visually-hidden" :value="key" v-model="state.layout" name="results-layout"
         :aria-label="value" />
 
       <AtomsIcon :icon />
@@ -46,24 +46,10 @@ const options = computed(() => {
 })
 
 /**
- *  Events
- */
-const emits = defineEmits(['layout-updated'])
-
-/**
  *  Track current value
  */
-const selected = defineModel({
-  default: 'grid'
-})
-
-const { setLayout } = useUniversalSearch()
-
-watchImmediate(selected, (newValue) => {
-  setLayout(newValue as ResultLayout, () => {
-    emits('layout-updated')
-  })
-})
+const { state, setLayout } = useUniversalSearch()
+const { layout } = toRefs(state.value)
 
 /**
  *  Loading state
@@ -77,7 +63,9 @@ const $labels = useTemplateRef('$labels')
 const $highlight = useTemplateRef('$highlight')
 const $wrapper = useTemplateRef('$wrapper')
 
-function updateHighlightPosition() {
+async function updateHighlightPosition() {
+  await nextTick()
+
   // Search for active label
   const activeLabel = unref($labels)?.find(label => {
     return label.querySelector('input:checked')
@@ -103,17 +91,25 @@ function updateHighlightPosition() {
 onMounted(() => {
   isMounted.value = true
 
-  watchImmediate(selected, updateHighlightPosition)
+  watchImmediate(layout, updateHighlightPosition)
   useResizeObserver($wrapper, updateHighlightPosition)
+})
 
-  // Change split view to non-split-view if unavailable
-  watch(options, (newValue) => {
-    if (newValue.length !== 2 || selected.value !== 'split') {
-      return
-    }
+/**
+ *  Track user, breakpoint changes
+ */
+const emits = defineEmits(['changed'])
 
-    selected.value = 'grid'
-  })
+watch(layout, (newValue) => {
+  emits('changed', newValue)
+})
+
+watch(options, (newValue) => {
+  if (newValue.length !== 2 || layout.value !== 'split') {
+    return
+  }
+
+  setLayout('grid')
 })
 
 </script>

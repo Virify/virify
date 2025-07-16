@@ -3,7 +3,7 @@
     <li class="o-dock-menu__item">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Results layout</span>
 
-      <OrganismsDockInputsLayout class="o-dock-menu__input-height" @layout-updated="updateLayout" />
+      <OrganismsDockInputsLayout class="o-dock-menu__input-height" @changed="updateLayout" />
     </li>
 
     <li class="o-dock-menu__item">
@@ -69,15 +69,15 @@ function showFiltersDialog() {
 /**
  *  Update sort order
  */
-function updateSortOrder() {
-  console.log('Re-order the results...')
+function updateSortOrder(newValue: string) {
+  console.log('Re-order the results...', newValue)
 }
 
 /**
  *  Update layout
  */
-function updateLayout() {
-  console.log('Update the page layout...')
+function updateLayout(newValue: string) {
+  console.log('Update the page layout...', newValue)
 }
 
 </script>
