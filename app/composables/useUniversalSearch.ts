@@ -43,10 +43,11 @@ export function useUniversalSearch() {
    */
   function setAiFilters(value: unknown[], callback?: () => void) {
     // Check value is valid
-    if (!Array.isArray(value)) return
+    if (value && !Array.isArray(value)) return
 
     // Update state
-    state.value.filters.ai = value
+    state.value.filters.type = 'ai'
+    state.value.filters.options = value ?? []
 
     // Run optional callback
     _runCallback(callback)
