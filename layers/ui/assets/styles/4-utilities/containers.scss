@@ -81,10 +81,9 @@
  *  Elevations
  */
 .elevate-200 {
-  box-shadow: 0 10px 30px -10px fn.faded-color(8%, black);
+  box-shadow: var(--elevate-200);
 }
 
 .elevate-300 {
-  box-shadow:
-    0 10px 20px -10px fn.faded-color(8%, black), 0 10px 40px -20px fn.faded-color(33%, black);
+  box-shadow: var(--elevate-300);
 }
