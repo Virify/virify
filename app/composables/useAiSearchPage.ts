@@ -35,6 +35,27 @@ export const useAiSearchPage = () => {
         lastLocation.value = restored.location;
         lastRadius.value = restored.radius;
         currentSort.value = restored.sortBy;
+        hasSearched.value = true;
+        
+        // Restore global search query and analysis for useAi composable
+        searchQuery.value = restored.query;
+        globalQueryAnalysis.value = restored.queryAnalysis;
+        
+        // Restore results and pagination if available
+        if (restored.results) {
+          searchResults.value = restored.results;
+          queryAnalysis.value = restored.queryAnalysis;
+          currentPage.value = restored.currentPage || 1;
+          totalPages.value = restored.totalPages || 0;
+          totalResults.value = restored.totalResults;
+          lastWhereClause.value = restored.whereClause;
+          lastLocationContext.value = restored.locationContext;
+        }
+        
+        // Keep form collapsed when we have search results
+        if (restored.results && restored.results.length > 0) {
+          isSearchFormCollapsed.value = true;
+        }
       }
     }
   };
@@ -68,14 +89,21 @@ export const useAiSearchPage = () => {
     saveSearchState({ viewMode: currentViewMode });
   };
 
-  // Save current form state
+  // Save current form state and results
   const saveCurrentState = () => {
     saveSearchState({
       query: lastSearchQuery.value,
       location: lastLocation.value,
       radius: lastRadius.value,
       sortBy: currentSort.value,
-      hasSearched: true
+      hasSearched: true,
+      results: searchResults.value,
+      queryAnalysis: queryAnalysis.value,
+      currentPage: currentPage.value,
+      totalPages: totalPages.value,
+      totalResults: totalResults.value,
+      whereClause: lastWhereClause.value,
+      locationContext: lastLocationContext.value
     });
   };
 

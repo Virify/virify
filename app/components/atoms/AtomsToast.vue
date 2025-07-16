@@ -1,24 +1,23 @@
 <template>
-  <div
-    class="toast"
-    :class="[
-      `toast-${type}`,
-      { 'toast-visible': visible }
-    ]"
-  >
+  <div class="toast" :class="[
+    `toast-${type}`,
+    { 'toast-visible': visible }
+  ]">
     <div class="toast-content">
       <div class="toast-icon" v-if="showIcon">
         <svg v-if="type === 'success'" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z"/>
+          <path
+            d="M13.485 2.929a1 1 0 0 1 0 1.414l-7 7a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6 9.443l6.071-6.07a1 1 0 0 1 1.414 0z" />
         </svg>
         <svg v-else-if="type === 'error'" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          <path
+            d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
         </svg>
         <svg v-else-if="type === 'info'" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm1 12H7V7h2v5zM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+          <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm1 12H7V7h2v5zM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
         </svg>
       </div>
-      <div class="toast-message">
+      <div class="toast-message | body-sm">
         {{ message }}
       </div>
     </div>
@@ -50,15 +49,15 @@ withDefaults(defineProps<Props>(), {
   padding: var(--size-16);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateX(calc(100% + var(--size-20)));
-  transition: transform var(--animation-normal) ease-out;
+  transform: translateX(calc(100% + var(--size-20))) scale(0.8);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   z-index: 9999;
-  font-size: var(--font-sm);
-  font-weight: var(--font-medium);
 }
 
 .toast-visible {
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
+  opacity: 1;
 }
 
 .toast-content {
@@ -74,6 +73,24 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: toast-icon-bounce 0.6s ease-out 0.2s both;
+}
+
+@keyframes toast-icon-bounce {
+  0% {
+    transform: scale(0) rotate(-360deg);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.2) rotate(-180deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 .toast-message {
@@ -83,9 +100,9 @@ withDefaults(defineProps<Props>(), {
 
 /* Toast variants using brand colors */
 .toast-success {
-  background: var(--primary-400);
-  color: var(--monochrome-100);
-  border: 1px solid var(--primary-400);
+  background: var(--background-100);
+  color: var(--foreground-100);
+  border: 1px solid var(--foreground-100);
 }
 
 .toast-error {
@@ -95,9 +112,9 @@ withDefaults(defineProps<Props>(), {
 }
 
 .toast-info {
-  background: var(--secondary-400);
-  color: var(--monochrome-100);
-  border: 1px solid var(--secondary-300);
+  background: var(--background-100);
+  color: var(--foreground-100);
+  border: 1px solid var(--foreground-100);
 }
 
 /* Responsive */
@@ -107,11 +124,13 @@ withDefaults(defineProps<Props>(), {
     left: var(--size-12);
     min-width: auto;
     max-width: none;
-    transform: translateY(-100vh);
+    transform: translateX(calc(100% + var(--size-12))) scale(0.8);
+    opacity: 0;
   }
-  
+
   .toast-visible {
-    transform: translateY(0);
+    transform: translateX(0) scale(1);
+    opacity: 1;
   }
 }
 </style>

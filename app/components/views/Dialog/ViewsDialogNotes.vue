@@ -1,13 +1,13 @@
 <template>
   <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">{{ title }}</h1>
-    <p class="| body-sm">Write your notes about this property below</p>
+    <p class="| body-sm">{{ content }}</p>
 
     <div class="| flow flow-md">
       <textarea v-model="notes" class="| body-sm" rows="4" placeholder="Enter your notes here..."></textarea>
 
       <div class="| flex justify-between">
-        <button v-if="hasExistingNote" class="| button button-ghost button-sm" @click="handleDeleteNote"
+        <button v-if="hasExistingNote" class="| button button-delete button-sm" @click="handleDeleteNote"
           :disabled="isPending">
           {{ isPending ? 'Deleting...' : 'Delete note' }}
         </button>
@@ -15,8 +15,8 @@
           <button class="| button button-ghost button-sm" @click="() => hideDialog()" :disabled="isPending">
             Cancel
           </button>
-          <button class="| button button-primary button-sm" @click="saveNotes" :disabled="isPending || !notes.trim()">
-            {{ isPending ? 'Saving...' : 'Save notes' }}
+          <button class="| button button-secondary button-sm" @click="saveNotes" :disabled="isPending || !notes.trim()">
+            {{ isPending ? 'Saving...' : hasExistingNote ? 'Update note' : 'Create notes' }}
           </button>
         </div>
       </div>
@@ -42,7 +42,8 @@ const hasExistingNote = computed(() => hasNote(props.listingId))
 /**
  * Dynamic title based on whether we're editing or creating a note
  */
-const title = computed(() => hasExistingNote.value ? 'Edit notes' : 'Add notes')
+const title = computed(() => hasExistingNote.value ? 'Note' : 'Add notes')
+const content = computed(() => hasExistingNote.value ? 'View your note on this listing or update it below' : 'Add a new note for this listing.');
 
 /**
  * Load existing note when the component is mounted
@@ -62,7 +63,6 @@ async function saveNotes() {
 
   await setPendingWhile(async () => {
     await updateNote(props.listingId, notes.value.trim())
-
     hideDialog()
   })
 }
@@ -73,7 +73,6 @@ async function saveNotes() {
 async function handleDeleteNote() {
   await setPendingWhile(async () => {
     await deleteNote(props.listingId)
-
     hideDialog()
   })
 }
@@ -90,7 +89,7 @@ textarea {
 
   &:focus {
     outline: none;
-    border-color: var(--primary-500);
+    border-color: var(--secondary-400);
   }
 }
 </style>

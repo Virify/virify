@@ -1,18 +1,14 @@
 <template>
-  <div class="m-listing-card-actions">
-    <nuxt-link :to="`/listing/${listingId}`" target="_blank" class="| button button-secondary body-sm">
-      View
-    </nuxt-link>
-    <button class="| button button-ghost body-sm" :disabled="isEnquiryDisabled" @click="onEnquire">
-      {{ enquiryLabel }}
-    </button>
+  <div @click="handleEnquire">
+    <slot :disabled="isEnquiryDisabled" :enquiry-label="enquiryLabel">
+      <button class="| button button-ghost button-full body-sm" :disabled="isEnquiryDisabled">{{ enquiryLabel }}</button>
+    </slot>
   </div>
 </template>
 
 <script setup lang="ts">
 import ViewsDialogEnquiry from '~/components/views/Dialog/ViewsDialogEnquiry.vue';
 import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
-import { useEnquiry } from '~/composables/useEnquiry';
 
 interface Props {
   listingId: number;
@@ -42,7 +38,9 @@ const enquiryLabel = computed(() =>
       : 'Enquire'
 );
 
-function onEnquire() {
+function handleEnquire() {
+  if (isEnquiryDisabled.value) return;
+  
   if (!user.value || !user.value.id) {
     showDialog({
       component: ViewsDialogLogin,
@@ -57,18 +55,11 @@ function onEnquire() {
   }
 }
 </script>
-<style lang="scss">
-.m-listing-card-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--size-8);
+<style scoped lang="scss">
+.button {
   width: 100%;
-
-  .button {
-    width: 100%;
-    padding: var(--size-8);
-    border-radius: var(--border-radius-lg);
-    border-color: var(--secondary-400);
-  }
+  padding: var(--size-8);
+  border-radius: var(--border-radius-lg);
+  box-sizing: border-box;
 }
 </style>

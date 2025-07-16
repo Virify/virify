@@ -19,8 +19,9 @@
           <span class="| gradient-text gradient-text-ai">AI</span>
           do the rest
         </h1>
-        <button v-if="hasSearched" @click="isCollapsed = true" type="button" class="close-button | button button-quiet">
-          <AtomsIcon icon="cross" title="Close" />
+        <button v-if="hasSearched" @click="isCollapsed = true" type="button" class="close-button | button button-quiet" 
+                aria-label="Close search form" title="Close search form">
+          <AtomsIcon icon="cross" aria-hidden="true" />
         </button>
       </div>
 
@@ -30,47 +31,52 @@
           <legend class="| visually-hidden">Location</legend>
 
           <input type="text" class="location-input | body-md" placeholder="Where do you want to live?"
-            aria-label="Location" v-model="locationQuery" @input="showPopover" @focus="showPopover"
+            aria-label="Enter location to search" v-model="locationQuery" @input="showPopover" @focus="showPopover"
             @keydown.enter="handleLocationEnter" />
 
-          <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+          <AtomsSelect name="radius" id="radius" aria-label="Search radius from location"
             class="location-radius location-radius--desktop | body-md" v-model="selectedRadius"
             :options="selectOptionRadius" />
         </fieldset>
 
-        <Transition name="location-popover">
-          <div role="presentation" v-show="popoverExpanded">
-            <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
-          </div>
-        </Transition>
+        <ClientOnly>
+          <Transition name="location-popover">
+            <div role="presentation" v-show="popoverExpanded">
+              <MoleculesAutocompletePopover :searchValue="locationQuery" @location-selected="handleLocation" />
+            </div>
+          </Transition>
+        </ClientOnly>
       </div>
 
-      <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+      <AtomsSelect name="radius-mobile" id="radius-mobile" aria-label="Search radius from location"
         class="location-radius location-radius--mobile | body-md" v-model="selectedRadius"
         :options="selectOptionRadius" />
 
       <div role="fieldset">
         <legend class="| visually-hidden">The property</legend>
         <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-          :disabled="!isFormValid" @submit="submitSearch" />
+          :disabled="!isFormValid" @submit="submitSearch" aria-label="Describe your ideal property" />
       </div>
 
       <!-- example prompts -->
       <ul class="example-prompts">
         <li v-for="(prompt, index) of examplePrompts" :key="index">
           <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
-            @click.prevent="addPrompt(prompt)" />
+            @click.prevent="addPrompt(prompt)" :aria-label="`Use example: ${prompt}`" :title="`Use example: ${prompt}`" />
         </li>
       </ul>
 
       <!-- View Toggle Button -->
       <AtomsButton v-if="hasSearched" @click="emit('toggle-view')" type="button"
-        class="view-toggle | button button-xs button-secondary button-full button-bordered">
+        class="view-toggle | button button-xs button-secondary button-full button-bordered"
+        :aria-label="`Switch to ${props.isMapView ? 'list' : 'map'} view`"
+        :title="`Switch to ${props.isMapView ? 'list' : 'map'} view`">
         {{ props.isMapView ? 'Show List' : 'Show Map' }}
       </AtomsButton>
 
       <AtomsButton v-if="hasSearched || hasSavedState" @click.prevent="handleReset" type="reset"
-        class="| button button-xs button-delete button-full button-bordered">
+        class="| button button-xs button-delete button-full button-bordered"
+        aria-label="Reset search form" title="Reset search form">
         Reset form
       </AtomsButton>
     </div>
@@ -89,6 +95,7 @@ const props = defineProps<{
   hasSearched: boolean;
   hasSavedState?: boolean;
   isMapView?: boolean;
+  forceCollapsed?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -105,7 +112,14 @@ const { searchQuery, getAnalyzedQuery } = useAi();
 const segments = computed(() => getAnalyzedQuery());
 
 // UI state
-const isCollapsed = ref(props.hasSearched);
+const isCollapsed = ref(props.forceCollapsed ?? props.hasSearched);
+
+// Watch for forceCollapsed prop changes
+watch(() => props.forceCollapsed, (newValue) => {
+  if (newValue !== undefined) {
+    isCollapsed.value = newValue;
+  }
+}, { immediate: true });
 
 const popoverExpanded = ref(false);
 const locationError = ref("");
@@ -235,13 +249,15 @@ const submitSearch = async () => {
 
   // Clear any previous error and submit
   locationError.value = "";
+  
+  // Collapse form immediately before emitting search
+  isCollapsed.value = true;
+  
   emit("submit-search", {
     location: selectedLocation.value,
     radius: selectedRadius.value,
     query: searchQuery.value,
   });
-
-  isCollapsed.value = true;
 };
 
 const handleReset = () => {

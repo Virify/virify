@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- AI Search Hero -->
-    <OrganismsHeroAISearchHero @selectSuggestion="handleSuggestionSelect" />
+    <OrganismsAiSearchHero @selectSuggestion="handleSuggestionSelect" />
 
     <!-- How It Works Section -->
     <div class="ai-how-it-works | flow">

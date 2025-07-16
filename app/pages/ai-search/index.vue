@@ -4,7 +4,7 @@
 
     <!-- Hero Image (shown in initial state, even when form expanded) -->
     <div v-if="!hasSearched" class="hero-section">
-      <img src="/img/ai-search-cover.png" alt="AI Search Cover" class="hero-image" />
+      <img src="/img/ai-search-cover.png" alt="Modern residential properties showcasing AI-powered search" class="hero-image" />
     </div>
 
     <!-- Collapsible Search Header -->
@@ -22,14 +22,14 @@
 
       <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched" :initial-query="lastSearchQuery"
         :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState" :is-map-view="isMapView"
-        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
+        :force-collapsed="hasSearched && (!!searchResults || isSearching)" @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
     <div v-if="shouldShowFeedback && !isMapView" class="search-feedback-wrapper">
       <div class="search-feedback-section | container container-sm">
-      <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
-      <OrganismsAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
+      <MoleculesAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
+      <MoleculesAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
       </div>
     </div>
     <div v-else-if="hasSearched" class="results-container">
@@ -45,7 +45,7 @@
       />
       
       <!-- Map View (shown even with no results) -->
-      <OrganismsAiSearchMapView 
+      <LazyOrganismsAiSearchMapView 
         v-if="isMapView"
         :results="sortedResults"
         :location="lastLocation"
@@ -57,6 +57,8 @@
 </template>
 
 <script setup lang="ts">
+import { applySortToResults } from '~/utils/results/search-sort';
+
 
 interface SearchPayload {
   location: GeocodingFeature;
@@ -152,6 +154,13 @@ const sortedResults = computed(() => {
 onMounted(() => {
   initializeFromSavedState();
   initializeViewState();
+});
+
+// Save state when navigating away
+onBeforeUnmount(() => {
+  if (hasSearched.value && searchResults.value) {
+    saveCurrentState();
+  }
 });
 
 // Handle sort changes

@@ -1,12 +1,20 @@
 <template>
   <div class="container flow flow-2xl">
     <div v-if="listing && property">
+      <!-- Back Link -->
+      <div class="p-listing-back-link">
+        <NuxtLink to="/ai-search" class="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors">
+          <AtomsIcon icon="arrow-left" width="20" height="20" />
+          <span class="body-md">Back to Search</span>
+        </NuxtLink>
+      </div>
+
       <!-- Header -->
       <div class="p-listing-header flex justify-between items-center">
         <h1 class="title-xl p-listing-title">{{ listing.title }}</h1>
         <div class="flex gap-4 p-listing-action-buttons">
-          <AtomsFavouriteButton :property-id="property.id" />
-          <AtomsNoteButton :property-id="property.id" />
+          <AtomsFavouriteButton :listing-id="property.id" />
+          <AtomsNoteButton :listing-id="property.id" />
         </div>
       </div>
 

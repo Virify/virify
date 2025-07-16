@@ -79,28 +79,29 @@ export async function getRecentUserNotes(userId: number) {
  * @returns Success status
  */
 export async function updateUserNote(userId: number, listingId: number, note: string) {
-  await prisma.userNote.upsert({
-    where: {
-      userPreferencesId_listingId: {
-        userPreferencesId: userId,
-        listingId,
-      },
-    },
-    create: {
-      userPreferences: {
-        connectOrCreate: {
-          where: { userId },
-          create: { userId },
+  await prisma.$transaction(async (tx) => {
+    const userPreferences = await tx.userPreferences.upsert({
+      where: { userId },
+      create: { userId },
+      update: {},
+    });
+
+    await tx.userNote.upsert({
+      where: {
+        userPreferencesId_listingId: {
+          userPreferencesId: userPreferences.id,
+          listingId,
         },
       },
-      listing: {
-        connect: { id: listingId },
+      create: {
+        userPreferencesId: userPreferences.id,
+        listingId,
+        note,
       },
-      note,
-    },
-    update: {
-      note,
-    },
+      update: {
+        note,
+      },
+    });
   });
 
   return { success: true };
