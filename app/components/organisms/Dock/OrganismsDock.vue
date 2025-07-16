@@ -133,7 +133,7 @@ onMounted(() => {
     left: 50%;
     transform: translateX(-50%);
     top: auto;
-    bottom: var(--size-12);
+    bottom: var(--size-10);
     max-height: calc(100dvh - var(--size-24));
     padding: var(--size-16);
     padding-top: var(--size-48);
@@ -184,38 +184,38 @@ onMounted(() => {
  *
  */
 @include mq.motion {
-  .o-dock {
+  .o-dock__menu {
     transition-property: opacity, transform;
     transition-duration: var(--animation-fast);
     transition-timing-function: var(--ease-in);
+  }
 
-    &__popover {
-      animation: fadeDockPopover var(--animation-medium) var(--ease-out);
+  .o-dock__popover {
+    animation: fadeDockPopover var(--animation-medium) var(--ease-out);
 
-      /*
+    /*
        *  @TODO
        *  There is a bug in Safari where `:popover-open` is always true,
        *  meaning the popover opacity never gets removed. Temporarily
        *  using explicit `&--open` classname
        */
-      &--open {
-        display: block;
-        animation-delay: var(--animation-fast);
-        animation-fill-mode: backwards;
+    &--open {
+      display: block;
+      animation-delay: var(--animation-fast);
+      animation-fill-mode: backwards;
 
-        @include mq.tablet {
-          animation-delay: 0ms;
-        }
+      @include mq.tablet {
+        animation-delay: 0ms;
       }
+    }
 
-      &--open+.o-dock {
-        opacity: 0;
-        transform: translateX(-50%) translateY(var(--size-8));
+    &--open+.o-dock__menu {
+      opacity: 0;
+      transform: translateY(var(--size-8));
 
-        @include mq.tablet {
-          opacity: unset;
-          transform: translateX(-50%);
-        }
+      @include mq.tablet {
+        opacity: unset;
+        transform: none;
       }
     }
   }
