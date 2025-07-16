@@ -128,7 +128,7 @@ watch(options, (newValue) => {
   padding: 0;
   background: var(--background-300);
   color: var(--foreground-300);
-  border-radius: var(--border-radius-xl);
+  border-radius: var(--border-radius-2xl);
   box-sizing: border-box;
 
   &__label {
@@ -138,7 +138,7 @@ watch(options, (newValue) => {
     gap: var(--size-8);
     padding: var(--size-6) var(--size-16);
     line-height: var(--lineheight-sm);
-    border-radius: var(--border-radius-xl);
+    border-radius: var(--border-radius-2xl);
     flex: 1 0 auto;
     text-align: center;
     font-size: var(--font-sm);
@@ -177,7 +177,7 @@ watch(options, (newValue) => {
     left: 0;
     width: 0;
     background: var(--secondary-400);
-    border-radius: var(--border-radius-xl);
+    border-radius: var(--border-radius-2xl);
     z-index: -1;
     transition-property: width, left;
     transition-duration: var(--animation-medium);
