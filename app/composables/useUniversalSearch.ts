@@ -52,6 +52,20 @@ export function useUniversalSearch() {
   /**
    *  Update state sort order
    */
+  function setLocationRadius(value: number, callback?: () => void) {
+    // Check value is valid
+    if (!Number.isInteger(value)) return
+
+    // Update state
+    state.value.locationRadius = value
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
   function setSortOrder(value: SortOrder, callback?: () => void) {
     const validValues: SortOrder[] = ['date-desc', 'date-asc', 'price-asc', 'price-desc', 'relevance']
 
@@ -85,6 +99,7 @@ export function useUniversalSearch() {
     state,
     setSortOrder,
     setLayout,
+    setLocationRadius,
     setState
   }
 }

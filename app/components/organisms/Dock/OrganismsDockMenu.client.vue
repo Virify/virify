@@ -15,14 +15,10 @@
     <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Location</span>
 
-      <button type="button" :popovertarget="popoverId" class="o-dock-menu__input o-dock-menu__input-height | body-md"
-        :class="{
+      <OrganismsDockInputsLocation type="button" :popovertarget="popoverId"
+        class="o-dock-menu__input o-dock-menu__input-height | body-md" :class="{
           'o-dock-menu__input--active': currentlyOpen === 'location'
-        }" @click.prevent="showLocationDialog">
-        <AtomsIcon icon="search/location" />
-
-        <span class="o-dock-menu__input-text">Location</span>
-      </button>
+        }" @click.prevent="showLocationDialog" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
