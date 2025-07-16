@@ -6,13 +6,13 @@
       <OrganismsDockInputsLayout class="o-dock-menu__input-height" @changed="updateLayout" />
     </li>
 
-    <li class="o-dock-menu__item">
+    <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Sort by</span>
 
       <OrganismsDockInputsSort class="o-dock-menu__input-height" @update:model-value="updateSortOrder" />
     </li>
 
-    <li class="o-dock-menu__item">
+    <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Location</span>
 
       <button type="button" :popovertarget="popoverId" class="o-dock-menu__input o-dock-menu__input-height | body-md"
@@ -25,7 +25,7 @@
       </button>
     </li>
 
-    <li class="o-dock-menu__item">
+    <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Filters</span>
 
       <button type="button" :popovertarget="popoverId" class="o-dock-menu__input o-dock-menu__input-height | body-md"
@@ -103,7 +103,11 @@ function updateLayout(newValue: string) {
     text-align: center;
     justify-content: stretch;
     gap: var(--size-4);
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+
+    &--shrinkable {
+      min-width: 0;
+    }
   }
 
   &__mobile-label {

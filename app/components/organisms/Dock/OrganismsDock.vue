@@ -107,6 +107,10 @@ onMounted(() => {
   @include mq.tablet {
     width: min(100% - var(--size-32), 800px);
   }
+
+  @include mq.desktop {
+    width: min(100% - var(--size-32), 880px);
+  }
 }
 
 .o-dock {
