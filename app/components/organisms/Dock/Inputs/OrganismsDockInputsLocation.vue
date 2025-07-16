@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
 const { state } = useUniversalSearch()
-
 const { location, locationRadius } = toRefs(state.value)
+
 </script>
 
 <style lang="scss">

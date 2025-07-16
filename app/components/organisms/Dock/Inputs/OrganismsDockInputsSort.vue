@@ -1,5 +1,5 @@
 <template>
-  <SelectRoot v-model="state.sortOrder">
+  <SelectRoot v-model="sortOrder">
     <SelectTrigger class="o-dock-inputs-sort__button" v-bind="$attrs">
       <AtomsIcon icon="search/sort" />
       <SelectValue class="o-dock-inputs-sort__button-value | body-sm" placeholder="Select sort order" />
@@ -43,9 +43,10 @@ import {
 } from 'reka-ui'
 
 /**
- *  Sort order
+ *  Sort order state
  */
 const { state } = useUniversalSearch()
+const { sortOrder } = toRefs(state.value)
 
 </script>
 

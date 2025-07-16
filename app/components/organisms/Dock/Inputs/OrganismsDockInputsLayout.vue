@@ -46,7 +46,7 @@ const options = computed(() => {
 })
 
 /**
- *  Track current value
+ *  Layout state
  */
 const { state, setLayout } = useUniversalSearch()
 const { layout } = toRefs(state.value)
