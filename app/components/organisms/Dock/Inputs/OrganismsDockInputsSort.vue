@@ -100,7 +100,7 @@ const sortOrder = ref()
     border-radius: var(--border-radius-2xl);
     box-shadow: var(--elevate-200);
     overflow: hidden;
-    z-index: 9;
+    z-index: 99;
 
     @include mq.motion {
       animation: fadeSortPopover var(--animation-medium) var(--ease-out);
