@@ -15,15 +15,15 @@
     <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Location</span>
 
-      <OrganismsDockInputsLocation :popovertarget="popoverId" :is-expanded="currentlyOpen === 'location'"
-        @click.prevent="showLocationDialog" />
+      <OrganismsDockInputsLocation class="o-dock-menu__fix-height" :popovertarget="popoverId"
+        :is-expanded="currentlyOpen === 'location'" @click.prevent="showLocationDialog" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--fit-content">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Filters</span>
 
-      <OrganismsDockInputsFilters :popovertarget="popoverId" :is-expanded="currentlyOpen === 'filters'"
-        @click.prevent="showFiltersDialog">
+      <OrganismsDockInputsFilters class="o-dock-menu__fix-height" :popovertarget="popoverId"
+        :is-expanded="currentlyOpen === 'filters'" @click.prevent="showFiltersDialog">
       </OrganismsDockInputsFilters>
     </li>
   </ul>
