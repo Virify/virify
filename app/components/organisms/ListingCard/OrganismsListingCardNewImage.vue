@@ -167,7 +167,7 @@ onMounted(() => {
 }
 
 .m-listing-card-image-counter {
-  background-color: var(--secondary-400);
+  background-color: var(--blue-400);
   border-radius: var(--border-radius-xl);
   color: var(--monochrome-900);
   padding: var(--size-4) var(--size-12);
@@ -178,7 +178,7 @@ onMounted(() => {
 }
 
 .m-listing-card-image-actions {
-  background-color: var(--secondary-400);
+  background-color: var(--blue-400);
   border-radius: var(--border-radius-pill);
   display: flex;
   gap: var(--size-4);
@@ -186,6 +186,21 @@ onMounted(() => {
   position: absolute;
   top: var(--size-16);
   right: var(--size-16);
+}
+
+.m-listing-card:not([data-tier="FEATURED"]):not([data-tier="PREMIUM"]) .m-listing-card-image-actions {
+  .a-favourite-button,
+  .note-button {
+    color: white !important;
+  }
+  
+  .a-favourite-button svg {
+    stroke: white !important;
+  }
+  
+  .note-button-icon {
+    color: white !important;
+  }
 }
 
 .m-listing-card-icon-button {
@@ -251,7 +266,7 @@ onMounted(() => {
 
 .m-listing-card-arrow-button {
   align-items: center;
-  background-color: var(--secondary-400);
+  background-color: var(--blue-400);
   border: none;
   border-radius: 50%;
   color: var(--monochrome-900);

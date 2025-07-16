@@ -1,6 +1,6 @@
 <template>
   <div class="m-listing-card-actions" role="group" aria-label="Property actions">
-    <nuxt-link :to="`/listing/${listingId}`" class="| button button-secondary body-sm" 
+    <nuxt-link :to="`/listing/${listingId}`" class="| button button-primary body-sm" 
                aria-label="View property details" title="View property details">
       View
     </nuxt-link>

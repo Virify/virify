@@ -98,7 +98,7 @@ function toggle() {
 }
 
 .a-favourite-button svg {
-  stroke: var(--monochrome-900);
+  stroke: currentColor;
   stroke-width: 1px;
 }
 
@@ -112,7 +112,7 @@ function toggle() {
 }
 
 .a-favourite-button.selected svg {
-  stroke: var(--monochrome-100);
+  stroke: currentColor;
   stroke-width: 1px;
 }
 
