@@ -1,18 +1,25 @@
 <template>
   <ul class="o-dock-menu">
     <li class="o-dock-menu__item">
+      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Results layout</span>
+
+      <OrganismsDockInputsLayout class="o-dock-menu__input-height" @layout-updated="updateLayout" />
+    </li>
+
+    <li class="o-dock-menu__item">
       <label :for="sortOrderId" class="o-dock-menu__mobile-label | faded-text body-2xs">Sort by</label>
 
-      <AtomsSelect class="o-dock-menu__input" :id="sortOrderId" :options="selectOptionSortOrder"
-        @change="updateSortOrder" />
+      <AtomsSelect class="o-dock-menu__input o-dock-menu__input-height" :id="sortOrderId"
+        :options="selectOptionSortOrder" @change="updateSortOrder" />
     </li>
 
     <li class="o-dock-menu__item">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Location</span>
 
-      <button type="button" :popovertarget="popoverId" class="o-dock-menu__input | body-md" :class="{
-        'o-dock-menu__input--active': currentlyOpen === 'location'
-      }" @click.prevent="showLocationDialog">
+      <button type="button" :popovertarget="popoverId" class="o-dock-menu__input o-dock-menu__input-height | body-md"
+        :class="{
+          'o-dock-menu__input--active': currentlyOpen === 'location'
+        }" @click.prevent="showLocationDialog">
         <AtomsIcon icon="search/location" />
 
         <span class="o-dock-menu__input-text">Location</span>
@@ -22,9 +29,10 @@
     <li class="o-dock-menu__item">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Filters</span>
 
-      <button type="button" :popovertarget="popoverId" class="o-dock-menu__input | body-md" :class="{
-        'o-dock-menu__input--active': currentlyOpen === 'filters'
-      }" @click.prevent="showFiltersDialog">
+      <button type="button" :popovertarget="popoverId" class="o-dock-menu__input o-dock-menu__input-height | body-md"
+        :class="{
+          'o-dock-menu__input--active': currentlyOpen === 'filters'
+        }" @click.prevent="showFiltersDialog">
         <AtomsIcon icon="search/filter" />
 
         <span class="o-dock-menu__input-text">AI search</span>
@@ -73,7 +81,17 @@ function updateSortOrder({ target }: Event) {
   const { value } = asObject(target)
 
   setState('sortOrder', value)
+
+  console.log('Re-order the results...')
 }
+
+/**
+ *  Update layout
+ */
+function updateLayout() {
+  console.log('Update the page layout...')
+}
+
 </script>
 
 <style lang="scss">
@@ -114,7 +132,7 @@ function updateSortOrder({ target }: Event) {
     gap: var(--size-10);
     background: var(--background-300);
     border-radius: var(--border-radius-xl);
-    padding: var(--size-10) var(--size-16);
+    padding: var(--size-6) var(--size-16);
     line-height: var(--size-24);
     font-size: var(--font-md);
     font-weight: var(--font-semibold);
@@ -151,6 +169,12 @@ function updateSortOrder({ target }: Event) {
         padding: var(--size-10) var(--size-16);
       }
     }
+  }
+
+  &__input-height {
+    height: var(--size-40);
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   &__input-text {
