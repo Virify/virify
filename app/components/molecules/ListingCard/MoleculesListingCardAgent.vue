@@ -12,7 +12,7 @@ interface Props {
 defineProps<Props>()
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '#styles/_utils/media' as mq;
 
 .m-listing-card-agent {

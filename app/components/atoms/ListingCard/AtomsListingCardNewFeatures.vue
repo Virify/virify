@@ -1,10 +1,13 @@
 <template>
-  <ul class="m-listing-card-features">
-    <li v-for="{ count, icon, iconTitle } of iconList" :key="iconTitle" class="m-listing-card-feature">
-      <AtomsIcon :name="iconTitle" :icon="icon" class="icon" />
-      <p class="| body-sm">{{ count }}</p>
-    </li>
-  </ul>
+  <slot :features="iconList.filter(item => item.count)" :bedrooms="props.bedrooms" :bathrooms="props.bathrooms" :receptions="props.receptions">
+    <ul class="m-listing-card-features" aria-label="Property features">
+      <li v-for="{ count, icon, iconTitle } of iconList.filter(item => item.count)" :key="iconTitle" class="m-listing-card-feature" 
+          :aria-label="`${count} ${iconTitle}`">
+        <AtomsIcon :name="iconTitle" :icon="icon" class="icon" :aria-hidden="true" :title="`${count} ${iconTitle}`" />
+        <p class="| body-sm" :title="`${count} ${iconTitle}`">{{ count }}</p>
+      </li>
+    </ul>
+  </slot>
 </template>
 <script setup lang="ts">
 
@@ -30,7 +33,6 @@ ul {
   display: flex;
   gap: var(--size-12);
   list-style: none;
-  margin-bottom: var(--size-8);
   padding: 0;
 }
 
@@ -41,7 +43,7 @@ ul {
   gap: var(--size-4);
 
   .icon {
-    font-size: var(--font-2xl);
+    font-size: var(--font-3xl);
   }
 }
 </style>

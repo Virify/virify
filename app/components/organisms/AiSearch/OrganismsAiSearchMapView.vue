@@ -11,7 +11,7 @@
     
     <!-- Loading overlay for map view -->
     <div v-if="isSearching" class="loading-overlay">
-      <div class="loading-message">
+      <div class="loading-message | body-sm">
         {{ loadingMessage }}
       </div>
     </div>
@@ -143,12 +143,6 @@ onMounted(() => {
           center = [props.location.geometry.coordinates[0], props.location.geometry.coordinates[1]];
         }
         
-        console.log('Map visualization - Location:', props.location.place_name_en);
-        console.log('Map visualization - Radius:', props.radius);
-        console.log('Map visualization - Bbox:', props.location.bbox);
-        console.log('Map visualization - Boundary polygon:', props.location.boundaryPolygon);
-        console.log('Map visualization - Center:', center);
-        
         updateSearchRadiusVisualization(mapRef.value.map, center, props.radius, props.location.bbox, props.location.boundaryPolygon);
       }
     }, 500); // Give map time to fully initialize
@@ -194,12 +188,10 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
 .loading-message,
 .no-results-message {
   background: rgba(255, 255, 255, 0.95);
-  color: var(--color-text-primary);
+  color: var(--monochrome-100);
   padding: var(--size-12) var(--size-20);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
   border: 1px solid var(--color-border-light);
 }
 

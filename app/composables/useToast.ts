@@ -43,6 +43,9 @@ export default function useToast(): UseToastResponse {
       duration = 4000
     } = options
 
+    // Clear existing toasts when showing a new one
+    clearAllToasts()
+
     const id = generateToastId()
     
     const toast: ToastState = {

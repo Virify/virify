@@ -1,11 +1,11 @@
 <template>
-  <MoleculesListingCardBase :listing="listing">
+  <OrganismsListingCardBase :listing="listing">
     <template #featured-banner>
       <div class="m-listing-card-featured-banner | body-sm font-bold">
         Featured
       </div>
     </template>
-  </MoleculesListingCardBase>
+  </OrganismsListingCardBase>
 </template>
 
 <script lang="ts" setup>
