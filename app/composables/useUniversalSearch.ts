@@ -21,11 +21,15 @@ const initialSortOrder = selectOptionSortOrder[0]?.value as SortOrder
  */
 export function useUniversalSearch() {
   const state = useState<State>('current-search', () => ({
+    location: {
+      place_name_en: 'Cardiff, United Kingdom'
+    },
     filters: {
       type: 'ai',
+      options: [1, 2, 3]
     },
     sortOrder: initialSortOrder,
-    locationRadius: 0,
+    locationRadius: 40,
     layout: 'grid'
   }))
 
