@@ -137,6 +137,20 @@ function updateSortOrder({ target }: Event) {
         color: var(--monochrome-900);
       }
     }
+
+    @supports (appearance: base-select) {
+      &:is(select)::picker(select) {
+        @include mq.tablet {
+          bottom: var(--size-24);
+          box-shadow: var(--elevate-200);
+          padding: var(--size-10);
+        }
+      }
+
+      &:is(select) option {
+        padding: var(--size-10) var(--size-16);
+      }
+    }
   }
 
   &__input-text {

@@ -56,6 +56,7 @@ const selected = defineModel({
   }
 
   @supports (appearance: base-select) {
+    cursor: pointer;
 
     &,
     &::picker(select) {
@@ -69,12 +70,12 @@ const selected = defineModel({
     /* Reset picker style */
     &::picker(select) {
       flex-direction: column;
-      gap: var(--size-6);
+      gap: var(--size-4);
       background: var(--background-200);
-      border-radius: var(--border-radius-lg);
+      border-radius: var(--border-radius-2xl);
       top: var(--size-4);
       bottom: var(--size-4);
-      padding: var(--size-6);
+      padding: var(--size-8);
       margin: 0;
       scrollbar-width: thin;
       scrollbar-color: fn.faded-color(25%) transparent;
@@ -90,8 +91,8 @@ const selected = defineModel({
 
     /* Option styling */
     & option {
-      padding: var(--size-6) var(--size-16);
-      border-radius: var(--border-radius-md);
+      padding: var(--size-8) var(--size-16);
+      border-radius: var(--border-radius-xl);
       flex-shrink: 0;
       cursor: pointer;
 
@@ -100,8 +101,8 @@ const selected = defineModel({
       }
 
       &:checked {
-        background: var(--secondary-500);
-        color: var(--monochrome-100);
+        background: var(--secondary-400);
+        color: var(--monochrome-900);
       }
 
       &:focus:not(:checked),
