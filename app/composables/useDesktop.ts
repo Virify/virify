@@ -1,0 +1,10 @@
+import { useMediaQuery } from '@vueuse/core'
+// @ts-ignore
+import { desktopBreakpoint } from '#styles/_utils/breakpoints.module.scss'
+
+/**
+ *  Check whether the screen size is desktop or not
+ */
+export function useDesktop() {
+  return useMediaQuery(`(min-width: ${desktopBreakpoint})`)
+}
