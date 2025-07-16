@@ -43,16 +43,32 @@ export function useUniversalSearch() {
   /**
    *  Run a callback, if it's valid
    */
-  function _runCallback(fn: Function) {
+  function _runCallback(fn: unknown) {
     if (!isFunction(fn)) return
 
     fn()
   }
 
   /**
+   *  Update state sort order
+   */
+  function setSortOrder(value: SortOrder, callback?: () => void) {
+    const validValues: SortOrder[] = ['date-desc', 'date-asc', 'price-asc', 'price-desc', 'relevance']
+
+    // Check value is valid
+    if (!validValues.includes(value)) return
+
+    // Update state
+    state.value.sortOrder = value
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
    *  Update state layout
    */
-  function setLayout(value: ResultLayout, callback?: Function) {
+  function setLayout(value: ResultLayout, callback?: () => void) {
     const validValues: ResultLayout[] = ['grid', 'split', 'map']
 
     // Check value is valid
@@ -66,7 +82,8 @@ export function useUniversalSearch() {
   }
 
   return {
-    state: readonly(state),
+    state,
+    setSortOrder,
     setLayout,
     setState
   }

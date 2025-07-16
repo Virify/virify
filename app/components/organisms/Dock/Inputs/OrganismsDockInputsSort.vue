@@ -1,5 +1,5 @@
 <template>
-  <SelectRoot v-model="sortOrder">
+  <SelectRoot v-model="state.sortOrder">
     <SelectTrigger class="o-dock-inputs-sort__button" v-bind="$attrs">
       <AtomsIcon icon="search/sort" />
       <SelectValue class="o-dock-inputs-sort__button-value | body-sm" placeholder="Select sort order" />
@@ -45,7 +45,7 @@ import {
 /**
  *  Sort order
  */
-const sortOrder = ref()
+const { state } = useUniversalSearch()
 
 </script>
 

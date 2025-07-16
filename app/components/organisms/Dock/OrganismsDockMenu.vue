@@ -9,8 +9,7 @@
     <li class="o-dock-menu__item">
       <span class="o-dock-menu__mobile-label | faded-text body-2xs">Sort by</span>
 
-      <OrganismsDockInputsSort class="o-dock-menu__input-height" :model-value="state.sortOrder"
-        @update:model-value="updateSortOrder" />
+      <OrganismsDockInputsSort class="o-dock-menu__input-height" @update:model-value="updateSortOrder" />
     </li>
 
     <li class="o-dock-menu__item">
@@ -70,11 +69,7 @@ function showFiltersDialog() {
 /**
  *  Update sort order
  */
-const { state, setState } = useUniversalSearch()
-
-function updateSortOrder(newValue: SortOrder) {
-  setState('sortOrder', newValue)
-
+function updateSortOrder() {
   console.log('Re-order the results...')
 }
 
