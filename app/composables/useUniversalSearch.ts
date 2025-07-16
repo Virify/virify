@@ -4,10 +4,10 @@ export type ResultLayout = 'map' | 'grid' | 'split'
 interface State {
   location?: Record<any, unknown>,
   locationRadius: number,
-  filters?: {
-    ai: unknown,
-    traditional: unknown
-  }
+  filters: {
+    type: 'ai' | 'traditional'
+    options?: unknown[]
+  },
   sortOrder?: SortOrder
   layout: ResultLayout
 }
@@ -21,24 +21,13 @@ const initialSortOrder = selectOptionSortOrder[0]?.value as SortOrder
  */
 export function useUniversalSearch() {
   const state = useState<State>('current-search', () => ({
+    filters: {
+      type: 'ai',
+    },
     sortOrder: initialSortOrder,
     locationRadius: 0,
     layout: 'grid'
   }))
-
-  function setState(key: keyof State, value: unknown) {
-    if (key === 'location') {
-      state.value.location = value as Record<any, unknown>
-    }
-
-    if (key === 'sortOrder') {
-      state.value.sortOrder = value as SortOrder
-    }
-
-    if (key === 'layout') {
-      state.value.layout = asString(value) as ResultLayout
-    }
-  }
 
   /**
    *  Run a callback, if it's valid
@@ -47,6 +36,20 @@ export function useUniversalSearch() {
     if (!isFunction(fn)) return
 
     fn()
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setAiFilters(value: unknown[], callback?: () => void) {
+    // Check value is valid
+    if (!Array.isArray(value)) return
+
+    // Update state
+    state.value.filters.ai = value
+
+    // Run optional callback
+    _runCallback(callback)
   }
 
   /**
@@ -100,6 +103,6 @@ export function useUniversalSearch() {
     setSortOrder,
     setLayout,
     setLocationRadius,
-    setState
+    setAiFilters
   }
 }

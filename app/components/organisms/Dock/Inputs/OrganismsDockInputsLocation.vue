@@ -1,6 +1,7 @@
 <template>
   <button type="button" class="o-dock-inputs-location" :class="{
-    'o-dock-inputs-location--no-radius': !locationRadius
+    'o-dock-inputs-location--no-radius': !locationRadius,
+    'o-dock-inputs-location--active': isExpanded
   }">
     <AtomsIcon class="o-dock-inputs-location__icon" icon="search/location" />
 
@@ -21,12 +22,48 @@
 const { state } = useUniversalSearch()
 const { location, locationRadius } = toRefs(state.value)
 
+/**
+ *  Is expanded styling
+ */
+interface Props {
+  isExpanded?: boolean
+}
+
+defineProps<Props>()
 </script>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
 
 .o-dock-inputs-location {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-10);
+  background: var(--background-300);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--size-6) var(--size-12);
+  line-height: var(--size-24);
+  font-size: var(--font-md);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+  flex: 1 0 auto;
+  width: 100%;
+
+  .a-icon {
+    flex: 0 0 auto;
+    width: var(--size-24);
+    height: var(--size-24);
+  }
+
+  @include mq.tablet {
+    font-size: var(--font-sm);
+
+    &--active {
+      background-color: var(--secondary-400);
+      color: var(--monochrome-900);
+    }
+  }
 
   @include mq.mobile-only {
     &__icon {
