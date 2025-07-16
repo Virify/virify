@@ -56,7 +56,7 @@ const sortOrder = ref()
   &__button {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: var(--size-10);
     background: var(--background-300);
     border-radius: var(--border-radius-xl);
@@ -64,7 +64,7 @@ const sortOrder = ref()
     line-height: var(--size-24);
     font-size: var(--font-md);
     font-weight: var(--font-semibold);
-    width: fit-content;
+    width: 100%;
 
     .a-icon {
       flex: 0 0 auto;
@@ -75,15 +75,24 @@ const sortOrder = ref()
     @include mq.tablet {
       font-size: var(--font-sm);
     }
+
+    &[aria-expanded="true"] {
+      background: var(--secondary-400);
+      color: var(--monochrome-900);
+    }
   }
 
   &__button-value {
-    display: block;
+    display: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 10ch;
     text-align: left;
+
+    @include mq.tablet {
+      display: block;
+    }
   }
 
   &__popover {
