@@ -106,11 +106,14 @@ function updateLayout(newValue: string) {
     flex: 1 1 auto;
 
     &--shrinkable {
-      min-width: 0;
+      min-width: 4ch;
     }
   }
 
   &__mobile-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     @include mq.tablet {
       display: none;
@@ -124,7 +127,7 @@ function updateLayout(newValue: string) {
     gap: var(--size-10);
     background: var(--background-300);
     border-radius: var(--border-radius-xl);
-    padding: var(--size-6) var(--size-16);
+    padding: var(--size-6) var(--size-12);
     line-height: var(--size-24);
     font-size: var(--font-md);
     font-weight: var(--font-semibold);

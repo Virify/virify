@@ -60,7 +60,7 @@ const { state } = useUniversalSearch()
     gap: var(--size-10);
     background: var(--background-300);
     border-radius: var(--border-radius-xl);
-    padding: var(--size-6) var(--size-16);
+    padding: var(--size-6) var(--size-12);
     line-height: var(--size-24);
     font-size: var(--font-md);
     font-weight: var(--font-semibold);
