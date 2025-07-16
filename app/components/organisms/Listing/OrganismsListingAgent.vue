@@ -14,8 +14,8 @@
 @use '#styles/_utils/functions' as fn;
 
 .o-listing-sidebar-agent {
-  --estate-agent-brand-background: #4e2489;
-  --estate-agent-brand-foreground: #fff;
+  --estate-agent-brand-background: var(--blue-400);
+  --estate-agent-brand-foreground: var(--monochrome-900);
 
   background: var(--estate-agent-brand-background);
   color: var(--estate-agent-brand-foreground);

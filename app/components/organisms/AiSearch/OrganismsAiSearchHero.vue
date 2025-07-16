@@ -194,7 +194,7 @@ onUnmounted(() => {
 @use "#styles/_utils/functions" as fn;
 
 .ai-search-hero {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+  background: linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
   color: var(--monochrome-900);
   border-radius: var(--border-radius-3xl);
   min-height: max(500px, 60vh);
@@ -206,7 +206,7 @@ onUnmounted(() => {
 
   @include mq.tablet {
     padding: var(--size-72) var(--size-32);
-    background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+    background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
     background-size: auto 120%, cover;
   }
 }

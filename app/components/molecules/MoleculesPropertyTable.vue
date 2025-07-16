@@ -75,80 +75,200 @@
 
 <script setup lang="ts">
 /**
- * Property Table Component - Completely rewritten with CSS Grid
+ * Property Table Component - Typed version using Prisma types
  * 
  * A responsive property display component that uses CSS Grid for layout.
- * Handles single/multiple items with responsive behavior.
+ * Accepts typed property feature data directly from Prisma models.
  */
 
-// ===== INTERFACES =====
+import type { 
+  Bedroom, 
+  Bathroom, 
+  Kitchen, 
+  LivingArea, 
+  Reception, 
+  Diningroom, 
+  OutdoorSpace, 
+  Parking, 
+  Utility, 
+  AdditionalToilet, 
+  Security, 
+  Storage, 
+  EnergyAndUtilities, 
+  Accessibility, 
+  AdditionalFeatures, 
+  RunningCosts 
+} from '@prisma/client'
 
-interface Field {
-  key: string
-  label: string
-  type?: 'string' | 'boolean' | 'number' | 'array' | 'date'
-  formatter?: (value: any) => string
-  condition?: (value: any) => boolean
-}
+// ===== UNION TYPE FOR ALL SUPPORTED PROPERTY FEATURES =====
+
+type PropertyFeatureData = 
+  | Bedroom[] 
+  | Bathroom[] 
+  | Kitchen 
+  | LivingArea 
+  | Reception[] 
+  | Diningroom 
+  | OutdoorSpace 
+  | Parking 
+  | Utility 
+  | AdditionalToilet 
+  | Security 
+  | Storage 
+  | EnergyAndUtilities 
+  | Accessibility 
+  | AdditionalFeatures 
+  | RunningCosts
+
+// ===== COMPONENT PROPS =====
 
 interface Props {
-  data: any
-  fields: Field[]
+  data: PropertyFeatureData | null | undefined
   title?: string
   showTitle?: boolean
-  isArray?: boolean
 }
 
 // ===== COMPONENT SETUP =====
 
 const props = withDefaults(defineProps<Props>(), {
-  showTitle: true,
-  isArray: true
+  showTitle: true
 })
-
 
 // ===== COMPUTED PROPERTIES =====
 
 const items = computed(() => {
   if (!props.data) return []
-
-  if (props.isArray) {
-    return Array.isArray(props.data) ? props.data : []
-  } else {
-    return [props.data]
-  }
+  return Array.isArray(props.data) ? props.data : [props.data]
 })
+
+const isArray = computed(() => Array.isArray(props.data))
 
 const shouldShowTitle = computed(() => {
   return items.value.length > 1
 })
 
+// ===== FIELD DEFINITIONS =====
+
+const fields = computed(() => {
+  if (!props.data || items.value.length === 0) return []
+  
+  const sampleItem = items.value[0]
+  if (!sampleItem) return []
+  
+  const generatedFields = []
+  
+  // Generate fields based on the actual data structure
+  for (const [key, value] of Object.entries(sampleItem as Record<string, any>)) {
+    // Skip internal fields
+    if (['id', 'propertyId', 'createdAt', 'updatedAt'].includes(key)) continue
+    
+    // Skip null/undefined values
+    if (value === null || value === undefined) continue
+    
+    // Skip empty arrays
+    if (Array.isArray(value) && value.length === 0) continue
+    
+    // Skip empty strings
+    if (typeof value === 'string' && value === '') continue
+    
+    // Create field definition
+    const field = {
+      key,
+      label: formatLabel(key),
+      type: getFieldType(value),
+      formatter: getFieldFormatter(key, value)
+    }
+    
+    generatedFields.push(field)
+  }
+  
+  return generatedFields.sort((a, b) => {
+    // Priority order: roomNumber, size, then alphabetical
+    const priorityOrder = ['roomNumber', 'size', 'description']
+    const aIndex = priorityOrder.indexOf(a.key)
+    const bIndex = priorityOrder.indexOf(b.key)
+    
+    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
+    if (aIndex !== -1) return -1
+    if (bIndex !== -1) return 1
+    
+    // Description always last
+    if (a.key === 'description') return 1
+    if (b.key === 'description') return -1
+    
+    return a.label.localeCompare(b.label)
+  })
+})
+
 // ===== UTILITY FUNCTIONS =====
 
-/**
- * Generate title for each item
- */
-function getItemTitle(item: any, index: number): string {
-  if (props.title) {
-    return props.isArray ? `${props.title} ${index + 1}` : props.title
-  }
+function formatLabel(key: string): string {
+  return key
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, str => str.toUpperCase())
+    .trim()
+}
 
-  if (item.roomNumber) {
-    return `Room ${item.roomNumber}`
-  }
+function getFieldType(value: any): string {
+  if (Array.isArray(value)) return 'array'
+  if (typeof value === 'boolean') return 'boolean'
+  if (typeof value === 'number') return 'number'
+  if (value instanceof Date) return 'date'
+  if (typeof value === 'string' && value.includes('T') && value.includes('Z')) return 'date'
+  return 'string'
+}
 
-  if (item.name) {
-    return item.name
+function getFieldFormatter(key: string, value: any): ((value: any) => string) | undefined {
+  // Size formatting
+  if (key === 'size' || key.includes('Size')) {
+    return (val: number) => typeof val === 'number' && !isNaN(val) ? `${Math.round(val)} m²` : ''
   }
-
-  return `Item ${index + 1}`
+  
+  // Date formatting
+  if (key.includes('Date') || value instanceof Date) {
+    return (val: Date | string) => {
+      const date = val instanceof Date ? val : new Date(val)
+      return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    }
+  }
+  
+  // Money formatting
+  if (key.includes('Charges') || key.includes('Rent') || key.includes('Cost')) {
+    return (val: number) => typeof val === 'number' && !isNaN(val) ? `£${val}` : ''
+  }
+  
+  // Speed formatting
+  if (key.includes('Speed') || key.includes('Mbps')) {
+    return (val: number) => typeof val === 'number' && !isNaN(val) ? `${val} Mbps` : ''
+  }
+  
+  // Array formatting
+  if (Array.isArray(value)) {
+    return (val: any[]) => {
+      if (!Array.isArray(val)) return ''
+      return val.map(item => {
+        if (typeof item === 'string') {
+          // Format enum values
+          return item.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
+        }
+        return item
+      }).join(', ')
+    }
+  }
+  
+  // Enum formatting for strings
+  if (typeof value === 'string' && /^[A-Z_]+$/.test(value)) {
+    return (val: string) => val.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
+  }
+  
+  return undefined
 }
 
 /**
  * Get visible fields with formatted values
  */
 function getVisibleFields(item: any) {
-  return props.fields
+  return fields.value
     .map(field => ({
       ...field,
       value: getFieldValue(item, field)
@@ -164,10 +284,6 @@ function getVisibleFields(item: any) {
         return false
       }
 
-      if (field.condition) {
-        return field.condition(field.value)
-      }
-
       return field.value !== undefined && field.value !== null && field.value !== ''
     })
 }
@@ -175,7 +291,7 @@ function getVisibleFields(item: any) {
 /**
  * Format field value based on type
  */
-function getFieldValue(item: any, field: Field) {
+function getFieldValue(item: any, field: any) {
   const value = item[field.key]
 
   if (field.formatter) {

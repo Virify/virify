@@ -12,7 +12,23 @@
       {{ address }}
     </p>
 
-    <OrganismsListingSidebarIcons />
+    <OrganismsListingSidebarIcons 
+      :property-type="propertyType"
+      :price="priceNumber"
+      :bedrooms="bedrooms"
+      :bathrooms="bathrooms"
+      :receptions="receptions"
+      :ownership="ownership"
+    />
+
+      <OrganismsListingSidebarPills 
+      :property-size="propertySize"
+      :construction-type="constructionType"
+      :chain-free="chainFree"
+      :vacant="vacant"
+      :year-built="yearBuilt"
+    />
+
     <OrganismsListingButtons :listing-id="listingId" enquire-url="#" />
     <OrganismsListingAgent />
   </section>
@@ -23,6 +39,17 @@ interface Props {
   price?: string
   listingId: number
   address?: string
+  propertyType?: string
+  propertySize?: number
+  priceNumber?: number
+  bedrooms?: number
+  bathrooms?: number
+  receptions?: number
+  ownership?: string
+  yearBuilt?: string
+  constructionType?: string
+  chainFree?: boolean
+  vacant?: boolean
 }
 
 defineProps<Props>()
@@ -41,6 +68,8 @@ defineProps<Props>()
     display: block;
     text-align: left;
     margin-bottom: var(--size-4);
+    background: var(--blue-400);
+    color: var(--monochrome-900);
   }
 
   &__address {

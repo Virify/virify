@@ -22,78 +22,127 @@
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" :address="fullAddress" />
 
-          <!-- Location & Amenities (Most Important) -->
-          <OrganismsListingSection v-if="property" accordion-label="Map and Location" :start-expanded="isDesktop || true">
+          <!-- General Property Information (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section-standalone">
+            <OrganismsListingGeneralInfo 
+              :description="property?.description || undefined"
+            />
+          </div>
+
+          <!-- Curated Rooms Section (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section-standalone">
+            <OrganismsListingRooms 
+              :bedrooms="property?.numberBedrooms || undefined"
+              :bathrooms="property?.numberBathrooms || undefined"
+              :receptions="property?.numberReceptions || undefined"
+              :bedroom-features="property?.bedroomFeatures || undefined"
+              :bathroom-features="property?.bathroomFeatures || undefined"
+              :reception-features="property?.reception || undefined"
+              :kitchen-features="property?.kitchenFeatures || undefined"
+              :living-area-features="property?.livingAreaFeatures || undefined"
+              :diningroom-features="property?.diningroomFeatures || undefined"
+            />
+          </div>
+
+          <!-- Property Features Highlight (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section-standalone">
+            <OrganismsListingFeaturesHighlight 
+              :additional-features="property?.additionalFeatures || undefined"
+              :outdoor-space="property?.outdoorSpace || undefined"
+              :parking="property?.parking || undefined"
+              :security="property?.securityFeatures || undefined"
+              :storage="property?.storageFeatures || undefined"
+              :accessibility="property?.accessibilityFeatures || undefined"
+              :kitchen="property?.kitchenFeatures || undefined"
+              :living-area="property?.livingAreaFeatures || undefined"
+            />
+          </div>
+
+          <!-- Location & Amenities (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section-standalone">
             <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!" :listing="listing" :amenities="amenitiesArray" />
-          </OrganismsListingSection>
+          </div>
 
           <!-- Core Room Features -->
-          <OrganismsListingSection v-if="bedroomFeatures" accordion-label="Bedroom Features" :start-expanded="isDesktop || true">
-            <MoleculesPropertyTable :data="bedroomFeatures" :fields="bedroomFields" title="Bedroom" />
+          <OrganismsListingSection v-if="property?.bedroomFeatures" accordion-label="Bedroom Features" :start-expanded="isDesktop || true">
+            <MoleculesPropertyTableArray :data="property.bedroomFeatures" title="Bedroom" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="bathroomFeatures" accordion-label="Bathroom Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="bathroomFeatures" :fields="bathroomFields" title="Bathroom" />
+          <OrganismsListingSection v-if="property?.bathroomFeatures" accordion-label="Bathroom Features" :start-expanded="isDesktop">
+            <MoleculesPropertyTableArray :data="property.bathroomFeatures" title="Bathroom" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="kitchenFeatures" accordion-label="Kitchen" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="kitchenFeatures" :fields="kitchenFields" title="Kitchen" :is-array="false" />
+          <OrganismsListingSection v-if="property?.kitchenFeatures" accordion-label="Kitchen" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.kitchenFeatures" title="Kitchen" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="livingAreaFeatures" accordion-label="Living Area" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="livingAreaFeatures" :fields="livingAreaFields" title="Living Area" :is-array="false" />
+          <OrganismsListingSection v-if="property?.livingAreaFeatures" accordion-label="Living Area" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.livingAreaFeatures" title="Living Area" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="reception" accordion-label="Reception Rooms" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="reception" :fields="receptionFields" title="Reception" />
+          <OrganismsListingSection v-if="property?.reception" accordion-label="Reception Rooms" :start-expanded="isDesktop">
+            <MoleculesPropertyTableArray :data="property.reception" title="Reception" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="diningroomFeatures" accordion-label="Dining Room" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="diningroomFeatures" :fields="diningroomFields" title="Dining Room" :is-array="false" />
+          <OrganismsListingSection v-if="property?.diningroomFeatures" accordion-label="Dining Room" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.diningroomFeatures" title="Dining Room" />
           </OrganismsListingSection>
 
           <!-- External Features -->
 
-          <OrganismsListingSection v-if="parking" accordion-label="Parking" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="parking" :fields="parkingFields" title="Parking" :is-array="false" />
+          <OrganismsListingSection v-if="property?.parking" accordion-label="Parking" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.parking" title="Parking" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="outdoorSpace" accordion-label="Outdoor Space" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="outdoorSpace" :fields="outdoorSpaceFields" title="Outdoor Space" :is-array="false" />
+          <OrganismsListingSection v-if="property?.outdoorSpace" accordion-label="Outdoor Space" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.outdoorSpace" title="Outdoor Space" />
           </OrganismsListingSection>
 
           <!-- Property Features & Amenities -->
-          <OrganismsListingSection v-if="additionalFeatures" accordion-label="Additional Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="additionalFeatures" :fields="additionalFields" title="Features" :is-array="false" />
+          <OrganismsListingSection v-if="property?.additionalFeatures" accordion-label="Additional Features" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.additionalFeatures" title="Features" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="storageFeatures" accordion-label="Storage Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="storageFeatures" :fields="storageFields" title="Storage" :is-array="false" />
+          <OrganismsListingSection v-if="property?.storageFeatures" accordion-label="Storage Features" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.storageFeatures" title="Storage" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="utility" accordion-label="Utility Room" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="utility" :fields="utilityFields" title="Utility" :is-array="false" />
+          <OrganismsListingSection v-if="property?.utility" accordion-label="Utility Room" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.utility" title="Utility" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="additionalToilet" accordion-label="Additional Toilet" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="additionalToilet" :fields="additionalToiletFields" title="Additional Toilet" :is-array="false" />
+          <OrganismsListingSection v-if="property?.additionalToilet" accordion-label="Additional Toilet" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.additionalToilet" title="Additional Toilet" />
           </OrganismsListingSection>
 
           <!-- Technical & Financial -->
-          <OrganismsListingSection v-if="energyAndUtilities" accordion-label="Energy and Utilities" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="energyAndUtilities" :fields="energyAndUtilitiesFields" title="Energy & Utilities" :is-array="false" />
+          <OrganismsListingSection v-if="property?.energyAndUtilities" accordion-label="Energy and Utilities" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.energyAndUtilities" title="Energy & Utilities" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="runningCosts" accordion-label="Running Costs" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="runningCosts" :fields="runningCostsFields" title="Running Costs" :is-array="false" />
+          <OrganismsListingSection v-if="property?.runningCosts" accordion-label="Running Costs" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.runningCosts" title="Running Costs" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="securityFeatures" accordion-label="Security Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="securityFeatures" :fields="securityFields" title="Security" :is-array="false" />
+          <OrganismsListingSection v-if="property?.securityFeatures" accordion-label="Security Features" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.securityFeatures" title="Security" />
           </OrganismsListingSection>
 
-          <OrganismsListingSection v-if="accessibilityFeatures" accordion-label="Accessibility Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="accessibilityFeatures" :fields="accessibilityFields" title="Accessibility" :is-array="false" />
+          <OrganismsListingSection v-if="property?.accessibilityFeatures" accordion-label="Accessibility Features" :start-expanded="isDesktop">
+            <MoleculesPropertyTableSingle :data="property.accessibilityFeatures" title="Accessibility" />
+          </OrganismsListingSection>
+
+          <!-- EPC and Property Information -->
+          <OrganismsListingSection v-if="property?.energyAndUtilities || property?.runningCosts" accordion-label="Energy & Information" :start-expanded="isDesktop">
+            <OrganismsListingEPCInfo 
+              :current-rating="property?.energyAndUtilities?.epcRating || undefined"
+              :council-tax-band="property?.runningCosts?.councilTaxBand || undefined"
+              :service-charges="property?.runningCosts?.serviceCharges || undefined"
+              :ground-rent="property?.runningCosts?.groundRent || undefined"
+              :primary-heating="property?.energyAndUtilities?.primaryHeatingType || undefined"
+              :hot-water-source="property?.energyAndUtilities?.hotWaterSource || undefined"
+              :broadband-type="property?.energyAndUtilities?.broadbandType || undefined"
+            />
           </OrganismsListingSection>
         </div>
 
@@ -104,7 +153,23 @@
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="fullAddress" />
+          <OrganismsListingSidebar 
+            :price="priceFormatted" 
+            :listing-id="listing?.id || 0" 
+            :address="fullAddress"
+            :property-type="property?.type?.name"
+            :property-size="property?.size || undefined"
+            :price-number="listing?.price || undefined"
+            :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined"
+            :receptions="property?.numberReceptions || undefined"
+            :ownership="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined"
+            :construction-type="property?.constructionType || undefined"
+            :chain-free="property?.chainFree"
+            :vacant="property?.vacant"
+            :has-image-slide="!isImagesVisible"
+          />
         </div>
       </div>
     </div>
@@ -118,7 +183,6 @@
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
 import breakpoints from '#styles/_utils/breakpoints.module.scss'
-import { generateDynamicFields } from '~/utils/listing/dynamic-fields'
 
 const route = useRoute();
 
@@ -141,32 +205,9 @@ const priceFormatted = computed(() => {
   return isNumber(price) ? numberToCurrency(price) : ''
 })
 
-function getPropertyFeature(key: keyof NonNullable<typeof property.value>, validator: (value: any) => boolean) {
-  return computed(() => {
-    const feature = property.value?.[key]
-    return validator(feature) ? feature : false
-  })
-}
-
 const fullAddress = computed(() => {
   return property.value?.address?.fullAddress || "No address provided"
 })
-const bedroomFeatures = getPropertyFeature('bedroomFeatures', Array.isArray)
-const bathroomFeatures = getPropertyFeature('bathroomFeatures', Array.isArray)
-const additionalFeatures = getPropertyFeature('additionalFeatures', isObject)
-const accessibilityFeatures = getPropertyFeature('accessibilityFeatures', isObject)
-const energyAndUtilities = getPropertyFeature('energyAndUtilities', isObject)
-const parking = getPropertyFeature('parking', isObject)
-const outdoorSpace = getPropertyFeature('outdoorSpace', isObject)
-const securityFeatures = getPropertyFeature('securityFeatures', isObject)
-const storageFeatures = getPropertyFeature('storageFeatures', isObject)
-const runningCosts = getPropertyFeature('runningCosts', isObject)
-const diningroomFeatures = getPropertyFeature('diningroomFeatures', isObject)
-const kitchenFeatures = getPropertyFeature('kitchenFeatures', isObject)
-const livingAreaFeatures = getPropertyFeature('livingAreaFeatures', isObject)
-const reception = getPropertyFeature('reception', Array.isArray)
-const utility = getPropertyFeature('utility', isObject)
-const additionalToilet = getPropertyFeature('additionalToilet', isObject)
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {
@@ -175,25 +216,6 @@ const amenitiesArray = computed(() => {
   return Array.isArray(amenities) ? amenities : [amenities]
 })
 
-/**
- * Dynamic field generation from actual data
- */
-const bedroomFields = computed(() => generateDynamicFields(bedroomFeatures.value))
-const bathroomFields = computed(() => generateDynamicFields(bathroomFeatures.value))
-const additionalFields = computed(() => generateDynamicFields(additionalFeatures.value))
-const accessibilityFields = computed(() => generateDynamicFields(accessibilityFeatures.value))
-const energyAndUtilitiesFields = computed(() => generateDynamicFields(energyAndUtilities.value))
-const parkingFields = computed(() => generateDynamicFields(parking.value))
-const outdoorSpaceFields = computed(() => generateDynamicFields(outdoorSpace.value))
-const securityFields = computed(() => generateDynamicFields(securityFeatures.value))
-const storageFields = computed(() => generateDynamicFields(storageFeatures.value))
-const runningCostsFields = computed(() => generateDynamicFields(runningCosts.value))
-const diningroomFields = computed(() => generateDynamicFields(diningroomFeatures.value))
-const kitchenFields = computed(() => generateDynamicFields(kitchenFeatures.value))
-const livingAreaFields = computed(() => generateDynamicFields(livingAreaFeatures.value))
-const receptionFields = computed(() => generateDynamicFields(reception.value))
-const utilityFields = computed(() => generateDynamicFields(utility.value))
-const additionalToiletFields = computed(() => generateDynamicFields(additionalToilet.value))
 
 
 /**
@@ -267,6 +289,7 @@ useIntersectionObserver($overview, ([entry]) => {
 @use '#styles/_utils/functions' as fn;
 
 .p-listing {
+  margin-top: var(--size-32);
 
   &__grid {
     display: grid;
@@ -310,6 +333,10 @@ useIntersectionObserver($overview, ([entry]) => {
     @include mq.not-notebook {
       padding-inline: var(--size-24);
     }
+  }
+
+  &__section-standalone {
+    margin-bottom: var(--size-24);
   }
 
   &__sidebar {
