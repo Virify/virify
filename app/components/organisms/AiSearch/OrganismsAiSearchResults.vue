@@ -2,25 +2,30 @@
   <div class="p-ai-search-results | container flow" v-if="results">
     <h2 class="results-title | title-md">
       Found {{ props.totalResults }} results
-      <span v-if="hasPagination" class="body-sm"> (Page {{ props.currentPage }} of {{ props.totalPages }})</span>
     </h2>
 
     <!-- Sorted results with proper interleaving -->
     <div class="p-ai-search-results__sorted-content">
-      <template v-for="section in sortedResults" :key="section.type + (section.item?.id || section.items?.[0]?.id)">
+      <template
+        v-for="section in sortedResults"
+        :key="section.type + (section.item?.id || section.items?.[0]?.id)"
+      >
         <!-- Premium card row -->
-        <div v-if="section.type === 'premium'" class="p-ai-search-results__premium-row">
+        <div
+          v-if="section.type === 'premium'"
+          class="p-ai-search-results__premium-row"
+        >
           <OrganismsListingCardPremium
             :listing="(section.item as ListingCardData)"
           />
         </div>
-        
+
         <!-- Grid row with basic/featured cards -->
-        <ul v-else-if="section.type === 'grid-row'" class="p-ai-search-results__grid-row">
-          <li
-            v-for="listing in section.items!"
-            :key="listing.id"
-          >
+        <div
+          v-else-if="section.type === 'grid-row'"
+          class="p-ai-search-results__grid-row"
+        >
+          <template v-for="listing in section.items!" :key="listing.id">
             <OrganismsListingCardFeatured
               v-if="listing.listingTier === 'FEATURED'"
               :listing="(listing as ListingCardData)"
@@ -29,57 +34,32 @@
               v-else
               :listing="(listing as ListingCardData)"
             />
-          </li>
-        </ul>
+          </template>
+        </div>
       </template>
-    </div>
-
-    <!-- Pagination -->
-    <div v-if="hasPagination" class="pagination | body-sm font-bold">
-      <button 
-        @click="$emit('page-change', props.currentPage - 1)"
-        :disabled="props.currentPage === 1"
-        class="button button-ghost button-sm"
-      >
-        Previous
-      </button>
-      
-      <span class="pagination-info">
-        Page {{ props.currentPage }} of {{ props.totalPages }}
-      </span>
-      
-      <button 
-        @click="$emit('page-change', props.currentPage + 1)"
-        :disabled="props.currentPage === props.totalPages"
-        class="button button-secondary button-sm"
-      >
-        Next
-      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { distributePremiumListings } from '~/utils/results/listing-distribution';
+import { distributePremiumListings } from "~/utils/results/listing-distribution";
 
-
-  const props = withDefaults(defineProps<{
-  results: ListingWithFullProperty[];
-  queryAnalysis: QueryAnalysis | null;
-  currentPage?: number;
-  totalPages?: number;
-  totalResults?: number;
-}>(), {
-  currentPage: 1,
-  totalPages: 1,
-  totalResults: 0
-});
+const props = withDefaults(
+  defineProps<{
+    results: ListingWithFullProperty[];
+    queryAnalysis: QueryAnalysis | null;
+    totalResults?: number;
+  }>(),
+  {
+    currentPage: 1,
+    totalPages: 1,
+    totalResults: 0,
+  }
+);
 
 defineEmits<{
-  'page-change': [page: number];
+  "page-change": [page: number];
 }>();
-
-const hasPagination = computed(() => props.totalPages > 1);
 
 const sortedResults = computed(() => distributePremiumListings(props.results));
 </script>
@@ -98,24 +78,35 @@ const sortedResults = computed(() => distributePremiumListings(props.results));
   }
 
   &__grid-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--size-32);
     margin: 0;
     padding: 0;
-    list-style: none;
-    
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  &__grid-row > * {
+    flex: 1 1 45%;
+    min-width: 300px;
+    max-width: 50%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 768px) {
+    &__grid-row > * {
+      min-width: 100%;
+      max-width: 100%;
+      flex-basis: 100%;
     }
   }
 }
 
- .results-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
+.results-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
 
 .pagination {
   display: flex;

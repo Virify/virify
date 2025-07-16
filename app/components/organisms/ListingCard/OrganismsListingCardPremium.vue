@@ -35,10 +35,7 @@
 
     <!-- Price and Price Type -->
     <template #header>
-      <AtomsListingCardNewHeader
-        :price="listing.price"
-        :price-type="priceType"
-      >
+      <AtomsListingCardNewHeader :price="listing.price" :price-type="priceType">
         <template #default="{ price, priceType }">
           <h2 class="premium-header | title-md">
             {{ price }}
@@ -261,7 +258,7 @@
       <!-- Enquiry button for mobile -->
       <div class="premium-mobile-actions">
         <OrganismsListingCardNewView :listing-id="listing.id">
-          <span class="| button button-primary button-full body-sm">View</span>
+          <span class="| button button-bordered button-full body-sm">View</span>
         </OrganismsListingCardNewView>
         <AtomsListingCardNewEnquire
           :listing-id="listing.id"
@@ -519,7 +516,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   height: 100%;
   // Calculate width: remaining space after main image and gap
   width: calc(100% - 72% - var(--size-8));
-  transition: all 0.3s ease-in-out;
 }
 
 .premium-side-image {
@@ -529,7 +525,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   object-fit: cover;
   cursor: pointer;
   border-radius: 0;
-  transition: all 0.3s ease-in-out;
 
   &:first-child {
     border-top-right-radius: calc(
@@ -727,8 +722,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     grid-template-columns: 1fr 1fr;
     gap: var(--size-8);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   &-feature-check {
@@ -809,6 +802,12 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
         border-radius: var(--border-radius-lg);
         box-sizing: border-box;
         padding: var(--size-10);
+
+        &.button-bordered {
+          padding: var(--size-8);
+          border-width: 2px;
+          border-color: var(--primary-400);
+        }
       }
     }
   }

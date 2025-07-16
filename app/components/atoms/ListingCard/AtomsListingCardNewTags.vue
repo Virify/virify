@@ -8,7 +8,6 @@
   </slot>
 </template>
 <script setup lang="ts">
-
 const props = defineProps<{
   chainFree: boolean;
   listedDate: Date | string;
@@ -21,17 +20,15 @@ const now = new Date();
 const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
 if (createdAt >= oneWeekAgo) {
-  tags.push('Recently Added');
+  tags.push("Recently Added");
 }
 
 if (props.reduced) {
-  tags.push('Reduced');
+  tags.push("Reduced");
 }
 if (props.chainFree) {
-  tags.push('Chain Free');
+  tags.push("Chain Free");
 }
-
-
 </script>
 
 <style lang="scss">
@@ -45,14 +42,15 @@ ul {
   gap: var(--size-8);
   list-style: none;
   padding: 0;
+  margin: 0;
   align-items: center;
 }
 
 .m-listing-card-tag {
-  padding-right: var(--size-8);
   background-color: var(--background-300);
   padding: var(--size-8);
   border-radius: var(--border-radius-lg);
+  white-space: nowrap;
 }
 
 @media (max-width: 768px) {

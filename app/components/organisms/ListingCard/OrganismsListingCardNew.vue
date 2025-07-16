@@ -1,47 +1,96 @@
 <template>
   <article
-    v-if="listing.property && listing.property.address && listing.property.type && listing.property.classification && listing.property.createdAt && listing.user && listing.user.id && listing.user.username"
-    class="m-listing-card" :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null"
-    :aria-label="`Property listing: ${listing.property.type.name} in ${listing.property.address.fullAddress}`">
-    <div v-if="listing.listingTier === 'FEATURED'" class="m-listing-card-featured-banner | body-sm font-bold" aria-label="Featured listing">
+    v-if="
+      listing.property &&
+      listing.property.address &&
+      listing.property.type &&
+      listing.property.classification &&
+      listing.property.createdAt &&
+      listing.user &&
+      listing.user.id &&
+      listing.user.username
+    "
+    class="m-listing-card"
+    :data-tier="listing.listingTier === 'FEATURED' ? 'featured' : null"
+    :aria-label="`Property listing: ${listing.property.type.name} in ${listing.property.address.fullAddress}`"
+  >
+    <div
+      v-if="listing.listingTier === 'FEATURED'"
+      class="m-listing-card-featured-banner | body-sm font-bold"
+      aria-label="Featured listing"
+    >
       Featured
     </div>
-    <OrganismsListingCardNewImage :images="image_urls" :listing-id="listing.id" />
+    <OrganismsListingCardNewImage
+      :images="image_urls"
+      :listing-id="listing.id"
+    />
     <div class="m-listing-card-content">
       <div class="m-listing-card-details">
         <div class="m-listing-card-header-row m-listing-card-price-group">
-          <AtomsListingCardNewHeader :price="listing.price" :price-type="priceType" />
-          <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs" aria-label="Property for rent">Rent</span>
-          <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs" aria-label="Property for sale">Sale</span>
+          <AtomsListingCardNewHeader
+            :price="listing.price"
+            :price-type="priceType"
+          />
+          <span
+            v-if="listing.rentalListing"
+            class="m-listing-card-type-indicator | body-xs"
+            aria-label="Property for rent"
+            >Rent</span
+          >
+          <span
+            v-else-if="listing.saleListing"
+            class="m-listing-card-type-indicator | body-xs"
+            aria-label="Property for sale"
+            >Sale</span
+          >
         </div>
-        <AtomsListingCardNewTitle v-if="listing.property?.address" :address="listing.property.address"
-          :type="listing.property.type.name" :classification="listing.property.classification.name" />
-        <AtomsListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
-          :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
-        <AtomsListingCardNewTags :chain-free="listing.property.chainFree" :listed-date="listing.property.createdAt"
-          :reduced="true" />
+        <AtomsListingCardNewTitle
+          v-if="listing.property?.address"
+          :address="listing.property.address"
+          :type="listing.property.type.name"
+          :classification="listing.property.classification.name"
+        />
+        <AtomsListingCardNewFeatures
+          :bedrooms="listing.property.numberBedrooms"
+          :bathrooms="listing.property.numberBathrooms"
+          :receptions="listing.property.numberReceptions"
+        />
+        <AtomsListingCardNewTags
+          :chain-free="listing.property.chainFree"
+          :listed-date="listing.property.createdAt"
+          :reduced="true"
+        />
       </div>
       <div class="m-listing-card-footer">
-        <AtomsListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
-        <AtomsListingCardNewActions :listing-id="listing.id" :user-id="listing.user.id" />
+        <AtomsListingCardNewAgent
+          :username="listing.user.username"
+          :id="listing.user.id"
+        />
+        <AtomsListingCardNewActions
+          :listing-id="listing.id"
+          :user-id="listing.user.id"
+        />
       </div>
     </div>
   </article>
 </template>
 
 <script lang="ts" setup>
-
 interface Props {
   listing: ListingWithFullProperty;
 }
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const image_urls = computed(() => {
-  return props.listing.property?.media?.map((m: any) => m.image) ?? []
-})
+  return props.listing.property?.media?.map((m: any) => m.image) ?? [];
+});
 
 const priceType = computed(() => {
-  return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
+  return (
+    props.listing?.rentalListing?.rentFrequency ??
+    props.listing?.saleListing?.priceType
+  );
 });
 </script>
 
@@ -58,7 +107,7 @@ const priceType = computed(() => {
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  &[data-tier='featured'] {
+  &[data-tier="featured"] {
     border-color: var(--secondary-400);
     border-width: var(--size-4);
     padding: 0;
@@ -73,7 +122,8 @@ const priceType = computed(() => {
 
     .m-listing-card-featured-banner {
       background-color: var(--secondary-400);
-      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0 var(--border-radius-lg) 0;
+      border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0
+        var(--border-radius-lg) 0;
       color: var(--monochrome-900);
       padding: var(--size-8) var(--size-24);
       position: absolute;
@@ -89,7 +139,18 @@ const priceType = computed(() => {
     flex-direction: column;
     justify-content: space-between;
     padding: var(--card-padding);
-    width: calc(100% - var(--image-width));
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .m-listing-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-16);
+    height: 100%;
+    flex-grow: 1;
+    justify-content: space-between;
+    min-width: 0;
   }
 
   .m-listing-card-footer {
@@ -123,7 +184,6 @@ const priceType = computed(() => {
     background-color: var(--background-300);
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
-
   }
 }
 
@@ -133,7 +193,7 @@ const priceType = computed(() => {
     max-width: 100%;
     padding: 0;
 
-    &[data-tier='featured'] {
+    &[data-tier="featured"] {
       .m-listing-card-content {
         padding: var(--card-padding);
       }

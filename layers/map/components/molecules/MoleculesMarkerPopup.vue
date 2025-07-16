@@ -122,7 +122,7 @@ const formattedPrice = computed(() => {
 const formattedPriceType = computed(() => {
   if (!props.marker.priceType) return "";
   // Capitalize the first letter of priceType and replace underscores with spaces
-  return props.marker.priceType.slice(0).replace(/_/g, " ");
+  return convertEnumToString(props.marker.priceType).toLowerCase();
 });
 
 const hasBedrooms = computed(
@@ -376,6 +376,7 @@ onMounted(() => {
 .listing-card__price-type {
   margin-top: 0;
   color: var(--monochrome-600);
+  text-transform: capitalize;
 }
 
 .listing-card--premium .listing-card__price {

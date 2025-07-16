@@ -3,74 +3,102 @@
   <div class="m-listing-card" :data-tier="listing.listingTier">
     <!-- Optional featured banner slot (used for premium/featured indicators) -->
     <slot name="featured-banner" />
-    
+
     <!-- Image slot with default property image component -->
     <slot name="image">
-      <OrganismsListingCardNewImage :images="image_urls" :listing-id="listing.id" />
+      <OrganismsListingCardNewImage
+        :images="image_urls"
+        :listing-id="listing.id"
+      />
     </slot>
-    
+
     <div class="m-listing-card-content-wrapper">
       <!-- Premium Header  -->
       <slot name="premium-header" />
-      
       <div class="m-listing-card-content">
         <!-- Main listing details section -->
         <div class="m-listing-card-details">
           <!-- Price and listing type indicator row -->
           <div class="m-listing-card-header-row m-listing-card-price-group">
             <slot name="header">
-              <AtomsListingCardNewHeader :price="listing.price" :price-type="priceType" />
+              <AtomsListingCardNewHeader
+                :price="listing.price"
+                :price-type="priceType"
+              />
             </slot>
-            <span v-if="listing.rentalListing" class="m-listing-card-type-indicator | body-xs">Rent</span>
-            <span v-else-if="listing.saleListing" class="m-listing-card-type-indicator | body-xs">Sale</span>
+            <span
+              v-if="listing.rentalListing"
+              class="m-listing-card-type-indicator | body-xs"
+              >Rent</span
+            >
+            <span
+              v-else-if="listing.saleListing"
+              class="m-listing-card-type-indicator | body-xs"
+              >Sale</span
+            >
           </div>
-          
+
           <!-- Property title with address, type, and classification -->
           <slot name="title">
-            <AtomsListingCardNewTitle :address="listing.property.address" :type="listing.property.type.name"
-              :classification="listing.property.classification.name" />
+            <AtomsListingCardNewTitle
+              :address="listing.property.address"
+              :type="listing.property.type.name"
+              :classification="listing.property.classification.name"
+            />
           </slot>
-          
+
           <!-- Property features (bedrooms, bathrooms, receptions) -->
           <slot name="features">
-            <AtomsListingCardNewFeatures :bedrooms="listing.property.numberBedrooms"
-              :bathrooms="listing.property.numberBathrooms" :receptions="listing.property.numberReceptions" />
+            <AtomsListingCardNewFeatures
+              :bedrooms="listing.property.numberBedrooms"
+              :bathrooms="listing.property.numberBathrooms"
+              :receptions="listing.property.numberReceptions"
+            />
           </slot>
-          
+
           <!-- Property tags (chain-free, listing date, reduced status) -->
           <slot name="tags">
-            <AtomsListingCardNewTags :chain-free="listing.property.chainFree"
-              :listed-date="listing.property.createdAt" :reduced="true" />
+            <AtomsListingCardNewTags
+              :chain-free="listing.property.chainFree"
+              :listed-date="listing.property.createdAt"
+              :reduced="true"
+            />
           </slot>
-          
+
           <!-- Description slot -->
           <slot name="description" />
-          
+
           <!-- Mobile-only content slot -->
           <div class="m-listing-card-mobile-content">
             <slot name="mobile-content" />
           </div>
-          
+
           <!-- Agent info -->
           <slot name="agent">
-            <AtomsListingCardNewAgent :username="listing.user.username" :id="listing.user.id" />
+            <AtomsListingCardNewAgent
+              :username="listing.user.username"
+              :id="listing.user.id"
+            />
           </slot>
-          
+
           <!-- Actions slot with default view/enquire buttons -->
           <slot name="actions">
             <div class="m-listing-card-actions">
               <OrganismsListingCardNewView :listing-id="listing.id" />
-              <AtomsListingCardNewEnquire :listing-id="listing.id" :user-id="listing.user.id" />
+              <AtomsListingCardNewEnquire
+                :listing-id="listing.id"
+                :user-id="listing.user.id"
+              />
             </div>
           </slot>
-          
+
           <!-- Mobile actions slot -->
           <div class="m-listing-card-mobile-actions">
             <slot name="mobile-actions" />
           </div>
         </div>
       </div>
-      
+
       <!-- Optional additional content slot (for extra content below main card) -->
       <slot name="premium-content" />
     </div>
@@ -81,14 +109,17 @@
 interface Props {
   listing: ListingCardData;
 }
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const image_urls = computed(() => {
-  return props.listing.property?.media?.map((m: any) => m.image) ?? []
-})
+  return props.listing.property?.media?.map((m: any) => m.image) ?? [];
+});
 
 const priceType = computed(() => {
-  return props.listing?.rentalListing?.rentFrequency ?? props.listing?.saleListing?.priceType;
+  return (
+    props.listing?.rentalListing?.rentFrequency ??
+    props.listing?.saleListing?.priceType
+  );
 });
 </script>
 
@@ -108,6 +139,8 @@ const priceType = computed(() => {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100%;
+    justify-content: space-between;
   }
 
   .m-listing-card-content {
@@ -122,8 +155,9 @@ const priceType = computed(() => {
     display: flex;
     flex-direction: column;
     gap: var(--size-16);
+    height: 100%;
+    justify-content: space-between;
   }
-
 
   .m-listing-card-actions {
     display: grid;
@@ -131,7 +165,7 @@ const priceType = computed(() => {
     grid-template-columns: 1fr 1fr;
     width: 100%;
   }
-  
+
   // Apply border-radius to all buttons within the card
   button,
   .button,
@@ -166,7 +200,7 @@ const priceType = computed(() => {
   .m-listing-card-mobile-content,
   .m-listing-card-mobile-actions {
     width: 100%;
-    
+
     @media (min-width: 769px) {
       display: none;
     }
