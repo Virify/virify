@@ -503,8 +503,7 @@ ul {
       &__title {
         width: 100%;
         padding: var(--size-24) 0;
-        background: url("/img/logo-background.svg") no-repeat center right,
-          linear-gradient(70deg, var(--secondary-400), var(--secondary-500));
+        background: url("/img/logo-background.svg") no-repeat center right, var(--secondary-400);
         background-size: auto 250%, cover;
         color: var(--foreground-100);
         text-transform: capitalize;
