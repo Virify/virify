@@ -122,7 +122,7 @@ async function saveLocation() {
   }
 
   &__popover {
-    position: absolute;
+    position: fixed;
     inset: unset;
     background: var(--background-200);
     padding: var(--size-14) var(--size-16) var(--size-16);
