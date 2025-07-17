@@ -8,8 +8,8 @@
         class="room-summary-item"
       >
         <div class="room-summary-item__title | title-md">
-          <p>{{ item.length || 1 }}</p>
-          <p>{{ item.type }}</p>
+          <p>{{ item.length > 1 ? item.length : null }} {{ item.type }}</p>
+          <!-- <p>{{ item.type }}</p> -->
         </div>
 
         <!-- Single room - show normally -->
@@ -26,37 +26,25 @@
           </p>
         </div>
 
-        <!-- Multiple rooms - show as carousel -->
-        <div v-else class="room-summary-item__details">
-          <MoleculesCarousel
-            :ref="(el) => setCarouselRef(el, index)"
-            :slides="item.individualRooms"
-            class="room-carousel-container"
+        <!-- Multiple rooms - show all stacked -->
+        <div v-else class="room-summary-item__details room-summary-item__details--multiple">
+          <div
+            v-for="(roomData, roomIndex) in item.individualRooms"
+            :key="roomIndex"
+            class="room-summary-item__room"
+            :class="{ 'room-summary-item__room--divider': roomIndex > 0 }"
           >
-            <template #default="{ slide }">
-              <p
-                v-for="(detail, detailIndex) in slide"
-                :key="detailIndex"
-                class="| body-sm"
-              >
-                {{ detail }}
-              </p>
-            </template>
-          </MoleculesCarousel>
-
-          <!-- Navigation arrows -->
-          <button
-            class="room-carousel-arrow room-carousel-arrow--prev"
-            @click="scrollPrev(index)"
-          >
-            <AtomsChevron height="30" width="30" />
-          </button>
-          <button
-            class="room-carousel-arrow room-carousel-arrow--next"
-            @click="scrollNext(index)"
-          >
-            <AtomsChevron height="30" width="30" />
-          </button>
+            <div v-if="item.length > 1" class="room-summary-item__room-number">
+              Room {{ roomIndex + 1 }}
+            </div>
+            <p
+              v-for="(detail, detailIndex) in roomData"
+              :key="detailIndex"
+              class="| body-sm"
+            >
+              {{ detail }}
+            </p>
+          </div>
         </div>
       </li>
     </ul>
@@ -80,27 +68,6 @@ const props = withDefaults(defineProps<Props>(), {
   title: 'Rooms'
 });
 
-const carouselRefs = ref<any[]>([]);
-
-const setCarouselRef = (el: any, index: number) => {
-  if (el) {
-    carouselRefs.value[index] = el;
-  }
-};
-
-const scrollPrev = (index: number) => {
-  const carousel = carouselRefs.value[index];
-  if (carousel) {
-    carousel.scrollPrev();
-  }
-};
-
-const scrollNext = (index: number) => {
-  const carousel = carouselRefs.value[index];
-  if (carousel) {
-    carousel.scrollNext();
-  }
-};
 
 const rooms = computed(() => {
   return props.roomConfigs.map((config) => {
@@ -122,19 +89,30 @@ const rooms = computed(() => {
 .room-summary {
   padding: var(--size-16);
   &__items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: var(--size-24);
+    columns: 3;
+    column-gap: var(--size-24);
+    column-fill: balance;
+    
+    @media (max-width: 768px) {
+      columns: 2;
+    }
+    
+    @media (max-width: 480px) {
+      columns: 1;
+    }
   }
   &-item {
     display: flex;
     flex-direction: column;
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
-    background: var(--blue-400);
+    background: var(--monochrome-300);
     text-align: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
+    break-inside: avoid;
+    margin-bottom: var(--size-24);
+    width: 100%;
 
     &:hover {
       transform: translateY(-2px);
@@ -153,39 +131,39 @@ const rooms = computed(() => {
 
     &__details {
       position: relative;
+      padding: var(--size-32);
       display: flex;
       height: 100%;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: var(--size-24) var(--size-16);
       color: var(--monochrome-900);
+
+      &--multiple {
+        gap: var(--size-16);
+      }
+    }
+
+    &__room {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--size-4);
+      width: 100%;
+
+      &--divider {
+        border-top: 1px solid var(--monochrome-300);
+        padding-top: var(--size-16);
+      }
+    }
+
+    &__room-number {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--secondary-400);
+      margin-bottom: var(--size-8);
     }
   }
 }
 
-.room-carousel-container {
-  position: relative;
-}
-
-.room-carousel-arrow {
-  position: absolute;
-  top: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  color: var(--secondary-400);
-
-  &--prev {
-    left: 8px;
-    transform: translateY(-50%) rotate(90deg);
-  }
-
-  &--next {
-    right: 8px;
-    transform: translateY(-50%) rotate(-90deg);
-  }
-}
 </style>

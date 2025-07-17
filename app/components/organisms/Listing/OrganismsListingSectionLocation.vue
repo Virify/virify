@@ -15,38 +15,74 @@
     </div>
 
     <div class="o-listing-section-location__amenities-section">
-      <div class="o-listing-section-location__amenities-hero">
-        <h2 class="| title-md">Know your stuff ahead of time!</h2>
-        <p class="| body-md">
-          Check out the nearby amenities to see what’s around your potential new
-          home. We’ve got you covered with all the info you need.
-        </p>
-        <p class="| body-md">
-          You can even cutomise them to see what matters most to you.
-        </p>
-        <NuxtLink
-          to="#"
-          class="o-listing-section-location__amenities-hero__link | button button-secondary"
+      <!-- Not logged in: Show original hero + blurred amenities -->
+      <template v-if="!loggedIn">
+        <div class="o-listing-section-location__amenities-hero">
+          <h2 class="| title-md">Know your stuff ahead of time!</h2>
+          <p class="| body-md">
+            Check out the nearby amenities to see what's around your potential
+            new home. We've got you covered with all the info you need.
+          </p>
+          <p class="| body-md">
+            You can even customise them to see what matters most to you.
+          </p>
+          <button
+            @click="openLogin"
+            class="o-listing-section-location__amenities-hero__link | button button-secondary"
           >
-          Customise
-          </NuxtLink>
-        <p class="| body-xs">
-          <strong>Note:</strong> Amenities are approximate and may not be
-          exhaustive. Always verify with local sources.
-        </p>
-      </div>
+            Sign In to Access
+          </button>
+          <p class="| body-xs">
+            <strong>Note:</strong> Amenities are approximate and may not be
+            exhaustive. Always verify with local sources.
+          </p>
+        </div>
 
-      <MoleculesListingAmenities
-        :lat="lat"
-        :lon="lon"
-        :listing="listing"
-        @amenities-loaded="handleAmenitiesLoaded"
-      />
+        <MoleculesListingAmenitiesPreview :show-overlay="false">
+          <template #content>
+            <MoleculesListingAmenitiesSkeleton />
+          </template>
+        </MoleculesListingAmenitiesPreview>
+      </template>
+
+      <!-- Logged in: Show amenities + upsell for more -->
+      <template v-else>
+        <MoleculesListingAmenities
+          :lat="lat"
+          :lon="lon"
+          :listing="listing"
+          @amenities-loaded="handleAmenitiesLoaded"
+        />
+
+        <MoleculesListingAmenitiesPreview>
+          <template #content>
+            <MoleculesListingAmenities
+              :lat="lat"
+              :lon="lon"
+              :listing="listing"
+              class="o-listing-section-location__amenities-blurred"
+            />
+          </template>
+          <template #overlay>
+            <h2 class="| title-sm">Discover More Amenities</h2>
+            <p class="| body-sm">
+              Unlock restaurants, gyms, parks, shops and 15+ more categories.
+            </p>
+            <NuxtLink
+              to="#"
+              class="o-listing-section-location__amenities-unlock-btn | button button-secondary"
+            >
+              Unlock Premium
+            </NuxtLink>
+          </template>
+        </MoleculesListingAmenitiesPreview>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ViewsDialogLogin } from "#components";
 
 interface Props {
   lat: number;
@@ -56,8 +92,16 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { loggedIn } = useUserSession();
+const { showDialog } = useDialog();
 const mapRef = ref();
 const mapMarker = computed(() => props.listing);
+
+function openLogin() {
+  showDialog({
+    component: ViewsDialogLogin,
+  });
+}
 
 function handleAmenitiesLoaded() {
   // Recenter map after amenities are loaded (content has changed the layout)
@@ -107,6 +151,7 @@ onMounted(() => {
 
     @include mq.tablet {
       flex-direction: row;
+      gap: var(--size-32);
     }
   }
 
@@ -118,14 +163,27 @@ onMounted(() => {
     align-items: flex-start;
     justify-content: space-around;
     padding: var(--size-32);
-    background: url("/img/logo-background.svg") no-repeat top right,
+    background: url("/img/logo-background.svg") no-repeat bottom right,
       var(--blue-400);
+    background-size: auto, cover;
     color: var(--monochrome-900);
+    gap: var(--size-8);
 
     &__link {
       margin: var(--size-16) 0;
       color: var(--foreground-100);
     }
+  }
+
+  &__amenities-blurred {
+    filter: blur(var(--size-8));
+    pointer-events: none;
+  }
+
+  &__amenities-unlock-btn {
+    margin-top: var(--size-16);
+    color: var(--foreground-100);
+    align-self: center;
   }
 }
 </style>
