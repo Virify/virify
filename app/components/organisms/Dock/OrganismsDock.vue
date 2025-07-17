@@ -1,23 +1,25 @@
 <template>
-  <div class="o-dock">
-    <div ref="$popover" popover="auto" :id="popoverId" class="o-dock__popover o-dock-container | elevate-200" :class="{
-      'o-dock__popover--open': !!popover
-    }" tabindex="-1">
-      <AtomsButton class="o-dock__popover-close | button button-quiet" aria-label="Close popover"
-        :aria-controls="popoverId" @click.prevent="hidePopover">
-        <AtomsIcon icon="cross" aria-hidden class="o-dock__popover-close-icon" />
-      </AtomsButton>
+  <div class="o-dock" :class="{
+    'o-dock--open': !!popover
+  }" role="presentation">
+    <div ref="$popover" popover="auto" class="o-dock__popover-container" role="presentation">
+      <div :id="popoverId" class="o-dock__popover | elevate-200" tabindex="-1">
+        <AtomsButton class="o-dock__popover-close | button button-quiet" aria-label="Close popover"
+          :aria-controls="popoverId" @click.prevent="hidePopover">
+          <AtomsIcon icon="cross" aria-hidden class="o-dock__popover-close-icon" />
+        </AtomsButton>
 
-      <template v-if="popover">
-        <component :is="popover.component" />
+        <template v-if="popover">
+          <component :is="popover.component" />
 
-        <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
-          @close-popover="hidePopover" />
-      </template>
+          <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
+            @close-popover="hidePopover" />
+        </template>
+      </div>
     </div>
 
     <OrganismsDockMenu :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
-      class="o-dock__menu o-dock-container | elevate-300" />
+      class="o-dock__menu | elevate-300" />
   </div>
 </template>
 
@@ -94,26 +96,9 @@ onMounted(() => {
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
 
-.o-dock-container {
-  background: var(--background-200);
-  border-radius: var(--border-radius-3xl);
-  width: calc(100% - var(--size-24));
-  border: 1px solid var(--border-color-200);
-
-  @include mq.small-tablet {
-    width: min(100% - var(--size-32), 450px);
-  }
-
-  @include mq.tablet {
-    width: min(100% - var(--size-32), 800px);
-  }
-
-  @include mq.desktop {
-    width: min(100% - var(--size-32), 880px);
-  }
-}
-
 .o-dock {
+  $dock-height: 80px;
+
   list-style: none;
   position: fixed;
   left: 0;
@@ -132,12 +117,33 @@ onMounted(() => {
     bottom: var(--size-24);
   }
 
-  &__popover {
+  &__popover-container {
     position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     top: auto;
     bottom: var(--size-10);
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: none;
+    pointer-events: none;
+
+    &:popover-open {
+      display: flex;
+    }
+
+    @include mq.tablet {
+      bottom: calc(var(--size-16) + #{ $dock-height });
+    }
+
+    @include mq.notebook {
+      bottom: calc(var(--size-24) + #{ $dock-height });
+    }
+  }
+
+  &__popover {
+    position: relative;
     max-height: calc(100dvh - var(--size-24));
     padding: var(--size-16);
     padding-top: var(--size-48);
@@ -145,24 +151,15 @@ onMounted(() => {
     z-index: 10;
     overflow: auto;
     scrollbar-width: thin;
-
-    &:popover-open {
-      display: block;
-    }
+    pointer-events: all;
 
     @include mq.tablet {
-      $dock-height: 80px;
-
-      bottom: calc(var(--size-16) + #{ $dock-height });
       max-height: calc(100dvh - var(--size-32) - #{ $dock-height });
       padding: var(--size-32);
       padding-top: var(--size-48);
     }
 
     @include mq.notebook {
-      $dock-height: 80px;
-
-      bottom: calc(var(--size-24) + #{ $dock-height });
       max-height: calc(100dvh - var(--size-48) - #{ $dock-height });
     }
   }
@@ -181,6 +178,27 @@ onMounted(() => {
     width: var(--size-24);
     height: var(--size-24);
   }
+
+  &__popover,
+  &__menu {
+    background: var(--background-200);
+    border-radius: var(--border-radius-3xl);
+    border: 1px solid var(--border-color-200);
+    box-sizing: border-box;
+    width: calc(100% - var(--size-24));
+
+    @include mq.small-tablet {
+      width: min(100% - var(--size-32), 450px);
+    }
+
+    @include mq.tablet {
+      width: min(100% - var(--size-32), 800px);
+    }
+
+    @include mq.desktop {
+      width: min(100% - var(--size-32), 880px);
+    }
+  }
 }
 
 /**
@@ -194,8 +212,11 @@ onMounted(() => {
     transition-timing-function: var(--ease-in);
   }
 
-  .o-dock__popover {
-    animation: fadeDockPopover var(--animation-medium) var(--ease-out);
+  .o-dock {
+
+    &__popover {
+      animation: fadeDockPopover var(--animation-medium) var(--ease-out);
+    }
 
     /*
        *  @TODO
@@ -203,7 +224,7 @@ onMounted(() => {
        *  meaning the popover opacity never gets removed. Temporarily
        *  using explicit `&--open` classname
        */
-    &--open {
+    &--open &__popover {
       display: block;
       animation-delay: var(--animation-fast);
       animation-fill-mode: backwards;
@@ -213,7 +234,7 @@ onMounted(() => {
       }
     }
 
-    &--open+.o-dock__menu {
+    &--open .o-dock__menu {
       opacity: 0;
       transform: translateY(var(--size-8));
 
@@ -227,7 +248,7 @@ onMounted(() => {
   @keyframes fadeDockPopover {
     from {
       opacity: 0;
-      transform: translateX(-50%) translateY(var(--size-32));
+      transform: translateY(var(--size-32));
     }
   }
 
