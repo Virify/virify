@@ -21,15 +21,28 @@
             <AtomsIcon :icon="category.icon" :size="16" />
           </div>
           <div class="m-listing-amenities-skeleton__item-content">
-            <span class="m-listing-amenities-skeleton__placeholder-text">
+            <span
+              v-if="showRedacted"
+              class="m-listing-amenities-skeleton__placeholder-text"
+              :class="{ shimmer: showRedacted }"
+            >
               {{ item.name }}
             </span>
+            <a
+              v-else
+              href="#"
+              class="m-listing-amenities-skeleton__fake-link"
+              >{{ item.name }}</a
+            >
             -
             <span
+              v-if="showRedacted"
               class="| font-semibold m-listing-amenities-skeleton__placeholder-text"
+              :class="{ shimmer: showRedacted }"
             >
               {{ item.distance }}
             </span>
+            <span v-else class="| font-semibold">{{ item.distance }}</span>
           </div>
         </li>
       </ul>
@@ -38,6 +51,14 @@
 </template>
 
 <script setup lang="ts">
+interface Props {
+  showRedacted?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showRedacted: true,
+});
+
 const skeletonCategories = [
   {
     name: "Schools",
@@ -54,14 +75,16 @@ const skeletonCategories = [
     items: [
       { id: 4, name: "Medical Centre", distance: "0.5 miles" },
       { id: 5, name: "Hospital", distance: "2.1 miles" },
+      { id: 6, name: "Clinic", distance: "1.3 miles" },
     ],
   },
   {
     name: "Train Stations",
     icon: "amenities/train",
     items: [
-      { id: 6, name: "Station", distance: "0.7 miles" },
-      { id: 7, name: "Metro Stop", distance: "1.1 miles" },
+      { id: 7, name: "Station", distance: "0.7 miles" },
+      { id: 8, name: "Metro Stop", distance: "1.1 miles" },
+      { id: 9, name: "Railway Station", distance: "1.8 miles" },
     ],
   },
 ];
@@ -121,20 +144,39 @@ const skeletonCategories = [
 
   &__item-content {
     flex: 1;
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-color: var(--secondary-400);
+      text-underline-offset: 2px;
+    }
+  }
+
+  &__fake-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--secondary-400);
+    text-underline-offset: 2px;
+    pointer-events: none; // Disable clicking on the fake link
   }
 
   &__placeholder-text {
-    background: linear-gradient(
-      90deg,
-      var(--blue-400) 25%,
-      var(--blue-300) 50%,
-      var(--blue-400) 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
     border-radius: var(--border-radius-sm);
     color: transparent;
     user-select: none;
+    background: var(--blue-400);
+
+    &.shimmer {
+      background: linear-gradient(
+        90deg,
+        var(--blue-400) 25%,
+        var(--blue-300) 50%,
+        var(--blue-400) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
   }
 }
 

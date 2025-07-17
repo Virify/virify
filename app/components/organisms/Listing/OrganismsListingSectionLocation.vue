@@ -56,11 +56,8 @@
 
         <MoleculesListingAmenitiesPreview>
           <template #content>
-            <MoleculesListingAmenities
-              :lat="lat"
-              :lon="lon"
-              :listing="listing"
-              :skip-fetch="true"
+            <MoleculesListingAmenitiesSkeleton 
+              :show-redacted="false"
               class="o-listing-section-location__amenities-blurred"
             />
           </template>
@@ -154,6 +151,14 @@ onMounted(() => {
       flex-direction: row;
       gap: var(--size-32);
     }
+
+    > * {
+      width: 100%;
+      
+      @include mq.tablet {
+        width: calc(50% - var(--size-16));
+      }
+    }
   }
 
   &__amenities-hero {
@@ -169,6 +174,7 @@ onMounted(() => {
     background-size: auto, cover;
     color: var(--monochrome-900);
     gap: var(--size-8);
+
 
     &__link {
       margin: var(--size-16) 0;
