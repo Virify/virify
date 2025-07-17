@@ -8,7 +8,7 @@
         </span>
       </div>
 
-      <textarea :id class="m-promptbox__textarea" :placeholder :aria-label="props.label" v-model="textarea"
+      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
         :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
     </div>
 
