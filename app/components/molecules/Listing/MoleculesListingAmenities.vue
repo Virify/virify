@@ -64,6 +64,7 @@ interface Props {
   lat: number
   lon: number
   listing?: any
+  skipFetch?: boolean
 }
 
 interface Emits {
@@ -100,8 +101,10 @@ function getMapUrl(item: any) {
 
 onMounted(async () => {
   if (props.lat && props.lon && props.listing?.property?.id) {
-    await fetchAmenities(props.listing.property.id, props.lat, props.lon, 5000)
-    emit('amenities-loaded')
+    if (!props.skipFetch) {
+      await fetchAmenities(props.listing.property.id, props.lat, props.lon, 5000)
+      emit('amenities-loaded')
+    }
   }
 })
 </script>

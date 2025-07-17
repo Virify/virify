@@ -60,6 +60,7 @@
               :lat="lat"
               :lon="lon"
               :listing="listing"
+              :skip-fetch="true"
               class="o-listing-section-location__amenities-blurred"
             />
           </template>

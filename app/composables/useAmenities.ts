@@ -13,26 +13,28 @@ import { useStorage } from '@vueuse/core'
   function setCategoryCollapsed(category: string, collapsed: boolean) {
     collapsedCategories.value[category] = collapsed
   }
+
+// Global state for amenities (singleton pattern)
+const globalAmenities = ref({
+  schools: [] as Array<{ name: string; distance: number; type: string }>,
+  hospitals: [] as Array<{ name: string; distance: number; type: string }>,
+  train_stations: [] as Array<{ name: string; distance: number; type: string }>
+})
+
+const globalIsLoading = ref(false)
+const globalError = ref<string | null>(null)
+
 export function useAmenities() {
   const { findNearbyAmenities } = useMapSearch()
-
-  const amenities = ref({
-    schools: [] as Array<{ name: string; distance: number; type: string }>,
-    hospitals: [] as Array<{ name: string; distance: number; type: string }>,
-    train_stations: [] as Array<{ name: string; distance: number; type: string }>
-  })
-
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
 
   /**
    * Fetch amenities for a property - checks cache first, then fetches if needed
    */
   async function fetchAmenities(propertyId: number, lat: number, lon: number, radius: number = 5000) {
-    if (isLoading.value) return
+    if (globalIsLoading.value) return
     
-    isLoading.value = true
-    error.value = null
+    globalIsLoading.value = true
+    globalError.value = null
 
     try {
       // Step 1: FIRST - Check if amenities already exist in database
@@ -63,22 +65,22 @@ export function useAmenities() {
               type: 'TRAIN_STATION'
             }))
         }
-        amenities.value = groupedAmenities
+        globalAmenities.value = groupedAmenities
         console.log('Using cached amenities from database')
         return
       }
       
       // Step 2: ONLY if no amenities exist - fetch from MapTiler API
       const nearbyAmenities = await findNearbyAmenities(lat, lon, radius)
-      amenities.value = nearbyAmenities
+      globalAmenities.value = nearbyAmenities
       
       // Step 3: ONLY after fetching - save to database for future use
-      await saveAmenitiesToDatabase(propertyId, nearbyAmenities)
+      await saveAmenitiesToDatabase(propertyId, globalAmenities.value)
       
     } catch (err) {
       console.error('Error fetching nearby amenities:', err)
     } finally {
-      isLoading.value = false
+      globalIsLoading.value = false
     }
   }
 
@@ -101,7 +103,7 @@ export function useAmenities() {
   /**
    * Save amenities to database
    */
-  async function saveAmenitiesToDatabase(propertyId: number, amenitiesData: typeof amenities.value) {
+  async function saveAmenitiesToDatabase(propertyId: number, amenitiesData: typeof globalAmenities.value) {
     try {
       const amenitiesArray = [
         ...amenitiesData.schools.map(school => ({
@@ -151,18 +153,18 @@ export function useAmenities() {
    * Reset amenities state
    */
   function resetAmenities() {
-    amenities.value = {
+    globalAmenities.value = {
       schools: [],
       hospitals: [],
       train_stations: []
     }
-    error.value = null
+    globalError.value = null
   }
 
   return {
-    amenities: readonly(amenities),
-    isLoading: readonly(isLoading),
-    error: readonly(error),
+    amenities: readonly(globalAmenities),
+    isLoading: readonly(globalIsLoading),
+    error: readonly(globalError),
     fetchAmenities,
     formatDistance,
     resetAmenities,
