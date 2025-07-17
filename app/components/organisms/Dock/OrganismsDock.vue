@@ -96,7 +96,7 @@ onMounted(() => {
 
 .o-dock-container {
   background: var(--background-200);
-  border-radius: var(--border-radius-2xl);
+  border-radius: var(--border-radius-3xl);
   width: calc(100% - var(--size-24));
   border: 1px solid var(--border-color-200);
 
