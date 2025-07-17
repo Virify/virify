@@ -50,91 +50,74 @@
             <OrganismsListingGeneralInfo
               :description="property?.description || undefined"
             />
-          </div>
 
-          <div class="p-listing__section room-summary">
-            <h2 class="| title-xs">Room Summary</h2>
-            <div class="room-summary__items">
-              <!-- item 1 -->
-              <div class="room-summary-item">
-                <div class="room-summary-item__title | title-xs">
-                  <p>4</p>
-                  <p>bedrooms</p>
-                </div>
-                <div class="room-summary-item__details | body-xs">
-                  <p>1 Large</p>
-                  <p>2 single</p>
-                </div>
-              </div>
+            <div class="room-summary">
+              <ul class="room-summary__items">
+                <!-- item 1 -->
 
-              <div class="room-summary-item">
-                <div class="room-summary-item__title | title-xs">
-                  <p>4</p>
-                  <p>bedrooms</p>
-                </div>
-                <div class="room-summary-item__details | body-xs">
-                  <p>1 Large</p>
-                  <p>2 single</p>
-                </div>
-              </div>
-
-              <div class="room-summary-item">
-                <div class="room-summary-item__title | title-xs">
-                  <p>4</p>
-                  <p>bedrooms</p>
-                </div>
-                <div class="room-summary-item__details | body-xs">
-                  <p>1 Large</p>
-                  <p>2 single</p>
-                </div>
-              </div>
-
-              <div class="room-summary-item">
-                <div class="room-summary-item__title | title-xs">
-                  <p>4</p>
-                  <p>bedrooms</p>
-                </div>
-                <div class="room-summary-item__details | body-xs">
-                  <p>1 Large</p>
-                  <p>2 single</p>
-                </div>
-              </div>
+                <li
+                  v-for="(item, index) in rooms"
+                  :key="index"
+                  class="room-summary-item"
+                >
+                  <div class="room-summary-item__title | title-md">
+                    <p>{{ item.length || 1 }}</p>
+                    <p>{{ item.type }}</p>
+                  </div>
+                  
+                  <!-- Single room - show normally -->
+                  <div
+                    v-if="item.length <= 1"
+                    class="room-summary-item__details"
+                  >
+                    <p
+                      v-for="(detail, detailIndex) in item.data"
+                      :key="detailIndex"
+                      class="| body-md"
+                    >
+                      {{ detail }}
+                    </p>
+                  </div>
+                  
+                  <!-- Multiple rooms - show as carousel -->
+                  <div v-else class="room-summary-item__details">
+                    <MoleculesCarousel 
+                      :ref="(el) => setCarouselRef(el, index)"
+                      :slides="item.individualRooms"
+                      class="room-carousel-container"
+                    >
+                      <template #default="{ slide }">
+                        <p
+                          v-for="(detail, detailIndex) in slide"
+                          :key="detailIndex"
+                          class="| body-md"
+                        >
+                          {{ detail }}
+                        </p>
+                      </template>
+                    </MoleculesCarousel>
+                    
+                    <!-- Navigation arrows -->
+                    <button 
+                      class="room-carousel-arrow room-carousel-arrow--prev"
+                      @click="scrollPrev(index)"
+                    >
+                      <AtomsChevron height="50" width="50" />
+                    </button>
+                    <button 
+                      class="room-carousel-arrow room-carousel-arrow--next"
+                      @click="scrollNext(index)"
+                    >
+                      <AtomsChevron height="50" width="50" />
+                    </button>
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <AtomsDivider />
-
-          <!-- Curated Rooms Section (Non-collapsible) -->
-          <div v-if="property" class="p-listing__section">
-            <OrganismsListingRooms
-              :bedrooms="property?.numberBedrooms || undefined"
-              :bathrooms="property?.numberBathrooms || undefined"
-              :receptions="property?.numberReceptions || undefined"
-              :bedroom-features="property?.bedroomFeatures || undefined"
-              :bathroom-features="property?.bathroomFeatures || undefined"
-              :reception-features="property?.reception || undefined"
-              :kitchen-features="property?.kitchenFeatures || undefined"
-              :living-area-features="property?.livingAreaFeatures || undefined"
-              :diningroom-features="property?.diningroomFeatures || undefined"
-            />
-          </div>
-
-          <!-- Property Features Highlight (Non-collapsible) -->
-          <div v-if="property" class="p-listing__section-standalone">
-            <OrganismsListingFeaturesHighlight
-              :additional-features="property?.additionalFeatures || undefined"
-              :outdoor-space="property?.outdoorSpace || undefined"
-              :parking="property?.parking || undefined"
-              :security="property?.securityFeatures || undefined"
-              :storage="property?.storageFeatures || undefined"
-              :accessibility="property?.accessibilityFeatures || undefined"
-              :kitchen="property?.kitchenFeatures || undefined"
-              :living-area="property?.livingAreaFeatures || undefined"
-            />
-          </div>
-
           <!-- Location & Amenities (Non-collapsible) -->
-          <div v-if="property" class="p-listing__section-standalone">
+          <div v-if="property" class="p-listing__section">
             <OrganismsListingSectionLocation
               :lat="property?.address?.lat!"
               :lon="property?.address?.lon!"
@@ -142,216 +125,6 @@
               :amenities="amenitiesArray"
             />
           </div>
-
-          <!-- Core Room Features -->
-          <OrganismsListingSection
-            v-if="property?.bedroomFeatures"
-            accordion-label="Bedroom Features"
-            :start-expanded="isDesktop || true"
-          >
-            <MoleculesPropertyTableArray
-              :data="property.bedroomFeatures"
-              title="Bedroom"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.bathroomFeatures"
-            accordion-label="Bathroom Features"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableArray
-              :data="property.bathroomFeatures"
-              title="Bathroom"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.kitchenFeatures"
-            accordion-label="Kitchen"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.kitchenFeatures"
-              title="Kitchen"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.livingAreaFeatures"
-            accordion-label="Living Area"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.livingAreaFeatures"
-              title="Living Area"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.reception"
-            accordion-label="Reception Rooms"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableArray
-              :data="property.reception"
-              title="Reception"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.diningroomFeatures"
-            accordion-label="Dining Room"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.diningroomFeatures"
-              title="Dining Room"
-            />
-          </OrganismsListingSection>
-
-          <!-- External Features -->
-
-          <OrganismsListingSection
-            v-if="property?.parking"
-            accordion-label="Parking"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.parking"
-              title="Parking"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.outdoorSpace"
-            accordion-label="Outdoor Space"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.outdoorSpace"
-              title="Outdoor Space"
-            />
-          </OrganismsListingSection>
-
-          <!-- Property Features & Amenities -->
-          <OrganismsListingSection
-            v-if="property?.additionalFeatures"
-            accordion-label="Additional Features"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.additionalFeatures"
-              title="Features"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.storageFeatures"
-            accordion-label="Storage Features"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.storageFeatures"
-              title="Storage"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.utility"
-            accordion-label="Utility Room"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.utility"
-              title="Utility"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.additionalToilet"
-            accordion-label="Additional Toilet"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.additionalToilet"
-              title="Additional Toilet"
-            />
-          </OrganismsListingSection>
-
-          <!-- Technical & Financial -->
-          <OrganismsListingSection
-            v-if="property?.energyAndUtilities"
-            accordion-label="Energy and Utilities"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.energyAndUtilities"
-              title="Energy & Utilities"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.runningCosts"
-            accordion-label="Running Costs"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.runningCosts"
-              title="Running Costs"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.securityFeatures"
-            accordion-label="Security Features"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.securityFeatures"
-              title="Security"
-            />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection
-            v-if="property?.accessibilityFeatures"
-            accordion-label="Accessibility Features"
-            :start-expanded="isDesktop"
-          >
-            <MoleculesPropertyTableSingle
-              :data="property.accessibilityFeatures"
-              title="Accessibility"
-            />
-          </OrganismsListingSection>
-
-          <!-- EPC and Property Information -->
-          <OrganismsListingSection
-            v-if="property?.energyAndUtilities || property?.runningCosts"
-            accordion-label="Energy & Information"
-            :start-expanded="isDesktop"
-          >
-            <OrganismsListingEPCInfo
-              :current-rating="
-                property?.energyAndUtilities?.epcRating || undefined
-              "
-              :council-tax-band="
-                property?.runningCosts?.councilTaxBand || undefined
-              "
-              :service-charges="
-                property?.runningCosts?.serviceCharges || undefined
-              "
-              :ground-rent="property?.runningCosts?.groundRent || undefined"
-              :primary-heating="
-                property?.energyAndUtilities?.primaryHeatingType || undefined
-              "
-              :hot-water-source="
-                property?.energyAndUtilities?.hotWaterSource || undefined
-              "
-              :broadband-type="
-                property?.energyAndUtilities?.broadbandType || undefined
-              "
-            />
-          </OrganismsListingSection>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
@@ -399,6 +172,8 @@
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
 import breakpoints from "#styles/_utils/breakpoints.module.scss";
+import MoleculesCarousel from "~/components/molecules/MoleculesCarousel.vue";
+import AtomsChevron from "~/components/atoms/AtomsChevron.vue";
 
 const route = useRoute();
 
@@ -425,9 +200,131 @@ const priceFormatted = computed(() => {
   return isNumber(price) ? numberToCurrency(price) : "";
 });
 
+const extractFeatures = (features: any[]) => {
+  const excludedKeys = ["id", "description", "createdAt", "updatedAt", "roomNumber", "size"];
+
+  const allFeatures =
+    features?.flatMap((feature) =>
+      {
+        const roomFeatures = Object.entries(feature)
+          .filter(
+            ([key, value]) =>
+              (value === true || (typeof value === "string" && value)) &&
+              !excludedKeys.includes(key)
+          )
+          .map(([key, value]) => {
+            const formattedKey =
+              key.charAt(0).toUpperCase() +
+              key
+                .slice(1)
+                .replace(/([A-Z])/g, " $1")
+                .trim();
+            const featureText = typeof value === "string"
+              ? value
+                  .replace(/_/g, " ")
+                  .toLowerCase()
+                  .replace(/\b\w/g, (l) => l.toUpperCase())
+              : formattedKey;
+            
+            // Add room number prefix only if there are multiple rooms
+            return feature.roomNumber && features.length > 1
+              ? `Room ${feature.roomNumber}: ${featureText}`
+              : featureText;
+          });
+
+        // Add size information if available
+        if (feature.size) {
+          const roundedSize = Math.floor(feature.size);
+          const sizeText = `Size: ${roundedSize}m²`;
+          const formattedSize = feature.roomNumber && features.length > 1
+            ? `Room ${feature.roomNumber}: ${sizeText}`
+            : sizeText;
+          roomFeatures.unshift(formattedSize); // Add size at the beginning
+        }
+
+        return roomFeatures;
+      }
+    ) || [];
+
+  return [...new Set(allFeatures.flat())];
+};
+
+const rooms = computed(() => {
+
+  const arr = [
+    {
+      length: property.value?.bedroomFeatures.length || 0,
+      type: "bedrooms",
+      data: extractFeatures(property.value?.bedroomFeatures || []),
+      individualRooms: property.value?.bedroomFeatures?.map(feature => extractFeatures([feature])) || [],
+    },
+    {
+      length: property.value?.bathroomFeatures.length || 0,
+      type: "bathrooms",
+      data: extractFeatures(property.value?.bathroomFeatures || []),
+      individualRooms: property.value?.bathroomFeatures?.map(feature => extractFeatures([feature])) || [],
+    },
+    {
+      length: property.value?.reception.length || 0,
+      type: "receptions",
+      data: extractFeatures(property.value?.reception || []),
+      individualRooms: property.value?.reception?.map(feature => extractFeatures([feature])) || [],
+    },
+    {
+      length: 1,
+      type: "kitchen",
+      data: extractFeatures([property.value?.kitchenFeatures].filter(Boolean)),
+    },
+    {
+      length: 1,
+      type: "living area",
+      data: extractFeatures(
+        [property.value?.livingAreaFeatures].filter(Boolean)
+      ),
+    },
+    {
+      length: 1,
+      type: "dining room",
+      data: extractFeatures(
+        [property.value?.diningroomFeatures].filter(Boolean)
+      ),
+    },
+    {
+      length: 1,
+      type: "utility",
+      data: extractFeatures([property.value?.utility].filter(Boolean)),
+    },
+    {
+      length: 1,
+      type: "additional toilet",
+      data: extractFeatures([property.value?.additionalToilet].filter(Boolean)),
+    },
+  ];
+  return arr;
+});
+
 const fullAddress = computed(() => {
   return property.value?.address?.fullAddress || "No address provided";
 });
+
+// Room carousel controls
+const carouselRefs = ref<{ [key: number]: any }>({})
+
+function setCarouselRef(el: any, index: number) {
+  if (el) {
+    carouselRefs.value[index] = el
+  }
+}
+
+function scrollPrev(index: number) {
+  carouselRefs.value[index]?.scrollPrev()
+}
+
+function scrollNext(index: number) {
+  carouselRefs.value[index]?.scrollNext()
+}
+
+
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {
@@ -505,6 +402,12 @@ useIntersectionObserver($overview, ([entry]) => {
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
 
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .p-listing {
   margin-top: var(--size-32);
 
@@ -558,7 +461,7 @@ useIntersectionObserver($overview, ([entry]) => {
     @include mq.notebook {
       display: block;
       position: sticky;
-      top: var(--header-height);
+      top: calc(var(--header-height) + var(--size-32));
       max-height: calc(100dvh - var(--header-height));
       overflow: auto;
       overscroll-behavior: contain;
@@ -577,28 +480,74 @@ useIntersectionObserver($overview, ([entry]) => {
   }
 
   .room-summary {
+    padding: var(--size-16);
     &__items {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: var(--size-8);
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: var(--size-24);
     }
     &-item {
       display: flex;
       flex-direction: column;
       border-radius: var(--border-radius-2xl);
       overflow: hidden;
-      background: none;
+      background: var(--blue-400);
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
 
       &__title {
-        color: var(--monochrome-900);
-        padding: var(--size-16);
-        background: var(--blue-400);
+        width: 100%;
+        padding: var(--size-24) 0;
+        background: url("/img/logo-background.svg") no-repeat center right,
+          linear-gradient(70deg, var(--secondary-400), var(--secondary-500));
+        background-size: auto 250%, cover;
+        color: var(--foreground-100);
+        text-transform: capitalize;
+        margin: 0;
       }
 
       &__details {
-        padding: var(--size-16);
-        background: var(--orange-400);
+        position: relative;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;;
+        padding: var(--size-24) var(--size-16);
+        color: var(--monochrome-900);
       }
+    }
+  }
+
+  .room-carousel-container {
+    position: relative;
+  }
+
+
+
+  .room-carousel-arrow {
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    color: var(--secondary-400);
+
+    &--prev {
+      left: 8px;
+      transform: translateY(-50%) rotate(90deg);
+    }
+
+    &--next {
+      right: 8px;
+      transform: translateY(-50%) rotate(-90deg);
     }
   }
 

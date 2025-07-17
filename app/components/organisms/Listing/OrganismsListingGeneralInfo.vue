@@ -1,7 +1,7 @@
 <template>
   <section v-if="description" class="listing-general-info">
-    <h3 class="listing-general-info__title">Property Description</h3>
-    <p class="listing-general-info__description">{{ description }}</p>
+    <h3 class="listing-general-info__title | title-md">Property Description</h3>
+    <p class="listing-general-info__description | body-md">{{ description }}</p>
   </section>
 </template>
 
@@ -15,23 +15,8 @@ defineProps<Props>()
 
 <style lang="scss">
 .listing-general-info {
-  padding: var(--size-16) var(--size-12);
-  background: var(--background-200);
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color, #e5e7eb);
-}
-
-.listing-general-info__title {
-  margin-bottom: var(--size-8);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--foreground-900);
-}
-
-.listing-general-info__description {
-  color: var(--foreground-800);
-  line-height: 1.5;
-  font-size: var(--font-size-md);
-  margin: 0;
+  padding: var(--size-16);
+  border-radius: var(--border-radius-2xl);
+  // border: 1px solid var(--border-color, #e5e7eb);
 }
 </style>
