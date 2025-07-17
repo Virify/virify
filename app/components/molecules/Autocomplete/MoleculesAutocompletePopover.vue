@@ -80,7 +80,7 @@ const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
 
 interface Props {
-  searchValue: string
+  searchValue?: string
 }
 
 const props = defineProps<Props>()
@@ -163,9 +163,11 @@ function setLocationFromSaved(option: Partial<UserLocation>) {
   }
 }
 
-function setLocation(option: GeocodingFeature) {
-  addLocationToHistory(option)
-  emits('location-selected', option)
+function setLocation(option: MaybeRef<GeocodingFeature>) {
+  const rawOption = unref(option)
+
+  addLocationToHistory(rawOption)
+  emits('location-selected', rawOption)
   suppressAutocomplete.value = true
 }
 

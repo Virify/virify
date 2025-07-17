@@ -2,8 +2,8 @@ export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 
 export type ResultLayout = 'map' | 'grid' | 'split'
 
 interface State {
-  location?: Record<any, unknown>,
-  locationRadius: number,
+  location?: Partial<GeocodingFeature>,
+  locationRadius?: number,
   filters: {
     type: 'ai' | 'traditional'
     options?: unknown[]
@@ -21,15 +21,13 @@ const initialSortOrder = selectOptionSortOrder[0]?.value as SortOrder
  */
 export function useUniversalSearch() {
   const state = useState<State>('current-search', () => ({
-    location: {
-      place_name_en: 'Cardiff, United Kingdom'
-    },
+    location: {},
+    locationRadius: 0,
     filters: {
       type: 'ai',
       options: [1, 2, 3]
     },
     sortOrder: initialSortOrder,
-    locationRadius: 40,
     layout: 'grid'
   }))
 
@@ -40,6 +38,17 @@ export function useUniversalSearch() {
     if (!isFunction(fn)) return
 
     fn()
+  }
+
+  /**
+   *  Update state layout
+   */
+  function setLocation(value: GeocodingFeature, callback?: () => void) {
+    // Update state
+    state.value.location = value
+
+    // Run optional callback
+    _runCallback(callback)
   }
 
   /**
@@ -107,6 +116,7 @@ export function useUniversalSearch() {
     state,
     setSortOrder,
     setLayout,
+    setLocation,
     setLocationRadius,
     setAiFilters
   }
