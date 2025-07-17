@@ -1,26 +1,26 @@
 <template>
   <ul class="o-dock-menu">
     <li class="o-dock-menu__item">
-      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Results layout</span>
+      <span class="o-dock-menu__mobile-label | faded-text body-xs">Results layout</span>
 
       <OrganismsDockInputsLayout class="o-dock-menu__fix-height" @changed="updateLayout" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
-      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Sort by</span>
+      <span class="o-dock-menu__mobile-label | faded-text body-xs">Sort by</span>
 
       <OrganismsDockInputsSort class="o-dock-menu__fix-height" @update:model-value="updateSortOrder" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
-      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Location</span>
+      <span class="o-dock-menu__mobile-label | faded-text body-xs">Location</span>
 
       <OrganismsDockInputsLocation class="o-dock-menu__fix-height" :popovertarget="popoverId"
         :is-expanded="currentlyOpen === 'location'" @click.prevent="showLocationDialog" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--fit-content">
-      <span class="o-dock-menu__mobile-label | faded-text body-2xs">Filters</span>
+      <span class="o-dock-menu__mobile-label | faded-text body-xs">Filters</span>
 
       <OrganismsDockInputsFilters class="o-dock-menu__fix-height" :popovertarget="popoverId"
         :is-expanded="currentlyOpen === 'filters'" @click.prevent="showFiltersDialog">
@@ -91,7 +91,7 @@ function updateLayout(newValue: string) {
     flex-direction: column;
     text-align: center;
     justify-content: stretch;
-    gap: var(--size-4);
+    gap: var(--size-6);
     flex: 1 1 auto;
 
     &--shrinkable {
