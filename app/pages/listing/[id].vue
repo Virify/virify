@@ -51,69 +51,7 @@
               :description="property?.description || undefined"
             />
 
-            <div class="room-summary">
-              <ul class="room-summary__items">
-                <!-- item 1 -->
-
-                <li
-                  v-for="(item, index) in rooms"
-                  :key="index"
-                  class="room-summary-item"
-                >
-                  <div class="room-summary-item__title | title-md">
-                    <p>{{ item.length || 1 }}</p>
-                    <p>{{ item.type }}</p>
-                  </div>
-                  
-                  <!-- Single room - show normally -->
-                  <div
-                    v-if="item.length <= 1"
-                    class="room-summary-item__details"
-                  >
-                    <p
-                      v-for="(detail, detailIndex) in item.data"
-                      :key="detailIndex"
-                      class="| body-md"
-                    >
-                      {{ detail }}
-                    </p>
-                  </div>
-                  
-                  <!-- Multiple rooms - show as carousel -->
-                  <div v-else class="room-summary-item__details">
-                    <MoleculesCarousel 
-                      :ref="(el) => setCarouselRef(el, index)"
-                      :slides="item.individualRooms"
-                      class="room-carousel-container"
-                    >
-                      <template #default="{ slide }">
-                        <p
-                          v-for="(detail, detailIndex) in slide"
-                          :key="detailIndex"
-                          class="| body-md"
-                        >
-                          {{ detail }}
-                        </p>
-                      </template>
-                    </MoleculesCarousel>
-                    
-                    <!-- Navigation arrows -->
-                    <button 
-                      class="room-carousel-arrow room-carousel-arrow--prev"
-                      @click="scrollPrev(index)"
-                    >
-                      <AtomsChevron height="50" width="50" />
-                    </button>
-                    <button 
-                      class="room-carousel-arrow room-carousel-arrow--next"
-                      @click="scrollNext(index)"
-                    >
-                      <AtomsChevron height="50" width="50" />
-                    </button>
-                  </div>
-                </li>
-              </ul>
-            </div>
+            <MoleculesListingRoomSummary :room-configs="roomConfigs" />
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
@@ -148,12 +86,13 @@
             :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined"
             :receptions="property?.numberReceptions || undefined"
-            :ownership="property?.classification?.name"
+            :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
             :chain-free="property?.chainFree"
             :vacant="property?.vacant"
             :has-image-slide="!isImagesVisible"
+            :agent="listing?.user || {}"
           />
         </div>
       </div>
@@ -172,8 +111,6 @@
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
 import breakpoints from "#styles/_utils/breakpoints.module.scss";
-import MoleculesCarousel from "~/components/molecules/MoleculesCarousel.vue";
-import AtomsChevron from "~/components/atoms/AtomsChevron.vue";
 
 const route = useRoute();
 
@@ -200,129 +137,13 @@ const priceFormatted = computed(() => {
   return isNumber(price) ? numberToCurrency(price) : "";
 });
 
-const extractFeatures = (features: any[]) => {
-  const excludedKeys = ["id", "description", "createdAt", "updatedAt", "roomNumber", "size"];
-
-  const allFeatures =
-    features?.flatMap((feature) =>
-      {
-        const roomFeatures = Object.entries(feature)
-          .filter(
-            ([key, value]) =>
-              (value === true || (typeof value === "string" && value)) &&
-              !excludedKeys.includes(key)
-          )
-          .map(([key, value]) => {
-            const formattedKey =
-              key.charAt(0).toUpperCase() +
-              key
-                .slice(1)
-                .replace(/([A-Z])/g, " $1")
-                .trim();
-            const featureText = typeof value === "string"
-              ? value
-                  .replace(/_/g, " ")
-                  .toLowerCase()
-                  .replace(/\b\w/g, (l) => l.toUpperCase())
-              : formattedKey;
-            
-            // Add room number prefix only if there are multiple rooms
-            return feature.roomNumber && features.length > 1
-              ? `Room ${feature.roomNumber}: ${featureText}`
-              : featureText;
-          });
-
-        // Add size information if available
-        if (feature.size) {
-          const roundedSize = Math.floor(feature.size);
-          const sizeText = `Size: ${roundedSize}m²`;
-          const formattedSize = feature.roomNumber && features.length > 1
-            ? `Room ${feature.roomNumber}: ${sizeText}`
-            : sizeText;
-          roomFeatures.unshift(formattedSize); // Add size at the beginning
-        }
-
-        return roomFeatures;
-      }
-    ) || [];
-
-  return [...new Set(allFeatures.flat())];
-};
-
-const rooms = computed(() => {
-
-  const arr = [
-    {
-      length: property.value?.bedroomFeatures.length || 0,
-      type: "bedrooms",
-      data: extractFeatures(property.value?.bedroomFeatures || []),
-      individualRooms: property.value?.bedroomFeatures?.map(feature => extractFeatures([feature])) || [],
-    },
-    {
-      length: property.value?.bathroomFeatures.length || 0,
-      type: "bathrooms",
-      data: extractFeatures(property.value?.bathroomFeatures || []),
-      individualRooms: property.value?.bathroomFeatures?.map(feature => extractFeatures([feature])) || [],
-    },
-    {
-      length: property.value?.reception.length || 0,
-      type: "receptions",
-      data: extractFeatures(property.value?.reception || []),
-      individualRooms: property.value?.reception?.map(feature => extractFeatures([feature])) || [],
-    },
-    {
-      length: 1,
-      type: "kitchen",
-      data: extractFeatures([property.value?.kitchenFeatures].filter(Boolean)),
-    },
-    {
-      length: 1,
-      type: "living area",
-      data: extractFeatures(
-        [property.value?.livingAreaFeatures].filter(Boolean)
-      ),
-    },
-    {
-      length: 1,
-      type: "dining room",
-      data: extractFeatures(
-        [property.value?.diningroomFeatures].filter(Boolean)
-      ),
-    },
-    {
-      length: 1,
-      type: "utility",
-      data: extractFeatures([property.value?.utility].filter(Boolean)),
-    },
-    {
-      length: 1,
-      type: "additional toilet",
-      data: extractFeatures([property.value?.additionalToilet].filter(Boolean)),
-    },
-  ];
-  return arr;
-});
 
 const fullAddress = computed(() => {
   return property.value?.address?.fullAddress || "No address provided";
 });
 
-// Room carousel controls
-const carouselRefs = ref<{ [key: number]: any }>({})
+const roomConfigs = computed(() => generateRoomConfig(property.value));
 
-function setCarouselRef(el: any, index: number) {
-  if (el) {
-    carouselRefs.value[index] = el
-  }
-}
-
-function scrollPrev(index: number) {
-  carouselRefs.value[index]?.scrollPrev()
-}
-
-function scrollNext(index: number) {
-  carouselRefs.value[index]?.scrollNext()
-}
 
 
 
@@ -479,76 +300,6 @@ ul {
     }
   }
 
-  .room-summary {
-    padding: var(--size-16);
-    &__items {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: var(--size-24);
-    }
-    &-item {
-      display: flex;
-      flex-direction: column;
-      border-radius: var(--border-radius-2xl);
-      overflow: hidden;
-      background: var(--blue-400);
-      text-align: center;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-
-      &:hover {
-        transform: translateY(-2px);
-      }
-
-      &__title {
-        width: 100%;
-        padding: var(--size-24) 0;
-        background: url("/img/logo-background.svg") no-repeat center right, var(--secondary-400);
-        background-size: auto 250%, cover;
-        color: var(--foreground-100);
-        text-transform: capitalize;
-        margin: 0;
-      }
-
-      &__details {
-        position: relative;
-        display: flex;
-        height: 100%;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;;
-        padding: var(--size-24) var(--size-16);
-        color: var(--monochrome-900);
-      }
-    }
-  }
-
-  .room-carousel-container {
-    position: relative;
-  }
-
-
-
-  .room-carousel-arrow {
-    position: absolute;
-    top: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    color: var(--secondary-400);
-
-    &--prev {
-      left: 8px;
-      transform: translateY(-50%) rotate(90deg);
-    }
-
-    &--next {
-      right: 8px;
-      transform: translateY(-50%) rotate(-90deg);
-    }
-  }
 
   /**
    *  Images

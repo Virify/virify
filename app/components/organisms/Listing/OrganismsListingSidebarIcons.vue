@@ -1,51 +1,68 @@
 <template>
   <ul class="o-listing-sidebar-icons | body-sm">
-    <li v-if="propertyType" class="o-listing-sidebar-icons__row o-listing-sidebar-icons__row--full">
-      <AtomsIcon icon="listings/property-type" aria-hidden class="o-listing-sidebar-icons__icon" />
+    <li
+      v-if="propertyType"
+      class="o-listing-sidebar-icons__row o-listing-sidebar-icons__row--full"
+    >
+      <AtomsIcon
+        :icon="getPropertyTypeIcon(propertyType)"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
       {{ propertyType }}
     </li>
-    
+
+    <li v-if="classification" class="o-listing-sidebar-icons__row">
+      <AtomsIcon
+        :icon="getClassificationIcon(classification)"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ classification }}
+    </li>
+
     <li v-if="bedrooms" class="o-listing-sidebar-icons__row">
-      <AtomsIcon icon="listings/beds" aria-hidden class="o-listing-sidebar-icons__icon" />
-      {{ bedrooms }} bed{{ bedrooms !== 1 ? 's' : '' }}
+      <AtomsIcon
+        icon="listings/beds"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ bedrooms }} bed{{ bedrooms !== 1 ? "s" : "" }}
     </li>
-    
+
     <li v-if="bathrooms" class="o-listing-sidebar-icons__row">
-      <AtomsIcon icon="listings/bathrooms" aria-hidden class="o-listing-sidebar-icons__icon" />
-      {{ bathrooms }} bathroom{{ bathrooms !== 1 ? 's' : '' }}
+      <AtomsIcon
+        icon="listings/bathrooms"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ bathrooms }} bathroom{{ bathrooms !== 1 ? "s" : "" }}
     </li>
-    
+
     <li v-if="receptions" class="o-listing-sidebar-icons__row">
-      <AtomsIcon icon="property/receptions" aria-hidden class="o-listing-sidebar-icons__icon" />
-      {{ receptions }} reception{{ receptions !== 1 ? 's' : '' }}
-    </li>
-    
-    <li v-if="ownership" class="o-listing-sidebar-icons__row">
-      <AtomsIcon icon="listings/contract" aria-hidden class="o-listing-sidebar-icons__icon" />
-      {{ ownership }}
+      <AtomsIcon
+        icon="property/receptions"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ receptions }} reception{{ receptions !== 1 ? "s" : "" }}
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
+
 interface Props {
-  propertyType?: string
-  propertySize?: number
-  price?: number
-  bedrooms?: number
-  bathrooms?: number
-  receptions?: number
-  ownership?: string
+  propertyType?: string;
+  propertySize?: number;
+  price?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  receptions?: number;
+  classification?: string;
 }
 
-const props = defineProps<Props>()
-
-const pricePerSqft = computed(() => {
-  if (props.price && props.propertySize) {
-    return `£${Math.round(props.price / props.propertySize)}`
-  }
-  return ''
-})
+defineProps<Props>();
 </script>
 
 <style lang="scss">

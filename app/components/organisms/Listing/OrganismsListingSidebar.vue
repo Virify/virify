@@ -18,19 +18,23 @@
       :bedrooms="bedrooms"
       :bathrooms="bathrooms"
       :receptions="receptions"
-      :ownership="ownership"
+      :classification="classification"
     />
 
       <OrganismsListingSidebarPills 
       :property-size="propertySize"
-      :construction-type="constructionType"
       :chain-free="chainFree"
       :vacant="vacant"
-      :year-built="yearBuilt"
+      :year-built="newBuild"
     />
 
     <OrganismsListingButtons :listing-id="listingId" enquire-url="#" />
-    <OrganismsListingAgent />
+
+    <NuxtLink v-if="agent" to="#" class="o-listing-sidebar__agent-link">
+      <OrganismsListingAgent :agent="agent" />
+    </NuxtLink>
+
+    <OrganismsListingAgent v-else :agent="agent" />
   </section>
 </template>
 
@@ -45,14 +49,28 @@ interface Props {
   bedrooms?: number
   bathrooms?: number
   receptions?: number
-  ownership?: string
+  classification?: string
   yearBuilt?: string
   constructionType?: string
   chainFree?: boolean
   vacant?: boolean
+  agent?: {
+    username?: string | null
+    email?: string | null
+    id?: number | null
+    createdAt?: Date | String | null
+    avatar?: string | null
+  }
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const newBuild = computed(() => {
+  // if built in the last 3 years, return "New build"
+  if (props.yearBuilt && new Date().getFullYear() - parseInt(props.yearBuilt) <= 3) {
+    return 'New build';
+  }
+});
 
 </script>
 
@@ -75,6 +93,11 @@ defineProps<Props>()
   &__address {
     margin: 0;
     color: var(--secondary-400);
+  }
+
+  &__agent-link {
+    text-decoration: none;
+    display: block;
   }
 }
 </style>

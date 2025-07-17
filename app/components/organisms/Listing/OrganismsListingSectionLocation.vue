@@ -36,7 +36,7 @@
         </p>
       </div>
 
-      <ListingAmenities
+      <MoleculesListingAmenities
         :lat="lat"
         :lon="lon"
         :listing="listing"
@@ -47,7 +47,6 @@
 </template>
 
 <script setup lang="ts">
-import ListingAmenities from "../../molecules/Listing/MolculesListingAmenities.vue";
 
 interface Props {
   lat: number;
@@ -90,7 +89,7 @@ onMounted(() => {
   padding: var(--size-16);
   &__map-container {
     width: 100%;
-    height: min(40em, 30vh);
+    height: min(40em, 40vh);
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
   }

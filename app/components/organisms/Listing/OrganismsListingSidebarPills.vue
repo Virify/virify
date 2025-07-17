@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import AtomsPill from "~/components/atoms/AtomsPill.vue";
 
 interface Props {
   constructionType?: string;
@@ -17,6 +16,7 @@ interface Props {
   vacant?: boolean;
   yearBuilt?: string;
   propertySize?: number;
+  reduced?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -39,11 +39,15 @@ const pills = computed(() => {
   }
 
   if (props.yearBuilt) {
-    pillsArray.push(`Built: ${props.yearBuilt}`);
+    pillsArray.push(`${props.yearBuilt}`);
   }
 
   if (props.propertySize) {
     pillsArray.push(`Total Size: ${props.propertySize} m²`);
+  }
+
+  if (props.reduced) {
+    pillsArray.push("Reduced");
   }
 
   return pillsArray;
