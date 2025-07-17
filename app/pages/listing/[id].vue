@@ -13,11 +13,10 @@
         <skeleton-loader
           class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile"
         >
-          <OrganismsListingCarousel
-            v-if="!isDesktop"
-            :slides="images"
-            :width="1000"
-            aspect-ratio="4/3"
+          <MoleculesImageGallery
+            v-if="!isDesktop && galleryImages.length > 0"
+            :images="galleryImages"
+            @open-modal="openImageModal"
           />
         </skeleton-loader>
       </div>
@@ -30,10 +29,10 @@
             role="presentation"
           >
             <skeleton-loader class="p-listing__main-carousel-skeleton">
-              <OrganismsListingCarousel
-                v-if="isDesktop"
-                :slides="images"
-                :width="1000"
+              <MoleculesImageGallery
+                v-if="isDesktop && galleryImages.length > 0"
+                :images="galleryImages"
+                @open-modal="openImageModal"
               />
             </skeleton-loader>
           </div>
@@ -68,11 +67,13 @@
         <div class="p-listing__sidebar" role="presentation">
           <Transition name="p-listing-images">
             <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
-              <OrganismsListingCarousel
-                class="p-listing__sidebar-carousel"
-                :slides="images"
-                :width="400"
-              />
+              <div class="p-listing__sidebar-carousel">
+                <MoleculesImageGallery
+                  v-if="galleryImages.length > 0"
+                  :images="galleryImages"
+                  @open-modal="openImageModal"
+                />
+              </div>
             </div>
           </Transition>
 
@@ -97,6 +98,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Image Gallery Modal -->
+    <MoleculesImageGalleryModal
+      v-if="showImageModal"
+      :images="galleryImages"
+      :initial-index="modalImageIndex"
+      @close="closeImageModal"
+    />
 
     <client-only>
       <OrganismsListingMobileBanner
@@ -169,6 +178,24 @@ const images = computed(() => {
     }));
 });
 
+// Gallery images formatted for the new image gallery component
+const galleryImages = computed(() => {
+  // Create fake data with 20 images for testing with varying heights for masonry
+  const heights = [400, 600, 500, 700, 450, 550, 650, 480, 580, 520, 750, 420, 680, 460, 620, 540, 720, 490, 590, 510];
+  const fakeImages = Array.from({ length: 20 }, (_, index) => ({
+    src: `https://picsum.photos/800/${heights[index]}?random=${index + 1}`,
+    alt: `Property image ${index + 1}`
+  }));
+  
+  return fakeImages;
+  
+  // Original code (commented out for testing)
+  // return images.value.map((item, index) => ({
+  //   src: (typeof item.image === 'string' ? item.image : (item.image as any)?.url) || `https://picsum.photos/800/600?random=${index + 1}`,
+  //   alt: item.metadata?.alt || `Property image ${index + 1}`
+  // }));
+});
+
 /**
  *  Toggle media visibility
  */
@@ -217,6 +244,21 @@ const isOverviewVisible = shallowRef(true);
 useIntersectionObserver($overview, ([entry]) => {
   isOverviewVisible.value = !!entry?.isIntersecting;
 });
+
+/**
+ *  Image Gallery Modal
+ */
+const showImageModal = ref(false);
+const modalImageIndex = ref(0);
+
+function openImageModal(imageIndex: number) {
+  modalImageIndex.value = imageIndex;
+  showImageModal.value = true;
+}
+
+function closeImageModal() {
+  showImageModal.value = false;
+}
 </script>
 
 <style lang="scss">
@@ -306,7 +348,6 @@ ul {
    */
   &__main-carousel,
   &__sidebar-carousel {
-    background: var(--foreground-300);
     overflow: hidden;
   }
 
@@ -324,14 +365,12 @@ ul {
 
       @include mq.notebook {
         display: block;
-        border-radius: var(--border-radius-3xl);
         margin-bottom: var(--size-24);
       }
     }
   }
 
   &__sidebar-carousel {
-    border-radius: var(--border-radius-2xl);
     margin-bottom: var(--size-24);
   }
 
