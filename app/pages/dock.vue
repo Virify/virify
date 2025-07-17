@@ -77,7 +77,7 @@ function clearFilters() {
 
 <style scoped>
 pre {
-  height: 150vh;
+  min-height: 150vh;
   overflow: hidden;
 }
 </style>
