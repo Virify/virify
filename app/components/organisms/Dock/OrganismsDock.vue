@@ -127,6 +127,7 @@ onMounted(() => {
     justify-content: center;
     width: 100%;
     background: none;
+    overflow: hidden;
     pointer-events: none;
 
     &:popover-open {
