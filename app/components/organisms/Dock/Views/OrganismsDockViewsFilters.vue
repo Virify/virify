@@ -2,25 +2,48 @@
   <div class="| flow">
     <h2 class="| title-md">AI filters</h2>
 
-    <textarea placeholder="Example text area"></textarea>
+    <div v-if="isPending">Loading...</div>
+
+    <MoleculesAiSearchFormFilters v-else :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
   </div>
 </template>
 
-<style scoped>
-textarea {
-  position: relative;
-  border: none;
-  background: transparent;
-  color: inherit;
-  margin: 0;
-  min-height: 12ch;
-  padding: var(--size-14) var(--size-18);
-  resize: none;
-  outline: none;
-  z-index: 2;
-  border: 1px solid var(--border-color-200);
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: var(--border-radius-xl);
+<script setup lang="ts">
+const initialQuery = ref('')
+
+function searchSubmit(newValue: unknown) {
+  console.log('submit-search', newValue);
+
+  togglePending(2000, true)
+};
+
+function searchReset() {
+  console.log('reset-search')
+
+  togglePending()
 }
-</style>
+
+/**
+ *  Allow closing
+ */
+const emits = defineEmits(['close'])
+
+/**
+ *  Mock pending states
+ */
+const isPending = ref(false)
+
+const togglePending = (timeout = 0, closeAfter = false) => {
+  if (import.meta.server) return
+
+  if (isPending.value) return
+
+  isPending.value = true
+
+  setTimeout(() => {
+    isPending.value = false
+
+    if (closeAfter) emits('close')
+  }, timeout)
+}
+</script>

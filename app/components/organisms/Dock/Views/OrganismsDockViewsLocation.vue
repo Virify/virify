@@ -27,4 +27,9 @@ function updateFormSubmitted(radius: number) {
     type: 'submit'
   })
 }
+
+/**
+ *  Allow closing
+ */
+const emits = defineEmits(['close'])
 </script>

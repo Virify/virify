@@ -10,7 +10,7 @@
         </AtomsButton>
 
         <template v-if="popover">
-          <component :is="popover.component" />
+          <component :is="popover.component" @close="hidePopover" />
 
           <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
             @close-popover="hidePopover" />
