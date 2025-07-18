@@ -68,6 +68,11 @@ defineProps<Props>()
   flex: 1 0 auto;
   width: 100%;
 
+  &[disabled] {
+    cursor: not-allowed;
+    color: light-dark(var(--monochrome-500), var(--monochrome-600));
+  }
+
   @include mq.tablet {
     padding-right: var(--size-6);
   }
@@ -82,7 +87,7 @@ defineProps<Props>()
     font-size: var(--font-sm);
     gap: var(--size-10);
 
-    &--active {
+    &--active:not([disabled]) {
       background-color: var(--secondary-400);
       color: var(--monochrome-900);
     }
@@ -115,7 +120,7 @@ defineProps<Props>()
     }
   }
 
-  &--active &__count {
+  &--active:not([disabled]) &__count {
     background: var(--secondary-300);
   }
 }
