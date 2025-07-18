@@ -11,39 +11,38 @@
 <script setup lang="ts">
 const initialQuery = ref('')
 
-function searchSubmit(newValue: unknown) {
-  console.log('submit-search', newValue);
+/**
+ *  Fetch filters
+ */
+const { isPending, setPendingWhile } = usePending()
+const { state, setAiFilters } = useUniversalSearch()
+const { aiSearch } = useAiSearchPage();
 
-  togglePending(2000, true)
+function searchSubmit(filterString: string) {
+
+  // Get current location, locationRadius
+  const { location, locationRadius } = asObject(state.value)
+
+  // Set pending state
+  setPendingWhile(async () => {
+    if (!location) return
+
+    const response = await aiSearch(location as GeocodingFeature, locationRadius as number, filterString, 1);
+
+    setAiFilters(response as unknown)
+  }).then(() => {
+    emits('close')
+  })
+
+  console.log('submit-search', filterString);
 };
 
 function searchReset() {
   console.log('reset-search')
-
-  togglePending()
 }
 
 /**
  *  Allow closing
  */
 const emits = defineEmits(['close'])
-
-/**
- *  Mock pending states
- */
-const isPending = ref(false)
-
-const togglePending = (timeout = 0, closeAfter = false) => {
-  if (import.meta.server) return
-
-  if (isPending.value) return
-
-  isPending.value = true
-
-  setTimeout(() => {
-    isPending.value = false
-
-    if (closeAfter) emits('close')
-  }, timeout)
-}
 </script>

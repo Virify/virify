@@ -25,9 +25,17 @@ const { filters } = toRefs(state.value)
  *  Count filters
  */
 const filtersCount = computed(() => {
-  const { options = [] } = asObject(filters.value)
+  const { type, options } = asObject(filters.value)
 
-  return (options as unknown[])?.length
+  // If AI search is used, get usedTerms
+  if (type === 'ai') {
+    const { usedTerms = [] } = asObject((options as Record<string, unknown>)?.queryAnalysis)
+
+    return (usedTerms as string[]).length || 0
+  }
+
+  // @TODO for traditional search
+  return 0
 })
 
 /**

@@ -6,7 +6,7 @@ interface State {
   locationRadius?: number,
   filters: {
     type: 'ai' | 'traditional'
-    options?: unknown[]
+    options?: Record<string, unknown> | null
   },
   sortOrder?: SortOrder
   layout: ResultLayout
@@ -25,7 +25,7 @@ export function useUniversalSearch() {
     locationRadius: 0,
     filters: {
       type: 'ai',
-      options: [1, 2, 3]
+      options: null
     },
     sortOrder: initialSortOrder,
     layout: 'grid'
@@ -54,13 +54,13 @@ export function useUniversalSearch() {
   /**
    *  Update state sort order
    */
-  function setAiFilters(value: unknown[], callback?: () => void) {
+  function setAiFilters(value: unknown, callback?: () => void) {
     // Check value is valid
-    if (value && !Array.isArray(value)) return
+    if (!isObject(value)) return
 
     // Update state
     state.value.filters.type = 'ai'
-    state.value.filters.options = value ?? []
+    state.value.filters.options = value ?? {}
 
     // Run optional callback
     _runCallback(callback)
