@@ -11,7 +11,7 @@
     </AtomsButton>
 
     <AtomsButton class="| button button-sm button-secondary" @click.prevent="hidePopover">
-      Show results
+      Back to results
     </AtomsButton>
   </div>
 </template>
@@ -58,7 +58,7 @@ function hidePopover() {
   gap: var(--size-8);
 
   .button {
-    flex: 1 1 50%;
+    flex: 1 1 auto;
   }
 
   @include mq.tablet {
