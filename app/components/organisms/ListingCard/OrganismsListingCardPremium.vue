@@ -16,7 +16,7 @@
           #side-images="{ selectedIndex, goToSlide, images: allImages }"
         >
           <div class="premium-side-images">
-            <AtomsSkeletonImage
+             <nuxt-img
               v-for="(image, index) in getRotatedImages(allImages, selectedIndex)"
               :key="`${selectedIndex}-${index}`"
               :src="image.src"
@@ -24,11 +24,11 @@
               :class="{ active: image.isActive }"
               :alt="image.alt"
               @click="goToSlide(image.originalIndex)"
-              width="200"
-              height="200"
+              :width="200"
+              :height="200"
               fit="cover"
               quality="80"
-              placeholder
+              placeholder="/img/preload.svg"
             />
           </div>
         </template>
@@ -326,7 +326,7 @@ const getRotatedImages = (allImages: any[], selectedIndex: number) => {
   const len = allImages.length;
   if (len === 0) return [];
   for (let i = 0; i < Math.min(4, len); i++) {
-    const imageIndex = (selectedIndex + i) % len;
+    const imageIndex = (selectedIndex + i) % len + 1;
     const img = allImages[imageIndex];
     if (!img) continue;
     sideImages.push({
@@ -529,8 +529,8 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   gap: var(--size-8);
   padding: 0;
   height: 100%;
-  // Calculate width: remaining space after main image and gap
   width: calc(100% - 72% - var(--size-8));
+  border-radius: 0;
 }
 
 .premium-side-image {
@@ -539,19 +539,20 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   object-fit: cover;
   cursor: pointer;
 
-  &:first-of-type img {
-    border-top-right-radius: var(--border-radius-lg);
-  }
-  &:last-of-type img {
-    border-bottom-right-radius: var(--border-radius-lg);
-  }
   &:hover {
     opacity: 0.8;
-    transform: scale(1.02);
   }
 
   &.active {
     opacity: 1;
+  }
+
+  &:first-child {
+    border-top-right-radius: var(--border-radius-2xl);
+  }
+
+  &:last-child {
+    border-bottom-right-radius: var(--border-radius-2xl);
   }
 }
 
@@ -858,6 +859,14 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       height: 100%;
       aspect-ratio: 1;
       object-fit: cover;
+
+      &:first-child {
+        border-top-right-radius: 0;
+      }
+
+      &:nth-child(2) {
+        border-top-right-radius: var(--border-radius-2xl);
+      }
     }
   }
 }
@@ -921,6 +930,18 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
         border-bottom-right-radius: calc(
           var(--border-radius-2xl) + var(--size-2) - var(--size-8)
         );
+      }
+
+      &:first-child {
+       border-bottom-left-radius: var(--border-radius-2xl);
+      }
+
+      &:nth-child(2) {
+        border-radius: 0;
+      }
+
+      &:last-child {
+        border-bottom-right-radius: var(--border-radius-2xl);
       }
     }
   }

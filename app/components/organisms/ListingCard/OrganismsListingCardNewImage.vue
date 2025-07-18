@@ -13,15 +13,15 @@
           class="m-listing-card-image-slide"
           @click="openImageModal(index)"
         >
-          <AtomsSkeletonImage
+          <nuxt-img
             :src="img.image"
             :alt="img.metadata"
             class="m-listing-card-image"
-            width="600"
-            height="400"
-            fit="cover"
+            :width="600"
+            :height="400"
             quality="80"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
+            placeholder="/img/preload.svg"
           />
         </div>
       </div>
@@ -197,7 +197,7 @@ onMounted(() => {
   height: 100%;
   object-fit: cover;
   width: 100%;;
-  transition: transform 0.2s ease;
+  // transition: transform 0.2s ease;
 }
 
 .m-listing-card-image-overlay {

@@ -23,13 +23,13 @@
             :src="image.src"
             :alt="image.alt"
             class="image-gallery-modal__grid-image"
-            loading="eager"
             decoding="async"
             :width="800"
             :height="600"
             fit="cover"
             quality="90"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
+            placeholder="/img/preload.svg"
           />
           <div class="image-gallery-modal__overlay">
             <span class="image-gallery-modal__overlay-text">{{ image.alt }}</span>
@@ -44,13 +44,13 @@
             :src="expandedImage.src"
             :alt="expandedImage.alt"
             class="image-gallery-modal__expanded-image"
-            loading="eager"
             decoding="async"
             :width="1200"
             :height="900"
             fit="contain"
             quality="95"
             sizes="90vw"
+            placeholder="/img/preload.svg"
           />
           <div class="image-gallery-modal__expanded-overlay">
             <span class="image-gallery-modal__expanded-text">{{ expandedImage.alt }}</span>
