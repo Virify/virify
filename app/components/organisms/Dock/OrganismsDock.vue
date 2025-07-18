@@ -153,6 +153,7 @@ onMounted(() => {
     overflow: auto;
     scrollbar-width: thin;
     pointer-events: all;
+    overscroll-behavior: contain;
 
     @include mq.tablet {
       max-height: calc(100dvh - var(--size-32) - #{ $dock-height });
