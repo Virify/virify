@@ -96,6 +96,13 @@ function setWithinBounds(newPosition: number) {
 }
 
 /**
+ *  Reset isDragToClose on layout change
+ */
+watch(bothSlots, () => {
+  isDragToClose.value = false
+})
+
+/**
  *  Track pane sizes
  */
 let resizer: ResizeObserver
