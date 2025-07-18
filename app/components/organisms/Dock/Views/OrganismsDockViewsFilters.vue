@@ -36,8 +36,6 @@ function searchSubmit(filterString: string) {
   }).finally(() => {
     setSearchPending(false)
   })
-
-  console.log('submit-search', filterString);
 };
 
 function searchReset() {
