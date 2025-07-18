@@ -1,14 +1,19 @@
 <template>
-  <div ref="$wrapper" role="presentation" class="window">
-    <div v-if="leftSlot" role="presentation" class="pane pane-left" :class="{ 'pane-full': !bothSlots }">
+  <div ref="$wrapper" role="presentation" class="o-pane-slider">
+    <div v-if="leftSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--left"
+      :class="{ 'o-pane-slider__pane--full': !bothSlots }">
       <slot name="left"></slot>
     </div>
 
-    <button v-show="bothSlots" ref="$thumb" type="button" class="slider" role="separator" aria-orientation="vertical">
-      <div class="slider-thumb" role="hidden"></div>
+    <button v-show="bothSlots" ref="$thumb" type="button" class="o-pane-slider__slider" role="separator"
+      aria-orientation="vertical">
+      <div class="o-pane-slider__slider-thumb" role="hidden">
+        <span class="o-pane-slider__slider-icon" role="hidden"></span>
+      </div>
     </button>
 
-    <div v-if="rightSlot" role="presentation" class="pane pane-right" :class="{ 'pane-full': !bothSlots }">
+    <div v-if="rightSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--right"
+      :class="{ 'o-pane-slider__pane--full': !bothSlots }">
       <slot name="right"></slot>
     </div>
   </div>
@@ -190,66 +195,78 @@ const positionPercent = computed(() => {
 const leftWidth = computed(() => unref(positionPercent) + '%')
 </script>
 
-<style scoped>
-.window {
+<style lang="scss">
+.o-pane-slider {
+  --pane-spacing: var(--size-16);
+  --thumb-grab-width: var(--size-32);
+
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: stretch;
-  gap: var(--size-16);
-}
+  gap: var(--pane-spacing);
 
-.pane {
-  padding: var(--size-32);
-  box-sizing: border-box;
-  border-radius: var(--border-radius-2xl);
-}
+  &__pane {
+    flex: 1 0 auto;
 
-.pane-left {
-  width: calc(v-bind(leftWidth) - var(--size-16));
-  background: #fff;
-  flex: 0 0 auto;
-}
+    &--left {
+      width: calc(v-bind(leftWidth) - var(--pane-spacing));
+      flex: 0 0 auto;
+    }
 
-.pane-right {
-  flex: 1 0;
-  background: #ccc;
-}
+    &--full {
+      width: 100%;
+    }
+  }
 
-.pane-full {
-  width: 100%;
-}
 
-.slider {
-  position: sticky;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  height: 100dvh;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
-}
+  &__slider {
+    position: sticky;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    height: auto;
+    min-height: 12ch;
+    max-height: 100svh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
 
-.slider:active {
-  cursor: grabbing;
-}
+    &:active {
+      cursor: grabbing;
+    }
+  }
 
-.slider-thumb {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--size-2);
-  transform: translateX(-50%);
-  background: var(--secondary-400);
-}
+  &__slider-thumb {
+    position: absolute;
+    top: 0;
+    left: calc(0px - var(--thumb-grab-width) / 2);
+    height: 100%;
+    width: var(--thumb-grab-width);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.slider:active .slider-thumb,
-.slider:hover .slider-thumb {
-  width: var(--size-16);
+  &__slider-icon {
+    display: block;
+    width: var(--size-6);
+    height: 5ch;
+    background: light-dark(var(--monochrome-600), var(--monochrome-500));
+    border-radius: var(--border-radius-pill);
+    transition: width, height, background-color;
+    transition-duration: var(--animation-fast);
+  }
+
+  &__slider:active &__slider-icon,
+  &__slider:hover &__slider-icon {
+    width: var(--size-8);
+    height: 7ch;
+    background: var(--secondary-400);
+  }
 }
 </style>
