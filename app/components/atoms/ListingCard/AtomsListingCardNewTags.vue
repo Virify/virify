@@ -47,7 +47,8 @@ ul {
 }
 
 .m-listing-card-tag {
-  background-color: var(--background-300);
+  background-color: var(--blue-400);
+  color: var(--monochrome-900);
   padding: var(--size-8);
   border-radius: var(--border-radius-lg);
   white-space: nowrap;

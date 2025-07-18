@@ -1,182 +1,196 @@
 <template>
   <div class="o-listing-section-location | flow flow-lg">
-    <div class="o-listing-section-location__grid" role="presentation">
-      <div class="o-listing-section-location__amenities">
-        <template v-for="([key, items], idx) in Object.entries(groupedAmenities)" :key="key">
-          <div v-if="Array.isArray(items) && items.length > 0" class="o-listing-section-location__category | box">
-            <button
-              class="o-listing-section-location__category-toggle"
-              :aria-expanded="!isCategoryCollapsed(key)"
-              @click="setCategoryCollapsed(key, !isCategoryCollapsed(key))"
+    <h2 class="| title-md">Location and Amenities</h2>
+    <!-- Map Section on its own row -->
+    <div class="o-listing-section-location__map-container">
+      <Map
+        v-if="lat && lon"
+        ref="mapRef"
+        :center="[lon, lat]"
+        :zoom="12"
+        :interactive="false"
+        :marker="mapMarker"
+        class="o-listing-section-location__map"
+      />
+    </div>
+
+    <div class="o-listing-section-location__amenities-section">
+      <!-- Not logged in: Show original hero + blurred amenities -->
+      <template v-if="!loggedIn">
+        <div class="o-listing-section-location__amenities-hero">
+          <h2 class="| title-md">Know your stuff ahead of time!</h2>
+          <p class="| body-md">
+            Check out the nearby amenities to see what's around your potential
+            new home. We've got you covered with all the info you need.
+          </p>
+          <p class="| body-md">
+            You can even customise them to see what matters most to you.
+          </p>
+          <button
+            @click="openLogin"
+            class="o-listing-section-location__amenities-hero__link | button button-secondary"
+          >
+            Sign In to Access
+          </button>
+          <p class="| body-xs">
+            <strong>Note:</strong> Amenities are approximate and may not be
+            exhaustive. Always verify with local sources.
+          </p>
+        </div>
+
+        <MoleculesListingAmenitiesPreview :show-overlay="false">
+          <template #content>
+            <MoleculesListingAmenitiesSkeleton />
+          </template>
+        </MoleculesListingAmenitiesPreview>
+      </template>
+
+      <!-- Logged in: Show amenities + upsell for more -->
+      <template v-else>
+        <MoleculesListingAmenities
+          :lat="lat"
+          :lon="lon"
+          :listing="listing"
+          @amenities-loaded="handleAmenitiesLoaded"
+        />
+
+        <MoleculesListingAmenitiesPreview>
+          <template #content>
+            <MoleculesListingAmenitiesSkeleton 
+              :show-redacted="false"
+              class="o-listing-section-location__amenities-blurred"
+            />
+          </template>
+          <template #overlay>
+            <h2 class="| title-sm">Discover More Amenities</h2>
+            <p class="| body-sm">
+              Unlock restaurants, gyms, parks, shops and 15+ more categories.
+            </p>
+            <NuxtLink
+              to="#"
+              class="o-listing-section-location__amenities-unlock-btn | button button-secondary"
             >
-              <span class="o-listing-section-location__category-title | title-xs">{{ formatCategoryKey(key) }}</span>
-              <span class="o-listing-section-location__category-arrow" aria-hidden="true">
-                <svg v-if="isCategoryCollapsed(key)" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M7 13L11 9L7 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <svg v-else width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M5 7L9 11L13 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-            </button>
-            <transition name="fade">
-              <ul v-if="!isCategoryCollapsed(key)" class="o-listing-section-location__list">
-                <li v-for="item in items" :key="item.name">
-                  <a
-                    :href="item.location && item.location.lat && item.location.lon
-                      ? `https://www.google.com/maps/search/?api=1&query=${item.location.lat},${item.location.lon}`
-                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name)}`"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {{ item.name }}
-                  </a>
-                  - {{ formatDistance(item.distance) }}
-                </li>
-              </ul>
-            </transition>
-          </div>
-        </template>
-
-        <div v-if="isLoading" class="o-listing-section-location__loading">
-          Loading nearby amenities...
-        </div>
-
-        <div v-else-if="error" class="o-listing-section-location__error">
-          {{ error }}
-        </div>
-
-        <div
-          v-else-if="!groupedAmenities.schools.length && !groupedAmenities.hospitals.length && !groupedAmenities.train_stations.length"
-          class="o-listing-section-location__empty">
-          No nearby amenities found
-        </div>
-      </div>
-
-      <Map v-if="lat && lon" ref="mapRef" :center="[lon, lat]" :zoom="12" :interactive="false" :marker="mapMarker"
-        class="o-listing-section-location__map" />
+              Unlock Premium
+            </NuxtLink>
+          </template>
+        </MoleculesListingAmenitiesPreview>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ViewsDialogLogin } from "#components";
 
 interface Props {
-  lat: number
-  lon: number
-  listing?: any
+  lat: number;
+  lon: number;
+  listing?: any;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
-const mapRef = ref()
-const mapMarker = computed(() => props.listing)
+const { loggedIn } = useUserSession();
+const { showDialog } = useDialog();
+const mapRef = ref();
+const mapMarker = computed(() => props.listing);
 
-function formatCategoryKey(key: string) {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+function openLogin() {
+  showDialog({
+    component: ViewsDialogLogin,
+  });
 }
 
-const { amenities: groupedAmenities, isLoading, error, fetchAmenities, formatDistance, isCategoryCollapsed, setCategoryCollapsed } = useAmenities()
+function handleAmenitiesLoaded() {
+  // Recenter map after amenities are loaded (content has changed the layout)
+  nextTick(() => {
+    if (mapRef.value?.recenterMap) {
+      setTimeout(() => {
+        mapRef.value.recenterMap();
+      }, 100);
+    }
+  });
+}
 
-onMounted(async () => {
-  if (props.lat && props.lon && props.listing?.property?.id) {
-    await fetchAmenities(props.listing.property.id, props.lat, props.lon, 5000)
-    
-    // Recenter map after amenities are loaded (content has changed the layout)
-    nextTick(() => {
-      if (mapRef.value?.recenterMap) {
-        setTimeout(() => {
-          mapRef.value.recenterMap()
-        }, 100)
-      }
-    })
-  }
-})
+// Ensure map loads properly after component mount
+onMounted(() => {
+  nextTick(() => {
+    if (mapRef.value?.recenterMap) {
+      setTimeout(() => {
+        mapRef.value.recenterMap();
+      }, 200);
+    }
+  });
+});
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/media' as mq;
+@use "#styles/_utils/media" as mq;
 
 .o-listing-section-location {
-  &__grid {
-    display: grid;
-    grid-gap: var(--size-16);
-
-    @include mq.small-tablet {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  padding: var(--size-16);
+  &__map-container {
+    width: 100%;
+    height: min(40em, 40vh);
+    border-radius: var(--border-radius-2xl);
+    overflow: hidden;
   }
 
   &__map {
-    border-radius: var(--border-radius-2xl);
-    height: min(40em, 100vh);
+    width: 100%;
+    height: 100%;
   }
 
-  &__amenities {
+  &__amenities-section {
     display: flex;
     flex-direction: column;
-    gap: var(--size-8);
-  }
+    gap: var(--size-16);
+    margin-top: var(--size-32);
 
-  &__category {
-    background: var(--background-300);
-    &-title {
-      margin: 0;
-      color: var(--foreground-700);
+    @include mq.tablet {
+      flex-direction: row;
+      gap: var(--size-32);
+    }
+
+    > * {
+      width: 100%;
+      
+      @include mq.tablet {
+        width: calc(50% - var(--size-16));
+      }
     }
   }
 
-  &__category-toggle {
+  &__amenities-hero {
+    border-radius: var(--border-radius-2xl);
     width: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: var(--size-8);
-    font: inherit;
-  }
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding: var(--size-32);
+    background: url("/img/logo-background.svg") no-repeat bottom right,
+      var(--blue-400);
+    background-size: auto, cover;
+    color: var(--monochrome-900);
+    gap: var(--size-8);
 
-  &__category-arrow {
-    font-size: 1.2em;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    margin-left: var(--size-8);
-  }
 
-  &__list {
-    a {
-      color: inherit;
-      text-decoration: underline;
-      text-decoration-color: var(--secondary-400);
-      text-underline-offset: 2px;
-    }
-    margin: 0;
-    padding: 0;
-    list-style: none;
-
-    li {
-      font-size: var(--text-sm);
-      color: var(--foreground-600);
+    &__link {
+      margin: var(--size-16) 0;
+      color: var(--foreground-100);
     }
   }
 
-  &__loading,
-  &__error,
-  &__empty {
-    font-size: var(--text-sm);
-    font-style: italic;
+  &__amenities-blurred {
+    filter: blur(var(--size-8));
+    pointer-events: none;
   }
 
-  &__loading {
-    color: var(--foreground-500);
-  }
-
-  &__error {
-    color: var(--danger-500, #ef4444);
-  }
-
-  &__empty {
-    color: var(--foreground-400);
+  &__amenities-unlock-btn {
+    margin-top: var(--size-16);
+    color: var(--foreground-100);
+    align-self: center;
   }
 }
 </style>

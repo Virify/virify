@@ -181,7 +181,6 @@ const priceType = computed(() => {
     min-width: 60px;
     text-align: center;
     padding-right: var(--size-8);
-    background-color: var(--background-300);
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
   }

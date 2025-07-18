@@ -184,16 +184,33 @@ export const generateAdditionalToilet = (): Prisma.AdditionalToiletCreateWithout
 };
 
 /**
- * Generate a random number of media objects
+ * Generate media objects for a specific feature
  *
+ * @param featureId - The ID of the feature to link the media to
+ * @param roomType - The type of room (for better metadata)
  * @returns Array of media objects
  */
-export const generateMedia = (): Prisma.MediaCreateWithoutPropertyInput[] => {
+export const generateMediaForFeature = (featureId: number, roomType: string): Prisma.MediaCreateWithoutPropertyInput[] => {
   const mediaCount = faker.number.int({ min: 1, max: 3 });
-  return Array.from({ length: mediaCount }, () => ({
-    image: faker.image.url({ width: 300, height: 300 }),
-    metadata: faker.word.words(10),
-  }));
+  return Array.from({ length: mediaCount }, () => {
+    // Use realistic real estate image dimensions
+    // 2048x1536 for high-quality web display (4:3 aspect ratio)
+    // Common in real estate photography for MLS and web platforms
+    const width = 2048;
+    const height = 1536;
+    
+    return {
+      image: faker.image.urlPicsumPhotos({ width, height }),
+      metadata: JSON.stringify({
+        alt: `${roomType} - ${faker.word.words(3)}`,
+        description: faker.word.words(5),
+        roomType: roomType,
+        dimensions: `${width}x${height}`,
+        aspectRatio: '4:3'
+      }),
+      featureId: featureId,
+    };
+  });
 };
 
 /**
@@ -356,7 +373,8 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   const { count: bathroomCount, data: bathrooms } = generateBathrooms();
   const { count: receptionCount, data: receptions } = generateReception();
 
-  const property: PropertyWithAddress = await prisma.property.create({
+  // First create the property with all features
+  const propertyWithFeatures = await prisma.property.create({
     data: {
       title: faker.word.words(10),
       description: faker.word.words(20),
@@ -400,9 +418,6 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       },
       additionalToilet: {
         create: generateAdditionalToilet(),
-      },
-      media: {
-        create: generateMedia(),
       },
       outdoorSpace: {
         create: generateOutDoorSpace(),
@@ -450,8 +465,97 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     },
     include: {
       address: true,
+      bedroomFeatures: true,
+      bathroomFeatures: true,
+      reception: true,
+      kitchenFeatures: true,
+      livingAreaFeatures: true,
+      diningroomFeatures: true,
+      outdoorSpace: true,
+      utility: true,
     },
   });
+
+  // Now create media for each feature
+  const mediaToCreate: Prisma.MediaCreateWithoutPropertyInput[] = [];
+  
+  // General property images (exterior, hallways, etc.) - use featureId = 0
+  const generalImageTypes = ['Exterior', 'Hallway', 'Staircase', 'Entrance', 'Overview'];
+  const generalImageCount = faker.number.int({ min: 2, max: 5 });
+  for (let i = 0; i < generalImageCount; i++) {
+    const imageType = faker.helpers.arrayElement(generalImageTypes);
+    // Use realistic real estate image dimensions
+    const width = 2048;
+    const height = 1536;
+    
+    mediaToCreate.push({
+      image: faker.image.urlPicsumPhotos({ width, height }),
+      metadata: JSON.stringify({
+        alt: `${imageType} - ${faker.word.words(3)}`,
+        description: faker.word.words(5),
+        roomType: imageType,
+        dimensions: `${width}x${height}`,
+        aspectRatio: '4:3'
+      }),
+      featureId: 0, // 0 indicates general property images
+    });
+  }
+  
+  // Bedroom media
+  propertyWithFeatures.bedroomFeatures.forEach((bedroom) => {
+    mediaToCreate.push(...generateMediaForFeature(bedroom.id, `Bedroom ${bedroom.roomNumber}`));
+  });
+  
+  // Bathroom media
+  propertyWithFeatures.bathroomFeatures.forEach((bathroom) => {
+    mediaToCreate.push(...generateMediaForFeature(bathroom.id, `Bathroom ${bathroom.roomNumber}`));
+  });
+  
+  // Reception media
+  propertyWithFeatures.reception.forEach((reception) => {
+    mediaToCreate.push(...generateMediaForFeature(reception.id, `Reception ${reception.roomNumber}`));
+  });
+  
+  // Kitchen media
+  if (propertyWithFeatures.kitchenFeatures) {
+    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.kitchenFeatures.id, 'Kitchen'));
+  }
+  
+  // Living area media
+  if (propertyWithFeatures.livingAreaFeatures) {
+    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.livingAreaFeatures.id, 'Living Area'));
+  }
+  
+  // Dining room media
+  if (propertyWithFeatures.diningroomFeatures) {
+    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.diningroomFeatures.id, 'Dining Room'));
+  }
+  
+  // Outdoor space media
+  if (propertyWithFeatures.outdoorSpace) {
+    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.outdoorSpace.id, 'Outdoor Space'));
+  }
+  
+  // Utility media
+  if (propertyWithFeatures.utility) {
+    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.utility.id, 'Utility'));
+  }
+
+  // Create all media
+  if (mediaToCreate.length > 0) {
+    await prisma.media.createMany({
+      data: mediaToCreate.map(media => ({
+        ...media,
+        propertyId: propertyWithFeatures.id,
+      })),
+    });
+  }
+
+  // Return the property with just address for compatibility
+  const property: PropertyWithAddress = {
+    ...propertyWithFeatures,
+    address: propertyWithFeatures.address,
+  };
 
   const updateLocation = await updateLocationByAddressIdForSeed(property.addressId, property.address.lon!, property.address.lat!);
   const location = await getLocationByAddressIdForSeed(property.addressId);

@@ -53,6 +53,16 @@
     }
   }
 
+  &-tertiary {
+    background: var(--blue-400);
+    color: var(--monochrome-900);
+
+    &:hover {
+      background: var(--blue-500);
+      color: var(--monochrome-900);
+    }
+  }
+
   &-monochrome {
     background: var(--monochrome-100);
     color: var(--monochrome-900);

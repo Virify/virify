@@ -16,7 +16,7 @@
           #side-images="{ selectedIndex, goToSlide, images: allImages }"
         >
           <div class="premium-side-images">
-            <img
+            <AtomsSkeletonImage
               v-for="(image, index) in getRotatedImages(
                 allImages,
                 selectedIndex
@@ -27,6 +27,12 @@
               :class="{ active: image.isActive }"
               :alt="`Property thumbnail ${index + 1}`"
               @click="goToSlide(image.originalIndex)"
+              loading="lazy"
+              :width="200"
+              :height="200"
+              fit="cover"
+              quality="80"
+              placeholder
             />
           </div>
         </template>
@@ -380,6 +386,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     border-bottom-right-radius: 0;
   }
 
+
   .m-listing-card-image {
     border-top-left-radius: calc(
       var(--border-radius-2xl) + var(--size-2) - var(--size-8)
@@ -476,6 +483,19 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 
   .m-listing-card-image-actions {
     background-color: var(--primary-400);
+  }
+
+  .a-favourite-button,
+  .note-button {
+    color: var(--monochrome-100);
+  }
+  
+  .a-favourite-button svg {
+    stroke: var(--monochrome-100);
+  }
+  
+  .note-button-icon {
+    color: var(--monochrome-100);
   }
 
   @media (max-width: 768px) {

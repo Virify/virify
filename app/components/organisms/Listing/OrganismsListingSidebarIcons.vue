@@ -1,23 +1,69 @@
 <template>
   <ul class="o-listing-sidebar-icons | body-sm">
-    <li class="o-listing-sidebar-icons__row o-listing-sidebar-icons__row--full">
-      <AtomsIcon icon="listings/property-type" aria-hidden class="o-listing-sidebar-icons__icon" />
-      House / Student accommodation
+    <li
+      v-if="propertyType"
+      class="o-listing-sidebar-icons__row o-listing-sidebar-icons__row--full"
+    >
+      <AtomsIcon
+        :icon="getPropertyTypeIcon(propertyType)"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ propertyType }}
     </li>
-    <li class="o-listing-sidebar-icons__row">
-      <AtomsIcon icon="listings/beds" aria-hidden class="o-listing-sidebar-icons__icon" />
-      2 beds
+
+    <li v-if="classification" class="o-listing-sidebar-icons__row">
+      <AtomsIcon
+        :icon="getClassificationIcon(classification)"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ classification }}
     </li>
-    <li class="o-listing-sidebar-icons__row">
-      <AtomsIcon icon="listings/bathrooms" aria-hidden class="o-listing-sidebar-icons__icon" />
-      3 bathrooms
+
+    <li v-if="bedrooms" class="o-listing-sidebar-icons__row">
+      <AtomsIcon
+        icon="listings/beds"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ bedrooms }} bed{{ bedrooms !== 1 ? "s" : "" }}
     </li>
-    <li class="o-listing-sidebar-icons__row">
-      <AtomsIcon icon="listings/contract" aria-hidden class="o-listing-sidebar-icons__icon" />
-      Leasehold
+
+    <li v-if="bathrooms" class="o-listing-sidebar-icons__row">
+      <AtomsIcon
+        icon="listings/bathrooms"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ bathrooms }} bathroom{{ bathrooms !== 1 ? "s" : "" }}
+    </li>
+
+    <li v-if="receptions" class="o-listing-sidebar-icons__row">
+      <AtomsIcon
+        icon="property/receptions"
+        aria-hidden
+        class="o-listing-sidebar-icons__icon"
+      />
+      {{ receptions }} reception{{ receptions !== 1 ? "s" : "" }}
     </li>
   </ul>
 </template>
+
+<script setup lang="ts">
+
+interface Props {
+  propertyType?: string;
+  propertySize?: number;
+  price?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  receptions?: number;
+  classification?: string;
+}
+
+defineProps<Props>();
+</script>
 
 <style lang="scss">
 .o-listing-sidebar-icons {
@@ -27,20 +73,13 @@
   padding: 0;
   border-radius: var(--border-radius-2xl);
   margin-inline: 0;
-  gap: var(--size-6);
+  gap: var(--size-8);
 
   &__row {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: var(--size-6);
-    white-space: nowrap;
-    flex: 1 1 auto;
-
-    &--full {
-      width: 100%;
-      flex-grow: 1;
-    }
+    gap: var(--size-8);
+    justify-content: space-evenly;
   }
 
   &__icon {

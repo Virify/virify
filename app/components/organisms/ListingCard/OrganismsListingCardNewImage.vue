@@ -11,11 +11,19 @@
           v-for="(img, index) in images"
           :key="index"
           class="m-listing-card-image-slide"
+          @click="openImageModal(index)"
         >
-          <nuxt-img
+          <AtomsSkeletonImage
             :src="img"
             :alt="`Property image ${index + 1} of ${images.length}`"
             class="m-listing-card-image"
+            loading="lazy"
+            :width="600"
+            :height="400"
+            fit="cover"
+            quality="80"
+            placeholder
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
           />
         </div>
       </div>
@@ -27,7 +35,7 @@
         >
           {{ selectedIndex + 1 }}/{{ images.length }}
         </div>
-        <div class="m-listing-card-image-actions">
+        <div class="m-listing-card-image-actions" @click.stop>
           <AtomsFavouriteButton
             :listing-id="listingId"
             :confirm-removal="false"
@@ -38,7 +46,7 @@
         <button
           v-if="images.length > 1"
           class="m-listing-card-arrow-button m-listing-card-arrow-button--left"
-          @click="scrollPrev"
+          @click.stop="scrollPrev"
           aria-label="Previous image"
           title="Previous image"
         >
@@ -51,7 +59,7 @@
         <button
           v-if="images.length > 1"
           class="m-listing-card-arrow-button m-listing-card-arrow-button--right"
-          @click="scrollNext"
+          @click.stop="scrollNext"
           aria-label="Next image"
           title="Next image"
         >
@@ -68,6 +76,14 @@
       :selected-index="selectedIndex"
       :go-to-slide="goToSlide"
       :images="images"
+    />
+    
+    <!-- Image Gallery Modal -->
+    <MoleculesImageGalleryModal
+      v-if="showImageModal"
+      :images="galleryImages"
+      :initial-index="modalImageIndex"
+      @close="closeImageModal"
     />
   </div>
 </template>
@@ -89,6 +105,18 @@ const props = defineProps({
 const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: 0 });
 const selectedIndex = ref(0);
 
+// Image Gallery Modal
+const showImageModal = ref(false);
+const modalImageIndex = ref(0);
+
+// Format images for the gallery modal
+const galleryImages = computed(() => {
+  return props.images.map((src, index) => ({
+    src,
+    alt: `Property image ${index + 1} of ${props.images.length}`
+  }));
+});
+
 const scrollPrev = () => {
   emblaApi.value?.scrollPrev();
 };
@@ -105,6 +133,16 @@ const onSelect = () => {
   if (!emblaApi.value) return;
   selectedIndex.value = emblaApi.value.selectedScrollSnap();
 };
+
+// Modal functions
+function openImageModal(imageIndex: number) {
+  modalImageIndex.value = imageIndex;
+  showImageModal.value = true;
+}
+
+function closeImageModal() {
+  showImageModal.value = false;
+}
 
 onMounted(() => {
   if (emblaApi.value) {
@@ -144,13 +182,20 @@ onMounted(() => {
   flex: 0 0 100%;
   min-width: 0;
   position: relative;
+  cursor: pointer;
 }
+
 
 .m-listing-card-image {
   height: 100%;
   object-fit: cover;
   width: 100%;
   border-radius: calc(var(--border-radius-2xl) + var(--size-2));
+  transition: transform 0.2s ease;
+  
+  .m-listing-card-image-slide:hover & {
+    transform: scale(1.02);
+  }
 }
 
 .m-listing-card-image-overlay {
@@ -160,14 +205,16 @@ onMounted(() => {
   right: 0;
   top: 0;
   z-index: 2;
+  pointer-events: none; // Allow clicks to pass through
 
   > * {
     transition: opacity 0.2s ease-in-out;
+    pointer-events: auto; // Re-enable clicks on child elements
   }
 }
 
 .m-listing-card-image-counter {
-  background-color: var(--secondary-400);
+  background-color: var(--blue-400);
   border-radius: var(--border-radius-xl);
   color: var(--monochrome-900);
   padding: var(--size-4) var(--size-12);
@@ -178,7 +225,7 @@ onMounted(() => {
 }
 
 .m-listing-card-image-actions {
-  background-color: var(--secondary-400);
+  background-color: var(--blue-400);
   border-radius: var(--border-radius-pill);
   display: flex;
   gap: var(--size-4);
@@ -186,6 +233,21 @@ onMounted(() => {
   position: absolute;
   top: var(--size-16);
   right: var(--size-16);
+}
+
+.m-listing-card:not([data-tier="FEATURED"]):not([data-tier="PREMIUM"]) .m-listing-card-image-actions {
+  .a-favourite-button,
+  .note-button {
+    color: var(--monochrome-900);
+  }
+  
+  .a-favourite-button svg {
+    stroke: var(--monochrome-900) !important;
+  }
+  
+  .note-button-icon {
+    color: var(--monochrome-900) !important;
+  }
 }
 
 .m-listing-card-icon-button {
@@ -251,7 +313,7 @@ onMounted(() => {
 
 .m-listing-card-arrow-button {
   align-items: center;
-  background-color: var(--secondary-400);
+  background-color: var(--blue-400);
   border: none;
   border-radius: 50%;
   color: var(--monochrome-900);
@@ -286,6 +348,15 @@ onMounted(() => {
   .m-listing-card-image-container {
     border-radius: var(--border-radius-2xl);
     aspect-ratio: 4 / 3;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 </style>

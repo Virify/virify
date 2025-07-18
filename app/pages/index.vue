@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="homepage | container">
     <!-- AI Search Hero -->
     <OrganismsAiSearchHero @selectSuggestion="handleSuggestionSelect" />
 
@@ -132,6 +132,10 @@ const handleSuggestionSelect = (suggestion) => {
 @use '#styles/_utils/media' as mq;
 @use '#styles/_utils/functions' as fn;
 
+.homepage {
+  margin-top: var(--size-32);
+}
+
 // Section spacing
 .ai-how-it-works,
 .ai-how-it-works-grid,
@@ -154,7 +158,7 @@ const handleSuggestionSelect = (suggestion) => {
 
 // Capabilities section with hero-style background
 .ai-capabilities {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+  background: linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
   border-radius: var(--border-radius-3xl);
   padding: var(--size-56) var(--size-20);
   margin: var(--size-64) 0;
@@ -165,7 +169,7 @@ const handleSuggestionSelect = (suggestion) => {
     margin: var(--size-80) 0;
     background:
       url('/img/logo-background.svg') no-repeat top right,
-      linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+      linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
     background-size: auto 120%, cover;
   }
 
@@ -193,20 +197,20 @@ const handleSuggestionSelect = (suggestion) => {
   grid-template-columns: 1fr;
   gap: var(--size-24);
   padding: var(--size-40) 0;
+  color: var(--background-100);
 
   @include mq.tablet {
     grid-template-columns: repeat(3, 1fr);
   }
 
   .title-sm {
-    color: var(--foreground-100);
-    font-weight: 700;
+    color: var(--secondary-400);
     margin-bottom: var(--size-16);
     font-size: 1.25rem;
   }
 
   .body-md {
-    color: var(--foreground-200);
+    color: inherit;
     line-height: 1.6;
   }
 }
@@ -258,12 +262,12 @@ const handleSuggestionSelect = (suggestion) => {
 .ai-faq-list {
   display: flex;
   flex-direction: column;
-  gap: var(--size-16);
+  gap: var(--size-0);
 }
 
 // Call to Action - Hero Style
 .ai-cta {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+  background: linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
   color: var(--monochrome-900);
   border-radius: var(--border-radius-3xl);
   min-height: max(300px, 40vh);
@@ -277,7 +281,7 @@ const handleSuggestionSelect = (suggestion) => {
     padding: var(--size-72) var(--size-32);
     background:
       url('/img/logo-background.svg') no-repeat top right,
-      linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
+      linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
     background-size: auto 120%, cover;
   }
 }

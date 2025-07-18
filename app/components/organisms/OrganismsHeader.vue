@@ -17,11 +17,8 @@
   position: sticky;
   top: 0;
   z-index: 30;
-  background: var(--background-100);
-
-  @include mq.mobile-only {
-    background: var(--background-100);
-  }
+  background: var(--blue-400);
+  border-bottom: var(--size-4) solid var(--secondary-400);
 
   &-container {
     display: flex;

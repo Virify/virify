@@ -12,9 +12,10 @@ const currentYear = new Date().getFullYear()
 
 <style>
 .o-footer {
-  background-color: var(--background-200);
-  color: var(--foreground-100);
+  background-color: var(--blue-400);
+  color: var(--background-100);
   padding: var(--size-32) 0;
   margin: var(--size-64) 0 0;
+  color: var(--monochrome-900);
 }
 </style>

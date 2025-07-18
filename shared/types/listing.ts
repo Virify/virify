@@ -34,6 +34,7 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         id: true;
         username: true;
         email: true;
+        createdAt: true;
       };
     }
   };

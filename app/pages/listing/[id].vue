@@ -5,268 +5,283 @@
     </div>
 
     <div v-else class="p-listing" role="presentation">
-      <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
-        <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
-          <OrganismsListingCarousel v-if="!isDesktop" :slides="images" :width="1000" aspect-ratio="4/3" />
+      <div
+        ref="$mobile-carousel"
+        class="p-listing__main-carousel p-listing__main-carousel--mobile"
+        role="presentation"
+      >
+        <skeleton-loader
+          class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile"
+        >
+          <MoleculesImageGallery
+            v-if="!isDesktop && galleryImages.length > 0"
+            :images="galleryImages"
+            @open-modal="openImageModal"
+          />
         </skeleton-loader>
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
         <div class="p-listing__content | flow flow-sm">
-          <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
-            role="presentation">
+          <div
+            ref="$desktop-carousel"
+            class="p-listing__main-carousel p-listing__main-carousel--desktop"
+            role="presentation"
+          >
             <skeleton-loader class="p-listing__main-carousel-skeleton">
-              <OrganismsListingCarousel v-if="isDesktop" :slides="images" :width="1000" />
+              <MoleculesImageGallery
+                v-if="isDesktop && galleryImages.length > 0"
+                :images="galleryImages"
+                @open-modal="openImageModal"
+              />
             </skeleton-loader>
           </div>
 
-          <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted" :address="fullAddress" />
+          <OrganismsListingOverview
+            ref="$overview"
+            class="p-listing__mobile-overview"
+            :price="priceFormatted"
+            :address="fullAddress"
+          />
 
-          <!-- Location & Amenities (Most Important) -->
-          <OrganismsListingSection v-if="property" accordion-label="Map and Location" :start-expanded="isDesktop || true">
-            <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!" :listing="listing" :amenities="amenitiesArray" />
-          </OrganismsListingSection>
+          <!-- General Property Information (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section">
+            <OrganismsListingGeneralInfo
+              :description="property?.description || undefined"
+            />
 
-          <!-- Core Room Features -->
-          <OrganismsListingSection v-if="bedroomFeatures" accordion-label="Bedroom Features" :start-expanded="isDesktop || true">
-            <MoleculesPropertyTable :data="bedroomFeatures" :fields="bedroomFields" title="Bedroom" />
-          </OrganismsListingSection>
+            <MoleculesListingRoomSummary :room-configs="roomConfigs" />
+          </div>
 
-          <OrganismsListingSection v-if="bathroomFeatures" accordion-label="Bathroom Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="bathroomFeatures" :fields="bathroomFields" title="Bathroom" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="kitchenFeatures" accordion-label="Kitchen" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="kitchenFeatures" :fields="kitchenFields" title="Kitchen" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="livingAreaFeatures" accordion-label="Living Area" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="livingAreaFeatures" :fields="livingAreaFields" title="Living Area" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="reception" accordion-label="Reception Rooms" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="reception" :fields="receptionFields" title="Reception" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="diningroomFeatures" accordion-label="Dining Room" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="diningroomFeatures" :fields="diningroomFields" title="Dining Room" :is-array="false" />
-          </OrganismsListingSection>
-
-          <!-- External Features -->
-
-          <OrganismsListingSection v-if="parking" accordion-label="Parking" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="parking" :fields="parkingFields" title="Parking" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="outdoorSpace" accordion-label="Outdoor Space" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="outdoorSpace" :fields="outdoorSpaceFields" title="Outdoor Space" :is-array="false" />
-          </OrganismsListingSection>
-
-          <!-- Property Features & Amenities -->
-          <OrganismsListingSection v-if="additionalFeatures" accordion-label="Additional Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="additionalFeatures" :fields="additionalFields" title="Features" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="storageFeatures" accordion-label="Storage Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="storageFeatures" :fields="storageFields" title="Storage" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="utility" accordion-label="Utility Room" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="utility" :fields="utilityFields" title="Utility" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="additionalToilet" accordion-label="Additional Toilet" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="additionalToilet" :fields="additionalToiletFields" title="Additional Toilet" :is-array="false" />
-          </OrganismsListingSection>
-
-          <!-- Technical & Financial -->
-          <OrganismsListingSection v-if="energyAndUtilities" accordion-label="Energy and Utilities" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="energyAndUtilities" :fields="energyAndUtilitiesFields" title="Energy & Utilities" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="runningCosts" accordion-label="Running Costs" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="runningCosts" :fields="runningCostsFields" title="Running Costs" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="securityFeatures" accordion-label="Security Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="securityFeatures" :fields="securityFields" title="Security" :is-array="false" />
-          </OrganismsListingSection>
-
-          <OrganismsListingSection v-if="accessibilityFeatures" accordion-label="Accessibility Features" :start-expanded="isDesktop">
-            <MoleculesPropertyTable :data="accessibilityFeatures" :fields="accessibilityFields" title="Accessibility" :is-array="false" />
-          </OrganismsListingSection>
+          <!-- Location & Amenities (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section">
+            <OrganismsListingSectionLocation
+              :lat="property?.address?.lat!"
+              :lon="property?.address?.lon!"
+              :listing="listing"
+              :amenities="amenitiesArray"
+            />
+          </div>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
           <Transition name="p-listing-images">
             <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
-              <OrganismsListingCarousel class="p-listing__sidebar-carousel" :slides="images" :width="400" />
+              <div class="p-listing__sidebar-carousel">
+                <MoleculesImageGallery
+                  v-if="galleryImages.length > 0"
+                  :images="galleryImages"
+                  @open-modal="openImageModal"
+                />
+              </div>
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="fullAddress" />
+          <OrganismsListingSidebar
+            :price="priceFormatted"
+            :listing-id="listing?.id || 0"
+            :address="fullAddress"
+            :property-type="property?.type?.name"
+            :property-size="property?.size || undefined"
+            :price-number="listing?.price || undefined"
+            :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined"
+            :receptions="property?.numberReceptions || undefined"
+            :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined"
+            :construction-type="property?.constructionType || undefined"
+            :chain-free="property?.chainFree"
+            :vacant="property?.vacant"
+            :has-image-slide="!isImagesVisible"
+            :agent="listing?.user || {}"
+          />
         </div>
       </div>
     </div>
 
+    <!-- Image Gallery Modal -->
+    <MoleculesImageGalleryModal
+      v-if="showImageModal"
+      :images="galleryImages"
+      :initial-index="modalImageIndex"
+      @close="closeImageModal"
+    />
+
     <client-only>
-      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible" />
+      <OrganismsListingMobileBanner
+        v-if="!isDesktop"
+        :price="priceFormatted"
+        :overview-visible="isOverviewVisible"
+      />
     </client-only>
   </main>
 </template>
 
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
-import breakpoints from '#styles/_utils/breakpoints.module.scss'
-import { generateDynamicFields } from '~/utils/listing/dynamic-fields'
+import breakpoints from "#styles/_utils/breakpoints.module.scss";
 
 const route = useRoute();
 
 /**
  *  Fetch listing
  */
-const { data: listing, status } = await useAsyncData("listing", () => {
-  return $fetch<ListingWithFullProperty>(`/api/listing/${route.params?.id}`)
-}, {
-  deep: false
-});
+const { data: listing, status } = await useAsyncData(
+  "listing",
+  () => {
+    return $fetch<ListingWithFullProperty>(`/api/listing/${route.params?.id}`);
+  },
+  {
+    deep: false,
+  }
+);
 
 /**
  *  Content
  */
-const property = computed(() => listing.value?.property)
+const property = computed(() => listing.value?.property);
 
 const priceFormatted = computed(() => {
-  const price = listing.value?.price
-  return isNumber(price) ? numberToCurrency(price) : ''
-})
+  const price = listing.value?.price;
+  return isNumber(price) ? numberToCurrency(price) : "";
+});
 
-function getPropertyFeature(key: keyof NonNullable<typeof property.value>, validator: (value: any) => boolean) {
-  return computed(() => {
-    const feature = property.value?.[key]
-    return validator(feature) ? feature : false
-  })
-}
 
 const fullAddress = computed(() => {
-  return property.value?.address?.fullAddress || "No address provided"
-})
-const bedroomFeatures = getPropertyFeature('bedroomFeatures', Array.isArray)
-const bathroomFeatures = getPropertyFeature('bathroomFeatures', Array.isArray)
-const additionalFeatures = getPropertyFeature('additionalFeatures', isObject)
-const accessibilityFeatures = getPropertyFeature('accessibilityFeatures', isObject)
-const energyAndUtilities = getPropertyFeature('energyAndUtilities', isObject)
-const parking = getPropertyFeature('parking', isObject)
-const outdoorSpace = getPropertyFeature('outdoorSpace', isObject)
-const securityFeatures = getPropertyFeature('securityFeatures', isObject)
-const storageFeatures = getPropertyFeature('storageFeatures', isObject)
-const runningCosts = getPropertyFeature('runningCosts', isObject)
-const diningroomFeatures = getPropertyFeature('diningroomFeatures', isObject)
-const kitchenFeatures = getPropertyFeature('kitchenFeatures', isObject)
-const livingAreaFeatures = getPropertyFeature('livingAreaFeatures', isObject)
-const reception = getPropertyFeature('reception', Array.isArray)
-const utility = getPropertyFeature('utility', isObject)
-const additionalToilet = getPropertyFeature('additionalToilet', isObject)
+  return property.value?.address?.fullAddress || "No address provided";
+});
+
+const roomConfigs = computed(() => generateRoomConfig(property.value));
+
+
+
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {
-  const amenities = property.value?.amenities
-  if (!amenities) return null
-  return Array.isArray(amenities) ? amenities : [amenities]
-})
-
-/**
- * Dynamic field generation from actual data
- */
-const bedroomFields = computed(() => generateDynamicFields(bedroomFeatures.value))
-const bathroomFields = computed(() => generateDynamicFields(bathroomFeatures.value))
-const additionalFields = computed(() => generateDynamicFields(additionalFeatures.value))
-const accessibilityFields = computed(() => generateDynamicFields(accessibilityFeatures.value))
-const energyAndUtilitiesFields = computed(() => generateDynamicFields(energyAndUtilities.value))
-const parkingFields = computed(() => generateDynamicFields(parking.value))
-const outdoorSpaceFields = computed(() => generateDynamicFields(outdoorSpace.value))
-const securityFields = computed(() => generateDynamicFields(securityFeatures.value))
-const storageFields = computed(() => generateDynamicFields(storageFeatures.value))
-const runningCostsFields = computed(() => generateDynamicFields(runningCosts.value))
-const diningroomFields = computed(() => generateDynamicFields(diningroomFeatures.value))
-const kitchenFields = computed(() => generateDynamicFields(kitchenFeatures.value))
-const livingAreaFields = computed(() => generateDynamicFields(livingAreaFeatures.value))
-const receptionFields = computed(() => generateDynamicFields(reception.value))
-const utilityFields = computed(() => generateDynamicFields(utility.value))
-const additionalToiletFields = computed(() => generateDynamicFields(additionalToilet.value))
-
+  const amenities = property.value?.amenities;
+  if (!amenities) return null;
+  return Array.isArray(amenities) ? amenities : [amenities];
+});
 
 /**
  *  Media
  */
 const images = computed(() => {
-  const media = property.value?.media
-  if (!Array.isArray(media)) return []
-  
+  const media = property.value?.media;
+  if (!Array.isArray(media)) return [];
+
   return media
-    .filter(item => item.image !== null)
-    .map(item => ({
+    .filter((item) => item.image !== null)
+    .map((item) => ({
       image: item.image!,
-      metadata: item.metadata
-    }))
-})
+      metadata: item.metadata,
+    }));
+});
+
+// Gallery images formatted for the new image gallery component
+const galleryImages = computed(() => {
+  // If we have real media, use it
+  if (images.value.length > 0) {
+    return images.value.map((item, index) => ({
+      src: (typeof item.image === 'string' ? item.image : (item.image as any)?.url) || `https://picsum.photos/800/600?random=${index + 1}`,
+      alt: (() => {
+        try {
+          const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+          return metadata?.alt || `Property image ${index + 1}`;
+        } catch {
+          return `Property image ${index + 1}`;
+        }
+      })()
+    }));
+  }
+  
+  // TOOD: Replace with placeholder
+  const heights = [400, 600, 500, 700, 450, 550, 650, 480, 580, 520, 750, 420, 680, 460, 620, 540, 720, 490, 590, 510];
+  const fakeImages = Array.from({ length: 20 }, (_, index) => ({
+    src: `https://picsum.photos/800/${heights[index]}?random=${index + 1}`,
+    alt: `Property image ${index + 1}`
+  }));
+  
+  return fakeImages;
+});
 
 /**
  *  Toggle media visibility
  */
-const $mobileCarousel = useTemplateRef('$mobile-carousel')
-const $desktopCarousel = useTemplateRef('$desktop-carousel')
-const isDesktop = useMediaQuery(`(min-width: ${breakpoints.notebook})`)
-const isImagesVisible = shallowRef(true)
+const $mobileCarousel = useTemplateRef("$mobile-carousel");
+const $desktopCarousel = useTemplateRef("$desktop-carousel");
+const isDesktop = useMediaQuery(`(min-width: ${breakpoints.notebook})`);
+const isImagesVisible = shallowRef(true);
 
 function parallaxCarousel() {
-  if (isDesktop.value) return
+  if (isDesktop.value) return;
 
   // Get elem to watch
-  const elem = unref($mobileCarousel)
+  const elem = unref($mobileCarousel);
 
   // Ensure element exists
-  if (!elem) return
+  if (!elem) return;
 
   // Get top scroll position
-  const getScrollTop = window.scrollY
+  const getScrollTop = window.scrollY;
   const getScrollThreshold = elem.offsetHeight;
 
   // Calculate as transform from the top, if below threshold
   if (getScrollTop < getScrollThreshold) {
-    elem.style.transform = `translateY(${getScrollTop / 2}px)`
+    elem.style.transform = `translateY(${getScrollTop / 2}px)`;
   }
 }
 
 useIntersectionObserver($desktopCarousel, ([entry]) => {
-  isImagesVisible.value = !!entry?.isIntersecting
-})
+  isImagesVisible.value = !!entry?.isIntersecting;
+});
 
 onMounted(() => {
-  window.addEventListener('scroll', parallaxCarousel, { passive: true })
-})
+  window.addEventListener("scroll", parallaxCarousel, { passive: true });
+});
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', parallaxCarousel)
-})
+  window.removeEventListener("scroll", parallaxCarousel);
+});
 
 /**
  *  Toggle overview scroll
  */
-const $overview = useTemplateRef('$overview')
-const isOverviewVisible = shallowRef(true)
+const $overview = useTemplateRef("$overview");
+const isOverviewVisible = shallowRef(true);
 
 useIntersectionObserver($overview, ([entry]) => {
-  isOverviewVisible.value = !!entry?.isIntersecting
-})
+  isOverviewVisible.value = !!entry?.isIntersecting;
+});
 
+/**
+ *  Image Gallery Modal
+ */
+const showImageModal = ref(false);
+const modalImageIndex = ref(0);
+
+function openImageModal(imageIndex: number) {
+  modalImageIndex.value = imageIndex;
+  showImageModal.value = true;
+}
+
+function closeImageModal() {
+  showImageModal.value = false;
+}
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/media' as mq;
-@use '#styles/_utils/functions' as fn;
+@use "#styles/_utils/media" as mq;
+@use "#styles/_utils/functions" as fn;
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
 .p-listing {
+  margin-top: var(--size-32);
 
   &__grid {
     display: grid;
@@ -318,7 +333,7 @@ useIntersectionObserver($overview, ([entry]) => {
     @include mq.notebook {
       display: block;
       position: sticky;
-      top: var(--header-height);
+      top: calc(var(--header-height) + var(--size-32));
       max-height: calc(100dvh - var(--header-height));
       overflow: auto;
       overscroll-behavior: contain;
@@ -336,12 +351,12 @@ useIntersectionObserver($overview, ([entry]) => {
     }
   }
 
+
   /**
    *  Images
    */
   &__main-carousel,
   &__sidebar-carousel {
-    background: var(--foreground-300);
     overflow: hidden;
   }
 
@@ -359,14 +374,12 @@ useIntersectionObserver($overview, ([entry]) => {
 
       @include mq.notebook {
         display: block;
-        border-radius: var(--border-radius-3xl);
         margin-bottom: var(--size-24);
       }
     }
   }
 
   &__sidebar-carousel {
-    border-radius: var(--border-radius-2xl);
     margin-bottom: var(--size-24);
   }
 
