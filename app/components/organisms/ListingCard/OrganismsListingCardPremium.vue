@@ -25,9 +25,8 @@
               :src="image.src"
               class="premium-side-image"
               :class="{ active: image.isActive }"
-              :alt="`Property thumbnail ${index + 1}`"
+              :alt="image.alt"
               @click="goToSlide(image.originalIndex)"
-              loading="lazy"
               :width="200"
               :height="200"
               fit="cover"
@@ -313,34 +312,32 @@ onMounted(() => {
   }
 });
 
-// Use all images for carousel
+/**
+ *  Media
+ */
 const images = computed(() => {
-  const allImages =
-    props.listing.property?.media?.map((m: any) => m.image) ?? [];
-
-  // If we have no images, return empty array
-  if (allImages.length === 0) {
-    return [];
-  }
-
-  // Just return the actual images - no fake ones
-  return allImages;
+  const media = props.listing?.property?.media;
+  if (!Array.isArray(media)) return [];
+  return media.filter((item) => item.image !== null);
 });
 
 // Function to get 4 rotating side images based on the selected index
-const getRotatedImages = (allImages: string[], selectedIndex: number) => {
+const getRotatedImages = (allImages: any[], selectedIndex: number) => {
   const sideImages = [];
-
-  // Always show exactly 4 side images, cycling through all available images
-  for (let i = 0; i < 4; i++) {
-    const imageIndex = (selectedIndex + i) % allImages.length;
+  const len = allImages.length;
+  if (len === 0) return [];
+  for (let i = 0; i < Math.min(4, len); i++) {
+    const imageIndex = (selectedIndex + i) % len;
+    const img = allImages[imageIndex];
+    if (!img) continue;
     sideImages.push({
-      src: allImages[imageIndex],
+      src: img.image,
+      alt: img.metadata,
       originalIndex: imageIndex,
       isActive: imageIndex === selectedIndex,
+      metadata: img.metadata,
     });
   }
-
   return sideImages;
 };
 
@@ -385,7 +382,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
-
 
   .m-listing-card-image {
     border-top-left-radius: calc(
@@ -489,11 +485,11 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   .note-button {
     color: var(--monochrome-100);
   }
-  
+
   .a-favourite-button svg {
     stroke: var(--monochrome-100);
   }
-  
+
   .note-button-icon {
     color: var(--monochrome-100);
   }
@@ -540,24 +536,16 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 
 .premium-side-image {
   width: 100%;
-  // Dynamic height: (container height - 3 gaps) / 4 images
   height: calc((100% - (var(--size-8) * 3)) / 4);
   object-fit: cover;
   cursor: pointer;
-  border-radius: 0;
 
-  &:first-child {
-    border-top-right-radius: calc(
-      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
-    );
+  &:first-of-type img {
+    border-top-right-radius: var(--border-radius-lg);
   }
-
-  &:last-child {
-    border-bottom-right-radius: calc(
-      var(--border-radius-2xl) + var(--size-2) - var(--size-8)
-    );
+  &:last-of-type img {
+    border-bottom-right-radius: var(--border-radius-lg);
   }
-
   &:hover {
     opacity: 0.8;
     transform: scale(1.02);
@@ -843,7 +831,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     .m-listing-card-image-container {
       // Main image takes 50% of container
       width: 50%;
-      aspect-ratio: 4/3 !important;
+      aspect-ratio: 4/3;
     }
 
     .premium-side-images {
@@ -854,6 +842,16 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       grid-template-rows: 1fr 1fr;
       gap: var(--size-8);
       height: 100%;
+
+      :first-of-type img {
+        border-radius: 0;
+      }
+
+      :nth-of-type(2) img {
+        border-top-right-radius: calc(
+          var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+        );
+      }
     }
 
     .premium-side-image {
@@ -862,28 +860,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       height: 100%;
       aspect-ratio: 1;
       object-fit: cover;
-
-      &:first-child {
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-      }
-
-      &:nth-child(2) {
-        border-top-right-radius: calc(
-          var(--border-radius-2xl) + var(--size-2) - var(--size-8)
-        );
-      }
-
-      &:nth-child(3) {
-        border-bottom-left-radius: 0;
-      }
-
-      &:last-child {
-        border-bottom-right-radius: calc(
-          var(--border-radius-2xl) + var(--size-2) - var(--size-8)
-        );
-        border-bottom-left-radius: 0;
-      }
     }
   }
 }
@@ -910,6 +886,12 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       border-bottom-right-radius: 0;
     }
 
+    .m-listing-card-image {
+      // Main image full width
+      border-radius: calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8))
+        calc(var(--border-radius-2xl) + var(--size-2) - var(--size-8)) 0 0;
+    }
+
     .premium-side-images {
       // Side images underneath, full width
       width: 100%;
@@ -926,21 +908,17 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       height: auto;
       aspect-ratio: 1;
       object-fit: cover;
-
-      // Reset all border radius for mobile
+      // Remove all right border radius in grid layout
       border-radius: 0;
-
-      &:first-child {
+      &:first-of-type img {
         border-bottom-left-radius: calc(
           var(--border-radius-2xl) + var(--size-2) - var(--size-8)
         );
       }
-
-      &:nth-child(2) {
-        border-top-right-radius: 0;
+      &:nth-of-type(2) img {
+        border-radius: 0;
       }
-
-      &:last-child {
+      &:last-of-type img {
         border-bottom-right-radius: calc(
           var(--border-radius-2xl) + var(--size-2) - var(--size-8)
         );

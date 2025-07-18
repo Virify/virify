@@ -3,17 +3,33 @@
     <nuxt-img
       v-bind="$attrs"
       @load="onImageLoad"
+      @error="onImageError"
+      :src="imgSrc"
       :data-loaded="isLoaded"
       class="skeleton-image"
     />
+    <!-- No fallback image shown on error -->
   </div>
 </template>
 
 <script setup lang="ts">
-const isLoaded = ref(false)
+// No fallbackSrc prop needed
+
+const isLoaded = ref(false);
+const hasError = ref(false);
+const attrs = useAttrs();
+
+const imgSrc = computed(() => {
+  // If error, don't try to reload the original image
+  return hasError.value ? '' : (attrs.src as string || '');
+});
 
 function onImageLoad() {
-  isLoaded.value = true
+  isLoaded.value = true;
+}
+
+function onImageError() {
+  hasError.value = true;
 }
 </script>
 
@@ -44,6 +60,8 @@ function onImageLoad() {
     opacity: 1;
   }
 }
+
+// No fallback image styles
 
 @keyframes shimmer {
   0% {

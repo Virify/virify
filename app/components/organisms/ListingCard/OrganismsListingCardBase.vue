@@ -7,7 +7,7 @@
     <!-- Image slot with default property image component -->
     <slot name="image">
       <OrganismsListingCardNewImage
-        :images="image_urls"
+        :images="images"
         :listing-id="listing.id"
       />
     </slot>
@@ -111,8 +111,19 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const image_urls = computed(() => {
-  return props.listing.property?.media?.map((m: any) => m.image) ?? [];
+/**
+ *  Media
+ */
+const images = computed(() => {
+  const media = props.listing?.property?.media;
+  if (!Array.isArray(media)) return [];
+
+  return media
+    .filter((item) => item.image !== null)
+    .map((item) => ({
+      image: item.image!,
+      metadata: item.metadata,
+    }));
 });
 
 const priceType = computed(() => {
