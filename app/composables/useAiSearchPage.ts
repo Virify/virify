@@ -35,37 +35,35 @@ export const useAiSearchPage = () => {
 
   // Load state from KV once on initialization
   const loadInitialState = async () => {
-    if (import.meta.client) {
-      try {
-        const stored = await refreshFromKV();
-        if (stored && stored.hasSearched) {
-          // Populate local refs from KV
-          searchResults.value = stored.results;
-          queryAnalysis.value = stored.queryAnalysis;
-          hasSearched.value = stored.hasSearched;
-          lastSearchQuery.value = stored.query;
-          lastLocation.value = stored.location;
-          lastRadius.value = stored.radius;
-          currentSort.value = stored.sortBy;
-          currentPage.value = stored.currentPage || 1;
-          totalPages.value = stored.totalPages || 0;
-          totalResults.value = stored.totalResults;
-          lastWhereClause.value = stored.whereClause;
-          lastLocationContext.value = stored.locationContext;
-          viewMode.value = stored.viewMode;
+    try {
+      const stored = await refreshFromKV();
+      if (stored && stored.hasSearched) {
+        // Populate local refs from KV
+        searchResults.value = stored.results;
+        queryAnalysis.value = stored.queryAnalysis;
+        hasSearched.value = stored.hasSearched;
+        lastSearchQuery.value = stored.query;
+        lastLocation.value = stored.location;
+        lastRadius.value = stored.radius;
+        currentSort.value = stored.sortBy;
+        currentPage.value = stored.currentPage || 1;
+        totalPages.value = stored.totalPages || 0;
+        totalResults.value = stored.totalResults;
+        lastWhereClause.value = stored.whereClause;
+        lastLocationContext.value = stored.locationContext;
+        viewMode.value = stored.viewMode;
 
-          // Sync with global useAi composable
-          searchQuery.value = stored.query;
-          globalQueryAnalysis.value = stored.queryAnalysis;
+        // Sync with global useAi composable
+        searchQuery.value = stored.query;
+        globalQueryAnalysis.value = stored.queryAnalysis;
 
-          // Auto-collapse form when we have results
-          if (stored.results && stored.results.length > 0) {
-            isSearchFormCollapsed.value = true;
-          }
+        // Auto-collapse form when we have results
+        if (stored.results && stored.results.length > 0) {
+          isSearchFormCollapsed.value = true;
         }
-      } catch (error) {
-        console.error("Failed to load initial search state:", error);
       }
+    } catch (error) {
+      console.error("Failed to load initial search state:", error);
     }
   };
 
