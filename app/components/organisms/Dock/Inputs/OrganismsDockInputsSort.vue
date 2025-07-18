@@ -88,7 +88,7 @@ const { sortOrder } = toRefs(state.value)
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 10ch;
+    max-width: 10ch;
     text-align: left;
 
     @include mq.tablet {
