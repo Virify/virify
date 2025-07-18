@@ -25,6 +25,9 @@
 <script setup>
 const { state, setLayout } = useUniversalSearch()
 
+/**
+ *  Update layout
+ */
 function updateLayout(layout) {
   setLayout(layout === 'left' ? 'map' : 'grid')
 }
@@ -40,6 +43,15 @@ const showMap = computed(() => {
 
   return layout === 'map' || layout === 'split'
 })
+
+/**
+ *  Handle searches
+ */
+const { location, locationRadius, filters } = toRefs(state.value)
+
+watch([location, locationRadius, filters], () => {
+  console.log('Search properties!', JSON.parse(JSON.stringify(state.value)))
+}, { deep: true })
 
 </script>
 
