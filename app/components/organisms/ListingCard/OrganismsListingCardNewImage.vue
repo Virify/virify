@@ -17,13 +17,12 @@
             :src="img"
             :alt="`Property image ${index + 1} of ${images.length}`"
             class="m-listing-card-image"
-            loading="lazy"
-            :width="600"
-            :height="400"
+            width="600"
+            height="400"
             fit="cover"
             quality="80"
-            placeholder
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
+            :fallback-src="'/img/fallback-image.png'"
           />
         </div>
       </div>
