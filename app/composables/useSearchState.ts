@@ -24,45 +24,36 @@ function createSearchState() {
       sessionId.value =
         sessionStorage.getItem("search-session-id") || crypto.randomUUID();
       sessionStorage.setItem("search-session-id", sessionId.value);
-      // ...log removed...
     }
   };
 
   // Save to KV storage
   const saveToKV = async (state: SearchState) => {
     if (!sessionId.value || isLoading.value) {
-      // ...log removed...
       return;
     }
 
     try {
-      // ...log removed...
       await $fetch("/api/search-state", {
         method: "POST",
         body: { sessionId: sessionId.value, state },
       });
-      // ...log removed...
-    } catch (error) {
-      // ...log removed...
-    }
+    } catch (error) {}
   };
 
   // Load from KV storage
   const loadFromKV = async (): Promise<SearchState | null> => {
     if (!sessionId.value) {
-      // ...log removed...
       return null;
     }
 
     try {
-      // ...log removed...
       const stored = await $fetch("/api/search-state", {
         query: { sessionId: sessionId.value },
       });
-      // ...log removed...
+
       return (stored as unknown as SearchState) || null;
     } catch (error) {
-      // ...log removed...
       return null;
     }
   };
@@ -76,20 +67,12 @@ function createSearchState() {
         method: "DELETE",
         query: { sessionId: sessionId.value },
       });
-      // ...log removed...
-    } catch (error) {
-      // ...log removed...
-    }
+    } catch (error) {}
   };
 
   // Initialize on client side
   if (import.meta.client) {
     initSessionId();
-
-    // Note: Initial KV load is handled by useAiSearchPage.loadInitialState()
-    // This avoids duplicate loads
-
-    // Note: No auto-save watcher - we manually save via updateState() calls
 
     // Delete KV entry when tab closes
     const handleBeforeUnload = async () => {
@@ -105,7 +88,7 @@ function createSearchState() {
           );
         }
       } catch (error) {
-        // ...log removed...
+        // Ignore errors for beacon requests
       }
     };
 
@@ -154,7 +137,6 @@ function createSearchState() {
 
 export const useSearchState = () => {
   if (!instance) {
-    // ...log removed...
     instance = createSearchState();
   }
   return instance;
