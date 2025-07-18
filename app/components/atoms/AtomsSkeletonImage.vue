@@ -4,25 +4,15 @@
       v-bind="$attrs"
       @load="onImageLoad"
       @error="onImageError"
-      :src="imgSrc"
       :data-loaded="isLoaded"
       class="skeleton-image"
     />
-    <!-- No fallback image shown on error -->
   </div>
 </template>
 
 <script setup lang="ts">
-// No fallbackSrc prop needed
-
 const isLoaded = ref(false);
 const hasError = ref(false);
-const attrs = useAttrs();
-
-const imgSrc = computed(() => {
-  // If error, don't try to reload the original image
-  return hasError.value ? '' : (attrs.src as string || '');
-});
 
 function onImageLoad() {
   isLoaded.value = true;

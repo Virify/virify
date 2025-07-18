@@ -17,18 +17,15 @@
         >
           <div class="premium-side-images">
             <AtomsSkeletonImage
-              v-for="(image, index) in getRotatedImages(
-                allImages,
-                selectedIndex
-              )"
+              v-for="(image, index) in getRotatedImages(allImages, selectedIndex)"
               :key="`${selectedIndex}-${index}`"
               :src="image.src"
               class="premium-side-image"
               :class="{ active: image.isActive }"
               :alt="image.alt"
               @click="goToSlide(image.originalIndex)"
-              :width="200"
-              :height="200"
+              width="200"
+              height="200"
               fit="cover"
               quality="80"
               placeholder
@@ -284,6 +281,8 @@
 </template>
 
 <script setup lang="ts">
+import { getPremiumFeatures } from '~/utils/results/premium-features';
+
 interface Props {
   listing: ListingCardData;
 }
@@ -340,8 +339,6 @@ const getRotatedImages = (allImages: any[], selectedIndex: number) => {
   }
   return sideImages;
 };
-
-import { getPremiumFeatures } from "~/utils/results/premium-features";
 
 const premiumFeatures = computed(() => getPremiumFeatures(props.listing, 16));
 const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));

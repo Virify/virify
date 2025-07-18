@@ -172,6 +172,7 @@ onMounted(() => {
   width: 100%;
   z-index: 1;
   flex-shrink: 0;
+  border-radius: var(--border-radius-2xl);
 
   &:hover .m-listing-card-arrow-button {
     opacity: 1;
@@ -197,9 +198,6 @@ onMounted(() => {
   object-fit: cover;
   width: 100%;;
   transition: transform 0.2s ease;
-  // calc the size of the border 
-  border-radius: calc(var(--border-radius-2xl) - var(--size-4));
-
 }
 
 .m-listing-card-image-overlay {
