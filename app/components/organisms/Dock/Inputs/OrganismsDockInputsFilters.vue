@@ -2,17 +2,23 @@
   <button type="button" class="o-dock-inputs-filters" :class="{
     'o-dock-inputs-filters--active': isExpanded
   }">
-    <AtomsIcon class="o-dock-inputs-filters__icon" icon="search/filter" />
-
-    <span role="presentation" class="o-dock-inputs-filters__text">
-      Filters
+    <span v-if="state.searchPending" class="o-dock-inputs-filters__pending-icon">
+      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
     </span>
 
-    <span role="presentation" class="o-dock-inputs-filters__count | body-xs" :class="{
-      'o-dock-inputs-filters__count--empty': !filtersCount
-    }">
-      {{ filtersCount }}
-    </span>
+    <template v-else>
+      <AtomsIcon class="o-dock-inputs-filters__icon" icon="search/filter" />
+
+      <span role="presentation" class="o-dock-inputs-filters__text">
+        Filters
+      </span>
+
+      <span role="presentation" class="o-dock-inputs-filters__count | body-xs" :class="{
+        'o-dock-inputs-filters__count--empty': !filtersCount
+      }">
+        {{ filtersCount }}
+      </span>
+    </template>
   </button>
 </template>
 
@@ -25,9 +31,17 @@ const { filters } = toRefs(state.value)
  *  Count filters
  */
 const filtersCount = computed(() => {
-  const { options = [] } = asObject(filters.value)
+  const { type, options } = asObject(filters.value)
 
-  return (options as unknown[])?.length
+  // If AI search is used, get usedTerms
+  if (type === 'ai') {
+    const { usedTerms = [] } = asObject((options as Record<string, unknown>)?.queryAnalysis)
+
+    return (usedTerms as string[]).length || 0
+  }
+
+  // @TODO for traditional search
+  return 0
 })
 
 /**
@@ -60,6 +74,11 @@ defineProps<Props>()
   flex: 1 0 auto;
   width: 100%;
 
+  &[disabled] {
+    cursor: not-allowed;
+    color: light-dark(var(--monochrome-500), var(--monochrome-600));
+  }
+
   @include mq.tablet {
     padding-right: var(--size-6);
   }
@@ -74,7 +93,7 @@ defineProps<Props>()
     font-size: var(--font-sm);
     gap: var(--size-10);
 
-    &--active {
+    &--active:not([disabled]) {
       background-color: var(--secondary-400);
       color: var(--monochrome-900);
     }
@@ -85,6 +104,22 @@ defineProps<Props>()
 
     @include mq.tablet {
       display: unset;
+    }
+  }
+
+  &__pending-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 4.5ch;
+
+    @include mq.tablet {
+      width: 11ch;
+    }
+
+    .a-icon {
+      width: var(--size-24);
+      height: var(--size-24);
     }
   }
 
@@ -107,7 +142,7 @@ defineProps<Props>()
     }
   }
 
-  &--active &__count {
+  &--active:not([disabled]) &__count {
     background: var(--secondary-300);
   }
 }

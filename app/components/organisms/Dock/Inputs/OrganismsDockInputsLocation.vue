@@ -6,11 +6,15 @@
     <AtomsIcon class="o-dock-inputs-location__icon" icon="search/location" />
 
     <span role="presentation" class="o-dock-inputs-location__content">
-      <span role="presentation" class="o-dock-inputs-location__text" v-if="location">
-        {{ location.place_name_en }}
+      <span role="presentation" class="o-dock-inputs-location__text" v-if="locationName">
+        {{ locationName }}
       </span>
 
-      <span role="presentation" class="o-dock-inputs-location__radius" v-if="locationRadius">
+      <span v-else class="o-dock-inputs-location__text">
+        Add location
+      </span>
+
+      <span role="presentation" class="o-dock-inputs-location__radius" v-if="locationName && locationRadius">
         +{{ locationRadius }}
         <sup class="| body-2xs">Mi</sup>
       </span>
@@ -21,6 +25,12 @@
 <script setup lang="ts">
 const { state } = useUniversalSearch()
 const { location, locationRadius } = toRefs(state.value)
+
+const locationName = computed(() => {
+  const { place_name_en } = asObject(location?.value)
+
+  return place_name_en
+})
 
 /**
  *  Is expanded styling

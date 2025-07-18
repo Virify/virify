@@ -2,25 +2,50 @@
   <div class="| flow">
     <h2 class="| title-md">AI filters</h2>
 
-    <textarea placeholder="Example text area"></textarea>
+    <div v-if="isPending">Loading...</div>
+
+    <MoleculesAiSearchFormFilters v-else :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
   </div>
 </template>
 
-<style scoped>
-textarea {
-  position: relative;
-  border: none;
-  background: transparent;
-  color: inherit;
-  margin: 0;
-  min-height: 12ch;
-  padding: var(--size-14) var(--size-18);
-  resize: none;
-  outline: none;
-  z-index: 2;
-  border: 1px solid var(--border-color-200);
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: var(--border-radius-xl);
+<script setup lang="ts">
+const initialQuery = ref('')
+
+/**
+ *  Fetch filters
+ */
+const { isPending, setPendingWhile } = usePending()
+const { state, setAiFilters, setSearchPending } = useUniversalSearch()
+const { aiSearch } = useAiSearchPage();
+
+function searchSubmit(filterString: string) {
+  setSearchPending(true)
+
+  // Get current location, locationRadius
+  const { location, locationRadius } = asObject(state.value)
+
+  // Set pending state
+  setPendingWhile(async () => {
+    if (!location) return
+
+    const response = await aiSearch(location as GeocodingFeature, locationRadius as number, filterString, 1);
+
+    setAiFilters(response as unknown)
+  }).then(() => {
+    emits('close')
+  }).finally(() => {
+    setSearchPending(false)
+  })
+
+  console.log('submit-search', filterString);
+};
+
+function searchReset() {
+  console.log('reset-search')
 }
-</style>
+
+/**
+ *  Allow closing
+ */
+const emits = defineEmits(['close'])
+</script>

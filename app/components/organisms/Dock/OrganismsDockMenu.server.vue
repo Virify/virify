@@ -45,6 +45,11 @@
     }
   }
 
+  &__skeleton-input,
+  &__skeleton-mobile-label {
+    border-radius: var(--border-radius-2xl);
+  }
+
   &__skeleton-input {
     width: 100%;
     height: var(--size-40);
