@@ -2,6 +2,7 @@ export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 
 export type ResultLayout = 'map' | 'grid' | 'split'
 
 interface State {
+  searchPending: boolean
   location?: Partial<GeocodingFeature>,
   locationRadius?: number,
   filters: {
@@ -21,6 +22,7 @@ const initialSortOrder = selectOptionSortOrder[0]?.value as SortOrder
  */
 export function useUniversalSearch() {
   const state = useState<State>('current-search', () => ({
+    searchPending: false,
     location: {},
     locationRadius: 0,
     filters: {
@@ -38,6 +40,13 @@ export function useUniversalSearch() {
     if (!isFunction(fn)) return
 
     fn()
+  }
+
+  /**
+   *  Toggle whether a search is pending
+   */
+  function setSearchPending(value: boolean = false) {
+    state.value.searchPending = !!value
   }
 
   /**
@@ -118,6 +127,7 @@ export function useUniversalSearch() {
     setLayout,
     setLocation,
     setLocationRadius,
+    setSearchPending,
     setAiFilters
   }
 }

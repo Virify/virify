@@ -15,10 +15,11 @@ const initialQuery = ref('')
  *  Fetch filters
  */
 const { isPending, setPendingWhile } = usePending()
-const { state, setAiFilters } = useUniversalSearch()
+const { state, setAiFilters, setSearchPending } = useUniversalSearch()
 const { aiSearch } = useAiSearchPage();
 
 function searchSubmit(filterString: string) {
+  setSearchPending(true)
 
   // Get current location, locationRadius
   const { location, locationRadius } = asObject(state.value)
@@ -32,6 +33,8 @@ function searchSubmit(filterString: string) {
     setAiFilters(response as unknown)
   }).then(() => {
     emits('close')
+  }).finally(() => {
+    setSearchPending(false)
   })
 
   console.log('submit-search', filterString);

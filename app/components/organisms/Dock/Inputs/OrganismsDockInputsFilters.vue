@@ -2,17 +2,23 @@
   <button type="button" class="o-dock-inputs-filters" :class="{
     'o-dock-inputs-filters--active': isExpanded
   }">
-    <AtomsIcon class="o-dock-inputs-filters__icon" icon="search/filter" />
-
-    <span role="presentation" class="o-dock-inputs-filters__text">
-      Filters
+    <span v-if="state.searchPending" class="o-dock-inputs-filters__pending-icon">
+      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
     </span>
 
-    <span role="presentation" class="o-dock-inputs-filters__count | body-xs" :class="{
-      'o-dock-inputs-filters__count--empty': !filtersCount
-    }">
-      {{ filtersCount }}
-    </span>
+    <template v-else>
+      <AtomsIcon class="o-dock-inputs-filters__icon" icon="search/filter" />
+
+      <span role="presentation" class="o-dock-inputs-filters__text">
+        Filters
+      </span>
+
+      <span role="presentation" class="o-dock-inputs-filters__count | body-xs" :class="{
+        'o-dock-inputs-filters__count--empty': !filtersCount
+      }">
+        {{ filtersCount }}
+      </span>
+    </template>
   </button>
 </template>
 
@@ -98,6 +104,22 @@ defineProps<Props>()
 
     @include mq.tablet {
       display: unset;
+    }
+  }
+
+  &__pending-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 4.5ch;
+
+    @include mq.tablet {
+      width: 11ch;
+    }
+
+    .a-icon {
+      width: var(--size-24);
+      height: var(--size-24);
     }
   }
 
