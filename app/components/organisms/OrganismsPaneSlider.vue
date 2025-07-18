@@ -1,7 +1,9 @@
 <template>
   <div ref="$wrapper" role="presentation" class="o-pane-slider">
-    <div v-if="leftSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--left"
-      :class="{ 'o-pane-slider__pane--full': !bothSlots }">
+    <div v-if="leftSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--left" :class="{
+      'o-pane-slider__pane--full': !bothSlots,
+      'o-pane-slider__pane--faded': isDragToClose === 'left'
+    }">
       <slot name="left"></slot>
     </div>
 
@@ -12,8 +14,10 @@
       </div>
     </button>
 
-    <div v-if="rightSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--right"
-      :class="{ 'o-pane-slider__pane--full': !bothSlots }">
+    <div v-if="rightSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--right" :class="{
+      'o-pane-slider__pane--full': !bothSlots,
+      'o-pane-slider__pane--faded': isDragToClose === 'right'
+    }">
       <slot name="right"></slot>
     </div>
   </div>
@@ -208,6 +212,7 @@ const leftWidth = computed(() => unref(positionPercent) + '%')
 
   &__pane {
     flex: 1 0 auto;
+    transition: opacity var(--animation-medium);
 
     &--left {
       width: calc(v-bind(leftWidth) - var(--pane-spacing));
@@ -216,6 +221,10 @@ const leftWidth = computed(() => unref(positionPercent) + '%')
 
     &--full {
       width: 100%;
+    }
+
+    &--faded {
+      opacity: 0.5;
     }
   }
 
