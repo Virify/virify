@@ -14,15 +14,14 @@
           @click="openImageModal(index)"
         >
           <AtomsSkeletonImage
-            :src="img"
-            :alt="`Property image ${index + 1} of ${images.length}`"
+            :src="img.image"
+            :alt="img.metadata"
             class="m-listing-card-image"
             width="600"
             height="400"
             fit="cover"
             quality="80"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
-            :fallback-src="'/img/fallback-image.png'"
           />
         </div>
       </div>
@@ -88,18 +87,35 @@
 </template>
 
 <script lang="ts" setup>
+import type { Media } from "@prisma/client";
 import emblaCarouselVue from "embla-carousel-vue";
 
-const props = defineProps({
+interface Props {
   images: {
-    type: Array as () => string[],
-    required: true,
-  },
-  listingId: {
-    type: Number,
-    required: true,
-  },
+    image: Media["image"];
+    metadata?: Media["metadata"];
+  }[];
+  listingId: number;
+}
+
+const props = defineProps<Props>();
+
+/**
+ *  Media
+ */
+const images = computed(() => {
+  const media = props.images;
+  if (!Array.isArray(media)) return [];
+
+  return media
+    .filter((item) => item.image !== null)
+    .map((item) => ({
+      image: item.image!,
+      metadata: item.metadata,
+    }));
 });
+
+const galleryImages = computed(() => formatGalleryImages(images.value));
 
 const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: 0 });
 const selectedIndex = ref(0);
@@ -107,14 +123,6 @@ const selectedIndex = ref(0);
 // Image Gallery Modal
 const showImageModal = ref(false);
 const modalImageIndex = ref(0);
-
-// Format images for the gallery modal
-const galleryImages = computed(() => {
-  return props.images.map((src, index) => ({
-    src,
-    alt: `Property image ${index + 1} of ${props.images.length}`
-  }));
-});
 
 const scrollPrev = () => {
   emblaApi.value?.scrollPrev();
@@ -159,7 +167,6 @@ onMounted(() => {
 }
 
 .m-listing-card-image-container {
-  border-radius: var(--border-radius-2xl);
   overflow: hidden;
   position: relative;
   width: 100%;
@@ -188,13 +195,11 @@ onMounted(() => {
 .m-listing-card-image {
   height: 100%;
   object-fit: cover;
-  width: 100%;
-  border-radius: calc(var(--border-radius-2xl) + var(--size-2));
+  width: 100%;;
   transition: transform 0.2s ease;
-  
-  .m-listing-card-image-slide:hover & {
-    transform: scale(1.02);
-  }
+  // calc the size of the border 
+  border-radius: calc(var(--border-radius-2xl) - var(--size-4));
+
 }
 
 .m-listing-card-image-overlay {
