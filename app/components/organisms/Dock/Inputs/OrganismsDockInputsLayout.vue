@@ -96,14 +96,8 @@ onMounted(() => {
 })
 
 /**
- *  Track user, breakpoint changes
+ *  Update layout in state
  */
-const emits = defineEmits(['changed'])
-
-watch(layout, (newValue) => {
-  emits('changed', newValue)
-})
-
 watch(options, (newValue) => {
   if (newValue.length !== 2 || layout.value !== 'split') {
     return

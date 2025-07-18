@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="| flow">
+  <form @submit.prevent="hidePopover" class="| flow">
     <div role="presentation" ref="$location" class="m-ai-search-form-location__container | flow flow-lg">
       <fieldset class="m-ai-search-form-location__fieldset | elevate-200">
         <legend class="| visually-hidden">Location</legend>
@@ -9,7 +9,7 @@
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
-          v-model="state.locationRadius" :options="selectOptionRadius" @change="handleLocationRadius" />
+          v-model="state.locationRadius" :options="selectOptionRadius" />
       </fieldset>
 
       <Transition name="m-ai-search-form-location">
@@ -21,7 +21,7 @@
 
     <AtomsSelect name="radius" id="radius" aria-label="Location radius"
       class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
-      v-model="state.locationRadius" :options="selectOptionRadius" @change="handleLocationRadius" />
+      v-model="state.locationRadius" :options="selectOptionRadius" />
   </form>
 </template>
 
@@ -51,12 +51,6 @@ const { state } = useUniversalSearch()
 const { location } = toRefs(state.value)
 
 const locationQuery = ref(location?.value?.place_name_en || '')
-
-/**
- *  Events
- */
-const emits = defineEmits(['location-selected', 'radius-updated', 'form-submitted'])
-
 /**
  *  Handle autocomplete events
  */
@@ -72,31 +66,7 @@ function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
   locationQuery.value = place_name_en as string
 
   // Update global state
-  setLocation(locationUnref, () => {
-
-    // Emit event to parent
-    emits('location-selected', locationUnref)
-
-    // Hide popover
-    hidePopover()
-  })
-}
-
-/**
- *  Handle autocomplete events
- */
-function handleLocationRadius({ target }: Event) {
-  const { value } = asObject(target)
-
-  // Emit event to parent
-  emits('radius-updated', value)
-}
-
-function handleSubmit() {
-  emits('form-submitted')
-
-  // Hide popover
-  hidePopover()
+  setLocation(locationUnref, hidePopover)
 }
 
 /**

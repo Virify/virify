@@ -3,13 +3,13 @@
     <li class="o-dock-menu__item">
       <span class="o-dock-menu__mobile-label | faded-text body-xs">Results layout</span>
 
-      <OrganismsDockInputsLayout class="o-dock-menu__fix-height" @changed="updateLayout" />
+      <OrganismsDockInputsLayout class="o-dock-menu__fix-height" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
       <span class="o-dock-menu__mobile-label | faded-text body-xs">Sort by</span>
 
-      <OrganismsDockInputsSort class="o-dock-menu__fix-height" @update:model-value="updateSortOrder" />
+      <OrganismsDockInputsSort class="o-dock-menu__fix-height" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--shrinkable">
@@ -65,20 +65,6 @@ const hasLocation = computed(() => {
 
   return (location as Record<string, unknown>)?.place_name_en
 })
-
-/**
- *  Update sort order
- */
-function updateSortOrder(newValue: string) {
-  console.log('Re-order the results...', newValue)
-}
-
-/**
- *  Update layout
- */
-function updateLayout(newValue: string) {
-  console.log('Update the page layout...', newValue)
-}
 
 </script>
 
