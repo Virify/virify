@@ -180,7 +180,22 @@ const images = computed(() => {
 
 // Gallery images formatted for the new image gallery component
 const galleryImages = computed(() => {
-  // Create fake data with 20 images for testing with varying heights for masonry
+  // If we have real media, use it
+  if (images.value.length > 0) {
+    return images.value.map((item, index) => ({
+      src: (typeof item.image === 'string' ? item.image : (item.image as any)?.url) || `https://picsum.photos/800/600?random=${index + 1}`,
+      alt: (() => {
+        try {
+          const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+          return metadata?.alt || `Property image ${index + 1}`;
+        } catch {
+          return `Property image ${index + 1}`;
+        }
+      })()
+    }));
+  }
+  
+  // TOOD: Replace with placeholder
   const heights = [400, 600, 500, 700, 450, 550, 650, 480, 580, 520, 750, 420, 680, 460, 620, 540, 720, 490, 590, 510];
   const fakeImages = Array.from({ length: 20 }, (_, index) => ({
     src: `https://picsum.photos/800/${heights[index]}?random=${index + 1}`,
@@ -188,12 +203,6 @@ const galleryImages = computed(() => {
   }));
   
   return fakeImages;
-  
-  // Original code (commented out for testing)
-  // return images.value.map((item, index) => ({
-  //   src: (typeof item.image === 'string' ? item.image : (item.image as any)?.url) || `https://picsum.photos/800/600?random=${index + 1}`,
-  //   alt: item.metadata?.alt || `Property image ${index + 1}`
-  // }));
 });
 
 /**

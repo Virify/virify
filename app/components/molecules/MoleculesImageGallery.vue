@@ -8,11 +8,20 @@
           :key="index"
           @click="openModal"
         >
-          <img
-            :src="image.src"
-            :alt="image.alt"
-            class="m-image-gallery__image"
-          />
+          <div class="m-image-gallery__image-container">
+            <AtomsSkeletonImage
+              :src="image.src"
+              :alt="image.alt"
+              class="m-image-gallery__image"
+              loading="lazy"
+              :width="800"
+              :height="600"
+              fit="cover"
+              quality="85"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px"
+              placeholder
+            />
+          </div>
         </div>
       </div>
       
@@ -43,11 +52,19 @@
           :class="{ 'is-active': index === selectedIndex }"
           @click="onThumbClick(index)"
         >
-          <img
-            :src="image.src"
-            :alt="image.alt"
-            class="m-image-gallery__thumb-image"
-          />
+          <div class="m-image-gallery__thumb-container">
+            <AtomsSkeletonImage
+              :src="image.src"
+              :alt="image.alt"
+              class="m-image-gallery__thumb-image"
+              loading="lazy"
+              :width="175"
+              :height="100"
+              fit="cover"
+              quality="75"
+              placeholder
+            />
+          </div>
         </button>
       </div>
     </div>
@@ -149,17 +166,25 @@ onUnmounted(() => {
     }
   }
 
-  &__image {
+  &__image-container {
+    position: relative;
     width: 100%;
-    object-fit: cover;
     aspect-ratio: 4/3;
     max-height: 70vh;
     border-radius: var(--border-radius-2xl);
+    overflow: hidden;
 
     @include mq.notebook {
       aspect-ratio: 16/9;
       max-height: none;
     }
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius-2xl);
   }
 
   &__prev,
@@ -231,13 +256,22 @@ onUnmounted(() => {
     }
   }
 
-  &__thumb-image {
+  &__thumb-container {
+    position: relative;
     width: 175px;
     aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: var(--border-radius-xl);
+  }
+
+  &__thumb-image {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     display: block;
   }
 }
+
 
 // Hide thumbnails when in sidebar
 .p-listing__sidebar-carousel .m-image-gallery {
@@ -245,4 +279,5 @@ onUnmounted(() => {
     display: none;
   }
 }
+
 </style>

@@ -62,10 +62,6 @@ interface Props {
   listing: ListingCardData;
 }
 
-const image_urls = computed(() => {
-  return props.listing.property?.media?.map((m: any) => m.image) ?? [];
-});
-
 const props = defineProps<Props>();
 </script>
 
@@ -97,22 +93,16 @@ const props = defineProps<Props>();
 
   // Sale tag positioning
   .m-listing-card-type-indicator {
-    position: absolute;
-    top: var(--size-16);
-    right: var(--size-16);
-    z-index: 10;
     background-color: var(--secondary-400);
     color: var(--monochrome-900);
     opacity: 1;
 
-    @media (max-width: 768px) {
+    // Only apply absolute positioning on large desktop screens
+    @media (min-width: 1201px) {
       position: absolute;
-      top: var(--size-20);
-      left: var(--size-24);
-      right: auto;
-      z-index: 20;
-      margin-left: 0;
-      align-self: auto;
+      top: var(--size-16);
+      right: var(--size-16);
+      z-index: 10;
     }
   }
 
@@ -133,6 +123,19 @@ const props = defineProps<Props>();
 
   .m-listing-card-image-actions {
     background-color: var(--secondary-400);
+  }
+
+  .a-favourite-button,
+  .note-button {
+    color: var(--monochrome-100);
+  }
+  
+  .a-favourite-button svg {
+    stroke: var(--monochrome-100);
+  }
+  
+  .note-button-icon {
+    color: var(--monochrome-100);
   }
 
   .button {

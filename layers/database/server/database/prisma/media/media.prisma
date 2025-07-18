@@ -1,9 +1,10 @@
 model Media {
   id         Int      @id @default(autoincrement())
-  image      String?
-  videoTour  String?
-  floorPlan  String?
-  metadata   String
+  image      String? 
+  videoTour  String? 
+  floorPlan  String? 
+  metadata   String  
+  featureId  Int?     // to link the image to a feature (e.g., kitchen, living room)
   propertyId Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
