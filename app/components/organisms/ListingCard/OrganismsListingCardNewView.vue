@@ -1,7 +1,7 @@
 <template>
   <nuxt-link :to="`/listing/${listingId}`" aria-label="View property details" title="View property details">
     <slot>
-      <span class="| button button-secondary button-full body-sm">View</span>
+      <span class="| button button-tertiary button-full body-sm">View</span>
     </slot>
   </nuxt-link>
 </template>

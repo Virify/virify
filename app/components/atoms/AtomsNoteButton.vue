@@ -103,7 +103,7 @@ function handleClick() {
   width: var(--size-32);
   height: var(--size-32);
   transition: all var(--animation-medium) var(--ease-out);
-  color: var(--monochrome-100);
+  color: var(--foreground-100);
 }
 
 /* Specific styling for when note exists */
@@ -111,7 +111,7 @@ function handleClick() {
   position: relative;
 
   .note-button-icon {
-    color: var(--monochrome-100);
+    color: var(--foreground-100);
     filter: drop-shadow(0 0 2px rgba(var(--primary-rgb), 0.3));
   }
 

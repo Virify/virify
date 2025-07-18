@@ -44,6 +44,11 @@
 /**
  *  Body
  */
+.body-2xs {
+  font-size: var(--font-2xs);
+  line-height: var(--lineheight-sm);
+}
+
 .body-xs {
   font-size: var(--font-xs);
   line-height: var(--lineheight-sm);

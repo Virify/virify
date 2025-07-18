@@ -7,7 +7,7 @@ model Amenities {
   description String?
   // I could use adress here - but I think it is better to use location
   location    Json?
-  propertyId  Int             @unique
+  propertyId  Int
   createdAt   DateTime        @default(now())
   property    Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 

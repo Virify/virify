@@ -128,7 +128,7 @@ const priceType = computed(() => {
   --card-padding: var(--size-16);
 
   background-color: var(--background-200);
-  border: 1px solid var(--foreground-100);
+  border: 2px solid var(--foreground-100);
   border-radius: calc(var(--border-radius-2xl) + var(--size-2));
   display: flex;
   width: 100%;
@@ -192,9 +192,10 @@ const priceType = computed(() => {
     min-width: 60px;
     text-align: center;
     padding-right: var(--size-8);
-    background-color: var(--background-300);
+    background-color: var(--blue-400);
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
+    color: var(--monochrome-900);
   }
 
   .m-listing-card-mobile-content,
@@ -209,6 +210,21 @@ const priceType = computed(() => {
   .m-listing-card-mobile-content:empty,
   .m-listing-card-mobile-actions:empty {
     display: none;
+  }
+
+  &:not([data-tier="FEATURED"]):not([data-tier="PREMIUM"]) {
+    .a-favourite-button,
+    .note-button {
+      color: white;
+    }
+    
+    .a-favourite-button svg {
+      stroke: white;
+    }
+    
+    .note-button-icon {
+      color: white;
+    }
   }
 }
 
@@ -243,5 +259,6 @@ const priceType = computed(() => {
       height: 100%;
     }
   }
+
 }
 </style>

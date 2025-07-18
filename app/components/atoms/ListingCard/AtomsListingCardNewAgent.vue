@@ -26,7 +26,7 @@ defineProps<{
 
 .m-listing-card-agent-logo {
   align-items: center;
-  background-color: var(--secondary-400);
+  background-color: var(--blue-400);
   border-radius: 50%;
   color: var(--monochrome-900);
   display: flex;

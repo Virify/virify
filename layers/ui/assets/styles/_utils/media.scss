@@ -27,6 +27,12 @@
     }
 }
 
+@mixin not-tablet {
+    @media (max-width: #{ breakpoints.$tablet - 1px }) {
+        @content;
+    }
+}
+
 @mixin tablet-only {
     @media (min-width: breakpoints.$tablet) and (max-width: #{ breakpoints.$notebook - 1px }) {
         @content;
@@ -41,6 +47,12 @@
 
 @mixin notebook-only {
     @media (min-width: breakpoints.$notebook) and (max-width: #{ breakpoints.$desktop - 1px }) {
+        @content;
+    }
+}
+
+@mixin not-notebook {
+    @media (max-width: #{ breakpoints.$notebook - 1px }) {
         @content;
     }
 }

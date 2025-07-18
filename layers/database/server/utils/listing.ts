@@ -43,6 +43,7 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
           id: true,
           username: true,
           email: true,
+          createdAt: true,
         },
       },
     },
@@ -102,6 +103,7 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
           id: true,
           username: true,
           email: true,
+          createdAt: true,
         },
       },
     },
@@ -267,6 +269,7 @@ const fullListingInclude = {
       id: true,
       username: true,
       email: true,
+      createdAt: true,
     },
   },
 };

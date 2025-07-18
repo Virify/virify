@@ -40,6 +40,11 @@ function openForgotPassword() {
 <style lang="scss">
 @use "#styles/_utils/media.scss" as mq;
 
+.o-site-navigation {
+  color: var(--monochrome-900);
+  background-color: var(--background-400);
+}
+
 .o-site-navigation-list {
   list-style: none;
   margin: 0;
@@ -56,5 +61,6 @@ function openForgotPassword() {
 .o-site-navigation-link {
   white-space: nowrap;
   text-decoration: none;
+  color: inherit;
 }
 </style>
