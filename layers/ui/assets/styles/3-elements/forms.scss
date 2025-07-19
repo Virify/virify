@@ -6,19 +6,24 @@ input,
 optgroup,
 select,
 textarea {
-  font: inherit;
-  box-sizing: border-box;
+  :where(&) {
+    font: inherit;
+    box-sizing: border-box;
+    border: 0;
+  }
 }
 
-button {
+:where(button) {
   cursor: pointer;
   width: fit-content;
 }
 
-fieldset {
+:where(fieldset) {
   display: block;
   margin: 0;
   padding: 0;
+  border: 0;
+  box-sizing: border-box;
 }
 
 input[type=number]::-webkit-inner-spin-button,

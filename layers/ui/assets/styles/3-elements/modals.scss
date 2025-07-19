@@ -1,0 +1,9 @@
+/**
+ *  Reset popovers, dialogs, etc
+ */
+:where([popover]) {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  inset: none;
+}
