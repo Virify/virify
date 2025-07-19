@@ -1,14 +1,12 @@
 <template>
   <div class="| container">
-    <OrganismsPaneSlider @boundary-exceeded="updateLayout" :left-slot="showGrid" :right-slot="showMap">
+    <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap">
       <template #left v-if="showGrid">
-        <pre>{{ state }}</pre>
+        <pre>{{ searchState }}</pre>
       </template>
 
       <template #right v-if="showMap">
-        <div class="p-dock__map">
-          Map
-        </div>
+        <OrganismsAiSearchMapView class="p-dock__map" :results="[]" />
       </template>
     </OrganismsPaneSlider>
 
@@ -21,34 +19,37 @@
 </template>
 
 <script setup>
-const { state, setLayout } = useUniversalSearch()
+const { searchState, setViewMode } = useSearchState()
 
 /**
  *  Update layout
  */
-function updateLayout(layout) {
-  setLayout(layout === 'left' ? 'map' : 'grid')
+function updateViewMode(viewMode) {
+  setViewMode(viewMode === 'left' ? 'map' : 'grid')
 }
 
 const showGrid = computed(() => {
-  const { layout } = asObject(state.value)
+  const { viewMode } = asObject(searchState.value)
 
-  return layout === 'grid' || layout === 'split'
+  return viewMode === 'grid' || viewMode === 'split'
 })
 
 const showMap = computed(() => {
-  const { layout } = asObject(state.value)
+  const { viewMode } = asObject(searchState.value)
 
-  return layout === 'map' || layout === 'split'
+  return viewMode === 'map' || viewMode === 'split'
 })
 
 /**
  *  Handle searches
  */
-const { location, locationRadius, filters } = toRefs(state.value)
+const { location, radius } = toRefs(searchState.value)
 
-watch([location, locationRadius, filters], () => {
-  console.log('Search properties!', JSON.parse(JSON.stringify(state.value)))
+watch([location, radius], () => {
+  console.log(
+    'Search properties!',
+    JSON.parse(JSON.stringify(searchState.value))
+  )
 }, { deep: true })
 
 </script>
@@ -75,14 +76,7 @@ pre {
     width: 100%;
     background: var(--monochrome-400);
     border-radius: var(--border-radius-2xl);
-
-    // For demo
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--monochrome-500);
-    font-size: var(--font-5xl);
-    font-weight: var(--font-semibold);
+    overflow: hidden;
   }
 
   &__demo-footer {

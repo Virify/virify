@@ -31,7 +31,7 @@ export const useAiSearchPage = () => {
   const totalResults = ref(0);
   const lastWhereClause = ref<any>(null);
   const lastLocationContext = ref<any>(null);
-  const viewMode = ref<"list" | "map">("list");
+  const viewMode = ref<"grid" | "map" | "split">("grid");
 
   // Load state from KV once on initialization
   const loadInitialState = async () => {
@@ -165,7 +165,7 @@ export const useAiSearchPage = () => {
   };
 
   // Update view mode
-  const updateViewMode = async (newViewMode: "list" | "map") => {
+  const updateViewMode = async (newViewMode: "grid" | "map" | "split") => {
     viewMode.value = newViewMode;
     await saveToKV();
   };

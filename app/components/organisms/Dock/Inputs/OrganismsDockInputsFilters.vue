@@ -2,7 +2,7 @@
   <button type="button" class="o-dock-inputs-filters" :class="{
     'o-dock-inputs-filters--active': isExpanded
   }">
-    <span v-if="state.searchPending" class="o-dock-inputs-filters__pending-icon">
+    <span v-if="isLoading" class="o-dock-inputs-filters__pending-icon">
       <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
     </span>
 
@@ -24,24 +24,15 @@
 
 
 <script setup lang="ts">
-const { state } = useUniversalSearch()
-const { filters } = toRefs(state.value)
+const { searchState, isLoading } = useSearchState()
 
 /**
  *  Count filters
  */
 const filtersCount = computed(() => {
-  const { type, options } = asObject(filters.value)
+  const { queryAnalysis } = asObject(searchState.value)
 
-  // If AI search is used, get usedTerms
-  if (type === 'ai') {
-    const { usedTerms = [] } = asObject((options as Record<string, unknown>)?.queryAnalysis)
-
-    return (usedTerms as string[]).length || 0
-  }
-
-  // @TODO for traditional search
-  return 0
+  return queryAnalysis?.usedTerms?.length || 0
 })
 
 /**

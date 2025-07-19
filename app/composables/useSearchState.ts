@@ -1,3 +1,6 @@
+export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
+export type ResultLayout = 'map' | 'grid' | 'split'
+
 /**
  * KV-backed search state management
  *
@@ -28,47 +31,50 @@ function createSearchState() {
   };
 
   // Save to KV storage
-  const saveToKV = async (state: SearchState) => {
-    if (!sessionId.value || isLoading.value) {
-      return;
-    }
+  function saveToKV() { }
+  // const saveToKV = async (state: SearchState) => {
+  //   if (!sessionId.value || isLoading.value) {
+  //     return;
+  //   }
 
-    try {
-      await $fetch("/api/search-state", {
-        method: "POST",
-        body: { sessionId: sessionId.value, state },
-      });
-    } catch (error) {}
-  };
+  //   try {
+  //     await $fetch("/api/search-state", {
+  //       method: "POST",
+  //       body: { sessionId: sessionId.value, state },
+  //     });
+  //   } catch (error) { }
+  // };
 
   // Load from KV storage
-  const loadFromKV = async (): Promise<SearchState | null> => {
-    if (!sessionId.value) {
-      return null;
-    }
+  function loadFromKV() { }
+  // const loadFromKV = async (): Promise<SearchState | null> => {
+  //   if (!sessionId.value) {
+  //     return null;
+  //   }
 
-    try {
-      const stored = await $fetch("/api/search-state", {
-        query: { sessionId: sessionId.value },
-      });
+  //   try {
+  //     const stored = await $fetch("/api/search-state", {
+  //       query: { sessionId: sessionId.value },
+  //     });
 
-      return (stored as unknown as SearchState) || null;
-    } catch (error) {
-      return null;
-    }
-  };
+  //     return (stored as unknown as SearchState) || null;
+  //   } catch (error) {
+  //     return null;
+  //   }
+  // };
 
   // Clear from KV storage
-  const clearKV = async () => {
-    if (!sessionId.value) return;
+  function clearKV() { }
+  // const clearKV = async () => {
+  //   if (!sessionId.value) return;
 
-    try {
-      await $fetch("/api/search-state", {
-        method: "DELETE",
-        query: { sessionId: sessionId.value },
-      });
-    } catch (error) {}
-  };
+  //   try {
+  //     await $fetch("/api/search-state", {
+  //       method: "DELETE",
+  //       query: { sessionId: sessionId.value },
+  //     });
+  //   } catch (error) { }
+  // };
 
   // Initialize on client side
   if (import.meta.client) {
@@ -101,8 +107,100 @@ function createSearchState() {
     });
   }
 
-  // Public API
+  /**
+   *  Run a callback, if it's valid
+   */
+  function _runCallback(fn: unknown) {
+    if (!isFunction(fn)) return
+
+    fn()
+  }
+
+  /**
+   *  Toggle whether a search is pending
+   */
+  function setSearchPending(value: boolean = false) {
+    isLoading.value = value
+  }
+
+  /**
+   *  Update state layout
+   */
+  function setLocation(value: GeocodingFeature, callback?: () => void) {
+    // Update state
+    updateState({ location: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setQueryAnalysis(value: unknown, callback?: () => void) {
+    const { queryAnalysis } = asObject(value)
+
+    // Check value is valid
+    if (!isObject(queryAnalysis)) return
+
+    // Update state
+    updateState({ queryAnalysis: queryAnalysis as QueryAnalysis })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setLocationRadius(value: number, callback?: () => void) {
+    // Check value is valid
+    if (!Number.isInteger(value)) return
+
+    // Update state
+    updateState({ radius: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setSortOrder(value: SortOrder, callback?: () => void) {
+    const validValues: SortOrder[] = ['date-desc', 'date-asc', 'price-asc', 'price-desc', 'relevance']
+
+    // Check value is valid
+    if (!validValues.includes(value)) return
+
+    // Update state
+    updateState({ sortBy: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state layout
+   */
+  function setViewMode(value: ResultLayout, callback?: () => void) {
+    const validValues: ResultLayout[] = ['grid', 'split', 'map']
+
+    // Check value is valid
+    if (!validValues.includes(value)) return
+
+    // Update state
+    updateState({ viewMode: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Manage state directly
+   */
   const updateState = async (updates: Partial<SearchState>) => {
+    // @TODO maybe replace this with Defu to better handle nested merges?
     Object.assign(searchState.value, updates);
     await saveToKV(searchState.value);
   };
@@ -115,23 +213,33 @@ function createSearchState() {
   const refreshFromKV = async (): Promise<SearchState | null> => {
     if (!import.meta.client) return null;
 
-    isLoading.value = true;
+    setSearchPending(true)
+
     const stored = await loadFromKV();
+
+    setSearchPending(false)
+
     if (stored) {
       searchState.value = { ...defaultState, ...stored };
-      isLoading.value = false;
+
       return stored;
     }
-    isLoading.value = false;
+
     return null;
   };
 
   return {
-    searchState: readonly(searchState),
-    isLoading: readonly(isLoading),
+    searchState,
+    setSortOrder,
+    setViewMode,
+    setLocation,
+    setLocationRadius,
+    setSearchPending,
+    setQueryAnalysis,
     updateState,
     clearState,
     refreshFromKV,
+    isLoading: readonly(isLoading),
   };
 }
 

@@ -58,10 +58,10 @@ function showFiltersDialog() {
 /**
  *  Check if a location has been added
  */
-const { state } = useUniversalSearch()
+const { searchState } = useSearchState()
 
 const hasLocation = computed(() => {
-  const { location } = asObject(state.value)
+  const { location } = asObject(searchState.value)
 
   return (location as Record<string, unknown>)?.place_name_en
 })

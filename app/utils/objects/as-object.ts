@@ -5,7 +5,7 @@ import { isObject } from './is-object'
  *
  */
 export function asObject<T extends object>(obj: T): T
-export function asObject<T>(obj: T): {}
-export function asObject<T>(obj: T): T {
-  return isObject(obj) ? obj : {} as T
+export function asObject<T extends unknown>(obj: T): Record<string, unknown>
+export function asObject(obj: unknown): Record<string, unknown> {
+  return isObject(obj) ? obj : {}
 }
