@@ -145,6 +145,7 @@ const priceType = computed(() => {
   width: 100%;
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 
   .m-listing-card-content-wrapper {
     display: flex;

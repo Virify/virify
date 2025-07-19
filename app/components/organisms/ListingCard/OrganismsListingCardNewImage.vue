@@ -13,15 +13,15 @@
           class="m-listing-card-image-slide"
           @click="openImageModal(index)"
         >
-          <AtomsSkeletonImage
+          <nuxt-img
             :src="img.image"
             :alt="img.metadata"
             class="m-listing-card-image"
-            width="600"
-            height="400"
-            fit="cover"
+            :width="600"
+            :height="400"
             quality="80"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
+            placeholder="/img/preload.svg"
           />
         </div>
       </div>
@@ -172,6 +172,7 @@ onMounted(() => {
   width: 100%;
   z-index: 1;
   flex-shrink: 0;
+  border-radius: var(--border-radius-2xl);
 
   &:hover .m-listing-card-arrow-button {
     opacity: 1;
@@ -196,10 +197,7 @@ onMounted(() => {
   height: 100%;
   object-fit: cover;
   width: 100%;;
-  transition: transform 0.2s ease;
-  // calc the size of the border 
-  border-radius: calc(var(--border-radius-2xl) - var(--size-4));
-
+  // transition: transform 0.2s ease;
 }
 
 .m-listing-card-image-overlay {

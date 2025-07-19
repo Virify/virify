@@ -9,7 +9,7 @@
           @click="openModal"
         >
           <div class="m-image-gallery__image-container">
-            <AtomsSkeletonImage
+            <nuxt-img
               :src="image.src"
               :alt="image.alt"
               class="m-image-gallery__image"
@@ -19,7 +19,7 @@
               fit="cover"
               quality="85"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px"
-              placeholder
+              placeholder="/img/preload.svg"
             />
           </div>
         </div>
@@ -53,7 +53,7 @@
           @click="onThumbClick(index)"
         >
           <div class="m-image-gallery__thumb-container">
-            <AtomsSkeletonImage
+            <nuxt-img
               :src="image.src"
               :alt="image.alt"
               class="m-image-gallery__thumb-image"
@@ -62,7 +62,7 @@
               :height="100"
               fit="cover"
               quality="75"
-              placeholder
+              placeholder="/img/preload.svg"
             />
           </div>
         </button>
@@ -87,7 +87,7 @@ interface Emits {
   (e: 'open-modal', imageIndex: number): void
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const [emblaRef, emblaApi] = emblaCarouselVue({ loop: true })

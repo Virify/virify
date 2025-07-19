@@ -4,7 +4,7 @@
     <template #premium-header>
       <div class="premium-content-header">
         <div class="premium-header-line"></div>
-        <h1 class="premium-header-title | title-lg">Premium</h1>
+        <h1 class="premium-header-title | title-lg">Spotlight</h1>
         <div class="premium-header-line"></div>
       </div>
     </template>
@@ -16,11 +16,8 @@
           #side-images="{ selectedIndex, goToSlide, images: allImages }"
         >
           <div class="premium-side-images">
-            <AtomsSkeletonImage
-              v-for="(image, index) in getRotatedImages(
-                allImages,
-                selectedIndex
-              )"
+             <nuxt-img
+              v-for="(image, index) in getRotatedImages(allImages, selectedIndex)"
               :key="`${selectedIndex}-${index}`"
               :src="image.src"
               class="premium-side-image"
@@ -31,7 +28,7 @@
               :height="200"
               fit="cover"
               quality="80"
-              placeholder
+              placeholder="/img/preload.svg"
             />
           </div>
         </template>
@@ -284,6 +281,8 @@
 </template>
 
 <script setup lang="ts">
+import { getPremiumFeatures } from '~/utils/results/premium-features';
+
 interface Props {
   listing: ListingCardData;
 }
@@ -327,7 +326,7 @@ const getRotatedImages = (allImages: any[], selectedIndex: number) => {
   const len = allImages.length;
   if (len === 0) return [];
   for (let i = 0; i < Math.min(4, len); i++) {
-    const imageIndex = (selectedIndex + i) % len;
+    const imageIndex = (selectedIndex + i) % len + 1;
     const img = allImages[imageIndex];
     if (!img) continue;
     sideImages.push({
@@ -340,8 +339,6 @@ const getRotatedImages = (allImages: any[], selectedIndex: number) => {
   }
   return sideImages;
 };
-
-import { getPremiumFeatures } from "~/utils/results/premium-features";
 
 const premiumFeatures = computed(() => getPremiumFeatures(props.listing, 16));
 const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
@@ -359,7 +356,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   // Premium styling
   border: 5px solid var(--primary-400);
   background-color: var(--blue-400);
-  color: var(--primary-400);
+  color: var(--monochrome-900);
 
   // Image section
   .m-listing-card-image-wrapper {
@@ -381,6 +378,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     );
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    overflow: hidden;
   }
 
   .m-listing-card-image {
@@ -448,8 +446,9 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     right: var(--size-16);
     z-index: 10;
     background-color: var(--primary-400);
-    color: var(--monochrome-100);
+    color: inherit;
     opacity: 1;
+    color: var(--monochrome-100);
 
     @media (max-width: 768px) {
       position: absolute;
@@ -512,11 +511,11 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 .premium-header-line {
   width: 150px;
   height: 1px;
-  background: var(--primary-400);
+  background: var(--monochrome-900);
 }
 
 .premium-header-title {
-  color: var(--primary-400);
+  color: inherit;
   padding-bottom: 0;
   margin: 0;
   text-align: center;
@@ -530,8 +529,8 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   gap: var(--size-8);
   padding: 0;
   height: 100%;
-  // Calculate width: remaining space after main image and gap
   width: calc(100% - 72% - var(--size-8));
+  border-radius: 0;
 }
 
 .premium-side-image {
@@ -540,19 +539,20 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   object-fit: cover;
   cursor: pointer;
 
-  &:first-of-type img {
-    border-top-right-radius: var(--border-radius-lg);
-  }
-  &:last-of-type img {
-    border-bottom-right-radius: var(--border-radius-lg);
-  }
   &:hover {
     opacity: 0.8;
-    transform: scale(1.02);
   }
 
   &.active {
     opacity: 1;
+  }
+
+  &:first-child {
+    border-top-right-radius: var(--border-radius-2xl);
+  }
+
+  &:last-child {
+    border-bottom-right-radius: var(--border-radius-2xl);
   }
 }
 
@@ -565,17 +565,17 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
 
 .premium {
   // Header section (price and type)
+  color: inherit;
   &-header {
     align-items: baseline;
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-8);
     margin-bottom: 0;
-    color: var(--primary-400);
   }
 
   &-price-type {
-    color: var(--primary-300);
+    color: var(--monochrome-600);
     text-transform: capitalize;
     font-weight: normal;
   }
@@ -584,12 +584,11 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   &-title {
     &-main {
       @extend %text-truncate;
-      color: var(--primary-400);
     }
 
     &-location {
       @extend %text-truncate;
-      color: var(--primary-300);
+      color: var(--monochrome-600);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -610,11 +609,9 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     display: flex;
     font-weight: var(--font-semibold);
     gap: var(--size-4);
-    color: var(--monochrome-900);
 
     &-icon {
       font-size: var(--font-3xl);
-      color: var(--monochrome-900);
     }
   }
 
@@ -628,16 +625,15 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
   }
 
   &-tag {
-    background-color: var(--blue-500);
+    background-color: var(--primary-400);
     opacity: 1;
-    color: var(--monochrome-900);
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
+    color: var(--monochrome-100);
   }
 
   // Description section
   &-description {
-    color: white;
 
     &-content {
       transition: max-height 0.3s ease-in-out;
@@ -659,7 +655,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     &-toggle {
       background: none;
       border: none;
-      color: var(--primary-400);
       text-decoration: underline;
       cursor: pointer;
       padding: 0;
@@ -673,7 +668,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     p {
       margin: 0;
       line-height: 1.5;
-      color: white;
+      color: inherit;
     }
   }
 
@@ -683,7 +678,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
     display: flex;
     gap: var(--size-8);
     text-decoration: none;
-    color: white;
 
     &-logo {
       align-items: center;
@@ -695,10 +689,6 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       height: var(--size-32);
       justify-content: center;
       width: var(--size-32);
-    }
-
-    &-text {
-      color: white;
     }
   }
 
@@ -832,6 +822,15 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       // Main image takes 50% of container
       width: 50%;
       aspect-ratio: 4/3;
+      border-top-left-radius: calc(
+        var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+      );
+      border-bottom-left-radius: calc(
+        var(--border-radius-2xl) + var(--size-2) - var(--size-8)
+      );
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      overflow: hidden;
     }
 
     .premium-side-images {
@@ -860,6 +859,14 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       height: 100%;
       aspect-ratio: 1;
       object-fit: cover;
+
+      &:first-child {
+        border-top-right-radius: 0;
+      }
+
+      &:nth-child(2) {
+        border-top-right-radius: var(--border-radius-2xl);
+      }
     }
   }
 }
@@ -884,6 +891,7 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
       );
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
+      overflow: hidden;
     }
 
     .m-listing-card-image {
@@ -922,6 +930,18 @@ const premiumFeaturesMobile = computed(() => premiumFeatures.value.slice(0, 6));
         border-bottom-right-radius: calc(
           var(--border-radius-2xl) + var(--size-2) - var(--size-8)
         );
+      }
+
+      &:first-child {
+       border-bottom-left-radius: var(--border-radius-2xl);
+      }
+
+      &:nth-child(2) {
+        border-radius: 0;
+      }
+
+      &:last-child {
+        border-bottom-right-radius: var(--border-radius-2xl);
       }
     }
   }

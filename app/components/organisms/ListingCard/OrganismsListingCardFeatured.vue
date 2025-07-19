@@ -1,9 +1,9 @@
 <template>
   <OrganismsListingCardBase :listing="listing">
     <template #featured-banner>
-      <div class="m-listing-card-featured-banner | body-sm font-bold">
+      <span class="m-listing-card-featured-tag | body-xs">
         Featured
-      </div>
+      </span>
     </template>
 
     <!-- Property Tags (Chain Free, Listed Date, etc.) -->
@@ -79,15 +79,16 @@ const props = defineProps<Props>();
     padding: var(--card-padding);
   }
 
-  .m-listing-card-featured-banner {
+  .m-listing-card-featured-tag {
     background-color: var(--secondary-400);
-    border-radius: calc(var(--border-radius-2xl) - var(--size-4)) 0
-      var(--border-radius-lg) 0;
+    border-radius: var(--border-radius-lg);
     color: var(--monochrome-900);
-    padding: var(--size-8) var(--size-24);
+    min-width: 125px;
+    padding: var(--size-8);
+    text-align: center;
     position: absolute;
-    top: 0;
-    left: -2px;
+    top: 18px;
+    left: var(--size-16);
     z-index: 3;
   }
 

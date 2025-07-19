@@ -84,17 +84,17 @@ const {
   totalResults,
   lastWhereClause,
   lastLocationContext,
+  viewMode,
   
   // Methods
-  initializeFromSavedState,
-  resetForm,
+  updateViewMode,
+  updateSort,
+  updateSearchResults,
   saveCurrentState,
+  resetForm,
   aiSearch,
   paginateSearch
 } = useAiSearchPage();
-
-// Access search state for view mode persistence
-const { saveSearchState, restoreSearchState } = useSearchState();
 
 // Computed properties (belong in template, not composable)
 const shouldShowFeedback = computed(() =>
@@ -116,31 +116,22 @@ const hasSavedState = computed(() =>
 // Map view state - initialize from saved state
 const isMapView = ref(false);
 
-// Initialize view state from localStorage
-const initializeViewState = () => {
+// Watch for view mode changes and update local state
+watch(() => viewMode.value, (newViewMode) => {
   if (import.meta.client) {
-    const restored = restoreSearchState();
-    isMapView.value = restored.viewMode === 'map';
+    isMapView.value = newViewMode === 'map';
   }
-};
+}, { immediate: true });
 
 const toggleView = () => {
   isMapView.value = !isMapView.value;
-  // Save the new view mode to localStorage
-  saveSearchState({ viewMode: isMapView.value ? 'map' : 'list' });
+  // Save the new view mode to KV storage
+  updateViewMode(isMapView.value ? 'map' : 'list');
 };
 
 const handleReset = async () => {
-  resetForm();
-  // Reset view to list when form is reset
+  await resetForm();
   isMapView.value = false;
-  // Clear any stored view mode and set to list
-  if (import.meta.client) {
-    localStorage.removeItem('search-state');
-  }
-  saveSearchState({ viewMode: 'list' });
-  // Ensure state is updated
-  await nextTick();
 };
 
 
@@ -150,11 +141,8 @@ const sortedResults = computed(() => {
 });
 
 
-// Initialize state on mount
-onMounted(() => {
-  initializeFromSavedState();
-  initializeViewState();
-});
+// State automatically initializes from KV storage via useSearchState
+// No manual initialization needed anymore
 
 // Save state when navigating away
 onBeforeUnmount(() => {
@@ -165,8 +153,7 @@ onBeforeUnmount(() => {
 
 // Handle sort changes
 const handleSort = (sortBy: string) => {
-  currentSort.value = sortBy;
-  saveCurrentState();
+  updateSort(sortBy);
 };
 
 const handlePageChange = async (page: number) => {
@@ -187,16 +174,22 @@ const handlePageChange = async (page: number) => {
         lastLocationContext.value
       );
       
-      searchResults.value = response.results;
-      currentPage.value = response.currentPage;
-      totalPages.value = response.totalPages;
-      totalResults.value = response.totalResults;
-      
       // Apply current sort order to results
-      searchResults.value = applySortToResults(searchResults.value, currentSort.value);
+      const sortedResults = applySortToResults(response.results, currentSort.value);
       
-      // Save current state
-      saveCurrentState();
+      // Update all state at once
+      await updateSearchResults({
+        results: sortedResults,
+        queryAnalysis: queryAnalysis.value ? {
+          usedTerms: [...queryAnalysis.value.usedTerms],
+          ignoredTerms: [...queryAnalysis.value.ignoredTerms]
+        } : { usedTerms: [], ignoredTerms: [] },
+        currentPage: response.currentPage || page,
+        totalPages: response.totalPages,
+        totalResults: response.totalResults,
+        whereClause: lastWhereClause.value,
+        locationContext: lastLocationContext.value
+      });
       
     } catch (error: any) {
       searchError.value = error.message || "An unexpected error occurred.";
