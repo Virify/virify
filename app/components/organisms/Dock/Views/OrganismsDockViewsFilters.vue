@@ -15,10 +15,10 @@ const initialQuery = ref('')
  *  Fetch filters
  */
 const { isPending, setPendingWhile } = usePending()
-const { searchState, setQueryAnalysis, setSearchPending } = useSearchState()
+const { searchState, setFilters, setSearchPending } = useSearchState()
 const { aiSearch } = useAiSearchPage();
 
-function searchSubmit(filterString: string) {
+function searchSubmit(query: string) {
   setSearchPending(true)
 
   // Get current location, radius
@@ -28,9 +28,9 @@ function searchSubmit(filterString: string) {
   setPendingWhile(async () => {
     if (!location) return
 
-    const response = await aiSearch(location, radius, filterString, 1);
+    const { queryAnalysis } = await aiSearch(location, radius, query, 1);
 
-    setQueryAnalysis(response as unknown)
+    setFilters({ query, queryAnalysis })
   }).then(() => {
     emits('close')
   }).finally(() => {

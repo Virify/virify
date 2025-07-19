@@ -137,14 +137,19 @@ function createSearchState() {
   /**
    *  Update state sort order
    */
-  function setQueryAnalysis(value: unknown, callback?: () => void) {
-    const { queryAnalysis } = asObject(value)
+  function setFilters(value: Partial<AISearchResponse>, callback?: () => void) {
+    const { queryAnalysis, query } = asObject(value)
 
-    // Check value is valid
-    if (!isObject(queryAnalysis)) return
+    // Check either value is valid
+    if (!isString(query) && !isObject(queryAnalysis)) {
+      return
+    }
 
     // Update state
-    updateState({ queryAnalysis: queryAnalysis as QueryAnalysis })
+    updateState({
+      queryAnalysis,
+      query
+    })
 
     // Run optional callback
     _runCallback(callback)
@@ -235,7 +240,7 @@ function createSearchState() {
     setLocation,
     setLocationRadius,
     setSearchPending,
-    setQueryAnalysis,
+    setFilters,
     updateState,
     clearState,
     refreshFromKV,
