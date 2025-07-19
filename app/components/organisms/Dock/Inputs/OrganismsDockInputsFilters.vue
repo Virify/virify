@@ -32,8 +32,6 @@ const { searchState, isLoading } = useSearchState()
 const filtersCount = computed(() => {
   const { queryAnalysis } = asObject(searchState.value)
 
-  console.log('queryAnalysis', JSON.parse(JSON.stringify(queryAnalysis)))
-
   return queryAnalysis?.usedTerms?.length || 0
 })
 
