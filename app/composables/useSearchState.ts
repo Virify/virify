@@ -1,3 +1,6 @@
+export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
+export type ResultLayout = 'map' | 'grid' | 'split'
+
 /**
  * KV-backed search state management
  *
