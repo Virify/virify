@@ -1,5 +1,5 @@
 <template>
-  <MoleculesListingCardBase :listing="listing" />
+  <OrganismsListingCardBase :listing="listing" />
 </template>
 
 <script lang="ts" setup>

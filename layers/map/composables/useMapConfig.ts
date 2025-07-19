@@ -59,6 +59,20 @@ export function useMapConfig() {
       center: options.center,
     }) as ExtendedMapTilerMap;
 
+    // Handle missing map images to prevent console warnings
+    map.on('styleimagemissing', (e: any) => {
+      // Create a simple 1x1 transparent pixel as fallback for missing POI icons
+      const canvas = document.createElement('canvas');
+      canvas.width = 1;
+      canvas.height = 1;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = 'transparent';
+        ctx.fillRect(0, 0, 1, 1);
+        map.addImage(e.id, canvas);
+      }
+    });
+
     // Add controls manually in bottom-right position
     if (options.interactive) {
       const navControl = new sdk.NavigationControl() as any;

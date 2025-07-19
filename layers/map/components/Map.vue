@@ -10,6 +10,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { formatMarker } from '../utils/markers';
+
 /**
  * state
  */
@@ -27,7 +29,8 @@ const {
 } = useMap();
 
 defineExpose({ 
-  map
+  map,
+  recenterMap
 });
 
 /**
@@ -178,40 +181,11 @@ function updateMarkers() {
 
   if (props.markers?.length) {
     addMarkers(map.value, formattedMarkers.value);
-  } else if (props.marker) {
-    addMarker(map.value, formattedMarkers.value);
+  } else if (props.marker && formattedMarkers.value[0]) {
+    addMarker(map.value, [formattedMarkers.value[0]]);
   }
 }
 
-/**
- * Format the single marker
- * 
- * @param listing
- */
-function formatMarker(listing: ListingCardType): MapMarker {
-  return {
-    id: listing.id,
-    lat: listing.property?.address?.lat ?? 0,
-    lon: listing.property?.address?.lon ?? 0,
-    title: listing.title ?? null,
-    bedrooms: listing.property?.numberBedrooms ?? null,
-    bathrooms: listing.property?.numberBathrooms ?? null,
-    receptions: listing.property?.numberReceptions ?? null,
-    price: listing.price ?? null,
-    propertyType: listing.property?.type?.name ?? null,
-    classification: listing.property?.classification?.name ?? null,
-    priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,
-    address: listing.property?.address
-      ? {
-          street: listing.property.address.street,
-          city: listing.property.address.city,
-          postcode: listing.property.address.postcode,
-        }
-      : null,
-    image: listing.property?.media ?? [],
-    tier: listing.listingTier,
-  };
-}
 
 /**
  * Format the markers for the map
@@ -232,8 +206,28 @@ function removeCircle(map: any) {
   // Remove SVG overlay using composable util
   removeSearchRadiusVisualization(map);
 }
+
+/**
+ * Recenter the map to ensure marker is properly positioned
+ */
+function recenterMap() {
+  if (!map.value || !props.center) return;
+  
+  nextTick(() => {
+    map.value.resize();
+    map.value.flyTo({
+      center: props.center,
+      zoom: props.zoom || map.value.getZoom(),
+      essential: true,
+      duration: 800
+    });
+  });
+}
 </script>
-<style>
+<style lang="scss">
+@import '@maptiler/sdk/dist/maptiler-sdk.css';
+@import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+
 .map-container {
   width: 100%;
   height: 100%;

@@ -1,4 +1,4 @@
-import type { RentalAvailabilityStatus, SaleAvailabilityStatus } from "@prisma/client";
+import type { RentalAvailabilityStatus, SaleAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
 
 /**
  * Converts a string to a valid Prisma enum value.

@@ -97,6 +97,11 @@ function toggle() {
   color: var(--foreground-200);
 }
 
+.a-favourite-button svg {
+  stroke: currentColor;
+  stroke-width: 1px;
+}
+
 .a-favourite-button.pending {
   color: var(--monochrome-400);
 }
@@ -104,6 +109,11 @@ function toggle() {
 .a-favourite-button.selected {
   color: var(--favourite-colour);
   animation: selectedBounce var(--animation-subtle) linear;
+}
+
+.a-favourite-button.selected svg {
+  stroke: currentColor;
+  stroke-width: 1px;
 }
 
 @keyframes selectedBounce {

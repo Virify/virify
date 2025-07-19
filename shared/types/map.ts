@@ -1,6 +1,5 @@
 import type { Map as MaptilerMap, Marker } from "@maptiler/sdk";
-import type { ListingTier } from "@prisma/client";
-
+import type { ListingTier } from "~~/layers/database/server/database/prisma/generated/client";
 /**
  * Map marker type for use with MapTiler maps
  */
@@ -110,6 +109,12 @@ export type GeocodingFeature = {
     [key: string]: any;
   };
   bbox?: [number, number, number, number];
+};
+
+/**
+ * Geocoding feature with boundary polygon for map visualization
+ */
+export type GeocodingFeatureWithBoundary = GeocodingFeature & {
   boundaryPolygon?: {
     type: "Polygon" | "MultiPolygon";
     coordinates: number[][][] | number[][][][];

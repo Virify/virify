@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import type { RentalPriceType, SalePriceType } from '@prisma/client'
 import { useElementHover, onClickOutside } from '@vueuse/core'
+import type { RentalPriceType, SalePriceType } from '~~/layers/database/server/database/prisma/generated/enums'
 
 /**
  *  Props
@@ -216,7 +216,7 @@ const iconOptions = computed(() => {
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '#styles/_utils/functions' as fn;
 @use '#styles/_utils/media' as mq;
 

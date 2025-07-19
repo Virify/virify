@@ -2,8 +2,8 @@
   <div role="presentation">
     <div class="embla" ref="emblaRef">
       <div class="embla-slides">
-        <div class="embla-slide" v-for="slide of slides">
-          <slot v-bind="{ slide }"></slot>
+        <div class="embla-slide" v-for="(slide, slideIndex) of slides" :key="slideIndex">
+          <slot v-bind="{ slide, slideIndex }"></slot>
         </div>
       </div>
     </div>
@@ -13,13 +13,22 @@
 <script setup lang="ts">
 import emblaCarouselVue from 'embla-carousel-vue'
 
-const [emblaRef] = emblaCarouselVue()
+const [emblaRef, emblaApi] = emblaCarouselVue({loop: true})
+
 
 interface Props {
   slides?: any[]
 }
 
 defineProps<Props>()
+
+// Expose the API for parent components
+defineExpose({
+  scrollPrev: () => emblaApi.value?.scrollPrev(),
+  scrollNext: () => emblaApi.value?.scrollNext(),
+  canScrollPrev: () => emblaApi.value?.canScrollPrev(),
+  canScrollNext: () => emblaApi.value?.canScrollNext()
+})
 </script>
 
 <style scoped>

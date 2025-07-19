@@ -11,7 +11,7 @@ model Property {
   floorLevel               Int?
   additionalFeatures       AdditionalFeatures?
   accessibilityFeatures    Accessibility?
-  amenities                Amenities?
+  amenities                Amenities[]
   numberBedrooms           Int?                   @default(0)
   numberBathrooms          Int?                   @default(0)
   numberReceptions         Int?                   @default(0)

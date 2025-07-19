@@ -1,7 +1,4 @@
 import { defineTask } from 'nitropack/runtime/task'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
 
 /**
  * Seeding function to populate property types and classifications in the database.

@@ -1,4 +1,5 @@
-import { Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus } from "@prisma/client";
+import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import type { SaleAvailabilityStatus, RentalAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {
@@ -34,6 +35,7 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         id: true;
         username: true;
         email: true;
+        createdAt: true;
       };
     }
   };

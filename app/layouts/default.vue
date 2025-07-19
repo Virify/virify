@@ -7,7 +7,7 @@
       <NuxtPage />
     </div>
 
-    <!-- <OrganismsFooter /> -->
+    <OrganismsFooter />
 
     <ViewsDialog />
     <MoleculesToastContainer />
@@ -41,6 +41,11 @@ useHead({
       as: "style",
       href: "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap",
       onload: 'this.onload=null; this.rel="stylesheet"',
+    },
+    {
+      rel: "preload",
+      as: 'image',
+      href: "/img/preload.svg",
     },
   ],
 });

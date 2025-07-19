@@ -4,7 +4,7 @@
 
     <!-- Hero Image (shown in initial state, even when form expanded) -->
     <div v-if="!hasSearched" class="hero-section">
-      <img src="/img/ai-search-cover.png" alt="AI Search Cover" class="hero-image" />
+      <img src="/img/ai-search-cover.png" alt="Modern residential properties showcasing AI-powered search" class="hero-image" />
     </div>
 
     <!-- Collapsible Search Header -->
@@ -22,14 +22,14 @@
 
       <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched" :initial-query="lastSearchQuery"
         :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState" :is-map-view="isMapView"
-        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
+        :force-collapsed="hasSearched && (!!searchResults || isSearching)" @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
     <div v-if="shouldShowFeedback && !isMapView" class="search-feedback-wrapper">
       <div class="search-feedback-section | container container-sm">
-      <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
-      <OrganismsAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
+      <MoleculesAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
+      <MoleculesAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
       </div>
     </div>
     <div v-else-if="hasSearched" class="results-container">
@@ -45,7 +45,7 @@
       />
       
       <!-- Map View (shown even with no results) -->
-      <OrganismsAiSearchMapView 
+      <LazyOrganismsAiSearchMapView 
         v-if="isMapView"
         :results="sortedResults"
         :location="lastLocation"
@@ -57,6 +57,8 @@
 </template>
 
 <script setup lang="ts">
+import { applySortToResults } from '~/utils/results/search-sort';
+
 
 interface SearchPayload {
   location: GeocodingFeature;
@@ -82,17 +84,17 @@ const {
   totalResults,
   lastWhereClause,
   lastLocationContext,
+  viewMode,
   
   // Methods
-  initializeFromSavedState,
-  resetForm,
+  updateViewMode,
+  updateSort,
+  updateSearchResults,
   saveCurrentState,
+  resetForm,
   aiSearch,
   paginateSearch
 } = useAiSearchPage();
-
-// Access search state for view mode persistence
-const { saveSearchState, restoreSearchState } = useSearchState();
 
 // Computed properties (belong in template, not composable)
 const shouldShowFeedback = computed(() =>
@@ -114,31 +116,22 @@ const hasSavedState = computed(() =>
 // Map view state - initialize from saved state
 const isMapView = ref(false);
 
-// Initialize view state from localStorage
-const initializeViewState = () => {
+// Watch for view mode changes and update local state
+watch(() => viewMode.value, (newViewMode) => {
   if (import.meta.client) {
-    const restored = restoreSearchState();
-    isMapView.value = restored.viewMode === 'map';
+    isMapView.value = newViewMode === 'map';
   }
-};
+}, { immediate: true });
 
 const toggleView = () => {
   isMapView.value = !isMapView.value;
-  // Save the new view mode to localStorage
-  saveSearchState({ viewMode: isMapView.value ? 'map' : 'list' });
+  // Save the new view mode to KV storage
+  updateViewMode(isMapView.value ? 'map' : 'list');
 };
 
 const handleReset = async () => {
-  resetForm();
-  // Reset view to list when form is reset
+  await resetForm();
   isMapView.value = false;
-  // Clear any stored view mode and set to list
-  if (import.meta.client) {
-    localStorage.removeItem('search-state');
-  }
-  saveSearchState({ viewMode: 'list' });
-  // Ensure state is updated
-  await nextTick();
 };
 
 
@@ -148,16 +141,19 @@ const sortedResults = computed(() => {
 });
 
 
-// Initialize state on mount
-onMounted(() => {
-  initializeFromSavedState();
-  initializeViewState();
+// State automatically initializes from KV storage via useSearchState
+// No manual initialization needed anymore
+
+// Save state when navigating away
+onBeforeUnmount(() => {
+  if (hasSearched.value && searchResults.value) {
+    saveCurrentState();
+  }
 });
 
 // Handle sort changes
 const handleSort = (sortBy: string) => {
-  currentSort.value = sortBy;
-  saveCurrentState();
+  updateSort(sortBy);
 };
 
 const handlePageChange = async (page: number) => {
@@ -178,16 +174,22 @@ const handlePageChange = async (page: number) => {
         lastLocationContext.value
       );
       
-      searchResults.value = response.results;
-      currentPage.value = response.currentPage;
-      totalPages.value = response.totalPages;
-      totalResults.value = response.totalResults;
-      
       // Apply current sort order to results
-      searchResults.value = applySortToResults(searchResults.value, currentSort.value);
+      const sortedResults = applySortToResults(response.results, currentSort.value);
       
-      // Save current state
-      saveCurrentState();
+      // Update all state at once
+      await updateSearchResults({
+        results: sortedResults,
+        queryAnalysis: queryAnalysis.value ? {
+          usedTerms: [...queryAnalysis.value.usedTerms],
+          ignoredTerms: [...queryAnalysis.value.ignoredTerms]
+        } : { usedTerms: [], ignoredTerms: [] },
+        currentPage: response.currentPage || page,
+        totalPages: response.totalPages,
+        totalResults: response.totalResults,
+        whereClause: lastWhereClause.value,
+        locationContext: lastLocationContext.value
+      });
       
     } catch (error: any) {
       searchError.value = error.message || "An unexpected error occurred.";

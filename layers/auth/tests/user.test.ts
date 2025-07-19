@@ -22,7 +22,6 @@ vi.mock("../../database/server/utils/prisma-client", () => {
 });
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { Reviewed } from "@prisma/client";
 import {
   findUser,
   findFirstUser,
@@ -36,6 +35,7 @@ import {
   isActive,
 } from "../../database/server/utils/user";
 import { prisma } from "../../database/server/utils/prisma-client";
+import { Reviewed } from "~~/layers/database/server/database/prisma/generated/enums";
 
 const prismaAny = prisma as any;
 

@@ -1,4 +1,4 @@
-import type { TrackLocation, TrackQuery } from "@prisma/client";
+import type { TrackLocation, TrackQuery } from "../database/prisma/generated/client";
 
 /**
  * Get actual analytics aggregates for business intelligence
@@ -59,7 +59,7 @@ export async function getUserListingIds(userId: number) {
     },
   });
 
-  return listings.map((listing) => listing.id);
+  return listings.map((listing: { id: any; }) => listing.id);
 }
 
 /**
