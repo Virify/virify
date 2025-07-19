@@ -10,10 +10,6 @@
       </template>
     </OrganismsPaneSlider>
 
-    <footer class="p-dock__demo-footer">
-      <p class="| body-sm">Copy &copy; Virify</p>
-    </footer>
-
     <OrganismsDock />
   </div>
 </template>
@@ -79,11 +75,6 @@ pre {
     background: var(--monochrome-400);
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
-  }
-
-  &__demo-footer {
-    margin: var(--size-48) 0 0;
-    padding: var(--size-16) 0;
   }
 }
 </style>
