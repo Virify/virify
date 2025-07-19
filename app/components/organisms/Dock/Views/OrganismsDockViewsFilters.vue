@@ -28,7 +28,7 @@ function searchSubmit(filterString: string) {
   setPendingWhile(async () => {
     if (!location) return
 
-    const response = await aiSearch(location as GeocodingFeature, radius as number, filterString, 1);
+    const response = await aiSearch(location, radius, filterString, 1);
 
     setQueryAnalysis(response as unknown)
   }).then(() => {
