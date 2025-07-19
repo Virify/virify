@@ -1,26 +1,17 @@
 <template>
   <div class="ai-search-map-view">
-    <Map
-      ref="mapRef"
-      :markers="convertedMarkers"
-      :zoom="mapZoom"
-      :center="mapCenter"
-      :interactive="true"
-      :mapId="GLOBAL_MAP_ID"
-    />
-    
+    <Map ref="mapRef" :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true"
+      :mapId="GLOBAL_MAP_ID" />
+
     <!-- Loading overlay for map view -->
-    <div v-if="isSearching" class="loading-overlay">
-      <div class="loading-message | body-sm">
+    <div v-if="isSearching || !results || results.length === 0" class="ai-search-map-view__overlay | body-lg">
+      <template v-if="isSearching">
         {{ loadingMessage }}
-      </div>
-    </div>
-    
-    <!-- No results overlay for map view -->
-    <div v-else-if="!results || results.length === 0" class="no-results-overlay">
-      <div class="no-results-message">
+      </template>
+
+      <template v-else>
         No results found
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -91,38 +82,28 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/functions' as fn;
+
 .ai-search-map-view {
   position: relative;
   width: 100%;
-  height: calc(100vh - var(--header-height));
-  border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0 0;
+  height: 100%;
   overflow: hidden;
-}
 
-.loading-overlay,
-.no-results-overlay {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  pointer-events: none;
-}
-
-.loading-message,
-.no-results-message {
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--monochrome-100);
-  padding: var(--size-12) var(--size-20);
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--color-border-light);
-}
-
-@media (max-width: 768px) {
-  .ai-search-map-view {
-    height: calc(100vh - var(--header-height) - var(--size-72));
-    min-height: 400px;
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: fn.faded-color(70%, var(--monochrome-100));
+    color: var(--monochrome-900);
+    font-weight: var(--font-semibold);
   }
 }
 </style>
