@@ -430,7 +430,7 @@ onClickOutside($form, () => {
     background-color: transparent;
     color: currentColor;
     border-radius: var(--border-radius-lg);
-
+    border: none;
     @include mq.tablet {
       border-radius: var(--border-radius-xl);
     }

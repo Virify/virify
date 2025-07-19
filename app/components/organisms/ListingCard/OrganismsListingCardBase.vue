@@ -168,7 +168,7 @@ const priceType = computed(() => {
     flex-direction: column;
     gap: var(--size-16);
     height: 100%;
-    justify-content: space-between;
+    // justify-content: space-between;
   }
 
   .m-listing-card-actions {

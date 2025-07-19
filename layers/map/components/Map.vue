@@ -251,7 +251,10 @@ function recenterMap() {
   });
 }
 </script>
-<style>
+<style lang="scss">
+@import '@maptiler/sdk/dist/maptiler-sdk.css';
+@import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+
 .map-container {
   width: 100%;
   height: 100%;

@@ -432,8 +432,14 @@ onMounted(() => {
 
 .listing-card__actions .a-favourite-button,
 .listing-card__actions .note-button {
-  height: var(--size-24);
-  width: var(--size-24);
+  width: var(--size-32);
+
+  svg {
+    width: var(--size-32);
+    height: var(--size-32);
+    stroke: var(--monochrome-100);
+  }
+  
 }
 
 .listing-card__actions .note-button.has-note::after {

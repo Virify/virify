@@ -3,7 +3,7 @@
     <ul class="o-site-navigation-list">
       <template v-if="!loggedIn">
         <li>
-          <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm font-bold">Log in</button>
+          <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm button button-tertiary button-sm">Log in</button>
         </li>
         <li>
           <button @click.prevent="openForgotPassword"
@@ -51,10 +51,10 @@ function openForgotPassword() {
   padding: 0;
   display: flex;
   align-items: center;
-  gap: var(--size-16);
+  gap: var(--size-8);
 
   @include mq.desktop {
-    gap: var(--size-20);
+    gap: var(--size-8);
   }
 }
 

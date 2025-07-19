@@ -249,7 +249,8 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
 
   &__drag-handle {
     --touch-overlap: calc(0px - var(--size-8));
-
+    border: none;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -238,12 +238,12 @@ onMounted(() => {
 }
 
 .m-listing-card:not([data-tier="FEATURED"]):not([data-tier="PREMIUM"]) .m-listing-card-image-actions {
-  .a-favourite-button,
+  .a-favourite-button:not(.selected),
   .note-button {
     color: var(--monochrome-900);
   }
   
-  .a-favourite-button svg {
+  .a-favourite-button:not(.selected) svg {
     stroke: var(--monochrome-900) !important;
   }
   
