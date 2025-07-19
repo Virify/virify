@@ -6,7 +6,7 @@
 
     <label ref="$labels" v-for="{ key, value, icon } of options" :key
       class="o-dock-inputs-layout__label | font-semibold">
-      <input type="radio" class="| visually-hidden" :value="key" v-model="state.layout" name="results-layout"
+      <input type="radio" class="| visually-hidden" :value="key" v-model="searchState.viewMode" name="results-layout"
         :aria-label="value" />
 
       <AtomsIcon :icon />
@@ -48,8 +48,8 @@ const options = computed(() => {
 /**
  *  Layout state
  */
-const { state, setLayout } = useUniversalSearch()
-const { layout } = toRefs(state.value)
+const { searchState, setViewMode } = useSearchState()
+const { viewMode } = toRefs(searchState.value)
 
 /**
  *  Loading state
@@ -91,7 +91,7 @@ async function updateHighlightPosition() {
 onMounted(() => {
   isMounted.value = true
 
-  watchImmediate(layout, updateHighlightPosition)
+  watchImmediate(viewMode, updateHighlightPosition)
   useResizeObserver($wrapper, updateHighlightPosition)
 })
 
@@ -99,11 +99,11 @@ onMounted(() => {
  *  Update layout in state
  */
 watch(options, (newValue) => {
-  if (newValue.length !== 2 || layout.value !== 'split') {
+  if (newValue.length !== 2 || viewMode.value !== 'split') {
     return
   }
 
-  setLayout('grid')
+  setViewMode('grid')
 })
 
 </script>

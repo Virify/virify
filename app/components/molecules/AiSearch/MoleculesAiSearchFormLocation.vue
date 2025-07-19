@@ -9,7 +9,7 @@
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
-          v-model="state.locationRadius" :options="selectOptionRadius" />
+          v-model="searchState.radius" :options="selectOptionRadius" />
       </fieldset>
 
       <Transition name="m-ai-search-form-location">
@@ -21,7 +21,7 @@
 
     <AtomsSelect name="radius" id="radius" aria-label="Location radius"
       class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
-      v-model="state.locationRadius" :options="selectOptionRadius" />
+      v-model="searchState.radius" :options="selectOptionRadius" />
   </form>
 </template>
 
@@ -47,14 +47,14 @@ function updateAutocompleteValue({ target }: Event) {
 /**
  *  Global and input state
  */
-const { state } = useUniversalSearch()
-const { location } = toRefs(state.value)
+const { searchState } = useSearchState()
+const { location } = toRefs(searchState.value)
 
 const locationQuery = ref(location?.value?.place_name_en || '')
 /**
  *  Handle autocomplete events
  */
-const { setLocation } = useUniversalSearch()
+const { setLocation } = useSearchState()
 
 function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
   const locationUnref = unref(location)

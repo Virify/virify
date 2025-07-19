@@ -15,22 +15,22 @@ const initialQuery = ref('')
  *  Fetch filters
  */
 const { isPending, setPendingWhile } = usePending()
-const { state, setAiFilters, setSearchPending } = useUniversalSearch()
+const { searchState, setQueryAnalysis, setSearchPending } = useSearchState()
 const { aiSearch } = useAiSearchPage();
 
 function searchSubmit(filterString: string) {
   setSearchPending(true)
 
-  // Get current location, locationRadius
-  const { location, locationRadius } = asObject(state.value)
+  // Get current location, radius
+  const { location, radius } = asObject(searchState.value)
 
   // Set pending state
   setPendingWhile(async () => {
     if (!location) return
 
-    const response = await aiSearch(location as GeocodingFeature, locationRadius as number, filterString, 1);
+    const response = await aiSearch(location as GeocodingFeature, radius as number, filterString, 1);
 
-    setAiFilters(response as unknown)
+    setQueryAnalysis(response as unknown)
   }).then(() => {
     emits('close')
   }).finally(() => {

@@ -1,6 +1,6 @@
 <template>
   <button type="button" class="o-dock-inputs-location" :class="{
-    'o-dock-inputs-location--no-radius': !locationRadius,
+    'o-dock-inputs-location--no-radius': !radius,
     'o-dock-inputs-location--active': isExpanded
   }">
     <AtomsIcon class="o-dock-inputs-location__icon" icon="search/location" />
@@ -14,8 +14,8 @@
         Add location
       </span>
 
-      <span role="presentation" class="o-dock-inputs-location__radius" v-if="locationName && locationRadius">
-        +{{ locationRadius }}
+      <span role="presentation" class="o-dock-inputs-location__radius" v-if="locationName && radius">
+        +{{ radius }}
         <sup class="| body-2xs">Mi</sup>
       </span>
     </span>
@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-const { state } = useUniversalSearch()
-const { location, locationRadius } = toRefs(state.value)
+const { searchState } = useSearchState()
+const { location, radius } = toRefs(searchState.value)
 
 const locationName = computed(() => {
   const { place_name_en } = asObject(location?.value)
