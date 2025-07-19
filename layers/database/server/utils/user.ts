@@ -1,4 +1,5 @@
-import { type User, Prisma, Reviewed } from "@prisma/client";
+import { type User, Prisma, Reviewed } from "../database/prisma/generated/client";
+
 import { prisma } from "./prisma-client";
 export type UserWithVerification = Prisma.UserGetPayload<{ include: { verification: true } }>;
 export type { User };

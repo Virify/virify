@@ -1,5 +1,5 @@
-import type { Property } from "@prisma/client";
 import type { Fullproperty } from "~~/shared/types/property";
+import type { Property } from "../database/prisma/generated/client";
 
 export const propertyInclude = {
   address: true,

@@ -7,6 +7,7 @@ const trackSearchSchema = z.object({
     type: z.string(),
     text: z.string(),
     place_name_en: z.string(),
+    place_name: z.string(),
     geometry: z.object({
       type: z.string(),
       coordinates: z.tuple([z.number(), z.number()]),

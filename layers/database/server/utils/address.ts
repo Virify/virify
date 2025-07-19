@@ -1,4 +1,5 @@
-import type { Address } from "@prisma/client";
+import type { Address } from "../database/prisma/generated/client";
+
 
 /**
  * Searches for addresses matching the query string using PostgreSQL full-text search.

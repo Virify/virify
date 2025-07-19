@@ -1,4 +1,4 @@
-import type { AmenityType, AmenitySubtype } from '@prisma/client'
+import type { AmenityType, AmenitySubtype } from '../database/prisma/generated/enums'
 
 export interface AmenityData {
   type: AmenityType
@@ -24,7 +24,7 @@ export async function getAmenitiesByPropertyId(propertyId: number) {
  */
 export async function createAmenitiesForProperty(propertyId: number, amenitiesData: AmenityData[]) {
   // Use transaction to ensure atomicity
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: any) => {
     // Delete existing amenities for this property
     await tx.amenities.deleteMany({
       where: { propertyId }

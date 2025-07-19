@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "vitest";
 import { getListingByDistanceAndFilters } from "../server/utils/listing";
-import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, PrismaClient } from "@prisma/client";
+import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus } from "../server/database/prisma/generated/enums";
 
 // Create hoisted mocks
 const mockPrisma = vi.hoisted(() => ({

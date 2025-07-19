@@ -87,8 +87,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { Media } from "@prisma/client";
 import emblaCarouselVue from "embla-carousel-vue";
+import type { Media } from "~~/layers/database/server/database/prisma/generated/client";
 
 interface Props {
   images: {

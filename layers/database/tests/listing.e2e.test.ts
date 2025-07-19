@@ -5,19 +5,12 @@
 
 import { describe, it, expect, afterAll, afterEach, beforeAll, vi } from "vitest";
 import { 
-  PrismaClient, 
-  ConstructionType, 
-  ListingTier, 
-  RentalAvailabilityStatus, 
-  RentalPriceType,
-  SaleAvailabilityStatus,
-  SalePriceType
-} from "@prisma/client";
-import { 
   getListingByDistanceAndFilters, 
   getFullListingById,
 } from "../server/utils/listing";
 import type { ListingCardType } from "~~/shared/types/listing";
+import { PrismaClient } from "../server/database/prisma/generated/client";
+import { ConstructionType, ListingTier, RentalAvailabilityStatus, RentalPriceType, SaleAvailabilityStatus, SalePriceType } from "../server/database/prisma/generated/enums";
 
 /**
  * Mock the Prisma client to always use the test database URL.

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "~~/layers/database/server/database/prisma/generated/client";
 
 const config = useRuntimeConfig();
 

@@ -10,7 +10,7 @@ interface Range {
  *
  */
 export function clampNumber(num: number, range: Range): number {
-  let { min, max } = asObject(range) as Record<string, number>
+  let { min, max } = asObject(range) as unknown as Record<string, number>
 
   // Ensure max/min values are valid
   if (!min || !Number.isFinite(min)) min = 0;

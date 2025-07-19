@@ -1,6 +1,5 @@
 import type { Map as MaptilerMap, Marker } from "@maptiler/sdk";
-import type { ListingTier } from "@prisma/client";
-
+import type { ListingTier } from "~~/layers/database/server/database/prisma/generated/client";
 /**
  * Map marker type for use with MapTiler maps
  */

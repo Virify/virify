@@ -1,4 +1,5 @@
-import type { RentalPriceType, SaleListing, SalePriceType } from "@prisma/client"
+import type { RentalPriceType } from "~~/layers/database/server/database/prisma/generated/client"
+import type { SalePriceType } from "~~/layers/database/server/database/prisma/generated/client"
 
 export type MinMaxPrice = [
   min: number,
