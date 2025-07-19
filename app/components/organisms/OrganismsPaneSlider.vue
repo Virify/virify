@@ -2,7 +2,7 @@
   <div ref="$wrapper" role="presentation" class="o-pane-slider">
     <div v-if="leftSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--left" :class="{
       'o-pane-slider__pane--full': !bothSlots,
-      'o-pane-slider__pane--faded': isDragToClose === 'left'
+      'o-pane-slider__pane--faded': bothSlots && isDragToClose === 'left'
     }">
       <slot name="left"></slot>
     </div>
@@ -16,7 +16,7 @@
 
     <div v-if="rightSlot" role="presentation" class="o-pane-slider__pane o-pane-slider__pane--right" :class="{
       'o-pane-slider__pane--full': !bothSlots,
-      'o-pane-slider__pane--faded': isDragToClose === 'right'
+      'o-pane-slider__pane--faded': bothSlots && isDragToClose === 'right'
     }">
       <slot name="right"></slot>
     </div>
