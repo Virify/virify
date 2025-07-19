@@ -1,5 +1,5 @@
 <template>
-  <div class="| container">
+  <div class="p-dock | container">
     <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap">
       <template #left v-if="showGrid">
         <pre>{{ searchState }}</pre>
@@ -63,16 +63,18 @@ pre {
   border-radius: var(--border-radius-2xl);
   padding: var(--size-32);
   overflow: hidden;
+  margin: 0;
 }
 </style>
 
 <style lang="scss">
 .p-dock {
+  padding: var(--size-16) 0;
 
   &__map {
     position: sticky;
-    top: calc(var(--header-height) + var(--size-8));
-    height: calc(100vh - var(--header-height) - var(--size-16));
+    top: calc(var(--header-height) + var(--size-20));
+    height: calc(100vh - var(--header-height) - var(--size-32));
     width: 100%;
     background: var(--monochrome-400);
     border-radius: var(--border-radius-2xl);
