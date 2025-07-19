@@ -2,7 +2,7 @@
   <div class="| flow">
     <h2 class="| title-md">AI filters</h2>
 
-    <div v-if="isPending">Loading...</div>
+    <div v-if="isLoading">Loading...</div>
 
     <MoleculesAiSearchFormFilters v-else :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
   </div>
@@ -14,36 +14,14 @@ const initialQuery = ref('')
 /**
  *  Fetch filters
  */
-const { isPending, setPendingWhile } = usePending()
-const { searchState, setFilters, setSearchPending } = useSearchState()
-const { aiSearch } = useAiSearchPage();
+const { setQuery, isLoading } = useSearchState()
 
 function searchSubmit(query: string) {
-  setSearchPending(true)
-
-  // Get current location, radius
-  const { location, radius } = asObject(searchState.value)
-
-  // Set pending state
-  setPendingWhile(async () => {
-    if (!location) return
-
-    const { queryAnalysis } = await aiSearch(location, radius, query, 1);
-
-    setFilters({ query, queryAnalysis })
-  }).then(() => {
-    emits('close')
-  }).finally(() => {
-    setSearchPending(false)
-  })
+  setQuery(query)
 };
 
 function searchReset() {
-  console.log('reset-search')
+  setQuery('')
 }
 
-/**
- *  Allow closing
- */
-const emits = defineEmits(['close'])
 </script>

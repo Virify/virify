@@ -15,7 +15,12 @@
 </template>
 
 <script setup>
-const { searchState, setViewMode } = useSearchState()
+const {
+  searchState,
+  setResults,
+  setQueryAnalysis,
+  setSearchPending
+} = useSearchState()
 
 /**
  *  Update layout
@@ -39,13 +44,31 @@ const showMap = computed(() => {
 /**
  *  Handle searches
  */
-const { location, radius } = toRefs(searchState.value)
+const { location, radius, sortBy, query } = toRefs(searchState.value)
+const { setPendingWhile } = usePending()
+const { aiSearch } = useAiSearchPage();
 
-watch([location, radius], () => {
-  console.log(
-    'Search properties!',
-    JSON.parse(JSON.stringify(searchState.value))
-  )
+watch([location, radius, sortBy, query], () => {
+  // Get current location, radius
+  const { location, query, radius } = asObject(searchState.value)
+
+  // Do not search if no location or query is added
+  if (!location || !query) return
+
+  // Set pending state
+  setSearchPending(true)
+
+  // Set pending state
+  setPendingWhile(async () => {
+    if (!location) return
+
+    const { queryAnalysis, results } = await aiSearch(location, radius, query, 1);
+
+    setQueryAnalysis(queryAnalysis)
+    setResults(results)
+  }).finally(() => {
+    setSearchPending(false)
+  })
 }, { deep: true })
 
 </script>

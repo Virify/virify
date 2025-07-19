@@ -137,19 +137,26 @@ function createSearchState() {
   /**
    *  Update state sort order
    */
-  function setFilters(value: Partial<AISearchResponse>, callback?: () => void) {
-    const { queryAnalysis, query } = asObject(value)
-
+  function setQuery(value: string, callback?: () => void) {
     // Check either value is valid
-    if (!isString(query) && !isObject(queryAnalysis)) {
-      return
-    }
+    if (!isString(value)) return
 
     // Update state
-    updateState({
-      queryAnalysis,
-      query
-    })
+    updateState({ query: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setQueryAnalysis(value: QueryAnalysis, callback?: () => void) {
+    // Check either value is valid
+    if (!isObject(value)) return
+
+    // Update state
+    updateState({ queryAnalysis: value })
 
     // Run optional callback
     _runCallback(callback)
@@ -204,6 +211,20 @@ function createSearchState() {
   /**
    *  Manage state directly
    */
+  function setResults(value: unknown[], callback?: () => void) {
+    // Check value is valid
+    if (!Array.isArray(value)) return
+
+    // Update state
+    updateState({ results: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Manage state directly
+   */
   const updateState = async (updates: Partial<SearchState>) => {
     // @TODO maybe replace this with Defu to better handle nested merges?
     Object.assign(searchState.value, updates);
@@ -240,7 +261,9 @@ function createSearchState() {
     setLocation,
     setLocationRadius,
     setSearchPending,
-    setFilters,
+    setQuery,
+    setQueryAnalysis,
+    setResults,
     updateState,
     clearState,
     refreshFromKV,
