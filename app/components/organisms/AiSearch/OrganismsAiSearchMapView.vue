@@ -27,14 +27,14 @@ const loadingMessage = computed(() => {
 
 interface Props {
   results: ListingWithFullProperty[];
-  location: GeocodingFeatureWithBoundary | null;
-  radius: number;
+  location?: GeocodingFeatureWithBoundary | null;
+  radius?: number;
   isSearching?: boolean;
 }
 
 const props = defineProps<Props>();
 
-const { calculateZoomLevelFromRadius, updateSearchRadiusVisualization } = useMap();
+const { updateSearchRadiusVisualization } = useMap();
 
 const mapRef = ref();
 
