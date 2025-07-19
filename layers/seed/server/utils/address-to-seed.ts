@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 
 export const cityCenters: Prisma.AddressCreateWithoutPropertiesInput[] = [
   {

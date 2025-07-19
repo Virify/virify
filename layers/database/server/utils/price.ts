@@ -63,7 +63,7 @@ export async function getAllPrices(type: ListingType = "sales"): Promise<number[
     },
   });
 
-  return prices.map((price) => price.price);
+  return prices.map((price: { price: any; }) => price.price);
 }
 
 /**

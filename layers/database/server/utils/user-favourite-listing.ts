@@ -98,7 +98,7 @@ export async function updateFavouriteListing(userId: number, listingId: number):
     select: { listingId: true },
   });
 
-  return favourites.map((fav) => fav.listingId);
+  return favourites.map((fav: { listingId: any; }) => fav.listingId);
 }
 
 /**

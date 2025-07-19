@@ -1,8 +1,6 @@
 // imports require .ts extension to run seed
-import { BedSizeType, PrismaClient, ConstructionType, FireplaceType, PlanningClassification, LandUse, BoilerType, BroadbandType, ConnectedUtilities, EPCRating, HeatingType, HotWaterSource, RenewableEnergy } from "@prisma/client";
-import type { Prisma } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-const prisma = new PrismaClient();
+import { BedSizeType, BoilerType, BroadbandType, ConnectedUtilities, ConstructionType, EPCRating, FireplaceType, HeatingType, HotWaterSource, LandUse, PlanningClassification, RenewableEnergy, type Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 
 /**
  * Generate random additiional features
@@ -502,17 +500,17 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   }
   
   // Bedroom media
-  propertyWithFeatures.bedroomFeatures.forEach((bedroom) => {
+  propertyWithFeatures.bedroomFeatures.forEach((bedroom: { id: number; roomNumber: any; }) => {
     mediaToCreate.push(...generateMediaForFeature(bedroom.id, `Bedroom ${bedroom.roomNumber}`));
   });
   
   // Bathroom media
-  propertyWithFeatures.bathroomFeatures.forEach((bathroom) => {
+  propertyWithFeatures.bathroomFeatures.forEach((bathroom: { id: number; roomNumber: any; }) => {
     mediaToCreate.push(...generateMediaForFeature(bathroom.id, `Bathroom ${bathroom.roomNumber}`));
   });
   
   // Reception media
-  propertyWithFeatures.reception.forEach((reception) => {
+  propertyWithFeatures.reception.forEach((reception: { id: number; roomNumber: any; }) => {
     mediaToCreate.push(...generateMediaForFeature(reception.id, `Reception ${reception.roomNumber}`));
   });
   

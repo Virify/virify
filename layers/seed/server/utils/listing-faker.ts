@@ -1,8 +1,7 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { ContactMethod, FurnishedStatus, ListingTier, PrismaClient, RentalPriceType, VerificationLevel, type Listing, type Prisma, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus } from "@prisma/client";
-const prisma = new PrismaClient();
-
+import type { Prisma, Listing } from "~~/layers/database/server/database/prisma/generated/client";
+import { RentalPriceType, FurnishedStatus, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus, ListingTier, ContactMethod, VerificationLevel } from "~~/layers/database/server/database/prisma/generated/enums";
 /**
  * Generate a random date between 1, 3, 7, and 14 days ago.
  */

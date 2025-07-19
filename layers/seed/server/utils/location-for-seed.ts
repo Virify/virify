@@ -1,9 +1,8 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
 /**
  * !! This file is only to be used for seeding - because it instantiates a new PrismaClient which does not work in production.
  */
+
+import { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 
 /**
  * Returns the location of a given addressId.

@@ -1,8 +1,7 @@
-import { prisma } from "./prisma-client";
 import type { AddressLocation } from "~~/shared/types/location";
 import { prepareFullTextSearch } from "./address";
 import type { PropertySearchResult } from "~~/shared/types/property";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../database/prisma/generated/client";
 /**
  * Convert meters to miles. For PostGIS, we need to convert meters to miles.
  *

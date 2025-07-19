@@ -1,9 +1,11 @@
-import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing, type Prisma } from "@prisma/client";
 import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
+import { ListingTier, Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "../database/prisma/generated/client";
 import { prisma } from "./prisma-client";
+
+// required for testing - auto-importing not working
 import { propertyInclude } from "./property";
-import { getPriceFilter } from "./price";
 import { getPropertyIdsByDistance, getPropertyIdsByPolygons } from "./location";
+import { getPriceFilter } from "./price";
 
 /**
  * Get a listing by ID
@@ -203,7 +205,10 @@ export async function getListingByDistanceAndFilters(
 
   // Map the listings to include the distance
   const listingsWithDistance = listings.map((listing) => {
-    const property = nearbyProperties.find((p) => p.propertyId === listing.property?.address?.id);
+    const propertyId = listing.property && listing.property.address ? listing.property.address.id : undefined;
+    const property = propertyId !== undefined
+      ? nearbyProperties.find((p) => p.propertyId === propertyId)
+      : undefined;
     return {
       ...listing,
       distanceMiles: property ? property.distanceMiles : 0,

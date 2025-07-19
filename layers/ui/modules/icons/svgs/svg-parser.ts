@@ -27,10 +27,11 @@ export function svgParser(path: string): ParsedSvg {
      *  The initial argument '_' accounts for any pre-opening-tag content
      */
     const [_, openingTag, afterTag] = fileContent.split(matchOpeningTag)
-    const [svgContent] = afterTag.split(matchClosingTag)
+    const [svgContentRaw] = typeof afterTag === 'string' ? afterTag.split(matchClosingTag) : ['']
+    const svgContent = svgContentRaw ?? ''
 
     // Get viewBox and width/height (to construct viewbox if none exists)
-    const viewBox = parseViewboxFromTag(openingTag)
+    const viewBox = openingTag ? parseViewboxFromTag(openingTag) : undefined
 
     // Return relevant values
     return {

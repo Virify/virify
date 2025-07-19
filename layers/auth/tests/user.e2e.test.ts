@@ -5,7 +5,6 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
-import { PrismaClient, Reviewed } from "@prisma/client";
 
 // Mock the Prisma client to always use the test database URL
 vi.mock("../../database/server/utils/prisma-client", () => {
@@ -33,6 +32,8 @@ import {
   createUserWithTokens,
   isActive,
 } from "../../database/server/utils/user";
+import { PrismaClient } from "~~/layers/database/server/database/prisma/generated/client";
+import { Reviewed } from "~~/layers/database/server/database/prisma/generated/enums";
 
 let testUser: any;
 let userActivationToken: string;

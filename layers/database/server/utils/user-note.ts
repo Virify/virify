@@ -79,7 +79,7 @@ export async function getRecentUserNotes(userId: number) {
  * @returns Success status
  */
 export async function updateUserNote(userId: number, listingId: number, note: string) {
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     const userPreferences = await tx.userPreferences.upsert({
       where: { userId },
       create: { userId },

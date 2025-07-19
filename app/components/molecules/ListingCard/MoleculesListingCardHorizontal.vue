@@ -57,8 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import type { RentalPriceType, SalePriceType } from '@prisma/client'
 import { useElementHover, onClickOutside } from '@vueuse/core'
+import type { RentalPriceType, SalePriceType } from '~~/layers/database/server/database/prisma/generated/enums'
 
 /**
  *  Props
