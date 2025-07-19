@@ -20,7 +20,8 @@ const {
   searchState,
   setResults,
   setQueryAnalysis,
-  setSearchPending
+  setSearchPending,
+  setViewMode
 } = useSearchState()
 
 /**
