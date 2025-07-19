@@ -6,7 +6,7 @@
       </template>
 
       <template #right v-if="showMap">
-        <OrganismsAiSearchMapView class="p-dock__map" :results="[]" />
+        <OrganismsAiSearchMapView class="p-dock__map" :results :is-searching="isLoading" />
       </template>
     </OrganismsPaneSlider>
 
@@ -16,6 +16,7 @@
 
 <script setup>
 const {
+  isLoading,
   searchState,
   setResults,
   setQueryAnalysis,
@@ -70,6 +71,17 @@ watch([location, radius, sortBy, query], () => {
     setSearchPending(false)
   })
 }, { deep: true })
+
+/**
+ *  Ensure missing results do not break the map
+ */
+const results = computed(() => {
+  const { results } = asObject(searchState.value)
+
+  if (!Array.isArray(results)) return []
+
+  return results
+})
 
 </script>
 
