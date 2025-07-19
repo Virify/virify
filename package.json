@@ -11,7 +11,7 @@
     "pgen": "prisma generate",
     "db-push": "prisma db push",
     "seed": "npx nuxi run seed:database",
-    "test": "vitest run --exclude=\"**/*.e2e.test.ts\"",
+    "test": "vitest run",
     "test:full": "vitest run",
     "start": "node .output/server/index.mjs"
   },
