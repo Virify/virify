@@ -6,12 +6,12 @@
     <div class="| flow flow-md">
       <textarea v-model="notes" class="| body-sm" rows="4" placeholder="Enter your notes here..."></textarea>
 
-      <div class="| flex justify-between">
+      <div class="notes-dialog-actions">
         <button v-if="hasExistingNote" class="| button button-delete button-sm" @click="handleDeleteNote"
           :disabled="isPending">
           {{ isPending ? 'Deleting...' : 'Delete note' }}
         </button>
-        <div class="| flex gap-2">
+        <div class="notes-dialog-buttons">
           <button class="| button button-ghost button-sm" @click="() => hideDialog()" :disabled="isPending">
             Cancel
           </button>
@@ -78,7 +78,7 @@ async function handleDeleteNote() {
 }
 </script>
 
-<style>
+<style lang="scss">
 textarea {
   width: 100%;
   padding: var(--size-12);
@@ -91,5 +91,16 @@ textarea {
     outline: none;
     border-color: var(--secondary-400);
   }
+}
+
+.notes-dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notes-dialog-buttons {
+  display: flex;
+  gap: var(--size-8);
 }
 </style>

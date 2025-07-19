@@ -15,7 +15,7 @@
           <!-- Hidden span to measure text width -->
           <span ref="textMeasure" class="ai-search-hero-text-measure" v-if="currentText">{{ currentText }}</span>
           <span v-if="!isFocused && !searchQuery && currentText" class="ai-search-hero-cursor" :class="{ blinking: isBlinking }" :style="{ left: `calc(var(--size-20) + ${textWidth}px)` }">|</span>
-          <button type="submit" class="button-lg">
+          <button type="submit" class="ai-search-hero-submit | button-lg" @click="scrollToSearch">
             <AtomsIcon icon="search" title="search" />
           </button>
         </div>
@@ -209,6 +209,14 @@ onUnmounted(() => {
     background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
     background-size: auto 120%, cover;
   }
+}
+
+.ai-search-hero-submit {
+  background: none;
+  border: none;
+  color: var(--monochrome-900);
+  cursor: pointer;
+  display: flex
 }
 
 .ai-search-hero-content {

@@ -5,39 +5,19 @@
 
     <!-- How It Works Section -->
     <div class="ai-how-it-works | flow">
-      <h2 class="| title-lg text-center">Revolutionary <GradientText>AI-Powered</GradientText> Property Search
+      <h2 class="| title-lg">Revolutionary <GradientText>AI-Powered</GradientText> Property Search
       </h2>
-      <p class="| body-lg text-center max-width-prose">
+      <p class="| body-lg max-width-prose">
         The most advanced property search technology ever created. Simply describe your dream home in natural language,
         and our AI will find perfect matches using intelligent filtering and location awareness.
       </p>
-
-      <div class="ai-how-it-works-grid">
-        <GradientBox>
-          <h3 class="| title-sm">Natural Language Search</h3>
-          <p class="| body-md">Describe exactly what you want: "3 bedroom house with large garden near good schools" -
-            our AI understands context and intent.</p>
-        </GradientBox>
-
-        <GradientBox>
-          <h3 class="| title-sm">Intelligent Filtering</h3>
-          <p class="| body-md">Advanced filters for every detail: room sizes, garden dimensions, accessibility
-            features, EV charging, and hundreds more criteria.</p>
-        </GradientBox>
-
-        <GradientBox>
-          <h3 class="| title-sm">Location Intelligence</h3>
-          <p class="| body-md">Smart location matching with radius search, postcode recognition, and proximity to
-            amenities like transport and schools.</p>
-        </GradientBox>
-      </div>
     </div>
 
     <!-- Advanced Search Capabilities -->
     <div class="ai-capabilities | flow">
-      <h2 class="| title-lg text-center">Search By Anything You Can <GradientText>Imagine</GradientText>
+      <h2 class="| title-lg">Search By Anything You Can <GradientText>Imagine</GradientText>
       </h2>
-      <p class="| body-lg text-center max-width-prose">
+      <p class="| body-lg max-width-prose">
         Our AI understands hundreds of property features and can search by size, style, amenities, and lifestyle
         requirements.
       </p>
@@ -65,7 +45,7 @@
 
     <!-- FAQ Section -->
     <div class="ai-faq">
-      <h2 class="| title-lg text-center">Frequently Asked Questions</h2>
+      <h2 class="| title-lg">Frequently Asked Questions</h2>
 
       <div class="ai-faq-list">
         <FAQItem question="How does AI property search work?"
@@ -134,6 +114,14 @@ const handleSuggestionSelect = (suggestion) => {
 
 .homepage {
   margin-top: var(--size-32);
+}
+
+.ai-how-it-works {
+  text-align: center;
+}
+
+.ai-capabilities {
+  text-align: center;
 }
 
 // Section spacing

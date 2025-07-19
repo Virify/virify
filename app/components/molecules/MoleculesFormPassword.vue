@@ -70,6 +70,8 @@ function toggleShowPassword() {
   justify-content: center;
   aspect-ratio: 1;
   transition: opacity var(--animation-fast);
+  border: none;
+  background: transparent;
 }
 
 .m-formpassword-icon {

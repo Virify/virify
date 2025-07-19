@@ -126,13 +126,17 @@ const props = defineProps<Props>();
     background-color: var(--secondary-400);
   }
 
-  .a-favourite-button,
+  .a-favourite-button:not(.selected),
   .note-button {
     color: var(--monochrome-100);
   }
   
-  .a-favourite-button svg {
-    stroke: var(--monochrome-100);
+&[data-tier="FEATURED"] .m-listing-card-image-actions .a-favourite-button.selected {
+    color: var(--favourite-colour);
+  }
+
+  &[data-tier="FEATURED"] .m-listing-card-image-actions .a-favourite-button.selected svg {
+    stroke: var(--monochrome-900);
   }
   
   .note-button-icon {
