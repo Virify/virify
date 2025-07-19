@@ -19,7 +19,7 @@ const LocationSchema = z
         type: z.string(),
         coordinates: z.tuple([z.number(), z.number()]),
       }),
-      properties: z.record(z.any()),
+      properties: z.record(z.any(), z.any())
     }),
   })
   .optional();

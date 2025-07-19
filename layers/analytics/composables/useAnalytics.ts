@@ -109,14 +109,37 @@ export const useAnalytics = createSharedComposable(() => {
   };
 
   const trackAiSearch = async (aiQuery: string, location: GeocodingFeature) => {
+    console.log("trackAiSearch called with:", { aiQuery, location: location.text });
+    
     try {
       const payload: { aiQuery: string; location: GeocodingFeature } = {
         aiQuery,
         location,
       };
-
+      
+      console.log("Sending payload (size:", JSON.stringify(payload).length, "bytes)");
+      console.log("Payload preview:", { 
+        aiQuery, 
+        locationId: location.id, 
+        locationText: location.text,
+        hasProperties: !!location.properties,
+        hasBbox: !!location.bbox 
+      });
+      
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-      navigator.sendBeacon("/api/analytics/search", blob);
+      const success = navigator.sendBeacon("/api/analytics/search", blob);
+      console.log("sendBeacon result:", success);
+      
+      if (!success) {
+        console.warn("sendBeacon failed, falling back to fetch");
+        await $fetch("/api/analytics/search", {
+          method: "POST",
+          body: payload,
+        });
+        console.log("Fetch fallback completed successfully");
+      } else {
+        console.log("sendBeacon completed successfully");
+      }
     } catch (error) {
       console.error("Failed to track AI search:", error);
     }

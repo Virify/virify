@@ -111,3 +111,77 @@ export function createSimpleMarker(options: {
   
   return marker;
 }
+
+/**
+ * Format a single listing to MapMarker format
+ * 
+ * @param listing The listing to format
+ * @returns Formatted MapMarker
+ */
+export function formatMarker(listing: any): any {
+  return {
+    id: listing.id,
+    lat: listing.property?.address?.lat ?? 0,
+    lon: listing.property?.address?.lon ?? 0,
+    title: listing.title ?? null,
+    bedrooms: listing.property?.numberBedrooms ?? null,
+    bathrooms: listing.property?.numberBathrooms ?? null,
+    receptions: listing.property?.numberReceptions ?? null,
+    price: listing.price ?? null,
+    propertyType: listing.property?.type?.name ?? null,
+    classification: listing.property?.classification?.name ?? null,
+    priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,
+    address: listing.property?.address
+      ? {
+          street: listing.property.address.street,
+          city: listing.property.address.city,
+          postcode: listing.property.address.postcode,
+        }
+      : null,
+    image: listing.property?.media ?? [],
+    tier: listing.listingTier,
+  };
+}
+
+/**
+ * Convert ListingWithFullProperty to ListingCardType format that Map component expects
+ */
+export function convertListingsToMarkers(listings: any[]): any[] {
+  return listings
+    .filter(listing => listing.property?.address?.lat && listing.property?.address?.lon)
+    .map((listing, index) => ({
+      id: listing.id || `listing-${index}`,
+      title: listing.title,
+      price: listing.price,
+      listingTier: listing.listingTier,
+      publishedAt: listing.publishedAt,
+      rentalListing: listing.rentalListing,
+      saleListing: listing.saleListing,
+      property: {
+        address: listing.property?.address ? {
+          id: listing.property.address.id,
+          number: listing.property.address.number,
+          flat: listing.property.address.flat,
+          street: listing.property.address.street,
+          city: listing.property.address.city,
+          postcode: listing.property.address.postcode,
+          country: listing.property.address.country,
+          county: listing.property.address.county,
+          fullAddress: listing.property.address.fullAddress,
+          lat: listing.property.address.lat,
+          lon: listing.property.address.lon,
+        } : null,
+        media: listing.property?.media || [],
+        type: listing.property?.type || null,
+        classification: listing.property?.classification || null,
+        numberBedrooms: listing.property?.numberBedrooms || null,
+        numberBathrooms: listing.property?.numberBathrooms || null,
+        numberReceptions: listing.property?.numberReceptions || null,
+        accessibilityFeatures: listing.property?.accessibilityFeatures || null,
+        additionalFeatures: listing.property?.additionalFeatures || null,
+        parking: listing.property?.parking || null,
+        outdoorSpace: listing.property?.outdoorSpace || null,
+      },
+      user: listing.user,
+    }));
+}

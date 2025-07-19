@@ -6,7 +6,7 @@ import { convertToValidEnum } from "~~/shared/utils/enums";
 const searchSchema = z.object({
   buyOrRent: z.enum(["rent", "buy"]),
   radius: z.coerce.number().min(0).max(40).optional(),
-  propertyTypes: z.record(z.coerce.string(), z.array(z.coerce.number())).optional(),
+  propertyTypes: z.record(z.string(), z.array(z.coerce.number())).optional(),
   priceRange: z.array(z.coerce.number()).optional(),
   location: z.string().optional(),
   coordinates: z

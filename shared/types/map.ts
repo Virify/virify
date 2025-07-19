@@ -109,6 +109,12 @@ export type GeocodingFeature = {
     [key: string]: any;
   };
   bbox?: [number, number, number, number];
+};
+
+/**
+ * Geocoding feature with boundary polygon for map visualization
+ */
+export type GeocodingFeatureWithBoundary = GeocodingFeature & {
   boundaryPolygon?: {
     type: "Polygon" | "MultiPolygon";
     coordinates: number[][][] | number[][][][];
