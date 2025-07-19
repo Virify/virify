@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { useResizeObserver, watchImmediate } from '@vueuse/core'
+import { useMounted, useResizeObserver, watchImmediate } from '@vueuse/core'
 import type { ResultLayout } from '#imports'
 
 /**
@@ -54,7 +54,7 @@ const { viewMode } = toRefs(searchState.value)
 /**
  *  Loading state
  */
-const isMounted = ref(false)
+const isMounted = useMounted()
 
 /**
  *  Update highlight position
@@ -64,6 +64,8 @@ const $highlight = useTemplateRef('$highlight')
 const $wrapper = useTemplateRef('$wrapper')
 
 async function updateHighlightPosition() {
+  if (!import.meta.client) return
+
   await nextTick()
 
   // Search for active label
@@ -88,12 +90,8 @@ async function updateHighlightPosition() {
   highlight.style.left = `${offsetLeft}px`
 }
 
-onMounted(() => {
-  isMounted.value = true
-
-  watchImmediate(viewMode, updateHighlightPosition)
-  useResizeObserver($wrapper, updateHighlightPosition)
-})
+watchImmediate(viewMode, updateHighlightPosition)
+useResizeObserver($wrapper, updateHighlightPosition)
 
 /**
  *  Update layout in state
