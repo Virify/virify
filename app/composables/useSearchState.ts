@@ -31,47 +31,50 @@ function createSearchState() {
   };
 
   // Save to KV storage
-  const saveToKV = async (state: SearchState) => {
-    if (!sessionId.value || isLoading.value) {
-      return;
-    }
+  function saveToKV() { }
+  // const saveToKV = async (state: SearchState) => {
+  //   if (!sessionId.value || isLoading.value) {
+  //     return;
+  //   }
 
-    try {
-      await $fetch("/api/search-state", {
-        method: "POST",
-        body: { sessionId: sessionId.value, state },
-      });
-    } catch (error) { }
-  };
+  //   try {
+  //     await $fetch("/api/search-state", {
+  //       method: "POST",
+  //       body: { sessionId: sessionId.value, state },
+  //     });
+  //   } catch (error) { }
+  // };
 
   // Load from KV storage
-  const loadFromKV = async (): Promise<SearchState | null> => {
-    if (!sessionId.value) {
-      return null;
-    }
+  function loadFromKV() { }
+  // const loadFromKV = async (): Promise<SearchState | null> => {
+  //   if (!sessionId.value) {
+  //     return null;
+  //   }
 
-    try {
-      const stored = await $fetch("/api/search-state", {
-        query: { sessionId: sessionId.value },
-      });
+  //   try {
+  //     const stored = await $fetch("/api/search-state", {
+  //       query: { sessionId: sessionId.value },
+  //     });
 
-      return (stored as unknown as SearchState) || null;
-    } catch (error) {
-      return null;
-    }
-  };
+  //     return (stored as unknown as SearchState) || null;
+  //   } catch (error) {
+  //     return null;
+  //   }
+  // };
 
   // Clear from KV storage
-  const clearKV = async () => {
-    if (!sessionId.value) return;
+  function clearKV() { }
+  // const clearKV = async () => {
+  //   if (!sessionId.value) return;
 
-    try {
-      await $fetch("/api/search-state", {
-        method: "DELETE",
-        query: { sessionId: sessionId.value },
-      });
-    } catch (error) { }
-  };
+  //   try {
+  //     await $fetch("/api/search-state", {
+  //       method: "DELETE",
+  //       query: { sessionId: sessionId.value },
+  //     });
+  //   } catch (error) { }
+  // };
 
   // Initialize on client side
   if (import.meta.client) {
@@ -103,8 +106,6 @@ function createSearchState() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     });
   }
-
-
 
   /**
    *  Run a callback, if it's valid
