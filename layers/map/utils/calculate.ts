@@ -120,3 +120,32 @@ export function getBboxCenter(bbox: [number, number, number, number]): [number, 
   const [west, south, east, north] = bbox;
   return [(west + east) / 2, (south + north) / 2];
 }
+
+/**
+ * Calculate map center coordinates from location data
+ * For radius=0 searches, uses bbox center; otherwise uses geometry coordinates
+ */
+export function calculateMapCenter(location: { geometry: { coordinates: [number, number] }, bbox?: [number, number, number, number] }, radius: number): [number, number] {
+  // For location-only searches (radius = 0), use bbox center
+  if (radius === 0 && location.bbox) {
+    return getBboxCenter(location.bbox);
+  }
+  // For radius searches, use geometry coordinates
+  return [location.geometry.coordinates[0], location.geometry.coordinates[1]];
+}
+
+/**
+ * Calculate appropriate zoom level from bbox or radius
+ */
+export function calculateMapZoom(location: { bbox?: [number, number, number, number] }, radius: number): number | undefined {
+  // For location-only searches (radius = 0), calculate zoom from bbox
+  if (radius === 0 && location.bbox) {
+    return calculateZoomFromBbox(location.bbox);
+  }
+  // For radius searches, use existing calculation
+  if (radius && radius > 0) {
+    return calculateZoomLevelFromRadius(radius);
+  }
+  return undefined; // Let Map component use defaults
+}
+

@@ -1,4 +1,5 @@
-import { calculateDistance, milesToMeters } from '../utils/calculate-zoom';
+import { calculateDistance, milesToMeters } from '../utils/calculate';
+import type { GeocodingFeature, GeocodingFeatureWithBoundary, GeocodingResponse } from '~~/shared/types/map';
 
 export function useMapSearch() {
   const sdk = useNuxtApp().$maptilersdk;
@@ -69,7 +70,7 @@ export function useMapSearch() {
   /**
    * Enhance location with boundary polygon for location-only searches
    */
-  async function enhanceWithBoundaryPolygon(feature: GeocodingFeature): Promise<GeocodingFeature> {
+  async function enhanceWithBoundaryPolygon(feature: GeocodingFeature): Promise<GeocodingFeatureWithBoundary> {
     const boundaryPolygon = await getBoundaryPolygon(feature.id);
     return {
       ...feature,

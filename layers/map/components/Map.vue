@@ -10,6 +10,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { formatMarker } from '../utils/markers';
+
 /**
  * state
  */
@@ -184,35 +186,6 @@ function updateMarkers() {
   }
 }
 
-/**
- * Format the single marker
- * 
- * @param listing
- */
-function formatMarker(listing: ListingCardType): MapMarker {
-  return {
-    id: listing.id,
-    lat: listing.property?.address?.lat ?? 0,
-    lon: listing.property?.address?.lon ?? 0,
-    title: listing.title ?? null,
-    bedrooms: listing.property?.numberBedrooms ?? null,
-    bathrooms: listing.property?.numberBathrooms ?? null,
-    receptions: listing.property?.numberReceptions ?? null,
-    price: listing.price ?? null,
-    propertyType: listing.property?.type?.name ?? null,
-    classification: listing.property?.classification?.name ?? null,
-    priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,
-    address: listing.property?.address
-      ? {
-          street: listing.property.address.street,
-          city: listing.property.address.city,
-          postcode: listing.property.address.postcode,
-        }
-      : null,
-    image: listing.property?.media ?? [],
-    tier: listing.listingTier,
-  };
-}
 
 /**
  * Format the markers for the map
