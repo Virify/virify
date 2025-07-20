@@ -7,8 +7,6 @@ model Bathroom {
   enSuite      Boolean  @default(false)
   bathtub      Boolean  @default(true)
   walkInShower Boolean  @default(false)
-  downstairs   Boolean  @default(false)
-  upstairs     Boolean  @default(true)
   description  String
   size         Float?
   propertyId   Int

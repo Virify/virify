@@ -2,6 +2,8 @@
 import { faker } from "@faker-js/faker";
 import type { Prisma, Listing } from "~~/layers/database/server/database/prisma/generated/client";
 import { RentalPriceType, FurnishedStatus, RentalAvailabilityStatus, TenureType, SalePriceType, SaleAvailabilityStatus, ListingTier, VerificationLevel } from "~~/layers/database/server/database/prisma/generated/enums";
+import { roundFloat } from "~~/shared/utils/numbers";
+import { prisma } from "~~/layers/database/server/utils/prisma-client";
 /**
  * Generate a random date between 1, 3, 7, and 14 days ago.
  */
