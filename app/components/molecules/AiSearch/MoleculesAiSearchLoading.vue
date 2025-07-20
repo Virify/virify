@@ -3,9 +3,7 @@
     <div class="loading-details">
       <span class="loading-query | body-sm">"{{ lastSearchQuery }}"</span>
     </div>
-    <div class="loading-spinner">
-      <AtomsBarSpinner />
-    </div>
+    <img src="/img/ai-loading.svg" class="loading-spinner" />
     <p class="loading-text body-sm">{{ loadingMessage }}</p>
   </div>
 </template>
@@ -38,6 +36,8 @@ const loadingMessage = computed(() => {
   display: flex;
   justify-content: center;
   color: var(--secondary-400);
+  width: auto;
+  height: 4ch;
 }
 
 .loading-text {
