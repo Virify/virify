@@ -1,7 +1,7 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
 import type { Prisma, Listing } from "~~/layers/database/server/database/prisma/generated/client";
-import { RentalPriceType, FurnishedStatus, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus, ListingTier, ContactMethod, VerificationLevel } from "~~/layers/database/server/database/prisma/generated/enums";
+import { RentalPriceType, FurnishedStatus, RentalAvailabilityStatus, TenureType, SalePriceType, SaleAvailabilityStatus, ListingTier, VerificationLevel } from "~~/layers/database/server/database/prisma/generated/enums";
 /**
  * Generate a random date between 1, 3, 7, and 14 days ago.
  */
@@ -37,7 +37,7 @@ export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInpu
   return {
     tenureType: faker.helpers.arrayElement(Object.values(TenureType)),
     chain: faker.datatype.boolean(),
-    ownershipType: faker.helpers.arrayElement(Object.values(OwnershipType)),
+    sharedOwnership: faker.datatype.boolean(),
     priceType: faker.helpers.arrayElement(Object.values(SalePriceType)),
     availabilityStatus: faker.helpers.arrayElement(Object.values(SaleAvailabilityStatus)),
   }
@@ -98,7 +98,6 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
       listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
-      contactMethod: [faker.helpers.arrayElement(Object.values(ContactMethod))],
       viewingOptions: faker.word.words(10),
       verificationLevel: faker.helpers.arrayElement(Object.values(VerificationLevel)),
       rentalListing: {
@@ -142,7 +141,6 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
       listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
-      contactMethod: [faker.helpers.arrayElement(Object.values(ContactMethod))],
       viewingOptions: faker.word.words(10),
       verificationLevel: faker.helpers.arrayElement(Object.values(VerificationLevel)),
       saleListing: {
