@@ -1,8 +1,12 @@
 <template>
   <div class="p-dock | container">
-    <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap">
+    <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
+    <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
+
+    <OrganismsPaneSlider v-else @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap">
       <template #left v-if="showGrid">
-        <pre>{{ searchState }}</pre>
+        <OrganismsAiSearchResults :results="results" :query-analysis="queryAnalysis" :current-page="currentPage"
+          :total-pages="totalPages" :total-results="totalResults" @page-change="handlePageChange" />
       </template>
 
       <template #right v-if="showMap">
@@ -83,6 +87,11 @@ const results = computed(() => {
 
   return results
 })
+
+/**
+ *  No results message
+ */
+const { lastSearchQuery } = useAiSearchPage()
 
 </script>
 

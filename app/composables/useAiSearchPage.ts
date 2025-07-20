@@ -22,7 +22,7 @@ export const useAiSearchPage = () => {
   const searchResults = ref<ListingWithFullProperty[] | null>(null);
   const queryAnalysis = ref<QueryAnalysis | null>(null);
   const hasSearched = ref(false);
-  const lastSearchQuery = ref("");
+  const lastSearchQuery = ref("No previous searches");
   const lastLocation = ref<GeocodingFeature | null>(null);
   const lastRadius = ref(0);
   const currentSort = ref("relevance");
