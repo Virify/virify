@@ -18,12 +18,9 @@ export type Fullproperty = Prisma.PropertyGetPayload<{
     amenities: true;
     additionalFeatures: true;
     accessibilityFeatures: true;
-    diningroomFeatures: true;
     kitchenFeatures: true;
-    livingAreaFeatures: true;
     reception: true;
     utility: true;
-    additionalToilet: true;
     outdoorSpace: true;
     energyAndUtilities: true;
     securityFeatures: true;

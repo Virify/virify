@@ -54,12 +54,9 @@ export interface SearchResult {
     amenities?: any[]
     additionalFeatures?: any
     accessibilityFeatures?: any
-    diningroomFeatures?: any
     kitchenFeatures?: any
-    livingAreaFeatures?: any
     reception?: any
     utility?: any
-    additionalToilet?: any
     outdoorSpace?: any
     energyAndUtilities?: any
     securityFeatures?: any

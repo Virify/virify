@@ -20,7 +20,6 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         kitchenFeatures: true;
         reception: true;
         utility: true;
-        additionalToilet: true;
         outdoorSpace: true;
         energyAndUtilities: true;
         securityFeatures: true;

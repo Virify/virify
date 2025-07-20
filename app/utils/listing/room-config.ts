@@ -24,20 +24,8 @@ export const generateRoomConfig = (property: any) => {
       features: property.kitchenFeatures,
     },
     {
-      type: "living area",
-      features: property.livingAreaFeatures,
-    },
-    {
-      type: "dining room",
-      features: property.diningroomFeatures,
-    },
-    {
       type: "utility",
       features: property.utility,
-    },
-    {
-      type: "additional toilet",
-      features: property.additionalToilet,
     },
   ];
 };
