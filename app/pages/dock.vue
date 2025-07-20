@@ -1,11 +1,15 @@
 <template>
-  <div class="p-dock | container container-lg">
-    <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
-    <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
-
-    <OrganismsPaneSlider v-else @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap">
+  <div class="p-dock" :class="{
+    'p-dock--has-grid': showGrid
+  }">
+    <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap" :class="{
+      '| container container-lg': showGrid
+    }">
       <template #left v-if="showGrid">
-        <OrganismsAiSearchResults :results="results" :query-analysis="queryAnalysis" :current-page="currentPage"
+        <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
+        <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
+
+        <OrganismsAiSearchResults v-else :results="results" :query-analysis="queryAnalysis" :current-page="currentPage"
           :total-pages="totalPages" :total-results="totalResults" @page-change="handlePageChange" />
       </template>
 
@@ -95,31 +99,25 @@ const { lastSearchQuery } = useAiSearchPage()
 
 </script>
 
-<style scoped>
-pre {
-  overflow: hidden;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: lightpink;
-  border-radius: var(--border-radius-2xl);
-  padding: var(--size-32);
-  overflow: hidden;
-  margin: 0;
-}
-</style>
-
 <style lang="scss">
 .p-dock {
-  padding: var(--size-16) 0;
 
-  &__map {
+  &--has-grid {
+    padding: var(--size-16) 0;
+  }
+
+  &--has-grid &__map {
     position: sticky;
     top: calc(var(--header-height) + var(--size-20));
     height: calc(100vh - var(--header-height) - var(--size-32));
+    border-radius: var(--border-radius-2xl);
+  }
+
+  &__map {
     width: 100%;
     background: var(--monochrome-400);
-    border-radius: var(--border-radius-2xl);
     overflow: hidden;
+    height: calc(100vh - var(--header-height));
   }
 }
 </style>
