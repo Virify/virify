@@ -3,7 +3,7 @@ model Kitchen {
   modern        Boolean  @default(true)
   openPlan      Boolean  @default(false)
   whiteGoods    Boolean  @default(false)
-  description   String
+  description   String?
   size          Float?
   breakfastBar  Boolean  @default(false)
   island        Boolean  @default(false)

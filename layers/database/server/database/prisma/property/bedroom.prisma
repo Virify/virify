@@ -1,8 +1,10 @@
 model Bedroom {
   id             Int           @id @default(autoincrement())
   roomNumber     Int
+  name           String?
   bed            BedSizeType[]
-  description    String
+  floor          Int
+  description    String?
   enSuite        Boolean       @default(false)
   builtInStorage Boolean       @default(false)
   walkInWardrobe Boolean       @default(false)
@@ -21,5 +23,4 @@ enum BedSizeType {
   QUEEN
   KING
   SUPER_KING
-  BUNK
 }

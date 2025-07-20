@@ -1,6 +1,9 @@
 model Bathroom {
   id           Int      @id @default(autoincrement())
   roomNumber   Int
+  floor        Int
+  name         String?
+  toilet       Boolean  @default(false)
   enSuite      Boolean  @default(false)
   bathtub      Boolean  @default(true)
   walkInShower Boolean  @default(false)

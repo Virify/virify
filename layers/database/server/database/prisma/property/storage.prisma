@@ -4,7 +4,6 @@ model Storage {
   basement           Boolean  @default(false)
   separateDressing   Boolean  @default(false)
   underStairsStorage Boolean  @default(false)
-  pantry             Boolean  @default(false)
   description        String?
   propertyId         Int      @unique
   createdAt          DateTime @default(now())

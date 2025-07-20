@@ -1,12 +1,15 @@
 model Reception {
   id          Int            @id @default(autoincrement())
   roomNumber  Int
-  description String
+  floor       Int
+  name        String
+  type        ReceptionType
+  description String?
   size        Float?
   openPlan    Boolean        @default(false)
+  openConcept Boolean        @default(false)
   fireplace   FireplaceType?
-  gamesRoom   Boolean        @default(false)
-  homeCinema  Boolean        @default(false)
+  balcony     Boolean        @default(false)
   propertyId  Int
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
@@ -18,4 +21,16 @@ model Reception {
 enum FireplaceType {
   LOG_BURNER
   OPEN_FIRE
+}
+
+enum ReceptionType {
+  LIVING_ROOM
+  FAMILY_ROOM
+  DINING_ROOM
+  DEN
+  STUDY
+  GAMES_ROOM
+  HOME_CINEMA
+  OFFICE
+  CONSERVATORY
 }
