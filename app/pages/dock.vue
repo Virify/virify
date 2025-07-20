@@ -1,5 +1,5 @@
 <template>
-  <div class="p-dock | container">
+  <div class="p-dock | container container-lg">
     <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
     <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
 

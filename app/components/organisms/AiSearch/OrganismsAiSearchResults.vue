@@ -1,5 +1,5 @@
 <template>
-  <div class="p-ai-search-results | container flow" v-if="results">
+  <div class="p-ai-search-results | flow" v-if="results">
     <h2 class="results-title | title-md">
       Found {{ props.totalResults }} results
     </h2>
