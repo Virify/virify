@@ -9,8 +9,8 @@
         <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
         <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
 
-        <OrganismsAiSearchResults v-else :results="results" :query-analysis="queryAnalysis" :current-page="currentPage"
-          :total-pages="totalPages" :total-results="totalResults" @page-change="handlePageChange" />
+        <OrganismsAiSearchResults v-else :results="results" :query-analysis="queryAnalysis"
+          :total-results="results.length" />
       </template>
 
       <template #right v-if="showMap">
@@ -54,7 +54,7 @@ const showMap = computed(() => {
 /**
  *  Handle searches
  */
-const { location, radius, sortBy, query } = toRefs(searchState.value)
+const { location, radius, sortBy, query, queryAnalysis } = toRefs(searchState.value)
 const { setPendingWhile } = usePending()
 const { aiSearch } = useAiSearchPage();
 
