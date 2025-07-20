@@ -52,13 +52,18 @@ const showMap = computed(() => {
 })
 
 /**
+ *  No results message
+ */
+const { lastSearchQuery, updateSort } = useAiSearchPage()
+
+/**
  *  Handle searches
  */
 const { location, radius, sortBy, query, queryAnalysis } = toRefs(searchState.value)
 const { setPendingWhile } = usePending()
 const { aiSearch } = useAiSearchPage();
 
-watch([location, radius, sortBy, query], () => {
+watch([location, radius, query], () => {
   // Get current location, radius
   const { location, query, radius } = asObject(searchState.value)
 
@@ -81,6 +86,13 @@ watch([location, radius, sortBy, query], () => {
   })
 }, { deep: true })
 
+watch(sortBy, (newValue) => {
+  // @TODO
+  // The KV store needs fixing before this can be activated
+  console.log('@TODO: sort results by', newValue)
+  // updateSort(newValue)
+})
+
 /**
  *  Ensure missing results do not break the map
  */
@@ -91,11 +103,6 @@ const results = computed(() => {
 
   return results
 })
-
-/**
- *  No results message
- */
-const { lastSearchQuery } = useAiSearchPage()
 
 </script>
 
