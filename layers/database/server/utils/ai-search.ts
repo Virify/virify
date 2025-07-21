@@ -132,12 +132,8 @@ export async function generateWhereClauseFromQuery(query: string): Promise<aiSea
 function getPrismaSchemaPrompt(): string {
   return `
 CRITICAL: DO NOT NEST saleListing or rentalListing (or any of their fields) inside property or any nested object. This is a SCHEMA VIOLATION and will cause a FATAL ERROR. These fields MUST ONLY appear at the ROOT level of the query.
-
 CRITICAL: NEVER add Comments or quotes or markdown formatting to the AI response. The response MUST be a valid JSON object with a "whereClause" and "queryAnalysis" field. Any comments, quotes, or markdown will cause a FATAL ERROR.
-
-NEVER DO THIS: "landSize": { "gte": 1000 } // Assuming "large" refers to a size greater than 1000 square meters - the quotes around large breaks
-
-
+NEVER DO THIS: "size": { "gte": 1000 } // Assuming "large" refers to a size greater than 1000 square meters - the quotes around large breaks
 IMPORTANT: To filter by fields of rentalListing or saleListing, you MUST use the correct Prisma relation filter syntax:
 - To filter for existence: { rentalListing: { isNot: null } }
 - To filter by fields: { rentalListing: { is: { furnishedStatus: "FURNISHED" } } }
@@ -187,37 +183,32 @@ To filter for MULTIPLE property types (e.g., "house or flat"), you MUST use the 
 ROOT LISTING FIELDS:
 - published: Boolean (always true for searches)
 - price: Float (listing price in £)
+- title: String (listing title)
+- description: String (listing description)
+- moveInDate: DateTime (for rentals)
 - saleListing: {isNot: null} for sales only (ROOT LEVEL)
 - rentalListing: {isNot: null} for rentals only (ROOT LEVEL)
 - property: {...} (all property features below)
 
 SALE LISTING FIELDS (saleListing, root level only):
 - id: Int
-- availableFrom: DateTime
-- tenure: "FREEHOLD"|"LEASEHOLD"|"SHARE_OF_FREEHOLD"|"COMMONHOLD"|"FEUDAL"|"OTHER"|null
-- chainFree: Boolean
+- tenureType: "FREEHOLD"|"LEASEHOLD"|"COMMONHOLD"
+- chain: Boolean
 - sharedOwnership: Boolean
-- sharedEquity: Boolean
-- newBuild: Boolean
 - auction: Boolean
-- guidePrice: Float
-- offersOver: Float
-- offersInRegionOf: Float
-- offersInExcessOf: Float
-- priceOnApplication: Boolean
-- description: String
+- priceType: "FIXED"|"OFFER_OVER"|"GUIDE_PRICE"
+- availabilityStatus: "FOR_SALE"|"UNDER_OFFER"|"SOLD"
 
 RENTAL LISTING FIELDS (rentalListing, root level only):
 - id: Int
-- availableFrom: DateTime
-- furnishedStatus: "FURNISHED"|"UNFURNISHED"|"PART_FURNISHED"|null
+- availabilityStatus: "AVAILABLE"|"LET_AGREED"|"LET"
+- furnishedStatus: "FURNISHED"|"PART_FURNISHED"|"UNFURNISHED"
 - isBillsIncluded: Boolean
 - deposit: Float
 - holdingDeposit: Float
 - rentFrequency: "WEEKLY"|"MONTHLY"
 - rentalLength: Int
 - availabilityStatus: "AVAILABLE"|"LET_AGREED"|"LET"
-- description: String
 
 PROPERTY FIELDS (under property):
 - numberBedrooms: Int
@@ -226,10 +217,10 @@ PROPERTY FIELDS (under property):
 - size: Float
 - value: Float
 - yearBuilt: String
-- chainFree: Boolean
 - vacant: Boolean
 - constructionType: "STANDARD"|"NON_STANDARD"
 - floorLevel: Int
+- totalFloors: Int
 - type: {name: String} (PropertyType relation)
 - classification: {name: String} (PropertyClassification relation)
 
@@ -246,21 +237,11 @@ kitchenFeatures (property.kitchenFeatures):
 - description: String
 - size: Float
 
-livingAreaFeatures (property.livingAreaFeatures):
-- fireplace: "LOG_BURNER"|"OPEN_FIRE"|null
-- balcony: Boolean
-- openPlan: Boolean
-- description: String
-- size: Float
-
-diningroomFeatures (property.diningroomFeatures):
-- openConcept: Boolean
-- description: String
-- size: Float
-
 bedroomFeatures (property.bedroomFeatures): ARRAY (use {some: {...}})
 - roomNumber: Int
-- bed: ["SINGLE"|"DOUBLE"|"QUEEN"|"KING"|"SUPER_KING"|"BUNK"] (enum array)
+- name: String
+- floor: Int
+- bed: ["SINGLE"|"DOUBLE"|"QUEEN"|"KING"|"SUPER_KING"] (enum array)
 - enSuite: Boolean
 - builtInStorage: Boolean
 - walkInWardrobe: Boolean
@@ -269,17 +250,23 @@ bedroomFeatures (property.bedroomFeatures): ARRAY (use {some: {...}})
 
 bathroomFeatures (property.bathroomFeatures): ARRAY (use {some: {...}})
 - roomNumber: Int
+- floor: Int
+- name: String
 - enSuite: Boolean
 - bathtub: Boolean
 - walkInShower: Boolean
-- downstairs: Boolean
-- upstairs: Boolean
+- toilet: Boolean
 - description: String
 - size: Float
 
 reception (property.reception): ARRAY (use {some: {...}})
 - roomNumber: Int
+- floor: Int
+- name: String
+- type: "LIVING_ROOM"|"FAMILY_ROOM"|"DINING_ROOM"|"DEN"|"STUDY"|"GAMES_ROOM"|"HOME_CINEMA"|"OFFICE"|"CONSERVATORY"
 - openPlan: Boolean
+- openConcept: Boolean
+- balcony: Boolean
 - fireplace: "LOG_BURNER"|"OPEN_FIRE"|null
 - gamesRoom: Boolean
 - homeCinema: Boolean
@@ -301,6 +288,7 @@ outdoorSpace (property.outdoorSpace):
 - gardenOffice: Boolean
 - pool: Boolean
 - description: String
+- totalSize: Float
 
 parking (property.parking):
 - garage: Boolean
@@ -336,37 +324,25 @@ securityFeatures (property.securityFeatures):
 additionalFeatures (property.additionalFeatures):
 - petFriendly: Boolean
 - moveInDate: DateTime
-- homeOffice: Boolean
 - pool: Boolean
 - internet: Boolean
-- cableTv: Boolean
-- phone: Boolean
-- laundry: Boolean
 - concierge: Boolean
 - shop: Boolean
 - gym: Boolean
 - description: String
 
 utility (property.utility):
-- appliances: String[]
 - storage: Boolean
 - sink: Boolean
 - plumbing: Boolean
 - description: String
 - size: Float
 
-additionalToilet (property.additionalToilet):
-- downstairs: Boolean
-- upstairs: Boolean
-- guestCloakroom: Boolean
-- description: String
-
 storageFeatures (property.storageFeatures):
 - attic: Boolean
 - basement: Boolean
 - separateDressing: Boolean
 - underStairsStorage: Boolean
-- pantry: Boolean
 - description: String
 
 energyAndUtilities (property.energyAndUtilities):
@@ -387,23 +363,9 @@ runningCosts (property.runningCosts):
 - groundRent: Float
 - description: String
 
-Land (property.Land):
-- landSize: Float
-- planningClassification: "AGRICULTURAL"|"RESIDENTIAL"|"COMMERCIAL"|"INDUSTRIAL"|"MIXED_USE"|"OTHER"
-- accessRights: Boolean
-- roadFrontage: Boolean
-- utilitiesAvailable: Boolean
-- currentUse: "GRAZING"|"ARABLE"|"PASTURE"|"FORESTRY"|"EQUESTRIAN"|"HORTICULTURE"|"CONSERVATION"|"MIXED"|"VACANT"|"OTHER"
-- agriculturalSubsidies: Boolean
-- stewardshipScheme: Boolean
-- tenanted: Boolean
-- vacant: Boolean
-- agriculturalUse: Boolean
-- description: String
-
 amenities (property.amenities):
-- type: "TRANSPORT"|"EDUCATION"|"HEALTHCARE"|"SHOPPING_ENTERTAINMENT"|"GREEN_SPACE"
-- subtype: "TRAIN_STATION"|"BUS_STOP"|"MOTORWAY_ACCESS"|"SCHOOL"|"UNIVERSITY"|"HOSPITAL"|"MEDICAL_CENTRE"|"SHOP"|"RESTAURANT"|"CINEMA"|"GYM"|"PARK"|"TRAIL"|"PLAYGROUND"|"OTHER"
+- type: "TRANSPORT"|"EDUCATION"|"HEALTHCARE"
+- subtype: "TRAIN_STATION"|"SCHOOL"|"UNIVERSITY"|"HOSPITAL"
 - name: String
 - distanceM: Float
 
@@ -419,6 +381,7 @@ ARRAY/RELATION/ENUM RULES:
 - NEVER use "has" for object relations; only for enum arrays
 - saleListing and rentalListing (and all their fields, e.g. furnished) MUST ONLY appear at the ROOT level of the query, NEVER inside property or any nested object. Any query with saleListing or rentalListing inside property is INVALID.
 - Respond with ONLY valid JSON, no comments, no markdown
+- Receptions have different types (e.g., living room, family room, etc.) and can be filtered by type or features like balcony, fireplace, etc. Use the exact type names as defined in the schema. This is to determine the type of reception room (e.g house with a home cinema and home office).
 
 IMPORTANT: For every user query, you MUST return a queryAnalysis object with two arrays:
 - usedTerms: all terms/phrases from the user query that were mapped to valid schema fields and used in the whereClause
@@ -571,6 +534,56 @@ EXAMPLES:
     }
   },
   "queryAnalysis": { "usedTerms": ["house", "games room", "home cinema"], "ignoredTerms": [] }
+}
+
+IMPORTANT: For queries like "property with additional toilet", you MUST filter for properties where more than one bathroom has a toilet. Prisma cannot directly count array elements in the where clause, but you should use:
+  { "property": { "bathroomFeatures": { "some": { "toilet": true } } } }
+This will match any property with at least one bathroom with a toilet. For "additional toilet", "second toilet", or "more than one toilet", you should explain in the queryAnalysis that this is a limitation and the filter will match any property with at least one bathroom with a toilet.
+
+EXAMPLES:
+// "property with additional toilet" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "bathroomFeatures": { "some": { "toilet": true } }
+    }
+  },
+  "queryAnalysis": {
+    "usedTerms": ["additional toilet"],
+    "ignoredTerms": [],
+    "notes": ["Prisma cannot directly filter for more than one bathroom with a toilet; this filter matches any property with at least one bathroom with a toilet."]
+  }
+}
+
+IMPORTANT: When the user requests a "home office", "office room", or similar, you MUST map this to a reception room with type "OFFICE". Use:
+  { "property": { "reception": { "some": { "type": "OFFICE" } } } }
+If the schema also supports an additionalFeatures.homeOffice boolean, you MAY also include:
+  { "property": { "additionalFeatures": { "is": { "homeOffice": true } } } }
+But the primary mapping for "home office" or "office room" is always a reception with type "OFFICE".
+
+EXAMPLES:
+// "property with home office" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "reception": { "some": { "type": "OFFICE" } }
+    }
+  },
+  "queryAnalysis": { "usedTerms": ["home office"], "ignoredTerms": [] }
+}
+
+// "house with office" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "type": { "name": "House" },
+      "reception": { "some": { "type": "OFFICE" } }
+    }
+  },
+  "queryAnalysis": { "usedTerms": ["house", "office"], "ignoredTerms": [] }
 }
 
 // SPECIAL MAPPING: "fast broadband" or similar phrases should NOT be mapped to broadbandType: "UNKNOWN". Instead, map as follows:
