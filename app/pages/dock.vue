@@ -9,8 +9,16 @@
         <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
         <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
 
-        <OrganismsAiSearchResults v-else :results="results" :query-analysis="queryAnalysis"
-          :total-results="results.length" />
+        <div v-else class="p-dock__results-container">
+          <div class="p-dock__results">
+            <MoleculesCardPremium :result="results[0]" class="p-dock__result-card--large" />
+            <MoleculesCardBasic :result="results[1]" />
+            <MoleculesCardFeatured :result="results[2]" />
+          </div>
+        </div>
+
+        <!-- <OrganismsAiSearchResults v-else :results="results" :query-analysis="queryAnalysis"
+          :total-results="results.length" /> -->
       </template>
 
       <template #right v-if="showMap">
@@ -125,6 +133,30 @@ const results = computed(() => {
     background: var(--monochrome-400);
     overflow: hidden;
     height: calc(100vh - var(--header-height));
+  }
+
+  &__results-container {
+    container-type: inline-size;
+  }
+
+  &__results {
+    display: grid;
+    grid-gap: var(--size-12);
+    align-items: stretch;
+
+    @container (width > 800px) {
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: var(--size-16);
+
+      .p-dock__result-card--large {
+        grid-column: span 2;
+      }
+    }
+
+    // @container (width > 1200px) {
+    //   grid-template-columns: repeat(3, 1fr);
+    //   grid-gap: var(--size-16);
+    // }
   }
 }
 </style>
