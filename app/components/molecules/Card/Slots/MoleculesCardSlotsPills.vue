@@ -27,13 +27,13 @@ defineProps<Props>()
   &__pill {
     display: flex;
     align-items: center;
-    padding: var(--size-6) var(--size-12);
+    padding: var(--size-4) var(--size-12);
+    line-height: var(--lineheight-xs);
     border: 1px solid var(--card-border-colour);
     background-color: var(--card-background-pill);
     border-radius: var(--border-radius-pill);
     white-space: nowrap;
     font-weight: var(--font-semibold);
-
   }
 }
 </style>

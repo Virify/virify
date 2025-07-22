@@ -31,8 +31,10 @@ defineProps<Props>()
   &__pill {
     display: flex;
     align-items: center;
+    font-weight: var(--font-semibold);
     padding: var(--size-4) var(--size-12);
     line-height: var(--lineheight-xs);
+    background: var(--card-background-pill);
     border: 1px solid var(--card-border-colour);
     border-radius: var(--border-radius-pill);
     white-space: nowrap;
