@@ -283,17 +283,17 @@ const premiumFeatures = computed(() => {
       >.m-card-lots-view-link {
         display: contents;
       }
-    }
 
-    .m-cards-slots-price {
-      flex-direction: column-reverse;
-      justify-content: flex-start;
-      align-items: flex-start;
-    }
+      .m-cards-slots-price {
+        flex-direction: column-reverse;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
 
-    .m-cards-slots-icons,
-    .m-card-lots-pills {
-      margin: 0 0 var(--size-12);
+      .m-cards-slots-icons,
+      .m-card-lots-pills {
+        margin: 0 0 var(--size-12);
+      }
     }
   }
 }
