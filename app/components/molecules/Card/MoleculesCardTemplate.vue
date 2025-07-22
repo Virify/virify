@@ -177,7 +177,6 @@ const premiumFeatures = computed(() => {
   background-color: var(--card-background);
   border: 1px solid var(--card-border-colour);
   border-radius: var(--border-radius-2xl);
-  box-shadow: var(--elevate-200);
   box-sizing: border-box;
   display: grid;
   align-items: stretch;
@@ -185,8 +184,8 @@ const premiumFeatures = computed(() => {
   flex-grow: 1;
   overflow: hidden;
 
-  @container (width > 600px) {
-    grid-template-columns: 1.2fr minmax(20ch, 1fr);
+  &--basic {
+    box-shadow: var(--elevate-200);
   }
 
   &--featured {
@@ -199,8 +198,13 @@ const premiumFeatures = computed(() => {
     --card-button-background-hover: var(--secondary-500);
     --card-button-foreground-hover: var(--monochrome-100);
     --card-button-border-colour: var(--secondary-400);
+  }
 
-    box-shadow: none;
+  &--basic,
+  &--featured {
+    @container (width > 600px) {
+      grid-template-columns: 1.2fr minmax(20ch, 1fr);
+    }
   }
 
   &--premium {
@@ -216,7 +220,10 @@ const premiumFeatures = computed(() => {
     --card-button-border-colour: var(--primary-400);
 
     border: 4px solid var(--primary-500);
-    box-shadow: none;
+
+    @container (width > 900px) {
+      grid-template-columns: 1.2fr minmax(20ch, 1fr);
+    }
   }
 
   &__corner-badge {
