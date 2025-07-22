@@ -201,7 +201,7 @@ const premiumFeatures = computed(() => {
 
   &--basic,
   &--featured {
-    @container (width > 600px) {
+    @container (width > 800px) {
       grid-template-columns: 1.2fr minmax(20ch, 1fr);
     }
   }
@@ -244,8 +244,6 @@ const premiumFeatures = computed(() => {
   }
 
   &__gallery {
-    background: var(--monochrome-300);
-    border-radius: var(--border-radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
