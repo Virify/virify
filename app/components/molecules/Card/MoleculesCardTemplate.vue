@@ -5,9 +5,8 @@
       'm-card-template--featured': isFeatured,
       'm-card-template--premium': isPremium
     }">
-      <span class="m-card-template__corner-badge | body-xs font-semibold" v-if="isFeatured || isPremium">
-        <template v-if="isFeatured">Featured</template>
-        <template v-if="isPremium">Premium</template>
+      <span class="m-card-template__corner-badge | body-xs font-semibold" v-if="isFeatured">
+        Featured
       </span>
 
       <div class="m-card-template__gallery">
