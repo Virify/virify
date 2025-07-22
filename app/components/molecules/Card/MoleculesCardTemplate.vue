@@ -7,7 +7,9 @@
     }">
       <div class="m-card-template__gallery">
         <slot name="carousel">
-          Carousel (Base)
+          <div class="m-card-template__gallery-img">
+            Carousel (Base)
+          </div>
         </slot>
       </div>
 
@@ -161,7 +163,7 @@ const pills = computed(() => {
   flex-grow: 1;
 
   @container (width > 600px) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.2fr minmax(20ch, 1fr);
   }
 
   &--featured {
@@ -197,6 +199,9 @@ const pills = computed(() => {
   &__gallery {
     background: var(--monochrome-300);
     border-radius: var(--border-radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__content {
@@ -214,14 +219,17 @@ const pills = computed(() => {
    *  DEBUG
    *  @TODO remove this when carousel goes in
    */
-  &__gallery {
+  &__gallery-img {
+    background: var(--monochrome-300);
+    border-radius: var(--border-radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--size-16);
     box-sizing: border-box;
-    min-height: 10ch;
+    aspect-ratio: 4/3;
     color: var(--monochrome-900);
+    flex-grow: 1;
   }
 }
 </style>
