@@ -5,6 +5,11 @@
       'm-card-template--featured': isFeatured,
       'm-card-template--premium': isPremium
     }">
+      <span class="m-card-template__corner-badge | body-xs font-semibold" v-if="isFeatured || isPremium">
+        <template v-if="isFeatured">Featured</template>
+        <template v-if="isPremium">Premium</template>
+      </span>
+
       <div class="m-card-template__gallery">
         <slot name="carousel">
           <div class="m-card-template__gallery-img">
@@ -166,6 +171,7 @@ const premiumFeatures = computed(() => {
   --card-button-foreground-hover: var(--monochrome-900);
   --card-button-border-colour: var(--blue-400);
 
+  position: relative;
   padding: var(--size-8);
   color: var(--card-foreground);
   background-color: var(--card-background);
@@ -177,6 +183,7 @@ const premiumFeatures = computed(() => {
   align-items: stretch;
   gap: var(--size-8);
   flex-grow: 1;
+  overflow: hidden;
 
   @container (width > 600px) {
     grid-template-columns: 1.2fr minmax(20ch, 1fr);
@@ -210,6 +217,24 @@ const premiumFeatures = computed(() => {
 
     border: 4px solid var(--primary-500);
     box-shadow: none;
+  }
+
+  &__corner-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-button-background);
+    color: var(--card-button-foreground);
+    z-index: 2;
+    text-transform: uppercase;
+    width: 15em;
+    height: var(--size-32);
+    text-align: center;
+    transform: translate(-4.5em, 2em) rotate(-45deg);
+    pointer-events: none;
   }
 
   &__gallery {
