@@ -2,7 +2,7 @@
   <div class="m-card-template__container">
     <div class="m-card-template" :class="{
       'm-card-template--basic': isBasic,
-      'm-card-template--featured': isFeatued,
+      'm-card-template--featured': isFeatured,
       'm-card-template--premium': isPremium
     }">
       <div class="m-card-template__gallery">
@@ -51,9 +51,9 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  *  Check variants
  */
-const isFeatued = computed(() => props.variant === 'basic')
+const isFeatured = computed(() => props.variant === 'basic')
 const isPremium = computed(() => props.variant === 'premium')
-const isBasic = computed(() => !isFeatued.value && !isPremium.value)
+const isBasic = computed(() => !isFeatured.value && !isPremium.value)
 
 /**
  *  Break down listing card data
