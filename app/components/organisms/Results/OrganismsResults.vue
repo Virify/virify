@@ -8,8 +8,6 @@
           'o-results__card--large': !!fullWidth
         }" />
     </div>
-
-    <pre>{{ resultsComponents }}</pre>
   </div>
 </template>
 
