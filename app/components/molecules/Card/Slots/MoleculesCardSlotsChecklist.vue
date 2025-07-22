@@ -45,11 +45,5 @@ defineProps<Props>()
   @container (width < 300px) {
     grid-template-columns: 1fr;
   }
-
-  @container (width < 500px) {
-    &__row:nth-child(n+7) {
-      display: none;
-    }
-  }
 }
 </style>
