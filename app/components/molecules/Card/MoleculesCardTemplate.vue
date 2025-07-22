@@ -11,22 +11,22 @@
 
       <div class="m-card-template__gallery">
         <slot name="carousel">
-          <div class="m-card-template__gallery-img">
-            Carousel (Base)
-          </div>
+          <MoleculesCardSlotsCarousel />
         </slot>
       </div>
 
       <div class="m-card-template__content">
         <slot name="content"
           v-bind="{ price, priceGuide, fullAddress, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
-          <MoleculesCardSlotsViewLink :property-id>
-            <MoleculesCardSlotsPrice :price :price-guide />
-            <MoleculesCardSlotsOverview :property-type :full-address />
-            <MoleculesCardSlotsIcons :room-counts />
-          </MoleculesCardSlotsViewLink>
+          <div class="m-card-template__content-grid">
+            <MoleculesCardSlotsViewLink :property-id class="m-card-template__content-subgrid">
+              <MoleculesCardSlotsPrice :price :price-guide />
+              <MoleculesCardSlotsOverview :property-type :full-address />
+              <MoleculesCardSlotsIcons :room-counts />
+            </MoleculesCardSlotsViewLink>
 
-          <MoleculesCardSlotsPills v-if="pills.length" :pills />
+            <MoleculesCardSlotsPills v-if="pills.length" :pills />
+          </div>
         </slot>
 
         <div role="presentation" class="m-card-template__footer">
@@ -272,20 +272,31 @@ const premiumFeatures = computed(() => {
   }
 
   /**
-   *  DEBUG
-   *  @TODO remove this when carousel goes in
+   *  Default layout
    */
-  &__gallery-img {
-    background: var(--monochrome-300);
-    border-radius: var(--border-radius-xl);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--size-16);
-    box-sizing: border-box;
-    aspect-ratio: 4/3;
-    color: var(--monochrome-900);
-    flex-grow: 1;
+  @container (width > 420px) {
+    &__content-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      align-items: flex-start;
+      justify-content: flex-start;
+      column-gap: var(--size-24);
+
+      >.m-card-lots-view-link {
+        display: contents;
+      }
+    }
+
+    .m-cards-slots-price {
+      flex-direction: column-reverse;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+
+    .m-cards-slots-icons,
+    .m-card-lots-pills {
+      margin: 0 0 var(--size-12);
+    }
   }
 }
 </style>

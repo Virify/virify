@@ -37,7 +37,7 @@ const { beds, baths, receptions } = toRefs(props.roomCounts)
 .m-cards-slots-icons {
   list-style: none;
   padding: 0;
-  margin: var(--size-10) 0;
+  margin: var(--size-8) 0;
   display: flex;
   align-items: center;
   gap: var(--size-24);

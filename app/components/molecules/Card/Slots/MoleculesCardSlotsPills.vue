@@ -18,7 +18,7 @@ defineProps<Props>()
 <style lang="scss">
 .m-card-lots-pills {
   list-style: none;
-  margin: var(--size-12) 0;
+  margin: var(--size-10) 0;
   padding: 0;
   display: flex;
   gap: var(--size-6);
