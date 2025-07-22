@@ -35,7 +35,8 @@ const username = computed(() => {
   gap: var(--size-6);
   margin: var(--size-10) 0;
   padding: var(--size-8) var(--size-16) var(--size-8) var(--size-12);
-  background: var(--card-background-overlay);
+  background: var(--card-background-pill);
+  border: 1px solid var(--card-border-colour);
   border-radius: var(--border-radius-ui);
 
   &__author {

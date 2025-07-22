@@ -159,16 +159,17 @@ const premiumFeatures = computed(() => {
 }
 
 .m-card-template {
-  --card-foreground: var(--foreground-200);
+  --card-foreground: var(--foreground-100);
   --card-background: var(--background-200);
-  --card-background-overlay: var(--background-300);
+  --card-background-overlay: light-dark(var(--background-300), var(--background-100));
+  --card-background-pill: light-dark(var(--background-300), var(--background-100));
   --card-colour: var(--blue-400);
-  --card-border-colour: var(--border-color-200);
-  --card-button-background: var(--blue-400);
-  --card-button-foreground: var(--monochrome-900);
-  --card-button-background-hover: var(--blue-200);
-  --card-button-foreground-hover: var(--monochrome-900);
-  --card-button-border-colour: var(--blue-400);
+  --card-border-colour: light-dark(var(--border-color-200), var(--border-color-300));
+  --card-button-background: light-dark(var(--blue-400), var(--monochrome-900));
+  --card-button-foreground: light-dark(var(--monochrome-900), var(--monochrome-100));
+  --card-button-background-hover: light-dark(var(--blue-200), var(--blue-800));
+  --card-button-foreground-hover: light-dark(var(--monochrome-900), var(--monochrome-100));
+  --card-button-border-colour: light-dark(var(--blue-400), var(--monochrome-900));
 
   position: relative;
   padding: var(--size-8);
@@ -189,9 +190,10 @@ const premiumFeatures = computed(() => {
 
   &--featured {
     --card-colour: var(--secondary-500);
-    --card-background: var(--secondary-800);
-    --card-background-overlay: var(--secondary-700);
-    --card-border-colour: var(--secondary-700);
+    --card-background: light-dark(var(--secondary-800), var(--secondary-100));
+    --card-background-overlay: light-dark(var(--secondary-700), var(--secondary-200));
+    --card-background-pill: light-dark(var(--secondary-700), var(--secondary-200));
+    --card-border-colour: var(--secondary-600);
     --card-button-background: var(--secondary-400);
     --card-button-foreground: var(--monochrome-100);
     --card-button-background-hover: var(--secondary-500);
@@ -211,7 +213,8 @@ const premiumFeatures = computed(() => {
     --card-colour: var(--primary-400);
     --card-background: var(--blue-400);
     --card-background-overlay: var(--blue-300);
-    --card-border-colour: var(--blue-500);
+    --card-background-pill: var(--blue-400);
+    --card-border-colour: var(--blue-600);
     --card-button-background: var(--primary-400);
     --card-button-foreground: var(--monochrome-100);
     --card-button-background-hover: var(--primary-600);
