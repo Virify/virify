@@ -14,12 +14,14 @@
       </div>
 
       <div class="m-card-template__content">
-        <slot name="content" v-bind="{ price, priceGuide, fullAddress, propertyType, roomCounts, pills, propertyId }">
+        <slot name="content"
+          v-bind="{ price, priceGuide, fullAddress, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
           <MoleculesCardSlotsViewLink :property-id>
             <MoleculesCardSlotsPrice :price :price-guide />
             <MoleculesCardSlotsOverview :property-type :full-address />
             <MoleculesCardSlotsIcons :room-counts />
           </MoleculesCardSlotsViewLink>
+
           <MoleculesCardSlotsPills v-if="pills.length" :pills />
         </slot>
 
@@ -35,6 +37,8 @@
 </template>
 
 <script setup lang="ts">
+import { getPremiumFeatures } from '~/utils/results/premium-features';
+
 interface Props {
   result: ListingCardData
   variant?: 'basic' | 'featured' | 'premium'
@@ -130,6 +134,18 @@ const pills = computed(() => {
   return pills
 })
 
+const description = computed(() => {
+  const { description = '--' } = asObject(props.result)
+
+  return description
+})
+
+const premiumFeatures = computed(() => {
+  const { result } = props
+
+  return asArray(getPremiumFeatures(result, 16))
+})
+
 </script>
 
 <style lang="scss">
@@ -213,6 +229,15 @@ const pills = computed(() => {
 
   &__footer {
     margin-top: auto;
+  }
+
+  /**
+   *  Support container queries for each slot
+   */
+  &__gallery,
+  &__content,
+  &__footer {
+    container-type: inline-size;
   }
 
   /**

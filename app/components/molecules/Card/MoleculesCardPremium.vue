@@ -4,16 +4,29 @@
       Carousel (Premium)
     </template>
 
-    <template #content="{ price, priceGuide, propertyType, fullAddress, roomCounts, pills, propertyId }">
+    <template
+      #content="{ price, priceGuide, propertyType, fullAddress, roomCounts, pills, propertyId, description, premiumFeatures }">
       <MoleculesCardSlotsViewLink :property-id>
-        <span class="m-card-premium | title-sm">Spotlight</span>
-
-        <MoleculesCardSlotsPrice :price :price-guide />
-        <MoleculesCardSlotsOverview :property-type :full-address />
-        <MoleculesCardSlotsIcons :room-counts />
+        <span class="m-card-premium__title | title-sm">Spotlight</span>
       </MoleculesCardSlotsViewLink>
 
-      <MoleculesCardSlotsPills v-if="pills.length" :pills />
+      <div class="m-card-premium__grid">
+        <div class="m-card-premium__grid-row">
+          <MoleculesCardSlotsViewLink :property-id>
+            <MoleculesCardSlotsPrice :price :price-guide />
+            <MoleculesCardSlotsOverview :property-type :full-address />
+            <MoleculesCardSlotsIcons :room-counts />
+          </MoleculesCardSlotsViewLink>
+
+          <MoleculesCardSlotsPills v-if="pills.length" :pills />
+
+          <MoleculesCardSlotsDescription v-if="description" :description />
+        </div>
+
+        <div class="m-card-premium__grid-row">
+          <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
+        </div>
+      </div>
     </template>
   </MoleculesCardTemplate>
 </template>
@@ -29,23 +42,36 @@ defineProps<Props>()
 
 <style lang="scss">
 .m-card-premium {
-  display: flex;
-  align-items: center;
-  gap: var(--size-16);
-  padding: var(--size-8) 0;
-  margin: 0 auto var(--size-24);
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: var(--size-16);
+    padding: var(--size-8) 0;
+    margin: 0 auto var(--size-24);
 
-  @container (width > 600px) {
-    max-width: min(26ch, 100% - var(--size-48));
+    @container (width > 600px) {
+      max-width: min(26ch, 100% - var(--size-48));
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      height: 1px;
+      background: currentColor;
+      min-width: 1ch;
+      flex-grow: 1;
+    }
   }
 
-  &::before,
-  &::after {
-    content: '';
-    height: 1px;
-    background: currentColor;
-    min-width: 1ch;
-    flex-grow: 1;
+  &__grid {
+    display: grid;
+    gap: var(--size-12);
+
+    @container (width > 600px) {
+      align-items: center;
+      grid-template-columns: 1fr 1.1fr;
+      column-gap: var(--size-40);
+    }
   }
 }
 </style>
