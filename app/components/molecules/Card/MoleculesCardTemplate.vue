@@ -176,7 +176,7 @@ const premiumFeatures = computed(() => {
   color: var(--card-foreground);
   background-color: var(--card-background);
   border: 1px solid var(--card-border-colour);
-  border-radius: var(--border-radius-2xl);
+  border-radius: var(--border-radius-3xl);
   box-sizing: border-box;
   display: grid;
   align-items: stretch;

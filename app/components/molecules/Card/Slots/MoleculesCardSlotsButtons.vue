@@ -29,7 +29,7 @@ defineProps<Props>()
   white-space: nowrap;
 
   &__button {
-    border-radius: var(--border-radius-ui);
+    border-radius: var(--border-radius-xl);
     box-sizing: border-box;
 
     &--view {
