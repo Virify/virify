@@ -161,8 +161,8 @@ const premiumFeatures = computed(() => {
 .m-card-template {
   --card-foreground: var(--foreground-100);
   --card-background: var(--background-200);
-  --card-background-overlay: light-dark(var(--background-300), var(--background-100));
-  --card-background-pill: light-dark(var(--background-300), var(--background-100));
+  --card-background-overlay: light-dark(var(--background-300), var(--background-200));
+  --card-background-pill: light-dark(var(--background-300), var(--background-200));
   --card-colour: var(--blue-400);
   --card-border-colour: light-dark(var(--border-color-200), var(--border-color-300));
   --card-button-background: light-dark(var(--blue-400), var(--monochrome-900));
@@ -175,7 +175,7 @@ const premiumFeatures = computed(() => {
   padding: var(--size-8);
   color: var(--card-foreground);
   background-color: var(--card-background);
-  border: 1px solid var(--card-border-colour);
+  border: 2px solid var(--card-border-colour);
   border-radius: var(--border-radius-3xl);
   box-sizing: border-box;
   display: grid;
@@ -190,9 +190,9 @@ const premiumFeatures = computed(() => {
 
   &--featured {
     --card-colour: var(--secondary-500);
-    --card-background: light-dark(var(--secondary-800), var(--secondary-100));
-    --card-background-overlay: light-dark(var(--secondary-700), var(--secondary-200));
-    --card-background-pill: light-dark(var(--secondary-700), var(--secondary-200));
+    --card-background: var(--background-200);
+    --card-background-overlay: light-dark(var(--secondary-800), var(--background-200));
+    --card-background-pill: light-dark(var(--secondary-800), var(--background-200));
     --card-border-colour: var(--secondary-600);
     --card-button-background: var(--secondary-400);
     --card-button-foreground: var(--monochrome-100);
