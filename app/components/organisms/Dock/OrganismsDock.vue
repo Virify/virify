@@ -93,8 +93,8 @@ watch(results, () => {
  *  Monitor close events
  */
 onMounted(() => {
-  $popover.value?.addEventListener('toggle', (event: ToggleEvent) => {
-    const { newState } = asObject(event)
+  $popover.value?.addEventListener('toggle', (event: Event) => {
+    const { newState } = asObject(event as ToggleEvent)
 
     if (newState !== 'closed') return
 
