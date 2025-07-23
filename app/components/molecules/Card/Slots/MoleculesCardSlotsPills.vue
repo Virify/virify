@@ -1,9 +1,11 @@
 <template>
-  <ul class="m-card-lots-pills">
-    <li v-for="pill of pills" :key="pill" class="m-card-lots-pills__pill | body-xs">
-      {{ pill }}
-    </li>
-  </ul>
+  <MoleculesScrollBox>
+    <ul class="m-card-lots-pills">
+      <li v-for="pill of pills" :key="pill" class="m-card-lots-pills__pill | body-xs">
+        {{ pill }}
+      </li>
+    </ul>
+  </MoleculesScrollBox>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +24,6 @@ defineProps<Props>()
   padding: 0;
   display: flex;
   gap: var(--size-6);
-  flex-wrap: wrap;
 
   &__pill {
     display: flex;
