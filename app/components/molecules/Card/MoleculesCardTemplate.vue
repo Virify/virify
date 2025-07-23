@@ -275,13 +275,20 @@ const premiumFeatures = computed(() => {
   /**
    *  Default layout
    */
+  @container (width <=420px) {
+    &__content-grid {
+      margin: 0 0 var(--size-10);
+    }
+  }
+
   @container (width > 420px) {
     &__content-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: auto 1fr;
       align-items: flex-start;
       justify-content: flex-start;
       column-gap: var(--size-24);
+      margin: 0;
 
       >.m-card-lots-view-link {
         display: contents;
@@ -293,9 +300,9 @@ const premiumFeatures = computed(() => {
         align-items: flex-start;
       }
 
-      .m-cards-slots-icons,
-      .m-card-lots-pills {
-        margin: 0 0 var(--size-12);
+      .m-card-lots-pills,
+      .m-cards-slots-icons {
+        margin: 0;
       }
     }
   }
