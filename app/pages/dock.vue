@@ -13,7 +13,7 @@
       </template>
 
       <template #right v-if="showMap">
-        <OrganismsAiSearchMapView class="p-dock__map" :results :is-searching="isLoading" />
+        <LazyOrganismsAiSearchMapView class="p-dock__map" :results :is-searching="isLoading" :radius :location />
       </template>
     </OrganismsPaneSlider>
 
@@ -58,7 +58,7 @@ const { lastSearchQuery, updateSort } = useAiSearchPage()
 /**
  *  Handle searches
  */
-const { location, radius, sortBy, query, queryAnalysis } = toRefs(searchState.value)
+const { location, radius, sortBy, query } = toRefs(searchState.value)
 const { setPendingWhile } = usePending()
 const { aiSearch } = useAiSearchPage();
 
