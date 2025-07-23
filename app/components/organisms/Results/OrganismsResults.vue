@@ -78,7 +78,34 @@ const resultsComponents = computed(() => {
     grid-gap: var(--size-12);
     align-items: stretch;
 
-    @container (width > 800px) {
+    @container (800px > width >=640px) {
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: var(--size-16);
+
+      .o-results__card--large {
+        grid-column: span 2;
+      }
+    }
+
+    @container (1100px > width >=950px) {
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: var(--size-16);
+
+      .o-results__card--large {
+        grid-column: span 2;
+      }
+    }
+
+    @container (1560px > width >=1100px) {
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: var(--size-16);
+
+      .o-results__card--large {
+        grid-column: span 3;
+      }
+    }
+
+    @container (width >=1560px) {
       grid-template-columns: repeat(2, 1fr);
       grid-gap: var(--size-16);
 

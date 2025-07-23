@@ -203,7 +203,7 @@ const premiumFeatures = computed(() => {
 
   &--basic,
   &--featured {
-    @container (width > 800px) {
+    @container (width > 750px) {
       grid-template-columns: 1.2fr minmax(20ch, 1fr);
     }
   }

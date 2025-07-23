@@ -3,10 +3,6 @@
     <div class="m-card-slots-carousel__slide">
       <p>Carousel</p>
     </div>
-
-    <div class="m-card-slots-carousel__slide m-card-slots-carousel__slide--second">
-      <p>Carousel</p>
-    </div>
   </div>
 </template>
 
@@ -28,14 +24,6 @@
     aspect-ratio: 4/3;
     color: var(--monochrome-900);
     flex-grow: 1;
-
-    &--second {
-      display: none;
-
-      @container (width > 450px) {
-        display: flex;
-      }
-    }
   }
 }
 </style>
