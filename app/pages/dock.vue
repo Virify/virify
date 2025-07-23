@@ -58,7 +58,7 @@ const { lastSearchQuery, updateSort } = useAiSearchPage()
 /**
  *  Handle searches
  */
-const { location, radius, sortBy, query } = toRefs(searchState.value)
+const { location, radius, sortBy, query, viewMode } = toRefs(searchState.value)
 const { setPendingWhile } = usePending()
 const { aiSearch } = useAiSearchPage();
 
@@ -90,6 +90,15 @@ watch(sortBy, (newValue) => {
   // The KV store needs fixing before this can be activated
   console.log('@TODO: sort results by', newValue)
   // updateSort(newValue)
+})
+
+watch(viewMode, (layout) => {
+  if (layout !== 'map') return
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'instant'
+  })
 })
 
 /**
