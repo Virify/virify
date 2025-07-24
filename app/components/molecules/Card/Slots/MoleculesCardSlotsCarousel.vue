@@ -14,7 +14,7 @@
 
   &__slide {
     background: var(--monochrome-300);
-    border-radius: var(--border-radius-2xl);
+    border-radius: calc(var(--border-radius-3xl) - 2px);
     display: flex;
     flex-direction: column;
     align-items: center;

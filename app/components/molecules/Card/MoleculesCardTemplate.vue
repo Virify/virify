@@ -172,7 +172,6 @@ const premiumFeatures = computed(() => {
   --card-button-border-colour: light-dark(var(--blue-400), var(--monochrome-900));
 
   position: relative;
-  padding: var(--size-8);
   color: var(--card-foreground);
   background-color: var(--card-background);
   border: 2px solid var(--card-border-colour);
@@ -262,7 +261,7 @@ const premiumFeatures = computed(() => {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding: var(--size-12);
+    padding: var(--size-16);
   }
 
   &__footer {
