@@ -3,7 +3,7 @@
     'p-dock--has-grid': showGrid
   }">
     <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap" :class="{
-      '| container container-lg': showGrid
+      '| container': showGrid
     }">
       <template #left v-if="showGrid">
         <OrganismsResults v-if="isLoading || results.length" :results :is-loading />
