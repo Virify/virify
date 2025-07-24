@@ -159,7 +159,7 @@ const premiumFeatures = computed(() => {
 }
 
 .m-card-template {
-  --card-foreground: var(--foreground-100);
+  --card-foreground: var(--foreground-200);
   --card-background: var(--background-200);
   --card-background-overlay: light-dark(var(--background-300), var(--background-200));
   --card-background-pill: light-dark(var(--background-300), var(--background-200));
