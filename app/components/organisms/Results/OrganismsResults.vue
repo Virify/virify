@@ -1,13 +1,26 @@
 <template>
   <div class="o-results">
-    <h2 class="o-results__title | title-sm">{{ results.length }} matches</h2>
+    <template v-if="isLoading">
+      <div class="o-results__title o-results__title--skeleton | skeleton"></div>
 
-    <div class="o-results__grid">
-      <component v-for="{ variant, fullWidth, component, result } of resultsComponents" :is="component" :variant :result
-        :class="{
-          'o-results__card--large': !!fullWidth
-        }" />
-    </div>
+      <div class="o-results__grid">
+        <MoleculesCardPremiumSkeleton class="o-results__card--large" />
+        <MoleculesCardSkeleton v-for="key of 6" :key />
+      </div>
+    </template>
+
+    <template v-else>
+      <h2 class="o-results__title | title-sm">
+        {{ results.length }} matches
+      </h2>
+
+      <div class="o-results__grid">
+        <component v-for="{ variant, fullWidth, component, result } of resultsComponents" :is="component" :variant
+          :result :class="{
+            'o-results__card--large': !!fullWidth
+          }" />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -19,10 +32,13 @@ import {
 } from '#components'
 
 interface Props {
+  isLoading?: boolean
   results: ListingCardData[]
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isLoading: false
+})
 
 /**
  *  Get the variant of the card
@@ -71,6 +87,11 @@ const resultsComponents = computed(() => {
 
   &__title {
     margin: 0 0 var(--size-16);
+
+    &--skeleton {
+      width: 12ch;
+      height: 2.6ch;
+    }
   }
 
   &__grid {

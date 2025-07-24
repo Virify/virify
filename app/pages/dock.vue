@@ -6,10 +6,8 @@
       '| container container-lg': showGrid
     }">
       <template #left v-if="showGrid">
-        <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
-        <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
-
-        <OrganismsResults v-else :results />
+        <OrganismsResults v-if="isLoading || results.length" :results :is-loading />
+        <MoleculesAiSearchNoResults v-else :last-search-query="lastSearchQuery" />
       </template>
 
       <template #right v-if="showMap">
