@@ -1,6 +1,6 @@
 <template>
-  <MoleculesScrollBox>
-    <ul class="m-card-lots-pills">
+  <MoleculesScrollBox class="m-card-lots-pills">
+    <ul class="m-card-lots-pills__list">
       <li v-for="pill of pills" :key="pill" class="m-card-lots-pills__pill | body-xs">
         {{ pill }}
       </li>
@@ -19,11 +19,15 @@ defineProps<Props>()
 
 <style lang="scss">
 .m-card-lots-pills {
-  list-style: none;
-  margin: var(--size-4) 0 0;
-  padding: 0;
-  display: flex;
-  gap: var(--size-6);
+  align-self: center;
+
+  &__list {
+    list-style: none;
+    margin: var(--size-4) 0 0;
+    padding: 0;
+    display: flex;
+    gap: var(--size-6);
+  }
 
   &__pill {
     display: flex;

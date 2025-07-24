@@ -201,10 +201,16 @@ const premiumFeatures = computed(() => {
     --card-button-border-colour: var(--secondary-400);
   }
 
-  &--basic,
-  &--featured {
-    @container (width > 750px) {
+  @container (width > 750px) {
+
+    &--basic,
+    &--featured {
       grid-template-columns: 1.2fr minmax(20ch, 1fr);
+    }
+
+    &--basic &__gallery,
+    &--featured &__gallery {
+      align-items: center;
     }
   }
 
@@ -248,7 +254,7 @@ const premiumFeatures = computed(() => {
 
   &__gallery {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
   }
 
