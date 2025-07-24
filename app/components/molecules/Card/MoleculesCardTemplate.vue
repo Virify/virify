@@ -164,12 +164,12 @@ const premiumFeatures = computed(() => {
   --card-background-overlay: light-dark(var(--background-300), var(--background-200));
   --card-background-pill: light-dark(var(--background-300), var(--background-200));
   --card-colour: var(--blue-400);
-  --card-border-colour: light-dark(var(--border-color-200), var(--border-color-300));
-  --card-button-background: light-dark(var(--blue-400), var(--monochrome-900));
+  --card-border-colour: light-dark(var(--border-color-200), var(--blue-500));
+  --card-button-background: light-dark(var(--blue-400), var(--blue-600));
   --card-button-foreground: light-dark(var(--monochrome-900), var(--monochrome-100));
-  --card-button-background-hover: light-dark(var(--blue-200), var(--blue-800));
+  --card-button-background-hover: light-dark(var(--blue-200), var(--blue-900));
   --card-button-foreground-hover: light-dark(var(--monochrome-900), var(--monochrome-100));
-  --card-button-border-colour: light-dark(var(--blue-400), var(--monochrome-900));
+  --card-button-border-colour: light-dark(var(--blue-400), var(--blue-600));
 
   position: relative;
   color: var(--card-foreground);
