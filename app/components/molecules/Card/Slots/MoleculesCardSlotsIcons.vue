@@ -29,7 +29,7 @@ const props = defineProps<Props>()
 /**
  *  Extract room counts
  */
-const { beds, baths, receptions } = toRefs(props.roomCounts)
+const { beds, baths, receptions } = asObject(props.roomCounts)
 
 </script>
 
