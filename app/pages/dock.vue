@@ -128,7 +128,6 @@ const results = computed(() => {
 
   &__map {
     width: 100%;
-    background: var(--monochrome-400);
     overflow: hidden;
     height: calc(100vh - var(--header-height));
   }
