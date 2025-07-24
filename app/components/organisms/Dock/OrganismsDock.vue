@@ -118,7 +118,6 @@ onMounted(() => {
   justify-content: center;
   bottom: var(--size-10);
   z-index: 9;
-  pointer-events: none;
 
   @include mq.tablet {
     bottom: var(--size-16);
@@ -126,29 +125,6 @@ onMounted(() => {
 
   @include mq.notebook {
     bottom: var(--size-24);
-  }
-
-  &__popover-container,
-  &__menu {
-    pointer-events: auto;
-  }
-
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: var(--monochrome-100);
-    opacity: 0;
-    z-index: -1;
-    pointer-events: none;
-    transition: opacity var(--animation-veryslow);
-    backdrop-filter: blur(40px);
-  }
-
-  &:has(:popover-open)::before,
-  &:has([aria-expanded="true"])::before {
-    transition-delay: 0ms;
-    opacity: 0.66;
   }
 
   &__popover-container {
