@@ -96,7 +96,7 @@ const resultsComponents = computed(() => {
       }
     }
 
-    @container (1560px > width >=1100px) {
+    @container (1600px > width >=1100px) {
       grid-template-columns: repeat(3, 1fr);
       grid-gap: var(--size-16);
 
@@ -105,7 +105,7 @@ const resultsComponents = computed(() => {
       }
     }
 
-    @container (width >=1560px) {
+    @container (width >=1600px) {
       grid-template-columns: repeat(2, 1fr);
       grid-gap: var(--size-16);
 
