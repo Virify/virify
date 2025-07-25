@@ -133,6 +133,7 @@ function getPrismaSchemaPrompt(): string {
   return `
 CRITICAL: DO NOT NEST saleListing or rentalListing (or any of their fields) inside property or any nested object. This is a SCHEMA VIOLATION and will cause a FATAL ERROR. These fields MUST ONLY appear at the ROOT level of the query.
 CRITICAL: NEVER add Comments or quotes or markdown formatting to the AI response. The response MUST be a valid JSON object with a "whereClause" and "queryAnalysis" field. Any comments, quotes, or markdown will cause a FATAL ERROR.
+CRITICAL: Ensure all JSON brackets and braces are properly closed. Missing closing braces will cause parsing errors.
 NEVER DO THIS: "size": { "gte": 1000 } // Assuming "large" refers to a size greater than 1000 square meters - the quotes around large breaks
 IMPORTANT: To filter by fields of rentalListing or saleListing, you MUST use the correct Prisma relation filter syntax:
 - To filter for existence: { rentalListing: { isNot: null } }
@@ -617,6 +618,17 @@ EXAMPLES:
   },
   "queryAnalysis": { "usedTerms": ["conservatory", "hardwood floors"], "ignoredTerms": [] }
 }
+
+CRITICAL: For "X or more rooms" queries, you MUST create OR conditions that represent ALL possible ways to achieve X total rooms using numberBedrooms + numberBathrooms + numberReceptions + numberOtherRooms.
+
+ROOM COUNT LOGIC:
+1. Any single room type with X or more (e.g., for "5+ rooms": numberBedrooms >= 5)
+2. Generate combinations where the sum equals X or more:
+   - For X=2: (1 bed + 1 bath), (1 bed + 1 reception), etc.
+   - For X=5: (4 bed + 1 bath), (3 bed + 2 bath), (2 bed + 1 bath + 1 reception + 1 other), etc.
+   - For X=9: (9 bed), (8 bed + 1 bath), (4 bed + 2 bath + 2 reception + 1 other), etc.
+
+This applies to ANY number. Generate logical combinations that sum to the target number.
 
 IMPORTANT: For queries like "property with additional toilet", you MUST filter for properties where more than one bathroom has a toilet. Prisma cannot directly count array elements in the where clause, but you should use:
   { "property": { "bathroomFeatures": { "some": { "toilet": true } } } }
