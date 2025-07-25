@@ -9,6 +9,7 @@ export const propertyInclude: PropertyInclude = {
   classification: true,
   bedroomFeatures: true,
   bathroomFeatures: true,
+  otherRoom: true,
   parking: true,
   amenities: true,
   additionalFeatures: true,

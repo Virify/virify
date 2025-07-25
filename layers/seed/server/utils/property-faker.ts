@@ -1,6 +1,6 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { BedSizeType, BoilerType, BroadbandType, ConnectedUtilities, ConstructionType, EPCRating, FireplaceType, HeatingType, HotWaterSource, ReceptionType, RenewableEnergy, type Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import { BedSizeType, BoilerType, BroadbandType, ConnectedUtilities, ConstructionType, EPCRating, FireplaceType, HeatingType, HotWaterSource, OtherRoomType, ReceptionType, RenewableEnergy, type Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 import { roundFloat } from "~~/shared/utils/numbers";
 import { typeToClassificationMap } from "./property-type-map";
 import type { PropertyWithAddress } from "~~/shared/types/property";
@@ -85,6 +85,11 @@ export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateW
       enSuite: faker.datatype.boolean(),
       builtInStorage: faker.datatype.boolean(),
       walkInWardrobe: faker.datatype.boolean(),
+      bayWindow: faker.datatype.boolean(),
+      balcony: faker.datatype.boolean(),
+      hasView: faker.datatype.boolean(),
+      patioDoors: faker.datatype.boolean(),
+      builtInDesk: faker.datatype.boolean(),
       size: faker.number.int({ min: 10, max: 50 }),
     })),
   };
@@ -128,7 +133,51 @@ export const generateReception = (): { count: number; data: Prisma.ReceptionCrea
       openPlan: faker.datatype.boolean(),
       fireplace: faker.helpers.arrayElement(Object.values(FireplaceType)),
       balcony: faker.datatype.boolean(),
+      bayWindow: faker.datatype.boolean(),
       openConcept: faker.datatype.boolean(),
+      conservatory: faker.datatype.boolean(),
+      barArea: faker.datatype.boolean(),
+      builtInDesk: faker.datatype.boolean(),
+      builtInStorage: faker.datatype.boolean(),
+      builtInShelving: faker.datatype.boolean(),
+      hasView: faker.datatype.boolean(),
+      soundProofing: faker.datatype.boolean(),
+      accousticPanels: faker.datatype.boolean(),
+      stoneFlooring: faker.datatype.boolean(),
+      hardwoodFlooring: faker.datatype.boolean(),
+    })),
+  };
+};
+
+/**
+ * Generate a random number of reception objects
+ *
+ * @returns Array of Reception objects
+ */
+export const generateOtherRooms = (): { count: number; data: Prisma.OtherRoomCreateWithoutPropertyInput[] } => {
+  const otherRoomCount = faker.number.int({ min: 1, max: 3 });
+  return {
+    count: otherRoomCount,
+    data: Array.from({ length: otherRoomCount }, (_, i) => ({
+      roomNumber: i + 1,
+      floor: faker.number.int({ min: 0, max: 3 }),
+      name: faker.word.words(2),
+      type: faker.helpers.arrayElement(Object.values(OtherRoomType)),
+      description: faker.word.words(10),
+      size: faker.number.int({ min: 10, max: 50 }),
+      openPlan: faker.datatype.boolean(),
+      fireplace: faker.helpers.arrayElement(Object.values(FireplaceType)),
+      balcony: faker.datatype.boolean(),
+      openConcept: faker.datatype.boolean(),
+      barArea: faker.datatype.boolean(),
+      builtInDesk: faker.datatype.boolean(),
+      builtInStorage: faker.datatype.boolean(),
+      builtInShelving: faker.datatype.boolean(),
+      hasView: faker.datatype.boolean(),
+      soundProofing: faker.datatype.boolean(),
+      accousticPanels: faker.datatype.boolean(),
+      stoneFlooring: faker.datatype.boolean(),
+      hardwoodFlooring: faker.datatype.boolean(),
     })),
   };
 };
@@ -314,6 +363,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   const { count: bedroomCount, data: bedrooms } = generateBedrooms();
   const { count: bathroomCount, data: bathrooms } = generateBathrooms();
   const { count: receptionCount, data: receptions } = generateReception();
+  const { count: otherRoomCount, data: otherRooms } = generateOtherRooms();
 
   // First create the property with all features
   const propertyWithFeatures = await prisma.property.create({
@@ -338,6 +388,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       numberBedrooms: bedroomCount,
       numberBathrooms: bathroomCount,
       numberReceptions: receptionCount,
+      numberOtherRooms: otherRoomCount,
       bathroomFeatures: {
         create: bathrooms,
       },
@@ -349,6 +400,9 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       },
       reception: {
         create: receptions,
+      },
+      otherRoom: {
+        create: otherRooms,
       },
       utility: {
         create: generateUtility(),

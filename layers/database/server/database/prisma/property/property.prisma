@@ -16,10 +16,12 @@ model Property {
   numberBedrooms           Int?                   @default(0)
   numberBathrooms          Int?                   @default(0)
   numberReceptions         Int?                   @default(0)
+  numberOtherRooms         Int?                   @default(0)
   bathroomFeatures         Bathroom[]
   bedroomFeatures          Bedroom[]
   kitchenFeatures          Kitchen?
   reception                Reception[]
+  otherRoom                OtherRoom[]
   utility                  Utility?
   listing                  Listing[]
   media                    Media[]

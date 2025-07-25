@@ -27,6 +27,7 @@ export interface SearchResult {
     numberBedrooms?: number | null
     numberBathrooms?: number | null
     numberReceptions?: number | null
+    numberOtherRooms?: number | null
     size?: number | null
     yearBuilt?: string | null
     chainFree?: boolean
@@ -56,6 +57,7 @@ export interface SearchResult {
     accessibilityFeatures?: any
     kitchenFeatures?: any
     reception?: any
+    otherRooms?: any
     utility?: any
     outdoorSpace?: any
     energyAndUtilities?: any

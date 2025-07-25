@@ -2,8 +2,8 @@ model SaleListing {
   id                 Int                    @id
   listing            Listing                @relation(fields: [id], references: [id])
   tenureType         TenureType?
-  chain              Boolean @default(false)
-  sharedOwnership    Boolean @default(false)
+  chain              Boolean                @default(false)
+  sharedOwnership    Boolean                @default(false)
   priceType          SalePriceType
   availabilityStatus SaleAvailabilityStatus
 

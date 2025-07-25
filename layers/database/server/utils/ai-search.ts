@@ -214,6 +214,7 @@ PROPERTY FIELDS (under property):
 - numberBedrooms: Int
 - numberBathrooms: Int
 - numberReceptions: Int
+- numberOtherRooms: Int
 - size: Float
 - value: Float
 - yearBuilt: String
@@ -245,6 +246,11 @@ bedroomFeatures (property.bedroomFeatures): ARRAY (use {some: {...}})
 - enSuite: Boolean
 - builtInStorage: Boolean
 - walkInWardrobe: Boolean
+- bayWindow: Boolean
+- balcony: Boolean
+- hasView: Boolean
+- patioDoors: Boolean
+- builtInDesk: Boolean
 - description: String
 - size: Float
 
@@ -263,15 +269,50 @@ reception (property.reception): ARRAY (use {some: {...}})
 - roomNumber: Int
 - floor: Int
 - name: String
-- type: "LIVING_ROOM"|"FAMILY_ROOM"|"DINING_ROOM"|"DEN"|"STUDY"|"GAMES_ROOM"|"HOME_CINEMA"|"OFFICE"|"CONSERVATORY"
-- openPlan: Boolean
-- openConcept: Boolean
-- balcony: Boolean
-- fireplace: "LOG_BURNER"|"OPEN_FIRE"|null
-- gamesRoom: Boolean
-- homeCinema: Boolean
+- type: "LIVING_ROOM"|"FAMILY_ROOM"|"DINING_ROOM"|"GAMES_ROOM"|"HOME_CINEMA"
 - description: String
 - size: Float
+- conservatory: Boolean
+- openPlan: Boolean
+- openConcept: Boolean
+- fireplace: "LOG_BURNER"|"OPEN_FIRE"|null
+- balcony: Boolean
+- bayWindow: Boolean
+- builtInShelving: Boolean
+- hasView: Boolean
+- patioDoors: Boolean
+- builtInStorage: Boolean
+- servingHatch: Boolean
+- barArea: Boolean
+- soundProofing: Boolean
+- accousticPanels: Boolean
+- stoneFlooring: Boolean
+- hardwoodFlooring: Boolean
+- builtInDesk: Boolean
+
+otherRoom (property.otherRoom): ARRAY (use {some: {...}})
+- roomNumber: Int
+- floor: Int
+- name: String
+- type: "OFFICE"|"STUDY"|"LIBRARY"|"GYM"|"WORKSHOP"|"POOL_ROOM"|"WINE_CELLAR"|"SPA"|"OTHER"
+- description: String
+- size: Float
+- openPlan: Boolean
+- openConcept: Boolean
+- fireplace: "LOG_BURNER"|"OPEN_FIRE"|null
+- balcony: Boolean
+- bayWindow: Boolean
+- builtInShelving: Boolean
+- hasView: Boolean
+- patioDoors: Boolean
+- builtInStorage: Boolean
+- servingHatch: Boolean
+- barArea: Boolean
+- soundProofing: Boolean
+- accousticPanels: Boolean
+- stoneFlooring: Boolean
+- hardwoodFlooring: Boolean
+- builtInDesk: Boolean
 
 outdoorSpace (property.outdoorSpace):
 - frontGarden: Boolean
@@ -381,7 +422,28 @@ ARRAY/RELATION/ENUM RULES:
 - NEVER use "has" for object relations; only for enum arrays
 - saleListing and rentalListing (and all their fields, e.g. furnished) MUST ONLY appear at the ROOT level of the query, NEVER inside property or any nested object. Any query with saleListing or rentalListing inside property is INVALID.
 - Respond with ONLY valid JSON, no comments, no markdown
-- Receptions have different types (e.g., living room, family room, etc.) and can be filtered by type or features like balcony, fireplace, etc. Use the exact type names as defined in the schema. This is to determine the type of reception room (e.g house with a home cinema and home office).
+- Receptions have different types (e.g., living room, family room, dining room, games room, home cinema) and can be filtered by type or features like balcony, fireplace, etc. Use the exact type names as defined in the schema.
+- Other rooms (otherRoom) include office spaces, studies, libraries, gyms, workshops, pool rooms, wine cellars, spas, etc. Use otherRoom for office-related queries (home office, study, etc.).
+
+COMMON USER TERM MAPPINGS (map these user terms to correct schema fields):
+- "conservatory" → property.reception: { some: { conservatory: true } }
+- "bay window" → property.reception: { some: { bayWindow: true } } OR property.otherRoom: { some: { bayWindow: true } } OR property.bedroomFeatures: { some: { bayWindow: true } }
+- "built-in storage" → property.reception: { some: { builtInStorage: true } } OR property.otherRoom: { some: { builtInStorage: true } } OR property.bedroomFeatures: { some: { builtInStorage: true } }
+- "hardwood floors" → property.reception: { some: { hardwoodFlooring: true } } OR property.otherRoom: { some: { hardwoodFlooring: true } }
+- "stone floors" → property.reception: { some: { stoneFlooring: true } } OR property.otherRoom: { some: { stoneFlooring: true } }
+- "sound proofing" → property.reception: { some: { soundProofing: true } } OR property.otherRoom: { some: { soundProofing: true } }
+- "acoustic panels" → property.reception: { some: { accousticPanels: true } } OR property.otherRoom: { some: { accousticPanels: true } }
+- "patio doors" → property.reception: { some: { patioDoors: true } } OR property.otherRoom: { some: { patioDoors: true } } OR property.bedroomFeatures: { some: { patioDoors: true } }
+- "serving hatch" → property.reception: { some: { servingHatch: true } } OR property.otherRoom: { some: { servingHatch: true } }
+- "bar area" → property.reception: { some: { barArea: true } } OR property.otherRoom: { some: { barArea: true } }
+- "built-in desk" → property.reception: { some: { builtInDesk: true } } OR property.otherRoom: { some: { builtInDesk: true } } OR property.bedroomFeatures: { some: { builtInDesk: true } }
+- "balcony" → property.reception: { some: { balcony: true } } OR property.otherRoom: { some: { balcony: true } } OR property.bedroomFeatures: { some: { balcony: true } }
+- "has view" → property.reception: { some: { hasView: true } } OR property.otherRoom: { some: { hasView: true } } OR property.bedroomFeatures: { some: { hasView: true } }
+- "wine cellar" → property.otherRoom: { some: { type: "WINE_CELLAR" } }
+- "home gym" → property.otherRoom: { some: { type: "GYM" } }
+- "workshop" → property.otherRoom: { some: { type: "WORKSHOP" } }
+- "library" → property.otherRoom: { some: { type: "LIBRARY" } }
+- "spa room" → property.otherRoom: { some: { type: "SPA" } }
 
 IMPORTANT: For every user query, you MUST return a queryAnalysis object with two arrays:
 - usedTerms: all terms/phrases from the user query that were mapped to valid schema fields and used in the whereClause
@@ -530,10 +592,30 @@ EXAMPLES:
     "published": true,
     "property": {
       "type": { "name": "House" },
-      "reception": { "some": { "gamesRoom": true, "homeCinema": true } }
+      "OR": [
+        { "reception": { "some": { "type": "GAMES_ROOM" } } },
+        { "reception": { "some": { "type": "HOME_CINEMA" } } }
+      ]
     }
   },
   "queryAnalysis": { "usedTerms": ["house", "games room", "home cinema"], "ignoredTerms": [] }
+}
+
+// VALID EXAMPLE (conservatory):
+// "property with conservatory and hardwood floors" →
+{
+  "whereClause": {
+    "published": true,
+    "property": {
+      "reception": { 
+        "some": { 
+          "conservatory": true,
+          "hardwoodFlooring": true
+        } 
+      }
+    }
+  },
+  "queryAnalysis": { "usedTerms": ["conservatory", "hardwood floors"], "ignoredTerms": [] }
 }
 
 IMPORTANT: For queries like "property with additional toilet", you MUST filter for properties where more than one bathroom has a toilet. Prisma cannot directly count array elements in the where clause, but you should use:
@@ -556,11 +638,11 @@ EXAMPLES:
   }
 }
 
-IMPORTANT: When the user requests a "home office", "office room", or similar, you MUST map this to a reception room with type "OFFICE". Use:
-  { "property": { "reception": { "some": { "type": "OFFICE" } } } }
+IMPORTANT: When the user requests a "home office", "office room", or similar, you MUST map this to an otherRoom with type "OFFICE". Use:
+  { "property": { "otherRoom": { "some": { "type": "OFFICE" } } } }
 If the schema also supports an additionalFeatures.homeOffice boolean, you MAY also include:
   { "property": { "additionalFeatures": { "is": { "homeOffice": true } } } }
-But the primary mapping for "home office" or "office room" is always a reception with type "OFFICE".
+But the primary mapping for "home office" or "office room" is always an otherRoom with type "OFFICE".
 
 EXAMPLES:
 // "property with home office" →
@@ -568,7 +650,7 @@ EXAMPLES:
   "whereClause": {
     "published": true,
     "property": {
-      "reception": { "some": { "type": "OFFICE" } }
+      "otherRoom": { "some": { "type": "OFFICE" } }
     }
   },
   "queryAnalysis": { "usedTerms": ["home office"], "ignoredTerms": [] }
@@ -580,7 +662,7 @@ EXAMPLES:
     "published": true,
     "property": {
       "type": { "name": "House" },
-      "reception": { "some": { "type": "OFFICE" } }
+      "otherRoom": { "some": { "type": "OFFICE" } }
     }
   },
   "queryAnalysis": { "usedTerms": ["house", "office"], "ignoredTerms": [] }
