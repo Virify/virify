@@ -8,7 +8,7 @@ model Parking {
   carport          Boolean  @default(false)
   allocatedParking Boolean  @default(false)
   evCharging       Boolean  @default(false)
-  description      String
+  description      String?
   propertyId       Int      @unique
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

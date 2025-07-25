@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import { prisma } from "~~/layers/database/server/utils/prisma-client";
 
 export function generateFakeUser(): Prisma.UserCreateInput {
   return {

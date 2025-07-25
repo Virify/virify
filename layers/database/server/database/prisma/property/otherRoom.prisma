@@ -1,12 +1,11 @@
-model Reception {
+model OtherRoom {
   id               Int            @id @default(autoincrement())
   roomNumber       Int
   floor            Int
   name             String
-  type             ReceptionType
+  type             OtherRoomType
   description      String?
   size             Float?
-  conservatory     Boolean        @default(false)
   openPlan         Boolean        @default(false)
   openConcept      Boolean        @default(false)
   fireplace        FireplaceType?
@@ -31,15 +30,14 @@ model Reception {
   @@index([propertyId])
 }
 
-enum FireplaceType {
-  LOG_BURNER
-  OPEN_FIRE
-}
-
-enum ReceptionType {
-  LIVING_ROOM
-  FAMILY_ROOM
-  DINING_ROOM
-  GAMES_ROOM
-  HOME_CINEMA
+enum OtherRoomType {
+  OFFICE
+  STUDY
+  LIBRARY
+  GYM
+  WORKSHOP
+  POOL_ROOM
+  WINE_CELLAR
+  SPA
+  OTHER
 }

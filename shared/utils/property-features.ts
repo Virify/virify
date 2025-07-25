@@ -376,14 +376,11 @@ const FEATURE_GROUPS: FeatureGroup[] = [
   { groupName: 'accessibilityFeatures', formatter: (data) => extractGroupFeatures('accessibilityFeatures', data) },
   { groupName: 'securityFeatures', formatter: (data) => extractGroupFeatures('securityFeatures', data) },
   { groupName: 'kitchenFeatures', formatter: (data) => extractGroupFeatures('kitchenFeatures', data) },
-  { groupName: 'livingAreaFeatures', formatter: (data) => extractGroupFeatures('livingAreaFeatures', data) },
   { groupName: 'bathroomFeatures', formatter: (data) => extractGroupFeatures('bathroomFeatures', data) },
   { groupName: 'bedroomFeatures', formatter: (data) => extractGroupFeatures('bedroomFeatures', data) },
   { groupName: 'reception', formatter: (data) => extractGroupFeatures('reception', data) },
   { groupName: 'storageFeatures', formatter: (data) => extractGroupFeatures('storageFeatures', data) },
-  { groupName: 'diningroomFeatures', formatter: (data) => extractGroupFeatures('diningroomFeatures', data) },
   { groupName: 'utility', formatter: (data) => extractGroupFeatures('utility', data) },
-  { groupName: 'additionalToilet', formatter: (data) => extractGroupFeatures('additionalToilet', data) },
   { groupName: 'runningCosts', formatter: (data) => extractGroupFeatures('runningCosts', data) },
   { groupName: 'energyAndUtilities', formatter: (data) => extractGroupFeatures('energyAndUtilities', data) }
 ]

@@ -1,11 +1,18 @@
 model Bedroom {
   id             Int           @id @default(autoincrement())
   roomNumber     Int
+  name           String?
   bed            BedSizeType[]
-  description    String
+  floor          Int
+  description    String?
   enSuite        Boolean       @default(false)
   builtInStorage Boolean       @default(false)
   walkInWardrobe Boolean       @default(false)
+  bayWindow      Boolean       @default(false)
+  balcony        Boolean       @default(false)
+  hasView        Boolean       @default(false)
+  patioDoors     Boolean       @default(false)
+  builtInDesk    Boolean       @default(false)
   size           Float?
   propertyId     Int
   createdAt      DateTime      @default(now())
@@ -21,5 +28,4 @@ enum BedSizeType {
   QUEEN
   KING
   SUPER_KING
-  BUNK
 }

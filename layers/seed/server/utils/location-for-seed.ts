@@ -3,6 +3,12 @@
  */
 
 import { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import { prisma } from "~~/layers/database/server/utils/prisma-client";
+
+type AddressLocation = {
+  lat: number;
+  lon: number;
+};
 
 /**
  * Returns the location of a given addressId.
