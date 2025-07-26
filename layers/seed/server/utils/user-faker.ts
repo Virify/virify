@@ -67,11 +67,8 @@ export async function seedFakeUsers(count = 1): Promise<void> {
     return;
   }
 
-  // Create users with unique favorites if listings exist
-  const createdUsers = [];
-  
-  // First, create all users with their favorites
-  for (const user of users) {
+  // Create users with unique favorites if listings exist - in parallel
+  const userCreationPromises = users.map(async (user) => {
     try {
       // Get 3 unique random listing IDs for this user
       const availableIds = Array.from({ length: listingCount }, (_, i) => i + 1);
@@ -109,20 +106,24 @@ export async function seedFakeUsers(count = 1): Promise<void> {
         },
       });
       
-      // Store the created user and their selected listings for conversation creation
-      createdUsers.push({ userId: createdUser.id, selectedListingIds: selectedIds });
       console.log(`Created user ${createdUser.id} with ${selectedIds.length} favorites`);
+      return { userId: createdUser.id, selectedListingIds: selectedIds };
     } catch (error) {
       console.error("Error creating user with favorites:", error);
+      return null;
     }
-  }
+  });
+
+  // Wait for all users to be created
+  const createdUsersResults = await Promise.all(userCreationPromises);
+  const createdUsers = createdUsersResults.filter(result => result !== null);
   
-  // Now create conversations for all users after they've been created
+  // Now create conversations for all users after they've been created - in parallel
   console.log("Creating conversations for users...");
-  for (const { userId, selectedListingIds } of createdUsers) {
+  const conversationPromises = createdUsers.map(async ({ userId, selectedListingIds }) => {
     try {
-      // Create a conversation for each favorite listing
-      for (const listingId of selectedListingIds) {
+      // Create conversations and messages for each favorite listing
+      const conversationCreationPromises = selectedListingIds.map(async (listingId) => {
         // Create the conversation
         const conversation = await prisma.conversation.create({
           data: {
@@ -147,10 +148,16 @@ export async function seedFakeUsers(count = 1): Promise<void> {
             },
           },
         });
-      }
+        
+        return conversation.id;
+      });
+      
+      await Promise.all(conversationCreationPromises);
       console.log(`Created conversations and messages for user ${userId}`);
     } catch (error) {
       console.error(`Error creating conversations for user ${userId}:`, error);
     }
-  }
+  });
+
+  await Promise.all(conversationPromises);
 }

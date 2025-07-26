@@ -120,14 +120,30 @@ export default defineTask({
       await seedPropertyTypes()
 
       console.log('Seeding properties and listings...')
-      for (const addr of saleAddress) {
-        const property = await generateProperty(addr)
-        await generateSaleListing(property.id)
-      }
-      for (const addr of rentalAddress) {
-        const property = await generateProperty(addr)
-        await generateRentalListing(property.id)
-      }
+      
+      // Generate properties and listings in parallel batches
+      await Promise.all([
+        // Sale properties and listings
+        (async () => {
+          const saleProperties = await Promise.all(
+            saleAddress.map(addr => generateProperty(addr))
+          )
+          await Promise.all(
+            saleProperties.map(prop => generateSaleListing(prop.id))
+          )
+        })(),
+        
+        // Rental properties and listings  
+        (async () => {
+          const rentalProperties = await Promise.all(
+            rentalAddress.map(addr => generateProperty(addr))
+          )
+          await Promise.all(
+            rentalProperties.map(prop => generateRentalListing(prop.id))
+          )
+        })()
+      ])
+      
       console.log('Properties and listings seeded.')
 
       console.log('Seeding fake users...')

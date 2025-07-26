@@ -547,15 +547,18 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     mediaToCreate.push(generateGeneralMedia('Utility'));
   }
 
-  // Create all media
-  if (mediaToCreate.length > 0) {
-    await prisma.media.createMany({
+  // Create all media and update location in parallel
+  const [, updateLocation] = await Promise.all([
+    // Batch create all media
+    mediaToCreate.length > 0 ? prisma.media.createMany({
       data: mediaToCreate.map(media => ({
         ...media,
         propertyId: propertyWithFeatures.id,
       })),
-    });
-  }
+    }) : Promise.resolve(),
+    // Update location
+    updateLocationByAddressIdForSeed(propertyWithFeatures.addressId, propertyWithFeatures.address.lon!, propertyWithFeatures.address.lat!)
+  ]);
 
   // Return the property with just address for compatibility
   const property: PropertyWithAddress = {
@@ -563,7 +566,6 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     address: propertyWithFeatures.address,
   };
 
-  const updateLocation = await updateLocationByAddressIdForSeed(property.addressId, property.address.lon!, property.address.lat!);
   const location = await getLocationByAddressIdForSeed(property.addressId);
 
   return property;
