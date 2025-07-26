@@ -270,7 +270,7 @@ onUnmounted(() => {
 
   &__overlay-text {
     color: var(--monochrome-900);
-    font-size: var(--text-sm);
+    font-size: var(--font-sm);
     font-weight: 500;
     line-height: 1.3;
   }
@@ -290,6 +290,9 @@ onUnmounted(() => {
     position: relative;
     max-width: 90vw;
     max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__expanded-image {

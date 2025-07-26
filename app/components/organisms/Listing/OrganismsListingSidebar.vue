@@ -18,6 +18,9 @@
       :bedrooms="bedrooms"
       :bathrooms="bathrooms"
       :receptions="receptions"
+      :other-rooms="otherRooms"
+      :rear-garden="rearGarden"
+      :front-garden="frontGarden"
       :classification="classification"
     />
 
@@ -49,6 +52,7 @@ interface Props {
   bedrooms?: number
   bathrooms?: number
   receptions?: number
+  otherRooms?: number
   classification?: string
   yearBuilt?: string
   constructionType?: string
@@ -61,6 +65,8 @@ interface Props {
     createdAt?: Date | String | null
     avatar?: string | null
   }
+  rearGarden?: boolean
+  frontGarden?: boolean
 }
 
 const props = defineProps<Props>()
