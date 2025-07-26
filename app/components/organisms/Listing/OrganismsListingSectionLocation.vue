@@ -128,7 +128,7 @@ onMounted(() => {
 @use "#styles/_utils/media" as mq;
 
 .o-listing-section-location {
-  padding: var(--size-16);
+  margin: var(--size-32) 0;
   &__map-container {
     width: 100%;
     height: min(40em, 40vh);

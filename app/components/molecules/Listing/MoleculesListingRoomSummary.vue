@@ -1,14 +1,5 @@
 <template>
-  <div class="room-summary">
-    <!-- bedrooms -->
-    <MoleculesListingRoom :rooms="bedrooms" type="Bedroom" title="Bedrooms" />
-    <!-- bathrooms -->
-    <MoleculesListingRoom :rooms="bathrooms" type="Bathroom" title="Bathrooms" />
-    <!-- receptions -->
-    <MoleculesListingRoom :rooms="receptions" type="Reception" title="Receptions" />
-    <!-- other rooms -->
-    <MoleculesListingRoom :rooms="otherRooms" type="Other Rooms" title="Other Rooms" />
-  </div>
+  
 </template>
 
 <script setup lang="ts">
@@ -34,6 +25,6 @@ onMounted(() => {
 
 <style lang="scss">
 .room-summary {
-  padding: var(--size-16);
+  margin: var(--size-32) 0;
 }
 </style>

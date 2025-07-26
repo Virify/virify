@@ -51,12 +51,20 @@ export const generateAccessability = (): Prisma.AccessibilityCreateWithoutProper
  */
 export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreateWithoutPropertyInput[] } => {
   const bathroomCount = faker.number.int({ min: 1, max: 3 });
+  const bathroomNames = [
+    'Master Bathroom',
+    'Guest Bathroom',
+    'Family Bathroom',
+    'En Suite Bathroom',
+    'Powder Room',
+    'Shared Bathroom',
+  ];
   return {
     count: bathroomCount,
     data: Array.from({ length: bathroomCount }, (_, i) => ({
       roomNumber: i + 1,
       floor: faker.number.int({ min: 1, max: 3 }),
-      name: faker.word.words(2),
+      name: faker.helpers.arrayElement(bathroomNames),
       description: faker.word.words(10),
       enSuite: faker.datatype.boolean(),
       toilet: faker.datatype.boolean(),
@@ -74,11 +82,19 @@ export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreat
  */
 export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateWithoutPropertyInput[] } => {
   const bedroomCount = faker.number.int({ min: 1, max: 5 });
+  const bedroomNames = [
+    'Master Bedroom',
+    'Guest Bedroom',
+    'Child\'s Bedroom',
+    'Spare Bedroom',
+    'Nursery',
+    'Teenager\'s Bedroom',
+  ];
   return {
     count: bedroomCount,
     data: Array.from({ length: bedroomCount }, (_, i) => ({
       roomNumber: i + 1,
-      name: faker.word.words(2),
+      name: faker.helpers.arrayElement(bedroomNames),
       floor: faker.number.int({ min: 0, max: 3 }),
       bed: [faker.helpers.arrayElement(Object.values(BedSizeType))],
       description: faker.word.words(10),

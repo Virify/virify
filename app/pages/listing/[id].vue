@@ -67,6 +67,15 @@
               :amenities="amenitiesArray"
             />
           </div>
+
+          <div v-if="property" class="p-listing__section">
+            <h2 class="title-md">Room Details</h2>
+            <p class="| body-md">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Magni dicta earum minus, voluptate libero blanditiis distinctio quae quasi expedita aliquid. Odit officia iusto eligendi quod totam saepe dolorem dolorum nobis.</p>
+            <MoleculesListingRoomDetails :rooms="property?.bedroomFeatures" type="Bedroom" title="Bedrooms" />
+            <MoleculesListingRoomDetails :rooms="property?.bathroomFeatures" type="Bathroom" title="Bathrooms" />
+            <MoleculesListingRoomDetails :rooms="property?.reception" type="Reception" title="Receptions" />
+            <MoleculesListingRoomDetails :rooms="property?.otherRoom" type="Other Rooms" title="Other Rooms" />
+          </div>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
