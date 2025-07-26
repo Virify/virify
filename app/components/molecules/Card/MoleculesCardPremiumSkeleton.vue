@@ -120,6 +120,8 @@
     display: flex;
     align-items: center;
     gap: var(--size-16);
+    padding: 0;
+    margin: var(--size-12) 0;
   }
 
   &__icon {
@@ -141,6 +143,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-8);
+    padding: 0;
     margin: 0 0 var(--size-20);
   }
 

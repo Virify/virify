@@ -86,6 +86,8 @@
     display: flex;
     align-items: center;
     gap: var(--size-16);
+    padding: 0;
+    margin: var(--size-12) 0;
   }
 
   &__icon {
