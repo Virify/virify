@@ -59,7 +59,8 @@ export interface SearchResult {
     reception?: any
     otherRooms?: any
     utility?: any
-    outdoorSpace?: any
+    frontGarden?: any
+    rearGarden?: any
     energyAndUtilities?: any
     securityFeatures?: any
     storageFeatures?: any

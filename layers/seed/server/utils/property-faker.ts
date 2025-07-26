@@ -217,11 +217,11 @@ export const generateUtility = (): Prisma.UtilityCreateWithoutPropertyInput => {
  * Generate media objects for a specific room type
  *
  * @param roomId - The ID of the room to link the media to
- * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom)
+ * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom, frontGarden, rearGarden)
  * @param roomName - The display name of the room (for metadata)
  * @returns Array of media objects
  */
-export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
+export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom' | 'frontGarden' | 'rearGarden', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
   const mediaCount = faker.number.int({ min: 1, max: 3 });
   return Array.from({ length: mediaCount }, () => {
     // Use realistic real estate image dimensions
@@ -255,6 +255,12 @@ export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bath
       case 'otherRoom':
         mediaData.otherRoomId = roomId;
         break;
+      case 'frontGarden':
+        mediaData.frontGardenId = roomId
+        break;
+      case 'rearGarden':
+        mediaData.rearGardenId = roomId
+        break;
     }
 
     return mediaData;
@@ -287,16 +293,33 @@ export const generateGeneralMedia = (imageType: string): Prisma.MediaUncheckedCr
 /**
  * Generate a random number of outdoor space objects
  *
- * @returns Random OutdoorSpace object
+ * @returns Random RearGarden object
  */
-export const generateOutDoorSpace = (): Prisma.OutdoorSpaceCreateWithoutPropertyInput => {
+export const generateRearGarden = (): Prisma.RearGardenCreateWithoutPropertyInput => {
   return {
     description: faker.word.words(10),
-    totalSize: faker.number.int({ min: 10, max: 50 }),
-    frontGarden: faker.datatype.boolean(),
-    frontGardenSize: faker.number.int({ min: 10, max: 50 }),
-    rearGarden: faker.datatype.boolean(),
-    rearGardenSize: faker.number.int({ min: 10, max: 50 }),
+    size: faker.number.int({ min: 10, max: 100 }),
+    sunTerrace: faker.datatype.boolean(),
+    terrace: faker.datatype.boolean(),
+    balcony: faker.datatype.boolean(),
+    patio: faker.datatype.boolean(),
+    separateParcel: faker.datatype.boolean(),
+    shed: faker.datatype.boolean(),
+    summerHouse: faker.datatype.boolean(),
+    gardenOffice: faker.datatype.boolean(),
+    pool: faker.datatype.boolean(),
+  };
+};
+
+/**
+ * Generate a random number of outdoor space objects
+ *
+ * @returns Random FrontGarden object
+ */
+export const generateFrontGarden = (): Prisma.FrontGardenCreateWithoutPropertyInput => {
+  return {
+    description: faker.word.words(10),
+    size: faker.number.int({ min: 10, max: 100 }),
     sunTerrace: faker.datatype.boolean(),
     terrace: faker.datatype.boolean(),
     balcony: faker.datatype.boolean(),
@@ -464,9 +487,12 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       utility: {
         create: generateUtility(),
       },
-      outdoorSpace: {
-        create: generateOutDoorSpace(),
-      },
+      frontGarden: faker.datatype.boolean({ probability: 0.7 }) ? {
+        create: generateFrontGarden(),
+      } : undefined,
+      rearGarden: faker.datatype.boolean({ probability: 0.8 }) ? {
+        create: generateRearGarden(),
+      } : undefined,
       parking: {
         create: generateParking(),
       },
@@ -512,7 +538,8 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       otherRoom: true,
       reception: true,
       kitchenFeatures: true,
-      outdoorSpace: true,
+      rearGarden: true,
+      frontGarden: true,
       utility: true,
     },
   });
@@ -548,14 +575,19 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     mediaToCreate.push(...generateMediaForRoom(otherRoom.id, 'otherRoom', `Other Room ${otherRoom.roomNumber}`));
   });
   
+  // Front garden media
+  if (propertyWithFeatures.frontGarden) {
+    mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.frontGarden.id), 'frontGarden', 'Front Garden'));
+  }
+  
+  // Rear garden media
+  if (propertyWithFeatures.rearGarden) {
+    mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.rearGarden.id), 'rearGarden', 'Rear Garden'));
+  }
+  
   // Kitchen media (general property media since it's not room-specific)
   if (propertyWithFeatures.kitchenFeatures) {
     mediaToCreate.push(generateGeneralMedia('Kitchen'));
-  }
-  
-  // Outdoor space media (general property media)
-  if (propertyWithFeatures.outdoorSpace) {
-    mediaToCreate.push(generateGeneralMedia('Outdoor Space'));
   }
   
   // Utility media (general property media)
@@ -564,7 +596,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   }
 
   // Create all media and update location in parallel
-  const [, updateLocation] = await Promise.all([
+  await Promise.all([
     // Batch create all media
     mediaToCreate.length > 0 ? prisma.media.createMany({
       data: mediaToCreate.map(media => ({
@@ -582,7 +614,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     address: propertyWithFeatures.address,
   };
 
-  const location = await getLocationByAddressIdForSeed(property.addressId);
+  await getLocationByAddressIdForSeed(property.addressId);
 
   return property;
 };

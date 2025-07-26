@@ -17,7 +17,7 @@
     <div class="o-listing-section-location__amenities-section">
       <!-- Not logged in: Show original hero + blurred amenities -->
       <template v-if="!loggedIn">
-        <div class="o-listing-section-location__amenities-hero">
+        <AtomsHeroCard>
           <h2 class="| title-md">Know your stuff ahead of time!</h2>
           <p class="| body-md">
             Check out the nearby amenities to see what's around your potential
@@ -28,7 +28,7 @@
           </p>
           <button
             @click="openLogin"
-            class="o-listing-section-location__amenities-hero__link | button button-secondary"
+            class="| button button-secondary"
           >
             Sign In to Access
           </button>
@@ -36,7 +36,7 @@
             <strong>Note:</strong> Amenities are approximate and may not be
             exhaustive. Always verify with local sources.
           </p>
-        </div>
+        </AtomsHeroCard>
 
         <MoleculesListingAmenitiesPreview :show-overlay="false">
           <template #content>
@@ -161,27 +161,6 @@ onMounted(() => {
     }
   }
 
-  &__amenities-hero {
-    border-radius: var(--border-radius-2xl);
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-around;
-    padding: var(--size-32);
-    background: url("/img/logo-background.svg") no-repeat bottom right,
-      var(--blue-400);
-    background-size: auto, cover;
-    color: var(--monochrome-900);
-    gap: var(--size-8);
-
-
-    &__link {
-      margin: var(--size-16) 0;
-      color: var(--foreground-100);
-    }
-  }
 
   &__amenities-blurred {
     filter: blur(var(--size-8));

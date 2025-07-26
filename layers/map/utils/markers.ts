@@ -182,7 +182,8 @@ export function convertListingsToMarkers(listings: any[]): any[] {
         accessibilityFeatures: listing.property?.accessibilityFeatures || null,
         additionalFeatures: listing.property?.additionalFeatures || null,
         parking: listing.property?.parking || null,
-        outdoorSpace: listing.property?.outdoorSpace || null,
+        rearGarden: listing.property?.rearGarden || null,
+        frontGarden: listing.property?.frontGarden || null,
       },
       user: listing.user,
     }));

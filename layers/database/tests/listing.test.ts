@@ -53,7 +53,6 @@ const baseListing = {
     numberBedrooms: 2,
     numberBathrooms: 1,
     parking: { evCharging: true, garage: false },
-    outdoorSpace: { frontGarden: true, rearGarden: false },
   },
 };
 

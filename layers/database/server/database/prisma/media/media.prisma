@@ -1,21 +1,25 @@
 model Media {
-  id          Int        @id @default(autoincrement())
-  image       String?
-  videoTour   String?
-  floorPlan   String?
-  metadata    String
-  propertyId  Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  property    Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  bedroom     Bedroom?   @relation(fields: [bedroomId], references: [id])
-  bathroom    Bathroom?  @relation(fields: [bathroomId], references: [id])
-  reception   Reception? @relation(fields: [receptionId], references: [id])
-  otherRoom   OtherRoom? @relation(fields: [otherRoomId], references: [id])
-  bedroomId   Int?
-  bathroomId  Int?
-  receptionId Int?
-  otherRoomId Int?
+  id            Int          @id @default(autoincrement())
+  image         String?
+  videoTour     String?
+  floorPlan     String?
+  metadata      String
+  propertyId    Int
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  property      Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  bedroom       Bedroom?     @relation(fields: [bedroomId], references: [id])
+  bathroom      Bathroom?    @relation(fields: [bathroomId], references: [id])
+  reception     Reception?   @relation(fields: [receptionId], references: [id])
+  otherRoom     OtherRoom?   @relation(fields: [otherRoomId], references: [id])
+  bedroomId     Int?
+  bathroomId    Int?
+  receptionId   Int?
+  otherRoomId   Int?
+  FrontGarden   FrontGarden? @relation(fields: [frontGardenId], references: [id])
+  frontGardenId Int?
+  RearGarden    RearGarden?  @relation(fields: [rearGardenId], references: [id])
+  rearGardenId  Int?
 
   @@index([propertyId])
 }

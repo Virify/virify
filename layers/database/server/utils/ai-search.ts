@@ -315,11 +315,9 @@ otherRoom (property.otherRoom): ARRAY (use {some: {...}})
 - hardwoodFlooring: Boolean
 - builtInDesk: Boolean
 
-outdoorSpace (property.outdoorSpace):
-- frontGarden: Boolean
-- frontGardenSize: Float
-- rearGarden: Boolean
-- rearGardenSize: Float
+rearGarden (property.rearGarden):
+- size: Float
+- description: String
 - sunTerrace: Boolean
 - terrace: Boolean
 - balcony: Boolean
@@ -329,8 +327,19 @@ outdoorSpace (property.outdoorSpace):
 - summerHouse: Boolean
 - gardenOffice: Boolean
 - pool: Boolean
+
+frontGarden (property.frontGarden):
+- size: Float
 - description: String
-- totalSize: Float
+- sunTerrace: Boolean
+- terrace: Boolean
+- balcony: Boolean
+- patio: Boolean
+- separateParcel: Boolean
+- shed: Boolean
+- summerHouse: Boolean
+- gardenOffice: Boolean
+- pool: Boolean
 
 parking (property.parking):
 - garage: Boolean
@@ -416,10 +425,10 @@ ARRAY/RELATION/ENUM RULES:
 - For enum arrays (primaryHeatingType, renewables, connectedUtilities, bed): use {"has": "ENUM_VALUE"}
 - For single-value enums (e.g., broadbandType, boilerType, hotWaterSource): filter as { field: "ENUM_VALUE" } (e.g., { "broadbandType": "FTTP" })
 - NEVER use { "has": ... } for single-value enums. Only use { "has": ... } for enum arrays (e.g., primaryHeatingType, renewables, connectedUtilities, bed).
-- For single object relations (kitchenFeatures, outdoorSpace, etc.): you MUST use the Prisma relation filter syntax: { relationName: { is: { field: value } } } (e.g., property.outdoorSpace: { is: { rearGarden: true } })
+- For single object relations (kitchenFeatures, rearGarden, frontGarden, etc.): you MUST use the Prisma relation filter syntax: { relationName: { is: { field: value } } } or { relationName: { isNot: null } } for existence (e.g., property.rearGarden: { isNot: null } or property.rearGarden: { is: { patio: true } })
 - DO NOT use additionalFeatures as a filter in the query. The additionalFeatures relation is NOT available as a filter in the Prisma PropertyWhereInput type. Any query that attempts to filter by property.additionalFeatures will cause a FATAL ERROR and must be rejected. This includes filtering for petFriendly, homeOffice, or any other field inside additionalFeatures. These cannot be filtered directly and must be ignored in the query.
 - For type/classification: use {name: "..."} (e.g., property.type: {name: "House"})
-- NEVER use invented fields (e.g., garden: true is INVALID; use property.outdoorSpace.rearGarden: true)
+- NEVER use invented fields (e.g., garden: true is INVALID; use property.rearGarden: { isNot: null } or property.frontGarden: { isNot: null } for existence)
 - NEVER use "has" for object relations; only for enum arrays
 - saleListing and rentalListing (and all their fields, e.g. furnished) MUST ONLY appear at the ROOT level of the query, NEVER inside property or any nested object. Any query with saleListing or rentalListing inside property is INVALID.
 - Respond with ONLY valid JSON, no comments, no markdown
@@ -551,7 +560,7 @@ EXAMPLES:
   "whereClause": {
     "published": true,
     "property": {
-      "outdoorSpace": {"rearGarden": true},
+      "rearGarden": { "isNot": null },
       "parking": {"driveway": true}
     }
   },
@@ -708,7 +717,7 @@ EXAMPLES:
 //     "property": {
 //       "type": { "name": "House" },
 //       // petFriendly cannot be filtered directly due to Prisma limitations
-//       "outdoorSpace": { "is": { "rearGarden": true } }
+//       "rearGarden": { "isNot": null }
 //     }
 //   },
 //   "queryAnalysis": { "usedTerms": ["pet friendly", "house", "garden"], "ignoredTerms": ["pet friendly"] }
@@ -721,7 +730,8 @@ EXAMPLES:
 //     "property": {
 //       "type": { "name": "House" },
 //       // petFriendly cannot be filtered directly due to Prisma limitations
-//       "outdoorSpace": { "is": { "frontGarden": true, "rearGarden": true } }
+//       "rearGarden": { "isNot": null },
+//       "frontGarden": { "isNot": null }
 //     }
 //   },
 //   "queryAnalysis": { "usedTerms": ["pet friendly", "house", "gardens"], "ignoredTerms": ["pet friendly"] }
