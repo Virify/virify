@@ -198,13 +198,14 @@ export const generateUtility = (): Prisma.UtilityCreateWithoutPropertyInput => {
 };
 
 /**
- * Generate media objects for a specific feature
+ * Generate media objects for a specific room type
  *
- * @param featureId - The ID of the feature to link the media to
- * @param roomType - The type of room (for better metadata)
+ * @param roomId - The ID of the room to link the media to
+ * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom)
+ * @param roomName - The display name of the room (for metadata)
  * @returns Array of media objects
  */
-export const generateMediaForFeature = (featureId: number, roomType: string): Prisma.MediaCreateWithoutPropertyInput[] => {
+export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
   const mediaCount = faker.number.int({ min: 1, max: 3 });
   return Array.from({ length: mediaCount }, () => {
     // Use realistic real estate image dimensions
@@ -213,18 +214,58 @@ export const generateMediaForFeature = (featureId: number, roomType: string): Pr
     const width = 2048;
     const height = 1536;
     
-    return {
+    const mediaData: Prisma.MediaUncheckedCreateWithoutPropertyInput = {
       image: faker.image.urlPicsumPhotos({ width, height }),
       metadata: JSON.stringify({
-        alt: `${roomType} - ${faker.word.words(3)}`,
+        alt: `${roomName} - ${faker.word.words(3)}`,
         description: faker.word.words(5),
-        roomType: roomType,
+        roomType: roomName,
         dimensions: `${width}x${height}`,
         aspectRatio: '4:3'
       }),
-      featureId: featureId,
     };
+
+    // Set the appropriate room ID based on room type
+    switch (roomType) {
+      case 'bedroom':
+        mediaData.bedroomId = roomId;
+        break;
+      case 'bathroom':
+        mediaData.bathroomId = roomId;
+        break;
+      case 'reception':
+        mediaData.receptionId = roomId;
+        break;
+      case 'otherRoom':
+        mediaData.otherRoomId = roomId;
+        break;
+    }
+
+    return mediaData;
   });
+};
+
+/**
+ * Generate general property media (not tied to specific rooms)
+ *
+ * @param imageType - The type of general image (Exterior, Hallway, etc.)
+ * @returns Media object
+ */
+export const generateGeneralMedia = (imageType: string): Prisma.MediaUncheckedCreateWithoutPropertyInput => {
+  const width = 2048;
+  const height = 1536;
+  
+  return {
+    image: faker.image.urlPicsumPhotos({ width, height }),
+    metadata: JSON.stringify({
+      alt: `${imageType} - ${faker.word.words(3)}`,
+      description: faker.word.words(5),
+      roomType: imageType,
+      dimensions: `${width}x${height}`,
+      aspectRatio: '4:3'
+    }),
+    // No room IDs set - this is general property media
+  };
 };
 
 /**
@@ -452,6 +493,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       address: true,
       bedroomFeatures: true,
       bathroomFeatures: true,
+      otherRoom: true,
       reception: true,
       kitchenFeatures: true,
       outdoorSpace: true,
@@ -460,58 +502,49 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   });
 
   // Now create media for each feature
-  const mediaToCreate: Prisma.MediaCreateWithoutPropertyInput[] = [];
+  const mediaToCreate: Prisma.MediaUncheckedCreateWithoutPropertyInput[] = [];
   
-  // General property images (exterior, hallways, etc.) - use featureId = 0
-  const generalImageTypes = ['Exterior', 'Hallway', 'Staircase', 'Entrance', 'Overview'];
+  // General property images (exterior, hallways, etc.)
+  const generalImageTypes = ['Exterior', 'Hallway', 'Staircase', 'Entrance', 'Overview', 'Garden', 'Street View'];
   const generalImageCount = faker.number.int({ min: 2, max: 5 });
   for (let i = 0; i < generalImageCount; i++) {
     const imageType = faker.helpers.arrayElement(generalImageTypes);
-    // Use realistic real estate image dimensions
-    const width = 2048;
-    const height = 1536;
-    
-    mediaToCreate.push({
-      image: faker.image.urlPicsumPhotos({ width, height }),
-      metadata: JSON.stringify({
-        alt: `${imageType} - ${faker.word.words(3)}`,
-        description: faker.word.words(5),
-        roomType: imageType,
-        dimensions: `${width}x${height}`,
-        aspectRatio: '4:3'
-      }),
-      featureId: 0, // 0 indicates general property images
-    });
+    mediaToCreate.push(generateGeneralMedia(imageType));
   }
   
   // Bedroom media
   propertyWithFeatures.bedroomFeatures.forEach((bedroom: { id: number; roomNumber: any; }) => {
-    mediaToCreate.push(...generateMediaForFeature(bedroom.id, `Bedroom ${bedroom.roomNumber}`));
+    mediaToCreate.push(...generateMediaForRoom(bedroom.id, 'bedroom', `Bedroom ${bedroom.roomNumber}`));
   });
   
   // Bathroom media
   propertyWithFeatures.bathroomFeatures.forEach((bathroom: { id: number; roomNumber: any; }) => {
-    mediaToCreate.push(...generateMediaForFeature(bathroom.id, `Bathroom ${bathroom.roomNumber}`));
+    mediaToCreate.push(...generateMediaForRoom(bathroom.id, 'bathroom', `Bathroom ${bathroom.roomNumber}`));
   });
   
   // Reception media
   propertyWithFeatures.reception.forEach((reception: { id: number; roomNumber: any; }) => {
-    mediaToCreate.push(...generateMediaForFeature(reception.id, `Reception ${reception.roomNumber}`));
+    mediaToCreate.push(...generateMediaForRoom(reception.id, 'reception', `Reception ${reception.roomNumber}`));
+  });
+
+  // Other room media
+  propertyWithFeatures.otherRoom.forEach((otherRoom: { id: number; roomNumber: any; }) => {
+    mediaToCreate.push(...generateMediaForRoom(otherRoom.id, 'otherRoom', `Other Room ${otherRoom.roomNumber}`));
   });
   
-  // Kitchen media
+  // Kitchen media (general property media since it's not room-specific)
   if (propertyWithFeatures.kitchenFeatures) {
-    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.kitchenFeatures.id, 'Kitchen'));
+    mediaToCreate.push(generateGeneralMedia('Kitchen'));
   }
   
-  // Outdoor space media
+  // Outdoor space media (general property media)
   if (propertyWithFeatures.outdoorSpace) {
-    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.outdoorSpace.id, 'Outdoor Space'));
+    mediaToCreate.push(generateGeneralMedia('Outdoor Space'));
   }
   
-  // Utility media
+  // Utility media (general property media)
   if (propertyWithFeatures.utility) {
-    mediaToCreate.push(...generateMediaForFeature(propertyWithFeatures.utility.id, 'Utility'));
+    mediaToCreate.push(generateGeneralMedia('Utility'));
   }
 
   // Create all media

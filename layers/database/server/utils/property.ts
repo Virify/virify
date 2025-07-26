@@ -1,28 +1,43 @@
 import type { Fullproperty } from "~~/shared/types/property";
 import type { Property } from "../database/prisma/generated/client";
-import type { PropertyInclude } from "../database/prisma/generated/models";
 
-export const propertyInclude: PropertyInclude = {
+export const propertyInclude = {
   address: true,
   media: true,
   type: true,
   classification: true,
-  bedroomFeatures: true,
-  bathroomFeatures: true,
-  otherRoom: true,
+  bedroomFeatures: {
+    include: {
+      media: true,
+    },
+  },
+  bathroomFeatures: {
+    include: {
+      media: true,
+    },
+  },
+  otherRoom: {
+    include: {
+      media: true,
+    },
+  },
   parking: true,
   amenities: true,
   additionalFeatures: true,
   accessibilityFeatures: true,
   kitchenFeatures: true,
-  reception: true,
+  reception: {
+    include: {
+      media: true,
+    },
+  },
   utility: true,
   outdoorSpace: true,
   energyAndUtilities: true,
   securityFeatures: true,
   storageFeatures: true,
   runningCosts: true,
-};
+} as const;
 
 /**
  * Get a property by ID

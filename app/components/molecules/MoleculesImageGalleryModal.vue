@@ -5,7 +5,6 @@
     <div class="image-gallery-modal__container" @click.stop>
       <!-- Close Button -->
       <div class="image-gallery-modal__header">
-        <p class="| body-sm">Total Images: {{ images.length }}</p>
         <button class="image-gallery-modal__close" @click="closeModal">
           <AtomsIcon icon="cross" :size="24" />
         </button>
@@ -209,9 +208,9 @@ onUnmounted(() => {
   &__header {
     color: var(--monochrome-900);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    padding: var(--size-16) var(--size-24) 0 var(--size-24);
+    padding: var(--size-12) var(--size-24) 0 var(--size-24);
   }
 
   &__close {
@@ -225,6 +224,7 @@ onUnmounted(() => {
   &__grid {
     flex: 1;
     padding: var(--size-16);
+    padding-top: 0;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: max-content;
@@ -233,6 +233,7 @@ onUnmounted(() => {
 
     @include mq.tablet {
       padding: var(--size-24);
+      padding-top: 0;
       grid-template-columns: repeat(3, 1fr);
       gap: var(--size-20);
     }

@@ -50,7 +50,12 @@
               :description="property?.description || undefined"
             />
 
-            <MoleculesListingRoomSummary :room-configs="roomConfigs" />
+            <MoleculesListingRoomSummary
+              :bedrooms="property?.bedroomFeatures"
+              :bathrooms="property?.bathroomFeatures"
+              :receptions="property?.reception"
+              :other-rooms="property?.otherRoom"
+            />
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
@@ -150,11 +155,6 @@ const priceFormatted = computed(() => {
 const fullAddress = computed(() => {
   return property.value?.address?.fullAddress || "No address provided";
 });
-
-const roomConfigs = computed(() => generateRoomConfig(property.value));
-
-
-
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {

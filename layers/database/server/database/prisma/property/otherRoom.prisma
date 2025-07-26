@@ -26,6 +26,7 @@ model OtherRoom {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   property         Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  media            Media[]
 
   @@index([propertyId])
 }

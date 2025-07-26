@@ -164,6 +164,7 @@ onMounted(() => {
   &__amenities-hero {
     border-radius: var(--border-radius-2xl);
     width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
