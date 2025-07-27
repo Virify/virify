@@ -1,5 +1,5 @@
 model FrontGarden {
-  id             Int           @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   description    String?
   size           Float?
   sunTerrace     Boolean  @default(false)

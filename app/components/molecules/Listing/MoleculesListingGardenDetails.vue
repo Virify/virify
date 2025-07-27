@@ -1,38 +1,47 @@
 <template>
-  <div class="room-details">
-    <h2 class="| title-sm">{{ roomTitle }}</h2>
-    <ul class="room-details__list">
-      <li v-for="(room, index) in roomsArray" :key="index" class="room-details__item">
-        <div class="room-details__item-image">
-          <nuxt-img v-if="room.media[0]" :src="room.media[0].image!" :alt="room.media[0].metadata!"
+  <!-- Garden details section with cards for each garden -->
+  <div class="garden-details">
+    <!-- Section title with garden count -->
+    <h2 class="| title-sm">{{ gardenTitle }}</h2>
+
+    <!-- List of garden cards -->
+    <ul class="garden-details__list">
+      <li v-for="(garden, index) in gardens" :key="index" class="garden-details__item">
+
+        <!-- Garden image -->
+        <div class="garden-details__item-image">
+          <nuxt-img v-if="garden.media[0]" :src="garden.media[0].image!" :alt="garden.media[0].metadata!"
             class="| image-sm" />
         </div>
-        <div class="room-details__item-content | body-sm">
-          <p class="room-details__item-content-type | font-semibold">
-            <span class="room-details__item-title-wrapper">
-              <AtomsIcon :icon="getRoomIconForType(room)" :size="20" class="room-details__type-icon" />
-              {{ getRoomType(room) }}
+
+        <!-- Garden content -->
+        <div class="garden-details__item-content | body-sm">
+
+          <!-- Garden type header with icon and info button -->
+          <p class="garden-details__item-content-type | font-semibold">
+            <span class="garden-details__item-title-wrapper">
+              <AtomsIcon :icon="getGardenIcon(garden)" :size="20" class="garden-details__type-icon" />
+              {{ getGardenType(garden) }}
             </span>
-            <button v-if="room.description" @click="toggleDescription(index, $event)"
+            <!-- Info button to show description modal (only if description exists) -->
+            <button v-if="garden.description" @click="toggleDescription(index, $event)"
               class="button button-xs button-quiet" type="button"
-              :aria-label="`Show description for ${getRoomType(room)}`">
+              :aria-label="`Show description for ${getGardenType(garden)}`">
               <AtomsIcon icon="property/info" :size="18" />
             </button>
           </p>
-          <div class="room-details__item-header">
-            <p class="room-details__item-detail">
-              <AtomsIcon icon="property/size" :size="24" class="room-details__icon" />
-              {{ room.size }}sqmt
-            </p>
-            <p v-if="'floor' in room && room.floor !== undefined" class="room-details__item-detail">
-              <AtomsIcon icon="property/floor" :size="24" class="room-details__icon" />
-              {{ getFloorText((room as any).floor) }}
-            </p>
-          </div>
-          <div class="room-details__item-features" v-if="getFeatures(room).length > 0">
-            <AtomsIcon icon="property/feature" :size="24" class="room-details__icon" />
-            <div class="room-details__item-features-pills">
-              <AtomsPill v-for="feature in getFeatures(room)" :key="feature" class="| body-xs">
+
+          <!-- Garden size (only if size exists) -->
+          <p v-if="garden.size" class="garden-details__item-detail">
+            <AtomsIcon icon="property/size" :size="24" class="garden-details__icon" />
+            {{ garden.size }}sqmt
+          </p>
+
+          <!-- Garden features as pills (only if features exist) -->
+          <div class="garden-details__item-features" v-if="getFeatures(garden).length > 0">
+            <AtomsIcon icon="property/feature" :size="24" class="garden-details__icon" />
+            <div class="garden-details__item-features-pills">
+              <AtomsPill v-for="feature in getFeatures(garden)" :key="feature" class="| body-xs">
                 {{ feature }}
               </AtomsPill>
             </div>
@@ -42,52 +51,56 @@
     </ul>
   </div>
 
+  <!-- Description modal teleported to body for proper positioning -->
   <Teleport to="body">
-    <div v-if="activeDescription !== null && roomsArray[activeDescription as number]?.description"
-      class="room-description-modal" :style="modalPosition" @click.stop>
-      <p class="| body-xs">{{ roomsArray[activeDescription as number]?.description }}</p>
-      <button @click="closeDescription" class="room-description-modal__close" type="button"
+    <div v-if="activeDescription !== null && gardens[activeDescription]?.description" class="garden-description-modal"
+      :style="modalPosition" @click.stop>
+      <!-- Garden description text -->
+      <p class="| body-xs">{{ gardens[activeDescription]?.description }}</p>
+      <!-- Close button -->
+      <button @click="closeDescription" class="garden-description-modal__close" type="button"
         aria-label="Close description">
         <AtomsIcon icon="property/close" :size="14" />
       </button>
     </div>
   </Teleport>
+
 </template>
 
 <script setup lang="ts">
 import type { Prisma } from '~~/layers/database/server/database/prisma/generated/client';
 
 interface Props {
-  title: string;
-  type: string;
-  rooms: Prisma.BedroomGetPayload<{ include: { media: true } }>[] |
-  Prisma.BathroomGetPayload<{ include: { media: true } }>[] |
-  Prisma.ReceptionGetPayload<{ include: { media: true } }>[] |
-  Prisma.OtherRoomGetPayload<{ include: { media: true } }>[] |
-  Prisma.KitchenGetPayload<{ include: { media: true } }> |
-  null |
-  undefined;
+  frontGarden?: Prisma.FrontGardenGetPayload<{ include: { media: true } }> | null;
+  rearGarden?: Prisma.RearGardenGetPayload<{ include: { media: true } }> | null;
 }
+
 const props = defineProps<Props>();
 
-const roomsArray = computed(() => {
-  if (!props.rooms) {
-    return [];
+// Computed properties
+const gardens = computed(() => {
+  const gardenList = [];
+  if (props.frontGarden) {
+    gardenList.push({ ...props.frontGarden, gardenType: 'front' });
   }
-  if (Array.isArray(props.rooms)) {
-    return props.rooms;
+  if (props.rearGarden) {
+    gardenList.push({ ...props.rearGarden, gardenType: 'rear' });
   }
-  return [props.rooms];
+  return gardenList;
 });
 
-const roomTitle = computed(() => `${props.title} (${roomsArray.value.length})`);
+const gardenTitle = computed(() => {
+  const count = gardens.value.length;
+  return count === 1 ? 'Garden (1)' : `Gardens (${count})`;
+});
 
 // Description modal state
 const activeDescription = ref<number | null>(null);
 const modalPosition = ref({});
 
-const getRoomIconForType = (room: any): string => {
-  return getRoomTypeIcon(room, props.type);
+// Helper functions
+const getGardenIcon = (garden: any): string => {
+  return getGardenTypeIcon(garden.gardenType);
 };
 
 // Description modal methods
@@ -103,7 +116,7 @@ const toggleDescription = (index: number, event: Event) => {
   modalPosition.value = {
     position: 'fixed',
     top: `${rect.bottom + 8}px`,
-    left: `${rect.left - 200}px`,
+    left: `${rect.left - 200}px`, // Position to the left of the icon
     zIndex: 1000
   };
 
@@ -134,8 +147,8 @@ onMounted(() => {
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
-.room-details {
-  margin: var(--size-32) 0;
+.garden-details {
+  margin-top: var(--size-16);
 
   &__list {
     list-style: none;
@@ -145,12 +158,10 @@ onMounted(() => {
     flex-direction: row;
     gap: var(--size-16);
     margin: var(--size-16) 0;
-    flex-wrap: wrap;
 
     @include mq.mobile-only {
-      justify-content: center;
-      align-items: center;
-      width: 100%;
+      flex-direction: column;
+      gap: var(--size-12);
     }
   }
 
@@ -174,7 +185,7 @@ onMounted(() => {
       aspect-ratio: 16 / 9;
 
       img {
-        width: 100%;
+        width: 300px;
       }
 
       @include mq.mobile-only {
@@ -186,7 +197,6 @@ onMounted(() => {
 
     &-content {
       padding: var(--size-16);
-      position: relative;
 
       &-type {
         text-transform: capitalize;
@@ -203,17 +213,14 @@ onMounted(() => {
       gap: var(--size-8);
     }
 
-    &-header {
-      display: flex;
-      align-items: center;
-      gap: var(--size-16);
-      margin: var(--size-8) 0;
-    }
-
     &-detail {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: var(--size-8);
+
+      .a-icon {
+        flex-shrink: 0;
+      }
     }
 
     &-features {
@@ -249,7 +256,7 @@ onMounted(() => {
 }
 
 /* Modal styles (teleported to body) */
-.room-description-modal {
+.garden-description-modal {
   background: var(--background-100);
   border: 1px solid var(--monochrome-600);
   border-radius: var(--border-radius-md);

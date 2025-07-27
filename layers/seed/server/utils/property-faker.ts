@@ -217,11 +217,11 @@ export const generateUtility = (): Prisma.UtilityCreateWithoutPropertyInput => {
  * Generate media objects for a specific room type
  *
  * @param roomId - The ID of the room to link the media to
- * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom, frontGarden, rearGarden)
+ * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom, frontGarden, rearGarden, kitchen)
  * @param roomName - The display name of the room (for metadata)
  * @returns Array of media objects
  */
-export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom' | 'frontGarden' | 'rearGarden', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
+export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom' | 'frontGarden' | 'rearGarden' | 'kitchen', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
   const mediaCount = faker.number.int({ min: 1, max: 3 });
   return Array.from({ length: mediaCount }, () => {
     // Use realistic real estate image dimensions
@@ -260,6 +260,9 @@ export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bath
         break;
       case 'rearGarden':
         mediaData.rearGardenId = roomId
+        break;
+      case 'kitchen':
+        mediaData.kitchenId = roomId;
         break;
     }
 
@@ -585,9 +588,9 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.rearGarden.id), 'rearGarden', 'Rear Garden'));
   }
   
-  // Kitchen media (general property media since it's not room-specific)
+  // Kitchen media
   if (propertyWithFeatures.kitchenFeatures) {
-    mediaToCreate.push(generateGeneralMedia('Kitchen'));
+    mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.kitchenFeatures.id), 'kitchen', 'Kitchen'));
   }
   
   // Utility media (general property media)

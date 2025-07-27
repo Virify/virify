@@ -5,131 +5,97 @@
     </div>
 
     <div v-else class="p-listing" role="presentation">
-      <div
-        ref="$mobile-carousel"
-        class="p-listing__main-carousel p-listing__main-carousel--mobile"
-        role="presentation"
-      >
-        <skeleton-loader
-          class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile"
-        >
-          <MoleculesImageGallery
-            v-if="!isDesktop && galleryImages.length > 0"
-            :images="galleryImages"
-            @open-modal="openImageModal"
-          />
+      <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
+        <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
+          <MoleculesImageGallery v-if="!isDesktop && galleryImages.length > 0" :images="galleryImages"
+            @open-modal="openImageModal" />
         </skeleton-loader>
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
         <div class="p-listing__content | flow flow-sm">
-          <div
-            ref="$desktop-carousel"
-            class="p-listing__main-carousel p-listing__main-carousel--desktop"
-            role="presentation"
-          >
+          <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
+            role="presentation">
             <skeleton-loader class="p-listing__main-carousel-skeleton">
-              <MoleculesImageGallery
-                v-if="isDesktop && galleryImages.length > 0"
-                :images="galleryImages"
-                @open-modal="openImageModal"
-              />
+              <MoleculesImageGallery v-if="isDesktop && galleryImages.length > 0" :images="galleryImages"
+                @open-modal="openImageModal" />
             </skeleton-loader>
           </div>
 
-          <OrganismsListingOverview
-            ref="$overview"
-            class="p-listing__mobile-overview"
-            :price="priceFormatted"
-            :address="fullAddress"
-          />
+          <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
+            :address="fullAddress" />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
-            <OrganismsListingGeneralInfo
-              :description="property?.description || undefined"
-            />
+            <OrganismsListingGeneralInfo :description="property?.description || undefined" />
 
-            <MoleculesListingRoomSummary
-              :bedrooms="property?.bedroomFeatures"
-              :bathrooms="property?.bathroomFeatures"
-              :receptions="property?.reception"
-              :other-rooms="property?.otherRoom"
-            />
+            <MoleculesListingRoomSummary :bedrooms="property?.bedroomFeatures" :bathrooms="property?.bathroomFeatures"
+              :receptions="property?.reception" :other-rooms="property?.otherRoom" />
+
+            <div v-if="property" class="p-listing__section">
+              <MoleculesListingRoomDetails :rooms="property?.bedroomFeatures" type="Bedroom" title="Bedrooms" />
+              <MoleculesListingRoomDetails :rooms="property?.bathroomFeatures" type="Bathroom" title="Bathrooms" />
+              <MoleculesListingRoomDetails :rooms="property?.kitchenFeatures" type="Kitchen" title="Kitchen" />
+              <MoleculesListingRoomDetails :rooms="property?.reception" type="Reception" title="Receptions" />
+              <MoleculesListingRoomDetails :rooms="property?.otherRoom" type="Other Rooms" title="Other Rooms" />
+            </div>
+
+            <div v-if="property?.rearGarden || property?.frontGarden" class="p-listing__section">
+              <MoleculesListingGardenDetails :rear-garden="property?.rearGarden"
+                :front-garden="property?.frontGarden" />
+            </div>
+
+            <div v-if="property" class="p-listing__section">
+              <h2 class="title-md">Additional Details</h2>
+              <div class="p-listing__features-list">
+                <MoleculesListingFeatures v-if="property?.parking" title="Parking" :features="property?.parking" />
+                <MoleculesListingFeatures v-if="property?.accessibilityFeatures" title="Accessibility" :features="property?.accessibilityFeatures" />
+                <MoleculesListingFeatures v-if="property?.utility" title="Utility" :features="property?.utility" />
+                <MoleculesListingFeatures v-if="property?.securityFeatures" title="Security" :features="property?.securityFeatures" />
+                <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage" :features="property?.storageFeatures" />
+                <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features" :features="property?.additionalFeatures" />
+              </div>
+            </div>
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
-            <OrganismsListingSectionLocation
-              :lat="property?.address?.lat!"
-              :lon="property?.address?.lon!"
-              :listing="listing"
-              :amenities="amenitiesArray"
-            />
+            <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!"
+              :listing="listing" :amenities="amenitiesArray" />
           </div>
 
-          <div v-if="property" class="p-listing__section">
-            <h2 class="title-md">Room Details</h2>
-            <p class="| body-md">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Magni dicta earum minus, voluptate libero blanditiis distinctio quae quasi expedita aliquid. Odit officia iusto eligendi quod totam saepe dolorem dolorum nobis.</p>
-            <MoleculesListingRoomDetails :rooms="property?.bedroomFeatures" type="Bedroom" title="Bedrooms" />
-            <MoleculesListingRoomDetails :rooms="property?.bathroomFeatures" type="Bathroom" title="Bathrooms" />
-            <MoleculesListingRoomDetails :rooms="property?.reception" type="Reception" title="Receptions" />
-            <MoleculesListingRoomDetails :rooms="property?.otherRoom" type="Other Rooms" title="Other Rooms" />
-          </div>
+
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
           <Transition name="p-listing-images">
             <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
               <div class="p-listing__sidebar-carousel">
-                <MoleculesImageGallery
-                  v-if="galleryImages.length > 0"
-                  :images="galleryImages"
-                  @open-modal="openImageModal"
-                />
+                <MoleculesImageGallery v-if="galleryImages.length > 0" :images="galleryImages"
+                  @open-modal="openImageModal" />
               </div>
             </div>
           </Transition>
 
-          <OrganismsListingSidebar
-            :price="priceFormatted"
-            :listing-id="listing?.id || 0"
-            :address="fullAddress"
-            :property-type="property?.type?.name"
-            :property-size="property?.size || undefined"
-            :price-number="listing?.price || undefined"
-            :bedrooms="property?.numberBedrooms || undefined"
-            :bathrooms="property?.numberBathrooms || undefined"
-            :other-rooms="property?.numberOtherRooms || undefined"
-            :rear-garden="property?.rearGarden ? true : false"
-            :front-garden="property?.frontGarden ? true : false"
-            :receptions="property?.numberReceptions || undefined"
-            :classification="property?.classification?.name"
-            :year-built="property?.yearBuilt || undefined"
-            :construction-type="property?.constructionType || undefined"
-            :chain-free="property?.chainFree"
-            :vacant="property?.vacant"
-            :has-image-slide="!isImagesVisible"
-            :agent="listing?.user || {}"
-          />
+          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="fullAddress"
+            :property-type="property?.type?.name" :property-size="property?.size || undefined"
+            :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+            :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+            :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+            :chain-free="property?.chainFree" :vacant="property?.vacant" :has-image-slide="!isImagesVisible"
+            :agent="listing?.user || {}" />
         </div>
       </div>
     </div>
 
     <!-- Image Gallery Modal -->
-    <MoleculesImageGalleryModal
-      v-if="showImageModal"
-      :images="galleryImages"
-      :initial-index="modalImageIndex"
-      @close="closeImageModal"
-    />
+    <MoleculesImageGalleryModal v-if="showImageModal" :images="galleryImages" :initial-index="modalImageIndex"
+      @close="closeImageModal" />
 
     <client-only>
-      <OrganismsListingMobileBanner
-        v-if="!isDesktop"
-        :price="priceFormatted"
-        :overview-visible="isOverviewVisible"
-      />
+      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible" />
     </client-only>
   </main>
 </template>
@@ -403,5 +369,21 @@ ul {
   height: 0;
   margin: 0;
   transform: translateY(-100%);
+}
+
+.p-listing__section {
+  margin: var(--size-32) 0;
+}
+
+.p-listing__features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-16);
+  margin-top: var(--size-16);
+
+  @include mq.mobile-only {
+    flex-direction: column;
+    gap: var(--size-12);
+  }
 }
 </style>

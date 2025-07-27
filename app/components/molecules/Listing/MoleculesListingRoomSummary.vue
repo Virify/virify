@@ -25,6 +25,6 @@ onMounted(() => {
 
 <style lang="scss">
 .room-summary {
-  margin: var(--size-32) 0;
+  margin: 0;
 }
 </style>

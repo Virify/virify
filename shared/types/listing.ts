@@ -30,7 +30,11 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         amenities: true,
         additionalFeatures: true,
         accessibilityFeatures: true,
-        kitchenFeatures: true,
+        kitchenFeatures: {
+          include: {
+            media: true,
+          },
+        },
         reception: {
           include: {
             media: true,

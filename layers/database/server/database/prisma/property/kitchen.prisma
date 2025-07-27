@@ -12,6 +12,7 @@ model Kitchen {
   propertyId    Int      @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  media         Media[]
   property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])

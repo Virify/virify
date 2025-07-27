@@ -20,6 +20,8 @@ model Media {
   frontGardenId Int?
   RearGarden    RearGarden?  @relation(fields: [rearGardenId], references: [id])
   rearGardenId  Int?
+  Kitchen       Kitchen?     @relation(fields: [kitchenId], references: [id])
+  kitchenId     Int?
 
   @@index([propertyId])
 }
