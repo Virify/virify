@@ -158,6 +158,7 @@ onMounted(() => {
     flex-direction: row;
     gap: var(--size-16);
     margin: var(--size-16) 0;
+    flex-wrap: wrap;
 
     @include mq.mobile-only {
       flex-direction: column;
