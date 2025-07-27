@@ -29,20 +29,41 @@
           <div v-if="property" class="p-listing__section">
             <OrganismsListingGeneralInfo :description="property?.description || undefined" />
 
-            <MoleculesListingRoomSummary :bedrooms="property?.bedroomFeatures" :bathrooms="property?.bathroomFeatures"
-              :receptions="property?.reception" :other-rooms="property?.otherRoom" />
 
             <div v-if="property" class="p-listing__section">
-              <MoleculesListingRoomDetails :rooms="property?.bedroomFeatures" type="Bedroom" title="Bedrooms" />
-              <MoleculesListingRoomDetails :rooms="property?.bathroomFeatures" type="Bathroom" title="Bathrooms" />
-              <MoleculesListingRoomDetails :rooms="property?.kitchenFeatures" type="Kitchen" title="Kitchen" />
-              <MoleculesListingRoomDetails :rooms="property?.reception" type="Reception" title="Receptions" />
-              <MoleculesListingRoomDetails :rooms="property?.otherRoom" type="Other Rooms" title="Other Rooms" />
+              <MoleculesListingItemDetails v-if="property?.bedroomFeatures" 
+                :items="property?.bedroomFeatures" 
+                type="room" 
+                subtype="Bedroom" 
+                title="Bedrooms" />
+              <MoleculesListingItemDetails v-if="property?.bathroomFeatures" 
+                :items="property?.bathroomFeatures" 
+                type="room" 
+                subtype="Bathroom" 
+                title="Bathrooms" />
+              <MoleculesListingItemDetails v-if="property?.kitchenFeatures" 
+                :items="property?.kitchenFeatures" 
+                type="room" 
+                subtype="Kitchen" 
+                title="Kitchen" />
+              <MoleculesListingItemDetails v-if="property?.reception" 
+                :items="property?.reception" 
+                type="room" 
+                subtype="Reception" 
+                title="Receptions" />
+              <MoleculesListingItemDetails v-if="property?.otherRoom" 
+                :items="property?.otherRoom" 
+                type="room" 
+                subtype="Other Rooms" 
+                title="Other Rooms" />
             </div>
 
             <div v-if="property?.rearGarden || property?.frontGarden" class="p-listing__section">
-              <MoleculesListingGardenDetails :rear-garden="property?.rearGarden"
-                :front-garden="property?.frontGarden" />
+              <MoleculesListingItemDetails 
+                :items="getGardenItems(property)" 
+                type="garden" 
+                title="Gardens" 
+                :show-floor="false" />
             </div>
 
             <div v-if="property" class="p-listing__section">
@@ -140,6 +161,18 @@ const amenitiesArray = computed(() => {
   if (!amenities) return null;
   return Array.isArray(amenities) ? amenities : [amenities];
 });
+
+// Create garden items array for unified component
+const getGardenItems = (property: any) => {
+  const gardens = [];
+  if (property?.frontGarden) {
+    gardens.push({ ...property.frontGarden, gardenType: 'front' });
+  }
+  if (property?.rearGarden) {
+    gardens.push({ ...property.rearGarden, gardenType: 'rear' });
+  }
+  return gardens;
+};
 
 /**
  *  Media
