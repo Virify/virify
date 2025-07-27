@@ -22,10 +22,11 @@ model Property {
   kitchenFeatures          Kitchen?
   reception                Reception[]
   otherRoom                OtherRoom[]
+  frontGarden              FrontGarden?
+  rearGarden               RearGarden?
   utility                  Utility?
   listing                  Listing[]
   media                    Media[]
-  outdoorSpace             OutdoorSpace?
   parking                  Parking?
   energyAndUtilities       EnergyAndUtilities?
   address                  Address                @relation(fields: [addressId], references: [id], onDelete: Cascade)

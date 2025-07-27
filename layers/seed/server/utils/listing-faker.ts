@@ -120,9 +120,12 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
     },
   });
 
-  // Generate random views for this listing
-  const viewsGenerated = await generateListingViews(listing.id);
-  console.log(`Generated ${viewsGenerated} views for rental listing ${listing.id}`);
+  // Generate views in background (don't await)
+  generateListingViews(listing.id).then(viewsGenerated => {
+    console.log(`Generated ${viewsGenerated} views for rental listing ${listing.id}`);
+  }).catch(error => {
+    console.error(`Error generating views for rental listing ${listing.id}:`, error);
+  });
 
   return listing;
 };
@@ -163,9 +166,12 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
     },
   });
 
-  // Generate random views for this listing
-  const viewsGenerated = await generateListingViews(listing.id);
-  console.log(`Generated ${viewsGenerated} views for sale listing ${listing.id}`);
+  // Generate views in background (don't await)
+  generateListingViews(listing.id).then(viewsGenerated => {
+    console.log(`Generated ${viewsGenerated} views for sale listing ${listing.id}`);
+  }).catch(error => {
+    console.error(`Error generating views for sale listing ${listing.id}:`, error);
+  });
 
   return listing;
 };

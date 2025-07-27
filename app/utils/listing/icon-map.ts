@@ -67,3 +67,52 @@ export const getPropertyTypeIcon = (propertyType: string | undefined) => {
     ? iconMappings[propertyType]
     : "property/other";
 };
+
+/**
+ * Map room type to icon
+ */
+export const getRoomTypeIcon = (room: any, roomType: string) => {
+  // Check the room type from the props.type or infer from the room data structure
+  if (roomType === 'Bedroom' || room.hasOwnProperty('bedSize')) {
+    return 'property/bedrooms';
+  }
+  if (roomType === 'Bathroom' || room.hasOwnProperty('shower') || room.hasOwnProperty('bath')) {
+    return 'property/bathrooms';
+  }
+  if (roomType === 'Kitchen' || room.hasOwnProperty('whiteGoods') || room.hasOwnProperty('breakfastBar') || room.hasOwnProperty('island')) {
+    return 'property/kitchen';
+  }
+
+  // Map other room types
+  const roomTypeMappings: Record<string, string> = {
+    gym: 'property/gym',
+    office: 'property/work',
+    study: 'property/work',
+  };
+
+  const roomTypeString = room.type ? room.type.toLowerCase() : room.name?.toLowerCase();
+  
+  return roomTypeMappings[roomTypeString] || 'property/other-room';
+};
+
+/**
+ * Map garden type to icon
+ */
+export const getGardenTypeIcon = (gardenType: 'front' | 'rear') => {
+  return gardenType === 'front' ? 'property/front-garden' : 'property/rear-garden';
+};
+
+/**
+ * Map feature type to icon
+ */
+export const getFeatureTypeIcon = (featureKey: string) => {
+  const iconMappings: Record<string, string> = {
+    parking: 'property/parking',
+    security: 'property/security',
+    utility: 'property/utility',
+    accessibility: 'property/access',
+    storage: 'property/storage',
+  };
+
+  return iconMappings[featureKey] || 'property/feature';
+};

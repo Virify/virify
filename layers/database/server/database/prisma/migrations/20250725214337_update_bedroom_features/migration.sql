@@ -1,6 +1,0 @@
--- AlterTable
-ALTER TABLE "Bedroom" ADD COLUMN     "balcony" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "bayWindow" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "builtInDesk" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "hasView" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "patioDoors" BOOLEAN NOT NULL DEFAULT false;
