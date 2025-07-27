@@ -1,35 +1,31 @@
 <template>
-  <!-- Feature details card -->
-  <div class="feature-details">
-    <!-- Feature card -->
-    <div class="feature-details__item">
-
-      <!-- Feature content -->
-      <div class="feature-details__item-content | body-sm">
-
-        <!-- Feature type header with icon and info button -->
-        <p class="feature-details__item-content-type | font-semibold">
-          <span class="feature-details__item-title-wrapper">
-            <AtomsIcon :icon="getFeatureIcon(title)" :size="20" class="feature-details__type-icon" />
-            {{ title }}
-          </span>
-          <!-- Info button to show description modal (only if description exists) -->
-          <button v-if="features?.description" @click="toggleDescription($event)" class="button button-xs button-quiet"
-            type="button" :aria-label="`Show description for ${title}`">
-            <AtomsIcon icon="property/info" :size="18" />
+  <div class="feature-card" @click="toggleCollapse">
+    <div class="feature-card__content | body-sm">
+      <!-- Title row with icon, title, info button, and collapse arrow -->
+      <div class="feature-card__title-row | font-semibold">
+        <div class="feature-card__title-wrapper">
+          <AtomsIcon :icon="getFeatureIcon(title)" :size="20" />
+          {{ title }}
+          <button v-if="features?.description" @click.stop="toggleDescription($event)" 
+            class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${title}`">
+            <AtomsIcon icon="property/info" :size="16" />
           </button>
-        </p>
+        </div>
+        <div class="feature-card__collapse-btn" :class="{ 'expanded': !isCollapsed }">
+          <AtomsIcon icon="chevron-down" :size="18" />
+        </div>
+      </div>
 
-        <!-- Feature size (only if size exists) -->
-        <p v-if="features?.size" class="feature-details__item-detail">
-          <AtomsIcon icon="property/size" :size="24" class="feature-details__icon" />
+      <!-- Size and features row (collapsible) -->
+      <div v-show="!isCollapsed" class="feature-card__details-row">
+        <div v-if="features?.size" class="feature-card__size">
+          <AtomsIcon icon="property/size" :size="24" />
           {{ formattedSize }}sqmt
-        </p>
+        </div>
 
-        <!-- Feature boolean features as pills (only if features exist) -->
-        <div class="feature-details__item-features" v-if="filteredFeatures.length > 0">
-          <AtomsIcon icon="property/feature" :size="24" class="feature-details__icon" />
-          <div class="feature-details__item-features-pills">
+        <div v-if="filteredFeatures.length > 0" class="feature-card__features">
+          <AtomsIcon icon="property/feature" :size="24" />
+          <div class="feature-card__pills">
             <AtomsPill v-for="feature in filteredFeatures" :key="feature" class="| body-xs">
               {{ feature }}
             </AtomsPill>
@@ -39,20 +35,15 @@
     </div>
   </div>
 
-  <!-- Description modal teleported to body for proper positioning -->
+  <!-- Description modal -->
   <Teleport to="body">
-    <div v-if="showDescription && features?.description" class="feature-description-modal" :style="modalPosition"
-      @click.stop>
-      <!-- Feature description text -->
+    <div v-if="showDescription && features?.description" class="modal" :style="modalPosition" @click.stop>
       <p class="| body-xs">{{ features.description }}</p>
-      <!-- Close button -->
-      <button @click="closeDescription" class="feature-description-modal__close" type="button"
-        aria-label="Close description">
+      <button @click="closeDescription" class="modal__close" type="button" aria-label="Close description">
         <AtomsIcon icon="property/close" :size="14" />
       </button>
     </div>
   </Teleport>
-
 </template>
 
 <script setup lang="ts">
@@ -80,6 +71,9 @@ const filteredFeatures = computed(() => {
 
   return features;
 });
+
+// Collapse state
+const isCollapsed = ref(true);
 
 // Description modal state
 const showDescription = ref(false);
@@ -121,6 +115,11 @@ const closeDescription = () => {
   modalPosition.value = {};
 };
 
+// Collapse toggle
+const toggleCollapse = () => {
+  isCollapsed.value = !isCollapsed.value;
+};
+
 // Close modal on escape key
 onMounted(() => {
   const handleEscape = (event: KeyboardEvent) => {
@@ -140,67 +139,77 @@ onMounted(() => {
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
-.feature-details {
-  margin-top: var(--size-16);
+.feature-card {
+  background: var(--background-100);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--monochrome-600);
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 
-  &__item {
-    background: var(--background-100);
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--monochrome-600);
-    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
-    width: 300px;
+  &__content {
+    padding: var(--size-16);
+    width: 100%;
+  }
 
-    @include mq.mobile-only {
-      width: 100%;
+  &__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: capitalize;
+  }
+
+  &__title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
+  }
+
+  &__details-row {
+    display: flex;
+    align-items: center;
+    gap: var(--size-16);
+  }
+
+  &__size {
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
+  }
+
+  &__features {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-4);
+    flex: 1;
+    margin-top: var(--size-8);
+
+    .a-icon {
+      flex-shrink: 0;
     }
+  }
 
-    &-content {
-      padding: var(--size-16);
-      position: relative;
+  &__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-4);
 
-      &-type {
-        text-transform: capitalize;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--size-8);
-      }
+    .a-pill {
+      background: var(--background-300);
+      color: var(--foreground-100);
     }
+  }
 
-    &-title-wrapper {
-      display: flex;
-      align-items: center;
-      gap: var(--size-8);
-    }
+  &__collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
 
-    &-detail {
-      display: flex;
-      align-items: center;
-      gap: var(--size-8);
-      margin: var(--size-8) 0;
-    }
-
-    &-features {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--size-4);
-      margin: var(--size-12) 0;
-
-      .a-icon {
-        flex-shrink: 0;
-      }
-
-      &-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--size-4);
-        flex: 1;
-
-        .a-pill {
-          background: var(--background-300);
-          color: var(--foreground-100);
-        }
-      }
+    &.expanded .a-icon {
+      transform: rotate(180deg);
     }
   }
 
@@ -208,12 +217,10 @@ onMounted(() => {
     width: 22px;
     height: 22px;
     color: var(--foreground-200);
-    margin-bottom: var(--size-2);
   }
 }
 
-/* Modal styles (teleported to body) */
-.feature-description-modal {
+.modal {
   background: var(--background-100);
   border: 1px solid var(--monochrome-600);
   border-radius: var(--border-radius-md);

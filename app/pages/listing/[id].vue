@@ -373,16 +373,22 @@ ul {
 
 .p-listing__section {
   margin: var(--size-32) 0;
+  
+  @include mq.notebook {
+    margin-right: var(--size-24);
+  }
 }
 
 .p-listing__features-list {
-  display: flex;
-  flex-wrap: wrap;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--size-16);
   margin-top: var(--size-16);
+  align-items: start;
 
   @include mq.mobile-only {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: var(--size-12);
   }
 }
