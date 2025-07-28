@@ -142,6 +142,8 @@ watchImmediate(currentSlide, (newSlide) => {
   }
 
   @media (hover: hover) {
+
+    &:focus-within &__button,
     &:hover &__button {
       opacity: 1;
       pointer-events: auto;
