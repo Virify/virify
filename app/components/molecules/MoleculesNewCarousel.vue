@@ -129,7 +129,7 @@ watchImmediate(currentSlide, (newSlide) => {
     color: var(--monochrome-900);
     padding: var(--size-6) var(--size-12);
     border-radius: var(--border-radius-pill);
-    min-width: 6ch;
+    min-width: 6.5ch;
     text-align: center;
   }
 

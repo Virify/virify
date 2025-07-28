@@ -7,13 +7,9 @@
 </template>
 
 <script setup>
-const slides = [
-  'One',
-  'Two',
-  'Three',
-  'Four',
-  'Five'
-]
+const slides = Array.from({ length: 5 }).map((_, index) => {
+  return 'Slide ' + (index + 1)
+})
 </script>
 
 <style lang="scss">
