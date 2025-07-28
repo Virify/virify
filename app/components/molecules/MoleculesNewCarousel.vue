@@ -84,8 +84,8 @@ watchImmediate(currentSlide, (newSlide) => {
     }
 
     .a-icon {
-      width: var(--size-32);
-      height: var(--size-32);
+      width: var(--size-28);
+      height: var(--size-28);
     }
 
     &--prev {
