@@ -61,7 +61,8 @@ onBeforeUnmount(() => {
   overflow: hidden;
 
   &__slide {
-    background: var(--monochrome-300);
+    background: var(--monochrome-300) url('/img/spinner.svg') no-repeat center;
+    background-size: var(--size-48) var(--size-48);
     aspect-ratio: 4/3;
     width: 100%;
     height: 100%;
