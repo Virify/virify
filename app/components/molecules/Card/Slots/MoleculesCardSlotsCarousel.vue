@@ -1,15 +1,42 @@
 <template>
-  <MoleculesNewCarousel :slides v-slot="{ slide }" class="m-card-slots-carousel">
-    <div class="m-card-slots-carousel__slide">
-      {{ slide }}
+  <div role="presentation" class="m-card-slots-carousel" ref="$root">
+    <div v-if="!isActive" class="m-card-slots-carousel__slide">
+      {{ slides[currentSlide - 1] }}
     </div>
-  </MoleculesNewCarousel>
+
+    <MoleculesNewCarousel v-else :slides v-slot="{ slide }" v-model="currentSlide">
+      <div class="m-card-slots-carousel__slide">
+        {{ slide }}
+      </div>
+    </MoleculesNewCarousel>
+  </div>
 </template>
 
 <script setup>
+import { useIntersectionObserver } from '@vueuse/core'
+
 const slides = Array.from({ length: 5 }).map((_, index) => {
   return 'Slide ' + (index + 1)
 })
+
+const currentSlide = ref(1)
+
+/**
+ *  Control hydration
+ */
+const isActive = ref(false)
+const $root = useTemplateRef('$root')
+
+const { stop } = useIntersectionObserver($root, ([entry]) => {
+  const { isIntersecting } = asObject(entry)
+
+  isActive.value = !!isIntersecting
+})
+
+onBeforeUnmount(() => {
+  stop()
+})
+
 </script>
 
 <style lang="scss">
