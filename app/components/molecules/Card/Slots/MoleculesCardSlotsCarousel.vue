@@ -1,10 +1,10 @@
 <template>
   <div role="presentation" class="m-card-slots-carousel" ref="$root">
-    <nuxt-img v-if="!isActive" :src="currentSlide?.image" :alt="currentSlide.alt" class="m-card-slots-carousel__slide"
+    <nuxt-img v-if="!isActive" :src="currentSlide?.image" :alt="currentSlide?.alt" class="m-card-slots-carousel__slide"
       loading="lazy" />
 
     <MoleculesNewCarousel v-else :slides v-slot="{ slide }" v-model="currentIndex">
-      <nuxt-img :src="slide?.image" :alt="currentSlide.alt" class="m-card-slots-carousel__slide" loading="lazy" />
+      <nuxt-img :src="slide?.image" :alt="slide?.alt" class="m-card-slots-carousel__slide" loading="lazy" />
     </MoleculesNewCarousel>
   </div>
 </template>
