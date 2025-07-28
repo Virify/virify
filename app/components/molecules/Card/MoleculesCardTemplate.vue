@@ -10,8 +10,8 @@
       </span>
 
       <div class="m-card-template__gallery">
-        <slot name="carousel">
-          <MoleculesCardSlotsCarousel />
+        <slot name="carousel" v-bind="{ media }">
+          <MoleculesCardSlotsCarousel :slides="media" />
         </slot>
       </div>
 
@@ -63,6 +63,12 @@ const isBasic = computed(() => !isFeatured.value && !isPremium.value)
  *  Break down listing card data
  */
 const { property } = toRefs(props.result)
+
+const media = computed(() => {
+  const { media } = asObject(property.value)
+
+  return asArray(media)
+})
 
 const user = computed(() => {
   const { user } = asObject(props.result)

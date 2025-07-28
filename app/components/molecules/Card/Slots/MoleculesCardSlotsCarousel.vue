@@ -1,25 +1,39 @@
 <template>
   <div role="presentation" class="m-card-slots-carousel" ref="$root">
-    <div v-if="!isActive" class="m-card-slots-carousel__slide">
-      {{ slides[currentSlide - 1] }}
-    </div>
+    <nuxt-img v-if="!isActive" :src="currentSlide?.image" :alt="currentSlide.alt" class="m-card-slots-carousel__slide"
+      loading="lazy" />
 
-    <MoleculesNewCarousel v-else :slides v-slot="{ slide }" v-model="currentSlide">
-      <div class="m-card-slots-carousel__slide">
-        {{ slide }}
-      </div>
+    <MoleculesNewCarousel v-else :slides v-slot="{ slide }" v-model="currentIndex">
+      <nuxt-img :src="slide?.image" :alt="currentSlide.alt" class="m-card-slots-carousel__slide" loading="lazy" />
     </MoleculesNewCarousel>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
 
-const slides = Array.from({ length: 5 }).map((_, index) => {
-  return 'Slide ' + (index + 1)
-})
+interface MediaSlide {
+  image: string
+  alt: string
+  [key: string]: unknown
+}
 
-const currentSlide = ref(1)
+interface Props {
+  slides: MediaSlide[]
+}
+
+const props = defineProps<Props>()
+
+/**
+ *  Current slide
+ */
+const currentIndex = ref(1)
+
+const currentSlide = computed(() => {
+  const { slides } = asObject(props)
+
+  return asArray(slides)[currentIndex.value] as unknown as MediaSlide
+})
 
 /**
  *  Control hydration
@@ -48,15 +62,10 @@ onBeforeUnmount(() => {
 
   &__slide {
     background: var(--monochrome-300);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--size-16);
-    box-sizing: border-box;
     aspect-ratio: 4/3;
-    color: var(--monochrome-900);
-    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 </style>
