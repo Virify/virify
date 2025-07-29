@@ -1,7 +1,8 @@
 import OpenAI from "openai";
+const config = useRuntimeConfig();
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: config.OPENAI_API_KEY as string,
 });
 
 /**

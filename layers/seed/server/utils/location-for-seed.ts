@@ -26,7 +26,7 @@ export async function getLocationByAddressIdForSeed(addressId: number): Promise<
     `
   );
 
-  if (!result[0]) throw createError({ statusCode: 404, statusMessage: "location not found" });
+  if (!result[0]) throw new Error("location not found");
 
   return result[0];
 }

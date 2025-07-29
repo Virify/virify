@@ -1,22 +1,54 @@
-import { PrismaClient } from "~~/layers/database/server/database/prisma/generated/client";
+import { PrismaClient as AppClient } from "~~/layers/database/server/database/prisma/generated/client";
+import { PrismaClient as PpdClient } from "~~/layers/database/server/database/prisma-ppd/generated/client";
 
-const config = useRuntimeConfig();
+const appClientSingleton = () => {
+  // Get config at runtime, not module load time
+  const config = typeof useRuntimeConfig !== 'undefined' ? useRuntimeConfig() : {
+    DATABASE_URL: process.env.DATABASE_URL,
+    PPD_DATABASE_URL: process.env.PPD_DATABASE_URL,
+  };
 
-// Create a PrismaClient instance with the database URL from runtime config
-const prismaClientSingleton = () => {
-  return new PrismaClient({
+  return new AppClient({
     datasources: {
-      db: {
-        url: config.DATABASE_URL,
-      },
+      db: { url: config.DATABASE_URL },
     },
   });
 };
 
-// Use a global variable to ensure a single PrismaClient instance in development
-declare const globalThis: {
-  prismaGlobal?: PrismaClient;
+const ppdClientSingleton = () => {
+  // Get config at runtime, not module load time
+  const config = typeof useRuntimeConfig !== 'undefined' ? useRuntimeConfig() : {
+    DATABASE_URL: process.env.DATABASE_URL,
+    PPD_DATABASE_URL: process.env.PPD_DATABASE_URL,
+  };
+
+  return new PpdClient({
+    datasources: {
+      ppdDb: { url: config.PPD_DATABASE_URL },
+    },
+  });
 };
 
-// Create or reuse the PrismaClient instance
-export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+declare const globalThis: {
+  prismaAppGlobal?: AppClient;
+  prismaPpdGlobal?: PpdClient;
+};
+
+// Export lazy-initialized clients
+export const prisma = new Proxy({} as AppClient, {
+  get(target, prop) {
+    if (!globalThis.prismaAppGlobal) {
+      globalThis.prismaAppGlobal = appClientSingleton();
+    }
+    return (globalThis.prismaAppGlobal as any)[prop];
+  }
+});
+
+export const ppdPrisma = new Proxy({} as PpdClient, {
+  get(target, prop) {
+    if (!globalThis.prismaPpdGlobal) {
+      globalThis.prismaPpdGlobal = ppdClientSingleton();
+    }
+    return (globalThis.prismaPpdGlobal as any)[prop];
+  }
+});

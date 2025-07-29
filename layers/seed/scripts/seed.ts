@@ -1,6 +1,21 @@
-/** This works although TS says it should not - ignoring for now. */
-// @ts-nocheck
-import { defineTask } from 'nitropack/runtime/task'
+#!/usr/bin/env tsx
+
+import { config } from 'dotenv'
+
+// Load environment variables FIRST
+config()
+
+
+// Now import prisma after env vars are loaded
+import { prisma } from '../../database/server/utils/prisma-client'
+
+// Import utility functions from the seed layer
+import { updateLocationsByAddressListForSeed } from '../server/utils/location-for-seed'
+import { generateProperty } from '../server/utils/property-faker'
+import { generateSaleListing, generateRentalListing } from '../server/utils/listing-faker'
+import { seedFakeUsers } from '../server/utils/user-faker'
+import { rentalAddress, saleAddress, cityCenters } from '../server/utils/address-to-seed'
+
 /**
  * Seeding function to populate property types and classifications in the database.
  */
@@ -106,60 +121,54 @@ async function seedCityCenters() {
   console.log('City centers seeded.')
 }
 
-export default defineTask({
-  meta: {
-    name: 'db:seed',
-    description: 'Run database seeders',
-  },
-  async run({ payload, context }) {
-    try {
-      console.log('Running database seeder...')
+async function seedDatabase() {
+  try {
+    console.log('Running database seeder...')
 
-      await seedAdminUser()
-      await seedCityCenters()
-      await seedPropertyTypes()
+    await seedAdminUser()
+    await seedCityCenters()
+    await seedPropertyTypes()
 
-      console.log('Seeding properties and listings...')
+    console.log('Seeding properties and listings...')
+    
+    // Generate properties and listings in parallel batches
+    await Promise.all([
+      // Sale properties and listings
+      (async () => {
+        const saleProperties = await Promise.all(
+          saleAddress.map(addr => generateProperty(addr))
+        )
+        await Promise.all(
+          saleProperties.map(prop => generateSaleListing(prop.id))
+        )
+      })(),
       
-      // Generate properties and listings in parallel batches
-      await Promise.all([
-        // Sale properties and listings
-        (async () => {
-          const saleProperties = await Promise.all(
-            saleAddress.map(addr => generateProperty(addr))
-          )
-          await Promise.all(
-            saleProperties.map(prop => generateSaleListing(prop.id))
-          )
-        })(),
-        
-        // Rental properties and listings  
-        (async () => {
-          const rentalProperties = await Promise.all(
-            rentalAddress.map(addr => generateProperty(addr))
-          )
-          await Promise.all(
-            rentalProperties.map(prop => generateRentalListing(prop.id))
-          )
-        })()
-      ])
-      
-      console.log('Properties and listings seeded.')
+      // Rental properties and listings  
+      (async () => {
+        const rentalProperties = await Promise.all(
+          rentalAddress.map(addr => generateProperty(addr))
+        )
+        await Promise.all(
+          rentalProperties.map(prop => generateRentalListing(prop.id))
+        )
+      })()
+    ])
+    
+    console.log('Properties and listings seeded.')
 
-      console.log('Seeding fake users...')
-      await seedFakeUsers(20)
-      console.log('Fake users seeded.')
+    console.log('Seeding fake users...')
+    await seedFakeUsers(20)
+    console.log('Fake users seeded.')
 
-      return {
-        result: 'Database seeding complete.',
-      }
-    }
-    catch (e: any) {
-      console.error('Error during database seeding:', e)
-      throw new Error('Database seeding failed.', { cause: e })
-    }
-    finally {
-      await prisma.$disconnect()
-    }
-  },
-})
+    console.log('Database seeding complete.')
+  }
+  catch (e: any) {
+    console.error('Error during database seeding:', e)
+    process.exit(1)
+  }
+  finally {
+    await prisma.$disconnect()
+  }
+}
+
+seedDatabase()
