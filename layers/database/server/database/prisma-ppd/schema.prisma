@@ -1,0 +1,33 @@
+generator ppdClient {
+  provider        = "prisma-client"
+  output          = "./generated/"
+  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource ppdDb {
+  provider   = "postgresql"
+  url        = env("PPD_DATABASE_URL")
+}
+
+model PricePaid {
+  transaction_id String @id
+  price Int
+  transfer_date DateTime
+  postcode String?
+  property_type String?
+  old_new String?
+  duration String?
+  paon String?
+  saon String?
+  street String?
+  locality String?
+  town_city String?
+  district String?
+  county String?
+  ppd_category String?
+  record_status String?
+  @@index([postcode])
+  @@index([transfer_date])
+  @@index([price])
+  @@map("price_paid")
+}

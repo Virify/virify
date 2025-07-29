@@ -1,22 +1,28 @@
-import { PrismaClient } from "~~/layers/database/server/database/prisma/generated/client";
+import { PrismaClient as AppClient } from "~~/layers/database/server/database/prisma/generated/client";
+import { PrismaClient as PpdClient } from "~~/layers/database/server/database/prisma-ppd/generated/client";
 
 const config = useRuntimeConfig();
 
-// Create a PrismaClient instance with the database URL from runtime config
-const prismaClientSingleton = () => {
-  return new PrismaClient({
+const appClientSingleton = () => {
+  return new AppClient({
     datasources: {
-      db: {
-        url: config.DATABASE_URL,
-      },
+      db: { url: config.DATABASE_URL },
     },
   });
 };
 
-// Use a global variable to ensure a single PrismaClient instance in development
-declare const globalThis: {
-  prismaGlobal?: PrismaClient;
+const ppdClientSingleton = () => {
+  return new PpdClient({
+    datasources: {
+      ppdDb: { url: config.PPD_DATABASE_URL },
+    },
+  });
 };
 
-// Create or reuse the PrismaClient instance
-export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+declare const globalThis: {
+  prismaAppGlobal?: AppClient;
+  prismaPpdGlobal?: PpdClient;
+};
+
+export const prisma = globalThis.prismaAppGlobal ?? appClientSingleton();
+export const ppdPrisma = globalThis.prismaPpdGlobal ?? ppdClientSingleton();
