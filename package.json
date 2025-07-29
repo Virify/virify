@@ -17,7 +17,9 @@
     "db-push": "prisma db push",
     "db-push:ppd": "prisma db push --schema=./layers/database/server/database/prisma-ppd/schema.prisma",
     "db-studio:ppd": "prisma studio --schema=./layers/database/server/database/prisma-ppd/schema.prisma",
-    "seed": "npx nuxi run seed:database",
+    "db:reset": "tsx layers/seed/scripts/reset.ts",
+    "db:seed": "tsx layers/seed/scripts/seed.ts",
+    "db:migrate": "tsx layers/seed/scripts/migrate.ts",
     "test": "vitest run",
     "test:full": "vitest run",
     "start": "node .output/server/index.mjs"
