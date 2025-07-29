@@ -50,15 +50,9 @@ importers:
       embla-carousel-vue:
         specifier: ^8.6.0
         version: 8.6.0(vue@3.5.17(typescript@5.8.3))
-      g:
-        specifier: ^2.0.1
-        version: 2.0.1
       maptiler-sdk.css:
         specifier: link:@maptiler/sdk/dist/maptiler-sdk.css
         version: link:@maptiler/sdk/dist/maptiler-sdk.css
-      node-fetch:
-        specifier: ^3.3.2
-        version: 3.3.2
       nuxi:
         specifier: ^3.25.0
         version: 3.26.2
@@ -3561,9 +3555,6 @@ packages:
   fuse.js@7.1.0:
     resolution: {integrity: sha512-trLf4SzuuUxfusZADLINj+dE8clK1frKdmqiJNb1Es75fmI5oY6X2mxLVUciLLjxqw/xr72Dhy+lER6dGd02FQ==}
     engines: {node: '>=10'}
-
-  g@2.0.1:
-    resolution: {integrity: sha512-Fi6Ng5fZ/ANLQ15H11hCe+09sgUoNvDEBevVgx3KoYOhsH5iLNPn54hx0jPZ+3oSWr+xajnp2Qau9VmPsc7hTA==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -10849,8 +10840,6 @@ snapshots:
   function-bind@1.1.2: {}
 
   fuse.js@7.1.0: {}
-
-  g@2.0.1: {}
 
   gensync@1.0.0-beta.2: {}
 
