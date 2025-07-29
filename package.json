@@ -9,10 +9,14 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "pgen": "prisma generate",
-    "pgen:ppd": "prisma generate --schema=./layers/database/server/database/prisma-ppd/schema-ppd.prisma",
+    "pgen:ppd": "prisma generate --schema=layers/database/server/database/prisma-ppd/schema.prisma",
+    "migrate-reset": "prisma migrate reset",
+    "migrate-reset:ppd": "prisma migrate reset --schema=layers/database/server/database/prisma-ppd/schema.prisma",
+    "migrate-dev": "prisma migrate dev",
+    "migrate-dev:ppd": "prisma migrate reset --schema=layers/database/server/database/prisma-ppd/schema.prisma",
     "db-push": "prisma db push",
-    "db-push:ppd": "prisma db push --schema=./layers/database/server/database/prisma-ppd/schema-ppd.prisma",
-    "db-studio:ppd": "prisma studio --schema=./layers/database/server/database/prisma-ppd/schema-ppd.prisma",
+    "db-push:ppd": "prisma db push --schema=./layers/database/server/database/prisma-ppd/schema.prisma",
+    "db-studio:ppd": "prisma studio --schema=./layers/database/server/database/prisma-ppd/schema.prisma",
     "seed": "npx nuxi run seed:database",
     "test": "vitest run",
     "test:full": "vitest run",
@@ -20,9 +24,6 @@
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/"
-  },
-  "prisma-ppd": {
-    "schema": "./layers/database/server/database/prisma-ppd/"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.799.0",
