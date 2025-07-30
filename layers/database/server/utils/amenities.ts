@@ -20,29 +20,15 @@ export async function getAmenitiesByPropertyId(propertyId: number) {
 }
 
 /**
- * Create or update amenities for a property (replaces existing ones)
+ * Create amenities for a property (simple approach - no transaction needed)
  */
 export async function createAmenitiesForProperty(propertyId: number, amenitiesData: AmenityData[]) {
-  // Use transaction to ensure atomicity
-  return await prisma.$transaction(async (tx: any) => {
-    // Delete existing amenities for this property
-    await tx.amenities.deleteMany({
-      where: { propertyId }
-    })
-
-    // Create new amenities
-    const createdAmenities = await Promise.all(
-      amenitiesData.map(amenity => 
-        tx.amenities.create({
-          data: {
-            ...amenity,
-            propertyId
-          }
-        })
-      )
-    )
-
-    return createdAmenities
+  // Use createManyAndReturn for single operation that creates and returns records
+  return await prisma.amenities.createManyAndReturn({
+    data: amenitiesData.map(amenity => ({
+      ...amenity,
+      propertyId
+    }))
   })
 }
 

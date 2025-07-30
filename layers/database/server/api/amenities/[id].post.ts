@@ -27,7 +27,23 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { amenities } = AmenitiesRequestSchema.parse(body)
 
-    // Create amenities for this property
+    // First check if amenities already exist for this property
+    const existingAmenities = await getAmenitiesByPropertyId(parseInt(propertyId))
+    
+    if (existingAmenities.length > 0) {
+      // Amenities already exist, just clear cache and return existing ones
+      const cacheKey = `amenities:property:${propertyId}`;
+      await useStorage().removeItem(cacheKey);
+      
+      return {
+        success: true,
+        count: existingAmenities.length,
+        amenities: existingAmenities,
+        message: 'Amenities already exist for this property'
+      }
+    }
+
+    // Create amenities for this property only if none exist
     const createdAmenities = await createAmenitiesForProperty(parseInt(propertyId), amenities)
 
     // Clear the cache since we now have amenities for this property
