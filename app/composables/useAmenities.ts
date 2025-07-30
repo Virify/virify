@@ -73,7 +73,11 @@ export function useAmenities() {
    */
   async function checkExistingAmenities(propertyId: number) {
     try {
-      const response = await $fetch(`/api/amenities/${propertyId}`)
+      const response = await $fetch<{
+        exists: boolean
+        amenities: any[]
+        lastUpdated: string | null
+      }>(`/api/amenities/${propertyId}`)
       if (response.exists && response.amenities) {
         return response.amenities
       }
