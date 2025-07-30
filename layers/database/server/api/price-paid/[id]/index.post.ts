@@ -41,25 +41,8 @@ export default defineEventHandler(async (event) => {
       return cached;
     }
 
-    // Build exact match conditions since addresses are from PPD data
-    const whereConditions: any = {
-      postcode: postcode.toUpperCase(),
-      street: street.toUpperCase(),
-      town_city: city.toUpperCase(),
-      paon: number.toUpperCase()
-    };
-
-    // Add exact flat matching if available
-    if (flat) {
-      whereConditions.saon = flat.toUpperCase();
-    }
-
-    const ppdData = await ppdPrisma.pricePaid.findMany({
-      where: whereConditions,
-      orderBy: {
-        transfer_date: 'desc'
-      }
-    });
+    // Use utility function to get PPD data
+    const ppdData = await getPricePaidByAddress(postcode, street, city, number, flat);
 
     if (ppdData.length === 0) {
       throw createError({
@@ -68,32 +51,26 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Sort sales by date (newest first) and calculate percentage changes
+    // Sort sales by date (newest first)
     const sortedSales = ppdData
       .sort((a, b) => new Date(b.transfer_date).getTime() - new Date(a.transfer_date).getTime());
 
-    const propertySales = sortedSales.map((item, index) => {
-      let percentageChange: number | null = null;
-      
-      // Calculate percentage change from previous sale (if exists)
-      if (index < sortedSales.length - 1) {
-        const previousSale = sortedSales[index + 1];
-        if (previousSale && previousSale.price) {
-          const priceDiff = item.price - previousSale.price;
-          percentageChange = Math.round((priceDiff / previousSale.price) * 100 * 100) / 100; // Round to 2 decimal places
-        }
-      }
+    // Calculate market context using utility function
+    const latestPrice = sortedSales.length > 0 && sortedSales[0] ? sortedSales[0].price : 0;
+    const propertyType = sortedSales[0]?.property_type || null;
+    
+    const marketContext = await calculateMarketContext(
+      city, 
+      postcode, 
+      number, 
+      flat, 
+      propertyType, 
+      latestPrice, 
+      sortedSales
+    );
 
-      return {
-        price: item.price,
-        transfer_date: item.transfer_date,
-        transaction_id: item.transaction_id,
-        old_new: item.old_new,
-        duration: item.duration,
-        property_type: item.property_type,
-        percentage_change: percentageChange
-      };
-    });
+    // Process sales data using utility function
+    const propertySales = processPricePaidSales(sortedSales);
 
     const result = {
       data: {
@@ -103,7 +80,8 @@ export default defineEventHandler(async (event) => {
         price_range: propertySales.length > 0 ? {
           min: Math.min(...propertySales.map(s => s.price)),
           max: Math.max(...propertySales.map(s => s.price))
-        } : null
+        } : null,
+        market_context: marketContext
       }
     };
 

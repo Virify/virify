@@ -31,14 +31,12 @@ export default defineEventHandler(async (event) => {
   });
 
   const mappedData = ppdData.map(item => {
+    // Clean address: number, street, city, postcode only
     const addressParts = [
-      item.saon,
-      item.paon,
+      item.saon, // flat number if exists
+      item.paon, // property number
       item.street,
-      item.locality,
       item.town_city,
-      item.district,
-      item.county,
       item.postcode
     ].filter(Boolean);
     

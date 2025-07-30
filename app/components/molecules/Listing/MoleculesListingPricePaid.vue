@@ -1,52 +1,42 @@
 <template>
   <section class="price-paid">
     <h2 class="| title-md">Property History</h2>
-    <ol v-if="pricePaidData?.data?.sales" class="sales-timeline" reversed>
-      <li v-for="sale in pricePaidData.data.sales" :key="sale.transaction_id" class="sale">
-        <header class="sale__header">
-          <h3 class="sale__price | title-xs">
-            Price Sold: £{{ sale.price.toLocaleString() }}
-            <AtomsPill v-if="sale.duration" class="pill pill--duration | body-xs">
-              {{ formatDuration(sale.duration) }}
-            </AtomsPill>
-            <AtomsPill v-if="sale.property_type" class="pill pill--type | body-xs">
-              {{ formatPropertyType(sale.property_type) }}
-            </AtomsPill>
-          </h3>
-          <AtomsPill v-if="sale.percentage_change !== null" class="pill pill--percentage | body-xs">
-            {{ formatPercentageChange(sale.percentage_change) }}
-          </AtomsPill>
-        </header>
-        <time class="sale__date | body-sm" :datetime="sale.transfer_date"> Date Sold: {{ formatDate(sale.transfer_date) }} </time>
-      </li>
-    </ol>
-    <p class="price-paid-note | body-xs">Note: This data is based on the latest available information provided by the Land Registry.</p>
+    <div v-if="pricePaidData?.data?.sales" class="price-history-grid">
+      <!-- Property History Column -->
+      <MoleculesTimeline title="This Property" :items="timelineItems" note="Note: This data is based on the latest available information provided by the Land Registry." />
+
+      <!-- Market Context Column -->
+      <div class="area-column" v-if="pricePaidData?.data?.market_context">
+        <h3 class="column-title | title-sm">Market Context ({{ pricePaidData?.data?.market_context?.reference_year }})</h3>
+        <div class="market-analytics">
+          <!-- Area Average Card -->
+          <div class="stat-card-with-info" v-if="areaAverageCard">
+            <MoleculesStatCard :title="areaAverageCard.title" :value="areaAverageCard.value" :description="areaAverageCard.description" :info="areaAverageInfo" class="pill--percentage" />
+          </div>
+
+          <!-- Property Type Average Card -->
+          <div class="stat-card-with-info" v-if="propertyTypeAverageCard">
+            <MoleculesStatCard :title="propertyTypeAverageCard.title" :value="propertyTypeAverageCard.value" :description="propertyTypeAverageCard.description" :info="propertyTypeAverageInfo" class="pill--percentage" />
+          </div>
+
+          <!-- Market Position Card -->
+          <div class="stat-card-with-info" v-if="marketPositionCard">
+            <MoleculesStatCard :title="marketPositionCard.title" :value="marketPositionCard.value" :description="marketPositionCard.description" :info="marketPositionInfo" class="pill--percentage" />
+          </div>
+
+          <!-- Market Trend Card -->
+          <div class="stat-card-with-info" v-if="marketTrendCard">
+            <MoleculesStatCard :title="marketTrendCard.title" :value="marketTrendCard.value" :description="marketTrendCard.description" :info="marketTrendInfo" class="pill--percentage" />
+          </div>
+
+          <!-- Info Modal -->
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-interface Sale {
-  price: number;
-  transfer_date: string;
-  transaction_id: string;
-  old_new: string;
-  duration: string;
-  property_type: string;
-  percentage_change: number | null;
-}
-
-interface PricePaidResponse {
-  data: {
-    sales: Sale[];
-    total_sales: number;
-    latest_sale: Sale;
-    price_range: {
-      min: number;
-      max: number;
-    } | null;
-  } | null;
-}
-
 interface Props {
   listingId: number;
   address: {
@@ -89,39 +79,84 @@ const fetchPricePaidData = async () => {
   }
 };
 
-// Computed properties for formatting
-const formatDuration = (duration: string): string => {
-  const durationMap: Record<string, string> = {
-    F: "Freehold",
-    L: "Leasehold",
+// Computed property for timeline items
+const timelineItems = computed(() => {
+  const sales = pricePaidData.value?.data?.sales;
+  if (!sales) return [];
+
+  return sales.map((sale) => ({
+    id: sale.transaction_id,
+    title: `Price Sold: £${sale.price.toLocaleString()}`,
+    date: sale.transfer_date,
+    badge: sale.percentage_change !== null ? formatPercentageChange(sale.percentage_change) : undefined,
+    badgeColor: "pill--percentage",
+  }));
+});
+
+// Computed properties for market analytics cards
+const areaAverageCard = computed(() => {
+  const marketContext = pricePaidData.value?.data?.market_context;
+  const latestPrice = pricePaidData.value?.data?.sales?.[0]?.price;
+
+  if (!marketContext?.area_average || !latestPrice) return null;
+
+  return {
+    title: `Area Average: £${marketContext.area_average.toLocaleString()}`,
+    value: formatVsAverage(latestPrice, marketContext.area_average),
+    description: `${marketContext.sample_size} sales this year`,
   };
-  return durationMap[duration] || duration;
-};
+});
 
-const formatPropertyType = (propertyType: string): string => {
-  const typeMap: Record<string, string> = {
-    D: "Detached",
-    S: "Semi-Detached",
-    T: "Terraced",
-    F: "Flat",
-    O: "Other",
+const propertyTypeAverageCard = computed(() => {
+  const marketContext = pricePaidData.value?.data?.market_context;
+  const latestSale = pricePaidData.value?.data?.sales?.[0];
+
+  if (!marketContext?.property_type_average || !latestSale?.price || !latestSale?.property_type) return null;
+
+  return {
+    title: `${formatPropertyTypeName(latestSale.property_type)} Average: £${marketContext.property_type_average.toLocaleString()}`,
+    value: formatVsAverage(latestSale.price, marketContext.property_type_average),
+    description: `${marketContext.property_type_sample_size} similar properties`,
   };
-  return typeMap[propertyType] || propertyType;
-};
+});
 
-const formatPercentageChange = (change: number): string => {
-  return `${change > 0 ? "+" : ""}${change}%`;
-};
+const marketPositionCard = computed(() => {
+  const percentile = pricePaidData.value?.data?.market_context?.percentile;
 
-const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString("en-GB");
-};
+  if (percentile === null || percentile === undefined) return null;
+
+  return {
+    title: "Market Position",
+    value: `Top ${100 - percentile}%`,
+    description: `Above ${percentile}% of local properties`,
+  };
+});
+
+const marketTrendCard = computed(() => {
+  const yearlyTrend = pricePaidData.value?.data?.market_context?.yearly_trend;
+
+  if (yearlyTrend === null || yearlyTrend === undefined) return null;
+
+  return {
+    title: "Area Trend",
+    value: formatTrend(yearlyTrend),
+    description: "Year-over-year change",
+  };
+});
 
 onMounted(() => {
   fetchPricePaidData();
 });
+
+const areaAverageInfo = "Area Average: This is the average sale price for all properties in this area for the selected year (excluding this property). The percentage shown compares this property’s price to the area average.";
+const propertyTypeAverageInfo =
+  "Property Type Average: This is the average sale price for properties of this type in this area for the selected year (excluding this property). The percentage shows how this property’s price compares to similar properties.";
+const marketPositionInfo = "Market Position: This shows how this property’s price ranks among all sales in the area for the year. For example, “Top 95%” means this property sold for more than 95% of local sales.";
+const marketTrendInfo = "Area Trend: This shows the percentage change in the average sale price for the area compared to the previous year.";
 </script>
+
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
 .price-paid {
   margin: var(--size-32) 0;
 
@@ -130,81 +165,30 @@ onMounted(() => {
     padding: 0;
     list-style: none;
   }
-  
 }
 
-.sales-timeline {
+.price-history-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--size-32);
   margin-top: var(--size-32);
-  list-style: none;
-  padding: 0;
-  padding-left: var(--size-48);
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-16);
-  position: relative;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: var(--size-24);
+  }
 }
 
-.sale {
-  background: var(--background-100);
-  border: 1px solid var(--monochrome-600);
-  border-radius: var(--border-radius-lg);
-  padding: var(--size-16);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  position: relative;
+.column-title {
+  margin: 0 0 var(--size-16) 0;
+  color: var(--foreground-100);
+}
 
-  // Timeline ball
-  &::before {
-    content: "";
-    position: absolute;
-    left: calc(-1 * var(--size-48) + var(--size-6));
-    top: var(--size-16);
-    width: var(--size-16);
-    height: var(--size-16);
-    background-color: var(--secondary-400);
-    border-radius: 50%;
-    z-index: 2;
-  }
-
-  // Highlight first (most recent) item
-  &:first-child::before {
-    border: 3px solid var(--blue-400);
-    left: calc(-1 * var(--size-48) + var(--size-6) - 3px);
-    top: calc(var(--size-16) - 3px);
-  }
-
-  // Timeline connecting line
-  &::after {
-    content: "";
-    position: absolute;
-    left: calc(-1 * var(--size-48) + var(--size-14) - 1px);
-    top: calc(var(--size-16) + var(--size-16));
-    width: 2px;
-    height: calc(100% + var(--size-16));
-    background-color: var(--secondary-400);
-    z-index: 1;
-  }
-
-  &:last-child::after {
-    display: none;
-  }
-
-  &__header {
+.area-column {
+  .market-analytics {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--size-12);
-    margin-bottom: var(--size-4);
-  }
-
-  &__price {
-    flex: 1;
-    margin: 0;
-  }
-
-  &__date {
-    color: var(--foreground-200);
-    display: block;
-    margin: 0;
+    flex-direction: column;
+    gap: var(--size-16);
   }
 }
 
@@ -229,10 +213,5 @@ onMounted(() => {
       display: none;
     }
   }
-}
-
-.price-paid-note {
-  margin-top: var(--size-16);
-  padding-left: var(--size-48);
 }
 </style>
