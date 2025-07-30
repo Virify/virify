@@ -30,6 +30,10 @@ export default defineEventHandler(async (event) => {
     // Create amenities for this property
     const createdAmenities = await createAmenitiesForProperty(parseInt(propertyId), amenities)
 
+    // Clear the cache since we now have amenities for this property
+    const cacheKey = `amenities:property:${propertyId}`;
+    await useStorage().removeItem(cacheKey);
+
     return {
       success: true,
       count: createdAmenities.length,
