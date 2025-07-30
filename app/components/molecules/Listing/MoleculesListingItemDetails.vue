@@ -10,8 +10,10 @@
         <div class="item-details__content | body-sm">
           <!-- Title row with icon, title, and info button -->
           <div class="item-details__title | font-semibold">
-            <AtomsIcon :icon="getItemIcon(item)" :size="20" />
-            {{ getItemTitle(item) }}
+            <div class="item-details__title-content">
+              <AtomsIcon :icon="getItemIcon(item)" :size="20" />
+              {{ getItemTitle(item) }}
+            </div>
             <button v-if="item.description" @click="toggleDescription(index, $event)"
               class="button button-xs button-quiet" type="button"
               :aria-label="`Show description for ${getItemTitle(item)}`">
@@ -57,7 +59,6 @@
 
 <script setup lang="ts">
 import type { Prisma } from '~~/layers/database/server/database/prisma/generated/client';
-import { convertEnumToString } from '~/utils/listing/room-config';
 
 interface Props {
   title: string;
@@ -123,7 +124,7 @@ const getFeatures = (item: any): string[] => {
   Object.entries(item).forEach(([key, value]) => {
     // Skip non-boolean properties or specific properties we handle separately
     if (typeof value === 'boolean' && value === true && key !== 'description' && key !== 'size') {
-      features.push(convertEnumToString(key));
+      features.push(convertRoomEnumToString(key));
     }
   });
 
@@ -235,6 +236,12 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--size-8);
+  }
+
+  &__title-content {
+    display: flex;
+    align-items: center;
     gap: var(--size-8);
   }
 

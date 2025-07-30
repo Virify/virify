@@ -47,7 +47,6 @@
 </template>
 
 <script setup lang="ts">
-import { convertEnumToString } from '~/utils/listing/room-config';
 
 interface Props {
   title: string;
@@ -65,7 +64,7 @@ const filteredFeatures = computed(() => {
   Object.entries(props.features).forEach(([key, value]) => {
     // Skip non-boolean properties or specific properties we handle separately
     if (typeof value === 'boolean' && value === true && key !== 'description' && key !== 'size') {
-      features.push(convertEnumToString(key));
+      features.push(convertRoomEnumToString(key));
     }
   });
 

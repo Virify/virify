@@ -23,7 +23,7 @@
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
-            :address="fullAddress" />
+            :address="address" />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
@@ -85,6 +85,21 @@
               :listing="listing" :amenities="amenitiesArray" />
           </div>
 
+          <!-- Price Paid History -->
+          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
+            <MoleculesListingPricePaid
+              :listing-id="listing.id" 
+              :address="{
+                number: property.address.number,
+                flat: property.address.flat,
+                street: property.address.street,
+                city: property.address.city,
+                postcode: property.address.postcode,
+                county: property.address.county
+              }" 
+            />
+          </div>
+
 
         </div>
 
@@ -98,7 +113,7 @@
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="fullAddress"
+          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="address"
             :property-type="property?.type?.name" :property-size="property?.size || undefined"
             :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
@@ -140,6 +155,7 @@ const { data: listing, status } = await useAsyncData(
   }
 );
 
+
 /**
  *  Content
  */
@@ -150,9 +166,9 @@ const priceFormatted = computed(() => {
   return isNumber(price) ? numberToCurrency(price) : "";
 });
 
-
-const fullAddress = computed(() => {
-  return property.value?.address?.fullAddress || "No address provided";
+/** omit street number */
+const address = computed(() => {
+  return property.value?.address ? `${property.value.address.street || ''}, ${property.value.address.city || ''}, ${property.value.address.postcode || ''}`.trim() : '';
 });
 
 // Handle amenities array/object conversion

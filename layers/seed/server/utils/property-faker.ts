@@ -423,10 +423,11 @@ export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
 
 export const generateAddress = (address: any) => {
   return {
+    number: address.number,
     street: address.street,
     city: address.city,
     postcode: address.postcode,
-    fullAddress: address.street + ", " + address.city + ", " + address.postcode,
+    fullAddress: address.number + ", " + address.street + ", " + address.city + ", " + address.postcode,
     lat: address.lat,
     lon: address.lon,
   }

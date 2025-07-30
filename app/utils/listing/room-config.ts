@@ -5,7 +5,7 @@
 /**
  * Convert enum values to readable strings
  */
-export const convertEnumToString = (enumValue: string): string => {
+export const convertRoomEnumToString = (enumValue: string): string => {
   // Handle underscore-separated enums first
   if (enumValue.includes('_')) {
     return enumValue
@@ -46,10 +46,10 @@ export const getRoomType = (room: any): string => {
   
   // If room type is "other", use the room's name instead
   if (room.type && room.type.toLowerCase() === 'other' && room.name) {
-    return convertEnumToString(room.name);
+    return convertRoomEnumToString(room.name);
   }
-  
-  return room.type ? convertEnumToString(room.type) : room.name || 'Room';
+
+  return room.type ? convertRoomEnumToString(room.type) : room.name || 'Room';
 };
 
 /**
