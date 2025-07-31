@@ -46,6 +46,18 @@
               :items="getGardenItems(property)" type="garden" title="Gardens" :show-floor="false" />
           </div>
 
+           <!-- Price Paid History -->
+          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
+            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
+              number: property.address.number,
+              flat: property.address.flat,
+              street: property.address.street,
+              city: property.address.city,
+              postcode: property.address.postcode,
+              county: property.address.county,
+            }" />
+          </div>
+
           <div v-if="property" class="p-listing__section">
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-list">
@@ -61,23 +73,19 @@
                 :features="property?.additionalFeatures" />
             </div>
           </div>
-
+          
           <!-- Location & Amenities (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
             <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!"
               :listing="listing" :amenities="amenitiesArray" />
           </div>
 
-          <!-- Price Paid History -->
-          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
-            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
-              number: property.address.number,
-              flat: property.address.flat,
-              street: property.address.street,
-              city: property.address.city,
-              postcode: property.address.postcode,
-              county: property.address.county,
-            }" />
+           <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+            <OrganismsListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
+          </div>
+
+           <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+            <OrganismsListingCrimeScore :lat="property.address.lat" :lon="property.address.lon" />
           </div>
         </div>
 

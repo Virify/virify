@@ -45,10 +45,23 @@ export default defineEventHandler(async (event) => {
     const ppdData = await getPricePaidByAddress(postcode, street, city, number, flat);
 
     if (ppdData.length === 0) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'No price paid data found for this address'
+      // Return empty data structure instead of throwing error
+      const emptyResult = {
+        data: {
+          sales: [],
+          total_sales: 0,
+          latest_sale: null,
+          price_range: null,
+          market_context: null
+        }
+      };
+      
+      // Cache the empty result for 7 days (shorter than successful results)
+      await useStorage().setItem(cacheKey, emptyResult, {
+        ttl: 60 * 60 * 24 * 7 // 7 days in seconds
       });
+      
+      return emptyResult;
     }
 
     // Sort sales by date (newest first)
