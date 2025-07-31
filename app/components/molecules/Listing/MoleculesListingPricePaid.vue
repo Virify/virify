@@ -1,6 +1,9 @@
 <template>
   <section class="price-paid">
     <h2 class="| title-md">Property History</h2>
+    <p class="property-history-desc | body-md">
+      See when this property changed hands, how the price has moved, and how it stacks up against the rest of the city. Get a feel for its journey so far, spot local price trends, and find out if you’re looking at a hidden gem—or a record breaker. All data comes straight from the Land Registry, so you’re always in the know.
+    </p>
     <div v-if="pricePaidData?.data?.sales" class="price-history-grid">
       <!-- Property History Column -->
       <MoleculesTimeline title="This Property" :items="timelineItems" note="Note: This data is based on the latest available information provided by the Land Registry." />
@@ -8,6 +11,7 @@
       <!-- Market Context Column -->
       <div class="area-column" v-if="pricePaidData?.data?.market_context">
         <h3 class="column-title | title-sm">Market Context ({{ pricePaidData?.data?.market_context?.reference_year }})</h3>
+        <!-- Market context description moved to top of section -->
         <div class="market-analytics">
           <!-- Area Average Card -->
           <div class="stat-card-with-info" v-if="areaAverageCard">
@@ -158,7 +162,6 @@ const marketTrendInfo = "Area Trend: This shows the percentage change in the ave
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 .price-paid {
-  margin: var(--size-32) 0;
 
   ul {
     margin: 0;

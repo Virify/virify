@@ -7,26 +7,19 @@
       <AtomsPill class="pill | body-xs">{{ value }}</AtomsPill>
     </header>
     <div v-if="description" class="stat-card__desc-row">
-      <button v-if="info" class="stat-card__info-btn button button-xs button-quiet" type="button" aria-label="Show info about this statistic" @click="toggleInfoModal">
+      <button v-if="info" class="stat-card__info-btn button button-xs button-quiet" type="button" aria-label="Show info about this statistic" @click="openInfoModal">
         <AtomsIcon icon="property/info" :size="16" />
       </button>
       <p class="stat-card__description | body-sm">{{ description }}</p>
     </div>
 
     <!-- Info Modal -->
-    <Teleport to="body">
-      <div v-if="showInfoModal">
-        <div class="stat-card-info-modal" @click.stop :style="modalPosition">
-          <div class="stat-card-info-modal__header">
-            <span></span>
-            <button @click="closeInfoModal" class="stat-card__info-btn button button-xs button-quiet" type="button" aria-label="Close info">
-              <AtomsIcon icon="cross" :size="16" />
-            </button>
-          </div>
-          <p class="| body-sm">{{ info }}</p>
-        </div>
-      </div>
-    </Teleport>
+    <AtomsInfoModal 
+      :show="showInfoModal" 
+      :content="info || ''" 
+      :position="modalPosition"
+      @close="closeInfoModal"
+    />
   </div>
 </template>
 
@@ -41,55 +34,24 @@ interface Props {
 defineProps<Props>();
 
 const showInfoModal = ref(false);
-const modalPosition = ref({});
-const modalRef = ref<HTMLElement | null>(null);
+const { modalPosition, openModal, closeModal } = useInfoModal(() => {
+  showInfoModal.value = false;
+});
 
-function lockBodyScroll() {
-  document.body.style.overflow = "hidden";
-}
-
-function unlockBodyScroll() {
-  document.body.style.overflow = "";
-}
-
-function toggleInfoModal(event: MouseEvent) {
-  if (showInfoModal.value) {
-    closeInfoModal();
-  } else {
-    // Position modal near the button
-    const button = event.target as HTMLElement;
-    const rect = button.getBoundingClientRect();
-    modalPosition.value = {
-      position: "fixed",
-      top: `${rect.bottom + 8}px`,
-      left: `${rect.left - 40}px`,
-      zIndex: 2000,
-    };
-    showInfoModal.value = true;
-    lockBodyScroll();
-    // Wait for next tick to set ref
-    setTimeout(() => {
-      modalRef.value = document.querySelector(".stat-card-info-modal");
-    }, 0);
-  }
+function openInfoModal(event: MouseEvent) {
+  showInfoModal.value = true;
+  openModal(event, -40, 8);
 }
 
 function closeInfoModal() {
   showInfoModal.value = false;
-  modalPosition.value = {};
-  unlockBodyScroll();
-}
-
-function handleDocumentClick(event: MouseEvent) {
-  if (!showInfoModal.value) return;
-  const modalEl = modalRef.value;
-  if (modalEl && !modalEl.contains(event.target as Node)) {
-    closeInfoModal();
-  }
+  closeModal();
 }
 </script>
 
 <style lang="scss" scoped>
+@use "#styles/_utils/media" as mq;
+
 .stat-card {
   background: var(--background-100);
   border: 1px solid var(--monochrome-600);
@@ -143,6 +105,13 @@ function handleDocumentClick(event: MouseEvent) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    @include mq.mobile-only {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      line-height: 1.3;
+    }
   }
 
   .pill {
@@ -161,29 +130,6 @@ function handleDocumentClick(event: MouseEvent) {
     display: block;
     margin: 0;
     flex: 1;
-  }
-}
-
-/* Modal styles */
-.stat-card-info-modal {
-  background: var(--background-100);
-  border: 1px solid var(--monochrome-600);
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 250px;
-  max-width: 350px;
-  padding: var(--size-16);
-  position: fixed;
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-
-  &__header {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-end;
-    margin-bottom: var(--size-8);
   }
 }
 </style>

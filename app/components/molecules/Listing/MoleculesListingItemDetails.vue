@@ -1,84 +1,97 @@
 <template>
   <div class="item-details">
-    <h2 class="| title-sm">{{ displayTitle }}</h2>
-    <ul class="item-details__list">
-      <li v-for="(item, index) in itemsArray" :key="index" class="item-details__item">
-        <div class="item-details__image">
-          <nuxt-img v-if="item.media && item.media[0]" :src="item.media[0].image!" :alt="item.media[0].metadata!"
-            class="| image-sm" />
-        </div>
-        <div class="item-details__content | body-sm">
-          <!-- Title row with icon, title, and info button -->
-          <div class="item-details__title | font-semibold">
-            <div class="item-details__title-content">
-              <AtomsIcon :icon="getItemIcon(item)" :size="20" />
-              {{ getItemTitle(item) }}
-            </div>
-            <button v-if="item.description" @click="toggleDescription(index, $event)"
-              class="button button-xs button-quiet" type="button"
-              :aria-label="`Show description for ${getItemTitle(item)}`">
-              <AtomsIcon icon="property/info" :size="18" />
-            </button>
+    <button 
+      :class="[
+        'item-details__header',
+        `item-details__header--${variant}`
+      ]"
+      @click="toggleCollapsed" 
+      :aria-expanded="!isCollapsed" 
+      :aria-controls="`item-details-${normalizedTitle}`"
+    >
+      <h2 class="| body-md font-semibold">
+        <AtomsIcon v-if="variant === 'card'" :icon="getSectionIcon()" :size="20" />
+        {{ props.title }} <span class="body-sm">({{ itemsArray.length }})</span>
+      </h2>
+      <AtomsIcon icon="chevron-down" :size="24" class="item-details__chevron" :class="{ 'item-details__chevron--open': !isCollapsed }" />
+    </button>
+
+    <Transition name="item-details-collapse">
+      <ul v-show="!isCollapsed" class="item-details__list" :id="`item-details-${normalizedTitle}`">
+        <li v-for="(item, index) in itemsArray" :key="index" class="item-details__item">
+          <div class="item-details__image">
+            <nuxt-img v-if="item.media && item.media[0]" :src="item.media[0].image!" :alt="item.media[0].metadata!" class="| image-sm" />
           </div>
-          
-          <!-- Size and floor info -->
-          <div class="item-details__details-row">
-            <div v-if="item.size" class="item-details__detail">
-              <AtomsIcon icon="property/size" :size="24" />
-              {{ item.size }}sqmt
+          <div class="item-details__content | body-sm">
+            <!-- Title row with icon, title, and info button -->
+            <div class="item-details__title | font-semibold">
+              <div class="item-details__title-content">
+                <AtomsIcon :icon="getItemIcon(item)" :size="20" />
+                {{ getItemTitle(item) }}
+              </div>
+              <button v-if="item.description" @click="openDescription(index, $event)" class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${getItemTitle(item)}`">
+                <AtomsIcon icon="property/info" :size="22" />
+              </button>
             </div>
-            <div v-if="showFloor && 'floor' in item && item.floor !== undefined" class="item-details__detail">
-              <AtomsIcon icon="property/floor" :size="24" />
-              {{ getFloorText((item as any).floor) }}
+
+            <!-- Size and floor info -->
+            <div class="item-details__details-row">
+              <div v-if="item.size" class="item-details__detail">
+                <AtomsIcon icon="property/size" :size="24" />
+                {{ item.size }}sqmt
+              </div>
+              <div v-if="showFloor && 'floor' in item && item.floor !== undefined" class="item-details__detail">
+                <AtomsIcon icon="property/floor" :size="24" />
+                {{ getFloorText((item as any).floor) }}
+              </div>
+            </div>
+
+            <!-- Features -->
+            <div v-if="getFeatures(item).length > 0" class="item-details__features">
+              <AtomsPill v-for="feature in getFeatures(item)" :key="feature" class="| body-xs">
+                {{ feature }}
+              </AtomsPill>
             </div>
           </div>
-          
-          <!-- Features -->
-          <div v-if="getFeatures(item).length > 0" class="item-details__features">
-            <AtomsPill v-for="feature in getFeatures(item)" :key="feature" class="| body-xs">
-              {{ feature }}
-            </AtomsPill>
-          </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </Transition>
   </div>
 
-  <!-- Description modal teleported to body for proper positioning -->
-  <Teleport to="body">
-    <div v-if="activeDescription !== null && itemsArray[activeDescription]?.description" class="item-details-modal"
-      :style="modalPosition" @click.stop>
-      <p class="| body-xs">{{ itemsArray[activeDescription]?.description }}</p>
-      <button @click="closeDescription" class="item-details-modal__close" type="button"
-        aria-label="Close description">
-        <AtomsIcon icon="property/close" :size="14" />
-      </button>
-    </div>
-  </Teleport>
+  <!-- Description modal -->
+  <AtomsInfoModal 
+    :show="activeDescription !== null" 
+    :content="activeDescription !== null ? itemsArray[activeDescription]?.description || '' : ''" 
+    :position="modalPosition"
+    @close="closeDescription"
+  />
 </template>
 
 <script setup lang="ts">
-import type { Prisma } from '~~/layers/database/server/database/prisma/generated/client';
+import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 
 interface Props {
   title: string;
-  type: 'room' | 'garden';
+  type: "room" | "garden";
   subtype?: string; // For room types like "Bedroom", "Bathroom", etc.
-  items: 
-    | Prisma.BedroomGetPayload<{ include: { media: true } }>[] 
-    | Prisma.BathroomGetPayload<{ include: { media: true } }>[] 
-    | Prisma.ReceptionGetPayload<{ include: { media: true } }>[] 
-    | Prisma.OtherRoomGetPayload<{ include: { media: true } }>[] 
+  items:
+    | Prisma.BedroomGetPayload<{ include: { media: true } }>[]
+    | Prisma.BathroomGetPayload<{ include: { media: true } }>[]
+    | Prisma.ReceptionGetPayload<{ include: { media: true } }>[]
+    | Prisma.OtherRoomGetPayload<{ include: { media: true } }>[]
     | Prisma.KitchenGetPayload<{ include: { media: true } }>
     | { gardenType: string; media: any[]; [key: string]: any }[]
-    | null 
+    | null
     | undefined;
   showFloor?: boolean;
+  variant?: "card" | "plain";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showFloor: true
+  showFloor: true,
+  variant: "card",
 });
+
 
 // Normalize items to always be an array
 const itemsArray = computed(() => {
@@ -90,27 +103,56 @@ const itemsArray = computed(() => {
 // Display title with count
 const displayTitle = computed(() => {
   const count = itemsArray.value.length;
-  if (props.type === 'garden') {
-    return count === 1 ? 'Garden (1)' : `Gardens (${count})`;
+  if (props.type === "garden") {
+    return count === 1 ? "Garden (1)" : `Gardens (${count})`;
   }
   return `${props.title} (${count})`;
 });
 
+// Normalized title for ID generation
+const normalizedTitle = computed(() => {
+  return props.title.toLowerCase().replace(/\s+/g, "-");
+});
+
+// Collapsible state logic
+const isCollapsed = ref(false);
+
+// Set initial collapsed state - only bedrooms open by default
+watchEffect(() => {
+  isCollapsed.value = props.title.toLowerCase() !== "bedrooms";
+});
+
+// Toggle collapse function
+const toggleCollapsed = () => {
+  isCollapsed.value = !isCollapsed.value;
+};
+
 // Description modal state
 const activeDescription = ref<number | null>(null);
-const modalPosition = ref({});
-
+const { modalPosition, openModal, closeModal } = useInfoModal(() => {
+  activeDescription.value = null;
+});
 
 // Helper functions
-const getItemIcon = (item: any): string => {
+const getSectionIcon = (): string => {
   if (props.type === 'garden') {
+    return 'property/front-garden'; // or could be 'property/rear-garden'
+  }
+  
+  // Use the existing room type icon logic based on subtype
+  const dummyRoom = {}; // Empty object since we're using subtype
+  return getRoomTypeIcon(dummyRoom, props.subtype || props.title);
+};
+
+const getItemIcon = (item: any): string => {
+  if (props.type === "garden") {
     return getGardenTypeIcon(item.gardenType);
   }
-  return getRoomTypeIcon(item, props.subtype || '');
+  return getRoomTypeIcon(item, props.subtype || "");
 };
 
 const getItemTitle = (item: any): string => {
-  if (props.type === 'garden') {
+  if (props.type === "garden") {
     return getGardenType(item);
   }
   return getRoomType(item);
@@ -118,12 +160,12 @@ const getItemTitle = (item: any): string => {
 
 // Computed property to filter only TRUE boolean features and convert to readable strings
 const getFeatures = (item: any): string[] => {
-  if (!item || typeof item !== 'object') return [];
+  if (!item || typeof item !== "object") return [];
 
   const features: string[] = [];
   Object.entries(item).forEach(([key, value]) => {
     // Skip non-boolean properties or specific properties we handle separately
-    if (typeof value === 'boolean' && value === true && key !== 'description' && key !== 'size') {
+    if (typeof value === "boolean" && value === true && key !== "description" && key !== "size") {
       features.push(convertRoomEnumToString(key));
     }
   });
@@ -132,52 +174,77 @@ const getFeatures = (item: any): string[] => {
 };
 
 // Description modal methods
-const toggleDescription = (index: number, event: Event) => {
-  if (activeDescription.value === index) {
-    closeDescription();
-    return;
-  }
-
-  const button = event.target as HTMLElement;
-  const rect = button.getBoundingClientRect();
-
-  modalPosition.value = {
-    position: 'fixed',
-    top: `${rect.bottom + 8}px`,
-    left: `${rect.left - 200}px`,
-    zIndex: 1000
-  };
-
+const openDescription = (index: number, event: MouseEvent) => {
   activeDescription.value = index;
+  openModal(event, -200, 8);
 };
 
 const closeDescription = () => {
   activeDescription.value = null;
-  modalPosition.value = {};
+  closeModal();
 };
 
-
-// Close modal on escape key
-onMounted(() => {
-  const handleEscape = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && activeDescription.value !== null) {
-      closeDescription();
-    }
-  };
-
-  document.addEventListener('keydown', handleEscape);
-
-  onUnmounted(() => {
-    document.removeEventListener('keydown', handleEscape);
-  });
-});
 </script>
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
 .item-details {
-  margin: var(--size-32) 0;
+  margin: 0;
+
+  &__header {
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: var(--size-16);
+
+    &:hover {
+      .item-details__chevron {
+        color: var(--foreground-100);
+      }
+    }
+
+    h2 {
+      margin: 0;
+      text-transform: capitalize;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: var(--size-8);
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    // Card variant (styled like ListingFeatures)
+    &--card {
+      background: var(--background-100);
+      border: 1px solid var(--monochrome-600);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+      padding: var(--size-16);
+      margin-bottom: var(--size-16);
+    }
+
+    // Plain variant (original minimal style)
+    &--plain {
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: var(--size-8);
+    }
+  }
+
+  &__chevron {
+    color: var(--foreground-200);
+    transition: transform var(--animation-medium) var(--ease-in-out), color var(--animation-medium) var(--ease-in-out);
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
 
   &__list {
     list-style: none;
@@ -269,45 +336,23 @@ onMounted(() => {
     }
   }
 
-  .a-icon {
+  // Info button icon size
+  &__title .button.button-xs.button-quiet .a-icon {
     width: 22px;
     height: 22px;
-    color: var(--foreground-200);
-    margin-bottom: var(--size-2);
   }
 }
 
-/* Modal styles (teleported to body) */
-.item-details-modal {
-  background: var(--background-100);
-  border: 1px solid var(--monochrome-600);
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 250px;
-  max-width: 300px;
-  padding: var(--size-12);
-  position: relative;
+/* Collapse transition styles */
+.item-details-collapse-enter-active,
+.item-details-collapse-leave-active {
+  transition: opacity var(--animation-medium) var(--ease-in-out), transform var(--animation-medium) var(--ease-in-out);
+  transform-origin: top;
+}
 
-  p {
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  &__close {
-    position: absolute;
-    top: var(--size-8);
-    right: var(--size-8);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--size-2);
-    border-radius: var(--border-radius-sm);
-    color: var(--foreground-200);
-
-    &:hover {
-      background-color: var(--background-200);
-      color: var(--foreground-100);
-    }
-  }
+.item-details-collapse-enter-from,
+.item-details-collapse-leave-to {
+  opacity: 0;
+  transform: scaleY(0.95) translateY(-8px);
 }
 </style>

@@ -15,7 +15,6 @@ defineProps<Props>()
 
 <style lang="scss">
 .listing-general-info {
-  margin: var(--size-32) 0;
   border-radius: var(--border-radius-2xl);
 }
 </style>

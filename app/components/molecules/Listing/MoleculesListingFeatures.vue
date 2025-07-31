@@ -1,12 +1,12 @@
 <template>
   <div class="feature-card" @click="toggleCollapse">
-    <div class="feature-card__content | body-sm">
+    <div class="feature-card__content | body-md">
       <!-- Title row with icon, title, info button, and collapse arrow -->
       <div class="feature-card__title-row | font-semibold">
         <div class="feature-card__title-wrapper">
           <AtomsIcon :icon="getFeatureIcon(title)" :size="20" />
           {{ title }}
-          <button v-if="features?.description" @click.stop="toggleDescription($event)" 
+          <button v-if="features?.description" @click.stop="openDescription($event)" 
             class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${title}`">
             <AtomsIcon icon="property/info" :size="16" />
           </button>
@@ -36,14 +36,12 @@
   </div>
 
   <!-- Description modal -->
-  <Teleport to="body">
-    <div v-if="showDescription && features?.description" class="modal" :style="modalPosition" @click.stop>
-      <p class="| body-xs">{{ features.description }}</p>
-      <button @click="closeDescription" class="modal__close" type="button" aria-label="Close description">
-        <AtomsIcon icon="property/close" :size="14" />
-      </button>
-    </div>
-  </Teleport>
+  <AtomsInfoModal 
+    :show="showDescription" 
+    :content="features?.description || ''" 
+    :position="modalPosition"
+    @close="closeDescription"
+  />
 </template>
 
 <script setup lang="ts">
@@ -72,11 +70,13 @@ const filteredFeatures = computed(() => {
 });
 
 // Collapse state
-const isCollapsed = ref(true);
+const isCollapsed = ref(false);
 
 // Description modal state
 const showDescription = ref(false);
-const modalPosition = ref({});
+const { modalPosition, openModal, closeModal } = useInfoModal(() => {
+  showDescription.value = false;
+});
 
 // Helper function to get feature icon based on title
 const getFeatureIcon = (title: string): string => {
@@ -90,28 +90,14 @@ const formattedSize = computed(() => {
 });
 
 // Description modal methods
-const toggleDescription = (event: Event) => {
-  if (showDescription.value) {
-    closeDescription();
-    return;
-  }
-
-  const button = event.target as HTMLElement;
-  const rect = button.getBoundingClientRect();
-
-  modalPosition.value = {
-    position: 'fixed',
-    top: `${rect.bottom + 8}px`,
-    left: `${rect.left - 200}px`, // Position to the left of the icon
-    zIndex: 1000
-  };
-
+const openDescription = (event: MouseEvent) => {
   showDescription.value = true;
+  openModal(event, -200, 8);
 };
 
 const closeDescription = () => {
   showDescription.value = false;
-  modalPosition.value = {};
+  closeModal();
 };
 
 // Collapse toggle
@@ -119,20 +105,6 @@ const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
-// Close modal on escape key
-onMounted(() => {
-  const handleEscape = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && showDescription.value) {
-      closeDescription();
-    }
-  };
-
-  document.addEventListener('keydown', handleEscape);
-
-  onUnmounted(() => {
-    document.removeEventListener('keydown', handleEscape);
-  });
-});
 </script>
 
 <style lang="scss">
@@ -216,40 +188,6 @@ onMounted(() => {
     width: 22px;
     height: 22px;
     color: var(--foreground-200);
-  }
-}
-
-.modal {
-  background: var(--background-100);
-  border: 1px solid var(--monochrome-600);
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 250px;
-  max-width: 300px;
-  padding: var(--size-12);
-  position: relative;
-
-  p {
-    margin: 0;
-    line-height: 1.4;
-    padding-right: var(--size-20);
-  }
-
-  &__close {
-    position: absolute;
-    top: var(--size-8);
-    right: var(--size-8);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--size-2);
-    border-radius: var(--border-radius-sm);
-    color: var(--foreground-200);
-
-    &:hover {
-      background-color: var(--background-200);
-      color: var(--foreground-100);
-    }
   }
 }
 </style>
