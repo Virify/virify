@@ -265,7 +265,7 @@ const premiumFeatures = computed(() => {
 
   &__gallery {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
   }
 

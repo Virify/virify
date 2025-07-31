@@ -1,7 +1,7 @@
 <template>
   <MoleculesCardTemplate variant="premium" :result>
-    <template #carousel>
-      <MoleculesCardSlotsThumbCarousel />
+    <template #carousel="{ media }">
+      <MoleculesCardSlotsThumbCarousel :slides="media" />
     </template>
 
     <template
