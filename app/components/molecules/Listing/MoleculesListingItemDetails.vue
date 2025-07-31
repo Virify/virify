@@ -192,7 +192,7 @@ const closeDescription = () => {
   &__list {
     list-style: none;
     padding: 0;
-    margin: var(--size-32) 0;
+    margin: var(--size-24) 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--size-24);
@@ -203,7 +203,7 @@ const closeDescription = () => {
 
     @include mq.mobile-only {
       grid-template-columns: 1fr;
-      gap: var(--size-12);
+      gap: var(--size-24);
     }
   }
 
