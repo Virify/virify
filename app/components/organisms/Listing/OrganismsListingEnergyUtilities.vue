@@ -25,7 +25,7 @@
         <!-- Renewable Energy -->
         <div v-if="energyData.renewables?.length" class="o-listing-energy__renewable-hero">
           <div class="o-listing-energy__renewable-icon">
-            <AtomsIcon icon="property/feature" :size="32" />
+            <AtomsIcon icon="listings/eco" :size="32" />
           </div>
           <div class="o-listing-energy__renewable-info">
             <h4 class="title-sm">Renewable Energy</h4>
@@ -38,9 +38,6 @@
           </div>
         </div>
       </div>
-
-
-
     </div>
   </section>
 </template>
@@ -112,7 +109,7 @@ const formatRenewableEnergy = (renewable: string): string => {
     align-items: center;
     gap: var(--size-20);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    color: white;
+    color: var(--monochrome-900);
 
     @include mq.mobile-only {
       flex-direction: column;
@@ -197,9 +194,9 @@ const formatRenewableEnergy = (renewable: string): string => {
     display: flex;
     align-items: center;
     gap: var(--size-20);
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 169, 81, 0.25);
-
+    color: var(--monochrome-900);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
     @include mq.mobile-only {
       flex-direction: column;
       text-align: center;
@@ -208,10 +205,11 @@ const formatRenewableEnergy = (renewable: string): string => {
   }
 
   &__renewable-icon {
+    display: flex;
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius-lg);
-    padding: var(--size-16);
+    padding: var(--size-24);
 
     .a-icon {
       color: white;

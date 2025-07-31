@@ -195,7 +195,7 @@ const closeDescription = () => {
     margin: var(--size-32) 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--size-16);
+    gap: var(--size-24);
 
     @include mq.tablet-only {
       grid-template-columns: repeat(2, 1fr);
@@ -270,8 +270,8 @@ const closeDescription = () => {
     margin-top: var(--size-4);
 
     .a-pill {
-      background: var(--background-300);
-      color: var(--foreground-100);
+      background: var(--blue-400);
+      color: var(--monochrome-900);
     }
   }
 

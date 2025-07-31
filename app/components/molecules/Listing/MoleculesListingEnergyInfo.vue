@@ -8,7 +8,14 @@
         title="Energy"
         variant="inline"
         @toggle="() => {}"
-      />
+      >
+        <template #actions>
+          <button v-if="description" @click.stop="openDescription($event)" 
+            class="button button-xs button-quiet" type="button" :aria-label="`Show description for Energy`">
+            <AtomsIcon icon="property/info" :size="16" />
+          </button>
+        </template>
+      </AtomsCollapsibleHeader>
 
       <!-- Energy details (collapsible) -->
       <div v-show="!isCollapsed" class="feature-card__details-section">
@@ -64,6 +71,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Description modal -->
+  <AtomsInfoModal 
+    :show="showDescription" 
+    :content="description" 
+    :position="modalPosition"
+    @close="closeDescription"
+  />
 </template>
 
 <script setup lang="ts">
@@ -88,6 +103,28 @@ const isCollapsed = ref(true);
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
 };
+
+// Description modal state
+const showDescription = ref(false);
+
+const { modalPosition, openModal, closeModal } = useInfoModal(() => {
+  showDescription.value = false;
+});
+
+// Description modal methods
+const openDescription = (event: MouseEvent) => {
+  showDescription.value = true;
+  openModal(event, -200, 8);
+};
+
+const closeDescription = () => {
+  showDescription.value = false;
+  closeModal();
+};
+
+const description = computed(() => {
+  return 'This section provides information about the energy efficiency and utilities available for the property.';
+});
 
 // Format helper functions
 const formatHeatingType = (type: string): string => {

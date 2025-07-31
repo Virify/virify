@@ -130,9 +130,10 @@ onMounted(() => {
     border: 2px solid var(--secondary-400);
     border-radius: var(--border-radius-xl);
     padding: var(--size-16);
-    margin: var(--size-20) 0;
+    margin: var(--size-32) auto;
     text-align: center;
     color: var(--monochrome-900);
+    max-width: fit-content;
   }
 
   &__risk-level {

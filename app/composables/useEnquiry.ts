@@ -7,6 +7,7 @@ import { createSharedComposable } from '@vueuse/core';
 export const useEnquiry = createSharedComposable(() => {
   const { loggedIn, user } = useUserSession();
   const requestFetch = useRequestFetch();
+  const { showDialog } = useDialog();
 
   // State
   const sentEnquiries = ref<number[]>([]); // Listing IDs already enquired
@@ -75,11 +76,64 @@ export const useEnquiry = createSharedComposable(() => {
     }
   }
 
+  /**
+   * Check if user can enquire about a listing
+   */
+  function canEnquire(listingId: number, receiverId?: number | null): boolean {
+    if (!receiverId || typeof receiverId !== 'number' || isNaN(receiverId)) return false;
+    if (receiverId === currentUserId.value) return false; // Can't enquire about own property
+    if (hasEnquired(listingId)) return false;
+    return true;
+  }
+
+  /**
+   * Get enquiry button state for UI
+   */
+  function getEnquiryState(listingId: number, receiverId?: number | null) {
+    const safeReceiverId = typeof receiverId === 'number' && !isNaN(receiverId) ? receiverId : null;
+    const isSelf = safeReceiverId !== null && currentUserId.value === safeReceiverId;
+    const alreadyEnquired = hasEnquired(listingId);
+    
+    return {
+      isDisabled: !safeReceiverId || alreadyEnquired || loadingEnquiries.value || isSelf,
+      label: isSelf ? 'Self Listing' : alreadyEnquired ? 'Enquiry sent' : 'Enquire now',
+      canEnquire: canEnquire(listingId, receiverId)
+    };
+  }
+
+  /**
+   * Handle enquiry button click - opens appropriate dialog
+   */
+  async function handleEnquiryClick(listingId: number, receiverId?: number | null) {
+    // Lazy import to avoid circular dependencies
+    const [{ default: ViewsDialogLogin }, { default: ViewsDialogEnquiry }] = await Promise.all([
+      import('~/components/views/Dialog/ViewsDialogLogin.vue'),
+      import('~/components/views/Dialog/ViewsDialogEnquiry.vue')
+    ]);
+
+    if (!user.value || !user.value.id) {
+      showDialog({
+        component: ViewsDialogLogin,
+      });
+      return;
+    }
+
+    if (canEnquire(listingId, receiverId)) {
+      showDialog({
+        component: ViewsDialogEnquiry,
+        props: { listingId, receiverId },
+      });
+    }
+  }
+
   return {
     hasEnquired,
     sendEnquiry,
     sentEnquiries,
     loadingEnquiries,
     hydrateEnquiries,
+    canEnquire,
+    getEnquiryState,
+    handleEnquiryClick,
   };
 });

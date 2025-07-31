@@ -13,7 +13,6 @@
 interface Props {
   constructionType?: string;
   chainFree?: boolean;
-  vacant?: boolean;
   yearBuilt?: string;
   propertySize?: number;
   reduced?: boolean;
@@ -26,16 +25,12 @@ const pills = computed(() => {
 
   if (props.constructionType) {
     pillsArray.push(
-      `Construction Type: ${props.constructionType.toLowerCase()}`
+      `Construction Type: ${convertRoomEnumToString(props.constructionType)}`
     );
   }
 
   if (props.chainFree !== undefined) {
     pillsArray.push(props.chainFree ? "Chain Free" : "Chain Dependent");
-  }
-
-  if (props.vacant !== undefined) {
-    pillsArray.push(props.vacant ? "Vacant" : "Occupied");
   }
 
   if (props.yearBuilt) {

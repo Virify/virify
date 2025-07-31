@@ -4,11 +4,18 @@
       <!-- Title row with icon, title, info button, and collapse arrow -->
       <AtomsCollapsibleHeader
         :is-collapsed="isCollapsed"
-        icon="property/work"
+        icon="listings/speed"
         title="Broadband"
         variant="inline"
         @toggle="() => {}"
-      />
+      >
+        <template #actions>
+          <button v-if="description" @click.stop="openDescription($event)" 
+            class="button button-xs button-quiet" type="button" :aria-label="`Show description for Broadband`">
+            <AtomsIcon icon="property/info" :size="16" />
+          </button>
+        </template>
+      </AtomsCollapsibleHeader>
 
       <!-- Broadband details (collapsible) -->
       <div v-show="!isCollapsed" class="feature-card__details-section">
@@ -35,6 +42,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Description modal -->
+  <AtomsInfoModal 
+    :show="showDescription"
+    :content="description"
+    :position="modalPosition"
+    @close="closeDescription"
+  />
 </template>
 
 <script setup lang="ts">
@@ -44,7 +59,7 @@ interface Props {
   fullFibreAvailable?: boolean;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 // Collapse state
 const isCollapsed = ref(true);
@@ -52,6 +67,22 @@ const isCollapsed = ref(true);
 // Collapse toggle
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
+};
+
+// Description modal state
+const showDescription = ref(false);
+const { modalPosition, openModal, closeModal } = useInfoModal(() => {
+  showDescription.value = false;
+});
+
+const openDescription = (event: MouseEvent) => {
+  showDescription.value = true;
+  openModal(event, -40, 8);
+};
+
+const closeDescription = () => {
+  showDescription.value = false;
+  closeModal();
 };
 
 const formatBroadbandType = (type: string): string => {
@@ -65,6 +96,10 @@ const formatBroadbandType = (type: string): string => {
   };
   return typeMap[type] || convertEnumToString(type);
 };
+
+const description = computed(() => {
+  return props.broadbandType ? `information about the broadband available, including type and speed.` : '';
+}); 
 </script>
 
 <style lang="scss">

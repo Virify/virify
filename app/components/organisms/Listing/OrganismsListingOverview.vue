@@ -1,17 +1,40 @@
 <template>
   <div class="o-listing-overview">
-    <h2 v-if="price" class="o-listing-overview__title | title-lg lineheight-xs">
-      <AtomsPill class="| body-2xs">
-        Offers in excess of
+    <h2 v-if="price" class="o-listing-overview__title | title-xl lineheight-xs">
+      <AtomsPill class="o-listing-overview__price-type | body-2xs">
+        {{ convertRoomEnumToString(priceType!) }}
       </AtomsPill>
 
-      {{ price }}
+      <span class="o-listing-overview__price">{{ price }}</span>
     </h2>
 
-
-    <p role="presentation" class="o-listing-overview__address | body-sm">
+    <p role="presentation" class="o-listing-overview__address | body-md">
       {{ address }}
     </p>
+
+    <!-- Property Icons -->
+    <div class="o-listing-overview__icons">
+      <OrganismsListingSidebarIcons 
+        :property-type="propertyType"
+        :bedrooms="bedrooms"
+        :bathrooms="bathrooms"
+        :receptions="receptions"
+        :other-rooms="otherRooms"
+        :rear-garden="rearGarden"
+        :front-garden="frontGarden"
+        :classification="classification"
+      />
+    </div>
+
+    <!-- Property Pills -->
+    <div class="o-listing-overview__pills">
+      <OrganismsListingSidebarPills 
+        :property-size="propertySize"
+        :chain-free="chainFree"
+        :year-built="yearBuilt"
+        :construction-type="constructionType"
+      />
+    </div>
   </div>
 </template>
 
@@ -19,6 +42,19 @@
 interface Props {
   price?: string
   address?: string
+  priceType?: string
+  propertyType?: string
+  propertySize?: number
+  bedrooms?: number
+  bathrooms?: number
+  receptions?: number
+  otherRooms?: number
+  classification?: string
+  yearBuilt?: string
+  constructionType?: string
+  chainFree?: boolean
+  rearGarden?: boolean
+  frontGarden?: boolean
 }
 
 const props = defineProps<Props>()
@@ -48,6 +84,15 @@ console.log("OrganismsListingOverview loaded with props:", props.address);
       justify-content: flex-start;
     }
   }
+  &__price-type {
+    background: var(--blue-400);
+    color: var(--monochrome-900);
+  }
+
+  &__price {
+    color: var(--foreground-100);
+  }
+
   &__address {
     color: var(--secondary-400);
     margin: 0;
@@ -58,5 +103,36 @@ console.log("OrganismsListingOverview loaded with props:", props.address);
       text-align: left;
     }
   }
+
+  &__icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--size-16);
+    margin: var(--size-32) 0;
+  }
+
+  &__pills {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--size-12);
+  }
+}
+
+// Override the OrganismsListingSidebarIcons styles when inside mobile overview
+.o-listing-overview__icons .o-listing-sidebar-icons {
+  justify-content: center;
+  text-align: center;
+  
+  .o-listing-sidebar-icons__row {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+// Override the OrganismsListingSidebarPills styles when inside mobile overview
+.o-listing-overview__pills .sidebar-pills {
+  justify-content: center;
+  text-align: center;
 }
 </style>

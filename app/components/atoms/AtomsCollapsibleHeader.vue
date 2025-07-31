@@ -11,7 +11,9 @@
     <h2 class="collapsible-header__title | body-md font-semibold">
       <AtomsIcon v-if="icon && (variant === 'card' || variant === 'inline')" :icon="icon" :size="20" />
       <slot name="title">{{ title }}</slot>
-      <slot name="actions"></slot>
+      <ClientOnly>
+        <slot name="actions"></slot>
+      </ClientOnly>
     </h2>
     <AtomsIcon 
       icon="chevron-down" 

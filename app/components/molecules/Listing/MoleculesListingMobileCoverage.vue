@@ -2,13 +2,15 @@
   <div class="feature-card" @click="toggleCollapse">
     <div class="feature-card__content | body-md">
       <!-- Title row with icon, title, info button, and collapse arrow -->
-      <AtomsCollapsibleHeader
-        :is-collapsed="isCollapsed"
-        icon="property/work"
-        title="Mobile Coverage"
-        variant="inline"
-        @toggle="() => {}"
-      />
+      <AtomsCollapsibleHeader :is-collapsed="isCollapsed" icon="listings/signal" title="Mobile Coverage" variant="inline"
+        @toggle="() => {}">
+        <template #actions>
+          <button v-if="description" @click.stop="openDescription($event)" class="button button-xs button-quiet"
+            type="button" :aria-label="`Show description for Mobile Coverage`">
+            <AtomsIcon icon="property/info" :size="16" />
+          </button>
+        </template>
+      </AtomsCollapsibleHeader>
 
       <!-- Mobile coverage details (collapsible) -->
       <div v-show="!isCollapsed" class="feature-card__details-section">
@@ -23,9 +25,13 @@
       </div>
     </div>
   </div>
+
+  <AtomsInfoModal :show="showDescription" :content="description || ''" :position="modalPosition"
+    @close="closeDescription" />
 </template>
 
 <script setup lang="ts">
+
 interface NetworkCoverage {
   name: string;
   coverage: string;
@@ -47,10 +53,30 @@ const props = withDefaults(defineProps<Props>(), {
 // Collapse state
 const isCollapsed = ref(true);
 
+// Description modal state
+const showDescription = ref(false);
+const { modalPosition, openModal, closeModal } = useInfoModal(() => {
+  showDescription.value = false;
+});
+
+const openDescription = (event: MouseEvent) => {
+  showDescription.value = true;
+  openModal(event, -40, 8);
+};
+
+const closeDescription = () => {
+  showDescription.value = false;
+  closeModal();
+};
+
 // Collapse toggle
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
 };
+
+const description = computed(() => {
+  return "This section provides information about the mobile network coverage available at the property. It includes details on various networks and their coverage quality.";
+});
 </script>
 
 <style lang="scss">

@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="p-listing">
     <div v-if="status === 'pending'">
       <h1>Loading...</h1>
     </div>
@@ -23,7 +23,12 @@
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
-            :address="address" />
+            :address="address" :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
+            :bedrooms="property?.numberBedrooms || undefined" :bathrooms="property?.numberBathrooms || undefined" 
+            :other-rooms="property?.numberOtherRooms || undefined" :rear-garden="property?.rearGarden ? true : false" 
+            :front-garden="property?.frontGarden ? true : false" :receptions="property?.numberReceptions || undefined" 
+            :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined" 
+            :construction-type="property?.constructionType || undefined" :chain-free="listing?.saleListing?.chain || false" />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
@@ -113,13 +118,13 @@
           </Transition>
 
           <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="address"
-            :property-type="property?.type?.name" :property-size="property?.size || undefined"
+            :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
             :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
             :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
             :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
-            :chain-free="property?.chainFree" :vacant="property?.vacant" :has-image-slide="!isImagesVisible"
+            :chain-free="listing?.saleListing?.chain || false" :has-image-slide="!isImagesVisible"
             :agent="listing?.user || {}" />
         </div>
       </div>
@@ -130,7 +135,14 @@
       @close="closeImageModal" />
 
     <client-only>
-      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible" />
+      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
+        :price-type="priceType" :address="address" :property-type="property?.type?.name" :property-size="property?.size || undefined"
+        :bedrooms="property?.numberBedrooms || undefined" :bathrooms="property?.numberBathrooms || undefined" 
+        :other-rooms="property?.numberOtherRooms || undefined" :rear-garden="property?.rearGarden ? true : false" 
+        :front-garden="property?.frontGarden ? true : false" :receptions="property?.numberReceptions || undefined" 
+        :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined" 
+        :construction-type="property?.constructionType || undefined" :chain-free="listing?.saleListing?.chain || false"
+        :listing-id="listing?.id || 0" :agent="listing?.user || {}" />
     </client-only>
   </main>
 </template>
@@ -167,6 +179,10 @@ const priceFormatted = computed(() => {
 /** omit street number */
 const address = computed(() => {
   return property.value?.address ? `${property.value.address.street || ""}, ${property.value.address.city || ""}, ${property.value.address.postcode || ""}`.trim() : "";
+});
+
+const priceType = computed(() => {
+  return listing.value?.saleListing ? listing.value.saleListing.priceType : listing.value?.rentalListing?.rentFrequency;
 });
 
 // Handle amenities array/object conversion
@@ -321,6 +337,7 @@ ul {
 
   &__content {
     overflow: hidden;
+    padding-bottom: var(--size-32);
 
     @include mq.not-notebook {
       padding-inline: var(--size-24);
