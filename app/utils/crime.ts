@@ -1,3 +1,5 @@
+import { calculateDistance } from "#imports"
+
 /**
  * Gets the last available month for crime data (2 months behind current date)
  * @returns Date string in YYYY-MM format
