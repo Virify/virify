@@ -19,12 +19,12 @@
         class="m-listing-amenities__category"
       >
         <div class="m-listing-amenities__category-header">
-          <h3 class="m-listing-amenities__category-title | title-sm">
+          <h3 class="m-listing-amenities__category-title | title-xs">
             {{ formatCategoryKey(categoryKey) }}
           </h3>
         </div>
         
-        <ul class="m-listing-amenities__list | body-md">
+        <ul class="m-listing-amenities__list | body-sm">
           <li v-for="item in items" :key="item.name" class="m-listing-amenities__item">
             <div class="m-listing-amenities__item-icon">
               <AtomsIcon 
@@ -100,7 +100,8 @@ function getMapUrl(item: any) {
 
 onMounted(async () => {
   if (props.lat && props.lon && props.listing?.property?.id) {
-    await fetchAmenities(props.listing.property.id, props.lat, props.lon, 5000)
+    // Increased radius to 25km (25000m) to ensure hospitals are found in rural/suburban areas
+    await fetchAmenities(props.listing.property.id, props.lat, props.lon, 25000)
     emit('amenities-loaded')
   }
 })
@@ -114,6 +115,11 @@ onMounted(async () => {
   width: 100%;
 
   &__category {
+    background: var(--background-100);
+    padding: var(--size-16);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--monochrome-600);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     &-title {
       margin: 0;
       color: var(--foreground-100);

@@ -23,59 +23,42 @@
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
-            :address="fullAddress" />
+            :address="address" />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
             <OrganismsListingGeneralInfo :description="property?.description || undefined" />
+          </div>
 
+          <div v-if="property" class="p-listing__section">
+            <h2 class="title-md">Rooms</h2>
+            <MoleculesListingItemDetails v-if="property?.bedroomFeatures" :items="property?.bedroomFeatures" type="room"
+              subtype="Bedroom" title="Bedrooms" />
+            <MoleculesListingItemDetails v-if="property?.bathroomFeatures" :items="property?.bathroomFeatures"
+              type="room" subtype="Bathroom" title="Bathrooms" />
+            <MoleculesListingItemDetails v-if="property?.kitchenFeatures" :items="property?.kitchenFeatures" type="room"
+              subtype="Kitchen" title="Kitchen" />
+            <MoleculesListingItemDetails v-if="property?.reception" :items="property?.reception" type="room"
+              subtype="Reception" title="Receptions" />
+            <MoleculesListingItemDetails v-if="property?.otherRoom" :items="property?.otherRoom" type="room"
+              subtype="Other Rooms" title="Other Rooms" />
+            <MoleculesListingItemDetails v-if="property?.rearGarden || property?.frontGarden"
+              :items="getGardenItems(property)" type="garden" title="Gardens" :show-floor="false" />
+          </div>
 
-            <div v-if="property" class="p-listing__section">
-              <MoleculesListingItemDetails v-if="property?.bedroomFeatures" 
-                :items="property?.bedroomFeatures" 
-                type="room" 
-                subtype="Bedroom" 
-                title="Bedrooms" />
-              <MoleculesListingItemDetails v-if="property?.bathroomFeatures" 
-                :items="property?.bathroomFeatures" 
-                type="room" 
-                subtype="Bathroom" 
-                title="Bathrooms" />
-              <MoleculesListingItemDetails v-if="property?.kitchenFeatures" 
-                :items="property?.kitchenFeatures" 
-                type="room" 
-                subtype="Kitchen" 
-                title="Kitchen" />
-              <MoleculesListingItemDetails v-if="property?.reception" 
-                :items="property?.reception" 
-                type="room" 
-                subtype="Reception" 
-                title="Receptions" />
-              <MoleculesListingItemDetails v-if="property?.otherRoom" 
-                :items="property?.otherRoom" 
-                type="room" 
-                subtype="Other Rooms" 
-                title="Other Rooms" />
-            </div>
-
-            <div v-if="property?.rearGarden || property?.frontGarden" class="p-listing__section">
-              <MoleculesListingItemDetails 
-                :items="getGardenItems(property)" 
-                type="garden" 
-                title="Gardens" 
-                :show-floor="false" />
-            </div>
-
-            <div v-if="property" class="p-listing__section">
-              <h2 class="title-md">Additional Details</h2>
-              <div class="p-listing__features-list">
-                <MoleculesListingFeatures v-if="property?.parking" title="Parking" :features="property?.parking" />
-                <MoleculesListingFeatures v-if="property?.accessibilityFeatures" title="Accessibility" :features="property?.accessibilityFeatures" />
-                <MoleculesListingFeatures v-if="property?.utility" title="Utility" :features="property?.utility" />
-                <MoleculesListingFeatures v-if="property?.securityFeatures" title="Security" :features="property?.securityFeatures" />
-                <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage" :features="property?.storageFeatures" />
-                <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features" :features="property?.additionalFeatures" />
-              </div>
+          <div v-if="property" class="p-listing__section">
+            <h2 class="title-md">Additional Details</h2>
+            <div class="p-listing__features-list">
+              <MoleculesListingFeatures v-if="property?.parking" title="Parking" :features="property?.parking" />
+              <MoleculesListingFeatures v-if="property?.accessibilityFeatures" title="Accessibility"
+                :features="property?.accessibilityFeatures" />
+              <MoleculesListingFeatures v-if="property?.utility" title="Utility" :features="property?.utility" />
+              <MoleculesListingFeatures v-if="property?.securityFeatures" title="Security"
+                :features="property?.securityFeatures" />
+              <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage"
+                :features="property?.storageFeatures" />
+              <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features"
+                :features="property?.additionalFeatures" />
             </div>
           </div>
 
@@ -85,7 +68,17 @@
               :listing="listing" :amenities="amenitiesArray" />
           </div>
 
-
+          <!-- Price Paid History -->
+          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
+            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
+              number: property.address.number,
+              flat: property.address.flat,
+              street: property.address.street,
+              city: property.address.city,
+              postcode: property.address.postcode,
+              county: property.address.county,
+            }" />
+          </div>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
@@ -98,7 +91,7 @@
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="fullAddress"
+          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="address"
             :property-type="property?.type?.name" :property-size="property?.size || undefined"
             :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
@@ -112,7 +105,7 @@
     </div>
 
     <!-- Image Gallery Modal -->
-    <MoleculesImageGalleryModal v-if="showImageModal" :images="galleryImages" :initial-index="modalImageIndex"
+    <MoleculesImageGalleryModal :images="galleryImages" :show="showImageModal" :initial-index="modalImageIndex"
       @close="closeImageModal" />
 
     <client-only>
@@ -150,9 +143,9 @@ const priceFormatted = computed(() => {
   return isNumber(price) ? numberToCurrency(price) : "";
 });
 
-
-const fullAddress = computed(() => {
-  return property.value?.address?.fullAddress || "No address provided";
+/** omit street number */
+const address = computed(() => {
+  return property.value?.address ? `${property.value.address.street || ""}, ${property.value.address.city || ""}, ${property.value.address.postcode || ""}`.trim() : "";
 });
 
 // Handle amenities array/object conversion
@@ -166,10 +159,10 @@ const amenitiesArray = computed(() => {
 const getGardenItems = (property: any) => {
   const gardens = [];
   if (property?.frontGarden) {
-    gardens.push({ ...property.frontGarden, gardenType: 'front' });
+    gardens.push({ ...property.frontGarden, gardenType: "front" });
   }
   if (property?.rearGarden) {
-    gardens.push({ ...property.rearGarden, gardenType: 'rear' });
+    gardens.push({ ...property.rearGarden, gardenType: "rear" });
   }
   return gardens;
 };
@@ -337,7 +330,6 @@ ul {
     }
   }
 
-
   /**
    *  Images
    */
@@ -405,8 +397,9 @@ ul {
 }
 
 .p-listing__section {
-  margin: var(--size-32) 0;
-  
+  padding: var(--size-16) 0;
+  margin-left: var(--size-2);
+
   @include mq.notebook {
     margin-right: var(--size-24);
   }
