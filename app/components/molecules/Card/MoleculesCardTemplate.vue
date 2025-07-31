@@ -165,6 +165,8 @@ const premiumFeatures = computed(() => {
 }
 
 .m-card-template {
+  --card-layout: vertical;
+
   --card-foreground: var(--foreground-200);
   --card-background: var(--background-200);
   --card-background-overlay: light-dark(var(--background-300), var(--background-200));
@@ -210,6 +212,8 @@ const premiumFeatures = computed(() => {
 
     &--basic,
     &--featured {
+      --card-layout: horizontal;
+
       grid-template-columns: 1.2fr minmax(20ch, 1fr);
     }
 
@@ -235,6 +239,8 @@ const premiumFeatures = computed(() => {
     border: 4px solid var(--primary-500);
 
     @container (width > 900px) {
+      --card-layout: horizontal;
+
       grid-template-columns: 1.2fr minmax(20ch, 1fr);
     }
   }
