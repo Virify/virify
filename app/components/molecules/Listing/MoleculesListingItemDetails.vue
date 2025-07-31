@@ -1,20 +1,16 @@
 <template>
   <div class="item-details">
-    <button 
-      :class="[
-        'item-details__header',
-        `item-details__header--${variant}`
-      ]"
-      @click="toggleCollapsed" 
-      :aria-expanded="!isCollapsed" 
+    <AtomsCollapsibleHeader
+      :is-collapsed="isCollapsed"
+      :variant="variant"
+      :icon="getSectionIcon()"
       :aria-controls="`item-details-${normalizedTitle}`"
+      @toggle="toggleCollapsed"
     >
-      <h2 class="| body-md font-semibold">
-        <AtomsIcon v-if="variant === 'card'" :icon="getSectionIcon()" :size="20" />
+      <template #title>
         {{ props.title }} <span class="body-sm">({{ itemsArray.length }})</span>
-      </h2>
-      <AtomsIcon icon="chevron-down" :size="24" class="item-details__chevron" :class="{ 'item-details__chevron--open': !isCollapsed }" />
-    </button>
+      </template>
+    </AtomsCollapsibleHeader>
 
     <Transition name="item-details-collapse">
       <ul v-show="!isCollapsed" class="item-details__list" :id="`item-details-${normalizedTitle}`">
@@ -192,59 +188,6 @@ const closeDescription = () => {
 .item-details {
   margin: 0;
 
-  &__header {
-    width: 100%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-align: left;
-    gap: var(--size-16);
-
-    &:hover {
-      .item-details__chevron {
-        color: var(--foreground-100);
-      }
-    }
-
-    h2 {
-      margin: 0;
-      text-transform: capitalize;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: var(--size-8);
-      flex-shrink: 0;
-      min-width: 0;
-    }
-
-    // Card variant (styled like ListingFeatures)
-    &--card {
-      background: var(--background-100);
-      border: 1px solid var(--monochrome-600);
-      border-radius: var(--border-radius-lg);
-      box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
-      padding: var(--size-16);
-      margin-bottom: var(--size-16);
-    }
-
-    // Plain variant (original minimal style)
-    &--plain {
-      background: none;
-      border: none;
-      padding: 0;
-      margin-bottom: var(--size-8);
-    }
-  }
-
-  &__chevron {
-    color: var(--foreground-200);
-    transition: transform var(--animation-medium) var(--ease-in-out), color var(--animation-medium) var(--ease-in-out);
-
-    &--open {
-      transform: rotate(180deg);
-    }
-  }
 
   &__list {
     list-style: none;

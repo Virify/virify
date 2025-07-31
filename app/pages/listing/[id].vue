@@ -46,7 +46,7 @@
               :items="getGardenItems(property)" type="garden" title="Gardens" :show-floor="false" />
           </div>
 
-           <!-- Price Paid History -->
+          <!-- Price Paid History -->
           <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
             <MoleculesListingPricePaid :listing-id="listing.id" :address="{
               number: property.address.number,
@@ -56,6 +56,12 @@
               postcode: property.address.postcode,
               county: property.address.county,
             }" />
+          </div>
+
+          <!-- Energy & Utilities -->
+          <div v-if="property?.energyAndUtilities" class="p-listing__section">
+            <OrganismsListingEnergyUtilities :energy-data="property.energyAndUtilities"
+              :postcode="property?.address?.postcode" />
           </div>
 
           <div v-if="property" class="p-listing__section">
@@ -69,22 +75,29 @@
                 :features="property?.securityFeatures" />
               <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage"
                 :features="property?.storageFeatures" />
+              <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities"
+                :energy-data="property.energyAndUtilities" />
+              <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
+                :broadband-type="property.energyAndUtilities.broadbandType"
+                :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
+                :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
+              <MoleculesListingMobileCoverage />
               <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features"
                 :features="property?.additionalFeatures" />
             </div>
           </div>
-          
+
           <!-- Location & Amenities (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
             <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!"
               :listing="listing" :amenities="amenitiesArray" />
           </div>
 
-           <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
             <OrganismsListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
           </div>
 
-           <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
             <OrganismsListingCrimeScore :lat="property.address.lat" :lon="property.address.lon" />
           </div>
         </div>

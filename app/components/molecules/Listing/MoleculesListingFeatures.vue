@@ -2,19 +2,20 @@
   <div class="feature-card" @click="toggleCollapse">
     <div class="feature-card__content | body-md">
       <!-- Title row with icon, title, info button, and collapse arrow -->
-      <div class="feature-card__title-row | font-semibold">
-        <div class="feature-card__title-wrapper">
-          <AtomsIcon :icon="getFeatureIcon(title)" :size="20" />
-          {{ title }}
+      <AtomsCollapsibleHeader
+        :is-collapsed="isCollapsed"
+        :icon="getFeatureIcon(title)"
+        :title="title"
+        variant="inline"
+        @toggle="() => {}"
+      >
+        <template #actions>
           <button v-if="features?.description" @click.stop="openDescription($event)" 
             class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${title}`">
             <AtomsIcon icon="property/info" :size="16" />
           </button>
-        </div>
-        <div class="feature-card__collapse-btn" :class="{ 'expanded': !isCollapsed }">
-          <AtomsIcon icon="chevron-down" :size="18" />
-        </div>
-      </div>
+        </template>
+      </AtomsCollapsibleHeader>
 
       <!-- Size and features row (collapsible) -->
       <div v-show="!isCollapsed" class="feature-card__details-row">
@@ -125,18 +126,6 @@ const toggleCollapse = () => {
     width: 100%;
   }
 
-  &__title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-transform: capitalize;
-  }
-
-  &__title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: var(--size-8);
-  }
 
   &__details-row {
     display: flex;
@@ -173,16 +162,6 @@ const toggleCollapse = () => {
     }
   }
 
-  &__collapse-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-
-    &.expanded .a-icon {
-      transform: rotate(180deg);
-    }
-  }
 
   .a-icon {
     width: 22px;
