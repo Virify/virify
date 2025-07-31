@@ -173,7 +173,7 @@ const marketTrendInfo = "Area Trend: This shows the percentage change in the ave
 .price-history-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--size-32);
+  gap: var(--size-16);
   margin-top: var(--size-32);
 
   @media (max-width: 768px) {

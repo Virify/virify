@@ -2,6 +2,7 @@
   <div class="stat-card">
     <header class="stat-card__header">
       <div class="stat-card__title-row">
+        <AtomsIcon v-if="icon" :icon="icon" :size="20" />
         <h4 class="stat-card__title | title-xs">{{ title }}</h4>
       </div>
       <AtomsPill class="pill | body-xs">{{ value }}</AtomsPill>
@@ -29,6 +30,7 @@ interface Props {
   value: string | number;
   description?: string;
   info?: string;
+  icon?: string;
 }
 
 defineProps<Props>();
