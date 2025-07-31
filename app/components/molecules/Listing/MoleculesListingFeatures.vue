@@ -70,7 +70,7 @@ const filteredFeatures = computed(() => {
 });
 
 // Collapse state
-const isCollapsed = ref(false);
+const isCollapsed = ref(true);
 
 // Description modal state
 const showDescription = ref(false);

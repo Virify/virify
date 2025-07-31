@@ -57,6 +57,10 @@ defineEmits<Emits>()
     &--left {
       flex: 0 0 200px; // Fixed width to match logo area
       justify-content: flex-start;
+
+      @include mq.mobile-only {
+        flex: 0 0 80px; // Much smaller on mobile
+      }
     }
 
     &--center {
@@ -68,6 +72,10 @@ defineEmits<Emits>()
     &--right {
       flex: 0 0 200px; // Fixed width to match left section
       justify-content: flex-end;
+
+      @include mq.mobile-only {
+        flex: 0 0 60px; // Smaller on mobile, just enough for close button
+      }
     }
   }
 
@@ -89,7 +97,7 @@ defineEmits<Emits>()
     display: -webkit-box;
 
     @include mq.mobile-only {
-      font-size: var(--text-base);
+      font-size: var(--font-sm);
       -webkit-line-clamp: 1;
     }
   }

@@ -178,10 +178,13 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-80) var(--size-24) var(--size-120);
+    padding: var(--size-80) var(--size-24) var(--size-24);
+    min-height: 0;
+    height: calc(100vh - var(--size-80) - var(--size-24));
 
     @include mq.mobile-only {
-      padding: var(--size-60) var(--size-16) var(--size-100);
+      padding: var(--size-60) var(--size-16) var(--size-16);
+      height: calc(100vh - var(--size-60) - var(--size-16));
     }
   }
 
@@ -189,6 +192,8 @@ onUnmounted(() => {
     position: relative;
     max-width: 100%;
     max-height: 100%;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,12 +228,12 @@ onUnmounted(() => {
     color: white;
     padding: var(--size-8) var(--size-12);
     border-radius: var(--border-radius-full);
-    font-size: var(--text-sm);
+    font-size: var(--t-font-sm);
     font-weight: 500;
     backdrop-filter: blur(10px);
 
     @include mq.mobile-only {
-      font-size: var(--text-xs);
+      font-size: var(--font-xs);
       padding: var(--size-6) var(--size-10);
     }
   }

@@ -249,17 +249,18 @@ const closeDescription = () => {
   &__list {
     list-style: none;
     padding: 0;
-    margin: var(--size-16) 0;
-    display: flex;
-    flex-direction: row;
+    margin: var(--size-32) 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--size-16);
-    flex-wrap: wrap;
-    align-items: stretch;
+
+    @include mq.tablet-only {
+      grid-template-columns: repeat(2, 1fr);
+    }
 
     @include mq.mobile-only {
-      flex-direction: column;
+      grid-template-columns: 1fr;
       gap: var(--size-12);
-      width: 100%;
     }
   }
 
@@ -268,13 +269,8 @@ const closeDescription = () => {
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--monochrome-600);
     box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
-    width: 300px;
     display: flex;
     flex-direction: column;
-
-    @include mq.mobile-only {
-      width: 100%;
-    }
   }
 
   &__image {

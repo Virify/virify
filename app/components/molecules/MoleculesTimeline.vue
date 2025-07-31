@@ -1,7 +1,7 @@
 <template>
   <div class="timeline">
     <div v-if="title || address || type || duration" class="timeline__header">
-      <h3 v-if="title" class="timeline__title | title-sm">{{ title }}</h3>
+      <h3 v-if="title" class="timeline__title | title-xs">{{ title }}</h3>
       <div v-if="type || duration" class="timeline__pills">
         <AtomsPill v-if="type" class="timeline__type-pill | body-xs">{{ type }}</AtomsPill>
         <AtomsPill v-if="duration" class="timeline__duration-pill | body-xs">{{ duration }}</AtomsPill>

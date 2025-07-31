@@ -10,7 +10,7 @@
 
       <!-- Market Context Column -->
       <div class="area-column" v-if="pricePaidData?.data?.market_context">
-        <h3 class="column-title | title-sm">Market Context ({{ pricePaidData?.data?.market_context?.reference_year }})</h3>
+        <h3 class="column-title | title-xs">Market Context ({{ pricePaidData?.data?.market_context?.reference_year }})</h3>
         <!-- Market context description moved to top of section -->
         <div class="market-analytics">
           <!-- Area Average Card -->
