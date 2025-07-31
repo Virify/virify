@@ -103,15 +103,6 @@ function closeInfoModal() {
     margin: 0;
     min-width: 0;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    @include mq.mobile-only {
-      white-space: normal;
-      overflow: visible;
-      text-overflow: unset;
-      line-height: 1.3;
-    }
   }
 
   .pill {
