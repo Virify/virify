@@ -20,7 +20,6 @@
   &__logo {
     height: 67px;
     width: 159px;
-    // align-self: flex-start;
   }
 }
 </style>
