@@ -12,7 +12,7 @@
 
 interface Props {
   constructionType?: string;
-  chainFree?: boolean;
+  chainFree?: boolean | null;
   yearBuilt?: string;
   propertySize?: number;
   reduced?: boolean;
@@ -29,7 +29,7 @@ const pills = computed(() => {
     );
   }
 
-  if (props.chainFree !== undefined) {
+  if (props.chainFree !== null) {
     pillsArray.push(props.chainFree ? "Chain Free" : "Chain Dependent");
   }
 

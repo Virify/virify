@@ -1,9 +1,15 @@
 <template>
   <section role="presentation" class="o-listing-sidebar | flow flow-md">
     <h2 v-if="price" class="o-listing-sidebar__title | title-2xl lineheight-xs">
-      <AtomsPill class="o-listing-sidebar__title-offertype | body-xs">
-        {{ convertRoomEnumToString(priceType!) }}
-      </AtomsPill>
+      <div class="o-listing-sidebar__title-offertype">
+        <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
+          {{ convertRoomEnumToString(priceType!) }}
+        </AtomsPill>
+        <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
+          {{ convertRoomEnumToString(available!) }}
+        </AtomsPill>
+      </div>
+
 
       {{ price }}
     </h2>
@@ -12,23 +18,12 @@
       {{ address }}
     </p>
 
-    <OrganismsListingSidebarIcons 
-      :property-type="propertyType"
-      :bedrooms="bedrooms"
-      :bathrooms="bathrooms"
-      :receptions="receptions"
-      :other-rooms="otherRooms"
-      :rear-garden="rearGarden"
-      :front-garden="frontGarden"
-      :classification="classification"
-    />
+    <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
+      :receptions="receptions" :other-rooms="otherRooms" :rear-garden="rearGarden" :front-garden="frontGarden"
+      :classification="classification" />
 
-      <OrganismsListingSidebarPills 
-      :property-size="propertySize"
-      :chain-free="chainFree"
-      :year-built="newBuild"
-      :construction-type="constructionType"
-    />
+    <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree" :year-built="newBuild"
+      :construction-type="constructionType" />
 
     <OrganismsListingButtons :listing-id="listingId" :agent="agent" />
 
@@ -55,7 +50,7 @@ interface Props {
   classification?: string
   yearBuilt?: string
   constructionType?: string
-  chainFree?: boolean
+  chainFree?: boolean | null
   agent?: {
     username?: string | null
     email?: string | null
@@ -65,6 +60,7 @@ interface Props {
   }
   rearGarden?: boolean
   frontGarden?: boolean
+  available?: string
 }
 
 const props = defineProps<Props>()
@@ -87,11 +83,15 @@ const newBuild = computed(() => {
   }
 
   &__title-offertype {
-    display: block;
+    display: flex;
+    gap: var(--size-8);
     text-align: left;
     margin-bottom: var(--size-4);
+
+    &__item {
     background: var(--blue-400);
     color: var(--monochrome-900);
+    }
   }
 
   &__address {

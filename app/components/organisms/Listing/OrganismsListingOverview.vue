@@ -1,9 +1,15 @@
 <template>
   <div class="o-listing-overview">
     <h2 v-if="price" class="o-listing-overview__title | title-xl lineheight-xs">
-      <AtomsPill class="o-listing-overview__price-type | body-2xs">
-        {{ convertRoomEnumToString(priceType!) }}
-      </AtomsPill>
+      <div class="o-listing-overview__title-offertype">
+        <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
+          {{ convertRoomEnumToString(priceType!) }}
+        </AtomsPill>
+        <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
+          {{ convertRoomEnumToString(available!) }}
+        </AtomsPill>
+      </div>
+
 
       <span class="o-listing-overview__price">{{ price }}</span>
     </h2>
@@ -14,26 +20,15 @@
 
     <!-- Property Icons -->
     <div class="o-listing-overview__icons">
-      <OrganismsListingSidebarIcons 
-        :property-type="propertyType"
-        :bedrooms="bedrooms"
-        :bathrooms="bathrooms"
-        :receptions="receptions"
-        :other-rooms="otherRooms"
-        :rear-garden="rearGarden"
-        :front-garden="frontGarden"
-        :classification="classification"
-      />
+      <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
+        :receptions="receptions" :other-rooms="otherRooms" :rear-garden="rearGarden" :front-garden="frontGarden"
+        :classification="classification" />
     </div>
 
     <!-- Property Pills -->
     <div class="o-listing-overview__pills">
-      <OrganismsListingSidebarPills 
-        :property-size="propertySize"
-        :chain-free="chainFree"
-        :year-built="yearBuilt"
-        :construction-type="constructionType"
-      />
+      <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree" :year-built="yearBuilt"
+        :construction-type="constructionType" />
     </div>
   </div>
 </template>
@@ -52,9 +47,10 @@ interface Props {
   classification?: string
   yearBuilt?: string
   constructionType?: string
-  chainFree?: boolean
+  chainFree?: boolean | null
   rearGarden?: boolean
   frontGarden?: boolean
+  available?: string
 }
 
 const props = defineProps<Props>()
@@ -84,6 +80,19 @@ console.log("OrganismsListingOverview loaded with props:", props.address);
       justify-content: flex-start;
     }
   }
+
+  &__title-offertype {
+    display: flex;
+    gap: var(--size-8);
+    text-align: left;
+    margin-bottom: var(--size-4);
+
+    &__item {
+    background: var(--blue-400);
+    color: var(--monochrome-900);
+    }
+  }
+
   &__price-type {
     background: var(--blue-400);
     color: var(--monochrome-900);
@@ -123,7 +132,7 @@ console.log("OrganismsListingOverview loaded with props:", props.address);
 .o-listing-overview__icons .o-listing-sidebar-icons {
   justify-content: center;
   text-align: center;
-  
+
   .o-listing-sidebar-icons__row {
     justify-content: center;
     text-align: center;

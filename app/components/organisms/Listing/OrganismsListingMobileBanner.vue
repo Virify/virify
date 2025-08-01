@@ -25,6 +25,9 @@
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
             {{ convertRoomEnumToString(priceType!) }}
           </AtomsPill>
+          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+            {{ convertRoomEnumToString(available!) }}
+          </AtomsPill>
         </h2>
 
         <p role="presentation" class="o-listing-mobile-banner__additional-info-address | body-md">
@@ -98,7 +101,7 @@ interface Props {
   classification?: string
   yearBuilt?: string
   constructionType?: string
-  chainFree?: boolean
+  chainFree?: boolean | null
   rearGarden?: boolean
   frontGarden?: boolean
   listingId?: number
@@ -109,6 +112,7 @@ interface Props {
     createdAt?: Date | String | null
     avatar?: string | null
   }
+  available?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
