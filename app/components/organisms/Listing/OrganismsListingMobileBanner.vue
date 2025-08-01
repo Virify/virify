@@ -416,6 +416,10 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
 
     @include mq.not-tablet {
       padding: var(--size-12) var(--size-16);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
 
       .o-listing-sidebar-icons__row {
         justify-content: center;
