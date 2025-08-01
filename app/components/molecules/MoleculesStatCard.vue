@@ -72,7 +72,6 @@ function closeInfoModal() {
   padding: var(--size-16);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
-  box-sizing: border-box;
 
   &__content {
     width: 100%;
