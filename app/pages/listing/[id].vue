@@ -1,6 +1,5 @@
 <template>
   <main class="p-listing">
-
     <div class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
         <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
@@ -26,11 +25,16 @@
             :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
             :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
-            :chain-free="listing?.saleListing?.chain || false" />
+            :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
+            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
             <AtomsListingGeneralInfo :description="property?.description || undefined" />
+          </div>
+
+          <div v-if="listing && property" class="p-listing__section">
+            <MoleculesListingEssentials :listing="listing" :property="property" />
           </div>
 
           <div v-if="property" class="p-listing__section">
@@ -59,24 +63,26 @@
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-list">
               <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.parking)" title="Parking" :features="property?.parking" />
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.utility)" title="Utility" :features="property?.utility" />
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.parking)" title="Parking"
+                  :features="property?.parking" />
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.utility)" title="Utility"
+                  :features="property?.utility" />
                 <MoleculesListingFeatures v-if="filterListingFeatures(property?.storageFeatures)" title="Storage"
                   :features="property?.storageFeatures" />
                 <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
                   :broadband-type="property.energyAndUtilities.broadbandType"
                   :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
                   :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.additionalFeatures)" title="Additional Features"
-                  :features="property?.additionalFeatures" />
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.additionalFeatures)"
+                  title="Additional Features" :features="property?.additionalFeatures" />
               </div>
               <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.accessibilityFeatures)" title="Accessibility"
-                  :features="property?.accessibilityFeatures" />
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.accessibilityFeatures)"
+                  title="Accessibility" :features="property?.accessibilityFeatures" />
                 <MoleculesListingFeatures v-if="filterListingFeatures(property?.securityFeatures)" title="Security"
                   :features="property?.securityFeatures" />
-                <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)" title="Energy & Utilities"
-                  :energy-data="property.energyAndUtilities!" />
+                <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)"
+                  title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
                 <MoleculesListingMobileCoverage />
               </div>
             </div>
@@ -130,8 +136,9 @@
             :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
             :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
-            :chain-free="listing?.saleListing?.chain || false" :has-image-slide="!isImagesVisible"
-            :agent="listing?.user || {}" />
+            :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
+            :agent="listing?.user || {}"
+            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
         </div>
       </div>
     </div>
@@ -148,8 +155,9 @@
         :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
         :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
         :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
-        :chain-free="listing?.saleListing?.chain || false" :listing-id="listing?.id || 0"
-        :agent="listing?.user || {}" />
+        :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
+        :agent="listing?.user || {}"
+        :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
     </client-only>
   </main>
   <!-- Similar Listings -->
@@ -500,4 +508,5 @@ ul {
     width: 100%;
   }
 }
+
 </style>
