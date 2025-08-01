@@ -133,7 +133,8 @@ onMounted(() => {
     margin: var(--size-32) auto;
     text-align: center;
     color: var(--monochrome-900);
-    max-width: fit-content;
+    max-width: 400px;
+    width: 100%;
   }
 
   &__risk-level {
