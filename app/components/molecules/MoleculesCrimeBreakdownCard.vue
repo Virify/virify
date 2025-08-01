@@ -62,7 +62,7 @@ function formatCategoryName(category: string): string {
 
   &__fill {
     height: 100%;
-    background: var(--blue-400);
+    background: var(--secondary-400);
     transition: width 0.3s ease;
     border-radius: 2px;
   }

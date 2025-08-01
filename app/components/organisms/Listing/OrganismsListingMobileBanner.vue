@@ -442,6 +442,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
     height: 100%;
     z-index: 4;
     touch-action: none;
+    border: none;
     background: light-dark(#{ fn.faded-color(30%, var(--monochrome-100))},
       #{ fn.faded-color(70%, var(--monochrome-100))});
   }
