@@ -144,10 +144,10 @@ const toggleCollapse = () => {
     display: flex;
     align-items: flex-start;
     gap: var(--size-4);
-    flex: 1;
 
     .a-icon {
       margin-top: 3px;
+      flex-shrink: 0;
     }
   }
 
@@ -164,9 +164,9 @@ const toggleCollapse = () => {
 
 
   .a-icon {
-    width: 22px;
-    height: 22px;
     color: var(--foreground-200);
+    width: auto;
+    height: auto;
   }
 }
 </style>
