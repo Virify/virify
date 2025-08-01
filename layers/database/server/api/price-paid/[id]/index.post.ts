@@ -34,13 +34,19 @@ export default defineEventHandler(async (event) => {
 
     // Create cache key from listing ID
     const cacheKey = `ppd:listing:${listingId}`;
+    console.log(`[CACHE] Checking price paid cache for key: ${cacheKey}`);
 
     // Try to get from cache first
+    const startTime = Date.now();
     const cached = await useStorage().getItem(cacheKey);
     if (cached) {
+      const cacheTime = Date.now() - startTime;
+      console.log(`[CACHE] PPD CACHE HIT - Retrieved in ${cacheTime}ms`);
       return cached;
     }
 
+    console.log(`[CACHE] PPD CACHE MISS - Fetching from database`);
+    
     // Use utility function to get PPD data
     const ppdData = await getPricePaidByAddress(postcode, street, city, number, flat);
 
@@ -102,6 +108,9 @@ export default defineEventHandler(async (event) => {
     await useStorage().setItem(cacheKey, result, {
       ttl: 60 * 60 * 24 * 30 // 30 days in seconds
     });
+
+    const totalTime = Date.now() - startTime;
+    console.log(`[CACHE] PPD CACHE MISS - Total time: ${totalTime}ms`);
 
     return result;
 

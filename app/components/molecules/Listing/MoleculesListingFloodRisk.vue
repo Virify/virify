@@ -5,53 +5,59 @@
     </div>
 
     <div v-else class="o-listing-flood-risk__content">
-      <AtomsHeroCard>
-        <div class="o-listing-flood-risk__data-summary">
+      <div class="o-listing-flood-risk__card-grid">
+        <AtomsHeroCard>
           <div class="o-listing-flood-risk__data-header">
             <AtomsIcon icon="listings/flood" :size="42" />
             <h3 class="title-md">Flood Risk</h3>
           </div>
-          <p class="| body-md">We've checked the latest flood data so you don't have to. This gives you a heads up on
+          <p class="| r-body-md-sm">We've checked the latest flood data so you don't have to. This gives you a heads up
+            on
             any potential flooding risks in the area, helping you make informed decisions about your next home.</p>
           <div class="o-listing-flood-risk__risk-highlight">
-            <h3 class="o-listing-flood-risk__risk-level | title-md" v-if="!loading">
+            <h3 class="o-listing-flood-risk__risk-level | title-sm" v-if="!loading">
               {{ getRiskLevelText(floodRiskLevel) }}
             </h3>
             <div v-else class="skeleton-bar skeleton-bar--title"></div>
-            
-            <p class="o-listing-flood-risk__risk-description | body-md" v-if="!loading">
+
+            <p class="o-listing-flood-risk__risk-description | r-body-md-sm" v-if="!loading">
               {{ getRiskDescription(floodRiskLevel) }}
             </p>
             <div v-else class="skeleton-bar skeleton-bar--body"></div>
           </div>
-          <h3 class="| title-xs">Historical Data (Last 10 Years):</h3>
+        </AtomsHeroCard>
+
+        <AtomsHeroCard>
+          <div class="o-listing-flood-risk__data-header">
+            <AtomsIcon icon="listings/flood" :size="42" />
+            <h3 class="title-md">Summary</h3>
+          </div>
+          <p class="| r-body-md-sm">This is a summary of the flood risk data in the last 10 years.</p>
           <div class="o-listing-flood-risk__data-points">
             <div class="o-listing-flood-risk__data-point">
-              <span class="o-listing-flood-risk__data-label | body-md font-semibold">Flood Events:</span>
-              <span class="o-listing-flood-risk__data-value | body-md font-semibold" v-if="!loading">{{ historicalFloodEvents?.length || 0
-                }}</span>
+              <span class="o-listing-flood-risk__data-label | r-body-md-sm font-semibold">Flood Events:</span>
+              <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold" v-if="!loading">{{
+                historicalFloodEvents?.length || 0
+              }}</span>
               <div v-else class="skeleton-bar skeleton-bar--small"></div>
             </div>
+
             <div class="o-listing-flood-risk__data-point">
-              <span class="o-listing-flood-risk__data-label | body-md font-semibold">Monitoring Stations:</span>
-              <span class="o-listing-flood-risk__data-value | body-md font-semibold" v-if="!loading">{{ floodStations?.length || 0
-                }}</span>
-              <div v-else class="skeleton-bar skeleton-bar--small"></div>
+              <span class="o-listing-flood-risk__data-label | r-body-md-sm font-semibold">Search Radius:</span>
+              <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold">10 miles</span>
             </div>
             <div class="o-listing-flood-risk__data-point">
-              <span class="o-listing-flood-risk__data-label | body-md font-semibold">Search Radius:</span>
-              <span class="o-listing-flood-risk__data-value | body-md font-semibold">10 miles</span>
+              <span class="o-listing-flood-risk__data-label | r-body-md-sm font-semibold">Monitoring Stations:</span>
+              <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold" v-if="!loading">{{
+                floodStations?.length || 0
+              }}</span>
+              <div v-else class="skeleton-bar skeleton-bar--small"></div>
             </div>
           </div>
-        </div>
+        </AtomsHeroCard>
+      </div>
 
-        <div class="o-listing-flood-risk__disclaimer">
-          <p class="body-xs">
-            Data provided by Environment Agency. This information is for guidance only and should not be relied upon for
-            safety critical applications.
-          </p>
-        </div>
-      </AtomsHeroCard>
+
     </div>
   </section>
 </template>
@@ -93,8 +99,32 @@ onMounted(() => {
     width: 100%;
   }
 
-  &__data-summary {
+  &__card-grid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: var(--size-20);
     width: 100%;
+    flex-direction: row;
+
+    >AtomsHeroCard {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @include mq.mobile-only {
+      flex-direction: column;
+      gap: var(--size-16);
+
+      >AtomsHeroCard {
+        width: 100%;
+        align-items: stretch;
+      }
+    }
   }
 
   &__data-header {
@@ -130,9 +160,12 @@ onMounted(() => {
     border: 2px solid var(--secondary-400);
     border-radius: var(--border-radius-xl);
     padding: var(--size-16);
-    margin: var(--size-20) 0;
+    margin: var(--size-32) auto;
     text-align: center;
     color: var(--monochrome-900);
+    max-width: 400px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__risk-level {
@@ -146,29 +179,47 @@ onMounted(() => {
   }
 
   &__data-points {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: var(--size-12);
-    margin: var(--size-16) 0;
+    width: 100%;
+    height: 100%;
+    margin: var(--size-32) auto;
   }
 
   &__data-point {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
-    border: 2px solid var(--background-200);
+    justify-content: center;
+    box-sizing: border-box;
+    background-color: fn.faded-color(12%, var(--monochrome-600));
+    border: 2px solid var(--secondary-400);
+    border-radius: var(--border-radius-xl);
     padding: var(--size-16);
-    background: var(--secondary-400);
-    border-radius: var(--border-radius-lg);
-    color: var(--monochrome-100);
+    color: var(--monochrome-900);
+    width: 100%;
+    gap: var(--size-8);
+
+    @include mq.mobile-only {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      text-align: left;
+      gap: var(--size-8);
+
+      .o-listing-flood-risk__data-value {
+        font-weight: bold;
+      }
+    }
   }
 
   &__disclaimer {
     text-align: center;
 
     p {
-      margin: 0;
+      text-align: left;
       color: var(--monochrome-900);
     }
   }
@@ -201,6 +252,7 @@ onMounted(() => {
     0% {
       background-position: 200% 0;
     }
+
     100% {
       background-position: -200% 0;
     }

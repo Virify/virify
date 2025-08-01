@@ -339,3 +339,14 @@ template {
 [hidden] {
   display: none;
 }
+
+/* iOS Safari fixes
+   ========================================================================== */
+/**
+ * Prevent iOS Safari from applying system blue color to headings and buttons
+ */
+h1, h2, h3, h4, h5, h6,
+button {
+  color: inherit;
+  -webkit-text-fill-color: inherit;
+}

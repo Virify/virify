@@ -2,7 +2,7 @@
   <section role="presentation" class="o-listing-sidebar | flow flow-md">
     <h2 v-if="price" class="o-listing-sidebar__title | title-2xl lineheight-xs">
       <AtomsPill class="o-listing-sidebar__title-offertype | body-xs">
-        Offers in excess of
+        {{ convertRoomEnumToString(priceType!) }}
       </AtomsPill>
 
       {{ price }}
@@ -14,7 +14,6 @@
 
     <OrganismsListingSidebarIcons 
       :property-type="propertyType"
-      :price="priceNumber"
       :bedrooms="bedrooms"
       :bathrooms="bathrooms"
       :receptions="receptions"
@@ -27,11 +26,11 @@
       <OrganismsListingSidebarPills 
       :property-size="propertySize"
       :chain-free="chainFree"
-      :vacant="vacant"
       :year-built="newBuild"
+      :construction-type="constructionType"
     />
 
-    <OrganismsListingButtons :listing-id="listingId" enquire-url="#" />
+    <OrganismsListingButtons :listing-id="listingId" :agent="agent" />
 
     <NuxtLink v-if="agent" to="#" class="o-listing-sidebar__agent-link">
       <OrganismsListingAgent :agent="agent" />
@@ -48,7 +47,7 @@ interface Props {
   address?: string
   propertyType?: string
   propertySize?: number
-  priceNumber?: number
+  priceType?: string
   bedrooms?: number
   bathrooms?: number
   receptions?: number
@@ -57,7 +56,6 @@ interface Props {
   yearBuilt?: string
   constructionType?: string
   chainFree?: boolean
-  vacant?: boolean
   agent?: {
     username?: string | null
     email?: string | null

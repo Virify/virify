@@ -202,7 +202,6 @@ onUnmounted(() => {
   &__image {
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain;
     border-radius: 0;
     cursor: zoom-in;
     transition: transform 0.3s ease, cursor 0.2s ease;

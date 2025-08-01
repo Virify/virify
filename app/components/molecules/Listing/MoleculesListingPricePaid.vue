@@ -1,7 +1,7 @@
 <template>
   <section class="price-paid">
     <h2 class="| title-md">Property History</h2>
-    <p class="property-history-desc | body-md">
+    <p class="property-history-desc | r-body-md-sm">
       See when this property changed hands, how the price has moved, and how it stacks up against the rest of the city. Get a feel for its journey so far, spot local price trends, and find out if you’re looking at a hidden gem—or a record breaker. All data comes straight from the Land Registry, so you’re always in the know.
     </p>
     <div v-if="pricePaidData?.data?.sales" class="price-history-grid">

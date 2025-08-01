@@ -1,7 +1,7 @@
 <template>
   <section class="o-listing-crime-score">
     <h3 class="o-listing-crime-score__title | title-md">Crime & Safety</h3>
-    <p class="| body-md">Safety matters when choosing where to live. We've crunched the local crime numbers to give you
+    <p class="| r-body-md-sm">Safety matters when choosing where to live. We've crunched the local crime numbers to give you
       a clear picture of what's happening in the neighbourhood, so you can feel confident about your move.</p>
 
     <div v-if="loading" class="o-listing-crime-score__loading">
