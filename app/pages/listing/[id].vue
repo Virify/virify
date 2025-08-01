@@ -1,10 +1,7 @@
 <template>
   <main class="p-listing">
-    <div v-if="status === 'pending'">
-      <h1>Loading...</h1>
-    </div>
 
-    <div v-else class="p-listing" role="presentation">
+    <div class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
         <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
           <MoleculesImageGallery v-if="!isDesktop && galleryImages.length > 0" :images="galleryImages"
@@ -85,7 +82,7 @@
             </div>
           </div>
 
-           <!-- Price Paid History -->
+          <!-- Price Paid History -->
           <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
             <MoleculesListingPricePaid :listing-id="listing.id" :address="{
               number: property.address.number,
@@ -173,7 +170,7 @@ const route = useRoute();
  *  Fetch listing
  */
 const { data: listingData, status } = await useAsyncData(
-  "listing",
+  `listing-${route.params?.id}`,
   () => {
     return $fetch<ListingWithSimilar>(`/api/listing/${route.params?.id}`);
   },

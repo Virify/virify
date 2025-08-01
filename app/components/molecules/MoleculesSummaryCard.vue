@@ -1,58 +1,57 @@
 <template>
-  <div class="listing-card" :class="{
-    'listing-card--featured': isFeatured,
-    'listing-card--premium': isPremium,
-  }" @click.stop>
+  <div class="summary-card" :class="{
+    'summary-card--featured': isFeatured,
+    'summary-card--premium': isPremium,
+  }">
     <!-- Banner -->
-    <div v-if="isFeaturedOrPremium" class="listing-card__banner | body-sm font-bold">
+    <div v-if="isFeaturedOrPremium" class="summary-card__banner | body-sm font-bold">
       {{ isPremium ? "Premium" : "Featured" }}
     </div>
     <!-- Image -->
-    <div class="listing-card__image-container">
-      <nuxt-img v-if="hasImage" :src="listing.image?.[0]?.image" alt="Listing image" class="listing-card__image" />
+    <div class="summary-card__image-container">
+      <nuxt-img v-if="hasImage" :src="listing.image?.[0]?.image" alt="Listing image" class="summary-card__image" />
     </div>
     <!-- Content -->
-    <div class="listing-card__content">
+    <div class="summary-card__content">
       <!-- Price and Actions -->
-      <div class="listing-card__header">
-        <div class="listing-card__price | title-md">
-          <p class="listing-card__price-value">{{ formattedPrice }}</p>
-          <p class="listing-card__price-type | body-xs">
+      <div class="summary-card__header">
+        <div class="summary-card__price | title-md">
+          <p class="summary-card__price-value">{{ formattedPrice }}</p>
+          <p class="summary-card__price-type | body-xs">
             {{ formattedPriceType }}
           </p>
         </div>
-        <div class="m-listing-card-image-actions" @click.stop>
-          <AtomsFavouriteButton :listing-id="Number(listing.id)"
-            class="a-favourite-button" />
+        <div class="summary-card__actions" @click.stop>
+          <AtomsFavouriteButton :listing-id="Number(listing.id)" class="a-favourite-button" />
           <AtomsNoteButton :listing-id="Number(listing.id)" class="note-button" />
         </div>
       </div>
 
       <!-- Address -->
-      <div v-if="address" class="listing-card__address | body-xs font-semibold">
+      <div v-if="address" class="summary-card__address | body-xs font-semibold">
         <span v-if="address.street">{{ address.street }},&nbsp;</span>
         <span v-if="address.city">{{ address.city }},&nbsp;</span>
         <span v-if="address.postcode">{{ address.postcode }}</span>
       </div>
 
       <!-- Property type -->
-      <div v-if="typeText" class="listing-card__type | body-xs">
+      <div v-if="typeText" class="summary-card__type | body-xs">
         {{ typeText }}
       </div>
 
       <!-- Features -->
-      <div v-if="hasBedrooms || hasBathrooms" class="listing-card__features">
-        <div v-if="hasBedrooms" class="listing-card__feature | font-semibold"
+      <div v-if="hasBedrooms || hasBathrooms" class="summary-card__features">
+        <div v-if="hasBedrooms" class="summary-card__feature | font-semibold"
           :aria-label="`${listing.bedrooms} bedrooms`" :title="`${listing.bedrooms} bedrooms`">
           <AtomsIcon name="bedrooms" icon="property/bedrooms" aria-hidden="true" />
           <span class="body-sm">{{ listing.bedrooms }}</span>
         </div>
-        <div v-if="hasBathrooms" class="listing-card__feature | body-sm font-semibold"
+        <div v-if="hasBathrooms" class="summary-card__feature | body-sm font-semibold"
           :aria-label="`${listing.bathrooms} bathrooms`" :title="`${listing.bathrooms} bathrooms`">
           <AtomsIcon name="bathrooms" icon="property/bathrooms" aria-hidden="true" />
           <span class="body-sm">{{ listing.bathrooms }}</span>
         </div>
-        <div v-if="hasReceptions" class="listing-card__feature | body-sm font-semibold"
+        <div v-if="hasReceptions" class="summary-card__feature | body-sm font-semibold"
           :aria-label="`${listing.receptions} receptions`" :title="`${listing.receptions} receptions`">
           <AtomsIcon name="receptions" icon="property/receptions" aria-hidden="true" />
           <span class="body-sm">{{ listing.receptions }}</span>
@@ -60,12 +59,17 @@
       </div>
 
       <!-- View button -->
-      <div class="listing-card__footer">
-        <nuxt-link :to="`/listing/${listing.id}`" target="_blank"
-          class="listing-card__view-btn | button button-secondary body-sm" aria-label="View property details"
+      <div class="summary-card__footer">
+        <NuxtLink :to="`/listing/${listing.id}`"
+          class="summary-card__view-btn | button body-sm" aria-label="View property details"
+          :class="{
+            'button-primary': isPremium,
+            'button-secondary': isFeatured,
+            'button-tertiary': isBasic
+          }"
           title="View property details">
           View
-        </nuxt-link>
+        </NuxtLink>
       </div>
     </div>
   </div>
@@ -115,20 +119,18 @@ const typeText = computed(() =>
 const hasImage = computed(
   () => props.listing.image && props.listing.image[0] && props.listing.image[0].image
 );
-
+const isBasic = computed(() => props.listing.tier === "BASIC");
 const isFeatured = computed(() => props.listing.tier === "FEATURED");
 const isPremium = computed(() => props.listing.tier === "PREMIUM");
 const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
+
+
 </script>
 
 <style lang="scss">
-/* ============================================
-   CARD BASE STYLES
-   ============================================ */
-
-.listing-card {
+.summary-card {
   background-color: var(--background-200);
-  border: var(--size-2) solid var(--monochrome-300);
+  border: none;
   border-radius: var(--border-radius-2xl);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -138,217 +140,194 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
   padding: 0;
   position: relative;
   width: 280px;
-}
 
-/* ============================================
-   CARD TIER VARIANTS
-   ============================================ */
+  // Tier variants
+  &--featured {
+    background-color: var(--background-200);
+    border-color: var(--secondary-400);
 
-.listing-card--featured {
-  border-color: var(--secondary-400);
-}
+    .summary-card__banner {
+      left: -1px;
+      top: -1px;
+    }
 
-.listing-card--premium {
-  background: var(--monochrome-300);
-  border-color: var(--primary-400);
-  color: var(--monochrome-100);
-}
+    .summary-card__price {
+      color: var(--secondary-400);
+    }
 
-/* ============================================
-   BANNER
-   ============================================ */
+    .summary-card__actions {
+      background-color: var(--secondary-400);
+    }
 
-.listing-card__banner {
-  background-color: var(--secondary-400);
-  border-radius: calc(var(--border-radius-2xl) - 4px) 0 var(--border-radius-lg) 0;
-  color: var(--monochrome-900);
-  left: -2px;
-  padding: 6px 16px;
-  position: absolute;
-  top: 0;
-  z-index: 3;
-}
+    .summary-card__view-btn {
+      color: var(--monochrome-900);
+    }
+  }
 
-.listing-card--featured .listing-card__banner {
-  left: -1px;
-  top: -1px;
-}
+  &--premium {
+    background: var(--blue-400);
+    border: none;
+    color: var(--monochrome-900);
 
-.listing-card--premium .listing-card__banner {
-  background-color: var(--primary-400);
-  color: var(--monochrome-300);
-  left: -1px;
-  top: -1px;
-}
+    .summary-card__banner {
+      background-color: var(--primary-400);
+      color: var(--monochrome-300);
+      left: -1px;
+      top: -1px;
+    }
 
-/* ============================================
-   IMAGE
-   ============================================ */
+    .summary-card__price {
+      color: var(--monochrome-900);
+    }
 
-.listing-card__image-container {
-  border-radius: calc(var(--border-radius-2xl) - var(--size-2)) calc(var(--border-radius-2xl) - var(--size-2)) 0 0;
-  height: 140px;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-}
+    .summary-card__price-type {
+      color: var(--monochrome-800);
+    }
 
-.listing-card__image {
-  height: 100%;
-  object-fit: cover;
-  width: 100%;
-}
+    .summary-card__address {
+      color: var(--monochrome-800);
+    }
 
-/* ============================================
-   CONTENT AREA
-   ============================================ */
+    .summary-card__type {
+      color: var(--monochrome-900);
+    }
 
-.listing-card__content {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--size-4);
-  padding: var(--size-12);
-}
+    .summary-card__actions {
+      background-color: var(--primary-400);
+    }
 
-/* Header with price and actions */
-.listing-card__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  width: 100%;
-}
+    .summary-card__view-btn {
+      color: var(--monochrome-100);
+      background: var(--primary-400);
 
-/* Price */
-.listing-card__price {
-  color: var(--secondary-500);
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
+      &:hover {
+        background-color: var(--primary-300);
+      }
+    }
+  }
 
-.listing-card__price-type {
-  margin: var(--size-4) 0;
-  color: var(--monochrome-600);
-  text-transform: capitalize;
-}
+  // Banner
+  &__banner {
+    background-color: var(--secondary-400);
+    border-radius: calc(var(--border-radius-2xl) - 4px) 0 var(--border-radius-lg) 0;
+    color: var(--monochrome-900);
+    left: -2px;
+    padding: 6px 16px;
+    position: absolute;
+    top: 0;
+    z-index: 3;
+  }
 
-.listing-card__address {
-  margin: var(--size-2) 0;
-  color: var(--monochrome-600);
-}
+  // Image
+  &__image-container {
+    border-radius: calc(var(--border-radius-2xl) - var(--size-2)) calc(var(--border-radius-2xl) - var(--size-2)) 0 0;
+    height: 140px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
 
-.listing-card--premium .listing-card__price {
-  color: var(--primary-500);
-}
+  &__image {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
 
-.listing-card--premium .listing-card__type {
-  color: var(--monochrome-900);
-}
+  // Content
+  &__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--size-4);
+    padding: var(--size-12);
+  }
 
-/* Features */
-.listing-card__features {
-  display: flex;
-  gap: var(--size-8);
-  margin: var(--size-4) 0;
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+  }
 
-}
+  &__price {
+    color: var(--blue-400);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.listing-card__feature {
-  align-items: center;
-  color: var(--text-color);
-  font-size: var(--font-2xl);
-  display: flex;
-  gap: var(--size-4);
-}
+  &__price-type {
+    margin: var(--size-4) 0;
+    color: var(--monochrome-400);
+    text-transform: capitalize;
+  }
 
-.listing-card--premium .listing-card__feature {
-  color: var(--monochrome-900);
-}
+  &__address {
+    margin: var(--size-2) 0;
+    color: var(--monochrome-400);
+  }
 
-.listing-card__feature svg {
-  color: var(--text-secondary);
-}
+  &__features {
+    display: flex;
+    gap: var(--size-8);
+    margin: var(--size-4) 0;
+  }
 
-.listing-card--premium .listing-card__feature svg {
-  color: var(--monochrome-900);
-}
+  &__feature {
+    align-items: center;
+    color: var(--text-color);
+    font-size: var(--font-2xl);
+    display: flex;
+    gap: var(--size-4);
+  }
 
-/* ============================================
-   ACTION BUTTONS (HEART/NOTES)
-   ============================================ */
+  &__actions {
+    background-color: var(--blue-400);
+    border-radius: var(--border-radius-2xl);
+    display: flex;
+    gap: var(--size-2);
+    padding: var(--size-4) var(--size-8);
 
-/* ============================================
-   OVERRIDE ACTION BUTTONS FOR SUMMARY CARD
-   ============================================ */
-.m-listing-card-image-actions {
-  background-color: var(--secondary-400);
-  border-radius: var(--border-radius-2xl);
-  display: flex;
-  gap: var(--size-2);
-  padding: var(--size-4) var(--size-8);
-}
+    .a-favourite-button,
+    .note-button {
+      background: none;
+      border: none;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      transition: border-color 0.2s;
 
-.listing-card--premium .m-listing-card-image-actions {
-  background-color: var(--primary-400);
-}
+      &:hover {
+        border-color: var(--secondary-400);
+      }
+    }
+  }
 
-.m-listing-card-image-actions .a-favourite-button,
-.m-listing-card-image-actions .note-button {
-  background: none;
-  border: none;
-  border-radius: var(--border-radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: none;
-  transition: border-color 0.2s;
-}
+  &__footer {
+    margin-top: auto;
+  }
 
-.m-listing-card-image-actions .a-favourite-button svg,
-.m-listing-card-image-actions .note-button svg {
-  stroke: var(--monochrome-100);
-}
+  &__view-btn {
+    border-radius: var(--border-radius-lg);
+    display: inline-block;
+    padding: var(--size-8);
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+  }
 
-.m-listing-card-image-actions .a-favourite-button:hover,
-.m-listing-card-image-actions .note-button:hover {
-  border-color: var(--secondary-400);
-}
+  // Icon color fixes - PRESERVED EXACTLY AS WORKING
+  .a-favourite-button svg,
+  .note-button svg {
+    color: var(--monochrome-900);
+  }
 
-/* ============================================
-   VIEW BUTTON
-   ============================================ */
-
-.listing-card__footer {
-  margin-top: auto;
-}
-
-.listing-card__view-btn {
-  background: var(--secondary-400);
-  border: none;
-  border-radius: var(--border-radius-lg);
-  color: var(--monochrome-900);
-  display: inline-block;
-  padding: var(--size-8);
-  text-align: center;
-  text-decoration: none;
-  transition: none;
-  width: 100%;
-}
-
-.listing-card__view-btn:hover {
-  background: var(--secondary-400);
-  color: var(--monochrome-900);
-}
-
-.listing-card--premium .listing-card__view-btn {
-  background: var(--primary-400);
-  color: var(--monochrome-300);
-}
-
-.listing-card--featured .listing-card__view-btn:hover {
-  background: var(--secondary-400);
-  color: var(--monochrome-900);
+  &--premium .a-favourite-button svg,
+  &--premium .note-button svg {
+    color: var(--monochrome-100);
+  }
 }
 </style>

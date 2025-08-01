@@ -104,7 +104,7 @@ const scrollNext = () => carouselRef.value?.scrollNext?.();
     flex-direction: column;
   }
 
-  .listing-card {
+  .summary-card {
     width: 100%;
     max-width: none;
     height: 100%;

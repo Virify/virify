@@ -91,6 +91,7 @@ interface EnergyData {
 }
 
 interface Props {
+  title?: string;
   energyData?: EnergyData;
 }
 
