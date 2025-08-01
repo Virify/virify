@@ -10,7 +10,17 @@
     </div>
 
     <ol class="timeline__list">
-      <li v-for="item in displayItems" :key="item.id" class="timeline__item">
+      <!-- Skeleton loading items -->
+      <li v-if="loading" v-for="n in skeletonCount" :key="`skeleton-${n}`" class="timeline__item">
+        <header class="timeline__item-header">
+          <AtomsSkeletonBar loading :width="180" :height="20" />
+          <AtomsSkeletonBar loading :width="60" :height="24" />
+        </header>
+        <AtomsSkeletonBar loading :width="100" :height="16" />
+      </li>
+
+      <!-- Actual data items -->
+      <li v-if="!loading" v-for="item in displayItems" :key="item.id" class="timeline__item">
         <header class="timeline__item-header">
           <h4 class="timeline__item-title | title-xs">{{ item.title }}</h4>
           <AtomsPill v-if="item.badge" class="pill | body-xs" :class="item.badgeColor">
@@ -22,7 +32,7 @@
         </time>
       </li>
       
-      <!-- No more history card when only one item -->
+      <!-- Render the no more history card (always visible at the end of the timeline) -->
       <li class="timeline__item timeline__item--no-history">
         <p class="timeline__no-history-message | body-sm">No more property history available</p>
       </li>
@@ -49,9 +59,13 @@ interface Props {
   items: TimelineItem[]
   reversed?: boolean
   note?: string
+  loading?: boolean
+  skeletonCount?: number
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  skeletonCount: 3
+})
 
 const displayItems = computed(() => {
   return props.reversed ? [...props.items].reverse() : props.items

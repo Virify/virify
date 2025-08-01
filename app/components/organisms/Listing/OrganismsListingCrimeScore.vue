@@ -4,12 +4,7 @@
     <p class="| r-body-md-sm">Safety matters when choosing where to live. We've crunched the local crime numbers to give you
       a clear picture of what's happening in the neighbourhood, so you can feel confident about your move.</p>
 
-    <div v-if="loading" class="o-listing-crime-score__loading">
-      <AtomsBarSpinner />
-      <p>Loading crime data...</p>
-    </div>
-
-    <div v-else-if="error" class="o-listing-crime-score__error">
+    <div v-if="error" class="o-listing-crime-score__error">
       <p>{{ error }}</p>
     </div>
 
@@ -21,27 +16,27 @@
 
           <div class="crime-analytics">
             <!-- Overall Crime Score Card -->
-            <div class="stat-card-with-info" v-if="overallScoreCard">
-              <MoleculesStatCard :title="overallScoreCard.title" :value="overallScoreCard.value"
-                :description="overallScoreCard.description" :info="crimeInfoText.overallScore" :icon="overallScoreCard.icon" />
+            <div class="stat-card-with-info" v-if="overallScoreCard || loading">
+              <MoleculesStatCard :title="overallScoreCard?.title || 'Loading...'" :value="overallScoreCard?.value || 'Loading...'"
+                :description="overallScoreCard?.description || 'Loading description...'" :info="crimeInfoText.overallScore" :icon="overallScoreCard?.icon" :loading="loading" />
             </div>
 
             <!-- Total Incidents Card -->
-            <div class="stat-card-with-info" v-if="totalIncidentsCard">
-              <MoleculesStatCard :title="totalIncidentsCard.title" :value="totalIncidentsCard.value"
-                :description="totalIncidentsCard.description" :info="crimeInfoText.totalIncidents" :icon="totalIncidentsCard.icon" />
+            <div class="stat-card-with-info" v-if="totalIncidentsCard || loading">
+              <MoleculesStatCard :title="totalIncidentsCard?.title || 'Loading...'" :value="totalIncidentsCard?.value || 'Loading...'"
+                :description="totalIncidentsCard?.description || 'Loading description...'" :info="crimeInfoText.totalIncidents" :icon="totalIncidentsCard?.icon" :loading="loading" />
             </div>
 
             <!-- Most Common Crime Card -->
-            <div class="stat-card-with-info" v-if="mostCommonCrimeCard">
-              <MoleculesStatCard :title="mostCommonCrimeCard.title" :value="mostCommonCrimeCard.value"
-                :description="mostCommonCrimeCard.description" :info="crimeInfoText.mostCommon" :icon="mostCommonCrimeCard.icon" />
+            <div class="stat-card-with-info" v-if="mostCommonCrimeCard || loading">
+              <MoleculesStatCard :title="mostCommonCrimeCard?.title || 'Loading...'" :value="mostCommonCrimeCard?.value || 'Loading...'"
+                :description="mostCommonCrimeCard?.description || 'Loading description...'" :info="crimeInfoText.mostCommon" :icon="mostCommonCrimeCard?.icon" :loading="loading" />
             </div>
 
             <!-- Safety Level Card -->
-            <div class="stat-card-with-info" v-if="safetyLevelCard">
-              <MoleculesStatCard :title="safetyLevelCard.title" :value="safetyLevelCard.value"
-                :description="safetyLevelCard.description" :info="crimeInfoText.safetyLevel" :icon="safetyLevelCard.icon" />
+            <div class="stat-card-with-info" v-if="safetyLevelCard || loading">
+              <MoleculesStatCard :title="safetyLevelCard?.title || 'Loading...'" :value="safetyLevelCard?.value || 'Loading...'"
+                :description="safetyLevelCard?.description || 'Loading description...'" :info="crimeInfoText.safetyLevel" :icon="safetyLevelCard?.icon" :loading="loading" />
             </div>
           </div>
           <div class="o-listing-crime-score__disclaimer">
@@ -53,10 +48,14 @@
         </div>
 
         <!-- Crime Breakdown Column -->
-        <div class="breakdown-column" v-if="crimesByCategory?.length > 0">
+        <div class="breakdown-column" v-if="crimesByCategory?.length > 0 || loading">
           <h3 class="column-title | title-xs">Crime Breakdown</h3>
           <div class="crime-breakdown-list">
-            <MoleculesCrimeBreakdownCard v-for="category in crimesByCategory.slice(0, 6)" :key="category.category"
+            <!-- Loading skeleton items -->
+            <MoleculesCrimeBreakdownCard v-if="loading" v-for="n in 6" :key="`skeleton-${n}`"
+              category="Loading..." :count="0" :percentage="0" :loading="true" />
+            <!-- Actual data items -->
+            <MoleculesCrimeBreakdownCard v-else v-for="category in crimesByCategory.slice(0, 6)" :key="category.category"
               :category="category.category" :count="category.count"
               :percentage="(category.count / maxCategoryCount) * 100" />
           </div>

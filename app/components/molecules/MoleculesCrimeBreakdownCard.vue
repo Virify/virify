@@ -1,17 +1,22 @@
 <template>
   <div class="crime-breakdown-card">
     <div class="crime-breakdown-card__header">
-      <h3 class="crime-breakdown-card__category-name | title-xs">
-        {{ formatCategoryName(category) }}
-      </h3>
-      <p class="crime-breakdown-card__category-count | body-sm">
-        {{ count }} incident{{ count !== 1 ? 's' : '' }}
-      </p>
+      <AtomsSkeletonBar :loading="loading" :width="120" :height="20">
+        <h3 class="crime-breakdown-card__category-name | title-xs">
+          {{ formatCategoryName(category) }}
+        </h3>
+      </AtomsSkeletonBar>
+      <AtomsSkeletonBar :loading="loading" :width="80" :height="16">
+        <p class="crime-breakdown-card__category-count | body-sm">
+          {{ count }} incident{{ count !== 1 ? 's' : '' }}
+        </p>
+      </AtomsSkeletonBar>
     </div>
     <div class="crime-breakdown-card__bar">
-      <div class="crime-breakdown-card__fill"
+      <div v-if="!loading" class="crime-breakdown-card__fill"
         :style="{ width: `${percentage}%` }">
       </div>
+      <AtomsSkeletonBar v-else loading :width="120" :height="4" />
     </div>
   </div>
 </template>
@@ -21,6 +26,7 @@ interface Props {
   category: string
   count: number
   percentage: number
+  loading?: boolean
 }
 
 defineProps<Props>()
