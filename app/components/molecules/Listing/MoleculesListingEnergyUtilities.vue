@@ -120,42 +120,42 @@ const formatRenewableEnergy = (renewable: string): string => {
     // Rating-specific backgrounds
     &--a {
       background: linear-gradient(315deg, #00e676 0%, #009e4f 100%);
-      color: #fff;
+      color: var(--monochrome-900);
     }
 
     &--b {
       background: linear-gradient(315deg, #aeea00 0%, #558b2f 100%);
-      color: #fff;
+      color: var(--monochrome-900);
     }
 
     &--c {
       background: linear-gradient(315deg, #fff600 0%, #ffd600 100%);
-      color: #333;
+      color: var(--monochrome-100);
     }
 
     &--d {
       background: linear-gradient(315deg, #ff9800 0%, #f57c00 100%);
-      color: #fff;
+      color: var(--monochrome-900);
     }
 
     &--e {
       background: linear-gradient(315deg, #ff3d00 0%, #d50000 100%);
-      color: #fff;
+      color: var(--monochrome-900);
     }
 
     &--f {
       background: linear-gradient(315deg, #c51162 0%, #880e4f 100%);
-      color: #fff;
+      color: var(--monochrome-900);
     }
 
     &--g {
       background: linear-gradient(315deg, #6a1b9a 0%, #311b92 100%);
-      color: #fff;
+      color: var(--monochrome-900);
     }
 
     &--unknown {
       background: linear-gradient(315deg, #bdbdbd 0%, #616161 100%);
-      color: #fff;
+      color: var(--monochrome-900);
     }
   }
 
@@ -219,7 +219,7 @@ const formatRenewableEnergy = (renewable: string): string => {
     padding: var(--size-24);
 
     .a-icon {
-      color: white;
+      color: var(--monochrome-900);
     }
   }
 
@@ -228,7 +228,7 @@ const formatRenewableEnergy = (renewable: string): string => {
 
     h4 {
       margin: 0 0 var(--size-8) 0;
-      color: white;
+      color: var(--monochrome-900);
     }
   }
 
@@ -244,7 +244,7 @@ const formatRenewableEnergy = (renewable: string): string => {
 
   &__renewable-pill {
     background: rgba(255, 255, 255, 0.2);
-    color: white;
+    color: var(--monochrome-900);
     border: 1px solid rgba(255, 255, 255, 0.3);
 
     &:hover {

@@ -215,7 +215,7 @@ const formatUtility = (utility: string): string => {
 
     .a-pill {
       background: var(--blue-400);
-      color: (--monochrome-900);
+      color: var(--monochrome-900);
     }
   }
 
