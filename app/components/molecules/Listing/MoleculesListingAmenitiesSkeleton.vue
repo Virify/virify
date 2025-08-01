@@ -176,7 +176,7 @@ const skeletonCategories = [
       background: linear-gradient(
         90deg,
         var(--blue-400) 25%,
-        var(--blue-300) 50%,
+        var(--background-100) 50%,
         var(--blue-400) 75%
       );
       background-size: 200% 100%;

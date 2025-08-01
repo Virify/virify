@@ -4,33 +4,33 @@
     <p class="property-history-desc | r-body-md-sm">
       See when this property changed hands, how the price has moved, and how it stacks up against the rest of the city. Get a feel for its journey so far, spot local price trends, and find out if you’re looking at a hidden gem—or a record breaker. All data comes straight from the Land Registry, so you’re always in the know.
     </p>
-    <div v-if="pricePaidData?.data?.sales" class="price-history-grid">
+    <div v-if="pricePaidData?.data?.sales || loading" class="price-history-grid">
       <!-- Property History Column -->
-      <MoleculesTimeline title="This Property" :items="timelineItems" note="Note: This data is based on the latest available information provided by the Land Registry." />
+      <MoleculesTimeline title="This Property" :items="timelineItems" :loading="loading" note="Note: This data is based on the latest available information provided by the Land Registry." />
 
       <!-- Market Context Column -->
-      <div class="area-column" v-if="pricePaidData?.data?.market_context">
-        <h3 class="column-title | title-xs">Market Context ({{ pricePaidData?.data?.market_context?.reference_year }})</h3>
+      <div class="area-column" v-if="pricePaidData?.data?.market_context || loading">
+        <h3 class="column-title | title-xs">Market Context ({{ pricePaidData?.data?.market_context?.reference_year || '2024' }})</h3>
         <!-- Market context description moved to top of section -->
         <div class="market-analytics">
           <!-- Area Average Card -->
-          <div class="stat-card-with-info" v-if="areaAverageCard">
-            <MoleculesStatCard :title="areaAverageCard.title" :value="areaAverageCard.value" :description="areaAverageCard.description" :info="areaAverageInfo" class="pill--percentage" />
+          <div class="stat-card-with-info" v-if="areaAverageCard || loading">
+            <MoleculesStatCard :title="areaAverageCard?.title || 'Loading...'" :value="areaAverageCard?.value || 'Loading...'" :description="areaAverageCard?.description || 'Loading description...'" :info="areaAverageInfo" :loading="loading" class="pill--percentage" />
           </div>
 
           <!-- Property Type Average Card -->
-          <div class="stat-card-with-info" v-if="propertyTypeAverageCard">
-            <MoleculesStatCard :title="propertyTypeAverageCard.title" :value="propertyTypeAverageCard.value" :description="propertyTypeAverageCard.description" :info="propertyTypeAverageInfo" class="pill--percentage" />
+          <div class="stat-card-with-info" v-if="propertyTypeAverageCard || loading">
+            <MoleculesStatCard :title="propertyTypeAverageCard?.title || 'Loading...'" :value="propertyTypeAverageCard?.value || 'Loading...'" :description="propertyTypeAverageCard?.description || 'Loading description...'" :info="propertyTypeAverageInfo" :loading="loading" class="pill--percentage" />
           </div>
 
           <!-- Market Position Card -->
-          <div class="stat-card-with-info" v-if="marketPositionCard">
-            <MoleculesStatCard :title="marketPositionCard.title" :value="marketPositionCard.value" :description="marketPositionCard.description" :info="marketPositionInfo" class="pill--percentage" />
+          <div class="stat-card-with-info" v-if="marketPositionCard || loading">
+            <MoleculesStatCard :title="marketPositionCard?.title || 'Loading...'" :value="marketPositionCard?.value || 'Loading...'" :description="marketPositionCard?.description || 'Loading description...'" :info="marketPositionInfo" :loading="loading" class="pill--percentage" />
           </div>
 
           <!-- Market Trend Card -->
-          <div class="stat-card-with-info" v-if="marketTrendCard">
-            <MoleculesStatCard :title="marketTrendCard.title" :value="marketTrendCard.value" :description="marketTrendCard.description" :info="marketTrendInfo" class="pill--percentage" />
+          <div class="stat-card-with-info" v-if="marketTrendCard || loading">
+            <MoleculesStatCard :title="marketTrendCard?.title || 'Loading...'" :value="marketTrendCard?.value || 'Loading...'" :description="marketTrendCard?.description || 'Loading description...'" :info="marketTrendInfo" :loading="loading" class="pill--percentage" />
           </div>
 
           <!-- Info Modal -->

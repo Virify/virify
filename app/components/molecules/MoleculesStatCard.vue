@@ -2,16 +2,26 @@
   <div class="stat-card">
     <header class="stat-card__header">
       <div class="stat-card__title-row">
-        <AtomsIcon v-if="icon" :icon="icon" :size="20" />
-        <h4 class="stat-card__title | title-xs">{{ title }}</h4>
+        <AtomsSkeletonBar :loading="loading" :width="20" :height="20">
+          <AtomsIcon v-if="icon" :icon="icon" :size="20" />
+        </AtomsSkeletonBar>
+        <AtomsSkeletonBar :loading="loading" :width="120" :height="20">
+          <h4 class="stat-card__title | title-xs">{{ title }}</h4>
+        </AtomsSkeletonBar>
       </div>
-      <AtomsPill class="pill | body-xs">{{ value }}</AtomsPill>
+      <AtomsSkeletonBar :loading="loading" :width="60" :height="24">
+        <AtomsPill class="pill | body-xs">{{ value }}</AtomsPill>
+      </AtomsSkeletonBar>
     </header>
-    <div v-if="description" class="stat-card__desc-row">
-      <button v-if="info" class="stat-card__info-btn button button-xs button-quiet" type="button" aria-label="Show info about this statistic" @click="openInfoModal">
-        <AtomsIcon icon="property/info" :size="16" />
-      </button>
-      <p class="stat-card__description | body-sm">{{ description }}</p>
+    <div v-if="description || loading" class="stat-card__desc-row">
+      <AtomsSkeletonBar :loading="loading" :width="16" :height="16">
+        <button v-if="info" class="stat-card__info-btn button button-xs button-quiet" type="button" aria-label="Show info about this statistic" @click="openInfoModal">
+          <AtomsIcon icon="property/info" :size="16" />
+        </button>
+      </AtomsSkeletonBar>
+      <AtomsSkeletonBar :loading="loading" :width="200" :height="16">
+        <p class="stat-card__description | body-sm">{{ description }}</p>
+      </AtomsSkeletonBar>
     </div>
 
     <!-- Info Modal -->
@@ -31,6 +41,7 @@ interface Props {
   description?: string;
   info?: string;
   icon?: string;
+  loading?: boolean;
 }
 
 defineProps<Props>();
@@ -61,6 +72,7 @@ function closeInfoModal() {
   padding: var(--size-16);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
+  box-sizing: border-box;
 
   &__content {
     width: 100%;

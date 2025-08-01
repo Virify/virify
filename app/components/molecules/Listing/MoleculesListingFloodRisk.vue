@@ -15,15 +15,17 @@
             on
             any potential flooding risks in the area, helping you make informed decisions about your next home.</p>
           <div class="o-listing-flood-risk__risk-highlight">
-            <h3 class="o-listing-flood-risk__risk-level | title-sm" v-if="!loading">
-              {{ getRiskLevelText(floodRiskLevel) }}
-            </h3>
-            <div v-else class="skeleton-bar skeleton-bar--title"></div>
+            <AtomsSkeletonBar :loading="loading" :width="150" :height="24">
+              <h3 class="o-listing-flood-risk__risk-level | title-sm">
+                {{ getRiskLevelText(floodRiskLevel) }}
+              </h3>
+            </AtomsSkeletonBar>
 
-            <p class="o-listing-flood-risk__risk-description | r-body-md-sm" v-if="!loading">
-              {{ getRiskDescription(floodRiskLevel) }}
-            </p>
-            <div v-else class="skeleton-bar skeleton-bar--body"></div>
+            <AtomsSkeletonBar :loading="loading" :width="250" :height="16">
+              <p class="o-listing-flood-risk__risk-description | r-body-md-sm">
+                {{ getRiskDescription(floodRiskLevel) }}
+              </p>
+            </AtomsSkeletonBar>
           </div>
         </AtomsHeroCard>
 
@@ -36,10 +38,11 @@
           <div class="o-listing-flood-risk__data-points">
             <div class="o-listing-flood-risk__data-point">
               <span class="o-listing-flood-risk__data-label | r-body-md-sm font-semibold">Flood Events:</span>
-              <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold" v-if="!loading">{{
-                historicalFloodEvents?.length || 0
-              }}</span>
-              <div v-else class="skeleton-bar skeleton-bar--small"></div>
+              <AtomsSkeletonBar :loading="loading" :width="40" :height="16">
+                <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold">{{
+                  historicalFloodEvents?.length || 0
+                }}</span>
+              </AtomsSkeletonBar>
             </div>
 
             <div class="o-listing-flood-risk__data-point">
@@ -48,10 +51,11 @@
             </div>
             <div class="o-listing-flood-risk__data-point">
               <span class="o-listing-flood-risk__data-label | r-body-md-sm font-semibold">Monitoring Stations:</span>
-              <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold" v-if="!loading">{{
-                floodStations?.length || 0
-              }}</span>
-              <div v-else class="skeleton-bar skeleton-bar--small"></div>
+              <AtomsSkeletonBar :loading="loading" :width="40" :height="16">
+                <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold">{{
+                  floodStations?.length || 0
+                }}</span>
+              </AtomsSkeletonBar>
             </div>
           </div>
         </AtomsHeroCard>
@@ -224,38 +228,5 @@ onMounted(() => {
     }
   }
 
-  // Skeleton loading styles
-  .skeleton-bar {
-    background: linear-gradient(90deg, var(--monochrome-100) 25%, var(--blue-300) 50%, var(--blue-400) 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-    border-radius: 4px;
-
-    &--title {
-      height: 24px;
-      width: 60%;
-      margin-bottom: 8px;
-    }
-
-    &--body {
-      height: 16px;
-      width: 80%;
-    }
-
-    &--small {
-      height: 16px;
-      width: 40px;
-    }
-  }
-
-  @keyframes loading {
-    0% {
-      background-position: 200% 0;
-    }
-
-    100% {
-      background-position: -200% 0;
-    }
-  }
 }
 </style>
