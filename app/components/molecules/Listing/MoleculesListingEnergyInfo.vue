@@ -20,7 +20,7 @@
       <!-- Energy details (collapsible) -->
       <div v-show="!isCollapsed" class="feature-card__details-section">
         <!-- Heating & Hot Water -->
-        <div v-if="energyData.primaryHeatingType?.length || energyData.boilerType" class="feature-card__details-group">
+        <div v-if="energyData?.primaryHeatingType?.length || energyData?.boilerType" class="feature-card__details-group">
           <h6 class="feature-card__group-title | body-sm font-semibold">Heating & Hot Water</h6>
           <ul class="energy-info__list">
             <li v-if="energyData.primaryHeatingType?.length" class="feature-card__detail-row">
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Utilities -->
-        <div v-if="energyData.connectedUtilities?.length" class="feature-card__details-group">
+        <div v-if="energyData?.connectedUtilities?.length" class="feature-card__details-group">
           <h6 class="feature-card__group-title | body-sm font-semibold">Connected Utilities</h6>
           <ul class="energy-info__list">
             <li class="feature-card__detail-row">
@@ -91,7 +91,7 @@ interface EnergyData {
 }
 
 interface Props {
-  energyData: EnergyData;
+  energyData?: EnergyData;
 }
 
 defineProps<Props>();

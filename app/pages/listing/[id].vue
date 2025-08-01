@@ -62,24 +62,24 @@
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-list">
               <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="property?.parking" title="Parking" :features="property?.parking" />
-                <MoleculesListingFeatures v-if="property?.utility" title="Utility" :features="property?.utility" />
-                <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage"
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.parking)" title="Parking" :features="property?.parking" />
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.utility)" title="Utility" :features="property?.utility" />
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.storageFeatures)" title="Storage"
                   :features="property?.storageFeatures" />
                 <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
                   :broadband-type="property.energyAndUtilities.broadbandType"
                   :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
                   :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
-                <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features"
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.additionalFeatures)" title="Additional Features"
                   :features="property?.additionalFeatures" />
               </div>
               <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="property?.accessibilityFeatures" title="Accessibility"
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.accessibilityFeatures)" title="Accessibility"
                   :features="property?.accessibilityFeatures" />
-                <MoleculesListingFeatures v-if="property?.securityFeatures" title="Security"
+                <MoleculesListingFeatures v-if="filterListingFeatures(property?.securityFeatures)" title="Security"
                   :features="property?.securityFeatures" />
-                <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities"
-                  :energy-data="property.energyAndUtilities" />
+                <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)" title="Energy & Utilities"
+                  :energy-data="property.energyAndUtilities!" />
                 <MoleculesListingMobileCoverage />
               </div>
             </div>
