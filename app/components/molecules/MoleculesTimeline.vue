@@ -32,7 +32,7 @@
         </time>
       </li>
       
-      <!-- Always render the no more history card -->
+      <!-- Render the no more history card (always visible at the end of the timeline) -->
       <li class="timeline__item timeline__item--no-history">
         <p class="timeline__no-history-message | body-sm">No more property history available</p>
       </li>
