@@ -1,5 +1,6 @@
 <template>
-  <AtomsHeroCard class="o-listing-advert" variant="primary">
+  <AtomsHeroCard class="o-advert" variant="primary">
+    <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" class="o-advert__logo"/>
     <h2 class="title-md">List your property with Virify!</h2>
     <p class="r-body-md-sm">
       Ready to sell or rent? Get your home in front of the right buyers and renters with Virify’s smart, modern platform.
@@ -14,3 +15,12 @@
     </p>
   </AtomsHeroCard>
 </template>
+<style lang="scss">
+.o-advert {
+  &__logo {
+    height: 67px;
+    width: 159px;
+    // align-self: flex-start;
+  }
+}
+</style>
