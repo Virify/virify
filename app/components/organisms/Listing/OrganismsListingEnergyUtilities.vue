@@ -119,36 +119,43 @@ const formatRenewableEnergy = (renewable: string): string => {
 
     // Rating-specific backgrounds
     &--a {
-      background: linear-gradient(135deg, #00A651 0%, #00C95F 100%);
+      background: linear-gradient(135deg, #00e676 0%, #009e4f 100%);
+      color: #fff;
     }
 
     &--b {
-      background: linear-gradient(135deg, #8CC63F 0%, #A3D94D 100%);
+      background: linear-gradient(135deg, #aeea00 0%, #558b2f 100%);
+      color: #fff;
     }
 
     &--c {
-      background: linear-gradient(135deg, #FFF200 0%, #FFFF4D 100%);
+      background: linear-gradient(135deg, #fff600 0%, #ffd600 100%);
       color: #333;
     }
 
     &--d {
-      background: linear-gradient(135deg, #F7931E 0%, #FF9E2C 100%);
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      color: #fff;
     }
 
     &--e {
-      background: linear-gradient(135deg, #ED1C24 0%, #F52A32 100%);
+      background: linear-gradient(135deg, #ff3d00 0%, #d50000 100%);
+      color: #fff;
     }
 
     &--f {
-      background: linear-gradient(135deg, #B71234 0%, #C91A3E 100%);
+      background: linear-gradient(135deg, #c51162 0%, #880e4f 100%);
+      color: #fff;
     }
 
     &--g {
-      background: linear-gradient(135deg, #662D91 0%, #7435A3 100%);
+      background: linear-gradient(135deg, #6a1b9a 0%, #311b92 100%);
+      color: #fff;
     }
 
     &--unknown {
-      background: linear-gradient(135deg, var(--monochrome-400) 0%, var(--monochrome-500) 100%);
+      background: linear-gradient(135deg, #bdbdbd 0%, #616161 100%);
+      color: #fff;
     }
   }
 
