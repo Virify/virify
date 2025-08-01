@@ -23,12 +23,13 @@
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
-            :address="address" :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
-            :bedrooms="property?.numberBedrooms || undefined" :bathrooms="property?.numberBathrooms || undefined" 
-            :other-rooms="property?.numberOtherRooms || undefined" :rear-garden="property?.rearGarden ? true : false" 
-            :front-garden="property?.frontGarden ? true : false" :receptions="property?.numberReceptions || undefined" 
-            :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined" 
-            :construction-type="property?.constructionType || undefined" :chain-free="listing?.saleListing?.chain || false" />
+            :address="address" :price-type="priceType" :property-type="property?.type?.name"
+            :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+            :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+            :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+            :chain-free="listing?.saleListing?.chain || false" />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
@@ -72,23 +73,27 @@
           <div v-if="property" class="p-listing__section">
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-list">
-              <MoleculesListingFeatures v-if="property?.parking" title="Parking" :features="property?.parking" />
-              <MoleculesListingFeatures v-if="property?.accessibilityFeatures" title="Accessibility"
-                :features="property?.accessibilityFeatures" />
-              <MoleculesListingFeatures v-if="property?.utility" title="Utility" :features="property?.utility" />
-              <MoleculesListingFeatures v-if="property?.securityFeatures" title="Security"
-                :features="property?.securityFeatures" />
-              <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage"
-                :features="property?.storageFeatures" />
-              <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities"
-                :energy-data="property.energyAndUtilities" />
-              <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
-                :broadband-type="property.energyAndUtilities.broadbandType"
-                :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
-                :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
-              <MoleculesListingMobileCoverage />
-              <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features"
-                :features="property?.additionalFeatures" />
+              <div class="p-listing__features-column">
+                <MoleculesListingFeatures v-if="property?.parking" title="Parking" :features="property?.parking" />
+                <MoleculesListingFeatures v-if="property?.utility" title="Utility" :features="property?.utility" />
+                <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage"
+                  :features="property?.storageFeatures" />
+                <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
+                  :broadband-type="property.energyAndUtilities.broadbandType"
+                  :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
+                  :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
+                <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features"
+                  :features="property?.additionalFeatures" />
+              </div>
+              <div class="p-listing__features-column">
+                <MoleculesListingFeatures v-if="property?.accessibilityFeatures" title="Accessibility"
+                  :features="property?.accessibilityFeatures" />
+                <MoleculesListingFeatures v-if="property?.securityFeatures" title="Security"
+                  :features="property?.securityFeatures" />
+                <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities"
+                  :energy-data="property.energyAndUtilities" />
+                <MoleculesListingMobileCoverage />
+              </div>
             </div>
           </div>
 
@@ -105,6 +110,7 @@
           <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
             <OrganismsListingCrimeScore :lat="property.address.lat" :lon="property.address.lon" />
           </div>
+
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
@@ -136,36 +142,53 @@
 
     <client-only>
       <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
-        :price-type="priceType" :address="address" :property-type="property?.type?.name" :property-size="property?.size || undefined"
-        :bedrooms="property?.numberBedrooms || undefined" :bathrooms="property?.numberBathrooms || undefined" 
-        :other-rooms="property?.numberOtherRooms || undefined" :rear-garden="property?.rearGarden ? true : false" 
-        :front-garden="property?.frontGarden ? true : false" :receptions="property?.numberReceptions || undefined" 
-        :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined" 
-        :construction-type="property?.constructionType || undefined" :chain-free="listing?.saleListing?.chain || false"
-        :listing-id="listing?.id || 0" :agent="listing?.user || {}" />
+        :price-type="priceType" :address="address" :property-type="property?.type?.name"
+        :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
+        :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+        :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+        :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+        :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+        :chain-free="listing?.saleListing?.chain || false" :listing-id="listing?.id || 0"
+        :agent="listing?.user || {}" />
     </client-only>
   </main>
+  <!-- Similar Listings -->
+  <div class="p-listing | container">
+    <MoleculesSimilarListings :listings="similarListings" :address="similarListingsAddress" />
+  </div>
+
 </template>
 
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
 import breakpoints from "#styles/_utils/breakpoints.module.scss";
+import type { ListingWithSimilar } from "~~/shared/types/listing";
 
 const route = useRoute();
 
 /**
  *  Fetch listing
  */
-const { data: listing, status } = await useAsyncData(
+const { data: listingData, status } = await useAsyncData(
   "listing",
   () => {
-    return $fetch<ListingWithFullProperty>(`/api/listing/${route.params?.id}`);
+    return $fetch<ListingWithSimilar>(`/api/listing/${route.params?.id}`);
   },
   {
     deep: false,
   }
 );
 
+const listing = computed(() => listingData.value?.listing);
+const similarListings = computed(() => listingData.value?.similarListings || []);
+
+const similarListingsAddress = computed(() => {
+  return listing.value?.property?.address ? {
+    street: listing.value.property.address.street,
+    city: listing.value.property.address.city,
+    postcode: listing.value.property.address.postcode,
+  } : {};
+});
 /**
  *  Content
  */
@@ -284,6 +307,16 @@ function openImageModal(imageIndex: number) {
 function closeImageModal() {
   showImageModal.value = false;
 }
+
+
+
+onMounted(() => {
+  window.addEventListener("scroll", parallaxCarousel, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", parallaxCarousel);
+});
 </script>
 
 <style lang="scss">
@@ -298,6 +331,7 @@ ul {
 
 .p-listing {
   margin-top: var(--size-32);
+
 
   &__grid {
     display: grid;
@@ -445,15 +479,27 @@ ul {
 
 .p-listing__features-list {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: var(--size-16);
   margin-top: var(--size-16);
-  align-items: start;
+  align-items: flex-start;
 
   @include mq.mobile-only {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: var(--size-12);
   }
 }
+
+.p-listing__features-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+
+  @include mq.mobile-only {
+    gap: var(--size-12);
+    width: 100%;
+  }
+}
+
 </style>

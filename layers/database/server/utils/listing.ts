@@ -1,4 +1,6 @@
-import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
+
+import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty, ListingCardType, SummaryCardData } from "~~/shared/types/listing";
+import { listingCardFields } from "~~/shared/types/listing";
 import { ListingTier, Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "../database/prisma/generated/client";
 import { prisma } from "./prisma-client";
 
@@ -302,4 +304,117 @@ export async function fetchPaginatedListings(where: Prisma.ListingWhereInput, pa
     skip,
     take: limit,
   });
+}
+
+/**
+ * Get similar listings based on property characteristics and location
+ */
+export async function getSimilarListings(listing: ListingWithFullProperty, limit: number = 10): Promise<SummaryCardData[]> {
+  const property = listing.property;
+  if (!property?.address || !property.type) {
+    return [];
+  }
+
+  // Get nearby properties within 3 mile radius
+  const lat = property.address.lat ?? 0;
+  const lon = property.address.lon ?? 0;
+  const nearbyProperties = await getPropertyIdsByDistance(
+    lat,
+    lon,
+    10 // 10 mile radius
+  );
+
+  const propertyIds = nearbyProperties.map(p => p.propertyId);
+  if (propertyIds.length === 0) {
+    return [];
+  }
+  
+  // Determine listing type filter
+  const listingTypeFilter = listing.saleListing ? 'saleListing' : 'rentalListing';
+  
+  // Calculate price range (±30%)
+  const basePrice = listing.price;
+  const priceMin = Math.floor(basePrice * 0.7);
+  const priceMax = Math.ceil(basePrice * 1.3);
+
+  // Determine if the current listing is a house share
+  const isHouseShare = property.classification?.name?.toLowerCase() === 'house share';
+
+  // Build classification filter for house share logic
+  let classificationFilter: any = {};
+  if (isHouseShare) {
+    classificationFilter = {
+      classification: {
+        name: {
+          equals: 'House Share',
+        },
+      },
+    };
+  } else {
+    classificationFilter = {
+      classification: {
+        name: {
+          not: 'House Share',
+        },
+      },
+    };
+  }
+
+  // Query for similar listings with strict filters and house share logic
+  const similarListings = await prisma.listing.findMany({
+    where: {
+      id: {
+        not: listing.id, // Exclude the current listing
+      },
+      published: true,
+      [listingTypeFilter]: {
+        isNot: null, // Just check that the listing type exists
+      },
+      price: {
+        gte: priceMin,
+        lte: priceMax,
+      },
+      property: {
+        id: {
+          in: propertyIds, // Nearby location
+        },
+        type: {
+          id: property.type.id, // Same property type
+        },
+        ...classificationFilter,
+      },
+    },
+    take: limit,
+    select: listingCardFields,
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  // Convert to SummaryCardData format
+  const simplifiedListings = similarListings.map((similarListing): SummaryCardData => {
+    const property = similarListing.property;
+    return {
+      id: similarListing.id || 0,
+      lat: property?.address?.lat || 0,
+      lon: property?.address?.lon || 0,
+      title: similarListing.title,
+      bedrooms: property?.numberBedrooms || null,
+      bathrooms: property?.numberBathrooms || null,
+      receptions: property?.numberReceptions || null,
+      price: similarListing.price,
+      propertyType: property?.type?.name || null,
+      classification: property?.classification?.name || null,
+      priceType: similarListing.saleListing?.priceType || similarListing.rentalListing?.rentFrequency || null,
+      address: property?.address ? {
+        street: property.address.street,
+        city: property.address.city,
+        postcode: property.address.postcode,
+      } : null,
+      image: property?.media || [],
+      tier: similarListing.listingTier,
+    };
+  });
+
+  return simplifiedListings;
 }

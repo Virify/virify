@@ -84,3 +84,8 @@ if (import.meta.client) {
   );
 }
 </script>
+<style lang="scss">
+.page {
+  background: var(--background-100);
+}
+</style>
