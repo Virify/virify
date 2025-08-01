@@ -1,6 +1,5 @@
 <template>
   <main class="p-listing">
-
     <div class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
         <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
@@ -34,34 +33,8 @@
             <AtomsListingGeneralInfo :description="property?.description || undefined" />
           </div>
 
-          <div>
-            <h2 class="title-md">Essentials</h2>
-            <!-- sale -->
-            <p class="r-body-md-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum, sint, molestiae
-              atque sunt dolor sed maxime neque sequi aliquid similique iure sit modi sapiente suscipit tempore odio.
-              Excepturi, et similique.</p>
-            <div v-if="listing?.saleListing" class="r-body-md-sm">
-              <div>Chain: {{ listing?.saleListing?.sharedOwnership }}</div>
-              <div>Tenure Type: {{ listing?.saleListing?.tenureType }}</div>
-              <div>Availability Status: {{ listing?.saleListing?.availabilityStatus }}</div>
-            </div>
-            <!-- rent -->
-            <div v-if="listing?.rentalListing" class="r-body-md-sm">
-              <div>Available: {{ listing?.rentalListing?.availabilityStatus }}</div>
-              <div>Rent Frequency: {{ listing?.rentalListing?.rentFrequency }}</div>
-              <div>Rental Length: {{ listing?.rentalListing?.rentalLength }}</div>
-              <div>Deposit: {{ `£${parseInt(String(listing?.rentalListing?.deposit)).toLocaleString()}` }}</div>
-              <div>Furnished: {{ listing?.rentalListing?.furnishedStatus ? 'Yes' : 'No' }}</div>
-            </div>
-
-            <!-- combined running costs -->
-            <div v-if="listing && property" class="r-body-md-sm">
-              <div>Move In Date: {{ new Date(listing?.moveInDate!).toLocaleString('en-GB', { month: 'long' }) }}</div>
-              <div>Council Tax Band: {{ property?.runningCosts?.councilTaxBand }}</div>
-              <div>Ground Rent: {{ `£${parseInt(String(property?.runningCosts?.groundRent)).toLocaleString()}` }}</div>
-              <div>Service Charge: {{ `£${parseInt(String(property?.runningCosts?.serviceCharges)).toLocaleString()}` }}</div>
-              <div>Pet Friendly: {{ property?.additionalFeatures?.petFriendly ? 'Yes' : 'No' }}</div>
-            </div>
+          <div v-if="listing && property" class="p-listing__section">
+            <MoleculesListingEssentials :listing="listing" :property="property" />
           </div>
 
           <div v-if="property" class="p-listing__section">
@@ -535,4 +508,5 @@ ul {
     width: 100%;
   }
 }
+
 </style>
