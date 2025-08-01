@@ -15,3 +15,16 @@ export function filterListingFeatures(features: Record<string, any> | null | und
   }
   return null;
 }
+
+/**
+ * Check if boolean-only features have any true values
+ */
+export function hasBooleanFeatures(features: Record<string, any> | null | undefined): boolean {
+  if (!features || typeof features !== 'object') return false;
+  
+  return Object.entries(features).some(([key, value]) => 
+    typeof value === 'boolean' && 
+    value === true && 
+    !['description', 'size', 'id', 'propertyId', 'createdAt', 'updatedAt'].includes(key)
+  );
+}
