@@ -13,12 +13,12 @@
           :class="`o-listing-energy__epc-hero--${energyData.epcRating.toLowerCase()}`">
           <div class="o-listing-energy__epc-badge">
             <span class="o-listing-energy__epc-letter">
-              {{ energyData.epcRating }}
+              {{ energyData.epcRating.toLowerCase() === 'unknown' ? 'U' : energyData.epcRating }}
             </span>
           </div>
           <div class="o-listing-energy__epc-info">
             <h4 class="title-sm">Energy Performance</h4>
-            <p class="body-sm">EPC Rating {{ energyData.epcRating }}</p>
+            <p class="body-sm">EPC Rating {{ energyData.epcRating.toLowerCase() === 'unknown' ? 'UNKNOWN' : energyData.epcRating }}</p>
           </div>
         </div>
 
@@ -119,42 +119,42 @@ const formatRenewableEnergy = (renewable: string): string => {
 
     // Rating-specific backgrounds
     &--a {
-      background: linear-gradient(135deg, #00e676 0%, #009e4f 100%);
+      background: linear-gradient(315deg, #00e676 0%, #009e4f 100%);
       color: #fff;
     }
 
     &--b {
-      background: linear-gradient(135deg, #aeea00 0%, #558b2f 100%);
+      background: linear-gradient(315deg, #aeea00 0%, #558b2f 100%);
       color: #fff;
     }
 
     &--c {
-      background: linear-gradient(135deg, #fff600 0%, #ffd600 100%);
+      background: linear-gradient(315deg, #fff600 0%, #ffd600 100%);
       color: #333;
     }
 
     &--d {
-      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      background: linear-gradient(315deg, #ff9800 0%, #f57c00 100%);
       color: #fff;
     }
 
     &--e {
-      background: linear-gradient(135deg, #ff3d00 0%, #d50000 100%);
+      background: linear-gradient(315deg, #ff3d00 0%, #d50000 100%);
       color: #fff;
     }
 
     &--f {
-      background: linear-gradient(135deg, #c51162 0%, #880e4f 100%);
+      background: linear-gradient(315deg, #c51162 0%, #880e4f 100%);
       color: #fff;
     }
 
     &--g {
-      background: linear-gradient(135deg, #6a1b9a 0%, #311b92 100%);
+      background: linear-gradient(315deg, #6a1b9a 0%, #311b92 100%);
       color: #fff;
     }
 
     &--unknown {
-      background: linear-gradient(135deg, #bdbdbd 0%, #616161 100%);
+      background: linear-gradient(315deg, #bdbdbd 0%, #616161 100%);
       color: #fff;
     }
   }
