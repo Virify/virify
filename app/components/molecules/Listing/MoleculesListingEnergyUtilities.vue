@@ -1,7 +1,7 @@
 <template>
   <section class="o-listing-energy">
     <h3 class="o-listing-energy__title | title-md">Energy & Connectivity</h3>
-    <p class="| body-md">Essential information about energy performance, heating systems, utilities, and connectivity to
+    <p class="| r-body-md-sm">Essential information about energy performance, heating systems, utilities, and connectivity to
       help you understand the property's running costs and convenience.</p>
 
     <div v-if="energyData" class="o-listing-energy__dashboard">

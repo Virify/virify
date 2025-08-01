@@ -33,7 +33,7 @@
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
-            <OrganismsListingGeneralInfo :description="property?.description || undefined" />
+            <AtomsListingGeneralInfo :description="property?.description || undefined" />
           </div>
 
           <div v-if="property" class="p-listing__section">
@@ -52,21 +52,9 @@
               :items="getGardenItems(property)" type="garden" title="Gardens" :show-floor="false" />
           </div>
 
-          <!-- Price Paid History -->
-          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
-            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
-              number: property.address.number,
-              flat: property.address.flat,
-              street: property.address.street,
-              city: property.address.city,
-              postcode: property.address.postcode,
-              county: property.address.county,
-            }" />
-          </div>
-
           <!-- Energy & Utilities -->
           <div v-if="property?.energyAndUtilities" class="p-listing__section">
-            <OrganismsListingEnergyUtilities :energy-data="property.energyAndUtilities"
+            <MoleculesListingEnergyUtilities :energy-data="property.energyAndUtilities"
               :postcode="property?.address?.postcode" />
           </div>
 
@@ -97,6 +85,18 @@
             </div>
           </div>
 
+           <!-- Price Paid History -->
+          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
+            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
+              number: property.address.number,
+              flat: property.address.flat,
+              street: property.address.street,
+              city: property.address.city,
+              postcode: property.address.postcode,
+              county: property.address.county,
+            }" />
+          </div>
+
           <!-- Location & Amenities (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
             <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!"
@@ -104,13 +104,16 @@
           </div>
 
           <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
-            <OrganismsListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
-          </div>
-
-          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
             <OrganismsListingCrimeScore :lat="property.address.lat" :lon="property.address.lon" />
           </div>
 
+          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+            <MoleculesListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
+          </div>
+
+          <div class="p-listing__section">
+            <MoleculesListingAdvert />
+          </div>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
@@ -371,7 +374,6 @@ ul {
 
   &__content {
     overflow: hidden;
-    padding-bottom: var(--size-32);
 
     @include mq.not-notebook {
       padding-inline: var(--size-24);
@@ -501,5 +503,4 @@ ul {
     width: 100%;
   }
 }
-
 </style>

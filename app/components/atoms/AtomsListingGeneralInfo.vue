@@ -1,7 +1,7 @@
 <template>
   <section v-if="description" class="listing-general-info">
     <h3 class="listing-general-info__title | title-md">Property Description</h3>
-    <p class="listing-general-info__description | body-md">{{ description }}</p>
+    <p class="listing-general-info__description | r-body-md-sm">{{ description }}</p>
   </section>
 </template>
 
