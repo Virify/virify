@@ -166,7 +166,6 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
   &--premium {
     background: var(--blue-400);
-    border: none;
     color: var(--monochrome-900);
 
     .summary-card__banner {
@@ -177,18 +176,18 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     }
 
     .summary-card__price {
-      color: var(--monochrome-900);
+      color: var(--primary-400);
     }
 
     .summary-card__price-type {
-      color: var(--monochrome-800);
+      color: var(--text-color);
     }
 
     .summary-card__address {
-      color: var(--monochrome-800);
+      color: var(--text-color);
     }
 
-    .summary-card__type {
+    .summary-card__type { 
       color: var(--monochrome-900);
     }
 
@@ -204,6 +203,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
         background-color: var(--primary-300);
       }
     }
+    
   }
 
   // Banner
@@ -255,17 +255,24 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+
+    // Dark mode override for better contrast
+    @media (prefers-color-scheme: dark) {
+      color: var(--monochrome-800);
+    }
   }
 
   &__price-type {
     margin: var(--size-4) 0;
-    color: var(--monochrome-400);
+    color: var(--text-color);
+    opacity: 0.7;
     text-transform: capitalize;
   }
 
   &__address {
     margin: var(--size-2) 0;
-    color: var(--monochrome-400);
+    color: var(--text-color);
+    opacity: 0.8;
   }
 
   &__features {

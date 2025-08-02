@@ -63,23 +63,23 @@
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-list">
               <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.parking)" title="Parking"
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.parking)" title="Parking"
                   :features="property?.parking" />
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.utility)" title="Utility"
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.utility)" title="Utility"
                   :features="property?.utility" />
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.storageFeatures)" title="Storage"
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.storageFeatures)" title="Storage"
                   :features="property?.storageFeatures" />
                 <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
                   :broadband-type="property.energyAndUtilities.broadbandType"
                   :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
                   :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.additionalFeatures)"
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.additionalFeatures)"
                   title="Additional Features" :features="property?.additionalFeatures" />
               </div>
               <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.accessibilityFeatures)"
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.accessibilityFeatures)"
                   title="Accessibility" :features="property?.accessibilityFeatures" />
-                <MoleculesListingFeatures v-if="filterListingFeatures(property?.securityFeatures)" title="Security"
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.securityFeatures)" title="Security"
                   :features="property?.securityFeatures" />
                 <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)"
                   title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
@@ -170,7 +170,7 @@
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
 import breakpoints from "#styles/_utils/breakpoints.module.scss";
-import type { ListingWithSimilar } from "~~/shared/types/listing";
+import { hasBooleanFeatures, filterListingFeatures } from "~/utils/listing/filter-listing-features";
 
 const route = useRoute();
 
@@ -215,6 +215,7 @@ const address = computed(() => {
 const priceType = computed(() => {
   return listing.value?.saleListing ? listing.value.saleListing.priceType : listing.value?.rentalListing?.rentFrequency;
 });
+
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {

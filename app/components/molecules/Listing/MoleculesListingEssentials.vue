@@ -3,59 +3,6 @@
     <h2 class="title-md">Essentials</h2>
 
     <div class="o-listing-essentials__grid">
-      <!-- Sale Information -->
-      <div v-if="listing?.saleListing" class="o-listing-essentials__card o-listing-essentials__card-">
-        <div class="o-listing-essentials__header">
-          <div class="o-listing-essentials__icon">
-            <AtomsIcon icon="listings/savings" :size="32" />
-          </div>
-          <div class="o-listing-essentials__header-text">
-            <h4 class="title-sm">Sale Details</h4>
-            <p class="body-xs">Key information about this sale</p>
-          </div>
-        </div>
-        <div class="o-listing-essentials__pills">
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedChain }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedTenure }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedAvailability }}
-          </AtomsPill>
-        </div>
-      </div>
-
-      <!-- Rental Information -->
-      <div v-if="listing?.rentalListing" class="o-listing-essentials__card o-listing-essentials__card">
-        <div class="o-listing-essentials__header">
-          <div class="o-listing-essentials__icon">
-            <AtomsIcon icon="listings/savings" :size="32" />
-          </div>
-          <div class="o-listing-essentials__header-text">
-            <h4 class="title-sm">Rental Details</h4>
-            <p class="body-xs">Terms and conditions for this rental</p>
-          </div>
-        </div>
-        <div class="o-listing-essentials__pills">
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedRentalAvailability }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedRentFrequency }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ listing?.rentalListing?.rentalLength }} months
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            £{{ parseInt(String(listing?.rentalListing?.deposit)).toLocaleString() }} deposit
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedFurnishedStatus }}
-          </AtomsPill>
-        </div>
-      </div>
 
       <!-- Property Information -->
       <div v-if="listing && property" class="o-listing-essentials__card o-listing-essentials__card">
@@ -74,7 +21,7 @@
           </AtomsPill>
           <AtomsPill class="body-sm | o-listing-essentials__pill">
             Move in &nbsp; <strong>{{ new Date(listing?.moveInDate!).toLocaleString('en-GB', { month: 'long' })
-              }}</strong>
+            }}</strong>
           </AtomsPill>
           <AtomsPill v-if="property?.runningCosts?.groundRent" class="body-sm | o-listing-essentials__pill">
             <strong>£{{ parseInt(String(property?.runningCosts?.groundRent)).toLocaleString() }}</strong>&nbsp;Ground
@@ -88,6 +35,62 @@
           </AtomsPill>
         </div>
       </div>
+
+      <!-- Sale Information -->
+      <div v-if="listing?.saleListing" class="o-listing-essentials__card o-listing-essentials__card-">
+        <div class="o-listing-essentials__header">
+          <div class="o-listing-essentials__icon">
+            <AtomsIcon icon="listings/savings" :size="32" />
+          </div>
+          <div class="o-listing-essentials__header-text">
+            <h4 class="title-sm">Sale Details</h4>
+            <p class="body-xs">Key information about this sale</p>
+          </div>
+        </div>
+        <div class="o-listing-essentials__pills">
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            {{ formattedChain }}
+          </AtomsPill>
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            Tenure: {{ formattedTenure }}
+          </AtomsPill>
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            Availability: {{ formattedAvailability }}
+          </AtomsPill>
+        </div>
+      </div>
+
+      <!-- Rental Information -->
+      <div v-if="listing?.rentalListing" class="o-listing-essentials__card o-listing-essentials__card">
+        <div class="o-listing-essentials__header">
+          <div class="o-listing-essentials__icon">
+            <AtomsIcon icon="listings/savings" :size="32" />
+          </div>
+          <div class="o-listing-essentials__header-text">
+            <h4 class="title-sm">Rental Details</h4>
+            <p class="body-xs">Terms and conditions for this rental</p>
+          </div>
+        </div>
+        <div class="o-listing-essentials__pills">
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            Availability: {{ formattedRentalAvailability }}
+          </AtomsPill>
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            Rent Frequency: {{ formattedRentFrequency }}
+          </AtomsPill>
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            Rent Length: {{ listing?.rentalListing?.rentalLength }} months
+          </AtomsPill>
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            Deposit: £{{ parseInt(String(listing?.rentalListing?.deposit)).toLocaleString() }} deposit
+          </AtomsPill>
+          <AtomsPill class="body-sm | o-listing-essentials__pill">
+            {{ formattedFurnishedStatus }}
+          </AtomsPill>
+        </div>
+      </div>
+
+
     </div>
   </section>
 </template>
