@@ -17,6 +17,14 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [],
+    build: {
+      cssCodeSplit: true,
+      rollupOptions: {
+        output: {
+          assetFileNames: 'assets/[name].[hash][extname]'
+        }
+      }
+    }
   },
   nitro: {
     experimental: {
