@@ -2,11 +2,10 @@
   <div class="ai-search-hero">
     <div class="ai-search-hero-content">
       <h1 class="ai-search-hero-title | title-2xl lineheight-xs">
-        Find your perfect home with
-        <span class="ai-search-hero-ai-text">AI</span>
+        Find Your Perfect Home with <GradientText>Virify AI</GradientText>
       </h1>
 
-      <p class="ai-search-hero-subtitle">Simply describe what you're looking for and let our AI find the perfect properties for you</p>
+      <p class="ai-search-hero-subtitle">Describe your dream home in your own words. Our AI does the rest—matching you with the best properties, fast.</p>
 
       <!-- Functional Search Input -->
       <form @submit.prevent="handleSearch" class="ai-search-hero-search">
@@ -44,6 +43,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, computed, nextTick } from "vue";
+import GradientText from "~/components/atoms/GradientText.vue";
 import MoleculesIconLink from "~/components/molecules/MoleculesIconLink.vue";
 
 // Define emits for communicating with parent

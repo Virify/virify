@@ -5,90 +5,37 @@
     <div class="o-listing-essentials__grid">
 
       <!-- Property Information -->
-      <div v-if="listing && property" class="o-listing-essentials__card o-listing-essentials__card">
-        <div class="o-listing-essentials__header">
-          <div class="o-listing-essentials__icon">
-            <AtomsIcon icon="property/info" :size="32" />
-          </div>
-          <div class="o-listing-essentials__header-text">
-            <h4 class="title-sm">Property Information</h4>
-            <p class="body-xs">Running costs and property details</p>
-          </div>
-        </div>
-        <div class="o-listing-essentials__pills">
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Council Tax Band &nbsp;<strong>{{ property?.runningCosts?.councilTaxBand }}</strong>
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Move in &nbsp; <strong>{{ new Date(listing?.moveInDate!).toLocaleString('en-GB', { month: 'long' })
-            }}</strong>
-          </AtomsPill>
-          <AtomsPill v-if="property?.runningCosts?.groundRent" class="body-sm | o-listing-essentials__pill">
-            <strong>£{{ parseInt(String(property?.runningCosts?.groundRent)).toLocaleString() }}</strong>&nbsp;Ground
-            Rent
-          </AtomsPill>
-          <AtomsPill v-if="property?.runningCosts?.serviceCharges" class="body-sm | o-listing-essentials__pill">
-            £{{ parseInt(String(property?.runningCosts?.serviceCharges)).toLocaleString() }} Service Charge
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ property?.additionalFeatures?.petFriendly ? 'Pet Friendly' : 'No Pets' }}
-          </AtomsPill>
-        </div>
-      </div>
+      <MoleculesFeatureTile 
+        v-if="listing && property"
+        icon-name="property/info"
+        title="Property Information" 
+        subtitle="Running costs and property details"
+        :pills="propertyInfoPills"
+        variant="blue"
+        has-background-image
+      />
 
       <!-- Sale Information -->
-      <div v-if="listing?.saleListing" class="o-listing-essentials__card o-listing-essentials__card-">
-        <div class="o-listing-essentials__header">
-          <div class="o-listing-essentials__icon">
-            <AtomsIcon icon="listings/savings" :size="32" />
-          </div>
-          <div class="o-listing-essentials__header-text">
-            <h4 class="title-sm">Sale Details</h4>
-            <p class="body-xs">Key information about this sale</p>
-          </div>
-        </div>
-        <div class="o-listing-essentials__pills">
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedChain }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Tenure: {{ formattedTenure }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Availability: {{ formattedAvailability }}
-          </AtomsPill>
-        </div>
-      </div>
+      <MoleculesFeatureTile 
+        v-if="listing?.saleListing"
+        icon-name="listings/savings"
+        title="Sale Details" 
+        subtitle="Key information about this sale"
+        :pills="saleInfoPills"
+        variant="blue"
+        has-background-image
+      />
 
       <!-- Rental Information -->
-      <div v-if="listing?.rentalListing" class="o-listing-essentials__card o-listing-essentials__card">
-        <div class="o-listing-essentials__header">
-          <div class="o-listing-essentials__icon">
-            <AtomsIcon icon="listings/savings" :size="32" />
-          </div>
-          <div class="o-listing-essentials__header-text">
-            <h4 class="title-sm">Rental Details</h4>
-            <p class="body-xs">Terms and conditions for this rental</p>
-          </div>
-        </div>
-        <div class="o-listing-essentials__pills">
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Availability: {{ formattedRentalAvailability }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Rent Frequency: {{ formattedRentFrequency }}
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Rent Length: {{ listing?.rentalListing?.rentalLength }} months
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            Deposit: £{{ parseInt(String(listing?.rentalListing?.deposit)).toLocaleString() }} deposit
-          </AtomsPill>
-          <AtomsPill class="body-sm | o-listing-essentials__pill">
-            {{ formattedFurnishedStatus }}
-          </AtomsPill>
-        </div>
-      </div>
+      <MoleculesFeatureTile 
+        v-if="listing?.rentalListing"
+        icon-name="listings/savings"
+        title="Rental Details" 
+        subtitle="Terms and conditions for this rental"
+        :pills="rentalInfoPills"
+        variant="blue"
+        has-background-image
+      />
 
 
     </div>
@@ -133,6 +80,53 @@ const formattedRentFrequency = computed(() => {
 const formattedFurnishedStatus = computed(() => {
   if (props.listing?.rentalListing?.furnishedStatus === null || props.listing?.rentalListing?.furnishedStatus === undefined) return '';
   return props.listing.rentalListing.furnishedStatus ? 'Furnished' : 'Unfurnished';
+});
+
+// Computed pills arrays
+const propertyInfoPills = computed(() => {
+  const pills = [];
+  if (props.property?.runningCosts?.councilTaxBand) {
+    pills.push(`Council Tax Band ${props.property.runningCosts.councilTaxBand}`);
+  }
+  if (props.listing?.moveInDate) {
+    pills.push(`Move in ${new Date(props.listing.moveInDate).toLocaleString('en-GB', { month: 'long' })}`);
+  }
+  if (props.property?.runningCosts?.groundRent) {
+    pills.push(`£${parseInt(String(props.property.runningCosts.groundRent)).toLocaleString()} Ground Rent`);
+  }
+  if (props.property?.runningCosts?.serviceCharges) {
+    pills.push(`£${parseInt(String(props.property.runningCosts.serviceCharges)).toLocaleString()} Service Charge`);
+  }
+  pills.push(props.property?.additionalFeatures?.petFriendly ? 'Pet Friendly' : 'No Pets');
+  return pills.filter(Boolean);
+});
+
+const saleInfoPills = computed(() => {
+  return [
+    formattedChain.value,
+    `Tenure: ${formattedTenure.value}`,
+    `Availability: ${formattedAvailability.value}`
+  ].filter(Boolean);
+});
+
+const rentalInfoPills = computed(() => {
+  const pills = [];
+  if (formattedRentalAvailability.value) {
+    pills.push(`Availability: ${formattedRentalAvailability.value}`);
+  }
+  if (formattedRentFrequency.value) {
+    pills.push(`Rent Frequency: ${formattedRentFrequency.value}`);
+  }
+  if (props.listing?.rentalListing?.rentalLength) {
+    pills.push(`Rent Length: ${props.listing.rentalListing.rentalLength} months`);
+  }
+  if (props.listing?.rentalListing?.deposit) {
+    pills.push(`Deposit: £${parseInt(String(props.listing.rentalListing.deposit)).toLocaleString()} deposit`);
+  }
+  if (formattedFurnishedStatus.value) {
+    pills.push(formattedFurnishedStatus.value);
+  }
+  return pills.filter(Boolean);
 });
 </script>
 

@@ -1,97 +1,269 @@
 <template>
-  <div class="homepage | container">
+  <div class="homepage">
     <!-- AI Search Hero -->
-    <OrganismsAiSearchHero @selectSuggestion="handleSuggestionSelect" />
-
-    <!-- How It Works Section -->
-    <div class="ai-how-it-works | flow">
-      <h2 class="| title-lg">Revolutionary <GradientText>AI-Powered</GradientText> Property Search
-      </h2>
-      <p class="| body-lg max-width-prose">
-        The most advanced property search technology ever created. Simply describe your dream home in natural language,
-        and our AI will find perfect matches using intelligent filtering and location awareness.
-      </p>
+    <div class="container">
+      <OrganismsAiSearchHero @selectSuggestion="handleSuggestionSelect" />
     </div>
 
-    <!-- Advanced Search Capabilities -->
-    <div class="ai-capabilities | flow">
-      <h2 class="| title-lg">Search By Anything You Can <GradientText>Imagine</GradientText>
-      </h2>
-      <p class="| body-lg max-width-prose">
-        Our AI understands hundreds of property features and can search by size, style, amenities, and lifestyle
-        requirements.
-      </p>
-
-      <div class="ai-capabilities-list">
-        <div class="ai-capabilities-category">
-          <h3 class="| title-sm">Property & Location</h3>
-          <p class="| body-md">Houses, flats, penthouses, studios • Room sizes, garden area • Near schools, stations,
-            city centre</p>
-        </div>
-
-        <div class="ai-capabilities-category">
-          <h3 class="| title-sm">Features & Amenities</h3>
-          <p class="| body-md">Parking, garages, EV charging • Gardens, balconies, patios • Home office, study spaces
+    <!-- How It Works Steps -->
+    <section class="ai-stepper-section">
+      <div class="container">
+        <header class="ai-stepper__header">
+          <h2 class="title-xl">How It Works</h2>
+          <p class="body-md">
+            Four steps to finding your perfect home. No jargon, no fuss—just smart tech doing the hard work.
           </p>
+        </header>
+        
+        <div class="ai-stepper">
+          <div class="ai-stepper__track">
+            <div class="ai-stepper__connector"></div>
+            <div class="ai-stepper__steps">
+              <div class="ai-stepper__step ai-stepper__step--active">
+                <div class="ai-stepper__circle ai-stepper__circle--blue">1</div>
+                <div class="ai-stepper__content">
+                  <h3 class="title-md">Tell us what you want</h3>
+                  <p class="body-sm">
+                    "Big windows and a garden" or "somewhere quiet"—speak human, not estate agent.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="ai-stepper__step">
+                <div class="ai-stepper__circle ai-stepper__circle--secondary">2</div>
+                <div class="ai-stepper__content">
+                  <h3 class="title-md">We do the searching</h3>
+                  <p class="body-sm">
+                    Smart tech scans thousands of properties in seconds to find ones that actually match what you said.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="ai-stepper__step">
+                <div class="ai-stepper__circle ai-stepper__circle--blue">3</div>
+                <div class="ai-stepper__content">
+                  <h3 class="title-md">Get the real story</h3>
+                  <p class="body-sm">
+                    Price history, safety stats, school ratings—all the stuff that actually matters, made simple.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="ai-stepper__step">
+                <div class="ai-stepper__circle ai-stepper__circle--secondary">4</div>
+                <div class="ai-stepper__content">
+                  <h3 class="title-md">Make your move</h3>
+                  <p class="body-sm">
+                    Armed with real facts, not marketing fluff. You'll know it's the right choice before you even view.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="ai-capabilities-category">
-          <h3 class="| title-sm">Accessibility & Lifestyle</h3>
-          <p class="| body-md">Wheelchair access, lifts, step-free • Pet-friendly, eco features • Solar panels, EPC
-            ratings</p>
+    <!-- Key Features Showcase -->
+    <section class="features-showcase section-hero-bg">
+      <div class="container">
+        <header class="features-showcase__header">
+          <h2 class="title-xl">
+            Everything you <GradientText>actually</GradientText> need to know
+          </h2>
+          <p class="max-width-prose body-md">
+            No estate agent waffle. Just the real data that helps you make smart decisions about where you'll live.
+          </p>
+        </header>
+
+        <div class="features-showcase__grid">
+          <MoleculesFeatureTile 
+            iconName="listings/savings"
+            title="What places actually sold for" 
+            subtitle="Real prices, not asking prices"
+            description="Skip the guesswork. See what properties actually sold for and spot the trends that matter."
+            variant="secondary"
+            :hasBackgroundImage="true"
+          />
+          
+          <MoleculesFeatureTile 
+            iconName="listings/flood"
+            title="Will it flood?" 
+            subtitle="Straight answers about water"
+            description="Plain English flood risk info. No confusing maps, just clear answers about staying dry."
+            variant="secondary"
+            :hasBackgroundImage="true"
+          />
+          
+          <MoleculesFeatureTile 
+            iconName="listings/eco"
+            title="Bills and broadband" 
+            subtitle="What you'll actually pay"
+            description="Energy costs, council tax, broadband speeds. The boring but important stuff, made simple."
+            variant="secondary"
+            :hasBackgroundImage="true"
+          />
+          
+          <MoleculesFeatureTile 
+            iconName="property/security"
+            title="How safe is it?" 
+            subtitle="Real safety, not scare stories"
+            description="Honest crime stats without the drama. Know what's actually happening in your potential neighbourhood."
+            variant="secondary"
+            :hasBackgroundImage="true"
+          />
+          
+          <MoleculesFeatureTile 
+            iconName="explore/map"
+            title="Getting around" 
+            subtitle="Your actual commute time"
+            description="Tube delays, bus routes, walking times. How you'll really get to work, not the marketing version."
+            variant="secondary"
+            :hasBackgroundImage="true"
+          />
+          
+          <MoleculesFeatureTile 
+            iconName="amenities/school"
+            title="Local schools" 
+            subtitle="Education without the stress"
+            description="Good schools nearby? We'll show you Ofsted ratings and catchment areas in plain English."
+            variant="secondary"
+            :hasBackgroundImage="true"
+          />
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- FAQ Section -->
-    <div class="ai-faq">
-      <h2 class="| title-lg">Frequently Asked Questions</h2>
-
-      <div class="ai-faq-list">
-        <FAQItem question="How does AI property search work?"
-          answer="Our AI analyzes your natural language description and converts it into precise database queries. It understands context, synonyms, and relationships between different property features to find exactly what you're looking for."
-          :is-open="true" />
-
-        <FAQItem question="Can I search by specific room sizes?"
-          answer="Yes! You can search by bedroom sizes, kitchen area, garden dimensions, total property size, and more. Try searches like 'house with master bedroom over 20 sqm' or 'flat with garden over 50 sqm'." />
-
-        <FAQItem question="What locations can I search?"
-          answer="Currently featuring properties in Cardiff and Newport with intelligent location matching. You can search by city, postcode, or proximity to landmarks like 'near Cardiff city centre' or 'close to Newport train station'." />
-
-        <FAQItem question="How specific can my search be?"
-          answer="Very specific! Our AI understands complex queries like '3 bedroom detached house with double garage, EV charging, large kitchen, and pet-friendly garden under £400,000 in Cardiff'. The more detail you provide, the better the matches." />
-
-        <FAQItem question="What makes this different from traditional search?"
-          answer="Traditional search uses dropdown filters and checkboxes. Our AI search understands natural language, context, and relationships between features. Instead of clicking dozens of filters, just describe your ideal home in your own words." />
-
-        <FAQItem question="How many manual filters does AI search replace?"
-          answer="Traditional property searches often require 50+ separate filters for detailed searches - property type, bedrooms, bathrooms, price ranges, features, location radius, parking, garden size, accessibility options, and more. Our AI understands all of these from a single sentence." />
-
-        <FAQItem question="Can I perform complex searches without using any filters?"
-          answer="Absolutely! Try 'Victorian terrace house with original features, modern kitchen, off-street parking, small garden, near primary school, under £350k in Cardiff suburbs' - our AI handles all the complexity automatically." />
-
-        <FAQItem question="What if I have very specific requirements?"
-          answer="The more specific, the better! Our AI excels at complex requirements like 'ground floor flat with level access, wet room, lift access, allocated parking space, south-facing balcony, pet-friendly building, near bus route' - no manual filter combinations needed." />
+    <!-- Why People Love Virify Section -->
+    <section class="why-virify">
+      <div class="container">
+        <header class="why-virify__header">
+          <h2 class="title-xl">Why Virify?</h2>
+          <p class="body-md max-width-prose section-subtitle">
+            Property hunting shouldn't be painful. We're here to make it actually helpful (and maybe even enjoyable).
+          </p>
+        </header>
+        
+        <div class="why-virify__highlights">
+          <div class="why-virify__highlight why-virify__highlight--left">
+            <div class="why-virify__image">
+              <AtomsIcon icon="ai/star" :size="48" />
+            </div>
+            <div class="why-virify__content">
+              <h3 class="title-md">Plain English, always</h3>
+              <p class="body-md">
+                No estate agent speak. Complex stuff made simple so you actually understand what you're looking at.
+              </p>
+            </div>
+          </div>
+          
+          <div class="why-virify__highlight why-virify__highlight--right">
+            <div class="why-virify__content">
+              <h3 class="title-md">Smart, not flashy</h3>
+              <p class="body-md">
+                Tech that actually works for you. Fast searches, real insights, zero hassle.
+              </p>
+            </div>
+            <div class="why-virify__image">
+              <AtomsIcon icon="explore/ai" :size="48" />
+            </div>
+          </div>
+          
+          <div class="why-virify__highlight why-virify__highlight--left">
+            <div class="why-virify__image">
+              <AtomsIcon icon="account/chat" :size="48" />
+            </div>
+            <div class="why-virify__content">
+              <h3 class="title-md">Humans when you need them</h3>
+              <p class="body-md">
+                Real support from real people. No chatbots pretending to understand your house-hunting stress.
+              </p>
+            </div>
+          </div>
+          
+          <div class="why-virify__highlight why-virify__highlight--right">
+            <div class="why-virify__content">
+              <h3 class="title-md">Your data, your business</h3>
+              <p class="body-md">
+                We don't sell your info or spam you with calls. Your search stays private, full stop.
+              </p>
+            </div>
+            <div class="why-virify__image">
+              <AtomsIcon icon="property/security" :size="48" />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Call to Action -->
-    <div class="ai-cta">
-      <div class="ai-cta-content">
-        <h2 class="ai-cta-title | title-lg">Ready to Find Your Perfect
-          <GradientText>Home</GradientText>?
-        </h2>
-        <p class="ai-cta-subtitle | body-lg">Start your search above and experience the future of property discovery</p>
-        <a href="/search/ai" class="ai-cta-button">Try AI Search Now</a>
+    <!-- Trust Signals / Stats --> 
+    <section class="trust-signals section-hero-bg">
+      <div class="container">
+        <header class="trust-signals__header">
+          <h2 class="title-xl">The <GradientText>numbers</GradientText> don't lie</h2>
+          <p class="body-md max-width-prose section-subtitle section-subtitle--large">
+            Thousands of people have already ditched the estate agent spin for straight answers. 
+            Here's what we're building together.
+          </p>
+        </header>
+        
+        <div class="trust-signals__cards">
+          <AtomsStatsCard 
+            value="50,000+" 
+            subtitle="Properties checked" 
+            title="Data We've Crunched" 
+          />
+          <AtomsStatsCard 
+            value="15+" 
+            subtitle="Data sources" 
+            title="Where We Get Info" 
+          />
+          <AtomsStatsCard 
+            value="10,000+" 
+            subtitle="People helped" 
+            title="Happy House Hunters" 
+          />
+          <AtomsStatsCard 
+            value="<1s" 
+            subtitle="Average search time" 
+            title="Speed That Matters" 
+          />
+          <AtomsStatsCard 
+            value="5M+" 
+            subtitle="Sale records" 
+            title="Real Price Data" 
+          />
+          <AtomsStatsCard 
+            value="100%" 
+            subtitle="Privacy compliant" 
+            title="Your Data Is Safe" 
+          />
+          <AtomsStatsCard 
+            value="24/7" 
+            subtitle="Human support" 
+            title="When You Need Help" 
+          />
+          <AtomsStatsCard 
+            value="99.9%" 
+            subtitle="Data accuracy" 
+            title="Getting It Right" 
+          />
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- Listing Advert -->
+    <section>
+      <div class="container">
+        <div class="listing-advert">
+          <MoleculesListingAdvert />
+        </div>
+      </div>
+    </section>
   </div>
 </template>
-
 <script setup>
-import GradientBox from '~/components/atoms/GradientBox.vue';
 import GradientText from '~/components/atoms/GradientText.vue';
-import FAQItem from '~/components/molecules/FAQItem.vue';
 
 // Page metadata
 useHead({
@@ -106,67 +278,25 @@ const handleSuggestionSelect = (suggestion) => {
   // Navigate to the AI search page with the suggestion as a query parameter
   navigateTo(`/search/ai/?q=${encodeURIComponent(suggestion)}`)
 }
+
 </script>
 
 <style scoped lang="scss">
 @use '#styles/_utils/media' as mq;
 @use '#styles/_utils/functions' as fn;
 
-.homepage {
-  margin-top: var(--size-32);
-}
+// ==========================================================================
+// GLOBAL STYLES
+// ==========================================================================
 
-.ai-how-it-works {
-  text-align: center;
-}
-
-.ai-capabilities {
-  text-align: center;
-}
-
-// Section spacing
-.ai-how-it-works,
-.ai-how-it-works-grid,
-.ai-capabilities,
-.ai-faq,
-.ai-faq-list {
-  margin: var(--size-64) 0;
-  padding: var(--size-40) 0;
-
-  @include mq.tablet {
-    margin: var(--size-80) 0;
-  }
-}
-
-// How It Works Section - Enhanced styling
-.ai-how-it-works {
-  position: relative;
-  padding: var(--size-40) 0;
-}
-
-// Capabilities section with hero-style background
-.ai-capabilities {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
-  border-radius: var(--border-radius-3xl);
-  padding: var(--size-56) var(--size-20);
-  margin: var(--size-64) 0;
+// Full-width hero-style background for alternating sections
+.section-hero-bg {
+  background: linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
+  padding: var(--size-120) 0;
   color: var(--monochrome-900);
 
-  @include mq.tablet {
-    padding: var(--size-72) var(--size-32);
-    margin: var(--size-80) 0;
-    background:
-      url('/img/logo-background.svg') no-repeat top right,
-      linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
-    background-size: auto 120%, cover;
-  }
-
-  .title-lg {
-    color: var(--monochrome-900);
-  }
-
-  .body-lg {
-    color: var(--monochrome-700);
+  @media (max-width: 900px) {
+    padding: var(--size-120) 0;
   }
 }
 
@@ -177,129 +307,348 @@ const handleSuggestionSelect = (suggestion) => {
   margin-right: auto;
 }
 
-
-
-// How It Works Grid
-.ai-how-it-works-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--size-24);
-  padding: var(--size-40) 0;
-  color: var(--background-100);
-
-  @include mq.tablet {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .title-sm {
-    color: var(--secondary-400);
-    margin-bottom: var(--size-16);
-    font-size: 1.25rem;
-  }
-
-  .body-md {
-    color: inherit;
-    line-height: 1.6;
-  }
-}
-
-// Capabilities List
-.ai-capabilities-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-32);
-  padding: var(--size-40) 0;
-  max-width: 800px;
+// Section subtitle classes
+.section-subtitle {
   margin: 0 auto;
+  margin-top: var(--size-12);
 
-  @include mq.tablet {
-    gap: var(--size-40);
+  &--large {
+    margin-top: var(--size-16);
   }
 }
 
-.ai-capabilities-category {
-  text-align: center;
+// Section spacing
+section {
+  margin: calc(var(--size-72) / 2) 0;
+  padding: calc(var(--size-72) / 2) 0;
 
-  .title-sm {
-    color: var(--monochrome-900);
-    font-weight: 700;
-    margin-bottom: var(--size-12);
+  @include mq.tablet {
+    margin: calc(var(--size-72) / 2) 0;
+    padding: calc(var(--size-72) / 2) 0;
+  }
+}
+
+// ==========================================================================
+// HOMEPAGE CONTAINER
+// ==========================================================================
+
+.homepage {
+  padding-top: calc(var(--size-16) + var(--header-height));
+}
+
+// ==========================================================================
+// AI STEPPER SECTION
+// ==========================================================================
+
+.ai-stepper-section {
+  padding: var(--size-40) 0;
+  background: var(--background-100);
+}
+
+.ai-stepper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  &__header {
+    text-align: center;
+    margin-bottom: var(--size-48);
+  }
+
+  &__track {
+    position: relative;
+    width: 100%;
+  }
+
+  &__connector {
+    position: absolute;
+    top: 24px;
+    left: -50vw;
+    right: -50vw;
+    height: 4px;
+    background: linear-gradient(90deg, var(--blue-400), var(--secondary-400));
+    z-index: 1;
+    border-radius: 2px;
+  }
+
+  &__steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  &__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 1 auto;
+    text-align: center;
     position: relative;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 2px;
-      background: var(--primary-600);
+    &--active .ai-stepper__circle {
+      box-shadow: 0 0 0 4px var(--blue-400, #3b82f6);
     }
   }
 
-  .body-md {
-    color: var(--monochrome-700);
-    line-height: 1.6;
-    max-width: 600px;
+  &__circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--size-16);
+    border: 4px solid #fff;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s;
+
+    &--blue {
+      background: var(--blue-400);
+    }
+
+    &--secondary {
+      background: var(--secondary-400);
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    padding: 0 var(--size-12);
+    gap: var(--size-16);
+
+    h3,
+    p {
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .ai-stepper {
+    &__steps {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--size-40);
+      position: relative;
+    }
+
+    &__connector {
+      top: 12px;
+      left: 28px;
+      width: 4px;
+      height: calc(100% - 90px);
+      background: linear-gradient(180deg, var(--blue-400), var(--secondary-400));
+      z-index: 0;
+    }
+
+    &__step {
+      flex-direction: row;
+      align-items: flex-start;
+      min-width: 0;
+      max-width: none;
+      margin-bottom: 0;
+      position: relative;
+      padding: var(--size-8) 0;
+    }
+
+    &__circle {
+      margin-bottom: 0;
+      margin-right: var(--size-20);
+      min-width: 48px;
+      min-height: 48px;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      padding-top: 2px;
+      align-items: flex-start;
+      text-align: left;
+    }
+  }
+}
+
+// ==========================================================================
+// FEATURES SHOWCASE SECTION
+// ==========================================================================
+
+.features-showcase {
+  &__header {
+    text-align: center;
+    margin-bottom: var(--size-48);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--size-20);
     margin: 0 auto;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 }
 
-// FAQ List
-.ai-faq-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-0);
-}
+// ==========================================================================
+// WHY VIRIFY SECTION
+// ==========================================================================
 
-// Call to Action - Hero Style
-.ai-cta {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
-  color: var(--monochrome-900);
-  border-radius: var(--border-radius-3xl);
-  min-height: max(300px, 40vh);
-  margin-bottom: var(--size-32);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--size-56) var(--size-20);
-
-  @include mq.tablet {
-    padding: var(--size-72) var(--size-32);
-    background:
-      url('/img/logo-background.svg') no-repeat top right,
-      linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
-    background-size: auto 120%, cover;
-  }
-}
-
-.ai-cta-content {
+.why-virify {
   text-align: center;
-  max-width: 600px;
+
+  &__header {
+    margin-bottom: var(--size-40);
+  }
+
+  &__highlights {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-48);
+    margin-top: var(--size-40);
+  }
+
+  &__highlight {
+    display: flex;
+    align-items: center;
+    gap: var(--size-32);
+    color: var(--foreground-100);
+    border-radius: var(--border-radius-2xl);
+    box-shadow: 0 2px 8px 0 rgba(60, 80, 180, 0.04), 0 1.5px 6px 0 rgba(0,0,0,0.02);
+    border: 1.5px solid var(--foreground-100);
+    padding: var(--size-32);
+    transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s, background 0.18s;
+    width: 100%;
+    max-width: 900px;
+    flex-shrink: 0;
+
+    &--left {
+      align-self: flex-start;
+    }
+
+    &--right {
+      align-self: flex-end;
+
+      .why-virify__content {
+        text-align: right;
+        order: 1;
+      }
+
+      .why-virify__image {
+        order: 2;
+      }
+    }
+  }
+
+  &__image {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    background: var(--blue-400);
+    border-radius: var(--border-radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .a-icon {
+      color: var(--monochrome-900);
+    }
+  }
+
+  &__content {
+    flex: 1;
+    text-align: left;
+
+    h3 {
+      margin: 0 0 var(--size-12) 0;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
 }
 
-.ai-cta-title {
-  margin: 0 auto var(--size-16);
+@media (max-width: 900px) {
+  .why-virify {
+    &__highlights {
+      gap: var(--size-32);
+      align-items: stretch;
+    }
+    
+    &__highlight {
+      flex-direction: column;
+      text-align: center;
+      gap: var(--size-24);
+      align-self: stretch;
+      max-width: none;
+      width: auto;
+
+      &--left,
+      &--right {
+        align-self: stretch;
+      }
+
+      .why-virify__image {
+        order: 1;
+      }
+
+      .why-virify__content {
+        order: 2;
+        text-align: center;
+      }
+    }
+
+    &__content {
+      text-align: center;
+    }
+  }
 }
 
-.ai-cta-subtitle {
-  margin-bottom: var(--size-32);
-  line-height: 1.6;
-}
+// ==========================================================================
+// TRUST SIGNALS SECTION
+// ==========================================================================
 
-.ai-cta-button {
-  display: inline-block;
-  background-color: fn.faded-color(12%, var(--monochrome-600));
-  color: var(--monochrome-900);
-  padding: var(--size-12) var(--size-24);
-  border-radius: var(--border-radius-lg);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  transition: background-color 0.2s ease;
+.trust-signals {
+  text-align: center;
 
-  &:hover {
-    background-color: fn.faded-color(24%, var(--monochrome-600));
+  &__header {
+    margin-bottom: var(--size-48);
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--size-24);
+    margin: 0;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 }
 </style>
