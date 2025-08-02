@@ -1,10 +1,10 @@
 <template>
   <div class="stats-card">
     <div class="stats-card__top">
-      <div class="stats-card__value">{{ value }}</div>
-      <div class="stats-card__subtitle">{{ subtitle }}</div>
+      <div class="stats-card__value | r-title-xl-md">{{ value }}</div>
+      <div class="stats-card__subtitle | body-sm font-bold">{{ subtitle }}</div>
     </div>
-    <div class="stats-card__title">{{ title }}</div>
+    <div class="stats-card__title | r-body-md-sm font-bold">{{ title }}</div>
   </div>
 </template>
 
@@ -22,17 +22,32 @@ defineProps<Props>()
 .stats-card {
   border-radius: var(--border-radius-xl);
   padding: 0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.6s ease-out;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: translateY(30px);
 
+  &.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   &:hover {
     transform: translateY(-2px);
   }
+
+  &:nth-child(1) { transition-delay: 0.1s; }
+  &:nth-child(2) { transition-delay: 0.2s; }
+  &:nth-child(3) { transition-delay: 0.3s; }
+  &:nth-child(4) { transition-delay: 0.4s; }
+  &:nth-child(5) { transition-delay: 0.5s; }
+  &:nth-child(6) { transition-delay: 0.6s; }
+  &:nth-child(7) { transition-delay: 0.7s; }
+  &:nth-child(8) { transition-delay: 0.8s; }
 
   &__top {
     background: 
@@ -44,31 +59,24 @@ defineProps<Props>()
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-start;
-    padding: var(--size-64) var(--size-24) var(--size-24) var(--size-24);
+    padding: var(--size-16);
     background-size: cover;
   }
 
   &__value {
-    font-size: 3rem;
-    font-weight: 900;
     color: var(--monochrome-300);
     line-height: 1;
     margin-bottom: var(--size-4);
   }
 
   &__subtitle {
-    font-size: var(--font-size-lg);
     color: var(--monochrome-300);
-    font-weight: var(--font-semibold);
   }
-
 
   &__title {
     background: var(--background-200);
-    padding: var(--size-32);
+    padding: var(--size-16);
     color: var(--foreground-100);
-    font-size: var(--font-lg);
-    font-weight: var(--font-bold);
     text-align: center;
   }
 }

@@ -14,7 +14,7 @@
             Four steps to finding your perfect home. No jargon, no fuss—just smart tech doing the hard work.
           </p>
         </header>
-        
+
         <MoleculesStepper>
           <MoleculesStepperStep :step-number="1" :active="true" variant="blue">
             <h3 class="title-md">Tell us what you want</h3>
@@ -22,21 +22,21 @@
               "Big windows and a garden" or "somewhere quiet"—speak human, not estate agent.
             </p>
           </MoleculesStepperStep>
-          
+
           <MoleculesStepperStep :step-number="2" variant="secondary">
             <h3 class="title-md">We do the searching</h3>
             <p class="body-sm">
               Smart tech scans thousands of properties in seconds to find ones that actually match what you said.
             </p>
           </MoleculesStepperStep>
-          
+
           <MoleculesStepperStep :step-number="3" variant="blue">
             <h3 class="title-md">Get the real story</h3>
             <p class="body-sm">
               Price history, safety stats, school ratings—all the stuff that actually matters, made simple.
             </p>
           </MoleculesStepperStep>
-          
+
           <MoleculesStepperStep :step-number="4" variant="secondary">
             <h3 class="title-md">Make your move</h3>
             <p class="body-sm">
@@ -60,59 +60,32 @@
         </header>
 
         <div class="features-showcase__grid">
-          <MoleculesFeatureTile 
-            iconName="listings/savings"
-            title="What places actually sold for" 
+          <MoleculesFeatureTile iconName="listings/savings" title="What places actually sold for"
             subtitle="Real prices, not asking prices"
             description="Skip the guesswork. See what properties actually sold for and spot the trends that matter."
-            variant="secondary"
-            :hasBackgroundImage="true"
-          />
-          
-          <MoleculesFeatureTile 
-            iconName="listings/flood"
-            title="Will it flood?" 
-            subtitle="Straight answers about water"
+            variant="secondary" :hasBackgroundImage="true" />
+
+          <MoleculesFeatureTile iconName="listings/flood" title="Will it flood?" subtitle="Straight answers about water"
             description="Plain English flood risk info. No confusing maps, just clear answers about staying dry."
-            variant="secondary"
-            :hasBackgroundImage="true"
-          />
-          
-          <MoleculesFeatureTile 
-            iconName="listings/eco"
-            title="Bills and broadband" 
-            subtitle="What you'll actually pay"
+            variant="secondary" :hasBackgroundImage="true" />
+
+          <MoleculesFeatureTile iconName="listings/eco" title="Bills and broadband" subtitle="What you'll actually pay"
             description="Energy costs, council tax, broadband speeds. The boring but important stuff, made simple."
-            variant="secondary"
-            :hasBackgroundImage="true"
-          />
-          
-          <MoleculesFeatureTile 
-            iconName="property/security"
-            title="How safe is it?" 
+            variant="secondary" :hasBackgroundImage="true" />
+
+          <MoleculesFeatureTile iconName="property/security" title="How safe is it?"
             subtitle="Real safety, not scare stories"
             description="Honest crime stats without the drama. Know what's actually happening in your potential neighbourhood."
-            variant="secondary"
-            :hasBackgroundImage="true"
-          />
-          
-          <MoleculesFeatureTile 
-            iconName="explore/map"
-            title="Getting around" 
-            subtitle="Your actual commute time"
+            variant="secondary" :hasBackgroundImage="true" />
+
+          <MoleculesFeatureTile iconName="explore/map" title="Getting around" subtitle="Your actual commute time"
             description="Tube delays, bus routes, walking times. How you'll really get to work, not the marketing version."
-            variant="secondary"
-            :hasBackgroundImage="true"
-          />
-          
-          <MoleculesFeatureTile 
-            iconName="amenities/school"
-            title="Local schools" 
+            variant="secondary" :hasBackgroundImage="true" />
+
+          <MoleculesFeatureTile iconName="amenities/school" title="Local schools"
             subtitle="Education without the stress"
             description="Good schools nearby? We'll show you Ofsted ratings and catchment areas in plain English."
-            variant="secondary"
-            :hasBackgroundImage="true"
-          />
+            variant="secondary" :hasBackgroundImage="true" />
         </div>
       </div>
     </section>
@@ -126,32 +99,32 @@
             Property hunting shouldn't be painful. We're here to make it actually helpful (and maybe even enjoyable).
           </p>
         </header>
-        
+
         <div class="why-virify__highlights" ref="highlightsRef">
           <div class="why-virify__highlight why-virify__highlight--left" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__image">
               <AtomsIcon icon="ai/star" :size="48" />
             </div>
             <div class="why-virify__content">
-              <h3 class="title-md">Plain English, always</h3>
-              <p class="body-md">
+              <h3 class="title-sm">Plain English, always</h3>
+              <p class="r-body-md-sm">
                 No estate agent speak. Complex stuff made simple so you actually understand what you're looking at.
               </p>
             </div>
           </div>
-          
+
           <div class="why-virify__highlight why-virify__highlight--right" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__content">
               <h3 class="title-md">Smart, not flashy</h3>
-              <p class="body-md">
+              <p class="r-body-md-sm">
                 Tech that actually works for you. Fast searches, real insights, zero hassle.
               </p>
             </div>
             <div class="why-virify__image">
-              <AtomsIcon icon="explore/ai" :size="48" />
+              <AtomsIcon icon="explore/ai" :size="40" />
             </div>
           </div>
-          
+
           <div class="why-virify__highlight why-virify__highlight--left" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__image">
               <AtomsIcon icon="account/chat" :size="48" />
@@ -163,7 +136,7 @@
               </p>
             </div>
           </div>
-          
+
           <div class="why-virify__highlight why-virify__highlight--right" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__content">
               <h3 class="title-md">Your data, your business</h3>
@@ -179,58 +152,34 @@
       </div>
     </section>
 
-    <!-- Trust Signals / Stats --> 
+    <!-- Trust Signals / Stats -->
     <section class="trust-signals section-hero-bg">
       <div class="container">
         <header class="trust-signals__header">
           <h2 class="title-xl">The <GradientText>numbers</GradientText> don't lie</h2>
           <p class="body-md max-width-prose section-subtitle section-subtitle--large">
-            Thousands of people have already ditched the estate agent spin for straight answers. 
+            Thousands of people have already ditched the estate agent spin for straight answers.
             Here's what we're building together.
           </p>
         </header>
-        
-        <div class="trust-signals__cards">
-          <AtomsStatsCard 
-            value="50,000+" 
-            subtitle="Properties checked" 
-            title="Data We've Crunched" 
-          />
-          <AtomsStatsCard 
-            value="15+" 
-            subtitle="Data sources" 
-            title="Where We Get Info" 
-          />
-          <AtomsStatsCard 
-            value="10,000+" 
-            subtitle="People helped" 
-            title="Happy House Hunters" 
-          />
-          <AtomsStatsCard 
-            value="<1s" 
-            subtitle="Average search time" 
-            title="Speed That Matters" 
-          />
-          <AtomsStatsCard 
-            value="5M+" 
-            subtitle="Sale records" 
-            title="Real Price Data" 
-          />
-          <AtomsStatsCard 
-            value="100%" 
-            subtitle="Privacy compliant" 
-            title="Your Data Is Safe" 
-          />
-          <AtomsStatsCard 
-            value="24/7" 
-            subtitle="Human support" 
-            title="When You Need Help" 
-          />
-          <AtomsStatsCard 
-            value="99.9%" 
-            subtitle="Data accuracy" 
-            title="Getting It Right" 
-          />
+
+        <div class="trust-signals__cards" ref="statsCardsRef">
+          <AtomsStatsCard value="50,000+" subtitle="Properties checked" title="Data We've Crunched"
+            :class="{ 'animate-in': isStatsVisible }" />
+          <AtomsStatsCard value="15+" subtitle="Data sources" title="Where We Get Info"
+            :class="{ 'animate-in': isStatsVisible }" />
+          <AtomsStatsCard value="10,000+" subtitle="People helped" title="Happy House Hunters"
+            :class="{ 'animate-in': isStatsVisible }" />
+          <AtomsStatsCard value="<1s" subtitle="Average search time" title="Speed That Matters"
+            :class="{ 'animate-in': isStatsVisible }" />
+          <AtomsStatsCard value="5M+" subtitle="Sale records" title="Real Price Data"
+            :class="{ 'animate-in': isStatsVisible }" />
+          <AtomsStatsCard value="100%" subtitle="Privacy compliant" title="Your Data Is Safe"
+            :class="{ 'animate-in': isStatsVisible }" />
+          <AtomsStatsCard value="24/7" subtitle="Human support" title="When You Need Help"
+            :class="{ 'animate-in': isStatsVisible }" />
+          <AtomsStatsCard value="99.9%" subtitle="Data accuracy" title="Getting It Right"
+            :class="{ 'animate-in': isStatsVisible }" />
         </div>
       </div>
     </section>
@@ -243,6 +192,13 @@
         </div>
       </div>
     </section>
+
+    <!-- Trending Listings -->
+
+    <div class="container">
+      <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
+    </div>
+
   </div>
 </template>
 <script setup>
@@ -270,6 +226,16 @@ const isVisible = ref(false)
 useIntersectionObserver(highlightsRef, ([{ isIntersecting }]) => {
   if (isIntersecting) {
     isVisible.value = true
+  }
+}, { threshold: 0.3 })
+
+// Intersection observer for Trust Signals animations
+const statsCardsRef = ref(null)
+const isStatsVisible = ref(false)
+
+useIntersectionObserver(statsCardsRef, ([{ isIntersecting }]) => {
+  if (isIntersecting) {
+    isStatsVisible.value = true
   }
 }, { threshold: 0.3 })
 
@@ -301,6 +267,11 @@ useIntersectionObserver(highlightsRef, ([{ isIntersecting }]) => {
 .features-showcase {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 90%);
   padding-bottom: 150px;
+
+  @media (max-width: 900px) {
+    clip-path: none;
+    padding: 80px 0;
+  }
 }
 
 .trust-signals {
@@ -308,8 +279,8 @@ useIntersectionObserver(highlightsRef, ([{ isIntersecting }]) => {
   padding: 160px 0;
 
   @media (max-width: 900px) {
-    clip-path: polygon(0 7%, 100% 0, 100% 100%, 0 93%);
-    padding: 160px 0;
+    clip-path: none;
+    padding: 80px 0;
   }
 }
 
@@ -405,7 +376,7 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--size-48);
+    gap: var(--size-32);
     margin-top: var(--size-40);
   }
 
@@ -415,9 +386,9 @@ section {
     gap: var(--size-32);
     color: var(--foreground-100);
     border-radius: var(--border-radius-2xl);
-    box-shadow: 0 2px 8px 0 rgba(60, 80, 180, 0.04), 0 1.5px 6px 0 rgba(0,0,0,0.02);
+    box-shadow: 0 2px 8px 0 rgba(60, 80, 180, 0.04), 0 1.5px 6px 0 rgba(0, 0, 0, 0.02);
     border: 1.5px solid var(--foreground-100);
-    padding: var(--size-32);
+    padding: var(--size-16);
     transition: all 0.8s ease-out;
     width: 100%;
     max-width: 900px;
@@ -509,7 +480,7 @@ section {
       gap: var(--size-32);
       align-items: stretch;
     }
-    
+
     &__highlight {
       flex-direction: column;
       text-align: center;
@@ -548,6 +519,7 @@ section {
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -567,16 +539,18 @@ section {
 
   &__cards {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--size-24);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--size-16);
     margin: 0;
 
     @media (min-width: 768px) {
       grid-template-columns: repeat(2, 1fr);
+      gap: var(--size-20);
     }
 
     @media (min-width: 1024px) {
       grid-template-columns: repeat(4, 1fr);
+      gap: var(--size-24);
     }
   }
 }
