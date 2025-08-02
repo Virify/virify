@@ -108,6 +108,15 @@ const {
   paginateSearch,
 } = useAiSearchPage();
 
+// Handle URL query parameter for pre-filling search
+const route = useRoute();
+onMounted(() => {
+  const queryParam = route.query.q as string;
+  if (queryParam && !lastSearchQuery.value) {
+    lastSearchQuery.value = queryParam;
+  }
+});
+
 // Computed properties (belong in template, not composable)
 const shouldShowFeedback = computed(() => isSearching.value || (hasSearched.value && (!searchResults.value || searchResults.value.length === 0)) || searchError.value);
 

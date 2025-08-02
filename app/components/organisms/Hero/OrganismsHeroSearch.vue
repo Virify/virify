@@ -9,12 +9,12 @@
 
       <!-- Functional Search Input -->
       <form @submit.prevent="handleSearch" class="ai-search-hero-search">
-        <div class="ai-search-hero-input-container">
+        <div class="ai-search-hero-input-container" ref="inputContainer">
           <input v-model="searchQuery" type="text" class="ai-search-hero-input" :placeholder="currentText" @focus="handleInputFocus" @blur="handleInputBlur" ref="searchInput" />
           <!-- Hidden span to measure text width -->
           <span ref="textMeasure" class="ai-search-hero-text-measure" v-if="currentText">{{ currentText }}</span>
           <span v-if="!isFocused && !searchQuery && currentText" class="ai-search-hero-cursor" :class="{ blinking: isBlinking }" :style="{ left: `calc(var(--size-20) + ${textWidth}px)` }">|</span>
-          <button type="submit" class="ai-search-hero-submit | button-lg" @click="scrollToSearch">
+          <button type="submit" class="ai-search-hero-submit | button-lg" @click="selectSuggestion(searchQuery)">
             <AtomsIcon icon="search" title="search" />
           </button>
         </div>
@@ -42,9 +42,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, computed, nextTick } from "vue";
-import GradientText from "~/components/atoms/GradientText.vue";
-import MoleculesIconLink from "~/components/molecules/MoleculesIconLink.vue";
 
 // Define emits for communicating with parent
 const emit = defineEmits(["selectSuggestion"]);
@@ -67,6 +64,7 @@ const isTyping = ref(true);
 const isBlinking = ref(true);
 const isFocused = ref(false);
 const searchInput = ref(null);
+const inputContainer = ref(null);
 const textMeasure = ref(null);
 const textWidth = ref(0);
 let blinkingInterval = null;
@@ -77,6 +75,12 @@ const DELETING_SPEED = 50; // ms per character
 const PAUSE_BETWEEN_SUGGESTIONS = 2000; // ms
 const CURSOR_BLINK_SPEED = 500; // ms
 
+const scrollInputToCursor = () => {
+  if (inputContainer.value) {
+    inputContainer.value.scrollLeft = inputContainer.value.scrollWidth;
+  }
+};
+
 const typeText = async (text) => {
   isBlinking.value = false;
 
@@ -84,6 +88,7 @@ const typeText = async (text) => {
   for (let i = 0; i <= text.length; i++) {
     currentText.value = text.substring(0, i);
     await updateTextWidth();
+    scrollInputToCursor();
     await new Promise((resolve) => setTimeout(resolve, TYPING_SPEED));
   }
 
@@ -94,6 +99,7 @@ const typeText = async (text) => {
   for (let i = text.length; i >= 0; i--) {
     currentText.value = text.substring(0, i);
     await updateTextWidth();
+    scrollInputToCursor();
     await new Promise((resolve) => setTimeout(resolve, DELETING_SPEED));
   }
 
@@ -194,7 +200,7 @@ onUnmounted(() => {
 @use "#styles/_utils/functions" as fn;
 
 .ai-search-hero {
-  background: linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
+  background: var(--blue-400);
   color: var(--monochrome-900);
   border-radius: var(--border-radius-3xl);
   min-height: max(500px, 60vh);
@@ -206,7 +212,7 @@ onUnmounted(() => {
 
   @include mq.tablet {
     padding: var(--size-72) var(--size-32);
-    background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--blue-400));
+    background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--blue-300), var(--blue-400));
     background-size: auto 120%, cover;
   }
 }
@@ -258,10 +264,17 @@ onUnmounted(() => {
   border-radius: var(--border-radius-lg);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   min-width: 600px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   @include mq.mobile-only {
     min-width: 300px;
   }
+}
+.ai-search-hero-input-container::-webkit-scrollbar {
+  display: none;
 }
 
 .ai-search-hero-input {

@@ -2,7 +2,7 @@
   <div class="homepage">
     <!-- AI Search Hero -->
     <div class="container">
-      <OrganismsAiSearchHero @selectSuggestion="handleSuggestionSelect" />
+      <OrganismsHeroSearch @selectSuggestion="handleSuggestionSelect" />
     </div>
 
     <!-- How It Works Steps -->
@@ -216,7 +216,7 @@ useHead({
 // Handle suggestion clicks from hero component
 const handleSuggestionSelect = (suggestion) => {
   // Navigate to the AI search page with the suggestion as a query parameter
-  navigateTo(`/search/ai/?q=${encodeURIComponent(suggestion)}`)
+  navigateTo(`/ai-search?q=${encodeURIComponent(suggestion)}`)
 }
 
 // Intersection observer for Why Virify animations
