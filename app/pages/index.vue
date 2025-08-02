@@ -15,52 +15,35 @@
           </p>
         </header>
         
-        <div class="ai-stepper">
-          <div class="ai-stepper__track">
-            <div class="ai-stepper__connector"></div>
-            <div class="ai-stepper__steps">
-              <div class="ai-stepper__step ai-stepper__step--active">
-                <div class="ai-stepper__circle ai-stepper__circle--blue">1</div>
-                <div class="ai-stepper__content">
-                  <h3 class="title-md">Tell us what you want</h3>
-                  <p class="body-sm">
-                    "Big windows and a garden" or "somewhere quiet"—speak human, not estate agent.
-                  </p>
-                </div>
-              </div>
-              
-              <div class="ai-stepper__step">
-                <div class="ai-stepper__circle ai-stepper__circle--secondary">2</div>
-                <div class="ai-stepper__content">
-                  <h3 class="title-md">We do the searching</h3>
-                  <p class="body-sm">
-                    Smart tech scans thousands of properties in seconds to find ones that actually match what you said.
-                  </p>
-                </div>
-              </div>
-              
-              <div class="ai-stepper__step">
-                <div class="ai-stepper__circle ai-stepper__circle--blue">3</div>
-                <div class="ai-stepper__content">
-                  <h3 class="title-md">Get the real story</h3>
-                  <p class="body-sm">
-                    Price history, safety stats, school ratings—all the stuff that actually matters, made simple.
-                  </p>
-                </div>
-              </div>
-              
-              <div class="ai-stepper__step">
-                <div class="ai-stepper__circle ai-stepper__circle--secondary">4</div>
-                <div class="ai-stepper__content">
-                  <h3 class="title-md">Make your move</h3>
-                  <p class="body-sm">
-                    Armed with real facts, not marketing fluff. You'll know it's the right choice before you even view.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <MoleculesStepper>
+          <MoleculesStepperStep :step-number="1" :active="true" variant="blue">
+            <h3 class="title-md">Tell us what you want</h3>
+            <p class="body-sm">
+              "Big windows and a garden" or "somewhere quiet"—speak human, not estate agent.
+            </p>
+          </MoleculesStepperStep>
+          
+          <MoleculesStepperStep :step-number="2" variant="secondary">
+            <h3 class="title-md">We do the searching</h3>
+            <p class="body-sm">
+              Smart tech scans thousands of properties in seconds to find ones that actually match what you said.
+            </p>
+          </MoleculesStepperStep>
+          
+          <MoleculesStepperStep :step-number="3" variant="blue">
+            <h3 class="title-md">Get the real story</h3>
+            <p class="body-sm">
+              Price history, safety stats, school ratings—all the stuff that actually matters, made simple.
+            </p>
+          </MoleculesStepperStep>
+          
+          <MoleculesStepperStep :step-number="4" variant="secondary">
+            <h3 class="title-md">Make your move</h3>
+            <p class="body-sm">
+              Armed with real facts, not marketing fluff. You'll know it's the right choice before you even view.
+            </p>
+          </MoleculesStepperStep>
+        </MoleculesStepper>
       </div>
     </section>
 
@@ -144,8 +127,8 @@
           </p>
         </header>
         
-        <div class="why-virify__highlights">
-          <div class="why-virify__highlight why-virify__highlight--left">
+        <div class="why-virify__highlights" ref="highlightsRef">
+          <div class="why-virify__highlight why-virify__highlight--left" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__image">
               <AtomsIcon icon="ai/star" :size="48" />
             </div>
@@ -157,7 +140,7 @@
             </div>
           </div>
           
-          <div class="why-virify__highlight why-virify__highlight--right">
+          <div class="why-virify__highlight why-virify__highlight--right" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__content">
               <h3 class="title-md">Smart, not flashy</h3>
               <p class="body-md">
@@ -169,7 +152,7 @@
             </div>
           </div>
           
-          <div class="why-virify__highlight why-virify__highlight--left">
+          <div class="why-virify__highlight why-virify__highlight--left" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__image">
               <AtomsIcon icon="account/chat" :size="48" />
             </div>
@@ -181,7 +164,7 @@
             </div>
           </div>
           
-          <div class="why-virify__highlight why-virify__highlight--right">
+          <div class="why-virify__highlight why-virify__highlight--right" :class="{ 'animate-in': isVisible }">
             <div class="why-virify__content">
               <h3 class="title-md">Your data, your business</h3>
               <p class="body-md">
@@ -264,6 +247,7 @@
 </template>
 <script setup>
 import GradientText from '~/components/atoms/GradientText.vue';
+import { useIntersectionObserver } from '@vueuse/core';
 
 // Page metadata
 useHead({
@@ -279,6 +263,16 @@ const handleSuggestionSelect = (suggestion) => {
   navigateTo(`/search/ai/?q=${encodeURIComponent(suggestion)}`)
 }
 
+// Intersection observer for Why Virify animations
+const highlightsRef = ref(null)
+const isVisible = ref(false)
+
+useIntersectionObserver(highlightsRef, ([{ isIntersecting }]) => {
+  if (isIntersecting) {
+    isVisible.value = true
+  }
+}, { threshold: 0.3 })
+
 </script>
 
 <style scoped lang="scss">
@@ -291,14 +285,34 @@ const handleSuggestionSelect = (suggestion) => {
 
 // Full-width hero-style background for alternating sections
 .section-hero-bg {
+  position: relative;
   background: linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
   padding: var(--size-120) 0;
   color: var(--monochrome-900);
+  margin: var(--size-60) 0;
+  padding-bottom: 160px 0;
 
   @media (max-width: 900px) {
-    padding: var(--size-120) 0;
+    padding: 160px 0;
+    // margin: var(--size-40) 0;
   }
 }
+
+.features-showcase {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 90%);
+  padding-bottom: 150px;
+}
+
+.trust-signals {
+  clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 90%);
+  padding: 160px 0;
+
+  @media (max-width: 900px) {
+    clip-path: polygon(0 7%, 100% 0, 100% 100%, 0 93%);
+    padding: 160px 0;
+  }
+}
+
 
 // Centered content with max width
 .max-width-prose {
@@ -345,142 +359,9 @@ section {
   background: var(--background-100);
 }
 
-.ai-stepper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-
-  &__header {
-    text-align: center;
-    margin-bottom: var(--size-48);
-  }
-
-  &__track {
-    position: relative;
-    width: 100%;
-  }
-
-  &__connector {
-    position: absolute;
-    top: 24px;
-    left: -50vw;
-    right: -50vw;
-    height: 4px;
-    background: linear-gradient(90deg, var(--blue-400), var(--secondary-400));
-    z-index: 1;
-    border-radius: 2px;
-  }
-
-  &__steps {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-    position: relative;
-    z-index: 2;
-    width: 100%;
-  }
-
-  &__step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 0 1 auto;
-    text-align: center;
-    position: relative;
-
-    &--active .ai-stepper__circle {
-      box-shadow: 0 0 0 4px var(--blue-400, #3b82f6);
-    }
-  }
-
-  &__circle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    color: #fff;
-    font-size: 1.5rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: var(--size-16);
-    border: 4px solid #fff;
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
-    transition: box-shadow 0.2s;
-
-    &--blue {
-      background: var(--blue-400);
-    }
-
-    &--secondary {
-      background: var(--secondary-400);
-    }
-  }
-
-  &__content {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    flex: 1;
-    padding: 0 var(--size-12);
-    gap: var(--size-16);
-
-    h3,
-    p {
-      margin: 0;
-    }
-  }
-}
-
-@media (max-width: 900px) {
-  .ai-stepper {
-    &__steps {
-      flex-direction: column;
-      align-items: stretch;
-      gap: var(--size-40);
-      position: relative;
-    }
-
-    &__connector {
-      top: 12px;
-      left: 28px;
-      width: 4px;
-      height: calc(100% - 90px);
-      background: linear-gradient(180deg, var(--blue-400), var(--secondary-400));
-      z-index: 0;
-    }
-
-    &__step {
-      flex-direction: row;
-      align-items: flex-start;
-      min-width: 0;
-      max-width: none;
-      margin-bottom: 0;
-      position: relative;
-      padding: var(--size-8) 0;
-    }
-
-    &__circle {
-      margin-bottom: 0;
-      margin-right: var(--size-20);
-      min-width: 48px;
-      min-height: 48px;
-      flex-shrink: 0;
-      z-index: 1;
-    }
-
-    &__content {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-width: 0;
-      padding-top: 2px;
-      align-items: flex-start;
-      text-align: left;
-    }
-  }
+.ai-stepper__header {
+  text-align: center;
+  margin-bottom: var(--size-48);
 }
 
 // ==========================================================================
@@ -537,17 +418,34 @@ section {
     box-shadow: 0 2px 8px 0 rgba(60, 80, 180, 0.04), 0 1.5px 6px 0 rgba(0,0,0,0.02);
     border: 1.5px solid var(--foreground-100);
     padding: var(--size-32);
-    transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s, background 0.18s;
+    transition: all 0.8s ease-out;
     width: 100%;
     max-width: 900px;
     flex-shrink: 0;
+    opacity: 0;
+    transform: translateY(40px);
+
+    &.animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     &--left {
       align-self: flex-start;
+      transition-delay: 0.1s;
+
+      &.animate-in {
+        transition-delay: 0.1s;
+      }
     }
 
     &--right {
       align-self: flex-end;
+      transition-delay: 0.3s;
+
+      &.animate-in {
+        transition-delay: 0.3s;
+      }
 
       .why-virify__content {
         text-align: right;
@@ -556,6 +454,22 @@ section {
 
       .why-virify__image {
         order: 2;
+      }
+    }
+
+    &:nth-child(3) {
+      transition-delay: 0.5s;
+
+      &.animate-in {
+        transition-delay: 0.5s;
+      }
+    }
+
+    &:nth-child(4) {
+      transition-delay: 0.7s;
+
+      &.animate-in {
+        transition-delay: 0.7s;
       }
     }
   }
@@ -622,6 +536,21 @@ section {
     &__content {
       text-align: center;
     }
+  }
+}
+
+// ==========================================================================
+// ANIMATIONS
+// ==========================================================================
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
