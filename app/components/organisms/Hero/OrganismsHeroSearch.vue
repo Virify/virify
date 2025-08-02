@@ -42,6 +42,8 @@
 </template>
 
 <script setup>
+import GradientText from '~/components/atoms/GradientText.vue';
+
 
 // Define emits for communicating with parent
 const emit = defineEmits(["selectSuggestion"]);
