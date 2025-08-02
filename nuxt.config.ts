@@ -17,11 +17,10 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [],
-    build: {
-      cssCodeSplit: true,
-      rollupOptions: {
-        output: {
-          assetFileNames: 'assets/[name].[hash][extname]'
+    vue: {
+      template: {
+        compilerOptions: {
+          comments: false
         }
       }
     }
