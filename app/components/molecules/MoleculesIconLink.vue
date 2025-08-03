@@ -34,9 +34,9 @@ defineProps({
 </script>
 
 <style lang="scss">
-.m-icon-link {
+.m-icon-link.button {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   border-radius: var(--border-radius-ui);
   text-decoration: none;

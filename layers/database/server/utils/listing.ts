@@ -392,29 +392,85 @@ export async function getSimilarListings(listing: ListingWithFullProperty, limit
   });
 
   // Convert to SummaryCardData format
-  const simplifiedListings = similarListings.map((similarListing): SummaryCardData => {
-    const property = similarListing.property;
+  return transformToSummaryCardData(similarListings);
+}
+
+/**
+ * Transform listing data to SummaryCardData format
+ */
+function transformToSummaryCardData(listings: any[]): SummaryCardData[] {
+  return listings.map((listing): SummaryCardData => {
+    const property = listing.property;
     return {
-      id: similarListing.id || 0,
+      id: listing.id || 0,
       lat: property?.address?.lat || 0,
       lon: property?.address?.lon || 0,
-      title: similarListing.title,
+      title: listing.title,
       bedrooms: property?.numberBedrooms || null,
       bathrooms: property?.numberBathrooms || null,
       receptions: property?.numberReceptions || null,
-      price: similarListing.price,
+      price: listing.price,
       propertyType: property?.type?.name || null,
       classification: property?.classification?.name || null,
-      priceType: similarListing.saleListing?.priceType || similarListing.rentalListing?.rentFrequency || null,
+      priceType: listing.saleListing?.priceType || listing.rentalListing?.rentFrequency || null,
       address: property?.address ? {
         street: property.address.street,
         city: property.address.city,
         postcode: property.address.postcode,
       } : null,
       image: property?.media || [],
-      tier: similarListing.listingTier,
+      tier: listing.listingTier,
     };
   });
+}
 
-  return simplifiedListings;
+/**
+ * Get trending listings analytics data from ListingView table
+ */
+export async function getTrendingListingsAnalytics(days: number, limit: number) {
+  const sinceDate = new Date();
+  sinceDate.setDate(sinceDate.getDate() - days);
+
+  return await prisma.listingView.groupBy({
+    by: ['listingId'],
+    where: {
+      createdAt: {
+        gte: sinceDate
+      }
+    },
+    _count: {
+      id: true, // Total views
+      userId: true, // Views by registered users
+      sessionId: true, // Unique sessions
+    },
+    orderBy: {
+      _count: {
+        id: 'desc' // Order by total view count
+      }
+    },
+    take: limit * 2 // Get more than needed to filter active listings
+  });
+}
+
+/**
+ * Get trending listings by IDs in SummaryCardData format
+ */
+export async function getTrendingListingsByIds(listingIds: number[], limit: number): Promise<SummaryCardData[]> {
+  const listings = await prisma.listing.findMany({
+    where: {
+      id: {
+        in: listingIds
+      },
+      // Only include published listings
+      published: true,
+      property: {
+        isNot: null
+      }
+    },
+    select: listingCardFields,
+    take: limit
+  });
+
+  // Transform to SummaryCardData format using shared utility
+  return transformToSummaryCardData(listings);
 }

@@ -162,7 +162,7 @@
   </main>
   <!-- Similar Listings -->
   <div class="p-listing | container">
-    <MoleculesSimilarListings :listings="similarListings" :address="similarListingsAddress" />
+    <OrganismsRelevantListings type="similar" :listing-id="String(route.params?.id)" :address="similarListingsAddress" />
   </div>
 
 </template>
@@ -180,7 +180,7 @@ const route = useRoute();
 const { data: listingData, status } = await useAsyncData(
   `listing-${route.params?.id}`,
   () => {
-    return $fetch<ListingWithSimilar>(`/api/listing/${route.params?.id}`);
+    return $fetch<{ listing: any }>(`/api/listing/${route.params?.id}`);
   },
   {
     deep: false,
@@ -188,7 +188,6 @@ const { data: listingData, status } = await useAsyncData(
 );
 
 const listing = computed(() => listingData.value?.listing);
-const similarListings = computed(() => listingData.value?.similarListings || []);
 
 const similarListingsAddress = computed(() => {
   return listing.value?.property?.address ? {

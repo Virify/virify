@@ -1,6 +1,4 @@
-import type { ListingWithSimilar } from "~~/shared/types/listing";
-import { getSimilarListings, getFullListingById } from "~~/layers/database/server/utils/listing";
-
+import { getFullListingById } from "~~/layers/database/server/utils/listing";
 
 // Helper to fetch cached listing (1 year)
 const getCachedListing = defineCachedFunction(async (id: number) => {
@@ -11,16 +9,7 @@ const getCachedListing = defineCachedFunction(async (id: number) => {
   getKey: (id) => `listing:${id}`,
 });
 
-// Helper to fetch cached similar listings (1 day)
-const getCachedSimilarListings = defineCachedFunction(async (listing: any, count: number) => {
-  return await getSimilarListings(listing, count);
-}, {
-  maxAge: 1000 * 60 * 60 * 24, // 1 day
-  name: 'similarListings',
-  getKey: (listing, count) => `similarListings:${listing.id}:${count}`,
-});
-
-export default defineEventHandler(async (event): Promise<ListingWithSimilar> => {
+export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
   if (!id) {
     throw createError({
@@ -39,11 +28,5 @@ export default defineEventHandler(async (event): Promise<ListingWithSimilar> => 
     });
   }
 
-  // Fetch cached similar listings (1 day)
-  const similarListings = await getCachedSimilarListings(listing, 10);
-
-  return {
-    listing,
-    similarListings,
-  };
+  return { listing };
 });
