@@ -11,18 +11,14 @@
         <p v-if="subtitle" class="body-xs">{{ subtitle }}</p>
       </div>
     </div>
-    
+
     <!-- Content below header -->
     <div v-if="pills && pills.length" class="feature-tile__pills">
-      <AtomsPill 
-        v-for="(pill, index) in pills" 
-        :key="index"
-        class="body-sm feature-tile__pill"
-      >
+      <AtomsPill v-for="(pill, index) in pills" :key="index" class="feature-tile__pill | body-sm">
         {{ pill }}
       </AtomsPill>
     </div>
-    <p v-else-if="description" class="feature-tile__description body-sm">{{ description }}</p>
+    <p v-else-if="description" class="feature-tile__description | body-sm">{{ description }}</p>
   </div>
 </template>
 
@@ -34,13 +30,13 @@ interface Props {
   subtitle?: string
   description?: string
   pills?: string[]
-  variant?: 'primary' | 'blue' | 'secondary' | 'tertiary'
+  variant?: 'default' | 'primary' | 'blue' | 'secondary' | 'tertiary'
   hasBackgroundImage?: boolean
   layout?: 'vertical' | 'horizontal'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'primary',
+  variant: 'default',
   hasBackgroundImage: false,
   layout: 'vertical'
 })
@@ -55,6 +51,8 @@ const tileClasses = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+@use "#styles/_utils/functions" as fn;
+
 .feature-tile {
   border-radius: var(--border-radius-xl);
   padding: var(--size-24);
@@ -160,9 +158,40 @@ const tileClasses = computed(() => {
   }
 
   // Color variants
+  &--default {
+    background-color: fn.faded-color(12%, var(--monochrome-600));
+    color: var(--monochrome-900);
+
+    &:hover {
+      background-color: fn.faded-color(24%, var(--monochrome-600));
+    }
+
+    .feature-tile__icon {
+      background: rgba(255, 255, 255, 0.1);
+
+      .a-icon {
+        color: var(--secondary-500);
+      }
+    }
+
+    .feature-tile__header-text {
+      h4 {
+        color: var(--secondary-500);
+      }
+    }
+
+    &.feature-tile--with-background {
+      background-color: fn.faded-color(12%, var(--monochrome-600));
+
+      &:hover {
+        background-color: fn.faded-color(24%, var(--monochrome-600));
+      }
+    }
+  }
+
   &--primary {
     background-color: var(--primary-400);
-    
+
     &.feature-tile--with-background {
       background-image: url('/img/logo-background.svg'), linear-gradient(135deg, var(--primary-400), var(--primary-500));
     }
@@ -170,7 +199,7 @@ const tileClasses = computed(() => {
 
   &--blue {
     background-color: var(--blue-400);
-    
+
     &.feature-tile--with-background {
       background-image: url('/img/logo-background.svg'), linear-gradient(135deg, var(--blue-400), var(--blue-500));
     }
@@ -179,7 +208,7 @@ const tileClasses = computed(() => {
   &--secondary {
     background-color: var(--secondary-400);
     color: var(--monochrome-900);
-    
+
     &.feature-tile--with-background {
       position: relative;
       background: linear-gradient(135deg, var(--secondary-400), var(--secondary-300));

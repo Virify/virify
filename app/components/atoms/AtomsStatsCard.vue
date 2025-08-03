@@ -1,8 +1,15 @@
 <template>
   <div class="stats-card">
     <div class="stats-card__top">
-      <div class="stats-card__value | r-title-xl-md">{{ value }}</div>
-      <div class="stats-card__subtitle | body-sm font-bold">{{ subtitle }}</div>
+      <div class="stats-card__content">
+        <div v-if="iconName" class="stats-card__icon">
+          <AtomsIcon :icon="iconName" :size="32" />
+        </div>
+        <div class="stats-card__text">
+          <div class="stats-card__value | r-title-xl-md">{{ value }}</div>
+          <div class="stats-card__subtitle | body-sm font-bold">{{ subtitle }}</div>
+        </div>
+      </div>
     </div>
     <div class="stats-card__title | r-body-md-sm font-bold">{{ title }}</div>
   </div>
@@ -13,6 +20,7 @@ interface Props {
   value: string
   subtitle: string
   title: string
+  iconName?: string
 }
 
 defineProps<Props>()
@@ -22,11 +30,12 @@ defineProps<Props>()
 .stats-card {
   border-radius: var(--border-radius-xl);
   padding: 0;
-  transition: all 0.6s ease-out;
+  transition: opacity 0.4s ease-out, transform 0.15s ease;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 100%;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   opacity: 0;
   transform: translateY(30px);
@@ -37,20 +46,19 @@ defineProps<Props>()
   }
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 
-  &:nth-child(1) { transition-delay: 0.1s; }
-  &:nth-child(2) { transition-delay: 0.2s; }
-  &:nth-child(3) { transition-delay: 0.3s; }
-  &:nth-child(4) { transition-delay: 0.4s; }
-  &:nth-child(5) { transition-delay: 0.5s; }
-  &:nth-child(6) { transition-delay: 0.6s; }
-  &:nth-child(7) { transition-delay: 0.7s; }
-  &:nth-child(8) { transition-delay: 0.8s; }
+  // Generate staggered delays for entrance animation only (opacity only)
+  @for $i from 1 through 15 {
+    &:nth-child(#{$i}) {
+      transition: opacity 0.4s ease-out #{$i * 0.1}s,
+      transform 0.15s ease;
+    }
+  }
 
   &__top {
-    background: 
+    background:
       linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)),
       url('/img/call-out-bg.svg'),
       var(--secondary-400);
@@ -62,7 +70,34 @@ defineProps<Props>()
     padding: var(--size-16);
     background-size: cover;
     min-height: 100px;
+  }
 
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: var(--size-12);
+    width: 100%;
+  }
+
+  &__icon {
+    display: flex;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    padding: var(--size-12);
+    align-items: center;
+    justify-content: center;
+
+    .a-icon {
+      color: var(--monochrome-900);
+    }
+  }
+
+  &__text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4);
   }
 
   &__value {

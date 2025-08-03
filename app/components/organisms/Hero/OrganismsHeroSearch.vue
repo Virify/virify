@@ -1,38 +1,52 @@
 <template>
   <div class="ai-search-hero">
-    <div class="ai-search-hero-content">
-      <h1 class="ai-search-hero-title | title-2xl lineheight-xs">
+    <div class="ai-search-hero__content">
+      <h1 class="ai-search-hero__title | title-2xl lineheight-xs">
         Find Your Perfect Home with <GradientText>Virify AI</GradientText>
       </h1>
 
-      <p class="ai-search-hero-subtitle">Describe your dream home in your own words. Our AI does the rest—matching you with the best properties, fast.</p>
+      <p class="ai-search-hero__subtitle | body-md">Describe your dream home in your own words. Our AI does the rest—matching you
+        with the best properties, fast.</p>
 
       <!-- Functional Search Input -->
-      <form @submit.prevent="handleSearch" class="ai-search-hero-search">
-        <div class="ai-search-hero-input-container">
-          <input v-model="searchQuery" type="text" class="ai-search-hero-input" :placeholder="currentText" @focus="handleInputFocus" @blur="handleInputBlur" />
-          <button type="submit" class="ai-search-hero-submit | button-lg" @click="selectSuggestion(searchQuery)">
+      <form @submit.prevent="handleSearch" class="ai-search-hero__search">
+        <div class="ai-search-hero__input-container">
+          <input v-model="searchQuery" type="text" class="ai-search-hero__input" :placeholder="currentText"
+            @focus="handleInputFocus" @blur="handleInputBlur" />
+          <button type="submit" class="ai-search-hero__submit | button-lg" @click="selectSuggestion(searchQuery)">
             <AtomsIcon icon="search" title="search" />
           </button>
         </div>
       </form>
 
-      <AtomsDivider text="try these searches" class="ai-search-hero-divider" />
+      <AtomsDivider text="try these searches" class="ai-search-hero__divider" />
 
-      <div role="presentation" class="ai-search-hero-footer-links">
-        <MoleculesIconLink class="ai-search-hero-footer-link" icon="property/house" content="3 bedroom house" icon-inline @click="selectSuggestion('3 bedroom house')" />
-        <MoleculesIconLink class="ai-search-hero-footer-link" icon="property/flat" content="House in Cardiff city centre" icon-inline @click="selectSuggestion('house in Cardiff city centre')" />
-        <MoleculesIconLink class="ai-search-hero-footer-link" icon="property/house" content="House with modern kitchen" icon-inline @click="selectSuggestion('house with modern kitchen and breakfast bar')" />
-        <MoleculesIconLink class="ai-search-hero-footer-link" icon="property/flat" content="Flat with balcony and parking" icon-inline @click="selectSuggestion('flat with balcony and parking')" />
-        <MoleculesIconLink class="ai-search-hero-footer-link" icon="property/house" content="Property with garden and garage" icon-inline @click="selectSuggestion('property with garden and garage')" />
-        <MoleculesIconLink class="ai-search-hero-footer-link" icon="property/house" content="Pet friendly house with garden" icon-inline @click="selectSuggestion('pet friendly house with garden')" />
+      <div role="presentation" class="ai-search-hero__suggestions">
+        <MoleculesIconLink class="ai-search-hero__suggestion" icon="property/house" content="3 bedroom house"
+          icon-inline @click="selectSuggestion('3 bedroom house')" />
+        <MoleculesIconLink class="ai-search-hero__suggestion" icon="property/flat"
+          content="House in Cardiff city centre" icon-inline
+          @click="selectSuggestion('house in Cardiff city centre')" />
+        <MoleculesIconLink class="ai-search-hero__suggestion" icon="property/house" content="House with modern kitchen"
+          icon-inline @click="selectSuggestion('house with modern kitchen and breakfast bar')" />
+        <MoleculesIconLink class="ai-search-hero__suggestion" icon="property/flat"
+          content="Flat with balcony and parking" icon-inline
+          @click="selectSuggestion('flat with balcony and parking')" />
+        <MoleculesIconLink class="ai-search-hero__suggestion" icon="property/house"
+          content="Property with garden and garage" icon-inline
+          @click="selectSuggestion('property with garden and garage')" />
+        <MoleculesIconLink class="ai-search-hero__suggestion" icon="property/house"
+          content="Pet friendly house with garden" icon-inline
+          @click="selectSuggestion('pet friendly house with garden')" />
       </div>
 
-      <AtomsDivider text="or" class="o-hero-home-divider" />
+      <AtomsDivider text="or" class="ai-search-hero__divider" />
 
-      <div role="presentation" class="o-hero-home-footer-links">
-        <MoleculesIconLink class="o-hero-home-footer-link" to="/search/legacy" icon="explore/ai" content="Traditional search" icon-inline />
-        <MoleculesIconLink class="o-hero-home-footer-link" to="/map-search/" icon="explore/map" content="Search by map" icon-inline />
+      <div role="presentation" class="ai-search-hero__actions">
+        <MoleculesIconLink class="ai-search-hero__action" to="/search/legacy" icon="explore/ai"
+          content="Traditional search" icon-inline />
+        <MoleculesIconLink class="ai-search-hero__action" to="/map-search/" icon="explore/map" content="Search by map"
+          icon-inline />
       </div>
     </div>
   </div>
@@ -121,12 +135,12 @@ onUnmounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
 
 .ai-search-hero {
-  background: linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
   color: var(--monochrome-900);
   border-radius: var(--border-radius-3xl);
   min-height: max(500px, 60vh);
@@ -138,145 +152,143 @@ onUnmounted(() => {
 
   @include mq.tablet {
     padding: var(--size-72) var(--size-32);
-    background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
-    background-size: auto 120%, cover;
-  }
-}
+    position: relative;
 
-.ai-search-hero-submit {
-  background: none;
-  border: none;
-  color: var(--monochrome-900);
-  cursor: pointer;
-  display: flex
-}
-
-.ai-search-hero-content {
-  text-align: center;
-  width: 100%;
-}
-
-.ai-search-hero-title {
-  margin: 0 auto var(--size-16);
-
-}
-
-.ai-search-hero-subtitle {
-  font-size: var(--text-lg);
-  color: var(--monochrome-700);
-  margin-bottom: var(--size-32);
-  line-height: 1.6;
-}
-
-.ai-search-hero-search {
-  margin-bottom: var(--size-32);
-  display: flex;
-  justify-content: center;
-}
-
-.ai-search-hero-input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: var(--monochrome-white);
-  border: 2px solid var(--monochrome-900);
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  min-width: 800px;
-
-  @include mq.tablet-only {
-    min-width: 600px;
-    max-width: calc(100vw - var(--size-64));
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: url("/img/call-out-bg.svg") no-repeat right, linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+      background-size: auto 120%;
+      opacity: 0.1;
+      pointer-events: none;
+      border-radius: inherit;
+    }
   }
 
-  @include mq.mobile-only {
-    min-width: 100%;
-    max-width: calc(100vw - var(--size-40));
-  }
-}
-
-.ai-search-hero-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: var(--size-16) var(--size-20);
-  font-size: var(--text-lg);
-  min-height: 60px;
-  color: var(--monochrome-800);
-  outline: none;
-
-  @include mq.mobile-only {
-    font-size: var(--text-base);
+  &__content {
+    text-align: center;
+    width: 100%;
   }
 
-  &::placeholder {
-    color: var(--monochrome-500);
-    opacity: 1; /* Ensure full opacity for animated placeholder */
+  &__title {
+    margin: 0 auto var(--size-16);
   }
 
-  &:focus::placeholder {
-    opacity: 0.7; /* Slightly fade placeholder when focused */
-  }
-}
-
-.ai-search-hero .ai-search-hero-divider {
-  margin: var(--size-32) auto;
-  max-width: 600px;
-}
-
-.ai-search-hero-footer-links {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--size-16);
-
-  @include mq.tablet-only {
-    grid-template-columns: repeat(2, 1fr);
+  &__subtitle {
+    color: var(--monochrome-700);
+    margin-bottom: var(--size-32);
   }
 
-  @include mq.mobile-only {
-    grid-template-columns: 1fr;
+  &__search {
+    margin-bottom: var(--size-32);
+    display: flex;
+    justify-content: center;
   }
-}
 
-.ai-search-hero-footer-link {
-  background-color: fn.faded-color(12%, var(--monochrome-600));
-  transition: all 0.2s ease;
+  &__input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--monochrome-white);
+    border: 2px solid var(--monochrome-900);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    min-width: 800px;
 
-  /* Ensure all links have equal height in grid */
-  display: flex;
-  align-items: center;
+    @include mq.tablet-only {
+      min-width: 600px;
+      max-width: calc(100vw - var(--size-64));
+    }
 
-  &:hover {
-    background-color: fn.faded-color(24%, var(--monochrome-600));
-    transform: translateY(-2px);
+    @include mq.mobile-only {
+      min-width: 100%;
+      max-width: calc(100vw - var(--size-40));
+    }
   }
-}
 
-.o-hero-home-footer-links {
-  display: flex;
-  align-items: stretch;
-  gap: var(--size-16);
-  max-width: 600px;
-  margin: 0 auto;
+  &__input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: var(--size-16) var(--size-20);
+    min-height: 60px;
+    color: var(--monochrome-800);
+    outline: none;
 
-  @include mq.mobile-only {
-    flex-direction: column;
+    &::placeholder {
+      color: var(--monochrome-500);
+      opacity: 1;
+    }
+
+    &:focus::placeholder {
+      opacity: 0.7;
+    }
   }
-}
 
-.o-hero-home-footer-link {
-  flex-grow: 1;
-  background-color: fn.faded-color(12%, var(--monochrome-600));
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: fn.faded-color(24%, var(--monochrome-600));
-    transform: translateY(-2px);
+  &__submit {
+    background: none;
+    border: none;
+    color: var(--monochrome-900);
+    cursor: pointer;
+    display: flex;
   }
-}
 
-.ai-search-hero .o-hero-home-divider {
-  max-width: 600px;
-  margin: var(--size-32) auto;
+  &__divider {
+    margin: var(--size-32) auto;
+    max-width: 600px;
+  }
+
+  &__suggestions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--size-16);
+
+    @include mq.tablet-only {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include mq.mobile-only {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__suggestion {
+    background-color: fn.faded-color(12%, var(--monochrome-600));
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background-color: fn.faded-color(24%, var(--monochrome-600));
+      transform: translateY(-2px);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: stretch;
+    gap: var(--size-16);
+    max-width: 600px;
+    margin: 0 auto;
+
+    @include mq.mobile-only {
+      flex-direction: column;
+    }
+  }
+
+  &__action {
+    flex-grow: 1;
+    background-color: fn.faded-color(12%, var(--monochrome-600));
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: fn.faded-color(24%, var(--monochrome-600));
+      transform: translateY(-2px);
+    }
+  }
 }
 </style>

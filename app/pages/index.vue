@@ -60,32 +60,31 @@
         </header>
 
         <div class="features-showcase__grid" ref="featuresRef">
-          <MoleculesFeatureTile iconName="listings/savings" title="What places actually sold for"
-            subtitle="Real prices, not asking prices"
+          <MoleculesFeatureTile iconName="listings/savings" title="Real prices" subtitle="Up-to-date sale prices"
             description="Skip the guesswork. See what properties actually sold for and spot the trends that matter."
-            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
+            :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="listings/flood" title="Will it flood?" subtitle="Straight answers about water"
             description="Plain English flood risk info. No confusing maps, just clear answers about staying dry."
-            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
+            :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="listings/eco" title="Bills and broadband" subtitle="What you'll actually pay"
             description="Energy costs, council tax, broadband speeds. The boring but important stuff, made simple."
-            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
+            :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="property/security" title="How safe is it?"
             subtitle="Real safety, not scare stories"
             description="Honest crime stats without the drama. Know what's actually happening in your potential neighbourhood."
-            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
+            :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="explore/map" title="Getting around" subtitle="Your actual commute time"
             description="Tube delays, bus routes, walking times. How you'll really get to work, not the marketing version."
-            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
+            :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="amenities/school" title="Local schools"
             subtitle="Education without the stress"
             description="Good schools nearby? We'll show you Ofsted ratings and catchment areas in plain English."
-            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
+            :class="{ 'animate-in': isFeaturesVisible }" />
         </div>
       </div>
     </section>
@@ -244,10 +243,11 @@ const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersect
 
 // Full-width hero-style background for alternating sections
 .section-hero-bg {
-  background: linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+
   color: var(--monochrome-900);
   margin: var(--size-60) 0;
-  padding: 80px 0;
+  padding: 100px 0;
 
   @media (max-width: 900px) {
     padding: 80px 0;
@@ -296,7 +296,6 @@ section {
 // Features Showcase Section
 
 .features-showcase {
-  padding-bottom: 80px;
 
   @media (max-width: 900px) {
     padding: 80px 0;
@@ -469,10 +468,7 @@ section {
     }
   }
 }
-
-
 // Trust signals
-
 .trust-signals {
   text-align: center;
 
@@ -492,29 +488,6 @@ section {
     @media (min-width: 1024px) {
       grid-template-columns: repeat(4, 1fr);
       gap: var(--size-24);
-    }
-
-    // Animation styles for stats cards
-    :deep(.stats-card) {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.6s ease-out;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-
-      &.animate-in {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-  }
-
-  // Generate staggered delays for stats cards
-  @for $i from 1 through 15 {
-    &__cards :deep(.stats-card:nth-child(#{$i})) {
-      transition-delay: #{$i * 0.1}s;
     }
   }
 }
