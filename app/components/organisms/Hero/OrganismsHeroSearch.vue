@@ -9,11 +9,8 @@
 
       <!-- Functional Search Input -->
       <form @submit.prevent="handleSearch" class="ai-search-hero-search">
-        <div class="ai-search-hero-input-container" ref="inputContainer">
-          <input v-model="searchQuery" type="text" class="ai-search-hero-input" :placeholder="currentText" @focus="handleInputFocus" @blur="handleInputBlur" ref="searchInput" />
-          <!-- Hidden span to measure text width -->
-          <span ref="textMeasure" class="ai-search-hero-text-measure" v-if="currentText">{{ currentText }}</span>
-          <span v-if="!isFocused && !searchQuery && currentText" class="ai-search-hero-cursor" :class="{ blinking: isBlinking }" :style="{ left: `calc(var(--size-20) + ${textWidth}px)` }">|</span>
+        <div class="ai-search-hero-input-container">
+          <input v-model="searchQuery" type="text" class="ai-search-hero-input" :placeholder="currentText" @focus="handleInputFocus" @blur="handleInputBlur" />
           <button type="submit" class="ai-search-hero-submit | button-lg" @click="selectSuggestion(searchQuery)">
             <AtomsIcon icon="search" title="search" />
           </button>
@@ -44,7 +41,6 @@
 <script setup>
 import GradientText from '~/components/atoms/GradientText.vue';
 
-
 // Define emits for communicating with parent
 const emit = defineEmits(["selectSuggestion"]);
 
@@ -63,34 +59,17 @@ const searchQuery = ref("");
 const currentText = ref("");
 const currentSuggestionIndex = ref(0);
 const isTyping = ref(true);
-const isBlinking = ref(true);
 const isFocused = ref(false);
-const searchInput = ref(null);
-const inputContainer = ref(null);
-const textMeasure = ref(null);
-const textWidth = ref(0);
-let blinkingInterval = null;
 
 // Animation timing
 const TYPING_SPEED = 100; // ms per character
 const DELETING_SPEED = 50; // ms per character
 const PAUSE_BETWEEN_SUGGESTIONS = 2000; // ms
-const CURSOR_BLINK_SPEED = 500; // ms
-
-const scrollInputToCursor = () => {
-  if (inputContainer.value) {
-    inputContainer.value.scrollLeft = inputContainer.value.scrollWidth;
-  }
-};
 
 const typeText = async (text) => {
-  isBlinking.value = false;
-
   // Type the text
   for (let i = 0; i <= text.length; i++) {
     currentText.value = text.substring(0, i);
-    await updateTextWidth();
-    scrollInputToCursor();
     await new Promise((resolve) => setTimeout(resolve, TYPING_SPEED));
   }
 
@@ -100,22 +79,11 @@ const typeText = async (text) => {
   // Delete the text
   for (let i = text.length; i >= 0; i--) {
     currentText.value = text.substring(0, i);
-    await updateTextWidth();
-    scrollInputToCursor();
     await new Promise((resolve) => setTimeout(resolve, DELETING_SPEED));
   }
 
   // Brief pause before next suggestion
   await new Promise((resolve) => setTimeout(resolve, 500));
-
-  isBlinking.value = true;
-};
-
-const updateTextWidth = async () => {
-  await nextTick();
-  if (textMeasure.value) {
-    textWidth.value = textMeasure.value.getBoundingClientRect().width;
-  }
 };
 
 const startTypingAnimation = async () => {
@@ -126,29 +94,8 @@ const startTypingAnimation = async () => {
   }
 };
 
-const startBlinkingCursor = () => {
-  blinkingInterval = setInterval(() => {
-    if (isBlinking.value) {
-      // Toggle cursor visibility
-      const cursor = document.querySelector(".ai-search-hero-cursor");
-      if (cursor) {
-        cursor.style.opacity = cursor.style.opacity === "0" ? "1" : "0";
-      }
-    }
-  }, CURSOR_BLINK_SPEED);
-};
-
-const scrollToSearch = (e) => {
-  e.preventDefault();
-  const searchElement = document.querySelector("form");
-  if (searchElement) {
-    searchElement.scrollIntoView({ behavior: "smooth" });
-  }
-};
-
 const selectSuggestion = (suggestion) => {
   emit("selectSuggestion", suggestion);
-  scrollToSearch({ preventDefault: () => {} });
 };
 
 const handleSearch = () => {
@@ -159,41 +106,18 @@ const handleSearch = () => {
 
 const handleInputFocus = () => {
   isFocused.value = true;
-  isBlinking.value = false;
 };
 
 const handleInputBlur = () => {
   isFocused.value = false;
-  if (!searchQuery.value) {
-    isBlinking.value = true;
-  }
 };
-
-// Watch for changes in search query to hide cursor when typing
-watch(searchQuery, (newValue) => {
-  if (newValue) {
-    isBlinking.value = false;
-  } else if (!isFocused.value) {
-    isBlinking.value = true;
-  }
-});
-
-// Watch for changes in currentText to update cursor position
-watch(currentText, () => {
-  updateTextWidth();
-});
 
 onMounted(() => {
   startTypingAnimation();
-  startBlinkingCursor();
-  updateTextWidth();
 });
 
 onUnmounted(() => {
   isTyping.value = false;
-  if (blinkingInterval) {
-    clearInterval(blinkingInterval);
-  }
 });
 </script>
 
@@ -202,7 +126,7 @@ onUnmounted(() => {
 @use "#styles/_utils/functions" as fn;
 
 .ai-search-hero {
-  background: var(--blue-400);
+  background: linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
   color: var(--monochrome-900);
   border-radius: var(--border-radius-3xl);
   min-height: max(500px, 60vh);
@@ -214,7 +138,7 @@ onUnmounted(() => {
 
   @include mq.tablet {
     padding: var(--size-72) var(--size-32);
-    background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--blue-300), var(--blue-400));
+    background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
     background-size: auto 120%, cover;
   }
 }
@@ -229,19 +153,12 @@ onUnmounted(() => {
 
 .ai-search-hero-content {
   text-align: center;
-  max-width: 800px;
+  width: 100%;
 }
 
 .ai-search-hero-title {
   margin: 0 auto var(--size-16);
 
-  .ai-search-hero-ai-text {
-    background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700;
-  }
 }
 
 .ai-search-hero-subtitle {
@@ -265,18 +182,17 @@ onUnmounted(() => {
   border: 2px solid var(--monochrome-900);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  min-width: 600px;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  min-width: 800px;
+
+  @include mq.tablet-only {
+    min-width: 600px;
+    max-width: calc(100vw - var(--size-64));
+  }
 
   @include mq.mobile-only {
-    min-width: 300px;
+    min-width: 100%;
+    max-width: calc(100vw - var(--size-40));
   }
-}
-.ai-search-hero-input-container::-webkit-scrollbar {
-  display: none;
 }
 
 .ai-search-hero-input {
@@ -303,49 +219,9 @@ onUnmounted(() => {
   }
 }
 
-.ai-search-hero-text-measure {
-  position: absolute;
-  left: var(--size-20);
-  top: 50%;
-  transform: translateY(-50%);
-  visibility: hidden;
-  pointer-events: none;
-  font-size: var(--text-lg);
-  white-space: nowrap;
-
-  @include mq.mobile-only {
-    font-size: var(--text-base);
-  }
-}
-
-.ai-search-hero-cursor {
-  color: var(--primary-600);
-  font-weight: 300;
-  transition: opacity 0.1s ease;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-
-  &.blinking {
-    animation: blink 1s infinite;
-  }
-}
-
-@keyframes blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  51%,
-  100% {
-    opacity: 0;
-  }
-}
-
-.ai-search-hero-divider {
+.ai-search-hero .ai-search-hero-divider {
   margin: var(--size-32) auto;
-  max-width: calc(100% - var(--size-32));
+  max-width: 600px;
 }
 
 .ai-search-hero-footer-links {
@@ -374,5 +250,33 @@ onUnmounted(() => {
     background-color: fn.faded-color(24%, var(--monochrome-600));
     transform: translateY(-2px);
   }
+}
+
+.o-hero-home-footer-links {
+  display: flex;
+  align-items: stretch;
+  gap: var(--size-16);
+  max-width: 600px;
+  margin: 0 auto;
+
+  @include mq.mobile-only {
+    flex-direction: column;
+  }
+}
+
+.o-hero-home-footer-link {
+  flex-grow: 1;
+  background-color: fn.faded-color(12%, var(--monochrome-600));
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: fn.faded-color(24%, var(--monochrome-600));
+    transform: translateY(-2px);
+  }
+}
+
+.ai-search-hero .o-hero-home-divider {
+  max-width: 600px;
+  margin: var(--size-32) auto;
 }
 </style>

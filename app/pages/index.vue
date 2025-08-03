@@ -59,33 +59,33 @@
           </p>
         </header>
 
-        <div class="features-showcase__grid">
+        <div class="features-showcase__grid" ref="featuresRef">
           <MoleculesFeatureTile iconName="listings/savings" title="What places actually sold for"
             subtitle="Real prices, not asking prices"
             description="Skip the guesswork. See what properties actually sold for and spot the trends that matter."
-            variant="secondary" :hasBackgroundImage="true" />
+            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="listings/flood" title="Will it flood?" subtitle="Straight answers about water"
             description="Plain English flood risk info. No confusing maps, just clear answers about staying dry."
-            variant="secondary" :hasBackgroundImage="true" />
+            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="listings/eco" title="Bills and broadband" subtitle="What you'll actually pay"
             description="Energy costs, council tax, broadband speeds. The boring but important stuff, made simple."
-            variant="secondary" :hasBackgroundImage="true" />
+            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="property/security" title="How safe is it?"
             subtitle="Real safety, not scare stories"
             description="Honest crime stats without the drama. Know what's actually happening in your potential neighbourhood."
-            variant="secondary" :hasBackgroundImage="true" />
+            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="explore/map" title="Getting around" subtitle="Your actual commute time"
             description="Tube delays, bus routes, walking times. How you'll really get to work, not the marketing version."
-            variant="secondary" :hasBackgroundImage="true" />
+            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
 
           <MoleculesFeatureTile iconName="amenities/school" title="Local schools"
             subtitle="Education without the stress"
             description="Good schools nearby? We'll show you Ofsted ratings and catchment areas in plain English."
-            variant="secondary" :hasBackgroundImage="true" />
+            variant="secondary" :hasBackgroundImage="true" :class="{ 'animate-in': isFeaturesVisible }" />
         </div>
       </div>
     </section>
@@ -193,8 +193,6 @@
       </div>
     </section>
 
-    <!-- Trending Listings -->
-
     <div class="container">
       <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </div>
@@ -219,25 +217,24 @@ const handleSuggestionSelect = (suggestion) => {
   navigateTo(`/ai-search?q=${encodeURIComponent(suggestion)}`)
 }
 
-// Intersection observer for Why Virify animations
-const highlightsRef = ref(null)
-const isVisible = ref(false)
+// Intersection observer wrapper function
+const createIntersectionObserver = () => {
+  const elementRef = ref(null)
+  const isVisible = ref(false)
 
-useIntersectionObserver(highlightsRef, ([{ isIntersecting }]) => {
-  if (isIntersecting) {
-    isVisible.value = true
-  }
-}, { threshold: 0.3 })
+  useIntersectionObserver(elementRef, ([{ isIntersecting }]) => {
+    if (isIntersecting) {
+      isVisible.value = true
+    }
+  }, { threshold: 0.3 })
 
-// Intersection observer for Trust Signals animations
-const statsCardsRef = ref(null)
-const isStatsVisible = ref(false)
+  return { elementRef, isVisible }
+}
 
-useIntersectionObserver(statsCardsRef, ([{ isIntersecting }]) => {
-  if (isIntersecting) {
-    isStatsVisible.value = true
-  }
-}, { threshold: 0.3 })
+// Create observers for each section
+const { elementRef: highlightsRef, isVisible } = createIntersectionObserver()
+const { elementRef: featuresRef, isVisible: isFeaturesVisible } = createIntersectionObserver()
+const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersectionObserver()
 
 </script>
 
@@ -245,45 +242,17 @@ useIntersectionObserver(statsCardsRef, ([{ isIntersecting }]) => {
 @use '#styles/_utils/media' as mq;
 @use '#styles/_utils/functions' as fn;
 
-// ==========================================================================
-// GLOBAL STYLES
-// ==========================================================================
-
 // Full-width hero-style background for alternating sections
 .section-hero-bg {
-  position: relative;
   background: linear-gradient(135deg, var(--monochrome-100) 0%, var(--blue-500) 60%, var(--secondary-400) 100%);
-  padding: var(--size-120) 0;
   color: var(--monochrome-900);
   margin: var(--size-60) 0;
-  padding-bottom: 160px 0;
+  padding: 80px 0;
 
   @media (max-width: 900px) {
-    padding: 160px 0;
-    // margin: var(--size-40) 0;
-  }
-}
-
-.features-showcase {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 90%);
-  padding-bottom: 150px;
-
-  @media (max-width: 900px) {
-    clip-path: none;
     padding: 80px 0;
   }
 }
-
-.trust-signals {
-  clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 90%);
-  padding: 160px 0;
-
-  @media (max-width: 900px) {
-    clip-path: none;
-    padding: 80px 0;
-  }
-}
-
 
 // Centered content with max width
 .max-width-prose {
@@ -302,28 +271,17 @@ useIntersectionObserver(statsCardsRef, ([{ isIntersecting }]) => {
   }
 }
 
-// Section spacing
-section {
-  margin: calc(var(--size-72) / 2) 0;
-  padding: calc(var(--size-72) / 2) 0;
-
-  @include mq.tablet {
-    margin: calc(var(--size-72) / 2) 0;
-    padding: calc(var(--size-72) / 2) 0;
-  }
-}
-
-// ==========================================================================
-// HOMEPAGE CONTAINER
-// ==========================================================================
-
 .homepage {
   padding-top: calc(var(--size-16) + var(--header-height));
 }
 
-// ==========================================================================
-// AI STEPPER SECTION
-// ==========================================================================
+// Default section spacing
+section {
+  margin: calc(var(--size-72) / 2) 0;
+  padding: calc(var(--size-72) / 2) 0;
+}
+
+// Stepper section
 
 .ai-stepper-section {
   padding: var(--size-40) 0;
@@ -335,11 +293,15 @@ section {
   margin-bottom: var(--size-48);
 }
 
-// ==========================================================================
-// FEATURES SHOWCASE SECTION
-// ==========================================================================
+// Features Showcase Section
 
 .features-showcase {
+  padding-bottom: 80px;
+
+  @media (max-width: 900px) {
+    padding: 80px 0;
+  }
+
   &__header {
     text-align: center;
     margin-bottom: var(--size-48);
@@ -358,12 +320,29 @@ section {
     @media (min-width: 1024px) {
       grid-template-columns: repeat(3, 1fr);
     }
+
+    // Animation styles for feature tiles
+    :deep(.feature-tile) {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease-out;
+
+      &.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    // Generate staggered delays for any number of children
+    @for $i from 1 through 20 {
+      :deep(.feature-tile:nth-child(#{$i})) {
+        transition-delay: #{$i * 0.1}s;
+      }
+    }
   }
 }
 
-// ==========================================================================
-// WHY VIRIFY SECTION
-// ==========================================================================
+// Why Virify Section
 
 .why-virify {
   text-align: center;
@@ -403,20 +382,10 @@ section {
 
     &--left {
       align-self: flex-start;
-      transition-delay: 0.1s;
-
-      &.animate-in {
-        transition-delay: 0.1s;
-      }
     }
 
     &--right {
       align-self: flex-end;
-      transition-delay: 0.3s;
-
-      &.animate-in {
-        transition-delay: 0.3s;
-      }
 
       .why-virify__content {
         text-align: right;
@@ -427,21 +396,12 @@ section {
         order: 2;
       }
     }
+  }
 
-    &:nth-child(3) {
-      transition-delay: 0.5s;
-
-      &.animate-in {
-        transition-delay: 0.5s;
-      }
-    }
-
-    &:nth-child(4) {
-      transition-delay: 0.7s;
-
-      &.animate-in {
-        transition-delay: 0.7s;
-      }
+  // Generate staggered delays for why-virify highlights
+  @for $i from 1 through 10 {
+    &__highlight:nth-child(#{$i}) {
+      transition-delay: #{$i * 0.2}s;
     }
   }
 
@@ -510,25 +470,8 @@ section {
   }
 }
 
-// ==========================================================================
-// ANIMATIONS
-// ==========================================================================
 
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// ==========================================================================
-// TRUST SIGNALS SECTION
-// ==========================================================================
+// Trust signals
 
 .trust-signals {
   text-align: center;
@@ -541,16 +484,37 @@ section {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--size-16);
-    margin: 0;
 
     @media (min-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
       gap: var(--size-20);
     }
 
     @media (min-width: 1024px) {
       grid-template-columns: repeat(4, 1fr);
       gap: var(--size-24);
+    }
+
+    // Animation styles for stats cards
+    :deep(.stats-card) {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease-out;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      &.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+  }
+
+  // Generate staggered delays for stats cards
+  @for $i from 1 through 15 {
+    &__cards :deep(.stats-card:nth-child(#{$i})) {
+      transition-delay: #{$i * 0.1}s;
     }
   }
 }

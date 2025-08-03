@@ -61,6 +61,8 @@ defineProps<Props>()
     align-items: flex-start;
     padding: var(--size-16);
     background-size: cover;
+    min-height: 100px;
+
   }
 
   &__value {
@@ -78,6 +80,29 @@ defineProps<Props>()
     padding: var(--size-16);
     color: var(--foreground-100);
     text-align: center;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Mobile layout for equal heights
+@media (max-width: 900px) {
+  .stats-card {
+
+    &__top {
+      flex: 1;
+      min-height: 80px;
+    }
+
+    &__title {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--size-16);
+    }
   }
 }
 </style>

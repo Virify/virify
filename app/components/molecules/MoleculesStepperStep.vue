@@ -38,6 +38,7 @@ const circleClass = computed(() => `stepper-step__circle--${props.variant}`)
   text-align: center;
   position: relative;
 
+
   &--active .stepper-step__circle {
     box-shadow: 0 0 0 4px var(--blue-400, #3b82f6);
   }

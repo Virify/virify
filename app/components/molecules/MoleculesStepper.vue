@@ -29,8 +29,8 @@
   &__connector {
     position: absolute;
     top: 24px;
-    left: -50vw;
-    right: -50vw;
+    left: calc(-50vw + 50%);
+    right: calc(-50vw + 50%);
     height: 4px;
     background: linear-gradient(90deg, var(--blue-400), var(--secondary-400));
     z-index: 1;
