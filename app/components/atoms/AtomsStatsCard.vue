@@ -1,5 +1,5 @@
 <template>
-  <div class="stats-card">
+  <div class="stats-card" :class="{ 'animate-in': animated }">
     <div class="stats-card__top">
       <div class="stats-card__content">
         <div v-if="iconName" class="stats-card__icon">
@@ -21,6 +21,7 @@ interface Props {
   subtitle: string
   title: string
   iconName?: string
+  animated?: boolean
 }
 
 defineProps<Props>()

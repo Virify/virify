@@ -3,6 +3,6 @@
  */
 :root {
   --header-height: 4rem;
-  --header-expanded-height: 8rem;
   --header-offset: calc(var(--header-expanded-height) - var(--header-height));
+  --header-expanded-height: 8rem;
 }
