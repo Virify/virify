@@ -285,7 +285,7 @@ useIntersectionObserver($desktopCarousel, ([entry]) => {
 
 onMounted(() => {
   window.addEventListener("scroll", parallaxCarousel, { passive: true });
-  window.addEventListener("scroll", parallaxCarousel, { passive: true });
+  // Removed duplicate event listener registration
   if (listing.value && listing.value.id) {
     trackListingView(String(listing.value.id));
   }
