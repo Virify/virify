@@ -1,5 +1,5 @@
 <template>
-  <div role="presentation" class="m-card-slots-gallery-carousel">
+  <div ref="$root" role="presentation" class="m-card-slots-gallery-carousel">
     <MoleculesCardSlotsCarousel class="m-card-slots-gallery-carousel__main" :slides />
 
     <div class="m-card-slots-gallery-carousel__thumbnails">
@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
 import type { MediaSlide } from './MoleculesCardSlotsCarousel.vue'
 
 interface Props {
@@ -23,11 +24,22 @@ interface Props {
 
 defineProps<Props>()
 
+
 /**
- *  Control hydration of carousel
+ *  Control hydration
  */
 const isActive = ref(false)
+const $root = useTemplateRef('$root')
 
+const { stop } = useIntersectionObserver($root, ([entry]) => {
+  const { isIntersecting } = asObject(entry)
+
+  isActive.value = !!isIntersecting
+})
+
+onBeforeUnmount(() => {
+  stop()
+})
 </script>
 
 <style lang="scss">
