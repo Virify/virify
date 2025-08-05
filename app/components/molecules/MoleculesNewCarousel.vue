@@ -8,16 +8,19 @@
       </div>
     </div>
 
-    <button class="m-new-carousel__button m-new-carousel__button--prev" aria-label="Previous slide"
-      @click.prevent="emblaApi?.scrollPrev">
-      <AtomsIcon icon="chevron-left" aria-hidden="true" />
-    </button>
-    <button class="m-new-carousel__button m-new-carousel__button--next" aria-label="Next slide"
-      @click.prevent="emblaApi?.scrollNext">
-      <AtomsIcon icon="chevron-right" aria-hidden="true" />
-    </button>
+    <template v-if="navigation">
+      <button class="m-new-carousel__button m-new-carousel__button--prev" aria-label="Previous slide"
+        @click.prevent="emblaApi?.scrollPrev">
+        <AtomsIcon icon="chevron-left" aria-hidden="true" />
+      </button>
 
-    <span class="m-new-carousel__currents-slide | body-2xs">
+      <button class="m-new-carousel__button m-new-carousel__button--next" aria-label="Next slide"
+        @click.prevent="emblaApi?.scrollNext">
+        <AtomsIcon icon="chevron-right" aria-hidden="true" />
+      </button>
+    </template>
+
+    <span v-if="pagination" class="m-new-carousel__currents-slide | body-2xs">
       {{ currentSlide }} of {{ slides?.length }}
     </span>
   </div>
@@ -26,16 +29,27 @@
 <script setup lang="ts">
 import { watchImmediate } from '@vueuse/core';
 import emblaCarouselVue from 'embla-carousel-vue'
-
-const [emblaRef, emblaApi] = emblaCarouselVue({
-  loop: true
-})
+import type { EmblaOptionsType } from 'embla-carousel'
 
 interface Props {
+  pagination?: boolean
+  navigation?: boolean
+  emblaOptions?: EmblaOptionsType
   slides?: any[]
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  pagination: true,
+  navigation: true,
+})
+
+/**
+ *  Set up carousel
+ */
+const [emblaRef, emblaApi] = emblaCarouselVue({
+  loop: true,
+  ...asObject(props.emblaOptions)
+})
 
 /**
  *  Track current slide
