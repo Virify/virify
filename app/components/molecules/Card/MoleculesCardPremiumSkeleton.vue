@@ -66,7 +66,7 @@
   &__carousel {
     width: 100%;
     height: auto;
-    aspect-ratio: 16/9;
+    aspect-ratio: 560 / 351;
     border-radius: var(--border-radius-2xl);
   }
 
