@@ -41,6 +41,7 @@ const thumbnailOptions: ComputedRef<EmblaOptionsType> = computed(() => {
 
   return {
     loop: true,
+    dragFree: true,
     axis
   }
 })
