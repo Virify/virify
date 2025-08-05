@@ -48,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
  */
 const [emblaRef, emblaApi] = emblaCarouselVue({
   loop: true,
+  containScroll: false,
   ...asObject(props.emblaOptions)
 })
 
