@@ -27,7 +27,7 @@ const props = defineProps<Props>()
 /**
  *  Current slide
  */
-const currentIndex = ref(1)
+const currentIndex = defineModel({ default: 1 })
 
 const currentSlide = computed(() => {
   const { slides } = asObject(props)
