@@ -10,8 +10,8 @@
       </span>
 
       <div class="m-card-template__gallery">
-        <slot name="carousel" v-bind="{ media }">
-          <MoleculesCardSlotsCarousel :slides="media" />
+        <slot name="carousel" v-bind="{ media, propertyId }">
+          <MoleculesCardSlotsCarousel :slides="media" :property-id />
         </slot>
       </div>
 

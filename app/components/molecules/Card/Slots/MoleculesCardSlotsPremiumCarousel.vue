@@ -1,6 +1,7 @@
 <template>
   <div ref="$root" role="presentation" class="m-card-slots-gallery-carousel">
-    <MoleculesCardSlotsCarousel class="m-card-slots-gallery-carousel__main" :slides v-model="currentSlide" />
+    <MoleculesCardSlotsCarousel class="m-card-slots-gallery-carousel__main" :slides v-model="currentSlide"
+      :property-id />
 
     <div ref="$thubmnails" class="m-card-slots-gallery-carousel__thumbnails" role="none">
       <template v-if="!isActive">
@@ -29,6 +30,7 @@ import type { MediaSlide } from './MoleculesCardSlotsCarousel.vue'
 import type { EmblaOptionsType } from 'embla-carousel'
 
 interface Props {
+  propertyId: number
   slides: MediaSlide[]
 }
 

@@ -4,7 +4,9 @@
       loading="lazy" />
 
     <MoleculesNewCarousel v-else :slides v-slot="{ slide }" v-model="currentIndex">
-      <nuxt-img :src="slide?.image" :alt="slide?.alt" class="m-card-slots-carousel__slide" loading="lazy" />
+      <nuxt-link :to="'/listing/' + propertyId">
+        <nuxt-img :src="slide?.image" :alt="slide?.alt" class="m-card-slots-carousel__slide" loading="lazy" />
+      </nuxt-link>
     </MoleculesNewCarousel>
   </div>
 </template>
@@ -19,6 +21,7 @@ export interface MediaSlide {
 }
 
 interface Props {
+  propertyId: number
   slides: MediaSlide[]
 }
 
