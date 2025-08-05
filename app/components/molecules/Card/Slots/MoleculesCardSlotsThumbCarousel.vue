@@ -10,7 +10,8 @@
       </template>
 
       <MoleculesNewCarousel v-else :slides :embla-options="thumbnailOptions" :pagination="false" :navigation="false"
-        class="m-card-slots-gallery-carousel__thumbnail-carousel" v-slot="{ slide, slideIndex }">
+        class="m-card-slots-gallery-carousel__thumbnail-carousel" v-model="currentThumbnail"
+        v-slot="{ slide, slideIndex }">
         <button @click.prevent="goToSlide(slideIndex)" class="m-card-slots-gallery-carousel__thumbnail-button" :class="{
           'm-card-slots-gallery-carousel__thumbnail-button--active': slideIndex === currentSlide - 1
         }">
@@ -50,10 +51,15 @@ const thumbnailOptions: ComputedRef<EmblaOptionsType> = computed(() => {
  *  Change slide
  */
 const currentSlide = ref(1)
+const currentThumbnail = ref(1)
 
 function goToSlide(newIndex: number) {
   currentSlide.value = newIndex + 1
 }
+
+watch(currentSlide, (newIndex) => {
+  currentThumbnail.value = newIndex
+})
 
 /**
  *  Control hydration
