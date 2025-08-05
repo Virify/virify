@@ -118,15 +118,8 @@ onBeforeUnmount(() => {
     height: 100%;
   }
 
-  &__thumbnail-carousel .m-new-carousel__window {
-    gap: var(--size-10);
-  }
-
-  &__thumbnail-carousel .m-new-carousel__slides {
-    flex-direction: column;
-  }
-
   &__thumbnail-button {
+    display: block;
     padding: 0;
     margin: 0;
     border: 3px solid transparent;
@@ -138,16 +131,35 @@ onBeforeUnmount(() => {
     }
   }
 
-  &__thumbnail,
+  &__skeleton-thumbnail,
+  &__thumbnail {
+    aspect-ratio: 4/3;
+  }
+
   &__skeleton-thumbnail {
     width: 100%;
     height: auto;
     flex: 1 0 auto;
-    aspect-ratio: 4/3;
   }
 
   &__thumbnail {
     display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  &__thumbnail-carousel {
+    .m-new-carousel__window {
+      gap: var(--size-10);
+    }
+
+    .m-new-carousel__slides {
+      flex-direction: column;
+    }
+
+    .m-new-carousel__slide {
+      margin: 0 0 calc(var(--size-10) - 3px);
+    }
   }
 
   @container (width < 740px) {
@@ -163,15 +175,20 @@ onBeforeUnmount(() => {
       flex-direction: row;
     }
 
-    &__thumbnail-carousel .m-new-carousel__slides {
-      flex-direction: row;
-    }
-
-    &__thumbnail,
     &__skeleton-thumbnail {
       width: calc(25% - var(--size-10));
       height: auto;
-      aspect-ratio: 4/3;
+    }
+
+    &__thumbnail-carousel {
+      .m-new-carousel__slides {
+        flex-direction: row;
+      }
+
+      .m-new-carousel__slide {
+        flex: 0 0 10ch;
+        margin: 0 calc(var(--size-10) - 3px) 0 0;
+      }
     }
   }
 
