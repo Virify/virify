@@ -30,3 +30,5 @@ logs
 # prisma
 layers/database/server/database/prisma/generated
 layers/database/server/database/prisma-ppd/generated
+*storybook.log
+storybook-static

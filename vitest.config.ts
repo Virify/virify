@@ -1,5 +1,4 @@
 import { defineVitestConfig } from '@nuxt/test-utils/config'
-import ts from 'typescript'
 
 export default defineVitestConfig({
   test: {
@@ -15,5 +14,12 @@ export default defineVitestConfig({
         }
       },
     },
+    setupFiles: ['./.storybook/vitest.setup.ts'],
+    include: [
+      'stories/**/*.test.ts',
+      'stories/**/*.spec.ts',
+      'layers/**/*.test.ts',
+      'layers/**/*.spec.ts',
+    ],
   },
 })

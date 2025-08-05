@@ -22,8 +22,13 @@
     "db:migrate": "tsx layers/seed/scripts/migrate.ts",
     "seed:address": "tsx layers/seed/scripts/extract-and-geocode-addresses.ts",
     "test": "vitest run",
+    "test:watch": "vitest",
+    "test:stories": "vitest run stories/",
+    "test:stories:watch": "vitest stories/",
     "test:full": "vitest run",
-    "start": "node .output/server/index.mjs"
+    "start": "node .output/server/index.mjs",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "prisma": {
     "schema": "./layers/database/server/database/prisma/"
@@ -36,7 +41,7 @@
     "@nuxtjs/fontaine": "0.5.0",
     "@prisma/nuxt": "^0.3.0",
     "@turf/turf": "^7.2.0",
-    "@vitejs/plugin-vue": "^5.2.3",
+    "@vitejs/plugin-vue": "^5.2.4",
     "@vue-email/components": "^0.0.21",
     "@vue-email/render": "^0.0.9",
     "@vueuse/core": "^13.1.0",
@@ -61,16 +66,28 @@
     "@faker-js/faker": "^9.7.0",
     "@nuxt/test-utils": "^3.17.2",
     "@prisma/client": "^6.12.0",
+    "@storybook/addon-docs": "^9.1.1",
+    "@storybook/addon-onboarding": "^9.1.1",
+    "@storybook/addon-vitest": "^9.1.1",
+    "@storybook/vue3-vite": "^9.1.1",
     "@types/mapbox__mapbox-gl-draw": "^1.4.8",
     "@types/pg": "^8.11.14",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^26.1.0",
     "prisma": "^6.12.0",
     "sass": "^1.87.0",
+    "storybook": "^9.1.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@vitest/browser": "3.2.4",
+    "playwright": "^1.54.2",
+    "@vitest/coverage-v8": "3.2.4"
   },
-  "pnpm": { "overrides": { "ipx": "^3.0.0" } }
+  "pnpm": {
+    "overrides": {
+      "ipx": "^3.0.0"
+    }
+  }
 }
