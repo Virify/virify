@@ -2,12 +2,14 @@
   <div ref="$root" role="presentation" class="m-card-slots-gallery-carousel">
     <MoleculesCardSlotsCarousel class="m-card-slots-gallery-carousel__main" :slides v-model="currentSlide" />
 
-    <div ref="$thubmnails" class="m-card-slots-gallery-carousel__thumbnails">
+    <div ref="$thubmnails" class="m-card-slots-gallery-carousel__thumbnails" role="none">
       <template v-if="!isActive">
-        <div v-for="i of 10" class="m-card-slots-gallery-carousel__skeleton-thumbnail | skeleton"></div>
+        <div class="m-card-slots-gallery-carousel__skeleton-thumbnails">
+          <div v-for="i of 10" class="m-card-slots-gallery-carousel__skeleton-thumbnail | skeleton"></div>
+        </div>
       </template>
 
-      <MoleculesNewCarousel :slides :embla-options="thumbnailOptions" :pagination="false" :navigation="false"
+      <MoleculesNewCarousel v-else :slides :embla-options="thumbnailOptions" :pagination="false" :navigation="false"
         class="m-card-slots-gallery-carousel__thumbnail-carousel" v-slot="{ slide, slideIndex }">
         <button @click.prevent="goToSlide(slideIndex)" class="m-card-slots-gallery-carousel__thumbnail-button" :class="{
           'm-card-slots-gallery-carousel__thumbnail-button--active': slideIndex === currentSlide - 1
@@ -38,6 +40,7 @@ const thumbnailOptions: ComputedRef<EmblaOptionsType> = computed(() => {
   const axis = isVertical.value ? 'y' : 'x'
 
   return {
+    loop: true,
     axis
   }
 })
@@ -111,11 +114,45 @@ onBeforeUnmount(() => {
   }
 
   &__thumbnails {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  /**
+   * Skeleton thumbnails
+   */
+  &__skeleton-thumbnails {
     display: flex;
     gap: var(--size-12);
     flex-direction: column;
-    overflow: hidden;
+  }
+
+  &__skeleton-thumbnail {
+    width: 100%;
+    height: auto;
+    flex: 1 0 auto;
+  }
+
+  /**
+   * Embla thumbnails
+   */
+  &__thumbnail-carousel {
     height: 100%;
+
+    .m-new-carousel__window {
+      height: 100%;
+    }
+
+    .m-new-carousel__slides {
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .m-new-carousel__slide {
+      min-height: 0;
+      flex: 0 0 auto;
+      padding: 0 0 var(--size-10);
+    }
   }
 
   &__thumbnail-button {
@@ -131,37 +168,23 @@ onBeforeUnmount(() => {
     }
   }
 
-  &__skeleton-thumbnail,
-  &__thumbnail {
-    aspect-ratio: 4/3;
-  }
-
-  &__skeleton-thumbnail {
-    width: 100%;
-    height: auto;
-    flex: 1 0 auto;
-  }
-
   &__thumbnail {
     display: block;
     width: 100%;
     height: auto;
   }
 
-  &__thumbnail-carousel {
-    .m-new-carousel__window {
-      gap: var(--size-10);
-    }
-
-    .m-new-carousel__slides {
-      flex-direction: column;
-    }
-
-    .m-new-carousel__slide {
-      margin: 0 0 calc(var(--size-10) - 3px);
-    }
+  /**
+   * All thumbnails
+   */
+  &__skeleton-thumbnail,
+  &__thumbnail {
+    aspect-ratio: 4/3;
   }
 
+  /**
+   * Containers
+   */
   @container (width < 740px) {
     grid-template-columns: 1fr;
     aspect-ratio: unset;
@@ -171,7 +194,10 @@ onBeforeUnmount(() => {
       height: auto;
     }
 
-    &__thumbnails {
+    /**
+     * Skeleton thumbnails
+     */
+    &__skeleton-thumbnails {
       flex-direction: row;
     }
 
@@ -180,14 +206,32 @@ onBeforeUnmount(() => {
       height: auto;
     }
 
+    /**
+     * Embla thumbnails
+     */
     &__thumbnail-carousel {
       .m-new-carousel__slides {
         flex-direction: row;
       }
 
       .m-new-carousel__slide {
-        flex: 0 0 10ch;
-        margin: 0 calc(var(--size-10) - 3px) 0 0;
+        flex: 0 0 20%;
+        padding: 0 var(--size-10) 0 0;
+      }
+    }
+  }
+
+  /**
+   * Smaller containers
+   */
+  @container (width < 580px) {
+    &__skeleton-thumbnail {
+      width: calc(33% - var(--size-10));
+    }
+
+    &__thumbnail-carousel {
+      .m-new-carousel__slide {
+        flex: 0 0 25%;
       }
     }
   }
