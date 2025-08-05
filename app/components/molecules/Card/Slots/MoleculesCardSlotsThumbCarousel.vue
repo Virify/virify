@@ -114,12 +114,16 @@ onBeforeUnmount(() => {
     display: flex;
     gap: var(--size-12);
     flex-direction: column;
-    overflow: auto;
+    overflow: hidden;
     height: 100%;
   }
 
   &__thumbnail-carousel .m-new-carousel__window {
     gap: var(--size-10);
+  }
+
+  &__thumbnail-carousel .m-new-carousel__slides {
+    flex-direction: column;
   }
 
   &__thumbnail-button {
@@ -156,6 +160,10 @@ onBeforeUnmount(() => {
     }
 
     &__thumbnails {
+      flex-direction: row;
+    }
+
+    &__thumbnail-carousel .m-new-carousel__slides {
       flex-direction: row;
     }
 
