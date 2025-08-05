@@ -2,7 +2,7 @@
   <div ref="$root" role="presentation" class="m-card-slots-gallery-carousel">
     <MoleculesCardSlotsCarousel class="m-card-slots-gallery-carousel__main" :slides v-model="currentSlide" />
 
-    <div class="m-card-slots-gallery-carousel__thumbnails">
+    <div ref="$thubmnails" class="m-card-slots-gallery-carousel__thumbnails">
       <template v-if="!isActive">
         <div v-for="i of 10" class="m-card-slots-gallery-carousel__skeleton-thumbnail | skeleton"></div>
       </template>
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { useIntersectionObserver } from '@vueuse/core'
+import { useIntersectionObserver, useResizeObserver } from '@vueuse/core'
 import type { MediaSlide } from './MoleculesCardSlotsCarousel.vue'
 import type { EmblaOptionsType } from 'embla-carousel'
 
@@ -34,9 +34,13 @@ defineProps<Props>()
 /**
  *  Thumbnail options
  */
-const thumbnailOptions: EmblaOptionsType = {
-  axis: 'x',
-}
+const thumbnailOptions: ComputedRef<EmblaOptionsType> = computed(() => {
+  const axis = isVertical.value ? 'y' : 'x'
+
+  return {
+    axis
+  }
+})
 
 /**
  *  Change slide
@@ -44,7 +48,6 @@ const thumbnailOptions: EmblaOptionsType = {
 const currentSlide = ref(1)
 
 function goToSlide(newIndex: number) {
-  console.log({ newIndex })
   currentSlide.value = newIndex + 1
 }
 
@@ -60,8 +63,21 @@ const { stop } = useIntersectionObserver($root, ([entry]) => {
   isActive.value = !!isIntersecting
 })
 
+/**
+ *  Control axis
+ */
+const isVertical = ref(false)
+const $thubmnails = useTemplateRef('$thubmnails')
+
+const { stop: stopResize } = useResizeObserver($thubmnails, ([entry]) => {
+  const { width } = asObject(entry?.contentRect)
+
+  isVertical.value = (width as number) < 200
+})
+
 onBeforeUnmount(() => {
   stop()
+  stopResize()
 })
 </script>
 

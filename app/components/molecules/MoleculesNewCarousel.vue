@@ -66,6 +66,18 @@ watchImmediate(currentSlide, (newSlide) => {
   emblaApi.value?.scrollTo(newSlide - 1)
 })
 
+/**
+ *  Reinit carousel when props change
+ */
+const { emblaOptions } = toRefs(props)
+
+watch(emblaOptions, (newProps) => {
+  emblaApi.value?.reInit({
+    loop: true,
+    ...asObject(newProps)
+  })
+})
+
 </script>
 
 <style lang="scss">
