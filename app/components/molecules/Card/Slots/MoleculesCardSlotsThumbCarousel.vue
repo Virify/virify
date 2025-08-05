@@ -163,6 +163,7 @@ onBeforeUnmount(() => {
     border: 3px solid transparent;
     background: none;
     overflow: hidden;
+    width: 100%;
 
     &--active {
       border-color: var(--secondary-400);
@@ -173,11 +174,14 @@ onBeforeUnmount(() => {
     display: block;
     width: 100%;
     height: auto;
+    background: var(--monochrome-300) url(/img/spinner.svg) no-repeat center;
+    background-size: var(--size-28) var(--size-28);
   }
 
   /**
    * All thumbnails
    */
+  &__thumbnail-button,
   &__skeleton-thumbnail,
   &__thumbnail {
     aspect-ratio: 4/3;
