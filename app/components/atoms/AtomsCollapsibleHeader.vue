@@ -64,17 +64,12 @@ defineEmits<{
     text-transform: capitalize;
     font-weight: 600;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--size-8);
     flex: 1;
     min-width: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    line-height: 1.2;
-    
-    .title-icon {
-      margin-top: 2px;
-    }
   }
 
   // Card variant (styled with background, border, shadow)
