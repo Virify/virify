@@ -9,7 +9,7 @@
     :aria-controls="ariaControls"
   >
     <h2 class="collapsible-header__title | body-md font-semibold">
-      <AtomsIcon v-if="icon && (variant === 'card' || variant === 'inline')" :icon="icon" :size="20" />
+      <AtomsIcon v-if="icon && (variant === 'card' || variant === 'inline')" :icon="icon" :size="20" class="title-icon" />
       <slot name="title">{{ title }}</slot>
       <ClientOnly>
         <slot name="actions"></slot>
@@ -64,10 +64,17 @@ defineEmits<{
     text-transform: capitalize;
     font-weight: 600;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--size-8);
-    flex-shrink: 0;
+    flex: 1;
     min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.2;
+    
+    .title-icon {
+      margin-top: 2px;
+    }
   }
 
   // Card variant (styled with background, border, shadow)
