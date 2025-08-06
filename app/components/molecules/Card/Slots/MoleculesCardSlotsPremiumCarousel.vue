@@ -172,6 +172,7 @@ onBeforeUnmount(() => {
     background: none;
     overflow: hidden;
     width: 100%;
+    transition: border-color var(--animation-medium);
 
     &--active {
       border-color: var(--secondary-400);
