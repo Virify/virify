@@ -1,46 +1,20 @@
 <template>
-  <button type="button" role="switch" :aria-checked="hasNote" :aria-label="tooltip" class="note-button | relative"
-    :class="{ 'has-note': hasNote }" @click="handleClick">
-    <div class="note-icon-wrapper">
-      <AtomsIcon icon="cards/notes" class="note-button-icon" />
-    </div>
-    <client-only>
-      <svg v-if="hasNote" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"
-        aria-hidden class="note-button-confetti">
-        <circle cx="45" cy="45" r="35" fill-opacity="0.5" class="root" />
-        <circle cx="12.5" cy="3.5" r="3.5" class="dot dot-1" />
-        <circle cx="14.5" cy="35.5" r="7.5" class="dot dot-2" />
-        <circle cx="25.5" cy="74.5" r="3.5" class="dot dot-3" />
-        <circle cx="80" cy="78" r="3" class="dot dot-4" />
-        <circle cx="76.5" cy="32.5" r="5.5" class="dot dot-5" />
-        <circle cx="73" cy="4" r="2" class="dot dot-6" />
-        <circle cx="70" cy="69" r="8" class="dot dot-7" />
-        <circle cx="59" cy="82" r="4" class="dot dot-8" />
-        <circle cx="26" cy="56" r="3" class="dot dot-9" />
-        <circle cx="2" cy="81" r="2" class="dot dot-10" />
-        <circle cx="31" cy="88" r="2" class="dot dot-11" />
-        <circle cx="57.5" cy="11.5" r="4.5" class="dot dot-12" />
-        <circle cx="35.5" cy="25.5" r="5.5" class="dot dot-13" />
-        <circle cx="43.5" cy="78.5" r="4.5" class="dot dot-14" />
-        <circle cx="9.5" cy="55.5" r="3.5" class="dot dot-15" />
-        <circle cx="62.5" cy="36.5" r="3.5" class="dot dot-16" />
-        <circle cx="80.5" cy="64.5" r="1.5" class="dot dot-17" />
-        <circle cx="87.5" cy="41.5" r="1.5" class="dot dot-18" />
-      </svg>
-    </client-only>
+  <button type="button" role="switch" :aria-checked="hasNote" :aria-label="tooltip"
+    class="a-note-button | relative button-none" :class="{ 'a-note-button--active': hasNote }" @click="handleClick">
+
+    <AtomsIcon icon="cards/notes" :class="iconClass" />
   </button>
 </template>
 
 <script setup lang="ts">
-import ViewsDialogNotes from '~/components/views/Dialog/ViewsDialogNotes.vue';
-import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
+import { ViewsDialogNotes, ViewsDialogLogin } from '#components'
 
-const props = defineProps({
-  listingId: {
-    type: Number,
-    required: true
-  }
-})
+interface Props {
+  listingId: number
+  iconClass?: string
+}
+
+const props = defineProps<Props>()
 
 const { hasNote: propertyHasNote } = useNotes()
 const { showDialog } = useDialog()
@@ -88,66 +62,35 @@ function handleClick() {
 </script>
 
 <style lang="scss">
-.note-button {
+.a-note-button {
+  --notes-active-color: currentColor;
+  --notes-dot-color: var(--secondary-400);
+
   position: relative;
-}
+  color: currentColor;
+  flex: 0 0;
 
-.note-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  &--active {
+    color: var(--notes-active-color);
 
-/* Base styling */
-.note-button-icon {
-  width: var(--size-32);
-  height: var(--size-32);
-  transition: all var(--animation-medium) var(--ease-out);
-  color: var(--foreground-100);
-}
-
-/* Specific styling for when note exists */
-.note-button.has-note {
-  position: relative;
-
-  .note-button-icon {
-    color: var(--foreground-100);
-    filter: drop-shadow(0 0 2px rgba(var(--primary-rgb), 0.3));
+    &::after {
+      content: '';
+      position: absolute;
+      top: calc(0px - var(--size-2));
+      right: calc(0px - var(--size-2));
+      width: var(--size-10);
+      height: var(--size-10);
+      background-color: var(--notes-dot-color);
+      border-radius: 50%;
+    }
   }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: var(--size-2);
-    right: var(--size-2);
-    width: var(--size-12);
-    height: var(--size-12);
-    background-color: var(--error);
-    border-radius: 50%;
-    border: 1px solid white;
-  }
-}
-
-.note-button-confetti {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  pointer-events: none;
-  width: 90px;
-  height: 90px;
-  transform: translate(-50%, -50%);
-  max-width: none;
-}
-
-/* Inherit the animation from parent */
-.note-button:active .note-button-icon {
-  transform: scale(0.9);
 }
 </style>
 
 <style scoped>
 circle {
   fill: var(--primary-600);
+  border: none;
 }
 
 circle.root {
