@@ -27,11 +27,13 @@
 
             <MoleculesCardSlotsPills v-if="pills.length" :pills />
           </div>
+
+          <MoleculesCardSlotsBookmark :property-id />
         </slot>
 
         <div role="presentation" class="m-card-template__footer">
           <slot name="footer" v-bind="{ user, propertyId }">
-            <MoleculesCardSlotsProfile :user :property-id />
+            <MoleculesCardSlotsProfile :user />
             <MoleculesCardSlotsButtons :property-id />
           </slot>
         </div>
@@ -270,6 +272,7 @@ const premiumFeatures = computed(() => {
   }
 
   &__content {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -292,6 +295,10 @@ const premiumFeatures = computed(() => {
   /**
    *  Default layout
    */
+  &__content-grid {
+    padding-right: var(--size-36);
+  }
+
   @container (width <=420px) {
     &__content-grid {
       margin: 0 0 var(--size-10);

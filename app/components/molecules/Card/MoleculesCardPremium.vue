@@ -27,6 +27,8 @@
           <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
         </div>
       </div>
+
+      <MoleculesCardSlotsBookmark :property-id />
     </template>
   </MoleculesCardTemplate>
 </template>
@@ -47,6 +49,7 @@ defineProps<Props>()
     align-items: center;
     gap: var(--size-16);
     padding: var(--size-8) 0;
+    padding-right: var(--size-36);
     margin: 0 auto var(--size-24);
 
     @container (width > 600px) {

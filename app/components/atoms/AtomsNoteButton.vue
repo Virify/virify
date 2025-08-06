@@ -63,7 +63,7 @@ function handleClick() {
 
 <style lang="scss">
 .a-note-button {
-  --notes-active-color: currentColor;
+  --notes-active-color: var(--secondary-400);
   --notes-dot-color: var(--secondary-400);
 
   position: relative;
