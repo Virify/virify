@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import { watchImmediate } from '@vueuse/core';
 import emblaCarouselVue from 'embla-carousel-vue'
 import type { EmblaOptionsType } from 'embla-carousel'
 
@@ -61,9 +60,11 @@ onMounted(() => {
   emblaApi.value?.on('select', ({ selectedScrollSnap }) => {
     currentSlide.value = 1 + selectedScrollSnap()
   })
+
+  emblaApi.value?.scrollTo(currentSlide.value - 1, true)
 })
 
-watchImmediate(currentSlide, (newSlide) => {
+watch(currentSlide, (newSlide) => {
   emblaApi.value?.scrollTo(newSlide - 1)
 })
 
