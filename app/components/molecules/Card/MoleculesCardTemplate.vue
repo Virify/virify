@@ -31,7 +31,7 @@
 
         <div role="presentation" class="m-card-template__footer">
           <slot name="footer" v-bind="{ user, propertyId }">
-            <MoleculesCardSlotsProfile :user />
+            <MoleculesCardSlotsProfile :user :property-id />
             <MoleculesCardSlotsButtons :property-id />
           </slot>
         </div>
