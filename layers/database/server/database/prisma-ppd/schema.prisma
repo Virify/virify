@@ -27,6 +27,7 @@ model PricePaid {
   ppd_category String?
   record_status String?
   @@index([postcode])
+  @@index([postcode, paon, street, town_city, county])
   @@index([transfer_date])
   @@index([price])
   @@map("price_paid")

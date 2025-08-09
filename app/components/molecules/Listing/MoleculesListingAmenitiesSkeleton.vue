@@ -6,12 +6,12 @@
       class="m-listing-amenities-skeleton__category"
     >
       <div class="m-listing-amenities-skeleton__category-header">
-        <h3 class="m-listing-amenities-skeleton__category-title | title-sm">
+        <h3 class="m-listing-amenities-skeleton__category-title | title-xs">
           {{ category.name }}
         </h3>
       </div>
 
-      <ul class="m-listing-amenities-skeleton__list | body-md">
+      <ul class="m-listing-amenities-skeleton__list | body-sm">
         <li
           v-for="item in category.items"
           :key="item.id"
@@ -97,7 +97,12 @@ const skeletonCategories = [
   gap: var(--size-16);
   width: 100%;
 
-  &__category {
+ &__category {
+    background: var(--background-100);
+    padding: var(--size-16);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--monochrome-600);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     &-title {
       margin: 0;
       color: var(--foreground-100);
@@ -171,7 +176,7 @@ const skeletonCategories = [
       background: linear-gradient(
         90deg,
         var(--blue-400) 25%,
-        var(--blue-300) 50%,
+        var(--background-100) 50%,
         var(--blue-400) 75%
       );
       background-size: 200% 100%;

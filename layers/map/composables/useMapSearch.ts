@@ -24,6 +24,28 @@ export function useMapSearch() {
   }
 
   /**
+   * Autocomplete for UK postcodes
+   * @param postcode The postcode to autocomplete
+   * @returns A list of matching postcode features
+   */
+  async function postcodeAutoComplete(postcode: string): Promise<GeocodingFeature[]> {
+    if (!postcode) return [];
+    try {
+      const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(postcode)}.json`, {
+        query: { 
+          key: sdk.config.apiKey,
+          country: "gb",
+          types: "postal_code",
+        },
+      });
+      return res.features ?? [];
+    } catch (e) {
+      console.error("[Map] Search error:", e);
+      return [];
+    }
+  }
+
+  /**
    * Geocodes a query and returns the best match (first result)
    * Used as fallback when user doesn't click on autocomplete suggestions
    */
@@ -149,6 +171,7 @@ export function useMapSearch() {
 
   return {
     autoComplete,
+    postcodeAutoComplete,
     geocodeAndSelectBest,
     enhanceWithBoundaryPolygon,
     findNearbyAmenities,

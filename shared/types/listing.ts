@@ -1,5 +1,6 @@
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 import type { SaleAvailabilityStatus, RentalAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
+import type { MapMarker } from "~~/shared/types/map";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {
@@ -203,4 +204,17 @@ export type ListingCardType = Prisma.ListingGetPayload<{
 export type GeoJSONPolygon = {
   type: "Polygon";
   coordinates: number[][][];
+};
+
+/**
+ * Summary card data type - alias of MapMarker to ensure they stay in sync
+ */
+export type SummaryCardData = MapMarker;
+
+/**
+ * Listing response with similar listings
+ */
+export type ListingWithSimilar = {
+  listing: ListingWithFullProperty;
+  similarListings: SummaryCardData[];
 };

@@ -4,8 +4,8 @@
   }">
     <div class="| container" role="presentation">
       <Transition name="o-listing-mobile-banner">
-        <button ref="$handle" v-show="!overviewVisible && !isExpanded" type="button"
-          class="o-listing-mobile-banner__drag-handle" aria-label="Show additional information"></button>
+        <button ref="$handle" v-show="!overviewVisible" type="button"
+          class="o-listing-mobile-banner__drag-handle" :aria-label="isExpanded ? 'Hide additional information' : 'Show additional information'"></button>
       </Transition>
 
       <Teleport to="body">
@@ -23,17 +23,43 @@
           {{ price }}
 
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            Offers in excess of
+            {{ convertRoomEnumToString(priceType!) }}
+          </AtomsPill>
+          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+            {{ convertRoomEnumToString(available!) }}
           </AtomsPill>
         </h2>
+
+        <p role="presentation" class="o-listing-mobile-banner__additional-info-address | body-md">
+          {{ address }}
+        </p>
 
         <div role="presentation">
           <h3 class="o-listing-mobile-banner__additional-info-subtitle | title-sm">At a glance</h3>
 
-          <OrganismsListingSidebarIcons class="o-listing-mobile-banner__additional-info-icons" />
+          <OrganismsListingSidebarIcons 
+            class="o-listing-mobile-banner__additional-info-icons"
+            :property-type="propertyType"
+            :bedrooms="bedrooms"
+            :bathrooms="bathrooms"
+            :receptions="receptions"
+            :other-rooms="otherRooms"
+            :rear-garden="rearGarden"
+            :front-garden="frontGarden"
+            :classification="classification"
+          />
+
+          <div class="o-listing-mobile-banner__additional-info-pills">
+            <OrganismsListingSidebarPills 
+              :property-size="propertySize"
+              :chain-free="chainFree"
+              :year-built="yearBuilt"
+              :construction-type="constructionType"
+            />
+          </div>
         </div>
 
-        <OrganismsListingAgent />
+        <OrganismsListingAgent :agent="agent" />
       </div>
 
       <div class="o-listing-mobile-banner__grid" role="presentation">
@@ -42,16 +68,16 @@
             {{ price }}
 
             <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-              Offers in excess of
+              {{ convertRoomEnumToString(priceType!) }}
             </AtomsPill>
           </h2>
 
-          <p role="presentation" class="o-listing-mobile-banner__address | body-sm">
-            123 House, Somewhere Street
+          <p role="presentation" class="o-listing-mobile-banner__address | body-md">
+            {{ address }}
           </p>
         </div>
 
-        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="4" enquire-url="#" />
+        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent" />
       </div>
     </div>
   </div>
@@ -65,9 +91,31 @@ interface Props {
   price: string
   overviewVisible?: boolean
   address?: string
+  priceType?: string
+  propertyType?: string
+  propertySize?: number
+  bedrooms?: number
+  bathrooms?: number
+  receptions?: number
+  otherRooms?: number
+  classification?: string
+  yearBuilt?: string
+  constructionType?: string
+  chainFree?: boolean | null
+  rearGarden?: boolean
+  frontGarden?: boolean
+  listingId?: number
+  agent?: {
+    username?: string | null
+    email?: string | null
+    id?: number | null
+    createdAt?: Date | String | null
+    avatar?: string | null
+  }
+  available?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   overviewVisible: true
 })
 
@@ -92,6 +140,14 @@ const additionalInfoHeight = shallowRef(0)
 const isDragging = shallowRef(false)
 const backdropIsDragging = shallowRef(false)
 
+// Auto-close when overview becomes visible again
+watch(() => props.overviewVisible, (newValue, oldValue) => {
+  if (newValue && !oldValue && isExpanded.value) {
+    // Overview just became visible and banner is expanded - auto close
+    closeExpanded()
+  }
+})
+
 // Set up dragging
 useVerticalDrag($handle, {
   onDragMounted() {
@@ -99,36 +155,78 @@ useVerticalDrag($handle, {
   },
   onDragStart() {
     isDragging.value = true
+    if (isExpanded.value) {
+      additionalInfoHeight.value = unref($additional)?.clientHeight || 0
+    }
   },
   onDrag({ relativeY }) {
-    const clampedValue = clampNumber(relativeY, { min: 0, max: DRAG_OPEN_THRESHOLD })
+    if (isExpanded.value) {
+      // Handle dragging down when expanded (to close) - exact mirror of drag up behavior
+      const clampedValue = clampNumber(-relativeY, { min: 0, max: DRAG_CLOSE_THRESHOLD })
+      const infoHeight = additionalInfoHeight.value
+      const remainingHeight = infoHeight - clampedValue
 
-    // Set styling
-    setStyle($additional, {
-      height: clampedValue + 'px',
-      opacity: clampedValue / DRAG_OPEN_THRESHOLD,
-      overflow: 'hidden'
-    })
+      // Set styling during drag
+      setStyle($additional, {
+        height: remainingHeight + 'px',
+        overflow: 'hidden'
+      })
 
-    setStyle($backdrop, {
-      opacity: clampedValue / DRAG_OPEN_THRESHOLD
-    })
+      // Auto-close when threshold reached - but let it animate smoothly
+      if (-relativeY > DRAG_CLOSE_THRESHOLD) {
+        isDragging.value = false
+        
+        // Set final closed state with smooth transition
+        setStyle($additional, {
+          height: '0px',
+          overflow: 'hidden'
+        })
+        
+        // Set expanded state after animation completes
+        setTimeout(() => {
+          isExpanded.value = false
+        }, 200) // Match animation duration
+      }
+    } else {
+      // Handle dragging up when collapsed (to open)
+      const clampedValue = clampNumber(relativeY, { min: 0, max: DRAG_OPEN_THRESHOLD })
 
-    // Open
-    if (relativeY > DRAG_OPEN_THRESHOLD) {
-      isDragging.value = false
+      // Set styling
+      setStyle($additional, {
+        height: clampedValue + 'px',
+        opacity: clampedValue / DRAG_OPEN_THRESHOLD,
+        overflow: 'hidden'
+      })
 
-      openExpanded()
+      setStyle($backdrop, {
+        opacity: clampedValue / DRAG_OPEN_THRESHOLD
+      })
+
+      // Open
+      if (relativeY > DRAG_OPEN_THRESHOLD) {
+        isDragging.value = false
+        openExpanded()
+      }
     }
   },
   onDragEnd({ relativeY }) {
     isDragging.value = false
 
-    if (relativeY > DRAG_OPEN_THRESHOLD) {
-      return openExpanded()
-    }
+    if (isExpanded.value) {
+      // Handle drag end when expanded (closing) - reverse of opening logic
+      if (-relativeY > DRAG_CLOSE_THRESHOLD) {
+        return closeExpanded()
+      }
+      
+      openExpanded()
+    } else {
+      // Handle drag end when collapsed (opening)
+      if (relativeY > DRAG_OPEN_THRESHOLD) {
+        return openExpanded()
+      }
 
-    closeExpanded()
+      closeExpanded()
+    }
   }
 })
 
@@ -231,16 +329,23 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
 .o-listing-mobile-banner {
   position: fixed;
   bottom: 0;
+  bottom: env(safe-area-inset-bottom, 0);
   left: 0;
   z-index: 5;
   width: 100%;
   background: var(--background-100);
   border-top: 1px solid var(--border-color-200);
   padding: var(--size-12) 0;
+  padding-bottom: calc(var(--size-12) + env(safe-area-inset-bottom, 0));
   display: flex;
   flex-direction: column;
   gap: var(--size-10);
   transition: border-radius var(--animation-slow) var(--ease-out);
+  
+  // Fix for dynamic viewport issues on mobile browsers
+  @supports (height: 100dvh) {
+    bottom: max(0px, env(safe-area-inset-bottom, 0));
+  }
 
   &--expanded {
     border-top-right-radius: var(--border-radius-3xl);
@@ -274,6 +379,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
       border-radius: var(--border-radius-pill);
     }
   }
+
 
   &__additional-info {
     box-sizing: border-box;
@@ -309,15 +415,37 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
     }
   }
 
+  &__additional-info-address {
+    color: var(--secondary-400);
+    margin: var(--size-8) 0;
+    text-align: center;
+    font-weight: 500;
+  }
+
   &__additional-info-icons {
     height: fit-content;
 
     @include mq.not-tablet {
       padding: var(--size-12) var(--size-16);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
 
       .o-listing-sidebar-icons__row {
         justify-content: center;
       }
+    }
+  }
+
+  &__additional-info-pills {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--size-12);
+
+    .sidebar-pills {
+      justify-content: center;
+      text-align: center;
     }
   }
 
@@ -329,6 +457,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
     height: 100%;
     z-index: 4;
     touch-action: none;
+    border: none;
     background: light-dark(#{ fn.faded-color(30%, var(--monochrome-100))},
       #{ fn.faded-color(70%, var(--monochrome-100))});
   }
@@ -358,6 +487,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
     justify-content: center;
     gap: var(--size-10);
     margin: 0;
+    color: var(--foreground-100);
 
     @include mq.tablet {
       justify-content: flex-start;
@@ -366,6 +496,11 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
         display: none;
       }
     }
+  }
+
+  &__title-offertype {
+    background: var(--blue-400);
+    color: var(--monochrome-900);
   }
 
   &__address {

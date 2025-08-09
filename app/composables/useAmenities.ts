@@ -1,19 +1,3 @@
-import { useStorage } from '@vueuse/core'
-  // Collapsed state for amenities categories (persisted)
-  const collapsedCategories = useStorage<Record<string, boolean>>('amenities-collapsed', {
-    schools: false,
-    hospitals: false,
-    train_stations: false
-  })
-
-  function isCategoryCollapsed(category: string) {
-    return !!collapsedCategories.value[category]
-  }
-
-  function setCategoryCollapsed(category: string, collapsed: boolean) {
-    collapsedCategories.value[category] = collapsed
-  }
-
 // Global state for amenities (singleton pattern)
 const globalAmenities = ref({
   schools: [] as Array<{ name: string; distance: number; type: string }>,
@@ -89,7 +73,11 @@ export function useAmenities() {
    */
   async function checkExistingAmenities(propertyId: number) {
     try {
-      const response = await $fetch(`/api/amenities/${propertyId}`)
+      const response = await $fetch<{
+        exists: boolean
+        amenities: any[]
+        lastUpdated: string | null
+      }>(`/api/amenities/${propertyId}`)
       if (response.exists && response.amenities) {
         return response.amenities
       }
@@ -168,7 +156,5 @@ export function useAmenities() {
     fetchAmenities,
     formatDistance,
     resetAmenities,
-    isCategoryCollapsed,
-    setCategoryCollapsed
   }
 }

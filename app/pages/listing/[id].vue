@@ -1,10 +1,6 @@
 <template>
-  <main>
-    <div v-if="status === 'pending'">
-      <h1>Loading...</h1>
-    </div>
-
-    <div v-else class="p-listing" role="presentation">
+  <main class="p-listing">
+    <div class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
         <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
           <MoleculesImageGallery v-if="!isDesktop && galleryImages.length > 0" :images="galleryImages"
@@ -23,60 +19,85 @@
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
-            :address="fullAddress" />
+            :address="address" :price-type="priceType" :property-type="property?.type?.name"
+            :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+            :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+            :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+            :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
+            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
-            <OrganismsListingGeneralInfo :description="property?.description || undefined" />
+            <AtomsListingGeneralInfo :description="property?.description || undefined" />
+          </div>
 
+          <div v-if="listing && property" class="p-listing__section">
+            <MoleculesListingEssentials :listing="listing" :property="property" />
+          </div>
 
-            <div v-if="property" class="p-listing__section">
-              <MoleculesListingItemDetails v-if="property?.bedroomFeatures" 
-                :items="property?.bedroomFeatures" 
-                type="room" 
-                subtype="Bedroom" 
-                title="Bedrooms" />
-              <MoleculesListingItemDetails v-if="property?.bathroomFeatures" 
-                :items="property?.bathroomFeatures" 
-                type="room" 
-                subtype="Bathroom" 
-                title="Bathrooms" />
-              <MoleculesListingItemDetails v-if="property?.kitchenFeatures" 
-                :items="property?.kitchenFeatures" 
-                type="room" 
-                subtype="Kitchen" 
-                title="Kitchen" />
-              <MoleculesListingItemDetails v-if="property?.reception" 
-                :items="property?.reception" 
-                type="room" 
-                subtype="Reception" 
-                title="Receptions" />
-              <MoleculesListingItemDetails v-if="property?.otherRoom" 
-                :items="property?.otherRoom" 
-                type="room" 
-                subtype="Other Rooms" 
-                title="Other Rooms" />
-            </div>
+          <div v-if="property" class="p-listing__section">
+            <h2 class="title-md">Rooms</h2>
+            <MoleculesListingItemDetails v-if="property?.bedroomFeatures" :items="property?.bedroomFeatures" type="room"
+              subtype="Bedroom" title="Bedrooms" />
+            <MoleculesListingItemDetails v-if="property?.bathroomFeatures" :items="property?.bathroomFeatures"
+              type="room" subtype="Bathroom" title="Bathrooms" />
+            <MoleculesListingItemDetails v-if="property?.kitchenFeatures" :items="property?.kitchenFeatures" type="room"
+              subtype="Kitchen" title="Kitchen" />
+            <MoleculesListingItemDetails v-if="property?.reception" :items="property?.reception" type="room"
+              subtype="Reception" title="Receptions" />
+            <MoleculesListingItemDetails v-if="property?.otherRoom" :items="property?.otherRoom" type="room"
+              subtype="Other Rooms" title="Other Rooms" />
+            <MoleculesListingItemDetails v-if="property?.rearGarden || property?.frontGarden"
+              :items="getGardenItems(property)" type="garden" title="Gardens" :show-floor="false" />
+          </div>
 
-            <div v-if="property?.rearGarden || property?.frontGarden" class="p-listing__section">
-              <MoleculesListingItemDetails 
-                :items="getGardenItems(property)" 
-                type="garden" 
-                title="Gardens" 
-                :show-floor="false" />
-            </div>
+          <!-- Energy & Utilities -->
+          <div v-if="property?.energyAndUtilities" class="p-listing__section">
+            <MoleculesListingEnergyUtilities :energy-data="property.energyAndUtilities"
+              :postcode="property?.address?.postcode" />
+          </div>
 
-            <div v-if="property" class="p-listing__section">
-              <h2 class="title-md">Additional Details</h2>
-              <div class="p-listing__features-list">
-                <MoleculesListingFeatures v-if="property?.parking" title="Parking" :features="property?.parking" />
-                <MoleculesListingFeatures v-if="property?.accessibilityFeatures" title="Accessibility" :features="property?.accessibilityFeatures" />
-                <MoleculesListingFeatures v-if="property?.utility" title="Utility" :features="property?.utility" />
-                <MoleculesListingFeatures v-if="property?.securityFeatures" title="Security" :features="property?.securityFeatures" />
-                <MoleculesListingFeatures v-if="property?.storageFeatures" title="Storage" :features="property?.storageFeatures" />
-                <MoleculesListingFeatures v-if="property?.additionalFeatures" title="Additional Features" :features="property?.additionalFeatures" />
+          <div v-if="property" class="p-listing__section">
+            <h2 class="title-md">Additional Details</h2>
+            <div class="p-listing__features-list">
+              <div class="p-listing__features-column">
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.parking)" title="Parking"
+                  :features="property?.parking" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.utility)" title="Utility"
+                  :features="property?.utility" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.storageFeatures)" title="Storage"
+                  :features="property?.storageFeatures" />
+                <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
+                  :broadband-type="property.energyAndUtilities.broadbandType"
+                  :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
+                  :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.additionalFeatures)"
+                  title="Additional Features" :features="property?.additionalFeatures" />
+              </div>
+              <div class="p-listing__features-column">
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.accessibilityFeatures)"
+                  title="Accessibility" :features="property?.accessibilityFeatures" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.securityFeatures)" title="Security"
+                  :features="property?.securityFeatures" />
+                <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)"
+                  title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
+                <MoleculesListingMobileCoverage />
               </div>
             </div>
+          </div>
+
+          <!-- Price Paid History -->
+          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
+            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
+              number: property.address.number,
+              flat: property.address.flat,
+              street: property.address.street,
+              city: property.address.city,
+              postcode: property.address.postcode,
+              county: property.address.county,
+            }" />
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
@@ -85,7 +106,17 @@
               :listing="listing" :amenities="amenitiesArray" />
           </div>
 
+          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+            <OrganismsListingCrimeScore :lat="property.address.lat" :lon="property.address.lon" />
+          </div>
 
+          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+            <MoleculesListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
+          </div>
+
+          <div class="p-listing__section">
+            <MoleculesListingAdvert />
+          </div>
         </div>
 
         <div class="p-listing__sidebar" role="presentation">
@@ -98,48 +129,73 @@
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="fullAddress"
-            :property-type="property?.type?.name" :property-size="property?.size || undefined"
+          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="address"
+            :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
             :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
             :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
             :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
-            :chain-free="property?.chainFree" :vacant="property?.vacant" :has-image-slide="!isImagesVisible"
-            :agent="listing?.user || {}" />
+            :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
+            :agent="listing?.user || {}"
+            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
         </div>
       </div>
     </div>
 
     <!-- Image Gallery Modal -->
-    <MoleculesImageGalleryModal v-if="showImageModal" :images="galleryImages" :initial-index="modalImageIndex"
+    <MoleculesImageGalleryModal :images="galleryImages" :show="showImageModal" :initial-index="modalImageIndex"
       @close="closeImageModal" />
 
     <client-only>
-      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible" />
+      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
+        :price-type="priceType" :address="address" :property-type="property?.type?.name"
+        :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
+        :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+        :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+        :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+        :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+        :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
+        :agent="listing?.user || {}"
+        :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
     </client-only>
   </main>
+  <!-- Similar Listings -->
+  <div class="p-listing | container">
+    <OrganismsRelevantListings type="similar" :listing-id="String(route.params?.id)" :address="similarListingsAddress" />
+  </div>
+
 </template>
 
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
 import breakpoints from "#styles/_utils/breakpoints.module.scss";
+import { hasBooleanFeatures, filterListingFeatures } from "~/utils/listing/filter-listing-features";
 
 const route = useRoute();
 
 /**
  *  Fetch listing
  */
-const { data: listing, status } = await useAsyncData(
-  "listing",
+const { data: listingData, status } = await useAsyncData(
+  `listing-${route.params?.id}`,
   () => {
-    return $fetch<ListingWithFullProperty>(`/api/listing/${route.params?.id}`);
+    return $fetch<{ listing: any }>(`/api/listing/${route.params?.id}`);
   },
   {
     deep: false,
   }
 );
 
+const listing = computed(() => listingData.value?.listing);
+
+const similarListingsAddress = computed(() => {
+  return listing.value?.property?.address ? {
+    street: listing.value.property.address.street,
+    city: listing.value.property.address.city,
+    postcode: listing.value.property.address.postcode,
+  } : {};
+});
 /**
  *  Content
  */
@@ -150,10 +206,15 @@ const priceFormatted = computed(() => {
   return isNumber(price) ? numberToCurrency(price) : "";
 });
 
-
-const fullAddress = computed(() => {
-  return property.value?.address?.fullAddress || "No address provided";
+/** omit street number */
+const address = computed(() => {
+  return property.value?.address ? `${property.value.address.street || ""}, ${property.value.address.city || ""}, ${property.value.address.postcode || ""}`.trim() : "";
 });
+
+const priceType = computed(() => {
+  return listing.value?.saleListing ? listing.value.saleListing.priceType : listing.value?.rentalListing?.rentFrequency;
+});
+
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {
@@ -166,10 +227,10 @@ const amenitiesArray = computed(() => {
 const getGardenItems = (property: any) => {
   const gardens = [];
   if (property?.frontGarden) {
-    gardens.push({ ...property.frontGarden, gardenType: 'front' });
+    gardens.push({ ...property.frontGarden, gardenType: "front" });
   }
   if (property?.rearGarden) {
-    gardens.push({ ...property.rearGarden, gardenType: 'rear' });
+    gardens.push({ ...property.rearGarden, gardenType: "rear" });
   }
   return gardens;
 };
@@ -254,6 +315,16 @@ function openImageModal(imageIndex: number) {
 function closeImageModal() {
   showImageModal.value = false;
 }
+
+
+
+onMounted(() => {
+  window.addEventListener("scroll", parallaxCarousel, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", parallaxCarousel);
+});
 </script>
 
 <style lang="scss">
@@ -268,6 +339,7 @@ ul {
 
 .p-listing {
   margin-top: var(--size-32);
+
 
   &__grid {
     display: grid;
@@ -320,7 +392,7 @@ ul {
       display: block;
       position: sticky;
       top: calc(var(--header-height) + var(--size-32));
-      max-height: calc(100dvh - var(--header-height));
+      max-height: calc(100dvh - var(--header-height) - var(--size-32) - var(--size-16));
       overflow: auto;
       overscroll-behavior: contain;
       scrollbar-width: thin;
@@ -336,7 +408,6 @@ ul {
       }
     }
   }
-
 
   /**
    *  Images
@@ -405,8 +476,9 @@ ul {
 }
 
 .p-listing__section {
-  margin: var(--size-32) 0;
-  
+  padding: var(--size-16) 0;
+  margin-left: var(--size-2);
+
   @include mq.notebook {
     margin-right: var(--size-24);
   }
@@ -414,15 +486,27 @@ ul {
 
 .p-listing__features-list {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: var(--size-16);
   margin-top: var(--size-16);
-  align-items: start;
+  align-items: flex-start;
 
   @include mq.mobile-only {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: var(--size-12);
   }
 }
+
+.p-listing__features-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+
+  @include mq.mobile-only {
+    gap: var(--size-12);
+    width: 100%;
+  }
+}
+
 </style>

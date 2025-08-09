@@ -3,19 +3,33 @@
     <AtomsNoteButton class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
     <AtomsFavouriteButton class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
 
-    <nuxt-link :to="enquireUrl" class="o-listing-buttons__enquire | button button-secondary button-full">
-      Enquire now
-    </nuxt-link>
+    <button 
+      class="o-listing-buttons__enquire | button button-secondary button-full"
+      :disabled="enquiryState.isDisabled"
+      @click="() => handleEnquiryClick(listingId, agent?.id)"
+    >
+      {{ enquiryState.label }}
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
   listingId: number
-  enquireUrl: string
+  agent?: {
+    username?: string | null
+    email?: string | null
+    id?: number | null
+    createdAt?: Date | String | null
+    avatar?: string | null
+  }
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const { getEnquiryState, handleEnquiryClick } = useEnquiry()
+
+const enquiryState = computed(() => getEnquiryState(props.listingId, props.agent?.id))
 </script>
 
 <style lang="scss">

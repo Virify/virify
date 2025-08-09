@@ -1,20 +1,21 @@
 <template>
   <div class="feature-card" @click="toggleCollapse">
-    <div class="feature-card__content | body-sm">
+    <div class="feature-card__content | body-md">
       <!-- Title row with icon, title, info button, and collapse arrow -->
-      <div class="feature-card__title-row | font-semibold">
-        <div class="feature-card__title-wrapper">
-          <AtomsIcon :icon="getFeatureIcon(title)" :size="20" />
-          {{ title }}
-          <button v-if="features?.description" @click.stop="toggleDescription($event)" 
+      <AtomsCollapsibleHeader
+        :is-collapsed="isCollapsed"
+        :icon="getFeatureIcon(title)"
+        :title="title"
+        variant="inline"
+        @toggle="() => {}"
+      >
+        <template #actions>
+          <button v-if="features?.description" @click.stop="openDescription($event)" 
             class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${title}`">
             <AtomsIcon icon="property/info" :size="16" />
           </button>
-        </div>
-        <div class="feature-card__collapse-btn" :class="{ 'expanded': !isCollapsed }">
-          <AtomsIcon icon="chevron-down" :size="18" />
-        </div>
-      </div>
+        </template>
+      </AtomsCollapsibleHeader>
 
       <!-- Size and features row (collapsible) -->
       <div v-show="!isCollapsed" class="feature-card__details-row">
@@ -36,18 +37,15 @@
   </div>
 
   <!-- Description modal -->
-  <Teleport to="body">
-    <div v-if="showDescription && features?.description" class="modal" :style="modalPosition" @click.stop>
-      <p class="| body-xs">{{ features.description }}</p>
-      <button @click="closeDescription" class="modal__close" type="button" aria-label="Close description">
-        <AtomsIcon icon="property/close" :size="14" />
-      </button>
-    </div>
-  </Teleport>
+  <AtomsInfoModal 
+    :show="showDescription" 
+    :content="features?.description || ''" 
+    :position="modalPosition"
+    @close="closeDescription"
+  />
 </template>
 
 <script setup lang="ts">
-import { convertEnumToString } from '~/utils/listing/room-config';
 
 interface Props {
   title: string;
@@ -65,7 +63,7 @@ const filteredFeatures = computed(() => {
   Object.entries(props.features).forEach(([key, value]) => {
     // Skip non-boolean properties or specific properties we handle separately
     if (typeof value === 'boolean' && value === true && key !== 'description' && key !== 'size') {
-      features.push(convertEnumToString(key));
+      features.push(convertRoomEnumToString(key));
     }
   });
 
@@ -77,7 +75,9 @@ const isCollapsed = ref(true);
 
 // Description modal state
 const showDescription = ref(false);
-const modalPosition = ref({});
+const { modalPosition, openModal, closeModal } = useInfoModal(() => {
+  showDescription.value = false;
+});
 
 // Helper function to get feature icon based on title
 const getFeatureIcon = (title: string): string => {
@@ -91,28 +91,14 @@ const formattedSize = computed(() => {
 });
 
 // Description modal methods
-const toggleDescription = (event: Event) => {
-  if (showDescription.value) {
-    closeDescription();
-    return;
-  }
-
-  const button = event.target as HTMLElement;
-  const rect = button.getBoundingClientRect();
-
-  modalPosition.value = {
-    position: 'fixed',
-    top: `${rect.bottom + 8}px`,
-    left: `${rect.left - 200}px`, // Position to the left of the icon
-    zIndex: 1000
-  };
-
+const openDescription = (event: MouseEvent) => {
   showDescription.value = true;
+  openModal(event, -200, 8);
 };
 
 const closeDescription = () => {
   showDescription.value = false;
-  modalPosition.value = {};
+  closeModal();
 };
 
 // Collapse toggle
@@ -120,20 +106,6 @@ const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
-// Close modal on escape key
-onMounted(() => {
-  const handleEscape = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && showDescription.value) {
-      closeDescription();
-    }
-  };
-
-  document.addEventListener('keydown', handleEscape);
-
-  onUnmounted(() => {
-    document.removeEventListener('keydown', handleEscape);
-  });
-});
 </script>
 
 <style lang="scss">
@@ -154,23 +126,12 @@ onMounted(() => {
     width: 100%;
   }
 
-  &__title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-transform: capitalize;
-  }
-
-  &__title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: var(--size-8);
-  }
 
   &__details-row {
     display: flex;
     align-items: center;
     gap: var(--size-16);
+    margin-top: var(--size-8);
   }
 
   &__size {
@@ -183,10 +144,9 @@ onMounted(() => {
     display: flex;
     align-items: flex-start;
     gap: var(--size-4);
-    flex: 1;
-    margin-top: var(--size-8);
 
     .a-icon {
+      margin-top: 3px;
       flex-shrink: 0;
     }
   }
@@ -202,55 +162,11 @@ onMounted(() => {
     }
   }
 
-  &__collapse-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-
-    &.expanded .a-icon {
-      transform: rotate(180deg);
-    }
-  }
 
   .a-icon {
-    width: 22px;
-    height: 22px;
     color: var(--foreground-200);
-  }
-}
-
-.modal {
-  background: var(--background-100);
-  border: 1px solid var(--monochrome-600);
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 250px;
-  max-width: 300px;
-  padding: var(--size-12);
-  position: relative;
-
-  p {
-    margin: 0;
-    line-height: 1.4;
-    padding-right: var(--size-20);
-  }
-
-  &__close {
-    position: absolute;
-    top: var(--size-8);
-    right: var(--size-8);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--size-2);
-    border-radius: var(--border-radius-sm);
-    color: var(--foreground-200);
-
-    &:hover {
-      background-color: var(--background-200);
-      color: var(--foreground-100);
-    }
+    width: auto;
+    height: auto;
   }
 }
 </style>
