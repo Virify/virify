@@ -82,7 +82,8 @@ const propertyFeatures = [
   { group: 'additionalFeatures', key: "petFriendly", label: "Pet-friendly", isDefault: false },
   { group: 'parking', key: "garage", label: "Garage", isDefault: false },
   { group: 'parking', key: "evCharging", label: "EV Charging", isDefault: false },
-  { group: 'outdoorSpace', key: "garden", label: "Garden", isDefault: false },
+  { group: 'rearGarden', key: "garden", label: "Garden", isDefault: false },
+  { group: 'frontGarden', key: "garden", label: "Garden", isDefault: false },
   { group: 'accessibilityFeatures', key: "wheelchairFriendly", label: "Accessible", isDefault: false },
 ];
 

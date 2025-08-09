@@ -1,10 +1,12 @@
 <template>
   <div class="| flow">
-    <h2 class="| title-md">AI filters</h2>
+    <MoleculesAiSearchLoading v-if="isLoading" />
 
-    <div v-if="isLoading">Loading...</div>
+    <template v-else>
+      <h2 class="| title-md">AI filters</h2>
 
-    <MoleculesAiSearchFormFilters v-else :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
+      <MoleculesAiSearchFormFilters :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
+    </template>
   </div>
 </template>
 

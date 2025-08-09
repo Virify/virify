@@ -84,10 +84,13 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
 
-.ai-search-map-view {
-  position: relative;
+:where(.ai-search-map-view) {
   width: 100%;
   height: 100%;
+}
+
+.ai-search-map-view {
+  position: relative;
   overflow: hidden;
 
   &__overlay {
@@ -96,7 +99,7 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1000;
+    z-index: 2;
     pointer-events: none;
     display: flex;
     align-items: center;

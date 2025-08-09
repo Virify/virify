@@ -3,18 +3,15 @@
     'p-dock--has-grid': showGrid
   }">
     <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap" :class="{
-      '| container container-lg': showGrid
+      '| container': showGrid
     }">
       <template #left v-if="showGrid">
-        <MoleculesAiSearchLoading v-if="isLoading" :last-search-query="lastSearchQuery" />
-        <MoleculesAiSearchNoResults v-else-if="!results.length" :last-search-query="lastSearchQuery" />
-
-        <OrganismsAiSearchResults v-else :results="results" :query-analysis="queryAnalysis"
-          :total-results="results.length" />
+        <OrganismsResults v-if="isLoading || results.length" :results :is-loading />
+        <MoleculesAiSearchNoResults v-else :last-search-query="lastSearchQuery" />
       </template>
 
       <template #right v-if="showMap">
-        <OrganismsAiSearchMapView class="p-dock__map" :results :is-searching="isLoading" />
+        <LazyOrganismsAiSearchMapView class="p-dock__map" :results :is-searching="isLoading" :radius :location />
       </template>
     </OrganismsPaneSlider>
 
@@ -59,7 +56,7 @@ const { lastSearchQuery, updateSort } = useAiSearchPage()
 /**
  *  Handle searches
  */
-const { location, radius, sortBy, query, queryAnalysis } = toRefs(searchState.value)
+const { location, radius, sortBy, query, viewMode } = toRefs(searchState.value)
 const { setPendingWhile } = usePending()
 const { aiSearch } = useAiSearchPage();
 
@@ -93,6 +90,15 @@ watch(sortBy, (newValue) => {
   // updateSort(newValue)
 })
 
+watch(viewMode, (layout) => {
+  if (layout !== 'map') return
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'instant'
+  })
+})
+
 /**
  *  Ensure missing results do not break the map
  */
@@ -122,7 +128,6 @@ const results = computed(() => {
 
   &__map {
     width: 100%;
-    background: var(--monochrome-400);
     overflow: hidden;
     height: calc(100vh - var(--header-height));
   }

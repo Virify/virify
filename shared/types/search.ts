@@ -27,6 +27,7 @@ export interface SearchResult {
     numberBedrooms?: number | null
     numberBathrooms?: number | null
     numberReceptions?: number | null
+    numberOtherRooms?: number | null
     size?: number | null
     yearBuilt?: string | null
     chainFree?: boolean
@@ -54,13 +55,12 @@ export interface SearchResult {
     amenities?: any[]
     additionalFeatures?: any
     accessibilityFeatures?: any
-    diningroomFeatures?: any
     kitchenFeatures?: any
-    livingAreaFeatures?: any
     reception?: any
+    otherRooms?: any
     utility?: any
-    additionalToilet?: any
-    outdoorSpace?: any
+    frontGarden?: any
+    rearGarden?: any
     energyAndUtilities?: any
     securityFeatures?: any
     storageFeatures?: any

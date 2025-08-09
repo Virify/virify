@@ -7,7 +7,6 @@ model Listing {
   listingTier          ListingTier
   listingStartDate     DateTime?
   listingEndDate       DateTime?
-  contactMethod        ContactMethod[]
   viewingOptions       String?
   verificationLevel    VerificationLevel?
   rentalListing        RentalListing?
@@ -39,13 +38,6 @@ enum ListingTier {
   BASIC
   PREMIUM
   FEATURED
-}
-
-enum ContactMethod {
-  CALL
-  EMAIL
-  WHATSAPP
-  LIVE_CHAT
 }
 
 enum VerificationLevel {
