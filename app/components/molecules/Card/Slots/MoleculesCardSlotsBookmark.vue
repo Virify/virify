@@ -24,7 +24,7 @@ defineProps<Props>()
   display: flex;
   flex-direction: column;
   gap: var(--size-6);
-  color: #{ fn.faded-color(33%, var(--card-foreground)) };
+  color: #{ fn.faded-color(40%, var(--card-foreground)) };
 
   .a-favourite-button,
   .a-note-button {
