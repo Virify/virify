@@ -33,8 +33,8 @@
 
         <div role="presentation" class="m-card-template__footer">
           <slot name="footer" v-bind="{ user, propertyId }">
-            <MoleculesCardSlotsProfile :user />
-            <MoleculesCardSlotsButtons :property-id />
+            <MoleculesCardSlotsProfile :user :property-id />
+            <MoleculesCardSlotsButtons :user-id="user.id" :property-id />
           </slot>
         </div>
       </div>
@@ -75,7 +75,7 @@ const media = computed(() => {
 const user = computed(() => {
   const { user } = asObject(props.result)
 
-  return user
+  return asObject(user)
 })
 
 const propertyId = computed(() => {

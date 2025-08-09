@@ -5,14 +5,14 @@
       View
     </MoleculesCardSlotsViewLink>
 
-    <AtomsButton class="m-card-slots-buttons__button m-card-slots-buttons__button--enquire | button-sm button-full">
-      Enquire
-    </AtomsButton>
+    <AtomsEnquireButton :listing-id="propertyId" :user-id="userId"
+      class="m-card-slots-buttons__button m-card-slots-buttons__button--enquire | button button-sm button-full" />
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
+  userId: number
   propertyId: number
 }
 
