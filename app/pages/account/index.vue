@@ -1,59 +1,57 @@
 <template>
-  <!-- Middle Column - Main Content -->
-  <div class="account-profile-content | container">
-    <div v-if="loggedIn">
-      <h2 class="title-sm">Weclome back, {{ user?.firstName ?? user?.username }}!</h2>
-      <!-- Analytics Dashboard -->
-      <div class="analytics-dashboard">
-        <div class="analytics-card | box">
-          <h3 class="| title-xs">Total Listings Views</h3>
-          <p class="| title-lg text-primary-500">{{ analytics?.totalViews }}</p>
-          <p class="| body-xs">+{{ analytics?.percentageChange }}% from last month</p>
-        </div>
-        <div class="analytics-card | box">
-          <h3 class="| title-xs">Listings Favourited</h3>
-          <p class="| title-lg text-primary-500">{{ analytics?.favoritedByOthersCount }}</p>
-          <p class="| body-xs">Listings saved by users</p>
-        </div>
-        <div class="analytics-card | box">
-          <h3 class="| title-xs">Total Enquiries</h3>
-          <p class="| title-lg text-primary-500">{{ analytics?.totalConversations }}</p>
-          <p class="| body-xs">Enquiries on your listings</p>
-        </div>
+  <div class="dashboard | container">
+    <OrganismsNavigation />
+
+    <main class="main">
+      <div class="analytics-section">
+        <slot name="analytics">
+          <AtomsStatsCard :value="String(analytics?.totalViews || 0)"
+            :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views"
+            :animated="true" />
+          <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users"
+            title="Listings Favourited" :animated="true" />
+          <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings"
+            title="Total Enquiries" :animated="true" />
+        </slot>
       </div>
 
-      <!-- notifications -->
-      <div class="account-notifications">
-        <h3 class="title-sm">Notifications</h3>
-        <div class="box-xl | box">
-          <p class="body-md">You have no new notifications.</p>
-        </div>
+      <div class="content-section">
+        <slot name="content">
+          <OrganismsRecentCard :is-collapsed="isViewedCollapsed" @toggle="isViewedCollapsed = !isViewedCollapsed"
+            title="Recently Viewed Listings" icon="search" :items="recentlyViewedListings" variant="blue"
+            icon-name="search" empty-message="No recent views yet." />
+        </slot>
       </div>
 
-      <!-- activity -->
-      <div class="account-activity">
-        <h3 class="title-sm">Recent Activity</h3>
-        <div class="box-xl | box">
-          <p class="body-md">{{ recentlyViewedListings }}</p>
-        </div>
+      <div class="content-section">
+        <slot name="content">
+          <OrganismsRecentCard :is-collapsed="isFavouritesCollapsed"
+            @toggle="isFavouritesCollapsed = !isFavouritesCollapsed" title="Recently Favourited Listings"
+            icon="cards/favourite" :items="recentFavourites" variant="secondary" icon-name="cards/favourite-filled"
+            empty-message="No recent favourites yet." />
+        </slot>
       </div>
 
-      <!-- recent favourites -->
-      <div class="account-favourites">
-        <h3 class="title-sm">Recent Favourites</h3>
-        <div class="box-xl | box">
-          <p class="body-md">{{ recentFavourites }}</p>
-        </div>
+      <div class="content-section">
+        <slot name="content">
+          <OrganismsRecentCard :is-collapsed="isNotesCollapsed" @toggle="isNotesCollapsed = !isNotesCollapsed"
+            title="Recently Added Notes" icon="cards/notes" :items="recentUserNotes" variant="blue"
+            icon-name="cards/notes" :has-background-image="true" empty-message="No recent notes yet." />
+        </slot>
       </div>
-    </div>
 
-    <!-- recent favourites -->
-    <div class="account-notes">
-      <h3 class="title-sm">Recent Notes</h3>
-      <div class="box-xl | box">
-        <p class="body-md">{{ recentUserNotes }}</p>
+      <div class="actions-section">
+        <slot name="actions"></slot>
       </div>
-    </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="sidebar-content">
+        <slot name="chat">
+          Chat
+        </slot>
+      </div>
+    </aside>
   </div>
 </template>
 
@@ -61,70 +59,130 @@
 definePageMeta({
   middleware: ["authenticated"],
   head: {
-    title: "Account",
-    meta: [
-      { name: "description", content: "Manage your account settings and preferences." },
-      { name: "keywords", content: "account, settings, preferences, user" },
-    ],
+    title: "Dashboard v2",
   },
 });
-const { user, loggedIn } = useUserSession();
-const { analytics, recentUserNotes, recentFavourites, recentlyViewedListings } = useAnalytics();
 
+const { analytics, recentFavourites, recentUserNotes, recentlyViewedListings } = useAnalytics();
+
+const isViewedCollapsed = ref(false);
+const isFavouritesCollapsed = ref(true);
+const isNotesCollapsed = ref(true);
 </script>
+
 <style lang="scss" scoped>
-.account-profile-content {
-  margin-top: -3rem;
+.dashboard {
+  display: grid;
+  grid-template-columns: 300px 1fr 300px;
+  background: var(--background-100);
+  gap: var(--size-16);
+  padding: var(--size-16);
+  min-height: calc(100vh - var(--header-offset) - var(--size-32));
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 300px 1fr;
+
+    .sidebar:last-child {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 260px 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+
+    .sidebar {
+      display: none;
+    }
+  }
 }
 
-.analytics-dashboard {
+.sidebar {
+  height: fit-content;
+  z-index: 10;
+  width: auto;
+  transition: width 0.3s ease;
+
+  .sidebar-content {
+    background: var(--blue-400);
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: relative;
+    padding: var(--size-16);
+    color: white;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+  }
+}
+
+// Common styles for grid sections
+%grid-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  > * {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+.analytics-section {
+  @extend %grid-section;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  margin: 1rem 0;
 
-  @media screen and (max-width: 768px) {
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
-
-  .analytics-card {
-    padding: 1rem;
-  }
 }
 
-.box {
-  background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-  background-size: auto 200%, cover;
-  color: var(--monochrome-900);
-
-  &-xl {
-    background: none;
-    background-color: var(--background-200);
-    color: var(--foreground-100);
-  }
-}
-
-.account-notifications,
-.account-activity,
-.account-favourites,
-.account-notes {
-  margin: 1rem 0;
-}
-
-.account-favourites-list {
+.content-section {
+  @extend %grid-section;
+  background: var(--background-200);
+  padding: var(--size-32);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-  justify-content: space-between;
-  padding: 0;
-  padding-right: 20px;
-  text-align: left;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
 
-  @media screen and (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
+  @media (max-width: 768px) {
+    padding: var(--size-16);
+    gap: 1rem;
+  }
+}
+
+.actions-section {
+  @extend %grid-section;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 </style>
