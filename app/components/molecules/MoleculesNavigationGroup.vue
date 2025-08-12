@@ -113,16 +113,16 @@ function isLastVisibleGroup(groupIndex: number) {
   }
 
   :deep(svg) {
-    color: white;
+    color: var(--background-200);
   }
 }
 
 .text-cell {
-  background: var(--blue-400);
+  background: var(--background-200);
   display: flex;
   align-items: center;
   padding: 0 var(--size-16);
-  color: var(--monochrome-900);
+  color: var(--foreground-100);
 
   &.last-visible {
     border-bottom-right-radius: var(--border-radius-xl);

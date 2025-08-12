@@ -81,7 +81,7 @@ function handleNavClick(item: any) {
       height: auto;
       min-height: 100vh;
       overflow-y: visible;
-      background: var(--blue-400);
+      background: var(--background-200);
       border-radius: 0;
     }
 
@@ -92,7 +92,7 @@ function handleNavClick(item: any) {
       align-items: center;
 
       .nav-title {
-        color: white;
+        color: var(--foreground-100);
         margin: 0;
       }
 
@@ -108,7 +108,7 @@ function handleNavClick(item: any) {
         justify-content: center;
 
         :deep(svg) {
-          color: white;
+          color: var(--foreground-100);
         }
       }
     }

@@ -50,7 +50,7 @@ const lastMessageTime = computed(() => {
   border-radius: var(--border-radius-lg);
 
   &:hover {
-    background: var(--blue-500);
+    background: var(--background-100);
   }
 
   &__content {
@@ -67,7 +67,7 @@ const lastMessageTime = computed(() => {
   }
 
   &__username {
-    color: var(--monochrome-900);
+    color: var(--foreground-100);
     text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
@@ -78,14 +78,14 @@ const lastMessageTime = computed(() => {
 
   &__time {
     font-size: 0.75rem;
-    color: var(--monochrome-600);
+    color: var(--foreground-200);
     white-space: nowrap;
     flex-shrink: 0;
   }
 
   &__message {
     font-size: 0.8125rem;
-    color: var(--monochrome-800);
+    color: var(--foreground-100);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;

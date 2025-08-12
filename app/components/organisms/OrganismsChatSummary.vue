@@ -74,12 +74,12 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
     align-items: center;
     justify-content: center;
     margin-bottom: var(--size-16);
-    color: var(--monochrome-900);
+    color: var(--foreground-100);
   }
 
   &__title {
     margin: 0;
-    color: var(--monochrome-900);
+    color: var(--foreground-100);
     padding: var(--size-8);
   }
 

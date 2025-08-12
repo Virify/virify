@@ -130,12 +130,12 @@ const isNotesCollapsed = ref(true);
   align-self: start;
 
   .sidebar-content {
-    background: var(--blue-400);
+    background: var(--background-200);
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     height: fit-content;
     padding: var(--size-16);
-    color: var(--monochrome-900);
+    color: var(--foreground-100);
     overflow-y: auto;
   }
 }

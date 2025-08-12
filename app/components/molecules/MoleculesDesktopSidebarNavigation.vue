@@ -44,8 +44,8 @@ defineEmits<{
 }
 
 .sidebar-content {
-  background: var(--blue-400);
-  border-radius: 16px;
+  background: var(--background-200);
+  border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
   position: relative;

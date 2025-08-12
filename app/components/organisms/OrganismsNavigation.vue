@@ -111,9 +111,4 @@ async function deleteAccount() {
     console.error('Error deleting account:', error)
   }
 }
-
 </script>
-
-<style lang="scss" scoped>
-// No styles needed - all styles moved to individual components
-</style>
