@@ -1,23 +1,24 @@
 /**
+ * Global state - shared across all composable instances
+ */
+const aggregates = ref<UserItemsAggregates>({
+  favourites: 0,
+  notes: 0,
+  enquiries: 0,
+  locations: 0,
+  notifications: 0,
+  messages: 0,
+  offers: 0,
+  viewings: 0,
+});
+const aggregatesLoading = ref(false);
+const aggregatesError = ref<Error | null>(null);
+
+/**
  * User notifications composable
  * Handles count badges, real-time updates, and future notification features
  */
 export function useNotifications() {
-  /**
-   * User item aggregates (count badges for navigation)
-   */
-  const aggregates = ref<UserItemsAggregates>({
-    favourites: 0,
-    notes: 0,
-    enquiries: 0,
-    locations: 0,
-    notifications: 0,
-    messages: 0,
-    offers: 0,
-    viewings: 0,
-  });
-  const aggregatesLoading = ref(false);
-  const aggregatesError = ref<Error | null>(null);
 
   /**
    * Fetch user item aggregates from the API
@@ -29,7 +30,6 @@ export function useNotifications() {
     try {
       const data = await $fetch<UserItemsAggregates>("/api/notifications/aggregates");
       aggregates.value = data;
-      console.log("Fetched user items aggregates:", data);
     } catch (err) {
       console.error("Failed to fetch user items aggregates:", err);
       aggregatesError.value = err as Error;

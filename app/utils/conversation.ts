@@ -1,4 +1,3 @@
-import type { ConversationWithUserAndMessages, MessageWithUser } from '~~/shared/types/conversation';
 
 interface ConversationPoV {
   name: string;
@@ -79,4 +78,134 @@ export const formatMessageTimestamp = (createdAt?: string | Date): string => {
     hour: '2-digit',
     minute: '2-digit',
   });
+};
+
+/**
+ * Get the other user's ID in a conversation (not the current user)
+ * 
+ * @param conversation - The conversation object
+ * @param currentUserId - The current user's ID
+ * @returns The other user's ID, or null if not found
+ */
+export const getOtherUserId = (conversation: ConversationWithUserAndMessages, currentUserId: number): number | null => {
+  return conversation.sender.id === currentUserId ? conversation.receiver.id : conversation.sender.id;
+};
+
+/**
+ * Format a partner name from email by removing @ domain and replacing separators
+ * 
+ * @param name - The name or email to format
+ * @returns Formatted name
+ */
+export const formatPartnerName = (name: string): string => {
+  // If it's an email, just return the part before the @ symbol
+  if (name.includes("@")) {
+    const parts = name.split("@");
+    return parts[0]?.replace(/[._-]/g, " ") || name;
+  }
+  return name;
+};
+
+/**
+ * Get the last message from a conversation
+ * 
+ * @param conversation - The conversation object
+ * @returns The last message or null if no messages
+ */
+export const getLastMessage = (conversation: ConversationWithUserAndMessages): MessageWithUser | null => {
+  if (conversation.messages && conversation.messages.length > 0) {
+    return conversation.messages[conversation.messages.length - 1] || null;
+  }
+  return null;
+};
+
+/**
+ * Get the content of the last message in a conversation
+ * 
+ * @param conversation - The conversation object
+ * @returns The last message content or fallback text
+ */
+export const getLastMessageContent = (conversation: ConversationWithUserAndMessages): string => {
+  const lastMessage = getLastMessage(conversation);
+  return lastMessage?.content || "No messages yet";
+};
+
+/**
+ * Get the formatted time of the last message in a conversation
+ * 
+ * @param conversation - The conversation object
+ * @returns Formatted time string or empty string
+ */
+export const getLastMessageTime = (conversation: ConversationWithUserAndMessages): string => {
+  const lastMessage = getLastMessage(conversation);
+  return lastMessage ? formatMessageTimestampToTime(lastMessage.createdAt) : "";
+};
+
+/**
+ * Update a conversation in an array and move it to the top
+ * 
+ * @param conversations - Array of conversations
+ * @param conversationId - ID of conversation to update
+ * @param updatedData - Partial data to update
+ * @returns Updated conversations array
+ */
+export const updateConversationInArray = (
+  conversations: ConversationWithUserAndMessages[], 
+  conversationId: number, 
+  updatedData: Partial<ConversationWithUserAndMessages>
+): ConversationWithUserAndMessages[] => {
+  const index = conversations.findIndex(c => c.id === conversationId);
+  
+  if (index >= 0) {
+    const existingConversation = conversations[index];
+    if (!existingConversation) return conversations;
+    
+    // Create a new conversation object with updates
+    const updatedConversation: ConversationWithUserAndMessages = {
+      ...existingConversation,
+      ...updatedData,
+      id: existingConversation.id,
+      listingId: updatedData.listingId ?? existingConversation.listingId,
+      createdAt: updatedData.createdAt ?? existingConversation.createdAt,
+      updatedAt: updatedData.updatedAt ?? existingConversation.updatedAt,
+      messages: updatedData.messages ?? existingConversation.messages,
+      sender: updatedData.sender ?? existingConversation.sender,
+      receiver: updatedData.receiver ?? existingConversation.receiver
+    };
+    
+    conversations[index] = updatedConversation;
+    
+    // Move to top if it's not already there
+    if (index > 0) {
+      conversations.splice(index, 1);
+      conversations.unshift(updatedConversation);
+    }
+  }
+  
+  return conversations;
+};
+
+/**
+ * Add a conversation to an array, avoiding duplicates
+ * 
+ * @param conversations - Array of conversations
+ * @param conversation - Conversation to add
+ * @returns Updated conversations array
+ */
+export const addConversationToArray = (
+  conversations: ConversationWithUserAndMessages[], 
+  conversation: ConversationWithUserAndMessages
+): ConversationWithUserAndMessages[] => {
+  // Check if conversation already exists
+  const existingIndex = conversations.findIndex(c => c.id === conversation.id);
+  
+  if (existingIndex >= 0) {
+    // Update existing conversation
+    conversations[existingIndex] = conversation;
+  } else {
+    // Add new conversation to the beginning
+    conversations.unshift(conversation);
+  }
+  
+  return conversations;
 };

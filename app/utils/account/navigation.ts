@@ -94,16 +94,6 @@ export const searchNavigation: NavigationItem[] = [
     icon: "cards/favourite-filled",
     countKey: "locations",
   },
-  {
-    name: "Search Properties",
-    url: "/",
-    icon: "search",
-  },
-  {
-    name: "Map Search",
-    url: "/map-search",
-    icon: "search",
-  },
 ];
 
 export const navigationGroups: NavigationGroup[] = [

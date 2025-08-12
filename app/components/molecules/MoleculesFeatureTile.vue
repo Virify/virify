@@ -7,8 +7,15 @@
         <AtomsIcon v-else-if="iconName" :icon="iconName" :size="32" />
       </div>
       <div class="feature-tile__header-text">
-        <h4 class="title-sm">{{ title }}</h4>
-        <p v-if="subtitle" class="body-xs">{{ subtitle }}</p>
+        <h4 :class="{
+          'title-xs': size === 'xs',
+          'title-sm': size === 'sm',
+          'title-md': size === 'md',
+        }">{{ title }}</h4>
+        <p v-if="subtitle" :class="{
+          'body-xs': size === 'xs' || size === 'sm',
+          'body-md': size === 'sm',
+        }">{{ subtitle }}</p>
       </div>
     </div>
 
@@ -18,11 +25,15 @@
         {{ pill }}
       </AtomsPill>
     </div>
-    <p v-else-if="description" class="feature-tile__description | body-sm">{{ description }}</p>
+    <p v-else-if="description" class="feature-tile__description" :class="{
+      'body-xs': size === 'xs',
+      'body-sm': size === 'sm' || size === 'md',
+    }">{{ description }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
+
 interface Props {
   icon?: string
   iconName?: string
@@ -33,12 +44,14 @@ interface Props {
   variant?: 'default' | 'primary' | 'blue' | 'secondary' | 'tertiary'
   hasBackgroundImage?: boolean
   layout?: 'vertical' | 'horizontal'
+  size?: 'xs' | 'sm' | 'md'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variant: 'default',
   hasBackgroundImage: false,
-  layout: 'vertical'
+  layout: 'vertical',
+  size: 'sm',
 })
 
 const tileClasses = computed(() => {
@@ -198,21 +211,42 @@ const tileClasses = computed(() => {
   }
 
   &--blue {
-    background-color: var(--blue-400);
+    background: linear-gradient(135deg, var(--blue-400), var(--blue-500));
+
 
     &.feature-tile--with-background {
-      background-image: url('/img/logo-background.svg'), linear-gradient(135deg, var(--blue-400), var(--blue-500));
+      position: relative;
+      background: linear-gradient(135deg, var(--blue-400), var(--blue-500));
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: url('/img/call-out-bg.svg');
+        background-repeat: no-repeat;
+        background-position: right;
+        background-size: auto 150%;
+        opacity: 0.3;
+        pointer-events: none;
+      }
     }
   }
 
   &--secondary {
-    background-color: var(--secondary-400);
+    background: linear-gradient(135deg, var(--secondary-400), var(--secondary-300));
     color: var(--monochrome-900);
+
+    .a-icon {
+      color: var(--monochrome-900);
+    }
 
     &.feature-tile--with-background {
       position: relative;
       background: linear-gradient(135deg, var(--secondary-400), var(--secondary-300));
-      
+
       &::before {
         content: '';
         position: absolute;
@@ -232,7 +266,7 @@ const tileClasses = computed(() => {
 
   &--tertiary {
     background-color: var(--tertiary-400);
-    
+
     &.feature-tile--with-background {
       background-image: url('/img/logo-background.svg'), linear-gradient(135deg, var(--tertiary-400), var(--tertiary-500));
     }
