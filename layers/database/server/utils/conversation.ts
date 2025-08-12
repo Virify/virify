@@ -34,6 +34,7 @@ export async function createConversation(senderId: number, receiverId: number, m
           senderId: true,
           receiverId: true,
           content: true,
+          isRead: true,
           createdAt: true,
           updatedAt: true,
           sender: {
@@ -107,6 +108,7 @@ export async function replyToConversation(conversationId: number, messageContent
         senderId: true,
         receiverId: true,
         content: true,
+        isRead: true,
         createdAt: true,
         updatedAt: true,
         sender: {
@@ -204,6 +206,7 @@ export const conversationWithUserAndMessages = {
       id: true,
       senderId: true,
       receiverId: true,
+      isRead: true,
       content: true,
       createdAt: true,
       updatedAt: true,
