@@ -1,10 +1,9 @@
 <template>
   <div class="o-chat-summary">
     <div class="o-chat-summary__header">
-      <h3 class="o-chat-summary__title | title-xs">Enquiries</h3>
-      <span class="o-chat-summary__count | body-sm font-semibold" v-if="enquiriesCount && enquiriesCount > 0">
-        {{ enquiriesCount }}
-      </span>
+      <h3 class="o-chat-summary__title | title-xs">Enquiries 
+        <span class="o-chat-summary__count | body-sm">({{ enquiriesCount }})</span>
+      </h3>
     </div>
 
     <div class="o-chat-summary__content">
@@ -73,7 +72,7 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
   &__header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom: var(--size-16);
     color: var(--monochrome-900);
   }
@@ -85,12 +84,7 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
   }
 
   &__count {
-    color: var(--monochrome-900);
-    background: var(--secondary-400);
-    padding: var(--size-4) var(--size-8);
-    border-radius: var(--border-radius-md);
-    text-align: center;
-    color: var(--background-100);
+    color: var(--secondary-400);
   }
 
   &__content {

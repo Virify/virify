@@ -2,8 +2,8 @@
   <li class="m-chat-summary-item" @click="$emit('select-conversation', conversation)">
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
-        <span class="m-chat-summary-item__username | body-md font-semibold">{{ formattedPartnerName }}</span>
-        <span class="m-chat-summary-item__time | body-sm">{{ lastMessageTime }}</span>
+        <span class="m-chat-summary-item__username | body-sm font-semibold">{{ formattedPartnerName }}</span>
+        <span class="m-chat-summary-item__time | body-xs">{{ lastMessageTime }}</span>
       </div>
       <p class="m-chat-summary-item__message | body-xs">{{ lastMessageContent }}</p>
     </div>
