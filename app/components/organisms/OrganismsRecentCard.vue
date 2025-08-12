@@ -24,7 +24,7 @@
             </nuxt-link>
           </li>
         </ul>
-        <div v-else class="recent-empty">{{ emptyMessage }}</div>
+        <div v-else class="recent-empty | body-sm">{{ emptyMessage }}</div>
       </div>
     </Transition>
   </div>

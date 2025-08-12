@@ -5,38 +5,55 @@
     <main class="main">
       <div class="analytics-section">
         <slot name="analytics">
-          <AtomsStatsCard :value="String(analytics?.totalViews || 0)"
-            :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views"
-            :animated="true" />
-          <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users"
-            title="Listings Favourited" :animated="true" />
-          <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings"
-            title="Total Enquiries" :animated="true" />
+          <AtomsStatsCard :value="String(analytics?.totalViews || 0)" :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views" :animated="true" />
+          <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users" title="Listings Favourited" :animated="true" />
+          <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings" title="Total Enquiries" :animated="true" />
         </slot>
       </div>
 
       <div class="content-section">
         <slot name="content">
-          <OrganismsRecentCard :is-collapsed="isViewedCollapsed" @toggle="isViewedCollapsed = !isViewedCollapsed"
-            title="Recently Viewed Listings" icon="search" :items="recentlyViewedListings" variant="blue"
-            icon-name="search" empty-message="No recent views yet." />
+          <OrganismsRecentCard
+            :is-collapsed="isViewedCollapsed"
+            @toggle="isViewedCollapsed = !isViewedCollapsed"
+            title="Recently Viewed Listings"
+            icon="search"
+            :items="recentlyViewedListings"
+            variant="blue"
+            icon-name="search"
+            empty-message="No recent views yet."
+          />
         </slot>
       </div>
 
       <div class="content-section">
         <slot name="content">
-          <OrganismsRecentCard :is-collapsed="isFavouritesCollapsed"
-            @toggle="isFavouritesCollapsed = !isFavouritesCollapsed" title="Recently Favourited Listings"
-            icon="cards/favourite" :items="recentFavourites" variant="secondary" icon-name="cards/favourite-filled"
-            empty-message="No recent favourites yet." />
+          <OrganismsRecentCard
+            :is-collapsed="isFavouritesCollapsed"
+            @toggle="isFavouritesCollapsed = !isFavouritesCollapsed"
+            title="Recently Favourited Listings"
+            icon="cards/favourite"
+            :items="recentFavourites"
+            variant="secondary"
+            icon-name="cards/favourite-filled"
+            empty-message="No recent favourites yet."
+          />
         </slot>
       </div>
 
       <div class="content-section">
         <slot name="content">
-          <OrganismsRecentCard :is-collapsed="isNotesCollapsed" @toggle="isNotesCollapsed = !isNotesCollapsed"
-            title="Recently Added Notes" icon="cards/notes" :items="recentUserNotes" variant="blue"
-            icon-name="cards/notes" :has-background-image="true" empty-message="No recent notes yet." />
+          <OrganismsRecentCard
+            :is-collapsed="isNotesCollapsed"
+            @toggle="isNotesCollapsed = !isNotesCollapsed"
+            title="Recently Added Notes"
+            icon="cards/notes"
+            :items="recentUserNotes"
+            variant="blue"
+            icon-name="cards/notes"
+            :has-background-image="true"
+            empty-message="No recent notes yet."
+          />
         </slot>
       </div>
 
@@ -48,7 +65,7 @@
     <aside class="sidebar">
       <div class="sidebar-content">
         <slot name="chat">
-          Chat
+          <OrganismsChatSummary />
         </slot>
       </div>
     </aside>
@@ -93,8 +110,8 @@ const isNotesCollapsed = ref(true);
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1rem;
+    gap: var(--size-16);
+    padding: var(--size-16);
 
     .sidebar {
       display: none;
@@ -103,19 +120,23 @@ const isNotesCollapsed = ref(true);
 }
 
 .sidebar {
+  position: sticky;
+  top: calc(var(--header-offset, 0) + var(--size-16));
   height: fit-content;
+  max-height: calc(100vh - var(--header-offset, 0) - var(--size-32));
   z-index: 10;
   width: auto;
   transition: width 0.3s ease;
+  align-self: start;
 
   .sidebar-content {
     background: var(--blue-400);
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     height: fit-content;
-    position: relative;
     padding: var(--size-16);
-    color: white;
+    color: var(--monochrome-900);
+    overflow-y: auto;
   }
 }
 
@@ -129,7 +150,7 @@ const isNotesCollapsed = ref(true);
   min-width: 0;
 
   @media (max-width: 768px) {
-    gap: 1rem;
+    gap: var(--size-16);
   }
 }
 
@@ -150,7 +171,7 @@ const isNotesCollapsed = ref(true);
   @extend %grid-section;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: var(--size-16);
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -165,12 +186,12 @@ const isNotesCollapsed = ref(true);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--size-24);
   min-width: 0;
 
   @media (max-width: 768px) {
     padding: var(--size-16);
-    gap: 1rem;
+    gap: var(--size-16);
   }
 }
 
@@ -178,11 +199,11 @@ const isNotesCollapsed = ref(true);
   @extend %grid-section;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: var(--size-24);
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: var(--size-16);
   }
 }
 </style>
