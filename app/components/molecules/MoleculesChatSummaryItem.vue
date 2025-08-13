@@ -2,16 +2,20 @@
   <li class="m-chat-summary-item" @click="$emit('select-conversation', conversation)">
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
-        <span class="m-chat-summary-item__username | body-sm font-semibold">{{ formattedPartnerName }}</span>
+        <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
+          'unread': unreadMessages > 0
+        }">{{ formattedPartnerName }}</span>
         <span class="m-chat-summary-item__time | body-xs">{{ lastMessageTime }}</span>
       </div>
-      <p class="m-chat-summary-item__message | body-xs">{{ lastMessageContent }}</p>
+      <div class="m-chat-summary-item-message">
+        <p class="m-chat-summary-item-message__content | body-xs">{{ lastMessageContent }}</p>
+        <button v-if="unreadMessages > 0" class="m-chat-summary-item-message__unread | button button-secondary button-xs">{{ unreadMessages }}</button>
+      </div>
     </div>
   </li>
 </template>
 
 <script setup lang="ts">
-
 interface Props {
   conversation: ConversationWithUserAndMessages;
   currentUserId?: string | number;
@@ -20,7 +24,7 @@ interface Props {
 const props = defineProps<Props>();
 
 defineEmits<{
-  'select-conversation': [conversation: ConversationWithUserAndMessages]
+  "select-conversation": [conversation: ConversationWithUserAndMessages];
 }>();
 
 const conversationPartnerName = computed(() => {
@@ -41,6 +45,10 @@ const lastMessageContent = computed(() => {
 const lastMessageTime = computed(() => {
   return getLastMessageTime(props.conversation);
 });
+
+const unreadMessages = computed(() => {
+  return props.conversation.messages.filter((message) => !message.isRead && message.senderId !== props.currentUserId).length;
+});
 </script>
 
 <style lang="scss" scoped>
@@ -48,6 +56,10 @@ const lastMessageTime = computed(() => {
   padding: var(--size-8);
   cursor: pointer;
   border-radius: var(--border-radius-lg);
+
+  .unread {
+    color: var(--secondary-400);
+  }
 
   &:hover {
     background: var(--background-100);
@@ -83,14 +95,28 @@ const lastMessageTime = computed(() => {
     flex-shrink: 0;
   }
 
-  &__message {
-    font-size: 0.8125rem;
+  &-message {
     color: var(--foreground-100);
     margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--size-8);
+
+    &__content {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__unread {
+      color: var(--background-100);
+
+      &.button {
+        border-radius: 50%;
+        line-height: var(--font-xs);
+      }
+    }
   }
 }
 </style>
