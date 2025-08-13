@@ -86,6 +86,7 @@ if (import.meta.client) {
 </script>
 <style lang="scss">
 .page {
+  min-height: calc(100vh - var(--header-expanded-height) - var(--size-16));
   background: var(--background-100);
 }
 </style>

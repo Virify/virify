@@ -94,7 +94,6 @@ const isNotesCollapsed = ref(true);
   background: var(--background-100);
   gap: var(--size-16);
   padding: var(--size-16);
-  min-height: calc(100vh - var(--header-offset) - var(--size-32));
 
   @media (max-width: 1200px) {
     grid-template-columns: 300px 1fr;
