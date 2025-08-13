@@ -48,8 +48,6 @@ defineEmits<{
 }
 
 .navigation {
-  padding: var(--size-16);
-
   ul {
     display: grid;
     grid-template-columns: auto 1fr;
