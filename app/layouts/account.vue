@@ -107,7 +107,7 @@ if (import.meta.client) {
   @media (max-width: 1200px) {
     grid-template-columns: 300px 1fr;
     grid-template-rows: auto 1fr;
-    grid-template-areas: 
+    grid-template-areas:
       "nav main"
       "sidebar main";
 

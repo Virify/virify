@@ -2,55 +2,38 @@
   <div class="dashboard">
     <div class="analytics-section">
       <slot name="analytics">
-        <AtomsStatsCard :value="String(analytics?.totalViews || 0)" :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views" :animated="true" />
-        <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users" title="Listings Favourited" :animated="true" />
-        <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings" title="Total Enquiries" :animated="true" />
+        <AtomsStatsCard :value="String(analytics?.totalViews || 0)"
+          :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views"
+          :animated="true" />
+        <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users"
+          title="Listings Favourited" :animated="true" />
+        <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings"
+          title="Total Enquiries" :animated="true" />
       </slot>
     </div>
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsRecentCard
-          :is-collapsed="isViewedCollapsed"
-          @toggle="isViewedCollapsed = !isViewedCollapsed"
-          title="Recently Viewed Listings"
-          icon="search"
-          :items="recentlyViewedListings"
-          variant="blue"
-          icon-name="search"
-          empty-message="No recent views yet."
-        />
+        <OrganismsRecentCard :is-collapsed="isViewedCollapsed" @toggle="isViewedCollapsed = !isViewedCollapsed"
+          title="Recently Viewed Listings" icon="search" :items="recentlyViewedListings" variant="blue"
+          icon-name="search" empty-message="No recent views yet." />
       </slot>
     </div>
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsRecentCard
-          :is-collapsed="isFavouritesCollapsed"
-          @toggle="isFavouritesCollapsed = !isFavouritesCollapsed"
-          title="Recently Favourited Listings"
-          icon="cards/favourite"
-          :items="recentFavourites"
-          variant="secondary"
-          icon-name="cards/favourite-filled"
-          empty-message="No recent favourites yet."
-        />
+        <OrganismsRecentCard :is-collapsed="isFavouritesCollapsed"
+          @toggle="isFavouritesCollapsed = !isFavouritesCollapsed" title="Recently Favourited Listings"
+          icon="cards/favourite" :items="recentFavourites" variant="secondary" icon-name="cards/favourite-filled"
+          empty-message="No recent favourites yet." />
       </slot>
     </div>
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsRecentCard
-          :is-collapsed="isNotesCollapsed"
-          @toggle="isNotesCollapsed = !isNotesCollapsed"
-          title="Recently Added Notes"
-          icon="cards/notes"
-          :items="recentUserNotes"
-          variant="blue"
-          icon-name="cards/notes"
-          :has-background-image="true"
-          empty-message="No recent notes yet."
-        />
+        <OrganismsRecentCard :is-collapsed="isNotesCollapsed" @toggle="isNotesCollapsed = !isNotesCollapsed"
+          title="Recently Added Notes" icon="cards/notes" :items="recentUserNotes" variant="blue"
+          icon-name="cards/notes" :has-background-image="true" empty-message="No recent notes yet." />
       </slot>
     </div>
 
@@ -66,7 +49,7 @@ definePageMeta({
   head: {
     title: "Dashboard",
   },
-  layout: "account"
+  layout: "account",
 });
 
 const { analytics, recentFavourites, recentUserNotes, recentlyViewedListings } = useAnalytics();
@@ -97,7 +80,7 @@ const isNotesCollapsed = ref(true);
   max-width: 100%;
   box-sizing: border-box;
 
-  > * {
+  >* {
     min-width: 0;
     max-width: 100%;
     box-sizing: border-box;
