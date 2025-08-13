@@ -76,7 +76,7 @@
 definePageMeta({
   middleware: ["authenticated"],
   head: {
-    title: "Dashboard v2",
+    title: "Dashboard",
   },
 });
 
@@ -97,23 +97,44 @@ const isNotesCollapsed = ref(true);
 
   @media (max-width: 1200px) {
     grid-template-columns: 300px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 
+      "nav main"
+      "sidebar main";
 
-    .sidebar:last-child {
-      display: none;
+    .sidebar {
+      grid-area: sidebar;
+      position: static;
+      height: auto;
+      max-height: none;
     }
-  }
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 260px 1fr;
+    .main {
+      grid-area: main;
+    }
+
+    > :first-child {
+      grid-area: nav;
+    }
   }
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "main";
     gap: var(--size-16);
     padding: var(--size-16);
 
     .sidebar {
       display: none;
+    }
+
+    .main {
+      grid-area: main;
+    }
+
+    > :first-child {
+      grid-area: unset;
     }
   }
 }
@@ -128,6 +149,14 @@ const isNotesCollapsed = ref(true);
   transition: width 0.3s ease;
   align-self: start;
 
+  @media (max-width: 1200px) {
+    position: static;
+    top: auto;
+    height: auto;
+    max-height: none;
+    align-self: stretch;
+  }
+
   .sidebar-content {
     background: var(--background-200);
     border-radius: var(--border-radius-xl);
@@ -136,6 +165,7 @@ const isNotesCollapsed = ref(true);
     padding: var(--size-16);
     color: var(--foreground-100);
     overflow-y: auto;
+
   }
 }
 

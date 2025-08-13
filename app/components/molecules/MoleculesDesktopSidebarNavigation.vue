@@ -34,12 +34,8 @@ defineEmits<{
   top: calc(var(--header-offset, 0) + var(--size-16));
   transition: width 0.3s ease;
 
-  @media (max-width: 1024px) {
-    width: 260px;
-  }
-
   @media (max-width: 768px) {
-    display: none !important;
+    display: none;
   }
 }
 
