@@ -13,7 +13,7 @@
 
         <aside class="sidebar">
           <div class="sidebar-content">
-            <OrganismsChatSummary :limit="5" />
+            <OrganismsChatSummary :limit="5" :search-enabled="false" />
           </div>
         </aside>
       </div>

@@ -106,10 +106,11 @@ defineProps<Props>()
     color: inherit;
     line-height: 1;
     margin-bottom: var(--size-4);
+    color: var(--monochrome-300);
   }
 
   &__subtitle {
-    color: inherit;
+    color: var(--monochrome-300);
   }
 
   &__title {

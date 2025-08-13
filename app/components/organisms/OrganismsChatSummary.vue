@@ -5,8 +5,18 @@
         <span class="o-chat-summary__count | body-sm">({{ enquiriesCount }})</span>
       </h3>
     </div>
-
     <div class="o-chat-summary__content">
+      <template v-if="props.searchEnabled !== false">
+        <div class="o-chat-summary__search-row">
+          <input
+            v-model="search"
+            type="text"
+            class="o-chat-summary__search-input"
+            placeholder="Search enquiries..."
+            autocomplete="off"
+          />
+        </div>
+      </template>
       <ClientOnly>
         <template v-if="loading">
           <div class="o-chat-summary__loading">
@@ -15,27 +25,23 @@
             <SkeletonLoader class="o-chat-summary__skeleton" />
           </div>
         </template>
-
-        <template v-else-if="conversations.length > 0">
+        <template v-else-if="filteredConversations.length > 0">
           <ul class="o-chat-summary__list">
-            <MoleculesChatSummaryItem v-for="conversation in conversations" :key="conversation.id"
+            <MoleculesChatSummaryItem v-for="conversation in filteredConversations" :key="conversation.id"
               :conversation="conversation" :current-user-id="user?.id"
               @select-conversation="handleConversationSelect" />
           </ul>
-
           <div class="o-chat-summary__footer">
             <NuxtLink to="/account/messages">
               <button class="button button-sm button-secondary">See all</button>
             </NuxtLink>
           </div>
         </template>
-
         <template v-else>
           <div class="o-chat-summary__empty">
-            <p class="o-chat-summary__empty-text">No enquiries yet</p>
+            <p class="o-chat-summary__empty-text">No enquiries found</p>
           </div>
         </template>
-
         <template #fallback>
           <div class="o-chat-summary__loading">
             <SkeletonLoader class="o-chat-summary__skeleton" />
@@ -51,7 +57,8 @@
 <script setup lang="ts">
 
 const props = defineProps<{
-  limit?: number
+  limit?: number,
+  searchEnabled?: boolean
 }>();
 
 const { user } = useUserSession();
@@ -61,12 +68,37 @@ const { getAggregateCount } = useNotifications();
 // Get the enquiries count from the notifications system
 const enquiriesCount = computed(() => getAggregateCount('enquiries'));
 
+
+const search = ref("");
+
 // Limit conversations based on the limit prop
-const conversations = computed(() => {
+const allLimitedConversations = computed(() => {
   if (!props.limit || props.limit === 0) {
     return allConversations.value;
   }
   return allConversations.value.slice(0, props.limit);
+});
+
+const filteredConversations = computed(() => {
+  if (props.searchEnabled === false || !search.value.trim()) return allLimitedConversations.value;
+  const term = search.value.trim().toLowerCase();
+  return allLimitedConversations.value.filter(c => {
+    // Search by sender/receiver name or username, listing title, or last message content
+  const senderUsername = c.sender?.username?.toLowerCase() || "";
+  const senderEmail = c.sender?.email?.toLowerCase() || "";
+  const receiverUsername = c.receiver?.username?.toLowerCase() || "";
+  const receiverEmail = c.receiver?.email?.toLowerCase() || "";
+    const listingTitle = c.listing?.title?.toLowerCase() || "";
+    const lastMsg = c.messages?.[c.messages.length-1]?.content?.toLowerCase() || "";
+    return (
+      senderUsername.includes(term) ||
+      senderEmail.includes(term) ||
+      receiverUsername.includes(term) ||
+      receiverEmail.includes(term) ||
+      listingTitle.includes(term) ||
+      lastMsg.includes(term)
+    );
+  });
 });
 
 function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
@@ -170,5 +202,23 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
       max-height: none;
     }
   }
+}
+.o-chat-summary__search-row {
+  padding: var(--size-4);
+}
+.o-chat-summary__search-input {
+  display: block;
+  width: 100%;
+  padding: var(--size-8) var(--size-12);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-100);
+  background: var(--background-100);
+  color: var(--foreground-100);
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: var(--size-4);
+}
+.o-chat-summary__search-input:focus {
+  border-color: var(--primary-400);
 }
 </style>

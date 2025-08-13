@@ -68,14 +68,13 @@ const unreadMessages = computed(() => {
   &__content {
     display: flex;
     flex-direction: column;
-    gap: var(--size-4);
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--size-8);
+    gap: var(--size-4);
   }
 
   &__username {

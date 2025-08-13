@@ -9,7 +9,7 @@
         </button>
       </div>
       <div class="chat-summary-scrollable">
-        <OrganismsChatSummary :limit="0" />
+        <OrganismsChatSummary :limit="0" :search-enabled="true" />
       </div>
     </aside>
   </div>
