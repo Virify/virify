@@ -40,6 +40,7 @@ defineProps<Props>()
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   opacity: 0;
   transform: translateY(30px);
+  color: var(--foreground-200);
 
   &.animate-in {
     opacity: 1;
@@ -102,13 +103,13 @@ defineProps<Props>()
   }
 
   &__value {
-    color: var(--monochrome-300);
+    color: inherit;
     line-height: 1;
     margin-bottom: var(--size-4);
   }
 
   &__subtitle {
-    color: var(--monochrome-300);
+    color: inherit;
   }
 
   &__title {

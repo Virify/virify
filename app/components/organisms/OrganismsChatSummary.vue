@@ -68,6 +68,7 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
   height: 100%;
   display: flex;
   flex-direction: column;
+  
 
   &__header {
     display: flex;

@@ -3,11 +3,11 @@
     <ul>
       <li class="bottom-nav-item" @click="$emit('toggleMenu')" :class="{ 'active': isMobileMenuOpen }">
         <AtomsIcon icon="read-more" size="24" />
-        <span class="nav-label | body-sm">Menu</span>
+        <span class="nav-label | body-xs">Menu</span>
       </li>
       <li class="bottom-nav-item active current-page">
         <AtomsIcon icon="property/house" size="24" />
-        <span class="nav-label | body-sm">Dashboard</span>
+        <span class="nav-label | body-xs">Dashboard</span>
       </li>
       <li class="bottom-nav-item" @click="console.log('Chat clicked')">
         <div class="icon-wrapper">
@@ -16,7 +16,7 @@
             {{ chatNotificationCount > 99 ? '99+' : chatNotificationCount }}
           </span>
         </div>
-        <span class="nav-label | body-sm">Chat</span>
+        <span class="nav-label | body-xs">Chat</span>
       </li>
     </ul>
   </nav>
@@ -50,11 +50,10 @@ const chatNotificationCount = computed(() => {
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--background-100);
-    border-top: 1px solid var(--border-color, #e2e8f0);
-    padding: var(--size-8) var(--size-16);
+    background: var(--background-200);
+    padding: var(--size-16);
     z-index: 1001;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
     justify-content: space-around;
     align-items: center;
   }
@@ -79,14 +78,10 @@ const chatNotificationCount = computed(() => {
     cursor: pointer;
     transition: all 0.2s ease;
     min-width: 60px;
-    color: var(--foreground-200);
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.05);
-    }
+    color: var(--foreground-100);
 
     &.active {
-      color: var(--blue-400);
+      color: var(--secondary-500);
     }
 
     &.current-page {
