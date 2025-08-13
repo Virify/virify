@@ -13,7 +13,7 @@
 
         <aside class="sidebar">
           <div class="sidebar-content">
-            <OrganismsChatSummary />
+            <OrganismsChatSummary :limit="5" />
           </div>
         </aside>
       </div>

@@ -74,21 +74,7 @@ const isNotesCollapsed = ref(true);
   }
 }
 
-// Common styles for grid sections
-%grid-section {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-
-  >* {
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-}
-
 .analytics-section {
-  @extend %grid-section;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--size-16);
@@ -99,7 +85,6 @@ const isNotesCollapsed = ref(true);
 }
 
 .content-section {
-  @extend %grid-section;
   background: var(--background-200);
   padding: var(--size-32);
   border-radius: var(--border-radius-xl);
@@ -116,7 +101,6 @@ const isNotesCollapsed = ref(true);
 }
 
 .actions-section {
-  @extend %grid-section;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--size-24);

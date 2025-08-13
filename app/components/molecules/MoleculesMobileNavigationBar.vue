@@ -5,11 +5,11 @@
         <AtomsIcon icon="read-more" size="24" />
         <span class="nav-label | body-xs">Menu</span>
       </li>
-      <li class="bottom-nav-item active current-page">
+      <li class="bottom-nav-item" :class="{ 'current-page': !isMobileMenuOpen && !isChatSummaryOpen }" @click="$emit('closeBoth')">
         <AtomsIcon icon="property/house" size="24" />
         <span class="nav-label | body-xs">Dashboard</span>
       </li>
-      <li class="bottom-nav-item" @click="console.log('Chat clicked')">
+      <li class="bottom-nav-item" :class="{ 'active': isChatSummaryOpen }" @click="$emit('toggleChat')">
         <div class="icon-wrapper">
           <AtomsIcon icon="account/enquiry" size="24" />
           <span v-if="chatNotificationCount > 0" class="notification-badge | body-xs font-semibold">
@@ -25,10 +25,13 @@
 <script setup lang="ts">
 defineProps<{
   isMobileMenuOpen: boolean
+  isChatSummaryOpen: boolean
 }>()
 
 defineEmits<{
   toggleMenu: []
+  toggleChat: []
+  closeBoth: []
 }>()
 
 // Use notifications composable to get chat/enquiry count

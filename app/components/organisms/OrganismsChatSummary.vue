@@ -50,12 +50,24 @@
 
 <script setup lang="ts">
 
+const props = defineProps<{
+  limit?: number
+}>();
+
 const { user } = useUserSession();
-const { conversations, loading } = useConversations({ limit: 5 });
+const { allConversations, loading } = useConversations();
 const { getAggregateCount } = useNotifications();
 
 // Get the enquiries count from the notifications system
 const enquiriesCount = computed(() => getAggregateCount('enquiries'));
+
+// Limit conversations based on the limit prop
+const conversations = computed(() => {
+  if (!props.limit || props.limit === 0) {
+    return allConversations.value;
+  }
+  return allConversations.value.slice(0, props.limit);
+});
 
 function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
   // Navigate to messages page with the conversation selected
@@ -64,6 +76,7 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
 </script>
 
 <style lang="scss" scoped>
+@use '#styles/_utils/media' as mq;
 .o-chat-summary {
   height: 100%;
   display: flex;
@@ -76,6 +89,10 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
     justify-content: center;
     margin-bottom: var(--size-16);
     color: var(--foreground-100);
+    
+    @include mq.mobile-only {
+      display: none;
+    }
   }
 
   &__title {
@@ -134,6 +151,24 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
 
   &__empty-text {
     color: rgba(255, 255, 255, 0.7);
+  }
+  
+  // Mobile-only overrides for when used in mobile overlay
+  @include mq.mobile-only {
+    height: auto;
+    min-height: auto;
+    
+    &__content {
+      overflow: visible;
+      flex: none;
+      height: auto;
+    }
+    
+    &__list {
+      overflow: visible;
+      flex: none;
+      max-height: none;
+    }
   }
 }
 </style>
