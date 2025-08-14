@@ -1,7 +1,12 @@
-export default defineNuxtRouteMiddleware(() => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
   const { loggedIn } = useUserSession()
 
   if (!loggedIn.value) {
-    return navigateTo('/login')
+    // Save the intended destination
+    const redirectCookie = useCookie('redirect')
+    redirectCookie.value = to.fullPath
+    
+    // Always redirect to home with showLogin flag (avoid infinite loops)
+    return navigateTo('/?showLogin=true')
   }
 })

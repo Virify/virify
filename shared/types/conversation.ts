@@ -18,6 +18,7 @@ export type ConversationWithUserAndMessages = {
     content: string;
     createdAt: Date;
     updatedAt: Date;
+    isRead: boolean;
     sender: {
       id: number;
       username: string | null;
@@ -49,6 +50,7 @@ export type MessageWithUser = {
   senderId: number;
   receiverId: number;
   content: string;
+  isRead: boolean;
   createdAt: Date;
   updatedAt: Date;
   sender: {

@@ -336,8 +336,7 @@ ul {
 }
 
 .p-listing {
-  margin-top: var(--size-32);
-
+  padding-top: var(--size-16);
 
   &__grid {
     display: grid;

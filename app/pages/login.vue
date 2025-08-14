@@ -1,11 +1,20 @@
 <script setup lang="ts">
-const { fetch } = useUserSession();
+const { loggedIn } = useUserSession();
+
+// Redirect logged in users to account page
+// Redirect non-logged in users to home page (they should use the dialog)
+onMounted(() => {
+  if (loggedIn.value) {
+    navigateTo("/account");
+  } else {
+    navigateTo("/");
+  }
+});
 
 /**
- *  Success
+ *  Success (should not be needed since we redirect, but keeping for safety)
  */
 function formSuccess() {
-  fetch();
   navigateTo("/account");
 }
 </script>

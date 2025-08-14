@@ -8,7 +8,7 @@ const replySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
-  const { sendMessage, createNewMessageMessage } = useWebSocketServer();
+  const { sendMessage, createNewMessageMessage, createAggregateUpdateMessage } = useWebSocketServer();
 
   try {
     const { conversationId, message } = await readValidatedBody(event, replySchema.parse);
@@ -28,6 +28,15 @@ export default defineEventHandler(async (event) => {
     const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId);
 
     sendMessage(messageToSend);
+
+    // Send aggregate update to the receiver (unreadMessages count increased)
+    const aggregateUpdate = createAggregateUpdateMessage(
+      "unreadMessages",
+      "add",
+      receiverId
+    );
+
+    sendMessage(aggregateUpdate);
 
     return newMessage;
   } catch (error) {

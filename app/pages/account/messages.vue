@@ -29,8 +29,6 @@
 
 <script setup lang="ts">
 import { useWebSocket } from "@vueuse/core";
-import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
-import { useWebSocketServer, type WebSocketEvents } from "~~/layers/websocket/composables/useWebSocketServer";
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -43,6 +41,16 @@ const message = ref("");
 const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
 const activeChatRef = ref<{ scrollToBottom: () => void } | null>(null);
 const conversationsSearch = ref("");
+const route = useRoute();
+
+onMounted(() => {
+  // Scroll to the bottom of the active chat when it changes
+  if (route.query.conversation) {
+    activeConversation.value = conversations.value.find(
+      (c) => c.id === Number(route.query.conversation)
+    ) as ConversationWithUserAndMessages;
+  }
+});
 
 /**
  * Computed property to filter conversations based on search input

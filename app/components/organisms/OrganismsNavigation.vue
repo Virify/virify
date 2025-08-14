@@ -1,114 +1,68 @@
 <template>
   <div>
-    <MoleculesMobileNavigationBar
-      :isMobileMenuOpen="isMobileMenuOpen"
-      @toggleMenu="toggleMobileMenu"
-    />
+    <MoleculesMobileNavigationBar :isMobileMenuOpen="isMobileMenuOpen" :isChatSummaryOpen="isChatSummaryOpen" @toggleMenu="toggleMobileMenu"
+      @toggleChat="toggleChatSummary" @closeBoth="closeBothOverlays" />
 
-    <MoleculesMobileSidebarNavigation 
-      :isOpen="isMobileMenuOpen"
-      :groupStates="groupStates"
-      @close="isMobileMenuOpen = false"
-      @toggleGroup="toggleGroup"
-      @navClick="handleNavClick"
-    />
+    <MoleculesMobileSidebarNavigation :isOpen="isMobileMenuOpen" :groupStates="groupStates"
+      @close="isMobileMenuOpen = false" @toggleGroup="toggleGroup" @navClick="handleNavClick" />
 
-    <MoleculesDesktopSidebarNavigation 
-      :groupStates="groupStates"
-      @toggleGroup="toggleGroup"
-      @navClick="handleNavClick"
-    />
+    <OrganismsMobileChatSummary :isOpen="isChatSummaryOpen" @close="toggleChatSummary" />
+
+    <MoleculesDesktopSidebarNavigation :groupStates="groupStates" @toggleGroup="toggleGroup"
+      @navClick="handleNavClick" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useWebSocket } from '@vueuse/core'
-
-// Composables
-const config = useRuntimeConfig()
-const { data } = useWebSocket(config.public.WS_BASE_URL + '/api/_ws/connection')
 const { clear } = useUserSession()
-const { fetchUserItemsAggregates, getAggregateCount, handleAggregateUpdate } = useNotifications()
-const { handleOutgoingMessages } = useWebSocketServer()
+const { fetchUserItemsAggregates } = useNotifications()
 
-// Mobile menu state
 const isMobileMenuOpen = ref(false)
-
-// Group accordion states - start with first group open
+const isChatSummaryOpen = ref(false)
 const groupStates = ref([true, false, false])
 
-// WebSocket Events
-const navigationWebSocketEvents = {
-  onAggregateUpdate: ({ 
-    aggregateType, 
-    operation 
-  }: { 
-    aggregateType: keyof UserItemsAggregates
-    operation: 'add' | 'remove' | 'update'
-  }) => {
-    handleAggregateUpdate({ 
-      type: 'aggregate_update',
-      aggregateType, 
-      operation,
-      to: 0,
-      timestamp: new Date().toISOString()
-    })
-  },
-}
-
-// WebSocket Message Handlers
-watchEffect(() => {
-  if (data.value) {
-    handleOutgoingMessages(data.value, navigationWebSocketEvents)
-  }
-})
-
-// Lifecycle
 onMounted(() => {
   fetchUserItemsAggregates()
 })
 
 function toggleGroup(index: number) {
-  // If this group is already open, close it
-  if (groupStates.value[index]) {
-    groupStates.value[index] = false
-  } else {
-    // Close all groups first, then open the selected one
-    groupStates.value = groupStates.value.map(() => false)
-    groupStates.value[index] = true
-  }
+  groupStates.value[index] = !groupStates.value[index]
 }
 
 function toggleMobileMenu() {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  const wasMenuOpen = isMobileMenuOpen.value
+  isMobileMenuOpen.value = false
+  isChatSummaryOpen.value = false
+  if (!wasMenuOpen) {
+    isMobileMenuOpen.value = true
+  }
+}
+
+function toggleChatSummary() {
+  const wasChatOpen = isChatSummaryOpen.value
+  isMobileMenuOpen.value = false
+  isChatSummaryOpen.value = false
+  if (!wasChatOpen) {
+    isChatSummaryOpen.value = true
+  }
+}
+
+function closeBothOverlays() {
+  isMobileMenuOpen.value = false
+  isChatSummaryOpen.value = false
 }
 
 function handleNavClick(item: any) {
   if (item.action === 'logout') {
     logout()
-  } else if (item.action === 'delete') {
-    deleteAccount()
   }
 }
 
-// Navigation Actions
 async function logout() {
   await clear()
-  
-  // Only redirect to homepage if currently on /account routes
   const route = useRoute()
   if (route.path.startsWith('/account')) {
     navigateTo('/')
-  }
-}
-
-async function deleteAccount() {
-  try {
-    await $fetch('/auth/delete', { method: 'DELETE' })
-    await clear()
-    navigateTo('/')
-  } catch (error) {
-    console.error('Error deleting account:', error)
   }
 }
 </script>

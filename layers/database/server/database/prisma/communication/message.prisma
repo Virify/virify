@@ -4,6 +4,7 @@ model Message {
   receiverId     Int
   conversationId Int
   content        String
+  isRead         Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   sender         User         @relation("SenderMessages", fields: [senderId], references: [id], onDelete: Cascade)

@@ -71,11 +71,23 @@ export function useConversationEvents(conversationState: ReturnType<typeof useCo
     },
 
     /**
-     * Handle message read confirmations - TODO: Implement when backend support is added
+     * Handle message read confirmations
+     * Updates the read status of messages in the conversation state
      */
     onMessageRead: ({ conversationId, messageId, from }) => {
-      // TODO: Implement read status when backend support is added
-      console.log('Message read event received:', { conversationId, messageId, from });
+      if (!allConversations.value) return;
+
+      const conversation = allConversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
+      if (!conversation) return;
+
+      // Find and update the message read status
+      const message = conversation.messages.find((m: any) => m.id === messageId);
+      if (message) {
+        message.isRead = true;
+        
+        // Force reactivity by creating a new array reference
+        allConversations.value = [...allConversations.value];
+      }
     },
   };
 
@@ -90,9 +102,55 @@ export function useConversationEvents(conversationState: ReturnType<typeof useCo
     });
   }
 
+  /**
+   * Mark a message as read
+   * @param messageId - The ID of the message to mark as read
+   * @param conversationId - The ID of the conversation the message belongs to
+   */
+  const markMessageAsRead = async (messageId: number, conversationId: number) => {
+    try {
+      // Optimistically update the local state first for immediate UI feedback
+      if (allConversations.value) {
+        const conversation = allConversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
+        if (conversation) {
+          const message = conversation.messages.find((m: any) => m.id === messageId);
+          if (message) {
+            message.isRead = true;
+            // Force reactivity by creating a new array reference
+            allConversations.value = [...allConversations.value];
+          }
+        }
+      }
+
+      // Then make the API call
+      await $fetch('/api/conversation/mark-read', {
+        method: 'POST',
+        body: { messageId, conversationId },
+      });
+      
+      // The WebSocket event will handle notifying other users
+    } catch (error) {
+      console.error('Error marking message as read:', error);
+      
+      // Revert the optimistic update on error
+      if (allConversations.value) {
+        const conversation = allConversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
+        if (conversation) {
+          const message = conversation.messages.find((m: any) => m.id === messageId);
+          if (message) {
+            message.isRead = false;
+            // Force reactivity by creating a new array reference
+            allConversations.value = [...allConversations.value];
+          }
+        }
+      }
+    }
+  };
+
   return {
     wsConnection,
     wsComposable,
     webSocketEvents,
+    markMessageAsRead,
   };
 }

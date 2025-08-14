@@ -1,23 +1,21 @@
 <template>
-  <div class="mobile-nav-overlay" :class="{ 'open': isOpen }" @click="$emit('close')">
+  <div class="mobile-nav-overlay" :class="{ open: isOpen }" @click="$emit('close')">
     <aside class="mobile-sidebar" @click.stop>
-      <div class="sidebar-content">
-        <div class="mobile-nav-header">
-          <h3 class="nav-title">Menu</h3>
-          <button class="close-btn" @click="$emit('close')">
-            <AtomsIcon icon="cross" size="24" />
-          </button>
-        </div>
-        <nav class="navigation" role="navigation" aria-label="Mobile sidebar navigation">
-          <ul>
-            <MoleculesNavigationGroup 
-              :groupStates="groupStates"
-              @toggleGroup="$emit('toggleGroup', $event)"
-              @navClick="handleNavClick"
-            />
-          </ul>
-        </nav>
+      <div class="mobile-nav-header">
+        <h3 class="nav-title">Menu</h3>
+        <button class="close-btn" @click="$emit('close')">
+          <AtomsIcon icon="cross" size="24" />
+        </button>
       </div>
+      <nav class="navigation">
+        <ul>
+          <MoleculesNavigationGroup 
+            :groupStates="groupStates"
+            @toggleGroup="$emit('toggleGroup', $event)"
+            @navClick="handleNavClick"
+          />
+        </ul>
+      </nav>
     </aside>
   </div>
 </template>
@@ -66,51 +64,44 @@ function handleNavClick(item: any) {
   @media (max-width: 768px) {
     display: block;
   }
+}
 
-  .mobile-sidebar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
+.mobile-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: var(--background-200);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+}
 
-    .sidebar-content {
-      height: auto;
-      min-height: 100vh;
-      overflow-y: visible;
-      background: var(--background-200);
-      border-radius: 0;
-    }
+.mobile-nav-header {
+  padding: var(--size-16);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    .mobile-nav-header {
-      padding: var(--size-16);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+  .nav-title {
+    color: var(--foreground-100);
+    margin: 0;
+  }
 
-      .nav-title {
-        color: var(--foreground-100);
-        margin: 0;
-      }
+  .close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-      .close-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        :deep(svg) {
-          color: var(--foreground-100);
-        }
-      }
+    :deep(svg) {
+      color: var(--foreground-100);
     }
   }
 }
@@ -126,10 +117,6 @@ function handleNavClick(item: any) {
     margin: 0;
     padding: 0;
     list-style: none;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow: visible;
   }
 }
 </style>

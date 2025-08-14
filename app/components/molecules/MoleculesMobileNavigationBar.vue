@@ -2,21 +2,21 @@
   <nav class="mobile-bottom-nav" role="navigation" aria-label="Mobile bottom navigation">
     <ul>
       <li class="bottom-nav-item" @click="$emit('toggleMenu')" :class="{ 'active': isMobileMenuOpen }">
-        <AtomsIcon icon="read-more" size="24" />
-        <span class="nav-label | body-sm">Menu</span>
+        <AtomsIcon icon="read-more" size="28" />
+        <span class="nav-label | body-xs">Menu</span>
       </li>
-      <li class="bottom-nav-item active current-page">
-        <AtomsIcon icon="property/house" size="24" />
-        <span class="nav-label | body-sm">Dashboard</span>
+      <li class="bottom-nav-item" :class="{ 'current-page': !isMobileMenuOpen && !isChatSummaryOpen }" @click="$emit('closeBoth')">
+        <AtomsIcon icon="property/house" size="28" />
+        <span class="nav-label | body-xs">Dashboard</span>
       </li>
-      <li class="bottom-nav-item" @click="console.log('Chat clicked')">
+      <li class="bottom-nav-item" :class="{ 'active': isChatSummaryOpen }" @click="$emit('toggleChat')">
         <div class="icon-wrapper">
-          <AtomsIcon icon="account/enquiry" size="24" />
+          <AtomsIcon icon="account/chat" size="28" />
           <span v-if="chatNotificationCount > 0" class="notification-badge | body-xs font-semibold">
             {{ chatNotificationCount > 99 ? '99+' : chatNotificationCount }}
           </span>
         </div>
-        <span class="nav-label | body-sm">Chat</span>
+        <span class="nav-label | body-xs">Chat</span>
       </li>
     </ul>
   </nav>
@@ -25,18 +25,21 @@
 <script setup lang="ts">
 defineProps<{
   isMobileMenuOpen: boolean
+  isChatSummaryOpen: boolean
 }>()
 
 defineEmits<{
   toggleMenu: []
+  toggleChat: []
+  closeBoth: []
 }>()
 
-// Use notifications composable to get chat/enquiry count
-const { aggregates } = useNotifications()
+// Use notifications aggregate for unread messages count
+const { getAggregateCount } = useNotifications()
 
-// For chat notifications, we'll use enquiries count
+// Get unread messages count from aggregates
 const chatNotificationCount = computed(() => {
-  return aggregates.value?.enquiries || 0
+  return getAggregateCount('unreadMessages') || 0
 })
 </script>
 
@@ -50,11 +53,10 @@ const chatNotificationCount = computed(() => {
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--background-100);
-    border-top: 1px solid var(--border-color, #e2e8f0);
-    padding: var(--size-8) var(--size-16);
+    background: var(--background-200);
+    padding: var(--size-16);
     z-index: 1001;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
     justify-content: space-around;
     align-items: center;
   }
@@ -79,14 +81,10 @@ const chatNotificationCount = computed(() => {
     cursor: pointer;
     transition: all 0.2s ease;
     min-width: 60px;
-    color: var(--foreground-200);
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.05);
-    }
+    color: var(--foreground-100);
 
     &.active {
-      color: var(--blue-400);
+      color: var(--secondary-500);
     }
 
     &.current-page {
@@ -111,17 +109,15 @@ const chatNotificationCount = computed(() => {
 
     .notification-badge {
       position: absolute;
-      top: -8px;
+      top: -12px;
       left: 15px;
-      background: var(--error);
-      color: var(--monochrome-900);
+      background: var(--secondary-500);
+      color: var(--monochrome-100);
       border-radius: 50%;
-      min-width: var(--size-22);
       height: var(--size-22);
-      padding: var(--size-4);
+      padding: var(--size-4) var(--size-8);
       display: flex;
-      align-items: center;
-      justify-content: center;
+      text-align: center;
     }
   }
 }
