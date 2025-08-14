@@ -63,21 +63,35 @@ export const formatMessageTimestampToTime = (createdAt?: string | Date): string 
 };
 
 /**
- * Formats a message creation timestamp to a full date-time string.
+ * Formats a message creation timestamp - shows only time if today, date+time if older.
  * 
  * @param createdAt - The timestamp of message creation.
- * @returns Formatted date-time string.
+ * @returns Formatted time string if today, date-time string if older.
  */
 export const formatMessageTimestamp = (createdAt?: string | Date): string => {
   if (!createdAt) return '';
   const date = new Date(createdAt);
-  return date.toLocaleString('en-GB', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const now = new Date();
+  
+  // Check if the message is from today
+  const isToday = date.toDateString() === now.toDateString();
+  
+  if (isToday) {
+    // Show only time for today's messages
+    return date.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } else {
+    // Show date and time for older messages
+    return date.toLocaleString('en-GB', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
 };
 
 /**

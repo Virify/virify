@@ -38,8 +38,11 @@
               :class="{ 'from-me': message.senderId === currentUserId }">
               <p class="message-content | body-sm">{{ message.content }}</p>
               <div class="message-status">
-                <AtomsIcon :icon="message.isRead ? 'account/read' : 'account/sent'" size="12" />
-                <span class="status-text | body-xs">{{ message.isRead ? 'Read' : 'Sent' }}</span>
+                <span class="message-time | body-xs">{{ formatMessageTimestamp(message.createdAt) }}</span>
+                <div v-if="message.senderId === currentUserId" class="message-read-status">
+                  <AtomsIcon :icon="message.isRead ? 'account/read' : 'account/sent'" size="12" />
+                  <span class="status-text | body-xs">{{ message.isRead ? 'Read' : 'Sent' }}</span>
+                </div>
               </div>
             </li>
           </ul>
@@ -83,7 +86,6 @@ const images = computed(() => {
 });
 
 const firstImage = computed(() => images.value[0]);
-
 const address = computed(() => property.value?.address?.fullAddress || "Address not provided");
 
 const priceFormatted = computed(() => {
@@ -91,6 +93,7 @@ const priceFormatted = computed(() => {
   if (!price) return "";
   return `£${parseInt(String(price)).toLocaleString()}`;
 });
+
 
 // Conversation management
 const conversationState = useConversationState();
@@ -359,12 +362,20 @@ async function sendReply() {
 
     .message-status {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 4px;
+      gap: var(--size-8);
       color: var(--monochrome-400);
 
-      .status-text {
-        font-weight: 500;
+      .message-time {
+        color: var(--monochrome-400);
+        flex-shrink: 0;
+      }
+
+      .message-read-status {
+        display: flex;
+        align-items: center;
+        gap: var(--size-4);
       }
     }
   }
