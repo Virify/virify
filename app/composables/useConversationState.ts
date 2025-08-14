@@ -73,14 +73,16 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
       const receiverEmail = c.receiver?.email?.toLowerCase() || "";
       const listingTitle = c.listing?.title?.toLowerCase() || "";
       const lastMsg = c.messages?.[c.messages.length-1]?.content?.toLowerCase() || "";
-      
+      const address = c.listing?.property?.address?.fullAddress?.toLowerCase() || "";
+
       return (
         senderUsername.includes(term) ||
         senderEmail.includes(term) ||
         receiverUsername.includes(term) ||
         receiverEmail.includes(term) ||
         listingTitle.includes(term) ||
-        lastMsg.includes(term)
+        lastMsg.includes(term) ||
+        address.includes(term)
       );
     });
   }

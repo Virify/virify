@@ -129,12 +129,6 @@ onMounted(scrollToBottom)
 
 watch(() => props.conversation?.messages?.length, scrollToBottom)
 
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    setTimeout(scrollToBottom, 350)
-  }
-})
-
 function scrollToBottom() {
   nextTick(() => {
     if (scrollableRef.value) {
@@ -153,7 +147,6 @@ async function sendReply() {
 
   try {
     await conversationActions.sendReply(conversationId, content)
-    scrollToBottom()
   } catch (e) {
     replyMessage.value = content
     console.error('Failed to send reply', e)
