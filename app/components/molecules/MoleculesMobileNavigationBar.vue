@@ -11,7 +11,7 @@
       </li>
       <li class="bottom-nav-item" :class="{ 'active': isChatSummaryOpen }" @click="$emit('toggleChat')">
         <div class="icon-wrapper">
-          <AtomsIcon icon="account/enquiry" size="24" />
+          <AtomsIcon icon="account/chat" size="24" />
           <span v-if="chatNotificationCount > 0" class="notification-badge | body-xs font-semibold">
             {{ chatNotificationCount > 99 ? '99+' : chatNotificationCount }}
           </span>

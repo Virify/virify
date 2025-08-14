@@ -1,5 +1,4 @@
 <template>
-  <!-- Mobile Chat Summary Overlay -->
   <div class="mobile-chat-overlay" :class="{ 'open': isOpen }" @click="$emit('close')">
     <aside class="mobile-chat-summary" @click.stop>
       <div class="mobile-chat-header">
@@ -11,7 +10,7 @@
       <div class="chat-summary-scrollable" v-if="!activeConversation">
         <OrganismsChatSummary :limit="0" :search-enabled="true" :disable-navigate="true" @select-conversation="handleSelectConversation" />
       </div>
-      <OrganismsMobileEnquiryDetail
+      <OrganismsEnquiryDetail
         :is-open="!!activeConversation"
         :conversation="activeConversation"
         :current-user-id="user?.id"
@@ -30,28 +29,23 @@ defineEmits<{
   close: []
 }>()
 
-const { user } = useUserSession();
-const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
+const { user } = useUserSession()
+const activeConversation = ref<ConversationWithUserAndMessages | null>(null)
 
-// Prevent body scroll when modal is open
 watchEffect(() => {
   if (import.meta.client) {
-    if (props.isOpen) {
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.documentElement.style.overflow = '';
-    }
+    document.documentElement.style.overflow = props.isOpen ? 'hidden' : ''
   }
-});
+})
 
 onUnmounted(() => {
   if (import.meta.client) {
-    document.documentElement.style.overflow = '';
+    document.documentElement.style.overflow = ''
   }
-});
+})
 
 function handleSelectConversation(conversation: ConversationWithUserAndMessages) {
-  activeConversation.value = conversation;
+  activeConversation.value = conversation
 }
 </script>
 
@@ -98,21 +92,18 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
 }
 
 .mobile-chat-header {
-  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--size-20) var(--size-20) var(--size-16);
   border-bottom: 1px solid var(--border-100);
-  background: var(--background-200);
 }
 
 .chat-summary-scrollable {
   flex: 1;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  padding: var(--size-16);
-  padding-bottom: 110px;
+  padding: 0 0 110px 0;
   min-height: 0;
   height: 0;
 }

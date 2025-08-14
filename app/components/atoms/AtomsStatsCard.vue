@@ -125,17 +125,14 @@ defineProps<Props>()
   }
 }
 
-// Mobile layout for equal heights
+// Mobile layout 
 @media (max-width: 900px) {
   .stats-card {
-
     &__top {
-      flex: 1;
       min-height: 80px;
     }
 
     &__title {
-      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;

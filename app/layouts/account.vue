@@ -12,8 +12,24 @@
         </main>
 
         <aside class="sidebar">
-          <div class="sidebar-content">
-            <OrganismsChatSummary :limit="5" :search-enabled="false" />
+          <div class="sidebar-content sidebar-content--enquiries" :class="{ 'sidebar-content--collapsed': isCollapsed, 'sidebar-content--has-overlay': selectedConversation !== null }">
+            <OrganismsChatSummary 
+              v-show="selectedConversation === null"
+              :limit="0" 
+              :search-enabled="true" 
+              :disable-navigate="true"
+              @select-conversation="handleConversationSelect"
+              @toggle-collapsed="isCollapsed = $event"
+            />
+            
+            <div v-show="selectedConversation !== null" class="sidebar-overlay">
+              <OrganismsEnquiryDetail 
+                :is-open="selectedConversation !== null"
+                :conversation="selectedConversation"
+                :current-user-id="user?.id"
+                @back="selectedConversation = null"
+              />
+            </div>
           </div>
         </aside>
       </div>
@@ -27,7 +43,12 @@
 </template>
 
 <script setup lang="ts">
-import { useWebSocket } from "@vueuse/core";
+const selectedConversation = ref<ConversationWithUserAndMessages | null>(null);
+const isCollapsed = ref(false);
+
+function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
+  selectedConversation.value = conversation;
+}
 
 useHead({
   htmlAttrs: {
@@ -57,59 +78,40 @@ useHead({
   ],
 });
 
-const config = useRuntimeConfig();
-const { loggedIn } = useUserSession();
 
-const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
-  autoConnect: false,
-  immediate: false,
-  autoClose: false,
-  autoReconnect: {
-    retries: 3,
-    delay: 1000,
-    onFailed() {
-      console.warn("Failed to reconnect WebSocket after 3 attempts.");
-    },
-  },
-  heartbeat: {
-    message: "ping",
-    interval: 30000,
-    pongTimeout: 5000,
-  },
-});
+const { user } = useUserSession();
 
-// Connect when user logs in
-if (import.meta.client) {
-  watch(
-    () => loggedIn.value,
-    (newUser) => {
-      if (newUser && ws.status.value === "CLOSED") {
-        ws.open();
-      }
-    },
-    { immediate: true }
-  );
-}
 </script>
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
 .page {
-  min-height: calc(100vh - var(--header-expanded-height) - var(--size-16));
   background: var(--background-100);
 }
 
 .account-layout {
   display: grid;
   grid-template-columns: 300px 1fr 300px;
-  background: var(--background-100);
   gap: var(--size-16);
   padding: var(--size-16);
+  transition: grid-template-columns 0.3s ease;
+  
+  &:has(.sidebar-content--has-overlay) {
+    grid-template-columns: 300px 1fr 400px;
+  }
 
-  @media (max-width: 1200px) {
+  @include mq.not-notebook {
     grid-template-columns: 300px 1fr;
     grid-template-rows: auto 1fr;
     grid-template-areas:
       "nav main"
       "sidebar main";
+
+    &:has(.sidebar-content--has-overlay) {
+      grid-template-columns: 300px 1fr;
+      grid-template-areas:
+        "nav sidebar"
+        "sidebar sidebar";
+    }
 
     .sidebar {
       grid-area: sidebar;
@@ -127,12 +129,9 @@ if (import.meta.client) {
     }
   }
 
-  @media (max-width: 768px) {
+  @include mq.mobile-only {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
     grid-template-areas: "main";
-    gap: var(--size-16);
-    padding: var(--size-16);
 
     .sidebar {
       display: none;
@@ -151,14 +150,15 @@ if (import.meta.client) {
 .sidebar {
   position: sticky;
   top: calc(var(--header-offset, 0) + var(--size-16));
+  bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100vh - var(--header-offset, 0) - var(--size-32));
+  max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
   z-index: 10;
   width: auto;
   transition: width 0.3s ease;
   align-self: start;
 
-  @media (max-width: 1200px) {
+  @include mq.not-notebook {
     position: static;
     top: auto;
     height: auto;
@@ -174,6 +174,30 @@ if (import.meta.client) {
     padding: var(--size-16);
     color: var(--foreground-100);
     overflow-y: auto;
+    position: relative;
+    
+    @include mq.mobile-only {
+      padding: 0;
+    }
+
+    &--enquiries {
+      padding: 0;
+      
+      &.sidebar-content--has-overlay {
+        height: calc(100vh - var(--header-expanded-height) + var(--size-32));
+      }
+    }
+  }
+
+  .sidebar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
   }
 }
 
@@ -185,9 +209,5 @@ if (import.meta.client) {
   max-width: 100%;
   box-sizing: border-box;
   min-width: 0;
-
-  @media (max-width: 768px) {
-    gap: var(--size-16);
-  }
 }
 </style>

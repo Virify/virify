@@ -1,17 +1,20 @@
 <template>
-  <div class="o-chat-summary">
-    <div class="o-chat-summary__header">
+  <div class="o-chat-summary" :class="{ collapsed: isCollapsed }">
+    <div class="o-chat-summary__header" @click="toggleCollapsed">
       <h3 class="o-chat-summary__title | title-xs">Enquiries 
         <span class="o-chat-summary__count | body-sm">({{ enquiriesCount }})</span>
       </h3>
+      <button class="o-chat-summary__toggle-btn" :class="{ 'o-chat-summary__toggle-btn--collapsed': isCollapsed }">
+        <AtomsIcon icon="chevron-down" size="16" />
+      </button>
     </div>
-    <div class="o-chat-summary__content">
-      <template v-if="props.searchEnabled !== false">
+    <div class="o-chat-summary__content" v-show="!isCollapsed">
+      <template v-if="searchEnabled !== false">
         <div class="o-chat-summary__search-row">
           <input
             v-model="search"
             type="text"
-            class="o-chat-summary__search-input"
+            class="o-chat-summary__search-input | body-sm"
             placeholder="Search enquiries..."
             autocomplete="off"
           />
@@ -31,7 +34,7 @@
               :conversation="conversation" :current-user-id="user?.id"
               @select-conversation="handleConversationSelect" />
           </ul>
-          <div v-if="props.limit"class="o-chat-summary__footer">
+          <div v-if="limit" class="o-chat-summary__footer">
             <NuxtLink to="/account/messages">
               <button class="button button-sm button-secondary">See all</button>
             </NuxtLink>
@@ -57,84 +60,84 @@
 <script setup lang="ts">
 
 const props = defineProps<{
-  limit?: number,
-  searchEnabled?: boolean,
-  /**
-   * When true, the component will emit an event instead of navigating to the messages page
-   * allowing parent components (e.g. mobile overlays) to control how a conversation is opened.
-   */
-  disableNavigate?: boolean;
-}>();
+  limit?: number
+  searchEnabled?: boolean
+  disableNavigate?: boolean
+}>()
+
+const { limit, searchEnabled, disableNavigate } = toRefs(props)
 
 const emit = defineEmits<{
   /** Emitted when a conversation is selected if disableNavigate is true */
   "select-conversation": [conversation: ConversationWithUserAndMessages];
+  /** Emitted when the collapsed state changes */
+  "toggle-collapsed": [collapsed: boolean];
 }>();
 
-const { user } = useUserSession();
-const { allConversations, loading } = useConversations();
-const { getAggregateCount } = useNotifications();
+const { user } = useUserSession()
+const { allConversations, loading, filterConversations } = useConversations()
+const { getAggregateCount } = useNotifications()
 
-// Get the enquiries count from the notifications system
-const enquiriesCount = computed(() => getAggregateCount('enquiries'));
+const isCollapsed = ref(false)
+const search = ref("")
 
+const enquiriesCount = computed(() => getAggregateCount('enquiries'))
 
-const search = ref("");
-
-// Limit conversations based on the limit prop
 const allLimitedConversations = computed(() => {
-  if (!props.limit || props.limit === 0) {
-    return allConversations.value;
+  if (!limit?.value || limit.value === 0) {
+    return allConversations.value
   }
-  return allConversations.value.slice(0, props.limit);
-});
+  return allConversations.value.slice(0, limit.value)
+})
 
 const filteredConversations = computed(() => {
-  if (props.searchEnabled === false || !search.value.trim()) return allLimitedConversations.value;
-  const term = search.value.trim().toLowerCase();
-  return allLimitedConversations.value.filter(c => {
-    // Search by sender/receiver name or username, listing title, or last message content
-  const senderUsername = c.sender?.username?.toLowerCase() || "";
-  const senderEmail = c.sender?.email?.toLowerCase() || "";
-  const receiverUsername = c.receiver?.username?.toLowerCase() || "";
-  const receiverEmail = c.receiver?.email?.toLowerCase() || "";
-    const listingTitle = c.listing?.title?.toLowerCase() || "";
-    const lastMsg = c.messages?.[c.messages.length-1]?.content?.toLowerCase() || "";
-    return (
-      senderUsername.includes(term) ||
-      senderEmail.includes(term) ||
-      receiverUsername.includes(term) ||
-      receiverEmail.includes(term) ||
-      listingTitle.includes(term) ||
-      lastMsg.includes(term)
-    );
-  });
-});
+  if (searchEnabled?.value === false || !search.value.trim()) {
+    return allLimitedConversations.value
+  }
+  return filterConversations(allLimitedConversations.value, search.value)
+})
 
 function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
-  if (props.disableNavigate) {
-    emit("select-conversation", conversation);
-    return;
+  if (disableNavigate?.value) {
+    emit("select-conversation", conversation)
+    return
   }
-  // Default behaviour – navigate to messages page with the conversation selected
-  navigateTo(`/account/messages?conversation=${conversation.id}`);
+  navigateTo(`/account/messages?conversation=${conversation.id}`)
+}
+
+function toggleCollapsed() {
+  isCollapsed.value = !isCollapsed.value
 }
 </script>
 
 <style lang="scss" scoped>
 @use '#styles/_utils/media' as mq;
 .o-chat-summary {
-  height: 100%;
+  height: calc(100vh - var(--header-expanded-height) + var(--size-32));
   display: flex;
   flex-direction: column;
+  
+  &.collapsed {
+    height: auto;
+  }
+  
+  @include mq.mobile-only {
+    height: 100%;
+    
+    &.collapsed {
+      height: auto;
+    }
+  }
   
 
   &__header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: var(--size-16);
+    justify-content: space-between;
     color: var(--foreground-100);
+    cursor: pointer;
+    border-radius: var(--border-radius-md);
+    padding: var(--size-16);
     
     @include mq.mobile-only {
       display: none;
@@ -143,8 +146,35 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
 
   &__title {
     margin: 0;
+    flex: 1;
+  }
+
+  &__toggle-btn {
+    background: none;
+    border: none;
     color: var(--foreground-100);
-    padding: var(--size-8);
+    cursor: pointer;
+    padding: var(--size-4);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: var(--background-400);
+    }
+
+    :deep(svg) {
+      transition: transform 0.2s ease;
+      transform: rotate(180deg);
+    }
+
+    &--collapsed {
+      :deep(svg) {
+        transform: rotate(0deg);
+      }
+    }
   }
 
   &__count {
@@ -156,6 +186,7 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0;
   }
 
   &__loading {
@@ -173,11 +204,16 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
     flex: 1;
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0 var(--size-16) var(--size-16) var(--size-16);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: var(--size-8);
+    min-height: 0;
+    
+    @include mq.mobile-only {
+      padding: var(--size-16);
+    }
   }
 
   &__footer {
@@ -198,42 +234,26 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
   &__empty-text {
     color: rgba(255, 255, 255, 0.7);
   }
-  
-  // Mobile-only overrides for when used in mobile overlay
-  @include mq.mobile-only {
-    height: auto;
-    min-height: auto;
-    
-    &__content {
-      overflow: visible;
-      flex: none;
-      height: auto;
-    }
-    
-    &__list {
-      overflow: visible;
-      flex: none;
-      max-height: none;
+
+  &__search-row {
+    padding: 0 var(--size-16);
+    margin: var(--size-12) 0;
+  }
+
+  &__search-input {
+    display: block;
+    width: 100%;
+    padding: var(--size-8);
+    border-radius: var(--border-radius-2xl);
+    border: 1px solid var(--monochrome-600);
+    background: var(--background-100);
+    color: var(--foreground-100);
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: var(--secondary-400);
     }
   }
-}
-.o-chat-summary__search-row {
-  padding: var(--size-4);
-  margin-bottom: var(--size-16);
-}
-.o-chat-summary__search-input {
-  display: block;
-  width: 100%;
-  padding: var(--size-12);
-  border-radius: var(--border-radius-2xl);
-  border: 1px solid var(--monochrome-600);
-  background: var(--background-100);
-  color: var(--foreground-100);
-  outline: none;
-  transition: border-color 0.2s;
-  margin-bottom: var(--size-4);
-}
-.o-chat-summary__search-input:focus {
-  border-color: var(--secondary-400);
 }
 </style>

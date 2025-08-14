@@ -1,30 +1,39 @@
 <template>
-  <!-- Secondary Overlay for Selected Enquiry -->
-  <div class="mobile-enquiry-overlay" :class="{ open: isOpen }" @click="$emit('back')">
-    <aside class="mobile-enquiry-detail" @click.stop>
-      <div class="mobile-enquiry-header">
-        <h3 class="enquiry-title | title-md">{{ conversation?.sender?.username }}</h3>
+  <div class="enquiry-overlay" :class="{ open: isOpen }" @click="$emit('back')">
+    <aside class="enquiry-detail" @click.stop>
+      <div class="enquiry-header">
+        <h3 class="enquiry-title | title-xs">{{ conversation?.sender?.username }}</h3>
         <button class="close-btn" @click="$emit('back')">
           <AtomsIcon icon="cross" size="24" />
         </button>
       </div>
 
-      <div class="enquiry-content-scrollable">
+      <div class="enquiry-content-scrollable" ref="scrollableRef">
         <div v-if="conversation && conversation.listing" class="property-header">
           <div class="property-image" v-if="firstImage">
-            <img :src="firstImage" alt="Property image" />
+            <NuxtImg 
+              :src="firstImage" 
+              alt="Property image" 
+              width="268" 
+              height="100"
+              loading="eager"
+              sizes="268px"
+              format="webp,jpg"
+              quality="80"
+              placeholder="/img/preload.svg"
+            />
             <div class="property-badge | body-sm font-semibold">Your Property</div>
           </div>
           <div class="property-details">
             <div class="property-info">
               <h3 class="property-price | title-sm">{{ priceFormatted }}</h3>
-              <p class="property-address| body-sm">{{ address }}</p>
+              <p class="property-address| body-xs">{{ address }}</p>
             </div>
             <div class="agent-info">
               <div class="agent-avatar">
                 <AtomsIcon icon="profile" size="28" />
               </div>
-              <span class="agent-name | body-sm">MaggotBalls</span>
+              <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
             </div>
           </div>
         </div>
@@ -33,7 +42,7 @@
         </div>
 
         <div class="enquiry-messages">
-          <ul class="messages-list" ref="messagesListRef">
+          <ul class="messages-list">
             <li v-for="message in conversation?.messages" :key="message.id" class="message-item"
               :class="{ 'from-me': message.senderId === currentUserId }">
               <p class="message-content | body-sm">{{ message.content }}</p>
@@ -75,24 +84,21 @@ const props = defineProps<{
 
 defineEmits<{ back: [] }>();
 
-const conversation = computed(() => props.conversation);
-const listing = computed(() => props.conversation?.listing);
-const property = computed(() => listing.value?.property);
+const listing = computed(() => props.conversation?.listing)
+const property = computed(() => listing.value?.property)
 
-const images = computed(() => {
-  const media = property.value?.media;
-  if (!Array.isArray(media)) return [];
-  return media.filter(m => m.image).map(m => m.image!);
-});
-
-const firstImage = computed(() => images.value[0]);
-const address = computed(() => property.value?.address?.fullAddress || "Address not provided");
+const firstImage = computed(() => {
+  const media = property.value?.media
+  if (!Array.isArray(media)) return null
+  return media.find(m => m.image)?.image
+})
+const address = computed(() => property.value?.address?.fullAddress || "Address not provided")
 
 const priceFormatted = computed(() => {
-  const price = listing.value?.price;
-  if (!price) return "";
-  return `£${parseInt(String(price)).toLocaleString()}`;
-});
+  const price = listing.value?.price
+  if (!price) return ""
+  return `£${parseInt(String(price)).toLocaleString()}`
+})
 
 
 // Conversation management
@@ -100,119 +106,118 @@ const conversationState = useConversationState();
 const conversationActions = useConversationActions(conversationState);
 
 // Reply logic
-const replyMessage = ref("");
-const sending = ref(false);
-const messagesListRef = ref<HTMLUListElement | null>(null);
+const replyMessage = ref("")
+const sending = ref(false)
+const scrollableRef = ref<HTMLDivElement | null>(null)
 
 
-// Prevent body scroll when modal is open
 watchEffect(() => {
-  if (import.meta.client) {
-    if (props.isOpen) {
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.documentElement.style.overflow = '';
-    }
+  if (import.meta.client && props.isOpen && window.innerWidth <= 768) {
+    document.documentElement.style.overflow = 'hidden'
+  } else if (import.meta.client) {
+    document.documentElement.style.overflow = ''
   }
-});
+})
 
 onUnmounted(() => {
   if (import.meta.client) {
-    document.documentElement.style.overflow = '';
+    document.documentElement.style.overflow = ''
   }
-});
+})
 
-onMounted(() => {
-  // Auto scroll when opened
-  scrollToBottom();
-});
+onMounted(scrollToBottom)
 
-watch(() => props.conversation?.messages?.length, () => {
-  scrollToBottom();
-});
+watch(() => props.conversation?.messages?.length, scrollToBottom)
+
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen) {
+    setTimeout(scrollToBottom, 350)
+  }
+})
 
 function scrollToBottom() {
   nextTick(() => {
-    const el = messagesListRef.value || document.querySelector('.messages-list');
-    if (el) { (el as HTMLElement).scrollTop = (el as HTMLElement).scrollHeight; }
-  });
+    if (scrollableRef.value) {
+      scrollableRef.value.scrollTop = scrollableRef.value.scrollHeight
+    }
+  })
 }
 
 async function sendReply() {
-  if (!props.conversation || !replyMessage.value.trim() || sending.value) return;
+  if (!props.conversation || !replyMessage.value.trim() || sending.value) return
 
-  const content = replyMessage.value.trim();
-  const conversationId = props.conversation.id;
-  replyMessage.value = "";
-  sending.value = true;
+  const content = replyMessage.value.trim()
+  const conversationId = props.conversation.id
+  replyMessage.value = ""
+  sending.value = true
 
   try {
-    await conversationActions.sendReply(conversationId, content);
-    scrollToBottom();
+    await conversationActions.sendReply(conversationId, content)
+    scrollToBottom()
   } catch (e) {
-    // Fallback: reinsert unsent content so user can retry
-    replyMessage.value = content;
-    console.error('Failed to send reply', e);
+    replyMessage.value = content
+    console.error('Failed to send reply', e)
   } finally {
-    sending.value = false;
+    sending.value = false
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.mobile-enquiry-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1002;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  overscroll-behavior: contain;
-  touch-action: manipulation;
-  overflow: hidden;
+.enquiry-overlay {
+  width: 100%;
+  height: 100%;
 
   @media (max-width: 768px) {
-    display: block;
-  }
-
-  &.open {
-    opacity: 1;
-    visibility: visible;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1002;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    
+    &.open {
+      opacity: 1;
+      visibility: visible;
+    }
   }
 }
 
-.mobile-enquiry-detail {
-  position: absolute;
-  top: 0;
-  right: 0;
+.enquiry-detail {
   width: 100%;
   height: 100%;
   background: var(--background-200);
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
   touch-action: manipulation;
   overflow: hidden;
+  border-radius: var(--border-radius-xl);
 
-  .open & {
-    transform: translateX(0);
+  @media (max-width: 768px) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    border-radius: 0;
+    
+    .open & {
+      transform: translateX(0);
+    }
   }
 }
 
-.mobile-enquiry-header {
+.enquiry-header {
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--size-20) var(--size-20) var(--size-16);
+  padding: var(--size-16);
   border-bottom: 1px solid var(--border-100);
   background: var(--background-200);
 
@@ -331,7 +336,7 @@ async function sendReply() {
 }
 
 .enquiry-messages {
-  padding: 0; // No padding needed since container handles spacing
+  padding: 0;
 
   .messages-list {
     list-style: none;
@@ -343,16 +348,20 @@ async function sendReply() {
   }
 
   .message-item {
-    background: var(--primary-800);
+    background: var(--primary-600);
     padding: var(--size-12) var(--size-16);
     border-radius: var(--border-radius-lg);
+    border-bottom-left-radius: 0;
     max-width: 280px;
     align-self: flex-start;
+    position: relative;
 
     &.from-me {
       background: var(--secondary-500);
       color: var(--foreground-100);
       align-self: flex-end;
+      border-bottom-left-radius: var(--border-radius-lg);
+      border-bottom-right-radius: 0;
     }
 
     .message-content {
@@ -386,7 +395,10 @@ async function sendReply() {
   background: var(--background-200);
   border-top: 1px solid var(--border-100);
   padding: var(--size-16);
-  padding-bottom: calc(var(--size-16) + 90px + env(safe-area-inset-bottom));
+  
+  @media (max-width: 768px) {
+    padding-bottom: calc(var(--size-16) + 90px + env(safe-area-inset-bottom));
+  }
 
   .reply-input-container {
     position: relative;
@@ -396,7 +408,7 @@ async function sendReply() {
 
   .reply-input {
     width: 100%;
-    padding: var(--size-12);
+    padding: var(--size-8);
     border-radius: var(--border-radius-2xl);
     border: 1px solid var(--monochrome-600);
     background: var(--background-100);

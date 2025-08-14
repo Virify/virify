@@ -60,6 +60,7 @@ const isNotesCollapsed = ref(true);
 </script>
 
 <style lang="scss" scoped>
+@use '#styles/_utils/media' as mq;
 .dashboard {
   display: flex;
   flex-direction: column;
@@ -69,9 +70,6 @@ const isNotesCollapsed = ref(true);
   box-sizing: border-box;
   min-width: 0;
 
-  @media (max-width: 768px) {
-    gap: var(--size-16);
-  }
 }
 
 .analytics-section {
@@ -79,8 +77,8 @@ const isNotesCollapsed = ref(true);
   grid-template-columns: repeat(3, 1fr);
   gap: var(--size-16);
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+  @include mq.not-notebook {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 
@@ -94,7 +92,7 @@ const isNotesCollapsed = ref(true);
   gap: var(--size-24);
   min-width: 0;
 
-  @media (max-width: 768px) {
+  @include mq.mobile-only {
     padding: var(--size-16);
     gap: var(--size-16);
   }
@@ -105,7 +103,7 @@ const isNotesCollapsed = ref(true);
   grid-template-columns: 1fr 1fr;
   gap: var(--size-24);
 
-  @media (max-width: 768px) {
+  @include mq.mobile-only {
     grid-template-columns: 1fr;
     gap: var(--size-16);
   }
