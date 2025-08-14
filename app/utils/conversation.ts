@@ -14,18 +14,18 @@ interface ConversationPoV {
 export const getConversationPoV = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined): ConversationPoV => {
   if (currentUserId === undefined || !conversation?.sender || !conversation?.receiver) {
     return {
-      name: conversation?.sender?.email || conversation?.receiver?.email || 'Unknown Participant',
+      name: conversation?.sender?.username || conversation?.receiver?.username || 'Unknown Participant',
       otherUserId: undefined
     };
   }
   if (String(conversation.sender.id) === String(currentUserId)) {
     return {
-      name: conversation.receiver.email,
+      name: conversation.receiver.username || conversation.receiver.email,
       otherUserId: conversation.receiver.id
     };
   } else {
     return {
-      name: conversation.sender.email,
+      name: conversation.sender.username || conversation.sender.email,
       otherUserId: conversation.sender.id
     };
   }
@@ -36,14 +36,14 @@ export const getConversationPoV = (conversation: ConversationWithUserAndMessages
  * 
  * @param convoMessage - The message object.
  * @param currentUserId - The ID of the current user.
- * @returns 'You' if the sender is the current user, otherwise the sender's email.
+ * @returns 'You' if the sender is the current user, otherwise the sender's username (or email if username not available).
  */
 export const getConvoMessagePoV = (convoMessage: MessageWithUser, currentUserId: string | number | undefined): string => {
-  if (currentUserId === undefined || !convoMessage?.sender) return convoMessage?.sender?.email || 'Unknown Sender';
+  if (currentUserId === undefined || !convoMessage?.sender) return convoMessage?.sender?.username || convoMessage?.sender?.email || 'Unknown Sender';
   if (String(convoMessage.sender.id) === String(currentUserId)) {
     return 'You';
   } else {
-    return convoMessage.sender.email;
+    return convoMessage.sender.username || convoMessage.sender.email;
   }
 };
 
@@ -85,8 +85,7 @@ export const formatMessageTimestamp = (createdAt?: string | Date): string => {
   } else {
     // Show date and time for older messages
     return date.toLocaleString('en-GB', {
-      year: 'numeric',
-      month: '2-digit',
+      month: 'short',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
@@ -222,4 +221,30 @@ export const addConversationToArray = (
   }
   
   return conversations;
+};
+
+/**
+ * Sort conversations by unread status first, then by most recent activity
+ * 
+ * @param conversations - Array of conversations to sort
+ * @param currentUserId - ID of the current user to determine unread messages
+ * @returns Sorted conversations array (unread first, then by most recent activity)
+ */
+export const sortConversationsByUnreadAndRecency = (
+  conversations: ConversationWithUserAndMessages[], 
+  currentUserId?: string | number
+): ConversationWithUserAndMessages[] => {
+  return conversations.sort((a, b) => {
+    const aHasUnread = a.messages.some(message => !message.isRead && message.senderId !== currentUserId);
+    const bHasUnread = b.messages.some(message => !message.isRead && message.senderId !== currentUserId);
+    
+    // If one has unread and the other doesn't, prioritize the one with unread
+    if (aHasUnread && !bHasUnread) return -1;
+    if (!aHasUnread && bHasUnread) return 1;
+    
+    // If both have same unread status, sort by most recent activity (updatedAt)
+    const aTime = new Date(a.updatedAt).getTime();
+    const bTime = new Date(b.updatedAt).getTime();
+    return bTime - aTime; // Most recent first
+  });
 };

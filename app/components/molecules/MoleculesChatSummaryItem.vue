@@ -32,8 +32,7 @@ defineEmits<{
 
 const conversationPartnerName = computed(() => {
   const pov = getConversationPoV(props.conversation, props.currentUserId);
-  // If pov is an object with a name property, use that. Otherwise, assume it's already a string.
-  return typeof pov === "object" && pov !== null && "name" in pov ? pov.name : pov;
+  return pov.name;
 });
 
 const formattedPartnerName = computed(() => {
@@ -46,7 +45,7 @@ const lastMessageContent = computed(() => {
 });
 
 const lastMessageTime = computed(() => {
-  return getLastMessageTime(props.conversation);
+  return formatMessageTimestamp(props.conversation.updatedAt);
 });
 
 const unreadMessages = computed(() => {
@@ -82,6 +81,7 @@ const conversationAddress = computed(() => {
     justify-content: space-between;
     align-items: flex-start;
     gap: var(--size-4);
+    margin-bottom: var(--size-4);
   }
 
   &__name-section {
@@ -93,7 +93,7 @@ const conversationAddress = computed(() => {
   }
 
   &__username {
-    color: var(--foreground-100);
+    color: var(--secondary-600);
     text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
@@ -113,6 +113,7 @@ const conversationAddress = computed(() => {
     color: var(--foreground-200);
     white-space: nowrap;
     flex-shrink: 0;
+    margin-top: 2px;
   }
 
   &-message {

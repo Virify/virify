@@ -2,16 +2,16 @@
   <nav class="mobile-bottom-nav" role="navigation" aria-label="Mobile bottom navigation">
     <ul>
       <li class="bottom-nav-item" @click="$emit('toggleMenu')" :class="{ 'active': isMobileMenuOpen }">
-        <AtomsIcon icon="read-more" size="24" />
+        <AtomsIcon icon="read-more" size="28" />
         <span class="nav-label | body-xs">Menu</span>
       </li>
       <li class="bottom-nav-item" :class="{ 'current-page': !isMobileMenuOpen && !isChatSummaryOpen }" @click="$emit('closeBoth')">
-        <AtomsIcon icon="property/house" size="24" />
+        <AtomsIcon icon="property/house" size="28" />
         <span class="nav-label | body-xs">Dashboard</span>
       </li>
       <li class="bottom-nav-item" :class="{ 'active': isChatSummaryOpen }" @click="$emit('toggleChat')">
         <div class="icon-wrapper">
-          <AtomsIcon icon="account/chat" size="24" />
+          <AtomsIcon icon="account/chat" size="28" />
           <span v-if="chatNotificationCount > 0" class="notification-badge | body-xs font-semibold">
             {{ chatNotificationCount > 99 ? '99+' : chatNotificationCount }}
           </span>
@@ -34,12 +34,12 @@ defineEmits<{
   closeBoth: []
 }>()
 
-// Use notifications composable to get chat/enquiry count
-const { aggregates } = useNotifications()
+// Use notifications aggregate for unread messages count
+const { getAggregateCount } = useNotifications()
 
-// For chat notifications, we'll use enquiries count
+// Get unread messages count from aggregates
 const chatNotificationCount = computed(() => {
-  return aggregates.value?.enquiries || 0
+  return getAggregateCount('unreadMessages') || 0
 })
 </script>
 
@@ -109,17 +109,15 @@ const chatNotificationCount = computed(() => {
 
     .notification-badge {
       position: absolute;
-      top: -8px;
+      top: -12px;
       left: 15px;
-      background: var(--error);
-      color: var(--monochrome-900);
+      background: var(--secondary-500);
+      color: var(--monochrome-100);
       border-radius: 50%;
-      min-width: var(--size-22);
       height: var(--size-22);
-      padding: var(--size-4);
+      padding: var(--size-4) var(--size-8);
       display: flex;
-      align-items: center;
-      justify-content: center;
+      text-align: center;
     }
   }
 }

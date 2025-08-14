@@ -104,6 +104,7 @@ const priceFormatted = computed(() => {
 // Conversation management
 const conversationState = useConversationState();
 const conversationActions = useConversationActions(conversationState);
+const conversationEvents = useConversationEvents(conversationState);
 
 // Reply logic
 const replyMessage = ref("")
@@ -125,9 +126,40 @@ onUnmounted(() => {
   }
 })
 
-onMounted(scrollToBottom)
+onMounted(() => {
+  scrollToBottom();
+  // Mark messages as read when component mounts and conversation is open
+  if (props.isOpen && props.conversation) {
+    markUnreadMessagesAsRead();
+  }
+});
 
-watch(() => props.conversation?.messages?.length, scrollToBottom)
+// Simple watcher just for scrolling when messages change
+watch(() => props.conversation?.messages?.length, scrollToBottom);
+
+// Mark messages as read ONLY when conversation opens (not when new messages arrive)
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen && props.conversation) {
+    markUnreadMessagesAsRead();
+  }
+});
+
+/**
+ * Mark all unread messages in the current conversation as read
+ * Only marks messages that were sent TO the current user (not from them)
+ */
+function markUnreadMessagesAsRead() {
+  if (!props.conversation || !props.currentUserId) return;
+  
+  const unreadMessages = props.conversation.messages.filter(
+    message => !message.isRead && message.senderId !== props.currentUserId
+  );
+  
+  // Mark each unread message as read
+  unreadMessages.forEach(message => {
+    conversationEvents.markMessageAsRead(message.id, props.conversation!.id);
+  });
+}
 
 function scrollToBottom() {
   nextTick(() => {

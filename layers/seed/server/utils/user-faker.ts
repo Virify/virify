@@ -137,6 +137,7 @@ export async function seedFakeUsers(count = 1): Promise<void> {
         await prisma.message.create({
           data: {
             content: faker.lorem.sentence(),
+            isRead: faker.datatype.boolean(),
             conversation: {
               connect: { id: conversation.id },
             },

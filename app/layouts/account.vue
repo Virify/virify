@@ -157,6 +157,7 @@ const { user } = useUserSession();
   width: auto;
   transition: width 0.3s ease;
   align-self: start;
+  padding-bottom: var(--size-4);
 
   @include mq.not-notebook {
     position: static;
@@ -185,6 +186,10 @@ const { user } = useUserSession();
       
       &.sidebar-content--has-overlay {
         height: calc(100vh - var(--header-expanded-height) + var(--size-32));
+        
+        @include mq.tablet-only {
+          height: 60vh;
+        }
       }
     }
   }

@@ -42,7 +42,7 @@
         </template>
         <template v-else>
           <div class="o-chat-summary__empty">
-            <p class="o-chat-summary__empty-text">No enquiries found</p>
+            <p class="o-chat-summary__empty-text | body-sm">No enquiries found</p>
           </div>
         </template>
         <template #fallback>
@@ -81,13 +81,21 @@ const { getAggregateCount } = useNotifications()
 const isCollapsed = ref(false)
 const search = ref("")
 
-const enquiriesCount = computed(() => getAggregateCount('enquiries'))
+// Get unread enquiries count from aggregates instead of calculating manually
+const enquiriesCount = computed(() => {
+  return getAggregateCount('unreadMessages') || 0;
+});
 
 const allLimitedConversations = computed(() => {
+  let conversations = allConversations.value || [];
+  
+  // Sort conversations using utility function
+  conversations = sortConversationsByUnreadAndRecency(conversations, user.value?.id);
+  
   if (!limit?.value || limit.value === 0) {
-    return allConversations.value
+    return conversations;
   }
-  return allConversations.value.slice(0, limit.value)
+  return conversations.slice(0, limit.value);
 })
 
 const filteredConversations = computed(() => {
@@ -113,7 +121,8 @@ function toggleCollapsed() {
 <style lang="scss" scoped>
 @use '#styles/_utils/media' as mq;
 .o-chat-summary {
-  height: calc(100vh - var(--header-expanded-height) + var(--size-32));
+  height: fit-content;
+  max-height: calc(100vh - var(--header-expanded-height) + var(--size-32));
   display: flex;
   flex-direction: column;
   
@@ -121,8 +130,13 @@ function toggleCollapsed() {
     height: auto;
   }
   
+  @include mq.tablet-only {
+    max-height: 60vh; /* Reduce max height on tablet */
+  }
+  
   @include mq.mobile-only {
     height: 100%;
+    max-height: none;
     
     &.collapsed {
       height: auto;
@@ -232,7 +246,7 @@ function toggleCollapsed() {
   }
 
   &__empty-text {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--foreground-100);
   }
 
   &__search-row {
