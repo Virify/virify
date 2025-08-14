@@ -16,6 +16,9 @@
 
 <script setup lang="ts">
 
+// Handle authentication dialog logic
+useAuthenticationHandler()
+
 useHead({
   htmlAttrs: {
     lang: "en-GB",

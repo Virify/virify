@@ -39,8 +39,10 @@ export default function useDialog(): UseDialogResponse {
    *
    *  @param {{ returnValue: unknown }} event
    */
-  const hideDialog = (evt: unknown) => {
-    if (!state.value) return
+  const hideDialog = (evt: unknown): void => {
+    if (!state.value) {
+      return
+    }
 
     // Check the onClose key
     const { onClose } = state.value
@@ -49,7 +51,9 @@ export default function useDialog(): UseDialogResponse {
     state.value = undefined
 
     // Verify that onClose is a function
-    if (!isFunction(onClose)) return
+    if (!isFunction(onClose)) {
+      return
+    }
 
     // If so, standardise the response...
     const standardisedReturnValue = createResponseObject(evt)
