@@ -60,6 +60,10 @@
   @include mq.desktop {
     padding: var(--size-40)
   }
+
+  @include mq.mobile-only {
+    width: fit-content;
+  }
 }
 
 .dialog-container-lg {

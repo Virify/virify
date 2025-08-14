@@ -167,11 +167,11 @@
 
 </template>
 
+
 <script setup lang="ts">
 import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
 import breakpoints from "#styles/_utils/breakpoints.module.scss";
-import { hasBooleanFeatures, filterListingFeatures } from "~/utils/listing/filter-listing-features";
-
+const { trackListingView } = useAnalytics();
 const route = useRoute();
 
 /**
@@ -285,6 +285,10 @@ useIntersectionObserver($desktopCarousel, ([entry]) => {
 
 onMounted(() => {
   window.addEventListener("scroll", parallaxCarousel, { passive: true });
+  // Removed duplicate event listener registration
+  if (listing.value && listing.value.id) {
+    trackListingView(String(listing.value.id));
+  }
 });
 
 onBeforeUnmount(() => {
@@ -316,12 +320,6 @@ function closeImageModal() {
   showImageModal.value = false;
 }
 
-
-
-onMounted(() => {
-  window.addEventListener("scroll", parallaxCarousel, { passive: true });
-});
-
 onBeforeUnmount(() => {
   window.removeEventListener("scroll", parallaxCarousel);
 });
@@ -338,8 +336,7 @@ ul {
 }
 
 .p-listing {
-  margin-top: var(--size-32);
-
+  padding-top: var(--size-16);
 
   &__grid {
     display: grid;

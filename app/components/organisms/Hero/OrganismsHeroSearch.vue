@@ -151,22 +151,8 @@ onUnmounted(() => {
   padding: var(--size-56) var(--size-20);
 
   @include mq.tablet {
-    padding: var(--size-72) var(--size-32);
+    padding: var(--size-72);
     position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      background: url("/img/call-out-bg.svg") no-repeat right, linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-      background-size: auto 120%;
-      opacity: 0.1;
-      pointer-events: none;
-      border-radius: inherit;
-    }
   }
 
   &__content {

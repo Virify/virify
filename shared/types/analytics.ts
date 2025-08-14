@@ -50,3 +50,13 @@ export interface AnalyticsAggregates {
   
   // Add more analytics metrics as needed
 }
+
+export type RecentlyViewed = {
+  id: number;
+  listingId: number | null;
+  listing: ListingCardType | null;
+  userId?: number | null;
+  createdAt: Date | string;
+  sessionId?: string | null;
+  ip?: string | null;
+};

@@ -1,0 +1,68 @@
+<template>
+  <div>
+    <MoleculesMobileNavigationBar :isMobileMenuOpen="isMobileMenuOpen" :isChatSummaryOpen="isChatSummaryOpen" @toggleMenu="toggleMobileMenu"
+      @toggleChat="toggleChatSummary" @closeBoth="closeBothOverlays" />
+
+    <MoleculesMobileSidebarNavigation :isOpen="isMobileMenuOpen" :groupStates="groupStates"
+      @close="isMobileMenuOpen = false" @toggleGroup="toggleGroup" @navClick="handleNavClick" />
+
+    <OrganismsMobileChatSummary :isOpen="isChatSummaryOpen" @close="toggleChatSummary" />
+
+    <MoleculesDesktopSidebarNavigation :groupStates="groupStates" @toggleGroup="toggleGroup"
+      @navClick="handleNavClick" />
+  </div>
+</template>
+
+<script setup lang="ts">
+const { clear } = useUserSession()
+const { fetchUserItemsAggregates } = useNotifications()
+
+const isMobileMenuOpen = ref(false)
+const isChatSummaryOpen = ref(false)
+const groupStates = ref([true, false, false])
+
+onMounted(() => {
+  fetchUserItemsAggregates()
+})
+
+function toggleGroup(index: number) {
+  groupStates.value[index] = !groupStates.value[index]
+}
+
+function toggleMobileMenu() {
+  const wasMenuOpen = isMobileMenuOpen.value
+  isMobileMenuOpen.value = false
+  isChatSummaryOpen.value = false
+  if (!wasMenuOpen) {
+    isMobileMenuOpen.value = true
+  }
+}
+
+function toggleChatSummary() {
+  const wasChatOpen = isChatSummaryOpen.value
+  isMobileMenuOpen.value = false
+  isChatSummaryOpen.value = false
+  if (!wasChatOpen) {
+    isChatSummaryOpen.value = true
+  }
+}
+
+function closeBothOverlays() {
+  isMobileMenuOpen.value = false
+  isChatSummaryOpen.value = false
+}
+
+function handleNavClick(item: any) {
+  if (item.action === 'logout') {
+    logout()
+  }
+}
+
+async function logout() {
+  await clear()
+  const route = useRoute()
+  if (route.path.startsWith('/account')) {
+    navigateTo('/')
+  }
+}
+</script>

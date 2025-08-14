@@ -132,7 +132,9 @@ defineExpose({ scrollToBottom });
 
 <style lang="scss" scoped>
 .o-active-chat-panel {
-  height: 100%;
+  height: fit-content;
+  min-height: 200px;
+  max-height: calc(100vh - var(--header-expanded-height) - 100px);
   display: flex;
   flex-direction: column;
   overflow: hidden;

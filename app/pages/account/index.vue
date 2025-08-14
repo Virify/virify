@@ -1,58 +1,44 @@
 <template>
-  <!-- Middle Column - Main Content -->
-  <div class="account-profile-content | container">
-    <div v-if="loggedIn">
-      <h2 class="title-sm">Weclome back, {{ user?.firstName ?? user?.username }}!</h2>
-      <!-- Analytics Dashboard -->
-      <div class="analytics-dashboard">
-        <div class="analytics-card | box">
-          <h3 class="| title-xs">Total Listings Views</h3>
-          <p class="| title-lg text-primary-500">{{ analytics?.totalViews }}</p>
-          <p class="| body-xs">+{{ analytics?.percentageChange }}% from last month</p>
-        </div>
-        <div class="analytics-card | box">
-          <h3 class="| title-xs">Listings Favourited</h3>
-          <p class="| title-lg text-primary-500">{{ analytics?.favoritedByOthersCount }}</p>
-          <p class="| body-xs">Listings saved by users</p>
-        </div>
-        <div class="analytics-card | box">
-          <h3 class="| title-xs">Total Enquiries</h3>
-          <p class="| title-lg text-primary-500">{{ analytics?.totalConversations }}</p>
-          <p class="| body-xs">Enquiries on your listings</p>
-        </div>
-      </div>
-
-      <!-- notifications -->
-      <div class="account-notifications">
-        <h3 class="title-sm">Notifications</h3>
-        <div class="box-xl | box">
-          <p class="body-md">You have no new notifications.</p>
-        </div>
-      </div>
-
-      <!-- activity -->
-      <div class="account-activity">
-        <h3 class="title-sm">Recent Activity</h3>
-        <div class="box-xl | box">
-          <p class="body-md">{{ recentlyViewedListings }}</p>
-        </div>
-      </div>
-
-      <!-- recent favourites -->
-      <div class="account-favourites">
-        <h3 class="title-sm">Recent Favourites</h3>
-        <div class="box-xl | box">
-          <p class="body-md">{{ recentFavourites }}</p>
-        </div>
-      </div>
+  <div class="dashboard">
+    <div class="analytics-section">
+      <slot name="analytics">
+        <AtomsStatsCard :value="String(analytics?.totalViews || 0)"
+          :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views"
+          :animated="true" />
+        <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users"
+          title="Listings Favourited" :animated="true" />
+        <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings"
+          title="Total Enquiries" :animated="true" />
+      </slot>
     </div>
 
-    <!-- recent favourites -->
-    <div class="account-notes">
-      <h3 class="title-sm">Recent Notes</h3>
-      <div class="box-xl | box">
-        <p class="body-md">{{ recentUserNotes }}</p>
-      </div>
+    <div class="content-section">
+      <slot name="content">
+        <OrganismsRecentCard :is-collapsed="isViewedCollapsed" @toggle="isViewedCollapsed = !isViewedCollapsed"
+          title="Recently Viewed Listings" icon="search" :items="recentlyViewedListings" variant="blue"
+          icon-name="search" empty-message="No recent views yet." />
+      </slot>
+    </div>
+
+    <div class="content-section">
+      <slot name="content">
+        <OrganismsRecentCard :is-collapsed="isFavouritesCollapsed"
+          @toggle="isFavouritesCollapsed = !isFavouritesCollapsed" title="Recently Favourited Listings"
+          icon="cards/favourite" :items="recentFavourites" variant="secondary" icon-name="cards/favourite-filled"
+          empty-message="No recent favourites yet." />
+      </slot>
+    </div>
+
+    <div class="content-section">
+      <slot name="content">
+        <OrganismsRecentCard :is-collapsed="isNotesCollapsed" @toggle="isNotesCollapsed = !isNotesCollapsed"
+          title="Recently Added Notes" icon="cards/notes" :items="recentUserNotes" variant="blue"
+          icon-name="cards/notes" :has-background-image="true" empty-message="No recent notes yet." />
+      </slot>
+    </div>
+
+    <div class="actions-section">
+      <slot name="actions"></slot>
     </div>
   </div>
 </template>
@@ -61,70 +47,65 @@
 definePageMeta({
   middleware: ["authenticated"],
   head: {
-    title: "Account",
-    meta: [
-      { name: "description", content: "Manage your account settings and preferences." },
-      { name: "keywords", content: "account, settings, preferences, user" },
-    ],
+    title: "Dashboard",
   },
+  layout: "account",
 });
-const { user, loggedIn } = useUserSession();
-const { analytics, recentUserNotes, recentFavourites, recentlyViewedListings } = useAnalytics();
 
+const { analytics, recentFavourites, recentUserNotes, recentlyViewedListings } = useAnalytics();
+
+const isViewedCollapsed = ref(false);
+const isFavouritesCollapsed = ref(true);
+const isNotesCollapsed = ref(true);
 </script>
+
 <style lang="scss" scoped>
-.account-profile-content {
-  margin-top: -3rem;
+@use '#styles/_utils/media' as mq;
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+
 }
 
-.analytics-dashboard {
+.analytics-section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin: 1rem 0;
+  gap: var(--size-16);
 
-  @media screen and (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-
-  .analytics-card {
-    padding: 1rem;
+  @include mq.not-notebook {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 
-.box {
-  background: url("/img/logo-background.svg") no-repeat top right, linear-gradient(70deg, var(--monochrome-100), var(--primary-200));
-  background-size: auto 200%, cover;
-  color: var(--monochrome-900);
-
-  &-xl {
-    background: none;
-    background-color: var(--background-200);
-    color: var(--foreground-100);
-  }
-}
-
-.account-notifications,
-.account-activity,
-.account-favourites,
-.account-notes {
-  margin: 1rem 0;
-}
-
-.account-favourites-list {
+.content-section {
+  background: var(--background-200);
+  padding: var(--size-32);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-  justify-content: space-between;
-  padding: 0;
-  padding-right: 20px;
-  text-align: left;
+  flex-direction: column;
+  gap: var(--size-24);
+  min-width: 0;
 
-  @media screen and (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
+  @include mq.mobile-only {
+    padding: var(--size-16);
+    gap: var(--size-16);
+  }
+}
+
+.actions-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--size-24);
+
+  @include mq.mobile-only {
+    grid-template-columns: 1fr;
+    gap: var(--size-16);
   }
 }
 </style>

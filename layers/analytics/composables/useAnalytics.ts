@@ -15,7 +15,7 @@ export const useAnalytics = createSharedComposable(() => {
   const sessionId = useState("analytics-session-id", () => nanoid());
   
   // Reactive state for analytics data
-  const recentlyViewedListings = ref<number[]>([]);
+  const recentlyViewedListings = ref<RecentlyViewed[]>([]);
   const analytics = ref<UserAnalyticsSummary | null>(null);
   
   const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/search/location"), {
@@ -30,7 +30,7 @@ export const useAnalytics = createSharedComposable(() => {
     
     try {
       const [viewedListings, userAnalytics] = await Promise.all([
-        useRequestFetch()<number[]>("/api/analytics/listing/track-view").catch(() => []),
+        useRequestFetch()<RecentlyViewed[]>("/api/analytics/listing/track-view").catch(() => []),
         useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all").catch(() => null)
       ]);
       

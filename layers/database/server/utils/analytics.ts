@@ -258,7 +258,7 @@ export async function getListingViewsInDateRange(listingIds: number[], startDate
  * @param limit Maximum number of listings to return
  * @returns Array of recently viewed listings
  */
-export async function getRecentViewedListings(userId: number, limit: number = 5) {
+export async function getRecentViewedListings(userId: number, limit: number = 5): Promise<RecentlyViewed[]> {
   return prisma.listingView.findMany({
     where: {
       userId,

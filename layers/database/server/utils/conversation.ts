@@ -34,6 +34,7 @@ export async function createConversation(senderId: number, receiverId: number, m
           senderId: true,
           receiverId: true,
           content: true,
+          isRead: true,
           createdAt: true,
           updatedAt: true,
           sender: {
@@ -107,6 +108,7 @@ export async function replyToConversation(conversationId: number, messageContent
         senderId: true,
         receiverId: true,
         content: true,
+        isRead: true,
         createdAt: true,
         updatedAt: true,
         sender: {
@@ -194,6 +196,88 @@ export async function getSentEnquiryListingIds(userId: number): Promise<number[]
     .filter(Boolean) as number[];
 }
 
+/**
+ * Mark a message as read
+ *
+ * @param messageId The ID of the message to mark as read
+ * @param userId The ID of the user marking the message as read (must be the receiver)
+ * @returns The updated message if successful, null if not authorized or message not found
+ */
+export async function markMessageAsRead(messageId: number, userId: number): Promise<MessageWithUser | null> {
+  // First verify the user is the receiver of this message
+  const message = await prisma.message.findUnique({
+    where: { id: messageId },
+    select: {
+      id: true,
+      receiverId: true,
+      isRead: true,
+    },
+  });
+
+  if (!message || message.receiverId !== userId) {
+    return null; // User is not authorized to mark this message as read
+  }
+
+  if (message.isRead) {
+    // Message is already read, return current state
+    return await prisma.message.findUnique({
+      where: { id: messageId },
+      select: {
+        id: true,
+        senderId: true,
+        receiverId: true,
+        content: true,
+        isRead: true,
+        createdAt: true,
+        updatedAt: true,
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Mark the message as read
+  return await prisma.message.update({
+    where: { id: messageId },
+    data: { isRead: true },
+    select: {
+      id: true,
+      senderId: true,
+      receiverId: true,
+      content: true,
+      isRead: true,
+      createdAt: true,
+      updatedAt: true,
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+      receiver: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
 export const conversationWithUserAndMessages = {
   id: true,
   listingId: true,
@@ -204,6 +288,7 @@ export const conversationWithUserAndMessages = {
       id: true,
       senderId: true,
       receiverId: true,
+      isRead: true,
       content: true,
       createdAt: true,
       updatedAt: true,

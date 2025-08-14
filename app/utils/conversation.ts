@@ -1,4 +1,3 @@
-import type { ConversationWithUserAndMessages, MessageWithUser } from '~~/shared/types/conversation';
 
 interface ConversationPoV {
   name: string;
@@ -15,18 +14,18 @@ interface ConversationPoV {
 export const getConversationPoV = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined): ConversationPoV => {
   if (currentUserId === undefined || !conversation?.sender || !conversation?.receiver) {
     return {
-      name: conversation?.sender?.email || conversation?.receiver?.email || 'Unknown Participant',
+      name: conversation?.sender?.username || conversation?.receiver?.username || 'Unknown Participant',
       otherUserId: undefined
     };
   }
   if (String(conversation.sender.id) === String(currentUserId)) {
     return {
-      name: conversation.receiver.email,
+      name: conversation.receiver.username || conversation.receiver.email,
       otherUserId: conversation.receiver.id
     };
   } else {
     return {
-      name: conversation.sender.email,
+      name: conversation.sender.username || conversation.sender.email,
       otherUserId: conversation.sender.id
     };
   }
@@ -37,14 +36,14 @@ export const getConversationPoV = (conversation: ConversationWithUserAndMessages
  * 
  * @param convoMessage - The message object.
  * @param currentUserId - The ID of the current user.
- * @returns 'You' if the sender is the current user, otherwise the sender's email.
+ * @returns 'You' if the sender is the current user, otherwise the sender's username (or email if username not available).
  */
 export const getConvoMessagePoV = (convoMessage: MessageWithUser, currentUserId: string | number | undefined): string => {
-  if (currentUserId === undefined || !convoMessage?.sender) return convoMessage?.sender?.email || 'Unknown Sender';
+  if (currentUserId === undefined || !convoMessage?.sender) return convoMessage?.sender?.username || convoMessage?.sender?.email || 'Unknown Sender';
   if (String(convoMessage.sender.id) === String(currentUserId)) {
     return 'You';
   } else {
-    return convoMessage.sender.email;
+    return convoMessage.sender.username || convoMessage.sender.email;
   }
 };
 
@@ -64,19 +63,188 @@ export const formatMessageTimestampToTime = (createdAt?: string | Date): string 
 };
 
 /**
- * Formats a message creation timestamp to a full date-time string.
+ * Formats a message creation timestamp - shows only time if today, date+time if older.
  * 
  * @param createdAt - The timestamp of message creation.
- * @returns Formatted date-time string.
+ * @returns Formatted time string if today, date-time string if older.
  */
 export const formatMessageTimestamp = (createdAt?: string | Date): string => {
   if (!createdAt) return '';
   const date = new Date(createdAt);
-  return date.toLocaleString('en-GB', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
+  const now = new Date();
+  
+  // Check if the message is from today
+  const isToday = date.toDateString() === now.toDateString();
+  
+  if (isToday) {
+    // Show only time for today's messages
+    return date.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } else {
+    // Show date and time for older messages
+    return date.toLocaleString('en-GB', {
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+};
+
+/**
+ * Get the other user's ID in a conversation (not the current user)
+ * 
+ * @param conversation - The conversation object
+ * @param currentUserId - The current user's ID
+ * @returns The other user's ID, or null if not found
+ */
+export const getOtherUserId = (conversation: ConversationWithUserAndMessages, currentUserId: number): number | null => {
+  return conversation.sender.id === currentUserId ? conversation.receiver.id : conversation.sender.id;
+};
+
+/**
+ * Format a partner name from email by removing @ domain and replacing separators
+ * 
+ * @param name - The name or email to format
+ * @returns Formatted name
+ */
+export const formatPartnerName = (name: string): string => {
+  // If it's an email, just return the part before the @ symbol
+  if (name.includes("@")) {
+    const parts = name.split("@");
+    return parts[0]?.replace(/[._-]/g, " ") || name;
+  }
+  return name;
+};
+
+/**
+ * Get the last message from a conversation
+ * 
+ * @param conversation - The conversation object
+ * @returns The last message or null if no messages
+ */
+export const getLastMessage = (conversation: ConversationWithUserAndMessages): MessageWithUser | null => {
+  if (conversation.messages && conversation.messages.length > 0) {
+    return conversation.messages[conversation.messages.length - 1] || null;
+  }
+  return null;
+};
+
+/**
+ * Get the content of the last message in a conversation
+ * 
+ * @param conversation - The conversation object
+ * @returns The last message content or fallback text
+ */
+export const getLastMessageContent = (conversation: ConversationWithUserAndMessages): string => {
+  const lastMessage = getLastMessage(conversation);
+  return lastMessage?.content || "No messages yet";
+};
+
+/**
+ * Get the formatted time of the last message in a conversation
+ * 
+ * @param conversation - The conversation object
+ * @returns Formatted time string or empty string
+ */
+export const getLastMessageTime = (conversation: ConversationWithUserAndMessages): string => {
+  const lastMessage = getLastMessage(conversation);
+  return lastMessage ? formatMessageTimestampToTime(lastMessage.createdAt) : "";
+};
+
+/**
+ * Update a conversation in an array and move it to the top
+ * 
+ * @param conversations - Array of conversations
+ * @param conversationId - ID of conversation to update
+ * @param updatedData - Partial data to update
+ * @returns Updated conversations array
+ */
+export const updateConversationInArray = (
+  conversations: ConversationWithUserAndMessages[], 
+  conversationId: number, 
+  updatedData: Partial<ConversationWithUserAndMessages>
+): ConversationWithUserAndMessages[] => {
+  const index = conversations.findIndex(c => c.id === conversationId);
+  
+  if (index >= 0) {
+    const existingConversation = conversations[index];
+    if (!existingConversation) return conversations;
+    
+    // Create a new conversation object with updates
+    const updatedConversation: ConversationWithUserAndMessages = {
+      ...existingConversation,
+      ...updatedData,
+      id: existingConversation.id,
+      listingId: updatedData.listingId ?? existingConversation.listingId,
+      createdAt: updatedData.createdAt ?? existingConversation.createdAt,
+      updatedAt: updatedData.updatedAt ?? existingConversation.updatedAt,
+      messages: updatedData.messages ?? existingConversation.messages,
+      sender: updatedData.sender ?? existingConversation.sender,
+      receiver: updatedData.receiver ?? existingConversation.receiver
+    };
+    
+    conversations[index] = updatedConversation;
+    
+    // Move to top if it's not already there
+    if (index > 0) {
+      conversations.splice(index, 1);
+      conversations.unshift(updatedConversation);
+    }
+  }
+  
+  return conversations;
+};
+
+/**
+ * Add a conversation to an array, avoiding duplicates
+ * 
+ * @param conversations - Array of conversations
+ * @param conversation - Conversation to add
+ * @returns Updated conversations array
+ */
+export const addConversationToArray = (
+  conversations: ConversationWithUserAndMessages[], 
+  conversation: ConversationWithUserAndMessages
+): ConversationWithUserAndMessages[] => {
+  // Check if conversation already exists
+  const existingIndex = conversations.findIndex(c => c.id === conversation.id);
+  
+  if (existingIndex >= 0) {
+    // Update existing conversation
+    conversations[existingIndex] = conversation;
+  } else {
+    // Add new conversation to the beginning
+    conversations.unshift(conversation);
+  }
+  
+  return conversations;
+};
+
+/**
+ * Sort conversations by unread status first, then by most recent activity
+ * 
+ * @param conversations - Array of conversations to sort
+ * @param currentUserId - ID of the current user to determine unread messages
+ * @returns Sorted conversations array (unread first, then by most recent activity)
+ */
+export const sortConversationsByUnreadAndRecency = (
+  conversations: ConversationWithUserAndMessages[], 
+  currentUserId?: string | number
+): ConversationWithUserAndMessages[] => {
+  return conversations.sort((a, b) => {
+    const aHasUnread = a.messages.some(message => !message.isRead && message.senderId !== currentUserId);
+    const bHasUnread = b.messages.some(message => !message.isRead && message.senderId !== currentUserId);
+    
+    // If one has unread and the other doesn't, prioritize the one with unread
+    if (aHasUnread && !bHasUnread) return -1;
+    if (!aHasUnread && bHasUnread) return 1;
+    
+    // If both have same unread status, sort by most recent activity (updatedAt)
+    const aTime = new Date(a.updatedAt).getTime();
+    const bTime = new Date(b.updatedAt).getTime();
+    return bTime - aTime; // Most recent first
   });
 };

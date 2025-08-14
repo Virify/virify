@@ -1,5 +1,5 @@
 <template>
-  <div class="stats-card">
+  <div class="stats-card" :class="{ 'animate-in': animated }">
     <div class="stats-card__top">
       <div class="stats-card__content">
         <div v-if="iconName" class="stats-card__icon">
@@ -21,6 +21,7 @@ interface Props {
   subtitle: string
   title: string
   iconName?: string
+  animated?: boolean
 }
 
 defineProps<Props>()
@@ -39,6 +40,7 @@ defineProps<Props>()
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   opacity: 0;
   transform: translateY(30px);
+  color: var(--foreground-200);
 
   &.animate-in {
     opacity: 1;
@@ -101,9 +103,10 @@ defineProps<Props>()
   }
 
   &__value {
-    color: var(--monochrome-300);
+    color: inherit;
     line-height: 1;
     margin-bottom: var(--size-4);
+    color: var(--monochrome-300);
   }
 
   &__subtitle {
@@ -122,17 +125,14 @@ defineProps<Props>()
   }
 }
 
-// Mobile layout for equal heights
+// Mobile layout 
 @media (max-width: 900px) {
   .stats-card {
-
     &__top {
-      flex: 1;
       min-height: 80px;
     }
 
     &__title {
-      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;

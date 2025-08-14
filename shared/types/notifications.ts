@@ -11,6 +11,7 @@ export interface UserItemsAggregates {
   notes: number;
   enquiries: number;
   locations: number;
+  unreadMessages: number; // Count of unread messages from other users
   // Keep all the original ones even if not used yet
   notifications?: number;
   messages?: number;
