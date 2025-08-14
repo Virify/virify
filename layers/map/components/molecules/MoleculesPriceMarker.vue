@@ -1,68 +1,34 @@
 <template>
-  <div
-    class="price-marker-container"
-    role="button"
-    :aria-label="`Property marker: ${priceDisplay} ${
-      tier ? tier.toLowerCase() : 'basic'
-    } listing${isCurrentlyFavorite ? ', favorited' : ''}`"
-    :title="`Property: ${priceDisplay} ${
-      tier ? tier.toLowerCase() : 'basic'
-    } listing${isCurrentlyFavorite ? ', favorited' : ''}`"
-  >
-    <!-- SVG Marker Shape -->
-    <!-- Dynamic marker based on favorite status and tier -->
-    <AtomsIcon :icon="markerIcon" :class="markerClass" aria-hidden="true" />
+  <button class="m-price-marker" :class="{
+    'm-price-marker--featured': tier === 'FEATURED',
+    'm-price-marker--premium': tier === 'PREMIUM',
+  }" aria-label="Expand property card">
+    <nuxt-img v-if="image && tier === 'PREMIUM'" :src="image" class="m-price-marker__image" />
 
-    <!-- Favorite indicator -->
-    <div
-      v-if="isCurrentlyFavorite"
-      class="favorite-indicator"
-      aria-label="Favorited property"
-    >
-      <AtomsIcon
-        icon="map/marker-fav"
-        class="favorite-icon"
-        aria-hidden="true"
-      />
+    <div class="m-price-marker__content">
+      <span class="m-price-marker__price | body-xs font-semibold" aria-hidden="true">
+        {{ priceDisplay }}
+      </span>
+
+      <AtomsFavouriteButton v-if="id" @click.stop :listing-id="Number(id)" />
+      <AtomsNoteButton v-if="id" @click.stop :listing-id="Number(id)" />
     </div>
 
-    <!-- Note indicator -->
-    <div v-if="hasNote" class="note-indicator" aria-label="Property has notes">
-      <div class="note-dot"></div>
-    </div>
-
-    <!-- Content overlay -->
-    <div class="price-marker-content">
-      <span
-        class="price-marker-price | body-xs font-semibold"
-        aria-hidden="true"
-        >{{ priceDisplay }}</span
-      >
-    </div>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
 interface MarkerProps {
-  id: string | number | null;
-  price: number | null;
-  hasNote?: boolean | null;
-  isFavorite?: boolean | null;
-  tier?: "FEATURED" | "BASIC" | "PREMIUM";
-  priceType?: string | null;
+  id: string | number | null
+  price: number | null
+  image?: string
+  hasNote?: boolean | null
+  isFavorite?: boolean | null
+  tier?: "FEATURED" | "BASIC" | "PREMIUM"
+  priceType?: string | null
 }
 
 const props = defineProps<MarkerProps>();
-
-// Use composables for live favorite status (separate from props to avoid re-renders)
-const { isFavourite } = useFavourites();
-const { hasNote: propertyHasNote } = useNotes();
-
-// Get live favorite status
-const isCurrentlyFavorite = computed(() => isFavourite(props.id as number));
-
-// Get live note status
-const hasNote = computed(() => propertyHasNote(props.id as number));
 
 // Format price based on property type (sale vs rental)
 const priceDisplay = computed(() => {
@@ -89,141 +55,94 @@ const priceDisplay = computed(() => {
   }
 });
 
-// Computed marker icon based on favorite status and tier
-const markerIcon = computed(() => {
-  switch (props.tier) {
-    case "PREMIUM":
-      return "map/marker-premium";
-    case "FEATURED":
-      return "map/marker-featured";
-    case "BASIC":
-    default:
-      return "map/marker-basic";
-  }
-});
-
-// Computed marker class based on favorite status and tier
-const markerClass = computed(() => {
-  if (props.tier === "PREMIUM")
-    return "marker-shape teardrop-marker premium-marker";
-  return "marker-shape teardrop-marker";
-});
 </script>
 
-<style scoped>
-/* Container for the SVG marker */
-.price-marker-container {
+<style lang="scss">
+.m-price-marker {
+  --marker-background: var(--blue-400);
+  --marker-foreground: var(--monochrome-900);
+  --marker-border: var(--blue-300);
+
   position: relative;
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Ensure the bottom of the container is the precise anchor point */
-  transform-origin: center bottom;
-  /* Inherit z-index from parent wrapper for proper stacking */
-  z-index: inherit;
-  /* Make container non-clickable, only the actual marker content should be clickable */
-  pointer-events: none;
-  /* Smooth hover transitions */
-  transition: transform 0.2s ease-in-out;
-}
+  background: var(--marker-background);
+  color: var(--marker-foreground);
+  border-radius: var(--border-radius-md);
+  border: 2px solid var(--marker-border);
+  padding: var(--size-2);
+  margin: 0;
 
-/* Hover effect to highlight the marker */
-.price-marker-container:hover {
-  transform: scale(1.1);
-  z-index: 999;
-}
+  .a-note-button {
+    --notes-active-color: var(--monochrome-900);
+  }
 
-.marker-shape {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 70px;
-  height: 70px;
-  color: var(--monochrome-300);
-  /* Allow clicking on the actual marker shape */
-  pointer-events: auto;
-  /* Smooth color transition on hover */
-  transition: color 0.2s ease-in-out, filter 0.2s ease-in-out;
-}
+  &--featured {
+    --marker-background: var(--secondary-400);
+    --marker-border: var(--secondary-300);
 
-/* Enhanced hover effect for the marker shape */
-.price-marker-container:hover .marker-shape {
-  color: var(--monochrome-800);
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
-}
+    .a-favourite-button {
+      --favourite-colour: var(--monochrome-900);
+    }
 
-.marker-shape.heart-marker {
-  color: var(--favourite-colour);
-}
+    .a-note-button {
+      --notes-dot-color: var(--monochrome-900);
+    }
+  }
 
-/* Content overlay positioned on top of the SVG */
-.price-marker-content {
-  position: absolute;
-  top: 34%;
-  /* Adjusted to center in the circular part of the teardrop */
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--monochrome-900);
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-  /* Allow clicking on the price content */
-  pointer-events: auto;
-  font: inherit;
-  /* Smooth color transition on hover */
-  transition: color 0.2s ease-in-out;
-}
+  &--premium {
+    --marker-foreground: var(--primary-500);
 
-/* Change content color on hover */
-.price-marker-container:hover .price-marker-content {
-  color: var(--monochrome-100);
-}
+    min-width: 17ch;
+  }
 
-/* Favorite indicator */
-.favorite-indicator {
-  position: absolute;
-  top: var(--size-2);
-  right: var(--size-2);
-  z-index: 2;
-  width: var(--size-20);
-  height: var(--size-20);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-}
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: calc(50% - 3px);
+    transform: rotate(45deg);
+    width: 6px;
+    height: 6px;
+    background: var(--marker-background);
+    border-right: 2px solid var(--marker-border);
+    border-bottom: 2px solid var(--marker-border);
+    border-bottom-right-radius: 2px;
+  }
 
-.favorite-icon {
-  width: 100%;
-  height: 100%;
-  color: var(--favourite-colour);
-  filter: drop-shadow(0 var(--size-1) var(--size-2) rgba(0, 0, 0, 0.3));
-}
+  &__image {
+    display: block;
+    background: var(--marker-border);
+    width: 17ch;
+    aspect-ratio: 4/3;
+    margin-bottom: var(--size-4);
+    border-radius: var(--border-radius-sm);
+    object-fit: cover;
+  }
 
-/* Note indicator */
-.note-indicator {
-  position: absolute;
-  top: var(--size-32);
-  z-index: 2;
-  width: var(--size-12);
-  height: var(--size-12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-}
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-2);
+  }
 
-.note-dot {
-  width: 100%;
-  height: 100%;
-  background-color: var(--error);
-  border-radius: 50%;
-  border: 1px solid var(--monochrome-100);
-  filter: drop-shadow(0 var(--size-1) var(--size-2) rgba(0, 0, 0, 0.3));
+  &__price {
+    display: block;
+    padding: 0 var(--size-8) 0 var(--size-4);
+  }
+
+  .a-favourite-button,
+  .a-note-button {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: var(--size-20);
+    height: var(--size-20);
+
+    .a-icon {
+      width: var(--size-18);
+      height: var(--size-18);
+    }
+  }
 }
 </style>

@@ -4,12 +4,14 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   const vueApp = useNuxtApp();
   const sdk = useNuxtApp().$maptilersdk;
 
-
   /**
    * Private helper to create and add a single SDK marker to the map and instance.
    */
   function _createAndAddSdkMarker(map: ExtendedMapTilerMap, markerData: MapMarker, instance: MapInstance): Marker {
-    const markerWrapper = renderMarker(markerData.id, markerData.price, markerData.tier, vueApp, markerData.priceType);
+    const [firstImageObject] = asArray(markerData.image, true)
+    const { image } = asObject(firstImageObject)
+
+    const markerWrapper = renderMarker(markerData.id, markerData.price, markerData.tier, image as string, vueApp, markerData.priceType);
     const newSdkMarker = new sdk.Marker({
       element: markerWrapper,
       anchor: "bottom",

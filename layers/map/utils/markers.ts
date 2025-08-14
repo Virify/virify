@@ -16,10 +16,11 @@ import { defineComponent, h, createVNode, render } from "vue";
  * @returns HTMLElement containing the rendered marker
  */
 export function renderMarker(
-  id: string | number | null, 
-  price: number | null, 
-  tier?: string, 
-  vueApp?: any, 
+  id: string | number | null,
+  price: number | null,
+  tier?: string,
+  image?: string,
+  vueApp?: any,
   priceType?: string | null
 ): HTMLElement {
   const markerWrapper = document.createElement("div");
