@@ -8,21 +8,51 @@
           <AtomsIcon icon="cross" size="24" />
         </button>
       </div>
-      <div class="chat-summary-scrollable">
-        <OrganismsChatSummary :limit="0" :search-enabled="true" />
+      <div class="chat-summary-scrollable" v-if="!activeConversation">
+        <OrganismsChatSummary :limit="0" :search-enabled="true" :disable-navigate="true" @select-conversation="handleSelectConversation" />
       </div>
+      <OrganismsMobileEnquiryDetail
+        :is-open="!!activeConversation"
+        :conversation="activeConversation"
+        :current-user-id="user?.id"
+        @back="activeConversation = null"
+      />
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
 }>()
 
 defineEmits<{
   close: []
 }>()
+
+const { user } = useUserSession();
+const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
+
+// Prevent body scroll when modal is open
+watchEffect(() => {
+  if (import.meta.client) {
+    if (props.isOpen) {
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = '';
+    }
+  }
+});
+
+onUnmounted(() => {
+  if (import.meta.client) {
+    document.documentElement.style.overflow = '';
+  }
+});
+
+function handleSelectConversation(conversation: ConversationWithUserAndMessages) {
+  activeConversation.value = conversation;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -81,8 +111,8 @@ defineEmits<{
   flex: 1;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  padding: var(--size-20);
-  padding-bottom: 150px;
+  padding: var(--size-16);
+  padding-bottom: 110px;
   min-height: 0;
   height: 0;
 }

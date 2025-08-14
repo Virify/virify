@@ -31,7 +31,7 @@
               :conversation="conversation" :current-user-id="user?.id"
               @select-conversation="handleConversationSelect" />
           </ul>
-          <div class="o-chat-summary__footer">
+          <div v-if="props.limit"class="o-chat-summary__footer">
             <NuxtLink to="/account/messages">
               <button class="button button-sm button-secondary">See all</button>
             </NuxtLink>
@@ -58,7 +58,17 @@
 
 const props = defineProps<{
   limit?: number,
-  searchEnabled?: boolean
+  searchEnabled?: boolean,
+  /**
+   * When true, the component will emit an event instead of navigating to the messages page
+   * allowing parent components (e.g. mobile overlays) to control how a conversation is opened.
+   */
+  disableNavigate?: boolean;
+}>();
+
+const emit = defineEmits<{
+  /** Emitted when a conversation is selected if disableNavigate is true */
+  "select-conversation": [conversation: ConversationWithUserAndMessages];
 }>();
 
 const { user } = useUserSession();
@@ -102,7 +112,11 @@ const filteredConversations = computed(() => {
 });
 
 function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
-  // Navigate to messages page with the conversation selected
+  if (props.disableNavigate) {
+    emit("select-conversation", conversation);
+    return;
+  }
+  // Default behaviour – navigate to messages page with the conversation selected
   navigateTo(`/account/messages?conversation=${conversation.id}`);
 }
 </script>
@@ -205,13 +219,14 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
 }
 .o-chat-summary__search-row {
   padding: var(--size-4);
+  margin-bottom: var(--size-16);
 }
 .o-chat-summary__search-input {
   display: block;
   width: 100%;
-  padding: var(--size-8) var(--size-12);
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-100);
+  padding: var(--size-12);
+  border-radius: var(--border-radius-2xl);
+  border: 1px solid var(--monochrome-600);
   background: var(--background-100);
   color: var(--foreground-100);
   outline: none;
@@ -219,6 +234,6 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
   margin-bottom: var(--size-4);
 }
 .o-chat-summary__search-input:focus {
-  border-color: var(--primary-400);
+  border-color: var(--secondary-400);
 }
 </style>

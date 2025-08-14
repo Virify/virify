@@ -19,19 +19,8 @@ export function useConversationActions(conversationState: ReturnType<typeof useC
         body: { message: content, conversationId },
       });
 
-      // Update the conversation locally for immediate feedback
-      const conversation = allConversations.value.find((c) => c.id === conversationId);
-      if (conversation && newMessage) {
-        conversation.messages.push(newMessage);
-        conversation.updatedAt = new Date();
-
-        // Move conversation to top
-        const index = allConversations.value.indexOf(conversation);
-        if (index > 0) {
-          allConversations.value.splice(index, 1);
-          allConversations.value.unshift(conversation);
-        }
-      }
+      // Don't add the message here - let WebSocket events handle it
+      // This prevents duplicates when WebSocket also adds the same message
 
       return newMessage;
     } catch (error) {

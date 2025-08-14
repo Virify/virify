@@ -2,13 +2,16 @@
   <li class="m-chat-summary-item" @click="$emit('select-conversation', conversation)">
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
-        <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
-          'unread': unreadMessages > 0
-        }">{{ formattedPartnerName }}</span>
+        <div class="m-chat-summary-item__name-section">
+          <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
+            'unread': unreadMessages > 0
+          }">{{ formattedPartnerName }}</span>
+          <p class="m-chat-summary-item__address | body-xs">{{ conversationAddress }}</p>
+        </div>
         <span class="m-chat-summary-item__time | body-xs">{{ lastMessageTime }}</span>
       </div>
       <div class="m-chat-summary-item-message">
-        <p class="m-chat-summary-item-message__content | body-xs">{{ lastMessageContent }}</p>
+        <p class="m-chat-summary-item-message__content | body-sm">{{ lastMessageContent }}</p>
         <button v-if="unreadMessages > 0" class="m-chat-summary-item-message__unread | button button-secondary button-xs">{{ unreadMessages }}</button>
       </div>
     </div>
@@ -49,13 +52,16 @@ const lastMessageTime = computed(() => {
 const unreadMessages = computed(() => {
   return props.conversation.messages.filter((message) => !message.isRead && message.senderId !== props.currentUserId).length;
 });
+
+const conversationAddress = computed(() => {
+  return props.conversation.listing?.property?.address?.fullAddress || "Address not available";
+});
 </script>
 
 <style lang="scss" scoped>
 .m-chat-summary-item {
-  padding: var(--size-8);
   cursor: pointer;
-  border-radius: var(--border-radius-lg);
+  padding: var(--size-8);
 
   .unread {
     color: var(--secondary-400);
@@ -63,6 +69,7 @@ const unreadMessages = computed(() => {
 
   &:hover {
     background: var(--background-100);
+    border-radius: var(--border-radius-lg);
   }
 
   &__content {
@@ -73,8 +80,16 @@ const unreadMessages = computed(() => {
   &__header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--size-4);
+  }
+
+  &__name-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-2);
+    flex: 1;
+    min-width: 0;
   }
 
   &__username {
@@ -83,8 +98,14 @@ const unreadMessages = computed(() => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex: 1;
-    min-width: 0;
+  }
+
+  &__address {
+    margin: 0;
+    color: var(--monochrome-500);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__time {
