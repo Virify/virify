@@ -20,11 +20,9 @@ const mapContainer = ref<HTMLElement>();
 const { 
   initMap, 
   addMarkers,
-  clearMarkers, 
-  addMarker, 
-  initDrawing, 
-  getDrawControl, 
-  updateSearchRadiusVisualization, 
+  clearMarkers,
+  initDrawing,
+  updateSearchRadiusVisualization,
   removeSearchRadiusVisualization
 } = useMap();
 
@@ -42,7 +40,6 @@ const props = withDefaults(defineProps<{
   interactive?: boolean;
   mapId?: string;
   markers?: ListingCardType[];
-  marker?: ListingCardType;
   draw?: boolean;
   searchRadius?: number | null;
   searchCenter?: [number, number] | null;
@@ -179,22 +176,11 @@ function updateMarkers() {
 
   clearMarkers(map.value);
 
-  const markersArray: Marker[] = asArray(formattedMarkers.value, true)
+  const { markers } = props
+  const formattedMarkers = asArray(markers, true).map(formatMarker)
 
-  addMarkers(map.value, markersArray);
+  addMarkers(map.value, formattedMarkers);
 }
-
-
-/**
- * Format the markers for the map
- * 
- * @returns {Array} - Array of formatted markers
- */
-const formattedMarkers = computed(() => {
-  if (props.markers) return props.markers.map(listing => formatMarker(listing));
-  if (props.marker) return [formatMarker(props.marker)];
-  return [];
-});
 
 /**
  * Remove the search radius visualization from the map
