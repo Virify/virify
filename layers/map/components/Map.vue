@@ -179,11 +179,9 @@ function updateMarkers() {
 
   clearMarkers(map.value);
 
-  if (props.markers?.length) {
-    addMarkers(map.value, formattedMarkers.value);
-  } else if (props.marker && formattedMarkers.value[0]) {
-    addMarker(map.value, [formattedMarkers.value[0]]);
-  }
+  const markersArray: Marker[] = asArray(formattedMarkers.value, true)
+
+  addMarkers(map.value, markersArray);
 }
 
 
