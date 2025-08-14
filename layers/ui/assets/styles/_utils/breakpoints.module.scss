@@ -11,6 +11,12 @@ $superultrawide: 1600px;
 
 // Exports
 :export {
+    smallTablet: $small-tablet;
+    tablet: $tablet;
+    notebook: $notebook;
+    desktop: $desktop;
+    ultrawide: $ultrawide;
+    superultrawide: $superultrawide;
     menuBreakpoint: $menu;
     desktopBreakpoint: $desktop;
 }

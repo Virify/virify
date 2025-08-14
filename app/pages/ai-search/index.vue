@@ -1,10 +1,10 @@
 <template>
   <div class="ai-search-page-wrapper"
     :class="{ 'initial-state': !hasSearched, 'form-expanded': !isSearchFormCollapsed && hasSearched }">
-
     <!-- Hero Image (shown in initial state, even when form expanded) -->
     <div v-if="!hasSearched" class="hero-section">
-      <img src="/img/ai-search-cover.png" alt="AI Search Cover" class="hero-image" />
+      <img src="/img/ai-search-cover.png" alt="Modern residential properties showcasing AI-powered search"
+        class="hero-image" />
     </div>
 
     <!-- Collapsible Search Header -->
@@ -14,49 +14,63 @@
       <!-- Hero Title (shown in initial state, even when form expanded) -->
       <h1 v-if="!hasSearched" class="hero-title | title-xl font-bold">
         Find your perfect home with the
-        <span class="viri-ai-text">
-          ViriAI
-        </span>
+        <span class="viri-ai-text"> ViriAI </span>
         boosted search
       </h1>
 
       <OrganismsAiSearchForm @submit-search="handleSearch" :has-searched="hasSearched" :initial-query="lastSearchQuery"
-        :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState" :is-map-view="isMapView"
-        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset" @toggle-view="toggleView" />
+        :initial-location="lastLocation" :initial-radius="lastRadius" :has-saved-state="hasSavedState"
+        :is-map-view="isMapView" :force-collapsed="hasSearched && (!!searchResults || isSearching)"
+        @update:collapsed="isSearchFormCollapsed = $event" @sort="handleSort" @reset="handleReset"
+        @toggle-view="toggleView" />
+    </div>
+
+    <div v-if="!hasSearched" class="ai-search-content | container">
+      <AtomsHeroCard class="hero-card">
+        <h2 class="hero-card-title | title-md">Step 1</h2>
+        <p class="| body-md">Input the location supported by our fancy suggestions. And the area or radius you want to
+          search in.</p>
+        <p class="hero-card-note | body-xs"><strong>Note:</strong> The address does fancy auto-complete!</p>
+      </AtomsHeroCard>
+
+      <AtomsHeroCard class="hero-card">
+        <h2 class="hero-card-title | title-md">Step 2</h2>
+        <p class="| body-md">Once you have selected your location and area, you can add enter your property search
+          criteria.</p>
+        <p class="hero-card-note | body-xs"><strong>Note: </strong>The search and criteria fields are powered by AI!</p>
+      </AtomsHeroCard>
+
+      <AtomsHeroCard class="hero-card">
+        <h2 class="hero-card-title | title-md">Step 3</h2>
+        <p class="| body-md">Review your search criteria and click "Search". AI will take your query, understand your
+          intent and provide personalized results.</p>
+        <p class="hero-card-note | body-xs"><strong>Note: </strong>Remember to search for buy or rent (or similar
+          options).</p>
+      </AtomsHeroCard>
     </div>
 
     <!-- Search Feedback Section: Loading, No Results, Error -->
     <div v-if="shouldShowFeedback && !isMapView" class="search-feedback-wrapper">
       <div class="search-feedback-section | container container-sm">
-      <OrganismsAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
-      <OrganismsAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
+        <MoleculesAiSearchLoading v-if="isSearching" :last-search-query="lastSearchQuery" />
+        <MoleculesAiSearchNoResults v-else-if="hasNoResults" :last-search-query="lastSearchQuery" />
       </div>
     </div>
     <div v-else-if="hasSearched" class="results-container">
       <!-- List View -->
-      <OrganismsAiSearchResults 
-        v-if="!isMapView && hasResults"
-        :results="sortedResults" 
-        :query-analysis="queryAnalysis" 
-        :current-page="currentPage" 
-        :total-pages="totalPages" 
-        :total-results="totalResults"
-        @page-change="handlePageChange" 
-      />
-      
+      <OrganismsAiSearchResults v-if="!isMapView && hasResults" :results="sortedResults" :query-analysis="queryAnalysis"
+        :current-page="currentPage" :total-pages="totalPages" :total-results="totalResults"
+        @page-change="handlePageChange" />
+
       <!-- Map View (shown even with no results) -->
-      <OrganismsAiSearchMapView 
-        v-if="isMapView"
-        :results="sortedResults"
-        :location="lastLocation"
-        :radius="lastRadius"
-        :is-searching="isSearching"
-      />
+      <LazyOrganismsAiSearchMapView v-if="isMapView" :results="sortedResults" :location="lastLocation"
+        :radius="lastRadius" :is-searching="isSearching" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { applySortToResults } from "~/utils/results/search-sort";
 
 interface SearchPayload {
   location: GeocodingFeature;
@@ -82,123 +96,123 @@ const {
   totalResults,
   lastWhereClause,
   lastLocationContext,
-  
+  viewMode,
+
   // Methods
-  initializeFromSavedState,
-  resetForm,
+  updateViewMode,
+  updateSort,
+  updateSearchResults,
   saveCurrentState,
+  resetForm,
   aiSearch,
-  paginateSearch
+  paginateSearch,
 } = useAiSearchPage();
 
-// Access search state for view mode persistence
-const { saveSearchState, restoreSearchState } = useSearchState();
+// Handle URL query parameter for pre-filling search
+const route = useRoute();
+onMounted(() => {
+  const queryParam = route.query.q as string;
+  if (queryParam && !lastSearchQuery.value) {
+    lastSearchQuery.value = queryParam;
+  }
+});
 
 // Computed properties (belong in template, not composable)
-const shouldShowFeedback = computed(() =>
-  isSearching.value || (hasSearched.value && (!searchResults.value || searchResults.value.length === 0)) || searchError.value
-);
+const shouldShowFeedback = computed(() => isSearching.value || (hasSearched.value && (!searchResults.value || searchResults.value.length === 0)) || searchError.value);
 
-const hasNoResults = computed(() =>
-  hasSearched.value && (!searchResults.value || searchResults.value.length === 0)
-);
+const hasNoResults = computed(() => hasSearched.value && (!searchResults.value || searchResults.value.length === 0));
 
-const hasResults = computed(() =>
-  !isSearching.value && searchResults.value && searchResults.value.length > 0
-);
+const hasResults = computed(() => !isSearching.value && searchResults.value && searchResults.value.length > 0);
 
-const hasSavedState = computed(() =>
-  !!(lastSearchQuery.value || lastLocation.value || lastRadius.value)
-);
+const hasSavedState = computed(() => !!(lastSearchQuery.value || lastLocation.value || lastRadius.value));
 
 // Map view state - initialize from saved state
 const isMapView = ref(false);
 
-// Initialize view state from localStorage
-const initializeViewState = () => {
-  if (import.meta.client) {
-    const restored = restoreSearchState();
-    isMapView.value = restored.viewMode === 'map';
-  }
-};
+// Watch for view mode changes and update local state
+watch(
+  () => viewMode.value,
+  (newViewMode) => {
+    if (import.meta.client) {
+      isMapView.value = newViewMode === "map";
+    }
+  },
+  { immediate: true }
+);
 
 const toggleView = () => {
   isMapView.value = !isMapView.value;
-  // Save the new view mode to localStorage
-  saveSearchState({ viewMode: isMapView.value ? 'map' : 'list' });
+  // Save the new view mode to KV storage
+  updateViewMode(isMapView.value ? "map" : "list");
 };
 
 const handleReset = async () => {
-  resetForm();
-  // Reset view to list when form is reset
+  await resetForm();
   isMapView.value = false;
-  // Clear any stored view mode and set to list
-  if (import.meta.client) {
-    localStorage.removeItem('search-state');
-  }
-  saveSearchState({ viewMode: 'list' });
-  // Ensure state is updated
-  await nextTick();
 };
-
 
 const sortedResults = computed(() => {
   if (!searchResults.value) return [];
   return applySortToResults(searchResults.value, currentSort.value);
 });
 
+// State automatically initializes from KV storage via useSearchState
+// No manual initialization needed anymore
 
-// Initialize state on mount
-onMounted(() => {
-  initializeFromSavedState();
-  initializeViewState();
+// Save state when navigating away
+onBeforeUnmount(() => {
+  if (hasSearched.value && searchResults.value) {
+    saveCurrentState();
+  }
 });
 
 // Handle sort changes
 const handleSort = (sortBy: string) => {
-  currentSort.value = sortBy;
-  saveCurrentState();
+  updateSort(sortBy);
 };
 
 const handlePageChange = async (page: number) => {
   if (page === currentPage.value || page < 1 || page > totalPages.value) return;
-  
+
   // Scroll to top immediately
   scrollToTop();
-  
+
   // Use cached WHERE clause for faster pagination
   if (lastWhereClause.value) {
     try {
-      const response = await paginateSearch(
-        lastWhereClause.value,
-        page,
-        20,
-        lastSearchQuery.value,
-        queryAnalysis.value,
-        lastLocationContext.value
-      );
-      
-      searchResults.value = response.results;
-      currentPage.value = response.currentPage;
-      totalPages.value = response.totalPages;
-      totalResults.value = response.totalResults;
-      
+      const response = await paginateSearch(lastWhereClause.value, page, 20, lastSearchQuery.value, queryAnalysis.value, lastLocationContext.value);
+
       // Apply current sort order to results
-      searchResults.value = applySortToResults(searchResults.value, currentSort.value);
-      
-      // Save current state
-      saveCurrentState();
-      
+      const sortedResults = applySortToResults(response.results, currentSort.value);
+
+      // Update all state at once
+      await updateSearchResults({
+        results: sortedResults,
+        queryAnalysis: queryAnalysis.value
+          ? {
+            usedTerms: [...queryAnalysis.value.usedTerms],
+            ignoredTerms: [...queryAnalysis.value.ignoredTerms],
+          }
+          : { usedTerms: [], ignoredTerms: [] },
+        currentPage: response.currentPage || page,
+        totalPages: response.totalPages,
+        totalResults: response.totalResults,
+        whereClause: lastWhereClause.value,
+        locationContext: lastLocationContext.value,
+      });
     } catch (error: any) {
       searchError.value = error.message || "An unexpected error occurred.";
     }
   } else {
     // Fallback to full search if WHERE clause not available
-    await handleSearch({
-      location: lastLocation.value!,
-      radius: lastRadius.value,
-      query: lastSearchQuery.value
-    }, page);
+    await handleSearch(
+      {
+        location: lastLocation.value!,
+        radius: lastRadius.value,
+        query: lastSearchQuery.value,
+      },
+      page
+    );
   }
 };
 
@@ -206,16 +220,16 @@ const handlePageChange = async (page: number) => {
 watch([isSearchFormCollapsed, hasResults], ([collapsed, results]) => {
   if (!collapsed && results) {
     // Form is expanded and we have results - disable body scroll
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   } else {
     // Form is collapsed or no results - restore body scroll
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
   }
 });
 
 // Cleanup on unmount
 onUnmounted(() => {
-  document.body.style.overflow = '';
+  document.body.style.overflow = "";
 });
 
 const handleSearch = async (payload: SearchPayload, page: number = 1) => {
@@ -239,7 +253,7 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
   await nextTick(() => {
     document.querySelector(".search-feedback-section")?.scrollIntoView({
       behavior: "smooth",
-      block: "start"
+      block: "start",
     });
   });
 
@@ -247,22 +261,21 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
     const response = await aiSearch(payload.location, payload.radius, payload.query, page);
     searchResults.value = response.results;
     queryAnalysis.value = response.queryAnalysis;
-    
+
     // Use pagination info from backend (fallback to defaults if pagination removed)
     totalResults.value = response.totalResults ?? searchResults.value?.length ?? 0;
     totalPages.value = response.totalPages ?? 1;
     currentPage.value = response.currentPage ?? 1;
-    
+
     // Cache WHERE clause and context for efficient pagination
     lastWhereClause.value = response.generatedWhereClause;
     lastLocationContext.value = response.locationContext;
-    
+
     // Apply current sort order to results
     searchResults.value = applySortToResults(searchResults.value, currentSort.value);
-    
+
     // Save current state
     saveCurrentState();
-    
   } catch (error: any) {
     searchError.value = error.message || "An unexpected error occurred.";
   } finally {
@@ -272,6 +285,8 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 // Page blur effects when form expanded
 .ai-search-page-wrapper.form-expanded {
 
@@ -281,18 +296,17 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
     transition: filter 0.3s ease;
     opacity: 0.7;
   }
-
 }
 
 // Common margin adjustments for fixed search bar
 .results-container,
 .search-feedback-wrapper {
   margin-top: calc(var(--header-height) + 80px);
-  
+
   @media (max-width: 768px) and (min-width: 600px) {
     margin-top: calc(var(--header-height) + 120px);
   }
-  
+
   @media (max-width: 600px) {
     margin-top: calc(var(--header-height) + 140px);
   }
@@ -331,7 +345,7 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
 
   // Dark overlay for better text contrast
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -371,6 +385,31 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
   }
 }
 
+.ai-search-content {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: var(--size-32);
+  padding: var(--size-40) 0;
+
+  .hero-card {
+    flex: 1;
+
+    &-title {
+      color: var(--monochrome-900);
+    }
+
+    &-note {
+      color: var(--secondary-400);
+    }
+  }
+
+  @include mq.mobile-only {
+    flex-direction: column;
+    padding: var(--size-24) 0;
+  }
+}
+
 // Hero title styling
 .hero-title {
   text-align: center;
@@ -397,9 +436,8 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
   padding: var(--size-40);
   background: var(--background-200);
   border-radius: var(--border-radius-3xl);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow:0 4px 12px rgba(0, 0, 0, 0.08);
 }
-
 
 // Error content
 .error-content {
@@ -417,7 +455,6 @@ const handleSearch = async (payload: SearchPayload, page: number = 1) => {
     color: var(--danger-text);
   }
 }
-
 
 // No results in list view
 .no-results-list-view {

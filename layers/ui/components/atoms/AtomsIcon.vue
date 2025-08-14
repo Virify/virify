@@ -1,5 +1,5 @@
 <template>
-  <svg width="24" height="24" class="a-icon">
+  <svg :width="size" :height="size" class="a-icon">
     <title v-if="title">{{ title }}</title>
     <use :href="iconFile"></use>
   </svg>
@@ -13,6 +13,10 @@ const props = defineProps({
   icon: {
     type: String,
     required: true
+  },
+  size: {
+    type: [String, Number],
+    default: '24'
   }
 })
 
@@ -36,10 +40,3 @@ const iconFile = computed(() => {
   return `/sprites/icon-${prefix}.svg#${name}`
 })
 </script>
-
-<style>
-:where(.a-icon) {
-  width: 1em;
-  height: 1em;
-}
-</style>

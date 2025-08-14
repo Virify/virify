@@ -1,4 +1,3 @@
-import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 export default defineNuxtConfig({
   extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed"],
@@ -17,11 +16,19 @@ export default defineNuxtConfig({
     }
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [],
+    vue: {
+      template: {
+        compilerOptions: {
+          comments: false
+        }
+      }
+    }
   },
   nitro: {
     experimental: {
       tasks: true,
+      asyncContext: true,
     },
     rollupConfig: {
       // @ts-ignore

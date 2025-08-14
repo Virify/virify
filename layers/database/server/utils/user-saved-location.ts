@@ -1,4 +1,4 @@
-import type { UserLocation } from "@prisma/client";
+import type { UserLocation } from "../database/prisma/generated/client";
 
 /**
  * Get user saved locations

@@ -593,6 +593,8 @@ async function sendForm(event: Event) {
 
   .o-searchform-location-input {
     transition-property: width, height;
+    border: none;
+    
   }
 
   .o-searchform-location-button {

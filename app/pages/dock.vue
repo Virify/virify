@@ -1,20 +1,135 @@
 <template>
-  <div class="| container">
-    <h1 class="| title-lg">Dock demo</h1>
+  <div class="p-dock" :class="{
+    'p-dock--has-grid': showGrid
+  }">
+    <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap" :class="{
+      '| container': showGrid
+    }">
+      <template #left v-if="showGrid">
+        <OrganismsResults v-if="isLoading || results.length" :results :is-loading />
+        <MoleculesAiSearchNoResults v-else :last-search-query="lastSearchQuery" />
+      </template>
 
-    <pre>{{ state }}</pre>
+      <template #right v-if="showMap">
+        <LazyOrganismsAiSearchMapView class="p-dock__map" :results :is-searching="isLoading" :radius :location />
+      </template>
+    </OrganismsPaneSlider>
 
     <OrganismsDock />
   </div>
 </template>
 
 <script setup>
-const { state } = useUniversalSearch()
+const {
+  isLoading,
+  searchState,
+  setResults,
+  setQueryAnalysis,
+  setSearchPending,
+  setViewMode
+} = useSearchState()
+
+/**
+ *  Update layout
+ */
+function updateViewMode(viewMode) {
+  setViewMode(viewMode === 'left' ? 'map' : 'grid')
+}
+
+const showGrid = computed(() => {
+  const { viewMode } = asObject(searchState.value)
+
+  return viewMode === 'grid' || viewMode === 'split'
+})
+
+const showMap = computed(() => {
+  const { viewMode } = asObject(searchState.value)
+
+  return viewMode === 'map' || viewMode === 'split'
+})
+
+/**
+ *  No results message
+ */
+const { lastSearchQuery, updateSort } = useAiSearchPage()
+
+/**
+ *  Handle searches
+ */
+const { location, radius, sortBy, query, viewMode } = toRefs(searchState.value)
+const { setPendingWhile } = usePending()
+const { aiSearch } = useAiSearchPage();
+
+watch([location, radius, query], () => {
+  // Get current location, radius
+  const { location, query, radius } = asObject(searchState.value)
+
+  // Do not search if no location or query is added
+  if (!location || !query) return
+
+  // Set pending state
+  setSearchPending(true)
+
+  // Set pending state
+  setPendingWhile(async () => {
+    if (!location) return
+
+    const { queryAnalysis, results } = await aiSearch(location, radius, query, 1);
+
+    setQueryAnalysis(queryAnalysis)
+    setResults(results)
+  }).finally(() => {
+    setSearchPending(false)
+  })
+}, { deep: true })
+
+watch(sortBy, (newValue) => {
+  // @TODO
+  // The KV store needs fixing before this can be activated
+  console.log('@TODO: sort results by', newValue)
+  // updateSort(newValue)
+})
+
+watch(viewMode, (layout) => {
+  if (layout !== 'map') return
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'instant'
+  })
+})
+
+/**
+ *  Ensure missing results do not break the map
+ */
+const results = computed(() => {
+  const { results } = asObject(searchState.value)
+
+  if (!Array.isArray(results)) return []
+
+  return results
+})
 
 </script>
 
-<style scoped>
-pre {
-  overflow: hidden;
+<style lang="scss">
+.p-dock {
+
+  &--has-grid {
+    padding: var(--size-16) 0;
+  }
+
+  &--has-grid &__map {
+    position: sticky;
+    top: calc(var(--header-height) + var(--size-20));
+    height: calc(100vh - var(--header-height) - var(--size-32));
+    border-radius: var(--border-radius-2xl);
+  }
+
+  &__map {
+    width: 100%;
+    overflow: hidden;
+    height: calc(100vh - var(--header-height));
+  }
 }
 </style>

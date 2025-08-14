@@ -1,6 +1,15 @@
-import type { ListingWithFullProperty } from "~~/shared/types/listing";
+import { getFullListingById } from "~~/layers/database/server/utils/listing";
 
-export default defineEventHandler(async (event): Promise<ListingWithFullProperty> => {
+// Helper to fetch cached listing (1 year)
+const getCachedListing = defineCachedFunction(async (id: number) => {
+  return await getFullListingById(id);
+}, {
+  maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+  name: 'listing',
+  getKey: (id) => `listing:${id}`,
+});
+
+export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
   if (!id) {
     throw createError({
@@ -8,18 +17,16 @@ export default defineEventHandler(async (event): Promise<ListingWithFullProperty
       statusMessage: "Missing Listing ID",
     });
   }
-  try {
-    const listing = await getFullListingById(Number(id));
 
-    if (!listing) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "listing not found",
-      });
-    }
+  // Fetch cached listing
+  const listing = await getCachedListing(Number(id));
 
-    return listing
-  } catch (error) {
-    throw error;
+  if (!listing) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "listing not found",
+    });
   }
+
+  return { listing };
 });

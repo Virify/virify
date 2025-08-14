@@ -3,7 +3,7 @@ model Kitchen {
   modern        Boolean  @default(true)
   openPlan      Boolean  @default(false)
   whiteGoods    Boolean  @default(false)
-  description   String
+  description   String?
   size          Float?
   breakfastBar  Boolean  @default(false)
   island        Boolean  @default(false)
@@ -12,6 +12,7 @@ model Kitchen {
   propertyId    Int      @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  media         Media[]
   property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])

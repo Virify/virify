@@ -1,3 +1,5 @@
+import type { GeocodingFeatureWithBoundary } from '~~/shared/types/map';
+
 export default function useAi() {
   const { trackAiSearch } = useAnalytics();
   // Global state for query analysis and search query
@@ -16,7 +18,7 @@ export default function useAi() {
    * @param limit The number of results per page (optional, defaults to 20)
    * @returns The search results
    */
-  async function aiSearch(location: GeocodingFeature, radius: number, query: string, page?: number, limit?: number) {
+  async function aiSearch(location: GeocodingFeatureWithBoundary, radius: number, query: string, page?: number, limit?: number) {
     searchQuery.value = query; // Update state for analysis function
     const response = await $fetch<AISearchResponse>("/api/search/rag/", {
       method: "POST",
@@ -30,7 +32,9 @@ export default function useAi() {
       },
     });
 
-    trackAiSearch(query, location);
+    // Strip boundaryPolygon for analytics tracking
+    const { boundaryPolygon, ...locationForTracking } = location;
+    trackAiSearch(query, locationForTracking);
 
     if (response.queryAnalysis) {
       queryAnalysis.value = response.queryAnalysis;

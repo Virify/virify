@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import { ViewsDialogSavedLocations } from '#components';
-import type { UserLocation } from '@prisma/client';
+import type { UserLocation } from '~~/layers/database/server/database/prisma/generated/client';
 
 const { trendingLocations } = useAnalytics();
 const locationSuggestions = ref<GeocodingFeature[]>([]);

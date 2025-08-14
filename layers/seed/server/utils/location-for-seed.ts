@@ -1,9 +1,14 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
 /**
  * !! This file is only to be used for seeding - because it instantiates a new PrismaClient which does not work in production.
  */
+
+import { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import { prisma } from "~~/layers/database/server/utils/prisma-client";
+
+type AddressLocation = {
+  lat: number;
+  lon: number;
+};
 
 /**
  * Returns the location of a given addressId.
@@ -21,7 +26,7 @@ export async function getLocationByAddressIdForSeed(addressId: number): Promise<
     `
   );
 
-  if (!result[0]) throw createError({ statusCode: 404, statusMessage: "location not found" });
+  if (!result[0]) throw new Error("location not found");
 
   return result[0];
 }

@@ -1,8 +1,9 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { ContactMethod, FurnishedStatus, ListingTier, PrismaClient, RentalPriceType, VerificationLevel, type Listing, type Prisma, RentalAvailabilityStatus, TenureType, OwnershipType, SalePriceType, SaleAvailabilityStatus } from "@prisma/client";
-const prisma = new PrismaClient();
-
+import type { Prisma, Listing } from "~~/layers/database/server/database/prisma/generated/client";
+import { RentalPriceType, FurnishedStatus, RentalAvailabilityStatus, TenureType, SalePriceType, SaleAvailabilityStatus, ListingTier, VerificationLevel } from "~~/layers/database/server/database/prisma/generated/enums";
+import { roundFloat } from "~~/shared/utils/numbers";
+import { prisma } from "~~/layers/database/server/utils/prisma-client";
 /**
  * Generate a random date between 1, 3, 7, and 14 days ago.
  */
@@ -38,7 +39,7 @@ export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInpu
   return {
     tenureType: faker.helpers.arrayElement(Object.values(TenureType)),
     chain: faker.datatype.boolean(),
-    ownershipType: faker.helpers.arrayElement(Object.values(OwnershipType)),
+    sharedOwnership: faker.datatype.boolean(),
     priceType: faker.helpers.arrayElement(Object.values(SalePriceType)),
     availabilityStatus: faker.helpers.arrayElement(Object.values(SaleAvailabilityStatus)),
   }
@@ -99,7 +100,6 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
       listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
-      contactMethod: [faker.helpers.arrayElement(Object.values(ContactMethod))],
       viewingOptions: faker.word.words(10),
       verificationLevel: faker.helpers.arrayElement(Object.values(VerificationLevel)),
       rentalListing: {
@@ -120,9 +120,12 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
     },
   });
 
-  // Generate random views for this listing
-  const viewsGenerated = await generateListingViews(listing.id);
-  console.log(`Generated ${viewsGenerated} views for rental listing ${listing.id}`);
+  // Generate views in background (don't await)
+  generateListingViews(listing.id).then(viewsGenerated => {
+    console.log(`Generated ${viewsGenerated} views for rental listing ${listing.id}`);
+  }).catch(error => {
+    console.error(`Error generating views for rental listing ${listing.id}:`, error);
+  });
 
   return listing;
 };
@@ -143,7 +146,6 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
       listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
-      contactMethod: [faker.helpers.arrayElement(Object.values(ContactMethod))],
       viewingOptions: faker.word.words(10),
       verificationLevel: faker.helpers.arrayElement(Object.values(VerificationLevel)),
       saleListing: {
@@ -164,9 +166,12 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
     },
   });
 
-  // Generate random views for this listing
-  const viewsGenerated = await generateListingViews(listing.id);
-  console.log(`Generated ${viewsGenerated} views for sale listing ${listing.id}`);
+  // Generate views in background (don't await)
+  generateListingViews(listing.id).then(viewsGenerated => {
+    console.log(`Generated ${viewsGenerated} views for sale listing ${listing.id}`);
+  }).catch(error => {
+    console.error(`Error generating views for sale listing ${listing.id}:`, error);
+  });
 
   return listing;
 };

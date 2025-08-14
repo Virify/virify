@@ -240,7 +240,7 @@ function handleNavAction(action: string) {
     position: absolute;
     height: 3px;
     width: 100%;
-    background: var(--foreground-100);
+    background: var(--monochrome-900);
     border-radius: 3px;
     opacity: 1;
     left: 0;
@@ -290,7 +290,7 @@ function handleNavAction(action: string) {
   bottom: 0;
   width: 80%;
   max-width: 300px;
-  background-color: var(--background-200);
+  background-color: var(--blue-400);
   z-index: 1000;
   padding: var(--size-16);
   overflow-y: auto;
@@ -320,12 +320,12 @@ function handleNavAction(action: string) {
   justify-content: center;
   border-radius: 50%;
   transition: background-color var(--animation-fast);
-  color: var(--foreground-100);
+  color: var(--monochrome-900);
   position: relative;
   z-index: 1002;
 
   &:hover {
-    background-color: var(--background-100);
+    background-color: var(--blue-500);
   }
 }
 
@@ -373,7 +373,7 @@ function handleNavAction(action: string) {
 .m-menu-chevron {
   transition: transform 0.3s ease;
   margin-left: auto;
-  color: var(--foreground-80, #666);
+  color: inherit;
 }
 
 .m-menu-icon {
@@ -393,14 +393,14 @@ function handleNavAction(action: string) {
   display: flex;
   align-items: center;
   gap: var(--size-5);
-  color: var(--foreground-100);
+  color: var(--monochrome-900);
   padding-left: var(--size-6);
   width: 100%;
   margin: var(--size-2) 0;
   border-radius: var(--border-radius-md);
 
   &:hover {
-    background: var(--background-100);
+    background: var(--blue-500);
   }
 }
 
@@ -418,7 +418,7 @@ function handleNavAction(action: string) {
   border-radius: var(--border-radius-md);
   background: transparent;
   transition: background-color var(--animation-fast);
-  color: var(--foreground-100);
+  color: var(--monochrome-900);
   border: none;
   cursor: pointer;
   width: 100%;

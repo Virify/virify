@@ -60,6 +60,8 @@ defineProps<Props<T>>()
   }
 
   &__action {
+    display: flex;
+    align-items: center;
     transition: color var(--animation-fast);
 
     &:hover {

@@ -1,9 +1,13 @@
-import { ListingTier, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing, type Prisma } from "@prisma/client";
-import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty } from "~~/shared/types/listing";
+
+import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty, ListingCardType, SummaryCardData } from "~~/shared/types/listing";
+import { listingCardFields } from "~~/shared/types/listing";
+import { ListingTier, Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "../database/prisma/generated/client";
 import { prisma } from "./prisma-client";
+
+// required for testing - auto-importing not working
 import { propertyInclude } from "./property";
-import { getPriceFilter } from "./price";
 import { getPropertyIdsByDistance, getPropertyIdsByPolygons } from "./location";
+import { getPriceFilter } from "./price";
 
 /**
  * Get a listing by ID
@@ -43,6 +47,7 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
           id: true,
           username: true,
           email: true,
+          createdAt: true,
         },
       },
     },
@@ -102,6 +107,7 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
           id: true,
           username: true,
           email: true,
+          createdAt: true,
         },
       },
     },
@@ -201,7 +207,10 @@ export async function getListingByDistanceAndFilters(
 
   // Map the listings to include the distance
   const listingsWithDistance = listings.map((listing) => {
-    const property = nearbyProperties.find((p) => p.propertyId === listing.property?.address?.id);
+    const propertyId = listing.property && listing.property.address ? listing.property.address.id : undefined;
+    const property = propertyId !== undefined
+      ? nearbyProperties.find((p) => p.propertyId === propertyId)
+      : undefined;
     return {
       ...listing,
       distanceMiles: property ? property.distanceMiles : 0,
@@ -267,6 +276,7 @@ const fullListingInclude = {
       id: true,
       username: true,
       email: true,
+      createdAt: true,
     },
   },
 };
@@ -294,4 +304,173 @@ export async function fetchPaginatedListings(where: Prisma.ListingWhereInput, pa
     skip,
     take: limit,
   });
+}
+
+/**
+ * Get similar listings based on property characteristics and location
+ */
+export async function getSimilarListings(listing: ListingWithFullProperty, limit: number = 10): Promise<SummaryCardData[]> {
+  const property = listing.property;
+  if (!property?.address || !property.type) {
+    return [];
+  }
+
+  // Get nearby properties within 3 mile radius
+  const lat = property.address.lat ?? 0;
+  const lon = property.address.lon ?? 0;
+  const nearbyProperties = await getPropertyIdsByDistance(
+    lat,
+    lon,
+    10 // 10 mile radius
+  );
+
+  const propertyIds = nearbyProperties.map(p => p.propertyId);
+  if (propertyIds.length === 0) {
+    return [];
+  }
+  
+  // Determine listing type filter
+  const listingTypeFilter = listing.saleListing ? 'saleListing' : 'rentalListing';
+  
+  // Calculate price range (±30%)
+  const basePrice = listing.price;
+  const priceMin = Math.floor(basePrice * 0.7);
+  const priceMax = Math.ceil(basePrice * 1.3);
+
+  // Determine if the current listing is a house share
+  const isHouseShare = property.classification?.name?.toLowerCase() === 'house share';
+
+  // Build classification filter for house share logic
+  let classificationFilter: any = {};
+  if (isHouseShare) {
+    classificationFilter = {
+      classification: {
+        name: {
+          equals: 'House Share',
+        },
+      },
+    };
+  } else {
+    classificationFilter = {
+      classification: {
+        name: {
+          not: 'House Share',
+        },
+      },
+    };
+  }
+
+  // Query for similar listings with strict filters and house share logic
+  const similarListings = await prisma.listing.findMany({
+    where: {
+      id: {
+        not: listing.id, // Exclude the current listing
+      },
+      published: true,
+      [listingTypeFilter]: {
+        isNot: null, // Just check that the listing type exists
+      },
+      price: {
+        gte: priceMin,
+        lte: priceMax,
+      },
+      property: {
+        id: {
+          in: propertyIds, // Nearby location
+        },
+        type: {
+          id: property.type.id, // Same property type
+        },
+        ...classificationFilter,
+      },
+    },
+    take: limit,
+    select: listingCardFields,
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  // Convert to SummaryCardData format
+  return transformToSummaryCardData(similarListings);
+}
+
+/**
+ * Transform listing data to SummaryCardData format
+ */
+function transformToSummaryCardData(listings: any[]): SummaryCardData[] {
+  return listings.map((listing): SummaryCardData => {
+    const property = listing.property;
+    return {
+      id: listing.id || 0,
+      lat: property?.address?.lat || 0,
+      lon: property?.address?.lon || 0,
+      title: listing.title,
+      bedrooms: property?.numberBedrooms || null,
+      bathrooms: property?.numberBathrooms || null,
+      receptions: property?.numberReceptions || null,
+      price: listing.price,
+      propertyType: property?.type?.name || null,
+      classification: property?.classification?.name || null,
+      priceType: listing.saleListing?.priceType || listing.rentalListing?.rentFrequency || null,
+      address: property?.address ? {
+        street: property.address.street,
+        city: property.address.city,
+        postcode: property.address.postcode,
+      } : null,
+      image: property?.media || [],
+      tier: listing.listingTier,
+    };
+  });
+}
+
+/**
+ * Get trending listings analytics data from ListingView table
+ */
+export async function getTrendingListingsAnalytics(days: number, limit: number) {
+  const sinceDate = new Date();
+  sinceDate.setDate(sinceDate.getDate() - days);
+
+  return await prisma.listingView.groupBy({
+    by: ['listingId'],
+    where: {
+      createdAt: {
+        gte: sinceDate
+      }
+    },
+    _count: {
+      id: true, // Total views
+      userId: true, // Views by registered users
+      sessionId: true, // Unique sessions
+    },
+    orderBy: {
+      _count: {
+        id: 'desc' // Order by total view count
+      }
+    },
+    take: limit * 2 // Get more than needed to filter active listings
+  });
+}
+
+/**
+ * Get trending listings by IDs in SummaryCardData format
+ */
+export async function getTrendingListingsByIds(listingIds: number[], limit: number): Promise<SummaryCardData[]> {
+  const listings = await prisma.listing.findMany({
+    where: {
+      id: {
+        in: listingIds
+      },
+      // Only include published listings
+      published: true,
+      property: {
+        isNot: null
+      }
+    },
+    select: listingCardFields,
+    take: limit
+  });
+
+  // Transform to SummaryCardData format using shared utility
+  return transformToSummaryCardData(listings);
 }

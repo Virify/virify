@@ -10,7 +10,7 @@
         </AtomsButton>
 
         <template v-if="popover">
-          <component :is="popover.component" @close="hidePopover" />
+          <component :is="popover.component" />
 
           <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
             @close-popover="hidePopover" />
@@ -80,11 +80,21 @@ function hidePopover() {
 }
 
 /**
+ *  Close popover when results are updated
+ */
+const { searchState } = useSearchState()
+const { results } = toRefs(searchState.value)
+
+watch(results, () => {
+  hidePopover()
+})
+
+/**
  *  Monitor close events
  */
 onMounted(() => {
-  $popover.value?.addEventListener('toggle', (event) => {
-    const { newState } = asObject(event)
+  $popover.value?.addEventListener('toggle', (event: Event) => {
+    const { newState } = asObject(event as ToggleEvent)
 
     if (newState !== 'closed') return
 

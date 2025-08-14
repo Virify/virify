@@ -10,6 +10,7 @@ import type { UserFavouriteListingCard } from "~~/shared/types/user-favourite-li
 export const useFavourites = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
+  const { showToast } = useToast();
 
   /**
    * State Management
@@ -66,11 +67,20 @@ export const useFavourites = createSharedComposable(() => {
       return;
     }
 
-    await $fetch<UserFavouriteListingCard[]>(`/api/user/favourites/${listingId}/`, {
-      method: "POST",
-      body: { listingId },
-    });
-    await refreshFavourites();
+    try {
+      await $fetch<UserFavouriteListingCard[]>(`/api/user/favourites/${listingId}/`, {
+        method: "POST",
+        body: { listingId },
+      });
+      await refreshFavourites();
+      
+      // Show success toast
+      showToast("Added to favourites", { type: "success" });
+    } catch (error) {
+      // Show error toast
+      showToast("Failed to add to favourites", { type: "error" });
+      console.error("Error adding to favourites:", error);
+    }
   };
 
   /**
@@ -81,12 +91,21 @@ export const useFavourites = createSharedComposable(() => {
    * @returns Array of remaining favourite listing IDs or empty array on error
    */
   const removeFromFavourite = async (listingId: number) => {
-    const result = await $fetch<number[]>(`/api/user/favourites/${listingId}/`, {
-      method: "DELETE",
-      body: { listingId },
-    });
-    if (result) {
-      await refreshFavourites();
+    try {
+      const result = await $fetch<number[]>(`/api/user/favourites/${listingId}/`, {
+        method: "DELETE",
+        body: { listingId },
+      });
+      if (result) {
+        await refreshFavourites();
+        
+        // Show success toast
+        showToast("Removed from favourites", { type: "success" });
+      }
+    } catch (error) {
+      // Show error toast
+      showToast("Failed to remove from favourites", { type: "error" });
+      console.error("Error removing from favourites:", error);
     }
   };
 

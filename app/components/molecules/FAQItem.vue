@@ -1,36 +1,40 @@
 <template>
-  <GradientBox>
-    <details class="faq-item" :open="isOpen">
-      <summary class="faq-question | title-sm">
-        {{ question }}
-      </summary>
-      <p class="faq-answer | body-md">
-        {{ answer }}
-      </p>
-    </details>
-  </GradientBox>
+  <details class="faq-item | box" :open="isOpen">
+    <summary class="faq-question | title-xs">
+      {{ question }}
+    </summary>
+    <p class="faq-answer | body-md">
+      {{ answer }}
+    </p>
+  </details>
 </template>
 
 <script setup>
-import GradientBox from '@/components/atoms/GradientBox.vue'
 defineProps({
   question: {
     type: String,
-    required: true
+    required: true,
   },
   answer: {
     type: String,
-    required: true
+    required: true,
   },
   isOpen: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 </script>
 
 <style scoped lang="scss">
 .faq-item {
+  background: linear-gradient(
+    to right,
+    var(--monochrome-100) 0%,
+    var(--blue-400) 100%
+  );
+  
+  padding: var(--size-24);
   &[open] {
     .faq-question::after {
       transform: rotate(90deg);
@@ -44,7 +48,7 @@ defineProps({
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--foreground-100);
+  color: var(--monochrome-900);
   margin: 0;
   padding: 0;
 
@@ -64,7 +68,7 @@ defineProps({
     content: "→";
     font-size: 1.2rem;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--foreground-300);
+    color: var(--monochrome-900);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,5 +83,6 @@ defineProps({
 
 .faq-answer {
   margin: var(--size-16) 0 0;
+  color: var(--monochrome-900);
 }
 </style>

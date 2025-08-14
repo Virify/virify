@@ -1,16 +1,33 @@
 model Reception {
-  id          Int            @id @default(autoincrement())
-  roomNumber  Int
-  description String
-  size        Float?
-  openPlan    Boolean        @default(false)
-  fireplace   FireplaceType?
-  gamesRoom   Boolean        @default(false)
-  homeCinema  Boolean        @default(false)
-  propertyId  Int
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  property    Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  id               Int            @id @default(autoincrement())
+  roomNumber       Int
+  floor            Int
+  name             String
+  type             ReceptionType
+  description      String?
+  size             Float?
+  conservatory     Boolean        @default(false)
+  openPlan         Boolean        @default(false)
+  openConcept      Boolean        @default(false)
+  fireplace        FireplaceType?
+  balcony          Boolean        @default(false)
+  bayWindow        Boolean        @default(false)
+  builtInShelving  Boolean        @default(false)
+  hasView          Boolean        @default(false)
+  patioDoors       Boolean        @default(false)
+  builtInStorage   Boolean        @default(false)
+  servingHatch     Boolean        @default(false)
+  barArea          Boolean        @default(false)
+  soundProofing    Boolean        @default(false)
+  accousticPanels  Boolean        @default(false)
+  stoneFlooring    Boolean        @default(false)
+  hardwoodFlooring Boolean        @default(false)
+  builtInDesk      Boolean        @default(false)
+  propertyId       Int
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  property         Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  media            Media[]
 
   @@index([propertyId])
 }
@@ -18,4 +35,12 @@ model Reception {
 enum FireplaceType {
   LOG_BURNER
   OPEN_FIRE
+}
+
+enum ReceptionType {
+  LIVING_ROOM
+  FAMILY_ROOM
+  DINING_ROOM
+  GAMES_ROOM
+  HOME_CINEMA
 }

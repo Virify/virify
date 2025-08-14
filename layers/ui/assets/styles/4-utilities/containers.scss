@@ -5,15 +5,12 @@
  *  Page widths
  */
 .container {
-  --container-width: 82rem;
+  --container-width: 94rem;
   --container-padding: var(--size-48);
 
   width: min(100% - var(--container-padding), var(--container-width));
   margin-inline: auto;
 
-  // @TODO remove once Tailwind is removed, this only exists to
-  // prevent conflicts in the meantime
-  max-width: none;
 
   @include mq.tablet {
     --container-padding: var(--size-48);

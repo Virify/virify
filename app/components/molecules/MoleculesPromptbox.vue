@@ -2,7 +2,7 @@
   <div class="m-promptbox | elevate-200">
     <div class="m-promptbox__input-wrapper">
       <!-- analysed query overlays the textarea -->
-      <div class="m-promptbox__overlay" v-if="queryAnalysis" aria-hidden="true">
+      <div class="m-promptbox__overlay | body-md" v-if="queryAnalysis" aria-hidden="true">
         <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type}`">
           {{ segment.text }}
         </span>

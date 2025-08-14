@@ -1,0 +1,125 @@
+import * as z from 'zod';
+
+const listingPpdSchema = z.object({
+  listingId: z.number(),
+  address: z.object({
+    number: z.string().nullable().optional(),
+    flat: z.string().nullable().optional(),
+    street: z.string(),
+    city: z.string(),
+    postcode: z.string(),
+    county: z.string().nullable().optional(),
+  })
+});
+
+export default defineEventHandler(async (event) => {
+  try {
+    const { listingId, address } = await readValidatedBody(event, listingPpdSchema.parse);
+
+    const { number, flat, street, city, postcode } = address;
+
+    if (!postcode) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Postcode is required'
+      });
+    }
+
+    if (!number) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Property number is required for PPD matching'
+      });
+    }
+
+    // Create cache key from listing ID
+    const cacheKey = `ppd:listing:${listingId}`;
+    console.log(`[CACHE] Checking price paid cache for key: ${cacheKey}`);
+
+    // Try to get from cache first
+    const startTime = Date.now();
+    const cached = await useStorage().getItem(cacheKey);
+    if (cached) {
+      const cacheTime = Date.now() - startTime;
+      console.log(`[CACHE] PPD CACHE HIT - Retrieved in ${cacheTime}ms`);
+      return cached;
+    }
+
+    console.log(`[CACHE] PPD CACHE MISS - Fetching from database`);
+    
+    // Use utility function to get PPD data
+    const ppdData = await getPricePaidByAddress(postcode, street, city, number, flat);
+
+    if (ppdData.length === 0) {
+      // Return empty data structure instead of throwing error
+      const emptyResult = {
+        data: {
+          sales: [],
+          total_sales: 0,
+          latest_sale: null,
+          price_range: null,
+          market_context: null
+        }
+      };
+      
+      // Cache the empty result for 7 days (shorter than successful results)
+      await useStorage().setItem(cacheKey, emptyResult, {
+        ttl: 60 * 60 * 24 * 7 // 7 days in seconds
+      });
+      
+      return emptyResult;
+    }
+
+    // Sort sales by date (newest first)
+    const sortedSales = ppdData
+      .sort((a, b) => new Date(b.transfer_date).getTime() - new Date(a.transfer_date).getTime());
+
+    // Calculate market context using utility function
+    const latestPrice = sortedSales.length > 0 && sortedSales[0] ? sortedSales[0].price : 0;
+    const propertyType = sortedSales[0]?.property_type || null;
+    
+    const marketContext = await calculateMarketContext(
+      city, 
+      postcode, 
+      number, 
+      flat, 
+      propertyType, 
+      latestPrice, 
+      sortedSales
+    );
+
+    // Process sales data using utility function
+    const propertySales = processPricePaidSales(sortedSales);
+
+    const result = {
+      data: {
+        sales: propertySales,
+        total_sales: propertySales.length,
+        latest_sale: propertySales[0],
+        price_range: propertySales.length > 0 ? {
+          min: Math.min(...propertySales.map(s => s.price)),
+          max: Math.max(...propertySales.map(s => s.price))
+        } : null,
+        market_context: marketContext
+      }
+    };
+
+    // Cache the result for 30 days (PPD data is updated monthly)
+    await useStorage().setItem(cacheKey, result, {
+      ttl: 60 * 60 * 24 * 30 // 30 days in seconds
+    });
+
+    const totalTime = Date.now() - startTime;
+    console.log(`[CACHE] PPD CACHE MISS - Total time: ${totalTime}ms`);
+
+    return result;
+
+  } catch (error) {
+    // Handle database/unexpected errors
+    console.error('Error fetching price paid data:', error);
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to fetch price paid data'
+    });
+  }
+});

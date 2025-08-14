@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import type { RentalPriceType, SalePriceType } from '@prisma/client'
 import { useElementHover, onClickOutside } from '@vueuse/core'
+import type { RentalPriceType, SalePriceType } from '~~/layers/database/server/database/prisma/generated/enums'
 
 /**
  *  Props
@@ -146,23 +146,23 @@ const getClassificationIcon = (classification: string | undefined) => {
   const iconMappings: Record<string, string> = {
     'Terraced': 'property/terraced',
     'Semi-detached': 'property/terraced',
-    'End of terrace': 'property/terraced',
+    'End of Terrace': 'property/terraced',
     'Detached': 'property/detatched',
     'Mansion': 'property/mansion',
     'Cottage': 'property/cottage',
     'Bungalow': 'property/bungalow',
-    'Converted flat': 'property/flat',
-    'Studio flat': 'property/flat',
+    'Converted': 'property/flat',
+    'Studio': 'property/flat',
     'Maisonette': 'property/flat',
     'High-rise': 'property/flat',
-    'Within a complex': 'property/flat',
+    'Within a Complex': 'property/flat',
     'Penthouse': 'property/flat',
     'Land': 'property/land',
-    'Residential Land': 'property/land',
-    'Commercial Land': 'property/land',
-    'Agricultural Land': 'property/land',
-    'Development plot': 'property/land',
-    'Development potential': 'property/land',
+    'Residential': 'property/land',
+    'Commercial': 'property/land',
+    'Agricultural': 'property/land',
+    'Development Plot': 'property/land',
+    'Development Potential': 'property/land',
     'Non-working Farmhouse': 'property/farm',
     'Working Farm': 'property/farm',
     'Small Holding': 'property/farm',
@@ -216,7 +216,7 @@ const iconOptions = computed(() => {
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use '#styles/_utils/functions' as fn;
 @use '#styles/_utils/media' as mq;
 

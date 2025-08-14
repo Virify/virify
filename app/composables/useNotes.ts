@@ -8,6 +8,7 @@ import type { NoteData } from "~~/shared/types/note";
 export const useNotes = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
+  const { showToast } = useToast();
 
   /**
    * State Management
@@ -74,6 +75,8 @@ export const useNotes = createSharedComposable(() => {
       return;
     }
 
+    const isUpdating = hasNote(listingId);
+
     try {
       await $fetch(`/api/user/notes/${listingId}/`, {
         method: "POST",
@@ -91,8 +94,13 @@ export const useNotes = createSharedComposable(() => {
         // If note doesn't exist, we should refetch all notes to get the complete data
         refreshUserNotes();
       }
+
+      // Show success toast
+      showToast(isUpdating ? 'Note updated' : 'Note added', { type: 'success' });
     } catch (error) {
       console.error("Error updating note:", error);
+      // Show error toast
+      showToast(isUpdating ? 'Failed to update note' : 'Failed to add note', { type: 'error' });
       throw error;
     }
   };
@@ -118,8 +126,13 @@ export const useNotes = createSharedComposable(() => {
 
       // Remove from state after successful API call
       userNotes.value = userNotes.value.filter((note) => note.listingId !== listingId);
+      
+      // Show success toast
+      showToast('Note deleted', { type: 'success' });
     } catch (error) {
       console.error("Error deleting note:", error);
+      // Show error toast
+      showToast('Failed to delete note', { type: 'error' });
       throw error;
     }
   };

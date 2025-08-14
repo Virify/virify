@@ -1,0 +1,49 @@
+<svg width="56" height="39" viewBox="0 0 56 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="1" width="7" height="37" fill="#FC7239" />
+  <rect x="11" y="1" width="7" height="37" fill="#FC7239" />
+  <rect x="20" y="1" width="7" height="37" fill="#FC7239" />
+  <rect x="29" y="1" width="7" height="37" fill="#FC7239" />
+  <rect x="38" y="1" width="7" height="37" fill="#FC7239" />
+  <rect x="47" y="1" width="7" height="37" fill="#FC7239" />
+
+  <style>
+    rect {
+      animation: bar-bounce 1.5s infinite ease-in-out;
+      transform-origin: 50% 50%;
+    }
+
+    rect:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    rect:nth-child(2) {
+      animation-delay: -0.24s;
+    }
+
+    rect:nth-child(3) {
+      animation-delay: -0.16s;
+    }
+
+    rect:nth-child(4) {
+      animation-delay: -0.08s;
+    }
+
+    rect:nth-child(5) {
+      animation-delay: 0s;
+    }
+
+    @keyframes bar-bounce {
+      0%,
+      40%,
+      100% {
+        transform: scaleY(0.4);
+        rx: 10;
+      }
+
+      20% {
+        transform: scaleY(1);
+        rx: 4;
+      }
+    }
+  </style>
+</svg>

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 
 export type PropertyWithAddress = Prisma.PropertyGetPayload<{
   include: {
@@ -18,13 +18,11 @@ export type Fullproperty = Prisma.PropertyGetPayload<{
     amenities: true;
     additionalFeatures: true;
     accessibilityFeatures: true;
-    diningroomFeatures: true;
     kitchenFeatures: true;
-    livingAreaFeatures: true;
     reception: true;
     utility: true;
-    additionalToilet: true;
-    outdoorSpace: true;
+    rearGarden: true;
+    frontGarden: true;
     energyAndUtilities: true;
     securityFeatures: true;
     storageFeatures: true;

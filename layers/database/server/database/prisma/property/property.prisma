@@ -9,24 +9,24 @@ model Property {
   vacant                   Boolean                @default(false)
   constructionType         ConstructionType?
   floorLevel               Int?
+  totalFloors              Int
   additionalFeatures       AdditionalFeatures?
   accessibilityFeatures    Accessibility?
-  amenities                Amenities?
+  amenities                Amenities[]
   numberBedrooms           Int?                   @default(0)
   numberBathrooms          Int?                   @default(0)
   numberReceptions         Int?                   @default(0)
+  numberOtherRooms         Int?                   @default(0)
   bathroomFeatures         Bathroom[]
   bedroomFeatures          Bedroom[]
-  diningroomFeatures       Diningroom?
   kitchenFeatures          Kitchen?
-  livingAreaFeatures       LivingArea?
   reception                Reception[]
+  otherRoom                OtherRoom[]
+  frontGarden              FrontGarden?
+  rearGarden               RearGarden?
   utility                  Utility?
-  additionalToilet         AdditionalToilet?
   listing                  Listing[]
   media                    Media[]
-  outdoorSpace             OutdoorSpace?
-  Land                     Land?
   parking                  Parking?
   energyAndUtilities       EnergyAndUtilities?
   address                  Address                @relation(fields: [addressId], references: [id], onDelete: Cascade)

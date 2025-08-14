@@ -1,3 +1,6 @@
+import { calculateDistance, milesToMeters } from '../utils/calculate';
+import type { GeocodingFeature, GeocodingFeatureWithBoundary, GeocodingResponse } from '~~/shared/types/map';
+
 export function useMapSearch() {
   const sdk = useNuxtApp().$maptilersdk;
 
@@ -11,6 +14,28 @@ export function useMapSearch() {
         query: { 
           key: sdk.config.apiKey, 
           country: "gb",
+        },
+      });
+      return res.features ?? [];
+    } catch (e) {
+      console.error("[Map] Search error:", e);
+      return [];
+    }
+  }
+
+  /**
+   * Autocomplete for UK postcodes
+   * @param postcode The postcode to autocomplete
+   * @returns A list of matching postcode features
+   */
+  async function postcodeAutoComplete(postcode: string): Promise<GeocodingFeature[]> {
+    if (!postcode) return [];
+    try {
+      const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(postcode)}.json`, {
+        query: { 
+          key: sdk.config.apiKey,
+          country: "gb",
+          types: "postal_code",
         },
       });
       return res.features ?? [];
@@ -67,7 +92,7 @@ export function useMapSearch() {
   /**
    * Enhance location with boundary polygon for location-only searches
    */
-  async function enhanceWithBoundaryPolygon(feature: GeocodingFeature): Promise<GeocodingFeature> {
+  async function enhanceWithBoundaryPolygon(feature: GeocodingFeature): Promise<GeocodingFeatureWithBoundary> {
     const boundaryPolygon = await getBoundaryPolygon(feature.id);
     return {
       ...feature,
@@ -75,9 +100,80 @@ export function useMapSearch() {
     };
   }
 
+  /**
+   * Find nearby amenities (schools, hospitals, shops) based on lat/long coordinates
+   * TODO: Batch these requests to reduce API calls
+   */
+  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000): Promise<{
+    schools: Array<{ name: string; distance: number; type: string }>;
+    hospitals: Array<{ name: string; distance: number; type: string }>;
+    train_stations: Array<{ name: string; distance: number; type: string }>;
+  }> {
+    const amenities = {
+      schools: [] as Array<{ name: string; distance: number; type: string }>,
+      hospitals: [] as Array<{ name: string; distance: number; type: string }>,
+      train_stations: [] as Array<{ name: string; distance: number; type: string }>
+    };
+
+    try {
+      // Search for different types of amenities
+      const amenityTypes = [
+        { category: 'schools', query: 'school' },
+        { category: 'hospitals', query: 'hospital' },
+        { category: 'train_stations', query: 'train station' }
+      ];
+
+      for (const amenityType of amenityTypes) {
+        try {
+          const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(amenityType.query)}.json`, {
+            query: { 
+              key: sdk.config.apiKey,
+              country: "gb",
+              proximity: `${lon},${lat}`,
+              limit: 3,
+              types: "poi"
+            },
+          });
+          if (res.features) {
+            for (const feature of res.features) {
+              if (feature.geometry && feature.geometry.type === 'Point') {
+                const [featureLon, featureLat] = feature.geometry.coordinates;
+                const distanceInMiles = calculateDistance(lat, lon, featureLat, featureLon);
+                const distanceInMeters = milesToMeters(distanceInMiles);
+                
+                if (distanceInMeters <= radius) {
+                  amenities[amenityType.category as keyof typeof amenities].push({
+                    name: feature.text || 'Unknown',
+                    distance: Math.round(distanceInMeters),
+                    type: amenityType.category
+                  });
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error(`[Map] Error fetching ${amenityType.category}:`, e);
+        }
+      }
+
+      // Sort by distance and take closest 3 for each category
+      amenities.schools = amenities.schools.sort((a, b) => a.distance - b.distance).slice(0, 3);
+      amenities.hospitals = amenities.hospitals.sort((a, b) => a.distance - b.distance).slice(0, 3);
+      amenities.train_stations = amenities.train_stations.sort((a, b) => a.distance - b.distance).slice(0, 3);
+
+    } catch (e) {
+      console.error("[Map] Error finding nearby amenities:", e);
+    }
+
+    return amenities;
+  }
+
+
   return {
     autoComplete,
+    postcodeAutoComplete,
     geocodeAndSelectBest,
     enhanceWithBoundaryPolygon,
+    findNearbyAmenities,
   } as const;
 }

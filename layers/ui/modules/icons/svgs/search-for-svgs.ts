@@ -38,6 +38,6 @@ export function searchForSVGs(dir: string, svgs: FoundSVGs, key: string) {
     if (extname(fullPath) !== '.svg') return
 
     // Add SVG to sprites key
-    svgs[key] = pushPathIfNotExist(svgs[key], fullPath)
+    svgs[key] = pushPathIfNotExist(svgs[key] ?? [], fullPath)
   })
 }

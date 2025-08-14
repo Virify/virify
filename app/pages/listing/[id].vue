@@ -1,678 +1,512 @@
 <template>
-  <div class="container flow flow-2xl">
-    <div v-if="listing && property">
-      <!-- Header -->
-      <div class="p-listing-header flex justify-between items-center">
-        <h1 class="title-xl p-listing-title">{{ listing.title }}</h1>
-        <div class="flex gap-4 p-listing-action-buttons">
-          <AtomsFavouriteButton :property-id="property.id" />
-          <AtomsNoteButton :property-id="property.id" />
-        </div>
+  <main class="p-listing">
+    <div class="p-listing" role="presentation">
+      <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
+        <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
+          <MoleculesImageGallery v-if="!isDesktop && galleryImages.length > 0" :images="galleryImages"
+            @open-modal="openImageModal" />
+        </skeleton-loader>
       </div>
 
-      <!-- Listing Metadata -->
-      <div class="box">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <div><span class="font-medium">Listed:</span> {{ listing.publishedAt ? formatMDY(listing.publishedAt) : 'Not published' }}</div>
-          <div><span class="font-medium">Reference ID:</span> #{{ listing.id }}</div>
-          <div><span class="font-medium">Tier:</span> {{ listing.listingTier }}</div>
-          <div v-if="listing.verificationLevel"><span class="font-medium">Verification:</span> {{ listing.verificationLevel }}</div>
-        </div>
-      </div>
-
-      <!-- Media Gallery -->
-      <div class="p-listing-media-grid">
-        <NuxtImg v-for="(mediaItem, index) in property.media" :key="index" :src="mediaItem.image as string" :alt="mediaItem?.metadata" class="p-listing-media-image" width="400" />
-      </div>
-
-      <!-- Key Info Panel -->
-      <div class="p-listing-info-grid">
-        <div class="box box-lg">
-          <h2 class="title-md">£{{ listing.price?.toLocaleString() }}</h2>
-          <div class="flex flex-wrap gap-2 mb-4">
-            <span class="p-listing-badge p-listing-badge-primary">{{ listing.saleListing ? 'For Sale' : 'For Rent' }}</span>
-            <span class="p-listing-badge p-listing-badge-secondary">{{ listing.rentalListing?.availabilityStatus ?? listing.saleListing?.availabilityStatus }}</span>
-          </div>
-          <div class="flow flow-xs body-sm">
-            <p>{{ listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency }}</p>
-            <p v-if="listing.rentalListing">Deposit: £{{ listing.rentalListing.deposit }}</p>
-            <p v-if="listing.rentalListing">Furnished: {{ listing.rentalListing.furnishedStatus }}</p>
-            <p>Available from: {{ formattedMoveInDate }}</p>
-          </div>
-        </div>
-        <div class="box box-lg">
-          <h2 class="title-sm">Property Details</h2>
-          <div class="p-listing-details-grid">
-            <div><span class="body-xs faded-text">Type:</span> <span class="font-medium">{{ property.type?.name }}</span></div>
-            <div><span class="body-xs faded-text">Class:</span> <span class="font-medium">{{ property.classification?.name }}</span></div>
-            <div><span class="body-xs faded-text">Bedrooms:</span> <span class="font-medium">{{ property.bedroomFeatures?.length ?? 0 }}</span></div>
-            <div><span class="body-xs faded-text">Bathrooms:</span> <span class="font-medium">{{ property.bathroomFeatures?.length ?? 0 }}</span></div>
-            <div><span class="body-xs faded-text">Tier:</span> <span class="font-medium">{{ listing.listingTier }}</span></div>
-            <div><span class="body-xs faded-text">Receptions:</span> <span class="font-medium">{{ property.numberReceptions ?? 0 }}</span></div>
-            <div><span class="body-xs faded-text">Floor Area:</span> <span class="font-medium">{{ property.floorLevel ?? 'N/A' }}</span></div>
-            <div><span class="body-xs faded-text">Year Built:</span> <span class="font-medium">{{ property.yearBuilt ?? 'N/A' }}</span></div>
-            <div><span class="body-xs faded-text">EPC Rating:</span> <span class="font-medium">{{ property.energyAndUtilities?.epcRating ?? 'N/A' }}</span></div>
-            <div><span class="body-xs faded-text">Council Tax Band:</span> <span class="font-medium">{{ property.runningCosts?.councilTaxBand ?? 'N/A' }}</span></div>
-            <div><span class="body-xs faded-text">Construction Type:</span> <span class="font-medium">{{ property.constructionType || 'N/A' }}</span></div>
-            <div><span class="body-xs faded-text">Size:</span> <span class="font-medium">{{ property.size ?? 'N/A' }}</span></div>
-          </div>
-        </div>
-        <div class="box box-lg">
-          <h2 class="title-sm">Location</h2>
-          <address class="body-sm flow flow-xs">
-            {{ property.address?.flat ? property.address.flat + ', ' : '' }}
-            {{ property.address?.number ? property.address.number + ' ' : '' }}
-            {{ property.address?.street }}<br>
-            {{ property.address?.city }}<br>
-            {{ property.address?.county }}<br>
-            {{ property.address?.postcode }}
-          </address>
-        </div>
-      </div>
-
-      <!-- Map -->
-      <div class="p-listing-map-container">
-        <h2 class="title-md">Map</h2>
-        <div v-if="property?.address?.lat && property?.address?.lon" class="p-listing-map-inner">
-          <Map
-            ref="mapRef"
-            :marker="listing"
-            :zoom="15"
-            :center="[property.address.lon, property.address.lat]"
-            :interactive="false"
-            :mapId="GLOBAL_MAP_ID"
-          />
-        </div>
-      </div>
-
-      <!-- Descriptions -->
-      <div class="box box-lg">
-        <h2 class="title-sm">Listing Description</h2>
-        <p class="body-sm">{{ listing.description }}</p>
-      </div>
-      <div class="box box-lg">
-        <h2 class="title-sm">Property Description</h2>
-        <p class="body-sm">{{ property.description }}</p>
-      </div>
-
-      <!-- Property Features -->
-      <div class="flow flow-2xl">
-        <h2 class="title-xl p-listing-main-title">Property Features</h2>
-        <div class="p-listing-features box box-lg">
-          <!-- Bedrooms -->
-          <div class="flow flow-lg section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Bedroom Features</h3>
-            <div class="p-listing-feature-grid">
-              <template v-if="property.bedroomFeatures && property.bedroomFeatures.length">
-                <div v-for="(room, i) in property.bedroomFeatures" :key="i" class="p-listing-feature-card">
-                  <h4 class="font-medium body-sm">Bedroom {{ room.roomNumber ?? (i + 1) }}</h4>
-                  <div class="body-xs">Bed Size(s): {{ room.bed?.length ? room.bed.join(', ') : 'N/A' }}</div>
-                  <div class="body-xs">Description: {{ room.description || 'N/A' }}</div>
-                  <div class="body-xs">Size: {{ room.size || 'N/A' }}</div>
-                  <div class="body-xs">Ensuite: {{ room.enSuite ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Built-In Storage: {{ room.builtInStorage ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Walk-In Wardrobe: {{ room.walkInWardrobe ? 'Yes' : 'No' }}</div>
-                </div>
-              </template>
-              <div v-else class="p-listing-feature-card p-listing-empty-card">
-                <h4 class="font-medium body-sm">No bedroom information available</h4>
-              </div>
-            </div>
+      <div class="p-listing__grid | container" role="presentation">
+        <div class="p-listing__content | flow flow-sm">
+          <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
+            role="presentation">
+            <skeleton-loader class="p-listing__main-carousel-skeleton">
+              <MoleculesImageGallery v-if="isDesktop && galleryImages.length > 0" :images="galleryImages"
+                @open-modal="openImageModal" />
+            </skeleton-loader>
           </div>
 
-          <!-- Bathrooms -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Bathroom Features</h3>
-            <div class="p-listing-feature-grid">
-              <template v-if="property.bathroomFeatures && property.bathroomFeatures.length">
-                <div v-for="(room, i) in property.bathroomFeatures" :key="i" class="p-listing-feature-card">
-                  <h4 class="font-medium body-sm">Bathroom {{ room.roomNumber ?? (i + 1) }}</h4>
-                  <div class="body-xs">Description: {{ room.description || 'N/A' }}</div>
-                  <div class="body-xs">Size: {{ room.size || 'N/A' }}</div>
-                  <div class="body-xs">Ensuite: {{ room.enSuite ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Bathtub: {{ room.bathtub ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Walk-In Shower: {{ room.walkInShower ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Downstairs: {{ room.downstairs ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Upstairs: {{ room.upstairs ? 'Yes' : 'No' }}</div>
-                </div>
-              </template>
-              <div v-else class="p-listing-feature-card p-listing-empty-card">
-                <h4 class="font-medium body-sm">No bathroom information available</h4>
-              </div>
-            </div>
+          <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
+            :address="address" :price-type="priceType" :property-type="property?.type?.name"
+            :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+            :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+            :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+            :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
+            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
+
+          <!-- General Property Information (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section">
+            <AtomsListingGeneralInfo :description="property?.description || undefined" />
           </div>
 
-          <!-- Kitchen -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Kitchen Features</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card">
-                <div class="body-xs">Modern: {{ property.kitchenFeatures?.modern ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Open Plan: {{ property.kitchenFeatures?.openPlan ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">White Goods: {{ property.kitchenFeatures?.whiteGoods ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Breakfast Bar: {{ property.kitchenFeatures?.breakfastBar ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Island: {{ property.kitchenFeatures?.island ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Pantry: {{ property.kitchenFeatures?.pantry ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Utility Room Access: {{ property.kitchenFeatures?.utilityAccess ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Size: {{ property.kitchenFeatures?.size || 'N/A' }}</div>
-                <div class="body-xs">Description: {{ property.kitchenFeatures?.description || 'N/A' }}</div>
-              </div>
-            </div>
+          <div v-if="listing && property" class="p-listing__section">
+            <MoleculesListingEssentials :listing="listing" :property="property" />
           </div>
 
-          <!-- Utility -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Utility Room</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card">
-                <div class="body-xs">Appliances: {{ property.utility?.appliances?.length ? property.utility.appliances.join(', ') : 'None' }}</div>
-                <div class="body-xs">Storage: {{ property.utility?.storage ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Sink: {{ property.utility?.sink ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Plumbing: {{ property.utility?.plumbing ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Size: {{ property.utility?.size || 'N/A' }}</div>
-                <div class="body-xs">Description: {{ property.utility?.description || 'N/A' }}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Living Area -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Living Area</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card">
-                <div class="body-xs">Fireplace: {{ property.livingAreaFeatures?.fireplace || 'N/A' }}</div>
-                <div class="body-xs">Balcony: {{ property.livingAreaFeatures?.balcony ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Open Plan: {{ property.livingAreaFeatures?.openPlan ? 'Yes' : 'No' }}</div>
-                <div class="body-xs">Size: {{ property.livingAreaFeatures?.size || 'N/A' }}</div>
-                <div class="body-xs">Description: {{ property.livingAreaFeatures?.description || 'N/A' }}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Reception Rooms -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Reception Rooms</h3>
-            <div class="p-listing-feature-grid">
-              <template v-if="property.reception && property.reception.length">
-                <div v-for="(rec, i) in property.reception" :key="i" class="p-listing-feature-card">
-                  <h4 class="font-medium body-sm">Reception {{ rec.roomNumber ?? (i + 1) }}</h4>
-                  <div class="body-xs">Description: {{ rec.description || 'N/A' }}</div>
-                  <div class="body-xs">Size: {{ rec.size || 'N/A' }}</div>
-                  <div class="body-xs">Open Plan: {{ rec.openPlan ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Fireplace: {{ rec.fireplace || 'N/A' }}</div>
-                  <div class="body-xs">Games Room: {{ rec.gamesRoom ? 'Yes' : 'No' }}</div>
-                  <div class="body-xs">Home Cinema: {{ rec.homeCinema ? 'Yes' : 'No' }}</div>
-                </div>
-              </template>
-              <div v-else class="p-listing-feature-card p-listing-empty-card">
-                <h4 class="font-medium body-sm">No reception room information available</h4>
-              </div>
-            </div>
-          </div>
-
-          <!-- Parking -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Parking</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Garage:</span> <span class="body-xs">{{ property.parking?.garage ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Driveway:</span> <span class="body-xs">{{ property.parking?.driveway ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Permit Parking:</span> <span class="body-xs">{{ property.parking?.permitParking ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">On Street:</span> <span class="body-xs">{{ property.parking?.onStreet ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">No Parking:</span> <span class="body-xs">{{ property.parking?.noParking ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Carport:</span> <span class="body-xs">{{ property.parking?.carport ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Allocated Parking:</span> <span class="body-xs">{{ property.parking?.allocatedParking ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">EV Charging:</span> <span class="body-xs">{{ property.parking?.evCharging ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.parking?.description || 'N/A' }}</span></div>
-            </div>
-          </div>
-
-          <!-- Outdoor Space -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Outdoor Space</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.outdoorSpace?.description || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Total Size:</span> <span class="body-xs">{{ property.outdoorSpace?.totalSize || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Front Garden:</span> <span class="body-xs">{{ property.outdoorSpace?.frontGarden ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Front Garden Size:</span> <span class="body-xs">{{ property.outdoorSpace?.frontGardenSize || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Rear Garden:</span> <span class="body-xs">{{ property.outdoorSpace?.rearGarden ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Rear Garden Size:</span> <span class="body-xs">{{ property.outdoorSpace?.rearGardenSize || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Sun Terrace:</span> <span class="body-xs">{{ property.outdoorSpace?.sunTerrace ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Terrace:</span> <span class="body-xs">{{ property.outdoorSpace?.terrace ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Balcony:</span> <span class="body-xs">{{ property.outdoorSpace?.balcony ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Patio:</span> <span class="body-xs">{{ property.outdoorSpace?.patio ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Separate Parcel:</span> <span class="body-xs">{{ property.outdoorSpace?.separateParcel ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Shed:</span> <span class="body-xs">{{ property.outdoorSpace?.shed ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Summer House:</span> <span class="body-xs">{{ property.outdoorSpace?.summerHouse ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Garden Office:</span> <span class="body-xs">{{ property.outdoorSpace?.gardenOffice ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Pool:</span> <span class="body-xs">{{ property.outdoorSpace?.pool ? 'Yes' : 'No' }}</span></div>
-            </div>
+          <div v-if="property" class="p-listing__section">
+            <h2 class="title-md">Rooms</h2>
+            <MoleculesListingItemDetails v-if="property?.bedroomFeatures" :items="property?.bedroomFeatures" type="room"
+              subtype="Bedroom" title="Bedrooms" />
+            <MoleculesListingItemDetails v-if="property?.bathroomFeatures" :items="property?.bathroomFeatures"
+              type="room" subtype="Bathroom" title="Bathrooms" />
+            <MoleculesListingItemDetails v-if="property?.kitchenFeatures" :items="property?.kitchenFeatures" type="room"
+              subtype="Kitchen" title="Kitchen" />
+            <MoleculesListingItemDetails v-if="property?.reception" :items="property?.reception" type="room"
+              subtype="Reception" title="Receptions" />
+            <MoleculesListingItemDetails v-if="property?.otherRoom" :items="property?.otherRoom" type="room"
+              subtype="Other Rooms" title="Other Rooms" />
+            <MoleculesListingItemDetails v-if="property?.rearGarden || property?.frontGarden"
+              :items="getGardenItems(property)" type="garden" title="Gardens" :show-floor="false" />
           </div>
 
           <!-- Energy & Utilities -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Energy & Utilities</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.energyAndUtilities?.description || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">EPC Rating:</span> <span class="body-xs">{{ property.energyAndUtilities?.epcRating || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">EPC Certificate URL:</span> <span class="body-xs"><a v-if="property.energyAndUtilities?.epcCertificateUrl" :href="property.energyAndUtilities.epcCertificateUrl" target="_blank">View Certificate</a><span v-else>N/A</span></span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Primary Heating Type:</span> <span class="body-xs">{{ property.energyAndUtilities?.primaryHeatingType?.length ? property.energyAndUtilities.primaryHeatingType.join(', ') : 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Secondary Heating Type:</span> <span class="body-xs">{{ property.energyAndUtilities?.secondaryHeatingType?.length ? property.energyAndUtilities.secondaryHeatingType.join(', ') : 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Boiler Type:</span> <span class="body-xs">{{ property.energyAndUtilities?.boilerType || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Hot Water Source:</span> <span class="body-xs">{{ property.energyAndUtilities?.hotWaterSource || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Renewables:</span> <span class="body-xs">{{ property.energyAndUtilities?.renewables?.length ? property.energyAndUtilities.renewables.join(', ') : 'None' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Connected Utilities:</span> <span class="body-xs">{{ property.energyAndUtilities?.connectedUtilities?.length ? property.energyAndUtilities.connectedUtilities.join(', ') : 'None' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Broadband Type:</span> <span class="body-xs">{{ property.energyAndUtilities?.broadbandType || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Full Fibre Available:</span> <span class="body-xs">{{ property.energyAndUtilities?.fullFibreAvailable ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Max Download Speed (Mbps):</span> <span class="body-xs">{{ property.energyAndUtilities?.maxDownloadSpeedMbps || 'N/A' }}</span></div>
+          <div v-if="property?.energyAndUtilities" class="p-listing__section">
+            <MoleculesListingEnergyUtilities :energy-data="property.energyAndUtilities"
+              :postcode="property?.address?.postcode" />
+          </div>
+
+          <div v-if="property" class="p-listing__section">
+            <h2 class="title-md">Additional Details</h2>
+            <div class="p-listing__features-list">
+              <div class="p-listing__features-column">
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.parking)" title="Parking"
+                  :features="property?.parking" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.utility)" title="Utility"
+                  :features="property?.utility" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.storageFeatures)" title="Storage"
+                  :features="property?.storageFeatures" />
+                <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities"
+                  :broadband-type="property.energyAndUtilities.broadbandType"
+                  :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
+                  :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.additionalFeatures)"
+                  title="Additional Features" :features="property?.additionalFeatures" />
+              </div>
+              <div class="p-listing__features-column">
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.accessibilityFeatures)"
+                  title="Accessibility" :features="property?.accessibilityFeatures" />
+                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.securityFeatures)" title="Security"
+                  :features="property?.securityFeatures" />
+                <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)"
+                  title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
+                <MoleculesListingMobileCoverage />
+              </div>
             </div>
           </div>
 
-          <!-- Accessibility Features -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Accessibility Features</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.accessibilityFeatures?.description || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Wheelchair Friendly:</span> <span class="body-xs">{{ property.accessibilityFeatures?.wheelchairFriendly ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Step Free Access:</span> <span class="body-xs">{{ property.accessibilityFeatures?.stepFreeAccess ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Wide Doorways:</span> <span class="body-xs">{{ property.accessibilityFeatures?.wideDoorways ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Wet Room:</span> <span class="body-xs">{{ property.accessibilityFeatures?.wetRoom ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Handrails:</span> <span class="body-xs">{{ property.accessibilityFeatures?.handrails ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Elevator:</span> <span class="body-xs">{{ property.accessibilityFeatures?.elevator ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Stairs:</span> <span class="body-xs">{{ property.accessibilityFeatures?.stairs ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Accessible Parking:</span> <span class="body-xs">{{ property.accessibilityFeatures?.accessibleParking ? 'Yes' : 'No' }}</span></div>
-            </div>
+          <!-- Price Paid History -->
+          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
+            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
+              number: property.address.number,
+              flat: property.address.flat,
+              street: property.address.street,
+              city: property.address.city,
+              postcode: property.address.postcode,
+              county: property.address.county,
+            }" />
           </div>
 
-          <!-- Security Features -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Security Features</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.securityFeatures?.description || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Gated Community:</span> <span class="body-xs">{{ property.securityFeatures?.gatedCommunity ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">CCTV:</span> <span class="body-xs">{{ property.securityFeatures?.cctv ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Alarm System:</span> <span class="body-xs">{{ property.securityFeatures?.alarmSystem ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Neighbourhood Watch:</span> <span class="body-xs">{{ property.securityFeatures?.neighborhoodWatch ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Intercom System:</span> <span class="body-xs">{{ property.securityFeatures?.intercomSystem ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Security Staff:</span> <span class="body-xs">{{ property.securityFeatures?.security ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Reception:</span> <span class="body-xs">{{ property.securityFeatures?.reception ? 'Yes' : 'No' }}</span></div>
-            </div>
+          <!-- Location & Amenities (Non-collapsible) -->
+          <div v-if="property" class="p-listing__section">
+            <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!"
+              :listing="listing" :amenities="amenitiesArray" />
           </div>
 
-          <!-- Additional Features -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Additional Features</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.additionalFeatures?.description || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Pet Friendly:</span> <span class="body-xs">{{ property.additionalFeatures?.petFriendly ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Move In Date:</span> <span class="body-xs">{{ property.additionalFeatures?.moveInDate ? formatMDY(property.additionalFeatures.moveInDate) : 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Home Office:</span> <span class="body-xs">{{ property.additionalFeatures?.homeOffice ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Pool:</span> <span class="body-xs">{{ property.additionalFeatures?.pool ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Internet:</span> <span class="body-xs">{{ property.additionalFeatures?.internet ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Cable TV:</span> <span class="body-xs">{{ property.additionalFeatures?.cableTv ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Phone:</span> <span class="body-xs">{{ property.additionalFeatures?.phone ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Laundry:</span> <span class="body-xs">{{ property.additionalFeatures?.laundry ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Concierge:</span> <span class="body-xs">{{ property.additionalFeatures?.concierge ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Shop:</span> <span class="body-xs">{{ property.additionalFeatures?.shop ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Gym:</span> <span class="body-xs">{{ property.additionalFeatures?.gym ? 'Yes' : 'No' }}</span></div>
-            </div>
+          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+            <OrganismsListingCrimeScore :lat="property.address.lat" :lon="property.address.lon" />
           </div>
 
-          <!-- Amenities -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Amenities</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Amenities:</span> <span class="body-xs">N/A</span></div>
-            </div>
+          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
+            <MoleculesListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
           </div>
 
-          <!-- Storage Features -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Storage Features</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.storageFeatures?.description || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Attic:</span> <span class="body-xs">{{ property.storageFeatures?.attic ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Basement:</span> <span class="body-xs">{{ property.storageFeatures?.basement ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Separate Dressing:</span> <span class="body-xs">{{ property.storageFeatures?.separateDressing ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Under Stairs Storage:</span> <span class="body-xs">{{ property.storageFeatures?.underStairsStorage ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Pantry:</span> <span class="body-xs">{{ property.storageFeatures?.pantry ? 'Yes' : 'No' }}</span></div>
-            </div>
+          <div class="p-listing__section">
+            <MoleculesListingAdvert />
           </div>
+        </div>
 
-          <!-- Running Costs -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Running Costs</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.runningCosts?.description || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Council Tax Band:</span> <span class="body-xs">{{ property.runningCosts?.councilTaxBand || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Service Charges:</span> <span class="body-xs">{{ property.runningCosts?.serviceCharges !== undefined ? '£' + property.runningCosts.serviceCharges : 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Ground Rent:</span> <span class="body-xs">{{ property.runningCosts?.groundRent !== undefined ? '£' + property.runningCosts.groundRent : 'N/A' }}</span></div>
+        <div class="p-listing__sidebar" role="presentation">
+          <Transition name="p-listing-images">
+            <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
+              <div class="p-listing__sidebar-carousel">
+                <MoleculesImageGallery v-if="galleryImages.length > 0" :images="galleryImages"
+                  @open-modal="openImageModal" />
+              </div>
             </div>
-          </div>
+          </Transition>
 
-          <!-- Land Details -->
-          <div class="mt-10 section-container">
-            <h3 class="title-md section-heading p-listing-section-title">Land Details</h3>
-            <div class="p-listing-feature-grid">
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Planning Classification:</span> <span class="body-xs">{{ property.Land?.planningClassification || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Land Size:</span> <span class="body-xs">{{ property.Land?.landSize ?? 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Access Rights:</span> <span class="body-xs">{{ property.Land?.accessRights ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Road Frontage:</span> <span class="body-xs">{{ property.Land?.roadFrontage ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Utilities Available:</span> <span class="body-xs">{{ property.Land?.utilitiesAvailable ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Current Use:</span> <span class="body-xs">{{ property.Land?.currentUse || 'N/A' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Agricultural Subsidies:</span> <span class="body-xs">{{ property.Land?.agriculturalSubsidies ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Stewardship Scheme:</span> <span class="body-xs">{{ property.Land?.stewardshipScheme ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Tenanted:</span> <span class="body-xs">{{ property.Land?.tenanted ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Vacant:</span> <span class="body-xs">{{ property.Land?.vacant ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Agricultural Use:</span> <span class="body-xs">{{ property.Land?.agriculturalUse ? 'Yes' : 'No' }}</span></div>
-              <div class="p-listing-feature-card"><span class="font-medium body-xs">Description:</span> <span class="body-xs">{{ property.Land?.description || 'N/A' }}</span></div>
-            </div>
-          </div>
+          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="address"
+            :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
+            :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+            :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+            :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+            :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
+            :agent="listing?.user || {}"
+            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
         </div>
       </div>
     </div>
-    <div v-else class="p-listing-loader">
-      <div class="text-center">
-        <p class="title-sm">Loading...</p>
-        <p class="body-xs">Please wait while we fetch the property details</p>
-      </div>
-    </div>
+
+    <!-- Image Gallery Modal -->
+    <MoleculesImageGalleryModal :images="galleryImages" :show="showImageModal" :initial-index="modalImageIndex"
+      @close="closeImageModal" />
+
+    <client-only>
+      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
+        :price-type="priceType" :address="address" :property-type="property?.type?.name"
+        :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
+        :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+        :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+        :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
+        :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+        :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
+        :agent="listing?.user || {}"
+        :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
+    </client-only>
+  </main>
+  <!-- Similar Listings -->
+  <div class="p-listing | container">
+    <OrganismsRelevantListings type="similar" :listing-id="String(route.params?.id)" :address="similarListingsAddress" />
   </div>
+
 </template>
 
 <script setup lang="ts">
-import type { MapMarker } from '~~/shared/types/map';
-const { trackListingView } = useAnalytics()
+import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
+import breakpoints from "#styles/_utils/breakpoints.module.scss";
+import { hasBooleanFeatures, filterListingFeatures } from "~/utils/listing/filter-listing-features";
+
 const route = useRoute();
-const listingId = route.params.id as string;
-const listing = ref<ListingWithFullProperty | null>(null);
-const url: string = `/api/listing/${listingId}/`;
-const { data } = await useAsyncData("listing", () => $fetch<ListingWithFullProperty>(url));
-if (data.value) {
-  listing.value = data.value;
-}
-const property = computed(() => {
-  if (!listing.value || !listing.value.property) return undefined;
-  return listing.value.property as typeof listing.value.property & { Land?: any };
+
+/**
+ *  Fetch listing
+ */
+const { data: listingData, status } = await useAsyncData(
+  `listing-${route.params?.id}`,
+  () => {
+    return $fetch<{ listing: any }>(`/api/listing/${route.params?.id}`);
+  },
+  {
+    deep: false,
+  }
+);
+
+const listing = computed(() => listingData.value?.listing);
+
+const similarListingsAddress = computed(() => {
+  return listing.value?.property?.address ? {
+    street: listing.value.property.address.street,
+    city: listing.value.property.address.city,
+    postcode: listing.value.property.address.postcode,
+  } : {};
 });
-const formattedMoveInDate = computed(() => formatMDY(listing.value?.moveInDate as Date));
+/**
+ *  Content
+ */
+const property = computed(() => listing.value?.property);
+
+const priceFormatted = computed(() => {
+  const price = listing.value?.price;
+  return isNumber(price) ? numberToCurrency(price) : "";
+});
+
+/** omit street number */
+const address = computed(() => {
+  return property.value?.address ? `${property.value.address.street || ""}, ${property.value.address.city || ""}, ${property.value.address.postcode || ""}`.trim() : "";
+});
+
+const priceType = computed(() => {
+  return listing.value?.saleListing ? listing.value.saleListing.priceType : listing.value?.rentalListing?.rentFrequency;
+});
+
+
+// Handle amenities array/object conversion
+const amenitiesArray = computed(() => {
+  const amenities = property.value?.amenities;
+  if (!amenities) return null;
+  return Array.isArray(amenities) ? amenities : [amenities];
+});
+
+// Create garden items array for unified component
+const getGardenItems = (property: any) => {
+  const gardens = [];
+  if (property?.frontGarden) {
+    gardens.push({ ...property.frontGarden, gardenType: "front" });
+  }
+  if (property?.rearGarden) {
+    gardens.push({ ...property.rearGarden, gardenType: "rear" });
+  }
+  return gardens;
+};
+
+/**
+ *  Media
+ */
+const images = computed(() => {
+  const media = property.value?.media;
+  if (!Array.isArray(media)) return [];
+
+  return media
+    .filter((item) => item.image !== null)
+    .map((item) => ({
+      image: item.image!,
+      metadata: item.metadata,
+    }));
+});
+
+const galleryImages = computed(() => formatGalleryImages(images.value));
+
+/**
+ *  Toggle media visibility
+ */
+const $mobileCarousel = useTemplateRef("$mobile-carousel");
+const $desktopCarousel = useTemplateRef("$desktop-carousel");
+const isDesktop = useMediaQuery(`(min-width: ${breakpoints.notebook})`);
+const isImagesVisible = shallowRef(true);
+
+function parallaxCarousel() {
+  if (isDesktop.value) return;
+
+  // Get elem to watch
+  const elem = unref($mobileCarousel);
+
+  // Ensure element exists
+  if (!elem) return;
+
+  // Get top scroll position
+  const getScrollTop = window.scrollY;
+  const getScrollThreshold = elem.offsetHeight;
+
+  // Calculate as transform from the top, if below threshold
+  if (getScrollTop < getScrollThreshold) {
+    elem.style.transform = `translateY(${getScrollTop / 2}px)`;
+  }
+}
+
+useIntersectionObserver($desktopCarousel, ([entry]) => {
+  isImagesVisible.value = !!entry?.isIntersecting;
+});
 
 onMounted(() => {
-  if (route.params.id) {
-    trackListingView(route.params.id as string);
-  }
+  window.addEventListener("scroll", parallaxCarousel, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", parallaxCarousel);
+});
+
+/**
+ *  Toggle overview scroll
+ */
+const $overview = useTemplateRef("$overview");
+const isOverviewVisible = shallowRef(true);
+
+useIntersectionObserver($overview, ([entry]) => {
+  isOverviewVisible.value = !!entry?.isIntersecting;
+});
+
+/**
+ *  Image Gallery Modal
+ */
+const showImageModal = ref(false);
+const modalImageIndex = ref(0);
+
+function openImageModal(imageIndex: number) {
+  modalImageIndex.value = imageIndex;
+  showImageModal.value = true;
+}
+
+function closeImageModal() {
+  showImageModal.value = false;
+}
+
+
+
+onMounted(() => {
+  window.addEventListener("scroll", parallaxCarousel, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", parallaxCarousel);
 });
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/functions' as fn;
-@use '#styles/_utils/media' as mq;
+@use "#styles/_utils/media" as mq;
+@use "#styles/_utils/functions" as fn;
 
-/* Header Section */
-.p-listing-header {
-  margin-bottom: var(--size-20);
-  padding-bottom: var(--size-16);
-  border-bottom: 1px solid var(--background-300);
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.p-listing-title {
-  font-weight: var(--font-bold);
-  color: var(--foreground-100);
-  line-height: var(--lineheight-xs);
-}
+.p-listing {
+  margin-top: var(--size-32);
 
-.p-listing-action-buttons {
-  transform-origin: center right;
-  transition: transform var(--animation-fast);
-  
-  &:hover {
-    transform: scale(1.05);
-  }
-}
 
-/* Media Grid for property images */
-.p-listing-media-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--size-16);
-  margin-bottom: var(--size-24);
-}
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: calc(var(--container-padding) / 2);
+    align-items: flex-start;
 
-.p-listing-media-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  border-radius: var(--border-radius-lg);
-  transition: transform var(--animation-fast), box-shadow var(--animation-fast);
-  border: 1px solid var(--background-300);
+    @include mq.not-notebook {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: none;
+      background: var(--background-100);
+      border-top-right-radius: var(--border-radius-3xl);
+      border-top-left-radius: var(--border-radius-3xl);
+      padding: var(--border-radius-3xl) 0 0;
+      margin: calc(0px - var(--border-radius-3xl)) 0 0;
+    }
 
-  &:hover {
-    transform: scale(0.98);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-}
+    @include mq.notebook {
+      grid-template-columns: 1fr 18em;
+    }
 
-/* Info grid for the key information panels */
-.p-listing-info-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--size-20);
-  margin-bottom: var(--size-32);
-  
-  @include mq.tablet {
-    grid-template-columns: repeat(3, 1fr);
+    @include mq.desktop {
+      grid-template-columns: 1fr 20em;
+    }
   }
 
-  .box {
-    height: 100%;
-    transition: transform var(--animation-fast), box-shadow var(--animation-fast);
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /**
+   *  Content wrappers
+   */
+  &__mobile-overview {
+    @include mq.notebook {
+      display: none;
+    }
+  }
+
+  &__content {
+    overflow: hidden;
+
+    @include mq.not-notebook {
+      padding-inline: var(--size-24);
+    }
+  }
+
+  &__sidebar {
+    display: none;
+
+    @include mq.notebook {
+      display: block;
+      position: sticky;
+      top: calc(var(--header-height) + var(--size-32));
+      max-height: calc(100dvh - var(--header-height) - var(--size-32) - var(--size-16));
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      padding-bottom: var(--size-16);
+    }
+
+    &-expand {
+      overflow: hidden;
+      display: none;
+
+      @include mq.notebook {
+        display: block;
+      }
+    }
+  }
+
+  /**
+   *  Images
+   */
+  &__main-carousel,
+  &__sidebar-carousel {
+    overflow: hidden;
+  }
+
+  &__main-carousel {
+    &--mobile {
+      display: block;
+
+      @include mq.notebook {
+        display: none;
+      }
+    }
+
+    &--desktop {
+      display: none;
+
+      @include mq.notebook {
+        display: block;
+        margin-bottom: var(--size-24);
+      }
+    }
+  }
+
+  &__sidebar-carousel {
+    margin-bottom: var(--size-24);
+  }
+
+  /**
+   *  Skeleton loaders
+   */
+  &__main-carousel-skeleton {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+
+    &--mobile {
+      aspect-ratio: 4 / 3;
+      max-height: 70vh;
     }
   }
 }
 
-.p-listing-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--size-12);
+/**
+ *  Animations
+ */
+.p-listing-images-enter-active,
+.p-listing-images-leave-active {
+  interpolate-size: allow-keywords;
+
+  height: calc-size(max-content, size);
+  transition-property: opacity, height, transform, margin;
+  transition-duration: var(--animation-medium);
+  transition-timing-function: var(--ease-in-out);
+  transform-origin: 100% 100%;
 }
 
-/* Map container styles */
-.p-listing-map-container {
-  margin-bottom: var(--size-24);
+.p-listing-images-leave-to,
+.p-listing-images-enter-from {
+  height: 0;
+  margin: 0;
+  transform: translateY(-100%);
 }
 
-.p-listing-map-inner {
-  height:300px;
+.p-listing__section {
+  padding: var(--size-16) 0;
+  margin-left: var(--size-2);
+
+  @include mq.notebook {
+    margin-right: var(--size-24);
+  }
+}
+
+.p-listing__features-list {
   width: 100%;
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--background-300);
-  position: relative;
-}
-
-/* Feature sections container */
-.p-listing-features {
+  display: flex;
+  gap: var(--size-16);
   margin-top: var(--size-16);
-  background: var(--background-100); /* Lighter background like ListingCard */
-  border: 1px solid var(--background-200);
+  align-items: flex-start;
+
+  @include mq.mobile-only {
+    flex-direction: column;
+    gap: var(--size-12);
+  }
 }
 
-/* Add margin to create separation between sections */
-.mt-10 {
-  margin-top: var(--size-40);
-}
-
-/* Section styling */
-.section-container {
-  padding-bottom: var(--size-24);
-  border-bottom: 1px solid var(--background-300);
-}
-
-.section-heading {
-  margin-bottom: var(--size-16);
-  color: var(--foreground-100); /* Use foreground color that works in both light/dark mode */
-  font-weight: var(--font-semibold);
-}
-
-/* Feature grids and cards */
-.p-listing-feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+.p-listing__features-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: var(--size-16);
-}
 
-.p-listing-feature-card {
-  padding: var(--size-16);
-  background-color: var(--background-200);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--background-300);
-  transition: transform var(--animation-fast), box-shadow var(--animation-fast);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  @include mq.mobile-only {
+    gap: var(--size-12);
+    width: 100%;
   }
 }
 
-.p-listing-feature-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--size-8);
-  margin-top: var(--size-12);
-  
-  @include mq.small-tablet {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  div {
-    padding: var(--size-6);
-    border-radius: var(--border-radius-sm);
-    transition: background-color var(--animation-fast);
-    
-    &:hover {
-      background-color: var(--background-300);
-    }
-  }
-}
-
-.p-listing-feature-list {
-  list-style: disc;
-  padding-left: var(--size-20);
-  font-size: var(--font-xs);
-  color: var(--foreground-100); /* Ensures text is visible in both dark/light mode */
-  
-  li {
-    margin-bottom: var(--size-8);
-    position: relative;
-    
-    &::marker {
-      color: var(--primary-400); /* Use primary color for list bullets */
-    }
-  }
-}
-
-.p-listing-amenity-item {
-  padding: var(--size-12) 0;
-  border-bottom: var(--divider-100);
-  
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-/* EPC Badge */
-.p-listing-epc-badge {
-  width: var(--size-48);
-  height: var(--size-48);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100%;
-  font-weight: var(--font-bold);
-  font-size: var(--font-lg);
-  color: var(--monochrome-100);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform var(--animation-fast);
-  
-  &:hover {
-    transform: scale(1.05);
-  }
-}
-
-/* Status badges */
-.p-listing-badge {
-  display: inline-flex;
-  padding: var(--size-6) var(--size-12);
-  border-radius: var(--border-radius-pill);
-  font-size: var(--font-xs);
-  font-weight: var(--font-semibold);
-  transition: transform var(--animation-fast);
-  
-  &:hover {
-    transform: translateY(-1px);
-  }
-}
-
-.p-listing-badge-primary {
-  background: var(--primary-200);
-  color: var(--primary-800);
-  border: 1px solid var(--primary-300);
-}
-
-.p-listing-badge-secondary {
-  background: var(--secondary-200);
-  color: var(--secondary-800);
-  border: 1px solid var(--secondary-300);
-}
-
-/* Loading state */
-.p-listing-loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-  background: var(--background-200);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--background-300);
-}
-
-/* Section title styling for dark-mode compatibility */
-.p-listing-section-title {
-  position: relative;
-  display: inline-block;
-  color: var(--foreground-100);
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 40px;
-    height: 2px;
-    background-color: var(--primary-400);
-  }
-}
-
-/* Main Property Features title styling */
-.p-listing-main-title {
-  font-weight: var(--font-bold);
-  color: var(--foreground-100);
-  position: relative;
-  display: inline-block;
-  margin-bottom: var(--size-20);
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background-color: var(--primary-500);
-  }
-}
 </style>

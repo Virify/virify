@@ -6,7 +6,7 @@
 
     <label ref="$labels" v-for="{ key, value, icon } of options" :key
       class="o-dock-inputs-layout__label | font-semibold">
-      <input type="radio" class="| visually-hidden" :value="key" v-model="state.layout" name="results-layout"
+      <input type="radio" class="| visually-hidden" :value="key" v-model="searchState.viewMode" name="results-layout"
         :aria-label="value" />
 
       <AtomsIcon :icon />
@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { useResizeObserver, watchImmediate } from '@vueuse/core'
+import { useMounted, useResizeObserver, watchImmediate } from '@vueuse/core'
 import type { ResultLayout } from '#imports'
 
 /**
@@ -48,13 +48,13 @@ const options = computed(() => {
 /**
  *  Layout state
  */
-const { state, setLayout } = useUniversalSearch()
-const { layout } = toRefs(state.value)
+const { searchState, setViewMode } = useSearchState()
+const { viewMode } = toRefs(searchState.value)
 
 /**
  *  Loading state
  */
-const isMounted = ref(false)
+const isMounted = useMounted()
 
 /**
  *  Update highlight position
@@ -64,6 +64,8 @@ const $highlight = useTemplateRef('$highlight')
 const $wrapper = useTemplateRef('$wrapper')
 
 async function updateHighlightPosition() {
+  if (!import.meta.client) return
+
   await nextTick()
 
   // Search for active label
@@ -88,28 +90,18 @@ async function updateHighlightPosition() {
   highlight.style.left = `${offsetLeft}px`
 }
 
-onMounted(() => {
-  isMounted.value = true
-
-  watchImmediate(layout, updateHighlightPosition)
-  useResizeObserver($wrapper, updateHighlightPosition)
-})
+watchImmediate(viewMode, updateHighlightPosition)
+useResizeObserver($wrapper, updateHighlightPosition)
 
 /**
- *  Track user, breakpoint changes
+ *  Update layout in state
  */
-const emits = defineEmits(['changed'])
-
-watch(layout, (newValue) => {
-  emits('changed', newValue)
-})
-
 watch(options, (newValue) => {
-  if (newValue.length !== 2 || layout.value !== 'split') {
+  if (newValue.length !== 2 || viewMode.value !== 'split') {
     return
   }
 
-  setLayout('grid')
+  setViewMode('grid')
 })
 
 </script>
