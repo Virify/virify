@@ -32,6 +32,7 @@ export function renderMarker(
       return h(MoleculesPriceMarker, {
         id,
         price,
+        image,
         tier: resolvedTier,
         priceType,
       });
