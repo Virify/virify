@@ -23,10 +23,6 @@ defineProps<{
   currentUserId?: number | string | null;
 }>();
 
-function formatMessageTimestamp(timestamp: string | Date): string {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 </script>
 
 <style lang="scss" scoped>
@@ -69,10 +65,10 @@ function formatMessageTimestamp(timestamp: string | Date): string {
       justify-content: space-between;
       align-items: center;
       gap: var(--size-8);
-      color: var(--monochrome-400);
+      color: var(--monochrome-300);
 
       .message-time {
-        color: var(--monochrome-400);
+        color: var(--monochrome-300);
         flex-shrink: 0;
       }
 

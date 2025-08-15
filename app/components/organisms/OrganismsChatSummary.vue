@@ -2,7 +2,7 @@
   <div class="o-chat-summary" :class="{ collapsed: isCollapsed }">
     <div class="o-chat-summary__header" @click="toggleCollapsed">
       <h3 class="o-chat-summary__title | title-xs">Enquiries 
-        <span class="o-chat-summary__count | body-sm">({{ enquiriesCount }})</span>
+        <span class="o-chat-summary__count | body-sm">{{ enquiriesCount }}</span>
       </h3>
       <button class="o-chat-summary__toggle-btn" :class="{ 'o-chat-summary__toggle-btn--collapsed': isCollapsed }">
         <AtomsIcon icon="chevron-down" size="16" />
@@ -101,7 +101,10 @@ const sortOptions = [
 
 // Get unread enquiries count from aggregates instead of calculating manually
 const enquiriesCount = computed(() => {
-  return getAggregateCount('unreadMessages') || 0;
+  if(getAggregateCount('unreadMessages')) {
+    return `(${getAggregateCount('unreadMessages')})`;
+  }
+  return null;
 });
 
 const allLimitedConversations = computed(() => {

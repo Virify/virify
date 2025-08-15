@@ -76,7 +76,7 @@ const firstImage = computed(() => {
 
   &:hover {
     background: var(--background-100);
-    border-radius: var(--border-radius-lg);
+    border-radius: var(--border-radius-xl);
   }
 
   &__content {
@@ -115,7 +115,7 @@ const firstImage = computed(() => {
   }
 
   &__username {
-    color: var(--secondary-600);
+    color: var(--foreground-100);
     text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
