@@ -9,6 +9,13 @@
       </button>
     </div>
     <div class="o-chat-summary__content" v-show="!isCollapsed">
+      <div class="o-chat-summary__filters-row">
+        <AtomsSelect 
+          v-model="sortBy" 
+          :options="sortOptions"
+          class="o-chat-summary__sort-select | body-sm"
+        />
+      </div>
       <template v-if="searchEnabled !== false">
         <div class="o-chat-summary__search-row">
           <input
@@ -80,6 +87,16 @@ const { getAggregateCount } = useNotifications()
 
 const isCollapsed = ref(false)
 const search = ref("")
+const sortBy = ref("all")
+
+const sortOptions = [
+  { key: "All", value: "all" },
+  { key: "Unread", value: "unread" },
+  { key: "Received", value: "received" },
+  { key: "Sent", value: "sent" },
+  { key: "Recent", value: "recent" },
+  { key: "Oldest", value: "oldest" }
+]
 
 // Get unread enquiries count from aggregates instead of calculating manually
 const enquiriesCount = computed(() => {
@@ -89,8 +106,8 @@ const enquiriesCount = computed(() => {
 const allLimitedConversations = computed(() => {
   let conversations = allConversations.value || [];
   
-  // Sort conversations using utility function
-  conversations = sortConversationsByUnreadAndRecency(conversations, user.value?.id);
+  // Apply sorting using the conversation util
+  conversations = sortConversations(conversations, sortBy.value, user.value?.id);
   
   if (!limit?.value || limit.value === 0) {
     return conversations;
@@ -249,18 +266,27 @@ function toggleCollapsed() {
     color: var(--foreground-100);
   }
 
+  &__filters-row {
+    padding: 0 var(--size-16);
+    margin: var(--size-8) 0;
+
+    .a-select {
+      width: 100%;
+    }
+  }
+
   &__search-row {
     padding: 0 var(--size-16);
-    margin: var(--size-12) 0;
+    margin: var(--size-8) 0;
   }
 
   &__search-input {
     display: block;
     width: 100%;
-    padding: var(--size-8);
+    padding: var(--size-8) var(--size-12);
     border-radius: var(--border-radius-2xl);
-    border: 1px solid var(--monochrome-600);
-    background: var(--background-100);
+    border: 1px solid var(--foreground-200);
+    background: var(--background-200);
     color: var(--foreground-100);
     outline: none;
     transition: border-color 0.2s;

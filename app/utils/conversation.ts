@@ -248,3 +248,64 @@ export const sortConversationsByUnreadAndRecency = (
     return bTime - aTime; // Most recent first
   });
 };
+
+/**
+ * Sort and filter conversations based on the specified criteria
+ * 
+ * @param conversations - Array of conversations to sort/filter
+ * @param sortBy - The sorting/filtering criteria
+ * @param userId - The current user's ID
+ * @returns Sorted/filtered conversations array
+ */
+export const sortConversations = (
+  conversations: ConversationWithUserAndMessages[], 
+  sortBy: string, 
+  userId?: number
+): ConversationWithUserAndMessages[] => {
+  const conversationsCopy = [...conversations];
+
+  switch (sortBy) {
+    case "all":
+      // Sort conversations using utility function (default behavior)
+      return sortConversationsByUnreadAndRecency(conversationsCopy, userId);
+    
+    case "unread":
+      // Show only unread conversations
+      return conversationsCopy
+        .filter(conversation => {
+          // Check if there are unread messages for the current user
+          return conversation.messages?.some(message => 
+            !message.isRead && message.receiverId === userId
+          );
+        })
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
+    case "recent":
+      // Sort by most recent updated conversation
+      return conversationsCopy.sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+    
+    case "oldest":
+      // Sort by oldest updated conversation
+      return conversationsCopy.sort((a, b) => 
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+      );
+    
+    case "received":
+      // Show only conversations where current user is the receiver
+      return conversationsCopy
+        .filter(conversation => conversation.receiver?.id === userId)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
+    case "sent":
+      // Show only conversations where current user is the sender
+      return conversationsCopy
+        .filter(conversation => conversation.sender?.id === userId)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
+    default:
+      // Default to all/relevance sorting
+      return sortConversationsByUnreadAndRecency(conversationsCopy, userId);
+  }
+};

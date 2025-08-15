@@ -2,17 +2,21 @@
   <li class="m-chat-summary-item" @click="$emit('select-conversation', conversation)">
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
-        <div class="m-chat-summary-item__name-section">
-          <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
-            'unread': unreadMessages > 0
-          }">{{ formattedPartnerName }}</span>
-          <p class="m-chat-summary-item__address | body-xs">{{ conversationAddress }}</p>
+        <div class="m-chat-summary-item__title">
+        <nuxt-img :src="firstImage" alt="" width="40" height="40" placeholder="/img/preload.svg" />
+          <div class="m-chat-summary-item__name-section">
+            <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
+              'unread': unreadMessages > 0
+            }">{{ formattedPartnerName }}</span>
+            <p class="m-chat-summary-item__address | body-xs">{{ conversationAddress }}</p>
+          </div>
         </div>
         <span class="m-chat-summary-item__time | body-xs">{{ lastMessageTime }}</span>
       </div>
       <div class="m-chat-summary-item-message">
         <p class="m-chat-summary-item-message__content | body-sm">{{ lastMessageContent }}</p>
-        <button v-if="unreadMessages > 0" class="m-chat-summary-item-message__unread | button button-secondary button-xs">{{ unreadMessages }}</button>
+        <button v-if="unreadMessages > 0"
+          class="m-chat-summary-item-message__unread | button button-secondary button-xs">{{ unreadMessages }}</button>
       </div>
     </div>
   </li>
@@ -55,6 +59,10 @@ const unreadMessages = computed(() => {
 const conversationAddress = computed(() => {
   return props.conversation.listing?.property?.address?.fullAddress || "Address not available";
 });
+
+const firstImage = computed(() => {
+  return props.conversation.listing?.property?.media?.[0]?.image || "/img/preload.svg";
+});
 </script>
 
 <style lang="scss" scoped>
@@ -82,6 +90,20 @@ const conversationAddress = computed(() => {
     align-items: flex-start;
     gap: var(--size-4);
     margin-bottom: var(--size-4);
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: row;
+    gap: var(--size-8);
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    align-items: center;
+
+    & img {
+      border-radius: var(--border-radius-md);
+    }
   }
 
   &__name-section {
