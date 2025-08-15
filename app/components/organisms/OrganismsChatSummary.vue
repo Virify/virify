@@ -9,7 +9,7 @@
       </button>
     </div>
     <div class="o-chat-summary__content" v-show="!isCollapsed">
-      <div class="o-chat-summary__filters-row">
+      <div v-if="sort" class="o-chat-summary__filters-row">
         <AtomsSelect 
           v-model="sortBy" 
           :options="sortOptions"
@@ -70,9 +70,10 @@ const props = defineProps<{
   limit?: number
   searchEnabled?: boolean
   disableNavigate?: boolean
+  sort?: boolean
 }>()
 
-const { limit, searchEnabled, disableNavigate } = toRefs(props)
+const { limit, searchEnabled, disableNavigate, sort } = toRefs(props)
 
 const emit = defineEmits<{
   /** Emitted when a conversation is selected if disableNavigate is true */
@@ -92,8 +93,8 @@ const sortBy = ref("all")
 const sortOptions = [
   { key: "All", value: "all" },
   { key: "Unread", value: "unread" },
-  { key: "Received", value: "received" },
-  { key: "Sent", value: "sent" },
+  { key: "Received Enquiries", value: "received" },
+  { key: "Sent Enquiries", value: "sent" },
   { key: "Recent", value: "recent" },
   { key: "Oldest", value: "oldest" }
 ]

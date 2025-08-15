@@ -52,4 +52,19 @@ useHead({
   min-height: calc(100vh - var(--header-expanded-height) - var(--size-16));
   background: var(--background-100);
 }
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+.page-enter-to,
+.page-leave-from {
+  opacity: 1;
+}
 </style>

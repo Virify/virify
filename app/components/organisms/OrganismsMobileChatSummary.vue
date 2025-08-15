@@ -8,7 +8,7 @@
         </button>
       </div>
       <div class="chat-summary-scrollable" v-if="!activeConversation">
-        <OrganismsChatSummary :limit="0" :search-enabled="true" :disable-navigate="true" @select-conversation="handleSelectConversation" />
+        <OrganismsChatSummary :limit="0" :search-enabled="true" :disable-navigate="true" :sort="true" @select-conversation="handleSelectConversation" />
       </div>
       <OrganismsEnquiryDetail
         :is-open="!!activeConversation"

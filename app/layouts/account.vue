@@ -4,20 +4,21 @@
     <OrganismsHeader />
 
     <div class="page">
-      <div class="account-layout | container">
+      <div class="account-layout | container" :class="{ 'account-layout--messages-expanded': isExpanded }">
         <OrganismsNavigation />
 
         <main class="main">
           <NuxtPage />
         </main>
 
-        <aside class="sidebar">
+        <aside class="sidebar" v-if="showSidebar">
           <div class="sidebar-content sidebar-content--enquiries" :class="{ 'sidebar-content--collapsed': isCollapsed, 'sidebar-content--has-overlay': selectedConversation !== null }">
             <OrganismsChatSummary 
               v-show="selectedConversation === null"
               :limit="0" 
               :search-enabled="true" 
               :disable-navigate="true"
+              :sort="true"
               @select-conversation="handleConversationSelect"
               @toggle-collapsed="isCollapsed = $event"
             />
@@ -45,6 +46,42 @@
 <script setup lang="ts">
 const selectedConversation = ref<ConversationWithUserAndMessages | null>(null);
 const isCollapsed = ref(false);
+const route = useRoute();
+
+const isMessagesPage = computed(() => {
+  return route.path === '/account/messages';
+});
+
+// Control sidebar visibility with transition timing
+const showSidebar = ref(true);
+const isExpanded = ref(false);
+
+// Watch route changes and control transition timing
+watch(() => route.path, (newPath, oldPath) => {
+  const newIsMessages = newPath === '/account/messages';
+  const oldIsMessages = oldPath === '/account/messages';
+  
+  if (newIsMessages !== oldIsMessages) {
+    if (newIsMessages) {
+      // Going TO messages - hide sidebar after a delay to let page transition start
+      setTimeout(() => {
+        showSidebar.value = false;
+        isExpanded.value = true;
+      }, 250); // Start during page fade out
+    } else {
+      // Going FROM messages - show sidebar immediately when page starts transitioning
+      showSidebar.value = true;
+      isExpanded.value = false;
+    }
+  }
+});
+
+// Initialize on mount
+onMounted(() => {
+  showSidebar.value = route.path !== '/account/messages';
+  isExpanded.value = route.path === '/account/messages';
+});
+
 
 function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
   selectedConversation.value = conversation;
@@ -86,6 +123,8 @@ const { user } = useUserSession();
 @use '#styles/_utils/media' as mq;
 .page {
   background: var(--background-100);
+  min-height: 100vh;
+  transition: min-height 0.25s ease;
 }
 
 .account-layout {
@@ -93,10 +132,14 @@ const { user } = useUserSession();
   grid-template-columns: 300px 1fr 300px;
   gap: var(--size-16);
   padding: var(--size-16);
-  transition: grid-template-columns 0.3s ease;
+  transition: grid-template-columns 0.25s ease;
   
   &:has(.sidebar-content--has-overlay) {
     grid-template-columns: 300px 1fr 400px;
+  }
+  
+  &.account-layout--messages-expanded {
+    grid-template-columns: 300px 1fr;
   }
 
   @include mq.not-notebook {
@@ -155,9 +198,10 @@ const { user } = useUserSession();
   max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
   z-index: 10;
   width: auto;
-  transition: width 0.3s ease;
+  transition: all 0.3s ease;
   align-self: start;
   padding-bottom: var(--size-4);
+  
 
   @include mq.not-notebook {
     position: static;
@@ -191,6 +235,7 @@ const { user } = useUserSession();
           height: 60vh;
         }
       }
+      
     }
   }
 
@@ -214,5 +259,23 @@ const { user } = useUserSession();
   max-width: 100%;
   box-sizing: border-box;
   min-width: 0;
+  transition: width 0.25s ease, max-width 0.25s ease;
+  overflow: hidden;
 }
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+.page-enter-to,
+.page-leave-from {
+  opacity: 1;
+}
+
 </style>

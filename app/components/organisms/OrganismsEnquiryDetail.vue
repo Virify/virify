@@ -10,35 +10,10 @@
 
       <div class="enquiry-content-scrollable" ref="scrollableRef">
         <MoleculesEnquiryListing :conversation="conversation" />
-
-        <div class="enquiry-messages">
-          <ul class="messages-list">
-            <li v-for="message in conversation?.messages" :key="message.id" class="message-item"
-              :class="{ 'from-me': message.senderId === currentUserId }">
-              <p class="message-content | body-sm">{{ message.content }}</p>
-              <div class="message-status">
-                <span class="message-time | body-xs">{{ formatMessageTimestamp(message.createdAt) }}</span>
-                <div v-if="message.senderId === currentUserId" class="message-read-status">
-                  <AtomsIcon :icon="message.isRead ? 'account/read' : 'account/sent'" size="12" />
-                  <span class="status-text | body-xs">{{ message.isRead ? 'Read' : 'Sent' }}</span>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-
+        <MoleculesMessageList :messages="conversation?.messages || []" :current-user-id="currentUserId" />
       </div>
 
-      <div class="reply-section" v-if="conversation">
-        <div class="reply-input-container">
-          <input v-model="replyMessage" type="text" class="reply-input | body-sm" placeholder="Message..."
-            @keydown.enter.prevent="sendReply" />
-          <button class="send-btn" :disabled="!replyMessage.trim() || sending" @click="sendReply">
-            <AtomsIcon v-if="!sending" icon="ai/send" size="20" />
-            <span v-else class="loading-text">...</span>
-          </button>
-        </div>
-      </div>
+      <MoleculesReplyInput v-if="conversation" @send="sendReply" />
     </aside>
   </div>
 </template>
@@ -60,7 +35,6 @@ const conversationActions = useConversationActions(conversationState);
 const conversationEvents = useConversationEvents(conversationState);
 
 // Reply logic
-const replyMessage = ref("")
 const sending = ref(false)
 const scrollableRef = ref<HTMLDivElement | null>(null)
 
@@ -122,18 +96,16 @@ function scrollToBottom() {
   })
 }
 
-async function sendReply() {
-  if (!props.conversation || !replyMessage.value.trim() || sending.value) return
+async function sendReply(message: string) {
+  if (!props.conversation || !message.trim() || sending.value) return
 
-  const content = replyMessage.value.trim()
+  const content = message.trim()
   const conversationId = props.conversation.id
-  replyMessage.value = ""
   sending.value = true
 
   try {
     await conversationActions.sendReply(conversationId, content)
   } catch (e) {
-    replyMessage.value = content
     console.error('Failed to send reply', e)
   } finally {
     sending.value = false

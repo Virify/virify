@@ -49,7 +49,7 @@ definePageMeta({
   head: {
     title: "Dashboard",
   },
-  layout: "account",
+  layout: "account"
 });
 
 const { analytics, recentFavourites, recentUserNotes, recentlyViewedListings } = useAnalytics();
