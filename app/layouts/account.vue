@@ -216,7 +216,6 @@ const { user } = useUserSession();
     border-radius: var(--border-radius-xl);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     height: fit-content;
-    padding: var(--size-16);
     color: var(--foreground-100);
     overflow-y: auto;
     position: relative;

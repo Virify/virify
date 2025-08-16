@@ -52,6 +52,14 @@ function closeBothOverlays() {
   isChatSummaryOpen.value = false
 }
 
+// Prevent body scrolling on mobile when either mobile menu or chat is open
+watch([isMobileMenuOpen, isChatSummaryOpen], ([menuOpen, chatOpen]) => {
+  const shouldBlock = !!menuOpen || !!chatOpen
+  if (process.client) {
+    document.body.classList.toggle('no-scroll', shouldBlock)
+  }
+})
+
 function handleNavClick(item: any) {
   if (item.action === 'logout') {
     logout()

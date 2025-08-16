@@ -100,12 +100,12 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
 }
 
 .chat-summary-scrollable {
-  flex: 1;
-  overflow-y: scroll;
+  /* allow the chat list to grow and scroll internally without forcing a zero height or an always-visible scrollbar */
+  flex: 1 1 auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0 0 110px 0;
   min-height: 0;
-  height: 0;
 }
 
 .chat-title {
