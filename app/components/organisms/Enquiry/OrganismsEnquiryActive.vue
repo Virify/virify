@@ -9,11 +9,11 @@
       </div>
 
       <div class="enquiry-content-scrollable" ref="scrollableRef">
-        <MoleculesEnquiryListing :conversation="conversation" />
-        <MoleculesMessageList :messages="conversation?.messages || []" :current-user-id="currentUserId" />
+        <MoleculesEnquiryListingCard :conversation="conversation" />
+        <MoleculesEnquiryMessageList :messages="conversation?.messages || []" :current-user-id="currentUserId" />
       </div>
 
-      <MoleculesReplyInput v-if="conversation" @send="sendReply" />
+      <MoleculesEnquiryReplyInput v-if="conversation" @send="sendReply" />
     </aside>
   </div>
 </template>

@@ -8,9 +8,9 @@
         </button>
       </div>
       <div class="chat-summary-scrollable" v-if="!activeConversation">
-        <OrganismsChatSummary :limit="0" :search-enabled="true" :disable-navigate="true" :sort="true" @select-conversation="handleSelectConversation" />
+        <OrganismsEnquirySummary :limit="0" :search-enabled="true" :disable-navigate="true" :sort="true" @select-conversation="handleSelectConversation" />
       </div>
-      <OrganismsEnquiryDetail
+      <OrganismsEnquiryActive
         :is-open="!!activeConversation"
         :conversation="activeConversation"
         :current-user-id="user?.id"
