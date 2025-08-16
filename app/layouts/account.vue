@@ -216,7 +216,7 @@ useHead({
       transition: height ease;
       
       &.sidebar-content--has-overlay {
-        height: calc(100vh - var(--header-expanded-height) + var(--size-32));
+        height: var(--navigation-sidebar-height, fit-content);
         
         @include mq.tablet-only {
           height: 60vh;
