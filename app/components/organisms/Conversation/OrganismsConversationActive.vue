@@ -112,16 +112,18 @@ async function sendReply(message: string) {
 </script>
 
 <style lang="scss" scoped>
+@use '#styles/_utils/media' as mq;
+
 .conversation-overlay {
   width: 100%;
   height: 100%;
 
   @media (max-width: 768px) {
     position: fixed;
-    top: 0;
+    top: var(--header-offset);
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - var(--header-offset) - var(--mobile-nav-header-height));
     background: rgba(0, 0, 0, 0.5);
     z-index: 1002;
     opacity: 0;
@@ -202,7 +204,7 @@ async function sendReply(message: string) {
   position: relative;
   overscroll-behavior: contain;
   touch-action: pan-y;
-  padding: 0 var(--size-16) var(--size-16) var(--size-16);
+  padding: var(--size-16);
 }
 
 .conversation-messages {
@@ -264,63 +266,17 @@ async function sendReply(message: string) {
   flex-shrink: 0;
   background: var(--background-200);
   border-top: 1px solid var(--border-100);
-  padding: var(--size-16);
+
   
-  @media (max-width: 768px) {
-    padding-bottom: calc(var(--size-16) + 90px + env(safe-area-inset-bottom));
+  @include mq.mobile-only {
+    padding: 16px;
+    padding-bottom: calc(var(--size-16) + env(safe-area-inset-bottom));
   }
 
   .reply-input-container {
     position: relative;
     display: flex;
     align-items: center;
-  }
-
-  .reply-input {
-    width: 100%;
-    padding: var(--size-8);
-    border-radius: var(--border-radius-2xl);
-    border: 1px solid var(--monochrome-600);
-    background: var(--background-100);
-    color: var(--foreground-100);
-    outline: none;
-
-    &:focus {
-      border-color: var(--secondary-400);
-    }
-  }
-
-  .send-btn {
-    position: absolute;
-    right: var(--size-4);
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--secondary-400);
-    color: var(--foreground-100);
-    border: none;
-    padding: var(--size-8);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--size-36);
-    height: var(--size-36);
-
-    &:hover:not(:disabled) {
-      background: var(--secondary-500);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .loading-text {
-      font-size: 12px;
-      font-weight: bold;
-    }
   }
 }
 </style>

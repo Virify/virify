@@ -2,6 +2,7 @@
   <div class="sidebar-content sidebar-content--conversations" :class="{ 'sidebar-content--collapsed': isCollapsed, 'sidebar-content--has-overlay': selectedConversation !== null }">
     <OrganismsConversationSummary 
       v-show="selectedConversation === null"
+      :is-open="true"
       :limit="0" 
       :search-enabled="true" 
       :disable-navigate="true"

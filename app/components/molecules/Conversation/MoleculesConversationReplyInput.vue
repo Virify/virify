@@ -33,7 +33,6 @@ async function handleSend() {
   flex-shrink: 0;
   background: var(--background-200);
   border-top: 1px solid var(--border-100);
-  padding: var(--size-16);
   
   @media (max-width: 768px) {
     padding-bottom: calc(var(--size-16) + 90px + env(safe-area-inset-bottom));

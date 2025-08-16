@@ -140,6 +140,12 @@ useHead({
   &.account-layout--messages-expanded {
     grid-template-columns: 300px 1fr;
     grid-template-areas: "left-sidebar main";
+
+    @include mq.mobile-only {
+      grid-template-columns: 1fr;
+      grid-template-areas: "main";
+      padding: var(--size-16) 0;
+    }
   }
 
   @include mq.not-notebook {
@@ -154,7 +160,6 @@ useHead({
   @include mq.mobile-only {
     grid-template-columns: 1fr;
     grid-template-areas: "main";
-    padding-bottom: calc(var(--size-16) + var(--mobile-nav-height));
 
     .left-sidebar,
     .right-sidebar {

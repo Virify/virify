@@ -70,6 +70,11 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
   flex-direction: column;
   min-height: 0;
 
+  ul, li {
+    padding: 0;
+    margin: 0;
+  }
+
   &__loading {
     display: flex;
     flex-direction: column;

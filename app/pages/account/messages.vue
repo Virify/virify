@@ -1,63 +1,62 @@
 <template>
+  <!-- Desktop: Full messages page -->
   <div class="messages-page">
-    <!-- Received Enquiries Section -->
-    <div class="content-section">
-      <AtomsCollapsibleHeader 
-        :is-collapsed="isReceivedCollapsed" 
-        @toggle="isReceivedCollapsed = !isReceivedCollapsed"
-        :title="sectionTitle" 
-        icon="account/chat" 
-        variant="inline"
-      />
-      <Transition name="collapse-fade">
-        <div v-show="!isReceivedCollapsed" class="section-content">
-          <div class="filters-bar">
-            <div class="search-sort-row">
-              <AtomsInput
-                v-model="receivedSearch"
-                type="text"
-                placeholder="Search received enquiries..."
-                autocomplete="off"
-                class="body-sm"
-              />
-              <AtomsSelect 
-                v-model="receivedSort" 
-                :options="sortOptions"
-                class="sort-select | body-sm"
-              />
-            </div>
-          </div>
-          <div class="conversations-grid" :class="{ 'conversations-grid--has-active-conversation': selectedConversation }">
-            <div class="conversations-list">
-              <OrganismsConversationDesktopSummary 
-                :conversations="filteredReceivedConversations"
-                :loading="loading"
-                :active-conversation-id="selectedConversation?.id"
-                :empty-message="emptyMessage"
-                @select-conversation="handleConversationSelect"
-              />
-            </div>
-            <div class="conversation-details">
-              <div v-if="selectedConversation" class="conversation-content">
-                <MoleculesConversationListingCard :conversation="selectedConversation" variant="horizontal" />
-                <div class="messages-container" ref="messagesContainer">
-                  <MoleculesConversationMessageList 
-                    :messages="selectedConversation.messages || []"
-                    :current-user-id="user?.id"
-                  />
-                </div>
-                <MoleculesConversationReplyInput @send="handleSendReply" />
-              </div>
-              <div v-else class="empty-state">
-                <p class="body-sm">Select a conversation to view details</p>
-              </div>
-            </div>
-          </div>
+    <!-- Title and Controls Section -->
+    <div class="messages-header-card">
+      <h2 class="messages-title | title-md">{{ sectionTitle }}</h2>
+      <div class="messages-controls">
+        <div class="search-sort-row">
+          <AtomsInput
+            v-model="receivedSearch"
+            type="text"
+            placeholder="Search conversations..."
+            autocomplete="off"
+            class="body-sm"
+          />
+          <AtomsSelect 
+            v-model="receivedSort" 
+            :options="sortOptions"
+            class="sort-select | body-sm"
+          />
         </div>
-      </Transition>
+      </div>
     </div>
 
+    <!-- Messages Grid -->
+    <div class="messages-grid" :class="{ 'messages-grid--has-active-conversation': selectedConversation }">
+      <!-- Conversations List Section -->
+      <div class="conversations-card">
+        <OrganismsConversationDesktopSummary 
+          :conversations="filteredReceivedConversations"
+          :loading="loading"
+          :active-conversation-id="selectedConversation?.id"
+          :empty-message="emptyMessage"
+          @select-conversation="handleConversationSelect"
+        />
+      </div>
 
+      <!-- Conversation Details Section -->
+      <div class="conversation-details-card">
+        <div v-if="selectedConversation" class="conversation-content">
+          <MoleculesConversationListingCard :conversation="selectedConversation" />
+          <div class="messages-container" ref="messagesContainer">
+            <MoleculesConversationMessageList 
+              :messages="selectedConversation.messages || []"
+              :current-user-id="user?.id"
+            />
+          </div>
+          <MoleculesConversationReplyInput @send="handleSendReply" />
+        </div>
+        <div v-else class="empty-state">
+          <p class="body-sm">Select a conversation to view details</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile: Chat interface as the page -->
+  <div class="mobile-chat-page">
+    <OrganismsConversationMobileSummary :isOpen="true" :show-close-button="false" variant="page" :search-enabled="true" :sort="true" @close="() => {}" />
   </div>
 </template>
 
@@ -73,14 +72,11 @@ definePageMeta({
 const { user } = useUserSession()
 const { allConversations, loading, filterConversations } = useConversations()
 
-// Collapse states
-const isReceivedCollapsed = ref(false)
-
 // Search states
 const receivedSearch = ref("")
 
 // Sort states
-const receivedSort = ref("received")
+const receivedSort = ref("all")
 
 // Selected conversation
 const selectedConversation = ref<ConversationWithUserAndMessages | null>(null)
@@ -174,14 +170,6 @@ watch(receivedSort, () => {
   selectedConversation.value = null
 })
 
-// Auto-open chat on mobile when page loads
-onMounted(() => {
-  if (import.meta.client && window.innerWidth <= 768) {
-    // Find the mobile navigation component and trigger chat open
-    const event = new CustomEvent('openMobileChat')
-    window.dispatchEvent(event)
-  }
-})
 </script>
 
 <style lang="scss" scoped>
@@ -198,6 +186,80 @@ onMounted(() => {
 
   @include mq.mobile-only {
     display: none;
+  }
+}
+
+.messages-header-card {
+  background: var(--background-200);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--size-24);
+  margin-bottom: var(--size-16);
+}
+
+.messages-title {
+  margin: 0 0 var(--size-16) 0;
+  color: var(--foreground-100);
+}
+
+.messages-controls {
+  width: 100%;
+}
+
+.messages-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--size-16);
+  height: 60vh;
+  overflow: hidden;
+
+  @include mq.not-notebook {
+    grid-template-columns: 1fr;
+    gap: var(--size-12);
+  }
+}
+
+.conversations-card {
+  background: var(--background-200);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--size-8);
+  overflow-y: auto;
+
+  @include mq.not-notebook {
+    height: 50vh;
+  }
+}
+
+.conversation-details-card {
+  background: var(--background-200);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--size-16);
+  overflow-y: auto;
+
+  @include mq.not-notebook {
+    height: 50vh;
+  }
+}
+
+
+.mobile-chat-page {
+  display: none;
+
+  @include mq.mobile-only {
+    display: block;
+    position: fixed;
+    top: var(--header-offset);
+    background: var(--background-100);
+    left: 0;
+    right: 0;
+    bottom: var(--mobile-nav-header-height);
+    width: 100vw;
+    height: calc(100vh - var(--header-offset) - var(--mobile-nav-header-height));
+    padding: var(--size-16) var(--size-16) 0 var(--size-16);
+    box-sizing: border-box;
+    z-index: 10;
   }
 }
 
@@ -234,6 +296,10 @@ onMounted(() => {
   gap: var(--size-12);
   align-items: center;
 
+  @include mq.tablet {
+    grid-template-columns: 2fr 1fr;
+  }
+
   @include mq.mobile-only {
     grid-template-columns: 1fr;
     gap: var(--size-8);
@@ -263,7 +329,7 @@ onMounted(() => {
     height: 60vh;
 
     @include mq.not-notebook {
-      height: 500px;
+      height: fit-content;
     }
 
     @include mq.mobile-only {
@@ -291,6 +357,10 @@ onMounted(() => {
   
   .conversations-grid--has-active-conversation & {
     height: 100%;
+
+    @include mq.not-notebook {
+      height: 50vh;
+    }
   }
 }
 
@@ -302,6 +372,10 @@ onMounted(() => {
   
   .conversations-grid--has-active-conversation & {
     height: 100%;
+
+    @include mq.not-notebook {
+      height: 50vh;
+    }
   }
 }
 

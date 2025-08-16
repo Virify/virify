@@ -67,9 +67,11 @@ const firstImage = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '#styles/_utils/media' as mq;
+
 .m-chat-summary-item {
   cursor: pointer;
-  padding: var(--size-4) var(--size-8);
+  padding: var(--size-8);
 
   .unread {
     color: var(--secondary-400);
@@ -96,6 +98,11 @@ const firstImage = computed(() => {
   &__content {
     display: flex;
     flex-direction: column;
+    padding: var(--size-16);
+
+    @include mq.mobile-only {
+      padding: var(--size-8);
+    }
   }
 
   &__header {

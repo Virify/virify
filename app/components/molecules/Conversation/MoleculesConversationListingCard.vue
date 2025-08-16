@@ -1,5 +1,5 @@
 <template>
-  <div v-if="conversation && conversation.listing" class="property-header" :class="`property-header--${variant}`">
+  <div v-if="conversation && conversation.listing" class="property-header">
     <div class="property-image" v-if="firstImage">
       <NuxtImg 
         :src="firstImage" 
@@ -12,7 +12,6 @@
         quality="80"
         placeholder="/img/preload.svg"
       />
-      <div class="property-badge | body-sm font-semibold">Your Property</div>
     </div>
     <div class="property-details">
       <div class="property-info">
@@ -20,14 +19,17 @@
         <p class="property-address | body-xs">{{ address }}</p>
       </div>
       <div class="agent-info">
-        <div class="agent-avatar">
-          <AtomsIcon icon="profile" size="28" />
+        <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
+        <div class="agent-details">
+          <div class="agent-avatar">
+            <AtomsIcon icon="profile" size="28" />
+          </div>
+          <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
         </div>
-        <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
       </div>
     </div>
   </div>
-  <div v-else class="property-header property-header--empty" :class="`property-header--${variant}`">
+  <div v-else class="property-header property-header--empty">
     <p class="body-xs">No listing details available.</p>
   </div>
 </template>
@@ -35,12 +37,9 @@
 <script setup lang="ts">
 import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   conversation: ConversationWithUserAndMessages | null;
-  variant?: 'vertical' | 'horizontal';
-}>(), {
-  variant: 'vertical'
-});
+}>();
 
 const listing = computed(() => props.conversation?.listing)
 const property = computed(() => listing.value?.property)
@@ -58,101 +57,83 @@ const priceFormatted = computed(() => {
   if (!price) return ""
   return `£${parseInt(String(price)).toLocaleString()}`
 })
+
+const { user } = useUserSession()
+
+const isMyProperty = computed(() => {
+  return listing.value?.user?.id === user.value?.id
+})
 </script>
 
 <style lang="scss" scoped>
 .property-header {
-  background: var(--background-100);
-  border-radius: var(--border-radius-2xl);
   margin: 0 0 var(--size-16) 0;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-  &--empty {
-    padding: var(--size-20);
-    opacity: 0.7;
-    color: var(--foreground-100);
-  }
-
-  // Horizontal variant
-  &--horizontal {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-
-    .property-image {
-      width: 200px;
-      flex-shrink: 0;
-      border-radius: var(--border-radius-2xl) 0 0 var(--border-radius-2xl);
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-
-    .property-details {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: var(--size-16);
-    }
-
-    .property-info {
-      margin-bottom: var(--size-8);
-    }
-
-    .agent-info {
-      margin-top: auto;
-    }
-  }
-
-  // Vertical variant (default)
-  &--vertical {
-    display: flex;
-    flex-direction: column;
-
-    .property-image {
-      width: 100%;
-      height: 120px;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-  }
+  /* Default: horizontal layout */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 
   .property-image {
-    position: relative;
+    width: 80px;
+    height: 60px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
-  }
+    margin-right: var(--size-12);
+    position: relative;
 
-  .property-badge {
-    position: absolute;
-    top: var(--size-8);
-    left: var(--size-8);
-    background: var(--secondary-400);
-    color: var(--foreground-100);
-    padding: var(--size-4) var(--size-8);
-    border-radius: var(--border-radius-2xl);
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   .property-details {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
     color: var(--foreground-100);
   }
 
-  // Vertical variant styles for property-details
-  &--vertical .property-details {
-    padding: var(--size-16);
+  .property-info {
+    margin-bottom: 0;
+    flex: 1;
   }
 
-  // Vertical variant styles for property-info
-  &--vertical .property-info {
-    margin-bottom: var(--size-12);
+  .property-price {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--size-2);
+  }
+
+  .property-address {
+    font-size: 0.75rem;
+    margin-bottom: 0;
+  }
+
+  .agent-info {
+    margin-top: 0;
+    margin-left: var(--size-12);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--size-4);
+  }
+
+  .property-badge {
+    align-self: flex-end;
+  }
+
+  .agent-details {
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
   }
 
   .property-price {
@@ -169,6 +150,10 @@ const priceFormatted = computed(() => {
     gap: var(--size-8);
   }
 
+  .a-pill {
+    background: var(--secondary-400);
+  }
+
   .agent-avatar {
     width: var(--size-32);
     height: var(--size-32);
@@ -181,6 +166,12 @@ const priceFormatted = computed(() => {
 
   .agent-name {
     flex: 1;
+  }
+
+  &--empty {
+    padding: var(--size-20);
+    opacity: 0.7;
+    color: var(--foreground-100);
   }
 }
 </style>
