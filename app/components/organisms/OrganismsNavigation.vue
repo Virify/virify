@@ -19,7 +19,7 @@ const { fetchUserItemsAggregates } = useNotifications()
 
 const isMobileMenuOpen = ref(false)
 const isChatSummaryOpen = ref(false)
-const groupStates = ref([true, true, false, false])
+const groupStates = ref([true, true, true, false])
 
 onMounted(() => {
   fetchUserItemsAggregates()

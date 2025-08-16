@@ -55,10 +55,12 @@ const chatNotificationCount = computed(() => {
     right: 0;
     background: var(--background-200);
     padding: var(--size-16);
+    padding-bottom: calc(var(--size-16) + env(safe-area-inset-bottom));
     z-index: 1001;
     box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
     justify-content: space-around;
     align-items: center;
+    min-height: var(--mobile-nav-height);
   }
 
   ul {

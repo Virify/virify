@@ -45,7 +45,6 @@ function handleNavClick(item: any) {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   opacity: 0;
@@ -70,45 +69,57 @@ function handleNavClick(item: any) {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100vh;
+  height: calc(100dvh - var(--mobile-nav-header-height));
   width: 100vw;
   background: var(--background-200);
   transform: translateX(-100%);
   transition: transform 0.3s ease;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .mobile-nav-header {
-  padding: var(--size-16);
+  padding: var(--size-20) var(--size-20) var(--size-16);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid var(--border-100);
+  flex-shrink: 0;
 
   .nav-title {
     color: var(--foreground-100);
     margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
   }
 
   .close-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: none;
     border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    color: var(--foreground-100);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: var(--size-8);
+    border-radius: var(--border-radius-md);
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--background-300);
+    }
 
     :deep(svg) {
       color: var(--foreground-100);
+      display: block;
     }
   }
 }
 
 .navigation {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: var(--size-16);
-  padding-bottom: calc(var(--size-16) + 80px);
+  min-height: 0;
+  height: calc(100dvh - var(--mobile-nav-header-height) - var(--mobile-nav-height));
 
   ul {
     display: grid;

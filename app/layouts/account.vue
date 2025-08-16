@@ -175,6 +175,7 @@ const { user } = useUserSession();
   @include mq.mobile-only {
     grid-template-columns: 1fr;
     grid-template-areas: "main";
+    padding-bottom: calc(var(--size-16) + var(--mobile-nav-height));
 
     .sidebar {
       display: none;
@@ -200,7 +201,6 @@ const { user } = useUserSession();
   width: auto;
   transition: all 0.3s ease;
   align-self: start;
-  padding-bottom: var(--size-4);
   
 
   @include mq.not-notebook {
@@ -217,7 +217,6 @@ const { user } = useUserSession();
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     height: fit-content;
     color: var(--foreground-100);
-    overflow-y: auto;
     position: relative;
     
     @include mq.mobile-only {
@@ -226,6 +225,10 @@ const { user } = useUserSession();
 
     &--enquiries {
       padding: 0;
+      overflow-y: auto;
+      height: var(--navigation-sidebar-height, fit-content);
+      box-sizing: border-box;
+      transition: height 0.3s ease;
       
       &.sidebar-content--has-overlay {
         height: calc(100vh - var(--header-expanded-height) + var(--size-32));

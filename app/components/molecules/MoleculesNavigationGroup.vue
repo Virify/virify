@@ -81,7 +81,7 @@ function isLastVisibleGroup(groupIndex: number) {
   text-decoration: none;
   color: inherit;
   position: relative;
-  padding: var(--size-12) var(--size-16);
+  padding: var(--size-10) var(--size-16);
 
   &:hover {
     opacity: 0.8;
@@ -148,7 +148,6 @@ function isLastVisibleGroup(groupIndex: number) {
 
   a {
     color: inherit;
-    padding: 0 var(--size-8);
     text-decoration: none;
     border-radius: var(--border-radius-md);
     transition: background 0.2s ease;

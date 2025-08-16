@@ -68,7 +68,7 @@ const firstImage = computed(() => {
 <style lang="scss" scoped>
 .m-chat-summary-item {
   cursor: pointer;
-  padding: var(--size-8);
+  padding: var(--size-4) var(--size-8);
 
   .unread {
     color: var(--secondary-400);
@@ -88,7 +88,7 @@ const firstImage = computed(() => {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: var(--size-4);
+    gap: var(--size-2);
     margin-bottom: var(--size-4);
   }
 

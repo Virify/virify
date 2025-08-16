@@ -5,4 +5,6 @@
   --header-height: 4rem;
   --header-offset: calc(var(--header-expanded-height) - var(--header-height));
   --header-expanded-height: 8rem;
+  --mobile-nav-height: calc(68px + env(safe-area-inset-bottom));
+  --mobile-nav-header-height: 95px;
 }

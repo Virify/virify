@@ -1,6 +1,6 @@
 <template>
   <aside class="sidebar">
-    <div class="sidebar-content">
+    <div ref="sidebarContent" class="sidebar-content">
       <nav class="navigation" role="navigation" aria-label="Desktop sidebar navigation">
         <ul>
           <MoleculesNavigationGroup 
@@ -23,21 +23,44 @@ defineEmits<{
   toggleGroup: [index: number]
   navClick: [item: any]
 }>()
+
+const sidebarContent = ref<HTMLElement>()
+
+// Update CSS custom property with height
+const updateHeight = () => {
+  if (sidebarContent.value && import.meta.client) {
+    const height = sidebarContent.value.offsetHeight
+    document.documentElement.style.setProperty('--navigation-sidebar-height', `${height}px`)
+  }
+}
+
+// Watch for changes and update height
+onMounted(() => {
+  nextTick(() => {
+    updateHeight()
+    // Watch for content changes using ResizeObserver
+    if (sidebarContent.value) {
+      const resizeObserver = new ResizeObserver(updateHeight)
+      resizeObserver.observe(sidebarContent.value)
+      
+      onUnmounted(() => {
+        resizeObserver.disconnect()
+      })
+    }
+  })
+})
 </script>
 
 <style lang="scss" scoped>
 .sidebar {
-  /* use flex so the content can stretch to the available max-height */
   display: flex;
   flex-direction: column;
-  height: auto;
+  height: fit-content;
   z-index: 10;
   width: 300px;
   position: sticky;
   top: calc(var(--header-offset, 0) + var(--size-16));
   bottom: var(--size-16);
-  max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
-  overflow: hidden;
   transition: width 0.3s ease;
 
   @media (max-width: 768px) {
@@ -49,22 +72,12 @@ defineEmits<{
   background: var(--background-200);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  /* fill the sidebar container and hide overflow; the inner .navigation will scroll */
-  height: 100%;
-  max-height: 100%;
+  height: fit-content;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex: 1 1 auto;
+  padding: 0 var(--size-8) 0 0;
 }
 
 .navigation {
-  /* make the navigation area scroll internally when it's taller than the available space */
-  overflow-y: auto;
-  max-height: 100%;
-  flex: 1 1 auto;
-
   ul {
     display: grid;
     grid-template-columns: auto 1fr;

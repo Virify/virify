@@ -9,25 +9,28 @@
       </button>
     </div>
     <div class="o-chat-summary__content" v-show="!isCollapsed">
-      <div v-if="sort" class="o-chat-summary__filters-row">
-        <AtomsSelect 
-          v-model="sortBy" 
-          :options="sortOptions"
-          class="o-chat-summary__sort-select | body-sm"
-        />
-      </div>
-      <template v-if="searchEnabled !== false">
-        <div class="o-chat-summary__search-row">
-          <input
-            v-model="search"
-            type="text"
-            class="o-chat-summary__search-input | body-sm"
-            placeholder="Search enquiries..."
-            autocomplete="off"
+      <div class="o-chat-summary__fixed-section">
+        <div v-if="sort" class="o-chat-summary__filters-row">
+          <AtomsSelect 
+            v-model="sortBy" 
+            :options="sortOptions"
+            class="o-chat-summary__sort-select | body-sm"
           />
         </div>
-      </template>
-      <ClientOnly>
+        <template v-if="searchEnabled !== false">
+          <div class="o-chat-summary__search-row">
+            <input
+              v-model="search"
+              type="text"
+              class="o-chat-summary__search-input | body-sm"
+              placeholder="Search enquiries..."
+              autocomplete="off"
+            />
+          </div>
+        </template>
+      </div>
+      <div class="o-chat-summary__scrollable-section">
+        <ClientOnly>
         <template v-if="loading">
           <div class="o-chat-summary__loading">
             <SkeletonLoader class="o-chat-summary__skeleton" />
@@ -59,7 +62,8 @@
             <SkeletonLoader class="o-chat-summary__skeleton" />
           </div>
         </template>
-      </ClientOnly>
+        </ClientOnly>
+      </div>
     </div>
   </div>
 </template>
@@ -142,8 +146,7 @@ function toggleCollapsed() {
 <style lang="scss" scoped>
 @use '#styles/_utils/media' as mq;
 .o-chat-summary {
-  height: fit-content;
-  max-height: calc(100vh - var(--header-expanded-height) + var(--size-32));
+  height: 100%;
   display: flex;
   flex-direction: column;
   
@@ -224,6 +227,17 @@ function toggleCollapsed() {
     min-height: 0;
   }
 
+  &__fixed-section {
+    flex-shrink: 0;
+  }
+
+  &__scrollable-section {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
   &__loading {
     display: flex;
     flex-direction: column;
@@ -236,15 +250,12 @@ function toggleCollapsed() {
   }
 
   &__list {
-    flex: 1;
     list-style: none;
     margin: 0;
-    padding: 0 var(--size-16) var(--size-16) var(--size-16);
-    overflow-y: auto;
+    padding: var(--size-16);
     display: flex;
     flex-direction: column;
     gap: var(--size-8);
-    min-height: 0;
     
     @include mq.mobile-only {
       padding: var(--size-16);

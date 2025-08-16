@@ -56,7 +56,7 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   opacity: 0;
@@ -78,7 +78,8 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
   top: 0;
   right: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100dvh - var(--mobile-nav-header-height));
+
   background: var(--background-200);
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
   transform: translateX(100%);
@@ -104,8 +105,8 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
   flex: 1 1 auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0 0 110px 0;
   min-height: 0;
+  height: calc(100dvh - var(--mobile-nav-header-height));
 }
 
 .chat-title {
