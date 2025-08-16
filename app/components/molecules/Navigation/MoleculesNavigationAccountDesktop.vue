@@ -1,6 +1,5 @@
 <template>
-  <aside class="sidebar">
-    <div ref="sidebarContent" class="sidebar-content">
+  <div ref="sidebarContent" class="navigation-container">
       <nav class="navigation" role="navigation" aria-label="Desktop sidebar navigation">
         <ul>
           <MoleculesNavigationGroup 
@@ -10,12 +9,11 @@
           />
         </ul>
       </nav>
-    </div>
-  </aside>
+  </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   groupStates: boolean[]
 }>()
 
@@ -34,47 +32,46 @@ const updateHeight = () => {
   }
 }
 
+// Store resizeObserver ref for cleanup
+let resizeObserver: ResizeObserver | null = null
+
 // Watch for changes and update height
 onMounted(() => {
   nextTick(() => {
     updateHeight()
     // Watch for content changes using ResizeObserver
     if (sidebarContent.value) {
-      const resizeObserver = new ResizeObserver(updateHeight)
-      resizeObserver.observe(sidebarContent.value)
-      
-      onUnmounted(() => {
-        resizeObserver.disconnect()
+      resizeObserver = new ResizeObserver(() => {
+        // Use requestAnimationFrame instead of setTimeout for better timing
+        requestAnimationFrame(() => {
+          updateHeight()
+        })
       })
+      resizeObserver.observe(sidebarContent.value)
     }
   })
+})
+
+
+// Cleanup on unmount
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
 })
 </script>
 
 <style lang="scss" scoped>
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  height: fit-content;
-  z-index: 10;
-  width: 300px;
-  position: sticky;
-  top: calc(var(--header-offset, 0) + var(--size-16));
-  bottom: var(--size-16);
-  transition: width 0.3s ease;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-}
-
-.sidebar-content {
+.navigation-container {
   background: var(--background-200);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
   position: relative;
   padding: 0 var(--size-8) 0 0;
+  transition: height 0.3s ease;
+  overflow: hidden;
 }
 
 .navigation {

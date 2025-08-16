@@ -1,15 +1,12 @@
 <template>
   <div>
-    <MoleculesMobileNavigationBar :isMobileMenuOpen="isMobileMenuOpen" :isChatSummaryOpen="isChatSummaryOpen" @toggleMenu="toggleMobileMenu"
+    <MoleculesNavigationAccountMobileBar :isMobileMenuOpen="isMobileMenuOpen" :isChatSummaryOpen="isChatSummaryOpen" @toggleMenu="toggleMobileMenu"
       @toggleChat="toggleChatSummary" @closeBoth="closeBothOverlays" />
 
-    <MoleculesMobileSidebarNavigation :isOpen="isMobileMenuOpen" :groupStates="groupStates"
+    <MoleculesNavigationAccountMobileOverlay :isOpen="isMobileMenuOpen" :groupStates="groupStates"
       @close="isMobileMenuOpen = false" @toggleGroup="toggleGroup" @navClick="handleNavClick" />
 
     <OrganismsMobileChatSummary :isOpen="isChatSummaryOpen" @close="toggleChatSummary" />
-
-    <MoleculesDesktopSidebarNavigation :groupStates="groupStates" @toggleGroup="toggleGroup"
-      @navClick="handleNavClick" />
   </div>
 </template>
 
@@ -55,7 +52,7 @@ function closeBothOverlays() {
 // Prevent body scrolling on mobile when either mobile menu or chat is open
 watch([isMobileMenuOpen, isChatSummaryOpen], ([menuOpen, chatOpen]) => {
   const shouldBlock = !!menuOpen || !!chatOpen
-  if (process.client) {
+  if (import.meta.client) {
     document.body.classList.toggle('no-scroll', shouldBlock)
   }
 })

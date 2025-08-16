@@ -122,3 +122,12 @@ export const navigationGroups: NavigationGroup[] = [
     items: searchNavigation,
   },
 ];
+
+export const logout = async () => {
+  const { clear } = useUserSession()
+  await clear()
+  const route = useRoute()
+  if (route.path.startsWith('/account')) {
+    navigateTo('/')
+  }
+}

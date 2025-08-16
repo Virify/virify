@@ -5,35 +5,33 @@
 
     <div class="page">
       <div class="account-layout | container" :class="{ 'account-layout--messages-expanded': isExpanded }">
-        <OrganismsNavigation />
+        <!-- Left Sidebar Slot (Desktop only) -->
+        <aside class="left-sidebar">
+          <slot name="left-sidebar">
+            <MoleculesNavigationAccountDesktop 
+              :groupStates="groupStates" 
+              @toggleGroup="toggleGroup" 
+              @navClick="handleNavClick" 
+            />
+          </slot>
+        </aside>
 
         <main class="main">
           <NuxtPage />
         </main>
 
-        <aside class="sidebar" v-if="showSidebar">
-          <div class="sidebar-content sidebar-content--enquiries" :class="{ 'sidebar-content--collapsed': isCollapsed, 'sidebar-content--has-overlay': selectedConversation !== null }">
-            <OrganismsChatSummary 
-              v-show="selectedConversation === null"
-              :limit="0" 
-              :search-enabled="true" 
-              :disable-navigate="true"
-              :sort="true"
-              @select-conversation="handleConversationSelect"
-              @toggle-collapsed="isCollapsed = $event"
-            />
-            
-            <div v-show="selectedConversation !== null" class="sidebar-overlay">
-              <OrganismsEnquiryDetail 
-                :is-open="selectedConversation !== null"
-                :conversation="selectedConversation"
-                :current-user-id="user?.id"
-                @back="selectedConversation = null"
-              />
-            </div>
-          </div>
+        <!-- Right Sidebar Slot -->
+        <aside class="right-sidebar" v-if="showSidebar">
+          <slot name="right-sidebar">
+            <OrganismsEnquirySidebar />
+          </slot>
         </aside>
       </div>
+
+      <!-- Bottom Navigation Slot -->
+      <slot name="bottom-navigation">
+        <OrganismsNavigationAccountMobile />
+      </slot>
     </div>
 
     <OrganismsFooter />
@@ -44,48 +42,50 @@
 </template>
 
 <script setup lang="ts">
-const selectedConversation = ref<ConversationWithUserAndMessages | null>(null);
-const isCollapsed = ref(false);
-const route = useRoute();
-
-const isMessagesPage = computed(() => {
-  return route.path === '/account/messages';
-});
+import { logout } from '~/utils/account/navigation'
+const route = useRoute()
+const groupStates = ref([true, true, true, false])
 
 // Control sidebar visibility with transition timing
-const showSidebar = ref(true);
-const isExpanded = ref(false);
+const showSidebar = ref(true)
+const isExpanded = ref(false)
+
+function handleNavClick(item: any) {
+  if (item.action === 'logout') {
+    logout()
+  }
+}
 
 // Watch route changes and control transition timing
 watch(() => route.path, (newPath, oldPath) => {
-  const newIsMessages = newPath === '/account/messages';
-  const oldIsMessages = oldPath === '/account/messages';
+  const newIsMessages = newPath === '/account/messages'
+  const oldIsMessages = oldPath === '/account/messages'
   
   if (newIsMessages !== oldIsMessages) {
     if (newIsMessages) {
       // Going TO messages - hide sidebar after a delay to let page transition start
       setTimeout(() => {
-        showSidebar.value = false;
-        isExpanded.value = true;
-      }, 250); // Start during page fade out
+        showSidebar.value = false
+        isExpanded.value = true
+      }, 250) // Start during page fade out
     } else {
       // Going FROM messages - show sidebar immediately when page starts transitioning
-      showSidebar.value = true;
-      isExpanded.value = false;
+      showSidebar.value = true
+      isExpanded.value = false
     }
   }
-});
+})
 
 // Initialize on mount
 onMounted(() => {
-  showSidebar.value = route.path !== '/account/messages';
-  isExpanded.value = route.path === '/account/messages';
-});
+  showSidebar.value = route.path !== '/account/messages'
+  isExpanded.value = route.path === '/account/messages'
+})
 
-
-function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
-  selectedConversation.value = conversation;
+function toggleGroup(index: number) {
+  groupStates.value[index] = !groupStates.value[index]
 }
+
 
 useHead({
   htmlAttrs: {
@@ -116,7 +116,6 @@ useHead({
 });
 
 
-const { user } = useUserSession();
 
 </script>
 <style lang="scss">
@@ -130,6 +129,7 @@ const { user } = useUserSession();
 .account-layout {
   display: grid;
   grid-template-columns: 300px 1fr 300px;
+  grid-template-areas: "left-sidebar main right-sidebar";
   gap: var(--size-16);
   padding: var(--size-16);
   transition: grid-template-columns 0.25s ease;
@@ -140,35 +140,15 @@ const { user } = useUserSession();
   
   &.account-layout--messages-expanded {
     grid-template-columns: 300px 1fr;
+    grid-template-areas: "left-sidebar main";
   }
 
   @include mq.not-notebook {
     grid-template-columns: 300px 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      "nav main"
-      "sidebar main";
+    grid-template-areas: "left-sidebar main";
 
-    &:has(.sidebar-content--has-overlay) {
-      grid-template-columns: 300px 1fr;
-      grid-template-areas:
-        "nav sidebar"
-        "sidebar sidebar";
-    }
-
-    .sidebar {
-      grid-area: sidebar;
-      position: static;
-      height: auto;
-      max-height: none;
-    }
-
-    .main {
-      grid-area: main;
-    }
-
-    > :first-child {
-      grid-area: nav;
+    .right-sidebar {
+      display: none;
     }
   }
 
@@ -177,31 +157,36 @@ const { user } = useUserSession();
     grid-template-areas: "main";
     padding-bottom: calc(var(--size-16) + var(--mobile-nav-height));
 
-    .sidebar {
+    .left-sidebar,
+    .right-sidebar {
       display: none;
-    }
-
-    .main {
-      grid-area: main;
-    }
-
-    > :first-child {
-      grid-area: unset;
     }
   }
 }
 
-.sidebar {
+// Left Sidebar (Navigation)
+.left-sidebar {
+  grid-area: left-sidebar;
   position: sticky;
   top: calc(var(--header-offset, 0) + var(--size-16));
   bottom: var(--size-16);
   height: fit-content;
   max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
   z-index: 10;
-  width: auto;
-  transition: all 0.3s ease;
   align-self: start;
-  
+  overflow: hidden;
+}
+
+// Right Sidebar (Enquiries)  
+.right-sidebar {
+  grid-area: right-sidebar;
+  position: sticky;
+  top: calc(var(--header-offset, 0) + var(--size-16));
+  bottom: var(--size-16);
+  height: fit-content;
+  max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
+  z-index: 10;
+  align-self: start;
 
   @include mq.not-notebook {
     position: static;
@@ -228,7 +213,7 @@ const { user } = useUserSession();
       overflow-y: auto;
       height: var(--navigation-sidebar-height, fit-content);
       box-sizing: border-box;
-      transition: height 0.3s ease;
+      transition: height ease;
       
       &.sidebar-content--has-overlay {
         height: calc(100vh - var(--header-expanded-height) + var(--size-32));

@@ -204,7 +204,7 @@ function toggleCollapsed() {
     }
 
     :deep(svg) {
-      transition: transform 0.2s ease;
+      transition: transform 0.1s ease;
       transform: rotate(180deg);
     }
 
@@ -311,4 +311,6 @@ function toggleCollapsed() {
     }
   }
 }
+
+
 </style>
