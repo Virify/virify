@@ -23,7 +23,7 @@
         <!-- Right Sidebar Slot -->
         <aside class="right-sidebar" v-if="showSidebar">
           <slot name="right-sidebar">
-            <OrganismsEnquirySidebar />
+            <OrganismsConversationSidebar />
           </slot>
         </aside>
       </div>
@@ -177,7 +177,7 @@ useHead({
   overflow: hidden;
 }
 
-// Right Sidebar (Enquiries)  
+// Right Sidebar (Conversations)  
 .right-sidebar {
   grid-area: right-sidebar;
   position: sticky;
@@ -208,7 +208,7 @@ useHead({
       padding: 0;
     }
 
-    &--enquiries {
+    &--conversations {
       padding: 0;
       overflow-y: auto;
       height: var(--navigation-sidebar-height, fit-content);

@@ -1,8 +1,8 @@
 <template>
   <div class="o-chat-summary" :class="{ collapsed: isCollapsed }">
     <div class="o-chat-summary__header" @click="toggleCollapsed">
-      <h3 class="o-chat-summary__title | title-xs">Enquiries 
-        <span class="o-chat-summary__count | body-sm">{{ enquiriesCount }}</span>
+      <h3 class="o-chat-summary__title | title-xs">Conversations 
+        <span class="o-chat-summary__count | body-sm">{{ conversationsCount }}</span>
       </h3>
       <button class="o-chat-summary__toggle-btn" :class="{ 'o-chat-summary__toggle-btn--collapsed': isCollapsed }">
         <AtomsIcon icon="chevron-down" size="16" />
@@ -23,7 +23,7 @@
               v-model="search"
               type="text"
               class="o-chat-summary__search-input | body-sm"
-              placeholder="Search enquiries..."
+              placeholder="Search conversations..."
               autocomplete="off"
             />
           </div>
@@ -40,7 +40,7 @@
         </template>
         <template v-else-if="filteredConversations.length > 0">
           <ul class="o-chat-summary__list">
-            <MoleculesEnquiryItem v-for="conversation in filteredConversations" :key="conversation.id"
+            <MoleculesConversationItem v-for="conversation in filteredConversations" :key="conversation.id"
               :conversation="conversation" :current-user-id="user?.id"
               @select-conversation="handleConversationSelect" />
           </ul>
@@ -52,7 +52,7 @@
         </template>
         <template v-else>
           <div class="o-chat-summary__empty">
-            <p class="o-chat-summary__empty-text | body-sm">No enquiries found</p>
+            <p class="o-chat-summary__empty-text | body-sm">No conversations found</p>
           </div>
         </template>
         <template #fallback>
@@ -97,14 +97,14 @@ const sortBy = ref("all")
 const sortOptions = [
   { key: "All", value: "all" },
   { key: "Unread", value: "unread" },
-  { key: "Received Enquiries", value: "received" },
-  { key: "Sent Enquiries", value: "sent" },
+  { key: "Received Messages", value: "received" },
+  { key: "Sent Messages", value: "sent" },
   { key: "Recent", value: "recent" },
   { key: "Oldest", value: "oldest" }
 ]
 
-// Get unread enquiries count from aggregates instead of calculating manually
-const enquiriesCount = computed(() => {
+// Get unread conversations count from aggregates instead of calculating manually
+const conversationsCount = computed(() => {
   if(getAggregateCount('unreadMessages')) {
     return `(${getAggregateCount('unreadMessages')})`;
   }

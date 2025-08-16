@@ -1,5 +1,5 @@
 <template>
-  <div class="enquiry-messages">
+  <div class="conversation-messages">
     <ul class="messages-list">
       <li v-for="message in messages" :key="message.id" class="message-item"
         :class="{ 'from-me': message.senderId === currentUserId }">
@@ -26,7 +26,7 @@ defineProps<{
 </script>
 
 <style lang="scss" scoped>
-.enquiry-messages {
+.conversation-messages {
   padding: 0;
 
   .messages-list {

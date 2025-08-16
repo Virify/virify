@@ -1,13 +1,13 @@
 <template>
-  <div @click="handleEnquire">
-    <slot :disabled="isEnquiryDisabled" :enquiry-label="enquiryLabel">
-      <button class="| button button-ghost button-full body-sm" :disabled="isEnquiryDisabled">{{ enquiryLabel }}</button>
+  <div @click="handleContact">
+    <slot :disabled="isContactDisabled" :contact-label="contactLabel">
+      <button class="| button button-ghost button-full body-sm" :disabled="isContactDisabled">{{ contactLabel }}</button>
     </slot>
   </div>
 </template>
 
 <script setup lang="ts">
-import ViewsDialogEnquiry from '~/components/views/Dialog/ViewsDialogEnquiry.vue';
+import ViewsDialogConversation from '~/components/views/Dialog/ViewsDialogConversation.vue';
 import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const { hasEnquired, loadingEnquiries } = useEnquiry();
+const { hasConversation, loadingConversations } = useConversations();
 const { showDialog } = useDialog();
 const { user } = useUserSession();
 
@@ -26,20 +26,20 @@ const safeUserId = computed(() =>
 
 const isSelf = computed(() => safeUserId.value !== null && user.value?.id === safeUserId.value);
 
-const isEnquiryDisabled = computed(() =>
-  !safeUserId.value || hasEnquired(props.listingId) || loadingEnquiries.value || isSelf.value
+const isContactDisabled = computed(() =>
+  !safeUserId.value || hasConversation(props.listingId) || loadingConversations.value || isSelf.value
 );
 
-const enquiryLabel = computed(() =>
+const contactLabel = computed(() =>
   isSelf.value
-    ? 'Enquire'
-    : hasEnquired(props.listingId)
-      ? 'Enquiry Sent'
-      : 'Enquire'
+    ? 'Contact'
+    : hasConversation(props.listingId)
+      ? 'Message Sent'
+      : 'Contact'
 );
 
-function handleEnquire() {
-  if (isEnquiryDisabled.value) return;
+function handleContact() {
+  if (isContactDisabled.value) return;
   
   if (!user.value || !user.value.id) {
     showDialog({
@@ -49,7 +49,7 @@ function handleEnquire() {
   }
   if (safeUserId.value !== null && !isSelf.value) {
     showDialog({
-      component: ViewsDialogEnquiry,
+      component: ViewsDialogConversation,
       props: { listingId: props.listingId, receiverId: safeUserId.value },
     });
   }

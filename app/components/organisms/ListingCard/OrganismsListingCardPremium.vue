@@ -257,7 +257,7 @@
 
     <!-- Mobile Action Buttons -->
     <template #mobile-actions>
-      <!-- Enquiry button for mobile -->
+      <!-- Contact button for mobile -->
       <div class="premium-mobile-actions">
         <OrganismsListingCardNewView :listing-id="listing.id">
           <span class="| button button-bordered button-full body-sm">View</span>

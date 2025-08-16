@@ -1,6 +1,6 @@
 <template>
-  <div class="sidebar-content sidebar-content--enquiries" :class="{ 'sidebar-content--collapsed': isCollapsed, 'sidebar-content--has-overlay': selectedConversation !== null }">
-    <OrganismsEnquirySummary 
+  <div class="sidebar-content sidebar-content--conversations" :class="{ 'sidebar-content--collapsed': isCollapsed, 'sidebar-content--has-overlay': selectedConversation !== null }">
+    <OrganismsConversationSummary 
       v-show="selectedConversation === null"
       :limit="0" 
       :search-enabled="true" 
@@ -11,7 +11,7 @@
     />
     
     <div v-show="selectedConversation !== null" class="sidebar-overlay">
-      <OrganismsEnquiryActive 
+      <OrganismsConversationActive 
         :is-open="selectedConversation !== null"
         :conversation="selectedConversation"
         :current-user-id="user?.id"

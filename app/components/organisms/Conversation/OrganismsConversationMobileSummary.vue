@@ -2,15 +2,15 @@
   <div class="mobile-chat-overlay" :class="{ 'open': isOpen }" @click="$emit('close')">
     <aside class="mobile-chat-summary" @click.stop>
       <div class="mobile-chat-header">
-        <h3 class="chat-title">Enquiries</h3>
+        <h3 class="chat-title">Conversations</h3>
         <button class="close-btn" @click="$emit('close')">
           <AtomsIcon icon="cross" size="24" />
         </button>
       </div>
       <div class="chat-summary-scrollable" v-if="!activeConversation">
-        <OrganismsEnquirySummary :limit="0" :search-enabled="true" :disable-navigate="true" :sort="true" @select-conversation="handleSelectConversation" />
+        <OrganismsConversationSummary :limit="0" :search-enabled="true" :disable-navigate="true" :sort="true" @select-conversation="handleSelectConversation" />
       </div>
-      <OrganismsEnquiryActive
+      <OrganismsConversationActive
         :is-open="!!activeConversation"
         :conversation="activeConversation"
         :current-user-id="user?.id"

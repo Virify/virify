@@ -6,7 +6,7 @@
     <MoleculesNavigationAccountMobileOverlay :isOpen="isMobileMenuOpen" :groupStates="groupStates"
       @close="isMobileMenuOpen = false" @toggleGroup="toggleGroup" @navClick="handleNavClick" />
 
-    <OrganismsEnquiryMobileSummary :isOpen="isChatSummaryOpen" @close="toggleChatSummary" />
+    <OrganismsConversationMobileSummary :isOpen="isChatSummaryOpen" @close="toggleChatSummary" />
   </div>
 </template>
 

@@ -1,19 +1,19 @@
 <template>
-  <div class="enquiry-overlay" :class="{ open: isOpen }" @click="$emit('back')">
-    <aside class="enquiry-detail" @click.stop>
-      <div class="enquiry-header">
-        <h3 class="enquiry-title | title-xs">{{ conversation?.sender?.username }}</h3>
+  <div class="conversation-overlay" :class="{ open: isOpen }" @click="$emit('back')">
+    <aside class="conversation-detail" @click.stop>
+      <div class="conversation-header">
+        <h3 class="conversation-title | title-xs">{{ conversation?.sender?.username }}</h3>
         <button class="close-btn" @click="$emit('back')">
           <AtomsIcon icon="cross" size="24" />
         </button>
       </div>
 
-      <div class="enquiry-content-scrollable" ref="scrollableRef">
-        <MoleculesEnquiryListingCard :conversation="conversation" />
-        <MoleculesEnquiryMessageList :messages="conversation?.messages || []" :current-user-id="currentUserId" />
+      <div class="conversation-content-scrollable" ref="scrollableRef">
+        <MoleculesConversationListingCard :conversation="conversation" />
+        <MoleculesConversationMessageList :messages="conversation?.messages || []" :current-user-id="currentUserId" />
       </div>
 
-      <MoleculesEnquiryReplyInput v-if="conversation" @send="sendReply" />
+      <MoleculesConversationReplyInput v-if="conversation" @send="sendReply" />
     </aside>
   </div>
 </template>
@@ -114,7 +114,7 @@ async function sendReply(message: string) {
 </script>
 
 <style lang="scss" scoped>
-.enquiry-overlay {
+.conversation-overlay {
   width: 100%;
   height: 100%;
 
@@ -137,7 +137,7 @@ async function sendReply(message: string) {
   }
 }
 
-.enquiry-detail {
+.conversation-detail {
   width: 100%;
   height: 100%;
   background: var(--background-200);
@@ -162,7 +162,7 @@ async function sendReply(message: string) {
   }
 }
 
-.enquiry-header {
+.conversation-header {
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
@@ -171,7 +171,7 @@ async function sendReply(message: string) {
   border-bottom: 1px solid var(--border-100);
   background: var(--background-200);
 
-  .enquiry-title {
+  .conversation-title {
     margin: 0;
     color: var(--foreground-100);
   }
@@ -195,7 +195,7 @@ async function sendReply(message: string) {
   }
 }
 
-.enquiry-content-scrollable {
+.conversation-content-scrollable {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -207,7 +207,7 @@ async function sendReply(message: string) {
   padding: 0 var(--size-16) var(--size-16) var(--size-16);
 }
 
-.enquiry-messages {
+.conversation-messages {
   padding: 0;
 
   .messages-list {

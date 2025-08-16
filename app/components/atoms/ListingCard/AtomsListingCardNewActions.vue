@@ -4,10 +4,10 @@
       aria-label="View property details" title="View property details">
       View
     </nuxt-link>
-    <button class="| button button-ghost body-sm" :disabled="enquiryState.isDisabled" @click="onEnquire" 
-        :aria-label="enquiryState.isDisabled ? 'Cannot enquire about this property' : 'Send enquiry about this property'"
-        :title="enquiryState.isDisabled ? 'Cannot enquire about this property' : 'Send enquiry about this property'">
-      {{ enquiryState.label }}
+    <button class="| button button-ghost body-sm" :disabled="conversationState.isDisabled" @click="onContact" 
+        :aria-label="conversationState.isDisabled ? 'Cannot contact about this property' : 'Contact about this property'"
+        :title="conversationState.isDisabled ? 'Cannot contact about this property' : 'Contact about this property'">
+      {{ conversationState.label }}
     </button>
   </div>
 </template>
@@ -19,12 +19,12 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const { getEnquiryState, handleEnquiryClick } = useEnquiry();
+const { getConversationState, handleConversationClick } = useConversations();
 
-const enquiryState = computed(() => getEnquiryState(props.listingId, props.userId));
+const conversationState = computed(() => getConversationState(props.listingId, props.userId));
 
-function onEnquire() {
-  handleEnquiryClick(props.listingId, props.userId);
+function onContact() {
+  handleConversationClick(props.listingId, props.userId);
 }
 </script>
 <style lang="scss">
