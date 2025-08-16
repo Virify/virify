@@ -40,7 +40,7 @@
         </template>
         <template v-else-if="filteredConversations.length > 0">
           <ul class="o-chat-summary__list">
-            <MoleculesConversationItem v-for="conversation in filteredConversations" :key="conversation.id"
+            <MoleculesConversationSummaryItem v-for="conversation in filteredConversations" :key="conversation.id"
               :conversation="conversation" :current-user-id="user?.id"
               @select-conversation="handleConversationSelect" />
           </ul>
