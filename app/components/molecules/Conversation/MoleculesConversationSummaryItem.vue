@@ -1,5 +1,5 @@
 <template>
-  <li class="m-chat-summary-item" @click="$emit('select-conversation', conversation)">
+  <li class="m-chat-summary-item" :class="{ 'm-chat-summary-item--active': isActive }" @click="$emit('select-conversation', conversation)">
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
         <div class="m-chat-summary-item__title">
@@ -26,6 +26,7 @@
 interface Props {
   conversation: ConversationWithUserAndMessages;
   currentUserId?: string | number;
+  isActive?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -77,6 +78,19 @@ const firstImage = computed(() => {
   &:hover {
     background: var(--background-100);
     border-radius: var(--border-radius-xl);
+  }
+
+  &--active {
+    background: var(--secondary-500);
+    border-radius: var(--border-radius-xl);
+
+    .m-chat-summary-item__address {
+      color: var(--monochrome-300);
+    }
+
+    &:hover {
+      background: var(--secondary-500);
+    }
   }
 
   &__content {

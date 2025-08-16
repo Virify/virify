@@ -122,7 +122,6 @@ useHead({
 @use '#styles/_utils/media' as mq;
 .page {
   background: var(--background-100);
-  min-height: 100vh;
   transition: min-height 0.25s ease;
 }
 

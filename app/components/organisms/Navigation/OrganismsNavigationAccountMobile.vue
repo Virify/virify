@@ -20,7 +20,18 @@ const groupStates = ref([true, true, true, false])
 
 onMounted(() => {
   fetchUserItemsAggregates()
+  
+  // Listen for auto-open chat event from messages page
+  window.addEventListener('openMobileChat', handleOpenMobileChat)
 })
+
+onUnmounted(() => {
+  window.removeEventListener('openMobileChat', handleOpenMobileChat)
+})
+
+function handleOpenMobileChat() {
+  isChatSummaryOpen.value = true
+}
 
 function toggleGroup(index: number) {
   groupStates.value[index] = !groupStates.value[index]

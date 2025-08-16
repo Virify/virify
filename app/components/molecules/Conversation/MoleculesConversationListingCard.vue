@@ -1,5 +1,5 @@
 <template>
-  <div v-if="conversation && conversation.listing" class="property-header">
+  <div v-if="conversation && conversation.listing" class="property-header" :class="`property-header--${variant}`">
     <div class="property-image" v-if="firstImage">
       <NuxtImg 
         :src="firstImage" 
@@ -27,7 +27,7 @@
       </div>
     </div>
   </div>
-  <div v-else class="property-header property-header--empty">
+  <div v-else class="property-header property-header--empty" :class="`property-header--${variant}`">
     <p class="body-xs">No listing details available.</p>
   </div>
 </template>
@@ -35,9 +35,12 @@
 <script setup lang="ts">
 import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   conversation: ConversationWithUserAndMessages | null;
-}>();
+  variant?: 'vertical' | 'horizontal';
+}>(), {
+  variant: 'vertical'
+});
 
 const listing = computed(() => props.conversation?.listing)
 const property = computed(() => listing.value?.property)
@@ -71,17 +74,61 @@ const priceFormatted = computed(() => {
     color: var(--foreground-100);
   }
 
+  // Horizontal variant
+  &--horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+
+    .property-image {
+      width: 200px;
+      flex-shrink: 0;
+      border-radius: var(--border-radius-2xl) 0 0 var(--border-radius-2xl);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .property-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: var(--size-16);
+    }
+
+    .property-info {
+      margin-bottom: var(--size-8);
+    }
+
+    .agent-info {
+      margin-top: auto;
+    }
+  }
+
+  // Vertical variant (default)
+  &--vertical {
+    display: flex;
+    flex-direction: column;
+
+    .property-image {
+      width: 100%;
+      height: 120px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+
   .property-image {
     position: relative;
-    width: 100%;
-    height: 120px;
     overflow: hidden;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
   }
 
   .property-badge {
@@ -95,11 +142,16 @@ const priceFormatted = computed(() => {
   }
 
   .property-details {
-    padding: var(--size-16);
     color: var(--foreground-100);
   }
 
-  .property-info {
+  // Vertical variant styles for property-details
+  &--vertical .property-details {
+    padding: var(--size-16);
+  }
+
+  // Vertical variant styles for property-info
+  &--vertical .property-info {
     margin-bottom: var(--size-12);
   }
 

@@ -54,7 +54,7 @@ onUnmounted(() => {
 })
 
 onMounted(() => {
-  scrollToBottom();
+  scrollToBottomInternal();
   // Mark messages as read when component mounts and conversation is open
   if (props.isOpen && props.conversation) {
     markUnreadMessagesAsRead();
@@ -62,7 +62,7 @@ onMounted(() => {
 });
 
 // Simple watcher just for scrolling when messages change
-watch(() => props.conversation?.messages?.length, scrollToBottom);
+watch(() => props.conversation?.messages?.length, scrollToBottomInternal);
 
 // Mark messages as read ONLY when conversation opens (not when new messages arrive)
 watch(() => props.isOpen, (isOpen) => {
@@ -88,11 +88,9 @@ function markUnreadMessagesAsRead() {
   });
 }
 
-function scrollToBottom() {
+function scrollToBottomInternal() {
   nextTick(() => {
-    if (scrollableRef.value) {
-      scrollableRef.value.scrollTop = scrollableRef.value.scrollHeight
-    }
+    scrollToBottom(scrollableRef.value)
   })
 }
 
