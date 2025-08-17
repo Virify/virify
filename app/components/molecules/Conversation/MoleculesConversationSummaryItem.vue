@@ -46,7 +46,14 @@ const formattedPartnerName = computed(() => {
 });
 
 const lastMessageContent = computed(() => {
-  return getLastMessageContent(props.conversation);
+  const baseContent = getLastMessageContent(props.conversation);
+  const lastMessage = props.conversation.messages[props.conversation.messages.length - 1];
+  
+  if (lastMessage && lastMessage.senderId === props.currentUserId) {
+    return `You: ${baseContent}`;
+  }
+  
+  return baseContent;
 });
 
 const lastMessageTime = computed(() => {
@@ -72,6 +79,7 @@ const firstImage = computed(() => {
 .m-chat-summary-item {
   cursor: pointer;
   padding: var(--size-8);
+  color: var(--monochrome-100);
 
   .unread {
     color: var(--secondary-400);
@@ -85,9 +93,10 @@ const firstImage = computed(() => {
   &--active {
     background: var(--secondary-500);
     border-radius: var(--border-radius-xl);
+    color: var(--monochrome-100);
 
-    .m-chat-summary-item__address {
-      color: inherit;
+    .m-chat-summary-item__address, .m-chat-summary-item__username, .m-chat-summary-item__time, .m-chat-summary-item-message__content {
+      color: var(--monochrome-100);
     }
 
     &:hover {

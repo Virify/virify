@@ -58,7 +58,7 @@ export const listingsNavigation: NavigationItem[] = [
     name: "Enquiries",
     url: "/account/messages",
     icon: "account/enquiry",
-    countKey: "enquiries",
+    countKey: "unreadMessages",
   },
   {
     name: "Viewings",

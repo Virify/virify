@@ -14,7 +14,8 @@ defineProps<{
 
 <style lang="scss" scoped>
 .conversation-bubble {
-  background: var(--primary-600);
+  background: var(--secondary-500);
+  color: var(--monochrome-100);
   padding: var(--size-12) var(--size-16);
   border-radius: var(--border-radius-lg);
   border-bottom-left-radius: 0;
@@ -23,8 +24,8 @@ defineProps<{
   position: relative;
 
   &.sent {
-    background: var(--secondary-500);
-    color: var(--foreground-100);
+    background: var(--background-100);
+    color: var(--foreground-300);
     margin-left: auto;
     border-bottom-left-radius: var(--border-radius-lg);
     border-bottom-right-radius: 0;
@@ -32,7 +33,6 @@ defineProps<{
 
   .bubble-content {
     margin: 0 0 var(--size-8) 0;
-    color: var(--monochrome-100);
   }
 }
 </style>

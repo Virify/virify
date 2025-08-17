@@ -96,8 +96,12 @@ const sortOptions = [
   { key: "Read", value: "read" }
 ]
 
-// Apply search and sort filters using conversation utils
-const filteredReceivedConversations = computed(() => {
+// Use ref instead of computed to have full control
+const filteredReceivedConversations = ref<ConversationWithUserAndMessages[]>([])
+const lastActiveConversationId = ref<number | null>(null)
+
+// Function to update conversations
+function updateConversationsList() {
   let conversations = allConversations.value || []
   
   // Apply search filter first
@@ -105,21 +109,33 @@ const filteredReceivedConversations = computed(() => {
     conversations = filterConversations(conversations, receivedSearch.value)
   }
   
-  // Apply sorting and filtering using the conversation utility
-  let sortedConversations = sortConversations(conversations, receivedSort.value, user.value?.id)
-  
-  // If there's an active conversation, move it to the top (index 0) to keep it visible
-  if (selectedConversation.value) {
-    const activeIndex = sortedConversations.findIndex(c => c.id === selectedConversation.value?.id)
-    if (activeIndex > 0) {
-      const activeConversation = sortedConversations.splice(activeIndex, 1)[0]
-      if (activeConversation) {
-        sortedConversations.unshift(activeConversation)
-      }
+  // Apply sorting
+  const sorted = sortConversations(conversations, receivedSort.value, user.value?.id)
+  filteredReceivedConversations.value = sorted
+}
+
+// Combined watcher for all conversation list updates
+watch([receivedSearch, receivedSort, allConversations, selectedConversation], 
+  ([newSearch, newSort, newConversations, newConv], [oldSearch, oldSort, oldConversations, oldConv]) => {
+    // Track active conversation ID changes
+    if (newConv !== oldConv) {
+      lastActiveConversationId.value = newConv?.id || null
+    }
+    
+    // Update list when search/sort changes
+    if (newSearch !== oldSearch || newSort !== oldSort) {
+      updateConversationsList()
+    }
+    // Update list when conversations change but only if no active conversation
+    else if (newConversations !== oldConversations && !selectedConversation.value) {
+      updateConversationsList()
     }
   }
-  
-  return sortedConversations
+)
+
+// Initial load
+onMounted(() => {
+  updateConversationsList()
 })
 
 // Dynamic section title based on selected filter
@@ -151,6 +167,14 @@ const emptyMessage = computed(() => {
 })
 
 function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
+  const previousConversation = selectedConversation.value
+  
+  // If we're switching between conversations, trigger re-sort first
+  if (previousConversation && previousConversation.id !== conversation.id) {
+    updateConversationsList()
+  }
+  
+  // Set new active conversation
   selectedConversation.value = conversation
   // Mark unread messages as read
   markUnreadMessagesAsRead(conversation)

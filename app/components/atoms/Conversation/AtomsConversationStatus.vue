@@ -22,10 +22,8 @@ defineProps<{
   justify-content: space-between;
   align-items: center;
   gap: var(--size-8);
-  color: var(--monochrome-300);
 
   .status-time {
-    color: var(--monochrome-300);
     flex-shrink: 0;
   }
 
