@@ -101,6 +101,11 @@ useHead({
 .page {
   background: var(--background-100);
   transition: min-height 0.25s ease;
+  
+  @media (max-width: 768px) {
+    padding-bottom: var(--mobile-nav-height);
+    min-height: calc(100dvh - var(--header-height));
+  }
 }
 
 .account-layout {

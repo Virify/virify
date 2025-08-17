@@ -55,6 +55,7 @@ const chatNotificationCount = computed(() => {
     bottom: 0;
     left: 0;
     right: 0;
+    width: 100vw;
     background: var(--background-200);
     padding: var(--size-16);
     padding-bottom: calc(var(--size-16) + env(safe-area-inset-bottom));
@@ -63,6 +64,14 @@ const chatNotificationCount = computed(() => {
     justify-content: space-around;
     align-items: center;
     min-height: var(--mobile-nav-height);
+    transform: translateZ(0);
+    
+    /* iOS Safari specific fixes */
+    @supports (-webkit-touch-callout: none) {
+      position: -webkit-sticky;
+      position: sticky;
+      bottom: env(safe-area-inset-bottom, 0);
+    }
   }
 
   ul {

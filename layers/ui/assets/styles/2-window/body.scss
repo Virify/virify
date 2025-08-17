@@ -8,6 +8,12 @@ body {
   font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: var(--font-light);
   line-height: var(--lineheight-md);
+  
+  /* iOS Safari specific fixes */
+  @supports (-webkit-touch-callout: none) {
+    height: 100%;
+    overflow-x: hidden;
+  }
 
   @include mq.motion {
     scroll-behavior: smooth;
