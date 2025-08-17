@@ -87,7 +87,7 @@ const firstImage = computed(() => {
     border-radius: var(--border-radius-xl);
 
     .m-chat-summary-item__address {
-      color: var(--monochrome-300);
+      color: inherit;
     }
 
     &:hover {
