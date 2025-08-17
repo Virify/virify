@@ -2,7 +2,7 @@
   <div :class="wrapperClass" class="a-input" role="presentation">
     <slot name="prefix" />
 
-    <input v-bind="$attrs" :value="modelValue" :ariaDescribed class="| text-input" @input="handleInput" />
+    <input v-bind="$attrs" :value="modelValue" :aria-describedby="ariaDescribed" class="| text-input" @input="handleInput" />
 
     <slot name="suffix" />
   </div>
