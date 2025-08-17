@@ -36,29 +36,6 @@ export function useConversationActions(conversationState: ReturnType<typeof useC
     }
   }
 
-  /**
-   * Mark a conversation as read - TODO: Implement when backend support is added
-   */
-  async function markAsRead(conversationId: number) {
-    // TODO: Implement when backend read status API is available
-    console.log("Mark as read requested for conversation:", conversationId);
-  }
-
-  /**
-   * Get unread message count for a conversation - TODO: Implement when backend support is added
-   */
-  function getUnreadCount(conversationId: number): number {
-    // TODO: Implement when backend read status support is added
-    return 0;
-  }
-
-  /**
-   * Get total unread conversations count
-   */
-  const unreadConversationsCount = computed(() => {
-    // TODO: Implement when backend read status support is added
-    return 0;
-  });
 
   /**
    * Hydrate sentConversations from backend - optimized to fetch only listing IDs
@@ -172,9 +149,6 @@ export function useConversationActions(conversationState: ReturnType<typeof useC
 
   return {
     sendReply,
-    markAsRead,
-    getUnreadCount,
-    unreadConversationsCount,
     // New conversation functionality
     hasConversation,
     startConversation,

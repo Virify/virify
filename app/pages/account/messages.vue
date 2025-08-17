@@ -71,6 +71,9 @@ definePageMeta({
 
 const { user } = useUserSession()
 const { allConversations, loading, filterConversations } = useConversations()
+const conversationState = useConversationState()
+const { markMessageAsRead } = useConversationEvents(conversationState)
+const conversationActions = useConversationActions(conversationState)
 
 // Search states
 const receivedSearch = ref("")
@@ -103,7 +106,20 @@ const filteredReceivedConversations = computed(() => {
   }
   
   // Apply sorting and filtering using the conversation utility
-  return sortConversations(conversations, receivedSort.value, user.value?.id)
+  let sortedConversations = sortConversations(conversations, receivedSort.value, user.value?.id)
+  
+  // If there's an active conversation, move it to the top (index 0) to keep it visible
+  if (selectedConversation.value) {
+    const activeIndex = sortedConversations.findIndex(c => c.id === selectedConversation.value?.id)
+    if (activeIndex > 0) {
+      const activeConversation = sortedConversations.splice(activeIndex, 1)[0]
+      if (activeConversation) {
+        sortedConversations.unshift(activeConversation)
+      }
+    }
+  }
+  
+  return sortedConversations
 })
 
 // Dynamic section title based on selected filter
@@ -136,16 +152,31 @@ const emptyMessage = computed(() => {
 
 function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
   selectedConversation.value = conversation
+  // Mark unread messages as read
+  markUnreadMessagesAsRead(conversation)
   // Scroll to bottom when conversation is selected
   nextTick(() => {
     scrollToBottom(messagesContainer.value)
   })
 }
 
+
+function markUnreadMessagesAsRead(conversation: ConversationWithUserAndMessages) {
+  if (!conversation || !user.value) return
+  
+  const currentUserId = user.value.id
+  const unreadMessages = conversation.messages.filter(
+    message => !message.isRead && message.senderId !== currentUserId
+  )
+  
+  // Mark each unread message as read
+  unreadMessages.forEach(message => {
+    markMessageAsRead(message.id, conversation.id)
+  })
+}
+
 async function handleSendReply(message: string) {
   if (!selectedConversation.value || !message.trim()) return
-
-  const conversationActions = useConversationActions(useConversationState())
   
   try {
     await conversationActions.sendReply(selectedConversation.value.id, message.trim())
@@ -409,6 +440,7 @@ onMounted(() => {
   gap: var(--size-16);
   height: 100%;
 }
+
 
 .messages-container {
   flex: 1;
