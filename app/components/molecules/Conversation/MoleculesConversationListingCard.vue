@@ -1,5 +1,6 @@
 <template>
   <div v-if="conversation && conversation.listing" class="property-header">
+    <NuxtLink :to="`/listing/${conversation.listing.id}`" target="_blank">
     <div class="property-main-row">
       <div class="property-image" v-if="firstImage">
         <NuxtImg 
@@ -39,6 +40,7 @@
         <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
       </div>
     </div>
+    </NuxtLink>
   </div>
   <div v-else class="property-header property-header--empty">
     <p class="body-xs">No listing details available.</p>
@@ -81,6 +83,10 @@ const isMyProperty = computed(() => {
   margin: 0 0 var(--size-16) 0;
   overflow: hidden;
   container-type: inline-size;
+
+  a {
+    text-decoration: none;
+  }
 
   /* Default: vertical layout (narrow containers) */
   display: flex;
