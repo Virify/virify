@@ -38,6 +38,10 @@ async function handleSend() {
     padding-bottom: calc(var(--size-16) + 90px + env(safe-area-inset-bottom));
   }
 
+  .right-sidebar & {
+    padding: var(--size-8) var(--size-16);
+  }
+
   .reply-input-container {
     position: relative;
     display: flex;

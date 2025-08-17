@@ -46,41 +46,19 @@ import { logout } from '~/utils/account/navigation'
 const route = useRoute()
 const groupStates = ref([true, true, true, false])
 
-// Control sidebar visibility with transition timing
-const showSidebar = ref(true)
-const isExpanded = ref(false)
+  // Control sidebar visibility
+  const showSidebar = computed(() => 
+    route.path !== '/account/messages'
+  )
+  const isExpanded = computed(() => 
+    route.path === '/account/messages'
+  )
 
 function handleNavClick(item: any) {
   if (item.action === 'logout') {
     logout()
   }
 }
-
-// Watch route changes and control transition timing
-watch(() => route.path, (newPath, oldPath) => {
-  const newIsMessages = newPath === '/account/messages'
-  const oldIsMessages = oldPath === '/account/messages'
-  
-  if (newIsMessages !== oldIsMessages) {
-    if (newIsMessages) {
-      // Going TO messages - hide sidebar after a delay to let page transition start
-      setTimeout(() => {
-        showSidebar.value = false
-        isExpanded.value = true
-      }, 250) // Start during page fade out
-    } else {
-      // Going FROM messages - show sidebar immediately when page starts transitioning
-      showSidebar.value = true
-      isExpanded.value = false
-    }
-  }
-})
-
-// Initialize on mount
-onMounted(() => {
-  showSidebar.value = route.path !== '/account/messages'
-  isExpanded.value = route.path === '/account/messages'
-})
 
 function toggleGroup(index: number) {
   groupStates.value[index] = !groupStates.value[index]
