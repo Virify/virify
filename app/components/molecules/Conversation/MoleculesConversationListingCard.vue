@@ -1,31 +1,42 @@
 <template>
   <div v-if="conversation && conversation.listing" class="property-header">
-    <div class="property-image" v-if="firstImage">
-      <NuxtImg 
-        :src="firstImage" 
-        alt="Property image" 
-        width="268" 
-        height="100"
-        loading="eager"
-        sizes="268px"
-        format="webp,jpg"
-        quality="80"
-        placeholder="/img/preload.svg"
-      />
-    </div>
-    <div class="property-details">
-      <div class="property-info">
-        <h3 class="property-price | title-sm">{{ priceFormatted }}</h3>
-        <p class="property-address | body-xs">{{ address }}</p>
+    <div class="property-main-row">
+      <div class="property-image" v-if="firstImage">
+        <NuxtImg 
+          :src="firstImage" 
+          alt="Property image" 
+          width="268" 
+          height="100"
+          loading="eager"
+          sizes="268px"
+          format="webp,jpg"
+          quality="80"
+          placeholder="/img/preload.svg"
+        />
       </div>
-      <div class="agent-info">
-        <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
-        <div class="agent-details">
-          <div class="agent-avatar">
-            <AtomsIcon icon="profile" size="28" />
-          </div>
-          <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
+      <div class="property-details">
+        <div class="property-info">
+          <h3 class="property-price | title-sm">{{ priceFormatted }}</h3>
+          <p class="property-address | body-xs">{{ address }}</p>
         </div>
+        <div class="agent-info">
+          <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
+          <div class="agent-details">
+            <div class="agent-avatar">
+              <AtomsIcon icon="profile" size="28" />
+            </div>
+            <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="agent-info-row">
+      <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
+      <div class="agent-details">
+        <div class="agent-avatar">
+          <AtomsIcon icon="profile" size="28" />
+        </div>
+        <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
       </div>
     </div>
   </div>
@@ -69,11 +80,27 @@ const isMyProperty = computed(() => {
 .property-header {
   margin: 0 0 var(--size-16) 0;
   overflow: hidden;
+  container-type: inline-size;
 
-  /* Default: horizontal layout */
+  /* Default: vertical layout (narrow containers) */
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--size-8);
+
+  /* Side by side when there's enough room */
+  @container (min-width: 400px) {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--size-12);
+  }
+
+  .property-main-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--size-12);
+    flex: 1;
+  }
 
   .property-image {
     width: 80px;
@@ -81,7 +108,6 @@ const isMyProperty = computed(() => {
     flex-shrink: 0;
     border-radius: var(--border-radius-lg);
     overflow: hidden;
-    margin-right: var(--size-12);
     position: relative;
 
     img {
@@ -99,52 +125,57 @@ const isMyProperty = computed(() => {
     justify-content: space-between;
     padding: 0;
     color: var(--foreground-100);
+    min-width: 0;
+
+    .agent-info {
+      display: none;
+
+      /* Show when side by side layout */
+      @container (min-width: 400px) {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: var(--size-4);
+        margin-left: var(--size-12);
+      }
+    }
+  }
+
+  .agent-info-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--size-8);
+    flex-shrink: 0;
+
+    /* Hide when side by side layout */
+    @container (min-width: 400px) {
+      display: none;
+    }
   }
 
   .property-info {
     margin-bottom: 0;
     flex: 1;
+    min-width: 0;
   }
 
   .property-price {
     font-size: 1rem;
     font-weight: 600;
-    margin-bottom: var(--size-2);
+    margin: 0 0 var(--size-2) 0;
   }
 
   .property-address {
     font-size: 0.75rem;
-    margin-bottom: 0;
-  }
-
-  .agent-info {
-    margin-top: 0;
-    margin-left: var(--size-12);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: var(--size-4);
-  }
-
-  .property-badge {
-    align-self: flex-end;
-  }
-
-  .agent-details {
-    display: flex;
-    align-items: center;
-    gap: var(--size-8);
-  }
-
-  .property-price {
-    margin: 0 0 var(--size-4) 0;
-  }
-
-  .property-address {
     margin: 0;
   }
 
-  .agent-info {
+  .property-badge {
+    flex-shrink: 0;
+  }
+
+  .agent-details {
     display: flex;
     align-items: center;
     gap: var(--size-8);

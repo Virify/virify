@@ -287,6 +287,8 @@ function toggleCollapsed() {
 
     .a-select {
       width: 100%;
+      height: var(--input-text-height);
+      align-items: center;
     }
   }
 

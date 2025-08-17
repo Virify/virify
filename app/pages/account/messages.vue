@@ -170,7 +170,7 @@ watch(receivedSort, () => {
   selectedConversation.value = null
 })
 
-// Disable body scroll on mobile
+// Disable body scroll only on mobile (not tablet)
 onMounted(() => {
   const mediaQuery = window.matchMedia('(max-width: 768px)')
   
@@ -215,7 +215,6 @@ onMounted(() => {
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: var(--size-24);
-  margin-bottom: var(--size-16);
 }
 
 .messages-title {
@@ -237,6 +236,8 @@ onMounted(() => {
   @include mq.not-notebook {
     grid-template-columns: 1fr;
     gap: var(--size-12);
+    height: auto;
+    overflow: visible;
   }
 }
 
@@ -272,7 +273,7 @@ onMounted(() => {
     display: block;
     position: fixed;
     top: var(--header-offset);
-    background: var(--background-100);
+    background: var(--background-200);
     left: 0;
     right: 0;
     bottom: var(--mobile-nav-height);
@@ -331,6 +332,8 @@ onMounted(() => {
 .sort-select {
   min-width: 160px;
   padding: var(--size-8) var(--size-12);
+  height: var(--input-text-height);
+  align-items: center;
 
   @include mq.mobile-only {
     width: 100%;
