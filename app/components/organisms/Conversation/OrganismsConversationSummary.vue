@@ -19,12 +19,12 @@
         </div>
         <template v-if="searchEnabled !== false">
           <div class="o-chat-summary__search-row">
-            <input
+            <AtomsInput
               v-model="search"
               type="text"
-              class="o-chat-summary__search-input | body-sm"
               placeholder="Search conversations..."
               autocomplete="off"
+              class="body-sm"
             />
           </div>
         </template>
@@ -295,21 +295,6 @@ function toggleCollapsed() {
     margin: var(--size-8) 0;
   }
 
-  &__search-input {
-    display: block;
-    width: 100%;
-    padding: var(--size-8) var(--size-12);
-    border-radius: var(--border-radius-2xl);
-    border: 1px solid var(--foreground-200);
-    background: var(--background-200);
-    color: var(--foreground-100);
-    outline: none;
-    transition: border-color 0.2s;
-
-    &:focus {
-      border-color: var(--secondary-400);
-    }
-  }
 }
 
 

@@ -103,6 +103,10 @@ const firstImage = computed(() => {
     @include mq.mobile-only {
       padding: var(--size-8);
     }
+
+    .right-sidebar & {
+      padding: 0;
+    }
   }
 
   &__header {

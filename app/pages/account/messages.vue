@@ -56,7 +56,7 @@
 
   <!-- Mobile: Chat interface as the page -->
   <div class="mobile-chat-page">
-    <OrganismsConversationMobileSummary :isOpen="true" :show-close-button="false" variant="page" :search-enabled="true" :sort="true" @close="() => {}" />
+    <OrganismsConversationMobileSummary />
   </div>
 </template>
 
@@ -170,6 +170,27 @@ watch(receivedSort, () => {
   selectedConversation.value = null
 })
 
+// Disable body scroll on mobile
+onMounted(() => {
+  const mediaQuery = window.matchMedia('(max-width: 768px)')
+  
+  function handleMobileChange(e: MediaQueryListEvent | MediaQueryList) {
+    if (e.matches) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }
+  
+  handleMobileChange(mediaQuery)
+  mediaQuery.addEventListener('change', handleMobileChange)
+  
+  onUnmounted(() => {
+    mediaQuery.removeEventListener('change', handleMobileChange)
+    document.body.style.overflow = ''
+  })
+})
+
 </script>
 
 <style lang="scss" scoped>
@@ -254,12 +275,12 @@ watch(receivedSort, () => {
     background: var(--background-100);
     left: 0;
     right: 0;
-    bottom: var(--mobile-nav-header-height);
+    bottom: var(--mobile-nav-height);
     width: 100vw;
     height: calc(100vh - var(--header-offset) - var(--mobile-nav-header-height));
-    padding: var(--size-16) var(--size-16) 0 var(--size-16);
     box-sizing: border-box;
     z-index: 10;
+    overflow: hidden;
   }
 }
 
