@@ -49,7 +49,7 @@ useHead({
 </script>
 <style lang="scss">
 .page {
-  min-height: calc(100vh - var(--header-expanded-height) - var(--size-16));
+  min-height: calc(100dvh - var(--header-expanded-height) - var(--size-16));
   background: var(--background-100);
 }
 

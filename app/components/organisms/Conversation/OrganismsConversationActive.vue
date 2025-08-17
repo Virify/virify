@@ -123,7 +123,7 @@ async function sendReply(message: string) {
     top: var(--header-offset);
     left: 0;
     width: 100vw;
-    height: calc(100vh - var(--header-offset) - var(--mobile-nav-header-height));
+    height: calc(100dvh - var(--header-offset) - var(--mobile-nav-header-height));
     background: rgba(0, 0, 0, 0.5);
     z-index: 1002;
     opacity: 0;

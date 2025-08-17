@@ -153,7 +153,7 @@ useHead({
   top: calc(var(--header-offset, 0) + var(--size-16));
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
+  max-height: calc(100dvh - var(--header-offset, 0) - var(--size-48));
   z-index: 10;
   align-self: start;
   overflow: hidden;
@@ -166,7 +166,7 @@ useHead({
   top: calc(var(--header-offset, 0) + var(--size-16));
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
+  max-height: calc(100dvh - var(--header-offset, 0) - var(--size-48));
   z-index: 10;
   align-self: start;
 

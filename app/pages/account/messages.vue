@@ -309,7 +309,7 @@ onMounted(() => {
     right: 0;
     bottom: var(--mobile-nav-height);
     width: 100vw;
-    height: calc(100vh - var(--header-offset) - var(--mobile-nav-header-height));
+    height: calc(100dvh - var(--header-offset) - var(--mobile-nav-header-height));
     box-sizing: border-box;
     z-index: 10;
     overflow: hidden;

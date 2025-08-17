@@ -51,7 +51,7 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
 .chat-summary-container {
   flex: 1 1 auto;
   min-height: 0;
-  height: calc(100vh - var(--header-offset) - var(--mobile-nav-height) - 100px);
+  height: calc(100dvh - var(--header-offset) - var(--mobile-nav-height) - 100px);
 }
 
 .chat-title {
