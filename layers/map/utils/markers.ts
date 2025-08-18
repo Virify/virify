@@ -54,7 +54,7 @@ export function renderMarker(
  * @returns Popup instance
  */
 export function renderPopup(marker: MapMarker, vueApp?: any): any {
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
   const popupWrapper = document.createElement("div");
   
   const PopupComp = defineComponent({

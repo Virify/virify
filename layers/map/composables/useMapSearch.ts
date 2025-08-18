@@ -2,7 +2,7 @@ import { calculateDistance, milesToMeters } from '../utils/calculate';
 import type { GeocodingFeature, GeocodingFeatureWithBoundary, GeocodingResponse } from '~~/shared/types/map';
 
 export function useMapSearch() {
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
 
   /**
    * Geocoding autocomplete

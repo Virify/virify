@@ -13,7 +13,7 @@
 export function setControls(existingMapInstance: MapInstance, map: ExtendedMapTilerMap, options: MapOptions): boolean | void {
   const prevInteractive = existingMapInstance.interactive;
   const newInteractive = options.interactive;
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
   const controls = map._controls ?? [];
 
   if (prevInteractive !== newInteractive) {
@@ -92,7 +92,7 @@ export function disableAllControls(map: ExtendedMapTilerMap) {
  * @param position Position for the control
  */
 export function addNavigationControl(map: ExtendedMapTilerMap, position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'top-right') {
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
   const navControl = new sdk.NavigationControl() as any;
   map.addControl(navControl, position);
 }
@@ -103,7 +103,7 @@ export function addNavigationControl(map: ExtendedMapTilerMap, position: 'top-le
  * @param map The map object
  */
 export function removeNavigationControl(map: ExtendedMapTilerMap) {
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
   const controls = map._controls ?? [];
   for (const control of controls) {
     if (control instanceof sdk.NavigationControl || control instanceof sdk.GeolocateControl) {

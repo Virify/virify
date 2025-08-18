@@ -2,7 +2,7 @@ const mapCache = new Map<string, MapInstance>();
 export const GLOBAL_MAP_ID = "virify-map";
 
 export function useMapConfig() {
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
 
   /**
    * Reuse an existing map instance if it exists.

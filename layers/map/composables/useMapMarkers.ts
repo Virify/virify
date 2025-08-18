@@ -2,7 +2,7 @@ import { Marker } from "@maptiler/sdk";
 
 export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   const vueApp = useNuxtApp();
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
 
   /**
    * Private helper to create and add a single SDK marker to the map and instance.
