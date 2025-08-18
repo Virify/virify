@@ -53,6 +53,7 @@ export type ExtendedMapTilerMap = MaptilerMap & {
   getSource(id: string): any;
   addSource(id: string, source: any): void;
   removeSource(id: string): void;
+  addImage(id: string, options: Record<string, unknown>): void
   getLayer(id: string): any;
   addLayer(layer: any): void;
   removeLayer(id: string): void;

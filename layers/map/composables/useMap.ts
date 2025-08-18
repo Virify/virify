@@ -1,4 +1,3 @@
-import { useMapConfig } from "./useMapConfig";
 import { useMapMarkers } from "./useMapMarkers";
 import { useMapDraw } from "./useMapDraw";
 import { useMapSearch } from "./useMapSearch";
@@ -6,25 +5,25 @@ import { useMapVisualization } from "./useMapVisualization";
 
 export function useMap() {
   // Initialize all specialized composables
-  const { initMap, getMapCache, GLOBAL_MAP_ID } = useMapConfig();
-  const mapCache = getMapCache();
-  
-  const { 
-    addMarker, 
-    addMarkers, 
-    addMarkersForFeature, 
-    clearMarkers, 
-    clearMarkersForFeature 
+  const { initMap, getExistingMap } = useInitMap();
+  const mapCache = getExistingMap();
+
+  const {
+    addMarker,
+    addMarkers,
+    addMarkersForFeature,
+    clearMarkers,
+    clearMarkersForFeature
   } = useMapMarkers(mapCache);
-  
-  const { 
-    initDrawing, 
-    getDrawControl, 
-    togglePolygonDrawing, 
-    deleteAllShapes, 
-    deleteSelectedShape, 
-    getBBox, 
-    setBBox, 
+
+  const {
+    initDrawing,
+    getDrawControl,
+    togglePolygonDrawing,
+    deleteAllShapes,
+    deleteSelectedShape,
+    getBBox,
+    setBBox,
     clearBBox,
     drawingState,
     polygonGeometries
@@ -49,8 +48,7 @@ export function useMap() {
   return {
     // Map initialization
     initMap,
-    GLOBAL_MAP_ID,
-    
+
     // Marker management
     addMarkers,
     addMarker,

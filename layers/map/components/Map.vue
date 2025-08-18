@@ -46,7 +46,6 @@ const props = withDefaults(defineProps<{
 }>(), {
   interactive: true,
   zoom: 5, // Zoom level to show entire UK
-  mapId: GLOBAL_MAP_ID,
   center: () => [-2.5, 54.7], // Geographic center of UK [lon, lat]
   draw: false,
   searchRadius: null,
@@ -156,7 +155,7 @@ function loadMap() {
         zoom: props.zoom,
         center: props.center ?? [0, 0],
       },
-      props.mapId ?? GLOBAL_MAP_ID,
+      props.mapId
     );
     
     // Reset the initial load flag after a short delay to allow the watcher to handle initial positioning
