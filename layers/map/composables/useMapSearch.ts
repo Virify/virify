@@ -104,15 +104,23 @@ export function useMapSearch() {
    * Find nearby amenities (schools, hospitals, shops) based on lat/long coordinates
    * TODO: Batch these requests to reduce API calls
    */
-  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000): Promise<{
-    schools: Array<{ name: string; distance: number; type: string }>;
-    hospitals: Array<{ name: string; distance: number; type: string }>;
-    train_stations: Array<{ name: string; distance: number; type: string }>;
-  }> {
-    const amenities = {
-      schools: [] as Array<{ name: string; distance: number; type: string }>,
-      hospitals: [] as Array<{ name: string; distance: number; type: string }>,
-      train_stations: [] as Array<{ name: string; distance: number; type: string }>
+  interface Amenity {
+    name: string
+    distance: number
+    type: string
+  }
+
+  interface Amenities {
+    schools: Amenity[]
+    hospitals: Amenity[]
+    train_stations: Amenity[]
+  }
+
+  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000): Promise<Amenities> {
+    const amenities: Amenities = {
+      schools: [],
+      hospitals: [],
+      train_stations: []
     };
 
     try {
