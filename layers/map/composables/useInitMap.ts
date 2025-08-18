@@ -52,8 +52,10 @@ export function useInitMap() {
     // Get map options
     const { zoom = 6, center } = asObject(options)
 
-    // reset map controls and options
-    setControls(mapInstance, mapInstance.map, options);
+    // Reset map controls, options
+    const { setControls } = useMapControls(mapInstance)
+
+    setControls(options);
 
     // Reset zoom, center for map
     mapInstance.map.setZoom(zoom);
