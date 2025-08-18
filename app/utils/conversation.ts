@@ -309,3 +309,27 @@ export const sortConversations = (
       return sortConversationsByUnreadAndRecency(conversationsCopy, userId);
   }
 };
+
+/**
+ * Get newly-added messages between two lengths and return only those that are unread and sent by other users
+ *
+ * @param conversation - Conversation object
+ * @param oldLen - Previous length of the messages array
+ * @param newLen - New length of the messages array
+ * @param currentUserId - ID of current user
+ * @returns Array of messages that were newly added and need marking
+ */
+export const getNewUnreadMessagesFromOthers = (
+  conversation: ConversationWithUserAndMessages | null | undefined,
+  oldLen: number | undefined | null,
+  newLen: number | undefined | null,
+  currentUserId?: number | string | null
+): MessageWithUser[] => {
+  if (!conversation || !Array.isArray(conversation.messages)) return [];
+  if (!oldLen || !newLen || newLen <= oldLen) return [];
+
+  const start = oldLen;
+  const added = conversation.messages.slice(start, newLen);
+
+  return added.filter(m => !m.isRead && m.senderId !== currentUserId);
+};

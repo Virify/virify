@@ -26,7 +26,7 @@
             <div class="agent-avatar">
               <AtomsIcon icon="profile" size="28" />
             </div>
-            <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
+            <span class="agent-name | body-sm">{{ conversation.listing.user?.username  }}</span>
           </div>
         </div>
       </div>
@@ -37,7 +37,7 @@
         <div class="agent-avatar">
           <AtomsIcon icon="profile" size="28" />
         </div>
-        <span class="agent-name | body-sm">{{ conversation.sender?.username }}</span>
+        <span class="agent-name | body-sm">{{ conversation.sender?.username || conversation.sender.email }}</span>
       </div>
     </div>
     </NuxtLink>
@@ -153,7 +153,7 @@ const isMyProperty = computed(() => {
     align-items: center;
     gap: var(--size-8);
     flex-shrink: 0;
-
+    padding-top: var(--size-8);
     /* Hide when side by side layout */
     @container (min-width: 400px) {
       display: none;

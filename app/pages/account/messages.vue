@@ -84,6 +84,7 @@ const receivedSort = ref("all")
 // Selected conversation
 const selectedConversation = ref<ConversationWithUserAndMessages | null>(null)
 const messagesContainer = ref<HTMLDivElement | null>(null)
+const marking = ref(false)
 
 
 const sortOptions = [
@@ -187,16 +188,23 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
 
 function markUnreadMessagesAsRead(conversation: ConversationWithUserAndMessages) {
   if (!conversation || !user.value) return
-  
+  if (marking.value) return
+  marking.value = true
+
   const currentUserId = user.value.id
   const unreadMessages = conversation.messages.filter(
     message => !message.isRead && message.senderId !== currentUserId
   )
-  
-  // Mark each unread message as read
+
+  // Only mark messages that are actually unread
   unreadMessages.forEach(message => {
-    markMessageAsRead(message.id, conversation.id)
+    if (!message.isRead) {
+      markMessageAsRead(message.id, conversation.id)
+    }
   })
+
+  // Allow marking again after next tick
+  nextTick(() => { marking.value = false })
 }
 
 async function handleSendReply(message: string) {
@@ -214,10 +222,26 @@ async function handleSendReply(message: string) {
 }
 
 // Watch for changes in messages and scroll to bottom
-watch(() => selectedConversation.value?.messages?.length, () => {
+// Watch for changes in messages: scroll and mark incoming messages as read when conversation is active
+watch(() => selectedConversation.value?.messages?.length, (newLen, oldLen) => {
   nextTick(() => {
     scrollToBottom(messagesContainer.value)
   })
+
+  if (!selectedConversation.value || !user.value) return
+  if (!oldLen || !newLen || newLen <= oldLen) return
+
+  const newMessages: MessageWithUser[] = getNewUnreadMessagesFromOthers(selectedConversation.value, oldLen, newLen, user.value?.id)
+
+  if (!newMessages.length) return
+  if (marking.value) return
+  marking.value = true
+
+  newMessages.forEach(message => {
+    markMessageAsRead(message.id, selectedConversation.value!.id)
+  })
+
+  nextTick(() => { marking.value = false })
 })
 
 // Reset selected conversation when sort/filter changes

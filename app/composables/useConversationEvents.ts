@@ -83,10 +83,12 @@ export function useConversationEvents(conversationState: ReturnType<typeof useCo
       // Find and update the message read status
       const message = conversation.messages.find((m: any) => m.id === messageId);
       if (message) {
-        message.isRead = true;
-        
-        // Force reactivity by creating a new array reference
-        allConversations.value = [...allConversations.value];
+        // Only update/react if the message wasn't already marked as read
+        if (!message.isRead) {
+          message.isRead = true;
+          // Force reactivity by creating a new array reference
+          allConversations.value = [...allConversations.value];
+        }
       }
     },
   };
@@ -115,9 +117,12 @@ export function useConversationEvents(conversationState: ReturnType<typeof useCo
         if (conversation) {
           const message = conversation.messages.find((m: any) => m.id === messageId);
           if (message) {
-            message.isRead = true;
-            // Force reactivity by creating a new array reference
-            allConversations.value = [...allConversations.value];
+            // Only perform optimistic update if message wasn't already read
+            if (!message.isRead) {
+              message.isRead = true;
+              // Force reactivity by creating a new array reference
+              allConversations.value = [...allConversations.value];
+            }
           }
         }
       }

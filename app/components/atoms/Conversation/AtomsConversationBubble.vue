@@ -1,15 +1,21 @@
 <template>
   <div class="conversation-bubble" :class="{ 'sent': variant === 'sent', 'received': variant === 'received' }">
+    <p class="bubble-user | body-xs">{{ contentPov }}</p>
     <p class="bubble-content | body-sm">{{ content }}</p>
     <slot name="status" />
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
+  user: String;
   content: string;
   variant: 'sent' | 'received';
 }>();
+
+const contentPov = computed(() => {
+return props.variant === 'sent' ? 'You' : props.user;
+});
 </script>
 
 <style lang="scss" scoped>
@@ -20,6 +26,7 @@ defineProps<{
   border-radius: var(--border-radius-lg);
   border-bottom-left-radius: 0;
   max-width: 280px;
+  min-width: 50%;
   align-self: flex-start;
   position: relative;
 
@@ -29,6 +36,10 @@ defineProps<{
     margin-left: auto;
     border-bottom-left-radius: var(--border-radius-lg);
     border-bottom-right-radius: 0;
+  }
+
+  .bubble-user {
+    font-style: italic;
   }
 
   .bubble-content {

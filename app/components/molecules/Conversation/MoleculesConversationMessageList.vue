@@ -2,7 +2,8 @@
   <div class="conversation-messages">
     <ul class="messages-list">
       <li v-for="message in messages" :key="message.id" class="message-item">
-        <AtomsConversationBubble 
+        <AtomsConversationBubble
+          :user="message.sender?.username || message.sender?.email"
           :content="message.content"
           :variant="getMessageVariant(message)"
         >

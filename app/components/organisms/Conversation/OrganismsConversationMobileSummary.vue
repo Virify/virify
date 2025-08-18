@@ -50,10 +50,6 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
   border-bottom: 1px solid var(--border-100);
 }
 
-.chat-summary-container {
-  min-height: calc(100dvh - 100px);
-}
-
 .chat-title {
   margin: 0;
   color: var(--foreground-100);

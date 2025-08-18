@@ -2,7 +2,7 @@
   <div class="conversation-overlay" :class="{ open: isOpen }" @click="$emit('back')">
     <aside class="conversation-detail" @click.stop>
       <div class="conversation-header">
-        <h3 class="conversation-title | title-xs">{{ conversation?.sender?.username }}</h3>
+        <h3 class="conversation-title | title-xs">{{ formattedPartnerName }}</h3>
         <button class="close-btn" @click="$emit('back')">
           <AtomsIcon icon="cross" size="24" />
         </button>
@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
 
 const props = defineProps<{
   isOpen: boolean;
@@ -38,23 +37,61 @@ const conversationEvents = useConversationEvents(conversationState);
 // Reply logic
 const sending = ref(false)
 const scrollableRef = ref<HTMLDivElement | null>(null)
+const marking = ref(false)
+
+// Partner name computation
+const conversationPartnerName = computed(() => {
+  if (!props.conversation) return '';
+  const pov = getConversationPoV(props.conversation, props.currentUserId as number);
+  return pov.name;
+});
+
+const formattedPartnerName = computed(() => {
+  const name = conversationPartnerName.value;
+  return typeof name === "string" ? formatPartnerName(name) : name;
+});
 
 
 onMounted(() => {
   scrollToBottomInternal();
-  // Mark messages as read when component mounts and conversation is open
-  if (props.isOpen && props.conversation) {
-    markUnreadMessagesAsRead();
-  }
 });
 
-// Simple watcher just for scrolling when messages change
-watch(() => props.conversation?.messages?.length, scrollToBottomInternal);
+// Watch for message list length changes: scroll, and if conversation is open mark incoming messages as read
+// Combined watcher: handles conversation open (mark all unread) and new incoming messages (mark newly-added unread)
+watch([
+  () => props.isOpen,
+  () => props.conversation?.messages?.length,
+], ([isOpen, newLen], [oldIsOpen, oldLen]) => {
+  // Always ensure we scroll when messages change or conversation opens
+  scrollToBottomInternal();
 
-// Mark messages as read ONLY when conversation opens (not when new messages arrive)
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen && props.conversation) {
-    markUnreadMessagesAsRead();
+  // If conversation just opened, mark all unread messages
+  if (isOpen && !oldIsOpen && props.conversation) {
+    if (marking.value) return;
+    marking.value = true;
+
+    const unreadMessages = props.conversation.messages.filter(
+      (m: any) => !m.isRead && m.senderId !== props.currentUserId
+    );
+
+    unreadMessages.forEach(m => conversationEvents.markMessageAsRead(m.id, props.conversation!.id));
+
+    nextTick(() => { marking.value = false });
+  }
+
+  // If new messages were appended while conversation is open, mark the newly added unread ones
+  if (isOpen && props.conversation && oldLen && newLen && newLen > oldLen) {
+    const newMessages: MessageWithUser[] = getNewUnreadMessagesFromOthers(props.conversation, oldLen, newLen, props.currentUserId)
+    if (!newMessages.length) return
+
+    if (marking.value) return
+    marking.value = true
+
+    newMessages.forEach(message => {
+      conversationEvents.markMessageAsRead(message.id, props.conversation!.id);
+    })
+
+    nextTick(() => { marking.value = false })
   }
 });
 
@@ -64,6 +101,8 @@ watch(() => props.isOpen, (isOpen) => {
  */
 function markUnreadMessagesAsRead() {
   if (!props.conversation || !props.currentUserId) return;
+  // Prevent re-entrant calls
+  marking.value = true
   
   const unreadMessages = props.conversation.messages.filter(
     message => !message.isRead && message.senderId !== props.currentUserId
@@ -73,6 +112,11 @@ function markUnreadMessagesAsRead() {
   unreadMessages.forEach(message => {
     conversationEvents.markMessageAsRead(message.id, props.conversation!.id);
   });
+
+  // Release the guard after next tick to allow state updates to settle
+  nextTick(() => {
+    marking.value = false
+  })
 }
 
 function scrollToBottomInternal() {
@@ -191,7 +235,7 @@ async function sendReply(message: string) {
   position: relative;
   overscroll-behavior: contain;
   touch-action: pan-y;
-  padding: var(--size-16);
+  padding: 0 var(--size-16);
 }
 
 
