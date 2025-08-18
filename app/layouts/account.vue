@@ -104,6 +104,7 @@ useHead({
   
   @media (max-width: 768px) {
     min-height: calc(100dvh - var(--header-height));
+    margin-bottom: var(--size-64);
   }
 }
 
