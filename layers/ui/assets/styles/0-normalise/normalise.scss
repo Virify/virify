@@ -351,3 +351,11 @@ button {
   color: inherit;
   -webkit-text-fill-color: inherit;
 }
+
+/**
+ * Prevent iOS Safari from applying system blue color to select elements
+ */
+select {
+  color: inherit;
+  -webkit-text-fill-color: inherit;
+}

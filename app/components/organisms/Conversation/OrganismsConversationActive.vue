@@ -14,6 +14,7 @@
       </div>
 
       <MoleculesConversationReplyInput v-if="conversation" @send="sendReply" />
+      
     </aside>
   </div>
 </template>
@@ -38,20 +39,6 @@ const conversationEvents = useConversationEvents(conversationState);
 const sending = ref(false)
 const scrollableRef = ref<HTMLDivElement | null>(null)
 
-
-watchEffect(() => {
-  if (import.meta.client && props.isOpen && window.innerWidth <= 768) {
-    document.documentElement.style.overflow = 'hidden'
-  } else if (import.meta.client) {
-    document.documentElement.style.overflow = ''
-  }
-})
-
-onUnmounted(() => {
-  if (import.meta.client) {
-    document.documentElement.style.overflow = ''
-  }
-})
 
 onMounted(() => {
   scrollToBottomInternal();
@@ -122,10 +109,11 @@ async function sendReply(message: string) {
     position: fixed;
     top: var(--header-offset);
     left: 0;
+    bottom: var(--mobile-nav-height);
+    height: calc(100dvh - var(--header-offset) - var(--mobile-nav-height));
     width: 100vw;
-    height: calc(100dvh - var(--header-offset) - var(--mobile-nav-header-height));
     background: rgba(0, 0, 0, 0.5);
-    z-index: 1002;
+    z-index: 40;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -151,10 +139,12 @@ async function sendReply(message: string) {
     position: absolute;
     top: 0;
     right: 0;
+    bottom: 0;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     transform: translateX(100%);
     transition: transform 0.3s ease;
     border-radius: 0;
+    padding-bottom: var(--mobile-nav-height);
     
     .open & {
       transform: translateX(0);
@@ -207,60 +197,7 @@ async function sendReply(message: string) {
   padding: var(--size-16);
 }
 
-.conversation-messages {
-  padding: 0;
 
-  .messages-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-12);
-  }
-
-  .message-item {
-    background: var(--primary-600);
-    padding: var(--size-12) var(--size-16);
-    border-radius: var(--border-radius-lg);
-    border-bottom-left-radius: 0;
-    max-width: 280px;
-    align-self: flex-start;
-    position: relative;
-
-    &.from-me {
-      background: var(--secondary-500);
-      color: var(--foreground-100);
-      align-self: flex-end;
-      border-bottom-left-radius: var(--border-radius-lg);
-      border-bottom-right-radius: 0;
-    }
-
-    .message-content {
-      margin: 0 0 var(--size-8) 0;
-      color: var(--monochrome-100);
-    }
-
-    .message-status {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--size-8);
-      color: var(--monochrome-400);
-
-      .message-time {
-        color: var(--monochrome-400);
-        flex-shrink: 0;
-      }
-
-      .message-read-status {
-        display: flex;
-        align-items: center;
-        gap: var(--size-4);
-      }
-    }
-  }
-}
 
 .reply-section {
   flex-shrink: 0;
@@ -277,6 +214,20 @@ async function sendReply(message: string) {
     position: relative;
     display: flex;
     align-items: center;
+  }
+}
+
+.mobile-nav-overlay {
+  @media (max-width: 768px) {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1004;
+  }
+  
+  @media (min-width: 769px) {
+    display: none;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="mobile-chat-page">
+  <div class="mobile-chat">
     <div class="mobile-chat-header">
       <h3 class="chat-title">Conversations</h3>
     </div>
@@ -29,29 +29,29 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
 </script>
 
 <style lang="scss" scoped>
-.mobile-chat-page {
-  display: flex;
-  flex-direction: column;
+.mobile-chat {
   width: 100%;
-  height: 100%;
   background: var(--background-200);
+  box-sizing: border-box;
+  border-radius: var(--border-radius-2xl);
+  border: 1px solid var(--background-300);
   overflow: hidden;
 }
 
-
 .mobile-chat-header {
+  position: sticky;
+  top: 0;
+  background: var(--background-200);
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--size-20) var(--size-20) var(--size-16);
   border-bottom: 1px solid var(--border-100);
-  // flex-shrink: 0;
 }
 
 .chat-summary-container {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: calc(100dvh - var(--header-offset) - var(--mobile-nav-height) - 100px);
+  min-height: calc(100dvh - 100px);
 }
 
 .chat-title {
@@ -60,6 +60,4 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
   font-size: 1.25rem;
   font-weight: 600;
 }
-
-
 </style>

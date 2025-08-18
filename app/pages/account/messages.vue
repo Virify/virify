@@ -225,26 +225,7 @@ watch(receivedSort, () => {
   selectedConversation.value = null
 })
 
-// Disable body scroll only on mobile (not tablet)
-onMounted(() => {
-  const mediaQuery = window.matchMedia('(max-width: 768px)')
-  
-  function handleMobileChange(e: MediaQueryListEvent | MediaQueryList) {
-    if (e.matches) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-  }
-  
-  handleMobileChange(mediaQuery)
-  mediaQuery.addEventListener('change', handleMobileChange)
-  
-  onUnmounted(() => {
-    mediaQuery.removeEventListener('change', handleMobileChange)
-    document.body.style.overflow = ''
-  })
-})
+
 
 </script>
 
@@ -326,17 +307,7 @@ onMounted(() => {
 
   @include mq.mobile-only {
     display: block;
-    position: fixed;
-    top: var(--header-offset);
-    background: var(--background-200);
-    left: 0;
-    right: 0;
-    bottom: var(--mobile-nav-height);
-    width: 100vw;
-    height: calc(100dvh - var(--header-offset) - var(--mobile-nav-header-height));
-    box-sizing: border-box;
-    z-index: 10;
-    overflow: hidden;
+    width: 100%;
   }
 }
 
@@ -396,66 +367,13 @@ onMounted(() => {
   }
 }
 
-.conversations-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--size-16);
-  height: fit-content;
-  overflow: hidden;
-
-  // When there's an active conversation, use fixed height for scrolling
-  &--has-active-conversation {
-    height: 60vh;
-
-    @include mq.not-notebook {
-      height: fit-content;
-    }
-
-    @include mq.mobile-only {
-      height: 400px;
-    }
-  }
-
-  @include mq.not-notebook {
-    grid-template-columns: 1fr;
-    gap: var(--size-12);
-  }
-
-}
 
 .conversations-list {
   background: var(--background-200);
   border-radius: var(--border-radius-lg);
   overflow-y: auto;
   padding-right: var(--size-8);
-  
-  .conversations-grid:not(.conversations-grid--has-active-conversation) & {
-    height: fit-content;
-    max-height: 60vh;
-  }
-  
-  .conversations-grid--has-active-conversation & {
-    height: 100%;
 
-    @include mq.not-notebook {
-      height: 50vh;
-    }
-  }
-}
-
-.conversation-details {
-  background: var(--background-200);
-  border-radius: var(--border-radius-lg);
-  overflow-y: auto;
-  padding-right: var(--size-8);
-  
-  .conversations-grid--has-active-conversation & {
-    height: 100%;
-
-    @include mq.not-notebook {
-      height: 50vh;
-    }
-  }
 }
 
 .conversation-content {

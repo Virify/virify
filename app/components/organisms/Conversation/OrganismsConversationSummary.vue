@@ -159,8 +159,9 @@ function toggleCollapsed() {
   }
   
   @include mq.mobile-only {
-    height: 100%;
+    height: auto;
     max-height: none;
+    border-radius: inherit;
     
     &.collapsed {
       height: auto;
@@ -223,7 +224,7 @@ function toggleCollapsed() {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    // overflow: hidden;
     min-height: 0;
   }
 
@@ -235,7 +236,10 @@ function toggleCollapsed() {
     flex: 1 1 auto;
     overflow-y: auto;
     min-height: 0;
-    -webkit-overflow-scrolling: touch;
+    
+    @include mq.mobile-only {
+      overflow-y: visible;
+    }
   }
 
   &__loading {

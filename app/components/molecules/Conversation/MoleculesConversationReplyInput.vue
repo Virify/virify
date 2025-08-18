@@ -39,7 +39,7 @@ async function handleSend() {
   }
 
   .right-sidebar & {
-    padding: var(--size-8) var(--size-16);
+    padding: var(--size-16);
   }
 
   .reply-input-container {

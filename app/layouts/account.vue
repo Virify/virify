@@ -30,11 +30,11 @@
 
       <!-- Bottom Navigation Slot -->
       <slot name="bottom-navigation">
-        <OrganismsNavigationAccountMobile />
+        <OrganismsNavigationAccountMobile class="mobile-only-nav" />
       </slot>
     </div>
 
-    <OrganismsFooter />
+    <OrganismsFooter class="desktop-only-footer" />
 
     <ViewsDialog />
     <MoleculesToastContainer />
@@ -250,6 +250,28 @@ useHead({
 .page-enter-to,
 .page-leave-from {
   opacity: 1;
+}
+
+.mobile-only-nav {
+  @include mq.mobile-only {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  @include mq.tablet {
+  display: none;
+}
+}
+
+
+
+.desktop-only-footer {
+  @include mq.mobile-only {
+    display: none;
+  }
 }
 
 </style>

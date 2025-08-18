@@ -5,7 +5,8 @@
         <AtomsIcon icon="read-more" size="28" />
         <span class="nav-label | body-xs">Menu</span>
       </li>
-      <li class="bottom-nav-item" :class="{ 'current-page': $route.path === '/account' || $route.path === '/account/' }">
+      <li class="bottom-nav-item"
+        :class="{ 'current-page': $route.path === '/account' || $route.path === '/account/' }">
         <NuxtLink to="/account" class="nav-link" @click="$emit('closeBoth')">
           <AtomsIcon icon="property/house" size="28" />
           <span class="nav-label | body-xs">Dashboard</span>
@@ -47,52 +48,42 @@ const chatNotificationCount = computed(() => {
 
 <style lang="scss" scoped>
 .mobile-bottom-nav {
-  display: none;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--background-200);
+  padding: var(--size-4);
+  z-index: 1003;
+  box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
 
-  @media (max-width: 768px) {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    background: var(--background-200);
-    padding: var(--size-16);
-    padding-bottom: calc(var(--size-16) + env(safe-area-inset-bottom));
-    z-index: 1001;
-    box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
-    justify-content: space-around;
-    align-items: center;
-    min-height: var(--mobile-nav-height);
-    transform: translateZ(0);
-    
-    /* iOS Safari specific fixes */
-    @supports (-webkit-touch-callout: none) {
-      position: -webkit-sticky;
-      position: sticky;
-      bottom: env(safe-area-inset-bottom, 0);
-    }
+  @media (min-width: 769px) {
+    display: none;
   }
+
 
   ul {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
     width: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
+    box-sizing: border-box;
   }
 
   .bottom-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: var(--size-4);
     padding: var(--size-8);
     border-radius: var(--border-radius-md);
     cursor: pointer;
-    min-width: 60px;
     color: var(--foreground-100);
 
     &.active {
