@@ -105,15 +105,14 @@ async function sendReply(message: string) {
   width: 100%;
   height: 100%;
 
-  @media (max-width: 768px) {
+@include mq.mobile-only {
     position: fixed;
     top: var(--header-offset);
     left: 0;
-    bottom: var(--mobile-nav-height);
-    height: calc(100dvh - var(--header-offset) - var(--mobile-nav-height));
+    height: calc(100dvh - var(--header-offset));
     width: 100vw;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 40;
+    z-index: 9999;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -132,7 +131,6 @@ async function sendReply(message: string) {
   display: flex;
   flex-direction: column;
   touch-action: manipulation;
-  overflow: hidden;
   border-radius: var(--border-radius-xl);
 
   @media (max-width: 768px) {
@@ -144,7 +142,6 @@ async function sendReply(message: string) {
     transform: translateX(100%);
     transition: transform 0.3s ease;
     border-radius: 0;
-    padding-bottom: var(--mobile-nav-height);
     
     .open & {
       transform: translateX(0);
@@ -207,27 +204,12 @@ async function sendReply(message: string) {
   
   @include mq.mobile-only {
     padding: 16px;
-    padding-bottom: calc(var(--size-16) + env(safe-area-inset-bottom));
   }
 
   .reply-input-container {
     position: relative;
     display: flex;
     align-items: center;
-  }
-}
-
-.mobile-nav-overlay {
-  @media (max-width: 768px) {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1004;
-  }
-  
-  @media (min-width: 769px) {
-    display: none;
   }
 }
 </style>
