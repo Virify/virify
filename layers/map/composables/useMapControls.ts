@@ -1,3 +1,4 @@
+import type { NavigationControl, GeolocateControl } from '@maptiler/sdk'
 type ControlPositions = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 /**
@@ -11,22 +12,22 @@ export function useMapControls(mapInstance: MapInstance) {
   /**
    * Validate whether an input is a NavigationControl
    */
-  function _isNavigationControl(arg: unknown): arg is sdk.NavigationControl {
+  function _isNavigationControl(arg: unknown): arg is NavigationControl {
     return arg instanceof sdk.NavigationControl
   }
 
   /**
    * Validate whether an input is a GeolocateControl
    */
-  function _isGeolocateControl(arg: unknown): arg is sdk.GeolocateControl {
+  function _isGeolocateControl(arg: unknown): arg is GeolocateControl {
     return arg instanceof sdk.GeolocateControl
   }
 
   /**
    * Validate whether an input is a control
    */
-  function _isControl(arg: sdk.NavigationControl): arg is sdk.NavigationControl
-  function _isControl(arg: sdk.GeolocateControl): arg is sdk.GeolocateControl
+  function _isControl(arg: NavigationControl): arg is NavigationControl
+  function _isControl(arg: GeolocateControl): arg is GeolocateControl
   function _isControl(arg: unknown): boolean {
     return _isNavigationControl(arg) || _isGeolocateControl(arg)
   }
