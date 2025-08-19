@@ -145,4 +145,17 @@ const priceDisplay = computed(() => {
     }
   }
 }
+
+/**
+ *  Sort z-index order of marker
+ */
+.maplibregl-marker {
+  &:has(.m-price-marker--featured) {
+    z-index: 2;
+  }
+
+  &:has(.m-price-marker--premium) {
+    z-index: 3;
+  }
+}
 </style>
