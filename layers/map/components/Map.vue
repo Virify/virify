@@ -10,8 +10,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { formatMarker } from '../utils/markers';
-
 /**
  * state
  */
@@ -173,12 +171,10 @@ function loadMap() {
 function updateMarkers() {
   if (!map.value) return;
 
-  clearMarkers(map.value);
-
   const { markers } = props
-  const formattedMarkers = asArray(markers, true).map(formatMarker)
 
-  addMarkers(map.value, formattedMarkers);
+  clearMarkers(map.value);
+  addMarkers(map.value, markers);
 }
 
 /**

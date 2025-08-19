@@ -80,20 +80,28 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
    * @param markers Array of markers to add
    * @returns Array of newly created marker objects
    */
-  function addMarkers(map: ExtendedMapTilerMap, markersData: MapMarker[]): Marker[] {
+  function addMarkers(
+    map: ExtendedMapTilerMap,
+    markers: ListingCardType[] | undefined
+  ): Marker[] {
     const instance = findMapInstance(map, mapCache);
+
     if (!instance) {
       console.error("[Map] Instance not found");
+
       return [];
     }
 
     const addedSdkMarkers: Marker[] = [];
-    for (const markerData of markersData) {
-      const newSdkMarker = _createAndAddSdkMarker(map, markerData, instance);
-      addedSdkMarkers.push(newSdkMarker);
+
+    for (const marker of asArray(markers, true)) {
+      const formattedMarker = formatMarker(marker)
+
+      addedSdkMarkers.push(_createAndAddSdkMarker(map, formattedMarker, instance));
     }
 
     console.log(`[Map] Added ${addedSdkMarkers.length} general markers to map instance`);
+
     return addedSdkMarkers;
   }
 
