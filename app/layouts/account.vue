@@ -3,7 +3,7 @@
     <NuxtLoadingIndicator />
     <OrganismsHeader />
 
-    <div class="page">
+
       <div class="account-layout | container" :class="{ 'account-layout--messages-expanded': isExpanded }">
         <!-- Left Sidebar Slot (Desktop only) -->
         <aside class="left-sidebar">
@@ -16,7 +16,7 @@
           </slot>
         </aside>
 
-        <main class="main">
+        <main class="main account-page">
           <NuxtPage />
         </main>
 
@@ -26,7 +26,7 @@
             <OrganismsConversationSidebar />
           </slot>
         </aside>
-      </div>
+      
 
       <!-- Bottom Navigation Slot -->
       <slot name="bottom-navigation">
@@ -98,13 +98,13 @@ useHead({
 </script>
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
-.page {
+.accout-page {
   background: var(--background-100);
   transition: min-height 0.25s ease;
   
   @media (max-width: 768px) {
-    min-height: calc(100dvh - var(--header-height));
-    margin-bottom: var(--size-64);
+    // min-height: calc(100dvh - var(--header-height));
+    // margin-bottom: var(--size-64);
   }
 }
 
@@ -266,12 +266,9 @@ useHead({
 }
 }
 
-
-
 .desktop-only-footer {
   @include mq.mobile-only {
     display: none;
   }
 }
-
 </style>
