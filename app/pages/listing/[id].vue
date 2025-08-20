@@ -335,6 +335,12 @@ ul {
   margin: 0;
 }
 
+.o-footer {
+  @include mq.mobile-only {
+    display: none;
+  }
+}
+
 .p-listing {
   padding-top: var(--size-16);
 
