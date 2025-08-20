@@ -51,6 +51,7 @@ useHead({
 .page {
   background: var(--background-100);
   padding-top: var(--size-16);
+  min-height: calc(100dvh - var(--header-expanded-height) - var(--size-16));
 }
 
 .page-enter-active,
