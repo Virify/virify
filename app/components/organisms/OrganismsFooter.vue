@@ -16,7 +16,7 @@ const currentYear = new Date().getFullYear()
   color: var(--background-100);
   padding: var(--size-32) 0;
   color: var(--monochrome-900);
-  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom);
   width: 100%;
 }
 </style>
