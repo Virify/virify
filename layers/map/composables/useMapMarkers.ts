@@ -7,28 +7,36 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   /**
    * Private helper to create and add a single SDK marker to the map and instance.
    */
-  function _createAndAddSdkMarker(map: ExtendedMapTilerMap, markerData: MapMarker, instance: MapInstance): Marker {
-    const [firstImageObject] = asArray(markerData.image, true)
+  function _createMarkerWithPopup(markerData?: ListingCardType[]): Marker {
+    const formattedMarker = formatMarker(markerData)
+
+    const [firstImageObject] = asArray(formattedMarker.image, true)
     const { image } = asObject(firstImageObject)
 
-    const markerWrapper = renderMarker({
-      id: markerData.id,
-      price: markerData.price,
-      tier: markerData.tier,
+    // Create marker Vue element
+    const marker = renderMarker({
+      id: formattedMarker.id,
+      price: formattedMarker.price,
+      tier: formattedMarker.tier,
       image: image as string,
-      priceType: markerData.priceType,
+      priceType: formattedMarker.priceType,
       vueApp,
     });
-    const newSdkMarker = new sdk.Marker({
-      element: markerWrapper,
+
+    // Create popup Vue element
+    const popup = renderPopup(formattedMarker, vueApp);
+
+    // Convert marker to SDK
+    const sdkMarker = new sdk.Marker({
+      element: marker,
       anchor: "bottom",
     });
-    newSdkMarker.setLngLat([markerData.lon, markerData.lat]);
-    const popup = renderPopup(markerData, vueApp);
-    newSdkMarker.setPopup(popup);
-    newSdkMarker.addTo(map);
-    instance.markers.push(newSdkMarker);
-    return newSdkMarker;
+
+    // Set the appropriate lat/long and popup
+    sdkMarker.setLngLat([formattedMarker.lon, formattedMarker.lat]);
+    sdkMarker.setPopup(popup);
+
+    return sdkMarker
   }
 
 
@@ -90,15 +98,18 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       return [];
     }
 
-    const addedSdkMarkers: Marker[] = [];
+    let markerCount = 0;
 
-    for (const marker of asArray(markers, true)) {
-      const formattedMarker = formatMarker(marker)
+    for (const markerData of asArray(markers, true)) {
+      const newMarker = _createMarkerWithPopup(markerData);
 
-      addedSdkMarkers.push(_createAndAddSdkMarker(map, formattedMarker, instance));
+      newMarker.addTo(map);
+      instance.markers.push(newMarker);
+
+      markerCount++
     }
 
-    console.log(`[Map] Added ${addedSdkMarkers.length} general markers to map instance`);
+    console.log(`[Map] Added ${markerCount} general markers to map instance`);
   }
 
   /**
