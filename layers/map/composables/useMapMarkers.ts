@@ -87,10 +87,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
    * @param markers Array of markers to add
    * @returns Array of newly created marker objects
    */
-  function addMarkers(
-    map: ExtendedMapTilerMap,
-    markers: ListingCardType[] | undefined
-  ): Marker[] {
+  function addMarkers(map: ExtendedMapTilerMap, markers?: ListingCardType[]) {
     const instance = findMapInstance(map, mapCache);
 
     if (!instance) {
@@ -108,8 +105,6 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     }
 
     console.log(`[Map] Added ${addedSdkMarkers.length} general markers to map instance`);
-
-    return addedSdkMarkers;
   }
 
   /**
