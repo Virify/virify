@@ -34,9 +34,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
 
   /**
    * Adds a marker to the map instance
-   *
-   * @param map The map to add the marker to
-   * @param marker The marker to add
+   * @deprecated this method does not appear to be used
    */
   function addMarker(map: ExtendedMapTilerMap, marker: Array<{ lat: number; lon: number }> | null | undefined): Marker | undefined {
     const instance = findMapInstance(map, mapCache);
@@ -54,11 +52,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
 
   /**
    * Adds multiple markers to the map instance for a specific feature
-   *
-   * @param map The map to add markers to
-   * @param markers Array of markers to add
-   * @param featureId The ID of the feature these markers belong to
-   * @returns Array of created marker objects
+   * @deprecated this method does not appear to be used
    */
   function addMarkersForFeature(map: ExtendedMapTilerMap, markersData: MapMarker[], featureId: string): Marker[] {
     const instance = findMapInstance(map, mapCache);
