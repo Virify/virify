@@ -11,7 +11,14 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     const [firstImageObject] = asArray(markerData.image, true)
     const { image } = asObject(firstImageObject)
 
-    const markerWrapper = renderMarker(markerData.id, markerData.price, markerData.tier, image as string, vueApp, markerData.priceType);
+    const markerWrapper = renderMarker({
+      id: markerData.id,
+      price: markerData.price,
+      tier: markerData.tier,
+      image: image as string,
+      priceType: markerData.priceType,
+      vueApp,
+    });
     const newSdkMarker = new sdk.Marker({
       element: markerWrapper,
       anchor: "bottom",
