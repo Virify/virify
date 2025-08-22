@@ -139,6 +139,7 @@ useHead({
   @include mq.mobile-only {
     grid-template-columns: 1fr;
     grid-template-areas: "main";
+    padding-bottom: calc(var(--size-16) + var(--mobile-nav-height, 0));
 
     .left-sidebar,
     .right-sidebar {

@@ -332,6 +332,7 @@ watch(receivedSort, () => {
   @include mq.mobile-only {
     display: block;
     width: 100%;
+    padding-bottom: calc(var(--size-16) + var(--mobile-nav-height, 0));
   }
 }
 
