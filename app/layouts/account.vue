@@ -100,7 +100,11 @@ useHead({
 .account-page {
   background: var(--background-100);
   transition: min-height 0.25s ease;
+  min-height: 100vh; /* Fallback for browsers that do not support svh */
   min-height: 100svh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .account-layout {
@@ -110,6 +114,7 @@ useHead({
   gap: var(--size-16);
   padding: var(--size-16);
   transition: grid-template-columns 0.25s ease;
+  flex-grow: 1;
 
   &:has(.sidebar-content--has-overlay) {
     grid-template-columns: 300px 1fr 400px;
@@ -139,8 +144,9 @@ useHead({
   @include mq.mobile-only {
     grid-template-columns: 1fr;
     grid-template-areas: "main";
-    padding-bottom: calc(var(--size-16) + var(--mobile-nav-height, 0));
-    min-height: calc(100vh - var(--mobile-nav-height, 0) - var(--size-16));
+    padding: 0;
+    padding-bottom: var(--mobile-nav-height, 70px); /* Ensure there's space for the nav bar */
+    min-height: auto;
 
     .left-sidebar,
     .right-sidebar {
