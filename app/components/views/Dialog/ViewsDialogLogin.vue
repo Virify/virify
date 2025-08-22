@@ -64,7 +64,10 @@ async function formSuccess() {
     query: cleanQuery
   }, { replace: true })
   
-  hideDialog({ loginSuccess: true });
+  // Add a small delay to allow the browser to process navigation before closing the dialog
+  setTimeout(() => {
+    hideDialog({ loginSuccess: true });
+  }, 100);
   
   // Navigate to the intended destination if there's a redirect cookie
   if (destination) {
