@@ -179,6 +179,11 @@ useHead({
     align-self: stretch;
   }
 
+  @include mq.mobile-only {
+      padding: 0;
+      display: none;
+    }
+
   .sidebar-content {
     background: var(--background-200);
     border-radius: var(--border-radius-xl);
@@ -252,15 +257,6 @@ useHead({
 }
 
 .mobile-only-nav {
-  @include mq.mobile-only {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-
   @include mq.tablet {
     display: none;
   }
