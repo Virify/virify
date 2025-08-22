@@ -58,7 +58,7 @@ const chatNotificationCount = computed(() => {
   z-index: 1003;
   box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
   transform: translateZ(0);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(env(safe-area-inset-bottom));
 
   @media (min-width: 769px) {
     display: none;

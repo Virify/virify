@@ -46,28 +46,19 @@ const { hideDialog } = useDialog();
  *  Success
  */
 async function formSuccess() {
-  const route = useRoute()
+  console.log('Login form success triggered');
   
   // Fetch user session
   await fetch();
+  console.log('Session fetched');
+  
+  console.log('Closing dialog');
   
   // Check if there's a redirect destination from the middleware
   const redirectCookie = useCookie('redirect');
   const destination = redirectCookie.value;
-
-  // Clean up the URL by removing the showLogin query param
-  const cleanQuery = { ...route.query }
-  delete cleanQuery.showLogin
   
-  await navigateTo({
-    path: route.path,
-    query: cleanQuery
-  }, { replace: true })
-  
-  // Add a small delay to allow the browser to process navigation before closing the dialog
-  setTimeout(() => {
-    hideDialog({ loginSuccess: true });
-  }, 100);
+  hideDialog({ loginSuccess: true });
   
   // Navigate to the intended destination if there's a redirect cookie
   if (destination) {
