@@ -11,9 +11,9 @@
         </li>
       </template>
 
-      <li v-else>
+      <!-- <li v-else>
         <MoleculesNavPopover :options="navigationGroups" />
-      </li>
+      </li> -->
     </ul>
   </nav>
 </template>
