@@ -130,11 +130,12 @@ async function sendReply(message: string) {
   height: 100%;
 
 @include mq.mobile-only {
+    height: calc(100dvh - var(--header-offset) - env(safe-area-inset-bottom, 0px));
     position: fixed;
     top: var(--header-offset);
-    bottom: env(safe-area-inset-bottom, 0px);
+    bottom: 0;
     left: 0;
-    height: calc(100dvh - var(--header-offset) - env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom);
     width: 100vw;
     background: rgba(0, 0, 0, 0.5);
     z-index: 9999;
