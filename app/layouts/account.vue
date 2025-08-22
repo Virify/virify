@@ -4,7 +4,7 @@
     <OrganismsHeader />
 
     <div class="account-page">
-      <div class="account-layout | container" :class="{ 'account-layout--messages-expanded': isExpanded }">
+      <div class="account-layout" :class="{ 'account-layout--messages-expanded': isExpanded }">
         <!-- Left Sidebar Slot (Desktop only) -->
         <aside class="left-sidebar">
           <slot name="left-sidebar">
@@ -123,7 +123,8 @@ useHead({
     @include mq.mobile-only {
       grid-template-columns: 1fr;
       grid-template-areas: "main";
-      padding: var(--size-16) 0;
+      padding: 0;
+      overflow: visible;
     }
   }
 
@@ -231,7 +232,8 @@ useHead({
   box-sizing: border-box;
   min-width: 0;
   transition: width 0.25s ease, max-width 0.25s ease;
-  overflow: hidden;
+  // Allow children to manage their own scroll/clipping; required for position: sticky
+  overflow: visible;
 }
 
 .page-enter-active,

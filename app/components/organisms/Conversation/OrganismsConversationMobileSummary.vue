@@ -3,7 +3,7 @@
     <div class="mobile-chat-header">
       <h3 class="chat-title">Conversations</h3>
     </div>
-      <div class="chat-summary-container" v-if="!activeConversation">
+      <div v-if="!activeConversation">
         <OrganismsConversationSummary :limit="0" :search-enabled="true" :disable-navigate="true" :sort="true" @select-conversation="handleSelectConversation" />
       </div>
       <OrganismsConversationActive
@@ -16,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-// No props needed for mobile page variant
 
 const { user } = useUserSession()
 const activeConversation = ref<ConversationWithUserAndMessages | null>(null)
@@ -31,23 +30,19 @@ function handleSelectConversation(conversation: ConversationWithUserAndMessages)
 <style lang="scss" scoped>
 .mobile-chat {
   width: 100%;
+  overflow: visible;
   background: var(--background-200);
-  box-sizing: border-box;
-  border-radius: var(--border-radius-2xl);
-  border: 1px solid var(--background-300);
-  overflow: hidden;
 }
 
 .mobile-chat-header {
   position: sticky;
-  top: 0;
+  top: var(--header-offset, 0);
   background: var(--background-200);
-  z-index: 10;
+  z-index: 20;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--size-20) var(--size-20) var(--size-16);
-  border-bottom: 1px solid var(--border-100);
 }
 
 .chat-title {

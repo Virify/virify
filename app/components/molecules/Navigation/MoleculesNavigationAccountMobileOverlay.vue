@@ -7,13 +7,10 @@
           <AtomsIcon icon="cross" size="24" />
         </button>
       </div>
-      <nav class="navigation">
+      <nav class="navigation" ref="navigationEl">
         <ul>
-          <MoleculesNavigationGroup 
-            :groupStates="groupStates"
-            @toggleGroup="$emit('toggleGroup', $event)"
-            @navClick="handleNavClick"
-          />
+          <MoleculesNavigationGroup :groupStates="groupStates" @toggleGroup="handleToggleGroup"
+            @navClick="handleNavClick" />
         </ul>
       </nav>
     </aside>
@@ -32,9 +29,32 @@ const emit = defineEmits<{
   navClick: [item: any]
 }>()
 
+// Scroll container for the overlay navigation
+const navigationEl = ref<HTMLElement | null>(null)
+
+function scrollNavToBottom() {
+  const el = navigationEl.value
+  if (!el) return
+  try {
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  } catch (_) {
+    el.scrollTop = el.scrollHeight
+  }
+}
+
+function handleToggleGroup(index: number) {
+  emit('toggleGroup', index)
+  // Wait for DOM update and transitions, then attempt scroll a few times for reliability
+  nextTick(() => {
+    scrollNavToBottom()
+    requestAnimationFrame(() => scrollNavToBottom())
+    setTimeout(scrollNavToBottom, 200)
+  })
+}
+
 function handleNavClick(item: any) {
   emit('navClick', item)
-  emit('close') // Close mobile menu after navigation
+  emit('close')
 }
 </script>
 
