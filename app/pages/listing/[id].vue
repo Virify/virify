@@ -325,7 +325,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
 

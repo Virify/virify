@@ -18,9 +18,6 @@ const currentYear = new Date().getFullYear()
   padding: var(--size-32) 0;
   color: var(--monochrome-900);
   width: 100%;
-
-  @include mq.mobile-only {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  bottom: 0;
 }
 </style>
