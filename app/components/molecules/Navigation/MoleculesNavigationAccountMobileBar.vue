@@ -50,7 +50,7 @@ const chatNotificationCount = computed(() => {
 .mobile-bottom-nav {
   display: flex;
   position: fixed;
-  bottom: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
   left: 0;
   right: 0;
   background: var(--background-200);
@@ -58,6 +58,7 @@ const chatNotificationCount = computed(() => {
   z-index: 1003;
   box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
   transform: translateZ(0);
+  padding-bottom: calc(var(--size-4) + env(safe-area-inset-bottom, 0px));
 
   @media (min-width: 769px) {
     display: none;

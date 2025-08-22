@@ -99,30 +99,6 @@ watch([
   }
 });
 
-/**
- * Mark all unread messages in the current conversation as read
- * Only marks messages that were sent TO the current user (not from them)
- */
-function markUnreadMessagesAsRead() {
-  if (!props.conversation || !props.currentUserId) return;
-  // Prevent re-entrant calls
-  marking.value = true
-  
-  const unreadMessages = props.conversation.messages.filter(
-    message => !message.isRead && message.senderId !== props.currentUserId
-  );
-  
-  // Mark each unread message as read
-  unreadMessages.forEach(message => {
-    conversationEvents.markMessageAsRead(message.id, props.conversation!.id);
-  });
-
-  // Release the guard after next tick to allow state updates to settle
-  nextTick(() => {
-    marking.value = false
-  })
-}
-
 function scrollToBottomInternal() {
   nextTick(() => {
     scrollToBottom(scrollableRef.value)
@@ -156,8 +132,9 @@ async function sendReply(message: string) {
 @include mq.mobile-only {
     position: fixed;
     top: var(--header-offset);
+    bottom: env(safe-area-inset-bottom, 0px);
     left: 0;
-    height: calc(100dvh - var(--header-offset));
+    height: calc(100dvh - var(--header-offset) - env(safe-area-inset-bottom, 0px));
     width: 100vw;
     background: rgba(0, 0, 0, 0.5);
     z-index: 9999;
@@ -238,7 +215,7 @@ async function sendReply(message: string) {
 
   @include mq.mobile-only {
     position: sticky;
-    top: 0; // sits under the conversation-header within the non-scrolling area
+    top: 0;
     z-index: 1;
   }
 }
