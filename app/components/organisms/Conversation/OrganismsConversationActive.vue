@@ -130,7 +130,7 @@ async function sendReply(message: string) {
   height: 100%;
 
 @include mq.mobile-only {
-    height: calc(100dvh - var(--header-offset) - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100dvh - var(--header-offset) - env(safe-area-inset-bottom, 0px));
     position: fixed;
     top: var(--header-offset);
     bottom: 0;
@@ -152,7 +152,6 @@ async function sendReply(message: string) {
 
 .conversation-detail {
   width: 100%;
-  height: 100%;
   background: var(--background-200);
   display: flex;
   flex-direction: column;
@@ -225,8 +224,6 @@ async function sendReply(message: string) {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  min-height: 0;
-  height: 0;
   position: relative;
   overscroll-behavior: contain;
   touch-action: pan-y;

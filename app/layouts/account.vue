@@ -152,10 +152,9 @@ useHead({
 .left-sidebar {
   grid-area: left-sidebar;
   position: sticky;
-  top: calc(var(--header-offset, 0) + var(--size-16));
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100dvh - var(--header-offset, 0) - var(--size-48));
+  max-height: calc(100dvh - var(--header-height) - var(--size-48));
   z-index: 10;
   align-self: start;
   overflow: hidden;
@@ -165,10 +164,9 @@ useHead({
 .right-sidebar {
   grid-area: right-sidebar;
   position: sticky;
-  top: calc(var(--header-offset, 0) + var(--size-16));
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100dvh - var(--header-offset, 0) - var(--size-48));
+  max-height: calc(100dvh - var(--header-height) - var(--size-48));
   z-index: 10;
   align-self: start;
 
