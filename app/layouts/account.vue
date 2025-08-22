@@ -4,15 +4,12 @@
     <OrganismsHeader />
 
     <div class="account-page">
-      <div class="account-layout" :class="{ 'account-layout--messages-expanded': isExpanded }">
+      <div class="account-layout container" :class="{ 'account-layout--messages-expanded': isExpanded }">
         <!-- Left Sidebar Slot (Desktop only) -->
         <aside class="left-sidebar">
           <slot name="left-sidebar">
-            <MoleculesNavigationAccountDesktop 
-              :groupStates="groupStates" 
-              @toggleGroup="toggleGroup" 
-              @navClick="handleNavClick" 
-            />
+            <MoleculesNavigationAccountDesktop :groupStates="groupStates" @toggleGroup="toggleGroup"
+              @navClick="handleNavClick" />
           </slot>
         </aside>
 
@@ -26,13 +23,13 @@
             <OrganismsConversationSidebar />
           </slot>
         </aside>
-      
 
-      <!-- Bottom Navigation Slot -->
-      <slot name="bottom-navigation">
-        <OrganismsNavigationAccountMobile class="mobile-only-nav" />
-      </slot>
-    </div>
+
+        <!-- Bottom Navigation Slot -->
+        <slot name="bottom-navigation">
+          <OrganismsNavigationAccountMobile class="mobile-only-nav" />
+        </slot>
+      </div>
     </div>
 
     <OrganismsFooter class="desktop-only-footer" />
@@ -47,13 +44,13 @@ import { logout } from '~/utils/account/navigation'
 const route = useRoute()
 const groupStates = ref([true, true, true, false])
 
-  // Control sidebar visibility
-  const showSidebar = computed(() => 
-    route.path !== '/account/messages'
-  )
-  const isExpanded = computed(() => 
-    route.path === '/account/messages'
-  )
+// Control sidebar visibility
+const showSidebar = computed(() =>
+  route.path !== '/account/messages'
+)
+const isExpanded = computed(() =>
+  route.path === '/account/messages'
+)
 
 function handleNavClick(item: any) {
   if (item.action === 'logout') {
@@ -99,6 +96,7 @@ useHead({
 </script>
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .account-page {
   background: var(--background-100);
   transition: min-height 0.25s ease;
@@ -111,11 +109,11 @@ useHead({
   gap: var(--size-16);
   padding: var(--size-16);
   transition: grid-template-columns 0.25s ease;
-  
+
   &:has(.sidebar-content--has-overlay) {
     grid-template-columns: 300px 1fr 400px;
   }
-  
+
   &.account-layout--messages-expanded {
     grid-template-columns: 300px 1fr;
     grid-template-areas: "left-sidebar main";
@@ -188,7 +186,7 @@ useHead({
     height: fit-content;
     color: var(--foreground-100);
     position: relative;
-    
+
     @include mq.mobile-only {
       padding: 0;
     }
@@ -196,18 +194,19 @@ useHead({
     &--conversations {
       padding: 0;
       overflow-y: auto;
+      min-height: 70vh;
       height: var(--navigation-sidebar-height, fit-content);
       box-sizing: border-box;
       transition: height ease;
-      
+
       &.sidebar-content--has-overlay {
         height: var(--navigation-sidebar-height, fit-content);
-        
+
         @include mq.tablet-only {
           height: 60vh;
         }
       }
-      
+
     }
   }
 
@@ -261,8 +260,8 @@ useHead({
   }
 
   @include mq.tablet {
-  display: none;
-}
+    display: none;
+  }
 }
 
 .desktop-only-footer {

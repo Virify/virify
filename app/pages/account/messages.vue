@@ -55,7 +55,7 @@
   </div>
 
   <!-- Mobile: Chat interface as the page -->
-  <div class="mobile-chat-page">
+  <div class="mobile-chat-page | container-reset">
     <OrganismsConversationMobileSummary />
   </div>
 </template>

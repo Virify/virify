@@ -8,8 +8,12 @@
         </button>
       </div>
 
-      <div class="conversation-content-scrollable" ref="scrollableRef">
+      <!-- Mobile: Listing card acts as the title/header content (non-scrolling) -->
+      <div class="conversation-listing-header">
         <MoleculesConversationListingCard :conversation="conversation" />
+      </div>
+
+      <div class="conversation-content-scrollable" ref="scrollableRef">
         <MoleculesConversationMessageList :messages="conversation?.messages || []" :current-user-id="currentUserId" />
       </div>
 
@@ -226,6 +230,19 @@ async function sendReply(message: string) {
   }
 }
 
+.conversation-listing-header {
+  flex-shrink: 0;
+  background: var(--background-200);
+  border-bottom: 1px solid var(--border-100);
+  padding: 0 var(--size-16) var(--size-8);
+
+  @include mq.mobile-only {
+    position: sticky;
+    top: 0; // sits under the conversation-header within the non-scrolling area
+    z-index: 1;
+  }
+}
+
 .conversation-content-scrollable {
   flex: 1;
   overflow-y: auto;
@@ -237,8 +254,6 @@ async function sendReply(message: string) {
   touch-action: pan-y;
   padding: 0 var(--size-16);
 }
-
-
 
 .reply-section {
   flex-shrink: 0;

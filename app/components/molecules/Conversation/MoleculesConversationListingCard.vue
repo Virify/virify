@@ -37,7 +37,8 @@
         <div class="agent-avatar">
           <AtomsIcon icon="profile" size="28" />
         </div>
-        <span class="agent-name | body-sm">{{ conversation.sender?.username || conversation.sender.email }}</span>
+        <!-- Show listing owner in the compact (narrow) layout as well -->
+        <span class="agent-name | body-sm">{{ conversation.listing.user?.username }}</span>
       </div>
     </div>
     </NuxtLink>

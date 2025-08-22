@@ -6,7 +6,7 @@
       <div v-if="!activeConversation">
         <OrganismsConversationSummary :limit="0" :search-enabled="true" :disable-navigate="true" :sort="true" @select-conversation="handleSelectConversation" />
       </div>
-      <OrganismsConversationActive
+  <OrganismsConversationActive
         :is-open="!!activeConversation"
         :conversation="activeConversation"
         :current-user-id="user?.id"
