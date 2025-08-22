@@ -100,6 +100,7 @@ useHead({
 .account-page {
   background: var(--background-100);
   transition: min-height 0.25s ease;
+  min-height: calc(100dvh - var(--header-expanded-height) - var(--size-16));
 }
 
 .account-layout {
