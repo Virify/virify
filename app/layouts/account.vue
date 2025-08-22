@@ -189,6 +189,7 @@ useHead({
 
     @include mq.mobile-only {
       padding: 0;
+      display: none;
     }
 
     &--conversations {
@@ -257,6 +258,7 @@ useHead({
     left: 0;
     right: 0;
     z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
   @include mq.tablet {
