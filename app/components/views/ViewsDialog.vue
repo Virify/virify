@@ -16,23 +16,26 @@
 </template>
 
 <script setup>
+import { useScrollLock } from '@vueuse/core'
+
 const $dialog = useTemplateRef('$dialog')
+const body = useTemplateRef('body')
 
 /**
  *  Monitor changes in dialog content
  */
 const { dialog, hideDialog } = useDialog()
-const { lock } = useScrollLock()
+const isLocked = useScrollLock(body)
 
 onMounted(() => {
   watchEffect(() => {
     if (!dialog.value) {
       $dialog.value.close()
+      isLocked.value = false
     } else {
       $dialog.value.showModal()
+      isLocked.value = true
     }
-
-    lock(!!dialog.value)
   })
 })
 
