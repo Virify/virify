@@ -100,7 +100,7 @@ useHead({
 .account-page {
   background: var(--background-100);
   transition: min-height 0.25s ease;
-  min-height: calc(100dvh - var(--header-expanded-height) - var(--size-16));
+  min-height: 100vh;
 }
 
 .account-layout {
@@ -140,6 +140,7 @@ useHead({
     grid-template-columns: 1fr;
     grid-template-areas: "main";
     padding-bottom: calc(var(--size-16) + var(--mobile-nav-height, 0));
+    min-height: calc(100vh - var(--mobile-nav-height, 0) - var(--size-16));
 
     .left-sidebar,
     .right-sidebar {
@@ -154,7 +155,7 @@ useHead({
   position: sticky;
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100dvh - var(--header-height) - var(--size-48));
+  max-height: calc(100svh - var(--header-height) - var(--size-48));
   z-index: 10;
   align-self: start;
   overflow: hidden;
@@ -166,7 +167,7 @@ useHead({
   position: sticky;
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100dvh - var(--header-height) - var(--size-48));
+  max-height: calc(100svh - var(--header-height) - var(--size-48));
   z-index: 10;
   align-self: start;
 
@@ -237,7 +238,6 @@ useHead({
   min-width: 0;
   transition: width 0.25s ease, max-width 0.25s ease;
   // Allow children to manage their own scroll/clipping; required for position: sticky
-  overflow: visible;
 }
 
 .page-enter-active,

@@ -25,6 +25,7 @@
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
+    min-height: var(--header-height);
   }
 
   &-homelink {
