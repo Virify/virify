@@ -10,6 +10,8 @@ interface UseScrollLock {
  *
  */
 export function useScrollLock(): UseScrollLock {
+  let originalStyles: Styles = { overflow: '', paddingRight: '' };
+
   /**
    *  Set styling to the HTML document
    */
@@ -35,23 +37,20 @@ export function useScrollLock(): UseScrollLock {
 
     // Check if shouldLock is true/false
     if (shouldLock) {
-      setStyle(container, {
-        overflow: '',
-        paddingRight: ''
-      })
+      originalStyles = {
+        overflow: container.style.overflow,
+        paddingRight: container.style.paddingRight
+      };
 
-      const scrollbarWidth = window.innerWidth - document.body.offsetWidth
+      const scrollbarWidth = window.innerWidth - container.offsetWidth
 
       setStyle(container, {
         overflow: 'hidden',
-        paddingRight: scrollbarWidth + 'px'
+        paddingRight: `${scrollbarWidth}px`
       })
     }
     else {
-      setStyle(container, {
-        overflow: '',
-        paddingRight: ''
-      })
+      setStyle(container, originalStyles)
     }
   }
 
