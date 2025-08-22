@@ -24,16 +24,6 @@ export function useAuthenticationHandler() {
           props: {
             fromProtectedPage
           },
-          onClose: async (result) => {
-            // Clean up the URL by removing the showLogin query param
-            const cleanQuery = { ...route.query }
-            delete cleanQuery.showLogin
-            
-            await navigateTo({
-              path: route.path,
-              query: cleanQuery
-            }, { replace: true })
-          }
         })
       } else {
         // User is already logged in, just clean up the URL
