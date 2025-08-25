@@ -89,7 +89,27 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
    * @param markers Array of markers to add
    * @returns Array of newly created marker objects
    */
-  function addMarkers(map: ExtendedMapTilerMap, markers?: ListingCardType[]) {
+  function createMapSource(markers: ListingCardType[] | undefined) {
+    const markersArray: ListingCardType[] = asArray(markers)
+
+    return {
+      type: 'FeatureCollection',
+      features: markersArray.map((marker) => {
+        const { lat, lon } = asObject(marker?.property?.address)
+
+        return {
+          type: 'Feature',
+          properties: formatMarker(marker),
+          geometry: {
+            type: 'Point',
+            coordinates: [lon, lat]
+          }
+        }
+      })
+    }
+  }
+
+  async function addMarkers(map: ExtendedMapTilerMap, markers?: ListingCardType[]) {
     const instance = findMapInstance(map, mapCache);
 
     if (!instance) {
@@ -98,18 +118,135 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       return [];
     }
 
-    let markerCount = 0;
+    // Wait for map to be ready
+    await map.onReadyAsync()
 
-    for (const markerData of asArray(markers, true)) {
-      const newMarker = _createMarkerWithPopup(markerData);
+    // Create marker data
+    const markerData = createMapSource(markers)
 
-      newMarker.addTo(map);
-      instance.markers.push(newMarker);
+    // Set (or update) sources
+    const existingListings = map.getSource('property_listings')
 
-      markerCount++
+    if (existingListings) {
+      existingListings.setData(markerData)
+    }
+    else {
+      map.addSource('property_listings', {
+        type: 'geojson',
+        data: markerData,
+        cluster: true,
+        // clusterMaxZoom: 14,
+        clusterRadius: 50 // In pixels
+      })
     }
 
-    console.log(`[Map] Added ${markerCount} general markers to map instance`);
+    // Remove any existing layers
+    if (map.getLayer('clusters')) {
+      map.removeLayer('clusters')
+    }
+
+    if (map.getLayer('cluster-count')) {
+      map.removeLayer('cluster-count')
+    }
+
+    if (map.getLayer('unclustered-count')) {
+      map.removeLayer('unclustered-count')
+    }
+
+    // Add a new 'proprties' source
+
+
+    map.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'property_listings',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'step',
+          ['get', 'point_count'],
+          '#FEC7B0', // Colour...
+          2, // ...when 2 properties
+          '#FD8E61', // Colour...
+          5, // ...when less than 5 properties
+          '#FC7239' // Else when more than 5 properties
+        ],
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          15, // Radius 20px
+          2, // When 2 properties
+          20, // Radius 30px
+          5, // When less than 5 properties
+          30 // Else radius 40px when more than 5 properties
+        ]
+      },
+    })
+
+    map.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'property_listings',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-size': 16
+      }
+    })
+
+    map.addLayer({
+      id: 'unclustered-count',
+      type: 'circle',
+      source: 'property_listings',
+      filter: ['!', ['has', 'point_count']],
+      layout: {
+        visibility: 'visible'
+      },
+      paint: {
+        'circle-color': '#FC7239',
+        'circle-radius': 8,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#fff'
+      }
+    })
+
+    // Zoom into cluster on click
+    map.on('click', 'clusters', async (e: { point: unknown }) => {
+      const [feature] = map.queryRenderedFeatures(e.point, {
+        layers: ['clusters']
+      });
+
+      // Get cluster ID, coordinates
+      const { cluster_id } = asObject(feature?.properties)
+      const { coordinates } = asObject(feature?.geometry)
+
+      // Get the cluster expansion zoom
+      const zoom = await map.getSource('property_listings').getClusterExpansionZoom(cluster_id);
+
+      // Animate to cluster position
+      map.easeTo({
+        center: coordinates,
+        zoom
+      });
+    })
+
+    // Show pointer on cluster hover
+    map.on('mouseenter', 'clusters', () => {
+      map.getCanvas().style.cursor = 'pointer'
+    })
+
+    map.on('mouseleave', 'clusters', () => {
+      map.getCanvas().style.cursor = ''
+    })
+
+    // for (const markerData of markerArray) {
+    //   const newMarker = _createMarkerWithPopup(markerData);
+
+    //   newMarker.addTo(map);
+    //   instance.markers.push(newMarker);
+    // }
+
+    console.log(`[Map] Added ${markerData.features?.length} general markers to map instance`);
   }
 
   /**

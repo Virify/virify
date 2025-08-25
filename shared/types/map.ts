@@ -62,6 +62,9 @@ export type ExtendedMapTilerMap = MaptilerMap & {
   jumpTo(options: { center?: [number, number]; zoom?: number; animate?: boolean }): void;
   getCanvas(): HTMLCanvasElement;
   queryRenderedFeatures(pointOrBox?: any, options?: any): any[];
+  onReadyAsync(): Promise<unknown>;
+  on(event: string, layer: string, listener: Function): void
+  easeTo(options: { center: unknown, zoom: unknown, [key: string]: unknown }): void
 };
 
 /**
