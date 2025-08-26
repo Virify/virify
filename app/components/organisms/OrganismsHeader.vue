@@ -14,11 +14,12 @@
 @use "#styles/_utils/media" as mq;
 
 .o-header {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: env(safe-area-inset-top);
   z-index: 30;
   background: var(--blue-400);
   border-bottom: var(--size-4) solid var(--secondary-400);
+  width: 100%;
 
   &-container {
     display: flex;

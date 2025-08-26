@@ -50,6 +50,7 @@ useHead({
 <style lang="scss">
 .page {
   background: var(--background-100);
+  padding-top: var(--header-height);
 }
 
 .page-enter-active,
