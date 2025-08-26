@@ -1,4 +1,5 @@
 import { Marker } from "@maptiler/sdk";
+import { useDebounceFn } from "@vueuse/core";
 
 export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   const vueApp = useNuxtApp();
@@ -7,24 +8,22 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   /**
    * Private helper to create and add a single SDK marker to the map and instance.
    */
-  function _createMarkerWithPopup(markerData?: ListingCardType[]): Marker {
-    const formattedMarker = formatMarker(markerData)
-
-    const [firstImageObject] = asArray(formattedMarker.image, true)
+  function _createMarkerWithPopup(markerData?: any): Marker {
+    const [firstImageObject] = asArray(markerData.image, true)
     const { image } = asObject(firstImageObject)
 
     // Create marker Vue element
     const marker = renderMarker({
-      id: formattedMarker.id,
-      price: formattedMarker.price,
-      tier: formattedMarker.tier,
+      id: markerData.id,
+      price: markerData.price,
+      tier: markerData.tier,
       image: image as string,
-      priceType: formattedMarker.priceType,
+      priceType: markerData.priceType,
       vueApp,
     });
 
     // Create popup Vue element
-    const popup = renderPopup(formattedMarker, vueApp);
+    const popup = renderPopup(markerData, vueApp);
 
     // Convert marker to SDK
     const sdkMarker = new sdk.Marker({
@@ -33,7 +32,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     });
 
     // Set the appropriate lat/long and popup
-    sdkMarker.setLngLat([formattedMarker.lon, formattedMarker.lat]);
+    sdkMarker.setLngLat([markerData.lon, markerData.lat]);
     sdkMarker.setPopup(popup);
 
     return sdkMarker
@@ -127,34 +126,20 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     // Set (or update) sources
     const existingListings = map.getSource('property_listings')
 
+    // If a source already exists, simple update the data
     if (existingListings) {
       existingListings.setData(markerData)
-    }
-    else {
-      map.addSource('property_listings', {
-        type: 'geojson',
-        data: markerData,
-        cluster: true,
-        // clusterMaxZoom: 14,
-        clusterRadius: 50 // In pixels
-      })
+
+      return
     }
 
-    // Remove any existing layers
-    if (map.getLayer('clusters')) {
-      map.removeLayer('clusters')
-    }
-
-    if (map.getLayer('cluster-count')) {
-      map.removeLayer('cluster-count')
-    }
-
-    if (map.getLayer('unclustered-count')) {
-      map.removeLayer('unclustered-count')
-    }
-
-    // Add a new 'proprties' source
-
+    // Else add a new source
+    map.addSource('property_listings', {
+      type: 'geojson',
+      data: markerData,
+      cluster: true,
+      clusterRadius: 50 // In pixels
+    })
 
     map.addLayer({
       id: 'clusters',
@@ -199,14 +184,9 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       type: 'circle',
       source: 'property_listings',
       filter: ['!', ['has', 'point_count']],
-      layout: {
-        visibility: 'visible'
-      },
       paint: {
-        'circle-color': '#FC7239',
-        'circle-radius': 8,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#fff'
+        'circle-radius': 2,
+        'circle-color': 'transparent',
       }
     })
 
@@ -221,7 +201,9 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       const { coordinates } = asObject(feature?.geometry)
 
       // Get the cluster expansion zoom
-      const zoom = await map.getSource('property_listings').getClusterExpansionZoom(cluster_id);
+      const zoom = await map
+        .getSource('property_listings')
+        .getClusterExpansionZoom(cluster_id);
 
       // Animate to cluster position
       map.easeTo({
@@ -239,12 +221,41 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       map.getCanvas().style.cursor = ''
     })
 
-    // for (const markerData of markerArray) {
-    //   const newMarker = _createMarkerWithPopup(markerData);
+    // Function to get and add unclustered markers
+    const _addUnClusteredMarkers = useDebounceFn(() => {
+      // Get a list of visible markers
+      const visibleMarkers = map.queryRenderedFeatures(null, {
+        layers: ['unclustered-count']
+      })
 
-    //   newMarker.addTo(map);
-    //   instance.markers.push(newMarker);
-    // }
+      // Clear any existing markers
+      clearMarkers(map)
+
+      // Log new markers to add
+      for (const visibleMarkerData of asArray(visibleMarkers)) {
+        const { properties } = asObject(visibleMarkerData)
+
+        const newMarker = _createMarkerWithPopup(properties);
+
+        newMarker.addTo(map);
+        instance.markers.push(newMarker);
+      }
+
+      // Show how many markers added to map
+      console.log(`[Map] Added ${visibleMarkers?.length} unclustered markers to map instance`);
+    }, 200)
+
+    // Add new listeners
+    map.on('data', ({ sourceId }: { sourceId: string }) => {
+      if (sourceId !== 'property_listings') return
+
+      // Show markers
+      _addUnClusteredMarkers()
+
+      // Update on zoom, moveend
+      map.on('zoomend', _addUnClusteredMarkers)
+      map.on('moveend', _addUnClusteredMarkers)
+    })
 
     console.log(`[Map] Added ${markerData.features?.length} general markers to map instance`);
   }
