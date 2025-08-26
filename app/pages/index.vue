@@ -272,7 +272,7 @@ const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersect
 }
 
 .homepage {
-
+padding-top: var(--size-32);
   @include mq.mobile-only {
     padding-top: var(--size-16);
   }
