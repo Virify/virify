@@ -1,6 +1,10 @@
 @use '../_utils/media' as mq;
 
-html,
+html {
+  /* Force iPhone Chrome to enable dynamic viewport */
+  height: 100dvh;
+}
+
 body {
   background: var(--blue-400);
   color: var(--foreground-100);
@@ -8,7 +12,6 @@ body {
   font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: var(--font-light);
   line-height: var(--lineheight-md);
-  /* Enable dynamic viewport handling on iPhone Chrome */
   min-height: 100dvh;
 
   @include mq.motion {
