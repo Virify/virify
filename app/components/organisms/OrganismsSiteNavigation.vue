@@ -51,7 +51,8 @@ const isLoggedIn = computed(() => loggedIn.value);
 .o-site-navigation__wrapper {
   display: flex;
   align-items: center;
-  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
 }
 
 .o-site-navigation-list {
