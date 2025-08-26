@@ -15,16 +15,19 @@
 
 .o-header {
   position: sticky;
-  -webkit-sticky: sticky;
   top: 0;
   z-index: 30;
   background: var(--blue-400);
   border-bottom: var(--size-4) solid var(--secondary-400);
   
-  /* Force iPhone Chrome to enable dynamic viewport from start */
+  /* Force iPhone Chrome viewport responsiveness */
   @supports (-webkit-touch-callout: none) {
-    transform: translateZ(0);
-    will-change: transform;
+    position: -webkit-sticky;
+    position: sticky;
+    top: env(safe-area-inset-top, 0);
+    height: 100%;
+    min-height: var(--header-height);
+    contain: layout;
   }
 
   &-container {
