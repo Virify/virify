@@ -8,22 +8,24 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   /**
    * Private helper to create and add a single SDK marker to the map and instance.
    */
-  function _createMarkerWithPopup(markerData?: any): Marker {
-    const [firstImageObject] = asArray(markerData.image, true)
+  function _createMarkerWithPopup(markerData?: ListingCardType): Marker {
+    const formattedMarker = formatMarker(markerData)
+
+    const [firstImageObject] = asArray(formattedMarker.image, true)
     const { image } = asObject(firstImageObject)
 
     // Create marker Vue element
     const marker = renderMarker({
-      id: markerData.id,
-      price: markerData.price,
-      tier: markerData.tier,
+      id: formattedMarker.id,
+      price: formattedMarker.price,
+      tier: formattedMarker.tier,
       image: image as string,
-      priceType: markerData.priceType,
+      priceType: formattedMarker.priceType,
       vueApp,
     });
 
     // Create popup Vue element
-    const popup = renderPopup(markerData, vueApp);
+    const popup = renderPopup(formattedMarker, vueApp);
 
     // Convert marker to SDK
     const sdkMarker = new sdk.Marker({
@@ -32,7 +34,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     });
 
     // Set the appropriate lat/long and popup
-    sdkMarker.setLngLat([markerData.lon, markerData.lat]);
+    sdkMarker.setLngLat([formattedMarker.lon, formattedMarker.lat]);
     sdkMarker.setPopup(popup);
 
     return sdkMarker
@@ -94,11 +96,12 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     return {
       type: 'FeatureCollection',
       features: markersArray.map((marker) => {
-        const { lat, lon } = asObject(marker?.property?.address)
+        const { id, property } = asObject(marker)
+        const { lat, lon } = asObject(property?.address)
 
         return {
           type: 'Feature',
-          properties: formatMarker(marker),
+          properties: { id },
           geometry: {
             type: 'Point',
             coordinates: [lon, lat]
@@ -224,18 +227,30 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     // Function to get and add unclustered markers
     const _addUnClusteredMarkers = useDebounceFn(() => {
       // Get a list of visible markers
-      const visibleMarkers = map.queryRenderedFeatures(null, {
+      const unclusteredMarkers = map.queryRenderedFeatures(null, {
         layers: ['unclustered-count']
       })
 
       // Clear any existing markers
       clearMarkers(map)
 
-      // Log new markers to add
-      for (const visibleMarkerData of asArray(visibleMarkers)) {
-        const { properties } = asObject(visibleMarkerData)
+      // Get a list of visible IDs
+      // We need to do it this way as the markers added via the
+      // map.addSource() does not allow nested objects
+      const unclusterMarkerIds = asArray(unclusteredMarkers).map((marker) => {
+        const { id } = asObject(marker?.properties)
 
-        const newMarker = _createMarkerWithPopup(properties);
+        return id
+      })
+
+      // Get visible markers
+      const visibleMarkers = asArray(markers).filter(({ id }) => {
+        return unclusterMarkerIds.includes(id)
+      })
+
+      // Log new markers to add
+      for (const visibleMarkerData of visibleMarkers) {
+        const newMarker = _createMarkerWithPopup(visibleMarkerData);
 
         newMarker.addTo(map);
         instance.markers.push(newMarker);
