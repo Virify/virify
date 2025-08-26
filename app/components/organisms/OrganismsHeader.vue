@@ -15,6 +15,7 @@
 
 .o-header {
   position: sticky;
+  -webkit-sticky: sticky;
   top: 0;
   z-index: 30;
   background: var(--blue-400);
