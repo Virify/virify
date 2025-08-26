@@ -39,11 +39,4 @@
     height: auto;
   }
 }
-
-/**
- *  @TODO: refactor
- */
-body:has(.o-searchform-fixed) .o-header-container {
-  margin-bottom: calc(var(--header-offset) + var(--size-24));
-}
 </style>
