@@ -8,7 +8,8 @@ body {
   font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: var(--font-light);
   line-height: var(--lineheight-md);
-  
+  /* Enable dynamic viewport handling on iPhone Chrome */
+  min-height: 100dvh;
 
   @include mq.motion {
     scroll-behavior: smooth;
