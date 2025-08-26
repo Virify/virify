@@ -8,9 +8,6 @@ body {
   font-family: 'Be Vietnam Pro', sans-serif;
   font-weight: var(--font-light);
   line-height: var(--lineheight-md);
-  
-  /* Force iPhone Chrome viewport recalculation on load */
-  animation: force-viewport-calc 0.1s ease-out;
 
   @include mq.motion {
     scroll-behavior: smooth;
@@ -33,15 +30,4 @@ html.light {
 
 html.dark {
   color-scheme: dark;
-}
-
-/** Hack to fix iPhone Chrome DVH issues */
-
-@keyframes force-viewport-calc {
-  0% { 
-    transform: translateY(0.01px);
-  }
-  100% { 
-    transform: translateY(0px);
-  }
 }
