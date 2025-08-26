@@ -19,6 +19,12 @@
   z-index: 30;
   background: var(--blue-400);
   border-bottom: var(--size-4) solid var(--secondary-400);
+  
+  /* Force iPhone Chrome to enable dynamic viewport from start */
+  @supports (-webkit-touch-callout: none) {
+    transform: translateZ(0);
+    will-change: transform;
+  }
 
   &-container {
     display: flex;
