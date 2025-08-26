@@ -2,7 +2,7 @@
   <nav class="o-site-navigation">
     <div class="o-site-navigation__wrapper">
       <ul class="o-site-navigation-list">
-        <template v-if="!loggedIn">
+        <div v-if="!isLoggedIn">
           <li>
             <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm button button-tertiary button-sm">Log in</button>
           </li>
@@ -10,11 +10,10 @@
             <button @click.prevent="openSignup"
               class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
           </li>
-        </template>
-
-        <li v-else>
+        </div>
+        <!-- <li v-else>
           <MoleculesNavPopover :options="navigationGroups" />
-        </li>
+        </li> -->
       </ul>
     </div>
   </nav>
@@ -37,6 +36,8 @@ function openSignup() {
     component: ViewsDialogSignup,
   });
 }
+
+const isLoggedIn = computed(() => loggedIn.value);
 </script>
 
 <style lang="scss">
@@ -50,7 +51,7 @@ function openSignup() {
 .o-site-navigation__wrapper {
   display: flex;
   align-items: center;
-  min-height: 40px; /* Adjust this value to match the height of the popover button */
+  height: 40px;
 }
 
 .o-site-navigation-list {
