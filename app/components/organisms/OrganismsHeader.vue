@@ -19,13 +19,13 @@
   z-index: 30;
   background: var(--blue-400);
   border-bottom: var(--size-4) solid var(--secondary-400);
+  height: 100%;
 
   &-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    min-height: var(--header-height);
   }
 
   &-homelink {
