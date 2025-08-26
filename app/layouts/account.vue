@@ -159,7 +159,6 @@ useHead({
   z-index: 10;
   align-self: start;
   overflow: hidden;
-  padding-top: var(--header-height);
 }
 
 // Right Sidebar (Conversations)  
@@ -171,8 +170,6 @@ useHead({
   max-height: calc(100svh - var(--header-height) - var(--size-48));
   z-index: 10;
   align-self: start;
-  padding-top: var(--header-height);
-
 
   @include mq.not-notebook {
     position: static;
@@ -240,7 +237,7 @@ useHead({
   box-sizing: border-box;
   min-width: 0;
   transition: width 0.25s ease, max-width 0.25s ease;
-  padding-top: var(--header-height)  // Allow children to manage their own scroll/clipping; required for position: sticky
+  // Allow children to manage their own scroll/clipping; required for position: sticky
 }
 
 .page-enter-active,
