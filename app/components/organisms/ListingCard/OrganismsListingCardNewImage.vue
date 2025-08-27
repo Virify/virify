@@ -13,13 +13,12 @@
           class="m-listing-card-image-slide"
           @click="openImageModal(index)"
         >
-          <nuxt-img 
-          provider="cloudflare"
-            :src="img.image + '/card'"
+          <AtomsCloudFlareImage
+            :src="img.image"
             :alt="img.metadata"
+            variant="card"
+            :placeholder="true"
             class="m-listing-card-image"
-
-            placeholder="/img/preload.svg"
           />
         </div>
       </div>
@@ -204,8 +203,8 @@ onMounted(() => {
 
 
 .m-listing-card-image {
-  height: 100%;
-  width: 100%;;
+  object-fit: cover;
+  width: 100%;
   // transition: transform 0.2s ease;
 }
 
