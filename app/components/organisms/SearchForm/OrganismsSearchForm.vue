@@ -793,8 +793,8 @@ async function sendForm(event: Event) {
     background: var(--background-100);
   }
 
-  @supports (max-height: var(--viewport-height)) {
-    max-height: calc(var(--viewport-height) - var(--header-expanded-height) - var(--size-12));
+  @supports (max-height: 100dvh) {
+    max-height: calc(100dvh - var(--header-expanded-height) - var(--size-12));
   }
 }
 

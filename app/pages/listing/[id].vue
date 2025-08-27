@@ -389,7 +389,7 @@ ul {
       display: block;
       position: sticky;
       top: calc(var(--header-height) + var(--size-32));
-      max-height: calc(var(--viewport-height) - var(--header-height) - var(--size-32) - var(--size-16));
+      max-height: calc(100dvh - var(--header-height) - var(--size-32) - var(--size-16));
       overflow: auto;
       overscroll-behavior: contain;
       scrollbar-width: thin;

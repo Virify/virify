@@ -130,7 +130,7 @@ async function sendReply(message: string) {
   height: 100%;
 
 @include mq.mobile-only {
-    max-height: calc(var(--viewport-height) - var(--header-offset) - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100dvh - var(--header-offset) - env(safe-area-inset-bottom, 0px));
     position: fixed;
     top: var(--header-offset);
     bottom: 0;
