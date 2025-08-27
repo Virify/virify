@@ -1,24 +1,20 @@
 <template>
-  <div class="l-root">
-    <NuxtLoadingIndicator />
-    <OrganismsHeader />
+  <NuxtLoadingIndicator />
+  <OrganismsHeader />
 
-    <div class="page">
-      <NuxtPage />
-    </div>
-
-    <OrganismsFooter />
-
-    <ViewsDialog />
-    <MoleculesToastContainer />
+  <div class="page">
+    <NuxtPage />
   </div>
 
+  <OrganismsFooter />
+
+  <ViewsDialog />
+  <MoleculesToastContainer />
 </template>
 
 <script setup lang="ts">
-
 // Handle authentication dialog logic
-useAuthenticationHandler()
+useAuthenticationHandler();
 
 useHead({
   htmlAttrs: {
@@ -42,22 +38,15 @@ useHead({
     },
     {
       rel: "preload",
-      as: 'image',
+      as: "image",
       href: "/img/preload.svg",
     },
   ],
 });
 </script>
 <style lang="scss">
-.l-root {
-  /* dvh-first app shell for consistent sticky footer */
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
 .page {
   background: var(--background-100);
-  flex: 1 1 auto;
 }
 
 .page-enter-active,
