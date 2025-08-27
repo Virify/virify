@@ -9,8 +9,14 @@
     </div>
     <!-- Image -->
     <div class="summary-card__image-container">
-      <nuxt-img provider="cloudflare" v-if="hasImage" :src="listing.image?.[0]?.image + '/card'"
-      alt="Listing image" class="summary-card__image" />
+      <AtomsCloudFlareImage
+        v-if="hasImage"
+        :src="listing.image?.[0]?.image"
+        :alt="listing.image?.[0]?.metadata?.alt || 'Listing image'"
+        variant="card"
+        :placeholder="true"
+        class="summary-card__image"
+      />
     </div>
     <!-- Content -->
     <div class="summary-card__content">
