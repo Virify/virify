@@ -2,8 +2,8 @@
  *  Offsets for headers
  */
 :root {
-  --header-height: calc(var(--size-16) * 4);
-  --header-offset: calc(var(--header-expanded-height) - var(--header-height));
+  --header-height: 4rem;
+  --header-offset: 0;
   --header-expanded-height: 8rem;
   --mobile-nav-height: 60px;
   --mobile-nav-header-height: 70px;
