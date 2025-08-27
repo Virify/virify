@@ -15,6 +15,10 @@
 </template>
 
 <script setup lang="ts">
+import { useViewportHeight } from '~/composables/useViewportHeight';
+
+// Set viewport height
+useViewportHeight();
 
 // Handle authentication dialog logic
 useAuthenticationHandler()

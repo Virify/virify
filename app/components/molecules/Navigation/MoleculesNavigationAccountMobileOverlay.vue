@@ -89,7 +89,7 @@ function handleNavClick(item: any) {
   position: absolute;
   top: 0;
   left: 0;
-  height: calc(100dvh - var(--mobile-nav-header-height));
+  height: calc(var(--viewport-height) - var(--mobile-nav-header-height));
   width: 100vw;
   background: var(--background-200);
   transform: translateX(-100%);
@@ -139,7 +139,7 @@ function handleNavClick(item: any) {
   -webkit-overflow-scrolling: touch;
   padding: var(--size-16);
   min-height: 0;
-  height: calc(100dvh - var(--mobile-nav-header-height) - var(--mobile-nav-height));
+  height: calc(var(--viewport-height) - var(--mobile-nav-header-height) - var(--mobile-nav-height));
 
   ul {
     display: grid;

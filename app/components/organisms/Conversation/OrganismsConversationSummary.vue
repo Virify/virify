@@ -152,7 +152,7 @@ function toggleCollapsed() {
   }
 
   @include mq.mobile-only {
-    height: 100dvh;
+    height: var(--viewport-height);
     border-radius: inherit;
 
     &.collapsed {
@@ -246,7 +246,7 @@ function toggleCollapsed() {
     min-height: 0;
 
     @include mq.mobile-only {
-      height: 100dvh;
+      height: var(--viewport-height);
     }
   }
 

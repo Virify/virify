@@ -9,6 +9,7 @@
 @use '1-variables/dividers' as variables-dividers;
 @use '1-variables/animations' as variables-animations;
 @use '1-variables/offsets' as variables-offsets;
+@use '1-variables/layout' as variables-layout;
 
 // Window
 @use '2-window/body' as window-body;
