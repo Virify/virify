@@ -16,7 +16,7 @@
       <ul v-show="!isCollapsed" class="item-details__list" :id="`item-details-${normalizedTitle}`">
         <li v-for="(item, index) in itemsArray" :key="index" class="item-details__item">
           <div class="item-details__image">
-            <nuxt-img v-if="item.media && item.media[0]" :src="item.media[0].image!" :alt="item.media[0].metadata!" class="| image-sm" />
+            <nuxt-img provider="cloudflare" v-if="item.media && item.media[0]" :src="item.media[0].image! + '/card'" :alt="item.media[0].metadata!" class="| image-sm" />
           </div>
           <div class="item-details__content | body-sm">
             <!-- Title row with icon, title, and info button -->

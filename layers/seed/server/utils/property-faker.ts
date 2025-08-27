@@ -6,6 +6,7 @@ import { typeToClassificationMap } from "./property-type-map";
 import type { PropertyWithAddress } from "~~/shared/types/property";
 import { prisma } from "~~/layers/database/server/utils/prisma-client";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed";
+import { getRequiredImages, getRandomAdditionalImages, getAllImagesByRoom } from "./images-to-seed";
 
 /**LandUse
  * Generate random additiional features
@@ -214,7 +215,7 @@ export const generateUtility = (): Prisma.UtilityCreateWithoutPropertyInput => {
 };
 
 /**
- * Generate media objects for a specific room type
+ * Generate media objects for a specific room type using Cloudflare images
  *
  * @param roomId - The ID of the room to link the media to
  * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom, frontGarden, rearGarden, kitchen)
@@ -222,22 +223,47 @@ export const generateUtility = (): Prisma.UtilityCreateWithoutPropertyInput => {
  * @returns Array of media objects
  */
 export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom' | 'frontGarden' | 'rearGarden' | 'kitchen', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
-  const mediaCount = faker.number.int({ min: 1, max: 3 });
+  const mediaCount = faker.number.int({ min: 1, max: 2 });
+  const allImagesByRoom = getAllImagesByRoom();
+  
   return Array.from({ length: mediaCount }, () => {
-    // Use realistic real estate image dimensions
-    // 2048x1536 for high-quality web display (4:3 aspect ratio)
-    // Common in real estate photography for MLS and web platforms
-    const width = 2048;
-    const height = 1536;
+    let imageId: string;
+    
+    // Map room types to image collections
+    switch (roomType) {
+      case 'bedroom':
+        imageId = faker.helpers.arrayElement(allImagesByRoom.bedroom);
+        break;
+      case 'bathroom':
+        imageId = faker.helpers.arrayElement(allImagesByRoom.bathroom);
+        break;
+      case 'kitchen':
+        imageId = faker.helpers.arrayElement(allImagesByRoom.kitchen);
+        break;
+      case 'frontGarden':
+      case 'rearGarden':
+        imageId = faker.helpers.arrayElement(allImagesByRoom.garden);
+        break;
+      case 'reception':
+        imageId = faker.helpers.arrayElement(allImagesByRoom.livingroom);
+        break;
+      case 'otherRoom':
+        // For other rooms, randomly pick from homeoffice, garage, or bathroom
+        const otherRoomOptions = [...allImagesByRoom.homeoffice, ...allImagesByRoom.garage, ...allImagesByRoom.bathroom];
+        imageId = faker.helpers.arrayElement(otherRoomOptions);
+        break;
+      default:
+        imageId = faker.helpers.arrayElement(allImagesByRoom.house);
+        break;
+    }
     
     const mediaData: Prisma.MediaUncheckedCreateWithoutPropertyInput = {
-      image: faker.image.urlPicsumPhotos({ width, height }),
+      image: imageId,
       metadata: JSON.stringify({
         alt: `${roomName} - ${faker.word.words(3)}`,
         description: faker.word.words(5),
         roomType: roomName,
-        dimensions: `${width}x${height}`,
-        aspectRatio: '4:3'
+        cloudflareImageId: imageId
       }),
     };
 
@@ -271,23 +297,45 @@ export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bath
 };
 
 /**
- * Generate general property media (not tied to specific rooms)
+ * Generate general property media (not tied to specific rooms) using Cloudflare images
  *
  * @param imageType - The type of general image (Exterior, Hallway, etc.)
  * @returns Media object
  */
 export const generateGeneralMedia = (imageType: string): Prisma.MediaUncheckedCreateWithoutPropertyInput => {
-  const width = 2048;
-  const height = 1536;
+  const allImagesByRoom = getAllImagesByRoom();
+  let imageId: string;
+  
+  // Map general image types to appropriate room collections
+  switch (imageType.toLowerCase()) {
+    case 'exterior':
+    case 'entrance':
+    case 'street view':
+      imageId = faker.helpers.arrayElement(allImagesByRoom.house);
+      break;
+    case 'garden':
+      imageId = faker.helpers.arrayElement(allImagesByRoom.garden);
+      break;
+    case 'hallway':
+    case 'staircase':
+    case 'overview':
+      imageId = faker.helpers.arrayElement(allImagesByRoom.livingroom);
+      break;
+    case 'utility':
+      imageId = faker.helpers.arrayElement(allImagesByRoom.garage);
+      break;
+    default:
+      imageId = faker.helpers.arrayElement(allImagesByRoom.house);
+      break;
+  }
   
   return {
-    image: faker.image.urlPicsumPhotos({ width, height }),
+    image: imageId,
     metadata: JSON.stringify({
       alt: `${imageType} - ${faker.word.words(3)}`,
       description: faker.word.words(5),
       roomType: imageType,
-      dimensions: `${width}x${height}`,
-      aspectRatio: '4:3'
+      cloudflareImageId: imageId
     }),
     // No room IDs set - this is general property media
   };
@@ -551,17 +599,54 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   // Now create media for each feature
   const mediaToCreate: Prisma.MediaUncheckedCreateWithoutPropertyInput[] = [];
   
-  // General property images (exterior, hallways, etc.)
-  const generalImageTypes = ['Exterior', 'Hallway', 'Staircase', 'Entrance', 'Overview', 'Garden', 'Street View'];
-  const generalImageCount = faker.number.int({ min: 2, max: 5 });
-  for (let i = 0; i < generalImageCount; i++) {
-    const imageType = faker.helpers.arrayElement(generalImageTypes);
-    mediaToCreate.push(generateGeneralMedia(imageType));
-  }
+  // Get required images first (mandatory room types)
+  const requiredImages = getRequiredImages();
+  const requiredImageIds = Object.values(requiredImages);
   
-  // Bedroom media
-  propertyWithFeatures.bedroomFeatures.forEach((bedroom: { id: number; roomNumber: any; }) => {
-    mediaToCreate.push(...generateMediaForRoom(bedroom.id, 'bedroom', `Bedroom ${bedroom.roomNumber}`));
+  // Add required property images
+  mediaToCreate.push(generateGeneralMedia('Exterior')); // house image
+  mediaToCreate.push(generateGeneralMedia('Garden')); // garden image
+  
+  // Add images for dining room and home office as general property media since they don't have dedicated tables
+  const allImagesByRoom = getAllImagesByRoom();
+  mediaToCreate.push({
+    image: requiredImages.diningroom,
+    metadata: JSON.stringify({
+      alt: 'Dining Room',
+      description: faker.word.words(5),
+      roomType: 'Dining Room',
+      cloudflareImageId: requiredImages.diningroom
+    }),
+  });
+  
+  mediaToCreate.push({
+    image: requiredImages.homeoffice,
+    metadata: JSON.stringify({
+      alt: 'Home Office',
+      description: faker.word.words(5),
+      roomType: 'Home Office',
+      cloudflareImageId: requiredImages.homeoffice
+    }),
+  });
+  
+  // Bedroom media - ensure at least one uses required bedroom image
+  propertyWithFeatures.bedroomFeatures.forEach((bedroom: { id: number; roomNumber: any; }, index: number) => {
+    if (index === 0) {
+      // First bedroom gets the required bedroom image
+      mediaToCreate.push({
+        image: requiredImages.bedroom,
+        metadata: JSON.stringify({
+          alt: `Bedroom ${bedroom.roomNumber}`,
+          description: faker.word.words(5),
+          roomType: `Bedroom ${bedroom.roomNumber}`,
+          cloudflareImageId: requiredImages.bedroom
+        }),
+        bedroomId: bedroom.id,
+      });
+    } else {
+      // Other bedrooms get random bedroom images
+      mediaToCreate.push(...generateMediaForRoom(bedroom.id, 'bedroom', `Bedroom ${bedroom.roomNumber}`));
+    }
   });
   
   // Bathroom media
@@ -589,9 +674,37 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.rearGarden.id), 'rearGarden', 'Rear Garden'));
   }
   
-  // Kitchen media
+  // Kitchen media - ensure it uses required kitchen image
   if (propertyWithFeatures.kitchenFeatures) {
-    mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.kitchenFeatures.id), 'kitchen', 'Kitchen'));
+    mediaToCreate.push({
+      image: requiredImages.kitchen,
+      metadata: JSON.stringify({
+        alt: 'Kitchen',
+        description: faker.word.words(5),
+        roomType: 'Kitchen',
+        cloudflareImageId: requiredImages.kitchen
+      }),
+      kitchenId: Number(propertyWithFeatures.kitchenFeatures.id),
+    });
+  }
+  
+  // Add additional random images to ensure minimum of 5 total images
+  const currentImageCount = mediaToCreate.length;
+  if (currentImageCount < 5) {
+    const additionalImagesNeeded = 5 - currentImageCount;
+    const additionalImages = getRandomAdditionalImages(additionalImagesNeeded, requiredImageIds as string[]);
+    
+    additionalImages.forEach((imageId: string) => {
+      mediaToCreate.push({
+        image: imageId,
+        metadata: JSON.stringify({
+          alt: 'Property Image',
+          description: faker.word.words(5),
+          roomType: 'General',
+          cloudflareImageId: imageId
+        }),
+      });
+    });
   }
   
   // Utility media (general property media)

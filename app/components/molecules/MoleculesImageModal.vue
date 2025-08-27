@@ -10,14 +10,10 @@
           :class="{ 'gallery-modal__thumbnail--active': index === currentIndex }"
           @click="setCurrentIndex(index)"
         >
-          <nuxt-img
-            :src="image.src"
+          <nuxt-img provider="cloudflare"
+            :src="image.src + '/thumbnail'"
             :alt="image.alt"
             class="gallery-modal__thumbnail-image"
-            fit="cover"
-            quality="60"
-            :width="80"
-            :height="60"
           />
         </button>
       </div>
@@ -29,15 +25,13 @@
     <!-- Main Image Display -->
     <div class="gallery-modal__main">
       <div class="gallery-modal__image-container">
-        <nuxt-img
-          :src="currentImage.src"
+        <nuxt-img 
+          provider="cloudflare"
+          :src="currentImage.src + '/gallery'"
           :alt="currentImage.alt"
           class="gallery-modal__image"
           :class="{ 'gallery-modal__image--zoomed': isZoomed }"
           decoding="async"
-          fit="contain"
-          quality="95"
-          sizes="95vw"
           @click.stop="toggleZoom"
         />
         

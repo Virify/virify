@@ -13,14 +13,12 @@
           class="m-listing-card-image-slide"
           @click="openImageModal(index)"
         >
-          <nuxt-img
-            :src="img.image"
+          <nuxt-img 
+          provider="cloudflare"
+            :src="img.image + '/card'"
             :alt="img.metadata"
             class="m-listing-card-image"
-            :width="600"
-            :height="400"
-            quality="80"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
+
             placeholder="/img/preload.svg"
           />
         </div>
@@ -78,7 +76,7 @@
     
     <!-- Image Gallery Modal -->
     <MoleculesImageGalleryModal
-      v-if="showImageModal"
+      :show="showImageModal"
       :images="galleryImages"
       :initial-index="modalImageIndex"
       @close="closeImageModal"
@@ -115,7 +113,19 @@ const images = computed(() => {
     }));
 });
 
-const galleryImages = computed(() => formatGalleryImages(images.value));
+const galleryImages = computed(() => {
+  return images.value.map((item, index) => ({
+    src: item.image,
+    alt: (() => {
+      try {
+        const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+        return metadata?.alt || `Property image ${index + 1}`;
+      } catch {
+        return `Property image ${index + 1}`;
+      }
+    })()
+  }));
+});
 
 const [emblaNode, emblaApi] = emblaCarouselVue({ loop: true, startIndex: 0 });
 const selectedIndex = ref(0);
@@ -195,7 +205,6 @@ onMounted(() => {
 
 .m-listing-card-image {
   height: 100%;
-  object-fit: cover;
   width: 100%;;
   // transition: transform 0.2s ease;
 }
