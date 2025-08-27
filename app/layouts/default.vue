@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="default-layout">
     <NuxtLoadingIndicator />
     <OrganismsHeader />
 
@@ -48,8 +48,15 @@ useHead({
 });
 </script>
 <style lang="scss">
+.default-layout {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
 .page {
   background: var(--background-100);
+  flex-grow: 1;
 }
 
 .page-enter-active,
