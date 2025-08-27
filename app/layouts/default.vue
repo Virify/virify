@@ -1,16 +1,17 @@
 <template>
+  <div class="l-root">
+    <NuxtLoadingIndicator />
+    <OrganismsHeader />
 
-  <NuxtLoadingIndicator />
-  <OrganismsHeader />
+    <div class="page">
+      <NuxtPage />
+    </div>
 
-  <div class="page">
-    <NuxtPage />
+    <OrganismsFooter />
+
+    <ViewsDialog />
+    <MoleculesToastContainer />
   </div>
-
-  <OrganismsFooter />
-
-  <ViewsDialog />
-  <MoleculesToastContainer />
 
 </template>
 
@@ -48,9 +49,15 @@ useHead({
 });
 </script>
 <style lang="scss">
+.l-root {
+  /* dvh-first app shell for consistent sticky footer */
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
 .page {
   background: var(--background-100);
-  flex-grow: 1;
+  flex: 1 1 auto;
 }
 
 .page-enter-active,
