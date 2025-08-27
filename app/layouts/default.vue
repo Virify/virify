@@ -1,40 +1,23 @@
 <template>
-  <div class="default-layout" :style="layoutStyle">
-    <NuxtLoadingIndicator />
-    <OrganismsHeader ref="headerRef" />
 
-    <div class="page">
-      <NuxtPage />
-    </div>
+  <NuxtLoadingIndicator />
+  <OrganismsHeader />
 
-    <OrganismsFooter />
-
-    <ViewsDialog />
-    <MoleculesToastContainer />
+  <div class="page">
+    <NuxtPage />
   </div>
+
+  <OrganismsFooter />
+
+  <ViewsDialog />
+  <MoleculesToastContainer />
+
 </template>
 
 <script setup lang="ts">
-import { useResizeObserver, useScreenSafeArea } from '@vueuse/core';
 
 // Handle authentication dialog logic
-useAuthenticationHandler();
-
-const headerRef = ref<HTMLElement | null>(null);
-const headerHeight = ref(0);
-
-useResizeObserver(headerRef, (entries) => {
-  const entry = entries[0]!;
-  headerHeight.value = entry.contentRect.height;
-});
-
-const { top, bottom } = useScreenSafeArea();
-
-const layoutStyle = computed(() => ({
-  '--header-height-actual': `${headerHeight.value}px`,
-  '--safe-area-inset-top': top.value,
-  '--safe-area-inset-bottom': bottom.value,
-}));
+useAuthenticationHandler()
 
 useHead({
   htmlAttrs: {
@@ -65,18 +48,9 @@ useHead({
 });
 </script>
 <style lang="scss">
-.default-layout {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  padding-top: var(--safe-area-inset-top);
-  padding-bottom: var(--safe-area-inset-bottom);
-}
-
 .page {
   background: var(--background-100);
   flex-grow: 1;
-  padding-top: var(--header-height-actual);
 }
 
 .page-enter-active,
