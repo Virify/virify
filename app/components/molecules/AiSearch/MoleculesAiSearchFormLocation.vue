@@ -48,9 +48,13 @@ function updateAutocompleteValue({ target }: Event) {
  *  Global and input state
  */
 const { searchState } = useSearchState()
-const { location } = toRefs(searchState.value)
 
-const locationQuery = ref(location?.value?.place_name_en || '')
+const locationQuery = computed(() => {
+  const { location } = asObject(searchState.value)
+
+  return location?.place_name_en || ''
+})
+
 /**
  *  Handle autocomplete events
  */
@@ -63,12 +67,6 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
   // Get enhanced location, falling back to normal location
   const enhancedLocation = await enhanceWithBoundaryPolygon(locationUnref)
     .catch(() => locationUnref);
-
-  // Get place name from location
-  const { place_name_en } = asObject(enhancedLocation)
-
-  // Update current location query
-  locationQuery.value = place_name_en as string
 
   // Update global state
   setLocation(enhancedLocation, hidePopover)
