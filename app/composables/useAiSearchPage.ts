@@ -3,6 +3,7 @@
 /**
  * Composable for managing AI search page state and functionality
  * Uses local refs with manual KV save/load
+ * @deprecated
  */
 export const useAiSearchPage = () => {
   const {

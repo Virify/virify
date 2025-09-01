@@ -7,7 +7,7 @@
     }">
       <template #left v-if="showGrid">
         <OrganismsResults v-if="isLoading || results.length" :results :is-loading />
-        <MoleculesAiSearchNoResults v-else :last-search-query="lastSearchQuery" />
+        <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
 
       <template #right v-if="showMap">
@@ -26,7 +26,8 @@ const {
   setResults,
   setQueryAnalysis,
   setSearchPending,
-  setViewMode
+  setViewMode,
+  setSortOrder
 } = useSearchState()
 
 /**
@@ -49,16 +50,11 @@ const showMap = computed(() => {
 })
 
 /**
- *  No results message
- */
-const { lastSearchQuery, updateSort } = useAiSearchPage()
-
-/**
  *  Handle searches
  */
 const { location, radius, sortBy, query, viewMode } = toRefs(searchState.value)
 const { setPendingWhile } = usePending()
-const { aiSearch } = useAiSearchPage();
+const { aiSearch } = useAi();
 
 watch([location, radius, query], () => {
   // Get current location, radius
@@ -84,10 +80,7 @@ watch([location, radius, query], () => {
 }, { deep: true })
 
 watch(sortBy, (newValue) => {
-  // @TODO
-  // The KV store needs fixing before this can be activated
-  console.log('@TODO: sort results by', newValue)
-  // updateSort(newValue)
+  setSortOrder(newValue)
 })
 
 watch(viewMode, (layout) => {
