@@ -22,6 +22,7 @@
 <script setup>
 const {
   isLoading,
+  refreshFromKV,
   searchState,
   setResults,
   setQueryAnalysis,
@@ -72,9 +73,14 @@ watch([location, radius, query], () => {
 
     const { queryAnalysis, results } = await aiSearch(location, radius, query, 1);
 
+    // Remove loading state
+    setSearchPending(false)
+
+    // Save results
     setQueryAnalysis(queryAnalysis)
     setResults(results)
   }).finally(() => {
+    // Remove loading state, e.g. in case of error
     setSearchPending(false)
   })
 }, { deep: true })
@@ -101,6 +107,13 @@ const results = computed(() => {
   if (!Array.isArray(results)) return []
 
   return results
+})
+
+/**
+ *  Load search state on page mounted
+ */
+onMounted(() => {
+  refreshFromKV()
 })
 
 </script>
