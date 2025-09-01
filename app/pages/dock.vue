@@ -53,7 +53,12 @@ const showMap = computed(() => {
 /**
  *  Handle searches
  */
-const { location, radius, sortBy, query, viewMode } = toRefs(searchState.value)
+const location = computed(() => asObject(searchState.value).location)
+const radius = computed(() => asObject(searchState.value).radius)
+const sortBy = computed(() => asObject(searchState.value).sortBy)
+const viewMode = computed(() => asObject(searchState.value).viewMode)
+const query = computed(() => asObject(searchState.value).query)
+
 const { setPendingWhile } = usePending()
 const { aiSearch } = useAi();
 

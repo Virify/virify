@@ -83,7 +83,7 @@ function hidePopover() {
  *  Close popover when results are updated
  */
 const { searchState } = useSearchState()
-const { results } = toRefs(searchState.value)
+const results = computed(() => asObject(searchState.value).results)
 
 watch(results, () => {
   hidePopover()
