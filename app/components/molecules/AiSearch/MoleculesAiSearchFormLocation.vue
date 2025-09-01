@@ -9,7 +9,7 @@
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
-          v-model="searchState.radius" :options="selectOptionRadius" />
+          v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
       </fieldset>
 
       <Transition name="m-ai-search-form-location">
@@ -21,7 +21,7 @@
 
     <AtomsSelect name="radius" id="radius" aria-label="Location radius"
       class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
-      v-model="searchState.radius" :options="selectOptionRadius" />
+      v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
   </form>
 </template>
 
@@ -54,7 +54,7 @@ const locationQuery = ref(location?.value?.place_name_en || '')
 /**
  *  Handle autocomplete events
  */
-const { setLocation } = useSearchState()
+const { setLocation, setLocationRadius } = useSearchState()
 const { enhanceWithBoundaryPolygon } = useMap();
 
 async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
@@ -72,6 +72,15 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
 
   // Update global state
   setLocation(enhancedLocation, hidePopover)
+}
+
+/**
+ *  Update radius via state when updated
+ */
+function handleRadiusSelected() {
+  const { radius } = asObject(searchState.value)
+
+  setLocationRadius(Number(radius) || 0)
 }
 
 /**
