@@ -232,6 +232,7 @@ function createSearchState() {
     await saveToKV(searchState.value);
   };
 
+  // @TODO add a button to reset form, then test functionality
   const clearState = async () => {
     searchState.value = { ...defaultState };
     await clearKV();
