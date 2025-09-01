@@ -1,5 +1,5 @@
 <template>
-  <SelectRoot v-model="sortBy">
+  <SelectRoot v-model="searchState.sortBy">
     <SelectTrigger class="o-dock-inputs-sort__button" v-bind="$attrs">
       <AtomsIcon icon="search/sort" />
       <SelectValue class="o-dock-inputs-sort__button-value | body-sm" placeholder="Select sort order" />
@@ -46,7 +46,6 @@ import {
  *  Sort order state
  */
 const { searchState } = useSearchState()
-const { sortBy } = toRefs(searchState.value)
 
 </script>
 
