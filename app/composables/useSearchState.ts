@@ -23,11 +23,12 @@ function createSearchState() {
 
   // Generate or restore session ID (unique per tab)
   const initSessionId = () => {
-    if (import.meta.client) {
-      sessionId.value =
-        sessionStorage.getItem("search-session-id") || crypto.randomUUID();
-      sessionStorage.setItem("search-session-id", sessionId.value);
-    }
+    if (!import.meta.client) return
+
+    sessionId.value =
+      sessionStorage.getItem("search-session-id") || crypto.randomUUID();
+
+    sessionStorage.setItem("search-session-id", sessionId.value);
   };
 
   // Save to KV storage
