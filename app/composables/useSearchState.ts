@@ -247,7 +247,16 @@ function createSearchState() {
     setSearchPending(false)
 
     if (stored) {
-      searchState.value = { ...defaultState, ...stored };
+      const newState = { ...defaultState, ...stored }
+
+      // Save new state to ref
+      searchState.value = newState;
+
+      // Update AI query analysis
+      // @TODO this needs a refactor to reduce coupling
+      const { queryAnalysis } = useAi()
+
+      queryAnalysis.value = newState.queryAnalysis
     }
   };
 
