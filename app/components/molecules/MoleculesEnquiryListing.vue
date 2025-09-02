@@ -10,7 +10,6 @@
         sizes="268px"
         format="webp,jpg"
         quality="80"
-        
       />
       <div class="property-badge | body-sm font-semibold">Your Property</div>
     </div>
