@@ -5,6 +5,7 @@
     :alt="alt"
     class="a-cloudflare-image"
     :placeholder="placeholder"
+    v-bind="$attrs"
   />
 </template>
 
@@ -18,4 +19,9 @@ const props = defineProps<{
 
 const source = props.src + '/' + (props.variant || 'public');
 const placeholder = props.placeholder ? '/img/preload.svg' : undefined;
+
+// Allow all other attributes to be passed through
+defineOptions({
+  inheritAttrs: false
+});
 </script>

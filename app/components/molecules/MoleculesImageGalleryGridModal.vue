@@ -8,7 +8,7 @@
       <div class="gallery-grid-modal__grid">
         <button v-for="(image, index) in images" :key="index" class="gallery-grid-modal__image-button"
           @click="openImageModal(index)">
-          <nuxt-img provider="cloudflare" :src="image.src + '/gallery'" :alt="image.alt" class="gallery-grid-modal__image"
+          <AtomsCloudFlareImage :src="image.src" :alt="image.alt" variant="gallery" class="gallery-grid-modal__image"
           />
         </button>
       </div>

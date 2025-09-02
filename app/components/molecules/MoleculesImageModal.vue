@@ -10,9 +10,10 @@
           :class="{ 'gallery-modal__thumbnail--active': index === currentIndex }"
           @click="setCurrentIndex(index)"
         >
-          <nuxt-img provider="cloudflare"
-            :src="image.src + '/thumbnail'"
+          <AtomsCloudFlareImage
+            :src="image.src"
             :alt="image.alt"
+            variant="thumbnail"
             class="gallery-modal__thumbnail-image"
           />
         </button>
@@ -25,10 +26,11 @@
     <!-- Main Image Display -->
     <div class="gallery-modal__main">
       <div class="gallery-modal__image-container">
-        <nuxt-img 
-          provider="cloudflare"
-          :src="currentImage.src + '/gallery'"
+        <AtomsCloudFlareImage
+          :key="currentIndex"
+          :src="currentImage.src"
           :alt="currentImage.alt"
+          variant="gallery"
           class="gallery-modal__image"
           :class="{ 'gallery-modal__image--zoomed': isZoomed }"
           decoding="async"

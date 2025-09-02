@@ -16,16 +16,16 @@
           #side-images="{ selectedIndex, goToSlide, images: allImages }"
         >
           <div class="premium-side-images">
-             <nuxt-img 
-              provider="cloudflare"
+             <AtomsCloudFlareImage
               v-for="(image, index) in getRotatedImages(allImages, selectedIndex)"
               :key="`${selectedIndex}-${index}`"
-              :src="image.src + '/card'"
+              :src="image.src"
+              variant="thumbnail"
               class="premium-side-image"
               :class="{ active: image.isActive }"
               :alt="image.alt"
               @click="goToSlide(image.originalIndex)"
-              placeholder="/img/preload.svg"
+              :placeholder="true"
             />
           </div>
         </template>

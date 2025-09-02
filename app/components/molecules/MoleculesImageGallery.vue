@@ -9,13 +9,12 @@
           @click="openModal"
         >
           <div class="m-image-gallery__image-container">
-            <nuxt-img 
-              provider="cloudflare"
-              :src="image.src + '/card'"
+            <AtomsCloudFlareImage
+              :src="image.src"
               :alt="image.alt"
+              variant="card"
               class="m-image-gallery__image"
-              loading="lazy"
-              placeholder="/img/preload.svg"
+              :placeholder="true"
             />
           </div>
         </div>
@@ -49,13 +48,12 @@
           @click="onThumbClick(index)"
         >
           <div class="m-image-gallery__thumb-container">
-            <nuxt-img 
-              provider="cloudflare"
-              :src="image.src + '/thumbnail'"
+            <AtomsCloudFlareImage
+              :src="image.src"
               :alt="image.alt"
+              variant="thumbnail"
               class="m-image-gallery__thumb-image"
-              loading="lazy"
-              placeholder="/img/preload.svg"
+              :placeholder="true"
             />
           </div>
         </button>

@@ -3,7 +3,7 @@
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
         <div class="m-chat-summary-item__title">
-        <nuxt-img provider="cloudflare" :src="firstImage" alt="" width="40" height="40"  />
+        <AtomsCloudFlareImage :src="firstImage" alt="" width="40" height="40" />
           <div class="m-chat-summary-item__name-section">
             <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
               'unread': unreadMessages > 0
