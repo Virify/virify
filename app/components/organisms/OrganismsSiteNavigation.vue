@@ -1,20 +1,19 @@
 <template>
   <nav class="o-site-navigation">
-    <ul class="o-site-navigation-list">
-      <template v-if="!loggedIn">
-        <li>
-          <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm button button-tertiary button-sm">Log in</button>
-        </li>
-        <li>
-          <button @click.prevent="openForgotPassword"
-            class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
-        </li>
-      </template>
-
-      <li v-else>
-        <MoleculesNavPopover :options="navigationGroups" />
-      </li>
-    </ul>
+    <div class="o-site-navigation__wrapper">
+      <ul class="o-site-navigation-list">
+          <li>
+            <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm button button-tertiary button-sm">Log in</button>
+          </li>
+          <li>
+            <button @click.prevent="openSignup"
+              class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
+          </li>
+        <!-- <li v-else>
+          <MoleculesNavPopover :options="navigationGroups" />
+        </li> -->
+      </ul>
+    </div>
   </nav>
 </template>
 
@@ -30,11 +29,13 @@ function openLogin() {
   });
 }
 
-function openForgotPassword() {
+function openSignup() {
   showDialog({
     component: ViewsDialogSignup,
   });
 }
+
+const isLoggedIn = computed(() => loggedIn.value);
 </script>
 
 <style lang="scss">
@@ -43,6 +44,11 @@ function openForgotPassword() {
 .o-site-navigation {
   color: var(--monochrome-900);
   background-color: var(--background-400);
+}
+
+.o-site-navigation__wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .o-site-navigation-list {

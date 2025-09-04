@@ -1,9 +1,9 @@
 <template>
-  <li class="m-chat-summary-item" @click="$emit('select-conversation', conversation)">
+  <li class="m-chat-summary-item" :class="{ 'm-chat-summary-item--active': isActive }" @click="$emit('select-conversation', conversation)">
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
         <div class="m-chat-summary-item__title">
-        <AtomsCloudFlareImage :src="firstImage" alt="" width="40" height="40" />
+        <AtomsCloudFlareImage :src="firstImage" alt="" variant="thumbnail" class="m-chat-summary-item__image" />
           <div class="m-chat-summary-item__name-section">
             <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
               'unread': unreadMessages > 0
@@ -26,6 +26,7 @@
 interface Props {
   conversation: ConversationWithUserAndMessages;
   currentUserId?: string | number;
+  isActive?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -45,7 +46,14 @@ const formattedPartnerName = computed(() => {
 });
 
 const lastMessageContent = computed(() => {
-  return getLastMessageContent(props.conversation);
+  const baseContent = getLastMessageContent(props.conversation);
+  const lastMessage = props.conversation.messages[props.conversation.messages.length - 1];
+  
+  if (lastMessage && lastMessage.senderId === props.currentUserId) {
+    return `You: ${baseContent}`;
+  }
+  
+  return baseContent;
 });
 
 const lastMessageTime = computed(() => {
@@ -66,9 +74,17 @@ const firstImage = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '#styles/_utils/media' as mq;
+
 .m-chat-summary-item {
   cursor: pointer;
   padding: var(--size-8);
+  color: var(--monochrome-100);
+
+  &__image {
+    width: 40px;
+    height: 40px;
+  }
 
   .unread {
     color: var(--secondary-400);
@@ -76,19 +92,42 @@ const firstImage = computed(() => {
 
   &:hover {
     background: var(--background-100);
-    border-radius: var(--border-radius-lg);
+    border-radius: var(--border-radius-xl);
+  }
+
+  &--active {
+    background: var(--secondary-500);
+    border-radius: var(--border-radius-xl);
+    color: var(--monochrome-100);
+
+    .m-chat-summary-item__address, .m-chat-summary-item__username, .m-chat-summary-item__time, .m-chat-summary-item-message__content {
+      color: var(--monochrome-100);
+    }
+
+    &:hover {
+      background: var(--secondary-500);
+    }
   }
 
   &__content {
     display: flex;
     flex-direction: column;
+    padding: var(--size-16);
+
+    @include mq.mobile-only {
+      padding: var(--size-8);
+    }
+
+    .right-sidebar & {
+      padding: 0;
+    }
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: var(--size-4);
+    gap: var(--size-2);
     margin-bottom: var(--size-4);
   }
 
@@ -115,7 +154,7 @@ const firstImage = computed(() => {
   }
 
   &__username {
-    color: var(--secondary-600);
+    color: var(--foreground-100);
     text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;

@@ -79,6 +79,18 @@
 }
 
 /**
+ * Container Reset
+ */
+.container-reset {
+  --container-width: 100%;
+  --container-padding: 0;
+
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+/**
  *  Elevations
  */
 .elevate-200 {

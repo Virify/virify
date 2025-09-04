@@ -8,5 +8,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
   }
 
-  return await getSentEnquiryListingIds(user.id);
+  return await getSentConversationListingIds(user.id);
 });

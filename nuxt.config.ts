@@ -16,9 +16,11 @@ export default defineNuxtConfig({
   app: {
     head: {
       meta: [
-        { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" }
+        { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=overlays-content" }
       ]
-    }
+    },
+    // pageTransition: { name: "page", mode: "out-in" },
+    // layoutTransition: { name: "page", mode: "in-out" },
   },
   vite: {
     plugins: [],

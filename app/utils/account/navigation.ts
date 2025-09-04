@@ -1,9 +1,18 @@
-export const accountNavigation: NavigationItem[] = [
+export const navigationHome: NavigationItem[] = [
   {
-    name: "Dashboard",
+    name: "Home",
     url: "/account",
-    icon: "property/house",
+    icon: "account/dash-home",
   },
+  {
+    name: "Logout",
+    url: "#",
+    icon: "account/logout",
+    action: "logout",
+  },
+];
+
+export const accountNavigation: NavigationItem[] = [
   {
     name: "Profile",
     url: "#",
@@ -29,12 +38,7 @@ export const accountNavigation: NavigationItem[] = [
     url: "#",
     icon: "account/account-preferences",
   },
-  {
-    name: "Logout",
-    url: "#",
-    icon: "arrow-right",
-    action: "logout",
-  },
+
 ];
 
 export const listingsNavigation: NavigationItem[] = [
@@ -54,7 +58,7 @@ export const listingsNavigation: NavigationItem[] = [
     name: "Enquiries",
     url: "/account/messages",
     icon: "account/enquiry",
-    countKey: "enquiries",
+    countKey: "unreadMessages",
   },
   {
     name: "Viewings",
@@ -98,7 +102,12 @@ export const searchNavigation: NavigationItem[] = [
 
 export const navigationGroups: NavigationGroup[] = [
   {
-    title: "My Listings",
+    title: "Dashboard",
+    icon: "account/dash",
+    items: navigationHome,
+  },
+  {
+    title: "Listings",
     icon: "property/house",
     items: listingsNavigation,
   },
@@ -113,3 +122,12 @@ export const navigationGroups: NavigationGroup[] = [
     items: searchNavigation,
   },
 ];
+
+export const logout = async () => {
+  const { clear } = useUserSession()
+  await clear()
+  const route = useRoute()
+  if (route.path.startsWith('/account')) {
+    navigateTo('/')
+  }
+}

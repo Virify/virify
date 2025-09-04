@@ -2,7 +2,7 @@
   <div :class="wrapperClass" class="a-input" role="presentation">
     <slot name="prefix" />
 
-    <input v-bind="$attrs" :ariaDescribed class="| text-input" @input="checkValidity" />
+    <input v-bind="$attrs" :value="modelValue" :aria-describedby="ariaDescribed" class="| text-input" @input="handleInput" />
 
     <slot name="suffix" />
   </div>
@@ -27,17 +27,29 @@ const ariaDescribed = computed(() => {
 /**
  *  Apply the appropriate settings for password inputs
  */
-const { customValidation } = defineProps({
+const props = defineProps({
   customValidation: {
     type: Object
   },
   wrapperClass: {
     type: String
+  },
+  modelValue: {
+    type: String,
+    default: ''
   }
 })
+
+const emit = defineEmits(['update:modelValue'])
+
+function handleInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  emit('update:modelValue', target.value)
+  checkValidity(event)
+}
 
 /**
  *  Validate inputs - this can probably be made into a composable
  */
-const { validityText, checkValidity } = useCheckValidity(customValidation)
+const { validityText, checkValidity } = useCheckValidity(props.customValidation)
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="| flow dialog-container dialog-container-xs">
-    <h1 class="| title-xl">Send Enquiry</h1>
-    <p class="| body-sm">Write your message or question below - we will notify them of your enquiry.</p>
+    <h1 class="| title-xl">Start Conversation</h1>
+    <p class="| body-sm">Write your message or question below - we will notify them of your message.</p>
     <div class="| flow flow-md">
       <textarea v-model="message" class="| body-sm" rows="4" placeholder="Type your message..."></textarea>
       <div class="| flex justify-end gap-2">
@@ -23,7 +23,7 @@ const props = defineProps<{ listingId: number; receiverId: number }>();
 
 const message = ref('');
 const sending = ref(false);
-const { sendEnquiry } = useEnquiry();
+const { startConversation } = useConversations();
 const { hideDialog } = useDialog();
 const { showToast } = useToast();
 
@@ -31,12 +31,12 @@ async function onSend() {
   if (!message.value.trim()) return;
   sending.value = true;
   try {
-    await sendEnquiry(props.listingId, props.receiverId, message.value.trim());
-    showToast('Enquiry sent successfully!', { type: 'success' });
+    await startConversation(props.listingId, props.receiverId, message.value.trim());
+    showToast('Message sent successfully!', { type: 'success' });
     hideDialog();
   } catch (e) {
-    showToast('Failed to send enquiry. Please try again.', { type: 'error' });
-    console.error('Error sending enquiry:', e);
+    showToast('Failed to send message. Please try again.', { type: 'error' });
+    console.error('Error starting conversation:', e);
   } finally {
     sending.value = false;
   }

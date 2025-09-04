@@ -49,7 +49,7 @@ definePageMeta({
   head: {
     title: "Dashboard",
   },
-  layout: "account",
+  layout: "account"
 });
 
 const { analytics, recentFavourites, recentUserNotes, recentlyViewedListings } = useAnalytics();
@@ -84,7 +84,7 @@ const isNotesCollapsed = ref(true);
 
 .content-section {
   background: var(--background-200);
-  padding: var(--size-32);
+  padding: var(--size-16);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;

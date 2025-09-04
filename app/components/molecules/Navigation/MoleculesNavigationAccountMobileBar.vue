@@ -5,18 +5,23 @@
         <AtomsIcon icon="read-more" size="28" />
         <span class="nav-label | body-xs">Menu</span>
       </li>
-      <li class="bottom-nav-item" :class="{ 'current-page': !isMobileMenuOpen && !isChatSummaryOpen }" @click="$emit('closeBoth')">
-        <AtomsIcon icon="property/house" size="28" />
-        <span class="nav-label | body-xs">Dashboard</span>
+      <li class="bottom-nav-item"
+        :class="{ 'current-page': $route.path === '/account' || $route.path === '/account/' }">
+        <NuxtLink to="/account" class="nav-link" @click="$emit('closeBoth')">
+          <AtomsIcon icon="property/house" size="28" />
+          <span class="nav-label | body-xs">Dashboard</span>
+        </NuxtLink>
       </li>
-      <li class="bottom-nav-item" :class="{ 'active': isChatSummaryOpen }" @click="$emit('toggleChat')">
-        <div class="icon-wrapper">
-          <AtomsIcon icon="account/chat" size="28" />
-          <span v-if="chatNotificationCount > 0" class="notification-badge | body-xs font-semibold">
-            {{ chatNotificationCount > 99 ? '99+' : chatNotificationCount }}
-          </span>
-        </div>
-        <span class="nav-label | body-xs">Chat</span>
+      <li class="bottom-nav-item" :class="{ 'current-page': $route.path === '/account/messages' }">
+        <NuxtLink to="/account/messages" class="nav-link">
+          <div class="icon-wrapper">
+            <AtomsIcon icon="account/chat" size="28" />
+            <span v-if="chatNotificationCount > 0" class="notification-badge | body-xs font-semibold">
+              {{ chatNotificationCount > 99 ? '99+' : chatNotificationCount }}
+            </span>
+          </div>
+          <span class="nav-label | body-xs">Chat</span>
+        </NuxtLink>
       </li>
     </ul>
   </nav>
@@ -25,12 +30,10 @@
 <script setup lang="ts">
 defineProps<{
   isMobileMenuOpen: boolean
-  isChatSummaryOpen: boolean
 }>()
 
 defineEmits<{
   toggleMenu: []
-  toggleChat: []
   closeBoth: []
 }>()
 
@@ -45,42 +48,43 @@ const chatNotificationCount = computed(() => {
 
 <style lang="scss" scoped>
 .mobile-bottom-nav {
-  display: none;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--background-200);
+  padding: var(--size-4);
+  z-index: 1003;
+  box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
+  padding-bottom: calc(env(safe-area-inset-bottom));
 
-  @media (max-width: 768px) {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--background-200);
-    padding: var(--size-16);
-    z-index: 1001;
-    box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
-    justify-content: space-around;
-    align-items: center;
+  @media (min-width: 769px) {
+    display: none;
   }
+
 
   ul {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
     width: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
+    box-sizing: border-box;
   }
 
   .bottom-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: var(--size-4);
     padding: var(--size-8);
     border-radius: var(--border-radius-md);
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 60px;
     color: var(--foreground-100);
 
     &.active {
@@ -91,9 +95,17 @@ const chatNotificationCount = computed(() => {
       color: var(--secondary-400);
     }
 
+    .nav-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--size-4);
+      text-decoration: none;
+      color: inherit;
+    }
+
     :deep(svg) {
       color: inherit;
-      transition: color 0.2s ease;
     }
 
     .nav-label {

@@ -1,65 +1,60 @@
 <template>
   <div class="o-chat-summary" :class="{ collapsed: isCollapsed }">
     <div class="o-chat-summary__header" @click="toggleCollapsed">
-      <h3 class="o-chat-summary__title | title-xs">Enquiries 
-        <span class="o-chat-summary__count | body-sm">({{ enquiriesCount }})</span>
+      <h3 class="o-chat-summary__title | title-xs">Conversations
+        <span class="o-chat-summary__count | body-sm">{{ conversationsCount }}</span>
       </h3>
       <button class="o-chat-summary__toggle-btn" :class="{ 'o-chat-summary__toggle-btn--collapsed': isCollapsed }">
         <AtomsIcon icon="chevron-down" size="16" />
       </button>
     </div>
     <div class="o-chat-summary__content" v-show="!isCollapsed">
-      <div class="o-chat-summary__filters-row">
-        <AtomsSelect 
-          v-model="sortBy" 
-          :options="sortOptions"
-          class="o-chat-summary__sort-select | body-sm"
-        />
-      </div>
-      <template v-if="searchEnabled !== false">
-        <div class="o-chat-summary__search-row">
-          <input
-            v-model="search"
-            type="text"
-            class="o-chat-summary__search-input | body-sm"
-            placeholder="Search enquiries..."
-            autocomplete="off"
-          />
+      <div class="o-chat-summary__fixed-section">
+        <div v-if="sort" class="o-chat-summary__filters-row">
+          <AtomsSelect v-model="sortBy" :options="sortOptions" class="o-chat-summary__sort-select | body-sm" />
         </div>
-      </template>
-      <ClientOnly>
-        <template v-if="loading">
-          <div class="o-chat-summary__loading">
-            <SkeletonLoader class="o-chat-summary__skeleton" />
-            <SkeletonLoader class="o-chat-summary__skeleton" />
-            <SkeletonLoader class="o-chat-summary__skeleton" />
+        <template v-if="searchEnabled !== false">
+          <div class="o-chat-summary__search-row">
+            <AtomsInput v-model="search" type="text" placeholder="Search conversations..." autocomplete="off"
+              class="body-sm" />
           </div>
         </template>
-        <template v-else-if="filteredConversations.length > 0">
-          <ul class="o-chat-summary__list">
-            <MoleculesChatSummaryItem v-for="conversation in filteredConversations" :key="conversation.id"
-              :conversation="conversation" :current-user-id="user?.id"
-              @select-conversation="handleConversationSelect" />
-          </ul>
-          <div v-if="limit" class="o-chat-summary__footer">
-            <NuxtLink to="/account/messages">
-              <button class="button button-sm button-secondary">See all</button>
-            </NuxtLink>
-          </div>
-        </template>
-        <template v-else>
-          <div class="o-chat-summary__empty">
-            <p class="o-chat-summary__empty-text | body-sm">No enquiries found</p>
-          </div>
-        </template>
-        <template #fallback>
-          <div class="o-chat-summary__loading">
-            <SkeletonLoader class="o-chat-summary__skeleton" />
-            <SkeletonLoader class="o-chat-summary__skeleton" />
-            <SkeletonLoader class="o-chat-summary__skeleton" />
-          </div>
-        </template>
-      </ClientOnly>
+      </div>
+      <div class="o-chat-summary__scrollable-section">
+        <ClientOnly>
+          <template v-if="loading">
+            <div class="o-chat-summary__loading">
+              <SkeletonLoader class="o-chat-summary__skeleton" />
+              <SkeletonLoader class="o-chat-summary__skeleton" />
+              <SkeletonLoader class="o-chat-summary__skeleton" />
+            </div>
+          </template>
+          <template v-else-if="filteredConversations.length > 0">
+            <ul class="o-chat-summary__list">
+              <MoleculesConversationSummaryItem v-for="conversation in filteredConversations" :key="conversation.id"
+                :conversation="conversation" :current-user-id="user?.id"
+                @select-conversation="handleConversationSelect" />
+            </ul>
+            <div v-if="limit" class="o-chat-summary__footer">
+              <NuxtLink to="/account/messages">
+                <button class="button button-sm button-secondary">See all</button>
+              </NuxtLink>
+            </div>
+          </template>
+          <template v-else>
+            <div class="o-chat-summary__empty">
+              <p class="o-chat-summary__empty-text | body-sm">No conversations found</p>
+            </div>
+          </template>
+          <template #fallback>
+            <div class="o-chat-summary__loading">
+              <SkeletonLoader class="o-chat-summary__skeleton" />
+              <SkeletonLoader class="o-chat-summary__skeleton" />
+              <SkeletonLoader class="o-chat-summary__skeleton" />
+            </div>
+          </template>
+        </ClientOnly>
+      </div>
     </div>
   </div>
 </template>
@@ -70,9 +65,10 @@ const props = defineProps<{
   limit?: number
   searchEnabled?: boolean
   disableNavigate?: boolean
+  sort?: boolean
 }>()
 
-const { limit, searchEnabled, disableNavigate } = toRefs(props)
+const { limit, searchEnabled, disableNavigate, sort } = toRefs(props)
 
 const emit = defineEmits<{
   /** Emitted when a conversation is selected if disableNavigate is true */
@@ -92,23 +88,26 @@ const sortBy = ref("all")
 const sortOptions = [
   { key: "All", value: "all" },
   { key: "Unread", value: "unread" },
-  { key: "Received", value: "received" },
-  { key: "Sent", value: "sent" },
+  { key: "Received Messages", value: "received" },
+  { key: "Sent Messages", value: "sent" },
   { key: "Recent", value: "recent" },
   { key: "Oldest", value: "oldest" }
 ]
 
-// Get unread enquiries count from aggregates instead of calculating manually
-const enquiriesCount = computed(() => {
-  return getAggregateCount('unreadMessages') || 0;
+// Get unread conversations count from aggregates instead of calculating manually
+const conversationsCount = computed(() => {
+  if (getAggregateCount('unreadMessages')) {
+    return `(${getAggregateCount('unreadMessages')})`;
+  }
+  return null;
 });
 
 const allLimitedConversations = computed(() => {
   let conversations = allConversations.value || [];
-  
+
   // Apply sorting using the conversation util
   conversations = sortConversations(conversations, sortBy.value, user.value?.id);
-  
+
   if (!limit?.value || limit.value === 0) {
     return conversations;
   }
@@ -137,29 +136,30 @@ function toggleCollapsed() {
 
 <style lang="scss" scoped>
 @use '#styles/_utils/media' as mq;
+
 .o-chat-summary {
-  height: fit-content;
-  max-height: calc(100vh - var(--header-expanded-height) + var(--size-32));
+  height: 100%;
   display: flex;
   flex-direction: column;
-  
+
   &.collapsed {
     height: auto;
   }
-  
+
   @include mq.tablet-only {
-    max-height: 60vh; /* Reduce max height on tablet */
+    max-height: 60vh;
+    /* Reduce max height on tablet */
   }
-  
+
   @include mq.mobile-only {
-    height: 100%;
-    max-height: none;
-    
+    height: 100dvh;
+    border-radius: inherit;
+
     &.collapsed {
       height: auto;
     }
   }
-  
+
 
   &__header {
     display: flex;
@@ -169,7 +169,7 @@ function toggleCollapsed() {
     cursor: pointer;
     border-radius: var(--border-radius-md);
     padding: var(--size-16);
-    
+
     @include mq.mobile-only {
       display: none;
     }
@@ -191,13 +191,13 @@ function toggleCollapsed() {
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s ease;
-    
+
     &:hover {
       background-color: var(--background-400);
     }
 
     :deep(svg) {
-      transition: transform 0.2s ease;
+      transition: transform 0.1s ease;
       transform: rotate(180deg);
     }
 
@@ -216,8 +216,38 @@ function toggleCollapsed() {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    // overflow: hidden;
     min-height: 0;
+  }
+
+  &__fixed-section {
+    flex-shrink: 0;
+
+    // Make sort + search stick to the top on mobile
+    @include mq.mobile-only {
+      position: sticky;
+      top: calc(var(--header-offset, 0) + var(--size-64));
+      z-index: 5;
+      background: var(--background-200);
+      border-bottom: 1px solid var(--border-100);
+      padding: var(--size-8) 0;
+    }
+  }
+
+  // Normalize spacing of rows inside the sticky section on mobile
+  @include mq.mobile-only {
+    &__fixed-section > :first-child { margin-top: 0; }
+    &__fixed-section > :last-child { margin-bottom: 0; }
+  }
+
+  &__scrollable-section {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+
+    @include mq.mobile-only {
+      height: 100dvh;
+    }
   }
 
   &__loading {
@@ -232,16 +262,13 @@ function toggleCollapsed() {
   }
 
   &__list {
-    flex: 1;
     list-style: none;
     margin: 0;
-    padding: 0 var(--size-16) var(--size-16) var(--size-16);
-    overflow-y: auto;
+    padding: var(--size-16);
     display: flex;
     flex-direction: column;
     gap: var(--size-8);
-    min-height: 0;
-    
+
     @include mq.mobile-only {
       padding: var(--size-16);
     }
@@ -272,6 +299,8 @@ function toggleCollapsed() {
 
     .a-select {
       width: 100%;
+      height: var(--input-text-height);
+      align-items: center;
     }
   }
 
@@ -280,20 +309,6 @@ function toggleCollapsed() {
     margin: var(--size-8) 0;
   }
 
-  &__search-input {
-    display: block;
-    width: 100%;
-    padding: var(--size-8) var(--size-12);
-    border-radius: var(--border-radius-2xl);
-    border: 1px solid var(--foreground-200);
-    background: var(--background-200);
-    color: var(--foreground-100);
-    outline: none;
-    transition: border-color 0.2s;
 
-    &:focus {
-      border-color: var(--secondary-400);
-    }
-  }
 }
 </style>

@@ -44,8 +44,8 @@
     "dotenv": "^17.2.1",
     "embla-carousel-vue": "^8.6.0",
     "maptiler-sdk.css": "link:@maptiler/sdk/dist/maptiler-sdk.css",
-    "nuxi": "^3.25.0",
-    "nuxt": "^4.0.0",
+    "nuxi": "^3.28.0",
+    "nuxt": "^4.0.3",
     "nuxt-auth-utils": "^0.5.20",
     "nuxt-gtag": "3.0.2",
     "openai": "^5.6.0",
@@ -72,5 +72,9 @@
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   },
-  "pnpm": { "overrides": { "ipx": "^3.0.0" } }
+  "pnpm": {
+    "overrides": {
+      "ipx": "^3.0.0"
+    }
+  }
 }

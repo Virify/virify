@@ -3,39 +3,36 @@
     <NuxtLoadingIndicator />
     <OrganismsHeader />
 
-    <div class="page">
-      <div class="account-layout | container">
-        <OrganismsNavigation />
+    <div class="account-page">
+      <div class="account-layout container" :class="{ 'account-layout--messages-expanded': isExpanded }">
+        <!-- Left Sidebar Slot (Desktop only) -->
+        <aside class="left-sidebar">
+          <slot name="left-sidebar">
+            <MoleculesNavigationAccountDesktop :groupStates="groupStates" @toggleGroup="toggleGroup"
+              @navClick="handleNavClick" />
+          </slot>
+        </aside>
 
         <main class="main">
           <NuxtPage />
         </main>
 
-        <aside class="sidebar">
-          <div class="sidebar-content sidebar-content--enquiries" :class="{ 'sidebar-content--collapsed': isCollapsed, 'sidebar-content--has-overlay': selectedConversation !== null }">
-            <OrganismsChatSummary 
-              v-show="selectedConversation === null"
-              :limit="0" 
-              :search-enabled="true" 
-              :disable-navigate="true"
-              @select-conversation="handleConversationSelect"
-              @toggle-collapsed="isCollapsed = $event"
-            />
-            
-            <div v-show="selectedConversation !== null" class="sidebar-overlay">
-              <OrganismsEnquiryDetail 
-                :is-open="selectedConversation !== null"
-                :conversation="selectedConversation"
-                :current-user-id="user?.id"
-                @back="selectedConversation = null"
-              />
-            </div>
-          </div>
+        <!-- Right Sidebar Slot -->
+        <aside class="right-sidebar" v-if="showSidebar">
+          <slot name="right-sidebar">
+            <OrganismsConversationSidebar />
+          </slot>
         </aside>
+
+
+        <!-- Bottom Navigation Slot -->
+        <slot name="bottom-navigation">
+          <OrganismsNavigationAccountMobile class="mobile-only-nav" />
+        </slot>
       </div>
     </div>
 
-    <OrganismsFooter />
+    <OrganismsFooter class="desktop-only-footer" />
 
     <ViewsDialog />
     <MoleculesToastContainer />
@@ -43,12 +40,28 @@
 </template>
 
 <script setup lang="ts">
-const selectedConversation = ref<ConversationWithUserAndMessages | null>(null);
-const isCollapsed = ref(false);
+import { logout } from '~/utils/account/navigation'
+const route = useRoute()
+const groupStates = ref([true, true, true, false])
 
-function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
-  selectedConversation.value = conversation;
+// Control sidebar visibility
+const showSidebar = computed(() =>
+  route.path !== '/account/messages'
+)
+const isExpanded = computed(() =>
+  route.path === '/account/messages'
+)
+
+function handleNavClick(item: any) {
+  if (item.action === 'logout') {
+    logout()
+  }
 }
+
+function toggleGroup(index: number) {
+  groupStates.value[index] = !groupStates.value[index]
+}
+
 
 useHead({
   htmlAttrs: {
@@ -79,85 +92,84 @@ useHead({
 });
 
 
-const { user } = useUserSession();
 
 </script>
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
-.page {
+
+.account-page {
   background: var(--background-100);
+  transition: min-height 0.25s ease;
+  min-height: 100vh;
 }
 
 .account-layout {
   display: grid;
   grid-template-columns: 300px 1fr 300px;
+  grid-template-areas: "left-sidebar main right-sidebar";
   gap: var(--size-16);
   padding: var(--size-16);
-  transition: grid-template-columns 0.3s ease;
-  
+  transition: grid-template-columns 0.25s ease;
+
   &:has(.sidebar-content--has-overlay) {
     grid-template-columns: 300px 1fr 400px;
   }
 
+  &.account-layout--messages-expanded {
+    grid-template-columns: 300px 1fr;
+    grid-template-areas: "left-sidebar main";
+
+    @include mq.mobile-only {
+      grid-template-columns: 1fr;
+      grid-template-areas: "main";
+      padding: 0;
+      overflow: visible;
+    }
+  }
+
   @include mq.not-notebook {
     grid-template-columns: 300px 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      "nav main"
-      "sidebar main";
+    grid-template-areas: "left-sidebar main";
 
-    &:has(.sidebar-content--has-overlay) {
-      grid-template-columns: 300px 1fr;
-      grid-template-areas:
-        "nav sidebar"
-        "sidebar sidebar";
-    }
-
-    .sidebar {
-      grid-area: sidebar;
-      position: static;
-      height: auto;
-      max-height: none;
-    }
-
-    .main {
-      grid-area: main;
-    }
-
-    > :first-child {
-      grid-area: nav;
+    .right-sidebar {
+      display: none;
     }
   }
 
   @include mq.mobile-only {
     grid-template-columns: 1fr;
     grid-template-areas: "main";
+    padding-bottom: calc(var(--size-16) + var(--mobile-nav-height, 0));
+    min-height: calc(100vh - var(--mobile-nav-height, 0) - var(--size-16));
 
-    .sidebar {
+    .left-sidebar,
+    .right-sidebar {
       display: none;
-    }
-
-    .main {
-      grid-area: main;
-    }
-
-    > :first-child {
-      grid-area: unset;
     }
   }
 }
 
-.sidebar {
+// Left Sidebar (Navigation)
+.left-sidebar {
+  grid-area: left-sidebar;
   position: sticky;
-  top: calc(var(--header-offset, 0) + var(--size-16));
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100vh - var(--header-offset, 0) - var(--size-48));
+  max-height: calc(100svh - var(--header-height) - var(--size-48));
   z-index: 10;
-  width: auto;
-  transition: width 0.3s ease;
   align-self: start;
-  padding-bottom: var(--size-4);
+  overflow: hidden;
+}
+
+// Right Sidebar (Conversations)  
+.right-sidebar {
+  grid-area: right-sidebar;
+  position: sticky;
+  bottom: var(--size-16);
+  height: fit-content;
+  max-height: calc(100svh - var(--header-height) - var(--size-48));
+  z-index: 10;
+  align-self: start;
 
   @include mq.not-notebook {
     position: static;
@@ -167,30 +179,40 @@ const { user } = useUserSession();
     align-self: stretch;
   }
 
+  @include mq.mobile-only {
+      padding: 0;
+      display: none;
+    }
+
   .sidebar-content {
     background: var(--background-200);
     border-radius: var(--border-radius-xl);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     height: fit-content;
-    padding: var(--size-16);
     color: var(--foreground-100);
-    overflow-y: auto;
     position: relative;
-    
+
     @include mq.mobile-only {
       padding: 0;
+      display: none;
     }
 
-    &--enquiries {
+    &--conversations {
       padding: 0;
-      
+      overflow-y: auto;
+      min-height: 70vh;
+      height: var(--navigation-sidebar-height, fit-content);
+      box-sizing: border-box;
+      transition: height ease;
+
       &.sidebar-content--has-overlay {
-        height: calc(100vh - var(--header-expanded-height) + var(--size-32));
-        
+        height: var(--navigation-sidebar-height, fit-content);
+
         @include mq.tablet-only {
           height: 60vh;
         }
       }
+
     }
   }
 
@@ -214,5 +236,34 @@ const { user } = useUserSession();
   max-width: 100%;
   box-sizing: border-box;
   min-width: 0;
+  transition: width 0.25s ease, max-width 0.25s ease;
+  // Allow children to manage their own scroll/clipping; required for position: sticky
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+.page-enter-to,
+.page-leave-from {
+  opacity: 1;
+}
+
+.mobile-only-nav {
+  @include mq.tablet {
+    display: none;
+  }
+}
+
+.desktop-only-footer {
+  @include mq.mobile-only {
+    display: none;
+  }
 }
 </style>

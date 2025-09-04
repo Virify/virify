@@ -1,320 +1,446 @@
 <template>
-  <div class="p-messages | container">
-    <h1 class="| title-md">Messages</h1>
-    <div class="">
-      <MoleculesFormField label="Search">
-        <input v-model="conversationsSearch" class="| text-input focus-visible" name="Search"
-          placeholder="Search conversations..." />
-      </MoleculesFormField>
-      
-    </div>
-    <AtomsDivider />
-    <div class="p-messages-layout">
-      <!-- Left Column: Conversations List -->
-      <ul class="p-conversations-column">
-        <MoleculesConversationListItem v-for="conversation in searchedConversations" :key="conversation.id"
-          :conversation="conversation" :current-user-id="user?.id"
-          :is-active="activeConversation?.id === conversation.id" @select-conversation="setActiveConversation" />
-      </ul>
-
-      <!-- Right Column: Active Conversation Messages -->
-      <div class="p-active-chat-column">
-        <OrganismsActiveChat ref="activeChatRef" :conversation="activeConversation" :current-user-id="user?.id"
-          v-model:reply-message="message" :is-send-disabled="status !== 'OPEN'" :is-typing="isOtherUserTyping"
-          @send-reply="sendReply" @user-typing="handleUserTyping" />
+  <!-- Desktop: Full messages page -->
+  <div class="messages-page">
+    <!-- Title and Controls Section -->
+    <div class="messages-header-card">
+      <h2 class="messages-title | title-md">{{ sectionTitle }}</h2>
+      <div class="messages-controls">
+        <div class="search-sort-row">
+          <AtomsInput
+            v-model="receivedSearch"
+            type="text"
+            placeholder="Search conversations..."
+            autocomplete="off"
+            class="body-sm"
+          />
+          <AtomsSelect 
+            v-model="receivedSort" 
+            :options="sortOptions"
+            class="sort-select | body-sm"
+          />
+        </div>
       </div>
     </div>
+
+    <!-- Messages Grid -->
+    <div class="messages-grid" :class="{ 'messages-grid--has-active-conversation': selectedConversation }">
+      <!-- Conversations List Section -->
+      <div class="conversations-card">
+        <OrganismsConversationDesktopSummary 
+          :conversations="filteredReceivedConversations"
+          :loading="loading"
+          :active-conversation-id="selectedConversation?.id"
+          :empty-message="emptyMessage"
+          @select-conversation="handleConversationSelect"
+        />
+      </div>
+
+      <!-- Conversation Details Section -->
+      <div class="conversation-details-card">
+        <div v-if="selectedConversation" class="conversation-content">
+          <MoleculesConversationListingCard :conversation="selectedConversation" />
+          <div class="messages-container" ref="messagesContainer">
+            <MoleculesConversationMessageList 
+              :messages="selectedConversation.messages || []"
+              :current-user-id="user?.id"
+            />
+          </div>
+          <MoleculesConversationReplyInput @send="handleSendReply" />
+        </div>
+        <div v-else class="empty-state">
+          <p class="body-sm">Select a conversation to view details</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile: Chat interface as the page -->
+  <div class="mobile-chat-page | container-reset">
+    <OrganismsConversationMobileSummary />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useWebSocket } from "@vueuse/core";
-
 definePageMeta({
   middleware: ["authenticated"],
-  title: "Messages",
+  head: {
+    title: "Messages",
+  },
+  layout: "account"
 });
 
-// User and basic state
-const { user } = useUserSession();
-const message = ref("");
-const activeConversation = ref<ConversationWithUserAndMessages | null>(null);
-const activeChatRef = ref<{ scrollToBottom: () => void } | null>(null);
-const conversationsSearch = ref("");
-const route = useRoute();
+const { user } = useUserSession()
+const { allConversations, loading, filterConversations } = useConversations()
+const conversationState = useConversationState()
+const { markMessageAsRead } = useConversationEvents(conversationState)
+const conversationActions = useConversationActions(conversationState)
 
+// Search states
+const receivedSearch = ref("")
+
+// Sort states
+const receivedSort = ref("all")
+
+// Selected conversation
+const selectedConversation = ref<ConversationWithUserAndMessages | null>(null)
+const messagesContainer = ref<HTMLDivElement | null>(null)
+const marking = ref(false)
+
+
+const sortOptions = [
+  { key: "All Enquiries", value: "all" },
+  { key: "Received Enquiries", value: "received" },
+  { key: "Sent Enquiries", value: "sent" },
+  { key: "Recent", value: "recent" },
+  { key: "Oldest", value: "oldest" },
+  { key: "Unread", value: "unread" },
+  { key: "Read", value: "read" }
+]
+
+// Use ref instead of computed to have full control
+const filteredReceivedConversations = ref<ConversationWithUserAndMessages[]>([])
+const lastActiveConversationId = ref<number | null>(null)
+
+// Function to update conversations
+function updateConversationsList() {
+  let conversations = allConversations.value || []
+  
+  // Apply search filter first
+  if (receivedSearch.value.trim()) {
+    conversations = filterConversations(conversations, receivedSearch.value)
+  }
+  
+  // Apply sorting
+  const sorted = sortConversations(conversations, receivedSort.value, user.value?.id)
+  filteredReceivedConversations.value = sorted
+}
+
+// Combined watcher for all conversation list updates
+watch([receivedSearch, receivedSort, allConversations, selectedConversation], 
+  ([newSearch, newSort, newConversations, newConv], [oldSearch, oldSort, oldConversations, oldConv]) => {
+    // Track active conversation ID changes
+    if (newConv !== oldConv) {
+      lastActiveConversationId.value = newConv?.id || null
+    }
+    
+    // Update list when search/sort changes
+    if (newSearch !== oldSearch || newSort !== oldSort) {
+      updateConversationsList()
+    }
+    // Update list when conversations change but only if no active conversation
+    else if (newConversations !== oldConversations && !selectedConversation.value) {
+      updateConversationsList()
+    }
+  }
+)
+
+// Initial load
 onMounted(() => {
-  // Scroll to the bottom of the active chat when it changes
-  if (route.query.conversation) {
-    activeConversation.value = conversations.value.find(
-      (c) => c.id === Number(route.query.conversation)
-    ) as ConversationWithUserAndMessages;
+  updateConversationsList()
+})
+
+// Dynamic section title based on selected filter
+const sectionTitle = computed(() => {
+  switch (receivedSort.value) {
+    case 'received':
+      return 'Received Enquiries'
+    case 'sent':
+      return 'Sent Enquiries'
+    case 'all':
+      return 'All Enquiries'
+    default:
+      return 'Messages'
   }
-});
+})
 
-/**
- * Computed property to filter conversations based on search input
- */
-const searchedConversations = computed(() => {
-  if (!conversations.value) return [];
-  const searchTerm = conversationsSearch.value.toLowerCase();
-  return conversations.value.filter((conversation: ConversationWithUserAndMessages) => {
-    return (
-      conversation.sender.email.toLowerCase().includes(searchTerm) ||
-      conversation.receiver.email.toLowerCase().includes(searchTerm) ||
-      conversation.sender?.username?.toLowerCase().includes(searchTerm) ||
-      conversation.receiver?.username?.toLowerCase().includes(searchTerm) ||
-      conversation.listing?.property?.address?.fullAddress?.toLowerCase().includes(searchTerm) ||
-      conversation.messages.some((message: MessageWithUser) =>
-        message.content.toLowerCase().includes(searchTerm)
-      )
-    );
-  });
-});
-
-// Typing state
-const typingUsers = ref<Record<number, boolean>>({});
-let typingTimeout: NodeJS.Timeout | null = null;
-
-// WebSocket connection
-const config = useRuntimeConfig();
-const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
-
-// WebSocket composable
-const { createTypingMessage, handleOutgoingMessages } = useWebSocketServer();
-
-// Fetch conversations with secure session handling
-const conversationsData = await useRequestFetch()<ConversationWithUserAndMessages[]>("/api/conversation/");
-const conversations = ref<ConversationWithUserAndMessages[]>(conversationsData || []);
-
-/**
- * WebSocket event handlers - Called when WebSocket messages are received
- * These handle real-time updates to the chat interface
- */
-const webSocketEvents: WebSocketEvents = {
-  /**
-   * Handles incoming new message events from all participants
-   * Updates the conversation and moves it to the top of the list
-   * @param conversationId - ID of the conversation the message belongs to
-   * @param message - The new message object from the server
-   */
-  onNewMessage: ({ conversationId, message: newMessage }) => {
-    if (!conversations.value || !user.value) return;
-
-    const conversation = conversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
-    if (!conversation) return;
-
-    // Prevent duplicate messages
-    if (conversation.messages.some((m: MessageWithUser) => m.id === newMessage.id)) return;
-
-    // Add message and update conversation timestamp
-    conversation.messages.push(newMessage);
-    conversation.updatedAt = new Date();
-
-    // Move conversation to top of list and trigger reactivity
-    const index = conversations.value.indexOf(conversation);
-    if (index > 0) {
-      conversations.value.splice(index, 1);
-      conversations.value.unshift(conversation);
-    }
-    triggerRef(conversations);
-
-    // Auto-scroll to new message if this conversation is active
-    if (activeConversation.value?.id === conversationId) {
-      nextTick(() => activeChatRef.value?.scrollToBottom());
-    }
-  },
-
-  /**
-   * Handles new conversation creation events
-   * Adds the new conversation to the top of the conversations list
-   * @param conversation - The new conversation object
-   */
-  onNewConversation: ({ conversation }) => {
-    if (conversations.value) {
-      conversations.value.unshift(conversation);
-    }
-  },
-
-  /**
-   * Handles typing indicator events from other users
-   * Shows/hides "user is typing" indicators in the active conversation
-   * @param from - User ID who is typing
-   * @param conversationId - ID of the conversation where typing is happening
-   * @param isTyping - Whether the user is currently typing
-   */
-  onTyping: ({ from, conversationId, isTyping }) => {
-    if (!activeConversation.value || activeConversation.value.id !== conversationId) return;
-
-    if (isTyping) {
-      typingUsers.value[from] = true;
-      // Auto-clear typing indicator after 3 seconds
-      setTimeout(() => delete typingUsers.value[from], 3000);
-    } else {
-      delete typingUsers.value[from];
-    }
-  },
-
-  /**
-   * Handles message read status events
-   * Updates message read receipts and status indicators
-   * @param from - User ID who read the message
-   * @param conversationId - ID of the conversation
-   * @param messageId - ID of the message that was read
-   */
-  onMessageRead: ({ from, conversationId, messageId }) => {
-    // TODO: Implement read receipt functionality
-  },
-};
-
-/**
- * Computed property to check if another user is currently typing
- * Excludes the current user from typing indicators
- */
-const isOtherUserTyping = computed(() => {
-  if (!user.value) return false;
-  return Object.entries(typingUsers.value).some(([userId, isTyping]) => isTyping && Number(userId) !== user.value!.id);
-});
-
-/**
- * Watch WebSocket data and route messages through the composable's event handler
- */
-watchEffect(() => {
-  if (data.value) {
-    handleOutgoingMessages(data.value, webSocketEvents);
+// Dynamic empty message based on selected filter
+const emptyMessage = computed(() => {
+  switch (receivedSort.value) {
+    case 'received':
+      return 'No received enquiries found'
+    case 'sent':
+      return 'No sent enquiries found'
+    case 'all':
+      return 'No enquiries found'
+    default:
+      return 'No messages found'
   }
-});
+})
 
-/**
- * Sets the active conversation and resets the input field
- * @param conversation - The conversation to make active
- */
-function setActiveConversation(conversation: ConversationWithUserAndMessages) {
-  activeConversation.value = conversation;
-  message.value = "";
-  nextTick(() => activeChatRef.value?.scrollToBottom());
+function handleConversationSelect(conversation: ConversationWithUserAndMessages) {
+  const previousConversation = selectedConversation.value
+  
+  // If we're switching between conversations, trigger re-sort first
+  if (previousConversation && previousConversation.id !== conversation.id) {
+    updateConversationsList()
+  }
+  
+  // Set new active conversation
+  selectedConversation.value = conversation
+  // Mark unread messages as read
+  markUnreadMessagesAsRead(conversation)
+  // Scroll to bottom when conversation is selected
+  nextTick(() => {
+    scrollToBottom(messagesContainer.value)
+  })
 }
 
-/**
- * Sends a reply message and lets WebSocket handle UI updates
- * Server will broadcast the message to all participants (including sender)
- * The onNewMessage event handler will update the UI when the message comes back
- */
-async function sendReply() {
-  if (!activeConversation.value || !message.value.trim() || status.value !== "OPEN" || !user.value) {
-    return;
-  }
 
-  const content = message.value;
-  const conversationId = activeConversation.value.id;
+function markUnreadMessagesAsRead(conversation: ConversationWithUserAndMessages) {
+  if (!conversation || !user.value) return
+  if (marking.value) return
+  marking.value = true
 
-  // Clear input and stop typing indicator
-  message.value = "";
-  sendTypingStatus(false);
+  const currentUserId = user.value.id
+  const unreadMessages = conversation.messages.filter(
+    message => !message.isRead && message.senderId !== currentUserId
+  )
 
+  // Only mark messages that are actually unread
+  unreadMessages.forEach(message => {
+    if (!message.isRead) {
+      markMessageAsRead(message.id, conversation.id)
+    }
+  })
+
+  // Allow marking again after next tick
+  nextTick(() => { marking.value = false })
+}
+
+async function handleSendReply(message: string) {
+  if (!selectedConversation.value || !message.trim()) return
+  
   try {
-    // Send message to server (will broadcast to all participants via WebSocket)
-    await $fetch<MessageWithUser>("/api/conversation/reply/", {
-      method: "POST",
-      body: { message: content, conversationId },
-    });
-
-    // UI will be updated automatically when WebSocket receives the message
+    await conversationActions.sendReply(selectedConversation.value.id, message.trim())
+    // Scroll to bottom after sending message
+    nextTick(() => {
+      scrollToBottom(messagesContainer.value)
+    })
   } catch (error) {
-    console.error("Error sending message:", error);
-
-    // Restore original message content for retry
-    message.value = content;
+    console.error('Failed to send reply:', error)
   }
 }
 
-/**
- * Handles user typing events from the input field
- * Triggers typing status broadcast to other users
- */
-function handleUserTyping() {
-  sendTypingStatus(true);
-}
+// Watch for changes in messages and scroll to bottom
+// Watch for changes in messages: scroll and mark incoming messages as read when conversation is active
+watch(() => selectedConversation.value?.messages?.length, (newLen, oldLen) => {
+  nextTick(() => {
+    scrollToBottom(messagesContainer.value)
+  })
 
-/**
- * Sends typing status to other users in the conversation
- * Debounces typing start events and immediately sends stop events
- * @param isTyping - Whether the user is currently typing
- */
-function sendTypingStatus(isTyping: boolean) {
-  if (!activeConversation.value || !user.value) return;
+  if (!selectedConversation.value || !user.value) return
+  if (!oldLen || !newLen || newLen <= oldLen) return
 
-  // Clear any existing typing timeout
-  if (typingTimeout) {
-    clearTimeout(typingTimeout);
-    typingTimeout = null;
-  }
+  const newMessages: MessageWithUser[] = getNewUnreadMessagesFromOthers(selectedConversation.value, oldLen, newLen, user.value?.id)
 
-  const otherUserId = getOtherUserId(activeConversation.value, user.value.id!);
-  if (!otherUserId) return;
+  if (!newMessages.length) return
+  if (marking.value) return
+  marking.value = true
 
-  if (isTyping) {
-    // Debounce typing start to avoid spam
-    typingTimeout = setTimeout(() => {
-      const typingMessage = createTypingMessage(activeConversation.value!.id, otherUserId, true);
-      send(JSON.stringify(typingMessage));
-    }, 300);
-  } else {
-    // Send stop typing immediately for responsive UX
-    const typingMessage = createTypingMessage(activeConversation.value.id, otherUserId, false);
-    send(JSON.stringify(typingMessage));
-  }
-}
+  newMessages.forEach(message => {
+    markMessageAsRead(message.id, selectedConversation.value!.id)
+  })
 
-/**
- * Gets the other user's ID in a conversation (not the current user)
- * @param conversation - The conversation object
- * @param currentUserId - The current user's ID
- * @returns The other user's ID, or null if not found
- */
-function getOtherUserId(conversation: ConversationWithUserAndMessages, currentUserId: number): number | null {
-  return conversation.sender.id === currentUserId ? conversation.receiver.id : conversation.sender.id;
-}
+  nextTick(() => { marking.value = false })
+})
+
+// Reset selected conversation when sort/filter changes
+watch(receivedSort, () => {
+  selectedConversation.value = null
+})
+
+
+
 </script>
 
 <style lang="scss" scoped>
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+@use '#styles/_utils/media' as mq;
 
-  li {
-    padding: 12px;
+.messages-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+
+  @include mq.mobile-only {
+    display: none;
   }
 }
 
-.p-messages {
-  margin-top: -3rem;
+.messages-header-card {
+  background: var(--background-200);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--size-24);
 }
 
-.p-messages-layout {
+.messages-title {
+  margin: 0 0 var(--size-16) 0;
+  color: var(--foreground-100);
+}
+
+.messages-controls {
+  width: 100%;
+}
+
+.messages-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  height: calc(100vh - 244px);
+  grid-template-columns: 1fr 1fr;
+  gap: var(--size-16);
+  height: 60vh;
+  overflow: hidden;
 
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 3fr;
+  @include mq.not-notebook {
+    grid-template-columns: 1fr;
+    gap: var(--size-12);
+    height: auto;
+    overflow: visible;
   }
 }
 
-.p-conversations-column {
+.conversations-card {
+  background: var(--background-200);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--size-8);
+  overflow-y: auto;
+
+  @include mq.not-notebook {
+    height: 50vh;
+  }
+}
+
+.conversation-details-card {
+  background: var(--background-200);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--size-16);
+  overflow-y: auto;
+
+  @include mq.not-notebook {
+    height: 50vh;
+  }
+}
+
+
+.mobile-chat-page {
+  display: none;
+
+  @include mq.mobile-only {
+    display: block;
+    width: 100%;
+    padding-bottom: calc(var(--size-16) + var(--mobile-nav-height, 0));
+  }
+}
+
+.content-section {
+  background: var(--background-200);
+  padding: var(--size-16);
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--size-24);
+  min-width: 0;
+
+  @include mq.mobile-only {
+    padding: var(--size-16);
+    gap: var(--size-16);
+  }
+}
+
+.section-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+}
+
+.filters-bar {
+  border-bottom: 1px solid var(--background-300);
+  padding-bottom: var(--size-16);
+}
+
+.search-sort-row {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: var(--size-12);
+  align-items: center;
+
+  @include mq.tablet {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  @include mq.mobile-only {
+    grid-template-columns: 1fr;
+    gap: var(--size-8);
+  }
+}
+
+
+.sort-select {
+  min-width: 160px;
+  padding: var(--size-8) var(--size-12);
+  height: var(--input-text-height);
+  align-items: center;
+
+  @include mq.mobile-only {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+
+.conversations-list {
+  background: var(--background-200);
+  border-radius: var(--border-radius-lg);
   overflow-y: auto;
+  padding-right: var(--size-8);
+
+}
+
+.conversation-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
   height: 100%;
 }
 
-.p-active-chat-column {
-  height: 100%;
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: var(--size-8);
+}
+
+.empty-state {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+  color: var(--foreground-100);
+  opacity: 0.7;
+}
+
+.collapse-fade-enter-active,
+.collapse-fade-leave-active {
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s;
   overflow: hidden;
+}
+
+.collapse-fade-enter-from,
+.collapse-fade-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.collapse-fade-enter-to,
+.collapse-fade-leave-from {
+  max-height: 2000px;
+  opacity: 1;
 }
 </style>

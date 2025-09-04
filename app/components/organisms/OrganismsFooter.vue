@@ -10,13 +10,14 @@
 const currentYear = new Date().getFullYear()
 </script>
 
-<style>
+<style lang="scss">
+@use "#styles/_utils/media" as mq;
 .o-footer {
   background-color: var(--blue-400);
   color: var(--background-100);
   padding: var(--size-32) 0;
   color: var(--monochrome-900);
-  bottom: 0;
   width: 100%;
+  bottom: 0;
 }
 </style>

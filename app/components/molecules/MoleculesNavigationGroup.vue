@@ -13,19 +13,23 @@
 
     <!-- Group items -->
     <template v-for="item in group.items" :key="item.name">
-      <li v-if="groupStates[groupIndex]" class="icon-cell group-item">
-        <NuxtLink :to="item.url" @click="handleNavClick(item)">
-          <AtomsIcon :icon="item.icon" size="22" />
-        </NuxtLink>
-      </li>
-      <li v-if="groupStates[groupIndex]" class="text-cell group-item | body-sm">
-        <NuxtLink :to="item.url" @click="handleNavClick(item)">
-          {{ item.name }}
-          <span v-if="item.countKey && aggregates[item.countKey as keyof UserItemsAggregates]" class="nav-count body-xs font-bold">
-            ({{ aggregates[item.countKey as keyof UserItemsAggregates] }})
-          </span>
-        </NuxtLink>
-      </li>
+      <Transition name="accordion-item">
+        <li v-if="groupStates[groupIndex]" class="icon-cell group-item">
+          <NuxtLink :to="item.url" @click="handleNavClick(item)">
+            <AtomsIcon :icon="item.icon" size="22" />
+          </NuxtLink>
+        </li>
+      </Transition>
+      <Transition name="accordion-item">
+        <li v-if="groupStates[groupIndex]" class="text-cell group-item | body-sm">
+          <NuxtLink :to="item.url" @click="handleNavClick(item)">
+            {{ item.name }}
+            <span v-if="item.countKey && aggregates[item.countKey as keyof UserItemsAggregates]" class="nav-count body-xs font-bold">
+              ({{ aggregates[item.countKey as keyof UserItemsAggregates] }})
+            </span>
+          </NuxtLink>
+        </li>
+      </Transition>
     </template>
   </template>
 </template>
@@ -81,7 +85,7 @@ function isLastVisibleGroup(groupIndex: number) {
   text-decoration: none;
   color: inherit;
   position: relative;
-  padding: var(--size-12) var(--size-16);
+  padding: var(--size-10) var(--size-16);
 
   &:hover {
     opacity: 0.8;
@@ -148,7 +152,6 @@ function isLastVisibleGroup(groupIndex: number) {
 
   a {
     color: inherit;
-    padding: 0 var(--size-8);
     text-decoration: none;
     border-radius: var(--border-radius-md);
     transition: background 0.2s ease;
@@ -164,4 +167,25 @@ function isLastVisibleGroup(groupIndex: number) {
     margin-left: var(--size-4);
   }
 }
+
+.accordion-item-enter-active,
+.accordion-item-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.accordion-item-enter-from,
+.accordion-item-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.accordion-item-enter-to,
+.accordion-item-leave-from {
+  opacity: 1;
+  max-height: 60px; // Approximate height of nav items
+}
+
 </style>

@@ -328,7 +328,6 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
 
 .o-listing-mobile-banner {
   position: fixed;
-  bottom: 0;
   bottom: env(safe-area-inset-bottom, 0);
   left: 0;
   z-index: 5;
@@ -336,16 +335,11 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
   background: var(--background-100);
   border-top: 1px solid var(--border-color-200);
   padding: var(--size-12) 0;
-  padding-bottom: calc(var(--size-12) + env(safe-area-inset-bottom, 0));
+  padding-bottom: calc(var(--size-12) + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: var(--size-10);
   transition: border-radius var(--animation-slow) var(--ease-out);
-  
-  // Fix for dynamic viewport issues on mobile browsers
-  @supports (height: 100dvh) {
-    bottom: max(0px, env(safe-area-inset-bottom, 0));
-  }
 
   &--expanded {
     border-top-right-radius: var(--border-radius-3xl);

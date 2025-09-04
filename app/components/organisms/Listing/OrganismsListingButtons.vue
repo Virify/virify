@@ -4,11 +4,11 @@
     <AtomsFavouriteButton class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
 
     <button 
-      class="o-listing-buttons__enquire | button button-secondary button-full"
-      :disabled="enquiryState.isDisabled"
-      @click="() => handleEnquiryClick(listingId, agent?.id)"
+      class="o-listing-buttons__contact | button button-secondary button-full"
+      :disabled="conversationState.isDisabled"
+      @click="() => handleConversationClick(listingId, agent?.id)"
     >
-      {{ enquiryState.label }}
+      {{ conversationState.label }}
     </button>
   </div>
 </template>
@@ -27,9 +27,9 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { getEnquiryState, handleEnquiryClick } = useEnquiry()
+const { getConversationState, handleConversationClick } = useConversations()
 
-const enquiryState = computed(() => getEnquiryState(props.listingId, props.agent?.id))
+const conversationState = computed(() => getConversationState(props.listingId, props.agent?.id))
 </script>
 
 <style lang="scss">
@@ -38,7 +38,7 @@ const enquiryState = computed(() => getEnquiryState(props.listingId, props.agent
   align-items: center;
   gap: var(--size-8);
 
-  &__enquire {
+  &__contact {
     white-space: nowrap;
     padding-inline: var(--size-32);
   }
