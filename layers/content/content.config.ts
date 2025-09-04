@@ -6,7 +6,7 @@ export default defineContentConfig({
     guides: defineCollection({
       type: 'page',
       source: {
-        cwd: path.resolve('./layers/content/pages/guides'),
+        cwd: path.resolve('./layers/content/app/pages/guides'),
         include: '**/*.md',
       }
     })
