@@ -5,6 +5,11 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   modules: ["@nuxt/image"],
+  image: {
+    cloudflare: {
+      baseURL: process.env.CF_IMAGES_URL
+    }
+  },
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
