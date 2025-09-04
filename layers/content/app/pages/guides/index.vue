@@ -1,5 +1,5 @@
 <template>
-  <ContentRenderer v-if="data" :value="data" />
+  <ContentRenderer v-if="data" :value="data" class="| container" />
   <div v-else>Home not found</div>
 </template>
 
