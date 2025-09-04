@@ -32,6 +32,7 @@
     "@aws-sdk/client-ses": "^3.799.0",
     "@mapbox/mapbox-gl-draw": "^1.5.0",
     "@maptiler/sdk": "^3.2.2",
+    "@nuxt/content": "^3.6.3",
     "@nuxt/image": "1.10.0",
     "@nuxtjs/fontaine": "0.5.0",
     "@prisma/nuxt": "^0.3.0",
@@ -41,6 +42,7 @@
     "@vue-email/render": "^0.0.9",
     "@vueuse/core": "^13.1.0",
     "auth-utils": "^1.0.0",
+    "better-sqlite3": "^12.2.0",
     "dotenv": "^17.2.1",
     "embla-carousel-vue": "^8.6.0",
     "maptiler-sdk.css": "link:@maptiler/sdk/dist/maptiler-sdk.css",
@@ -75,6 +77,12 @@
   "pnpm": {
     "overrides": {
       "ipx": "^3.0.0"
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "better-sqlite3"
+    ],
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   }
 }
