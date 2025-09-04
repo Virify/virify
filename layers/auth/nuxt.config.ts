@@ -7,6 +7,12 @@ export default defineNuxtConfig({
       NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
     },
   },
+  devServer: {
+    https: {
+      key: "./server.key",
+      cert: "./server.crt",
+    },
+  },
 });
 
 /**

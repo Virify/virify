@@ -1,6 +1,6 @@
 import vue from "@vitejs/plugin-vue";
 export default defineNuxtConfig({
-  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content"],
+  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed"],
   future: {
     compatibilityVersion: 4,
   },
