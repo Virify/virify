@@ -3,7 +3,7 @@
     <div class="m-chat-summary-item__content">
       <div class="m-chat-summary-item__header">
         <div class="m-chat-summary-item__title">
-        <AtomsCloudFlareImage :src="firstImage" alt="" width="40" height="40" />
+        <AtomsCloudFlareImage :src="firstImage" alt="" variant="thumbnail" class="m-chat-summary-item__image" />
           <div class="m-chat-summary-item__name-section">
             <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
               'unread': unreadMessages > 0
@@ -80,6 +80,11 @@ const firstImage = computed(() => {
   cursor: pointer;
   padding: var(--size-8);
   color: var(--monochrome-100);
+
+  &__image {
+    width: 40px;
+    height: 40px;
+  }
 
   .unread {
     color: var(--secondary-400);

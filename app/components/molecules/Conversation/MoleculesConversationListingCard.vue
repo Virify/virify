@@ -3,16 +3,11 @@
     <NuxtLink :to="`/listing/${conversation.listing.id}`" target="_blank">
     <div class="property-main-row">
       <div class="property-image" v-if="firstImage">
-        <NuxtImg 
-          :src="firstImage" 
-          alt="Property image" 
-          width="268" 
-          height="100"
-          loading="eager"
-          sizes="268px"
-          format="webp,jpg"
-          quality="80"
-          placeholder="/img/preload.svg"
+        <AtomsCloudFlareImage
+          :src="firstImage"
+          alt="Property image"
+          variant="thumbnail"
+          :placeholder="true"
         />
       </div>
       <div class="property-details">
