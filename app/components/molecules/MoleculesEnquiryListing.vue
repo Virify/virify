@@ -10,7 +10,6 @@
         sizes="268px"
         format="webp,jpg"
         quality="80"
-        placeholder="/img/preload.svg"
       />
       <div class="property-badge | body-sm font-semibold">Your Property</div>
     </div>

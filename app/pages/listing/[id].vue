@@ -250,7 +250,19 @@ const images = computed(() => {
     }));
 });
 
-const galleryImages = computed(() => formatGalleryImages(images.value));
+const galleryImages = computed(() => {
+  return images.value.map((item, index) => ({
+    src: item.image,
+    alt: (() => {
+      try {
+        const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+        return metadata?.alt || `Property image ${index + 1}`;
+      } catch {
+        return `Property image ${index + 1}`;
+      }
+    })()
+  }));
+});
 
 /**
  *  Toggle media visibility
