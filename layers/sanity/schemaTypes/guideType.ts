@@ -337,11 +337,11 @@ export const guide = defineType({
     },
     prepare(selection) {
       const {title, category, media, published, featured} = selection
-      const status = published ? '' : '�'
-      const featuredIcon = featured ? 'P' : ''
+      const status = published ? '[PUBLISHED]' : '[DRAFT]'
+      const featuredIcon = featured ? '[FEATURED]' : ''
       
       return {
-        title: `${status} ${featuredIcon} ${title}`,
+        title: `${status} ${featuredIcon} ${title}`.trim(),
         subtitle: category || 'No category assigned',
         media: media
       }
