@@ -39,21 +39,22 @@ defineProps<{
     background: var(--background-100);
     color: var(--foreground-100);
     border: 1px solid var(--secondary-400);
+    transition: background 0.2s ease, color 0.2s ease;
 
     &--current {
       background: var(--secondary-400);
       color: var(--background-100);
+    }
+
+    &:hover {
+      background: var(--secondary-400);
+      color: var(--foreground-100);
     }
   }
 
   &__link {
     color: inherit;
     text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-      text-decoration-color: var(--secondary-400);
-    }
   }
 
   &__separator {

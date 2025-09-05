@@ -7,10 +7,13 @@
         </div>
         <h3 class="guide-card__title | r-title-sm">{{ title }}</h3>
       </div>
-        <p v-if="readTime" class="guide-card__read-time | body-xs">{{ readTime }} min read</p>
     </div>
     <div class="guide-card__description | body-sm">
-      {{ excerpt || description }}
+      <p>{{ excerpt || description }}</p>
+    </div>
+    <div class="guide-card__details">
+      <p v-if="readTime" class="body-xs">{{ readTime }} min read</p>
+      <p v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</p>
     </div>
   </NuxtLink>
 </template>
@@ -24,6 +27,7 @@ defineProps<{
   excerpt?: string;
   readTime?: number;
   isFeatured?: boolean;
+  publishedAt?: string;
 }>();
 </script>
 
@@ -90,7 +94,6 @@ defineProps<{
 
   &__title {
     color: var(--monochrome-100);
-    margin: 0;
   }
 
   &__description {
@@ -98,19 +101,19 @@ defineProps<{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: var(--size-24);
+    padding: var(--size-16);
     color: var(--foreground-100);
     text-align: center;
     flex-grow: 1;
-    margin: 0;
   }
 
-  &__read-time {
-    position: absolute;
-    top: 0;
-    left: 0;
+  &__details {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    color: var(--secondary-400);
     padding: var(--size-16);
-    color: var(--background-100);
   }
 }
 </style>

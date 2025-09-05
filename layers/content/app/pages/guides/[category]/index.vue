@@ -13,6 +13,7 @@
           :to="`/guides/${categorySlug}/${guide.slug.current}`"
           :excerpt="guide.excerpt"
           :read-time="guide.readTime"
+          :published-at="guide.publishedAt"
           :is-featured="guide.isFeatured"
           :icon="guide.icon || 'content/info'"
         />

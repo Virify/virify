@@ -5,7 +5,7 @@
       provider="sanity" 
       :src="image.asset._ref" 
       :width="1200" 
-      :height="300"
+      :height="400"
       loading="eager"
       class="guides-hero__image"
       placeholder='/img/preload.svg'
@@ -36,7 +36,7 @@ defineProps<{
 <style scoped lang="scss">
 .guides-hero {
   position: relative;
-  height: 300px;
+  height: 400px;
   border-radius: var(--border-radius-lg);
   display: flex;
   align-items: center;
