@@ -9,7 +9,7 @@ export const useSanity = () => {
    * @returns A lazy async data fetcher for guide categories from the Sanity CMS.
    */
   const useCategories = () => {
-    return useLazyAsyncData('guide-categories', () => 
+    return useAsyncData('guide-categories', () => 
       $fetch<CategoriesResponse>('/api/sanity/categories')
     )
   }
@@ -20,7 +20,7 @@ export const useSanity = () => {
    * @returns A lazy async data fetcher for a guide by slug from the Sanity CMS.
    */
   const useGuideBySlug = (slug: string) => {
-    return useLazyAsyncData(`guide-${slug}`, () => 
+    return useAsyncData(`guide-${slug}`, () => 
       $fetch<GuideResponse>(`/api/sanity/guide/${slug}`)
     )
   }
@@ -31,7 +31,7 @@ export const useSanity = () => {
    * @returns A lazy async data fetcher for a category by slug from the Sanity CMS.
    */
   const useCategoryBySlug = (slug: string) => {
-    return useLazyAsyncData(`category-${slug}`, () => 
+    return useAsyncData(`category-${slug}`, () => 
       $fetch<CategoryWithGuidesResponse>(`/api/sanity/categories/${slug}`)
     )
   }

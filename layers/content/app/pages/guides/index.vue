@@ -21,7 +21,7 @@
 // Guides homepage
 const { useCategories } = useSanity();
 
-const { data: categories, pending } = await useCategories();
+const { data: categories} = await useCategories();
 
 const breadcrumbItems = computed(() => [
   { label: 'Guides', to: '/guides' },

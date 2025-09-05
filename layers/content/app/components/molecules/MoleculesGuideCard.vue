@@ -1,11 +1,8 @@
 <template>
   <NuxtLink :to="to" class="guide-card">
-    <div v-if="heroImage" class="guide-card__image">
-      <img :src="heroImage" :alt="imageAlt || title" />
-    </div>
     <div class="guide-card__top" :class="{ 'has-image': heroImage }">
       <div class="guide-card__content">
-        <div v-if="!heroImage" class="guide-card__icon">
+        <div class="guide-card__icon">
           <AtomsIcon :icon="icon" :size="64" />
         </div>
         <h3 class="guide-card__title | r-title-sm">{{ title }}</h3>
@@ -96,27 +93,6 @@ defineProps<{
   &__title {
     color: var(--monochrome-100);
     margin: 0;
-  }
-
-  &__image {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  &__top.has-image {
-    padding: var(--size-24);
-    background: var(--background-200);
-
-    &::before {
-      display: none;
-    }
   }
 
   &__description {

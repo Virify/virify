@@ -2,18 +2,11 @@
   <div class="category-page | container">
     <MoleculesBreadcrumb :items="breadcrumbItems" />
 
-    <AtomsGuideHero 
-      :title="category ? category.title : 'Category Not Found'" 
-      :description="category && category.description ? category.description : 'Explore our collection of guides to help you navigate your marketing journey.'"
-    />
-
-    <div v-if="pending">Loading...</div>
-    <div v-else-if="category">
-
-      <div v-if="guidesPending">Loading guides...</div>
-      <div v-else-if="guides && guides.length > 0" class="guides-grid">
+    <AtomsGuideHero :title="category ? category.title : 'Category Not Found'" :description="category && category.description ? category.description : 'Explore our collection of guides to help you navigate your marketing journey.'" />
+    <div v-if="category">
+      <div v-if="guides && guides.length > 0" class="category-page__categories">
         <MoleculesGuideCard
-          v-for="guide in guides" 
+          v-for="guide in guides"
           :key="guide._id"
           :title="guide.title"
           :to="`/guides/${categorySlug}/${guide.slug.current}`"
@@ -23,50 +16,32 @@
           icon="account/billing"
         />
       </div>
-      <div v-else class="no-guides">
-        <p>No guides available in this category yet.</p>
-      </div>
-    </div>
-    <div v-else>
-      <h1>Category not found</h1>
-      <NuxtLink to="/guides">← Back to all categories</NuxtLink>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
-const categorySlug = route.params.category as string
+const route = useRoute();
+const categorySlug = route.params.category as string;
 
-const { useCategoryBySlug } = useSanity()
+const { useCategoryBySlug } = useSanity();
 
-const { data: category, pending } = await useCategoryBySlug(categorySlug)
-const guides = computed(() => category.value?.guides || [])
-const guidesPending = pending
+const { data: category } = await useCategoryBySlug(categorySlug);
+const guides = computed(() => category.value?.guides || []);
 
-const breadcrumbItems = computed(() => [
-  { label: 'Guides', to: '/guides' },
-  { label: category.value?.title || categorySlug }
-])
+const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { label: category.value?.title || categorySlug }]);
 </script>
 
 <style scoped lang="scss">
-
-.category-header {
-  margin-bottom: 2rem;
+.category-page {
+  &__categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--size-24);
+    padding: var(--size-32) 0;
+    justify-items: start;
+  }
 }
-
-.category-header h1 {
-  margin-bottom: 0.5rem;
-}
-
-.guides-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  padding: var(--size-32) 0;
-  justify-items: start;
-}
-
 
 .no-guides {
   text-align: center;
