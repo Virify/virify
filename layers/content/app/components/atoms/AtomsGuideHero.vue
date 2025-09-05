@@ -1,5 +1,21 @@
 <template>
   <section class="guides-hero">
+    <nuxt-img 
+      v-if="image" 
+      provider="sanity" 
+      :src="image.asset._ref" 
+      :width="1200" 
+      :height="300"
+      loading="eager"
+      class="guides-hero__image"
+      placeholder='/img/preload.svg'
+    />
+    <nuxt-img 
+      v-else 
+      src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=300&q=75" 
+      class="guides-hero__image"
+      placeholder='/img/preload.svg'
+    />
     <div class="guides-hero__content">
       <h1 class="guides-hero__title | title-xl">{{ title }}</h1>
       <p class="guides-hero__description | body-md">
@@ -13,6 +29,7 @@
 defineProps<{
   title: string;
   description: string;
+  image?: SanityImage;
 }>();
 </script>
 
@@ -20,25 +37,34 @@ defineProps<{
 .guides-hero {
   position: relative;
   height: 300px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80");
-  background-size: cover;
-  background-position: center;
   border-radius: var(--border-radius-lg);
   display: flex;
   align-items: center;
   overflow: hidden;
 
-  @media (max-width: 768px) {
-    height: 300px;
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
   }
 
   &__content {
-    max-width: 600px;
-    padding: 0 var(--size-32);
+    position: relative;
+    z-index: 2;
+    max-width: 400px;
+    margin-left: var(--size-32);
+    padding: var(--size-24) var(--size-32);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--border-radius-md);
   }
 
   &__title {
     color: var(--monochrome-900);
+    margin-bottom: var(--size-16);
   }
 
   &__description {

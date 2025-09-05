@@ -2,7 +2,7 @@
   <div class="category-page | container">
     <MoleculesBreadcrumb :items="breadcrumbItems" />
 
-    <AtomsGuideHero :title="category ? category.title : 'Category Not Found'" :description="category && category.description ? category.description : 'Explore our collection of guides to help you navigate your marketing journey.'" />
+    <AtomsGuideHero :title="category ? category.title : 'Category Not Found'" :description="category && category.description ? category.description : 'Explore our collection of guides to help you navigate your marketing journey.'" :image="image" />
 
     <section v-if="category && guides.length > 0">
       <MoleculesGuideGrid>
@@ -23,7 +23,7 @@
         <MoleculesListingAdvert />
       </div>
     </section>
-     <section>
+    <section>
       <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </section>
   </div>
@@ -37,6 +37,8 @@ const { useCategoryBySlug } = useSanity();
 
 const { data: category } = await useCategoryBySlug(categorySlug);
 const guides = computed(() => category.value?.guides || []);
+
+const image = category.value?.heroImage?.asset?._ref ? category.value?.heroImage : undefined;
 
 const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { label: category.value?.title || categorySlug }]);
 </script>
