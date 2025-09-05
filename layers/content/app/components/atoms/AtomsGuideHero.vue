@@ -21,6 +21,14 @@
       <p class="guides-hero__description | body-md">
         {{ description }}
       </p>
+      <div v-if="readTime || publishedAt" class="guides-hero__meta">
+        <span v-if="readTime" class="guides-hero__read-time | body-xs">
+          {{ readTime }} min read
+        </span>
+        <span v-if="publishedAt" class="guides-hero__published | body-xs">
+          Published {{ formatDate(publishedAt) }}
+        </span>
+      </div>
     </div>
   </section>
 </template>
@@ -30,7 +38,17 @@ defineProps<{
   title: string;
   description: string;
   image?: SanityImage;
+  readTime?: number;
+  publishedAt?: string;
 }>();
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
 </script>
 
 <style scoped lang="scss">
@@ -55,7 +73,7 @@ defineProps<{
   &__content {
     position: relative;
     z-index: 2;
-    max-width: 400px;
+    max-width: 600px;
     margin-left: var(--size-32);
     padding: var(--size-24) var(--size-32);
     background: rgba(0, 0, 0, 0.3);
@@ -69,6 +87,18 @@ defineProps<{
 
   &__description {
     color: var(--monochrome-900);
+    margin-bottom: var(--size-16);
+  }
+
+  &__meta {
+    display: flex;
+    gap: var(--size-16);
+    color: var(--monochrome-900);
+  }
+
+  &__read-time,
+  &__published {
+    opacity: 0.9;
   }
 }
 </style>

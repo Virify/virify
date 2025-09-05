@@ -5,7 +5,7 @@
         <div class="guide-card__icon">
           <AtomsIcon :icon="icon" :size="64" />
         </div>
-        <h3 class="guide-card__title | r-title-sm">{{ title }}</h3>
+        <h3 class="guide-card__title | title-xs">{{ title }}</h3>
       </div>
     </div>
     <div class="guide-card__description | body-sm">

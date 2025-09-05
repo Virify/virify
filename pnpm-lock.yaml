@@ -83,6 +83,9 @@ importers:
       pg-copy-streams:
         specifier: ^7.0.0
         version: 7.0.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       reka-ui:
         specifier: ^2.2.0
         version: 2.3.2(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
@@ -5377,6 +5380,11 @@ packages:
   precinct@12.2.0:
     resolution: {integrity: sha512-NFBMuwIfaJ4SocE9YXPU/n4AcNSoFMVFjP72nvl3cx69j/ke61/hPOWFREVxLkFhhEGnA8ZuVfTqJBa+PK3b5w==}
     engines: {node: '>=18'}
+    hasBin: true
+
+  prettier@3.6.2:
+    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
+    engines: {node: '>=14'}
     hasBin: true
 
   pretty-bytes@6.1.1:
@@ -13410,6 +13418,8 @@ snapshots:
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
+
+  prettier@3.6.2: {}
 
   pretty-bytes@6.1.1: {}
 
