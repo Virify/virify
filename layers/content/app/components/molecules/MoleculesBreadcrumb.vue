@@ -1,0 +1,63 @@
+<template>
+  <nav class="breadcrumb">
+    <template v-for="(item, index) in items" :key="index">
+      <AtomsPill v-if="item.to" class="breadcrumb__item">
+        <NuxtLink :to="item.to" class="breadcrumb__link">
+          {{ item.label }}
+        </NuxtLink>
+      </AtomsPill>
+      <AtomsPill v-else class="breadcrumb__item--current" aria-current="page">
+        {{ item.label }}
+      </AtomsPill>
+
+      <span v-if="index < items.length - 1" class="breadcrumb__separator">
+        /
+      </span>
+    </template>
+  </nav>
+</template>
+
+<script setup lang="ts">
+interface BreadcrumbItem {
+  label: string
+  to?: string
+}
+
+defineProps<{
+  items: BreadcrumbItem[]
+}>()
+</script>
+
+<style scoped lang="scss">
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--size-8);
+  padding: var(--size-16) 0;
+
+  &__item {
+    background: var(--background-100);
+    color: var(--foreground-100);
+    border: 1px solid var(--secondary-400);
+
+    &--current {
+      background: var(--secondary-400);
+      color: var(--background-100);
+    }
+  }
+
+  &__link {
+    color: inherit;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--secondary-400);
+    }
+  }
+
+  &__separator {
+    color: var(--secondary-400);
+  }
+}
+</style>

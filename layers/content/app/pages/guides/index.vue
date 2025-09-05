@@ -1,5 +1,8 @@
 <template>
   <div class="guides-home | container">
+
+    <MoleculesBreadcrumb :items="breadcrumbItems" />
+
     <AtomsGuideHero title="Virify Guides" description="From your very first step to your biggest leap, our guides help keep your marketing moving in the right direction." />
 
     <div class="guides-home__categories">
@@ -19,15 +22,15 @@
 const { useCategories } = useSanity();
 
 const { data: categories, pending } = await useCategories();
+
+const breadcrumbItems = computed(() => [
+  { label: 'Guides', to: '/guides' },
+])
 </script>
 
 <style scoped lang="scss">
 .guides-home {
-  padding: var(--size-32) 0;
-
-  @media (max-width: 768px) {
-    padding: var(--size-16) 0;
-  }
+  padding-bottom: var(--size-32);
 
   &__categories {
     display: grid;
