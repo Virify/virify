@@ -42,7 +42,7 @@ defineProps<{
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   background: var(--background-200);
   height: 100%;
-  width: 350px;
+  width: 100%;
 
   &:hover {
     transform: translateY(-4px);
