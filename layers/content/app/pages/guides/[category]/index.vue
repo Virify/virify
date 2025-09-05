@@ -3,8 +3,9 @@
     <MoleculesBreadcrumb :items="breadcrumbItems" />
 
     <AtomsGuideHero :title="category ? category.title : 'Category Not Found'" :description="category && category.description ? category.description : 'Explore our collection of guides to help you navigate your marketing journey.'" />
-    <div v-if="category">
-      <div v-if="guides && guides.length > 0" class="category-page__categories">
+    
+    <section v-if="category">
+      <MoleculesGuideGrid>
         <MoleculesGuideCard
           v-for="guide in guides"
           :key="guide._id"
@@ -13,10 +14,16 @@
           :excerpt="guide.excerpt"
           :read-time="guide.readTime"
           :is-featured="guide.isFeatured"
-          icon="account/billing"
+          :icon="guide.icon || 'content/info'"
         />
+      </MoleculesGuideGrid>
+    </section>
+    <section>
+      <div class="category-page__advert">
+        <AtomsDivider />
+        <MoleculesListingAdvert />
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -38,14 +45,14 @@ const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { la
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--size-24);
-    padding: var(--size-32) 0;
+    margin-top: var(--size-32);
     justify-items: start;
   }
-}
 
-.no-guides {
-  text-align: center;
-  padding: 3rem 0;
-  color: #666;
+  &__advert {
+    padding: var(--size-32) 0;
+    display: flex;
+    justify-content: center;
+  }
 }
 </style>

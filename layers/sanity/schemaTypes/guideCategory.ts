@@ -50,18 +50,22 @@ export const guideCategory = defineType({
     defineField({
       name: 'icon',
       title: 'Category Icon',
-      type: 'image',
+      type: 'string',
       options: {
-        accept: '.svg,.png,.jpg,.jpeg',
+        list: [
+          {title: 'Billing', value: 'content/billing'},
+          {title: 'Contract', value: 'content/contract'},
+          {title: 'Enquiry', value: 'content/enquiry'},
+          {title: 'House', value: 'content/house'},
+          {title: 'Info', value: 'content/info'},
+          {title: 'Map', value: 'content/map'},
+          {title: 'Savings', value: 'content/savings'},
+          {title: 'Search', value: 'content/search'},
+          {title: 'Security', value: 'content/security'},
+          {title: 'Settings', value: 'content/settings'}
+        ]
       },
-      fields: [
-        {
-          name: 'alt',
-          type: 'string',
-          title: 'Alternative Text',
-        }
-      ],
-      description: 'Small icon to represent this category'
+      description: 'Icon to represent this category'
     }),
     defineField({
       name: 'orderIndex',

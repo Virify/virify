@@ -50,6 +50,26 @@ export const guide = defineType({
       description: 'Main hero image for the guide'
     }),
     defineField({
+      name: 'icon',
+      title: 'Guide Icon',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Billing', value: 'content/billing'},
+          {title: 'Contract', value: 'content/contract'},
+          {title: 'Enquiry', value: 'content/enquiry'},
+          {title: 'House', value: 'content/house'},
+          {title: 'Info', value: 'content/info'},
+          {title: 'Map', value: 'content/map'},
+          {title: 'Savings', value: 'content/savings'},
+          {title: 'Search', value: 'content/search'},
+          {title: 'Security', value: 'content/security'},
+          {title: 'Settings', value: 'content/settings'}
+        ]
+      },
+      description: 'Icon identifier for this guide (overrides category icon if set)'
+    }),
+    defineField({
       name: 'category',
       title: 'Guide Category',
       type: 'reference',

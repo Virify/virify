@@ -103,6 +103,7 @@ export interface Guide {
   excerpt?: string
   content?: PortableTextContent[]
   heroImage?: SanityImage
+  icon?: string
   category?: GuideCategory | SanityReference
   readTime?: number
   publishedAt?: string

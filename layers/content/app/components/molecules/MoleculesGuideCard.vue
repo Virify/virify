@@ -1,6 +1,6 @@
 <template>
   <NuxtLink :to="to" class="guide-card">
-    <div class="guide-card__top" :class="{ 'has-image': heroImage }">
+    <div class="guide-card__top">
       <div class="guide-card__content">
         <div class="guide-card__icon">
           <AtomsIcon :icon="icon" :size="64" />
@@ -24,8 +24,6 @@ defineProps<{
   excerpt?: string;
   readTime?: number;
   isFeatured?: boolean;
-  heroImage?: string;
-  imageAlt?: string;
 }>();
 </script>
 
