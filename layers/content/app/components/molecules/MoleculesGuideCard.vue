@@ -1,10 +1,14 @@
 <template>
   <NuxtLink :to="to" class="guide-card">
-    <div class="guide-card__icon">
-      <AtomsIcon :icon="icon" :size="48" />
+    <div class="guide-card__top">
+      <div class="guide-card__content">
+        <div class="guide-card__icon">
+          <AtomsIcon :icon="icon" :size="64" />
+        </div>
+        <h3 class="guide-card__title | r-title-md-sm">{{ title }}</h3>
+      </div>
     </div>
-    <h3 class="guide-card__title | title-lg">{{ title }}</h3>
-    <p class="guide-card__description | title-sm">{{ description }}</p>
+    <div class="guide-card__description | r-body-md-sm font-bold">{{ description }}</div>
   </NuxtLink>
 </template>
 
@@ -20,33 +24,73 @@ defineProps<{
 <style scoped lang="scss">
 .guide-card {
   display: block;
-  background: var(--secondary-800);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--border-radius-xl);
   text-decoration: none;
   transition: all 0.3s ease;
-  text-align: center;
-  padding: var(--size-32);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 
   &:hover {
     transform: translateY(-4px);
   }
 
+  &__top {
+    background:
+      linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)),
+      var(--secondary-400);
+    padding: var(--size-32);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('/img/call-out-bg.svg');
+      background-size: cover;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-16);
+    position: relative;
+    z-index: 1;
+  }
+
   &__icon {
     display: flex;
+    align-items: center;
     justify-content: center;
-    padding-bottom: var(--size-16);
+    border-radius: var(--border-radius-lg);
 
-    svg {
-      color: var(--secondary-400);
+    .a-icon {
+      color: var(--monochrome-100);
     }
   }
 
   &__title {
-    color: var(--secondary-400);
+    color: var(--monochrome-100);
+    margin: 0;
   }
 
   &__description {
-    margin-top: var(--size-8);
+    background: var(--background-200);
+    padding: var(--size-24);
+    color: var(--foreground-100);
+    text-align: center;
+    margin: 0;
   }
 }
 </style>
