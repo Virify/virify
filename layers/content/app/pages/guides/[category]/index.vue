@@ -46,6 +46,22 @@ const description = computed(() => (category.value && category.value.description
 const image = computed(() => (category.value?.heroImage?.asset?._ref ? category.value?.heroImage : undefined));
 
 const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { label: category.value?.title || categorySlug }]);
+
+// SEO metadata
+const seoTitle = computed(() => 
+  category.value ? `${category.value.title} Guides - Virify` : 'Category Not Found - Virify'
+);
+
+const seoDescription = computed(() => 
+  category.value?.description || 'Explore our collection of guides to help you navigate your marketing journey.'
+);
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+});
 </script>
 
 <style scoped lang="scss">

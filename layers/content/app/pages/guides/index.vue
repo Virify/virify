@@ -32,6 +32,22 @@ const { useCategories } = useSanity();
 const { data: categories } = await useCategories();
 
 const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }]);
+
+// SEO metadata
+const seoDescription = computed(() => {
+  const categoryNames = categories.value?.map(cat => cat.title).join(', ') || '';
+  const baseDescription = 'From your very first step to your biggest leap, our comprehensive guides help keep your property marketing moving in the right direction.';
+  return categoryNames 
+    ? `${baseDescription} Browse categories: ${categoryNames}.`
+    : baseDescription;
+});
+
+useSeoMeta({
+  title: 'Virify Guides - Property Marketing & Investment Insights',
+  description: seoDescription,
+  ogTitle: 'Virify Guides - Property Marketing & Investment Insights',
+  ogDescription: seoDescription,
+});
 </script>
 
 <style scoped lang="scss">
