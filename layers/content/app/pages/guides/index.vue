@@ -5,13 +5,13 @@
     <AtomsGuideHero title="Virify Guides" description="From your very first step to your biggest leap, our guides help keep your marketing moving in the right direction." />
 
     <MoleculesGuideGrid>
-      <MoleculesGuideCard
-        v-for="category in categories"
-        :key="category._id"
-        :title="category.title"
-        :description="category.description"
-        :to="`/guides/${category.slug.current}`"
-        :icon="category.icon || 'content/info'" />
+      <MoleculesGuideCard 
+      v-for="category in categories" 
+      :key="category._id" 
+      :title="category.title" 
+      :description="category.description" 
+      :to="`/guides/${category.slug.current}`" 
+      :icon="category.icon || 'content/info'" />
     </MoleculesGuideGrid>
 
     <section>
@@ -23,12 +23,10 @@
     <section>
       <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </section>
-
   </div>
 </template>
 
 <script setup lang="ts">
-// Guides homepage
 const { useCategories } = useSanity();
 
 const { data: categories } = await useCategories();
