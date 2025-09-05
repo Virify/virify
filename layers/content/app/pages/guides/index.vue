@@ -2,7 +2,7 @@
   <div class="guides-home | container">
     <MoleculesBreadcrumb :items="breadcrumbItems" />
 
-    <AtomsGuideHero title="Virify Guides" description="From your very first step to your biggest leap, our guides help keep your marketing moving in the right direction." />
+    <AtomsGuideHero title="Virify Guides" description="Complete step-by-step guides for buying, selling, and renting properties. Learn how to find the right property, negotiate deals, and navigate the entire process with confidence." />
 
     <MoleculesGuideGrid>
       <MoleculesGuideCard 
@@ -36,16 +36,16 @@ const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }]);
 // SEO metadata
 const seoDescription = computed(() => {
   const categoryNames = categories.value?.map(cat => cat.title).join(', ') || '';
-  const baseDescription = 'From your very first step to your biggest leap, our comprehensive guides help keep your property marketing moving in the right direction.';
+  const baseDescription = 'Complete step-by-step guides for buying, selling, and renting properties. Learn how to find properties, negotiate deals, finalize agreements, and use our platform effectively.';
   return categoryNames 
     ? `${baseDescription} Browse categories: ${categoryNames}.`
     : baseDescription;
 });
 
 useSeoMeta({
-  title: 'Virify Guides - Property Marketing & Investment Insights',
+  title: 'Virify Guides - Complete Property Buying, Selling, Searching & Rental Guides',
   description: seoDescription,
-  ogTitle: 'Virify Guides - Property Marketing & Investment Insights',
+  ogTitle: 'Virify Guides - Complete Property Buying, Selling, Searching & Rental Guides',
   ogDescription: seoDescription,
 });
 </script>
