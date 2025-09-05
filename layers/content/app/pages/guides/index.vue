@@ -1,41 +1,43 @@
 <template>
   <div class="guides-home | container">
-    <h1>Guides</h1>
-    <div v-if="pending">Loading categories...</div>
-    <div v-else-if="categories" class="categories-grid">
-      <div 
+    <AtomsGuideHero title="Virify Guides" description="From your very first step to your biggest leap, our guides help keep your marketing moving in the right direction." />
+
+    <div class="guides-home__categories">
+      <MoleculesGuideCard 
         v-for="category in categories" 
-        :key="category._id"
-        class="category-card"
-      >
-        <h2>{{ category.title }}</h2>
-        <p v-if="category.description">{{ category.description }}</p>
-        <NuxtLink :to="`/guides/${category.slug.current}`">
-          View Guides
-        </NuxtLink>
-      </div>
+        :key="category._id" 
+        :title="category.title" 
+        :description="category.description" 
+        :to="`/guides/${category.slug.current}`" 
+        icon="account/billing" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-
 // Guides homepage
-const { useCategories } = useSanity()
+const { useCategories } = useSanity();
 
-const { data: categories, pending } = await useCategories()
+const { data: categories, pending } = await useCategories();
 </script>
 
-<style scoped>
-.categories-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-}
+<style scoped lang="scss">
+.guides-home {
+  padding: var(--size-32) 0;
 
-.category-card {
-  padding: 1.5rem;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
+  @media (max-width: 768px) {
+    padding: var(--size-16) 0;
+  }
+
+  &__categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--size-24);
+    margin-top: var(--size-32);
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
 }
 </style>
