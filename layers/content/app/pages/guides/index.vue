@@ -16,9 +16,12 @@
 
     <section>
       <div class="guides-home__advert">
-        <AtomsDivider />
         <MoleculesListingAdvert />
       </div>
+    </section>
+
+    <section>
+      <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </section>
 
   </div>
@@ -36,18 +39,6 @@ const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }]);
 <style scoped lang="scss">
 .guides-home {
   padding-bottom: var(--size-32);
-
-  &__categories {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--size-24);
-    margin-top: var(--size-32);
-
-    @media (max-width: 768px) {
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-  }
-
   &__advert {
     padding: var(--size-32) 0;
     display: flex;

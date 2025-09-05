@@ -5,19 +5,21 @@
 export const useSanity = () => {
 
   /**
-   * A lazy async data fetcher for guide categories from the Sanity CMS.
-   * @returns A lazy async data fetcher for guide categories from the Sanity CMS.
+   * A async data fetcher for guide categories from the Sanity CMS.
+   * Filters out categories with no guides.
+   * @returns A async data fetcher for guide categories with guides only.
    */
   const useCategories = () => {
-    return useAsyncData('guide-categories', () => 
-      $fetch<CategoriesResponse>('/api/sanity/categories')
-    )
+    return useAsyncData('guide-categories', async () => {
+      const categories = await $fetch<CategoriesResponse>('/api/sanity/categories')
+      return categories.filter(category => (category.guideCount ?? 0) > 0)
+    })
   }
 
   /**
-   * A lazy async data fetcher for a guide by slug from the Sanity CMS.
+   * A async data fetcher for a guide by slug from the Sanity CMS.
    * @param slug The slug of the guide to fetch.
-   * @returns A lazy async data fetcher for a guide by slug from the Sanity CMS.
+   * @returns A async data fetcher for a guide by slug from the Sanity CMS.
    */
   const useGuideBySlug = (slug: string) => {
     return useAsyncData(`guide-${slug}`, () => 
@@ -26,9 +28,9 @@ export const useSanity = () => {
   }
 
   /**
-   * A lazy async data fetcher for a category by slug from the Sanity CMS.
+   * A async data fetcher for a category by slug from the Sanity CMS.
    * @param slug The slug of the category to fetch.
-   * @returns A lazy async data fetcher for a category by slug from the Sanity CMS.
+   * @returns A async data fetcher for a category by slug from the Sanity CMS.
    */
   const useCategoryBySlug = (slug: string) => {
     return useAsyncData(`category-${slug}`, () => 

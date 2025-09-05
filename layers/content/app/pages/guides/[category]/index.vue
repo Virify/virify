@@ -3,8 +3,8 @@
     <MoleculesBreadcrumb :items="breadcrumbItems" />
 
     <AtomsGuideHero :title="category ? category.title : 'Category Not Found'" :description="category && category.description ? category.description : 'Explore our collection of guides to help you navigate your marketing journey.'" />
-    
-    <section v-if="category">
+
+    <section v-if="category && guides.length > 0">
       <MoleculesGuideGrid>
         <MoleculesGuideCard
           v-for="guide in guides"
@@ -20,9 +20,11 @@
     </section>
     <section>
       <div class="category-page__advert">
-        <AtomsDivider />
         <MoleculesListingAdvert />
       </div>
+    </section>
+     <section>
+      <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </section>
   </div>
 </template>
@@ -41,14 +43,6 @@ const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { la
 
 <style scoped lang="scss">
 .category-page {
-  &__categories {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--size-24);
-    margin-top: var(--size-32);
-    justify-items: start;
-  }
-
   &__advert {
     padding: var(--size-32) 0;
     display: flex;

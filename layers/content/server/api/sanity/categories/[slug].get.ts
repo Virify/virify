@@ -32,6 +32,7 @@ export default defineEventHandler(async (event): Promise<CategoryWithGuidesRespo
           slug,
           excerpt,
           heroImage,
+          icon,
           readTime,
           publishedAt,
           isFeatured,

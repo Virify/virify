@@ -186,9 +186,7 @@
     <!-- Listing Advert -->
     <section>
       <div class="container">
-        <div class="listing-advert">
-          <MoleculesListingAdvert />
-        </div>
+        <MoleculesListingAdvert />
       </div>
     </section>
 

@@ -13,8 +13,9 @@ export default defineEventHandler(async (): Promise<CategoriesResponse> => {
         heroImage,
         icon,
         orderIndex,
-        isActive
-      }
+        isActive,
+        "guideCount": count(*[_type == "guide" && isPublished == true && category._ref == ^._id])
+      }[guideCount > 0]
     `)
     return categories
   } catch (error) {

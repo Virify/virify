@@ -91,6 +91,7 @@ export interface GuideCategory {
   icon?: string
   orderIndex: number
   isActive: boolean
+  guideCount?: number
   guides?: Guide[]
 }
 
