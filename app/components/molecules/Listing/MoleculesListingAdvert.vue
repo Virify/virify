@@ -10,7 +10,7 @@
         List Your Property
       </button>
     </NuxtLink>
-    <p class="| body-sm">
+    <p class="| body-xs">
       <strong>Note:</strong> Virify is designed for transparency and ease. Listing is quick, and you’re always in control.
     </p>
   </AtomsHeroCard>

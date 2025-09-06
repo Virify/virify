@@ -164,7 +164,10 @@
   <div class="p-listing | container">
     <OrganismsRelevantListings type="similar" :listing-id="String(route.params?.id)" :address="similarListingsAddress" />
   </div>
-
+  <!-- Trending Listings -->
+  <div class="p-listing | container">
+    <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
+  </div>
 </template>
 
 
