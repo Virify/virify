@@ -35,6 +35,7 @@
     <OrganismsFooter class="desktop-only-footer" />
 
     <ViewsDialog />
+    <ViewsHelpButton />
     <MoleculesToastContainer />
   </div>
 </template>

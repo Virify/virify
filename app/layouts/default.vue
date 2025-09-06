@@ -9,6 +9,7 @@
   <OrganismsFooter />
 
   <ViewsDialog />
+  <ViewsHelpButton />
   <MoleculesToastContainer />
 </template>
 
