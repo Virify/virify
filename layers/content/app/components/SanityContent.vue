@@ -14,6 +14,25 @@ defineProps<{
   blocks: PortableTextContent[]
 }>()
 
+// Add IDs to headings after component mounts for table of contents
+onMounted(() => {
+  const contentEl = document.querySelector('.sanity-content')
+  if (!contentEl) return
+  
+  const headings = contentEl.querySelectorAll('h1, h2, h3, h4, h5, h6')
+  
+  headings.forEach((heading) => {
+    if (!heading.id) {
+      // Create slug from heading text
+      const text = heading.textContent || ''
+      const slug = text.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '')
+      heading.id = slug || 'heading'
+    }
+  })
+})
+
 // Custom components for different block types
 const customComponents = {
   types: {
@@ -67,7 +86,8 @@ const customComponents = {
         rel: props.value?.href?.startsWith('http') ? 'noopener noreferrer' : undefined
       }, props.children)
     }
-  }
+  },
+
 }
 </script>
 

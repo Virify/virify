@@ -36,14 +36,14 @@ defineProps<{
   padding: var(--size-16) 0 var(--size-16) 0;
 
   &__item {
-    background: var(--background-100);
+    background: var(--background-200);
     color: var(--foreground-100);
     border: 1px solid var(--secondary-400);
     transition: background 0.2s ease, color 0.2s ease;
 
     &--current {
       background: var(--secondary-400);
-      color: var(--background-100);
+      color: var(--background-200);
     }
 
     &:hover {
