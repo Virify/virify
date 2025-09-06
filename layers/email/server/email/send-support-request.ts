@@ -31,12 +31,12 @@ export default async function sendSupportRequest(
 
   // Set the email subject, HTML content, and recipient address
   const subject = `New Support Request: ${type} from ${name}`;
-  const html = emailHtml;
+  
   
   // Use the INTERNAL_EMAIL from environment variables or fallback
   const config = useRuntimeConfig();
   const to = (config.INTERNAL_EMAIL as string) || 'all@virify.co.uk';
 
   // Send the email
-  return await sesSender(html, subject, to);
+  return await sesSender(emailHtml, subject, to);
 }
