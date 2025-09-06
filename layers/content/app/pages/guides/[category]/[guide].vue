@@ -7,9 +7,16 @@
         :title="guide.title"
         :description="guide.excerpt || ''"
         :image="guide.heroImage"
-        :read-time="guide.readTime"
-        :published-at="guide.publishedAt"
       />
+      
+      <div class="guide-page__meta">
+        <AtomsPill v-if="guide.readTime" class="guide-page__pill">
+          {{ guide.readTime }} min read
+        </AtomsPill>
+        <AtomsPill v-if="guide.publishedAt" class="guide-page__pill">
+          Published {{ formatDate(guide.publishedAt) }}
+        </AtomsPill>
+      </div>
 
       <div class="guide-page__layout">
         <!-- Main Content -->
@@ -46,7 +53,6 @@ const breadcrumbItems = computed(() => [
   { label: guide.value?.title ?? '' }
 ])
 
-
 // Set page meta if guide exists and has SEO data
 if (guide.value) {
   useSeoMeta({
@@ -65,18 +71,33 @@ if (guide.value) {
 .guide-page {
   margin: 0 auto;
 
+  &__meta {
+    display: flex;
+    gap: var(--size-12);
+    margin-top: var(--size-32);
+    flex-wrap: wrap;
+
+    @include mq.mobile-only {
+      margin-top: var(--size-16);
+    }
+  }
+
+  &__pill {
+    background: var(--background-200);
+    color: var(--foreground-100);
+    border: 1px solid var(--secondary-400);
+  }
+
   &__layout {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--size-32);
-    margin-top: var(--size-16);
 
     @include mq.desktop {
       grid-template-columns: 2fr 1fr;
       gap: var(--size-48);
     }
   }
-
 
   &__content {
     min-width: 0;

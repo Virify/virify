@@ -87,15 +87,15 @@ const { data: categories } = await useCategories();
   &__container {
     display: flex;
     flex-direction: column;
-    gap: var(--size-32);
+    gap: var(--size-16);
   }
 
   &__sections {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
-    gap: var(--size-20);
-    margin-top: var(--size-24);
+    gap: var(--size-12);
+    margin-top: var(--size-12);
     width: 100%;
     text-align: left;
 

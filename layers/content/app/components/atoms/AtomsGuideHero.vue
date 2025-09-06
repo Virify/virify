@@ -18,17 +18,9 @@
     />
     <div class="guides-hero__content">
       <h1 class="guides-hero__title | title-xl">{{ title }}</h1>
-      <p class="guides-hero__description | body-md">
+      <p class="guides-hero__description | r-body-md-sm">
         {{ description }}
       </p>
-      <div v-if="readTime || publishedAt" class="guides-hero__meta">
-        <span v-if="readTime" class="guides-hero__read-time | body-xs">
-          {{ readTime }} min read
-        </span>
-        <span v-if="publishedAt" class="guides-hero__published | body-xs">
-          Published {{ formatDate(publishedAt) }}
-        </span>
-      </div>
     </div>
   </section>
 </template>
@@ -38,20 +30,11 @@ defineProps<{
   title: string;
   description: string;
   image?: SanityImage;
-  readTime?: number;
-  publishedAt?: string;
 }>();
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
 </script>
 
 <style scoped lang="scss">
+@use '#styles/_utils/media' as mq;
 .guides-hero {
   position: relative;
   height: 400px;
@@ -68,6 +51,7 @@ const formatDate = (dateString: string) => {
     height: 100%;
     object-fit: cover;
     z-index: 1;
+    filter: brightness(0.6) contrast(1.1);
   }
 
   &__content {
@@ -76,8 +60,14 @@ const formatDate = (dateString: string) => {
     max-width: 600px;
     margin-left: var(--size-32);
     padding: var(--size-24) var(--size-32);
-    background: rgba(0, 0, 0, 0.3);
     border-radius: var(--border-radius-md);
+
+    @include mq.mobile-only {
+      margin: 0 auto;
+      padding: var(--size-16) var(--size-24);
+      text-align: center;
+      max-width: 100%;
+    }
   }
 
   &__title {
@@ -90,15 +80,5 @@ const formatDate = (dateString: string) => {
     margin-bottom: var(--size-16);
   }
 
-  &__meta {
-    display: flex;
-    gap: var(--size-16);
-    color: var(--monochrome-900);
-  }
-
-  &__read-time,
-  &__published {
-    opacity: 0.9;
-  }
 }
 </style>

@@ -92,12 +92,13 @@ const customComponents = {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
 .sanity-content {
   max-width: 100%;
+  padding: var(--size-32) 0;
 
   // Typography elements
   h1, h2, h3, h4, h5, h6 {
-    margin-top: var(--size-32);
     margin-bottom: var(--size-16);
     font-weight: var(--font-bold);
     color: var(--secondary-400);
