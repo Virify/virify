@@ -1,7 +1,7 @@
 <template>
   <aside class="table-of-contents">
     <nav class="guide-toc">
-      <h3 class="guide-toc__title | title-xs">Table of Contents</h3>
+      <h3 class="guide-toc__title | title-lg">Table of Contents</h3>
       <ul class="guide-toc__list">
         <li v-for="heading in tableOfContents" :key="heading.id" :class="['guide-toc__item', `guide-toc__item--${heading.level}`]">
           <a :href="`#${heading.id}`" :class="['guide-toc__link | body-sm', { active: activeHeading === heading.id }]" @click.prevent="scrollToSection(heading.id)">
@@ -98,9 +98,9 @@ onMounted(() => {
 
 .guide-toc {
   background: var(--background-100);
-  border: 1px solid var(--monochrome-600);
-  border-radius: var(--border-radius-lg);
-  padding: var(--size-16);
+  border-left: 1px solid var(--monochrome-600);
+  margin-top: var(--size-32);
+  padding: 0 var(--size-32);
 
   &__title {
     margin-bottom: var(--size-16);
@@ -140,8 +140,7 @@ onMounted(() => {
     transition: all 0.2s ease;
 
     &:hover {
-      color: var(--foreground-100);
-      background-color: var(--background-200);
+      color: var(--secondary-500);
     }
 
     &.active {

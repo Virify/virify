@@ -69,10 +69,10 @@ if (guide.value) {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--size-32);
-    margin-top: var(--size-32);
+    margin-top: var(--size-16);
 
     @include mq.desktop {
-      grid-template-columns: 3fr 1fr;
+      grid-template-columns: 2fr 1fr;
       gap: var(--size-48);
     }
   }
