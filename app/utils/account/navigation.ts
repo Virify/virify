@@ -19,7 +19,7 @@ export const accountNavigation: NavigationItem[] = [
     icon: "profile",
   },
   // {
-  //   name: "Biilling & Plans",
+  //   name: "Billing & Plans",
   //   url: "#",
   //   icon: "account/billing",
   // },

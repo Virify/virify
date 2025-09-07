@@ -44,7 +44,8 @@
           @toggle="isNotesCollapsed = !isNotesCollapsed"
           title="Recently Added Notes"
           icon="cards/notes"
-          :items="(recentUserNotes as RecentItem[])"          empty-message="No recent notes yet."
+          :items="(recentUserNotes as RecentItem[])"          
+          empty-message="No recent notes yet."
           :show-notes-icon="true"
         />
 
