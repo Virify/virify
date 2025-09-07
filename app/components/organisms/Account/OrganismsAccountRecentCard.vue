@@ -93,21 +93,19 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
   }
 
   &__list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--size-12);
     margin: 0;
     padding: 0;
     list-style: none;
-
-    @include mq.mobile-only {
-      grid-template-columns: 1fr;
-    }
   }
 
   &__item {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-width: 300px;
   }
 
   &__link {
@@ -143,6 +141,11 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
     gap: var(--size-12);
     flex: 1;
     min-height: 100px;
+
+    @include mq.mobile-only {
+      gap: var(--size-8);
+      min-height: 80px;
+    }
   }
 
   &__content-wrapper {

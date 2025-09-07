@@ -13,6 +13,8 @@ defineProps<Props>();
 </script>
 
 <style lang="scss" scoped>
+@use '#styles/_utils/media' as mq;
+
 .recent-card-image {
   width: 120px;
   flex: 0 0 120px;
@@ -22,7 +24,12 @@ defineProps<Props>();
   position: relative;
   margin: 0;
 
-  img {
+  @include mq.mobile-only {
+    width: 80px;
+    flex: 0 0 80px;
+  }
+
+  :deep(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;

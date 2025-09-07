@@ -56,7 +56,7 @@ const formattedAddress = computed(() => {
   return parts.length > 0 ? parts.join(", ") : "Address not provided";
 });
 
-const listingTypeText = computed(() => (props.isRental ? "To Rent" : "For Sale"));
+const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
 </script>
 
 <style lang="scss" scoped>
@@ -75,10 +75,8 @@ const listingTypeText = computed(() => (props.isRental ? "To Rent" : "For Sale")
   }
 
   &__price {
-    font-size: 1rem;
-    font-weight: 600;
     margin: 0;
-    color: var(--foreground-100);
+    color: var(--secondary-400);
     flex: 1;
   }
 
@@ -87,7 +85,7 @@ const listingTypeText = computed(() => (props.isRental ? "To Rent" : "For Sale")
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--background-100);
+    color: var(--monochrome-900);
   }
 
   &__address {
