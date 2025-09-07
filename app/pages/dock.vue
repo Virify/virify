@@ -6,7 +6,8 @@
       '| container': showGrid
     }">
       <template #left v-if="showGrid">
-        <OrganismsResults v-if="isLoading || results.length" :results :is-loading />
+        <OrganismsResults v-if="!isMounted || isLoading || results.length" :results
+          :is-loading="!isMounted || isLoading" />
         <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
 
@@ -117,7 +118,11 @@ const results = computed(() => {
 /**
  *  Load search state on page mounted
  */
+const isMounted = ref(false)
+
 onMounted(() => {
+  isMounted.value = true
+
   refreshFromKV()
 })
 
