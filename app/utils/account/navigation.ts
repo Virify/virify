@@ -18,26 +18,26 @@ export const accountNavigation: NavigationItem[] = [
     url: "#",
     icon: "profile",
   },
-  {
-    name: "Biilling & Plans",
-    url: "#",
-    icon: "account/billing",
-  },
+  // {
+  //   name: "Billing & Plans",
+  //   url: "#",
+  //   icon: "account/billing",
+  // },
   {
     name: "Analytics",
     url: "#",
     icon: "explore/hot",
   },
-  {
-    name: "Contact Support",
-    url: "#",
-    icon: "cards/verified",
-  },
-  {
-    name: "Preferences",
-    url: "#",
-    icon: "account/account-preferences",
-  },
+  // {
+  //   name: "Contact Support",
+  //   url: "#",
+  //   icon: "cards/verified",
+  // },
+  // {
+  //   name: "Preferences",
+  //   url: "#",
+  //   icon: "account/account-preferences",
+  // },
 
 ];
 
@@ -48,24 +48,24 @@ export const listingsNavigation: NavigationItem[] = [
     icon: "read-more",
     countKey: "listings",
   },
-  {
-    name: "Offers",
-    url: "#",
-    icon: "account/offers",
-    countKey: "offers",
-  },
+  // {
+  //   name: "Offers",
+  //   url: "#",
+  //   icon: "account/offers",
+  //   countKey: "offers",
+  // },
   {
     name: "Enquiries",
     url: "/account/messages",
     icon: "account/enquiry",
     countKey: "unreadMessages",
   },
-  {
-    name: "Viewings",
-    url: "#",
-    icon: "account/viewing",
-    countKey: "viewings",
-  },
+  // {
+  //   name: "Viewings",
+  //   url: "#",
+  //   icon: "account/viewing",
+  //   countKey: "viewings",
+  // },
   {
     name: "Favourites",
     url: "#",
