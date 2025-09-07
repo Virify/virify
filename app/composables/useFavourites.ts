@@ -38,7 +38,7 @@ export const useFavourites = createSharedComposable(() => {
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         return createdAt >= sevenDaysAgo;
       })
-      .slice(0, 5);
+      .slice(0, 6);
   });
 
   /**

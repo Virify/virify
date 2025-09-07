@@ -60,3 +60,32 @@ export type RecentlyViewed = {
   sessionId?: string | null;
   ip?: string | null;
 };
+
+export type RecentItem = {
+  id: number;
+  note?: string;
+  listing?: {
+    id: number;
+    price?: number;
+    rentalListing?: {
+      priceType?: string;
+    };
+    saleListing?: {
+      priceType?: string;
+    };
+    property?: {
+      numberBedrooms?: number;
+      numberBathrooms?: number;
+      address?: {
+        street?: string;
+        city?: string;
+        postcode?: string;
+        fullAddress?: string;
+      };
+      media?: Array<{
+        image?: string;
+      }>;
+    };
+  };
+  isFavourite?: boolean;
+}
