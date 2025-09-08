@@ -1,5 +1,5 @@
 <template>
-  <!-- Desktop: Full favourties page -->
+  <!-- Desktop: Full favourites page -->
   <div class="favourites-page">
     <!-- Breadcrumb -->
     <MoleculesBreadcrumb :items="breadcrumbItems" />
