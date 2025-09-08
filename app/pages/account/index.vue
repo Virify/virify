@@ -33,7 +33,7 @@
           :show-favourite-icon="true"
         />
 
-        <nuxt-link v-if="recentFavourites?.length > 5" to="account/favourites" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
       </slot>
     </div>
 
@@ -49,12 +49,8 @@
           :show-notes-icon="true"
         />
 
-        <nuxt-link v-if="recentUserNotes?.length > 5" to="#" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="#" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
       </slot>
-    </div>
-
-    <div class="actions-section">
-      <slot name="actions"></slot>
     </div>
   </div>
 </template>
@@ -125,17 +121,6 @@ watchEffect(() => {
     align-self: flex-start;
     width: fit-content;
     margin: 0 var(--size-16) var(--size-16) var(--size-16);
-  }
-}
-
-.actions-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--size-24);
-
-  @include mq.mobile-only {
-    grid-template-columns: 1fr;
-    gap: var(--size-16);
   }
 }
 </style>

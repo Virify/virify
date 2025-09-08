@@ -29,7 +29,7 @@
                           <AtomsFavouriteButton
                           :is-favourite="item.isFavourite"
                           :listing-id="item.listing?.id!"
-                          size="24"
+                          class="recent-card__fav"
                         />
                         </div>
                         
@@ -105,7 +105,7 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
     top: 0;
     background: var(--background-200);
     z-index: 1;
-    padding: var(--size-16) var(--size-16) 0;
+    padding: var(--size-16);
   }
 
   &__content {
@@ -119,6 +119,7 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
     flex: 1;
     overflow-y: auto;
     padding: var(--size-16) var(--size-16) var(--size-16);
+    padding-top: 0;
   }
 
   &__list {
@@ -164,7 +165,9 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
   }
 
   &__fav {
-   
+   background: inherit;
+   border: none;
+   margin-top: var(--size-4);
   }
 
   &__notes {
