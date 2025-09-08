@@ -11,7 +11,7 @@
     <div class="favourites-page__grid">
       <!-- Conversations List Section -->
       <div class="favourites-card">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isSaleCollapsed"
           @toggle="isSaleCollapsed = !isSaleCollapsed"
           title="Sale Favourites"

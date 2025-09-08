@@ -23,8 +23,6 @@
         <span class="recent-card-details__feature-text | body-xs">{{ bathrooms }}</span>
       </div>
     </div>
-
-    <p v-if="note" class="recent-card-details__note | body-xs">Note: {{ note }}</p>
   </div>
 </template>
 
@@ -38,7 +36,6 @@ interface Props {
   };
   bedrooms?: number;
   bathrooms?: number;
-  note?: string;
   isRental: boolean;
 }
 

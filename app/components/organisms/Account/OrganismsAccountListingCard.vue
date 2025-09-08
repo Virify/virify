@@ -15,18 +15,33 @@
               <NuxtLink :to="getListingUrl(item)" class="recent-card__link">
                 <div class="recent-card__card">
                   <div class="recent-card__main-row">
-                    <AtomsAccountRecentCardImage :image-src="getFirstImage(item)" />
+                    <AtomsAccountListingCardImage :image-src="getFirstImage(item)" :has-note="!!item.note" />
 
                     <div class="recent-card__content-wrapper">
-                      <MoleculesAccountRecentCardDetails :price="item.listing?.price"
-                        :address="item.listing?.property?.address" :bedrooms="item.listing?.property?.numberBedrooms"
-                        :bathrooms="item.listing?.property?.numberBathrooms" :note="item.note"
+                      <MoleculesAccountListingCardDetails :price="item.listing?.price"
+                        :address="item.listing?.property?.address" 
+                        :bedrooms="item.listing?.property?.numberBedrooms"
+                        :bathrooms="item.listing?.property?.numberBathrooms" 
+                        :note="item.note"
                         :is-rental="isRental(item)" />
 
-                      <MoleculesAccountRecentCardIcons :is-favourite="item.isFavourite"
-                        :show-favourite-icon="showFavouriteIcon" :show-notes-icon="showNotesIcon"
-                        @toggle-favourite="toggleFavourite(item)" @edit-note="editNote(item)" />
+                        <div v-if="showFavouriteIcon">
+                          <AtomsFavouriteButton
+                          :is-favourite="item.isFavourite"
+                          :listing-id="item.listing?.id!"
+                          size="24"
+                        />
+                        </div>
+                        
                     </div>
+                  </div>
+                  <!-- notes -->
+                  <div class="recent-card__notes" v-if="item.note && showNotesIcon" @click.prevent>
+                    <AtomsNoteButton 
+                      :listing-id="item.listing?.id!" 
+                      class="recent-card__notes-icon" 
+                    />
+                    <p v-if="item.note" class="body-sm lineheight-sm">{{ item.note }}</p>
                   </div>
                 </div>
               </NuxtLink>
@@ -59,24 +74,10 @@ defineEmits<{
   toggle: [];
 }>();
 
-const { toggleFavourite: toggleFavouriteAction } = useFavourites();
-const { showNoteDialog } = useNotes();
 
 // Computed properties
 const hasItems = computed(() => !!props.items?.length);
 
-// Action handlers
-const toggleFavourite = async (item: RecentItem) => {
-  if (item.listing?.id) {
-    await toggleFavouriteAction(item.listing.id);
-  }
-};
-
-const editNote = (item: RecentItem) => {
-  if (item.listing?.id) {
-    showNoteDialog(item.listing.id);
-  }
-};
 
 // Helper functions for data extraction
 const getListingUrl = (item: RecentItem): string => `/listing/${item.listing?.id}`;
@@ -159,6 +160,25 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border-color: var(--border-300);
+    }
+  }
+
+  &__fav {
+   
+  }
+
+  &__notes {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: var(--size-8);
+    padding: var(--size-8) var(--size-12);
+    border-top: 1px solid var(--monochrome-500);
+    background: var(--background-200);
+
+    &-icon {
+      background: inherit;
+      border: none;
     }
   }
 

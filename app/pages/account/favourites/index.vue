@@ -11,7 +11,7 @@
     <div class="favourites-page__grid">
       <!-- Conversations List Section -->
       <div class="favourites-card favourites-card--fixed-height">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isSaleCollapsed"
           @toggle="isSaleCollapsed = !isSaleCollapsed"
           title="For Sale"
@@ -25,7 +25,7 @@
 
       <!-- Conversation Details Section -->
       <div class="favourites-card favourites-card--fixed-height">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isRentCollapsed"
           @toggle="isRentCollapsed = !isRentCollapsed"
           title="Rental"

@@ -10,7 +10,7 @@
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isViewedCollapsed"
           @toggle="isViewedCollapsed = !isViewedCollapsed"
           title="Recently Viewed Listings"
@@ -23,7 +23,7 @@
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isFavouritesCollapsed"
           @toggle="isFavouritesCollapsed = !isFavouritesCollapsed"
           title="Recently Favourited Listings"
@@ -39,7 +39,7 @@
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isNotesCollapsed"
           @toggle="isNotesCollapsed = !isNotesCollapsed"
           title="Recently Added Notes"

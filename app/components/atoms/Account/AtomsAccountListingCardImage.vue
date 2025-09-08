@@ -1,5 +1,6 @@
 <template>
-  <figure v-if="imageSrc" class="recent-card-image">
+  <figure v-if="imageSrc" class="recent-card-image" :class="{
+    'recent-card-image--with-note': hasNote}">
     <AtomsCloudFlareImage :src="imageSrc" alt="Property image" variant="thumbnail" :placeholder="true" />
   </figure>
 </template>
@@ -7,6 +8,7 @@
 <script setup lang="ts">
 interface Props {
   imageSrc?: string | null;
+  hasNote?: boolean;
 }
 
 defineProps<Props>();
@@ -23,6 +25,11 @@ defineProps<Props>();
   overflow: hidden;
   position: relative;
   margin: 0;
+
+  &--with-note {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
 
   @include mq.mobile-only {
     width: 80px;
