@@ -15,6 +15,7 @@ import { generateProperty } from '../server/utils/property-faker'
 import { generateSaleListing, generateRentalListing } from '../server/utils/listing-faker'
 import { seedFakeUsers } from '../server/utils/user-faker'
 import { rentalAddress, saleAddress, cityCenters } from '../server/utils/address-to-seed'
+import { seedAdminFavourites } from '../server/utils/admin-favourites-seed'
 
 /**
  * Seeding function to populate property types and classifications in the database.
@@ -90,6 +91,7 @@ async function seedAdminUser() {
   }
 }
 
+
 /**
  * Seeding function to populate city center addresses in the database.
  */
@@ -159,6 +161,10 @@ async function seedDatabase() {
     console.log('Seeding fake users...')
     await seedFakeUsers(20)
     console.log('Fake users seeded.')
+
+    console.log('Seeding admin favourites...')
+    await seedAdminFavourites()
+    console.log('Admin favourites seeded.')
 
     console.log('Database seeding complete.')
   }

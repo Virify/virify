@@ -1,36 +1,42 @@
 <template>
   <div class="recent-card">
-    <AtomsCollapsibleHeader :is-collapsed="isCollapsed" :title="title" :icon="icon" variant="inline" @toggle="$emit('toggle')" />
+    <div class="recent-card__header">
+      <AtomsCollapsibleHeader :is-collapsed="isCollapsed" :title="title" :icon="icon" variant="inline"
+        @toggle="$emit('toggle')" />
+    </div>
 
     <Transition name="collapse-fade">
       <div v-show="!isCollapsed" class="recent-card__content">
-        <ul v-if="hasItems" class="recent-card__list">
-          <li v-for="item in items" :key="item.id" class="recent-card__item">
-            <NuxtLink :to="getListingUrl(item)" class="recent-card__link">
-              <div class="recent-card__card">
-                <div class="recent-card__main-row">
-                  <AtomsAccountRecentCardImage :image-src="getFirstImage(item)" />
+        <div class="recent-card__scrollable">
 
-                  <div class="recent-card__content-wrapper">
-                    <MoleculesAccountRecentCardDetails
-                      :price="item.listing?.price"
-                      :address="item.listing?.property?.address"
-                      :bedrooms="item.listing?.property?.numberBedrooms"
-                      :bathrooms="item.listing?.property?.numberBathrooms"
-                      :note="item.note"
-                      :is-rental="isRental(item)"
-                    />
+          <ul v-if="hasItems" class="recent-card__list">
+            <li v-for="item in items" :key="item.id" class="recent-card__item">
 
-                    <MoleculesAccountRecentCardIcons :is-favourite="item.isFavourite" :show-favourite-icon="showFavouriteIcon" :show-notes-icon="showNotesIcon" @toggle-favourite="toggleFavourite(item)" @edit-note="editNote(item)" />
+              <NuxtLink :to="getListingUrl(item)" class="recent-card__link">
+                <div class="recent-card__card">
+                  <div class="recent-card__main-row">
+                    <AtomsAccountRecentCardImage :image-src="getFirstImage(item)" />
+
+                    <div class="recent-card__content-wrapper">
+                      <MoleculesAccountRecentCardDetails :price="item.listing?.price"
+                        :address="item.listing?.property?.address" :bedrooms="item.listing?.property?.numberBedrooms"
+                        :bathrooms="item.listing?.property?.numberBathrooms" :note="item.note"
+                        :is-rental="isRental(item)" />
+
+                      <MoleculesAccountRecentCardIcons :is-favourite="item.isFavourite"
+                        :show-favourite-icon="showFavouriteIcon" :show-notes-icon="showNotesIcon"
+                        @toggle-favourite="toggleFavourite(item)" @edit-note="editNote(item)" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </NuxtLink>
-          </li>
-        </ul>
+              </NuxtLink>
+              
+            </li>
+          </ul>
 
-        <div v-else class="recent-card__empty | body-sm">
-          {{ emptyMessage }}
+          <div v-else class="recent-card__empty | body-sm">
+            {{ emptyMessage }}
+          </div>
         </div>
       </div>
     </Transition>
@@ -88,8 +94,30 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
 @use "#styles/_utils/media" as mq;
 
 .recent-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__header {
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    background: var(--background-200);
+    z-index: 1;
+    padding: var(--size-16) var(--size-16) 0;
+  }
+
   &__content {
-    padding-top: var(--size-16);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  &__scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--size-16) var(--size-16) var(--size-16);
   }
 
   &__list {

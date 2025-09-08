@@ -1,6 +1,6 @@
 <template>
   <div class="guides-home | container">
-    <MoleculesGuideBreadcrumb :items="breadcrumbItems" />
+    <MoleculesBreadcrumb :items="breadcrumbItems" />
 
     <AtomsGuideHero title="Virify Guides" description="Complete step-by-step guides for buying, selling, and renting properties. Learn how to find the right property, negotiate deals, and navigate the entire process with confidence." />
 

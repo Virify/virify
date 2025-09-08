@@ -68,7 +68,7 @@ export const listingsNavigation: NavigationItem[] = [
   // },
   {
     name: "Favourites",
-    url: "#",
+    url: "/account/favourites",
     icon: "cards/favourite-filled",
     countKey: "favourites",
   },

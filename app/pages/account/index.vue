@@ -33,7 +33,7 @@
           :show-favourite-icon="true"
         />
 
-        <nuxt-link v-if="recentFavourites?.length > 5" to="#" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentFavourites?.length > 5" to="favourites" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
       </slot>
     </div>
 
@@ -109,13 +109,12 @@ watchEffect(() => {
 
 .content-section {
   background: var(--background-200);
-  padding: var(--size-16);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: var(--size-24);
   min-width: 0;
+  overflow: hidden;
 
   @include mq.mobile-only {
     padding: var(--size-16);
@@ -124,6 +123,8 @@ watchEffect(() => {
 
   &__see-all {
     align-self: flex-start;
+    width: fit-content;
+    margin: 0 var(--size-16) var(--size-16) var(--size-16);
   }
 }
 

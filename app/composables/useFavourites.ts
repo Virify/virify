@@ -31,6 +31,14 @@ export const useFavourites = createSharedComposable(() => {
     }
   );
 
+  const saleFavourites = computed(() => {
+    return favourites.value.filter((item) => item.listing.saleListing);
+  });
+
+  const rentalFavourites = computed(() => {
+    return favourites.value.filter((item) => item.listing.rentalListing);
+  });
+
   const recentFavourites = computed(() => {
     return favourites.value
       .filter((item) => {
@@ -137,5 +145,8 @@ export const useFavourites = createSharedComposable(() => {
     toggleFavourite,
     favourites,
     recentFavourites,
+    saleFavourites,
+    rentalFavourites,
+    refreshFavourites,
   };
 });

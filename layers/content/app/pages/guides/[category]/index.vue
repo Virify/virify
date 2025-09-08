@@ -1,6 +1,6 @@
 <template>
   <div class="category-page | container">
-    <MoleculesGuideBreadcrumb :items="breadcrumbItems" />
+    <MoleculesBreadcrumb :items="breadcrumbItems" />
 
     <AtomsGuideHero :title="title" :description="description" :image="image" />
 
