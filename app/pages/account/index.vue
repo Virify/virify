@@ -33,7 +33,7 @@
           :show-favourite-icon="true"
         />
 
-        <nuxt-link v-if="recentFavourites?.length > 5" to="favourites" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentFavourites?.length > 5" to="account/favourites" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
       </slot>
     </div>
 
