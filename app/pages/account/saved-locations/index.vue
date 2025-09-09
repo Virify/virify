@@ -153,10 +153,10 @@ function openEditDialog(entry?: any) {
   }
   
   &__name {
-  grid-area: name;
+    grid-area: name;
     margin: 0;
     font-weight: 600;
-  align-self: center;
+    align-self: center;
   }
 
   &__address {
