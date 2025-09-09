@@ -73,24 +73,6 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: toast-icon-bounce 0.6s ease-out 0.2s both;
-}
-
-@keyframes toast-icon-bounce {
-  0% {
-    transform: scale(0) rotate(-360deg);
-    opacity: 0;
-  }
-
-  50% {
-    transform: scale(1.2) rotate(-180deg);
-    opacity: 1;
-  }
-
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
 }
 
 .toast-message {
@@ -100,8 +82,8 @@ withDefaults(defineProps<Props>(), {
 
 /* Toast variants using brand colors */
 .toast-success {
-  background: var(--background-100);
-  color: var(--foreground-100);
+  background: var(--secondary-400);
+  color: var(--background-100);
   border: 1px solid var(--foreground-100);
 }
 

@@ -93,12 +93,28 @@ export const useSavedLocation = createSharedComposable(() => {
     })
   }
 
+  /**
+   * Update only the name of an existing entry
+   */
+  async function updateEntryName(entryId: number, name: string) {
+    if (!Number.isInteger(entryId) || !name?.length) return
+    await $fetch<UserSavedLocation>(`/api/user/locations/`, {
+      method: 'PATCH',
+      body: { id: entryId, name }
+    }).then(async () => {
+      await getEntries()
+    }).catch(() => {
+      throw createError({ status: 500, statusMessage: 'Unable to update location name' })
+    })
+  }
+
   return {
     entries,
     getEntries,
     checkEntry,
     clearEntries,
     deleteEntry,
-    addEntry
+    addEntry,
+    updateEntryName
   }
 });

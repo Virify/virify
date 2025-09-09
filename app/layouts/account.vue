@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { logout } from '~/utils/account/navigation'
 const route = useRoute()
-const groupStates = ref([true, true, true, false])
+const groupStates = ref([true, true, true, true])
 
 // Control sidebar visibility
 const showSidebar = computed(() =>
