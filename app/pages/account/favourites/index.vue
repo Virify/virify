@@ -1,41 +1,34 @@
 <template>
   <!-- Desktop: Full favourites page -->
   <div class="favourites-page">
-    <!-- Breadcrumb -->
-    <MoleculesBreadcrumb :items="breadcrumbItems" />
-    
     <!-- Title -->
-    <h2 class="favourites-page__title | title-md">My Favourites</h2>
+    <div class="favourites-page__header">
+      <h2 class="favourites-page__title | title-md">My Favourites</h2>
+      <div class="favourites-page__controls">
+        <div class="favourites-page__search-filter-row">
+          <AtomsInput v-model="searchTerm" type="text" placeholder="Search favourites..." autocomplete="off"
+            class="body-sm" />
+          <AtomsSelect v-model="categoryFilter" :options="filterOptions"
+            class="favourites-page__filter-select | body-sm" />
+        </div>
+      </div>
+    </div>
 
     <!-- favourites Grid -->
     <div class="favourites-page__grid">
       <!-- Conversations List Section -->
-      <div class="favourites-card favourites-card--fixed-height">
-        <OrganismsAccountListingCard
-          :is-collapsed="isSaleCollapsed"
+      <div class="favourites-card">
+        <OrganismsAccountListingCard 
+          :is-collapsed="isSaleCollapsed" 
           @toggle="isSaleCollapsed = !isSaleCollapsed"
-          title="For Sale"
-          icon="cards/favourite"
-          :items="(saleFavourites as RecentItem[])"
-          empty-message="No sale favourites yet."
+          title="Favourites" 
+          icon="cards/favourite" 
+          :items="(filteredFavourites as RecentItem[])"
+          empty-message="No favourites yet." 
           :show-favourite-icon="true"
-        />
+          :show-notes-icon="true"
+          />
       </div>
-      <nuxt-link v-if="saleFavourites.length" to="favourites/sale" class="favourites-card__see-all | button button-sm button-secondary">See all sale favourites</nuxt-link>
-
-      <!-- Conversation Details Section -->
-      <div class="favourites-card favourites-card--fixed-height">
-        <OrganismsAccountListingCard
-          :is-collapsed="isRentCollapsed"
-          @toggle="isRentCollapsed = !isRentCollapsed"
-          title="Rental"
-          icon="cards/favourite"
-          :items="(rentalFavourites as RecentItem[])"
-          empty-message="No rental favourites yet."
-          :show-favourite-icon="true"
-        />
-      </div>
-      <nuxt-link v-if="rentalFavourites.length" to="favourites/rental" class="favourites-card__see-all | button button-sm button-secondary">See all rental favourites</nuxt-link>
     </div>
   </div>
 </template>
@@ -45,10 +38,6 @@
 const seoData = {
   title: "My Favourites - Virify",
   description: "View and manage your favourite property listings. Keep track of properties you're interested in buying or renting.",
-  breadcrumbs: [
-    { label: "Account", to: "/account" },
-    { label: "Favourites" }
-  ]
 };
 
 definePageMeta({
@@ -65,14 +54,16 @@ useSeoMeta({
   twitterDescription: seoData.description
 });
 
-const { saleFavourites, rentalFavourites } = useFavourites();
+const { filteredFavourites, searchTerm, categoryFilter } = useFavourites();
+
+const filterOptions = [
+  { key: 'All', value: 'all' },
+  { key: 'Sale', value: 'sale' },
+  { key: 'Rental', value: 'rental' },
+];
 
 // Component state
 const isSaleCollapsed = ref(false);
-const isRentCollapsed = ref(false);
-
-// Generate breadcrumb items from SEO data
-const breadcrumbItems = seoData.breadcrumbs;
 </script>
 
 <style lang="scss">
@@ -88,11 +79,7 @@ const breadcrumbItems = seoData.breadcrumbs;
   min-width: 0;
 
   &__title {
-    background: var(--background-200);
-    border-radius: var(--border-radius-xl);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: var(--size-16);
-    margin: 0;
+    margin: 0 0 var(--size-16) 0;
   }
 
   &__grid {
@@ -108,24 +95,61 @@ const breadcrumbItems = seoData.breadcrumbs;
       overflow: visible;
     }
   }
-}
 
-.favourites-card {
-  background: var(--background-200);
-  border-radius: var(--border-radius-xl);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  &--fixed-height {
-    max-height: 40dvh;
+  &__header {
+    background: var(--background-200);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: var(--size-24);
   }
 
-  &__see-all {
-    width: fit-content;
-    margin-top: var(--size-8);
-    margin-left: var(--size-8);
+  &__controls {
+    width: 100%;
+  }
+
+  &__search-filter-row {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: var(--size-12);
+    align-items: center;
+
+    @include mq.tablet {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    @include mq.mobile-only {
+      grid-template-columns: 1fr;
+      gap: var(--size-8);
+    }
+  }
+
+  &__filter-select {
+    min-width: 160px;
+    padding: var(--size-8) var(--size-12);
+
+    @include mq.mobile-only {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+
+  .favourites-card {
+    background: var(--background-200);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    &--fixed-height {
+      max-height: 40dvh;
+    }
+
+    &__see-all {
+      width: fit-content;
+      margin-top: var(--size-8);
+      margin-left: var(--size-8);
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
-  <div class="recent-card">
-    <div class="recent-card__header">
+  <div class="account-card">
+    <div class="account-card__header">
       <AtomsCollapsibleHeader 
         :is-collapsed="isCollapsed" 
         :title="title" 
@@ -11,19 +11,19 @@
     </div>
 
     <Transition name="collapse-fade">
-      <div v-show="!isCollapsed" class="recent-card__content">
-        <div class="recent-card__scrollable">
-          <ul v-if="hasItems" class="recent-card__list">
-            <li v-for="item in items" :key="item.id" class="recent-card__item">
-              <NuxtLink :to="getListingUrl(item)" class="recent-card__link">
-                <div class="recent-card__card">
-                  <div class="recent-card__main-row">
+      <div v-show="!isCollapsed" class="account-card__content">
+        <div class="account-card__scrollable">
+          <ul v-if="hasItems" class="account-card__list">
+            <li v-for="item in items" :key="item.id" class="account-card__item">
+              <NuxtLink :to="getListingUrl(item)" class="account-card__link">
+                <div class="account-card__card">
+                  <div class="account-card__main-row">
                     <AtomsAccountListingCardImage :image-src="getFirstImage(item)" :has-note="!!item.note" />
 
-                    <div class="recent-card__content-wrapper">
+                    <div class="account-card__content-wrapper">
                       <MoleculesAccountListingCardDetails
                         :price="item.listing?.price"
-                        :price-type="item.listing?.saleListing?.priceType || item.listing?.rentalListing?.priceType"
+                        :price-type="getPriceType(item)"
                         :address="item.listing?.property?.address"
                         :bedrooms="item.listing?.property?.numberBedrooms"
                         :bathrooms="item.listing?.property?.numberBathrooms"
@@ -32,20 +32,20 @@
                         <template #after-pill>
                           <AtomsNoteButton v-if="showNotesIcon" 
                             :listing-id="item.listing?.id!" 
-                            class="recent-card__note-btn" 
+                            class="account-card__note-btn" 
                             @click.prevent 
                           />
                           <AtomsFavouriteButton v-if="showFavouriteIcon" 
                             :is-favourite="item.isFavourite" 
                             :listing-id="item.listing?.id!" 
-                            @click.prevent class="recent-card__fav" 
+                            @click.prevent class="account-card__fav" 
                           />
                         </template>
                       </MoleculesAccountListingCardDetails>
                     </div>
                   </div>
                   <!-- notes text (no icon now) -->
-                  <div class="recent-card__notes" v-if="item.note" @click.prevent>
+                  <div class="account-card__notes" v-if="item.note" @click.prevent>
                     <p class="body-sm lineheight-sm">
                       <em class="font-bold">Notes: </em>
                       {{ item.note }}
@@ -56,7 +56,7 @@
             </li>
           </ul>
 
-          <div v-else class="recent-card__empty | body-sm">
+          <div v-else class="account-card__empty | body-sm">
             {{ emptyMessage }}
           </div>
         </div>
@@ -66,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+
 interface Props {
   isCollapsed: boolean;
   title: string;
@@ -94,12 +95,17 @@ const getFirstImage = (item: RecentItem): string | null => {
 };
 
 const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
+
+const getPriceType = (item: RecentItem): string | undefined => {
+  return item.listing?.saleListing?.priceType ? item.listing.saleListing.priceType : item.listing?.rentalListing?.rentFrequency;
+};
+
 </script>
 
 <style lang="scss" scoped>
 @use "#styles/_utils/media" as mq;
 
-.recent-card {
+.account-card {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -189,6 +195,7 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
     padding: var(--size-8) var(--size-12);
     border-top: 1px solid var(--monochrome-500);
     background: inherit;
+    flex-grow: 1;
 
     p {
       margin: 0;

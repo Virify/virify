@@ -68,7 +68,7 @@ export type RecentItem = {
     id: number;
     price?: number;
     rentalListing?: {
-      priceType?: string;
+      rentFrequency?: string;
     };
     saleListing?: {
       priceType?: string;

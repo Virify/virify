@@ -1,29 +1,29 @@
 <template>
-  <div class="recent-card-details">
-    <div class="recent-card-details__price-row">
-      <h3 class="recent-card-details__price | title-sm">{{ formattedPrice }}</h3>
-      <div class="recent-card-details__actions">
+  <div class="account-card-details">
+    <div class="account-card-details__price-row">
+      <h3 class="account-card-details__price | title-sm">{{ formattedPrice }}</h3>
+      <div class="account-card-details__actions">
         <slot name="after-pill" />
       </div>
     </div>
 
-    <div class="recent-card-details__pills" v-if="listingTypeText || priceType">
-      <AtomsPill v-if="listingTypeText" class="recent-card-details__type-pill | body-xs">{{ listingTypeText }}
+    <div class="account-card-details__pills" v-if="listingTypeText || priceType">
+      <AtomsPill v-if="listingTypeText" class="account-card-details__type-pill | body-xs">{{ listingTypeText }}
       </AtomsPill>
-      <AtomsPill v-if="priceType" class="recent-card-details__type-pill | body-xs">{{
+      <AtomsPill v-if="priceType" class="account-card-details__type-pill | body-xs">{{
         formattedPriceType.toLocaleLowerCase() }}</AtomsPill>
     </div>
 
-    <address class="recent-card-details__address | body-xs">{{ formattedAddress }}</address>
+    <address class="account-card-details__address | body-xs">{{ formattedAddress }}</address>
 
-    <div v-if="bedrooms || bathrooms" class="recent-card-details__features">
-      <div v-if="bedrooms" class="recent-card-details__feature">
+    <div v-if="bedrooms || bathrooms" class="account-card-details__features">
+      <div v-if="bedrooms" class="account-card-details__feature">
         <AtomsIcon icon="listings/beds" size="24" />
-        <span class="recent-card-details__feature-text | body-xs">{{ bedrooms }}</span>
+        <span class="account-card-details__feature-text | body-xs">{{ bedrooms }}</span>
       </div>
-      <div v-if="bathrooms" class="recent-card-details__feature">
+      <div v-if="bathrooms" class="account-card-details__feature">
         <AtomsIcon icon="listings/bathrooms" size="24" />
-        <span class="recent-card-details__feature-text | body-xs">{{ bathrooms }}</span>
+        <span class="account-card-details__feature-text | body-xs">{{ bathrooms }}</span>
       </div>
     </div>
   </div>
@@ -64,7 +64,7 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
 </script>
 
 <style lang="scss" scoped>
-.recent-card-details {
+.account-card-details {
   flex: 1;
   min-width: 0;
   display: flex;

@@ -1,6 +1,6 @@
 <template>
-  <figure v-if="imageSrc" class="recent-card-image" :class="{
-    'recent-card-image--with-note': hasNote}">
+  <figure v-if="imageSrc" class="account-card-image" :class="{
+    'account-card-image--with-note': hasNote}">
     <AtomsCloudFlareImage :src="imageSrc" alt="Property image" variant="thumbnail" :placeholder="true" />
   </figure>
 </template>
@@ -17,7 +17,7 @@ const props= defineProps<Props>();
 <style lang="scss" scoped>
 @use '#styles/_utils/media' as mq;
 
-.recent-card-image {
+.account-card-image {
   width: 120px;
   flex: 0 0 120px;
   height: 100%;
