@@ -93,3 +93,18 @@ export function deleteUserSavedLocation(id: number, userId: number): Promise<Use
     },
   });
 }
+
+/**
+ * Update only the name of a saved location (without altering coords or feature)
+ */
+export async function updateUserSavedLocationName(id: number, userId: number, name: string): Promise<UserLocation> {
+  return prisma.userLocation.update({
+    where: { 
+      id,
+      userPreferences: {
+        userId: userId,
+      }
+    },
+    data: { name }
+  })
+}

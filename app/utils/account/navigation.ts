@@ -94,7 +94,7 @@ export const searchNavigation: NavigationItem[] = [
   },
   {
     name: "Saved Locations",
-    url: "#",
+    url: "/account/saved-locations",
     icon: "cards/favourite-filled",
     countKey: "locations",
   },
