@@ -290,7 +290,7 @@ watch(receivedSort, () => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--size-16);
-  height: 60vh;
+  height: calc(100dvh - var(--header-height) - var(--conversation-search-height) - 64px); // header height + search + padding
   overflow: hidden;
 
   @include mq.not-notebook {

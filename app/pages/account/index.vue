@@ -17,6 +17,8 @@
           icon="search"
           :items="(recentlyViewedListings as RecentItem[])"
           empty-message="No recent views yet."
+          :show-favourite-icon="true"
+          :show-notes-icon="true"
         />
       </slot>
     </div>
@@ -33,7 +35,7 @@
           :show-favourite-icon="true"
         />
 
-        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites" class="content-section__see-all | button button-sm button-secondary">See all favourites</nuxt-link>
       </slot>
     </div>
 
@@ -49,7 +51,7 @@
           :show-notes-icon="true"
         />
 
-        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="#" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="account/notes" class="content-section__see-all | button button-sm button-secondary">See all notes</nuxt-link>
       </slot>
     </div>
   </div>
@@ -101,6 +103,10 @@ watchEffect(() => {
   @include mq.not-notebook {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
+
+  @include mq.mobile-only {
+    grid-template-columns: 1fr;
+  }
 }
 
 .content-section {
@@ -111,11 +117,6 @@ watchEffect(() => {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-
-  @include mq.mobile-only {
-    padding: var(--size-16);
-    gap: var(--size-16);
-  }
 
   &__see-all {
     align-self: flex-start;

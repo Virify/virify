@@ -1,51 +1,58 @@
 <template>
   <div class="recent-card">
     <div class="recent-card__header">
-      <AtomsCollapsibleHeader :is-collapsed="isCollapsed" :title="title" :icon="icon" variant="inline"
-        @toggle="$emit('toggle')" />
+      <AtomsCollapsibleHeader 
+        :is-collapsed="isCollapsed" 
+        :title="title" 
+        :icon="icon" 
+        variant="inline" 
+        @toggle="$emit('toggle')"
+      />
     </div>
 
     <Transition name="collapse-fade">
       <div v-show="!isCollapsed" class="recent-card__content">
         <div class="recent-card__scrollable">
-
           <ul v-if="hasItems" class="recent-card__list">
             <li v-for="item in items" :key="item.id" class="recent-card__item">
-
               <NuxtLink :to="getListingUrl(item)" class="recent-card__link">
                 <div class="recent-card__card">
                   <div class="recent-card__main-row">
                     <AtomsAccountListingCardImage :image-src="getFirstImage(item)" :has-note="!!item.note" />
 
                     <div class="recent-card__content-wrapper">
-                      <MoleculesAccountListingCardDetails :price="item.listing?.price"
-                        :address="item.listing?.property?.address" 
+                      <MoleculesAccountListingCardDetails
+                        :price="item.listing?.price"
+                        :price-type="item.listing?.saleListing?.priceType || item.listing?.rentalListing?.priceType"
+                        :address="item.listing?.property?.address"
                         :bedrooms="item.listing?.property?.numberBedrooms"
-                        :bathrooms="item.listing?.property?.numberBathrooms" 
-                        :note="item.note"
-                        :is-rental="isRental(item)" />
-
-                        <div v-if="showFavouriteIcon">
-                          <AtomsFavouriteButton
-                          :is-favourite="item.isFavourite"
-                          :listing-id="item.listing?.id!"
-                          class="recent-card__fav"
-                        />
-                        </div>
-                        
+                        :bathrooms="item.listing?.property?.numberBathrooms"
+                        :is-rental="isRental(item)"
+                      >
+                        <template #after-pill>
+                          <AtomsNoteButton v-if="showNotesIcon" 
+                            :listing-id="item.listing?.id!" 
+                            class="recent-card__note-btn" 
+                            @click.prevent 
+                          />
+                          <AtomsFavouriteButton v-if="showFavouriteIcon" 
+                            :is-favourite="item.isFavourite" 
+                            :listing-id="item.listing?.id!" 
+                            @click.prevent class="recent-card__fav" 
+                          />
+                        </template>
+                      </MoleculesAccountListingCardDetails>
                     </div>
                   </div>
-                  <!-- notes -->
-                  <div class="recent-card__notes" v-if="item.note && showNotesIcon" @click.prevent>
-                    <AtomsNoteButton 
-                      :listing-id="item.listing?.id!" 
-                      class="recent-card__notes-icon" 
-                    />
-                    <p v-if="item.note" class="body-sm lineheight-sm">{{ item.note }}</p>
+                  <!-- notes text (no icon now) -->
+                  <div class="recent-card__notes" v-if="item.note" @click.prevent>
+                    <p class="body-sm lineheight-sm">
+                      <em class="font-bold">Notes: </em>
+                      {{ item.note }}
+                    </p>
                   </div>
                 </div>
               </NuxtLink>
-              
             </li>
           </ul>
 
@@ -74,10 +81,8 @@ defineEmits<{
   toggle: [];
 }>();
 
-
 // Computed properties
 const hasItems = computed(() => !!props.items?.length);
-
 
 // Helper functions for data extraction
 const getListingUrl = (item: RecentItem): string => `/listing/${item.listing?.id}`;
@@ -123,19 +128,23 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
   }
 
   &__list {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--size-12);
     margin: 0;
     padding: 0;
     list-style: none;
+    align-items: stretch;
+
+    @include mq.mobile-only {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__item {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    min-width: 300px;
+    height: 100%;
   }
 
   &__link {
@@ -144,30 +153,32 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
     flex-direction: column;
     text-decoration: none;
     color: inherit;
+    height: 100%;
   }
 
   &__card {
     margin: 0;
     overflow: hidden;
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--monochrome-500);
     transition: all 0.2s ease;
     flex: 1;
     display: flex;
     flex-direction: column;
+    height: 100%;
 
     &:hover {
-      transform: translateY(-1px);
+      transform: translateY(1px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border-color: var(--border-300);
     }
   }
 
   &__fav {
-   background: inherit;
-   border: none;
-   margin-top: var(--size-4);
+    background: inherit;
+    border: none;
+    padding: 0;
   }
 
   &__notes {
@@ -177,37 +188,55 @@ const isRental = (item: RecentItem): boolean => !!item.listing?.rentalListing;
     gap: var(--size-8);
     padding: var(--size-8) var(--size-12);
     border-top: 1px solid var(--monochrome-500);
-    background: var(--background-200);
+    background: inherit;
 
-    &-icon {
-      background: inherit;
-      border: none;
+    p {
+      margin: 0;
     }
+  }
+
+  &__note-btn {
+    background: inherit;
+    border: none;
+    padding: 0;
   }
 
   &__main-row {
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    align-items: flex-start; /* image height fixed; content can be taller */
     gap: var(--size-12);
+    width: 100%;
+    box-sizing: border-box;
     flex: 1;
-    min-height: 100px;
 
     @include mq.mobile-only {
+      flex-direction: column;
       gap: var(--size-8);
-      min-height: 80px;
+      width: 100%;
     }
   }
 
   &__content-wrapper {
     flex: 1;
     display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    justify-content: space-between;
+    flex-direction: column;
     padding: var(--size-8);
     color: var(--foreground-100);
     min-width: 0;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    height: 100%;
+    flex-grow: 1;
+
+    @include mq.mobile-only {
+      gap: var(--size-4);
+      align-items: stretch;
+      padding: var(--size-8) var(--size-8) var(--size-12);
+    }
   }
 
   &__empty {

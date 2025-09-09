@@ -33,6 +33,8 @@ defineProps<Props>()
   padding: 0;
   transition: opacity 0.4s ease-out, transform 0.15s ease;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
   overflow: hidden;
   display: flex;
   flex-direction: column;

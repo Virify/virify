@@ -288,7 +288,6 @@ onMounted(() => {
   align-items: center;
   background-color: transparent;
   border: none;
-  color: var(--monochrome-100);
   cursor: pointer;
   display: flex;
   font-size: var(--font-xl);

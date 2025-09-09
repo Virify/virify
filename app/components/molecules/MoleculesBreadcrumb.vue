@@ -49,7 +49,8 @@ defineProps<{
 
     &--current {
       background: var(--secondary-400);
-      color: var(--background-200);
+      color: var(--foreground-100);
+      border: 1px solid var(--foreground-200);
     }
 
     &:hover {

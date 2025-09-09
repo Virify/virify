@@ -1,41 +1,41 @@
 <template>
-  <!-- Desktop: Full favourites page -->
-  <div class="favourites-page">
+  <!-- Desktop: Full notes page -->
+  <div class="notes-page">
     <!-- Breadcrumb -->
     <MoleculesBreadcrumb :items="breadcrumbItems" />
     
     <!-- Title -->
-    <h2 class="favourites-page__title | title-md">My Favourites</h2>
+    <h2 class="notes-page__title | title-md">My Notes</h2>
 
-    <!-- favourites Grid -->
-    <div class="favourites-page__grid">
-      <!-- Conversations List Section -->
-      <div class="favourites-card favourites-card--fixed-height">
+    <!-- Notes Grid -->
+    <div class="notes-page__grid">
+      <!-- Sale Notes Section -->
+      <div class="notes-card notes-card--fixed-height">
         <OrganismsAccountListingCard
           :is-collapsed="isSaleCollapsed"
           @toggle="isSaleCollapsed = !isSaleCollapsed"
           title="For Sale"
-          icon="cards/favourite"
-          :items="(saleFavourites as RecentItem[])"
-          empty-message="No sale favourites yet."
-          :show-favourite-icon="true"
+          icon="cards/notes"
+          :items="(saleNotes as RecentItem[])"
+          empty-message="No sale notes yet."
+          :show-notes-icon="true"
         />
       </div>
-      <nuxt-link v-if="saleFavourites.length" to="favourites/sale" class="favourites-card__see-all | button button-sm button-secondary">See all sale favourites</nuxt-link>
+      <nuxt-link v-if="saleNotes.length" to="notes/sale" class="notes-card__see-all | button button-sm button-secondary">See sale details...</nuxt-link>
 
-      <!-- Conversation Details Section -->
-      <div class="favourites-card favourites-card--fixed-height">
+      <!-- Rental Notes Section -->
+      <div class="notes-card notes-card--fixed-height">
         <OrganismsAccountListingCard
           :is-collapsed="isRentCollapsed"
           @toggle="isRentCollapsed = !isRentCollapsed"
           title="Rental"
-          icon="cards/favourite"
-          :items="(rentalFavourites as RecentItem[])"
-          empty-message="No rental favourites yet."
-          :show-favourite-icon="true"
+          icon="cards/notes"
+          :items="(rentalNotes as RecentItem[])"
+          empty-message="No rental notes yet."
+          :show-notes-icon="true"
         />
       </div>
-      <nuxt-link v-if="rentalFavourites.length" to="favourites/rental" class="favourites-card__see-all | button button-sm button-secondary">See all rental favourites</nuxt-link>
+      <nuxt-link v-if="rentalNotes.length" to="notes/rental" class="notes-card__see-all | button button-sm button-secondary">See rental details...</nuxt-link>
     </div>
   </div>
 </template>
@@ -43,11 +43,11 @@
 <script setup lang="ts">
 // SEO metadata
 const seoData = {
-  title: "My Favourites - Virify",
-  description: "View and manage your favourite property listings. Keep track of properties you're interested in buying or renting.",
+  title: "My Notes - Virify",
+  description: "View and manage your property notes. Keep track of important information about properties you're researching.",
   breadcrumbs: [
     { label: "Account", to: "/account" },
-    { label: "Favourites" }
+    { label: "Notes" }
   ]
 };
 
@@ -65,7 +65,7 @@ useSeoMeta({
   twitterDescription: seoData.description
 });
 
-const { saleFavourites, rentalFavourites } = useFavourites();
+const { saleNotes, rentalNotes } = useNotes();
 
 // Component state
 const isSaleCollapsed = ref(false);
@@ -78,7 +78,7 @@ const breadcrumbItems = seoData.breadcrumbs;
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
-.favourites-page {
+.notes-page {
   display: flex;
   flex-direction: column;
   gap: var(--size-16);
@@ -110,7 +110,7 @@ const breadcrumbItems = seoData.breadcrumbs;
   }
 }
 
-.favourites-card {
+.notes-card {
   background: var(--background-200);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -119,7 +119,7 @@ const breadcrumbItems = seoData.breadcrumbs;
   overflow: hidden;
 
   &--fixed-height {
-    max-height: 40dvh;
+    max-height: 50dvh;
   }
 
   &__see-all {

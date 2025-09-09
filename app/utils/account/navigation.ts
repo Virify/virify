@@ -74,7 +74,7 @@ export const listingsNavigation: NavigationItem[] = [
   },
   {
     name: "Notes",
-    url: "#",
+    url: "/account/notes",
     icon: "cards/notes",
     countKey: "notes",
   },

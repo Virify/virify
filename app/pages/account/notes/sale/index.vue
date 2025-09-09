@@ -1,24 +1,24 @@
 <template>
-  <!-- Desktop: Full favourites page -->
-  <div class="favourites-page">
+  <!-- Desktop: Full notes page -->
+  <div class="notes-page">
     <!-- Breadcrumb -->
     <MoleculesBreadcrumb :items="breadcrumbItems" />
     
     <!-- Title  -->
-    <h2 class="favourites-page__title | title-md">Sale Favourites</h2>
+    <h2 class="notes-page__title | title-md">Sale Notes</h2>
 
-    <!-- favourites Grid -->
-    <div class="favourites-page__grid">
-      <!-- Conversations List Section -->
-      <div class="favourites-card">
+    <!-- Notes Grid -->
+    <div class="notes-page__grid">
+      <!-- Sale Notes Section -->
+      <div class="notes-card">
         <OrganismsAccountListingCard
           :is-collapsed="isSaleCollapsed"
           @toggle="isSaleCollapsed = !isSaleCollapsed"
-          title="Sale Favourites"
-          icon="cards/favourite"
-          :items="(saleFavourites as RecentItem[])"
-          empty-message="No sale favourites yet."
-          :show-favourite-icon="true"
+          title="Sale Notes"
+          icon="cards/notes"
+          :items="(saleNotes as RecentItem[])"
+          empty-message="No sale notes yet."
+          :show-notes-icon="true"
         />
       </div>
     </div>
@@ -28,11 +28,11 @@
 <script setup lang="ts">
 // SEO metadata
 const seoData = {
-  title: "Sale Favourites - Virify",
-  description: "View your favourite properties for sale. Browse and manage the properties you're interested in purchasing.",
+  title: "Sale Notes - Virify",
+  description: "View your notes on properties for sale. Browse and manage the notes you've made on properties you're interested in purchasing.",
   breadcrumbs: [
     { label: "Account", to: "/account" },
-    { label: "Favourites", to: "/account/favourites" },
+    { label: "Notes", to: "/account/notes" },
     { label: "Sale" }
   ]
 };
@@ -51,7 +51,7 @@ useSeoMeta({
   twitterDescription: seoData.description
 });
 
-const { saleFavourites } = useFavourites();
+const { saleNotes } = useNotes();
 
 // Component state
 const isSaleCollapsed = ref(false);

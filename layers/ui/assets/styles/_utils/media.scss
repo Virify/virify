@@ -3,8 +3,9 @@
 /**
  *  Common breakpoints
  */
+
 @mixin mobile-only {
-    @media (max-width: #{ breakpoints.$tablet - 1px }) {
+    @media (max-width: #{ breakpoints.$small-tablet - 1px }) {
         @content;
     }
 }

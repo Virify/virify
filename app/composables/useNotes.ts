@@ -40,6 +40,14 @@ export const useNotes = createSharedComposable(() => {
       .slice(0, 6);
   });
 
+  const saleNotes = computed(() => {
+    return userNotes.value.filter((item) => item.listing?.saleListing);
+  });
+  
+  const rentalNotes = computed(() => {
+    return userNotes.value.filter((item) => item.listing?.rentalListing);
+  });
+
   /**
    * Check if a property has a note
    *
@@ -185,5 +193,7 @@ export const useNotes = createSharedComposable(() => {
     showNoteDialog,
     userNotes,
     recentUserNotes,
+    saleNotes,
+    rentalNotes,
   };
 });

@@ -1,23 +1,25 @@
 <template>
-  <li class="m-chat-summary-item" :class="{ 'm-chat-summary-item--active': isActive }" @click="$emit('select-conversation', conversation)">
+  <li class="m-chat-summary-item" :class="{ 'm-chat-summary-item--active': isActive }"
+    @click="$emit('select-conversation', conversation)">
     <div class="m-chat-summary-item__content">
-      <div class="m-chat-summary-item__header">
-        <div class="m-chat-summary-item__title">
+      <!-- Row 1: Image + Name -->
+      <div class="m-chat-summary-item__row m-chat-summary-item__row--top">
         <AtomsCloudFlareImage :src="firstImage" alt="" variant="thumbnail" class="m-chat-summary-item__image" />
-          <div class="m-chat-summary-item__name-section">
-            <span class="m-chat-summary-item__username | body-sm font-semibold" :class="{
-              'unread': unreadMessages > 0
-            }">{{ formattedPartnerName }}</span>
-            <p class="m-chat-summary-item__address | body-xs">{{ conversationAddress }}</p>
-          </div>
+        <div class="m-chat-summary-item__info">
+          <span class="m-chat-summary-item__username | body-sm font-semibold"
+            :class="{ 'unread': unreadMessages > 0 }">{{ formattedPartnerName }}</span>
+          <span class="m-chat-summary-item__time | body-xs">{{ lastMessageTime }}</span>
         </div>
-        <span class="m-chat-summary-item__time | body-xs">{{ lastMessageTime }}</span>
-      </div>
-      <div class="m-chat-summary-item-message">
-        <p class="m-chat-summary-item-message__content | body-sm">{{ lastMessageContent }}</p>
         <button v-if="unreadMessages > 0"
-          class="m-chat-summary-item-message__unread | button button-secondary button-xs">{{ unreadMessages }}</button>
+          class="m-chat-summary-item__unread m-chat-summary-item__unread--top | button button-secondary button-xs">{{
+            unreadMessages }}</button>
       </div>
+
+      <!-- Row 2: Address -->
+      <p class="m-chat-summary-item__address | body-xs">{{ conversationAddress }}</p>
+
+      <!-- Row 3: Message Snippet -->
+      <p class="m-chat-summary-item__message | body-sm">{{ lastMessageContent }}</p>
     </div>
   </li>
 </template>
@@ -48,11 +50,11 @@ const formattedPartnerName = computed(() => {
 const lastMessageContent = computed(() => {
   const baseContent = getLastMessageContent(props.conversation);
   const lastMessage = props.conversation.messages[props.conversation.messages.length - 1];
-  
+
   if (lastMessage && lastMessage.senderId === props.currentUserId) {
     return `You: ${baseContent}`;
   }
-  
+
   return baseContent;
 });
 
@@ -81,15 +83,6 @@ const firstImage = computed(() => {
   padding: var(--size-8);
   color: var(--monochrome-100);
 
-  &__image {
-    width: 40px;
-    height: 40px;
-  }
-
-  .unread {
-    color: var(--secondary-400);
-  }
-
   &:hover {
     background: var(--background-100);
     border-radius: var(--border-radius-xl);
@@ -100,18 +93,18 @@ const firstImage = computed(() => {
     border-radius: var(--border-radius-xl);
     color: var(--monochrome-100);
 
-    .m-chat-summary-item__address, .m-chat-summary-item__username, .m-chat-summary-item__time, .m-chat-summary-item-message__content {
+    .m-chat-summary-item__address,
+    .m-chat-summary-item__username,
+    .m-chat-summary-item__time,
+    .m-chat-summary-item__message {
       color: var(--monochrome-100);
-    }
-
-    &:hover {
-      background: var(--secondary-500);
     }
   }
 
   &__content {
     display: flex;
     flex-direction: column;
+    gap: var(--size-4);
     padding: var(--size-16);
 
     @include mq.mobile-only {
@@ -123,34 +116,23 @@ const firstImage = computed(() => {
     }
   }
 
-  &__header {
+  &__row {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--size-2);
-    margin-bottom: var(--size-4);
-  }
-
-  &__title {
-    display: flex;
-    flex-direction: row;
-    gap: var(--size-8);
-    flex: 1;
-    min-width: 0;
-    justify-content: center;
     align-items: center;
-
-    & img {
-      border-radius: var(--border-radius-md);
-    }
+    gap: var(--size-8);
+    min-width: 0;
   }
 
-  &__name-section {
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-2);
-    flex: 1;
-    min-width: 0;
+  &__row--top {
+    align-items: center;
+    gap: var(--size-8);
+  }
+
+  &__image {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius-md);
+    flex-shrink: 0;
   }
 
   &__username {
@@ -159,6 +141,14 @@ const firstImage = computed(() => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-2);
+    min-width: 0;
+    flex: 1;
   }
 
   &__address {
@@ -174,31 +164,28 @@ const firstImage = computed(() => {
     color: var(--foreground-200);
     white-space: nowrap;
     flex-shrink: 0;
-    margin-top: 2px;
   }
 
-  &-message {
-    color: var(--foreground-100);
+  &__unread.button {
+    border-radius: 50%;
+    line-height: var(--font-xs);
+    color: var(--background-100);
+  }
+
+  &__unread--top {
+    flex-shrink: 0;
+  }
+
+  &__message {
     margin: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--size-8);
+    color: var(--foreground-100);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    &__content {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    &__unread {
-      color: var(--background-100);
-
-      &.button {
-        border-radius: 50%;
-        line-height: var(--font-xs);
-      }
-    }
+  .unread {
+    color: var(--secondary-400);
   }
 }
 </style>

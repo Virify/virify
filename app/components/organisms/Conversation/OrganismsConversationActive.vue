@@ -157,6 +157,7 @@ async function sendReply(message: string) {
   flex-direction: column;
   touch-action: manipulation;
   border-radius: var(--border-radius-xl);
+  height: 100%;
 
   @media (max-width: 768px) {
     position: absolute;

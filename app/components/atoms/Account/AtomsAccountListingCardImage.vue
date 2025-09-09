@@ -11,7 +11,7 @@ interface Props {
   hasNote?: boolean;
 }
 
-defineProps<Props>();
+const props= defineProps<Props>();
 </script>
 
 <style lang="scss" scoped>
@@ -20,7 +20,8 @@ defineProps<Props>();
 .recent-card-image {
   width: 120px;
   flex: 0 0 120px;
-  align-self: stretch;
+  height: 100%;
+  box-sizing: border-box;
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   position: relative;
@@ -32,14 +33,20 @@ defineProps<Props>();
   }
 
   @include mq.mobile-only {
-    width: 80px;
-    flex: 0 0 80px;
+    width: 100%;
+    flex: 0 0 auto;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
   }
 
-  :deep(img) {
+  img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+    aspect-ratio: 4 / 3;
   }
 }
 </style>

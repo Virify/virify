@@ -1,24 +1,24 @@
 <template>
-  <!-- Desktop: Full favourites page -->
-  <div class="favourites-page">
+  <!-- Desktop: Full notes page -->
+  <div class="notes-page">
     <!-- Breadcrumb -->
     <MoleculesBreadcrumb :items="breadcrumbItems" />
     
     <!-- Title -->
-    <h2 class="favourites-page__title | title-md">Rental Favourites</h2>
+    <h2 class="notes-page__title | title-md">Rental Notes</h2>
 
-    <!-- favourites Grid -->
-    <div class="favourites-page__grid">
-      <!-- Conversations List Section -->
-      <div class="favourites-card">
+    <!-- Notes Grid -->
+    <div class="notes-page__grid">
+      <!-- Rental Notes Section -->
+      <div class="notes-card">
         <OrganismsAccountListingCard
           :is-collapsed="isRentCollapsed"
           @toggle="isRentCollapsed = !isRentCollapsed"
-          title="Rental Favourites"
-          icon="cards/favourite"
-          :items="(rentalFavourites as RecentItem[])"
-          empty-message="No rental favourites yet."
-          :show-favourite-icon="true"
+          title="Rental Notes"
+          icon="cards/notes"
+          :items="(rentalNotes as RecentItem[])"
+          empty-message="No rental notes yet."
+          :show-notes-icon="true"
         />
       </div>
     </div>
@@ -28,11 +28,11 @@
 <script setup lang="ts">
 // SEO metadata
 const seoData = {
-  title: "Rental Favourites - Virify",
-  description: "View your favourite rental properties. Browse and manage the rental properties you're interested in.",
+  title: "Rental Notes - Virify",
+  description: "View your notes on rental properties. Browse and manage the notes you've made on rental properties you're interested in.",
   breadcrumbs: [
     { label: "Account", to: "/account" },
-    { label: "Favourites", to: "/account/favourites" },
+    { label: "Notes", to: "/account/notes" },
     { label: "Rental" }
   ]
 };
@@ -51,7 +51,7 @@ useSeoMeta({
   twitterDescription: seoData.description
 });
 
-const { rentalFavourites } = useFavourites();
+const { rentalNotes } = useNotes();
 
 // Component state
 const isRentCollapsed = ref(false);

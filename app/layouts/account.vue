@@ -101,7 +101,7 @@ useHead({
 .account-page {
   background: var(--background-100);
   transition: min-height 0.25s ease;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .account-layout {
@@ -156,7 +156,7 @@ useHead({
   position: sticky;
   bottom: var(--size-16);
   height: fit-content;
-  max-height: calc(100svh - var(--header-height) - var(--size-48));
+  max-height: calc(100dvh - var(--header-height) - var(--size-48));
   z-index: 10;
   align-self: start;
   overflow: hidden;
@@ -166,9 +166,9 @@ useHead({
 .right-sidebar {
   grid-area: right-sidebar;
   position: sticky;
-  bottom: var(--size-16);
+  top: calc(var(--header-height) + var(--size-16));
   height: fit-content;
-  max-height: calc(100svh - var(--header-height) - var(--size-48));
+  max-height: calc(100dvh - var(--header-height) - var(--size-32));
   z-index: 10;
   align-self: start;
 
@@ -201,13 +201,13 @@ useHead({
     &--conversations {
       padding: 0;
       overflow-y: auto;
-      min-height: 70vh;
-      height: var(--navigation-sidebar-height, fit-content);
+      max-height: calc(100dvh - var(--header-height) - var(--size-32));
+      height: fit-content;
       box-sizing: border-box;
       transition: height ease;
 
       &.sidebar-content--has-overlay {
-        height: var(--navigation-sidebar-height, fit-content);
+        height: calc(100dvh - var(--header-height) - var(--size-32));
 
         @include mq.tablet-only {
           height: 60vh;
@@ -238,7 +238,6 @@ useHead({
   box-sizing: border-box;
   min-width: 0;
   transition: width 0.25s ease, max-width 0.25s ease;
-  // Allow children to manage their own scroll/clipping; required for position: sticky
 }
 
 .page-enter-active,
