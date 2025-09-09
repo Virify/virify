@@ -154,9 +154,9 @@ useHead({
 .left-sidebar {
   grid-area: left-sidebar;
   position: sticky;
-  bottom: var(--size-16);
+  top: calc(var(--header-height) + var(--size-16));
   height: fit-content;
-  max-height: calc(100dvh - var(--header-height) - var(--size-48));
+  max-height: calc(100dvh - var(--header-height) - var(--size-32));
   z-index: 10;
   align-self: start;
   overflow: hidden;
