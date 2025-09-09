@@ -166,11 +166,11 @@ function openEditDialog(entry?: any) {
   }
 
   &__actions {
-  grid-area: actions;
+    grid-area: actions;
     display: flex;
     align-items: center;
     gap: var(--size-8);
-  align-self: center;
+    align-self: center;
   }
 }
 </style>
