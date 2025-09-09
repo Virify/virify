@@ -160,7 +160,7 @@ function openEditDialog(entry?: any) {
   }
 
   &__address {
-  grid-area: address;
+    grid-area: address;
     margin: 0;
     line-height: var(--lineheight-sm);
   }
