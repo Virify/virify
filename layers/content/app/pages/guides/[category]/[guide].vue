@@ -1,7 +1,9 @@
 <template>
   <div class="guide-page | container">
     <article v-if="guide">
-      <MoleculesGuideBreadcrumb :items="breadcrumbItems" />
+      <div class="guide-page__breadcrumb">
+        <MoleculesBreadcrumb :items="breadcrumbItems" />
+      </div>
       
       <AtomsGuideHero 
         :title="guide.title"
@@ -70,6 +72,10 @@ if (guide.value) {
 
 .guide-page {
   margin: 0 auto;
+
+  &__breadcrumb {
+    padding: var(--size-16) 0;
+  }
 
   &__meta {
     display: flex;

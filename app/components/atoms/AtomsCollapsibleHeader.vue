@@ -70,6 +70,11 @@ defineEmits<{
     min-width: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    align-items: flex-start;
+
+    & .title-icon {
+      margin-top: 4px;
+    }
   }
 
   // Card variant (styled with background, border, shadow)

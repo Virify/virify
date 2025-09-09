@@ -1,6 +1,8 @@
 <template>
   <div class="category-page | container">
-    <MoleculesGuideBreadcrumb :items="breadcrumbItems" />
+    <div class="category-page__breadcrumb">
+      <MoleculesBreadcrumb :items="breadcrumbItems" />
+    </div>
 
     <AtomsGuideHero :title="title" :description="description" :image="image" />
 
@@ -66,6 +68,10 @@ useSeoMeta({
 
 <style scoped lang="scss">
 .category-page {
+  &__breadcrumb {
+    padding: var(--size-16) 0;
+  }
+  
   &__advert {
     padding: var(--size-32) 0;
     display: flex;

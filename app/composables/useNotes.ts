@@ -10,23 +10,27 @@ export const useNotes = createSharedComposable(() => {
   const { showDialog } = useDialog();
   const { showToast } = useToast();
 
+  // Local filtering state (mirrors favourites pattern)
+  const searchTerm = ref("");
+  const categoryFilter = ref<"all" | "sale" | "rental">("all");
+
   /**
    * State Management
    * Store notes as an array with listing relationship
    */
   const { data: userNotes, refresh: refreshUserNotes } = useAsyncData<NoteData[]>(
-    "userNotes", 
+    "userNotes",
     () => {
       // Only make API call if user is logged in
       if (!loggedIn.value) {
         return Promise.resolve([]);
       }
       return useRequestFetch()<NoteData[]>("/api/user/notes/");
-    }, 
+    },
     {
       default: () => [],
       watch: [loggedIn],
-      server: false // Prevent server-side execution
+      server: false, // Prevent server-side execution
     }
   );
 
@@ -38,6 +42,26 @@ export const useNotes = createSharedComposable(() => {
         return createdAt >= sevenDaysAgo;
       })
       .slice(0, 6);
+  });
+
+  const saleNotes = computed(() => {
+    return userNotes.value.filter((item) => item.listing?.saleListing);
+  });
+
+  const rentalNotes = computed(() => {
+    return userNotes.value.filter((item) => item.listing?.rentalListing);
+  });
+
+  /**
+   * Filtered notes based on search term and category
+   * Uses shared search utility to match against listing fields + note content
+   */
+  const filteredUserNotes = computed(() => {
+    const category = categoryFilter.value;
+    let list = userNotes.value || [];
+    if (category === "sale") list = list.filter((n) => n?.listing?.saleListing);
+    else if (category === "rental") list = list.filter((n) => n?.listing?.rentalListing);
+    return filterListingItems(list, searchTerm.value, true); // include notes content
   });
 
   /**
@@ -96,11 +120,11 @@ export const useNotes = createSharedComposable(() => {
       }
 
       // Show success toast
-      showToast(isUpdating ? 'Note updated' : 'Note added', { type: 'success' });
+      showToast(isUpdating ? "Note updated" : "Note added", { type: "success" });
     } catch (error) {
       console.error("Error updating note:", error);
       // Show error toast
-      showToast(isUpdating ? 'Failed to update note' : 'Failed to add note', { type: 'error' });
+      showToast(isUpdating ? "Failed to update note" : "Failed to add note", { type: "error" });
       throw error;
     }
   };
@@ -126,13 +150,13 @@ export const useNotes = createSharedComposable(() => {
 
       // Remove from state after successful API call
       userNotes.value = userNotes.value.filter((note) => note.listingId !== listingId);
-      
+
       // Show success toast
-      showToast('Note deleted', { type: 'success' });
+      showToast("Note deleted", { type: "success" });
     } catch (error) {
       console.error("Error deleting note:", error);
       // Show error toast
-      showToast('Failed to delete note', { type: 'error' });
+      showToast("Failed to delete note", { type: "error" });
       throw error;
     }
   };
@@ -184,6 +208,12 @@ export const useNotes = createSharedComposable(() => {
     hasNote,
     showNoteDialog,
     userNotes,
+    filteredUserNotes,
     recentUserNotes,
+    saleNotes,
+    rentalNotes,
+    // search filter state
+    searchTerm,
+    categoryFilter,
   };
 });

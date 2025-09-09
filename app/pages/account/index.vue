@@ -10,20 +10,22 @@
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isViewedCollapsed"
           @toggle="isViewedCollapsed = !isViewedCollapsed"
           title="Recently Viewed Listings"
           icon="search"
           :items="(recentlyViewedListings as RecentItem[])"
           empty-message="No recent views yet."
+          :show-favourite-icon="true"
+          :show-notes-icon="true"
         />
       </slot>
     </div>
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isFavouritesCollapsed"
           @toggle="isFavouritesCollapsed = !isFavouritesCollapsed"
           title="Recently Favourited Listings"
@@ -33,13 +35,13 @@
           :show-favourite-icon="true"
         />
 
-        <nuxt-link v-if="recentFavourites?.length > 5" to="#" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites" class="content-section__see-all | button button-sm button-secondary">See all favourites</nuxt-link>
       </slot>
     </div>
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountRecentCard
+        <OrganismsAccountListingCard
           :is-collapsed="isNotesCollapsed"
           @toggle="isNotesCollapsed = !isNotesCollapsed"
           title="Recently Added Notes"
@@ -49,12 +51,8 @@
           :show-notes-icon="true"
         />
 
-        <nuxt-link v-if="recentUserNotes?.length > 5" to="#" class="content-section__see-all | button button-xs button-tertiary">See all</nuxt-link>
+        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="account/notes" class="content-section__see-all | button button-sm button-secondary">See all notes</nuxt-link>
       </slot>
-    </div>
-
-    <div class="actions-section">
-      <slot name="actions"></slot>
     </div>
   </div>
 </template>
@@ -105,36 +103,25 @@ watchEffect(() => {
   @include mq.not-notebook {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
+
+  @include mq.mobile-only {
+    grid-template-columns: 1fr;
+  }
 }
 
 .content-section {
   background: var(--background-200);
-  padding: var(--size-16);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: var(--size-24);
   min-width: 0;
-
-  @include mq.mobile-only {
-    padding: var(--size-16);
-    gap: var(--size-16);
-  }
+  overflow: hidden;
 
   &__see-all {
     align-self: flex-start;
-  }
-}
-
-.actions-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--size-24);
-
-  @include mq.mobile-only {
-    grid-template-columns: 1fr;
-    gap: var(--size-16);
+    width: fit-content;
+    margin: 0 var(--size-16) var(--size-16) var(--size-16);
   }
 }
 </style>
