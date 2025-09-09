@@ -77,6 +77,12 @@ const isSaleCollapsed = ref(false);
   max-width: 100%;
   box-sizing: border-box;
   min-width: 0;
+  max-height: calc(100dvh - var(--header-height) - var(--size-32));
+
+  @include mq.mobile-only {
+    height: 100%;
+    max-height: unset;
+  }
 
   &__title {
     margin: 0 0 var(--size-16) 0;
