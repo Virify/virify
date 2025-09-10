@@ -68,16 +68,44 @@ function getCardVariant(result: ListingCardData) {
 }
 
 /**
+ * Flatten the premium listing sections into a simple array 
+ * while maintaining the distribution logic from the utility
+ */
+function distributeListings(listings: ListingCardData[]): ListingCardData[] {
+  // Use the existing utility function
+  const sections = distributePremiumListings(listings as ListingWithFullProperty[])
+  const result: ListingCardData[] = []
+  
+  // Flatten the sections into a simple array
+  for (const section of sections) {
+    if (section.item) {
+      result.push(section.item as ListingCardData)
+    }
+    if (section.items) {
+      // Add all items from the section
+      for (const item of section.items) {
+        result.push(item as ListingCardData)
+      }
+    }
+  }
+  
+  return result
+}
+
+/**
  *  Determine component type, variant for each card
  */
 const resultsComponents = computed(() => {
   const { results } = asObject(props)
+  const distributedResults = distributeListings(asArray(results))
 
-  return asArray(results).map((result) => {
-    const { variant, fullWidth, component } = getCardVariant(result)
+  return distributedResults
+    .filter((result): result is ListingCardData => !!result) // Type guard to remove undefined
+    .map((result) => {
+      const { variant, fullWidth, component } = getCardVariant(result)
 
-    return { variant, fullWidth, component, result }
-  })
+      return { variant, fullWidth, component, result }
+    })
 })
 </script>
 
