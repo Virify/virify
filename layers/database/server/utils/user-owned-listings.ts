@@ -112,14 +112,10 @@ function applyTierSorting(listings: any[], sort: string) {
   }
 
   const targetTier = sort.toUpperCase()
-  const preferred = listings.filter((listing: any) => 
+  // Filter to show ONLY the selected tier
+  return listings.filter((listing: any) => 
     (listing.listingTier || '').toUpperCase() === targetTier
   )
-  const others = listings.filter((listing: any) => 
-    (listing.listingTier || '').toUpperCase() !== targetTier
-  )
-  
-  return [...preferred, ...others]
 }
 
 export async function toggleListingPublished(userId: number, listingId: number, published: boolean) {
