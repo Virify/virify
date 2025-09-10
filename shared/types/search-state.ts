@@ -4,6 +4,20 @@
  */
 
 /**
+ * Map viewport state for preserving user's map interaction
+ */
+export interface MapViewportState {
+  /** Current map zoom level */
+  zoom: number
+
+  /** Current map center coordinates [longitude, latitude] */
+  center: [number, number]
+
+  /** Current map bounds [west, south, east, north] */
+  bounds?: [number, number, number, number]
+}
+
+/**
  * Complete search state structure stored in KV storage
  * This represents all the search context for a user session
  */
@@ -49,6 +63,9 @@ export interface SearchState {
 
   /** User's preferred view mode for results display */
   viewMode: 'grid' | 'map' | 'split'
+
+  /** Map viewport state for preserving zoom, center, and bounds */
+  mapViewport?: MapViewportState
 }
 
 /**
@@ -68,7 +85,8 @@ export const defaultSearchState: SearchState = {
   totalResults: 0,
   whereClause: null,
   locationContext: null,
-  viewMode: 'grid'
+  viewMode: 'grid',
+  mapViewport: undefined
 }
 
 /**
