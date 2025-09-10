@@ -14,7 +14,7 @@
       </li>
     </ul>
 
-    <AtomsButton :disabled="!isValid" @click.prevent="searchReset" type="reset"
+    <AtomsButton v-if="!hideReset" :disabled="!isValid" @click.prevent="searchReset" type="reset"
       class="| button button-xs button-delete button-full button-bordered">
       Reset filters
     </AtomsButton>
@@ -26,6 +26,7 @@
 interface Props {
   initialQuery?: string;
   disabled?: boolean
+  hideReset?: boolean
 }
 
 const props = defineProps<Props>();

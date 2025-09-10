@@ -4,7 +4,7 @@
       <h1 class="| title-lg">Find your perfect property</h1>
 
       <MoleculesAiSearchFormLocation />
-      <MoleculesAiSearchFormFilters :initial-query :disabled="isDisabled" @submit-search="searchSubmit"
+      <MoleculesAiSearchFormFilters :initial-query :disabled="isDisabled" hideReset @submit-search="searchSubmit"
         @reset-search="searchReset" />
     </div>
   </div>
