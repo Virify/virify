@@ -130,6 +130,7 @@ onMounted(() => {
 
 <style lang="scss">
 .p-dock {
+  min-height: calc(100vh - var(--header-height));
 
   &--has-grid {
     padding: var(--size-16) 0;
