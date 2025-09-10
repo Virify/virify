@@ -132,6 +132,26 @@ export const useMyListings = createSharedComposable(() => {
     return fetchPage(true)
   }
 
+  async function getRecentListings(limit = 5) {
+    if (!loggedIn.value) return []
+    
+    try {
+      const data = await requestFetch<OwnedListingWithAnalytics[]>("/api/user/my-listings/", {
+        query: {
+          status: "all",
+          page: 1,
+          take: limit,
+          sort: "new",
+        },
+      })
+      
+      return Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error("Failed to fetch recent listings:", error)
+      return []
+    }
+  }
+
   const hasMore = computed(() => !ended.value && !loading.value)
 
   return {
@@ -145,5 +165,6 @@ export const useMyListings = createSharedComposable(() => {
     sortBy,
     setPublished,
     togglePublished,
+    getRecentListings,
   };
 });

@@ -2,7 +2,7 @@
   <div class="stats-card" :class="{
     'animate-in': animated,
   }">
-    <NuxtLink v-if="to" :to="to" class="stats-card__link" aria-label="Navigate to {{ title }}">
+    <component :is="to ? 'NuxtLink' : 'div'" :to="to" :class="to ? 'stats-card__link' : 'stats-card__content-wrapper'" :aria-label="to ? `Navigate to ${title}` : undefined">
       <div class="stats-card__top" :class="{
         'tier-basic': tier === 'basic',
         'tier-featured': tier === 'featured',
@@ -14,12 +14,12 @@
           </div>
           <div class="stats-card__text">
             <div class="stats-card__value | r-title-xl-md">{{ value }}</div>
-            <div class="stats-card__subtitle | body-sm font-bold">{{ subtitle }}</div>
+            <div v-if="subtitle" class="stats-card__subtitle | body-sm font-bold">{{ subtitle }}</div>
           </div>
         </div>
       </div>
       <div class="stats-card__title | r-body-md-sm font-bold">{{ title }}</div>
-    </NuxtLink>
+    </component>
   </div>
 </template>
 
@@ -71,13 +71,17 @@ defineProps<Props>()
     }
   }
 
-  &__link {
+  &__link,
+  &__content-wrapper {
     color: inherit;
-    text-decoration: none;
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
+  }
+
+  &__link {
+    text-decoration: none;
   }
 
   &__top {

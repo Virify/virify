@@ -16,6 +16,7 @@ export const useAnalytics = createSharedComposable(() => {
   
   // Reactive state for analytics data
   const recentlyViewedListings = ref<RecentlyViewed[]>([]);
+  const recentOwnedListings = ref<OwnedListingWithAnalytics[]>([]);
   const analytics = ref<UserAnalyticsSummary | null>(null);
   
   const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/search/location"), {
@@ -23,18 +24,21 @@ export const useAnalytics = createSharedComposable(() => {
   });
   const { recentFavourites } = useFavourites();
   const { recentUserNotes } = useNotes();
+  const { getRecentListings } = useMyListings();
   
   // Fetch analytics data when logged in
   const fetchAnalytics = async () => {
     if (!loggedIn.value) return;
     
     try {
-      const [viewedListings, userAnalytics] = await Promise.all([
+      const [viewedListings, userAnalytics, ownedListings] = await Promise.all([
         useRequestFetch()<RecentlyViewed[]>("/api/analytics/listing/track-view").catch(() => []),
-        useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all").catch(() => null)
+        useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all").catch(() => null),
+        getRecentListings(3).catch(() => [])
       ]);
       
       recentlyViewedListings.value = viewedListings;
+      recentOwnedListings.value = ownedListings;
       analytics.value = userAnalytics;
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
@@ -48,6 +52,7 @@ export const useAnalytics = createSharedComposable(() => {
         fetchAnalytics();
       } else {
         recentlyViewedListings.value = [];
+        recentOwnedListings.value = [];
         analytics.value = null;
       }
     });
@@ -151,6 +156,7 @@ export const useAnalytics = createSharedComposable(() => {
     recentFavourites,
     recentUserNotes,
     recentlyViewedListings,
+    recentOwnedListings,
     trackAiSearch,
     trendingLocations,
     fetchAnalytics,

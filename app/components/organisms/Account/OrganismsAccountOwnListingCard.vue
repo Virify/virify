@@ -130,6 +130,7 @@ const onTogglePublish = () => {
   border-radius: var(--border-radius-xl);
   overflow: hidden;
   padding: var(--size-12);
+  box-sizing: border-box;
 
   &__main {
     display: flex;
