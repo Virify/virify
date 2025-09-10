@@ -152,6 +152,27 @@ export const useMyListings = createSharedComposable(() => {
     }
   }
 
+  async function getAllListingsForAnalytics() {
+    if (!loggedIn.value) return []
+    
+    try {
+      // Fetch with a very high limit to get all listings for analytics
+      const data = await requestFetch<OwnedListingWithAnalytics[]>("/api/user/my-listings/", {
+        query: {
+          status: "all",
+          page: 1,
+          take: 10000, // High limit to get all listings
+          sort: "new",
+        },
+      })
+      
+      return Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error("Failed to fetch all listings for analytics:", error)
+      return []
+    }
+  }
+
   const hasMore = computed(() => !ended.value && !loading.value)
 
   return {
@@ -166,5 +187,6 @@ export const useMyListings = createSharedComposable(() => {
     setPublished,
     togglePublished,
     getRecentListings,
+    getAllListingsForAnalytics,
   };
 });

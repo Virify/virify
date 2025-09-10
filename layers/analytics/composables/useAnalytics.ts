@@ -22,24 +22,36 @@ export const useAnalytics = createSharedComposable(() => {
   const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/search/location"), {
     immediate: true,
   });
-  const { recentFavourites } = useFavourites();
-  const { recentUserNotes } = useNotes();
-  const { getRecentListings } = useMyListings();
+  const { favourites, refreshFavourites } = useFavourites();
+  const { userNotes, refreshUserNotes } = useNotes();
+  const { getAllListingsForAnalytics } = useMyListings();
   
-  // Fetch analytics data when logged in
+  // Add state for all listings analytics data
+  const allUserListings = ref<OwnedListingWithAnalytics[]>([]);
+  
+  // Fetch ALL analytics data when logged in
   const fetchAnalytics = async () => {
     if (!loggedIn.value) return;
     
     try {
-      const [viewedListings, userAnalytics, ownedListings] = await Promise.all([
+      // Fetch core analytics data
+      const [viewedListings, userAnalytics] = await Promise.all([
         useRequestFetch()<RecentlyViewed[]>("/api/analytics/listing/track-view").catch(() => []),
-        useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all").catch(() => null),
-        getRecentListings(3).catch(() => [])
+        useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all").catch(() => null)
       ]);
       
       recentlyViewedListings.value = viewedListings;
-      recentOwnedListings.value = ownedListings;
       analytics.value = userAnalytics;
+      
+      // Ensure ALL data is fetched from respective composables
+      const [allListings] = await Promise.all([
+        getAllListingsForAnalytics(), // Load ALL listings for analytics
+        refreshFavourites(),          // Load ALL favourites
+        refreshUserNotes()            // Load ALL notes  
+      ]);
+      
+      allUserListings.value = allListings;
+      
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
     }
@@ -53,6 +65,7 @@ export const useAnalytics = createSharedComposable(() => {
       } else {
         recentlyViewedListings.value = [];
         recentOwnedListings.value = [];
+        allUserListings.value = [];
         analytics.value = null;
       }
     });
@@ -153,10 +166,11 @@ export const useAnalytics = createSharedComposable(() => {
   return {
     analytics,
     trackListingView,
-    recentFavourites,
-    recentUserNotes,
+    favourites,
+    userNotes,
     recentlyViewedListings,
     recentOwnedListings,
+    allUserListings,
     trackAiSearch,
     trendingLocations,
     fetchAnalytics,

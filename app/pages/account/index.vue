@@ -98,7 +98,9 @@ definePageMeta({
   layout: "account",
 });
 
-const { analytics, recentFavourites, recentUserNotes, recentlyViewedListings, recentOwnedListings } = useAnalytics();
+const { analytics, recentlyViewedListings, recentOwnedListings } = useAnalytics();
+const { favourites: recentFavourites } = useFavourites();
+const { userNotes: recentUserNotes } = useNotes();
 
 const isViewedCollapsed = ref(false);
 const isFavouritesCollapsed = ref(true);
