@@ -8,19 +8,36 @@
       </slot>
     </div>
 
-    <div class="content-section">
-      <slot name="content">
-        <OrganismsAccountListingCard
-          :is-collapsed="isViewedCollapsed"
-          @toggle="isViewedCollapsed = !isViewedCollapsed"
-          title="Recently Viewed Listings"
-          icon="search"
-          :items="(recentlyViewedListings as RecentItem[])"
-          empty-message="No recent views yet."
-          :show-favourite-icon="true"
-          :show-notes-icon="true"
-        />
-      </slot>
+    <div v-if="recentOwnedListings?.length > 0" class="content-section">
+      <div class="account-card">
+        <div class="account-card__header">
+          <AtomsCollapsibleHeader 
+            :is-collapsed="isOwnedCollapsed" 
+            title="My Recent Listings"
+            icon="read-more"
+            variant="inline" 
+            @toggle="isOwnedCollapsed = !isOwnedCollapsed"
+          />
+        </div>
+
+        <Transition name="collapse-fade">
+          <div v-show="!isOwnedCollapsed" class="account-card__content">
+            <div class="account-card__scrollable">
+              <div class="owned-listings-grid">
+                <OrganismsAccountOwnListingCard 
+                  v-for="listing in recentOwnedListings.slice(0, 6)" 
+                  :key="listing.id" 
+                  :item="listing" 
+                />
+              </div>
+            </div>
+            
+            <nuxt-link v-if="recentOwnedListings?.length >= 6" to="/account/my-listings" class="content-section__see-all | button button-sm button-secondary">
+              See all listings
+            </nuxt-link>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <div class="content-section">
@@ -54,6 +71,21 @@
         <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="account/notes" class="content-section__see-all | button button-sm button-secondary">See all notes</nuxt-link>
       </slot>
     </div>
+
+    <div class="content-section">
+      <slot name="content">
+        <OrganismsAccountListingCard
+          :is-collapsed="isViewedCollapsed"
+          @toggle="isViewedCollapsed = !isViewedCollapsed"
+          title="Recently Viewed Listings"
+          icon="search"
+          :items="(recentlyViewedListings as RecentItem[])"
+          empty-message="No recent views yet."
+          :show-favourite-icon="true"
+          :show-notes-icon="true"
+        />
+      </slot>
+    </div>
   </div>
 </template>
 
@@ -66,14 +98,20 @@ definePageMeta({
   layout: "account",
 });
 
-const { analytics, recentFavourites, recentUserNotes, recentlyViewedListings } = useAnalytics();
+const { analytics, recentlyViewedListings, recentOwnedListings } = useAnalytics();
+const { favourites: recentFavourites } = useFavourites();
+const { userNotes: recentUserNotes } = useNotes();
 
 const isViewedCollapsed = ref(false);
 const isFavouritesCollapsed = ref(true);
 const isNotesCollapsed = ref(true);
+const isOwnedCollapsed = ref(true);
 
 // Open sections by default if they have items
 watchEffect(() => {
+  if (recentOwnedListings.value && recentOwnedListings.value.length > 0) {
+    isOwnedCollapsed.value = false;
+  }
   if (recentFavourites.value && recentFavourites.value.length > 0) {
     isFavouritesCollapsed.value = false;
   }
@@ -123,5 +161,25 @@ watchEffect(() => {
     width: fit-content;
     margin: 0 var(--size-16) var(--size-16) var(--size-16);
   }
+}
+
+.account-card {
+  &__header {
+    padding: var(--size-16);
+  }
+
+  &__content {
+    padding: 0 var(--size-16) var(--size-16);
+  }
+
+  &__scrollable {
+    padding-top: 0;
+  }
+}
+
+.owned-listings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--size-12);
 }
 </style>

@@ -212,6 +212,7 @@ export const useNotes = createSharedComposable(() => {
     recentUserNotes,
     saleNotes,
     rentalNotes,
+    refreshUserNotes,
     // search filter state
     searchTerm,
     categoryFilter,

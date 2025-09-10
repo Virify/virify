@@ -178,19 +178,28 @@ const { trackListingView } = useAnalytics();
 const route = useRoute();
 
 /**
- *  Fetch listing
+ *  Fetch and validate listing
  */
-const { data: listingData, status } = await useAsyncData(
-  `listing-${route.params?.id}`,
-  () => {
-    return $fetch<{ listing: any }>(`/api/listing/${route.params?.id}`);
-  },
-  {
-    deep: false,
+async function fetchListing(id: string) {
+  try {
+    const response = await $fetch<{ listing: any }>(`/api/listing/${id}`);
+    if (!response?.listing) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Listing not found'
+      });
+    }
+    return response;
+  } catch (error: any) {
+    throw createError({
+      statusCode: error.statusCode || 404,
+      statusMessage: 'Listing not found'
+    });
   }
-);
+}
 
-const listing = computed(() => listingData.value?.listing);
+const listingData = await fetchListing(route.params?.id as string);
+const listing = computed(() => listingData.listing);
 
 const similarListingsAddress = computed(() => {
   return listing.value?.property?.address ? {
