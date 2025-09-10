@@ -1,5 +1,3 @@
-// import { useAi } from './useAi'
-
 /**
  * Composable for managing AI search page state and functionality
  * Uses local refs with manual KV save/load
@@ -33,11 +31,15 @@ export const useAiSearchPage = () => {
   const lastWhereClause = ref<any>(null);
   const lastLocationContext = ref<any>(null);
   const viewMode = ref<"grid" | "map" | "split">("grid");
+  const mapViewport = ref<{ zoom: number; center: [number, number]; bounds?: [number, number, number, number] } | undefined>(undefined);
 
   // Load state from KV once on initialization
   const loadInitialState = async () => {
     try {
-      const stored = await refreshFromKV();
+      await refreshFromKV();
+      const { searchState } = useSearchState();
+      const stored = searchState.value;
+      
       if (stored && stored.hasSearched) {
         // Populate local refs from KV
         searchResults.value = stored.results;
@@ -53,6 +55,7 @@ export const useAiSearchPage = () => {
         lastWhereClause.value = stored.whereClause;
         lastLocationContext.value = stored.locationContext;
         viewMode.value = stored.viewMode;
+        mapViewport.value = stored.mapViewport;
 
         // Sync with global useAi composable
         searchQuery.value = stored.query;
@@ -90,6 +93,7 @@ export const useAiSearchPage = () => {
       whereClause: lastWhereClause.value,
       locationContext: lastLocationContext.value,
       viewMode: viewMode.value,
+      mapViewport: mapViewport.value,
     });
   };
 
@@ -183,6 +187,12 @@ export const useAiSearchPage = () => {
     await saveToKV();
   };
 
+  // Update map viewport state
+  const updateMapViewport = async (viewport: MapViewportState) => {
+    mapViewport.value = viewport;
+    await saveToKV();
+  };
+
   // Save current state (backward compatibility)
   const saveCurrentState = async () => {
     await saveToKV();
@@ -203,6 +213,7 @@ export const useAiSearchPage = () => {
     lastWhereClause,
     lastLocationContext,
     viewMode,
+    mapViewport,
 
     // Local reactive state
     isSearching,
@@ -215,6 +226,7 @@ export const useAiSearchPage = () => {
     updateViewMode,
     updateSort,
     updatePagination,
+    updateMapViewport,
     saveCurrentState,
     resetForm,
     loadInitialState,
