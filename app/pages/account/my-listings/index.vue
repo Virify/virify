@@ -56,7 +56,6 @@ const combinedOptions = [
 ]
 
 const sortOptions = ['new', 'old', 'premium', 'featured', 'basic'] as const
-const statusOptions = ['all', 'active', 'inactive', 'draft'] as const
 
 const sortOrStatus = computed({
   get: () => statusFilter.value !== 'all' ? statusFilter.value : sortBy.value,
@@ -84,6 +83,7 @@ function onEdit(id: number) {
   gap: var(--size-16);
   min-width: 0;
   width: 100%;
+  max-height: calc(100dvh - var(--header-height) - var(--size-32));
 
   &__analytics {
     margin-bottom: var(--size-8);
@@ -150,7 +150,7 @@ function onEdit(id: number) {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--size-16);
-    overflow: visible;
+    overflow: auto;
   }
 
   &__card {
@@ -159,7 +159,6 @@ function onEdit(id: number) {
     box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     padding: var(--size-16);
   }
 
