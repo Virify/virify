@@ -1,27 +1,37 @@
 <template>
-  <div class="stats-card" :class="{ 'animate-in': animated }">
-    <div class="stats-card__top">
-      <div class="stats-card__content">
-        <div v-if="iconName" class="stats-card__icon">
-          <AtomsIcon :icon="iconName" :size="32" />
-        </div>
-        <div class="stats-card__text">
-          <div class="stats-card__value | r-title-xl-md">{{ value }}</div>
-          <div class="stats-card__subtitle | body-sm font-bold">{{ subtitle }}</div>
+  <div class="stats-card" :class="{
+    'animate-in': animated,
+  }">
+    <NuxtLink v-if="to" :to="to" class="stats-card__link" aria-label="Navigate to {{ title }}">
+      <div class="stats-card__top" :class="{
+        'tier-basic': tier === 'basic',
+        'tier-featured': tier === 'featured',
+        'tier-premium': tier === 'premium'
+      }">
+        <div class="stats-card__content">
+          <div v-if="iconName" class="stats-card__icon">
+            <AtomsIcon :icon="iconName" :size="32" />
+          </div>
+          <div class="stats-card__text">
+            <div class="stats-card__value | r-title-xl-md">{{ value }}</div>
+            <div class="stats-card__subtitle | body-sm font-bold">{{ subtitle }}</div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="stats-card__title | r-body-md-sm font-bold">{{ title }}</div>
+      <div class="stats-card__title | r-body-md-sm font-bold">{{ title }}</div>
+    </NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
   value: string
-  subtitle: string
+  subtitle?: string
   title: string
   iconName?: string
   animated?: boolean
+  tier?: 'basic' | 'featured' | 'premium' | null,
+  to?: string
 }
 
 defineProps<Props>()
@@ -61,6 +71,15 @@ defineProps<Props>()
     }
   }
 
+  &__link {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+
   &__top {
     background:
       linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)),
@@ -74,6 +93,23 @@ defineProps<Props>()
     padding: var(--size-16);
     background-size: cover;
     min-height: 100px;
+    color: var(--monochrome-300);
+
+
+    &.tier-basic {
+      background-color: var(--monochrome-400);
+      color: var(--monochrome-900);
+    }
+
+    &.tier-featured {
+      background-color: var(--secondary-400);
+      color: var(--foreground-100);
+    }
+
+    &.tier-premium {
+      background-color: var(--blue-400);
+      color: var(--monochrome-900);
+    }
   }
 
   &__content {
@@ -108,11 +144,11 @@ defineProps<Props>()
     color: inherit;
     line-height: 1;
     margin-bottom: var(--size-4);
-    color: var(--monochrome-300);
+    color: inherit;
   }
 
   &__subtitle {
-    color: var(--monochrome-300);
+    color: inherit;
   }
 
   &__title {

@@ -6,7 +6,7 @@
  * @returns UserItemsAggregates - An object containing notification counts
  */
 export async function getUserItemsAggregates(userId: number): Promise<UserItemsAggregates> {
-  const [favourites, notes, enquiries, locations, unreadMessages] = await prisma.$transaction([
+  const [favourites, notes, enquiries, locations, listings, unreadMessages] = await prisma.$transaction([
     prisma.userFavouriteListing.count({
       where: {
         userPreferences: {
@@ -33,6 +33,11 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
         },
       },
     }),
+    prisma.listing.count({
+      where: {
+        userId: userId,
+      },
+    }),
     // Count unread messages that were sent TO the current user
     prisma.message.count({
       where: {
@@ -47,6 +52,7 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
     notes,
     enquiries,
     locations,
+    listings,
     unreadMessages,
     // Include all the original ones even if not used yet
     notifications: 0,

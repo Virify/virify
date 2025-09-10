@@ -44,7 +44,7 @@ export const accountNavigation: NavigationItem[] = [
 export const listingsNavigation: NavigationItem[] = [
   {
     name: "My Listings",
-    url: "#",
+    url: "/account/my-listings",
     icon: "read-more",
     countKey: "listings",
   },
