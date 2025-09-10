@@ -12,11 +12,14 @@
           v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
       </fieldset>
 
-      <Transition name="m-ai-search-form-location">
-        <div role="presentation" v-show="popoverExpanded">
-          <MoleculesAutocompletePopover :search-value="autocompleteValue" @location-selected="handleLocationSelected" />
-        </div>
-      </Transition>
+      <client-only>
+        <Transition name="m-ai-search-form-location">
+          <div role="presentation" v-show="popoverExpanded">
+            <MoleculesAutocompletePopover :search-value="autocompleteValue"
+              @location-selected="handleLocationSelected" />
+          </div>
+        </Transition>
+      </client-only>
     </div>
 
     <AtomsSelect name="radius" id="radius" aria-label="Location radius"
