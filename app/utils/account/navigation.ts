@@ -25,7 +25,7 @@ export const accountNavigation: NavigationItem[] = [
   // },
   {
     name: "Analytics",
-    url: "#",
+    url: "/account/analytics",
     icon: "explore/hot",
   },
   // {
