@@ -4,7 +4,8 @@
       <h1 class="| title-lg">Find your perfect property</h1>
 
       <MoleculesAiSearchFormLocation />
-      <MoleculesAiSearchFormFilters :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
+      <MoleculesAiSearchFormFilters :initial-query :disabled="isDisabled" @submit-search="searchSubmit"
+        @reset-search="searchReset" />
     </div>
   </div>
 </template>
@@ -15,7 +16,7 @@ const initialQuery = ref('')
 /**
  *  Fetch filters
  */
-const { setQuery } = useSearchState()
+const { setQuery, searchState } = useSearchState()
 
 async function searchSubmit(query: string) {
   setQuery(query)
@@ -28,6 +29,15 @@ async function searchSubmit(query: string) {
 function searchReset() {
   setQuery('')
 }
+
+/**
+ *  Disable filters button if no location is added
+ */
+const isDisabled = computed(() => {
+  const { location } = asObject(searchState.value)
+
+  return !location
+})
 </script>
 
 <style lang="scss">

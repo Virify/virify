@@ -25,6 +25,7 @@
 <script setup lang="ts">
 interface Props {
   initialQuery?: string;
+  disabled?: boolean
 }
 
 const props = defineProps<Props>();
@@ -58,7 +59,7 @@ watch(() => props.initialQuery, (newQuery) => {
 /**
  *  Errors
  */
-const isValid = computed(() => unref(searchQuery).length)
+const isValid = computed(() => !props.disabled && unref(searchQuery).length)
 
 /**
  *  Example prompts
