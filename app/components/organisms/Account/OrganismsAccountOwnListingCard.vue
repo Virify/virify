@@ -70,8 +70,8 @@
           <NuxtLink to="#">
             <button class="button button-xs">Edit</button>
           </NuxtLink>
-          <NuxtLink :to="viewHref">
-            <button class="button button-xs">View</button>
+          <NuxtLink :to="item.published ? viewHref : undefined" :class="{ 'disabled-link': !item.published }">
+            <button class="button button-xs" :disabled="!item.published">View</button>
           </NuxtLink>
         </div>
       </div>
@@ -101,7 +101,8 @@ const bathrooms = computed(() => props.item.property?.numberBathrooms || 0)
 const firstImage = computed(() => props.item.property?.media?.find((m) => m.image)?.image || null)
 const viewHref = computed(() => `/listing/${props.item.id}`)
 
-const tierKey = computed(() => String((props.item as any).listingTier || "").toLowerCase())
+const tierKey = computed(() => String(props.item.listingTier || "").toLowerCase())
+
 const tierLabel = computed(() => {
   const key = tierKey.value
   if (key === "premium") return "Premium"
@@ -343,6 +344,15 @@ const onTogglePublish = () => {
   .button:hover,
   .button:focus {
     filter: brightness(0.95);
+  }
+
+  .button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .disabled-link {
+    pointer-events: none;
   }
 
   /* Tier color themes */

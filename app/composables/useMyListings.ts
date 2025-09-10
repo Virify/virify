@@ -79,7 +79,7 @@ export const useMyListings = createSharedComposable(() => {
   async function setPublished(listingId: number, published: boolean) {
     try {
       await $fetch(`/api/user/my-listings/${listingId}`, { 
-        method: "post" as any, 
+        method: "POST", 
         body: { published } 
       })
       

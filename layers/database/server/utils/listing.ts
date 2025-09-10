@@ -33,6 +33,7 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
   return await prisma.listing.findUnique({
     where: {
       id,
+      published: true,
     },
     include: {
       rentalListing: true,

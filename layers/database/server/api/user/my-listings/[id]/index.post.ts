@@ -22,7 +22,13 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { published } = togglePublishedSchema.parse(body)
 
-    return await toggleListingPublished(userId as number, Number(id), published)
+    const result = await toggleListingPublished(userId as number, Number(id), published)
+    
+    // Clear the listing cache when published status changes
+    const storage = useStorage('cache:listing')
+    await storage.removeItem(`listing:${id}`)
+    
+    return result
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw createError({ 

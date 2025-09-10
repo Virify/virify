@@ -41,7 +41,7 @@ export async function getUserOwnedListingsWithAnalytics(
     
     const numericSearch = Number(searchTerm)
     if (!Number.isNaN(numericSearch)) {
-      (where.OR as any[]).push({ price: numericSearch })
+      (where.OR as Prisma.ListingWhereInput[]).push({ price: numericSearch })
     }
   }
 
