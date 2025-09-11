@@ -11,9 +11,12 @@
 
           <MoleculesAiSearchFormLocation class="o-dock-banner__form-fader" />
 
-          <MoleculesAiSearchFormFilters v-show="hasLocation && filtersVisible" class="o-dock-banner__form-fader"
-            :initial-query :disabled="!hasLocation" hideReset @submit-search="searchSubmit"
-            @reset-search="searchReset" />
+          <client-only>
+            <Transition v-show="hasLocation && filtersVisible" name="o-dock-banner">
+              <MoleculesAiSearchFormFilters class="o-dock-banner__form-fader" :initial-query :disabled="!hasLocation"
+                hideReset @submit-search="searchSubmit" @reset-search="searchReset" />
+            </Transition>
+          </client-only>
 
           <AtomsButton v-if="hasLocation" class="o-dock-banner__toggle | button-bordered button-full button-xs" :class="{
             'o-dock-banner__toggle--expanded': filtersVisible
@@ -149,5 +152,25 @@ const hasLocation = computed(() => {
 
     }
   }
+}
+
+/**
+ *  Toggle transitions
+ */
+.o-dock-banner-enter-active,
+.o-dock-banner-leave-active {
+  interpolate-size: allow-keywords;
+
+  height: calc-size(max-content, size);
+  transition: height, margin;
+  transition-duration: var(--animation-slow);
+  transition-timing-function: var(--ease-out);
+  overflow: hidden;
+}
+
+.o-dock-banner-leave-to,
+.o-dock-banner-enter-from {
+  margin: 0;
+  height: 0;
 }
 </style>
