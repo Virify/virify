@@ -14,6 +14,10 @@
 </template>
 
 <script setup lang="ts">
+import ViewsDialogTierConfirmation from "~/components/views/Dialog/ViewsDialogTierConfirmation.vue";
+import ViewsDialogPayment from "~/components/views/Dialog/ViewsDialogPayment.vue";
+
+const { showDialog } = useDialog();
 
 const tiers: TierOption[] = [
   { tier: 'basic', price: 12.99 },
@@ -26,11 +30,51 @@ const formattedPrice = (price: number) => {
 };
 
 const emit = defineEmits<{
-  (e: 'create', tier: TierOption): void
+  (e: 'create', tier: TierOption): void;
+  (e: 'paymentSuccess', tier: TierOption): void;
 }>()
 
 function createTier(tier: TierOption) {
-  emit('create', tier);
+  showTierConfirmation(tier);
+}
+
+function showTierConfirmation(tier: TierOption) {
+  showDialog({
+    component: ViewsDialogTierConfirmation,
+    props: {
+      tier: tier
+    },
+    onClose: (result) => {
+      const { returnValue } = result as { returnValue: { action?: string; tier?: TierOption } };
+      
+      if (returnValue.action === 'continue' && returnValue.tier) {
+        showPaymentDialog(returnValue.tier);
+      } else if (returnValue.action === 'back') {
+        // User went back, just close the dialog
+        console.log("User went back to tier selection");
+      }
+    }
+  });
+}
+
+function showPaymentDialog(tier: TierOption) {
+  showDialog({
+    component: ViewsDialogPayment,
+    props: {
+      tier: tier
+    },
+    onClose: (result) => {
+      const { returnValue } = result as { returnValue: { paymentConfirmed?: boolean; cancelled?: boolean; tier?: TierOption } };
+      
+      if (returnValue.paymentConfirmed && returnValue.tier) {
+        emit('paymentSuccess', returnValue.tier);
+        console.log("Payment successful!");
+      } else if (returnValue.cancelled) {
+        // User cancelled payment, show tier confirmation again
+        showTierConfirmation(tier);
+      }
+    }
+  });
 }
 </script>
 

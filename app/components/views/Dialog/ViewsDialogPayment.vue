@@ -64,7 +64,7 @@
 
     <div v-else-if="paymentSuccess" class="payment-dialog__success | flow flow-md">
       <p class="| body-md">Your payment has been processed successfully. You can now start creating your listing with the {{ tier?.tier }} tier features.</p>
-      <p class="| body-sm">This dialog will close automatically...</p>
+      <p class="payment-dialog__success--message | body-sm">This dialog will close automatically...</p>
     </div>
   </div>
 </template>
@@ -113,10 +113,14 @@ function onCancel() {
 }
 
 function onSuccessClose() {
+  /**
+   * TODO: Create a listing draft on the server here then navigate to the listing creation page
+   */
   hideDialog({ 
     paymentConfirmed: true,
     tier: props.tier 
   });
+  navigateTo('/account/create-listing');
 }
 
 function resetDialogState() {
@@ -148,7 +152,6 @@ function processPayment() {
 .payment-dialog {
   &__tier {
     text-transform: capitalize;
-    font-weight: 600;
   }
 
   &__form {
@@ -172,9 +175,13 @@ function processPayment() {
 
   &__success {
     text-align: center;
+    padding: var(--size-24) 0;
+
+    &--message {
+      padding: var(--size-16) 0;
+    }
     
     h2 {
-      color: var(--success-500);
       margin: 0;
     }
   }
