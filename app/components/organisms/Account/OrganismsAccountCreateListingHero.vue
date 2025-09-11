@@ -3,6 +3,7 @@
     <AtomsAriaTooltip 
       v-for="tier in tiers" 
       :key="tier.tier"
+      :id="tier.tier"
       content="Click to see tier features and details"
     >
       <AtomsStatsCard 

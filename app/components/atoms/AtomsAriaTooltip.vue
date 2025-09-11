@@ -19,11 +19,18 @@
 <script setup lang="ts">
 interface Props {
   content: string;
+  id?: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+const tooltipId = computed(() => {
+  if (props.id) {
+    return `tooltip-${props.id}`;
+  }
+  // Fallback to a hash of the content for SSR consistency
+  return `tooltip-${btoa(props.content).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8)}`;
+});
 </script>
 
 <style lang="scss" scoped>
