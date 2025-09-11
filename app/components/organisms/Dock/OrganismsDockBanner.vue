@@ -118,12 +118,13 @@ const hasLocation = computed(() => {
     z-index: -1;
     inset: calc(0px - var(--size-12));
     background: var(--background-200);
-    border-radius: var(--border-radius-3xl);
+    border-radius: var(--border-radius-2xl);
     transition: box-shadow, inset, opacity;
     transition-duration: var(--animation-slow);
     transition-timing-function: var(--ease-in-out);
 
     @include mq.tablet {
+      border-radius: var(--border-radius-3xl);
       inset: calc(0px - var(--size-16));
     }
 
