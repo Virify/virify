@@ -6,6 +6,16 @@
         <OrganismsDockBanner />
       </div>
     </div>
+
+    <div class="p-pre-dock__content | container container-sm flow flow-xl">
+      <h2 class="| title-lg">This is test content</h2>
+
+      <p style="margin-top: 1em" v-for="i of 10">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium incidunt, quo consequuntur unde quae
+        deleniti officia, cupiditate tempore nobis, earum minus? Illum enim voluptates doloremque nihil ullam dolore,
+        facere modi?
+      </p>
+    </div>
   </div>
 </template>
 
@@ -27,6 +37,10 @@
     max-width: min(100%, 45rem);
     margin: 0 auto;
     flex: 1 0;
+  }
+
+  &__content {
+    padding: var(--size-40) 0;
   }
 }
 </style>
