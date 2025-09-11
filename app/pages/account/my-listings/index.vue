@@ -3,17 +3,13 @@
     <!-- Analytics/CTA band -->
     <OrganismsAccountCreateListingHero />
 
-    <div class="my-listings-page__header">
-      <h2 class="my-listings-page__title | title-md">My Listings</h2>
-      <div class="my-listings-page__controls">
-        <div class="my-listings-page__search-filter-row">
-          <AtomsInput v-model="searchTerm" type="text" placeholder="Search my listings..." autocomplete="off"
-            class="body-sm" />
-          <AtomsSelect v-model="sortOrStatus" :options="combinedOptions"
-            class="my-listings-page__filter-select | body-sm" />
-        </div>
-      </div>
-    </div>
+    <MoleculesAccountHeader 
+      v-model:search-term="searchTerm" 
+      v-model:category-filter="sortOrStatus"
+      :filter-options="combinedOptions"
+      :title="'My Listings'"
+      placeholder="Search listings..."
+    />
 
     <div class="my-listings-page__grid">
       <div class="my-listings-page__card">

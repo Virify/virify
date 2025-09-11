@@ -1,8 +1,8 @@
 <template>
   <div class="saved-locations-page">
-    <div class="saved-locations-page__header">
-      <h2 class="saved-locations-page__title | title-md">Saved Locations</h2>
-    </div>
+   <MoleculesAccountHeader 
+      :title="'My Favourites'"
+    />
 
     <div class="saved-locations-page__grid">
       <div class="saved-locations-card">
