@@ -11,3 +11,8 @@ definePageMeta({
   layout: "account",
 });
 </script>
+<style lang="scss">
+.create-listing__info {
+  padding: var(--size-16);
+}
+</style>
