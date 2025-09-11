@@ -89,8 +89,8 @@ async function animateFormToDock() {
   // Return promise for animation
   return new Promise(async (resolve, reject) => {
     const animation = await backdropEl.animate([finalAnimationState], {
-      duration: 400,
-      easing: 'cubic-bezier(0, 0.7, 0.5, 1)',
+      duration: 300,
+      easing: 'cubic-bezier(0.2, 1.1, 0.8, 1)',
       fill: 'forwards'
     })
 
