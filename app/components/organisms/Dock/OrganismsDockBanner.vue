@@ -1,24 +1,28 @@
 <template>
   <section class="o-dock-banner__form-height" role="presentation">
-    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner | flow" @focusin="showExpandedForm">
+    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" @focusin="showExpandedForm">
       <div class="o-dock-banner__backdrop | elevate-300" :class="{
         'o-dock-banner__backdrop--hidden': !hasLocation
-      }" aria-hidden="true"></div>
+      }" aria-hidden="true" ref="$backdrop">
+        <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
+      </div>
 
-      <MoleculesAiSearchFormLocation class="o-dock-banner__fader" />
+      <fieldset class="o-dock-banner__fader | flow" :disabled="isSearchLoading">
+        <MoleculesAiSearchFormLocation />
 
-      <client-only>
-        <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
-          <MoleculesAiSearchFormFilters class="o-dock-banner__fader" :initial-query :disabled="!hasLocation" hideReset
-            @submit-search="searchSubmit" @reset-search="searchReset" />
-        </Transition>
-      </client-only>
+        <client-only>
+          <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
+            <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
+              @submit-search="searchSubmit" @reset-search="searchReset" />
+          </Transition>
+        </client-only>
 
-      <AtomsButton v-if="hasLocation && !isExpanded"
-        class="o-dock-banner__toggle o-dock-banner__fader | button-bordered button-full button-xs" type="button"
-        @click.prevent="showExpandedForm">
-        Expand form
-      </AtomsButton>
+        <AtomsButton v-if="hasLocation && !isExpanded"
+          class="o-dock-banner__toggle | button-bordered button-full button-xs" type="button"
+          @click.prevent="showExpandedForm">
+          Expand form
+        </AtomsButton>
+      </fieldset>
     </div>
   </section>
 </template>
@@ -27,6 +31,80 @@
 import { onClickOutside } from '@vueuse/core'
 
 const initialQuery = ref('')
+
+/**
+ *  Animate dock to final position
+ */
+const isSearchLoading = ref(false)
+const $backdrop = useTemplateRef('$backdrop')
+
+async function animateFormToDock() {
+  const backdropEl = $backdrop.value
+
+  // If backdrop is not an element, something is wrong
+  if (!isElement(backdropEl)) return
+
+  // Set 'searching' to be 'true'
+  isSearchLoading.value = true
+
+  // Get starting width, height and position of backdrop
+  const { width, height, bottom } = backdropEl.getBoundingClientRect()
+
+  // Set backdrop position to be fixed, with appropriate width, height
+  backdropEl.style.transition = 'none'
+  backdropEl.style.inset = 'unset'
+  backdropEl.style.position = 'fixed'
+  backdropEl.style.bottom = (window.innerHeight - bottom) + 'px'
+  backdropEl.style.left = '50%'
+  backdropEl.style.transform = 'translateX(-50%)'
+  backdropEl.style.width = width + 'px'
+  backdropEl.style.height = height + 'px'
+
+  // Get responsive sizes for final position
+  const finalAnimationState = {
+    width: '880px',
+    height: '63px',
+    bottom: '23px'
+  }
+
+  // Adjust final sizes based on screen size (hacky AF, but simplest way
+  // to do this)
+  const windowWidth = window.innerWidth
+
+  if (windowWidth < 1280) {
+    finalAnimationState.width = Math.min(800, windowWidth - 31) + 'px'
+  }
+  if (windowWidth < 1024) {
+    finalAnimationState.bottom = '16px'
+  }
+  if (windowWidth < 768) {
+    finalAnimationState.width = '450px'
+    finalAnimationState.height = '86px'
+    finalAnimationState.bottom = '10px'
+  }
+  if (windowWidth < 560) {
+    finalAnimationState.width = windowWidth - 23 + 'px'
+  }
+
+  // Return promise for animation
+  return new Promise(async (resolve, reject) => {
+    const animation = await backdropEl.animate([finalAnimationState], {
+      duration: 400,
+      easing: 'cubic-bezier(0, 0.7, 0.5, 1)',
+      fill: 'forwards'
+    })
+
+    // When finished, resolve
+    animation.onfinish = () => {
+      resolve(true)
+    }
+
+    // If cancelled, reject
+    animation.oncancel = () => {
+      reject(false)
+    }
+  })
+}
 
 /**
  *  Toggle filters as visible
@@ -54,6 +132,7 @@ const { setQuery, searchState } = useSearchState()
 async function searchSubmit(query: string) {
   setQuery(query)
 
+  await animateFormToDock()
   await navigateTo({
     path: '/dock'
   })
@@ -99,6 +178,7 @@ const hasLocation = computed(() => {
     transition: box-shadow, inset, opacity;
     transition-duration: var(--animation-slow);
     transition-timing-function: var(--ease-in-out);
+    overflow: hidden;
 
     @include mq.tablet {
       border-radius: var(--border-radius-3xl);
@@ -112,12 +192,26 @@ const hasLocation = computed(() => {
     }
   }
 
+  &__backdrop-skeleton {
+    padding: var(--size-12);
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  &__fader {
+    transition: opacity var(--animation-medium) var(--ease-out);
+
+    &[disabled] {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
   &__toggle {
     margin-top: var(--size-16);
 
     &--expanded {
       margin-top: var(--size-36);
-
     }
   }
 }
