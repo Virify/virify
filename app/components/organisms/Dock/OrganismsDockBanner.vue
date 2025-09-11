@@ -4,7 +4,7 @@
       <h1 class="| title-xl">Find your perfect property</h1>
 
       <section class="o-dock-banner__form-height" role="presentation">
-        <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner__form | flow">
+        <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner__form | flow" @focusin="showExpandedForm">
           <div class="o-dock-banner__form-backdrop | elevate-300" :class="{
             'o-dock-banner__form-backdrop--hidden': !hasLocation
           }" aria-hidden="true"></div>
@@ -12,17 +12,16 @@
           <MoleculesAiSearchFormLocation class="o-dock-banner__form-fader" />
 
           <client-only>
-            <Transition v-show="hasLocation && filtersVisible" name="o-dock-banner">
+            <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
               <MoleculesAiSearchFormFilters class="o-dock-banner__form-fader" :initial-query :disabled="!hasLocation"
                 hideReset @submit-search="searchSubmit" @reset-search="searchReset" />
             </Transition>
           </client-only>
 
-          <AtomsButton v-if="hasLocation"
-            class="o-dock-banner__toggle o-dock-banner__form-fader | button-bordered button-full button-xs" :class="{
-              'o-dock-banner__toggle--expanded': filtersVisible
-            }" type="button" @click.prevent="toggleFiltersVisibility">
-            {{ filtersVisible ? 'Collapse' : 'Show' }} additional fields
+          <AtomsButton v-if="hasLocation && !isExpanded"
+            class="o-dock-banner__toggle o-dock-banner__form-fader | button-bordered button-full button-xs"
+            type="button" @click.prevent="showExpandedForm">
+            Expand form
           </AtomsButton>
         </div>
       </section>
@@ -31,37 +30,27 @@
 </template>
 
 <script setup lang="ts">
-const initialQuery = ref('')
+import { onClickOutside } from '@vueuse/core'
 
-/**
- *  @TODO
- *  When a user selects a location
- *    OR
- *  Focuses within the container
- *    -> SHOW FILTERS
- * 
- *  When a user clicks outside of the container
- *    OR
- *  When a user presses 'escape' key
- *    OR
- *  When user clicked a 'close' button? (TBC)
- *    -> HIDE FILTERS
- *    -> SHOW EXPAND FILTERS BUTTON
- * 
- *  When a user opens the location autocomplete
- *    AND
- *  WHen 'expand filters button' is visible
- *    -> HIDE EXPAND FILTERS BUTTON
- */
+const initialQuery = ref('')
 
 /**
  *  Toggle filters as visible
  */
-const filtersVisible = ref(true)
+const isExpanded = ref(true)
 
-function toggleFiltersVisibility() {
-  filtersVisible.value = !filtersVisible.value
+function showExpandedForm() {
+  isExpanded.value = true
 }
+
+/**
+ *  Close form on click outside
+ */
+const $formWrapper = useTemplateRef('$focusWrapper')
+
+onClickOutside($formWrapper, () => {
+  isExpanded.value = false
+})
 
 /**
  *  Fetch filters
