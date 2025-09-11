@@ -18,9 +18,10 @@
             </Transition>
           </client-only>
 
-          <AtomsButton v-if="hasLocation" class="o-dock-banner__toggle | button-bordered button-full button-xs" :class="{
-            'o-dock-banner__toggle--expanded': filtersVisible
-          }" type="button" @click.prevent="toggleFiltersVisibility">
+          <AtomsButton v-if="hasLocation"
+            class="o-dock-banner__toggle o-dock-banner__form-fader | button-bordered button-full button-xs" :class="{
+              'o-dock-banner__toggle--expanded': filtersVisible
+            }" type="button" @click.prevent="toggleFiltersVisibility">
             {{ filtersVisible ? 'Collapse' : 'Show' }} additional fields
           </AtomsButton>
         </div>
