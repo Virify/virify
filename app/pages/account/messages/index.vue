@@ -2,25 +2,12 @@
   <!-- Desktop: Full messages page -->
   <div class="messages-page">
     <!-- Title and Controls Section -->
-    <div class="messages-header-card">
-      <h2 class="messages-title | title-md">{{ sectionTitle }}</h2>
-      <div class="messages-controls">
-        <div class="search-sort-row">
-          <AtomsInput
-            v-model="receivedSearch"
-            type="text"
-            placeholder="Search conversations..."
-            autocomplete="off"
-            class="body-sm"
-          />
-          <AtomsSelect 
-            v-model="receivedSort" 
-            :options="sortOptions"
-            class="sort-select | body-sm"
-          />
-        </div>
-      </div>
-    </div>
+   <MoleculesAccountHeader 
+      v-model:search-term="receivedSearch" v-model:category-filter="receivedSort"
+      :filter-options="sortOptions"
+      :title="sectionTitle"
+      placeholder="Search messages..."
+    />
 
     <!-- Messages Grid -->
     <div class="messages-grid" :class="{ 'messages-grid--has-active-conversation': selectedConversation }">

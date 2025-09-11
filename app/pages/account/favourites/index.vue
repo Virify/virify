@@ -2,17 +2,12 @@
   <!-- Desktop: Full favourites page -->
   <div class="favourites-page">
     <!-- Title -->
-    <div class="favourites-page__header">
-      <h2 class="favourites-page__title | title-md">My Favourites</h2>
-      <div class="favourites-page__controls">
-        <div class="favourites-page__search-filter-row">
-          <AtomsInput v-model="searchTerm" type="text" placeholder="Search favourites..." autocomplete="off"
-            class="body-sm" />
-          <AtomsSelect v-model="categoryFilter" :options="filterOptions"
-            class="favourites-page__filter-select | body-sm" />
-        </div>
-      </div>
-    </div>
+    <MoleculesAccountHeader 
+      v-model:search-term="searchTerm" v-model:category-filter="categoryFilter"
+      :filter-options="filterOptions"
+      :title="'My Favourites'"
+      placeholder="Search favourites..."
+    />
 
     <!-- favourites Grid -->
     <div class="favourites-page__grid">
@@ -84,10 +79,6 @@ const isSaleCollapsed = ref(false);
     max-height: unset;
   }
 
-  &__title {
-    margin: 0 0 var(--size-16) 0;
-  }
-
   &__grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -99,43 +90,6 @@ const isSaleCollapsed = ref(false);
       gap: var(--size-12);
       height: auto;
       overflow: visible;
-    }
-  }
-
-  &__header {
-    background: var(--background-200);
-    border-radius: var(--border-radius-xl);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: var(--size-24);
-  }
-
-  &__controls {
-    width: 100%;
-  }
-
-  &__search-filter-row {
-    display: grid;
-    grid-template-columns: 3fr 1fr;
-    gap: var(--size-12);
-    align-items: center;
-
-    @include mq.tablet {
-      grid-template-columns: 2fr 1fr;
-    }
-
-    @include mq.mobile-only {
-      grid-template-columns: 1fr;
-      gap: var(--size-8);
-    }
-  }
-
-  &__filter-select {
-    min-width: 160px;
-    padding: var(--size-8) var(--size-12);
-
-    @include mq.mobile-only {
-      width: 100%;
-      min-width: unset;
     }
   }
 

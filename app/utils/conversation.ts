@@ -280,6 +280,17 @@ export const sortConversations = (
         })
         .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
     
+    case "read":
+      // Show only conversations with no unread messages for the current user
+      return conversationsCopy
+        .filter(conversation => {
+          // Check if there are NO unread messages for the current user
+          return !conversation.messages?.some(message => 
+            !message.isRead && message.receiverId === userId
+          );
+        })
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
     case "recent":
       // Sort by most recent updated conversation
       return conversationsCopy.sort((a, b) => 
