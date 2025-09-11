@@ -109,7 +109,7 @@ useHead({
   grid-template-columns: 300px 1fr 300px;
   grid-template-areas: "left-sidebar main right-sidebar";
   gap: var(--size-16);
-  padding: var(--size-16);
+  padding: var(--size-16) 0;
   transition: grid-template-columns 0.25s ease;
 
   &:has(.sidebar-content--has-overlay) {
