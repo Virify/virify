@@ -1,32 +1,26 @@
 <template>
-  <div class="o-dock-banner">
-    <div class="o-dock-banner__content | flow flow-xl">
-      <h1 class="| title-xl">Find your perfect property</h1>
+  <section class="o-dock-banner__form-height" role="presentation">
+    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner | flow" @focusin="showExpandedForm">
+      <div class="o-dock-banner__backdrop | elevate-300" :class="{
+        'o-dock-banner__backdrop--hidden': !hasLocation
+      }" aria-hidden="true"></div>
 
-      <section class="o-dock-banner__form-height" role="presentation">
-        <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner__form | flow" @focusin="showExpandedForm">
-          <div class="o-dock-banner__form-backdrop | elevate-300" :class="{
-            'o-dock-banner__form-backdrop--hidden': !hasLocation
-          }" aria-hidden="true"></div>
+      <MoleculesAiSearchFormLocation class="o-dock-banner__fader" />
 
-          <MoleculesAiSearchFormLocation class="o-dock-banner__form-fader" />
+      <client-only>
+        <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
+          <MoleculesAiSearchFormFilters class="o-dock-banner__fader" :initial-query :disabled="!hasLocation" hideReset
+            @submit-search="searchSubmit" @reset-search="searchReset" />
+        </Transition>
+      </client-only>
 
-          <client-only>
-            <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
-              <MoleculesAiSearchFormFilters class="o-dock-banner__form-fader" :initial-query :disabled="!hasLocation"
-                hideReset @submit-search="searchSubmit" @reset-search="searchReset" />
-            </Transition>
-          </client-only>
-
-          <AtomsButton v-if="hasLocation && !isExpanded"
-            class="o-dock-banner__toggle o-dock-banner__form-fader | button-bordered button-full button-xs"
-            type="button" @click.prevent="showExpandedForm">
-            Expand form
-          </AtomsButton>
-        </div>
-      </section>
+      <AtomsButton v-if="hasLocation && !isExpanded"
+        class="o-dock-banner__toggle o-dock-banner__fader | button-bordered button-full button-xs" type="button"
+        @click.prevent="showExpandedForm">
+        Expand form
+      </AtomsButton>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -83,26 +77,9 @@ const hasLocation = computed(() => {
 @use '#styles/_utils/media' as mq;
 
 .o-dock-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  padding: var(--size-64) var(--size-32);
-  box-sizing: border-box;
-  background: #27da9b;
-  text-align: center;
-
-  &__content {
-    max-width: min(100%, 45rem);
-    margin: 0 auto;
-    flex: 1 0;
-  }
-
-  &__form {
-    position: relative;
-    z-index: 2;
-    text-align: left;
-  }
+  position: relative;
+  z-index: 2;
+  text-align: left;
 
   &__form-height {
     height: 7em;
@@ -113,7 +90,7 @@ const hasLocation = computed(() => {
     }
   }
 
-  &__form-backdrop {
+  &__backdrop {
     position: absolute;
     z-index: -1;
     inset: calc(0px - var(--size-12));
