@@ -11,10 +11,15 @@
 
           <MoleculesAiSearchFormLocation class="o-dock-banner__form-fader" />
 
-          <MoleculesAiSearchFormFilters v-show="hasLocation" class="o-dock-banner__form-fader" :initial-query
-            :disabled="!hasLocation" hideReset @submit-search="searchSubmit" @reset-search="searchReset" />
+          <MoleculesAiSearchFormFilters v-show="hasLocation && filtersVisible" class="o-dock-banner__form-fader"
+            :initial-query :disabled="!hasLocation" hideReset @submit-search="searchSubmit"
+            @reset-search="searchReset" />
 
-          <!-- @TODO - add expand filters button here -->
+          <AtomsButton v-if="hasLocation" class="o-dock-banner__toggle | button-bordered button-full button-xs" :class="{
+            'o-dock-banner__toggle--expanded': filtersVisible
+          }" type="button" @click.prevent="toggleFiltersVisibility">
+            {{ filtersVisible ? 'Collapse' : 'Show' }} additional fields
+          </AtomsButton>
         </div>
       </section>
     </div>
@@ -44,6 +49,15 @@ const initialQuery = ref('')
  *  WHen 'expand filters button' is visible
  *    -> HIDE EXPAND FILTERS BUTTON
  */
+
+/**
+ *  Toggle filters as visible
+ */
+const filtersVisible = ref(true)
+
+function toggleFiltersVisibility() {
+  filtersVisible.value = !filtersVisible.value
+}
 
 /**
  *  Fetch filters
@@ -76,6 +90,10 @@ const hasLocation = computed(() => {
 @use '#styles/_utils/media' as mq;
 
 .o-dock-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
   padding: var(--size-64) var(--size-32);
   box-sizing: border-box;
   background: #27da9b;
@@ -84,6 +102,7 @@ const hasLocation = computed(() => {
   &__content {
     max-width: min(100%, 45rem);
     margin: 0 auto;
+    flex: 1 0;
   }
 
   &__form {
@@ -104,7 +123,7 @@ const hasLocation = computed(() => {
   &__form-backdrop {
     position: absolute;
     z-index: -1;
-    inset: calc(0px - var(--size-16));
+    inset: calc(0px - var(--size-12));
     background: var(--background-200);
     border-radius: var(--border-radius-3xl);
     transition: box-shadow, inset, opacity;
@@ -112,13 +131,22 @@ const hasLocation = computed(() => {
     transition-timing-function: var(--ease-in-out);
 
     @include mq.tablet {
-      inset: calc(0px - var(--size-24));
+      inset: calc(0px - var(--size-16));
     }
 
     &--hidden {
       box-shadow: none;
       opacity: 0;
       inset: 0;
+    }
+  }
+
+  &__toggle {
+    margin-top: var(--size-16);
+
+    &--expanded {
+      margin-top: var(--size-36);
+
     }
   }
 }
