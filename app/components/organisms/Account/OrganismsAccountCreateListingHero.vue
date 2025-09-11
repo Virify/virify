@@ -51,11 +51,11 @@ function showTierConfirmation(tier: TierOption) {
       tier: tier,
     },
     onClose: (result) => {
-      const { returnValue } = result as { returnValue: { action?: string; tier?: TierOption } };
+      const { returnValue } = result as { returnValue?: { action?: string; tier?: TierOption } };
 
-      if (returnValue.action === "continue" && returnValue.tier) {
+      if (returnValue?.action === "continue" && returnValue.tier) {
         showPaymentDialog(returnValue.tier);
-      } else if (returnValue.action === "back") {
+      } else if (returnValue?.action === "back") {
         // User went back, just close the dialog
         console.log("User went back to tier selection");
       }
@@ -70,12 +70,12 @@ function showPaymentDialog(tier: TierOption) {
       tier: tier,
     },
     onClose: (result) => {
-      const { returnValue } = result as { returnValue: { paymentConfirmed?: boolean; cancelled?: boolean; tier?: TierOption } };
+      const { returnValue } = result as { returnValue?: { paymentConfirmed?: boolean; cancelled?: boolean; tier?: TierOption } };
 
-      if (returnValue.paymentConfirmed && returnValue.tier) {
+      if (returnValue?.paymentConfirmed && returnValue.tier) {
         emit("paymentSuccess", returnValue.tier);
         console.log("Payment successful!");
-      } else if (returnValue.cancelled) {
+      } else if (returnValue?.cancelled) {
         // User cancelled payment, show tier confirmation again
         showTierConfirmation(tier);
       }

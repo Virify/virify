@@ -1,6 +1,6 @@
 <template>
   <div class="account-card-container">
-    <slot></slot>
+    <slot/>
   </div>
 </template>
 
