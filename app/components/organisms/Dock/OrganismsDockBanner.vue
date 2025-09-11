@@ -136,6 +136,19 @@ async function searchSubmit(query: string) {
   await navigateTo({
     path: '/dock'
   })
+
+  /**
+   *  To avoid global smooth scrolling
+   *
+   *  @TODO - we may want to have a more site-wide and elevant fix for
+   *          this, perhaps finding a way to adjust the Vue Router
+   *          behaviour to have `behaviour: instant` instead
+   *          https://router.vuejs.org/guide/advanced/scroll-behavior
+   */
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
 };
 
 function searchReset() {
