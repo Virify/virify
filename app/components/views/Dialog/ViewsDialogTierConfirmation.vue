@@ -1,24 +1,24 @@
 <template>
-  <div class="| flow dialog-container dialog-container-sm">
-    <h1 class="| title-md">Confirm Your Selection</h1>
+  <div class="tier-confirmation | flow dialog-container dialog-container-sm">
+    <h1 class="tier-confirmation__title | title-md">Confirm Your Selection</h1>
 
     <AtomsDivider />
     
     <div class="tier-confirmation | flow flow-md">
       <div class="tier-confirmation__header">
-        <h3 class="| title-sm">You have selected the {{ tier?.tier }} tier</h3>
+        <h3 class="| title-xs">You have selected the {{ tier?.tier }} tier</h3>
         <p class="| body-md">This tier is <em><strong>£{{ tier?.price }}</strong></em> per month.</p>
       </div>
 
       <AtomsDivider />
 
       <div class="tier-confirmation__features">
-          <h4 class="title-xs">Features: </h4>
+          <h4 class="tier-confirmation__features--title | title-xs">Features: </h4>
 
         <Transition name="tier-features" mode="out-in">
           <ul :key="tier?.tier" class="tier-features-list">
             <li v-for="feature in currentTierFeatures" :key="feature" class="tier-feature-item">
-              <AtomsIcon icon="tick-solid" size="16" class="tier-feature-icon" />
+              <AtomsIcon icon="tick-solid" size="24" class="tier-feature-icon" />
               <span class="| body-sm">{{ feature }}</span>
             </li>
           </ul>
@@ -68,10 +68,20 @@ function onContinue() {
 
 <style lang="scss" scoped>
 .tier-confirmation {
+
+  &__title {
+    color: var(--secondary-400);
+  }
+  
   &__features {
     margin: var(--size-16) 0;
     overflow: hidden;
     transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
+    &--title {
+      color: var(--secondary-400);
+      margin-bottom: var(--size-8);
+    }
   }
 
   &__actions {
@@ -123,7 +133,7 @@ function onContinue() {
   }
 
   &-icon {
-    color: var(--success-500);
+    color: var(--secondary-400);
     flex-shrink: 0;
   }
 }
