@@ -212,6 +212,7 @@ const hasLocation = computed(() => {
   }
 
   &__fader {
+    min-width: 0;
     transition: opacity var(--animation-medium) var(--ease-out);
 
     &[disabled] {
