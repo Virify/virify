@@ -30,8 +30,6 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 
-const initialQuery = ref('')
-
 /**
  *  Animate dock to final position
  */
@@ -128,6 +126,12 @@ onClickOutside($formWrapper, () => {
  *  Fetch filters
  */
 const { setQuery, searchState } = useSearchState()
+
+const initialQuery = computed(() => {
+  const { query } = asObject(searchState.value)
+
+  return query
+})
 
 async function searchSubmit(query: string) {
   setQuery(query)
