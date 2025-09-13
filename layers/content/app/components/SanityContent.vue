@@ -78,15 +78,38 @@ const customComponents = {
   },
 
   marks: {
-    // Custom link component
+    // Custom link component (external)
     link: (props: any) => {
-      return h('a', {
-        href: props.value?.href,
-        target: props.value?.href?.startsWith('http') ? '_blank' : undefined,
-        rel: props.value?.href?.startsWith('http') ? 'noopener noreferrer' : undefined
-      }, props.children)
+      const href = props.value?.href || '#'
+      const target = (props.value?.blank || href?.startsWith('http')) ? '_blank' : undefined
+      const rel = target ? 'noopener noreferrer' : undefined
+      const children = typeof props.children === 'function' ? props.children() : (props.children || [])
+      return h('a', { href, target, rel }, children)
+    },
+
+    // Internal link to another guide (reference expanded in API)
+    internalLink: (props: any) => {
+      const val = props.value || {}
+      // possible shapes:
+      // { reference: { slug: 'my-slug' } }
+      // { reference: { slug: { current: 'my-slug' } } }
+      // { slug: 'my-slug' }
+      const raw = val.reference?.slug || val.slug || val.reference?._ref
+      const slug = typeof raw === 'string' ? raw : (raw && raw.current) ? raw.current : undefined
+      const children = typeof props.children === 'function' ? props.children() : (props.children || [])
+      if (slug) {
+        const categorySlug = val.reference?.category?.slug
+        const href = categorySlug ? `/guides/${categorySlug}/${slug}` : `/guides/${slug}`
+        // if children empty, use reference title or slug as link text
+        const text = (Array.isArray(children) && children.length > 0)
+          ? children
+          : (val.reference?.title || slug)
+        const NuxtLink = resolveComponent('NuxtLink') as any
+        return h(NuxtLink, { to: href }, { default: () => (Array.isArray(children) && children.length > 0 ? children : text) })
+      }
+      return h('span', {}, children)
     }
-  },
+  }
 
 }
 </script>
@@ -177,11 +200,12 @@ const customComponents = {
 
   // Links
   a {
-    color: var(--blue-600);
+    color: var(--secondary-400);
     text-decoration: underline;
-    
+    text-decoration-color: var(--secondary-400);
+
     &:hover {
-      color: var(--blue-700);
+      color: var(--secondary-500);
     }
   }
 

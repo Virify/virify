@@ -121,6 +121,25 @@ export const guide = defineType({
                     title: 'URL',
                     name: 'href',
                     type: 'url'
+                  },
+                  {
+                    title: 'Open in new tab',
+                    name: 'blank',
+                    type: 'boolean',
+                    initialValue: false
+                  }
+                ]
+              },
+              {
+                title: 'Internal link',
+                name: 'internalLink',
+                type: 'object',
+                fields: [
+                  {
+                    title: 'Guide reference',
+                    name: 'reference',
+                    type: 'reference',
+                    to: [{type: 'guide'}]
                   }
                 ]
               }
