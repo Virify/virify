@@ -33,9 +33,10 @@ import {
   deleteUser,
   createUserWithTokens,
   isActive,
+  User,
 } from "../../database/server/utils/user";
 import { prisma } from "../../database/server/utils/prisma-client";
-import { Reviewed } from "~~/layers/database/server/database/prisma/generated/enums";
+import { Reviewed } from "../../database/server/database/prisma/generated/enums";
 
 const prismaAny = prisma as any;
 
@@ -48,7 +49,31 @@ describe("user functions", () => {
    * Mock user object used across all tests.
    * Includes all required fields for User and Verification models.
    */
-  const mockUser = {
+  type MockUser = User & {
+    verification: typeof mockVerification;
+    membership: Record<string, unknown>;
+  };
+
+  const mockVerification = {
+    id: 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    address: null,
+    userId: 1,
+    estateAgentId: null,
+    activationToken: "activation-token",
+    identity: null,
+    reviewed: Reviewed.PENDING,
+    reviewToken: null,
+    reviewTokenExpiry: null,
+    activated: false,
+    activationTokenExpiry: null,
+    bank: null,
+    payslip: null,
+    business: null,
+  };
+
+  const mockUser: MockUser = {
     id: 1,
     firstName: null,
     lastName: null,
@@ -65,27 +90,8 @@ describe("user functions", () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     addressId: null,
-    listings: [],
-    properties: [],
-    favourites: [],
-    verification: {
-      id: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      address: null,
-      userId: 1,
-      estateAgentId: null,
-      activationToken: "activation-token",
-      identity: null,
-      reviewed: Reviewed.PENDING,
-      reviewToken: null,
-      reviewTokenExpiry: null,
-      activated: false,
-      activationTokenExpiry: null,
-      bank: null,
-      payslip: null,
-      business: null,
-    },
+    verification: mockVerification,
+    membership: {},
   };
 
   beforeEach(() => {
@@ -102,6 +108,7 @@ describe("user functions", () => {
     expect(found).toEqual(mockUser);
     expect(prismaAny.user.findUnique).toHaveBeenCalledWith({
       where: { email: mockUser.email },
+      include: { membership: true },
     });
   });
 
@@ -166,7 +173,7 @@ describe("user functions", () => {
    */
   it("should find user by password reset token", async () => {
     prismaAny.user.findUnique.mockResolvedValue(mockUser);
-    const found = await findUserByPasswordToken(mockUser.passwordResetToken);
+    const found = await findUserByPasswordToken(mockUser.passwordResetToken as string);
     expect(found).toEqual(mockUser);
   });
 
@@ -179,7 +186,7 @@ describe("user functions", () => {
     const updatedUser = { ...mockUser, password: newPassword };
     prismaAny.user.update.mockResolvedValue(updatedUser);
     
-    const result = await updateUserByToken(mockUser.passwordResetToken, newPassword);
+    const result = await updateUserByToken(mockUser.passwordResetToken as string, newPassword);
     expect(result).toEqual(updatedUser);
     expect(prismaAny.user.update).toHaveBeenCalledWith({
       where: { passwordResetToken: mockUser.passwordResetToken },
