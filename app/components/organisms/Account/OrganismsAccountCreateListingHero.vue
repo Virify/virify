@@ -24,6 +24,11 @@ import ViewsDialogTierConfirmation from "~/components/views/Dialog/ViewsDialogTi
 import ViewsDialogPayment from "~/components/views/Dialog/ViewsDialogPayment.vue";
 
 const { showDialog } = useDialog();
+const { isMember, membershipType, membershipEndDate } = useUserMembership();
+
+console.log("isMember", isMember.value);
+console.log("membershipType", membershipType.value);
+console.log("membershipEndDate", membershipEndDate.value);
 
 const tiers: TierOption[] = [
   { tier: "basic", price: 12.99 },

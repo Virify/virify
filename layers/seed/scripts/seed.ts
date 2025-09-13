@@ -1,13 +1,9 @@
-#!/usr/bin/env tsx
-
 import { config } from 'dotenv'
 
-// Load environment variables FIRST
 config()
 
-
-// Now import prisma after env vars are loaded
 import { prisma } from '../../database/server/utils/prisma-client'
+import { MembershipType } from "../../database/server/database/prisma/generated/enums";
 
 // Import utility functions from the seed layer
 import { updateLocationsByAddressListForSeed } from '../server/utils/location-for-seed'
@@ -85,6 +81,11 @@ async function seedAdminUser() {
             country: 'Admin Country',
           },
         },
+        membership: { 
+          create: {
+            type: MembershipType.PREMIUM,
+          },
+        },
       },
     })
     console.log('Admin user created.')
@@ -141,7 +142,7 @@ async function seedDatabase() {
           saleAddress.map(addr => generateProperty(addr))
         )
         await Promise.all(
-          saleProperties.map(prop => generateSaleListing(prop.id))
+          saleProperties.map((prop: { id: number; }) => generateSaleListing(prop.id))
         )
       })(),
       
@@ -151,7 +152,7 @@ async function seedDatabase() {
           rentalAddress.map(addr => generateProperty(addr))
         )
         await Promise.all(
-          rentalProperties.map(prop => generateRentalListing(prop.id))
+          rentalProperties.map((prop: { id: number; }) => generateRentalListing(prop.id))
         )
       })()
     ])

@@ -1,7 +1,9 @@
-import { type User, Prisma, Reviewed } from "../database/prisma/generated/client";
+import { type User, Prisma, Reviewed, MembershipType } from "../database/prisma/generated/client";
 
 import { prisma } from "./prisma-client";
-export type UserWithVerification = Prisma.UserGetPayload<{ include: { verification: true } }>;
+export type UserWithVerification = Prisma.UserGetPayload<{ include: { verification: true, } }>;
+export type UserWithVerificationAndMembership = Prisma.UserGetPayload<{ include: { verification: true, membership: true } }>;
+export type UserWithMembership = Prisma.UserGetPayload<{ include: { membership: true } }>;
 export type { User };
 
 /**
@@ -9,10 +11,13 @@ export type { User };
  * @param email - The email of the user to find.
  * @returns The user object if found, otherwise null.
  */
-export async function findUser(email: string): Promise<User | null> {
+export async function findUser(email: string): Promise<UserWithMembership | null> {
   return prisma.user.findUnique({
     where: {
       email,
+    },
+    include: {
+      membership: true,
     },
   });
 }
@@ -72,6 +77,7 @@ export async function findUserByActivationToken(token: string): Promise<UserWith
     },
     include: {
       verification: true,
+      membership: true,
     },
   });
 }
@@ -227,7 +233,7 @@ export async function updateUserTokens(email: string, token: string, otpCode: st
  * @param password string
  * @returns Promise<User>
  */
-export async function updateuUserAndActivate(userId: number, password?: string): Promise<UserWithVerification> {
+export async function updateUserAndActivate(userId: number, password?: string): Promise<UserWithVerificationAndMembership> {
   return prisma.user.update({
     where: { id: userId },
     data: {
@@ -240,9 +246,15 @@ export async function updateuUserAndActivate(userId: number, password?: string):
           activated: true,
         },
       },
+      membership: {
+        create: {
+          type: MembershipType.FREE,
+        },
+      },
     },
     include: {
       verification: true,
+      membership: true
     },
   });
 }
