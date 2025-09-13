@@ -2,10 +2,10 @@ import type { MembershipStatus, MembershipType } from "../../layers/database/ser
 
 declare module "#auth-utils" {
   interface AuthUser {
-    id?: number;
+    id: number;
     email?: string,
     username?: string;
-    membership?: MembershipType
+    membership: MembershipType
     membershipActive?: MembershipStatus;
     membershipEndDate?: Date | null;
   }

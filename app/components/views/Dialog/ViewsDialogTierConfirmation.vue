@@ -4,16 +4,16 @@
 
     <AtomsDivider />
     
-    <div class="tier-confirmation | flow flow-md">
+    <div class=" | flow flow-md">
       <div class="tier-confirmation__header">
         <h3 class="| title-xs">You have selected the {{ tier?.tier }} tier</h3>
-        <p class="| body-md">This tier is <em><strong>£{{ tier?.price }}</strong></em> per month.</p>
+        <p class="| body-md">This tier is <em><strong>{{ tierPrice }}</strong></em></p>
       </div>
 
       <AtomsDivider />
 
       <div class="tier-confirmation__features">
-          <h4 class="tier-confirmation__features--title | title-xs">Features: </h4>
+        <h4 class="tier-confirmation__features--title | title-xs">Features: </h4>
 
         <Transition name="tier-features" mode="out-in">
           <ul :key="tier?.tier" class="tier-features-list">
@@ -38,7 +38,7 @@
           @click="onContinue"
           class="| button-secondary"
         >
-          Continue to payment
+          {{ primaryActionLabel }}
         </AtomsButton>
       </div>
     </div>
@@ -52,9 +52,20 @@ const props = defineProps<{
 }>();
 
 const { hideDialog } = useDialog();
+const { isIncludedInMembership, needsMembershipUpgrade } = useUserMembership();
 
 const currentTierFeatures = computed(() => {
   return props.tier ? getTierFeatures(props.tier.tier) : [];
+});
+
+const tierPrice = computed(() => {
+  return isIncludedInMembership(props.tier) ? 'Included with your membership' : `£${props.tier.price.toFixed(2)} / month`;
+});
+
+const primaryActionLabel = computed(() => {
+  if (isIncludedInMembership(props.tier)) return 'Create Listing';
+  if (needsMembershipUpgrade(props.tier)) return 'Upgrade Membership';
+  return 'Continue to payment';
 });
 
 function onBack() {
@@ -62,20 +73,33 @@ function onBack() {
 }
 
 function onContinue() {
-  hideDialog({ action: 'continue', tier: props.tier });
+  // If the tier is included in their membership, skip payment and create listing immediately
+  if (isIncludedInMembership(props.tier)) {
+    hideDialog({ action: 'create', tier: props.tier });
+    return;
+  }
+
+  // If user's membership rank is lower than required, offer upgrade
+  if (needsMembershipUpgrade(props.tier)) {
+    hideDialog({ action: 'upgrade', tier: props.tier });
+    return;
+  }
+
+  // Otherwise, proceed to payment
+  hideDialog({ action: 'payment', tier: props.tier });
 }
 </script>
 
 <style lang="scss" scoped>
 .tier-confirmation {
-
   &__title {
     color: var(--secondary-400);
   }
   
   &__features {
     margin: var(--size-16) 0;
-    overflow: hidden;
+    max-height: 35dvh;
+    overflow: auto;
     transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
 
     &--title {
