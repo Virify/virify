@@ -22,7 +22,16 @@ export default defineEventHandler(async (event): Promise<GuideResponse> => {
         slug,
         excerpt,
         heroImage,
-        content,
+        content[]{
+          ...,
+          _type == 'block' => {
+            ..., 
+            markDefs[]{
+              ..., 
+              _type == 'internalLink' => { reference-> { _id, title, 'slug': slug.current, 'category': category-> { 'slug': slug.current } } }
+            }
+          }
+        },
         readTime,
         publishedAt,
         updatedAt,

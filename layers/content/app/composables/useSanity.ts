@@ -38,9 +38,20 @@ export const useSanity = () => {
     )
   }
 
+  /**
+   * Helper to build a guide URL from a slug or expanded reference
+   * @param slugOrRef string or object with slug.current
+   */
+  const guideUrl = (slugOrRef: any) => {
+    if (!slugOrRef) return '#'
+    if (typeof slugOrRef === 'string') return `/guides/${slugOrRef}`
+    return slugOrRef?.slug?.current ? `/guides/${slugOrRef.slug.current}` : '#'
+  }
+
   return {
     useCategories,
     useGuideBySlug,
-    useCategoryBySlug
+    useCategoryBySlug,
+    guideUrl
   }
 }
