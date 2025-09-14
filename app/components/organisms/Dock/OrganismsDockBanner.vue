@@ -138,7 +138,7 @@ async function searchSubmit(query: string) {
 
   await animateFormToDock()
   await navigateTo({
-    path: '/dock'
+    path: '/search'
   })
 
   /**
