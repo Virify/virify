@@ -2,14 +2,14 @@
   <MoleculesForm method="POST" action="/auth/signup" @submit.prevent="createAccount" class="| stacked"
     :error="formErrors">
     <MoleculesFormField label="Email address" v-slot="{ id }">
-      <AtomsInput :id type="email" name="email" required />
+      <AtomsInput :id v-model="email" type="email" name="email" required />
     </MoleculesFormField>
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Create account </AtomsButton>
   </MoleculesForm>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /**
  *  Emits
  */
@@ -21,6 +21,11 @@ const emits = defineEmits(["form-success", "form-error", "form-clear-error"]);
 const { isPending, setPendingWhile } = usePending();
 
 /**
+ *  Form data
+ */
+const email = ref('')
+
+/**
  *  Handle errors
  */
 const formErrors = ref(null);
@@ -28,20 +33,19 @@ const formErrors = ref(null);
 /**
  *  Validate form and submit
  */
-async function createAccount({ target }) {
+async function createAccount({ target }: SubmitEvent) {
   if (isPending.value) return;
 
   setPendingWhile(async () => {
     // Clear any existing form errors
     formErrors.value = null;
 
-    // First check the validity of the form
-    const { formData, errors } = useFormData(target);
-
-    // If errors exist, show them
-    if (errors) {
-      formErrors.value = errors;
-
+    // Basic validation
+    if (!email.value) {
+      formErrors.value = {
+        title: "Please fill in all fields",
+        message: "Email is required.",
+      };
       return;
     }
 
@@ -49,7 +53,7 @@ async function createAccount({ target }) {
     await $fetch("/auth/signup", {
       method: "POST",
       body: {
-        email: formData.get("email"),
+        email: email.value,
       },
     })
       .then((response) => {
@@ -58,7 +62,7 @@ async function createAccount({ target }) {
       .catch((error) => {
         formErrors.value = {
           title: "Account creation failed",
-          message: error.data.message,
+          message: error.data?.message || "An error occurred",
         };
       });
   });

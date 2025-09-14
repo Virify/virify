@@ -16,19 +16,16 @@
           #side-images="{ selectedIndex, goToSlide, images: allImages }"
         >
           <div class="premium-side-images">
-             <nuxt-img
+             <AtomsCloudFlareImage
               v-for="(image, index) in getRotatedImages(allImages, selectedIndex)"
               :key="`${selectedIndex}-${index}`"
               :src="image.src"
+              variant="thumbnail"
               class="premium-side-image"
               :class="{ active: image.isActive }"
               :alt="image.alt"
               @click="goToSlide(image.originalIndex)"
-              :width="200"
-              :height="200"
-              fit="cover"
-              quality="80"
-              placeholder="/img/preload.svg"
+              :placeholder="true"
             />
           </div>
         </template>
@@ -257,7 +254,7 @@
 
     <!-- Mobile Action Buttons -->
     <template #mobile-actions>
-      <!-- Enquiry button for mobile -->
+      <!-- Contact button for mobile -->
       <div class="premium-mobile-actions">
         <OrganismsListingCardNewView :listing-id="listing.id">
           <span class="| button button-bordered button-full body-sm">View</span>

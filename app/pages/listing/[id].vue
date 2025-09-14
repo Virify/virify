@@ -164,7 +164,10 @@
   <div class="p-listing | container">
     <OrganismsRelevantListings type="similar" :listing-id="String(route.params?.id)" :address="similarListingsAddress" />
   </div>
-
+  <!-- Trending Listings -->
+  <div class="p-listing | container">
+    <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
+  </div>
 </template>
 
 
@@ -175,19 +178,28 @@ const { trackListingView } = useAnalytics();
 const route = useRoute();
 
 /**
- *  Fetch listing
+ *  Fetch and validate listing
  */
-const { data: listingData, status } = await useAsyncData(
-  `listing-${route.params?.id}`,
-  () => {
-    return $fetch<{ listing: any }>(`/api/listing/${route.params?.id}`);
-  },
-  {
-    deep: false,
+async function fetchListing(id: string) {
+  try {
+    const response = await $fetch<{ listing: any }>(`/api/listing/${id}`);
+    if (!response?.listing) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Listing not found'
+      });
+    }
+    return response;
+  } catch (error: any) {
+    throw createError({
+      statusCode: error.statusCode || 404,
+      statusMessage: 'Listing not found'
+    });
   }
-);
+}
 
-const listing = computed(() => listingData.value?.listing);
+const listingData = await fetchListing(route.params?.id as string);
+const listing = computed(() => listingData.listing);
 
 const similarListingsAddress = computed(() => {
   return listing.value?.property?.address ? {
@@ -250,7 +262,19 @@ const images = computed(() => {
     }));
 });
 
-const galleryImages = computed(() => formatGalleryImages(images.value));
+const galleryImages = computed(() => {
+  return images.value.map((item, index) => ({
+    src: item.image,
+    alt: (() => {
+      try {
+        const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+        return metadata?.alt || `Property image ${index + 1}`;
+      } catch {
+        return `Property image ${index + 1}`;
+      }
+    })()
+  }));
+});
 
 /**
  *  Toggle media visibility
@@ -325,7 +349,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
 

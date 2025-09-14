@@ -1,14 +1,5 @@
 import { getFullListingById } from "~~/layers/database/server/utils/listing";
 
-// Helper to fetch cached listing (1 year)
-const getCachedListing = defineCachedFunction(async (id: number) => {
-  return await getFullListingById(id);
-}, {
-  maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
-  name: 'listing',
-  getKey: (id) => `listing:${id}`,
-});
-
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
   if (!id) {
@@ -18,8 +9,23 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Fetch cached listing
-  const listing = await getCachedListing(Number(id));
+  const storage = useStorage('cache:listing');
+  const cacheKey = `listing:${id}`;
+  
+  // Try to get from cache first
+  let listing = await storage.getItem(cacheKey);
+  
+  if (!listing) {
+    // Fetch from database if not in cache
+    listing = await getFullListingById(Number(id));
+    
+    if (listing) {
+      // Cache for 1 year
+      await storage.setItem(cacheKey, listing, {
+        ttl: 1000 * 60 * 60 * 24 * 365
+      });
+    }
+  }
 
   if (!listing) {
     throw createError({

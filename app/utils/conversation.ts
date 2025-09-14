@@ -248,3 +248,99 @@ export const sortConversationsByUnreadAndRecency = (
     return bTime - aTime; // Most recent first
   });
 };
+
+/**
+ * Sort and filter conversations based on the specified criteria
+ * 
+ * @param conversations - Array of conversations to sort/filter
+ * @param sortBy - The sorting/filtering criteria
+ * @param userId - The current user's ID
+ * @returns Sorted/filtered conversations array
+ */
+export const sortConversations = (
+  conversations: ConversationWithUserAndMessages[], 
+  sortBy: string, 
+  userId?: number
+): ConversationWithUserAndMessages[] => {
+  const conversationsCopy = [...conversations];
+
+  switch (sortBy) {
+    case "all":
+      // Sort conversations using utility function (default behavior)
+      return sortConversationsByUnreadAndRecency(conversationsCopy, userId);
+    
+    case "unread":
+      // Show only unread conversations
+      return conversationsCopy
+        .filter(conversation => {
+          // Check if there are unread messages for the current user
+          return conversation.messages?.some(message => 
+            !message.isRead && message.receiverId === userId
+          );
+        })
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
+    case "read":
+      // Show only conversations with no unread messages for the current user
+      return conversationsCopy
+        .filter(conversation => {
+          // Check if there are NO unread messages for the current user
+          return !conversation.messages?.some(message => 
+            !message.isRead && message.receiverId === userId
+          );
+        })
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
+    case "recent":
+      // Sort by most recent updated conversation
+      return conversationsCopy.sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+    
+    case "oldest":
+      // Sort by oldest updated conversation
+      return conversationsCopy.sort((a, b) => 
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+      );
+    
+    case "received":
+      // Show only conversations where current user is the receiver
+      return conversationsCopy
+        .filter(conversation => conversation.receiver?.id === userId)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
+    case "sent":
+      // Show only conversations where current user is the sender
+      return conversationsCopy
+        .filter(conversation => conversation.sender?.id === userId)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    
+    default:
+      // Default to all/relevance sorting
+      return sortConversationsByUnreadAndRecency(conversationsCopy, userId);
+  }
+};
+
+/**
+ * Get newly-added messages between two lengths and return only those that are unread and sent by other users
+ *
+ * @param conversation - Conversation object
+ * @param oldLen - Previous length of the messages array
+ * @param newLen - New length of the messages array
+ * @param currentUserId - ID of current user
+ * @returns Array of messages that were newly added and need marking
+ */
+export const getNewUnreadMessagesFromOthers = (
+  conversation: ConversationWithUserAndMessages | null | undefined,
+  oldLen: number | undefined | null,
+  newLen: number | undefined | null,
+  currentUserId?: number | string | null
+): MessageWithUser[] => {
+  if (!conversation || !Array.isArray(conversation.messages)) return [];
+  if (!oldLen || !newLen || newLen <= oldLen) return [];
+
+  const start = oldLen;
+  const added = conversation.messages.slice(start, newLen);
+
+  return added.filter(m => !m.isRead && m.senderId !== currentUserId);
+};

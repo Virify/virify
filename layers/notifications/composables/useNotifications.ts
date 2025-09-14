@@ -6,6 +6,7 @@ const aggregates = ref<UserItemsAggregates>({
   notes: 0,
   enquiries: 0,
   locations: 0,
+  listings: 0,
   unreadMessages: 0,
   notifications: 0,
   messages: 0,
