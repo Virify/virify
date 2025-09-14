@@ -30,6 +30,9 @@ defineProps<Props>()
   .a-note-button {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: var(--size-24);
+    height: var(--size-24);
     transition: color var(--animation-fast);
 
     :where(&):hover {
