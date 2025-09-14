@@ -26,17 +26,15 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
-  entry: UserSavedLocation
-}
-
+interface Props { entry: UserSavedLocation }
 const props = defineProps<Props>()
+const emit = defineEmits<{ (e:'updated', name:string): void; (e:'deleted', id:number): void }>()
 
 /**
  *  Check if location name is updated
  */
 const locationValue = defineModel({
-  default: (props) => {
+  default: (props: Props) => {
     const { name } = asObject(props.entry)
 
     return name as string
@@ -53,7 +51,7 @@ const isUpdated = computed(() => {
  *  Manage entries
  */
 const { isPending: isDeleting, setPendingWhile: setPendingWhileDeleting } = usePending()
-const { addEntry, deleteEntry } = useSavedLocation();
+const { addEntry, deleteEntry, updateEntryName } = useSavedLocation();
 
 const $input = useTemplateRef('$input')
 
@@ -62,6 +60,7 @@ function removeLocation() {
 
   setPendingWhileDeleting(async () => {
     await deleteEntry(id as number)
+  emit('deleted', id as number)
   })
 }
 
@@ -84,7 +83,13 @@ function updateLocation() {
   }
 
   setPendingWhile(async () => {
-    await addEntry({ ...entry, ...{ name } } as UserSavedLocation)
+    if (props.entry?.id) {
+      await updateEntryName(props.entry.id as number, name)
+      emit('updated', name)
+    } else {
+      await addEntry({ ...props.entry, name } as UserSavedLocation)
+      emit('updated', name)
+    }
   })
 }
 </script>
@@ -109,6 +114,7 @@ function updateLocation() {
     gap: var(--size-10);
     line-height: var(--lineheight-sm);
     padding-inline: var(--size-8);
+    padding-top: var(--size-8);
 
     svg {
       width: var(--size-20);

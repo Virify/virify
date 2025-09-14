@@ -174,12 +174,12 @@ export async function getConversationById(conversationId: number, userId: number
 }
 
 /**
- * Get listing IDs that a user has sent enquiries for
+ * Get listing IDs that a user has started conversations for
  *
  * @param userId User ID
- * @returns Array of listing IDs the user has enquired about
+ * @returns Array of listing IDs the user has contacted about
  */
-export async function getSentEnquiryListingIds(userId: number): Promise<number[]> {
+export async function getSentConversationListingIds(userId: number): Promise<number[]> {
   const sentListingIds = await prisma.conversation.findMany({
     where: {
       sender: { id: userId },

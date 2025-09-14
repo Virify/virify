@@ -15,10 +15,11 @@
 
 .o-header {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top);
   z-index: 30;
   background: var(--blue-400);
   border-bottom: var(--size-4) solid var(--secondary-400);
+  height: 100%;
 
   &-container {
     display: flex;
@@ -39,10 +40,4 @@
   }
 }
 
-/**
- *  @TODO: refactor
- */
-body:has(.o-searchform-fixed) .o-header-container {
-  margin-bottom: calc(var(--header-offset) + var(--size-24));
-}
 </style>

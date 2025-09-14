@@ -1,6 +1,5 @@
 import { ViewsDialogLogin } from "#components";
 import { createSharedComposable } from "@vueuse/core";
-import type { UserFavouriteListingCard } from "~~/shared/types/user-favourite-listing";
 
 /**
  * Favourites Composable
@@ -12,24 +11,44 @@ export const useFavourites = createSharedComposable(() => {
   const { showDialog } = useDialog();
   const { showToast } = useToast();
 
+  // Lightweight shared search / category state (favourites + notes share util)
+  const searchTerm = ref("");
+  const categoryFilter = ref<"all" | "sale" | "rental">("all");
+
   /**
    * State Management
    */
   const { data: favourites, refresh: refreshFavourites } = useAsyncData<UserFavouriteListingCard[]>(
-    "favourites", 
+    "favourites",
     () => {
       // Only make API call if user is logged in
       if (!loggedIn.value) {
         return Promise.resolve([]);
       }
       return useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/");
-    }, 
-    { 
-      default: () => [], 
+    },
+    {
+      default: () => [],
       watch: [loggedIn],
-      server: false // Prevent server-side execution
+      server: false, // Prevent server-side execution
     }
   );
+
+  const saleFavourites = computed(() => {
+    return favourites.value.filter((item) => item.listing.saleListing);
+  });
+
+  const rentalFavourites = computed(() => {
+    return favourites.value.filter((item) => item.listing.rentalListing);
+  });
+
+  // Filter favourites (category first then text) via shared util
+  const filteredFavourites = computed(() => {
+    let list = favourites.value || [];
+    if (categoryFilter.value === "sale") list = list.filter((f) => f.listing.saleListing);
+    else if (categoryFilter.value === "rental") list = list.filter((f) => f.listing.rentalListing);
+    return filterListingItems(list, searchTerm.value);
+  });
 
   const recentFavourites = computed(() => {
     return favourites.value
@@ -38,7 +57,7 @@ export const useFavourites = createSharedComposable(() => {
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         return createdAt >= sevenDaysAgo;
       })
-      .slice(0, 5);
+      .slice(0, 6);
   });
 
   /**
@@ -73,7 +92,7 @@ export const useFavourites = createSharedComposable(() => {
         body: { listingId },
       });
       await refreshFavourites();
-      
+
       // Show success toast
       showToast("Added to favourites", { type: "success" });
     } catch (error) {
@@ -98,7 +117,7 @@ export const useFavourites = createSharedComposable(() => {
       });
       if (result) {
         await refreshFavourites();
-        
+
         // Show success toast
         showToast("Removed from favourites", { type: "success" });
       }
@@ -137,5 +156,11 @@ export const useFavourites = createSharedComposable(() => {
     toggleFavourite,
     favourites,
     recentFavourites,
+    saleFavourites,
+    rentalFavourites,
+    filteredFavourites,
+    refreshFavourites,
+    searchTerm,
+    categoryFilter,
   };
 });

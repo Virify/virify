@@ -10,6 +10,7 @@ html {
   /* 1 */
   -webkit-text-size-adjust: 100%;
   box-sizing: border-box;
+  height: 100dvh;
   /* 2 */
 }
 
@@ -20,6 +21,7 @@ html {
  */
 body {
   margin: 0;
+  height: 100dvh;
 }
 
 /**
@@ -348,6 +350,14 @@ template {
  */
 h1, h2, h3, h4, h5, h6,
 button {
+  color: inherit;
+  -webkit-text-fill-color: inherit;
+}
+
+/**
+ * Prevent iOS Safari from applying system blue color to select elements
+ */
+select {
   color: inherit;
   -webkit-text-fill-color: inherit;
 }

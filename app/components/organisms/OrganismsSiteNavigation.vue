@@ -1,28 +1,40 @@
 <template>
   <nav class="o-site-navigation">
-    <ul class="o-site-navigation-list">
-      <template v-if="!loggedIn">
+    <div class="o-site-navigation__wrapper">
+      <ul class="o-site-navigation-list">
+        <!-- Guides always shows first -->
         <li>
-          <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm button button-tertiary button-sm">Log in</button>
+          <nuxt-link to="/guides" class="o-site-navigation-link | button button-monochrome button-sm">Guides</nuxt-link>
         </li>
-        <li>
-          <button @click.prevent="openForgotPassword"
-            class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
-        </li>
-      </template>
 
-      <li v-else>
-        <MoleculesNavPopover :options="navigationGroups" />
-      </li>
-    </ul>
+        <!-- Not logged in: show Login and Signup -->
+        <template v-if="!isLoggedIn">
+          <li>
+            <button @click.prevent="openLogin" class="o-site-navigation-link | body-sm button button-tertiary button-sm">Login</button>
+          </li>
+          <li>
+            <button @click.prevent="openSignup" class="o-site-navigation-link | button button-monochrome button-sm">Signup</button>
+          </li>
+        </template>
+
+        <!-- Logged in: show Account and Logout -->
+        <template v-else>
+          <li>
+            <nuxt-link to="/account" class="o-site-navigation-link | button button-monochrome button-sm">Account</nuxt-link>
+          </li>
+          <li>
+            <button @click.prevent="logout" class="o-site-navigation-link | button button-monochrome button-sm">Logout</button>
+          </li>
+        </template>
+      </ul>
+    </div>
   </nav>
 </template>
 
 <script setup>
-const { loggedIn } = useUserSession()
-const { showDialog } = useDialog()
-import { ViewsDialogSignup, ViewsDialogLogin } from '#components';
-import { navigationGroups } from '~/utils/account/navigation';
+const { loggedIn, clear } = useUserSession();
+const { showDialog } = useDialog();
+import { ViewsDialogSignup, ViewsDialogLogin } from "#components";
 
 function openLogin() {
   showDialog({
@@ -30,11 +42,18 @@ function openLogin() {
   });
 }
 
-function openForgotPassword() {
+function openSignup() {
   showDialog({
     component: ViewsDialogSignup,
   });
 }
+
+async function logout() {
+  await clear();
+  navigateTo("/");
+}
+
+const isLoggedIn = computed(() => loggedIn.value);
 </script>
 
 <style lang="scss">
@@ -43,6 +62,11 @@ function openForgotPassword() {
 .o-site-navigation {
   color: var(--monochrome-900);
   background-color: var(--background-400);
+}
+
+.o-site-navigation__wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .o-site-navigation-list {

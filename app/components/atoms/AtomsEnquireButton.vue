@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogEnquiry, ViewsDialogLogin } from '#components'
+import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
 
 interface Props {
   listingId: number;
@@ -16,7 +16,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { hasEnquired, loadingEnquiries } = useEnquiry();
+const { hasConversation, loading: loadingConversation } = useConversations();
 const { showDialog } = useDialog();
 const { user } = useUserSession();
 
@@ -33,7 +33,7 @@ const isSelf = computed(() => {
 const isEnquiryDisabled = computed(() => {
   const { listingId } = asObject(props)
 
-  return !safeUserId.value || hasEnquired(listingId) || loadingEnquiries.value || isSelf.value
+  return !safeUserId.value || hasConversation(listingId) || loadingConversation.value || isSelf.value
 });
 
 const defaultContent = computed(() => {
@@ -41,7 +41,7 @@ const defaultContent = computed(() => {
 
   return isSelf.value
     ? 'Enquire'
-    : hasEnquired(listingId)
+    : hasConversation(listingId)
       ? 'Enquiry Sent'
       : 'Enquire'
 });
@@ -58,7 +58,7 @@ function handleEnquire() {
 
   if (safeUserId.value !== null && !isSelf.value) {
     showDialog({
-      component: ViewsDialogEnquiry,
+      component: ViewsDialogConversation,
       props: { listingId: props.listingId, receiverId: safeUserId.value },
     });
   }
