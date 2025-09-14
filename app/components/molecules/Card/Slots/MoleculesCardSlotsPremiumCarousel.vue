@@ -16,7 +16,7 @@
         <button @click.prevent="goToSlide(slideIndex)" class="m-card-slots-gallery-carousel__thumbnail-button" :class="{
           'm-card-slots-gallery-carousel__thumbnail-button--active': slideIndex === currentSlide - 1
         }">
-          <nuxt-img :src="slide?.image" :alt="slide?.alt" class="m-card-slots-gallery-carousel__thumbnail"
+          <AtomsCloudFlareImage :src="slide?.image" :alt="slide?.alt" class="m-card-slots-gallery-carousel__thumbnail"
             loading="lazy" />
         </button>
       </MoleculesNewCarousel>
