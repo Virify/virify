@@ -53,6 +53,7 @@ export type ExtendedMapTilerMap = MaptilerMap & {
   getSource(id: string): any;
   addSource(id: string, source: any): void;
   removeSource(id: string): void;
+  addImage(id: string, options: Record<string, unknown>): void
   getLayer(id: string): any;
   addLayer(layer: any): void;
   removeLayer(id: string): void;
@@ -61,6 +62,9 @@ export type ExtendedMapTilerMap = MaptilerMap & {
   jumpTo(options: { center?: [number, number]; zoom?: number; animate?: boolean }): void;
   getCanvas(): HTMLCanvasElement;
   queryRenderedFeatures(pointOrBox?: any, options?: any): any[];
+  onReadyAsync(): Promise<unknown>;
+  on(event: string, layer: string, listener: Function): void
+  easeTo(options: { center: unknown, zoom: unknown, [key: string]: unknown }): void
 };
 
 /**

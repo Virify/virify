@@ -9,19 +9,22 @@
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
-          v-model="searchState.radius" :options="selectOptionRadius" />
+          v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
       </fieldset>
 
-      <Transition name="m-ai-search-form-location">
-        <div role="presentation" v-show="popoverExpanded">
-          <MoleculesAutocompletePopover :search-value="autocompleteValue" @location-selected="handleLocationSelected" />
-        </div>
-      </Transition>
+      <client-only>
+        <Transition name="m-ai-search-form-location">
+          <div role="presentation" v-show="popoverExpanded">
+            <MoleculesAutocompletePopover :search-value="autocompleteValue"
+              @location-selected="handleLocationSelected" />
+          </div>
+        </Transition>
+      </client-only>
     </div>
 
     <AtomsSelect name="radius" id="radius" aria-label="Location radius"
       class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
-      v-model="searchState.radius" :options="selectOptionRadius" />
+      v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
   </form>
 </template>
 
@@ -48,13 +51,17 @@ function updateAutocompleteValue({ target }: Event) {
  *  Global and input state
  */
 const { searchState } = useSearchState()
-const { location } = toRefs(searchState.value)
 
-const locationQuery = ref(location?.value?.place_name_en || '')
+const locationQuery = computed(() => {
+  const { location } = asObject(searchState.value)
+
+  return location?.place_name_en || ''
+})
+
 /**
  *  Handle autocomplete events
  */
-const { setLocation } = useSearchState()
+const { setLocation, setLocationRadius } = useSearchState()
 const { enhanceWithBoundaryPolygon } = useMap();
 
 async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
@@ -64,14 +71,17 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
   const enhancedLocation = await enhanceWithBoundaryPolygon(locationUnref)
     .catch(() => locationUnref);
 
-  // Get place name from location
-  const { place_name_en } = asObject(enhancedLocation)
-
-  // Update current location query
-  locationQuery.value = place_name_en as string
-
   // Update global state
   setLocation(enhancedLocation, hidePopover)
+}
+
+/**
+ *  Update radius via state when updated
+ */
+function handleRadiusSelected() {
+  const { radius } = asObject(searchState.value)
+
+  setLocationRadius(Number(radius) || 0)
 }
 
 /**

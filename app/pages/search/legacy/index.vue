@@ -22,13 +22,7 @@
       </div>
       <div class="dual-view-container" v-show="content === 'dual' || content === 'map'">
         <div class="dual-view-map" :class="{ 'map-fullscreen': content === 'map' }">
-          <Map
-            :markers="searchListings"
-            :zoom="mapZoomLevel"
-            :center="mapCenterCoordinates"
-            :interactive="true"
-            :mapId="GLOBAL_MAP_ID"
-          />
+          <Map :markers="searchListings" :zoom="mapZoomLevel" :center="mapCenterCoordinates" :interactive="true" />
         </div>
         <div class="dual-view-listings" v-show="content === 'dual'">
           <MoleculesListingCardHorizontal

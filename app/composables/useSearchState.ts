@@ -23,58 +23,57 @@ function createSearchState() {
 
   // Generate or restore session ID (unique per tab)
   const initSessionId = () => {
-    if (import.meta.client) {
-      sessionId.value =
-        sessionStorage.getItem("search-session-id") || crypto.randomUUID();
-      sessionStorage.setItem("search-session-id", sessionId.value);
-    }
+    if (!import.meta.client) return
+
+    sessionId.value =
+      sessionStorage.getItem("search-session-id") || crypto.randomUUID();
+
+    sessionStorage.setItem("search-session-id", sessionId.value);
   };
 
   // Save to KV storage
-  function saveToKV() { }
-  // const saveToKV = async (state: SearchState) => {
-  //   if (!sessionId.value || isLoading.value) {
-  //     return;
-  //   }
+  const saveToKV = async (state: SearchState) => {
+    if (!sessionId.value || isLoading.value) {
+      return;
+    }
 
-  //   try {
-  //     await $fetch("/api/search-state", {
-  //       method: "POST",
-  //       body: { sessionId: sessionId.value, state },
-  //     });
-  //   } catch (error) { }
-  // };
+    try {
+      await $fetch("/api/search-state", {
+        method: "POST",
+        body: { sessionId: sessionId.value, state },
+      });
+
+    } catch (error) { }
+  };
 
   // Load from KV storage
-  function loadFromKV() { }
-  // const loadFromKV = async (): Promise<SearchState | null> => {
-  //   if (!sessionId.value) {
-  //     return null;
-  //   }
+  const loadFromKV = async (): Promise<SearchState | null> => {
+    if (!sessionId.value) {
+      return null;
+    }
 
-  //   try {
-  //     const stored = await $fetch("/api/search-state", {
-  //       query: { sessionId: sessionId.value },
-  //     });
+    try {
+      const stored = await $fetch("/api/search-state", {
+        query: { sessionId: sessionId.value },
+      });
 
-  //     return (stored as unknown as SearchState) || null;
-  //   } catch (error) {
-  //     return null;
-  //   }
-  // };
+      return (stored as unknown as SearchState) || null;
+    } catch (error) {
+      return null;
+    }
+  };
 
   // Clear from KV storage
-  function clearKV() { }
-  // const clearKV = async () => {
-  //   if (!sessionId.value) return;
+  const clearKV = async () => {
+    if (!sessionId.value) return;
 
-  //   try {
-  //     await $fetch("/api/search-state", {
-  //       method: "DELETE",
-  //       query: { sessionId: sessionId.value },
-  //     });
-  //   } catch (error) { }
-  // };
+    try {
+      await $fetch("/api/search-state", {
+        method: "DELETE",
+        query: { sessionId: sessionId.value },
+      });
+    } catch (error) { }
+  };
 
   // Initialize on client side
   if (import.meta.client) {
@@ -211,7 +210,7 @@ function createSearchState() {
   /**
    *  Manage state directly
    */
-  function setResults(value: unknown[], callback?: () => void) {
+  function setResults(value: any[], callback?: () => void) {
     // Check value is valid
     if (!Array.isArray(value)) return
 
@@ -228,16 +227,19 @@ function createSearchState() {
   const updateState = async (updates: Partial<SearchState>) => {
     // @TODO maybe replace this with Defu to better handle nested merges?
     Object.assign(searchState.value, updates);
+
+    // Save state
     await saveToKV(searchState.value);
   };
 
+  // @TODO add a button to reset form, then test functionality
   const clearState = async () => {
     searchState.value = { ...defaultState };
     await clearKV();
   };
 
-  const refreshFromKV = async (): Promise<SearchState | null> => {
-    if (!import.meta.client) return null;
+  const refreshFromKV = async (): Promise<void> => {
+    if (!import.meta.client) return;
 
     setSearchPending(true)
 
@@ -246,12 +248,17 @@ function createSearchState() {
     setSearchPending(false)
 
     if (stored) {
-      searchState.value = { ...defaultState, ...stored };
+      const newState = { ...defaultState, ...stored }
 
-      return stored;
+      // Save new state to ref
+      searchState.value = newState;
+
+      // Update AI query analysis
+      // @TODO this needs a refactor to reduce coupling
+      const { queryAnalysis } = useAi()
+
+      queryAnalysis.value = newState.queryAnalysis
     }
-
-    return null;
   };
 
   return {

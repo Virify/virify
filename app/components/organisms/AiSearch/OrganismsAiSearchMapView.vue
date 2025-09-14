@@ -1,7 +1,6 @@
 <template>
   <div class="ai-search-map-view">
-    <Map ref="mapRef" :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true"
-      :mapId="GLOBAL_MAP_ID" />
+    <Map ref="mapRef" :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true" />
 
     <!-- Loading overlay for map view -->
     <div v-if="isSearching || !results || results.length === 0" class="ai-search-map-view__overlay | body-lg">

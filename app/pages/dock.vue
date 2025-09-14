@@ -6,8 +6,9 @@
       '| container': showGrid
     }">
       <template #left v-if="showGrid">
-        <OrganismsResults v-if="isLoading || results.length" :results :is-loading />
-        <MoleculesAiSearchNoResults v-else :last-search-query="lastSearchQuery" />
+        <OrganismsResults v-if="!isMounted || isLoading || results.length" :results
+          :is-loading="!isMounted || isLoading" />
+        <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
 
       <template #right v-if="showMap">
@@ -22,11 +23,13 @@
 <script setup>
 const {
   isLoading,
+  refreshFromKV,
   searchState,
   setResults,
   setQueryAnalysis,
   setSearchPending,
-  setViewMode
+  setViewMode,
+  setSortOrder
 } = useSearchState()
 
 /**
@@ -49,16 +52,16 @@ const showMap = computed(() => {
 })
 
 /**
- *  No results message
- */
-const { lastSearchQuery, updateSort } = useAiSearchPage()
-
-/**
  *  Handle searches
  */
-const { location, radius, sortBy, query, viewMode } = toRefs(searchState.value)
+const location = computed(() => asObject(searchState.value).location)
+const radius = computed(() => asObject(searchState.value).radius)
+const sortBy = computed(() => asObject(searchState.value).sortBy)
+const viewMode = computed(() => asObject(searchState.value).viewMode)
+const query = computed(() => asObject(searchState.value).query)
+
 const { setPendingWhile } = usePending()
-const { aiSearch } = useAiSearchPage();
+const { aiSearch } = useAi();
 
 watch([location, radius, query], () => {
   // Get current location, radius
@@ -76,18 +79,20 @@ watch([location, radius, query], () => {
 
     const { queryAnalysis, results } = await aiSearch(location, radius, query, 1);
 
+    // Remove loading state
+    setSearchPending(false)
+
+    // Save results
     setQueryAnalysis(queryAnalysis)
     setResults(results)
   }).finally(() => {
+    // Remove loading state, e.g. in case of error
     setSearchPending(false)
   })
 }, { deep: true })
 
 watch(sortBy, (newValue) => {
-  // @TODO
-  // The KV store needs fixing before this can be activated
-  console.log('@TODO: sort results by', newValue)
-  // updateSort(newValue)
+  setSortOrder(newValue)
 })
 
 watch(viewMode, (layout) => {
@@ -110,10 +115,22 @@ const results = computed(() => {
   return results
 })
 
+/**
+ *  Load search state on page mounted
+ */
+const isMounted = ref(false)
+
+onMounted(() => {
+  isMounted.value = true
+
+  refreshFromKV()
+})
+
 </script>
 
 <style lang="scss">
 .p-dock {
+  min-height: calc(100vh - var(--header-height));
 
   &--has-grid {
     padding: var(--size-16) 0;

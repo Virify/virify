@@ -1,35 +1,49 @@
 import { Marker } from "@maptiler/sdk";
+import { useDebounceFn } from "@vueuse/core";
 
 export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   const vueApp = useNuxtApp();
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
 
   /**
    * Private helper to create and add a single SDK marker to the map and instance.
    */
-  function _createAndAddSdkMarker(map: ExtendedMapTilerMap, markerData: MapMarker, instance: MapInstance): Marker {
-    const [firstImageObject] = asArray(markerData.image, true)
+  function _createMarkerWithPopup(markerData?: ListingCardType): Marker {
+    const formattedMarker = formatMarker(markerData)
+
+    const [firstImageObject] = asArray(formattedMarker.image, true)
     const { image } = asObject(firstImageObject)
 
-    const markerWrapper = renderMarker(markerData.id, markerData.price, markerData.tier, image as string, vueApp, markerData.priceType);
-    const newSdkMarker = new sdk.Marker({
-      element: markerWrapper,
+    // Create marker Vue element
+    const marker = renderMarker({
+      id: formattedMarker.id,
+      price: formattedMarker.price,
+      tier: formattedMarker.tier,
+      image: image as string,
+      priceType: formattedMarker.priceType,
+      vueApp,
+    });
+
+    // Create popup Vue element
+    const popup = renderPopup(formattedMarker, vueApp);
+
+    // Convert marker to SDK
+    const sdkMarker = new sdk.Marker({
+      element: marker,
       anchor: "bottom",
     });
-    newSdkMarker.setLngLat([markerData.lon, markerData.lat]);
-    const popup = renderPopup(markerData, vueApp);
-    newSdkMarker.setPopup(popup);
-    newSdkMarker.addTo(map);
-    instance.markers.push(newSdkMarker);
-    return newSdkMarker;
+
+    // Set the appropriate lat/long and popup
+    sdkMarker.setLngLat([formattedMarker.lon, formattedMarker.lat]);
+    sdkMarker.setPopup(popup);
+
+    return sdkMarker
   }
 
 
   /**
    * Adds a marker to the map instance
-   *
-   * @param map The map to add the marker to
-   * @param marker The marker to add
+   * @deprecated this method does not appear to be used
    */
   function addMarker(map: ExtendedMapTilerMap, marker: Array<{ lat: number; lon: number }> | null | undefined): Marker | undefined {
     const instance = findMapInstance(map, mapCache);
@@ -47,11 +61,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
 
   /**
    * Adds multiple markers to the map instance for a specific feature
-   *
-   * @param map The map to add markers to
-   * @param markers Array of markers to add
-   * @param featureId The ID of the feature these markers belong to
-   * @returns Array of created marker objects
+   * @deprecated this method does not appear to be used
    */
   function addMarkersForFeature(map: ExtendedMapTilerMap, markersData: MapMarker[], featureId: string): Marker[] {
     const instance = findMapInstance(map, mapCache);
@@ -80,34 +90,189 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
    * @param markers Array of markers to add
    * @returns Array of newly created marker objects
    */
-  function addMarkers(map: ExtendedMapTilerMap, markersData: MapMarker[]): Marker[] {
+  function createMapSource(markers: ListingCardType[] | undefined) {
+    const markersArray: ListingCardType[] = asArray(markers)
+
+    return {
+      type: 'FeatureCollection',
+      features: markersArray.map((marker) => {
+        const { id, property } = asObject(marker)
+        const { lat, lon } = asObject(property?.address)
+
+        return {
+          type: 'Feature',
+          properties: { id },
+          geometry: {
+            type: 'Point',
+            coordinates: [lon, lat]
+          }
+        }
+      })
+    }
+  }
+
+  async function addMarkers(map: ExtendedMapTilerMap, markers?: ListingCardType[]) {
     const instance = findMapInstance(map, mapCache);
+
     if (!instance) {
       console.error("[Map] Instance not found");
+
       return [];
     }
 
-    // Sort markers by tier priority: BASIC first (bottom), then FEATURED, then PREMIUM last (top)
-    const sortedMarkersData = [...markersData].sort((a, b) => {
-      const getTierPriority = (tier?: string) => {
-        switch (tier) {
-          case "BASIC": return 1;
-          case "FEATURED": return 2;
-          case "PREMIUM": return 3;
-          default: return 1; // Default to BASIC priority
-        }
-      };
-      return getTierPriority(a.tier) - getTierPriority(b.tier);
-    });
+    // Wait for map to be ready
+    await map.onReadyAsync()
 
-    const addedSdkMarkers: Marker[] = [];
-    for (const markerData of sortedMarkersData) {
-      const newSdkMarker = _createAndAddSdkMarker(map, markerData, instance);
-      addedSdkMarkers.push(newSdkMarker);
+    // Create marker data
+    const markerData = createMapSource(markers)
+
+    // Set (or update) sources
+    const existingListings = map.getSource('property_listings')
+
+    // If a source already exists, simple update the data
+    if (existingListings) {
+      existingListings.setData(markerData)
+
+      return
     }
 
-    console.log(`[Map] Added ${addedSdkMarkers.length} general markers to map instance`);
-    return addedSdkMarkers;
+    // Else add a new source
+    map.addSource('property_listings', {
+      type: 'geojson',
+      data: markerData,
+      cluster: true,
+      clusterRadius: 100 // In pixels
+    })
+
+    map.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'property_listings',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': [
+          'step',
+          ['get', 'point_count'],
+          '#FEC7B0', // Colour...
+          2, // ...when 2 properties
+          '#FD8E61', // Colour...
+          5, // ...when less than 5 properties
+          '#FC7239' // Else when more than 5 properties
+        ],
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          15, // Radius 20px
+          2, // When 2 properties
+          20, // Radius 30px
+          5, // When less than 5 properties
+          30 // Else radius 40px when more than 5 properties
+        ]
+      },
+    })
+
+    map.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'property_listings',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-size': 16
+      }
+    })
+
+    map.addLayer({
+      id: 'unclustered-count',
+      type: 'circle',
+      source: 'property_listings',
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        'circle-radius': 2,
+        'circle-color': 'transparent',
+      }
+    })
+
+    // Zoom into cluster on click
+    map.on('click', 'clusters', async (e: { point: unknown }) => {
+      const [feature] = map.queryRenderedFeatures(e.point, {
+        layers: ['clusters']
+      });
+
+      // Get cluster ID, coordinates
+      const { cluster_id } = asObject(feature?.properties)
+      const { coordinates } = asObject(feature?.geometry)
+
+      // Get the cluster expansion zoom
+      const zoom = await map
+        .getSource('property_listings')
+        .getClusterExpansionZoom(cluster_id);
+
+      // Animate to cluster position
+      map.easeTo({
+        center: coordinates,
+        zoom
+      });
+    })
+
+    // Show pointer on cluster hover
+    map.on('mouseenter', 'clusters', () => {
+      map.getCanvas().style.cursor = 'pointer'
+    })
+
+    map.on('mouseleave', 'clusters', () => {
+      map.getCanvas().style.cursor = ''
+    })
+
+    // Function to get and add unclustered markers
+    const _addUnClusteredMarkers = useDebounceFn(() => {
+      // Get a list of visible markers
+      const unclusteredMarkers = map.queryRenderedFeatures(null, {
+        layers: ['unclustered-count']
+      })
+
+      // Clear any existing markers
+      clearMarkers(map)
+
+      // Get a list of visible IDs
+      // We need to do it this way as the markers added via the
+      // map.addSource() does not allow nested objects
+      const unclusterMarkerIds = asArray(unclusteredMarkers).map((marker) => {
+        const { id } = asObject(marker?.properties)
+
+        return id
+      })
+
+      // Get visible markers
+      const visibleMarkers = asArray(markers).filter(({ id }) => {
+        return unclusterMarkerIds.includes(id)
+      })
+
+      // Log new markers to add
+      for (const visibleMarkerData of visibleMarkers) {
+        const newMarker = _createMarkerWithPopup(visibleMarkerData);
+
+        newMarker.addTo(map);
+        instance.markers.push(newMarker);
+      }
+
+      // Show how many markers added to map
+      console.log(`[Map] Added ${visibleMarkers?.length} unclustered markers to map instance`);
+    }, 200)
+
+    // Add new listeners
+    map.on('data', ({ sourceId }: { sourceId: string }) => {
+      if (sourceId !== 'property_listings') return
+
+      // Show markers
+      _addUnClusteredMarkers()
+
+      // Update on zoom, moveend
+      map.on('zoomend', _addUnClusteredMarkers)
+      map.on('moveend', _addUnClusteredMarkers)
+    })
+
+    console.log(`[Map] Added ${markerData.features?.length} general markers to map instance`);
   }
 
   /**

@@ -20,15 +20,15 @@
     </div>
 
     <!-- Content below header -->
+    <p v-if="description" class="feature-tile__description" :class="{
+      'body-xs': size === 'xs',
+      'body-sm': size === 'sm' || size === 'md',
+    }">{{ description }}</p>
     <div v-if="pills && pills.length" class="feature-tile__pills">
       <AtomsPill v-for="(pill, index) in pills" :key="index" class="feature-tile__pill | body-sm">
         {{ pill }}
       </AtomsPill>
     </div>
-    <p v-else-if="description" class="feature-tile__description" :class="{
-      'body-xs': size === 'xs',
-      'body-sm': size === 'sm' || size === 'md',
-    }">{{ description }}</p>
   </div>
 </template>
 

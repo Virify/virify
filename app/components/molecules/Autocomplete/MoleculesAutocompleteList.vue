@@ -33,6 +33,16 @@ defineProps<Props<T>>()
     border: 0;
     gap: var(--size-14);
 
+    &:first-child {
+      border-top-left-radius: var(--border-radius-lg);
+      border-top-right-radius: var(--border-radius-lg);
+    }
+
+    &:last-child {
+      border-bottom-left-radius: var(--border-radius-lg);
+      border-bottom-right-radius: var(--border-radius-lg);
+    }
+
     &:not(:first-child) {
       border-top: 1px solid var(--border-color-200);
     }

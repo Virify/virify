@@ -141,11 +141,7 @@ const scrollNext = () => carouselRef.value?.scrollNext?.();
 }
 
 .o-relevant-listings {
-  padding-bottom: var(--size-32);
-}
-
-.o-relevant-listings__carousel {
-  margin-top: var(--size-16);
+  padding-bottom: var(--size-16);
 }
 
 .o-relevant-listings__card {

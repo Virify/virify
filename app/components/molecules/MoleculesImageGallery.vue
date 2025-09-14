@@ -9,17 +9,12 @@
           @click="openModal"
         >
           <div class="m-image-gallery__image-container">
-            <nuxt-img
+            <AtomsCloudFlareImage
               :src="image.src"
               :alt="image.alt"
+              variant="card"
               class="m-image-gallery__image"
-              loading="lazy"
-              :width="800"
-              :height="600"
-              fit="cover"
-              quality="85"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px"
-              placeholder="/img/preload.svg"
+              :placeholder="true"
             />
           </div>
         </div>
@@ -53,16 +48,12 @@
           @click="onThumbClick(index)"
         >
           <div class="m-image-gallery__thumb-container">
-            <nuxt-img
+            <AtomsCloudFlareImage
               :src="image.src"
               :alt="image.alt"
+              variant="thumbnail"
               class="m-image-gallery__thumb-image"
-              loading="lazy"
-              :width="175"
-              :height="100"
-              fit="cover"
-              quality="75"
-              placeholder="/img/preload.svg"
+              :placeholder="true"
             />
           </div>
         </button>

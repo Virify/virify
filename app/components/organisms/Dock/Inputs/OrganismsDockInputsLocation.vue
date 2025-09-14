@@ -24,12 +24,17 @@
 
 <script setup lang="ts">
 const { searchState } = useSearchState()
-const { location, radius } = toRefs(searchState.value)
 
 const locationName = computed(() => {
-  const { place_name_en } = asObject(location?.value)
+  const { place_name_en } = asObject(searchState.value?.location)
 
   return place_name_en
+})
+
+const radius = computed(() => {
+  const { radius } = asObject(searchState.value)
+
+  return radius
 })
 
 /**

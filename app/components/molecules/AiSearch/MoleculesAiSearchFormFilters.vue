@@ -14,7 +14,7 @@
       </li>
     </ul>
 
-    <AtomsButton :disabled="!isValid" @click.prevent="searchReset" type="reset"
+    <AtomsButton v-if="!hideReset" :disabled="!isValid" @click.prevent="searchReset" type="reset"
       class="| button button-xs button-delete button-full button-bordered">
       Reset filters
     </AtomsButton>
@@ -25,6 +25,8 @@
 <script setup lang="ts">
 interface Props {
   initialQuery?: string;
+  disabled?: boolean
+  hideReset?: boolean
 }
 
 const props = defineProps<Props>();
@@ -58,7 +60,7 @@ watch(() => props.initialQuery, (newQuery) => {
 /**
  *  Errors
  */
-const isValid = computed(() => unref(searchQuery).length)
+const isValid = computed(() => !props.disabled && unref(searchQuery).length)
 
 /**
  *  Example prompts

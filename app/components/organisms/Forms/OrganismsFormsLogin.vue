@@ -1,10 +1,10 @@
 <template>
   <MoleculesForm method="POST" action="/auth/login" @submit.prevent="loginUser" class="| stacked" :error="formErrors">
     <MoleculesFormField label="Email address" v-slot="{ id }">
-      <AtomsInput :id type="email" name="email" required />
+      <AtomsInput :id v-model="email" type="email" name="email" required />
     </MoleculesFormField>
 
-    <MoleculesFormPassword label="Password" type="password" name="password" required minlength="8" />
+    <MoleculesFormPassword label="Password" v-model="password" type="password" name="password" required minlength="8" />
 
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Log in </AtomsButton>
   </MoleculesForm>
@@ -23,6 +23,12 @@ const { pattern, validityText } = getValidPassword();
 const { isPending, setPendingWhile } = usePending();
 
 /**
+ *  Form data
+ */
+const email = ref('')
+const password = ref('')
+
+/**
  *  Handle errors
  */
 const formErrors = ref();
@@ -37,13 +43,12 @@ async function loginUser({ target }: SubmitEvent) {
     // Clear any existing form errors
     formErrors.value = null;
 
-    // First check the validity of the form
-    const { formData, errors } = useFormData(target);
-
-    // If errors exist, show them
-    if (errors) {
-      formErrors.value = errors;
-
+    // Basic validation
+    if (!email.value || !password.value) {
+      formErrors.value = {
+        title: 'Please fill in all fields',
+        message: 'Email and password are required.',
+      };
       return;
     }
 
@@ -51,8 +56,8 @@ async function loginUser({ target }: SubmitEvent) {
     await $fetch('/auth/login', {
       method: 'POST',
       body: {
-        email: formData?.get('email'),
-        password: formData?.get('password'),
+        email: email.value,
+        password: password.value,
       },
     })
       .then(() => {

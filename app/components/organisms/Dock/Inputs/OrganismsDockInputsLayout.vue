@@ -7,7 +7,7 @@
     <label ref="$labels" v-for="{ key, value, icon } of options" :key
       class="o-dock-inputs-layout__label | font-semibold">
       <input type="radio" class="| visually-hidden" :value="key" v-model="searchState.viewMode" name="results-layout"
-        :aria-label="value" />
+        :aria-label="value" @change="setUpdateViewMode" />
 
       <AtomsIcon :icon />
 
@@ -49,7 +49,12 @@ const options = computed(() => {
  *  Layout state
  */
 const { searchState, setViewMode } = useSearchState()
-const { viewMode } = toRefs(searchState.value)
+
+const viewMode = computed(() => {
+  const { viewMode } = asObject(searchState.value)
+
+  return viewMode
+})
 
 /**
  *  Loading state
@@ -88,6 +93,9 @@ async function updateHighlightPosition() {
   // Update higlight positions accordingly
   highlight.style.width = `${offsetWidth}px`
   highlight.style.left = `${offsetLeft}px`
+
+  // Save new view mode
+  setViewMode(viewMode.value)
 }
 
 watchImmediate(viewMode, updateHighlightPosition)

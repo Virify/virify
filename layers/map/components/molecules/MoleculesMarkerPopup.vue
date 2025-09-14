@@ -26,6 +26,10 @@ defineProps<{
   transform: translateY(-2px) !important;
 }
 
+.maplibregl-popup {
+  z-index: 4;
+}
+
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
   border-bottom-color: var(--monochrome-300) !important;
 }

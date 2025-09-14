@@ -23,6 +23,29 @@ export default defineNuxtPlugin(() => {
   });
 
   if (import.meta.client) {
+    // Set up global message handling for aggregate updates
+    const { handleAggregateUpdate } = useNotifications();
+    const wsComposable = useWebSocketServer();
+
+    const globalWebSocketEvents: WebSocketEvents = {
+      onAggregateUpdate: ({ aggregateType, operation }) => {
+        handleAggregateUpdate({ 
+          type: "aggregate_update",
+          aggregateType, 
+          operation,
+          to: 0, // Not used in handler
+          timestamp: new Date().toISOString()
+        });
+      }
+    };
+
+    // Watch for incoming websocket messages and handle them globally
+    watchEffect(() => {
+      if (ws.data.value && typeof ws.data.value === 'string') {
+        wsComposable.handleOutgoingMessages(ws.data.value, globalWebSocketEvents);
+      }
+    });
+
     watch(
       () => loggedIn.value,
       (newUser) => {

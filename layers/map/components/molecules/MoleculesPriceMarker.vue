@@ -3,7 +3,7 @@
     'm-price-marker--featured': tier === 'FEATURED',
     'm-price-marker--premium': tier === 'PREMIUM',
   }" aria-label="Expand property card">
-    <nuxt-img v-if="image && tier === 'PREMIUM'" :src="image" class="m-price-marker__image" />
+    <AtomsCloudFlareImage v-if="image && tier === 'PREMIUM'" :src="image" class="m-price-marker__image" />
 
     <div class="m-price-marker__content">
       <span class="m-price-marker__price | body-xs font-semibold" aria-hidden="true">
@@ -143,6 +143,19 @@ const priceDisplay = computed(() => {
       width: var(--size-18);
       height: var(--size-18);
     }
+  }
+}
+
+/**
+ *  Sort z-index order of marker
+ */
+.maplibregl-marker {
+  &:has(.m-price-marker--featured) {
+    z-index: 2;
+  }
+
+  &:has(.m-price-marker--premium) {
+    z-index: 3;
   }
 }
 </style>

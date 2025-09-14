@@ -1,76 +1,80 @@
-export const accountNavigation: NavigationItem[] = [
+export const navigationHome: NavigationItem[] = [
   {
-    name: "Dashboard",
+    name: "Home",
     url: "/account",
-    icon: "property/house",
+    icon: "account/dash-home",
   },
+  {
+    name: "Logout",
+    url: "#",
+    icon: "account/logout",
+    action: "logout",
+  },
+];
+
+export const accountNavigation: NavigationItem[] = [
   {
     name: "Profile",
     url: "#",
     icon: "profile",
   },
-  {
-    name: "Biilling & Plans",
-    url: "#",
-    icon: "account/billing",
-  },
+  // {
+  //   name: "Billing & Plans",
+  //   url: "#",
+  //   icon: "account/billing",
+  // },
   {
     name: "Analytics",
-    url: "#",
+    url: "/account/analytics",
     icon: "explore/hot",
   },
-  {
-    name: "Contact Support",
-    url: "#",
-    icon: "cards/verified",
-  },
-  {
-    name: "Preferences",
-    url: "#",
-    icon: "account/account-preferences",
-  },
-  {
-    name: "Logout",
-    url: "#",
-    icon: "arrow-right",
-    action: "logout",
-  },
+  // {
+  //   name: "Contact Support",
+  //   url: "#",
+  //   icon: "cards/verified",
+  // },
+  // {
+  //   name: "Preferences",
+  //   url: "#",
+  //   icon: "account/account-preferences",
+  // },
+
 ];
 
 export const listingsNavigation: NavigationItem[] = [
   {
     name: "My Listings",
-    url: "#",
+    url: "/account/my-listings",
     icon: "read-more",
     countKey: "listings",
   },
-  {
-    name: "Offers",
-    url: "#",
-    icon: "account/offers",
-    countKey: "offers",
-  },
+  // {
+  //   name: "Offers",
+  //   url: "#",
+  //   icon: "account/offers",
+  //   countKey: "offers",
+  // },
   {
     name: "Enquiries",
     url: "/account/messages",
     icon: "account/enquiry",
-    countKey: "enquiries",
+    countKey: "unreadMessages",
   },
-  {
-    name: "Viewings",
-    url: "#",
-    icon: "account/viewing",
-    countKey: "viewings",
-  },
+  // {
+  //   name: "Viewings",
+  //   url: "#",
+  //   icon: "account/viewing",
+  //   countKey: "viewings",
+  // },
   {
     name: "Favourites",
-    url: "#",
+    url: "/account/favourites",
     icon: "cards/favourite-filled",
     countKey: "favourites",
   },
   {
     name: "Notes",
-    url: "#",
+    url: "/account/notes",
     icon: "cards/notes",
     countKey: "notes",
   },
@@ -90,7 +94,7 @@ export const searchNavigation: NavigationItem[] = [
   },
   {
     name: "Saved Locations",
-    url: "#",
+    url: "/account/saved-locations",
     icon: "cards/favourite-filled",
     countKey: "locations",
   },
@@ -98,7 +102,12 @@ export const searchNavigation: NavigationItem[] = [
 
 export const navigationGroups: NavigationGroup[] = [
   {
-    title: "My Listings",
+    title: "Dashboard",
+    icon: "account/dash",
+    items: navigationHome,
+  },
+  {
+    title: "Listings",
     icon: "property/house",
     items: listingsNavigation,
   },
@@ -113,3 +122,12 @@ export const navigationGroups: NavigationGroup[] = [
     items: searchNavigation,
   },
 ];
+
+export const logout = async () => {
+  const { clear } = useUserSession()
+  await clear()
+  const route = useRoute()
+  if (route.path.startsWith('/account')) {
+    navigateTo('/')
+  }
+}

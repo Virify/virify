@@ -46,30 +46,19 @@ const { hideDialog } = useDialog();
  *  Success
  */
 async function formSuccess() {
+  console.log('Login form success triggered');
+  
+  // Fetch user session
   await fetch();
+  console.log('Session fetched');
   
-  // Wait for the session to properly update and verify it's actually logged in
-  let attempts = 0;
-  const { loggedIn } = useUserSession();
-  
-  while (!loggedIn.value && attempts < 10) {
-    await nextTick();
-    await fetch();
-    attempts++;
-  }
-  
-  if (!loggedIn.value) {
-    return;
-  }
+  console.log('Closing dialog');
   
   // Check if there's a redirect destination from the middleware
   const redirectCookie = useCookie('redirect');
   const destination = redirectCookie.value;
   
   hideDialog({ loginSuccess: true });
-  
-  // Wait for dialog to close
-  await new Promise(resolve => setTimeout(resolve, 100));
   
   // Navigate to the intended destination if there's a redirect cookie
   if (destination) {
