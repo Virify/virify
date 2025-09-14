@@ -251,6 +251,8 @@ const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersect
   }
 
   &__banner {
+    position: relative;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
