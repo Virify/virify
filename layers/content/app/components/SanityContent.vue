@@ -244,7 +244,6 @@ const customComponents = {
     max-width: 100%;
     height: auto;
     border-radius: var(--border-radius-md);
-    margin: var(--size-32) 0;
   }
 
   // Horizontal rules
@@ -269,7 +268,6 @@ const customComponents = {
 }
 
 .content-image {
-  margin: var(--size-32) 0;
   text-align: center;
 
   img {
@@ -280,9 +278,9 @@ const customComponents = {
 }
 
 .image-caption {
-  margin-top: var(--size-8);
   color: var(--foreground-100);
   font-style: italic;
+  font-size: var(--font-sm);
 }
 
 .content-table {
