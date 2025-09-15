@@ -54,12 +54,13 @@ defineProps<{
     padding: var(--size-32);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: baseline;
     align-items: center;
     text-align: center;
     position: relative;
     flex: 1;
-    min-height: 115px;
+    min-height: 130px;
+    height: fit-content;
 
     &::before {
       content: "";
