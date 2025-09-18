@@ -1,92 +1,73 @@
-@startuml
-' Full UML for Listing and related models (generated from Prisma schema)
+@startuml ListingDraftCombined
+' Combined Listing + DraftListing model (design proposal)
 
 skinparam classAttributeIconSize 0
 
-' Listing and related models
+' Enums omitted for clarity (kept out to avoid PlantUML syntax issues)
+
+' Listing and DraftListing (fields trimmed for clarity)
 class Listing {
   +id : Int
   +title : String
-  +description : String
   +price : Float
-  +moveInDate : DateTime?
-  +listingTier : ListingTier
-  +listingStartDate : DateTime?
-  +listingEndDate : DateTime?
-  +viewingOptions : String?
-  +verificationLevel : VerificationLevel?
-  +rentalListing : RentalListing?
-  +saleListing : SaleListing?
-  +userId : Int?
-  +propertyId : Int
-  +estateAgentId : Int?
-  +publishedAt : DateTime?
   +published : Boolean
-  +createdAt : DateTime
-  +updatedAt : DateTime
 }
+
+class DraftListing {
+  +id : Int
+  +title : String
+  +price : Float
+}
+
+' Explanation notes
+note top of DraftListing
+  - Draft listings are stored separately from published Listings.
+  - Drafts are intentionally excluded from search/indexing.
+  - When a draft is completed it is migrated to Listing (records moved or copied).
+  - Relationships remain identical; migration preserves all FK relationships.
+end note
+
+' Shared related models (simplified)
 
 class User {
   +id : Int
-  +firstName : String?
-  +lastName : String?
-  +username : String?
   +email : String
-  +phoneNumber : String?
-  +password : String?
-  +passwordResetToken : String?
-  +passwordResetTokenExpiry : DateTime?
-  +otpCode : String?
-  +otpCodeExpiry : DateTime?
-  +lastLogin : DateTime?
-  +deletedAt : DateTime?
-  +createdAt : DateTime
-  +updatedAt : DateTime
 }
 
 class Property {
   +id : Int
   +title : String
-  +description : String
-  +value : Float?
-  +size : Float?
-  +yearBuilt : String?
-  +chainFree : Boolean
-  +vacant : Boolean
-  +constructionType : String?
-  +floorLevel : Int?
-  +totalFloors : Int
-  +numberBedrooms : Int?
-  +numberBathrooms : Int?
-  +numberReceptions : Int?
-  +numberOtherRooms : Int?
-  +createdAt : DateTime
-  +updatedAt : DateTime
 }
 
+class HiddenListing {
+  +id : Int
+}
 
+class UserFavouriteListing {
+  +id : Int
+}
+
+class ListingView {
+  +id : Int
+}
+
+class Conversation {
+  +id : Int
+}
+
+class UserNote {
+  +id : Int
+}
 
 class RentalListing {
   +id : Int
-  +deposit : Float?
-  +holdingDeposit : Float?
-  +rentFrequency : RentalPriceType
-  +isBillsIncluded : Boolean
-  +rentalLength : Int?
-  +furnishedStatus : FurnishedStatus?
-  +availabilityStatus : RentalAvailabilityStatus
 }
 
 class SaleListing {
   +id : Int
-  +tenureType : TenureType?
-  +chain : Boolean
-  +sharedOwnership : Boolean
-  +priceType : SalePriceType
-  +availabilityStatus : SaleAvailabilityStatus
 }
 
-
+' Property-related models (expanded)
 class Address {
   +id : Int
   +number : String?
@@ -114,7 +95,6 @@ class Media {
   +updatedAt : DateTime
 }
 
-' Property-related models (expanded)
 class Amenities {
   +id : Int
   +type : AmenityType
@@ -224,30 +204,20 @@ class RunningCosts {
   +propertyId : Int
 }
 
-' ' Enums omitted for clarity (to avoid PlantUML syntax issues)
 
-' Relations
-
-' Listing -> User (optional many-to-one)
+' Relations: Listing is the active/published model (has engagement/analytics links).
+' DraftListing is isolated from engagement/analytics (omitted from search/indexing)
 User "1" <-- "0..*" Listing : user
+User "1" <-- "0..*" DraftListing : user
 
-' Listing -> Property (required many-to-one, onDelete: Cascade)
+
 Property "1" <-- "1..*" Listing : property
+Property "1" <-- "1..*" DraftListing : property
 
 ' Property -> Address (required many-to-one, onDelete: Cascade)
 Address "1" <-- "1..*" Property : address
 
-' Listing <-> Agent (many-to-many via relation name AgentToListing)
-
-' ' Engagement/analytics and messaging relations removed from this UML
-
-' Listing -> RentalListing (one-to-one)
-Listing "1" <-- "0..1" RentalListing : rentalListing
-
-' Listing -> SaleListing (one-to-one)
-Listing "1" <-- "0..1" SaleListing : saleListing
-
-' Property -> property-detail relations (from Prisma schema)
+' Property -> property-detail relations
 Property "1" <-- "0..*" Amenities : Amenities.property
 Property "1" <-- "0..*" Bedroom : Bedroom.property
 Property "1" <-- "0..*" Bathroom : Bathroom.property
@@ -262,6 +232,24 @@ Property "1" <-- "0..1" EnergyAndUtilities : EnergyAndUtilities.property
 Property "1" <-- "0..1" RunningCosts : RunningCosts.property
 Property "1" <-- "0..*" Media : Media.property
 
-' Additional relations (to show context but not exhaustive cross-linking)
+' Engagement/analytics relations only apply to active Listings (not Drafts)
+
+Listing "1" <-- "0..*" HiddenListing : HiddenListing.listing
+Listing "1" <-- "0..*" UserFavouriteListing : UserFavouriteListing.listing
+Listing "1" <-- "0..*" ListingView : ListingView.listing
+Listing "1" <-- "0..*" Conversation : Conversation.listing
+Listing "1" <-- "0..*" UserNote : UserNote.listing
+
+Listing "1" <-- "0..1" RentalListing : rentalListing
+Listing "1" <-- "0..1" SaleListing : saleListing
+
+' DraftListing keeps core domain relationships but is not linked to engagement models
+DraftListing "1" <-- "0..1" RentalListing : rentalListing
+DraftListing "1" <-- "0..1" SaleListing : saleListing
+
+' Migration arrow: show intended flow when draft is completed
+DraftListing -down-> Listing : migrate when completed
+
+note right: Migration preserves relationships and FK references.
 
 @enduml

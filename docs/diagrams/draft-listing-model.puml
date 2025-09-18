@@ -3,65 +3,7 @@
 
 skinparam classAttributeIconSize 0
 
-' Enums
-enum ListingTier {
-  BASIC
-  PREMIUM
-  FEATURED
-}
-
-enum VerificationLevel {
-  UNVERIFIED
-  BASIC
-  VERIFIED
-  FULLY_VERIFIED
-}
-
-enum FurnishedStatus {
-  FURNISHED
-  UNFURNISHED
-  PART_FURNISHED
-}
-
-enum RentalPriceType {
-  WEEKLY
-  MONTHLY
-}
-
-enum RentalAvailabilityStatus {
-  AVAILABLE
-  LET_AGREED
-  LET
-}
-
-enum TenureType {
-  FREEHOLD
-  LEASEHOLD
-  COMMONHOLD
-}
-
-enum SalePriceType {
-  FIXED
-  OFFERS_OVER
-  GUIDE_PRICE
-}
-
-enum SaleAvailabilityStatus {
-  AVAILABLE
-  UNDER_OFFER
-  SOLD
-}
-
-enum AgentRole {
-  SENIOR
-  JUNIOR
-}
-
-enum Reviewed {
-  PENDING
-  APPROVED
-  REJECTED
-}
+' Enums omitted for clarity (kept out to avoid PlantUML syntax issues)
 
 ' DraftListing and related models (mirrors Listing file)
 class DraftListing {
@@ -81,7 +23,6 @@ class DraftListing {
   +propertyId : Int
   +estateAgentId : Int?
   +publishedAt : DateTime?
-  +isDraft : Boolean
   +createdAt : DateTime
   +updatedAt : DateTime
 }
@@ -124,87 +65,9 @@ class Property {
   +updatedAt : DateTime
 }
 
-class EstateAgent {
-  +id : Int
-  +firstName : String?
-  +lastName : String?
-  +email : String
-  +mainContact : String?
-  +phoneNumber : String?
-  +password : String?
-  +businessName : String?
-  +companyRegistration : String?
-  +passwordResetToken : String?
-  +passwordResetTokenExpiry : DateTime?
-  +otpCode : String?
-  +otpCodeExpiry : DateTime?
-  +lastLogin : DateTime?
-  +deletedAt : DateTime?
-  +createdAt : DateTime
-  +updatedAt : DateTime
-}
 
-class Agent {
-  +id : Int
-  +firstName : String?
-  +lastName : String?
-  +email : String
-  +password : String?
-  +estateAgentId : Int
-  +role : AgentRole
-  +passwordResetToken : String?
-  +lastLogin : DateTime?
-  +activationToken : String?
-  +tokenExpiry : DateTime?
-  +isActivated : Boolean
-  +createdAt : DateTime
-  +updatedAt : DateTime
-  +deletedAt : DateTime?
-}
+' Agent/EstateAgent removed per scope (not used)
 
-class HiddenListing {
-  +id : Int
-  +userPreferencesId : Int
-  +listingId : Int
-  +reason : String?
-  +hiddenAt : DateTime
-}
-
-class UserFavouriteListing {
-  +id : Int
-  +userPreferencesId : Int
-  +listingId : Int
-  +note : String?
-  +createdAt : DateTime
-  +updatedAt : DateTime
-}
-
-class ListingView {
-  +id : Int
-  +listingId : Int
-  +userId : Int?
-  +sessionId : String?
-  +ip : String?
-  +createdAt : DateTime
-}
-
-class Conversation {
-  +id : Int
-  +listingId : Int?
-  +senderId : Int
-  +receiverId : Int
-  +createdAt : DateTime
-  +updatedAt : DateTime
-}
-
-class UserNote {
-  +id : Int
-  +userPreferencesId : Int
-  +listingId : Int
-  +note : String
-  +createdAt : DateTime
-  +updatedAt : DateTime
-}
 
 class RentalListing {
   +id : Int
@@ -226,23 +89,6 @@ class SaleListing {
   +availabilityStatus : SaleAvailabilityStatus
 }
 
-class UserPreferences {
-  +id : Int
-  +userId : Int
-  +createdAt : DateTime
-  +updatedAt : DateTime
-}
-
-class Message {
-  +id : Int
-  +senderId : Int
-  +receiverId : Int
-  +conversationId : Int
-  +content : String
-  +isRead : Boolean
-  +createdAt : DateTime
-  +updatedAt : DateTime
-}
 
 class Address {
   +id : Int
@@ -271,48 +117,143 @@ class Media {
   +updatedAt : DateTime
 }
 
-' Relations
+' Property-related models (expanded)
+class Amenities {
+  +id : Int
+  +type : AmenityType
+  +subtype : AmenitySubtype?
+  +name : String
+  +distanceM : Float
+  +description : String?
+  +propertyId : Int
+}
 
-' DraftListing -> User (optional many-to-one)
+class Bedroom {
+  +id : Int
+  +roomNumber : Int
+  +name : String?
+  +bed : BedSizeType[]
+  +floor : Int
+  +size : Float?
+  +propertyId : Int
+}
+
+class Bathroom {
+  +id : Int
+  +roomNumber : Int
+  +floor : Int
+  +name : String?
+  +bathtub : Boolean
+  +walkInShower : Boolean
+  +size : Float?
+  +propertyId : Int
+}
+
+class Kitchen {
+  +id : Int
+  +modern : Boolean
+  +openPlan : Boolean
+  +whiteGoods : Boolean
+  +size : Float?
+  +propertyId : Int
+}
+
+class Reception {
+  +id : Int
+  +roomNumber : Int
+  +floor : Int
+  +name : String
+  +type : ReceptionType
+  +size : Float?
+  +propertyId : Int
+}
+
+class OtherRoom {
+  +id : Int
+  +roomNumber : Int
+  +floor : Int
+  +name : String
+  +type : OtherRoomType
+  +size : Float?
+  +propertyId : Int
+}
+
+class FrontGarden {
+  +id : Int
+  +description : String?
+  +size : Float?
+  +propertyId : Int
+}
+
+class RearGarden {
+  +id : Int
+  +description : String?
+  +size : Float?
+  +propertyId : Int
+}
+
+class Parking {
+  +id : Int
+  +garage : Boolean
+  +driveway : Boolean
+  +allocatedParking : Boolean
+  +evCharging : Boolean
+  +propertyId : Int
+}
+
+class Security {
+  +id : Int
+  +description : String?
+  +gatedCommunity : Boolean
+  +cctv : Boolean
+  +alarmSystem : Boolean
+  +propertyId : Int
+}
+
+class EnergyAndUtilities {
+  +id : Int
+  +epcRating : EPCRating
+  +broadbandType : BroadbandType?
+  +fullFibreAvailable : Boolean
+  +maxDownloadSpeedMbps : Float?
+  +propertyId : Int
+}
+
+class RunningCosts {
+  +id : Int
+  +councilTaxBand : String
+  +serviceCharges : Float?
+  +groundRent : Float?
+  +propertyId : Int
+}
+
+
+ ' Relations (DraftListing only has build-related relations)
 User "1" <-- "0..*" DraftListing : user
-
-' DraftListing -> Property (required many-to-one, onDelete: Cascade)
 Property "1" <-- "1..*" DraftListing : property
 
-' DraftListing -> EstateAgent (optional many-to-one)
-EstateAgent "1" <-- "0..*" DraftListing : estateAgent
+' Property -> Address (required many-to-one, onDelete: Cascade)
+Address "1" <-- "1..*" Property : address
 
-' DraftListing <-> Agent (many-to-many via relation name AgentToListing)
-Agent "0..*" <-- "0..*" DraftListing : AgentToListing
+' Property -> property-detail relations (from Prisma schema)
+Property "1" <-- "0..*" Amenities : Amenities.property
+Property "1" <-- "0..*" Bedroom : Bedroom.property
+Property "1" <-- "0..*" Bathroom : Bathroom.property
+Property "1" <-- "0..*" Reception : Reception.property
+Property "1" <-- "0..*" OtherRoom : OtherRoom.property
+Property "1" <-- "0..1" Kitchen : Kitchen.property
+Property "1" <-- "0..1" FrontGarden : FrontGarden.property
+Property "1" <-- "0..1" RearGarden : RearGarden.property
+Property "1" <-- "0..1" Parking : Parking.property
+Property "1" <-- "0..1" Security : Security.property
+Property "1" <-- "0..1" EnergyAndUtilities : EnergyAndUtilities.property
+Property "1" <-- "0..1" RunningCosts : RunningCosts.property
+Property "1" <-- "0..*" Media : Media.property
 
-' DraftListing -> HiddenListing (one-to-many)
-DraftListing "1" <-- "0..*" HiddenListing : HiddenListing.listing
+' DraftListing keeps only core build relationships; it has no engagement/analytics
+' or user-preferences links (no views, favourites, hidden, notes, messages, conversations)
 
-' DraftListing -> UserFavouriteListing (one-to-many)
-DraftListing "1" <-- "0..*" UserFavouriteListing : UserFavouriteListing.listing
-
-' DraftListing -> ListingView (one-to-many)
-DraftListing "1" <-- "0..*" ListingView : ListingView.listing
-
-' DraftListing -> Conversation (one-to-many)
-DraftListing "1" <-- "0..*" Conversation : Conversation.listing
-
-' DraftListing -> UserNote (one-to-many)
-DraftListing "1" <-- "0..*" UserNote : UserNote.listing
-
-' DraftListing -> RentalListing (one-to-one)
 DraftListing "1" <-- "0..1" RentalListing : rentalListing
-
-' DraftListing -> SaleListing (one-to-one)
 DraftListing "1" <-- "0..1" SaleListing : saleListing
-
-' Additional relations (to show context but not exhaustive cross-linking)
-User "1" <-- "0..*" ListingView : ListingView.user
-User "1" <-- "0..*" Message : Message.sender
-User "1" <-- "0..*" Message : Message.receiver
-Conversation "1" <-- "0..*" Message : Conversation.messages
-UserPreferences "1" <-- "0..*" UserFavouriteListing : UserFavouriteListing.userPreferences
-UserPreferences "1" <-- "0..*" HiddenListing : HiddenListing.userPreferences
-UserPreferences "1" <-- "0..*" UserNote : UserNote.userPreferences
 
 @enduml
