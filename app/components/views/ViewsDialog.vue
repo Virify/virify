@@ -1,7 +1,12 @@
 <template>
   <Teleport to="#teleports">
     <dialog ref="$dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
-      <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="close"></button>
+      <button
+        class="o-dialog-backdrop"
+        role="none"
+        tabindex="-1"
+        @click.prevent="handleBackdropClick"
+      ></button>
 
       <section v-if="dialog" class="o-dialog-window" :class="dialog.className">
         <component :is="dialog.component" v-bind="dialog.props" />
@@ -44,6 +49,16 @@ onMounted(() => {
  */
 function close() {
   $dialog.value?.close()
+}
+
+/**
+ * Handle clicks on the backdrop. If the dialog explicitly opts out
+ * of backdrop-close (backdropClose: false) then do nothing.
+ */
+function handleBackdropClick() {
+  if (!dialog?.value) return
+  if (dialog.value.backdropClose === false) return
+  close()
 }
 
 /**
