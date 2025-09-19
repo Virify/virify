@@ -6,11 +6,11 @@
     <!-- Notes Grid -->
     <div class="notes-page__grid">
       <!-- Sale Notes Section -->
-      <div class="notes-card">
+      <AtomsAccountCardContainer>
         <OrganismsAccountListingCard :is-collapsed="isNotesCollapsed" @toggle="isNotesCollapsed = !isNotesCollapsed"
           title="My Notes" icon="cards/notes" :items="(filteredUserNotes as RecentItem[])" empty-message="Empty"
           :show-notes-icon="true" :show-favourite-icon="true" />
-      </div>
+      </AtomsAccountCardContainer>
     </div>
   </div>
 </template>
