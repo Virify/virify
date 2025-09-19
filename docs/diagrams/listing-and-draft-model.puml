@@ -1,0 +1,255 @@
+@startuml ListingDraftCombined
+' Combined Listing + DraftListing model (design proposal)
+
+skinparam classAttributeIconSize 0
+
+' Enums omitted for clarity (kept out to avoid PlantUML syntax issues)
+
+' Listing and DraftListing (fields trimmed for clarity)
+class Listing {
+  +id : Int
+  +title : String
+  +price : Float
+  +published : Boolean
+}
+
+class DraftListing {
+  +id : Int
+  +title : String
+  +price : Float
+}
+
+' Explanation notes
+note top of DraftListing
+  - Draft listings are stored separately from published Listings.
+  - Drafts are intentionally excluded from search/indexing.
+  - When a draft is completed it is migrated to Listing (records moved or copied).
+  - Relationships remain identical; migration preserves all FK relationships.
+end note
+
+' Shared related models (simplified)
+
+class User {
+  +id : Int
+  +email : String
+}
+
+class Property {
+  +id : Int
+  +title : String
+}
+
+class HiddenListing {
+  +id : Int
+}
+
+class UserFavouriteListing {
+  +id : Int
+}
+
+class ListingView {
+  +id : Int
+}
+
+class Conversation {
+  +id : Int
+}
+
+class UserNote {
+  +id : Int
+}
+
+class RentalListing {
+  +id : Int
+}
+
+class SaleListing {
+  +id : Int
+}
+
+' Property-related models (expanded)
+class Address {
+  +id : Int
+  +number : String?
+  +flat : String?
+  +street : String
+  +city : String
+  +postcode : String
+  +country : String?
+  +county : String?
+  +fullAddress : String?
+  +lat : Float?
+  +lon : Float?
+  +createdAt : DateTime
+  +updatedAt : DateTime
+}
+
+class Media {
+  +id : Int
+  +image : String?
+  +videoTour : String?
+  +floorPlan : String?
+  +metadata : String
+  +propertyId : Int
+  +createdAt : DateTime
+  +updatedAt : DateTime
+}
+
+class Amenities {
+  +id : Int
+  +type : AmenityType
+  +subtype : AmenitySubtype?
+  +name : String
+  +distanceM : Float
+  +description : String?
+  +propertyId : Int
+}
+
+class Bedroom {
+  +id : Int
+  +roomNumber : Int
+  +name : String?
+  +bed : BedSizeType[]
+  +floor : Int
+  +size : Float?
+  +propertyId : Int
+}
+
+class Bathroom {
+  +id : Int
+  +roomNumber : Int
+  +floor : Int
+  +name : String?
+  +bathtub : Boolean
+  +walkInShower : Boolean
+  +size : Float?
+  +propertyId : Int
+}
+
+class Kitchen {
+  +id : Int
+  +modern : Boolean
+  +openPlan : Boolean
+  +whiteGoods : Boolean
+  +size : Float?
+  +propertyId : Int
+}
+
+class Reception {
+  +id : Int
+  +roomNumber : Int
+  +floor : Int
+  +name : String
+  +type : ReceptionType
+  +size : Float?
+  +propertyId : Int
+}
+
+class OtherRoom {
+  +id : Int
+  +roomNumber : Int
+  +floor : Int
+  +name : String
+  +type : OtherRoomType
+  +size : Float?
+  +propertyId : Int
+}
+
+class FrontGarden {
+  +id : Int
+  +description : String?
+  +size : Float?
+  +propertyId : Int
+}
+
+class RearGarden {
+  +id : Int
+  +description : String?
+  +size : Float?
+  +propertyId : Int
+}
+
+class Parking {
+  +id : Int
+  +garage : Boolean
+  +driveway : Boolean
+  +allocatedParking : Boolean
+  +evCharging : Boolean
+  +propertyId : Int
+}
+
+class Security {
+  +id : Int
+  +description : String?
+  +gatedCommunity : Boolean
+  +cctv : Boolean
+  +alarmSystem : Boolean
+  +propertyId : Int
+}
+
+class EnergyAndUtilities {
+  +id : Int
+  +epcRating : EPCRating
+  +broadbandType : BroadbandType?
+  +fullFibreAvailable : Boolean
+  +maxDownloadSpeedMbps : Float?
+  +propertyId : Int
+}
+
+class RunningCosts {
+  +id : Int
+  +councilTaxBand : String
+  +serviceCharges : Float?
+  +groundRent : Float?
+  +propertyId : Int
+}
+
+
+' Relations: Listing is the active/published model (has engagement/analytics links).
+' DraftListing is isolated from engagement/analytics (omitted from search/indexing)
+User "1" <-- "0..*" Listing : user
+User "1" <-- "0..*" DraftListing : user
+
+
+Property "1" <-- "1..*" Listing : property
+Property "1" <-- "1..*" DraftListing : property
+
+' Property -> Address (required many-to-one, onDelete: Cascade)
+Address "1" <-- "1..*" Property : address
+
+' Property -> property-detail relations
+Property "1" <-- "0..*" Amenities : Amenities.property
+Property "1" <-- "0..*" Bedroom : Bedroom.property
+Property "1" <-- "0..*" Bathroom : Bathroom.property
+Property "1" <-- "0..*" Reception : Reception.property
+Property "1" <-- "0..*" OtherRoom : OtherRoom.property
+Property "1" <-- "0..1" Kitchen : Kitchen.property
+Property "1" <-- "0..1" FrontGarden : FrontGarden.property
+Property "1" <-- "0..1" RearGarden : RearGarden.property
+Property "1" <-- "0..1" Parking : Parking.property
+Property "1" <-- "0..1" Security : Security.property
+Property "1" <-- "0..1" EnergyAndUtilities : EnergyAndUtilities.property
+Property "1" <-- "0..1" RunningCosts : RunningCosts.property
+Property "1" <-- "0..*" Media : Media.property
+
+' Engagement/analytics relations only apply to active Listings (not Drafts)
+
+Listing "1" <-- "0..*" HiddenListing : HiddenListing.listing
+Listing "1" <-- "0..*" UserFavouriteListing : UserFavouriteListing.listing
+Listing "1" <-- "0..*" ListingView : ListingView.listing
+Listing "1" <-- "0..*" Conversation : Conversation.listing
+Listing "1" <-- "0..*" UserNote : UserNote.listing
+
+Listing "1" <-- "0..1" RentalListing : rentalListing
+Listing "1" <-- "0..1" SaleListing : saleListing
+
+' DraftListing keeps core domain relationships but is not linked to engagement models
+DraftListing "1" <-- "0..1" RentalListing : rentalListing
+DraftListing "1" <-- "0..1" SaleListing : saleListing
+
+' Migration arrow: show intended flow when draft is completed
+DraftListing -down-> Listing : migrate when completed
+
+note right: Migration preserves relationships and FK references.
+
+@enduml

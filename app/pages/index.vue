@@ -16,7 +16,7 @@
         </header>
 
         <MoleculesStepper>
-          <MoleculesStepperStep :step-number="1" :active="true" variant="blue">
+          <MoleculesStepperStep :step-number="1" variant="blue">
             <h3 class="title-md">Tell us what you want</h3>
             <p class="body-sm">
               "Big windows and a garden" or "somewhere quiet"—speak human, not estate agent.
