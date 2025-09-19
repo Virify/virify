@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import { MembershipType } from "~~/layers/database/server/database/prisma/generated/enums";
 import { prisma } from "~~/layers/database/server/utils/prisma-client";
 
 export function generateFakeUser(): Prisma.UserCreateInput {
@@ -61,6 +62,11 @@ export async function seedFakeUsers(count = 1): Promise<void> {
               activated: true,
             },
           },
+          membership: {
+            create: {
+              type: MembershipType.FREE,
+            },
+          }
         },
       });
     }

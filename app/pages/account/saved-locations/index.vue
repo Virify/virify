@@ -5,7 +5,7 @@
     />
 
     <div class="saved-locations-page__grid">
-      <div class="saved-locations-card">
+      <AtomsAccountCardContainer>
         <template v-if="entries?.length">
           <ul class="saved-locations-list">
             <li v-for="entry in entries" :key="entry.id" class="saved-locations-list__item">
@@ -21,7 +21,7 @@
           </ul>
         </template>
         <p v-else class="saved-locations-card__empty | body-sm">No saved locations yet.</p>
-      </div>
+      </AtomsAccountCardContainer>
     </div>
   </div>
 </template>
@@ -94,32 +94,14 @@ function openEditDialog(entry?: any) {
   }
 }
 
-.saved-locations-card {
-  background: var(--background-200);
-  border-radius: var(--border-radius-xl);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: var(--size-24);
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-16);
-  overflow: hidden;
-
-  &__empty {
-    background: var(--background-100);
-    border-radius: var(--border-radius-lg);
-    padding: var(--size-24);
-    text-align: center;
-    margin: 0;
-  }
-}
-
 .saved-locations-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: var(--size-16);
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--size-12);
+  overflow: hidden;
 
   @include mq.tablet {
     grid-template-columns: 1fr 1fr;
