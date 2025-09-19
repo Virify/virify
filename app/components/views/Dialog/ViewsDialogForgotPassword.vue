@@ -40,6 +40,8 @@ function formSuccess(passwordToken: string) {
       props: {
         passwordToken: passwordToken,
       },
+      // Prevent closing the OTP modal by clicking the backdrop
+      backdropClose: false,
     });
   });
 }
