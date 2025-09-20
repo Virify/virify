@@ -1,14 +1,12 @@
 import type { MembershipStatus, MembershipType } from "../../layers/database/server/database/prisma/generated/enums";
 
 declare module "#auth-utils" {
-  interface AuthUser {
+  interface User {
     id: number;
-    email?: string,
+    email?: string;
     username?: string;
-    membership: MembershipType
+    membership: MembershipType;
     membershipActive?: MembershipStatus;
     membershipEndDate?: Date | null;
   }
-
-  export { AuthUser }
 }

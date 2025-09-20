@@ -1,8 +1,8 @@
 model DraftListing {
   id                Int                @id @default(autoincrement())
-  title             String
-  description       String
-  price             Float
+  title             String?
+  description       String?
+  price             Float?
   moveInDate        DateTime?
   listingTier       ListingTier
   listingStartDate  DateTime?
@@ -11,8 +11,8 @@ model DraftListing {
   verificationLevel VerificationLevel?
   rentalListing     RentalListing?     @relation(fields: [rentalListingId], references: [id])
   saleListing       SaleListing?       @relation(fields: [saleListingId], references: [id])
-  userId            Int?
-  propertyId        Int
+  userId            Int
+  propertyId        Int?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   user              User?              @relation(fields: [userId], references: [id])
