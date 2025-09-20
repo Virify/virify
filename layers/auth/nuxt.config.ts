@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     },
   },
   devServer: {
-    https: {
+    https: process.env.SKIP_HTTPS === 'true' ? false : {
       key: "./server.key",
       cert: "./server.crt",
     },
