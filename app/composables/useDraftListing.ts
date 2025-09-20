@@ -1,16 +1,14 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { DraftListing } from "~~/layers/database/server/database/prisma/generated/client";
+import type { DraftListing, ListingTier } from "~~/layers/database/server/database/prisma/generated/client";
 
 export const useDraftListing = createSharedComposable(() => {
-  const { loggedIn, user } = useUserSession();
   const { showToast } = useToast();
 
-  const { data: draftListings, refresh: refreshDraftListings } = useAsyncData<DraftListing[]>("draft-listings", () => {
-    if (!loggedIn.value || !user.value) {
-      return Promise.resolve([]);
-    }
-    return useRequestFetch()<DraftListing[]>(`/api/draft-listings/`);
-  });
+  const { data: draftListings, refresh: refreshDraftListings } = useAsyncData<DraftListing[]>(
+    "draft-listings",
+    async () => await useRequestFetch()<DraftListing[]>(`/api/draft-listings/user/`),
+    { immediate: true }
+  );
 
   /**
    * Adds a new draft listing.
@@ -19,10 +17,13 @@ export const useDraftListing = createSharedComposable(() => {
    */
   async function createDraftListing(tier: TierOption) {
     try {
+      const title = `New ${tier.tier.charAt(0).toUpperCase() + tier.tier.slice(1)} Listing`;
+      
       await $fetch<DraftListing>("/api/draft-listings/create/", {
         method: "POST",
         body: {
-          tier,
+          tier: tier.tier.toUpperCase() as ListingTier,
+          title
         },
       });
       refreshDraftListings();

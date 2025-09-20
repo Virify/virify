@@ -13,7 +13,6 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Unauthorized",
       });
     }
-
     return getDraftListingsByUserId(user.id);
   } catch (error) {
     console.log(error);
