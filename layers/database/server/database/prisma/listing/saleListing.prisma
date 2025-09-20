@@ -6,6 +6,7 @@ model SaleListing {
   sharedOwnership    Boolean                @default(false)
   priceType          SalePriceType
   availabilityStatus SaleAvailabilityStatus
+  DraftListing       DraftListing[]
 
   @@index([id])
 }

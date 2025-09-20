@@ -45,6 +45,7 @@ model Property {
   estateAgentId            Int?
   propertyTypeId           Int
   propertyClassificationId Int
+  DraftListing             DraftListing[]
 
   @@index(addressId)
 }

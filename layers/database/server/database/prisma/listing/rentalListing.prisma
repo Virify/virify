@@ -8,6 +8,7 @@ model RentalListing {
   rentalLength       Int?
   furnishedStatus    FurnishedStatus?
   availabilityStatus RentalAvailabilityStatus
+  DraftListing       DraftListing[]
 
   @@index([id])
 }

@@ -26,6 +26,7 @@ model User {
   conversationsAsSender    Conversation[]    @relation("ConversationsAsSender")
   conversationsAsReceiver  Conversation[]    @relation("ConversationsAsReceiver")
   membership               Membership?
+  DraftListing             DraftListing[]
 
   @@index([addressId])
   @@index([email])
