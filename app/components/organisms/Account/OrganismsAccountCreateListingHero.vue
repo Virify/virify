@@ -29,7 +29,7 @@ const { createDraftListing } = useDraftListing();
 
 const tierPrice = (tier: TierOption) => {
   if (isIncludedInMembership(tier)) {
-    return 'Included with your membership';
+    return 'Included in your membership';
   }
 
   return formattedPrice(tier.price) + ' / month';

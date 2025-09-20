@@ -2,8 +2,9 @@
   <OrganismsAccountCreateListingHero />
   <AtomsAccountCardContainer>
     <div class="create-listing__info">
-      <pre v-if="draftListings && draftListings.length" class="body-sm">{{ draftListings }}</pre>
-      <p v-else class="body-sm">No draft listings available.</p>
+      <p v-if="draftListingsPending" class="body-sm">Loading...</p>
+      <p v-else-if="!draftListings.length" class="body-sm">No draft listings available.</p>
+      <pre v-else class="body-sm">{{ draftListings }}</pre>
     </div>
   </AtomsAccountCardContainer>
 </template>
@@ -17,7 +18,7 @@ definePageMeta({
   layout: "account",
 });
 
-const { draftListings } = useDraftListing();
+const { draftListings, draftListingsPending } = useDraftListing();
 
 </script>
 <style lang="scss">

@@ -4,10 +4,10 @@ import type { DraftListing, ListingTier } from "~~/layers/database/server/databa
 export const useDraftListing = createSharedComposable(() => {
   const { showToast } = useToast();
 
-  const { data: draftListings, refresh: refreshDraftListings } = useAsyncData<DraftListing[]>(
+  const { data: draftListings, refresh: refreshDraftListings, pending: draftListingsPending } = useAsyncData<DraftListing[]>(
     "draft-listings",
     async () => await useRequestFetch()<DraftListing[]>(`/api/draft-listings/user/`),
-    { immediate: true }
+    { default: () => [], immediate: true}
   );
 
   /**
@@ -53,6 +53,7 @@ export const useDraftListing = createSharedComposable(() => {
 
   return {
     draftListings,
+    draftListingsPending,
     refreshDraftListings,
     createDraftListing,
     deleteDraftListing,

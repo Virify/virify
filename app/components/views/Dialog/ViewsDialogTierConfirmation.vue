@@ -59,7 +59,7 @@ const currentTierFeatures = computed(() => {
 });
 
 const tierPrice = computed(() => {
-  return isIncludedInMembership(props.tier) ? 'Included with your membership' : `£${props.tier.price.toFixed(2)} / month`;
+  return isIncludedInMembership(props.tier) ? 'Included in your membership' : `£${props.tier.price.toFixed(2)} / month`;
 });
 
 const primaryActionLabel = computed(() => {
