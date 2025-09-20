@@ -1,4 +1,3 @@
-import type { H3Event, EventHandlerRequest } from "h3";
 import * as z from "zod";
 
 const tokenSchema = z.string().min(1, "Token is required").max(100, "Token is too long");
@@ -20,8 +19,8 @@ export default defineEventHandler(async (event) => {
     if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
 
     validateActivationToken(user, token as string);
-    await updateuUserAndActivate(user.id);
-    await loginUser(event, user);
+    const updatedUser = await updateUserAndActivate(user.id);
+    await loginUser(event, updatedUser);
 
     return sendRedirect(event, "/account");
   } catch (error) {

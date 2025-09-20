@@ -19,8 +19,9 @@ export async function verifyActivationOtpCode(event: H3Event, token: string, otp
     throw createError({ statusCode: 400, statusMessage: "Invalid OTP code." });
   }
 
-  await loginUser(event, user);
-  return await updateuUserAndActivate(user.id);
+  const updatedUser = await updateUserAndActivate(user.id);
+  await loginUser(event, updatedUser);
+  return updatedUser;
 }
 
 /**

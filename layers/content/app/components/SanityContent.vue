@@ -36,13 +36,21 @@ onMounted(() => {
 // Custom components for different block types
 const customComponents = {
   types: {
-    // Custom image component
+    // Custom image component (uses Nuxt Image with Sanity provider)
     image: (props: any) => {
+      const NuxtImg = resolveComponent('NuxtImg') as any
+      const srcRef = props.value?.asset?._ref || props.value?.asset?.url
+      const width = props.value?.metadata?.dimensions?.width
+      const height = props.value?.metadata?.dimensions?.height
       return h('figure', { class: 'content-image' }, [
-        h('img', {
-          src: props.value.asset?.url,
-          alt: props.value.alt || '',
-          loading: 'lazy'
+        h(NuxtImg, {
+          provider: 'sanity',
+          src: srcRef,
+          width,
+          height,
+          loading: 'lazy',
+          class: 'content-image__img',
+          placeholder: '/img/preload.svg'
         }),
         props.value.caption ? h('figcaption', { class: 'image-caption' }, props.value.caption) : null
       ].filter(Boolean))
@@ -232,11 +240,10 @@ const customComponents = {
   }
 
   // Images
-  img {
+  .content-image__img, img {
     max-width: 100%;
     height: auto;
     border-radius: var(--border-radius-md);
-    margin: var(--size-32) 0;
   }
 
   // Horizontal rules
@@ -261,7 +268,6 @@ const customComponents = {
 }
 
 .content-image {
-  margin: var(--size-32) 0;
   text-align: center;
 
   img {
@@ -272,9 +278,9 @@ const customComponents = {
 }
 
 .image-caption {
-  margin-top: var(--size-8);
   color: var(--foreground-100);
   font-style: italic;
+  font-size: var(--font-sm);
 }
 
 .content-table {

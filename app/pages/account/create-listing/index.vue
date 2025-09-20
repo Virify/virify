@@ -1,6 +1,7 @@
 <template>
-  <h1>Create a Listing</h1>
+  <OrganismsAccountCreateListingHero />
 </template>
+
 <script setup lang="ts">
 definePageMeta({
   middleware: ["authenticated"],
@@ -10,3 +11,8 @@ definePageMeta({
   layout: "account",
 });
 </script>
+<style lang="scss">
+.create-listing__info {
+  padding: var(--size-16);
+}
+</style>

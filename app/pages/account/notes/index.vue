@@ -1,22 +1,16 @@
 <template>
   <!-- Desktop: Full notes page -->
   <div class="notes-page">
-
-    <MoleculesAccountHeader 
-      v-model:search-term="searchTerm" v-model:category-filter="categoryFilter"
-      :filter-options="filterOptions"
-      :title="'My Notes'"
-      placeholder="Search notes..."
-    />
+    <MoleculesAccountHeader v-model:search-term="searchTerm" v-model:category-filter="categoryFilter" :filter-options="filterOptions" :title="'My Notes'" placeholder="Search notes..." />
 
     <!-- Notes Grid -->
     <div class="notes-page__grid">
       <!-- Sale Notes Section -->
-      <div class="notes-card">
+      <AtomsAccountCardContainer>
         <OrganismsAccountListingCard :is-collapsed="isNotesCollapsed" @toggle="isNotesCollapsed = !isNotesCollapsed"
-          title="My Notes" icon="cards/notes" :items="(filteredUserNotes as RecentItem[])" empty-message="No notes yet."
+          title="My Notes" icon="cards/notes" :items="(filteredUserNotes as RecentItem[])" empty-message="Empty"
           :show-notes-icon="true" :show-favourite-icon="true" />
-      </div>
+      </AtomsAccountCardContainer>
     </div>
   </div>
 </template>
@@ -39,15 +33,15 @@ useSeoMeta({
   ogTitle: seoData.title,
   ogDescription: seoData.description,
   twitterTitle: seoData.title,
-  twitterDescription: seoData.description
+  twitterDescription: seoData.description,
 });
 
 const { filteredUserNotes, searchTerm, categoryFilter } = useNotes();
 
 const filterOptions = [
-  { key: 'All', value: 'all' },
-  { key: 'Sale', value: 'sale' },
-  { key: 'Rental', value: 'rental' },
+  { key: "All", value: "all" },
+  { key: "Sale", value: "sale" },
+  { key: "Rental", value: "rental" },
 ];
 
 // Component state
@@ -72,8 +66,6 @@ const isNotesCollapsed = ref(false);
     max-height: unset;
   }
 
-
-
   &__grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -88,26 +80,6 @@ const isNotesCollapsed = ref(false);
     }
   }
 }
-
-.notes-card {
-  background: var(--background-200);
-  border-radius: var(--border-radius-xl);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  &--fixed-height {
-    max-height: 50dvh;
-  }
-
-  &__see-all {
-    width: fit-content;
-    margin-top: var(--size-8);
-    margin-left: var(--size-8);
-  }
-}
-
 .breadcrumb {
   padding: 0 !important;
 }

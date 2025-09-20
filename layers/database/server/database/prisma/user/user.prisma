@@ -25,6 +25,7 @@ model User {
   messagesReceived         Message[]         @relation("ReceiverMessages")
   conversationsAsSender    Conversation[]    @relation("ConversationsAsSender")
   conversationsAsReceiver  Conversation[]    @relation("ConversationsAsReceiver")
+  membership               Membership?
 
   @@index([addressId])
   @@index([email])

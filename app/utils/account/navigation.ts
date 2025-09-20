@@ -79,8 +79,8 @@ export const listingsNavigation: NavigationItem[] = [
     countKey: "notes",
   },
   {
-    name: "List New Property",
-    url: "#",
+    name: "Create a listing",
+    url: "/account/create-listing",
     icon: "draw",
   },
 ];

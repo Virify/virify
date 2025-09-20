@@ -12,7 +12,7 @@
     <!-- favourites Grid -->
     <div class="favourites-page__grid">
       <!-- Conversations List Section -->
-      <div class="favourites-card">
+      <AtomsAccountCardContainer>
         <OrganismsAccountListingCard 
           :is-collapsed="isSaleCollapsed" 
           @toggle="isSaleCollapsed = !isSaleCollapsed"
@@ -23,7 +23,7 @@
           :show-favourite-icon="true"
           :show-notes-icon="true"
           />
-      </div>
+      </AtomsAccountCardContainer>
     </div>
   </div>
 </template>
@@ -90,25 +90,6 @@ const isSaleCollapsed = ref(false);
       gap: var(--size-12);
       height: auto;
       overflow: visible;
-    }
-  }
-
-  .favourites-card {
-    background: var(--background-200);
-    border-radius: var(--border-radius-xl);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    &--fixed-height {
-      max-height: 40dvh;
-    }
-
-    &__see-all {
-      width: fit-content;
-      margin-top: var(--size-8);
-      margin-left: var(--size-8);
     }
   }
 }

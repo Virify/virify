@@ -12,7 +12,7 @@
     />
 
     <div class="my-listings-page__grid">
-      <div class="my-listings-page__card">
+      <AtomsAccountCardContainer>
         <div v-if="(listings?.length || 0) > 0" class="my-listings-page__list">
           <div v-for="listing in listings" :key="listing.id" class="my-listings-page__item">
             <OrganismsAccountOwnListingCard :item="listing" @edit="onEdit" />
@@ -23,7 +23,7 @@
           </div>
         </div>
         <div v-else class="my-listings-page__empty | body-sm">You have no listings yet.</div>
-      </div>
+      </AtomsAccountCardContainer>
     </div>
   </div>
 </template>
@@ -163,6 +163,8 @@ function onEdit(id: number) {
     grid-template-columns: 1fr;
     gap: var(--size-12);
     width: 100%;
+    padding: var(--size-16);
+    overflow: auto;
   }
 
   &__item {

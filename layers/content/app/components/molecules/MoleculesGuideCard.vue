@@ -32,6 +32,7 @@ defineProps<{
 </script>
 
 <style scoped lang="scss">
+@use '#styles/_utils/media' as mq;
 .guide-card {
   display: flex;
   flex-direction: column;
@@ -53,10 +54,13 @@ defineProps<{
     padding: var(--size-32);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: baseline;
     align-items: center;
     text-align: center;
     position: relative;
+    flex: 1;
+    min-height: 130px;
+    height: fit-content;
 
     &::before {
       content: "";
@@ -99,12 +103,17 @@ defineProps<{
   &__description {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     padding: var(--size-16);
     color: var(--foreground-100);
     text-align: center;
-    flex-grow: 1;
+    flex: 1 1 auto;
+    min-height: 100px;
+
+    @include mq.mobile-only {
+      justify-content: center;
+    }
   }
 
   &__details {
