@@ -14,9 +14,10 @@
 
       <MoleculesAutocompleteList v-else-if="isPending" :options="Array.from({ length: 5 })">
         <span class="m-autocomplete-popover__empty-suggestion | skeleton"></span>
+        <span class="m-autocomplete-popover__empty-suggestion-pin | skeleton"></span>
       </MoleculesAutocompleteList>
 
-      <p v-else class="m-autocomplete-popover__empty | faded-text r-body-md-xs">
+      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         {{ autocompleteFeedback }}
       </p>
     </template>
@@ -35,7 +36,7 @@
         </li>
       </ul>
 
-      <p v-else class="m-autocomplete-popover__empty | faded-text r-body-md-xs">
+      <p v-else class="m-autocomplete-popover__empty | faded-text body-md">
         You do not currently have any saved locations
       </p>
     </template>
@@ -79,7 +80,7 @@ const locationSuggestions = ref<GeocodingFeature[]>([]);
 const suppressAutocomplete = ref(false);
 
 interface Props {
-  searchValue: string
+  searchValue?: string
 }
 
 const props = defineProps<Props>()
@@ -95,8 +96,8 @@ const { entries, getEntries, clearEntries } = useSavedLocation();
  */
 const hideAutocomplete = computed(() => {
   if (!locationSuggestions.value.length || !props.searchValue) return false;
-  
-  return locationSuggestions.value.some(option => 
+
+  return locationSuggestions.value.some(option =>
     option.display_name === props.searchValue
   );
 });
@@ -162,9 +163,11 @@ function setLocationFromSaved(option: Partial<UserLocation>) {
   }
 }
 
-function setLocation(option: GeocodingFeature) {
-  addLocationToHistory(option)
-  emits('location-selected', option)
+function setLocation(option: MaybeRef<GeocodingFeature>) {
+  const rawOption = unref(option)
+
+  addLocationToHistory(rawOption)
+  emits('location-selected', rawOption)
   suppressAutocomplete.value = true
 }
 
@@ -182,13 +185,13 @@ watch(
       if (suppressAutocomplete.value && newVal && oldVal && newVal !== oldVal) {
         suppressAutocomplete.value = false;
       }
-      
+
       // Only reset suppressAutocomplete if the input is cleared
       if (suppressAutocomplete.value && (!newVal || newVal.trim() === '')) {
         suppressAutocomplete.value = false;
         return;
       }
-      
+
       if (newVal && newVal.trim().length > 2) {
         locationSuggestions.value = await autoComplete(newVal)
       } else {

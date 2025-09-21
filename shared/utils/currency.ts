@@ -8,6 +8,8 @@ type CurrencyString = `£${string}`
  * @returns string
  */
 export function numberToCurrency(value: number): string {
+  if (!Number.isFinite(value)) return '£-'
+
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",

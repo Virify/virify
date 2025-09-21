@@ -5,42 +5,62 @@
 import { MoleculesMarkerPopup, MoleculesPriceMarker } from "#components";
 import { defineComponent, h, createVNode, render } from "vue";
 
+enum Tiers {
+  BASIC = "BASIC",
+  FEATURED = "FEATURED",
+  PREMIUM = "PREMIUM"
+}
+
+type Tier = `${Tiers}`
+
+interface MarkerProps {
+  id: string | number | null
+  price: number | null
+  tier?: Tier
+  image?: string
+  vueApp?: any
+  priceType?: string | null
+}
+
+/**
+ *  Get valid tier
+ */
+function getTier(tier?: Tier): Tier {
+  const isValid = [
+    Tiers.BASIC as any,
+    Tiers.FEATURED as any,
+    Tiers.PREMIUM as any
+  ].includes(tier)
+
+  return isValid ? tier as Tier : Tiers.BASIC
+}
+
 /**
  * Render a price marker
- *
- * @param id Marker identifier
- * @param price Listing price
- * @param tier Listing tier (FEATURED, BASIC, PREMIUM)
- * @param vueApp Optional Vue app context
- * @param priceType Price type (e.g., "rent", "sale")
- * @returns HTMLElement containing the rendered marker
  */
-export function renderMarker(
-  id: string | number | null, 
-  price: number | null, 
-  tier?: string, 
-  vueApp?: any, 
-  priceType?: string | null
-): HTMLElement {
+export function renderMarker(props: MarkerProps): HTMLElement {
+  const { id, price, tier, image, priceType, vueApp } = asObject(props)
+
   const markerWrapper = document.createElement("div");
-  
-  const resolvedTier = tier === "FEATURED" || tier === "BASIC" || tier === "PREMIUM" ? tier : "BASIC";
-  
+
   const MarkerComp = defineComponent({
     setup: () => () => {
       return h(MoleculesPriceMarker, {
         id,
         price,
-        tier: resolvedTier,
+        image,
+        tier: getTier(tier),
         priceType,
       });
     },
   });
-  
+
   const markerNode = createVNode(MarkerComp);
+
   if (vueApp) markerNode.appContext = vueApp.vueApp._context;
+
   render(markerNode, markerWrapper);
-  
+
   return markerWrapper;
 }
 
@@ -52,7 +72,7 @@ export function renderMarker(
  * @returns Popup instance
  */
 export function renderPopup(marker: MapMarker, vueApp?: any): any {
-  const sdk = useNuxtApp().$maptilersdk;
+  const sdk = useMapSDK();
   const popupWrapper = document.createElement("div");
   
   const PopupComp = defineComponent({

@@ -1,3 +1,5 @@
+@use '../_utils/functions.scss' as fn;
+
 :root {
   color-scheme: light dark;
 
@@ -96,4 +98,11 @@
    *
    */
   --favourite-colour: #FF4A9E;
+
+  /**
+  * Box shadows
+  */
+  --elevate-200: 0 10px 30px -10px #{fn.faded-color(8%, black)};
+  --elevate-300: 0 10px 20px -10px #{fn.faded-color(8%, black)},
+  0 10px 40px -20px #{fn.faded-color(33%, black)};
 }

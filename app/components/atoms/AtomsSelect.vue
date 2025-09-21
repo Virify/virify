@@ -59,7 +59,12 @@ const selected = defineModel({
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40' fill='white'><path d='M20 23.4L14 17.4L15.4 16L20 20.6L24.6 16L26 17.4L20 23.4Z'/></svg>");
   }
 
+  option {
+    font-weight: var(--font-medium);
+  }
+
   @supports (appearance: base-select) {
+    cursor: pointer;
 
     &,
     &::picker(select) {
@@ -73,12 +78,13 @@ const selected = defineModel({
     /* Reset picker style */
     &::picker(select) {
       flex-direction: column;
-      gap: var(--size-6);
+      gap: var(--size-4);
       background: var(--background-200);
-      border-radius: var(--border-radius-lg);
-      top: var(--size-4);
-      bottom: var(--size-4);
-      padding: var(--size-6);
+      border-radius: var(--border-radius-2xl);
+      top: var(--size-8);
+      bottom: var(--size-8);
+      box-shadow: var(--elevate-200);
+      padding: var(--size-10);
       margin: 0;
       scrollbar-width: thin;
       scrollbar-color: fn.faded-color(25%) transparent;
@@ -94,8 +100,8 @@ const selected = defineModel({
 
     /* Option styling */
     & option {
-      padding: var(--size-6) var(--size-16);
-      border-radius: var(--border-radius-md);
+      padding: var(--size-10) var(--size-16);
+      border-radius: var(--border-radius-xl);
       flex-shrink: 0;
       cursor: pointer;
 
@@ -104,8 +110,8 @@ const selected = defineModel({
       }
 
       &:checked {
-        background: var(--secondary-500);
-        color: var(--monochrome-100);
+        background: var(--secondary-400);
+        color: var(--monochrome-900);
       }
 
       &:focus:not(:checked),

@@ -1,12 +1,21 @@
 <template>
   <div class="homepage">
     <!-- AI Search Hero -->
-    <div class="container">
-      <OrganismsHeroSearch @selectSuggestion="handleSuggestionSelect" />
+    <div class="p-index__banner">
+      <div class="p-index__banner-content | flow flow-xl">
+        <h1 class="p-index__title | title-2xl lineheight-xs">
+          Find Your Perfect Home with
+          <span class="gradient-text">
+            Virify AI
+          </span>
+        </h1>
+
+        <OrganismsDockBanner />
+      </div>
     </div>
 
     <!-- How It Works Steps -->
-    <section class="ai-stepper-section">
+    <section class="ai-stepper-section homepage-section">
       <div class="container">
         <header class="ai-stepper__header">
           <h2 class="title-xl">How It Works</h2>
@@ -48,7 +57,7 @@
     </section>
 
     <!-- Key Features Showcase -->
-    <section class="features-showcase section-hero-bg">
+    <section class="features-showcase section-hero-bg homepage-section">
       <div class="container">
         <header class="features-showcase__header">
           <h2 class="title-xl">
@@ -90,7 +99,7 @@
     </section>
 
     <!-- Why People Love Virify Section -->
-    <section class="why-virify">
+    <section class="why-virify homepage-section">
       <div class="container">
         <header class="why-virify__header">
           <h2 class="title-xl">Why Virify?</h2>
@@ -152,7 +161,7 @@
     </section>
 
     <!-- Trust Signals / Stats -->
-    <section class="trust-signals section-hero-bg">
+    <section class="trust-signals section-hero-bg homepage-section">
       <div class="container">
         <header class="trust-signals__header">
           <h2 class="title-xl">The <GradientText>numbers</GradientText> don't lie</h2>
@@ -184,7 +193,7 @@
     </section>
 
     <!-- Listing Advert -->
-    <section>
+    <section class="homepage-section">
       <div class="container">
         <MoleculesListingAdvert />
       </div>
@@ -207,12 +216,6 @@ useHead({
     { name: 'description', content: 'Revolutionary AI-powered property search. Simply describe your ideal home and let our intelligent system find perfect matches using natural language processing.' }
   ]
 })
-
-// Handle suggestion clicks from hero component
-const handleSuggestionSelect = (suggestion) => {
-  // Navigate to the AI search page with the suggestion as a query parameter
-  navigateTo(`/ai-search?q=${encodeURIComponent(suggestion)}`)
-}
 
 // Intersection observer wrapper function
 const createIntersectionObserver = () => {
@@ -238,6 +241,34 @@ const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersect
 <style scoped lang="scss">
 @use '#styles/_utils/media' as mq;
 @use '#styles/_utils/functions' as fn;
+
+// Hero banner
+.p-index {
+  &__title {
+    color: var(--monochrome-900);
+    max-width: 20ch;
+    margin: 0 auto var(--size-40);
+  }
+
+  &__banner {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    padding: var(--size-64) var(--size-32);
+    box-sizing: border-box;
+    background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+    text-align: center;
+  }
+
+  &__banner-content {
+    max-width: min(100%, 45rem);
+    margin: 0 auto;
+    flex: 1 0;
+  }
+}
 
 // Full-width hero-style background for alternating sections
 .section-hero-bg {
@@ -269,15 +300,8 @@ const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersect
   }
 }
 
-.homepage {
-padding-top: var(--size-32);
-  @include mq.mobile-only {
-    padding-top: var(--size-16);
-  }
-}
-
 // Default section spacing
-section {
+:where(.homepage-section) {
   margin: calc(var(--size-72) / 2) 0;
   padding: calc(var(--size-72) / 2) 0;
 }
@@ -469,6 +493,7 @@ section {
     }
   }
 }
+
 // Trust signals
 .trust-signals {
   text-align: center;

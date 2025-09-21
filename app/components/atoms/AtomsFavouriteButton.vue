@@ -1,13 +1,13 @@
 <template>
-  <button type="button" role="switch" :aria-checked="isCurrentFavourite" :aria-label class="a-favourite-button | relative"
-    :class="{
+  <button type="button" role="switch" :aria-checked="isCurrentFavourite" :aria-label
+    class="a-favourite-button | relative button-none" :class="{
       selected: isCurrentFavourite,
     }" @click.prevent="toggle">
     <AtomsIcon :icon :class="iconClass" />
 
     <client-only>
-      <svg v-if="isCurrentFavourite && isSelected && isInteracted" width="90" height="90" viewBox="0 0 90 90" fill="none"
-        xmlns="http://www.w3.org/2000/svg" aria-hidden class="a-favourite-button-confetti">
+      <svg v-if="isCurrentFavourite && isSelected && isInteracted" width="90" height="90" viewBox="0 0 90 90"
+        fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden class="a-favourite-button-confetti">
         <circle cx="45" cy="45" r="35" fill-opacity="0.5" class="root" />
         <circle cx="12.5" cy="3.5" r="3.5" class="dot dot-1" />
         <circle cx="14.5" cy="35.5" r="7.5" class="dot dot-2" />
@@ -85,35 +85,32 @@ function toggle() {
     setTimeout(() => {
       isSelected.value = false
       removeFromFavourite(props.listingId)
-    }, 100) 
+    }, 100)
   } else {
     addToFavourite(props.listingId)
   }
 }
 </script>
 
-<style>
+<style lang="scss">
 .a-favourite-button {
-  color: var(--foreground-200);
-}
+  color: currentColor;
+  flex: 0 0;
 
-.a-favourite-button svg {
-  stroke: currentColor;
-  stroke-width: 1px;
-}
+  &.pending {
+    color: var(--monochrome-400);
+  }
 
-.a-favourite-button.pending {
-  color: var(--monochrome-400);
-}
+  &.selected {
+    color: var(--favourite-colour);
+    animation: selectedBounce var(--animation-subtle) linear;
 
-.a-favourite-button.selected {
-  color: var(--favourite-colour);
-  animation: selectedBounce var(--animation-subtle) linear;
-}
+    svg {
+      stroke: currentColor;
+      stroke-width: 1px;
+    }
+  }
 
-.a-favourite-button.selected svg {
-  stroke: currentColor;
-  stroke-width: 1px;
 }
 
 @keyframes selectedBounce {

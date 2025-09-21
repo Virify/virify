@@ -37,10 +37,25 @@ function interleaveGridRowsWithPremiums(
     return gridRows;
   }
 
-  const spacing = Math.max(
-    1,
-    Math.floor(gridRows.length / middlePremiums.length)
-  );
+  // Calculate even spacing for middle premiums
+  // We want to distribute middle premiums evenly across the available grid row positions
+  const totalPositions = gridRows.length;
+  const premiumCount = middlePremiums.length;
+  
+  // Calculate positions where premiums should be inserted
+  const premiumPositions: number[] = [];
+  
+  if (premiumCount > 0) {
+    // For even distribution, divide the total positions into equal segments
+    const segmentSize = totalPositions / (premiumCount + 1);
+    
+    for (let i = 0; i < premiumCount; i++) {
+      // Place premium at the end of each segment (except the last one)
+      const position = Math.floor(segmentSize * (i + 1)) - 1;
+      premiumPositions.push(Math.max(0, Math.min(position, totalPositions - 2)));
+    }
+  }
+
   let premiumIndex = 0;
 
   for (let i = 0; i < gridRows.length; i++) {
@@ -49,11 +64,11 @@ function interleaveGridRowsWithPremiums(
       result.push(gridRow);
     }
 
-    // Insert middle premium at calculated intervals
+    // Insert premium at calculated positions
     if (
-      premiumIndex < middlePremiums.length &&
-      (i + 1) % spacing === 0 &&
-      i + 1 < gridRows.length
+      premiumIndex < premiumPositions.length &&
+      i === premiumPositions[premiumIndex] &&
+      premiumIndex < middlePremiums.length
     ) {
       const premiumListing = middlePremiums[premiumIndex];
       if (premiumListing) {

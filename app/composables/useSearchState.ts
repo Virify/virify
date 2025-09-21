@@ -1,3 +1,6 @@
+export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
+export type ResultLayout = 'map' | 'grid' | 'split'
+
 /**
  * KV-backed search state management
  *
@@ -20,11 +23,12 @@ function createSearchState() {
 
   // Generate or restore session ID (unique per tab)
   const initSessionId = () => {
-    if (import.meta.client) {
-      sessionId.value =
-        sessionStorage.getItem("search-session-id") || crypto.randomUUID();
-      sessionStorage.setItem("search-session-id", sessionId.value);
-    }
+    if (!import.meta.client) return
+
+    sessionId.value =
+      sessionStorage.getItem("search-session-id") || crypto.randomUUID();
+
+    sessionStorage.setItem("search-session-id", sessionId.value);
   };
 
   // Save to KV storage
@@ -38,7 +42,8 @@ function createSearchState() {
         method: "POST",
         body: { sessionId: sessionId.value, state },
       });
-    } catch (error) {}
+
+    } catch (error) { }
   };
 
   // Load from KV storage
@@ -67,7 +72,7 @@ function createSearchState() {
         method: "DELETE",
         query: { sessionId: sessionId.value },
       });
-    } catch (error) {}
+    } catch (error) { }
   };
 
   // Initialize on client side
@@ -101,37 +106,175 @@ function createSearchState() {
     });
   }
 
-  // Public API
+  /**
+   *  Run a callback, if it's valid
+   */
+  function _runCallback(fn: unknown) {
+    if (!isFunction(fn)) return
+
+    fn()
+  }
+
+  /**
+   *  Toggle whether a search is pending
+   */
+  function setSearchPending(value: boolean = false) {
+    isLoading.value = value
+  }
+
+  /**
+   *  Update state layout
+   */
+  function setLocation(value: GeocodingFeature, callback?: () => void) {
+    // Update state
+    updateState({ location: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setQuery(value: string, callback?: () => void) {
+    // Check either value is valid
+    if (!isString(value)) return
+
+    // Update state
+    updateState({ query: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setQueryAnalysis(value: QueryAnalysis, callback?: () => void) {
+    // Check either value is valid
+    if (!isObject(value)) return
+
+    // Update state
+    updateState({ queryAnalysis: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setLocationRadius(value: number, callback?: () => void) {
+    // Check value is valid
+    if (!Number.isInteger(value)) return
+
+    // Update state
+    updateState({ radius: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state sort order
+   */
+  function setSortOrder(value: SortOrder, callback?: () => void) {
+    const validValues: SortOrder[] = ['date-desc', 'date-asc', 'price-asc', 'price-desc', 'relevance']
+
+    // Check value is valid
+    if (!validValues.includes(value)) return
+
+    // Update state
+    updateState({ sortBy: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Update state layout
+   */
+  function setViewMode(value: ResultLayout, callback?: () => void) {
+    const validValues: ResultLayout[] = ['grid', 'split', 'map']
+
+    // Check value is valid
+    if (!validValues.includes(value)) return
+
+    // Update state
+    updateState({ viewMode: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Manage state directly
+   */
+  function setResults(value: any[], callback?: () => void) {
+    // Check value is valid
+    if (!Array.isArray(value)) return
+
+    // Update state
+    updateState({ results: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
+   *  Manage state directly
+   */
   const updateState = async (updates: Partial<SearchState>) => {
+    // @TODO maybe replace this with Defu to better handle nested merges?
     Object.assign(searchState.value, updates);
+
+    // Save state
     await saveToKV(searchState.value);
   };
 
+  // @TODO add a button to reset form, then test functionality
   const clearState = async () => {
     searchState.value = { ...defaultState };
     await clearKV();
   };
 
-  const refreshFromKV = async (): Promise<SearchState | null> => {
-    if (!import.meta.client) return null;
+  const refreshFromKV = async (): Promise<void> => {
+    if (!import.meta.client) return;
 
-    isLoading.value = true;
+    setSearchPending(true)
+
     const stored = await loadFromKV();
+
+    setSearchPending(false)
+
     if (stored) {
-      searchState.value = { ...defaultState, ...stored };
-      isLoading.value = false;
-      return stored;
+      const newState = { ...defaultState, ...stored }
+
+      // Save new state to ref
+      searchState.value = newState;
+
+      // Update AI query analysis
+      // @TODO this needs a refactor to reduce coupling
+      const { queryAnalysis } = useAi()
+
+      queryAnalysis.value = newState.queryAnalysis
     }
-    isLoading.value = false;
-    return null;
   };
 
   return {
-    searchState: readonly(searchState),
-    isLoading: readonly(isLoading),
+    searchState,
+    setSortOrder,
+    setViewMode,
+    setLocation,
+    setLocationRadius,
+    setSearchPending,
+    setQuery,
+    setQueryAnalysis,
+    setResults,
     updateState,
     clearState,
     refreshFromKV,
+    isLoading: readonly(isLoading),
   };
 }
 
