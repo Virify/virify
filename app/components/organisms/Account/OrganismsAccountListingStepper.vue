@@ -15,7 +15,8 @@
           class="o-account-listing-stepper__step" 
           :class="{
             'o-account-listing-stepper__step--complete': slideIndex < currentStep,
-            'o-account-listing-stepper__step--active': slideIndex === currentStep
+            'o-account-listing-stepper__step--active': slideIndex === currentStep,
+            'o-account-listing-stepper__step--disabled': !isStepAccessible(slideIndex)
           }" 
           @click="goToStep(slideIndex)"
         >
@@ -53,7 +54,7 @@ import { useMediaQuery } from '@vueuse/core';
 
 interface Props {
   modelValue?: number;
-  stepperSlides: { title: string }[];
+  stepperSlides: { title: string; complete?: boolean; }[];
 }
 
 interface Emits {
@@ -86,8 +87,33 @@ const currentStep = computed({
 });
 
 // Functions to handle step navigation
+const isStepAccessible = (stepIndex: number): boolean => {
+  // Current step and previous steps are always accessible
+  if (stepIndex <= currentStep.value) {
+    return true;
+  }
+  // Next step is accessible only if current step is complete
+  if (stepIndex === currentStep.value + 1) {
+    const currentStepData = props.stepperSlides[currentStep.value];
+    return currentStepData?.complete === true;
+  }
+  // Steps further ahead are not accessible
+  return false;
+};
+
 const goToStep = (stepIndex: number) => {
-  currentStep.value = stepIndex;
+  // Only allow navigation to the current step, completed steps, or the next step if previous is complete
+  if (stepIndex <= currentStep.value) {
+    // Can always go back to current or previous steps
+    currentStep.value = stepIndex;
+  } else if (stepIndex === currentStep.value + 1) {
+    // Can only go to next step if current step is completed
+    const currentStepData = props.stepperSlides[currentStep.value];
+    if (currentStepData?.complete) {
+      currentStep.value = stepIndex;
+    }
+  }
+  // Ignore clicks on steps that are further ahead and not accessible
 };
 
 // Watch for carousel scroll events to update current step
@@ -154,6 +180,11 @@ defineExpose({
 
     &--complete {
       color: var(--monochrome-900);
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+      color: var(--monochrome-500);
     }
 
     &-indicator {

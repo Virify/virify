@@ -3,7 +3,7 @@
   <div class="p-listing-creator">
     <MoleculesBreadcrumb :items="breadcrumbItems" />
 
-    <OrganismsAccountListingStepper v-model="currentStep" :stepper-slides="stepperSlides"
+    <OrganismsAccountListingStepper v-model="currentStep" :stepper-slides="stepperSlidesProp"
       @step-change="handleStepChange" />
 
     <!-- Current step content -->
@@ -11,7 +11,7 @@
       <AtomsAccountCardContainer>
         <div class="p-listing-creator__content-inner">
           <p class="body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperSlides.length }}</em></p>
-          <currentStepComponent v-if="draft" :draft="draft" @update-step-data="handleUpdateStepData" />
+          <currentStepComponent v-if="draft" :draft="stepperSlidesData[currentStep]" @update-step-data="handleUpdateStepData" />
           <div v-else class="loading">Loading draft...</div>
         </div>
       </AtomsAccountCardContainer>
@@ -21,6 +21,7 @@
 </template>
 <script setup lang="ts">
 import CreateListingStepsStep1 from '~/components/create-listing-steps/Step1.vue';
+import CreateListingStepsStep2 from '~/components/create-listing-steps/Step2.vue';
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -31,15 +32,22 @@ definePageMeta({
 });
 
 const route = useRoute();
-const { draftListing } = useDraftListing();
+const { draftListing, updateDraftStepOne } = useDraftListing();
 const draft = computed(() => draftListing(Number(route.params.id)));
 const currentStep = ref(0);
 
 
 // Stepper configuration
 const stepperSlides = [
-  { title: 'Listing Type' },
-  { title: 'Property' },
+  { 
+    title: 'Listing Type',
+    data: {
+      saleListing: draft.value?.saleListing || null,
+      rentalListing: draft.value?.rentalListing || null
+    },
+    complete: !!(draft.value?.saleListing || draft.value?.rentalListing)
+  },
+  { title: 'Property', complete: !!draft.value?.property },
   { title: 'Price' },
   { title: 'Description' },
   { title: 'Address' },
@@ -50,9 +58,13 @@ const stepperSlides = [
   { title: 'Media' }
 ];
 
+const stepperSlidesProp = stepperSlides.map(s => ({ title: s.title, complete: s.complete }));
+const stepperSlidesData = stepperSlides.map(s => s.data || {});
+
 // Component mapping for each step
 const stepComponents: Record<number, any> = {
   0: CreateListingStepsStep1,
+  1: CreateListingStepsStep2
   // Add more steps as you create them:
   // 1: CreateListingStepsStep2,
   // 2: CreateListingStepsStep3,
@@ -64,9 +76,14 @@ const currentStepComponent = computed(() => {
   return stepComponents[currentStep.value] || CreateListingStepsStep1;
 });
 
-const handleUpdateStepData = (stepData: any) => {
-  console.log('Received step data:', stepData);
-  // Here you can handle the step data, e.g., save it to a store or send it to an API
+const handleUpdateStepData = async (stepData: StepOne) => {
+  console.log('Received step data from child:', stepData);
+  if(!draft?.value?.id) return;
+  await updateDraftStepOne(draft.value.id, stepData);
+  // Optionally, move to the next step after updating
+  if (currentStep.value < stepperSlides.length - 1) {
+    currentStep.value += 1;
+  }
 };
 
 // Breadcrumb items
