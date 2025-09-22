@@ -29,3 +29,14 @@ export function convertEnumToString(type: string | undefined): string {
   if(!type) return "";
   return type.toUpperCase().replace("_", " ");
 }
+
+/**
+ * Format and return a capitalized price type enum.
+ * @param type Price Type enum.
+ * @returns Capitalized string.
+ */
+export function convertEnumToCapalizedString(type: string | undefined): string {
+  if(!type) return "";
+  const formatted = type.toLowerCase().replace("_", " ");
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}

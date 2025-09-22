@@ -4,7 +4,7 @@ model SaleListing {
   tenureType         TenureType?
   chain              Boolean                @default(false)
   sharedOwnership    Boolean                @default(false)
-  priceType          SalePriceType
+  priceType          SalePriceType?
   availabilityStatus SaleAvailabilityStatus
   DraftListing       DraftListing[]
 

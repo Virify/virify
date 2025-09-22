@@ -11,7 +11,7 @@
       <AtomsAccountCardContainer>
         <div class="p-listing-creator__content-inner">
           <p class="body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperSlides.length }}</em></p>
-          <currentStepComponent :draft="draft" />
+          <currentStepComponent :draft="draft" @update-step-data="handleUpdateStepData" />
         </div>
       </AtomsAccountCardContainer>
 
@@ -62,6 +62,11 @@ const currentStepComponent = computed(() => {
   return stepComponents[currentStep.value] || CreateListingStepsStep1;
 });
 
+const handleUpdateStepData = (stepData: any) => {
+  console.log('Received step data:', stepData);
+  // Here you can handle the step data, e.g., save it to a store or send it to an API
+};
+
 // Breadcrumb items - handle hydration mismatch
 const breadcrumbItems = computed(() => [
   { label: 'Account', to: '/account' },
@@ -78,6 +83,8 @@ const handleStepChange = (step: number) => {
 </script>
 <style lang="scss">
 .p-listing-creator {
+  display: flex;
+  flex-direction: column;
   &__content {
     padding: var(--size-16) 0;
 
