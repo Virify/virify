@@ -1,4 +1,4 @@
-import { SaleAvailabilityStatus, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { FurnishedStatus, RentalAvailabilityStatus, SaleAvailabilityStatus, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
  * Step One Listing Options
@@ -25,4 +25,18 @@ export const stepOneSaleOptions = {
   saleListingAvailabilityOptions: Object.values(SaleAvailabilityStatus).map(element => {
     return { value: element, key: convertEnumToCapalizedString(element), info: `Your property availability is ${convertEnumToCapalizedString(element).toLowerCase()}` };
   }),
+};
+
+/** Rental Step One options */
+export const stepOneRentalOptions = {
+  rentalFurnishedStatusOptions: Object.values(FurnishedStatus).map(element => {
+    return { value: element, key: convertEnumToCapalizedString(element), info: `Furnished status: ${convertEnumToCapalizedString(element).toLowerCase()}` };
+  }),
+  rentalAvailabilityStatusOptions: Object.values(RentalAvailabilityStatus).map(element => {
+    return { value: element, key: convertEnumToCapalizedString(element), info: `Your property availability is ${convertEnumToCapalizedString(element).toLowerCase()}` };
+  }),
+  rentalBillsIncludedOptions: [
+    { value: true, key: 'Yes', info: 'Bills are included in the rent' },
+    { value: false, key: 'No', info: 'Bills are not included in the rent' },
+  ],
 };

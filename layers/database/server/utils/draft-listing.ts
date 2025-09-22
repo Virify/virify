@@ -1,17 +1,29 @@
 import { prisma } from "./prisma-client";
 import type { DraftListing, ListingTier } from "../database/prisma/generated/client";
-
 /**
  * Get a draft listing by its ID.
  * @param id DraftListing ID
  * @returns The draft listing or null if not found
  */
-export async function getDraftListingById(id: number): Promise<DraftListing | null> {
+export async function getDraftListingById(id: number): Promise<DraftListingWithFullPayload | null> {
   return await prisma.draftListing.findUnique({
     where: { id },
     include: {
-      property: true,
-      user: true,
+      rentalListing: true,
+      saleListing: true,
+      property: {
+        include: {
+          ...propertyInclude,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          createdAt: true,
+        },
+      },
     },
   });
 }
@@ -21,14 +33,24 @@ export async function getDraftListingById(id: number): Promise<DraftListing | nu
  * @param userId User ID
  * @returns A list of draft listings for the user
  */
-export async function getDraftListingsByUserId(userId: number): Promise<DraftListing[]> {
+export async function getDraftListingsByUserId(userId: number): Promise<DraftListingWithFullPayload[]> {
   return await prisma.draftListing.findMany({
     where: { userId },
     include: {
+      rentalListing: true,
+      saleListing: true,
       property: {
         include: {
-          ...propertyInclude
-        }
+          ...propertyInclude,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          createdAt: true,
+        },
       },
     },
     orderBy: {

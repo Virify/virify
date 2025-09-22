@@ -1,16 +1,19 @@
 model RentalListing {
-  id                 Int                      @id
-  listing            Listing                  @relation(fields: [id], references: [id])
+  id                 Int                      @id @default(autoincrement())
+  listing            Listing?                 @relation(fields: [listingId], references: [id])
+  listingId          Int?                     @unique
   deposit            Float?
   holdingDeposit     Float?
-  rentFrequency      RentalPriceType
+  rentFrequency      RentalPriceType?
   isBillsIncluded    Boolean
   rentalLength       Int?
   furnishedStatus    FurnishedStatus?
   availabilityStatus RentalAvailabilityStatus
-  DraftListing       DraftListing[]
+  DraftListing       DraftListing?            @relation(fields: [draftListingId], references: [id])
+  draftListingId     Int?                     @unique
 
-  @@index([id])
+  @@index([listingId])
+  @@index([draftListingId])
 }
 
 enum FurnishedStatus {

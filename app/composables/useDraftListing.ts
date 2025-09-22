@@ -4,9 +4,9 @@ import type { DraftListing, ListingTier } from "~~/layers/database/server/databa
 export const useDraftListing = createSharedComposable(() => {
   const { showToast } = useToast();
 
-  const { data: draftListings, refresh: refreshDraftListings, pending: draftListingsPending } = useAsyncData<DraftListing[]>(
+  const { data: draftListings, refresh: refreshDraftListings, pending: draftListingsPending } = useAsyncData<DraftListingWithFullPayload[]>(
     "draft-listings",
-    async () => await useRequestFetch()<DraftListing[]>(`/api/draft-listings/user/`),
+    async () => await useRequestFetch()<DraftListingWithFullPayload[]>(`/api/draft-listings/user/`),
     { immediate: true}
   );
 
@@ -15,7 +15,7 @@ export const useDraftListing = createSharedComposable(() => {
    * @param id ID of the draft listing to retrieve
    * @returns The draft listing if found, null otherwise
    */
-  const draftListing = (id: number): DraftListing | null => {
+  const draftListing = (id: number): DraftListingWithFullPayload | null => {
     return draftListings.value?.find((draft) => draft.id === id) || null;
   };
 

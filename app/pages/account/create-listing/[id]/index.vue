@@ -11,7 +11,8 @@
       <AtomsAccountCardContainer>
         <div class="p-listing-creator__content-inner">
           <p class="body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperSlides.length }}</em></p>
-          <currentStepComponent :draft="draft" @update-step-data="handleUpdateStepData" />
+          <currentStepComponent v-if="draft" :draft="draft" @update-step-data="handleUpdateStepData" />
+          <div v-else class="loading">Loading draft...</div>
         </div>
       </AtomsAccountCardContainer>
 
@@ -31,8 +32,9 @@ definePageMeta({
 
 const route = useRoute();
 const { draftListing } = useDraftListing();
-const draft = draftListing(Number(route.params.id));
+const draft = computed(() => draftListing(Number(route.params.id)));
 const currentStep = ref(0);
+
 
 // Stepper configuration
 const stepperSlides = [
@@ -67,11 +69,11 @@ const handleUpdateStepData = (stepData: any) => {
   // Here you can handle the step data, e.g., save it to a store or send it to an API
 };
 
-// Breadcrumb items - handle hydration mismatch
+// Breadcrumb items
 const breadcrumbItems = computed(() => [
   { label: 'Account', to: '/account' },
   { label: 'Create Listing', to: '/account/create-listing' },
-  { label: draft?.id ? `Draft #${draft.id}` : `Draft #${route.params.id}` }
+  { label: draft.value?.id ? `Draft #${draft.value.id}` : `Draft #${route.params.id}` }
 ]);
 
 // Handle step change from stepper component
