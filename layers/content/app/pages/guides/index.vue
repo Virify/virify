@@ -1,8 +1,6 @@
 <template>
   <div class="guides-home | container">
-    <div class="guides-home__breadcrumb">
-      <MoleculesBreadcrumb :items="breadcrumbItems" />
-    </div>
+    <MoleculesBreadcrumb :items="breadcrumbItems" />
 
     <AtomsGuideHero title="Virify Guides" description="Complete step-by-step guides for buying, selling, and renting properties. Learn how to find the right property, negotiate deals, and navigate the entire process with confidence." />
 
@@ -55,10 +53,6 @@ useSeoMeta({
 <style scoped lang="scss">
 .guides-home {
   padding-bottom: var(--size-32);
-
-  &__breadcrumb {
-    padding: var(--size-16) 0;
-  }
 
   &__advert {
     padding: var(--size-32) 0;

@@ -53,6 +53,7 @@ import { useMediaQuery } from '@vueuse/core';
 
 interface Props {
   modelValue?: number;
+  stepperSlides: { title: string }[];
 }
 
 interface Emits {
@@ -72,20 +73,6 @@ const isMobile = useMediaQuery('(max-width: 640px)');
 const carouselSize = computed(() => {
   return isMobile.value ? '100px' : '120px';
 });
-
-// Stepper configuration
-const stepperSlides = [
-  { title: 'Listing Type' },
-  { title: 'Property' },
-  { title: 'Price' },
-  { title: 'Description' },
-  { title: 'Address' },
-  { title: 'Rooms' },
-  { title: 'Additional' },
-  { title: 'Energy' },
-  { title: 'Outdoor' },
-  { title: 'Media' }
-];
 
 const carouselRef = ref();
 
@@ -119,7 +106,7 @@ onMounted(() => {
 defineExpose({
   goToStep,
   currentStep: readonly(currentStep),
-  stepperSlides: readonly(stepperSlides)
+  stepperSlides: readonly(props.stepperSlides)
 });
 </script>
 
@@ -145,6 +132,7 @@ defineExpose({
 
   &__step {
     position: relative;
+    color: var(--monochrome-900);
     min-width: 100px;
     max-width: 100px;
     display: flex;

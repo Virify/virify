@@ -34,12 +34,8 @@ defineProps<{
   display: flex;
   align-items: center;
   gap: var(--size-8);
-  padding: var(--size-32) 0 var(--size-32) 0;
+  padding: var(--size-16) 0 var(--size-16) 0;
   flex-wrap: wrap;
-
-  @include mq.mobile-only {
-    padding: var(--size-16) 0 var(--size-16) 0;
-  }
 
   &__item {
     background: var(--background-200);
