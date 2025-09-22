@@ -20,7 +20,7 @@
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--fit-content">
-      <span class="o-dock-menu__mobile-label | faded-text body-xs">Filters</span>
+      <span class="o-dock-menu__mobile-label | faded-text body-xs">Property</span>
 
       <OrganismsDockInputsFilters class="o-dock-menu__fix-height" :popovertarget="popoverId"
         :is-expanded="currentlyOpen === 'filters'" @click.prevent="showFiltersDialog" :disabled="!hasLocation">

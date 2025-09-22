@@ -2,7 +2,7 @@
   <div class="o-dock-views-footer">
     <AtomsButton :popovertarget="popoverId" v-if="currentlyOpen !== 'filters'" class="| button button-sm button-ghost"
       @click.prevent="showFiltersDialog">
-      Filters
+      Property
     </AtomsButton>
 
     <AtomsButton :popovertarget="popoverId" v-if="currentlyOpen !== 'location'" class="| button button-sm button-ghost"
