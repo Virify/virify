@@ -31,7 +31,7 @@ main {
   display: block;
 }
 
-div {
+div, section, article, aside, header, footer, nav, figure, figcaption {
   box-sizing: border-box;
 }
 

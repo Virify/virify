@@ -47,10 +47,10 @@ const groupStates = ref([true, true, true, true])
 
 // Control sidebar visibility
 const showSidebar = computed(() =>
-  route.path !== '/account/messages'
+  route.path !== '/account/messages' && route.path !== `/account/create-listing/${route.params.id}`
 )
 const isExpanded = computed(() =>
-  route.path === '/account/messages'
+  route.path === '/account/messages' || route.path === `/account/create-listing/${route.params.id}`
 )
 
 function handleNavClick(item: any) {

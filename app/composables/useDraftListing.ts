@@ -11,6 +11,15 @@ export const useDraftListing = createSharedComposable(() => {
   );
 
   /**
+   * Retrieves a draft listing by its ID.
+   * @param id ID of the draft listing to retrieve
+   * @returns The draft listing if found, null otherwise
+   */
+  const draftListing = (id: number): DraftListing | null => {
+    return draftListings.value?.find((draft) => draft.id === id) || null;
+  };
+
+  /**
    * Adds a new draft listing.
    * @param tier Tier option for the new draft listing
    * @returns
@@ -53,6 +62,7 @@ export const useDraftListing = createSharedComposable(() => {
 
   return {
     draftListings,
+    draftListing,
     draftListingsPending,
     refreshDraftListings,
     createDraftListing,

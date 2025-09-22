@@ -1,10 +1,18 @@
 <template>
   <OrganismsAccountCreateListingHero />
   <AtomsAccountCardContainer>
-    <div class="create-listing__info">
+    <div class="p-create-listing">
       <p v-if="draftListingsPending" class="body-sm">Loading...</p>
       <p v-else-if="!draftListings.length" class="body-sm">No draft listings available.</p>
-      <pre v-else class="body-sm">{{ draftListings }}</pre>
+      <NuxtLink
+        v-else
+        v-for="draft in draftListings"
+        :key="draft.id"
+        :to="`/account/create-listing/${draft.id}`"
+        class="p-create-listing__link | body-sm"
+      >
+        <pre class="body-sm">{{ draftListings }}</pre>
+      </NuxtLink>
     </div>
   </AtomsAccountCardContainer>
 </template>
@@ -22,7 +30,11 @@ const { draftListings, draftListingsPending } = useDraftListing();
 
 </script>
 <style lang="scss">
-.create-listing__info {
+.p-create-listing {
   padding: var(--size-16);
+
+  &__link {
+    text-decoration: none;
+  }
 }
 </style>

@@ -38,6 +38,7 @@ interface Props {
   loop?: boolean
   showArrows?: boolean // Show navigation arrows
   options?: any // Additional Embla options
+  buttonSize?: string // Size of navigation buttons in pixels
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -45,6 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
   gap: 'var(--size-12)',
   loop: true,
   showArrows: false,
+  buttonSize: "40px",
   options: () => ({})
 })
 
@@ -132,8 +134,8 @@ defineExpose({
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: v-bind(buttonSize);
+  height: v-bind(buttonSize);
   display: flex;
   align-items: center;
   justify-content: center;
