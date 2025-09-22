@@ -7,7 +7,7 @@ export const useDraftListing = createSharedComposable(() => {
   const { data: draftListings, refresh: refreshDraftListings, pending: draftListingsPending } = useAsyncData<DraftListing[]>(
     "draft-listings",
     async () => await useRequestFetch()<DraftListing[]>(`/api/draft-listings/user/`),
-    { default: () => [], immediate: true}
+    { immediate: true}
   );
 
   /**

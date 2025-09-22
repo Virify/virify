@@ -70,7 +70,7 @@ const emit = defineEmits<Emits>();
 const isMobile = useMediaQuery('(max-width: 640px)');
 
 const carouselSize = computed(() => {
-  return isMobile.value ? '75px' : '120px';
+  return isMobile.value ? '100px' : '120px';
 });
 
 // Stepper configuration
@@ -165,7 +165,7 @@ defineExpose({
     }
 
     &--complete {
-      color: var(--secondary-400);
+      color: var(--monochrome-900);
     }
 
     &-indicator {

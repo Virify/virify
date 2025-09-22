@@ -67,8 +67,7 @@ const handleStepChange = (step: number) => {
     text-align: center;
     
     h2 {
-      margin-bottom: var(--size-16);
-      color: var(--primary-400);
+      color: var(--secondary-400);
     }
     
     p {
