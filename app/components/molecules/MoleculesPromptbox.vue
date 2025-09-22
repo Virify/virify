@@ -9,10 +9,12 @@
       </div>
 
       <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
-        :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
+        :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"
+        @keypress.enter="keyboardSubmit"></textarea>
     </div>
 
-    <button type="submit" class="m-promptbox__button" aria-label="Submit" :disabled="disabled" @click.prevent="$emit('submit', textarea)">
+    <button type="submit" class="m-promptbox__button" aria-label="Submit" :disabled="disabled"
+      @click.prevent="emitSearch">
       <AtomsIcon icon="ai/send" aria-hidden />
     </button>
   </div>
@@ -28,11 +30,24 @@ const props = defineProps({
   disabled: { type: Boolean, default: false }
 })
 
-defineEmits<{
+const textarea = defineModel({ default: '' })
+
+const emits = defineEmits<{
   (e: 'submit', value: string): void
 }>()
 
-const textarea = defineModel({ default: '' })
+function emitSearch() {
+  emits('submit', textarea.value)
+}
+
+function keyboardSubmit(e: KeyboardEvent) {
+  // Allow return carriage if shift key pressed
+  if (e.shiftKey) return
+
+  e.preventDefault()
+
+  emitSearch()
+}
 </script>
 
 <style lang="scss">
