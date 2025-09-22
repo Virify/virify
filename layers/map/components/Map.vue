@@ -10,7 +10,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { formatMarker } from '../utils/markers';
+import { useDebounceFn } from '@vueuse/core';
 
 /**
  * state
@@ -20,11 +20,9 @@ const mapContainer = ref<HTMLElement>();
 const { 
   initMap, 
   addMarkers,
-  clearMarkers, 
-  addMarker, 
-  initDrawing, 
-  getDrawControl, 
-  updateSearchRadiusVisualization, 
+  clearMarkers,
+  initDrawing,
+  updateSearchRadiusVisualization,
   removeSearchRadiusVisualization
 } = useMap();
 
@@ -34,7 +32,7 @@ defineExpose({
 });
 
 /**
- * props
+ * props & emits
  */
 const props = withDefaults(defineProps<{
   center?: [number, number]; // [lon, lat]
@@ -42,19 +40,25 @@ const props = withDefaults(defineProps<{
   interactive?: boolean;
   mapId?: string;
   markers?: ListingCardType[];
-  marker?: ListingCardType;
   draw?: boolean;
   searchRadius?: number | null;
   searchCenter?: [number, number] | null;
 }>(), {
   interactive: true,
   zoom: 5, // Zoom level to show entire UK
-  mapId: GLOBAL_MAP_ID,
   center: () => [-2.5, 54.7], // Geographic center of UK [lon, lat]
   draw: false,
   searchRadius: null,
   searchCenter: null,
 });
+
+const emit = defineEmits<{
+  'map-ready': [map: any];
+  'zoom-changed': [zoom: number];
+  'center-changed': [center: [number, number]];
+  'bounds-changed': [bounds: [number, number, number, number]];
+  'viewport-changed': [viewport: { zoom: number; center: [number, number]; bounds: [number, number, number, number] }];
+}>();
 
 onMounted(() => {
   loadMap();
@@ -63,8 +67,66 @@ onMounted(() => {
     if (map.value) {
       map.value.resize();
       initDrawing(map.value, props.draw);
+      
+      // Add event listeners for map interactions
+      setupMapEventListeners();
+      
+      // Emit map ready event
+      emit('map-ready', map.value);
     }
   });
+});
+
+// Set up event listeners to track map interactions
+const setupMapEventListeners = () => {
+  if (!map.value || !props.interactive) return;
+  
+  // Debounced event handler to avoid too many state updates
+  const debouncedEmitViewport = useDebounceFn(() => {
+    if (!map.value) return;
+    
+    const zoom = map.value.getZoom();
+    const center = map.value.getCenter();
+    const bounds = map.value.getBounds();
+    
+    // Convert to expected format
+    const centerArray: [number, number] = [center.lng, center.lat];
+    const boundsArray: [number, number, number, number] = [
+      bounds.getWest(),
+      bounds.getSouth(), 
+      bounds.getEast(),
+      bounds.getNorth()
+    ];
+    
+    // Emit individual events
+    emit('zoom-changed', zoom);
+    emit('center-changed', centerArray);
+    emit('bounds-changed', boundsArray);
+    
+    // Emit combined viewport event for convenience
+    emit('viewport-changed', {
+      zoom,
+      center: centerArray,
+      bounds: boundsArray
+    });
+  }, 500); // 500ms debounce
+  
+  // Listen to zoom and move events
+  map.value.on('zoomend', debouncedEmitViewport);
+  map.value.on('moveend', debouncedEmitViewport);
+  
+  // Store cleanup function for later
+  (map.value as any)._cleanupViewportListeners = () => {
+    map.value.off('zoomend', debouncedEmitViewport);
+    map.value.off('moveend', debouncedEmitViewport);
+  };
+};
+
+// Cleanup event listeners on unmount
+onUnmounted(() => {
+  if (map.value && (map.value as any)._cleanupViewportListeners) {
+    (map.value as any)._cleanupViewportListeners();
+  }
 });
 
 // Watch for changes in draw prop to add/remove controls
@@ -159,7 +221,7 @@ function loadMap() {
         zoom: props.zoom,
         center: props.center ?? [0, 0],
       },
-      props.mapId ?? GLOBAL_MAP_ID,
+      props.mapId
     );
     
     // Reset the initial load flag after a short delay to allow the watcher to handle initial positioning
@@ -177,26 +239,11 @@ function loadMap() {
 function updateMarkers() {
   if (!map.value) return;
 
+  const { markers } = props
+
   clearMarkers(map.value);
-
-  if (props.markers?.length) {
-    addMarkers(map.value, formattedMarkers.value);
-  } else if (props.marker && formattedMarkers.value[0]) {
-    addMarker(map.value, [formattedMarkers.value[0]]);
-  }
+  addMarkers(map.value, markers);
 }
-
-
-/**
- * Format the markers for the map
- * 
- * @returns {Array} - Array of formatted markers
- */
-const formattedMarkers = computed(() => {
-  if (props.markers) return props.markers.map(listing => formatMarker(listing));
-  if (props.marker) return [formatMarker(props.marker)];
-  return [];
-});
 
 /**
  * Remove the search radius visualization from the map

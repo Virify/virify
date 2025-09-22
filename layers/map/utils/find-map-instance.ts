@@ -5,7 +5,10 @@
  * @param mapCache The map cache
  * @returns The MapInstance or undefined if not found
  */
-export function findMapInstance(map: ExtendedMapTilerMap, mapCache: Map<string, MapInstance>): MapInstance | undefined {
+export function findMapInstance(
+  map: ExtendedMapTilerMap,
+  mapCache: Map<string, MapInstance>
+): MapInstance | undefined {
   for (const [_, instance] of mapCache) {
     if (instance.map === map) {
       return instance;

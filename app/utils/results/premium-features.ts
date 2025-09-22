@@ -5,6 +5,11 @@ export interface PremiumFeatureDef {
   path: string[];
 }
 
+interface PremiumListItem {
+  label: string;
+  value: any;
+}
+
 // Prioritized by what property seekers value most
 export const premiumFeatureDefs: PremiumFeatureDef[] = [
   // TOP TIER - High demand, major decision factors
@@ -88,7 +93,7 @@ export function getFeatureValue(obj: any, path: string[]): any {
   return path.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
 }
 
-export function getPremiumFeatures(listing: any, max = 20) {
+export function getPremiumFeatures(listing: any, max = 20): PremiumListItem[] {
   return premiumFeatureDefs
     .map(f => ({ label: f.label, value: getFeatureValue(listing, f.path) }))
     .filter(f => f.value === true)

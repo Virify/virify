@@ -4,54 +4,75 @@
  */
 
 /**
+ * Map viewport state for preserving user's map interaction
+ */
+export interface MapViewportState {
+  /** Current map zoom level */
+  zoom: number
+
+  /** Current map center coordinates [longitude, latitude] */
+  center: [number, number]
+
+  /** Current map bounds [west, south, east, north] */
+  bounds?: [number, number, number, number]
+}
+
+/**
  * Complete search state structure stored in KV storage
  * This represents all the search context for a user session
  */
 export interface SearchState {
   /** User's search query text */
   query: string
-  
+
   /** Selected location from geocoding service */
   location: GeocodingFeature | null
-  
+
   /** Search radius in kilometers */
   radius: number
-  
+
   /** Current sort preference (relevance, price_asc, price_desc, etc.) */
   sortBy: string
-  
+
   /** Flag indicating if user has performed at least one search */
   hasSearched: boolean
-  
+
+  /** Flag for whether search is being processed  */
+  searchPending?: boolean
+
   /** Cached search results for navigation preservation */
   results: ListingWithFullProperty[] | null
-  
+
   /** AI analysis result of the search query */
   queryAnalysis: QueryAnalysis | null
-  
+
   /** Current page in paginated results */
   currentPage: number | null
-  
+
   /** Total pages available in current search */
   totalPages: number | null
-  
+
   /** Total number of results found */
   totalResults: number
-  
+
   /** Preserved database WHERE clause for pagination consistency */
   whereClause: any
-  
+
   /** Preserved location context for search refinement */
   locationContext: any
-  
+
   /** User's preferred view mode for results display */
-  viewMode: 'list' | 'map'
+  viewMode: 'grid' | 'map' | 'split'
+
+  /** Map viewport state for preserving zoom, center, and bounds */
+  mapViewport?: MapViewportState
 }
 
 /**
  * Default values for search state
  */
 export const defaultSearchState: SearchState = {
+  searchPending: false,
   query: '',
   location: null,
   radius: 0,
@@ -64,7 +85,8 @@ export const defaultSearchState: SearchState = {
   totalResults: 0,
   whereClause: null,
   locationContext: null,
-  viewMode: 'list'
+  viewMode: 'grid',
+  mapViewport: undefined
 }
 
 /**

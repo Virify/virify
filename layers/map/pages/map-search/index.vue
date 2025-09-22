@@ -2,17 +2,8 @@
   <div class="map-search-page">
     <OrganismsSearchForm :map-draw="true"  @update:draw-mode="updateDrawMode" />
     <div class="map-fullscreen">
-      <Map
-        ref="mapRef"
-        :markers="searchListings"
-        :zoom="mapZoomLevel"
-        :center="mapCenterCoordinates"
-        :interactive="true"
-        :mapId="GLOBAL_MAP_ID"
-        :draw="drawMode"
-        :search-radius="searchRadius"
-        :search-center="mapCenterCoordinates"
-      />
+      <Map ref="mapRef" :markers="searchListings" :zoom="mapZoomLevel" :center="mapCenterCoordinates"
+        :interactive="true" :draw="drawMode" :search-radius="searchRadius" :search-center="mapCenterCoordinates" />
     </div>
   </div>
 </template>

@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { PortableText } from '@portabletext/vue'
 
-defineProps<{
+const props = defineProps<{
   blocks: PortableTextContent[]
 }>()
 
@@ -31,6 +31,8 @@ onMounted(() => {
       heading.id = slug || 'heading'
     }
   })
+
+  console.log(props.blocks)
 })
 
 // Custom components for different block types
@@ -91,8 +93,8 @@ const customComponents = {
       const href = props.value?.href || '#'
       const target = (props.value?.blank || href?.startsWith('http')) ? '_blank' : undefined
       const rel = target ? 'noopener noreferrer' : undefined
-      const children = typeof props.children === 'function' ? props.children() : (props.children || [])
-      return h('a', { href, target, rel }, children)
+      const linkText = props.text
+      return h('a', { href, target, rel }, linkText)
     },
 
     // Internal link to another guide (reference expanded in API)
