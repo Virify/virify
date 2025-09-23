@@ -11,7 +11,12 @@
       <AtomsAccountCardContainer>
         <div class="p-listing-creator__content-inner">
           <p class="body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperSlides.length }}</em></p>
-          <currentStepComponent v-if="draft" :draft="stepperSlidesData[currentStep]" @update-step-data="handleUpdateStepData" />
+          <currentStepComponent 
+            v-if="draft" 
+            :draft="stepperSlidesData[currentStep]" 
+            @update-step-data="handleUpdateStepData"
+            @next-step="currentStep++"
+          />
           <div v-else class="loading">Loading draft...</div>
         </div>
       </AtomsAccountCardContainer>

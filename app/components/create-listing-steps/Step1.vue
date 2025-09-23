@@ -5,35 +5,83 @@
 
     <form class="step__form" @submit.prevent="submitForm">
       <!-- first parent select -->
-      <OrganismsDraftFormGroup v-if="!draft.saleListing && !draft.rentalListing"
-        title="What type of listing do you want to create?" :options="stepOneListingOptions" v-model="selectedType"
-        name="listing-type" :required="true" />
+      <OrganismsDraftFormGroup 
+        v-if="!draft.saleListing && !draft.rentalListing"
+        title="What type of listing do you want to create?" 
+        :options="stepOneListingOptions" 
+        v-model="selectedType"
+        name="listing-type" 
+        :required="true" 
+      />
 
       <!-- SALE -->
-      <OrganismsDraftFormGroup v-if="isSale" title="What type of sale tenure do you want to set?"
-        :options="stepOneSaleOptions.saleListingTenureOptions" v-model="saleListing.tenureType" name="sale-tenure-type"
-        :divider="true" :required="true" />
-      <OrganismsDraftFormGroup v-if="isSale" title="What is the availability status of the listing?"
-        :options="stepOneSaleOptions.saleListingAvailabilityOptions" v-model="saleListing.availabilityStatus"
-        name="sale-availability" :divider="true" :required="true" />
-      <OrganismsDraftFormGroup v-if="isSale" title="What is the chain of the listing?"
-        :options="stepOneSaleOptions.saleListingChainOptions" v-model="saleListing.chain" :divider="true"
-        name="sale-chain" />
-      <OrganismsDraftFormGroup v-if="isSale" title="What is the ownership status of the listing?"
-        :options="stepOneSaleOptions.saleSharedOwnershipOptions" v-model="saleListing.sharedOwnership" :divider="true"
-        name="sale-shared-ownership" />
+      <OrganismsDraftFormGroup 
+        v-if="isSale" 
+        title="What type of sale tenure do you want to set?"
+        :options="saleListingTenureOptions"
+        v-model="saleListing.tenureType" name="sale-tenure-type"
+        :divider="true" 
+        :required="true"
+      />
+
+      <OrganismsDraftFormGroup 
+        v-if="isSale" 
+        title="What is the availability status of the listing?"
+        :options="saleListingAvailabilityOptions" 
+        v-model="saleListing.availabilityStatus"
+        name="sale-availability" 
+        :divider="true" 
+        :required="true" 
+      />
+
+      <OrganismsDraftFormGroup 
+        v-if="isSale" 
+        title="What is the chain of the listing?"
+        :options="saleListingChainOptions" 
+        v-model="saleListing.chain" 
+        :divider="true"
+        name="sale-chain" 
+      />
+
+      <OrganismsDraftFormGroup 
+        v-if="isSale" 
+        title="What is the ownership status of the listing?"
+        :options="saleSharedOwnershipOptions" 
+        v-model="saleListing.sharedOwnership" 
+        :divider="true"
+        name="sale-shared-ownership" 
+      />
+
       <!-- RENTAL -->
-      <OrganismsDraftFormGroup v-if="isRent" title="What type of rental price do you want to set?"
-        :options="stepOneRentalOptions.rentalAvailabilityStatusOptions" v-model="rentalListing.availabilityStatus"
-        name="rental-availability-status" :required="true" :divider="true" />
+      <OrganismsDraftFormGroup 
+        v-if="isRent" 
+        title="What type of rental price do you want to set?"
+        :options="rentalAvailabilityStatusOptions" 
+        v-model="rentalListing.availabilityStatus"
+        name="rental-availability-status" 
+        :required="true" 
+        :divider="true" 
+      />
 
-      <OrganismsDraftFormGroup v-if="isRent" title="What type of rental price do you want to set?"
-        :options="stepOneRentalOptions.rentalBillsIncludedOptions" v-model="rentalListing.isBillsIncluded"
-        name="rental-bills-included" :required="true" :divider="true" />
+      <OrganismsDraftFormGroup 
+        v-if="isRent" 
+        title="What type of rental price do you want to set?"
+        :options="rentalBillsIncludedOptions" 
+        v-model="rentalListing.isBillsIncluded"
+        name="rental-bills-included" 
+        :required="true" 
+        :divider="true" 
+        />
 
-      <OrganismsDraftFormGroup v-if="isRent" title="What type of rental price do you want to set?"
-        :options="stepOneRentalOptions.rentalFurnishedStatusOptions" v-model="rentalListing.furnishedStatus"
-        name="rental-furnished-status" :required="true" :divider="true" />
+      <OrganismsDraftFormGroup 
+        v-if="isRent" 
+        title="What type of rental price do you want to set?"
+        :options="rentalFurnishedStatusOptions" 
+        v-model="rentalListing.furnishedStatus"
+        name="rental-furnished-status" 
+        :required="true" 
+        :divider="true" 
+      />
 
       <button class="step__form-action | button button-sm button-secondary" :disabled="buttonDisabled" type="submit">
         {{ buttonText }}
@@ -49,36 +97,16 @@ const props = defineProps<{
   draft: DraftListingWithFullPayload;
 }>();
 
-console.log('Draft in Step 1:', props.draft);
-
 const emit = defineEmits<{
   'updateStepData': [stepData: StepOne];
+  'nextStep': [];
 }>();
 
 const selectedType = ref<string | null>(props.draft.saleListing ? 'sale' : props.draft.rentalListing ? 'rent' : null);
 const buttonDisabled = ref(true);
 
-// Helper function to create initial values from draft
-const createInitialSaleValues = (): SaleListingCreateWithoutListingInput => ({
-  tenureType: props.draft.saleListing?.tenureType || null,
-  chain: props.draft.saleListing?.chain || false,
-  sharedOwnership: props.draft.saleListing?.sharedOwnership || false,
-  availabilityStatus: props.draft.saleListing?.availabilityStatus || null as any,
-  priceType: props.draft.saleListing?.priceType || null
-});
-
-const createInitialRentalValues = (): RentalListingCreateWithoutListingInput => ({
-  deposit: props.draft.rentalListing?.deposit || null,
-  holdingDeposit: props.draft.rentalListing?.holdingDeposit || null,
-  rentFrequency: props.draft.rentalListing?.rentFrequency || null as any,
-  isBillsIncluded: props.draft.rentalListing?.isBillsIncluded || null as any,
-  rentalLength: props.draft.rentalListing?.rentalLength || null,
-  furnishedStatus: props.draft.rentalListing?.furnishedStatus || null,
-  availabilityStatus: props.draft.rentalListing?.availabilityStatus || null as any
-});
-
-const saleListing = ref<SaleListingCreateWithoutListingInput>(createInitialSaleValues());
-const rentalListing = ref<RentalListingCreateWithoutListingInput>(createInitialRentalValues());
+const saleListing = ref<SaleListingCreateWithoutListingInput>(createInitialSaleValues(props.draft));
+const rentalListing = ref<RentalListingCreateWithoutListingInput>(createInitialRentalValues(props.draft));
 
 const isSale = computed(() => selectedType.value === 'sale');
 const isRent = computed(() => selectedType.value === 'rent');
@@ -120,10 +148,10 @@ const objectsEqual = (obj1: any, obj2: any): boolean => {
 // Track if any changes have been made from original draft data
 const hasChanges = computed(() => {
   if (selectedType.value === 'sale' && props.draft.saleListing) {
-    const originalSale = createInitialSaleValues();
+    const originalSale = createInitialSaleValues(props.draft);
     return !objectsEqual(saleListing.value, originalSale);
   } else if (selectedType.value === 'rent' && props.draft.rentalListing) {
-    const originalRental = createInitialRentalValues();
+    const originalRental = createInitialRentalValues(props.draft);
     return !objectsEqual(rentalListing.value, originalRental);
   }
   // If no draft data exists, any valid form data counts as changes
@@ -142,57 +170,25 @@ const buttonText = computed(() => {
 });
 
 const resetSaleListing = () => {
-  saleListing.value = createInitialSaleValues();
+  saleListing.value = createInitialSaleValues(props.draft);
 };
 
 const resetRentalListing = () => {
-  rentalListing.value = createInitialRentalValues();
+  rentalListing.value = createInitialRentalValues(props.draft);
 };
 
 const submitForm = () => {
   if (!isFormValid.value) return;
-
-  const stepData: StepOne = {};
-  if (selectedType.value === 'sale') {
-    // Only assign properties that match SaleListingCreateWithoutListingInput
-    const { 
-      tenureType, 
-      chain, 
-      sharedOwnership, 
-      availabilityStatus 
-    } = saleListing.value;
-
-    stepData.saleListing = { 
-      tenureType, 
-      chain, 
-      sharedOwnership, 
-      availabilityStatus 
-    };
-
-    emit('updateStepData', stepData);
-  } else if (selectedType.value === 'rent') {
-    const { 
-      deposit, 
-      holdingDeposit, 
-      rentFrequency, 
-      isBillsIncluded, 
-      rentalLength, 
-      furnishedStatus,
-      availabilityStatus 
-    } = rentalListing.value;
-
-    stepData.rentalListing = { 
-      deposit,
-      holdingDeposit,
-      rentFrequency,
-      isBillsIncluded,
-      rentalLength,
-      furnishedStatus,
-      availabilityStatus 
-    };
-
-    emit('updateStepData', stepData);
+  if(hasChanges.value === false && isFormValid.value) {
+    emit('nextStep');
+    return;
   }
+  
+  // Type assertion since we've validated the form is valid
+  const stepData = selectedType.value === 'sale' 
+    ? setStepData("sale", saleListing.value as SaleListingCreateWithoutListingInput) 
+    : setStepData("rent", rentalListing.value as RentalListingCreateWithoutListingInput);
+  emit('updateStepData', stepData);
 };
 
 // Helper to get all form values for watching
