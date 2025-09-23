@@ -12,5 +12,8 @@ export type PropertyTypeWithOptions = {
   id: number
   name: string
   defaultSelected: boolean
-  options: string[]
+  options: Array<{
+    key: number
+    value: string
+  }>
 }

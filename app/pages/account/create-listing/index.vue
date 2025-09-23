@@ -12,7 +12,7 @@
           :to="`/account/create-listing/${draft.id}`"
           class="p-create-listing__link | body-sm"
         >
-          <pre class="body-sm">{{ draftListings }}</pre>
+          <pre class="p-create-listing__draft | body-sm">{{ draft }}</pre>
         </NuxtLink>
       </div>
     </ClientOnly>
@@ -37,6 +37,12 @@ const { draftListings, draftListingsPending } = useDraftListing();
 
   &__link {
     text-decoration: none;
+  }
+
+  &__draft {
+    border: 1px solid var(--monochrome-200);
+    padding: var(--size-16);
+    border-radius: var(--border-radius-md);
   }
 }
 </style>

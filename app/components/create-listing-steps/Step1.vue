@@ -1,7 +1,6 @@
 <template>
   <section class="step">
     <h2 class="title-sm">Listing Type</h2>
-    <p class="body-sm"></p>
 
     <form class="step__form" @submit.prevent="submitForm">
       <!-- first parent select -->
@@ -224,12 +223,10 @@ watch(
 </script>
 <style lang="scss">
 .step {
-  width: 100%;
 
   &__form {
     display: flex;
     flex-direction: column;
-    overflow: auto;
 
     &-action {
       align-self: flex-end;

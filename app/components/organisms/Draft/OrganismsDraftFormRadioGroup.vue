@@ -67,6 +67,7 @@ defineEmits<{
     list-style: none;
     padding: 0;
     margin: 0;
+    flex-wrap: wrap;
   }
 
   &__radio {
