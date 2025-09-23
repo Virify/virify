@@ -5,7 +5,7 @@
 
     <form class="step__form" @submit.prevent="submitForm">
       <!-- first parent select -->
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="!draft.saleListing && !draft.rentalListing"
         title="What type of listing do you want to create?" 
         :options="stepOneListingOptions" 
@@ -15,7 +15,7 @@
       />
 
       <!-- SALE -->
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="isSale" 
         title="What type of sale tenure do you want to set?"
         :options="saleListingTenureOptions"
@@ -24,7 +24,7 @@
         :required="true"
       />
 
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="isSale" 
         title="What is the availability status of the listing?"
         :options="saleListingAvailabilityOptions" 
@@ -34,7 +34,7 @@
         :required="true" 
       />
 
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="isSale" 
         title="What is the chain of the listing?"
         :options="saleListingChainOptions" 
@@ -43,7 +43,7 @@
         name="sale-chain" 
       />
 
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="isSale" 
         title="What is the ownership status of the listing?"
         :options="saleSharedOwnershipOptions" 
@@ -53,7 +53,7 @@
       />
 
       <!-- RENTAL -->
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="isRent" 
         title="What type of rental price do you want to set?"
         :options="rentalAvailabilityStatusOptions" 
@@ -63,7 +63,7 @@
         :divider="true" 
       />
 
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="isRent" 
         title="What type of rental price do you want to set?"
         :options="rentalBillsIncludedOptions" 
@@ -73,7 +73,7 @@
         :divider="true" 
         />
 
-      <OrganismsDraftFormGroup 
+      <OrganismsDraftFormRadioGroup 
         v-if="isRent" 
         title="What type of rental price do you want to set?"
         :options="rentalFurnishedStatusOptions" 
