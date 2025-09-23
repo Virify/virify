@@ -141,7 +141,8 @@ defineExpose({
 
 .o-account-listing-stepper {
   width: 100%;
-  max-width: 100%;
+  display: flex;
+  justify-content: center;
 
   &__carousel {
     padding: var(--size-20) var(--size-32);

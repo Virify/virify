@@ -1,6 +1,10 @@
 <template>
   <section class="step">
     <h2 class="title-sm">Listing Type</h2>
+    <p class="body-xs">
+      <span class="step__required | body-md font-semibold">*</span>
+      <em>represents a required field</em>
+    </p>
 
     <form class="step__form" @submit.prevent="submitForm">
       <!-- first parent select -->
@@ -223,6 +227,10 @@ watch(
 </script>
 <style lang="scss">
 .step {
+
+  &__required {
+    color: var(--error);
+  }
 
   &__form {
     display: flex;

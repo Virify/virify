@@ -10,6 +10,7 @@
         :placeholder="'Select Year Built'"
         :label="'What year was the property built?'"
         name="year-built"
+        :required="required"
         @update:modelValue="$emit('update:modelValue', $event)" />
     </label>
   </div>
@@ -50,7 +51,7 @@ defineEmits<{
   }
 
   &__select {
-    min-width: 150px;
+    min-width: 200px;
     margin: 0 auto;
     border: 1px solid var(--secondary-400);
   }

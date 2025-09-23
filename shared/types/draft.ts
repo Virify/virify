@@ -1,9 +1,21 @@
-import type { Prisma, RentalListing, SaleListing } from "~~/layers/database/server/database/prisma/generated/client"
+import type { Prisma, PropertyType } from "~~/layers/database/server/database/prisma/generated/client"
+import type { ConstructionType } from "~~/layers/database/server/database/prisma/generated/enums";
 import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
 export type StepOne = {
   rentalListing?: RentalListingCreateWithoutListingInput
   saleListing?: SaleListingCreateWithoutListingInput
+}
+
+export type StepTwo = {
+  property: {
+    type: number | null
+    classification: number | null
+    constructionType: ConstructionType | null
+    yearBuilt: string | null
+    size: number | null
+    description: string | null
+  }
 }
 
 export type DraftListingWithFullPayload = Prisma.DraftListingGetPayload<{

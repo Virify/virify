@@ -1,7 +1,9 @@
 <template>
   <div class="o-form-group">
     <AtomsDivider v-if="divider" />
-    <p class="o-form-group__title | body-sm">{{ title }}</p>
+    <p class="o-form-group__title | body-sm">{{ title }}
+      <span v-if="required" class="o-form-group__required | title-xs">*</span>
+    </p>
     <ul class="o-form-group__list">
       <li v-for="option in options" :key="option.value" class="o-form-group__item">
         <label class="o-form-group__label | body-sm">
@@ -68,6 +70,12 @@ defineEmits<{
     padding: 0;
     margin: 0;
     flex-wrap: wrap;
+  }
+  
+  &__required {
+    color: var(--error);
+    margin-left: var(--size-4);
+    top: -20px;
   }
 
   &__radio {

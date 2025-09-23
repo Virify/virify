@@ -4,8 +4,7 @@
     <MoleculesBreadcrumb :items="breadcrumbItems" />
 
     <ClientOnly>
-      <OrganismsAccountListingStepper v-model="currentStep" :stepper-slides="stepperSlidesProp"
-        @step-change="handleStepChange" />
+      <OrganismsAccountListingStepper v-model="currentStep" :stepper-slides="stepperSlidesProp" />
     </ClientOnly>
 
     <!-- Current step content -->
@@ -46,7 +45,7 @@ const route = useRoute();
 const { draftListing, updateDraftStepOne } = useDraftListing();
 const draft = computed(() => draftListing(Number(route.params.id)));
 
-const stepperSlides = [
+const stepperSlides = computed(() => [
   { 
     title: 'Listing Type',
     data: {
@@ -64,21 +63,21 @@ const stepperSlides = [
     },
     complete: !!draft.value?.property
   },
+  { title: 'Address' },
   { title: 'Price' },
   { title: 'Description' },
-  { title: 'Address' },
   { title: 'Rooms' },
   { title: 'Additional' },
   { title: 'Energy' },
   { title: 'Outdoor' },
   { title: 'Media' }
-];
+]);
 
-const currentStep = ref(stepperSlides.findIndex(s => !s.complete) || 0);
+const currentStep = ref(0);
 
-// Stepper configuration
-const stepperSlidesProp = stepperSlides.map(s => ({ title: s.title, complete: s.complete }));
-const stepperSlidesData = stepperSlides.map(s => s.data || {});
+// Stepper configuration (reactive)
+const stepperSlidesProp = computed(() => stepperSlides.value.map(s => ({ title: s.title, complete: s.complete })));
+const stepperSlidesData = computed(() => stepperSlides.value.map(s => s.data || {}));
 
 // Component mapping for each step
 const stepComponents: Record<number, any> = {
@@ -100,10 +99,17 @@ const handleUpdateStepData = async (stepData: StepOne) => {
   if(!draft?.value?.id) return;
   await updateDraftStepOne(draft.value.id, stepData);
   // Optionally, move to the next step after updating
-  if (currentStep.value < stepperSlides.length - 1) {
+  if (currentStep.value < stepperSlides.value.length - 1) {
     currentStep.value += 1;
   }
 };
+
+// When the draft (and therefore step completion flags) becomes available,
+// set the current step to the first incomplete step so a hard refresh resumes
+watch(stepperSlides, (newSlides) => {
+  const idx = newSlides.findIndex(s => !s.complete);
+  currentStep.value = idx >= 0 ? idx : 0;
+}, { immediate: true });
 
 // Breadcrumb items
 const breadcrumbItems = computed(() => [
@@ -111,13 +117,6 @@ const breadcrumbItems = computed(() => [
   { label: 'Draft Listings', to: '/account/create-listing' },
   { label: draft.value?.id ? `Draft #${draft.value.id}` : `Draft #${route.params.id}` }
 ]);
-
-// Handle step change from stepper component
-const handleStepChange = (step: number) => {
-  console.log('Step changed to:', step);
-  // Add any additional logic here when step changes
-};
-
 </script>
 <style lang="scss">
 .p-listing-creator {

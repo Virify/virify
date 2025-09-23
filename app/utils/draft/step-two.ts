@@ -2,7 +2,6 @@
 /**
  * Utilities for Step Two of the listing creation process.
  */
-
 import { ConstructionType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
@@ -35,10 +34,16 @@ export function getPropertyClassifications(propertyTypeId: number): { value: num
   }));
 };
 
+/**
+ * Property Construction Types
+ */
 export const constructionOptions = Object.values(ConstructionType).map((option) => {
   return { value: option, key: convertEnumToCapalizedString(option), info: "Property is of Construction: " + convertEnumToCapalizedString(option) };
 });
 
+/**
+ * Year Built Options
+ */
 const currentYear = new Date().getFullYear();
 export const yearBuiltOptions = [
   { value: '0', key: 'Select Year Built' },
@@ -47,3 +52,34 @@ export const yearBuiltOptions = [
     key: year.toString(),
   })),
 ];
+
+/**
+ * Size Options for property measurement units.
+ * Used to convert into the database from feet/meters.
+ */
+export const sizeOptions = [
+  { value: 'meter', label: 'Meters', isDefault: true, name: 'size-meter' },
+  { value: 'feet', label: 'Feet', isDefault: false, name: 'size-feet' },
+]
+
+/**
+ * Convert feet to meters.
+ * @param feet Value in feet to convert to meters
+ * @returns Value in meters
+ */
+export function convertFeetToMeters(feet: number): number {
+  return parseFloat((feet * 0.3048).toFixed(2));
+}
+
+export const createInitialStepTwoValues = (draftListing: DraftListingWithFullPayload): StepTwo => {
+  return {
+    property: {
+      type: draftListing.property?.type.id || null,
+      classification: draftListing.property?.classification.id || null,
+      constructionType: draftListing.property?.constructionType || null,
+      yearBuilt: draftListing.property?.yearBuilt || '0',
+      size: draftListing.property?.size || null,
+      description: draftListing.property?.description || null,
+    }
+  }
+}

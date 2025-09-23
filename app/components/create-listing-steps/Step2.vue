@@ -1,21 +1,26 @@
 <template>
   <section class="step">
     <h2 class="title-sm">Property Basics</h2>
+    <p class="body-xs">
+      <span class="step__required | body-md font-semibold">*</span>
+      <em>represents a required field</em>
+    </p>
 
     <form class="step__form">
       <OrganismsDraftFormRadioGroup 
         title="What type of property are you listing?" 
         :options="propertyTypeSelectOptions" 
-        v-model="selectedPropertyType"
+        v-model="stepTwoData.property.type"
         name="listing-type" 
         :required="true" 
+        :divider="true"
       />
 
       <OrganismsDraftFormRadioGroup 
-        v-if="selectedPropertyType !== null"
+        v-if="stepTwoData.property.type !== null"
         title="What is the classification of the property?" 
-        :options="getPropertyClassifications(selectedPropertyType)" 
-        v-model="selectedPropertyClassification"
+        :options="getPropertyClassifications(stepTwoData.property.type)" 
+        v-model="stepTwoData.property.classification"
         name="property-classification" 
         :required="true"
         :divider="true"
@@ -24,30 +29,36 @@
       <OrganismsDraftFormRadioGroup
         title="What is the construction type of the property?" 
         :options="constructionOptions" 
-        v-model="selectedPropertyConstruction"
+        v-model="stepTwoData.property.constructionType"
         name="property-construction-type" 
-        :required="true"
         :divider="true"      
       />
 
       <OrganismsDraftFormTextGroup
         title="Please provide a short description of the property - your property features speaks for itself!"
-        v-model="propertyDescription"
+        v-model="stepTwoData.property.description"
         name="property-description"
         placeholder="e.g., A charming 3-bedroom house with a spacious garden..."
-        :required="true"
+        :divider="true"
+      />
+
+      <OrganismsDraftFormSizeToggle
+        title="What is your property's total size?"
+        :options="sizeOptions"
+        v-model:unit="sizeToConvert"
+        v-model:size="stepTwoData.property.size"
+        name="property-size"
         :divider="true"
       />
 
       <OrganismsDraftFormSelectGroup
         title="What year was the property built?"
         :options="yearBuiltOptions"
-        v-model="yearBuilt"
+        v-model="stepTwoData.property.yearBuilt"
         name="year-built"
-        :required="true"
         :divider="true"
       />
-
+    
       <div class="step__form-actions">
         <button class="step__form-action | button button-sm button-secondary" @click="$emit('previousStep')" type="button">
           Previous Step
@@ -72,25 +83,19 @@ const emit = defineEmits<{
   'nextStep': [];
 }>();
 
-const buttonDisabled = ref<boolean>(true);
-const listingType = ref(props.draft.saleListing ? 'sale' : 'rental');
-const selectedPropertyType = ref<number | null>(props.draft.property?.type.id || null);
-const selectedPropertyClassification = ref<number | null>(props.draft.property?.classification.categoryId || null);
-const selectedPropertyConstruction = ref<string | null>(props.draft.property?.constructionType || null);
-const propertyDescription = ref<string>(props.draft.property?.description || '');
-const yearBuilt = ref<string>(props.draft.property?.yearBuilt || '0');
+const stepTwoData = ref<StepTwo>(createInitialStepTwoValues(props.draft));
+const sizeToConvert = ref<string>(props.draft.property ? 'meter' : 'meter')
 
-watch([selectedPropertyType], ([newPropertyType]) => {
-  if (newPropertyType) {
-    selectedPropertyClassification.value = null;
-  }
-});
+const isFormValid = computed(() => Boolean(stepTwoData.value.property.type && stepTwoData.value.property.classification))
+
+const buttonDisabled = computed(() => !isFormValid.value)
 
 function submitForm() {
   console.log('Form submitted');
 }
 </script>
 <style lang="scss">
+// inherited from step 1
 .step {
   &__form-actions {
     display: flex;
