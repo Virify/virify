@@ -38,3 +38,12 @@ export function getPropertyClassifications(propertyTypeId: number): { value: num
 export const constructionOptions = Object.values(ConstructionType).map((option) => {
   return { value: option, key: convertEnumToCapalizedString(option), info: "Property is of Construction: " + convertEnumToCapalizedString(option) };
 });
+
+const currentYear = new Date().getFullYear();
+export const yearBuiltOptions = [
+  { value: '0', key: 'Select Year Built' },
+  ...Array.from({ length: currentYear - 1800 + 1 }, (_, i) => currentYear - i).map((year) => ({
+    value: year,
+    key: year.toString(),
+  })),
+];

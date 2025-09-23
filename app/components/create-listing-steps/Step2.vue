@@ -22,7 +22,6 @@
       />
 
       <OrganismsDraftFormRadioGroup
-        v-if="selectedPropertyClassification !== null"
         title="What is the construction type of the property?" 
         :options="constructionOptions" 
         v-model="selectedPropertyConstruction"
@@ -32,11 +31,19 @@
       />
 
       <OrganismsDraftFormTextGroup
-        v-if="selectedPropertyConstruction !== null"
         title="Please provide a short description of the property - your property features speaks for itself!"
         v-model="propertyDescription"
         name="property-description"
         placeholder="e.g., A charming 3-bedroom house with a spacious garden..."
+        :required="true"
+        :divider="true"
+      />
+
+      <OrganismsDraftFormSelectGroup
+        title="What year was the property built?"
+        :options="yearBuiltOptions"
+        v-model="yearBuilt"
+        name="year-built"
         :required="true"
         :divider="true"
       />
@@ -71,6 +78,7 @@ const selectedPropertyType = ref<number | null>(props.draft.property?.type.id ||
 const selectedPropertyClassification = ref<number | null>(props.draft.property?.classification.categoryId || null);
 const selectedPropertyConstruction = ref<string | null>(props.draft.property?.constructionType || null);
 const propertyDescription = ref<string>(props.draft.property?.description || '');
+const yearBuilt = ref<string>(props.draft.property?.yearBuilt || '0');
 
 watch([selectedPropertyType], ([newPropertyType]) => {
   if (newPropertyType) {
