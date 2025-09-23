@@ -101,7 +101,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'updateStepData': [stepData: StepOne];
+  'updateStepData': [stepData: StepOne, step: number];
   'nextStep': [];
 }>();
 
@@ -191,7 +191,7 @@ const submitForm = () => {
   const stepData = selectedType.value === 'sale' 
     ? setStepData("sale", saleListing.value as SaleListingCreateWithoutListingInput) 
     : setStepData("rent", rentalListing.value as RentalListingCreateWithoutListingInput);
-  emit('updateStepData', stepData);
+  emit('updateStepData', stepData, 1);
 };
 
 // Helper to get all form values for watching

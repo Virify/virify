@@ -12,6 +12,8 @@
         <AtomsInput
           type="number"
           min="0"
+          step="0.01"
+          inputmode="decimal"
           v-model="localSize"
           :name="name ? `${name}-size` : 'property-size'"
           :placeholder="`Size in ${localUnit === 'feet' ? 'feet' : 'meters'}`"
@@ -60,15 +62,8 @@ const localUnit = computed<string | number | undefined>({
 })
 
 const localSize = computed<string>({
-  get: () => (String(props.size) ?? ''),
-  set: (val: string) => {
-    // convert to meters if feet is selected
-    if (props.unit === 'feet') {
-      emit('update:size', convertFeetToMeters(Number(val)))
-    } else {
-      emit('update:size', Number(val))
-    }
-  }
+  get: () => (props.size != null ? String(props.size) : ''),
+  set: (val: string) => emit('update:size', val !== '' ? Number(val) : null)
 })
 </script>
 
@@ -95,6 +90,8 @@ const localSize = computed<string>({
     flex-direction: column;
     justify-content: baseline;
     gap: var(--size-4);
+    max-width: 250px;
+    width: 250px;
   }
 }
 </style>

@@ -6,7 +6,7 @@
       <em>represents a required field</em>
     </p>
 
-    <form class="step__form">
+    <form class="step__form" @submit.prevent="submitForm">
       <OrganismsDraftFormRadioGroup 
         title="What type of property are you listing?" 
         :options="propertyTypeSelectOptions" 
@@ -78,7 +78,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'updateStepData': [stepData: StepOne];
+  'updateStepData': [stepData: StepTwo, step: number];
   'previousStep': [];
   'nextStep': [];
 }>();
@@ -91,7 +91,12 @@ const isFormValid = computed(() => Boolean(stepTwoData.value.property.type && st
 const buttonDisabled = computed(() => !isFormValid.value)
 
 function submitForm() {
-  console.log('Form submitted');
+  if (!isFormValid.value) return
+  // reset year built to null if '0' (Not Specified) is selected
+  if(stepTwoData.value.property.yearBuilt === '0') {
+    stepTwoData.value.property.yearBuilt = null
+  }
+  emit('updateStepData', stepTwoData.value, 2);
 }
 </script>
 <style lang="scss">
