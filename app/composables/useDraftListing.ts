@@ -60,6 +60,11 @@ export const useDraftListing = createSharedComposable(() => {
     }
   }
 
+  /**
+   * Updates the first step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the first step
+   */
   async function updateDraftStepOne(draftId: number, stepData: StepOne) {
     try {
       await $fetch(`/api/draft-listings/update/steps/one/`, {
@@ -77,8 +82,22 @@ export const useDraftListing = createSharedComposable(() => {
     }
   };
 
-  function updateDraftStepTwo(draftId: number, stepData: StepTwo) {
-    console.log('Updating draft step two with data:', { draftId, ...stepData });
+  async function updateDraftStepTwo(draftId: number, stepData: StepTwo) {
+    console.log("Updating draft step two for draftId:", draftId, "with data:", stepData);
+    try {
+      await $fetch(`/api/draft-listings/update/steps/two/`, {
+        method: "PATCH",
+        body: {
+          draftId,
+          ...stepData,
+        },
+      });
+      refreshDraftListings();
+      // showToast("Draft listing updated", { type: "success" });
+    } catch (error) {
+      showToast("Failed to update draft listing", { type: "error" });
+      console.error("Error updating draft listing:", error);
+    }
   }
 
   return {

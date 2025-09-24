@@ -15,9 +15,9 @@
             <p class="body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperMap.length }}</em></p>
             
               <component
-                v-if="draft" 
-                :is="!stepperMap[currentStep]?.component"
-                :draft="stepperMap[currentStep]?.data" 
+                v-if="draft && currentSlide.component"
+                :is="currentSlide.component"
+                :draft="currentSlide.data"
                 @update-step-data="handleUpdateStepData"
                 @next-step="currentStep++"
                 @previous-step="currentStep--"
@@ -43,8 +43,8 @@ import CreateListingStepsStep1 from '~/components/create-listing-steps/Step1.vue
 import CreateListingStepsStep2 from '~/components/create-listing-steps/Step2.vue';
 
 const route = useRoute();
-const draft = computed(() => draftListing(Number(route.params.id)));
 const { draftListing, updateDraftStepOne, updateDraftStepTwo } = useDraftListing();
+const draft = computed(() => draftListing(Number(route.params.id)));
 const currentStep = ref(0);
 
 const stepperMap = computed(() => [
@@ -61,8 +61,6 @@ const stepperMap = computed(() => [
   { 
     title: 'Property',
     data: {
-      rentalListing: draft.value?.rentalListing || null,
-      saleListing: draft.value?.saleListing || null,
       property: draft.value?.property || null,
     },
     complete: !!(draft.value?.property?.type && draft.value?.property?.classification),
@@ -82,6 +80,8 @@ const stepperMap = computed(() => [
 
 // Stepper configuration (reactive)
 const stepperMapProp = computed(() => stepperMap.value.map(s => ({ title: s.title, complete: s.complete })));
+// current slide helper (loose any typing to avoid template TS strictness)
+const currentSlide: any = computed(() => stepperMap.value[currentStep.value] || {});
 
 const handleUpdateStepData = async (stepData: StepOne & StepTwo, step: number) => {
   if(!draft?.value?.id) return;
@@ -89,7 +89,14 @@ const handleUpdateStepData = async (stepData: StepOne & StepTwo, step: number) =
   const stepToUpdate = computed(() => stepperMap.value[step - 1]?.update).value;
 
   if (stepToUpdate) {
-    await stepToUpdate(draft.value.id, stepData);
+    await stepToUpdate(draft.value.id, stepData).then(
+      () => {
+        if (currentStep.value < stepperMap.value.length - 1) {
+          currentStep.value += 1;
+        }
+      },
+    );
+    
      // Optionally, move to the next step after updating
     if (currentStep.value < stepperMap.value.length - 1) {
       currentStep.value += 1;

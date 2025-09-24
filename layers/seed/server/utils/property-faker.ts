@@ -500,7 +500,6 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   // First create the property with all features
   const propertyWithFeatures = await prisma.property.create({
     data: {
-      title: faker.word.words(10),
       description: faker.word.words(20),
       value: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
       totalFloors: faker.number.int({ min: 1, max: 5 }),

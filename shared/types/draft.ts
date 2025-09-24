@@ -15,6 +15,7 @@ export type StepTwo = {
     yearBuilt: string | null
     size: number | null
     description: string | null
+    totalFloors: number | null
   }
 }
 

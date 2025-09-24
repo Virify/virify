@@ -80,6 +80,7 @@ export const createInitialStepTwoValues = (draftListing: DraftListingWithFullPay
       yearBuilt: draftListing.property?.yearBuilt || '0',
       size: draftListing.property?.size || null,
       description: draftListing.property?.description || null,
+      totalFloors: draftListing.property?.totalFloors || null,
     }
   }
 }

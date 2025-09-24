@@ -1,6 +1,5 @@
 model Property {
   id                       Int                    @id @default(autoincrement())
-  title                    String
   description              String
   value                    Float?
   size                     Float?
@@ -29,7 +28,7 @@ model Property {
   media                    Media[]
   parking                  Parking?
   energyAndUtilities       EnergyAndUtilities?
-  address                  Address                @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  address                  Address?                @relation(fields: [addressId], references: [id], onDelete: Cascade)
   runningCosts             RunningCosts?
   securityFeatures         Security?
   storageFeatures          Storage?
@@ -40,7 +39,7 @@ model Property {
   classification           PropertyClassification @relation(fields: [propertyClassificationId], references: [id])
   createdAt                DateTime               @default(now())
   updatedAt                DateTime               @updatedAt
-  addressId                Int
+  addressId                Int?
   userId                   Int?
   estateAgentId            Int?
   propertyTypeId           Int

@@ -4,34 +4,40 @@
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
     </p>
-    <div class="o-form-group__input">
+    <div class="o-form-group__number">
       <AtomsInput
-        :name="name" 
-        :modelValue="modelValue" 
+        type="number"
+        min="0"
+        max="100"
+        :name="name"
+        :modelValue="modelValue"
+        :placeholder="placeholder || 'Enter a number'"
         :required="required"
-        :placeholder="placeholder || 'Enter ' + title.toLowerCase()"
-        class="body-sm"
-        @update:modelValue="$emit('update:modelValue', $event)" 
+        @update:modelValue="handleUpdateModel"
       />
     </div>
-      
   </div>
 </template>
 
 <script setup lang="ts">
+
 interface Props {
   title: string;
-  modelValue: any;
-  name: string;
-  placeholder?: string;
+  name?: string;
   required?: boolean;
   divider?: boolean;
+  placeholder?: string
+  modelValue: any;
 }
 
-defineProps<Props>();
-defineEmits<{
-  'update:modelValue': [value: any];
-}>();
+defineProps<Props>()
+
+const emit = defineEmits(['update:modelValue'])
+
+function handleUpdateModel(val: any) {
+  emit('update:modelValue', val ? parseInt(val) : null)
+}
+
 </script>
 
 <style lang="scss">
@@ -42,10 +48,9 @@ defineEmits<{
     padding-bottom: var(--size-16);
   }
 
-  &__input {
+  &__number {
+    max-width: 300px;
     margin: 0 auto;
-    width:100%;
-    max-width: 800px;
   }
 }
 </style>

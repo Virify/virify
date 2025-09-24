@@ -26,20 +26,30 @@
         :divider="true"
       />
 
-      <OrganismsDraftFormRadioGroup
+      <OrganismsDraftFormTextGroup
+        title="Please provide a short description of the property - your property features speaks for itself!"
+        v-model="stepTwoData.property.description"
+        name="property-description"
+        placeholder="e.g 'This charming 2-bedroom apartment offers stunning views etc...'"
+        :divider="true"
+        :required="true"
+      />
+
+      <OrganismsDraftFormNumberGroup
+        title="How many total floors does the property have?"
+        v-model="stepTwoData.property.totalFloors"
+        name="property-floors"
+        placeholder="e.g '2'"
+        :divider="true"
+        :required="true"
+      />
+
+        <OrganismsDraftFormRadioGroup
         title="What is the construction type of the property?" 
         :options="constructionOptions" 
         v-model="stepTwoData.property.constructionType"
         name="property-construction-type" 
         :divider="true"      
-      />
-
-      <OrganismsDraftFormTextGroup
-        title="Please provide a short description of the property - your property features speaks for itself!"
-        v-model="stepTwoData.property.description"
-        name="property-description"
-        placeholder="e.g., A charming 3-bedroom house with a spacious garden..."
-        :divider="true"
       />
 
       <OrganismsDraftFormSizeToggle
@@ -86,15 +96,31 @@ const emit = defineEmits<{
 const stepTwoData = ref<StepTwo>(createInitialStepTwoValues(props.draft));
 const sizeToConvert = ref<string>(props.draft.property ? 'meter' : 'meter')
 
-const isFormValid = computed(() => Boolean(stepTwoData.value.property.type && stepTwoData.value.property.classification))
+const isFormValid = computed(() => 
+  Boolean(
+    stepTwoData.value.property.type && 
+    stepTwoData.value.property.classification && 
+    stepTwoData.value.property.description &&
+    stepTwoData.value.property.totalFloors
+))
 
 const buttonDisabled = computed(() => !isFormValid.value)
 
 function submitForm() {
   if (!isFormValid.value) return
-  // reset year built to null if '0' (Not Specified) is selected
+  
+  /**
+   * Set year built to null if '0' (Not Specified) is selected to maintain type consistency
+   */
   if(stepTwoData.value.property.yearBuilt === '0') {
     stepTwoData.value.property.yearBuilt = null
+  }
+
+  /**
+   * Convert size to meters if the selected unit is feet
+   */
+  if(sizeToConvert.value === 'feet' && stepTwoData.value.property.size) {
+    stepTwoData.value.property.size = convertFeetToMeters(stepTwoData.value.property.size)
   }
   emit('updateStepData', stepTwoData.value, 2);
 }
