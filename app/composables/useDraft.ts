@@ -1,6 +1,7 @@
 import { createSharedComposable } from "@vueuse/core";
 import CreateListingStepsStep1 from '~/components/create-listing-steps/Step1.vue';
 import CreateListingStepsStep2 from '~/components/create-listing-steps/Step2.vue';
+import CreateListingStepsStep3 from '~/components/create-listing-steps/Step3.vue';
 
 export interface DraftStepConfig {
   title: string;
@@ -11,7 +12,7 @@ export interface DraftStepConfig {
 }
 
 export const useDraft = createSharedComposable(() => {
-  const { draftListing, updateDraftStepOne, updateDraftStepTwo } = useDraftListing();
+  const { draftListing, updateDraftStepOne, updateDraftStepTwo, updateDraftStepThree } = useDraftListing();
 
   /**
    * Get draft by ID
@@ -32,7 +33,7 @@ export const useDraft = createSharedComposable(() => {
         data: {
           saleListing: draft.value?.saleListing || null,
           rentalListing: draft.value?.rentalListing || null
-        },
+        } as StepOne,
         complete: !!(draft.value?.saleListing || draft.value?.rentalListing),
         update: updateDraftStepOne,
         component: CreateListingStepsStep1
@@ -40,8 +41,16 @@ export const useDraft = createSharedComposable(() => {
       { 
         title: 'Property',
         data: {
-          property: draft.value?.property || null,
-        },
+          property: {
+            type: draft.value?.property?.type || null,
+            classification: draft.value?.property?.classification || null,
+            constructionType: draft.value?.property?.constructionType || null,
+            yearBuilt: draft.value?.property?.yearBuilt || '0',
+            size: draft.value?.property?.size || null,
+            description: draft.value?.property?.description || null,
+            totalFloors: draft.value?.property?.totalFloors || null,
+          },
+        } as StepTwo,
         complete: !!(
           draft.value?.property?.type && 
           draft.value?.property?.classification && 
@@ -51,8 +60,41 @@ export const useDraft = createSharedComposable(() => {
         update: updateDraftStepTwo,
         component: CreateListingStepsStep2
       },
+      { 
+        title: 'Price', 
+        data: {
+          price: draft.value?.price || null,
+          ...(draft.value?.rentalListing && {
+            rentalListing: {
+              deposit: draft.value.rentalListing.deposit || null,
+              holdingDeposit: draft.value.rentalListing.holdingDeposit || null,
+              rentFrequency: draft.value.rentalListing.rentFrequency || null,
+              rentalLength: draft.value.rentalListing.rentalLength || null,
+            }
+          }),
+          ...(draft.value?.saleListing && {
+            saleListing: {
+              priceType: draft.value.saleListing.priceType || null,
+            }
+          }),
+        } as StepThree,
+        complete: !!(
+          draft.value?.price &&
+          (
+            (draft.value?.rentalListing &&
+              draft.value.rentalListing.deposit &&
+              draft.value.rentalListing.rentFrequency &&
+              draft.value.rentalListing.rentalLength
+            ) ||
+            (draft.value?.saleListing &&
+              draft.value.saleListing.priceType !== null
+            )
+          )
+        ),
+        update: updateDraftStepThree,
+        component: CreateListingStepsStep3
+      },
       { title: 'Address', complete: false },
-      { title: 'Price', complete: false },
       { title: 'Description', complete: false },
       { title: 'Rooms', complete: false },
       { title: 'Additional', complete: false },
@@ -105,10 +147,10 @@ export const useDraft = createSharedComposable(() => {
     if (stepToUpdate) {
       try {
         await stepToUpdate(draft.value.id, stepData);
-        return true; // Success
+        return true;
       } catch (error) {
         console.error("Error updating step data:", error);
-        return false; // Failure
+        return false;
       }
     }
     return false;

@@ -98,6 +98,23 @@ export const useDraftListing = createSharedComposable(() => {
     }
   }
 
+  async function updateDraftStepThree(draftId: number, stepData: StepThree) {
+    console.log("Updating draft step three for draftId:", draftId, "with data:", stepData);
+    try {
+      await $fetch(`/api/draft-listings/update/steps/three/`, {
+        method: "PATCH",
+        body: {
+          draftId,
+          ...stepData,
+        },
+      });
+      refreshDraftListings();
+    } catch (error) {
+      showToast("Failed to update draft listing", { type: "error" });
+      console.error("Error updating draft listing:", error);
+    }
+  }
+
   return {
     draftListings,
     draftListing,
@@ -106,6 +123,7 @@ export const useDraftListing = createSharedComposable(() => {
     createDraftListing,
     deleteDraftListing,
     updateDraftStepOne,
-    updateDraftStepTwo
+    updateDraftStepTwo,
+    updateDraftStepThree
   };
 });

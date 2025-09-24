@@ -43,6 +43,9 @@
         placeholder="e.g '2'"
         :divider="true"
         :required="true"
+        min="0"
+        step="1"
+        max="100"
       />
 
         <OrganismsDraftFormRadioGroup

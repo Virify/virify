@@ -59,7 +59,7 @@
       <!-- RENTAL -->
       <OrganismsDraftFormRadioGroup 
         v-if="isRent" 
-        title="What type of rental price do you want to set?"
+        title="What is the availability status of the listing?"
         :options="rentalAvailabilityStatusOptions" 
         v-model="stepOneData.rentalListing.availabilityStatus"
         name="rental-availability-status" 
@@ -69,7 +69,7 @@
 
       <OrganismsDraftFormRadioGroup 
         v-if="isRent" 
-        title="What type of rental price do you want to set?"
+        title="Are bills included in the rent?"
         :options="rentalBillsIncludedOptions" 
         v-model="stepOneData.rentalListing.isBillsIncluded"
         name="rental-bills-included" 
@@ -79,7 +79,7 @@
 
       <OrganismsDraftFormRadioGroup 
         v-if="isRent" 
-        title="What type of rental price do you want to set?"
+        title="What is the furnished status of the listing?"
         :options="rentalFurnishedStatusOptions" 
         v-model="stepOneData.rentalListing.furnishedStatus"
         name="rental-furnished-status" 

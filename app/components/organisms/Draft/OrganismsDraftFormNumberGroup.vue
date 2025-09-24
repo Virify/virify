@@ -4,15 +4,18 @@
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
     </p>
-    <div class="o-form-group__number">
+    <div class="o-form-group__input">
       <AtomsInput
         type="number"
-        min="0"
-        max="100"
+        :min="min"
+        :max="max"
+        :step="step"
+        inputmode="decimal"
         :name="name"
-        :modelValue="modelValue"
-        :placeholder="placeholder || 'Enter a number'"
+        :modelValue="modelValue || undefined"
+        :placeholder="placeholder || 'Enter ' + title.toLowerCase()"
         :required="required"
+        class="body-sm"
         @update:modelValue="handleUpdateModel"
       />
     </div>
@@ -26,8 +29,11 @@ interface Props {
   name?: string;
   required?: boolean;
   divider?: boolean;
-  placeholder?: string
-  modelValue: any;
+  placeholder?: string;
+  modelValue: number | null;
+  min?: string | number;
+  max?: string | number;
+  step?: string | number;
 }
 
 defineProps<Props>()
@@ -35,8 +41,9 @@ defineProps<Props>()
 const emit = defineEmits(['update:modelValue'])
 
 function handleUpdateModel(val: any) {
-  emit('update:modelValue', val ? parseInt(val) : null)
+  emit('update:modelValue', val ? parseFloat(val) : null)
 }
+
 
 </script>
 
@@ -48,9 +55,10 @@ function handleUpdateModel(val: any) {
     padding-bottom: var(--size-16);
   }
 
-  &__number {
-    max-width: 300px;
+  &__input {
     margin: 0 auto;
+    width:100%;
+    max-width: 250px;
   }
 }
 </style>

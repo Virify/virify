@@ -1,5 +1,5 @@
-import type { Prisma, PropertyType } from "~~/layers/database/server/database/prisma/generated/client"
-import type { ConstructionType } from "~~/layers/database/server/database/prisma/generated/enums";
+import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client"
+import type { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
 export type StepOne = {
@@ -16,6 +16,19 @@ export type StepTwo = {
     size: number | null
     description: string | null
     totalFloors: number | null
+  }
+}
+
+export type StepThree = {
+  price: number | null
+  rentalListing?: {
+    deposit: number | null
+    holdingDeposit: number | null
+    rentFrequency: RentalPriceType | null
+    rentalLength: number | null
+  },
+  saleListing?: {
+    priceType: SalePriceType | null
   }
 }
 
