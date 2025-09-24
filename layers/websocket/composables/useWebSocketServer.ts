@@ -200,7 +200,7 @@ export const useWebSocketServer = () => {
    * @param events - Object containing event handler callbacks for different message types
    */
   const handleOutgoingMessages = (rawData: string, events: WebSocketEvents) => {
-    if (!rawData || rawData === "ping") return;
+    if (!rawData || rawData === "ping" || rawData === "pong") return;
 
     try {
       const wsMessage: WebSocketMessage = JSON.parse(rawData);

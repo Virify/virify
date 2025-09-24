@@ -158,8 +158,6 @@ function onSelectedTypeChange(newType: string | null) {
 
 function resetForm() {
   stepOneData.value = JSON.parse(JSON.stringify(initialStepOneData.value));
-  // force remount of form child components so they pick up restored v-model
-  formKey.value++;
 }
 
 function submitForm() {
