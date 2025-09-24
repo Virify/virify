@@ -7,7 +7,7 @@ const stepTwoScehma = z.object({
     classification: z.number().int().positive(),
     constructionType: z.enum(["STANDARD", "NON_STANDARD"]).nullable().optional(),
     yearBuilt: z
-      .number()
+      .coerce.number()
       .min(4)
       .max(new Date().getFullYear() || 2024)
       .nullable()

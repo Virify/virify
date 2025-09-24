@@ -89,19 +89,23 @@ const handleUpdateStepData = async (stepData: StepOne & StepTwo, step: number) =
   const stepToUpdate = computed(() => stepperMap.value[step - 1]?.update).value;
 
   if (stepToUpdate) {
-    await stepToUpdate(draft.value.id, stepData).then(
-      () => {
-        if (currentStep.value < stepperMap.value.length - 1) {
-          currentStep.value += 1;
-        }
-      },
-    );
-    
-     // Optionally, move to the next step after updating
-    if (currentStep.value < stepperMap.value.length - 1) {
-      currentStep.value += 1;
+    try {
+      await stepToUpdate(draft.value.id, stepData);
+      if (currentStep.value < stepperMap.value.length - 1) {
+        currentStep.value += 1;
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to save step data:', err);
     }
   }
+}
+
+// Scroll to top when the current step changes (client only)
+if (import.meta.client) {
+  watch(currentStep, () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
 // When the draft (and therefore step completion flags) becomes available,
