@@ -11,6 +11,7 @@
         title="What type of property are you listing?" 
         :options="propertyTypeSelectOptions" 
         v-model="stepTwoData.property.type"
+        @update:modelValue="onPropertyTypeChange"
         name="listing-type" 
         :required="true" 
         :divider="true"
@@ -69,19 +70,21 @@
         :divider="true"
       />
     
-      <div class="step__form-actions">
-        <button class="step__form-action | button button-sm button-secondary" @click="$emit('previousStep')" type="button">
-          Previous Step
-        </button>
-
-        <button class="step__form-action | button button-sm button-secondary" :disabled="buttonDisabled" type="submit">
-          Save and Continue
-        </button>
-      </div>
+      <MoleculesDraftFormActions
+        :hasChanges="hasChanges"
+        :buttonDisabled="buttonDisabled"
+        primaryText="Save and Continue"
+        showPrevious
+        @cancel="resetForm"
+        @previous="$emit('previousStep')"
+        @submit="submitForm"
+      />
     </form>
   </section>
 </template>
 <script setup lang="ts">
+import { objectsEqual } from '~/utils/objects/objects-equal';
+import MoleculesDraftFormActions from '~/components/molecules/Draft/MoleculesDraftFormActions.vue';
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
@@ -94,6 +97,8 @@ const emit = defineEmits<{
 }>();
 
 const stepTwoData = ref<StepTwo>(createInitialStepTwoValues(props.draft));
+// take a deep snapshot so initial state is not the same reference as the live form state
+const initialStepTwoData = ref<StepTwo>(JSON.parse(JSON.stringify(stepTwoData.value)));
 const sizeToConvert = ref<string>(props.draft.property ? 'meter' : 'meter')
 
 const isFormValid = computed(() => 
@@ -105,9 +110,39 @@ const isFormValid = computed(() =>
 ))
 
 const buttonDisabled = computed(() => !isFormValid.value)
+const hasChanges = computed(() => !objectsEqual(initialStepTwoData.value, stepTwoData.value))
 
+/**
+ * Handler for user-driven property type changes.
+ * We attach this to the radio group's `update:modelValue` event so
+ * programmatic resets (which directly assign the object) won't trigger it.
+ */
+function onPropertyTypeChange(newType: string | null) {
+  stepTwoData.value.property.classification = null;
+}
+
+/**
+ * Reset form to initial values
+ */
+function resetForm() {
+  // restore a deep copy of the initial snapshot
+  stepTwoData.value = JSON.parse(JSON.stringify(initialStepTwoData.value));
+}
+
+/**
+ * Submit form data
+ */
 function submitForm() {
   if (!isFormValid.value) return
+
+  // If the current form state equals the initial snapshot, skip API call
+  if (objectsEqual(initialStepTwoData.value, stepTwoData.value)) {
+    console.log('No changes detected, skipping API call');
+    emit('nextStep');
+    return;
+  }
+  console.log('Changes detected, proceeding with API call');
+  
   
   /**
    * Set year built to null if '0' (Not Specified) is selected to maintain type consistency
@@ -122,6 +157,7 @@ function submitForm() {
   if(sizeToConvert.value === 'feet' && stepTwoData.value.property.size) {
     stepTwoData.value.property.size = convertFeetToMeters(stepTwoData.value.property.size)
   }
+
   emit('updateStepData', stepTwoData.value, 2);
 }
 </script>
@@ -134,6 +170,11 @@ function submitForm() {
     margin-top: var(--size-32);
     flex-wrap: wrap;
     gap: var(--size-16);
+
+    &--right {
+      display: flex;
+      gap: var(--size-16);
+    }
   }
 }
 </style>

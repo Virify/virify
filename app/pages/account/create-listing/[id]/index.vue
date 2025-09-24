@@ -63,7 +63,12 @@ const stepperMap = computed(() => [
     data: {
       property: draft.value?.property || null,
     },
-    complete: !!(draft.value?.property?.type && draft.value?.property?.classification),
+    complete: !!(
+      draft.value?.property?.type && 
+      draft.value?.property?.classification && 
+      draft.value?.property?.description && 
+      draft.value?.property?.totalFloors
+    ),
     update: updateDraftStepTwo,
     component: CreateListingStepsStep2
   },
@@ -82,6 +87,7 @@ const stepperMap = computed(() => [
 const stepperMapProp = computed(() => stepperMap.value.map(s => ({ title: s.title, complete: s.complete })));
 // current slide helper (loose any typing to avoid template TS strictness)
 const currentSlide: any = computed(() => stepperMap.value[currentStep.value] || {});
+const _stepperInitialized = ref(false);
 
 const handleUpdateStepData = async (stepData: StepOne & StepTwo, step: number) => {
   if(!draft?.value?.id) return;
@@ -91,9 +97,8 @@ const handleUpdateStepData = async (stepData: StepOne & StepTwo, step: number) =
   if (stepToUpdate) {
     try {
       await stepToUpdate(draft.value.id, stepData);
-      if (currentStep.value < stepperMap.value.length - 1) {
-        currentStep.value += 1;
-      }
+      currentStep.value ++;
+      
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Failed to save step data:', err);
@@ -108,11 +113,29 @@ if (import.meta.client) {
   });
 }
 
-// When the draft (and therefore step completion flags) becomes available,
-// set the current step to the first incomplete step so a hard refresh resumes
-watch(stepperMap, (newSlides) => {
-  const idx = newSlides.findIndex(s => !s.complete);
-  currentStep.value = idx >= 0 ? idx : 0;
+/**
+ * Determine and set the initial step once when stepper data first becomes available.
+ * This prevents subsequent updates to `stepperMap` (for example, after saving a step)
+ * from overriding whatever step the user is currently viewing.
+ */
+function setInitialStepIfNeeded(slides: Array<{ complete?: boolean }>) {
+  // already set
+  if (_stepperInitialized.value) return;
+
+  // no slides yet
+  if (!Array.isArray(slides) || slides.length === 0) return;
+
+  // find first incomplete step or default to step 0
+  const firstIncompleteIndex = slides.findIndex(s => !s.complete);
+  currentStep.value = firstIncompleteIndex >= 0 ? firstIncompleteIndex : 0;
+  _stepperInitialized.value = true;
+}
+
+/**
+ * Watch for stepper data to become available and set initial step if needed.
+ */
+watch(stepperMap, (slides) => {
+  setInitialStepIfNeeded(slides);
 }, { immediate: true });
 
 // Breadcrumb items

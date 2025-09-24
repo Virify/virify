@@ -6,13 +6,14 @@
       <em>represents a required field</em>
     </p>
 
-    <form class="step__form" @submit.prevent="submitForm">
+  <form :key="formKey" class="step__form" @submit.prevent="submitForm">
       <!-- first parent select -->
       <OrganismsDraftFormRadioGroup 
         v-if="!draft.saleListing && !draft.rentalListing"
         title="What type of listing do you want to create?" 
         :options="stepOneListingOptions" 
-        v-model="selectedType"
+        v-model="stepOneData.selectedType"
+        @update:modelValue="onSelectedTypeChange"
         name="listing-type" 
         :required="true" 
       />
@@ -22,7 +23,7 @@
         v-if="isSale" 
         title="What type of sale tenure do you want to set?"
         :options="saleListingTenureOptions"
-        v-model="saleListing.tenureType" name="sale-tenure-type"
+        v-model="stepOneData.saleListing.tenureType" name="sale-tenure-type"
         :divider="true" 
         :required="true"
       />
@@ -31,7 +32,7 @@
         v-if="isSale" 
         title="What is the availability status of the listing?"
         :options="saleListingAvailabilityOptions" 
-        v-model="saleListing.availabilityStatus"
+        v-model="stepOneData.saleListing.availabilityStatus"
         name="sale-availability" 
         :divider="true" 
         :required="true" 
@@ -41,7 +42,7 @@
         v-if="isSale" 
         title="What is the chain of the listing?"
         :options="saleListingChainOptions" 
-        v-model="saleListing.chain" 
+        v-model="stepOneData.saleListing.chain" 
         :divider="true"
         name="sale-chain" 
       />
@@ -50,7 +51,7 @@
         v-if="isSale" 
         title="What is the ownership status of the listing?"
         :options="saleSharedOwnershipOptions" 
-        v-model="saleListing.sharedOwnership" 
+        v-model="stepOneData.saleListing.sharedOwnership" 
         :divider="true"
         name="sale-shared-ownership" 
       />
@@ -60,7 +61,7 @@
         v-if="isRent" 
         title="What type of rental price do you want to set?"
         :options="rentalAvailabilityStatusOptions" 
-        v-model="rentalListing.availabilityStatus"
+        v-model="stepOneData.rentalListing.availabilityStatus"
         name="rental-availability-status" 
         :required="true" 
         :divider="true" 
@@ -70,7 +71,7 @@
         v-if="isRent" 
         title="What type of rental price do you want to set?"
         :options="rentalBillsIncludedOptions" 
-        v-model="rentalListing.isBillsIncluded"
+        v-model="stepOneData.rentalListing.isBillsIncluded"
         name="rental-bills-included" 
         :required="true" 
         :divider="true" 
@@ -80,21 +81,24 @@
         v-if="isRent" 
         title="What type of rental price do you want to set?"
         :options="rentalFurnishedStatusOptions" 
-        v-model="rentalListing.furnishedStatus"
+        v-model="stepOneData.rentalListing.furnishedStatus"
         name="rental-furnished-status" 
         :required="true" 
         :divider="true" 
       />
 
-      <button class="step__form-action | button button-sm button-secondary" :disabled="buttonDisabled" type="submit">
-        {{ buttonText }}
-      </button>
+      <MoleculesDraftFormActions
+        :hasChanges="hasChanges"
+        :buttonDisabled="buttonDisabled"
+        :primaryText="buttonText"
+        @cancel="resetForm"
+        @submit="submitForm"
+      />
     </form>
   </section>
 </template>
 <script setup lang="ts">
 import type { SaleListingCreateWithoutListingInput, RentalListingCreateWithoutListingInput } from '~~/layers/database/server/database/prisma/generated/models';
-
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
@@ -105,125 +109,73 @@ const emit = defineEmits<{
   'nextStep': [];
 }>();
 
-const selectedType = ref<string | null>(props.draft.saleListing ? 'sale' : props.draft.rentalListing ? 'rent' : null);
-const buttonDisabled = ref(true);
-
-const saleListing = ref<SaleListingCreateWithoutListingInput>(createInitialSaleValues(props.draft));
-const rentalListing = ref<RentalListingCreateWithoutListingInput>(createInitialRentalValues(props.draft));
-
-const isSale = computed(() => selectedType.value === 'sale');
-const isRent = computed(() => selectedType.value === 'rent');
-
-const saleComplete = computed(() => {
-  return saleListing.value.tenureType !== null && saleListing.value.availabilityStatus !== null;
+const stepOneData = ref({
+  selectedType: props.draft.saleListing ? 'sale' : props.draft.rentalListing ? 'rent' : null,
+  saleListing: createInitialSaleValues(props.draft),
+  rentalListing: createInitialRentalValues(props.draft)
 });
 
+// deep snapshot for reset/change detection
+const initialStepOneData = ref(JSON.parse(JSON.stringify(stepOneData.value)));
+// key to force remount of form children when performing a full reset
+const formKey = ref(0);
+
+const isSale = computed(() => stepOneData.value.selectedType === 'sale');
+const isRent = computed(() => stepOneData.value.selectedType === 'rent');
+
+const saleComplete = computed(() => stepOneData.value.saleListing.tenureType !== null && stepOneData.value.saleListing.availabilityStatus !== null);
+
 const rentalComplete = computed(() => {
-  return rentalListing.value.furnishedStatus !== null &&
-    rentalListing.value.availabilityStatus !== null &&
-    rentalListing.value.isBillsIncluded !== null;
+  return stepOneData.value.rentalListing.furnishedStatus !== null &&
+    stepOneData.value.rentalListing.availabilityStatus !== null &&
+    stepOneData.value.rentalListing.isBillsIncluded !== null;
 });
 
 const isFormValid = computed(() => {
-  if (selectedType.value === 'sale') {
-    return saleComplete.value;
-  } else if (selectedType.value === 'rent') {
-    return rentalComplete.value;
-  }
+  if (stepOneData.value.selectedType === 'sale') return saleComplete.value;
+  if (stepOneData.value.selectedType === 'rent') return rentalComplete.value;
   return false;
 });
 
-// Check if draft already has complete step one data
-const draftHasStepOneData = computed(() => {
-  return (props.draft.saleListing && saleComplete.value) || 
-         (props.draft.rentalListing && rentalComplete.value);
-});
+const draftHasStepOneData = computed(() => (props.draft.saleListing && saleComplete.value) || (props.draft.rentalListing && rentalComplete.value));
 
-const objectsEqual = (obj1: any, obj2: any): boolean => {
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-  
-  if (keys1.length !== keys2.length) return false;
-  
-  return keys1.every(key => obj1[key] === obj2[key]);
-};
+const hasChanges = computed(() => !objectsEqual(initialStepOneData.value, stepOneData.value));
 
-// Track if any changes have been made from original draft data
-const hasChanges = computed(() => {
-  if (selectedType.value === 'sale' && props.draft.saleListing) {
-    const originalSale = createInitialSaleValues(props.draft);
-    return !objectsEqual(saleListing.value, originalSale);
-  } else if (selectedType.value === 'rent' && props.draft.rentalListing) {
-    const originalRental = createInitialRentalValues(props.draft);
-    return !objectsEqual(rentalListing.value, originalRental);
-  }
-  // If no draft data exists, any valid form data counts as changes
-  return isFormValid.value;
-});
-
-// Button text based on conditions
 const buttonText = computed(() => {
-  if (!isFormValid.value) {
-    return 'Save and Continue';
-  }
-  if (draftHasStepOneData.value && !hasChanges.value) {
-    return 'Next Step';
-  }
+  if (!isFormValid.value) return 'Save and Continue';
+  if (draftHasStepOneData.value && !hasChanges.value) return 'Next Step';
   return 'Save and Continue';
 });
 
-const resetSaleListing = () => {
-  saleListing.value = createInitialSaleValues(props.draft);
-};
+const buttonDisabled = computed(() => !isFormValid.value);
 
-const resetRentalListing = () => {
-  rentalListing.value = createInitialRentalValues(props.draft);
-};
+function onSelectedTypeChange(newType: string | null) {
+  stepOneData.value.selectedType = newType;
+  // reset the opposite listing
+  if (newType === 'sale') stepOneData.value.rentalListing = createInitialRentalValues(props.draft);
+  if (newType === 'rent') stepOneData.value.saleListing = createInitialSaleValues(props.draft);
+}
 
-const submitForm = () => {
+function resetForm() {
+  stepOneData.value = JSON.parse(JSON.stringify(initialStepOneData.value));
+  // force remount of form child components so they pick up restored v-model
+  formKey.value++;
+}
+
+function submitForm() {
   if (!isFormValid.value) return;
-  if(hasChanges.value === false && isFormValid.value) {
+  if (!hasChanges.value) {
+    console.log('No changes detected, skipping API call');
     emit('nextStep');
     return;
   }
-  
-  // Type assertion since we've validated the form is valid
-  const stepData = selectedType.value === 'sale' 
-    ? setStepData("sale", saleListing.value as SaleListingCreateWithoutListingInput) 
-    : setStepData("rent", rentalListing.value as RentalListingCreateWithoutListingInput);
+
+  const stepData = stepOneData.value.selectedType === 'sale'
+    ? setStepData('sale', stepOneData.value.saleListing as SaleListingCreateWithoutListingInput)
+    : setStepData('rent', stepOneData.value.rentalListing as RentalListingCreateWithoutListingInput);
+
   emit('updateStepData', stepData, 1);
-};
-
-// Helper to get all form values for watching
-const getAllFormValues = () => [
-  selectedType,
-  () => saleListing.value.tenureType,
-  () => saleListing.value.chain,
-  () => saleListing.value.sharedOwnership,
-  () => saleListing.value.availabilityStatus,
-  () => rentalListing.value.deposit,
-  () => rentalListing.value.holdingDeposit,
-  () => rentalListing.value.rentFrequency,
-  () => rentalListing.value.isBillsIncluded,
-  () => rentalListing.value.rentalLength,
-  () => rentalListing.value.furnishedStatus,
-  () => rentalListing.value.availabilityStatus
-];
-
-watch(
-  getAllFormValues(),
-  () => {
-    buttonDisabled.value = !isFormValid.value;
-
-    // Reset other form when switching types
-    if (selectedType.value === 'rent') {
-      resetSaleListing();
-    } else if (selectedType.value === 'sale') {
-      resetRentalListing();
-    }
-  },
-  { immediate: true }
-);
+}
 </script>
 <style lang="scss">
 .step {

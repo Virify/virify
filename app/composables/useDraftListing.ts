@@ -75,7 +75,6 @@ export const useDraftListing = createSharedComposable(() => {
         },
       });
       refreshDraftListings();
-      showToast("Draft listing updated", { type: "success" });
     } catch (error) {
       showToast("Failed to update draft listing", { type: "error" });
       console.error("Error updating draft listing:", error);
@@ -93,7 +92,6 @@ export const useDraftListing = createSharedComposable(() => {
         },
       });
       refreshDraftListings();
-      // showToast("Draft listing updated", { type: "success" });
     } catch (error) {
       showToast("Failed to update draft listing", { type: "error" });
       console.error("Error updating draft listing:", error);
