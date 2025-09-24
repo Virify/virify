@@ -86,34 +86,31 @@ const currentStep = computed({
   }
 });
 
-// Functions to handle step navigation
+/**
+ * @param stepIndex Index of the step to check
+ * @returns True if the step is accessible (clickable), false otherwise
+ */
 const isStepAccessible = (stepIndex: number): boolean => {
-  // Current step and previous steps are always accessible
-  if (stepIndex <= currentStep.value) {
-    return true;
-  }
-  // Next step is accessible only if current step is complete
-  if (stepIndex === currentStep.value + 1) {
-    const currentStepData = props.stepperSlides[currentStep.value];
-    return currentStepData?.complete === true;
-  }
-  // Steps further ahead are not accessible
-  return false;
-};
-
-const goToStep = (stepIndex: number) => {
-  // Only allow navigation to the current step, completed steps, or the next step if previous is complete
-  if (stepIndex <= currentStep.value) {
-    // Can always go back to current or previous steps
-    currentStep.value = stepIndex;
-  } else if (stepIndex === currentStep.value + 1) {
-    // Can only go to next step if current step is completed
-    const currentStepData = props.stepperSlides[currentStep.value];
-    if (currentStepData?.complete) {
-      currentStep.value = stepIndex;
+  // Find the highest completed step
+  let highestCompletedStep = -1;
+  for (let i = 0; i < props.stepperSlides.length; i++) {
+    if (props.stepperSlides[i]?.complete === true) {
+      highestCompletedStep = i;
     }
   }
-  // Ignore clicks on steps that are further ahead and not accessible
+  
+  // Can access any step up to one past the highest completed step
+  return stepIndex <= highestCompletedStep + 1;
+};
+
+/**
+ * Navigate to a specific step in the stepper.
+ * @param stepIndex Index of the step to navigate to
+ */
+const goToStep = (stepIndex: number) => {
+  if (isStepAccessible(stepIndex)) {
+    currentStep.value = stepIndex;
+  }
 };
 
 // Watch for carousel scroll events to update current step
@@ -128,7 +125,6 @@ onMounted(() => {
   });
 });
 
-// Expose step navigation methods for parent components
 defineExpose({
   goToStep,
   currentStep: readonly(currentStep),

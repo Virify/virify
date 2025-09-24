@@ -98,6 +98,11 @@ export const useDraftListing = createSharedComposable(() => {
     }
   }
 
+  /**
+   * Updates the third step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the third step
+   */
   async function updateDraftStepThree(draftId: number, stepData: StepThree) {
     console.log("Updating draft step three for draftId:", draftId, "with data:", stepData);
     try {

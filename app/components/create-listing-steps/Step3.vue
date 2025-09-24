@@ -138,6 +138,7 @@ function resetForm() {
 async function submitForm() {
   if (!isFormValid.value) return;
   if (objectsEqual(initialStepThreeData.value, stepThreeData.value)) {
+    console.log('No changes detected, skipping API call');
     // No changes to save, just proceed to next step
     emit('nextStep');
     return;
