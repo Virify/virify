@@ -4,7 +4,7 @@
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
     </p>
-    <div class="o-form-group__input">
+    <div class="o-form-group__number-input">
       <AtomsInput
         type="number"
         :min="min"
@@ -49,13 +49,13 @@ function handleUpdateModel(val: any) {
 
 <style lang="scss">
 .o-form-group {
-
+  padding: var(--size-32) 0;
   &__title {
     text-align: center;
     padding-bottom: var(--size-16);
   }
 
-  &__input {
+  &__number-input {
     margin: 0 auto;
     width:100%;
     max-width: 250px;

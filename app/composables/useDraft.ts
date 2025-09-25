@@ -2,6 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 import CreateListingStepsStep1 from '~/components/create-listing-steps/Step1.vue';
 import CreateListingStepsStep2 from '~/components/create-listing-steps/Step2.vue';
 import CreateListingStepsStep3 from '~/components/create-listing-steps/Step3.vue';
+import CreateListingStepsStep4 from '~/components/create-listing-steps/Step4.vue';
 
 export interface DraftStepConfig {
   title: string;
@@ -12,7 +13,7 @@ export interface DraftStepConfig {
 }
 
 export const useDraft = createSharedComposable(() => {
-  const { draftListing, updateDraftStepOne, updateDraftStepTwo, updateDraftStepThree } = useDraftListing();
+  const { draftListing, updateDraftStepOne, updateDraftStepTwo, updateDraftStepThree, updateDraftStepFour } = useDraftListing();
 
   /**
    * Get draft by ID
@@ -94,7 +95,35 @@ export const useDraft = createSharedComposable(() => {
         update: updateDraftStepThree,
         component: CreateListingStepsStep3
       },
-      { title: 'Address', complete: false },
+      { 
+        title: 'Address',
+        data: {
+          property: {
+            address: {
+              number: draft.value?.property?.address?.number || null,
+              flat: draft.value?.property?.address?.flat || null,
+              street: draft.value?.property?.address?.street || null,
+              city: draft.value?.property?.address?.city || null,
+              county: draft.value?.property?.address?.county || null,
+              postcode: draft.value?.property?.address?.postcode || null,
+              country: draft.value?.property?.address?.country || null,
+              fullAddress: draft.value?.property?.address?.fullAddress || null,
+              lat: draft.value?.property?.address?.lat || null,
+              lon: draft.value?.property?.address?.lon || null,
+            }
+          },
+        } as StepFour,
+        complete: !!(
+          draft.value?.property?.address?.number &&
+          draft.value?.property?.address?.street &&
+          draft.value?.property?.address?.city &&
+          draft.value?.property?.address?.postcode &&
+          draft.value?.property?.address?.lat &&
+          draft.value?.property?.address?.lon
+        ),
+        update: updateDraftStepFour,
+        component: CreateListingStepsStep4
+      },
       { title: 'Description', complete: false },
       { title: 'Rooms', complete: false },
       { title: 'Additional', complete: false },

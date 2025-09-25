@@ -24,7 +24,6 @@
         title="What type of sale tenure do you want to set?"
         :options="saleListingTenureOptions"
         v-model="stepOneData.saleListing.tenureType" name="sale-tenure-type"
-        :divider="true" 
         :required="true"
       />
 
@@ -34,7 +33,6 @@
         :options="saleListingAvailabilityOptions" 
         v-model="stepOneData.saleListing.availabilityStatus"
         name="sale-availability" 
-        :divider="true" 
         :required="true" 
       />
 
@@ -64,7 +62,6 @@
         v-model="stepOneData.rentalListing.availabilityStatus"
         name="rental-availability-status" 
         :required="true" 
-        :divider="true" 
       />
 
       <OrganismsDraftFormRadioGroup 
@@ -74,7 +71,6 @@
         v-model="stepOneData.rentalListing.isBillsIncluded"
         name="rental-bills-included" 
         :required="true" 
-        :divider="true" 
         />
 
       <OrganismsDraftFormRadioGroup 
@@ -84,7 +80,6 @@
         v-model="stepOneData.rentalListing.furnishedStatus"
         name="rental-furnished-status" 
         :required="true" 
-        :divider="true" 
       />
 
       <MoleculesDraftFormActions

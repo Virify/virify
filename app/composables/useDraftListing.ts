@@ -120,6 +120,10 @@ export const useDraftListing = createSharedComposable(() => {
     }
   }
 
+  async function updateDraftStepFour(draftId: number, stepData: StepFour) {
+    console.log("Updating draft step four for draftId:", draftId, "with data:", stepData);
+  }
+
   return {
     draftListings,
     draftListing,
@@ -129,6 +133,7 @@ export const useDraftListing = createSharedComposable(() => {
     deleteDraftListing,
     updateDraftStepOne,
     updateDraftStepTwo,
-    updateDraftStepThree
+    updateDraftStepThree,
+    updateDraftStepFour,
   };
 });

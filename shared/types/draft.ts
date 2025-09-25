@@ -1,4 +1,4 @@
-import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client"
+import type { Address, Prisma } from "~~/layers/database/server/database/prisma/generated/client"
 import type { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
@@ -29,6 +29,23 @@ export type StepThree = {
   },
   saleListing?: {
     priceType: SalePriceType | null
+  }
+}
+
+export type StepFour = {
+  property: {
+    address: {
+      number: string | null
+      street: string | null
+      flat: string | null
+      city: string | null
+      county: string | null
+      country: string | null
+      postcode: string | null
+      fullAddress: string | null
+      lat: number | null
+      lon: number | null
+    } | null
   }
 }
 

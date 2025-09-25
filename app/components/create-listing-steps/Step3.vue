@@ -16,7 +16,6 @@
         v-model="stepThreeData.saleListing.priceType"
         name="sale-price-type"
         :required="true"
-        :divider="true"
       />
 
       <!-- rental specific -->
@@ -28,7 +27,6 @@
         v-model="stepThreeData.rentalListing.rentFrequency"
         name="rental-frequency"
         :required="true"
-        :divider="true"
       />
 
       <!-- price input for both sale and rental -->
@@ -38,7 +36,6 @@
         name="listing-price"
         placeholder="e.g '250000' or '1200'"
         :required="true"
-        :divider="true"
         min="0"
         step="0.01"
       />
@@ -51,7 +48,6 @@
         name="listing-deposit"
         placeholder="e.g '250000' or '1200'"
         :required="true"
-        :divider="true"
         type="number"
         min="0"
         step="0.01"
@@ -64,7 +60,6 @@
         v-model="stepThreeData.rentalListing.holdingDeposit"
         name="listing-holding-deposit"
         placeholder="e.g '250000' or '1200'"
-        :divider="true"
         type="number"
         min="0"
         step="0.01"
@@ -78,7 +73,6 @@
         name="listing-rental-length"
         placeholder="e.g '12'or '6 months'"
         :required="true"
-        :divider="true"
         type="number"
         min="0"
         step="0.01"

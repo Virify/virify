@@ -69,7 +69,7 @@ const localSize = computed<string>({
 
 <style lang="scss">
 .o-form-group {
-
+  padding: var(--size-32) 0;
   &__title {
     text-align: center;
     padding-bottom: var(--size-16);
@@ -81,8 +81,6 @@ const localSize = computed<string>({
     align-items: flex-start;
     gap: var(--size-16);
     justify-content: center;
-    margin-top: var(--size-16);
-    margin-bottom: var(--size-32);
   }
 
   &__text {

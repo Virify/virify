@@ -39,6 +39,7 @@ defineEmits<{
 
 <style lang="scss">
 .o-form-group {
+  padding: var(--size-32) 0;
   &__title {
     text-align: center;
     padding-bottom: var(--size-16);

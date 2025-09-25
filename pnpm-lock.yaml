@@ -14,6 +14,9 @@ importers:
       '@aws-sdk/client-ses':
         specifier: ^3.799.0
         version: 3.848.0
+      '@getaddress/autocomplete':
+        specifier: ^3.1.6
+        version: 3.1.6
       '@mapbox/mapbox-gl-draw':
         specifier: ^1.5.0
         version: 1.5.0
@@ -948,6 +951,9 @@ packages:
   '@floating-ui/vue@1.1.7':
     resolution: {integrity: sha512-idmAtbAIigGXN2SI5gItiXYBYtNfDTP9yIiObxgu13dgtG7ARCHlNfnR29GxP4LI4o13oiwsJ8wVgghj1lNqcw==}
 
+  '@getaddress/autocomplete@3.1.6':
+    resolution: {integrity: sha512-PGulKaL9ofr4EOGaWi4VaPXImuODqXA57/f/CoZAGxqExVqgz1h6w+4TcnU87ImUMyDvTJBQGAP/7MNCxr7laQ==}
+
   '@img/sharp-darwin-arm64@0.34.3':
     resolution: {integrity: sha512-ryFMfvxxpQRsgZJqBd4wsttYQbCxsJksrv9Lw/v798JcQ8+w84mBWuXwl+TT0WJ/WrYOLaYpwQXi3sA9nTIaIg==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
@@ -1330,6 +1336,9 @@ packages:
 
   '@nuxtjs/fontaine@0.5.0':
     resolution: {integrity: sha512-68po45LJW1bMrlxPiI96L4lH/8Hom8LDKsUSmIZtgPrtI1HvFvg9Kcj2329DkWIH379hyffT2Qt7/1RgRPVV+A==}
+
+  '@oddbird/css-anchor-positioning@0.6.1':
+    resolution: {integrity: sha512-/M1guQMJROMAFjS0uTmcg93S2X5r0Gwe6m5DqmRrGxNEUe1llmY6/Qw8UuhvexP6yeD+GDCP9CJtXBJS1vS9UQ==}
 
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
@@ -2644,6 +2653,9 @@ packages:
 
   '@types/chai@5.2.2':
     resolution: {integrity: sha512-8kB30R7Hwqf40JPiKhVzodJs2Qc1ZJ5zuT3uzw5Hq/dhNCl3G3l83jfpdI1e20BP348+fV7VIL/+FxaXkqBmWg==}
+
+  '@types/css-tree@2.3.10':
+    resolution: {integrity: sha512-WcaBazJ84RxABvRttQjjFWgTcHvZR9jGr0Y3hccPkHjFyk/a3N8EuxjKr+QfrwjoM5b1yI1Uj1i7EzOAAwBwag==}
 
   '@types/d3-voronoi@1.1.12':
     resolution: {integrity: sha512-DauBl25PKZZ0WVJr42a6CNvI6efsdzofl9sajqZr2Gf5Gu733WkDdUGiPkUHXiUvYGzNNlFQde2wdZdfQPG+yw==}
@@ -4099,6 +4111,10 @@ packages:
 
   get-tsconfig@4.10.1:
     resolution: {integrity: sha512-auHyJ4AgMz7vgS8Hp3N6HXSmlMdUyhSUrfBF16w153rxtLIEOE+HGqaBppczZvnHLqQJfiHotCYpNhl0lUROFQ==}
+
+  getaddress-api@2.3.1:
+    resolution: {integrity: sha512-LR/xL0h9jKqyAF5IoKEE8myEkxm8JCsZt0TXvhsRKtX4aICdcZIbFIxeCNmOt6nMLBcWsjWIVlbcsm9bZukIrA==}
+    engines: {node: '>= 18.0.0'}
 
   giget@2.0.0:
     resolution: {integrity: sha512-L5bGsVkxJbJgdnwyuheIunkGatUF/zssUoxxjACCseZYAVbaqdh9Tsmmlkl8vYan09H7sbvKt4pS8GqKLBrEzA==}
@@ -7580,6 +7596,11 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
+  '@getaddress/autocomplete@3.1.6':
+    dependencies:
+      '@oddbird/css-anchor-positioning': 0.6.1
+      getaddress-api: 2.3.1
+
   '@img/sharp-darwin-arm64@0.34.3':
     optionalDependencies:
       '@img/sharp-libvips-darwin-arm64': 1.2.0
@@ -8263,6 +8284,13 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - magicast
+
+  '@oddbird/css-anchor-positioning@0.6.1':
+    dependencies:
+      '@floating-ui/dom': 1.7.2
+      '@types/css-tree': 2.3.10
+      css-tree: 3.1.0
+      nanoid: 5.1.5
 
   '@one-ini/wasm@0.1.1': {}
 
@@ -10241,6 +10269,8 @@ snapshots:
     dependencies:
       '@types/deep-eql': 4.0.2
 
+  '@types/css-tree@2.3.10': {}
+
   '@types/d3-voronoi@1.1.12': {}
 
   '@types/deep-eql@4.0.2': {}
@@ -11884,6 +11914,8 @@ snapshots:
   get-tsconfig@4.10.1:
     dependencies:
       resolve-pkg-maps: 1.0.0
+
+  getaddress-api@2.3.1: {}
 
   giget@2.0.0:
     dependencies:

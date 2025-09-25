@@ -14,7 +14,6 @@
         @update:modelValue="onPropertyTypeChange"
         name="listing-type" 
         :required="true" 
-        :divider="true"
       />
 
       <OrganismsDraftFormRadioGroup 
@@ -24,7 +23,6 @@
         v-model="stepTwoData.property.classification"
         name="property-classification" 
         :required="true"
-        :divider="true"
       />
 
       <OrganismsDraftFormTextGroup
@@ -32,7 +30,6 @@
         v-model="stepTwoData.property.description"
         name="property-description"
         placeholder="e.g 'This charming 2-bedroom apartment offers stunning views etc...'"
-        :divider="true"
         :required="true"
       />
 
@@ -41,7 +38,6 @@
         v-model="stepTwoData.property.totalFloors"
         name="property-floors"
         placeholder="e.g '2'"
-        :divider="true"
         :required="true"
         min="0"
         step="1"
@@ -52,8 +48,7 @@
         title="What is the construction type of the property?" 
         :options="constructionOptions" 
         v-model="stepTwoData.property.constructionType"
-        name="property-construction-type" 
-        :divider="true"      
+        name="property-construction-type"       
       />
 
       <OrganismsDraftFormSizeToggle
@@ -62,7 +57,6 @@
         v-model:unit="sizeToConvert"
         v-model:size="stepTwoData.property.size"
         name="property-size"
-        :divider="true"
       />
 
       <OrganismsDraftFormSelectGroup
@@ -70,7 +64,6 @@
         :options="yearBuiltOptions"
         v-model="stepTwoData.property.yearBuilt"
         name="year-built"
-        :divider="true"
       />
     
       <MoleculesDraftFormActions
