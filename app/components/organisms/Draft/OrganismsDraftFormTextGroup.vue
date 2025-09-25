@@ -1,5 +1,5 @@
 <template>
-  <div class="o-form-group" :class="{ 'o-form-group--expanded': expanded }">
+  <div class="o-form-group" :class="{ 'o-form-group--grid': grid}">
     <AtomsDivider v-if="divider" />
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
@@ -27,7 +27,7 @@ interface Props {
   placeholder?: string;
   required?: boolean;
   divider?: boolean;
-  expanded?: boolean;
+  grid?: boolean;
   disabled?: boolean;
 }
 
@@ -39,7 +39,6 @@ defineEmits<{
 
 <style lang="scss">
 .o-form-group { 
-  padding: var(--size-32) 0;
   &__title {
     text-align: center;
     padding-bottom: var(--size-16);
@@ -51,14 +50,18 @@ defineEmits<{
     max-width: 800px;
   }
 
-  /* Expanded modifier overrides without !important */
-  &--expanded {
-    .o-form-group__title {
-      text-align: left;
-    }
+  /* gridmodifier overrides without !important */
+  &--grid{
+    padding: var(--size-8) 0 !important;
+    
+    .o-form-group {
+      &__title {
+        text-align: left;
+      }
 
-    .o-form-group__input {
-      max-width: none;
+      &__input {
+        max-width: none;
+      }
     }
   }
 }

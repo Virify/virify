@@ -3,6 +3,7 @@ import CreateListingStepsStep1 from '~/components/create-listing-steps/Step1.vue
 import CreateListingStepsStep2 from '~/components/create-listing-steps/Step2.vue';
 import CreateListingStepsStep3 from '~/components/create-listing-steps/Step3.vue';
 import CreateListingStepsStep4 from '~/components/create-listing-steps/Step4.vue';
+import CreateListingStepsStep5 from '~/components/create-listing-steps/Step5.vue';
 
 export interface DraftStepConfig {
   title: string;
@@ -13,7 +14,14 @@ export interface DraftStepConfig {
 }
 
 export const useDraft = createSharedComposable(() => {
-  const { draftListing, updateDraftStepOne, updateDraftStepTwo, updateDraftStepThree, updateDraftStepFour } = useDraftListing();
+  const { 
+    draftListing, 
+    updateDraftStepOne, 
+    updateDraftStepTwo, 
+    updateDraftStepThree, 
+    updateDraftStepFour, 
+    updateDraftStepFive 
+  } = useDraftListing();
 
   /**
    * Get draft by ID
@@ -124,7 +132,15 @@ export const useDraft = createSharedComposable(() => {
         update: updateDraftStepFour,
         component: CreateListingStepsStep4
       },
-      { title: 'Description', complete: false },
+      { 
+        title: 'Description',
+        data: {
+          draft: draft.value
+        } as any,
+        complete: false ,
+        update: updateDraftStepFive,
+        component: CreateListingStepsStep5
+      },
       { title: 'Rooms', complete: false },
       { title: 'Additional', complete: false },
       { title: 'Energy', complete: false },

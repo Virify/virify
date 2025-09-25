@@ -79,8 +79,6 @@
   </section>
 </template>
 <script setup lang="ts">
-import { objectsEqual } from '~/utils/objects/objects-equal';
-import MoleculesDraftFormActions from '~/components/molecules/Draft/MoleculesDraftFormActions.vue';
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;

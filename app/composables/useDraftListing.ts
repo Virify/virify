@@ -81,6 +81,11 @@ export const useDraftListing = createSharedComposable(() => {
     }
   };
 
+  /**
+   * Updates the second step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the second step
+   */
   async function updateDraftStepTwo(draftId: number, stepData: StepTwo) {
     console.log("Updating draft step two for draftId:", draftId, "with data:", stepData);
     try {
@@ -120,8 +125,35 @@ export const useDraftListing = createSharedComposable(() => {
     }
   }
 
+  /**
+   * Updates the fourth step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the fourth step
+   */
   async function updateDraftStepFour(draftId: number, stepData: StepFour) {
     console.log("Updating draft step four for draftId:", draftId, "with data:", stepData);
+    try {
+      await $fetch(`/api/draft-listings/update/steps/four/`, {
+        method: "PATCH",
+        body: {
+          draftId,
+          ...stepData,
+        },
+      });
+      refreshDraftListings();
+    } catch (error) {
+      showToast("Failed to update draft listing", { type: "error" });
+      console.error("Error updating draft listing:", error);
+    }
+  }
+
+    /**
+   * Updates the fifth step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the fifth step
+   */
+  async function updateDraftStepFive(draftId: number, stepData: any) {
+    console.log("Updating draft step five for draftId:", draftId, "with data:", stepData);
   }
 
   return {
@@ -135,5 +167,6 @@ export const useDraftListing = createSharedComposable(() => {
     updateDraftStepTwo,
     updateDraftStepThree,
     updateDraftStepFour,
+    updateDraftStepFive,
   };
 });

@@ -39,9 +39,10 @@
             v-model="stepFourData.property.address!.number"
             name="property-number"
             placeholder="e.g. 123" 
-            :required="true" 
+            :grid="true"
             :expanded="true" 
             :disabled="true" 
+            :required="true"
             />
 
           <!-- Street (required) -->
@@ -50,9 +51,10 @@
             v-model="stepFourData.property.address!.street"
             name="property-street" 
             placeholder="e.g. High Street" 
-            :required="true" 
+            :grid="true"
             :expanded="true" 
             :disabled="true" 
+            :required="true"
           />
 
           <!-- City (required) -->
@@ -61,9 +63,10 @@
             v-model="stepFourData.property.address!.city" 
             name="property-city"
             placeholder="e.g. London" 
-            :required="true" 
+            :grid="true"
             :expanded="true" 
-            :disabled="true" 
+            :disabled="true"
+            :required="true"
           />
 
           <!-- Postcode (required) -->
@@ -72,8 +75,29 @@
             v-model="stepFourData.property.address!.postcode"
             name="property-postcode" 
             placeholder="e.g. SW1A 1AA" 
-            :required="true" 
+            :grid="true"
             :expanded="true" 
+            :disabled="true"
+            :required="true"
+          />
+
+          <!-- County -->
+          <OrganismsDraftFormTextGroup 
+            title="County" 
+            v-model="stepFourData.property.address!.county"
+            name="property-county" 
+            placeholder="e.g. Greater London" 
+            :grid="true"
+            :disabled="true" 
+          />
+
+          <!-- Country -->
+          <OrganismsDraftFormTextGroup 
+            title="Country" 
+            v-model="stepFourData.property.address!.country"
+            name="property-country" 
+            placeholder="e.g. United Kingdom" 
+            :grid="true"
             :disabled="true" 
           />
         </div>
@@ -199,7 +223,6 @@ async function submitForm() {
   &__form {
 
     &-instruction {
-      margin: var(--size-32) 0;
       display: flex;
       align-items: center;
       justify-content: flex-start;

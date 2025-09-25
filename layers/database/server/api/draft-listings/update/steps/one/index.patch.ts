@@ -1,5 +1,5 @@
-import * as z from 'zod';
-import { FurnishedStatus, RentalAvailabilityStatus, RentalPriceType, SaleAvailabilityStatus, SalePriceType, TenureType } from '~~/layers/database/server/database/prisma/generated/enums';
+import * as z from "zod";
+import { FurnishedStatus, RentalAvailabilityStatus, RentalPriceType, SaleAvailabilityStatus, SalePriceType, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 const saleListingSchema = z.object({
   tenureType: z.enum(Object.values(TenureType)).nullable().optional(),
@@ -26,43 +26,45 @@ const stepDataSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const { saleListing, rentalListing, draftId } = await readValidatedBody(event, stepDataSchema.parse);
+  const { errorResponse } = useResponse();
+  try {
+    const { saleListing, rentalListing, draftId } = await readValidatedBody(event, stepDataSchema.parse);
 
-  const rentalListingData = rentalListing
-    ? {
-        ...rentalListing,
-        rentFrequency: rentalListing.rentFrequency
-          ? (rentalListing.rentFrequency as RentalPriceType)
+    const rentalListingData = rentalListing
+      ? {
+          ...rentalListing,
+          rentFrequency: rentalListing.rentFrequency ? (rentalListing.rentFrequency as RentalPriceType) : undefined,
+        }
+      : undefined;
+
+    return await prisma.draftListing.update({
+      where: { id: draftId },
+      data: {
+        id: draftId,
+        saleListing: saleListing
+          ? {
+              upsert: {
+                update: saleListing,
+                create: saleListing,
+              },
+            }
           : undefined,
-      }
-    : undefined;
-
-  const updatedDraftListing = await prisma.draftListing.update({
-    where: { id: draftId },
-    data: {
-      id: draftId,
-      saleListing: saleListing
-        ? {
-            upsert: {
-              update: saleListing,
-              create: saleListing,
-            },
-          }
-        : undefined,
-      rentalListing: rentalListingData
-        ? {
-            upsert: {
-              update: rentalListingData,
-              create: rentalListingData,
-            },
-          }
-        : undefined,
-    },
-    include: {
-      saleListing: true,
-      rentalListing: true,
-    },
-  });
-
-  return updatedDraftListing;
+        rentalListing: rentalListingData
+          ? {
+              upsert: {
+                update: rentalListingData,
+                create: rentalListingData,
+              },
+            }
+          : undefined,
+      },
+      include: {
+        saleListing: true,
+        rentalListing: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating draft listing:", error);
+    return errorResponse(error, event);
+  }
 });

@@ -19,6 +19,7 @@ const stepDataSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { errorResponse } = useResponse();
   try {
     const { draftId, price, rentalListing, saleListing } = await readValidatedBody(event, stepDataSchema.parse);
 
@@ -49,8 +50,7 @@ export default defineEventHandler(async (event) => {
 
     return updatedDraftListing;
   } catch (error) {
-    console.error("Error processing request:", error);
-    setResponseStatus(event, 400);
-    return { error: "Invalid request data" };
+    console.log("Error updating draft listing:", error);
+    return errorResponse(error, event);
   }
 });

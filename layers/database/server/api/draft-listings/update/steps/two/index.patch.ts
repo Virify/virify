@@ -6,8 +6,8 @@ const stepTwoScehma = z.object({
     type: z.number().int().positive(),
     classification: z.number().int().positive(),
     constructionType: z.enum(["STANDARD", "NON_STANDARD"]).nullable().optional(),
-    yearBuilt: z
-      .coerce.number()
+    yearBuilt: z.coerce
+      .number()
       .min(4)
       .max(new Date().getFullYear() || 2024)
       .nullable()
@@ -19,10 +19,11 @@ const stepTwoScehma = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { errorResponse } = useResponse();
   try {
     const { draftId, property } = await readValidatedBody(event, stepTwoScehma.parse);
 
-    const updatedDraftListing = await prisma.draftListing.update({
+    return await prisma.draftListing.update({
       where: { id: draftId },
       data: {
         property: {
@@ -51,11 +52,8 @@ export default defineEventHandler(async (event) => {
         property: true,
       },
     });
-
-    return updatedDraftListing;
   } catch (error) {
-    console.error("Error processing request:", error);
-    setResponseStatus(event, 400);
-    return { error: "Invalid request data" };
+    console.error("Error fetching PPD test data:", error);
+    return errorResponse(error, event);
   }
 });
