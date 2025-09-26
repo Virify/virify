@@ -7,7 +7,7 @@ model SaleListing {
   sharedOwnership    Boolean                @default(false)
   priceType          SalePriceType?
   availabilityStatus SaleAvailabilityStatus
-  DraftListing       DraftListing?          @relation(fields: [draftListingId], references: [id])
+  DraftListing       DraftListing?          @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
   draftListingId     Int?                   @unique
 
   @@index([listingId])

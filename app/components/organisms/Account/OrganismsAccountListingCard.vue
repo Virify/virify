@@ -135,7 +135,7 @@ const getPriceType = (item: RecentItem): string | undefined => {
 
   &__list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: var(--size-12);
     margin: 0;
     padding: 0;

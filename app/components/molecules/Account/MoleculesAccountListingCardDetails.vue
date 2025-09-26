@@ -84,7 +84,7 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
 
   &__actions {
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--size-4);
     flex-shrink: 0;
     padding-right: var(--size-2);

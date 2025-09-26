@@ -9,7 +9,7 @@ model RentalListing {
   rentalLength       Int?
   furnishedStatus    FurnishedStatus?
   availabilityStatus RentalAvailabilityStatus
-  DraftListing       DraftListing?            @relation(fields: [draftListingId], references: [id])
+  DraftListing       DraftListing?            @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
   draftListingId     Int?                     @unique
 
   @@index([listingId])
