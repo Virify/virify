@@ -301,6 +301,7 @@ function toggleCollapsed() {
       width: 100%;
       height: var(--input-text-height);
       align-items: center;
+      border: 1px solid var(--border-color-200);
     }
   }
 
