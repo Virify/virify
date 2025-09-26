@@ -1,4 +1,5 @@
 @use '../_utils/functions' as fn;
+@use '../_utils/media' as mq;
 
 /**
  *  Button base
@@ -139,6 +140,16 @@
   &-sm {
     font-size: var(--font-sm);
     padding: var(--size-10) var(--size-16);
+  }
+
+  &-r-sm {
+    font-size: var(--font-sm);
+    padding: var(--size-10) var(--size-16);
+    
+    @include mq.mobile-only {
+      font-size: var(--font-xs);
+      padding: var(--size-6) var(--size-10);
+    }
   }
 
   &-lg {

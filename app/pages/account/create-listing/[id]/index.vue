@@ -12,8 +12,7 @@
       <AtomsAccountCardContainer>
         <ClientOnly>
           <div class="p-listing-creator__content-inner">
-            <p class="body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperMap.length }}</em></p>
-            
+            <p class="p-listing-creator__content-inner--stepper | body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperMap.length }}</em></p>
               <component
                 v-if="draft && (currentSlide as any).component"
                 :is="(currentSlide as any).component"
@@ -26,7 +25,6 @@
           </div>
         </ClientOnly>
       </AtomsAccountCardContainer>
-
     </div>
   </div>
 </template>
@@ -91,14 +89,25 @@ const breadcrumbItems = computed(() => [
 
 </script>
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
 .p-listing-creator {
   display: flex;
   flex-direction: column;
+  
   &__content {
     padding: var(--size-16) 0;
+    background: var(--background-100);
 
     &-inner {
       padding: var(--size-32);
+      
+      @include mq.mobile-only {
+        padding: var(--size-16);
+      }
+
+      &--stepper {
+        margin-bottom: var(--size-16);
+      }
     }
   }
 }

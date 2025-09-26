@@ -1,12 +1,16 @@
 <template>
   <section class="step">
-    <h2 class="title-sm">Listing Type</h2>
+    <h2 class="step__title | title-lg">Listing Type</h2>
+
     <p class="body-xs">
       <span class="step__required | body-md font-semibold">*</span>
       <em>represents a required field</em>
     </p>
 
-  <form :key="formKey" class="step__form" @submit.prevent="submitForm">
+    <h3 class="step__info | title-xs">Please provide the type of listing you want to create below. This will help us tailor the rest of the form to your specific needs.
+    </h3>
+
+    <form :key="formKey" class="step__form" @submit.prevent="submitForm">
       <!-- first parent select -->
       <OrganismsDraftFormRadioGroup 
         v-if="!draft.saleListing && !draft.rentalListing"
@@ -170,8 +174,17 @@ function submitForm() {
   emit('updateStepData', stepData, 1);
 }
 </script>
+<!-- all step components will inherit these styles - they are NOT scoped -->
 <style lang="scss">
 .step {
+  &__title {
+    color: var(--secondary-400);
+    margin-bottom: var(--size-4);
+  }
+
+  &__info {
+    margin: var(--size-16) 0;
+  }
 
   &__required {
     color: var(--error);

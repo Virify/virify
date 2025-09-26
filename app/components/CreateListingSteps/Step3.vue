@@ -1,10 +1,14 @@
 <template>
   <section class="step">
-    <h2 class="title-sm">Price</h2>
+    <h2 class="step__title | title-lg">Price</h2>
+
     <p class="body-xs">
       <span class="step__required | body-md font-semibold">*</span>
       <em>represents a required field</em>
     </p>
+
+    <h3 class="step__info | title-xs">Please provide the pricing details for your listing below.
+    </h3>
 
     <form class="step__form" @submit.prevent="submitForm">
 

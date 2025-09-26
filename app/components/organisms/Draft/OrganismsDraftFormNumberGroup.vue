@@ -1,5 +1,5 @@
 <template>
-  <div class="o-form-group">
+  <div class="o-form-group" :class="{ 'o-form-group--grid': grid}">
     <AtomsDivider v-if="divider" />
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
@@ -34,6 +34,7 @@ interface Props {
   min?: string | number;
   max?: string | number;
   step?: string | number;
+  grid?: boolean;
 }
 
 defineProps<Props>()
@@ -55,10 +56,31 @@ function handleUpdateModel(val: any) {
     padding-bottom: var(--size-16);
   }
 
+  &__required {
+    color: var(--error);
+    margin-left: var(--size-4);
+    top: -20px;
+  }
+
   &__number-input {
     margin: 0 auto;
     width:100%;
     max-width: 250px;
+  }
+
+  /* grid modifier overrides without !important */
+  &--grid {
+    padding: var(--size-8) 0 !important;
+    
+    .o-form-group {
+      &__title {
+        text-align: left;
+      }
+
+      &__number-input {
+        max-width: none;
+      }
+    }
   }
 }
 </style>

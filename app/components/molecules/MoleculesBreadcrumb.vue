@@ -2,11 +2,11 @@
   <nav class="breadcrumb">
     <template v-for="(item, index) in items" :key="index">
       <AtomsPill v-if="item.to" class="breadcrumb__item">
-        <NuxtLink :to="item.to" class="breadcrumb__link | body-sm">
+        <NuxtLink :to="item.to" class="breadcrumb__link | r-body-sm-xs">
           {{ item.label }}
         </NuxtLink>
       </AtomsPill>
-      <AtomsPill v-else class="breadcrumb__item--current | body-sm" aria-current="page">
+      <AtomsPill v-else class="breadcrumb__item--current | r-body-sm-xs" aria-current="page">
         {{ item.label }}
       </AtomsPill>
 

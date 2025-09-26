@@ -1,13 +1,15 @@
 <template>
   <section class="step">
-    <h2 class="title-sm">Address</h2>
+    <h2 class="step__title | title-lg">Address</h2>
+
     <p class="body-xs">
       <span class="step__required | body-md font-semibold">*</span>
       <em>represents a required field</em>
     </p>
 
     <h3 class="step__info | title-xs">We use the latest address and location data provided by various sources. This
-      ensures accurate and validated address information so you can just search for your address or postcode below.</h3>
+      ensures accurate and validated address information so you can just search for your address or postcode below.
+    </h3>
 
     <form class="step__form" @submit.prevent="submitForm">
       <!-- Show search if no existing address -->
@@ -40,7 +42,6 @@
             name="property-number"
             placeholder="e.g. 123" 
             :grid="true"
-            :expanded="true" 
             :disabled="true" 
             :required="true"
             />
@@ -52,7 +53,6 @@
             name="property-street" 
             placeholder="e.g. High Street" 
             :grid="true"
-            :expanded="true" 
             :disabled="true" 
             :required="true"
           />
@@ -64,7 +64,6 @@
             name="property-city"
             placeholder="e.g. London" 
             :grid="true"
-            :expanded="true" 
             :disabled="true"
             :required="true"
           />
@@ -76,7 +75,6 @@
             name="property-postcode" 
             placeholder="e.g. SW1A 1AA" 
             :grid="true"
-            :expanded="true" 
             :disabled="true"
             :required="true"
           />
@@ -216,21 +214,23 @@ async function submitForm() {
 @use '#styles/_utils/media' as mq;
 
 .step {
-  &__info {
-    margin: var(--size-32) 0;
-  }
-
   &__form {
-
     &-instruction {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      flex-direction: column;
       justify-content: flex-start;
       gap: var(--size-16);
       margin-bottom: var(--size-24);
       padding: var(--size-16) 0;
       background: var(--background-200);
       border-radius: var(--border-radius-md);
+
+      @include mq.desktop {
+        flex-direction: row;
+        align-items: flex-start;
+        align-items: center;
+      }
     }
 
     &-change-link {

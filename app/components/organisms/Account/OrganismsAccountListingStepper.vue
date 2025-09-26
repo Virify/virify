@@ -74,7 +74,7 @@ const isMobile = useMediaQuery('(max-width: 640px)');
 const isTablet = useMediaQuery('(max-width: 1024px)');
 
 const carouselSize = computed(() => {
-  return isMobile.value ? '100px' : '120px';
+  return isMobile.value ? '100px' : '110px';
 });
 
 // Carousel options - use center alignment on mobile/tablet
@@ -185,7 +185,7 @@ defineExpose({
   justify-content: center;
 
   &__carousel {
-    padding: var(--size-16) var(--size-8) var(--size-40) var(--size-8);
+    padding: var(--size-24) var(--size-32);
     background: var(--blue-400);
     border-radius: var(--border-radius-lg);
     position: relative;
@@ -194,17 +194,27 @@ defineExpose({
     align-items: center;
     justify-content: center;
 
+    @include mq.mobile-only {
+      padding: var(--size-24) 0 var(--size-40) 0;
+    }
+
     :deep(.embla-prev),
     :deep(.embla-next) {
-      top: 80%;
+      top: 85%;
+    }
+
+    @include mq.tablet {
+      :deep(.embla-prev),
+      :deep(.embla-next) {
+        top: 50%;
+      }
     }
   }
 
   &__step {
     position: relative;
+    margin-top: var(--size-16);
     color: var(--monochrome-900);
-    min-width: 100px;
-    max-width: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -216,6 +226,7 @@ defineExpose({
     @include mq.mobile-only {
       max-width: none;
       min-width: auto;
+      margin-top: 0;
     }
 
     &--active {
@@ -253,8 +264,9 @@ defineExpose({
   }
 
   &__title {
-      line-height: var(--lineheight-sm);
-    }
+    line-height: var(--lineheight-sm);
+    align-items: center;
+  }
 
   &__connector {
     position: absolute;

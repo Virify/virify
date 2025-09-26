@@ -1,7 +1,9 @@
 <template>
   <div class="o-form-group">
     <AtomsDivider v-if="divider" />
-    <p class="o-form-group__title | body-sm">{{ title }}</p>
+    <p class="o-form-group__title | body-sm">{{ title }}
+      <span v-if="required" class="o-form-group__required | title-xs">*</span>
+    </p>
     <div class="o-form-group__toggle">
       <AtomsToggle
         v-model="localUnit"
@@ -68,6 +70,7 @@ const localSize = computed<string>({
 </script>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
 .o-form-group {
   padding: var(--size-32) 0;
   &__title {
@@ -81,6 +84,12 @@ const localSize = computed<string>({
     align-items: flex-start;
     gap: var(--size-16);
     justify-content: center;
+
+    @include mq.mobile-only {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--size-12);
+    }
   }
 
   &__text {
@@ -90,6 +99,11 @@ const localSize = computed<string>({
     gap: var(--size-4);
     max-width: 250px;
     width: 250px;
+
+    @include mq.mobile-only {
+      width: 100%;
+      max-width: none;
+    }
   }
 }
 </style>

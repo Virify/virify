@@ -1,9 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
-import CreateListingStepsStep1 from '~/components/create-listing-steps/Step1.vue';
-import CreateListingStepsStep2 from '~/components/create-listing-steps/Step2.vue';
-import CreateListingStepsStep3 from '~/components/create-listing-steps/Step3.vue';
-import CreateListingStepsStep4 from '~/components/create-listing-steps/Step4.vue';
-import CreateListingStepsStep5 from '~/components/create-listing-steps/Step5.vue';
+import CreateListingStepsStep1 from '~/components/CreateListingSteps/Step1.vue';
+import CreateListingStepsStep2 from '~/components/CreateListingSteps/Step2.vue';
+import CreateListingStepsStep3 from '~/components/CreateListingSteps/Step3.vue';
+import CreateListingStepsStep4 from '~/components/CreateListingSteps/Step4.vue';
+import CreateListingStepsStep5 from '~/components/CreateListingSteps/Step5.vue';
 
 export interface DraftStepConfig {
   title: string;
