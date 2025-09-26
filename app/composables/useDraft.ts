@@ -43,7 +43,7 @@ export const useDraft = createSharedComposable(() => {
           saleListing: draft.value?.saleListing || null,
           rentalListing: draft.value?.rentalListing || null
         } as StepOne,
-        complete: !!(draft.value?.saleListing || draft.value?.rentalListing),
+        complete: draft.value ? stepOneValidation.hasExistingStepOneData(draft.value) : false,
         update: updateDraftStepOne,
         component: CreateListingStepsStep1
       },
@@ -60,12 +60,7 @@ export const useDraft = createSharedComposable(() => {
             totalFloors: draft.value?.property?.totalFloors || null,
           },
         } as StepTwo,
-        complete: !!(
-          draft.value?.property?.type && 
-          draft.value?.property?.classification && 
-          draft.value?.property?.description && 
-          draft.value?.property?.totalFloors
-        ),
+        complete: draft.value ? stepTwoValidation.hasExistingStepTwoData(draft.value) : false,
         update: updateDraftStepTwo,
         component: CreateListingStepsStep2
       },
@@ -87,19 +82,7 @@ export const useDraft = createSharedComposable(() => {
             }
           }),
         } as StepThree,
-        complete: !!(
-          draft.value?.price &&
-          (
-            (draft.value?.rentalListing &&
-              draft.value.rentalListing.deposit &&
-              draft.value.rentalListing.rentFrequency &&
-              draft.value.rentalListing.rentalLength
-            ) ||
-            (draft.value?.saleListing &&
-              draft.value.saleListing.priceType !== null
-            )
-          )
-        ),
+        complete: draft.value ? stepThreeValidation.hasExistingStepThreeData(draft.value) : false,
         update: updateDraftStepThree,
         component: CreateListingStepsStep3
       },
@@ -121,14 +104,7 @@ export const useDraft = createSharedComposable(() => {
             }
           },
         } as StepFour,
-        complete: !!(
-          draft.value?.property?.address?.number &&
-          draft.value?.property?.address?.street &&
-          draft.value?.property?.address?.city &&
-          draft.value?.property?.address?.postcode &&
-          draft.value?.property?.address?.lat &&
-          draft.value?.property?.address?.lon
-        ),
+        complete: draft.value ? stepFourValidation.hasExistingStepFourData(draft.value) : false,
         update: updateDraftStepFour,
         component: CreateListingStepsStep4
       },
@@ -141,18 +117,7 @@ export const useDraft = createSharedComposable(() => {
             numberBedrooms: draft.value?.property?.numberBedrooms || 0,
           }
         } as StepFive,
-        complete: !!(
-          draft.value?.property?.numberBedrooms !== null &&
-          draft.value?.property?.bedroomFeatures.length &&
-          draft.value?.property.bedroomFeatures.every(
-            bedroom =>
-              // Use explicit checks so 0 (ground floor) is considered valid
-              bedroom.name &&
-              bedroom.roomNumber &&
-              bedroom.floor !== null &&
-              (Array.isArray(bedroom.bed) ? bedroom.bed.length > 0 : Boolean(bedroom.bed))
-          )
-        ),
+        complete: draft.value ? stepFiveValidation.hasExistingStepFiveData(draft.value) : false,
         update: updateDraftStepFive,
         component: CreateListingStepsStep5
       },

@@ -1,16 +1,15 @@
 <template>
-  <section class="step">
-    <h2 class="step__title | title-lg">Property Basics</h2>
-
-    <p class="body-xs">
-      <span class="step__required | body-md font-semibold">*</span>
-      <em>represents a required field</em>
-    </p>
-
-    <h3 class="step__info | title-xs">Please provide the basic details about the property you are listing below.
-    </h3>
-
-    <form class="step__form" @submit.prevent="submitForm">
+  <CreateListingStepsStepLayout
+    title="Property Basics"
+    info="Please provide the basic details about the property you are listing below."
+    :hasChanges="hasChanges"
+    :buttonDisabled="buttonDisabled"
+    :buttonText="buttonText"
+    showPrevious
+    @cancel="resetForm"
+    @previous="$emit('previousStep')"
+    @submit="submitForm"
+  >
       <OrganismsDraftFormRadioGroup 
         title="What type of property are you listing?" 
         :options="propertyTypeSelectOptions" 
@@ -49,7 +48,7 @@
         max="100"
       />
 
-        <OrganismsDraftFormRadioGroup
+      <OrganismsDraftFormRadioGroup
         title="What is the construction type of the property?" 
         :options="constructionOptions" 
         v-model="stepTwoData.property.constructionType"
@@ -71,17 +70,7 @@
         name="year-built"
       />
     
-      <MoleculesDraftFormActions
-        :hasChanges="hasChanges"
-        :buttonDisabled="buttonDisabled"
-        primaryText="Save and Continue"
-        showPrevious
-        @cancel="resetForm"
-        @previous="$emit('previousStep')"
-        @submit="submitForm"
-      />
-    </form>
-  </section>
+  </CreateListingStepsStepLayout>
 </template>
 <script setup lang="ts">
 
@@ -95,21 +84,40 @@ const emit = defineEmits<{
   'nextStep': [];
 }>();
 
-const stepTwoData = ref<StepTwo>(createInitialStepTwoValues(props.draft));
-// take a deep snapshot so initial state is not the same reference as the live form state
-const initialStepTwoData = ref<StepTwo>(JSON.parse(JSON.stringify(stepTwoData.value)));
-const sizeToConvert = ref<string>(props.draft.property ? 'meter' : 'meter')
+// Size conversion state (outside of form data as it's UI-only)
+const sizeToConvert = ref<string>('meter');
 
-const isFormValid = computed(() => 
-  Boolean(
-    stepTwoData.value.property.type && 
-    stepTwoData.value.property.classification && 
-    stepTwoData.value.property.description &&
-    stepTwoData.value.property.totalFloors
-))
+// Create step configuration for the composable
+const stepConfig = computed(() => ({
+  initialData: createInitialStepTwoValues(props.draft),
+  isValid: stepTwoValidation.isStepTwoValid,
+  hasExistingData: stepTwoValidation.hasExistingStepTwoData,
+  beforeSubmit: (data: StepTwo) => {
+    const processedData = { ...data };
+    
+    // Set year built to null if '0' (Not Specified) is selected to maintain type consistency
+    if (processedData.property.yearBuilt === '0') {
+      processedData.property.yearBuilt = null;
+    }
 
-const buttonDisabled = computed(() => !isFormValid.value)
-const hasChanges = computed(() => !objectsEqual(initialStepTwoData.value, stepTwoData.value))
+    // Convert size to meters if the selected unit is feet
+    if (sizeToConvert.value === 'feet' && processedData.property.size) {
+      processedData.property.size = convertFeetToMeters(processedData.property.size);
+    }
+
+    return processedData;
+  }
+}));
+
+// Use the reusable step form composable
+const {
+  formData: stepTwoData,
+  hasChanges,
+  buttonDisabled,
+  buttonText,
+  resetForm,
+  submitForm: handleSubmit
+} = useDraftStepForm(stepConfig, props.draft);
 
 /**
  * Handler for user-driven property type changes.
@@ -121,43 +129,15 @@ function onPropertyTypeChange(newType: string | null) {
 }
 
 /**
- * Reset form to initial values
- */
-function resetForm() {
-  // restore a deep copy of the initial snapshot
-  stepTwoData.value = JSON.parse(JSON.stringify(initialStepTwoData.value));
-}
-
-/**
- * Submit form data
+ * Handle form submission
  */
 function submitForm() {
-  if (!isFormValid.value) return
-
-  // If the current form state equals the initial snapshot, skip API call
-  if (objectsEqual(initialStepTwoData.value, stepTwoData.value)) {
-    console.log('No changes detected, skipping API call');
-    emit('nextStep');
-    return;
-  }
-  console.log('Changes detected, proceeding with API call');
-  
-  
-  /**
-   * Set year built to null if '0' (Not Specified) is selected to maintain type consistency
-   */
-  if(stepTwoData.value.property.yearBuilt === '0') {
-    stepTwoData.value.property.yearBuilt = null
-  }
-
-  /**
-   * Convert size to meters if the selected unit is feet
-   */
-  if(sizeToConvert.value === 'feet' && stepTwoData.value.property.size) {
-    stepTwoData.value.property.size = convertFeetToMeters(stepTwoData.value.property.size)
-  }
-
-  emit('updateStepData', stepTwoData.value, 2);
+  handleSubmit(
+    (data) => {
+      emit('updateStepData', data, 2);
+    },
+    () => emit('nextStep')
+  );
 }
 </script>
 <style lang="scss">

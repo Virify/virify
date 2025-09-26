@@ -1,17 +1,15 @@
 <template>
-  <section class="step">
-    <h2 class="step__title | title-lg">Address</h2>
-
-    <p class="body-xs">
-      <span class="step__required | body-md font-semibold">*</span>
-      <em>represents a required field</em>
-    </p>
-
-    <h3 class="step__info | title-xs">We use the latest address and location data provided by various sources. This
-      ensures accurate and validated address information so you can just search for your address or postcode below.
-    </h3>
-
-    <form class="step__form" @submit.prevent="submitForm">
+  <CreateListingStepsStepLayout
+    title="Address"
+    info="We use the latest address and location data provided by various sources. This ensures accurate and validated address information so you can just search for your address or postcode below."
+    :hasChanges="hasChanges"
+    :buttonDisabled="buttonDisabled"
+    :buttonText="buttonText"
+    showPrevious
+    @cancel="resetForm"
+    @previous="$emit('previousStep')"
+    @submit="submitForm"
+  >
       <!-- Show search if no existing address -->
       <div v-if="!hasExistingAddress" class="step__form-search">
         <OrganismsDraftFormAddressSearch      
@@ -101,17 +99,7 @@
         </div>
       </div>
 
-      <MoleculesDraftFormActions 
-        :hasChanges="hasChanges" 
-        :buttonDisabled="buttonDisabled"
-        primaryText="Save and Continue" 
-        showPrevious 
-        @cancel="resetForm" 
-        @previous="$emit('previousStep')"
-        @submit="submitForm" 
-      />
-    </form>
-  </section>
+  </CreateListingStepsStepLayout>
 </template>
 <script setup lang="ts">
 
@@ -125,10 +113,22 @@ const emit = defineEmits<{
   'nextStep': [];
 }>();
 
-const stepFourData = ref<StepFour>(createInitialStepFourValues(props.draft));
-console.log("Initial Step Four Data:", stepFourData.value);
-// take a deep snapshot so initial state is not the same reference as the live form state
-const initialStepFourData = ref<StepFour>(JSON.parse(JSON.stringify(stepFourData.value)));
+// Create step configuration for the composable
+const stepConfig = computed(() => ({
+  initialData: createInitialStepFourValues(props.draft),
+  isValid: stepFourValidation.isStepFourValid,
+  hasExistingData: stepFourValidation.hasExistingStepFourData
+}));
+
+// Use the reusable step form composable
+const {
+  formData: stepFourData,
+  hasChanges,
+  buttonDisabled,
+  buttonText,
+  resetForm,
+  submitForm: handleSubmit
+} = useDraftStepForm(stepConfig, props.draft);
 
 // Check if user has existing address data
 const hasExistingAddress = computed(() => {
@@ -142,20 +142,6 @@ const hasExistingAddress = computed(() => {
     address?.lon
   );
 });
-
-const isFormValid = computed(() => {
-  return Boolean(
-    stepFourData.value.property.address?.number &&
-    stepFourData.value.property.address?.street &&
-    stepFourData.value.property.address?.city &&
-    stepFourData.value.property.address?.postcode &&
-    stepFourData.value.property.address?.lat &&
-    stepFourData.value.property.address?.lon
-  );
-})
-
-const buttonDisabled = computed(() => !isFormValid.value)
-const hasChanges = computed(() => !objectsEqual(initialStepFourData.value, stepFourData.value));
 
 // Handle address selection from search
 const handleAddressSelected = (selectedAddress: any) => {
@@ -192,21 +178,16 @@ const clearAddress = () => {
   };
 };
 
-function resetForm() {
-  stepFourData.value = JSON.parse(JSON.stringify(initialStepFourData.value));
-}
-
-async function submitForm() {
-  if (!isFormValid.value) return;
-  if (objectsEqual(initialStepFourData.value, stepFourData.value)) {
-    console.log('No changes detected, skipping API call');
-    // No changes to save, just proceed to next step
-    emit('nextStep');
-    return;
-  }
-  console.log('Changes detected, proceeding with API call');
-
-  emit('updateStepData', stepFourData.value, 4);
+/**
+ * Handle form submission
+ */
+function submitForm() {
+  handleSubmit(
+    (data) => {
+      emit('updateStepData', data, 4);
+    },
+    () => emit('nextStep')
+  );
 }
 
 </script>

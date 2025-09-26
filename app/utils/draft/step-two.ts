@@ -54,15 +54,6 @@ export const yearBuiltOptions = [
 ];
 
 /**
- * Size Options for property measurement units.
- * Used to convert into the database from feet/meters.
- */
-export const sizeOptions = [
-  { value: 'meter', label: 'Meters', isDefault: true, name: 'size-meter' },
-  { value: 'feet', label: 'Feet', isDefault: false, name: 'size-feet' },
-]
-
-/**
  * Convert feet to meters.
  * @param feet Value in feet to convert to meters
  * @returns Value in meters
@@ -85,3 +76,37 @@ export const createInitialStepTwoValues = (draftListing: DraftListingWithFullPay
     }
   }
 }
+
+/**
+ * Step Two Validation Helpers
+ * Clean, reusable validation functions for step two
+ */
+export const stepTwoValidation = {
+  /**
+   * Check if step two data is valid
+   * @param data Step two form data
+   * @returns True if all required fields are present
+   */
+  isStepTwoValid: (data: StepTwo): boolean => {
+    return !!(
+      data.property.type &&
+      data.property.classification &&
+      data.property.description &&
+      data.property.totalFloors
+    );
+  },
+
+  /**
+   * Check if draft has existing step two data
+   * @param draft Draft listing
+   * @returns True if draft has complete step two data
+   */
+  hasExistingStepTwoData: (draft: DraftListingWithFullPayload): boolean => {
+    return !!(
+      draft.property?.type && 
+      draft.property?.classification && 
+      draft.property?.description && 
+      draft.property?.totalFloors
+    );
+  }
+};

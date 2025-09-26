@@ -105,3 +105,53 @@ export function setStepData(selectedType: "sale" | "rent", listingData: SaleList
 
   return stepData;
 }
+
+/**
+ * Step One Validation Helpers
+ * Clean, reusable validation functions for step one
+ */
+export const stepOneValidation = {
+  /**
+   * Check if sale listing data is complete
+   * @param saleListing Sale listing data
+   * @returns True if all required sale fields are present
+   */
+  isSaleComplete: (saleListing: SaleListingCreateWithoutListingInput): boolean => {
+    return !!(saleListing.tenureType && saleListing.availabilityStatus);
+  },
+
+  /**
+   * Check if rental listing data is complete  
+   * @param rentalListing Rental listing data
+   * @returns True if all required rental fields are present
+   */
+  isRentalComplete: (rentalListing: RentalListingCreateWithoutListingInput): boolean => {
+    return !!(
+      rentalListing.furnishedStatus && 
+      rentalListing.availabilityStatus && 
+      rentalListing.isBillsIncluded !== null
+    );
+  },
+
+  /**
+   * Check if step one data is valid based on selected type
+   * @param data Step one form data
+   * @returns True if the selected listing type is complete
+   */
+  isStepOneValid: (data: { selectedType: string | null; saleListing: SaleListingCreateWithoutListingInput; rentalListing: RentalListingCreateWithoutListingInput }): boolean => {
+    if (data.selectedType === 'sale') return stepOneValidation.isSaleComplete(data.saleListing);
+    if (data.selectedType === 'rent') return stepOneValidation.isRentalComplete(data.rentalListing);
+    return false;
+  },
+
+  /**
+   * Check if draft has existing step one data
+   * @param draft Draft listing
+   * @returns True if draft has complete step one data
+   */
+  hasExistingStepOneData: (draft: DraftListingWithFullPayload): boolean => {
+    const hasSaleData = draft.saleListing && stepOneValidation.isSaleComplete(draft.saleListing);
+    const hasRentalData = draft.rentalListing && stepOneValidation.isRentalComplete(draft.rentalListing);
+    return !!(hasSaleData || hasRentalData);
+  }
+};

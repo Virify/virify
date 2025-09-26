@@ -37,14 +37,6 @@ export const bedroomFeaturesOptions = [
 ];
 
 /**
- * Size options for room measurements
- */
-export const sizeOptions = [
-  { value: "meter", key: "Sq Meters", info: "Square meters", name: "sqm", isDefault: true },
-  { value: "feet", key: "Sq Feet", info: "Square feet", name: "sqft" },
-];
-
-/**
  * Get floor options based on total floors in the property
  * @param totalFloors - Total number of floors in the property
  * @returns Array of floor options for dropdowns
@@ -62,3 +54,46 @@ export function getFloorOptions(totalFloors: number) {
   
   return options;
 }
+
+/**
+ * Step Five Validation Helpers
+ * Clean, reusable validation functions for step five
+ */
+export const stepFiveValidation = {
+  /**
+   * Check if bedroom features are valid
+   * @param bedroomFeatures Array of bedroom feature data
+   * @returns True if all bedroom features have required fields
+   */
+  areBedroomFeaturesValid: (bedroomFeatures: any[]): boolean => {
+    if (bedroomFeatures.length === 0) return false;
+    
+    return bedroomFeatures.every(bedroom =>
+      bedroom.name &&
+      bedroom.roomNumber &&
+      bedroom.floor &&
+      bedroom.bed.length
+    );
+  },
+
+  /**
+   * Check if step five data is valid
+   * @param data Step five form data
+   * @returns True if all required fields are present
+   */
+  isStepFiveValid: (data: StepFive): boolean => {
+    return stepFiveValidation.areBedroomFeaturesValid(data.property.bedroomFeatures);
+  },
+
+  /**
+   * Check if draft has existing step five data
+   * @param draft Draft listing
+   * @returns True if draft has complete step five data
+   */
+  hasExistingStepFiveData: (draft: DraftListingWithFullPayload): boolean => {
+    return !!(
+      draft.property?.bedroomFeatures?.length &&
+      stepFiveValidation.areBedroomFeaturesValid(draft.property.bedroomFeatures)
+    );
+  }
+};
