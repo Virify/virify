@@ -7,11 +7,9 @@ import { BedSizeType } from "~~/layers/database/server/database/prisma/generated
  */
 export const createInitialStepFiveValues = (draftListing: DraftListingWithFullPayload): StepFive => ({
   property: {
-    totalFloors: draftListing.property?.totalFloors || 0,
+    totalFloors: draftListing.property?.totalFloors || 1,
     bedroomFeatures: draftListing.property?.bedroomFeatures || [],
     numberBedrooms: draftListing.property?.numberBedrooms || 0,
-    bathroomFeatures: draftListing.property?.bathroomFeatures || [],
-    numberBathrooms: draftListing.property?.numberBathrooms || 0,
   }
 });
 
@@ -54,8 +52,8 @@ export const sizeOptions = [
 export function getFloorOptions(totalFloors: number) {
   const options = [];
   
-  for (let i = 0; i <= totalFloors; i++) {
-    if (i === 0) {
+  for (let i = 1; i <= totalFloors -1; i++) {
+    if (i === 1) {
       options.push({ value: i, key: "Ground Floor", info: "Ground floor of the property" });
     } else {
       options.push({ value: i, key: `Floor ${i}`, info: `Floor ${i} of the property` });

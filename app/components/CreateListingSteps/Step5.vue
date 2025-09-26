@@ -1,6 +1,6 @@
 <template>
   <section class="step">
-    <h2 class="step__title | title-lg">Bedrooms and Bathrooms</h2>
+    <h2 class="step__title | title-lg">Bedrooms</h2>
 
     <p class="body-xs">
       <span class="step__required | body-md font-semibold">*</span>
@@ -8,18 +8,18 @@
     </p>
 
     <h3 class="step__info | title-xs">
-      Please provide the bedroom and bathroom details for your property below.
+      Please provide the bedroom details for the property. You can add multiple bedrooms and specify their features. This information is crucial for potential buyers or renters to understand the layout and amenities of the property.
     </h3>
 
     <form class="step__form" @submit.prevent="submitForm">
       <!-- Bedrooms Section -->
       <div class="step__section">
-        <h3 class="step__title | title-sm">Bedrooms</h3>
         
         <OrganismsDraftBedroomForm
           v-model="stepFiveData.property.bedroomFeatures"
-          :total-floors="stepFiveData.property.totalFloors || 1"
+          :total-floors="stepFiveData.property.totalFloors"
         />
+        
       </div>
 
       <!-- Form Actions -->
@@ -37,7 +37,6 @@
 </template>
 
 <script setup lang="ts">
-import type { BedSizeType } from '~~/layers/database/server/database/prisma/generated/enums';
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
@@ -54,20 +53,19 @@ const initialStepData = ref<StepFive>(JSON.parse(JSON.stringify(stepFiveData.val
 
 // Computed properties for validation
 const isFormValid = computed(() => 
-  stepFiveData.value.property.bedroomFeatures.length > 0 &&
-  stepFiveData.value.property.bedroomFeatures.every(bedroom => 
-    Boolean(bedroom.name && bedroom.roomNumber && bedroom.floor !== null && bedroom.bed?.length > 0)
-  )
+  !!(
+      stepFiveData.value?.property?.bedroomFeatures.length &&
+      stepFiveData.value?.property.bedroomFeatures.every(
+        bedroom =>
+          bedroom.name &&
+          bedroom.roomNumber &&
+          bedroom.floor &&
+          bedroom.bed.length
+      ))
 );
 
 const buttonDisabled = computed(() => !isFormValid.value);
 const hasChanges = computed(() => !objectsEqual(initialStepData.value, stepFiveData.value));
-
-// Floor options based on totalFloors
-const floorOptions = computed(() => {
-  const totalFloors = props.draft.property?.totalFloors || 1;
-  return getFloorOptions(totalFloors);
-});
 
 // Methods
 function resetForm() {

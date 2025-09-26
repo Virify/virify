@@ -13,6 +13,7 @@
   border: 1px solid var(--input-text-border);
   height: var(--input-text-height);
   border-radius: var(--border-radius-ui);
+  outline-offset: -3px;
 
   &:user-invalid {
     color: var(--text-input-error-color);

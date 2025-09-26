@@ -45,7 +45,6 @@
         title="What is the chain of the listing?"
         :options="saleListingChainOptions" 
         v-model="stepOneData.saleListing.chain" 
-        :divider="true"
         name="sale-chain" 
       />
 
@@ -54,7 +53,6 @@
         title="What is the ownership status of the listing?"
         :options="saleSharedOwnershipOptions" 
         v-model="stepOneData.saleListing.sharedOwnership" 
-        :divider="true"
         name="sale-shared-ownership" 
       />
 
@@ -177,6 +175,7 @@ function submitForm() {
 <!-- all step components will inherit these styles - they are NOT scoped -->
 <style lang="scss">
 .step {
+  padding: var(--size-32);
   &__title {
     color: var(--secondary-400);
     margin-bottom: var(--size-4);

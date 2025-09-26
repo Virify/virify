@@ -39,11 +39,12 @@
 
       <OrganismsDraftFormNumberGroup
         title="How many total floors does the property have?"
+        info="Including Ground Floor - i.e 2 floors above ground is 3 total floors"
         v-model="stepTwoData.property.totalFloors"
         name="property-floors"
         placeholder="e.g '2'"
         :required="true"
-        min="0"
+        min="1"
         step="1"
         max="100"
       />

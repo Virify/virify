@@ -8,6 +8,7 @@
       <AtomsSelect 
         :modelValue="modelValue"
         :options="options"
+        :value="modelValue"
         class="o-form-group__select | body-sm"
         :placeholder="placeholder || 'Select ' + title.toLowerCase()"
         :label="title"

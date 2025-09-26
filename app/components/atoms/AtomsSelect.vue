@@ -1,7 +1,7 @@
 <template>
   <select v-show="!disabled" class="a-select" v-model="selected">
     <slot v-bind="{ options: validOptions }">
-      <option v-for="({ key, value }) of validOptions" :key="value" :value>
+      <option v-for="({ key, value }) of validOptions" :key="value" :value="value">
         {{ key }}
       </option>
     </slot>

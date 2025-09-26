@@ -4,6 +4,7 @@
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
     </p>
+    <em v-if="info" class="o-form-group__info | body-xs">{{ info }}</em>
     <div class="o-form-group__number-input">
       <AtomsInput
         type="number"
@@ -26,6 +27,7 @@
 
 interface Props {
   title: string;
+  info?: string;
   name?: string;
   required?: boolean;
   divider?: boolean;
@@ -54,6 +56,13 @@ function handleUpdateModel(val: any) {
   &__title {
     text-align: center;
     padding-bottom: var(--size-16);
+  }
+
+  &__info {
+    display: block;
+    text-align: center;
+    margin-bottom: var(--size-8);
+    color: var(--secondary-500);
   }
 
   &__required {

@@ -1,5 +1,6 @@
 <template>
   <button 
+    type="button"
     :class="[
       'collapsible-header',
       `collapsible-header--${variant}`

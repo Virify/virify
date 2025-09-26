@@ -133,17 +133,26 @@ export const useDraft = createSharedComposable(() => {
         component: CreateListingStepsStep4
       },
       { 
-        title: 'Bedrooms & Bathrooms',
+        title: 'Bedrooms',
         data: {
           property: {
-            totalFloors: draft.value?.property?.totalFloors || 0,
+            totalFloors: draft.value?.property?.totalFloors,
             bedroomFeatures: draft.value?.property?.bedroomFeatures || [],
             numberBedrooms: draft.value?.property?.numberBedrooms || 0,
-            bathroomFeatures: draft.value?.property?.bathroomFeatures || [],
-            numberBathrooms: draft.value?.property?.numberBathrooms || 0,
           }
         } as StepFive,
-        complete: false,
+        complete: !!(
+          draft.value?.property?.numberBedrooms !== null &&
+          draft.value?.property?.bedroomFeatures.length &&
+          draft.value?.property.bedroomFeatures.every(
+            bedroom =>
+              // Use explicit checks so 0 (ground floor) is considered valid
+              bedroom.name &&
+              bedroom.roomNumber &&
+              bedroom.floor !== null &&
+              (Array.isArray(bedroom.bed) ? bedroom.bed.length > 0 : Boolean(bedroom.bed))
+          )
+        ),
         update: updateDraftStepFive,
         component: CreateListingStepsStep5
       },

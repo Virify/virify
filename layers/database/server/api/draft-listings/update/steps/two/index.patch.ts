@@ -35,6 +35,7 @@ export default defineEventHandler(async (event) => {
               yearBuilt: property.yearBuilt ? String(property.yearBuilt) : null,
               size: property.size || null,
               description: property.description,
+              totalFloors: property.totalFloors,
             },
             create: {
               type: { connect: { id: property.type } },
