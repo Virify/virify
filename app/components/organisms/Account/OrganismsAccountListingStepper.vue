@@ -15,7 +15,7 @@
         <div 
           class="o-account-listing-stepper__step" 
           :class="{
-            'o-account-listing-stepper__step--complete': slideIndex < currentStep,
+            'o-account-listing-stepper__step--complete': slide.complete || slideIndex < currentStep,
             'o-account-listing-stepper__step--active': slideIndex === currentStep,
             'o-account-listing-stepper__step--disabled': !isStepAccessible(slideIndex)
           }" 
@@ -30,7 +30,7 @@
           <div 
             class="o-account-listing-stepper__step-indicator" 
             :class="{
-              'o-account-listing-stepper__step-indicator--complete': slideIndex < currentStep,
+              'o-account-listing-stepper__step-indicator--complete': slide.complete || slideIndex < currentStep,
               'o-account-listing-stepper__step-indicator--active': slideIndex === currentStep
             }"
           ></div>
@@ -213,7 +213,6 @@ defineExpose({
 
   &__step {
     position: relative;
-    margin-top: var(--size-16);
     color: var(--monochrome-900);
     display: flex;
     flex-direction: column;
