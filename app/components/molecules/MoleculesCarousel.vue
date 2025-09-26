@@ -73,6 +73,10 @@ function scrollNext() {
   emblaApi.value?.scrollNext()
 }
 
+function scrollTo(index: number) {
+  emblaApi.value?.scrollTo(index)
+}
+
 // Update navigation state
 function updateNavigation() {
   if (emblaApi.value) {
@@ -94,8 +98,10 @@ watchEffect(() => {
 defineExpose({
   scrollPrev,
   scrollNext,
+  scrollTo,
   canScrollPrev: () => canScrollPrev.value,
-  canScrollNext: () => canScrollNext.value
+  canScrollNext: () => canScrollNext.value,
+  emblaApi: computed(() => emblaApi.value)
 })
 </script>
 

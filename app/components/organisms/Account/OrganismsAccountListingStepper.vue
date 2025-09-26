@@ -4,6 +4,7 @@
       ref="carouselRef"
       :slides="stepperSlides" 
       :slide-size="carouselSize"
+      :options="carouselOptions"
       gap="0"
       :loop="false" 
       :show-arrows="true"
@@ -33,8 +34,8 @@
               'o-account-listing-stepper__step-indicator--active': slideIndex === currentStep
             }"
           ></div>
-          
-          <h2 class="r-body-sm-xs">
+
+          <h2 class="o-account-listing-stepper__title | r-body-sm-xs">
             {{ slide.title }}
           </h2>
 
@@ -70,9 +71,20 @@ const emit = defineEmits<Emits>();
 
 // Media query reactive reference
 const isMobile = useMediaQuery('(max-width: 640px)');
+const isTablet = useMediaQuery('(max-width: 1024px)');
 
 const carouselSize = computed(() => {
   return isMobile.value ? '100px' : '120px';
+});
+
+// Carousel options - use center alignment on mobile/tablet
+const carouselOptions = computed(() => {
+  return {
+    align: (isMobile.value || isTablet.value) ? 'center' : 'start',
+    containScroll: 'trimSnaps',
+    skipSnaps: false,
+    dragFree: false
+  };
 });
 
 const carouselRef = ref();
@@ -113,14 +125,46 @@ const goToStep = (stepIndex: number) => {
   }
 };
 
+/**
+ * Scroll to center the current step on mobile/tablet viewports
+ */
+const scrollToCurrentStep = () => {
+  if ((isMobile.value || isTablet.value) && carouselRef.value?.scrollTo && carouselRef.value?.emblaApi) {
+    // Only scroll if the current selected index differs from currentStep
+    const selectedIndex = carouselRef.value.emblaApi.selectedScrollSnap();
+    if (selectedIndex !== currentStep.value) {
+      nextTick(() => {
+        carouselRef.value.scrollTo(currentStep.value);
+      });
+    }
+  }
+};
+
+// Watch for currentStep changes and auto-center on mobile/tablet
+watch(currentStep, () => {
+  scrollToCurrentStep();
+}, { immediate: false });
+
+// Watch for viewport changes to re-center if needed
+watch([isMobile, isTablet], () => {
+  scrollToCurrentStep();
+});
+
 // Watch for carousel scroll events to update current step
 onMounted(() => {
   nextTick(() => {
     if (carouselRef.value?.emblaApi) {
+      // Set up scroll listener
       carouselRef.value.emblaApi.on('scroll', () => {
         const selectedIndex = carouselRef.value.emblaApi.selectedScrollSnap();
-        currentStep.value = selectedIndex;
+        // Only update if different to avoid infinite loop
+        if (selectedIndex !== currentStep.value) {
+          currentStep.value = selectedIndex;
+        }
       });
+      
+      // Initial centering on mount
+      scrollToCurrentStep();
     }
   });
 });
@@ -141,15 +185,18 @@ defineExpose({
   justify-content: center;
 
   &__carousel {
-    padding: var(--size-20) var(--size-32);
+    padding: var(--size-16) var(--size-8) var(--size-40) var(--size-8);
     background: var(--blue-400);
     border-radius: var(--border-radius-lg);
     position: relative;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     :deep(.embla-prev),
     :deep(.embla-next) {
-      top: 32%;
+      top: 80%;
     }
   }
 
@@ -204,6 +251,10 @@ defineExpose({
       }
     }
   }
+
+  &__title {
+      line-height: var(--lineheight-sm);
+    }
 
   &__connector {
     position: absolute;

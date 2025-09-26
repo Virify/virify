@@ -1,6 +1,6 @@
-import type { Address, Prisma } from "~~/layers/database/server/database/prisma/generated/client"
+import type { Address, Bathroom, Bedroom, OtherRoom, Prisma, Reception } from "~~/layers/database/server/database/prisma/generated/client"
 import type { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
-import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
+import type { BathroomCreateWithoutMediaInput, BathroomCreateWithoutPropertyInput, BedroomCreateWithoutMediaInput, BedroomCreateWithoutPropertyInput, OtherRoomCreateWithoutMediaInput, OtherRoomCreateWithoutPropertyInput, ReceptionCreateWithoutMediaInput, ReceptionCreateWithoutPropertyInput, RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
 export type StepOne = {
   rentalListing?: RentalListingCreateWithoutListingInput
@@ -48,6 +48,17 @@ export type StepFour = {
     } | null
   }
 }
+
+export type StepFive = {
+  property: {
+    totalFloors: number | null
+    bedroomFeatures: Omit<Bedroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
+    numberBedrooms: number | null
+    bathroomFeatures: Omit<Bathroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
+    numberBathrooms: number | null
+  }
+}
+
 
 export type DraftListingWithFullPayload = Prisma.DraftListingGetPayload<{
   include: {

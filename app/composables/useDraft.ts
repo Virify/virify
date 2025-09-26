@@ -133,11 +133,17 @@ export const useDraft = createSharedComposable(() => {
         component: CreateListingStepsStep4
       },
       { 
-        title: 'Description',
+        title: 'Bedrooms & Bathrooms',
         data: {
-          draft: draft.value
-        } as any,
-        complete: false ,
+          property: {
+            totalFloors: draft.value?.property?.totalFloors || 0,
+            bedroomFeatures: draft.value?.property?.bedroomFeatures || [],
+            numberBedrooms: draft.value?.property?.numberBedrooms || 0,
+            bathroomFeatures: draft.value?.property?.bathroomFeatures || [],
+            numberBathrooms: draft.value?.property?.numberBathrooms || 0,
+          }
+        } as StepFive,
+        complete: false,
         update: updateDraftStepFive,
         component: CreateListingStepsStep5
       },
