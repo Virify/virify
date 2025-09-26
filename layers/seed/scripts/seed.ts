@@ -101,7 +101,8 @@ async function seedCityCenters() {
     cityCenters.map(center =>
       prisma.address.upsert({
         where: {
-          street_city_postcode_country: {
+          number_street_city_postcode_country: {
+            number: center.number || '',
             street: center.street,
             city: center.city,
             postcode: center.postcode,

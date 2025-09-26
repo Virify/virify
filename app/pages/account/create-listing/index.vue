@@ -3,8 +3,7 @@
   <AtomsAccountCardContainer>
     <ClientOnly>
       <div class="p-create-listing">
-        <p v-if="draftListingsPending" class="body-sm">Loading...</p>
-        <p v-else-if="!draftListings" class="body-sm">No draft listings available.</p>
+        <p v-if="!draftListings?.length" class="body-sm">No draft listings available.</p>
         <NuxtLink
           v-else
           v-for="draft in draftListings"

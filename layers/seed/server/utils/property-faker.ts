@@ -721,7 +721,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       })),
     }) : Promise.resolve(),
     // Update location
-    updateLocationByAddressIdForSeed(propertyWithFeatures.addressId, propertyWithFeatures.address.lon!, propertyWithFeatures.address.lat!)
+    updateLocationByAddressIdForSeed(propertyWithFeatures.addressId!, propertyWithFeatures.address?.lon!, propertyWithFeatures.address?.lat!)
   ]);
 
   // Return the property with just address for compatibility
@@ -730,7 +730,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     address: propertyWithFeatures.address,
   };
 
-  await getLocationByAddressIdForSeed(property.addressId);
+  await getLocationByAddressIdForSeed(property.addressId!);
 
   return property;
 };

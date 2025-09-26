@@ -154,6 +154,19 @@ export const useDraftListing = createSharedComposable(() => {
    */
   async function updateDraftStepFive(draftId: number, stepData: any) {
     console.log("Updating draft step five for draftId:", draftId, "with data:", stepData);
+     try {
+      await $fetch(`/api/draft-listings/update/steps/five/`, {
+        method: "PATCH",
+        body: {
+          draftId,
+          ...stepData,
+        },
+      });
+      refreshDraftListings();
+    } catch (error) {
+      showToast("Failed to update draft listing", { type: "error" });
+      console.error("Error updating draft listing:", error);
+    }
   }
 
   return {
