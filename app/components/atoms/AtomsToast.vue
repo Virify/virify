@@ -82,9 +82,9 @@ withDefaults(defineProps<Props>(), {
 
 /* Toast variants using brand colors */
 .toast-success {
-  background: var(--blue-400);
+  background: var(--secondary-400);
   color: var(--monochrome-900);
-  border: 1px solid var(--foreground-100);
+  border: 1px solid var(--secondary-500);
 }
 
 .toast-error {

@@ -10,6 +10,8 @@ export const createInitialStepFiveValues = (draftListing: DraftListingWithFullPa
     totalFloors: draftListing.property?.totalFloors || 1,
     bedroomFeatures: draftListing.property?.bedroomFeatures || [],
     numberBedrooms: draftListing.property?.numberBedrooms || 0,
+    bathroomFeatures: draftListing.property?.bathroomFeatures || [],
+    numberBathrooms: draftListing.property?.numberBathrooms || 0,
   }
 });
 
@@ -37,8 +39,18 @@ export const bedroomFeaturesOptions = [
 ];
 
 /**
+ * Bathroom features options for checkbox selection
+ */
+export const bathroomFeaturesOptions = [
+  { value: "toilet", key: "Toilet", info: "Bathroom has a toilet" },
+  { value: "enSuite", key: "En Suite", info: "Bathroom is an en suite" },
+  { value: "bathtub", key: "Bathtub", info: "Bathroom has a bathtub" },
+  { value: "walkInShower", key: "Walk-in Shower", info: "Bathroom has a walk-in shower" },
+];
+
+/**
  * Step Five Validation Helpers
- * Clean, reusable validation functions for step five
+ * Clean, reusable validation functions for step five (bedrooms and bathrooms)
  */
 export const stepFiveValidation = {
   /**
@@ -58,12 +70,29 @@ export const stepFiveValidation = {
   },
 
   /**
+   * Check if bathroom features are valid
+   * @param bathroomFeatures Array of bathroom feature data
+   * @returns True if all bathroom features have required fields
+   */
+  areBathroomFeaturesValid: (bathroomFeatures: any[]): boolean => {
+    if (bathroomFeatures.length === 0) return false;
+    
+    return bathroomFeatures.every(bathroom =>
+      bathroom.name &&
+      bathroom.roomNumber &&
+      bathroom.floor &&
+      bathroom.description
+    );
+  },
+
+  /**
    * Check if step five data is valid
    * @param data Step five form data
    * @returns True if all required fields are present
    */
   isStepFiveValid: (data: StepFive): boolean => {
-    return stepFiveValidation.areBedroomFeaturesValid(data.property.bedroomFeatures);
+    return stepFiveValidation.areBedroomFeaturesValid(data.property.bedroomFeatures) &&
+           stepFiveValidation.areBathroomFeaturesValid(data.property.bathroomFeatures);
   },
 
   /**
@@ -74,7 +103,9 @@ export const stepFiveValidation = {
   hasExistingStepFiveData: (draft: DraftListingWithFullPayload): boolean => {
     return !!(
       draft.property?.bedroomFeatures?.length &&
-      stepFiveValidation.areBedroomFeaturesValid(draft.property.bedroomFeatures)
+      stepFiveValidation.areBedroomFeaturesValid(draft.property.bedroomFeatures) &&
+      draft.property?.bathroomFeatures?.length &&
+      stepFiveValidation.areBathroomFeaturesValid(draft.property.bathroomFeatures)
     );
   }
 };

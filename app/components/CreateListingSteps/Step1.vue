@@ -6,6 +6,7 @@
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"
+    :errorMessage="errorMessage"
     @cancel="resetForm"
     @submit="submitForm"
   >
@@ -89,7 +90,8 @@ import type { SaleListingCreateWithoutListingInput, RentalListingCreateWithoutLi
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
-}>();
+  errorMessage?: string;
+}>()
 
 const emit = defineEmits<{
   'updateStepData': [stepData: StepOne, step: number];

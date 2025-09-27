@@ -55,7 +55,6 @@ export default defineEventHandler(async (event) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching PPD test data:", error);
     return errorResponse(error, event);
   }
 });

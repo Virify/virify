@@ -56,14 +56,20 @@ function showTierConfirmation(tier: TierOption) {
     props: {
       tier: tier,
     },
-    onClose: (result) => {
+    onClose: async (result) => {
         const { returnValue } = result as { returnValue?: { action?: string; tier?: TierOption } };
 
         if (!returnValue) return;
 
         if (returnValue.action === 'create' && returnValue.tier) {
-          createDraftListing(returnValue.tier);
-          navigateTo('/account/create-listing');
+          try {
+            const draftId = await createDraftListing(returnValue.tier);
+            // Navigate directly to the stepper instead of the dashboard
+            navigateTo(`/account/create-listing/${draftId}`);
+          } catch (error) {
+            // Error already handled in createDraftListing
+            console.error('Failed to create draft listing:', error);
+          }
         }
 
         if (returnValue.action === 'upgrade' && returnValue.tier) {
@@ -85,12 +91,18 @@ function showPaymentDialog(tier: TierOption) {
     props: {
       tier: tier,
     },
-    onClose: (result) => {
+    onClose: async (result) => {
       const { returnValue } = result as { returnValue?: { paymentConfirmed?: boolean; cancelled?: boolean; tier?: TierOption } };
 
       if (returnValue?.paymentConfirmed && returnValue.tier) {
-        createDraftListing(returnValue.tier);
-        navigateTo('/account/create-listing');
+        try {
+          const draftId = await createDraftListing(returnValue.tier);
+          // Navigate directly to the stepper instead of the dashboard  
+          navigateTo(`/account/create-listing/${draftId}`);
+        } catch (error) {
+          // Error already handled in createDraftListing
+          console.error('Failed to create draft listing:', error);
+        }
       } else if (returnValue?.cancelled) {
         showTierConfirmation(tier);
       }

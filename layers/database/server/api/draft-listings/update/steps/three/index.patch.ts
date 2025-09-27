@@ -51,7 +51,6 @@ export default defineEventHandler(async (event) => {
 
     return updatedDraftListing;
   } catch (error) {
-    console.log("Error updating draft listing:", error);
     return errorResponse(error, event);
   }
 });

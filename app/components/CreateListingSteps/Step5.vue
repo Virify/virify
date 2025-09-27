@@ -1,19 +1,43 @@
 <template>
   <CreateListingStepsStepLayout
-    title="Bedrooms"
-    info="Please provide the bedroom details for the property. You can add multiple bedrooms and specify their features. This information is crucial for potential buyers or renters to understand the layout and amenities of the property."
+    title="Bedrooms & Bathrooms"
+    info="Please provide the bedroom and bathroom details for the property. You can add multiple rooms and specify their features. This information is crucial for potential buyers or renters to understand the layout and amenities of the property."
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"
+    :errorMessage="errorMessage"
     showPrevious
     @cancel="resetForm"
     @previous="$emit('previousStep')"
     @submit="submitForm"
   >
+  <AtomsDivider />
     <!-- Bedrooms Section -->
     <div class="step__section">
+      <h3 class="step__section-title | title-md">Bedrooms</h3>
+      <em class="body-xs">
+        <span class="step__section-title--require | body-md">
+          *
+        </span>
+        At least one bedroom required
+      </em>
       <OrganismsDraftBedroomForm
         v-model="stepFiveData.property.bedroomFeatures"
+        :total-floors="stepFiveData.property.totalFloors"
+      />
+    </div>
+    <AtomsDivider />
+    <!-- Bathrooms Section -->
+    <div class="step__section">
+      <h3 class="step__section-title | title-md">Bathrooms</h3>
+      <em class="body-xs">
+        <span class="step__section-title--require | body-md">
+          *
+        </span>
+        At least one bathroom/toilet required
+      </em>
+      <OrganismsDraftBathroomForm
+        v-model="stepFiveData.property.bathroomFeatures"
         :total-floors="stepFiveData.property.totalFloors"
       />
     </div>
@@ -24,6 +48,7 @@
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
+  errorMessage?: string;
 }>();
 
 const emit = defineEmits<{
@@ -38,9 +63,10 @@ const stepConfig = computed(() => ({
   isValid: stepFiveValidation.isStepFiveValid,
   hasExistingData: stepFiveValidation.hasExistingStepFiveData,
   beforeSubmit: (data: StepFive) => {
-    // Update the number of bedrooms before submitting
+    // Update the number of bedrooms and bathrooms before submitting
     const processedData = { ...data };
     processedData.property.numberBedrooms = processedData.property.bedroomFeatures.length;
+    processedData.property.numberBathrooms = processedData.property.bathroomFeatures.length;
     return processedData;
   }
 }));
@@ -79,8 +105,14 @@ function submitForm() {
   }
   
   &__section-title {
-    margin-bottom: var(--size-24);
-    text-align: center;
+    display: flex;
+    justify-content: flex-start;
+    color: var(--secondary-400);
+    margin-bottom: 0;
+
+    &--require {
+      color: var(--error);
+    }
   }
   
   &__items {

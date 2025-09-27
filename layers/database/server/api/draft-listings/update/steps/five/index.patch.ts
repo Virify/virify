@@ -1,7 +1,7 @@
 import * as z from "zod";
 
-// Validate payload to match Prisma Bedroom model and StepFive type
-const bedroomSchema = z.object({
+// Validate payload to match Prisma Bedroom and Bathroom models and StepFive type (now includes both)
+const bedroomBathroomSchema = z.object({
   draftId: z.number().int().positive(),
   property: z.object({
     totalFloors: z.coerce.number().int().min(0),
@@ -25,7 +25,23 @@ const bedroomSchema = z.object({
         })
       )
       .min(1),
-    numberBedrooms: z.coerce.number().int().min(1)
+    numberBedrooms: z.coerce.number().int().min(1),
+    bathroomFeatures: z
+      .array(
+        z.object({
+          name: z.string().max(100).nullable(),
+          roomNumber: z.coerce.number().int().min(1),
+          description: z.string().max(500).optional(),
+          floor: z.coerce.number().int().min(1),
+          size: z.coerce.number().min(0).nullable().optional(),
+          toilet: z.boolean().optional(),
+          enSuite: z.boolean().optional(),
+          bathtub: z.boolean().optional(),
+          walkInShower: z.boolean().optional(),
+        })
+      )
+      .min(1),
+    numberBathrooms: z.coerce.number().int().min(1)
   }),
 });
 
@@ -33,9 +49,9 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
   try {
-    const { draftId, property } = await readValidatedBody(event, bedroomSchema.parse);
+    const { draftId, property } = await readValidatedBody(event, bedroomBathroomSchema.parse);
 
-    const { bedroomFeatures, numberBedrooms, totalFloors } = property;
+    const { bedroomFeatures, numberBedrooms, bathroomFeatures, numberBathrooms, totalFloors } = property;
 
     const result = await prisma.draftListing.update({
       where: { id: draftId, userId: user.id },
@@ -44,6 +60,7 @@ export default defineEventHandler(async (event) => {
           update: {
             totalFloors,
             numberBedrooms: numberBedrooms ?? bedroomFeatures.length,
+            numberBathrooms: numberBathrooms ?? bathroomFeatures.length,
             bedroomFeatures: {
               deleteMany: {},
               create: bedroomFeatures.map((b) => ({
@@ -63,6 +80,20 @@ export default defineEventHandler(async (event) => {
                 builtInDesk: b.builtInDesk ?? false,
               })),
             },
+            bathroomFeatures: {
+              deleteMany: {},
+              create: bathroomFeatures.map((b) => ({
+                name: b.name,
+                roomNumber: b.roomNumber,
+                description: b.description ?? null,
+                floor: b.floor,
+                size: b.size ?? null,
+                toilet: b.toilet ?? false,
+                enSuite: b.enSuite ?? false,
+                bathtub: b.bathtub ?? false,
+                walkInShower: b.walkInShower ?? false,
+              })),
+            },
           },
         },
       },
@@ -70,13 +101,13 @@ export default defineEventHandler(async (event) => {
         property: {
           include: {
             bedroomFeatures: true,
+            bathroomFeatures: true,
           },
         },
       },
     });
     return result;
   } catch (error) {
-    console.log("Error updating draft listing:", error);
     return errorResponse(error, event);
   }
 });

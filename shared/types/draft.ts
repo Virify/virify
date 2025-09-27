@@ -54,12 +54,6 @@ export type StepFive = {
     totalFloors: number
     bedroomFeatures: Omit<Bedroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
     numberBedrooms: number | null
-  }
-}
-
-export type StepSix = {
-  property: {
-    totalFloors: number
     bathroomFeatures: Omit<Bathroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
     numberBathrooms: number | null
   }

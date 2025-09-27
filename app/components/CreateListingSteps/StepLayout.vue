@@ -8,6 +8,11 @@
     </p>
 
     <h3 v-if="info" class="step__info | title-xs">{{ info }}</h3>
+    
+    <!-- Error message display -->
+    <AtomsInlineError v-if="errorMessage" class="step__error">
+      {{ errorMessage }}
+    </AtomsInlineError>
 
     <form :key="formKey" class="step__form" @submit.prevent="$emit('submit')">
       <slot />
@@ -35,6 +40,7 @@ defineProps<{
   buttonDisabled: boolean;
   showPrevious?: boolean;
   formKey?: number;
+  errorMessage?: string;
 }>()
 
 defineEmits<{
@@ -43,3 +49,14 @@ defineEmits<{
   submit: [];
 }>()
 </script>
+
+<style lang="scss" scoped>
+.step {
+  &__error {
+    display: flex;
+    gap: var(--size-8);
+    width: fit-content;
+    justify-self: center;
+  }
+}
+</style>

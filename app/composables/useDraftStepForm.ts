@@ -73,31 +73,40 @@ export function useDraftStepForm<T>(
   };
 
   /**
-   * Handle form submission
+   * Handle form submission with proper error handling
    * @param updateFn Function to call to update draft step data
    * @param nextStepFn Function to call to proceed to the next step
    * @returns Promise that resolves when submission is complete
    */
   const submitForm = async (
     updateFn: (data: T) => void | Promise<void>,
-    nextStepFn: () => void
+    nextStepFn?: () => void
   ) => {
     if (!isFormValid.value) return;
 
     // If no changes detected, skip API call and go to next step
     if (!hasChanges.value) {
       console.log('No changes detected, skipping API call');
-      nextStepFn();
+      nextStepFn?.();
       return;
     }
 
-    // Apply transformation if provided
-    const dataToSubmit = configRef.value.beforeSubmit 
-      ? configRef.value.beforeSubmit(formData.value)
-      : formData.value;
+    try {
+      // Apply transformation if provided
+      const dataToSubmit = configRef.value.beforeSubmit 
+        ? configRef.value.beforeSubmit(formData.value)
+        : formData.value;
 
-    // Execute update function
-    await updateFn(dataToSubmit);
+      // Execute update function
+      await updateFn(dataToSubmit);
+      
+      // Only call next step function if update was successful
+      nextStepFn?.();
+    } catch (error) {
+      // Error is already handled by the updateFn (likely shows a toast)
+      // Just don't call nextStepFn so user stays on current step
+      console.error('Step submission failed:', error);
+    }
   };
 
   return {

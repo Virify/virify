@@ -70,7 +70,8 @@ export const useResponse = () => {
   /**
    * Creates a standardized error response.
    * 
-   * Zod errors with throw a 400 status and return the field errors.
+   * Zod errors will throw a 400 status and return the field errors.
+   * Prisma errors will be converted to user-friendly messages.
    * Other errors will be returned via createError and should be handled by the frontend
    * 
    * @param error Error object
@@ -78,10 +79,21 @@ export const useResponse = () => {
    * @returns error response
    */
   const errorResponse = (error: any, event: H3Event) => {
+    // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       setResponseStatus(event, 400);
       return error.flatten().fieldErrors;
     }
+    
+    // Handle Prisma errors with user-friendly messages AND backend logging
+    if (error?.code?.startsWith('P')) {
+      const userFriendlyMessage = handlePrismaError(error, "Database Operation");
+      throw createError({
+        statusCode: 400,
+        statusMessage: userFriendlyMessage
+      });
+    }
+    
     return error;
   };
 

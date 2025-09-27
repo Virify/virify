@@ -5,6 +5,7 @@
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"
+    :errorMessage="errorMessage"
     showPrevious
     @cancel="resetForm"
     @previous="$emit('previousStep')"
@@ -77,6 +78,7 @@
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
+  errorMessage?: string;
 }>();
 
 const emit = defineEmits<{

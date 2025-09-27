@@ -134,7 +134,7 @@
             <button
               type="button"
               @click="saveRoom(index)"
-              class="button button-sm button-primary | body-sm"
+              class="button button-sm button-secondary | body-sm"
               :disabled="!isRoomCompleted(bedroom) || !hasRoomChanges(index)"
             >
               {{ lastAddedRoomIndex === index ? 'Save Bedroom' : 'Save Changes' }}

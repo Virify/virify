@@ -4,7 +4,7 @@ import CreateListingStepsStep2 from '~/components/CreateListingSteps/Step2.vue';
 import CreateListingStepsStep3 from '~/components/CreateListingSteps/Step3.vue';
 import CreateListingStepsStep4 from '~/components/CreateListingSteps/Step4.vue';
 import CreateListingStepsStep5 from '~/components/CreateListingSteps/Step5.vue';
-import CreateListingStepsStep6 from '~/components/CreateListingSteps/Step6.vue';
+
 
 export interface DraftStepConfig {
   title: string;
@@ -21,8 +21,7 @@ export const useDraft = createSharedComposable(() => {
     updateDraftStepTwo, 
     updateDraftStepThree, 
     updateDraftStepFour, 
-    updateDraftStepFive,
-    updateDraftStepSix
+    updateDraftStepFive
   } = useDraftListing();
 
   /**
@@ -71,18 +70,11 @@ export const useDraft = createSharedComposable(() => {
         component: CreateListingStepsStep4
       },
       { 
-        title: 'Bedrooms',
+        title: 'Bedrooms & Bathrooms',
         data: draft.value ? createInitialStepFiveValues(draft.value) : null,
         complete: draft.value ? stepFiveValidation.hasExistingStepFiveData(draft.value) : false,
         update: updateDraftStepFive,
         component: CreateListingStepsStep5
-      },
-      { 
-        title: 'Bathrooms',
-        data: draft.value ? createInitialStepSixValues(draft.value) : null,
-        complete: draft.value ? stepSixValidation.hasExistingStepSixData(draft.value) : false,
-        update: updateDraftStepSix,
-        component: CreateListingStepsStep6
       },
       { title: 'Rooms', complete: false },
       { title: 'Additional', complete: false },
@@ -119,29 +111,35 @@ export const useDraft = createSharedComposable(() => {
   };
 
   /**
-   * Handle step data update
+   * Handle step update with proper error handling and detailed error messages
    */
   const handleStepUpdate = async (
     draftId: number, 
     stepperMap: ComputedRef<DraftStepConfig[]>,
     stepData: any, 
     stepNumber: number
-  ) => {
+  ): Promise<{ success: boolean; errorMessage?: string }> => {
     const draft = getDraft(draftId);
-    if (!draft.value?.id) return;
+    const stepTitle = stepperMap.value[stepNumber - 1]?.title || `step ${stepNumber}`;
+    
+    if (!draft.value?.id) {
+      return { success: false, errorMessage: `Failed to update ${stepTitle}. Draft not found.` };
+    }
 
     const stepToUpdate = computed(() => stepperMap.value[stepNumber - 1]?.update).value;
 
     if (stepToUpdate) {
       try {
         await stepToUpdate(draft.value.id, stepData);
-        return true;
-      } catch (error) {
+        return { success: true };
+      } catch (error: any) {
         console.error("Error updating step data:", error);
-        return false;
+        // Backend should handle Prisma errors and return user-friendly messages
+        const errorMessage = error?.data?.message || error?.message || `Failed to update ${stepTitle}. Please try again.`;
+        return { success: false, errorMessage };
       }
     }
-    return false;
+    return { success: false, errorMessage: `Failed to update ${stepTitle}. Step configuration not found.` };
   };
 
   return {
