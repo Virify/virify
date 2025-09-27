@@ -4,6 +4,7 @@ import CreateListingStepsStep2 from '~/components/CreateListingSteps/Step2.vue';
 import CreateListingStepsStep3 from '~/components/CreateListingSteps/Step3.vue';
 import CreateListingStepsStep4 from '~/components/CreateListingSteps/Step4.vue';
 import CreateListingStepsStep5 from '~/components/CreateListingSteps/Step5.vue';
+import CreateListingStepsStep6 from '~/components/CreateListingSteps/Step6.vue';
 
 export interface DraftStepConfig {
   title: string;
@@ -20,7 +21,8 @@ export const useDraft = createSharedComposable(() => {
     updateDraftStepTwo, 
     updateDraftStepThree, 
     updateDraftStepFour, 
-    updateDraftStepFive 
+    updateDraftStepFive,
+    updateDraftStepSix
   } = useDraftListing();
 
   /**
@@ -74,6 +76,13 @@ export const useDraft = createSharedComposable(() => {
         complete: draft.value ? stepFiveValidation.hasExistingStepFiveData(draft.value) : false,
         update: updateDraftStepFive,
         component: CreateListingStepsStep5
+      },
+      { 
+        title: 'Bathrooms',
+        data: draft.value ? createInitialStepSixValues(draft.value) : null,
+        complete: draft.value ? stepSixValidation.hasExistingStepSixData(draft.value) : false,
+        update: updateDraftStepSix,
+        component: CreateListingStepsStep6
       },
       { title: 'Rooms', complete: false },
       { title: 'Additional', complete: false },

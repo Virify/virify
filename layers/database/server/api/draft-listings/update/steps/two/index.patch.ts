@@ -20,11 +20,12 @@ const stepTwoScehma = z.object({
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
+  const { user } = await requireUserSession(event);
   try {
     const { draftId, property } = await readValidatedBody(event, stepTwoScehma.parse);
 
     return await prisma.draftListing.update({
-      where: { id: draftId },
+      where: { id: draftId, userId: user.id },
       data: {
         property: {
           upsert: {

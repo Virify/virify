@@ -6,7 +6,6 @@ import { RentalPriceType, SalePriceType } from "~~/layers/database/server/databa
  * @returns Initial values for step three
  */
 export const createInitialStepThreeValues = (draftListing: DraftListingWithFullPayload): StepThree => {
-  console.log("Draft Listing Property:", draftListing);
   return {
     price: draftListing.price || null,
     ...(draftListing.rentalListing && {

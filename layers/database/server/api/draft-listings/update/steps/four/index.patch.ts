@@ -20,6 +20,7 @@ const addressSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
+  const { user } = await requireUserSession(event);
   try {
     const { draftId, property, } = await readValidatedBody(event, addressSchema.parse);
 
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
 
     // insert or update the address record associated with the draft listing
     const result = await prisma.draftListing.update({
-      where: { id: draftId },
+      where: { id: draftId, userId: user.id },
       data: {
         property: {
           update: {

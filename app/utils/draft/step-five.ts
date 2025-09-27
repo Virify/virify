@@ -37,25 +37,6 @@ export const bedroomFeaturesOptions = [
 ];
 
 /**
- * Get floor options based on total floors in the property
- * @param totalFloors - Total number of floors in the property
- * @returns Array of floor options for dropdowns
- */
-export function getFloorOptions(totalFloors: number) {
-  const options = [];
-  
-  for (let i = 1; i <= totalFloors -1; i++) {
-    if (i === 1) {
-      options.push({ value: i, key: "Ground Floor", info: "Ground floor of the property" });
-    } else {
-      options.push({ value: i, key: `Floor ${i}`, info: `Floor ${i} of the property` });
-    }
-  }
-  
-  return options;
-}
-
-/**
  * Step Five Validation Helpers
  * Clean, reusable validation functions for step five
  */

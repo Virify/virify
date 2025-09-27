@@ -63,7 +63,6 @@ export function convertFeetToMeters(feet: number): number {
 }
 
 export const createInitialStepTwoValues = (draftListing: DraftListingWithFullPayload): StepTwo => {
-  console.log("Draft Listing Property:", draftListing.property);
   return {
     property: {
       type: draftListing.property?.type.id || null,

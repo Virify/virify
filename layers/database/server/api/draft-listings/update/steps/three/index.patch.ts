@@ -20,11 +20,12 @@ const stepDataSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
+  const { user } = await requireUserSession(event);
   try {
     const { draftId, price, rentalListing, saleListing } = await readValidatedBody(event, stepDataSchema.parse);
 
     const updatedDraftListing = await prisma.draftListing.update({
-      where: { id: draftId },
+      where: { id: draftId, userId: user.id },
       data: {
         price: price,
         rentalListing: rentalListing

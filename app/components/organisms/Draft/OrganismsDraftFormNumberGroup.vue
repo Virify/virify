@@ -1,5 +1,5 @@
 <template>
-  <div class="o-form-group" :class="{ 'o-form-group--grid': grid}">
+  <div class="o-form-group" :class="{ 'o-form-group--grid': grid, 'o-form-group--disabled': disabled }">
     <AtomsDivider v-if="divider" />
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
@@ -16,6 +16,7 @@
         :modelValue="modelValue || undefined"
         :placeholder="placeholder || 'Enter ' + title.toLowerCase()"
         :required="required"
+        :disabled="disabled"
         class="body-sm"
         @update:modelValue="handleUpdateModel"
       />
@@ -30,6 +31,7 @@ interface Props {
   info?: string;
   name?: string;
   required?: boolean;
+  disabled?: boolean;
   divider?: boolean;
   placeholder?: string;
   modelValue: number | null;
@@ -89,6 +91,20 @@ function handleUpdateModel(val: any) {
       &__number-input {
         max-width: none;
       }
+    }
+  }
+
+  /* disabled modifier */
+  &--disabled {
+    opacity: 0.6;
+    
+    .o-form-group__title {
+      color: var(--text-muted);
+    }
+    
+    .o-form-group__info {
+      color: var(--accent-400);
+      font-weight: 500;
     }
   }
 }

@@ -38,11 +38,12 @@
 
       <OrganismsDraftFormNumberGroup
         title="How many total floors does the property have?"
-        info="Including Ground Floor - i.e 2 floors above ground is 3 total floors"
+        :info="totalFloorsInfo"
         v-model="stepTwoData.property.totalFloors"
         name="property-floors"
         placeholder="e.g '2'"
         :required="true"
+        :disabled="isTotalFloorsDisabled"
         min="1"
         step="1"
         max="100"
@@ -86,6 +87,21 @@ const emit = defineEmits<{
 
 // Size conversion state (outside of form data as it's UI-only)
 const sizeToConvert = ref<string>('meter');
+
+// Check if totalFloors should be disabled (when rooms already exist)
+const isTotalFloorsDisabled = computed(() => {
+  const hasBedroomFeatures = (props.draft.property?.bedroomFeatures?.length ?? 0) > 0;
+  const hasBathroomFeatures = (props.draft.property?.bathroomFeatures?.length ?? 0) > 0;
+  return hasBedroomFeatures || hasBathroomFeatures;
+});
+
+// Dynamic info text for totalFloors field
+const totalFloorsInfo = computed(() => {
+  if (isTotalFloorsDisabled.value) {
+    return "Total floors cannot be changed after adding bedrooms or bathrooms. To change this, remove all rooms first.";
+  }
+  return "e.g 2 floors above ground is 3 total floors - This cannot be changed after adding bedrooms or bathrooms without removing them first.";
+});
 
 // Create step configuration for the composable
 const stepConfig = computed(() => ({

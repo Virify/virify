@@ -57,6 +57,14 @@ export type StepFive = {
   }
 }
 
+export type StepSix = {
+  property: {
+    totalFloors: number
+    bathroomFeatures: Omit<Bathroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
+    numberBathrooms: number | null
+  }
+}
+
 
 export type DraftListingWithFullPayload = Prisma.DraftListingGetPayload<{
   include: {

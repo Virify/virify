@@ -27,6 +27,7 @@ const stepDataSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
+  const { user } = await requireUserSession(event);
   try {
     const { saleListing, rentalListing, draftId } = await readValidatedBody(event, stepDataSchema.parse);
 
@@ -38,7 +39,7 @@ export default defineEventHandler(async (event) => {
       : undefined;
 
     return await prisma.draftListing.update({
-      where: { id: draftId },
+      where: { id: draftId, userId: user.id },
       data: {
         id: draftId,
         saleListing: saleListing

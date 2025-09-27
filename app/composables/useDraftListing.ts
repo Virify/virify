@@ -28,7 +28,7 @@ export const useDraftListing = createSharedComposable(() => {
     try {
       const title = `New ${tier.tier.charAt(0).toUpperCase() + tier.tier.slice(1)} Listing`;
       
-      await $fetch<DraftListing>("/api/draft-listings/create/", {
+      await useRequestFetch()<DraftListing>("/api/draft-listings/create/", {
         method: "POST",
         body: {
           tier: tier.tier.toUpperCase() as ListingTier,
@@ -49,7 +49,7 @@ export const useDraftListing = createSharedComposable(() => {
    */
   async function deleteDraftListing(draftListingId: number) {
     try {
-      await $fetch(`/api/draft-listings/${draftListingId}`, {
+      await useRequestFetch()<DraftListing>(`/api/draft-listings/${draftListingId}`, {
         method: "DELETE",
       });
       refreshDraftListings();
@@ -67,7 +67,7 @@ export const useDraftListing = createSharedComposable(() => {
    */
   async function updateDraftStepOne(draftId: number, stepData: StepOne) {
     try {
-      await $fetch(`/api/draft-listings/update/steps/one/`, {
+      await useRequestFetch()<DraftListing>(`/api/draft-listings/update/steps/one/`, {
         method: "PATCH",
         body: {
           draftId,
@@ -89,7 +89,7 @@ export const useDraftListing = createSharedComposable(() => {
   async function updateDraftStepTwo(draftId: number, stepData: StepTwo) {
     console.log("Updating draft step two for draftId:", draftId, "with data:", stepData);
     try {
-      await $fetch(`/api/draft-listings/update/steps/two/`, {
+      await useRequestFetch()<DraftListing>(`/api/draft-listings/update/steps/two/`, {
         method: "PATCH",
         body: {
           draftId,
@@ -111,7 +111,7 @@ export const useDraftListing = createSharedComposable(() => {
   async function updateDraftStepThree(draftId: number, stepData: StepThree) {
     console.log("Updating draft step three for draftId:", draftId, "with data:", stepData);
     try {
-      await $fetch(`/api/draft-listings/update/steps/three/`, {
+      await useRequestFetch()<DraftListing>(`/api/draft-listings/update/steps/three/`, {
         method: "PATCH",
         body: {
           draftId,
@@ -133,7 +133,7 @@ export const useDraftListing = createSharedComposable(() => {
   async function updateDraftStepFour(draftId: number, stepData: StepFour) {
     console.log("Updating draft step four for draftId:", draftId, "with data:", stepData);
     try {
-      await $fetch(`/api/draft-listings/update/steps/four/`, {
+      await useRequestFetch()<DraftListing>(`/api/draft-listings/update/steps/four/`, {
         method: "PATCH",
         body: {
           draftId,
@@ -147,15 +147,37 @@ export const useDraftListing = createSharedComposable(() => {
     }
   }
 
-    /**
+  /**
    * Updates the fifth step of a draft listing.
    * @param draftId ID of the draft listing to update
    * @param stepData Data for the fifth step
    */
-  async function updateDraftStepFive(draftId: number, stepData: any) {
+  async function updateDraftStepFive(draftId: number, stepData: StepFive) {
     console.log("Updating draft step five for draftId:", draftId, "with data:", stepData);
-     try {
-      await $fetch(`/api/draft-listings/update/steps/five/`, {
+    try {
+      await useRequestFetch()<DraftListing>(`/api/draft-listings/update/steps/five/`, {
+        method: "PATCH",
+        body: {
+          draftId,
+          ...stepData,
+        },
+      });
+      refreshDraftListings();
+    } catch (error) {
+      showToast("Failed to update draft listing", { type: "error" });
+      console.error("Error updating draft listing:", error);
+    }
+  }
+
+  /**
+   * Updates the sixth step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the sixth step
+   */
+  async function updateDraftStepSix(draftId: number, stepData: StepSix) {
+    console.log("Updating draft step six for draftId:", draftId, "with data:", stepData);
+    try {
+      await useRequestFetch()<DraftListing>(`/api/draft-listings/update/steps/six/`, {
         method: "PATCH",
         body: {
           draftId,
@@ -181,5 +203,6 @@ export const useDraftListing = createSharedComposable(() => {
     updateDraftStepThree,
     updateDraftStepFour,
     updateDraftStepFive,
+    updateDraftStepSix,
   };
 });
