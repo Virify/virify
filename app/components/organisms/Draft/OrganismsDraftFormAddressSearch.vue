@@ -87,7 +87,7 @@ const initializeAutocomplete = async () => {
         console.log('Address selected:', address);
         // Parse the address from getaddress.io format
         const parsedAddress: AddressParsed = {
-          number: address.building_number,
+          number: address.building_number || address.sub_building_number,
           flat: address.sub_building_name || null,
           street: address.thoroughfare,
           city: address.town_or_city,
