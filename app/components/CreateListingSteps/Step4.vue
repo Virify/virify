@@ -67,6 +67,17 @@
             :required="true"
           />
 
+          <!-- County -->
+          <OrganismsDraftFormTextGroup
+            v-if="stepFourData.property.address!.county" 
+            title="County/District" 
+            v-model="stepFourData.property.address!.county"
+            name="property-county" 
+            placeholder="e.g. Greater London" 
+            :grid="true"
+            :disabled="true" 
+          />
+
           <!-- Postcode (required) -->
           <OrganismsDraftFormTextGroup 
             title="Postcode" 
@@ -78,20 +89,21 @@
             :required="true"
           />
 
-          <!-- County -->
-          <OrganismsDraftFormTextGroup 
-            title="County" 
-            v-model="stepFourData.property.address!.county"
-            name="property-county" 
-            placeholder="e.g. Greater London" 
+          <!-- Locality -->
+          <OrganismsDraftFormTextGroup
+            v-if="stepFourData.property.address!.locality" 
+            title="Locality" 
+            v-model="stepFourData.property.address!.locality"
+            name="property-locality" 
+            placeholder="e.g. Westminster" 
             :grid="true"
             :disabled="true" 
           />
 
           <!-- Country -->
           <OrganismsDraftFormTextGroup 
-            title="Country" 
-            v-model="stepFourData.property.address!.country"
+            title="District" 
+            v-model="stepFourData.property.address!.district"
             name="property-country" 
             placeholder="e.g. United Kingdom" 
             :grid="true"
@@ -153,8 +165,11 @@ const handleAddressSelected = (selectedAddress: any) => {
   stepFourData.value.property.address = {
     number: selectedAddress.number,
     flat: selectedAddress.flat,
+    name: selectedAddress.name,
     street: selectedAddress.street,
     city: selectedAddress.city,
+    locality: selectedAddress.locality,
+    district: selectedAddress.district,
     county: selectedAddress.county,
     country: selectedAddress.country,
     postcode: selectedAddress.postcode,
@@ -169,8 +184,11 @@ const clearAddress = () => {
   stepFourData.value.property.address = {
     number: null,
     flat: null,
+    name: null,
     street: null,
     city: null,
+    locality: null,
+    district: null,
     county: null,
     country: null,
     postcode: null,

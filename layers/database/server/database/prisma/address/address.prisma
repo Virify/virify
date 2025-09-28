@@ -2,11 +2,14 @@ model Address {
   id          Int                      @id @default(autoincrement())
   number      String?
   flat        String?
+  name        String?
   street      String
   city        String
   postcode    String
   country     String?
+  locality    String?
   county      String?
+  district    String?
   fullAddress String?
   lat         Float?
   lon         Float?
@@ -20,6 +23,7 @@ model Address {
 
   @@unique([number, street, city, postcode, country])
   @@index([location], map: "address_location_idx", type: Gist)
+  
   @@index([postcode], map: "address_postcode_idx")
   @@index([city], map: "address_city_idx")
   @@index([street], map: "address_street_idx")

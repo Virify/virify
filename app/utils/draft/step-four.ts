@@ -3,6 +3,9 @@ export const createInitialStepFourValues = (draftListing: DraftListingWithFullPa
     address: {
       number: draftListing.property?.address?.number || null,
       flat: draftListing.property?.address?.flat || null,
+      name: draftListing.property?.address?.name || null,
+      locality: draftListing.property?.address?.locality || null,
+      district: draftListing.property?.address?.district || null,
       street: draftListing.property?.address?.street || null,
       city: draftListing.property?.address?.city || null,
       county: draftListing.property?.address?.county || null,

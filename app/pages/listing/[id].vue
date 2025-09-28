@@ -220,7 +220,7 @@ const priceFormatted = computed(() => {
 
 /** omit street number */
 const address = computed(() => {
-  return property.value?.address ? `${property.value.address.street || ""}, ${property.value.address.city || ""}, ${property.value.address.postcode || ""}`.trim() : "";
+  return property.value?.address ? `${property.value.address.street || ""}, ${property.value.address.district || property.value.address.locality || ""}, ${property.value.address.city || ""}, ${property.value.address.postcode || ""}`.trim() : "";
 });
 
 const priceType = computed(() => {

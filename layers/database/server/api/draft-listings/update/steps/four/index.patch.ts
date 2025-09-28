@@ -6,8 +6,11 @@ const addressSchema = z.object({
     address: z.object({
       number: z.string().max(20),
       flat: z.string().max(20).nullable().optional(),
+      name: z.string().max(100).nullable().optional(),
       street: z.string().max(50),
       city: z.string().max(100),
+      locality: z.string().max(100).nullable().optional(),
+      district: z.string().max(100).nullable().optional(),
       postcode: z.string().max(20),
       county: z.string().max(100).nullable().optional(),
       country: z.string().max(100).optional(),

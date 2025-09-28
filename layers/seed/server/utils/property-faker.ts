@@ -1,12 +1,13 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { BedSizeType, BoilerType, BroadbandType, ConnectedUtilities, ConstructionType, EPCRating, FireplaceType, HeatingType, HotWaterSource, OtherRoomType, ReceptionType, RenewableEnergy, type Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import { BedSizeType, BoilerType, BroadbandType, ConnectedUtilities, ConstructionType, EPCRating, FireplaceType, HeatingType, HotWaterSource, OtherRoomType, ReceptionType, RenewableEnergy, type Address, type Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 import { roundFloat } from "~~/shared/utils/numbers";
 import { typeToClassificationMap } from "./property-type-map";
 import type { PropertyWithAddress } from "~~/shared/types/property";
 import { prisma } from "~~/layers/database/server/utils/prisma-client";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed";
 import { getRequiredImages, getRandomAdditionalImages, getAllImagesByRoom } from "./images-to-seed";
+import type { AddressCreateWithoutPropertiesInput } from "~~/layers/database/server/database/prisma/generated/models";
 
 /**LandUse
  * Generate random additiional features
@@ -469,12 +470,18 @@ export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
   };
 };
 
-export const generateAddress = (address: any) => {
+export const generateAddress = (address: AddressCreateWithoutPropertiesInput) => {
   return {
     number: address.number,
+    flat: address.flat,
+    name: address.name,
     street: address.street,
     city: address.city,
     postcode: address.postcode,
+    locality: address.locality,
+    county: address.county,
+    district: address.district,
+    country: address.country,
     fullAddress: address.number + ", " + address.street + ", " + address.city + ", " + address.postcode,
     lat: address.lat,
     lon: address.lon,

@@ -32,9 +32,12 @@ import * as getAddress from '@getaddress/autocomplete';
 interface AddressParsed {
   number: string | null;
   flat: string | null;
+  name: string | null;
   street: string | null;
   city: string | null;
+  locality: string | null;
   county: string | null;
+  district: string | null;
   country: string | null;
   postcode: string | null;
   fullAddress: string | null;
@@ -88,10 +91,13 @@ const initializeAutocomplete = async () => {
         // Parse the address from getaddress.io format
         const parsedAddress: AddressParsed = {
           number: address.building_number || address.sub_building_number,
-          flat: address.sub_building_name || null,
+          flat: address.sub_building_number || null,
+          name: address.building_name || address.sub_building_name || null,
           street: address.thoroughfare,
           city: address.town_or_city,
-          county: address.district ? address.district : address.county,
+          locality: address.locality,
+          district: address.district,
+          county: address.county,
           country: address.country || 'United Kingdom',
           postcode: address.postcode,
           fullAddress: address.formatted_address ? address.formatted_address.filter((part: string) => part && part.trim()).join(', ') : null,

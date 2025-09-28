@@ -82,7 +82,6 @@ const handleUpdateStepData = async (stepData: any, step: number) => {
 const handleNextStep = () => {
   // Prevent navigation if the last update failed or is in progress
   if (lastStepUpdateFailed.value || stepUpdateInProgress.value) {
-    console.log('Preventing navigation due to failed update');
     return;
   }
   

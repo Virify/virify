@@ -38,8 +38,11 @@ export type StepFour = {
       number: string | null
       street: string | null
       flat: string | null
+      name: string | null
       city: string | null
       county: string | null
+      locality: string | null
+      district: string | null
       country: string | null
       postcode: string | null
       fullAddress: string | null
