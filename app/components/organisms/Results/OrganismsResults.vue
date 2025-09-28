@@ -11,15 +11,18 @@
 
     <template v-else>
       <h2 class="o-results__title | title-sm">
-        {{ results.length }} matches
+        {{ visibleResultsTitle }}
       </h2>
 
       <div class="o-results__grid">
-        <component v-for="{ variant, fullWidth, component, result } of resultsComponents" :is="component" :variant
+        <component v-for="{ variant, fullWidth, component, result } of paginatedResults" :is="component" :variant
           :result :class="{
             'o-results__card--large': !!fullWidth
           }" />
       </div>
+
+      <MoleculesPaginator v-if="requiresPagnination" :current-page="currentPage" :items-per-page="RESULTS_PER_PAGE"
+        :total-items="results.length" @change-page="updateCurrentPage" />
     </template>
   </div>
 </template>
@@ -38,6 +41,61 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false
+})
+
+/**
+ *  Pagination
+ */
+const RESULTS_PER_PAGE = 24;
+const currentPage = ref(1)
+
+function updateCurrentPage(newIndex: number) {
+  currentPage.value = newIndex
+
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+}
+
+// Get paginatable results length
+const resultsLength = computed(() => {
+  const results = asArray(resultsComponents.value)
+
+  return results.length
+})
+
+// Check if pagination is necessary
+const requiresPagnination = computed(() => {
+  return resultsLength.value > RESULTS_PER_PAGE
+})
+
+// Get first paginated index
+const firstPaginatedIndex = computed(() => {
+  return 1 + (RESULTS_PER_PAGE * (currentPage.value - 1))
+})
+
+// Get last paginated index
+const lastPaginatedIndex = computed(() => {
+  return Math.min(firstPaginatedIndex.value + RESULTS_PER_PAGE - 1, resultsLength.value)
+})
+
+// Get title for visible paginated indexes
+const visibleResultsTitle = computed(() => {
+  // If no pagination, show normal title
+  if (!requiresPagnination.value) {
+    return `Showing ${resultsLength.value} results`
+  }
+
+  return `Showing results ${firstPaginatedIndex.value} to ${lastPaginatedIndex.value} of ${resultsLength.value}`
+})
+
+const paginatedResults = computed(() => {
+  // If no results, return empty array
+  if (!resultsLength.value) return []
+
+  // Else return sliced results
+  return asArray(resultsComponents.value).slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value)
 })
 
 /**
@@ -75,7 +133,7 @@ function distributeListings(listings: ListingCardData[]): ListingCardData[] {
   // Use the existing utility function
   const sections = distributePremiumListings(listings as ListingWithFullProperty[])
   const result: ListingCardData[] = []
-  
+
   // Flatten the sections into a simple array
   for (const section of sections) {
     if (section.item) {
@@ -88,7 +146,7 @@ function distributeListings(listings: ListingCardData[]): ListingCardData[] {
       }
     }
   }
-  
+
   return result
 }
 
@@ -97,6 +155,7 @@ function distributeListings(listings: ListingCardData[]): ListingCardData[] {
  */
 const resultsComponents = computed(() => {
   const { results } = asObject(props)
+
   const distributedResults = distributeListings(asArray(results))
 
   return distributedResults
