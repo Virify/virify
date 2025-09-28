@@ -23,7 +23,7 @@ async function seedPropertyTypes() {
     Bungalow: ['Terraced', 'Semi-detached', 'End of Terrace', 'Detached'],
     Flat: ['Converted', 'Studio', 'Maisonette', 'High-rise', 'Within a Complex', 'Penthouse'],
     Land: ['Residential', 'Commercial', 'Agricultural', 'Development Plot', 'Development Potential'],
-    Farms: ['Non-working Farmhouse', 'Working', 'Small Holding'],
+    Farms: ['Non-working Farmhouse', 'Working'],
     Specialty: ['Shared Ownership', 'Retirement Home', 'New Build Home'],
     'Student Accommodation': ['Flat', 'House', 'House-share'],
   }
