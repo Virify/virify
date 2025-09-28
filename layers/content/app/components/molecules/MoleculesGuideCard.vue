@@ -49,18 +49,18 @@ defineProps<{
     transform: translateY(-4px);
   }
 
-  &__top {
+    &__top {
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)), var(--secondary-400);
     padding: var(--size-32);
     display: flex;
     flex-direction: column;
-    justify-content: baseline;
+    justify-content: center;
     align-items: center;
     text-align: center;
+    min-height: 180px;
+    flex: 1 1 0;
+    width: 100%;
     position: relative;
-    flex: 1;
-    min-height: 130px;
-    height: fit-content;
 
     &::before {
       content: "";
@@ -108,8 +108,7 @@ defineProps<{
     padding: var(--size-16);
     color: var(--foreground-100);
     text-align: center;
-    flex: 1 1 auto;
-    min-height: 100px;
+    flex: 1 1 0;
 
     @include mq.mobile-only {
       justify-content: center;
@@ -123,6 +122,8 @@ defineProps<{
     align-items: center;
     color: var(--secondary-400);
     padding: var(--size-16);
+    flex-shrink: 0; // Don't shrink this section
+    margin-top: auto; // Push to bottom if content is shorter
   }
 }
 </style>

@@ -1,10 +1,6 @@
 <template>
   <div class="o-header | pointer-none">
     <div class="o-header-container | container">
-      <nuxt-link to="/" alt="Back to homepage" class="o-header-homelink | pointer">
-        <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="222" height="67" class="o-header-logo" />
-      </nuxt-link>
-
       <OrganismsSiteNavigation class="| pointer" />
     </div>
   </div>
@@ -24,19 +20,8 @@
   &-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     height: var(--header-height);
-  }
-
-  &-homelink {
-    display: block;
-    width: min(60%, 120px);
-  }
-
-  &-logo {
-    display: block;
-    width: 100%;
-    height: auto;
   }
 }
 

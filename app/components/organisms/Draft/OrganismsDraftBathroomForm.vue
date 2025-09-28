@@ -179,8 +179,7 @@ const roomManagerConfig = {
   isRoomCompleted: (bathroom: any) => Boolean(
     bathroom.name && 
     bathroom.roomNumber && 
-    bathroom.floor !== null && 
-    bathroom.description
+    bathroom.floor !== null
   ),
   createNewRoom: (roomNumber: number) => ({
     name: null,

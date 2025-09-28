@@ -17,6 +17,16 @@ export const useSanity = () => {
   }
 
   /**
+   * A async data fetcher for navigation data including categories with their guides.
+   * @returns A async data fetcher for navigation structure with categories and guides.
+   */
+  const useNavigationData = () => {
+    return useAsyncData('navigation-data', () => 
+      $fetch('/api/sanity/navigation')
+    )
+  }
+
+  /**
    * A async data fetcher for a guide by slug from the Sanity CMS.
    * @param slug The slug of the guide to fetch.
    * @returns A async data fetcher for a guide by slug from the Sanity CMS.
@@ -50,6 +60,7 @@ export const useSanity = () => {
 
   return {
     useCategories,
+    useNavigationData,
     useGuideBySlug,
     useCategoryBySlug,
     guideUrl

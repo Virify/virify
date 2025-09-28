@@ -1,3 +1,4 @@
+
 /**
  * Sanity CMS Types
  * These types match our Sanity schema definitions
@@ -129,4 +130,20 @@ export interface CategoryWithGuidesResponse extends GuideCategory {
 
 export interface GuideResponse extends Guide {
   category?: GuideCategory
+}
+
+export interface SanityGuideCategory {
+  _id: string
+  title: string
+  slug?: { current?: string }
+  description?: string
+  guides?: SanityGuide[]
+}
+
+export interface SanityGuide {
+  _id: string
+  title: string
+  slug?: { current?: string }
+  excerpt?: string
+  icon?: string
 }
