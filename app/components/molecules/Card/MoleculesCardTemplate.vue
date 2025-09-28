@@ -162,6 +162,7 @@ const premiumFeatures = computed(() => {
 
 <style lang="scss">
 .m-card-template__container {
+  container-name: listing-card;
   container-type: inline-size;
   display: flex;
 }
@@ -210,7 +211,7 @@ const premiumFeatures = computed(() => {
     --card-button-border-colour: var(--secondary-400);
   }
 
-  @container (width > 750px) {
+  @container listing-card (width > 700px) {
 
     &--basic,
     &--featured {
@@ -222,6 +223,20 @@ const premiumFeatures = computed(() => {
     &--basic &__gallery,
     &--featured &__gallery {
       align-items: center;
+    }
+  }
+
+  @container listing-card (800px > width > 700px) {
+
+    &--basic,
+    &--featured {
+      grid-template-columns: 1fr 20ch;
+      gap: 0;
+
+      .m-cards-slots-price {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   }
 
@@ -240,7 +255,7 @@ const premiumFeatures = computed(() => {
 
     border: 4px solid var(--primary-500);
 
-    @container (width > 900px) {
+    @container listing-card (width > 900px) {
       --card-layout: horizontal;
 
       grid-template-columns: 1.2fr minmax(20ch, 1fr);
@@ -322,6 +337,7 @@ const premiumFeatures = computed(() => {
         flex-direction: column-reverse;
         justify-content: flex-start;
         align-items: flex-start;
+        gap: var(--size-8);
       }
 
       .m-card-lots-pills,
