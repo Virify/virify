@@ -32,15 +32,6 @@
 
     <OrganismsDraftFormRadioGroup 
       v-if="isSale" 
-      title="What is the availability status of the listing?"
-      :options="saleListingAvailabilityOptions" 
-      v-model="stepOneData.saleListing.availabilityStatus"
-      name="sale-availability" 
-      :required="true" 
-    />
-
-    <OrganismsDraftFormRadioGroup 
-      v-if="isSale" 
       title="What is the chain of the listing?"
       :options="saleListingChainOptions" 
       v-model="stepOneData.saleListing.chain" 
@@ -56,15 +47,6 @@
     />
 
     <!-- RENTAL -->
-    <OrganismsDraftFormRadioGroup 
-      v-if="isRent" 
-      title="What is the availability status of the listing?"
-      :options="rentalAvailabilityStatusOptions" 
-      v-model="stepOneData.rentalListing.availabilityStatus"
-      name="rental-availability-status" 
-      :required="true" 
-    />
-
     <OrganismsDraftFormRadioGroup 
       v-if="isRent" 
       title="Are bills included in the rent?"

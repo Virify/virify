@@ -31,25 +31,12 @@ export const saleSharedOwnershipOptions = Object.values([true, false]).map((valu
   return { value: value, key: value ? "Shared Ownership" : "No Shared Ownership", info: value ? "The property is available for shared ownership." : "The property is not available for shared ownership." };
 });
 
-/**
- * Sale Listing Price Type Options
- */
-export const saleListingAvailabilityOptions = Object.values(SaleAvailabilityStatus).map((element) => {
-  return { value: element, key: convertEnumToCapalizedString(element), info: `Your property availability is ${convertEnumToCapalizedString(element).toLowerCase()}` };
-});
 
 /**
  * Rental Furnished Status Options
  */
 export const rentalFurnishedStatusOptions = Object.values(FurnishedStatus).map((element) => {
   return { value: element, key: convertEnumToCapalizedString(element), info: `Furnished status: ${convertEnumToCapalizedString(element).toLowerCase()}` };
-});
-
-/**
- * Rental Availability Status Options
- */
-export const rentalAvailabilityStatusOptions = Object.values(RentalAvailabilityStatus).map((element) => {
-  return { value: element, key: convertEnumToCapalizedString(element), info: `Your property availability is ${convertEnumToCapalizedString(element).toLowerCase()}` };
 });
 
 /**
@@ -69,7 +56,6 @@ export const createInitialSaleValues = (draftListing: DraftListingWithFullPayloa
   tenureType: draftListing.saleListing?.tenureType || null,
   chain: draftListing.saleListing?.chain || false,
   sharedOwnership: draftListing.saleListing?.sharedOwnership || false,
-  availabilityStatus: draftListing.saleListing?.availabilityStatus || null as any,
   priceType: draftListing.saleListing?.priceType || null
 });
 
@@ -85,7 +71,6 @@ export const createInitialRentalValues = (draftListing: DraftListingWithFullPayl
   isBillsIncluded: draftListing.rentalListing?.isBillsIncluded || null as any,
   rentalLength: draftListing.rentalListing?.rentalLength || null,
   furnishedStatus: draftListing.rentalListing?.furnishedStatus || null,
-  availabilityStatus: draftListing.rentalListing?.availabilityStatus || null as any
 });
 
 /**
@@ -117,7 +102,7 @@ export const stepOneValidation = {
    * @returns True if all required sale fields are present
    */
   isSaleComplete: (saleListing: SaleListingCreateWithoutListingInput): boolean => {
-    return !!(saleListing.tenureType && saleListing.availabilityStatus);
+    return !!(saleListing.tenureType);
   },
 
   /**
@@ -128,7 +113,6 @@ export const stepOneValidation = {
   isRentalComplete: (rentalListing: RentalListingCreateWithoutListingInput): boolean => {
     return !!(
       rentalListing.furnishedStatus && 
-      rentalListing.availabilityStatus && 
       rentalListing.isBillsIncluded !== null
     );
   },

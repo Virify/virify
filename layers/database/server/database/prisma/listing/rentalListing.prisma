@@ -8,7 +8,7 @@ model RentalListing {
   isBillsIncluded    Boolean
   rentalLength       Int?
   furnishedStatus    FurnishedStatus?
-  availabilityStatus RentalAvailabilityStatus
+  availabilityStatus RentalAvailabilityStatus @default(AVAILABLE)
   DraftListing       DraftListing?            @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
   draftListingId     Int?                     @unique
 

@@ -1,12 +1,11 @@
 import * as z from "zod";
-import { FurnishedStatus, RentalAvailabilityStatus, RentalPriceType, SaleAvailabilityStatus, SalePriceType, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { FurnishedStatus, RentalPriceType, SalePriceType, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 const saleListingSchema = z.object({
   tenureType: z.enum(Object.values(TenureType)).nullable().optional(),
   chain: z.boolean().optional(),
   sharedOwnership: z.boolean().optional(),
   priceType: z.enum(Object.values(SalePriceType)).nullable().optional(),
-  availabilityStatus: z.enum(Object.values(SaleAvailabilityStatus)),
 });
 
 const rentalListingSchema = z.object({
@@ -16,7 +15,6 @@ const rentalListingSchema = z.object({
   isBillsIncluded: z.boolean(),
   rentalLength: z.number().int().nullable().optional(),
   furnishedStatus: z.enum(Object.values(FurnishedStatus)).nullable().optional(),
-  availabilityStatus: z.enum(Object.values(RentalAvailabilityStatus)),
 });
 
 const stepDataSchema = z.object({
