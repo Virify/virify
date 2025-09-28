@@ -22,7 +22,7 @@
       </div>
 
       <MoleculesPaginator v-if="requiresPagnination" :current-page="currentPage" :items-per-page="RESULTS_PER_PAGE"
-        :total-items="results.length" @change-page="updateCurrentPage" />
+        :total-items="resultsLength" @change-page="updateCurrentPage" />
     </template>
   </div>
 </template>
