@@ -80,8 +80,7 @@ export const stepFiveValidation = {
     return bathroomFeatures.every(bathroom =>
       bathroom.name &&
       bathroom.roomNumber &&
-      bathroom.floor &&
-      bathroom.description
+      bathroom.floor
     );
   },
 
