@@ -147,6 +147,14 @@ export const useNavigation = (navigationData?: NavigationDataRef): NavigationCom
   onMounted(() => {
     if (!isClient()) return
     
+    // Close mobile menu on route change
+    const route = useRoute()
+    watch(() => route.path, () => {
+      if (isMobileMenuOpen.value) {
+        closeMobileMenu()
+      }
+    })
+    
     // Global escape key handler
     document.addEventListener('keydown', handleKeydown)
     
