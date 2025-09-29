@@ -1,9 +1,7 @@
 <template>
   <div class="guide-page | container">
     <article v-if="guide">
-      <div class="guide-page__breadcrumb">
-        <MoleculesBreadcrumb :items="breadcrumbItems" />
-      </div>
+      <MoleculesBreadcrumb :items="breadcrumbItems" />
       
       <AtomsGuideHero 
         :title="guide.title"

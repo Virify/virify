@@ -11,7 +11,7 @@
     <div class="guide-card__description | body-sm">
       <p>{{ excerpt || description }}</p>
     </div>
-    <div class="guide-card__details">
+    <div class="guide-card__details" v-if="readTime || publishedAt">
       <p v-if="readTime" class="body-xs">{{ readTime }} min read</p>
       <p v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</p>
     </div>
@@ -103,7 +103,7 @@ defineProps<{
   &__description {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     padding: var(--size-16);
     color: var(--foreground-100);
@@ -122,8 +122,18 @@ defineProps<{
     align-items: center;
     color: var(--secondary-400);
     padding: var(--size-16);
-    flex-shrink: 0; // Don't shrink this section
-    margin-top: auto; // Push to bottom if content is shorter
+
+    @include mq.small-tablet {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--size-8);
+    }
+
+    @include mq.desktop {
+      flex-direction: row;
+      align-items: center;
+      gap: 0;
+    }
   }
 }
 </style>

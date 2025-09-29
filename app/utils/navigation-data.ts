@@ -14,7 +14,6 @@ export const getBaseCenterItems = (): NavigationItem[] => [
   {
     id: "search",
     label: "Search",
-    href: "#",
     type: "dropdown",
     icon: "chevron-down",
     children: [
@@ -25,7 +24,6 @@ export const getBaseCenterItems = (): NavigationItem[] => [
   {
     id: "property-info",
     label: "Property Information",
-    href: "#",
     type: "dropdown",
     icon: "chevron-down",
     children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: 'account/billing' }],

@@ -146,12 +146,27 @@ export const useNavigation = (navigationData?: NavigationDataRef): NavigationCom
 
   onMounted(() => {
     if (!isClient()) return
+    
+    // Global escape key handler
     document.addEventListener('keydown', handleKeydown)
-  })
-
-  onUnmounted(() => {
-    if (!isClient()) return
-    document.removeEventListener('keydown', handleKeydown)
+    
+    // Watch for screen size changes to close mobile menu when transitioning to desktop
+    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (e.matches && isMobileMenuOpen.value) {
+        closeMobileMenu()
+      }
+    }
+    
+    mediaQuery.addEventListener('change', handleMediaChange)
+    
+    // Store cleanup function
+    const cleanup = () => {
+      document.removeEventListener('keydown', handleKeydown)
+      mediaQuery.removeEventListener('change', handleMediaChange)
+    }
+    
+    onUnmounted(cleanup)
   })
 
   const dropdown: NavigationDropdownControls = {

@@ -4,20 +4,21 @@
     ref="dropdownRef"
     class="o-site-navigation__dropdown"
   >
-    <nuxt-link 
+    <button 
       ref="triggerRef" 
-      :to="item.href || '#'" 
+      type="button"
       class="o-site-navigation-link | button button-quiet button-xs"
       @mouseenter="openMenu"
       @focus="openMenu"
-      @click="handleLinkClick"
+      @click="handleButtonClick"
+      @keydown="handleKeydown"
       :aria-expanded="isOpen" 
       aria-haspopup="true"
       :aria-controls="menuId"
     >
       <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16" class="o-site-navigation__icon" />
       {{ item.label }}
-    </nuxt-link>
+    </button>
 
     <div 
       :id="menuId" 
@@ -29,6 +30,18 @@
       :inert="!isOpen"
       @mouseleave="handleMouseLeave"
     >
+      <!-- Main Category Link Button -->
+      <div class="o-site-navigation__mega-header" v-if="item.href">
+        <NuxtLink
+          v-if="item.href"
+          :to="item.href"
+          class="o-site-navigation__mega-main-link | button button-ghost button-sm"
+          @click="handleMenuClose"
+        >
+          Browse all {{ item.label.toLowerCase() }}
+        </NuxtLink>
+      </div>
+
       <template v-if="isSingleColumn">
         <div class="o-site-navigation__mega-col o-site-navigation__mega-col--single">
           <OrganismsMegaMenuItem 
@@ -99,6 +112,10 @@ const activeGuides = computed(() => {
   return activeCategory?.children ?? [];
 });
 
+const childHasChildren = (item: NavigationItem) => {
+  return Array.isArray(item.children) && item.children[0] && item.children[0].children;
+};
+
 const menuStateClasses = computed(() => ({
   "is-visible": isOpen.value,
   "o-site-navigation__mega--single": isSingleColumn.value,
@@ -146,12 +163,34 @@ function closeMenu() {
 /**
  * Event Handlers
  */
-function handleLinkClick(event: Event) {
-  // Prevent navigation when menu is closed, allow when open
+function handleButtonClick() {
+  // Button only opens menu, never closes it
   if (!isOpen.value) {
+    openMenu();
+  }
+}
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key === ' ' || event.key === 'Spacebar') {
     event.preventDefault();
-  } else {
-    closeMenu();
+    if (!isOpen.value) {
+      openMenu();
+      // Focus first menu item after opening
+      nextTick(() => {
+        const firstMenuItem = menuRef.value?.querySelector('a, button, [tabindex]:not([tabindex="-1"])') as HTMLElement;
+        firstMenuItem?.focus();
+      });
+    }
+  } else if (event.key === 'Enter') {
+    event.preventDefault();
+    if (!isOpen.value) {
+      openMenu();
+    }
+  } else if (event.key === 'Escape') {
+    event.preventDefault();
+    if (isOpen.value) {
+      closeMenu();
+    }
   }
 }
 
@@ -184,28 +223,28 @@ function handleMouseLeave() {
 .o-site-navigation {
   &__dropdown {
     position: static;
-  }
 
-  &__dropdown-menu {
-    position: absolute;
-    top: calc(100% + 14px);
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--blue-400);
-    border-radius: var(--border-radius-lg);
-    padding: var(--size-16);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease-in-out;
-    z-index: 11;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    box-sizing: border-box;
-    color: inherit;
+    &-menu {
+      position: absolute;
+      top: calc(100% + 14px);
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--blue-400);
+      border-radius: var(--border-radius-lg);
+      padding: var(--size-16);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease-in-out;
+      z-index: 11;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      box-sizing: border-box;
+      color: inherit;
 
-    &.is-visible {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
+      &.is-visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
     }
   }
 
@@ -217,6 +256,17 @@ function handleMouseLeave() {
     width: 600px;
     align-items: stretch;
 
+    &-header {
+      grid-column: 1 / -1;
+      padding: var(--size-6);
+    }
+
+    &-main-link {
+      border-radius: var(--border-radius-lg);
+      width: 100%;
+      justify-content: center;
+    }
+
     &-divider {
       width: 1px;
       background-color: var(--secondary-400);
@@ -226,19 +276,26 @@ function handleMouseLeave() {
       display: flex;
       flex-direction: column;
       gap: var(--size-4);
+
+      &--single {
+        display: contents;
+      }
     }
 
     &--single {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: var(--size-8);
       min-width: 0;
       width: fit-content;
-      justify-content: center;
-      align-items: center;
+      align-items: stretch;
 
       .o-site-navigation__mega-col--single {
-        display: contents;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--size-8);
+        justify-content: center;
+        align-items: center;
       }
 
       .o-site-navigation__dropdown-link {

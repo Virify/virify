@@ -23,8 +23,11 @@
         <ul class="o-site-navigation-list o-site-navigation-list--actions">
           <template v-for="item in actionItems" :key="item.id">
             <li v-if="item.type === 'link' && item.href">
-              <nuxt-link :to="item.href" class="o-site-navigation-link | button button-ghost button-sm">{{
-                item.label }}</nuxt-link>
+              <nuxt-link 
+                :to="item.href" 
+                class="o-site-navigation-link | button button-ghost button-sm">
+                {{ item.label }}
+              </nuxt-link>
             </li>
             <li v-else-if="item.type === 'button'">
               <button @click.prevent="item.action && item.action()"
@@ -36,25 +39,35 @@
         </ul>
 
         <!-- Mobile burger button -->
-        <button class="o-site-navigation__burger button button-monochrome button-sm" aria-label="Open menu"
-          :aria-expanded="isMobileMenuOpen" aria-controls="mobile-nav-drawer" @click="toggleMobileMenu">
-          ☰
+        <button
+          type="button"
+          :class="['o-site-navigation__burger', { 'is-active': isMobileMenuOpen }]"
+          aria-label="Open menu"
+          :aria-expanded="isMobileMenuOpen"
+          aria-controls="mobile-nav-drawer"
+          @click="handleBurgerClick"
+        >
+          <span class="o-site-navigation__burger-box" aria-hidden="true">
+            <span class="o-site-navigation__burger-line"></span>
+            <span class="o-site-navigation__burger-line"></span>
+            <span class="o-site-navigation__burger-line"></span>
+          </span>
         </button>
       </div>
 
       <!-- Mobile drawer -->
-      <OrganismsNavigationMobileDrawer
-        v-if="typeof isMobileMenuOpen === 'boolean'"
+      <OrganismsMobileDrawer
         :open="isMobileMenuOpen"
         :primary-items="centerItems"
         :action-items="actionItems"
-        @close="toggleMobileMenu"
+        @close="closeMobileMenu"
       />
     </div>
   </nav>
 
 </template>
 <script setup lang="ts">
+
 const { useNavigationData } = useSanity()
 const { data: navigationData } = await useNavigationData()
 
@@ -63,8 +76,13 @@ const {
   actionItems,
   isMobileMenuOpen,
   toggleMobileMenu,
+  closeMobileMenu,
   dropdown,
 } = useNavigation(navigationData)
+
+function handleBurgerClick() {
+  toggleMobileMenu()
+}
 </script>
 
 <style lang="scss">
@@ -111,6 +129,52 @@ const {
   &__burger {
     display: none;
     margin-right: var(--size-6);
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+  }
+
+  &__burger:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  &__burger-box {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    width: 24px;
+    height: 18px;
+  }
+
+  &__burger-line {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 999px;
+    transition: transform 220ms ease, opacity 180ms ease;
+  }
+
+  &__burger.is-active .o-site-navigation__burger-line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  &__burger.is-active .o-site-navigation__burger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  &__burger.is-active .o-site-navigation__burger-line:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
   }
 
   &-list {
@@ -142,7 +206,7 @@ const {
 }
 
 /* Mobile behavior: show burger and collapse nav list */
-@include mq.mobile-only {
+@include mq.mobile-and-small-tablet {
   .o-site-navigation {
     &__wrapper {
       grid-template-columns: 1fr auto;
