@@ -3,7 +3,7 @@
     <NuxtLink to="/" class="o-site-navigation__brand" aria-label="Virify Home" @click="$emit('close')">
       <AtomsIcon icon="logo/horizontal-colour" width="120" height="36" />
     </NuxtLink>
-    <button class="button button-quiet button-sm" aria-label="Close menu" @click="$emit('close')">✕</button>
+    <button class="button button-ghost button-sm" aria-label="Close menu" @click="$emit('close')">✕</button>
   </header>
 </template>
 
