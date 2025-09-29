@@ -118,17 +118,24 @@ export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateW
  *
  * @returns KitchenWithoutPropertyInput
  */
-export const generateKitchen = (): Prisma.KitchenCreateWithoutPropertyInput => {
+export const generateKitchen = (): { count: number, data: Prisma.KitchenCreateWithoutPropertyInput[] } => {
+  const kitchenCount = faker.number.int({ min: 1, max: 3 });
   return {
-    modern: faker.datatype.boolean(),
-    openPlan: faker.datatype.boolean(),
-    whiteGoods: faker.datatype.boolean(),
-    description: faker.word.words(10),
-    size: faker.number.int({ min: 10, max: 50 }),
-    breakfastBar: faker.datatype.boolean(),
-    island: faker.datatype.boolean(),
-    pantry: faker.datatype.boolean(),
-    utilityAccess: faker.datatype.boolean(),
+    count: kitchenCount,
+    data: Array.from({ length: kitchenCount }, () => ({
+      roomNumber: faker.number.int({ min: 1, max: 3 }),
+      floor: faker.number.int({ min: 0, max: 3 }),
+      name: faker.word.words(2),
+      modern: faker.datatype.boolean(),
+      openPlan: faker.datatype.boolean(),
+      whiteGoods: faker.datatype.boolean(),
+      description: faker.word.words(10),
+      size: faker.number.int({ min: 10, max: 50 }),
+      breakfastBar: faker.datatype.boolean(),
+      island: faker.datatype.boolean(),
+      pantry: faker.datatype.boolean(),
+      utilityAccess: faker.datatype.boolean(),
+    }))
   };
 };
 
@@ -503,6 +510,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   const { count: bathroomCount, data: bathrooms } = generateBathrooms();
   const { count: receptionCount, data: receptions } = generateReception();
   const { count: otherRoomCount, data: otherRooms } = generateOtherRooms();
+  const { count: kitchenCount, data: kitchens } = generateKitchen();
 
   // First create the property with all features
   const propertyWithFeatures = await prisma.property.create({
@@ -527,6 +535,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       numberBathrooms: bathroomCount,
       numberReceptions: receptionCount,
       numberOtherRooms: otherRoomCount,
+      numberKitchens: kitchenCount,
       bathroomFeatures: {
         create: bathrooms,
       },
@@ -534,7 +543,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
         create: bedrooms,
       },
       kitchenFeatures: {
-        create: generateKitchen(),
+        create: kitchens,
       },
       reception: {
         create: receptions,
@@ -654,7 +663,11 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       mediaToCreate.push(...generateMediaForRoom(bedroom.id, 'bedroom', `Bedroom ${bedroom.roomNumber}`));
     }
   });
-  
+
+  propertyWithFeatures.kitchenFeatures.forEach((kitchen: { id: number; roomNumber: any; }) => {
+    mediaToCreate.push(...generateMediaForRoom(kitchen.id, 'kitchen', `Kitchen ${kitchen.roomNumber}`));
+  });
+
   // Bathroom media
   propertyWithFeatures.bathroomFeatures.forEach((bathroom: { id: number; roomNumber: any; }) => {
     mediaToCreate.push(...generateMediaForRoom(bathroom.id, 'bathroom', `Bathroom ${bathroom.roomNumber}`));
@@ -678,20 +691,6 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   // Rear garden media
   if (propertyWithFeatures.rearGarden) {
     mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.rearGarden.id), 'rearGarden', 'Rear Garden'));
-  }
-  
-  // Kitchen media - ensure it uses required kitchen image
-  if (propertyWithFeatures.kitchenFeatures) {
-    mediaToCreate.push({
-      image: requiredImages.kitchen,
-      metadata: JSON.stringify({
-        alt: 'Kitchen',
-        description: faker.word.words(5),
-        roomType: 'Kitchen',
-        cloudflareImageId: requiredImages.kitchen
-      }),
-      kitchenId: Number(propertyWithFeatures.kitchenFeatures.id),
-    });
   }
   
   // Add additional random images to ensure minimum of 5 total images

@@ -1,5 +1,8 @@
 model Kitchen {
   id            Int      @id @default(autoincrement())
+  roomNumber    Int?     
+  floor         Int?     
+  name          String?
   modern        Boolean  @default(true)
   openPlan      Boolean  @default(false)
   whiteGoods    Boolean  @default(false)
@@ -9,7 +12,7 @@ model Kitchen {
   island        Boolean  @default(false)
   utilityAccess Boolean  @default(false)
   pantry        Boolean  @default(true)
-  propertyId    Int      @unique
+  propertyId    Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   media         Media[]

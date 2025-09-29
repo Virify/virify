@@ -1,5 +1,4 @@
 import { defineVitestConfig } from '@nuxt/test-utils/config'
-import ts from 'typescript'
 
 export default defineVitestConfig({
   test: {
