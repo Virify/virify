@@ -1,5 +1,5 @@
 <template>
-  <div class="m-card-template__container">
+  <div class="m-card-template__container" ref="$hoverCard">
     <div class="m-card-template" :class="{
       'm-card-template--basic': isBasic,
       'm-card-template--featured': isFeatured,
@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import { useElementHover } from '@vueuse/core';
 import { getPremiumFeatures } from '~/utils/results/premium-features';
 
 interface Props {
@@ -156,6 +157,16 @@ const premiumFeatures = computed(() => {
   const { result } = props
 
   return asArray(getPremiumFeatures(result, 16))
+})
+
+/**
+ *  Track active hover card
+ */
+const $hoverCard = useTemplateRef('$hoverCard')
+const hoverState = useCardHoverState()
+
+watch(useElementHover($hoverCard), (isHovered) => {
+  hoverState.value = isHovered ? propertyId.value : null
 })
 
 </script>
