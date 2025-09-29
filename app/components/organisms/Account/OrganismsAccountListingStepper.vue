@@ -74,7 +74,7 @@ const isMobile = useMediaQuery('(max-width: 640px)');
 const isTablet = useMediaQuery('(max-width: 1024px)');
 
 const carouselSize = computed(() => {
-  return isMobile.value ? '100px' : '110px';
+  return isMobile.value ? '100px' : '120px';
 });
 
 // Carousel options - use center alignment on mobile/tablet

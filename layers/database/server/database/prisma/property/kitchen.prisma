@@ -3,7 +3,7 @@ model Kitchen {
   roomNumber    Int?     
   floor         Int?     
   name          String?
-  modern        Boolean  @default(true)
+  modern        Boolean  @default(false)
   openPlan      Boolean  @default(false)
   whiteGoods    Boolean  @default(false)
   description   String?
@@ -11,7 +11,7 @@ model Kitchen {
   breakfastBar  Boolean  @default(false)
   island        Boolean  @default(false)
   utilityAccess Boolean  @default(false)
-  pantry        Boolean  @default(true)
+  pantry        Boolean  @default(false)
   propertyId    Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

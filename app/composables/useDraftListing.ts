@@ -164,6 +164,15 @@ export const useDraftListing = createSharedComposable(() => {
     return updateDraftStep('five', draftId, stepData);
   }
 
+  /**
+   * Updates the sixth step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the sixth step
+   */
+  async function updateDraftStepSix(draftId: number, stepData: StepSix) {
+    return updateDraftStep('six', draftId, stepData);
+  }
+
   return {
     draftListings,
     draftListing,
@@ -178,5 +187,6 @@ export const useDraftListing = createSharedComposable(() => {
     updateDraftStepThree,
     updateDraftStepFour,
     updateDraftStepFive,
+    updateDraftStepSix,
   };
 });

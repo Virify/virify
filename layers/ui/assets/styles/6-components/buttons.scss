@@ -46,11 +46,11 @@
 .button {
   &-secondary {
     background: var(--secondary-400);
-    color: var(--background-200);
+    color: var(--background-100);
 
     &:hover {
       background: var(--secondary-300);
-      color: var(--background-200);
+      color: var(--background-100);
     }
   }
 

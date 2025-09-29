@@ -1,6 +1,6 @@
-import type { Address, Bathroom, Bedroom, OtherRoom, Prisma, Reception } from "~~/layers/database/server/database/prisma/generated/client"
+import type { Bathroom, Bedroom, Kitchen, OtherRoom, Prisma, Reception } from "~~/layers/database/server/database/prisma/generated/client"
 import type { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
-import type { BathroomCreateWithoutMediaInput, BathroomCreateWithoutPropertyInput, BedroomCreateWithoutMediaInput, BedroomCreateWithoutPropertyInput, OtherRoomCreateWithoutMediaInput, OtherRoomCreateWithoutPropertyInput, ReceptionCreateWithoutMediaInput, ReceptionCreateWithoutPropertyInput, RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
+import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
 export type StepOne = {
   rentalListing?: RentalListingCreateWithoutListingInput
@@ -59,6 +59,18 @@ export type StepFive = {
     numberBedrooms: number | null
     bathroomFeatures: Omit<Bathroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
     numberBathrooms: number | null
+  }
+}
+
+export type StepSix = {
+  property: {
+    totalFloors: number
+    kitchenFeatures: Omit<Kitchen, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
+    numberKitchens: number | null
+    reception: Omit<Reception, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
+    numberReceptions: number | null
+    otherRoom: Omit<OtherRoom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[]
+    numberOtherRooms: number | null
   }
 }
 

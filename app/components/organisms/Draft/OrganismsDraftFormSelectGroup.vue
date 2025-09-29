@@ -55,7 +55,7 @@ defineEmits<{
   &__select {
     min-width: 200px;
     margin: 0 auto;
-    border: 1px solid var(--secondary-400);
+    border: 1px solid var(--input-text-border);
     padding: var(--size-10);
   }
 
