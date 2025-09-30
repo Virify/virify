@@ -117,6 +117,9 @@ function handleBurgerClick() {
 
   &__center {
     justify-self: center;
+    display: flex;
+    align-items: center;
+    height: 100%;
   }
 
   &__actions {
