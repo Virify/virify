@@ -63,6 +63,7 @@ function handleClick() {
 
 <style lang="scss">
 .a-note-button {
+  --notes-active-background: transparent;
   --notes-active-color: var(--secondary-400);
   --notes-dot-color: var(--secondary-400);
 
@@ -72,6 +73,7 @@ function handleClick() {
 
   &--active {
     color: var(--notes-active-color);
+    background-color: var(--notes-active-background);
 
     &::after {
       content: '';

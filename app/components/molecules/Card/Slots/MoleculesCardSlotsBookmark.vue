@@ -19,12 +19,15 @@ defineProps<Props>()
 
 .m-card-slots-bookmark {
   position: absolute;
-  top: var(--size-14);
-  right: var(--size-14);
+  top: var(--size-12);
+  right: var(--size-12);
   display: flex;
   flex-direction: column;
-  gap: var(--size-6);
-  color: #{ fn.faded-color(40%, var(--card-foreground)) };
+  color: var(--card-foreground);
+  border: 1px solid #{ fn.faded-color(20%, var(--card-foreground)) };
+  border-radius: var(--border-radius-2xl);
+  padding: var(--size-4);
+  gap: var(--size-2);
 
   .a-favourite-button,
   .a-note-button {
@@ -34,14 +37,20 @@ defineProps<Props>()
     width: var(--size-24);
     height: var(--size-24);
     transition: color var(--animation-fast);
+    padding: var(--size-6);
+    border-radius: var(--border-radius-2xl);
+    box-sizing: content-box;
+    transition: background-color var(--animation-fast);
 
     :where(&):hover {
       color: var(--card-foreground);
+      background: #{ fn.faded-color(10%, var(--card-foreground)) };
     }
   }
 
   .a-note-button {
     --notes-active-color: var(--card-foreground);
+    --notes-active-background: #{ fn.faded-color(25%, var(--secondary-400)) };
   }
 
   .a-icon {

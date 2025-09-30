@@ -286,7 +286,7 @@ onMounted(() => {
 
 .a-favourite-button {
   align-items: center;
-  background-color: transparent;
+  // background-color: transparent;
   border: none;
   cursor: pointer;
   display: flex;

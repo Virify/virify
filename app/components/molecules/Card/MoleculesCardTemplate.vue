@@ -201,7 +201,6 @@ watch(useElementHover($hoverCard), (isHovered) => {
   box-sizing: border-box;
   display: grid;
   align-items: stretch;
-  gap: var(--size-8);
   flex-grow: 1;
   overflow: hidden;
 
@@ -242,7 +241,6 @@ watch(useElementHover($hoverCard), (isHovered) => {
     &--basic,
     &--featured {
       grid-template-columns: 1fr 20ch;
-      gap: 0;
 
       .m-cards-slots-price {
         flex-direction: column;
@@ -321,8 +319,15 @@ watch(useElementHover($hoverCard), (isHovered) => {
   /**
    *  Default layout
    */
+  &__content {
+    .a-note-button--active::after {
+      top: 0;
+      right: 0;
+    }
+  }
+
   &__content-grid {
-    padding-right: var(--size-36);
+    padding-right: var(--size-48);
   }
 
   @container (width <=420px) {
@@ -349,6 +354,7 @@ watch(useElementHover($hoverCard), (isHovered) => {
         justify-content: flex-start;
         align-items: flex-start;
         gap: var(--size-8);
+        padding-right: var(--size-40);
       }
 
       .m-card-lots-pills,
