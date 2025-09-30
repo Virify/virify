@@ -45,15 +45,25 @@ function interleaveGridRowsWithPremiums(
   // Calculate positions where premiums should be inserted
   const premiumPositions: number[] = [];
   
-  if (premiumCount > 0) {
-    // For even distribution, divide the total positions into equal segments
-    const segmentSize = totalPositions / (premiumCount + 1);
-    
-    for (let i = 0; i < premiumCount; i++) {
-      // Place premium at the end of each segment (except the last one)
-      const position = Math.floor(segmentSize * (i + 1)) - 1;
-      premiumPositions.push(Math.max(0, Math.min(position, totalPositions - 2)));
+  if (premiumCount > 0 && totalPositions > 0) {
+    if (premiumCount === 1) {
+      // Single premium goes in the middle
+      premiumPositions.push(Math.floor(totalPositions / 2));
+    } else {
+      // Multiple premiums distributed evenly
+      const segmentSize = totalPositions / (premiumCount + 1);
+      
+      for (let i = 0; i < premiumCount; i++) {
+        // Place premium at the end of each segment (except the last one)
+        const position = Math.floor(segmentSize * (i + 1)) - 1;
+        premiumPositions.push(Math.max(0, Math.min(position, totalPositions - 1)));
+      }
     }
+    
+    // Remove duplicate positions and sort
+    const uniquePositions = [...new Set(premiumPositions)].sort((a, b) => a - b);
+    premiumPositions.length = 0;
+    premiumPositions.push(...uniquePositions);
   }
 
   let premiumIndex = 0;
@@ -76,6 +86,15 @@ function interleaveGridRowsWithPremiums(
       }
       premiumIndex++;
     }
+  }
+
+  // Insert any remaining middle premiums that didn't get placed
+  while (premiumIndex < middlePremiums.length) {
+    const premiumListing = middlePremiums[premiumIndex];
+    if (premiumListing) {
+      result.push(createPremiumSection(premiumListing));
+    }
+    premiumIndex++;
   }
 
   return result;
