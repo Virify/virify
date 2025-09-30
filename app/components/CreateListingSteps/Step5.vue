@@ -1,7 +1,7 @@
 <template>
   <CreateListingStepsStepLayout
     title="Bedrooms & Bathrooms"
-    info="Please provide the bedroom and bathroom details for the property. You can add multiple rooms and specify their features. This information is crucial for potential buyers or renters to understand the layout and amenities of the property."
+    info="Please add all the bedrooms and bathrooms for your property, and insert their features. The more detailed you can be, the more likely you are to find the right viewer!"
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"

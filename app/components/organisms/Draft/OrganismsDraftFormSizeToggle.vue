@@ -4,6 +4,7 @@
     <p class="o-form-group__title | body-sm">{{ title }}
       <span v-if="required" class="o-form-group__required | title-xs">*</span>
     </p>
+    <p class="o-form-group__info | body-xs">Size in square meters or square feet</p>
     <div class="o-form-group__toggle">
       <AtomsToggle
         v-model="localUnit"

@@ -18,13 +18,13 @@ import { seedAdminFavourites } from '../server/utils/admin-favourites-seed'
  */
 async function seedPropertyTypes() {
   const types = {
-    House: ['Terraced', 'Semi-detached', 'End of Terrace', 'Detached', 'Mansion'],
+    House: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace', 'Mansion'],
     Cottage: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace'],
-    Bungalow: ['Terraced', 'Semi-detached', 'End of Terrace', 'Detached'],
+    Bungalow: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace'],
     Flat: ['Converted', 'Studio', 'Maisonette', 'High-rise', 'Within a Complex', 'Penthouse'],
     Land: ['Residential', 'Commercial', 'Agricultural', 'Development Plot', 'Development Potential'],
-    Farms: ['Non-working Farmhouse', 'Working'],
-    Specialty: ['Shared Ownership', 'Retirement Home', 'New Build Home'],
+    Farms: ['Non-working', 'Working', 'Small Holding'],
+    Specialty: ['Retirement Home', 'New Build Home'],
     'Student Accommodation': ['Flat', 'House', 'House-share'],
   }
 

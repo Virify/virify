@@ -14,7 +14,7 @@
     <!-- sale specific -->
     <OrganismsDraftFormRadioGroup
       v-if="draft.saleListing && stepThreeData.saleListing"
-      title="What is the sale price type for this listing?"
+      title="Price type:"
       :options="salePriceTypeOptions"
       v-model="stepThreeData.saleListing.priceType"
       name="sale-price-type"
@@ -34,7 +34,7 @@
 
     <!-- price input for both sale and rental -->
     <OrganismsDraftFormNumberGroup
-      :title="draft.saleListing ? 'What is the sale price for this property?' : 'What is the rental price for this property?'"
+      :title="draft.saleListing ? 'Price:' : 'Rent:'"
       v-model="stepThreeData.price"
       name="listing-price"
       placeholder="e.g '250000' or '1200'"

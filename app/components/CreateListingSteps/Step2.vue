@@ -30,7 +30,7 @@
       />
 
       <OrganismsDraftFormTextGroup
-        title="Please provide a short description of the property - your property features speak for itself!"
+        title="Please provide a short description of the property - your property features speak for themselves!"
         v-model="stepTwoData.property.description"
         name="property-description"
         placeholder="e.g 'This charming 2-bedroom apartment offers stunning views etc...'"

@@ -82,6 +82,7 @@ defineEmits<{
     background: var(--background-200);
     border: 1px solid var(--secondary-400);
     cursor: pointer;
+    text-transform: capitalize;
 
     &--selected {
       background: var(--secondary-400);

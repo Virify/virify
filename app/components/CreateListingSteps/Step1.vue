@@ -24,7 +24,7 @@
     <!-- SALE -->
     <OrganismsDraftFormRadioGroup 
       v-if="isSale" 
-      title="What type of sale tenure do you want to set?"
+      title="Please confirm property tenure"
       :options="saleListingTenureOptions"
       v-model="stepOneData.saleListing.tenureType" name="sale-tenure-type"
       :required="true"
@@ -32,7 +32,7 @@
 
     <OrganismsDraftFormRadioGroup 
       v-if="isSale" 
-      title="What is the chain of the listing?"
+      title="Are you part of a chain?"
       :options="saleListingChainOptions" 
       v-model="stepOneData.saleListing.chain" 
       name="sale-chain" 
@@ -40,7 +40,7 @@
 
     <OrganismsDraftFormRadioGroup 
       v-if="isSale" 
-      title="What is the ownership status of the listing?"
+      title="Are you selling as part of a shared ownership scheme?"
       :options="saleSharedOwnershipOptions" 
       v-model="stepOneData.saleListing.sharedOwnership" 
       name="sale-shared-ownership" 
