@@ -7,7 +7,7 @@
     <button 
       ref="triggerRef" 
       type="button"
-      class="o-site-navigation-link | button button-quiet button-xs"
+      class="o-site-navigation-link | button button-ghost button-sm"
       @mouseenter="openMenu"
       @focus="openMenu"
       @click="handleButtonClick"
@@ -221,6 +221,11 @@ function handleMouseLeave() {
 
 <style lang="scss" scoped>
 .o-site-navigation {
+
+  &-link {
+    font-size: var(--font-xs);
+  }
+
   &__dropdown {
     position: static;
 
@@ -294,15 +299,14 @@ function handleMouseLeave() {
         display: flex;
         flex-wrap: wrap;
         gap: var(--size-8);
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
       }
 
       .o-site-navigation__dropdown-link {
-        width: auto;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         margin: 0;
 
         &:not(:last-child) {

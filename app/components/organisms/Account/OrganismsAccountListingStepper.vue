@@ -88,6 +88,8 @@ const carouselOptions = computed(() => {
 });
 
 const carouselRef = ref();
+const isProgrammaticNavigation = ref(false);
+const isUpdatingFromCarousel = ref(false);
 
 // Current step - synced with parent via v-model
 const currentStep = computed({
@@ -121,7 +123,15 @@ const isStepAccessible = (stepIndex: number): boolean => {
  */
 const goToStep = (stepIndex: number) => {
   if (isStepAccessible(stepIndex)) {
+    isProgrammaticNavigation.value = true;
     currentStep.value = stepIndex;
+    if (import.meta.client) {
+      requestAnimationFrame(() => {
+        isProgrammaticNavigation.value = false;
+      });
+    } else {
+      isProgrammaticNavigation.value = false;
+    }
   }
 };
 
@@ -129,6 +139,7 @@ const goToStep = (stepIndex: number) => {
  * Scroll to center the current step on mobile/tablet viewports
  */
 const scrollToCurrentStep = () => {
+  if (isUpdatingFromCarousel.value) return;
   if ((isMobile.value || isTablet.value) && carouselRef.value?.scrollTo && carouselRef.value?.emblaApi) {
     // Only scroll if the current selected index differs from currentStep
     const selectedIndex = carouselRef.value.emblaApi.selectedScrollSnap();
@@ -155,11 +166,16 @@ onMounted(() => {
   nextTick(() => {
     if (carouselRef.value?.emblaApi) {
       // Set up scroll listener
-      carouselRef.value.emblaApi.on('scroll', () => {
+      carouselRef.value.emblaApi.on('select', () => {
+        if (isProgrammaticNavigation.value) return;
         const selectedIndex = carouselRef.value.emblaApi.selectedScrollSnap();
         // Only update if different to avoid infinite loop
         if (selectedIndex !== currentStep.value) {
+          isUpdatingFromCarousel.value = true;
           currentStep.value = selectedIndex;
+          nextTick(() => {
+            isUpdatingFromCarousel.value = false;
+          });
         }
       });
       
