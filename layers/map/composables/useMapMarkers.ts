@@ -162,12 +162,14 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
         'circle-radius': [
           'step',
           ['get', 'point_count'],
-          15, // Radius 20px
+          10, // Radius 20px
           2, // When 2 properties
-          20, // Radius 30px
+          16, // Radius 30px
           5, // When less than 5 properties
-          30 // Else radius 40px when more than 5 properties
-        ]
+          26 // Else radius 40px when more than 5 properties
+        ],
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#622c15ff'
       },
     })
 
@@ -178,6 +180,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       filter: ['has', 'point_count'],
       layout: {
         'text-field': '{point_count_abbreviated}',
+        'text-font': ['Be Vietnam Pro', 'sans-serif'],
         'text-size': 16
       }
     })
