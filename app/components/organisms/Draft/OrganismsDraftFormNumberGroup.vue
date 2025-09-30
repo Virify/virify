@@ -1,9 +1,13 @@
 <template>
   <div class="o-form-group" :class="{ 'o-form-group--grid': grid, 'o-form-group--disabled': disabled }">
     <AtomsDivider v-if="divider" />
-    <p class="o-form-group__title | body-sm">{{ title }}
-      <span v-if="required" class="o-form-group__required | title-xs">*</span>
-    </p>
+    <MoleculesDraftFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+      <template #tooltip-content>
+        <slot name="tooltip-content">
+          <p class="body-xs">{{ tooltip }}</p>
+        </slot>
+      </template>
+    </MoleculesDraftFormHeading>
     <em v-if="info" class="o-form-group__info | body-xs">{{ info }}</em>
     <div class="o-form-group__number-input">
       <AtomsInput
@@ -39,6 +43,7 @@ interface Props {
   max?: string | number;
   step?: string | number;
   grid?: boolean;
+  tooltip?: string;
 }
 
 defineProps<Props>()
@@ -55,10 +60,6 @@ function handleUpdateModel(val: any) {
 <style lang="scss">
 .o-form-group {
   padding: var(--size-32) 0;
-  &__title {
-    text-align: center;
-    padding-bottom: var(--size-16);
-  }
 
   &__info {
     display: block;

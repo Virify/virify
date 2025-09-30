@@ -25,6 +25,7 @@
               Remove
             </button>
             <button
+              v-if="!isNewUnsavedRoom(index)"
               type="button"
               @click.stop="toggleRoom(index)"
               class="button button-xs button-tertiary | body-xs"
@@ -45,6 +46,7 @@
               Remove
             </button>
             <button
+              v-if="!isNewUnsavedRoom(index)"
               type="button"
               @click="toggleRoom(index)"
               class="button button-xs button-tertiary | body-xs"
@@ -107,7 +109,13 @@
             v-model="bedroom.bed[0]"
             :name="`bedroom-${index}-bed`"
             :required="true"
-          />
+          >
+            <template #tooltip-content>
+              <AtomsTooltipParagraphs :paragraphs="[
+                'Choose the largest bed size that fits comfortably in this room. This helps users understand available space.'
+              ]" />
+            </template>
+          </OrganismsDraftFormRadioGroup>
 
           <!-- Bedroom Features (Multi-select) -->
           <OrganismsDraftFormCheckboxGroup
@@ -127,7 +135,13 @@
             :name="`bedroom-${index}-size`"
             @update:unit="() => {}"
             @update:size="(value: number | null) => bedroom.size = value"
-          />
+          >
+            <template #tooltip-content>
+              <AtomsTooltipParagraphs :paragraphs="[
+                'Enter the bedroom\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
+              ]" />
+            </template>
+          </OrganismsDraftFormSizeToggle>
 
           <!-- Save/Done Button for the form -->
           <div class="o-bedroom-form__form-actions">
@@ -138,6 +152,13 @@
               :disabled="!isRoomCompleted(bedroom) || !hasRoomChanges(index)"
             >
               {{ lastAddedRoomIndex === index ? 'Save Bedroom' : 'Save Changes' }}
+            </button>
+            <button
+              type="button"
+              @click="cancelRoom(index)"
+              class="button button-sm button-tertiary | body-sm"
+            >
+              {{ lastAddedRoomIndex === index ? 'Cancel' : 'Cancel Changes' }}
             </button>
           </div>
 
@@ -223,9 +244,11 @@ const {
   hasRoomChanges,
   addRoom,
   saveRoom,
+  cancelRoom,
   removeRoom,
   initializeRoomManager,
-  isRoomCompleted
+  isRoomCompleted,
+  isNewUnsavedRoom
 } = useRoomManager(localBedrooms, emit, roomManagerConfig);
 
 // Initialize with all bedrooms collapsed on load
@@ -335,6 +358,7 @@ function updateBedroomFeatures(bedroom: any, selectedFeatures: string[]) {
   &__form-actions {
     display: flex;
     justify-content: center;
+    gap: var(--size-12);
     margin-top: var(--size-24);
     margin-bottom: var(--size-24);
   }

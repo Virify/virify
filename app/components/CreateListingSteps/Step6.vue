@@ -14,11 +14,20 @@
     <AtomsDivider />
 
     <div class="step__section">
-      <h3 class="step__section-title | title-md">Kitchens</h3>
-      <em class="body-xs">
-        <span class="step__section-title--require | body-md">*</span>
-        At least one kitchen required
-      </em>
+      <MoleculesDraftFormHeading 
+        title="Kitchens" 
+        :required="true"
+        variant="section"
+        :hasTooltip="true"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Add all kitchens in your property including their size, appliances, and features.',
+            'Include details about fitted units, worktop materials, and any modern appliances included.'
+          ]" />
+        </template>
+      </MoleculesDraftFormHeading>
+      <em class="body-xs">At least one kitchen required</em>
       <OrganismsDraftKitchenForm
         v-model="stepSixData.property.kitchenFeatures"
         :total-floors="stepSixData.property.totalFloors"
@@ -28,7 +37,19 @@
     <AtomsDivider />
 
     <div class="step__section">
-      <h3 class="step__section-title | title-md">Receptions</h3>
+      <MoleculesDraftFormHeading 
+        title="Receptions" 
+        :required="false"
+        variant="section"
+        :hasTooltip="true"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Add reception rooms such as living rooms, lounges, dining rooms, and family rooms.',
+            'Include details about features like fireplaces, bay windows, or built-in storage.'
+          ]" />
+        </template>
+      </MoleculesDraftFormHeading>
       <em class="body-xs">Optional, add the property's reception rooms</em>
       <OrganismsDraftReceptionForm
         v-model="stepSixData.property.reception"
@@ -39,7 +60,19 @@
     <AtomsDivider />
 
     <div class="step__section">
-      <h3 class="step__section-title | title-md">Other Rooms</h3>
+      <MoleculesDraftFormHeading 
+        title="Other Rooms" 
+        :required="false"
+        variant="section"
+        :hasTooltip="true"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Add any additional functional rooms such as offices, studies, gyms, or utility rooms.',
+            'Include details about their purpose, size, and any special features or equipment included.'
+          ]" />
+        </template>
+      </MoleculesDraftFormHeading>
       <em class="body-xs">Optional, add additional functional rooms (office, gym, etc.)</em>
       <OrganismsDraftOtherRoomForm
         v-model="stepSixData.property.otherRoom"

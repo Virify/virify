@@ -35,7 +35,14 @@
         name="property-description"
         placeholder="e.g 'This charming 2-bedroom apartment offers stunning views etc...'"
         :required="true"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Write a short summary of your property, highlighting your property\'s features.',
+            'Please see our guide for examples.'
+          ]" />
+        </template>
+      </OrganismsDraftFormTextGroup>
 
       <OrganismsDraftFormNumberGroup
         title="How many total floors does the property have (including the ground floor)?"
@@ -51,11 +58,21 @@
       />
 
       <OrganismsDraftFormRadioGroup
-        title="What is the construction type of the property?" 
-        :options="constructionOptions" 
+        title="What is the construction of the property?" 
+        :options="constructionOptions"
         v-model="stepTwoData.property.constructionType"
-        name="property-construction-type"       
-      />
+        name="property-construction"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipList 
+            title="Indicate the building type:"
+            :items="[
+              'Standard: Brick or stone and with slate or tiled pitched roof.',
+              'Non-standard: Anything that isn\'t considered \'standard\'.'
+            ]" 
+          />
+        </template>
+      </OrganismsDraftFormRadioGroup>      
 
       <OrganismsDraftFormSizeToggle
         title="What is your property's total size?"
@@ -63,14 +80,28 @@
         v-model:unit="sizeToConvert"
         v-model:size="stepTwoData.property.size"
         name="property-size"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Insert the internal floor area of your property (either in square meters, or square foot).',
+            'If you\'re unsure how to measure your floor area, please see our guide.'
+          ]" />
+        </template>
+      </OrganismsDraftFormSizeToggle>
 
       <OrganismsDraftFormSelectGroup
         title="What year was the property built?"
         :options="yearBuiltOptions"
         v-model="stepTwoData.property.yearBuilt"
         name="year-built"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Enter the year the property was constructed.',
+            'If exact year is unknown, use an approximate year.'
+          ]" />
+        </template>
+      </OrganismsDraftFormSelectGroup>
     
   </CreateListingStepsStepLayout>
 </template>

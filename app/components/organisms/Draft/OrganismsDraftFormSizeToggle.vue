@@ -1,9 +1,13 @@
 <template>
   <div class="o-form-group">
     <AtomsDivider v-if="divider" />
-    <p class="o-form-group__title | body-sm">{{ title }}
-      <span v-if="required" class="o-form-group__required | title-xs">*</span>
-    </p>
+    <MoleculesDraftFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+      <template #tooltip-content>
+        <slot name="tooltip-content">
+          <p class="body-xs">{{ tooltip }}</p>
+        </slot>
+      </template>
+    </MoleculesDraftFormHeading>
     <p class="o-form-group__info | body-xs">Size in square meters or square feet</p>
     <div class="o-form-group__toggle">
       <AtomsToggle
@@ -44,6 +48,7 @@ interface Props {
   name?: string;
   required?: boolean;
   divider?: boolean;
+  tooltip?: string;
 }
 
 const props = defineProps<Props>()
@@ -74,10 +79,6 @@ const localSize = computed<string>({
 @use "#styles/_utils/media" as mq;
 .o-form-group {
   padding: var(--size-32) 0;
-  &__title {
-    text-align: center;
-    padding-bottom: var(--size-16);
-  }
 
   &__toggle {
     display: flex;

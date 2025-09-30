@@ -1,13 +1,16 @@
 <template>
   <div class="o-form-group">
     <AtomsDivider v-if="divider" />
-    <p class="o-form-group__title | body-sm">{{ title }}
-      <span v-if="required" class="o-form-group__required | title-xs">*</span>
-    </p>
+    <MoleculesDraftFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+      <template #tooltip-content>
+        <slot name="tooltip-content">
+          <p v-if="tooltip" class="body-xs">{{ tooltip }}</p>
+        </slot>
+      </template>
+    </MoleculesDraftFormHeading>
     <ul class="o-form-group__list">
       <li v-for="option in options" :key="option.value" class="o-form-group__item">
         <label class="o-form-group__label | body-sm">
-          <AtomsAriaTooltip :content="option.info">
             <AtomsPill class="o-form-group__checkbox"
               :class="{ 'o-form-group__checkbox--selected': isSelected(option.value) }">
               <input 
@@ -20,7 +23,6 @@
               />
               {{ option.key }}
             </AtomsPill>
-          </AtomsAriaTooltip>
         </label>
       </li>
     </ul>
@@ -41,6 +43,7 @@ interface Props {
   name: string;
   required?: boolean;
   divider?: boolean;
+  tooltip?: string;
 }
 
 const props = defineProps<Props>();
@@ -71,11 +74,6 @@ function handleChange(value: string) {
 <style lang="scss">
 .o-form-group {
   padding: var(--size-32) 0;
-  &__title {
-    text-align: center;
-    padding-bottom: var(--size-16);
-  }
-
   &__list {
     width: 100%;
     display: flex;

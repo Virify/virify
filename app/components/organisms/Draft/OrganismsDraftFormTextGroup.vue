@@ -1,9 +1,13 @@
 <template>
   <div class="o-form-group" :class="{ 'o-form-group--grid': grid}">
     <AtomsDivider v-if="divider" />
-    <p class="o-form-group__title | body-sm">{{ title }}
-      <span v-if="required" class="o-form-group__required | title-xs">*</span>
-    </p>
+    <MoleculesDraftFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+      <template #tooltip-content>
+        <slot name="tooltip-content">
+          <p class="body-xs">{{ tooltip }}</p>
+        </slot>
+      </template>
+    </MoleculesDraftFormHeading>
     <div class="o-form-group__input">
       <AtomsInput
         :name="name" 
@@ -29,6 +33,7 @@ interface Props {
   divider?: boolean;
   grid?: boolean;
   disabled?: boolean;
+  tooltip?: string;
 }
 
 defineProps<Props>();
@@ -39,10 +44,6 @@ defineEmits<{
 
 <style lang="scss">
 .o-form-group { 
-  &__title {
-    text-align: center;
-    padding-bottom: var(--size-16);
-  }
 
   &__input {
     margin: 0 auto;

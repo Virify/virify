@@ -19,7 +19,18 @@
       v-model="stepThreeData.saleListing.priceType"
       name="sale-price-type"
       :required="true"
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipList 
+          title="Choose how your price is presented:"
+          :items="[
+            'Offers Over: You expect bids above the listed price.',
+            'Asking Price: A fixed price you\'re aiming for.',
+            'Offers in the Region Of: You\'re more open to negotiation, although you expect a final price close to the listed price.'
+          ]" 
+        />
+      </template>
+    </OrganismsDraftFormRadioGroup>
 
     <!-- rental specific -->
     <!-- rent frequency -->
@@ -30,7 +41,17 @@
       v-model="stepThreeData.rentalListing.rentFrequency"
       name="rental-frequency"
       :required="true"
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipList 
+          title="Select the tenancy length:"
+          :items="[
+            'Short-term: Less than 6 months.',
+            'Long-term: 6 months or more.'
+          ]" 
+        />
+      </template>
+    </OrganismsDraftFormRadioGroup>
 
     <!-- price input for both sale and rental -->
     <OrganismsDraftFormNumberGroup
@@ -41,7 +62,14 @@
       :required="true"
       min="0"
       step="0.01"
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipParagraphs :paragraphs="[
+          'Sales: Enter the asking price for your property.',
+          'Rentals: Enter the rent amount.'
+        ]" />
+      </template>
+    </OrganismsDraftFormNumberGroup>
 
     <!-- deposit -->
     <OrganismsDraftFormNumberGroup
@@ -54,7 +82,11 @@
       type="number"
       min="0"
       step="0.01"
-    />
+    >
+      <template #tooltip-content>
+        <p class="body-xs">Enter the tenancy deposit amount.</p>
+      </template>
+    </OrganismsDraftFormNumberGroup>
 
     <!-- holding deposit -->
     <OrganismsDraftFormNumberGroup
@@ -66,7 +98,15 @@
       type="number"
       min="0"
       step="0.01"
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipParagraphs :paragraphs="[
+          'Enter the amount to reserve the property while references and contracts are completed.',
+          'This must be refundable (in certain circumstances) and is capped at 1 week\'s rent under the Tenants Fees Act 2019.',
+          'Use the below link for further information.'
+        ]" />
+      </template>
+    </OrganismsDraftFormNumberGroup>
 
     <!-- Rental Length -->
     <OrganismsDraftFormNumberGroup

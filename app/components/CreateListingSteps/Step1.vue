@@ -16,19 +16,35 @@
       title="What type of listing do you want to create?" 
       :options="stepOneListingOptions" 
       v-model="stepOneData.selectedType"
+      tooltip="Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs."
       @update:modelValue="onSelectedTypeChange"
       name="listing-type" 
       :required="true" 
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipParagraphs :paragraphs="[
+          'Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs.'
+        ]" />
+      </template>
+    </OrganismsDraftFormRadioGroup>
 
     <!-- SALE -->
     <OrganismsDraftFormRadioGroup 
       v-if="isSale" 
       title="Please confirm property tenure"
       :options="saleListingTenureOptions"
-      v-model="stepOneData.saleListing.tenureType" name="sale-tenure-type"
+      v-model="stepOneData.saleListing.tenureType" 
+      name="sale-tenure-type"
       :required="true"
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipParagraphs :paragraphs="[
+          'Freehold: You own the property and the land it sits on indefinitely.',
+          'Leasehold: You have the right to live in the property for a period of time, but you do not own the land it stands on.',
+          'Commonhold: Typically used on multi-occupancy developments. You own your part of the property on a freehold basis, but an association (or other entity) owns and manages the common parts.'
+        ]" />
+      </template>
+    </OrganismsDraftFormRadioGroup>
 
     <OrganismsDraftFormRadioGroup 
       v-if="isSale" 
@@ -36,7 +52,17 @@
       :options="saleListingChainOptions" 
       v-model="stepOneData.saleListing.chain" 
       name="sale-chain" 
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipList
+          title="Select whether the sale depends on another property transaction:"
+          :items="[
+            'Chain free: The sale is not dependant on you moving to another property.',
+            'Chain: The sale is dependant on you moving out and to another property.'
+          ]" 
+        />
+      </template>
+    </OrganismsDraftFormRadioGroup>
 
     <OrganismsDraftFormRadioGroup 
       v-if="isSale" 
@@ -44,7 +70,13 @@
       :options="saleSharedOwnershipOptions" 
       v-model="stepOneData.saleListing.sharedOwnership" 
       name="sale-shared-ownership" 
-    />
+    >
+      <template #tooltip-content>
+        <p class="body-xs">
+          Shared ownership allows you to buy a share of a property (between 25% and 75%) and pay subsidised rent on the remaining share.
+        </p>
+      </template>
+    </OrganismsDraftFormRadioGroup>
 
     <!-- RENTAL -->
     <OrganismsDraftFormRadioGroup 
@@ -54,7 +86,14 @@
       v-model="stepOneData.rentalListing.isBillsIncluded"
       name="rental-bills-included" 
       :required="true" 
-      />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipParagraphs :paragraphs="[
+          'Specify if any property bills (such as gas and electric) are included in the price.',
+          'If so, it\'s best to list which bills are included within your Property Description.'
+        ]" />
+      </template>
+    </OrganismsDraftFormRadioGroup>
 
     <OrganismsDraftFormRadioGroup 
       v-if="isRent" 
@@ -63,7 +102,15 @@
       v-model="stepOneData.rentalListing.furnishedStatus"
       name="rental-furnished-status" 
       :required="true" 
-    />
+    >
+      <template #tooltip-content>
+        <AtomsTooltipList :items="[
+          'Fully furnished: The property comes with everything you need to move in and live comfortably right away.',
+          'Part furnished: The property includes certain appliances and some furniture, but what\'s included can vary a lot.',
+          'Unfurnished: The property will generally not include appliances or furniture.'
+        ]" />
+      </template>
+    </OrganismsDraftFormRadioGroup>
   </CreateListingStepsStepLayout>
 </template>
 

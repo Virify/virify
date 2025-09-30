@@ -14,13 +14,20 @@
   <AtomsDivider />
     <!-- Bedrooms Section -->
     <div class="step__section">
-      <h3 class="step__section-title | title-md">Bedrooms</h3>
-      <em class="body-xs">
-        <span class="step__section-title--require | body-md">
-          *
-        </span>
-        At least one bedroom required
-      </em>
+      <MoleculesDraftFormHeading 
+        title="Bedrooms" 
+        :required="true"
+        variant="section"
+        :hasTooltip="true"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Add all bedrooms in your property including their size, features, and floor location.',
+            'The more detailed you can be, the more likely you are to find the right viewer.'
+          ]" />
+        </template>
+      </MoleculesDraftFormHeading>
+      <em class="body-xs">At least one bedroom required</em>
       <OrganismsDraftBedroomForm
         v-model="stepFiveData.property.bedroomFeatures"
         :total-floors="stepFiveData.property.totalFloors"
@@ -29,13 +36,20 @@
     <AtomsDivider />
     <!-- Bathrooms Section -->
     <div class="step__section">
-      <h3 class="step__section-title | title-md">Bathrooms</h3>
-      <em class="body-xs">
-        <span class="step__section-title--require | body-md">
-          *
-        </span>
-        At least one bathroom/toilet required
-      </em>
+      <MoleculesDraftFormHeading 
+        title="Bathrooms" 
+        :required="true"
+        variant="section"
+        :hasTooltip="true"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Add all bathrooms and toilets in your property including their features and floor location.',
+            'Include details about fixtures, accessibility features, and any special amenities.'
+          ]" />
+        </template>
+      </MoleculesDraftFormHeading>
+      <em class="body-xs">At least one bathroom/toilet required</em>
       <OrganismsDraftBathroomForm
         v-model="stepFiveData.property.bathroomFeatures"
         :total-floors="stepFiveData.property.totalFloors"

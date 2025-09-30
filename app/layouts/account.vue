@@ -4,7 +4,7 @@
     <OrganismsHeader />
 
     <div class="account-page">
-      <div class="account-layout container" :class="{ 'account-layout--messages-expanded': isExpanded }">
+      <div class="account-layout | container-xs" :class="{ 'account-layout--messages-expanded': isExpanded }">
         <!-- Left Sidebar Slot (Desktop only) -->
         <aside class="left-sidebar">
           <slot name="left-sidebar">

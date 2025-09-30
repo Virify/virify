@@ -1,9 +1,17 @@
 <template>
   <div class="address-search">
-    <p class="address-search__title | body-sm">
-      Enter your address or postcode.
-      <span class="address-search__required | title-xs">*</span>
-    </p>
+    <MoleculesDraftFormHeading 
+      title="Enter your address or postcode." 
+      :required="true" 
+      :tooltip="tooltip" 
+      :hasTooltip="!!tooltip || !!$slots['tooltip-content']"
+    >
+      <template #tooltip-content>
+        <slot name="tooltip-content">
+          <p class="body-xs">{{ tooltip }}</p>
+        </slot>
+      </template>
+    </MoleculesDraftFormHeading>
     
     <div class="address-search__input-wrapper">
       <!-- Single input with getaddress.io autocomplete -->
@@ -45,10 +53,15 @@ interface AddressParsed {
   lon: number | null;
 }
 
+interface Props {
+  tooltip?: string;
+}
+
 interface Emits {
   'address-selected': [address: AddressParsed];
 }
 
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const addressInput = ref();
 const error = ref<string | null>(null);

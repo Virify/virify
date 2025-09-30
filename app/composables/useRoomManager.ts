@@ -28,8 +28,21 @@ export function useRoomManager<T>(rooms: Ref<T[]>, emit: (event: "update:modelVa
   });
 
   const addButtonDisabled = computed(() => {
-    return Boolean(rooms.value.some((room) => !config.isRoomCompleted(room)));
+    // Only disable if there are incomplete rooms OR if there's a newly added unsaved room
+    return Boolean(
+      rooms.value.some((room) => !config.isRoomCompleted(room)) ||
+      lastAddedRoomIndex.value !== null
+    );
   });
+
+  /**
+   * Check if a room is newly added and unsaved
+   * @param index Index of the room to check
+   * @returns True if the room is newly added and unsaved
+   */
+  function isNewUnsavedRoom(index: number): boolean {
+    return lastAddedRoomIndex.value === index;
+  }
 
   /**
    * Set the reference for a room element
@@ -127,6 +140,30 @@ export function useRoomManager<T>(rooms: Ref<T[]>, emit: (event: "update:modelVa
   }
 
   /**
+   * Cancel room editing and revert any unsaved changes
+   * @param index Index of the room to cancel editing
+   */
+  function cancelRoom(index: number): void {
+    // If this is a newly added room that hasn't been saved, remove it entirely
+    if (lastAddedRoomIndex.value === index) {
+      removeRoom(index);
+      return;
+    }
+
+    // If this room was being edited, revert to original state
+    const originalState = originalRoomStates.value.get(index);
+    if (originalState) {
+      const currentRooms = [...rooms.value];
+      currentRooms[index] = JSON.parse(JSON.stringify(originalState));
+      emit("update:modelValue", currentRooms);
+    }
+
+    // Close the room and clear the original state
+    expandedRooms.value.delete(index);
+    originalRoomStates.value.delete(index);
+  }
+
+  /**
    * Remove a room
    * @param index Index of the room to remove
    */
@@ -186,8 +223,10 @@ export function useRoomManager<T>(rooms: Ref<T[]>, emit: (event: "update:modelVa
     hasRoomChanges,
     addRoom,
     saveRoom,
+    cancelRoom,
     removeRoom,
     initializeRoomManager,
+    isNewUnsavedRoom,
 
     // Config access
     isRoomCompleted: config.isRoomCompleted,

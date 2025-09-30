@@ -25,6 +25,7 @@
               Remove
             </button>
             <button
+              v-if="!isNewUnsavedRoom(index)"
               type="button"
               @click.stop="toggleRoom(index)"
               class="button button-xs button-tertiary | body-xs"
@@ -45,6 +46,7 @@
               Remove
             </button>
             <button
+              v-if="!isNewUnsavedRoom(index)"
               type="button"
               @click="toggleRoom(index)"
               class="button button-xs button-tertiary | body-xs"
@@ -130,7 +132,13 @@
               :name="`other-room-${index}-size`"
               @update:unit="() => {}"
               @update:size="(value: number | null) => (otherRoomItem.size = value)"
-            />
+            >
+              <template #tooltip-content>
+                <AtomsTooltipParagraphs :paragraphs="[
+                  'Enter the room\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
+                ]" />
+              </template>
+            </OrganismsDraftFormSizeToggle>
 
             <div class="o-other-room-form__form-actions">
               <button
@@ -140,6 +148,13 @@
                 :disabled="!isRoomCompleted(otherRoomItem) || !hasRoomChanges(index)"
               >
                 {{ lastAddedRoomIndex === index ? 'Save Room' : 'Save Changes' }}
+              </button>
+              <button
+                type="button"
+                @click="cancelRoom(index)"
+                class="button button-sm button-tertiary | body-sm"
+              >
+                {{ lastAddedRoomIndex === index ? 'Cancel' : 'Cancel Changes' }}
               </button>
             </div>
 
@@ -232,9 +247,11 @@ const {
   hasRoomChanges,
   addRoom,
   saveRoom,
+  cancelRoom,
   removeRoom,
   initializeRoomManager,
   isRoomCompleted,
+  isNewUnsavedRoom,
 } = useRoomManager(localOtherRooms, emit, roomManagerConfig);
 
 onMounted(() => {
@@ -348,6 +365,7 @@ function setOtherRoomFireplaceValue(room: any, value: string) {
   &__form-actions {
     display: flex;
     justify-content: center;
+    gap: var(--size-12);
     margin-top: var(--size-24);
     margin-bottom: var(--size-24);
   }

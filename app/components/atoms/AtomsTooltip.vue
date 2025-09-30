@@ -1,12 +1,16 @@
 <template>
-  <TooltipProvider delay-duration="2000">
+  <TooltipProvider :delay-duration="delayDuration">
     <TooltipRoot>
       <TooltipTrigger as-child>
         <slot></slot>
       </TooltipTrigger>
 
       <TooltipPortal>
-        <TooltipContent :side-offset="5" class="a-tooltip-popover | body-sm lineheight-sm">
+        <TooltipContent 
+          :side-offset="5" 
+          class="a-tooltip-popover | body-sm lineheight-sm"
+          :class="{ 'a-tooltip-popover--responsive': responsive }"
+        >
           <slot name="tooltip"></slot>
           <TooltipArrow :width="10" :height="5" class="a-tooltip-arrow" />
         </TooltipContent>
@@ -15,20 +19,69 @@
   </TooltipProvider>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipPortal, TooltipContent, TooltipArrow } from 'reka-ui';
 
+interface Props {
+  delayDuration?: number;
+  responsive?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  delayDuration: 500,
+  responsive: false,
+});
 </script>
 
-<style>
+<style lang="scss">
 .a-tooltip-popover {
-  z-index: 2;
-  background: var(--monochrome-100);
-  color: var(--monochrome-900);
+  z-index: 10;
+  background: var(--background-200);
+  color: var(--foreground-200);
+  border: 1px solid var(--background-300);
   padding: var(--size-8) var(--size-12);
   border-radius: var(--border-radius-lg);
   transform-origin: var(--reka-tooltip-content-transform-origin);
   animation: fadeTooltipUp var(--animation-slow) var(--ease-out);
+  max-width: min(600px, var(--reka-tooltip-content-available-width));
+  max-height: var(--reka-tooltip-content-available-height);
+  white-space: pre-line;
+  
+  @media (max-width: 768px) {
+    max-width: calc(100vw - 32px);
+    margin-left: var(--size-16);
+    margin-right: var(--size-16);
+  }
+  
+  @media (max-width: 480px) {
+    max-width: calc(100vw - 24px);
+    margin-left: var(--size-12);
+    margin-right: var(--size-12);
+  }
+  
+  &--responsive {
+    min-width: var(--reka-tooltip-trigger-width, 200px);
+    max-width: min(400px, var(--reka-tooltip-content-available-width));
+    white-space: normal;
+    word-wrap: break-word;
+    
+    @media (max-width: 768px) {
+      min-width: 250px;
+      max-width: calc(100vw - 48px); 
+      margin: 0 var(--size-16);
+    }
+    
+    @media (max-width: 480px) {
+      min-width: 200px;
+      max-width: calc(100vw - 40px);
+      margin: 0 var(--size-16);
+      padding: var(--size-12) var(--size-16);
+    }
+  }
+}
+
+.a-tooltip-arrow {
+  fill: var(--background-100);
 }
 
 .a-tooltip-popover[data-side="bottom"] {

@@ -36,11 +36,11 @@ const tooltipId = computed(() => {
 <style lang="scss" scoped>
 .a-aria-tooltip {
   position: relative;
-  display: inline-block;
 
   &:hover &__content {
     opacity: 1;
     visibility: visible;
+    overflow: visible;
   }
 
   &__trigger {
