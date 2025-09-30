@@ -141,7 +141,7 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       type: 'geojson',
       data: markerData,
       cluster: true,
-      clusterRadius: 100 // In pixels
+      clusterRadius: 75 // In pixels
     })
 
     map.addLayer({
