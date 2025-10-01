@@ -20,10 +20,13 @@ export default defineNuxtConfig({
       permissionsPolicy: false,
       contentSecurityPolicy: {
         "img-src": ["'self'", "data:", "https://cdn.sanity.io", String(process.env.CF_IMAGES_URL), "https://images.unsplash.com"],
+        "script-src": ["'self'", "https:", "'unsafe-inline'"],
         "script-src-attr": ["'unsafe-inline'"],
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", 'https:'],
       },
     },
+    nonce: false,
+    sri: false,
     requestSizeLimiter: false,
   },
   compatibilityDate: "2025-07-09",
