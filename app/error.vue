@@ -37,15 +37,16 @@ function clearErrors() {
       <div class="error-page">
         <div class="container">
           <div class="error-page__content">
-            <h1 class="error-page__title | title-lg">{{ errorTitle || 'Page Not Found' }}</h1>
+            <h1 class="error-page__title | title-xl">{{ error?.statusCode }}</h1>
+            <h2 class="error-page__title | title-lg">{{ errorTitle || 'Page Not Found' }}</h2>
             <p class="error-page__message | body-md">{{ errorMessage || 'The page you are looking for does not exist.' }}</p>
             
             <div class="error-page__actions">
-              <NuxtLink to="/" class="button button-primary">
+              <NuxtLink to="/" class="button button-tertiary">
                 Go Home
               </NuxtLink>
-              <button @click="clearErrors" class="button button-secondary">
-                Try Again
+              <button class="button button-secondary">
+                Contact Support
               </button>
             </div>
           </div>
@@ -69,6 +70,7 @@ function clearErrors() {
   align-items: center;
   justify-content: center;
   padding: var(--size-64, 64px) var(--size-24, 24px);
+  background: var(--background-100, #f9f9f9);
 
   .container {
     display: flex;
