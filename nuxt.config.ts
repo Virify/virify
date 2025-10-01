@@ -23,6 +23,7 @@ export default defineNuxtConfig({
         "script-src": ["'self'", "https:", "'unsafe-inline'"],
         "script-src-attr": ["'unsafe-inline'"],
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", 'https:'],
+        "worker-src": ["'self'", "blob:"],
       },
     },
     nonce: false,
