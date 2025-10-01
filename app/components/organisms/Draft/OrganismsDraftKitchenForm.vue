@@ -66,7 +66,13 @@
                 placeholder="e.g. Main Kitchen"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Give this kitchen a descriptive name to help identify it (e.g. Main Kitchen, Utility Kitchen)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <OrganismsDraftFormTextGroup
                 title="Kitchen Description"
@@ -75,7 +81,13 @@
                 placeholder="Describe this kitchen..."
                 :grid="true"
                 :expanded="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Add any additional details about this kitchen that buyers might find useful'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <OrganismsDraftFormNumberGroup
                 title="Kitchen Number"
@@ -86,7 +98,13 @@
                 :grid="true"
                 min="1"
                 step="1"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Assign a number to this kitchen (e.g. Kitchen 1, Kitchen 2)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormNumberGroup>
 
               <OrganismsDraftFormSelectGroup
                 title="Floor"
@@ -95,7 +113,13 @@
                 :name="`kitchen-${index}-floor`"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select which floor this kitchen is located on'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
             </div>
 
             <OrganismsDraftFormCheckboxGroup

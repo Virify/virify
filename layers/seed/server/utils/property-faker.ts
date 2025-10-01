@@ -454,7 +454,6 @@ export const generateOutdoorSpace = (): Prisma.OutdoorSpaceCreateWithoutProperty
   if (!hasGarden && !hasLand) {
     return {
       description: faker.word.words(10),
-      separateParcel: faker.datatype.boolean({ probability: 0.2 }),
       garden: {
         create: []
       },
@@ -494,18 +493,17 @@ export const generateOutdoorSpace = (): Prisma.OutdoorSpaceCreateWithoutProperty
     }
   }
 
-  // Calculate total sizes with 2 decimal places
+  // Calculate total sizes with 2 decimal places - ALWAYS present if gardens/land exist
   const totalGardenSize = gardens.length > 0 
-    ? parseFloat(faker.number.float({ min: 20, max: 200 }).toFixed(2))
+    ? parseFloat(faker.number.float({ min: 20, max: 200, fractionDigits: 2 }).toFixed(2))
     : null;
   
   const totalLandSize = lands.length > 0 
-    ? parseFloat(faker.number.float({ min: 100, max: 1000 }).toFixed(2))
+    ? parseFloat(faker.number.float({ min: 100, max: 1000, fractionDigits: 2 }).toFixed(2))
     : null;
 
   return {
     description: faker.word.words(10),
-    separateParcel: faker.datatype.boolean({ probability: 0.2 }),
     totalGardenSize: totalGardenSize,
     totalLandSize: totalLandSize,
     garden: {

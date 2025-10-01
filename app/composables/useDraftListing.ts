@@ -1,5 +1,6 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { DraftListing, ListingTier } from "~~/layers/database/server/database/prisma/generated/client";
+import type { StepSeven } from "~~/shared/types/draft";
 
 export const useDraftListing = createSharedComposable(() => {
   const { showToast } = useToast();
@@ -173,6 +174,15 @@ export const useDraftListing = createSharedComposable(() => {
     return updateDraftStep('six', draftId, stepData);
   }
 
+  /**
+   * Updates the seventh step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the seventh step
+   */
+  async function updateDraftStepSeven(draftId: number, stepData: StepSeven) {
+    return updateDraftStep('seven', draftId, stepData);
+  }
+
   return {
     draftListings,
     draftListing,
@@ -188,5 +198,6 @@ export const useDraftListing = createSharedComposable(() => {
     updateDraftStepFour,
     updateDraftStepFive,
     updateDraftStepSix,
+    updateDraftStepSeven,
   };
 });

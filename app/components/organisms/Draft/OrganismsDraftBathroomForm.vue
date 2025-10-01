@@ -66,8 +66,14 @@
               :name="`bathroom-${index}-name`"
               placeholder="e.g. Master En Suite, Guest Bathroom"
               :required="true"
-              :grid="true" 
-            />
+              :grid="true"
+            >
+              <template #tooltip-content>
+                <AtomsTooltipParagraphs :paragraphs="[
+                  'Give this bathroom a descriptive name to help identify it (e.g. Master En Suite, Family Bathroom, Downstairs WC)'
+                ]" />
+              </template>
+            </OrganismsDraftFormTextGroup>
 
             <!-- Bathroom Description -->
             <OrganismsDraftFormTextGroup
@@ -76,8 +82,14 @@
               :name="`bathroom-${index}-description`"
               placeholder="Describe this bathroom..."
               :grid="true"
-              :expanded="true" 
-            />
+              :expanded="true"
+            >
+              <template #tooltip-content>
+                <AtomsTooltipParagraphs :paragraphs="[
+                  'Add any additional details about this bathroom that buyers might find useful'
+                ]" />
+              </template>
+            </OrganismsDraftFormTextGroup>
 
             <!-- Bathroom Number -->
             <OrganismsDraftFormNumberGroup
@@ -89,7 +101,13 @@
               :grid="true"
               min="1"
               step="1"
-            />
+            >
+              <template #tooltip-content>
+                <AtomsTooltipParagraphs :paragraphs="[
+                  'Assign a number to this bathroom (e.g. Bathroom 1, Bathroom 2)'
+                ]" />
+              </template>
+            </OrganismsDraftFormNumberGroup>
 
             <!-- Floor -->
             <OrganismsDraftFormSelectGroup
@@ -99,7 +117,13 @@
               :name="`bathroom-${index}-floor`"
               :required="true"
               :grid="true"
-            />
+            >
+              <template #tooltip-content>
+                <AtomsTooltipParagraphs :paragraphs="[
+                  'Select which floor this bathroom is located on'
+                ]" />
+              </template>
+            </OrganismsDraftFormSelectGroup>
           </div>
 
           <!-- Bathroom Features (Multi-select) -->

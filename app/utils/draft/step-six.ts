@@ -103,14 +103,8 @@ export const stepSixValidation = {
    * @returns True if all kitchens have required fields
    */
   areKitchenFeaturesValid: (kitchenFeatures: any[]): boolean => {
-    if (kitchenFeatures.length === 0) return false;
-
-    return kitchenFeatures.every((kitchen) =>
-      kitchen.name &&
-      kitchen.roomNumber &&
-      kitchen.floor !== null &&
-      kitchen.floor !== undefined
-    );
+    // Kitchens are optional
+    return true;
   },
 
   /**
@@ -119,15 +113,8 @@ export const stepSixValidation = {
    * @returns True if all receptions have required fields
    */
   areReceptionRoomsValid: (receptionRooms: any[]): boolean => {
-    if (receptionRooms.length === 0) return true;
-
-    return receptionRooms.every((reception) =>
-      reception.name &&
-      reception.roomNumber &&
-      reception.floor !== null &&
-      reception.floor !== undefined &&
-      reception.type
-    );
+    // Receptions are optional
+    return true;
   },
 
   /**
@@ -136,15 +123,8 @@ export const stepSixValidation = {
    * @returns True if all other rooms have required fields
    */
   areOtherRoomsValid: (otherRooms: any[]): boolean => {
-    if (otherRooms.length === 0) return true;
-
-    return otherRooms.every((room) =>
-      room.name &&
-      room.roomNumber &&
-      room.floor !== null &&
-      room.floor !== undefined &&
-      room.type
-    );
+    // Other rooms are optional
+    return true;
   },
 
   /**
@@ -168,8 +148,12 @@ export const stepSixValidation = {
     const receptions = draft.property?.reception || [];
     const otherRooms = draft.property?.otherRoom || [];
 
-    return kitchens.length > 0 &&
-      stepSixValidation.areKitchenFeaturesValid(kitchens) &&
+    // Check if any rooms exist
+    if (kitchens.length === 0 && receptions.length === 0 && otherRooms.length === 0) {
+      return false;
+    }
+
+    return stepSixValidation.areKitchenFeaturesValid(kitchens) &&
       stepSixValidation.areReceptionRoomsValid(receptions) &&
       stepSixValidation.areOtherRoomsValid(otherRooms);
   }

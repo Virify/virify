@@ -1,7 +1,7 @@
 model Land {
   id             Int     @id @default(autoincrement())
   description    String?
-  name           String?
+  name           String
   separateParcel Boolean @default(false)
   woodland       Boolean @default(false)
   paddock        Boolean @default(false)

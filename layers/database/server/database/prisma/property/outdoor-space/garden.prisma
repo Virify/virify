@@ -1,9 +1,9 @@
 model Garden {
   id             Int             @id @default(autoincrement())
   description    String?
-  name           String?
-  facing         GardenFacing?
-  position       GardenPosition?
+  name           String
+  facing         GardenFacing
+  position       GardenPosition
   sunTerrace     Boolean         @default(false)
   terrace        Boolean         @default(false)
   balcony        Boolean         @default(false)

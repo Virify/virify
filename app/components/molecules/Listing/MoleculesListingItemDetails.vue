@@ -25,9 +25,12 @@
                 <AtomsIcon :icon="getItemIcon(item)" :size="20" />
                 {{ getItemTitle(item) }}
               </div>
-              <button v-if="item.description" @click="openDescription(index, $event)" class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${getItemTitle(item)}`">
+              <AtomsTooltip v-if="item.description" :responsive="true">
                 <AtomsIcon icon="property/info" :size="22" />
-              </button>
+                <template #tooltip>
+                  <p class="body-xs">{{ item.description }}</p>
+                </template>
+              </AtomsTooltip>
             </div>
 
             <!-- Size and floor info -->
@@ -68,14 +71,6 @@
       </ul>
     </Transition>
   </div>
-
-  <!-- Description modal -->
-  <AtomsInfoModal 
-    :show="activeDescription !== null" 
-    :content="activeDescription !== null ? itemsArray[activeDescription]?.description || '' : ''" 
-    :position="modalPosition"
-    @close="closeDescription"
-  />
 </template>
 
 <script setup lang="ts">
@@ -141,12 +136,6 @@ const toggleCollapsed = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
-// Description modal state
-const activeDescription = ref<number | null>(null);
-const { modalPosition, openModal, closeModal } = useInfoModal(() => {
-  activeDescription.value = null;
-});
-
 // Helper functions
 const getSectionIcon = (): string => {
   if (props.type === 'garden' || props.type === 'outdoor') {
@@ -204,17 +193,6 @@ const getFeatures = (item: any): string[] => {
   });
 
   return features;
-};
-
-// Description modal methods
-const openDescription = (index: number, event: MouseEvent) => {
-  activeDescription.value = index;
-  openModal(event, -200, 8);
-};
-
-const closeDescription = () => {
-  activeDescription.value = null;
-  closeModal();
 };
 
 </script>

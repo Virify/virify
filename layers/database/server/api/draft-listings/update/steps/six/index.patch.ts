@@ -22,9 +22,8 @@ const stepSixSchema = z.object({
           utilityAccess: z.boolean().optional(),
           pantry: z.boolean().optional(),
         })
-      )
-      .min(1),
-    numberKitchens: z.coerce.number().int().min(1).optional(),
+      ),
+    numberKitchens: z.coerce.number().int().min(0).optional(),
     reception: z
       .array(
         z.object({

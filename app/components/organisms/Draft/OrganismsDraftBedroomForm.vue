@@ -66,8 +66,14 @@
                 :name="`bedroom-${index}-name`"
                 placeholder="e.g. Master Bedroom, Guest Room"
                 :required="true"
-                :grid="true" 
-              />
+                :grid="true"
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Give this bedroom a descriptive name to help identify it (e.g. Master Bedroom, Guest Room, Front Bedroom)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <!-- Bedroom Description -->
               <OrganismsDraftFormTextGroup
@@ -76,8 +82,14 @@
                 :name="`bedroom-${index}-description`"
                 placeholder="Describe this bedroom..."
                 :grid="true"
-                :expanded="true" 
-              />
+                :expanded="true"
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Add any additional details about this bedroom that buyers might find useful'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <!-- Bedroom Number -->
               <OrganismsDraftFormNumberGroup
@@ -89,7 +101,13 @@
                 :grid="true"
                 min="1"
                 step="1"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Assign a number to this bedroom (e.g. Bedroom 1, Bedroom 2)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormNumberGroup>
 
               <!-- Floor -->
               <OrganismsDraftFormSelectGroup
@@ -99,7 +117,13 @@
                 :name="`bedroom-${index}-floor`"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select which floor this bedroom is located on'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
             </div>
 
           <!-- Bed Size -->

@@ -23,9 +23,8 @@ const bedroomBathroomSchema = z.object({
           patioDoors: z.boolean().optional(),
           builtInDesk: z.boolean().optional(),
         })
-      )
-      .min(1),
-    numberBedrooms: z.coerce.number().int().min(1),
+      ),
+    numberBedrooms: z.coerce.number().int().min(0),
     bathroomFeatures: z
       .array(
         z.object({
@@ -39,9 +38,8 @@ const bedroomBathroomSchema = z.object({
           bathtub: z.boolean().optional(),
           walkInShower: z.boolean().optional(),
         })
-      )
-      .min(1),
-    numberBathrooms: z.coerce.number().int().min(1)
+      ),
+    numberBathrooms: z.coerce.number().int().min(0)
   }),
 });
 

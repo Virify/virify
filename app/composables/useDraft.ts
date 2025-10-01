@@ -1,11 +1,13 @@
 import { createSharedComposable } from "@vueuse/core";
-import CreateListingStepsStep1 from '~/components/CreateListingSteps/Step1.vue';
-import CreateListingStepsStep2 from '~/components/CreateListingSteps/Step2.vue';
-import CreateListingStepsStep3 from '~/components/CreateListingSteps/Step3.vue';
-import CreateListingStepsStep4 from '~/components/CreateListingSteps/Step4.vue';
-import CreateListingStepsStep5 from '~/components/CreateListingSteps/Step5.vue';
-import CreateListingStepsStep6 from '~/components/CreateListingSteps/Step6.vue';
-
+import { 
+  CreateListingStepsStep1, 
+  CreateListingStepsStep2, 
+  CreateListingStepsStep3, 
+  CreateListingStepsStep4, 
+  CreateListingStepsStep5, 
+  CreateListingStepsStep6,
+  CreateListingStepsStep7
+ } from "#components";
 
 export interface DraftStepConfig {
   title: string;
@@ -23,7 +25,8 @@ export const useDraft = createSharedComposable(() => {
     updateDraftStepThree, 
     updateDraftStepFour, 
     updateDraftStepFive,
-    updateDraftStepSix
+    updateDraftStepSix,
+    updateDraftStepSeven
   } = useDraftListing();
 
   /**
@@ -85,8 +88,17 @@ export const useDraft = createSharedComposable(() => {
         update: updateDraftStepSix,
         component: CreateListingStepsStep6
       },
-      { title: 'Outdoor & Utilities', complete: false },
-      { title: 'Additional Features', complete: false },
+      { 
+        title: 'Outdoor Spaces',
+        data: draft.value ? createInitialStepSevenValues(draft.value) : null,
+        complete: draft.value ? stepSevenValidation.hasExistingStepSevenData(draft.value) : false,
+        update: updateDraftStepSeven,
+        component: CreateListingStepsStep7
+      },
+      { 
+        title: 'Additional Features', 
+        complete: false 
+      },
       { title: 'Energy', complete: false },
       { title: 'Media', complete: false }
     ]);

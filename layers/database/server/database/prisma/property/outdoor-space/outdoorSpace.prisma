@@ -5,7 +5,6 @@ model OutdoorSpace {
   totalGardenSize Float?
   land            Land[]
   totalLandSize   Float?
-  separateParcel  Boolean  @default(false)
   propertyId      Int      @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now())

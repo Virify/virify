@@ -66,7 +66,13 @@
                 placeholder="e.g. Home Office"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Give this room a descriptive name to help identify it (e.g. Home Office, Utility Room, Games Room)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <OrganismsDraftFormTextGroup
                 title="Other Room Description"
@@ -75,7 +81,13 @@
                 placeholder="Describe this room..."
                 :grid="true"
                 :expanded="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Add any additional details about this room that buyers might find useful'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <OrganismsDraftFormNumberGroup
                 title="Room Number"
@@ -86,7 +98,13 @@
                 :grid="true"
                 min="1"
                 step="1"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Assign a number to this room (e.g. Room 1, Room 2)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormNumberGroup>
 
               <OrganismsDraftFormSelectGroup
                 title="Floor"
@@ -95,7 +113,13 @@
                 :name="`other-room-${index}-floor`"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select which floor this room is located on'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
 
               <OrganismsDraftFormSelectGroup
                 title="Room Type"
@@ -104,7 +128,13 @@
                 :name="`other-room-${index}-type`"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select the type of room (e.g. Office, Utility, Gym, Playroom)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
 
               <OrganismsDraftFormSelectGroup
                 title="Fireplace"
@@ -113,7 +143,13 @@
                 @update:modelValue="setOtherRoomFireplaceValue(otherRoomItem, $event)"
                 :name="`other-room-${index}-fireplace`"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select the type of fireplace if this room has one'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
             </div>
 
             <OrganismsDraftFormCheckboxGroup

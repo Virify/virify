@@ -10,10 +10,12 @@
         @toggle="() => {}"
       >
         <template #actions>
-          <button v-if="features?.description" @click.stop="openDescription($event)" 
-            class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${title}`">
+          <AtomsTooltip v-if="features?.description" :responsive="true">
             <AtomsIcon icon="property/info" :size="16" />
-          </button>
+            <template #tooltip>
+              <p class="body-xs">{{ features?.description }}</p>
+            </template>
+          </AtomsTooltip>
         </template>
       </AtomsCollapsibleHeader>
 
@@ -35,14 +37,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Description modal -->
-  <AtomsInfoModal 
-    :show="showDescription" 
-    :content="features?.description || ''" 
-    :position="modalPosition"
-    @close="closeDescription"
-  />
 </template>
 
 <script setup lang="ts">
@@ -73,12 +67,6 @@ const filteredFeatures = computed(() => {
 // Collapse state
 const isCollapsed = ref(true);
 
-// Description modal state
-const showDescription = ref(false);
-const { modalPosition, openModal, closeModal } = useInfoModal(() => {
-  showDescription.value = false;
-});
-
 // Helper function to get feature icon based on title
 const getFeatureIcon = (title: string): string => {
   // Convert title to lowercase for mapping
@@ -89,17 +77,6 @@ const getFeatureIcon = (title: string): string => {
 const formattedSize = computed(() => {
   return Math.round(props.features?.size || 0);
 });
-
-// Description modal methods
-const openDescription = (event: MouseEvent) => {
-  showDescription.value = true;
-  openModal(event, -200, 8);
-};
-
-const closeDescription = () => {
-  showDescription.value = false;
-  closeModal();
-};
 
 // Collapse toggle
 const toggleCollapse = () => {

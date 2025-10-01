@@ -10,10 +10,12 @@
         @toggle="() => {}"
       >
         <template #actions>
-          <button v-if="description" @click.stop="openDescription($event)" 
-            class="button button-xs button-quiet" type="button" :aria-label="`Show description for Broadband`">
+          <AtomsTooltip v-if="description" :responsive="true">
             <AtomsIcon icon="property/info" :size="16" />
-          </button>
+            <template #tooltip>
+              <p class="body-xs">{{ description }}</p>
+            </template>
+          </AtomsTooltip>
         </template>
       </AtomsCollapsibleHeader>
 
@@ -42,14 +44,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Description modal -->
-  <AtomsInfoModal 
-    :show="showDescription"
-    :content="description"
-    :position="modalPosition"
-    @close="closeDescription"
-  />
 </template>
 
 <script setup lang="ts">
@@ -67,22 +61,6 @@ const isCollapsed = ref(true);
 // Collapse toggle
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
-};
-
-// Description modal state
-const showDescription = ref(false);
-const { modalPosition, openModal, closeModal } = useInfoModal(() => {
-  showDescription.value = false;
-});
-
-const openDescription = (event: MouseEvent) => {
-  showDescription.value = true;
-  openModal(event, -40, 8);
-};
-
-const closeDescription = () => {
-  showDescription.value = false;
-  closeModal();
 };
 
 const formatBroadbandType = (type: string): string => {

@@ -1,4 +1,4 @@
-import type { Bathroom, Bedroom, Kitchen, OtherRoom, Prisma, Reception } from "~~/layers/database/server/database/prisma/generated/client"
+import { Prisma, type Bathroom, type Bedroom, type Garden, type Kitchen, type Land, type OtherRoom, type OutdoorSpace, type Reception } from "~~/layers/database/server/database/prisma/generated/client"
 import type { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
@@ -74,6 +74,17 @@ export type StepSix = {
   }
 }
 
+export type StepSeven = {
+  property: {
+    outdoorSpace: {
+      totalGardenSize: number | null
+      garden: Omit<Garden, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
+      totalLandSize: number | null
+      land: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
+      description: string | null
+    }
+  }
+}
 
 export type DraftListingWithFullPayload = Prisma.DraftListingGetPayload<{
   include: {

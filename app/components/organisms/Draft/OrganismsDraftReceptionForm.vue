@@ -66,7 +66,13 @@
                 placeholder="e.g. Living Room"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Give this reception room a descriptive name to help identify it (e.g. Living Room, Dining Room, Lounge)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <OrganismsDraftFormTextGroup
                 title="Reception Description"
@@ -75,7 +81,13 @@
                 placeholder="Describe this reception space..."
                 :grid="true"
                 :expanded="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Add any additional details about this reception room that buyers might find useful'
+                  ]" />
+                </template>
+              </OrganismsDraftFormTextGroup>
 
               <OrganismsDraftFormNumberGroup
                 title="Reception Number"
@@ -86,7 +98,13 @@
                 :grid="true"
                 min="1"
                 step="1"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Assign a number to this reception room (e.g. Reception 1, Reception 2)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormNumberGroup>
 
               <OrganismsDraftFormSelectGroup
                 title="Floor"
@@ -95,7 +113,13 @@
                 :name="`reception-${index}-floor`"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select which floor this reception room is located on'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
 
               <OrganismsDraftFormSelectGroup
                 title="Reception Type"
@@ -104,7 +128,13 @@
                 :name="`reception-${index}-type`"
                 :required="true"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select the type of reception room (e.g. Living Room, Dining Room, Study)'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
 
               <OrganismsDraftFormSelectGroup
                 title="Fireplace"
@@ -113,7 +143,13 @@
                 @update:modelValue="setReceptionFireplaceValue(receptionRoom, $event)"
                 :name="`reception-${index}-fireplace`"
                 :grid="true"
-              />
+              >
+                <template #tooltip-content>
+                  <AtomsTooltipParagraphs :paragraphs="[
+                    'Select the type of fireplace if this room has one'
+                  ]" />
+                </template>
+              </OrganismsDraftFormSelectGroup>
             </div>
 
             <OrganismsDraftFormCheckboxGroup
