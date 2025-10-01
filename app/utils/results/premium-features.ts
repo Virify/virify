@@ -15,15 +15,15 @@ export const premiumFeatureDefs: PremiumFeatureDef[] = [
   // TOP TIER - High demand, major decision factors
   { label: 'Garage', path: ['property', 'parking', 'garage'] },
   { label: 'Driveway', path: ['property', 'parking', 'driveway'] },
-  { label: 'Rear Garden', path: ['property', 'rearGarden'] },
+  { label: 'Garden', path: ['property', 'outdoorSpace', 'garden'] },
   { label: 'Home Office', path: ['property', 'additionalFeatures', 'homeOffice'] },
   { label: 'Modern Kitchen', path: ['property', 'kitchenFeatures', 'modern'] },
   { label: 'Pet Friendly', path: ['property', 'additionalFeatures', 'petFriendly'] },
   { label: 'Allocated Parking', path: ['property', 'parking', 'allocatedParking'] },
-  { label: 'Pool', path: ['property', 'frontGarden', 'rearGarden', 'pool'] },
+  { label: 'Pool', path: ['property', 'outdoorSpace', 'garden', 'pool'] },
 
   // HIGH PRIORITY - Desirable lifestyle features
-  { label: 'Balcony', path: ['property', 'frontGarden', 'rearGarden', 'balcony'] },
+  { label: 'Balcony', path: ['property', 'outdoorSpace', 'garden', 'balcony'] },
   { label: 'EV Charging', path: ['property', 'parking', 'evCharging'] },
   { label: 'Gym', path: ['property', 'additionalFeatures', 'gym'] },
   { label: 'Concierge', path: ['property', 'additionalFeatures', 'concierge'] },
@@ -36,23 +36,23 @@ export const premiumFeatureDefs: PremiumFeatureDef[] = [
   { label: 'Fireplace', path: ['property', 'livingArea', 'fireplace'] },
   { label: 'Gated Community', path: ['property', 'securityFeatures', 'gatedCommunity'] },
   { label: 'Island', path: ['property', 'kitchenFeatures', 'island'] },
-  { label: 'Terrace', path: ['property', 'frontGarden', 'rearGarden', 'terrace'] },
-  { label: 'Patio', path: ['property', 'frontGarden', 'rearGarden', 'patio'] },
-  { label: 'Sun Terrace', path: ['property', 'frontGarden', 'rearGarden', 'sunTerrace'] },
+  { label: 'Terrace', path: ['property', 'outdoorSpace', 'garden', 'terrace'] },
+  { label: 'Patio', path: ['property', 'outdoorSpace', 'garden', 'patio'] },
+  { label: 'Sun Terrace', path: ['property', 'outdoorSpace', 'garden', 'sunTerrace'] },
   { label: 'Utility Room Access', path: ['property', 'kitchenFeatures', 'utilityRoomAccess'] },
   { label: 'Pantry', path: ['property', 'kitchenFeatures', 'pantry'] },
   { label: 'Breakfast Bar', path: ['property', 'kitchenFeatures', 'breakfastBar'] },
   { label: 'Built-in Storage', path: ['property', 'bedroomFeatures', 'builtInStorage'] },
   
   // LOWER PRIORITY - Specific needs/situations
-  { label: 'Garden Office', path: ['property', 'frontGarden', 'rearGarden', 'gardenOffice'] },
-  { label: 'Summer House', path: ['property', 'frontGarden', 'rearGarden', 'summerHouse'] },
+  { label: 'Garden Office', path: ['property', 'outdoorSpace', 'garden', 'gardenOffice'] },
+  { label: 'Summer House', path: ['property', 'outdoorSpace', 'garden', 'summerHouse'] },
   { label: 'Games Room', path: ['property', 'receptionRooms', 'gamesRoom'] },
   { label: 'Home Cinema', path: ['property', 'receptionRooms', 'homeCinema'] },
   { label: 'Walk-in Shower', path: ['property', 'bathroomFeatures', 'walkInShower'] },
   { label: 'Bathtub', path: ['property', 'bathroomFeatures', 'bathtub'] },
   { label: 'Carport', path: ['property', 'parking', 'carport'] },
-  { label: 'Front Garden', path: ['property', 'frontGarden', 'rearGarden', 'frontGarden'] },
+  { label: 'Land', path: ['property', 'outdoorSpace', 'land'] },
   { label: 'CCTV', path: ['property', 'securityFeatures', 'cctv'] },
   { label: 'Alarm System', path: ['property', 'securityFeatures', 'alarmSystem'] },
   
@@ -65,7 +65,7 @@ export const premiumFeatureDefs: PremiumFeatureDef[] = [
   // BASIC AMENITIES - Expected in many properties
   { label: 'Laundry', path: ['property', 'additionalFeatures', 'laundry'] },
   { label: 'Internet', path: ['property', 'additionalFeatures', 'internet'] },
-  { label: 'Shed', path: ['property', 'frontGarden', 'rearGarden', 'shed'] },
+  { label: 'Shed', path: ['property', 'outdoorSpace', 'garden', 'shed'] },
   { label: 'Permit Parking', path: ['property', 'parking', 'permitParking'] },
   { label: 'On Street Parking', path: ['property', 'parking', 'onStreet'] },
   

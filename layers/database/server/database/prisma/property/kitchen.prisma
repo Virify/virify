@@ -1,7 +1,7 @@
 model Kitchen {
   id            Int      @id @default(autoincrement())
-  roomNumber    Int?     
-  floor         Int?     
+  roomNumber    Int?
+  floor         Int?
   name          String?
   modern        Boolean  @default(false)
   openPlan      Boolean  @default(false)

@@ -22,7 +22,8 @@
             :address="address" :price-type="priceType" :property-type="property?.type?.name"
             :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-            :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+            :has-garden="hasGarden"
+            :has-land="hasLand"
             :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
@@ -49,8 +50,14 @@
               subtype="Reception" title="Receptions" />
             <MoleculesListingItemDetails v-if="property?.otherRoom" :items="property?.otherRoom" type="room"
               subtype="Other Rooms" title="Other Rooms" />
-            <MoleculesListingItemDetails v-if="property?.rearGarden || property?.frontGarden"
-              :items="getGardenItems(property)" type="garden" title="Gardens" :show-floor="false" />
+            <MoleculesListingItemDetails 
+              v-if="(property?.outdoorSpace?.garden && property.outdoorSpace.garden.length > 0) || (property?.outdoorSpace?.land && property.outdoorSpace.land.length > 0)"
+              :items="[...(property.outdoorSpace.garden || []), ...(property.outdoorSpace.land || [])]" 
+              type="outdoor" 
+              title="Outdoor Space" 
+              :show-floor="false" 
+              :total-garden-size="property.outdoorSpace.totalGardenSize"
+              :total-land-size="property.outdoorSpace.totalLandSize" />
           </div>
 
           <!-- Energy & Utilities -->
@@ -133,7 +140,8 @@
             :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
             :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-            :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+            :has-garden="hasGarden"
+            :has-land="hasLand"
             :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
@@ -152,7 +160,8 @@
         :price-type="priceType" :address="address" :property-type="property?.type?.name"
         :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
         :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-        :rear-garden="property?.rearGarden ? true : false" :front-garden="property?.frontGarden ? true : false"
+        :has-garden="hasGarden"
+        :has-land="hasLand"
         :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
         :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
         :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
@@ -235,17 +244,24 @@ const amenitiesArray = computed(() => {
   return Array.isArray(amenities) ? amenities : [amenities];
 });
 
-// Create garden items array for unified component
-const getGardenItems = (property: any) => {
-  const gardens = [];
-  if (property?.frontGarden) {
-    gardens.push({ ...property.frontGarden, gardenType: "front" });
-  }
-  if (property?.rearGarden) {
-    gardens.push({ ...property.rearGarden, gardenType: "rear" });
-  }
-  return gardens;
+// Helper function to check if property has a garden in a specific position
+const hasGardenByPosition = (position: 'FRONT' | 'REAR' | 'SIDE') => {
+  const gardens = property.value?.outdoorSpace?.garden;
+  if (!gardens || !Array.isArray(gardens)) return false;
+  return gardens.some((garden: any) => garden.position === position);
 };
+
+// Check if property has any garden
+const hasGarden = computed(() => {
+  const gardens = property.value?.outdoorSpace?.garden;
+  return gardens && Array.isArray(gardens) && gardens.length > 0;
+});
+
+// Check if property has any land
+const hasLand = computed(() => {
+  const land = property.value?.outdoorSpace?.land;
+  return land && Array.isArray(land) && land.length > 0;
+});
 
 /**
  *  Media

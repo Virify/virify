@@ -1,0 +1,16 @@
+model OutdoorSpace {
+  id              Int      @id @default(autoincrement())
+  description     String?
+  garden          Garden[]
+  totalGardenSize Float?
+  land            Land[]
+  totalLandSize   Float?
+  separateParcel  Boolean  @default(false)
+  propertyId      Int      @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+  media           Media[]
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}

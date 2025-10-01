@@ -1,0 +1,20 @@
+model Land {
+  id             Int     @id @default(autoincrement())
+  description    String?
+  name           String?
+  separateParcel Boolean @default(false)
+  woodland       Boolean @default(false)
+  paddock        Boolean @default(false)
+  stables        Boolean @default(false)
+  tennisCourt    Boolean @default(false)
+  orchard        Boolean @default(false)
+  pond           Boolean @default(false)
+  outbuilding    Boolean @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  media          Media[]
+  outdoorSpace   OutdoorSpace? @relation(fields: [outdoorSpaceId], references: [id])
+  outdoorSpaceId Int?
+
+  @@index([outdoorSpaceId])
+}

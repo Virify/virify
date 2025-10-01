@@ -21,7 +21,7 @@
     <!-- Property Icons -->
     <div class="o-listing-overview__icons">
       <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
-        :receptions="receptions" :other-rooms="otherRooms" :rear-garden="rearGarden" :front-garden="frontGarden"
+        :receptions="receptions" :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand"
         :classification="classification" />
     </div>
 
@@ -48,8 +48,8 @@ interface Props {
   yearBuilt?: string
   constructionType?: string
   chainFree?: boolean | null
-  rearGarden?: boolean
-  frontGarden?: boolean
+  hasGarden?: boolean
+  hasLand?: boolean
   available?: string
 }
 

@@ -85,9 +85,9 @@ export const useDraft = createSharedComposable(() => {
         update: updateDraftStepSix,
         component: CreateListingStepsStep6
       },
-      { title: 'Additional', complete: false },
+      { title: 'Outdoor & Utilities', complete: false },
+      { title: 'Additional Features', complete: false },
       { title: 'Energy', complete: false },
-      { title: 'Outdoor', complete: false },
       { title: 'Media', complete: false }
     ]);
   };

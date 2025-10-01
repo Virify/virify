@@ -13,10 +13,9 @@ export function mapFeatureToFilters(features: { group: string; key: string }[] |
       acc[group] = {};
     }
 
-    // Handle special case for "garden"
+    // Handle special case for "garden" - now under outdoorSpace
     if (key === "garden") {
-      acc[group]["frontGarden"] = true;
-      acc[group]["rearGarden"] = true;
+      acc["outdoorSpace"] = { garden: true };
     } else {
       acc[group][key] = true;
     }

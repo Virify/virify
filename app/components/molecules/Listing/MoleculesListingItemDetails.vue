@@ -36,6 +36,21 @@
                 <AtomsIcon icon="property/size" :size="24" />
                 {{ item.size }}sqmt
               </div>
+              <!-- Show Total Garden Size for garden items in outdoor type -->
+              <div v-if="props.type === 'outdoor' && 'position' in item && props.totalGardenSize" class="item-details__detail">
+                <AtomsIcon icon="property/size" :size="24" />
+                Total Garden Size: {{ props.totalGardenSize }}sqmt
+              </div>
+              <!-- Show Total Land Size for land items in outdoor type -->
+              <div v-if="props.type === 'outdoor' && ('woodland' in item || 'paddock' in item) && props.totalLandSize" class="item-details__detail">
+                <AtomsIcon icon="property/size" :size="24" />
+                Total Land Size: {{ props.totalLandSize }}sqmt
+              </div>
+              <!-- Legacy support for garden type -->
+              <div v-if="props.type === 'garden' && props.outdoorSpaceSize" class="item-details__detail">
+                <AtomsIcon icon="property/size" :size="24" />
+                Size (total): {{ props.outdoorSpaceSize }}sqmt
+              </div>
               <div v-if="showFloor && 'floor' in item && item.floor !== undefined" class="item-details__detail">
                 <AtomsIcon icon="property/floor" :size="24" />
                 {{ getFloorText((item as any).floor) }}
@@ -68,7 +83,7 @@ import type { Prisma } from "~~/layers/database/server/database/prisma/generated
 
 interface Props {
   title: string;
-  type: "room" | "garden";
+  type: "room" | "garden" | "outdoor";
   subtype?: string; // For room types like "Bedroom", "Bathroom", etc.
   items:
     | Prisma.BedroomGetPayload<{ include: { media: true } }>[]
@@ -81,6 +96,9 @@ interface Props {
     | undefined;
   showFloor?: boolean;
   variant?: "card" | "plain";
+  outdoorSpaceSize?: number | null;
+  totalGardenSize?: number | null;
+  totalLandSize?: number | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -131,8 +149,8 @@ const { modalPosition, openModal, closeModal } = useInfoModal(() => {
 
 // Helper functions
 const getSectionIcon = (): string => {
-  if (props.type === 'garden') {
-    return 'property/front-garden'; // or could be 'property/rear-garden'
+  if (props.type === 'garden' || props.type === 'outdoor') {
+    return 'property/rear-garden'; // Garden icon
   }
   
   // Use the existing room type icon logic based on subtype
@@ -141,14 +159,22 @@ const getSectionIcon = (): string => {
 };
 
 const getItemIcon = (item: any): string => {
-  if (props.type === "garden") {
-    return getGardenTypeIcon(item.gardenType);
+  if (props.type === "garden" || props.type === "outdoor") {
+    // Check if it's a Land item (has woodland, paddock, etc.) or Garden item
+    if ('woodland' in item || 'paddock' in item || 'stables' in item) {
+      return 'property/land';
+    }
+    return 'property/rear-garden';
   }
   return getRoomTypeIcon(item, props.subtype || "");
 };
 
 const getItemTitle = (item: any): string => {
-  if (props.type === "garden") {
+  if (props.type === "garden" || props.type === "outdoor") {
+    // Use the name field if available, otherwise fallback to old logic
+    if (item.name) {
+      return item.name;
+    }
     return getGardenType(item);
   }
   return getRoomType(item);
@@ -159,9 +185,20 @@ const getFeatures = (item: any): string[] => {
   if (!item || typeof item !== "object") return [];
 
   const features: string[] = [];
+  
+  // For gardens and outdoor space, add position and facing first (for garden items)
+  if ((props.type === "garden" || props.type === "outdoor") && item.position) {
+    features.push(convertRoomEnumToString(item.position));
+    if (item.facing) {
+      features.push(`${convertRoomEnumToString(item.facing)} Facing`);
+    }
+  }
+  
+  // Then add boolean features
   Object.entries(item).forEach(([key, value]) => {
     // Skip non-boolean properties or specific properties we handle separately
-    if (typeof value === "boolean" && value === true && key !== "description" && key !== "size") {
+    if (typeof value === "boolean" && value === true && 
+        key !== "description" && key !== "size" && key !== "separateParcel") {
       features.push(convertRoomEnumToString(key));
     }
   });

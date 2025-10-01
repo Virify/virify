@@ -68,6 +68,12 @@ CREATE TYPE "public"."BroadbandType" AS ENUM ('ADSL', 'FTTC', 'FTTP', 'CABLE', '
 CREATE TYPE "public"."OtherRoomType" AS ENUM ('OFFICE', 'STUDY', 'LIBRARY', 'GYM', 'WORKSHOP', 'POOL_ROOM', 'WINE_CELLAR', 'SPA', 'OTHER');
 
 -- CreateEnum
+CREATE TYPE "public"."GardenFacing" AS ENUM ('NORTH', 'EAST', 'SOUTH', 'WEST');
+
+-- CreateEnum
+CREATE TYPE "public"."GardenPosition" AS ENUM ('FRONT', 'REAR', 'SIDE');
+
+-- CreateEnum
 CREATE TYPE "public"."ConstructionType" AS ENUM ('STANDARD', 'NON_STANDARD');
 
 -- CreateEnum
@@ -293,9 +299,10 @@ CREATE TABLE "public"."Media" (
     "bathroomId" INTEGER,
     "receptionId" INTEGER,
     "otherRoomId" INTEGER,
-    "frontGardenId" INTEGER,
-    "rearGardenId" INTEGER,
     "kitchenId" INTEGER,
+    "gardenId" INTEGER,
+    "outdoorSpaceId" INTEGER,
+    "landId" INTEGER,
 
     CONSTRAINT "Media_pkey" PRIMARY KEY ("id")
 );
@@ -440,27 +447,6 @@ CREATE TABLE "public"."EnergyAndUtilities" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."FrontGarden" (
-    "id" SERIAL NOT NULL,
-    "description" TEXT,
-    "size" DOUBLE PRECISION,
-    "sunTerrace" BOOLEAN NOT NULL DEFAULT false,
-    "terrace" BOOLEAN NOT NULL DEFAULT false,
-    "balcony" BOOLEAN NOT NULL DEFAULT false,
-    "patio" BOOLEAN NOT NULL DEFAULT false,
-    "separateParcel" BOOLEAN NOT NULL DEFAULT false,
-    "shed" BOOLEAN NOT NULL DEFAULT false,
-    "summerHouse" BOOLEAN NOT NULL DEFAULT false,
-    "gardenOffice" BOOLEAN NOT NULL DEFAULT false,
-    "pool" BOOLEAN NOT NULL DEFAULT false,
-    "propertyId" INTEGER NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "FrontGarden_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "public"."Kitchen" (
     "id" SERIAL NOT NULL,
     "roomNumber" INTEGER,
@@ -512,6 +498,64 @@ CREATE TABLE "public"."OtherRoom" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "OtherRoom_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."Garden" (
+    "id" SERIAL NOT NULL,
+    "description" TEXT,
+    "name" TEXT,
+    "facing" "public"."GardenFacing",
+    "position" "public"."GardenPosition",
+    "sunTerrace" BOOLEAN NOT NULL DEFAULT false,
+    "terrace" BOOLEAN NOT NULL DEFAULT false,
+    "balcony" BOOLEAN NOT NULL DEFAULT false,
+    "patio" BOOLEAN NOT NULL DEFAULT false,
+    "separateParcel" BOOLEAN NOT NULL DEFAULT false,
+    "shed" BOOLEAN NOT NULL DEFAULT false,
+    "summerHouse" BOOLEAN NOT NULL DEFAULT false,
+    "gardenOffice" BOOLEAN NOT NULL DEFAULT false,
+    "pool" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "outdoorSpaceId" INTEGER,
+
+    CONSTRAINT "Garden_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."Land" (
+    "id" SERIAL NOT NULL,
+    "description" TEXT,
+    "name" TEXT,
+    "separateParcel" BOOLEAN NOT NULL DEFAULT false,
+    "woodland" BOOLEAN NOT NULL DEFAULT false,
+    "paddock" BOOLEAN NOT NULL DEFAULT false,
+    "stables" BOOLEAN NOT NULL DEFAULT false,
+    "tennisCourt" BOOLEAN NOT NULL DEFAULT false,
+    "orchard" BOOLEAN NOT NULL DEFAULT false,
+    "pond" BOOLEAN NOT NULL DEFAULT false,
+    "driveway" BOOLEAN NOT NULL DEFAULT false,
+    "outbuilding" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "outdoorSpaceId" INTEGER,
+
+    CONSTRAINT "Land_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."OutdoorSpace" (
+    "id" SERIAL NOT NULL,
+    "description" TEXT,
+    "totalGardenSize" DOUBLE PRECISION,
+    "totalLandSize" DOUBLE PRECISION,
+    "separateParcel" BOOLEAN NOT NULL DEFAULT false,
+    "propertyId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "OutdoorSpace_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -577,27 +621,6 @@ CREATE TABLE "public"."PropertyType" (
     "defaultSelected" BOOLEAN NOT NULL,
 
     CONSTRAINT "PropertyType_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."RearGarden" (
-    "id" SERIAL NOT NULL,
-    "description" TEXT,
-    "size" DOUBLE PRECISION,
-    "sunTerrace" BOOLEAN NOT NULL DEFAULT false,
-    "terrace" BOOLEAN NOT NULL DEFAULT false,
-    "balcony" BOOLEAN NOT NULL DEFAULT false,
-    "patio" BOOLEAN NOT NULL DEFAULT false,
-    "separateParcel" BOOLEAN NOT NULL DEFAULT false,
-    "shed" BOOLEAN NOT NULL DEFAULT false,
-    "summerHouse" BOOLEAN NOT NULL DEFAULT false,
-    "gardenOffice" BOOLEAN NOT NULL DEFAULT false,
-    "pool" BOOLEAN NOT NULL DEFAULT false,
-    "propertyId" INTEGER NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "RearGarden_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -981,16 +1004,22 @@ CREATE UNIQUE INDEX "EnergyAndUtilities_propertyId_key" ON "public"."EnergyAndUt
 CREATE INDEX "EnergyAndUtilities_propertyId_idx" ON "public"."EnergyAndUtilities"("propertyId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FrontGarden_propertyId_key" ON "public"."FrontGarden"("propertyId");
-
--- CreateIndex
-CREATE INDEX "FrontGarden_propertyId_idx" ON "public"."FrontGarden"("propertyId");
-
--- CreateIndex
 CREATE INDEX "Kitchen_propertyId_idx" ON "public"."Kitchen"("propertyId");
 
 -- CreateIndex
 CREATE INDEX "OtherRoom_propertyId_idx" ON "public"."OtherRoom"("propertyId");
+
+-- CreateIndex
+CREATE INDEX "Garden_outdoorSpaceId_idx" ON "public"."Garden"("outdoorSpaceId");
+
+-- CreateIndex
+CREATE INDEX "Land_outdoorSpaceId_idx" ON "public"."Land"("outdoorSpaceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OutdoorSpace_propertyId_key" ON "public"."OutdoorSpace"("propertyId");
+
+-- CreateIndex
+CREATE INDEX "OutdoorSpace_propertyId_idx" ON "public"."OutdoorSpace"("propertyId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Parking_propertyId_key" ON "public"."Parking"("propertyId");
@@ -1003,12 +1032,6 @@ CREATE INDEX "Property_addressId_idx" ON "public"."Property"("addressId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PropertyType_name_key" ON "public"."PropertyType"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "RearGarden_propertyId_key" ON "public"."RearGarden"("propertyId");
-
--- CreateIndex
-CREATE INDEX "RearGarden_propertyId_idx" ON "public"."RearGarden"("propertyId");
 
 -- CreateIndex
 CREATE INDEX "Reception_propertyId_idx" ON "public"."Reception"("propertyId");
@@ -1161,13 +1184,16 @@ ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_receptionId_fkey" FOREIGN KEY
 ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_otherRoomId_fkey" FOREIGN KEY ("otherRoomId") REFERENCES "public"."OtherRoom"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_frontGardenId_fkey" FOREIGN KEY ("frontGardenId") REFERENCES "public"."FrontGarden"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_rearGardenId_fkey" FOREIGN KEY ("rearGardenId") REFERENCES "public"."RearGarden"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_kitchenId_fkey" FOREIGN KEY ("kitchenId") REFERENCES "public"."Kitchen"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_gardenId_fkey" FOREIGN KEY ("gardenId") REFERENCES "public"."Garden"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_outdoorSpaceId_fkey" FOREIGN KEY ("outdoorSpaceId") REFERENCES "public"."OutdoorSpace"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Media" ADD CONSTRAINT "Media_landId_fkey" FOREIGN KEY ("landId") REFERENCES "public"."Land"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Membership" ADD CONSTRAINT "Membership_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1191,13 +1217,19 @@ ALTER TABLE "public"."Bedroom" ADD CONSTRAINT "Bedroom_propertyId_fkey" FOREIGN 
 ALTER TABLE "public"."EnergyAndUtilities" ADD CONSTRAINT "EnergyAndUtilities_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."FrontGarden" ADD CONSTRAINT "FrontGarden_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "public"."Kitchen" ADD CONSTRAINT "Kitchen_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."OtherRoom" ADD CONSTRAINT "OtherRoom_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Garden" ADD CONSTRAINT "Garden_outdoorSpaceId_fkey" FOREIGN KEY ("outdoorSpaceId") REFERENCES "public"."OutdoorSpace"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Land" ADD CONSTRAINT "Land_outdoorSpaceId_fkey" FOREIGN KEY ("outdoorSpaceId") REFERENCES "public"."OutdoorSpace"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."OutdoorSpace" ADD CONSTRAINT "OutdoorSpace_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Parking" ADD CONSTRAINT "Parking_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1219,9 +1251,6 @@ ALTER TABLE "public"."Property" ADD CONSTRAINT "Property_propertyClassificationI
 
 -- AddForeignKey
 ALTER TABLE "public"."PropertyClassification" ADD CONSTRAINT "PropertyClassification_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "public"."PropertyType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."RearGarden" ADD CONSTRAINT "RearGarden_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Reception" ADD CONSTRAINT "Reception_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "public"."Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;

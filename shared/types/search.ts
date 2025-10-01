@@ -59,8 +59,14 @@ export interface SearchResult {
     reception?: any
     otherRooms?: any
     utility?: any
-    frontGarden?: any
-    rearGarden?: any
+    outdoorSpace?: {
+      description?: string | null
+      garden?: any[]
+      land?: any[]
+      totalGardenSize?: number | null
+      totalLandSize?: number | null
+      separateParcel?: boolean
+    }
     energyAndUtilities?: any
     securityFeatures?: any
     storageFeatures?: any

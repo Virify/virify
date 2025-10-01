@@ -44,8 +44,8 @@
             :bathrooms="bathrooms"
             :receptions="receptions"
             :other-rooms="otherRooms"
-            :rear-garden="rearGarden"
-            :front-garden="frontGarden"
+            :has-garden="hasGarden"
+            :has-land="hasLand"
             :classification="classification"
           />
 
@@ -102,8 +102,8 @@ interface Props {
   yearBuilt?: string
   constructionType?: string
   chainFree?: boolean | null
-  rearGarden?: boolean
-  frontGarden?: boolean
+  hasGarden?: boolean
+  hasLand?: boolean
   listingId?: number
   agent?: {
     username?: string | null

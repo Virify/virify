@@ -19,7 +19,7 @@
     </p>
 
     <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
-      :receptions="receptions" :other-rooms="otherRooms" :rear-garden="rearGarden" :front-garden="frontGarden"
+      :receptions="receptions" :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand"
       :classification="classification" />
 
     <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree" :year-built="newBuild"
@@ -58,8 +58,8 @@ interface Props {
     createdAt?: Date | String | null
     avatar?: string | null
   }
-  rearGarden?: boolean
-  frontGarden?: boolean
+  hasGarden?: boolean
+  hasLand?: boolean
   available?: string
 }
 

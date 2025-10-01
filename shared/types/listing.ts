@@ -42,13 +42,18 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
           },
         },
         utility: true,
-        rearGarden: {
+        outdoorSpace: {
           include: {
-            media: true,
-          },
-        },
-        frontGarden: {
-          include: {
+            garden: {
+              include: {
+                media: true,
+              },
+            },
+            land: {
+              include: {
+                media: true,
+              },
+            },
             media: true,
           },
         },
@@ -179,8 +184,12 @@ export const listingCardFields = {
           garage: true,
         },
       },
-      rearGarden: true,
-      frontGarden: true,
+      outdoorSpace: {
+        select: {
+          garden: true,
+          land: true,
+        },
+      },
     },
   },
   user: {

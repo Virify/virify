@@ -316,22 +316,17 @@ otherRoom (property.otherRoom): ARRAY (use {some: {...}})
 - hardwoodFlooring: Boolean
 - builtInDesk: Boolean
 
-rearGarden (property.rearGarden):
-- size: Float
+outdoorSpace (property.outdoorSpace):
 - description: String
-- sunTerrace: Boolean
-- terrace: Boolean
-- balcony: Boolean
-- patio: Boolean
+- land: Boolean
+- size: Float
 - separateParcel: Boolean
-- shed: Boolean
-- summerHouse: Boolean
-- gardenOffice: Boolean
-- pool: Boolean
+- garden: Array (contains multiple gardens, each with position: FRONT/REAR/SIDE)
 
-frontGarden (property.frontGarden):
-- size: Float
+garden (property.outdoorSpace.garden):
 - description: String
+- facing: Enum (NORTH, EAST, SOUTH, WEST)
+- position: Enum (FRONT, REAR, SIDE)
 - sunTerrace: Boolean
 - terrace: Boolean
 - balcony: Boolean
@@ -426,10 +421,11 @@ ARRAY/RELATION/ENUM RULES:
 - For enum arrays (primaryHeatingType, renewables, connectedUtilities, bed): use {"has": "ENUM_VALUE"}
 - For single-value enums (e.g., broadbandType, boilerType, hotWaterSource): filter as { field: "ENUM_VALUE" } (e.g., { "broadbandType": "FTTP" })
 - NEVER use { "has": ... } for single-value enums. Only use { "has": ... } for enum arrays (e.g., primaryHeatingType, renewables, connectedUtilities, bed).
-- For single object relations (kitchenFeatures, rearGarden, frontGarden, etc.): you MUST use the Prisma relation filter syntax: { relationName: { is: { field: value } } } or { relationName: { isNot: null } } for existence (e.g., property.rearGarden: { isNot: null } or property.rearGarden: { is: { patio: true } })
+- For single object relations (kitchenFeatures, outdoorSpace, etc.): you MUST use the Prisma relation filter syntax: { relationName: { is: { field: value } } } or { relationName: { isNot: null } } for existence (e.g., property.outdoorSpace: { isNot: null } or property.outdoorSpace: { is: { land: true } })
+- For gardens: use property.outdoorSpace: { is: { garden: { some: { position: "REAR", patio: true } } } } to filter for specific garden features. Gardens are now nested under outdoorSpace.
 - DO NOT use additionalFeatures as a filter in the query. The additionalFeatures relation is NOT available as a filter in the Prisma PropertyWhereInput type. Any query that attempts to filter by property.additionalFeatures will cause a FATAL ERROR and must be rejected. This includes filtering for petFriendly, homeOffice, or any other field inside additionalFeatures. These cannot be filtered directly and must be ignored in the query.
 - For type/classification: use {name: "..."} (e.g., property.type: {name: "House"})
-- NEVER use invented fields (e.g., garden: true is INVALID; use property.rearGarden: { isNot: null } or property.frontGarden: { isNot: null } for existence)
+- NEVER use invented fields. For gardens, use property.outdoorSpace: { is: { garden: { some: { ... } } } } or property.outdoorSpace: { isNot: null } for existence
 - NEVER use "has" for object relations; only for enum arrays
 - saleListing and rentalListing (and all their fields, e.g. furnished) MUST ONLY appear at the ROOT level of the query, NEVER inside property or any nested object. Any query with saleListing or rentalListing inside property is INVALID.
 - Respond with ONLY valid JSON, no comments, no markdown
@@ -437,6 +433,7 @@ ARRAY/RELATION/ENUM RULES:
 - Other rooms (otherRoom) include office spaces, studies, libraries, gyms, workshops, pool rooms, wine cellars, spas, etc. Use otherRoom for office-related queries (home office, study, etc.).
 
 COMMON USER TERM MAPPINGS (map these user terms to correct schema fields):
+- "garden" → property.outdoorSpace: { is: { garden: { some: {} } } } (for existence) OR property.outdoorSpace: { is: { garden: { some: { position: "REAR" } } } } (for specific position)
 - "conservatory" → property.reception: { some: { conservatory: true } }
 - "bay window" → property.reception: { some: { bayWindow: true } } OR property.otherRoom: { some: { bayWindow: true } } OR property.bedroomFeatures: { some: { bayWindow: true } }
 - "built-in storage" → property.reception: { some: { builtInStorage: true } } OR property.otherRoom: { some: { builtInStorage: true } } OR property.bedroomFeatures: { some: { builtInStorage: true } }
@@ -555,14 +552,20 @@ EXAMPLES:
   "queryAnalysis": {"usedTerms": ["bedroom", "en suite", "walk-in", "wardrobe"], "ignoredTerms": []}
 }
 
-// VALID EXAMPLE (property features):
+// VALID EXAMPLE (property features with garden):
 // "property with rear garden and driveway" →
 {
   "whereClause": {
     "published": true,
     "property": {
-      "rearGarden": { "isNot": null },
-      "parking": {"driveway": true}
+      "outdoorSpace": { 
+        "is": { 
+          "garden": { 
+            "some": { "position": "REAR" } 
+          } 
+        } 
+      },
+      "parking": {"is": {"driveway": true}}
     }
   },
   "queryAnalysis": {"usedTerms": ["rear", "garden", "driveway"], "ignoredTerms": []}
@@ -575,8 +578,8 @@ EXAMPLES:
     "published": true,
     "property": {
       "type": {"name": "Flat"},
-      "energyAndUtilities": {"broadbandType": "FTTP"},
-      "livingAreaFeatures": {"balcony": true}
+      "energyAndUtilities": {"is": {"broadbandType": "FTTP"}},
+      "bedroomFeatures": {"some": {"balcony": true}}
     }
   },
   "queryAnalysis": {"usedTerms": ["flat", "FTTP", "broadband", "balcony"], "ignoredTerms": []}
@@ -718,7 +721,7 @@ EXAMPLES:
 //     "property": {
 //       "type": { "name": "House" },
 //       // petFriendly cannot be filtered directly due to Prisma limitations
-//       "rearGarden": { "isNot": null }
+//       "outdoorSpace": { "is": { "garden": { "some": {} } } }
 //     }
 //   },
 //   "queryAnalysis": { "usedTerms": ["pet friendly", "house", "garden"], "ignoredTerms": ["pet friendly"] }
@@ -731,8 +734,7 @@ EXAMPLES:
 //     "property": {
 //       "type": { "name": "House" },
 //       // petFriendly cannot be filtered directly due to Prisma limitations
-//       "rearGarden": { "isNot": null },
-//       "frontGarden": { "isNot": null }
+//       "outdoorSpace": { "is": { "garden": { "some": {} } } }
 //     }
 //   },
 //   "queryAnalysis": { "usedTerms": ["pet friendly", "house", "gardens"], "ignoredTerms": ["pet friendly"] }

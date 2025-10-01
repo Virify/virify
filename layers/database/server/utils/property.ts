@@ -36,13 +36,18 @@ export const propertyInclude = {
     },
   },
   utility: true,
-  rearGarden: {
+  outdoorSpace: {
     include: {
-      media: true,
-    },
-  },
-  frontGarden: {
-    include: {
+      garden: {
+        include: {
+          media: true,
+        },
+      },
+      land: {
+        include: {
+          media: true,
+        },
+      },
       media: true,
     },
   },
