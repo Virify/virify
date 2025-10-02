@@ -1,11 +1,12 @@
 <template>
+  <OrganismsDraftBaseRoomForm>
   <div class="o-garden-form">
-    <div class="o-garden-form__items">
+    <div class="o-base-room-form__items">
       <div
         v-for="(garden, index) in localGardens"
         :key="index"
         :ref="(el) => setRoomRef(el, index)"
-        class="o-garden-form__item"
+        class="o-base-room-form__item"
         :class="{ 'o-garden-form__item--collapsed': isRoomCollapsed(index) }"
       >
         <AtomsCollapsibleHeader
@@ -14,7 +15,7 @@
           :is-collapsed="!expandedRooms.has(index)"
           variant="inline"
           @toggle="toggleRoom(index)"
-          class="o-garden-form__item-title"
+          class="o-base-room-form__item-title"
         >
           <template #actions>
             <button
@@ -35,9 +36,9 @@
           </template>
         </AtomsCollapsibleHeader>
 
-        <div v-else class="o-garden-form__item-header">
-          <h4 class="o-garden-form__item-title | body-md font-semibold">Garden {{ index + 1 }}</h4>
-          <div class="o-garden-form__item-actions">
+        <div v-else class="o-base-room-form__item-header">
+          <h4 class="o-base-room-form__item-title | body-md font-semibold">Garden {{ index + 1 }}</h4>
+          <div class="o-base-room-form__item-actions">
             <button
               type="button"
               @click="removeRoom(index)"
@@ -57,8 +58,8 @@
         </div>
 
         <Transition name="accordion">
-          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-garden-form__item-content">
-            <div class="o-garden-form__form-grid">
+          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-base-room-form__item-content">
+            <div class="o-base-room-form__form-grid">
               <OrganismsDraftFormTextGroup
                 title="Garden Name"
                 v-model="garden.name"
@@ -126,7 +127,7 @@
               @update:modelValue="updateGardenFeatures(garden, $event)"
             />
 
-            <div class="o-garden-form__form-actions">
+            <div class="o-base-room-form__form-actions">
               <button
                 type="button"
                 @click="saveRoom(index)"
@@ -150,7 +151,7 @@
       </div>
     </div>
 
-    <div class="o-garden-form__add-item" v-show="!hasOpenRoomForm">
+    <div class="o-base-room-form__add-item" v-show="!hasOpenRoomForm">
       <button
         type="button"
         @click="addRoom"
@@ -161,6 +162,8 @@
       </button>
     </div>
   </div>
+
+  </OrganismsDraftBaseRoomForm>
 </template>
 
 <script setup lang="ts">

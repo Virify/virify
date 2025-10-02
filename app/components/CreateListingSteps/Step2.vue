@@ -186,20 +186,3 @@ function submitForm() {
   );
 }
 </script>
-<style lang="scss">
-// inherited from step 1
-.step {
-  &__form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: var(--size-32);
-    flex-wrap: wrap;
-    gap: var(--size-16);
-
-    &--right {
-      display: flex;
-      gap: var(--size-16);
-    }
-  }
-}
-</style>

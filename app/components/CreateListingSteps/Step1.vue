@@ -172,33 +172,7 @@ function submitForm() {
       
       emit('updateStepData', stepData, 1);
     },
-    () => emit('nextStep')
+        () => emit('nextStep')
   );
 }
 </script>
-<!-- all step components will inherit these styles - they are NOT scoped -->
-<style lang="scss">
-.step {
-  &__title {
-    color: var(--secondary-400);
-    margin-bottom: var(--size-4);
-  }
-
-  &__info {
-    margin: var(--size-16) 0;
-  }
-
-  &__required {
-    color: var(--error);
-  }
-
-  &__form {
-    display: flex;
-    flex-direction: column;
-
-    &-action {
-      align-self: flex-end;
-    }
-  }
-}
-</style>

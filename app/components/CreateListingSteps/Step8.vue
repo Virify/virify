@@ -318,25 +318,3 @@ function submitForm() {
 }
 </script>
 
-<style lang="scss">
-.step {
-  &__section {
-    border-bottom: 1px solid var(--border-200);
-
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-
-  &__section-title {
-    display: flex;
-    justify-content: flex-start;
-    color: var(--secondary-400);
-    margin-bottom: 0;
-
-    &--require {
-      color: var(--error);
-    }
-  }
-}
-</style>

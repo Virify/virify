@@ -134,14 +134,3 @@ function submitForm() {
 }
 </script>
 
-<style lang="scss">
-.step {
-  &__section {
-    border-bottom: 1px solid var(--border-200);
-
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-}
-</style>

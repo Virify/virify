@@ -166,15 +166,3 @@ function submitForm() {
 }
 
 </script>
-<style lang="scss">
-.step {
-  &__form {
-    &-price-input {
-      input {
-        margin: 0 auto;
-        max-width: 200px;
-      }
-    }
-  }
-}
-</style>

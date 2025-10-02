@@ -1,4 +1,5 @@
 <template>
+  <OrganismsDraftBaseRoomForm>
   <div class="o-other-room-form">
     <div class="o-other-room-form__items">
       <div
@@ -211,6 +212,8 @@
       </button>
     </div>
   </div>
+
+  </OrganismsDraftBaseRoomForm>
 </template>
 
 <script setup lang="ts">
@@ -325,90 +328,3 @@ function setOtherRoomFireplaceValue(room: any, value: string) {
 }
 </script>
 
-<style lang="scss">
-.o-other-room-form {
-  &__items {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__item {
-    padding: var(--size-16) 0;
-    border: 1px solid var(--border-200);
-    border-radius: var(--radius-lg);
-    background: var(--background-50);
-
-    &--collapsed {
-      background: var(--background-25);
-      border-color: var(--border-100);
-
-      .collapsible-header {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  &__item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: var(--size-16);
-    border-bottom: 1px solid var(--border-100);
-  }
-
-  &__item-actions {
-    display: flex;
-    gap: var(--size-8);
-    align-items: center;
-  }
-
-  &__item-title {
-    color: var(--secondary-400);
-  }
-
-  &__item-content {
-    overflow: hidden;
-  }
-
-  .accordion-enter-active,
-  .accordion-leave-active {
-    transition: all 0.3s ease-in-out;
-    max-height: 1000px;
-    opacity: 1;
-  }
-
-  .accordion-enter-from,
-  .accordion-leave-to {
-    max-height: 0;
-    opacity: 0;
-  }
-
-  &__form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--size-24);
-    margin-bottom: var(--size-24);
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-
-    .o-form-group {
-      padding: 0;
-    }
-  }
-
-  &__form-actions {
-    display: flex;
-    justify-content: center;
-    gap: var(--size-12);
-    margin-top: var(--size-24);
-    margin-bottom: var(--size-24);
-  }
-
-  &__add-item {
-    display: flex;
-    justify-content: center;
-  }
-}
-</style>

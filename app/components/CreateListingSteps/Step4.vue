@@ -211,11 +211,17 @@ function submitForm() {
 }
 
 </script>
+
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
 
+// Step 4 specific - address form styles
 .step {
   &__form {
+    &-search {
+      margin-bottom: var(--size-24);
+    }
+
     &-instruction {
       display: flex;
       align-items: flex-start;
@@ -223,28 +229,18 @@ function submitForm() {
       justify-content: flex-start;
       gap: var(--size-16);
       margin-bottom: var(--size-24);
-      padding: var(--size-16) 0;
+      padding: var(--size-16);
       background: var(--background-200);
-      border-radius: var(--border-radius-md);
+      border-radius: var(--radius-md);
 
       @include mq.desktop {
         flex-direction: row;
-        align-items: flex-start;
         align-items: center;
       }
     }
 
-    &-change-link {
-      background: none;
-      border: none;
-      color: var(--primary-500);
-      cursor: pointer;
-      text-decoration: underline;
-      padding: 0;
-
-      &:hover {
-        color: var(--primary-600);
-      }
+    &-manual {
+      margin-top: var(--size-24);
     }
 
     &-address-grid {
@@ -254,13 +250,6 @@ function submitForm() {
 
       @include mq.tablet {
         grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    &-price-input {
-      input {
-        margin: 0 auto;
-        max-width: 200px;
       }
     }
   }

@@ -1,11 +1,12 @@
 <template>
+  <OrganismsDraftBaseRoomForm>
   <div class="o-kitchen-form">
-    <div class="o-kitchen-form__items">
+    <div class="o-base-room-form__items">
       <div
         v-for="(kitchen, index) in localKitchens"
         :key="index"
         :ref="(el) => setRoomRef(el, index)"
-        class="o-kitchen-form__item"
+        class="o-base-room-form__item"
         :class="{ 'o-kitchen-form__item--collapsed': isRoomCollapsed(index) }"
       >
         <AtomsCollapsibleHeader
@@ -14,7 +15,7 @@
           :is-collapsed="!expandedRooms.has(index)"
           variant="inline"
           @toggle="toggleRoom(index)"
-          class="o-kitchen-form__item-title"
+          class="o-base-room-form__item-title"
         >
           <template #actions>
             <button
@@ -35,9 +36,9 @@
           </template>
         </AtomsCollapsibleHeader>
 
-        <div v-else class="o-kitchen-form__item-header">
-          <h4 class="o-kitchen-form__item-title | body-md font-semibold">Kitchen {{ index + 1 }}</h4>
-          <div class="o-kitchen-form__item-actions">
+        <div v-else class="o-base-room-form__item-header">
+          <h4 class="o-base-room-form__item-title | body-md font-semibold">Kitchen {{ index + 1 }}</h4>
+          <div class="o-base-room-form__item-actions">
             <button
               type="button"
               @click="removeRoom(index)"
@@ -57,8 +58,8 @@
         </div>
 
         <Transition name="accordion">
-          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-kitchen-form__item-content">
-            <div class="o-kitchen-form__form-grid">
+          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-base-room-form__item-content">
+            <div class="o-base-room-form__form-grid">
               <OrganismsDraftFormTextGroup
                 title="Kitchen Name"
                 v-model="kitchen.name"
@@ -152,7 +153,7 @@
               </template>
             </OrganismsDraftFormSizeToggle>
 
-            <div class="o-kitchen-form__form-actions">
+            <div class="o-base-room-form__form-actions">
               <button
                 type="button"
                 @click="saveRoom(index)"
@@ -176,7 +177,7 @@
       </div>
     </div>
 
-    <div class="o-kitchen-form__add-item" v-show="!hasOpenRoomForm">
+    <div class="o-base-room-form__add-item" v-show="!hasOpenRoomForm">
       <button
         type="button"
         @click="addRoom"
@@ -187,6 +188,8 @@
       </button>
     </div>
   </div>
+
+  </OrganismsDraftBaseRoomForm>
 </template>
 
 <script setup lang="ts">
@@ -275,90 +278,3 @@ function updateKitchenFeatures(kitchen: any, selectedFeatures: string[]) {
 }
 </script>
 
-<style lang="scss">
-.o-kitchen-form {
-  &__items {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__item {
-    padding: var(--size-16) 0;
-    border: 1px solid var(--border-200);
-    border-radius: var(--radius-lg);
-    background: var(--background-50);
-
-    &--collapsed {
-      background: var(--background-25);
-      border-color: var(--border-100);
-
-      .collapsible-header {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  &__item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: var(--size-16);
-    border-bottom: 1px solid var(--border-100);
-  }
-
-  &__item-actions {
-    display: flex;
-    gap: var(--size-8);
-    align-items: center;
-  }
-
-  &__item-title {
-    color: var(--secondary-400);
-  }
-
-  &__item-content {
-    overflow: hidden;
-  }
-
-  .accordion-enter-active,
-  .accordion-leave-active {
-    transition: all 0.3s ease-in-out;
-    max-height: 1000px;
-    opacity: 1;
-  }
-
-  .accordion-enter-from,
-  .accordion-leave-to {
-    max-height: 0;
-    opacity: 0;
-  }
-
-  &__form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--size-24);
-    margin-bottom: var(--size-24);
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-
-    .o-form-group {
-      padding: 0;
-    }
-  }
-
-  &__form-actions {
-    display: flex;
-    justify-content: center;
-    gap: var(--size-12);
-    margin-top: var(--size-24);
-    margin-bottom: var(--size-24);
-  }
-
-  &__add-item {
-    display: flex;
-    justify-content: center;
-  }
-}
-</style>

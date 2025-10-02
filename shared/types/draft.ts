@@ -105,6 +105,26 @@ export type StepNine = {
   }
 }
 
+export type StepTen = {
+  property: {
+    bedroomFeatures: Omit<Bedroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'>[]
+    bathroomFeatures: Omit<Bathroom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'>[]
+    kitchenFeatures: Omit<Kitchen, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'>[]
+    reception: Omit<Reception, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'>[]
+    otherRoom: Omit<OtherRoom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'>[]
+    outdoorSpace: {
+      garden: Omit<Garden, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt'>[]
+      land: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt'>[]
+    }
+    media: {
+      url: string
+      type: 'image' | 'video'
+      description: string | null
+      isCover: boolean
+    }[]
+  }
+}
+
 export type DraftListingWithFullPayload = Prisma.DraftListingGetPayload<{
   include: {
     rentalListing: true,

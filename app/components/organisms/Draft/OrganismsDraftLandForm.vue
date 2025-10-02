@@ -1,11 +1,12 @@
 <template>
-  <div class="o-land-form">
-    <div class="o-land-form__items">
-      <div
-        v-for="(land, index) in localLands"
-        :key="index"
-        :ref="(el) => setRoomRef(el, index)"
-        class="o-land-form__item"
+  <OrganismsDraftBaseRoomForm>
+    <div class="o-land-form">
+      <div class="o-base-room-form__items">
+        <div
+          v-for="(land, index) in localLands"
+          :key="index"
+          :ref="(el) => setRoomRef(el, index)"
+          class="o-base-room-form__item"
         :class="{ 'o-land-form__item--collapsed': isRoomCollapsed(index) }"
       >
         <AtomsCollapsibleHeader
@@ -14,7 +15,7 @@
           :is-collapsed="!expandedRooms.has(index)"
           variant="inline"
           @toggle="toggleRoom(index)"
-          class="o-land-form__item-title"
+          class="o-base-room-form__item-title"
         >
           <template #actions>
             <button
@@ -35,9 +36,9 @@
           </template>
         </AtomsCollapsibleHeader>
 
-        <div v-else class="o-land-form__item-header">
-          <h4 class="o-land-form__item-title | body-md font-semibold">Land {{ index + 1 }}</h4>
-          <div class="o-land-form__item-actions">
+        <div v-else class="o-base-room-form__item-header">
+          <h4 class="o-base-room-form__item-title | body-md font-semibold">Land {{ index + 1 }}</h4>
+          <div class="o-base-room-form__item-actions">
             <button
               type="button"
               @click="removeRoom(index)"
@@ -57,8 +58,8 @@
         </div>
 
         <Transition name="accordion">
-          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-land-form__item-content">
-            <div class="o-land-form__form-grid">
+          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-base-room-form__item-content">
+            <div class="o-base-room-form__form-grid">
               <OrganismsDraftFormTextGroup
                 title="Land Name"
                 v-model="land.name"
@@ -98,7 +99,7 @@
               @update:modelValue="updateLandFeatures(land, $event)"
             />
 
-            <div class="o-land-form__form-actions">
+            <div class="o-base-room-form__form-actions">
               <button
                 type="button"
                 @click="saveRoom(index)"
@@ -122,7 +123,7 @@
       </div>
     </div>
 
-    <div class="o-land-form__add-item" v-show="!hasOpenRoomForm">
+    <div class="o-base-room-form__add-item" v-show="!hasOpenRoomForm">
       <button
         type="button"
         @click="addRoom"
@@ -133,6 +134,7 @@
       </button>
     </div>
   </div>
+  </OrganismsDraftBaseRoomForm>
 </template>
 
 <script setup lang="ts">
