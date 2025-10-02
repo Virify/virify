@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 const stepDataSchema = z.object({
   draftId: z.number().int().positive(),
@@ -7,13 +8,13 @@ const stepDataSchema = z.object({
     .object({
       deposit: z.number().positive().nullable().optional(),
       holdingDeposit: z.number().positive().nullable().optional(),
-      rentFrequency: z.enum(["WEEKLY", "MONTHLY"]).nullable().optional(),
+      rentFrequency: z.enum(Object.values(RentalPriceType)).nullable().optional(),
       rentalLength: z.number().int().positive().nullable().optional(),
     })
     .optional(),
   saleListing: z
     .object({
-      priceType: z.enum(["FIXED", "OFFERS_OVER", "GUIDE_PRICE"]).nullable().optional(),
+      priceType: z.enum(Object.values(SalePriceType)).nullable().optional(),
     })
     .optional(),
 });

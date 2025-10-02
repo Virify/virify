@@ -95,23 +95,15 @@ export const stepFiveValidation = {
   },
 
   /**
-   * Check if draft has existing step five data
+   * Check if step five has been visited (bedroom/bathroom arrays exist)
    * @param draft Draft listing
-   * @returns True if draft has complete step five data
+   * @returns True if bedroom or bathroom features arrays exist
    */
   hasExistingStepFiveData: (draft: DraftListingWithFullPayload): boolean => {
+    // Arrays are always created, so check if any rooms have been added
     const bedrooms = draft.property?.bedroomFeatures || [];
     const bathrooms = draft.property?.bathroomFeatures || [];
     
-    // Has data if there are any rooms added
-    const hasData = bedrooms.length > 0 || bathrooms.length > 0;
-    
-    if (!hasData) {
-      // no rooms added - optional step, consider complete
-      return true;
-    }
-    
-    return stepFiveValidation.areBedroomFeaturesValid(bedrooms) &&
-           stepFiveValidation.areBathroomFeaturesValid(bathrooms);
+    return bedrooms.length > 0 || bathrooms.length > 0;
   }
 };

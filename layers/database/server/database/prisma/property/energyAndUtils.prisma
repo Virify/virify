@@ -4,7 +4,7 @@ model EnergyAndUtilities {
   description          String?
   epcRating            EPCRating
   epcCertificateUrl    String?
-  primaryHeatingType   HeatingType[]        @default([NILL])
+  primaryHeatingType   HeatingType[]
   secondaryHeatingType HeatingType[]
   boilerType           BoilerType?
   hotWaterSource       HotWaterSource?
@@ -45,7 +45,6 @@ enum HeatingType {
   PASSIVE
   SOLAR_THERMAL
   OTHER
-  NILL
 }
 
 enum BoilerType {
@@ -53,7 +52,6 @@ enum BoilerType {
   SYSTEM
   CONVENTIONAL
   BACK_BOILER
-  UNKNOWN
 }
 
 enum HotWaterSource {
@@ -89,5 +87,4 @@ enum BroadbandType {
   FTTP
   CABLE
   MOBILE
-  UNKNOWN
 }

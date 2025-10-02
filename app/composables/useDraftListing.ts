@@ -183,6 +183,24 @@ export const useDraftListing = createSharedComposable(() => {
     return updateDraftStep('seven', draftId, stepData);
   }
 
+  /**
+   * Updates the eighth step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the eighth step
+   */
+  async function updateDraftStepEight(draftId: number, stepData: StepEight) {
+    return updateDraftStep('eight', draftId, stepData);
+  }
+
+  /**
+   * Updates the ninth step of a draft listing.
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the ninth step
+   */
+  async function updateDraftStepNine(draftId: number, stepData: StepNine) {
+    return updateDraftStep('nine', draftId, stepData);
+  }
+
   return {
     draftListings,
     draftListing,
@@ -199,5 +217,7 @@ export const useDraftListing = createSharedComposable(() => {
     updateDraftStepFive,
     updateDraftStepSix,
     updateDraftStepSeven,
+    updateDraftStepEight,
+    updateDraftStepNine,
   };
 });

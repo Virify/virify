@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { BedSizeType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 // Validate payload to match Prisma Bedroom and Bathroom models and StepFive type (now includes both)
 const bedroomBathroomSchema = z.object({
@@ -12,7 +13,7 @@ const bedroomBathroomSchema = z.object({
           roomNumber: z.coerce.number().int().min(1),
           description: z.string().max(500).nullable().optional(),
           floor: z.coerce.number().int().min(1),
-          bed: z.array(z.enum(["SINGLE", "DOUBLE", "QUEEN", "KING", "SUPER_KING"])).min(1),
+          bed: z.array(z.enum(Object.values(BedSizeType))).min(1),
           size: z.coerce.number().min(0).nullable().optional(),
           enSuite: z.boolean().optional(),
           builtInStorage: z.boolean().optional(),

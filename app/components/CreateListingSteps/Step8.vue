@@ -27,7 +27,13 @@
         name="additional-features-description"
         placeholder="Describe additional features..."
         :expanded="true"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Describe any special features, amenities, or unique selling points of the property that don\'t fit in other categories.'
+          ]" />
+        </template>
+      </OrganismsDraftFormTextGroup>
 
       <OrganismsDraftFormCheckboxGroup
         title="Features"
@@ -35,7 +41,13 @@
         :model-value="additionalFeatures.selected.value"
         @update:modelValue="additionalFeatures.update"
         name="additional-features"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Select amenities and features that add value to the property, such as pet-friendly policies, pool, gym, concierge services, etc.'
+          ]" />
+        </template>
+      </OrganismsDraftFormCheckboxGroup>
     </div>
 
     <AtomsDivider />
@@ -44,7 +56,6 @@
     <div class="step__section">
       <MoleculesDraftFormHeading 
         title="Parking" 
-        :required="false"
         variant="section"
       />
       <em class="body-xs">Optional, add parking details</em>
@@ -55,7 +66,13 @@
         name="parking-description"
         placeholder="Describe parking arrangements..."
         :expanded="true"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Provide details about parking availability, number of spaces, restrictions, or costs associated with parking.'
+          ]" />
+        </template>
+      </OrganismsDraftFormTextGroup>
 
       <OrganismsDraftFormCheckboxGroup
         title="Parking Options"
@@ -63,7 +80,13 @@
         :model-value="parkingFeatures.selected.value"
         @update:modelValue="parkingFeatures.update"
         name="parking"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Select the types of parking available, such as garage, driveway, permit parking, EV charging, etc.'
+          ]" />
+        </template>
+      </OrganismsDraftFormCheckboxGroup>
     </div>
 
     <AtomsDivider />
@@ -83,7 +106,13 @@
         name="security-description"
         placeholder="Describe security features..."
         :expanded="true"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Detail the security measures in place, including systems, monitoring, and physical security features.'
+          ]" />
+        </template>
+      </OrganismsDraftFormTextGroup>
 
       <OrganismsDraftFormCheckboxGroup
         title="Security Options"
@@ -91,7 +120,13 @@
         :model-value="securityFeatures.selected.value"
         @update:modelValue="securityFeatures.update"
         name="security"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Select the security features available, such as CCTV, alarm systems, gated community, 24/7 security, etc.'
+          ]" />
+        </template>
+      </OrganismsDraftFormCheckboxGroup>
     </div>
 
     <AtomsDivider />
@@ -111,7 +146,13 @@
         name="accessibility-description"
         placeholder="Describe accessibility features..."
         :expanded="true"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Describe accessibility adaptations and features that make the property suitable for people with mobility challenges or disabilities.'
+          ]" />
+        </template>
+      </OrganismsDraftFormTextGroup>
 
       <OrganismsDraftFormCheckboxGroup
         title="Accessibility Options"
@@ -119,7 +160,13 @@
         :model-value="accessibilityFeatures.selected.value"
         @update:modelValue="accessibilityFeatures.update"
         name="accessibility"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Select accessibility features available, such as wheelchair access, step-free entry, wide doorways, elevator, wet room, etc.'
+          ]" />
+        </template>
+      </OrganismsDraftFormCheckboxGroup>
     </div>
 
     <AtomsDivider />
@@ -139,7 +186,15 @@
         name="storage-description"
         placeholder="Describe storage features..."
         :expanded="true"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs
+            :paragraphs="[
+              'Detail the storage facilities available with the property, including built-in wardrobes, cupboards, loft storage, shed, or garage storage space.',
+            ]"
+          />
+        </template>
+      </OrganismsDraftFormTextGroup>
 
       <OrganismsDraftFormCheckboxGroup
         title="Storage Options"
@@ -147,10 +202,72 @@
         :model-value="storageFeatures.selected.value"
         @update:modelValue="storageFeatures.update"
         name="storage"
-      />
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs
+            :paragraphs="[
+              'Select the storage facilities available: built-in wardrobes, walk-in closet, loft/attic storage, cellar/basement, bike storage, shed, garage storage, etc.',
+            ]"
+          />
+        </template>
+      </OrganismsDraftFormCheckboxGroup>
     </div>
 
     <AtomsDivider />
+
+    <!-- Utility Room -->
+    <div class="step__section">
+      <MoleculesDraftFormHeading 
+        title="Utility Room" 
+        :required="false"
+        variant="section"
+      />
+      <em class="body-xs">Optional, add utility room details if applicable</em>
+      
+      <OrganismsDraftFormTextGroup
+        title="Description"
+        v-model="(stepEightData.property.utility as any).description"
+        name="utility-description"
+        placeholder="Describe the utility room..."
+        :expanded="true"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Describe the utility room features, layout, and what appliances or storage it can accommodate.'
+          ]" />
+        </template>
+      </OrganismsDraftFormTextGroup>
+
+      <OrganismsDraftFormSizeToggle
+        title="Utility Room Size"
+        :options="sizeOptions"
+        :unit="'meter'"
+        :size="(stepEightData.property.utility as any).size"
+        name="utility-size"
+        @update:unit="() => {}"
+        @update:size="(value: number | null) => (stepEightData.property.utility as any).size = value"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Enter the utility room\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
+          ]" />
+        </template>
+      </OrganismsDraftFormSizeToggle>
+
+      <OrganismsDraftFormCheckboxGroup
+        title="Utility Room Features"
+        :options="utilityRoomOptions"
+        :model-value="utilityRoomFeatures.selected.value"
+        @update:modelValue="utilityRoomFeatures.update"
+        name="utility-room-features"
+      >
+        <template #tooltip-content>
+          <AtomsTooltipParagraphs :paragraphs="[
+            'Select the features available in the utility room, such as plumbing for appliances, sink, or storage space.'
+          ]" />
+        </template>
+      </OrganismsDraftFormCheckboxGroup>
+    </div>
 
   </CreateListingStepsStepLayout>
 </template>
@@ -189,6 +306,7 @@ const parkingFeatures = useParking(stepEightData);
 const securityFeatures = useSecurity(stepEightData);
 const accessibilityFeatures = useAccessibility(stepEightData);
 const storageFeatures = useStorageFeatures(stepEightData);
+const utilityRoomFeatures = useUtilityRoomFeatures(stepEightData);
 
 function submitForm() {
   handleSubmit(

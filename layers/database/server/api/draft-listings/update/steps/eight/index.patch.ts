@@ -68,6 +68,16 @@ const stepEightSchema = z.object({
       })
       .nullable()
       .optional(),
+    utility: z
+      .object({
+        description: z.string().max(5000).nullable().optional(),
+        storage: z.boolean().optional(),
+        sink: z.boolean().optional(),
+        plumbing: z.boolean().optional(),
+        size: z.coerce.number().min(0).nullable().optional(),
+      })
+      .nullable()
+      .optional(),
   }),
 });
 
@@ -214,6 +224,27 @@ export default defineEventHandler(async (event) => {
                 },
               },
             }),
+            // Utility Room (optional)
+            ...(property.utility && {
+              utility: {
+                upsert: {
+                  create: {
+                    description: property.utility.description ?? null,
+                    storage: property.utility.storage ?? false,
+                    sink: property.utility.sink ?? false,
+                    plumbing: property.utility.plumbing ?? false,
+                    size: property.utility.size ?? null,
+                  },
+                  update: {
+                    description: property.utility.description ?? null,
+                    storage: property.utility.storage ?? false,
+                    sink: property.utility.sink ?? false,
+                    plumbing: property.utility.plumbing ?? false,
+                    size: property.utility.size ?? null,
+                  },
+                },
+              },
+            }),
           },
         },
       },
@@ -225,6 +256,7 @@ export default defineEventHandler(async (event) => {
             securityFeatures: true,
             accessibilityFeatures: true,
             storageFeatures: true,
+            utility: true,
           },
         },
       },

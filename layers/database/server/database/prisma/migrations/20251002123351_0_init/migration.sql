@@ -47,10 +47,10 @@ CREATE TYPE "public"."BedSizeType" AS ENUM ('SINGLE', 'DOUBLE', 'QUEEN', 'KING',
 CREATE TYPE "public"."EPCRating" AS ENUM ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'UNKNOWN');
 
 -- CreateEnum
-CREATE TYPE "public"."HeatingType" AS ENUM ('GAS_CENTRAL', 'ELECTRIC', 'OIL', 'UNDERFLOOR', 'BIOMASS', 'HEAT_PUMP', 'DISTRICT', 'STORAGE_HEATERS', 'LPG', 'PASSIVE', 'SOLAR_THERMAL', 'OTHER', 'NILL');
+CREATE TYPE "public"."HeatingType" AS ENUM ('GAS_CENTRAL', 'ELECTRIC', 'OIL', 'UNDERFLOOR', 'BIOMASS', 'HEAT_PUMP', 'DISTRICT', 'STORAGE_HEATERS', 'LPG', 'PASSIVE', 'SOLAR_THERMAL', 'OTHER');
 
 -- CreateEnum
-CREATE TYPE "public"."BoilerType" AS ENUM ('COMBI', 'SYSTEM', 'CONVENTIONAL', 'BACK_BOILER', 'UNKNOWN');
+CREATE TYPE "public"."BoilerType" AS ENUM ('COMBI', 'SYSTEM', 'CONVENTIONAL', 'BACK_BOILER');
 
 -- CreateEnum
 CREATE TYPE "public"."HotWaterSource" AS ENUM ('BOILER', 'IMMERSION_HEATER', 'SOLAR_THERMAL', 'HEAT_PUMP', 'OTHER');
@@ -62,7 +62,7 @@ CREATE TYPE "public"."RenewableEnergy" AS ENUM ('SOLAR_PV', 'BATTERY_STORAGE', '
 CREATE TYPE "public"."ConnectedUtilities" AS ENUM ('GAS', 'ELECTRICITY', 'WATER', 'SEWAGE', 'DRAINAGE', 'SEPTIC_TANK', 'CESSPIT', 'RAINWATER_HARVESTING');
 
 -- CreateEnum
-CREATE TYPE "public"."BroadbandType" AS ENUM ('ADSL', 'FTTC', 'FTTP', 'CABLE', 'MOBILE', 'UNKNOWN');
+CREATE TYPE "public"."BroadbandType" AS ENUM ('ADSL', 'FTTC', 'FTTP', 'CABLE', 'MOBILE');
 
 -- CreateEnum
 CREATE TYPE "public"."OtherRoomType" AS ENUM ('OFFICE', 'STUDY', 'LIBRARY', 'GYM', 'WORKSHOP', 'POOL_ROOM', 'WINE_CELLAR', 'SPA', 'OTHER');
@@ -332,6 +332,7 @@ CREATE TABLE "public"."Membership" (
 -- CreateTable
 CREATE TABLE "public"."Accessibility" (
     "id" SERIAL NOT NULL,
+    "description" TEXT,
     "wheelchairFriendly" BOOLEAN NOT NULL DEFAULT false,
     "stepFreeAccess" BOOLEAN NOT NULL DEFAULT false,
     "wideDoorways" BOOLEAN NOT NULL DEFAULT false,
@@ -340,7 +341,6 @@ CREATE TABLE "public"."Accessibility" (
     "elevator" BOOLEAN NOT NULL DEFAULT false,
     "stairs" BOOLEAN NOT NULL DEFAULT false,
     "accessibleParking" BOOLEAN NOT NULL DEFAULT false,
-    "description" TEXT,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -351,9 +351,9 @@ CREATE TABLE "public"."Accessibility" (
 -- CreateTable
 CREATE TABLE "public"."AdditionalFeatures" (
     "id" SERIAL NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "petFriendly" BOOLEAN NOT NULL DEFAULT true,
-    "moveInDate" TIMESTAMP(3) NOT NULL,
+    "moveInDate" TIMESTAMP(3),
     "pool" BOOLEAN NOT NULL DEFAULT false,
     "internet" BOOLEAN NOT NULL DEFAULT false,
     "concierge" BOOLEAN NOT NULL DEFAULT false,
@@ -431,7 +431,7 @@ CREATE TABLE "public"."EnergyAndUtilities" (
     "description" TEXT,
     "epcRating" "public"."EPCRating" NOT NULL,
     "epcCertificateUrl" TEXT,
-    "primaryHeatingType" "public"."HeatingType"[] DEFAULT ARRAY['NILL']::"public"."HeatingType"[],
+    "primaryHeatingType" "public"."HeatingType"[],
     "secondaryHeatingType" "public"."HeatingType"[],
     "boilerType" "public"."BoilerType",
     "hotWaterSource" "public"."HotWaterSource",
@@ -504,9 +504,9 @@ CREATE TABLE "public"."OtherRoom" (
 CREATE TABLE "public"."Garden" (
     "id" SERIAL NOT NULL,
     "description" TEXT,
-    "name" TEXT,
-    "facing" "public"."GardenFacing",
-    "position" "public"."GardenPosition",
+    "name" TEXT NOT NULL,
+    "facing" "public"."GardenFacing" NOT NULL,
+    "position" "public"."GardenPosition" NOT NULL,
     "sunTerrace" BOOLEAN NOT NULL DEFAULT false,
     "terrace" BOOLEAN NOT NULL DEFAULT false,
     "balcony" BOOLEAN NOT NULL DEFAULT false,
@@ -527,7 +527,7 @@ CREATE TABLE "public"."Garden" (
 CREATE TABLE "public"."Land" (
     "id" SERIAL NOT NULL,
     "description" TEXT,
-    "name" TEXT,
+    "name" TEXT NOT NULL,
     "separateParcel" BOOLEAN NOT NULL DEFAULT false,
     "woodland" BOOLEAN NOT NULL DEFAULT false,
     "paddock" BOOLEAN NOT NULL DEFAULT false,
@@ -535,7 +535,6 @@ CREATE TABLE "public"."Land" (
     "tennisCourt" BOOLEAN NOT NULL DEFAULT false,
     "orchard" BOOLEAN NOT NULL DEFAULT false,
     "pond" BOOLEAN NOT NULL DEFAULT false,
-    "driveway" BOOLEAN NOT NULL DEFAULT false,
     "outbuilding" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -550,7 +549,6 @@ CREATE TABLE "public"."OutdoorSpace" (
     "description" TEXT,
     "totalGardenSize" DOUBLE PRECISION,
     "totalLandSize" DOUBLE PRECISION,
-    "separateParcel" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -561,6 +559,7 @@ CREATE TABLE "public"."OutdoorSpace" (
 -- CreateTable
 CREATE TABLE "public"."Parking" (
     "id" SERIAL NOT NULL,
+    "description" TEXT,
     "garage" BOOLEAN NOT NULL DEFAULT false,
     "driveway" BOOLEAN NOT NULL DEFAULT false,
     "permitParking" BOOLEAN NOT NULL DEFAULT false,
@@ -569,7 +568,6 @@ CREATE TABLE "public"."Parking" (
     "carport" BOOLEAN NOT NULL DEFAULT false,
     "allocatedParking" BOOLEAN NOT NULL DEFAULT false,
     "evCharging" BOOLEAN NOT NULL DEFAULT false,
-    "description" TEXT,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -691,11 +689,11 @@ CREATE TABLE "public"."Security" (
 -- CreateTable
 CREATE TABLE "public"."Storage" (
     "id" SERIAL NOT NULL,
+    "description" TEXT,
     "attic" BOOLEAN NOT NULL DEFAULT false,
     "basement" BOOLEAN NOT NULL DEFAULT false,
     "separateDressing" BOOLEAN NOT NULL DEFAULT false,
     "underStairsStorage" BOOLEAN NOT NULL DEFAULT false,
-    "description" TEXT,
     "propertyId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

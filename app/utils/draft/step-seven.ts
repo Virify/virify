@@ -123,32 +123,11 @@ export const stepSevenValidation = {
   },
 
   /**
-   * Check if draft has existing step seven data
+   * Check if step seven has been visited (outdoorSpace relationship exists)
    * @param draft Draft listing
-   * @returns True if draft has complete step seven data
+   * @returns True if outdoorSpace has been created
    */
   hasExistingStepSevenData: (draft: DraftListingWithFullPayload): boolean => {
-    const outdoorSpace = draft.property?.outdoorSpace;
-    
-    // If outdoorSpace object exists, consider it as having existing data
-    // (even if empty, because outdoor space is optional)
-    if (!outdoorSpace) {
-      return true;
-    }
-
-    const gardens = outdoorSpace.garden || [];
-    const lands = outdoorSpace.land || [];
-
-    // If there's no outdoor space data, but the object exists, it's been visited and saved
-    const hasData = gardens.length > 0 || lands.length > 0;
-
-    if (!hasData) {
-      // Outdoor space exists but is empty - this is valid, so return true
-      return true;
-    }
-
-    // If there is data, validate it
-    return stepSevenValidation.areGardensValid(gardens) &&
-           stepSevenValidation.areLandsValid(lands);
+    return !!draft.property?.outdoorSpace;
   }
 };

@@ -1,11 +1,12 @@
 import * as z from "zod";
+import { ConstructionType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 const stepTwoScehma = z.object({
   draftId: z.number().int().positive(),
   property: z.object({
     type: z.number().int().positive(),
     classification: z.number().int().positive(),
-    constructionType: z.enum(["STANDARD", "NON_STANDARD"]).nullable().optional(),
+    constructionType: z.enum(Object.values(ConstructionType)).nullable().optional(),
     yearBuilt: z.coerce
       .number()
       .min(4)

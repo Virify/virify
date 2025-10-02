@@ -246,6 +246,10 @@ defineExpose({
 
     &--active {
       color: var(--primary-400);
+
+      .o-account-listing-stepper__title {
+        color: var(--primary-400);
+      }
     }
 
     &--complete {

@@ -56,6 +56,13 @@ export const createInitialStepEightValues = (draftListing: DraftListingWithFullP
       separateDressing: false,
       underStairsStorage: false,
     },
+    utility: draftListing.property?.utility || {
+      description: null,
+      storage: false,
+      sink: false,
+      plumbing: false,
+      size: null,
+    },
   }
 });
 
@@ -116,10 +123,19 @@ export const accessibilityOptions = [
  * Storage Features options for checkbox selection
  */
 export const storageOptions = [
-  { value: 'attic', key: 'Attic', info: 'Attic storage available' },
-  { value: 'basement', key: 'Basement', info: 'Basement available' },
+  { value: 'attic', key: 'Attic/Loft Storage', info: 'Attic or loft storage space' },
+  { value: 'basement', key: 'Basement/Cellar', info: 'Basement or cellar storage' },
   { value: 'separateDressing', key: 'Separate Dressing Room', info: 'Separate dressing room' },
-  { value: 'underStairsStorage', key: 'Under Stairs Storage', info: 'Under stairs storage' },
+  { value: 'underStairsStorage', key: 'Under Stairs Storage', info: 'Under stairs storage cupboard' },
+];
+
+/**
+ * Utility Room options for checkbox selection
+ */
+export const utilityRoomOptions = [
+  { value: 'storage', key: 'Storage Space', info: 'Storage space available' },
+  { value: 'sink', key: 'Sink', info: 'Sink installed' },
+  { value: 'plumbing', key: 'Plumbing for Appliances', info: 'Plumbing for washing machine/dishwasher' },
 ];
 
 /**
@@ -142,14 +158,13 @@ export const stepEightValidation = {
    * @returns True if step eight is valid
    */
   isStepEightValid: (data: globalThis.StepEight, draft: DraftListingWithFullPayload): boolean => {
-    if (!draft.property?.additionalFeatures) return false;
     return stepEightValidation.areAdditionalFeaturesValid();
   },
 
   /**
-   * Check if step eight has any existing data
+   * Check if step eight has been visited (relationships created)
    * @param draft Draft listing with full payload
-   * @returns True if step eight has existing data
+   * @returns True if any step eight relationship has been created
    */
   hasExistingStepEightData: (draft: DraftListingWithFullPayload): boolean => {
     return !!(
@@ -157,7 +172,8 @@ export const stepEightValidation = {
       draft.property?.accessibilityFeatures ||
       draft.property?.parking ||
       draft.property?.securityFeatures ||
-      draft.property?.storageFeatures
+      draft.property?.storageFeatures ||
+      draft.property?.utility
     );
   },
 };
@@ -242,6 +258,22 @@ export const useStorageFeatures = (stepEightData: Ref<StepEight>) => {
   const update = (selectedFeatures: string[]) => {
     if (!stepEightData.value?.property?.storageFeatures) return;
     updateFeatures(stepEightData.value.property.storageFeatures, selectedFeatures, storageOptions);
+  };
+
+  return { selected, update };
+};
+
+/**
+ * Create composable for Utility Room Features
+ */
+export const useUtilityRoomFeatures = (stepEightData: Ref<StepEight>) => {
+  const selected = computed(() => 
+    getSelectedFeatures(stepEightData.value?.property?.utility, utilityRoomOptions)
+  );
+
+  const update = (selectedFeatures: string[]) => {
+    if (!stepEightData.value?.property?.utility) return;
+    updateFeatures(stepEightData.value.property.utility, selectedFeatures, utilityRoomOptions);
   };
 
   return { selected, update };

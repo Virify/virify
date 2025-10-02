@@ -41,7 +41,7 @@ interface Props {
   tooltip?: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 defineEmits<{
   'update:modelValue': [value: any];
 }>();

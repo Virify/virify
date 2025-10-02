@@ -139,17 +139,15 @@ export const stepSixValidation = {
   },
 
   /**
-   * Check if draft has existing step six data
+   * Check if step six has been visited (any kitchen/reception/other rooms added)
    * @param draft Draft listing
-   * @returns True if draft has complete step six data
+   * @returns True if any rooms have been added
    */
   hasExistingStepSixData: (draft: DraftListingWithFullPayload): boolean => {
     const kitchens = draft.property?.kitchenFeatures || [];
     const receptions = draft.property?.reception || [];
     const otherRooms = draft.property?.otherRoom || [];
 
-    return stepSixValidation.areKitchenFeaturesValid(kitchens) &&
-      stepSixValidation.areReceptionRoomsValid(receptions) &&
-      stepSixValidation.areOtherRoomsValid(otherRooms);
+    return kitchens.length > 0 || receptions.length > 0 || otherRooms.length > 0;
   }
 };

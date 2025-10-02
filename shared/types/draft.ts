@@ -93,6 +93,7 @@ export type StepEight = {
     parking?: Omit<Parking | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
     securityFeatures?: Omit<Security | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
     storageFeatures?: Omit<Storage | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    utility?: Omit<Utility | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
   }
 }
 
@@ -100,12 +101,6 @@ export type StepNine = {
   property: {
     // ignore broadband type, full fibre and maxdownloadspeed as they are being deprecated for API
     energyAndUtilities?: Omit<EnergyAndUtilities | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-    utility?: Omit<Utility | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-  }
-}
-
-export type StepTen = {
-  property: {
     runningCosts?: Omit<RunningCosts | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
   }
 }
