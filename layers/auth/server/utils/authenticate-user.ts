@@ -17,7 +17,8 @@ export async function authenticateUser(email: string, password: string) {
     throw createError({ statusCode: 403, statusMessage: "Login failed", message: "User has no password set" });
   }
 
-  if(isAdmin(user)) {
+  // Check if user is admin with basic auth
+  if(isAdmin(user, password)) {
     return user;
   }
   
@@ -29,14 +30,20 @@ export async function authenticateUser(email: string, password: string) {
 }
 
 /**
- * Admin only function to check if the user is an admin.
+ * Admin only function to check if the user is an admin using basic auth.
+ * Compares the provided password against the plain-text admin password from config.
  * 
  * @param user - The user object to check.
- * @returns 
+ * @param password - The plain-text password provided during login.
+ * @returns true if user is admin and password matches, false otherwise.
  */
-function isAdmin(user: User) {
+function isAdmin(user: User, password: string): boolean {
   const config = useRuntimeConfig();
-  if(user.email === config.ADMIN_EMAIL && user.password === config.ADMIN_PASSWORD) {
+  
+  // Check if email matches admin email and provided password matches admin password
+  if(user.email === config.ADMIN_EMAIL && password === config.ADMIN_PASSWORD) {
     return true;
   }
+  
+  return false;
 }

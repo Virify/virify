@@ -2,7 +2,7 @@
 /**
  * Utilities for Step Two of the listing creation process.
  */
-import { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { ConstructionType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
  * Fetch property types with their classification options from the API.
@@ -40,24 +40,6 @@ export function getPropertyClassifications(propertyTypeId: number): { value: num
 export const constructionOptions = Object.values(ConstructionType).map((option) => {
   return { value: option, key: convertEnumToCapalizedString(option), info: "Property is of Construction: " + convertEnumToCapalizedString(option) };
 });
-
-/**
- * Sale Price Type Options
- */
-export const salePriceTypeOptions = Object.values(SalePriceType).map((element) => ({
-  value: element,
-  key: convertEnumToCapalizedString(element),
-  info: `Set the sale price type as ${convertEnumToCapalizedString(element).toLowerCase()}`
-}));
-
-/**
- * Rental Price Type Options
- */
-export const rentalPriceTypeOptions = Object.values(RentalPriceType).map((element) => ({
-  value: element,
-  key: convertEnumToCapalizedString(element),
-  info: `Set the rental frequency as ${convertEnumToCapalizedString(element).toLowerCase()}`
-}));
 
 /**
  * Year Built Options
