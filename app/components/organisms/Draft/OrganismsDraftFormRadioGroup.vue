@@ -10,7 +10,7 @@
     </MoleculesDraftFormHeading>
     <ul class="o-form-group__list">
       <li v-for="option in options" :key="option.value" class="o-form-group__item">
-        <label class="o-form-group__label | body-sm">
+        <label class="o-form-group__label | body-sm" @click.prevent="handleClick(option.value)">
           
             <AtomsPill class="o-form-group__radio"
               :class="{ 'o-form-group__radio--selected': modelValue === option.value }">
@@ -21,7 +21,6 @@
                 :checked="modelValue === option.value" 
                 class="o-form-group__input | visually-hidden"
                 :required="required"
-                @change="$emit('update:modelValue', option.value)" 
               />
               {{ option.key }}
             </AtomsPill>
@@ -49,10 +48,25 @@ interface Props {
   tooltip?: string;
 }
 
-defineProps<Props>();
-defineEmits<{
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
   'update:modelValue': [value: any];
 }>();
+
+/**
+ * Handle radio button click
+ * If not required, allow toggling off by clicking the same option again
+ */
+function handleClick(value: any) {
+  if (!props.required && props.modelValue === value) {
+    // Unselect if clicking the same option and not required
+    emit('update:modelValue', null);
+  } else {
+    // Select the new option
+    emit('update:modelValue', value);
+  }
+}
 </script>
 
 <style lang="scss">

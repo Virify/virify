@@ -175,11 +175,53 @@ export const useDraft = createSharedComposable(() => {
     return { success: false, errorMessage: `Failed to update ${stepTitle}. Step configuration not found.` };
   };
 
+  /**
+   * Get step progress for a draft (last completed step index)
+   */
+  const getStepProgress = (draftId: number) => {
+    const stepperMap = getStepperMap(draftId);
+    
+    return computed(() => {
+      let lastCompleted = -1;
+      for (let i = 0; i < stepperMap.value.length; i++) {
+        const step = stepperMap.value[i];
+        if (step && step.complete) {
+          lastCompleted = i;
+        } else {
+          break; // Stop at first incomplete step
+        }
+      }
+      return lastCompleted;
+    });
+  };
+
+  /**
+   * Get step progress text for display
+   */
+  const getStepProgressText = (draftId: number) => {
+    const progress = getStepProgress(draftId);
+    const stepperMap = getStepperMap(draftId);
+    
+    return computed(() => {
+      const lastCompletedIndex = progress.value;
+      const totalSteps = stepperMap.value.length;
+      
+      if (lastCompletedIndex === -1) {
+        return 'Not started';
+      }
+      
+      const completedSteps = lastCompletedIndex + 1;
+      return `Step ${completedSteps}/${totalSteps}`;
+    });
+  };
+
   return {
     getDraft,
     getStepperMap,
     getStepperProps,
     getCurrentStepData,
     handleStepUpdate,
+    getStepProgress,
+    getStepProgressText,
   };
 });

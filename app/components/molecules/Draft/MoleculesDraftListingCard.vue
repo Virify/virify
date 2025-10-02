@@ -40,7 +40,10 @@
       <div class="draft-card__left">
         <div class="draft-card__meta">
           <span class="body-xs">{{ draft.title || 'Untitled Draft' }}</span>
-          <span class="draft-card__date | body-xs">Updated {{ formatDate(draft.updatedAt) }}</span>
+          <div class="draft-card__status">
+            <span class="draft-card__date | body-xs">Updated {{ formatDate(draft.updatedAt) }}</span>
+            <span class="draft-card__step | body-xs">{{ stepProgressText }}</span>
+          </div>
         </div>
       </div>
 
@@ -60,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+const { getStepProgressText } = useDraft();
 interface Props {
   draft: any;
   deleting?: boolean;
@@ -124,6 +128,13 @@ const draftCardClasses = computed(() => ({
   'draft-card--featured': tierKey.value === 'featured',
   'draft-card--basic': !tierKey.value || tierKey.value === 'basic'
 }));
+
+// Get step progress from composable
+const stepProgressText = computed(() => {
+  if (!props.draft?.id) return 'Not started';
+  return getStepProgressText(props.draft.id).value;
+});
+
 </script>
 
 <style lang="scss">
@@ -336,8 +347,21 @@ const draftCardClasses = computed(() => ({
     color: var(--text-muted);
   }
 
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
+    flex-wrap: wrap;
+  }
+
   &__date {
     color: var(--text-muted);
+  }
+
+  &__step {
+    color: var(--text-muted);
+    padding-left: var(--size-8);
+    border-left: 1px solid var(--monochrome-500);
   }
 
   &__right {
