@@ -6,7 +6,7 @@ const stepEightSchema = z.object({
   property: z.object({
     additionalFeatures: z
       .object({
-        description: z.string().max(5000),
+        description: z.string().max(5000).optional(),
         petFriendly: z.boolean().optional(),
         pool: z.boolean().optional(),
         internet: z.boolean().optional(),
