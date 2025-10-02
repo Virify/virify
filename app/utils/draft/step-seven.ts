@@ -133,7 +133,7 @@ export const stepSevenValidation = {
     // If outdoorSpace object exists, consider it as having existing data
     // (even if empty, because outdoor space is optional)
     if (!outdoorSpace) {
-      return false;
+      return true;
     }
 
     const gardens = outdoorSpace.garden || [];

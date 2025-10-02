@@ -6,8 +6,9 @@ import {
   CreateListingStepsStep4, 
   CreateListingStepsStep5, 
   CreateListingStepsStep6,
-  CreateListingStepsStep7
- } from "#components";
+  CreateListingStepsStep7,
+  CreateListingStepsStep8
+} from "#components";
 
 export interface DraftStepConfig {
   title: string;
@@ -97,9 +98,13 @@ export const useDraft = createSharedComposable(() => {
       },
       { 
         title: 'Additional Features', 
-        complete: false 
+        data: draft.value ? createInitialStepEightValues(draft.value) : null,
+        complete: draft.value ? stepEightValidation.hasExistingStepEightData(draft.value) : false,
+        // update: updateDraftStepEight,
+        component: CreateListingStepsStep8
       },
-      { title: 'Energy', complete: false },
+      { title: 'Energy & Utilities', complete: false },
+      { title: 'Cost & Bills', complete: false },
       { title: 'Media', complete: false }
     ]);
   };

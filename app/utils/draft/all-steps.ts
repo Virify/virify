@@ -26,3 +26,44 @@ export function getFloorOptions(totalFloors: number) {
   
   return options;
 }
+
+/**
+ * Helper to get selected features as an array from boolean properties
+ * Generic helper for checkbox groups that need to convert boolean properties to arrays
+ * @param features The features object with boolean properties
+ * @param options The options array to check against
+ * @returns Array of selected feature keys
+ */
+export const getSelectedFeatures = (features: any, options: Array<{ value: string }>): string[] => {
+  if (!features) return [];
+  
+  const selected: string[] = [];
+  options.forEach(option => {
+    if (features[option.value]) {
+      selected.push(option.value);
+    }
+  });
+  
+  return selected;
+};
+
+/**
+ * Helper to update features object from array of selected values
+ * Generic helper for checkbox groups that need to convert arrays back to boolean properties
+ * @param features The features object to update
+ * @param selectedFeatures Array of selected feature keys
+ * @param options The options array defining all possible features
+ */
+export const updateFeatures = (features: any, selectedFeatures: string[], options: Array<{ value: string }>): void => {
+  if (!features) return;
+  
+  // Reset all features to false
+  options.forEach(option => {
+    features[option.value] = false;
+  });
+  
+  // Set selected features to true
+  selectedFeatures.forEach(feature => {
+    features[feature] = true;
+  });
+};

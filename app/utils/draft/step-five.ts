@@ -107,7 +107,8 @@ export const stepFiveValidation = {
     const hasData = bedrooms.length > 0 || bathrooms.length > 0;
     
     if (!hasData) {
-      return false;
+      // no rooms added - optional step, consider complete
+      return true;
     }
     
     return stepFiveValidation.areBedroomFeaturesValid(bedrooms) &&

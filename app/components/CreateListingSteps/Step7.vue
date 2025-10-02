@@ -18,15 +18,7 @@
         title="General Outdoor Space Description" 
         :required="false"
         variant="section"
-        :hasTooltip="true"
-      >
-        <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Provide a general description of the outdoor space.',
-            'You can add specific garden and land details below.'
-          ]" />
-        </template>
-      </MoleculesDraftFormHeading>
+      />
       <em class="body-xs">Optional general description</em>
       
       <OrganismsDraftFormTextGroup
@@ -45,15 +37,7 @@
         title="Gardens" 
         :required="false"
         variant="section"
-        :hasTooltip="true"
-      >
-        <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Add details about all gardens including front, rear, and side gardens.',
-            'Include information about features, position, and facing direction.'
-          ]" />
-        </template>
-      </MoleculesDraftFormHeading>
+      />
       <em class="body-xs">Optional, add garden details</em>
       
       <OrganismsDraftGardenForm
@@ -77,15 +61,7 @@
         title="Land" 
         :required="false"
         variant="section"
-        :hasTooltip="true"
-      >
-        <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Add details about any additional land parcels including paddocks, woodland, or other features.',
-            'Include information about separate parcels and land features.'
-          ]" />
-        </template>
-      </MoleculesDraftFormHeading>
+      />
       <em class="body-xs">Optional, add land parcel details</em>
       
       <OrganismsDraftLandForm

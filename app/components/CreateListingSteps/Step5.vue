@@ -15,19 +15,10 @@
     <!-- Bedrooms Section -->
     <div class="step__section">
       <MoleculesDraftFormHeading 
-        title="Bedrooms" 
-        :required="true"
+        title="Bedrooms"
         variant="section"
-        :hasTooltip="true"
-      >
-        <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Add all bedrooms in your property including their size, features, and floor location.',
-            'The more detailed you can be, the more likely you are to find the right viewer.'
-          ]" />
-        </template>
-      </MoleculesDraftFormHeading>
-      <em class="body-xs">At least one bedroom required</em>
+      />
+      <em class="body-xs">Optional, add bedroom details</em>
       <OrganismsDraftBedroomForm
         v-model="stepFiveData.property.bedroomFeatures"
         :total-floors="stepFiveData.property.totalFloors"
@@ -38,18 +29,9 @@
     <div class="step__section">
       <MoleculesDraftFormHeading 
         title="Bathrooms" 
-        :required="true"
         variant="section"
-        :hasTooltip="true"
-      >
-        <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Add all bathrooms and toilets in your property including their features and floor location.',
-            'Include details about fixtures, accessibility features, and any special amenities.'
-          ]" />
-        </template>
-      </MoleculesDraftFormHeading>
-      <em class="body-xs">At least one bathroom/toilet required</em>
+      />
+      <em class="body-xs">Optional, add bathroom details</em>
       <OrganismsDraftBathroomForm
         v-model="stepFiveData.property.bathroomFeatures"
         :total-floors="stepFiveData.property.totalFloors"

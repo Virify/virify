@@ -1,4 +1,4 @@
-import { Prisma, type Bathroom, type Bedroom, type Garden, type Kitchen, type Land, type OtherRoom, type OutdoorSpace, type Reception } from "~~/layers/database/server/database/prisma/generated/client"
+import { Prisma, type Accessibility, type AdditionalFeatures, type Bathroom, type Bedroom, type EnergyAndUtilities, type Garden, type Kitchen, type Land, type OtherRoom, type OutdoorSpace, type Parking, type Reception, type RunningCosts, type Security, type Storage, type Utility } from "~~/layers/database/server/database/prisma/generated/client"
 import type { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
@@ -83,6 +83,30 @@ export type StepSeven = {
       land: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       description: string | null
     }
+  }
+}
+
+export type StepEight = {
+  property: {
+    additionalFeatures?: Omit<AdditionalFeatures | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    accessibilityFeatures?: Omit<Accessibility | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    parking?: Omit<Parking | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    securityFeatures?: Omit<Security | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    storageFeatures?: Omit<Storage | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+  }
+}
+
+export type StepNine = {
+  property: {
+    // ignore broadband type, full fibre and maxdownloadspeed as they are being deprecated for API
+    energyAndUtilities?: Omit<EnergyAndUtilities | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    utility?: Omit<Utility | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+  }
+}
+
+export type StepTen = {
+  property: {
+    runningCosts?: Omit<RunningCosts | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
   }
 }
 

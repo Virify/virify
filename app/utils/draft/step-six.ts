@@ -148,11 +148,6 @@ export const stepSixValidation = {
     const receptions = draft.property?.reception || [];
     const otherRooms = draft.property?.otherRoom || [];
 
-    // Check if any rooms exist
-    if (kitchens.length === 0 && receptions.length === 0 && otherRooms.length === 0) {
-      return false;
-    }
-
     return stepSixValidation.areKitchenFeaturesValid(kitchens) &&
       stepSixValidation.areReceptionRoomsValid(receptions) &&
       stepSixValidation.areOtherRoomsValid(otherRooms);

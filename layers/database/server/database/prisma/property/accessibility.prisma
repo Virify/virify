@@ -1,5 +1,6 @@
 model Accessibility {
   id                 Int      @id @default(autoincrement())
+  description        String?
   wheelchairFriendly Boolean  @default(false)
   stepFreeAccess     Boolean  @default(false)
   wideDoorways       Boolean  @default(false)
@@ -8,7 +9,6 @@ model Accessibility {
   elevator           Boolean  @default(false)
   stairs             Boolean  @default(false)
   accessibleParking  Boolean  @default(false)
-  description        String?
   propertyId         Int      @unique
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

@@ -1,10 +1,10 @@
 model Storage {
   id                 Int      @id @default(autoincrement())
+  description        String?
   attic              Boolean  @default(false)
   basement           Boolean  @default(false)
   separateDressing   Boolean  @default(false)
   underStairsStorage Boolean  @default(false)
-  description        String?
   propertyId         Int      @unique
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
