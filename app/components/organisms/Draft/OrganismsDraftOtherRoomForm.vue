@@ -1,12 +1,12 @@
 <template>
   <OrganismsDraftBaseRoomForm>
   <div class="o-other-room-form">
-    <div class="o-other-room-form__items">
+    <div class="o-base-room-form__items">
       <div
         v-for="(otherRoomItem, index) in localOtherRooms"
         :key="index"
         :ref="(el) => setRoomRef(el, index)"
-        class="o-other-room-form__item"
+        class="o-base-room-form__item"
         :class="{ 'o-other-room-form__item--collapsed': isRoomCollapsed(index) }"
       >
         <AtomsCollapsibleHeader
@@ -15,7 +15,7 @@
           :is-collapsed="!expandedRooms.has(index)"
           variant="inline"
           @toggle="toggleRoom(index)"
-          class="o-other-room-form__item-title"
+          class="o-base-room-form__item-title"
         >
           <template #actions>
             <button
@@ -36,9 +36,9 @@
           </template>
         </AtomsCollapsibleHeader>
 
-        <div v-else class="o-other-room-form__item-header">
-          <h4 class="o-other-room-form__item-title | body-md font-semibold">Other Room {{ index + 1 }}</h4>
-          <div class="o-other-room-form__item-actions">
+        <div v-else class="o-base-room-form__item-header">
+          <h4 class="o-base-room-form__item-title | body-md font-semibold">Other Room {{ index + 1 }}</h4>
+          <div class="o-base-room-form__item-actions">
             <button
               type="button"
               @click="removeRoom(index)"
@@ -58,8 +58,8 @@
         </div>
 
         <Transition name="accordion">
-          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-other-room-form__item-content">
-            <div class="o-other-room-form__form-grid">
+          <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-base-room-form__item-content">
+            <div class="o-base-room-form__form-grid">
               <OrganismsDraftFormTextGroup
                 title="Other Room Name"
                 v-model="otherRoomItem.name"
@@ -177,7 +177,7 @@
               </template>
             </OrganismsDraftFormSizeToggle>
 
-            <div class="o-other-room-form__form-actions">
+            <div class="o-base-room-form__form-actions">
               <button
                 type="button"
                 @click="saveRoom(index)"
@@ -201,7 +201,7 @@
       </div>
     </div>
 
-    <div class="o-other-room-form__add-item" v-show="!hasOpenRoomForm">
+    <div class="o-base-room-form__add-item" v-show="!hasOpenRoomForm">
       <button
         type="button"
         @click="addRoom"
