@@ -17,17 +17,15 @@
     <div class="step__section">
       <MoleculesDraftFormHeading 
         title="Additional Features" 
-        :required="true"
         variant="section"
       />
-      <em class="body-xs">Required, describe additional features and amenities</em>
+      <em class="body-xs">Optional, describe additional features and amenities</em>
       
       <OrganismsDraftFormTextGroup
         title="Description"
         v-model="(stepEightData.property.additionalFeatures as any).description"
         name="additional-features-description"
         placeholder="Describe additional features..."
-        :required="true"
         :expanded="true"
       />
 

@@ -4,55 +4,70 @@ import * as z from "zod";
 const stepEightSchema = z.object({
   draftId: z.number().int().positive(),
   property: z.object({
-    additionalFeatures: z.object({
-      description: z.string().max(5000),
-      petFriendly: z.boolean().optional(),
-      pool: z.boolean().optional(),
-      internet: z.boolean().optional(),
-      concierge: z.boolean().optional(),
-      shop: z.boolean().optional(),
-      gym: z.boolean().optional(),
-      moveInDate: z.coerce.date().nullable().optional(),
-    }),
-    parking: z.object({
-      description: z.string().max(5000).nullable().optional(),
-      garage: z.boolean().optional(),
-      driveway: z.boolean().optional(),
-      permitParking: z.boolean().optional(),
-      onStreet: z.boolean().optional(),
-      noParking: z.boolean().optional(),
-      carport: z.boolean().optional(),
-      allocatedParking: z.boolean().optional(),
-      evCharging: z.boolean().optional(),
-    }).nullable().optional(),
-    securityFeatures: z.object({
-      description: z.string().max(5000).nullable().optional(),
-      gatedCommunity: z.boolean().optional(),
-      cctv: z.boolean().optional(),
-      alarmSystem: z.boolean().optional(),
-      neighborhoodWatch: z.boolean().optional(),
-      intercomSystem: z.boolean().optional(),
-      security: z.boolean().optional(),
-      reception: z.boolean().optional(),
-    }).nullable().optional(),
-    accessibilityFeatures: z.object({
-      description: z.string().max(5000).nullable().optional(),
-      wheelchairFriendly: z.boolean().optional(),
-      stepFreeAccess: z.boolean().optional(),
-      wideDoorways: z.boolean().optional(),
-      wetRoom: z.boolean().optional(),
-      handrails: z.boolean().optional(),
-      elevator: z.boolean().optional(),
-      stairs: z.boolean().optional(),
-      accessibleParking: z.boolean().optional(),
-    }).nullable().optional(),
-    storageFeatures: z.object({
-      description: z.string().max(5000).nullable().optional(),
-      attic: z.boolean().optional(),
-      basement: z.boolean().optional(),
-      separateDressing: z.boolean().optional(),
-      underStairsStorage: z.boolean().optional(),
-    }).nullable().optional(),
+    additionalFeatures: z
+      .object({
+        description: z.string().max(5000),
+        petFriendly: z.boolean().optional(),
+        pool: z.boolean().optional(),
+        internet: z.boolean().optional(),
+        concierge: z.boolean().optional(),
+        shop: z.boolean().optional(),
+        gym: z.boolean().optional(),
+        moveInDate: z.coerce.date().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+    parking: z
+      .object({
+        description: z.string().max(5000).nullable().optional(),
+        garage: z.boolean().optional(),
+        driveway: z.boolean().optional(),
+        permitParking: z.boolean().optional(),
+        onStreet: z.boolean().optional(),
+        noParking: z.boolean().optional(),
+        carport: z.boolean().optional(),
+        allocatedParking: z.boolean().optional(),
+        evCharging: z.boolean().optional(),
+      })
+      .nullable()
+      .optional(),
+    securityFeatures: z
+      .object({
+        description: z.string().max(5000).nullable().optional(),
+        gatedCommunity: z.boolean().optional(),
+        cctv: z.boolean().optional(),
+        alarmSystem: z.boolean().optional(),
+        neighborhoodWatch: z.boolean().optional(),
+        intercomSystem: z.boolean().optional(),
+        security: z.boolean().optional(),
+        reception: z.boolean().optional(),
+      })
+      .nullable()
+      .optional(),
+    accessibilityFeatures: z
+      .object({
+        description: z.string().max(5000).nullable().optional(),
+        wheelchairFriendly: z.boolean().optional(),
+        stepFreeAccess: z.boolean().optional(),
+        wideDoorways: z.boolean().optional(),
+        wetRoom: z.boolean().optional(),
+        handrails: z.boolean().optional(),
+        elevator: z.boolean().optional(),
+        stairs: z.boolean().optional(),
+        accessibleParking: z.boolean().optional(),
+      })
+      .nullable()
+      .optional(),
+    storageFeatures: z
+      .object({
+        description: z.string().max(5000).nullable().optional(),
+        attic: z.boolean().optional(),
+        basement: z.boolean().optional(),
+        separateDressing: z.boolean().optional(),
+        underStairsStorage: z.boolean().optional(),
+      })
+      .nullable()
+      .optional(),
   }),
 });
 
@@ -67,31 +82,32 @@ export default defineEventHandler(async (event) => {
       data: {
         property: {
           update: {
-            // Additional Features (required)
-            additionalFeatures: {
-              upsert: {
-                create: {
-                  description: property.additionalFeatures.description,
-                  petFriendly: property.additionalFeatures.petFriendly ?? false,
-                  pool: property.additionalFeatures.pool ?? false,
-                  internet: property.additionalFeatures.internet ?? false,
-                  concierge: property.additionalFeatures.concierge ?? false,
-                  shop: property.additionalFeatures.shop ?? false,
-                  gym: property.additionalFeatures.gym ?? false,
-                  moveInDate: property.additionalFeatures.moveInDate ?? null,
-                },
-                update: {
-                  description: property.additionalFeatures.description,
-                  petFriendly: property.additionalFeatures.petFriendly ?? false,
-                  pool: property.additionalFeatures.pool ?? false,
-                  internet: property.additionalFeatures.internet ?? false,
-                  concierge: property.additionalFeatures.concierge ?? false,
-                  shop: property.additionalFeatures.shop ?? false,
-                  gym: property.additionalFeatures.gym ?? false,
-                  moveInDate: property.additionalFeatures.moveInDate ?? null,
+            ...(property.additionalFeatures && {
+              additionalFeatures: {
+                upsert: {
+                  create: {
+                    description: property.additionalFeatures.description ?? null,
+                    petFriendly: property.additionalFeatures.petFriendly ?? false,
+                    pool: property.additionalFeatures.pool ?? false,
+                    internet: property.additionalFeatures.internet ?? false,
+                    concierge: property.additionalFeatures.concierge ?? false,
+                    shop: property.additionalFeatures.shop ?? false,
+                    gym: property.additionalFeatures.gym ?? false,
+                    moveInDate: property.additionalFeatures.moveInDate ?? null,
+                  },
+                  update: {
+                    description: property.additionalFeatures.description ?? null,
+                    petFriendly: property.additionalFeatures.petFriendly ?? false,
+                    pool: property.additionalFeatures.pool ?? false,
+                    internet: property.additionalFeatures.internet ?? false,
+                    concierge: property.additionalFeatures.concierge ?? false,
+                    shop: property.additionalFeatures.shop ?? false,
+                    gym: property.additionalFeatures.gym ?? false,
+                    moveInDate: property.additionalFeatures.moveInDate ?? null,
+                  },
                 },
               },
-            },
+            }),
             // Parking (optional)
             ...(property.parking && {
               parking: {

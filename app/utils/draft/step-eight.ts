@@ -132,8 +132,8 @@ export const stepEightValidation = {
    * @param additionalFeatures Additional features data
    * @returns True if description is provided (required field)
    */
-  areAdditionalFeaturesValid: (additionalFeatures: any): boolean => {
-    return !!additionalFeatures?.description;
+  areAdditionalFeaturesValid: (): boolean => {
+    return true;
   },
 
   /**
@@ -143,7 +143,7 @@ export const stepEightValidation = {
    */
   isStepEightValid: (data: globalThis.StepEight, draft: DraftListingWithFullPayload): boolean => {
     if (!draft.property?.additionalFeatures) return false;
-    return stepEightValidation.areAdditionalFeaturesValid(draft.property.additionalFeatures);
+    return stepEightValidation.areAdditionalFeaturesValid();
   },
 
   /**
