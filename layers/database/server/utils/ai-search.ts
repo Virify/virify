@@ -162,7 +162,7 @@ PROPERTY TYPES AND CLASSIFICATIONS (use these exact values):
 - Flat: Converted, Studio, Maisonette, High-rise, Within a Complex, Penthouse
 - Land: Residential, Commercial, Agricultural, Development Plot, Development Potential
 - Farms: Non-working Farmhouse, Working, Small Holding
-- Specialty: Shared Ownership, Retirement Home, New Build Home
+- Specialty: Retirement Home, New Build Home
 - Student Accommodation: Flat, House, House-share
 
 To filter for a single property type (e.g., a studio flat), use:

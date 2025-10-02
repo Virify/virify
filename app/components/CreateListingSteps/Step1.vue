@@ -64,20 +64,6 @@
       </template>
     </OrganismsDraftFormRadioGroup>
 
-    <OrganismsDraftFormRadioGroup 
-      v-if="isSale" 
-      title="Are you selling as part of a shared ownership scheme?"
-      :options="saleSharedOwnershipOptions" 
-      v-model="stepOneData.saleListing.sharedOwnership" 
-      name="sale-shared-ownership" 
-    >
-      <template #tooltip-content>
-        <p class="body-xs">
-          Shared ownership allows you to buy a share of a property (between 25% and 75%) and pay subsidised rent on the remaining share.
-        </p>
-      </template>
-    </OrganismsDraftFormRadioGroup>
-
     <!-- RENTAL -->
     <OrganismsDraftFormRadioGroup 
       v-if="isRent" 

@@ -25,14 +25,6 @@ export const saleListingChainOptions = [
 ];
 
 /**
- * Sale Listing Shared Ownership Options
- */
-export const saleSharedOwnershipOptions = Object.values([true, false]).map((value) => {
-  return { value: value, key: value ? "Shared Ownership" : "No Shared Ownership", info: value ? "The property is available for shared ownership." : "The property is not available for shared ownership." };
-});
-
-
-/**
  * Rental Furnished Status Options
  */
 export const rentalFurnishedStatusOptions = Object.values(FurnishedStatus).map((element) => {
