@@ -48,11 +48,18 @@
       </div>
 
       <div class="draft-card__right">
-        <AtomsPill class="draft-card__pill draft-card__pill--draft | body-xs">Draft</AtomsPill>
         <div class="draft-card__buttons">
           <NuxtLink :to="`/account/create-listing/${draft.id}`" class="draft-card__button-link">
             <button class="button button-xs">Edit</button>
           </NuxtLink>
+          <button 
+            class="button button-xs" 
+            :disabled="!canPreview"
+            :title="canPreview ? 'Preview your listing' : 'Complete address details (Step 4) to preview'"
+            @click="canPreview && navigateTo(`/listing/preview/${draft.id}`)"
+          >
+            Preview
+          </button>
           <button @click="$emit('delete', draft.id)" class="button button-xs" :disabled="deleting">
             {{ deleting ? 'Deleting...' : 'Delete' }}
           </button>
@@ -133,6 +140,11 @@ const draftCardClasses = computed(() => ({
 const stepProgressText = computed(() => {
   if (!props.draft?.id) return 'Not started';
   return getStepProgressText(props.draft.id).value;
+});
+
+// Check if preview is available (step 4 must be complete - address must be set)
+const canPreview = computed(() => {
+  return stepFourValidation.hasExistingStepFourData(props.draft);
 });
 
 </script>

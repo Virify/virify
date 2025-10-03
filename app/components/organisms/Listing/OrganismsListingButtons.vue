@@ -1,7 +1,7 @@
 <template>
   <div class="o-listing-buttons" role="presentation">
-    <AtomsNoteButton class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
-    <AtomsFavouriteButton class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
+    <AtomsNoteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
+    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
 
     <button 
       class="o-listing-buttons__contact | button button-secondary button-full"
@@ -23,6 +23,7 @@ interface Props {
     createdAt?: Date | String | null
     avatar?: string | null
   }
+  isDraft?: boolean
 }
 
 const props = defineProps<Props>()

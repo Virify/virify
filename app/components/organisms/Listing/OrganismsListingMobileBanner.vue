@@ -77,7 +77,7 @@
           </p>
         </div>
 
-        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent" />
+        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent" :is-draft="isDraft" />
       </div>
     </div>
   </div>
@@ -113,6 +113,7 @@ interface Props {
     avatar?: string | null
   }
   available?: string
+  isDraft?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

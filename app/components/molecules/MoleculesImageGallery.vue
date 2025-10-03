@@ -38,7 +38,7 @@
     </div>
 
     <!-- Thumbnails (Desktop only) -->
-    <div class="m-image-gallery__thumbs" ref="emblaThumbsRef">
+    <div class="m-image-gallery__thumbs" ref="emblaThumbsRef" v-if="images.length">
       <div class="m-image-gallery__thumbs-container">
         <button
           v-for="(image, index) in images"

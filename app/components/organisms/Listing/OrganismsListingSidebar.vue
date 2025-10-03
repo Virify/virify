@@ -25,7 +25,7 @@
     <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree" :year-built="newBuild"
       :construction-type="constructionType" />
 
-    <OrganismsListingButtons :listing-id="listingId" :agent="agent" />
+    <OrganismsListingButtons :listing-id="listingId" :agent="agent" :is-draft="isDraft" />
 
     <NuxtLink v-if="agent" to="#" class="o-listing-sidebar__agent-link">
       <OrganismsListingAgent :agent="agent" />
@@ -61,6 +61,7 @@ interface Props {
   hasGarden?: boolean
   hasLand?: boolean
   available?: string
+  isDraft?: boolean
 }
 
 const props = defineProps<Props>()
