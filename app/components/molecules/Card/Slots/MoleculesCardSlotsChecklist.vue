@@ -42,7 +42,7 @@ defineProps<Props>()
     flex-shrink: 0;
   }
 
-  @container (width < 300px) {
+  @container listing-card-content (width < 300px) {
     grid-template-columns: 1fr;
   }
 }

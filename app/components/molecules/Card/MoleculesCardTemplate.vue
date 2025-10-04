@@ -313,6 +313,7 @@ watch(useElementHover($hoverCard), (isHovered) => {
   &__gallery,
   &__content,
   &__footer {
+    container-name: listing-card-content;
     container-type: inline-size;
   }
 
@@ -330,13 +331,13 @@ watch(useElementHover($hoverCard), (isHovered) => {
     padding-right: var(--size-48);
   }
 
-  @container (width <=420px) {
+  @container listing-card-content (width <=420px) {
     &__content-grid {
       margin: 0 0 var(--size-10);
     }
   }
 
-  @container (width > 420px) {
+  @container listing-card-content (width > 420px) {
     &__content-grid {
       display: grid;
       grid-template-columns: auto 1fr;

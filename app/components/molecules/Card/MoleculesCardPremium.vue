@@ -70,13 +70,13 @@ defineProps<Props>()
     display: grid;
     gap: var(--size-12);
 
-    @container (width <=600px) {
+    @container listing-card-content (width <=600px) {
       .m-card-slots-checklist__row:nth-child(n+7) {
         display: none;
       }
     }
 
-    @container (width > 600px) {
+    @container listing-card-content (width > 600px) {
       align-items: center;
       grid-template-columns: 1fr 1.1fr;
       column-gap: var(--size-40);
