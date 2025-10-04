@@ -20,12 +20,23 @@
 
           <MoleculesCardSlotsPills v-if="pills.length" :pills />
 
-          <MoleculesCardSlotsDescription v-if="description" :description />
+          <template v-if="isMobile">
+            <MoleculesCardSlotsAccordion>
+              <MoleculesCardSlotsDescription v-if="description" :description />
+              <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
+            </MoleculesCardSlotsAccordion>
+          </template>
+
+          <template v-else>
+            <MoleculesCardSlotsDescription if="description" :description />
+          </template>
         </div>
 
-        <div class="m-card-premium__grid-row">
-          <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
-        </div>
+        <template v-if="!isMobile">
+          <div class="m-card-premium__grid-row">
+            <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
+          </div>
+        </template>
       </div>
 
       <MoleculesCardSlotsBookmark :property-id />
@@ -34,11 +45,18 @@
 </template>
 
 <script setup lang="ts">
+import { useMediaQuery } from '@vueuse/core';
+
 interface Props {
   result: ListingCardData
 }
 
 defineProps<Props>()
+
+/**
+ *  Toggle mobile layout
+ */
+const isMobile = useMediaQuery('(max-width: 595px)')
 
 </script>
 
