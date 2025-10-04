@@ -156,7 +156,8 @@ function distributeListings(listings: ListingCardData[]): ListingCardData[] {
 const resultsComponents = computed(() => {
   const { results } = asObject(props)
 
-  const distributedResults = distributeListings(asArray(results))
+  const sortedResults = asArray(results) /* @TODO - sort here */
+  const distributedResults = distributeListings(sortedResults)
 
   return distributedResults
     .filter((result): result is ListingCardData => !!result) // Type guard to remove undefined
