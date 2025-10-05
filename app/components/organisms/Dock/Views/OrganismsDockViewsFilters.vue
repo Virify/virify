@@ -3,9 +3,15 @@
     <MoleculesAiSearchLoading v-if="isLoading" />
 
     <template v-else>
-      <h2 class="| title-md">AI property filters</h2>
+      <OrganismsFilterSwitcher show-titles>
+        <template v-slot:traditional>
+          <OrganismsTraditionalSearchForm />
+        </template>
 
-      <MoleculesAiSearchFormFilters :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
+        <template v-slot:ai>
+          <MoleculesAiSearchFormFilters :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
+        </template>
+      </OrganismsFilterSwitcher>
     </template>
   </div>
 </template>

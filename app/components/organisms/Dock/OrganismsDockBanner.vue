@@ -12,8 +12,17 @@
 
         <client-only>
           <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
-            <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-              @submit-search="searchSubmit" @reset-search="searchReset" />
+
+            <OrganismsFilterSwitcher>
+              <template v-slot:traditional>
+                <OrganismsTraditionalSearchForm />
+              </template>
+
+              <template v-slot:ai>
+                <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
+                  @submit-search="searchSubmit" @reset-search="searchReset" />
+              </template>
+            </OrganismsFilterSwitcher>
           </Transition>
         </client-only>
 
