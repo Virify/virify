@@ -9,7 +9,8 @@
         </template>
 
         <template v-slot:ai>
-          <MoleculesAiSearchFormFilters :initial-query @submit-search="searchSubmit" @reset-search="searchReset" />
+          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="searchSubmit"
+            @reset-search="searchReset" />
         </template>
       </OrganismsFilterSwitcher>
     </template>

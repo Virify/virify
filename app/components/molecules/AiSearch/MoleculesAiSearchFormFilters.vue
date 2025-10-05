@@ -7,7 +7,14 @@
         :disabled="!isValid" @submit="searchSubmit" />
     </div>
 
-    <ul class="m-ai-search-form-filters__example-prompts">
+    <!--
+      @TODO
+      Suggestions should dynamically update to whatever has been search
+      to show relevant prompts. For example, if someone searches for a
+      house with a garden. Until then, after a search has been done, the
+      suggestions are fairly irrelevant and can be hidden
+    -->
+    <ul v-if="!hideSuggestions" class="m-ai-search-form-filters__example-prompts">
       <li v-for="(prompt, index) of examplePrompts" :key="index">
         <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
           @click.prevent="addPrompt(prompt)" />
@@ -26,6 +33,7 @@
 interface Props {
   initialQuery?: string;
   disabled?: boolean
+  hideSuggestions?: boolean
   hideReset?: boolean
 }
 
