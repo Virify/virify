@@ -1,14 +1,14 @@
 <template>
-  <fieldset ref="$wrapper" class="m-toggle-text | relative" :class="{
-    'm-toggle-text-loading': !isMounted
+  <fieldset ref="$wrapper" class="m-switcher-text | relative" :class="{
+    'm-switcher-text-loading': !isMounted
   }">
     <legend v-if="legend" class="| visually-hidden">
       {{ legend }}
     </legend>
 
-    <span ref="$highlight" class="m-toggle-text-highlight"></span>
+    <span ref="$highlight" class="m-switcher-text-highlight"></span>
 
-    <label ref="$labels" v-for="{ key, value } of options" :key class="m-toggle-text-label | font-semibold">
+    <label ref="$labels" v-for="{ key, value } of options" :key class="m-switcher-text-label | font-semibold">
       <input type="radio" class="| visually-hidden" :value="key" v-model="selected" :name />
       {{ value }}
     </label>
@@ -77,12 +77,12 @@ onMounted(() => {
 <style lang="scss">
 @use '#styles/_utils/functions' as fn;
 
-:where(.m-toggle-text) {
+:where(.m-switcher-text) {
   --switcher-outer-radius: var(--border-radius-xl);
   --switcher-inner-radius: var(--border-radius-lg);
 }
 
-.m-toggle-text {
+.m-switcher-text {
   display: flex;
   padding: 0;
   border: 0;
@@ -93,8 +93,10 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
-.m-toggle-text-label {
+.m-switcher-text-label {
   display: block;
+  position: relative;
+  z-index: 1;
   padding: var(--size-6) var(--size-24);
   line-height: var(--lineheight-sm);
   border-radius: var(--switcher-inner-radius);
@@ -108,12 +110,12 @@ onMounted(() => {
   }
 }
 
-.m-toggle-text-loading .m-toggle-text-label:has(input:checked) {
+.m-switcher-text-loading .m-switcher-text-label:has(input:checked) {
   background: var(--secondary-500);
   box-shadow: var(--monochrome-100);
 }
 
-.m-toggle-text-highlight {
+.m-switcher-text-highlight {
   position: absolute;
   top: var(--size-4);
   left: var(--size-4);
@@ -122,7 +124,6 @@ onMounted(() => {
   background: var(--secondary-500);
   box-shadow: var(--monochrome-100);
   border-radius: var(--switcher-inner-radius);
-  z-index: -1;
 
   transition-property: width, left;
   transition-duration: var(--animation-medium);
