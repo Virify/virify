@@ -72,6 +72,9 @@ watch(
   grid-template-columns: repeat(2, 1fr);
   align-items: center;
   gap: var(--size-12);
+}
+
+:where(.m-range-slider) {
   margin: 0;
 }
 

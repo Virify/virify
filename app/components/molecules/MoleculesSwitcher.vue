@@ -80,15 +80,18 @@ onMounted(() => {
 :where(.m-switcher-text) {
   --switcher-outer-radius: var(--border-radius-xl);
   --switcher-inner-radius: var(--border-radius-lg);
+  --switcher-highlight-offset: var(--size-4);
+  --switcher-outer-padding: var(--size-4);
+  --switcher-inner-padding: var(--size-6) var(--size-24);
 }
 
 .m-switcher-text {
   display: flex;
-  padding: 0;
   border: 0;
-  background: var(--background-300);
+  padding: var(--switcher-outer-padding);
+  background: transparent;
+  border: 1px solid var(--border-color-200);
   color: var(--foreground-300);
-  padding: var(--size-4);
   border-radius: var(--switcher-outer-radius);
   box-sizing: border-box;
 }
@@ -97,7 +100,7 @@ onMounted(() => {
   display: block;
   position: relative;
   z-index: 1;
-  padding: var(--size-6) var(--size-24);
+  padding: var(--switcher-inner-padding);
   line-height: var(--lineheight-sm);
   border-radius: var(--switcher-inner-radius);
   flex: 1 0 0px;
@@ -117,9 +120,9 @@ onMounted(() => {
 
 .m-switcher-text-highlight {
   position: absolute;
-  top: var(--size-4);
-  left: var(--size-4);
-  height: calc(100% - (2 * var(--size-4)));
+  top: var(--switcher-highlight-offset);
+  left: var(--switcher-highlight-offset);
+  height: calc(100% - (2 * var(--switcher-highlight-offset)));
   width: 0;
   background: var(--secondary-500);
   box-shadow: var(--monochrome-100);
