@@ -1,5 +1,5 @@
 <template>
-  <MoleculesCardTemplate variant="premium" :result>
+  <MoleculesCardTemplate ref="$content" variant="premium" :result>
     <template #carousel="{ media, propertyId }">
       <MoleculesCardSlotsPremiumCarousel :slides="media" :property-id />
     </template>
@@ -20,7 +20,7 @@
 
           <MoleculesCardSlotsPills v-if="pills.length" :pills />
 
-          <template v-if="isMobile">
+          <template v-if="isExpandingContent">
             <MoleculesCardSlotsAccordion>
               <MoleculesCardSlotsDescription v-if="description" :description />
               <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
@@ -32,7 +32,7 @@
           </template>
         </div>
 
-        <template v-if="!isMobile">
+        <template v-if="!isExpandingContent">
           <div class="m-card-premium__grid-row">
             <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
           </div>
@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { useMediaQuery } from '@vueuse/core';
+import { useElementSize } from '@vueuse/core';
 
 interface Props {
   result: ListingCardData
@@ -56,7 +56,10 @@ defineProps<Props>()
 /**
  *  Toggle mobile layout
  */
-const isMobile = useMediaQuery('(max-width: 595px)')
+const $content = useTemplateRef('$content')
+const { width } = useElementSize($content)
+
+const isExpandingContent = computed(() => width.value < 550)
 
 </script>
 
