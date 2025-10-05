@@ -3,7 +3,7 @@
     <MoleculesAiSearchLoading v-if="isLoading" />
 
     <template v-else>
-      <OrganismsFilterSwitcher show-titles>
+      <OrganismsFilterSwitcher>
         <template v-slot:traditional>
           <OrganismsTraditionalSearchForm />
         </template>

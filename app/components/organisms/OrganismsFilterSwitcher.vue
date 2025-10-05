@@ -4,34 +4,24 @@
       class="o-property-filter__switcher" />
 
     <template v-if="searchType === 'traditional'">
-      <h2 v-if="showTitles" class="| title-md">Traditional search</h2>
-
       <slot name="traditional"></slot>
     </template>
 
     <template v-else>
-      <h2 v-if="showTitles" class="| title-md">AI powered search</h2>
-
       <slot name="ai"></slot>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-interface Props {
-  showTitles?: boolean
-}
-
-defineProps<Props>()
-
 /**
  *  Toggle between search variant
  */
 const searchType = useState('search-type', () => 'ai')
 
 const toggleSearchType = [
-  { value: 'Traditional search', key: 'traditional' },
-  { value: 'AI search', key: 'ai' }
+  { value: 'Traditional', key: 'traditional' },
+  { value: 'AI enhanced', key: 'ai' }
 ]
 
 </script>
@@ -40,7 +30,18 @@ const toggleSearchType = [
 .o-property-filter {
 
   &__switcher {
-    margin: 0 0 var(--size-32);
+    --switcher-outer-radius: var(--border-radius-2xl);
+    --switcher-inner-radius: var(--border-radius-xl);
+    --switcher-outer-padding: var(--size-6);
+    --switcher-highlight-offset: var(--size-6);
+    --switcher-inner-padding: var(--size-10) var(--size-16);
+
+    max-width: 34ch;
+    margin: 0 auto var(--size-16);
+
+    &--titled {
+      margin: 0 auto var(--size-32);
+    }
   }
 }
 </style>

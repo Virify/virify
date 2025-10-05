@@ -168,7 +168,6 @@ onMounted(() => {
     @include mq.tablet {
       max-height: calc(100dvh - var(--size-32) - #{ $dock-height });
       padding: var(--size-32);
-      padding-top: var(--size-48);
     }
 
     @include mq.notebook {
