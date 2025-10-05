@@ -8,9 +8,14 @@ export type PropertyTypeWithClassifications = {
   }[]
 }
 
+export type PropertyTypeOption = {
+  key: number
+  value: string
+}
+
 export type PropertyTypeWithOptions = {
   id: number
   name: string
   defaultSelected: boolean
-  options: string[]
+  options: PropertyTypeOption[]
 }
