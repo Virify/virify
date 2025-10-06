@@ -7,11 +7,13 @@
       </button>
     </PopoverTrigger>
 
-    <PopoverContent :side-offset="10" class="o-traditional-search-property-subtype__content">
+    <PopoverContent :side-offset="10" position-strategy="absolute"
+      class="o-traditional-search-property-subtype__content">
       <PopoverClose class="o-traditional-search-property-subtype__close | button button-ghost"
         aria-label="Close popover">
         <AtomsIcon icon="cross" aria-hidden class="o-traditional-search-property-subtype__close-icon" />
       </PopoverClose>
+      <h3 class="o-traditional-search-property-subtype__title | title-xs">{{ name }}</h3>
 
       <ul class="o-traditional-search-property-subtype__list">
         <li v-for="{ value, checked } of optionsWithSelection" :key="value">
@@ -103,12 +105,17 @@ async function emitChange(updatedValue: string, checked: boolean) {
   &__content {
     z-index: 9;
     min-width: 15ch;
+    max-width: 20ch;
     background: var(--background-200);
     color: var(--foreground-100);
-    padding: var(--size-40) var(--size-12) var(--size-12);
+    padding: var(--size-16);
     border-radius: var(--border-radius-ui);
     border: 1px solid var(--border-color-200);
     box-shadow: var(--elevate-200);
+  }
+
+  &__title {
+    margin-right: var(--size-40);
   }
 
   &__list {

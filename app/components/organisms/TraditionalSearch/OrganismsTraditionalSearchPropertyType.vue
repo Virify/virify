@@ -1,7 +1,5 @@
 <template>
-  <MoleculesScrollBox class="| focus-overflow">
-    <!-- @TODO - add skeleton loader here? -->
-
+  <div class="o-property-types" role="presentation">
     <ul class="o-property-types__list">
       <li v-for="{ name, options, selected, defaultSelected } of propertyTypes" :key="name"
         class="o-property-types__list-item | relative">
@@ -19,7 +17,7 @@
         </label>
       </li>
     </ul>
-  </MoleculesScrollBox>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -116,27 +114,38 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
 
 <style lang="scss">
 .o-property-types {
+  container-type: inline-size;
 
   &__list {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
+    display: grid;
     gap: var(--size-8);
+    grid-template-columns: repeat(2, 1fr);
+
+    @container (width > 480px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @container (width > 640px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 
   &__list-item {
     display: flex;
     align-items: stretch;
+    min-height: 12ch;
   }
 
   &__input {
     display: flex;
+    width: 100%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    width: 11ch;
     background: transparent;
     gap: var(--size-6);
     border: 2px solid var(--border-color-100);
