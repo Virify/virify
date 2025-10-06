@@ -3,16 +3,15 @@
     <!-- @TODO - add skeleton loader here? -->
 
     <ul class="o-property-types__list">
-      <li v-for="{ name, options } of propertyTypesArray" :key="name" class="o-property-types__list-item | relative">
+      <li v-for="{ name, options, selected, defaultSelected } of propertyTypes" :key="name"
+        class="o-property-types__list-item | relative">
 
-        <button type="button" class="o-property-types__dropdown | button button-ghost button-xs"
-          @click.prevent="showSelectedSubtypes(name, options)">
-          0/{{ options.length }} selected
-        </button>
+        <OrganismsTraditionalSearchPropertySubtype button-class="o-property-types__dropdown" :name :options :selected
+          @update-selected="updateSelectedSubtype" />
 
         <label class="o-property-types__input | font-bold">
           <input type="checkbox" :name="name" v-model="selectedTypes[name]" class="| visually-hidden"
-            @input="event => updateSelectedType(event, name)" />
+            :checked="defaultSelected" @input="event => updateSelectedType(event, { name, options })" />
 
           <AtomsIcon icon="tick-solid" aria-hidden class="o-property-types__input-icon" />
 
@@ -24,17 +23,26 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
-  propertyTypes?: PropertyTypeWithOptions[]
+interface PropertyType extends PropertyTypeWithOptions {
+  selected: string[]
 }
 
-const props = defineProps<Props>()
-
 /**
- *  Ensure property type is a valid format
+ *  Fetch property types (only once!) and save to state
  */
-const propertyTypesArray = computed<PropertyTypeWithOptions[]>(() => {
-  return asArray(props.propertyTypes)
+const propertyTypes = useState<PropertyType[]>('property-types', () => [])
+
+callOnce(async () => {
+  useFetch<PropertyTypeWithOptions[]>('/api/property-type/').then(({ data }) => {
+    propertyTypes.value = asArray(data.value).map((row) => {
+      const { options, defaultSelected } = asObject(row)
+
+      return {
+        ...(asObject(row) as Record<string, unknown>),
+        selected: defaultSelected ? getOptionsAsStrings(options) : []
+      }
+    }) as never as PropertyType[]
+  })
 })
 
 /**
@@ -44,14 +52,61 @@ const selectedTypes = useState('selected-property-types', () => {
   return reactive<Record<string, boolean>>({})
 })
 
-function updateSelectedType({ target }: Event, name: string) {
-  const { checked } = asObject(target)
+/**
+ *  Update selected types
+ */
+type MatchType = PropertyType | undefined
 
-  console.log('updateSelectedType', { name, checked })
+type SelectType = {
+  name: string
+  options: PropertyTypeOption[]
 }
 
-function showSelectedSubtypes(name: string, options: PropertyTypeOption[]) {
-  console.log('showSelectedSubtypes', { name, options })
+type SelectSubType = {
+  name: string
+  selected: string[]
+}
+
+function getOptionsAsStrings(options: PropertyTypeOption[]): string[] {
+  return asArray(options).map(({ value }) => value)
+}
+
+function setSelectedOptions(match: MatchType, options: string[]) {
+  if (!match) return
+
+  match.selected = options
+}
+
+function getPropertyTypeByName(name: string): PropertyType | undefined {
+  return propertyTypes.value.find((row) => row.name === name)
+}
+
+function updateSelectedType({ target }: Event, selected: SelectType) {
+  const { checked } = asObject(target)
+  const { name, options } = asObject(selected)
+
+  // Find the matching option
+  const match = getPropertyTypeByName(name)
+
+  // If unchecked, select all
+  if (checked) {
+    setSelectedOptions(match, getOptionsAsStrings(options))
+
+    return
+  }
+
+  // Else select none
+  setSelectedOptions(match, [])
+}
+
+function updateSelectedSubtype({ name, selected }: SelectSubType) {
+  const match = getPropertyTypeByName(name)
+
+  // If no matches, do nothing
+  if (!match) return
+
+  // If a selection is made, apply it
+  setSelectedOptions(match, selected)
 }
 
 </script>
@@ -125,6 +180,10 @@ function showSelectedSubtypes(name: string, options: PropertyTypeOption[]) {
     border-color: var(--secondary-400);
   }
 
+  &__list-item:has(&__dropdown:hover):not(:has(input:checked)) &__input {
+    border-color: var(--border-color-300);
+  }
+
   &__list-item:has(input:checked) &__input {
     border-color: var(--secondary-500);
     background-color: var(--secondary-900);
@@ -133,7 +192,11 @@ function showSelectedSubtypes(name: string, options: PropertyTypeOption[]) {
   &__list-item:has(input:checked) &__dropdown {
     background-color: var(--secondary-500);
     color: var(--monochrome-100);
-  }
 
+    &:hover {
+      background-color: var(--secondary-600);
+      color: var(--monochrome-100);
+    }
+  }
 }
 </style>
