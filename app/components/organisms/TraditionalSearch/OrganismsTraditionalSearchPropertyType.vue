@@ -107,6 +107,9 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
 
   // If a selection is made, apply it
   setSelectedOptions(match, selected)
+
+  // Ensure match is appropriately updated
+  selectedTypes.value[name] = !!selected.length
 }
 
 </script>
