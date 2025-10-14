@@ -32,12 +32,12 @@ const waitingListConfig: WaitingListConfig = {
   // Routes accessible in waiting-list mode
   allowedRoutes: [
     '/waiting-list',
+    '/contact',
     '/terms',
     '/privacy',
     '/price-paid',
     '/guides',
     '/login',
-    '/email-preview-tool',  // For testing emails
   ],
 
   // Navigation visibility

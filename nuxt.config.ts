@@ -5,6 +5,12 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
+  runtimeConfig: {
+    CF_SECRET_KEY: process.env.CF_SECRET_KEY,
+    public: {
+      CF_SITE_KEY: process.env.CF_SITE_KEY,
+    },
+  },
   modules: ["@nuxt/image", "nuxt-security"],
   image: {
     cloudflare: {
@@ -20,9 +26,11 @@ export default defineNuxtConfig({
       permissionsPolicy: false,
       contentSecurityPolicy: {
         "img-src": ["'self'", "data:", "https://cdn.sanity.io", "https://virify.co.uk", String(process.env.CF_IMAGES_URL), "https://images.unsplash.com"],
-        "script-src": ["'self'", "https:", "'unsafe-inline'"],
+        "script-src": ["'self'", "https:", "'unsafe-inline'", "https://challenges.cloudflare.com"],
         "script-src-attr": ["'unsafe-inline'"],
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", 'https:'],
+        "frame-src": ["'self'", "https://challenges.cloudflare.com"],
+        "connect-src": ["'self'", "https://challenges.cloudflare.com"],
         "worker-src": ["'self'", "blob:"],
       },
     },

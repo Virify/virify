@@ -2,6 +2,9 @@
  * Server middleware to block API access in waiting list mode
  * Only allows specific waiting list APIs
  */
+import { defineEventHandler, createError } from "h3";
+import { useRuntimeConfig } from "#imports";
+
 export default defineEventHandler((event) => {
   const config = useRuntimeConfig();
   
@@ -13,6 +16,7 @@ export default defineEventHandler((event) => {
     const allowedApis = [
       '/api/waiting-list',           // POST - join waiting list
       '/api/waiting-list/count',     // GET - get count
+      '/api/contact',                // POST - contact form
       '/api/sanity/',                // Sanity CMS content (guides, etc.)
       '/api/_auth/',                 // Nuxt Auth Utils endpoints
     ];
