@@ -2,13 +2,18 @@
   <footer class="o-footer">
     <div class="o-footer__container | container">
       <!-- Logo Section -->
-      <div class="o-footer__brand">
+      <div class="o-footer__brand" v-if="!isWaitingListMode">
         <nuxt-link to="/" class="o-footer__logo-link">
           <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="180" height="54" class="o-footer__logo" />
         </nuxt-link>
       </div>
 
       <div class="o-footer__sections">
+        <div class="o-footer__brand" v-if="isWaitingListMode">
+          <nuxt-link to="/" class="o-footer__logo-link">
+            <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="120" height="54" class="o-footer__logo" />
+          </nuxt-link>
+        </div>
         <!-- Property Search Section -->
         <div v-if="footerConfig.showPropertySearch" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Property Search</h3>
@@ -61,7 +66,7 @@
 
       <!-- Copyright -->
       <div class="o-footer__bottom">
-        <p class="o-footer__copyright | body-xs">Copyright &copy; Virify Ltd {{ currentYear }}</p>
+        <p class="o-footer__copyright | body-xs">© {{ currentYear }} Virify Ltd. All rights reserved. Company No. 16255324.</p>
       </div>
     </div>
   </footer>
@@ -117,6 +122,7 @@ const { data: categories } = await useCategories();
   &__sections {
     display: flex;
     justify-content: flex-start;
+    align-items: flex-start;
     flex-direction: row;
     gap: var(--size-48);
     margin-top: var(--size-12);

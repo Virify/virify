@@ -10,8 +10,8 @@
       :key="category._id" 
       :title="category.title" 
       :description="category.description" 
-      :to="`/guides/${category.slug.current}`" 
-      :icon="category.icon || 'content/info'" />
+      :to="`/guides/${category.slug.current}`"
+      :image="category.heroImage" />
     </MoleculesGuideGrid>
 
     <section v-if="!isWaitingListMode">

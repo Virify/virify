@@ -15,7 +15,7 @@
           :read-time="guide.readTime"
           :published-at="guide.publishedAt"
           :is-featured="guide.isFeatured"
-          :icon="guide.icon || 'content/info'"
+          :image="guide.heroImage"
         />
       </MoleculesGuideGrid>
     </section>

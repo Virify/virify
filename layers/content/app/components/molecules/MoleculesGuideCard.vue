@@ -1,15 +1,21 @@
 <template>
   <NuxtLink :to="to" class="guide-card">
     <div class="guide-card__top">
-      <div class="guide-card__content">
-        <div class="guide-card__icon">
-          <AtomsIcon :icon="icon" :size="64" />
-        </div>
-        <h3 class="guide-card__title | title-xs">{{ title }}</h3>
-      </div>
+      <nuxt-img 
+        v-if="image" 
+        provider="sanity" 
+        :src="image.asset._ref" 
+        :width="600" 
+        :height="300"
+        loading="lazy"
+        class="guide-card__image"
+        placeholder='/img/preload.svg'
+      />
+      <div class="guide-card__overlay"></div>
     </div>
-    <div class="guide-card__description | body-sm">
-      <p>{{ excerpt || description }}</p>
+    <div class="guide-card__description">
+      <h3 class="guide-card__title | title-sm">{{ title }}</h3>
+      <p class="body-sm">{{ excerpt || description }}</p>
     </div>
     <div class="guide-card__details" v-if="readTime || publishedAt">
       <p v-if="readTime" class="body-xs">{{ readTime }} min read</p>
@@ -22,7 +28,7 @@
 defineProps<{
   title: string;
   to: string;
-  icon?: string;
+  image?: SanityImage;
   description?: string;
   excerpt?: string;
   readTime?: number;
@@ -51,14 +57,13 @@ defineProps<{
 
     &__top {
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)), var(--secondary-400);
-    padding: var(--size-32);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    min-height: 180px;
-    flex: 1 1 0;
+    height: 200px;
+    flex-shrink: 0;
     width: 100%;
     position: relative;
 
@@ -73,45 +78,53 @@ defineProps<{
       background-size: cover;
       opacity: 0.7;
       pointer-events: none;
+      z-index: 0;
     }
   }
 
-  &__content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--size-16);
-    position: relative;
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
     z-index: 1;
   }
 
-  &__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--border-radius-lg);
-
-    .a-icon {
-      color: var(--monochrome-100);
-    }
-  }
-
   &__title {
-    color: var(--monochrome-100);
+    color: var(--secondary-400);
+    margin-bottom: var(--size-8);
   }
 
   &__description {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: var(--size-16);
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: var(--size-20);
     color: var(--foreground-100);
-    text-align: center;
-    flex: 1 1 0;
+    text-align: left;
+    flex: 1 1 auto;
+    gap: var(--size-12);
+    min-height: 0;
 
     @include mq.mobile-only {
-      justify-content: center;
+      justify-content: flex-start;
     }
   }
 
@@ -122,6 +135,7 @@ defineProps<{
     align-items: center;
     color: var(--secondary-400);
     padding: var(--size-16);
+    flex-shrink: 0;
 
     @include mq.small-tablet {
       flex-direction: column;
