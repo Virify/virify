@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const { isWaitingListMode, config } = useWaitingListMode()
+  const { isWaitingListMode } = useWaitingListMode()
 
   // Only apply restrictions if deployment environment is 'waiting-list' (waiting list mode)
   if (!isWaitingListMode.value) {

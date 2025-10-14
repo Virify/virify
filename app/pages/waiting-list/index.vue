@@ -229,19 +229,23 @@ async function handleSubmit() {
   isSubmitting.value = true;
   formError.value = null;
 
-  // TODO: Implement backend API call
-  // Simulate API call for now
-  setTimeout(() => {
-    isSuccess.value = true;
-    isSubmitting.value = false;
+  try {
+    const response = await $fetch<{ success: boolean; message: string; alreadyExists?: boolean }>("/api/waiting-list", {
+      method: "POST",
+      body: {
+        email: email.value,
+      },
+    });
 
-    // Track signup event
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "waiting_list_signup", {
-        method: "email",
-      });
+    if (response.success) {
+      isSuccess.value = true;
     }
-  }, 1000);
+  } catch (error: any) {
+    console.error("Waiting list signup error:", error);
+    formError.value = error.data?.statusMessage || "Failed to join waiting list. Please try again.";
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 
 function scrollToForm() {
