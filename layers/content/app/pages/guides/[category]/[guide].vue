@@ -7,16 +7,8 @@
         :title="guide.title"
         :description="guide.excerpt || ''"
         :image="guide.heroImage"
+        :meta="heroMeta"
       />
-      
-      <div class="guide-page__meta">
-        <AtomsPill v-if="guide.readTime" class="guide-page__pill">
-          {{ guide.readTime }} min read
-        </AtomsPill>
-        <AtomsPill v-if="guide.publishedAt" class="guide-page__pill">
-          Published {{ formatDate(guide.publishedAt) }}
-        </AtomsPill>
-      </div>
 
       <div class="guide-page__layout">
         <!-- Main Content -->
@@ -52,6 +44,14 @@ const breadcrumbItems = computed(() => [
   { label: guide.value?.category?.title ?? '', to: guide.value?.category ? `/guides/${guide.value.category.slug.current}` : undefined },
   { label: guide.value?.title ?? '' }
 ])
+
+// Build hero meta pills
+const heroMeta = computed(() => {
+  const items: string[] = []
+  if (guide.value?.readTime) items.push(`${guide.value.readTime} min read`)
+  if (guide.value?.publishedAt) items.push(`Published ${formatDate(guide.value.publishedAt)}`)
+  return items
+})
 
 // Set page meta if guide exists and has SEO data
 if (guide.value) {
@@ -113,5 +113,4 @@ if (guide.value) {
     justify-content: center;
   }
 }
-
 </style>

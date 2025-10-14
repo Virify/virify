@@ -22,7 +22,10 @@
       <div class="o-site-navigation__actions">
         <ul class="o-site-navigation-list o-site-navigation-list--actions">
           <template v-for="item in actionItems" :key="item.id">
-            <li v-if="item.type === 'link' && item.href">
+            <li v-if="item.type === 'component' && item.id === 'theme-toggle'">
+              <AtomsThemeToggle />
+            </li>
+            <li v-else-if="item.type === 'link' && item.href">
               <nuxt-link 
                 :to="item.href" 
                 class="o-site-navigation-link | button button-ghost button-sm">
@@ -30,7 +33,8 @@
               </nuxt-link>
             </li>
             <li v-else-if="item.type === 'button'">
-              <button @click.prevent="item.action && item.action()"
+              <button 
+                @click.prevent="item.action && item.action()"
                 :class="`o-site-navigation-link | button ${item.buttonClass || 'button-ghost'} button-sm`">
                 {{ item.label }}
               </button>
@@ -205,6 +209,11 @@ function handleBurgerClick() {
     white-space: nowrap;
     text-decoration: none;
     color: inherit;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--monochrome-700);
+    }
   }
 }
 

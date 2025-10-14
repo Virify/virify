@@ -6,8 +6,15 @@
         :key="action.id"
         class="o-site-navigation__drawer-action-item"
       >
+        <div
+          v-if="action.type === 'component' && action.id === 'theme-toggle'"
+          class="o-site-navigation__drawer-theme-toggle"
+        >
+          <AtomsThemeToggle />
+          <span class="o-site-navigation__drawer-text">Theme</span>
+        </div>
         <NuxtLink
-          v-if="action.type === 'link' && action.href"
+          v-else-if="action.type === 'link' && action.href"
           :to="action.href"
           class="o-site-navigation-link | button button-ghost button-sm | o-site-navigation__drawer-link"
           @click="$emit('close')"
@@ -98,6 +105,13 @@ function handleAction(fn?: () => void) {
 
 .o-site-navigation__drawer-icon {
   flex-shrink: 0;
+}
+
+.o-site-navigation__drawer-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--size-8);
+  padding: var(--size-8) var(--size-12);
 }
 
 .o-site-navigation__drawer-text {

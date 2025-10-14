@@ -34,7 +34,7 @@ const variantClass = props.variant === 'primary'
   padding: var(--size-32);
   gap: var(--size-8);
   background: url('/img/logo-background.svg') no-repeat bottom right, var(--blue-400);
-  background-size: auto 150%, cover;
+  background-size: auto 180%, cover;
   color: var(--monochrome-900);
 
   .button {
@@ -45,7 +45,7 @@ const variantClass = props.variant === 'primary'
 
 .a-hero-card--primary {
   background: url('/img/logo-background.svg') no-repeat bottom right, linear-gradient(135deg, var(--monochrome-100), var(--primary-400));
-  background-size: auto 150%, cover;
+  background-size: auto 180%, cover;
 
   .button {
     color: var(--monochrome-100)
@@ -54,7 +54,7 @@ const variantClass = props.variant === 'primary'
 
 .a-hero-card--secondary {
   background: url('/img/logo-background.svg') no-repeat bottom right, linear-gradient(135deg, var(--monochrome-100), var(--secondary-400));
-  background-size: auto 150%, cover;
+  background-size: auto 180%, cover;
 
   .button {
     color: var(--monochrome-100)

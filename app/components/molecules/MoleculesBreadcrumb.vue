@@ -45,7 +45,7 @@ defineProps<{
 
     &--current {
       background: var(--secondary-400);
-      color: var(--foreground-100);
+      color: var(--monochrome-900);
       border: 1px solid var(--foreground-200);
     }
 

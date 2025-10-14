@@ -1,5 +1,19 @@
 <template>
-  <div class="price-paid | container">
+  <div class="price-paid-page">
+    <!-- Hero like the homepage -->
+    <section class="price-paid-hero">
+      <div class="container">
+        <div class="price-paid-hero__content">
+          <h1 class="title-2xl lineheight-xs">Price Paid Data</h1>
+          <p class="body-lg">
+            Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form + results (unchanged) -->
+    <div class="price-paid | container">
     <AtomsHeroCard class="price-paid__hero">
       <h1 class="| title-lg">Price Paid Data</h1>
       <p class="| body-md">Enter a UK postcode and search</p>
@@ -56,6 +70,76 @@
         <button class="| button button-secondary button-sm" @click="error = null">Try again</button>
       </div>
     </div>
+    </div>
+
+    <!-- Feature tiles teaser (hidden once results load) -->
+    <section
+      v-if="!loading && !error && results.length === 0"
+      class="price-paid-teaser"
+    >
+      <div class="container">
+        <header class="price-paid-teaser__header">
+          <h2 class="title-xl">What you can do with Price Paid data</h2>
+          <p class="body-md max-width-prose">
+            Explore recent sold prices, track local market momentum, and understand how a home’s value has changed over time. This is a preview of the tools we’re building.
+          </p>
+        </header>
+
+        <div class="price-paid-teaser__grid">
+          <MoleculesFeatureTile
+            iconName="listings/savings"
+            title="See sold history by address"
+            subtitle="Every transaction, one place"
+            description="Look up a property and see its full sale timeline with prices and transfer dates."
+            variant="blue"
+          />
+
+          <MoleculesFeatureTile
+            iconName="explore/trending"
+            title="Track local trends"
+            subtitle="Postcode-level insights"
+            description="Understand price momentum in your area over the last 12–36 months."
+            variant="blue"
+          />
+
+          <MoleculesFeatureTile
+            iconName="explore/map"
+            title="Map the neighbourhood"
+            subtitle="Streets that set the tone"
+            description="Spot streets and pockets that outperform the postcode average."
+            variant="blue"
+          />
+
+          <MoleculesFeatureTile
+            iconName="listings/property-type"
+            title="Compare property types"
+            subtitle="Flats vs houses"
+            description="See how detached, semi, terrace, and flats differ in both price and velocity."
+            variant="blue"
+          />
+
+          <MoleculesFeatureTile
+            iconName="search"
+            title="Verify asking prices"
+            subtitle="Reality check"
+            description="Sense‑check current listings against actual sold prices nearby."
+            variant="blue"
+          />
+
+          <MoleculesFeatureTile
+            iconName="content/info"
+            title="Timing the move"
+            subtitle="Seasonality & cycles"
+            description="See when sales cluster and how that affects negotiation power."
+            variant="blue"
+          />
+        </div>
+
+        <div class="price-paid-teaser__cta">
+          <NuxtLink to="/waiting-list" class="button button-lg button-monochrome">Join the waiting list</NuxtLink>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 <script lang="ts" setup>
@@ -98,6 +182,26 @@ function formatTimelineItems(sales: any[]) {
 }
 </script>
 <style lang="scss" scoped>
+.price-paid-page {
+  background: var(--background-100);
+}
+
+.price-paid-hero {
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+  color: var(--monochrome-900);
+  padding: var(--size-80) var(--size-32) var(--size-64);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .price-paid-hero__content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--size-64) 0;
+  }
+}
+
 .price-paid {
   padding: var(--size-32) 0;
 
@@ -201,6 +305,31 @@ function formatTimelineItems(sales: any[]) {
         color: var(--foreground-200);
       }
     }
+  }
+}
+
+/* Teaser feature tiles */
+.price-paid-teaser {
+  padding: var(--size-48) 0 var(--size-64);
+
+  &__header {
+    text-align: center;
+    margin-bottom: var(--size-32);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--size-20);
+
+    @media (min-width: 720px) { grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  &__cta {
+    margin-top: var(--size-32);
+    display: flex;
+    justify-content: center;
   }
 }
 

@@ -17,10 +17,19 @@
       placeholder='/img/preload.svg'
     />
     <div class="guides-hero__content">
-      <h1 class="guides-hero__title | title-xl">{{ title }}</h1>
+  <h1 class="guides-hero__title | title-2xl">{{ title }}</h1>
       <p class="guides-hero__description | r-body-md-sm">
         {{ description }}
       </p>
+      <div v-if="meta?.length" class="guides-hero__meta">
+        <AtomsPill
+          v-for="(item, idx) in meta"
+          :key="idx"
+          class="guides-hero__pill | body-xs"
+        >
+          {{ item }}
+        </AtomsPill>
+      </div>
     </div>
   </section>
 </template>
@@ -30,6 +39,7 @@ defineProps<{
   title: string;
   description: string;
   image?: SanityImage;
+  meta?: string[];
 }>();
 </script>
 
@@ -57,7 +67,7 @@ defineProps<{
   &__content {
     position: relative;
     z-index: 2;
-    max-width: 600px;
+    max-width: 800px;
     margin-left: var(--size-32);
     padding: var(--size-24) var(--size-32);
     border-radius: var(--border-radius-md);
@@ -72,12 +82,29 @@ defineProps<{
 
   &__title {
     color: var(--monochrome-900);
-    margin-bottom: var(--size-16);
+    margin-bottom: var(--size-8);
   }
 
   &__description {
     color: var(--monochrome-900);
-    margin-bottom: var(--size-16);
+    margin-bottom: var(--size-8);
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-12);
+    margin-top: var(--size-16);
+    padding: var(--size-4);
+
+    @include mq.mobile-only {
+      justify-content: center;
+    }
+  }
+
+  &__pill {
+    background: var(--monochrome-900);
+    color: var(--monochrome-200);
   }
 
 }

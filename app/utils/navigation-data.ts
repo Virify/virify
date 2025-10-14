@@ -28,6 +28,13 @@ export const getBaseCenterItems = (): NavigationItem[] => [
     icon: "chevron-down",
     children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: 'account/billing' }],
   },
+  {
+    id: "waiting-list",
+    label: "Waiting List",
+    href: "/waiting-list/",
+    type: "link",
+    icon: 'account/waiting-list'
+  },
 ];
 
 /**
@@ -45,6 +52,9 @@ export const getActionItemsBuilder = () => {
     } else {
       items.push({ id: "account", label: "Account", href: "/account", type: "link", requiresAuth: true }, { id: "logout", label: "Logout", type: "button", requiresAuth: true, action: actions.logout, buttonClass: "button-monochrome" });
     }
+
+    // Add theme toggle last (always visible)
+    items.push({ id: "theme-toggle", label: "Theme", type: "component" });
 
     return items.filter((item) => {
       if (item.requiresAuth && !loggedIn) return false;

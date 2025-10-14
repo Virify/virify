@@ -71,14 +71,7 @@
     </div>
   </li>
   <li v-else class="o-site-navigation__item">
-    <nuxt-link :to="item.href || '#'" class="o-site-navigation-link | button button-quiet button-xs">
-      <AtomsIcon 
-        v-if="item.icon" 
-        :icon="item.icon" 
-        width="16" 
-        height="16" 
-        class="o-site-navigation__icon"
-      />
+    <nuxt-link :to="item.href || '#'" class="o-site-navigation-link | button button-ghost button-sm">
       {{ item.label }}
     </nuxt-link>
   </li>

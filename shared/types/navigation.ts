@@ -21,7 +21,7 @@ export interface NavigationItem {
   href?: string
   requiresAuth?: boolean
   hideWhenAuth?: boolean
-  type?: 'link' | 'button' | 'dropdown'
+  type?: 'link' | 'button' | 'dropdown' | 'component'
   icon?: string
   action?: () => void
   /** Optional button style class e.g. 'button-tertiary', 'button-secondary' */
