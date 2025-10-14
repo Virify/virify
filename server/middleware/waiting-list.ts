@@ -19,6 +19,7 @@ export default defineEventHandler((event) => {
       '/api/contact',                // POST - contact form
       '/api/sanity/',                // Sanity CMS content (guides, etc.)
       '/api/_auth/',                 // Nuxt Auth Utils endpoints
+      '/api/price-paid/',            // Price Paid Data endpoints
     ];
 
     // Check if the path is an API route
