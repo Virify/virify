@@ -43,7 +43,6 @@ export const getBaseCenterItems = (): NavigationItem[] => {
       label: "Waiting List",
       href: "/waiting-list/",
       type: "link",
-      icon: 'account/waiting-list'
     },
   )
 
@@ -79,7 +78,7 @@ export const getActionItemsBuilder = () => {
       );
     } else {
       items.push(
-      { id: "login", label: "Login", type: "button", hideWhenAuth: true, action: actions.openLogin, buttonClass: "button-tertiary" },
+      { id: "login", label: "Login", type: "button", hideWhenAuth: true, action: actions.openLogin, buttonClass: "button-monochrome" },
       { id: "theme-toggle", label: "Theme", type: "component" }
     );
     }

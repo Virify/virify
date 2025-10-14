@@ -11,7 +11,6 @@
           class="o-site-navigation__drawer-theme-toggle"
         >
           <AtomsThemeToggle />
-          <span class="o-site-navigation__drawer-text">Theme</span>
         </div>
         <NuxtLink
           v-else-if="action.type === 'link' && action.href"
@@ -91,13 +90,15 @@ function handleAction(fn?: () => void) {
 
 .o-site-navigation__drawer-link {
   width: 100%;
-  justify-content: flex-start;
+  display: flex;
+  justify-content: center;
   text-decoration: none;
   color: inherit;
 
   &-content {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--size-8);
     width: 100%;
   }

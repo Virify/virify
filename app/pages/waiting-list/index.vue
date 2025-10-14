@@ -339,7 +339,7 @@ useHead({
   padding: var(--size-48);
 
   @include mq.mobile-only {
-    padding: var(--size-32);
+    padding: 0;
   }
 }
 

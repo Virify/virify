@@ -105,6 +105,9 @@
         <div class="contact-form-container">
           <h2 class="title-xl">Interested in what we are doing?</h2>
           <p class="body-lg max-width-prose">We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.</p>
+          <nuxt-link to="/waiting-list" class="waiting-list__button | button button-lg button-monochrome"> 
+            Join the Waiting List
+          </nuxt-link>
         </div>
       </div>
     </section>
@@ -149,8 +152,6 @@ function checkEnquiryValidity(event: Event) {
 }
 
 onMounted(() => {
-  if (!turnstileEl.value || !(window as any).turnstile) return;
-
   widgetId.value = (window as any).turnstile.render(turnstileEl.value, {
     sitekey: config.public.CF_SITE_KEY,
     size: 'invisible',
@@ -160,6 +161,14 @@ onMounted(() => {
       submitForm();
     },
   });
+});
+
+onUnmounted(() => {
+  if ((window as any).turnstile && widgetId.value) {
+    try {
+      (window as any).turnstile.remove(widgetId.value);
+    } catch (_) {}
+  }
 });
 
 async function handleSubmit() {
@@ -297,7 +306,7 @@ useHead({
   padding: var(--size-48);
 
   @include mq.mobile-only {
-    padding: var(--size-32);
+    padding: 0;
   }
 }
 
@@ -423,5 +432,12 @@ useHead({
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+}
+
+.waiting-list__button {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+  margin-top: var(--size-24);
 }
 </style>
