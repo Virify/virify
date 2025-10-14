@@ -15,25 +15,31 @@
     <!-- Form + results (unchanged) -->
     <div class="price-paid | container">
     <AtomsHeroCard class="price-paid__hero">
-      <h1 class="| title-lg">Price Paid Data</h1>
-      <p class="| body-md">Enter a UK postcode and search</p>
+      <p class="| body-md">Enter a UK postcode and search for property sales history</p>
       <div class="price-paid__search">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="Eg 'CF10 1AA'" 
-          class="| body-sm text-input"
-          :disabled="loading"
-          @keyup.enter="search"
-        />
-        <button 
-          class="| button button-secondary button-md" 
-          @click="search"
-          :disabled="loading"
-        >
-          <span v-if="loading">Searching...</span>
-          <span v-else>Search</span>
-        </button>
+        <div class="price-paid__input">
+          <AtomsInput
+            v-model="searchQuery"
+            type="text"
+            placeholder="Eg 'CF10 1AA'"
+            :custom-validation="{ patternMismatch: 'Please enter a full valid UK postcode (e.g., CF10 1AA)' }"
+            pattern="^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$"
+            required
+            class="| body-sm"
+            :disabled="loading"
+            @keyup.enter="search"
+          />
+        </div>
+        <div class="price-paid__button">
+          <button 
+            class="| button button-secondary button-md" 
+            @click="search"
+            :disabled="loading"
+          >
+            <span v-if="loading">Searching...</span>
+            <span v-else>Search</span>
+          </button>
+        </div>
       </div>
     </AtomsHeroCard>
 
@@ -73,10 +79,7 @@
     </div>
 
     <!-- Feature tiles teaser (hidden once results load) -->
-    <section
-      v-if="!loading && !error && results.length === 0"
-      class="price-paid-teaser"
-    >
+    <section class="price-paid-teaser">
       <div class="container">
         <header class="price-paid-teaser__header">
           <h2 class="title-xl">What you can do with Price Paid data</h2>
@@ -143,6 +146,17 @@
   </div>
 </template>
 <script lang="ts" setup>
+import { z } from 'zod'
+
+// UK Postcode validation schema
+const postcodeSchema = z.string()
+  .min(1, 'Postcode is required')
+  .regex(
+    /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i,
+    'Please enter a valid UK postcode (e.g., CF10 1AA)'
+  )
+  .transform(val => val.toUpperCase().replace(/\s+/g, ''))
+
 const searchQuery = ref<string>("");
 const results = ref<any[]>([]);
 const loading = ref(false);
@@ -157,7 +171,8 @@ async function search() {
   error.value = null;
   
   try {
-    const formattedQuery = searchQuery.value.trim();
+    const formattedQuery = searchQuery.value.trim().toUpperCase();
+    
     const response = await $fetch<any>("/api/price-paid/", {
       method: "POST",
       body: { postcode: formattedQuery },
@@ -189,21 +204,20 @@ function formatTimelineItems(sales: any[]) {
 .price-paid-hero {
   background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
   color: var(--monochrome-900);
-  padding: var(--size-80) var(--size-32) var(--size-64);
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 45vh;
 
   .price-paid-hero__content {
     text-align: center;
     max-width: 800px;
     margin: 0 auto;
-    padding: var(--size-64) 0;
   }
 }
 
 .price-paid {
-  padding: var(--size-32) 0;
+  padding: var(--size-64) 0;
 
   &__hero {
     display: flex;
@@ -211,16 +225,24 @@ function formatTimelineItems(sales: any[]) {
     align-items: center;
     justify-content: space-evenly;
     margin: auto;
-    width: max-content;
+    max-width: 500px;
   }
 
   &__search {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--size-8);
+    gap: var(--size-12);
+    align-items: baseline;
     margin-top: var(--size-8);
-    border-radius: var(--border-radius-xl);
+    width: 100%;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__button {
+    flex-shrink: 0;
   }
 
   &__results {

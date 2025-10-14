@@ -205,6 +205,20 @@ const tileClasses = computed(() => {
   &--primary {
     background-color: var(--primary-400);
 
+    .feature-tile__icon {
+      background: rgba(255, 255, 255, 0.1);
+
+      .a-icon {
+        color: var(--secondary-500);
+      }
+    }
+
+    .feature-tile__header-text {
+      h4 {
+        color: var(--secondary-500);
+      }
+    }
+
     &.feature-tile--with-background {
       background-image: url('/img/logo-background.svg'), linear-gradient(135deg, var(--primary-400), var(--primary-500));
     }
@@ -213,6 +227,19 @@ const tileClasses = computed(() => {
   &--blue {
     background: linear-gradient(135deg, var(--blue-400), var(--blue-500));
 
+    .feature-tile__icon {
+      background: rgba(255, 255, 255, 0.1);
+
+      .a-icon {
+        color: var(--secondary-500);
+      }
+    }
+
+    .feature-tile__header-text {
+      h4 {
+        color: var(--secondary-500);
+      }
+    }
 
     &.feature-tile--with-background {
       position: relative;
