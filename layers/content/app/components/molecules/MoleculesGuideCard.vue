@@ -10,16 +10,15 @@
         loading="lazy"
         class="guide-card__image"
         placeholder='/img/preload.svg'
-      />
-      <div class="guide-card__overlay"></div>
+      />  
     </div>
     <div class="guide-card__description">
       <h3 class="guide-card__title | title-sm">{{ title }}</h3>
       <p class="body-sm">{{ excerpt || description }}</p>
-    </div>
-    <div class="guide-card__details" v-if="readTime || publishedAt">
-      <p v-if="readTime" class="body-xs">{{ readTime }} min read</p>
-      <p v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</p>
+      <div class="guide-card__details" v-if="readTime || publishedAt">
+        <p v-if="readTime" class="body-xs">{{ readTime }} min read</p>
+        <p v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</p>
+      </div>
     </div>
   </NuxtLink>
 </template>
@@ -56,7 +55,6 @@ defineProps<{
   }
 
     &__top {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)), var(--secondary-400);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -92,20 +90,6 @@ defineProps<{
     z-index: 0;
   }
 
-  &__overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.2) 0%,
-      rgba(0, 0, 0, 0.3) 100%
-    );
-    z-index: 1;
-  }
-
   &__title {
     color: var(--secondary-400);
     margin-bottom: var(--size-8);
@@ -114,12 +98,12 @@ defineProps<{
   &__description {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: flex-start;
     padding: var(--size-20);
     color: var(--foreground-100);
     text-align: left;
-    flex: 1 1 auto;
+    flex: 1;
     gap: var(--size-12);
     min-height: 0;
 
@@ -129,12 +113,13 @@ defineProps<{
   }
 
   &__details {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     flex-direction: row;
     align-items: center;
     color: var(--secondary-400);
-    padding: var(--size-16);
+    padding-top: var(--size-16);
     flex-shrink: 0;
 
     @include mq.small-tablet {
