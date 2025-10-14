@@ -54,15 +54,33 @@ const heroMeta = computed(() => {
   return items
 })
 
-// Set page meta if guide exists and has SEO data
+// SEO metadata
 if (guide.value) {
+  const seoTitle = guide.value.seo?.metaTitle || `${guide.value.title} | Virify`;
+  const seoDescription = guide.value.seo?.metaDescription || guide.value.excerpt || '';
+  
   useSeoMeta({
-    title: guide.value.seo?.metaTitle || guide.value.title,
-    description: guide.value.seo?.metaDescription || guide.value.excerpt,
-    ogTitle: guide.value.seo?.metaTitle || guide.value.title,
-    ogDescription: guide.value.seo?.metaDescription || guide.value.excerpt,
+    title: seoTitle,
+    description: seoDescription,
+    robots: 'index, follow',
+    
+    ogTitle: seoTitle,
+    ogDescription: seoDescription,
+    ogType: 'article',
+    ogUrl: `https://virify.co.uk/guides/${guide.value.category?.slug.current}/${guideSlug}`,
     ogImage: guide.value.heroImage?.asset?.url,
-  })
+    
+    twitterCard: 'summary_large_image',
+    twitterTitle: seoTitle,
+    twitterDescription: seoDescription,
+    twitterImage: guide.value.heroImage?.asset?.url,
+  });
+
+  useHead({
+    link: [
+      { rel: 'canonical', href: `https://virify.co.uk/guides/${guide.value.category?.slug.current}/${guideSlug}` }
+    ],
+  });
 }
 </script>
 

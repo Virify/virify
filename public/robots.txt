@@ -1,1 +1,26 @@
+# Virify - UK Private Property Marketplace
+# https://virify.co.uk
 
+User-agent: *
+Allow: /
+
+# Allow crawling of public pages
+Allow: /waiting-list
+Allow: /contact
+Allow: /guides
+Allow: /guides/*
+Allow: /privacy
+Allow: /terms
+
+# Disallow private/authenticated areas
+Disallow: /account
+Disallow: /account/*
+Disallow: /api
+Disallow: /api/*
+Disallow: /listing/preview
+Disallow: /listing/preview/*
+Disallow: /search
+Disallow: /ai-search
+
+# Crawl-delay (optional, adjust based on server capacity)
+Crawl-delay: 1

@@ -50,18 +50,32 @@ const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { la
 
 // SEO metadata
 const seoTitle = computed(() => 
-  category.value ? `${category.value.title} Guides - Virify` : 'Category Not Found - Virify'
+  category.value ? `${category.value.title} - Property Guides | Virify` : 'Category Not Found - Virify'
 );
 
 const seoDescription = computed(() => 
-  category.value?.description || 'Explore our collection of guides to help you navigate your marketing journey.'
+  category.value?.description || 'Explore our property guides to help you navigate buying, selling, and renting in the UK.'
 );
 
 useSeoMeta({
   title: seoTitle,
   description: seoDescription,
+  robots: 'index, follow',
+  
   ogTitle: seoTitle,
   ogDescription: seoDescription,
+  ogType: 'website',
+  ogUrl: computed(() => `https://virify.co.uk/guides/${categorySlug}`),
+  
+  twitterCard: 'summary',
+  twitterTitle: seoTitle,
+  twitterDescription: seoDescription,
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: computed(() => `https://virify.co.uk/guides/${categorySlug}`) }
+  ],
 });
 </script>
 

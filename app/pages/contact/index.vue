@@ -210,13 +210,27 @@ async function submitForm() {
   }
 }
 
+// SEO Meta
 useHead({
-  title: "Contact Us - Virify",
+  title: 'Contact Virify - Get in Touch | Private Property Marketplace UK',
   meta: [
-    {
-      name: "description",
-      content: "Get in touch with Virify. Whether you're interested in partnering with us or have a question about our platform, we'd love to hear from you.",
-    },
+    { name: 'description', content: 'Contact Virify for partnership opportunities, platform questions, or general enquiries about the UK\'s first private property marketplace. We respond within 24 hours.' },
+    { name: 'keywords', content: 'contact Virify, property marketplace contact, partnership opportunities, estate agent alternative contact, private property listings UK' },
+    { name: 'robots', content: 'index, follow' },
+    
+    // Open Graph
+    { property: 'og:title', content: 'Contact Virify - Get in Touch' },
+    { property: 'og:description', content: 'Get in touch with Virify about partnerships, questions, or general enquiries.' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://virify.co.uk/contact' },
+    
+    // Twitter Card
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: 'Contact Virify' },
+    { name: 'twitter:description', content: 'Get in touch with Virify about partnerships, questions, or general enquiries.' },
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://virify.co.uk/contact' },
   ],
   script: [
     {
