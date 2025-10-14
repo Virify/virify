@@ -19,7 +19,7 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: {
-        "img-src": ["'self'", "data:", "https://cdn.sanity.io", String(process.env.CF_IMAGES_URL), "https://images.unsplash.com"],
+        "img-src": ["'self'", "data:", "https://cdn.sanity.io", "https://virify.co.uk", String(process.env.CF_IMAGES_URL), "https://images.unsplash.com"],
         "script-src": ["'self'", "https:", "'unsafe-inline'"],
         "script-src-attr": ["'unsafe-inline'"],
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", 'https:'],

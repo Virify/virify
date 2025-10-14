@@ -1,0 +1,17 @@
+generator ppdClient {
+  provider        = "prisma-client"
+  output          = "./generated/"
+  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource waitingListDb {
+  provider   = "postgresql"
+  url        = env("WAITING_LIST_DATABASE_URL")
+}
+
+model WaitingList {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
