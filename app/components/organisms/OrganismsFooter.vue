@@ -56,7 +56,7 @@
         <div v-if="footerConfig.showCompany" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Company</h3>
           <ul class="o-footer__links">
-            <li><a href="#" class="o-footer__link | body-sm">About Us</a></li>
+            <!-- <li><a href="#" class="o-footer__link | body-sm">About Us</a></li> -->
             <li><nuxt-link to="/contact" class="o-footer__link | body-sm">Contact Us</nuxt-link></li>
             <li><nuxt-link to="/privacy" class="o-footer__link | body-sm">Privacy Policy</nuxt-link></li>
             <li><nuxt-link to="/terms" class="o-footer__link | body-sm">Terms & Conditions</nuxt-link></li>
