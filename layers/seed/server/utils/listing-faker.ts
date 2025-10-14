@@ -45,6 +45,24 @@ export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInpu
   }
 }
 
+/**
+ * Generate a weighted listing tier
+ * 60% BASIC, 30% FEATURED, 10% PREMIUM
+ * 
+ * @returns ListingTier
+ */
+const generateWeightedListingTier = (): ListingTier => {
+  const random = Math.random() * 100;
+  
+  if (random < 60) {
+    return ListingTier.BASIC;
+  } else if (random < 90) {
+    return ListingTier.FEATURED;
+  } else {
+    return ListingTier.PREMIUM;
+  }
+};
+
 const generateRandomViews = () => {
   return faker.number.int({ min: 0, max: 50 });
 };
@@ -97,7 +115,7 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
       description: faker.word.words(20),
       price: roundFloat(faker.number.float({ min: 300, max: 3000 }), 2),
       moveInDate: faker.date.future(),
-      listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
+      listingTier: generateWeightedListingTier(),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
       viewingOptions: faker.word.words(10),
@@ -143,7 +161,7 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
       description: faker.word.words(20),
       price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
       moveInDate: faker.date.future(),
-      listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
+      listingTier: generateWeightedListingTier(),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
       viewingOptions: faker.word.words(10),
