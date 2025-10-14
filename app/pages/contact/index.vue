@@ -100,6 +100,14 @@
         </div>
       </div>
     </section>
+    <section class="contact-form-section">
+      <div class="container">
+        <div class="contact-form-container">
+          <h2 class="title-xl">Interested in what we are doing?</h2>
+          <p class="body-lg max-width-prose">We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.</p>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -400,5 +408,6 @@ useHead({
   max-width: 65ch;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
 }
 </style>
