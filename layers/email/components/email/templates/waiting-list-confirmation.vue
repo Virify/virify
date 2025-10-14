@@ -42,36 +42,38 @@ defineProps<{ email: string }>();
             </Heading>
 
             <table style="width: 100%; margin: 0; padding: 0;">
-              <tr>
-                <td style="padding: 8px 0; vertical-align: top;">
-                  <Text style="color: #FC7239; font-size: 20px; margin: 0; padding-right: 12px;">✓</Text>
-                </td>
-                <td style="padding: 8px 0;">
-                  <Text style="color: #1a1a1a; font-size: 15px; line-height: 1.5; margin: 0;">
-                    <strong style="color: #2D2D4F;">Early Access</strong> - Be the first to use our platform before public launch
-                  </Text>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; vertical-align: top;">
-                  <Text style="color: #FC7239; font-size: 20px; margin: 0; padding-right: 12px;">✓</Text>
-                </td>
-                <td style="padding: 8px 0;">
-                  <Text style="color: #1a1a1a; font-size: 15px; line-height: 1.5; margin: 0;">
-                    <strong style="color: #2D2D4F;">Special Benefits</strong> - Reduced fees and priority support for early members
-                  </Text>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; vertical-align: top;">
-                  <Text style="color: #FC7239; font-size: 20px; margin: 0; padding-right: 12px;">✓</Text>
-                </td>
-                <td style="padding: 8px 0;">
-                  <Text style="color: #1a1a1a; font-size: 15px; line-height: 1.5; margin: 0;">
-                    <strong style="color: #2D2D4F;">Shape the Platform</strong> - Your feedback helps us build the best experience
-                  </Text>
-                </td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <Text style="color: #FC7239; font-size: 20px; margin: 0; padding-right: 12px;">✓</Text>
+                  </td>
+                  <td style="padding: 8px 0;">
+                    <Text style="color: #1a1a1a; font-size: 15px; line-height: 1.5; margin: 0;">
+                      <strong style="color: #2D2D4F;">Early Access</strong> - Be the first to use our platform before public launch
+                    </Text>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <Text style="color: #FC7239; font-size: 20px; margin: 0; padding-right: 12px;">✓</Text>
+                  </td>
+                  <td style="padding: 8px 0;">
+                    <Text style="color: #1a1a1a; font-size: 15px; line-height: 1.5; margin: 0;">
+                      <strong style="color: #2D2D4F;">Special Benefits</strong> - Reduced fees and priority support for early members
+                    </Text>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <Text style="color: #FC7239; font-size: 20px; margin: 0; padding-right: 12px;">✓</Text>
+                  </td>
+                  <td style="padding: 8px 0;">
+                    <Text style="color: #1a1a1a; font-size: 15px; line-height: 1.5; margin: 0;">
+                      <strong style="color: #2D2D4F;">Shape the Platform</strong> - Your feedback helps us build the best experience
+                    </Text>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </Section>
 

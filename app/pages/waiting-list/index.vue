@@ -58,7 +58,7 @@
             <div class="waiting-list-form__success" v-if="isSuccess">
               <AtomsIcon icon="tick" :size="48" class="waiting-list-form__success-icon" />
               <h3 class="title-sm">You're on the list!</h3>
-              <p class="body-sm">Check your email for confirmation. We will notify you as soon as we are ready to launch early access.</p>
+              <p class="body-sm">{{ message }}</p>
             </div>
           </form>
         </div>
@@ -189,12 +189,14 @@
 
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
+const { showToast } = useToast();
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
 const agreedToTerms = ref(false);
 const isSubmitting = ref(false);
 const isSuccess = ref(false);
 const formError = ref<string | null>(null);
+const message = ref("You're on the list! Check your email for confirmation.");
 
 // Intersection Observer helper (mirrors homepage pattern)
 const createIntersectionObserver = () => {
@@ -239,6 +241,8 @@ async function handleSubmit() {
 
     if (response.success) {
       isSuccess.value = true;
+      message.value = response.message;
+      showToast(message.value, { type: "success" });
     }
   } catch (error: any) {
     console.error("Waiting list signup error:", error);

@@ -9,18 +9,18 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   
   try {
-    const body = await readValidatedBody(event, waitingListSchema.parse);
+    const { email } = await readValidatedBody(event, waitingListSchema.parse);
     
 
     // Check if email already exists
     const existingEntry = await waitingListPrisma.waitingList.findUnique({
-      where: { email: body.email },
+      where: { email },
     });
 
     if (existingEntry) {
       return {
         success: true,
-        message: "You're already on the waiting list!",
+        message: "You're already on the waiting list! We will notify you as soon as we are ready to launch early access.",
         alreadyExists: true,
       };
     }
@@ -28,13 +28,13 @@ export default defineEventHandler(async (event) => {
     // Create new waiting list entry
     const newEntry = await waitingListPrisma.waitingList.create({
       data: {
-        email: body.email,
+        email,
       },
     });
 
     // Send confirmation email
     try {
-      await sendWaitingListConfirmation(body.email);
+      await sendWaitingListConfirmation(email);
     } catch (emailError) {
       console.error("Failed to send waiting list confirmation email:", emailError);
       // Don't fail the request if email fails, user is still on the list
