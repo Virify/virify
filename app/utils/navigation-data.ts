@@ -72,7 +72,19 @@ export const getActionItemsBuilder = () => {
     }
 
     // Add theme toggle last (always visible)
-    items.push({ id: "theme-toggle", label: "Theme", type: "component" });
+    if(loggedIn) {
+      items.push(
+        { id: "logout", label: "Logout", type: "button", requiresAuth: true, action: actions.logout, buttonClass: "button-monochrome" },
+        { id: "theme-toggle", label: "Theme", type: "component" }
+      );
+    } else {
+      items.push(
+      { id: "login", label: "Login", type: "button", hideWhenAuth: true, action: actions.openLogin, buttonClass: "button-tertiary" },
+      { id: "theme-toggle", label: "Theme", type: "component" }
+    );
+    }
+    
+    
 
     return items.filter((item) => {
       if (item.requiresAuth && !loggedIn) return false;

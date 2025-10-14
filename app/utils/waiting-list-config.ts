@@ -36,6 +36,8 @@ const waitingListConfig: WaitingListConfig = {
     '/privacy',
     '/price-paid',
     '/guides',
+    '/login',
+    '/email-preview-tool',  // For testing emails
   ],
 
   // Navigation visibility
@@ -47,7 +49,7 @@ const waitingListConfig: WaitingListConfig = {
 
   // Footer sections visibility
   footer: {
-    showPropertySearch: false,
+  showPropertySearch: false,
     showSellProperty: false,
     showPropertyTools: true,
     showGuides: true,

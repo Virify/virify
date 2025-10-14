@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      message: "Successfully added to waiting list",
+      message: "You have been added to the waiting list! We will notify you as soon as we are ready to launch early access.",
       data: {
         id: newEntry.id,
         email: newEntry.email,
