@@ -10,9 +10,8 @@ defineProps<{ email: string }>();
     <Body style="background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0;">
       <Container style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         
-        <!-- Header with Logo -->
-        <Section style="background: linear-gradient(135deg, #2D2D4F 0%, #FC7239 100%); border-radius: 12px 12px 0 0; padding: 40px 32px; text-align: center;">
-          <Img src="https://virify.co.uk/logo.png" alt="Virify Logo" width="120" height="40" style="margin-bottom: 16px;" />
+                <!-- Header with Logo -->
+        <Section style="background-color: #2D2D4F; background: linear-gradient(135deg, #2D2D4F 0%, #FC7239 100%); border-radius: 12px 12px 0 0; padding: 40px 32px; text-align: center;">
           <Heading style="color: #ffffff; font-size: 32px; font-weight: 700; margin: 0 0 16px 0; letter-spacing: -0.5px;">
             Virify
           </Heading>
