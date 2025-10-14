@@ -10,7 +10,7 @@
 
       <div class="o-footer__sections">
         <!-- Property Search Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showPropertySearch" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Property Search</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/ai-search" class="o-footer__link | body-sm">AI Search</nuxt-link></li>
@@ -19,7 +19,7 @@
         </div>
 
         <!-- List Property Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showSellProperty" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Sell Property</h3>
           <div class="o-footer__cta">
             <a href="#" class="o-footer__button | button button-secondary button-xs">List your property</a>
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Property Tools Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showPropertyTools" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Property Tools</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/price-paid" class="o-footer__link | body-sm">Price Paid Data</nuxt-link></li>
@@ -35,7 +35,7 @@
         </div>
 
         <!-- Guides Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showGuides" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Guides</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/guides" class="o-footer__link | body-sm">All Guides</nuxt-link></li>
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Company Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showCompany" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Company</h3>
           <ul class="o-footer__links">
             <li><a href="#" class="o-footer__link | body-sm">About Us</a></li>
@@ -68,6 +68,30 @@
 </template>
 
 <script setup>
+const { isWaitingListMode, config } = useWaitingListMode()
+
+// Determine which sections to show
+const footerConfig = computed(() => {
+  if (!isWaitingListMode.value) {
+    // Show everything when not in waiting-list mode
+    return {
+      showPropertySearch: true,
+      showSellProperty: true,
+      showPropertyTools: true,
+      showGuides: true,
+      showCompany: true,
+    }
+  }
+  // Use waiting-list config when in waiting-list mode
+  return {
+    showPropertySearch: config.footer.showPropertySearch,
+    showSellProperty: config.footer.showSellProperty,
+    showPropertyTools: config.footer.showPropertyTools,
+    showGuides: config.footer.showGuides,
+    showCompany: config.footer.showCompany,
+  }
+})
+
 const currentYear = new Date().getFullYear();
 
 // Get guide categories for footer navigation
@@ -92,15 +116,16 @@ const { data: categories } = await useCategories();
 
   &__sections {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-direction: row;
-    gap: var(--size-12);
+    gap: var(--size-48);
     margin-top: var(--size-12);
     width: 100%;
     text-align: left;
 
     @include mq.mobile-only {
       flex-direction: column;
+      gap: var(--size-12);
     }
   }
 

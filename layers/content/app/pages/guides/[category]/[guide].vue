@@ -20,12 +20,12 @@
         <MoleculesGuideTableOfContents :content="guide.content || []" />
       </div>
     </article>
-    <section>
+    <section v-if="!isWaitingListMode">
       <div class="guide-page__advert">
         <MoleculesListingAdvert />
       </div>
     </section>
-    <section>
+    <section v-if="!isWaitingListMode">
       <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </section>
   </div>
@@ -34,6 +34,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const guideSlug = route.params.guide as string
+const { isWaitingListMode } = useWaitingListMode()
 
 const { useGuideBySlug } = useSanity()
 

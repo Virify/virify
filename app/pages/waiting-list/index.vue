@@ -365,13 +365,13 @@ useHead({
   background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
   color: var(--monochrome-900);
   padding: var(--size-80) var(--size-32) var(--size-64);
-  min-height: 50vh;
+  min-height: 45vh;
   display: flex;
   align-items: center;
   justify-content: center;
 
   @include mq.tablet {
-    padding: var(--size-120) var(--size-32) var(--size-80);
+    padding: var(--size-32) var(--size-32) var(--size-32);
     background: 
       url('/img/logo-background.svg') no-repeat top right,
       linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
@@ -565,7 +565,7 @@ useHead({
 .waiting-list-features {
   background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
   color: var(--monochrome-900);
-  padding: var(--size-64) 0;
+  padding: var(--size-120) 0;
   margin: 0;
 
   &__header {
@@ -594,7 +594,7 @@ useHead({
 
 // Sellers Section
 .waiting-list-sellers {
-  padding: var(--size-64) 0;
+  padding: var(--size-120) 0;
   margin: 0;
 
   &__header {
@@ -749,7 +749,7 @@ useHead({
 .waiting-list-benefits {
   background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
   color: var(--monochrome-900);
-  padding: var(--size-64) 0;
+  padding: var(--size-120) 0;
   margin: 0;
 
   &__header {
@@ -780,7 +780,7 @@ useHead({
 
 // Final CTA Section
 .waiting-list-final-cta {
-  padding: var(--size-64) 0;
+  padding: var(--size-120) 0;
   margin: 0;
 
   &__content {

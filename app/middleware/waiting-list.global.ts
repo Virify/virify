@@ -1,23 +1,13 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const config = useRuntimeConfig()
-  const deploymentEnv = config.public.DEPLOYMENT_ENV
+  const { isWaitingListMode, config } = useWaitingListMode()
 
   // Only apply restrictions if deployment environment is 'waiting-list' (waiting list mode)
-  if (deploymentEnv !== 'waiting-list') {
+  if (!isWaitingListMode.value) {
     return
   }
 
-  // Define allowed routes in waiting list mode
-  const allowedRoutes = [
-    '/waiting-list',
-    '/terms',
-    '/privacy',
-    '/price-paid',
-    'guides',
-  ]
-
   // Check if the current route is allowed
-  const isAllowed = allowedRoutes.some(route => to.path.startsWith(route))
+  const isAllowed = isRouteAllowed(to.path)
 
   // If route is not allowed, redirect to waiting list
   if (!isAllowed) {

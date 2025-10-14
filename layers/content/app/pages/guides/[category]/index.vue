@@ -19,12 +19,12 @@
         />
       </MoleculesGuideGrid>
     </section>
-    <section>
+    <section v-if="!isWaitingListMode">
       <div class="category-page__advert">
         <MoleculesListingAdvert />
       </div>
     </section>
-    <section>
+    <section v-if="!isWaitingListMode">
       <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </section>
   </div>
@@ -35,6 +35,7 @@ const route = useRoute();
 const categorySlug = route.params.category as string;
 
 const { useCategoryBySlug } = useSanity();
+const { isWaitingListMode } = useWaitingListMode()
 
 const { data: category } = await useCategoryBySlug(categorySlug);
 const guides = computed(() => category.value?.guides || []);
@@ -66,6 +67,7 @@ useSeoMeta({
 
 <style scoped lang="scss">
 .category-page {
+  padding-bottom: var(--size-32);
   &__breadcrumb {
     padding: var(--size-16) 0;
   }

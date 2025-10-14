@@ -14,13 +14,13 @@
       :icon="category.icon || 'content/info'" />
     </MoleculesGuideGrid>
 
-    <section>
+    <section v-if="!isWaitingListMode">
       <div class="guides-home__advert">
         <MoleculesListingAdvert />
       </div>
     </section>
 
-    <section>
+    <section v-if="!isWaitingListMode">
       <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
     </section>
   </div>
@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 const { useCategories } = useSanity();
+const { isWaitingListMode} = useWaitingListMode()
 
 const { data: categories } = await useCategories();
 

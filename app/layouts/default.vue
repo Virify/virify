@@ -9,13 +9,14 @@
   <OrganismsFooter />
 
   <ViewsDialog />
-  <ViewsHelpButton />
+  <ViewsHelpButton v-if="!isWaitingListMode"/>
   <MoleculesToastContainer />
 </template>
 
 <script setup lang="ts">
 // Handle authentication dialog logic
 useAuthenticationHandler();
+const { isWaitingListMode } = useWaitingListMode()
 
 useHead({
   htmlAttrs: {
