@@ -49,6 +49,26 @@ export const useSanity = () => {
   }
 
   /**
+   * A async data fetcher for the Terms & Conditions from Sanity CMS.
+   * @returns A async data fetcher for terms document.
+   */
+  const useTerms = () => {
+    return useAsyncData('terms', () => 
+      $fetch<TermsResponse>('/api/sanity/terms')
+    )
+  }
+
+  /**
+   * A async data fetcher for the Privacy Policy from Sanity CMS.
+   * @returns A async data fetcher for privacy policy document.
+   */
+  const usePrivacy = () => {
+    return useAsyncData('privacy', () => 
+      $fetch<PrivacyResponse>('/api/sanity/privacy')
+    )
+  }
+
+  /**
    * Helper to build a guide URL from a slug or expanded reference
    * @param slugOrRef string or object with slug.current
    */
@@ -63,6 +83,8 @@ export const useSanity = () => {
     useNavigationData,
     useGuideBySlug,
     useCategoryBySlug,
+    useTerms,
+    usePrivacy,
     guideUrl
   }
 }

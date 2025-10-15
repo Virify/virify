@@ -147,3 +147,26 @@ export interface SanityGuide {
   excerpt?: string
   icon?: string
 }
+
+// Legal Documents
+export interface Terms {
+  _id: string
+  _type: 'terms'
+  title: string
+  slug: SanitySlug
+  content?: PortableTextContent[]
+  updatedAt?: string
+}
+
+export interface Privacy {
+  _id: string
+  _type: 'privacy'
+  title: string
+  slug: SanitySlug
+  content?: PortableTextContent[]
+  updatedAt?: string
+}
+
+export interface TermsResponse extends Terms {}
+
+export interface PrivacyResponse extends Privacy {}
