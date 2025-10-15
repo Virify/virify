@@ -141,7 +141,7 @@ export const stepSixValidation = {
   /**
    * Check if step six has been visited (any kitchen/reception/other rooms added)
    * @param draft Draft listing
-   * @returns True if any rooms have been added
+   * @returns True if step has been visited or has existing data
    */
   hasExistingStepSixData: (draft: DraftListingWithFullPayload): boolean => {
     const kitchens = draft.property?.kitchenFeatures || [];

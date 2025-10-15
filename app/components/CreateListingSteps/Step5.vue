@@ -58,6 +58,7 @@ const stepConfig = computed(() => ({
   initialData: createInitialStepFiveValues(props.draft),
   isValid: stepFiveValidation.isStepFiveValid,
   hasExistingData: stepFiveValidation.hasExistingStepFiveData,
+  stepNumber: 5,
   beforeSubmit: (data: StepFive) => {
     // Update the number of bedrooms and bathrooms before submitting
     const processedData = { ...data };

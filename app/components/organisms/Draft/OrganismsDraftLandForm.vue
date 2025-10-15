@@ -99,6 +99,23 @@
               @update:modelValue="updateLandFeatures(land, $event)"
             />
 
+            <!-- Land Size -->
+            <OrganismsDraftFormSizeToggle
+              title="Land Size"
+              :options="sizeOptions"
+              :unit="'meter'"
+              :size="land.size"
+              :name="`land-${index}-size`"
+              @update:unit="() => {}"
+              @update:size="(value: number | null) => land.size = value"
+            >
+              <template #tooltip-content>
+                <AtomsTooltipParagraphs :paragraphs="[
+                  'Enter the land parcel\'s area (either in square meters or square feet). Optional but helpful for potential buyers.'
+                ]" />
+              </template>
+            </OrganismsDraftFormSizeToggle>
+
             <div class="o-base-room-form__form-actions">
               <button
                 type="button"
@@ -141,6 +158,11 @@
 import type { Land } from '~~/layers/database/server/database/prisma/generated/client';
 import { landFeaturesOptions } from "../../../utils/draft/step-seven";
 
+const sizeOptions = [
+  { value: 'meter', key: 'm²', info: 'Square meters' },
+  { value: 'feet', key: 'ft²', info: 'Square feet' },
+];
+
 interface Props {
   modelValue: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[];
 }
@@ -157,7 +179,7 @@ const roomManagerConfig = {
   isRoomCompleted: (land: any) =>
     Boolean(land.name),
   createNewRoom: () => ({
-    name: null,
+    name: 'Land',
     description: null,
     separateParcel: false,
     woodland: false,

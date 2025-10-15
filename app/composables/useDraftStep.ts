@@ -23,71 +23,13 @@ export const useDraftStep = createSharedComposable(() => {
       });
     }
   };
-  
-  /**
-   * Get session storage key for a specific draft
-   */
-  const getSessionKey = (draftId: number) => `draft-${draftId}-current-step`;
-
-  /**
-   * Safely get item from session storage with fallback
-   */
-  const getFromStorage = (key: string): string | null => {
-    if (!import.meta.client) return null;
-    
-    try {
-      return sessionStorage.getItem(key);
-    } catch (error) {
-      // Storage might be disabled in incognito mode or full
-      console.warn('Failed to access sessionStorage:', error);
-      return null;
-    }
-  };
-
-  /**
-   * Safely set item in session storage with fallback
-   */
-  const setToStorage = (key: string, value: string): void => {
-    if (!import.meta.client) return;
-    
-    try {
-      sessionStorage.setItem(key, value);
-    } catch (error) {
-      // Storage might be disabled in incognito mode or full
-      console.warn('Failed to write to sessionStorage:', error);
-    }
-  };
-
-  /**
-   * Safely remove item from session storage
-   */
-  const removeFromStorage = (key: string): void => {
-    if (!import.meta.client) return;
-    
-    try {
-      sessionStorage.removeItem(key);
-    } catch (error) {
-      console.warn('Failed to remove from sessionStorage:', error);
-    }
-  };
-
-  /**
-   * Get initial step for a draft
-   */
-  const getInitialStep = (draftId: number): number => {
-    const savedStep = getFromStorage(getSessionKey(draftId));
-    if (savedStep !== null) {
-      return Math.max(0, Number(savedStep));
-    }
-    return 0;
-  };
 
   /**
    * Initialize step state for a draft
    */
   const initializeDraftStep = (draftId: number) => {
     if (!currentStepStates.value[draftId]) {
-      currentStepStates.value[draftId] = getInitialStep(draftId);
+      currentStepStates.value[draftId] = 0;
       cleanupOldDrafts(); // Clean up memory periodically
     }
     return currentStepStates.value[draftId];
@@ -101,40 +43,36 @@ export const useDraftStep = createSharedComposable(() => {
       get: () => currentStepStates.value[draftId] ?? 0,
       set: (value: number) => {
         currentStepStates.value[draftId] = value;
-        setToStorage(getSessionKey(draftId), String(value));
       }
     });
   };
 
   /**
-   * Determine the correct initial step based on completion status
+   * Determine the correct initial step based on database completedSteps
+   * Uses the last completed step from the database to determine where to start
    */
-  const determineInitialStep = (draftId: number, steps: StepConfig[]) => {
+  const determineInitialStep = (draftId: number, completedSteps: number[], steps: StepConfig[]) => {
     if (!Array.isArray(steps) || steps.length === 0) return;
 
-    const sessionKey = getSessionKey(draftId);
-    
-    // Check if we have a saved step from session storage (refresh scenario)
-    const savedStep = getFromStorage(sessionKey);
-    if (savedStep !== null) {
-      const stepNumber = Number(savedStep);
-      // Validate the saved step is within bounds
-      if (stepNumber >= 0 && stepNumber < steps.length) {
-        currentStepStates.value[draftId] = stepNumber;
-        return;
-      }
-      // Clear invalid saved step
-      removeFromStorage(sessionKey);
-    }
+    // Find the last completed step from the database
+    const lastCompletedStep = completedSteps.length > 0 
+      ? Math.max(...completedSteps) 
+      : 0;
 
-    // No valid saved step - we're entering edit mode, go to first incomplete step
-    const firstIncompleteIndex = steps.findIndex(s => !s.complete);
-    const targetStep = firstIncompleteIndex >= 0 ? firstIncompleteIndex : 0;
+    // If there are completed steps, go to the next step after the last completed one
+    // completedSteps contains step numbers 1-10, which corresponds to array indices 0-9
+    // So if lastCompletedStep is 3, we want to go to index 3 (the 4th step)
+    let targetStep = 0;
+    if (lastCompletedStep > 0) {
+      targetStep = lastCompletedStep;
+      
+      // Don't go past the last step
+      if (targetStep >= steps.length) {
+        targetStep = steps.length - 1;
+      }
+    }
     
     currentStepStates.value[draftId] = targetStep;
-    
-    // Save this initial step to session storage
-    setToStorage(sessionKey, String(targetStep));
   };
 
   /**
@@ -168,10 +106,9 @@ export const useDraftStep = createSharedComposable(() => {
   };
 
   /**
-   * Clean up session storage for a draft
+   * Clean up state for a draft (memory cleanup only, no sessionStorage)
    */
   const cleanupDraftStep = (draftId: number) => {
-    removeFromStorage(getSessionKey(draftId));
     delete currentStepStates.value[draftId];
   };
 

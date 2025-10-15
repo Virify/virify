@@ -1,17 +1,17 @@
 <template>
   <OrganismsDraftBaseRoomForm>
-  <div class="o-garden-form">
+  <div class="o-yard-form">
     <div class="o-base-room-form__items">
       <div
-        v-for="(garden, index) in localGardens"
+        v-for="(yard, index) in localYards"
         :key="index"
         :ref="(el) => setRoomRef(el, index)"
         class="o-base-room-form__item"
-        :class="{ 'o-garden-form__item--collapsed': isRoomCollapsed(index) }"
+        :class="{ 'o-yard-form__item--collapsed': isRoomCollapsed(index) }"
       >
         <AtomsCollapsibleHeader
           v-if="isRoomCollapsed(index)"
-          :title="`Garden ${index + 1}${garden.name ? ' - ' + garden.name : ''}`"
+          :title="`Yard ${index + 1}${yard.name ? ' - ' + yard.name : ''}`"
           :is-collapsed="!expandedRooms.has(index)"
           variant="inline"
           @toggle="toggleRoom(index)"
@@ -37,7 +37,7 @@
         </AtomsCollapsibleHeader>
 
         <div v-else class="o-base-room-form__item-header">
-          <h4 class="o-base-room-form__item-title | body-md font-semibold">Garden {{ index + 1 }}</h4>
+          <h4 class="o-base-room-form__item-title | body-md font-semibold">Yard {{ index + 1 }}</h4>
           <div class="o-base-room-form__item-actions">
             <button
               type="button"
@@ -61,30 +61,30 @@
           <div v-if="!isRoomCollapsed(index) || expandedRooms.has(index)" class="o-base-room-form__item-content">
             <div class="o-base-room-form__form-grid">
               <OrganismsDraftFormTextGroup
-                title="Garden Name"
-                v-model="garden.name"
-                :name="`garden-${index}-name`"
-                placeholder="e.g. Rear Garden"
+                title="Yard Name"
+                v-model="yard.name"
+                :name="`yard-${index}-name`"
+                placeholder="e.g. Front Yard"
                 :grid="true"
               >
                 <template #tooltip-content>
                   <AtomsTooltipParagraphs :paragraphs="[
-                    'Give this garden space a descriptive name to help identify it (e.g. Rear Garden, Front Garden, Side Garden)'
+                    'Give this yard space a descriptive name to help identify it (e.g. Front Yard, Back Yard, Side Yard)'
                   ]" />
                 </template>
               </OrganismsDraftFormTextGroup>
 
               <OrganismsDraftFormTextGroup
-                title="Garden Description"
-                v-model="garden.description"
-                :name="`garden-${index}-description`"
-                placeholder="Describe this garden..."
+                title="Yard Description"
+                v-model="yard.description"
+                :name="`yard-${index}-description`"
+                placeholder="Describe this yard..."
                 :grid="true"
                 :expanded="true"
               >
                 <template #tooltip-content>
                   <AtomsTooltipParagraphs :paragraphs="[
-                    'Add any additional details about this garden that buyers might find useful (e.g. landscaping, features, maintenance)'
+                    'Add any additional details about this yard that buyers might find useful (e.g. paving, features, maintenance)'
                   ]" />
                 </template>
               </OrganismsDraftFormTextGroup>
@@ -92,14 +92,14 @@
               <OrganismsDraftFormSelectGroup
                 title="Position"
                 :options="gardenPositionOptions"
-                v-model="garden.position"
-                :name="`garden-${index}-position`"
+                v-model="yard.position"
+                :name="`yard-${index}-position`"
                 :required="false"
                 :grid="true"
               >
                 <template #tooltip-content>
                   <AtomsTooltipParagraphs :paragraphs="[
-                    'Select where this garden is located relative to the property (Front, Rear, or Side)'
+                    'Select where this yard is located relative to the property (Front, Rear, or Side)'
                   ]" />
                 </template>
               </OrganismsDraftFormSelectGroup>
@@ -107,40 +107,40 @@
               <OrganismsDraftFormSelectGroup
                 title="Facing"
                 :options="gardenFacingOptions"
-                v-model="garden.facing"
-                :name="`garden-${index}-facing`"
+                v-model="yard.facing"
+                :name="`yard-${index}-facing`"
                 :required="false"
                 :grid="true"
               >
                 <template #tooltip-content>
                   <AtomsTooltipParagraphs :paragraphs="[
-                    'Select which direction this garden faces (affects sunlight throughout the day)'
+                    'Select which direction this yard faces (affects sunlight throughout the day)'
                   ]" />
                 </template>
               </OrganismsDraftFormSelectGroup>
             </div>
 
             <OrganismsDraftFormCheckboxGroup
-              title="Garden Features"
-              :options="gardenFeaturesOptions"
-              :model-value="getSelectedGardenFeatures(garden)"
-              :name="`garden-${index}-features`"
-              @update:modelValue="updateGardenFeatures(garden, $event)"
+              title="Yard Features"
+              :options="yardFeaturesOptions"
+              :model-value="getSelectedYardFeatures(yard)"
+              :name="`yard-${index}-features`"
+              @update:modelValue="updateYardFeatures(yard, $event)"
             />
 
-            <!-- Garden Size -->
+            <!-- Yard Size -->
             <OrganismsDraftFormSizeToggle
-              title="Garden Size"
+              title="Yard Size"
               :options="sizeOptions"
               :unit="'meter'"
-              :size="garden.size"
-              :name="`garden-${index}-size`"
+              :size="yard.size"
+              :name="`yard-${index}-size`"
               @update:unit="() => {}"
-              @update:size="(value: number | null) => garden.size = value"
+              @update:size="(value: number | null) => yard.size = value"
             >
               <template #tooltip-content>
                 <AtomsTooltipParagraphs :paragraphs="[
-                  'Enter the garden\'s area (either in square meters or square feet). Optional but helpful for potential buyers.'
+                  'Enter the yard\'s area (either in square meters or square feet). Optional but helpful for potential buyers.'
                 ]" />
               </template>
             </OrganismsDraftFormSizeToggle>
@@ -150,9 +150,9 @@
                 type="button"
                 @click="saveRoom(index)"
                 class="button button-sm button-secondary | body-sm"
-                :disabled="!isRoomCompleted(garden) || !hasRoomChanges(index)"
+                :disabled="!isRoomCompleted(yard) || !hasRoomChanges(index)"
               >
-                {{ lastAddedRoomIndex === index ? 'Save Garden' : 'Save Changes' }}
+                {{ lastAddedRoomIndex === index ? 'Save Yard' : 'Save Changes' }}
               </button>
               <button
                 type="button"
@@ -163,7 +163,7 @@
               </button>
             </div>
 
-            <AtomsDivider v-if="index < localGardens.length - 1" />
+            <AtomsDivider v-if="index < localYards.length - 1" />
           </div>
         </Transition>
       </div>
@@ -176,7 +176,7 @@
         class="button button-sm button-secondary | body-sm"
         :disabled="hasAnyRooms && addButtonDisabled"
       >
-        {{ hasAnyRooms ? '+ Add Another Garden' : '+ Add Garden' }}
+        {{ hasAnyRooms ? '+ Add Another Yard' : '+ Add Yard' }}
       </button>
     </div>
   </div>
@@ -185,11 +185,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Garden } from '~~/layers/database/server/database/prisma/generated/client';
-import { gardenFeaturesOptions, gardenPositionOptions, gardenFacingOptions } from "../../../utils/draft/step-seven";
+import type { Yard } from '~~/layers/database/server/database/prisma/generated/client';
+import { yardFeaturesOptions, gardenPositionOptions, gardenFacingOptions } from "../../../utils/draft/step-seven";
 
-const defaultGardenPosition = gardenPositionOptions[0]?.value ?? null;
-const defaultGardenFacing = gardenFacingOptions[0]?.value ?? null;
+const defaultYardPosition = gardenPositionOptions[0]?.value ?? null;
+const defaultYardFacing = gardenFacingOptions[0]?.value ?? null;
 
 const sizeOptions = [
   { value: 'meter', key: 'm²', info: 'Square meters' },
@@ -197,7 +197,7 @@ const sizeOptions = [
 ];
 
 interface Props {
-  modelValue: Omit<Garden, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[];
+  modelValue: Omit<Yard, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[];
 }
 
 const props = defineProps<Props>();
@@ -206,16 +206,16 @@ const emit = defineEmits<{
   'update:modelValue': [value: any[]];
 }>();
 
-const localGardens = computed(() => props.modelValue);
+const localYards = computed(() => props.modelValue);
 
 const roomManagerConfig = {
-  isRoomCompleted: (garden: any) =>
-    Boolean(garden.name),
+  isRoomCompleted: (yard: any) =>
+    Boolean(yard.name),
   createNewRoom: () => ({
-    name: 'Garden',
+    name: 'Yard',
     description: null,
-    position: defaultGardenPosition,
-    facing: defaultGardenFacing,
+    position: defaultYardPosition,
+    facing: defaultYardFacing,
     sunTerrace: false,
     terrace: false,
     balcony: false,
@@ -246,35 +246,35 @@ const {
   initializeRoomManager,
   isNewUnsavedRoom,
   isRoomCompleted,
-} = useRoomManager(localGardens, emit, roomManagerConfig);
+} = useRoomManager(localYards, emit, roomManagerConfig);
 
 onMounted(() => {
   initializeRoomManager();
 });
 
-// Garden features checkbox management
-const getSelectedGardenFeatures = (garden: any) => {
+// Yard features checkbox management
+const getSelectedYardFeatures = (yard: any) => {
   const features: string[] = [];
-  gardenFeaturesOptions.forEach((option) => {
-    if (garden[option.value]) {
+  yardFeaturesOptions.forEach((option) => {
+    if (yard[option.value]) {
       features.push(option.value);
     }
   });
   return features;
 };
 
-const updateGardenFeatures = (garden: any, selectedFeatures: string[]) => {
-  gardenFeaturesOptions.forEach((option) => {
-    garden[option.value] = false;
+const updateYardFeatures = (yard: any, selectedFeatures: string[]) => {
+  yardFeaturesOptions.forEach((option) => {
+    yard[option.value] = false;
   });
   selectedFeatures.forEach((feature) => {
-    garden[feature] = true;
+    yard[feature] = true;
   });
 };
 </script>
 
 <style lang="scss" scoped>
-.o-garden-form {
+.o-yard-form {
   &__items {
     display: flex;
     flex-direction: column;

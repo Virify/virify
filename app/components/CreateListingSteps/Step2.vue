@@ -138,6 +138,7 @@ const stepConfig = computed(() => ({
   initialData: createInitialStepTwoValues(props.draft),
   isValid: stepTwoValidation.isStepTwoValid,
   hasExistingData: stepTwoValidation.hasExistingStepTwoData,
+  stepNumber: 2,
   beforeSubmit: (data: StepTwo) => {
     const processedData = { ...data };
     

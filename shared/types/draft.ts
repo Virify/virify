@@ -78,10 +78,23 @@ export type StepSeven = {
   property: {
     outdoorSpace: {
       totalArea: number | null
+      hasGarden: boolean
+      hasYard: boolean
+      hasLand: boolean
       garden: Omit<Garden, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       yard: Omit<Yard, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       land: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       description: string | null
+      // OutdoorSpace boolean features
+      sunTerrace: boolean
+      terrace: boolean
+      balcony: boolean
+      patio: boolean
+      separateParcel: boolean
+      shed: boolean
+      summerHouse: boolean
+      gardenOffice: boolean
+      pool: boolean
     }
   }
 }

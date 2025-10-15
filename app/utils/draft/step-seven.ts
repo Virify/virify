@@ -6,17 +6,37 @@ import { GardenFacing, GardenPosition } from "~~/layers/database/server/database
  * @param draftListing - Draft listing to create initial values from
  * @returns Initial values for step seven
  */
-export const createInitialStepSevenValues = (draftListing: DraftListingWithFullPayload): StepSeven => ({
-  property: {
-    outdoorSpace: {
-      description: draftListing.property?.outdoorSpace?.description || null,
-      totalGardenSize: draftListing.property?.outdoorSpace?.totalGardenSize || null,
-      totalLandSize: draftListing.property?.outdoorSpace?.totalLandSize || null,
-      garden: draftListing.property?.outdoorSpace?.garden || [],
-      land: draftListing.property?.outdoorSpace?.land || []
+export const createInitialStepSevenValues = (draftListing: DraftListingWithFullPayload): StepSeven => {
+  const outdoorSpace = draftListing.property?.outdoorSpace;
+  const gardens = outdoorSpace?.garden || [];
+  const yards = outdoorSpace?.yard || [];
+  const lands = outdoorSpace?.land || [];
+
+  return {
+    property: {
+      outdoorSpace: {
+        description: outdoorSpace?.description || null,
+        totalArea: outdoorSpace?.totalArea || null,
+        hasGarden: gardens.length > 0,
+        hasYard: yards.length > 0,
+        hasLand: lands.length > 0,
+        garden: gardens,
+        yard: yards,
+        land: lands,
+        // OutdoorSpace boolean features
+        sunTerrace: outdoorSpace?.sunTerrace || false,
+        terrace: outdoorSpace?.terrace || false,
+        balcony: outdoorSpace?.balcony || false,
+        patio: outdoorSpace?.patio || false,
+        separateParcel: outdoorSpace?.separateParcel || false,
+        shed: outdoorSpace?.shed || false,
+        summerHouse: outdoorSpace?.summerHouse || false,
+        gardenOffice: outdoorSpace?.gardenOffice || false,
+        pool: outdoorSpace?.pool || false,
+      }
     }
-  }
-});
+  };
+};
 
 /**
  * Garden facing options
@@ -52,6 +72,37 @@ export const gardenFeaturesOptions = [
 ];
 
 /**
+ * Yard features options for checkbox selection (same as garden features)
+ */
+export const yardFeaturesOptions = [
+  { value: "sunTerrace", key: "Sun Terrace", info: "Yard has a sun terrace" },
+  { value: "terrace", key: "Terrace", info: "Yard has a terrace" },
+  { value: "balcony", key: "Balcony", info: "Yard has balcony access" },
+  { value: "patio", key: "Patio", info: "Yard has a patio" },
+  { value: "shed", key: "Shed", info: "Yard includes a shed" },
+  { value: "summerHouse", key: "Summer House", info: "Yard has a summer house" },
+  { value: "gardenOffice", key: "Garden Office", info: "Yard includes an office" },
+  { value: "pool", key: "Pool", info: "Yard has a swimming pool" },
+  { value: "separateParcel", key: "Separate Parcel", info: "Yard is on a separate parcel" },
+];
+
+/**
+ * Outdoor space features options for checkbox selection
+ * These are general features that apply to the entire outdoor space
+ */
+export const outdoorSpaceFeaturesOptions = [
+  { value: "sunTerrace", key: "Sun Terrace", info: "Outdoor space has a sun terrace" },
+  { value: "terrace", key: "Terrace", info: "Outdoor space has a terrace" },
+  { value: "balcony", key: "Balcony", info: "Outdoor space has balcony access" },
+  { value: "patio", key: "Patio", info: "Outdoor space has a patio" },
+  { value: "shed", key: "Shed", info: "Outdoor space includes a shed" },
+  { value: "summerHouse", key: "Summer House", info: "Outdoor space has a summer house" },
+  { value: "gardenOffice", key: "Garden Office", info: "Outdoor space includes an office" },
+  { value: "pool", key: "Pool", info: "Outdoor space has a swimming pool" },
+  { value: "separateParcel", key: "Separate Parcel", info: "Outdoor space is on a separate parcel" },
+];
+
+/**
  * Land features options for checkbox selection
  */
 export const landFeaturesOptions = [
@@ -73,18 +124,23 @@ export const stepSevenValidation = {
   /**
    * Check if garden data is valid
    * @param gardens Array of garden data
-   * @returns True if all gardens have required fields (name, position, facing)
+   * @returns True if all gardens have required fields (name only)
    */
   areGardensValid: (gardens: any[]): boolean => {
     if (gardens.length === 0) return true; // Gardens are optional
 
-    return gardens.every((garden) =>
-      garden.name &&
-      garden.position !== null &&
-      garden.position !== undefined &&
-      garden.facing !== null &&
-      garden.facing !== undefined
-    );
+    return gardens.every((garden) => garden.name);
+  },
+
+  /**
+   * Check if yard data is valid
+   * @param yards Array of yard data
+   * @returns True if all yards have required fields (name only)
+   */
+  areYardsValid: (yards: any[]): boolean => {
+    if (yards.length === 0) return true; // Yards are optional
+
+    return yards.every((yard) => yard.name);
   },
 
   /**
@@ -107,19 +163,31 @@ export const stepSevenValidation = {
    */
   isStepSevenValid: (data: StepSeven): boolean => {
     const gardens = data.property.outdoorSpace.garden || [];
+    const yards = data.property.outdoorSpace.yard || [];
     const lands = data.property.outdoorSpace.land || [];
+    const hasGarden = data.property.outdoorSpace.hasGarden;
+    const hasYard = data.property.outdoorSpace.hasYard;
+    const hasLand = data.property.outdoorSpace.hasLand;
 
-    // At least one garden or land parcel should exist, or explicit confirmation that there are none
-    const hasOutdoorSpace = gardens.length > 0 || lands.length > 0;
-    
-    // If there's outdoor space, validate it
-    if (hasOutdoorSpace) {
-      return stepSevenValidation.areGardensValid(gardens) &&
-             stepSevenValidation.areLandsValid(lands);
+    // If hasGarden is true, there MUST be at least one garden
+    if (hasGarden && gardens.length === 0) {
+      return false;
     }
 
-    // If no outdoor space, that's valid too (outdoor space is optional)
-    return true;
+    // If hasYard is true, there MUST be at least one yard
+    if (hasYard && yards.length === 0) {
+      return false;
+    }
+
+    // If hasLand is true, there MUST be at least one land
+    if (hasLand && lands.length === 0) {
+      return false;
+    }
+
+    // Validate all outdoor spaces if they exist
+    return stepSevenValidation.areGardensValid(gardens) &&
+           stepSevenValidation.areYardsValid(yards) &&
+           stepSevenValidation.areLandsValid(lands);
   },
 
   /**

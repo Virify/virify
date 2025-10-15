@@ -241,7 +241,7 @@ export const stepNineValidation = {
 
   /**
    * Check if step nine has been visited (relationships created)
-   * @param draft Draft listing with full payload
+   * @param draft Draft listing
    * @returns True if step nine relationships have been created
    */
   hasExistingStepNineData: (draft: DraftListingWithFullPayload): boolean => {

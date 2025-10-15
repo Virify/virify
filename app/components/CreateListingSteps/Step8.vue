@@ -289,6 +289,7 @@ const stepConfig = computed(() => ({
   initialData: createInitialStepEightValues(props.draft),
   isValid: (data: StepEight) => stepEightValidation.isStepEightValid(data, props.draft),
   hasExistingData: stepEightValidation.hasExistingStepEightData,
+  stepNumber: 8,
 }));
 
 const {

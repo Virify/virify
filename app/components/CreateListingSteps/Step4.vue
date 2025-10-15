@@ -131,7 +131,8 @@ const emit = defineEmits<{
 const stepConfig = computed(() => ({
   initialData: createInitialStepFourValues(props.draft),
   isValid: stepFourValidation.isStepFourValid,
-  hasExistingData: stepFourValidation.hasExistingStepFourData
+  hasExistingData: stepFourValidation.hasExistingStepFourData,
+  stepNumber: 4,
 }));
 
 // Use the reusable step form composable

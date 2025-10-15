@@ -121,7 +121,8 @@ const stepConfig = computed(() => ({
     rentalListing: createInitialRentalValues(props.draft)
   },
   isValid: stepOneValidation.isStepOneValid,
-  hasExistingData: stepOneValidation.hasExistingStepOneData
+  hasExistingData: stepOneValidation.hasExistingStepOneData,
+  stepNumber: 1,
 }));
 
 // Use the reusable step form composable

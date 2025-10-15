@@ -121,7 +121,7 @@ export const stepOneValidation = {
   },
 
   /**
-   * Check if draft has existing step one data
+   * Check if step one has existing data
    * @param draft Draft listing
    * @returns True if draft has complete step one data
    */

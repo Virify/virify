@@ -95,12 +95,11 @@ export const stepFiveValidation = {
   },
 
   /**
-   * Check if step five has been visited (bedroom/bathroom arrays exist)
+   * Check if step has existing data to determine button text and skip logic
    * @param draft Draft listing
-   * @returns True if bedroom or bathroom features arrays exist
+   * @returns True if step has been visited or has existing data
    */
   hasExistingStepFiveData: (draft: DraftListingWithFullPayload): boolean => {
-    // Arrays are always created, so check if any rooms have been added
     const bedrooms = draft.property?.bedroomFeatures || [];
     const bathrooms = draft.property?.bathroomFeatures || [];
     

@@ -91,7 +91,7 @@ export const stepThreeValidation = {
   },
 
   /**
-   * Check if draft has existing step three data
+   * Check if step three has existing data
    * @param draft Draft listing
    * @returns True if draft has complete step three data
    */

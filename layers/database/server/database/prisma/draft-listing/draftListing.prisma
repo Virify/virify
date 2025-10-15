@@ -9,6 +9,7 @@ model DraftListing {
   listingEndDate    DateTime?
   viewingOptions    String?
   verificationLevel VerificationLevel?
+  completedSteps    Int[]              @default([])
   rentalListing     RentalListing?
   saleListing       SaleListing?
   userId            Int

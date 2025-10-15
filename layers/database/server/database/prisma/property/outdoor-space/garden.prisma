@@ -4,8 +4,8 @@ model Garden {
   name              String
   size              Float?
   additionalDetails Boolean        @default(false)
-  facing            GardenFacing
-  position          GardenPosition
+  facing            GardenFacing?
+  position          GardenPosition?
   sunTerrace        Boolean        @default(false)
   terrace           Boolean        @default(false)
   balcony           Boolean        @default(false)

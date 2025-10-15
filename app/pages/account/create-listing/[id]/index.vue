@@ -97,8 +97,9 @@ watch(currentStep, () => {
 
 // Initialize step when stepper data becomes available
 watch(stepperMap, (steps) => {
-  if (steps.length > 0) {
-    determineInitialStep(draftId, steps);
+  if (steps.length > 0 && draft.value) {
+    const completedSteps = draft.value.completedSteps || [];
+    determineInitialStep(draftId, completedSteps, steps);
   }
 }, { immediate: true });
 

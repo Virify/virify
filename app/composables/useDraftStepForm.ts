@@ -1,4 +1,5 @@
 import { type MaybeRef } from '@vueuse/core';
+import type { DraftListing } from '~~/layers/database/server/database/prisma/generated/client';
 
 /**
  * Configuration interface for step validation and submission
@@ -8,6 +9,7 @@ export interface DraftStepFormConfig<T = any> {
   isValid: (data: T) => boolean;
   hasExistingData: (draft: DraftListingWithFullPayload) => boolean;
   beforeSubmit?: (data: T) => T;
+  stepNumber?: number; // Step number for tracking completion
 }
 
 /**
@@ -84,9 +86,26 @@ export function useDraftStepForm<T>(
   ) => {
     if (!isFormValid.value) return;
 
-    // If no changes detected, skip API call and go to next step
+    // Check if step needs to be marked as completed (first time visiting)
+    const needsCompletion = configRef.value.stepNumber !== undefined && 
+                           !draftRef.value.completedSteps?.includes(configRef.value.stepNumber);
+
+    // If no changes detected, just mark as completed and go to next step
     if (!hasChanges.value) {
       console.log('No changes detected, skipping API call');
+      
+      // Mark step as completed if this is the first time
+      if (needsCompletion) {
+        try {
+          await useRequestFetch()<DraftListing>(`/api/draft-listings/${draftRef.value.id}/`, {
+            method: 'PATCH',
+            body: { stepNumber: configRef.value.stepNumber },
+          });
+        } catch (error) {
+          console.error('Failed to mark step as completed:', error);
+        }
+      }
+      
       nextStepFn?.();
       return;
     }
@@ -100,11 +119,22 @@ export function useDraftStepForm<T>(
       // Execute update function
       await updateFn(dataToSubmit);
       
+      // Mark step as completed if this is the first time (after successful update)
+      if (needsCompletion) {
+        try {
+          await useRequestFetch()<DraftListing>(`/api/draft-listings/${draftRef.value.id}/`, {
+            method: 'PATCH',
+            body: { stepNumber: configRef.value.stepNumber },
+          });
+        } catch (error) {
+          console.error('Failed to mark step as completed:', error);
+          // Don't block navigation if marking fails
+        }
+      }
+      
       // Only call next step function if update was successful
       nextStepFn?.();
     } catch (error) {
-      // Error is already handled by the updateFn (likely shows a toast)
-      // Just don't call nextStepFn so user stays on current step
       console.error('Step submission failed:', error);
     }
   };

@@ -73,6 +73,7 @@ const stepConfig = computed(() => ({
   initialData: createInitialStepSixValues(props.draft),
   isValid: stepSixValidation.isStepSixValid,
   hasExistingData: stepSixValidation.hasExistingStepSixData,
+  stepNumber: 6,
   beforeSubmit: (data: StepSix) => {
     const processedData: StepSix = {
       property: {

@@ -53,63 +53,63 @@ export const useDraft = createSharedComposable(() => {
           saleListing: createInitialSaleValues(draft.value),
           rentalListing: createInitialRentalValues(draft.value)
         } as StepOne : null,
-        complete: draft.value ? stepOneValidation.hasExistingStepOneData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(1) || false : false,
         update: updateDraftStepOne,
         component: CreateListingStepsStep1
       },
       { 
         title: 'Property',
         data: draft.value ? createInitialStepTwoValues(draft.value) : null,
-        complete: draft.value ? stepTwoValidation.hasExistingStepTwoData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(2) || false : false,
         update: updateDraftStepTwo,
         component: CreateListingStepsStep2
       },
       { 
         title: 'Price', 
         data: draft.value ? createInitialStepThreeValues(draft.value) : null,
-        complete: draft.value ? stepThreeValidation.hasExistingStepThreeData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(3) || false : false,
         update: updateDraftStepThree,
         component: CreateListingStepsStep3
       },
       { 
         title: 'Address',
         data: draft.value ? createInitialStepFourValues(draft.value) : null,
-        complete: draft.value ? stepFourValidation.hasExistingStepFourData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(4) || false : false,
         update: updateDraftStepFour,
         component: CreateListingStepsStep4
       },
       { 
         title: 'Bedrooms & Bathrooms',
         data: draft.value ? createInitialStepFiveValues(draft.value) : null,
-        complete: draft.value ? stepFiveValidation.hasExistingStepFiveData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(5) || false : false,
         update: updateDraftStepFive,
         component: CreateListingStepsStep5
       },
       { 
         title: 'Kitchen & Other Rooms',
         data: draft.value ? createInitialStepSixValues(draft.value) : null,
-        complete: draft.value ? stepSixValidation.hasExistingStepSixData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(6) || false : false,
         update: updateDraftStepSix,
         component: CreateListingStepsStep6
       },
       { 
         title: 'Outdoor Spaces',
         data: draft.value ? createInitialStepSevenValues(draft.value) : null,
-        complete: draft.value ? stepSevenValidation.hasExistingStepSevenData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(7) || false : false,
         update: updateDraftStepSeven,
         component: CreateListingStepsStep7
       },
       { 
         title: 'Additional Features', 
         data: draft.value ? createInitialStepEightValues(draft.value) : null,
-        complete: draft.value ? stepEightValidation.hasExistingStepEightData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(8) || false : false,
         update: updateDraftStepEight,
         component: CreateListingStepsStep8
       },
       { 
         title: 'Energy & Costs',
         data: draft.value ? createInitialStepNineValues(draft.value) : null,
-        complete: draft.value ? stepNineValidation.hasExistingStepNineData(draft.value) : false,
+        complete: draft.value ? draft.value.completedSteps?.includes(9) || false : false,
         update: updateDraftStepNine,
         component: CreateListingStepsStep9
       },
