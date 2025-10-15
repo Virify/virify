@@ -211,8 +211,9 @@ const formatDisplayDate = (date: string | Date): string => {
     }
   }
 
-  .pill {
+  .a-pill {
     background: var(--blue-400);
+    color: var(--monochrome-900);
 
     &--percentage {
       background: var(--blue-400);

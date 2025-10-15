@@ -65,7 +65,7 @@ export const getActionItemsBuilder = () => {
           { id: "signup", label: "Signup", type: "button", hideWhenAuth: true, action: actions.openSignup, buttonClass: "button-monochrome" }
         );
       } else if (!isWaitingListMode.value || config.navigation.showAccount) {
-        items.push({ id: "account", label: "Account", href: "/account", type: "link", requiresAuth: true }, { id: "logout", label: "Logout", type: "button", requiresAuth: true, action: actions.logout, buttonClass: "button-monochrome" });
+        items.push({ id: "account", label: "Account", href: "/account", type: "link", requiresAuth: true });
       }
     }
 
