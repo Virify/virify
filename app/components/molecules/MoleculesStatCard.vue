@@ -118,8 +118,9 @@ function closeInfoModal() {
     overflow: hidden;
   }
 
-  .pill {
+  .a-pill {
     background: var(--blue-400);
+    color: var(--monochrome-900);
   }
 
   &__desc-row {
