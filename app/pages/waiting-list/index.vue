@@ -147,7 +147,7 @@
     <section class="waiting-list-benefits">
       <div class="container">
         <header class="waiting-list-benefits__header">
-          <h2 class="title-xl">Why join the waiting list?</h2>
+          <h2 class="title-xl">Why <span class="gradient-text">join</span> the waiting list?</h2>
         </header>
 
         <div class="waiting-list-benefits__cards">

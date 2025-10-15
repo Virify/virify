@@ -12,7 +12,7 @@
     </section>
 
     <!-- Contact Form Section -->
-    <section class="contact-form-section">
+    <section class="contact-form-section" id="contact">
       <div class="container">
         <div class="contact-form-container">
           <h2 class="contact-form__title | title-md">Get in Touch</h2>
@@ -93,10 +93,11 @@
     <section class="contact-info">
       <div class="container">
         <div class="contact-info__content">
-          <h2 class="title-xl">Looking to Partner?</h2>
+          <h2 class="title-xl">Looking to <span class="gradient-text">Partner?</span></h2>
           <p class="body-lg max-width-prose">We're always open to working with like-minded businesses, property
             professionals, and technology partners who share our vision of making property buying and selling more
             transparent and accessible.</p>
+            <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> Get in Touch </AtomsButton>
         </div>
       </div>
     </section>
@@ -148,6 +149,13 @@ function checkEnquiryValidity(event: Event) {
     enquiryError.value = "Enquiry must be at least 10 characters";
   } else if (target.validity.valueMissing) {
     enquiryError.value = "Enquiry is required";
+  }
+}
+
+function scrollToForm() {
+  const formSection = document.getElementById('contact');
+  if (formSection) {
+    formSection.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
