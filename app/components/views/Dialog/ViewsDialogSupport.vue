@@ -33,7 +33,7 @@
           name="type"
           required
           :disabled="isSubmitting"
-          class="support-dialog__select"
+          class="support-dialog__select | body-sm"
         >
           <option value="">Select type...</option>
           <option value="bug">Bug Report</option>
@@ -52,7 +52,7 @@
           required
           :disabled="isSubmitting"
           placeholder="Please describe the bug/issue including page name, device type, browser, and any steps to reproduce..."
-          class="support-dialog__textarea"
+          class="support-dialog__textarea | text-sm"
         ></textarea>
       </MoleculesFormField>
 
@@ -146,6 +146,8 @@ async function submitForm() {
     background: var(--background-200);
     resize: vertical;
     min-height: var(--size-120);
+    font-size: var(--font-sm);
+    line-height: var(--lineheight-sm);
 
     &:focus {
       outline: none;
