@@ -24,17 +24,7 @@ export default defineNuxtConfig({
     },
     headers: {
       permissionsPolicy: false,
-      contentSecurityPolicy: {
-        "default-src": ["'self'"],
-        "img-src": ["'self'", "data:", "https://cdn.sanity.io", "https://virify.co.uk", String(process.env.CF_IMAGES_URL), "https://images.unsplash.com", "https://www.google-analytics.com", "https://www.googletagmanager.com"],
-        "script-src": ["'self'", "'unsafe-inline'", "https://challenges.cloudflare.com", "https://www.googletagmanager.com", "https://static.cloudflareinsights.com"],
-        "script-src-attr": ["'unsafe-inline'"],
-        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        "font-src": ["'self'", "https://fonts.gstatic.com"],
-        "frame-src": ["'self'", "https://challenges.cloudflare.com"],
-        "connect-src": ["'self'", "https://challenges.cloudflare.com", "https://www.google-analytics.com", "https://analytics.google.com", "https://region1.google-analytics.com", "https://cloudflareinsights.com"],
-        "worker-src": ["'self'", "blob:"],
-      },
+      contentSecurityPolicy: false,
     },
     nonce: false,
     sri: false,

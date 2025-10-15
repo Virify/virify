@@ -24,6 +24,7 @@ export type Fullproperty = Prisma.PropertyGetPayload<{
     outdoorSpace: {
       include: {
         garden: true;
+        yard: true;
         land: true;
       };
     };

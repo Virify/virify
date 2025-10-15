@@ -3,72 +3,66 @@
     <AtomsCollapsibleHeader
       :is-collapsed="isCollapsed"
       :variant="variant"
-      :icon="getSectionIcon()"
+      :icon="sectionIcon"
       :aria-controls="`item-details-${normalizedTitle}`"
       @toggle="toggleCollapsed"
     >
       <template #title>
-        {{ props.title }} <span class="body-sm">({{ itemsArray.length }})</span>
+        {{ props.title }} <span class="body-sm">({{ totalCount }})</span>
       </template>
     </AtomsCollapsibleHeader>
 
     <Transition name="item-details-collapse">
-      <ul v-show="!isCollapsed" class="item-details__list" :id="`item-details-${normalizedTitle}`">
-        <li v-for="(item, index) in itemsArray" :key="index" class="item-details__item">
-          <div class="item-details__image" v-if="item.media && item.media.length > 0">
-            <AtomsCloudFlareImage :src="item.media[0].image!" :alt="item.media[0].metadata!" variant="card" class="| image-sm" />
-          </div>
-          <div class="item-details__content | body-sm">
-            <!-- Title row with icon, title, and info button -->
-            <div class="item-details__title | font-semibold">
-              <div class="item-details__title-content">
-                <AtomsIcon :icon="getItemIcon(item)" :size="20" />
-                {{ getItemTitle(item) }}
-              </div>
-              <AtomsTooltip v-if="item.description" :responsive="true">
-                <AtomsIcon icon="property/info" :size="22" />
-                <template #tooltip>
-                  <p class="body-xs">{{ item.description }}</p>
-                </template>
-              </AtomsTooltip>
-            </div>
+      <div v-show="!isCollapsed" :id="`item-details-${normalizedTitle}`">
+        <ul class="item-details__list">
+          <!-- Outdoor Space Card -->
+          <template v-if="props.type === 'outdoorspace'">
+            <MoleculesListingOutdoorSpaceCard
+              v-if="outdoorSpaceItem"
+              :outdoor-space="outdoorSpaceItem"
+              :total-area="props.totalArea"
+              :has-gardens="props.hasGardens"
+              :has-yards="props.hasYards"
+              :has-land="props.hasLand"
+            />
+            
+            <!-- Garden Cards -->
+            <MoleculesListingGardenYardLandCard
+              v-for="(garden, index) in props.gardens"
+              :key="`garden-${index}`"
+              :item="garden"
+              type="garden"
+            />
+            
+            <!-- Yard Cards -->
+            <MoleculesListingGardenYardLandCard
+              v-for="(yard, index) in props.yards"
+              :key="`yard-${index}`"
+              :item="yard"
+              type="yard"
+            />
+            
+            <!-- Land Cards -->
+            <MoleculesListingGardenYardLandCard
+              v-for="(land, index) in props.lands"
+              :key="`land-${index}`"
+              :item="land"
+              type="land"
+            />
+          </template>
 
-            <!-- Size and floor info -->
-            <div class="item-details__details-row">
-              <div v-if="item.size" class="item-details__detail">
-                <AtomsIcon icon="property/size" :size="24" />
-                {{ item.size }}sqmt
-              </div>
-              <!-- Show Total Garden Size for garden items in outdoor type -->
-              <div v-if="props.type === 'outdoor' && 'position' in item && props.totalGardenSize" class="item-details__detail">
-                <AtomsIcon icon="property/size" :size="24" />
-                Total Garden Size: {{ props.totalGardenSize }}sqmt
-              </div>
-              <!-- Show Total Land Size for land items in outdoor type -->
-              <div v-if="props.type === 'outdoor' && ('woodland' in item || 'paddock' in item) && props.totalLandSize" class="item-details__detail">
-                <AtomsIcon icon="property/size" :size="24" />
-                Total Land Size: {{ props.totalLandSize }}sqmt
-              </div>
-              <!-- Legacy support for garden type -->
-              <div v-if="props.type === 'garden' && props.outdoorSpaceSize" class="item-details__detail">
-                <AtomsIcon icon="property/size" :size="24" />
-                Size (total): {{ props.outdoorSpaceSize }}sqmt
-              </div>
-              <div v-if="showFloor && 'floor' in item && item.floor !== undefined" class="item-details__detail">
-                <AtomsIcon icon="property/floor" :size="24" />
-                {{ getFloorText((item as any).floor) }}
-              </div>
-            </div>
-
-            <!-- Features -->
-            <div v-if="getFeatures(item).length > 0" class="item-details__features">
-              <AtomsPill v-for="feature in getFeatures(item)" :key="feature" class="| body-xs">
-                {{ feature }}
-              </AtomsPill>
-            </div>
-          </div>
-        </li>
-      </ul>
+          <!-- Regular Room Cards -->
+          <template v-else>
+            <MoleculesListingRoomCard
+              v-for="(item, index) in roomItems"
+              :key="index"
+              :item="item"
+              :subtype="props.subtype"
+              :show-floor="props.showFloor"
+            />
+          </template>
+        </ul>
+      </div>
     </Transition>
   </div>
 </template>
@@ -78,7 +72,7 @@ import type { Prisma } from "~~/layers/database/server/database/prisma/generated
 
 interface Props {
   title: string;
-  type: "room" | "garden" | "outdoor";
+  type: "room" | "outdoorspace";
   subtype?: string; // For room types like "Bedroom", "Bathroom", etc.
   items:
     | Prisma.BedroomGetPayload<{ include: { media: true } }>[]
@@ -86,21 +80,24 @@ interface Props {
     | Prisma.ReceptionGetPayload<{ include: { media: true } }>[]
     | Prisma.OtherRoomGetPayload<{ include: { media: true } }>[]
     | Prisma.KitchenGetPayload<{ include: { media: true } }>
-    | { gardenType: string; media: any[]; [key: string]: any }[]
+    | Prisma.OutdoorSpaceGetPayload<{ include: { media: true; garden: true; yard: true; land: true } }>[]
     | null
     | undefined;
   showFloor?: boolean;
   variant?: "card" | "plain";
-  outdoorSpaceSize?: number | null;
-  totalGardenSize?: number | null;
-  totalLandSize?: number | null;
+  totalArea?: number | null;
+  hasGardens?: boolean;
+  hasYards?: boolean;
+  hasLand?: boolean;
+  gardens?: Prisma.GardenGetPayload<{ include: { media: true } }>[] | null;
+  yards?: Prisma.YardGetPayload<{ include: { media: true } }>[] | null;
+  lands?: Prisma.LandGetPayload<{ include: { media: true } }>[] | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showFloor: true,
   variant: "card",
 });
-
 
 // Normalize items to always be an array
 const itemsArray = computed(() => {
@@ -109,13 +106,44 @@ const itemsArray = computed(() => {
   return [props.items];
 });
 
-// Display title with count
-const displayTitle = computed(() => {
-  const count = itemsArray.value.length;
-  if (props.type === "garden") {
-    return count === 1 ? "Garden (1)" : `Gardens (${count})`;
+// Type guard for outdoor space
+const outdoorSpaceItem = computed(() => {
+  if (props.type !== 'outdoorspace' || itemsArray.value.length === 0) return null;
+  return itemsArray.value[0] as Prisma.OutdoorSpaceGetPayload<{ include: { media: true; garden: true; yard: true; land: true } }>;
+});
+
+// Type guard for room items
+const roomItems = computed(() => {
+  if (props.type === 'outdoorspace') return [];
+  return itemsArray.value as (
+    | Prisma.BedroomGetPayload<{ include: { media: true } }>
+    | Prisma.BathroomGetPayload<{ include: { media: true } }>
+    | Prisma.ReceptionGetPayload<{ include: { media: true } }>
+    | Prisma.OtherRoomGetPayload<{ include: { media: true } }>
+    | Prisma.KitchenGetPayload<{ include: { media: true } }>
+  )[];
+});
+
+// Calculate total count
+const totalCount = computed(() => {
+  if (props.type !== 'outdoorspace') return itemsArray.value.length;
+  
+  // For outdoor space: main card + gardens/yards/lands with additional details
+  const gardensCount = props.gardens?.length || 0;
+  const yardsCount = props.yards?.length || 0;
+  const landsCount = props.lands?.length || 0;
+  
+  return 1 + gardensCount + yardsCount + landsCount;
+});
+
+// Section icon
+const sectionIcon = computed(() => {
+  if (props.type === 'outdoorspace') {
+    return 'property/rear-garden';
   }
-  return `${props.title} (${count})`;
+  // Use the existing room type icon logic based on subtype
+  const dummyRoom = {};
+  return getRoomTypeIcon(dummyRoom, props.subtype || props.title);
 });
 
 // Normalized title for ID generation
@@ -135,66 +163,6 @@ watchEffect(() => {
 const toggleCollapsed = () => {
   isCollapsed.value = !isCollapsed.value;
 };
-
-// Helper functions
-const getSectionIcon = (): string => {
-  if (props.type === 'garden' || props.type === 'outdoor') {
-    return 'property/rear-garden'; // Garden icon
-  }
-  
-  // Use the existing room type icon logic based on subtype
-  const dummyRoom = {}; // Empty object since we're using subtype
-  return getRoomTypeIcon(dummyRoom, props.subtype || props.title);
-};
-
-const getItemIcon = (item: any): string => {
-  if (props.type === "garden" || props.type === "outdoor") {
-    // Check if it's a Land item (has woodland, paddock, etc.) or Garden item
-    if ('woodland' in item || 'paddock' in item || 'stables' in item) {
-      return 'property/land';
-    }
-    return 'property/rear-garden';
-  }
-  return getRoomTypeIcon(item, props.subtype || "");
-};
-
-const getItemTitle = (item: any): string => {
-  if (props.type === "garden" || props.type === "outdoor") {
-    // Use the name field if available, otherwise fallback to old logic
-    if (item.name) {
-      return item.name;
-    }
-    return getGardenType(item);
-  }
-  return getRoomType(item);
-};
-
-// Computed property to filter only TRUE boolean features and convert to readable strings
-const getFeatures = (item: any): string[] => {
-  if (!item || typeof item !== "object") return [];
-
-  const features: string[] = [];
-  
-  // For gardens and outdoor space, add position and facing first (for garden items)
-  if ((props.type === "garden" || props.type === "outdoor") && item.position) {
-    features.push(convertRoomEnumToString(item.position));
-    if (item.facing) {
-      features.push(`${convertRoomEnumToString(item.facing)} Facing`);
-    }
-  }
-  
-  // Then add boolean features
-  Object.entries(item).forEach(([key, value]) => {
-    // Skip non-boolean properties or specific properties we handle separately
-    if (typeof value === "boolean" && value === true && 
-        key !== "description" && key !== "size" && key !== "separateParcel") {
-      features.push(convertRoomEnumToString(key));
-    }
-  });
-
-  return features;
-};
-
 </script>
 
 <style lang="scss">
@@ -202,7 +170,6 @@ const getFeatures = (item: any): string[] => {
 
 .item-details {
   margin: 0;
-
 
   &__list {
     list-style: none;
@@ -220,80 +187,6 @@ const getFeatures = (item: any): string[] => {
       grid-template-columns: 1fr;
       gap: var(--size-24);
     }
-  }
-
-  &__item {
-    background: var(--background-100);
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--monochrome-600);
-    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__image {
-    height: auto;
-    border-radius: var(--border-radius-lg);
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-
-    img {
-      width: 100%;
-    }
-  }
-
-  &__content {
-    padding: var(--size-16);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-8);
-  }
-
-  &__title {
-    text-transform: capitalize;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--size-8);
-  }
-
-  &__title-content {
-    display: flex;
-    align-items: center;
-    gap: var(--size-8);
-  }
-
-  &__details-row {
-    display: flex;
-    align-items: center;
-    gap: var(--size-16);
-  }
-
-  &__detail {
-    display: flex;
-    align-items: center;
-    gap: var(--size-8);
-  }
-
-  &__features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--size-4);
-    margin-top: var(--size-4);
-
-    .a-pill {
-      background: var(--blue-400);
-      color: var(--monochrome-900);
-    }
-  }
-
-  // Info button icon size
-  &__title .button.button-xs.button-quiet .a-icon {
-    width: 22px;
-    height: 22px;
   }
 }
 

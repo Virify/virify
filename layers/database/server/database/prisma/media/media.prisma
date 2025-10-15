@@ -24,6 +24,8 @@ model Media {
   outdoorSpaceId Int?
   Land           Land?         @relation(fields: [landId], references: [id])
   landId         Int?
+  yard           Yard?         @relation(fields: [yardId], references: [id])
+  yardId         Int?
 
   @@index([propertyId])
 }

@@ -62,7 +62,6 @@ export const getActionItemsBuilder = () => {
     if (!isWaitingListMode.value || config.navigation.showAuth) {
       if (!loggedIn) {
         items.push(
-          { id: "login", label: "Login", type: "button", hideWhenAuth: true, action: actions.openLogin, buttonClass: "button-tertiary" },
           { id: "signup", label: "Signup", type: "button", hideWhenAuth: true, action: actions.openSignup, buttonClass: "button-monochrome" }
         );
       } else if (!isWaitingListMode.value || config.navigation.showAccount) {

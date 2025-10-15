@@ -49,6 +49,11 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
                 media: true,
               },
             },
+            yard: {
+              include: {
+                media: true,
+              },
+            },
             land: {
               include: {
                 media: true,
@@ -187,6 +192,7 @@ export const listingCardFields = {
       outdoorSpace: {
         select: {
           garden: true,
+          yard: true,
           land: true,
         },
       },

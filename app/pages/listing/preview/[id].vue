@@ -1,5 +1,5 @@
 <template>
-  <ViewsListingDetail :listing="draftListing" :is-draft="true" />
+  <OrganismsListingDetail :listing="draftListing" :is-draft="true" />
 </template>
 
 <script setup lang="ts">

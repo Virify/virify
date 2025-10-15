@@ -1,4 +1,4 @@
-import { Prisma, type Accessibility, type AdditionalFeatures, type Bathroom, type Bedroom, type EnergyAndUtilities, type Garden, type Kitchen, type Land, type OtherRoom, type OutdoorSpace, type Parking, type Reception, type RunningCosts, type Security, type Storage, type Utility } from "~~/layers/database/server/database/prisma/generated/client"
+import { Prisma, type Accessibility, type AdditionalFeatures, type Bathroom, type Bedroom, type EnergyAndUtilities, type Garden, type Kitchen, type Land, type OtherRoom, type OutdoorSpace, type Parking, type Reception, type RunningCosts, type Security, type Storage, type Utility, type Yard } from "~~/layers/database/server/database/prisma/generated/client"
 import type { ConstructionType, RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
 
@@ -77,9 +77,9 @@ export type StepSix = {
 export type StepSeven = {
   property: {
     outdoorSpace: {
-      totalGardenSize: number | null
+      totalArea: number | null
       garden: Omit<Garden, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
-      totalLandSize: number | null
+      yard: Omit<Yard, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       land: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       description: string | null
     }
@@ -114,6 +114,7 @@ export type StepTen = {
     otherRoom: Omit<OtherRoom, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'>[]
     outdoorSpace: {
       garden: Omit<Garden, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt'>[]
+      yard: Omit<Yard, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt'>[]
       land: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt'>[]
     }
     media: {
@@ -168,6 +169,11 @@ export type DraftListingWithFullPayload = Prisma.DraftListingGetPayload<{
         outdoorSpace: {
           include: {
             garden: {
+              include: {
+                media: true,
+              },
+            },
+            yard: {
               include: {
                 media: true,
               },

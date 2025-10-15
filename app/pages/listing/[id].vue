@@ -1,5 +1,5 @@
 <template>
-  <ViewsListingDetail v-if="listing" :key="listing.id" :listing="listing" />
+  <OrganismsListingDetail v-if="listing" :key="listing.id" :listing="listing" />
 </template>
 
 <script setup lang="ts">

@@ -2,20 +2,16 @@
   <main class="p-listing">
     <div class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
-        <skeleton-loader class="p-listing__main-carousel-skeleton p-listing__main-carousel-skeleton--mobile">
-          <MoleculesImageGallery v-if="!isDesktop && galleryImages.length > 0" :images="galleryImages"
-            @open-modal="openImageModal" />
-        </skeleton-loader>
+        <MoleculesImageGallery :images="galleryImages"
+          @open-modal="openImageModal" />
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
         <div class="p-listing__content | flow flow-sm">
           <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
             role="presentation">
-            <skeleton-loader class="p-listing__main-carousel-skeleton">
-              <MoleculesImageGallery v-if="isDesktop && galleryImages.length > 0" :images="galleryImages"
-                @open-modal="openImageModal" />
-            </skeleton-loader>
+            <MoleculesImageGallery :images="galleryImages"
+              @open-modal="openImageModal" />
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
@@ -50,14 +46,20 @@
               subtype="Reception" title="Receptions" />
             <MoleculesListingItemDetails v-if="property?.otherRoom" :items="property?.otherRoom" type="room"
               subtype="Other Rooms" title="Other Rooms" />
+            <!-- Outdoor Space Section (if it exists) -->
             <MoleculesListingItemDetails 
-              v-if="(property?.outdoorSpace?.garden && property.outdoorSpace.garden.length > 0) || (property?.outdoorSpace?.land && property.outdoorSpace.land.length > 0)"
-              :items="[...(property.outdoorSpace.garden || []), ...(property.outdoorSpace.land || [])]" 
-              type="outdoor" 
+              v-if="property?.outdoorSpace"
+              :items="[property.outdoorSpace]" 
+              type="outdoorspace" 
               title="Outdoor Space" 
               :show-floor="false" 
-              :total-garden-size="property.outdoorSpace.totalGardenSize"
-              :total-land-size="property.outdoorSpace.totalLandSize" />
+              :total-area="property.outdoorSpace.totalArea"
+              :has-gardens="hasGarden"
+              :has-yards="hasYard"
+              :has-land="hasLand"
+              :gardens="gardensWithDetails"
+              :yards="yardsWithDetails"
+              :lands="landsWithDetails" />
           </div>
 
           <!-- Energy & Utilities -->
@@ -130,7 +132,7 @@
           <Transition name="p-listing-images">
             <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
               <div class="p-listing__sidebar-carousel">
-                <MoleculesImageGallery v-if="galleryImages.length > 0" :images="galleryImages"
+                <MoleculesImageGallery :images="galleryImages"
                   @open-modal="openImageModal" />
               </div>
             </div>
@@ -226,16 +228,41 @@ const amenitiesArray = computed(() => {
   return Array.isArray(amenities) ? amenities : [amenities];
 });
 
-// Check if property has any garden
+// Check if property has any garden (regardless of additionalDetails)
 const hasGarden = computed(() => {
   const gardens = property.value?.outdoorSpace?.garden;
   return gardens && Array.isArray(gardens) && gardens.length > 0;
 });
 
-// Check if property has any land
+// Check if property has any yard (regardless of additionalDetails)
+const hasYard = computed(() => {
+  const yards = property.value?.outdoorSpace?.yard;
+  return yards && Array.isArray(yards) && yards.length > 0;
+});
+
+// Check if property has any land (regardless of additionalDetails)
 const hasLand = computed(() => {
   const land = property.value?.outdoorSpace?.land;
   return land && Array.isArray(land) && land.length > 0;
+});
+
+// Filter gardens/yards/lands that have additional details (for rendering individual cards)
+const gardensWithDetails = computed(() => {
+  const gardens = property.value?.outdoorSpace?.garden;
+  if (!gardens || !Array.isArray(gardens)) return [];
+  return gardens.filter(g => g.additionalDetails === true);
+});
+
+const yardsWithDetails = computed(() => {
+  const yards = property.value?.outdoorSpace?.yard;
+  if (!yards || !Array.isArray(yards)) return [];
+  return yards.filter(y => y.additionalDetails === true);
+});
+
+const landsWithDetails = computed(() => {
+  const lands = property.value?.outdoorSpace?.land;
+  if (!lands || !Array.isArray(lands)) return [];
+  return lands.filter(l => l.additionalDetails === true);
 });
 
 /**
@@ -247,9 +274,20 @@ const images = computed(() => {
 
   return media
     .filter((item) => item.image !== null)
-    .map((item) => ({
+    .map((item, index) => ({
       image: item.image!,
       metadata: item.metadata,
+      // Room relationship data for categorization
+      bedroomId: item.bedroomId,
+      bathroomId: item.bathroomId,
+      kitchenId: item.kitchenId,
+      receptionId: item.receptionId,
+      otherRoomId: item.otherRoomId,
+      gardenId: item.gardenId,
+      yardId: item.yardId,
+      landId: item.landId,
+      outdoorSpaceId: item.outdoorSpaceId,
+      globalIndex: index,
     }));
 });
 
@@ -263,7 +301,18 @@ const galleryImages = computed(() => {
       } catch {
         return `Property image ${index + 1}`;
       }
-    })()
+    })(),
+    // Pass room IDs for gallery to categorize
+    bedroomId: item.bedroomId,
+    bathroomId: item.bathroomId,
+    kitchenId: item.kitchenId,
+    receptionId: item.receptionId,
+    otherRoomId: item.otherRoomId,
+    gardenId: item.gardenId,
+    yardId: item.yardId,
+    landId: item.landId,
+    outdoorSpaceId: item.outdoorSpaceId,
+    globalIndex: index
   }));
 });
 
