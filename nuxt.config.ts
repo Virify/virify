@@ -18,6 +18,11 @@ export default defineNuxtConfig({
     },
   },
   security: {
+    rateLimiter: {
+      tokensPerInterval: 150,
+      interval: 60000, // 1 minute
+      throwError: false, // Optional: don't throw error, just block
+    },
     xssValidator: {
       methods: ["POST", "PUT", "PATCH", "DELETE", "GET"],
       escapeHtml: true,

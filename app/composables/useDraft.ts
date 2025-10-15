@@ -164,6 +164,7 @@ export const useDraft = createSharedComposable(() => {
     if (stepToUpdate) {
       try {
         await stepToUpdate(draft.value.id, stepData);
+        console.log(`Successfully updated ${stepTitle} for draft ID ${draftId}`);
         return { success: true };
       } catch (error: any) {
         console.error("Error updating step data:", error);

@@ -109,7 +109,8 @@ export const useDraftListing = createSharedComposable(() => {
           ...stepData,
         },
       });
-      refreshDraftListings();
+      // Note: We don't refresh all drafts here to avoid rate limiting
+      // The step completion tracking updates the cache when needed
     } catch (error: any) {
       // Use Nuxt's createError for proper error handling
       throw createError({
@@ -201,6 +202,23 @@ export const useDraftListing = createSharedComposable(() => {
     return updateDraftStep('nine', draftId, stepData);
   }
 
+  /**
+   * Marks a step as completed for a draft listing (updates local cache)
+   * @param draftId ID of the draft listing
+   * @param stepNumber Step number to mark as completed (1-10)
+   */
+  function markStepAsCompleted(draftId: number, stepNumber: number) {
+    if (!draftListings.value) return;
+    
+    const draft = draftListings.value.find(d => d.id === draftId);
+    if (!draft) return;
+    
+    // Only add if not already completed
+    if (!draft.completedSteps.includes(stepNumber)) {
+      draft.completedSteps.push(stepNumber);
+    }
+  }
+
   return {
     draftListings,
     draftListing,
@@ -219,5 +237,6 @@ export const useDraftListing = createSharedComposable(() => {
     updateDraftStepSeven,
     updateDraftStepEight,
     updateDraftStepNine,
+    markStepAsCompleted,
   };
 });

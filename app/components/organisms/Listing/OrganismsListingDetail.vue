@@ -36,15 +36,15 @@
 
           <div v-if="property" class="p-listing__section">
             <h2 class="title-md">Rooms</h2>
-            <MoleculesListingItemDetails v-if="property?.bedroomFeatures" :items="property?.bedroomFeatures" type="room"
+            <MoleculesListingItemDetails v-if="property?.bedroomFeatures && property.bedroomFeatures.length > 0" :items="property?.bedroomFeatures" type="room"
               subtype="Bedroom" title="Bedrooms" />
-            <MoleculesListingItemDetails v-if="property?.bathroomFeatures" :items="property?.bathroomFeatures"
+            <MoleculesListingItemDetails v-if="property?.bathroomFeatures && property.bathroomFeatures.length > 0" :items="property?.bathroomFeatures"
               type="room" subtype="Bathroom" title="Bathrooms" />
-            <MoleculesListingItemDetails v-if="property?.kitchenFeatures" :items="property?.kitchenFeatures" type="room"
+            <MoleculesListingItemDetails v-if="property?.kitchenFeatures && property.kitchenFeatures.length > 0" :items="property?.kitchenFeatures" type="room"
               subtype="Kitchen" title="Kitchen" />
-            <MoleculesListingItemDetails v-if="property?.reception" :items="property?.reception" type="room"
+            <MoleculesListingItemDetails v-if="property?.reception && property.reception.length > 0" :items="property?.reception" type="room"
               subtype="Reception" title="Receptions" />
-            <MoleculesListingItemDetails v-if="property?.otherRoom" :items="property?.otherRoom" type="room"
+            <MoleculesListingItemDetails v-if="property?.otherRoom && property.otherRoom.length > 0" :items="property?.otherRoom" type="room"
               subtype="Other Rooms" title="Other Rooms" />
             <!-- Outdoor Space Section (if it exists) -->
             <MoleculesListingItemDetails 
@@ -68,32 +68,28 @@
               :postcode="property?.address?.postcode" />
           </div>
 
-          <div v-if="property" class="p-listing__section">
+          <div v-if="hasAdditionalDetails" class="p-listing__section">
             <h2 class="title-md">Additional Details</h2>
-            <div class="p-listing__features-list">
-              <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.parking)" title="Parking"
-                  :features="property?.parking" />
-                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.utility)" title="Utility"
-                  :features="property?.utility" />
-                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.storageFeatures)" title="Storage"
-                  :features="property?.storageFeatures" />
-                <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities.broadbandType"
-                  :broadband-type="property.energyAndUtilities.broadbandType"
-                  :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
-                  :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
-                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.additionalFeatures)"
-                  title="Additional Features" :features="property?.additionalFeatures" />
-              </div>
-              <div class="p-listing__features-column">
-                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.accessibilityFeatures)"
-                  title="Accessibility" :features="property?.accessibilityFeatures" />
-                <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.securityFeatures)" title="Security"
-                  :features="property?.securityFeatures" />
-                <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)"
-                  title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
-                <MoleculesListingMobileCoverage />
-              </div>
+            <div class="p-listing__features-grid">
+              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.parking)" title="Parking"
+                :features="property?.parking" />
+              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.utility)" title="Utility"
+                :features="property?.utility" />
+              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.storageFeatures)" title="Storage"
+                :features="property?.storageFeatures" />
+              <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities?.broadbandType"
+                :broadband-type="property.energyAndUtilities.broadbandType"
+                :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
+                :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
+              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.additionalFeatures)"
+                title="Additional Features" :features="property?.additionalFeatures" />
+              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.accessibilityFeatures)"
+                title="Accessibility" :features="property?.accessibilityFeatures" />
+              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.securityFeatures)" title="Security"
+                :features="property?.securityFeatures" />
+              <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)"
+                title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
+              <MoleculesListingMobileCoverage />
             </div>
           </div>
 
@@ -263,6 +259,23 @@ const landsWithDetails = computed(() => {
   const lands = property.value?.outdoorSpace?.land;
   if (!lands || !Array.isArray(lands)) return [];
   return lands.filter(l => l.additionalDetails === true);
+});
+
+// Check if property has any additional details to display
+const hasAdditionalDetails = computed(() => {
+  const prop = property.value;
+  if (!prop) return false;
+
+  return (
+    hasBooleanFeatures(prop.parking) ||
+    hasBooleanFeatures(prop.utility) ||
+    hasBooleanFeatures(prop.storageFeatures) ||
+    prop.energyAndUtilities?.broadbandType ||
+    hasBooleanFeatures(prop.additionalFeatures) ||
+    hasBooleanFeatures(prop.accessibilityFeatures) ||
+    hasBooleanFeatures(prop.securityFeatures) ||
+    filterListingFeatures(prop.energyAndUtilities)
+  );
 });
 
 /**
@@ -543,26 +556,48 @@ ul {
 
 .p-listing__features-list {
   width: 100%;
-  display: flex;
+  display: grid;
   gap: var(--size-16);
   margin-top: var(--size-16);
-  align-items: flex-start;
+  grid-template-columns: 1fr;
+
+  @include mq.tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
   @include mq.mobile-only {
-    flex-direction: column;
     gap: var(--size-12);
   }
 }
 
-.p-listing__features-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-16);
+.p-listing__features-grid {
+  width: 100%;
+  margin-top: var(--size-16);
+  column-gap: var(--size-16);
+  row-gap: var(--size-16);
+
+  @include mq.tablet {
+    column-count: 2;
+  }
+
+  @include mq.notebook {
+    column-count: 3;
+  }
 
   @include mq.mobile-only {
-    gap: var(--size-12);
+    column-gap: var(--size-12);
+    row-gap: var(--size-12);
+  }
+
+  > * {
+    break-inside: avoid;
+    margin-bottom: var(--size-16);
+    display: inline-block;
     width: 100%;
+
+    @include mq.mobile-only {
+      margin-bottom: var(--size-12);
+    }
   }
 }
 </style>
