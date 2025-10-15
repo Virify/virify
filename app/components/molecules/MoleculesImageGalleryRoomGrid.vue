@@ -265,8 +265,10 @@ onUnmounted(() => {
 
   &__image {
     width: 100%;
+    height: 100%;
     aspect-ratio: 4/3;
     object-fit: cover;
+    display: block;
     border-radius: var(--border-radius-lg);
   }
 
