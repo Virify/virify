@@ -2,6 +2,8 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 
 export default defineVitestConfig({
   test: {
+    environment: 'nuxt',
+    setupFiles: ['./tests/setup/nuxt.ts'],
     environmentOptions: {
       nuxt: {
         domEnvironment: 'jsdom',
@@ -11,7 +13,10 @@ export default defineVitestConfig({
           image: {
             provider: 'none'
           }
-        }
+        },
+        mock: {
+          intersectionObserver: true,
+        },
       },
     },
   },

@@ -1,17 +1,17 @@
-import { describe, it, expect } from 'vitest'
-import { stepEightValidation } from '../../../../app/utils/draft/step-eight'
-import type { DraftListingWithFullPayload } from '../../../../shared/types/draft'
+import { describe, it, expect } from "vitest";
+import { stepEightValidation } from "../../../../app/utils/draft/step-eight";
+import type { DraftListingWithFullPayload } from "../../../../shared/types/draft";
 
-describe('Step8 - Additional Features Validation', () => {
-  describe('areAdditionalFeaturesValid', () => {
-    it('should always return true (features are optional)', () => {
-      const result = stepEightValidation.areAdditionalFeaturesValid()
-      expect(result).toBe(true)
-    })
-  })
+describe("Step8 - Additional Features Validation", () => {
+  describe("areAdditionalFeaturesValid", () => {
+    it("should always return true (features are optional)", () => {
+      const result = stepEightValidation.areAdditionalFeaturesValid();
+      expect(result).toBe(true);
+    });
+  });
 
-  describe('isStepEightValid', () => {
-    it('should validate step (all features are optional)', () => {
+  describe("isStepEightValid", () => {
+    it("should validate step (all features are optional)", () => {
       const data = {
         property: {
           additionalFeatures: null,
@@ -21,28 +21,28 @@ describe('Step8 - Additional Features Validation', () => {
           storageFeatures: null,
           utility: null,
         },
-      }
+      };
 
-      const draft = {} as DraftListingWithFullPayload
+      const draft = {} as DraftListingWithFullPayload;
 
-      const result = stepEightValidation.isStepEightValid(data, draft)
-      expect(result).toBe(true)
-    })
-  })
+      const result = stepEightValidation.isStepEightValid(data, draft);
+      expect(result).toBe(true);
+    });
+  });
 
-  describe('hasExistingStepEightData', () => {
-    it('should return true when draft has any feature relationship', () => {
+  describe("hasExistingStepEightData", () => {
+    it("should return true when draft has any feature relationship", () => {
       const mockDraft = {
         property: {
           additionalFeatures: {},
         },
-      } as DraftListingWithFullPayload
+      } as DraftListingWithFullPayload;
 
-      const result = stepEightValidation.hasExistingStepEightData(mockDraft)
-      expect(result).toBe(true)
-    })
+      const result = stepEightValidation.hasExistingStepEightData(mockDraft);
+      expect(result).toBe(true);
+    });
 
-    it('should return false when no feature relationships exist', () => {
+    it("should return false when no feature relationships exist", () => {
       const mockDraft = {
         property: {
           additionalFeatures: null,
@@ -52,10 +52,10 @@ describe('Step8 - Additional Features Validation', () => {
           storageFeatures: null,
           utility: null,
         },
-      } as DraftListingWithFullPayload
+      } as DraftListingWithFullPayload;
 
-      const result = stepEightValidation.hasExistingStepEightData(mockDraft)
-      expect(result).toBe(false)
-    })
-  })
-})
+      const result = stepEightValidation.hasExistingStepEightData(mockDraft);
+      expect(result).toBe(false);
+    });
+  });
+});
