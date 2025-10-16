@@ -160,15 +160,35 @@ function scrollToForm() {
 }
 
 onMounted(() => {
-  widgetId.value = (window as any).turnstile.render(turnstileEl.value, {
-    sitekey: config.public.CF_SITE_KEY,
-    size: 'invisible',
-    execution: 'execute',
-    callback: (token: string) => {
-      turnstileToken.value = token;
-      submitForm();
-    },
-  });
+  // Wait for Turnstile script to load before initializing
+  let retryCount = 0;
+  const maxRetries = 50; // Max 5 seconds (50 * 100ms)
+  
+  const initTurnstile = () => {
+    if ((window as any).turnstile && turnstileEl.value) {
+      try {
+        widgetId.value = (window as any).turnstile.render(turnstileEl.value, {
+          sitekey: config.public.CF_SITE_KEY,
+          size: 'invisible',
+          execution: 'execute',
+          callback: (token: string) => {
+            turnstileToken.value = token;
+            submitForm();
+          },
+        });
+      } catch (error) {
+        console.error('Failed to initialize Turnstile:', error);
+      }
+    } else if (retryCount < maxRetries) {
+      // Retry if Turnstile hasn't loaded yet
+      retryCount++;
+      setTimeout(initTurnstile, 100);
+    } else {
+      console.error('Turnstile script failed to load after maximum retries');
+    }
+  };
+  
+  initTurnstile();
 });
 
 onUnmounted(() => {
