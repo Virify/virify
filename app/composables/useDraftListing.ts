@@ -30,13 +30,11 @@ export const useDraftListing = createSharedComposable(() => {
    */
   async function createDraftListing(tier: TierOption): Promise<number> {
     try {
-      const title = `New ${tier.tier.charAt(0).toUpperCase() + tier.tier.slice(1)} Listing`;
       
       const createdListing = await useRequestFetch()<DraftListing>("/api/draft-listings/create/", {
         method: "POST",
         body: {
           tier: tier.tier.toUpperCase() as ListingTier,
-          title
         },
       });
       

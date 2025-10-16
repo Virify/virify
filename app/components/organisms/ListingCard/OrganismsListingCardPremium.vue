@@ -119,12 +119,12 @@
 
     <!-- Property Description -->
     <template #description>
-      <div class="premium-description | body-sm" v-if="listing.description">
+      <div class="premium-description | body-sm" v-if="listing.property?.description">
         <div
           class="premium-description-content"
           :class="{ collapsed: isDescriptionCollapsed }"
         >
-          <p>{{ listing.description }}</p>
+          <p>{{ listing.property.description }}</p>
         </div>
         <button
           class="premium-description-toggle | body-xs"
@@ -303,7 +303,7 @@ const toggleDescription = () => {
 
 // Check if toggle should be shown based on description length
 onMounted(() => {
-  if (props.listing.description && props.listing.description.length > 100) {
+  if (props.listing.property?.description && props.listing.property.description.length > 100) {
     shouldShowToggle.value = true;
   }
 });

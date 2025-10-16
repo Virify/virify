@@ -20,8 +20,17 @@ export const createInitialStepSevenValues = (draftListing: DraftListingWithFullP
         hasGarden: gardens.length > 0,
         hasYard: yards.length > 0,
         hasLand: lands.length > 0,
-        garden: gardens,
-        yard: yards,
+        // Convert null position/facing to '0' for select dropdowns (like yearBuilt in Step 2)
+        garden: gardens.map(g => ({
+          ...g,
+          position: (g.position || '0') as any,
+          facing: (g.facing || '0') as any,
+        })),
+        yard: yards.map(y => ({
+          ...y,
+          position: (y.position || '0') as any,
+          facing: (y.facing || '0') as any,
+        })),
         land: lands,
         // OutdoorSpace boolean features
         sunTerrace: outdoorSpace?.sunTerrace || false,
@@ -41,20 +50,26 @@ export const createInitialStepSevenValues = (draftListing: DraftListingWithFullP
 /**
  * Garden facing options
  */
-export const gardenFacingOptions = Object.values(GardenFacing).map((facing) => ({
-  value: facing,
-  key: convertEnumToCapalizedString(facing),
-  info: `Garden faces ${convertEnumToCapalizedString(facing).toLowerCase()}`
-}));
+export const gardenFacingOptions = [
+  { value: '0', key: 'Select a facing' },
+  ...Object.values(GardenFacing).map((facing) => ({
+    value: facing,
+    key: convertEnumToCapalizedString(facing),
+    info: `Garden faces ${convertEnumToCapalizedString(facing).toLowerCase()}`
+  }))
+];
 
 /**
  * Garden position options
  */
-export const gardenPositionOptions = Object.values(GardenPosition).map((position) => ({
-  value: position,
-  key: convertEnumToCapalizedString(position),
-  info: `${convertEnumToCapalizedString(position)} garden`
-}));
+export const gardenPositionOptions = [
+  { value: '0', key: 'Select a position' },
+  ...Object.values(GardenPosition).map((position) => ({
+    value: position,
+    key: convertEnumToCapalizedString(position),
+    info: `${convertEnumToCapalizedString(position)} garden`
+  }))
+];
 
 /**
  * Garden features options for checkbox selection

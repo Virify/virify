@@ -29,6 +29,23 @@
         :max-images="maxImages"
       />
     </div>
+
+    <!-- Additional Actions for Final Step -->
+    <template #additionalActions>
+      <NuxtLink 
+        v-if="canPreview"
+        :to="`/listing/preview/${draft.id}`" 
+        class="button button-tertiary button-sm"
+      >
+        Preview
+      </NuxtLink>
+      <NuxtLink 
+        to="/account/create-listing" 
+        class="button button-secondary button-sm"
+      >
+        Close
+      </NuxtLink>
+    </template>
   </CreateListingStepsStepLayout>
 </template>
 
@@ -81,6 +98,10 @@ onMounted(() => {
 // Validation
 const isValid = computed(() => uploadedImages.value.length > 0);
 
+// Check if preview is available (step must be completed/saved with at least 1 image)
+const stepCompleted = computed(() => props.draft.completedSteps?.includes(10) || false);
+const canPreview = computed(() => stepCompleted.value && uploadedImages.value.length > 0);
+
 // Change detection
 const initialImageCount = ref(0);
 onMounted(() => {
@@ -116,12 +137,11 @@ const hasImageChanges = computed(() => {
 
 const hasActualChanges = computed(() => hasImageChanges.value);
 
-// Button text
-const stepCompleted = computed(() => props.draft.completedSteps?.includes(10) || false);
+// Button text - this is the last step, so just "Save"
 const buttonText = computed(() => {
-  if (!isValid.value) return 'Save and Continue';
-  if (stepCompleted.value && !hasActualChanges.value) return 'Next Step';
-  return 'Save and Continue';
+  if (!isValid.value) return 'Save';
+  if (stepCompleted.value && !hasActualChanges.value) return 'Saved';
+  return 'Save';
 });
 
 /**

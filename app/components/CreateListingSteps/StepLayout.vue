@@ -25,7 +25,11 @@
         @cancel="$emit('cancel')"
         @previous="$emit('previous')"
         @submit="$emit('submit')"
-      />
+      >
+        <template #additionalActions>
+          <slot name="additionalActions" />
+        </template>
+      </MoleculesDraftFormActions>
     </form>
   </section>
   

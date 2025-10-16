@@ -130,7 +130,6 @@ export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilitySta
  */
 export const listingCardFields = {
   id: true,
-  title: true,
   price: true,
   listingTier: true,
   publishedAt: true,

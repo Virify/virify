@@ -66,6 +66,7 @@
                 :name="`garden-${index}-name`"
                 placeholder="e.g. Rear Garden"
                 :grid="true"
+                :required="true"
               >
                 <template #tooltip-content>
                   <AtomsTooltipParagraphs :paragraphs="[

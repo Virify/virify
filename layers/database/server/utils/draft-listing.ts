@@ -66,12 +66,11 @@ export async function getDraftListingsByUserId(userId: number): Promise<DraftLis
  * @param title Listing title
  * @returns The created draft listing
  */
-export async function createDraftListing(userId: number, tier: ListingTier, title: string): Promise<DraftListing> {
+export async function createDraftListing(userId: number, tier: ListingTier): Promise<DraftListing> {
   return await prisma.draftListing.create({
     data: {
       userId,
       listingTier: tier,
-      title,
     },
   });
 }

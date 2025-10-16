@@ -1,7 +1,5 @@
 model DraftListing {
   id                Int                @id @default(autoincrement())
-  title             String?
-  description       String?
   price             Float?
   moveInDate        DateTime?
   listingTier       ListingTier

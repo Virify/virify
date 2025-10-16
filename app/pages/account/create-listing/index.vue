@@ -10,7 +10,9 @@
             :key="draft.id"
             :draft="draft"
             :deleting="isDraftDeleting(draft.id)"
+            :publishing="isPublishing(draft.id)"
             @delete="handleDelete"
+            @publish="handlePublish"
           />
         </div>
       </div>
@@ -27,10 +29,41 @@ definePageMeta({
   layout: "account",
 });
 
-const { draftListings, draftListingsPending, deleteDraftListing, isDraftDeleting } = useDraftListing();
+const { draftListings, draftListingsPending, deleteDraftListing, isDraftDeleting, refreshDraftListings } = useDraftListing();
+const { showToast } = useToast();
+
+const publishingDrafts = ref<Set<number>>(new Set());
+
+const isPublishing = (draftId: number) => publishingDrafts.value.has(draftId);
 
 const handleDelete = async (draftId: number) => {
   await deleteDraftListing(draftId);
+};
+
+const handlePublish = async (draftId: number) => {
+  try {
+    publishingDrafts.value.add(draftId);
+    
+    const result = await useRequestFetch()<{ listingId: number }>(`/api/listing/publish`, {
+      method: 'POST',
+      body: { draftId }
+    });
+    
+    showToast('Listing published successfully!', { type: 'success' });
+    
+    // Refresh draft listings to remove the published one
+    await refreshDraftListings();
+    
+    // Navigate to the published listing
+    if (result?.listingId) {
+      await navigateTo(`/listing/${result.listingId}`);
+    }
+  } catch (error: any) {
+    console.error('Failed to publish listing:', error);
+    showToast(error?.data?.message || 'Failed to publish listing. Please try again.', { type: 'error' });
+  } finally {
+    publishingDrafts.value.delete(draftId);
+  }
 };
 
 </script>

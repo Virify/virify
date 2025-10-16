@@ -5,7 +5,7 @@
         <img 
           v-if="firstImage" 
           :src="firstImage" 
-          :alt="draft.title || 'Property image'"
+          alt="Property image"
           class="draft-card__img"
         />
         <div v-else class="draft-card__placeholder">
@@ -45,7 +45,6 @@
     <div class="draft-card__bottom">
       <div class="draft-card__left">
         <div class="draft-card__meta">
-          <span class="body-xs">{{ draft.title || 'Untitled Draft' }}</span>
           <div class="draft-card__status">
             <span class="draft-card__date | body-xs">Updated {{ formatDate(draft.updatedAt) }}</span>
             <span class="draft-card__step | body-xs">{{ stepProgressText }}</span>
@@ -55,6 +54,15 @@
 
       <div class="draft-card__right">
         <div class="draft-card__buttons">
+          <button 
+            v-if="canPublish"
+            @click="$emit('publish', draft.id)" 
+            class="button button-xs button-primary"
+            :disabled="publishing"
+            title="Publish your listing to make it searchable"
+          >
+            {{ publishing ? 'Publishing...' : 'Publish' }}
+          </button>
           <NuxtLink :to="`/account/create-listing/${draft.id}`" class="draft-card__button-link">
             <button class="button button-xs">Edit</button>
           </NuxtLink>
@@ -80,12 +88,14 @@ const { getStepProgressText } = useDraft();
 interface Props {
   draft: any;
   deleting?: boolean;
+  publishing?: boolean;
 }
 
 const props = defineProps<Props>();
 
 defineEmits<{
   delete: [id: number];
+  publish: [id: number];
 }>();
 
 // Helper functions
@@ -164,6 +174,12 @@ const stepProgressText = computed(() => {
 // Check if preview is available (step 4 must be complete - address must be set)
 const canPreview = computed(() => {
   return stepFourValidation.hasExistingStepFourData(props.draft);
+});
+
+// Check if all 10 steps are complete for publishing
+const canPublish = computed(() => {
+  const completedSteps = props.draft?.completedSteps || [];
+  return completedSteps.length === 10 && completedSteps.every((step: number) => step >= 1 && step <= 10);
 });
 
 </script>

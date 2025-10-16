@@ -406,7 +406,6 @@ function transformToSummaryCardData(listings: any[]): SummaryCardData[] {
       id: listing.id || 0,
       lat: property?.address?.lat || 0,
       lon: property?.address?.lon || 0,
-      title: listing.title,
       bedrooms: property?.numberBedrooms || null,
       bathrooms: property?.numberBathrooms || null,
       receptions: property?.numberReceptions || null,
