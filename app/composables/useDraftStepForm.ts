@@ -119,7 +119,6 @@ export function useDraftStepForm<T>(
           
           // Update local cached draft data to reflect the completed step
           markStepAsCompleted(draftRef.value.id, configRef.value.stepNumber!);
-          console.log(`Step ${configRef.value.stepNumber} marked as completed`);
         } catch (error) {
           console.error('Failed to mark step as completed:', error);
           showToast('Failed to save progress. Please try again.', { type: 'error' });

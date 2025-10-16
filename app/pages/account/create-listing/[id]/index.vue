@@ -95,11 +95,13 @@ watch(currentStep, () => {
   stepErrorMessage.value = '';
 });
 
-// Initialize step when stepper data becomes available
+// Initialize step when stepper data becomes available (only once)
+const hasInitialized = ref(false);
 watch(stepperMap, (steps) => {
-  if (steps.length > 0 && draft.value) {
+  if (steps.length > 0 && draft.value && !hasInitialized.value) {
     const completedSteps = draft.value.completedSteps || [];
     determineInitialStep(draftId, completedSteps, steps);
+    hasInitialized.value = true;
   }
 }, { immediate: true });
 

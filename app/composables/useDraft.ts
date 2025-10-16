@@ -8,7 +8,8 @@ import {
   CreateListingStepsStep6,
   CreateListingStepsStep7,
   CreateListingStepsStep8,
-  CreateListingStepsStep9
+  CreateListingStepsStep9,
+  CreateListingStepsStep10
 } from "#components";
 
 export interface DraftStepConfig {
@@ -30,7 +31,8 @@ export const useDraft = createSharedComposable(() => {
     updateDraftStepSix,
     updateDraftStepSeven,
     updateDraftStepEight,
-    updateDraftStepNine
+    updateDraftStepNine,
+    updateDraftStepTen
   } = useDraftListing();
 
   /**
@@ -113,7 +115,13 @@ export const useDraft = createSharedComposable(() => {
         update: updateDraftStepNine,
         component: CreateListingStepsStep9
       },
-      { title: 'Media', complete: false }
+      { 
+        title: 'Media', 
+        data: draft.value ? createInitialStepTenValues(draft.value) : null,
+        complete: draft.value ? draft.value.completedSteps?.includes(10) || false : false,
+        update: updateDraftStepTen,
+        component: CreateListingStepsStep10
+      },
     ]);
   };
 

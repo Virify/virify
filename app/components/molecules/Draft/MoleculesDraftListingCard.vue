@@ -2,7 +2,13 @@
   <div class="draft-card" :class="draftCardClasses">
     <div class="draft-card__main">
       <figure class="draft-card__image">
-        <div class="draft-card__placeholder">
+        <img 
+          v-if="firstImage" 
+          :src="firstImage" 
+          :alt="draft.title || 'Property image'"
+          class="draft-card__img"
+        />
+        <div v-else class="draft-card__placeholder">
           <AtomsIcon icon="property/placeholder" size="32" />
         </div>
       </figure>
@@ -116,6 +122,19 @@ const formatDate = (date: string) => {
   });
 };
 
+// Get first image from media
+const firstImage = computed(() => {
+  const config = useRuntimeConfig();
+  const media = props.draft.property?.media;
+  if (!media || media.length === 0) return null;
+  
+  const firstMedia = media[0];
+  if (!firstMedia.image) return null;
+  
+  // Build Cloudflare image URL with thumbnail variant
+  return `https://imagedelivery.net/${config.public.CF_ACCOUNT_HASH}/${firstMedia.image}/thumbnail`;
+});
+
 // Tier-based computed properties (matching OrganismsAccountOwnListingCard)
 const priceTypeText = computed(() =>
   convertEnumToString(props.draft.saleListing?.priceType || props.draft.rentalListing?.rentFrequency || "").toLowerCase()
@@ -220,6 +239,12 @@ const canPreview = computed(() => {
       aspect-ratio: 16 / 9;
       height: auto;
     }
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   &__placeholder {

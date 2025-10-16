@@ -7,8 +7,12 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     CF_SECRET_KEY: process.env.CF_SECRET_KEY,
+    CF_IMAGES_API_KEY: process.env.CF_IMAGES_API_KEY,
+    CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
+    CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH,
     public: {
       CF_SITE_KEY: process.env.CF_SITE_KEY,
+      CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
     },
   },
   modules: ["@nuxt/image", "nuxt-security"],

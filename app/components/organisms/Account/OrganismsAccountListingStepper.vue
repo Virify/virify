@@ -1,5 +1,18 @@
 <template>
   <section class="o-account-listing-stepper">
+    <!-- Custom navigation arrows -->
+    <button
+      v-if="isMobile || isTablet"
+      class="o-account-listing-stepper__arrow o-account-listing-stepper__arrow--prev"
+      :disabled="!canNavigatePrev"
+      @click="navigatePrev"
+      aria-label="Previous step"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
     <MoleculesCarousel 
       ref="carouselRef"
       :slides="stepperSlides" 
@@ -7,7 +20,7 @@
       :options="carouselOptions"
       gap="0"
       :loop="false" 
-      :show-arrows="true"
+      :show-arrows="false"
       button-size="30px"
       class="o-account-listing-stepper__carousel"
     >
@@ -47,6 +60,19 @@
         </div>
       </template>
     </MoleculesCarousel>
+
+    <!-- Next arrow -->
+    <button
+      v-if="isMobile || isTablet"
+      class="o-account-listing-stepper__arrow o-account-listing-stepper__arrow--next"
+      :disabled="!canNavigateNext"
+      @click="navigateNext"
+      aria-label="Next step"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </section>
 </template>
 
@@ -77,10 +103,10 @@ const carouselSize = computed(() => {
   return isMobile.value ? '100px' : '120px';
 });
 
-// Carousel options - use center alignment on mobile/tablet
+// Carousel options - use start alignment to prevent overflow
 const carouselOptions = computed(() => {
   return {
-    align: (isMobile.value || isTablet.value) ? 'center' : 'start',
+    align: 'start',
     containScroll: 'trimSnaps',
     skipSnaps: false,
     dragFree: false
@@ -105,16 +131,12 @@ const currentStep = computed({
  * @returns True if the step is accessible (clickable), false otherwise
  */
 const isStepAccessible = (stepIndex: number): boolean => {
-  // Find the highest completed step
-  let highestCompletedStep = -1;
-  for (let i = 0; i < props.stepperSlides.length; i++) {
-    if (props.stepperSlides[i]?.complete === true) {
-      highestCompletedStep = i;
-    }
-  }
+  // Step 0 (first step) is always accessible
+  if (stepIndex === 0) return true;
   
-  // Can access any step up to one past the highest completed step
-  return stepIndex <= highestCompletedStep + 1;
+  // For any other step, the previous step must be completed
+  const previousStepIndex = stepIndex - 1;
+  return props.stepperSlides[previousStepIndex]?.complete === true;
 };
 
 /**
@@ -132,6 +154,39 @@ const goToStep = (stepIndex: number) => {
     } else {
       isProgrammaticNavigation.value = false;
     }
+  }
+};
+
+/**
+ * Check if we can navigate to the previous step
+ */
+const canNavigatePrev = computed(() => {
+  return currentStep.value > 0;
+});
+
+/**
+ * Check if we can navigate to the next step
+ */
+const canNavigateNext = computed(() => {
+  const nextStepIndex = currentStep.value + 1;
+  return nextStepIndex < props.stepperSlides.length && isStepAccessible(nextStepIndex);
+});
+
+/**
+ * Navigate to the previous step
+ */
+const navigatePrev = () => {
+  if (canNavigatePrev.value) {
+    goToStep(currentStep.value - 1);
+  }
+};
+
+/**
+ * Navigate to the next step (only if accessible)
+ */
+const navigateNext = () => {
+  if (canNavigateNext.value) {
+    goToStep(currentStep.value + 1);
   }
 };
 
@@ -158,7 +213,12 @@ watch(currentStep, () => {
 
 // Watch for viewport changes to re-center if needed
 watch([isMobile, isTablet], () => {
+  // Set flag to prevent carousel scroll events from changing the step
+  isProgrammaticNavigation.value = true;
   scrollToCurrentStep();
+  nextTick(() => {
+    isProgrammaticNavigation.value = false;
+  });
 });
 
 // Watch for carousel scroll events to update current step
@@ -199,9 +259,8 @@ defineExpose({
   width: 100%;
   display: flex;
   justify-content: center;
-
   &__carousel {
-    padding: var(--size-24) var(--size-32);
+    padding: var(--size-16);
     background: var(--blue-400);
     border-radius: var(--border-radius-lg);
     position: relative;
@@ -209,11 +268,6 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: center;
-
-    @include mq.mobile-only {
-      padding: var(--size-24) 0 var(--size-40) 0;
-    }
-
     :deep(.embla-prev),
     :deep(.embla-next) {
       top: 85%;
@@ -302,6 +356,51 @@ defineExpose({
     &--after {
       right: -50%;
       width: 50%;
+    }
+  }
+
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: var(--background-100);
+    border: 2px solid var(--monochrome-300);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--monochrome-700);
+
+    &:hover:not(:disabled) {
+      background: var(--primary-400);
+      border-color: var(--primary-400);
+      color: var(--background-100);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    &--prev {
+      left: var(--size-8);
+
+      @include mq.tablet {
+        left: var(--size-16);
+      }
+    }
+
+    &--next {
+      right: var(--size-8);
+
+      @include mq.tablet {
+        right: var(--size-16);
+      }
     }
   }
 }

@@ -100,7 +100,6 @@ export const useDraftListing = createSharedComposable(() => {
    * @param stepData - Data for the step
    */
   async function updateDraftStep(endpoint: string, draftId: number, stepData: any) {
-    console.log(`Updating draft step ${endpoint} for draftId:`, draftId, "with data:", stepData);
     try {
       await useRequestFetch()<DraftListing>(`/api/draft-listings/update/steps/${endpoint}/`, {
         method: "PATCH",
@@ -109,10 +108,10 @@ export const useDraftListing = createSharedComposable(() => {
           ...stepData,
         },
       });
-      // Note: We don't refresh all drafts here to avoid rate limiting
-      // The step completion tracking updates the cache when needed
+      
+      // Refresh the cache to get updated data
+      await refreshDraftListings();
     } catch (error: any) {
-      // Use Nuxt's createError for proper error handling
       throw createError({
         statusCode: error?.response?.status || 500,
         statusMessage: error?.response?.statusText || "Failed to update draft listing",
@@ -203,6 +202,15 @@ export const useDraftListing = createSharedComposable(() => {
   }
 
   /**
+   * Updates the tenth step of a draft listing (Media/Images).
+   * @param draftId ID of the draft listing to update
+   * @param stepData Data for the tenth step
+   */
+  async function updateDraftStepTen(draftId: number, stepData: StepTen) {
+    return updateDraftStep('ten', draftId, stepData);
+  }
+
+  /**
    * Marks a step as completed for a draft listing (updates local cache)
    * @param draftId ID of the draft listing
    * @param stepNumber Step number to mark as completed (1-10)
@@ -237,6 +245,7 @@ export const useDraftListing = createSharedComposable(() => {
     updateDraftStepSeven,
     updateDraftStepEight,
     updateDraftStepNine,
+    updateDraftStepTen,
     markStepAsCompleted,
   };
 });

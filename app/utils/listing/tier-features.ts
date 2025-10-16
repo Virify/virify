@@ -90,3 +90,24 @@ export function getTierFeaturesMap(): Record<string, string[]> {
     {} as Record<string, string[]>
   );
 }
+
+/**
+ * Get maximum number of images allowed for a tier
+ * @param tier - The tier to get image limit for
+ * @returns Maximum number of images allowed
+ */
+export function getMaxImagesForTier(tier: "premium" | "featured" | "basic" | null | undefined): number {
+  if (!tier) return 10; // Default to basic tier limit
+  
+  const tierLower = tier.toLowerCase() as "premium" | "featured" | "basic";
+  
+  switch (tierLower) {
+    case "premium":
+      return 50;
+    case "featured":
+      return 25;
+    case "basic":
+    default:
+      return 10;
+  }
+}
