@@ -1,7 +1,10 @@
 <template>
   <div class="o-form-group" :class="{ 'o-form-group--grid': grid, 'o-form-group--disabled': disabled }">
     <AtomsDivider v-if="divider" />
-    <MoleculesDraftFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+    <MoleculesDraftFormHeading :title="title" :description="description" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+      <template v-if="$slots.description" #description>
+        <slot name="description" />
+      </template>
       <template #tooltip-content>
         <slot name="tooltip-content">
           <p class="body-xs">{{ tooltip }}</p>
@@ -32,6 +35,7 @@
 
 interface Props {
   title: string;
+  description?: string;
   info?: string;
   name?: string;
   required?: boolean;

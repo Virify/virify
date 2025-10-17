@@ -1,6 +1,6 @@
 <template>
   <CreateListingStepsStepLayout
-    title="Listing Type"
+    :title="stepOneData.selectedType === 'sale' ? 'Listing Type - Sale' : stepOneData.selectedType === 'rent' ? 'Listing Type - Rental' : 'Listing Type'"
     info="Please provide the type of listing you want to create below. This will help us tailor the rest of the form to your specific needs."
     :formKey="formKey"
     :hasChanges="hasChanges"
@@ -11,91 +11,109 @@
     @submit="submitForm"
   >
     <!-- first parent select -->
-    <OrganismsDraftFormRadioGroup 
+    <MoleculesDraftFormSection
       v-if="!draft.saleListing && !draft.rentalListing"
-      title="What type of listing do you want to create?" 
-      :options="stepOneListingOptions" 
-      v-model="stepOneData.selectedType"
-      @update:modelValue="onSelectedTypeChange"
-      name="listing-type" 
-      :required="true" 
-    >
-      <template #tooltip-content>
-        <AtomsTooltipParagraphs :paragraphs="[
-          'Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs.'
-        ]" />
-      </template>
-    </OrganismsDraftFormRadioGroup>
-
-    <!-- SALE -->
-    <OrganismsDraftFormRadioGroup 
-      v-if="isSale" 
-      title="Please confirm property tenure"
-      :options="saleListingTenureOptions"
-      v-model="stepOneData.saleListing.tenureType" 
-      name="sale-tenure-type"
+      title="Sale or Rental"
       :required="true"
     >
-      <template #tooltip-content>
-        <AtomsTooltipParagraphs :paragraphs="[
-          'Freehold: You own the property and the land it sits on indefinitely.',
-          'Leasehold: You have the right to live in the property for a period of time, but you do not own the land it stands on.',
-          'Commonhold: Typically used on multi-occupancy developments. You own your part of the property on a freehold basis, but an association (or other entity) owns and manages the common parts.'
-        ]" />
+      <template #description>
+        <p>Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs.</p>
       </template>
-    </OrganismsDraftFormRadioGroup>
+      
+      <OrganismsDraftFormRadioGroup 
+        title="What type of listing do you want to create?" 
+        :options="stepOneListingOptions" 
+        v-model="stepOneData.selectedType"
+        @update:modelValue="onSelectedTypeChange"
+        name="listing-type" 
+        :required="true" 
+      />
+    </MoleculesDraftFormSection>
 
-    <OrganismsDraftFormRadioGroup 
+    <AtomsDivider v-if="stepOneData.selectedType && !draft.saleListing && !draft.rentalListing" />
+
+    <!-- SALE -->
+    <MoleculesDraftFormSection
       v-if="isSale" 
-      title="Are you part of a chain?"
-      :options="saleListingChainOptions" 
-      v-model="stepOneData.saleListing.chain" 
-      name="sale-chain" 
+      title="Property Tenure"
+      :required="true"
     >
-      <template #tooltip-content>
-        <AtomsTooltipList
-          title="Select whether the sale depends on another property transaction:"
-          :items="[
-            'Chain free: The sale is not dependant on you moving to another property.',
-            'Chain: The sale is dependant on you moving out and to another property.'
-          ]" 
-        />
+      <template #description>
+        <p><strong>Freehold:</strong> You own the property and the land it sits on indefinitely.</p>
+        <p><strong>Leasehold:</strong> You have the right to live in the property for a period of time, but you do not own the land it stands on.</p>
+        <p><strong>Commonhold:</strong> Typically used on multi-occupancy developments. You own your part of the property on a freehold basis, but an association (or other entity) owns and manages the common parts.</p>
       </template>
-    </OrganismsDraftFormRadioGroup>
+      
+      <OrganismsDraftFormRadioGroup 
+        title="Please confirm property tenure"
+        :options="saleListingTenureOptions"
+        v-model="stepOneData.saleListing.tenureType" 
+        name="sale-tenure-type"
+        :required="true"
+      />
+    </MoleculesDraftFormSection>
+
+    <AtomsDivider v-if="isSale"/>
+
+    <MoleculesDraftFormSection
+      v-if="isSale" 
+      title="Chain Status"
+    >
+      <template #description>
+        <p><strong>Chain free:</strong> The sale is not dependant on you moving to another property.</p>
+        <p><strong>Chain:</strong> The sale is dependant on you moving out and to another property.</p>
+      </template>
+      
+      <OrganismsDraftFormRadioGroup 
+        title="Are you part of a chain?"
+        :options="saleListingChainOptions" 
+        v-model="stepOneData.saleListing.chain" 
+        name="sale-chain" 
+      />
+    </MoleculesDraftFormSection>
+
 
     <!-- RENTAL -->
-    <OrganismsDraftFormRadioGroup 
+    <MoleculesDraftFormSection
       v-if="isRent" 
-      title="Are bills included in the rent?"
-      :options="rentalBillsIncludedOptions" 
-      v-model="stepOneData.rentalListing.isBillsIncluded"
-      name="rental-bills-included" 
-      :required="true" 
+      title="Bills Included"
+      :required="true"
     >
-      <template #tooltip-content>
-        <AtomsTooltipParagraphs :paragraphs="[
-          'Specify if any property bills (such as gas and electric) are included in the price.',
-          'If so, it\'s best to list which bills are included within your Property Description.'
-        ]" />
+      <template #description>
+        <p>Specify if any property bills (such as gas and electric) are included in the price.</p>
+        <p>If so, it's best to list which bills are included within your Property Description.</p>
       </template>
-    </OrganismsDraftFormRadioGroup>
+      
+      <OrganismsDraftFormRadioGroup 
+        title="Are bills included in the rent?"
+        :options="rentalBillsIncludedOptions" 
+        v-model="stepOneData.rentalListing.isBillsIncluded"
+        name="rental-bills-included" 
+        :required="true" 
+      />
+    </MoleculesDraftFormSection>
 
-    <OrganismsDraftFormRadioGroup 
+    <AtomsDivider v-if="isRent"/>
+
+    <MoleculesDraftFormSection
       v-if="isRent" 
-      title="What is the furnished status of the listing?"
-      :options="rentalFurnishedStatusOptions" 
-      v-model="stepOneData.rentalListing.furnishedStatus"
-      name="rental-furnished-status" 
-      :required="true" 
+      title="Furnished Status"
+      :required="true"
     >
-      <template #tooltip-content>
-        <AtomsTooltipList :items="[
-          'Fully furnished: The property comes with everything you need to move in and live comfortably right away.',
-          'Part furnished: The property includes certain appliances and some furniture, but what\'s included can vary a lot.',
-          'Unfurnished: The property will generally not include appliances or furniture.'
-        ]" />
+      <template #description>
+        <p><strong>Fully furnished:</strong> The property comes with everything you need to move in and live comfortably right away.</p>
+        <p><strong>Part furnished:</strong> The property includes certain appliances and some furniture, but what's included can vary a lot.</p>
+        <p><strong>Unfurnished:</strong> The property will generally not include appliances or furniture.</p>
       </template>
-    </OrganismsDraftFormRadioGroup>
+      
+      <OrganismsDraftFormRadioGroup 
+        title="What is the furnished status of the listing?"
+        :options="rentalFurnishedStatusOptions" 
+        v-model="stepOneData.rentalListing.furnishedStatus"
+        name="rental-furnished-status" 
+        :required="true" 
+      />
+    </MoleculesDraftFormSection>
   </CreateListingStepsStepLayout>
 </template>
 
