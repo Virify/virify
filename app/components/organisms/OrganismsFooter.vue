@@ -60,6 +60,7 @@
             <li><nuxt-link to="/contact" class="o-footer__link | body-sm">Contact Us</nuxt-link></li>
             <li><nuxt-link to="/privacy" class="o-footer__link | body-sm">Privacy Policy</nuxt-link></li>
             <li><nuxt-link to="/terms" class="o-footer__link | body-sm">Terms & Conditions</nuxt-link></li>
+            <li><nuxt-link to="/cookie" class="o-footer__link | body-sm">Cookie Policy</nuxt-link></li>
           </ul>
         </div>
       </div>

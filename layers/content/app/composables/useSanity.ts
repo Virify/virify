@@ -69,6 +69,16 @@ export const useSanity = () => {
   }
 
   /**
+   * A async data fetcher for the Cookie Policy from Sanity CMS.
+   * @returns A async data fetcher for cookie policy document.
+   */
+  const useCookie = () => {
+    return useAsyncData('cookie', () => 
+      $fetch<CookieResponse>('/api/sanity/cookie')
+    )
+  }
+
+  /**
    * Helper to build a guide URL from a slug or expanded reference
    * @param slugOrRef string or object with slug.current
    */
@@ -85,6 +95,7 @@ export const useSanity = () => {
     useCategoryBySlug,
     useTerms,
     usePrivacy,
+    useCookie,
     guideUrl
   }
 }
