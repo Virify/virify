@@ -17,7 +17,7 @@
           :address="listing.property?.address"
           :bedrooms="listing.property?.numberBedrooms"
           :bathrooms="listing.property?.numberBathrooms"
-          :description="listing.title"
+          :description="listing.property?.description"
         />
       </div>
       <div class="dual-view-container" v-show="content === 'dual' || content === 'map'">
@@ -38,7 +38,7 @@
             :address="listing.property?.address"
             :bedrooms="listing.property?.numberBedrooms"
             :bathrooms="listing.property?.numberBathrooms"
-            :description="listing.title"
+            :description="listing.property?.description"
           />
         </div>
       </div>

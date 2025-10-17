@@ -55,8 +55,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Collapse state
-const isCollapsed = ref(true);
+// Collapse state - open by default
+const isCollapsed = ref(false);
 
 // Collapse toggle
 const toggleCollapse = () => {

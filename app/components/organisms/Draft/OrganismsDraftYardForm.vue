@@ -66,6 +66,7 @@
                 :name="`yard-${index}-name`"
                 placeholder="e.g. Front Yard"
                 :grid="true"
+                :required="true"
               >
                 <template #tooltip-content>
                   <AtomsTooltipParagraphs :paragraphs="[

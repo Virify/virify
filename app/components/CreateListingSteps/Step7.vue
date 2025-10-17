@@ -215,6 +215,39 @@ const stepConfig = computed(() => ({
   hasExistingData: stepSevenValidation.hasExistingStepSevenData,
   stepNumber: 7,
   beforeSubmit: (data: StepSeven): StepSeven => {
+    // Helper function to check if garden/yard has additional details
+    const hasGardenYardDetails = (item: any) => {
+      return !!(
+        item.size ||
+        (item.position && item.position !== '0') || // Check for non-default value
+        (item.facing && item.facing !== '0') ||     // Check for non-default value
+        item.sunTerrace ||
+        item.terrace ||
+        item.balcony ||
+        item.patio ||
+        item.separateParcel ||
+        item.shed ||
+        item.summerHouse ||
+        item.gardenOffice ||
+        item.pool
+      );
+    };
+
+    // Helper function to check if land has additional details
+    const hasLandDetails = (item: any) => {
+      return !!(
+        item.size ||
+        item.separateParcel ||
+        item.woodland ||
+        item.paddock ||
+        item.stables ||
+        item.tennisCourt ||
+        item.orchard ||
+        item.pond ||
+        item.outbuilding
+      );
+    };
+
     return {
       property: {
         outdoorSpace: {
@@ -222,6 +255,25 @@ const stepConfig = computed(() => ({
           hasGarden: data.property.outdoorSpace.garden.length > 0,
           hasYard: data.property.outdoorSpace.yard.length > 0,
           hasLand: data.property.outdoorSpace.land.length > 0,
+          // Update additionalDetails for each garden
+          garden: data.property.outdoorSpace.garden.map(g => ({
+            ...g,
+            position: (g.position as any) === '0' ? null : g.position, // Convert '0' to null
+            facing: (g.facing as any) === '0' ? null : g.facing,       // Convert '0' to null
+            additionalDetails: hasGardenYardDetails(g),
+          })),
+          // Update additionalDetails for each yard
+          yard: data.property.outdoorSpace.yard.map(y => ({
+            ...y,
+            position: (y.position as any) === '0' ? null : y.position, // Convert '0' to null
+            facing: (y.facing as any) === '0' ? null : y.facing,       // Convert '0' to null
+            additionalDetails: hasGardenYardDetails(y),
+          })),
+          // Update additionalDetails for each land
+          land: data.property.outdoorSpace.land.map(l => ({
+            ...l,
+            additionalDetails: hasLandDetails(l),
+          })),
         },
       },
     };
@@ -257,8 +309,8 @@ const handleGardenToggle = (hasGarden: boolean) => {
     stepSevenData.value.property.outdoorSpace.garden = [{
       name: 'Garden',
       description: null,
-      position: null,
-      facing: null,
+      position: '0' as any, // Default to "Select a position"
+      facing: '0' as any,   // Default to "Select a facing"
       sunTerrace: false,
       terrace: false,
       balcony: false,
@@ -283,8 +335,8 @@ const handleYardToggle = (hasYard: boolean) => {
     stepSevenData.value.property.outdoorSpace.yard = [{
       name: 'Yard',
       description: null,
-      position: null,
-      facing: null,
+      position: '0' as any, // Default to "Select a position"
+      facing: '0' as any,   // Default to "Select a facing"
       sunTerrace: false,
       terrace: false,
       balcony: false,

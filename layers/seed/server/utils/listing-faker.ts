@@ -111,8 +111,6 @@ export const generateListingViews = async (listingId: number): Promise<number> =
 export const generateRentalListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
-      title: faker.word.words(10),
-      description: faker.word.words(20),
       price: roundFloat(faker.number.float({ min: 300, max: 3000 }), 2),
       moveInDate: faker.date.future(),
       listingTier: generateWeightedListingTier(),
@@ -157,8 +155,6 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
 export const generateSaleListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
-      title: faker.word.words(10),
-      description: faker.word.words(20),
       price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
       moveInDate: faker.date.future(),
       listingTier: generateWeightedListingTier(),

@@ -16,7 +16,6 @@
       title="What type of listing do you want to create?" 
       :options="stepOneListingOptions" 
       v-model="stepOneData.selectedType"
-      tooltip="Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs."
       @update:modelValue="onSelectedTypeChange"
       name="listing-type" 
       :required="true" 

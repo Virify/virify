@@ -12,7 +12,7 @@
 .o-header {
   position: sticky;
   top: env(safe-area-inset-top);
-  z-index: 30;
+  z-index: 10;
   background: var(--blue-400);
   border-bottom: var(--size-4) solid var(--secondary-400);
   height: 100%;

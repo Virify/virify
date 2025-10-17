@@ -157,7 +157,7 @@ useHead({
   top: calc(var(--header-height) + var(--size-16));
   height: fit-content;
   max-height: calc(100dvh - var(--header-height) - var(--size-32));
-  z-index: 10;
+  z-index: 9;
   align-self: start;
   overflow: hidden;
 }
@@ -169,7 +169,7 @@ useHead({
   top: calc(var(--header-height) + var(--size-16));
   height: fit-content;
   max-height: calc(100dvh - var(--header-height) - var(--size-32));
-  z-index: 10;
+  z-index: 9;
   align-self: start;
 
   @include mq.not-notebook {

@@ -35,7 +35,6 @@ export async function getUserOwnedListingsWithAnalytics(
   const searchTerm = search.trim()
   if (searchTerm) {
     where.OR = [
-      { title: { contains: searchTerm, mode: "insensitive" } },
       { property: { address: { fullAddress: { contains: searchTerm, mode: "insensitive" } } } },
     ]
     

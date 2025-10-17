@@ -18,7 +18,7 @@
                 :name="name" 
                 :value="option.value"
                 :checked="isSelected(option.value)" 
-                class="o-form-group__input | visually-hidden"
+                class="visually-hidden"
                 @change="handleChange(option.value)" 
               />
               {{ option.key }}

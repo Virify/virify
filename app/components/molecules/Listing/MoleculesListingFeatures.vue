@@ -64,8 +64,8 @@ const filteredFeatures = computed(() => {
   return features;
 });
 
-// Collapse state
-const isCollapsed = ref(true);
+// Collapse state - open by default
+const isCollapsed = ref(false);
 
 // Helper function to get feature icon based on title
 const getFeatureIcon = (title: string): string => {

@@ -167,6 +167,17 @@ export interface Privacy {
   updatedAt?: string
 }
 
+export interface Cookie {
+  _id: string
+  _type: 'cookie'
+  title: string
+  slug: SanitySlug
+  content?: PortableTextContent[]
+  updatedAt?: string
+}
+
 export interface TermsResponse extends Terms {}
 
 export interface PrivacyResponse extends Privacy {}
+
+export interface CookieResponse extends Cookie {}

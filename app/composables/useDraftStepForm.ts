@@ -47,6 +47,8 @@ export function useDraftStepForm<T>(
 ): DraftStepFormReturn<T> {
   const configRef = toRef(config);
   const draftRef = toRef(draft);
+  const { showToast } = useToast();
+  const { markStepAsCompleted } = useDraftListing();
   
   // Initialize form data with deep copy to avoid reference issues
   const formData = ref<T>(JSON.parse(JSON.stringify(configRef.value.initialData))) as Ref<T>;
@@ -90,22 +92,10 @@ export function useDraftStepForm<T>(
     const needsCompletion = configRef.value.stepNumber !== undefined && 
                            !draftRef.value.completedSteps?.includes(configRef.value.stepNumber);
 
-    // If no changes detected, just mark as completed and go to next step
-    if (!hasChanges.value) {
-      console.log('No changes detected, skipping API call');
-      
-      // Mark step as completed if this is the first time
-      if (needsCompletion) {
-        try {
-          await useRequestFetch()<DraftListing>(`/api/draft-listings/${draftRef.value.id}/`, {
-            method: 'PATCH',
-            body: { stepNumber: configRef.value.stepNumber },
-          });
-        } catch (error) {
-          console.error('Failed to mark step as completed:', error);
-        }
-      }
-      
+    // On first visit, we MUST save even if no changes (to persist default values)
+    // On subsequent visits, only update if there are actual changes
+    if (!hasChanges.value && !needsCompletion) {
+      console.log('No changes detected and step already completed, going to next step');
       nextStepFn?.();
       return;
     }
@@ -116,7 +106,7 @@ export function useDraftStepForm<T>(
         ? configRef.value.beforeSubmit(formData.value)
         : formData.value;
 
-      // Execute update function
+      // Execute update function (always on first visit, or when there are changes)
       await updateFn(dataToSubmit);
       
       // Mark step as completed if this is the first time (after successful update)
@@ -126,9 +116,13 @@ export function useDraftStepForm<T>(
             method: 'PATCH',
             body: { stepNumber: configRef.value.stepNumber },
           });
+          
+          // Update local cached draft data to reflect the completed step
+          markStepAsCompleted(draftRef.value.id, configRef.value.stepNumber!);
         } catch (error) {
           console.error('Failed to mark step as completed:', error);
-          // Don't block navigation if marking fails
+          showToast('Failed to save progress. Please try again.', { type: 'error' });
+          return; // Block navigation on error
         }
       }
       

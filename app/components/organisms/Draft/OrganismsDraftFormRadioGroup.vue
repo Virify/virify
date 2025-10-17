@@ -19,7 +19,7 @@
                 :name="name" 
                 :value="option.value"
                 :checked="modelValue === option.value" 
-                class="o-form-group__input | visually-hidden"
+                class="| visually-hidden"
                 :required="required"
               />
               {{ option.key }}

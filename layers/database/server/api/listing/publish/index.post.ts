@@ -1,0 +1,284 @@
+import * as z from "zod";
+
+const publishSchema = z.object({
+  draftId: z.number().int().positive(),
+});
+
+// Comprehensive validation schema for a publishable draft listing
+const publishableDraftSchema = z.object({
+  // Core listing fields (Step 1, 3)
+  price: z.number().positive("Price must be greater than 0"),
+  listingTier: z.enum(["BASIC", "PREMIUM", "FEATURED"]),
+  
+  // Must have either sale or rental listing (Step 1)
+  saleListing: z.object({
+    tenureType: z.enum(["FREEHOLD", "LEASEHOLD", "COMMONHOLD"]),
+    priceType: z.enum(["FIXED", "OFFERS_OVER", "GUIDE_PRICE"]).nullable().optional(),
+  }).nullable().optional(),
+  
+  rentalListing: z.object({
+    isBillsIncluded: z.boolean(),
+    furnishedStatus: z.enum(["FURNISHED", "UNFURNISHED", "PART_FURNISHED"]).nullable().optional(),
+    rentFrequency: z.enum(["WEEKLY", "MONTHLY"]).nullable().optional(),
+  }).nullable().optional(),
+  
+  // Property is required
+  property: z.object({
+    // Step 2: Property basics
+    type: z.object({
+      id: z.number().int().positive(),
+    }).nullable(),
+    classification: z.object({
+      id: z.number().int().positive(),
+    }).nullable(),
+    constructionType: z.enum(["STANDARD", "NON_STANDARD"]).nullable().optional(),
+    yearBuilt: z.string().nullable().optional(),
+    size: z.number().positive().nullable().optional(),
+    description: z.string().nullable().optional(),
+    totalFloors: z.number().int().min(0).nullable().optional(),
+    
+    // Step 4: Address (required)
+    address: z.object({
+      number: z.string().nullable().optional(),
+      street: z.string().min(1, "Street is required"),
+      city: z.string().min(1, "City is required"),
+      postcode: z.string().min(1, "Postcode is required"),
+      country: z.string().min(1, "Country is required"),
+      lat: z.number(),
+      lon: z.number(),
+    }),
+    
+    // Step 5: Room counts
+    numberBedrooms: z.number().int().min(0).nullable().optional(),
+    numberBathrooms: z.number().int().min(0).nullable().optional(),
+    
+    // Step 10: Media (at least 1 image required)
+    media: z.array(z.object({
+      image: z.string().min(1),
+    })).min(1, "At least one image is required"),
+  }),
+  
+  // Must have completed all 10 steps
+  completedSteps: z.array(z.number().int().min(1).max(10)).length(10, "All 10 steps must be completed"),
+}).refine(
+  (data) => data.saleListing !== null || data.rentalListing !== null,
+  {
+    message: "Either saleListing or rentalListing must be present",
+    path: ["saleListing"],
+  }
+).refine(
+  (data) => data.property?.type !== null && data.property?.classification !== null,
+  {
+    message: "Property type and classification are required",
+    path: ["property", "type"],
+  }
+);
+
+/**
+ * POST /api/listing/publish
+ * Publish a draft listing by migrating it to a real Listing
+ */
+export default defineEventHandler(async (event) => {
+  const { errorResponse } = useResponse();
+  const { user } = await requireUserSession(event);
+
+  try {
+    const { draftId } = await readValidatedBody(event, publishSchema.parse);
+
+    // Fetch the draft listing with all its relations
+    const draft = await prisma.draftListing.findUnique({
+      where: {
+        id: draftId,
+        userId: user.id, // Ensure the user owns this draft
+      },
+      include: {
+        saleListing: true,
+        rentalListing: true,
+        property: {
+          include: {
+            address: true,
+            media: true,
+            type: true,
+            classification: true,
+            bedroomFeatures: {
+              include: {
+                media: true,
+              },
+            },
+            bathroomFeatures: {
+              include: {
+                media: true,
+              },
+            },
+            kitchenFeatures: {
+              include: {
+                media: true,
+              },
+            },
+            reception: {
+              include: {
+                media: true,
+              },
+            },
+            otherRoom: {
+              include: {
+                media: true,
+              },
+            },
+            outdoorSpace: {
+              include: {
+                garden: {
+                  include: {
+                    media: true,
+                  },
+                },
+                yard: {
+                  include: {
+                    media: true,
+                  },
+                },
+                land: {
+                  include: {
+                    media: true,
+                  },
+                },
+                media: true,
+              },
+            },
+            parking: true,
+            utility: true,
+            storageFeatures: true,
+            securityFeatures: true,
+            energyAndUtilities: true,
+            runningCosts: true,
+            amenities: true,
+            additionalFeatures: true,
+            accessibilityFeatures: true,
+          },
+        },
+      },
+    });
+
+    if (!draft) {
+      return errorResponse(
+        createError({
+          statusCode: 404,
+          statusMessage: "Draft listing not found or you don't have permission to publish it",
+        }),
+        event
+      );
+    }
+
+    // Log draft structure for debugging
+    console.log('Draft structure before validation:', {
+      price: draft.price,
+      listingTier: draft.listingTier,
+      hasSaleListing: !!draft.saleListing,
+      hasRentalListing: !!draft.rentalListing,
+      hasProperty: !!draft.property,
+      hasAddress: !!draft.property?.address,
+      hasType: !!draft.property?.type,
+      hasClassification: !!draft.property?.classification,
+      mediaCount: draft.property?.media?.length || 0,
+      completedSteps: draft.completedSteps,
+    });
+
+    // Comprehensive validation using Zod schema
+    try {
+      publishableDraftSchema.parse(draft);
+    } catch (validationError: any) {
+      console.error('Draft listing validation failed:', JSON.stringify(validationError, null, 2));
+      
+      // Zod errors are in the `issues` property, not `errors`
+      const issues = validationError.issues || validationError.errors || [];
+      
+      const errorMessages = issues.map((err: any) => 
+        `${err.path.join('.')}: ${err.message}`
+      ).join(', ') || 'Draft listing validation failed - no details available';
+      
+      console.error('Formatted error messages:', errorMessages);
+      console.error('Issues:', issues);
+      
+      return errorResponse(
+        createError({
+          statusCode: 400,
+          statusMessage: `Cannot publish listing: ${errorMessages}`,
+          data: issues,
+        }),
+        event
+      );
+    }
+
+    // Additional safety checks for required fields before publishing
+    if (!draft.propertyId) {
+      return errorResponse(
+        createError({
+          statusCode: 400,
+          statusMessage: "Property is required to publish a listing",
+        }),
+        event
+      );
+    }
+
+    // Create the published listing in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Create the main Listing
+      const listing = await tx.listing.create({
+        data: {
+          price: draft.price!,
+          moveInDate: draft.moveInDate,
+          listingTier: draft.listingTier,
+          listingStartDate: draft.listingStartDate,
+          listingEndDate: draft.listingEndDate,
+          viewingOptions: draft.viewingOptions,
+          verificationLevel: draft.verificationLevel,
+          userId: draft.userId,
+          propertyId: draft.propertyId!,
+          published: true,
+          publishedAt: new Date(),
+        },
+      });
+
+      // Migrate RentalListing if it exists
+      if (draft.rentalListing) {
+        await tx.rentalListing.update({
+          where: { id: draft.rentalListing.id },
+          data: {
+            listingId: listing.id,
+            draftListingId: null, // Unlink from draft
+          },
+        });
+      }
+
+      // Migrate SaleListing if it exists
+      if (draft.saleListing) {
+        await tx.saleListing.update({
+          where: { id: draft.saleListing.id },
+          data: {
+            listingId: listing.id,
+            draftListingId: null, // Unlink from draft
+          },
+        });
+      }
+
+      // Note: Property is already connected via propertyId in Listing
+      // No need to update property separately as there's no draftListingId field
+
+      // Delete the draft listing (cascade will handle unlinking)
+      await tx.draftListing.delete({
+        where: { id: draftId },
+      });
+
+      return listing;
+    });
+
+    return {
+      success: true,
+      listingId: result.id,
+      message: "Listing published successfully",
+    };
+  } catch (error) {
+    console.error("Error publishing listing:", error);
+    return errorResponse(error, event);
+  }
+});

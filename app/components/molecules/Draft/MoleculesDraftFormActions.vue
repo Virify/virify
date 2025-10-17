@@ -12,6 +12,9 @@
       <button class="step__form-action | button button-r-sm button-secondary" :disabled="buttonDisabled" @click.prevent="$emit('submit')" :type="submitType">
         {{ primaryText }}
       </button>
+      
+      <!-- Slot for additional actions (e.g., Preview, Close buttons) -->
+      <slot name="additionalActions" />
     </div>
   </div>
 </template>
