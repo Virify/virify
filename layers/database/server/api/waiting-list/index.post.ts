@@ -32,6 +32,17 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Get total signup count
+    const totalSignups = await waitingListPrisma.waitingList.count();
+
+    // Send Slack notification
+    try {
+      await notifyWaitingListSignup(totalSignups);
+    } catch (slackError) {
+      console.error("Failed to send Slack notification:", slackError);
+      // Don't fail the request if Slack notification fails
+    }
+
     // Send confirmation email
     try {
       await sendWaitingListConfirmation(email);
