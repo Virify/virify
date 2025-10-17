@@ -229,12 +229,19 @@ onMounted(() => {
       carouselRef.value.emblaApi.on('select', () => {
         if (isProgrammaticNavigation.value) return;
         const selectedIndex = carouselRef.value.emblaApi.selectedScrollSnap();
-        // Only update if different to avoid infinite loop
-        if (selectedIndex !== currentStep.value) {
+        // Only update if different and the step is accessible
+        if (selectedIndex !== currentStep.value && isStepAccessible(selectedIndex)) {
           isUpdatingFromCarousel.value = true;
           currentStep.value = selectedIndex;
           nextTick(() => {
             isUpdatingFromCarousel.value = false;
+          });
+        } else if (!isStepAccessible(selectedIndex)) {
+          // If user scrolled to an inaccessible step, scroll back to current step
+          isProgrammaticNavigation.value = true;
+          nextTick(() => {
+            carouselRef.value.scrollTo(currentStep.value);
+            isProgrammaticNavigation.value = false;
           });
         }
       });

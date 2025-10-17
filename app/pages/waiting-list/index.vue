@@ -4,10 +4,9 @@
     <section class="waiting-list-hero">
       <div class="container">
         <div class="waiting-list-hero__content">
-          <h1 class="waiting-list-hero__title | title-2xl lineheight-xs">The UKs first <span
-              class="gradient-text">private</span> property marketplace</h1>
-          <p class="waiting-list-hero__subtitle | body-lg">Skip the estate agent. Search with AI, buy direct from
-            owners, or list your property yourself. We verify every listing. You save thousands.</p>
+          <h1 class="waiting-list-hero__title | title-2xl lineheight-xs">The <span class="gradient-text">UK's</span> first <span
+              class="gradient-text">open</span> property marketplace</h1>
+          <p class="waiting-list-hero__subtitle | body-lg">Market privately, search with AI, and connect directly with sellers and landlords. Save time, cut costs, take control.</p>
         </div>
       </div>
     </section>
@@ -17,8 +16,7 @@
       <div class="container">
         <div class="waiting-list-form-container">
           <h2 class="waiting-list-form__title | title-md">Get Early Access</h2>
-          <p class="waiting-list-form__description | body-md">Whether you're searching for your next home or ready to
-            sell without the agent fees, join our waiting list for exclusive early access.</p>
+          <p class="waiting-list-form__description | body-md">Whether you’re looking for your next home, ready to market privately, or an estate agent looking for a more cost-effective and easy-to-use platform, join our waiting list for exclusive early access and progress updates.</p>
 
           <form @submit.prevent="handleSubmit" class="waiting-list-form">
             <div v-if="formError" class="waiting-list-form__error">
@@ -69,36 +67,36 @@
     <section class="waiting-list-features">
       <div class="container">
         <header class="waiting-list-features__header">
-          <h2 class="title-xl">For <span class="gradient-text">Searchers</span></h2>
+          <h2 class="title-xl">For <span class="gradient-text">Smart Home Seekers</span></h2>
           <p class="body-md max-width-prose section-subtitle">We're building the property search platform we wish
-            existed. AI-powered, data-driven, and brutally honest about what you're actually buying.</p>
+            existed. AI-powered, data-driven, and brutally honest about what you're actually getting.</p>
         </header>
 
         <div class="waiting-list-features__grid" ref="buyersRef">
           <MoleculesFeatureTile iconName="ai/prompt" title="AI-Powered Search" subtitle="Tell us in plain English"
-            description='"Big garden and quiet street" beats ticking 50 boxes. Tell us what you want in plain English. Our AI understands what you actually mean and finds properties that match.'
+            description='"Big garden and quiet street" beats ticking 50 boxes. Our AI understands what you actually mean and finds properties that match.'
             :class="{ 'animate-in': isBuyersVisible }" />
 
           <MoleculesFeatureTile iconName="listings/savings" title="Real Data, No Spin" subtitle="Facts in one place"
-            description="Actual sale prices, genuine crime stats, honest flood risks. We show you the facts estate agents would rather you didn't know, all in one place."
+            description="Actual sale prices, genuine crime stats, honest flood risks. We do the leg work and pull all the data into one place."
             :class="{ 'animate-in': isBuyersVisible }" />
 
-          <MoleculesFeatureTile iconName="explore/map" title="Map-Based Discovery" subtitle="Draw your perfect area"
+          <MoleculesFeatureTile iconName="explore/map" title="Map-Based Searching" subtitle="Draw your perfect area"
             description="Draw your perfect area on a map. See everything available at once. No more clicking through hundreds of listings one by one."
             :class="{ 'animate-in': isBuyersVisible }" />
 
           <MoleculesFeatureTile iconName="amenities/school" title="Neighbourhood Insights"
             subtitle="What it's like to live there"
-            description="Schools, transport, broadband speeds, energy costs. All the boring-but-crucial stuff that helps you actually live somewhere, not just buy somewhere."
+            description="Schools, transport, broadband speeds, energy costs. All the crucial stuff you need to make a decision on your next home"
             :class="{ 'animate-in': isBuyersVisible }" />
 
-          <MoleculesFeatureTile iconName="listings/eco" title="True Running Costs" subtitle="Bills before you buy"
-            description="See what you'll actually pay in bills before you commit. Energy ratings, council tax bands, typical heating costs—no nasty surprises after you move in."
+          <MoleculesFeatureTile iconName="listings/eco" title="Running Costs" subtitle="Bills before you commit"
+            description="From energy ratings, council tax bands and utilities, see how much the bills currently cost, and estimate your outgoings."
             :class="{ 'animate-in': isBuyersVisible }" />
 
-          <MoleculesFeatureTile iconName="property/security" title="Buy Direct from Owners"
-            subtitle="Verified sellers, no middlemen"
-            description="Connect directly with verified private sellers. No middleman markup, no estate agent spin. Just real people selling real homes at fair prices."
+          <MoleculesFeatureTile iconName="property/security" title="Deal Direct with Owners"
+            subtitle="Virified private listings, no middlemen"
+            description="Connect directly with real people and get the detail from the people who actually own the place, without the marketing spin”."
             :class="{ 'animate-in': isBuyersVisible }" />
         </div>
       </div>
@@ -108,36 +106,35 @@
     <section class="waiting-list-sellers">
       <div class="container">
         <header class="waiting-list-sellers__header">
-          <h2 class="title-xl">For <span class="gradient-text">Sellers</span></h2>
-          <p class="body-md max-width-prose section-subtitle">The UK's first verified private property marketplace.
-            Create your own listing, connect directly with buyers, and keep the £5,000+ you'd pay an estate agent.</p>
+          <h2 class="title-xl">Market <span class="gradient-text">Smarter</span>, Keep <span class="gradient-text">More</span></h2>
+          <p class="body-md max-width-prose section-subtitle">Create your own listing and connect directly with home seekers. Take control, manage your process and save costs.</p>
         </header>
 
         <div class="waiting-list-sellers__grid" ref="sellersRef">
-          <MoleculesFeatureTile iconName="listings/savings" title="Save Thousands" subtitle="No agent commission"
-            description="Estate agents charge 1–2% (£5,000+ on average). We don't. Create your listing yourself and keep every penny."
+          <MoleculesFeatureTile iconName="listings/savings" title="Keep more of your money" subtitle="No commission, no hidden costs"
+            description="Up-front and clear low-costs. Sounds good? Market on Virify."
             variant="blue" :class="{ 'animate-in': isSellersVisible }" />
 
-          <MoleculesFeatureTile iconName="cards/verified" title="We Verify Every Listing" subtitle="Trust that converts"
+          <MoleculesFeatureTile iconName="cards/verified" title="We Virify every listing" subtitle="Trust matters"
             description="We verify ownership and property details. Buyers trust verified listings—so you reach serious, qualified buyers only."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
 
-          <MoleculesFeatureTile iconName="account/chat" title="Direct Buyer Contact"
-            subtitle="Messages without middlemen"
-            description="Message buyers directly through our secure platform. Arrange viewings and negotiate on your terms—no filtering."
+          <MoleculesFeatureTile iconName="account/chat" title="Direct messaging"
+            subtitle="Messages without the middlemen"
+            description="Message users directly through our secure platform. Arrange viewings and discuss offers on your terms."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
 
-          <MoleculesFeatureTile iconName="ai/edit" title="Easy Listing Creation" subtitle="Guided and AI-assisted"
-            description="Our guided form makes listing simple. Add photos and details in minutes. AI helps write compelling descriptions that sell."
+          <MoleculesFeatureTile iconName="ai/edit" title="Easy Listing Creation" subtitle="Guided and intuitive creation"
+            description="Our guided form makes listing simple. Add photos and details in minutes."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
 
-          <MoleculesFeatureTile iconName="explore/ai" title="AI-Matched to Buyers" subtitle="Shown to serious buyers"
-            description="Your listing is matched to buyers using our AI search. They find you because your property fits what they actually want."
+          <MoleculesFeatureTile iconName="explore/ai" title="AI-Powered Matching" subtitle="Connect with the right home seekers"
+            description="Find the right home seeker by having your listing matched with home seekers using our AI-powered search."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
 
-          <MoleculesFeatureTile iconName="content/info" title="Full Support & Guidance"
-            subtitle="From listing to completion"
-            description="New to private selling? Use our guides, checklists, and support throughout. Know what to do at every stage."
+          <MoleculesFeatureTile iconName="content/info" title="Support & Guidance"
+            subtitle="From thinking about marketing to accepting an offer"
+            description="First time marketing without an estate agent? Our guides and easy-to-use platform gives you all the tools you need."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
         </div>
       </div>
@@ -147,26 +144,24 @@
     <section class="waiting-list-benefits">
       <div class="container">
         <header class="waiting-list-benefits__header">
-          <h2 class="title-xl">Why <span class="gradient-text">join</span> the waiting list?</h2>
+          <h2 class="title-xl">Get <span class="gradient-text">ahead</span> before everyone else</h2>
+          <p class="body-md max-width-prose section-subtitle">Get first access to a smarter way to buy and sell property, powered by AI, built by real people who’ve had enough of the old way.</p>
         </header>
 
         <div class="waiting-list-benefits__cards">
           <AtomsHeroCard>
-            <h3 class="title-md">Be First to Launch</h3>
-            <p class="body-md">Get exclusive early access before we open to the public. Be among the first to search
-              with AI or list your property privately in the UK.</p>
+            <h3 class="title-md gradient-text">Be First In</h3>
+            <p class="body-md">Get early access before launch. Be among the first to search with AI or list your property privately in the UK.</p>
           </AtomsHeroCard>
 
           <AtomsHeroCard variant="secondary">
-            <h3 class="title-md">Early Bird Benefits</h3>
-            <p class="body-md">Launch members get special perks and reduced fees. Plus priority support and exclusive
-              features as we roll them out.</p>
+            <h3 class="title-md">Insider Perks</h3>
+            <p class="body-md">Founding members get reduced fees and first access to our AI-powered tools.</p>
           </AtomsHeroCard>
 
           <AtomsHeroCard>
-            <h3 class="title-md">Shape the Future</h3>
-            <p class="body-md">Your feedback matters. Help us build the features that solve real problems for buyers and
-              sellers across the UK.</p>
+            <h3 class="title-md gradient-text">Direct Influence</h3>
+            <p class="body-md">Your feedback shapes our next features, from smarter search filters to better pricing tools.</p>
           </AtomsHeroCard>
         </div>
       </div>
@@ -176,9 +171,8 @@
     <section class="waiting-list-final-cta">
       <div class="container">
         <div class="waiting-list-final-cta__content">
-          <h2 class="title-xl">Ready to skip the estate agent?</h2>
-          <p class="body-lg max-width-prose">Join thousands who are ready for honest property search and direct private
-            sales. Whether you're buying or selling, Virify puts you in control.</p>
+          <h2 class="title-xl">Ready to market the <span class="gradient-text">new way?</span></h2>
+          <p class="body-lg max-width-prose">Join thousands who are ready for honest property search and direct private listings. Whether you’re buying, selling, leasing or renting, Virify puts you in control</p>
           <AtomsButton @click="scrollToForm" class="waiting-list-final-cta__button | button-lg button-monochrome"> Join
             the Waiting List </AtomsButton>
         </div>
