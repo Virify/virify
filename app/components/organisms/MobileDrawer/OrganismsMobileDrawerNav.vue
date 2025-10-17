@@ -146,7 +146,6 @@ function hasChildCategories(item: NavigationItem) {
 
   &-text {
     flex: 1;
-    text-align: left;
   }
 }
 </style>
