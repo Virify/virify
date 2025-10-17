@@ -38,6 +38,7 @@ const waitingListConfig: WaitingListConfig = {
     '/price-paid',
     '/guides',
     '/login',
+    '/cookie'
   ],
 
   // Navigation visibility
