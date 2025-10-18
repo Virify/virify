@@ -6,6 +6,7 @@ Allow: /
 
 # Allow crawling of public pages
 Allow: /waiting-list
+Allow: /price-paid
 Allow: /contact
 Allow: /guides
 Allow: /guides/*

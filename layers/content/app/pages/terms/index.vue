@@ -35,7 +35,23 @@ definePageMeta({
 
 useSeoMeta({
   title: 'Terms & Conditions — Virify',
-  description: 'The terms that govern your use of Virify.',
+  description: 'The terms that govern your use of Virify UK property marketplace platform.',
+  robots: 'index, follow',
+  
+  ogTitle: 'Terms & Conditions — Virify',
+  ogDescription: 'The terms that govern your use of Virify.',
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk/terms',
+  
+  twitterCard: 'summary',
+  twitterTitle: 'Terms & Conditions — Virify',
+  twitterDescription: 'The terms that govern your use of Virify.',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://virify.co.uk/terms' }
+  ],
 })
 </script>
 
