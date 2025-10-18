@@ -248,26 +248,25 @@ async function submitForm() {
 }
 
 // SEO Meta
+useSeoMeta({
+  title: 'Contact Virify - Get in Touch | The UK\'s Open Property Marketplace',
+  description: 'Contact Virify for partnership opportunities, platform enquiries, or questions about the UK\'s first open property marketplace. We typically respond within 24 hours.',
+  keywords: 'contact Virify, property marketplace contact, partnership opportunities, property platform enquiries, estate agent alternative, open property marketplace UK',
+  robots: 'index, follow',
+  
+  ogTitle: 'Contact Virify - Get in Touch',
+  ogDescription: 'Contact us about partnerships, platform questions, or general enquiries about Virify\'s open property marketplace.',
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk/contact',
+  
+  twitterCard: 'summary',
+  twitterTitle: 'Contact Virify',
+  twitterDescription: 'Get in touch about partnerships, questions, or enquiries about the UK\'s open property marketplace.',
+});
+
 useHead({
-  title: 'Contact Virify - Get in Touch | Private Property Marketplace UK',
-  meta: [
-    { name: 'description', content: 'Contact Virify for partnership opportunities, platform questions, or general enquiries about the UK\'s first private property marketplace. We respond within 24 hours.' },
-    { name: 'keywords', content: 'contact Virify, property marketplace contact, partnership opportunities, estate agent alternative contact, private property listings UK' },
-    { name: 'robots', content: 'index, follow' },
-    
-    // Open Graph
-    { property: 'og:title', content: 'Contact Virify - Get in Touch' },
-    { property: 'og:description', content: 'Get in touch with Virify about partnerships, questions, or general enquiries.' },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://virify.co.uk/contact' },
-    
-    // Twitter Card
-    { name: 'twitter:card', content: 'summary' },
-    { name: 'twitter:title', content: 'Contact Virify' },
-    { name: 'twitter:description', content: 'Get in touch with Virify about partnerships, questions, or general enquiries.' },
-  ],
   link: [
-    { rel: 'canonical', href: 'https://virify.co.uk/contact' },
+    { rel: 'canonical', href: 'https://virify.co.uk/contact' }
   ],
   script: [
     {

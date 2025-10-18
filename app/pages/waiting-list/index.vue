@@ -254,26 +254,25 @@ function scrollToForm() {
 }
 
 // SEO Meta
+useSeoMeta({
+  title: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
+  description: 'Get early access to Virify, an AI-powered property search with real data, map-based searching, and direct connections to sellers and landlords. Whether you\'re ready to market privately or an estate agent looking for a more cost-effective solution, Virify has you covered.',
+  keywords: 'property portal, property sales, buy property, rent property, sell property, property marketplace UK, AI property search, sell without estate agent, private property listings, buy direct from owner, map-based property search, UK property platform, estate agent alternative',
+  robots: 'index, follow',
+  
+  ogTitle: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
+  ogDescription: 'Market privately, search with AI, and connect directly. Save time, cut costs, take control of your property journey.',
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk/waiting-list',
+  
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Join Virify Waiting List - Open Property Marketplace',
+  twitterDescription: 'AI-powered search, real data, direct connections. The property platform you wish existed.',
+});
+
 useHead({
-  title: 'Join Virify Waiting List - UK Private Property Marketplace | Save £5,000+ on Estate Agent Fees',
-  meta: [
-    { name: 'description', content: 'Join the waiting list for Virify - the UK\'s first verified private property marketplace. AI-powered property search, buy direct from owners, or sell without estate agents. Save thousands in fees.' },
-    { name: 'keywords', content: 'private property marketplace UK, sell house without estate agent, buy property direct from owner, AI property search, save estate agent fees, verified property listings' },
-    { name: 'robots', content: 'index, follow' },
-    
-    // Open Graph
-    { property: 'og:title', content: 'Join Virify Waiting List - UK Private Property Marketplace' },
-    { property: 'og:description', content: 'AI-powered property search and verified private listings. Skip the estate agent, save thousands.' },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://virify.co.uk/waiting-list' },
-    
-    // Twitter Card
-    { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Join Virify Waiting List - UK Private Property Marketplace' },
-    { name: 'twitter:description', content: 'AI-powered property search and verified private listings. Skip the estate agent, save thousands.' },
-  ],
   link: [
-    { rel: 'canonical', href: 'https://virify.co.uk/waiting-list' },
+    { rel: 'canonical', href: 'https://virify.co.uk/waiting-list' }
   ],
 });
 </script>
