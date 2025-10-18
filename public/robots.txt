@@ -23,5 +23,8 @@ Disallow: /listing/preview/*
 Disallow: /search
 Disallow: /ai-search
 
+# Sitemap
+Sitemap: https://virify.co.uk/sitemap.xml
+
 # Crawl-delay (optional, adjust based on server capacity)
 Crawl-delay: 1
