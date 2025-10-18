@@ -21,9 +21,7 @@
           <AtomsInput
             v-model="searchQuery"
             type="text"
-            placeholder="Eg 'CF10 1AA'"
-            :custom-validation="{ patternMismatch: 'Please enter a full valid UK postcode (e.g., CF10 1AA)' }"
-            pattern="^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$"
+            placeholder="e.g., 'CF10 1AA' or 'cf101aa'"
             required
             class="| body-sm"
             :disabled="loading"
@@ -74,6 +72,14 @@
         <h3 class="| title-sm">Something went wrong</h3>
         <p class="| body-md">{{ error }}</p>
         <button class="| button button-secondary button-sm" @click="error = null">Try again</button>
+      </div>
+    </div>
+
+    <!-- No Results State -->
+    <div v-else-if="searched && results.length === 0" class="price-paid__no-results">
+      <div class="no-results-message">
+        <h3 class="| title-sm">No results found</h3>
+        <p class="| body-md">We couldn't find any price paid data for this postcode. Try a different postcode or check the spelling.</p>
       </div>
     </div>
     </div>
@@ -146,21 +152,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { z } from 'zod'
-
-// UK Postcode validation schema
-const postcodeSchema = z.string()
-  .min(1, 'Postcode is required')
-  .regex(
-    /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i,
-    'Please enter a valid UK postcode (e.g., CF10 1AA)'
-  )
-  .transform(val => val.toUpperCase().replace(/\s+/g, ''))
+import { z } from "zod";
 
 const searchQuery = ref<string>("");
 const results = ref<any[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
+const searched = ref(false);
 
 async function search() {
   if (searchQuery.value.trim() === "") {
@@ -169,19 +167,29 @@ async function search() {
   
   loading.value = true;
   error.value = null;
+  searched.value = false;
   
   try {
-    const formattedQuery = searchQuery.value.trim().toUpperCase();
+    // Validate and format the postcode
+    const validatedPostcode = postcodeSchema.parse(searchQuery.value.trim());
     
     const response = await $fetch<any>("/api/price-paid/", {
       method: "POST",
-      body: { postcode: formattedQuery },
+      body: { postcode: validatedPostcode },
     });
-    results.value = response.data;
-  } catch (err) {
+    results.value = response.data || [];
+    searched.value = true;
+  } catch (err: any) {
     console.error("Error searching price paid data:", err);
-    error.value = "Failed to search price paid data. Please try again.";
+    
+    // Check if it's a validation error from Zod
+    if (err instanceof z.ZodError) {
+      error.value = err.issues[0]?.message || "Invalid postcode format";
+    } else {
+      error.value = err.data?.statusMessage || "Failed to search price paid data. Please try again.";
+    }
     results.value = [];
+    searched.value = false;
   } finally {
     loading.value = false;
   }
@@ -347,6 +355,30 @@ useHead({
       
       p {
         margin-bottom: var(--size-20);
+        color: var(--foreground-200);
+      }
+    }
+  }
+
+  &__no-results {
+    margin-top: var(--size-48);
+    display: flex;
+    justify-content: center;
+    
+    .no-results-message {
+      text-align: center;
+      padding: var(--size-32);
+      border-radius: var(--border-radius-lg);
+      background: var(--background-200);
+      border: 1px solid var(--border-100);
+      max-width: 400px;
+      
+      h3 {
+        color: var(--foreground-100);
+        margin-bottom: var(--size-12);
+      }
+      
+      p {
         color: var(--foreground-200);
       }
     }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { distributePremiumListings } from '../../app/utils/results/listing-distribution'
+import { distributePremiumListings } from '../../../app/utils/results/listing-distribution'
 
 // Mock listing data
 const createMockListing = (id: number, tier: 'PREMIUM' | 'FEATURED' | 'BASIC') => ({
