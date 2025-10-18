@@ -38,7 +38,7 @@ defineProps<{ email: string }>();
           <!-- Benefits Section -->
           <Section style="background-color: #f9fafb; border-radius: 8px; padding: 24px; margin: 0 0 32px 0;">
             <Heading style="color: #2D2D4F; font-size: 20px; font-weight: 600; margin: 0 0 20px 0;">
-              So what's Next?
+              So What's Next?
             </Heading>
 
             <table style="width: 100%; margin: 0; padding: 0;">
