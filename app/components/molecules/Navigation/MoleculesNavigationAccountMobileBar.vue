@@ -53,7 +53,7 @@ const chatNotificationCount = computed(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--background-200);
+  background: var(--blue-400);
   padding: var(--size-4);
   z-index: 1003;
   box-shadow: 0 -10px 8px rgba(0, 0, 0, 0.1);
@@ -85,14 +85,14 @@ const chatNotificationCount = computed(() => {
     padding: var(--size-8);
     border-radius: var(--border-radius-md);
     cursor: pointer;
-    color: var(--foreground-100);
+    color: var(--monochrome-900);
 
     &.active {
-      color: var(--secondary-500);
+      color: var(--monochrome-900);
     }
 
     &.current-page {
-      color: var(--secondary-400);
+      color: var(--monochrome-900);
     }
 
     .nav-link {
@@ -121,10 +121,10 @@ const chatNotificationCount = computed(() => {
 
     .notification-badge {
       position: absolute;
-      top: -12px;
+      top: 0;
       left: 15px;
-      background: var(--secondary-500);
-      color: var(--monochrome-100);
+      background: var(--blue-500);
+      color: var(--monochrome-900);
       border-radius: 50%;
       height: var(--size-22);
       padding: var(--size-4) var(--size-8);

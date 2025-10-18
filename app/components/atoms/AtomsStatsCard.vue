@@ -85,10 +85,7 @@ defineProps<Props>()
   }
 
   &__top {
-    background:
-      linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)),
-      url('/img/call-out-bg.svg'),
-      var(--secondary-400);
+    background: var(--secondary-400);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -98,6 +95,25 @@ defineProps<Props>()
     background-size: cover;
     min-height: 100px;
     color: var(--monochrome-300);
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('/img/call-out-bg.svg');
+      background-size: cover;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    > * {
+      position: relative;
+      z-index: 1;
+    }
 
 
     &.tier-basic {

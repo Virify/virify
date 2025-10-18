@@ -2,9 +2,9 @@
   <div class="dashboard">
     <div class="analytics-section">
       <slot name="analytics">
-        <AtomsStatsCard :value="String(analytics?.totalViews || 0)" :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views" :animated="true" />
-        <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users" title="Listings Favourited" :animated="true" />
-        <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings" title="Total Enquiries" :animated="true" />
+        <AtomsStatsCard :value="String(analytics?.totalViews || 0)" :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views" :animated="true" tier="premium" />
+        <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users" title="Listings Favourited" :animated="true" tier="premium" />
+        <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings" title="Total Enquiries" :animated="true" tier="premium" />
       </slot>
     </div>
 
@@ -52,7 +52,7 @@
           :show-favourite-icon="true"
         />
 
-        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites" class="content-section__see-all | button button-sm button-secondary">See all favourites</nuxt-link>
+        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites" class="content-section__see-all | button button-sm button-tertiary">See all favourites</nuxt-link>
       </slot>
     </div>
 
@@ -68,7 +68,7 @@
           :show-notes-icon="true"
         />
 
-        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="account/notes" class="content-section__see-all | button button-sm button-secondary">See all notes</nuxt-link>
+        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="account/notes" class="content-section__see-all | button button-sm button-tertiary">See all notes</nuxt-link>
       </slot>
     </div>
 

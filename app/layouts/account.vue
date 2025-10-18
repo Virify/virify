@@ -4,7 +4,7 @@
     <OrganismsHeader />
 
     <div class="account-page">
-      <div class="account-layout | container" :class="{ 'account-layout--messages-expanded': isExpanded }">
+      <div class="account-layout | container">
         <!-- Left Sidebar Slot (Desktop only) -->
         <aside class="left-sidebar">
           <slot name="left-sidebar">
@@ -16,14 +16,6 @@
         <main class="main">
           <NuxtPage />
         </main>
-
-        <!-- Right Sidebar Slot -->
-        <aside class="right-sidebar" v-if="showSidebar">
-          <slot name="right-sidebar">
-            <OrganismsConversationSidebar />
-          </slot>
-        </aside>
-
 
         <!-- Bottom Navigation Slot -->
         <slot name="bottom-navigation">
@@ -44,14 +36,6 @@
 import { logout } from '~/utils/account/navigation'
 const route = useRoute()
 const groupStates = ref([true, true, true, true])
-
-// Control sidebar visibility
-const showSidebar = computed(() =>
-  route.path !== '/account/messages' && route.path !== `/account/create-listing/${route.params.id}`
-)
-const isExpanded = computed(() =>
-  route.path === '/account/messages' || route.path === `/account/create-listing/${route.params.id}`
-)
 
 function handleNavClick(item: any) {
   if (item.action === 'logout') {
@@ -106,36 +90,11 @@ useHead({
 
 .account-layout {
   display: grid;
-  grid-template-columns: 300px 1fr 300px;
-  grid-template-areas: "left-sidebar main right-sidebar";
+  grid-template-columns: 300px 1fr;
+  grid-template-areas: "left-sidebar main";
   gap: var(--size-16);
   padding: var(--size-16) 0;
   transition: grid-template-columns 0.25s ease;
-
-  &:has(.sidebar-content--has-overlay) {
-    grid-template-columns: 300px 1fr 400px;
-  }
-
-  &.account-layout--messages-expanded {
-    grid-template-columns: 300px 1fr;
-    grid-template-areas: "left-sidebar main";
-
-    @include mq.menu-mobile {
-      grid-template-columns: 1fr;
-      grid-template-areas: "main";
-      padding: 0;
-      overflow: visible;
-    }
-  }
-
-  @include mq.not-notebook {
-    grid-template-columns: 300px 1fr;
-    grid-template-areas: "left-sidebar main";
-
-    .right-sidebar {
-      display: none;
-    }
-  }
 
   @include mq.menu-mobile {
     grid-template-columns: 1fr;
@@ -143,8 +102,7 @@ useHead({
     padding-bottom: calc(var(--size-16) + var(--mobile-nav-height, 0));
     min-height: calc(100vh - var(--mobile-nav-height, 0) - var(--size-16));
 
-    .left-sidebar,
-    .right-sidebar {
+    .left-sidebar {
       display: none;
     }
   }
@@ -160,73 +118,6 @@ useHead({
   z-index: 9;
   align-self: start;
   overflow: hidden;
-}
-
-// Right Sidebar (Conversations)  
-.right-sidebar {
-  grid-area: right-sidebar;
-  position: sticky;
-  top: calc(var(--header-height) + var(--size-16));
-  height: fit-content;
-  max-height: calc(100dvh - var(--header-height) - var(--size-32));
-  z-index: 9;
-  align-self: start;
-
-  @include mq.not-notebook {
-    position: static;
-    top: auto;
-    height: auto;
-    max-height: none;
-    align-self: stretch;
-  }
-
-  @include mq.mobile-only {
-      padding: 0;
-      display: none;
-    }
-
-  .sidebar-content {
-    background: var(--background-200);
-    border-radius: var(--border-radius-xl);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    height: fit-content;
-    color: var(--foreground-100);
-    position: relative;
-
-    @include mq.mobile-only {
-      padding: 0;
-      display: none;
-    }
-
-    &--conversations {
-      padding: 0;
-      overflow-y: auto;
-      max-height: calc(100dvh - var(--header-height) - var(--size-32));
-      height: fit-content;
-      box-sizing: border-box;
-      transition: height ease;
-
-      &.sidebar-content--has-overlay {
-        height: calc(100dvh - var(--header-height) - var(--size-32));
-
-        @include mq.tablet-only {
-          height: 60vh;
-        }
-      }
-
-    }
-  }
-
-  .sidebar-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 10;
-    border-radius: var(--border-radius-xl);
-    overflow: hidden;
-  }
 }
 
 .main {
