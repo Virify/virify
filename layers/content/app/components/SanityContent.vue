@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { PortableText } from '@portabletext/vue'
+import AtomsDivider from '~/components/atoms/AtomsDivider.vue';
 
 const props = defineProps<{
   blocks: PortableTextContent[]
@@ -84,6 +85,11 @@ const customComponents = {
           }) : null
         ])
       ])
+    },
+
+    // Custom divider component
+    divider: () => {
+      return h(AtomsDivider)
     }
   },
 

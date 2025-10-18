@@ -24,21 +24,21 @@ defineProps<{ email: string }>();
         <Section style="background-color: #ffffff; padding: 40px 32px; border-radius: 0 0 12px 12px;">
           
           <Text style="color: #1a1a1a; font-size: 18px; line-height: 1.6; margin: 0 0 24px 0;">
-            Hi there,
+            Hi,
           </Text>
 
           <Text style="color: #1a1a1a; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-            Thank you for joining the Virify waiting list! You're now part of an exclusive group who will be the first to experience the UK's first private property marketplace.
+            Thank you for joining the Virify waiting list! You're now part of an exclusive group who will be the first to experience the UK's first open private property marketplace.
           </Text>
 
           <Text style="color: #1a1a1a; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0;">
-            No estate agents. No hidden fees. Just verified private listings and AI-powered search to help you find or sell your perfect property.
+            Virify is AI-powered, data-driven, and brutally honest. It's property marketing, made easy.
           </Text>
 
           <!-- Benefits Section -->
           <Section style="background-color: #f9fafb; border-radius: 8px; padding: 24px; margin: 0 0 32px 0;">
             <Heading style="color: #2D2D4F; font-size: 20px; font-weight: 600; margin: 0 0 20px 0;">
-              What's Next?
+              So what's Next?
             </Heading>
 
             <table style="width: 100%; margin: 0; padding: 0;">
@@ -89,8 +89,8 @@ defineProps<{ email: string }>();
           </Text>
 
           <Text style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0; text-align: center;">
-            <strong style="color: #2D2D4F;">Virify</strong> - The UK's first private property marketplace<br/>
-            Skip the estate agent. Save thousands.
+            <strong style="color: #2D2D4F;">Virify</strong> - The UK's first open property marketplace<br/>
+            Take control. Save thousands.
           </Text>
         </Section>
 
