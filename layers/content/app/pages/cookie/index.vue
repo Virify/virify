@@ -39,7 +39,7 @@ useSeoMeta({
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @use '#styles/_utils/media' as mq;
 
 .legal-page {
@@ -80,22 +80,6 @@ useSeoMeta({
     border-radius: var(--border-radius-xl);
     padding: var(--size-24);
     color: var(--foreground-100);
-  }
-
-  &__content :deep(h2) {
-    margin-top: var(--size-24);
-    font-size: var(--font-lg);
-  }
-
-  &__content :deep(p),
-  &__content :deep(ul) {
-    margin-bottom: var(--size-16);
-    font-size: var(--font-md);
-  }
-
-  &__content :deep(li) {
-    margin-bottom: var(--size-8);
-    font-size: var(--font-md);
   }
 }
 </style>
