@@ -4,7 +4,7 @@
     <section class="contact-hero">
       <div class="container">
         <div class="contact-hero__content">
-          <h1 class="contact-hero__title | title-2xl lineheight-xs">Contact <span class="gradient-text">Us</span></h1>
+          <h1 class="contact-hero__title | title-2xl lineheight-xs">Contact <span class="gradient-text">us</span></h1>
           <p class="contact-hero__subtitle | body-lg">Whether you're interested in partnering with us, have a question
             about our platform, or just want to get in touch—we'd love to hear from you.</p>
         </div>
@@ -15,7 +15,7 @@
     <section class="contact-form-section" id="contact">
       <div class="container">
         <div class="contact-form-container">
-          <h2 class="contact-form__title | title-md">Get in Touch</h2>
+          <h2 class="contact-form__title | title-md">Get in touch</h2>
           <p class="contact-form__description | body-md">Fill in the form below and we'll get back to you as soon as
             possible. We typically respond within 24 hours.</p>
 
@@ -93,11 +93,11 @@
     <section class="contact-info">
       <div class="container">
         <div class="contact-info__content">
-          <h2 class="title-xl">Looking to <span class="gradient-text">Partner?</span></h2>
+          <h2 class="title-xl">Looking to <span class="gradient-text">partner?</span></h2>
           <p class="body-lg max-width-prose">We're always open to working with like-minded businesses, property
             professionals, and technology partners who share our vision of making property buying and selling more
             transparent and accessible.</p>
-            <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> Get in Touch </AtomsButton>
+            <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> Get in touch </AtomsButton>
         </div>
       </div>
     </section>
@@ -107,7 +107,7 @@
           <h2 class="title-xl">Interested in what we are doing?</h2>
           <p class="body-lg max-width-prose">We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.</p>
           <nuxt-link to="/waiting-list" class="waiting-list__button | button button-lg button-monochrome"> 
-            Join the Waiting List
+            Join the waiting list
           </nuxt-link>
         </div>
       </div>

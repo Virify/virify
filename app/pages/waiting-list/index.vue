@@ -15,7 +15,7 @@
     <section class="waiting-list-form-section">
       <div class="container">
         <div class="waiting-list-form-container">
-          <h2 class="waiting-list-form__title | title-md">Get Early Access</h2>
+          <h2 class="waiting-list-form__title | title-md">Get early access</h2>
           <p class="waiting-list-form__description | body-md">Whether you’re looking for your next home, ready to market privately, or an estate agent looking for a more cost-effective and easy-to-use platform, join our waiting list for exclusive early access and progress updates.</p>
 
           <form @submit.prevent="handleSubmit" class="waiting-list-form">
@@ -67,7 +67,7 @@
     <section class="waiting-list-features">
       <div class="container">
         <header class="waiting-list-features__header">
-          <h2 class="title-xl">For <span class="gradient-text">Smart Home Seekers</span></h2>
+          <h2 class="title-xl">For <span class="gradient-text">smart home seekers</span></h2>
           <p class="body-md max-width-prose section-subtitle">We're building the property search platform we wish
             existed. AI-powered, data-driven, and brutally honest about what you're actually getting.</p>
         </header>
@@ -87,7 +87,7 @@
 
           <MoleculesFeatureTile iconName="amenities/school" title="Neighbourhood Insights"
             subtitle="What it's like to live there"
-            description="Schools, transport, broadband speeds, energy costs. All the crucial stuff you need to make a decision on your next home"
+            description="Schools, transport, broadband speeds, energy costs. All the crucial stuff you need to make a decision on your next home."
             :class="{ 'animate-in': isBuyersVisible }" />
 
           <MoleculesFeatureTile iconName="listings/eco" title="Running Costs" subtitle="Bills before you commit"
@@ -96,7 +96,7 @@
 
           <MoleculesFeatureTile iconName="property/security" title="Deal Direct with Owners"
             subtitle="Virified private listings, no middlemen"
-            description="Connect directly with real people and get the detail from the people who actually own the place, without the marketing spin”."
+            description="Connect directly with real people and get the detail from the people who actually own the place, without the marketing spin."
             :class="{ 'animate-in': isBuyersVisible }" />
         </div>
       </div>
@@ -106,17 +106,17 @@
     <section class="waiting-list-sellers">
       <div class="container">
         <header class="waiting-list-sellers__header">
-          <h2 class="title-xl">Market <span class="gradient-text">Smarter</span>, Keep <span class="gradient-text">More</span></h2>
+          <h2 class="title-xl">Market <span class="gradient-text">smarter</span>, keep <span class="gradient-text">more</span></h2>
           <p class="body-md max-width-prose section-subtitle">Create your own listing and connect directly with home seekers. Take control, manage your process and save costs.</p>
         </header>
 
         <div class="waiting-list-sellers__grid" ref="sellersRef">
           <MoleculesFeatureTile iconName="listings/savings" title="Keep more of your money" subtitle="No commission, no hidden costs"
-            description="Up-front and clear low-costs. Sounds good? Market on Virify."
+            description="Clear, up-front and low-costs. Sounds good? Market on Virify."
             variant="blue" :class="{ 'animate-in': isSellersVisible }" />
 
-          <MoleculesFeatureTile iconName="cards/verified" title="We Virify every listing" subtitle="Trust matters"
-            description="We verify ownership and property details. Buyers trust verified listings—so you reach serious, qualified buyers only."
+          <MoleculesFeatureTile iconName="cards/verified" title="Take control" subtitle="Your listing, your style"
+            description="Our personalised dashboard provides you with all the easy-to-use tools you need to market your property at your own pace."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
 
           <MoleculesFeatureTile iconName="account/chat" title="Direct messaging"
@@ -128,8 +128,8 @@
             description="Our guided form makes listing simple. Add photos and details in minutes."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
 
-          <MoleculesFeatureTile iconName="explore/ai" title="AI-Powered Matching" subtitle="Connect with the right home seekers"
-            description="Find the right home seeker by having your listing matched with home seekers using our AI-powered search."
+          <MoleculesFeatureTile iconName="explore/ai" title="AI-Powered Matching" subtitle="Be matched to the right person for your home using our AI-powered search."
+            description="Be matched to the right person for your home using our AI-powered search."
             :class="{ 'animate-in': isSellersVisible }" variant="blue" />
 
           <MoleculesFeatureTile iconName="content/info" title="Support & Guidance"
@@ -151,7 +151,7 @@
         <div class="waiting-list-benefits__cards">
           <AtomsHeroCard>
             <h3 class="title-md gradient-text">Be First In</h3>
-            <p class="body-md">Get early access before launch. Be among the first to search with AI or list your property privately in the UK.</p>
+            <p class="body-md">Get early access before launch. Be amongst the first to search with AI or list your property privately in the UK.</p>
           </AtomsHeroCard>
 
           <AtomsHeroCard variant="secondary">
@@ -172,7 +172,7 @@
       <div class="container">
         <div class="waiting-list-final-cta__content">
           <h2 class="title-xl">Ready to market the <span class="gradient-text">new way?</span></h2>
-          <p class="body-lg max-width-prose">Join thousands who are ready for honest property search and direct private listings. Whether you’re buying, selling, leasing or renting, Virify puts you in control</p>
+          <p class="body-lg max-width-prose">Join thousands who are ready for honest property searching and direct private listings. Whether you’re buying, selling, leasing or renting, Virify puts you in control.</p>
           <AtomsButton @click="scrollToForm" class="waiting-list-final-cta__button | button-lg button-monochrome"> Join
             the Waiting List </AtomsButton>
         </div>

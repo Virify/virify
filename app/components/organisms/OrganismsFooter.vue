@@ -69,7 +69,7 @@
       <div class="o-footer__bottom">
         <!-- Friendlier, Monzo-like disclaimer with protective legal backup on hover -->
         <p class="o-footer__copyright | body-xs">
-          We like to help — these guides are friendly tips, not legal advice.
+          We like to help — our guides are friendly tips, not legal advice.
         </p>
         <p class="o-footer__copyright | body-xs" title="Our guides are for informational purposes only and do not constitute legal or professional advice.">
           © {{ currentYear }} Virify Ltd. All rights reserved. Company No. 16255324.
