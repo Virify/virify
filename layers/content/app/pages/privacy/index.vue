@@ -35,7 +35,23 @@ definePageMeta({
 
 useSeoMeta({
   title: 'Privacy Policy — Virify',
-  description: 'How Virify collects, uses and protects your information.',
+  description: 'How Virify collects, uses and protects your information when using our UK property marketplace platform.',
+  robots: 'index, follow',
+  
+  ogTitle: 'Privacy Policy — Virify',
+  ogDescription: 'How Virify collects, uses and protects your information.',
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk/privacy',
+  
+  twitterCard: 'summary',
+  twitterTitle: 'Privacy Policy — Virify',
+  twitterDescription: 'How Virify collects, uses and protects your information.',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://virify.co.uk/privacy' }
+  ],
 })
 </script>
 

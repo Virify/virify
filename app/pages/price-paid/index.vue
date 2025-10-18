@@ -195,6 +195,29 @@ function formatTimelineItems(sales: any[]) {
     date: sale.transfer_date,
   }));
 }
+
+// SEO Meta
+useSeoMeta({
+  title: 'UK Price Paid Data - Free Property Sale History Search | Virify',
+  description: 'Search real property sale prices from HM Land Registry. View complete sale histories, market trends, and actual sold prices by postcode. Free UK property price data.',
+  keywords: 'UK price paid data, property sale prices, HM Land Registry, house sale history, property sold prices, UK postcode search, land registry data',
+  robots: 'index, follow',
+  
+  ogTitle: 'UK Price Paid Data - Free Property Sale History Search | Virify',
+  ogDescription: 'Search real property sale prices from HM Land Registry. View complete sale histories and market trends by postcode.',
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk/price-paid',
+  
+  twitterCard: 'summary',
+  twitterTitle: 'UK Price Paid Data | Virify',
+  twitterDescription: 'Free property sale price search using HM Land Registry data',
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://virify.co.uk/price-paid' }
+  ],
+});
 </script>
 <style lang="scss" scoped>
 .price-paid-page {
