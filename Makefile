@@ -54,16 +54,17 @@ exec:
 exec-db:
 		${COMPOSE_SERVICE} exec database /bin/sh
 
+start:
+		${COMPOSE_SERVICE} start
+
+stop:
+		${COMPOSE_SERVICE} stop
+
 down:
 		${COMPOSE_SERVICE} down
 
 # ----------
 # Aliases
 # ----------
-
-start:
+build:
 		@make up
-		@make exec
-
-stop:
-		@make down
