@@ -80,24 +80,8 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
    * Adds multiple markers to the map instance for a specific feature
    * @deprecated this method does not appear to be used
    */
-  function addMarkersForFeature(map: ExtendedMapTilerMap, markersData: MapMarker[], featureId: string): Marker[] {
-    const instance = findMapInstance(map, mapCache);
-    if (!instance) {
-      console.error("[Map] Instance not found");
-      return [];
-    }
-
-    const addedSdkMarkers: Marker[] = [];
-    for (const markerData of markersData) {
-      const newSdkMarker = _createAndAddSdkMarker(map, markerData, instance);
-      addedSdkMarkers.push(newSdkMarker);
-    }
-
-    // Store the markers for this feature
-    instance.featureMarkers.set(featureId, addedSdkMarkers);
-
-    console.log(`[Map] Added ${addedSdkMarkers.length} markers for feature ${featureId}`);
-    return addedSdkMarkers;
+  function addMarkersForFeature(): Marker[] {
+    return [];
   }
 
   /**
