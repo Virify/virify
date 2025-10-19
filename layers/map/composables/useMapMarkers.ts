@@ -268,7 +268,9 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
       })
 
       // Clear any existing markers
-      clearMarkers(map)
+      if (unclusteredMarkers.length) {
+        clearMarkers(map)
+      }
 
       // Get a list of visible IDs
       // We need to do it this way as the markers added via the
@@ -314,13 +316,19 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
   function clearClusters(map: ExtendedMapTilerMap): void {
     const instance = findMapInstance(map, mapCache);
 
-    if (instance) {
-      instance.map.removeLayer('clusters')
-      instance.map.removeLayer('cluster-count')
-      instance.map.removeLayer('unclustered-count')
+    if (!instance) return
 
-      console.log('Map] Clusters removed from map')
-    }
+    // Get each layer for map
+    const clusters = instance.map.getLayer('clusters')
+    const clusterCount = instance.map.getLayer('cluster-count')
+    const unclusteredCount = instance.map.getLayer('unclustered-count')
+
+    // Remove layer if it exists
+    if (clusters) instance.map.removeLayer('clusters')
+    if (clusterCount) instance.map.removeLayer('cluster-count')
+    if (unclusteredCount) instance.map.removeLayer('unclustered-count')
+
+    console.log('Map] Clusters removed from map')
   }
 
   /**

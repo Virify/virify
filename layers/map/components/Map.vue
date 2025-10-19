@@ -244,6 +244,7 @@ function updateMarkers() {
 
   const { markers = [], listingView } = props
 
+  // Remove any existing markers
   clearMarkers(map.value, true);
 
   // If no listing view, add any number of markers provided
