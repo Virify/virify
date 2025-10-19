@@ -13,7 +13,8 @@ export function useMap() {
     addMarkers,
     addMarkersForFeature,
     clearMarkers,
-    clearMarkersForFeature
+    clearMarkersForFeature,
+    clearClusters
   } = useMapMarkers(mapCache);
 
   const {
@@ -54,6 +55,7 @@ export function useMap() {
     addMarker,
     clearMarkers,
     clearMarkersForFeature,
+    clearClusters,
     addMarkersForFeature,
     
     // Drawing functionality

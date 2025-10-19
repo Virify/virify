@@ -4,7 +4,7 @@
     <!-- Map Section on its own row -->
     <div class="o-listing-section-location__map-container">
       <Map v-if="lat && lon" ref="mapRef" :center="[lon, lat]" :zoom="12" :interactive="false" :markers="[mapMarker]"
-        class="o-listing-section-location__map" />
+        :listing-view="true" class="o-listing-section-location__map" />
     </div>
 
     <div class="o-listing-section-location__amenities-section">
