@@ -163,8 +163,6 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
 
     // Add any missing layers
     if (!map.getLayer('clusters')) {
-      console.log('Adding clusters layer')
-
       map.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -196,8 +194,6 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     }
 
     if (!map.getLayer('cluster-count')) {
-      console.log('Adding cluster-count layer')
-
       map.addLayer({
         id: 'cluster-count',
         type: 'symbol',
@@ -212,8 +208,6 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     }
 
     if (!map.getLayer('unclustered-count')) {
-      console.log('Adding unclustered-count layer')
-
       map.addLayer({
         id: 'unclustered-count',
         type: 'circle',
@@ -262,15 +256,19 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
 
     // Function to get and add unclustered markers
     const _addUnClusteredMarkers = useDebounceFn(() => {
+      const hasClusters = map.queryRenderedFeatures(null, {
+        layers: ['unclustered-count', 'clusters']
+      })
+
+      // If clusters already exist, clear any markers present
+      if (hasClusters?.length) {
+        clearMarkers(map)
+      }
+
       // Get a list of visible markers
       const unclusteredMarkers = map.queryRenderedFeatures(null, {
         layers: ['unclustered-count']
       })
-
-      // Clear any existing markers
-      if (unclusteredMarkers.length) {
-        clearMarkers(map)
-      }
 
       // Get a list of visible IDs
       // We need to do it this way as the markers added via the
