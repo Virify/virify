@@ -33,19 +33,15 @@ definePageMeta({
   alias: ['/terms-and-conditions', '/legal/terms']
 })
 
+// SEO - Nuxt SEO auto-generates WebPage schema from this
 useSeoMeta({
   title: 'Terms & Conditions — Virify',
   description: 'The terms that govern your use of Virify UK property marketplace platform.',
-  robots: 'index, follow',
-  
   ogTitle: 'Terms & Conditions — Virify',
   ogDescription: 'The terms that govern your use of Virify.',
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/terms',
-  
   twitterCard: 'summary',
-  twitterTitle: 'Terms & Conditions — Virify',
-  twitterDescription: 'The terms that govern your use of Virify.',
 })
 
 useHead({
@@ -53,6 +49,17 @@ useHead({
     { rel: 'canonical', href: 'https://virify.co.uk/terms' }
   ],
 })
+
+// Custom breadcrumbs
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Terms & Conditions', item: 'https://virify.co.uk/terms' }
+    ]
+  }
+])
 </script>
 
 <style lang="scss">

@@ -34,7 +34,7 @@ const { data: categories } = await useCategories();
 
 const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }]);
 
-// SEO metadata
+// SEO - Nuxt SEO auto-generates CollectionPage schema from this
 const seoDescription = computed(() => {
   const categoryNames = categories.value?.map(cat => cat.title).join(', ') || '';
   const baseDescription = 'Complete guides for buying, selling, and renting property in the UK. Expert advice on property search, negotiations, and using AI-powered tools.';
@@ -47,16 +47,11 @@ useSeoMeta({
   title: 'Property Guides UK - Buying, Selling & Renting Advice | Virify',
   description: seoDescription,
   keywords: 'property buying guide UK, how to sell house, property search tips, rental guide, house buying advice, estate agent alternative guide',
-  robots: 'index, follow',
-  
   ogTitle: 'Property Guides UK - Buying, Selling & Renting Advice | Virify',
   ogDescription: seoDescription,
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/guides',
-  
-  twitterCard: 'summary',
-  twitterTitle: 'Property Guides UK | Virify',
-  twitterDescription: seoDescription,
+  twitterCard: 'summary_large_image',
 });
 
 useHead({
@@ -64,6 +59,18 @@ useHead({
     { rel: 'canonical', href: 'https://virify.co.uk/guides' }
   ],
 });
+
+// Custom breadcrumbs
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://virify.co.uk/guides' }
+    ]
+  }
+]);
+
 </script>
 
 <style scoped lang="scss">

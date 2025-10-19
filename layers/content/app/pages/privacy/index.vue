@@ -33,19 +33,15 @@ definePageMeta({
   alias: ['/privacy-policy', '/legal/privacy']
 })
 
+// SEO - Nuxt SEO auto-generates WebPage schema from this
 useSeoMeta({
   title: 'Privacy Policy — Virify',
   description: 'How Virify collects, uses and protects your information when using our UK property marketplace platform.',
-  robots: 'index, follow',
-  
   ogTitle: 'Privacy Policy — Virify',
   ogDescription: 'How Virify collects, uses and protects your information.',
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/privacy',
-  
   twitterCard: 'summary',
-  twitterTitle: 'Privacy Policy — Virify',
-  twitterDescription: 'How Virify collects, uses and protects your information.',
 })
 
 useHead({
@@ -53,6 +49,17 @@ useHead({
     { rel: 'canonical', href: 'https://virify.co.uk/privacy' }
   ],
 })
+
+// Custom breadcrumbs
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Privacy Policy', item: 'https://virify.co.uk/privacy' }
+    ]
+  }
+])
 </script>
 
 <style lang="scss">

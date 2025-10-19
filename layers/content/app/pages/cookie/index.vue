@@ -33,10 +33,33 @@ definePageMeta({
   alias: ['/cookie-policy', '/legal/cookie', '/cookies']
 })
 
+// SEO - Nuxt SEO auto-generates WebPage schema from this
 useSeoMeta({
   title: 'Cookie Policy — Virify',
-  description: 'How Virify uses cookies and similar technologies.',
+  description: 'How Virify uses cookies and similar technologies on our UK property marketplace platform.',
+  ogTitle: 'Cookie Policy — Virify',
+  ogDescription: 'How Virify uses cookies and similar technologies.',
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk/cookie',
+  twitterCard: 'summary',
 })
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://virify.co.uk/cookie' }
+  ],
+})
+
+// Custom breadcrumbs
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Cookie Policy', item: 'https://virify.co.uk/cookie' }
+    ]
+  }
+])
 </script>
 
 <style lang="scss">

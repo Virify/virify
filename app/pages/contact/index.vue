@@ -247,21 +247,16 @@ async function submitForm() {
   }
 }
 
-// SEO Meta
+// SEO - Nuxt SEO auto-generates ContactPage schema from this
 useSeoMeta({
   title: 'Contact Virify - Get in Touch | The UK\'s Open Property Marketplace',
   description: 'Contact Virify for partnership opportunities, platform enquiries, or questions about the UK\'s first open property marketplace. We typically respond within 24 hours.',
   keywords: 'contact Virify, property marketplace contact, partnership opportunities, property platform enquiries, estate agent alternative, open property marketplace UK',
-  robots: 'index, follow',
-  
   ogTitle: 'Contact Virify - Get in Touch',
   ogDescription: 'Contact us about partnerships, platform questions, or general enquiries about Virify\'s open property marketplace.',
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/contact',
-  
   twitterCard: 'summary',
-  twitterTitle: 'Contact Virify',
-  twitterDescription: 'Get in touch about partnerships, questions, or enquiries about the UK\'s open property marketplace.',
 });
 
 useHead({
@@ -276,6 +271,18 @@ useHead({
     }
   ]
 });
+
+// Custom breadcrumbs
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Contact', item: 'https://virify.co.uk/contact' }
+    ]
+  }
+]);
+
 </script>
 
 <style lang="scss" scoped>
