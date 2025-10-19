@@ -66,7 +66,7 @@ export const generateBathrooms = (totalFloors: number): { count: number; data: P
     count: bathroomCount,
     data: Array.from({ length: bathroomCount }, (_, i) => ({
       roomNumber: i + 1,
-      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
+      floor: faker.number.int({ min: 1, max: totalFloors }),
       name: faker.helpers.arrayElement(bathroomNames),
       description: faker.word.words(10),
       enSuite: faker.datatype.boolean(),
@@ -99,7 +99,7 @@ export const generateBedrooms = (totalFloors: number): { count: number; data: Pr
     data: Array.from({ length: bedroomCount }, (_, i) => ({
       roomNumber: i + 1,
       name: faker.helpers.arrayElement(bedroomNames),
-      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
+      floor: faker.number.int({ min: 1, max: totalFloors }),
       bed: [faker.helpers.arrayElement(Object.values(BedSizeType))],
       description: faker.word.words(10),
       enSuite: faker.datatype.boolean(),
@@ -127,7 +127,7 @@ export const generateKitchen = (totalFloors: number): { count: number, data: Pri
     count: kitchenCount,
     data: Array.from({ length: kitchenCount }, () => ({
       roomNumber: faker.number.int({ min: 1, max: 3 }),
-      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
+      floor: faker.number.int({ min: 1, max: totalFloors }),
       name: faker.word.words(2),
       modern: faker.datatype.boolean(),
       openPlan: faker.datatype.boolean(),
@@ -154,7 +154,7 @@ export const generateReception = (totalFloors: number): { count: number; data: P
     count: receptionCount,
     data: Array.from({ length: receptionCount }, (_, i) => ({
       roomNumber: i + 1,
-      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
+      floor: faker.number.int({ min: 1, max: totalFloors }),
       name: faker.word.words(2),
       type: faker.helpers.arrayElement(Object.values(ReceptionType)),
       description: faker.word.words(10),
