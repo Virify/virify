@@ -6,7 +6,7 @@ import type { Prisma } from "~~/layers/database/server/database/prisma/generated
 export async function getUserOwnedListingsWithAnalytics(
   userId: number,
   opts?: { 
-    status?: "all" | "active" | "inactive" | "draft"
+    status?: "all" | "active" | "inactive" | "draft" | "archived"
     search?: string
     take?: number
     skip?: number
@@ -21,14 +21,22 @@ export async function getUserOwnedListingsWithAnalytics(
   switch (status) {
     case "active":
       where.published = true
+      where.archived = false
       break
     case "inactive":
-      where.AND = [{ published: false }, { NOT: { publishedAt: null } }]
+      where.AND = [{ published: false }, { NOT: { publishedAt: null } }, { archived: false }]
       break
     case "draft":
       where.published = false
       where.publishedAt = null
+      where.archived = false
       break
+    case "archived":
+      where.archived = true
+      break
+    default:
+      // "all" - show everything except archived
+      where.archived = false
   }
 
   // Apply search filters
@@ -52,12 +60,13 @@ export async function getUserOwnedListingsWithAnalytics(
       id: true,
       published: true,
       publishedAt: true,
+      archived: true,
       updatedAt: true,
     },
     take,
     skip,
     orderBy: { updatedAt: sort === 'old' ? 'asc' : 'desc' },
-  }) as (ListingCardType & { published: boolean; publishedAt: Date | null })[]
+  }) as (ListingCardType & { published: boolean; publishedAt: Date | null; archived: boolean })[]
 
   if (listings.length === 0) return []
 
@@ -101,6 +110,7 @@ export async function getUserOwnedListingsWithAnalytics(
       enquiriesCount: enquiriesMap.get(listing.id) ?? 0,
     },
     published: listing.published,
+    archived: listing.archived,
     isDraft: !listing.published && !listing.publishedAt,
   }))
 }
@@ -143,12 +153,42 @@ export async function toggleListingPublished(userId: number, listingId: number, 
   const wasDraft = !listing.published && !listing.publishedAt
   const isDraft = !result.published && !result.publishedAt
   
-  // If draft status changed, send aggregate update
-  if (wasDraft !== isDraft) {
-    const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer()
-    const aggregateMessage = createAggregateUpdateMessage("listings", "update", userId)
-    sendMessage(aggregateMessage)
+  return { result, wasDraft, isDraft }
+}
+
+export async function archiveListing(userId: number, listingId: number) {
+  console.log(`[archiveListing] Starting archive for listing ${listingId}, user ${userId}`)
+  
+  const listing = await prisma.listing.findFirst({ 
+    where: { id: listingId, userId } 
+  })
+  
+  if (!listing) {
+    console.error(`[archiveListing] Listing ${listingId} not found for user ${userId}`)
+    throw createError({ statusCode: 404, statusMessage: "Listing not found" })
   }
+
+  console.log(`[archiveListing] Found listing ${listingId}, current state:`, {
+    published: listing.published,
+    archived: listing.archived,
+  })
+
+  const result = await prisma.listing.update({
+    where: { id: listingId },
+    data: {
+      published: false,
+      archived: true,
+      archivedAt: new Date(),
+    },
+    select: {
+      id: true,
+      published: true,
+      archived: true,
+      archivedAt: true,
+    },
+  })
+
+  console.log(`[archiveListing] Successfully updated listing ${listingId}:`, result)
 
   return result
 }

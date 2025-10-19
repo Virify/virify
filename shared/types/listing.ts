@@ -1,6 +1,7 @@
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 import type { SaleAvailabilityStatus, RentalAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
 import type { MapMarker } from "~~/shared/types/map";
+import type { DraftListingWithFullPayload } from "~~/shared/types/draft";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {
@@ -232,3 +233,8 @@ export type ListingWithSimilar = {
   listing: ListingWithFullProperty;
   similarListings: SummaryCardData[];
 };
+
+/**
+ * Union type for editing - either a draft or a live listing
+ */
+export type EditableListing = DraftListingWithFullPayload | ListingWithFullProperty;

@@ -1,6 +1,6 @@
 import { createSharedComposable, useDebounceFn } from "@vueuse/core";
 
-type StatusFilter = "all" | "active" | "inactive" | "draft";
+type StatusFilter = "all" | "active" | "inactive" | "draft" | "archived";
 type SortBy = "new" | "old" | "premium" | "featured" | "basic";
 
 export const useMyListings = createSharedComposable(() => {
@@ -124,6 +124,26 @@ export const useMyListings = createSharedComposable(() => {
     return setPublished(listingId, !current)
   }
 
+  async function archiveListing(listingId: number) {
+    try {
+      await $fetch(`/api/user/my-listings/${listingId}`, { 
+        method: "DELETE"
+      })
+      
+      // Remove from local state
+      const listingIndex = listings.value.findIndex((listing) => listing.id === listingId)
+      if (listingIndex !== -1) {
+        listings.value.splice(listingIndex, 1)
+      }
+
+      showToast("Listing archived successfully", { type: "success" })
+    } catch (error) {
+      console.error("Failed to archive listing", error)
+      showToast("Failed to archive listing", { type: "error" })
+      throw error
+    }
+  }
+
   function loadMore() {
     return fetchPage(false)
   }
@@ -186,6 +206,7 @@ export const useMyListings = createSharedComposable(() => {
     sortBy,
     setPublished,
     togglePublished,
+    archiveListing,
     getRecentListings,
     getAllListingsForAnalytics,
   };

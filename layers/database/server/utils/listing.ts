@@ -56,6 +56,40 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
 }
 
 /**
+ * Get a listing by ID for editing (no published filter, includes all property details)
+ * Only returns the listing if it belongs to the specified user
+ *
+ * @param id Listing ID
+ * @param userId User ID (for authorization)
+ * @returns ListingWithFullProperty or null if not found or unauthorized
+ */
+export async function getListingByIdForEdit(id: number, userId: number): Promise<ListingWithFullProperty | null> {
+  return await prisma.listing.findFirst({
+    where: {
+      id,
+      userId,
+    },
+    include: {
+      rentalListing: true,
+      saleListing: true,
+      property: {
+        include: {
+          ...propertyInclude,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          createdAt: true,
+        },
+      },
+    },
+  });
+}
+
+/**
  * Get featured listings for a card
  *
  * @returns ListingCardType[]

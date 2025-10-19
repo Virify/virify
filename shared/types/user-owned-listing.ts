@@ -8,6 +8,7 @@ export type OwnedListingAnalytics = {
 
 export type OwnedListingWithAnalytics = ListingCardType & {
   published: boolean
+  archived: boolean
   analytics: OwnedListingAnalytics
   isDraft: boolean
 }

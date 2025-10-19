@@ -49,9 +49,10 @@ export const generateAccessability = (): Prisma.AccessibilityCreateWithoutProper
 /**
  * Generate a random number of bathrooms
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of bathrooms
  */
-export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreateWithoutPropertyInput[] } => {
+export const generateBathrooms = (totalFloors: number): { count: number; data: Prisma.BathroomCreateWithoutPropertyInput[] } => {
   const bathroomCount = faker.number.int({ min: 1, max: 3 });
   const bathroomNames = [
     'Master Bathroom',
@@ -65,7 +66,7 @@ export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreat
     count: bathroomCount,
     data: Array.from({ length: bathroomCount }, (_, i) => ({
       roomNumber: i + 1,
-      floor: faker.number.int({ min: 1, max: 3 }),
+      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
       name: faker.helpers.arrayElement(bathroomNames),
       description: faker.word.words(10),
       enSuite: faker.datatype.boolean(),
@@ -80,9 +81,10 @@ export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreat
 /**
  * Generate a random number of bedrooms
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of bedrooms
  */
-export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateWithoutPropertyInput[] } => {
+export const generateBedrooms = (totalFloors: number): { count: number; data: Prisma.BedroomCreateWithoutPropertyInput[] } => {
   const bedroomCount = faker.number.int({ min: 1, max: 5 });
   const bedroomNames = [
     'Master Bedroom',
@@ -97,7 +99,7 @@ export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateW
     data: Array.from({ length: bedroomCount }, (_, i) => ({
       roomNumber: i + 1,
       name: faker.helpers.arrayElement(bedroomNames),
-      floor: faker.number.int({ min: 0, max: 3 }),
+      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
       bed: [faker.helpers.arrayElement(Object.values(BedSizeType))],
       description: faker.word.words(10),
       enSuite: faker.datatype.boolean(),
@@ -116,15 +118,16 @@ export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateW
 /**
  * Generate random Kitchen object
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns KitchenWithoutPropertyInput
  */
-export const generateKitchen = (): { count: number, data: Prisma.KitchenCreateWithoutPropertyInput[] } => {
+export const generateKitchen = (totalFloors: number): { count: number, data: Prisma.KitchenCreateWithoutPropertyInput[] } => {
   const kitchenCount = faker.number.int({ min: 1, max: 3 });
   return {
     count: kitchenCount,
     data: Array.from({ length: kitchenCount }, () => ({
       roomNumber: faker.number.int({ min: 1, max: 3 }),
-      floor: faker.number.int({ min: 0, max: 3 }),
+      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
       name: faker.word.words(2),
       modern: faker.datatype.boolean(),
       openPlan: faker.datatype.boolean(),
@@ -142,15 +145,16 @@ export const generateKitchen = (): { count: number, data: Prisma.KitchenCreateWi
 /**
  * Generate a random number of reception objects
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of Reception objects
  */
-export const generateReception = (): { count: number; data: Prisma.ReceptionCreateWithoutPropertyInput[] } => {
+export const generateReception = (totalFloors: number): { count: number; data: Prisma.ReceptionCreateWithoutPropertyInput[] } => {
   const receptionCount = faker.number.int({ min: 1, max: 3 });
   return {
     count: receptionCount,
     data: Array.from({ length: receptionCount }, (_, i) => ({
       roomNumber: i + 1,
-      floor: faker.number.int({ min: 0, max: 3 }),
+      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
       name: faker.word.words(2),
       type: faker.helpers.arrayElement(Object.values(ReceptionType)),
       description: faker.word.words(10),
@@ -177,15 +181,16 @@ export const generateReception = (): { count: number; data: Prisma.ReceptionCrea
 /**
  * Generate a random number of reception objects
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of Reception objects
  */
-export const generateOtherRooms = (): { count: number; data: Prisma.OtherRoomCreateWithoutPropertyInput[] } => {
+export const generateOtherRooms = (totalFloors: number): { count: number; data: Prisma.OtherRoomCreateWithoutPropertyInput[] } => {
   const otherRoomCount = faker.number.int({ min: 1, max: 3 });
   return {
     count: otherRoomCount,
     data: Array.from({ length: otherRoomCount }, (_, i) => ({
       roomNumber: i + 1,
-      floor: faker.number.int({ min: 0, max: 3 }),
+      floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
       name: faker.word.words(2),
       type: faker.helpers.arrayElement(Object.values(OtherRoomType)),
       description: faker.word.words(10),
@@ -777,18 +782,21 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   const classificationOptions = typeToClassificationMap[typeId];
   const classificationId = faker.helpers.arrayElement(classificationOptions!);
 
-  const { count: bedroomCount, data: bedrooms } = generateBedrooms();
-  const { count: bathroomCount, data: bathrooms } = generateBathrooms();
-  const { count: receptionCount, data: receptions } = generateReception();
-  const { count: otherRoomCount, data: otherRooms } = generateOtherRooms();
-  const { count: kitchenCount, data: kitchens } = generateKitchen();
+  // Generate totalFloors first so we can constrain room floor numbers
+  const totalFloors = faker.number.int({ min: 1, max: 5 });
+
+  const { count: bedroomCount, data: bedrooms } = generateBedrooms(totalFloors);
+  const { count: bathroomCount, data: bathrooms } = generateBathrooms(totalFloors);
+  const { count: receptionCount, data: receptions } = generateReception(totalFloors);
+  const { count: otherRoomCount, data: otherRooms } = generateOtherRooms(totalFloors);
+  const { count: kitchenCount, data: kitchens } = generateKitchen(totalFloors);
 
   // First create the property with all features
   const propertyWithFeatures = await prisma.property.create({
     data: {
       description: faker.word.words(20),
       value: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
-      totalFloors: faker.number.int({ min: 1, max: 5 }),
+      totalFloors,
       size: faker.number.int({ min: 50, max: 500 }),
       yearBuilt: faker.date.past().getFullYear().toString(),
       chainFree: faker.datatype.boolean(),

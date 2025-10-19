@@ -25,6 +25,8 @@ model Listing {
   ListingView          ListingView[]
   conversations        Conversation[]
   UserNote             UserNote[]
+  archived             Boolean                @default(false)
+  archivedAt           DateTime?
 
   @@index([userId])
   @@index([propertyId])

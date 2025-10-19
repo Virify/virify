@@ -5,7 +5,7 @@
       <div class="p-create-listing">
         <p v-if="!draftListings?.length" class="body-sm">No draft listings available.</p>
         <div v-else class="p-create-listing__grid">
-          <MoleculesDraftListingCard
+          <MoleculesListingListingCard
             v-for="draft in draftListings"
             :key="draft.id"
             :draft="draft"
@@ -29,7 +29,7 @@ definePageMeta({
   layout: "account",
 });
 
-const { draftListings, draftListingsPending, deleteDraftListing, isDraftDeleting, refreshDraftListings } = useDraftListing();
+const { draftListings, draftListingsPending, deleteDraftListing, isDraftDeleting, refreshDraftListings } = useListingEdit();
 const { showToast } = useToast();
 
 const publishingDrafts = ref<Set<number>>(new Set());

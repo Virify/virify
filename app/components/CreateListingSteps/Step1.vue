@@ -11,7 +11,7 @@
     @submit="submitForm"
   >
     <!-- first parent select -->
-    <MoleculesDraftFormSection
+    <MoleculesListingFormSection
       v-if="!draft.saleListing && !draft.rentalListing"
       title="Sale or Rental"
       :required="true"
@@ -20,7 +20,7 @@
         <p>Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs.</p>
       </template>
       
-      <OrganismsDraftFormRadioGroup 
+      <OrganismsListingFormRadioGroup 
         title="What type of listing do you want to create?" 
         :options="stepOneListingOptions" 
         v-model="stepOneData.selectedType"
@@ -28,12 +28,12 @@
         name="listing-type" 
         :required="true" 
       />
-    </MoleculesDraftFormSection>
+    </MoleculesListingFormSection>
 
     <AtomsDivider v-if="stepOneData.selectedType && !draft.saleListing && !draft.rentalListing" />
 
     <!-- SALE -->
-    <MoleculesDraftFormSection
+    <MoleculesListingFormSection
       v-if="isSale" 
       title="Property Tenure"
       :required="true"
@@ -44,18 +44,18 @@
         <p><strong>Commonhold:</strong> Typically used on multi-occupancy developments. You own your part of the property on a freehold basis, but an association (or other entity) owns and manages the common parts.</p>
       </template>
       
-      <OrganismsDraftFormRadioGroup 
+      <OrganismsListingFormRadioGroup 
         title="Please confirm property tenure"
         :options="saleListingTenureOptions"
         v-model="stepOneData.saleListing.tenureType" 
         name="sale-tenure-type"
         :required="true"
       />
-    </MoleculesDraftFormSection>
+    </MoleculesListingFormSection>
 
     <AtomsDivider v-if="isSale"/>
 
-    <MoleculesDraftFormSection
+    <MoleculesListingFormSection
       v-if="isSale" 
       title="Chain Status"
     >
@@ -64,17 +64,17 @@
         <p><strong>Chain:</strong> The sale is dependant on you moving out and to another property.</p>
       </template>
       
-      <OrganismsDraftFormRadioGroup 
+      <OrganismsListingFormRadioGroup 
         title="Are you part of a chain?"
         :options="saleListingChainOptions" 
         v-model="stepOneData.saleListing.chain" 
         name="sale-chain" 
       />
-    </MoleculesDraftFormSection>
+    </MoleculesListingFormSection>
 
 
     <!-- RENTAL -->
-    <MoleculesDraftFormSection
+    <MoleculesListingFormSection
       v-if="isRent" 
       title="Bills Included"
       :required="true"
@@ -84,18 +84,18 @@
         <p>If so, it's best to list which bills are included within your Property Description.</p>
       </template>
       
-      <OrganismsDraftFormRadioGroup 
+      <OrganismsListingFormRadioGroup 
         title="Are bills included in the rent?"
         :options="rentalBillsIncludedOptions" 
         v-model="stepOneData.rentalListing.isBillsIncluded"
         name="rental-bills-included" 
         :required="true" 
       />
-    </MoleculesDraftFormSection>
+    </MoleculesListingFormSection>
 
     <AtomsDivider v-if="isRent"/>
 
-    <MoleculesDraftFormSection
+    <MoleculesListingFormSection
       v-if="isRent" 
       title="Furnished Status"
       :required="true"
@@ -106,22 +106,23 @@
         <p><strong>Unfurnished:</strong> The property will generally not include appliances or furniture.</p>
       </template>
       
-      <OrganismsDraftFormRadioGroup 
+      <OrganismsListingFormRadioGroup 
         title="What is the furnished status of the listing?"
         :options="rentalFurnishedStatusOptions" 
         v-model="stepOneData.rentalListing.furnishedStatus"
         name="rental-furnished-status" 
         :required="true" 
       />
-    </MoleculesDraftFormSection>
+    </MoleculesListingFormSection>
   </CreateListingStepsStepLayout>
 </template>
 
 <script setup lang="ts">
 import type { SaleListingCreateWithoutListingInput, RentalListingCreateWithoutListingInput } from '~~/layers/database/server/database/prisma/generated/models';
+import type { EditableListing } from '~~/shared/types/listing';
 
 const props = defineProps<{
-  draft: DraftListingWithFullPayload;
+  draft: EditableListing;
   errorMessage?: string;
 }>()
 
@@ -152,7 +153,7 @@ const {
   buttonText,
   resetForm,
   submitForm: handleSubmit
-} = useDraftStepForm(stepConfig, props.draft);
+} = useListingStepForm(stepConfig, props.draft);
 
 // Computed properties for template conditions
 const isSale = computed(() => stepOneData.value.selectedType === 'sale');
