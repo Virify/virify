@@ -20,8 +20,8 @@ return props.variant === 'sent' ? 'You' : props.user;
 
 <style lang="scss" scoped>
 .conversation-bubble {
-  background: var(--secondary-500);
-  color: var(--monochrome-100);
+  background: var(--blue-400);
+  color: var(--monochrome-900);
   padding: var(--size-12) var(--size-16);
   border-radius: var(--border-radius-lg);
   border-bottom-left-radius: 0;
@@ -40,6 +40,7 @@ return props.variant === 'sent' ? 'You' : props.user;
 
   .bubble-user {
     font-style: italic;
+    color: var(--monochrome-600);
   }
 
   .bubble-content {

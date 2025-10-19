@@ -22,6 +22,8 @@ defineProps<{
   justify-content: space-between;
   align-items: center;
   gap: var(--size-8);
+  color: var(--monochrome-600);
+  font-style: italic;
 
   .status-time {
     flex-shrink: 0;
@@ -31,6 +33,7 @@ defineProps<{
     display: flex;
     align-items: center;
     gap: var(--size-4);
+    color: inherit;
   }
 }
 </style>

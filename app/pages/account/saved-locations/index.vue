@@ -1,7 +1,7 @@
 <template>
   <div class="saved-locations-page">
    <MoleculesAccountHeader 
-      :title="'My Favourites'"
+      :title="'My Favourite Locations'"
     />
 
     <div class="saved-locations-page__grid">
@@ -14,7 +14,7 @@
               </div>
               <p class="saved-locations-list__name | body-sm">{{ entry.name }}</p>
               <div class="saved-locations-list__actions">
-                <button class="button button-xs button-secondary" @click="openEditDialog(entry)">Edit</button>
+                <button class="button button-xs button-tertiary" @click="openEditDialog(entry)">Edit</button>
               </div>
               <p class="saved-locations-list__address | body-xs faded-text">{{ entry.location }}</p>
             </li>
@@ -116,8 +116,8 @@ function openEditDialog(entry?: any) {
       'icon address address';
     column-gap: var(--size-12);
     align-items: start;
-    background: var(--background-100);
-    border: 1px solid var(--border-color-100);
+    background: var(--background-200);
+    border: 1px solid var(--border-color-200);
     border-radius: var(--border-radius-xl);
     padding: var(--size-16);
   }

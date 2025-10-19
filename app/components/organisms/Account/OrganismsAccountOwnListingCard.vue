@@ -126,7 +126,7 @@ const onTogglePublish = () => {
 
 .own-card {
   width: 100%;
-  background: var(--background-100);
+  background: var(--background-200);
   border: 1px solid var(--monochrome-500);
   border-radius: var(--border-radius-xl);
   overflow: hidden;
@@ -371,6 +371,11 @@ const onTogglePublish = () => {
     .own-card__pill--active {
       color: var(--monochrome-900);
     }
+
+    /* Make toggle darker for premium tier */
+    input:checked + .slider {
+      background-color: var(--blue-500);
+    }
   }
 
   &.own-card--featured {
@@ -388,6 +393,11 @@ const onTogglePublish = () => {
     .button {
       background-color: var(--tier-color);
       border-color: var(--tier-color);
+    }
+
+    /* Make toggle more visible for basic tier */
+    input:checked + .slider {
+      background-color: var(--monochrome-100);
     }
   }
 
@@ -419,7 +429,7 @@ const onTogglePublish = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--tier-color, var(--secondary-400));
+  background-color: var(--monochrome-500);
   transition: 0.2s;
   border-radius: 20px;
 }
