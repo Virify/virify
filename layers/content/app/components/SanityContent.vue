@@ -45,10 +45,12 @@ const customComponents = {
       const srcRef = props.value?.asset?._ref || props.value?.asset?.url
       const width = props.value?.metadata?.dimensions?.width
       const height = props.value?.metadata?.dimensions?.height
+      const alt = props.value?.alt || props.value?.caption || 'Guide content image'
       return h('figure', { class: 'content-image' }, [
         h(NuxtImg, {
           provider: 'sanity',
           src: srcRef,
+          alt,
           width,
           height,
           loading: 'lazy',
