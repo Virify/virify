@@ -187,6 +187,7 @@
 
 <script setup lang="ts">
 import type { Garden } from '~~/layers/database/server/database/prisma/generated/client';
+
 const defaultGardenPosition = gardenPositionOptions[0]?.value ?? null;
 const defaultGardenFacing = gardenFacingOptions[0]?.value ?? null;
 
