@@ -20,6 +20,7 @@ export default defineEventHandler((event) => {
       '/api/sanity/',                // Sanity CMS content (guides, etc.)
       '/api/_auth/',                 // Nuxt Auth Utils endpoints
       '/api/price-paid/',            // Price Paid Data endpoints
+      '/api/__sitemap__/',           // Nuxt SEO sitemap generation
     ];
 
     // Check if the path is an API route

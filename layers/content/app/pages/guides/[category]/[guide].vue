@@ -54,33 +54,45 @@ const heroMeta = computed(() => {
   return items
 })
 
-// SEO metadata
+// SEO metadata - Nuxt SEO module handles schema.org automatically
 if (guide.value) {
   const seoTitle = guide.value.seo?.metaTitle || `${guide.value.title} | Virify`;
   const seoDescription = guide.value.seo?.metaDescription || guide.value.excerpt || '';
+  const guideUrl = `https://virify.co.uk/guides/${guide.value.category?.slug.current}/${guideSlug}`;
   
+  // SEO Meta tags - Nuxt SEO automatically generates WebPage/Article schema from this
   useSeoMeta({
     title: seoTitle,
     description: seoDescription,
-    robots: 'index, follow',
-    
     ogTitle: seoTitle,
     ogDescription: seoDescription,
     ogType: 'article',
-    ogUrl: `https://virify.co.uk/guides/${guide.value.category?.slug.current}/${guideSlug}`,
+    ogUrl: guideUrl,
     ogImage: guide.value.heroImage?.asset?.url,
-    
     twitterCard: 'summary_large_image',
-    twitterTitle: seoTitle,
-    twitterDescription: seoDescription,
-    twitterImage: guide.value.heroImage?.asset?.url,
+    articlePublishedTime: guide.value.publishedAt,
+    articleModifiedTime: guide.value.updatedAt || guide.value.publishedAt,
   });
 
+  // Canonical URL
   useHead({
     link: [
-      { rel: 'canonical', href: `https://virify.co.uk/guides/${guide.value.category?.slug.current}/${guideSlug}` }
+      { rel: 'canonical', href: guideUrl }
     ],
   });
+
+  // Custom schemas only - breadcrumbs (auto schema from useSeoMeta not sufficient)
+  useSchemaOrg([
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+        { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://virify.co.uk/guides' },
+        { '@type': 'ListItem', position: 3, name: guide.value.category?.title || '', item: `https://virify.co.uk/guides/${guide.value.category?.slug.current}` },
+        { '@type': 'ListItem', position: 4, name: guide.value.title, item: guideUrl }
+      ]
+    }
+  ]);
 }
 </script>
 

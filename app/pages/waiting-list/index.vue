@@ -253,21 +253,16 @@ function scrollToForm() {
   }
 }
 
-// SEO Meta
+// SEO - Nuxt SEO auto-generates WebPage schema from this
 useSeoMeta({
   title: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
   description: 'Get early access to Virify, an AI-powered property search with real data, map-based searching, and direct connections to sellers and landlords. Whether you\'re ready to market privately or an estate agent looking for a more cost-effective solution, Virify has you covered.',
   keywords: 'property portal, property sales, buy property, rent property, sell property, property marketplace UK, AI property search, sell without estate agent, private property listings, buy direct from owner, map-based property search, UK property platform, estate agent alternative',
-  robots: 'index, follow',
-  
   ogTitle: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
   ogDescription: 'Market privately, search with AI, and connect directly. Save time, cut costs, take control of your property journey.',
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/waiting-list',
-  
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Join Virify Waiting List - Open Property Marketplace',
-  twitterDescription: 'AI-powered search, real data, direct connections. The property platform you wish existed.',
 });
 
 useHead({
@@ -275,6 +270,18 @@ useHead({
     { rel: 'canonical', href: 'https://virify.co.uk/waiting-list' }
   ],
 });
+
+// Custom breadcrumbs
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Waiting List', item: 'https://virify.co.uk/waiting-list' }
+    ]
+  }
+]);
+
 </script>
 
 <style lang="scss" scoped>

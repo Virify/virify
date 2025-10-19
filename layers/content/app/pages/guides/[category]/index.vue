@@ -48,7 +48,7 @@ const image = computed(() => (category.value?.heroImage?.asset?._ref ? category.
 
 const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { label: category.value?.title || categorySlug }]);
 
-// SEO metadata
+// SEO metadata - Nuxt SEO auto-generates CollectionPage schema
 const seoTitle = computed(() => 
   category.value ? `${category.value.title} - Property Guides | Virify` : 'Category Not Found - Virify'
 );
@@ -57,26 +57,37 @@ const seoDescription = computed(() =>
   category.value?.description || 'Explore our property guides to help you navigate buying, selling, and renting in the UK.'
 );
 
+const categoryUrl = computed(() => `https://virify.co.uk/guides/${categorySlug}`);
+
+// Nuxt SEO auto-generates CollectionPage/WebPage schema from this
 useSeoMeta({
   title: seoTitle,
   description: seoDescription,
-  robots: 'index, follow',
-  
   ogTitle: seoTitle,
   ogDescription: seoDescription,
   ogType: 'website',
-  ogUrl: computed(() => `https://virify.co.uk/guides/${categorySlug}`),
-  
-  twitterCard: 'summary',
-  twitterTitle: seoTitle,
-  twitterDescription: seoDescription,
+  ogUrl: categoryUrl,
+  ogImage: computed(() => category.value?.heroImage?.asset?.url),
+  twitterCard: 'summary_large_image',
 });
 
 useHead({
   link: [
-    { rel: 'canonical', href: computed(() => `https://virify.co.uk/guides/${categorySlug}`) }
+    { rel: 'canonical', href: categoryUrl }
   ],
 });
+
+// Custom breadcrumbs - auto schema not sufficient
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://virify.co.uk/guides' },
+      { '@type': 'ListItem', position: 3, name: category.value?.title || categorySlug, item: categoryUrl.value }
+    ]
+  }
+]);
 </script>
 
 <style scoped lang="scss">
