@@ -1,4 +1,3 @@
-import type { EditableListing } from "~~/shared/types/listing";
 export const createInitialStepFourValues = (listing: EditableListing): StepFour => ({
   property: {
     address: {

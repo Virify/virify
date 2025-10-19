@@ -73,6 +73,7 @@ describe("Step5 Component", () => {
     it('emits updateStepData when form is submitted', async () => {
       const validDraft = {
         ...mockDraft,
+        completedSteps: [1, 2, 3, 4], // Steps 1-4 completed, but not Step 5
         property: {
           ...mockDraft.property,
           bedroomFeatures: [{

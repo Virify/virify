@@ -1,5 +1,3 @@
-import type { EditableListing } from "~~/shared/types/listing";
-
 /**
  * Utilities for Step Two of the listing creation process.
  */

@@ -3,7 +3,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import Step2 from "../../../../app/components/EditListingSteps/Step2.vue";
 
 // Mock the step-two utils module to avoid top-level $fetch calls
-vi.mock("~/utils/draft/step-two", () => ({
+vi.mock("~/utils/listing/step-two", () => ({
   propertyTypeSelectOptions: [
     { value: 1, key: "House", info: "House" },
     { value: 2, key: "Flat", info: "Flat" },
@@ -58,6 +58,7 @@ describe("Step2 Component", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       highestCompletedStep: 0,
+      completedSteps: [1], // Step 1 completed
     };
   });
 
@@ -71,7 +72,7 @@ describe("Step2 Component", () => {
 
     it("renders property type radio group", async () => {
       const wrapper = await mountSuspended(Step2, { props: { draft: mockDraft } });
-      const radioGroups = wrapper.findAllComponents({ name: "OrganismsDraftFormRadioGroup" });
+      const radioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
       const titles = radioGroups.map((r) => r.props("title"));
       expect(titles).toContain("What type of property are you listing?");
     });
@@ -87,21 +88,21 @@ describe("Step2 Component", () => {
         },
       };
       const wrapper = await mountSuspended(Step2, { props: { draft: draftWithType } });
-      const radioGroups = wrapper.findAllComponents({ name: "OrganismsDraftFormRadioGroup" });
+      const radioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
       const titles = radioGroups.map((r) => r.props("title"));
       expect(titles).toContain("What is the classification of the property?");
     });
 
     it("renders description text field", async () => {
       const wrapper = await mountSuspended(Step2, { props: { draft: mockDraft } });
-      const textGroups = wrapper.findAllComponents({ name: "OrganismsDraftFormTextGroup" });
+      const textGroups = wrapper.findAllComponents({ name: "OrganismsListingFormTextGroup" });
       const titles = textGroups.map((t) => t.props("title"));
       expect(titles).toContain("Please provide a short description of the property - your property features speak for themselves!");
     });
 
     it("renders total floors number field", async () => {
       const wrapper = await mountSuspended(Step2, { props: { draft: mockDraft } });
-      const numberGroups = wrapper.findAllComponents({ name: "OrganismsDraftFormNumberGroup" });
+      const numberGroups = wrapper.findAllComponents({ name: "OrganismsListingFormNumberGroup" });
       const titles = numberGroups.map((n) => n.props("title"));
       expect(titles).toContain("How many total floors does the property have (including the ground floor)?");
     });
@@ -137,6 +138,7 @@ describe("Step2 Component", () => {
     it("emits updateStepData when form is submitted with valid data", async () => {
       const validDraft = {
         ...mockDraft,
+        completedSteps: [1], // Step 1 completed, but not Step 2 - so needsCompletion = true for step 2
         property: {
           type: { id: 1, name: "House" },
           classification: { id: 1, key: "Detached" },

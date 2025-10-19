@@ -115,7 +115,6 @@
   </EditListingStepsStepLayout>
 </template>
 <script setup lang="ts">
-import type { EditableListing } from '~~/shared/types/listing';
 
 const props = defineProps<{
   draft: EditableListing;

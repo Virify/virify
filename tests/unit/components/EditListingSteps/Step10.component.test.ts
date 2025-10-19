@@ -65,14 +65,15 @@ describe("Step10 Component", () => {
 
   describe('Event Emissions', () => {
     it('emits updateStepData when form is submitted', async () => {
-      const draftWithImages = {
+      const validDraft = {
         ...mockDraft,
+        completedSteps: [1, 2, 3, 4, 5, 6, 7, 8, 9], // Steps 1-9 completed, but not Step 10
         property: {
           ...mockDraft.property,
           media: [{ image: 'test.jpg', metadata: null }],
         },
       };
-      const wrapper = await mountSuspended(Step10, { props: { draft: draftWithImages } });
+      const wrapper = await mountSuspended(Step10, { props: { draft: validDraft } });
       const stepLayout = wrapper.findComponent({ name: 'EditListingStepsStepLayout' });
       await stepLayout.vm.$emit('submit');
       expect(wrapper.emitted()).toHaveProperty('updateStepData');

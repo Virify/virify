@@ -30,9 +30,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { ListingWithFullProperty } from "~~/shared/types/listing";
-import { isDraftListing } from "~/composables/useListingEdit";
-
 definePageMeta({
   middleware: ["authenticated"],
   head: {

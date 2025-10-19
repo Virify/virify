@@ -3,8 +3,8 @@
  * Used to convert into the database from feet/meters.
  */
 export const sizeOptions = [
-  { value: 'meter', label: 'Metres (m²)', isDefault: true, name: 'size-meter' },
-  { value: 'feet',  label: 'Feet (ft²)',     isDefault: false, name: 'size-feet' },
+  { value: 'meter', key: 'm²', info: 'Square meters', isDefault: true },
+  { value: 'feet', key: 'ft²', info: 'Square feet', isDefault: false },
 ]
 
 

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { mountSuspended, mockNuxtImport } from "@nuxt/test-utils/runtime";
-import { ref } from "vue";
 import Step1 from "../../../../app/components/EditListingSteps/Step1.vue";
 import type { DraftListingWithFullPayload } from "../../../../shared/types/draft";
 
@@ -40,6 +39,7 @@ describe("Step1 Component", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       highestCompletedStep: 0,
+      completedSteps: [], // Required for isDraftListing type guard
     } as any;
   });
 
@@ -90,8 +90,8 @@ describe("Step1 Component", () => {
         props: { draft: mockDraft },
         global: {
           stubs: {
-            OrganismsDraftFormRadioGroup: {
-              name: "OrganismsDraftFormRadioGroup",
+            OrganismsListingFormRadioGroup: {
+              name: "OrganismsListingFormRadioGroup",
               props: ["title"],
               template: '<div><span class="radio-title">{{ title }}</span><slot /></div>',
               methods: {
@@ -105,14 +105,14 @@ describe("Step1 Component", () => {
       });
 
       // emulate selecting 'sale'
-      await wrapper.findComponent({ name: "OrganismsDraftFormRadioGroup" }).vm.$emit("update:modelValue", "sale");
+      await wrapper.findComponent({ name: "OrganismsListingFormRadioGroup" }).vm.$emit("update:modelValue", "sale");
       await wrapper.vm.$nextTick();
       // Look for radio group titles rendered by our stub
       const saleTitles = wrapper.findAll(".radio-title").map((w) => w.text());
       expect(saleTitles).toContain("Please confirm property tenure");
 
       // emulate selecting 'rent'
-      await wrapper.findComponent({ name: "OrganismsDraftFormRadioGroup" }).vm.$emit("update:modelValue", "rent");
+      await wrapper.findComponent({ name: "OrganismsListingFormRadioGroup" }).vm.$emit("update:modelValue", "rent");
       await wrapper.vm.$nextTick();
       const rentTitles = wrapper.findAll(".radio-title").map((w) => w.text());
       expect(rentTitles).toContain("Are bills included in the rent?");
@@ -136,7 +136,7 @@ describe("Step1 Component", () => {
       });
 
       // Find the radio group components and assert their title props include sale fields
-      const saleRadioGroups = wrapper.findAllComponents({ name: "OrganismsDraftFormRadioGroup" });
+      const saleRadioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
       const saleTitles = saleRadioGroups.map((r) => r.props("title"));
       expect(saleTitles).toContain("Please confirm property tenure");
       expect(saleTitles).toContain("Are you part of a chain?");
@@ -157,7 +157,7 @@ describe("Step1 Component", () => {
         },
       });
 
-      const titles = wrapper.findAllComponents({ name: "OrganismsDraftFormRadioGroup" }).map((r) => r.props("title"));
+      const titles = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" }).map((r) => r.props("title"));
       expect(titles).not.toContain("Are bills included in the rent?");
       expect(titles).not.toContain("What is the furnished status");
     });
@@ -179,7 +179,7 @@ describe("Step1 Component", () => {
         },
       });
 
-      const rentRadioGroups = wrapper.findAllComponents({ name: "OrganismsDraftFormRadioGroup" });
+      const rentRadioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
       const rentTitles = rentRadioGroups.map((r) => r.props("title"));
       expect(rentTitles).toContain("Are bills included in the rent?");
       expect(rentTitles).toContain("What is the furnished status of the listing?");
@@ -200,7 +200,7 @@ describe("Step1 Component", () => {
         },
       });
 
-      const titles2 = wrapper.findAllComponents({ name: "OrganismsDraftFormRadioGroup" }).map((r) => r.props("title"));
+      const titles2 = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" }).map((r) => r.props("title"));
       expect(titles2).not.toContain("Please confirm property tenure");
       expect(titles2).not.toContain("Are you part of a chain?");
     });
@@ -311,10 +311,7 @@ describe("Step1 Component", () => {
     it("should emit updateStepData when form is submitted with sale data", async () => {
       const mockValidDraft = {
         ...mockDraft,
-        saleListing: {
-          tenureType: "freehold",
-          chain: "chain-free",
-        },
+        completedSteps: [], // Ensure it's a fresh step
       } as any;
 
       const wrapper = await mountSuspended(Step1, {
@@ -323,10 +320,25 @@ describe("Step1 Component", () => {
         },
       });
 
+      // Find the first radio group (listing type selection) and emit a selection
+      const radioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
+      expect(radioGroups.length).toBeGreaterThan(0);
+      
+      // Select "sale" listing type
+      await radioGroups[0].vm.$emit("update:modelValue", "sale");
+      await wrapper.vm.$nextTick();
+
+      // Now find and select tenure type
+      const radioGroupsAfter = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
+      // The second radio group should be the tenure type
+      await radioGroupsAfter[1].vm.$emit("update:modelValue", "freehold");
+      await wrapper.vm.$nextTick();
+
+      // Submit the form
       const stepLayout = wrapper.findComponent({ name: "EditListingStepsStepLayout" });
       await stepLayout.vm.$emit("submit");
 
-      // Check that the component's submitForm was triggered
+      // Check that updateStepData was emitted
       expect(wrapper.emitted()).toHaveProperty("updateStepData");
     });
 

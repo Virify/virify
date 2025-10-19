@@ -36,7 +36,7 @@ describe("Step3 Component", () => {
         saleListing: { tenureType: 'freehold', priceType: null },
       };
       const wrapper = await mountSuspended(Step3, { props: { draft: saleDraft } });
-      const radioGroups = wrapper.findAllComponents({ name: 'OrganismsDraftFormRadioGroup' });
+      const radioGroups = wrapper.findAllComponents({ name: 'OrganismsListingFormRadioGroup' });
       const titles = radioGroups.map(r => r.props('title'));
       expect(titles).toContain('Price type:');
     });
@@ -49,7 +49,7 @@ describe("Step3 Component", () => {
         saleListing: { tenureType: 'freehold', chain: null, priceType: null, price: null },
       };
       const wrapper = await mountSuspended(Step3, { props: { draft: saleDraft } });
-      const radioGroups = wrapper.findAllComponents({ name: 'OrganismsDraftFormRadioGroup' });
+      const radioGroups = wrapper.findAllComponents({ name: 'OrganismsListingFormRadioGroup' });
       const titles = radioGroups.map(r => r.props('title'));
       expect(titles).toContain('Price type:');
     });
@@ -62,7 +62,7 @@ describe("Step3 Component", () => {
         rentalListing: { isBillsIncluded: true, furnishedStatus: "furnished", rentFrequency: null, price: null },
       };
       const wrapper = await mountSuspended(Step3, { props: { draft: rentalDraft } });
-      const radioGroups = wrapper.findAllComponents({ name: "OrganismsDraftFormRadioGroup" });
+      const radioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
       const titles = radioGroups.map((r) => r.props("title"));
       expect(titles).toContain("What is the rent frequency for this listing?");
     });
@@ -91,8 +91,9 @@ describe("Step3 Component", () => {
     it('emits updateStepData when form is submitted', async () => {
       const validDraft = {
         ...mockDraft,
+        completedSteps: [1, 2], // Steps 1-2 completed, but not Step 3
+        price: 250000, // Price at root level
         saleListing: { tenureType: 'freehold', chain: null, priceType: 'offers-over' },
-        price: 250000,
       };
       const wrapper = await mountSuspended(Step3, { props: { draft: validDraft } });
       const stepLayout = wrapper.findComponent({ name: 'EditListingStepsStepLayout' });

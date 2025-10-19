@@ -219,8 +219,6 @@
 <script setup lang="ts">
 import type { OtherRoom } from '~~/layers/database/server/database/prisma/generated/client';
 
-import { fireplaceSelectNoneValue, fireplaceSelectOptions, otherRoomFeatureOptions, otherRoomTypeOptions } from "../../../utils/draft/step-six";
-
 const defaultOtherRoomType = otherRoomTypeOptions[0]?.value ?? null;
 
 interface Props {

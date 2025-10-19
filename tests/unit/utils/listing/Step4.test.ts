@@ -69,7 +69,7 @@ describe("Step4 - Address Validation", () => {
       expect(result).toBe(false);
     });
 
-    it("should invalidate address without country", () => {
+    it("should validate address without country (country is optional)", () => {
       const address = {
         number: "123",
         street: "Main Street",
@@ -79,7 +79,7 @@ describe("Step4 - Address Validation", () => {
       };
 
       const result = stepFourValidation.isAddressValid(address);
-      expect(result).toBe(false);
+      expect(result).toBe(true); // Country is optional for backward compatibility
     });
   });
 

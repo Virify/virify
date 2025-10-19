@@ -1,6 +1,3 @@
-import type { EditableListing } from "~~/shared/types/listing";
-import type { DraftListingWithFullPayload, StepTen } from "../../../shared/types/draft";
-
 /**
  * Image assignment structure for Step 10
  */

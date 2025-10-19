@@ -191,12 +191,6 @@
 </template>
 
 <script setup lang="ts">
-import { gardenPositionOptions, gardenFacingOptions, outdoorSpaceFeaturesOptions } from '../../utils/listing/step-seven';
-
-const sizeOptions = [
-  { value: 'meter', key: 'm²', info: 'Square meters' },
-  { value: 'feet', key: 'ft²', info: 'Square feet' },
-];
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;

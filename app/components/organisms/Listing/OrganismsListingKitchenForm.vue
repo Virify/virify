@@ -195,8 +195,6 @@
 <script setup lang="ts">
 import type { Kitchen } from '~~/layers/database/server/database/prisma/generated/client';
 
-import { kitchenFeaturesOptions } from "../../../utils/draft/step-six";
-
 interface Props {
   modelValue: Omit<Kitchen, 'id' | 'propertyId' | 'createdAt' | 'updatedAt' | 'media'>[];
   totalFloors: number;

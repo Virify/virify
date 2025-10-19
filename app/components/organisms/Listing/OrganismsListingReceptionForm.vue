@@ -219,8 +219,6 @@
 <script setup lang="ts">
 import type { Reception } from '~~/layers/database/server/database/prisma/generated/client';
 
-import { fireplaceSelectNoneValue, fireplaceSelectOptions, receptionFeatureOptions, receptionTypeOptions } from "../../../utils/draft/step-six";
-
 const defaultReceptionType = receptionTypeOptions[0]?.value ?? null;
 
 interface Props {

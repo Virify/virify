@@ -50,7 +50,6 @@
 </template>
 
 <script setup lang="ts">
-import { isDraftListing, type EditableListing } from "~/composables/useListingEdit";
 
 const props = defineProps<{
   draft: EditableListing;

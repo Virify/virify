@@ -156,12 +156,6 @@
 
 <script setup lang="ts">
 import type { Land } from '~~/layers/database/server/database/prisma/generated/client';
-import { landFeaturesOptions } from "../../../utils/draft/step-seven";
-
-const sizeOptions = [
-  { value: 'meter', key: 'm²', info: 'Square meters' },
-  { value: 'feet', key: 'ft²', info: 'Square feet' },
-];
 
 interface Props {
   modelValue: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[];

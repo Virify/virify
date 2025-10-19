@@ -1,6 +1,5 @@
-import { FurnishedStatus, RentalAvailabilityStatus, SaleAvailabilityStatus, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { FurnishedStatus, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
 import type { RentalListingCreateWithoutListingInput, SaleListingCreateWithoutListingInput } from "~~/layers/database/server/database/prisma/generated/models";
-import type { EditableListing } from "~~/shared/types/listing";
 
 /**
  * Step One Listing Options

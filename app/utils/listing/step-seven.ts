@@ -1,5 +1,3 @@
-import type { EditableListing } from "~~/shared/types/listing";
-import type { DraftListingWithFullPayload, StepSeven } from "../../../shared/types/draft";
 import { GardenFacing, GardenPosition } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**

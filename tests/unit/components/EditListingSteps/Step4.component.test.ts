@@ -32,7 +32,7 @@ describe("Step4 Component", () => {
 
     it('renders address input fields', async () => {
       const wrapper = await mountSuspended(Step4, { props: { draft: mockDraft } });
-      const inputs = wrapper.findAllComponents({ name: 'OrganismsDraftFormTextGroup' });
+      const inputs = wrapper.findAllComponents({ name: 'OrganismsListingFormTextGroup' });
       const titles = inputs.map(i => i.props('title'));
       expect(titles).toContain('Property Number');
       expect(titles).toContain('Street Name');
@@ -83,15 +83,7 @@ describe("Step4 Component", () => {
     it('emits updateStepData when form is submitted', async () => {
       const validDraft = {
         ...mockDraft,
-        address: {
-          propertyNumber: '123',
-          street: 'Main St',
-          city: 'London',
-          postcode: 'SW1A 1AA',
-          country: 'United Kingdom',
-          latitude: 51.5,
-          longitude: -0.1,
-        },
+        completedSteps: [1, 2, 3], // Steps 1-3 completed, but not Step 4
         property: {
           ...mockDraft.property,
           address: {
@@ -99,7 +91,6 @@ describe("Step4 Component", () => {
             street: 'Main St',
             city: 'London',
             postcode: 'SW1A 1AA',
-            country: 'United Kingdom',
             lat: 51.5,
             lon: -0.1,
           },

@@ -25,7 +25,8 @@ describe("Step9 Component", () => {
       documents: [],
       createdAt: new Date(),
       updatedAt: new Date(),
-      highestCompletedStep: 7,
+      highestCompletedStep: 8,
+      completedSteps: [1, 2, 3, 4, 5, 6, 7, 8], // All previous steps completed
     };
   });
 
@@ -43,7 +44,7 @@ describe("Step9 Component", () => {
 
     it('renders EPC rating field', async () => {
       const wrapper = await mountSuspended(Step9, { props: { draft: mockDraft } });
-      const selectGroups = wrapper.findAllComponents({ name: 'OrganismsDraftFormSelectGroup' });
+      const selectGroups = wrapper.findAllComponents({ name: 'OrganismsListingFormSelectGroup' });
       const titles = selectGroups.map(s => s.props('title'));
       expect(titles).toContain('EPC Rating');
     });
@@ -59,7 +60,12 @@ describe("Step9 Component", () => {
 
   describe("Event Emissions", () => {
     it("emits updateStepData when form is submitted", async () => {
-      const wrapper = await mountSuspended(Step9, { props: { draft: mockDraft } });
+      const validDraft = {
+        ...mockDraft,
+        completedSteps: [1, 2, 3, 4, 5, 6, 7, 8], // Steps 1-8 completed, but not Step 9
+        // Step 9 is optional (energy & costs), so empty data is valid
+      };
+      const wrapper = await mountSuspended(Step9, { props: { draft: validDraft } });
       const stepLayout = wrapper.findComponent({ name: "EditListingStepsStepLayout" });
       await stepLayout.vm.$emit("submit");
       expect(wrapper.emitted()).toHaveProperty("updateStepData");

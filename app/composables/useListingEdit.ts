@@ -1,8 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
 import type { DraftListing, Listing, ListingTier } from "~~/layers/database/server/database/prisma/generated/client";
-import type { StepSeven } from "~~/shared/types/draft";
-import type { EditableListing, ListingWithFullProperty } from "~~/shared/types/listing";
-import type { DraftListingWithFullPayload } from "~~/shared/types/draft";
 
 // Type guard to check if it's a draft
 export function isDraftListing(listing: EditableListing): listing is DraftListingWithFullPayload {

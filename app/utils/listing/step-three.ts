@@ -1,4 +1,3 @@
-import type { EditableListing } from "~~/shared/types/listing";
 import { RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**

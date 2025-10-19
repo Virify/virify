@@ -187,15 +187,8 @@
 
 <script setup lang="ts">
 import type { Yard } from '~~/layers/database/server/database/prisma/generated/client';
-import { yardFeaturesOptions, gardenPositionOptions, gardenFacingOptions } from "../../../utils/draft/step-seven";
-
 const defaultYardPosition = gardenPositionOptions[0]?.value ?? null;
 const defaultYardFacing = gardenFacingOptions[0]?.value ?? null;
-
-const sizeOptions = [
-  { value: 'meter', key: 'm²', info: 'Square meters' },
-  { value: 'feet', key: 'ft²', info: 'Square feet' },
-];
 
 interface Props {
   modelValue: Omit<Yard, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[];

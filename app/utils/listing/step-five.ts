@@ -1,4 +1,3 @@
-import type { EditableListing } from "~~/shared/types/listing";
 import { BedSizeType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**

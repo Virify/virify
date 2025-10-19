@@ -62,7 +62,12 @@ describe("Step6 Component", () => {
 
   describe("Event Emissions", () => {
     it("emits updateStepData when form is submitted", async () => {
-      const wrapper = await mountSuspended(Step6, { props: { draft: mockDraft } });
+      const validDraft = {
+        ...mockDraft,
+        completedSteps: [1, 2, 3, 4, 5], // Steps 1-5 completed, but not Step 6
+        // Step 6 is optional (rooms), so empty data is valid
+      };
+      const wrapper = await mountSuspended(Step6, { props: { draft: validDraft } });
       const stepLayout = wrapper.findComponent({ name: "EditListingStepsStepLayout" });
       await stepLayout.vm.$emit("submit");
       expect(wrapper.emitted()).toHaveProperty("updateStepData");

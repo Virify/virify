@@ -1,4 +1,3 @@
-import type { EditableListing } from "~~/shared/types/listing";
 /** TODO: CREATE PATCH AND MORE FEATURES */
 
 /**
