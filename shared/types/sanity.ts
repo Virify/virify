@@ -267,10 +267,12 @@ export interface ContactPage {
   partnerSection: {
     title: string
     description: string
+    buttonText: string
   }
   interestedSection: {
     title: string
     description: string
+    buttonText: string
   }
   seo?: SeoMetadata
 }

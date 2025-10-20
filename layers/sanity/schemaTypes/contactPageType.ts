@@ -73,6 +73,12 @@ export const contactPageType = defineType({
           initialValue:
             "We're always open to working with like-minded businesses, property professionals, and technology partners who share our vision of making property buying and selling more transparent and accessible.",
         },
+        {
+          name: 'buttonText',
+          title: 'Button Text',
+          type: 'string',
+          initialValue: 'Get in touch',
+        },
       ],
     }),
 
@@ -95,6 +101,12 @@ export const contactPageType = defineType({
           rows: 3,
           initialValue:
             "We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.",
+        },
+        {
+          name: 'buttonText',
+          title: 'Button Text',
+          type: 'string',
+          initialValue: 'Join the waiting list',
         },
       ],
     }),

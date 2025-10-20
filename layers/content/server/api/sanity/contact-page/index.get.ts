@@ -17,11 +17,13 @@ export default defineEventHandler(async (event): Promise<ContactPageResponse> =>
         },
         partnerSection {
           title,
-          description
+          description,
+          buttonText
         },
         interestedSection {
           title,
-          description
+          description,
+          buttonText
         },
         seo {
           metaTitle,

@@ -1,23 +1,30 @@
 <template>
   <div class="contact-page">
-    <!-- Hero Section -->
+    <!-- ============================================ -->
+    <!-- HERO SECTION -->
+    <!-- ============================================ -->
     <section class="contact-hero">
       <div class="container">
         <div class="contact-hero__content">
-          <h1 class="contact-hero__title | title-2xl lineheight-xs">Contact <span class="gradient-text">us</span></h1>
-          <p class="contact-hero__subtitle | body-lg">Whether you're interested in partnering with us, have a question
-            about our platform, or just want to get in touch—we'd love to hear from you.</p>
+          <h1 class="contact-hero__title | title-2xl lineheight-xs">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <template v-else>{{ part.text }}</template>
+            </template>
+          </h1>
+          <p class="contact-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
         </div>
       </div>
     </section>
 
-    <!-- Contact Form Section -->
+    <!-- ============================================ -->
+    <!-- CONTACT FORM SECTION -->
+    <!-- ============================================ -->
     <section class="contact-form-section" id="contact">
       <div class="container">
         <div class="contact-form-container">
-          <h2 class="contact-form__title | title-md">Get in touch</h2>
-          <p class="contact-form__description | body-md">Fill in the form below and we'll get back to you as soon as
-            possible. We typically respond within 24 hours.</p>
+          <h2 class="contact-form__title | title-md">{{ cmsContent?.formSection.title }}</h2>
+          <p class="contact-form__description | body-md">{{ cmsContent?.formSection.description }}</p>
 
           <form @submit.prevent="handleSubmit" class="contact-form">
             <div v-if="formError" class="contact-form__error">
@@ -89,25 +96,36 @@
       </div>
     </section>
 
-    <!-- Info Section -->
+    <!-- ============================================ -->
+    <!-- PARTNER SECTION -->
+    <!-- ============================================ -->
     <section class="contact-info">
       <div class="container">
         <div class="contact-info__content">
-          <h2 class="title-xl">Looking to <span class="gradient-text">partner?</span></h2>
-          <p class="body-lg max-width-prose">We're always open to working with like-minded businesses, property
-            professionals, and technology partners who share our vision of making property buying and selling more
-            transparent and accessible.</p>
-            <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> Get in touch </AtomsButton>
+          <h2 class="title-xl">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.partnerSection.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <template v-else>{{ part.text }}</template>
+            </template>
+          </h2>
+          <p class="body-lg max-width-prose">{{ cmsContent?.partnerSection.description }}</p>
+            <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> 
+              {{ cmsContent?.partnerSection.buttonText }}
+            </AtomsButton>
         </div>
       </div>
     </section>
+
+    <!-- ============================================ -->
+    <!-- INTERESTED SECTION -->
+    <!-- ============================================ -->
     <section class="contact-form-section">
       <div class="container">
         <div class="contact-form-container">
-          <h2 class="title-xl">Interested in what we are doing?</h2>
-          <p class="body-lg max-width-prose">We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.</p>
+          <h2 class="title-xl">{{ cmsContent?.interestedSection.title }}</h2>
+          <p class="body-lg max-width-prose">{{ cmsContent?.interestedSection.description }}</p>
           <nuxt-link to="/waiting-list" class="waiting-list__button | button button-lg button-monochrome"> 
-            Join the waiting list
+            {{ cmsContent?.interestedSection.buttonText }}
           </nuxt-link>
         </div>
       </div>
@@ -257,14 +275,14 @@ const seoData = computed(() => {
   const cms = cmsContent.value?.seo;
   
   return {
-    title: cms?.metaTitle || 'Contact Virify - Get in Touch | The UK\'s Open Property Marketplace',
-    description: cms?.metaDescription || 'Contact Virify for partnership opportunities, platform enquiries, or questions about the UK\'s first open property marketplace. We typically respond within 24 hours.',
-    keywords: cms?.keywords || 'contact Virify, property marketplace contact, partnership opportunities, property platform enquiries, estate agent alternative, open property marketplace UK',
-    ogTitle: cms?.ogTitle || 'Contact Virify - Get in Touch',
-    ogDescription: cms?.ogDescription || 'Contact us about partnerships, platform questions, or general enquiries about Virify\'s open property marketplace.',
-    ogImage: cms?.ogImage || undefined,
-    twitterCard: cms?.twitterCard || 'summary',
-    canonicalUrl: cms?.canonicalUrl || 'https://virify.co.uk/contact',
+    title: cms?.metaTitle,
+    description: cms?.metaDescription,
+    keywords: cms?.keywords,
+    ogTitle: cms?.ogTitle,
+    ogDescription: cms?.ogDescription,
+    ogImage: cms?.ogImage,
+    twitterCard: cms?.twitterCard,
+    canonicalUrl: cms?.canonicalUrl,
   };
 });
 

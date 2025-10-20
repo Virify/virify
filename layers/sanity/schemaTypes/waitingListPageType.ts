@@ -49,6 +49,12 @@ export const waitingListPageType = defineType({
           initialValue:
             "Whether you're looking for your next home, ready to market privately, or an estate agent looking for a more cost-effective and easy-to-use platform, join our waiting list for exclusive early access and progress updates.",
         },
+        {
+          name: 'buttonText',
+          title: 'Button Text',
+          type: 'string',
+          initialValue: 'Join Waiting List',
+        },
       ],
     }),
 
@@ -59,8 +65,8 @@ export const waitingListPageType = defineType({
       type: 'object',
       fields: [
         {
-          name: 'heading',
-          title: 'Heading',
+          name: 'title',
+          title: 'Title',
           type: 'string',
           description: 'Use {gradient}text{/gradient} for gradient styling',
           initialValue: 'For {gradient}smart home seekers{/gradient}',
@@ -149,8 +155,8 @@ export const waitingListPageType = defineType({
       type: 'object',
       fields: [
         {
-          name: 'heading',
-          title: 'Heading',
+          name: 'title',
+          title: 'Title',
           type: 'string',
           description: 'Use {gradient}text{/gradient} for gradient styling',
           initialValue: 'Market {gradient}smarter{/gradient}, keep {gradient}more{/gradient}',
@@ -237,8 +243,8 @@ export const waitingListPageType = defineType({
       type: 'object',
       fields: [
         {
-          name: 'heading',
-          title: 'Heading',
+          name: 'title',
+          title: 'Title',
           type: 'string',
           description: 'Use {gradient}text{/gradient} for gradient styling',
           initialValue: 'Get {gradient}ahead{/gradient} before everyone else',
@@ -325,12 +331,24 @@ export const waitingListPageType = defineType({
           initialValue: 'Have questions? {gradient}Let\'s talk{/gradient}',
         },
         {
+          name: 'subtitle',
+          title: 'Subtitle',
+          type: 'string',
+          initialValue: '',
+        },
+        {
           name: 'description',
           title: 'Description',
           type: 'text',
           rows: 3,
           initialValue:
             "We're here to help. Whether you have questions about our platform, want to learn more about how Virify works, or are interested in partnering with us, we'd love to hear from you.",
+        },
+        {
+          name: 'buttonText',
+          title: 'Button Text',
+          type: 'string',
+          initialValue: 'Get in touch',
         },
       ],
     }),
@@ -349,12 +367,24 @@ export const waitingListPageType = defineType({
           initialValue: 'Ready to market the {gradient}new way?{/gradient}',
         },
         {
+          name: 'subtitle',
+          title: 'Subtitle',
+          type: 'string',
+          initialValue: '',
+        },
+        {
           name: 'description',
           title: 'Description',
           type: 'text',
           rows: 3,
           initialValue:
             "Join thousands who are ready for honest property searching and direct private listings. Whether you're buying, selling, leasing or renting, Virify puts you in control.",
+        },
+        {
+          name: 'buttonText',
+          title: 'Button Text',
+          type: 'string',
+          initialValue: 'Join the Waiting List',
         },
       ],
     }),
