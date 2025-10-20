@@ -8,12 +8,12 @@ export default defineNuxtConfig({
       DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
     },
   },
-  devServer: {
-    https: {
-      key: "./server.key",
-      cert: "./server.crt",
-    },
-  },
+  // devServer: {
+  //   https: {
+  //     key: "./server.key",
+  //     cert: "./server.crt",
+  //   },
+  // },
 });
 
 /**

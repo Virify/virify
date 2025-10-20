@@ -15,7 +15,7 @@ export default defineNuxtConfig({
       CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
     },
   },
-  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo"],
+  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
   
   // Nuxt SEO Configuration
   site: {
@@ -92,19 +92,17 @@ export default defineNuxtConfig({
     },
   },
   security: {
+    enabled: process.env.NODE_ENV === 'production', // Only enable in production
     rateLimiter: {
       tokensPerInterval: 150,
       interval: 60000, // 1 minute
       throwError: false, // Optional: don't throw error, just block
     },
-    xssValidator: {
-      methods: ["POST", "PUT", "PATCH", "DELETE", "GET"],
-      escapeHtml: true,
-    },
+    xssValidator: false, // Disable in dev
     headers: {
       permissionsPolicy: false,
-      contentSecurityPolicy: false,
-      xFrameOptions: process.env.NODE_ENV === 'development' ? false : 'SAMEORIGIN', // Allow iframe in development for Sanity preview
+      contentSecurityPolicy: false, // Disable CSP in dev, will be enabled in production
+      xFrameOptions: false,
     },
     nonce: false,
     sri: false,

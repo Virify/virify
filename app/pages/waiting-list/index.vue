@@ -10,7 +10,7 @@
           <h1 class="waiting-list-hero__title | title-2xl lineheight-xs">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
               <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
+              <span v-else>{{ part.text }}</span>
             </template>
           </h1>
           <p class="waiting-list-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
@@ -82,7 +82,7 @@
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
               <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
+              <span v-else>{{ part.text }}</span>
             </template>
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
@@ -110,7 +110,7 @@
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.sellersBenefits.title || '')" :key="index">
               <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
+              <span v-else>{{ part.text }}</span>
             </template>
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.sellersBenefits.subtitle }}</p>
@@ -139,7 +139,7 @@
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.earlyAccessBenefits.title || '')" :key="index">
               <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
+              <span v-else>{{ part.text }}</span>
             </template>
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.earlyAccessBenefits.subtitle }}</p>
@@ -150,7 +150,7 @@
             <h3 class="title-md">
               <template v-for="(part, pIndex) in parseGradientTextParts(benefit.title || '')" :key="pIndex">
                 <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-                <template v-else>{{ part.text }}</template>
+                <span v-else>{{ part.text }}</span>
               </template>
             </h3>
             <p class="body-md">{{ benefit.description }}</p>
@@ -184,11 +184,11 @@
 
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
+
 const { showToast } = useToast();
 
 // Fetch CMS content with fallback
-const { useWaitingListPage } = useSanity();
-const { data: cmsContent } = await useWaitingListPage();
+const { data: cmsContent } = await useSanityQuery<WaitingListPage>(waitingListPageQuery)
 
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
@@ -284,7 +284,6 @@ useSeoMeta({
   ogDescription: seoData.value.ogDescription,
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/waiting-list',
-  ogImage: seoData.value.ogImage,
   twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
 });
 

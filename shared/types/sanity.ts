@@ -132,6 +132,11 @@ export interface GuideResponse extends Guide {
   category?: GuideCategory
 }
 
+// Guide with dereferenced category (used in queries with category->)
+export interface GuideWithCategory extends Omit<Guide, 'category'> {
+  category?: GuideCategory
+}
+
 export interface SanityGuideCategory {
   _id: string
   title: string
@@ -181,6 +186,14 @@ export interface TermsResponse extends Terms {}
 export interface PrivacyResponse extends Privacy {}
 
 export interface CookieResponse extends Cookie {}
+
+// Policy page union type for convenience
+export interface PolicyPage {
+  _id: string
+  title: string
+  lastUpdated: string
+  content: PortableTextContent[]
+}
 
 // Waiting List Page
 export interface WaitingListFeature {

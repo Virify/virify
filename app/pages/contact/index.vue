@@ -120,12 +120,12 @@
 </template>
 
 <script setup lang="ts">
+
 const { showToast } = useToast();
 const config = useRuntimeConfig();
 
 // Fetch CMS content with fallback
-const { useContactPage } = useSanity();
-const { data: cmsContent } = await useContactPage();
+const { data: cmsContent } = await useSanityQuery<ContactPage>(contactPageQuery)
 
 const formData = ref({
   name: "",
@@ -280,7 +280,6 @@ useSeoMeta({
   ogDescription: seoData.value.ogDescription,
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/contact',
-  ogImage: seoData.value.ogImage,
   twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
 });
 
