@@ -97,7 +97,9 @@
           <p class="body-lg max-width-prose">We're always open to working with like-minded businesses, property
             professionals, and technology partners who share our vision of making property buying and selling more
             transparent and accessible.</p>
-            <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> Get in touch </AtomsButton>
+          <div class="waiting-list__button">
+            <AtomsButton @click="scrollToForm" class="button-lg button-monochrome"> Get in touch </AtomsButton>
+          </div>
         </div>
       </div>
     </section>
@@ -106,9 +108,11 @@
         <div class="contact-form-container">
           <h2 class="title-xl">Interested in what we are doing?</h2>
           <p class="body-lg max-width-prose">We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.</p>
-          <nuxt-link to="/waiting-list" class="waiting-list__button | button button-lg button-monochrome"> 
-            Join the waiting list
-          </nuxt-link>
+          <div class="waiting-list__button">
+            <nuxt-link to="/waiting-list" class="button button-lg button-monochrome"> 
+              Join the waiting list
+            </nuxt-link>
+          </div>
         </div>
       </div>
     </section>
@@ -470,8 +474,7 @@ useSchemaOrg([
 
 .waiting-list__button {
   display: flex;
-  align-self: center;
-  justify-self: center;
+  justify-content: center;
   margin-top: var(--size-24);
 }
 </style>
