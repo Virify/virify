@@ -79,6 +79,26 @@ export const useSanity = () => {
   }
 
   /**
+   * A async data fetcher for the Waiting List Page content from Sanity CMS.
+   * @returns A async data fetcher for waiting list page content.
+   */
+  const useWaitingListPage = () => {
+    return useAsyncData('waiting-list-page', () => 
+      $fetch<WaitingListPageResponse>('/api/sanity/waiting-list-page')
+    )
+  }
+
+  /**
+   * A async data fetcher for the Contact Page content from Sanity CMS.
+   * @returns A async data fetcher for contact page content.
+   */
+  const useContactPage = () => {
+    return useAsyncData('contact-page', () => 
+      $fetch<ContactPageResponse>('/api/sanity/contact-page')
+    )
+  }
+
+  /**
    * Helper to build a guide URL from a slug or expanded reference
    * @param slugOrRef string or object with slug.current
    */
@@ -96,6 +116,8 @@ export const useSanity = () => {
     useTerms,
     usePrivacy,
     useCookie,
+    useWaitingListPage,
+    useContactPage,
     guideUrl
   }
 }

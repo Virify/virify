@@ -199,6 +199,11 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
 const { showToast } = useToast();
+
+// Fetch CMS content with fallback
+const { useWaitingListPage } = useSanity();
+const { data: cmsContent } = await useWaitingListPage();
+
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
 const agreedToTerms = ref(false);
@@ -269,20 +274,37 @@ function scrollToForm() {
 }
 
 // SEO - Nuxt SEO auto-generates WebPage schema from this
+// Use CMS SEO metadata if available, otherwise fallback to defaults
+const seoData = computed(() => {
+  const cms = cmsContent.value?.seo;
+  
+  return {
+    title: cms?.metaTitle || 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
+    description: cms?.metaDescription || 'Get early access to Virify, an AI-powered property search with real data, map-based searching, and direct connections to sellers and landlords. Whether you\'re ready to market privately or an estate agent looking for a more cost-effective solution, Virify has you covered.',
+    keywords: cms?.keywords || 'property portal, property sales, buy property, rent property, sell property, property marketplace UK, AI property search, sell without estate agent, private property listings, buy direct from owner, map-based property search, UK property platform, estate agent alternative',
+    ogTitle: cms?.ogTitle || 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
+    ogDescription: cms?.ogDescription || 'Market privately, search with AI, and connect directly. Save time, cut costs, take control of your property journey.',
+    ogImage: cms?.ogImage || undefined,
+    twitterCard: cms?.twitterCard || 'summary_large_image',
+    canonicalUrl: cms?.canonicalUrl || 'https://virify.co.uk/waiting-list',
+  };
+});
+
 useSeoMeta({
-  title: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
-  description: 'Get early access to Virify, an AI-powered property search with real data, map-based searching, and direct connections to sellers and landlords. Whether you\'re ready to market privately or an estate agent looking for a more cost-effective solution, Virify has you covered.',
-  keywords: 'property portal, property sales, buy property, rent property, sell property, property marketplace UK, AI property search, sell without estate agent, private property listings, buy direct from owner, map-based property search, UK property platform, estate agent alternative',
-  ogTitle: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
-  ogDescription: 'Market privately, search with AI, and connect directly. Save time, cut costs, take control of your property journey.',
+  title: seoData.value.title,
+  description: seoData.value.description,
+  keywords: seoData.value.keywords,
+  ogTitle: seoData.value.ogTitle,
+  ogDescription: seoData.value.ogDescription,
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/waiting-list',
-  twitterCard: 'summary_large_image',
+  ogImage: seoData.value.ogImage,
+  twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
 });
 
 useHead({
   link: [
-    { rel: 'canonical', href: 'https://virify.co.uk/waiting-list' }
+    { rel: 'canonical', href: seoData.value.canonicalUrl }
   ],
 });
 

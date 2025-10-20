@@ -119,6 +119,10 @@
 const { showToast } = useToast();
 const config = useRuntimeConfig();
 
+// Fetch CMS content with fallback
+const { useContactPage } = useSanity();
+const { data: cmsContent } = await useContactPage();
+
 const formData = ref({
   name: "",
   email: "",
@@ -248,20 +252,37 @@ async function submitForm() {
 }
 
 // SEO - Nuxt SEO auto-generates ContactPage schema from this
+// Use CMS SEO metadata if available, otherwise fallback to defaults
+const seoData = computed(() => {
+  const cms = cmsContent.value?.seo;
+  
+  return {
+    title: cms?.metaTitle || 'Contact Virify - Get in Touch | The UK\'s Open Property Marketplace',
+    description: cms?.metaDescription || 'Contact Virify for partnership opportunities, platform enquiries, or questions about the UK\'s first open property marketplace. We typically respond within 24 hours.',
+    keywords: cms?.keywords || 'contact Virify, property marketplace contact, partnership opportunities, property platform enquiries, estate agent alternative, open property marketplace UK',
+    ogTitle: cms?.ogTitle || 'Contact Virify - Get in Touch',
+    ogDescription: cms?.ogDescription || 'Contact us about partnerships, platform questions, or general enquiries about Virify\'s open property marketplace.',
+    ogImage: cms?.ogImage || undefined,
+    twitterCard: cms?.twitterCard || 'summary',
+    canonicalUrl: cms?.canonicalUrl || 'https://virify.co.uk/contact',
+  };
+});
+
 useSeoMeta({
-  title: 'Contact Virify - Get in Touch | The UK\'s Open Property Marketplace',
-  description: 'Contact Virify for partnership opportunities, platform enquiries, or questions about the UK\'s first open property marketplace. We typically respond within 24 hours.',
-  keywords: 'contact Virify, property marketplace contact, partnership opportunities, property platform enquiries, estate agent alternative, open property marketplace UK',
-  ogTitle: 'Contact Virify - Get in Touch',
-  ogDescription: 'Contact us about partnerships, platform questions, or general enquiries about Virify\'s open property marketplace.',
+  title: seoData.value.title,
+  description: seoData.value.description,
+  keywords: seoData.value.keywords,
+  ogTitle: seoData.value.ogTitle,
+  ogDescription: seoData.value.ogDescription,
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/contact',
-  twitterCard: 'summary',
+  ogImage: seoData.value.ogImage,
+  twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
 });
 
 useHead({
   link: [
-    { rel: 'canonical', href: 'https://virify.co.uk/contact' }
+    { rel: 'canonical', href: seoData.value.canonicalUrl }
   ],
   script: [
     {
