@@ -3,13 +3,13 @@
     v-if="hasDropdown" 
     ref="dropdownRef"
     class="o-site-navigation__dropdown"
+    @mouseenter="openMenu"
+    @mouseleave="handleMouseLeave"
   >
     <button 
       ref="triggerRef" 
       type="button"
       class="o-site-navigation-link | button button-ghost button-sm"
-      @mouseenter="openMenu"
-      @focus="openMenu"
       @click="handleButtonClick"
       @keydown="handleKeydown"
       :aria-expanded="isOpen" 
@@ -28,7 +28,6 @@
       role="menu" 
       :aria-hidden="!isOpen" 
       :inert="!isOpen"
-      @mouseleave="handleMouseLeave"
     >
       <!-- Main Category Link Button -->
       <div class="o-site-navigation__mega-header" v-if="item.href">
@@ -70,7 +69,11 @@
       </template>
     </div>
   </li>
-  <li v-else class="o-site-navigation__item">
+  <li 
+    v-else 
+    class="o-site-navigation__item"
+    @mouseenter="closeMenuIfOpen"
+  >
     <nuxt-link :to="item.href || '#'" class="o-site-navigation-link | button button-ghost button-sm">
       {{ item.label }}
     </nuxt-link>
@@ -89,6 +92,7 @@ const props = defineProps<{
 const triggerRef = ref<HTMLElement | null>(null);
 const menuRef = ref<HTMLElement | null>(null);
 const dropdownRef = ref<HTMLElement | null>(null);
+let leaveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Computed
 const categories = computed<NavigationSubItem[]>(() => props.item.children ?? []);
@@ -140,6 +144,13 @@ watch(
  */
 function openMenu() {
   if (!hasDropdown.value) return;
+  
+  // Clear any pending close timeout
+  if (leaveTimeout) {
+    clearTimeout(leaveTimeout);
+    leaveTimeout = null;
+  }
+  
   props.dropdown.open(props.item.id, {
     trigger: triggerRef.value,
     defaultCategoryId: defaultCategoryId.value,
@@ -203,13 +214,32 @@ function handleMenuClose() {
 }
 
 /**
- * Handles mouse leave from the entire dropdown area
+ * Close menu if any menu is currently open (for non-dropdown items)
  */
-function handleMouseLeave() {
-  if (isOpen.value) {
+function closeMenuIfOpen() {
+  if (props.dropdown.openItemId.value) {
     closeMenu();
   }
 }
+
+/**
+ * Handles mouse leave from the entire dropdown area with delay
+ */
+function handleMouseLeave() {
+  // Add a delay before closing to allow mouse to move into menu
+  leaveTimeout = setTimeout(() => {
+    if (isOpen.value) {
+      closeMenu();
+    }
+  }, 300); // 300ms delay
+}
+
+// Clear timeout on cleanup
+onUnmounted(() => {
+  if (leaveTimeout) {
+    clearTimeout(leaveTimeout);
+  }
+});
 </script>
 
 <style lang="scss" scoped>

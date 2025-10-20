@@ -167,12 +167,27 @@
       </div>
     </section>
 
+    <!-- Contact Section -->
+    <section class="waiting-list-contact">
+      <div class="container">
+        <div class="waiting-list-contact__content">
+          <h2 class="title-xl">Have questions? <span class="gradient-text">Let's talk</span></h2>
+          <p class="body-lg max-width-prose">We're here to help. Whether you have questions about our platform, want to learn more about how Virify works, or are interested in partnering with us, we'd love to hear from you.</p>
+          <div class="waiting-list-contact__button-wrapper">
+            <nuxt-link to="/contact" class="button button-lg button-monochrome">
+              Get in touch
+            </nuxt-link>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Final CTA Section -->
     <section class="waiting-list-final-cta">
       <div class="container">
         <div class="waiting-list-final-cta__content">
           <h2 class="title-xl">Ready to market the <span class="gradient-text">new way?</span></h2>
-          <p class="body-lg max-width-prose">Join thousands who are ready for honest property searching and direct private listings. Whether you’re buying, selling, leasing or renting, Virify puts you in control.</p>
+          <p class="body-lg max-width-prose">Join thousands who are ready for honest property searching and direct private listings. Whether you're buying, selling, leasing or renting, Virify puts you in control.</p>
           <AtomsButton @click="scrollToForm" class="waiting-list-final-cta__button | button-lg button-monochrome"> Join
             the Waiting List </AtomsButton>
         </div>
@@ -565,8 +580,33 @@ useSchemaOrg([
   }
 }
 
+// Contact Section
+.waiting-list-contact {
+  padding: var(--size-120) 0;
+
+  &__content {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+
+    h2 {
+      margin-bottom: var(--size-16);
+    }
+
+    p {
+      margin-bottom: var(--size-32);
+    }
+  }
+
+  &__button-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+}
+
 // Final CTA Section
 .waiting-list-final-cta {
+  @extend .section-gradient-bg;
   padding: var(--size-120) 0;
 
   &__content {
