@@ -6,7 +6,7 @@ defineProps<{ email: string }>();
 <template>
   <Html lang="en">
     <Head />
-    <Preview>You're on the Virify waiting list! Get ready for early access to the UK's first private property marketplace.</Preview>
+    <Preview>You're on the Virify waiting list! Get ready for early access to the UK's first open property marketplace.</Preview>
     <Body style="background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0;">
       <Container style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         
@@ -28,7 +28,7 @@ defineProps<{ email: string }>();
           </Text>
 
           <Text style="color: #1a1a1a; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-            Thank you for joining the Virify waiting list! You're now part of an exclusive group who will be the first to experience the UK's first open private property marketplace.
+            Thank you for joining the Virify waiting list! You're now part of an exclusive group who will be the first to experience the UK's first open property marketplace.
           </Text>
 
           <Text style="color: #1a1a1a; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0;">
@@ -89,7 +89,7 @@ defineProps<{ email: string }>();
           </Text>
 
           <Text style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0; text-align: center;">
-            <strong style="color: #2D2D4F;">Virify</strong> - The UK's first open property marketplace<br/>
+            <strong style="color: #2D2D4F;">Virify</strong> - The UK's first open property marketplace.<br/>
             Take control. Save thousands.
           </Text>
         </Section>

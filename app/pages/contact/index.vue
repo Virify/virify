@@ -509,8 +509,7 @@ useSchemaOrg([
 
 .waiting-list__button {
   display: flex;
-  align-self: center;
-  justify-self: center;
+  justify-content: center;
   margin-top: var(--size-24);
 }
 </style>
