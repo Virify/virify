@@ -1,23 +1,30 @@
 <template>
   <div class="contact-page">
-    <!-- Hero Section -->
+    <!-- ============================================ -->
+    <!-- HERO SECTION -->
+    <!-- ============================================ -->
     <section class="contact-hero">
       <div class="container">
         <div class="contact-hero__content">
-          <h1 class="contact-hero__title | title-2xl lineheight-xs">Contact <span class="gradient-text">us</span></h1>
-          <p class="contact-hero__subtitle | body-lg">Whether you're interested in partnering with us, have a question
-            about our platform, or just want to get in touch—we'd love to hear from you.</p>
+          <h1 class="contact-hero__title | title-2xl lineheight-xs">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <template v-else>{{ part.text }}</template>
+            </template>
+          </h1>
+          <p class="contact-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
         </div>
       </div>
     </section>
 
-    <!-- Contact Form Section -->
+    <!-- ============================================ -->
+    <!-- CONTACT FORM SECTION -->
+    <!-- ============================================ -->
     <section class="contact-form-section" id="contact">
       <div class="container">
         <div class="contact-form-container">
-          <h2 class="contact-form__title | title-md">Get in touch</h2>
-          <p class="contact-form__description | body-md">Fill in the form below and we'll get back to you as soon as
-            possible. We typically respond within 24 hours.</p>
+          <h2 class="contact-form__title | title-md">{{ cmsContent?.formSection.title }}</h2>
+          <p class="contact-form__description | body-md">{{ cmsContent?.formSection.description }}</p>
 
           <form @submit.prevent="handleSubmit" class="contact-form">
             <div v-if="formError" class="contact-form__error">
@@ -89,39 +96,36 @@
       </div>
     </section>
 
-    <!-- Info Section -->
-    <section class="contact-info">
-      <div class="container">
-        <div class="contact-info__content">
-          <h2 class="title-xl">Looking to <span class="gradient-text">partner?</span></h2>
-          <p class="body-lg max-width-prose">We're always open to working with like-minded businesses, property
-            professionals, and technology partners who share our vision of making property buying and selling more
-            transparent and accessible.</p>
-          <div class="waiting-list__button">
-            <AtomsButton @click="scrollToForm" class="button-lg button-monochrome"> Get in touch </AtomsButton>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="contact-form-section">
-      <div class="container">
-        <div class="contact-form-container">
-          <h2 class="title-xl">Interested in what we are doing?</h2>
-          <p class="body-lg max-width-prose">We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.</p>
-          <div class="waiting-list__button">
-            <nuxt-link to="/waiting-list" class="button button-lg button-monochrome"> 
-              Join the waiting list
-            </nuxt-link>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- ============================================ -->
+    <!-- PARTNER SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.partnerSection.title || ''"
+      :description="cmsContent?.partnerSection.description || ''"
+      :buttonText="cmsContent?.partnerSection.buttonText || ''"
+      gradient
+      @click="scrollToForm"
+    />
+
+    <!-- ============================================ -->
+    <!-- INTERESTED SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.interestedSection.title || ''"
+      :description="cmsContent?.interestedSection.description || ''"
+      :buttonText="cmsContent?.interestedSection.buttonText || ''"
+      to="/waiting-list"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 const { showToast } = useToast();
 const config = useRuntimeConfig();
+
+// Fetch CMS content with fallback
+const { useContactPage } = useSanity();
+const { data: cmsContent } = await useContactPage();
 
 const formData = ref({
   name: "",
@@ -252,20 +256,37 @@ async function submitForm() {
 }
 
 // SEO - Nuxt SEO auto-generates ContactPage schema from this
+// Use CMS SEO metadata if available, otherwise fallback to defaults
+const seoData = computed(() => {
+  const cms = cmsContent.value?.seo;
+  
+  return {
+    title: cms?.metaTitle,
+    description: cms?.metaDescription,
+    keywords: cms?.keywords,
+    ogTitle: cms?.ogTitle,
+    ogDescription: cms?.ogDescription,
+    ogImage: cms?.ogImage,
+    twitterCard: cms?.twitterCard,
+    canonicalUrl: cms?.canonicalUrl,
+  };
+});
+
 useSeoMeta({
-  title: 'Contact Virify - Get in Touch | The UK\'s Open Property Marketplace',
-  description: 'Contact Virify for partnership opportunities, platform enquiries, or questions about the UK\'s first open property marketplace. We typically respond within 24 hours.',
-  keywords: 'contact Virify, property marketplace contact, partnership opportunities, property platform enquiries, estate agent alternative, open property marketplace UK',
-  ogTitle: 'Contact Virify - Get in Touch',
-  ogDescription: 'Contact us about partnerships, platform questions, or general enquiries about Virify\'s open property marketplace.',
+  title: seoData.value.title,
+  description: seoData.value.description,
+  keywords: seoData.value.keywords,
+  ogTitle: seoData.value.ogTitle,
+  ogDescription: seoData.value.ogDescription,
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/contact',
-  twitterCard: 'summary',
+  ogImage: seoData.value.ogImage,
+  twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
 });
 
 useHead({
   link: [
-    { rel: 'canonical', href: 'https://virify.co.uk/contact' }
+    { rel: 'canonical', href: seoData.value.canonicalUrl }
   ],
   script: [
     {
@@ -444,37 +465,11 @@ useSchemaOrg([
   }
 }
 
-// Info Section
-.contact-info {
-  @extend .section-gradient-bg;
-  padding: var(--size-120) 0;
-
-  &__content {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
-
-    h2 {
-      margin-bottom: var(--size-16);
-    }
-
-    p {
-      margin: 0;
-    }
-  }
-}
-
 // Utility classes
 .max-width-prose {
   max-width: 65ch;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-}
-
-.waiting-list__button {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--size-24);
 }
 </style>
