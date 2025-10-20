@@ -102,6 +102,7 @@
     <section class="contact-info">
       <div class="container">
         <div class="contact-info__content">
+<<<<<<< HEAD
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.partnerSection.title || '')" :key="index">
               <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
@@ -112,6 +113,15 @@
             <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> 
               {{ cmsContent?.partnerSection.buttonText }}
             </AtomsButton>
+=======
+          <h2 class="title-xl">Looking to <span class="gradient-text">partner?</span></h2>
+          <p class="body-lg max-width-prose">We're always open to working with like-minded businesses, property
+            professionals, and technology partners who share our vision of making property buying and selling more
+            transparent and accessible.</p>
+          <div class="waiting-list__button">
+            <AtomsButton @click="scrollToForm" class="button-lg button-monochrome"> Get in touch </AtomsButton>
+          </div>
+>>>>>>> main
         </div>
       </div>
     </section>
@@ -122,11 +132,21 @@
     <section class="contact-form-section">
       <div class="container">
         <div class="contact-form-container">
+<<<<<<< HEAD
           <h2 class="title-xl">{{ cmsContent?.interestedSection.title }}</h2>
           <p class="body-lg max-width-prose">{{ cmsContent?.interestedSection.description }}</p>
           <nuxt-link to="/waiting-list" class="waiting-list__button | button button-lg button-monochrome"> 
             {{ cmsContent?.interestedSection.buttonText }}
           </nuxt-link>
+=======
+          <h2 class="title-xl">Interested in what we are doing?</h2>
+          <p class="body-lg max-width-prose">We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.</p>
+          <div class="waiting-list__button">
+            <nuxt-link to="/waiting-list" class="button button-lg button-monochrome"> 
+              Join the waiting list
+            </nuxt-link>
+          </div>
+>>>>>>> main
         </div>
       </div>
     </section>
@@ -509,8 +529,7 @@ useSchemaOrg([
 
 .waiting-list__button {
   display: flex;
-  align-self: center;
-  justify-self: center;
+  justify-content: center;
   margin-top: var(--size-24);
 }
 </style>
