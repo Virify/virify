@@ -99,37 +99,23 @@
     <!-- ============================================ -->
     <!-- PARTNER SECTION -->
     <!-- ============================================ -->
-    <section class="contact-info">
-      <div class="container">
-        <div class="contact-info__content">
-          <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.partnerSection.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
-            </template>
-          </h2>
-          <p class="body-lg max-width-prose">{{ cmsContent?.partnerSection.description }}</p>
-            <AtomsButton @click="scrollToForm" class="waiting-list__button | button-lg button-monochrome"> 
-              {{ cmsContent?.partnerSection.buttonText }}
-            </AtomsButton>
-        </div>
-      </div>
-    </section>
+    <MoleculesCtaSection
+      :title="cmsContent?.partnerSection.title || ''"
+      :description="cmsContent?.partnerSection.description || ''"
+      :buttonText="cmsContent?.partnerSection.buttonText || ''"
+      gradient
+      @click="scrollToForm"
+    />
 
     <!-- ============================================ -->
     <!-- INTERESTED SECTION -->
     <!-- ============================================ -->
-    <section class="contact-form-section">
-      <div class="container">
-        <div class="contact-form-container">
-          <h2 class="title-xl">{{ cmsContent?.interestedSection.title }}</h2>
-          <p class="body-lg max-width-prose">{{ cmsContent?.interestedSection.description }}</p>
-          <nuxt-link to="/waiting-list" class="waiting-list__button | button button-lg button-monochrome"> 
-            {{ cmsContent?.interestedSection.buttonText }}
-          </nuxt-link>
-        </div>
-      </div>
-    </section>
+    <MoleculesCtaSection
+      :title="cmsContent?.interestedSection.title || ''"
+      :description="cmsContent?.interestedSection.description || ''"
+      :buttonText="cmsContent?.interestedSection.buttonText || ''"
+      to="/waiting-list"
+    />
   </div>
 </template>
 
@@ -479,37 +465,11 @@ useSchemaOrg([
   }
 }
 
-// Info Section
-.contact-info {
-  @extend .section-gradient-bg;
-  padding: var(--size-120) 0;
-
-  &__content {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
-
-    h2 {
-      margin-bottom: var(--size-16);
-    }
-
-    p {
-      margin: 0;
-    }
-  }
-}
-
 // Utility classes
 .max-width-prose {
   max-width: 65ch;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-}
-
-.waiting-list__button {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--size-24);
 }
 </style>

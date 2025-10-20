@@ -162,44 +162,23 @@
     <!-- ============================================ -->
     <!-- CONTACT SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-contact">
-      <div class="container">
-        <div class="waiting-list-contact__content">
-          <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.contactSection.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
-            </template>
-          </h2>
-          <p class="body-lg max-width-prose">{{ cmsContent?.contactSection.description }}</p>
-          <div class="waiting-list-contact__button-wrapper">
-            <nuxt-link to="/contact" class="button button-lg button-monochrome">
-              {{ cmsContent?.contactSection.buttonText }}
-            </nuxt-link>
-          </div>
-        </div>
-      </div>
-    </section>
+    <MoleculesCtaSection
+      :title="cmsContent?.contactSection.title || ''"
+      :description="cmsContent?.contactSection.description || ''"
+      :buttonText="cmsContent?.contactSection.buttonText || ''"
+      to="/contact"
+    />
 
     <!-- ============================================ -->
     <!-- FINAL CTA SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-final-cta">
-      <div class="container">
-        <div class="waiting-list-final-cta__content">
-          <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.finalCta.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
-            </template>
-          </h2>
-          <p class="body-lg max-width-prose">{{ cmsContent?.finalCta.description }}</p>
-          <AtomsButton @click="scrollToForm" class="waiting-list-final-cta__button | button-lg button-monochrome"> 
-            {{ cmsContent?.finalCta.buttonText }}
-          </AtomsButton>
-        </div>
-      </div>
-    </section>
+    <MoleculesCtaSection
+      :title="cmsContent?.finalCta.title || ''"
+      :description="cmsContent?.finalCta.description || ''"
+      :buttonText="cmsContent?.finalCta.buttonText || ''"
+      gradient
+      @click="scrollToForm"
+    />
   </div>
 </template>
 
@@ -606,54 +585,6 @@ useSchemaOrg([
     p {
       margin: 0;
     }
-  }
-}
-
-// Contact Section
-.waiting-list-contact {
-  padding: var(--size-120) 0;
-
-  &__content {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto;
-
-    h2 {
-      margin-bottom: var(--size-16);
-    }
-
-    p {
-      margin-bottom: var(--size-32);
-    }
-  }
-
-  &__button-wrapper {
-    display: flex;
-    justify-content: center;
-  }
-}
-
-// Final CTA Section
-.waiting-list-final-cta {
-  @extend .section-gradient-bg;
-  padding: var(--size-120) 0;
-
-  &__content {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto;
-
-    h2 {
-      margin-bottom: var(--size-16);
-    }
-
-    p {
-      margin-bottom: var(--size-32);
-    }
-  }
-
-  &__button {
-    min-width: 280px;
   }
 }
 
