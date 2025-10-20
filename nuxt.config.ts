@@ -104,6 +104,7 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
+      xFrameOptions: process.env.NODE_ENV === 'development' ? false : 'SAMEORIGIN', // Allow iframe in development for Sanity preview
     },
     nonce: false,
     sri: false,
