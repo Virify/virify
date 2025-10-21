@@ -203,7 +203,6 @@ export const useNavigation = (navigationData?: NavigationDataRef): NavigationCom
 }
 
 export const useNavigationWithData = async () => {
-  const { useNavigationData } = useSanity()
-  const { data } = await useNavigationData()
-  return useNavigation(data)
+  const { data } = await useSanityQuery<SanityGuideCategory[] | null | undefined>(navigationQuery)
+  return useNavigation(data as Ref<SanityGuideCategory[] | null | undefined>)
 }

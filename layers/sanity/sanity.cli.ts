@@ -7,7 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export default defineCliConfig({
   api: {
-    projectId: process.env.SANITY_PROJECT_ID,
+    projectId: 'zl7h47m2',
     dataset: 'production'
   },
   /**

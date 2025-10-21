@@ -31,13 +31,13 @@
 </template>
 
 <script setup lang="ts">
+
 const route = useRoute();
 const categorySlug = route.params.category as string;
 
-const { useCategoryBySlug } = useSanity();
 const { isWaitingListMode } = useWaitingListMode()
 
-const { data: category } = await useCategoryBySlug(categorySlug);
+const { data: category } = await useSanityQuery<GuideCategory>(categoryBySlugQuery, { slug: categorySlug })
 const guides = computed(() => category.value?.guides || []);
 
 const title = computed(() => (category.value ? category.value.title : "Category Not Found"));
@@ -67,7 +67,6 @@ useSeoMeta({
   ogDescription: seoDescription,
   ogType: 'website',
   ogUrl: categoryUrl,
-  ogImage: computed(() => category.value?.heroImage?.asset?.url),
   twitterCard: 'summary_large_image',
 });
 

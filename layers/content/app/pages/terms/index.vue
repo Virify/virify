@@ -11,8 +11,8 @@
     
     <section v-else-if="data" class="legal-page__content">
       <h1 class="legal-page__title | title-2xl">{{ data.title }}</h1>
-      <p class="legal-page__updated | body-xs" v-if="data.updatedAt">
-        Last updated: {{ formatDate(data.updatedAt) }}
+      <p class="legal-page__updated | body-xs" v-if="data.lastUpdated">
+        Last updated: {{ formatDate(data.lastUpdated) }}
       </p>
       
       <SanityContent v-if="data.content" :blocks="data.content" />
@@ -21,8 +21,8 @@
 </template>
 
 <script setup lang="ts">
-const { useTerms } = useSanity()
-const { data, pending, error } = await useTerms()
+
+const { data, pending, error } = await useSanityQuery<PolicyPage>(termsQuery)
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)

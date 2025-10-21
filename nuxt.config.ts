@@ -15,7 +15,7 @@ export default defineNuxtConfig({
       CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
     },
   },
-  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo"],
+  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
   
   // Nuxt SEO Configuration
   site: {
@@ -92,10 +92,11 @@ export default defineNuxtConfig({
     },
   },
   security: {
+    enabled: false, // Disabled to allow Sanity Studio iframe embedding
     rateLimiter: {
       tokensPerInterval: 150,
-      interval: 60000, // 1 minute
-      throwError: false, // Optional: don't throw error, just block
+      interval: 60000,
+      throwError: false,
     },
     xssValidator: {
       methods: ["POST", "PUT", "PATCH", "DELETE", "GET"],
@@ -109,6 +110,7 @@ export default defineNuxtConfig({
     sri: false,
     requestSizeLimiter: false,
   },
+  
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],

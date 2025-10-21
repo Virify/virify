@@ -79,8 +79,12 @@
   </footer>
 </template>
 
-<script setup>
+<script setup lang="ts">
+
 const { isWaitingListMode, config } = useWaitingListMode()
+
+// Get guide categories for footer navigation
+const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery)
 
 // Determine which sections to show
 const footerConfig = computed(() => {
@@ -105,10 +109,6 @@ const footerConfig = computed(() => {
 })
 
 const currentYear = new Date().getFullYear();
-
-// Get guide categories for footer navigation
-const { useCategories } = useSanity();
-const { data: categories } = await useCategories();
 </script>
 
 <style lang="scss">

@@ -72,8 +72,7 @@
 </template>
 <script setup lang="ts">
 
-const { useNavigationData } = useSanity()
-const { data: navigationData } = await useNavigationData()
+const { data: navigationData } = await useSanityQuery<GuideCategory[]>(navigationQuery)
 
 const {
   centerItems,
