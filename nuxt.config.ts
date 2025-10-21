@@ -104,7 +104,6 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
-      xFrameOptions: 'SAMEORIGIN', // Prevent iframe embedding except same origin
     },
     nonce: false,
     sri: false,
