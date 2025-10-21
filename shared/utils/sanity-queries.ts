@@ -153,16 +153,6 @@ export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
       description
     }
   },
-  sellersBenefits {
-    title,
-    subtitle,
-    features[] {
-      icon,
-      title,
-      subtitle,
-      description
-    }
-  },
   earlyAccessBenefits {
     title,
     subtitle,
