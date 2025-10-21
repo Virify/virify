@@ -11,15 +11,18 @@ export default defineConfig({
   dataset: 'production',
   plugins: [
     structureTool(), 
-    presentationTool({
-      previewUrl: {
-        origin: process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:3000',
-        previewMode: {
-          enable: '/api/preview/enable',
-          disable: '/api/preview/disable',
-        }
-      },
-    }),
+       presentationTool({
+         previewUrl: {
+           initial: 'https://virify.co.uk',
+           // Use the explicit env var when provided (set this in your Studio deployment).
+           // Fall back to the public staging site so the Presentation Tool doesn't default to localhost.
+           origin: 'https://virify.co.uk',
+           previewMode: {
+             enable: '/api/preview/enable',
+             disable: '/api/preview/disable',
+           },
+         },
+       }),
     visionTool(),
   ],
 
