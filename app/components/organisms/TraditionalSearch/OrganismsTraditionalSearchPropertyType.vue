@@ -1,7 +1,7 @@
 <template>
   <div class="o-property-types" role="presentation">
     <ul class="o-property-types__list">
-      <li v-for="{ name, options, selected, defaultSelected } of propertyTypes" :key="name"
+      <li v-for="{ name, icon, options, selected, defaultSelected } of propertyTypes" :key="name"
         class="o-property-types__list-item | relative">
 
         <OrganismsTraditionalSearchPropertySubtype button-class="o-property-types__dropdown" :name :options :selected
@@ -11,7 +11,7 @@
           <input type="checkbox" :name="name" v-model="selectedTypes[name]" class="| visually-hidden"
             :checked="defaultSelected" @input="event => updateSelectedType(event, { name, options })" />
 
-          <AtomsIcon icon="tick-solid" aria-hidden class="o-property-types__input-icon" />
+          <AtomsIcon :icon aria-hidden class="o-property-types__input-icon" />
 
           <span class="o-property-types__input-text | body-sm">{{ name }}</span>
         </label>
@@ -23,6 +23,7 @@
 <script setup lang="ts">
 interface PropertyType extends PropertyTypeWithOptions {
   selected: string[]
+  icon: string
 }
 
 /**
@@ -30,13 +31,25 @@ interface PropertyType extends PropertyTypeWithOptions {
  */
 const propertyTypes = useState<PropertyType[]>('property-types', () => [])
 
+const propertyTypeIcons: Record<string, string> = {
+  'House': 'legacy-search/house',
+  'Bungalow': 'legacy-search/bungalow',
+  'Cottage': 'legacy-search/cottage',
+  'Flat': 'legacy-search/flats',
+  // 'Land': 'legacy-search/land',
+  'Farms': 'legacy-search/farms',
+  'Specialty': 'legacy-search/specialty',
+  'Student Accommodation': 'legacy-search/student-accommodation',
+}
+
 callOnce(async () => {
   useFetch<PropertyTypeWithOptions[]>('/api/property-type/').then(({ data }) => {
     propertyTypes.value = asArray(data.value).map((row) => {
-      const { options, defaultSelected } = asObject(row)
+      const { options, name, defaultSelected } = asObject(row)
 
       return {
         ...(asObject(row) as Record<string, unknown>),
+        icon: propertyTypeIcons[name as string] || 'legacy-search/unknown',
         selected: defaultSelected ? getOptionsAsStrings(options) : []
       }
     }) as never as PropertyType[]
@@ -116,6 +129,8 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
 .o-property-types {
   container-type: inline-size;
 
+  --o-property-types-padding: var(--size-10);
+
   &__list {
     list-style: none;
     padding: 0;
@@ -147,10 +162,10 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     justify-content: center;
     overflow: hidden;
     background: transparent;
-    gap: var(--size-6);
+    gap: var(--size-8);
     border: 2px solid var(--border-color-100);
     border-radius: var(--border-radius-xl);
-    padding: var(--size-10) var(--size-8) var(--size-48);
+    padding: var(--size-8) var(--o-property-types-padding) var(--size-56);
     transition: border-color, background-color;
     transition-duration: var(--animation-fast);
     cursor: pointer;
@@ -167,14 +182,14 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: var(--lineheight-sm);
+    line-height: var(--lineheight-xs);
   }
 
   &__dropdown {
     position: absolute;
-    bottom: var(--size-8);
-    left: var(--size-8);
-    right: var(--size-8);
+    bottom: var(--o-property-types-padding);
+    left: var(--o-property-types-padding);
+    right: var(--o-property-types-padding);
     height: var(--size-36);
     padding: 0;
     margin: 0;
