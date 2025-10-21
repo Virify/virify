@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     visualEditing: {
       studioUrl: process.env.SANITY_STUDIO_URL || 'http://localhost:3333',
       token: process.env.SANITY_API_TOKEN,
-      stega: true,
+      stega: process.env.SANITY_PREVIEW === 'true', // Only enable stega on preview
       mode: 'visual-editing',
       previewMode: {
         enable: '/api/preview/enable',
