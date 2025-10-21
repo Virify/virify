@@ -187,8 +187,10 @@ import { useIntersectionObserver } from "@vueuse/core";
 
 const { showToast } = useToast();
 
-// Fetch CMS content with fallback
-const { data: cmsContent } = await useSanityQuery<WaitingListPage>(waitingListPageQuery)
+// Fetch CMS content - module automatically uses correct perspective
+const { data: cmsContent } = await useSanityQuery<WaitingListPage>(
+  waitingListPageQuery
+);
 
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");

@@ -108,6 +108,7 @@ export default defineNuxtConfig({
     sri: false,
     requestSizeLimiter: false,
   },
+  
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],

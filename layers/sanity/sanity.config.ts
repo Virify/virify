@@ -13,13 +13,13 @@ export default defineConfig({
     structureTool(),
     presentationTool({
       previewUrl: {
-        initial: 'https://virify.co.uk',
-        origin: 'https://virify.co.uk',
+        origin: process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:3000',
         previewMode: {
           enable: '/api/preview/enable',
           disable: '/api/preview/disable',
         },
       },
+      allowOrigins: ['http://localhost:3000', 'https://virify.co.uk'],
     }),
     visionTool(),
   ],
