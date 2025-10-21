@@ -43,18 +43,35 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
 
   /**
    * Adds a marker to the map instance
-   * @deprecated this method does not appear to be used
    */
-  function addMarker(map: ExtendedMapTilerMap, marker: Array<{ lat: number; lon: number }> | null | undefined): Marker | undefined {
+  function addMarker(map: ExtendedMapTilerMap, marker?: ListingCardType): Marker | undefined {
     const instance = findMapInstance(map, mapCache);
-    if (!instance || !marker || marker.length === 0 || !marker[0]) {
-      console.error("[Map] Instance not found or invalid marker");
+
+    if (!instance || !marker) {
+      console.error("[Map] Instance not found or invalid markers argument");
+
       return undefined;
     }
-    const newMarker = new sdk.Marker().setLngLat([marker[0].lon, marker[0].lat]);
+
+    const { lat, lon } = asObject(marker.property?.address)
+
+    if (!Number(lat) || !Number(lon)) {
+      console.error("[Map] Marker does not have a latitude or longitude");
+
+      return undefined
+    }
+
+    const newMarker = new sdk.Marker().setLngLat([
+      (lon as number),
+      (lat as number)
+    ]);
+
     newMarker.addTo(map);
+
     instance.markers.push(newMarker);
+
     console.log("[Map] Added marker to map instance");
+
     return newMarker;
   }
 
@@ -63,24 +80,8 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
    * Adds multiple markers to the map instance for a specific feature
    * @deprecated this method does not appear to be used
    */
-  function addMarkersForFeature(map: ExtendedMapTilerMap, markersData: MapMarker[], featureId: string): Marker[] {
-    const instance = findMapInstance(map, mapCache);
-    if (!instance) {
-      console.error("[Map] Instance not found");
-      return [];
-    }
-
-    const addedSdkMarkers: Marker[] = [];
-    for (const markerData of markersData) {
-      const newSdkMarker = _createAndAddSdkMarker(map, markerData, instance);
-      addedSdkMarkers.push(newSdkMarker);
-    }
-
-    // Store the markers for this feature
-    instance.featureMarkers.set(featureId, addedSdkMarkers);
-
-    console.log(`[Map] Added ${addedSdkMarkers.length} markers for feature ${featureId}`);
-    return addedSdkMarkers;
+  function addMarkersForFeature(): Marker[] {
+    return [];
   }
 
   /**
@@ -132,69 +133,79 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     // If a source already exists, simple update the data
     if (existingListings) {
       existingListings.setData(markerData)
-
-      return
     }
 
     // Else add a new source
-    map.addSource('property_listings', {
-      type: 'geojson',
-      data: markerData,
-      cluster: true,
-      clusterRadius: 75 // In pixels
-    })
+    else {
+      map.addSource('property_listings', {
+        type: 'geojson',
+        data: markerData,
+        cluster: true,
+        clusterRadius: 75 // In pixels
+      })
+    }
 
-    map.addLayer({
-      id: 'clusters',
-      type: 'circle',
-      source: 'property_listings',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': [
-          'step',
-          ['get', 'point_count'],
-          '#FEC7B0', // Colour...
-          2, // ...when 2 properties
-          '#FD8E61', // Colour...
-          5, // ...when less than 5 properties
-          '#FC7239' // Else when more than 5 properties
-        ],
-        'circle-radius': [
-          'step',
-          ['get', 'point_count'],
-          10, // Radius 20px
-          2, // When 2 properties
-          16, // Radius 30px
-          5, // When less than 5 properties
-          26 // Else radius 40px when more than 5 properties
-        ],
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#622c15ff'
-      },
-    })
+    // Add any missing layers
+    if (!map.getLayer('clusters')) {
+      map.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'property_listings',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': [
+            'step',
+            ['get', 'point_count'],
+            '#FEC7B0', // Colour...
+            2, // ...when 2 properties
+            '#FD8E61', // Colour...
+            5, // ...when less than 5 properties
+            '#FC7239' // Else when more than 5 properties
+          ],
+          'circle-radius': [
+            'step',
+            ['get', 'point_count'],
+            10, // Radius 20px
+            2, // When 2 properties
+            16, // Radius 30px
+            5, // When less than 5 properties
+            26 // Else radius 40px when more than 5 properties
+          ],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#622c15ff'
+        },
+      })
+    }
 
-    map.addLayer({
-      id: 'cluster-count',
-      type: 'symbol',
-      source: 'property_listings',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': '{point_count_abbreviated}',
-        'text-font': ['Be Vietnam Pro', 'sans-serif'],
-        'text-size': 16
-      }
-    })
+    if (!map.getLayer('cluster-count')) {
+      map.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'property_listings',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['Be Vietnam Pro', 'sans-serif'],
+          'text-size': 16
+        }
+      })
+    }
 
-    map.addLayer({
-      id: 'unclustered-count',
-      type: 'circle',
-      source: 'property_listings',
-      filter: ['!', ['has', 'point_count']],
-      paint: {
-        'circle-radius': 2,
-        'circle-color': 'transparent',
-      }
-    })
+    if (!map.getLayer('unclustered-count')) {
+      map.addLayer({
+        id: 'unclustered-count',
+        type: 'circle',
+        source: 'property_listings',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-radius': 2,
+          'circle-color': 'transparent',
+        }
+      })
+    }
+
+    // If listings already exist, listeners have already been added
+    if (existingListings) return
 
     // Zoom into cluster on click
     map.on('click', 'clusters', async (e: { point: unknown }) => {
@@ -229,13 +240,19 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
 
     // Function to get and add unclustered markers
     const _addUnClusteredMarkers = useDebounceFn(() => {
+      const hasClusters = map.queryRenderedFeatures(null, {
+        layers: ['unclustered-count', 'clusters']
+      })
+
+      // If clusters already exist, clear any markers present
+      if (hasClusters?.length) {
+        clearMarkers(map)
+      }
+
       // Get a list of visible markers
       const unclusteredMarkers = map.queryRenderedFeatures(null, {
         layers: ['unclustered-count']
       })
-
-      // Clear any existing markers
-      clearMarkers(map)
 
       // Get a list of visible IDs
       // We need to do it this way as the markers added via the
@@ -278,16 +295,37 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     console.log(`[Map] Added ${markerData.features?.length} general markers to map instance`);
   }
 
+  function clearClusters(map: ExtendedMapTilerMap): void {
+    const instance = findMapInstance(map, mapCache);
+
+    if (!instance) return
+
+    // Get each layer for map
+    const clusters = instance.map.getLayer('clusters')
+    const clusterCount = instance.map.getLayer('cluster-count')
+    const unclusteredCount = instance.map.getLayer('unclustered-count')
+
+    // Remove layer if it exists
+    if (clusters) instance.map.removeLayer('clusters')
+    if (clusterCount) instance.map.removeLayer('cluster-count')
+    if (unclusteredCount) instance.map.removeLayer('unclustered-count')
+
+    console.log('Map] Clusters removed from map')
+  }
+
   /**
    * Clears all markers from a map
    *
    * @param map The map to clear markers from
    */
-  function clearMarkers(map: ExtendedMapTilerMap): void {
+  function clearMarkers(map: ExtendedMapTilerMap, removeClusters: boolean = false): void {
     const instance = findMapInstance(map, mapCache);
+
     if (instance) {
       instance.markers.forEach((marker) => marker.remove());
+
       console.log("[Map] Cleared markers from map instance");
+
       instance.markers = [];
       instance.featureMarkers.clear();
     }
@@ -325,5 +363,6 @@ export function useMapMarkers(mapCache: Map<string, MapInstance>) {
     addMarkersForFeature,
     clearMarkers,
     clearMarkersForFeature,
+    clearClusters,
   } as const;
 }
