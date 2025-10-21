@@ -4,7 +4,7 @@ export default defineNuxtConfig({
     projectId: 'zl7h47m2',
     dataset: 'production',
     apiVersion: '2024-01-01',
-    useCdn: false, // Disable CDN to allow draft content fetching
+    useCdn: true, // Enable CDN for performance; disable only for preview/draft queries as needed
     // Token present to allow Studio/visual editing during dev
     // Use environment variable here because `runtimeConfig` is not available at module evaluation time
     visualEditing: {
