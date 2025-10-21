@@ -21,6 +21,8 @@ export default defineEventHandler((event) => {
       '/api/_auth/',                 // Nuxt Auth Utils endpoints
       '/api/price-paid/',            // Price Paid Data endpoints
       '/api/__sitemap__/',           // Nuxt SEO sitemap generation
+      '/api/preview/enable',         // Sanity preview enable
+      '/api/preview/disable',        // Sanity preview disable
     ];
 
     // Check if the path is an API route
