@@ -92,17 +92,19 @@ export default defineNuxtConfig({
     },
   },
   security: {
-    enabled: process.env.NODE_ENV === 'production', // Only enable in production
+    enabled: false, // Disabled to allow Sanity Studio iframe embedding
     rateLimiter: {
       tokensPerInterval: 150,
-      interval: 60000, // 1 minute
-      throwError: false, // Optional: don't throw error, just block
+      interval: 60000,
+      throwError: false,
     },
-    xssValidator: false, // Disable in dev
+    xssValidator: {
+      methods: ["POST", "PUT", "PATCH", "DELETE", "GET"],
+      escapeHtml: true,
+    },
     headers: {
       permissionsPolicy: false,
-      contentSecurityPolicy: false, // Disable CSP in dev, will be enabled in production
-      xFrameOptions: false,
+      contentSecurityPolicy: false,
     },
     nonce: false,
     sri: false,
