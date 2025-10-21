@@ -44,7 +44,8 @@ export const categoryBySlugQuery = `*[_type == "guideCategory" && slug.current =
 }`
 
 // Guide queries
-export const guideBySlugQuery = `*[_type == "guide" && slug.current == $slug && isPublished == true][0] {
+// Note: No isPublished filter - perspective setting controls draft vs published content
+export const guideBySlugQuery = `*[_type == "guide" && slug.current == $slug][0] {
   _id,
   _type,
   title,
