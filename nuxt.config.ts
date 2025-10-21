@@ -91,7 +91,7 @@ export default defineNuxtConfig({
     },
   },
   security: {
-    enabled: process.env.NODE_ENV === 'production' && process.env.SANITY_PREVIEW !== 'true',
+    enabled: true,
     rateLimiter: {
       tokensPerInterval: 150,
       interval: 60000,
@@ -104,6 +104,7 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
+      xFrameOptions: false,
     },
     nonce: false,
     sri: false,
