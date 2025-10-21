@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     projectId: 'zl7h47m2',
     dataset: 'production',
     apiVersion: '2024-01-01',
-    useCdn: false,
+    useCdn: process.env.SANITY_PREVIEW === 'true' ? false : true,
+    perspective: process.env.SANITY_PREVIEW === 'true' ? 'drafts' : 'published',
     visualEditing: {
       studioUrl: process.env.SANITY_STUDIO_URL || 'http://localhost:3333',
       token: process.env.SANITY_API_TOKEN,
