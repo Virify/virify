@@ -19,7 +19,7 @@ export default defineConfig({
           disable: '/api/preview/disable',
         },
       },
-      allowOrigins: ['http://localhost:3000', 'https://virify.co.uk'],
+      allowOrigins: ['http://localhost:3000', 'https://preview.virify.co.uk'],
     }),
     visionTool(),
   ],
