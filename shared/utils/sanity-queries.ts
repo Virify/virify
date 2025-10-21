@@ -58,7 +58,9 @@ export const guideBySlugQuery = `*[_type == "guide" && slug.current == $slug][0]
       ..., 
       markDefs[]{
         ..., 
-        _type == 'internalLink' => { reference-> { _id, title, 'slug': slug.current, 'category': category-> { 'slug': slug.current } } }
+        _type == 'internalLink' => { 
+          "reference": @.reference->{_id, title, 'slug': slug.current, 'category': category->{'slug': slug.current}}
+        }
       }
     }
   },
