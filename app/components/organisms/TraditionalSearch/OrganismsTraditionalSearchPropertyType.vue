@@ -36,7 +36,7 @@ const propertyTypeIcons: Record<string, string> = {
   'Bungalow': 'legacy-search/bungalow',
   'Cottage': 'legacy-search/cottage',
   'Flat': 'legacy-search/flats',
-  // 'Land': 'legacy-search/land',
+  'Land': 'legacy-search/land',
   'Farms': 'legacy-search/farms',
   'Specialty': 'legacy-search/specialty',
   'Student Accommodation': 'legacy-search/student-accommodation',
