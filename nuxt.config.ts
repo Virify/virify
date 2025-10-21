@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     name: 'Virify',
     description: 'The UK\'s first open property marketplace. AI-powered property search and verified private listings.',
     defaultLocale: 'en-GB',
+    indexable: process.env.SANITY_PREVIEW !== 'true',
   },
   
   // Schema.org structured data
@@ -63,7 +64,6 @@ export default defineNuxtConfig({
       '/ai-search',
     ],
   },
-  
   // Sitemap configuration
   sitemap: {
     exclude: [
@@ -85,14 +85,13 @@ export default defineNuxtConfig({
       '/api/__sitemap__/guides',
     ],
   },
-  
   image: {
     cloudflare: {
       baseURL: process.env.CF_IMAGES_URL,
     },
   },
   security: {
-    enabled: false, // Disabled to allow Sanity Studio iframe embedding
+    enabled: process.env.NODE_ENV === 'production' && process.env.SANITY_PREVIEW !== 'true',
     rateLimiter: {
       tokensPerInterval: 150,
       interval: 60000,
@@ -105,6 +104,7 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
+      xFrameOptions: 'SAMEORIGIN', // Prevent iframe embedding except same origin
     },
     nonce: false,
     sri: false,
