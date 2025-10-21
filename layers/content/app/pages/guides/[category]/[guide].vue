@@ -32,13 +32,12 @@
 </template>
 
 <script setup lang="ts">
+
 const route = useRoute()
 const guideSlug = route.params.guide as string
 const { isWaitingListMode } = useWaitingListMode()
 
-const { useGuideBySlug } = useSanity()
-
-const { data: guide } = await useGuideBySlug(guideSlug)
+const { data: guide } = await useSanityQuery<GuideWithCategory>(guideBySlugQuery, { slug: guideSlug })
 
 const breadcrumbItems = computed(() => [
   { label: "Guides", to: "/guides" },
@@ -68,7 +67,6 @@ if (guide.value) {
     ogDescription: seoDescription,
     ogType: 'article',
     ogUrl: guideUrl,
-    ogImage: guide.value.heroImage?.asset?.url,
     twitterCard: 'summary_large_image',
     articlePublishedTime: guide.value.publishedAt,
     articleModifiedTime: guide.value.updatedAt || guide.value.publishedAt,

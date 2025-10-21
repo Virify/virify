@@ -15,7 +15,7 @@ export default defineNuxtConfig({
       CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
     },
   },
-  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo"],
+  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
   
   // Nuxt SEO Configuration
   site: {
@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     name: 'Virify',
     description: 'The UK\'s first open property marketplace. AI-powered property search and verified private listings.',
     defaultLocale: 'en-GB',
+    indexable: process.env.SANITY_PREVIEW !== 'true',
   },
   
   // Schema.org structured data
@@ -63,7 +64,6 @@ export default defineNuxtConfig({
       '/ai-search',
     ],
   },
-  
   // Sitemap configuration
   sitemap: {
     exclude: [
@@ -85,17 +85,17 @@ export default defineNuxtConfig({
       '/api/__sitemap__/guides',
     ],
   },
-  
   image: {
     cloudflare: {
       baseURL: process.env.CF_IMAGES_URL,
     },
   },
   security: {
+    enabled: true,
     rateLimiter: {
       tokensPerInterval: 150,
-      interval: 60000, // 1 minute
-      throwError: false, // Optional: don't throw error, just block
+      interval: 60000,
+      throwError: false,
     },
     xssValidator: {
       methods: ["POST", "PUT", "PATCH", "DELETE", "GET"],
@@ -104,11 +104,13 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
+      xFrameOptions: false,
     },
     nonce: false,
     sri: false,
     requestSizeLimiter: false,
   },
+  
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
