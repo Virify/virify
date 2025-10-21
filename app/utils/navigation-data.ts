@@ -7,6 +7,12 @@ export const getBaseCenterItems = (): NavigationItem[] => {
 
   const items: NavigationItem[] = [
     {
+      id: "waiting-list",
+      label: "Waiting List",
+      href: "/waiting-list/",
+      type: "link",
+    },
+    {
       id: "guides",
       label: "Guides",
       href: "/guides",
@@ -30,21 +36,23 @@ export const getBaseCenterItems = (): NavigationItem[] => {
     })
   }
 
-  items.push(
-    {
-      id: "property-info",
-      label: "Property Information",
-      type: "dropdown",
-      icon: "chevron-down",
-      children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: 'account/billing' }],
-    },
-    {
-      id: "waiting-list",
-      label: "Waiting List",
-      href: "/waiting-list/",
+  items.push({
+    id: "property-info",
+    label: "Property Information",
+    type: "dropdown",
+    icon: "chevron-down",
+    children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: 'account/billing' }],
+  })
+
+  // Add Contact link only in waiting list mode
+  if (isWaitingListMode.value) {
+    items.push({
+      id: "contact",
+      label: "Contact Us",
+      href: "/contact/",
       type: "link",
-    },
-  )
+    })
+  }
 
   return items
 }

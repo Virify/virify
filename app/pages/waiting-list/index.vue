@@ -1,22 +1,31 @@
 <template>
   <div class="waiting-list-page">
-    <!-- Hero Section -->
+    
+    <!-- ============================================ -->
+    <!-- HERO SECTION -->
+    <!-- ============================================ -->
     <section class="waiting-list-hero">
       <div class="container">
         <div class="waiting-list-hero__content">
-          <h1 class="waiting-list-hero__title | title-2xl lineheight-xs">The <span class="gradient-text">UK's</span> first <span
-              class="gradient-text">open</span> property marketplace</h1>
-          <p class="waiting-list-hero__subtitle | body-lg">Market privately, search with AI, and connect directly with sellers and landlords. Save time, cut costs, take control.</p>
+          <h1 class="waiting-list-hero__title | title-2xl lineheight-xs">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-else>{{ part.text }}</span>
+            </template>
+          </h1>
+          <p class="waiting-list-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
         </div>
       </div>
     </section>
 
-    <!-- Sign Up Form Section -->
+    <!-- ============================================ -->
+    <!-- SIGN UP FORM SECTION -->
+    <!-- ============================================ -->
     <section class="waiting-list-form-section">
       <div class="container">
         <div class="waiting-list-form-container">
-          <h2 class="waiting-list-form__title | title-md">Get early access</h2>
-          <p class="waiting-list-form__description | body-md">Whether you’re looking for your next home, ready to market privately, or an estate agent looking for a more cost-effective and easy-to-use platform, join our waiting list for exclusive early access and progress updates.</p>
+          <h2 class="waiting-list-form__title | title-md">{{ cmsContent?.formSection.title }}</h2>
+          <p class="waiting-list-form__description | body-md">{{ cmsContent?.formSection.description }}</p>
 
           <form @submit.prevent="handleSubmit" class="waiting-list-form">
             <div v-if="formError" class="waiting-list-form__error">
@@ -33,7 +42,8 @@
                   </div>
                   <div class="waiting-list-form__submit">
                     <AtomsButton v-if="!isSuccess" class="waiting-list-form__submit-button | button-monochrome"
-                      type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email"> Join Waiting List
+                      type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email"> 
+                      {{ cmsContent?.formSection.buttonText }}
                     </AtomsButton>
                   </div>
                 </div>
@@ -63,127 +73,125 @@
       </div>
     </section>
 
-    <!-- What We're Building Section (Buyers) -->
+    <!-- ============================================ -->
+    <!-- BUYERS BENEFITS SECTION -->
+    <!-- ============================================ -->
     <section class="waiting-list-features">
       <div class="container">
         <header class="waiting-list-features__header">
-          <h2 class="title-xl">For <span class="gradient-text">smart home seekers</span></h2>
-          <p class="body-md max-width-prose section-subtitle">We're building the property search platform we wish
-            existed. AI-powered, data-driven, and brutally honest about what you're actually getting.</p>
+          <h2 class="title-xl">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-else>{{ part.text }}</span>
+            </template>
+          </h2>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
         </header>
 
         <div class="waiting-list-features__grid" ref="buyersRef">
-          <MoleculesFeatureTile iconName="ai/prompt" title="AI-Powered Search" subtitle="Tell us in plain English"
-            description='"Big garden and quiet street" beats ticking 50 boxes. Our AI understands what you actually mean and finds properties that match.'
-            :class="{ 'animate-in': isBuyersVisible }" />
-
-          <MoleculesFeatureTile iconName="listings/savings" title="Real Data, No Spin" subtitle="Facts in one place"
-            description="Actual sale prices, genuine crime stats, honest flood risks. We do the leg work and pull all the data into one place."
-            :class="{ 'animate-in': isBuyersVisible }" />
-
-          <MoleculesFeatureTile iconName="explore/map" title="Map-Based Searching" subtitle="Draw your perfect area"
-            description="Draw your perfect area on a map. See everything available at once. No more clicking through hundreds of listings one by one."
-            :class="{ 'animate-in': isBuyersVisible }" />
-
-          <MoleculesFeatureTile iconName="amenities/school" title="Neighbourhood Insights"
-            subtitle="What it's like to live there"
-            description="Schools, transport, broadband speeds, energy costs. All the crucial stuff you need to make a decision on your next home."
-            :class="{ 'animate-in': isBuyersVisible }" />
-
-          <MoleculesFeatureTile iconName="listings/eco" title="Running Costs" subtitle="Bills before you commit"
-            description="From energy ratings, council tax bands and utilities, see how much the bills currently cost, and estimate your outgoings."
-            :class="{ 'animate-in': isBuyersVisible }" />
-
-          <MoleculesFeatureTile iconName="property/security" title="Deal Direct with Owners"
-            subtitle="Virified private listings, no middlemen"
-            description="Connect directly with real people and get the detail from the people who actually own the place, without the marketing spin."
+          <MoleculesFeatureTile 
+            v-for="(feature, index) in cmsContent?.buyersBenefits.features" 
+            :key="index"
+            :iconName="feature.icon" 
+            :title="feature.title" 
+            :subtitle="feature.subtitle"
+            :description="feature.description"
             :class="{ 'animate-in': isBuyersVisible }" />
         </div>
       </div>
     </section>
 
-    <!-- For Sellers Section -->
+    <!-- ============================================ -->
+    <!-- SELLERS BENEFITS SECTION -->
+    <!-- ============================================ -->
     <section class="waiting-list-sellers">
       <div class="container">
         <header class="waiting-list-sellers__header">
-          <h2 class="title-xl">Market <span class="gradient-text">smarter</span>, keep <span class="gradient-text">more</span></h2>
-          <p class="body-md max-width-prose section-subtitle">Create your own listing and connect directly with home seekers. Take control, manage your process and save costs.</p>
+          <h2 class="title-xl">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.sellersBenefits.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-else>{{ part.text }}</span>
+            </template>
+          </h2>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.sellersBenefits.subtitle }}</p>
         </header>
 
         <div class="waiting-list-sellers__grid" ref="sellersRef">
-          <MoleculesFeatureTile iconName="listings/savings" title="Keep more of your money" subtitle="No commission, no hidden costs"
-            description="Clear, up-front and low-costs. Sounds good? Market on Virify."
-            variant="blue" :class="{ 'animate-in': isSellersVisible }" />
-
-          <MoleculesFeatureTile iconName="cards/verified" title="Take control" subtitle="Your listing, your style"
-            description="Our personalised dashboard provides you with all the easy-to-use tools you need to market your property at your own pace."
-            :class="{ 'animate-in': isSellersVisible }" variant="blue" />
-
-          <MoleculesFeatureTile iconName="account/chat" title="Direct messaging"
-            subtitle="Messages without the middlemen"
-            description="Message users directly through our secure platform. Arrange viewings and discuss offers on your terms."
-            :class="{ 'animate-in': isSellersVisible }" variant="blue" />
-
-          <MoleculesFeatureTile iconName="ai/edit" title="Easy Listing Creation" subtitle="Guided and intuitive creation"
-            description="Our guided form makes listing simple. Add photos and details in minutes."
-            :class="{ 'animate-in': isSellersVisible }" variant="blue" />
-
-          <MoleculesFeatureTile iconName="explore/ai" title="AI-Powered Matching" subtitle="Be matched to the right person for your home using our AI-powered search."
-            description="Be matched to the right person for your home using our AI-powered search."
-            :class="{ 'animate-in': isSellersVisible }" variant="blue" />
-
-          <MoleculesFeatureTile iconName="content/info" title="Support & Guidance"
-            subtitle="From thinking about marketing to accepting an offer"
-            description="First time marketing without an estate agent? Our guides and easy-to-use platform gives you all the tools you need."
-            :class="{ 'animate-in': isSellersVisible }" variant="blue" />
+          <MoleculesFeatureTile 
+            v-for="(feature, index) in cmsContent?.sellersBenefits.features" 
+            :key="index"
+            :iconName="feature.icon" 
+            :title="feature.title" 
+            :subtitle="feature.subtitle"
+            :description="feature.description"
+            variant="blue" 
+            :class="{ 'animate-in': isSellersVisible }" />
         </div>
       </div>
     </section>
 
-    <!-- Why Early Access Section -->
+    <!-- ============================================ -->
+    <!-- EARLY ACCESS BENEFITS SECTION -->
+    <!-- ============================================ -->
     <section class="waiting-list-benefits">
       <div class="container">
         <header class="waiting-list-benefits__header">
-          <h2 class="title-xl">Get <span class="gradient-text">ahead</span> before everyone else</h2>
-          <p class="body-md max-width-prose section-subtitle">Get first access to a smarter way to buy and sell property, powered by AI, built by real people who’ve had enough of the old way.</p>
+          <h2 class="title-xl">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.earlyAccessBenefits.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-else>{{ part.text }}</span>
+            </template>
+          </h2>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.earlyAccessBenefits.subtitle }}</p>
         </header>
 
         <div class="waiting-list-benefits__cards">
-          <AtomsHeroCard>
-            <h3 class="title-md gradient-text">Be First In</h3>
-            <p class="body-md">Get early access before launch. Be amongst the first to search with AI or list your property privately in the UK.</p>
-          </AtomsHeroCard>
-
-          <AtomsHeroCard variant="secondary">
-            <h3 class="title-md">Insider Perks</h3>
-            <p class="body-md">Founding members get reduced fees and first access to our AI-powered tools.</p>
-          </AtomsHeroCard>
-
-          <AtomsHeroCard>
-            <h3 class="title-md gradient-text">Direct Influence</h3>
-            <p class="body-md">Your feedback shapes our next features, from smarter search filters to better pricing tools.</p>
+          <AtomsHeroCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index" :variant="index === 1 ? 'secondary' : undefined">
+            <h3 class="title-md">
+              <template v-for="(part, pIndex) in parseGradientTextParts(benefit.title || '')" :key="pIndex">
+                <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+                <span v-else>{{ part.text }}</span>
+              </template>
+            </h3>
+            <p class="body-md">{{ benefit.description }}</p>
           </AtomsHeroCard>
         </div>
       </div>
     </section>
 
-    <!-- Final CTA Section -->
-    <section class="waiting-list-final-cta">
-      <div class="container">
-        <div class="waiting-list-final-cta__content">
-          <h2 class="title-xl">Ready to market the <span class="gradient-text">new way?</span></h2>
-          <p class="body-lg max-width-prose">Join thousands who are ready for honest property searching and direct private listings. Whether you’re buying, selling, leasing or renting, Virify puts you in control.</p>
-          <AtomsButton @click="scrollToForm" class="waiting-list-final-cta__button | button-lg button-monochrome"> Join
-            the Waiting List </AtomsButton>
-        </div>
-      </div>
-    </section>
+    <!-- ============================================ -->
+    <!-- CONTACT SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.contactSection.title || ''"
+      :description="cmsContent?.contactSection.description || ''"
+      :buttonText="cmsContent?.contactSection.buttonText || ''"
+      to="/contact"
+    />
+
+    <!-- ============================================ -->
+    <!-- FINAL CTA SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.finalCta.title || ''"
+      :description="cmsContent?.finalCta.description || ''"
+      :buttonText="cmsContent?.finalCta.buttonText || ''"
+      gradient
+      @click="scrollToForm"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
+
 const { showToast } = useToast();
+
+// Fetch CMS content - module automatically uses correct perspective
+const { data: cmsContent } = await useSanityQuery<WaitingListPage>(
+  waitingListPageQuery
+);
+
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
 const agreedToTerms = ref(false);
@@ -254,20 +262,36 @@ function scrollToForm() {
 }
 
 // SEO - Nuxt SEO auto-generates WebPage schema from this
+// Use CMS SEO metadata if available, otherwise fallback to defaults
+const seoData = computed(() => {
+  const cms = cmsContent.value?.seo;
+  
+  return {
+    title: cms?.metaTitle,
+    description: cms?.metaDescription,
+    keywords: cms?.keywords,
+    ogTitle: cms?.ogTitle,
+    ogDescription: cms?.ogDescription,
+    ogImage: cms?.ogImage,
+    twitterCard: cms?.twitterCard,
+    canonicalUrl: cms?.canonicalUrl,
+  };
+});
+
 useSeoMeta({
-  title: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
-  description: 'Get early access to Virify, an AI-powered property search with real data, map-based searching, and direct connections to sellers and landlords. Whether you\'re ready to market privately or an estate agent looking for a more cost-effective solution, Virify has you covered.',
-  keywords: 'property portal, property sales, buy property, rent property, sell property, property marketplace UK, AI property search, sell without estate agent, private property listings, buy direct from owner, map-based property search, UK property platform, estate agent alternative',
-  ogTitle: 'Join Virify Waiting List - The UK\'s First Open Property Marketplace',
-  ogDescription: 'Market privately, search with AI, and connect directly. Save time, cut costs, take control of your property journey.',
+  title: seoData.value.title,
+  description: seoData.value.description,
+  keywords: seoData.value.keywords,
+  ogTitle: seoData.value.ogTitle,
+  ogDescription: seoData.value.ogDescription,
   ogType: 'website',
   ogUrl: 'https://virify.co.uk/waiting-list',
-  twitterCard: 'summary_large_image',
+  twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
 });
 
 useHead({
   link: [
-    { rel: 'canonical', href: 'https://virify.co.uk/waiting-list' }
+    { rel: 'canonical', href: seoData.value.canonicalUrl }
   ],
 });
 
@@ -562,29 +586,6 @@ useSchemaOrg([
     p {
       margin: 0;
     }
-  }
-}
-
-// Final CTA Section
-.waiting-list-final-cta {
-  padding: var(--size-120) 0;
-
-  &__content {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto;
-
-    h2 {
-      margin-bottom: var(--size-16);
-    }
-
-    p {
-      margin-bottom: var(--size-32);
-    }
-  }
-
-  &__button {
-    min-width: 280px;
   }
 }
 

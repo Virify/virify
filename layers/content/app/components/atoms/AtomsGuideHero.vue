@@ -4,6 +4,7 @@
       v-if="image" 
       provider="sanity" 
       :src="image.asset._ref" 
+      :alt="imageAlt"
       :width="1200" 
       :height="400"
       loading="eager"
@@ -13,6 +14,7 @@
     <nuxt-img 
       v-else 
       src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=300&q=75" 
+      :alt="fallbackAlt"
       class="guides-hero__image"
       placeholder='/img/preload.svg'
     />
@@ -35,12 +37,21 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   title: string;
   description: string;
   image?: SanityImage;
   meta?: string[];
 }>();
+
+// Generate descriptive alt text for SEO and accessibility
+const imageAlt = computed(() => 
+  props.image?.alt || `${props.title} - Property guide hero image`
+);
+
+const fallbackAlt = computed(() => 
+  `${props.title} - UK property guide`
+);
 </script>
 
 <style scoped lang="scss">

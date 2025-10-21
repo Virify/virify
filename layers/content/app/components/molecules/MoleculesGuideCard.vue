@@ -4,7 +4,8 @@
       <nuxt-img 
         v-if="image" 
         provider="sanity" 
-        :src="image.asset._ref" 
+        :src="image.asset._ref"
+        :alt="imageAlt"
         :width="600" 
         :height="300"
         loading="lazy"
@@ -24,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   title: string;
   to: string;
   image?: SanityImage;
@@ -34,6 +35,11 @@ defineProps<{
   isFeatured?: boolean;
   publishedAt?: string;
 }>();
+
+// Generate descriptive alt text for SEO and accessibility
+const imageAlt = computed(() => 
+  props.image?.alt || `${props.title} guide cover image`
+);
 </script>
 
 <style scoped lang="scss">

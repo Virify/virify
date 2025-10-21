@@ -132,6 +132,11 @@ export interface GuideResponse extends Guide {
   category?: GuideCategory
 }
 
+// Guide with dereferenced category (used in queries with category->)
+export interface GuideWithCategory extends Omit<Guide, 'category'> {
+  category?: GuideCategory
+}
+
 export interface SanityGuideCategory {
   _id: string
   title: string
@@ -181,3 +186,108 @@ export interface TermsResponse extends Terms {}
 export interface PrivacyResponse extends Privacy {}
 
 export interface CookieResponse extends Cookie {}
+
+// Policy page union type for convenience
+export interface PolicyPage {
+  _id: string
+  title: string
+  lastUpdated: string
+  content: PortableTextContent[]
+}
+
+// Waiting List Page
+export interface WaitingListFeature {
+  icon: string
+  title: string
+  subtitle: string
+  description: string
+}
+
+export interface WaitingListBenefit {
+  title: string
+  description: string
+  icon?: string
+}
+
+export interface SeoMetadata {
+  metaTitle?: string
+  metaDescription?: string
+  keywords?: string
+  ogTitle?: string
+  ogDescription?: string
+  ogImage?: string
+  twitterCard?: 'summary' | 'summary_large_image'
+  canonicalUrl?: string
+}
+
+export interface WaitingListPage {
+  _id: string
+  _type: 'waitingListPage'
+  hero: {
+    title: string
+    subtitle: string
+    description: string
+  }
+  formSection: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  buyersBenefits: {
+    title: string
+    subtitle: string
+    features: WaitingListFeature[]
+  }
+  sellersBenefits: {
+    title: string
+    subtitle: string
+    features: WaitingListFeature[]
+  }
+  earlyAccessBenefits: {
+    title: string
+    subtitle: string
+    benefits: WaitingListBenefit[]
+  }
+  contactSection: {
+    title: string
+    subtitle: string
+    description: string
+    buttonText: string
+  }
+  finalCta: {
+    title: string
+    subtitle: string
+    description: string
+    buttonText: string
+  }
+  seo?: SeoMetadata
+}
+
+export interface WaitingListPageResponse extends WaitingListPage {}
+
+// Contact Page
+export interface ContactPage {
+  _id: string
+  _type: 'contactPage'
+  hero: {
+    title: string
+    subtitle: string
+  }
+  formSection: {
+    title: string
+    description: string
+  }
+  partnerSection: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  interestedSection: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  seo?: SeoMetadata
+}
+
+export interface ContactPageResponse extends ContactPage {}

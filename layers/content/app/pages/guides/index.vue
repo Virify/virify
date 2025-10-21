@@ -27,10 +27,10 @@
 </template>
 
 <script setup lang="ts">
-const { useCategories } = useSanity();
+
 const { isWaitingListMode} = useWaitingListMode()
 
-const { data: categories } = await useCategories();
+const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery)
 
 const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }]);
 
