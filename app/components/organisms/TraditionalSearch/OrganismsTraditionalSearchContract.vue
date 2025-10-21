@@ -130,7 +130,15 @@ function updateIsBuy(newValue: boolean) {
   }
 
   &__content {
-    padding: var(--size-16);
+    padding: var(--size-16) 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: var(--size-8);
+
+    :where(&) {
+      display: flex;
+    }
   }
 }
 </style>
