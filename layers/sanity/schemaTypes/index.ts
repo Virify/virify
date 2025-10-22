@@ -5,8 +5,15 @@ import {termsType} from './termsType'
 import {cookieType} from './cookieType'
 import {waitingListPageType} from './waitingListPageType'
 import {contactPageType} from './contactPageType'
+import {iconType} from './iconType'
+import {featureSectionType} from './featureSectionType'
 
 export const schemaTypes = [
+  // Reusable types
+  iconType,
+  featureSectionType,
+  
+  // Documents
   guideCategory,
   guide,
   privacyType,

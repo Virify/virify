@@ -235,6 +235,35 @@
   }
 }
 
+.gradient-text-light {
+  color: var(--blue-600);
+
+  @supports (-webkit-text-fill-color: transparent) {
+    background: linear-gradient(135deg, 
+    light-dark(var(--secondary-400), var(--secondary-400)), 
+    light-dark(var(--secondary-500), var(--secondary-500)));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &-ai {
+    margin-right: 0.2ch;
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -0.15em;
+      right: -0.5em;
+      width: 0.6em;
+      height: 0.6em;
+      background: linear-gradient(135deg, var(--blue-600), var(--secondary-500));
+      mask-image: url('/img/ai-star.svg');
+      mask-size: contain;
+    }
+  }
+}
+
 /**
  *  Responsive text classes - automatically shrink on mobile
  */

@@ -11,10 +11,11 @@ export interface SanitySlug {
 }
 
 export interface SanityImage {
-  _type: 'image'
+  _type?: 'image'
   asset: {
-    _ref: string
-    _type: 'reference'
+    _ref?: string
+    _id?: string
+    _type?: 'reference'
     url?: string
   }
   alt?: string
@@ -209,6 +210,42 @@ export interface WaitingListBenefit {
   icon?: string
 }
 
+// Feature Section (reusable component)
+export interface FeatureSectionFeature {
+  icon: string
+  title: string
+  description: string
+}
+
+export interface OverlaidImages {
+  rear: string
+  rearAlt: string
+  front: string
+  frontAlt: string
+}
+
+export interface OverlaidSanityImages {
+  rear: SanityImage
+  front: SanityImage
+}
+
+export interface FeatureSection {
+  title: string
+  subtitle: string
+  features: FeatureSectionFeature[]
+  imageType: 'single' | 'overlaid'
+  imageSource?: 'cloudflare' | 'sanity'
+  image?: string
+  imageAlt?: string
+  sanityImage?: SanityImage
+  overlaidImagesSource?: 'cloudflare' | 'sanity'
+  overlaidImages?: OverlaidImages
+  overlaidSanityImages?: OverlaidSanityImages
+  imagePosition: 'left' | 'right'
+  background: 'white' | 'gradient'
+  iconColor: 'orange' | 'blue'
+}
+
 export interface SeoMetadata {
   metaTitle?: string
   metaDescription?: string
@@ -226,13 +263,13 @@ export interface WaitingListPage {
   hero: {
     title: string
     subtitle: string
-    description: string
   }
   formSection: {
     title: string
     description: string
     buttonText: string
   }
+  featureSections?: FeatureSection[]
   buyersBenefits: {
     title: string
     subtitle: string

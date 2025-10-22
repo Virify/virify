@@ -7,13 +7,17 @@
     <section class="waiting-list-hero">
       <div class="container">
         <div class="waiting-list-hero__content">
-          <h1 class="waiting-list-hero__title | title-2xl lineheight-xs">
+          <h1 class="waiting-list-hero__title | title-2xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
               <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
             </template>
           </h1>
           <p class="waiting-list-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
+          
+          <div class="waiting-list-hero__search-demo">
+            <MoleculesAnimatedSearchInput />
+          </div>
         </div>
       </div>
     </section>
@@ -23,7 +27,7 @@
     <!-- ============================================ -->
     <section class="waiting-list-form-section">
       <div class="container">
-        <div class="waiting-list-form-container">
+        <div class="waiting-list-form__header">
           <h2 class="waiting-list-form__title | title-md">{{ cmsContent?.formSection.title }}</h2>
           <p class="waiting-list-form__description | body-md">{{ cmsContent?.formSection.description }}</p>
 
@@ -74,42 +78,30 @@
     </section>
 
     <!-- ============================================ -->
-    <!-- BUYERS BENEFITS SECTION -->
+    <!-- FEATURE SECTIONS (FROM SANITY CMS) -->
     <!-- ============================================ -->
-    <section class="waiting-list-features">
-      <div class="container">
-        <header class="waiting-list-features__header">
-          <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <span v-else>{{ part.text }}</span>
-            </template>
-          </h2>
-          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
-        </header>
-
-        <div class="waiting-list-features__grid" ref="buyersRef">
-          <MoleculesFeatureTile 
-            v-for="(feature, index) in cmsContent?.buyersBenefits.features" 
-            :key="index"
-            :iconName="feature.icon" 
-            :title="feature.title" 
-            :subtitle="feature.subtitle"
-            :description="feature.description"
-            :class="{ 'animate-in': isBuyersVisible }" />
-        </div>
-      </div>
-    </section>
+    <OrganismsFeatureSection
+      v-for="(section, index) in processedFeatureSections"
+      :key="index"
+      v-bind="section"
+    >
+      <template #title>
+        <template v-for="(part, titleIndex) in parseGradientTextParts(section.title || '')" :key="titleIndex">
+          <span v-if="part.isGradient" :class="(section.background || 'white') === 'white' ? 'gradient-text-light' : 'gradient-text'">{{ part.text }}</span>
+          <span v-else>{{ part.text }}</span>
+        </template>
+      </template>
+    </OrganismsFeatureSection>
 
     <!-- ============================================ -->
     <!-- SELLERS BENEFITS SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-sellers">
+    <section class="waiting-list-sellers" :class="sellersBackground">
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.sellersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-if="part.isGradient" :class="sellersGradientClass">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
             </template>
           </h2>
@@ -124,21 +116,60 @@
             :title="feature.title" 
             :subtitle="feature.subtitle"
             :description="feature.description"
-            variant="blue" 
+            :variant="sellersVariant"
             :class="{ 'animate-in': isSellersVisible }" />
         </div>
       </div>
     </section>
 
     <!-- ============================================ -->
+    <!-- BUYERS BENEFITS SECTION -->
+    <!-- ============================================ -->
+    <section class="waiting-list-features" :class="buyersBackground">
+      <div class="container">
+        <header class="waiting-list-sellers__header">
+          <h2 class="title-xl">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
+              <span v-if="part.isGradient" :class="buyersGradientClass">{{ part.text }}</span>
+              <span v-else>{{ part.text }}</span>
+            </template>
+          </h2>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
+        </header>
+
+        <div class="waiting-list-features__grid" ref="buyersRef">
+          <MoleculesFeatureTile 
+            v-for="(feature, index) in cmsContent?.buyersBenefits.features"
+            :key="index"
+            :iconName="feature.icon" 
+            :title="feature.title" 
+            :subtitle="feature.subtitle"
+            :description="feature.description"
+            :variant="buyersVariant"
+            :class="{ 'animate-in': isBuyersVisible }" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- CONTACT SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.contactSection.title || ''"
+      :description="cmsContent?.contactSection.description || ''"
+      :buttonText="cmsContent?.contactSection.buttonText || ''"
+      :gradient="contactGradient"
+      to="/contact" />
+
+    <!-- ============================================ -->
     <!-- EARLY ACCESS BENEFITS SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-benefits">
+    <section class="waiting-list-benefits" :class="benefitsBackground">
       <div class="container">
         <header class="waiting-list-benefits__header">
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.earlyAccessBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-if="part.isGradient" :class="benefitsGradientClass">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
             </template>
           </h2>
@@ -160,23 +191,13 @@
     </section>
 
     <!-- ============================================ -->
-    <!-- CONTACT SECTION -->
-    <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.contactSection.title || ''"
-      :description="cmsContent?.contactSection.description || ''"
-      :buttonText="cmsContent?.contactSection.buttonText || ''"
-      to="/contact"
-    />
-
-    <!-- ============================================ -->
     <!-- FINAL CTA SECTION -->
     <!-- ============================================ -->
     <MoleculesCtaSection
       :title="cmsContent?.finalCta.title || ''"
       :description="cmsContent?.finalCta.description || ''"
       :buttonText="cmsContent?.finalCta.buttonText || ''"
-      gradient
+      :gradient="finalCtaGradient"
       @click="scrollToForm"
     />
   </div>
@@ -188,9 +209,35 @@ import { useIntersectionObserver } from "@vueuse/core";
 const { showToast } = useToast();
 
 // Fetch CMS content - module automatically uses correct perspective
-const { data: cmsContent } = await useSanityQuery<WaitingListPage>(
+const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(
   waitingListPageQuery
 );
+
+// Process feature sections: clean stega encoding and determine which image props to pass
+const processedFeatureSections = computed(() => 
+  processFeatureSections(cmsContent.value?.featureSections)
+);
+
+// Determine if we should alternate backgrounds for remaining sections
+// If there are NO CMS feature sections, alternate them; otherwise keep current backgrounds
+const hasCmsFeatures = computed(() => processedFeatureSections.value.length > 0);
+
+// Background classes for remaining sections (alternating only if no CMS features)
+const sellersBackground = computed(() => hasCmsFeatures.value ? '' : 'section-gradient-bg');
+const buyersBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const contactGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
+const benefitsBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const finalCtaGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
+
+// Gradient text classes based on background
+const sellersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text-light' : 'gradient-text');
+const buyersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
+const benefitsGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
+
+// Variant for feature tiles (blue when no gradient background, default otherwise)
+const sellersVariant = computed(() => hasCmsFeatures.value ? 'blue' : undefined);
+const buyersVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
+const benefitsVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
 
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
@@ -348,6 +395,11 @@ useSchemaOrg([
   }
 
   &__subtitle {
+    margin: 0 auto var(--size-32);
+  }
+
+  &__search-demo {
+    max-width: 600px;
     margin: 0 auto;
   }
 }
@@ -538,7 +590,6 @@ useSchemaOrg([
 
 // Features Section (Buyers)
 .waiting-list-features {
-  @extend .section-gradient-bg;
   @extend %section-grid;
 
   &__header {
@@ -565,7 +616,6 @@ useSchemaOrg([
 
 // Benefits Section
 .waiting-list-benefits {
-  @extend .section-gradient-bg;
   padding: var(--size-120) 0;
 
   &__header {
@@ -600,3 +650,4 @@ useSchemaOrg([
   margin: var(--size-12) auto 0;
 }
 </style>
+
