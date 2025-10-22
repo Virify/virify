@@ -14,6 +14,10 @@
             </template>
           </h1>
           <p class="waiting-list-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
+          
+          <div class="waiting-list-hero__search-demo">
+            <MoleculesAnimatedSearchInput />
+          </div>
         </div>
       </div>
     </section>
@@ -143,6 +147,22 @@
     </OrganismsFeatureSection>
 
     <!-- ============================================ -->
+    <!-- LISTING MANAGEMENT SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="Complete control over your property listings from one powerful dashboard"
+      :features="listingManagementFeatures"
+      image="c10956e4-620a-413f-e559-88ef26c5dc00"
+      image-position="left"
+      background="gradient"
+      icon-color="orange"
+    >
+      <template #title>
+        Manage your <span class="gradient-text">listings</span>
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
     <!-- SELLERS BENEFITS SECTION -->
     <!-- ============================================ -->
     <section class="waiting-list-sellers">
@@ -165,6 +185,7 @@
             :title="feature.title" 
             :subtitle="feature.subtitle"
             :description="feature.description"
+            variant="blue"
             :class="{ 'animate-in': isSellersVisible }" />
         </div>
       </div>
@@ -173,7 +194,7 @@
     <!-- ============================================ -->
     <!-- BUYERS BENEFITS SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-features">
+    <section class="waiting-list-features section-gradient-bg">
       <div class="container">
         <header class="waiting-list-features__header">
           <h2 class="title-xl">
@@ -193,7 +214,6 @@
             :title="feature.title" 
             :subtitle="feature.subtitle"
             :description="feature.description"
-            variant="blue"
             :class="{ 'animate-in': isBuyersVisible }" />
         </div>
       </div>
@@ -207,13 +227,12 @@
       :description="cmsContent?.contactSection.description || ''"
       :buttonText="cmsContent?.contactSection.buttonText || ''"
       to="/contact"
-      gradient
     />
 
     <!-- ============================================ -->
     <!-- EARLY ACCESS BENEFITS SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-benefits">
+    <section class="waiting-list-benefits section-gradient-bg">
       <div class="container">
         <header class="waiting-list-benefits__header">
           <h2 class="title-xl">
@@ -246,7 +265,6 @@
       :title="cmsContent?.finalCta.title || ''"
       :description="cmsContent?.finalCta.description || ''"
       :buttonText="cmsContent?.finalCta.buttonText || ''"
-      gradient
       @click="scrollToForm"
     />
   </div>
@@ -352,6 +370,29 @@ const chatFeatures = [
     icon: 'content/info',
     title: 'Listing Context',
     description: 'See property details, price, and location at a glance within each conversation thread.'
+  }
+];
+
+const listingManagementFeatures = [
+  {
+    icon: 'account/settings',
+    title: 'Live editing',
+    description: 'Update your listing details, photos, and pricing in real-time. Changes appear instantly on the platform.'
+  },
+  {
+    icon: 'account/dash',
+    title: 'Archive & publish',
+    description: 'Control your listing visibility with one click. Archive sold properties or republish when ready.'
+  },
+  {
+    icon: 'account/enquiry',
+    title: 'Enquiry management',
+    description: 'View and respond to all enquiries from interested buyers or tenants in one centralised dashboard.'
+  },
+  {
+    icon: 'explore/trending',
+    title: 'Performance analytics',
+    description: 'Track views, favourites, and engagement at a glance. Understand how your listing is performing.'
   }
 ];
 
@@ -511,6 +552,11 @@ useSchemaOrg([
   }
 
   &__subtitle {
+    margin: 0 auto var(--size-32);
+  }
+
+  &__search-demo {
+    max-width: 600px;
     margin: 0 auto;
   }
 }
@@ -715,7 +761,6 @@ useSchemaOrg([
 // Sellers Section
 .waiting-list-sellers {
   @extend %section-grid;
-  @extend .section-gradient-bg;
 
   &__header {
     @extend %section-header;
@@ -729,7 +774,6 @@ useSchemaOrg([
 // Benefits Section
 .waiting-list-benefits {
   padding: var(--size-120) 0;
-  background: var(--background-100);
 
   &__header {
     text-align: center;
