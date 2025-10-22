@@ -160,6 +160,75 @@
     </section>
 
     <!-- ============================================ -->
+    <!-- LOCATION FEATURES SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="Find your perfect property location with our intelligent search tools"
+      :features="locationFeatures"
+      image="b32ace1f-5afb-4cb6-3c44-74d3e2a48e00"
+      image-position="left"
+      background="white"
+      icon-color="orange"
+    >
+      <template #title>
+        Smart <span class="gradient-text">Location Search</span>
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
+    <!-- AI SEARCH SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="Our AI understands what you're really looking for"
+      :features="aiSearchFeatures"
+      image="bd49d010-1530-4e89-2b57-ded582855a00"
+      image-position="right"
+      background="gradient"
+      icon-color="orange"
+    >
+      <template #title>
+        Search in <span class="gradient-text-light">Plain English</span>
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
+    <!-- INTERACTIVE MAP SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="See everything at a glance with our information-rich map interface"
+      :features="mapFeatures"
+      image="3e5a8fb9-f943-4d6d-2ab1-e5b76bdc0400"
+      image-position="left"
+      background="white"
+      icon-color="orange"
+    >
+      <template #title>
+        <span class="gradient-text">Interactive Map</span> Experience
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
+    <!-- CHAT FEATURES SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="Connect instantly with landlords, sellers, buyers, and tenants"
+      :features="chatFeatures"
+      :overlaid-images="{
+        rear: '6c42d57c-fd22-4b93-b29c-54f73eb46600',
+        rearAlt: 'Chat conversations list showing multiple property enquiries',
+        front: '4e8f13f6-21b8-436b-fc3d-30244a527500',
+        frontAlt: 'Active chat conversation with property details and messaging'
+      }"
+      image-position="right"
+      background="gradient"
+      icon-color="orange"
+    >
+      <template #title>
+        Direct <span class="gradient-text-light">Communication</span>
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
     <!-- CONTACT SECTION -->
     <!-- ============================================ -->
     <MoleculesCtaSection
@@ -191,6 +260,99 @@ const { showToast } = useToast();
 const { data: cmsContent } = await useSanityQuery<WaitingListPage>(
   waitingListPageQuery
 );
+
+// Feature data for OrganismsFeatureSection components
+const locationFeatures = [
+  {
+    icon: 'search/trending',
+    title: 'Trending Locations',
+    description: 'Discover the most popular search areas in real-time. See where others are looking to help inform your search.'
+  },
+  {
+    icon: 'search/pin',
+    title: 'Saved Locations',
+    description: 'Save your favourite search locations for quick access. Never lose track of areas you\'re interested in.'
+  },
+  {
+    icon: 'search/location',
+    title: 'Smart Autocomplete',
+    description: 'Lightning-fast location suggestions as you type. Find any city, town, or postcode instantly with intelligent search.'
+  },
+  {
+    icon: 'search/history',
+    title: 'Search History',
+    description: 'Quick access to your recent searches. Jump back to previous locations without typing them again.'
+  }
+];
+
+const aiSearchFeatures = [
+  {
+    icon: 'ai/star',
+    title: 'Natural Language Search',
+    description: 'Type exactly what you want: "2+ bedroom property to buy in Cardiff" and we\'ll understand instantly.'
+  },
+  {
+    icon: 'ai/prompt',
+    title: 'Smart Suggestions',
+    description: 'Get intelligent property suggestions based on your requirements. See popular searches and trending options as you type.'
+  },
+  {
+    icon: 'search/filter',
+    title: 'Contextual Filtering',
+    description: 'Our AI automatically extracts location, property type, and transaction type from your search query.'
+  },
+  {
+    icon: 'ai/send',
+    title: 'Instant Results',
+    description: 'Get relevant property matches in seconds. No complex forms or confusing filters—just type and search.'
+  }
+];
+
+const mapFeatures = [
+  {
+    icon: 'map/marker-premium',
+    title: 'Photo Markers',
+    description: 'View property photos directly on map markers. Get a visual preview before clicking through to full details.'
+  },
+  {
+    icon: 'explore/top-picks',
+    title: 'Smart Clustering',
+    description: 'Intelligent marker clustering keeps the map clean and organized, even with hundreds of properties.'
+  },
+  {
+    icon: 'cards/favourite',
+    title: 'Favourites & Notes',
+    description: 'See your saved properties and notes right on the map. Visual indicators show your favourites at a glance.'
+  },
+  {
+    icon: 'explore/map',
+    title: 'Search Boundaries',
+    description: 'Visual radial and boundary overlays show your search area clearly. Adjust on the fly to refine results.'
+  }
+];
+
+const chatFeatures = [
+  {
+    icon: 'account/chat',
+    title: 'Direct Messaging',
+    description: 'Chat directly with property owners, landlords, and potential buyers or tenants. No intermediaries needed.'
+  },
+  {
+    icon: 'account/notifications',
+    title: 'Real-Time Notifications',
+    description: 'Get instant notifications for new messages, enquiries, and viewing requests. Never miss an opportunity.'
+  },
+  {
+    icon: 'cards/expand',
+    title: 'Rich Media Sharing',
+    description: 'Share photos, documents, and listing details within conversations. Everything in one place.'
+  },
+  {
+    icon: 'content/info',
+    title: 'Listing Context',
+    description: 'See property details, price, and location at a glance within each conversation thread.'
+  }
+];
 
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
@@ -600,3 +762,4 @@ useSchemaOrg([
   margin: var(--size-12) auto 0;
 }
 </style>
+

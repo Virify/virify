@@ -58,7 +58,7 @@
       </template>
     </ClientOnly>
 
-    <template v-if="trendingLocations">
+    <template v-if="trendingLocations?.length">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Trending locations</h3>
 
       <ul class="m-autocomplete-popover__pill-list">
@@ -206,7 +206,7 @@ const autocompleteFeedback = computed(() => {
   const { searchValue } = props
   const MIN_SEARCH_LENGTH = 4
 
-  if (searchValue.length < MIN_SEARCH_LENGTH) {
+  if (searchValue && searchValue.length < MIN_SEARCH_LENGTH) {
     return 'Keep typing for location suggestions...'
   }
 

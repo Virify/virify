@@ -61,7 +61,7 @@ export async function seedAdminFavourites() {
     const address = `${street}, ${city}, ${country}`;
     const lat = Number(faker.location.latitude({ min: 50, max: 57 }));
     const lon = Number(faker.location.longitude({ min: -6, max: 2 }));
-    const name = `TEST ${city} ${i + 1}`;
+    const name = `${city}`;
 
     return {
       location: address,
