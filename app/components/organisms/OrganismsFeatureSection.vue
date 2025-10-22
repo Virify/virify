@@ -4,8 +4,8 @@
       <div class="o-feature-section__wrapper">
         <!-- Image Column -->
         <div class="o-feature-section__image-container" :class="imageContainerClasses">
-          <!-- Single Image -->
-          <div v-if="!overlaidImages && image" class="o-feature-section__image">
+          <!-- Single Image - Cloudflare -->
+          <div v-if="!overlaidImages && !overlaidSanityImages && image" class="o-feature-section__image">
             <AtomsCloudFlareImage 
               :src="image" 
               :variant="imageVariant"
@@ -14,13 +14,24 @@
             />
           </div>
 
-          <!-- Overlaid Images -->
-          <div v-else-if="overlaidImages" class="o-feature-section__images-overlaid">
+          <!-- Single Image - Sanity -->
+          <div v-else-if="!overlaidImages && !overlaidSanityImages && sanityImage?.asset" class="o-feature-section__image">
+            <NuxtImg
+              provider="sanity"
+              :src="sanityImage.asset._id || sanityImage.asset._ref || sanityImage.asset.url"
+              :alt="sanityImage.alt || imageAlt || ''"
+              loading="lazy"
+              :placeholder="'/img/preload.svg'"
+            />
+          </div>
+
+          <!-- Overlaid Images - Cloudflare -->
+          <div v-else-if="overlaidImages?.rear && overlaidImages?.front && !overlaidSanityImages" class="o-feature-section__images-overlaid">
             <div class="o-feature-section__image-rear">
               <AtomsCloudFlareImage 
                 :src="overlaidImages.rear" 
                 :variant="imageVariant"
-                :alt="overlaidImages.rearAlt"
+                :alt="overlaidImages.rearAlt || ''"
                 :placeholder="true"
               />
             </div>
@@ -28,8 +39,30 @@
               <AtomsCloudFlareImage 
                 :src="overlaidImages.front" 
                 :variant="imageVariant"
-                :alt="overlaidImages.frontAlt"
+                :alt="overlaidImages.frontAlt || ''"
                 :placeholder="true"
+              />
+            </div>
+          </div>
+
+          <!-- Overlaid Images - Sanity -->
+          <div v-else-if="overlaidSanityImages?.rear?.asset && overlaidSanityImages?.front?.asset" class="o-feature-section__images-overlaid">
+            <div class="o-feature-section__image-rear">
+              <NuxtImg
+                provider="sanity"
+                :src="overlaidSanityImages.rear.asset._id || overlaidSanityImages.rear.asset._ref || overlaidSanityImages.rear.asset.url"
+                :alt="overlaidSanityImages.rear.alt || ''"
+                loading="lazy"
+                :placeholder="'/img/preload.svg'"
+              />
+            </div>
+            <div class="o-feature-section__image-front">
+              <NuxtImg
+                provider="sanity"
+                :src="overlaidSanityImages.front.asset._id || overlaidSanityImages.front.asset._ref || overlaidSanityImages.front.asset.url"
+                :alt="overlaidSanityImages.front.alt || ''"
+                loading="lazy"
+                :placeholder="'/img/preload.svg'"
               />
             </div>
           </div>
@@ -77,17 +110,37 @@ interface OverlaidImages {
   frontAlt: string
 }
 
+interface SanityImageAsset {
+  _id?: string
+  _ref?: string
+  url?: string
+}
+
+interface SanityImage {
+  asset: SanityImageAsset
+  alt?: string
+}
+
+interface OverlaidSanityImages {
+  rear: SanityImage
+  front: SanityImage
+}
+
 interface Props {
   // Content
   title?: string
   subtitle: string
   features: Feature[]
   
-  // Image
+  // Image - Cloudflare
   image?: string
   imageAlt?: string
   imageVariant?: 'public' | 'thumbnail' | 'card' | 'gallery' | 'marker' | 'marketing'
   overlaidImages?: OverlaidImages
+  
+  // Image - Sanity
+  sanityImage?: SanityImage
+  overlaidSanityImages?: OverlaidSanityImages
   
   // Layout
   imagePosition?: 'left' | 'right'
@@ -164,7 +217,6 @@ const contentClasses = computed(() => ({
 
   &__image {
     width: 100%;
-    border-radius: var(--border-radius-2xl);
     overflow: hidden;
     box-shadow: var(--elevate-200);
 
@@ -195,7 +247,6 @@ const contentClasses = computed(() => ({
     width: 65%;
     top: 0;
     left: 0;
-    border-radius: var(--border-radius-2xl);
     overflow: hidden;
     box-shadow: var(--elevate-200);
     z-index: 1;
@@ -216,7 +267,6 @@ const contentClasses = computed(() => ({
     width: 65%;
     bottom: 0;
     right: 0;
-    border-radius: var(--border-radius-2xl);
     overflow: hidden;
     box-shadow: var(--elevate-300);
     z-index: 2;

@@ -58,6 +58,16 @@ export const waitingListPageType = defineType({
       ],
     }),
 
+    // Feature Sections
+    defineField({
+      name: 'featureSections',
+      title: 'Feature Sections',
+      type: 'array',
+      of: [{type: 'featureSection'}],
+      description: 'Reusable feature sections displayed throughout the page',
+      validation: (rule) => rule.max(10),
+    }),
+
     // Buyers Benefits Section
     defineField({
       name: 'buyersBenefits',

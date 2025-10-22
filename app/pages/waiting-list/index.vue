@@ -7,7 +7,7 @@
     <section class="waiting-list-hero">
       <div class="container">
         <div class="waiting-list-hero__content">
-          <h1 class="waiting-list-hero__title | title-2xl lineheight-xs">
+          <h1 class="waiting-list-hero__title | title-2xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
               <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
@@ -27,7 +27,7 @@
     <!-- ============================================ -->
     <section class="waiting-list-form-section">
       <div class="container">
-        <div class="waiting-list-form-container">
+        <div class="waiting-list-form__header">
           <h2 class="waiting-list-form__title | title-md">{{ cmsContent?.formSection.title }}</h2>
           <p class="waiting-list-form__description | body-md">{{ cmsContent?.formSection.description }}</p>
 
@@ -78,99 +78,30 @@
     </section>
 
     <!-- ============================================ -->
-    <!-- LOCATION FEATURES SECTION -->
+    <!-- FEATURE SECTIONS (FROM SANITY CMS) -->
     <!-- ============================================ -->
     <OrganismsFeatureSection
-      subtitle="Find your perfect property location with our intelligent search tools"
-      :features="locationFeatures"
-      image="a9460506-cfd4-4920-3ccb-0b4ba4177800"
-      image-position="left"
-      background="gradient"
-      icon-color="orange"
+      v-for="(section, index) in processedFeatureSections"
+      :key="index"
+      v-bind="section"
     >
       <template #title>
-        Smart <span class="gradient-text">location search</span>
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- AI SEARCH SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="Our AI understands what you're really looking for"
-      :features="aiSearchFeatures"
-      image="ef051198-d10f-480e-8756-90bc25a4ff00"
-      image-position="right"
-      background="white"
-      icon-color="orange"
-    >
-      <template #title>
-        Search in <span class="gradient-text-light">plain English</span>
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- INTERACTIVE MAP SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="See everything at a glance with our information-rich map interface"
-      :features="mapFeatures"
-      image="3e5a8fb9-f943-4d6d-2ab1-e5b76bdc0400"
-      image-position="left"
-      background="gradient"
-      icon-color="orange"
-    >
-      <template #title>
-        <span class="gradient-text">Interactive map</span> experience
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- CHAT FEATURES SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="Connect instantly with landlords, sellers, buyers, and tenants"
-      :features="chatFeatures"
-      :overlaid-images="{
-        rear: '6c42d57c-fd22-4b93-b29c-54f73eb46600',
-        rearAlt: 'Chat conversations list showing multiple property enquiries',
-        front: '4e8f13f6-21b8-436b-fc3d-30244a527500',
-        frontAlt: 'Active chat conversation with property details and messaging'
-      }"
-      image-position="right"
-      background="white"
-      icon-color="orange"
-    >
-      <template #title>
-        Direct <span class="gradient-text-light">communication</span>
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- LISTING MANAGEMENT SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="Complete control over your property listings from one powerful dashboard"
-      :features="listingManagementFeatures"
-      image="c10956e4-620a-413f-e559-88ef26c5dc00"
-      image-position="left"
-      background="gradient"
-      icon-color="orange"
-    >
-      <template #title>
-        Manage your <span class="gradient-text">listings</span>
+        <template v-for="(part, titleIndex) in parseGradientTextParts(section.title || '')" :key="titleIndex">
+          <span v-if="part.isGradient" :class="(section.background || 'white') === 'white' ? 'gradient-text-light' : 'gradient-text'">{{ part.text }}</span>
+          <span v-else>{{ part.text }}</span>
+        </template>
       </template>
     </OrganismsFeatureSection>
 
     <!-- ============================================ -->
     <!-- SELLERS BENEFITS SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-sellers">
+    <section class="waiting-list-sellers" :class="sellersBackground">
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.sellersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text-light">{{ part.text }}</span>
+              <span v-if="part.isGradient" :class="sellersGradientClass">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
             </template>
           </h2>
@@ -185,7 +116,7 @@
             :title="feature.title" 
             :subtitle="feature.subtitle"
             :description="feature.description"
-            variant="blue"
+            :variant="sellersVariant"
             :class="{ 'animate-in': isSellersVisible }" />
         </div>
       </div>
@@ -194,12 +125,12 @@
     <!-- ============================================ -->
     <!-- BUYERS BENEFITS SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-features section-gradient-bg">
+    <section class="waiting-list-features" :class="buyersBackground">
       <div class="container">
-        <header class="waiting-list-features__header">
+        <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-if="part.isGradient" :class="buyersGradientClass">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
             </template>
           </h2>
@@ -208,12 +139,13 @@
 
         <div class="waiting-list-features__grid" ref="buyersRef">
           <MoleculesFeatureTile 
-            v-for="(feature, index) in cmsContent?.buyersBenefits.features" 
+            v-for="(feature, index) in cmsContent?.buyersBenefits.features"
             :key="index"
             :iconName="feature.icon" 
             :title="feature.title" 
             :subtitle="feature.subtitle"
             :description="feature.description"
+            :variant="buyersVariant"
             :class="{ 'animate-in': isBuyersVisible }" />
         </div>
       </div>
@@ -226,18 +158,18 @@
       :title="cmsContent?.contactSection.title || ''"
       :description="cmsContent?.contactSection.description || ''"
       :buttonText="cmsContent?.contactSection.buttonText || ''"
-      to="/contact"
-    />
+      :gradient="contactGradient"
+      to="/contact" />
 
     <!-- ============================================ -->
     <!-- EARLY ACCESS BENEFITS SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-benefits section-gradient-bg">
+    <section class="waiting-list-benefits" :class="benefitsBackground">
       <div class="container">
         <header class="waiting-list-benefits__header">
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.earlyAccessBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-if="part.isGradient" :class="benefitsGradientClass">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
             </template>
           </h2>
@@ -265,6 +197,7 @@
       :title="cmsContent?.finalCta.title || ''"
       :description="cmsContent?.finalCta.description || ''"
       :buttonText="cmsContent?.finalCta.buttonText || ''"
+      :gradient="finalCtaGradient"
       @click="scrollToForm"
     />
   </div>
@@ -276,125 +209,35 @@ import { useIntersectionObserver } from "@vueuse/core";
 const { showToast } = useToast();
 
 // Fetch CMS content - module automatically uses correct perspective
-const { data: cmsContent } = await useSanityQuery<WaitingListPage>(
+const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(
   waitingListPageQuery
 );
 
-// Feature data for OrganismsFeatureSection components
-const locationFeatures = [
-  {
-    icon: 'search/trending',
-    title: 'Trending Locations',
-    description: 'Discover the most popular search areas in real-time. See where others are looking to help inform your search.'
-  },
-  {
-    icon: 'search/pin',
-    title: 'Saved Locations',
-    description: 'Save your favourite search locations for quick access. Never lose track of areas you\'re interested in.'
-  },
-  {
-    icon: 'search/location',
-    title: 'Smart Autocomplete',
-    description: 'Lightning-fast location suggestions as you type. Find any city, town, or postcode instantly with intelligent search.'
-  },
-  {
-    icon: 'search/history',
-    title: 'Search History',
-    description: 'Quick access to your recent searches. Jump back to previous locations without typing them again.'
-  }
-];
+// Process feature sections: clean stega encoding and determine which image props to pass
+const processedFeatureSections = computed(() => 
+  processFeatureSections(cmsContent.value?.featureSections)
+);
 
-const aiSearchFeatures = [
-  {
-    icon: 'ai/star',
-    title: 'Natural Language Search',
-    description: 'Type exactly what you want: "2+ bedroom property to buy in Cardiff" and we\'ll understand instantly.'
-  },
-  {
-    icon: 'ai/prompt',
-    title: 'Smart Suggestions',
-    description: 'Get intelligent property suggestions based on your requirements. See popular searches and trending options as you type.'
-  },
-  {
-    icon: 'search/filter',
-    title: 'Contextual Filtering',
-    description: 'Our AI automatically extracts location, property type, and transaction type from your search query.'
-  },
-  {
-    icon: 'ai/send',
-    title: 'Instant Results',
-    description: 'Get relevant property matches in seconds. No complex forms or confusing filters—just type and search.'
-  }
-];
+// Determine if we should alternate backgrounds for remaining sections
+// If there are NO CMS feature sections, alternate them; otherwise keep current backgrounds
+const hasCmsFeatures = computed(() => processedFeatureSections.value.length > 0);
 
-const mapFeatures = [
-  {
-    icon: 'map/marker-premium',
-    title: 'Photo Markers',
-    description: 'View property photos directly on map markers. Get a visual preview before clicking through to full details.'
-  },
-  {
-    icon: 'explore/top-picks',
-    title: 'Smart Clustering',
-    description: 'Intelligent marker clustering keeps the map clean and organized, even with hundreds of properties.'
-  },
-  {
-    icon: 'cards/favourite',
-    title: 'Favourites & Notes',
-    description: 'See your saved properties and notes right on the map. Visual indicators show your favourites at a glance.'
-  },
-  {
-    icon: 'explore/map',
-    title: 'Search Boundaries',
-    description: 'Visual radial and boundary overlays show your search area clearly. Adjust on the fly to refine results.'
-  }
-];
+// Background classes for remaining sections (alternating only if no CMS features)
+const sellersBackground = computed(() => hasCmsFeatures.value ? '' : 'section-gradient-bg');
+const buyersBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const contactGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
+const benefitsBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const finalCtaGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
 
-const chatFeatures = [
-  {
-    icon: 'account/chat',
-    title: 'Direct Messaging',
-    description: 'Chat directly with property owners, landlords, and potential buyers or tenants. No intermediaries needed.'
-  },
-  {
-    icon: 'account/notifications',
-    title: 'Real-Time Notifications',
-    description: 'Get instant notifications for new messages, enquiries, and viewing requests. Never miss an opportunity.'
-  },
-  {
-    icon: 'cards/expand',
-    title: 'Rich Media Sharing',
-    description: 'Share photos, documents, and listing details within conversations. Everything in one place.'
-  },
-  {
-    icon: 'content/info',
-    title: 'Listing Context',
-    description: 'See property details, price, and location at a glance within each conversation thread.'
-  }
-];
+// Gradient text classes based on background
+const sellersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text-light' : 'gradient-text');
+const buyersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
+const benefitsGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
 
-const listingManagementFeatures = [
-  {
-    icon: 'account/settings',
-    title: 'Live editing',
-    description: 'Update your listing details, photos, and pricing in real-time. Changes appear instantly on the platform.'
-  },
-  {
-    icon: 'account/dash',
-    title: 'Archive & publish',
-    description: 'Control your listing visibility with one click. Archive sold properties or republish when ready.'
-  },
-  {
-    icon: 'account/enquiry',
-    title: 'Enquiry management',
-    description: 'View and respond to all enquiries from interested buyers or tenants in one centralised dashboard.'
-  },
-  {
-    icon: 'explore/trending',
-    title: 'Performance analytics',
-    description: 'Track views, favourites, and engagement at a glance. Understand how your listing is performing.'
-  }
-];
+// Variant for feature tiles (blue when no gradient background, default otherwise)
+const sellersVariant = computed(() => hasCmsFeatures.value ? 'blue' : undefined);
+const buyersVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
+const benefitsVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
 
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
