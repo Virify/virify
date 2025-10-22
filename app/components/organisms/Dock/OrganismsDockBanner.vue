@@ -195,6 +195,20 @@ const hasLocation = computed(() => {
     }
   }
 
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: -1;
+    pointer-events: none;
+    transition: background-color var(--animation-medium);
+  }
+
+  &:hover::before {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
   &__backdrop {
     position: absolute;
     z-index: -1;
