@@ -166,7 +166,7 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     gap: var(--size-8);
     border: 2px solid transparent;
     border-radius: var(--border-radius-2xl);
-    padding: var(--size-12) var(--o-property-types-padding) var(--size-64);
+    padding: var(--size-8) var(--o-property-types-padding) var(--size-56);
     transition: border-color, background-color;
     transition-duration: var(--animation-fast);
     cursor: pointer;
@@ -174,8 +174,8 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
 
   &__input-icon {
     display: block;
-    width: var(--size-48);
-    height: var(--size-48);
+    width: var(--size-40);
+    height: var(--size-40);
   }
 
   &__input-text {
