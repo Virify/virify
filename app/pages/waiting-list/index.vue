@@ -74,32 +74,73 @@
     </section>
 
     <!-- ============================================ -->
-    <!-- BUYERS BENEFITS SECTION -->
+    <!-- LOCATION FEATURES SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-features">
-      <div class="container">
-        <header class="waiting-list-features__header">
-          <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <span v-else>{{ part.text }}</span>
-            </template>
-          </h2>
-          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
-        </header>
+    <OrganismsFeatureSection
+      subtitle="Find your perfect property location with our intelligent search tools"
+      :features="locationFeatures"
+      image="a9460506-cfd4-4920-3ccb-0b4ba4177800"
+      image-position="left"
+      background="gradient"
+      icon-color="orange"
+    >
+      <template #title>
+        Smart <span class="gradient-text">location search</span>
+      </template>
+    </OrganismsFeatureSection>
 
-        <div class="waiting-list-features__grid" ref="buyersRef">
-          <MoleculesFeatureTile 
-            v-for="(feature, index) in cmsContent?.buyersBenefits.features" 
-            :key="index"
-            :iconName="feature.icon" 
-            :title="feature.title" 
-            :subtitle="feature.subtitle"
-            :description="feature.description"
-            :class="{ 'animate-in': isBuyersVisible }" />
-        </div>
-      </div>
-    </section>
+    <!-- ============================================ -->
+    <!-- AI SEARCH SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="Our AI understands what you're really looking for"
+      :features="aiSearchFeatures"
+      image="ef051198-d10f-480e-8756-90bc25a4ff00"
+      image-position="right"
+      background="white"
+      icon-color="orange"
+    >
+      <template #title>
+        Search in <span class="gradient-text">plain English</span>
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
+    <!-- INTERACTIVE MAP SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="See everything at a glance with our information-rich map interface"
+      :features="mapFeatures"
+      image="3e5a8fb9-f943-4d6d-2ab1-e5b76bdc0400"
+      image-position="left"
+      background="gradient"
+      icon-color="orange"
+    >
+      <template #title>
+        <span class="gradient-text">Interactive map</span> experience
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
+    <!-- CHAT FEATURES SECTION -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      subtitle="Connect instantly with landlords, sellers, buyers, and tenants"
+      :features="chatFeatures"
+      :overlaid-images="{
+        rear: '6c42d57c-fd22-4b93-b29c-54f73eb46600',
+        rearAlt: 'Chat conversations list showing multiple property enquiries',
+        front: '4e8f13f6-21b8-436b-fc3d-30244a527500',
+        frontAlt: 'Active chat conversation with property details and messaging'
+      }"
+      image-position="right"
+      background="white"
+      icon-color="orange"
+    >
+      <template #title>
+        Direct <span class="gradient-text">communication</span>
+      </template>
+    </OrganismsFeatureSection>
 
     <!-- ============================================ -->
     <!-- SELLERS BENEFITS SECTION -->
@@ -124,11 +165,50 @@
             :title="feature.title" 
             :subtitle="feature.subtitle"
             :description="feature.description"
-            variant="blue" 
             :class="{ 'animate-in': isSellersVisible }" />
         </div>
       </div>
     </section>
+
+    <!-- ============================================ -->
+    <!-- BUYERS BENEFITS SECTION -->
+    <!-- ============================================ -->
+    <section class="waiting-list-features">
+      <div class="container">
+        <header class="waiting-list-features__header">
+          <h2 class="title-xl">
+            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-else>{{ part.text }}</span>
+            </template>
+          </h2>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
+        </header>
+
+        <div class="waiting-list-features__grid" ref="buyersRef">
+          <MoleculesFeatureTile 
+            v-for="(feature, index) in cmsContent?.buyersBenefits.features" 
+            :key="index"
+            :iconName="feature.icon" 
+            :title="feature.title" 
+            :subtitle="feature.subtitle"
+            :description="feature.description"
+            variant="blue"
+            :class="{ 'animate-in': isBuyersVisible }" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- CONTACT SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.contactSection.title || ''"
+      :description="cmsContent?.contactSection.description || ''"
+      :buttonText="cmsContent?.contactSection.buttonText || ''"
+      to="/contact"
+      gradient
+    />
 
     <!-- ============================================ -->
     <!-- EARLY ACCESS BENEFITS SECTION -->
@@ -158,85 +238,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ============================================ -->
-    <!-- LOCATION FEATURES SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="Find your perfect property location with our intelligent search tools"
-      :features="locationFeatures"
-      image="b32ace1f-5afb-4cb6-3c44-74d3e2a48e00"
-      image-position="left"
-      background="white"
-      icon-color="orange"
-    >
-      <template #title>
-        Smart <span class="gradient-text">Location Search</span>
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- AI SEARCH SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="Our AI understands what you're really looking for"
-      :features="aiSearchFeatures"
-      image="bd49d010-1530-4e89-2b57-ded582855a00"
-      image-position="right"
-      background="gradient"
-      icon-color="orange"
-    >
-      <template #title>
-        Search in <span class="gradient-text-light">Plain English</span>
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- INTERACTIVE MAP SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="See everything at a glance with our information-rich map interface"
-      :features="mapFeatures"
-      image="3e5a8fb9-f943-4d6d-2ab1-e5b76bdc0400"
-      image-position="left"
-      background="white"
-      icon-color="orange"
-    >
-      <template #title>
-        <span class="gradient-text">Interactive Map</span> Experience
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- CHAT FEATURES SECTION -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
-      subtitle="Connect instantly with landlords, sellers, buyers, and tenants"
-      :features="chatFeatures"
-      :overlaid-images="{
-        rear: '6c42d57c-fd22-4b93-b29c-54f73eb46600',
-        rearAlt: 'Chat conversations list showing multiple property enquiries',
-        front: '4e8f13f6-21b8-436b-fc3d-30244a527500',
-        frontAlt: 'Active chat conversation with property details and messaging'
-      }"
-      image-position="right"
-      background="gradient"
-      icon-color="orange"
-    >
-      <template #title>
-        Direct <span class="gradient-text-light">Communication</span>
-      </template>
-    </OrganismsFeatureSection>
-
-    <!-- ============================================ -->
-    <!-- CONTACT SECTION -->
-    <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.contactSection.title || ''"
-      :description="cmsContent?.contactSection.description || ''"
-      :buttonText="cmsContent?.contactSection.buttonText || ''"
-      to="/contact"
-    />
 
     <!-- ============================================ -->
     <!-- FINAL CTA SECTION -->
@@ -700,7 +701,6 @@ useSchemaOrg([
 
 // Features Section (Buyers)
 .waiting-list-features {
-  @extend .section-gradient-bg;
   @extend %section-grid;
 
   &__header {
@@ -715,6 +715,7 @@ useSchemaOrg([
 // Sellers Section
 .waiting-list-sellers {
   @extend %section-grid;
+  @extend .section-gradient-bg;
 
   &__header {
     @extend %section-header;
@@ -727,8 +728,8 @@ useSchemaOrg([
 
 // Benefits Section
 .waiting-list-benefits {
-  @extend .section-gradient-bg;
   padding: var(--size-120) 0;
+  background: var(--background-100);
 
   &__header {
     text-align: center;
