@@ -2,7 +2,7 @@
   <div class="o-property-types" role="presentation">
     <ul class="o-property-types__list">
       <li v-for="{ name, icon, options, selected, defaultSelected } of propertyTypes" :key="name"
-        class="o-property-types__list-item | relative">
+        class="o-property-types__list-item | gradient-box">
 
         <OrganismsTraditionalSearchPropertySubtype button-class="o-property-types__dropdown" :name :options :selected
           @update-selected="updateSelectedSubtype" />
@@ -136,7 +136,7 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     padding: 0;
     margin: 0;
     display: grid;
-    gap: var(--size-8);
+    gap: var(--size-12);
     grid-template-columns: repeat(2, 1fr);
 
     @container (width > 480px) {
@@ -149,6 +149,7 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
   }
 
   &__list-item {
+    position: relative;
     display: flex;
     align-items: stretch;
     min-height: 12ch;
@@ -163,9 +164,9 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     overflow: hidden;
     background: transparent;
     gap: var(--size-8);
-    border: 2px solid var(--border-color-100);
-    border-radius: var(--border-radius-xl);
-    padding: var(--size-8) var(--o-property-types-padding) var(--size-56);
+    border: 2px solid transparent;
+    border-radius: var(--border-radius-2xl);
+    padding: var(--size-12) var(--o-property-types-padding) var(--size-64);
     transition: border-color, background-color;
     transition-duration: var(--animation-fast);
     cursor: pointer;
@@ -190,14 +191,14 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     bottom: var(--o-property-types-padding);
     left: var(--o-property-types-padding);
     right: var(--o-property-types-padding);
-    height: var(--size-36);
+    height: var(--size-40);
+    font-weight: var(--font-semibold);
     padding: 0;
     margin: 0;
     width: auto;
     box-sizing: border-box;
     overflow: hidden;
-    border-radius: var(--border-radius-lg);
-    font-weight: normal;
+    border-radius: var(--border-radius-xl);
   }
 
   /**
@@ -208,12 +209,12 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
   }
 
   &__list-item:has(&__dropdown:hover):not(:has(input:checked)) &__input {
-    border-color: var(--border-color-300);
+    border-color: var(--secondary-700);
   }
 
   &__list-item:has(input:checked) &__input {
     border-color: var(--secondary-500);
-    background-color: var(--secondary-900);
+    background-color: light-dark(var(--secondary-900), var(--background-100));
   }
 
   &__list-item:has(input:checked) &__dropdown {

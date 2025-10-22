@@ -12,3 +12,45 @@
 .box-lg {
   padding: var(--size-20) var(--size-24);
 }
+
+/**
+ *  Gradient boxes
+ */
+.gradient-box {
+  // Colours
+  --gradient-box-start: light-dark(var(--monochrome-700), var(--monochrome-400));
+  --gradient-box-middle: light-dark(var(--monochrome-800), var(--monochrome-400));
+  --gradient-box-end: light-dark(var(--monochrome-700), var(--monochrome-400));
+  --gradident-box-bg-direction: to bottom;
+
+  // Shapes, sizes
+  --gradient-box-radius: var(--border-radius-2xl);
+  --gradient-box-thickness: 1.5px;
+
+  // Shadow
+  --gradient-box-shadow: 0 10px 25px -15px rgba(0, 0, 0, 0.18);
+
+  // Gradient
+  --gradient-box-gradient: linear-gradient(var(--gradident-box-bg-direction), var(--gradient-box-start), var(--gradient-box-middle), var(--gradient-box-end));
+
+  // Used to set image to clip against
+  --clip: linear-gradient(var(--background-200), var(--background-200));
+
+  position: relative;
+  box-shadow: var(--gradient-box-shadow);
+  border-radius: var(--gradient-box-radius);
+
+  @supports (mask: content-box) {
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      box-sizing: border-box;
+      background: var(--gradient-box-gradient);
+      padding: var(--gradient-box-thickness);
+      border-radius: var(--gradient-box-radius);
+      mask: var(--clip) content-box exclude, var(--clip);
+    }
+  }
+}

@@ -2,26 +2,26 @@
   <div class="o-traditional-search-form | flow flow-xl">
     <OrganismsTraditionalSearchContract />
 
-    <div>
-      <h3 class="| title-2xs">Property type</h3>
+    <div class="o-traditional-search-form__property-type">
+      <h3 class="o-traditional-search-form__title | title-xs">Property type</h3>
 
-      <OrganismsTraditionalSearchPropertyType />
+      <OrganismsTraditionalSearchPropertyType class="o-traditional-search-form__property-type-grid" />
     </div>
 
-    <div style="display: flex; justify-content: space-evenly; width: 100%; gap: var(--size-12)">
+    <div class="o-traditional-search-form__room-count">
       <div>
-        <h3 class="| title-2xs">Bed count</h3>
-        <p>Coming soon...</p>
+        <h3 class="o-traditional-search-form__title | title-xs">Bed count</h3>
+        <AtomsNumberRange />
       </div>
 
       <div>
-        <h3 class="| title-2xs">Bathroom count</h3>
-        <p>Coming soon...</p>
+        <h3 class="o-traditional-search-form__title | title-xs">Bathroom count</h3>
+        <AtomsNumberRange />
       </div>
     </div>
 
     <div>
-      <h3 class="| title-2xs">Additional features</h3>
+      <h3 class="o-traditional-search-form__title | title-2xs">Additional features</h3>
       <p>Coming soon...</p>
     </div>
   </div>
@@ -33,10 +33,23 @@
 @use "#styles/_utils/media" as mq;
 
 .o-traditional-search-form {
-  padding: var(--size-8);
 
-  @include mq.tablet {
-    padding: var(--size-16);
+  &__title {
+    text-align: center;
+    margin: 0 0 var(--size-16);
+  }
+
+  &__property-type-grid {
+    text-align: left;
+  }
+
+  &__room-count {
+    display: grid;
+    gap: var(--size-16);
+
+    @include mq.small-tablet {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 }
 </style>
