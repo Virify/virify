@@ -1,7 +1,7 @@
 <template>
   <div class="o-property-filter">
     <MoleculesSwitcher name="search-type" legend="Change search type" :options="toggleSearchType" v-model="searchType"
-      class="o-property-filter__switcher" />
+      class="o-property-filter__switcher | elevate-200" />
 
     <template v-if="searchType === 'traditional'">
       <slot name="traditional"></slot>
