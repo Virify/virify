@@ -318,7 +318,7 @@ const contentClasses = computed(() => ({
   // Text colors for white background
   &--white &__item-content {
     h3 {
-      color: var(--foreground-100);
+      color: var(--secondary-400);
     }
 
     p {

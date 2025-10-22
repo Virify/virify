@@ -105,7 +105,7 @@
       icon-color="orange"
     >
       <template #title>
-        Search in <span class="gradient-text">plain English</span>
+        Search in <span class="gradient-text-light">plain English</span>
       </template>
     </OrganismsFeatureSection>
 
@@ -142,7 +142,7 @@
       icon-color="orange"
     >
       <template #title>
-        Direct <span class="gradient-text">communication</span>
+        Direct <span class="gradient-text-light">communication</span>
       </template>
     </OrganismsFeatureSection>
 
@@ -170,7 +170,7 @@
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
             <template v-for="(part, index) in parseGradientTextParts(cmsContent?.sellersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+              <span v-if="part.isGradient" class="gradient-text-light">{{ part.text }}</span>
               <span v-else>{{ part.text }}</span>
             </template>
           </h2>
