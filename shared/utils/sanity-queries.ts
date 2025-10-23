@@ -128,13 +128,32 @@ export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
   _type,
   hero {
     title,
-    subtitle,
-    description
+    subtitle
   },
   formSection {
     title,
     description,
     buttonText
+  },
+  featureSections[] {
+    title,
+    subtitle,
+    features[] {
+      icon,
+      title,
+      description
+    },
+    imageType,
+    imageSource,
+    image,
+    imageAlt,
+    sanityImage,
+    overlaidImagesSource,
+    overlaidImages,
+    overlaidSanityImages,
+    imagePosition,
+    background,
+    iconColor
   },
   buyersBenefits {
     title,

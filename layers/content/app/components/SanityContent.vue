@@ -36,16 +36,40 @@ onMounted(() => {
   console.log(props.blocks)
 })
 
+// Helper to check if string is a Cloudflare image ID
+const isCloudflareId = (str: string | undefined): boolean => {
+  if (!str) return false
+  // Cloudflare IDs are UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+}
+
 // Custom components for different block types
 const customComponents = {
   types: {
-    // Custom image component (uses Nuxt Image with Sanity provider)
+    // Custom image component (handles both Sanity images and Cloudflare IDs)
     image: (props: any) => {
-      const NuxtImg = resolveComponent('NuxtImg') as any
       const srcRef = props.value?.asset?._ref || props.value?.asset?.url
+      const alt = props.value?.alt || props.value?.caption || 'Guide content image'
+      
+      // Check if this is a Cloudflare ID
+      if (isCloudflareId(srcRef)) {
+        const CloudFlareImage = resolveComponent('AtomsCloudFlareImage') as any
+        return h('figure', { class: 'content-image' }, [
+          h(CloudFlareImage, {
+            src: srcRef,
+            alt,
+            variant: 'marketing',
+            placeholder: true,
+            class: 'content-image__img'
+          }),
+          props.value.caption ? h('figcaption', { class: 'image-caption' }, props.value.caption) : null
+        ].filter(Boolean))
+      }
+      
+      // Otherwise use Sanity image
+      const NuxtImg = resolveComponent('NuxtImg') as any
       const width = props.value?.metadata?.dimensions?.width
       const height = props.value?.metadata?.dimensions?.height
-      const alt = props.value?.alt || props.value?.caption || 'Guide content image'
       return h('figure', { class: 'content-image' }, [
         h(NuxtImg, {
           provider: 'sanity',

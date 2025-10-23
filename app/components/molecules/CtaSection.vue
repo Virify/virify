@@ -4,7 +4,7 @@
       <div class="cta-section__content">
         <h2 class="title-xl">
           <template v-for="(part, index) in parseGradientTextParts(title)" :key="index">
-            <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
+            <span v-if="part.isGradient" :class="gradient ? 'gradient-text' : 'gradient-text-light'">{{ part.text }}</span>
             <template v-else>{{ part.text }}</template>
           </template>
         </h2>
