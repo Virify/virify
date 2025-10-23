@@ -99,7 +99,14 @@ export const featureSectionType = defineType({
       },
       initialValue: 'cloudflare',
       description: 'Choose image source type',
-      hidden: ({parent}) => parent?.imageType === 'overlaid',
+      hidden: ({parent}) => parent?.imageType !== 'single',
+      validation: (rule) => rule.custom((value, context) => {
+        const parent = context.parent as any
+        if (parent?.imageType === 'single' && !value) {
+          return 'Image source is required for single images'
+        }
+        return true
+      }),
     }),
     defineField({
       name: 'image',
@@ -146,6 +153,13 @@ export const featureSectionType = defineType({
       initialValue: 'cloudflare',
       description: 'Choose image source type for overlaid images',
       hidden: ({parent}) => parent?.imageType !== 'overlaid',
+      validation: (rule) => rule.custom((value, context) => {
+        const parent = context.parent as any
+        if (parent?.imageType === 'overlaid' && !value) {
+          return 'Image source is required for overlaid images'
+        }
+        return true
+      }),
     }),
     defineField({
       name: 'overlaidImages',
