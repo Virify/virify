@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="hidePopover" class="| flow">
     <div role="presentation" ref="$location" class="m-ai-search-form-location__container | flow flow-lg">
-      <fieldset class="m-ai-search-form-location__fieldset | elevate-200">
+      <fieldset class="m-ai-search-form-location__fieldset | gradient-box">
         <legend class="| visually-hidden">Location</legend>
 
         <input type="text" class="m-ai-search-form-location__input | body-md" placeholder="Where do you want to live?"
@@ -107,9 +107,7 @@ onClickOutside($location, hidePopover);
   &__fieldset {
     background: var(--background-200);
     color: var(--foreground-100);
-    border-radius: var(--border-radius-xl);
     align-items: center;
-    border: 1px solid var(--border-color-200);
 
     @include mq.tablet {
       display: grid;

@@ -1,3 +1,5 @@
+@use '../_utils/functions' as fn;
+
 /**
  *  Button base
  */
@@ -18,9 +20,9 @@
  */
 .gradient-box {
   // Colours
-  --gradient-box-start: light-dark(var(--monochrome-700), var(--monochrome-400));
-  --gradient-box-middle: light-dark(var(--monochrome-800), var(--monochrome-400));
-  --gradient-box-end: light-dark(var(--monochrome-700), var(--monochrome-400));
+  --gradient-box-start: #{fn.faded-color(8%)};
+  --gradient-box-middle: #{fn.faded-color(5%)};
+  --gradient-box-end: #{fn.faded-color(10%)};
   --gradident-box-bg-direction: to bottom;
 
   // Shapes, sizes
@@ -45,7 +47,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      z-index: -1;
+      pointer-events: none;
       box-sizing: border-box;
       background: var(--gradient-box-gradient);
       padding: var(--gradient-box-thickness);

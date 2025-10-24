@@ -1,5 +1,5 @@
 <template>
-  <div class="m-promptbox | elevate-200">
+  <div class="m-promptbox | gradient-box">
     <div class="m-promptbox__input-wrapper">
       <!-- analysed query overlays the textarea -->
       <div class="m-promptbox__overlay | body-md" v-if="queryAnalysis" aria-hidden="true">
@@ -58,13 +58,7 @@ function keyboardSubmit(e: KeyboardEvent) {
   align-items: flex-end;
   gap: var(--size-16);
   background: var(--background-200);
-  border-radius: var(--border-radius-xl);
   padding: var(--size-16);
-  border: 1px solid var(--border-color-200);
-
-  @include mq.small-tablet {
-    border-radius: var(--border-radius-2xl);
-  }
 
   &:has(textarea:focus) {
     outline: var(--focus-outline);
