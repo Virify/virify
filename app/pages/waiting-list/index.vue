@@ -368,7 +368,7 @@ useSchemaOrg([
 // Hero Section
 .waiting-list-hero {
   @extend .section-gradient-bg;
-  padding: var(--size-80) var(--size-32) var(--size-64);
+  padding: var(--size-64) var(--size-32);
   min-height: 45vh;
   display: flex;
   align-items: center;
