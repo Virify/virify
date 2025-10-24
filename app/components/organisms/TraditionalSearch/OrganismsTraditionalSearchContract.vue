@@ -1,50 +1,52 @@
 <template>
-  <div role="presentation" class="o-traditional-search-form-contract | flow flow-lg">
+  <div role="presentation" class="o-traditional-search-form-contract">
     <nav>
       <ul class="o-traditional-search-form-contract__menu">
         <li class="o-traditional-search-form-contract__menu-item">
           <button type="button" :aria-expanded="!contractType.buyOrRent"
             aria-controls="o-traditional-search-form-contract-buy"
-            class="o-traditional-search-form-contract__menu-button | button button-ghost"
+            class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(true)">
-            Buy
+            To Buy
           </button>
         </li>
 
         <li class="o-traditional-search-form-contract__menu-item">
           <button type="button" :aria-expanded="contractType.buyOrRent"
             aria-controls="o-traditional-search-form-contract-rent"
-            class="o-traditional-search-form-contract__menu-button | button button-ghost"
+            class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(false)">
-            Rent
+            To Rent
           </button>
         </li>
       </ul>
     </nav>
 
-    <section id="o-traditional-search-form-contract-buy" class="o-traditional-search-form-contract__content"
-      :hidden="contractType.buyOrRent">
+    <div role="presentation" class="o-traditional-search-form-contract__content">
+      <section id="o-traditional-search-form-contract-buy" class="o-traditional-search-form-contract__content-block"
+        :hidden="contractType.buyOrRent">
 
-      <AtomsCheckbox label="Include sold STC" />
-      <AtomsCheckbox label="Include shared ownership" />
-      <AtomsCheckbox label="Include retirement properties" />
-      <AtomsCheckbox label="Include cash-only properties" />
-    </section>
+        <AtomsCheckbox label="Include sold STC" />
+        <AtomsCheckbox label="Include shared ownership" />
+        <AtomsCheckbox label="Include retirement properties" />
+        <AtomsCheckbox label="Include cash-only properties" />
+      </section>
 
-    <section id="o-traditional-search-form-contract-rent" class="o-traditional-search-form-contract__content"
-      :hidden="!contractType.buyOrRent">
+      <section id="o-traditional-search-form-contract-rent" class="o-traditional-search-form-contract__content-block"
+        :hidden="!contractType.buyOrRent">
 
-      <AtomsCheckbox label="Include let agreed" />
-      <AtomsCheckbox label="Include short-term lets" />
-      <AtomsCheckbox label="Include long-term lets" />
-    </section>
+        <AtomsCheckbox label="Include let agreed" />
+        <AtomsCheckbox label="Include short-term lets" />
+        <AtomsCheckbox label="Include long-term lets" />
+      </section>
 
-    <div class="o-traditional-search-form-contract__price">
-      <h3 class="| title-2xs">Price</h3>
+      <section class="o-traditional-search-form-contract__price">
+        <h3 class="| title-2xs">Price</h3>
 
-      <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="contractType.min" :max="contractType.max"
-        :starting-min="contractType.min" :starting-max="contractType.max" :graph-data="priceRangeGraph"
-        hydrate-on-visible />
+        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="contractType.min" :max="contractType.max"
+          :starting-min="contractType.min" :starting-max="contractType.max" :graph-data="priceRangeGraph"
+          hydrate-on-visible />
+      </section>
     </div>
   </div>
 </template>
@@ -87,54 +89,104 @@ function updateIsBuy(newValue: boolean) {
 @use "#styles/_utils/media" as mq;
 
 .o-traditional-search-form-contract {
-  border: 1px solid var(--border-color-200);
-  border-radius: var(--border-radius-2xl);
-  padding: var(--size-16);
-  background: var(--background-100);
-
-  @include mq.tablet {
-    padding: var(--size-20);
-  }
-
-  @include mq.notebook {
-    padding: var(--size-24);
-  }
+  --search-form-background: var(--blue-400);
+  --search-form-foreground: var(--monochrome-900);
 
   &__menu {
     list-style: none;
     display: flex;
     padding: 0;
     margin: 0;
-    gap: var(--size-8);
+    align-items: flex-end;
+    justify-content: center;
   }
 
   &__menu-item {
     display: block;
-    flex-grow: 1;
   }
 
   &__menu-button {
+    --tab-bg: transparent;
+    --tab-colour: var(--foreground-200);
+    --tab-size: var(--border-radius-2xl);
+
+    position: relative;
     background: none;
     padding: var(--size-8) var(--size-16);
-    border-radius: var(--border-radius-lg);
+    text-align: center;
+    border-radius: 0;
+    border-top-left-radius: var(--tab-size);
+    border-top-right-radius: var(--tab-size);
     margin: 0;
     width: 100%;
+    min-width: 12ch;
+    min-height: calc(2 * var(--tab-size));
     box-sizing: border-box;
-    background: transparent;
+    background: var(--tab-bg);
+    color: var(--tab-colour);
     border-bottom: 0;
+    font-size: var(--font-sm);
 
-    &[aria-expanded=true] {
-      background: var(--secondary-500);
-      color: var(--monochrome-100);
+    &:hover {
+      --tab-bg: var(--background-300);
+      --tab-colour: var(--foreground-200);
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: var(--tab-size);
+      height: var(--tab-size);
+      bottom: 0;
+    }
+
+    &::before {
+      background: radial-gradient(circle at 0 0, transparent var(--tab-size), var(--tab-bg) var(--tab-size));
+      right: 100%;
+    }
+
+    &::after {
+      background: radial-gradient(circle at 100% 0, transparent var(--tab-size), var(--tab-bg) var(--tab-size));
+      left: 100%;
+    }
+
+    &,
+    &::before,
+    &::after {
+      transition: none;
+    }
+
+    &[aria-expanded=true],
+    &[aria-expanded=true]:hover {
+      --tab-bg: var(--blue-400);
+      --tab-colour: var(--monochrome-900);
+
+      z-index: 2;
     }
   }
 
   &__content {
-    padding: var(--size-16) 0;
+    border-radius: var(--border-radius-2xl);
+    padding: var(--size-20);
+    background: var(--search-form-background);
+    color: var(--search-form-foreground);
+
+    @include mq.small-tablet {
+      padding: var(--size-24);
+    }
+
+    @include mq.tablet {
+      padding: var(--size-32);
+    }
+  }
+
+  &__content-block {
     align-items: flex-start;
     justify-content: flex-start;
     flex-wrap: wrap;
     gap: var(--size-8);
+    margin: 0 0 var(--size-24);
 
     :where(&) {
       display: flex;

@@ -3,7 +3,7 @@
 /**
  *  Button base
  */
-.button {
+:where(.button) {
   display: inline-flex;
   border: 0;
   gap: var(--size-8);
