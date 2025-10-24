@@ -53,7 +53,9 @@ export const generateAccessability = (): Prisma.AccessibilityCreateWithoutProper
  * @returns Array of bathrooms
  */
 export const generateBathrooms = (totalFloors: number): { count: number; data: Prisma.BathroomCreateWithoutPropertyInput[] } => {
-  const bathroomCount = faker.number.int({ min: 1, max: 3 });
+  // 50% of properties have 2 bathrooms, 50% have 1 bathroom
+  const bathroomCount = faker.datatype.boolean({ probability: 0.5 }) ? 2 : 1;
+  
   const bathroomNames = [
     'Master Bathroom',
     'Guest Bathroom',
@@ -62,19 +64,22 @@ export const generateBathrooms = (totalFloors: number): { count: number; data: P
     'Powder Room',
     'Shared Bathroom',
   ];
+  
+  const bathrooms = Array.from({ length: bathroomCount }, (_, i) => ({
+    roomNumber: i + 1,
+    floor: i === 0 ? 0 : faker.number.int({ min: 1, max: totalFloors }), // First bathroom always on ground floor (0), second bathroom never on ground floor
+    name: faker.helpers.arrayElement(bathroomNames),
+    description: faker.word.words(10),
+    enSuite: i === 0 ? false : faker.datatype.boolean(), // Ground floor bathroom not en-suite
+    toilet: faker.datatype.boolean(),
+    bathtub: faker.datatype.boolean(),
+    walkInShower: faker.datatype.boolean(),
+    size: faker.number.int({ min: 10, max: 50 }),
+  }));
+  
   return {
     count: bathroomCount,
-    data: Array.from({ length: bathroomCount }, (_, i) => ({
-      roomNumber: i + 1,
-      floor: faker.number.int({ min: 1, max: totalFloors }),
-      name: faker.helpers.arrayElement(bathroomNames),
-      description: faker.word.words(10),
-      enSuite: faker.datatype.boolean(),
-      toilet: faker.datatype.boolean(),
-      bathtub: faker.datatype.boolean(),
-      walkInShower: faker.datatype.boolean(),
-      size: faker.number.int({ min: 10, max: 50 }),
-    })),
+    data: bathrooms,
   };
 };
 
