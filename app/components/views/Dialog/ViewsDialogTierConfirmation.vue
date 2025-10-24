@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { getTierFeatures } from '~/utils/listing/tier-features';
 
 const props = defineProps<{
   tier: TierOption;

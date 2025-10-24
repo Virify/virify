@@ -22,11 +22,22 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { published } = togglePublishedSchema.parse(body)
 
-    const result = await toggleListingPublished(userId as number, Number(id), published)
+    const { result, wasDraft, isDraft } = await toggleListingPublished(userId as number, Number(id), published)
     
     // Clear the listing cache when published status changes
     const storage = useStorage('cache:listing')
     await storage.removeItem(`listing:${id}`)
+    
+    // If draft status changed, send aggregate update
+    if (wasDraft !== isDraft) {
+      try {
+        const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer()
+        const aggregateMessage = createAggregateUpdateMessage("listings", "update", userId)
+        sendMessage(aggregateMessage)
+      } catch (error) {
+        console.warn(`[POST /api/user/my-listings/${id}] WebSocket update failed (non-critical):`, error)
+      }
+    }
     
     return result
   } catch (error) {

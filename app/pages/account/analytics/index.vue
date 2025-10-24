@@ -185,19 +185,15 @@ const engagementRate = computed(() => {
 
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--size-16);
-
-  @include mq.desktop {
-    grid-template-columns: repeat(4, 1fr);
-  }
 
   @include mq.tablet {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @include mq.mobile-only {
-    grid-template-columns: 1fr;
+  @include mq.desktop {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 </style>

@@ -1,24 +1,24 @@
 model Garden {
-  id                Int            @id @default(autoincrement())
+  id                Int             @id @default(autoincrement())
   description       String?
   name              String
   size              Float?
-  additionalDetails Boolean        @default(false)
+  additionalDetails Boolean         @default(false)
   facing            GardenFacing?
   position          GardenPosition?
-  sunTerrace        Boolean        @default(false)
-  terrace           Boolean        @default(false)
-  balcony           Boolean        @default(false)
-  patio             Boolean        @default(false)
-  separateParcel    Boolean        @default(false)
-  shed              Boolean        @default(false)
-  summerHouse       Boolean        @default(false)
-  gardenOffice      Boolean        @default(false)
-  pool              Boolean        @default(false)
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  sunTerrace        Boolean         @default(false)
+  terrace           Boolean         @default(false)
+  balcony           Boolean         @default(false)
+  patio             Boolean         @default(false)
+  separateParcel    Boolean         @default(false)
+  shed              Boolean         @default(false)
+  summerHouse       Boolean         @default(false)
+  gardenOffice      Boolean         @default(false)
+  pool              Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
   media             Media[]
-  outdoorSpace      OutdoorSpace?  @relation(fields: [outdoorSpaceId], references: [id])
+  outdoorSpace      OutdoorSpace?   @relation(fields: [outdoorSpaceId], references: [id])
   outdoorSpaceId    Int?
 
   @@index([outdoorSpaceId])

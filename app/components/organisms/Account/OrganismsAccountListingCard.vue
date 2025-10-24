@@ -16,7 +16,7 @@
           <ul v-if="hasItems" class="account-card__list">
             <li v-for="item in items" :key="item.id" class="account-card__item">
               <NuxtLink :to="getListingUrl(item)" class="account-card__link">
-                <div class="account-card__card">
+                <div class="account-card__card" :class="getTierClass(item)">
                   <div class="account-card__main-row">
                     <AtomsAccountListingCardImage :image-src="getFirstImage(item)" :has-note="!!item.note" />
 
@@ -28,6 +28,7 @@
                         :bedrooms="item.listing?.property?.numberBedrooms"
                         :bathrooms="item.listing?.property?.numberBathrooms"
                         :is-rental="isRental(item)"
+                        :tier="item.listing?.listingTier"
                       >
                         <template #after-pill>
                           <AtomsNoteButton v-if="showNotesIcon" 
@@ -44,12 +45,11 @@
                       </MoleculesAccountListingCardDetails>
                     </div>
                   </div>
-                  <!-- notes text (no icon now) -->
-                  <div class="account-card__notes" v-if="item.note" @click.prevent>
-                    <p class="body-sm lineheight-sm">
-                      <em class="font-bold">Notes: </em>
-                      {{ item.note }}
-                    </p>
+                  
+                  <!-- Notes row - full width below main content -->
+                  <div v-if="item.note" class="account-card__notes" @click.prevent>
+                    <AtomsIcon icon="cards/notes" size="16" />
+                    <p class="body-xs">{{ item.note }}</p>
                   </div>
                 </div>
               </NuxtLink>
@@ -100,6 +100,15 @@ const getPriceType = (item: RecentItem): string | undefined => {
   return item.listing?.saleListing?.priceType ? item.listing.saleListing.priceType : item.listing?.rentalListing?.rentFrequency;
 };
 
+const getTierClass = (item: RecentItem): Record<string, boolean> => {
+  const tierKey = String(item.listing?.listingTier || 'basic').toLowerCase();
+  return {
+    'account-card__card--premium': tierKey === 'premium',
+    'account-card__card--featured': tierKey === 'featured',
+    'account-card__card--basic': tierKey === 'basic'
+  };
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -135,15 +144,14 @@ const getPriceType = (item: RecentItem): string | undefined => {
 
   &__list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--size-12);
     margin: 0;
     padding: 0;
     list-style: none;
-    align-items: stretch;
 
-    @include mq.mobile-only {
-      grid-template-columns: 1fr;
+    @include mq.desktop {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -165,7 +173,7 @@ const getPriceType = (item: RecentItem): string | undefined => {
   &__card {
     margin: 0;
     overflow: hidden;
-    background: var(--background-100);
+    background: var(--background-200);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--monochrome-500);
     transition: all 0.2s ease;
@@ -187,35 +195,41 @@ const getPriceType = (item: RecentItem): string | undefined => {
     padding: 0;
   }
 
-  &__notes {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: var(--size-8);
-    padding: var(--size-8) var(--size-12);
-    border-top: 1px solid var(--monochrome-500);
-    background: inherit;
-    flex-grow: 1;
-
-    p {
-      margin: 0;
-    }
-  }
-
   &__note-btn {
     background: inherit;
     border: none;
     padding: 0;
   }
 
+  &__notes {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-8);
+    padding: var(--size-12);
+    width: 100%;
+    box-sizing: border-box;
+
+    p {
+      margin: 0;
+      flex: 1;
+      color: var(--foreground-200);
+      line-height: 1.5;
+    }
+
+    :deep(svg) {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--foreground-300);
+    }
+  }
+
   &__main-row {
     display: flex;
     flex-direction: row;
-    align-items: flex-start; /* image height fixed; content can be taller */
+    align-items: stretch;
     gap: var(--size-12);
     width: 100%;
     box-sizing: border-box;
-    flex: 1;
 
     @include mq.mobile-only {
       flex-direction: column;
@@ -249,6 +263,28 @@ const getPriceType = (item: RecentItem): string | undefined => {
   &__empty {
     color: var(--text-muted);
     padding: 1rem 0;
+  }
+
+  /* Tier color themes for note button */
+  &__card--premium {
+    .account-card__note-btn {
+      --notes-active-color: var(--blue-400);
+      --notes-dot-color: var(--blue-400);
+    }
+  }
+
+  &__card--featured {
+    .account-card__note-btn {
+      --notes-active-color: var(--secondary-400);
+      --notes-dot-color: var(--secondary-400);
+    }
+  }
+
+  &__card--basic {
+    .account-card__note-btn {
+      --notes-active-color: var(--foreground-100);
+      --notes-dot-color: var(--foreground-100);
+    }
   }
 }
 

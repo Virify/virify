@@ -67,5 +67,10 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     console.error("Error performing RAG search:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      statusMessage: error.statusMessage || "Failed to perform AI search",
+      message: error.message || "An error occurred during the search"
+    });
   }
 });

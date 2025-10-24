@@ -39,8 +39,8 @@ definePageMeta({
 });
 
 const route = useRoute();
-const { getCurrentStep, determineInitialStep, nextStep, previousStep, cleanupDraftStep } = useDraftStep();
-const { getDraft, getStepperMap, getStepperProps, getCurrentStepData, handleStepUpdate } = useDraft();
+const { getCurrentStep, determineInitialStep, nextStep, previousStep, cleanupListingStep } = useListingStep();
+const { getDraft, getStepperMap, getStepperProps, getCurrentStepData, handleStepUpdate } = useListingEditor();
 const { showToast } = useToast();
 
 const draftId = Number(route.params.id);
@@ -117,7 +117,7 @@ onBeforeUnmount(() => {
   // Only clear if we're navigating to a different page entirely
   const currentPath = window.location.pathname;
   if (!currentPath.includes(`/account/create-listing/${draftId}`)) {
-    cleanupDraftStep(draftId);
+    cleanupListingStep(draftId);
   }
 });
 

@@ -37,7 +37,7 @@
             </ul>
             <div v-if="limit" class="o-chat-summary__footer">
               <NuxtLink to="/account/messages">
-                <button class="button button-sm button-secondary">See all</button>
+                <button class="button button-sm button-tertiary">See all</button>
               </NuxtLink>
             </div>
           </template>
@@ -209,7 +209,7 @@ function toggleCollapsed() {
   }
 
   &__count {
-    color: var(--secondary-400);
+    color: var(--blue-400);
   }
 
   &__content {

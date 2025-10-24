@@ -25,7 +25,7 @@ import ViewsDialogPayment from "~/components/views/Dialog/ViewsDialogPayment.vue
 
 const { showDialog } = useDialog();
 const { isIncludedInMembership, requestMembershipUpgrade } = useUserMembership();
-const { createDraftListing } = useDraftListing();
+const { createDraftListing } = useListingEdit();
 
 const tierPrice = (tier: TierOption) => {
   if (isIncludedInMembership(tier)) {

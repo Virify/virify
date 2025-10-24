@@ -184,7 +184,8 @@ const isMyProperty = computed(() => {
   }
 
   .a-pill {
-    background: var(--secondary-400);
+    background: var(--blue-400);
+    color: var(--monochrome-900);
   }
 
   .agent-avatar {

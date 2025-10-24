@@ -58,7 +58,7 @@ async function handleSend() {
     outline: none;
 
     &:focus {
-      border-color: var(--secondary-400);
+      border-color: var(--blue-400);
     }
   }
 
@@ -67,8 +67,8 @@ async function handleSend() {
     right: var(--size-4);
     top: 50%;
     transform: translateY(-50%);
-    background: var(--secondary-400);
-    color: var(--foreground-100);
+    background: var(--blue-400);
+    color: var(--monochrome-900);
     border: none;
     padding: var(--size-8);
     border-radius: 50%;
@@ -81,7 +81,7 @@ async function handleSend() {
     height: var(--size-36);
 
     &:hover:not(:disabled) {
-      background: var(--secondary-500);
+      background: var(--blue-500);
     }
 
     &:disabled {

@@ -76,14 +76,14 @@ function isLastVisibleGroup(groupIndex: number) {
 
 <style lang="scss" scoped>
 .icon-cell {
-  background: var(--secondary-400);
+  background: var(--blue-400);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: opacity 0.2s ease;
   text-decoration: none;
-  color: inherit;
+  color: var(--monochrome-900);
   position: relative;
   padding: var(--size-10) var(--size-16);
 
@@ -115,10 +115,6 @@ function isLastVisibleGroup(groupIndex: number) {
     color: inherit;
     text-decoration: none;
   }
-
-  :deep(svg) {
-    color: var(--background-200);
-  }
 }
 
 .text-cell {
@@ -126,7 +122,6 @@ function isLastVisibleGroup(groupIndex: number) {
   display: flex;
   align-items: center;
   padding: 0 var(--size-16);
-  color: var(--foreground-100);
 
   &.last-visible {
     border-bottom-right-radius: var(--border-radius-xl);
@@ -163,7 +158,7 @@ function isLastVisibleGroup(groupIndex: number) {
   }
 
   .nav-count {
-    color: var(--secondary-400);
+    color: light-dark(var(--blue-400), var(--blue-600));
     margin-left: var(--size-4);
   }
 }

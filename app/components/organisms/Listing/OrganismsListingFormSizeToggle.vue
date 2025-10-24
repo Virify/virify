@@ -1,0 +1,115 @@
+<template>
+  <div class="o-form-group">
+    <AtomsDivider v-if="divider" />
+    <MoleculesListingFormHeading :title="title" :description="description" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+      <template v-if="$slots.description" #description>
+        <slot name="description" />
+      </template>
+      <template #tooltip-content>
+        <slot name="tooltip-content">
+          <p class="body-xs">{{ tooltip }}</p>
+        </slot>
+      </template>
+    </MoleculesListingFormHeading>
+    <p class="o-form-group__info | body-xs">Size in square meters or square feet</p>
+    <div class="o-form-group__toggle">
+      <AtomsToggle
+        v-model="localUnit"
+        :options="localOptions"
+        :name="name"
+      />
+      <div class="o-form-group__text">
+        <AtomsInput
+          type="number"
+          min="0"
+          step="0.01"
+          inputmode="decimal"
+          v-model="localSize"
+          :name="name ? `${name}-size` : 'property-size'"
+          :placeholder="`Size in ${localUnit === 'feet' ? 'feet' : 'meters'}`"
+          :required="required"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+interface FormOption {
+  value: any;
+  key?: string;
+  info?: string;
+  name?: string;
+  isDefault?: boolean;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  options: FormOption[];
+  unit?: string;
+  size?: number | null;
+  name?: string;
+  required?: boolean;
+  divider?: boolean;
+  tooltip?: string;
+}
+
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  (e: 'update:unit', value: string | undefined): void
+  (e: 'update:size', value: number | null): void
+}>()
+
+const localOptions = computed(() => props.options ?? [])
+
+const localUnit = computed<string | number | undefined>({
+  get() {
+    return props.unit
+  },
+  set(val) {
+    emit('update:unit', val as string)
+  }
+})
+
+const localSize = computed<string>({
+  get: () => (props.size != null ? String(props.size) : ''),
+  set: (val: string) => emit('update:size', val !== '' ? Number(val) : null)
+})
+</script>
+
+<style lang="scss">
+@use "#styles/_utils/media" as mq;
+.o-form-group {
+  padding: var(--size-32) 0;
+
+  &__toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--size-16);
+    justify-content: center;
+
+    @include mq.mobile-only {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--size-12);
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    gap: var(--size-4);
+    max-width: 250px;
+    width: 250px;
+
+    @include mq.mobile-only {
+      width: 100%;
+      max-width: none;
+    }
+  }
+}
+</style>

@@ -1,19 +1,19 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useDraftStep } from "../../app/composables/useDraftStep";
-import type { StepConfig } from "../../app/composables/useDraftStep";
+import { useListingStep } from "../../app/composables/useListingStep";
+import type { StepConfig } from "../../app/composables/useListingStep";
 
 /**
  * Integration Tests for Step Navigation Flow
  *
  * These tests verify the complete navigation flow through the listing creation steps
- * by testing the actual useDraftStep composable:
+ * by testing the actual useListingStep composable:
  * - Step initialization based on completed steps
  * - Navigation between steps (next, previous, goToStep)
  * - Current step state management
  * - Memory cleanup
  */
 
-describe("Step Navigation Integration - useDraftStep Composable", () => {
+describe("Step Navigation Integration - useListingStep Composable", () => {
   const mockSteps: StepConfig[] = [
     { title: "Listing Type" },
     { title: "Property Basics" },
@@ -30,22 +30,22 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
   const draftId = 1;
 
   beforeEach(() => {
-    const { cleanupDraftStep } = useDraftStep();
-    cleanupDraftStep(draftId);
+    const { cleanupListingStep } = useListingStep();
+    cleanupListingStep(draftId);
   });
 
   describe("Step Initialization", () => {
     it("should initialize at step 0 for new draft", () => {
-      const { initializeDraftStep, getCurrentStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       expect(currentStep.value).toBe(0);
     });
 
     it("should start at first step when no steps completed", () => {
-      const { getCurrentStep, determineInitialStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep } = useListingStep();
 
       determineInitialStep(draftId, [], mockSteps);
       const currentStep = getCurrentStep(draftId);
@@ -54,7 +54,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should start at next step after last completed step", () => {
-      const { getCurrentStep, determineInitialStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep } = useListingStep();
 
       // Steps 1, 2, 3 completed (database step numbers)
       determineInitialStep(draftId, [1, 2, 3], mockSteps);
@@ -65,7 +65,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should not exceed last step when all completed", () => {
-      const { getCurrentStep, determineInitialStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep } = useListingStep();
 
       // All 10 steps completed
       determineInitialStep(draftId, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], mockSteps);
@@ -76,7 +76,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should handle non-sequential completed steps", () => {
-      const { getCurrentStep, determineInitialStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep } = useListingStep();
 
       // Steps 1, 3, 5 completed (non-sequential)
       determineInitialStep(draftId, [1, 3, 5], mockSteps);
@@ -89,9 +89,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
 
   describe("Forward Navigation", () => {
     it("should navigate to next step", () => {
-      const { initializeDraftStep, getCurrentStep, nextStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, nextStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       expect(currentStep.value).toBe(0);
@@ -104,7 +104,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should not navigate past last step", () => {
-      const { getCurrentStep, determineInitialStep, nextStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep, nextStep } = useListingStep();
 
       // Start at last step
       determineInitialStep(draftId, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], mockSteps);
@@ -121,9 +121,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should navigate through multiple steps", () => {
-      const { initializeDraftStep, getCurrentStep, nextStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, nextStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       // Navigate forward 5 steps
@@ -137,7 +137,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
 
   describe("Backward Navigation", () => {
     it("should navigate to previous step", () => {
-      const { getCurrentStep, determineInitialStep, previousStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep, previousStep } = useListingStep();
 
       // Start at step 3
       determineInitialStep(draftId, [1, 2, 3], mockSteps);
@@ -153,9 +153,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should not navigate before first step", () => {
-      const { initializeDraftStep, getCurrentStep, previousStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, previousStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       expect(currentStep.value).toBe(0);
@@ -167,7 +167,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should navigate back through multiple steps", () => {
-      const { getCurrentStep, determineInitialStep, previousStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep, previousStep } = useListingStep();
 
       // Start at step 5
       determineInitialStep(draftId, [1, 2, 3, 4, 5], mockSteps);
@@ -184,9 +184,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
 
   describe("Direct Navigation (goToStep)", () => {
     it("should jump to specific step", () => {
-      const { initializeDraftStep, getCurrentStep, goToStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, goToStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       goToStep(draftId, 4, mockSteps.length);
@@ -197,9 +197,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should not jump to invalid step index (negative)", () => {
-      const { initializeDraftStep, getCurrentStep, goToStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, goToStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       const initialStep = currentStep.value;
@@ -211,9 +211,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should not jump to invalid step index (beyond max)", () => {
-      const { initializeDraftStep, getCurrentStep, goToStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, goToStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       goToStep(draftId, mockSteps.length + 5, mockSteps.length);
@@ -223,9 +223,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should allow jumping to any step within bounds", () => {
-      const { initializeDraftStep, getCurrentStep, goToStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, goToStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       goToStep(draftId, 9, mockSteps.length);
@@ -241,13 +241,13 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
 
   describe("Multi-Draft State Management", () => {
     it("should maintain separate state for different drafts", () => {
-      const { initializeDraftStep, getCurrentStep, nextStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, nextStep } = useListingStep();
 
       const draft1 = 1;
       const draft2 = 2;
 
-      initializeDraftStep(draft1);
-      initializeDraftStep(draft2);
+      initializeListingStep(draft1);
+      initializeListingStep(draft2);
 
       const step1 = getCurrentStep(draft1);
       const step2 = getCurrentStep(draft2);
@@ -264,14 +264,14 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should cleanup draft state", () => {
-      const { initializeDraftStep, getCurrentStep, cleanupDraftStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, cleanupListingStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       expect(currentStep.value).toBe(0);
 
-      cleanupDraftStep(draftId);
+      cleanupListingStep(draftId);
 
       // After cleanup, should reinitialize to 0
       const newStep = getCurrentStep(draftId);
@@ -281,18 +281,18 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
 
   describe("getCurrentStepData", () => {
     it("should return current step configuration", () => {
-      const { initializeDraftStep, getCurrentStep, getCurrentStepData } = useDraftStep();
+      const { initializeListingStep, getCurrentStep, getCurrentStepData } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStepData = getCurrentStepData(draftId, mockSteps);
 
       expect(currentStepData.value.title).toBe("Listing Type");
     });
 
     it("should return correct step data after navigation", () => {
-      const { initializeDraftStep, getCurrentStepData, nextStep } = useDraftStep();
+      const { initializeListingStep, getCurrentStepData, nextStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
 
       nextStep(draftId, mockSteps.length);
       nextStep(draftId, mockSteps.length);
@@ -303,9 +303,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should handle empty step array", () => {
-      const { initializeDraftStep, getCurrentStepData } = useDraftStep();
+      const { initializeListingStep, getCurrentStepData } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStepData = getCurrentStepData(draftId, []);
 
       expect(currentStepData.value).toEqual({});
@@ -314,7 +314,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
 
   describe("Completed Steps Integration", () => {
     it("should initialize to correct step based on completed steps", () => {
-      const { getCurrentStep, determineInitialStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep } = useListingStep();
 
       // User has completed steps 1, 2, 3
       determineInitialStep(draftId, [1, 2, 3], mockSteps);
@@ -325,7 +325,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should allow navigation within completed steps range", () => {
-      const { getCurrentStep, determineInitialStep, goToStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep, goToStep } = useListingStep();
 
       // User has completed steps 1, 2, 3
       determineInitialStep(draftId, [1, 2, 3], mockSteps);
@@ -347,10 +347,10 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should allow forward navigation using nextStep (composable doesn't enforce restrictions)", () => {
-      const { getCurrentStep, initializeDraftStep, nextStep } = useDraftStep();
+      const { getCurrentStep, initializeListingStep, nextStep } = useListingStep();
 
       // Start at step 1 with no completed steps
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       expect(currentStep.value).toBe(0);
@@ -366,9 +366,9 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should allow jumping to any step via goToStep (composable is unrestricted)", () => {
-      const { getCurrentStep, initializeDraftStep, goToStep } = useDraftStep();
+      const { getCurrentStep, initializeListingStep, goToStep } = useListingStep();
 
-      initializeDraftStep(draftId);
+      initializeListingStep(draftId);
       const currentStep = getCurrentStep(draftId);
 
       // Note: goToStep in the composable doesn't check if steps are complete
@@ -381,7 +381,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should handle edge case of all steps completed", () => {
-      const { getCurrentStep, determineInitialStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep } = useListingStep();
 
       // All 10 steps completed
       determineInitialStep(draftId, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], mockSteps);
@@ -392,7 +392,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should handle partial completion and allow resuming", () => {
-      const { getCurrentStep, determineInitialStep, nextStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep, nextStep } = useListingStep();
 
       // User completed first 5 steps
       determineInitialStep(draftId, [1, 2, 3, 4, 5], mockSteps);
@@ -407,7 +407,7 @@ describe("Step Navigation Integration - useDraftStep Composable", () => {
     });
 
     it("should respect bounds even with completed steps", () => {
-      const { getCurrentStep, determineInitialStep, nextStep } = useDraftStep();
+      const { getCurrentStep, determineInitialStep, nextStep } = useListingStep();
 
       // All steps completed
       determineInitialStep(draftId, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], mockSteps);

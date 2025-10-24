@@ -35,12 +35,17 @@
     <div class="own-card__bottom">
       <div class="own-card__left">
         <div class="own-card__toggle">
-          <label class="switch">
-            <input type="checkbox" :checked="item.published" @change="onTogglePublish"
-              :aria-label="item.published ? 'Unpublish listing' : 'Publish listing'" />
+          <label class="switch" :class="{ 'switch--disabled': item.archived }">
+            <input 
+              type="checkbox" 
+              :checked="item.published" 
+              :disabled="item.archived"
+              @change="onTogglePublish"
+              :aria-label="item.archived ? 'Cannot publish archived listing' : (item.published ? 'Unpublish listing' : 'Publish listing')" 
+            />
             <span class="slider"></span>
           </label>
-          <span class="body-xs">{{ item.published ? "Published" : "Unpublished" }}</span>
+          <span class="body-xs">{{ item.archived ? "Archived" : (item.published ? "Published" : "Unpublished") }}</span>
         </div>
 
         <div class="own-card__analytics">
@@ -67,12 +72,15 @@
       <div class="own-card__right">
         <AtomsPill v-if="item.isDraft" class="own-card__pill own-card__pill--draft | body-xs">Draft</AtomsPill>
         <div class="own-card__buttons">
-          <NuxtLink to="#">
+          <NuxtLink :to="editHref">
             <button class="button button-xs">Edit</button>
           </NuxtLink>
           <NuxtLink :to="item.published ? viewHref : undefined" :class="{ 'disabled-link': !item.published }">
             <button class="button button-xs" :disabled="!item.published">View</button>
           </NuxtLink>
+          <button v-if="!item.isDraft" class="button button-xs button-danger" @click="handleArchive">
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -83,6 +91,8 @@
 import type { OwnedListingWithAnalytics } from "~~/shared/types/user-owned-listing";
 
 const props = defineProps<{ item: OwnedListingWithAnalytics }>();
+
+const { archiveListing } = useMyListings();
 
 const isRental = computed(() => !!props.item.rentalListing)
 const priceFormatted = computed(() => 
@@ -100,6 +110,14 @@ const bedrooms = computed(() => props.item.property?.numberBedrooms || 0)
 const bathrooms = computed(() => props.item.property?.numberBathrooms || 0)
 const firstImage = computed(() => props.item.property?.media?.find((m) => m.image)?.image || null)
 const viewHref = computed(() => `/listing/${props.item.id}`)
+
+// Edit link - different for drafts vs live listings
+const editHref = computed(() => {
+  if (props.item.isDraft) {
+    return `/account/create-listing/${props.item.id}`
+  }
+  return `/account/edit-listing/${props.item.id}`
+})
 
 const tierKey = computed(() => String(props.item.listingTier || "").toLowerCase())
 
@@ -119,6 +137,18 @@ const onTogglePublish = () => {
   const { togglePublished } = useMyListings()
   togglePublished(props.item.id, props.item.published)
 }
+
+const handleArchive = async () => {
+  if (!confirm('Are you sure you want to archive this listing? This will unpublish it and mark it as archived.')) {
+    return
+  }
+  
+  try {
+    await archiveListing(props.item.id)
+  } catch (error) {
+    console.error('Failed to archive listing:', error)
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -126,7 +156,7 @@ const onTogglePublish = () => {
 
 .own-card {
   width: 100%;
-  background: var(--background-100);
+  background: var(--background-200);
   border: 1px solid var(--monochrome-500);
   border-radius: var(--border-radius-xl);
   overflow: hidden;
@@ -357,7 +387,7 @@ const onTogglePublish = () => {
 
   /* Tier color themes */
   &.own-card--premium {
-    --tier-color: var(--blue-400);
+    --tier-color: var(--blue-500);
 
     .button {
       color: var(--monochrome-900);
@@ -370,6 +400,11 @@ const onTogglePublish = () => {
     .own-card__pill,
     .own-card__pill--active {
       color: var(--monochrome-900);
+    }
+
+    /* Make toggle darker for premium tier */
+    input:checked + .slider {
+      background-color: var(--blue-500);
     }
   }
 
@@ -389,6 +424,11 @@ const onTogglePublish = () => {
       background-color: var(--tier-color);
       border-color: var(--tier-color);
     }
+
+    /* Make toggle more visible for basic tier */
+    input:checked + .slider {
+      background-color: var(--monochrome-100);
+    }
   }
 
   &__toggle {
@@ -404,12 +444,25 @@ const onTogglePublish = () => {
   display: inline-block;
   width: 34px;
   height: 20px;
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    .slider {
+      cursor: not-allowed;
+    }
+  }
 }
 
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
+
+  &:disabled + .slider {
+    cursor: not-allowed;
+  }
 }
 
 .slider {
@@ -419,7 +472,7 @@ const onTogglePublish = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--tier-color, var(--secondary-400));
+  background-color: var(--monochrome-500);
   transition: 0.2s;
   border-radius: 20px;
 }
