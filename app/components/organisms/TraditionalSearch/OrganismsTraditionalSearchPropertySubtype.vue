@@ -8,7 +8,7 @@
     </PopoverTrigger>
 
     <PopoverContent :side-offset="10" position-strategy="absolute"
-      class="o-traditional-search-property-subtype__content">
+      class="o-traditional-search-property-subtype__content | gradient-box">
       <PopoverClose class="o-traditional-search-property-subtype__close | button button-ghost"
         aria-label="Close popover">
         <AtomsIcon icon="cross" aria-hidden class="o-traditional-search-property-subtype__close-icon" />
@@ -89,8 +89,8 @@ async function emitChange(updatedValue: string, checked: boolean) {
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: var(--size-6);
-    right: var(--size-6);
+    top: var(--size-10);
+    right: var(--size-10);
     width: var(--size-32);
     height: var(--size-32);
     padding: 0;
@@ -109,9 +109,6 @@ async function emitChange(updatedValue: string, checked: boolean) {
     background: var(--background-200);
     color: var(--foreground-100);
     padding: var(--size-16);
-    border-radius: var(--border-radius-ui);
-    border: 1px solid var(--border-color-200);
-    box-shadow: var(--elevate-200);
   }
 
   &__title {
@@ -130,6 +127,10 @@ async function emitChange(updatedValue: string, checked: boolean) {
     .a-checkbox:has(input:checked) {
       border: 0;
       background: none;
+
+      &:hover {
+        color: currentColor;
+      }
     }
   }
 }
