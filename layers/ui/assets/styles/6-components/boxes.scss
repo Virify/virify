@@ -20,9 +20,9 @@
  */
 .gradient-box {
   // Colours
-  --gradient-box-start: #{fn.faded-color(8%)};
-  --gradient-box-middle: #{fn.faded-color(5%)};
-  --gradient-box-end: #{fn.faded-color(10%)};
+  --gradient-box-start: light-dark(#{fn.faded-color(8%)}, #{fn.faded-color(17%)});
+  --gradient-box-middle: light-dark(#{fn.faded-color(5%)}, #{fn.faded-color(15%)});
+  --gradient-box-end: light-dark(#{fn.faded-color(10%)}, #{fn.faded-color(20%)});
   --gradident-box-bg-direction: to bottom;
 
   // Shapes, sizes

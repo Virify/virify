@@ -209,12 +209,12 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
   }
 
   &__list-item:has(&__dropdown:hover):not(:has(input:checked)) &__input {
-    border-color: var(--secondary-700);
+    border-color: light-dark(var(--secondary-700), var(--secondary-200));
   }
 
   &__list-item:has(input:checked) &__input {
     border-color: var(--secondary-500);
-    background-color: light-dark(var(--secondary-900), var(--background-100));
+    background-color: light-dark(var(--secondary-900), var(--background-200));
   }
 
   &__list-item:has(input:checked) &__dropdown {
