@@ -202,7 +202,7 @@ const hasLocation = computed(() => {
     background: rgba(0, 0, 0, 0);
     z-index: -1;
     pointer-events: none;
-    transition: background-color var(--animation-medium);
+    transition: background-color var(--animation-slow);
   }
 
   &:hover::before {

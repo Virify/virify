@@ -89,7 +89,7 @@ function updateIsBuy(newValue: boolean) {
 @use "#styles/_utils/media" as mq;
 
 .o-traditional-search-form-contract {
-  --search-form-background: var(--blue-400);
+  --search-form-background: linear-gradient(to bottom, var(--blue-400), var(--blue-300));
   --search-form-foreground: var(--monochrome-900);
 
   &__menu {
