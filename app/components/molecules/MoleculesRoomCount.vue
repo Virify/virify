@@ -38,8 +38,8 @@ const max = [
 /**
  *  Selection
  */
-const minValue = ref(min.at(0).key)
-const maxValue = ref(max.at(-1).key)
+const minValue = ref(min.find(({ selected }) => selected)?.key)
+const maxValue = ref(max.find(({ selected }) => selected)?.key)
 
 /**
  *  Avoid overlapping selections
