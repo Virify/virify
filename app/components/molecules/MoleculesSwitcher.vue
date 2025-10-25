@@ -43,6 +43,11 @@ const $labels = useTemplateRef('$labels')
 const $highlight = useTemplateRef('$highlight')
 const $wrapper = useTemplateRef('$wrapper')
 
+/**
+ *  @TODO
+ *  Convert to composable so reuse with
+ *  app/components/organisms/Dock/Inputs/OrganismsDockInputsLayout.vue
+ */
 function updateHighlightPosition(isResize = false) {
   // Search for active label
   const activeLabel = unref($labels)?.find(label => {
@@ -65,7 +70,7 @@ function updateHighlightPosition(isResize = false) {
   const nextWidth = offsetWidth + 'px'
 
   // Do not animate resizes
-  if (isResize) {
+  if (isResize || !previousWidth) {
     highlight.style.left = nextLeft
     highlight.style.width = nextWidth
 
