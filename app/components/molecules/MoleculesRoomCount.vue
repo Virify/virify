@@ -55,7 +55,7 @@ const availableMax = computed(() => {
   const minKey = minValue.value
   const selected = min.findIndex(({ key }) => key === minKey)
 
-  return max.slice(selected - 1)
+  return max.slice(Math.max(selected - 1, 0))
 })
 
 </script>
