@@ -1,11 +1,14 @@
 <template>
   <div class="a-number-range | gradient-box">
-    <AtomsRangeSelect label="From" :options="min" />
-    <AtomsRangeSelect label="To" :options="max" />
+    <AtomsRangeSelect label="From" :options="availableMin" v-model="minValue" />
+    <AtomsRangeSelect label="To" :options="availableMax" v-model="maxValue" />
   </div>
 </template>
 
 <script setup>
+/**
+ *  Raw options
+ */
 const min = [
   { key: 0, value: 'No min', selected: true },
   { key: 0.5, value: 'Studio' },
@@ -29,8 +32,31 @@ const max = [
   { key: 6, value: '6' },
   { key: 7, value: '7' },
   { key: 8, value: '8' },
-  { key: 0, value: 'No max', selected: true }
+  { key: 9, value: 'No max', selected: true }
 ]
+
+/**
+ *  Selection
+ */
+const minValue = ref(min.at(0).key)
+const maxValue = ref(max.at(-1).key)
+
+/**
+ *  Avoid overlapping selections
+ */
+const availableMin = computed(() => {
+  const maxKey = maxValue.value
+  const selected = max.findIndex(({ key }) => key === maxKey)
+
+  return min.slice(0, selected + 2)
+})
+
+const availableMax = computed(() => {
+  const minKey = minValue.value
+  const selected = min.findIndex(({ key }) => key === minKey)
+
+  return max.slice(selected - 1)
+})
 
 </script>
 
