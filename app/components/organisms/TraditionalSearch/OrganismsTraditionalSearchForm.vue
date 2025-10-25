@@ -11,12 +11,12 @@
     <div class="o-traditional-search-form__room-count">
       <div>
         <h3 class="o-traditional-search-form__title | title-xs">Bed count</h3>
-        <AtomsNumberRange />
+        <MoleculesRoomCount />
       </div>
 
       <div>
         <h3 class="o-traditional-search-form__title | title-xs">Bathroom count</h3>
-        <AtomsNumberRange />
+        <MoleculesRoomCount />
       </div>
     </div>
 
