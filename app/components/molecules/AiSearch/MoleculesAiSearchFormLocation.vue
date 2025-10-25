@@ -14,7 +14,7 @@
 
       <client-only>
         <Transition name="m-ai-search-form-location">
-          <div role="presentation" v-show="popoverExpanded">
+          <div role="presentation" class="m-ai-search-form-location__popover" v-show="popoverExpanded">
             <MoleculesAutocompletePopover :search-value="autocompleteValue"
               @location-selected="handleLocationSelected" />
           </div>
@@ -109,6 +109,13 @@ onClickOutside($location, hidePopover);
     color: var(--foreground-100);
     align-items: center;
 
+    @include mq.not-tablet {
+      --gradient-box-shadow: none;
+      --gradient-box-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+
+      border: 0;
+    }
+
     @include mq.tablet {
       display: grid;
       padding: var(--size-16);
@@ -122,20 +129,33 @@ onClickOutside($location, hidePopover);
     }
   }
 
+  &__popover {
+    @include mq.not-tablet {
+      margin: 0;
+
+      .m-autocomplete-popover {
+        border-radius: 0;
+        border-width: 2px;
+        border-top: 0;
+        border-bottom: 0;
+      }
+    }
+  }
+
   &__radius,
   &__input {
     background-color: transparent;
     color: currentColor;
-    border-radius: var(--border-radius-lg);
-
-    @include mq.tablet {
-      border-radius: var(--border-radius-xl);
-    }
+    border-radius: var(--border-radius-xl);
   }
 
   &__input {
     padding: var(--size-14) var(--size-16);
     width: 100%;
+
+    @include mq.not-tablet {
+      border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+    }
 
     @include mq.tablet {
       width: auto;
@@ -161,6 +181,12 @@ onClickOutside($location, hidePopover);
       display: none;
       padding: var(--size-14) var(--size-18);
       padding-right: var(--size-48);
+    }
+
+    @include mq.not-tablet {
+      margin-top: 0;
+      border-top: 0;
+      border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
     }
 
     @include mq.tablet {

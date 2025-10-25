@@ -15,12 +15,12 @@
 
             <OrganismsFilterSwitcher>
               <template v-slot:traditional>
-                <OrganismsTraditionalSearchForm />
+                <OrganismsTraditionalSearchForm class="o-dock-banner__toggle-content" />
               </template>
 
               <template v-slot:ai>
                 <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-                  @submit-search="searchSubmit" @reset-search="searchReset" />
+                  @submit-search="searchSubmit" @reset-search="searchReset" class="o-dock-banner__toggle-content" />
               </template>
             </OrganismsFilterSwitcher>
           </Transition>
@@ -253,6 +253,14 @@ const hasLocation = computed(() => {
 
     &--expanded {
       margin-top: var(--size-36);
+    }
+  }
+
+  &__toggle-content {
+    padding: 0 var(--size-6) var(--size-6);
+
+    @include mq.small-tablet {
+      padding: 0 var(--size-16) var(--size-16);
     }
   }
 }
