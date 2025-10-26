@@ -29,7 +29,7 @@ defineProps<{
   width: 100%;
 
   &__title {
-    color: light-dark(var(--blue-400), var(--blue-600));
+    color: light-dark(var(--blue-500), var(--blue-600));
     margin-bottom: var(--size-12);
   }
 

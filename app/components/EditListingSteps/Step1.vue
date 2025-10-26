@@ -15,11 +15,7 @@
       v-if="!draft.saleListing && !draft.rentalListing"
       title="Sale or Rental?"
       :required="true"
-    >
-      <template #description>
-        <p>Are you selling or renting out a property? Your selection tailors the rest of the form.</p>
-      </template>
-      
+    > 
       <OrganismsListingFormRadioGroup 
         title="For Sale / For Rent" 
         :options="stepOneListingOptions" 

@@ -136,7 +136,6 @@ const breadcrumbItems = computed(() => [
   flex-direction: column;
   
   &__content {
-    padding: var(--size-16) 0;
     background: var(--background-100);
 
     &-inner {

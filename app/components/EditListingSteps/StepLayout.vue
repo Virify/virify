@@ -58,7 +58,7 @@ defineEmits<{
 // NOT scoped - these styles are inherited by all step components
 .step {
   &__title {
-    color: light-dark(var(--blue-400), var(--blue-600));
+    color: light-dark(var(--blue-500), var(--blue-600));
     margin-bottom: var(--size-4);
   }
 

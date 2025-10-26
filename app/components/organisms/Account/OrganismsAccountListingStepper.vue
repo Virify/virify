@@ -105,7 +105,7 @@ const isMobile = useMediaQuery('(max-width: 640px)');
 const isTablet = useMediaQuery('(max-width: 1024px)');
 
 const carouselSize = computed(() => {
-  return isMobile.value ? '100px' : '120px';
+  return isMobile.value ? '100px' : '130px';
 });
 
 // Carousel options - use start alignment to prevent overflow
@@ -272,6 +272,11 @@ defineExpose({
   display: flex;
   justify-content: flex-start;
   padding: var(--size-32) var(--size-32);
+  @include mq.mobile-only {
+    padding: 0;
+    border-radius: 0;
+    background: none;
+  }
   overflow: visible;
 
   @include mq.mobile-only {
@@ -295,6 +300,12 @@ defineExpose({
     :deep(.embla-prev),
     :deep(.embla-next) {
       top: 85%;
+    }
+
+    @include mq.mobile-only {
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
     }
 
     @include mq.tablet {
@@ -336,39 +347,11 @@ defineExpose({
 
       .o-account-listing-stepper__step-indicator {
         box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6);
-        /* Dark mode override */
-        @media (prefers-color-scheme: dark) {
-          box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.5);
-        }
-      }
-
-      /* Pulse animation for active step indicator */
-      @keyframes stepper-pulse {
-        0% {
-          box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6);
-        }
-        70% {
-          box-shadow: 0 0 0 12px rgba(59, 130, 246, 0.2);
-        }
-        100% {
-          box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6);
-        }
       }
       @media (prefers-color-scheme: dark) {
-        @keyframes stepper-pulse {
-          0% {
-            box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.5);
-          }
-          70% {
-            box-shadow: 0 0 0 12px rgba(96, 165, 250, 0.15);
-          }
-          100% {
-            box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.5);
-          }
+        .o-account-listing-stepper__step-indicator {
+          box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.5);
         }
-      }
-      .o-account-listing-stepper__step--active .o-account-listing-stepper__step-indicator {
-        animation: stepper-pulse 1.2s infinite;
       }
     }
 

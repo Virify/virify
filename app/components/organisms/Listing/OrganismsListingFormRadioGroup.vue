@@ -93,12 +93,12 @@ function handleClick(value: any) {
 
   &__radio {
     background: var(--background-200);
-    border: 1px solid light-dark(var(--blue-400), var(--blue-600));
+    border: 1px solid light-dark(var(--blue-500), var(--blue-600));
     cursor: pointer;
     text-transform: capitalize;
 
     &--selected {
-      background: light-dark(var(--blue-400), var(--blue-500));
+      background: light-dark(var(--blue-500), var(--blue-500));
       color: var(--monochrome-900);
     }
   }
