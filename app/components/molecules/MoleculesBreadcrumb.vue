@@ -2,11 +2,11 @@
   <nav :class="['breadcrumb', variant && `breadcrumb--${variant}`]">
     <template v-for="(item, index) in items" :key="index">
       <AtomsPill v-if="item.to" class="breadcrumb__item">
-        <NuxtLink :to="item.to" class="breadcrumb__link | r-body-sm-xs">
+        <NuxtLink :to="item.to" class="breadcrumb__link | body-sm">
           {{ item.label }}
         </NuxtLink>
       </AtomsPill>
-      <AtomsPill v-else class="breadcrumb__item breadcrumb__item--current | r-body-sm-xs" aria-current="page">
+      <AtomsPill v-else class="breadcrumb__item breadcrumb__item--current | body-sm" aria-current="page">
         {{ item.label }}
       </AtomsPill>
 
@@ -37,6 +37,10 @@ defineProps<{
   gap: var(--size-8);
   padding: var(--size-16) 0 var(--size-16) 0;
   flex-wrap: wrap;
+
+  @include mq.mobile-only {
+    padding: var(--size-8) 0 var(--size-8) 0;
+  }
 
   &__item {
     background: var(--background-200);

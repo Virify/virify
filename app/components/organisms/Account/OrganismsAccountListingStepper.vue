@@ -36,11 +36,11 @@
             }"
           ></div>
 
-          <h2 class="o-account-listing-stepper__title | r-body-sm-xs">
+          <h2 class="o-account-listing-stepper__title | body-sm">
             {{ slide.title }}
           </h2>
 
-          <p class="o-account-listing-stepper__counter | body-xs">
+          <p class="o-account-listing-stepper__counter | body-sm">
             <em>Step {{ slideIndex + 1 }} of {{ stepperSlides.length }}</em>
           </p>
 
@@ -105,7 +105,7 @@ const isMobile = useMediaQuery('(max-width: 640px)');
 const isTablet = useMediaQuery('(max-width: 1024px)');
 
 const carouselSize = computed(() => {
-  return isMobile.value ? '100px' : '130px';
+  return isMobile.value ? '120px' : '130px';
 });
 
 // Carousel options - use start alignment to prevent overflow

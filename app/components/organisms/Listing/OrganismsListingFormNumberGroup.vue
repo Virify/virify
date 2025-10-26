@@ -7,11 +7,11 @@
       </template>
       <template #tooltip-content>
         <slot name="tooltip-content">
-          <p class="body-xs">{{ tooltip }}</p>
+          <p class="body-sm">{{ tooltip }}</p>
         </slot>
       </template>
     </MoleculesListingFormHeading>
-    <em v-if="info" class="o-form-group__info | body-xs">{{ info }}</em>
+  <em v-if="info" class="o-form-group__info | body-sm">{{ info }}</em>
     <div class="o-form-group__number-input">
       <AtomsInput
         type="number"

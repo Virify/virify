@@ -7,7 +7,7 @@
       </template>
       <template #tooltip-content>
         <slot name="tooltip-content">
-          <p class="body-xs">{{ tooltip }}</p>
+          <p class="body-sm">{{ tooltip }}</p>
         </slot>
       </template>
     </MoleculesListingFormHeading>

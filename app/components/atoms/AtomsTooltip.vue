@@ -1,10 +1,11 @@
 <template>
   <TooltipProvider :delay-duration="delayDuration">
-    <TooltipRoot>
+    <TooltipRoot :open="open" @update:open="onUpdateOpen">
       <TooltipTrigger as-child>
-        <slot></slot>
+        <span @click="handleClick" style="display: inline-flex; align-items: center;">
+          <slot></slot>
+        </span>
       </TooltipTrigger>
-
       <TooltipPortal>
         <TooltipContent 
           :side-offset="5" 
@@ -27,10 +28,33 @@ interface Props {
   responsive?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   delayDuration: 500,
   responsive: false,
 });
+
+const open = ref(false);
+
+function isMobile() {
+  return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+}
+
+function handleClick(event: Event) {
+  if (isMobile()) {
+    open.value = !open.value;
+    event.stopPropagation();
+  }
+}
+
+function onUpdateOpen(val: boolean) {
+  open.value = val;
+}
+
+if (typeof window !== 'undefined' && isMobile()) {
+  window.addEventListener('click', () => {
+    open.value = false;
+  });
+}
 </script>
 
 <style lang="scss">
@@ -93,11 +117,11 @@ withDefaults(defineProps<Props>(), {
     color: var(--foreground-100);
   }
 
+
   p {
-    font-size: var(--font-xs);
+    font-size: var(--font-sm);
     margin-bottom: var(--size-8);
     line-height: var(--lineheight-md);
-    
     &:last-child {
       margin-bottom: 0;
     }
@@ -113,9 +137,8 @@ withDefaults(defineProps<Props>(), {
     padding-left: var(--size-20);
     
     li {
-      font-size: var(--font-xs);
+      font-size: var(--font-sm);
       margin-bottom: var(--size-4);
-      
       &:last-child {
         margin-bottom: 0;
       }

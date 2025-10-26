@@ -4,7 +4,7 @@
     <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
       <template #tooltip-content>
         <slot name="tooltip-content">
-          <p v-if="tooltip" class="body-xs">{{ tooltip }}</p>
+          <p v-if="tooltip" class="body-sm">{{ tooltip }}</p>
         </slot>
       </template>
     </MoleculesListingFormHeading>
@@ -72,8 +72,12 @@ function handleChange(value: string) {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
 .o-form-group {
   padding: var(--size-32) 0;
+  @include mq.mobile-only {
+    padding: var(--size-16) 0;
+  }
   &__list {
     width: 100%;
     display: flex;
