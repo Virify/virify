@@ -1,7 +1,7 @@
 <template>
   <EditListingStepsStepLayout
     :title="stepOneData.selectedType === 'sale' ? 'Listing Type - Sale' : stepOneData.selectedType === 'rent' ? 'Listing Type - Rental' : 'Listing Type'"
-    info="Please provide the type of listing you want to create below. This will help us tailor the rest of the form to your specific needs."
+    info="Are you selling or renting out a property? Your selection tailors the rest of the form."
     :formKey="formKey"
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
@@ -13,15 +13,15 @@
     <!-- first parent select -->
     <MoleculesListingFormSection
       v-if="!draft.saleListing && !draft.rentalListing"
-      title="Sale or Rental"
+      title="Sale or Rental?"
       :required="true"
     >
       <template #description>
-        <p>Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs.</p>
+        <p>Are you selling or renting out a property? Your selection tailors the rest of the form.</p>
       </template>
       
       <OrganismsListingFormRadioGroup 
-        title="What type of listing do you want to create?" 
+        title="For Sale / For Rent" 
         :options="stepOneListingOptions" 
         v-model="stepOneData.selectedType"
         @update:modelValue="onSelectedTypeChange"
@@ -45,7 +45,7 @@
       </template>
       
       <OrganismsListingFormRadioGroup 
-        title="Please confirm property tenure"
+        title="Select property tenure"
         :options="saleListingTenureOptions"
         v-model="stepOneData.saleListing.tenureType" 
         name="sale-tenure-type"
@@ -107,8 +107,8 @@
       </template>
       
       <OrganismsListingFormRadioGroup 
-        title="What is the furnished status of the listing?"
-        :options="rentalFurnishedStatusOptions" 
+        title="Select furnished status"
+        :options="rentalFurnishedStatusOptions"
         v-model="stepOneData.rentalListing.furnishedStatus"
         name="rental-furnished-status" 
         :required="true" 
