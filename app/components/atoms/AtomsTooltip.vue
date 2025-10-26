@@ -84,6 +84,45 @@ withDefaults(defineProps<Props>(), {
   fill: var(--background-100);
 }
 
+.a-tooltip-popover {
+  // Style common HTML elements in tooltip content
+  h4 {
+    font-size: var(--font-sm);
+    font-weight: 600;
+    margin-bottom: var(--size-8);
+    color: var(--foreground-100);
+  }
+
+  p {
+    font-size: var(--font-xs);
+    margin-bottom: var(--size-8);
+    line-height: var(--lineheight-md);
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--foreground-100);
+  }
+
+  ul, ol {
+    margin: var(--size-8) 0;
+    padding-left: var(--size-20);
+    
+    li {
+      font-size: var(--font-xs);
+      margin-bottom: var(--size-4);
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
 .a-tooltip-popover[data-side="bottom"] {
   animation-name: fadeTooltipDown;
 }

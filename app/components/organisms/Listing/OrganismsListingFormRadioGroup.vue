@@ -11,20 +11,18 @@
     <ul class="o-form-group__list">
       <li v-for="option in options" :key="option.value" class="o-form-group__item">
         <label class="o-form-group__label | body-sm" @click.prevent="handleClick(option.value)">
-          
-            <AtomsPill class="o-form-group__radio"
-              :class="{ 'o-form-group__radio--selected': modelValue === option.value }">
-              <input 
-                type="radio" 
-                :name="name" 
-                :value="option.value"
-                :checked="modelValue === option.value" 
-                class="| visually-hidden"
-                :required="required"
-              />
-              {{ option.key }}
-            </AtomsPill>
-          
+          <AtomsPill class="o-form-group__radio"
+            :class="{ 'o-form-group__radio--selected': modelValue === option.value }">
+            <input 
+              type="radio" 
+              :name="name" 
+              :value="option.value"
+              :checked="modelValue === option.value" 
+              class="| visually-hidden"
+              :required="required"
+            />
+            {{ option.key }}
+          </AtomsPill>
         </label>
       </li>
     </ul>
@@ -95,12 +93,12 @@ function handleClick(value: any) {
 
   &__radio {
     background: var(--background-200);
-    border: 1px solid var(--secondary-400);
+    border: 1px solid light-dark(var(--blue-400), var(--blue-600));
     cursor: pointer;
     text-transform: capitalize;
 
     &--selected {
-      background: var(--secondary-400);
+      background: light-dark(var(--blue-400), var(--blue-500));
       color: var(--monochrome-900);
     }
   }

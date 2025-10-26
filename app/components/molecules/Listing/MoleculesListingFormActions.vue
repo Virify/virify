@@ -1,15 +1,15 @@
 <template>
   <div class="step__form-actions" :class="{ 'with-previous': showPrevious }">
-    <button v-if="showPrevious" class="step__form-action | button button-r-sm button-secondary" @click.prevent="$emit('previous')" type="button">
+    <button v-if="showPrevious" class="step__form-action | button button-r-sm button-monochrome" @click.prevent="$emit('previous')" type="button">
       Previous Step
     </button>
 
     <div class="step__form-actions--right">
-      <button v-if="hasChanges" class="step__form-action | button button-r-sm button-secondary" @click.prevent="$emit('cancel')" type="button">
+      <button v-if="hasChanges" class="step__form-action | button button-r-sm button-monochrome" @click.prevent="$emit('cancel')" type="button">
         Cancel
       </button>
 
-      <button class="step__form-action | button button-r-sm button-secondary" :disabled="buttonDisabled" @click.prevent="$emit('submit')" :type="submitType">
+      <button class="step__form-action | button button-r-sm button-monochrome" :disabled="buttonDisabled" @click.prevent="$emit('submit')" :type="submitType">
         {{ primaryText }}
       </button>
       

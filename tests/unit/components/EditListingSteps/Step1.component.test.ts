@@ -71,7 +71,7 @@ describe("Step1 Component", () => {
         },
       });
 
-      expect(wrapper.text()).toContain("Please provide the type of listing you want to create below");
+      expect(wrapper.text()).toContain("Are you selling or renting out a property? Your selection tailors the rest of the form.");
     });
 
     it("should display initial listing type question when no type is selected", async () => {
@@ -81,7 +81,7 @@ describe("Step1 Component", () => {
         },
       });
 
-      expect(wrapper.text()).toContain("What type of listing do you want to create?");
+      expect(wrapper.text()).toContain("For Sale / For Rent");
     });
 
     it("should update UI when selecting sale then rent via child radio emits", async () => {
@@ -109,7 +109,7 @@ describe("Step1 Component", () => {
       await wrapper.vm.$nextTick();
       // Look for radio group titles rendered by our stub
       const saleTitles = wrapper.findAll(".radio-title").map((w) => w.text());
-      expect(saleTitles).toContain("Please confirm property tenure");
+      expect(saleTitles).toContain("Select property tenure");
 
       // emulate selecting 'rent'
       await wrapper.findComponent({ name: "OrganismsListingFormRadioGroup" }).vm.$emit("update:modelValue", "rent");
@@ -138,7 +138,7 @@ describe("Step1 Component", () => {
       // Find the radio group components and assert their title props include sale fields
       const saleRadioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
       const saleTitles = saleRadioGroups.map((r) => r.props("title"));
-      expect(saleTitles).toContain("Please confirm property tenure");
+      expect(saleTitles).toContain("Select property tenure");
       expect(saleTitles).toContain("Are you part of a chain?");
     });
 
@@ -159,7 +159,7 @@ describe("Step1 Component", () => {
 
       const titles = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" }).map((r) => r.props("title"));
       expect(titles).not.toContain("Are bills included in the rent?");
-      expect(titles).not.toContain("What is the furnished status");
+      expect(titles).not.toContain("Select furnished status");
     });
   });
 
@@ -182,7 +182,7 @@ describe("Step1 Component", () => {
       const rentRadioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
       const rentTitles = rentRadioGroups.map((r) => r.props("title"));
       expect(rentTitles).toContain("Are bills included in the rent?");
-      expect(rentTitles).toContain("What is the furnished status of the listing?");
+      expect(rentTitles).toContain("Select furnished status");
     });
 
     it("should not show sale fields when rental is selected", async () => {

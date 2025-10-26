@@ -96,11 +96,11 @@ function handleChange(value: string) {
 
   &__checkbox {
     background: var(--background-200);
-    border: 1px solid var(--secondary-400);
+    border: 1px solid light-dark(var(--blue-400), var(--blue-500));
     cursor: pointer;
 
     &--selected {
-      background: var(--secondary-400);
+      background: light-dark(var(--blue-400), var(--blue-500));
       color: var(--monochrome-900);
     }
   }

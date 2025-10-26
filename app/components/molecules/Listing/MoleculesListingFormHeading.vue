@@ -47,7 +47,7 @@ defineProps<{
     
     &--section {
       text-align: left;
-      color: var(--secondary-400);
+      color: light-dark(var(--blue-400), var(--blue-600));
       margin-bottom: 0;
     }
   }

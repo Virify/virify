@@ -53,7 +53,7 @@
 
   // Title for each room
   &__item-title {
-    color: var(--secondary-400);
+    color: light-dark(var(--blue-400), var(--blue-600));
   }
 
   // Content area (form fields)

@@ -1,18 +1,16 @@
 <template>
   <!-- stepper -->
   <div class="p-listing-creator">
-    <MoleculesBreadcrumb :items="breadcrumbItems" />
-
-    <ClientOnly>
-      <OrganismsAccountListingStepper v-model="currentStep" :stepper-slides="stepperMapProp" />
-    </ClientOnly>
+    <MoleculesBreadcrumb :items="breadcrumbItems" variant="blue" />
 
     <!-- Current step content -->
     <div class="p-listing-creator__content">
       <AtomsAccountCardContainer>
         <ClientOnly>
+          <OrganismsAccountListingStepper v-model="currentStep" :stepper-slides="stepperMapProp" />
+        </ClientOnly>
+        <ClientOnly>
           <div class="p-listing-creator__content-inner">
-            <p class="p-listing-creator__content-inner--stepper | body-xs"><em>Step {{ currentStep + 1 }} of {{ stepperMap.length }}</em></p>
               <component
                 v-if="draft && (currentSlide as any).component"
                 :is="(currentSlide as any).component"
@@ -142,10 +140,11 @@ const breadcrumbItems = computed(() => [
     background: var(--background-100);
 
     &-inner {
-      padding: var(--size-32);
+      padding: 0 var(--size-32);
+      padding-bottom: var(--size-32);
       
       @include mq.mobile-only {
-        padding: var(--size-16);
+        padding: var(--size-8);
       }
 
       &--stepper {
