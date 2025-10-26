@@ -1,6 +1,7 @@
 <template>
   <section class="o-dock-banner__form-height" role="presentation">
-    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" @focusin="showExpandedForm">
+    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
+      @focusin="showExpandedForm">
       <div class="o-dock-banner__backdrop | elevate-300" :class="{
         'o-dock-banner__backdrop--hidden': !hasLocation
       }" aria-hidden="true" ref="$backdrop">
@@ -116,7 +117,7 @@ async function animateFormToDock() {
 /**
  *  Toggle filters as visible
  */
-const isExpanded = ref(true)
+const isExpanded = ref(false)
 
 function showExpandedForm() {
   isExpanded.value = true
@@ -205,6 +206,7 @@ const hasLocation = computed(() => {
     transition: background-color var(--animation-slow);
   }
 
+  &--backdrop::before,
   &:hover::before {
     background: rgba(0, 0, 0, 0.4);
   }

@@ -4,8 +4,9 @@
       <fieldset class="m-ai-search-form-location__fieldset | gradient-box">
         <legend class="| visually-hidden">Location</legend>
 
-        <input type="text" class="m-ai-search-form-location__input | body-md" placeholder="Where do you want to live?"
-          aria-label="Location" v-model="locationQuery" @input="updateAutocompleteValue" @focus="showPopover" />
+        <input ref="$searchInput" type="text" class="m-ai-search-form-location__input | body-md"
+          placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery"
+          @input="updateAutocompleteValue" @focus="showPopover" />
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
@@ -95,6 +96,23 @@ const showPopover = () => { popoverExpanded.value = true; };
 const hidePopover = () => { popoverExpanded.value = false; };
 
 onClickOutside($location, hidePopover);
+
+/**
+ *  Show popover if focused on first mount
+ */
+const $searchInput = useTemplateRef('$searchInput')
+
+onMounted(() => {
+  const input = unref($searchInput)
+
+  // If input is not an element, do nothing
+  if (!isElement(input)) return
+
+  // If input is focused
+  if (input === document.activeElement) {
+    showPopover()
+  }
+})
 
 </script>
 
