@@ -11,116 +11,109 @@
     @previous="$emit('previousStep')"
     @submit="submitForm"
   >
-    <!-- sale specific -->
-    <OrganismsListingFormRadioGroup
-      v-if="draft.saleListing && stepThreeData.saleListing"
-      title="Price type:"
-      :options="salePriceTypeOptions"
-      v-model="stepThreeData.saleListing.priceType"
-      name="sale-price-type"
-      :required="true"
-    >
-      <template #tooltip-content>
-        <AtomsTooltipList 
-          title="Choose how your price is presented:"
-          :items="[
-            'Offers Over: You expect bids above the listed price.',
-            'Asking Price: A fixed price you\'re aiming for.',
-            'Offers in the Region Of: You\'re more open to negotiation, although you expect a final price close to the listed price.'
-          ]" 
-        />
-      </template>
-    </OrganismsListingFormRadioGroup>
+    <MoleculesListingFormSection v-if="draft.saleListing && stepThreeData.saleListing" title="Sale Price Type" required>
+      <OrganismsListingFormRadioGroup
+        title="Price type:"
+        :options="salePriceTypeOptions"
+        v-model="stepThreeData.saleListing.priceType"
+        name="sale-price-type"
+        :required="true"
+      >
+        <template #tooltip-content>
+          <p><strong>Offers Over:</strong> You expect bids above the listed price.</p>
+          <p><strong>Asking Price:</strong> A fixed price you're aiming for.</p>
+          <p><strong>Offers in the Region Of:</strong> You're more open to negotiation, although you expect a final price close to the listed price.</p>
+          <p>For more information see our <NuxtLink to="/guides/buying/offer-types" target="_blank" rel="noopener" class="link">Offer Types</NuxtLink> guide.</p>
+        </template>
+      </OrganismsListingFormRadioGroup>
+    </MoleculesListingFormSection>
+    <AtomsDivider v-if="draft.saleListing && stepThreeData.saleListing" />
 
-    <!-- rental specific -->
-    <!-- rent frequency -->
-    <OrganismsListingFormRadioGroup
-      v-if="draft.rentalListing && stepThreeData.rentalListing"
-      title="What is the rent frequency for this listing?"
-      :options="rentalPriceTypeOptions"
-      v-model="stepThreeData.rentalListing.rentFrequency"
-      name="rental-frequency"
-      :required="true"
-    >
-      <template #tooltip-content>
-        <AtomsTooltipList 
-          title="Select the tenancy length:"
-          :items="[
-            'Short-term: Less than 6 months.',
-            'Long-term: 6 months or more.'
-          ]" 
-        />
-      </template>
-    </OrganismsListingFormRadioGroup>
+    <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Rental Frequency">
+      <OrganismsListingFormRadioGroup
+        title="What is the rent frequency for this listing?"
+        :options="rentalPriceTypeOptions"
+        v-model="stepThreeData.rentalListing.rentFrequency"
+        name="rental-frequency"
+        :required="true"
+      >
+        <template #tooltip-content>
+          <p><strong>Monthly:</strong> Rent is paid every month.</p>
+          <p><strong>Weekly:</strong> Rent is paid every week.</p>
+        </template>
+      </OrganismsListingFormRadioGroup>
+    </MoleculesListingFormSection>
+    <AtomsDivider v-if="draft.rentalListing && stepThreeData.rentalListing" />
 
-    <!-- price input for both sale and rental -->
-    <OrganismsListingFormNumberGroup
-      :title="draft.saleListing ? 'Price:' : 'Rent:'"
-      v-model="stepThreeData.price"
-      name="listing-price"
-      placeholder="e.g '250000' or '1200'"
-      :required="true"
-      min="0"
-      step="0.01"
-    >
-      <template #tooltip-content>
-        <AtomsTooltipParagraphs :paragraphs="[
-          'Sales: Enter the asking price for your property.',
-          'Rentals: Enter the rent amount.'
-        ]" />
-      </template>
-    </OrganismsListingFormNumberGroup>
+    <MoleculesListingFormSection :title="draft.saleListing ? 'Sale Price' : 'Rental Amount'" :required="true">
+      <OrganismsListingFormNumberGroup
+        :title="draft.saleListing ? 'Insert sale price.' : 'Insert rental amount.'"
+        v-model="stepThreeData.price"
+        name="listing-price"
+        placeholder="e.g '250000' or '1200'"
+        :required="true"
+        min="0"
+        step="0.01"
+      >
+      </OrganismsListingFormNumberGroup>
+    </MoleculesListingFormSection>
+    <AtomsDivider />
 
-    <!-- deposit -->
-    <OrganismsListingFormNumberGroup
-      v-if="draft.rentalListing && stepThreeData.rentalListing"
-      title="What is the deposit amount for this rental listing?"
-      v-model="stepThreeData.rentalListing.deposit"
-      name="listing-deposit"
-      placeholder="e.g '250000' or '1200'"
-      :required="true"
-      type="number"
-      min="0"
-      step="0.01"
-    >
-      <template #tooltip-content>
-        <p class="body-xs">Enter the tenancy deposit amount.</p>
-      </template>
-    </OrganismsListingFormNumberGroup>
+    <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Tenancy/Rental Deposit" required>
+      <OrganismsListingFormNumberGroup
+        title="Insert the tenancy/rental deposit."
+        v-model="stepThreeData.rentalListing.deposit"
+        name="listing-deposit"
+        placeholder="e.g '1200' or '0'"
+        :required="true"
+        type="number"
+        min="0"
+        step="0.01"
+      >
+        <template #tooltip-content>
+          <p>For more information see our <NuxtLink to="/guides/rentals/tenancy-and-holding-deposits" target="_blank" rel="noopener" class="link">Tenancy and Holding Deposits</NuxtLink> guide.</p>
+        </template>
+      </OrganismsListingFormNumberGroup>
+    </MoleculesListingFormSection>
+    <AtomsDivider v-if="draft.rentalListing && stepThreeData.rentalListing" />
 
-    <!-- holding deposit -->
-    <OrganismsListingFormNumberGroup
-      v-if="draft.rentalListing && stepThreeData.rentalListing"
-      title="What is the holding deposit amount for this rental listing?"
-      v-model="stepThreeData.rentalListing.holdingDeposit"
-      name="listing-holding-deposit"
-      placeholder="e.g '250000' or '1200'"
-      type="number"
-      min="0"
-      step="0.01"
-    >
-      <template #tooltip-content>
-        <AtomsTooltipParagraphs :paragraphs="[
-          'Enter the amount to reserve the property while references and contracts are completed.',
-          'This must be refundable (in certain circumstances) and is capped at 1 week\'s rent under the Tenants Fees Act 2019.',
-          'Use the below link for further information.'
-        ]" />
-      </template>
-    </OrganismsListingFormNumberGroup>
+    <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Holding Deposit" required>
+      <OrganismsListingFormNumberGroup
+        title="Insert holding deposit amount."
+        v-model="stepThreeData.rentalListing.holdingDeposit"
+        name="listing-holding-deposit"
+        placeholder="e.g '300' or '0'"
+        type="number"
+        min="0"
+        step="0.01"
+        :required="true"
+      >
+        <template #tooltip-content>
+          <p>This must be refundable (in certain circumstances) and is capped at 1 week's rent under the Tenants Fees Act 2019.</p>
+          <p>For more information see our <NuxtLink to="/guides/rentals/tenancy-and-holding-deposits" target="_blank" rel="noopener" class="link">Tenancy and Holding Deposits</NuxtLink> guide.</p>
+        </template>
+      </OrganismsListingFormNumberGroup>
+    </MoleculesListingFormSection>
+    <AtomsDivider v-if="draft.rentalListing && stepThreeData.rentalListing" />
 
-    <!-- Rental Length -->
-    <OrganismsListingFormNumberGroup
-      v-if="draft.rentalListing && stepThreeData.rentalListing"
-      title="How long is the rental period in months?"
-      v-model="stepThreeData.rentalListing.rentalLength"
-      name="listing-rental-length"
-      placeholder="e.g '12'or '6 months'"
-      :required="true"
-      type="number"
-      min="0"
-      step="0.01"
-    />
-      
+    <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Tenancy Duration" required>
+      <OrganismsListingFormRadioGroup
+        title="Tenancy duration."
+        :options="[
+          { value: 'SHORT_TERM', key: 'Short term', info: 'A tenancy of less than 6 months.' },
+          { value: 'LONG_TERM', key: 'Long term', info: 'A tenancy of 6 months or more.' }
+        ]"
+        v-model="stepThreeData.rentalListing.rentalLength"
+        name="listing-rental-length"
+        :required="true"
+      >
+        <template #tooltip-content>
+          <p><strong>Short-term:</strong> Less than 6 months.</p>
+          <p><strong>Long-term:</strong> 6 months or more.</p>
+        </template>
+      </OrganismsListingFormRadioGroup>
+    </MoleculesListingFormSection>
+  <!-- No divider after Tenancy Duration for rent, and no divider after Sale Price for sale -->
   </EditListingStepsStepLayout>
 </template>
 <script setup lang="ts">

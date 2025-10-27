@@ -6,7 +6,7 @@ model RentalListing {
   holdingDeposit     Float?
   rentFrequency      RentalPriceType?
   isBillsIncluded    Boolean
-  rentalLength       Int?
+  rentalLength       RentalLengthType?
   furnishedStatus    FurnishedStatus?
   availabilityStatus RentalAvailabilityStatus @default(AVAILABLE)
   DraftListing       DraftListing?            @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
@@ -16,19 +16,27 @@ model RentalListing {
   @@index([draftListingId])
 }
 
+
 enum FurnishedStatus {
   FURNISHED
   UNFURNISHED
   PART_FURNISHED
 }
 
+
 enum RentalPriceType {
   WEEKLY
   MONTHLY
 }
 
+
 enum RentalAvailabilityStatus {
   AVAILABLE
   LET_AGREED
   LET
+}
+
+enum RentalLengthType {
+  SHORT_TERM
+  LONG_TERM
 }
