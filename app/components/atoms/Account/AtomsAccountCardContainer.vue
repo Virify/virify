@@ -5,6 +5,7 @@
 </template>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
 .account-card-container {
   background: var(--background-200);
   border-radius: var(--border-radius-xl);
@@ -13,5 +14,11 @@
   flex-direction: column;
   box-sizing: border-box;
   overflow: auto;
+
+  @include mq.mobile-only {
+    background: var(--background-200);
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
 </style>

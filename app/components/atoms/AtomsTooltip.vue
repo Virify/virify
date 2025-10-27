@@ -1,10 +1,11 @@
 <template>
   <TooltipProvider :delay-duration="delayDuration">
-    <TooltipRoot>
+    <TooltipRoot :open="open" @update:open="onUpdateOpen">
       <TooltipTrigger as-child>
-        <slot></slot>
+        <span @click="handleClick" style="display: inline-flex; align-items: center;">
+          <slot></slot>
+        </span>
       </TooltipTrigger>
-
       <TooltipPortal>
         <TooltipContent 
           :side-offset="5" 
@@ -27,10 +28,22 @@ interface Props {
   responsive?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   delayDuration: 500,
   responsive: false,
 });
+
+const open = ref(false);
+
+function handleClick(event: Event) {
+  open.value = !open.value;
+  // Prevent clicks from bubbling to parent handlers which might close modals etc.
+  event.stopPropagation();
+}
+
+function onUpdateOpen(val: boolean) {
+  open.value = val;
+}
 </script>
 
 <style lang="scss">
@@ -82,6 +95,44 @@ withDefaults(defineProps<Props>(), {
 
 .a-tooltip-arrow {
   fill: var(--background-100);
+}
+
+.a-tooltip-popover {
+  // Style common HTML elements in tooltip content
+  h4 {
+    font-size: var(--font-sm);
+    font-weight: 600;
+    margin-bottom: var(--size-8);
+    color: var(--foreground-100);
+  }
+
+
+  p {
+    font-size: var(--font-sm);
+    margin-bottom: var(--size-8);
+    line-height: var(--lineheight-md);
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--foreground-100);
+  }
+
+  ul, ol {
+    margin: var(--size-8) 0;
+    padding-left: var(--size-20);
+    
+    li {
+      font-size: var(--font-sm);
+      margin-bottom: var(--size-4);
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
 }
 
 .a-tooltip-popover[data-side="bottom"] {

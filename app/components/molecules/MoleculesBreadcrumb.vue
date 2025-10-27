@@ -1,12 +1,12 @@
 <template>
-  <nav class="breadcrumb">
+  <nav :class="['breadcrumb', variant && `breadcrumb--${variant}`]">
     <template v-for="(item, index) in items" :key="index">
       <AtomsPill v-if="item.to" class="breadcrumb__item">
-        <NuxtLink :to="item.to" class="breadcrumb__link | r-body-sm-xs">
+        <NuxtLink :to="item.to" class="breadcrumb__link | body-sm">
           {{ item.label }}
         </NuxtLink>
       </AtomsPill>
-      <AtomsPill v-else class="breadcrumb__item--current | r-body-sm-xs" aria-current="page">
+      <AtomsPill v-else class="breadcrumb__item breadcrumb__item--current | body-sm" aria-current="page">
         {{ item.label }}
       </AtomsPill>
 
@@ -25,6 +25,7 @@ interface BreadcrumbItem {
 
 defineProps<{
   items: BreadcrumbItem[]
+  variant?: 'default' | 'blue'
 }>()
 </script>
 
@@ -36,6 +37,10 @@ defineProps<{
   gap: var(--size-8);
   padding: var(--size-16) 0 var(--size-16) 0;
   flex-wrap: wrap;
+
+  @include mq.mobile-only {
+    padding: var(--size-8) 0 var(--size-8) 0;
+  }
 
   &__item {
     background: var(--background-200);
@@ -62,6 +67,29 @@ defineProps<{
 
   &__separator {
     color: var(--secondary-400);
+  }
+
+  // Blue variant modifier
+  &--blue {
+    .breadcrumb__item {
+      border-color: var(--blue-400);
+      border-color: var(--foreground-100);
+
+      &--current {
+        background: var(--blue-400);
+        color: var(--monochrome-900);
+        border-color: var(--foreground-200);
+      }
+
+      &:hover {
+        background: var(--blue-400);
+        color: var(--monochrome-900);
+      }
+    }
+
+    .breadcrumb__separator {
+      color: var(--blue-400);
+    }
   }
 }
 </style>

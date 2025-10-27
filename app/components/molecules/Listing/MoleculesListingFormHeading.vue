@@ -2,18 +2,18 @@
   <div class="m-form-header" :class="{ 'm-form-header--section': variant === 'section' }">
     <h3 v-if="variant === 'section'" class="m-form-header__title m-form-header__title--section | title-md">
       {{ title }}
-      <span v-if="required" class="m-form-header__required | title-xs">*</span>
+      <span v-if="required" class="m-form-header__required | title-sm">*</span>
     </h3>
     <p v-else class="m-form-header__title | body-sm">
       {{ title }}
-      <span v-if="required" class="m-form-header__required | title-xs">*</span>
+      <span v-if="required" class="m-form-header__required | title-sm">*</span>
     </p>
     
     <AtomsTooltip v-if="tooltip || hasTooltip" :responsive="true">
       <AtomsIcon icon="content/info" class="m-form-header__icon" />
       <template #tooltip>
         <slot name="tooltip-content">
-          <p class="body-xs">{{ tooltip }}</p>
+          <p class="body-sm">{{ tooltip }}</p>
         </slot>
       </template>
     </AtomsTooltip>
@@ -47,7 +47,7 @@ defineProps<{
     
     &--section {
       text-align: left;
-      color: var(--secondary-400);
+      color: light-dark(var(--blue-400), var(--blue-600));
       margin-bottom: 0;
     }
   }

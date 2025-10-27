@@ -4,7 +4,7 @@
     <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
       <template #tooltip-content>
         <slot name="tooltip-content">
-          <p v-if="tooltip" class="body-xs">{{ tooltip }}</p>
+          <p v-if="tooltip" class="body-sm">{{ tooltip }}</p>
         </slot>
       </template>
     </MoleculesListingFormHeading>
@@ -72,8 +72,12 @@ function handleChange(value: string) {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
 .o-form-group {
   padding: var(--size-32) 0;
+  @include mq.mobile-only {
+    padding: var(--size-16) 0;
+  }
   &__list {
     width: 100%;
     display: flex;
@@ -96,11 +100,11 @@ function handleChange(value: string) {
 
   &__checkbox {
     background: var(--background-200);
-    border: 1px solid var(--secondary-400);
+    border: 1px solid light-dark(var(--blue-400), var(--blue-500));
     cursor: pointer;
 
     &--selected {
-      background: var(--secondary-400);
+      background: light-dark(var(--blue-400), var(--blue-500));
       color: var(--monochrome-900);
     }
   }

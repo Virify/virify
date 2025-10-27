@@ -1,7 +1,7 @@
 <template>
   <EditListingStepsStepLayout
     :title="stepOneData.selectedType === 'sale' ? 'Listing Type - Sale' : stepOneData.selectedType === 'rent' ? 'Listing Type - Rental' : 'Listing Type'"
-    info="Please provide the type of listing you want to create below. This will help us tailor the rest of the form to your specific needs."
+    info="Are you selling or renting out a property? Your selection tailors the rest of the form."
     :formKey="formKey"
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
@@ -13,15 +13,11 @@
     <!-- first parent select -->
     <MoleculesListingFormSection
       v-if="!draft.saleListing && !draft.rentalListing"
-      title="Sale or Rental"
+      title="Sale or Rental?"
       :required="true"
-    >
-      <template #description>
-        <p>Select the type of listing you want to create. This will help us tailor the rest of the form to your specific needs.</p>
-      </template>
-      
+    > 
       <OrganismsListingFormRadioGroup 
-        title="What type of listing do you want to create?" 
+        title="For Sale / For Rent" 
         :options="stepOneListingOptions" 
         v-model="stepOneData.selectedType"
         @update:modelValue="onSelectedTypeChange"
@@ -38,19 +34,20 @@
       title="Property Tenure"
       :required="true"
     >
-      <template #description>
-        <p><strong>Freehold:</strong> You own the property and the land it sits on indefinitely.</p>
-        <p><strong>Leasehold:</strong> You have the right to live in the property for a period of time, but you do not own the land it stands on.</p>
-        <p><strong>Commonhold:</strong> Typically used on multi-occupancy developments. You own your part of the property on a freehold basis, but an association (or other entity) owns and manages the common parts.</p>
-      </template>
-      
       <OrganismsListingFormRadioGroup 
-        title="Please confirm property tenure"
+        title="Select property tenure"
         :options="saleListingTenureOptions"
         v-model="stepOneData.saleListing.tenureType" 
         name="sale-tenure-type"
         :required="true"
-      />
+      >
+        <template #tooltip-content>
+          <p><strong>Freehold</strong><br>You own the property and the land it sits on indefinitely.</p>
+          <p><strong>Leasehold</strong><br>You have the right to live in the property for a period of time, but you do not own the land it stands on.</p>
+          <p><strong>Commonhold</strong><br>You own your part of the property on a freehold basis, but an association (or other entity) owns and manages the common parts.</p>
+          <p>For more info, head to our <NuxtLink to="/guides/property-information/what-is-tenure" target="_blank" rel="noopener" class="link">What is 'Tenure'?</NuxtLink> guide.</p>
+        </template>
+      </OrganismsListingFormRadioGroup>
     </MoleculesListingFormSection>
 
     <AtomsDivider v-if="isSale"/>
@@ -59,17 +56,17 @@
       v-if="isSale" 
       title="Chain Status"
     >
-      <template #description>
-        <p><strong>Chain free:</strong> The sale is not dependant on you moving to another property.</p>
-        <p><strong>Chain:</strong> The sale is dependant on you moving out and to another property.</p>
-      </template>
-      
       <OrganismsListingFormRadioGroup 
         title="Are you part of a chain?"
         :options="saleListingChainOptions" 
         v-model="stepOneData.saleListing.chain" 
         name="sale-chain" 
-      />
+      >
+        <template #tooltip-content>
+          <p><strong>No chain</strong><br>Your sale is not dependant on you buying and/or moving to another property.</p>
+          <p><strong>Chain</strong><br>You need to buy and/or move to another property before this sale goes through.</p>
+        </template>
+      </OrganismsListingFormRadioGroup>
     </MoleculesListingFormSection>
 
 
@@ -79,18 +76,17 @@
       title="Bills Included"
       :required="true"
     >
-      <template #description>
-        <p>Specify if any property bills (such as gas and electric) are included in the price.</p>
-        <p>If so, it's best to list which bills are included within your Property Description.</p>
-      </template>
-      
       <OrganismsListingFormRadioGroup 
         title="Are bills included in the rent?"
         :options="rentalBillsIncludedOptions" 
         v-model="stepOneData.rentalListing.isBillsIncluded"
         name="rental-bills-included" 
         :required="true" 
-      />
+      >
+        <template #tooltip-content>
+          <p>If bills such as gas, electric, water are included tick Yes. Be sure to list these in your property description.</p>
+        </template>
+      </OrganismsListingFormRadioGroup>
     </MoleculesListingFormSection>
 
     <AtomsDivider v-if="isRent"/>
@@ -100,19 +96,19 @@
       title="Furnished Status"
       :required="true"
     >
-      <template #description>
-        <p><strong>Fully furnished:</strong> The property comes with everything you need to move in and live comfortably right away.</p>
-        <p><strong>Part furnished:</strong> The property includes certain appliances and some furniture, but what's included can vary a lot.</p>
-        <p><strong>Unfurnished:</strong> The property will generally not include appliances or furniture.</p>
-      </template>
-      
       <OrganismsListingFormRadioGroup 
-        title="What is the furnished status of the listing?"
-        :options="rentalFurnishedStatusOptions" 
+        title="Select furnished status"
+        :options="rentalFurnishedStatusOptions"
         v-model="stepOneData.rentalListing.furnishedStatus"
         name="rental-furnished-status" 
         :required="true" 
-      />
+      >
+        <template #tooltip-content>
+          <p><strong>Furnished</strong><br>Ready to move in with furniture provided.</p>
+          <p><strong>Part furnished</strong><br>Some furniture or appliances included (varies).</p>
+          <p><strong>Unfurnished</strong><br>No furniture or appliances included.</p>
+        </template>
+      </OrganismsListingFormRadioGroup>
     </MoleculesListingFormSection>
   </EditListingStepsStepLayout>
 </template>

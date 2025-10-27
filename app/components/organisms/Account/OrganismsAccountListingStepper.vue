@@ -1,19 +1,7 @@
 <template>
   <section class="o-account-listing-stepper">
-    <!-- Custom navigation arrows -->
-    <button
-      v-if="isMobile || isTablet"
-      class="o-account-listing-stepper__arrow o-account-listing-stepper__arrow--prev"
-      :disabled="!canNavigatePrev"
-      @click="navigatePrev"
-      aria-label="Previous step"
-    >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-
-    <MoleculesCarousel 
+    <div class="o-account-listing-stepper__wrapper">
+      <MoleculesCarousel 
       ref="carouselRef"
       :slides="stepperSlides" 
       :slide-size="carouselSize"
@@ -48,9 +36,13 @@
             }"
           ></div>
 
-          <h2 class="o-account-listing-stepper__title | r-body-sm-xs">
+          <h2 class="o-account-listing-stepper__title | body-sm">
             {{ slide.title }}
           </h2>
+
+          <p class="o-account-listing-stepper__counter | body-sm">
+            <em>Step {{ slideIndex + 1 }} of {{ stepperSlides.length }}</em>
+          </p>
 
           <!-- Connecting line after step (except last) -->
           <div 
@@ -61,18 +53,31 @@
       </template>
     </MoleculesCarousel>
 
-    <!-- Next arrow -->
-    <button
-      v-if="isMobile || isTablet"
-      class="o-account-listing-stepper__arrow o-account-listing-stepper__arrow--next"
-      :disabled="!canNavigateNext"
-      @click="navigateNext"
-      aria-label="Next step"
-    >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
+    <!-- Navigation arrows below carousel -->
+    <div class="o-account-listing-stepper__nav-buttons">
+      <button
+        class="o-account-listing-stepper__nav-button o-account-listing-stepper__nav-button--prev"
+        :disabled="!canNavigatePrev"
+        @click="navigatePrev"
+        aria-label="Previous step"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      
+      <button
+        class="o-account-listing-stepper__nav-button o-account-listing-stepper__nav-button--next"
+        :disabled="!canNavigateNext"
+        @click="navigateNext"
+        aria-label="Next step"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    </div>
   </section>
 </template>
 
@@ -100,7 +105,7 @@ const isMobile = useMediaQuery('(max-width: 640px)');
 const isTablet = useMediaQuery('(max-width: 1024px)');
 
 const carouselSize = computed(() => {
-  return isMobile.value ? '100px' : '120px';
+  return isMobile.value ? '120px' : '130px';
 });
 
 // Carousel options - use start alignment to prevent overflow
@@ -265,19 +270,42 @@ defineExpose({
 .o-account-listing-stepper {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  padding: var(--size-32) var(--size-32);
+  @include mq.mobile-only {
+    padding: 0;
+    border-radius: 0;
+    background: none;
+  }
+  overflow: visible;
+
+  @include mq.mobile-only {
+    padding: var(--size-8) 0;
+  }
+  
+  &__wrapper {
+    width: 100%;
+  }
+  
   &__carousel {
-    padding: var(--size-16);
-    background: var(--blue-400);
+    background: var(--background-200);
     border-radius: var(--border-radius-lg);
     position: relative;
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow: visible;
+    
     :deep(.embla-prev),
     :deep(.embla-next) {
       top: 85%;
+    }
+
+    @include mq.mobile-only {
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
     }
 
     @include mq.tablet {
@@ -290,14 +318,18 @@ defineExpose({
 
   &__step {
     position: relative;
-    color: var(--monochrome-900);
+    color: light-dark(var(--blue-400), var(--blue-600));
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    white-space: wrap;
-    text-align: center;
+    white-space: normal;
+    text-align: left;
     cursor: pointer;
+    padding-top: var(--size-8);
+    padding-bottom: var(--size-8);
+    padding-left: var(--size-8);
+    overflow: visible;
 
     @include mq.mobile-only {
       max-width: none;
@@ -306,39 +338,53 @@ defineExpose({
     }
 
     &--active {
-      color: var(--primary-400);
+      color: light-dark(var(--blue-400), var(--blue-600));
 
       .o-account-listing-stepper__title {
-        color: var(--primary-400);
+        color: light-dark(var(--blue-400), var(--blue-600));
+        font-weight: 600;
+      }
+
+      .o-account-listing-stepper__step-indicator {
+        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6);
+      }
+      @media (prefers-color-scheme: dark) {
+        .o-account-listing-stepper__step-indicator {
+          box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.5);
+        }
       }
     }
 
     &--complete {
-      color: var(--monochrome-900);
+      color: light-dark(var(--blue-400), var(--blue-600));
+
+      .o-account-listing-stepper__title {
+        color: light-dark(var(--blue-400), var(--blue-600));
+      }
     }
 
     &--disabled {
       cursor: not-allowed;
-      color: var(--monochrome-500);
+      color: light-dark(var(--monochrome-500), var(--monochrome-600));
     }
 
     &-indicator {
       width: var(--size-24);
       height: var(--size-24);
       border-radius: 50%;
-      border: 3px solid var(--secondary-400);
+      border: 3px solid light-dark(var(--blue-400), var(--blue-600));
       background: var(--monochrome-900);
-      margin: 0 auto 8px auto;
+      margin: 0 0 8px 0;
       z-index: 3;
 
       &--complete {
-        background: var(--secondary-400);
-        border-color: var(--secondary-400);
+        background: light-dark(var(--blue-400), var(--blue-600));
+        border-color: light-dark(var(--blue-400), var(--blue-600));
       }
 
       &--active {
-        background: var(--primary-400);
-        border-color: var(--primary-400);
+        background: light-dark(var(--blue-400), var(--blue-600));
+        border-color: light-dark(var(--blue-400), var(--blue-600));
       }
     }
   }
@@ -348,66 +394,56 @@ defineExpose({
     align-items: center;
   }
 
+  &__counter {
+    color: var(--monochrome-500);
+    margin-top: var(--size-4);
+  }
+
   &__connector {
     position: absolute;
     height: 2px;
-    background: var(--secondary-400);
+    background: light-dark(var(--blue-400), var(--blue-600));
     z-index: 2;
-    top: 12px;
+    top: calc(var(--size-8) + 12px);
+    left: 12px;
 
     &--before {
-      left: -50%;
+      left: calc(-50% + 12px);
       width: 50%;
     }
 
     &--after {
-      right: -50%;
-      width: 50%;
+      left: 12px;
+      width: calc(100% - 12px);
     }
   }
 
-  &__arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    background: var(--background-100);
-    border: 2px solid var(--monochrome-300);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+  &__nav-buttons {
+    display: flex;
+    gap: var(--size-8);
+  }
+
+  &__nav-button {
+    background: light-dark(var(--blue-400), var(--blue-600));
+    border: 2px solid light-dark(var(--blue-400), var(--blue-600));
+    border-radius: var(--border-radius-md);
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--monochrome-700);
+    color: var(--background-100);
 
     &:hover:not(:disabled) {
-      background: var(--primary-400);
-      border-color: var(--primary-400);
-      color: var(--background-100);
+      background: var(--blue-500);
+      border-color: var(--blue-500);
     }
 
     &:disabled {
       opacity: 0.3;
       cursor: not-allowed;
-    }
-
-    &--prev {
-      left: var(--size-8);
-
-      @include mq.tablet {
-        left: var(--size-16);
-      }
-    }
-
-    &--next {
-      right: var(--size-8);
-
-      @include mq.tablet {
-        right: var(--size-16);
-      }
     }
   }
 }
