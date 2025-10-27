@@ -57,12 +57,17 @@ export const createInitialSaleValues = (listing: EditableListing): SaleListingCr
  * @returns Initial rental listing values
  */
 export const createInitialRentalValues = (listing: EditableListing): RentalListingCreateWithoutListingInput => ({
-  deposit: listing.rentalListing?.deposit || null,
-  holdingDeposit: listing.rentalListing?.holdingDeposit || null,
-  rentFrequency: listing.rentalListing?.rentFrequency || null as any,
-  isBillsIncluded: listing.rentalListing?.isBillsIncluded || null as any,
-  rentalLength: listing.rentalListing?.rentalLength || null,
-  furnishedStatus: listing.rentalListing?.furnishedStatus || null,
+  deposit: listing.rentalListing?.deposit ?? null,
+  holdingDeposit: listing.rentalListing?.holdingDeposit ?? null,
+  rentFrequency: listing.rentalListing?.rentFrequency ?? null as any,
+  isBillsIncluded: listing.rentalListing?.isBillsIncluded ?? null as any,
+  rentalLength:
+    typeof listing.rentalListing?.rentalLength === 'string'
+      ? (listing.rentalListing?.rentalLength as 'SHORT_TERM' | 'LONG_TERM')
+      : typeof listing.rentalListing?.rentalLength === 'number'
+        ? (listing.rentalListing?.rentalLength < 6 ? 'SHORT_TERM' : 'LONG_TERM')
+        : null,
+  furnishedStatus: listing.rentalListing?.furnishedStatus ?? null,
 });
 
 /**

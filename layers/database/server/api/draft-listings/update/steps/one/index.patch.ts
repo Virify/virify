@@ -13,7 +13,7 @@ const rentalListingSchema = z.object({
   holdingDeposit: z.number().nullable().optional(),
   rentFrequency: z.enum(Object.values(RentalPriceType)).nullable().optional(),
   isBillsIncluded: z.boolean(),
-  rentalLength: z.number().int().nullable().optional(),
+  rentalLength: z.enum(["SHORT_TERM", "LONG_TERM"]).nullable().optional(),
   furnishedStatus: z.enum(Object.values(FurnishedStatus)).nullable().optional(),
 });
 

@@ -29,7 +29,7 @@ describe("Step3 - Price Validation", () => {
         rentFrequency: "MONTHLY" as any,
         deposit: 1200,
         holdingDeposit: 300,
-        rentalLength: 12,
+        rentalLength: 'LONG_TERM',
       };
 
       const result = stepThreeValidation.isRentalPriceValid(rentalData);
@@ -41,7 +41,7 @@ describe("Step3 - Price Validation", () => {
         rentFrequency: null,
         deposit: 1200,
         holdingDeposit: 300,
-        rentalLength: 12,
+        rentalLength: 'LONG_TERM',
       };
 
       const result = stepThreeValidation.isRentalPriceValid(rentalData);
@@ -53,7 +53,7 @@ describe("Step3 - Price Validation", () => {
         rentFrequency: "MONTHLY" as any,
         deposit: null,
         holdingDeposit: 300,
-        rentalLength: 12,
+        rentalLength: 'LONG_TERM',
       };
 
       const result = stepThreeValidation.isRentalPriceValid(rentalData);
@@ -65,7 +65,7 @@ describe("Step3 - Price Validation", () => {
         rentFrequency: "MONTHLY" as any,
         deposit: 1200,
         holdingDeposit: null,
-        rentalLength: 12,
+        rentalLength: 'LONG_TERM',
       };
 
       const result = stepThreeValidation.isRentalPriceValid(rentalData);
@@ -109,7 +109,7 @@ describe("Step3 - Price Validation", () => {
           rentFrequency: "MONTHLY" as any,
           deposit: 1500,
           holdingDeposit: 350,
-          rentalLength: 12,
+          rentalLength: 'LONG_TERM',
         },
       };
 
@@ -167,6 +167,7 @@ describe("Step3 - Price Validation", () => {
       expect(result).toBe(true);
     });
 
+
     it("should return true when draft has complete rental price data", () => {
       const mockDraft = {
         price: 1200,
@@ -174,11 +175,21 @@ describe("Step3 - Price Validation", () => {
           rentFrequency: "MONTHLY",
           deposit: 1200,
           holdingDeposit: 300,
-          rentalLength: 12,
+          rentalLength: 'LONG_TERM',
         },
       } as DraftListingWithFullPayload;
-
       const result = stepThreeValidation.hasExistingStepThreeData(mockDraft);
+      expect(result).toBe(true);
+    });
+
+    it("should validate rental price with deposit and holdingDeposit as 0", () => {
+      const rentalData = {
+        rentFrequency: "MONTHLY" as any,
+        deposit: 0,
+        holdingDeposit: 0,
+        rentalLength: 'SHORT_TERM',
+      };
+      const result = stepThreeValidation.isRentalPriceValid(rentalData);
       expect(result).toBe(true);
     });
 

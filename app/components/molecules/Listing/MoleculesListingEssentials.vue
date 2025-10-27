@@ -118,7 +118,8 @@ const rentalInfoPills = computed(() => {
     pills.push(`Rent Frequency: ${formattedRentFrequency.value}`);
   }
   if (props.listing?.rentalListing?.rentalLength) {
-    pills.push(`Rent Length: ${props.listing.rentalListing.rentalLength} months`);
+    const label = props.listing.rentalListing.rentalLength === 'SHORT_TERM' ? 'Short-term (less than 6 months)' : 'Long-term (6+ months)';
+    pills.push(`Rent Length: ${label}`);
   }
   if (props.listing?.rentalListing?.deposit) {
     pills.push(`Deposit: £${parseInt(String(props.listing.rentalListing.deposit)).toLocaleString()} deposit`);
