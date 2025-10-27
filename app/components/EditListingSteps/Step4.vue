@@ -229,7 +229,6 @@ function submitForm() {
       justify-content: flex-start;
       gap: var(--size-16);
       margin-bottom: var(--size-24);
-      padding: var(--size-16);
       background: var(--background-200);
       border-radius: var(--radius-md);
 
