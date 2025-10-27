@@ -63,7 +63,7 @@
         name="sale-chain" 
       >
         <template #tooltip-content>
-          <p><strong>No chain</strong><br>Your sale is not dependant on your buying and/or moving to another property.</p>
+          <p><strong>No chain</strong><br>Your sale is not dependant on you buying and/or moving to another property.</p>
           <p><strong>Chain</strong><br>You need to buy and/or move to another property before this sale goes through.</p>
         </template>
       </OrganismsListingFormRadioGroup>
