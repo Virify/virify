@@ -1,7 +1,6 @@
 <template>
   <EditListingStepsStepLayout
     title="Address"
-    info="We use the latest address and location data provided by various sources. This ensures accurate and validated address information so you can just search for your address or postcode below."
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"
@@ -22,7 +21,7 @@
       <div class="step__form-manual">
         <div v-if="hasExistingAddress" class="step__form-instruction">
           <p class="body-sm">
-            Your currently selected address has been auto-filled below. If this is not your address or want to pick a different address: 
+            Your address has been auto-filled below. If this is incorrect:
           </p>
           <button 
             type="button" 
@@ -230,7 +229,6 @@ function submitForm() {
       justify-content: flex-start;
       gap: var(--size-16);
       margin-bottom: var(--size-24);
-      padding: var(--size-16);
       background: var(--background-200);
       border-radius: var(--radius-md);
 
