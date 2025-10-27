@@ -35,25 +35,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const open = ref(false);
 
-function isMobile() {
-  return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
-}
-
 function handleClick(event: Event) {
-  if (isMobile()) {
-    open.value = !open.value;
-    event.stopPropagation();
-  }
+  open.value = !open.value;
+  // Prevent clicks from bubbling to parent handlers which might close modals etc.
+  event.stopPropagation();
 }
 
 function onUpdateOpen(val: boolean) {
   open.value = val;
-}
-
-if (typeof window !== 'undefined' && isMobile()) {
-  window.addEventListener('click', () => {
-    open.value = false;
-  });
 }
 </script>
 
