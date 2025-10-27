@@ -26,11 +26,34 @@ export function getPropertyClassifications(propertyTypeId: number): { value: num
     return [];
   }
 
-  return propertyType.options.map((option) => ({
+  // Map the API options into the shape the UI expects
+  const mapped = propertyType.options.map((option) => ({
     value: option.key,
     key: option.value,
     info: option.value
   }));
+
+  // Desired ordering for property classifications (higher value first)
+  const preferredOrder = [
+    'Mansion',
+    'Detached',
+    'Semi-detached',
+    'End of terrace',
+    'Terrace'
+  ];
+
+  // Sort mapped options according to preferredOrder when possible, otherwise keep original order
+  mapped.sort((a, b) => {
+    const aIndex = preferredOrder.indexOf(a.key as string);
+    const bIndex = preferredOrder.indexOf(b.key as string);
+
+    if (aIndex === -1 && bIndex === -1) return 0;
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
+  });
+
+  return mapped;
 };
 
 /**
@@ -44,9 +67,12 @@ export const constructionOptions = Object.values(ConstructionType).map((option) 
  * Year Built Options
  */
 const currentYear = new Date().getFullYear();
+
+// Years from current year back to 1500 (inclusive) — expanded historic range
+const earliestYear = 1500;
 export const yearBuiltOptions = [
   { value: '0', key: 'Select Year Built' },
-  ...Array.from({ length: currentYear - 1800 + 1 }, (_, i) => currentYear - i).map((year) => ({
+  ...Array.from({ length: currentYear - earliestYear + 1 }, (_, i) => currentYear - i).map((year) => ({
     value: year,
     key: year.toString(),
   })),

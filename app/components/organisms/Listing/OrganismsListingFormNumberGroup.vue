@@ -68,8 +68,9 @@ function handleUpdateModel(val: any) {
   &__info {
     display: block;
     text-align: center;
-    margin-bottom: var(--size-8);
-    color: var(--secondary-500);
+    margin-top: -8px;
+    margin-bottom: var(--size-12);
+    color: light-dark(var(--blue-500), var(--blue-600));
   }
 
   &__required {
@@ -108,7 +109,7 @@ function handleUpdateModel(val: any) {
     }
     
     .o-form-group__info {
-      color: var(--accent-400);
+      color: var(--blue-400);
       font-weight: 500;
     }
   }

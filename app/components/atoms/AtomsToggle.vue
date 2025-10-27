@@ -52,7 +52,7 @@ function select(value: string | number) {
   padding: 3px;
   background: var(--background-200);
   border-radius: var(--border-radius-2xl);
-  border: 1px solid var(--secondary-400);
+  border: 1px solid var(--blue-500);
   box-sizing: border-box;
   width: fit-content;
   overflow: hidden;
@@ -70,12 +70,12 @@ function select(value: string | number) {
   }
 
   &__option--active {
-    background: var(--secondary-400);
+    background: light-dark(var(--blue-400), var(--blue-500));
     color: var(--monochrome-900);
   }
 
   input[type="radio"]:checked + label.a-toggle__option {
-    background: var(--secondary-400);
+    background: light-dark(var(--blue-400), var(--blue-500));
     color: var(--monochrome-900, #111);
   }
 

@@ -73,8 +73,8 @@ describe("Step2 Component", () => {
     it("renders property type radio group", async () => {
       const wrapper = await mountSuspended(Step2, { props: { draft: mockDraft } });
       const radioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
-      const titles = radioGroups.map((r) => r.props("title"));
-      expect(titles).toContain("What type of property are you listing?");
+  const titles = radioGroups.map((r) => r.props("title"));
+  expect(titles).toContain("Select property type.");
     });
 
     it("shows classification field when property type is selected", async () => {
@@ -89,22 +89,22 @@ describe("Step2 Component", () => {
       };
       const wrapper = await mountSuspended(Step2, { props: { draft: draftWithType } });
       const radioGroups = wrapper.findAllComponents({ name: "OrganismsListingFormRadioGroup" });
-      const titles = radioGroups.map((r) => r.props("title"));
-      expect(titles).toContain("What is the classification of the property?");
+  const titles = radioGroups.map((r) => r.props("title"));
+  expect(titles).toContain("Select property classification.");
     });
 
     it("renders description text field", async () => {
       const wrapper = await mountSuspended(Step2, { props: { draft: mockDraft } });
       const textGroups = wrapper.findAllComponents({ name: "OrganismsListingFormTextGroup" });
-      const titles = textGroups.map((t) => t.props("title"));
-      expect(titles).toContain("Please provide a short description of the property - your property features speak for themselves!");
+  const titles = textGroups.map((t) => t.props("title"));
+  expect(titles).toContain("Add a short description of your property.");
     });
 
     it("renders total floors number field", async () => {
       const wrapper = await mountSuspended(Step2, { props: { draft: mockDraft } });
-      const numberGroups = wrapper.findAllComponents({ name: "OrganismsListingFormNumberGroup" });
-      const titles = numberGroups.map((n) => n.props("title"));
-      expect(titles).toContain("How many total floors does the property have (including the ground floor)?");
+  const numberGroups = wrapper.findAllComponents({ name: "OrganismsListingFormNumberGroup" });
+  const titles = numberGroups.map((n) => n.props("title"));
+  expect(titles).toContain("Select the property’s total floors. Do not count unconverted attics or cellars.");
     });
   });
 
