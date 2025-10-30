@@ -70,9 +70,9 @@
                 :grid="true"
               >
                 <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Give this bedroom a descriptive name to help identify it (e.g. Master Bedroom, Guest Room, Front Bedroom)'
-                  ]" />
+                 <p>
+                  Name this room to help identify it (e.g. Master Bedroom, Guest Room, Front Bedroom).
+                 </p>
                 </template>
               </OrganismsListingFormTextGroup>
 
@@ -86,9 +86,7 @@
                 :expanded="true"
               >
                 <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Add any additional details about this bedroom that buyers might find useful'
-                  ]" />
+                  <p>Add any additional details about this bedroom that viewers might find useful.</p>
                 </template>
               </OrganismsListingFormTextGroup>
 
@@ -104,9 +102,7 @@
                 step="1"
               >
                 <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Assign a number to this bedroom (e.g. Bedroom 1, Bedroom 2)'
-                  ]" />
+                  <p>Assign a number to this bedroom (e.g. Bedroom 1, Bedroom 2) - This will help you keep track of the different bedrooms in your listing and be used to order them on your listing.</p>
                 </template>
               </OrganismsListingFormNumberGroup>
 
@@ -120,27 +116,19 @@
                 :grid="true"
               >
                 <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Select which floor this bedroom is located on'
-                  ]" />
+                  <p>Select which floor this bedroom is located on</p>
                 </template>
               </OrganismsListingFormSelectGroup>
             </div>
 
           <!-- Bed Size -->
           <OrganismsListingFormRadioGroup
-            title="Bed Size"
+            title="Choose the largest bed size that fits this room comfortably"
             :options="bedSizeOptions"
             v-model="bedroom.bed[0]"
             :name="`bedroom-${index}-bed`"
             :required="true"
-          >
-            <template #tooltip-content>
-              <AtomsTooltipParagraphs :paragraphs="[
-                'Choose the largest bed size that fits comfortably in this room. This helps users understand available space.'
-              ]" />
-            </template>
-          </OrganismsListingFormRadioGroup>
+          />
 
           <!-- Bedroom Features (Multi-select) -->
           <OrganismsListingFormCheckboxGroup
@@ -162,9 +150,7 @@
             @update:size="(value: number | null) => bedroom.size = value"
           >
             <template #tooltip-content>
-              <AtomsTooltipParagraphs :paragraphs="[
-                'Enter the bedroom\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
-              ]" />
+              <p>Not sure how to measure? See our <NuxtLink to="/guides/property-information/room-sizing" target="_blank" rel="noopener" class="link">Room Sizing guide</NuxtLink>.</p>
             </template>
           </OrganismsListingFormSizeToggle>
 
