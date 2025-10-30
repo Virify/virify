@@ -145,22 +145,171 @@ Each layer contains its own documentation:
 Required environment variables:
 - `DATABASE_URL` - PostgreSQL connection string
 - `MAPTILER_API_KEY` - MapTiler API key for maps
-- `AWS_ACCESS_KEY_ID` - AWS access key for SES email service
-- `AWS_SECRET_ACCESS_KEY` - AWS secret for SES email service
-- `AWS_REGION` - AWS region for SES (e.g., us-east-1)
-- `SESSION_SECRET` - Secret for session management (generate random string)
-- `WS_BASE_URL` - WebSocket server URL (e.g., ws://localhost:3000)
-- `NUXT_SECRET_KEY` - Nuxt secret key for encryption
+
+# Virify
+
+Virify is a modern property management and listing platform built with Nuxt 4, featuring a modular, extensible architecture and real-time capabilities. This guide will help you onboard as a contributor, whether you want to run the project locally or with Docker, and will explain the structure and nuances of each layer.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- pnpm (preferred package manager)
+- PostgreSQL (local or Docker)
+- Docker & Docker Compose (optional, for containerized setup)
+
+---
+
+## 🐳 Docker Setup (Recommended)
+
+1. Copy the example environment file:
+	```bash
+	cp .env.example .env
+	```
+2. Start all services (app, database, etc):
+	```bash
+	make up
+	```
+3. To access the app container shell:
+	```bash
+	make exec
+	```
+4. To access the database container shell:
+	```bash
+	make exec-db
+	```
+5. To stop all containers:
+	```bash
+	make down
+	```
+
+---
+
+## 💻 Local Development Setup
+
+1. Install dependencies:
+	```bash
+	pnpm install
+	```
+2. Set up your database (local or remote):
+	- Update `DATABASE_URL` in your `.env` file.
+	- Generate Prisma client:
+	  ```bash
+	  pnpm pgen
+	  ```
+	- Run migrations:
+	  ```bash
+	  pnpm db:reset
+	  ```
+	- Seed the database:
+	  ```bash
+	  pnpm db:seed
+	  ```
+3. Start the development server:
+	```bash
+	pnpm dev
+	```
+
+---
+
+## 🏗️ Project Structure & Layers
+
+Virify is organized into **feature layers** for clear separation of concerns. Each layer has its own README for details and setup nuances:
+
+```
+├── app/                  # Main Nuxt app (components, pages, composables, layouts, utils)
+├── layers/               # Feature layers (see below)
+│   ├── analytics/        # User analytics & tracking
+│   ├── auth/             # Authentication & authorization
+│   ├── database/         # Prisma ORM & PostgreSQL
+│   ├── email/            # Transactional email (Vue Email, AWS SES)
+│   ├── map/              # MapTiler integration & geospatial features
+│   ├── notifications/    # User notification system
+│   ├── sanity/           # Content management (Sanity Studio)
+│   ├── seed/             # Database seeding utilities
+│   ├── ui/               # Design system & component library
+│   └── websocket/        # Real-time messaging & events
+├── shared/               # Shared types & utilities
+└── public/               # Static assets
+```
+
+**Layer Documentation:**
+- [Analytics](./layers/analytics/README.md)
+- [Auth](./layers/auth/README.md)
+- [Database](./layers/database/README.md)
+- [Email](./layers/email/README.md)
+- [Map](./layers/map/README.md)
+- [Notifications](./layers/notifications/README.md)
+- [Sanity](./layers/sanity/README.md)
+- [Seed](./layers/seed/README.md)
+- [UI](./layers/ui/README.md)
+- [WebSocket](./layers/websocket/README.md)
+
+---
+
+## ⚙️ Common Scripts
+
+- `pnpm dev` – Start development server
+- `pnpm build` – Build for production
+- `pnpm preview` – Preview production build
+- `pnpm test` – Run unit tests
+- `pnpm test:full` – Run all tests (unit + E2E)
+- `pnpm pgen` – Generate Prisma client
+- `pnpm db-push` – Push schema changes to DB
+- `pnpm seed` – Seed the database
+- `make up` – Start Docker containers
+- `make down` – Stop Docker containers
+- `make exec` – Enter app container
+- `make exec-db` – Enter database container
+
+---
+
+## 🧪 Testing
+
+Run tests with:
+```bash
+pnpm test        # Unit tests
+pnpm test:full   # Full suite (unit + E2E)
+```
+
+---
+
+## 🔑 Environment Variables
+
+Set these in your `.env` file (see `.env.example` for all options):
+
+- `DATABASE_URL` – PostgreSQL connection string
+- `MAPTILER_API_KEY` – MapTiler API key
+- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION` – AWS SES for email
+- `SESSION_SECRET` – Session management secret
+- `WS_BASE_URL` – WebSocket server URL
+- `NUXT_SECRET_KEY` – Nuxt encryption key
+
+---
 
 ## 🤝 Contributing
 
-1. Ensure you have the required dependencies installed
+1. Fork and clone the repo
 2. Create a feature branch
-3. Make your changes
-4. Write/update tests
-5. Update documentation
-6. Submit a pull request
+3. Make your changes (with tests)
+4. Update documentation as needed
+5. Open a pull request
+
+---
+
+## 📚 Further Reading
+
+Each layer has its own README for setup, usage, and best practices. Start with the [layers/](./layers/) directory for details on:
+- Local vs Docker nuances
+- Integration points
+- API endpoints
+- Testing strategies
+- Security considerations
+
+---
 
 ## 📜 License
 
-Proprietary - All rights reserved
+Proprietary – All rights reserved
