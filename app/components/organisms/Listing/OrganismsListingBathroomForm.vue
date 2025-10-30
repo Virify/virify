@@ -70,9 +70,7 @@
               :grid="true"
             >
               <template #tooltip-content>
-                <AtomsTooltipParagraphs :paragraphs="[
-                  'Give this bathroom a descriptive name to help identify it (e.g. Master En Suite, Family Bathroom, Downstairs WC)'
-                ]" />
+                <p>Name this room to help identify it (e.g. Master En Suite, Family Bathroom, Downstairs WC)</p>
               </template>
             </OrganismsListingFormTextGroup>
 
@@ -86,9 +84,7 @@
               :expanded="true"
             >
               <template #tooltip-content>
-                <AtomsTooltipParagraphs :paragraphs="[
-                  'Add any additional details about this bathroom that buyers might find useful'
-                ]" />
+                <p>Add any additional details about this bathroom that buyers might find useful</p>
               </template>
             </OrganismsListingFormTextGroup>
 
@@ -104,9 +100,7 @@
               step="1"
             >
               <template #tooltip-content>
-                <AtomsTooltipParagraphs :paragraphs="[
-                  'Assign a number to this bathroom (e.g. Bathroom 1, Bathroom 2)'
-                ]" />
+                <p>Assign a number to this bathroom (e.g. Bathroom 1, Bathroom 2) - This will help you keep track of the different bathrooms in your listing and be used to order them on your listing.</p>
               </template>
             </OrganismsListingFormNumberGroup>
 
@@ -120,9 +114,7 @@
               :grid="true"
             >
               <template #tooltip-content>
-                <AtomsTooltipParagraphs :paragraphs="[
-                  'Select which floor this bathroom is located on'
-                ]" />
+                <p>Select which floor this bathroom is located on</p>
               </template>
             </OrganismsListingFormSelectGroup>
           </div>
@@ -147,9 +139,7 @@
             @update:size="(value: number | null) => bathroom.size = value"
           >
             <template #tooltip-content>
-              <AtomsTooltipParagraphs :paragraphs="[
-                'Enter the bathroom\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
-              ]" />
+              <p>Not sure how to measure? See our <NuxtLink to="/guides/property-information/room-sizing" target="_blank" rel="noopener" class="link">Room Sizing guide</NuxtLink>.</p>
             </template>
           </OrganismsListingFormSizeToggle>
 
