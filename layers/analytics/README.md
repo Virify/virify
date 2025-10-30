@@ -28,19 +28,22 @@ layers/analytics/
 
 ## API Endpoints
 
-### Analytics Aggregates
-- `GET /api/analytics/aggregates/` - Get analytics aggregates (counts) for the authenticated user
-  - Returns property counts, view counts, favorite counts, etc.
+### Analytics API Endpoints
 
-### Complete Analytics Data
-- `GET /api/analytics/all/` - Get comprehensive analytics data for the authenticated user
-  - Includes detailed metrics and historical data
+- `GET    /api/analytics/aggregates/` — Get analytics aggregates (counts) for the authenticated user
+- `GET    /api/analytics/all/` — Get all analytics data for the authenticated user
 
-### Listing Analytics
-- `GET /api/analytics/listing/all/` - Get analytics summary for all user's listings
-  - Property-specific performance metrics
-- `POST /api/analytics/listing/track-view` - Track a listing view event
-  - Records when users view property listings
+#### Listing Analytics
+- `GET    /api/analytics/listing/all/` — Get analytics summary for all user's listings
+- `POST   /api/analytics/listing/track-view/` — Track a listing view event
+
+#### Search Analytics
+- `POST   /api/analytics/search/` — Track an AI-powered search event
+- `GET    /api/analytics/search/location/` — Get trending AI search locations
+
+---
+
+> **Note:** All endpoints require authentication. Some endpoints may require specific permissions or payloads. See code for request/response details.
 
 ## Composables
 
