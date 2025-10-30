@@ -61,7 +61,7 @@
 
     <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Tenancy/Rental Deposit" required>
       <OrganismsListingFormNumberGroup
-        title="Insert the tenancy/rental deposit."
+        title="Insert the tenancy/rental deposit amount."
         v-model="stepThreeData.rentalListing.deposit"
         name="listing-deposit"
         placeholder="e.g '1200' or '0'"
