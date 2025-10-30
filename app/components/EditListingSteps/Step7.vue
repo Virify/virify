@@ -1,7 +1,7 @@
 <template>
   <EditListingStepsStepLayout
     title="Outdoor Spaces & Utilities"
-    info="Add details about gardens, yards, land, and outdoor features of your property. The more information you provide, the better potential viewers can understand the property and the more features users can search and discover you from."
+    info="Please add details about your outdoor space. You’re property is more likely to stand out if you create a detailed listing!"
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"
@@ -19,7 +19,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional general description</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -29,9 +28,7 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Add any additional details about the outdoor space that potential buyers should know. For example: landscaping, privacy, outdoor lighting, irrigation system, etc.'
-          ]" />
+          <p>Add any additional details about the outdoor space that potential buyers should know. For example: landscaping, privacy, outdoor lighting, irrigation system, etc.</p>
         </template>
       </OrganismsListingFormTextGroup>
     </div>
@@ -45,7 +42,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional garden details</em>
       
       <OrganismsListingFormYesNoGroup
         title="Does the property come with a garden?"
@@ -54,14 +50,11 @@
         @update:modelValue="handleGardenToggle"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select Yes if the property has any garden space. You\'ll be able to provide details about size, position, features, and more.'
-          ]" />
+          <p>Select Yes if the property has any garden space. You'll be able to provide details about size, position, features, and more.</p>
         </template>
       </OrganismsListingFormYesNoGroup>
 
       <template v-if="stepSevenData.property.outdoorSpace.hasGarden">
-        <em class="body-xs">Add optional garden details and features</em>
         
         <OrganismsListingGardenForm
           v-model="stepSevenData.property.outdoorSpace.garden"
@@ -78,8 +71,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional yard details</em>
-      
       <OrganismsListingFormYesNoGroup
         title="Does the property come with a yard?"
         v-model="stepSevenData.property.outdoorSpace.hasYard"
@@ -87,14 +78,11 @@
         @update:modelValue="handleYardToggle"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select Yes if the property has any yard space. You\'ll be able to provide details about size, position, features, and more.'
-          ]" />
+          <p>Select Yes if the property has any yard space. You'll be able to provide details about size, position, features, and more.</p>
         </template>
       </OrganismsListingFormYesNoGroup>
 
       <template v-if="stepSevenData.property.outdoorSpace.hasYard">
-        <em class="body-xs">Add optional yard details and features</em>
         
         <OrganismsListingYardForm
           v-model="stepSevenData.property.outdoorSpace.yard"
@@ -111,7 +99,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional land details</em>
       
       <OrganismsListingFormYesNoGroup
         title="Does the property come with any other land?"
@@ -120,14 +107,11 @@
         @update:modelValue="handleLandToggle"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select Yes if the property includes any additional land parcels beyond the garden or yard. You\'ll be able to provide details about the land features and size.'
-          ]" />
+          <p>Select Yes if the property includes any additional land parcels beyond the garden or yard. You'll be able to provide details about the land features and size.</p>
         </template>
       </OrganismsListingFormYesNoGroup>
 
       <template v-if="stepSevenData.property.outdoorSpace.hasLand">
-        <em class="body-xs">Add optional land parcel details</em>
         
         <OrganismsListingLandForm
           v-model="stepSevenData.property.outdoorSpace.land"
@@ -144,7 +128,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Select any features that apply to the overall outdoor space</em>
       
       <OrganismsListingFormCheckboxGroup
         title="Outdoor Features"
@@ -154,9 +137,7 @@
         @update:modelValue="updateOutdoorSpaceFeatures"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select any features that apply to the entire outdoor space (not specific to individual gardens, yards, or land). These are general features that describe the overall outdoor area.'
-          ]" />
+          <p>Select any features that apply to the entire outdoor space (not specific to individual gardens, yards, or land). These are general features that describe the overall outdoor area.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -169,7 +150,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional total size of all outdoor spaces combined</em>
       
       <OrganismsListingFormSizeToggle
         title="Total Outdoor Area"
@@ -181,9 +161,7 @@
         @update:size="(value: number | null) => stepSevenData.property.outdoorSpace.totalArea = value"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Enter the total outdoor area including gardens, yards, and land (in square meters or square feet)'
-          ]" />
+          <p>Not sure how to measure? See our <NuxtLink to="/guides/property-information/guide-to-measuring-land-size" target="_blank" rel="noopener" class="link">Total Land Size (Acres) guide.</NuxtLink></p>
         </template>
       </OrganismsListingFormSizeToggle>
     </div>

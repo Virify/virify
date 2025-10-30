@@ -1,8 +1,8 @@
 import { RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
- * Creates initial values for step two of the draft listing process.
- * @param draftListing Draft listing to create initial values from
+ * Creates initial values for step three of the draft listing process.
+ * @param listing Draft listing to create initial values from
  * @returns Initial values for step three
  */
 export const createInitialStepThreeValues = (listing: EditableListing): StepThree => {
@@ -10,10 +10,15 @@ export const createInitialStepThreeValues = (listing: EditableListing): StepThre
     price: listing.price || null,
     ...(listing.rentalListing && {
       rentalListing: {
-        deposit: listing.rentalListing.deposit || null,
-        holdingDeposit: listing.rentalListing.holdingDeposit || null,
-        rentFrequency: listing.rentalListing.rentFrequency || null,
-        rentalLength: listing.rentalListing.rentalLength || null,
+        deposit: listing.rentalListing.deposit ?? null,
+        holdingDeposit: listing.rentalListing.holdingDeposit ?? null,
+        rentFrequency: listing.rentalListing.rentFrequency ?? null,
+        rentalLength:
+          typeof listing.rentalListing.rentalLength === 'string'
+            ? (listing.rentalListing.rentalLength as 'SHORT_TERM' | 'LONG_TERM')
+            : typeof listing.rentalListing.rentalLength === 'number'
+              ? (listing.rentalListing.rentalLength < 6 ? 'SHORT_TERM' : 'LONG_TERM')
+              : null,
       },
     }),
     ...(listing.saleListing && {
@@ -53,12 +58,12 @@ export const stepThreeValidation = {
    * @returns True if all required rental price fields are present
    */
   isRentalPriceValid: (rentalListing: any): boolean => {
-    return !!(
-      rentalListing?.deposit &&
-      rentalListing?.holdingDeposit &&
-      rentalListing?.rentFrequency &&
-      rentalListing?.rentalLength
-    );
+    // deposit and holdingDeposit must be a number (including 0)
+    const depositValid = typeof rentalListing?.deposit === 'number' && rentalListing.deposit !== null && !isNaN(rentalListing.deposit);
+    const holdingDepositValid = typeof rentalListing?.holdingDeposit === 'number' && rentalListing.holdingDeposit !== null && !isNaN(rentalListing.holdingDeposit);
+    const rentFrequencyValid = !!rentalListing?.rentFrequency;
+    const rentalLengthValid = rentalListing?.rentalLength === 'SHORT_TERM' || rentalListing?.rentalLength === 'LONG_TERM';
+    return depositValid && holdingDepositValid && rentFrequencyValid && rentalLengthValid;
   },
 
   /**

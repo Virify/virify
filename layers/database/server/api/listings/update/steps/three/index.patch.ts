@@ -6,10 +6,10 @@ const stepDataSchema = z.object({
   price: z.number().positive(),
   rentalListing: z
     .object({
-      deposit: z.number().positive().nullable().optional(),
-      holdingDeposit: z.number().positive().nullable().optional(),
+  deposit: z.number().min(0).nullable().optional(),
+  holdingDeposit: z.number().min(0).nullable().optional(),
       rentFrequency: z.enum(Object.values(RentalPriceType)).nullable().optional(),
-      rentalLength: z.number().int().positive().nullable().optional(),
+      rentalLength: z.enum(["SHORT_TERM", "LONG_TERM"]).nullable().optional(),
     })
     .optional(),
   saleListing: z

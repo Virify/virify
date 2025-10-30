@@ -24,7 +24,7 @@ export const generateRentalObject = (): Prisma.RentalListingCreateWithoutListing
     holdingDeposit: roundFloat(faker.number.float({ min: 1000, max: 10000 }), 2),
     rentFrequency: faker.helpers.arrayElement(Object.values(RentalPriceType)),
     isBillsIncluded: faker.datatype.boolean(),
-    rentalLength: faker.number.int({ min: 1, max: 48 }),
+    rentalLength: faker.helpers.arrayElement(['SHORT_TERM', 'LONG_TERM']),
     furnishedStatus: faker.helpers.arrayElement(Object.values(FurnishedStatus)),
     availabilityStatus: faker.helpers.arrayElement(Object.values(RentalAvailabilityStatus)),
   };

@@ -1,7 +1,7 @@
 <template>
   <EditListingStepsStepLayout
     title="Bedrooms & Bathrooms"
-    info="Please add all the bedrooms and bathrooms for your property, and insert their features. The more detailed you can be, the more likely you are to find the right viewer!"
+    info="Please add all the bedrooms and bathrooms for your property. You’re more likely to find the right viewer with complete and accurate details!"
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"
@@ -18,7 +18,6 @@
         title="Bedrooms"
         variant="section"
       />
-      <em class="body-xs">Optional, add bedroom details</em>
       <OrganismsListingBedroomForm
         v-model="stepFiveData.property.bedroomFeatures"
         :total-floors="stepFiveData.property.totalFloors"
@@ -31,7 +30,6 @@
         title="Bathrooms" 
         variant="section"
       />
-      <em class="body-xs">Optional, add bathroom details</em>
       <OrganismsListingBathroomForm
         v-model="stepFiveData.property.bathroomFeatures"
         :total-floors="stepFiveData.property.totalFloors"

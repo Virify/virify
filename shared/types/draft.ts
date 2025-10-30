@@ -25,7 +25,7 @@ export type StepThree = {
     deposit: number | null
     holdingDeposit: number | null
     rentFrequency: RentalPriceType | null
-    rentalLength: number | null
+    rentalLength: 'SHORT_TERM' | 'LONG_TERM' | null
   },
   saleListing?: {
     priceType: SalePriceType | null
