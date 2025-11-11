@@ -114,7 +114,7 @@
       :title="cmsContent?.interestedSection.title || ''"
       :description="cmsContent?.interestedSection.description || ''"
       :buttonText="cmsContent?.interestedSection.buttonText || ''"
-      to="/waiting-list"
+      to="/"
     />
   </div>
 </template>

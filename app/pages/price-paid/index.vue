@@ -145,7 +145,7 @@
         </div>
 
         <div class="price-paid-teaser__cta">
-          <NuxtLink to="/waiting-list" class="button button-lg button-monochrome">Join the waiting list</NuxtLink>
+          <NuxtLink to="/" class="button button-lg button-monochrome">Join the waiting list</NuxtLink>
         </div>
       </div>
     </section>

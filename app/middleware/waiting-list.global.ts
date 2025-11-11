@@ -11,6 +11,6 @@ export default defineNuxtRouteMiddleware((to) => {
 
   // If route is not allowed, redirect to waiting list
   if (!isAllowed) {
-    return navigateTo('/waiting-list')
+    return navigateTo('/')
   }
 })
