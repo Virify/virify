@@ -475,7 +475,7 @@ export const waitingListPageType = defineType({
           title: 'Canonical URL',
           type: 'url',
           description: 'The canonical URL for this page',
-          initialValue: 'https://virify.co.uk/waiting-list',
+          initialValue: 'https://virify.co.uk/',
         },
       ],
     }),

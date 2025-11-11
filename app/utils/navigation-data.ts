@@ -7,12 +7,6 @@ export const getBaseCenterItems = (): NavigationItem[] => {
 
   const items: NavigationItem[] = [
     {
-      id: "waiting-list",
-      label: "Waiting List",
-      href: "/waiting-list/",
-      type: "link",
-    },
-    {
       id: "guides",
       label: "Guides",
       href: "/guides",

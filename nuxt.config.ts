@@ -45,7 +45,6 @@ export default defineNuxtConfig({
   robots: {
     allow: [
       '/',
-      '/waiting-list',
       '/price-paid',
       '/contact',
       '/guides',
