@@ -1,6 +1,5 @@
 import { type MaybeRef } from '@vueuse/core';
 import type { DraftListing } from '~~/layers/database/server/database/prisma/generated/client';
-import { isDraftListing, type EditableListing } from './useListingEdit';
 
 /**
  * Configuration interface for step validation and submission
