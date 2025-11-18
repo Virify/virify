@@ -1,9 +1,12 @@
 export default defineEventHandler(async (event) => {
   try {
-    // Fetch categories and guides from the Sanity API
-    const categoriesWithGuides = await $fetch('/api/sanity/navigation', {
-      // Use the event to make the request within the Nitro context
-    })
+    const sanity = useSanity()
+    
+    const categoriesWithGuides = await sanity.fetch(navigationQuery)
+    
+    if (!categoriesWithGuides || !Array.isArray(categoriesWithGuides)) {
+      return []
+    }
     
     const urls: any[] = []
     
