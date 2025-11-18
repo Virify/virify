@@ -109,7 +109,11 @@ export default defineNuxtConfig({
     sri: false,
     requestSizeLimiter: false,
   },
-  
+  routeRules: {
+    '/waiting-list': {
+      redirect: '/',
+    }
+  },
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
