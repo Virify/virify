@@ -10,6 +10,7 @@ const stepSevenSchema = z.object({
       hasGarden: z.boolean().optional(),
       hasYard: z.boolean().optional(),
       hasLand: z.boolean().optional(),
+      features: z.array(z.enum(Object.values(OutdoorSpaceFeature) as [string, ...string[]])).optional(),
       garden: z.array(
         z.object({
           name: z.string().max(100),
@@ -64,6 +65,7 @@ export default defineEventHandler(async (event) => {
                 create: {
                   description: outdoorSpace.description ?? null,
                   totalArea: outdoorSpace.totalArea ?? null,
+                  features: outdoorSpace.features as OutdoorSpaceFeature[] ?? [],
                   garden: {
                     create: outdoorSpace.garden.map((g) => ({
                       name: g.name,
@@ -99,6 +101,7 @@ export default defineEventHandler(async (event) => {
                 update: {
                   description: outdoorSpace.description ?? null,
                   totalArea: outdoorSpace.totalArea ?? null,
+                  features: outdoorSpace.features as OutdoorSpaceFeature[] ?? [],
                   garden: {
                     deleteMany: {},
                     create: outdoorSpace.garden.map((g) => ({
