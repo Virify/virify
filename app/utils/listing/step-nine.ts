@@ -21,6 +21,7 @@ export const createInitialStepNineValues = (listing: EditableListing): StepNine 
     } : {
       description: null,
       epcRating: 'UNKNOWN',
+      epcCertificateUrl: null,
       primaryHeatingType: [],
       secondaryHeatingType: [],
       boilerType: null,
@@ -119,12 +120,12 @@ export const councilTaxBandOptions = [
  */
 export const useRenewableEnergy = (stepNineData: Ref<StepNine>) => {
   const selected = computed(() => 
-    (stepNineData.value?.property?.energyAndUtilities as any)?.renewables || []
+    stepNineData.value?.property?.energyAndUtilities?.renewables || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: RenewableEnergy[]) => {
     if (!stepNineData.value?.property?.energyAndUtilities) return;
-    (stepNineData.value.property.energyAndUtilities as any).renewables = selectedFeatures;
+    stepNineData.value.property.energyAndUtilities.renewables = selectedFeatures;
   };
 
   return { selected, update };
@@ -135,12 +136,12 @@ export const useRenewableEnergy = (stepNineData: Ref<StepNine>) => {
  */
 export const useConnectedUtilities = (stepNineData: Ref<StepNine>) => {
   const selected = computed(() => 
-    (stepNineData.value?.property?.energyAndUtilities as any)?.connectedUtilities || []
+    stepNineData.value?.property?.energyAndUtilities?.connectedUtilities || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: ConnectedUtilities[]) => {
     if (!stepNineData.value?.property?.energyAndUtilities) return;
-    (stepNineData.value.property.energyAndUtilities as any).connectedUtilities = selectedFeatures;
+    stepNineData.value.property.energyAndUtilities.connectedUtilities = selectedFeatures;
   };
 
   return { selected, update };
@@ -151,12 +152,12 @@ export const useConnectedUtilities = (stepNineData: Ref<StepNine>) => {
  */
 export const usePrimaryHeating = (stepNineData: Ref<StepNine>) => {
   const selected = computed(() => 
-    (stepNineData.value?.property?.energyAndUtilities as any)?.primaryHeatingType || []
+    stepNineData.value?.property?.energyAndUtilities?.primaryHeatingType || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: HeatingType[]) => {
     if (!stepNineData.value?.property?.energyAndUtilities) return;
-    (stepNineData.value.property.energyAndUtilities as any).primaryHeatingType = selectedFeatures;
+    stepNineData.value.property.energyAndUtilities.primaryHeatingType = selectedFeatures;
   };
 
   return { selected, update };
@@ -167,12 +168,12 @@ export const usePrimaryHeating = (stepNineData: Ref<StepNine>) => {
  */
 export const useSecondaryHeating = (stepNineData: Ref<StepNine>) => {
   const selected = computed(() => 
-    (stepNineData.value?.property?.energyAndUtilities as any)?.secondaryHeatingType || []
+    stepNineData.value?.property?.energyAndUtilities?.secondaryHeatingType || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: HeatingType[]) => {
     if (!stepNineData.value?.property?.energyAndUtilities) return;
-    (stepNineData.value.property.energyAndUtilities as any).secondaryHeatingType = selectedFeatures;
+    stepNineData.value.property.energyAndUtilities.secondaryHeatingType = selectedFeatures;
   };
 
   return { selected, update };
@@ -185,17 +186,17 @@ export const useSecondaryHeating = (stepNineData: Ref<StepNine>) => {
  */
 export const useCouncilTaxBand = (stepNineData: Ref<StepNine>) => {
   const selectedCouncilTaxBand = computed({
-    get: () => (stepNineData.value.property.runningCosts as any)?.councilTaxBand || 'A',
+    get: () => stepNineData.value.property.runningCosts?.councilTaxBand || 'A',
     set: (value: string) => {
       if (stepNineData.value.property.runningCosts) {
-        (stepNineData.value.property.runningCosts as any).councilTaxBand = value;
+        stepNineData.value.property.runningCosts.councilTaxBand = value;
       }
     }
   });
 
   const updateCouncilTaxBand = (value: string) => {
     if (stepNineData.value.property.runningCosts) {
-      (stepNineData.value.property.runningCosts as any).councilTaxBand = value;
+      stepNineData.value.property.runningCosts.councilTaxBand = value;
     }
   };
 

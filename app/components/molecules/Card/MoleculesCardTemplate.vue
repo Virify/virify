@@ -69,7 +69,10 @@ const { property } = toRefs(props.result)
 const media = computed(() => {
   const { media } = asObject(property.value)
 
-  return asArray(media)
+  return asArray(media).map((item: any) => ({
+    ...item,
+    alt: item.alt || 'Property image'
+  }))
 })
 
 const user = computed(() => {
@@ -105,15 +108,15 @@ const fullAddress = computed(() => {
   return fullAddress
 })
 
-const propertyType = computed(() => {
+const propertyType = computed<string>(() => {
   const { numberBedrooms, type, classification } = asObject(property.value)
   const { name: propertyType } = asObject(type)
   const { name: propertyClassification } = asObject(classification)
 
-  const propertyDescription = `${propertyClassification} ${propertyType}`
+  const propertyDescription = `${propertyClassification as string} ${propertyType as string}`
 
   if (!!numberBedrooms) {
-    return `${numberBedrooms} Bed ${propertyDescription}`
+    return `${numberBedrooms as number} Bed ${propertyDescription}`
   }
 
   return propertyDescription

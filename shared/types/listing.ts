@@ -171,7 +171,7 @@ export const listingCardFields = {
       },
       accessibilityFeatures: {
         select: {
-          wheelchairFriendly: true,
+          features: true,
         },
       },
       additionalFeatures: {
@@ -185,8 +185,7 @@ export const listingCardFields = {
       numberOtherRooms: true,
       parking: {
         select: {
-          evCharging: true,
-          garage: true,
+          features: true,
         },
       },
       outdoorSpace: {

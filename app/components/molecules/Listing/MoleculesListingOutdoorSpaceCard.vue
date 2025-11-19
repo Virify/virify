@@ -69,14 +69,12 @@ const features = computed(() => {
     features.push("Land");
   }
   
-  // Add boolean features from the outdoor space itself
-  Object.entries(props.outdoorSpace).forEach(([key, value]) => {
-    // Skip non-boolean values, arrays (garden/yard/land), objects (media), and specific fields
-    if (typeof value === "boolean" && value === true && 
-        key !== "separateParcel") {
-      features.push(convertRoomEnumToString(key));
-    }
-  });
+  // Add features from the features array (new enum-based structure)
+  if (props.outdoorSpace.features?.length) {
+    props.outdoorSpace.features.forEach((feature: string) => {
+      features.push(convertEnumToString(feature));
+    });
+  }
   
   return features;
 });

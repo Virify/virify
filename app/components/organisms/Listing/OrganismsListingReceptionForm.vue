@@ -136,21 +136,6 @@
                   ]" />
                 </template>
               </OrganismsListingFormSelectGroup>
-
-              <OrganismsListingFormSelectGroup
-                title="Fireplace"
-                :options="fireplaceSelectOptions"
-                :model-value="getReceptionFireplaceValue(receptionRoom)"
-                @update:modelValue="setReceptionFireplaceValue(receptionRoom, $event)"
-                :name="`reception-${index}-fireplace`"
-                :grid="true"
-              >
-                <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Select the type of fireplace if this room has one'
-                  ]" />
-                </template>
-              </OrganismsListingFormSelectGroup>
             </div>
 
             <OrganismsListingFormCheckboxGroup
@@ -250,25 +235,9 @@ const roomManagerConfig = {
     roomNumber,
     floor: 1,
     type: defaultReceptionType,
-    fireplace: null,
     description: '',
     size: null,
-    conservatory: false,
-    openPlan: false,
-    openConcept: false,
-    balcony: false,
-    bayWindow: false,
-    builtInShelving: false,
-    hasView: false,
-    patioDoors: false,
-    builtInStorage: false,
-    servingHatch: false,
-    barArea: false,
-    soundProofing: false,
-    accousticPanels: false,
-    stoneFlooring: false,
-    hardwoodFlooring: false,
-    builtInDesk: false,
+    features: [],
   }),
 };
 
@@ -297,33 +266,11 @@ onMounted(() => {
 });
 
 function getSelectedReceptionFeatures(reception: any): string[] {
-  const features: string[] = [];
-
-  receptionFeatureOptions.forEach((option: { value: string }) => {
-    if (reception[option.value]) {
-      features.push(option.value);
-    }
-  });
-
-  return features;
+  return reception.features || [];
 }
 
 function updateReceptionFeatures(reception: any, selectedFeatures: string[]) {
-  receptionFeatureOptions.forEach((option: { value: string }) => {
-    reception[option.value] = false;
-  });
-
-  selectedFeatures.forEach((feature) => {
-    reception[feature] = true;
-  });
-}
-
-function getReceptionFireplaceValue(reception: any): string {
-  return reception.fireplace ?? fireplaceSelectNoneValue;
-}
-
-function setReceptionFireplaceValue(reception: any, value: string) {
-  reception.fireplace = value === fireplaceSelectNoneValue ? null : value;
+  reception.features = selectedFeatures;
 }
 </script>
 

@@ -1,4 +1,4 @@
-import { FireplaceType, OtherRoomType, ReceptionType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { OtherRoomType, ReceptionType, KitchenFeature, RoomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
  * Create initial values for step six based on the draft listing
@@ -20,15 +20,11 @@ export const createInitialStepSixValues = (listing: EditableListing): StepSix =>
 /**
  * Kitchen features options for checkbox selection
  */
-export const kitchenFeaturesOptions = [
-  { value: "modern", key: "Modern Finish", info: "Kitchen has contemporary fittings and finishes" },
-  { value: "openPlan", key: "Open Plan", info: "Kitchen opens into the living space" },
-  { value: "whiteGoods", key: "Includes White Goods", info: "Essential appliances are provided" },
-  { value: "breakfastBar", key: "Breakfast Bar", info: "Kitchen includes a breakfast bar" },
-  { value: "island", key: "Kitchen Island", info: "Kitchen includes an island workspace" },
-  { value: "utilityAccess", key: "Utility Room Access", info: "Kitchen has access to a utility room" },
-  { value: "pantry", key: "Pantry", info: "Kitchen includes a dedicated pantry" },
-];
+export const kitchenFeaturesOptions = Object.values(KitchenFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Kitchen ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Reception type options
@@ -40,42 +36,13 @@ export const receptionTypeOptions = Object.values(ReceptionType).map((type) => (
 }));
 
 /**
- * Fireplace options shared between reception and other room forms
- */
-export const fireplaceTypeOptions = Object.values(FireplaceType).map((type) => ({
-  value: type,
-  key: convertEnumToCapalizedString(type),
-  info: `${convertEnumToCapalizedString(type)} fireplace`
-}));
-
-export const fireplaceSelectNoneValue = "NONE";
-
-export const fireplaceSelectOptions = [
-  { value: fireplaceSelectNoneValue, key: "No Fireplace", info: "Room does not include a fireplace" },
-  ...fireplaceTypeOptions,
-];
-
-/**
  * Reception room feature options
  */
-export const receptionFeatureOptions = [
-  { value: "conservatory", key: "Conservatory", info: "Room opens into a conservatory" },
-  { value: "openPlan", key: "Open Plan", info: "Room connects to other spaces" },
-  { value: "openConcept", key: "Open Concept", info: "Flexible open-concept layout" },
-  { value: "balcony", key: "Balcony", info: "Room has balcony access" },
-  { value: "bayWindow", key: "Bay Window", info: "Room includes a bay window" },
-  { value: "builtInShelving", key: "Built-in Shelving", info: "Room has fitted shelving" },
-  { value: "hasView", key: "View", info: "Room offers a notable outlook" },
-  { value: "patioDoors", key: "Patio Doors", info: "Room opens onto a patio" },
-  { value: "builtInStorage", key: "Built-in Storage", info: "Room features built-in storage" },
-  { value: "servingHatch", key: "Serving Hatch", info: "Includes a serving hatch" },
-  { value: "barArea", key: "Bar Area", info: "Room has a built-in bar" },
-  { value: "soundProofing", key: "Sound Proofing", info: "Room has sound proofing" },
-  { value: "accousticPanels", key: "Acoustic Panels", info: "Room fitted with acoustic panels" },
-  { value: "stoneFlooring", key: "Stone Flooring", info: "Room has stone flooring" },
-  { value: "hardwoodFlooring", key: "Hardwood Flooring", info: "Room has hardwood flooring" },
-  { value: "builtInDesk", key: "Built-in Desk", info: "Room includes a built-in desk" },
-];
+export const receptionFeatureOptions = Object.values(RoomFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Reception ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Other room type options
@@ -89,7 +56,11 @@ export const otherRoomTypeOptions = Object.values(OtherRoomType).map((type) => (
 /**
  * Other room features share most options with reception rooms
  */
-export const otherRoomFeatureOptions = receptionFeatureOptions.filter((feature) => feature.value !== "conservatory");
+export const otherRoomFeatureOptions = Object.values(RoomFeature).filter((feature) => feature !== 'CONSERVATORY').map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Other room ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Step Six Validation Helpers

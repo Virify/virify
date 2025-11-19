@@ -3,10 +3,10 @@
     <h2 v-if="price" class="o-listing-sidebar__title | title-2xl lineheight-xs">
       <div class="o-listing-sidebar__title-offertype">
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
-          {{ convertRoomEnumToString(priceType!) }}
+          {{ convertEnumToString(priceType!) }}
         </AtomsPill>
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
-          {{ convertRoomEnumToString(available!) }}
+          {{ convertEnumToString(available!) }}
         </AtomsPill>
       </div>
 

@@ -66,19 +66,18 @@ const features = computed(() => {
   
   // Add position and facing first (for gardens and yards)
   if ((props.type === 'garden' || props.type === 'yard') && 'position' in props.item && props.item.position) {
-    features.push(convertRoomEnumToString(props.item.position));
+    features.push(convertEnumToString(props.item.position));
     if ('facing' in props.item && props.item.facing) {
-      features.push(`${convertRoomEnumToString(props.item.facing)} Facing`);
+      features.push(`${convertEnumToString(props.item.facing)} Facing`);
     }
   }
   
-  // Add boolean features (excluding business logic fields)
-  Object.entries(props.item).forEach(([key, value]) => {
-    if (typeof value === "boolean" && value === true && 
-        key !== "separateParcel" && key !== "additionalDetails") {
-      features.push(convertRoomEnumToString(key));
-    }
-  });
+  // Add features from the features array (new enum-based structure)
+  if (props.item.features?.length) {
+    props.item.features.forEach((feature: string) => {
+      features.push(convertEnumToString(feature));
+    });
+  }
   
   return features;
 });

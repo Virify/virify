@@ -5,13 +5,7 @@ model Land {
   size              Float?
   name              String
   separateParcel    Boolean       @default(false)
-  woodland          Boolean       @default(false)
-  paddock           Boolean       @default(false)
-  stables           Boolean       @default(false)
-  tennisCourt       Boolean       @default(false)
-  orchard           Boolean       @default(false)
-  pond              Boolean       @default(false)
-  outbuilding       Boolean       @default(false)
+  features          LandFeature[]
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   media             Media[]
@@ -19,4 +13,14 @@ model Land {
   outdoorSpaceId    Int?
 
   @@index([outdoorSpaceId])
+}
+
+enum LandFeature {
+  WOODLAND
+  PADDOCK
+  STABLES
+  TENNIS_COURT
+  ORCHARD
+  POND
+  OUTBUILDING
 }

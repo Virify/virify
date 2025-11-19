@@ -1,4 +1,4 @@
-import { BedSizeType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { BedSizeType, BedroomFeature, BathroomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
  * Create initial values for step five based on the draft listing
@@ -27,26 +27,20 @@ export const bedSizeOptions = Object.values(BedSizeType).map((size) => ({
 /**
  * Bedroom features options for checkbox selection
  */
-export const bedroomFeaturesOptions = [
-  { value: "enSuite", key: "En Suite", info: "Bedroom has an en suite bathroom" },
-  { value: "builtInStorage", key: "Built-in Storage", info: "Bedroom has built-in storage" },
-  { value: "walkInWardrobe", key: "Walk-in Wardrobe", info: "Bedroom has a walk-in wardrobe" },
-  { value: "bayWindow", key: "Bay Window", info: "Bedroom has a bay window" },
-  { value: "balcony", key: "Balcony", info: "Bedroom has access to a balcony" },
-  { value: "hasView", key: "Has View", info: "Bedroom has a notable view" },
-  { value: "patioDoors", key: "Patio Doors", info: "Bedroom has patio doors" },
-  { value: "builtInDesk", key: "Built-in Desk", info: "Bedroom has a built-in desk" },
-];
+export const bedroomFeaturesOptions = Object.values(BedroomFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Bedroom ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Bathroom features options for checkbox selection
  */
-export const bathroomFeaturesOptions = [
-  { value: "toilet", key: "Toilet", info: "Bathroom has a toilet" },
-  { value: "enSuite", key: "En Suite", info: "Bathroom is an en suite" },
-  { value: "bathtub", key: "Bathtub", info: "Bathroom has a bathtub" },
-  { value: "walkInShower", key: "Walk-in Shower", info: "Bathroom has a walk-in shower" },
-];
+export const bathroomFeaturesOptions = Object.values(BathroomFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Bathroom ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Step Five Validation Helpers

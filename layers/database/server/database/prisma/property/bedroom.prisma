@@ -1,26 +1,30 @@
 model Bedroom {
-  id             Int           @id @default(autoincrement())
-  roomNumber     Int
-  name           String?
-  bed            BedSizeType[]
-  floor          Int
-  description    String?
-  enSuite        Boolean       @default(false)
-  builtInStorage Boolean       @default(false)
-  walkInWardrobe Boolean       @default(false)
-  bayWindow      Boolean       @default(false)
-  balcony        Boolean       @default(false)
-  hasView        Boolean       @default(false)
-  patioDoors     Boolean       @default(false)
-  builtInDesk    Boolean       @default(false)
-  size           Float?
-  propertyId     Int
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  property       Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  media          Media[]
+  id          Int              @id @default(autoincrement())
+  roomNumber  Int
+  name        String?
+  bed         BedSizeType[]
+  floor       Int
+  description String?
+  features    BedroomFeature[]
+  size        Float?
+  propertyId  Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  property    Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  media       Media[]
 
   @@index([propertyId])
+}
+
+enum BedroomFeature {
+  EN_SUITE
+  BUILT_IN_STORAGE
+  WALK_IN_WARDROBE
+  BAY_WINDOW
+  BALCONY
+  HAS_VIEW
+  PATIO_DOORS
+  BUILT_IN_DESK
 }
 
 enum BedSizeType {

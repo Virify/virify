@@ -283,15 +283,7 @@ const handleGardenToggle = (hasGarden: boolean) => {
       description: null,
       position: '0' as any, // Default to "Select a position"
       facing: '0' as any,   // Default to "Select a facing"
-      sunTerrace: false,
-      terrace: false,
-      balcony: false,
-      patio: false,
-      separateParcel: false,
-      shed: false,
-      summerHouse: false,
-      gardenOffice: false,
-      pool: false,
+      features: [],
       additionalDetails: false,
       size: null,
     }];
@@ -309,15 +301,7 @@ const handleYardToggle = (hasYard: boolean) => {
       description: null,
       position: '0' as any, // Default to "Select a position"
       facing: '0' as any,   // Default to "Select a facing"
-      sunTerrace: false,
-      terrace: false,
-      balcony: false,
-      patio: false,
-      separateParcel: false,
-      shed: false,
-      summerHouse: false,
-      gardenOffice: false,
-      pool: false,
+      features: [],
       additionalDetails: false,
       size: null,
     }];
@@ -334,13 +318,7 @@ const handleLandToggle = (hasLand: boolean) => {
       name: 'Land',
       description: null,
       separateParcel: false,
-      woodland: false,
-      paddock: false,
-      stables: false,
-      tennisCourt: false,
-      orchard: false,
-      pond: false,
-      outbuilding: false,
+      features: [],
       additionalDetails: false,
       size: null,
     }];
@@ -352,29 +330,11 @@ const handleLandToggle = (hasLand: boolean) => {
 
 // OutdoorSpace features checkbox management
 const getSelectedOutdoorSpaceFeatures = () => {
-  const features: string[] = [];
-  const outdoorSpace = stepSevenData.value.property.outdoorSpace;
-  
-  outdoorSpaceFeaturesOptions.forEach((option) => {
-    if (outdoorSpace[option.value as keyof typeof outdoorSpace]) {
-      features.push(option.value);
-    }
-  });
-  return features;
+  return stepSevenData.value.property.outdoorSpace.features || [];
 };
 
 const updateOutdoorSpaceFeatures = (selectedFeatures: string[]) => {
-  const outdoorSpace = stepSevenData.value.property.outdoorSpace;
-  
-  // Reset all features
-  outdoorSpaceFeaturesOptions.forEach((option) => {
-    (outdoorSpace as any)[option.value] = false;
-  });
-  
-  // Set selected features
-  selectedFeatures.forEach((feature) => {
-    (outdoorSpace as any)[feature] = true;
-  });
+  stepSevenData.value.property.outdoorSpace.features = selectedFeatures;
 };
 
 function submitForm() {

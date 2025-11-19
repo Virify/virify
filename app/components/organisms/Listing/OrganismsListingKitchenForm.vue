@@ -219,13 +219,7 @@ const roomManagerConfig = {
     floor: 1,
     description: '',
     size: null,
-    modern: true,
-    openPlan: false,
-    whiteGoods: false,
-    breakfastBar: false,
-    island: false,
-    utilityAccess: false,
-    pantry: true,
+    features: [],
   }),
 };
 
@@ -254,25 +248,11 @@ onMounted(() => {
 });
 
 function getSelectedKitchenFeatures(kitchen: any): string[] {
-  const features: string[] = [];
-
-  kitchenFeaturesOptions.forEach((option: { value: string }) => {
-    if (kitchen[option.value]) {
-      features.push(option.value);
-    }
-  });
-
-  return features;
+  return kitchen.features || [];
 }
 
 function updateKitchenFeatures(kitchen: any, selectedFeatures: string[]) {
-  kitchenFeaturesOptions.forEach((option: { value: string }) => {
-    kitchen[option.value] = false;
-  });
-
-  selectedFeatures.forEach((feature) => {
-    kitchen[feature] = true;
-  });
+  kitchen.features = selectedFeatures;
 }
 </script>
 

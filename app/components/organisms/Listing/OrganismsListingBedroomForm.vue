@@ -230,14 +230,7 @@ const roomManagerConfig = {
     floor: 1,
     bed: [],
     description: null,
-    enSuite: false,
-    builtInStorage: false,
-    walkInWardrobe: false,
-    bayWindow: false,
-    balcony: false,
-    hasView: false,
-    patioDoors: false,
-    builtInDesk: false,
+    features: [],
     size: null,
   })
 };
@@ -269,27 +262,11 @@ onMounted(() => {
 });
 
 function getSelectedBedroomFeatures(bedroom: any): string[] {
-  const features: string[] = [];
-  
-  bedroomFeaturesOptions.forEach((option: { value: string; key: string; info: string }) => {
-    if (bedroom[option.value]) {
-      features.push(option.value);
-    }
-  });
-  
-  return features;
+  return bedroom.features || [];
 }
 
 function updateBedroomFeatures(bedroom: any, selectedFeatures: string[]) {
-  // Reset all features to false
-  bedroomFeaturesOptions.forEach((option: { value: string; key: string; info: string }) => {
-    bedroom[option.value] = false;
-  });
-  
-  // Set selected features to true
-  selectedFeatures.forEach(feature => {
-    bedroom[feature] = true;
-  });
+  bedroom.features = selectedFeatures;
 }
 </script>
 

@@ -248,22 +248,11 @@ onMounted(() => {
 
 // Yard features checkbox management
 const getSelectedYardFeatures = (yard: any) => {
-  const features: string[] = [];
-  yardFeaturesOptions.forEach((option) => {
-    if (yard[option.value]) {
-      features.push(option.value);
-    }
-  });
-  return features;
+  return yard.features || [];
 };
 
 const updateYardFeatures = (yard: any, selectedFeatures: string[]) => {
-  yardFeaturesOptions.forEach((option) => {
-    yard[option.value] = false;
-  });
-  selectedFeatures.forEach((feature) => {
-    yard[feature] = true;
-  });
+  yard.features = selectedFeatures;
 };
 </script>
 

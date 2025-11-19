@@ -58,23 +58,23 @@ const formattedChain = computed(() => {
 
 const formattedTenure = computed(() => {
   if (!props.listing?.saleListing?.tenureType) return '';
-  return convertRoomEnumToString(props.listing.saleListing.tenureType);
+  return convertEnumToString(props.listing.saleListing.tenureType);
 });
 
 const formattedAvailability = computed(() => {
   if (!props.listing?.saleListing?.availabilityStatus) return '';
-  return convertRoomEnumToString(props.listing.saleListing.availabilityStatus);
+  return convertEnumToString(props.listing.saleListing.availabilityStatus);
 });
 
 // Computed properties for rental details formatting
 const formattedRentalAvailability = computed(() => {
   if (!props.listing?.rentalListing?.availabilityStatus) return '';
-  return convertRoomEnumToString(props.listing.rentalListing.availabilityStatus);
+  return convertEnumToString(props.listing.rentalListing.availabilityStatus);
 });
 
 const formattedRentFrequency = computed(() => {
   if (!props.listing?.rentalListing?.rentFrequency) return '';
-  return convertRoomEnumToString(props.listing.rentalListing.rentFrequency);
+  return convertEnumToString(props.listing.rentalListing.rentFrequency);
 });
 
 const formattedFurnishedStatus = computed(() => {

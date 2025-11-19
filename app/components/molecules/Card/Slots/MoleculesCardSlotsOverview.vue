@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 interface Props {
-  propertyType?: string | null
+  propertyType?: string | null | unknown
   fullAddress?: string | null
 }
 

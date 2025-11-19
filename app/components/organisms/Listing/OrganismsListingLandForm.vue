@@ -212,22 +212,11 @@ onMounted(() => {
 
 // Land features checkbox management
 const getSelectedLandFeatures = (land: any) => {
-  const features: string[] = [];
-  landFeaturesOptions.forEach((option) => {
-    if (land[option.value]) {
-      features.push(option.value);
-    }
-  });
-  return features;
+  return land.features || [];
 };
 
 const updateLandFeatures = (land: any, selectedFeatures: string[]) => {
-  landFeaturesOptions.forEach((option) => {
-    land[option.value] = false;
-  });
-  selectedFeatures.forEach((feature) => {
-    land[feature] = true;
-  });
+  land.features = selectedFeatures;
 };
 </script>
 

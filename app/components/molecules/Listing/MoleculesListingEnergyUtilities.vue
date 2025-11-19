@@ -71,7 +71,7 @@ defineProps<Props>();
 
 // Format helper function for renewable energy
 const formatRenewableEnergy = (renewable: string): string => {
-  return convertRoomEnumToString(renewable);
+  return convertEnumToString(renewable);
 };
 </script>
 
