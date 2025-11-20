@@ -44,7 +44,7 @@ describe("Step7 - Garden & Parking Validation", () => {
   });
 
   describe("isStepSevenValid", () => {
-    it("should validate when hasGarden is true and gardens exist", () => {
+    it("should validate when gardens exist with valid data", () => {
       const data: any = {
         property: {
           outdoorSpace: {
@@ -63,14 +63,14 @@ describe("Step7 - Garden & Parking Validation", () => {
       expect(result).toBe(true);
     });
 
-    it("should invalidate when hasGarden is true but no gardens exist", () => {
+    it("should invalidate when gardens exist but are missing required fields", () => {
       const data: any = {
         property: {
           outdoorSpace: {
             hasGarden: true,
             hasYard: false,
             hasLand: false,
-            garden: [],
+            garden: [{ name: null } as any],
             yard: [],
             land: [],
           },
@@ -82,7 +82,7 @@ describe("Step7 - Garden & Parking Validation", () => {
       expect(result).toBe(false);
     });
 
-    it("should validate when hasYard is true and yards exist", () => {
+    it("should validate when yards exist with valid data", () => {
       const data: any = {
         property: {
           outdoorSpace: {
@@ -101,7 +101,7 @@ describe("Step7 - Garden & Parking Validation", () => {
       expect(result).toBe(true);
     });
 
-    it("should validate when all outdoor flags are false", () => {
+    it("should validate when no outdoor spaces exist", () => {
       const data: any = {
         property: {
           outdoorSpace: {

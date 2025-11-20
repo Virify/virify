@@ -38,7 +38,7 @@ describe("Step7 Component", () => {
 
     it("renders general outdoor space description section", async () => {
       const wrapper = await mountSuspended(Step7, { props: { draft: mockDraft } });
-      expect(wrapper.text()).toContain("General Outdoor Space Description");
+      expect(wrapper.text()).toContain("Outdoor Space Description");
     });
 
     it("renders garden section", async () => {
