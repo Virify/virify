@@ -150,7 +150,7 @@
               <button
                 type="button"
                 @click="saveRoom(index)"
-                class="button button-sm button-secondary | body-sm"
+                class="button button-sm button-tertiary | body-sm"
                 :disabled="!isRoomCompleted(garden) || !hasRoomChanges(index)"
               >
                 {{ lastAddedRoomIndex === index ? 'Save Garden' : 'Save Changes' }}
@@ -174,7 +174,7 @@
       <button
         type="button"
         @click="addRoom"
-        class="button button-sm button-secondary | body-sm"
+        class="button button-sm button-tertiary | body-sm"
         :disabled="hasAnyRooms && addButtonDisabled"
       >
         {{ hasAnyRooms ? '+ Add Another Garden' : '+ Add Garden' }}
@@ -187,9 +187,6 @@
 
 <script setup lang="ts">
 import type { Garden } from '~~/layers/database/server/database/prisma/generated/client';
-
-const defaultGardenPosition = gardenPositionOptions[0]?.value ?? null;
-const defaultGardenFacing = gardenFacingOptions[0]?.value ?? null;
 
 interface Props {
   modelValue: Omit<Garden, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[];
@@ -209,8 +206,8 @@ const roomManagerConfig = {
   createNewRoom: () => ({
     name: 'Garden',
     description: null,
-    position: defaultGardenPosition,
-    facing: defaultGardenFacing,
+    position: '0',
+    facing: '0',
     sunTerrace: false,
     terrace: false,
     balcony: false,

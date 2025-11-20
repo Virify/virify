@@ -1,7 +1,7 @@
 <template>
   <EditListingStepsStepLayout
     title="Kitchens, Receptions & Other Rooms"
-    info="Share details about the property's living spaces including kitchens, receptions, and any additional rooms. You can add multiple rooms to fully represent the layout."
+    info="Please add all the living spaces for your property. You’re more likely to find the right viewer with complete and accurate details!"
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
     :buttonText="buttonText"
@@ -18,7 +18,6 @@
         title="Kitchens" 
         variant="section"
       />
-      <em class="body-xs">Optional, add kitchen details</em>
       <OrganismsListingKitchenForm
         v-model="stepSixData.property.kitchenFeatures"
         :total-floors="stepSixData.property.totalFloors"
@@ -33,7 +32,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add the property's reception rooms</em>
       <OrganismsListingReceptionForm
         v-model="stepSixData.property.reception"
         :total-floors="stepSixData.property.totalFloors"
@@ -47,8 +45,8 @@
         title="Other Rooms" 
         :required="false"
         variant="section"
+        subtext="Such as, office, gym and study"
       />
-      <em class="body-xs">Optional, add additional functional rooms (office, gym, etc.)</em>
       <OrganismsListingOtherRoomForm
         v-model="stepSixData.property.otherRoom"
         :total-floors="stepSixData.property.totalFloors"

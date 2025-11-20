@@ -12,7 +12,7 @@ const { data: listingData } = await useAsyncData(
   () => `listing-${route.params.id}`,
   async () => {
     try {
-      const response = await $fetch<{ listing: any }>(`/api/listing/${route.params.id}`);
+      const response = await $fetch<{ listing: ListingWithFullProperty }>(`/api/listing/${route.params.id}`);
       if (!response?.listing) {
         throw createError({
           statusCode: 404,

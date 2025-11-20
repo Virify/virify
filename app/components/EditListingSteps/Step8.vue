@@ -1,6 +1,6 @@
 <template>
   <EditListingStepsStepLayout
-    title="Property Features"
+    title="Additional Features"
     info="Add details about additional features, parking, security, accessibility, and storage options for your property."
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
@@ -19,7 +19,6 @@
         title="Additional Features" 
         variant="section"
       />
-      <em class="body-xs">Optional, describe additional features and amenities</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -42,9 +41,7 @@
         name="additional-features"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select amenities and features that add value to the property, such as pet-friendly policies, pool, gym, concierge services, etc.'
-          ]" />
+          <p>Select amenities and features that add value to the property, such as pool, gym, concierge services, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -57,7 +54,6 @@
         title="Parking" 
         variant="section"
       />
-      <em class="body-xs">Optional, add parking details</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -67,9 +63,7 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Provide details about parking availability, number of spaces, restrictions, or costs associated with parking.'
-          ]" />
+          <p>Provide details about parking availability, number of spaces, restrictions, or costs associated with parking.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
@@ -80,9 +74,7 @@
         name="parking"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the types of parking available, such as garage, driveway, permit parking, EV charging, etc.'
-          ]" />
+          <p>Select the types of parking available, such as garage, driveway, permit parking, EV charging, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -96,7 +88,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add security features</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -106,9 +97,7 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Detail the security measures in place, including systems, monitoring, and physical security features.'
-          ]" />
+          <p>Detail the security measures in place, including systems, monitoring, and physical security features.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
@@ -119,9 +108,7 @@
         name="security"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the security features available, such as CCTV, alarm systems, gated community, 24/7 security, etc.'
-          ]" />
+          <p>Select the security features available, such as CCTV, alarm systems, gated community, 24/7 security, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -135,7 +122,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add accessibility features</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -145,9 +131,7 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Describe accessibility adaptations and features that make the property suitable for people with mobility challenges or disabilities.'
-          ]" />
+          <p>Describe accessibility adaptations and features that make the property suitable for people with mobility challenges or disabilities.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
@@ -158,9 +142,7 @@
         name="accessibility"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select accessibility features available, such as wheelchair access, step-free entry, wide doorways, elevator, wet room, etc.'
-          ]" />
+          <p>Select accessibility features available, such as wheelchair access, step-free entry, wide doorways, elevator, wet room, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -174,7 +156,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add storage features</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -184,11 +165,7 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs
-            :paragraphs="[
-              'Detail the storage facilities available with the property, including built-in wardrobes, cupboards, loft storage, shed, or garage storage space.',
-            ]"
-          />
+          <p>Detail the storage facilities available with the property, including built-in wardrobes, cupboards, loft storage, shed, or garage storage space.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
@@ -199,11 +176,7 @@
         name="storage"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs
-            :paragraphs="[
-              'Select the storage facilities available: built-in wardrobes, walk-in closet, loft/attic storage, cellar/basement, bike storage, shed, garage storage, etc.',
-            ]"
-          />
+          <p>Select the storage facilities available</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -217,7 +190,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add utility room details if applicable</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -227,9 +199,7 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Describe the utility room features, layout, and what appliances or storage it can accommodate.'
-          ]" />
+          <p>Describe the utility room features, layout, and what appliances or storage it can accommodate.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
@@ -243,9 +213,9 @@
         @update:size="(value: number | null) => (stepEightData.property.utility as any).size = value"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Enter the utility room\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
-          ]" />
+          <p>
+            Not sure how to measure? See our <NuxtLink to="/guides/property-information/room-sizing" target="_blank" rel="noopener" class="link">Room Sizing guide</NuxtLink>.
+          </p>
         </template>
       </OrganismsListingFormSizeToggle>
 
@@ -256,9 +226,9 @@
         name="utility-room"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the features available in the utility room, such as plumbing for appliances, sink, or storage space.'
-          ]" />
+          <p>
+            Select the features available in the utility room, such as plumbing for appliances, sink, or storage space.
+          </p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -268,7 +238,6 @@
 
 <script setup lang="ts">
 import { additionalFeaturesOptions, parkingOptions, securityOptions, accessibilityOptions, storageOptions, utilityRoomOptions } from '~/utils/listing/step-eight';
-import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from '~~/layers/database/server/database/prisma/generated/enums';
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;

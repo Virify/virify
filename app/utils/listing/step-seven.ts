@@ -153,26 +153,9 @@ export const stepSevenValidation = {
     const gardens = data.property.outdoorSpace.garden || [];
     const yards = data.property.outdoorSpace.yard || [];
     const lands = data.property.outdoorSpace.land || [];
-    const hasGarden = data.property.outdoorSpace.hasGarden;
-    const hasYard = data.property.outdoorSpace.hasYard;
-    const hasLand = data.property.outdoorSpace.hasLand;
-
-    // If hasGarden is true, there MUST be at least one garden
-    if (hasGarden && gardens.length === 0) {
-      return false;
-    }
-
-    // If hasYard is true, there MUST be at least one yard
-    if (hasYard && yards.length === 0) {
-      return false;
-    }
-
-    // If hasLand is true, there MUST be at least one land
-    if (hasLand && lands.length === 0) {
-      return false;
-    }
 
     // Validate all outdoor spaces if they exist
+    // The has* flags are set automatically in beforeSubmit based on array lengths
     return stepSevenValidation.areGardensValid(gardens) &&
            stepSevenValidation.areYardsValid(yards) &&
            stepSevenValidation.areLandsValid(lands);

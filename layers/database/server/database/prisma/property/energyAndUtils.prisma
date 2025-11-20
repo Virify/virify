@@ -67,7 +67,6 @@ enum RenewableEnergy {
   BATTERY_STORAGE
   SMART_METER
   EV_CHARGING
-  GREY_WATER
 }
 
 enum ConnectedUtilities {

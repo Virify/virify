@@ -69,9 +69,9 @@
                 :grid="true"
               >
                 <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Give this kitchen a descriptive name to help identify it (e.g. Main Kitchen, Utility Kitchen)'
-                  ]" />
+                  <p>
+                    Name this room to help identify it (e.g. Main Kitchen, Utility Kitchen).
+                  </p>
                 </template>
               </OrganismsListingFormTextGroup>
 
@@ -84,28 +84,10 @@
                 :expanded="true"
               >
                 <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Add any additional details about this kitchen that buyers might find useful'
-                  ]" />
+                  <p>Add any additional details about this kitchen that buyers might find useful.</p>
                 </template>
               </OrganismsListingFormTextGroup>
 
-              <OrganismsListingFormNumberGroup
-                title="Kitchen Number"
-                v-model="kitchen.roomNumber"
-                :name="`kitchen-${index}-number`"
-                placeholder="1"
-                :required="true"
-                :grid="true"
-                min="1"
-                step="1"
-              >
-                <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Assign a number to this kitchen (e.g. Kitchen 1, Kitchen 2)'
-                  ]" />
-                </template>
-              </OrganismsListingFormNumberGroup>
 
               <OrganismsListingFormSelectGroup
                 title="Floor"
@@ -116,9 +98,7 @@
                 :grid="true"
               >
                 <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Select which floor this kitchen is located on'
-                  ]" />
+                  <p>Select which floor this kitchen is located on.</p>
                 </template>
               </OrganismsListingFormSelectGroup>
             </div>
@@ -131,9 +111,7 @@
               @update:modelValue="updateKitchenFeatures(kitchen, $event)"
             >
               <template #tooltip-content>
-                <AtomsTooltipParagraphs :paragraphs="[
-                  'Select all features that apply to the kitchen. These help showcase functionality and style to potential buyers or renters.'
-                ]" />
+                <p>Select all features that apply to the kitchen. These help showcase functionality and style to potential buyers or renters.</p>
               </template>
             </OrganismsListingFormCheckboxGroup>
 
@@ -147,9 +125,9 @@
               @update:size="(value: number | null) => (kitchen.size = value)"
             >
               <template #tooltip-content>
-                <AtomsTooltipParagraphs :paragraphs="[
-                  'Enter the kitchen\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
-                ]" />
+                <p>
+                  Not sure how to measure? See our <NuxtLink to="/guides/property-information/room-sizing" target="_blank" rel="noopener" class="link">Room Sizing guide</NuxtLink>.
+                </p>
               </template>
             </OrganismsListingFormSizeToggle>
 
@@ -157,7 +135,7 @@
               <button
                 type="button"
                 @click="saveRoom(index)"
-                class="button button-sm button-secondary | body-sm"
+                class="button button-sm button-tertiary | body-sm"
                 :disabled="!isRoomCompleted(kitchen) || !hasRoomChanges(index)"
               >
                 {{ lastAddedRoomIndex === index ? 'Save Kitchen' : 'Save Changes' }}
@@ -181,7 +159,7 @@
       <button
         type="button"
         @click="addRoom"
-        class="button button-sm button-secondary | body-sm"
+        class="button button-sm button-tertiary | body-sm"
         :disabled="hasAnyRooms && addButtonDisabled"
       >
         {{ hasAnyRooms ? '+ Add Another Kitchen' : '+ Add Kitchen' }}

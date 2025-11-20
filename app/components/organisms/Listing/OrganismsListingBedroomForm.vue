@@ -70,9 +70,9 @@
                 :grid="true"
               >
                 <template #tooltip-content>
-                 <p>
-                  Name this room to help identify it (e.g. Master Bedroom, Guest Room, Front Bedroom).
-                 </p>
+                  <p>
+                    Name this room to help identify it (e.g. Master Bedroom, Guest Room, Front Bedroom).
+                  </p>
                 </template>
               </OrganismsListingFormTextGroup>
 
@@ -89,22 +89,6 @@
                   <p>Add any additional details about this bedroom that viewers might find useful.</p>
                 </template>
               </OrganismsListingFormTextGroup>
-
-              <!-- Bedroom Number -->
-              <OrganismsListingFormNumberGroup
-                title="Bedroom Number"
-                v-model="bedroom.roomNumber"
-                :name="`bedroom-${index}-number`"
-                placeholder="1"
-                :required="true"
-                :grid="true"
-                min="1"
-                step="1"
-              >
-                <template #tooltip-content>
-                  <p>Assign a number to this bedroom (e.g. Bedroom 1, Bedroom 2) - This will help you keep track of the different bedrooms in your listing and be used to order them on your listing.</p>
-                </template>
-              </OrganismsListingFormNumberGroup>
 
               <!-- Floor -->
               <OrganismsListingFormSelectGroup
@@ -159,7 +143,7 @@
             <button
               type="button"
               @click="saveRoom(index)"
-              class="button button-sm button-secondary | body-sm"
+              class="button button-sm button-tertiary | body-sm"
               :disabled="!isRoomCompleted(bedroom) || !hasRoomChanges(index)"
             >
               {{ lastAddedRoomIndex === index ? 'Save Bedroom' : 'Save Changes' }}
@@ -184,7 +168,7 @@
       <button
         type="button"
         @click="addRoom"
-        class="button button-sm button-secondary | body-sm"
+        class="button button-sm button-tertiary | body-sm"
         :disabled="hasAnyRooms && addButtonDisabled"
       >
         {{ hasAnyRooms ? '+ Add Another Bedroom' : '+ Add Bedroom' }}

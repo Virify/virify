@@ -20,7 +20,7 @@ export function getFloorOptions(totalFloors: number) {
     if (i === 1) {
       options.push({ value: i, key: "Ground Floor", info: "Ground floor of the property" });
     } else {
-      options.push({ value: i, key: `Floor ${i}`, info: `Floor ${i} of the property` });
+      options.push({ value: i, key: `Floor ${i - 1}`, info: `Floor ${i - 1} of the property` });
     }
   }
   

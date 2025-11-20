@@ -63,12 +63,14 @@ const emit = defineEmits<{
 }>()
 
 const localOptions = computed(() => props.options ?? [])
+const internalUnit = ref<string>(props.unit ?? 'meter')
 
 const localUnit = computed<string | number | undefined>({
   get() {
-    return props.unit
+    return internalUnit.value
   },
   set(val) {
+    internalUnit.value = val as string
     emit('update:unit', val as string)
   }
 })

@@ -1,6 +1,4 @@
-import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from "~~/layers/database/server/database/prisma/generated/enums";
-
-/** TODO: CREATE PATCH AND MORE FEATURES */
+import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature, OutdoorSpaceFeature, OtherRoomType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
  * Create initial values for step eight based on the draft listing
@@ -9,12 +7,31 @@ import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature,
  */
 export const createInitialStepEightValues = (listing: EditableListing): StepEight => ({
   property: {
-    additionalFeatures: listing.property?.additionalFeatures || {
-      description: null,
-      petFriendly: true,
-      features: [],
-      moveInDate: null,
-    },
+    additionalFeatures: (() => {
+      const existing = listing.property?.additionalFeatures || {
+        description: null,
+        petFriendly: true,
+        features: [] as BuildingFeature[],
+        moveInDate: null,
+      };
+
+      const outdoor = listing.property?.outdoorSpace;
+      const otherRooms = listing.property?.otherRoom ?? [];
+
+      const features = [...(existing.features ?? [])];
+
+      // If outdoor.features includes POOL, add BuildingFeature.POOL
+      if ((outdoor?.features ?? []).includes(OutdoorSpaceFeature.POOL) && !features.includes(BuildingFeature.POOL)) {
+        features.push(BuildingFeature.POOL);
+      }
+
+      // If any otherRoom has type GYM, add BuildingFeature.GYM
+      if (otherRooms.some((r: any) => r.type === OtherRoomType.GYM) && !features.includes(BuildingFeature.GYM)) {
+        features.push(BuildingFeature.GYM);
+      }
+
+      return { ...existing, features };
+    })(),
     accessibilityFeatures: listing.property?.accessibilityFeatures || {
       description: null,
       features: [],
