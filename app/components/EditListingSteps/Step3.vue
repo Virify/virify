@@ -27,6 +27,7 @@
         </template>
       </OrganismsListingFormRadioGroup>
     </MoleculesListingFormSection>
+    
     <AtomsDivider v-if="draft.saleListing && stepThreeData.saleListing" />
 
     <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Rental Frequency">
@@ -43,6 +44,7 @@
         </template>
       </OrganismsListingFormRadioGroup>
     </MoleculesListingFormSection>
+
     <AtomsDivider v-if="draft.rentalListing && stepThreeData.rentalListing" />
 
     <MoleculesListingFormSection :title="draft.saleListing ? 'Sale Price' : 'Rental Amount'" :required="true">
@@ -57,7 +59,8 @@
       >
       </OrganismsListingFormNumberGroup>
     </MoleculesListingFormSection>
-    <AtomsDivider />
+
+    <AtomsDivider v-if="draft.rentalListing && stepThreeData.rentalListing" />
 
     <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Tenancy/Rental Deposit" required>
       <OrganismsListingFormNumberGroup
@@ -75,6 +78,7 @@
         </template>
       </OrganismsListingFormNumberGroup>
     </MoleculesListingFormSection>
+
     <AtomsDivider v-if="draft.rentalListing && stepThreeData.rentalListing" />
 
     <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Holding Deposit" required>
@@ -94,6 +98,7 @@
         </template>
       </OrganismsListingFormNumberGroup>
     </MoleculesListingFormSection>
+    
     <AtomsDivider v-if="draft.rentalListing && stepThreeData.rentalListing" />
 
     <MoleculesListingFormSection v-if="draft.rentalListing && stepThreeData.rentalListing" title="Tenancy Duration" required>
@@ -113,7 +118,7 @@
         </template>
       </OrganismsListingFormRadioGroup>
     </MoleculesListingFormSection>
-  <!-- No divider after Tenancy Duration for rent, and no divider after Sale Price for sale -->
+
   </EditListingStepsStepLayout>
 </template>
 <script setup lang="ts">

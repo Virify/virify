@@ -444,26 +444,13 @@ const canPublish = computed(() => {
     display: inline-flex;
   }
 
-  /* Buttons should use tier color */
-  .button {
-    color: var(--background-100);
-
-    &:hover,
-    &:focus {
-      filter: brightness(0.95);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
+  /* Use global button classes from layers/ui; avoid overriding hover/disabled behavior here */
 
   /* Tier color themes */
   &.draft-card--premium {
     --tier-color: var(--blue-400);
 
-    .button {
+    .button:not([disabled]) {
       color: var(--monochrome-900);
       background-color: var(--tier-color);
       border-color: var(--tier-color);
@@ -482,7 +469,7 @@ const canPublish = computed(() => {
   &.draft-card--featured {
     --tier-color: var(--secondary-400);
 
-    .button {
+    .button:not([disabled]) {
       background-color: var(--tier-color);
       border-color: var(--tier-color);
     }
@@ -491,7 +478,7 @@ const canPublish = computed(() => {
   &.draft-card--basic {
     --tier-color: var(--foreground-100);
 
-    .button {
+    .button:not([disabled]) {
       background-color: var(--tier-color);
       border-color: var(--tier-color);
     }

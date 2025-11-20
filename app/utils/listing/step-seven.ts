@@ -31,8 +31,13 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
           facing: (y.facing || '0') as any,
         })),
         land: lands,
-        // OutdoorSpace features (very compact): include POOL if any garden/yard has it
-        features: ((b => (b.includes(OutdoorSpaceFeature.POOL) || !(gardens.some(g => g.features?.includes(OutdoorSpaceFeature.POOL)) || yards.some(y => y.features?.includes(OutdoorSpaceFeature.POOL)))) ? b : [...b, OutdoorSpaceFeature.POOL])(outdoorSpace?.features ?? [])),
+        features: (
+          (b => (b.includes(OutdoorSpaceFeature.POOL) || 
+          !(gardens.some(g => g.features?.includes(OutdoorSpaceFeature.POOL)) || 
+          yards.some(y => y.features?.includes(OutdoorSpaceFeature.POOL)))) ? 
+          b : [...b, OutdoorSpaceFeature.POOL])
+          (outdoorSpace?.features ?? [])
+        ),
       }
     }
   };
