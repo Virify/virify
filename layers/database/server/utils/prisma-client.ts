@@ -1,6 +1,7 @@
 import { PrismaClient as AppClient } from "~~/layers/database/server/database/prisma/generated/client";
 import { PrismaClient as PpdClient } from "~~/layers/database/server/database/prisma-ppd/generated/client";
 import { PrismaClient as WaitingListClient } from "~~/layers/database/server/database/prisma-waiting-list/generated/client";
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const appClientSingleton = () => {
   // Get config at runtime, not module load time
@@ -10,9 +11,7 @@ const appClientSingleton = () => {
   };
 
   return new AppClient({
-    datasources: {
-      db: { url: config.DATABASE_URL },
-    },
+    adapter: new PrismaPg({ connectionString: config.DATABASE_URL }),
   });
 };
 
@@ -24,9 +23,7 @@ const ppdClientSingleton = () => {
   };
 
   return new PpdClient({
-    datasources: {
-      ppdDb: { url: config.PPD_DATABASE_URL },
-    },
+    adapter: new PrismaPg({ connectionString: config.PPD_DATABASE_URL }),
   });
 };
 
@@ -38,9 +35,7 @@ const waitingListClientSingleton = () => {
   };
 
   return new WaitingListClient({
-    datasources: {
-      waitingListDb: { url: config.WAITING_LIST_DATABASE_URL },
-    },
+    adapter: new PrismaPg({ connectionString: config.WAITING_LIST_DATABASE_URL }),
   });
 };
 
