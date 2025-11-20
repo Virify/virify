@@ -64,10 +64,9 @@
       </OrganismsListingFormTextGroup> -->
 
       <OrganismsListingFormCheckboxGroup
-        title="Primary Heating Type"
+        title="Primary Heating"
         :options="heatingTypeOptions"
-        :model-value="primaryHeating.selected.value"
-        @update:modelValue="primaryHeating.update"
+        v-model="stepNineData.property.energyAndUtilities!.primaryHeatingType"
         name="primary-heating"
       >
         <template #tooltip-content>
@@ -78,10 +77,9 @@
       </OrganismsListingFormCheckboxGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Secondary Heating Type"
+        title="Secondary Heating"
         :options="heatingTypeOptions"
-        :model-value="secondaryHeating.selected.value"
-        @update:modelValue="secondaryHeating.update"
+        v-model="stepNineData.property.energyAndUtilities!.secondaryHeatingType"
         name="secondary-heating"
       >
         <template #tooltip-content>
@@ -118,10 +116,9 @@
       </OrganismsListingFormRadioGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Renewable Energy & Smart Features"
+        title="Renewable Energy"
         :options="renewableEnergyOptions"
-        :model-value="renewableEnergy.selected.value"
-        @update:modelValue="renewableEnergy.update"
+        v-model="stepNineData.property.energyAndUtilities!.renewables"
         name="renewable-energy"
       >
         <template #tooltip-content>
@@ -134,8 +131,7 @@
       <OrganismsListingFormCheckboxGroup
         title="Connected Utilities"
         :options="connectedUtilitiesOptions"
-        :model-value="connectedUtilities.selected.value"
-        @update:modelValue="connectedUtilities.update"
+        v-model="stepNineData.property.energyAndUtilities!.connectedUtilities"
         name="connected-utilities"
       >
         <template #tooltip-content>
@@ -160,10 +156,9 @@
       <OrganismsListingFormSelectGroup
         title="Council Tax Band"
         :options="councilTaxBandOptions"
-        v-model="selectedCouncilTaxBand"
+        v-model="stepNineData.property.runningCosts!.councilTaxBand"
         name="council-tax-band"
         :required="true"
-        @update:modelValue="updateCouncilTaxBand"
       >
         <template #tooltip-content>
           <AtomsTooltipParagraphs :paragraphs="[
@@ -235,12 +230,6 @@ const {
   submitForm: handleSubmit,
 } = useListingStepForm(stepConfig, props.draft);
 
-// Use composables for each section
-const primaryHeating = usePrimaryHeating(stepNineData);
-const secondaryHeating = useSecondaryHeating(stepNineData);
-const renewableEnergy = useRenewableEnergy(stepNineData);
-const connectedUtilities = useConnectedUtilities(stepNineData);
-const { selectedCouncilTaxBand, updateCouncilTaxBand } = useCouncilTaxBand(stepNineData);
 
 function submitForm() {
   handleSubmit(

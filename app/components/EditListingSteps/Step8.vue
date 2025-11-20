@@ -38,8 +38,7 @@
       <OrganismsListingFormCheckboxGroup
         title="Features"
         :options="additionalFeaturesOptions"
-        :model-value="additionalFeatures.selected.value"
-        @update:modelValue="additionalFeatures.update"
+        v-model="stepEightData.property.additionalFeatures!.features"
         name="additional-features"
       >
         <template #tooltip-content>
@@ -77,8 +76,7 @@
       <OrganismsListingFormCheckboxGroup
         title="Parking Options"
         :options="parkingOptions"
-        :model-value="parkingFeatures.selected.value"
-        @update:modelValue="parkingFeatures.update"
+        v-model="stepEightData.property.parking!.features"
         name="parking"
       >
         <template #tooltip-content>
@@ -115,10 +113,9 @@
       </OrganismsListingFormTextGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Security Options"
+        title="Security Features"
         :options="securityOptions"
-        :model-value="securityFeatures.selected.value"
-        @update:modelValue="securityFeatures.update"
+        v-model="stepEightData.property.securityFeatures!.features"
         name="security"
       >
         <template #tooltip-content>
@@ -155,10 +152,9 @@
       </OrganismsListingFormTextGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Accessibility Options"
+        title="Accessibility Features"
         :options="accessibilityOptions"
-        :model-value="accessibilityFeatures.selected.value"
-        @update:modelValue="accessibilityFeatures.update"
+        v-model="stepEightData.property.accessibilityFeatures!.features"
         name="accessibility"
       >
         <template #tooltip-content>
@@ -197,10 +193,9 @@
       </OrganismsListingFormTextGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Storage Options"
+        title="Storage Features"
         :options="storageOptions"
-        :model-value="storageFeatures.selected.value"
-        @update:modelValue="storageFeatures.update"
+        v-model="stepEightData.property.storageFeatures!.features"
         name="storage"
       >
         <template #tooltip-content>
@@ -257,9 +252,8 @@
       <OrganismsListingFormCheckboxGroup
         title="Utility Room Features"
         :options="utilityRoomOptions"
-        :model-value="utilityRoomFeatures.selected.value"
-        @update:modelValue="utilityRoomFeatures.update"
-        name="utility-room-features"
+        v-model="stepEightData.property.utility!.features"
+        name="utility-room"
       >
         <template #tooltip-content>
           <AtomsTooltipParagraphs :paragraphs="[
@@ -273,6 +267,8 @@
 </template>
 
 <script setup lang="ts">
+import { additionalFeaturesOptions, parkingOptions, securityOptions, accessibilityOptions, storageOptions, utilityRoomOptions } from '~/utils/listing/step-eight';
+import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from '~~/layers/database/server/database/prisma/generated/enums';
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
@@ -301,13 +297,8 @@ const {
   submitForm: handleSubmit,
 } = useListingStepForm(stepConfig, props.draft);
 
-// Use composables for each feature section
-const additionalFeatures = useAdditionalFeatures(stepEightData);
-const parkingFeatures = useParking(stepEightData);
-const securityFeatures = useSecurity(stepEightData);
-const accessibilityFeatures = useAccessibility(stepEightData);
-const storageFeatures = useStorageFeatures(stepEightData);
-const utilityRoomFeatures = useUtilityRoomFeatures(stepEightData);
+// Direct update handlers for each feature section (no composables)
+// v-model on nested fields updates `stepEightData` automatically; no manual setters required.
 
 function submitForm() {
   handleSubmit(
