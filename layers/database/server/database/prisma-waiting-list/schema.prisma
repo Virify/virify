@@ -1,12 +1,12 @@
-generator ppdClient {
-  provider        = "prisma-client"
-  output          = "./generated/"
-  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
-}
+// This file contains WaitingList model only. Connection/generator configured in `prisma.config.ts`.
 
 datasource waitingListDb {
-  provider   = "postgresql"
-  url        = env("WAITING_LIST_DATABASE_URL")
+  provider = "postgresql"
+}
+
+generator client {
+  provider      = "prisma-client"
+  output        = "./generated/"
 }
 
 model WaitingList {
