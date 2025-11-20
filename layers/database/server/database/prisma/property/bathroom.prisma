@@ -1,19 +1,23 @@
 model Bathroom {
-  id           Int      @id @default(autoincrement())
-  roomNumber   Int
-  floor        Int
-  name         String?
-  toilet       Boolean  @default(false)
-  enSuite      Boolean  @default(false)
-  bathtub      Boolean  @default(true)
-  walkInShower Boolean  @default(false)
-  description  String?
-  size         Float?
-  propertyId   Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  property     Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  media        Media[]
+  id          Int               @id @default(autoincrement())
+  roomNumber  Int
+  floor       Int
+  name        String?
+  features    BathroomFeature[]
+  description String?
+  size        Float?
+  propertyId  Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  property    Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  media       Media[]
 
   @@index([propertyId])
+}
+
+enum BathroomFeature {
+  TOILET
+  EN_SUITE
+  BATHTUB
+  WALK_IN_SHOWER
 }

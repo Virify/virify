@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { BedSizeType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { BedSizeType, BedroomFeature, BathroomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
 // Validate payload to match Prisma Bedroom and Bathroom models and StepFive type (now includes both)
 const bedroomBathroomSchema = z.object({
@@ -15,14 +15,7 @@ const bedroomBathroomSchema = z.object({
           floor: z.coerce.number().int().min(1),
           bed: z.array(z.enum(Object.values(BedSizeType))).min(1),
           size: z.coerce.number().min(0).nullable().optional(),
-          enSuite: z.boolean().optional(),
-          builtInStorage: z.boolean().optional(),
-          walkInWardrobe: z.boolean().optional(),
-          bayWindow: z.boolean().optional(),
-          balcony: z.boolean().optional(),
-          hasView: z.boolean().optional(),
-          patioDoors: z.boolean().optional(),
-          builtInDesk: z.boolean().optional(),
+          features: z.array(z.enum(Object.values(BedroomFeature) as [string, ...string[]])).optional(),
         })
       ),
     numberBedrooms: z.coerce.number().int().min(0),
@@ -34,10 +27,7 @@ const bedroomBathroomSchema = z.object({
           description: z.string().max(500).optional(),
           floor: z.coerce.number().int().min(1),
           size: z.coerce.number().min(0).nullable().optional(),
-          toilet: z.boolean().optional(),
-          enSuite: z.boolean().optional(),
-          bathtub: z.boolean().optional(),
-          walkInShower: z.boolean().optional(),
+          features: z.array(z.enum(Object.values(BathroomFeature) as [string, ...string[]])).optional(),
         })
       ),
     numberBathrooms: z.coerce.number().int().min(0)
@@ -69,14 +59,7 @@ export default defineEventHandler(async (event) => {
                 floor: b.floor,
                 bed: b.bed,
                 size: b.size ?? null,
-                enSuite: b.enSuite ?? false,
-                builtInStorage: b.builtInStorage ?? false,
-                walkInWardrobe: b.walkInWardrobe ?? false,
-                bayWindow: b.bayWindow ?? false,
-                balcony: b.balcony ?? false,
-                hasView: b.hasView ?? false,
-                patioDoors: b.patioDoors ?? false,
-                builtInDesk: b.builtInDesk ?? false,
+                features: b.features as BedroomFeature[] ?? [],
               })),
             },
             bathroomFeatures: {
@@ -87,10 +70,7 @@ export default defineEventHandler(async (event) => {
                 description: b.description ?? null,
                 floor: b.floor,
                 size: b.size ?? null,
-                toilet: b.toilet ?? false,
-                enSuite: b.enSuite ?? false,
-                bathtub: b.bathtub ?? false,
-                walkInShower: b.walkInShower ?? false,
+                features: b.features as BathroomFeature[] ?? [],
               })),
             },
           },

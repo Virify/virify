@@ -1,14 +1,18 @@
 model Utility {
-  id          Int      @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   description String?
-  storage     Boolean  @default(false)
-  sink        Boolean  @default(false)
-  plumbing    Boolean  @default(false)
+  features    UtilityFeature[]
   size        Float?
-  propertyId  Int      @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId  Int              @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  property    Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
+}
+
+enum UtilityFeature {
+  STORAGE
+  SINK
+  PLUMBING
 }

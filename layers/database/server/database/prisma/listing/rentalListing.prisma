@@ -16,19 +16,16 @@ model RentalListing {
   @@index([draftListingId])
 }
 
-
 enum FurnishedStatus {
   FURNISHED
   UNFURNISHED
   PART_FURNISHED
 }
 
-
 enum RentalPriceType {
   WEEKLY
   MONTHLY
 }
-
 
 enum RentalAvailabilityStatus {
   AVAILABLE

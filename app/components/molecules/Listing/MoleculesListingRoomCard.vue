@@ -72,19 +72,9 @@ const hasDetails = computed(() => {
 });
 
 const features = computed(() => {
-  if (!props.item || typeof props.item !== "object") return [];
+  if (!props.item.features?.length) return [];
 
-  const features: string[] = [];
-  
-  // Add boolean features
-  Object.entries(props.item).forEach(([key, value]) => {
-    if (typeof value === "boolean" && value === true && 
-        key !== "description" && key !== "size") {
-      features.push(convertRoomEnumToString(key));
-    }
-  });
-
-  return features;
+  return props.item.features.map((feature: string) => convertEnumToString(feature));
 });
 </script>
 

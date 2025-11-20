@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { BedSizeType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { BedSizeType, BedroomFeature, BathroomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
 // Validate payload to match Prisma Bedroom and Bathroom models and StepFive type (now includes both)
 const bedroomBathroomSchema = z.object({
@@ -13,16 +13,9 @@ const bedroomBathroomSchema = z.object({
           roomNumber: z.coerce.number().int().min(1),
           description: z.string().max(500).nullable().optional(),
           floor: z.coerce.number().int().min(1),
-          bed: z.array(z.enum(Object.values(BedSizeType))).min(1),
+          bed: z.array(z.enum(Object.values(BedSizeType) as [string, ...string[]])).min(1),
+          features: z.array(z.enum(Object.values(BedroomFeature) as [string, ...string[]])).optional(),
           size: z.coerce.number().min(0).nullable().optional(),
-          enSuite: z.boolean().optional(),
-          builtInStorage: z.boolean().optional(),
-          walkInWardrobe: z.boolean().optional(),
-          bayWindow: z.boolean().optional(),
-          balcony: z.boolean().optional(),
-          hasView: z.boolean().optional(),
-          patioDoors: z.boolean().optional(),
-          builtInDesk: z.boolean().optional(),
         })
       ),
     numberBedrooms: z.coerce.number().int().min(0),
@@ -33,11 +26,8 @@ const bedroomBathroomSchema = z.object({
           roomNumber: z.coerce.number().int().min(1),
           description: z.string().max(500).optional(),
           floor: z.coerce.number().int().min(1),
+          features: z.array(z.enum(Object.values(BathroomFeature) as [string, ...string[]])).optional(),
           size: z.coerce.number().min(0).nullable().optional(),
-          toilet: z.boolean().optional(),
-          enSuite: z.boolean().optional(),
-          bathtub: z.boolean().optional(),
-          walkInShower: z.boolean().optional(),
         })
       ),
     numberBathrooms: z.coerce.number().int().min(0)
@@ -67,16 +57,9 @@ export default defineEventHandler(async (event) => {
                 roomNumber: b.roomNumber,
                 description: b.description ?? null,
                 floor: b.floor,
-                bed: b.bed,
+                bed: b.bed as BedSizeType[],
+                features: (b.features ?? []) as BedroomFeature[],
                 size: b.size ?? null,
-                enSuite: b.enSuite ?? false,
-                builtInStorage: b.builtInStorage ?? false,
-                walkInWardrobe: b.walkInWardrobe ?? false,
-                bayWindow: b.bayWindow ?? false,
-                balcony: b.balcony ?? false,
-                hasView: b.hasView ?? false,
-                patioDoors: b.patioDoors ?? false,
-                builtInDesk: b.builtInDesk ?? false,
               })),
             },
             bathroomFeatures: {
@@ -86,11 +69,8 @@ export default defineEventHandler(async (event) => {
                 roomNumber: b.roomNumber,
                 description: b.description ?? null,
                 floor: b.floor,
+                features: (b.features ?? []) as BathroomFeature[],
                 size: b.size ?? null,
-                toilet: b.toilet ?? false,
-                enSuite: b.enSuite ?? false,
-                bathtub: b.bathtub ?? false,
-                walkInShower: b.walkInShower ?? false,
               })),
             },
           },

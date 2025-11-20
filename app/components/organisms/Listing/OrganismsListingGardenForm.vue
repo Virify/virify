@@ -249,22 +249,11 @@ onMounted(() => {
 
 // Garden features checkbox management
 const getSelectedGardenFeatures = (garden: any) => {
-  const features: string[] = [];
-  gardenFeaturesOptions.forEach((option) => {
-    if (garden[option.value]) {
-      features.push(option.value);
-    }
-  });
-  return features;
+  return garden.features || [];
 };
 
 const updateGardenFeatures = (garden: any, selectedFeatures: string[]) => {
-  gardenFeaturesOptions.forEach((option) => {
-    garden[option.value] = false;
-  });
-  selectedFeatures.forEach((feature) => {
-    garden[feature] = true;
-  });
+  garden.features = selectedFeatures;
 };
 </script>
 

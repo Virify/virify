@@ -136,21 +136,6 @@
                   ]" />
                 </template>
               </OrganismsListingFormSelectGroup>
-
-              <OrganismsListingFormSelectGroup
-                title="Fireplace"
-                :options="fireplaceSelectOptions"
-                :model-value="getOtherRoomFireplaceValue(otherRoomItem)"
-                @update:modelValue="setOtherRoomFireplaceValue(otherRoomItem, $event)"
-                :name="`other-room-${index}-fireplace`"
-                :grid="true"
-              >
-                <template #tooltip-content>
-                  <AtomsTooltipParagraphs :paragraphs="[
-                    'Select the type of fireplace if this room has one'
-                  ]" />
-                </template>
-              </OrganismsListingFormSelectGroup>
             </div>
 
             <OrganismsListingFormCheckboxGroup
@@ -250,24 +235,9 @@ const roomManagerConfig = {
     roomNumber,
     floor: 1,
     type: defaultOtherRoomType,
-    fireplace: null,
     description: '',
     size: null,
-    openPlan: false,
-    openConcept: false,
-    balcony: false,
-    bayWindow: false,
-    builtInShelving: false,
-    hasView: false,
-    patioDoors: false,
-    builtInStorage: false,
-    servingHatch: false,
-    barArea: false,
-    soundProofing: false,
-    accousticPanels: false,
-    stoneFlooring: false,
-    hardwoodFlooring: false,
-    builtInDesk: false,
+    features: [],
   }),
 };
 
@@ -296,33 +266,11 @@ onMounted(() => {
 });
 
 function getSelectedOtherRoomFeatures(room: any): string[] {
-  const features: string[] = [];
-
-  otherRoomFeatureOptions.forEach((option: { value: string }) => {
-    if (room[option.value]) {
-      features.push(option.value);
-    }
-  });
-
-  return features;
+  return room.features || [];
 }
 
 function updateOtherRoomFeatures(room: any, selectedFeatures: string[]) {
-  otherRoomFeatureOptions.forEach((option: { value: string }) => {
-    room[option.value] = false;
-  });
-
-  selectedFeatures.forEach((feature) => {
-    room[feature] = true;
-  });
-}
-
-function getOtherRoomFireplaceValue(room: any): string {
-  return room.fireplace ?? fireplaceSelectNoneValue;
-}
-
-function setOtherRoomFireplaceValue(room: any, value: string) {
-  room.fireplace = value === fireplaceSelectNoneValue ? null : value;
+  room.features = selectedFeatures;
 }
 </script>
 

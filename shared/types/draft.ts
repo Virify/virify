@@ -85,36 +85,28 @@ export type StepSeven = {
       yard: Omit<Yard, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       land: Omit<Land, 'id' | 'outdoorSpaceId' | 'createdAt' | 'updatedAt' | 'media'>[]
       description: string | null
-      // OutdoorSpace boolean features
-      sunTerrace: boolean
-      terrace: boolean
-      balcony: boolean
-      patio: boolean
-      separateParcel: boolean
-      shed: boolean
-      summerHouse: boolean
-      gardenOffice: boolean
-      pool: boolean
+      // OutdoorSpace features array
+      features: string[]
     }
   }
 }
 
 export type StepEight = {
   property: {
-    additionalFeatures?: Omit<AdditionalFeatures | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-    accessibilityFeatures?: Omit<Accessibility | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-    parking?: Omit<Parking | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-    securityFeatures?: Omit<Security | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-    storageFeatures?: Omit<Storage | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-    utility?: Omit<Utility | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    additionalFeatures?: Omit<AdditionalFeatures, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    accessibilityFeatures?: Omit<Accessibility, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    parking?: Omit<Parking, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    securityFeatures?: Omit<Security, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    storageFeatures?: Omit<Storage, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    utility?: Omit<Utility, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
   }
 }
 
 export type StepNine = {
   property: {
     // ignore broadband type, full fibre and maxdownloadspeed as they are being deprecated for API
-    energyAndUtilities?: Omit<EnergyAndUtilities | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
-    runningCosts?: Omit<RunningCosts | null, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    energyAndUtilities?: Omit<EnergyAndUtilities, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
+    runningCosts?: Omit<RunningCosts, 'id' | 'propertyId' | 'createdAt' | 'updatedAt'> | null
   }
 }
 

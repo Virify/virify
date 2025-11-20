@@ -23,10 +23,10 @@
           {{ price }}
 
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            {{ convertRoomEnumToString(priceType!) }}
+            {{ convertEnumToString(priceType!) }}
           </AtomsPill>
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            {{ convertRoomEnumToString(available!) }}
+            {{ convertEnumToString(available!) }}
           </AtomsPill>
         </h2>
 
@@ -68,7 +68,7 @@
             {{ price }}
 
             <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-              {{ convertRoomEnumToString(priceType!) }}
+              {{ convertEnumToString(priceType!) }}
             </AtomsPill>
           </h2>
 

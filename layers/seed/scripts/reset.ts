@@ -5,7 +5,9 @@ import { execa } from 'execa'
 async function resetDatabase() {
   try {
     console.log('Resetting database...')
-    await execa('npx', ['prisma', 'migrate', 'reset', '--force'], { stdio: 'inherit' })
+    // Reset only the main database using the project-level Prisma config
+    // Use `pnpm exec` so the local Prisma binary and TypeScript config are resolved correctly
+    await execa('pnpm', ['exec', 'prisma', 'migrate', 'reset', '--config=./layers/database/server/database/prisma/prisma.config.ts', '--force'], { stdio: 'inherit' })
     console.log('Database reset complete.')
   }
   catch (e: any) {

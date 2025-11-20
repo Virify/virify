@@ -218,10 +218,7 @@ const roomManagerConfig = {
     roomNumber,
     floor: 1,
     description: '',
-    toilet: false,
-    enSuite: false,
-    bathtub: true,
-    walkInShower: false,
+    features: [],
     size: null,
   })
 };
@@ -253,27 +250,11 @@ onMounted(() => {
 });
 
 function getSelectedBathroomFeatures(bathroom: any): string[] {
-  const features: string[] = [];
-  
-  bathroomFeaturesOptions.forEach((option: { value: string; key: string; info: string }) => {
-    if (bathroom[option.value]) {
-      features.push(option.value);
-    }
-  });
-  
-  return features;
+  return bathroom.features || [];
 }
 
 function updateBathroomFeatures(bathroom: any, selectedFeatures: string[]) {
-  // Reset all features to false
-  bathroomFeaturesOptions.forEach((option: { value: string; key: string; info: string }) => {
-    bathroom[option.value] = false;
-  });
-  
-  // Set selected features to true
-  selectedFeatures.forEach(feature => {
-    bathroom[feature] = true;
-  });
+  bathroom.features = selectedFeatures;
 }
 </script>
 

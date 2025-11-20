@@ -1,3 +1,5 @@
+import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+
 /** TODO: CREATE PATCH AND MORE FEATURES */
 
 /**
@@ -10,57 +12,28 @@ export const createInitialStepEightValues = (listing: EditableListing): StepEigh
     additionalFeatures: listing.property?.additionalFeatures || {
       description: null,
       petFriendly: true,
-      pool: false,
-      internet: false,
-      concierge: false,
-      shop: false,
-      gym: false,
+      features: [],
       moveInDate: null,
     },
     accessibilityFeatures: listing.property?.accessibilityFeatures || {
       description: null,
-      wheelchairFriendly: false,
-      stepFreeAccess: false,
-      wideDoorways: false,
-      wetRoom: false,
-      handrails: false,
-      elevator: false,
-      stairs: false,
-      accessibleParking: false,
+      features: [],
     },
     parking: listing.property?.parking || {
       description: null,
-      garage: false,
-      driveway: false,
-      permitParking: false,
-      onStreet: false,
-      noParking: false,
-      carport: false,
-      allocatedParking: false,
-      evCharging: false,
+      features: [],
     },
     securityFeatures: listing.property?.securityFeatures || {
       description: null,
-      gatedCommunity: false,
-      cctv: false,
-      alarmSystem: false,
-      neighborhoodWatch: false,
-      intercomSystem: false,
-      security: false,
-      reception: false,
+      features: [],
     },
     storageFeatures: listing.property?.storageFeatures || {
       description: null,
-      attic: false,
-      basement: false,
-      separateDressing: false,
-      underStairsStorage: false,
+      features: [],
     },
     utility: listing.property?.utility || {
       description: null,
-      storage: false,
-      sink: false,
-      plumbing: false,
+      features: [],
       size: null,
     },
   }
@@ -69,74 +42,56 @@ export const createInitialStepEightValues = (listing: EditableListing): StepEigh
 /**
  * Additional Features options for checkbox selection
  */
-export const additionalFeaturesOptions = [
-  { value: 'petFriendly', key: 'Pet Friendly', info: 'Pets are allowed' },
-  { value: 'pool', key: 'Pool', info: 'Property has a pool' },
-  { value: 'internet', key: 'Internet', info: 'Internet included' },
-  { value: 'concierge', key: 'Concierge', info: 'Concierge service available' },
-  { value: 'shop', key: 'Shop', info: 'On-site shop available' },
-  { value: 'gym', key: 'Gym', info: 'Gym facilities available' },
-];
+export const additionalFeaturesOptions = Object.values(BuildingFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Building ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Parking options for checkbox selection
  */
-export const parkingOptions = [
-  { value: 'garage', key: 'Garage', info: 'Has garage' },
-  { value: 'driveway', key: 'Driveway', info: 'Has driveway' },
-  { value: 'permitParking', key: 'Permit Parking', info: 'Permit parking required' },
-  { value: 'onStreet', key: 'On Street', info: 'On-street parking available' },
-  { value: 'noParking', key: 'No Parking', info: 'No parking available' },
-  { value: 'carport', key: 'Carport', info: 'Has carport' },
-  { value: 'allocatedParking', key: 'Allocated Parking', info: 'Has allocated parking space' },
-  { value: 'evCharging', key: 'EV Charging', info: 'EV charging point available' },
-];
+export const parkingOptions = Object.values(ParkingFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Parking ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Security Features options for checkbox selection
  */
-export const securityOptions = [
-  { value: 'gatedCommunity', key: 'Gated Community', info: 'Property is in a gated community' },
-  { value: 'cctv', key: 'CCTV', info: 'CCTV security cameras' },
-  { value: 'alarmSystem', key: 'Alarm System', info: 'Alarm system installed' },
-  { value: 'neighborhoodWatch', key: 'Neighbourhood Watch', info: 'Part of neighbourhood watch scheme' },
-  { value: 'intercomSystem', key: 'Intercom System', info: 'Intercom system installed' },
-  { value: 'security', key: 'Security Personnel', info: 'On-site security personnel' },
-  { value: 'reception', key: 'Reception', info: '24-hour reception' },
-];
+export const securityOptions = Object.values(SecurityFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Security ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Accessibility Features options for checkbox selection
  */
-export const accessibilityOptions = [
-  { value: 'wheelchairFriendly', key: 'Wheelchair Friendly', info: 'Wheelchair accessible' },
-  { value: 'stepFreeAccess', key: 'Step Free Access', info: 'Step-free access available' },
-  { value: 'wideDoorways', key: 'Wide Doorways', info: 'Wide doorways throughout' },
-  { value: 'wetRoom', key: 'Wet Room', info: 'Wet room available' },
-  { value: 'handrails', key: 'Handrails', info: 'Handrails installed' },
-  { value: 'elevator', key: 'Elevator', info: 'Elevator/lift available' },
-  { value: 'stairs', key: 'Stairs', info: 'Property has stairs' },
-  { value: 'accessibleParking', key: 'Accessible Parking', info: 'Accessible parking available' },
-];
+export const accessibilityOptions = Object.values(AccessibilityFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Accessibility ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Storage Features options for checkbox selection
  */
-export const storageOptions = [
-  { value: 'attic', key: 'Attic/Loft Storage', info: 'Attic or loft storage space' },
-  { value: 'basement', key: 'Basement/Cellar', info: 'Basement or cellar storage' },
-  { value: 'separateDressing', key: 'Separate Dressing Room', info: 'Separate dressing room' },
-  { value: 'underStairsStorage', key: 'Under Stairs Storage', info: 'Under stairs storage cupboard' },
-];
+export const storageOptions = Object.values(StorageFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Storage ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Utility Room options for checkbox selection
  */
-export const utilityRoomOptions = [
-  { value: 'storage', key: 'Storage Space', info: 'Storage space available' },
-  { value: 'sink', key: 'Sink', info: 'Sink installed' },
-  { value: 'plumbing', key: 'Plumbing for Appliances', info: 'Plumbing for washing machine/dishwasher' },
-];
+export const utilityRoomOptions = Object.values(UtilityFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Utility ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Step Eight Validation Helpers
@@ -188,12 +143,12 @@ export const stepEightValidation = {
  */
 export const useAdditionalFeatures = (stepEightData: Ref<StepEight>) => {
   const selected = computed(() => 
-    getSelectedFeatures(stepEightData.value?.property?.additionalFeatures, additionalFeaturesOptions)
+    stepEightData.value?.property?.additionalFeatures?.features || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: BuildingFeature[]) => {
     if (!stepEightData.value?.property?.additionalFeatures) return;
-    updateFeatures(stepEightData.value.property.additionalFeatures, selectedFeatures, additionalFeaturesOptions);
+    stepEightData.value.property.additionalFeatures.features = selectedFeatures;
   };
 
   return { selected, update };
@@ -204,12 +159,12 @@ export const useAdditionalFeatures = (stepEightData: Ref<StepEight>) => {
  */
 export const useParking = (stepEightData: Ref<StepEight>) => {
   const selected = computed(() => 
-    getSelectedFeatures(stepEightData.value?.property?.parking, parkingOptions)
+    stepEightData.value?.property?.parking?.features || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: ParkingFeature[]) => {
     if (!stepEightData.value?.property?.parking) return;
-    updateFeatures(stepEightData.value.property.parking, selectedFeatures, parkingOptions);
+    stepEightData.value.property.parking.features = selectedFeatures;
   };
 
   return { selected, update };
@@ -220,12 +175,12 @@ export const useParking = (stepEightData: Ref<StepEight>) => {
  */
 export const useSecurity = (stepEightData: Ref<StepEight>) => {
   const selected = computed(() => 
-    getSelectedFeatures(stepEightData.value?.property?.securityFeatures, securityOptions)
+    stepEightData.value?.property?.securityFeatures?.features || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: SecurityFeature[]) => {
     if (!stepEightData.value?.property?.securityFeatures) return;
-    updateFeatures(stepEightData.value.property.securityFeatures, selectedFeatures, securityOptions);
+    stepEightData.value.property.securityFeatures.features = selectedFeatures;
   };
 
   return { selected, update };
@@ -236,12 +191,12 @@ export const useSecurity = (stepEightData: Ref<StepEight>) => {
  */
 export const useAccessibility = (stepEightData: Ref<StepEight>) => {
   const selected = computed(() => 
-    getSelectedFeatures(stepEightData.value?.property?.accessibilityFeatures, accessibilityOptions)
+    stepEightData.value?.property?.accessibilityFeatures?.features || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: AccessibilityFeature[]) => {
     if (!stepEightData.value?.property?.accessibilityFeatures) return;
-    updateFeatures(stepEightData.value.property.accessibilityFeatures, selectedFeatures, accessibilityOptions);
+    stepEightData.value.property.accessibilityFeatures.features = selectedFeatures;
   };
 
   return { selected, update };
@@ -252,12 +207,12 @@ export const useAccessibility = (stepEightData: Ref<StepEight>) => {
  */
 export const useStorageFeatures = (stepEightData: Ref<StepEight>) => {
   const selected = computed(() => 
-    getSelectedFeatures(stepEightData.value?.property?.storageFeatures, storageOptions)
+    stepEightData.value?.property?.storageFeatures?.features || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: StorageFeature[]) => {
     if (!stepEightData.value?.property?.storageFeatures) return;
-    updateFeatures(stepEightData.value.property.storageFeatures, selectedFeatures, storageOptions);
+    stepEightData.value.property.storageFeatures.features = selectedFeatures;
   };
 
   return { selected, update };
@@ -268,12 +223,12 @@ export const useStorageFeatures = (stepEightData: Ref<StepEight>) => {
  */
 export const useUtilityRoomFeatures = (stepEightData: Ref<StepEight>) => {
   const selected = computed(() => 
-    getSelectedFeatures(stepEightData.value?.property?.utility, utilityRoomOptions)
+    stepEightData.value?.property?.utility?.features || []
   );
 
-  const update = (selectedFeatures: string[]) => {
+  const update = (selectedFeatures: UtilityFeature[]) => {
     if (!stepEightData.value?.property?.utility) return;
-    updateFeatures(stepEightData.value.property.utility, selectedFeatures, utilityRoomOptions);
+    stepEightData.value.property.utility.features = selectedFeatures;
   };
 
   return { selected, update };

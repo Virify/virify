@@ -14,6 +14,7 @@
         <div class="m-card-premium__grid-row">
           <MoleculesCardSlotsViewLink :property-id>
             <MoleculesCardSlotsPrice :price :price-guide />
+            <!-- TODO: Oli fix your damn types -->
             <MoleculesCardSlotsOverview :property-type :full-address />
             <MoleculesCardSlotsIcons :room-counts />
           </MoleculesCardSlotsViewLink>

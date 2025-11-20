@@ -1,12 +1,12 @@
-generator ppdClient {
-  provider        = "prisma-client"
-  output          = "./generated/"
-  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
+// This file is a Prisma schema fragment for the PPD models.
+// The datasource name is preserved so this model can be used with a separate database.
+datasource ppdDb {
+  provider = "postgresql"
 }
 
-datasource ppdDb {
-  provider   = "postgresql"
-  url        = env("PPD_DATABASE_URL")
+generator client {
+  provider      = "prisma-client"
+  output        = "./generated/"
 }
 
 model PricePaid {

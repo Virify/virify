@@ -48,20 +48,11 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Computed property to filter only TRUE boolean features and convert to readable strings
+// Computed property to convert feature enum array to readable strings
 const filteredFeatures = computed(() => {
-  if (!props.features || typeof props.features !== 'object') return [];
+  if (!props.features?.features?.length) return [];
 
-  const features: string[] = [];
-
-  Object.entries(props.features).forEach(([key, value]) => {
-    // Skip non-boolean properties or specific properties we handle separately
-    if (typeof value === 'boolean' && value === true && key !== 'description' && key !== 'size') {
-      features.push(convertRoomEnumToString(key));
-    }
-  });
-
-  return features;
+  return props.features.features.map((feature: string) => convertEnumToString(feature));
 });
 
 // Collapse state - open by default

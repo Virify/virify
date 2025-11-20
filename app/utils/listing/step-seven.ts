@@ -1,4 +1,4 @@
-import { GardenFacing, GardenPosition } from "~~/layers/database/server/database/prisma/generated/enums";
+import { GardenFacing, GardenPosition, OutdoorSpaceFeature, LandFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
  * Create initial values for step seven based on the draft listing
@@ -31,16 +31,8 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
           facing: (y.facing || '0') as any,
         })),
         land: lands,
-        // OutdoorSpace boolean features
-        sunTerrace: outdoorSpace?.sunTerrace || false,
-        terrace: outdoorSpace?.terrace || false,
-        balcony: outdoorSpace?.balcony || false,
-        patio: outdoorSpace?.patio || false,
-        separateParcel: outdoorSpace?.separateParcel || false,
-        shed: outdoorSpace?.shed || false,
-        summerHouse: outdoorSpace?.summerHouse || false,
-        gardenOffice: outdoorSpace?.gardenOffice || false,
-        pool: outdoorSpace?.pool || false,
+        // OutdoorSpace features array
+        features: outdoorSpace?.features || [],
       }
     }
   };
@@ -73,62 +65,39 @@ export const gardenPositionOptions = [
 /**
  * Garden features options for checkbox selection
  */
-export const gardenFeaturesOptions = [
-  { value: "sunTerrace", key: "Sun Terrace", info: "Garden has a sun terrace" },
-  { value: "terrace", key: "Terrace", info: "Garden has a terrace" },
-  { value: "balcony", key: "Balcony", info: "Garden has balcony access" },
-  { value: "patio", key: "Patio", info: "Garden has a patio" },
-  { value: "shed", key: "Shed", info: "Garden includes a shed" },
-  { value: "summerHouse", key: "Summer House", info: "Garden has a summer house" },
-  { value: "gardenOffice", key: "Garden Office", info: "Garden includes an office" },
-  { value: "pool", key: "Pool", info: "Garden has a swimming pool" },
-  { value: "separateParcel", key: "Separate Parcel", info: "Garden is on a separate parcel" },
-];
+export const gardenFeaturesOptions = Object.values(OutdoorSpaceFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Garden ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Yard features options for checkbox selection (same as garden features)
  */
-export const yardFeaturesOptions = [
-  { value: "sunTerrace", key: "Sun Terrace", info: "Yard has a sun terrace" },
-  { value: "terrace", key: "Terrace", info: "Yard has a terrace" },
-  { value: "balcony", key: "Balcony", info: "Yard has balcony access" },
-  { value: "patio", key: "Patio", info: "Yard has a patio" },
-  { value: "shed", key: "Shed", info: "Yard includes a shed" },
-  { value: "summerHouse", key: "Summer House", info: "Yard has a summer house" },
-  { value: "gardenOffice", key: "Garden Office", info: "Yard includes an office" },
-  { value: "pool", key: "Pool", info: "Yard has a swimming pool" },
-  { value: "separateParcel", key: "Separate Parcel", info: "Yard is on a separate parcel" },
-];
+export const yardFeaturesOptions = Object.values(OutdoorSpaceFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Yard ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Outdoor space features options for checkbox selection
  * These are general features that apply to the entire outdoor space
  */
-export const outdoorSpaceFeaturesOptions = [
-  { value: "sunTerrace", key: "Sun Terrace", info: "Outdoor space has a sun terrace" },
-  { value: "terrace", key: "Terrace", info: "Outdoor space has a terrace" },
-  { value: "balcony", key: "Balcony", info: "Outdoor space has balcony access" },
-  { value: "patio", key: "Patio", info: "Outdoor space has a patio" },
-  { value: "shed", key: "Shed", info: "Outdoor space includes a shed" },
-  { value: "summerHouse", key: "Summer House", info: "Outdoor space has a summer house" },
-  { value: "gardenOffice", key: "Garden Office", info: "Outdoor space includes an office" },
-  { value: "pool", key: "Pool", info: "Outdoor space has a swimming pool" },
-  { value: "separateParcel", key: "Separate Parcel", info: "Outdoor space is on a separate parcel" },
-];
+export const outdoorSpaceFeaturesOptions = Object.values(OutdoorSpaceFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Outdoor space ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Land features options for checkbox selection
  */
-export const landFeaturesOptions = [
-  { value: "woodland", key: "Woodland", info: "Land includes woodland area" },
-  { value: "paddock", key: "Paddock", info: "Land has a paddock" },
-  { value: "stables", key: "Stables", info: "Land includes stables" },
-  { value: "tennisCourt", key: "Tennis Court", info: "Land has a tennis court" },
-  { value: "orchard", key: "Orchard", info: "Land includes an orchard" },
-  { value: "pond", key: "Pond", info: "Land has a pond" },
-  { value: "outbuilding", key: "Outbuilding", info: "Land includes outbuildings" },
-  { value: "separateParcel", key: "Separate Parcel", info: "Land is on a separate parcel" },
-];
+export const landFeaturesOptions = Object.values(LandFeature).map((feature) => ({
+  value: feature,
+  key: convertEnumToCapalizedString(feature),
+  info: `Land ${convertEnumToCapalizedString(feature).toLowerCase()}`
+}));
 
 /**
  * Step Seven Validation Helpers

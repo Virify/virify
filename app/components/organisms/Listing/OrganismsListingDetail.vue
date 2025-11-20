@@ -71,23 +71,23 @@
           <div v-if="hasAdditionalDetails" class="p-listing__section">
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-grid">
-              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.parking)" title="Parking"
+              <MoleculesListingFeatures v-if="property?.parking?.features?.length" title="Parking"
                 :features="property?.parking" />
-              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.utility)" title="Utility"
+              <MoleculesListingFeatures v-if="property?.utility?.features?.length" title="Utility"
                 :features="property?.utility" />
-              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.storageFeatures)" title="Storage"
+              <MoleculesListingFeatures v-if="property?.storageFeatures?.features?.length" title="Storage"
                 :features="property?.storageFeatures" />
               <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities?.broadbandType"
                 :broadband-type="property.energyAndUtilities.broadbandType"
                 :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
                 :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
-              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.additionalFeatures)"
+              <MoleculesListingFeatures v-if="property?.additionalFeatures?.features?.length"
                 title="Additional Features" :features="property?.additionalFeatures" />
-              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.accessibilityFeatures)"
+              <MoleculesListingFeatures v-if="property?.accessibilityFeatures?.features?.length"
                 title="Accessibility" :features="property?.accessibilityFeatures" />
-              <MoleculesListingFeatures v-if="hasBooleanFeatures(property?.securityFeatures)" title="Security"
+              <MoleculesListingFeatures v-if="property?.securityFeatures?.features?.length" title="Security"
                 :features="property?.securityFeatures" />
-              <MoleculesListingEnergyInfo v-if="filterListingFeatures(property?.energyAndUtilities)"
+              <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities"
                 title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
               <MoleculesListingMobileCoverage />
             </div>
@@ -267,14 +267,14 @@ const hasAdditionalDetails = computed(() => {
   if (!prop) return false;
 
   return (
-    hasBooleanFeatures(prop.parking) ||
-    hasBooleanFeatures(prop.utility) ||
-    hasBooleanFeatures(prop.storageFeatures) ||
+    prop.parking?.features?.length ||
+    prop.utility?.features?.length ||
+    prop.storageFeatures?.features?.length ||
     prop.energyAndUtilities?.broadbandType ||
-    hasBooleanFeatures(prop.additionalFeatures) ||
-    hasBooleanFeatures(prop.accessibilityFeatures) ||
-    hasBooleanFeatures(prop.securityFeatures) ||
-    filterListingFeatures(prop.energyAndUtilities)
+    prop.additionalFeatures?.features?.length ||
+    prop.accessibilityFeatures?.features?.length ||
+    prop.securityFeatures?.features?.length ||
+    prop.energyAndUtilities
   );
 });
 

@@ -105,19 +105,19 @@ const description = computed(() => {
 
 // Format helper functions
 const formatHeatingType = (type: string): string => {
-  return convertRoomEnumToString(type);
+  return convertEnumToString(type);
 };
 
 const formatBoilerType = (type: string): string => {
-  return convertRoomEnumToString(type);
+  return convertEnumToString(type);
 };
 
 const formatHotWaterSource = (source: string): string => {
-  return convertRoomEnumToString(source);
+  return convertEnumToString(source);
 };
 
 const formatUtility = (utility: string): string => {
-  return convertRoomEnumToString(utility);
+  return convertEnumToString(utility);
 };
 </script>
 

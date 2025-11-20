@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 interface Props {
-  list: { label: string, value: boolean }[]
+  list: { label: string, value: string | boolean }[]
 }
 
 defineProps<Props>()
