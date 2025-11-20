@@ -58,7 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  *  Check variants
  */
-const isFeatured = computed(() => props.variant === 'basic')
+const isFeatured = computed(() => props.variant !== 'basic')
 const isPremium = computed(() => props.variant === 'premium')
 const isBasic = computed(() => !isFeatured.value && !isPremium.value)
 
