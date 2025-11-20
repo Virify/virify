@@ -10,6 +10,7 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
   const gardens = outdoorSpace?.garden || [];
   const yards = outdoorSpace?.yard || [];
   const lands = outdoorSpace?.land || [];
+  
 
   return {
     property: {
@@ -19,7 +20,6 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
         hasGarden: gardens.length > 0,
         hasYard: yards.length > 0,
         hasLand: lands.length > 0,
-        // Convert null position/facing to '0' for select dropdowns (like yearBuilt in Step 2)
         garden: gardens.map(g => ({
           ...g,
           position: (g.position || '0') as any,
@@ -31,8 +31,8 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
           facing: (y.facing || '0') as any,
         })),
         land: lands,
-        // OutdoorSpace features array
-        features: outdoorSpace?.features || [],
+        // OutdoorSpace features (very compact): include POOL if any garden/yard has it
+        features: ((b => (b.includes(OutdoorSpaceFeature.POOL) || !(gardens.some(g => g.features?.includes(OutdoorSpaceFeature.POOL)) || yards.some(y => y.features?.includes(OutdoorSpaceFeature.POOL)))) ? b : [...b, OutdoorSpaceFeature.POOL])(outdoorSpace?.features ?? [])),
       }
     }
   };
