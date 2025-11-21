@@ -1,4 +1,13 @@
 <template>
+  <AtomsAccountCardContainer>
+    <MoleculesListingAdvert
+      title="Ready to create a listing?"
+      description="Save time and know what you need up-front to create a listing. Please check out our guide on what you need to know before you start creating a listing."
+      linkText="What you need to know"
+      link="/guides/property-information"
+      :showNote="false"
+    />
+  </AtomsAccountCardContainer>
   <OrganismsAccountCreateListingHero />
   <AtomsAccountCardContainer>
     <ClientOnly>
