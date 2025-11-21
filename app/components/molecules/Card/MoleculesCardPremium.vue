@@ -14,14 +14,13 @@
         <div class="m-card-premium__grid-row">
           <MoleculesCardSlotsViewLink :property-id>
             <MoleculesCardSlotsPrice :price :price-guide />
-            <!-- TODO: Oli fix your damn types -->
             <MoleculesCardSlotsOverview :property-type :full-address />
             <MoleculesCardSlotsIcons :room-counts />
           </MoleculesCardSlotsViewLink>
 
           <MoleculesCardSlotsPills v-if="pills.length" :pills />
 
-          <MoleculesCardSlotsDescription v-if="description" :description />
+          <MoleculesCardSlotsDescription v-if="description" :description="result.property.description" />
         </div>
 
         <div class="m-card-premium__grid-row">

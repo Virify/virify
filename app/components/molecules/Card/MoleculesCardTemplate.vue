@@ -150,7 +150,7 @@ const pills = computed(() => {
 })
 
 const description = computed(() => {
-  const { description = '--' } = asObject(props.result)
+  const { description = '--' } = asObject(props.result.property.description)
 
   return description
 })

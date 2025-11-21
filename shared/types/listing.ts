@@ -1,4 +1,4 @@
-import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import type { Address, Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 import type { SaleAvailabilityStatus, RentalAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
 import type { MapMarker } from "~~/shared/types/map";
 import type { DraftListingWithFullPayload } from "~~/shared/types/draft";
@@ -82,7 +82,7 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
 
 export type ListingCardData = Omit<ListingWithFullProperty, 'property' | 'user'> & {
   property: NonNullable<ListingWithFullProperty['property']> & {
-    address: NonNullable<ListingWithFullProperty['property']>['address'];
+    address: Address;
     type: NonNullable<ListingWithFullProperty['property']>['type'];
     classification: NonNullable<ListingWithFullProperty['property']>['classification'];
   };
