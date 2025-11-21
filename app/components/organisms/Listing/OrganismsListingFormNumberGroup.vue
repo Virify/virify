@@ -20,7 +20,7 @@
         :step="step"
         inputmode="decimal"
         :name="name"
-        :modelValue="modelValue || undefined"
+        :modelValue="modelValue ?? undefined"
         :placeholder="placeholder || 'Enter ' + title.toLowerCase()"
         :required="required"
         :disabled="disabled"
@@ -55,7 +55,8 @@ defineProps<Props>()
 const emit = defineEmits(['update:modelValue'])
 
 function handleUpdateModel(val: any) {
-  emit('update:modelValue', val ? parseFloat(val) : null)
+  // Handle empty string or null/undefined as null, but allow 0
+  emit('update:modelValue', val === '' || val === null || val === undefined ? null : parseFloat(val))
 }
 
 
