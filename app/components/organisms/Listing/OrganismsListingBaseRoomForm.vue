@@ -104,6 +104,7 @@
   &__add-item {
     display: flex;
     justify-content: center;
+    padding-top: var(--size-8);
   }
 }
 </style>
