@@ -29,7 +29,10 @@
       </div>
 
       <div class="v-ownership__actions">
-        <button type="submit" class="button button-sm button-tertiary">Submit</button>
+        <button type="submit" class="button button-sm button-tertiary" :disabled="isLoading">
+          <span v-if="!isLoading">Submit</span>
+          <span v-else>Uploading...</span>
+        </button>
       </div>
     </MoleculesForm>
   </div>
@@ -40,19 +43,15 @@ import type { AddressCreateWithoutUserInput } from '~~/layers/database/server/da
 
 const selectedFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+const isLoading = ref(false);
 
-defineProps({
-  successMessage: {
-    type: String,
-    default: "",
-  },
-  fromProtectedPage: {
-    type: Boolean,
-    default: false,
+const props = defineProps({
+  tier: {
+    type: Object as () => TierOption,
+    required: true,
   },
 })
 
-const { fetch } = useUserSession();
 const { hideDialog } = useDialog();
 
 const hasSelectedAddress = ref(false);
@@ -119,16 +118,25 @@ async function submitForm() {
   if(!validateAddress()) return;
   if(!selectedFile.value) return;
   
-  const formData = new FormData();
-  formData.append('file', selectedFile.value);
-  formData.append('address', JSON.stringify(address.value));
+  isLoading.value = true;
   
-  const response = await $fetch('/api/verification/', {
-    method: 'POST',
-    body: formData
-  })
-  
-  console.log('Upload response:', response);
+  try {
+    const formData = new FormData();
+    formData.append('file', selectedFile.value);
+    formData.append('address', JSON.stringify(address.value));
+    formData.append('tier', JSON.stringify(props.tier));
+    
+    const response = await useRequestFetch()('/api/verification/', {
+      method: 'POST',
+      body: formData
+    });
+    console.log('Verification submission response:', response);
+    hideDialog();
+  } catch (error) {
+    console.error('Error submitting verification:', error);
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
 <style lang="scss">

@@ -4,32 +4,37 @@ const verificationSchema = z.object({
   file: z.instanceof(File).refine((file) => file.size > 0 && file.size < 10 * 1024 * 1024, {
     message: 'File must be between 0 and 10MB',
   }),
-  address: z.string().transform((str) => JSON.parse(str)).pipe(
-    z.object({
-      number: z.string().nullable(),
-      flat: z.string().nullable(),
-      name: z.string().nullable(),
-      locality: z.string().nullable(),
-      district: z.string().nullable(),
-      street: z.string(),
-      city: z.string(),
-      county: z.string().nullable(),
-      postcode: z.string(),
-      country: z.string().nullable(),
-      fullAddress: z.string().nullable(),
-      lat: z.number(),
-      lon: z.number(),
-    })
-  ),
+  address: z.string().transform((str) => JSON.parse(str)).pipe(z.object({
+    number: z.string().nullable(),
+    flat: z.string().nullable(),
+    name: z.string().nullable(),
+    locality: z.string().nullable(),
+    district: z.string().nullable(),
+    street: z.string(),
+    city: z.string(),
+    county: z.string().nullable(),
+    postcode: z.string(),
+    country: z.string().nullable(),
+    fullAddress: z.string().nullable(),
+    lat: z.number(),
+    lon: z.number(),
+  })),
+  tier: z.string().transform((str) => JSON.parse(str)).pipe(z.object({
+    tier: z.string(),
+    price: z.number(),
+    rank: z.number(),
+  })),
 });
 
 export default defineEventHandler(async (event) => {
+  const { user } = await requireUserSession(event);
   try {
     const formData = await readFormData(event);
     
-    const { file, address } = verificationSchema.parse({
+    const { file, address, tier } = verificationSchema.parse({
       file: formData.get('file'),
       address: formData.get('address'),
+      tier: formData.get('tier'),
     });
 
     // Generate unique filename
@@ -51,6 +56,8 @@ export default defineEventHandler(async (event) => {
 
     return {
       message: 'File uploaded successfully',
+      tier,
+      address,
       response,
     }
   } catch (error) {

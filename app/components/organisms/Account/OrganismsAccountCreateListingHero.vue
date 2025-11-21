@@ -68,7 +68,7 @@ function showTierConfirmation(tier: TierOption) {
             // TODO: Create a verification flow involving uploading a deeds document and creating an address
             // After the deed is uploaded and address created, send an email to validate ownership
             // After the email is validated, allow the user to proceed with listing creation
-            verifyOwnershipDialog();
+            verifyOwnershipDialog(returnValue.tier);
             // Navigate directly to the stepper instead of the dashboard
             // navigateTo(`/account/create-listing/${draftId}`);
           } catch (error) {
@@ -115,11 +115,11 @@ function showPaymentDialog(tier: TierOption) {
   });
 }
 
-function verifyOwnershipDialog() {
+function verifyOwnershipDialog(tier: TierOption) {
   showDialog({
     component: ViewsDialogPropertyOwnership,
     props: {
-      successMessage: "To proceed with listing creation, please verify your property ownership by uploading the necessary documents.",
+      tier: tier,
     },
     onClose: () => {
       // Navigate directly to the stepper instead of the dashboard
