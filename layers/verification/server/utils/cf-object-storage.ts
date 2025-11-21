@@ -4,6 +4,9 @@ import {
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
 
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { get } from "@vueuse/core";
+
 const s3 =  new S3Client({
   region: "auto",
   endpoint: process.env.CF_R2_BUCKET,
@@ -27,7 +30,14 @@ export const addVerificationObjectToR2 = async (key: string, body: Buffer | Uint
   });
 
   try {
-    return await s3.send(putCommand);
+    // upload
+    await s3.send(putCommand);
+    // Generate presigned URL
+    const url = await getSignedUrlForVerificationObject(key);
+    return {
+      key,
+      url,
+    }
   } catch (error) {
     console.error(`Error uploading object ${key} to R2:`, error);
     throw error;
@@ -53,3 +63,17 @@ export const getVerificationObjectFromR2 = async (key: string) => {
     throw error;
   }
 }
+
+export const getSignedUrlForVerificationObject = async (key: string) => {
+  try {
+    const signedUrl = await getSignedUrl(s3, new GetObjectCommand({
+      Bucket: 'verification',
+      Key: key,
+    }), { expiresIn: 604800 }); // 1 week (7 days * 24 hours * 60 minutes * 60 seconds)
+
+    return signedUrl;
+  } catch (error) {
+    console.error(`Error generating signed URL for object ${key} from R2:`, error);
+    throw error;
+  }
+};

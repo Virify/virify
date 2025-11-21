@@ -1,29 +1,36 @@
 import * as z from 'zod';
 
-const verificationFileSchema = z.object({
-  file: z.instanceof(File).refine((file) => file.size > 0, {
-    message: 'File must not be empty',
+const verificationSchema = z.object({
+  file: z.instanceof(File).refine((file) => file.size > 0 && file.size < 10 * 1024 * 1024, {
+    message: 'File must be between 0 and 10MB',
   }),
-  address: z.object({
-    number: z.string().nullable(),
-    flat: z.string().nullable(),
-    name: z.string().nullable(),
-    locality: z.string().nullable(),
-    district: z.string().nullable(),
-    street: z.string(),
-    city: z.string(),
-    county: z.string().nullable(),
-    postcode: z.string(),
-    country: z.string().nullable(),
-    fullAddress: z.string().nullable(),
-    lat: z.number(),
-    lon: z.number(),
-  }),
+  address: z.string().transform((str) => JSON.parse(str)).pipe(
+    z.object({
+      number: z.string().nullable(),
+      flat: z.string().nullable(),
+      name: z.string().nullable(),
+      locality: z.string().nullable(),
+      district: z.string().nullable(),
+      street: z.string(),
+      city: z.string(),
+      county: z.string().nullable(),
+      postcode: z.string(),
+      country: z.string().nullable(),
+      fullAddress: z.string().nullable(),
+      lat: z.number(),
+      lon: z.number(),
+    })
+  ),
 });
 
 export default defineEventHandler(async (event) => {
   try {
-    const { file, address } = await readValidatedBody(event, verificationFileSchema.parse);
+    const formData = await readFormData(event);
+    
+    const { file, address } = verificationSchema.parse({
+      file: formData.get('file'),
+      address: formData.get('address'),
+    });
 
     // Generate unique filename
     const timestamp = Date.now();
@@ -44,7 +51,6 @@ export default defineEventHandler(async (event) => {
 
     return {
       message: 'File uploaded successfully',
-      key,
       response,
     }
   } catch (error) {

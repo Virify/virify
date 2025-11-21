@@ -103,7 +103,6 @@ const initializeAutocomplete = async () => {
       css_style: 'inline',
       list_class: 'virify-address-dropdown',
       selected: (address: any) => {
-        console.log('Address selected:', address);
         // Parse the address from getaddress.io format
         const parsedAddress: AddressParsed = {
           number: address.building_number || address.sub_building_number,
@@ -128,15 +127,12 @@ const initializeAutocomplete = async () => {
         emit('address-selected', parsedAddress);
       },
       suggested: (suggestions: any[]) => {
-        console.log('Suggestions:', suggestions);
         error.value = null;
       },
       selected_failed: (status: number, message: string) => {
-        console.error('Address selection failed:', status, message);
         error.value = message || 'Failed to select address';
       },
       suggested_failed: (status: number, message: string) => {
-        console.error('Address suggestions failed:', status, message);
         error.value = message || 'Failed to get address suggestions';
       }
     });
@@ -144,7 +140,6 @@ const initializeAutocomplete = async () => {
     isInitialized.value = true;
     
   } catch (err) {
-    console.error('Failed to initialize address autocomplete:', err);
     error.value = 'Failed to initialize address search';
   }
 };

@@ -116,15 +116,19 @@ function validateAddress() {
 }
 
 async function submitForm() {
-  const formData = new FormData();
   if(!validateAddress()) return;
+  if(!selectedFile.value) return;
+  
+  const formData = new FormData();
+  formData.append('file', selectedFile.value);
   formData.append('address', JSON.stringify(address.value));
-  formData.append('file', selectedFile.value!);
   
   const response = await $fetch('/api/verification/', {
     method: 'POST',
     body: formData
   })
+  
+  console.log('Upload response:', response);
 }
 </script>
 <style lang="scss">
