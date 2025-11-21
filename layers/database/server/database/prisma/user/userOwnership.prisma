@@ -1,0 +1,12 @@
+model UserOwnership {
+  id                Int           @id @default(autoincrement())
+  verificationId    Int           @unique
+  verification      Verification  @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  ownershipDocument String[]
+  draftListingId    Int?          @unique
+  draftListing      DraftListing? @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
+  listingId         Int?          @unique
+  listing           Listing?      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}

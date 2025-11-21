@@ -99,6 +99,9 @@ const initializeAutocomplete = async () => {
       enable_history: false,
       full_length:true,
       mobile_friendly: true,
+      enable_repositioning:true,
+      css_style: 'inline',
+      list_class: 'virify-address-dropdown',
       selected: (address: any) => {
         console.log('Address selected:', address);
         // Parse the address from getaddress.io format
@@ -119,7 +122,7 @@ const initializeAutocomplete = async () => {
         };
         // Reflect the selected address in the input
         if (parsedAddress.fullAddress) {
-          query.value = parsedAddress.fullAddress;
+          query.value = parsedAddress.fullAddress + ', ' + parsedAddress.postcode;
         }
         
         emit('address-selected', parsedAddress);
@@ -195,11 +198,34 @@ onUnmounted(() => {
     color: var(--error);
   }
 
+  // Custom CSS variables for getaddress.io autocomplete
   & {
     --ga-autocomplete-list-max-height: 20em;
     --ga-autocomplete-list-font-size: var(--font-sm);
     --ga-autocomplete-list-background-color: var(--background-200);
   } 
+}
+
+// Global override to ensure autocomplete list escapes dialog overflow constraints
+:global(.virify-address-dropdown) {
+  position: fixed !important;
+  z-index: 10000 !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  background: var(--background-200) !important;
+  border: 1px solid var(--border-100) !important;
+  border-radius: var(--border-radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+:global(.virify-address-dropdown div) {
+  padding: var(--size-12) var(--size-16) !important;
+  cursor: pointer !important;
+  font-size: var(--font-sm) !important;
+  
+  &:hover {
+    background: var(--background-300) !important;
+  }
 }
 
 </style>

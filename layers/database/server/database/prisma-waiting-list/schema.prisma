@@ -5,8 +5,8 @@ datasource waitingListDb {
 }
 
 generator client {
-  provider      = "prisma-client"
-  output        = "./generated/"
+  provider = "prisma-client"
+  output   = "./generated/"
 }
 
 model WaitingList {

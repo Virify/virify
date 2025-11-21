@@ -27,6 +27,7 @@ model Listing {
   UserNote             UserNote[]
   archived             Boolean                @default(false)
   archivedAt           DateTime?
+  userOwnership        UserOwnership?
 
   @@index([userId])
   @@index([propertyId])

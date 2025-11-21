@@ -160,6 +160,11 @@ watch(useRoute(), close)
   }
 }
 
+// Allow specific dialogs to have visible overflow for autocomplete dropdowns
+:where(.o-dialog-window:has(.dialog-overflow-visible)) {
+  overflow: visible;
+}
+
 :where(.o-dialog-window > *) {
   max-width: 100%;
 }

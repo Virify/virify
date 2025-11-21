@@ -11,6 +11,9 @@
     "pgen": "prisma generate --config=./layers/database/server/database/prisma/prisma.config.ts",
     "pgen:ppd": "prisma generate --config=./layers/database/server/database/prisma-ppd/prisma.config.ts",
     "pgen:waiting-list": "prisma generate --config=./layers/database/server/database/prisma-waiting-list/prisma.config.ts",
+    "format": "prisma format --config=./layers/database/server/database/prisma/prisma.config.ts",
+    "format:ppd": "prisma format --config=./layers/database/server/database/prisma-ppd/prisma.config.ts",
+    "format:waiting-list": "prisma format --config=./layers/database/server/database/prisma-waiting-list/prisma.config.ts",
     "migrate-reset": "prisma migrate reset",
     "migrate-reset:ppd": "prisma migrate reset --config=./layers/database/server/database/prisma-ppd/prisma.config.ts",
     "migrate-reset:waiting-list": "prisma migrate reset --config=./layers/database/server/database/prisma-waiting-list/prisma.config.ts",
@@ -34,6 +37,7 @@
     "schema": "./layers/database/server/database/prisma/"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.937.0",
     "@aws-sdk/client-ses": "^3.936.0",
     "@getaddress/autocomplete": "^3.1.6",
     "@mapbox/mapbox-gl-draw": "^1.5.1",
@@ -62,6 +66,7 @@
     "nuxt-gtag": "3.0.2",
     "nuxt-security": "2.4.0",
     "openai": "^5.23.2",
+    "pdf-to-img": "^5.0.0",
     "pg": "^8.16.3",
     "pg-copy-streams": "^7.0.0",
     "prettier": "^3.6.2",

@@ -22,6 +22,7 @@
 <script setup lang="ts">
 import ViewsDialogTierConfirmation from "~/components/views/Dialog/ViewsDialogTierConfirmation.vue";
 import ViewsDialogPayment from "~/components/views/Dialog/ViewsDialogPayment.vue";
+import ViewsDialogPropertyOwnership from "~~/layers/verification/app/components/views/Dialog/ViewsDialogPropertyOwnership.vue";
 
 const { showDialog } = useDialog();
 const { isIncludedInMembership, requestMembershipUpgrade } = useUserMembership();
@@ -63,9 +64,13 @@ function showTierConfirmation(tier: TierOption) {
 
         if (returnValue.action === 'create' && returnValue.tier) {
           try {
-            const draftId = await createDraftListing(returnValue.tier);
+            // const draftId = await createDraftListing(returnValue.tier);
+            // TODO: Create a vertification flow involving uploading a deeds document and creating an address
+            // After the deed is uploaded and address created, send an email to validate ownership
+            // After the email is validated, allow the user to proceed with listing creation
+            verifyOwnershipDialog();
             // Navigate directly to the stepper instead of the dashboard
-            navigateTo(`/account/create-listing/${draftId}`);
+            // navigateTo(`/account/create-listing/${draftId}`);
           } catch (error) {
             // Error already handled in createDraftListing
             console.error('Failed to create draft listing:', error);
@@ -106,6 +111,19 @@ function showPaymentDialog(tier: TierOption) {
       } else if (returnValue?.cancelled) {
         showTierConfirmation(tier);
       }
+    },
+  });
+}
+
+function verifyOwnershipDialog() {
+  showDialog({
+    component: ViewsDialogPropertyOwnership,
+    props: {
+      successMessage: "To proceed with listing creation, please verify your property ownership by uploading the necessary documents.",
+    },
+    onClose: () => {
+      // Navigate directly to the stepper instead of the dashboard
+      // navigateTo(`/account/create-listing/${draftId}`);
     },
   });
 }
