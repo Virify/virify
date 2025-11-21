@@ -1,3 +1,4 @@
+import type { RunningCosts } from "~~/layers/database/server/database/prisma/generated/client";
 import { 
   BoilerType, 
   EPCRating, 
@@ -20,7 +21,7 @@ export const createInitialStepNineValues = (listing: EditableListing): StepNine 
     hotWaterSource: listing.property.energyAndUtilities.hotWaterSource ?? null,
   } : {
     description: null,
-    epcRating: EPCRating.UNKNOWN,
+    epcRating: EPCRating.G,
     epcCertificateUrl: null,
     primaryHeatingType: [] as HeatingType[],
     secondaryHeatingType: [] as HeatingType[],
@@ -58,8 +59,8 @@ export const createInitialStepNineValues = (listing: EditableListing): StepNine 
  */
 export const epcRatingOptions = Object.values(EPCRating).map((rating) => ({
   value: rating,
-  key: rating === 'UNKNOWN' ? 'Unknown/NA' : rating,
-  info: rating === 'UNKNOWN' ? 'EPC Rating not known or not available' : `Energy Performance Certificate rating ${rating}`
+  key: rating,
+  info: `Energy Performance Certificate rating ${rating}`
 }));
 
 /**
@@ -119,8 +120,7 @@ export const councilTaxBandOptions = [
   { value: 'F', key: 'Band F', info: 'Council Tax Band F' },
   { value: 'G', key: 'Band G', info: 'Council Tax Band G' },
   { value: 'H', key: 'Band H', info: 'Council Tax Band H (highest)' },
-  { value: 'U', key: 'Unknown', info: 'Council Tax Band Unknown' },
-  { value: 'N/A', key: 'Not Applicable', info: 'Council Tax Band Not Applicable' },
+  { value: 'U', key: 'Unknown', info: 'Council Tax Band Unknown' }
 ];
 
 // Components bind directly to `stepNineData.property.energyAndUtilities.*` and
@@ -144,7 +144,7 @@ export const stepNineValidation = {
    * @param runningCosts Running costs data
    * @returns True if councilTaxBand is provided (required field)
    */
-  areRunningCostsValid: (runningCosts: any): boolean => {
+  areRunningCostsValid: (runningCosts: RunningCosts): boolean => {
     return !!runningCosts?.councilTaxBand;
   },
 
@@ -157,7 +157,7 @@ export const stepNineValidation = {
   isStepNineValid: (data: globalThis.StepNine, draft: DraftListingWithFullPayload): boolean => {
     if (!data.property?.energyAndUtilities || !data.property?.runningCosts) return false;
     return stepNineValidation.areEnergyAndUtilitiesValid(data.property.energyAndUtilities) &&
-           stepNineValidation.areRunningCostsValid(data.property.runningCosts);
+           stepNineValidation.areRunningCostsValid(data.property.runningCosts as RunningCosts);
   },
 
   /**

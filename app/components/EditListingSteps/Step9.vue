@@ -44,24 +44,9 @@
         :required="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Energy Performance Certificate rating from A (most efficient) to G (least efficient)'
-          ]" />
+          <p>See our <NuxtLink to="/guides/property-information/energy-performance-certificate" target="_blank" rel="noopener" class="link">Energy Performance Certificate (EPC)</NuxtLink> guide for more information.</p>
         </template>
       </OrganismsListingFormSelectGroup>
-
-      <!-- <OrganismsListingFormTextGroup
-        title="EPC Certificate URL"
-        v-model="(stepNineData.property.energyAndUtilities as any).epcCertificateUrl"
-        name="epc-certificate-url"
-        placeholder="https://..."
-      >
-        <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Link to the official EPC certificate document, if available online.'
-          ]" />
-        </template>
-      </OrganismsListingFormTextGroup> -->
 
       <OrganismsListingFormCheckboxGroup
         title="Primary Heating"
@@ -70,9 +55,7 @@
         name="primary-heating"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the main heating system(s) used to heat the property. You can select multiple if applicable.'
-          ]" />
+          <p>Leave unselected if not applicable.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
 
@@ -96,9 +79,7 @@
         name="boiler-type"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Optional - select the type of boiler installed in the property, or leave unselected if not applicable.'
-          ]" />
+          <p>Leave unselected if not applicable.</p>
         </template>
       </OrganismsListingFormRadioGroup>
 
@@ -109,9 +90,7 @@
         name="hot-water-source"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Optional - select the primary source of hot water for the property.'
-          ]" />
+          <p>Leave unselected if not applicable.</p>
         </template>
       </OrganismsListingFormRadioGroup>
 
@@ -161,13 +140,12 @@
         :required="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Council Tax Band determines the amount of council tax payable. Bands range from A (lowest) to H (highest) in England and Scotland, or A to I in Wales.'
-          ]" />
+          <p>For more information see our <NuxtLink to="/guides/property-information/council-tax-band" target="_blank" rel="noopener" class="link">Council Tax Band</NuxtLink> guide.</p>
         </template>
       </OrganismsListingFormSelectGroup>
 
       <OrganismsListingFormNumberGroup
+        v-if="draft.rentalListing || draft.saleListing?.tenureType === 'LEASEHOLD'"
         title="Service Charges (per annum)"
         v-model="(stepNineData.property.runningCosts as any).serviceCharges"
         name="service-charges"
@@ -176,13 +154,12 @@
         :step="1"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Annual service charges for maintenance of communal areas, building insurance, and shared facilities.'
-          ]" />
+          <p>For more information see our <NuxtLink to="/guides/property-information/ground-rent-and-service-charge" target="_blank" rel="noopener" class="link">Ground Rent & Service Charge</NuxtLink> guide.</p>
         </template>
       </OrganismsListingFormNumberGroup>
 
       <OrganismsListingFormNumberGroup
+        v-if="draft.rentalListing || draft.saleListing?.tenureType === 'LEASEHOLD'"
         title="Ground Rent (per annum)"
         v-model="(stepNineData.property.runningCosts as any).groundRent"
         name="ground-rent"
@@ -191,9 +168,7 @@
         :step="1"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Annual ground rent payment to the freeholder (typically applies to leasehold properties).'
-          ]" />
+          <p>For more information see our <NuxtLink to="/guides/property-information/ground-rent-and-service-charge" target="_blank" rel="noopener" class="link">Ground Rent & Service Charge</NuxtLink> guide.</p>
         </template>
       </OrganismsListingFormNumberGroup>
     </div>
