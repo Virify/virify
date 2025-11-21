@@ -29,7 +29,7 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   title: 'List your property with Virify!',
   description: 'Ready to sell or rent? Get your home in front of the right buyers and renters with Virify’s smart, modern platform.',
-  link: '#',
+  link: '/account/create-listing',
   linkText: 'List Your Property',
   note: 'Virify is designed for transparency and ease. Listing is quick, and you’re always in control.',
   showNote: false
