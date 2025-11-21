@@ -67,7 +67,6 @@
     "nuxt-gtag": "3.0.2",
     "nuxt-security": "2.4.0",
     "openai": "^5.23.2",
-    "pdf-to-img": "^5.0.0",
     "pg": "^8.16.3",
     "pg-copy-streams": "^7.0.0",
     "prettier": "^3.6.2",
