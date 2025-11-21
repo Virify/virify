@@ -88,22 +88,6 @@
               </template>
             </OrganismsListingFormTextGroup>
 
-            <!-- Bathroom Number -->
-            <OrganismsListingFormNumberGroup
-              title="Bathroom Number"
-              v-model="bathroom.roomNumber"
-              :name="`bathroom-${index}-number`"
-              placeholder="1"
-              :required="true"
-              :grid="true"
-              min="1"
-              step="1"
-            >
-              <template #tooltip-content>
-                <p>Assign a number to this bathroom (e.g. Bathroom 1, Bathroom 2) - This will help you keep track of the different bathrooms in your listing and be used to order them on your listing.</p>
-              </template>
-            </OrganismsListingFormNumberGroup>
-
             <!-- Floor -->
             <OrganismsListingFormSelectGroup
               title="Floor"
@@ -148,7 +132,7 @@
             <button
               type="button"
               @click="saveRoom(index)"
-              class="button button-sm button-secondary | body-sm"
+              class="button button-sm button-tertiary | body-sm"
               :disabled="!isRoomCompleted(bathroom) || !hasRoomChanges(index)"
             >
               {{ lastAddedRoomIndex === index ? 'Save Bathroom' : 'Save Changes' }}
@@ -173,7 +157,7 @@
       <button
         type="button"
         @click="addRoom"
-        class="button button-sm button-secondary | body-sm"
+        class="button button-sm button-tertiary | body-sm"
         :disabled="hasAnyRooms && addButtonDisabled"
       >
         {{ hasAnyRooms ? '+ Add Another Bathroom' : '+ Add Bathroom' }}

@@ -120,7 +120,7 @@
               <button
                 type="button"
                 @click="saveRoom(index)"
-                class="button button-sm button-secondary | body-sm"
+                class="button button-sm button-tertiary | body-sm"
                 :disabled="!isRoomCompleted(land) || !hasRoomChanges(index)"
               >
                 {{ lastAddedRoomIndex === index ? 'Save Land' : 'Save Changes' }}
@@ -144,7 +144,7 @@
       <button
         type="button"
         @click="addRoom"
-        class="button button-sm button-secondary | body-sm"
+        class="button button-sm button-tertiary | body-sm"
         :disabled="hasAnyRooms && addButtonDisabled"
       >
         {{ hasAnyRooms ? '+ Add Another Land Parcel' : '+ Add Land Parcel' }}

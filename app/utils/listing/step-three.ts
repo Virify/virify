@@ -7,7 +7,7 @@ import { RentalPriceType, SalePriceType } from "~~/layers/database/server/databa
  */
 export const createInitialStepThreeValues = (listing: EditableListing): StepThree => {
   return {
-    price: listing.price || null,
+    price: listing.price ?? null,
     ...(listing.rentalListing && {
       rentalListing: {
         deposit: listing.rentalListing.deposit ?? null,
@@ -82,7 +82,7 @@ export const stepThreeValidation = {
    * @returns True if all required fields are present
    */
   isStepThreeValid: (data: StepThree, draft: DraftListingWithFullPayload): boolean => {
-    if (!data.price) return false;
+    if (typeof data.price !== 'number' || data.price === null) return false;
     
     if (draft.rentalListing) {
       return stepThreeValidation.isRentalPriceValid(data.rentalListing);
@@ -101,7 +101,7 @@ export const stepThreeValidation = {
    * @returns True if draft has complete step three data
    */
   hasExistingStepThreeData: (listing: EditableListing): boolean => {
-    if (!listing.price) return false;
+    if (typeof listing.price !== 'number' || listing.price === null) return false;
     
     if (listing.rentalListing) {
       return stepThreeValidation.isRentalPriceValid(listing.rentalListing);

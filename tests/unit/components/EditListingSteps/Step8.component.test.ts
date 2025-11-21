@@ -33,7 +33,7 @@ describe("Step8 Component", () => {
     it("renders the component with correct title", async () => {
       const wrapper = await mountSuspended(Step8, { props: { draft: mockDraft } });
       expect(wrapper.exists()).toBe(true);
-      expect(wrapper.text()).toContain("Property Features");
+      expect(wrapper.text()).toContain("Additional Features");
     });
 
     it("renders additional features section", async () => {

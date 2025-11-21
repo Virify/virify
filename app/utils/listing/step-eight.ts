@@ -1,6 +1,4 @@
-import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from "~~/layers/database/server/database/prisma/generated/enums";
-
-/** TODO: CREATE PATCH AND MORE FEATURES */
+import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature, OutdoorSpaceFeature, OtherRoomType } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
  * Create initial values for step eight based on the draft listing
@@ -9,12 +7,31 @@ import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature,
  */
 export const createInitialStepEightValues = (listing: EditableListing): StepEight => ({
   property: {
-    additionalFeatures: listing.property?.additionalFeatures || {
-      description: null,
-      petFriendly: true,
-      features: [],
-      moveInDate: null,
-    },
+    additionalFeatures: (() => {
+      const existing = listing.property?.additionalFeatures || {
+        description: null,
+        petFriendly: true,
+        features: [] as BuildingFeature[],
+        moveInDate: null,
+      };
+
+      const outdoor = listing.property?.outdoorSpace;
+      const otherRooms = listing.property?.otherRoom ?? [];
+
+      const features = [...(existing.features ?? [])];
+
+      // If outdoor.features includes POOL, add BuildingFeature.POOL
+      if ((outdoor?.features ?? []).includes(OutdoorSpaceFeature.POOL) && !features.includes(BuildingFeature.POOL)) {
+        features.push(BuildingFeature.POOL);
+      }
+
+      // If any otherRoom has type GYM, add BuildingFeature.GYM
+      if (otherRooms.some((r: any) => r.type === OtherRoomType.GYM) && !features.includes(BuildingFeature.GYM)) {
+        features.push(BuildingFeature.GYM);
+      }
+
+      return { ...existing, features };
+    })(),
     accessibilityFeatures: listing.property?.accessibilityFeatures || {
       description: null,
       features: [],
@@ -131,105 +148,4 @@ export const stepEightValidation = {
       listing.property?.utility
     );
   },
-};
-
-/**
- * Helper composables for Step Eight feature sections
- * These create the computed properties and update functions for each feature section
- */
-
-/**
- * Create composable for Additional Features
- */
-export const useAdditionalFeatures = (stepEightData: Ref<StepEight>) => {
-  const selected = computed(() => 
-    stepEightData.value?.property?.additionalFeatures?.features || []
-  );
-
-  const update = (selectedFeatures: BuildingFeature[]) => {
-    if (!stepEightData.value?.property?.additionalFeatures) return;
-    stepEightData.value.property.additionalFeatures.features = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Parking
- */
-export const useParking = (stepEightData: Ref<StepEight>) => {
-  const selected = computed(() => 
-    stepEightData.value?.property?.parking?.features || []
-  );
-
-  const update = (selectedFeatures: ParkingFeature[]) => {
-    if (!stepEightData.value?.property?.parking) return;
-    stepEightData.value.property.parking.features = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Security Features
- */
-export const useSecurity = (stepEightData: Ref<StepEight>) => {
-  const selected = computed(() => 
-    stepEightData.value?.property?.securityFeatures?.features || []
-  );
-
-  const update = (selectedFeatures: SecurityFeature[]) => {
-    if (!stepEightData.value?.property?.securityFeatures) return;
-    stepEightData.value.property.securityFeatures.features = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Accessibility Features
- */
-export const useAccessibility = (stepEightData: Ref<StepEight>) => {
-  const selected = computed(() => 
-    stepEightData.value?.property?.accessibilityFeatures?.features || []
-  );
-
-  const update = (selectedFeatures: AccessibilityFeature[]) => {
-    if (!stepEightData.value?.property?.accessibilityFeatures) return;
-    stepEightData.value.property.accessibilityFeatures.features = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Storage Features
- */
-export const useStorageFeatures = (stepEightData: Ref<StepEight>) => {
-  const selected = computed(() => 
-    stepEightData.value?.property?.storageFeatures?.features || []
-  );
-
-  const update = (selectedFeatures: StorageFeature[]) => {
-    if (!stepEightData.value?.property?.storageFeatures) return;
-    stepEightData.value.property.storageFeatures.features = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Utility Room Features
- */
-export const useUtilityRoomFeatures = (stepEightData: Ref<StepEight>) => {
-  const selected = computed(() => 
-    stepEightData.value?.property?.utility?.features || []
-  );
-
-  const update = (selectedFeatures: UtilityFeature[]) => {
-    if (!stepEightData.value?.property?.utility) return;
-    stepEightData.value.property.utility.features = selectedFeatures;
-  };
-
-  return { selected, update };
 };

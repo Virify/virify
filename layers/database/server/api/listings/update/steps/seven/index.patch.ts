@@ -19,7 +19,6 @@ const stepSevenSchema = z.object({
           position: z.enum(Object.values(GardenPosition) as [string, ...string[]]).nullable().optional(),
           features: z.array(z.enum(Object.values(OutdoorSpaceFeature) as [string, ...string[]])).optional(),
           size: z.coerce.number().min(0).nullable().optional(),
-          additionalDetails: z.boolean().optional(),
         })
       ),
       yard: z.array(
@@ -30,7 +29,6 @@ const stepSevenSchema = z.object({
           position: z.enum(Object.values(GardenPosition) as [string, ...string[]]).nullable().optional(),
           features: z.array(z.enum(Object.values(OutdoorSpaceFeature) as [string, ...string[]])).optional(),
           size: z.coerce.number().min(0).nullable().optional(),
-          additionalDetails: z.boolean().optional(),
         })
       ),
       land: z.array(
@@ -39,7 +37,6 @@ const stepSevenSchema = z.object({
           description: z.string().max(500).nullable().optional(),
           features: z.array(z.enum(Object.values(LandFeature) as [string, ...string[]])).optional(),
           size: z.coerce.number().min(0).nullable().optional(),
-          additionalDetails: z.boolean().optional(),
         })
       ),
     }),
@@ -70,22 +67,20 @@ export default defineEventHandler(async (event) => {
                     create: outdoorSpace.garden.map((g) => ({
                       name: g.name,
                       description: g.description ?? null,
-                      facing: g.facing as GardenFacing | null,
-                      position: g.position as GardenPosition | null,
+                      facing: (g.facing === '0' ? null : g.facing) as GardenFacing | null,
+                      position: (g.position === '0' ? null : g.position) as GardenPosition | null,
                       features: g.features as OutdoorSpaceFeature[] ?? [],
                       size: g.size ?? null,
-                      additionalDetails: g.additionalDetails ?? false,
                     })),
                   },
                   yard: {
                     create: outdoorSpace.yard.map((y) => ({
                       name: y.name,
                       description: y.description ?? null,
-                      facing: y.facing as GardenFacing | null,
-                      position: y.position as GardenPosition | null,
+                      facing: (y.facing === '0' ? null : y.facing) as GardenFacing | null,
+                      position: (y.position === '0' ? null : y.position) as GardenPosition | null,
                       features: y.features as OutdoorSpaceFeature[] ?? [],
                       size: y.size ?? null,
-                      additionalDetails: y.additionalDetails ?? false,
                     })),
                   },
                   land: {
@@ -94,7 +89,6 @@ export default defineEventHandler(async (event) => {
                       description: l.description ?? null,
                       features: l.features as LandFeature[] ?? [],
                       size: l.size ?? null,
-                      additionalDetails: l.additionalDetails ?? false,
                     })),
                   },
                 },
@@ -107,11 +101,10 @@ export default defineEventHandler(async (event) => {
                     create: outdoorSpace.garden.map((g) => ({
                       name: g.name,
                       description: g.description ?? null,
-                      facing: g.facing as GardenFacing | null,
-                      position: g.position as GardenPosition | null,
+                      facing: (g.facing === '0' ? null : g.facing) as GardenFacing | null,
+                      position: (g.position === '0' ? null : g.position) as GardenPosition | null,
                       features: g.features as OutdoorSpaceFeature[] ?? [],
                       size: g.size ?? null,
-                      additionalDetails: g.additionalDetails ?? false,
                     })),
                   },
                   yard: {
@@ -119,11 +112,10 @@ export default defineEventHandler(async (event) => {
                     create: outdoorSpace.yard.map((y) => ({
                       name: y.name,
                       description: y.description ?? null,
-                      facing: y.facing as GardenFacing | null,
-                      position: y.position as GardenPosition | null,
+                      facing: (y.facing === '0' ? null : y.facing) as GardenFacing | null,
+                      position: (y.position === '0' ? null : y.position) as GardenPosition | null,
                       features: y.features as OutdoorSpaceFeature[] ?? [],
                       size: y.size ?? null,
-                      additionalDetails: y.additionalDetails ?? false,
                     })),
                   },
                   land: {
@@ -133,7 +125,6 @@ export default defineEventHandler(async (event) => {
                       description: l.description ?? null,
                       features: l.features as LandFeature[] ?? [],
                       size: l.size ?? null,
-                      additionalDetails: l.additionalDetails ?? false,
                     })),
                   },
                 },

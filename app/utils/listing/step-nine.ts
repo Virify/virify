@@ -1,10 +1,12 @@
+import type { RunningCosts } from "~~/layers/database/server/database/prisma/generated/client";
 import { 
   BoilerType, 
   EPCRating, 
   HeatingType, 
   HotWaterSource, 
   RenewableEnergy, 
-  ConnectedUtilities 
+  ConnectedUtilities,
+  ParkingFeature,
 } from "~~/layers/database/server/database/prisma/generated/enums";
 
 /**
@@ -12,42 +14,53 @@ import {
  * @param draftListing - Draft listing to create initial values from
  * @returns Initial values for step nine
  */
-export const createInitialStepNineValues = (listing: EditableListing): StepNine => ({
-  property: {
-    energyAndUtilities: listing.property?.energyAndUtilities ? {
-      ...listing.property.energyAndUtilities,
-      boilerType: listing.property.energyAndUtilities.boilerType || null,
-      hotWaterSource: listing.property.energyAndUtilities.hotWaterSource || null,
-    } : {
-      description: null,
-      epcRating: 'UNKNOWN',
-      epcCertificateUrl: null,
-      primaryHeatingType: [],
-      secondaryHeatingType: [],
-      boilerType: null,
-      hotWaterSource: null,
-      renewables: [],
-      connectedUtilities: [],
-      broadbandType: null,
-      fullFibreAvailable: false,
-      maxDownloadSpeedMbps: null,
-    },
-    runningCosts: listing.property?.runningCosts || {
-      description: null,
-      councilTaxBand: 'A',
-      serviceCharges: null,
-      groundRent: null,
-    },
+export const createInitialStepNineValues = (listing: EditableListing): StepNine => {
+  const energyAndUtilities = listing.property?.energyAndUtilities ? {
+    ...listing.property.energyAndUtilities,
+    boilerType: listing.property.energyAndUtilities.boilerType ?? null,
+    hotWaterSource: listing.property.energyAndUtilities.hotWaterSource ?? null,
+  } : {
+    description: null,
+    epcRating: EPCRating.G,
+    epcCertificateUrl: null,
+    primaryHeatingType: [] as HeatingType[],
+    secondaryHeatingType: [] as HeatingType[],
+    boilerType: null,
+    hotWaterSource: null,
+    renewables: [] as RenewableEnergy[],
+    connectedUtilities: [] as ConnectedUtilities[],
+    broadbandType: null,
+    fullFibreAvailable: false,
+    maxDownloadSpeedMbps: null,
+  };
+
+  // If parking indicates EV charging, pre-select EV charging in renewables
+  if (listing.property?.parking?.features?.includes(ParkingFeature.EV_CHARGING)) {
+    if (!energyAndUtilities.renewables.includes(RenewableEnergy.EV_CHARGING)) {
+      energyAndUtilities.renewables = [...energyAndUtilities.renewables, RenewableEnergy.EV_CHARGING];
+    }
   }
-});
+
+  return {
+    property: {
+      energyAndUtilities,
+      runningCosts: listing.property?.runningCosts ?? {
+        description: null,
+        councilTaxBand: 'A',
+        serviceCharges: null,
+        groundRent: null,
+      },
+    }
+  };
+};
 
 /**
  * EPC Rating options
  */
 export const epcRatingOptions = Object.values(EPCRating).map((rating) => ({
   value: rating,
-  key: rating === 'UNKNOWN' ? 'Unknown/NA' : rating,
-  info: rating === 'UNKNOWN' ? 'EPC Rating not known or not available' : `Energy Performance Certificate rating ${rating}`
+  key: rating,
+  info: `Energy Performance Certificate rating ${rating}`
 }));
 
 /**
@@ -107,104 +120,11 @@ export const councilTaxBandOptions = [
   { value: 'F', key: 'Band F', info: 'Council Tax Band F' },
   { value: 'G', key: 'Band G', info: 'Council Tax Band G' },
   { value: 'H', key: 'Band H', info: 'Council Tax Band H (highest)' },
-  { value: 'U', key: 'Unknown', info: 'Council Tax Band Unknown' },
-  { value: 'N/A', key: 'Not Applicable', info: 'Council Tax Band Not Applicable' },
+  { value: 'U', key: 'Unknown', info: 'Council Tax Band Unknown' }
 ];
 
-/**
- * Helper composables for Step Nine
- */
-
-/**
- * Create composable for Renewable Energy
- */
-export const useRenewableEnergy = (stepNineData: Ref<StepNine>) => {
-  const selected = computed(() => 
-    stepNineData.value?.property?.energyAndUtilities?.renewables || []
-  );
-
-  const update = (selectedFeatures: RenewableEnergy[]) => {
-    if (!stepNineData.value?.property?.energyAndUtilities) return;
-    stepNineData.value.property.energyAndUtilities.renewables = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Connected Utilities
- */
-export const useConnectedUtilities = (stepNineData: Ref<StepNine>) => {
-  const selected = computed(() => 
-    stepNineData.value?.property?.energyAndUtilities?.connectedUtilities || []
-  );
-
-  const update = (selectedFeatures: ConnectedUtilities[]) => {
-    if (!stepNineData.value?.property?.energyAndUtilities) return;
-    stepNineData.value.property.energyAndUtilities.connectedUtilities = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Primary Heating Type
- */
-export const usePrimaryHeating = (stepNineData: Ref<StepNine>) => {
-  const selected = computed(() => 
-    stepNineData.value?.property?.energyAndUtilities?.primaryHeatingType || []
-  );
-
-  const update = (selectedFeatures: HeatingType[]) => {
-    if (!stepNineData.value?.property?.energyAndUtilities) return;
-    stepNineData.value.property.energyAndUtilities.primaryHeatingType = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Create composable for Secondary Heating Type
- */
-export const useSecondaryHeating = (stepNineData: Ref<StepNine>) => {
-  const selected = computed(() => 
-    stepNineData.value?.property?.energyAndUtilities?.secondaryHeatingType || []
-  );
-
-  const update = (selectedFeatures: HeatingType[]) => {
-    if (!stepNineData.value?.property?.energyAndUtilities) return;
-    stepNineData.value.property.energyAndUtilities.secondaryHeatingType = selectedFeatures;
-  };
-
-  return { selected, update };
-};
-
-/**
- * Composable for Council Tax Band selection
- * @param stepNineData - Step nine form data
- * @returns Selected council tax band and update function
- */
-export const useCouncilTaxBand = (stepNineData: Ref<StepNine>) => {
-  const selectedCouncilTaxBand = computed({
-    get: () => stepNineData.value.property.runningCosts?.councilTaxBand || 'A',
-    set: (value: string) => {
-      if (stepNineData.value.property.runningCosts) {
-        stepNineData.value.property.runningCosts.councilTaxBand = value;
-      }
-    }
-  });
-
-  const updateCouncilTaxBand = (value: string) => {
-    if (stepNineData.value.property.runningCosts) {
-      stepNineData.value.property.runningCosts.councilTaxBand = value;
-    }
-  };
-
-  return {
-    selectedCouncilTaxBand,
-    updateCouncilTaxBand
-  };
-};
+// Components bind directly to `stepNineData.property.energyAndUtilities.*` and
+// `stepNineData.property.runningCosts` via `v-model`. Composables removed to reduce indirection.
 
 /**
  * Step Nine Validation Helpers
@@ -224,7 +144,7 @@ export const stepNineValidation = {
    * @param runningCosts Running costs data
    * @returns True if councilTaxBand is provided (required field)
    */
-  areRunningCostsValid: (runningCosts: any): boolean => {
+  areRunningCostsValid: (runningCosts: RunningCosts): boolean => {
     return !!runningCosts?.councilTaxBand;
   },
 
@@ -237,7 +157,7 @@ export const stepNineValidation = {
   isStepNineValid: (data: globalThis.StepNine, draft: DraftListingWithFullPayload): boolean => {
     if (!data.property?.energyAndUtilities || !data.property?.runningCosts) return false;
     return stepNineValidation.areEnergyAndUtilitiesValid(data.property.energyAndUtilities) &&
-           stepNineValidation.areRunningCostsValid(data.property.runningCosts);
+           stepNineValidation.areRunningCostsValid(data.property.runningCosts as RunningCosts);
   },
 
   /**

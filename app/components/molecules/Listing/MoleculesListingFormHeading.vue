@@ -3,10 +3,12 @@
     <h3 v-if="variant === 'section'" class="m-form-header__title m-form-header__title--section | title-md">
       {{ title }}
       <span v-if="required" class="m-form-header__required | title-sm">*</span>
+      <span v-if="subtext" class="m-form-header__subtext | body-xs font-light">{{ subtext }}</span>
     </h3>
     <p v-else class="m-form-header__title | body-sm">
       {{ title }}
       <span v-if="required" class="m-form-header__required | title-sm">*</span>
+      <span v-if="subtext" class="m-form-header__subtext | body-xs font-light">{{ subtext }}</span>
     </p>
     
     <AtomsTooltip v-if="tooltip || hasTooltip" :responsive="true">
@@ -25,6 +27,7 @@ defineProps<{
   tooltip?: string;
   required?: boolean;
   hasTooltip?: boolean;
+  subtext?: string;
   variant?: 'default' | 'section';
 }>()
 </script>
@@ -39,7 +42,7 @@ defineProps<{
 
   &--section {
     justify-content: flex-start;
-    padding-bottom: var(--size-8);
+    padding-bottom: 0;
   }
 
   &__title {
@@ -60,6 +63,11 @@ defineProps<{
   &__required {
     color: var(--error);
     margin-left: var(--size-4);
+  }
+
+  &__subtext {
+    font-style: italic;
+    color: var(--monochrome-300);
   }
 }
 </style>

@@ -30,9 +30,7 @@
 <script setup lang="ts">
 definePageMeta({
   middleware: ["authenticated"],
-  head: {
-    title: "Listing Creator",
-  },
+  title: `Listing Creator - Draft`,
   layout: "account",
 });
 
@@ -95,6 +93,7 @@ watch(currentStep, () => {
 
 // Initialize step when stepper data becomes available (only once)
 const hasInitialized = ref(false);
+
 watch(stepperMap, (steps) => {
   if (steps.length > 0 && draft.value && !hasInitialized.value) {
     const completedSteps = draft.value.completedSteps || [];

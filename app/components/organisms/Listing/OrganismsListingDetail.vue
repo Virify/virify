@@ -34,7 +34,7 @@
             <MoleculesListingEssentials :listing="listing" :property="property" />
           </div>
 
-          <div v-if="property" class="p-listing__section">
+          <div v-if="hasRooms" class="p-listing__section">
             <h2 class="title-md">Rooms</h2>
             <MoleculesListingItemDetails v-if="property?.bedroomFeatures && property.bedroomFeatures.length > 0" :items="property?.bedroomFeatures" type="room"
               subtype="Bedroom" title="Bedrooms" />
@@ -215,6 +215,19 @@ const address = computed(() => {
 
 const priceType = computed(() => {
   return props.listing?.saleListing ? props.listing.saleListing.priceType : props.listing?.rentalListing?.rentFrequency;
+});
+
+const hasRooms = computed(() => {
+  const prop = property.value;
+  if (!prop) return false;
+
+  return (
+    (prop.bedroomFeatures && prop.bedroomFeatures.length > 0) ||
+    (prop.bathroomFeatures && prop.bathroomFeatures.length > 0) ||
+    (prop.kitchenFeatures && prop.kitchenFeatures.length > 0) ||
+    (prop.reception && prop.reception.length > 0) ||
+    (prop.otherRoom && prop.otherRoom.length > 0)
+  );
 });
 
 // Handle amenities array/object conversion

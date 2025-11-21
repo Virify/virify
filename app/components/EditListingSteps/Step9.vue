@@ -44,44 +44,25 @@
         :required="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Energy Performance Certificate rating from A (most efficient) to G (least efficient)'
-          ]" />
+          <p>See our <NuxtLink to="/guides/property-information/energy-performance-certificate" target="_blank" rel="noopener" class="link">Energy Performance Certificate (EPC)</NuxtLink> guide for more information.</p>
         </template>
       </OrganismsListingFormSelectGroup>
 
-      <!-- <OrganismsListingFormTextGroup
-        title="EPC Certificate URL"
-        v-model="(stepNineData.property.energyAndUtilities as any).epcCertificateUrl"
-        name="epc-certificate-url"
-        placeholder="https://..."
-      >
-        <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Link to the official EPC certificate document, if available online.'
-          ]" />
-        </template>
-      </OrganismsListingFormTextGroup> -->
-
       <OrganismsListingFormCheckboxGroup
-        title="Primary Heating Type"
+        title="Primary Heating"
         :options="heatingTypeOptions"
-        :model-value="primaryHeating.selected.value"
-        @update:modelValue="primaryHeating.update"
+        v-model="stepNineData.property.energyAndUtilities!.primaryHeatingType"
         name="primary-heating"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the main heating system(s) used to heat the property. You can select multiple if applicable.'
-          ]" />
+          <p>Leave unselected if not applicable.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Secondary Heating Type"
+        title="Secondary Heating"
         :options="heatingTypeOptions"
-        :model-value="secondaryHeating.selected.value"
-        @update:modelValue="secondaryHeating.update"
+        v-model="stepNineData.property.energyAndUtilities!.secondaryHeatingType"
         name="secondary-heating"
       >
         <template #tooltip-content>
@@ -98,9 +79,7 @@
         name="boiler-type"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Optional - select the type of boiler installed in the property, or leave unselected if not applicable.'
-          ]" />
+          <p>Leave unselected if not applicable.</p>
         </template>
       </OrganismsListingFormRadioGroup>
 
@@ -111,17 +90,14 @@
         name="hot-water-source"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Optional - select the primary source of hot water for the property.'
-          ]" />
+          <p>Leave unselected if not applicable.</p>
         </template>
       </OrganismsListingFormRadioGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Renewable Energy & Smart Features"
+        title="Renewable Energy"
         :options="renewableEnergyOptions"
-        :model-value="renewableEnergy.selected.value"
-        @update:modelValue="renewableEnergy.update"
+        v-model="stepNineData.property.energyAndUtilities!.renewables"
         name="renewable-energy"
       >
         <template #tooltip-content>
@@ -134,8 +110,7 @@
       <OrganismsListingFormCheckboxGroup
         title="Connected Utilities"
         :options="connectedUtilitiesOptions"
-        :model-value="connectedUtilities.selected.value"
-        @update:modelValue="connectedUtilities.update"
+        v-model="stepNineData.property.energyAndUtilities!.connectedUtilities"
         name="connected-utilities"
       >
         <template #tooltip-content>
@@ -160,19 +135,17 @@
       <OrganismsListingFormSelectGroup
         title="Council Tax Band"
         :options="councilTaxBandOptions"
-        v-model="selectedCouncilTaxBand"
+        v-model="stepNineData.property.runningCosts!.councilTaxBand"
         name="council-tax-band"
         :required="true"
-        @update:modelValue="updateCouncilTaxBand"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Council Tax Band determines the amount of council tax payable. Bands range from A (lowest) to H (highest) in England and Scotland, or A to I in Wales.'
-          ]" />
+          <p>For more information see our <NuxtLink to="/guides/property-information/council-tax-band" target="_blank" rel="noopener" class="link">Council Tax Band</NuxtLink> guide.</p>
         </template>
       </OrganismsListingFormSelectGroup>
 
       <OrganismsListingFormNumberGroup
+        v-if="draft.rentalListing || draft.saleListing?.tenureType === 'LEASEHOLD'"
         title="Service Charges (per annum)"
         v-model="(stepNineData.property.runningCosts as any).serviceCharges"
         name="service-charges"
@@ -181,13 +154,12 @@
         :step="1"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Annual service charges for maintenance of communal areas, building insurance, and shared facilities.'
-          ]" />
+          <p>For more information see our <NuxtLink to="/guides/property-information/ground-rent-and-service-charge" target="_blank" rel="noopener" class="link">Ground Rent & Service Charge</NuxtLink> guide.</p>
         </template>
       </OrganismsListingFormNumberGroup>
 
       <OrganismsListingFormNumberGroup
+        v-if="draft.rentalListing || draft.saleListing?.tenureType === 'LEASEHOLD'"
         title="Ground Rent (per annum)"
         v-model="(stepNineData.property.runningCosts as any).groundRent"
         name="ground-rent"
@@ -196,9 +168,7 @@
         :step="1"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Annual ground rent payment to the freeholder (typically applies to leasehold properties).'
-          ]" />
+          <p>For more information see our <NuxtLink to="/guides/property-information/ground-rent-and-service-charge" target="_blank" rel="noopener" class="link">Ground Rent & Service Charge</NuxtLink> guide.</p>
         </template>
       </OrganismsListingFormNumberGroup>
     </div>
@@ -235,12 +205,6 @@ const {
   submitForm: handleSubmit,
 } = useListingStepForm(stepConfig, props.draft);
 
-// Use composables for each section
-const primaryHeating = usePrimaryHeating(stepNineData);
-const secondaryHeating = useSecondaryHeating(stepNineData);
-const renewableEnergy = useRenewableEnergy(stepNineData);
-const connectedUtilities = useConnectedUtilities(stepNineData);
-const { selectedCouncilTaxBand, updateCouncilTaxBand } = useCouncilTaxBand(stepNineData);
 
 function submitForm() {
   handleSubmit(

@@ -10,6 +10,7 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
   const gardens = outdoorSpace?.garden || [];
   const yards = outdoorSpace?.yard || [];
   const lands = outdoorSpace?.land || [];
+  
 
   return {
     property: {
@@ -19,7 +20,6 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
         hasGarden: gardens.length > 0,
         hasYard: yards.length > 0,
         hasLand: lands.length > 0,
-        // Convert null position/facing to '0' for select dropdowns (like yearBuilt in Step 2)
         garden: gardens.map(g => ({
           ...g,
           position: (g.position || '0') as any,
@@ -31,8 +31,13 @@ export const createInitialStepSevenValues = (listing: EditableListing): StepSeve
           facing: (y.facing || '0') as any,
         })),
         land: lands,
-        // OutdoorSpace features array
-        features: outdoorSpace?.features || [],
+        features: (
+          (b => (b.includes(OutdoorSpaceFeature.POOL) || 
+          !(gardens.some(g => g.features?.includes(OutdoorSpaceFeature.POOL)) || 
+          yards.some(y => y.features?.includes(OutdoorSpaceFeature.POOL)))) ? 
+          b : [...b, OutdoorSpaceFeature.POOL])
+          (outdoorSpace?.features ?? [])
+        ),
       }
     }
   };
@@ -148,26 +153,9 @@ export const stepSevenValidation = {
     const gardens = data.property.outdoorSpace.garden || [];
     const yards = data.property.outdoorSpace.yard || [];
     const lands = data.property.outdoorSpace.land || [];
-    const hasGarden = data.property.outdoorSpace.hasGarden;
-    const hasYard = data.property.outdoorSpace.hasYard;
-    const hasLand = data.property.outdoorSpace.hasLand;
-
-    // If hasGarden is true, there MUST be at least one garden
-    if (hasGarden && gardens.length === 0) {
-      return false;
-    }
-
-    // If hasYard is true, there MUST be at least one yard
-    if (hasYard && yards.length === 0) {
-      return false;
-    }
-
-    // If hasLand is true, there MUST be at least one land
-    if (hasLand && lands.length === 0) {
-      return false;
-    }
 
     // Validate all outdoor spaces if they exist
+    // The has* flags are set automatically in beforeSubmit based on array lengths
     return stepSevenValidation.areGardensValid(gardens) &&
            stepSevenValidation.areYardsValid(yards) &&
            stepSevenValidation.areLandsValid(lands);

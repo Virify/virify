@@ -1,6 +1,6 @@
 <template>
   <EditListingStepsStepLayout
-    title="Property Features"
+    title="Additional Features"
     info="Add details about additional features, parking, security, accessibility, and storage options for your property."
     :hasChanges="hasChanges"
     :buttonDisabled="buttonDisabled"
@@ -19,7 +19,6 @@
         title="Additional Features" 
         variant="section"
       />
-      <em class="body-xs">Optional, describe additional features and amenities</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -38,14 +37,11 @@
       <OrganismsListingFormCheckboxGroup
         title="Features"
         :options="additionalFeaturesOptions"
-        :model-value="additionalFeatures.selected.value"
-        @update:modelValue="additionalFeatures.update"
+        v-model="stepEightData.property.additionalFeatures!.features"
         name="additional-features"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select amenities and features that add value to the property, such as pet-friendly policies, pool, gym, concierge services, etc.'
-          ]" />
+          <p>Select amenities and features that add value to the property, such as pool, gym, concierge services, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -58,7 +54,6 @@
         title="Parking" 
         variant="section"
       />
-      <em class="body-xs">Optional, add parking details</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -68,23 +63,18 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Provide details about parking availability, number of spaces, restrictions, or costs associated with parking.'
-          ]" />
+          <p>Provide details about parking availability, number of spaces, restrictions, or costs associated with parking.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
       <OrganismsListingFormCheckboxGroup
         title="Parking Options"
         :options="parkingOptions"
-        :model-value="parkingFeatures.selected.value"
-        @update:modelValue="parkingFeatures.update"
+        v-model="stepEightData.property.parking!.features"
         name="parking"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the types of parking available, such as garage, driveway, permit parking, EV charging, etc.'
-          ]" />
+          <p>Select the types of parking available, such as garage, driveway, permit parking, EV charging, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -98,7 +88,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add security features</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -108,23 +97,18 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Detail the security measures in place, including systems, monitoring, and physical security features.'
-          ]" />
+          <p>Detail the security measures in place, including systems, monitoring, and physical security features.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Security Options"
+        title="Security Features"
         :options="securityOptions"
-        :model-value="securityFeatures.selected.value"
-        @update:modelValue="securityFeatures.update"
+        v-model="stepEightData.property.securityFeatures!.features"
         name="security"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the security features available, such as CCTV, alarm systems, gated community, 24/7 security, etc.'
-          ]" />
+          <p>Select the security features available, such as CCTV, alarm systems, gated community, 24/7 security, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -138,7 +122,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add accessibility features</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -148,23 +131,18 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Describe accessibility adaptations and features that make the property suitable for people with mobility challenges or disabilities.'
-          ]" />
+          <p>Describe accessibility adaptations and features that make the property suitable for people with mobility challenges or disabilities.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Accessibility Options"
+        title="Accessibility Features"
         :options="accessibilityOptions"
-        :model-value="accessibilityFeatures.selected.value"
-        @update:modelValue="accessibilityFeatures.update"
+        v-model="stepEightData.property.accessibilityFeatures!.features"
         name="accessibility"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select accessibility features available, such as wheelchair access, step-free entry, wide doorways, elevator, wet room, etc.'
-          ]" />
+          <p>Select accessibility features available, such as wheelchair access, step-free entry, wide doorways, elevator, wet room, etc.</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -178,7 +156,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add storage features</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -188,27 +165,18 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs
-            :paragraphs="[
-              'Detail the storage facilities available with the property, including built-in wardrobes, cupboards, loft storage, shed, or garage storage space.',
-            ]"
-          />
+          <p>Detail the storage facilities available with the property, including built-in wardrobes, cupboards, loft storage, shed, or garage storage space.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
       <OrganismsListingFormCheckboxGroup
-        title="Storage Options"
+        title="Storage Features"
         :options="storageOptions"
-        :model-value="storageFeatures.selected.value"
-        @update:modelValue="storageFeatures.update"
+        v-model="stepEightData.property.storageFeatures!.features"
         name="storage"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs
-            :paragraphs="[
-              'Select the storage facilities available: built-in wardrobes, walk-in closet, loft/attic storage, cellar/basement, bike storage, shed, garage storage, etc.',
-            ]"
-          />
+          <p>Select the storage facilities available</p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -222,7 +190,6 @@
         :required="false"
         variant="section"
       />
-      <em class="body-xs">Optional, add utility room details if applicable</em>
       
       <OrganismsListingFormTextGroup
         title="Description"
@@ -232,9 +199,7 @@
         :expanded="true"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Describe the utility room features, layout, and what appliances or storage it can accommodate.'
-          ]" />
+          <p>Describe the utility room features, layout, and what appliances or storage it can accommodate.</p>
         </template>
       </OrganismsListingFormTextGroup>
 
@@ -248,23 +213,22 @@
         @update:size="(value: number | null) => (stepEightData.property.utility as any).size = value"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Enter the utility room\'s floor area (either in square meters, or square foot). If you\'re unsure how to measure the floor area, please visit our guides.'
-          ]" />
+          <p>
+            Not sure how to measure? See our <NuxtLink to="/guides/property-information/room-sizing" target="_blank" rel="noopener" class="link">Room Sizing guide</NuxtLink>.
+          </p>
         </template>
       </OrganismsListingFormSizeToggle>
 
       <OrganismsListingFormCheckboxGroup
         title="Utility Room Features"
         :options="utilityRoomOptions"
-        :model-value="utilityRoomFeatures.selected.value"
-        @update:modelValue="utilityRoomFeatures.update"
-        name="utility-room-features"
+        v-model="stepEightData.property.utility!.features"
+        name="utility-room"
       >
         <template #tooltip-content>
-          <AtomsTooltipParagraphs :paragraphs="[
-            'Select the features available in the utility room, such as plumbing for appliances, sink, or storage space.'
-          ]" />
+          <p>
+            Select the features available in the utility room, such as plumbing for appliances, sink, or storage space.
+          </p>
         </template>
       </OrganismsListingFormCheckboxGroup>
     </div>
@@ -273,6 +237,7 @@
 </template>
 
 <script setup lang="ts">
+import { additionalFeaturesOptions, parkingOptions, securityOptions, accessibilityOptions, storageOptions, utilityRoomOptions } from '~/utils/listing/step-eight';
 
 const props = defineProps<{
   draft: DraftListingWithFullPayload;
@@ -301,13 +266,8 @@ const {
   submitForm: handleSubmit,
 } = useListingStepForm(stepConfig, props.draft);
 
-// Use composables for each feature section
-const additionalFeatures = useAdditionalFeatures(stepEightData);
-const parkingFeatures = useParking(stepEightData);
-const securityFeatures = useSecurity(stepEightData);
-const accessibilityFeatures = useAccessibility(stepEightData);
-const storageFeatures = useStorageFeatures(stepEightData);
-const utilityRoomFeatures = useUtilityRoomFeatures(stepEightData);
+// Direct update handlers for each feature section (no composables)
+// v-model on nested fields updates `stepEightData` automatically; no manual setters required.
 
 function submitForm() {
   handleSubmit(
