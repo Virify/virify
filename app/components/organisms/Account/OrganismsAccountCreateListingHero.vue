@@ -65,7 +65,7 @@ function showTierConfirmation(tier: TierOption) {
         if (returnValue.action === 'create' && returnValue.tier) {
           try {
             // const draftId = await createDraftListing(returnValue.tier);
-            // TODO: Create a vertification flow involving uploading a deeds document and creating an address
+            // TODO: Create a verification flow involving uploading a deeds document and creating an address
             // After the deed is uploaded and address created, send an email to validate ownership
             // After the email is validated, allow the user to proceed with listing creation
             verifyOwnershipDialog();
