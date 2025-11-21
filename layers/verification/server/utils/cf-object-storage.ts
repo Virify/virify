@@ -5,7 +5,6 @@ import {
 } from "@aws-sdk/client-s3";
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { get } from "@vueuse/core";
 
 const s3 =  new S3Client({
   region: "auto",
