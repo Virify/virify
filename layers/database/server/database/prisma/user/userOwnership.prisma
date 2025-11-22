@@ -5,6 +5,7 @@ model UserOwnership {
   pendingOwnershipDocuments  String[]
   approvedOwnershipDocuments String[]
   deniedOwnershipDocuments   String[]
+  rejectReason               String?
   reviewed                   Reviewed      @default(PENDING)
   draftListingId             Int?          @unique
   draftListing               DraftListing? @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
