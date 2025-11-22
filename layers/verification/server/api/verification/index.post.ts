@@ -44,16 +44,31 @@ export default defineEventHandler(async (event) => {
     // Upload to R2
     const response = await addVerificationObjectToR2(key, buffer);
 
-    // TODO: Store the key / url in the ownership verification database record
+    // Create UserOwnership record with pending documents
+    const userOwnership = await createUserOwnershipRecord(user.id, [response.key]);
     
-    // TODO: Send confirmation email to user and review team
+    
+    // TODO: Send the signed url to OpenAI for verification processing
+
+    /**
+     * TODO: If verification passes, update user's verification and move documents into acceptedDocuments and reviewed to accepted.
+     * 
+     * We also need to create/update the Address record and link it to the UserOwnership
+     * 
+     * If fails, move to rejectedDocuments with reason and delete the address record if created.
+     * 
+     * If accepted, create the draft listing and link the address to it.
+     */
+    
 
     return {
       message: 'File uploaded successfully',
       tier,
       address,
       response,
+      userOwnership,
     }
+    
   } catch (error) {
     console.error('Error uploading verification file:', error);
     throw createError({

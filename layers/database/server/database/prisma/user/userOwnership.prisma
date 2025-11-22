@@ -11,6 +11,8 @@ model UserOwnership {
   draftListing               DraftListing? @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
   listingId                  Int?          @unique
   listing                    Listing?      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  addressId                  Int?          @unique
+  address                    Address?      @relation(fields: [addressId], references: [id], onDelete: Cascade)
   createdAt                  DateTime      @default(now())
   updatedAt                  DateTime      @updatedAt
 }

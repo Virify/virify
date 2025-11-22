@@ -48,6 +48,11 @@ export const propertyInclude = {
           media: true,
         },
       },
+      yard: {
+        include: {
+          media: true,
+        },
+      },
       media: true,
     },
   },

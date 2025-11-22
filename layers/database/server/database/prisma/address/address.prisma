@@ -1,25 +1,26 @@
 model Address {
-  id          Int                      @id @default(autoincrement())
-  number      String?
-  flat        String?
-  name        String?
-  street      String
-  city        String
-  postcode    String
-  country     String?
-  locality    String?
-  county      String?
-  district    String?
-  fullAddress String?
-  lat         Float?
-  lon         Float?
-  createdAt   DateTime                 @default(now())
-  updatedAt   DateTime                 @updatedAt
+  id            Int                      @id @default(autoincrement())
+  number        String?
+  flat          String?
+  name          String?
+  street        String
+  city          String
+  postcode      String
+  country       String?
+  locality      String?
+  county        String?
+  district      String?
+  fullAddress   String?
+  lat           Float?
+  lon           Float?
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
   // geolocation fields
-  location    Unsupported("geometry")?
-  properties  Property[]
-  estateAgent EstateAgent[]
-  user        User[]
+  location      Unsupported("geometry")?
+  properties    Property[]
+  estateAgent   EstateAgent[]
+  user          User[]
+  userOwnership UserOwnership?
 
   @@unique([number, street, city, postcode, country])
   @@index([location], map: "address_location_idx", type: Gist)
