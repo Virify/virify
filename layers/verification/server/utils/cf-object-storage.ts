@@ -21,7 +21,7 @@ const s3 =  new S3Client({
  * @param body Buffer | Unit8Array | Blob | string | File
  * @returns 
  */
-export const addVerificationObjectToR2 = async (key: string, body: Buffer | Uint8Array | Blob | string | File) => {
+export const addVerificationObjectToR2 = async (key: string, body: Buffer | Uint8Array | Blob | string | File): Promise<{ key: string; url: string }> => {
   const putCommand = new PutObjectCommand({
     Bucket: 'verification',
     Key: key,
@@ -44,26 +44,11 @@ export const addVerificationObjectToR2 = async (key: string, body: Buffer | Uint
 };
 
 /**
- * Get object from Cloudflare R2 verification bucket
- * @param key String
- * @returns 
+ * Get a signed URL for accessing a verification object from Cloudflare R2
+ * @param key name of file in bucket
+ * @returns string - signed URL valid for 1 week
  */
-export const getVerificationObjectFromR2 = async (key: string) => {
-  const getCommand = new GetObjectCommand({
-    Bucket: 'verification',
-    Key: key,
-  });
-
-  try {
-    const response = await s3.send(getCommand);
-    return response.Body;
-  } catch (error) {
-    console.error(`Error retrieving object ${key} from R2:`, error);
-    throw error;
-  }
-}
-
-export const getSignedUrlForVerificationObject = async (key: string) => {
+export const getSignedUrlForVerificationObject = async (key: string): Promise<string> => {
   try {
     const signedUrl = await getSignedUrl(s3, new GetObjectCommand({
       Bucket: 'verification',

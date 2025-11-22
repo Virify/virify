@@ -1,9 +1,7 @@
 import * as z from 'zod';
 
 const verificationSchema = z.object({
-  file: z.instanceof(File).refine((file) => file.size > 0 && file.size < 10 * 1024 * 1024, {
-    message: 'File must be between 0 and 10MB',
-  }),
+  file: z.file().min(2).max(10 * 1024 * 1024).mime(allowedMimes),
   address: z.string().transform((str) => JSON.parse(str)).pipe(z.object({
     number: z.string().nullable(),
     flat: z.string().nullable(),
@@ -38,14 +36,10 @@ export default defineEventHandler(async (event) => {
     });
 
     // Generate unique filename
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(7);
-    const extension = file.name.split('.').pop();
-    const key = `verification-${timestamp}-${randomString}.${extension}`;
+    const key = generateUniqueFilename(file.name, 'verification');
 
     // Convert file to buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer = await convertFileToBuffer(file);
 
     // Upload to R2
     const response = await addVerificationObjectToR2(key, buffer);

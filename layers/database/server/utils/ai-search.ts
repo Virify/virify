@@ -1,22 +1,4 @@
-import OpenAI from "openai";
-
-const config = useRuntimeConfig();
-
-const openai = new OpenAI({
-  apiKey: config.OPENAI_API_KEY as string,
-});
-
-/**
- * Checks if the required AI configuration is present.
- */
-export function checkAiConfiguration() {
-  if (!process.env.OPENAI_API_KEY) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "AI search is not configured. Please contact support.",
-    });
-  }
-}
+import { model } from "~~/shared/utils/open-ai";
 
 /**
  * Constructs the Prisma WHERE clause from the query and location filters.
@@ -54,7 +36,7 @@ async function getAiSearchCompletion(query: string): Promise<string> {
   const schemaPrompt = await getPrismaSchemaPrompt();
   
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: model,
     messages: [
       { role: "system", content: schemaPrompt },
       { role: "user", content: `Convert this search query to a complete Prisma WHERE clause: "${query}"` },
@@ -77,7 +59,7 @@ async function getAiSearchCompletion(query: string): Promise<string> {
  * @param aiResponse The raw string response from the AI.
  * @returns The parsed JSON object.
  */
-function parseAiCompletion(aiResponse: string): any {
+function parseAiSearchCompletion(aiResponse: string): any {
   try {
     return JSON.parse(aiResponse);
   } catch (error) {
@@ -125,7 +107,7 @@ function normalizeWhereClause(parsedResponse: any): aiSearchResult {
 export async function generateWhereClauseFromQuery(query: string): Promise<aiSearchResult> {
   checkAiConfiguration();
   const aiResponse = await getAiSearchCompletion(query);
-  const parsedResponse = parseAiCompletion(aiResponse);
+  const parsedResponse = parseAiSearchCompletion(aiResponse);
   return normalizeWhereClause(parsedResponse);
 }
 
