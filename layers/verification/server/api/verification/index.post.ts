@@ -1,7 +1,15 @@
 import * as z from 'zod';
 
+const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+
 const verificationSchema = z.object({
-  file: z.file().min(2).max(10 * 1024 * 1024).mime(allowedMimes),
+  files: z.array(z.instanceof(File).refine(
+    (file) => file.size >= 2 && file.size <= 10 * 1024 * 1024,
+    { message: 'File size must be between 2 bytes and 10MB' }
+  ).refine(
+    (file) => allowedMimes.includes(file.type),
+    { message: 'Invalid file type' }
+  )).length(2),
   address: z.string().transform((str) => JSON.parse(str)).pipe(z.object({
     number: z.string().nullable(),
     flat: z.string().nullable(),
@@ -29,26 +37,29 @@ export default defineEventHandler(async (event) => {
   try {
     const formData = await readFormData(event);
     
-    const { file, address, tier } = verificationSchema.parse({
-      file: formData.get('file'),
+    const { files, address, tier } = verificationSchema.parse({
+      files: formData.getAll('files'),
       address: formData.get('address'),
       tier: formData.get('tier'),
     });
 
-    // Generate unique filename
-    const key = generateUniqueFilename(file.name, 'verification');
+    // Generate unique filenames and upload all files
+    const uploadedFiles = await Promise.all(
+      files.map(async (file) => {
+        const key = generateUniqueFilename(file.name, 'verification');
+        const buffer = await convertFileToBuffer(file);
+        const response = await addVerificationObjectToR2(key, buffer);
+        return response; // Returns { key, url }
+      })
+    );
 
-    // Convert file to buffer
-    const buffer = await convertFileToBuffer(file);
-
-    // Upload to R2
-    const response = await addVerificationObjectToR2(key, buffer);
+    const fileKeys = uploadedFiles.map(f => f.key);
+    const fileUrls = uploadedFiles.map(f => f.url);
 
     // Create UserOwnership record with pending documents
-    const userOwnership = await createUserOwnershipRecord(user.id, [response.key]);
+    const userOwnership = await createUserOwnershipRecord(user.id, fileKeys);
     
-    
-    // TODO: Send the signed url to OpenAI for verification processing
+    const verificationResult = await getAiVerificationCompletion(address as any, fileUrls);
 
     /**
      * TODO: If verification passes, update user's verification and move documents into acceptedDocuments and reviewed to accepted.
@@ -62,11 +73,12 @@ export default defineEventHandler(async (event) => {
     
 
     return {
-      message: 'File uploaded successfully',
+      message: 'Files uploaded successfully',
       tier,
       address,
-      response,
+      files: uploadedFiles,
       userOwnership,
+      verificationResult,
     }
     
   } catch (error) {

@@ -18,14 +18,25 @@
     <MoleculesForm @submit.prevent="submitForm">
       <OrganismsListingFormAddressSearch @address-selected="handleAddressSelected" />
 
-      <div class="v-ownership__dropzone" @click="handleFile(fileInput)">
-        <p v-if="!selectedFile" class="body-sm">Click here to upload your document</p>
-        <div v-if="selectedFile" class="v-ownership__dropzone--file | body-sm">
-          <p>Selected: {{ selectedFile.name }} — {{ (selectedFile.size / 1024).toFixed(1) }} KB</p>
-          <button class="button button-sm button-delete" @click.stop="selectedFile = null">Remove</button>
+      <div 
+        v-for="(file, index) in selectedFiles" 
+        :key="index" 
+        class="v-ownership__dropzone" 
+        @click="handleFile(index)"
+      >
+        <p v-if="!file" class="body-sm">Click here to upload document {{ index + 1 }}</p>
+        <div v-if="file" class="v-ownership__dropzone--file | body-sm">
+          <p>Selected: {{ file.name }} — {{ (file.size / 1024).toFixed(1) }} KB</p>
+          <button class="button button-sm button-delete" @click.stop="removeFile(index)">Remove</button>
         </div>
 
-        <input ref="fileInput" type="file" accept="image/*,.pdf" hidden @change="onFileChange" />
+        <input 
+          :ref="el => fileInputs[index] = el as HTMLInputElement" 
+          type="file" 
+          accept="image/*,.pdf" 
+          hidden 
+          @change="(e) => onFileChange(e, index)" 
+        />
       </div>
 
       <div class="v-ownership__actions">
@@ -41,8 +52,8 @@
 <script setup lang="ts">
 import type { AddressCreateWithoutUserInput } from '~~/layers/database/server/database/prisma/generated/models';
 
-const selectedFile = ref<File | null>(null);
-const fileInput = ref<HTMLInputElement | null>(null);
+const selectedFiles = ref<(File | null)[]>([null, null]);
+const fileInputs = ref<HTMLInputElement[]>([]);
 const isLoading = ref(false);
 
 const props = defineProps({
@@ -92,14 +103,18 @@ function handleAddressSelected(selectedAddress: any) {
   };
 }
 
-function handleFile(input: HTMLInputElement | null) {
-  input?.click();
+function handleFile(index: number) {
+  fileInputs.value[index]?.click();
 }
 
-async function onFileChange(event: Event) {
+function removeFile(index: number) {
+  selectedFiles.value[index] = null;
+}
+
+async function onFileChange(event: Event, index: number) {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
-    selectedFile.value = target.files[0]!;
+    selectedFiles.value[index] = target.files[0]!;
   }
 }
 
@@ -116,13 +131,17 @@ function validateAddress() {
 
 async function submitForm() {
   if(!validateAddress()) return;
-  if(!selectedFile.value) return;
+  if(selectedFiles.value.some(file => !file)) return;
   
   isLoading.value = true;
   
   try {
     const formData = new FormData();
-    formData.append('file', selectedFile.value);
+    selectedFiles.value.forEach((file, index) => {
+      if (file) {
+        formData.append('files', file);
+      }
+    });
     formData.append('address', JSON.stringify(address.value));
     formData.append('tier', JSON.stringify(props.tier));
     
