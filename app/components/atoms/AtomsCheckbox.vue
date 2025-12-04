@@ -1,3 +1,9 @@
+<!--
+  @TODO
+  Rename this component to AtomsCheckboxPill, OR add a 'pill' variant to
+  props and merge with AtomsChecktext
+-->
+
 <template>
   <label class="a-checkbox | body-sm font-semibold">
     <input type="checkbox" :value :checked v-model="isChecked" class="| visually-hidden" />
