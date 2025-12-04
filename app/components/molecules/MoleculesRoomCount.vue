@@ -1,58 +1,49 @@
 <template>
-  <div class="a-number-range | gradient-box">
-    <AtomsRangeSelect label="From" :options="availableMin" v-model="minValue" />
-    <AtomsRangeSelect label="To" :options="availableMax" v-model="maxValue" />
+  <div class="a-number-range">
+    <AtomsRangeSelect :label="'Min ' + roomType" :options="availableMin" v-model="minValue"
+      class="a-number-range__range-select" />
+    <AtomsRangeSelect :label="'Max ' + roomType" :options="availableMax" v-model="maxValue"
+      class="a-number-range__range-select" />
   </div>
 </template>
 
-<script setup>
-/**
- *  Raw options
- */
-const min = [
-  { key: 0, value: 'No min', selected: true },
-  { key: 0.5, value: 'Studio' },
-  { key: 1, value: '1' },
-  { key: 2, value: '2' },
-  { key: 3, value: '3' },
-  { key: 4, value: '4' },
-  { key: 5, value: '5' },
-  { key: 6, value: '6' },
-  { key: 7, value: '7' },
-  { key: 8, value: '8+' }
-]
+<script setup lang="ts">
+interface RoomRange {
+  key: number
+  value: string
+  selected?: boolean
+}
 
-const max = [
-  { key: 0.5, value: 'Studio' },
-  { key: 1, value: '1' },
-  { key: 2, value: '2' },
-  { key: 3, value: '3' },
-  { key: 4, value: '4' },
-  { key: 5, value: '5' },
-  { key: 6, value: '6' },
-  { key: 7, value: '7' },
-  { key: 8, value: '8' },
-  { key: 9, value: 'No max', selected: true }
-]
+interface Props {
+  min: RoomRange[]
+  max: RoomRange[]
+  roomType: string
+}
+
+const props = defineProps<Props>()
 
 /**
  *  Selection
  */
-const minValue = ref(min.find(({ selected }) => selected)?.key)
-const maxValue = ref(max.find(({ selected }) => selected)?.key)
+const minValue = ref(props.min.find(({ selected }) => selected)?.key)
+const maxValue = ref(props.max.find(({ selected }) => selected)?.key)
 
 /**
  *  Avoid overlapping selections
  */
 const availableMin = computed(() => {
-  const maxKey = maxValue.value
+  const { min, max } = props
+
+  const maxKey = Number(maxValue.value)
   const selected = max.findIndex(({ key }) => key === maxKey)
 
   return min.slice(0, selected + 2)
 })
 
 const availableMax = computed(() => {
-  const minKey = minValue.value
+  const { min, max } = props
+
+  const minKey = Number(minValue.value)
   const selected = min.findIndex(({ key }) => key === minKey)
 
   return max.slice(Math.max(selected - 1, 0))
@@ -62,10 +53,15 @@ const availableMax = computed(() => {
 
 <style lang="scss">
 .a-number-range {
-  padding: var(--size-12);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--size-8);
+  flex-grow: 1;
 
-  input {
-    display: block;
+  &__range-select {
+    flex-grow: 1;
   }
 }
 </style>

@@ -8,15 +8,13 @@
       <OrganismsTraditionalSearchPropertyType class="o-traditional-search-form__property-type-grid" />
     </div>
 
-    <div class="o-traditional-search-form__room-count">
-      <div>
-        <h3 class="o-traditional-search-form__title | title-xs">Bed count</h3>
-        <MoleculesRoomCount />
-      </div>
 
-      <div>
-        <h3 class="o-traditional-search-form__title | title-xs">Bathroom count</h3>
-        <MoleculesRoomCount />
+    <div class="o-traditional-search-form__room-count">
+      <h3 class="o-traditional-search-form__title | title-xs">Room counts</h3>
+
+      <div class="o-traditional-search-form__room-count-grid">
+        <MoleculesRoomCount :min="bedroomMin" :max="bedroomMax" room-type="bedrooms" />
+        <MoleculesRoomCount :min="bathroomMin" :max="bathroomMax" room-type="bathrooms" />
       </div>
     </div>
 
@@ -27,7 +25,54 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+const bedroomMin = [
+  { key: 0, value: 'Any', selected: true },
+  { key: 0.5, value: 'Studio' },
+  { key: 1, value: '1' },
+  { key: 2, value: '2' },
+  { key: 3, value: '3' },
+  { key: 4, value: '4' },
+  { key: 5, value: '5' },
+  { key: 6, value: '6' },
+  { key: 7, value: '7' },
+  { key: 8, value: '8+' }
+]
+
+const bedroomMax = [
+  { key: 0.5, value: 'Studio' },
+  { key: 1, value: '1' },
+  { key: 2, value: '2' },
+  { key: 3, value: '3' },
+  { key: 4, value: '4' },
+  { key: 5, value: '5' },
+  { key: 6, value: '6' },
+  { key: 7, value: '7' },
+  { key: 8, value: '8' },
+  { key: 9, value: 'Any', selected: true }
+]
+
+const bathroomMin = [
+  { key: 0, value: 'Any', selected: true },
+  { key: 1, value: '1' },
+  { key: 2, value: '2' },
+  { key: 3, value: '3' },
+  { key: 4, value: '4' },
+  { key: 5, value: '5+' },
+]
+
+const bathroomMax = [
+  { key: 1, value: '1' },
+  { key: 2, value: '2' },
+  { key: 3, value: '3' },
+  { key: 4, value: '4' },
+  { key: 5, value: '5' },
+  { key: 6, value: 'Any', selected: true }
+]
+
+
+</script>
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
@@ -43,13 +88,10 @@
     text-align: left;
   }
 
-  &__room-count {
-    display: grid;
-    gap: var(--size-16);
-
-    @include mq.small-tablet {
-      grid-template-columns: 1fr 1fr;
-    }
+  &__room-count-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-32);
   }
 }
 </style>

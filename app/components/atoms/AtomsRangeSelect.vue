@@ -1,20 +1,26 @@
 <template>
-  <fieldset>
-    <legend v-if="label">{{ label }}</legend>
+  <fieldset class="a-range-select">
+    <legend v-if="label" class="a-range-select__legend | body-sm font-bold">
+      {{ label }}
+    </legend>
 
-    <button type="button" :disabled="firstSelected" @click.prevent="selectPreviousOption">
-      Decrease
-    </button>
+    <div role="presentation" class="a-range-select__inputs | gradient-box">
+      <button type="button" :disabled="firstSelected" class="a-range-select__button a-range-select__button--decrease"
+        @click.prevent="selectPreviousOption">
+        <AtomsIcon icon="remove" title="Decrease" />
+      </button>
 
-    <select name="min-bedrooms" v-model="selected">
-      <option v-for="{ key, value, selected } of optionsArray" :key :value="key" :selected>
-        {{ value }}
-      </option>
-    </select>
+      <select name="min-bedrooms" v-model="selected" class="a-range-select__dropdown">
+        <option v-for="{ key, value, selected } of optionsArray" :key :value="key" :selected>
+          {{ value }}
+        </option>
+      </select>
 
-    <button type="button" :disabled="lastSelected" @click.prevent="selectNextOption">
-      Increase
-    </button>
+      <button type="button" :disabled="lastSelected" class="a-range-select__button a-range-select__button--increase"
+        @click.prevent="selectNextOption">
+        <AtomsIcon icon="plus" title="Increase" />
+      </button>
+    </div>
   </fieldset>
 </template>
 
@@ -91,8 +97,62 @@ function selectNextOption() {
 
 </script>
 
-<style scoped>
-button[disabled] {
-  opacity: 0.4;
+<style lang="scss">
+@use '#styles/_utils/functions' as fn;
+
+.a-range-select {
+  padding: 0;
+  margin: 0;
+
+  &__legend {
+    position: static;
+    display: block;
+    padding-left: var(--size-10);
+    margin: 0 0 var(--size-4);
+  }
+
+  &__inputs {
+    display: flex;
+    padding: var(--size-10);
+    gap: var(--size-6);
+    flex-grow: 1;
+  }
+
+  &__dropdown {
+    flex-grow: 1;
+    text-align: center;
+    appearance: none;
+    height: var(--size-40);
+    padding: 0;
+    margin: 0;
+    border-radius: var(--border-radius-lg);
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--size-40);
+    height: var(--size-40);
+    padding: 0;
+    margin: 0;
+    border-radius: var(--border-radius-lg);
+    background: transparent;
+    color: var(--foreground-200);
+
+    &:hover:not([disabled]) {
+      background: var(--background-300);
+    }
+
+    .a-icon {
+      width: var(--size-24);
+      height: var(--size-24);
+    }
+
+    &[disabled] {
+      color: #{fn.faded-color(40%)};
+      cursor: default;
+    }
+  }
 }
 </style>
