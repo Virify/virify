@@ -23,25 +23,31 @@
     </nav>
 
     <div role="presentation" class="o-traditional-search-form-contract__content">
+      <h3 class="o-traditional-search-form-contract__title | title-xs">
+        Include
+      </h3>
+
       <section id="o-traditional-search-form-contract-buy" class="o-traditional-search-form-contract__content-block"
         :hidden="contractType.buyOrRent">
 
-        <AtomsCheckbox label="Include sold STC" />
-        <AtomsCheckbox label="Include shared ownership" />
-        <AtomsCheckbox label="Include retirement properties" />
-        <AtomsCheckbox label="Include cash-only properties" />
+        <AtomsChecktext label="Include sold STC" />
+        <AtomsChecktext label="Include shared ownership" />
+        <AtomsChecktext label="Include retirement properties" />
+        <AtomsChecktext label="Include cash-only properties" />
       </section>
 
       <section id="o-traditional-search-form-contract-rent" class="o-traditional-search-form-contract__content-block"
         :hidden="!contractType.buyOrRent">
 
-        <AtomsCheckbox label="Include let agreed" />
-        <AtomsCheckbox label="Include short-term lets" />
-        <AtomsCheckbox label="Include long-term lets" />
+        <AtomsChecktext label="Include let agreed" />
+        <AtomsChecktext label="Include short-term lets" />
+        <AtomsChecktext label="Include long-term lets" />
       </section>
 
       <section class="o-traditional-search-form-contract__price">
-        <h3 class="| title-2xs">Price</h3>
+        <h3 class="o-traditional-search-form-contract__title | title-xs">
+          Price
+        </h3>
 
         <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="contractType.min" :max="contractType.max"
           :starting-min="contractType.min" :starting-max="contractType.max" :graph-data="priceRangeGraph"
@@ -91,6 +97,10 @@ function updateIsBuy(newValue: boolean) {
 .o-traditional-search-form-contract {
   --search-form-background: linear-gradient(to bottom, var(--blue-400), var(--blue-300));
   --search-form-foreground: var(--monochrome-900);
+
+  &__title {
+    margin-bottom: var(--size-16);
+  }
 
   &__menu {
     list-style: none;
@@ -185,11 +195,16 @@ function updateIsBuy(newValue: boolean) {
     align-items: flex-start;
     justify-content: flex-start;
     flex-wrap: wrap;
-    gap: var(--size-8);
-    margin: 0 0 var(--size-24);
+    row-gap: var(--size-12);
+    column-gap: var(--size-24);
+    margin: 0 0 var(--size-40);
+
+    @include mq.tablet {
+      grid-template-columns: 1fr 1fr;
+    }
 
     :where(&) {
-      display: flex;
+      display: grid;
     }
   }
 }

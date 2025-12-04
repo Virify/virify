@@ -1,16 +1,20 @@
 <template>
-  <div class="o-traditional-search-form | flow flow-xl">
+  <div class="o-traditional-search-form | flow flow-4xl">
     <OrganismsTraditionalSearchContract />
 
     <div class="o-traditional-search-form__property-type">
-      <h3 class="o-traditional-search-form__title | title-xs">Property type</h3>
+      <h3 class="o-traditional-search-form__title | title-xs">
+        Property type
+      </h3>
 
       <OrganismsTraditionalSearchPropertyType class="o-traditional-search-form__property-type-grid" />
     </div>
 
 
     <div class="o-traditional-search-form__room-count">
-      <h3 class="o-traditional-search-form__title | title-xs">Room counts</h3>
+      <h3 class="o-traditional-search-form__title | title-xs">
+        Room counts
+      </h3>
 
       <div class="o-traditional-search-form__room-count-grid">
         <MoleculesRoomCount :min="bedroomMin" :max="bedroomMax" room-type="bedrooms" />
@@ -19,7 +23,9 @@
     </div>
 
     <div>
-      <h3 class="o-traditional-search-form__title | title-2xs">Additional features</h3>
+      <h3 class="o-traditional-search-form__title | title-xs">
+        Additional features
+      </h3>
       <p>Coming soon...</p>
     </div>
   </div>
