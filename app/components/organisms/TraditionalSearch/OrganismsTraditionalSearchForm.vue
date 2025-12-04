@@ -26,7 +26,12 @@
       <h3 class="o-traditional-search-form__title | title-xs">
         Additional features
       </h3>
-      <p>Coming soon...</p>
+
+      <ul class="o-traditional-search-form__additional-features">
+        <li v-for="feature of additionalFeatures">
+          <AtomsCheckbox :label="feature" />
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -77,7 +82,15 @@ const bathroomMax = [
   { key: 6, value: 'Any', selected: true }
 ]
 
-
+const additionalFeatures = [
+  'Garage',
+  'Off-street parking',
+  'Disability access',
+  'Garden',
+  'Pet-friendly',
+  'Another feature',
+  'And another',
+]
 </script>
 
 <style lang="scss">
@@ -98,6 +111,15 @@ const bathroomMax = [
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-32);
+  }
+
+  &__additional-features {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+    gap: var(--size-8);
   }
 }
 </style>
