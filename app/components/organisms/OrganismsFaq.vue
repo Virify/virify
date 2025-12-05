@@ -1,10 +1,8 @@
 <template>
   <div class="o-faq">
     <p class="o-faq-subtitle | body-lg" v-if="description">{{ description }}</p>
-    <MoleculesFaqItem class="o-faq-item" v-for="(item, index) in items" :key="index" :question="item.question" :answer="item.answer"
-      :active="item.active" />
+    <MoleculesFaqItem class="o-faq-item" v-for="(item, index) in items" :key="index" :question="item.question" :answer="item.answer" :active="item.active" />
   </div>
-
 </template>
 <script lang="ts" setup>
 interface Props {
@@ -18,12 +16,12 @@ interface Props {
 const props = defineProps<Props>();
 
 useSchemaOrg({
-  '@type': 'FAQPage',
-  mainEntity: props.items.map(item => ({
-    '@type': 'Question',
+  "@type": "FAQPage",
+  mainEntity: props.items.map((item) => ({
+    "@type": "Question",
     name: item.question,
     acceptedAnswer: {
-      '@type': 'Answer',
+      "@type": "Answer",
       text: item.answer,
     },
   })),
@@ -33,7 +31,9 @@ useSchemaOrg({
 .o-faq {
   &-subtitle {
     text-align: center;
+    margin: 0 auto;
     margin-bottom: var(--size-32);
+    max-width: 600px;
   }
 
   &-item {
