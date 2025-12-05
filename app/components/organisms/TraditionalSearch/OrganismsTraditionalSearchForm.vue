@@ -32,6 +32,15 @@
           <AtomsCheckbox :label="feature" />
         </li>
       </ul>
+
+      <AtomsCollapsibleTip class="o-traditional-search-form__tip">
+        <h3 class="| title-2xs">Want even more customisability?</h3>
+
+        <p class="| body-sm">
+          Why not check out our AI-enhanced search to find your perfect home! Just select the 'AI enhanced' option at
+          the top of this form
+        </p>
+      </AtomsCollapsibleTip>
     </div>
   </div>
 </template>
@@ -120,6 +129,10 @@ const additionalFeatures = [
     padding: 0;
     flex-wrap: wrap;
     gap: var(--size-8);
+  }
+
+  &__tip {
+    margin: var(--size-24) 0 0;
   }
 }
 </style>
