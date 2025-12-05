@@ -229,6 +229,16 @@ export const contactPageQuery = `*[_type == "contactPage"][0] {
     description,
     buttonText
   },
+  faqSection {
+    title,
+    description,
+    faqs[]-> {
+      _id,
+      question,
+      answer,
+      enabled
+    }
+  },
   seo {
     metaTitle,
     metaDescription,

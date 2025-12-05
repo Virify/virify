@@ -111,6 +111,37 @@ export const contactPageType = defineType({
       ],
     }),
 
+    // faq section
+    defineField({
+      name: 'faqSection',
+      title: 'FAQ Section',
+      type: 'object',
+      fields: [
+        {
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          description: 'Use {gradient}text{/gradient} for gradient styling',
+          initialValue: 'Frequently Asked Questions',
+        },
+        {
+          name: 'description',
+          title: 'Description',
+          type: 'text',
+          rows: 3,
+          initialValue:
+            'Have questions? Here are some of the most common inquiries we receive about our platform and services.',
+        },
+        {
+          name: 'faqs',
+          title: 'FAQ Items',
+          type: 'array',
+          of: [{type: 'reference', to: [{type: 'faq'}]}],
+        },
+      ],
+      
+    }),
+
     // SEO Metadata
     defineField({
       name: 'seo',

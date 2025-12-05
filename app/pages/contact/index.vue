@@ -54,20 +54,10 @@
               <div class="contact-form__field contact-form__field--full">
                 <label for="enquiry" class="contact-form__label | body-sm">Enquiry <span
                     class="required">*</span></label>
-                <textarea 
-                  id="enquiry" 
-                  ref="enquiryInput"
-                  v-model="formData.enquiry" 
-                  name="enquiry"
-                  class="contact-form__textarea | text-input body-sm" 
-                  placeholder="Tell us about your enquiry..."
-                  rows="6" 
-                  minlength="10" 
-                  maxlength="1000" 
-                  required 
-                  :disabled="isSubmitting || isSuccess"
-                  @input="checkEnquiryValidity"
-                ></textarea>
+                <textarea id="enquiry" ref="enquiryInput" v-model="formData.enquiry" name="enquiry"
+                  class="contact-form__textarea | text-input body-sm" placeholder="Tell us about your enquiry..."
+                  rows="6" minlength="10" maxlength="1000" required :disabled="isSubmitting || isSuccess"
+                  @input="checkEnquiryValidity"></textarea>
                 <AtomsInlineError v-if="enquiryError" id="enquiry-error">
                   {{ enquiryError }}
                 </AtomsInlineError>
@@ -99,23 +89,29 @@
     <!-- ============================================ -->
     <!-- PARTNER SECTION -->
     <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.partnerSection.title || ''"
+    <MoleculesCtaSection :title="cmsContent?.partnerSection.title || ''"
       :description="cmsContent?.partnerSection.description || ''"
-      :buttonText="cmsContent?.partnerSection.buttonText || ''"
-      gradient
-      @click="scrollToForm"
-    />
+      :buttonText="cmsContent?.partnerSection.buttonText || ''" gradient @click="scrollToForm" />
 
     <!-- ============================================ -->
     <!-- INTERESTED SECTION -->
     <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.interestedSection.title || ''"
+    <MoleculesCtaSection :title="cmsContent?.interestedSection.title || ''"
       :description="cmsContent?.interestedSection.description || ''"
-      :buttonText="cmsContent?.interestedSection.buttonText || ''"
-      to="/"
-    />
+      :buttonText="cmsContent?.interestedSection.buttonText || ''" to="/" />
+
+    <!-- FAQ SECTION-->
+    <section class="contact-faq">
+      <div class="container">
+        <h2 class="contact-faq__title | title-xl">
+          <template v-for="(part, index) in parseGradientTextParts(cmsContent?.faqSection.title || '')" :key="index">
+              <span v-if="part.isGradient" class="gradient-text-light">{{ part.text }}</span>
+              <template v-else>{{ part.text }}</template>
+            </template>
+        </h2>
+        <OrganismsFaq :items="cmsContent?.faqSection.faqs || []" :description="cmsContent?.faqSection.description || ''"/>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -171,7 +167,7 @@ onMounted(() => {
   // Wait for Turnstile script to load before initializing
   let retryCount = 0;
   const maxRetries = 50; // Max 5 seconds (50 * 100ms)
-  
+
   const initTurnstile = () => {
     if ((window as any).turnstile && turnstileEl.value) {
       try {
@@ -195,7 +191,7 @@ onMounted(() => {
       console.error('Turnstile script failed to load after maximum retries');
     }
   };
-  
+
   initTurnstile();
 });
 
@@ -203,20 +199,20 @@ onUnmounted(() => {
   if ((window as any).turnstile && widgetId.value) {
     try {
       (window as any).turnstile.remove(widgetId.value);
-    } catch (_) {}
+    } catch (_) { }
   }
 });
 
 async function handleSubmit() {
   formError.value = null;
-  
+
   if (!isFormValid.value) {
     formError.value = "Please complete all required fields";
     return;
   }
-  
+
   isSubmitting.value = true;
-  
+
   if ((window as any).turnstile && widgetId.value) {
     (window as any).turnstile.execute(widgetId.value);
   }
@@ -243,11 +239,11 @@ async function submitForm() {
   } catch (error: any) {
     console.error("Contact form error:", error);
     formError.value = error.data?.statusMessage || error.statusMessage || "Failed to send enquiry. Please try again.";
-    
+
     if ((window as any).turnstile && widgetId.value) {
-      try { 
+      try {
         (window as any).turnstile.reset(widgetId.value);
-      } catch (_) {}
+      } catch (_) { }
       turnstileToken.value = null;
     }
   } finally {
@@ -259,7 +255,7 @@ async function submitForm() {
 // Use CMS SEO metadata if available, otherwise fallback to defaults
 const seoData = computed(() => {
   const cms = cmsContent.value?.seo;
-  
+
   return {
     title: cms?.metaTitle,
     description: cms?.metaDescription,
@@ -461,6 +457,14 @@ useSchemaOrg([
     p {
       margin: 0;
     }
+  }
+}
+
+.contact-faq {
+  padding: var(--size-120) 0;
+  &__title {
+    text-align: center;
+    padding-bottom: var(--size-16);
   }
 }
 

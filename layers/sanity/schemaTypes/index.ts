@@ -7,11 +7,13 @@ import {waitingListPageType} from './waitingListPageType'
 import {contactPageType} from './contactPageType'
 import {iconType} from './iconType'
 import {featureSectionType} from './featureSectionType'
+import {faqType} from './faqType'
 
 export const schemaTypes = [
   // Reusable types
   iconType,
   featureSectionType,
+  faqType,
   
   // Documents
   guideCategory,

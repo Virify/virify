@@ -324,6 +324,16 @@ export interface ContactPage {
     description: string
     buttonText: string
   }
+  faqSection: {
+    title: string
+    description: string
+    faqs: {
+      _id: string
+      question: string
+      answer: string
+      active: boolean
+    }[]
+  }
   seo?: SeoMetadata
 }
 
