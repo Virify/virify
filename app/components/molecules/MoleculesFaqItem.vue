@@ -1,7 +1,7 @@
 <template>
   <div class="m-faq-item" @click="isActive = !isActive">
     <div class="m-faq-item__question">
-      <h3 class="m-faq-item__question--title | title-sm">{{ question }}</h3>
+      <h3 class="m-faq-item__question--title | body-lg">{{ question }}</h3>
       <AtomsIcon class="m-faq-item__question--icon" :class="{ 'is-active': isActive }" icon="chevron-down" />
     </div>
     <p v-show="isActive" class="m-faq-item__answer | body-md">{{ answer }}</p>
@@ -21,11 +21,7 @@ const isActive = ref(props.active ?? false)
 @use "#styles/_utils/media" as mq;
 
 .m-faq-item {
-  padding: var(--size-16) 0;
-
-  @include mq.desktop {
-    padding: var(--size-8) 0;
-  }
+  padding: var(--size-8) 0;
 
   &__question {
     display: flex;
