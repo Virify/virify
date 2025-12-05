@@ -236,7 +236,7 @@ export const contactPageQuery = `*[_type == "contactPage"][0] {
       _id,
       question,
       answer,
-      enabled
+      active
     }
   },
   seo {

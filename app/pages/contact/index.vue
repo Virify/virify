@@ -105,11 +105,12 @@
       <div class="container">
         <h2 class="contact-faq__title | title-xl">
           <template v-for="(part, index) in parseGradientTextParts(cmsContent?.faqSection.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text-light">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
-            </template>
+            <span v-if="part.isGradient" class="gradient-text-light">{{ part.text }}</span>
+            <template v-else>{{ part.text }}</template>
+          </template>
         </h2>
-        <OrganismsFaq :items="cmsContent?.faqSection.faqs || []" :description="cmsContent?.faqSection.description || ''"/>
+        <OrganismsFaq :items="cmsContent?.faqSection.faqs || []"
+          :description="cmsContent?.faqSection.description || ''" />
       </div>
     </section>
   </div>
@@ -462,6 +463,7 @@ useSchemaOrg([
 
 .contact-faq {
   padding: var(--size-120) 0;
+
   &__title {
     text-align: center;
     padding-bottom: var(--size-16);
