@@ -338,6 +338,13 @@ export interface ContactPage {
       active: boolean
     }[]
   }
+  guidesSection?: {
+    title: string,
+    description: string,
+    guides: (Omit<Guide, 'category'> & {
+      category: GuideCategory
+    })[]
+  }
   seo?: SeoMetadata
 }
 

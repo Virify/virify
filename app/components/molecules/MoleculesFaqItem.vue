@@ -14,8 +14,8 @@ interface Props {
   active?: boolean;
 }
 
-const props = defineProps<Props>()
-const isActive = ref(props.active ?? false)
+const props = defineProps<Props>();
+const isActive = ref(props.active ?? false);
 </script>
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
@@ -31,6 +31,7 @@ const isActive = ref(props.active ?? false)
 
     &--title {
       margin: 0;
+      line-height: var(--lineheight-sm);
     }
 
     &--icon {

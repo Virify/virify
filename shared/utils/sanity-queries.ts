@@ -243,6 +243,26 @@ export const contactPageQuery = `*[_type == "contactPage"][0] {
       active
     }
   },
+  guidesSection {
+    title,
+    description,
+    guides[]-> {
+      _id,
+      title,
+      slug,
+      excerpt,
+      heroImage,
+      icon,
+      readTime,
+      publishedAt,
+      orderIndex,
+      category-> {
+        _id,
+        title,
+        slug
+      }
+    }
+  },
   seo {
     metaTitle,
     metaDescription,
