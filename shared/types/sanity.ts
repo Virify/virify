@@ -314,15 +314,29 @@ export interface ContactPage {
     title: string
     description: string
   }
+  interestedSection: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  pressFormSection: {
+    title: string
+    description: string
+  }
   partnerSection: {
     title: string
     description: string
     buttonText: string
   }
-  interestedSection: {
+  faqSection: {
     title: string
     description: string
-    buttonText: string
+    faqs: {
+      _id: string
+      question: string
+      answer: string
+      active: boolean
+    }[]
   }
   seo?: SeoMetadata
 }

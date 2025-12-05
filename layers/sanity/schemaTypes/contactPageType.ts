@@ -39,7 +39,7 @@ export const contactPageType = defineType({
           name: 'title',
           title: 'Title',
           type: 'string',
-          initialValue: 'Get in touch',
+          initialValue: 'Talk with our team',
         },
         {
           name: 'description',
@@ -47,7 +47,59 @@ export const contactPageType = defineType({
           type: 'text',
           rows: 2,
           initialValue:
-            "Fill in the form below and we'll get back to you as soon as possible. We typically respond within 24 hours.",
+            "Share your questions, ideas, or feedback in the form below. Our team usually replies within 24 hours, so you’ll never be left waiting.",
+        },
+      ],
+    }),
+
+    // Interested Section
+    defineField({
+      name: 'interestedSection',
+      title: "Interested in What We're Doing Section",
+      type: 'object',
+      fields: [
+        {
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          initialValue: 'Collaborate with us',
+        },
+        {
+          name: 'description',
+          title: 'Description',
+          type: 'text',
+          rows: 3,
+          initialValue:
+            'Passionate about reimagining property? So are we. Use the form below to connect and explore how we can work together.',
+        },
+        {
+          name: 'buttonText',
+          title: 'Button Text',
+          type: 'string',
+          initialValue: 'Join the waiting list',
+        },
+      ],
+    }),
+
+    // Form Section
+    defineField({
+      name: 'pressFormSection',
+      title: 'Press Form Section',
+      type: 'object',
+      fields: [
+        {
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          initialValue: 'Have a press enquiry?',
+        },
+        {
+          name: 'description',
+          title: 'Description',
+          type: 'text',
+          rows: 2,
+          initialValue:
+            "Journalists, researchers, storytellers: if you’ve got a question, we’ll have an answer. Complete the form below and we’ll get back to you within 24 hours. ",
         },
       ],
     }),
@@ -82,17 +134,18 @@ export const contactPageType = defineType({
       ],
     }),
 
-    // Interested Section
+    // faq section
     defineField({
-      name: 'interestedSection',
-      title: 'Interested in What We\'re Doing Section',
+      name: 'faqSection',
+      title: 'FAQ Section',
       type: 'object',
       fields: [
         {
           name: 'title',
           title: 'Title',
           type: 'string',
-          initialValue: 'Interested in what we are doing?',
+          description: 'Use {gradient}text{/gradient} for gradient styling',
+          initialValue: 'Frequently Asked Questions',
         },
         {
           name: 'description',
@@ -100,13 +153,13 @@ export const contactPageType = defineType({
           type: 'text',
           rows: 3,
           initialValue:
-            "We're always looking to connect with individuals and organizations who share our passion for innovation in the property sector. If you're interested in collaborating or learning more about our initiatives, please don't hesitate to reach out.",
+            'Have questions? Here are some of the most common inquiries we receive about our platform and services.',
         },
         {
-          name: 'buttonText',
-          title: 'Button Text',
-          type: 'string',
-          initialValue: 'Join the waiting list',
+          name: 'faqs',
+          title: 'FAQ Items',
+          type: 'array',
+          of: [{type: 'reference', to: [{type: 'faq'}]}],
         },
       ],
     }),
@@ -127,7 +180,7 @@ export const contactPageType = defineType({
           type: 'string',
           description: 'Recommended: 50-60 characters',
           validation: (Rule) => Rule.max(60).warning('Titles over 60 characters may be truncated'),
-          initialValue: 'Contact Virify - Get in Touch | The UK\'s Open Property Marketplace',
+          initialValue: "Contact Virify - Get in Touch | The UK's Open Property Marketplace",
         },
         {
           name: 'metaDescription',
@@ -135,9 +188,10 @@ export const contactPageType = defineType({
           type: 'text',
           rows: 3,
           description: 'Recommended: 150-160 characters',
-          validation: (Rule) => Rule.max(160).warning('Descriptions over 160 characters may be truncated'),
+          validation: (Rule) =>
+            Rule.max(160).warning('Descriptions over 160 characters may be truncated'),
           initialValue:
-            'Contact Virify for partnership opportunities, platform enquiries, or questions about the UK\'s first open property marketplace. We typically respond within 24 hours.',
+            "Contact Virify for partnership opportunities, platform enquiries, or questions about the UK's first open property marketplace. We typically respond within 24 hours.",
         },
         {
           name: 'keywords',
@@ -161,7 +215,7 @@ export const contactPageType = defineType({
           rows: 2,
           description: 'Description for social media shares',
           initialValue:
-            'Contact us about partnerships, platform questions, or general enquiries about Virify\'s open property marketplace.',
+            "Contact us about partnerships, platform questions, or general enquiries about Virify's open property marketplace.",
         },
         {
           name: 'ogImage',
