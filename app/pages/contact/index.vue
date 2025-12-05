@@ -87,21 +87,89 @@
     </section>
 
     <!-- ============================================ -->
-    <!-- PARTNER SECTION -->
-    <!-- ============================================ -->
-    <MoleculesCtaSection :title="cmsContent?.partnerSection.title || ''"
-      :description="cmsContent?.partnerSection.description || ''"
-      :buttonText="cmsContent?.partnerSection.buttonText || ''" gradient @click="scrollToForm" />
-
-    <!-- ============================================ -->
     <!-- INTERESTED SECTION -->
     <!-- ============================================ -->
     <MoleculesCtaSection :title="cmsContent?.interestedSection.title || ''"
       :description="cmsContent?.interestedSection.description || ''"
-      :buttonText="cmsContent?.interestedSection.buttonText || ''" to="/" />
+      :buttonText="cmsContent?.interestedSection.buttonText || ''" to="/"
+      :gradient="true" />
+
+    <!-- Press enquiry section -->
+    <section class="contact-form-section" id="contact">
+      <div class="container">
+        <div class="contact-form-container">
+          <h2 class="contact-form__title | title-md">{{ cmsContent?.pressFormSection.title }}</h2>
+          <p class="contact-form__description | body-md">{{ cmsContent?.pressFormSection.description }}</p>
+
+          <form @submit.prevent="handleSubmit" class="contact-form">
+            <div v-if="formError" class="contact-form__error">
+              {{ formError }}
+            </div>
+
+            <div class="contact-form__fields">
+              <div class="contact-form__field">
+                <label for="name" class="contact-form__label | body-sm">Name <span class="required">*</span></label>
+                <AtomsInput id="name" v-model="formData.name" type="text" name="name" placeholder="Your full name"
+                  minLength="4" maxLength="40" required :disabled="isSubmitting || isSuccess" />
+              </div>
+
+              <div class="contact-form__field">
+                <label for="email" class="contact-form__label | body-sm">Email <span class="required">*</span></label>
+                <AtomsInput id="email" v-model="formData.email" type="email" name="email"
+                  placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" />
+              </div>
+
+              <div class="contact-form__field">
+                <label for="telephone" class="contact-form__label | body-sm">Telephone</label>
+                <AtomsInput id="telephone" v-model="formData.telephone" type="tel" name="telephone"
+                  placeholder="Optional contact number" pattern="[0-9+\s\-\(\)]*"
+                  title="Please enter a valid phone number" :disabled="isSubmitting || isSuccess" />
+              </div>
+
+              <div class="contact-form__field contact-form__field--full">
+                <label for="enquiry" class="contact-form__label | body-sm">Enquiry <span
+                    class="required">*</span></label>
+                <textarea id="enquiry" ref="enquiryInput" v-model="formData.enquiry" name="enquiry"
+                  class="contact-form__textarea | text-input body-sm" placeholder="Tell us about your enquiry..."
+                  rows="6" minlength="10" maxlength="1000" required :disabled="isSubmitting || isSuccess"
+                  @input="checkEnquiryValidity"></textarea>
+                <AtomsInlineError v-if="enquiryError" id="enquiry-error">
+                  {{ enquiryError }}
+                </AtomsInlineError>
+              </div>
+            </div>
+
+            <!-- Cloudflare Turnstile -->
+            <div class="contact-form__turnstile">
+              <div ref="turnstileEl"></div>
+            </div>
+
+            <div class="contact-form__submit-wrapper">
+              <AtomsButton v-if="!isSuccess" class="contact-form__submit-button | button-monochrome" type="submit"
+                :pending="isSubmitting" :disabled="!isFormValid || isSubmitting">
+                Send Enquiry
+              </AtomsButton>
+            </div>
+
+            <div class="contact-form__success" v-if="isSuccess">
+              <AtomsIcon icon="tick" :size="48" class="contact-form__success-icon" />
+              <h3 class="title-sm">Message sent!</h3>
+              <p class="body-sm">{{ message }}</p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- PARTNER SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection v-if="cmsContent?.partnerSection" :title="cmsContent?.partnerSection.title || ''"
+      :description="cmsContent?.partnerSection.description || ''"
+      :buttonText="cmsContent?.partnerSection.buttonText || ''" @click="scrollToForm" />
 
     <!-- FAQ SECTION-->
-    <section class="contact-faq">
+    <section class="contact-faq section-gradient-bg">
       <div class="container">
         <h2 class="contact-faq__title | title-xl">
           <template v-for="(part, index) in parseGradientTextParts(cmsContent?.faqSection.title || '')" :key="index">

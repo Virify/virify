@@ -314,12 +314,16 @@ export interface ContactPage {
     title: string
     description: string
   }
-  partnerSection: {
+  interestedSection: {
     title: string
     description: string
     buttonText: string
   }
-  interestedSection: {
+  pressFormSection: {
+    title: string
+    description: string
+  }
+  partnerSection: {
     title: string
     description: string
     buttonText: string
