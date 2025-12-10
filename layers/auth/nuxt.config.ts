@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   },
   imports: {
     dirs: ["server/utils", "server/plugins"],
-  }
+  },
   // devServer: {
   //   https: {
   //     key: "./server.key",
