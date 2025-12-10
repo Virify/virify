@@ -11,13 +11,14 @@ export type { User };
  * @param email - The email of the user to find.
  * @returns The user object if found, otherwise null.
  */
-export async function findUser(email: string): Promise<UserWithMembership | null> {
+export async function findUser(email: string): Promise<UserWithVerificationAndMembership | null> {
   return prisma.user.findUnique({
     where: {
       email,
     },
     include: {
       membership: true,
+      verification: true,
     },
   });
 }

@@ -32,3 +32,11 @@ model PricePaid {
   @@index([price])
   @@map("price_paid")
 }
+
+model PpdUpdateLog {
+  id Int @id @default(autoincrement())
+  update_date DateTime @default(now())
+  records_processed Int
+  data_hash String @unique
+  @@map("ppd_update_log")
+}

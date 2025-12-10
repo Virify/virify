@@ -71,6 +71,7 @@ async function seedAdminUser() {
         verification: {
           create: {
             activated: true,
+            role: 'ADMIN',
           },
         },
         address: {
