@@ -1,4 +1,6 @@
-// TODO: Move this import into a task or railway job
+/**
+ * This is setup as a function in railwauy to trigger ONCE
+ */
 import { Client } from "pg";
 import fetch from "node-fetch";
 import { pipeline } from "stream";
@@ -13,14 +15,16 @@ const LAND_REGISTRY_URL =
 
 const pipelineAsync = promisify(pipeline);
 
-async function importPPDStream() {
+export default async function importPPDStream() {
   const client = new Client({
+    // change this in railway to point to the PPD database
     connectionString: process.env.PPD_DATABASE_URL,
   });
 
   await client.connect();
   console.log("Connected to DB");
 
+  console.log("Starting COPY command...");
   const stream = client.query(
     copyFrom(`COPY price_paid (
   transaction_id, price, transfer_date, postcode, property_type, old_new, duration,
@@ -28,19 +32,59 @@ async function importPPDStream() {
 ) FROM STDIN WITH (FORMAT csv, DELIMITER ',', HEADER false, QUOTE '"')`)
   );
 
-  console.log("Starting download and streaming import...");
-
-  const response = await fetch(LAND_REGISTRY_URL);
+  console.log("Fetching data from Land Registry...");
+  const response = await fetch(LAND_REGISTRY_URL, {});
   if (!response.ok) throw new Error(`Failed to fetch data: ${response.status}`);
 
-  await pipelineAsync(response.body!, stream);
+  console.log("Starting streaming import (this will take 30-60 minutes)...");
+  
+  // Simple progress logging
+  let bytesProcessed = 0;
+  const startTime = Date.now();
+  
+  const progressInterval = setInterval(() => {
+    const mb = (bytesProcessed / 1024 / 1024).toFixed(2);
+    const mins = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
+    console.log(`Progress: ${mb} MB processed (${mins} mins)`);
+  }, 30000); // Log every 30 seconds
+  
+  response.body!.on('data', (chunk) => {
+    bytesProcessed += chunk.length;
+  });
+
+  response.body!.on('error', (err) => {
+    console.error('Response body error:', err);
+  });
+
+  stream.on('error', (err) => {
+    console.error('COPY stream error:', err);
+  });
+
+  try {
+    await pipelineAsync(response.body!, stream);
+  } catch (error) {
+    clearInterval(progressInterval);
+    console.error('Pipeline error:', error);
+    throw error;
+  }
+  
+  clearInterval(progressInterval);
 
   console.log("Import completed successfully");
+  console.log(`Total: ${(bytesProcessed / 1024 / 1024).toFixed(2)} MB in ${((Date.now() - startTime) / 1000 / 60).toFixed(2)} minutes`);
 
   await client.end();
+  
+  return {
+    success: true,
+    dataSizeMB: parseFloat((bytesProcessed / 1024 / 1024).toFixed(2))
+  };
 }
 
-importPPDStream().catch((e) => {
-  console.error("Import failed:", e);
-  process.exit(1);
-});
+// For running directly via tsx (not as Railway Function)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  importPPDStream().catch((e) => {
+    console.error("Import failed:", e);
+    process.exit(1);
+  });
+}
