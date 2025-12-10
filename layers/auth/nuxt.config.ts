@@ -8,6 +8,9 @@ export default defineNuxtConfig({
       DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
     },
   },
+  imports: {
+    dirs: ["server/utils", "server/plugins"],
+  }
   // devServer: {
   //   https: {
   //     key: "./server.key",

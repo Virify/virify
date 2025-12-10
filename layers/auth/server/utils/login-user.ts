@@ -1,6 +1,6 @@
 import type { UserSession } from "#auth-utils";
 import { H3Event } from "h3";
-import type { UserWithMembership } from "~~/layers/database/server/utils/user";
+import type { User, UserWithMembership } from "~~/layers/database/server/utils/user";
 
 /**
  * Handles the login process for users and agents.
@@ -10,7 +10,7 @@ import type { UserWithMembership } from "~~/layers/database/server/utils/user";
  * @param isAgentLogin - A boolean indicating if the login is for an agen
  * @returns - set User Session
  */
-export async function loginUser(event: H3Event, user: UserWithMembership): Promise<UserSession> {
+export async function loginUser(event: H3Event, user: UserWithVerificationAndMembership): Promise<UserSession> {
   // Clear any existing session
   await clearUserSession(event);
   // Set the new session with user details
@@ -22,6 +22,7 @@ export async function loginUser(event: H3Event, user: UserWithMembership): Promi
       membership: user.membership?.type,
       membershipActive: user.membership?.status,
       membershipEndDate: user.membership?.endDate,
+      role: user.verification?.role,
     },
     loggedIn: true,
     loggedInAt: new Date(),
