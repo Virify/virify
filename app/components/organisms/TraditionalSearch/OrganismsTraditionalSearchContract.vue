@@ -215,5 +215,16 @@ function updateIsBuy(newValue: boolean) {
     --track-thumb-color: var(--secondary-500);
     --track-thumb-border: none;
   }
+
+  .m-range-slider-input {
+    background: var(--blue-400);
+    color: var(--monochrome-900);
+    border-width: 2px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--secondary-500);
+    }
+  }
 }
 </style>

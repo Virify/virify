@@ -4,11 +4,11 @@
       class="m-range-slider-graph" />
 
     <AtomsLabel class="m-range-slider-label-min">
-      <AtomsCurrencyInput v-model="rangeValue[0]" class="m-range-slider-input" />
+      <AtomsCurrencyInput v-model="rangeValue[0]" class="m-range-slider-input | body-md" />
     </AtomsLabel>
 
     <AtomsLabel class="m-range-slider-label-max">
-      <AtomsCurrencyInput v-model="rangeValue[1]" class="m-range-slider-input" />
+      <AtomsCurrencyInput v-model="rangeValue[1]" class="m-range-slider-input | body-md" />
     </AtomsLabel>
 
     <SliderRoot v-model="rangeValue" :min="min" :max="max" class="m-range-slider-root">
@@ -121,6 +121,11 @@ watch(
   margin-bottom: var(--size-4);
   text-align: inherit;
   max-width: 15ch;
+
+  @supports (field-sizing: content) {
+    field-sizing: content;
+    width: auto;
+  }
 }
 
 /**
