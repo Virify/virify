@@ -67,6 +67,17 @@ watch(
 </script>
 
 <style lang="scss">
+:where(.m-range-slider) {
+  --track-empty-color:
+    light-dark(var(--monochrome-700), var(--monochrome-200));
+  --track-fill-color:
+    light-dark(var(--secondary-300), var(--secondary-500));
+  --track-thumb-color:
+    light-dark(var(--secondary-500), var(--secondary-300));
+  --track-thumb-border:
+    2px solid light-dark(var(--secondary-300), var(--secondary-500));
+}
+
 .m-range-slider {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -128,7 +139,7 @@ watch(
 
 .m-range-slider-track {
   position: relative;
-  background: light-dark(var(--monochrome-700), var(--monochrome-200));
+  background: var(--track-empty-color);
   flex-grow: 1;
   height: var(--size-6);
   border-radius: var(--border-radius-ui);
@@ -137,7 +148,7 @@ watch(
 .m-range-slider-range {
   position: absolute;
   border-radius: var(--border-radius-pill);
-  background: light-dark(var(--secondary-300), var(--secondary-500));
+  background: var(--track-fill-color);
   height: 100%;
 }
 
@@ -145,8 +156,8 @@ watch(
   display: block;
   width: var(--size-32);
   height: var(--size-32);
-  background: light-dark(var(--secondary-500), var(--secondary-300));
-  border: 2px solid light-dark(var(--secondary-300), var(--secondary-500));
+  background: var(--track-thumb-color);
+  border: var(--track-thumb-border);
   border-radius: 100%;
   cursor: grab;
 

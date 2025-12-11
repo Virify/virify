@@ -49,9 +49,9 @@
           Price
         </h3>
 
-        <LazyMoleculesRangeSlider v-model="selectedPriceRange" :min="contractType.min" :max="contractType.max"
-          :starting-min="contractType.min" :starting-max="contractType.max" :graph-data="priceRangeGraph"
-          hydrate-on-visible />
+        <LazyMoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="selectedPriceRange"
+          :min="contractType.min" :max="contractType.max" :starting-min="contractType.min"
+          :starting-max="contractType.max" :graph-data="priceRangeGraph" hydrate-on-visible />
       </section>
     </div>
   </div>
@@ -93,6 +93,7 @@ function updateIsBuy(newValue: boolean) {
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
+@use '#styles/_utils/functions' as fn;
 
 .o-traditional-search-form-contract {
   --search-form-background: linear-gradient(to bottom, var(--blue-400), var(--blue-300));
@@ -206,6 +207,13 @@ function updateIsBuy(newValue: boolean) {
     :where(&) {
       display: grid;
     }
+  }
+
+  &__price-slider {
+    --track-empty-color: var(--blue-500);
+    --track-fill-color: var(--secondary-500);
+    --track-thumb-color: var(--secondary-500);
+    --track-thumb-border: none;
   }
 }
 </style>
