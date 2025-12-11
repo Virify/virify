@@ -55,16 +55,9 @@ const isChecked = defineModel({
     font-weight: var(--font-medium);
   }
 
-  // &:has(input:checked) {
-  //   color: currentColor;
-
-  //   &:hover {
-  //     background: #{ fn.faded-color(10%) };
-  //   }
-  // }
-
   &:has(input:checked) &__icon {
     display: block;
+    animation: scaleFadeIn var(--animation-slow) var(--bounce-out);
   }
 }
 </style>
