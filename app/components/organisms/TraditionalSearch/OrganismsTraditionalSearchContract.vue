@@ -50,7 +50,8 @@
         </h3>
 
         <LazyMoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="contractType.price"
-          :min="contractType.minPrice" :max="contractType.maxPrice" :graph-data="priceRangeGraph" hydrate-on-visible />
+          :min="contractType.minPrice" :max="contractType.maxPrice" :graph-data="priceGraph"
+          :loading="priceGraphLoading" hydrate-on-visible />
       </section>
     </div>
   </div>
@@ -72,7 +73,7 @@ const contractType = useState('search-contract-type', () => reactive({
  *  Graph data
  *  @TODO combine these into 1 endpoint
  */
-const { data: priceRangeGraph } = useAsyncData('price-graph', () => {
+const { data: priceGraph, pending: priceGraphLoading } = useAsyncData('price-graph', () => {
   return $fetch<string[]>("/api/price/graph/", {
     params: {
       listingType: contractType.value.isSale ? 'buy' : 'rent'

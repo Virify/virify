@@ -1,6 +1,6 @@
 <template>
   <div class="m-range-slider | relative">
-    <AtomsRangeGraph v-if="graphData.length" :min :max :range="selectedRange" :graph-data="graphData"
+    <AtomsRangeGraph v-if="graphData.length" :min :max :range="selectedRange" :graph-data="!loading ? graphData : []"
       class="m-range-slider-graph" />
 
     <AtomsLabel class="m-range-slider-label-min">
@@ -36,6 +36,10 @@ const props = defineProps({
   graphData: {
     type: Array,
     default: []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 
