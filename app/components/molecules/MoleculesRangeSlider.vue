@@ -1,17 +1,17 @@
 <template>
   <div class="m-range-slider | relative">
-    <AtomsRangeGraph v-if="graphData.length" :min :max :range="rangeValue" :graph-data="graphData"
+    <AtomsRangeGraph v-if="graphData.length" :min :max :range="selectedRange" :graph-data="graphData"
       class="m-range-slider-graph" />
 
     <AtomsLabel class="m-range-slider-label-min">
-      <AtomsCurrencyInput v-model="rangeValue[0]" class="m-range-slider-input | body-md" />
+      <AtomsCurrencyInput v-model="selectedRange[0]" class="m-range-slider-input | body-md" />
     </AtomsLabel>
 
     <AtomsLabel class="m-range-slider-label-max">
-      <AtomsCurrencyInput v-model="rangeValue[1]" class="m-range-slider-input | body-md" />
+      <AtomsCurrencyInput v-model="selectedRange[1]" class="m-range-slider-input | body-md" />
     </AtomsLabel>
 
-    <SliderRoot v-model="rangeValue" :min="min" :max="max" class="m-range-slider-root">
+    <SliderRoot v-model="selectedRange" :min="min" :max="max" class="m-range-slider-root">
       <SliderTrack class="m-range-slider-track">
         <SliderRange class="m-range-slider-range" />
       </SliderTrack>
@@ -27,19 +27,11 @@ import { SliderRoot, SliderTrack, SliderRange, SliderThumb } from "reka-ui";
 const props = defineProps({
   min: {
     type: Number,
-    default: 0,
+    default: 0
   },
   max: {
     type: Number,
-    default: 10,
-  },
-  startingMin: {
-    type: Number,
-    default: 0,
-  },
-  startingMax: {
-    type: Number,
-    default: 1,
+    default: 0
   },
   graphData: {
     type: Array,
@@ -47,22 +39,9 @@ const props = defineProps({
   }
 });
 
-const rangeValue = defineModel<[number, number]>({
-  default: (props) => [props.startingMin, props.startingMax],
-});
-
-onMounted(() => {
-  rangeValue.value = [props.startingMin, props.startingMax];
-});
-
-watch(
-  () => [props.min, props.max, props.startingMin, props.startingMax],
-  ([newMin, newMax, newStartingMin, newStartingMax]) => {
-    const newMinVal = Math.max(newMin ?? 0, newStartingMin ?? 0);
-    const newMaxVal = Math.min(newMax ?? 1000000, newStartingMax ?? 1000000);
-    rangeValue.value = [newMinVal, newMaxVal];
-  }
-);
+const selectedRange = defineModel<[number, number]>({
+  default: (props) => [Number(props.min), Number(props.max)]
+})
 
 </script>
 

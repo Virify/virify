@@ -3,7 +3,7 @@
     <nav>
       <ul class="o-traditional-search-form-contract__menu">
         <li class="o-traditional-search-form-contract__menu-item">
-          <button type="button" :aria-expanded="!contractType.buyOrRent"
+          <button type="button" :aria-expanded="!contractType.isSale"
             aria-controls="o-traditional-search-form-contract-buy"
             class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(true)">
@@ -12,7 +12,7 @@
         </li>
 
         <li class="o-traditional-search-form-contract__menu-item">
-          <button type="button" :aria-expanded="contractType.buyOrRent"
+          <button type="button" :aria-expanded="contractType.isSale"
             aria-controls="o-traditional-search-form-contract-rent"
             class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(false)">
@@ -28,7 +28,7 @@
       </h3>
 
       <section id="o-traditional-search-form-contract-buy" class="o-traditional-search-form-contract__content-block"
-        :hidden="contractType.buyOrRent">
+        :hidden="contractType.isSale">
 
         <AtomsChecktext label="Include sold STC" />
         <AtomsChecktext label="Include shared ownership" />
@@ -37,7 +37,7 @@
       </section>
 
       <section id="o-traditional-search-form-contract-rent" class="o-traditional-search-form-contract__content-block"
-        :hidden="!contractType.buyOrRent">
+        :hidden="!contractType.isSale">
 
         <AtomsChecktext label="Include let agreed" />
         <AtomsChecktext label="Include short-term lets" />
@@ -49,9 +49,8 @@
           Price
         </h3>
 
-        <LazyMoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="selectedPriceRange"
-          :min="contractType.min" :max="contractType.max" :starting-min="contractType.min"
-          :starting-max="contractType.max" :graph-data="priceRangeGraph" hydrate-on-visible />
+        <LazyMoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="contractType.price"
+          :min="contractType.minPrice" :max="contractType.maxPrice" :graph-data="priceRangeGraph" hydrate-on-visible />
       </section>
     </div>
   </div>
@@ -63,32 +62,46 @@
  *  Search data model
  */
 const contractType = useState('search-contract-type', () => reactive({
-  buyOrRent: false,
-  min: 0,
-  max: 100
+  isSale: false,
+  minPrice: 0,
+  maxPrice: 0,
+  price: <[number, number]>[0, 0]
 }))
-
-const selectedPriceRange = ref<[number, number]>([10, 50])
 
 /**
  *  Graph data
+ *  @TODO combine these into 1 endpoint
  */
 const { data: priceRangeGraph } = useAsyncData('price-graph', () => {
   return $fetch<string[]>("/api/price/graph/", {
     params: {
-      listingType: contractType.value.buyOrRent ? 'buy' : 'rent'
+      listingType: contractType.value.isSale ? 'buy' : 'rent'
     }
   })
 }, {
-  watch: [() => contractType.value.buyOrRent]
+  watch: [() => contractType.value.isSale]
+})
+
+const { data: priceMinMax } = useAsyncData('price-min-max', () => {
+  return $fetch<string[]>("/api/price/min-max/")
+})
+
+watch([priceMinMax, () => contractType.value.isSale], () => {
+  const { sale, rental } = asObject(priceMinMax.value)
+  const [min, max] = asArray(contractType.value.isSale ? sale : rental, true)
+
+  contractType.value.minPrice = Number(min)
+  contractType.value.maxPrice = Number(max)
+  contractType.value.price = [Number(min), Number(max)]
 })
 
 /**
  *  Tabs for buy/rent
  */
 function updateIsBuy(newValue: boolean) {
-  contractType.value.buyOrRent = !newValue
+  contractType.value.isSale = !newValue
 }
+
 </script>
 
 <style lang="scss">
