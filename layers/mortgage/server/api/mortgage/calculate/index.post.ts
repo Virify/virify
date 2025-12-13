@@ -91,7 +91,7 @@ export default defineEventHandler(async (event): Promise<MortgageCalculationResp
 
     // Get the latest rate fetch date if using database rates
     const ratesLastUpdated = !useDefaultRates && rates.length > 0
-      ? rates[0]?.fetchedAt?.toISOString() ?? null
+      ? rates[0].fetchedAt.toISOString()
       : null
 
     return {
