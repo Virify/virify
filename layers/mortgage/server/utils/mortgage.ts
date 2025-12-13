@@ -34,7 +34,7 @@ export function getMinDepositPercentage(buyerType: string): number {
 
 /**
  * Get default mortgage rates based on buyer type and LTV bracket
- * These are UK average rates as of late 2024
+ * These are current UK average rates
  */
 export function getDefaultRates(buyerType: string, ltvBracket: string): Array<{ rateType: string; rate: number }> {
   const baseRates: Record<string, number> = {
