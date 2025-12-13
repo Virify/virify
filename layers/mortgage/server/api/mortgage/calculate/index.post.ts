@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { prisma } from '~~/layers/database/server/utils/prisma-client'
 import type { MortgageCalculationResponse, MortgageResult } from '~~/shared/types/mortgage'
+import { formatBuyerType } from '~~/shared/types/mortgage'
 import {
   getLtvBracket,
   getMinDepositPercentage,
-  formatBuyerType,
   getDefaultRates,
   calculateMortgageResult,
 } from '~~/layers/mortgage/server/utils/mortgage'

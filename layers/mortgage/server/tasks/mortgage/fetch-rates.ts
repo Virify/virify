@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-
 /**
  * Nitro scheduled task to fetch UK mortgage rates monthly
  * Runs on the 1st of every month at 9am UTC

@@ -33,24 +33,6 @@ export function getMinDepositPercentage(buyerType: string): number {
 }
 
 /**
- * Format buyer type for display
- */
-export function formatBuyerType(buyerType: string): string {
-  switch (buyerType) {
-    case 'FIRST_TIME_BUYER':
-      return 'First Time Buyer'
-    case 'HOME_MOVER':
-      return 'Home Mover'
-    case 'BUY_TO_LET':
-      return 'Buy to Let'
-    case 'REMORTGAGE':
-      return 'Remortgage'
-    default:
-      return buyerType
-  }
-}
-
-/**
  * Get default mortgage rates based on buyer type and LTV bracket
  * These are UK average rates as of late 2024
  */

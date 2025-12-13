@@ -3,9 +3,8 @@
     <div class="m-term-selector__wrapper">
       <AtomsSelect
         :id="id"
-        :model-value="modelValue"
+        v-model="internalValue"
         :options="options"
-        @update:model-value="$emit('update:modelValue', $event)"
       />
     </div>
     <p class="m-term-selector__help | body-xs">
@@ -21,15 +20,20 @@ interface TermOption {
 }
 
 interface Props {
-  id: string
   modelValue: number
+  id: string
   options: TermOption[]
 }
 
-defineProps<Props>()
-defineEmits<{
+const props = defineProps<Props>()
+const emit = defineEmits<{
   'update:modelValue': [value: number]
 }>()
+
+const internalValue = computed({
+  get: () => props.modelValue,
+  set: (value: number) => emit('update:modelValue', value)
+})
 </script>
 
 <style lang="scss" scoped>
