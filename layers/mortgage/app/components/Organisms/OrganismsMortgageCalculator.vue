@@ -1,17 +1,29 @@
 <template>
   <section class="o-mortgage-calculator">
     <div class="o-mortgage-calculator__layout">
-      <OrganismsMortgageForm
-        :form-data="formData"
-        :current-step="currentStep"
-        :calculation-result="calculationResult"
-        :is-calculating="isCalculating"
-        @update:form-data="formData = $event"
-        @back="prevStep"
-        @next="nextStep"
-        @reset="resetCalculator"
-        @calculate="calculateMortgage"
-      />
+      <div class="o-mortgage-calculator__form-column">
+        <OrganismsMortgageForm
+          :form-data="formData"
+          :current-step="currentStep"
+          :calculation-result="calculationResult"
+          :is-calculating="isCalculating"
+          @update:form-data="formData = $event"
+          @back="prevStep"
+          @next="nextStep"
+          @reset="resetCalculator"
+          @calculate="calculateMortgage"
+        />
+
+        <!-- Disclaimer -->
+        <div class="o-mortgage-calculator__disclaimer">
+          <AtomsIcon icon="property/info" :size="18" />
+          <p class="body-xs">
+            <strong>Important:</strong> This calculator provides estimates only and does not constitute financial advice. 
+            Your actual mortgage rate will depend on your credit history, income, property type, and lender criteria. 
+            We recommend speaking with a qualified mortgage advisor before making any financial decisions.
+          </p>
+        </div>
+      </div>
 
       <OrganismsMortgageResults :result="calculationResult" />
     </div>
@@ -101,6 +113,39 @@ async function calculateMortgage() {
     @media (max-width: 900px) {
       grid-template-columns: 1fr;
       gap: var(--size-24);
+    }
+  }
+
+  &__form-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--size-24);
+
+    @media (max-width: 900px) {
+      align-items: center;
+    }
+  }
+
+  &__disclaimer {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-12);
+    padding: var(--size-16);
+    background: var(--background-200);
+    border-radius: var(--border-radius-lg);
+    max-width: 600px;
+    text-align: left;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--blue-400);
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-muted);
     }
   }
 }

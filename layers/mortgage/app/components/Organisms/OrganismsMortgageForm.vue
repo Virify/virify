@@ -164,6 +164,10 @@ function updateFormField<K extends keyof MortgageFormData>(
   &__step-content {
     width: 100%;
     margin: var(--size-16) 0;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 }
 </style>

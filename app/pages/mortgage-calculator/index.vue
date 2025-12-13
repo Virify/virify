@@ -15,16 +15,6 @@
     <!-- Calculator -->
     <div class="mortgage-page__calculator | container">
       <OrganismsMortgageCalculator />
-
-      <!-- Disclaimer -->
-      <div class="mortgage-disclaimer">
-        <AtomsIcon icon="property/info" :size="18" />
-        <p class="body-xs">
-          <strong>Important:</strong> This calculator provides estimates only and does not constitute financial advice. 
-          Your actual mortgage rate will depend on your credit history, income, property type, and lender criteria. 
-          We recommend speaking with a qualified mortgage advisor before making any financial decisions.
-        </p>
-      </div>
     </div>
 
     <!-- Understanding Your Mortgage Section -->
@@ -252,30 +242,7 @@ useHead({
   }
 }
 
-// Disclaimer (now inside calculator container)
-.mortgage-disclaimer {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--size-12);
-  margin-top: var(--size-32);
-  padding: var(--size-16);
-  background: var(--background-200);
-  border-radius: var(--border-radius-lg);
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
 
-  svg {
-    flex-shrink: 0;
-    margin-top: 2px;
-    color: var(--blue-400);
-  }
-
-  p {
-    margin: 0;
-    color: var(--text-muted);
-  }
-}
 
 // Utility classes
 .max-width-prose {
