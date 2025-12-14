@@ -73,9 +73,12 @@ jobs:
         if: steps.tasks.outputs.has_tasks == 'true'
         run: pnpm install
 
-      - name: Generate Prisma client
+      - name: Generate Prisma clients
         if: steps.tasks.outputs.has_tasks == 'true'
-        run: pnpm prisma generate --schema=./layers/database/server/database/prisma/schema.prisma
+        run: |
+          pnpm pgen
+          pnpm pgen:ppd
+          pnpm pgen:waiting-list
 
       - name: Start dev server & run tasks
         if: steps.tasks.outputs.has_tasks == 'true'
