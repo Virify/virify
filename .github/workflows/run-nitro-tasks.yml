@@ -1,0 +1,131 @@
+name: Run Nitro Tasks
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main, staging]
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '9'
+
+jobs:
+  run-tasks:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    
+    env:
+      DATABASE_URL: ${{ github.event.pull_request.base.ref == 'main' && secrets.MAIN_DATABASE_URL || secrets.STAGING_DATABASE_URL }}
+      NUXT_AUTH_SECRET: ${{ secrets.NUXT_AUTH_SECRET }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install
+
+      - name: Parse tasks from commits
+        id: tasks
+        run: |
+          # Extract tasks from commit messages and PR title
+          # Format: task: seed, migrate OR task(db): reset
+          
+          COMMITS=$(git log --format="%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          
+          TASKS=""
+          parse_tasks() {
+            while IFS= read -r line; do
+              if [[ "$line" =~ ^task(\([^)]+\))?:\ *(.+)$ ]]; then
+                IFS=',' read -ra items <<< "${BASH_REMATCH[2]}"
+                for item in "${items[@]}"; do
+                  TASKS="$TASKS $(echo "$item" | xargs)"
+                done
+              fi
+            done <<< "$1"
+          }
+          
+          parse_tasks "$COMMITS"
+          parse_tasks "$PR_TITLE"
+          
+          # Dedupe and trim
+          TASKS=$(echo "$TASKS" | xargs | tr ' ' '\n' | sort -u | tr '\n' ' ' | xargs)
+          
+          echo "tasks=$TASKS" >> $GITHUB_OUTPUT
+          echo "has_tasks=$([[ -n "$TASKS" ]] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "📋 Tasks found: ${TASKS:-none}"
+
+      - name: Start dev server & run tasks
+        if: steps.tasks.outputs.has_tasks == 'true'
+        run: |
+          # Start dev server in background
+          pnpm dev &
+          SERVER_PID=$!
+          
+          # Wait for dev server to be ready
+          echo "⏳ Waiting for dev server..."
+          for i in {1..60}; do
+            if curl -s http://localhost:3000 > /dev/null 2>&1; then
+              echo "✅ Dev server ready"
+              break
+            fi
+            sleep 2
+          done
+          
+          # Task aliases
+          declare -A ALIASES=(
+            ["seed"]="db:seed"
+            ["migrate"]="db:migrate"
+            ["reset"]="db:reset"
+            ["fetch-rates"]="mortgage:fetch-rates"
+          )
+          
+          # Run tasks via Nitro's HTTP API (the proper way for Nuxt)
+          for task in ${{ steps.tasks.outputs.tasks }}; do
+            TASK_NAME="${ALIASES[$task]:-$task}"
+            echo "🚀 Running: $TASK_NAME"
+            
+            RESPONSE=$(curl -s -X GET "http://localhost:3000/_nitro/tasks/$TASK_NAME")
+            echo "$RESPONSE"
+            
+            # Check if task failed
+            if echo "$RESPONSE" | grep -q '"error"'; then
+              echo "❌ Task $TASK_NAME failed"
+              kill $SERVER_PID 2>/dev/null || true
+              exit 1
+            fi
+            
+            echo "✅ Done: $TASK_NAME"
+          done
+          
+          # Cleanup
+          kill $SERVER_PID 2>/dev/null || true
+
+      - name: Summary
+        if: always()
+        run: |
+          ENV="${{ github.event.pull_request.base.ref == 'main' && 'production' || 'staging' }}"
+          TASKS="${{ steps.tasks.outputs.tasks }}"
+          
+          if [[ -n "$TASKS" ]]; then
+            echo "## ✅ Nitro Tasks Completed" >> $GITHUB_STEP_SUMMARY
+            echo "**Environment:** $ENV" >> $GITHUB_STEP_SUMMARY
+            echo "**Tasks:** $TASKS" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ℹ️ No Tasks" >> $GITHUB_STEP_SUMMARY
+            echo "No \`task:\` prefix found in commits or PR title." >> $GITHUB_STEP_SUMMARY
+          fi
