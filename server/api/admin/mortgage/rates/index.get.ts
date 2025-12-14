@@ -1,5 +1,3 @@
-import { Role } from "~~/layers/database/server/database/prisma/generated/enums";
-
 /**
  * GET /api/mortgage/admin/fetch-rates
  *
@@ -12,17 +10,8 @@ export default defineEventHandler(async (event) => {
   // Require authenticated session
   const { user } = await requireUserSession(event);
 
-  // Check user exists and is authenticated
-  if (!user || !user.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-      message: "You must be logged in to access this endpoint.",
-    });
-  }
-
-  // Check user has admin role
-  if (user.role !== Role.ADMIN) {
+  // Check user is admin
+  if (!isAdmin(user)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
