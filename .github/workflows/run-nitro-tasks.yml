@@ -29,17 +29,16 @@ jobs:
       - name: Parse tasks
         id: tasks
         run: |
-          # Get all commits in this PR
-          COMMITS=$(git log --format="%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          # Get all commit messages (subject + body) in this PR
+          COMMITS=$(git log --format="%B" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
           
-          echo "Commits in PR:"
-          echo "$COMMITS"
+          echo "Scanning commits for task: prefix..."
           
           TASKS=""
           PATTERN='^task(\([^)]+\))?:[[:space:]]*(.+)$'
           
-          while IFS= read -r commit; do
-            if [[ "$commit" =~ $PATTERN ]]; then
+          while IFS= read -r line; do
+            if [[ "$line" =~ $PATTERN ]]; then
               TASK_LIST="${BASH_REMATCH[2]}"
               IFS=',' read -ra items <<< "$TASK_LIST"
               for item in "${items[@]}"; do
