@@ -7,7 +7,6 @@ on:
 
 env:
   NODE_VERSION: '22'
-  PNPM_VERSION: '9'
 
 jobs:
   run-tasks:
@@ -28,8 +27,6 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v4
         with:
@@ -38,29 +35,20 @@ jobs:
 
       - run: pnpm install
 
-      - name: Parse tasks from commits
+      - name: Parse tasks from last commit
         id: tasks
         run: |
-          # Extract tasks from commit messages and PR title
-          # Format: task: seed, migrate OR task(db): reset
-          
-          COMMITS=$(git log --format="%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          # Get ONLY the last commit message (the merge commit or squash commit)
+          LAST_COMMIT=$(git log -1 --format="%s")
+          echo "Last commit: $LAST_COMMIT"
           
           TASKS=""
-          parse_tasks() {
-            while IFS= read -r line; do
-              if [[ "$line" =~ ^task(\([^)]+\))?:\ *(.+)$ ]]; then
-                IFS=',' read -ra items <<< "${BASH_REMATCH[2]}"
-                for item in "${items[@]}"; do
-                  TASKS="$TASKS $(echo "$item" | xargs)"
-                done
-              fi
-            done <<< "$1"
-          }
-          
-          parse_tasks "$COMMITS"
-          parse_tasks "$PR_TITLE"
+          if [[ "$LAST_COMMIT" =~ ^task(\([^)]+\))?:\ *(.+)$ ]]; then
+            IFS=',' read -ra items <<< "${BASH_REMATCH[2]}"
+            for item in "${items[@]}"; do
+              TASKS="$TASKS $(echo "$item" | xargs)"
+            done
+          fi
           
           # Dedupe and trim
           TASKS=$(echo "$TASKS" | xargs | tr ' ' '\n' | sort -u | tr '\n' ' ' | xargs)
