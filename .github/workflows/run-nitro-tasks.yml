@@ -49,8 +49,8 @@ jobs:
             fi
           done <<< "$COMMITS"
           
-          # Dedupe and trim
-          TASKS=$(echo "$TASKS" | xargs | tr ' ' '\n' | sort -u | tr '\n' ' ' | xargs)
+          # Dedupe while preserving order
+          TASKS=$(echo "$TASKS" | xargs | tr ' ' '\n' | awk '!seen[$0]++' | tr '\n' ' ' | xargs)
           
           echo "tasks=$TASKS" >> $GITHUB_OUTPUT
           echo "has_tasks=$([[ -n "$TASKS" ]] && echo true || echo false)" >> $GITHUB_OUTPUT
