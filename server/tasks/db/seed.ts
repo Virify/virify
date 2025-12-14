@@ -102,7 +102,7 @@ async function seedPropertyTypes() {
 async function seedAdminUser(config: any) {
   console.log('[DB Seed] Seeding admin user...')
   
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@virify.com'
+  const adminEmail = process.env.ADMIN_EMAIL
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
   })
@@ -111,8 +111,8 @@ async function seedAdminUser(config: any) {
     await prisma.user.create({
       data: {
         email: adminEmail,
-        password: process.env.ADMIN_PASSWORD || 'password',
-        username: process.env.ADMIN_USERNAME || 'admin',
+        password: process.env.ADMIN_PASSWORD,
+        username: process.env.ADMIN_USERNAME,
         firstName: 'Virify',
         lastName: 'Admin',
         verification: {

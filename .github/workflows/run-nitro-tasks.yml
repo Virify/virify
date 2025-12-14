@@ -18,6 +18,9 @@ jobs:
       DATABASE_URL: ${{ github.event.pull_request.base.ref == 'main' && secrets.MAIN_DATABASE_URL || secrets.STAGING_DATABASE_URL }}
       NUXT_AUTH_SECRET: ${{ secrets.NUXT_AUTH_SECRET }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
