@@ -91,11 +91,21 @@ jobs:
             ["fetch-rates"]="mortgage:fetch-rates"
           )
           
-          # Run tasks
+          # Run tasks via Nitro's HTTP API (the proper way for Nuxt)
           for task in ${{ steps.tasks.outputs.tasks }}; do
             TASK_NAME="${ALIASES[$task]:-$task}"
             echo "🚀 Running: $TASK_NAME"
-            npx nitro task run "$TASK_NAME"
+            
+            RESPONSE=$(curl -s -X GET "http://localhost:3000/_nitro/tasks/$TASK_NAME")
+            echo "$RESPONSE"
+            
+            # Check if task failed
+            if echo "$RESPONSE" | grep -q '"error"'; then
+              echo "❌ Task $TASK_NAME failed"
+              kill $SERVER_PID 2>/dev/null || true
+              exit 1
+            fi
+            
             echo "✅ Done: $TASK_NAME"
           done
           
