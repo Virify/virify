@@ -24,27 +24,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - run: pnpm install
-
-      - name: Parse tasks from last commit
+      - name: Parse tasks
         id: tasks
         run: |
-          # Get ONLY the last commit message (the merge commit or squash commit)
-          LAST_COMMIT=$(git log -1 --format="%s")
-          echo "Last commit: $LAST_COMMIT"
+          # Get the commit before the merge commit (HEAD~1) if it exists
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            TASK_COMMIT=$(git log -1 --format="%s" HEAD~1)
+          else
+            TASK_COMMIT=""
+          fi
+          
+          echo "Task commit: $TASK_COMMIT"
           
           TASKS=""
-          if [[ "$LAST_COMMIT" =~ ^task(\([^)]+\))?:\ *(.+)$ ]]; then
-            IFS=',' read -ra items <<< "${BASH_REMATCH[2]}"
+          PATTERN='^task(\([^)]+\))?:[[:space:]]*(.+)$'
+          
+          if [[ -n "$TASK_COMMIT" && "$TASK_COMMIT" =~ $PATTERN ]]; then
+            TASK_LIST="${BASH_REMATCH[2]}"
+            IFS=',' read -ra items <<< "$TASK_LIST"
             for item in "${items[@]}"; do
               TASKS="$TASKS $(echo "$item" | xargs)"
             done
@@ -56,6 +55,25 @@ jobs:
           echo "tasks=$TASKS" >> $GITHUB_OUTPUT
           echo "has_tasks=$([[ -n "$TASKS" ]] && echo true || echo false)" >> $GITHUB_OUTPUT
           echo "📋 Tasks found: ${TASKS:-none}"
+
+      - name: No tasks to run
+        if: steps.tasks.outputs.has_tasks == 'false'
+        run: |
+          echo "## ℹ️ No Tasks" >> $GITHUB_STEP_SUMMARY
+          echo "No \`task:\` prefix found in last commit before merge." >> $GITHUB_STEP_SUMMARY
+
+      - uses: pnpm/action-setup@v4
+        if: steps.tasks.outputs.has_tasks == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.tasks.outputs.has_tasks == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        if: steps.tasks.outputs.has_tasks == 'true'
+        run: pnpm install
 
       - name: Start dev server & run tasks
         if: steps.tasks.outputs.has_tasks == 'true'
@@ -82,7 +100,7 @@ jobs:
             ["fetch-rates"]="mortgage:fetch-rates"
           )
           
-          # Run tasks via Nitro's HTTP API (the proper way for Nuxt)
+          # Run tasks via Nitro's HTTP API
           for task in ${{ steps.tasks.outputs.tasks }}; do
             TASK_NAME="${ALIASES[$task]:-$task}"
             echo "🚀 Running: $TASK_NAME"
@@ -104,16 +122,9 @@ jobs:
           kill $SERVER_PID 2>/dev/null || true
 
       - name: Summary
-        if: always()
+        if: steps.tasks.outputs.has_tasks == 'true'
         run: |
           ENV="${{ github.event.pull_request.base.ref == 'main' && 'production' || 'staging' }}"
-          TASKS="${{ steps.tasks.outputs.tasks }}"
-          
-          if [[ -n "$TASKS" ]]; then
-            echo "## ✅ Nitro Tasks Completed" >> $GITHUB_STEP_SUMMARY
-            echo "**Environment:** $ENV" >> $GITHUB_STEP_SUMMARY
-            echo "**Tasks:** $TASKS" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "## ℹ️ No Tasks" >> $GITHUB_STEP_SUMMARY
-            echo "No \`task:\` prefix found in commits or PR title." >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "## ✅ Nitro Tasks Completed" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** $ENV" >> $GITHUB_STEP_SUMMARY
+          echo "**Tasks:** ${{ steps.tasks.outputs.tasks }}" >> $GITHUB_STEP_SUMMARY
