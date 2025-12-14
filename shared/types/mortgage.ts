@@ -63,6 +63,7 @@ export interface MortgageCalculationData {
   buyerType: string
   results: MortgageResult[]
   usingDefaultRates: boolean
+  usingCustomRate?: boolean
   ratesLastUpdated: string | null
 }
 
@@ -94,6 +95,28 @@ export interface RateTypeOption {
 export interface TermOption {
   value: number
   key: string
+}
+
+/**
+ * Payload for tracking mortgage calculations via analytics
+ */
+export interface TrackMortgageCalculationPayload {
+  listingId?: string | null
+  propertyPrice: number
+  deposit: number
+  termYears: number
+  buyerType: string
+  customRate?: number | null
+  loanAmount: number
+  ltv: number
+  ltvBracket: string
+  monthlyPayment: number
+  totalPayment: number
+  totalInterest: number
+  rateUsed: number
+  rateType: string
+  usedDefaultRates: boolean
+  usedCustomRate: boolean
 }
 
 /**
@@ -169,6 +192,7 @@ export function formatRateType(rateType: string): string {
     FIXED_10_YEAR: '10 Year Fixed',
     VARIABLE: 'Variable',
     TRACKER: 'Tracker',
+    CUSTOM: 'Custom Rate',
   }
   return map[rateType] || rateType
 }

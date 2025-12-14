@@ -1,7 +1,7 @@
 import vue from "@vitejs/plugin-vue";
 
 export default defineNuxtConfig({
-  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", "./layers/mortgage"],
+  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content"],
   future: {
     compatibilityVersion: 4,
   },
@@ -130,6 +130,11 @@ export default defineNuxtConfig({
   nitro: {
     experimental: {
       asyncContext: true,
+      tasks: true,
+    },
+    scheduledTasks: {
+      // Run mortgage rate fetch on the 1st of every month at 9am UTC
+      '0 9 1 * *': ['mortgage:fetch-rates'],
     },
     rollupConfig: {
       // @ts-ignore

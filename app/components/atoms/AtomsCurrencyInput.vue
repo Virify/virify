@@ -1,13 +1,16 @@
 <template>
-  <input type="text" v-model="currency" class="| text-input focus-visible" />
+  <input type="text" v-model="currency" :disabled="disabled" class="| text-input focus-visible" />
 </template>
 
 <script setup lang="ts">
 interface Props {
   modelValue?: number
+  disabled?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  disabled: false,
+})
 
 const currency = defineModel({
   get(value) {

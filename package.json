@@ -22,6 +22,8 @@
     "db-studio": "prisma studio --config=./layers/database/server/database/prisma/prisma.config.ts",
     "db-studio:ppd": "prisma studio --config=./layers/database/server/database/prisma-ppd/prisma.config.ts",
     "db-studio:waiting-list": "prisma studio --config=./layers/database/server/database/prisma-waiting-list/prisma.config.ts",
+    "prisma-format": "prisma format --config=./layers/database/server/database/prisma/prisma.config.ts",
+    "prisma-validate": "prisma validate --config=./layers/database/server/database/prisma/prisma.config.ts",
     "db:reset": "tsx layers/seed/scripts/reset.ts",
     "db:seed": "tsx layers/seed/scripts/seed.ts",
     "db:migrate": "tsx layers/seed/scripts/migrate.ts",

@@ -163,9 +163,30 @@ export const useAnalytics = createSharedComposable(() => {
     }
   };
 
+  /**
+   * Track when a user performs a mortgage calculation
+   * Uses sendBeacon for fire-and-forget lightweight tracking
+   * @param data Mortgage calculation data for analytics
+   */
+  const trackMortgageCalculation = (data: TrackMortgageCalculationPayload) => {
+    try {
+      const payload = {
+        sessionId: sessionId.value,
+        ...data,
+      };
+
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+      const success = navigator.sendBeacon("/api/analytics/mortgage/track", blob);
+      console.log("Mortgage calculation tracking:", success ? "queued" : "failed to queue");
+    } catch (error) {
+      console.error("Failed to track mortgage calculation:", error);
+    }
+  };
+
   return {
     analytics,
     trackListingView,
+    trackMortgageCalculation,
     favourites,
     userNotes,
     recentlyViewedListings,
