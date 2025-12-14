@@ -24,30 +24,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Parse tasks
         id: tasks
         run: |
-          # Get the commit before the merge commit (HEAD~1) if it exists
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
-            TASK_COMMIT=$(git log -1 --format="%s" HEAD~1)
-          else
-            TASK_COMMIT=""
-          fi
+          # Get all commits in this PR
+          COMMITS=$(git log --format="%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
           
-          echo "Task commit: $TASK_COMMIT"
+          echo "Commits in PR:"
+          echo "$COMMITS"
           
           TASKS=""
           PATTERN='^task(\([^)]+\))?:[[:space:]]*(.+)$'
           
-          if [[ -n "$TASK_COMMIT" && "$TASK_COMMIT" =~ $PATTERN ]]; then
-            TASK_LIST="${BASH_REMATCH[2]}"
-            IFS=',' read -ra items <<< "$TASK_LIST"
-            for item in "${items[@]}"; do
-              TASKS="$TASKS $(echo "$item" | xargs)"
-            done
-          fi
+          while IFS= read -r commit; do
+            if [[ "$commit" =~ $PATTERN ]]; then
+              TASK_LIST="${BASH_REMATCH[2]}"
+              IFS=',' read -ra items <<< "$TASK_LIST"
+              for item in "${items[@]}"; do
+                TASKS="$TASKS $(echo "$item" | xargs)"
+              done
+            fi
+          done <<< "$COMMITS"
           
           # Dedupe and trim
           TASKS=$(echo "$TASKS" | xargs | tr ' ' '\n' | sort -u | tr '\n' ' ' | xargs)
