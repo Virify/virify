@@ -13,7 +13,7 @@
     </section>
 
     <!-- Calculator -->
-    <div class="mortgage-page__calculator | container">
+    <div class="mortgage-page__calculator | container-xs">
       <OrganismsMortgageCalculator />
     </div>
 
@@ -128,12 +128,32 @@
 </template>
 
 <script setup lang="ts">
-useHead({
-  title: 'Mortgage Calculator | Virify',
-  meta: [
-    { name: 'description', content: 'Calculate your estimated monthly mortgage payments. See how much you could pay each month based on property price, deposit, and mortgage type. Learn about LTV, interest rates, and mortgage types.' }
-  ]
+useSeoMeta({
+  title: 'Mortgage Calculator — Virify',
+  description: 'Estimate your monthly mortgage payments in seconds. Enter your property price and deposit to compare typical UK mortgage rates and understand LTV, interest rates, and mortgage terms.',
+  keywords: 'mortgage calculator, UK mortgage calculator, monthly mortgage payments, interest rate, loan to value, LTV, deposit, first time buyer',
+  ogTitle: 'Mortgage Calculator — Virify',
+  ogDescription: 'Estimate monthly mortgage payments and compare typical UK rates. Understand deposit, LTV and mortgage terms.',
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk/mortgage-calculator',
+  ogImage: 'https://virify.co.uk/img/ai-search-cover.png',
+  twitterCard: 'summary_large_image',
+  twitterImage: 'https://virify.co.uk/img/ai-search-cover.png',
 })
+
+useHead({
+  link: [{ rel: 'canonical', href: 'https://virify.co.uk/mortgage-calculator' }],
+})
+
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+      { '@type': 'ListItem', position: 2, name: 'Mortgage Calculator', item: 'https://virify.co.uk/mortgage-calculator' },
+    ],
+  },
+])
 </script>
 
 <style lang="scss">

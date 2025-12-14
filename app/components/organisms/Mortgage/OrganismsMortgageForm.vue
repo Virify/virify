@@ -43,41 +43,42 @@
         {{ depositError }}
       </div>
 
-      <!-- Term -->
-      <div class="o-mortgage-form__field">
-        <label class="o-mortgage-form__label | body-sm text-medium">Mortgage Term</label>
-        <div class="o-mortgage-form__term-inputs">
-          <div class="o-mortgage-form__term-input">
-            <AtomsMortgageNumberInput id="term-years" :model-value="formData.termYears || undefined" :min="0" :max="40"
-              placeholder="e.g. 25" :disabled="!priceAndDepositFilled" @update:model-value="updateFormField('termYears', $event || 0)" />
-            <span class="| body-sm">years</span>
+      <!-- Term & Interest Rate Row -->
+      <div class="o-mortgage-form__row">
+        <div class="o-mortgage-form__field o-mortgage-form__field--half">
+          <label class="o-mortgage-form__label | body-sm text-medium">Mortgage Term</label>
+          <div class="o-mortgage-form__term-inputs">
+            <div class="o-mortgage-form__term-input">
+              <AtomsMortgageNumberInput id="term-years" :model-value="formData.termYears || undefined" :min="0" :max="40"
+                placeholder="e.g. 25" :disabled="!priceAndDepositFilled" @update:model-value="updateFormField('termYears', $event || 0)" />
+              <span class="| body-sm">years</span>
+            </div>
+            <div class="o-mortgage-form__term-input">
+              <AtomsMortgageNumberInput id="term-months" :model-value="formData.termMonths || undefined" :min="0"
+                :max="11" placeholder="0" :disabled="!priceAndDepositFilled" @update:model-value="updateFormField('termMonths', $event || 0)" />
+              <span class="| body-sm">months</span>
+            </div>
           </div>
-          <div class="o-mortgage-form__term-input">
-            <AtomsMortgageNumberInput id="term-months" :model-value="formData.termMonths || undefined" :min="0"
-              :max="11" placeholder="0" :disabled="!priceAndDepositFilled" @update:model-value="updateFormField('termMonths', $event || 0)" />
-            <span class="| body-sm">months</span>
-          </div>
+          <p class="o-mortgage-form__help | body-xs">
+            <template v-if="totalTermDisplay">Total: {{ totalTermDisplay }}</template>
+            <template v-else>Most mortgages are 25–35 years. Shorter terms mean higher payments but less interest overall.</template>
+          </p>
         </div>
-        <p class="o-mortgage-form__help | body-xs">
-          <template v-if="totalTermDisplay">Total: {{ totalTermDisplay }}</template>
-          <template v-else>Most mortgages are 25–35 years. Shorter terms mean higher payments but less interest overall.</template>
-        </p>
-      </div>
 
-      <!-- Custom Interest Rate (Optional) -->
-      <div class="o-mortgage-form__field">
-        <label class="o-mortgage-form__label | body-sm text-medium">
-          Interest Rate <span class="o-mortgage-form__optional">(optional)</span>
-        </label>
-        <div class="o-mortgage-form__rate-input">
-          <AtomsMortgageNumberInput id="custom-rate" :model-value="formData.customInterestRate ?? undefined" :min="0"
-            :max="15" :step="0.01" placeholder="e.g. 4.5" :disabled="!priceAndDepositFilled"
-            @update:model-value="updateFormField('customInterestRate', $event || null)" />
-          <span class="| body-sm">%</span>
+        <div class="o-mortgage-form__field o-mortgage-form__field--half">
+          <label class="o-mortgage-form__label | body-sm text-medium">
+            Interest Rate <span class="o-mortgage-form__optional">(optional)</span>
+          </label>
+          <div class="o-mortgage-form__rate-input">
+            <AtomsMortgageNumberInput id="custom-rate" :model-value="formData.customInterestRate ?? undefined" :min="0"
+              :max="15" :step="0.01" placeholder="e.g. 4.5" :disabled="!priceAndDepositFilled"
+              @update:model-value="updateFormField('customInterestRate', $event || null)" />
+            <span class="| body-sm">%</span>
+          </div>
+          <p class="o-mortgage-form__help | body-xs">
+            Enter a rate from your lender/broker, or leave blank to see average UK rates.
+          </p>
         </div>
-        <p class="o-mortgage-form__help | body-xs">
-          Enter a rate from your lender/broker, or leave blank to see average UK rates.
-        </p>
       </div>
     </div>
 
@@ -126,7 +127,10 @@ const depositError = computed(() =>
 )
 
 const priceAndDepositFilled = computed(() =>
-  props.formData.buyerType && props.formData.propertyPrice > 0 && props.formData.deposit > 0
+  !!props.formData.buyerType &&
+  props.formData.propertyPrice > 0 &&
+  props.formData.deposit > 0 &&
+  !depositError.value
 )
 
 const formValid = computed(() =>
@@ -243,6 +247,7 @@ function updateFormField<K extends keyof MortgageFormData>(
   &__term-inputs {
     display: flex;
     gap: var(--size-16);
+    width: 100%;
   }
 
   &__term-input {
@@ -260,7 +265,6 @@ function updateFormField<K extends keyof MortgageFormData>(
     display: flex;
     align-items: center;
     gap: var(--size-8);
-    max-width: 200px;
   }
 
   &__help {

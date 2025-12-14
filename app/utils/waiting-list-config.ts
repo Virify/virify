@@ -38,7 +38,8 @@ const waitingListConfig: WaitingListConfig = {
     '/price-paid',
     '/guides',
     '/login',
-    '/cookie'
+    '/cookie',
+    '/mortgage-calculator',
   ],
 
   // Navigation visibility
