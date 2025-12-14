@@ -1,4 +1,5 @@
 import { execa } from 'execa'
+import { defineTask } from 'nitropack/runtime'
 
 /**
  * Nitro task to reset the database
@@ -6,8 +7,6 @@ import { execa } from 'execa'
  * 
  * Can be triggered via:
  * - CLI: npx nitro task run db:reset
- * - GitHub Action: task: reset
- * - API: POST /api/_nitro/tasks/db:reset (if enabled)
  */
 export default defineTask({
   meta: {
@@ -19,7 +18,6 @@ export default defineTask({
     console.log('[DB Reset] This will DROP all data and reapply migrations!')
     
     try {
-      // Reset the main database using prisma migrate reset
       await execa('pnpm', [
         'exec', 
         'prisma', 
@@ -37,8 +35,10 @@ export default defineTask({
       console.log('[DB Reset] ✅ Database reset complete!')
       
       return { result: 'success' }
-    } catch (error: any) {
-      console.error('[DB Reset] ❌ Error during reset:', error.message)
+    }
+    catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error'
+      console.error('[DB Reset] ❌ Error:', message)
       throw error
     }
   },

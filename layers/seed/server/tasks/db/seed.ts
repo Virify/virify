@@ -1,11 +1,12 @@
-import { prisma } from '~~/layers/database/server/utils/prisma-client'
+import { defineTask, useRuntimeConfig } from 'nitropack/runtime'
 import { MembershipType } from '~~/layers/database/server/database/prisma/generated/enums'
-import { updateLocationsByAddressListForSeed } from '~~/layers/seed/server/utils/location-for-seed'
-import { generateProperty } from '~~/layers/seed/server/utils/property-faker'
-import { generateSaleListing, generateRentalListing } from '~~/layers/seed/server/utils/listing-faker'
-import { seedFakeUsers } from '~~/layers/seed/server/utils/user-faker'
-import { rentalAddress, saleAddress, cityCenters } from '~~/layers/seed/server/utils/address-to-seed'
-import { seedAdminFavourites } from '~~/layers/seed/server/utils/admin-favourites-seed'
+import { prisma } from '~~/layers/database/server/utils/prisma-client'
+import { cityCenters, saleAddress, rentalAddress } from '../../utils/address-to-seed'
+import { seedAdminFavourites } from '../../utils/admin-favourites-seed'
+import { generateSaleListing, generateRentalListing } from '../../utils/listing-faker'
+import { updateLocationsByAddressListForSeed } from '../../utils/location-for-seed'
+import { generateProperty } from '../../utils/property-faker'
+import { seedFakeUsers } from '../../utils/user-faker'
 
 /**
  * Nitro task to seed the database with initial data
@@ -110,7 +111,7 @@ async function seedAdminUser(config: any) {
   if (!existingAdmin) {
     await prisma.user.create({
       data: {
-        email: adminEmail,
+        email: adminEmail as string,
         password: process.env.ADMIN_PASSWORD,
         username: process.env.ADMIN_USERNAME,
         firstName: 'Virify',

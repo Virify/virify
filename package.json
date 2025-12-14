@@ -15,6 +15,7 @@
     "migrate-reset:ppd": "prisma migrate reset --config=./layers/database/server/database/prisma-ppd/prisma.config.ts",
     "migrate-reset:waiting-list": "prisma migrate reset --config=./layers/database/server/database/prisma-waiting-list/prisma.config.ts",
     "migrate-dev": "prisma migrate dev --config=./layers/database/server/database/prisma/prisma.config.ts",
+    "migrate-deploy": "prisma migrate deploy --config=./layers/database/server/database/prisma/prisma.config.ts",
     "migrate-dev:ppd": "prisma migrate dev --config=./layers/database/server/database/prisma-ppd/prisma.config.ts",
     "migrate-dev:waiting-list": "prisma migrate dev --config=./layers/database/server/database/prisma-waiting-list/prisma.config.ts",
     "db-push": "prisma db push --config=./layers/database/server/database/prisma/prisma.config.ts",

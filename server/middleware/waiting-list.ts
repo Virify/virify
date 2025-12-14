@@ -3,7 +3,6 @@
  * Only allows specific waiting list APIs
  */
 import { defineEventHandler, createError } from "h3";
-import { useRuntimeConfig } from "#imports";
 
 export default defineEventHandler((event) => {
   const config = useRuntimeConfig();
@@ -23,10 +22,8 @@ export default defineEventHandler((event) => {
       '/api/__sitemap__/',           // Nuxt SEO sitemap generation
       '/api/preview/enable',         // Sanity preview enable
       '/api/preview/disable',        // Sanity preview disable
-      '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates)
+      '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
       '/api/analytics/mortgage/track', // Track mortgage calculator usage
-      '/api/admin/mortgage/rates/',  // Admin mortgage endpoints (rates, fetch)
-      '/api/analytics/mortgage/track', // Track Mortgage calculator usage
     ];
 
     // Check if the path is an API route

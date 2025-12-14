@@ -1,5 +1,7 @@
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
-  // Nothing to configure yet
+  imports: {
+    dirs: ['server/tasks/**']
+  }
 })

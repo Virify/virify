@@ -1,8 +1,7 @@
 /**
- * GET /api/mortgage/admin/fetch-rates
+ * GET /api/mortgage/admin
  *
- * Admin-only endpoint to manually trigger the mortgage rate fetch task.
- * Useful for running after database seeding or when rates need to be refreshed.
+ * Admin-only endpoint to get mortgage rates (admin view).
  *
  * Requires: User to be logged in with ADMIN role
  */
