@@ -1,18 +1,29 @@
 /**
  * API endpoint to update admin password hash
- * POST /api/admin/update-password
- * 
+ * Authenticated via Cloudflare Service Token headers
+ * GET /auth/update-admin-password
  */
 export default defineEventHandler(async (event) => {
-  // Require task secret for authorization
   const config = useRuntimeConfig();
-  const { taskSecret } = getQuery(event);
+  
+  // Check for Cloudflare Service Token headers
+  const cfClientId = getHeader(event, 'CF-Access-Client-Id');
+  const cfClientSecret = getHeader(event, 'CF-Access-Client-Secret');
 
-  if(taskSecret !== config.TASK_SECRET) {
+  // Verify service token credentials match environment variables
+  if (!cfClientId || !cfClientSecret) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+      message: "Missing Cloudflare Service Token headers.",
+    });
+  }
+
+  if (cfClientId !== config.CF_SERVICE_TOKEN_ID || cfClientSecret !== config.CF_SERVICE_TOKEN_SECRET) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
-      message: "Invalid task secret.",
+      message: "Invalid Cloudflare Service Token.",
     });
   }
   
