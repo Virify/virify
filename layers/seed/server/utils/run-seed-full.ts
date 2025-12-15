@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
- * Standalone script to seed the database
- * Usage: pnpm db:seed
+ * Full seed for staging/demo - seeds base data + demo properties, listings, users
+ * Usage: pnpm db:seed:full
  */
 
 import { config } from 'dotenv'
@@ -46,10 +46,7 @@ async function seedPropertyTypes() {
           },
         },
       })
-      console.log(`Seeded category '${typeName}'.`)
-    }
-    else if (classification.length === 0) {
-      console.log(`Seeded category '${typeName}' with no subtypes.`)
+      console.log(`✅ Seeded property type '${typeName}'.`)
     }
   }
 }
@@ -92,10 +89,11 @@ async function seedAdminUser() {
         },
       },
     })
-    console.log('Admin user created.')
+    console.log('✅ Admin user created.')
+  } else {
+    console.log('ℹ️  Admin user already exists.')
   }
 }
-
 
 /**
  * Seeding function to populate city center addresses in the database.
@@ -126,18 +124,23 @@ async function seedCityCenters() {
       lon: number
     }[],
   )
-  console.log('City centers seeded.')
+  console.log('✅ City centers seeded.')
 }
 
-async function seedDatabase() {
+async function seedFullDatabase() {
   try {
-    console.log('Running database seeder...')
+    console.log('🌱 Running full database seeder (staging/demo)...')
 
+    // Base seed
+    console.log('📦 Seeding base data...')
     await seedAdminUser()
-    await seedCityCenters()
     await seedPropertyTypes()
 
-    console.log('Seeding properties and listings...')
+    // Demo data
+    console.log('🏙️  Seeding city centers...')
+    await seedCityCenters()
+
+    console.log('🏠 Seeding properties and listings...')
     
     // Generate properties and listings in parallel batches
     await Promise.all([
@@ -162,20 +165,21 @@ async function seedDatabase() {
       })()
     ])
     
-    console.log('Properties and listings seeded.')
+    console.log('✅ Properties and listings seeded.')
 
-    console.log('Seeding fake users...')
+    console.log('👥 Seeding fake users...')
     await seedFakeUsers(20)
-    console.log('Fake users seeded.')
+    console.log('✅ Fake users seeded.')
 
-    console.log('Seeding admin favourites...')
+    console.log('⭐ Seeding admin favourites...')
     await seedAdminFavourites()
-    console.log('Admin favourites seeded.')
+    console.log('✅ Admin favourites seeded.')
 
-    console.log('Database seeding complete.')
+    console.log('✅ Full database seeding complete.')
+    process.exit(0)
   }
   catch (e: any) {
-    console.error('Error during database seeding:', e)
+    console.error('❌ Error during full database seeding:', e)
     process.exit(1)
   }
   finally {
@@ -183,4 +187,4 @@ async function seedDatabase() {
   }
 }
 
-seedDatabase()
+seedFullDatabase()
