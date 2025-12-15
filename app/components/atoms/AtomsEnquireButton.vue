@@ -11,7 +11,7 @@ import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
 
 interface Props {
   listingId: number;
-  userId: number;
+  userId?: number | null;
 }
 
 const props = defineProps<Props>();
@@ -23,7 +23,7 @@ const { user } = useUserSession();
 const safeUserId = computed(() => {
   const { userId } = asObject(props)
 
-  return Number.isNaN(userId) ? null : userId
+  return userId && !Number.isNaN(userId) ? userId : null
 })
 
 const isSelf = computed(() => {

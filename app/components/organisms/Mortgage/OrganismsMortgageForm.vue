@@ -16,8 +16,8 @@
       <div class="o-mortgage-form__row">
         <div class="o-mortgage-form__field o-mortgage-form__field--half">
           <label class="o-mortgage-form__label | body-sm text-medium">Property Price</label>
-          <AtomsCurrencyInput id="property-price" :model-value="formData.propertyPrice || undefined"
-            placeholder="£0" :disabled="!formData.buyerType" @update:model-value="updateFormField('propertyPrice', $event || 0)" />
+          <AtomsCurrencyInput id="property-price" :model-value="formData.propertyPrice || undefined" placeholder="£0"
+            :disabled="!formData.buyerType" @update:model-value="updateFormField('propertyPrice', $event || 0)" />
           <p class="o-mortgage-form__help | body-xs">The full purchase price of the property.</p>
         </div>
 
@@ -35,7 +35,7 @@
           <strong>{{ depositPercentage }}%</strong> deposit · <strong>{{ ltvPercentage }}%</strong> LTV
         </div>
         <p class="o-mortgage-form__ltv-explainer | body-xs">
-          LTV (Loan-to-Value) is the percentage of the property you're borrowing. 
+          LTV (Loan-to-Value) is the percentage of the property you're borrowing.
           Lower LTV typically means better rates as it's less risky for lenders.
         </p>
       </div>
@@ -49,19 +49,22 @@
           <label class="o-mortgage-form__label | body-sm text-medium">Mortgage Term</label>
           <div class="o-mortgage-form__term-inputs">
             <div class="o-mortgage-form__term-input">
-              <AtomsMortgageNumberInput id="term-years" :model-value="formData.termYears || undefined" :min="0" :max="40"
-                placeholder="e.g. 25" :disabled="!priceAndDepositFilled" @update:model-value="updateFormField('termYears', $event || 0)" />
+              <AtomsMortgageNumberInput id="term-years" :model-value="formData.termYears || undefined" :min="0"
+                :max="40" placeholder="25" :disabled="!priceAndDepositFilled"
+                @update:model-value="updateFormField('termYears', $event || 0)" />
               <span class="| body-sm">years</span>
             </div>
             <div class="o-mortgage-form__term-input">
               <AtomsMortgageNumberInput id="term-months" :model-value="formData.termMonths || undefined" :min="0"
-                :max="11" placeholder="0" :disabled="!priceAndDepositFilled" @update:model-value="updateFormField('termMonths', $event || 0)" />
+                :max="11" placeholder="0" :disabled="!priceAndDepositFilled"
+                @update:model-value="updateFormField('termMonths', $event || 0)" />
               <span class="| body-sm">months</span>
             </div>
           </div>
           <p class="o-mortgage-form__help | body-xs">
             <template v-if="totalTermDisplay">Total: {{ totalTermDisplay }}</template>
-            <template v-else>Most mortgages are 25–35 years. Shorter terms mean higher payments but less interest overall.</template>
+            <template v-else>Most mortgages are 25–35 years. Shorter terms mean higher payments but less interest
+              overall.</template>
           </p>
         </div>
 
@@ -197,11 +200,8 @@ function updateFormField<K extends keyof MortgageFormData>(
 
   &__row {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--size-16);
-
-    @media (max-width: 500px) {
-      flex-direction: column;
-    }
   }
 
   &__field {
@@ -210,7 +210,7 @@ function updateFormField<K extends keyof MortgageFormData>(
     gap: var(--size-6);
 
     &--half {
-      flex: 1;
+      flex: 1 1 200px;
     }
   }
 

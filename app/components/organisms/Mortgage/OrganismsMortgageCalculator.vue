@@ -113,16 +113,18 @@ async function calculateMortgage() {
 </script>
 
 <style lang="scss" scoped>
+@use "#styles/_utils/media.scss" as mq;
+
 .o-mortgage-calculator {
   &__layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--size-48);
+    grid-template-columns: 1fr;
+    gap: var(--size-32);
     align-items: start;
 
-    @media (max-width: 900px) {
-      grid-template-columns: 1fr;
-      gap: var(--size-32);
+    @include mq.desktop {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--size-48);
     }
   }
 
