@@ -8,11 +8,6 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const { taskSecret } = getQuery(event);
 
-  console.log('🔍 Endpoint Debug:');
-  console.log('  Received taskSecret:', taskSecret || 'MISSING');
-  console.log('  Expected TASK_SECRET:', config.TASK_SECRET || 'NOT_SET');
-  console.log('  Match:', taskSecret === config.TASK_SECRET);
-
   // Verify task secret for authentication
   if (!taskSecret || taskSecret !== config.TASK_SECRET) {
     throw createError({

@@ -33,10 +33,6 @@ async function updateAdminPasswordRemote() {
 
     const url = `${baseUrl}/auth/update-admin-password?taskSecret=${encodeURIComponent(taskSecret)}`;
 
-    console.log('🔍 Debug:');
-    console.log('  URL:', url);
-    console.log('  TASK_SECRET:', taskSecret?.substring(0, 10) + '...');
-
     const response = await fetch(url, {
       method: "GET",
       headers: {
