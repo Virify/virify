@@ -1,6 +1,6 @@
-import { PrismaClient as AppClient } from "~~/layers/database/server/database/prisma/generated/client";
-import { PrismaClient as PpdClient } from "~~/layers/database/server/database/prisma-ppd/generated/client";
-import { PrismaClient as WaitingListClient } from "~~/layers/database/server/database/prisma-waiting-list/generated/client";
+import { PrismaClient as AppClient } from "../database/prisma/generated/client";
+import { PrismaClient as PpdClient } from "../database/prisma-ppd/generated/client";
+import { PrismaClient as WaitingListClient } from "../database/prisma-waiting-list/generated/client";
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const appClientSingleton = () => {

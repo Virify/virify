@@ -13,7 +13,7 @@
     </section>
 
     <!-- Calculator -->
-    <div class="mortgage-page__calculator | container-xs">
+    <div class="mortgage-page__calculator | container">
       <OrganismsMortgageCalculator />
     </div>
 

@@ -1,5 +1,5 @@
 <template>
-  <section class="o-mortgage-calculator | container">
+  <section class="o-mortgage-calculator | container-xs">
     <div class="o-mortgage-calculator__layout">
       <!-- Form Column -->
       <OrganismsMortgageForm
@@ -12,7 +12,7 @@
 
       <!-- Results Column -->
       <div class="o-mortgage-calculator__results-column">
-        <OrganismsMortgageResults :result="calculationResult" />
+        <OrganismsMortgageResults :result="calculationResult" :error="calculationError" />
 
         <!-- Disclaimer (hidden when results are shown) -->
         <div v-if="!calculationResult" class="o-mortgage-calculator__disclaimer">

@@ -23,8 +23,8 @@ interface Props {
   modelValue: string | null
 }
 
-defineProps<Props>()
-defineEmits<{
+const props = defineProps<Props>()
+const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 </script>

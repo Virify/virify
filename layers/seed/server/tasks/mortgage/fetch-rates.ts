@@ -1,6 +1,6 @@
 import OpenAI from "openai";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
 import { defineTask , useRuntimeConfig, useStorage } from "nitropack/runtime";
+import { prisma } from "../../../../database/server/utils/prisma-client";
 
 /**
  * Nitro scheduled task to fetch UK mortgage rates monthly

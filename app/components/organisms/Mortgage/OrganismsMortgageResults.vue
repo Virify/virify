@@ -1,7 +1,14 @@
 <template>
   <div class="o-mortgage-results">
+    <!-- Error state -->
+    <div v-if="error" class="o-mortgage-results__error">
+      <AtomsIcon icon="property/info" :size="24" />
+      <h3 class="| title-sm">Unable to Calculate</h3>
+      <p class="| body-sm">We couldn't calculate your mortgage estimate at this time. Please try again later or enter a custom interest rate.</p>
+    </div>
+
     <!-- Placeholder state (before calculation) -->
-    <MoleculesMortgageResultsPlaceholder v-if="!result" />
+    <MoleculesMortgageResultsPlaceholder v-else-if="!result" />
 
     <!-- Results state (after calculation) -->
     <Transition name="fade-in" mode="out-in">
@@ -45,6 +52,7 @@
 
 interface Props {
   result: MortgageCalculationData | null
+  error?: string | null
 }
 
 const props = defineProps<Props>()
@@ -85,6 +93,31 @@ const interestPercentage = computed(() =>
   background: var(--background-200);
   border-radius: var(--border-radius-2xl);
   padding: var(--size-24);
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 250px;
+    gap: var(--size-12);
+    color: var(--text-muted);
+
+    svg {
+      color: var(--red-400);
+    }
+
+    h3 {
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 0;
+      max-width: 280px;
+    }
+  }
 
   &__content {
     h3 {

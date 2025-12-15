@@ -2,8 +2,8 @@
  * !! This file is only to be used for seeding - because it instantiates a new PrismaClient which does not work in production.
  */
 
-import { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
+import { Prisma } from "../../../database/server/database/prisma/generated/client";
+import { prisma } from "../../../database/server/utils/prisma-client";
 
 type AddressLocation = {
   lat: number;

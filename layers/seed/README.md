@@ -1,79 +1,80 @@
-
 # Seed Layer
 
-The **Seed Layer** is responsible for populating the database with initial and test data. It is essential for onboarding, development, and testing. This layer uses Nitro tasks for fast, modular, and repeatable seeding.
+This layer handles database seeding, migrations, and scheduled tasks.
 
----
+## Scripts (Standalone)
 
-## 🚦 When to Use
-
-- **First-time setup**: Populate your local/dev database with sample data
-- **Testing**: Reset and seed the database before running tests
-- **Development**: Quickly generate realistic data for new features
-
----
-
-## 🐳 Docker Usage
-
-If running the project with Docker, the seed script is run automatically as part of the `make up` process (see root README). To manually reseed:
+Run these directly via pnpm - they work without the Nuxt server:
 
 ```bash
-make exec
-pnpm seed
+pnpm db:seed        # Seed database with initial data
+pnpm db:reset       # Reset database (⚠️ destructive - drops all data)
+pnpm db:migrate     # Run pending migrations (prisma migrate deploy)
+pnpm fetch-rates    # Fetch latest mortgage rates from OpenAI
 ```
 
----
+## Nitro Tasks (Scheduled)
 
-## 💻 Local Usage
+These run inside the Nitro server context:
 
-If running locally (not in Docker):
+- `mortgage:fetch-rates` - Cron task to fetch mortgage rates monthly
 
-1. Ensure your database is running and `DATABASE_URL` is set in `.env`
-2. Run:
-	```bash
-	pnpm seed
-	```
+## Railway Pre-Deploy
 
----
+The `railway.toml` configures pre-deploy commands. By default, migrations run on every deploy:
 
-## 🛠 How It Works
+```toml
+preDeployCommand = "pnpm migrate-deploy"
+```
 
-- The seeding logic lives in `layers/seed/server/` (see code for details)
-- Uses [Prisma](https://www.prisma.io/) for type-safe DB access
-- Modular: Add or update seeders for new models as needed
+## Triggering Tasks on Deploy
 
----
+Add task directives to your commit message to run additional tasks during Railway pre-deploy:
 
-## 🧩 Customizing Seed Data
-
-- Edit or add files in `layers/seed/server/` to change what data is seeded
-- Use environment variables to control seed behavior (e.g., number of users, listings, etc.)
-- For large datasets, consider using factories or Faker.js
-
----
-
-## 🧹 Resetting the Database
-
-To drop and recreate the database (dangerous, will erase all data!):
+### Staging (branches other than main)
 
 ```bash
-pnpm prisma migrate reset
-pnpm seed
+git commit -m "feat: new feature [task: seed]"
+git commit -m "fix: schema change [task: reset, seed]"
+git commit -m "chore: update rates [task: fetch-rates]"
 ```
 
----
+### Production (main branch)
 
-## 🏆 Best Practices
+Requires explicit `task:prod:` prefix for safety:
 
-- Keep seed data realistic but minimal
-- Use factories for randomization
-- Document any required relationships (e.g., users must exist before listings)
-- Reseed before running integration tests
-- Never run seed scripts against production databases
+```bash
+git commit -m "feat: release [task:prod: seed]"
+```
 
----
+### Available Tasks
 
-## 🔗 Related Docs
+| Task | Command | Description |
+|------|---------|-------------|
+| `seed` | `pnpm db:seed` | Seed database with initial data |
+| `reset` | `pnpm db:reset` | Reset database (⚠️ destructive) |
+| `fetch-rates` | `pnpm fetch-rates` | Fetch mortgage rates |
 
-- [Database Layer](../database/README.md)
-- [Prisma Seeding Docs](https://www.prisma.io/docs/guides/database/seed-database)
+## How It Works
+
+1. Push to `staging` or `main`
+2. GitHub Action (`.github/workflows/run-db-task.yml`) parses commit for `[task: ...]`
+3. Updates `railway.toml` with the additional pre-deploy commands
+4. Railway runs the pre-deploy command before starting the app
+
+## File Structure
+
+```
+layers/seed/
+├── scripts/                    # Standalone CLI scripts
+│   ├── seed.ts                # Database seeding
+│   ├── reset.ts               # Database reset
+│   ├── migrate.ts             # Run migrations
+│   └── fetch-rates.ts         # Fetch mortgage rates
+├── server/
+│   ├── tasks/
+│   │   └── mortgage/
+│   │       └── fetch-rates.ts # Nitro cron task
+│   └── utils/                 # Seed utilities (fakers, etc.)
+└── nuxt.config.ts
+```
