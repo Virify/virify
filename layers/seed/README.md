@@ -84,36 +84,49 @@ pnpm db:update-admin-password
 ```
 
 This script:
-1. Calls the `/auth/update-admin-password` endpoint
-2. Authenticates using Cloudflare Service Token headers
-3. Triggers the password hash update task
+1. Calls the `/auth/update-admin-password?taskSecret=<secret>` endpoint
+2. Authenticates using `TASK_SECRET` query parameter
+3. Includes Cloudflare Service Token headers (for staging environments with CF Access)
+4. Triggers the password hash update task
 
-#### Cloudflare Access Protection
+#### Authentication & Security
 
-The endpoint is protected by **Cloudflare Access** with a **Service Auth** policy:
+The endpoint uses **multi-layer authentication**:
 
-**Access Policy Configuration:**
-- **Include**: Service Token named "railway" OR Team member emails
-- **Action**: Service Auth (bypasses identity provider login for service tokens)
+**Primary Authentication (All Environments):**
+- **TASK_SECRET** query parameter validates the request
+- Required for both production and staging
+- Application-level security that works everywhere
+
+**Secondary Authentication (Staging Only):**
+- **Cloudflare Access** with Service Auth policy
+- Validates service token headers at the edge before reaching the app
+- Additional protection layer for staging environment
 
 **Required Environment Variables:**
 ```bash
+# Required for all environments
+TASK_SECRET=<random-secret-string>
+
+# Required for staging (Cloudflare Access protected)
 CF_SERVICE_TOKEN_ID=<client-id>.access
 CF_SERVICE_TOKEN_SECRET=<client-secret>
 ```
 
 **Security:**
-- Cloudflare Access validates service token headers at the edge
-- Application validates tokens again for defense in depth
-- Only requests with valid tokens reach the endpoint
-- Tokens are unguessable cryptographic values
+- `TASK_SECRET` must be kept secret (only in Railway env vars)
+- Cloudflare Access provides edge-level protection on staging
+- Service tokens validated at edge and stripped before reaching app
+- Defense in depth: Both query param and CF Access on staging
 
-**Creating Service Tokens:**
+**Cloudflare Service Token Setup (Staging Only):**
 1. Go to Cloudflare Zero Trust → Access → Service Auth → Service Tokens
 2. Create new token named "railway"
 3. Copy Client ID and Client Secret (shown only once)
-4. Add to Railway environment variables
-5. Configure Access policy to include the service token with "Service Auth" action
+4. Add to Railway staging environment variables
+5. Configure Access policy:
+   - **Include**: Service Token "railway" OR Team member emails
+   - **Action**: Service Auth (bypasses identity provider for tokens)
 
 ## Railway Pre-Deploy
 
@@ -164,7 +177,10 @@ ADMIN_EMAIL=admin@virify.co.uk
 ADMIN_PASSWORD=your-secure-password
 ADMIN_USERNAME=Virify
 
-# Cloudflare Service Token (for remote password updates)
+# Task authentication (required for all environments)
+TASK_SECRET=<random-secret-string>
+
+# Cloudflare Service Token (required for staging with CF Access)
 CF_SERVICE_TOKEN_ID=<client-id>.access
 CF_SERVICE_TOKEN_SECRET=<client-secret>
 
@@ -177,8 +193,9 @@ RAILWAY_ENVIRONMENT=staging|production
 
 ## Security Notes
 
-- **Service Tokens**: Keep `CF_SERVICE_TOKEN_ID` and `CF_SERVICE_TOKEN_SECRET` secret
-- **Never commit**: Service token values should only be in Railway environment variables
+- **TASK_SECRET**: Keep this secret - required for all remote admin operations
+- **Service Tokens**: Only needed for staging environments with Cloudflare Access
+- **Never commit**: All secrets should only be in Railway environment variables
 - **Admin Password**: The `ADMIN_PASSWORD` env var is automatically hashed by the server
 - **Production Seeds**: Always use `db:setup:prod` for production - never seed demo data
-- **Defense in Depth**: Both Cloudflare Access and application-level validation protect endpoints
+- **Defense in Depth**: Staging has both TASK_SECRET and Cloudflare Access protection

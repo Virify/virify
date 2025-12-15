@@ -60,6 +60,7 @@ export default defineNuxtConfig({
       '/account/*',
       '/api',
       '/api/*',
+      '/auth/update-admin-password',
       '/listing/preview',
       '/listing/preview/*',
       '/search',
@@ -82,6 +83,7 @@ export default defineNuxtConfig({
       '/search/**',
       '/ai-search/**',
       '/review/**',
+      '/auth/update-admin-password',
     ],
     sources: [
       '/api/__sitemap__/guides',

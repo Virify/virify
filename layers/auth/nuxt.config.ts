@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   modules: ["nuxt-auth-utils"],
   runtimeConfig: {
+    TASK_SECRET: process.env.TASK_SECRET,
     public: {
       redirectCookieName: "redirect",
       loginUrl: "/login",

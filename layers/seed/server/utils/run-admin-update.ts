@@ -12,10 +12,16 @@ async function updateAdminPasswordRemote() {
   try {
     const cfServiceTokenId = process.env.CF_SERVICE_TOKEN_ID;
     const cfServiceTokenSecret = process.env.CF_SERVICE_TOKEN_SECRET;
+    const taskSecret = process.env.TASK_SECRET;
     const baseUrl = process.env.EMAIL_BASE_URL;
 
     if (!baseUrl) {
       console.error("base url required");
+      process.exit(1);
+    }
+
+    if (!taskSecret) {
+      console.error("TASK_SECRET environment variable is required");
       process.exit(1);
     }
 
@@ -25,7 +31,7 @@ async function updateAdminPasswordRemote() {
       process.exit(1);
     }
 
-    const url = `${baseUrl}/auth/update-admin-password`;
+    const url = `${baseUrl}/auth/update-admin-password?taskSecret=${encodeURIComponent(taskSecret)}`;
 
     const response = await fetch(url, {
       method: "GET",
