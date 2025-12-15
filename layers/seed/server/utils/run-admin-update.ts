@@ -19,15 +19,29 @@ async function updateAdminPasswordRemote() {
     }
     
     const url = `${baseUrl}/auth/update-admin-password?taskSecret=${encodeURIComponent(taskSecret)}`
-    console.log(`🔐 Triggering admin password update at ${baseUrl}...`)
+    console.log(`🔐 Triggering admin password update...`)
+    console.log(`   URL: ${url}`)
 
     const response = await fetch(url, {
       method: 'GET',
     })
 
+    console.log(`   Status: ${response.status} ${response.statusText}`)
+    console.log(`   Content-Type: ${response.headers.get('content-type')}`)
+
     if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`HTTP ${response.status}: ${error}`)
+      const contentType = response.headers.get('content-type')
+      let error = `HTTP ${response.status}`
+      
+      if (contentType?.includes('application/json')) {
+        const json = await response.json()
+        error += `: ${JSON.stringify(json)}`
+      } else {
+        const text = await response.text()
+        error += `: ${text.substring(0, 200)}`
+      }
+      
+      throw new Error(error)
     }
 
     const result = await response.json()
