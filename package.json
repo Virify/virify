@@ -29,6 +29,7 @@
     "db:seed": "tsx layers/seed/server/utils/run-seed.ts",
     "db:migrate": "tsx layers/seed/server/utils/run-migrate.ts",
     "fetch-rates": "tsx layers/seed/server/utils/run-fetch-rates.ts",
+    "update-admin-password": "tsx layers/seed/server/utils/update-admin-password.ts",
     "seed:address": "tsx layers/seed/scripts/extract-and-geocode-addresses.ts",
     "test": "vitest run",
     "test:full": "vitest run",
