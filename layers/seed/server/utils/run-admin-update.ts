@@ -37,6 +37,10 @@ async function updateAdminPasswordRemote() {
       },
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
     const result = await response.json();
     console.log("✅ Admin password update triggered successfully");
     console.log(result);
