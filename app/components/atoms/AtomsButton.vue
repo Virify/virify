@@ -1,6 +1,9 @@
 <template>
   <button v-bind="$attrs" class="| button" :class="{
-    'button-pending': pending
+    'button-pending': pending,
+    'button-primary': variant === 'primary',
+    'button-secondary': variant === 'secondary',
+    'button-tertiary': variant === 'tertiary',
   }" :disabled="pending">
     <AtomsIcon v-if="pending" title="Pending" icon="animated-dots/animated-dots" />
     <template v-else>
@@ -9,11 +12,15 @@
   </button>
 </template>
 
-<script setup>
-defineProps({
-  pending: {
-    type: Boolean
-  }
+<script setup lang="ts">
+interface Props {
+  pending?: boolean
+  variant?: 'primary' | 'secondary' | 'tertiary'
+}
+
+withDefaults(defineProps<Props>(), {
+  pending: false,
+  variant: 'primary',
 })
 
 useHead({

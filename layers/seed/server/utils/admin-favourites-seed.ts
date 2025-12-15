@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { geocodingFeature } from "./user-faker";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
+import { prisma } from "../../../database/server/utils/prisma-client";
 
 /**
  * Seeding function to add favourites and notes to the admin user.

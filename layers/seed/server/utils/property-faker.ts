@@ -1,13 +1,13 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { AccessibilityFeature, BathroomFeature, BedSizeType, BedroomFeature, BoilerType, BroadbandType, BuildingFeature, ConnectedUtilities, ConstructionType, EPCRating, HeatingType, HotWaterSource, KitchenFeature, LandFeature, OtherRoomType, OutdoorSpaceFeature, ParkingFeature, ReceptionType, RenewableEnergy, RoomFeature, SecurityFeature, StorageFeature, UtilityFeature, type Address, type Prisma } from "~~/layers/database/server/database/prisma/generated/client";
-import { roundFloat } from "~~/shared/utils/numbers";
+import { AccessibilityFeature, BathroomFeature, BedSizeType, BedroomFeature, BoilerType, BroadbandType, BuildingFeature, ConnectedUtilities, ConstructionType, EPCRating, HeatingType, HotWaterSource, KitchenFeature, LandFeature, OtherRoomType, OutdoorSpaceFeature, ParkingFeature, ReceptionType, RenewableEnergy, RoomFeature, SecurityFeature, StorageFeature, UtilityFeature, type Address, type Prisma } from "../../../database/server/database/prisma/generated/client";
+import { roundFloat } from "../../../../shared/utils/numbers";
 import { typeToClassificationMap } from "./property-type-map";
-import type { PropertyWithAddress } from "~~/shared/types/property";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
+import type { PropertyWithAddress } from "../../../../shared/types/property";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed";
 import { getRequiredImages, getRandomAdditionalImages, getAllImagesByRoom } from "./images-to-seed";
-import type { AddressCreateWithoutPropertiesInput } from "~~/layers/database/server/database/prisma/generated/models";
+import type { AddressCreateWithoutPropertiesInput } from "../../../database/server/database/prisma/generated/models";
+import { prisma } from "../../../database/server/utils/prisma-client";
 
 /**
  * Helper function to randomly select enum values based on probability

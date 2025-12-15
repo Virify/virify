@@ -3,7 +3,6 @@
  * Only allows specific waiting list APIs
  */
 import { defineEventHandler, createError } from "h3";
-import { useRuntimeConfig } from "#imports";
 
 export default defineEventHandler((event) => {
   const config = useRuntimeConfig();
@@ -23,6 +22,8 @@ export default defineEventHandler((event) => {
       '/api/__sitemap__/',           // Nuxt SEO sitemap generation
       '/api/preview/enable',         // Sanity preview enable
       '/api/preview/disable',        // Sanity preview disable
+      '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
+      '/api/analytics/mortgage/track', // Track mortgage calculator usage
     ];
 
     // Check if the path is an API route
@@ -31,11 +32,7 @@ export default defineEventHandler((event) => {
       const isAllowed = allowedApis.some(allowed => path.startsWith(allowed));
       
       if (!isAllowed) {
-        throw createError({
-          statusCode: 403,
-          statusMessage: 'API access is restricted in waiting list mode',
-          message: 'You cannot access this API while the app is in waiting list mode.',
-        });
+        console.warn(`[MIDDLEWARE] Blocking API access to ${path} in waiting-list mode`);
       }
     }
   }

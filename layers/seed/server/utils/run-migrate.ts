@@ -1,4 +1,8 @@
 #!/usr/bin/env tsx
+/**
+ * Standalone script to run database migrations
+ * Usage: pnpm db:migrate
+ */
 
 import { execa } from 'execa'
 

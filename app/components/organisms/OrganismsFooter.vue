@@ -36,6 +36,7 @@
           <h3 class="o-footer__section-title | title-3xs">Property Tools</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/price-paid" class="o-footer__link | body-sm">Price Paid Data</nuxt-link></li>
+            <li><nuxt-link to="/mortgage-calculator" class="o-footer__link | body-sm">Mortgage Calculator</nuxt-link></li>
           </ul>
         </div>
 

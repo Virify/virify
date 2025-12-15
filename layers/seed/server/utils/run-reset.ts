@@ -1,4 +1,8 @@
 #!/usr/bin/env tsx
+/**
+ * Standalone script to reset the database
+ * Usage: pnpm db:reset
+ */
 
 import { execa } from 'execa'
 

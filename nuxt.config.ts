@@ -1,7 +1,7 @@
 import vue from "@vitejs/plugin-vue";
 
 export default defineNuxtConfig({
-  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content"],
+  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", './layers/sanity'],
   future: {
     compatibilityVersion: 4,
   },
@@ -10,6 +10,8 @@ export default defineNuxtConfig({
     CF_IMAGES_API_KEY: process.env.CF_IMAGES_API_KEY,
     CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
     CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH,
+    CF_SERVICE_TOKEN_ID: process.env.CF_SERVICE_TOKEN_ID,
+    CF_SERVICE_TOKEN_SECRET: process.env.CF_SERVICE_TOKEN_SECRET,
     public: {
       CF_SITE_KEY: process.env.CF_SITE_KEY,
       CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
@@ -45,6 +47,7 @@ export default defineNuxtConfig({
   robots: {
     allow: [
       '/',
+      '/mortgage-calculator',
       '/price-paid',
       '/contact',
       '/guides',
@@ -57,6 +60,7 @@ export default defineNuxtConfig({
       '/account/*',
       '/api',
       '/api/*',
+      '/auth/update-admin-password',
       '/listing/preview',
       '/listing/preview/*',
       '/search',
@@ -79,6 +83,7 @@ export default defineNuxtConfig({
       '/search/**',
       '/ai-search/**',
       '/review/**',
+      '/auth/update-admin-password',
     ],
     sources: [
       '/api/__sitemap__/guides',
@@ -129,8 +134,12 @@ export default defineNuxtConfig({
   },
   nitro: {
     experimental: {
-      tasks: true,
       asyncContext: true,
+      tasks: true,
+    },
+    scheduledTasks: {
+      // Run mortgage rate fetch on the 1st of every month at 9am UTC
+      '0 9 1 * *': ['mortgage:fetch-rates'],
     },
     rollupConfig: {
       // @ts-ignore

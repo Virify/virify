@@ -38,6 +38,13 @@ export const getBaseCenterItems = (): NavigationItem[] => {
     children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: 'account/billing' }],
   })
 
+  items.push({
+    id: "mortgage-calculator",
+    label: "Mortgage Calculator",
+    href: "/mortgage-calculator/",
+    type: "link",
+  })
+
   // Add Contact link only in waiting list mode
   if (isWaitingListMode.value) {
     items.push({

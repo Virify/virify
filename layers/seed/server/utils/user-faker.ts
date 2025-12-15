@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
-import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
-import { MembershipType } from "~~/layers/database/server/database/prisma/generated/enums";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
+import type { Prisma } from "../../../database/server/database/prisma/generated/client";
+import { MembershipType } from "../../../database/server/database/prisma/generated/enums";
+import { prisma } from "../../../database/server/utils/prisma-client";
 
 export function generateFakeUser(): Prisma.UserCreateInput {
   return {
