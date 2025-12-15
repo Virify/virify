@@ -24,6 +24,7 @@ export default defineEventHandler((event) => {
       '/api/preview/disable',        // Sanity preview disable
       '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
       '/api/analytics/mortgage/track', // Track mortgage calculator usage
+      '/auth/update-admin-password', // Admin password update (protected by TASK_SECRET)
     ];
 
     // Check if the path is an API route
