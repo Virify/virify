@@ -12,7 +12,7 @@
       <AtomsIcon icon="explore/map" width="16" height="16" />
       {{ locationName }}
     </AtomsPill>
-    <AtomsPill v-if="radiusText" class="m-results-context__pill m-results-context__pill--radius | body-sm">
+    <AtomsPill v-if="radiusText" class="m-results-context__pill m-results-context__pill--radius | body-sm" @click="openLocation">
       <AtomsIcon icon="explore/map" width="16" height="16" />
       {{ radiusText }}
     </AtomsPill>
