@@ -307,6 +307,7 @@ const premiumFeatures = computed(() => {
   }
 
   &__gallery {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
