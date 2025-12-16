@@ -55,26 +55,7 @@ const { searchState } = useSearchState()
 const locationQuery = computed(() => {
   const { location } = asObject(searchState.value)
   if (!location) return ''
-
-  const fullName = location.place_name_en || location.place_name || ''
-  const parts = fullName.split(', ')
-  const text = location.text || ''
-  
-  // Check if this is a postcode (UK postcode pattern)
-  const isPostcode = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i.test(text)
-  
-  // Remove country/region names from the end
-  const filteredParts = parts.filter((part: string) => 
-    !['United Kingdom', 'UK', 'England', 'Scotland', 'Wales', 'Northern Ireland'].includes(part)
-  )
-  
-  if (isPostcode && filteredParts.length >= 2) {
-    // For postcodes: show more detail "CF10 3NQ, Castle Street, Cardiff"
-    return filteredParts.slice(0, 3).join(', ')
-  }
-  
-  // For other locations: take first 2 parts for context
-  return filteredParts.slice(0, 2).join(', ') || text || fullName
+  return getShortLocationName(location)
 })
 
 /**

@@ -1,144 +1,104 @@
 <template>
   <div class="no-results">
-    <div class="no-results__card">
-      <div class="no-results__icon">
-        <AtomsIcon icon="search" />
-      </div>
-      
-      <div class="no-results__content | flow flow-sm">
-        <h2 class="no-results__title | title-md">No properties found</h2>
-        <p class="no-results__query | body-sm">"{{ lastSearchQuery }}"</p>
-      </div>
+    <!-- Search context pills -->
+    <MoleculesResultsContext 
+      :query-analysis="searchState?.queryAnalysis"
+      :location="searchState?.location"
+      :radius="searchState?.radius"
+    />
 
-      <div class="no-results__tips">
-        <p class="no-results__tips-title | body-sm">Try adjusting your search:</p>
-        <ul class="no-results__tips-list">
-          <li v-for="tip of suggestionTips" :key="tip">
-            <AtomsIcon icon="tick" class="no-results__tip-icon" />
-            <span>{{ tip }}</span>
-          </li>
-        </ul>
-      </div>
+    <!-- Big header -->
+    <h1 class="no-results__title | title-xl">No results found</h1>
+    <p class="no-results__subtitle | body-md">We couldn't find any properties matching your search. Try one of these instead:</p>
 
-      <NuxtLink to="/" class="no-results__cta | button button-sm button-primary">
-        Start a new search
-      </NuxtLink>
-    </div>
+    <!-- Suggestion prompts -->
+    <ul class="no-results__suggestions">
+      <li v-for="(prompt, index) of examplePrompts" :key="index">
+        <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
+          @click.prevent="searchWithPrompt(prompt)" />
+      </li>
+    </ul>
+
+    <!-- CTA -->
+    <NuxtLink to="/" class="no-results__cta | button button-md button-secondary">
+      Start a new search
+    </NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   lastSearchQuery: string;
 }>();
 
-const suggestionTips = [
-  'Broaden your location radius',
-  'Use simpler search terms',
-  'Try a different property type',
-  'Remove specific requirements'
+const { searchState } = useSearchState()
+
+const location = computed(() => searchState.value?.location)
+const radius = computed(() => searchState.value?.radius)
+
+const examplePrompts = [
+  "4 bedroom house with a garden for sale",
+  "Studio flat with a balcony to rent",
+  "2+ bedroom property to buy",
+  "3 bedroom detached cottage for sale",
+  "A large parcel of land",
+  "3 bedroom house with a garage"
 ];
+
+function searchWithPrompt(prompt: string) {
+  const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  
+  const loc = location.value
+  if (!loc) {
+    navigateTo('/')
+    return
+  }
+  
+  const locationSlug = slugify(loc.text || loc.place_name_en || loc.place_name)
+  const radiusSlug = radius.value === 0 ? 'this-area-only' : `${radius.value || 5}-miles`
+  const promptSlug = slugify(prompt)
+  
+  navigateTo(`/search/${locationSlug}/${radiusSlug}/${promptSlug}`)
+}
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .no-results {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  padding: var(--size-32) var(--size-16);
+  padding: var(--size-48) var(--size-16);
   min-height: 60vh;
-
-  &__card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--size-24);
-    padding: var(--size-32) var(--size-24);
-    max-width: 400px;
-    width: 100%;
-    background: var(--surface-elevated);
-    border-radius: var(--border-radius-2xl);
-    border: 1px solid var(--border-color);
-    text-align: center;
-  }
-
-  &__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-    color: white;
-
-    .a-icon {
-      width: 28px;
-      height: 28px;
-    }
-  }
-
-  &__content {
-    text-align: center;
-  }
+  text-align: center;
+  gap: var(--size-24);
 
   &__title {
     color: var(--heading-color);
-  }
-
-  &__query {
-    display: inline-block;
-    padding: var(--size-6) var(--size-12);
-    background: var(--surface-muted);
-    border-radius: var(--border-radius-lg);
-    color: var(--text-muted);
-    font-style: italic;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__tips {
-    width: 100%;
-    padding: var(--size-16);
-    background: var(--surface-muted);
-    border-radius: var(--border-radius-xl);
-  }
-
-  &__tips-title {
-    color: var(--text-muted);
-    margin-bottom: var(--size-12);
-    font-weight: var(--font-weight-medium);
-  }
-
-  &__tips-list {
-    list-style: none;
-    padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-8);
-    text-align: left;
-
-    li {
-      display: flex;
-      align-items: center;
-      gap: var(--size-8);
-      font-size: var(--font-size-sm);
-      color: var(--text-color);
-    }
   }
 
-  &__tip-icon {
-    width: 16px;
-    height: 16px;
-    color: var(--brand-primary);
-    flex-shrink: 0;
+  &__subtitle {
+    color: var(--text-muted);
+    max-width: 400px;
+    margin: 0;
+  }
+
+  &__suggestions {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
+    margin: var(--size-16) 0 0;
+    gap: var(--size-8);
+    max-width: 700px;
   }
 
   &__cta {
-    margin-top: var(--size-8);
+    margin-top: var(--size-16);
   }
 }
 </style>

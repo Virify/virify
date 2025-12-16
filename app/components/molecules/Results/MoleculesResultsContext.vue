@@ -63,12 +63,11 @@ const searchTerms = computed(() => {
 })
 
 /**
- * Location name for display - capitalized
+ * Location name for display - short but contextual
  */
 const locationName = computed(() => {
   if (!props.location) return ''
-  const name = props.location.place_name || props.location.text || ''
-  return name.charAt(0).toUpperCase() + name.slice(1)
+  return getShortLocationName(props.location)
 })
 
 /**
