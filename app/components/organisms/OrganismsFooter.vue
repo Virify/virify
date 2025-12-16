@@ -14,14 +14,6 @@
             <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="120" height="54" class="o-footer__logo" />
           </nuxt-link>
         </div>
-        <!-- Property Search Section -->
-        <div v-if="footerConfig.showPropertySearch" class="o-footer__section">
-          <h3 class="o-footer__section-title | title-3xs">Property Search</h3>
-          <ul class="o-footer__links">
-            <li><nuxt-link to="/ai-search" class="o-footer__link | body-sm">AI Search</nuxt-link></li>
-          </ul>
-        </div>
-
         <!-- List Property Section -->
         <div v-if="footerConfig.showSellProperty" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Sell Property</h3>
@@ -91,7 +83,6 @@ const footerConfig = computed(() => {
   if (!isWaitingListMode.value) {
     // Show everything when not in waiting-list mode
     return {
-      showPropertySearch: true,
       showSellProperty: true,
       showPropertyTools: true,
       showGuides: true,
@@ -100,7 +91,6 @@ const footerConfig = computed(() => {
   }
   // Use waiting-list config when in waiting-list mode
   return {
-    showPropertySearch: config.footer.showPropertySearch,
     showSellProperty: config.footer.showSellProperty,
     showPropertyTools: config.footer.showPropertyTools,
     showGuides: config.footer.showGuides,

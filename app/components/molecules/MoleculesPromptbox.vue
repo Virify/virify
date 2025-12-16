@@ -12,8 +12,9 @@
         :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
     </div>
 
-    <button type="submit" class="m-promptbox__button" aria-label="Submit" :disabled="disabled" @click.prevent="$emit('submit', textarea)">
-      <AtomsIcon icon="ai/send" aria-hidden />
+    <button type="submit" class="m-promptbox__button" :class="{ 'm-promptbox__button--loading': loading }" aria-label="Submit" :disabled="disabled || loading" @click.prevent="$emit('submit', textarea)">
+      <AtomsIcon v-if="!loading" icon="ai/send" aria-hidden />
+      <span v-else class="m-promptbox__spinner" aria-hidden></span>
     </button>
   </div>
 </template>
@@ -25,7 +26,8 @@ const props = defineProps({
   id: String,
   placeholder: String,
   label: { type: String, default: 'Enter your prompt here' },
-  disabled: { type: Boolean, default: false }
+  disabled: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false }
 })
 
 defineEmits<{
@@ -121,11 +123,29 @@ const textarea = defineModel({ default: '' })
     background: var(--monochrome-300);
   }
 
+  &--loading {
+    background: var(--secondary-400);
+  }
+
   svg {
     display: block;
     width: var(--size-24);
     height: var(--size-24);
   }
+}
+
+.m-promptbox__spinner {
+  width: var(--size-24);
+  height: var(--size-24);
+  border: 3px solid var(--monochrome-400);
+  border-top-color: var(--monochrome-900);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .m-promptbox__analysis {

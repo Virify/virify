@@ -12,7 +12,7 @@
 
         <client-only>
           <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
-            <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
+            <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" :loading="isChecking" hideReset
               @submit-search="searchSubmit" @reset-search="searchReset" />
           </Transition>
         </client-only>
@@ -126,6 +126,8 @@ onClickOutside($formWrapper, () => {
  *  Fetch filters
  */
 const { setQuery, searchState } = useSearchState()
+const { checkContent, isChecking } = useModeration()
+const { showToast } = useToast()
 
 const initialQuery = computed(() => {
   const { query } = asObject(searchState.value)
@@ -134,20 +136,30 @@ const initialQuery = computed(() => {
 })
 
 async function searchSubmit(query: string) {
-  setQuery(query)
+  const { location, radius } = asObject(searchState.value)
+  
+  if (!location) return
+
+  // Check content moderation before proceeding
+  const { safe, reason } = await checkContent(query)
+  if (!safe) {
+    showToast(reason || 'Please try a different search.', { type: 'error' })
+    return
+  }
+
+  // Build clean URL: /search/{location}/{radius}/{prompt}
+  const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  
+  // Use short text name for cleaner URLs (e.g. "Cardiff" instead of "Cardiff, Wales, United Kingdom")
+  const locationSlug = slugify(location.text || location.place_name_en || location.place_name)
+  const radiusSlug = radius === 0 ? 'this-area-only' : `${radius || 5}-miles`
+  const promptSlug = slugify(query)
 
   await animateFormToDock()
-  await navigateTo({
-    path: '/search'
-  })
+  await navigateTo(`/search/${locationSlug}/${radiusSlug}/${promptSlug}`)
 
   /**
    *  To avoid global smooth scrolling
-   *
-   *  @TODO - we may want to have a more site-wide and elevant fix for
-   *          this, perhaps finding a way to adjust the Vue Router
-   *          behaviour to have `behaviour: instant` instead
-   *          https://router.vuejs.org/guide/advanced/scroll-behavior
    */
   window.scrollTo({
     top: 0,

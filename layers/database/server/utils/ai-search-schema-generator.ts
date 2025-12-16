@@ -88,38 +88,40 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
   }
   
   const criticalRules = `
-    Convert natural language property queries to a valid Prisma WHERE clause JSON for the Virify property search. Use ONLY the fields, relations, and enum values exactly as defined below. Do NOT invent or generalize field names. Follow the structure and rules precisely.
+    Convert natural language property queries to a valid Prisma WHERE clause JSON for the Virify property search. Use ONLY the fields, relations, and enum values exactly as defined in the schema below.
 
-    CRITICAL RULES:
-    - DO NOT NEST saleListing or rentalListing (or any of their fields) inside property or any nested object. This is a SCHEMA VIOLATION and will cause a FATAL ERROR. These fields MUST ONLY appear at the ROOT level of the query.
-    - The 'property' field on Listing is a ONE-TO-ONE relation. You MUST wrap ALL property filters inside 'is: { ... }'. For example: { property: { is: { numberBedrooms: 3, type: { name: "House" } } } }
-    - NEVER add Comments or quotes or markdown formatting to the AI response. The response MUST be a valid JSON object with a "whereClause" and "queryAnalysis" field. Any comments, quotes, or markdown will cause a FATAL ERROR.
-    - Ensure all JSON brackets and braces are properly closed. Missing closing braces will cause parsing errors.
-    - To filter by fields of rentalListing or saleListing, you MUST use the correct Prisma relation filter syntax:
-      * To filter for existence: { rentalListing: { isNot: null } }
-      * To filter by fields: { rentalListing: { is: { furnishedStatus: "FURNISHED" } } }
-      * NEVER use { rentalListing: { furnishedStatus: ... } } (this is INVALID and will cause an error)
-
-    IMPORTANT FIELD LOCATIONS:
-    - garage, driveway, parking fields → property: { is: { parking: { is: { garage: true, driveway: true } } } }
-    - garden → property: { is: { outdoorSpace: { is: { garden: { some: {} } } } } }
-    - All bedroom/bathroom counts → property: { is: { numberBedrooms: 3, numberBathrooms: 2 } }
-    - Bathroom floor location → property: { is: { bathroomFeatures: { some: { floor: 0 } } } } (0=ground, 1=first, etc. downstairs = ground)
-    - Property type (House/Flat/etc) → property: { is: { type: { name: "House" } } } (type is a RELATION to PropertyType model)
-    - Property classification (Detached/Semi-detached/Terraced) → property: { is: { classification: { name: "Detached" } } } (classification is a RELATION to PropertyClassification model)
-    - Office/Study/Gym etc → property: { is: { otherRoom: { some: { type: "OFFICE" } } } } (type is an ENUM field, use the enum value directly, NOT { name: "OFFICE" })
+    CRITICAL PRISMA SYNTAX RULES:
     
-    CRITICAL: Distinguish between RELATIONS and ENUM fields:
-    - PropertyType and PropertyClassification are MODELS (relations), so use: { type: { name: "House" } }
-    - OtherRoomType, FireplaceType, ReceptionType, BedSizeType etc are ENUMS, so use the value directly: { type: "OFFICE" }
+    1. ROOT LEVEL ONLY: saleListing and rentalListing MUST appear at the ROOT of the query, never nested inside property.
+    
+    2. ONE-TO-ONE RELATIONS: Use 'is: { ... }' wrapper. Examples:
+       - property: { is: { numberBedrooms: 3 } }
+       - parking: { is: { features: { has: "GARAGE" } } }
+       - outdoorSpace: { is: { garden: { some: {} } } }
+    
+    3. ONE-TO-MANY RELATIONS: Use 'some: { ... }' wrapper. Examples:
+       - bathroomFeatures: { some: { floor: 0 } }
+       - otherRoom: { some: { type: "OFFICE" } }
+       - garden: { some: { facing: "SOUTH" } }
+    
+    4. ENUM ARRAYS: Use 'has' for single value, 'hasEvery' for multiple. Examples:
+       - features: { has: "GARAGE" }
+       - features: { hasEvery: ["GARAGE", "DRIVEWAY"] }
+    
+    5. EXISTENCE CHECK: Use 'isNot: null'. Examples:
+       - saleListing: { isNot: null } (for sales)
+       - rentalListing: { isNot: null } (for rentals)
+    
+    6. RELATIONS vs ENUMS:
+       - PropertyType/PropertyClassification are RELATIONS: { type: { name: "House" } }
+       - Other type fields are ENUMS: { type: "OFFICE" }
 
-    QUERY ANALYSIS REQUIREMENTS:
-    You MUST return a JSON object with:
+    RESPONSE FORMAT (JSON only, no markdown/comments):
     {
       "whereClause": { ... },
       "queryAnalysis": {
-        "usedTerms": ["term1", "term2"],  // All terms from query that were mapped to schema
-        "ignoredTerms": ["term3"]         // All terms that couldn't be mapped
+        "usedTerms": ["term1", "term2"],
+        "ignoredTerms": ["term3"]
       }
     }
     `;

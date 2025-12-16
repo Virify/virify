@@ -6,7 +6,7 @@
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
         v-slot="{ option, rowClass, actionClass }">
         <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-          {{ option.display_name || option.place_name_en }}
+          {{ getShortLocationName(option) }}
         </button>
 
         <MoleculesAutocompleteSaveLocation :option :custom-class="actionClass" />
@@ -47,7 +47,7 @@
 
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
           <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-            {{ option.display_name || option.place_name_en }}
+            {{ getShortLocationName(option) }}
           </button>
 
           <button type="button" aria-label="Remove saved location" :class="actionClass" class="| faded-icon"
@@ -169,6 +169,34 @@ function setLocation(option: MaybeRef<GeocodingFeature>) {
   addLocationToHistory(rawOption)
   emits('location-selected', rawOption)
   suppressAutocomplete.value = true
+}
+
+/**
+ * Get a short but unique location name
+ * e.g. "Cardiff, Wales" instead of "Cardiff" or "Cardiff, Wales, United Kingdom"
+ * For postcodes, include more address detail: "CF10 3NQ, Castle Street, Cardiff"
+ */
+function getShortLocationName(location: GeocodingFeature): string {
+  const fullName = location.place_name_en || location.place_name || ''
+  const parts = fullName.split(', ')
+  const text = location.text || ''
+  
+  // Check if this is a postcode (UK postcode pattern)
+  const isPostcode = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i.test(text)
+  
+  // Remove country/region names from the end
+  const filteredParts = parts.filter(part => 
+    !['United Kingdom', 'UK', 'England', 'Scotland', 'Wales', 'Northern Ireland'].includes(part)
+  )
+  
+  if (isPostcode && filteredParts.length >= 2) {
+    // For postcodes: show more detail "CF10 3NQ, Castle Street, Cardiff"
+    return filteredParts.slice(0, 3).join(', ')
+  }
+  
+  // For other locations: take first 2 parts for context
+  // e.g. "Cardiff, City of Cardiff" or "Cardiff Road, Newport"
+  return filteredParts.slice(0, 2).join(', ') || text || fullName
 }
 
 /**

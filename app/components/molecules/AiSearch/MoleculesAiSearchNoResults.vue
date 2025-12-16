@@ -1,19 +1,28 @@
 <template>
-  <div class="no-results-content | flow flow-lg">
-    <div class="loading-details">
-      <span class="loading-query | body-sm">"{{ lastSearchQuery }}"</span>
-    </div>
-    <div class="flow flow-sm">
-      <h2 class="title-md">No Results Found</h2>
-      <p class="body-sm">We couldn't find any properties matching your search.</p>
-    </div>
-    <div class="flow flow-md">
-      <h3 class="title-sm">To improve your results, try:</h3>
-      <ul class="suggestions-list">
-        <li v-for="tip of suggestionTips" :key="tip" class="body-sm">
-          {{ tip }}
-        </li>
-      </ul>
+  <div class="no-results">
+    <div class="no-results__card">
+      <div class="no-results__icon">
+        <AtomsIcon icon="search" />
+      </div>
+      
+      <div class="no-results__content | flow flow-sm">
+        <h2 class="no-results__title | title-md">No properties found</h2>
+        <p class="no-results__query | body-sm">"{{ lastSearchQuery }}"</p>
+      </div>
+
+      <div class="no-results__tips">
+        <p class="no-results__tips-title | body-sm">Try adjusting your search:</p>
+        <ul class="no-results__tips-list">
+          <li v-for="tip of suggestionTips" :key="tip">
+            <AtomsIcon icon="tick" class="no-results__tip-icon" />
+            <span>{{ tip }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <NuxtLink to="/" class="no-results__cta | button button-sm button-primary">
+        Start a new search
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -24,54 +33,112 @@ defineProps<{
 }>();
 
 const suggestionTips = [
-  'Removing some specific requirements',
-  'Searching for a different property type',
-  'Expanding your location search area',
-  'Using more general terms'
+  'Broaden your location radius',
+  'Use simpler search terms',
+  'Try a different property type',
+  'Remove specific requirements'
 ];
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/functions' as fn;
-
-.no-results-content {
-  width: 100%;
+.no-results {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--size-32);
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--size-32) var(--size-16);
+  min-height: 60vh;
 
-  .title-md {
+  &__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-24);
+    padding: var(--size-32) var(--size-24);
+    max-width: 400px;
+    width: 100%;
+    background: var(--surface-elevated);
+    border-radius: var(--border-radius-2xl);
+    border: 1px solid var(--border-color);
+    text-align: center;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    color: white;
+
+    .a-icon {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  &__content {
+    text-align: center;
+  }
+
+  &__title {
     color: var(--heading-color);
   }
 
-  .title-sm {
-    color: var(--heading-color);
-    font-weight: var(--font-weight-semibold);
+  &__query {
+    display: inline-block;
+    padding: var(--size-6) var(--size-12);
+    background: var(--surface-muted);
+    border-radius: var(--border-radius-lg);
+    color: var(--text-muted);
+    font-style: italic;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-}
 
-.loading-details {
-  margin: 0;
-}
+  &__tips {
+    width: 100%;
+    padding: var(--size-16);
+    background: var(--surface-muted);
+    border-radius: var(--border-radius-xl);
+  }
 
-.loading-query {
-  display: inline-block;
-  padding: var(--size-8) var(--size-16);
-  border: 1px solid fn.faded-color(15%);
-  border-radius: var(--border-radius-lg);
-  font-weight: var(--font-weight-medium);
-  font-style: italic;
-}
+  &__tips-title {
+    color: var(--text-muted);
+    margin-bottom: var(--size-12);
+    font-weight: var(--font-weight-medium);
+  }
 
-.suggestions-list {
-  list-style: disc;
-  padding-left: var(--size-24);
-  text-align: left;
-  max-width: 40ch;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-8);
+  &__tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-8);
+    text-align: left;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: var(--size-8);
+      font-size: var(--font-size-sm);
+      color: var(--text-color);
+    }
+  }
+
+  &__tip-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--brand-primary);
+    flex-shrink: 0;
+  }
+
+  &__cta {
+    margin-top: var(--size-8);
+  }
 }
 </style>
