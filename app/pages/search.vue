@@ -7,7 +7,8 @@
     }">
       <template #left v-if="showGrid">
         <OrganismsResults v-if="!isMounted || isLoading || results.length" :results
-          :is-loading="!isMounted || isLoading" />
+          :is-loading="!isMounted || isLoading" :query-analysis="searchState?.queryAnalysis"
+          :location="searchState?.location" :radius="searchState?.radius" @open-popover="handleOpenPopover" />
         <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
 
@@ -16,7 +17,7 @@
       </template>
     </OrganismsPaneSlider>
 
-    <OrganismsDock />
+    <OrganismsDock ref="dockRef" />
   </div>
 </template>
 
@@ -31,6 +32,18 @@ const {
   setViewMode,
   setSortOrder
 } = useSearchState()
+
+/**
+ * Reference to the dock component
+ */
+const dockRef = ref(null)
+
+/**
+ * Handle opening the dock popover
+ */
+function handleOpenPopover(type) {
+  dockRef.value?.showPopover(type)
+}
 
 /**
  *  Update layout

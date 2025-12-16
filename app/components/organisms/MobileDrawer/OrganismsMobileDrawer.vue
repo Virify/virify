@@ -75,9 +75,17 @@ function trapOpen() {
 
 function releaseTrap() {
   document.documentElement.style.overflow = ''
-  if (previousActive.value instanceof HTMLElement) {
-    previousActive.value.focus()
-  }
+  // Use nextTick to ensure DOM updates have completed
+  nextTick(() => {
+    if (previousActive.value instanceof HTMLElement && document.contains(previousActive.value)) {
+      try {
+        previousActive.value.focus()
+      } catch (e) {
+        // Silently fail if focus is not possible
+      }
+    }
+    previousActive.value = null
+  })
 }
 </script>
 

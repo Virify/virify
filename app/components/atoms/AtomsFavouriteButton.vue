@@ -105,9 +105,12 @@ function toggle() {
     color: var(--favourite-colour);
     animation: selectedBounce var(--animation-subtle) linear;
 
-    svg {
-      stroke: currentColor;
-      stroke-width: 1px;
+    .a-icon {
+      filter: 
+        drop-shadow(0 0 1px rgba(255, 255, 255, 1)) 
+        drop-shadow(0 0 1px rgba(255, 255, 255, 1)) 
+        drop-shadow(0 0 1px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1));
     }
   }
 

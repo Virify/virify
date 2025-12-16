@@ -13,22 +13,22 @@
         <slot name="carousel" v-bind="{ media, propertyId }">
           <MoleculesCardSlotsCarousel :slides="media" :property-id />
         </slot>
+        
+        <MoleculesCardSlotsBookmark :property-id />
       </div>
 
       <div class="m-card-template__content">
         <slot name="content"
-          v-bind="{ price, priceGuide, fullAddress, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
+          v-bind="{ price, priceGuide, listingType, fullAddress, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
           <div class="m-card-template__content-grid">
             <MoleculesCardSlotsViewLink :property-id class="m-card-template__content-subgrid">
-              <MoleculesCardSlotsPrice :price :price-guide />
+              <MoleculesCardSlotsPrice :price :price-guide :listing-type />
               <MoleculesCardSlotsOverview :property-type :full-address />
-              <MoleculesCardSlotsIcons :room-counts />
+              <MoleculesCardSlotsIcons :room-counts :has-outdoor-space :parking-type />
             </MoleculesCardSlotsViewLink>
 
             <MoleculesCardSlotsPills v-if="pills.length" :pills />
           </div>
-
-          <MoleculesCardSlotsBookmark :property-id />
         </slot>
 
         <div role="presentation" class="m-card-template__footer">
@@ -94,12 +94,21 @@ const price = computed(() => {
 })
 
 const priceGuide = computed(() => {
-  const { priceType } = asObject(props.result?.saleListing)
+  if (props.result?.rentalListing) {
+    return convertEnumToString(props.result.rentalListing.rentFrequency)
+  }
+  
+  if (props.result?.saleListing) {
+    return convertEnumToString(props.result.saleListing.priceType)
+  }
 
-  if (priceType === 'OFFERS_OVER') return 'Offers over'
-  if (priceType === 'GUIDE_PRICE') return 'Guide price'
+  return ''
+})
 
-  return 'Fixed'
+const listingType = computed(() => {
+  if (props.result?.rentalListing) return 'Rental'
+  if (props.result?.saleListing) return 'Sale'
+  return ''
 })
 
 const fullAddress = computed(() => {
@@ -131,6 +140,30 @@ const roomCounts = computed(() => {
     receptions: numberReceptions
   }
 });
+
+const hasOutdoorSpace = computed(() => {
+  const { outdoorSpace } = asObject(property.value)
+  if (!outdoorSpace) return false
+  
+  const { garden, yard, land } = asObject(outdoorSpace)
+  return (asArray(garden).length > 0) || (asArray(yard).length > 0) || (asArray(land).length > 0)
+})
+
+const parkingType = computed(() => {
+  const { parking } = asObject(property.value)
+  if (!parking) return null
+  
+  const { features } = asObject(parking)
+  const parkingFeatures = asArray(features)
+  
+  // Check for garage first (priority)
+  if (parkingFeatures.includes('GARAGE')) return 'garage'
+  
+  // Check for any other parking
+  if (parkingFeatures.length > 0 && !parkingFeatures.includes('NO_PARKING')) return 'parking'
+  
+  return null
+})
 
 const pills = computed(() => {
   const { chain, tenureType } = asObject(props.result?.saleListing)
@@ -183,6 +216,8 @@ const premiumFeatures = computed(() => {
   --card-button-background-hover: light-dark(var(--blue-200), var(--blue-900));
   --card-button-foreground-hover: light-dark(var(--monochrome-900), var(--monochrome-100));
   --card-button-border-colour: light-dark(var(--blue-400), var(--blue-600));
+  --card-bookmark-colour: var(--card-colour);
+
 
   position: relative;
   color: var(--card-foreground);
@@ -211,6 +246,8 @@ const premiumFeatures = computed(() => {
     --card-button-background-hover: var(--secondary-500);
     --card-button-foreground-hover: var(--monochrome-100);
     --card-button-border-colour: var(--secondary-400);
+    --card-bookmark-colour: var(--secondary-400);
+
   }
 
   @container (width > 750px) {
@@ -240,6 +277,7 @@ const premiumFeatures = computed(() => {
     --card-button-background-hover: var(--primary-600);
     --card-button-foreground-hover: var(--monochrome-100);
     --card-button-border-colour: var(--primary-400);
+    --card-bookmark-colour: var(--card-colour);
 
     border: 4px solid var(--primary-500);
 

@@ -80,6 +80,13 @@ function hidePopover() {
 }
 
 /**
+ * Expose showPopover to parent components
+ */
+defineExpose({
+  showPopover
+})
+
+/**
  *  Close popover when results are updated
  */
 const { searchState } = useSearchState()

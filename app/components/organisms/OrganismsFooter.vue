@@ -19,7 +19,6 @@
           <h3 class="o-footer__section-title | title-3xs">Property Search</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/ai-search" class="o-footer__link | body-sm">AI Search</nuxt-link></li>
-            <li><nuxt-link to="/search/legacy" class="o-footer__link | body-sm">Legacy Search</nuxt-link></li>
           </ul>
         </div>
 
