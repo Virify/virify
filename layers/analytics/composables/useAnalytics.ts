@@ -126,27 +126,32 @@ export const useAnalytics = createSharedComposable(() => {
     }
   };
 
-  const trackAiSearch = async (aiQuery: string, location: GeocodingFeature) => {
-    console.log("trackAiSearch called with:", { aiQuery, location: location.text });
+  const trackSearch = async (params: {
+    query: string;
+    location: GeocodingFeature;
+    radius: number;
+    resultCount: number;
+    userId?: number;
+  }) => {
+    console.log("trackSearch called with:", { 
+      query: params.query, 
+      location: params.location.text,
+      radius: params.radius,
+      resultCount: params.resultCount 
+    });
     
     try {
-      const payload: { aiQuery: string; location: GeocodingFeature } = {
-        aiQuery,
-        location,
+      const payload = {
+        query: params.query,
+        location: params.location,
+        radius: params.radius,
+        resultCount: params.resultCount,
+        userId: params.userId,
       };
-      
-      console.log("Sending payload (size:", JSON.stringify(payload).length, "bytes)");
-      console.log("Payload preview:", { 
-        aiQuery, 
-        locationId: location.id, 
-        locationText: location.text,
-        hasProperties: !!location.properties,
-        hasBbox: !!location.bbox 
-      });
       
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
       const success = navigator.sendBeacon("/api/analytics/search", blob);
-      console.log("sendBeacon result:", success);
+      console.log("Search tracking:", success ? "queued" : "failed to queue");
       
       if (!success) {
         console.warn("sendBeacon failed, falling back to fetch");
@@ -154,12 +159,9 @@ export const useAnalytics = createSharedComposable(() => {
           method: "POST",
           body: payload,
         });
-        console.log("Fetch fallback completed successfully");
-      } else {
-        console.log("sendBeacon completed successfully");
       }
     } catch (error) {
-      console.error("Failed to track AI search:", error);
+      console.error("Failed to track search:", error);
     }
   };
 
@@ -192,7 +194,7 @@ export const useAnalytics = createSharedComposable(() => {
     recentlyViewedListings,
     recentOwnedListings,
     allUserListings,
-    trackAiSearch,
+    trackSearch,
     trendingLocations,
     fetchAnalytics,
   };

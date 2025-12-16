@@ -1,7 +1,7 @@
 import type { GeocodingFeatureWithBoundary } from '~~/shared/types/map';
 
 export default function useAi() {
-  const { trackAiSearch } = useAnalytics();
+  const { trackSearch } = useAnalytics();
   // Global state for query analysis and search query
   const queryAnalysis = useState<QueryAnalysis | null>(
     "ai-query-analysis",
@@ -34,7 +34,14 @@ export default function useAi() {
 
     // Strip boundaryPolygon for analytics tracking
     const { boundaryPolygon, ...locationForTracking } = location;
-    trackAiSearch(query, locationForTracking);
+    
+    // Track search with full context
+    trackSearch({
+      query,
+      location: locationForTracking,
+      radius,
+      resultCount: response.results?.length ?? 0,
+    });
 
     if (response.queryAnalysis) {
       queryAnalysis.value = response.queryAnalysis;
