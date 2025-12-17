@@ -2,9 +2,15 @@
   <h3 class="m-cards-slots-price | title-sm">
     {{ price }}
 
-    <span v-if="priceGuide" class="m-cards-slots-price__pill | font-medium body-xs">
-      {{ priceGuide }}
-    </span>
+    <div class="m-cards-slots-price__pills">
+      <span v-if="listingType" class="m-cards-slots-price__pill | font-medium body-xs">
+        {{ listingType }}
+      </span>
+      
+      <span v-if="priceGuide" class="m-cards-slots-price__pill | font-medium body-xs">
+        {{ priceGuide }}
+      </span>
+    </div>
   </h3>
 </template>
 
@@ -12,6 +18,7 @@
 interface Props {
   price: string
   priceGuide?: string
+  listingType?: string
 }
 
 defineProps<Props>()
@@ -25,8 +32,14 @@ defineProps<Props>()
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  row-gap: var(--size-4);
-  column-gap: var(--size-10);
+  gap: var(--size-6);
+
+  &__pills {
+    display: flex;
+    align-items: center;
+    gap: var(--size-6);
+    flex-wrap: nowrap;
+  }
 
   &__pill {
     display: flex;

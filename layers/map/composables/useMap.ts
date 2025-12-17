@@ -29,7 +29,7 @@ export function useMap() {
     polygonGeometries
   } = useMapDraw(mapCache);
   
-  const { autoComplete, geocodeAndSelectBest, enhanceWithBoundaryPolygon } = useMapSearch();
+  const { autoComplete, geocodeAndSelectBest, geocodeById, enhanceWithBoundaryPolygon } = useMapSearch();
   const { updateSearchRadiusVisualization, removeSearchRadiusVisualization } = useMapVisualization();
 
   // Wrap draw functions to pass required dependencies
@@ -71,6 +71,7 @@ export function useMap() {
     // Search functionality
     autoComplete,
     geocodeAndSelectBest,
+    geocodeById,
     enhanceWithBoundaryPolygon,
     
     // Visualization

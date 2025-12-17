@@ -95,7 +95,7 @@ async function saveLocation() {
 
   await setPendingWhile(async () => {
     const { option } = props
-    const { geometry, place_name_en } = asObject(option)
+    const { geometry, place_name_en, bbox } = asObject(option)
     const { coordinates } = asObject(geometry)
 
     await addSavedLocation({
@@ -103,6 +103,7 @@ async function saveLocation() {
       lat: (coordinates as [number, number])[0],
       lon: (coordinates as [number, number])[1],
       location: place_name_en,
+      bbox: bbox as [number, number, number, number] | undefined,
       geocodingFeature: option
     } as UserSavedLocation);
 

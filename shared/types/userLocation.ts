@@ -1,3 +1,4 @@
+import type { GeocodingFeature } from "./map";
 
 export type UserSavedLocation = {
   id: number;
@@ -6,4 +7,5 @@ export type UserSavedLocation = {
   lat: number;
   lon: number;
   name: string;
+  bbox?: [number, number, number, number];
 };

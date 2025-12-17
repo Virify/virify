@@ -126,40 +126,36 @@ export const useAnalytics = createSharedComposable(() => {
     }
   };
 
-  const trackAiSearch = async (aiQuery: string, location: GeocodingFeature) => {
-    console.log("trackAiSearch called with:", { aiQuery, location: location.text });
-    
+  const trackSearch = async (params: {
+    query: string;
+    location: GeocodingFeature;
+    radius: number;
+    resultCount: number;
+    userId?: number;
+  }) => {
     try {
-      const payload: { aiQuery: string; location: GeocodingFeature } = {
-        aiQuery,
-        location,
+      const payload = {
+        query: params.query,
+        location: params.location,
+        radius: params.radius,
+        resultCount: params.resultCount,
+        userId: params.userId,
       };
-      
-      console.log("Sending payload (size:", JSON.stringify(payload).length, "bytes)");
-      console.log("Payload preview:", { 
-        aiQuery, 
-        locationId: location.id, 
-        locationText: location.text,
-        hasProperties: !!location.properties,
-        hasBbox: !!location.bbox 
-      });
       
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
       const success = navigator.sendBeacon("/api/analytics/search", blob);
-      console.log("sendBeacon result:", success);
-      
       if (!success) {
-        console.warn("sendBeacon failed, falling back to fetch");
-        await $fetch("/api/analytics/search", {
-          method: "POST",
-          body: payload,
-        });
-        console.log("Fetch fallback completed successfully");
-      } else {
-        console.log("sendBeacon completed successfully");
+        try {
+          await $fetch("/api/analytics/search", {
+            method: "POST",
+            body: payload,
+          });
+        } catch (e) {
+          // swallow fallback errors to avoid noisy logs
+        }
       }
     } catch (error) {
-      console.error("Failed to track AI search:", error);
+      // intentionally silent for analytics failures
     }
   };
 
@@ -177,7 +173,6 @@ export const useAnalytics = createSharedComposable(() => {
 
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
       const success = navigator.sendBeacon("/api/analytics/mortgage/track", blob);
-      console.log("Mortgage calculation tracking:", success ? "queued" : "failed to queue");
     } catch (error) {
       console.error("Failed to track mortgage calculation:", error);
     }
@@ -192,7 +187,7 @@ export const useAnalytics = createSharedComposable(() => {
     recentlyViewedListings,
     recentOwnedListings,
     allUserListings,
-    trackAiSearch,
+    trackSearch,
     trendingLocations,
     fetchAnalytics,
   };

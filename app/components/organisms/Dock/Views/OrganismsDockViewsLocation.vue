@@ -12,5 +12,4 @@
 
 <script setup lang="ts">
 const { isLoading } = useSearchState()
-
 </script>

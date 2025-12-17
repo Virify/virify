@@ -2,13 +2,12 @@ export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 
 export type ResultLayout = 'map' | 'grid' | 'split'
 
 /**
- * KV-backed search state management
+ * URL-based search state management
  *
  * Features:
- * - Server-side KV storage with automatic cleanup on tab close
- * - Tab-specific session IDs for independent search states
- * - Automatic restoration on page load/refresh/back button
  * - Reactive state updates across all consumers
+ * - State is persisted in URL (shareable, SEO-friendly)
+ * - No server-side storage needed
  */
 
 const defaultState = defaultSearchState;
@@ -18,93 +17,7 @@ let instance: ReturnType<typeof createSearchState> | null = null;
 
 function createSearchState() {
   const searchState = ref<SearchState>({ ...defaultState });
-  const sessionId = ref<string>("");
   const isLoading = ref(false);
-
-  // Generate or restore session ID (unique per tab)
-  const initSessionId = () => {
-    if (!import.meta.client) return
-
-    sessionId.value =
-      sessionStorage.getItem("search-session-id") || crypto.randomUUID();
-
-    sessionStorage.setItem("search-session-id", sessionId.value);
-  };
-
-  // Save to KV storage
-  const saveToKV = async (state: SearchState) => {
-    if (!sessionId.value || isLoading.value) {
-      return;
-    }
-
-    try {
-      await $fetch("/api/search-state", {
-        method: "POST",
-        body: { sessionId: sessionId.value, state },
-      });
-
-    } catch (error) { }
-  };
-
-  // Load from KV storage
-  const loadFromKV = async (): Promise<SearchState | null> => {
-    if (!sessionId.value) {
-      return null;
-    }
-
-    try {
-      const stored = await $fetch("/api/search-state", {
-        query: { sessionId: sessionId.value },
-      });
-
-      return (stored as unknown as SearchState) || null;
-    } catch (error) {
-      return null;
-    }
-  };
-
-  // Clear from KV storage
-  const clearKV = async () => {
-    if (!sessionId.value) return;
-
-    try {
-      await $fetch("/api/search-state", {
-        method: "DELETE",
-        query: { sessionId: sessionId.value },
-      });
-    } catch (error) { }
-  };
-
-  // Initialize on client side
-  if (import.meta.client) {
-    initSessionId();
-
-    // Delete KV entry when tab closes
-    const handleBeforeUnload = async () => {
-      try {
-        // Use navigator.sendBeacon for reliable cleanup
-        if (navigator.sendBeacon && sessionId.value) {
-          const url = `/api/search-state?sessionId=${sessionId.value}`;
-          navigator.sendBeacon(
-            url,
-            new Blob([JSON.stringify({ _method: "DELETE" })], {
-              type: "application/json",
-            })
-          );
-        }
-      } catch (error) {
-        // Ignore errors for beacon requests
-      }
-    };
-
-    // Add event listener for tab close
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Cleanup event listener (though this rarely fires on tab close)
-    onUnmounted(() => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    });
-  }
 
   /**
    *  Run a callback, if it's valid
@@ -126,7 +39,7 @@ function createSearchState() {
    *  Update state layout
    */
   function setLocation(value: GeocodingFeature, callback?: () => void) {
-    // Update state
+    // Update state - don't clear results, they'll be cleared when search starts
     updateState({ location: value })
 
     // Run optional callback
@@ -224,41 +137,12 @@ function createSearchState() {
   /**
    *  Manage state directly
    */
-  const updateState = async (updates: Partial<SearchState>) => {
-    // @TODO maybe replace this with Defu to better handle nested merges?
+  const updateState = (updates: Partial<SearchState>) => {
     Object.assign(searchState.value, updates);
-
-    // Save state
-    await saveToKV(searchState.value);
   };
 
-  // @TODO add a button to reset form, then test functionality
-  const clearState = async () => {
+  const clearState = () => {
     searchState.value = { ...defaultState };
-    await clearKV();
-  };
-
-  const refreshFromKV = async (): Promise<void> => {
-    if (!import.meta.client) return;
-
-    setSearchPending(true)
-
-    const stored = await loadFromKV();
-
-    setSearchPending(false)
-
-    if (stored) {
-      const newState = { ...defaultState, ...stored }
-
-      // Save new state to ref
-      searchState.value = newState;
-
-      // Update AI query analysis
-      // @TODO this needs a refactor to reduce coupling
-      const { queryAnalysis } = useAi()
-
-      queryAnalysis.value = newState.queryAnalysis
-    }
   };
 
   return {
@@ -273,7 +157,6 @@ function createSearchState() {
     setResults,
     updateState,
     clearState,
-    refreshFromKV,
     isLoading: readonly(isLoading),
   };
 }

@@ -12,7 +12,7 @@
 
         <client-only>
           <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
-            <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
+            <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" :loading="isChecking" hideReset
               @submit-search="searchSubmit" @reset-search="searchReset" />
           </Transition>
         </client-only>
@@ -126,6 +126,8 @@ onClickOutside($formWrapper, () => {
  *  Fetch filters
  */
 const { setQuery, searchState } = useSearchState()
+const { checkContent, isChecking } = useModeration()
+const { showToast } = useToast()
 
 const initialQuery = computed(() => {
   const { query } = asObject(searchState.value)
@@ -134,20 +136,22 @@ const initialQuery = computed(() => {
 })
 
 async function searchSubmit(query: string) {
-  setQuery(query)
+  const { location, radius } = asObject(searchState.value)
+  
+  if (!location) return
+
+  // Check content moderation before proceeding
+  const { safe, reason } = await checkContent(query)
+  if (!safe) {
+    showToast(reason || 'Please try a different search.', { type: 'error' })
+    return
+  }
 
   await animateFormToDock()
-  await navigateTo({
-    path: '/search'
-  })
+  await navigateTo(createSearchURL(location, radius ?? 5, query))
 
   /**
    *  To avoid global smooth scrolling
-   *
-   *  @TODO - we may want to have a more site-wide and elevant fix for
-   *          this, perhaps finding a way to adjust the Vue Router
-   *          behaviour to have `behaviour: instant` instead
-   *          https://router.vuejs.org/guide/advanced/scroll-behavior
    */
   window.scrollTo({
     top: 0,

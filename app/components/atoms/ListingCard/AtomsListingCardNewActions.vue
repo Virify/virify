@@ -13,18 +13,44 @@
 </template>
 
 <script setup lang="ts">
+import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
+
 interface Props {
   listingId: number;
   userId: number;
 }
 const props = defineProps<Props>();
 
-const { getConversationState, handleConversationClick } = useConversations();
+const { showDialog } = useDialog();
+const { user } = useUserSession();
 
-const conversationState = computed(() => getConversationState(props.listingId, props.userId));
+const safeUserId = computed(() =>
+  typeof props.userId === 'number' && !isNaN(props.userId) ? props.userId : null
+);
+
+const isSelf = computed(() => safeUserId.value !== null && user.value?.id === safeUserId.value);
+
+const conversationState = computed(() => ({
+  isDisabled: !safeUserId.value || isSelf.value,
+  label: isSelf.value ? 'Your Listing' : 'Contact'
+}));
 
 function onContact() {
-  handleConversationClick(props.listingId, props.userId);
+  if (conversationState.value.isDisabled) return;
+  
+  if (!user.value || !user.value.id) {
+    showDialog({
+      component: ViewsDialogLogin,
+    });
+    return;
+  }
+  
+  if (safeUserId.value !== null && !isSelf.value) {
+    showDialog({
+      component: ViewsDialogConversation,
+      props: { listingId: props.listingId, receiverId: safeUserId.value },
+    });
+  }
 }
 </script>
 <style lang="scss">

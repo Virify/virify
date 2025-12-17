@@ -56,13 +56,20 @@ export function updateUserSavedLocation(
     lat: number;
     lon: number;
     location: string;
+    bbox?: [number, number, number, number];
   }
 ): Promise<UserLocation> {
+  const { bbox, ...rest } = locationData;
+  const data = {
+    ...rest,
+    bbox: bbox ?? [],
+  };
+  
   if (id) {
     return prisma.userLocation.upsert({
       where: { id },
-      create: { userPreferences: { connectOrCreate: { where: { userId: userId }, create: { userId: userId } } }, ...locationData },
-      update: { ...locationData },
+      create: { userPreferences: { connectOrCreate: { where: { userId: userId }, create: { userId: userId } } }, ...data },
+      update: { ...data },
     });
   } else {
     return prisma.userLocation.create({
@@ -70,7 +77,7 @@ export function updateUserSavedLocation(
         userPreferences: {
           connectOrCreate: { where: { userId: userId }, create: { userId: userId } },
         },
-        ...locationData,
+        ...data,
       },
     });
   }

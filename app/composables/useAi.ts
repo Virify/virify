@@ -1,7 +1,7 @@
 import type { GeocodingFeatureWithBoundary } from '~~/shared/types/map';
 
 export default function useAi() {
-  const { trackAiSearch } = useAnalytics();
+  const { trackSearch } = useAnalytics();
   // Global state for query analysis and search query
   const queryAnalysis = useState<QueryAnalysis | null>(
     "ai-query-analysis",
@@ -20,21 +20,42 @@ export default function useAi() {
    */
   async function aiSearch(location: GeocodingFeatureWithBoundary, radius: number, query: string, page?: number, limit?: number) {
     searchQuery.value = query; // Update state for analysis function
+    
+    // Get center coordinates - use center property if available (for regions with Polygon geometry)
+    // otherwise fall back to Point geometry coordinates
+    const [lon, lat] = location.center 
+      ?? (location.geometry?.type === 'Point' ? location.geometry.coordinates : null)
+      ?? [0, 0];
+    
     const response = await $fetch<AISearchResponse>("/api/search/rag/", {
       method: "POST",
       body: {
         query: query,
-        lat: location.geometry.coordinates[1],
-        lon: location.geometry.coordinates[0],
+        lat,
+        lon,
         radius: radius,
         bbox: location.bbox,
         boundaryPolygon: location.boundaryPolygon,
       },
     });
 
-    // Strip boundaryPolygon for analytics tracking
-    const { boundaryPolygon, ...locationForTracking } = location;
-    trackAiSearch(query, locationForTracking);
+    // Strip boundaryPolygon for analytics tracking and normalize geometry to Point
+    const { boundaryPolygon, geometry, ...locationBase } = location;
+    const locationForTracking = {
+      ...locationBase,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [lon, lat] as [number, number]
+      }
+    };
+    
+    // Track search with full context
+    trackSearch({
+      query,
+      location: locationForTracking,
+      radius,
+      resultCount: response.results?.length ?? 0,
+    });
 
     if (response.queryAnalysis) {
       queryAnalysis.value = response.queryAnalysis;

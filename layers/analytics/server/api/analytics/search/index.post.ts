@@ -1,8 +1,11 @@
 import * as z from "zod";
-import { trackAiSearch } from "~~/layers/database/server/utils/analytics";
+import { trackSearch } from "~~/layers/database/server/utils/analytics";
 
 const trackSearchSchema = z.object({
-  aiQuery: z.string().min(1, "Query is required"),
+  query: z.string().min(1, "Query is required"),
+  radius: z.number().int().min(0),
+  resultCount: z.number().int().min(0),
+  userId: z.number().int().optional(),
   location: z.object({
     id: z.string(),
     type: z.string(),
@@ -16,14 +19,15 @@ const trackSearchSchema = z.object({
     properties: z.record(z.any(), z.any()),
   }),
 });
+
 /**
- * Handler for POST /api/analytics/listing/track-view
- * Tracks a listing view event
+ * Handler for POST /api/analytics/search
+ * Tracks a search event with location, query, radius, and results
  */
 export default defineEventHandler(async (event) => {
   try {
-    const { aiQuery, location } = await readValidatedBody(event, trackSearchSchema.parse);
-    await trackAiSearch(aiQuery, location);
+    const data = await readValidatedBody(event, trackSearchSchema.parse);
+    await trackSearch(data);
     return { success: true };
   } catch (error) {
     console.error("Error tracking search:", error);

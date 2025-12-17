@@ -43,8 +43,6 @@
       <AtomsDivider text="or" class="ai-search-hero__divider" />
 
       <div role="presentation" class="ai-search-hero__actions">
-        <MoleculesIconLink class="ai-search-hero__action" to="/search/legacy" icon="explore/ai"
-          content="Traditional search" icon-inline />
         <MoleculesIconLink class="ai-search-hero__action" to="/map-search/" icon="explore/map" content="Search by map"
           icon-inline />
       </div>

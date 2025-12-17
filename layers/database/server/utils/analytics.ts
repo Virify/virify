@@ -1,4 +1,12 @@
-import type { TrackLocation, TrackQuery } from "../database/prisma/generated/client";
+import type { TrackSearch } from "../database/prisma/generated/client";
+
+export interface TrackSearchParams {
+  query: string;
+  location: GeocodingFeature;
+  radius: number;
+  resultCount: number;
+  userId?: number;
+}
 
 /**
  * Get actual analytics aggregates for business intelligence
@@ -278,57 +286,125 @@ export async function getRecentViewedListings(userId: number, limit: number = 6)
 }
 
 /**
- * Tracks an AI search query and its associated location
+ * Tracks a search with location, radius, query, results, and optional user
  * 
- * @param aiQuery The AI search query
- * @param location The location associated with the search
- * @returns The created or updated track records
+ * @param params Search tracking parameters
+ * @returns The created or updated track record
  */
-export async function trackAiSearch(aiQuery: string, location: GeocodingFeature): Promise<[TrackLocation, TrackQuery]> {
-  return prisma.$transaction([
-    prisma.trackLocation.upsert({
-      where: {
-        location: location,
+export async function trackSearch(params: TrackSearchParams): Promise<TrackSearch> {
+  const { query, location, radius, resultCount, userId } = params;
+  
+  const locationId = location.id || '';
+  const locationPlaceName = location.place_name_en || location.place_name;
+  const locationText = location.text;
+  const [locationLon, locationLat] = location.geometry.coordinates;
+  
+  // Check if this search combination already exists
+  const existing = await prisma.trackSearch.findUnique({
+    where: {
+      locationPlaceName_radius_query: {
+        locationPlaceName,
+        radius,
+        query,
       },
-      create: {
-        location: location,
-        name: location.text,
-        count: 1,
+    },
+  });
+  
+  if (existing) {
+    // Update existing record - increment count and add userId if not already present
+    const userIds = existing.userIds;
+    if (userId && !userIds.includes(userId)) {
+      userIds.push(userId);
+    }
+    
+    return prisma.trackSearch.update({
+      where: { id: existing.id },
+      data: {
+        count: { increment: 1 }, // Increment search count
+        resultCount, // Update with latest result count
+        locationId, // Update locationId in case it was missing
+        userIds,
       },
-      update: {
-        count: {
-          increment: 1,
-        },
-      },
-    }),
-    prisma.trackQuery.upsert({
-      where: {
-        query: aiQuery,
-      },
-      create: {
-        query: aiQuery,
-        count: 1,
-      },
-      update: {
-        count: {
-          increment: 1,
-        },
-      },
-    }),
-  ]);
+    });
+  }
+  
+  // Create new record with count = 1
+  return prisma.trackSearch.create({
+    data: {
+      locationId,
+      locationPlaceName,
+      locationText,
+      locationLat,
+      locationLon,
+      radius,
+      query,
+      resultCount,
+      count: 1,
+      userIds: userId ? [userId] : [],
+    },
+  });
 }
 
 
 /**
- * Get trending AI searches based on the number of times they have been performed
- * @param limit Maximum number of trending AI searches to return
- * @returns 
+ * Get trending searches based on unique user count
+ * @param limit Maximum number of trending searches to return
+ * @returns Trending searches sorted by user count
  */
-export async function getTrendingLocations(limit: number = 5): Promise<TrackLocation[]> {
-  return prisma.trackLocation.findMany({
+export async function getTrendingSearches(limit: number = 10): Promise<TrackSearch[]> {
+  const searches = await prisma.trackSearch.findMany({
     orderBy: {
-      count: "desc",
+      updatedAt: "desc",
     },
-    take: limit,
+    take: limit * 3, // Get more to sort by userIds length
   });
+  
+  // Sort by number of unique users and take top results
+  return searches
+    .sort((a, b) => b.userIds.length - a.userIds.length)
+    .slice(0, limit);
+}
+
+/**
+ * Get trending locations based on search count
+ * Note: Caching is handled at the API endpoint level using Nitro's defineCachedEventHandler
+ * @param limit Maximum number of trending locations to return
+ * @returns Trending location names with search counts
+ */
+export async function getTrendingLocations(limit: number = 5) {
+  // Get top locations with their IDs - can't use groupBy with locationId since it varies
+  // So we get all searches, aggregate by locationText, and pick the best locationId for each
+  const searches = await prisma.trackSearch.findMany({
+    where: {
+      locationId: { not: '' }, // Only include searches with valid locationId
+    },
+    orderBy: {
+      count: 'desc',
+    },
+    take: 100, // Get enough to aggregate
+  });
+  
+  // Aggregate by locationText, keeping the highest count entry for each
+  const locationMap = new Map<string, typeof searches[0]>();
+  for (const search of searches) {
+    const key = search.locationText.toLowerCase();
+    const existing = locationMap.get(key);
+    if (!existing || search.count > existing.count) {
+      locationMap.set(key, search);
+    }
+  }
+  
+  // Sort by count and take top N
+  const sorted = Array.from(locationMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+  
+  return sorted.map(s => ({
+    locationId: s.locationId, // For geocoding on frontend
+    name: s.locationText,
+    placeName: s.locationPlaceName,
+    lat: s.locationLat,
+    lon: s.locationLon,
+    count: s.count,
+  }));
 }

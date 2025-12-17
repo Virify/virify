@@ -123,15 +123,28 @@ export function getBboxCenter(bbox: [number, number, number, number]): [number, 
 
 /**
  * Calculate map center coordinates from location data
- * For radius=0 searches, uses bbox center; otherwise uses geometry coordinates
+ * For radius=0 searches, uses bbox center; otherwise uses center property or geometry coordinates
+ * Supports both Point geometry (coordinates as [lon, lat]) and Polygon geometry (has center property)
  */
-export function calculateMapCenter(location: { geometry: { coordinates: [number, number] }, bbox?: [number, number, number, number] }, radius: number): [number, number] {
+export function calculateMapCenter(location: { center?: [number, number], geometry: { type: string, coordinates: any }, bbox?: [number, number, number, number] }, radius: number): [number, number] {
   // For location-only searches (radius = 0), use bbox center
   if (radius === 0 && location.bbox) {
     return getBboxCenter(location.bbox);
   }
-  // For radius searches, use geometry coordinates
-  return [location.geometry.coordinates[0], location.geometry.coordinates[1]];
+  // Prefer center property (always works for both Point and Polygon geometries)
+  if (location.center) {
+    return [location.center[0], location.center[1]];
+  }
+  // Fallback: use geometry coordinates only if it's a Point
+  if (location.geometry?.type === 'Point') {
+    return [location.geometry.coordinates[0], location.geometry.coordinates[1]];
+  }
+  // Last resort: use bbox center
+  if (location.bbox) {
+    return getBboxCenter(location.bbox);
+  }
+  // Default UK center
+  return [-2.5, 54.7];
 }
 
 /**

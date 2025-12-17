@@ -16,20 +16,6 @@ export const getBaseCenterItems = (): NavigationItem[] => {
     },
   ]
 
-  // Only show search if configured to show (disabled in waiting-list mode by default)
-  if (!isWaitingListMode.value || config.navigation.showSearch) {
-    items.push({
-      id: "search",
-      label: "Search",
-      type: "dropdown",
-      icon: "chevron-down",
-      children: [
-        { id: "ai-search", label: "AI Search", href: "/ai-search/", icon: 'search' },
-        { id: "legacy-search", label: "Legacy", href: "/search/legacy/", icon: 'search' },
-      ],
-    })
-  }
-
   items.push({
     id: "property-info",
     label: "Property Information",

@@ -6,7 +6,7 @@
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
         v-slot="{ option, rowClass, actionClass }">
         <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-          {{ option.display_name || option.place_name_en }}
+          {{ option.place_name_en || option.place_name }}
         </button>
 
         <MoleculesAutocompleteSaveLocation :option :custom-class="actionClass" />
@@ -47,7 +47,7 @@
 
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
           <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-            {{ option.display_name || option.place_name_en }}
+            {{ option.place_name_en || option.place_name }}
           </button>
 
           <button type="button" aria-label="Remove saved location" :class="actionClass" class="| faded-icon"

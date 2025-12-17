@@ -88,38 +88,104 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
   }
   
   const criticalRules = `
-    Convert natural language property queries to a valid Prisma WHERE clause JSON for the Virify property search. Use ONLY the fields, relations, and enum values exactly as defined below. Do NOT invent or generalize field names. Follow the structure and rules precisely.
+    Convert natural language property queries to a valid Prisma WHERE clause JSON for the Virify property search. Use ONLY the fields, relations, and enum values exactly as defined in the schema below.
 
-    CRITICAL RULES:
-    - DO NOT NEST saleListing or rentalListing (or any of their fields) inside property or any nested object. This is a SCHEMA VIOLATION and will cause a FATAL ERROR. These fields MUST ONLY appear at the ROOT level of the query.
-    - The 'property' field on Listing is a ONE-TO-ONE relation. You MUST wrap ALL property filters inside 'is: { ... }'. For example: { property: { is: { numberBedrooms: 3, type: { name: "House" } } } }
-    - NEVER add Comments or quotes or markdown formatting to the AI response. The response MUST be a valid JSON object with a "whereClause" and "queryAnalysis" field. Any comments, quotes, or markdown will cause a FATAL ERROR.
-    - Ensure all JSON brackets and braces are properly closed. Missing closing braces will cause parsing errors.
-    - To filter by fields of rentalListing or saleListing, you MUST use the correct Prisma relation filter syntax:
-      * To filter for existence: { rentalListing: { isNot: null } }
-      * To filter by fields: { rentalListing: { is: { furnishedStatus: "FURNISHED" } } }
-      * NEVER use { rentalListing: { furnishedStatus: ... } } (this is INVALID and will cause an error)
-
-    IMPORTANT FIELD LOCATIONS:
-    - garage, driveway, parking fields → property: { is: { parking: { is: { garage: true, driveway: true } } } }
-    - garden → property: { is: { outdoorSpace: { is: { garden: { some: {} } } } } }
-    - All bedroom/bathroom counts → property: { is: { numberBedrooms: 3, numberBathrooms: 2 } }
-    - Bathroom floor location → property: { is: { bathroomFeatures: { some: { floor: 0 } } } } (0=ground, 1=first, etc. downstairs = ground)
-    - Property type (House/Flat/etc) → property: { is: { type: { name: "House" } } } (type is a RELATION to PropertyType model)
-    - Property classification (Detached/Semi-detached/Terraced) → property: { is: { classification: { name: "Detached" } } } (classification is a RELATION to PropertyClassification model)
-    - Office/Study/Gym etc → property: { is: { otherRoom: { some: { type: "OFFICE" } } } } (type is an ENUM field, use the enum value directly, NOT { name: "OFFICE" })
+    CRITICAL PRISMA SYNTAX RULES:
     
-    CRITICAL: Distinguish between RELATIONS and ENUM fields:
-    - PropertyType and PropertyClassification are MODELS (relations), so use: { type: { name: "House" } }
-    - OtherRoomType, FireplaceType, ReceptionType, BedSizeType etc are ENUMS, so use the value directly: { type: "OFFICE" }
+    1. ROOT LEVEL ONLY: saleListing and rentalListing MUST appear at the ROOT of the query, never nested inside property.
+    
+    2. ONE-TO-ONE RELATIONS: Use 'is: { ... }' wrapper. Examples:
+       - property: { is: { numberBedrooms: 3 } }
+       - parking: { is: { features: { has: "GARAGE" } } }
+       - outdoorSpace: { is: { garden: { some: {} } } }
+    
+    3. ONE-TO-MANY RELATIONS: Use 'some: { ... }' wrapper. Examples:
+       - bathroomFeatures: { some: { floor: 0 } }
+       - otherRoom: { some: { type: "OFFICE" } }
+       - garden: { some: { facing: "SOUTH" } }
+    
+    4. ENUM ARRAYS: Use 'has' for single value, 'hasEvery' for multiple. Examples:
+       - features: { has: "GARAGE" }
+       - features: { hasEvery: ["GARAGE", "DRIVEWAY"] }
+    
+    5. EXISTENCE CHECK: Use 'isNot: null'. Examples:
+       - saleListing: { isNot: null } (for sales)
+       - rentalListing: { isNot: null } (for rentals)
+    
+    6. RELATIONS vs ENUMS:
+       - PropertyType/PropertyClassification are RELATIONS: { type: { name: "House" } }
+       - Other type fields are ENUMS: { type: "OFFICE" }
 
-    QUERY ANALYSIS REQUIREMENTS:
-    You MUST return a JSON object with:
+    NUMBER NOTATION RULES:
+    
+    7. "AT LEAST" NOTATION: Both "+3" and "3+" mean "at least 3" (use gte operator). Examples:
+       - "+3 bedrooms" or "3+ bedrooms" → property: { is: { numberBedrooms: { gte: 3 } } }
+       - "+2 bathrooms" or "2+ bathrooms" → property: { is: { numberBathrooms: { gte: 2 } } }
+       - "+1 garden" or "1+ garden" → outdoorSpace: { is: { garden: { some: {} } } }
+    
+    8. ABBREVIATED NUMBERS: "k" = thousand, "m" = million. Examples:
+       - "400k" = 400000
+       - "1.5m" = 1500000
+       - "250k" = 250000
+       - Apply to price fields: { saleListing: { is: { price: { lte: 400000 } } } }
+    
+    9. RANGE QUERIES: "between X and Y" or "X-Y" or "X to Y" (use gte and lte together). Examples:
+       - "between 1 and 3 bedrooms" → property: { is: { numberBedrooms: { gte: 1, lte: 3 } } }
+       - "2-4 bathrooms" → property: { is: { numberBathrooms: { gte: 2, lte: 4 } } }
+       - "between 200k and 500k" → saleListing: { is: { price: { gte: 200000, lte: 500000 } } }
+       - "300k to 600k" → saleListing: { is: { price: { gte: 300000, lte: 600000 } } }
+
+    COMMON SEARCH PATTERNS & EDGE CASES:
+    
+    10. LISTING STATUS: Always filter out archived listings unless explicitly requested:
+        - Default: { archived: false }
+        - Also consider: { published: true } for active listings only
+    
+    11. BOOLEAN DEFAULTS: Some booleans have specific meanings:
+        - "chain free" → property: { is: { chainFree: true } }
+        - "vacant" → property: { is: { vacant: true } }
+        - "furnished" → rentalListing: { is: { furnishedStatus: "FURNISHED" } }
+        - "unfurnished" → rentalListing: { is: { furnishedStatus: "UNFURNISHED" } }
+    
+    12. PARKING QUERIES: "parking" is ambiguous - check for specifics:
+        - "with parking" → parking: { isNot: null }
+        - "garage" → parking: { is: { features: { has: "GARAGE" } } }
+        - "driveway" → parking: { is: { features: { has: "DRIVEWAY" } } }
+        - "no parking" → parking: { is: { features: { has: "NO_PARKING" } } } (rare but explicit)
+    
+    13. GARDEN/OUTDOOR SPACE: Multiple interpretations:
+        - "with garden" → outdoorSpace: { is: { garden: { some: {} } } }
+        - "south facing garden" → outdoorSpace: { is: { garden: { some: { facing: "SOUTH" } } } }
+        - "front garden" → outdoorSpace: { is: { garden: { some: { position: "FRONT" } } } }
+    
+    14. EN-SUITE QUERIES: Can mean bathroom OR bedroom feature:
+        - "en-suite" generally → bathroomFeatures: { some: { features: { has: "EN_SUITE" } } }
+        - "bedroom with en-suite" → bedroomFeatures: { some: { features: { has: "EN_SUITE" } } }
+    
+    15. FLOOR LEVEL: 0 = ground floor, positive = above, negative = below:
+        - "ground floor" → property: { is: { floorLevel: 0 } }
+        - "first floor" → property: { is: { floorLevel: 1 } }
+        - "basement" → property: { is: { floorLevel: { lt: 0 } } }
+    
+    16. AVAILABILITY STATUS: Check listing status for sale/rental:
+        - "available" (sale) → saleListing: { is: { availabilityStatus: "AVAILABLE" } }
+        - "under offer" → saleListing: { is: { availabilityStatus: "UNDER_OFFER" } }
+        - "available" (rental) → rentalListing: { is: { availabilityStatus: "AVAILABLE" } }
+    
+    17. TENURE TYPE (SALE ONLY): Freehold vs Leasehold:
+        - "freehold" → saleListing: { is: { tenureType: "FREEHOLD" } }
+        - "leasehold" → saleListing: { is: { tenureType: "LEASEHOLD" } }
+    
+    18. SIZE QUERIES: Property size is in square feet/meters (check units):
+        - "over 1000 sqft" → property: { is: { size: { gte: 1000 } } }
+        - Size may be null - handle gracefully with: { size: { not: null, gte: X } }
+
+    RESPONSE FORMAT (JSON only, no markdown/comments):
     {
       "whereClause": { ... },
       "queryAnalysis": {
-        "usedTerms": ["term1", "term2"],  // All terms from query that were mapped to schema
-        "ignoredTerms": ["term3"]         // All terms that couldn't be mapped
+        "usedTerms": ["term1", "term2"],
+        "ignoredTerms": ["term3"]
       }
     }
     `;

@@ -52,10 +52,20 @@ function updateAutocompleteValue({ target }: Event) {
  */
 const { searchState } = useSearchState()
 
-const locationQuery = computed(() => {
-  const { location } = asObject(searchState.value)
+// Local input value - synced with global state but editable
+const locationQueryLocal = ref('')
 
-  return location?.place_name_en || ''
+// Sync from global state when location changes
+watch(() => searchState.value?.location, (location) => {
+  if (location) {
+    locationQueryLocal.value = location.place_name_en || location.place_name || ''
+  }
+}, { immediate: true })
+
+// Expose as locationQuery for template
+const locationQuery = computed({
+  get: () => locationQueryLocal.value,
+  set: (value: string) => { locationQueryLocal.value = value }
 })
 
 /**
@@ -70,6 +80,9 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
   // Get enhanced location, falling back to normal location
   const enhancedLocation = await enhanceWithBoundaryPolygon(locationUnref)
     .catch(() => locationUnref);
+
+  // Update input immediately with full location name
+  locationQueryLocal.value = enhancedLocation.place_name_en || enhancedLocation.place_name || ''
 
   // Update global state
   setLocation(enhancedLocation, hidePopover)
