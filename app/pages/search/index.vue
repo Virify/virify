@@ -12,7 +12,7 @@
  * If someone lands on /search without params, redirect them to start a search
  */
 definePageMeta({
-  middleware: () => navigateTo('/', { redirectCode: 302 })
+  middleware: () => navigateTo('/', { redirectCode: 301 })
 })
 </script>
 

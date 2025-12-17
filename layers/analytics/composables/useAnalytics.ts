@@ -133,13 +133,6 @@ export const useAnalytics = createSharedComposable(() => {
     resultCount: number;
     userId?: number;
   }) => {
-    console.log("trackSearch called with:", { 
-      query: params.query, 
-      location: params.location.text,
-      radius: params.radius,
-      resultCount: params.resultCount 
-    });
-    
     try {
       const payload = {
         query: params.query,
@@ -151,17 +144,18 @@ export const useAnalytics = createSharedComposable(() => {
       
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
       const success = navigator.sendBeacon("/api/analytics/search", blob);
-      console.log("Search tracking:", success ? "queued" : "failed to queue");
-      
       if (!success) {
-        console.warn("sendBeacon failed, falling back to fetch");
-        await $fetch("/api/analytics/search", {
-          method: "POST",
-          body: payload,
-        });
+        try {
+          await $fetch("/api/analytics/search", {
+            method: "POST",
+            body: payload,
+          });
+        } catch (e) {
+          // swallow fallback errors to avoid noisy logs
+        }
       }
     } catch (error) {
-      console.error("Failed to track search:", error);
+      // intentionally silent for analytics failures
     }
   };
 
@@ -179,7 +173,6 @@ export const useAnalytics = createSharedComposable(() => {
 
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
       const success = navigator.sendBeacon("/api/analytics/mortgage/track", blob);
-      console.log("Mortgage calculation tracking:", success ? "queued" : "failed to queue");
     } catch (error) {
       console.error("Failed to track mortgage calculation:", error);
     }

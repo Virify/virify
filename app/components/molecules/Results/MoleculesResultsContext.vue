@@ -1,5 +1,5 @@
 <template>
-  <div v-if="hasSearchInfo || count > 0" class="m-results-context">
+  <div class="m-results-context">
     <AtomsPill v-if="hasSearchInfo" class="m-results-context__pill m-results-context__pill--info | body-sm">
       <AtomsIcon icon="content/search" width="16" height="16" />
       {{ count }} {{ count === 1 ? 'property' : 'properties' }} found
@@ -63,18 +63,19 @@ const searchTerms = computed(() => {
 })
 
 /**
- * Location name for display - short but contextual
+ * Location name for display
  */
 const locationName = computed(() => {
   if (!props.location) return ''
-  return getShortLocationName(props.location)
+  return props.location.place_name_en || props.location.place_name || ''
 })
 
 /**
  * Radius text for display
  */
 const radiusText = computed(() => {
-  if (!props.radius) return ''
+  if (props.radius == null) return ''
+  if (props.radius === 0) return 'This location only'
   return `Within ${props.radius} Miles`
 })
 

@@ -39,7 +39,7 @@ function createSearchState() {
    *  Update state layout
    */
   function setLocation(value: GeocodingFeature, callback?: () => void) {
-    // Update state
+    // Update state - don't clear results, they'll be cleared when search starts
     updateState({ location: value })
 
     // Run optional callback

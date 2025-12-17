@@ -294,6 +294,7 @@ export async function getRecentViewedListings(userId: number, limit: number = 6)
 export async function trackSearch(params: TrackSearchParams): Promise<TrackSearch> {
   const { query, location, radius, resultCount, userId } = params;
   
+  const locationId = location.id || '';
   const locationPlaceName = location.place_name_en || location.place_name;
   const locationText = location.text;
   const [locationLon, locationLat] = location.geometry.coordinates;
@@ -310,7 +311,7 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
   });
   
   if (existing) {
-    // Update existing record - add userId if not already present
+    // Update existing record - increment count and add userId if not already present
     const userIds = existing.userIds;
     if (userId && !userIds.includes(userId)) {
       userIds.push(userId);
@@ -319,15 +320,18 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
     return prisma.trackSearch.update({
       where: { id: existing.id },
       data: {
+        count: { increment: 1 }, // Increment search count
         resultCount, // Update with latest result count
+        locationId, // Update locationId in case it was missing
         userIds,
       },
     });
   }
   
-  // Create new record
+  // Create new record with count = 1
   return prisma.trackSearch.create({
     data: {
+      locationId,
       locationPlaceName,
       locationText,
       locationLat,
@@ -335,6 +339,7 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
       radius,
       query,
       resultCount,
+      count: 1,
       userIds: userId ? [userId] : [],
     },
   });
@@ -362,26 +367,44 @@ export async function getTrendingSearches(limit: number = 10): Promise<TrackSear
 
 /**
  * Get trending locations based on search count
+ * Note: Caching is handled at the API endpoint level using Nitro's defineCachedEventHandler
  * @param limit Maximum number of trending locations to return
  * @returns Trending location names with search counts
  */
 export async function getTrendingLocations(limit: number = 5) {
-  const searches = await prisma.trackSearch.groupBy({
-    by: ['locationPlaceName', 'locationText'],
-    _count: {
-      id: true,
+  // Get top locations with their IDs - can't use groupBy with locationId since it varies
+  // So we get all searches, aggregate by locationText, and pick the best locationId for each
+  const searches = await prisma.trackSearch.findMany({
+    where: {
+      locationId: { not: '' }, // Only include searches with valid locationId
     },
     orderBy: {
-      _count: {
-        id: 'desc',
-      },
+      count: 'desc',
     },
-    take: limit,
+    take: 100, // Get enough to aggregate
   });
   
-  return searches.map(s => ({
+  // Aggregate by locationText, keeping the highest count entry for each
+  const locationMap = new Map<string, typeof searches[0]>();
+  for (const search of searches) {
+    const key = search.locationText.toLowerCase();
+    const existing = locationMap.get(key);
+    if (!existing || search.count > existing.count) {
+      locationMap.set(key, search);
+    }
+  }
+  
+  // Sort by count and take top N
+  const sorted = Array.from(locationMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+  
+  return sorted.map(s => ({
+    locationId: s.locationId, // For geocoding on frontend
     name: s.locationText,
     placeName: s.locationPlaceName,
-    count: s._count.id,
+    lat: s.locationLat,
+    lon: s.locationLon,
+    count: s.count,
   }));
 }

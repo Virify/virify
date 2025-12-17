@@ -16,28 +16,6 @@ export function generateFakeUser(): Prisma.UserCreateInput {
   };
 }
 
-/**
- * Example geocoding feature for saved user locations
- */
-export const geocodingFeature = {
-  "type": "Feature",
-  "geometry": {
-      "type": "Point",
-      "coordinates": [
-          -3.1791935116052628,
-          51.481654752296365
-      ]
-  },
-  "place_name": "Cardiff, United Kingdom",
-  "place_type": [
-      "county"
-  ],
-  "language": "en",
-  "text_en": "Cardiff",
-  "language_en": "en",
-  "place_name_en": "Cardiff, United Kingdom"
-};
-
 export async function seedFakeUsers(count = 1): Promise<void> {
   const users: Prisma.UserCreateInput[] = [];
 
@@ -93,15 +71,6 @@ export async function seedFakeUsers(count = 1): Promise<void> {
             create: {
               favourites: {
                 create: selectedIds.map((id) => ({ listingId: id })),
-              },
-              savedLocation: {
-                create: [{
-                  location: geocodingFeature.place_name_en,
-                  geocodingFeature: geocodingFeature,
-                  lat: Number(geocodingFeature.geometry.coordinates[1]),
-                  lon: Number(geocodingFeature.geometry.coordinates[0]),
-                  name: "my home location",
-                }],
               },
             },
           },

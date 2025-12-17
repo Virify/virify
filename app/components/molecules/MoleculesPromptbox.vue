@@ -12,10 +12,16 @@
         :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
     </div>
 
-    <button type="submit" class="m-promptbox__button" :class="{ 'm-promptbox__button--loading': loading }" aria-label="Submit" :disabled="disabled || loading" @click.prevent="$emit('submit', textarea)">
-      <AtomsIcon v-if="!loading" icon="ai/send" aria-hidden />
-      <span v-else class="m-promptbox__spinner" aria-hidden></span>
-    </button>
+    <AtomsButton
+      type="submit"
+      class="m-promptbox__button"
+      :pending="loading"
+      :disabled="disabled"
+      aria-label="Submit"
+      @click.prevent="$emit('submit', textarea)"
+    >
+      <AtomsIcon icon="ai/send" aria-hidden />
+    </AtomsButton>
   </div>
 </template>
 

@@ -26,7 +26,7 @@ export function convertToValidEnum(
  * @param enumValue The enum value to convert
  * @returns Readable string with proper capitalization
  */
-export function convertEnumToString(enumValue: string | undefined): string {
+export function convertEnumToString(enumValue: string | null | undefined): string {
   if (!enumValue) return "";
   
   // Handle underscore-separated enums first (e.g., "OPEN_PLAN" -> "Open Plan")

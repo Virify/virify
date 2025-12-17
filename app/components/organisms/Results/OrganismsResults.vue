@@ -10,7 +10,7 @@
     </template>
 
     <template v-else>
-      <div class="o-results__header">
+      <div v-if="hasSearchInfo" class="o-results__header">
         <MoleculesResultsContext 
           :count="results.length"
           :query-analysis="queryAnalysis"
@@ -55,6 +55,16 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<{
   'open-popover': [type: 'location' | 'filters']
 }>()
+
+/**
+ * Check if we have search info to display
+ */
+const hasSearchInfo = computed(() => {
+  const hasTerms = isPopulatedArray(props.queryAnalysis?.usedTerms)
+  const hasLocation = !!props.location
+  const hasRadius = props.radius > 0
+  return hasTerms || hasLocation || hasRadius || props.results.length > 0
+})
 
 /**
  *  Get the variant of the card

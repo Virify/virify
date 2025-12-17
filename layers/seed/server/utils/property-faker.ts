@@ -737,8 +737,19 @@ export const generateAddress = (address: AddressCreateWithoutPropertiesInput) =>
  * @returns PropertyWithAddress
  */
 export const generateProperty = async (address: Prisma.AddressCreateWithoutPropertiesInput): Promise<PropertyWithAddress> => {
-  // Generate mapped property types and classifications
-  const typeId = faker.helpers.arrayElement(Object.keys(typeToClassificationMap).map(Number));
+  // Generate mapped property types and classifications with weighted distribution:
+  // 70% houses (1), 5% cottages (2), 5% bungalows (3), 5% flats (4), 15% other (5-8)
+  const weightedTypeIds = [
+    ...Array(70).fill(1),  // 70% House
+    ...Array(5).fill(2),   // 5% Cottage
+    ...Array(5).fill(3),   // 5% Bungalow
+    ...Array(5).fill(4),   // 5% Flat
+    ...Array(4).fill(5),   // 4% Land
+    ...Array(4).fill(6),   // 4% Farms
+    ...Array(4).fill(7),   // 4% Specialty
+    ...Array(3).fill(8),   // 3% Student Accommodation
+  ];
+  const typeId = faker.helpers.arrayElement(weightedTypeIds);
   const classificationOptions = typeToClassificationMap[typeId];
   const classificationId = faker.helpers.arrayElement(classificationOptions!);
 

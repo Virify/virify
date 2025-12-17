@@ -1,32 +1,21 @@
 /// Unified search tracking for analytics
 /// Tracks each unique combination of location + radius + query
 model TrackSearch {
-  id        Int      @id @default(autoincrement())
-  
-  // Location data from MapTiler
-  locationPlaceName String   /// e.g. "Cardiff, Wales, United Kingdom"
-  locationText      String   /// Short name e.g. "Cardiff"
-  locationLat       Float    /// Latitude
-  locationLon       Float    /// Longitude
-  
-  // Search parameters
-  radius    Int      /// Search radius in miles (0 = this area only)
-  query     String   /// The search prompt/query
-  
-  // Results tracking
-  resultCount Int    @default(0) /// Number of results returned
-  
-  // User tracking (array of user IDs who performed this search)
-  userIds   Int[]    @default([])
-  
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Unique constraint on the search combination
+  id                Int      @id @default(autoincrement())
+  locationId        String   @default("") // MapTiler geocoding ID for re-geocoding
+  locationPlaceName String
+  locationText      String
+  locationLat       Float
+  locationLon       Float
+  radius            Int
+  query             String
+  resultCount       Int      @default(0)
+  count             Int      @default(0)
+  userIds           Int[]    @default([])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
   @@unique([locationPlaceName, radius, query])
-  
-  // Indexes for common queries
   @@index([locationPlaceName])
   @@index([query])
   @@index([createdAt])

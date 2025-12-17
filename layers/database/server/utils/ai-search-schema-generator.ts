@@ -116,6 +116,70 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
        - PropertyType/PropertyClassification are RELATIONS: { type: { name: "House" } }
        - Other type fields are ENUMS: { type: "OFFICE" }
 
+    NUMBER NOTATION RULES:
+    
+    7. "AT LEAST" NOTATION: Both "+3" and "3+" mean "at least 3" (use gte operator). Examples:
+       - "+3 bedrooms" or "3+ bedrooms" → property: { is: { numberBedrooms: { gte: 3 } } }
+       - "+2 bathrooms" or "2+ bathrooms" → property: { is: { numberBathrooms: { gte: 2 } } }
+       - "+1 garden" or "1+ garden" → outdoorSpace: { is: { garden: { some: {} } } }
+    
+    8. ABBREVIATED NUMBERS: "k" = thousand, "m" = million. Examples:
+       - "400k" = 400000
+       - "1.5m" = 1500000
+       - "250k" = 250000
+       - Apply to price fields: { saleListing: { is: { price: { lte: 400000 } } } }
+    
+    9. RANGE QUERIES: "between X and Y" or "X-Y" or "X to Y" (use gte and lte together). Examples:
+       - "between 1 and 3 bedrooms" → property: { is: { numberBedrooms: { gte: 1, lte: 3 } } }
+       - "2-4 bathrooms" → property: { is: { numberBathrooms: { gte: 2, lte: 4 } } }
+       - "between 200k and 500k" → saleListing: { is: { price: { gte: 200000, lte: 500000 } } }
+       - "300k to 600k" → saleListing: { is: { price: { gte: 300000, lte: 600000 } } }
+
+    COMMON SEARCH PATTERNS & EDGE CASES:
+    
+    10. LISTING STATUS: Always filter out archived listings unless explicitly requested:
+        - Default: { archived: false }
+        - Also consider: { published: true } for active listings only
+    
+    11. BOOLEAN DEFAULTS: Some booleans have specific meanings:
+        - "chain free" → property: { is: { chainFree: true } }
+        - "vacant" → property: { is: { vacant: true } }
+        - "furnished" → rentalListing: { is: { furnishedStatus: "FURNISHED" } }
+        - "unfurnished" → rentalListing: { is: { furnishedStatus: "UNFURNISHED" } }
+    
+    12. PARKING QUERIES: "parking" is ambiguous - check for specifics:
+        - "with parking" → parking: { isNot: null }
+        - "garage" → parking: { is: { features: { has: "GARAGE" } } }
+        - "driveway" → parking: { is: { features: { has: "DRIVEWAY" } } }
+        - "no parking" → parking: { is: { features: { has: "NO_PARKING" } } } (rare but explicit)
+    
+    13. GARDEN/OUTDOOR SPACE: Multiple interpretations:
+        - "with garden" → outdoorSpace: { is: { garden: { some: {} } } }
+        - "south facing garden" → outdoorSpace: { is: { garden: { some: { facing: "SOUTH" } } } }
+        - "front garden" → outdoorSpace: { is: { garden: { some: { position: "FRONT" } } } }
+    
+    14. EN-SUITE QUERIES: Can mean bathroom OR bedroom feature:
+        - "en-suite" generally → bathroomFeatures: { some: { features: { has: "EN_SUITE" } } }
+        - "bedroom with en-suite" → bedroomFeatures: { some: { features: { has: "EN_SUITE" } } }
+    
+    15. FLOOR LEVEL: 0 = ground floor, positive = above, negative = below:
+        - "ground floor" → property: { is: { floorLevel: 0 } }
+        - "first floor" → property: { is: { floorLevel: 1 } }
+        - "basement" → property: { is: { floorLevel: { lt: 0 } } }
+    
+    16. AVAILABILITY STATUS: Check listing status for sale/rental:
+        - "available" (sale) → saleListing: { is: { availabilityStatus: "AVAILABLE" } }
+        - "under offer" → saleListing: { is: { availabilityStatus: "UNDER_OFFER" } }
+        - "available" (rental) → rentalListing: { is: { availabilityStatus: "AVAILABLE" } }
+    
+    17. TENURE TYPE (SALE ONLY): Freehold vs Leasehold:
+        - "freehold" → saleListing: { is: { tenureType: "FREEHOLD" } }
+        - "leasehold" → saleListing: { is: { tenureType: "LEASEHOLD" } }
+    
+    18. SIZE QUERIES: Property size is in square feet/meters (check units):
+        - "over 1000 sqft" → property: { is: { size: { gte: 1000 } } }
+        - Size may be null - handle gracefully with: { size: { not: null, gte: X } }
+
     RESPONSE FORMAT (JSON only, no markdown/comments):
     {
       "whereClause": { ... },

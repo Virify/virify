@@ -8,7 +8,7 @@
     />
 
     <!-- Big header -->
-    <h1 class="no-results__title | title-xl">No results found</h1>
+    <h2 class="no-results__title | title-xl">No results found</h2>
     <p class="no-results__subtitle | body-md">We couldn't find any properties matching your search. Try one of these instead:</p>
 
     <!-- Suggestion prompts -->
@@ -36,6 +36,7 @@ const { searchState } = useSearchState()
 const location = computed(() => searchState.value?.location)
 const radius = computed(() => searchState.value?.radius)
 
+// @TODO: Consider making these dynamic based on popular searches or user preferences
 const examplePrompts = [
   "4 bedroom house with a garden for sale",
   "Studio flat with a balcony to rent",
@@ -46,19 +47,13 @@ const examplePrompts = [
 ];
 
 function searchWithPrompt(prompt: string) {
-  const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  
   const loc = location.value
   if (!loc) {
     navigateTo('/')
     return
   }
   
-  const locationSlug = slugify(loc.text || loc.place_name_en || loc.place_name)
-  const radiusSlug = radius.value === 0 ? 'this-area-only' : `${radius.value || 5}-miles`
-  const promptSlug = slugify(prompt)
-  
-  navigateTo(`/search/${locationSlug}/${radiusSlug}/${promptSlug}`)
+  navigateTo(createSearchURL(loc, radius.value ?? 5, prompt))
 }
 </script>
 

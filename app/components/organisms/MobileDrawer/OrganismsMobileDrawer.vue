@@ -77,7 +77,7 @@ function releaseTrap() {
   document.documentElement.style.overflow = ''
   // Use nextTick to ensure DOM updates have completed
   nextTick(() => {
-    if (previousActive.value instanceof HTMLElement && document.contains(previousActive.value)) {
+    if (isElement(previousActive.value) && document.contains(previousActive.value)) {
       try {
         previousActive.value.focus()
       } catch (e) {

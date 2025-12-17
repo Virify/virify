@@ -14,9 +14,28 @@ export function useMapSearch() {
         query: { 
           key: sdk.config.apiKey, 
           country: "gb",
+          language: "en", // Ensure English place names
         },
       });
-      return res.features ?? [];
+      
+      // Filter out "place" type entries when a "county" with same name exists
+      // Counties have boundary polygons, places are just points
+      const features = res.features ?? [];
+      const countyNames = new Set(
+        features
+          .filter(f => f.place_type?.[0] === 'county')
+          .map(f => (f.text_en || f.text || '').toLowerCase())
+      );
+      
+      const filtered = features.filter(f => {
+        const placeType = f.place_type?.[0];
+        const name = (f.text_en || f.text || '').toLowerCase();
+        
+        // Keep if it's not a "place" or if there's no county with the same name
+        return placeType !== 'place' || !countyNames.has(name);
+      });
+      
+      return filtered;
     } catch (e) {
       console.error("[Map] Search error:", e);
       return [];
@@ -46,15 +65,27 @@ export function useMapSearch() {
   }
 
   /**
-   * Geocodes a query and returns the best match (first result)
-   * Used as fallback when user doesn't click on autocomplete suggestions
+   * Geocodes a query and returns the best match
+   * Tries to find an exact match first, falls back to first result
    */
   async function geocodeAndSelectBest(query: string): Promise<GeocodingFeature | null> {
     if (!query) return null;
     try {
       const suggestions = await autoComplete(query);
-      const result = suggestions.length > 0 ? suggestions[0] ?? null : null;
-      return result;
+      if (!suggestions.length) return null;
+      
+      // Try to find an exact match by comparing place_name_en (case-insensitive)
+      const queryLower = query.toLowerCase().trim();
+      const exactMatch = suggestions.find(s => {
+        const placeName = (s.place_name_en || s.place_name || '').toLowerCase();
+        // Check if the query matches the start of the place name
+        // e.g., "cardiff united kingdom" should match "Cardiff, United Kingdom"
+        const normalizedPlace = placeName.replace(/,\s*/g, ' ').replace(/\s+/g, ' ');
+        const normalizedQuery = queryLower.replace(/,\s*/g, ' ').replace(/\s+/g, ' ');
+        return normalizedPlace.startsWith(normalizedQuery) || normalizedPlace === normalizedQuery;
+      });
+      
+      return exactMatch ?? suggestions[0] ?? null;
     } catch (e) {
       return null;
     }
@@ -69,6 +100,7 @@ export function useMapSearch() {
       const res = await $fetch<any>(`https://api.maptiler.com/geocoding/${encodeURIComponent(featureId)}.json`, {
         query: { 
           key: sdk.config.apiKey,
+          language: "en", // Ensure English place names
         },
       });
       
@@ -177,10 +209,61 @@ export function useMapSearch() {
   }
 
 
+  /**
+   * Geocode by location ID for precise lookup
+   * Returns feature with boundaryPolygon if geometry is Polygon/MultiPolygon
+   */
+  async function geocodeById(locationId: string): Promise<GeocodingFeatureWithBoundary | null> {
+    if (!locationId) return null;
+    try {
+      const res = await $fetch<any>(`https://api.maptiler.com/geocoding/${encodeURIComponent(locationId)}.json`, {
+        query: { 
+          key: sdk.config.apiKey,
+          language: 'en', // Ensure we get English place names
+        },
+      });
+      
+      if (res.features && res.features.length > 0) {
+        const feature = res.features[0];
+        
+        // For regions (counties, cities), geometry may be a Polygon, not a Point
+        // Ensure center property exists for coordinate extraction
+        if (feature.center?.length >= 2) {
+          // If geometry is a Polygon/MultiPolygon, extract it as boundaryPolygon
+          const boundaryPolygon = (feature.geometry?.type === 'Polygon' || feature.geometry?.type === 'MultiPolygon')
+            ? { type: feature.geometry.type, coordinates: feature.geometry.coordinates }
+            : undefined;
+          
+          return {
+            ...feature,
+            boundaryPolygon
+          } as GeocodingFeatureWithBoundary;
+        }
+        
+        // Fallback: check if geometry is a Point and use its coordinates as center
+        if (feature.geometry?.type === 'Point' && feature.geometry?.coordinates?.length >= 2) {
+          return {
+            ...feature,
+            center: feature.geometry.coordinates
+          } as GeocodingFeatureWithBoundary;
+        }
+        
+        console.warn("[Map] geocodeById: Feature missing valid center or point geometry", feature);
+      }
+      
+      return null;
+    } catch (e) {
+      console.error("[Map] Error geocoding by ID:", e);
+      return null;
+    }
+  }
+
+
   return {
     autoComplete,
     postcodeAutoComplete,
     geocodeAndSelectBest,
+    geocodeById,
     enhanceWithBoundaryPolygon,
     findNearbyAmenities,
   } as const;

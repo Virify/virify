@@ -6,16 +6,28 @@
       '| container': showGrid
     }">
       <template #left v-if="showGrid">
-        <OrganismsResults v-if="!isMounted || isLoading || results.length" :results
-          :is-loading="!isMounted || isLoading" :query-analysis="searchState?.queryAnalysis"
+        <OrganismsResults v-if="isInitializing || isLoading || results.length" :results
+          :is-loading="isInitializing || isLoading" :query-analysis="searchState?.queryAnalysis"
           :location="searchState?.location" :radius="searchState?.radius" @open-popover="handleOpenPopover" />
         <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
 
-      <template #right v-if="showMap">
-        <LazyOrganismsAiSearchMapView class="p-dock__map" :results :is-searching="isLoading" :radius :location />
+      <!-- Use v-show to keep map in DOM once initialized, avoiding expensive re-initialization -->
+      <template #right>
+        <LazyOrganismsAiSearchMapView 
+          v-if="mapHasBeenShown" 
+          v-show="showMap" 
+          class="p-dock__map" 
+          :results 
+          :is-searching="isLoading" 
+          :has-searched="resultsAreCurrentForLocation"
+          :radius 
+          :location 
+        />
       </template>
     </OrganismsPaneSlider>
+
+    <MoleculesAiSearchLoading v-if="isLoading" class="p-dock__loading" />
 
     <OrganismsDock ref="dockRef" />
   </div>
@@ -32,22 +44,19 @@ const route = useRoute()
 const locationName = computed(() => {
   const slug = route.params.location as string
   if (!slug) return 'UK'
-  // Convert slug to readable text and capitalize first letter of each word
-  return slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  return slugToTitleCase(slug)
 })
 
 const radiusText = computed(() => {
   const slug = route.params.radius as string
-  if (slug === 'this-area-only') return 'in'
-  const match = slug?.match(/^(\d+)-miles?$/)
-  return match ? `within ${match[1]} miles of` : 'near'
+  return getRadiusDisplayText(slug)
 })
 
 const searchQueryText = computed(() => {
   const prompt = route.params.prompt
   const slug = Array.isArray(prompt) ? prompt.join(' ') : prompt as string
   if (!slug) return 'properties'
-  return slug.replace(/-/g, ' ')
+  return slugToText(slug)
 })
 
 const seoTitle = computed(() => {
@@ -136,6 +145,16 @@ const showMap = computed(() => {
   return viewMode === 'map' || viewMode === 'split'
 })
 
+// Track if the map has ever been shown to avoid re-initializing it
+const mapHasBeenShown = ref(false)
+watch(showMap, (value) => {
+  if (value) mapHasBeenShown.value = true
+}, { immediate: true })
+
+// Track if results are current for the displayed location
+// When location changes, results become stale until a new search is performed
+const resultsAreCurrentForLocation = ref(false)
+
 /**
  *  Handle searches
  */
@@ -145,14 +164,12 @@ const sortBy = computed(() => asObject(searchState.value).sortBy)
 const viewMode = computed(() => asObject(searchState.value).viewMode)
 const query = computed(() => asObject(searchState.value).query)
 
-const { aiSearch } = useAi()
+// When location or radius changes, mark results as stale (not current for this search criteria)
+watch([location, radius], () => {
+  resultsAreCurrentForLocation.value = false
+})
 
-/**
- * Slugify text for URL
- */
-function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
+const { aiSearch } = useAi()
 
 /**
  * Trigger search - called on initial load only
@@ -162,6 +179,8 @@ async function triggerSearch() {
 
   if (!loc || !q) return
 
+  // Clear previous results and show loading state
+  setResults([])
   setSearchPending(true)
 
   try {
@@ -169,6 +188,9 @@ async function triggerSearch() {
 
     if (queryAnalysis) setQueryAnalysis(queryAnalysis)
     setResults(results)
+    
+    // Mark results as current for this location
+    resultsAreCurrentForLocation.value = true
   } finally {
     setSearchPending(false)
   }
@@ -226,26 +248,9 @@ useHead({
 /**
  *  Parse URL params and geocode location
  */
-const isMounted = ref(false)
-
-/**
- * Parse radius from URL param (e.g., "5-miles" -> 5, "this-area-only" -> 0)
- */
-function parseRadius(radiusParam: string): number {
-  if (radiusParam === 'this-area-only') return 0
-  const match = radiusParam.match(/^(\d+)-miles?$/)
-  return match ? parseInt(match[1], 10) : 5
-}
-
-/**
- * Convert slug back to readable text (e.g., "3-bed-house-with-garden" -> "3 bed house with garden")
- */
-function slugToText(slug: string): string {
-  return decodeURIComponent(slug).replace(/-/g, ' ')
-}
+const isInitializing = ref(true)
 
 onMounted(async () => {
-  isMounted.value = true
 
   // Parse URL params
   const locationSlug = route.params.location as string
@@ -253,23 +258,55 @@ onMounted(async () => {
   const promptSlug = Array.isArray(route.params.prompt) 
     ? route.params.prompt.join('/') 
     : route.params.prompt as string
+  const locationId = route.query.lid as string | undefined
 
   if (!locationSlug || !radiusSlug || !promptSlug) {
     return navigateTo('/search')
   }
 
-  // Parse radius
-  const radiusValue = parseRadius(radiusSlug)
+  // Parse radius using shared util
+  const radiusValue = parseRadiusFromSlug(radiusSlug)
 
-  // Convert prompt slug to text
+  // Convert prompt slug to text using shared util
   const promptText = slugToText(promptSlug)
 
-  // Geocode the location name
+  // Geocode the location - prefer ID lookup if available
   try {
-    const { geocodeAndSelectBest } = useMap()
-    const locationData = await geocodeAndSelectBest(slugToText(locationSlug))
+    const { geocodeAndSelectBest, geocodeById, enhanceWithBoundaryPolygon } = useMap()
+    
+    // Check if we already have this location in state (preserves full name from autocomplete)
+    const existingLocation = searchState.value?.location
+    if (existingLocation && locationId && existingLocation.id === locationId) {
+      // Location already in state with same ID - don't re-geocode as it loses the full name
+      setLocationRadius(radiusValue)
+      setQuery(promptText)
+      await triggerSearch()
+      isInitializing.value = false
+      return
+    }
+    
+    // Try to get location by ID first (precise) - includes boundaryPolygon
+    let locationData = locationId 
+      ? await geocodeById(locationId)
+      : null
+    
+    // Fall back to geocoding by name if ID lookup fails
+    // Need to enhance with boundary polygon for this path
+    if (!locationData) {
+      const baseLocation = await geocodeAndSelectBest(slugToText(locationSlug))
+      locationData = baseLocation ? await enhanceWithBoundaryPolygon(baseLocation) : null
+    }
 
     if (locationData) {
+      // MapTiler's ID lookup returns truncated place names (e.g. "Cardiff" instead of "Cardiff, United Kingdom")
+      // Use the URL slug to reconstruct the full name for display
+      const fullLocationName = slugToTitleCase(locationSlug)
+      locationData = {
+        ...locationData,
+        place_name_en: fullLocationName,
+        place_name: fullLocationName,
+      }
+      
       // Set state from URL
       setLocation(locationData)
       setLocationRadius(radiusValue)
@@ -282,6 +319,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Failed to geocode location:', error)
+  } finally {
+    isInitializing.value = false
   }
 })
 </script>
@@ -305,6 +344,23 @@ onMounted(async () => {
     width: 100%;
     overflow: hidden;
     height: calc(100vh - var(--header-height));
+  }
+
+  &__loading {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 8;
+    background: var(--background-100);
+    border-radius: var(--border-radius-2xl);
+    padding: var(--size-24);
+    box-shadow: var(--shadow-300);
+    max-width: 400px;
+
+    @media (min-width: 768px) {
+      bottom: 140px;
+    }
   }
 }
 </style>

@@ -13,8 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import ViewsDialogConversation from '~/components/views/Dialog/ViewsDialogConversation.vue';
-import ViewsDialogLogin from '~/components/views/Dialog/ViewsDialogLogin.vue';
+import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
 
 interface Props {
   listingId: number;

@@ -97,12 +97,10 @@ const priceGuide = computed(() => {
   if (props.result?.rentalListing) {
     return convertEnumToString(props.result.rentalListing.rentFrequency)
   }
-  
+
   if (props.result?.saleListing) {
     return convertEnumToString(props.result.saleListing.priceType)
   }
-
-  return ''
 })
 
 const listingType = computed(() => {
@@ -146,7 +144,7 @@ const hasOutdoorSpace = computed(() => {
   if (!outdoorSpace) return false
   
   const { garden, yard, land } = asObject(outdoorSpace)
-  return (asArray(garden).length > 0) || (asArray(yard).length > 0) || (asArray(land).length > 0)
+  return containsPopulatedArray(garden, yard, land)
 })
 
 const parkingType = computed(() => {
@@ -160,7 +158,7 @@ const parkingType = computed(() => {
   if (parkingFeatures.includes('GARAGE')) return 'garage'
   
   // Check for any other parking
-  if (parkingFeatures.length > 0 && !parkingFeatures.includes('NO_PARKING')) return 'parking'
+  if (isPopulatedArray(parkingFeatures) && !parkingFeatures.includes('NO_PARKING')) return 'parking'
   
   return null
 })

@@ -247,8 +247,10 @@ export async function handleLocationFilter(lat?: number, lon?: number, radius?: 
       }
     }
     
-    // No boundary data available for location-only search
-    return { propertyIds: [], locationContext: "no boundary data available" };
+    // Fallback: No boundary data available, use 0.1 mile radius for points/addresses
+    const nearbyProperties = await getPropertyIdsByDistance(lat, lon, 0.1);
+    const propertyIds = nearbyProperties.map((p) => p.propertyId);
+    return { propertyIds, locationContext: "within 0.1 miles (point location)" };
   }
 
   // Regular radius search

@@ -20,13 +20,6 @@ const { searchState, isLoading } = useSearchState()
 const { checkContent, isChecking } = useModeration()
 const { showToast } = useToast()
 
-/**
- * Slugify text for URL
- */
-function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
-
 async function searchSubmit(query: string) {
   const { location, radius } = asObject(searchState.value)
   
@@ -40,12 +33,7 @@ async function searchSubmit(query: string) {
   }
 
   // Build clean URL and navigate - this will trigger the search
-  // Use short text name for cleaner URLs (e.g. "Cardiff" instead of "Cardiff, Wales, United Kingdom")
-  const locationSlug = slugify(location.text || location.place_name_en || location.place_name)
-  const radiusSlug = radius === 0 ? 'this-area-only' : `${radius || 5}-miles`
-  const promptSlug = slugify(query)
-
-  await navigateTo(`/search/${locationSlug}/${radiusSlug}/${promptSlug}`)
+  await navigateTo(createSearchURL(location, radius ?? 5, query))
 }
 
 function searchReset() {
