@@ -1,15 +1,7 @@
 <template>
   <div class="m-promptbox | elevate-200">
     <div class="m-promptbox__input-wrapper">
-      <!-- analysed query overlays the textarea -->
-      <div class="m-promptbox__overlay | body-md" v-if="queryAnalysis" aria-hidden="true">
-        <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type}`">
-          {{ segment.text }}
-        </span>
-      </div>
-
-      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
-        :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"></textarea>
+      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"></textarea>
     </div>
 
     <AtomsButton
@@ -26,8 +18,6 @@
 </template>
 
 <script setup lang="ts">
-const { getAnalyzedQuery, queryAnalysis } = useAi()
-
 const props = defineProps({
   id: String,
   placeholder: String,

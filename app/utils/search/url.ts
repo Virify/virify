@@ -4,12 +4,15 @@ import { selectOptionRadius } from '~/utils/select-options/radius'
  * Sanitise text for use in URL paths
  * Converts to lowercase, replaces non-alphanumeric chars with hyphens,
  * and removes leading/trailing hyphens
+ * Preserves £ symbol as 'gbp' for better readability
  */
 export function sanitisePath(text: string | number): string {
   return String(text)
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+    .replace(/£/g, 'gbp')  // Preserve currency symbol as 'gbp'
+    .replace(/[^a-z0-9-]+/g, '-')  // Allow hyphens through (for ranges like 2-4)
+    .replace(/--+/g, '-')  // Collapse multiple hyphens into one
+    .replace(/^-|-$/g, '')  // Remove leading/trailing hyphens
 }
 
 /**
@@ -70,9 +73,34 @@ export function parseRadiusFromSlug(radiusParam: string): number {
 
 /**
  * Convert slug back to readable text (e.g., "3-bed-house-with-garden" -> "3 bed house with garden")
+ * Preserves hyphens in number ranges (e.g., "2-4" stays "2-4")
+ * Preserves hyphens between currency amounts (e.g., "£200k-£500k")
+ * Converts 'gbp' back to £ symbol
  */
 export function slugToText(slug: string): string {
-  return decodeURIComponent(slug).replace(/-/g, ' ')
+  const decoded = decodeURIComponent(slug)
+    .replace(/gbp/g, '£')  // Convert 'gbp' back to £
+  
+  // Use a more sophisticated replacement that preserves hyphens in ranges
+  return decoded.replace(/-/g, (match, offset) => {
+    const before = decoded[offset - 1]
+    const after = decoded[offset + 1]
+    
+    // Keep hyphen if between two digits (e.g., "2-4")
+    if (before && after && /\d/.test(before) && /\d/.test(after)) {
+      return '-'
+    }
+    
+    // Keep hyphen if between letters and digits (e.g., "200k-500k" or "£200k-£500k")
+    // Check a few chars back for numbers or currency symbols
+    const beforeContext = decoded.slice(Math.max(0, offset - 5), offset)
+    const afterContext = decoded.slice(offset + 1, offset + 6)
+    if (/[\d£kmKM]/.test(beforeContext) && /[\d£kmKM]/.test(afterContext)) {
+      return '-'
+    }
+    
+    return ' '  // Convert to space otherwise
+  })
 }
 
 /**
