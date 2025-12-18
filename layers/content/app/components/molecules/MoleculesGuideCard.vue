@@ -15,10 +15,12 @@
     </div>
     <div class="guide-card__description">
       <h3 class="guide-card__title | title-xs">{{ title }}</h3>
-      <p class="body-sm">{{ excerpt || description }}</p>
-      <div class="guide-card__details" v-if="readTime || publishedAt">
-        <AtomsPill v-if="readTime" class="body-xs">{{ readTime }} min read</AtomsPill>
-        <AtomsPill v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</AtomsPill>
+      <div class="guide-card__excerpt">
+        <p class="body-sm">{{ excerpt || description }}</p>
+        <div class="guide-card__details" v-if="readTime || publishedAt">
+          <AtomsPill v-if="readTime" class="body-xs">{{ readTime }} min read</AtomsPill>
+          <AtomsPill v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</AtomsPill>
+        </div>
       </div>
     </div>
   </NuxtLink>
@@ -117,6 +119,14 @@ const imageAlt = computed(() =>
     @include mq.mobile-only {
       justify-content: flex-start;
     }
+  }
+
+  &__excerpt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--size-12);
+    justify-content: space-between;
   }
 
   &__details {
