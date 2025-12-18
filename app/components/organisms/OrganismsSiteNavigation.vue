@@ -71,20 +71,19 @@
 
 </template>
 <script setup lang="ts">
-
-const { data: navigationData } = await useSanityQuery<GuideCategory[]>(navigationQuery)
-
 const {
   centerItems,
   actionItems,
   isMobileMenuOpen,
-  toggleMobileMenu,
+  openMobileMenu,
   closeMobileMenu,
   dropdown,
-} = useNavigation(navigationData)
+} = useNavigation()
+
+// Navigation data is fetched inside the composable for SSR safety
 
 function handleBurgerClick() {
-  toggleMobileMenu()
+  openMobileMenu()
 }
 </script>
 
