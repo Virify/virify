@@ -208,10 +208,11 @@ watch(viewMode, (layout) => {
 /**
  *  Ensure missing results do not break the map
  */
-const results = computed(() => {
+const results = computed((): ListingCardData[] => {
   const { results } = asObject(searchState.value)
   if (!Array.isArray(results)) return []
-  return results
+  // Filter out any results with null properties and properly type as ListingCardData
+  return results.filter((r): r is ListingCardData => r.property !== null)
 })
 
 /**

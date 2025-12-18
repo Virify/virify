@@ -88,99 +88,115 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
   }
   
   const criticalRules = `
-    Convert natural language property queries to a valid Prisma WHERE clause JSON for the Virify property search. Use ONLY the fields, relations, and enum values exactly as defined in the schema below.
+    Convert natural language property queries into valid Prisma WHERE clause JSON for Virify.
+    Study the schema below carefully - it contains all available fields, relations, and enum values.
 
-    CRITICAL PRISMA SYNTAX RULES:
+    ═══════════════════════════════════════════════════════════════════════════════
+    CRITICAL RULES - COMMON MISTAKES THAT BREAK QUERIES
+    ═══════════════════════════════════════════════════════════════════════════════
     
-    1. ROOT LEVEL ONLY: saleListing and rentalListing MUST appear at the ROOT of the query, never nested inside property.
+    1. PRICE FIELD IS AT ROOT LEVEL (most common error):
+       CORRECT: { price: { lte: 500000 }, saleListing: { isNot: null } }
+       WRONG: { saleListing: { is: { price: { lte: 500000 } } } }
+       → Price is on Listing model, NOT on saleListing or rentalListing
     
-    2. ONE-TO-ONE RELATIONS: Use 'is: { ... }' wrapper. Examples:
-       - property: { is: { numberBedrooms: 3 } }
-       - parking: { is: { features: { has: "GARAGE" } } }
-       - outdoorSpace: { is: { garden: { some: {} } } }
+    2. CRITICAL: ENUM FIELDS vs RELATION FIELDS
+       
+       READ THE MODEL DEFINITION IN THE SCHEMA TO DETERMINE FIELD TYPE:
+       
+       If field has @relation decorator → it's a RELATION → use object with fields like { name: "..." }
+       Example in schema: type PropertyType @relation(...)
+       In query: { type: { name: "House" } }
+       
+       If field type is an enum (defined in enum block) with NO @relation → it's DIRECT ENUM → use string value
+       Example in schema: position GardenPosition?
+       In query: { position: "REAR" }
+       
+       ONLY TWO RELATIONS IN THE ENTIRE SCHEMA USE .name:
+       - Property.type (PropertyType model)
+       - Property.classification (PropertyClassification model)
+       
+       EVERYTHING ELSE IS A DIRECT ENUM - DO NOT USE .name:
+       - OtherRoom.type → "OFFICE"
+       - Garden.position → "REAR" 
+       - Garden.facing → "SOUTH"
+       - All features arrays → "GARAGE", "EN_SUITE", etc.
+       
+       WRONG: { position: { name: "REAR" } }
+       CORRECT: { position: "REAR" }
     
-    3. ONE-TO-MANY RELATIONS: Use 'some: { ... }' wrapper. Examples:
-       - bathroomFeatures: { some: { floor: 0 } }
-       - otherRoom: { some: { type: "OFFICE" } }
-       - garden: { some: { facing: "SOUTH" } }
+    3. ALL PROPERTY FEATURES MUST BE NESTED INSIDE property:
+       
+       WRONG: { parking: { is: { features: { has: "GARAGE" } } } } [parking is NOT on Listing!]
+       CORRECT: { property: { is: { parking: { is: { features: { has: "GARAGE" } } } } } }
+       
+       WRONG: { bedroomFeatures: { some: { features: { has: "EN_SUITE" } } } } [not on Listing!]
+       CORRECT: { property: { is: { bedroomFeatures: { some: { features: { has: "EN_SUITE" } } } } } }
     
-    4. ENUM ARRAYS: Use 'has' for single value, 'hasEvery' for multiple. Examples:
-       - features: { has: "GARAGE" }
-       - features: { hasEvery: ["GARAGE", "DRIVEWAY"] }
+    4. LISTING TYPE FILTERS ARE AT ROOT:
+       CORRECT: { saleListing: { isNot: null } } // for sale properties
+       CORRECT: { rentalListing: { isNot: null } } // for rentals
+       WRONG: { property: { saleListing: { isNot: null } } }
     
-    5. EXISTENCE CHECK: Use 'isNot: null'. Examples:
-       - saleListing: { isNot: null } (for sales)
-       - rentalListing: { isNot: null } (for rentals)
+    5. PROPERTY RELATION REQUIRES 'is' WRAPPER:
+       ALL property fields and relations MUST be inside property: { is: { ... } }
+       
+       CORRECT: property: { is: { numberBedrooms: 3 } }
+       WRONG: property: { numberBedrooms: 3 }
+       WRONG: { parking: { is: { ... } } } [MUST be inside property!]
+       CORRECT: { property: { is: { parking: { is: { ... } } } } }
+       
+       → Listing has property relation, Property has all the feature relations
+       → parking, bedrooms, bathrooms, kitchen, etc. are ALL on Property, not Listing
     
-    6. RELATIONS vs ENUMS:
-       - PropertyType/PropertyClassification are RELATIONS: { type: { name: "House" } }
-       - Other type fields are ENUMS: { type: "OFFICE" }
+    6. ONE-TO-ONE RELATIONS USE 'is':
+       Use property: { is: { RELATION: { is: { ... } } } } for @unique relations:
+       - parking, outdoorSpace, additionalFeatures, accessibilityFeatures
+       - energyAndUtilities, runningCosts, securityFeatures, storageFeatures, utility
+       Example: property: { is: { parking: { is: { features: { has: "GARAGE" } } } } }
+    
+    7. ONE-TO-MANY RELATIONS USE 'some':
+       Use property: { is: { RELATION: { some: { ... } } } } for array relations:
+       - bedroomFeatures, bathroomFeatures, kitchenFeatures, reception, otherRoom, amenities
+       Example: property: { is: { bedroomFeatures: { some: { features: { has: "EN_SUITE" } } } } }
+    
+    8. NESTED RELATIONS (garden/yard/land inside outdoorSpace):
+       CORRECT: property: { is: { outdoorSpace: { is: { garden: { some: { facing: "SOUTH" } } } } } }
+       WRONG: property: { is: { garden: { some: { facing: "SOUTH" } } } }
+       → garden, yard, and land are nested inside outdoorSpace, not direct children of property
+    
+    9. ENUM ARRAYS:
+       - Single value: features: { has: "GARAGE" }
+       - Multiple (AND): features: { hasEvery: ["GARAGE", "EV_CHARGING"] }
+       - Multiple (OR): OR: [{ features: { has: "GARAGE" } }, { features: { has: "DRIVEWAY" } }]
 
-    NUMBER NOTATION RULES:
+    ═══════════════════════════════════════════════════════════════════════════════
+    NUMBER NOTATION
+    ═══════════════════════════════════════════════════════════════════════════════
     
-    7. "AT LEAST" NOTATION: Both "+3" and "3+" mean "at least 3" (use gte operator). Examples:
-       - "+3 bedrooms" or "3+ bedrooms" → property: { is: { numberBedrooms: { gte: 3 } } }
-       - "+2 bathrooms" or "2+ bathrooms" → property: { is: { numberBathrooms: { gte: 2 } } }
-       - "+1 garden" or "1+ garden" → outdoorSpace: { is: { garden: { some: {} } } }
-    
-    8. ABBREVIATED NUMBERS: "k" = thousand, "m" = million. Examples:
-       - "400k" = 400000
-       - "1.5m" = 1500000
-       - "250k" = 250000
-       - Apply to price fields: { saleListing: { is: { price: { lte: 400000 } } } }
-    
-    9. RANGE QUERIES: "between X and Y" or "X-Y" or "X to Y" (use gte and lte together). Examples:
-       - "between 1 and 3 bedrooms" → property: { is: { numberBedrooms: { gte: 1, lte: 3 } } }
-       - "2-4 bathrooms" → property: { is: { numberBathrooms: { gte: 2, lte: 4 } } }
-       - "between 200k and 500k" → saleListing: { is: { price: { gte: 200000, lte: 500000 } } }
-       - "300k to 600k" → saleListing: { is: { price: { gte: 300000, lte: 600000 } } }
+    - "k" = thousand: "400k" → 400000
+    - "m" = million: "1.5m" → 1500000
+    - "+N" or "N+" means "at least N": "3+ beds" → { gte: 3 }
+    - Ranges with hyphen: "2-4" means between 2 and 4, "200k-500k" → { gte: 200000, lte: 500000 }
+    - Currency: "£" or "gbp" both mean GBP (British pounds)
 
-    COMMON SEARCH PATTERNS & EDGE CASES:
+    ═══════════════════════════════════════════════════════════════════════════════
+    IMPORTANT FIELD MAPPINGS
+    ═══════════════════════════════════════════════════════════════════════════════
     
-    10. LISTING STATUS: Always filter out archived listings unless explicitly requested:
-        - Default: { archived: false }
-        - Also consider: { published: true } for active listings only
-    
-    11. BOOLEAN DEFAULTS: Some booleans have specific meanings:
-        - "chain free" → property: { is: { chainFree: true } }
-        - "vacant" → property: { is: { vacant: true } }
-        - "furnished" → rentalListing: { is: { furnishedStatus: "FURNISHED" } }
-        - "unfurnished" → rentalListing: { is: { furnishedStatus: "UNFURNISHED" } }
-    
-    12. PARKING QUERIES: "parking" is ambiguous - check for specifics:
-        - "with parking" → parking: { isNot: null }
-        - "garage" → parking: { is: { features: { has: "GARAGE" } } }
-        - "driveway" → parking: { is: { features: { has: "DRIVEWAY" } } }
-        - "no parking" → parking: { is: { features: { has: "NO_PARKING" } } } (rare but explicit)
-    
-    13. GARDEN/OUTDOOR SPACE: Multiple interpretations:
-        - "with garden" → outdoorSpace: { is: { garden: { some: {} } } }
-        - "south facing garden" → outdoorSpace: { is: { garden: { some: { facing: "SOUTH" } } } }
-        - "front garden" → outdoorSpace: { is: { garden: { some: { position: "FRONT" } } } }
-    
-    14. EN-SUITE QUERIES: Can mean bathroom OR bedroom feature:
-        - "en-suite" generally → bathroomFeatures: { some: { features: { has: "EN_SUITE" } } }
-        - "bedroom with en-suite" → bedroomFeatures: { some: { features: { has: "EN_SUITE" } } }
-    
-    15. FLOOR LEVEL: 0 = ground floor, positive = above, negative = below:
-        - "ground floor" → property: { is: { floorLevel: 0 } }
-        - "first floor" → property: { is: { floorLevel: 1 } }
-        - "basement" → property: { is: { floorLevel: { lt: 0 } } }
-    
-    16. AVAILABILITY STATUS: Check listing status for sale/rental:
-        - "available" (sale) → saleListing: { is: { availabilityStatus: "AVAILABLE" } }
-        - "under offer" → saleListing: { is: { availabilityStatus: "UNDER_OFFER" } }
-        - "available" (rental) → rentalListing: { is: { availabilityStatus: "AVAILABLE" } }
-    
-    17. TENURE TYPE (SALE ONLY): Freehold vs Leasehold:
-        - "freehold" → saleListing: { is: { tenureType: "FREEHOLD" } }
-        - "leasehold" → saleListing: { is: { tenureType: "LEASEHOLD" } }
-    
-    18. SIZE QUERIES: Property size is in square feet/meters (check units):
-        - "over 1000 sqft" → property: { is: { size: { gte: 1000 } } }
-        - Size may be null - handle gracefully with: { size: { not: null, gte: X } }
+    - Bedroom/bathroom counts: property: { is: { numberBedrooms: N, numberBathrooms: N } }
+    - Property type IS A RELATION: property: { is: { type: { name: "House" } } }
+    - Property classification IS A RELATION: property: { is: { classification: { name: "Detached" } } }
+    - OtherRoom type IS DIRECT ENUM: property: { is: { otherRoom: { some: { type: "OFFICE" } } } }
+    - Floor level: 0=ground, positive=above, negative=below
+    - Always filter out archived: { archived: false } (unless explicitly requested)
+    - Existence checks: { parking: { isNot: null } } or { parking: { is: null } }
 
-    RESPONSE FORMAT (JSON only, no markdown/comments):
+    ═══════════════════════════════════════════════════════════════════════════════
+    RESPONSE FORMAT
+    ═══════════════════════════════════════════════════════════════════════════════
+    
+    Return ONLY valid JSON (no markdown, no comments):
     {
       "whereClause": { ... },
       "queryAnalysis": {
@@ -188,6 +204,26 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
         "ignoredTerms": ["term3"]
       }
     }
+    
+    IMPORTANT - usedTerms MUST be human-readable summaries:
+    - Price: Format with currency symbol and commas: "£300,000" or "Under £500,000" or "£200k-£400k"
+    - Bedrooms: Combine ranges: "3-4 bedrooms" or "3+ bedrooms" or "3 bedrooms"
+    - Bathrooms: Same as bedrooms: "2+ bathrooms" or "2 bathrooms"
+    - Property type: Use proper capitalization: "House" not "HOUSE", "Detached house" not "DETACHED_HOUSE"
+    - Features: Human readable: "En-suite" not "EN_SUITE", "South-facing garden" not "SOUTH facing"
+    - Listing type: "For sale" or "To rent" not "saleListing" or "rentalListing"
+    - Location terms: Keep city/area names as-is
+    - Combine related terms into single phrases, not individual words
+    
+    Examples of GOOD usedTerms:
+    ["3-4 bedrooms", "House", "For sale", "Under £300,000", "Cardiff"]
+    ["2+ bathrooms", "Detached house", "En-suite", "Garage", "South-facing garden"]
+    ["Furnished", "To rent", "£1,000-£1,500 pcm", "City centre"]
+    
+    Examples of BAD usedTerms:
+    ["3", "4", "bedroom", "house", "sale", "300000"] [wrong - split terms]
+    ["DETACHED_HOUSE", "EN_SUITE", "GARAGE"] [wrong - enum values not human text]
+    ["saleListing", "rentalListing"] [wrong - use "For sale" or "To rent"]
     `;
 
   // Combine all sections
