@@ -164,7 +164,7 @@ const customComponents = {
 
   // Typography elements
   h1, h2, h3, h4, h5, h6 {
-    margin-bottom: var(--size-16);
+    margin-bottom: var(--size-24);
     font-weight: var(--font-bold);
     color: var(--foreground-100);
   }
@@ -198,9 +198,9 @@ const customComponents = {
   }
 
   p {
-    margin-bottom: var(--size-16);
+    margin-bottom: var(--size-24);
     font-size: var(--font-md);
-    line-height: var(--lineheight-lg);
+    line-height: var(--lineheight-md);
     color: var(--foreground-100);
 
     // Paragraphs immediately after headings get tighter spacing
@@ -224,7 +224,7 @@ const customComponents = {
     // Nested lists get tighter spacing
     ul, ol {
       margin-top: var(--size-8);
-      margin-bottom: var(--size-16);
+      margin-bottom: var(--size-24);
     }
   }
 
@@ -298,7 +298,7 @@ const customComponents = {
 }
 
 .content-block {
-  margin-bottom: var(--size-16);
+  margin-bottom: var(--size-24);
 }
 
 .content-image {

@@ -14,7 +14,7 @@
         ref="carouselRef"
         :slides="listings"
         slide-size="280px"
-        gap="var(--size-16)"
+        gap="var(--size-12)"
         :loop="false"
         :show-arrows="false"
         :options="{ slidesToScroll: 1 }"

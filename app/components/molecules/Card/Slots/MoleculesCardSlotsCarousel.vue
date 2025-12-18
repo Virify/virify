@@ -3,12 +3,12 @@
     <AtomsCloudFlareImage v-if="!isActive" :src="currentSlide?.image" :alt="currentSlide?.alt"
       class="m-card-slots-carousel__slide" loading="lazy" />
 
-    <MoleculesNewCarousel v-else :slides v-slot="{ slide }" v-model="currentIndex">
+    <MoleculesCardsCarousel v-else :slides v-slot="{ slide }" v-model="currentIndex">
       <nuxt-link :to="'/listing/' + propertyId">
         <AtomsCloudFlareImage :src="slide?.image" :alt="slide?.alt" class="m-card-slots-carousel__slide"
           loading="lazy" />
       </nuxt-link>
-    </MoleculesNewCarousel>
+    </MoleculesCardsCarousel>
   </div>
 </template>
 
