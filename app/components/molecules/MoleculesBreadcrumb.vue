@@ -1,14 +1,14 @@
 <template>
   <nav :class="['breadcrumb', variant && `breadcrumb--${variant}`]">
     <template v-for="(item, index) in items" :key="index">
-      <AtomsPill v-if="item.to" class="breadcrumb__item">
-        <NuxtLink :to="item.to" class="breadcrumb__link | body-sm">
+      <p v-if="item.to" class="breadcrumb__item">
+        <NuxtLink :to="item.to" class="breadcrumb__link | r-body-md-sm">
           {{ item.label }}
         </NuxtLink>
-      </AtomsPill>
-      <AtomsPill v-else class="breadcrumb__item breadcrumb__item--current | body-sm" aria-current="page">
+      </p>
+      <p v-else class="breadcrumb__item breadcrumb__item--current | r-body-md-sm" aria-current="page">
         {{ item.label }}
-      </AtomsPill>
+      </p>
 
       <span v-if="index < items.length - 1" class="breadcrumb__separator">
         /
@@ -42,24 +42,6 @@ defineProps<{
     padding: var(--size-8) 0 var(--size-8) 0;
   }
 
-  &__item {
-    background: var(--background-200);
-    color: var(--foreground-100);
-    border: 1px solid var(--secondary-400);
-    transition: background 0.2s ease, color 0.2s ease;
-
-    &--current {
-      background: var(--secondary-400);
-      color: var(--monochrome-900);
-      border: 1px solid var(--foreground-200);
-    }
-
-    &:hover {
-      background: var(--secondary-400);
-      color: var(--foreground-100);
-    }
-  }
-
   &__link {
     color: inherit;
     text-decoration: none;
@@ -67,6 +49,12 @@ defineProps<{
 
   &__separator {
     color: var(--secondary-400);
+  }
+
+  &__item {
+    &--current {
+      font-weight: var(--font-semibold);
+    }
   }
 
   // Blue variant modifier

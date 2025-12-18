@@ -114,7 +114,6 @@ onMounted(() => {
   }
 
   &__item {
-    margin-bottom: var(--size-8);
 
     &--2 {
       padding-left: var(--size-16);

@@ -8,7 +8,6 @@
         :alt="imageAlt"
         :width="600" 
         :height="300"
-        loading="lazy"
         class="guide-card__image"
         placeholder='/img/preload.svg'
       />  

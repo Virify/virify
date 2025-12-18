@@ -109,13 +109,13 @@ defineExpose({
 .embla-slides {
   display: flex;
   align-items: stretch;
+  gap: v-bind(gap);
 }
 
 .embla-slide {
   flex: 0 0 v-bind(slideSize);
   min-width: 0;
   cursor: grab;
-  padding-right: v-bind(gap);
 }
 
 .embla-slide:active {

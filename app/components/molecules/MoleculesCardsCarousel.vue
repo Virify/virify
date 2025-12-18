@@ -10,12 +10,12 @@
 
     <template v-if="navigation">
       <button class="m-new-carousel__button m-new-carousel__button--prev" aria-label="Previous slide"
-        @click.prevent="emblaApi?.scrollPrev">
+        @click.prevent="() => emblaApi?.scrollPrev()">
         <AtomsIcon icon="chevron-left" aria-hidden="true" />
       </button>
 
       <button class="m-new-carousel__button m-new-carousel__button--next" aria-label="Next slide"
-        @click.prevent="emblaApi?.scrollNext">
+        @click.prevent="() => emblaApi?.scrollNext()">
         <AtomsIcon icon="chevron-right" aria-hidden="true" />
       </button>
     </template>
