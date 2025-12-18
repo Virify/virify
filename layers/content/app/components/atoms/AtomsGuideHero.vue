@@ -72,7 +72,7 @@ const fallbackAlt = computed(() =>
     height: 100%;
     object-fit: cover;
     z-index: 1;
-    filter: brightness(0.6) contrast(1.1);
+    filter: brightness(0.7) contrast(1.1);
   }
 
   &__content {

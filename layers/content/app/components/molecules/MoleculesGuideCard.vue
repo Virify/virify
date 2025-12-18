@@ -14,11 +14,11 @@
       />  
     </div>
     <div class="guide-card__description">
-      <h3 class="guide-card__title | title-sm">{{ title }}</h3>
+      <h3 class="guide-card__title | title-xs">{{ title }}</h3>
       <p class="body-sm">{{ excerpt || description }}</p>
       <div class="guide-card__details" v-if="readTime || publishedAt">
-        <p v-if="readTime" class="body-xs">{{ readTime }} min read</p>
-        <p v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</p>
+        <AtomsPill v-if="readTime" class="body-xs">{{ readTime }} min read</AtomsPill>
+        <AtomsPill v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</AtomsPill>
       </div>
     </div>
   </NuxtLink>
@@ -55,6 +55,7 @@ const imageAlt = computed(() =>
   background: var(--background-200);
   height: 100%;
   width: 100%;
+  border: 1px solid var(--monochrome-500);
 
   &:hover {
     transform: translateY(-4px);
@@ -97,20 +98,20 @@ const imageAlt = computed(() =>
   }
 
   &__title {
-    color: var(--secondary-400);
+    color: var(--foreground-100);
     margin-bottom: var(--size-8);
   }
 
   &__description {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-start;
     padding: var(--size-20);
     color: var(--foreground-100);
     text-align: left;
     flex: 1;
-    gap: var(--size-12);
+    gap: var(--size-4);
     min-height: 0;
 
     @include mq.mobile-only {
@@ -124,7 +125,7 @@ const imageAlt = computed(() =>
     justify-content: space-between;
     flex-direction: row;
     align-items: center;
-    color: var(--secondary-400);
+    color: var(--foreground-200);
     padding-top: var(--size-16);
     flex-shrink: 0;
 

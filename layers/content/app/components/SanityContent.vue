@@ -166,7 +166,7 @@ const customComponents = {
   h1, h2, h3, h4, h5, h6 {
     margin-bottom: var(--size-16);
     font-weight: var(--font-bold);
-    color: var(--secondary-400);
+    color: var(--foreground-100);
   }
 
   h1 {
