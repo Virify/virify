@@ -3,7 +3,7 @@
     <MoleculesAiSearchLoading v-if="isLoading" />
 
     <template v-else>
-      <h2 class="| title-md">AI filters</h2>
+      <h2 class="| title-md">Describe your new home</h2>
 
       <MoleculesAiSearchFormFilters :initial-query :loading="isChecking" @submit-search="searchSubmit" @reset-search="searchReset" />
     </template>
