@@ -19,11 +19,11 @@
 
       <div class="m-card-template__content">
         <slot name="content"
-          v-bind="{ price, priceGuide, listingType, fullAddress, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
+          v-bind="{ price, priceGuide, listingType, address, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
           <div class="m-card-template__content-grid">
             <MoleculesCardSlotsViewLink :property-id class="m-card-template__content-subgrid">
               <MoleculesCardSlotsPrice :price :price-guide :listing-type />
-              <MoleculesCardSlotsOverview :property-type :full-address />
+              <MoleculesCardSlotsOverview :property-type :address />
               <MoleculesCardSlotsIcons :room-counts :has-outdoor-space :parking-type />
             </MoleculesCardSlotsViewLink>
 
@@ -109,10 +109,12 @@ const listingType = computed(() => {
   return ''
 })
 
-const fullAddress = computed(() => {
-  const { fullAddress } = asObject(property.value?.address)
+const address = computed(() => {
+  const { address } = asObject(property.value)
 
-  return fullAddress
+  const { street, city, postcode } = asObject(address)
+
+  return `${street}, ${city}, ${postcode.split(" ")[0]}`
 })
 
 const propertyType = computed<string>(() => {

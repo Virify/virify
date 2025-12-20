@@ -5,7 +5,7 @@
     </template>
 
     <template
-      #content="{ price, priceGuide, propertyType, fullAddress, roomCounts, pills, propertyId, description, premiumFeatures }">
+      #content="{ price, priceGuide, propertyType, address, roomCounts, pills, propertyId, description, premiumFeatures }">
       <MoleculesCardSlotsViewLink :property-id>
         <span class="m-card-premium__title | title-sm">Spotlight</span>
       </MoleculesCardSlotsViewLink>
@@ -14,7 +14,7 @@
         <div class="m-card-premium__grid-row">
           <MoleculesCardSlotsViewLink :property-id>
             <MoleculesCardSlotsPrice :price :price-guide />
-            <MoleculesCardSlotsOverview :property-type :full-address />
+            <MoleculesCardSlotsOverview :property-type :address />
             <MoleculesCardSlotsIcons :room-counts />
           </MoleculesCardSlotsViewLink>
 
