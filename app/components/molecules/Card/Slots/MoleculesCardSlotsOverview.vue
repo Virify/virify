@@ -4,8 +4,8 @@
       {{ propertyType }}
     </p>
 
-    <p v-if="fullAddress" class="m-card-slots-overview__address | body-xs">
-      {{ fullAddress }}
+    <p v-if="address" class="m-card-slots-overview__address | body-xs">
+      {{ address }}
     </p>
   </div>
 </template>
@@ -13,7 +13,7 @@
 <script setup lang="ts">
 interface Props {
   propertyType?: string | null | unknown
-  fullAddress?: string | null
+  address?: string | null
 }
 
 defineProps<Props>()
@@ -30,6 +30,9 @@ defineProps<Props>()
 
   &__address {
     margin-bottom: var(--size-12);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>
