@@ -16,9 +16,9 @@
       <h3 class="guide-card__title | title-xs">{{ title }}</h3>
       <div class="guide-card__excerpt">
         <p class="body-sm">{{ excerpt || description }}</p>
-        <div class="guide-card__details" v-if="readTime || publishedAt">
+        <div class="guide-card__details" v-if="readTime || updatedAt">
           <AtomsPill v-if="readTime" class="body-xs">{{ readTime }} min read</AtomsPill>
-          <AtomsPill v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</AtomsPill>
+          <AtomsPill v-if="updatedAt" class="body-xs">Updated on {{ formatDate(updatedAt) }}</AtomsPill>
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@ const props = defineProps<{
   excerpt?: string;
   readTime?: number;
   isFeatured?: boolean;
-  publishedAt?: string;
+  updatedAt?: string;
 }>();
 
 // Generate descriptive alt text for SEO and accessibility
@@ -137,12 +137,6 @@ const imageAlt = computed(() =>
     color: var(--foreground-200);
     padding-top: var(--size-16);
     flex-shrink: 0;
-
-    @include mq.small-tablet {
-      flex-direction: column;
-      align-items: center;
-      gap: var(--size-8);
-    }
 
     @include mq.desktop {
       flex-direction: row;

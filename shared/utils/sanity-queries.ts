@@ -29,6 +29,7 @@ export const categoryBySlugQuery = `*[_type == "guideCategory" && slug.current =
   "guides": *[_type == "guide" && isPublished == true && category._ref == ^._id] | order(orderIndex asc) {
     _id,
     _type,
+    _updatedAt,
     title,
     slug,
     excerpt,
@@ -48,6 +49,7 @@ export const categoryBySlugQuery = `*[_type == "guideCategory" && slug.current =
 export const guideBySlugQuery = `*[_type == "guide" && slug.current == $slug][0] {
   _id,
   _type,
+  _updatedAt,
   title,
   slug,
   excerpt,

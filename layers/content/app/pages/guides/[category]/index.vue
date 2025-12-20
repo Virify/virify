@@ -13,7 +13,7 @@
           :to="`/guides/${categorySlug}/${guide.slug.current}`"
           :excerpt="guide.excerpt"
           :read-time="guide.readTime"
-          :published-at="guide.publishedAt"
+          :updated-at="guide._updatedAt"
           :is-featured="guide.isFeatured"
           :image="guide.heroImage"
         />
@@ -38,6 +38,7 @@ const categorySlug = route.params.category as string;
 const { isWaitingListMode } = useWaitingListMode()
 
 const { data: category } = await useSanityQuery<GuideCategory>(categoryBySlugQuery, { slug: categorySlug })
+
 const guides = computed(() => category.value?.guides || []);
 
 const title = computed(() => (category.value ? category.value.title : "Category Not Found"));
