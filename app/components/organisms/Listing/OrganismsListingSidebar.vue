@@ -64,7 +64,9 @@ interface Props {
   isDraft?: boolean
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
+
+  
 
 const newBuild = computed(() => {
   // if built in the last 3 years, return "New build"
