@@ -22,8 +22,8 @@ export default defineEventHandler((event) => {
       '/api/__sitemap__/',           // Nuxt SEO sitemap generation
       '/api/preview/enable',         // Sanity preview enable
       '/api/preview/disable',        // Sanity preview disable
-      '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
-      '/api/analytics/mortgage/track', // Track mortgage calculator usage
+      // '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
+      // '/api/analytics/mortgage/track', // Track mortgage calculator usage
       '/auth/update-admin-password', // Admin password update (protected by TASK_SECRET)
     ];
 
