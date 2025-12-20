@@ -94,13 +94,13 @@
           </div>
 
           <!-- Mortgage Calculator (Sale listings only) -->
-          <div v-if="listing?.saleListing && listing?.price" class="p-listing__section">
+          <!-- <div v-if="listing?.saleListing && listing?.price" class="p-listing__section">
             <h2 class="title-md">Mortgage Calculator</h2>
             <OrganismsMortgageCalculator 
               :property-price="listing.price" 
               :listing-id="String(listing.id)" 
             />
-          </div>
+          </div> -->
 
           <!-- Price Paid History -->
           <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">

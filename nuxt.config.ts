@@ -47,13 +47,14 @@ export default defineNuxtConfig({
   robots: {
     allow: [
       '/',
-      '/mortgage-calculator',
+      // '/mortgage-calculator',
       '/price-paid',
       '/contact',
       '/guides',
       '/guides/*',
       '/privacy',
       '/terms',
+      '/cookie',
     ],
     disallow: [
       '/account',
