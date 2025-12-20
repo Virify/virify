@@ -101,6 +101,7 @@ export interface GuideCategory {
 export interface Guide {
   _id: string
   _type: 'guide'
+  _updatedAt?: string
   title: string
   slug: SanitySlug
   excerpt?: string

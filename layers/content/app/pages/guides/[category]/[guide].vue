@@ -49,7 +49,7 @@ const breadcrumbItems = computed(() => [
 const heroMeta = computed(() => {
   const items: string[] = []
   if (guide.value?.readTime) items.push(`${guide.value.readTime} min read`)
-  if (guide.value?.publishedAt) items.push(`Published ${formatDate(guide.value.publishedAt)}`)
+  if (guide.value?._updatedAt) items.push(`Updated ${formatDate(guide.value._updatedAt)}`)
   return items
 })
 
