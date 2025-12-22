@@ -219,6 +219,32 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     - Existence checks: { parking: { isNot: null } } or { parking: { is: null } }
 
     ═══════════════════════════════════════════════════════════════════════════════
+    AMENITY SEARCH RULES
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    Amenities are stored as a list of nearby facilities with type, subtype, and distanceM (in meters).
+    For location-based queries, use these generic rules:
+
+    * BASIC AMENITY PRESENCE:
+      - "near [amenity]" → property: { is: { amenities: { some: { [field]: "[VALUE]" } } } }
+      - Map common terms to schema values:
+        - "school" → type: "EDUCATION", subtype: "SCHOOL"
+        - "hospital" → type: "HEALTHCARE", subtype: "HOSPITAL"
+        - "train station" → type: "TRANSPORT", subtype: "TRAIN_STATION"
+        - "bus stop" → type: "TRANSPORT", subtype: "BUS_STOP"
+        - "park" → type: "GREEN_SPACE", subtype: "PARK"
+        - "gym" → type: "SHOPPING_ENTERTAINMENT", subtype: "GYM"
+
+    * DISTANCE-BASED SEARCH:
+      - "within [N] miles of [amenity]" → property: { is: { amenities: { some: { [field]: "[VALUE]", distanceM: { lte: [N * 1609] } } } } }
+      - Convert miles to meters: 1 mile = 1609 meters
+      - Examples: "within 2 miles" = distanceM: { lte: 3218 }
+
+    * MULTIPLE AMENITIES:
+      - Combine with AND: multiple some conditions on amenities
+      - "near school and gym" → amenities: { some: { type: "EDUCATION" } }, amenities: { some: { type: "SHOPPING_ENTERTAINMENT" } }
+
+    ═══════════════════════════════════════════════════════════════════════════════
     RESPONSE FORMAT
     ═══════════════════════════════════════════════════════════════════════════════
     

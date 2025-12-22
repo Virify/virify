@@ -12,46 +12,28 @@
         :lat="lat"
         :lon="lon"
         :listing="listing"
-        @amenities-loaded="handleAmenitiesLoaded"
+        :amenities="amenities"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogLogin } from "#components";
+import type { Amenities } from '~~/layers/database/server/database/prisma/generated/client';
+
 
 interface Props {
   lat: number;
   lon: number;
   listing?: any;
+  amenities: Amenities[];
 }
 
 const props = defineProps<Props>();
 
-const { loggedIn } = useUserSession();
-const { showDialog } = useDialog();
 const mapRef = ref();
 const mapMarker = computed(() => props.listing);
 
-function openLogin() {
-  showDialog({
-    component: ViewsDialogLogin,
-  });
-}
-
-function handleAmenitiesLoaded() {
-  // Recenter map after amenities are loaded (content has changed the layout)
-  nextTick(() => {
-    if (mapRef.value?.recenterMap) {
-      setTimeout(() => {
-        mapRef.value.recenterMap();
-      }, 100);
-    }
-  });
-}
-
-// Ensure map loads properly after component mount
 onMounted(() => {
   nextTick(() => {
     if (mapRef.value?.recenterMap) {

@@ -117,7 +117,7 @@
           <!-- Location & Amenities (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
             <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!"
-              :listing="listing" :amenities="amenitiesArray" />
+              :listing="listing" :amenities="property?.amenities" />
           </div>
 
           <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
