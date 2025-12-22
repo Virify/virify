@@ -36,6 +36,7 @@ function loadSchemaFiles(): string {
     "property/utility.prisma",
     "property/runningCosts.prisma",
     "property/additionalFeatures.prisma",
+    "property/amenties.prisma",
     "property/energyAndUtils.prisma",
     "property/outdoor-space/outdoorSpace.prisma",
     "property/outdoor-space/garden.prisma",
@@ -88,87 +89,112 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
   }
   
   const criticalRules = `
-    Convert natural language property queries into valid Prisma WHERE clause JSON for Virify.
-    Study the schema below carefully - it contains all available fields, relations, and enum values.
+    ═══════════════════════════════════════════════════════════════════════════════
+    AI PROPERTY SEARCH PROMPT - RULE-BASED SCHEMA COMPLIANCE
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    TASK: Convert natural language property search queries into VALID Prisma WHERE clauses for Virify listings.
+    CRITICAL: Study the RELEVANT PRISMA SCHEMA and AVAILABLE PROPERTY TYPES sections below CAREFULLY. Use EXACT field names, relations, and enum values from the schema - NO INVENTIONS.
 
     ═══════════════════════════════════════════════════════════════════════════════
-    CRITICAL RULES - COMMON MISTAKES THAT BREAK QUERIES
+    MANDATORY SCHEMA LOOKUP PROTOCOL
     ═══════════════════════════════════════════════════════════════════════════════
-    
-    1. PRICE FIELD IS AT ROOT LEVEL (most common error):
-       CORRECT: { price: { lte: 500000 }, saleListing: { isNot: null } }
-       WRONG: { saleListing: { is: { price: { lte: 500000 } } } }
-       → Price is on Listing model, NOT on saleListing or rentalListing
-    
-    2. CRITICAL: ENUM FIELDS vs RELATION FIELDS
-       
-       READ THE MODEL DEFINITION IN THE SCHEMA TO DETERMINE FIELD TYPE:
-       
-       If field has @relation decorator → it's a RELATION → use object with fields like { name: "..." }
-       Example in schema: type PropertyType @relation(...)
-       In query: { type: { name: "House" } }
-       
-       If field type is an enum (defined in enum block) with NO @relation → it's DIRECT ENUM → use string value
-       Example in schema: position GardenPosition?
-       In query: { position: "REAR" }
-       
-       ONLY TWO RELATIONS IN THE ENTIRE SCHEMA USE .name:
-       - Property.type (PropertyType model)
-       - Property.classification (PropertyClassification model)
-       
-       EVERYTHING ELSE IS A DIRECT ENUM - DO NOT USE .name:
-       - OtherRoom.type → "OFFICE"
-       - Garden.position → "REAR" 
-       - Garden.facing → "SOUTH"
-       - All features arrays → "GARAGE", "EN_SUITE", etc.
-       
-       WRONG: { position: { name: "REAR" } }
-       CORRECT: { position: "REAR" }
-    
-    3. ALL PROPERTY FEATURES MUST BE NESTED INSIDE property:
-       
-       WRONG: { parking: { is: { features: { has: "GARAGE" } } } } [parking is NOT on Listing!]
-       CORRECT: { property: { is: { parking: { is: { features: { has: "GARAGE" } } } } } }
-       
-       WRONG: { bedroomFeatures: { some: { features: { has: "EN_SUITE" } } } } [not on Listing!]
-       CORRECT: { property: { is: { bedroomFeatures: { some: { features: { has: "EN_SUITE" } } } } } }
-    
-    4. LISTING TYPE FILTERS ARE AT ROOT:
-       CORRECT: { saleListing: { isNot: null } } // for sale properties
-       CORRECT: { rentalListing: { isNot: null } } // for rentals
-       WRONG: { property: { saleListing: { isNot: null } } }
-    
-    5. PROPERTY RELATION REQUIRES 'is' WRAPPER:
-       ALL property fields and relations MUST be inside property: { is: { ... } }
-       
-       CORRECT: property: { is: { numberBedrooms: 3 } }
-       WRONG: property: { numberBedrooms: 3 }
-       WRONG: { parking: { is: { ... } } } [MUST be inside property!]
-       CORRECT: { property: { is: { parking: { is: { ... } } } } }
-       
-       → Listing has property relation, Property has all the feature relations
-       → parking, bedrooms, bathrooms, kitchen, etc. are ALL on Property, not Listing
-    
-    6. ONE-TO-ONE RELATIONS USE 'is':
-       Use property: { is: { RELATION: { is: { ... } } } } for @unique relations:
-       - parking, outdoorSpace, additionalFeatures, accessibilityFeatures
-       - energyAndUtilities, runningCosts, securityFeatures, storageFeatures, utility
-       Example: property: { is: { parking: { is: { features: { has: "GARAGE" } } } } }
-    
-    7. ONE-TO-MANY RELATIONS USE 'some':
-       Use property: { is: { RELATION: { some: { ... } } } } for array relations:
-       - bedroomFeatures, bathroomFeatures, kitchenFeatures, reception, otherRoom, amenities
-       Example: property: { is: { bedroomFeatures: { some: { features: { has: "EN_SUITE" } } } } }
-    
-    8. NESTED RELATIONS (garden/yard/land inside outdoorSpace):
-       CORRECT: property: { is: { outdoorSpace: { is: { garden: { some: { facing: "SOUTH" } } } } } }
-       WRONG: property: { is: { garden: { some: { facing: "SOUTH" } } } }
-       → garden, yard, and land are nested inside outdoorSpace, not direct children of property
-    
-    9. ENUM ARRAYS:
-       - Single value: features: { has: "GARAGE" }
-       - Multiple (AND): features: { hasEvery: ["GARAGE", "EV_CHARGING"] }
-       - Multiple (OR): OR: [{ features: { has: "GARAGE" } }, { features: { has: "DRIVEWAY" } }]
+
+    BEFORE WRITING ANY QUERY: Read the RELEVANT PRISMA SCHEMA section and find the EXACT field/relation for each term.
+
+    STEP 1 - FIELD IDENTIFICATION:
+       - "garden" → Schema lookup: OutdoorSpace.garden Garden[] (one-to-many relation inside outdoorSpace)
+       - "parking" → Schema lookup: Property.parking Parking? (one-to-one relation)
+       - "garage" → Schema lookup: Parking.features ParkingFeature[] (enum array on parking relation)
+       - "EPC" → Schema lookup: EnergyAndUtilities.epcRating EPCRating (direct enum)
+       - "amenities" → Schema lookup: Property.amenities Amenities[] (model list relation)
+
+    STEP 2 - APPLY EXACT TYPE RULES:
+       - Direct enum (e.g., epcRating): { field: "VALUE" }
+       - Enum array (e.g., features): { field: { has: "VALUE" } }
+       - One-to-one relation (e.g., parking?): { relation: { is: { ... } } } or { isNot: null }
+       - One-to-many relation (e.g., bedroomFeatures[]): { relation: { some: { ... } } }
+       - Model list (e.g., amenities[]): { relation: { some: { field: "VALUE" } } }
+
+    STEP 3 - NESTING PROTOCOL:
+       - ALL property fields: property: { is: { ... } }
+       - Nested relations: Follow exact schema hierarchy
+       - Garden inside outdoorSpace: outdoorSpace: { is: { garden: { some: { ... } } } }
+
+    CRITICAL EXAMPLES:
+    - "has garden" → property: { is: { outdoorSpace: { is: { garden: { some: {} } } } } }
+    - "has garage" → property: { is: { parking: { is: { features: { has: "GARAGE" } } } } }
+    - "EPC C or better" → property: { is: { energyAndUtilities: { is: { epcRating: { in: ["A", "B", "C"] } } } } }
+    - "has gym nearby" → property: { is: { amenities: { some: { type: "HEALTHCARE", subtype: "GYM" } } } }
+
+    ═══════════════════════════════════════════════════════════════════════════════
+    QUERY TYPE RULES
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    - PRICE QUERIES: "£300k", "under £500k" → { price: { lte: 500000 } } + listing filter.
+    - BEDROOM/BATHROOM: "3 beds" → property: { is: { numberBedrooms: 3 } }
+    - PROPERTY TYPE: "House" → property: { is: { type: { name: "House" } } } (relation!)
+    - CLASSIFICATION: "Detached" → property: { is: { classification: { name: "Detached" } } } (relation!)
+    - LOCATION: Use address fields if specified, but schema may not have full location - prioritize property fields.
+    - FEATURES: See RULE-BASED 'HAS' section below.
+
+    ═══════════════════════════════════════════════════════════════════════════════
+    RULE-BASED 'HAS' AND FIELD MAPPING (MANDATORY SCHEMA LOOKUP)
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    FOR EVERY 'has [X]' or feature query, FIRST look up the exact field/relation in the RELEVANT PRISMA SCHEMA section above.
+    Determine the field's type from the schema definition (e.g., field: Type?, field: Type[], @relation, etc.).
+    APPLY THESE EXACT RULES BASED ON SCHEMA TYPE (no exceptions, no guessing):
+
+    * DIRECT SINGLE ENUM (e.g., constructionType ConstructionType?, boilerType BoilerType?):
+      - Presence: { [field]: { not: null } }
+      - Specific: { [field]: "ENUM_VALUE" }
+
+    * DIRECT ENUM ARRAY (e.g., features ParkingFeature[], renewables RenewableEnergy[]):
+      - Presence: { [field]: { isEmpty: false } }
+      - Specific: { [field]: { has: "ENUM_VALUE" } } or { hasSome: ["VAL1", "VAL2"] }
+
+    * ONE-TO-ONE RELATION (e.g., parking Parking?, securityFeatures Security?):
+      - Presence: { [relation]: { isNot: null } }
+      - With features: { [relation]: { is: { features: { isEmpty: false } } } }
+      - Specific feature: { [relation]: { is: { features: { has: "ENUM_VALUE" } } } }
+
+    * ONE-TO-MANY RELATION (e.g., bedroomFeatures Bedroom[], kitchenFeatures Kitchen[]):
+      - Presence: { [relation]: { some: {} } }
+      - With features: { [relation]: { some: { features: { isEmpty: false } } } }
+      - Specific feature: { [relation]: { some: { features: { has: "ENUM_VALUE" } } } }
+
+    * RELATION WITH TYPE/FIELD (e.g., reception Reception[], otherRoom OtherRoom[] with type ReceptionType):
+      - Presence: { [relation]: { some: {} } }
+      - Specific type: { [relation]: { some: { type: "ENUM_VALUE" } } }
+
+    * MODEL LIST RELATIONS (e.g., amenities Amenities[] where Amenities is a model):
+      - Presence: { [relation]: { some: {} } }
+      - Specific: { [relation]: { some: { [field]: "VALUE" } } } (check model fields like type, name)
+
+    ALWAYS nest property fields inside property: { is: { ... } }
+    If unsure, default to presence check using the appropriate wrapper (isNot for one-to-one, some for arrays).
+
+    Examples (verified against schema):
+    - "has garage": property: { is: { parking: { is: { features: { has: "GARAGE" } } } } }
+    - "has garden": property: { is: { outdoorSpace: { is: { garden: { some: {} } } } } }
+    - "has en-suite": property: { is: { bedroomFeatures: { some: { features: { has: "EN_SUITE" } } } } }
+    - "has kitchen island": property: { is: { kitchenFeatures: { some: { features: { has: "ISLAND" } } } } }
+    - "has gym nearby": property: { is: { amenities: { some: { type: "HEALTHCARE", subtype: "GYM" } } } }
+
+    ═══════════════════════════════════════════════════════════════════════════════
+    EPC RATING LOGIC
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    - EPC ratings are ordered from best to worst: A, B, C, D, E, F, G.
+    - If a user queries for "EPC higher than C" or "EPC > C", it means C, B, and A (i.e., all ratings better than or equal to C).
+    - If a user queries for "EPC lower than C" or "EPC < C", it means D, E, F, G (all ratings worse than C).
+    - If a user queries for "EPC C or better", include C, B, and A.
+    - If a user queries for "EPC C or worse", include C, D, E, F, G.
+    - Prisma query for EPC rating must use:
+      property: { is: { energyAndUtilities: { is: { epcRating: { in: ["A", "B", "C"] } } } } }
+    - Always use the correct enum values: "A", "B", "C", "D", "E", "F", "G" (as defined in the schema).
+    - NEVER use comparison operators like gt, lt, gte, lte on enum fields - use 'in' arrays instead.
 
     ═══════════════════════════════════════════════════════════════════════════════
     NUMBER NOTATION
