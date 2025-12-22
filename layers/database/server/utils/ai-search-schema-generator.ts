@@ -262,20 +262,22 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     - Bedrooms: Combine ranges: "3-4 bedrooms" or "3+ bedrooms" or "3 bedrooms"
     - Bathrooms: Same as bedrooms: "2+ bathrooms" or "2 bathrooms"
     - Property type: Use proper capitalization: "House" not "HOUSE", "Detached house" not "DETACHED_HOUSE"
-    - Features: Human readable: "En-suite" not "EN_SUITE", "South-facing garden" not "SOUTH facing"
+    - Features: Human readable: "En-suite" not "EN_SUITE", "South-facing garden" not "SOUTH facing", "Garden" for garden presence
     - Listing type: "For sale" or "To rent" not "saleListing" or "rentalListing"
     - Location terms: Keep city/area names as-is
+    - Amenities: Include distance context: "Near hospital", "Within 2 miles of gym", "Close to school"
     - Combine related terms into single phrases, not individual words
     
     Examples of GOOD usedTerms:
-    ["3-4 bedrooms", "House", "For sale", "Under £300,000", "Cardiff"]
-    ["2+ bathrooms", "Detached house", "En-suite", "Garage", "South-facing garden"]
-    ["Furnished", "To rent", "£1,000-£1,500 pcm", "City centre"]
+    ["3-4 bedrooms", "House", "For sale", "Under £300,000", "Cardiff", "Near hospital", "Within 2 miles of gym"]
+    ["2+ bathrooms", "Detached house", "En-suite", "Garage", "South-facing garden", "Close to school"]
+    ["Furnished", "To rent", "£1,000-£1,500 pcm", "City centre", "Near train station"]
     
     Examples of BAD usedTerms:
     ["3", "4", "bedroom", "house", "sale", "300000"] [wrong - split terms]
     ["DETACHED_HOUSE", "EN_SUITE", "GARAGE"] [wrong - enum values not human text]
     ["saleListing", "rentalListing"] [wrong - use "For sale" or "To rent"]
+    ["school", "gym"] [wrong - use "Near school", "Close to gym"]
     `;
 
   // Combine all sections
