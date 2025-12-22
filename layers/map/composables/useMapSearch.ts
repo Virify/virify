@@ -164,8 +164,8 @@ export function useMapSearch() {
     try {
       // Search for different types of amenities
       const amenityTypes = [
-        { category: 'schools', query: 'school', searchategories: 'school' },
-        { category: 'hospitals', query: 'hospital', categories: 'hospital' },
+        { category: 'schools', query: 'school' },
+        { category: 'hospitals', query: 'hospital' },
         { category: 'train_stations', query: 'train_station'},
         { category: 'bus_stations', query: 'bus_station'},
         { category: 'parks', query: 'park' },

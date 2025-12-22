@@ -202,7 +202,7 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     
     - "k" = thousand: "400k" → 400000
     - "m" = million: "1.5m" → 1500000
-    - "+N" or "N+" means "at least N": "3+ beds" → { gte: 3 }
+    - "+N" or "N+" means "at least N": "3+ bedroom" → { gte: 3 }
     - Ranges with hyphen: "2-4" means between 2 and 4, "200k-500k" → { gte: 200000, lte: 500000 }
     - Currency: "£" or "gbp" both mean GBP (British pounds)
 
