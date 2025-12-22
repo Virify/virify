@@ -42,6 +42,21 @@
                 icon="amenities/train" 
                 :size="16" 
               />
+              <AtomsIcon
+                v-else-if="categoryKey === 'bus_stations'" 
+                icon="amenities/bus" 
+                :size="16" 
+              />
+              <AtomsIcon
+                v-else-if="categoryKey === 'parks'" 
+                icon="amenities/park" 
+                :size="16" 
+              />
+              <AtomsIcon
+                v-else-if="categoryKey === 'gyms'" 
+                icon="amenities/fitness" 
+                :size="16" 
+              />
             </div>
             <div class="m-listing-amenities__item-content">
               <NuxtLink :to="getMapUrl(item)" external target="_blank" rel="noopener noreferrer">
@@ -84,7 +99,10 @@ const amenityCategories = computed(() =>
 const hasNoAmenities = computed(() => 
   !groupedAmenities.value.schools?.length && 
   !groupedAmenities.value.hospitals?.length && 
-  !groupedAmenities.value.train_stations?.length
+  !groupedAmenities.value.train_stations?.length && 
+  !groupedAmenities.value.bus_stations?.length && 
+  !groupedAmenities.value.parks?.length && 
+  !groupedAmenities.value.gyms?.length
 )
 
 function formatCategoryKey(key: string) {
@@ -109,8 +127,8 @@ onMounted(async () => {
 
 <style lang="scss">
 .m-listing-amenities {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--size-16);
   width: 100%;
 

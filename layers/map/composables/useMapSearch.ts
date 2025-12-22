@@ -146,21 +146,30 @@ export function useMapSearch() {
     schools: Amenity[]
     hospitals: Amenity[]
     train_stations: Amenity[]
+    bus_stations: Amenity[]
+    parks: Amenity[]
+    gyms: Amenity[]
   }
 
-  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000): Promise<Amenities> {
+  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000, pick?: number): Promise<Amenities> {
     const amenities: Amenities = {
       schools: [],
       hospitals: [],
-      train_stations: []
+      train_stations: [],
+      bus_stations: [],
+      parks: [],
+      gyms: []
     };
 
     try {
       // Search for different types of amenities
       const amenityTypes = [
-        { category: 'schools', query: 'school' },
-        { category: 'hospitals', query: 'hospital' },
-        { category: 'train_stations', query: 'train station' }
+        { category: 'schools', query: 'school', searchategories: 'school' },
+        { category: 'hospitals', query: 'hospital', categories: 'hospital' },
+        { category: 'train_stations', query: 'train_station'},
+        { category: 'bus_stations', query: 'bus_station'},
+        { category: 'parks', query: 'park' },
+        { category: 'gyms', query: 'fitness_centre'},
       ];
 
       for (const amenityType of amenityTypes) {
@@ -170,8 +179,9 @@ export function useMapSearch() {
               key: sdk.config.apiKey,
               country: "gb",
               proximity: `${lon},${lat}`,
-              limit: 3,
-              types: "poi"
+              limit: pick || 3,
+              types: "poi",
+              categories: amenityType.query
             },
           });
           if (res.features) {
@@ -195,11 +205,6 @@ export function useMapSearch() {
           console.error(`[Map] Error fetching ${amenityType.category}:`, e);
         }
       }
-
-      // Sort by distance and take closest 3 for each category
-      amenities.schools = amenities.schools.sort((a, b) => a.distance - b.distance).slice(0, 3);
-      amenities.hospitals = amenities.hospitals.sort((a, b) => a.distance - b.distance).slice(0, 3);
-      amenities.train_stations = amenities.train_stations.sort((a, b) => a.distance - b.distance).slice(0, 3);
 
     } catch (e) {
       console.error("[Map] Error finding nearby amenities:", e);

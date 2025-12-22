@@ -38,6 +38,11 @@ export const propertyInclude = {
   utility: true,
   outdoorSpace: {
     include: {
+      yard: {
+        include: {
+          media: true,
+        },
+      },
       garden: {
         include: {
           media: true,

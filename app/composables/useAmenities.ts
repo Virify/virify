@@ -2,7 +2,10 @@
 const globalAmenities = ref({
   schools: [] as Array<{ name: string; distance: number; type: string }>,
   hospitals: [] as Array<{ name: string; distance: number; type: string }>,
-  train_stations: [] as Array<{ name: string; distance: number; type: string }>
+  train_stations: [] as Array<{ name: string; distance: number; type: string }>,
+  bus_stations: [] as Array<{ name: string; distance: number; type: string }>,
+  parks: [] as Array<{ name: string; distance: number; type: string }>,
+  gyms: [] as Array<{ name: string; distance: number; type: string }>
 })
 
 const globalIsLoading = ref(false)
@@ -47,6 +50,27 @@ export function useAmenities() {
               name: a.name,
               distance: a.distanceM,
               type: 'TRAIN_STATION'
+            })),
+          bus_stations: existingAmenities
+            .filter((a: any) => a.type === 'TRANSPORT' && a.subtype === 'BUS_STOP')
+            .map((a: any) => ({
+              name: a.name,
+              distance: a.distanceM,
+              type: 'BUS_STOP'
+            })),
+          parks: existingAmenities
+            .filter((a: any) => a.type === 'GREEN_SPACE' && a.subtype === 'PARK')
+            .map((a: any) => ({
+              name: a.name,
+              distance: a.distanceM,
+              type: 'PARK'
+            })),
+          gyms: existingAmenities
+            .filter((a: any) => a.type === 'SHOPPING_ENTERTAINMENT' && a.subtype === 'GYM')
+            .map((a: any) => ({
+              name: a.name,
+              distance: a.distanceM,
+              type: 'GYM'
             }))
         }
         globalAmenities.value = groupedAmenities
@@ -117,7 +141,31 @@ export function useAmenities() {
           distanceM: station.distance,
           description: null,
           location: null
-        }))
+        })),
+        ...amenitiesData.bus_stations.map(station => ({
+          type: 'TRANSPORT' as const,
+          subtype: 'BUS_STOP' as const,
+          name: station.name,
+          distanceM: station.distance,
+          description: null,
+          location: null
+        })),
+        ...amenitiesData.parks.map(park => ({
+          type: 'GREEN_SPACE' as const,
+          subtype: 'PARK' as const,
+          name: park.name,
+          distanceM: park.distance,
+          description: null,
+          location: null
+        })),
+        ...amenitiesData.gyms.map(gym => ({
+          type: 'SHOPPING_ENTERTAINMENT' as const,
+          subtype: 'GYM' as const,
+          name: gym.name,
+          distanceM: gym.distance,
+          description: null,
+          location: null
+        })),
       ]
       
       await $fetch(`/api/amenities/${propertyId}`, {
@@ -144,7 +192,10 @@ export function useAmenities() {
     globalAmenities.value = {
       schools: [],
       hospitals: [],
-      train_stations: []
+      train_stations: [],
+      bus_stations: [],
+      parks: [],
+      gyms: []
     }
     globalError.value = null
   }

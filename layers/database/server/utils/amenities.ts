@@ -23,12 +23,19 @@ export async function getAmenitiesByPropertyId(propertyId: number) {
  * Create amenities for a property (simple approach - no transaction needed)
  */
 export async function createAmenitiesForProperty(propertyId: number, amenitiesData: AmenityData[]) {
-  // Use createManyAndReturn for single operation that creates and returns records
-  return await prisma.amenities.createManyAndReturn({
-    data: amenitiesData.map(amenity => ({
-      ...amenity,
-      propertyId
-    }))
+  // Update the property to create and connect the amenities
+  return await prisma.property.update({
+    where: { id: propertyId },
+    data: {
+      amenities: {
+        createMany: {
+          data: amenitiesData
+        }
+      }
+    },
+    include: {
+      amenities: true
+    }
   })
 }
 

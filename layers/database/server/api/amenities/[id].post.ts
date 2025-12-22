@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 const AmenitySchema = z.object({
-  type: z.enum(['EDUCATION', 'HEALTHCARE', 'TRANSPORT']),
-  subtype: z.enum(['SCHOOL', 'HOSPITAL', 'TRAIN_STATION']).optional(),
+  type: z.enum(['TRANSPORT', 'EDUCATION', 'HEALTHCARE', 'SHOPPING_ENTERTAINMENT', 'GREEN_SPACE']),
+  subtype: z.enum(['TRAIN_STATION', 'BUS_STOP', 'MOTORWAY_ACCESS', 'SCHOOL', 'UNIVERSITY', 'HOSPITAL', 'MEDICAL_CENTRE', 'SHOP', 'RESTAURANT', 'CINEMA', 'GYM', 'PARK', 'TRAIL', 'PLAYGROUND', 'OTHER']).optional(),
   name: z.string(),
   distanceM: z.number(),
   description: z.string().optional().nullable(),
@@ -50,10 +50,13 @@ export default defineEventHandler(async (event) => {
     const cacheKey = `amenities:property:${propertyId}`;
     await useStorage().removeItem(cacheKey);
 
+    // Also bust the listing cache since amenities are part of the listing
+    await useStorage("cache:listing").removeItem(`listing:${propertyId}`);
+
     return {
       success: true,
-      count: createdAmenities.length,
-      amenities: createdAmenities
+      count: createdAmenities.amenities.length,
+      amenities: createdAmenities.amenities
     }
 
   } catch (error) {
