@@ -1,8 +1,11 @@
-import { calculateDistance, milesToMeters } from '../utils/calculate';
+import { calculateDistance, milesToMeters } from '../../utils/calculate';
 import type { GeocodingFeature, GeocodingFeatureWithBoundary, GeocodingResponse } from '~~/shared/types/map';
+import { useRuntimeConfig } from '#imports';
+import { AmenitySubtype, AmenityType, type Amenities } from '~~/layers/database/server/database/prisma/generated/client';
+import type { AmenitiesCreateWithoutPropertyInput } from '~~/layers/database/server/database/prisma/generated/models';
 
 export function useMapSearch() {
-  const sdk = useMapSDK();
+  const key = useRuntimeConfig().public.MAPTILER_API_KEY;
 
   /**
    * Geocoding autocomplete
@@ -12,7 +15,7 @@ export function useMapSearch() {
     try {
       const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json`, {
         query: { 
-          key: sdk.config.apiKey, 
+          key: key, 
           country: "gb",
           language: "en", // Ensure English place names
         },
@@ -52,7 +55,7 @@ export function useMapSearch() {
     try {
       const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(postcode)}.json`, {
         query: { 
-          key: sdk.config.apiKey,
+          key: key,
           country: "gb",
           types: "postal_code",
         },
@@ -99,7 +102,7 @@ export function useMapSearch() {
     try {
       const res = await $fetch<any>(`https://api.maptiler.com/geocoding/${encodeURIComponent(featureId)}.json`, {
         query: { 
-          key: sdk.config.apiKey,
+          key: key,
           language: "en", // Ensure English place names
         },
       });
@@ -136,47 +139,26 @@ export function useMapSearch() {
    * Find nearby amenities (schools, hospitals, shops) based on lat/long coordinates
    * TODO: Batch these requests to reduce API calls
    */
-  interface Amenity {
-    name: string
-    distance: number
-    type: string
-  }
+  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000, pick?: number): Promise<AmenitiesCreateWithoutPropertyInput[]> {
 
-  interface Amenities {
-    schools: Amenity[]
-    hospitals: Amenity[]
-    train_stations: Amenity[]
-    bus_stations: Amenity[]
-    parks: Amenity[]
-    gyms: Amenity[]
-  }
-
-  async function findNearbyAmenities(lat: number, lon: number, radius: number = 15000, pick?: number): Promise<Amenities> {
-    const amenities: Amenities = {
-      schools: [],
-      hospitals: [],
-      train_stations: [],
-      bus_stations: [],
-      parks: [],
-      gyms: []
-    };
+    const amenities: AmenitiesCreateWithoutPropertyInput[] = [];
 
     try {
       // Search for different types of amenities
       const amenityTypes = [
-        { category: 'schools', query: 'school' },
-        { category: 'hospitals', query: 'hospital' },
-        { category: 'train_stations', query: 'train_station'},
-        { category: 'bus_stations', query: 'bus_station'},
-        { category: 'parks', query: 'park' },
-        { category: 'gyms', query: 'fitness_centre'},
+        { category: AmenityType.EDUCATION, subtype: AmenitySubtype.SCHOOL, query: 'school' },
+        { category: AmenityType.HEALTHCARE, subtype: AmenitySubtype.HOSPITAL, query: 'hospital' },
+        { category: AmenityType.TRANSPORT, subtype: AmenitySubtype.TRAIN_STATION, query: 'train_station'},
+        { category: AmenityType.TRANSPORT, subtype: AmenitySubtype.BUS_STOP, query: 'bus_station'},
+        { category: AmenityType.GREEN_SPACE, subtype: AmenitySubtype.PARK, query: 'park' },
+        { category: AmenityType.SHOPPING_ENTERTAINMENT, subtype: AmenitySubtype.GYM, query: 'fitness_centre'},
       ];
 
       for (const amenityType of amenityTypes) {
         try {
           const res = await $fetch<GeocodingResponse>(`https://api.maptiler.com/geocoding/${encodeURIComponent(amenityType.query)}.json`, {
             query: { 
-              key: sdk.config.apiKey,
+              key: key,
               country: "gb",
               proximity: `${lon},${lat}`,
               limit: pick || 3,
@@ -192,10 +174,12 @@ export function useMapSearch() {
                 const distanceInMeters = milesToMeters(distanceInMiles);
                 
                 if (distanceInMeters <= radius) {
-                  amenities[amenityType.category as keyof typeof amenities].push({
-                    name: feature.text || 'Unknown',
-                    distance: Math.round(distanceInMeters),
-                    type: amenityType.category
+                  amenities.push({
+                    type: amenityType.category as AmenityType,
+                    subtype: amenityType.subtype as AmenitySubtype,
+                    distanceM: Math.round(distanceInMeters),
+                    name: (feature.properties?.name as string) || feature.text_en || feature.text,
+                    description: null,
                   });
                 }
               }
@@ -223,7 +207,7 @@ export function useMapSearch() {
     try {
       const res = await $fetch<any>(`https://api.maptiler.com/geocoding/${encodeURIComponent(locationId)}.json`, {
         query: { 
-          key: sdk.config.apiKey,
+          key: key,
           language: 'en', // Ensure we get English place names
         },
       });

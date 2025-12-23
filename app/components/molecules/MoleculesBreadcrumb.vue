@@ -57,24 +57,7 @@ defineProps<{
     }
   }
 
-  // Blue variant modifier
   &--blue {
-    .breadcrumb__item {
-      border-color: var(--blue-400);
-      border-color: var(--foreground-100);
-
-      &--current {
-        background: var(--blue-400);
-        color: var(--monochrome-900);
-        border-color: var(--foreground-200);
-      }
-
-      &:hover {
-        background: var(--blue-400);
-        color: var(--monochrome-900);
-      }
-    }
-
     .breadcrumb__separator {
       color: var(--blue-400);
     }

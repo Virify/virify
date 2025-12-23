@@ -1,6 +1,6 @@
 import { useMapMarkers } from "./useMapMarkers";
 import { useMapDraw } from "./useMapDraw";
-import { useMapSearch } from "./useMapSearch";
+import { useMapSearch } from "../shared/utils/useMapSearch";
 import { useMapVisualization } from "./useMapVisualization";
 
 export function useMap() {
