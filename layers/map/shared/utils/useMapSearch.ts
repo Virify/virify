@@ -1,7 +1,7 @@
 import { calculateDistance, milesToMeters } from '../../utils/calculate';
 import type { GeocodingFeature, GeocodingFeatureWithBoundary, GeocodingResponse } from '~~/shared/types/map';
 import { useRuntimeConfig } from '#imports';
-import { AmenitySubtype, AmenityType, type Amenities } from '~~/layers/database/server/database/prisma/generated/client';
+import { AmenitySubtype, AmenityType } from '~~/layers/database/server/database/prisma/generated/enums';
 import type { AmenitiesCreateWithoutPropertyInput } from '~~/layers/database/server/database/prisma/generated/models';
 
 export function useMapSearch() {
