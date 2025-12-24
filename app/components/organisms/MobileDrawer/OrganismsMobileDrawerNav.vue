@@ -3,65 +3,37 @@
     <ul class="o-site-navigation__drawer-list">
       <li v-for="item in primaryItems" :key="item.id" class="o-site-navigation__drawer-item">
         <!-- Simple Link -->
-        <NuxtLink
-          v-if="item.type === 'link' && item.href"
-          :to="item.href"
-          class="o-site-navigation-link | button button-monochrome button-sm | o-site-navigation__drawer-link"
-          @click="$emit('close')"
-        >
+        <NuxtLink v-if="item.type === 'link' && item.href" :to="item.href"
+          class="o-site-navigation-link | o-site-navigation__drawer-link" @click="$emit('close')">
           <span class="o-site-navigation__drawer-link-content">
-            <AtomsIcon
-              v-if="item.icon"
-              :icon="item.icon"
-              width="16"
-              height="16"
-              class="o-site-navigation__drawer-icon"
-            />
-            <span class="o-site-navigation__drawer-text">{{ item.label }}</span>
+            <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16"
+              class="o-site-navigation__drawer-icon" />
+            <span class="o-site-navigation__drawer-text | body-md">{{ item.label }}</span>
           </span>
         </NuxtLink>
 
         <!-- Button -->
-        <button
-          v-else-if="item.type === 'button'"
-          type="button"
+        <button v-else-if="item.type === 'button'" type="button"
           :class="`o-site-navigation-link | button ${item.buttonClass || 'button-monochrome'} button-sm | o-site-navigation__drawer-link`"
-          @click.prevent="handleAction(item.action)"
-        >
+          @click.prevent="handleAction(item.action)">
           <span class="o-site-navigation__drawer-link-content">
-            <AtomsIcon
-              v-if="item.icon"
-              :icon="item.icon"
-              width="16"
-              height="16"
-              class="o-site-navigation__drawer-icon"
-            />
+            <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16"
+              class="o-site-navigation__drawer-icon" />
             <span class="o-site-navigation__drawer-text">{{ item.label }}</span>
           </span>
         </button>
 
         <!-- Dropdown with Categories -->
-        <OrganismsMobileDrawerDropdown
-          v-else-if="item.type === 'dropdown' && hasChildCategories(item)"
-          :item="item"
-          @close="$emit('close')"
-        />
+        <OrganismsMobileDrawerDropdown v-else-if="item.type === 'dropdown' && hasChildCategories(item)" :item="item"
+          @close="$emit('close')" />
 
         <!-- Fallback Link -->
-        <NuxtLink
-          v-else-if="item.href"
-          :to="item.href"
+        <NuxtLink v-else-if="item.href" :to="item.href"
           class="o-site-navigation-link | button button-monochrome button-sm | o-site-navigation__drawer-link"
-          @click="$emit('close')"
-        >
+          @click="$emit('close')">
           <span class="o-site-navigation__drawer-link-content">
-            <AtomsIcon
-              v-if="item.icon"
-              :icon="item.icon"
-              width="16"
-              height="16"
-              class="o-site-navigation__drawer-icon"
-            />
+            <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16"
+              class="o-site-navigation__drawer-icon" />
             <span class="o-site-navigation__drawer-text">{{ item.label }}</span>
           </span>
         </NuxtLink>
@@ -69,13 +41,8 @@
         <!-- Plain Text (No Link) -->
         <span v-else class="o-site-navigation__drawer-plain | body-sm">
           <span class="o-site-navigation__drawer-link-content">
-            <AtomsIcon
-              v-if="item.icon"
-              :icon="item.icon"
-              width="16"
-              height="16"
-              class="o-site-navigation__drawer-icon"
-            />
+            <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16"
+              class="o-site-navigation__drawer-icon" />
             <span class="o-site-navigation__drawer-text">{{ item.label }}</span>
           </span>
         </span>
@@ -128,9 +95,17 @@ function hasChildCategories(item: NavigationItem) {
   &-link,
   &-plain {
     width: 100%;
-    justify-content: flex-start;
-    text-decoration: none;
+    cursor: pointer;
+    padding: var(--size-10);
+    border-radius: var(--border-radius-md);
     color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-8);
+    background: rgba(255, 255, 255, 0.02);
+    list-style: none;
+    transition: background-color 0.15s ease-in-out;
 
     &-content {
       display: flex;

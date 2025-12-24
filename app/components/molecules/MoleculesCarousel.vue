@@ -31,6 +31,7 @@ interface Props {
   showArrows?: boolean; // Show navigation arrows
   options?: any; // Additional Embla options
   buttonSize?: string; // Size of navigation buttons in pixels
+  buttonPosition?: string; // Position of navigation buttons
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,6 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
   loop: true,
   showArrows: false,
   buttonSize: "40px",
+  buttonPosition: "50%",
   options: () => ({}),
 });
 
@@ -116,17 +118,25 @@ defineExpose({
   flex: 0 0 v-bind(slideSize);
   min-width: 0;
   cursor: grab;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .embla-slide:active {
   cursor: grabbing;
 }
 
+.embla-slide > * {
+  /* Ensure direct child (the slotted card) fills the slide height */
+  height: 100%;
+}
+
 /* Navigation Arrows */
 .embla-prev,
 .embla-next {
   position: absolute;
-  top: 50%;
+  top: v-bind(buttonPosition);
   transform: translateY(-50%);
   background: rgba(0, 0, 0, 0.5);
   color: white;

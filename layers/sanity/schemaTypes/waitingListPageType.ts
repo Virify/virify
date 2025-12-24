@@ -399,6 +399,40 @@ export const waitingListPageType = defineType({
       ],
     }),
 
+    // Guides Section
+    defineField({
+      name: 'guidesSection',
+      title: 'Guides Section',
+      type: 'object',
+      fields: [
+        {
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          description: 'Use {gradient}text{/gradient} for gradient styling',
+          initialValue: 'Continue your property journey',
+        },
+        {
+          name: 'description',
+          title: 'Description',
+          type: 'text',
+          rows: 2,
+          initialValue:
+            'Our guides tackle those “grey areas” of buying and selling, from handling queries to what happens after your offer is accepted.',
+        },
+        {
+          name: 'guides',
+          title: 'Guides',
+          type: 'array',
+          of: [{type: 'reference', to: [{type: 'guide'}]}],
+          description: 'Select guides to feature on the contact page.',
+          validation: (rule) => rule.max(10).warning('You can select up to 10 guides.')
+          .min(3).warning('You should select at least 3 guides.')
+          .required().warning('Guides are required.'),
+        }
+      ]
+    }),
+
     // SEO Metadata
     defineField({
       name: 'seo',

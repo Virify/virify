@@ -164,6 +164,7 @@ export const contactPageType = defineType({
       ],
     }),
 
+    // Guides Section
     defineField({
       name: 'guidesSection',
       title: 'Guides Section',

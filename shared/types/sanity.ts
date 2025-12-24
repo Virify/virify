@@ -292,6 +292,13 @@ export interface WaitingListPage {
     description: string
     buttonText: string
   }
+  guidesSection?: {
+    title: string,
+    description: string,
+    guides: (Omit<Guide, 'category'> & {
+      category: GuideCategory
+    })[]
+  }
   finalCta: {
     title: string
     subtitle: string

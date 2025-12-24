@@ -18,6 +18,7 @@
     >
       <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16" class="o-site-navigation__icon" />
       {{ item.label }}
+      <AtomsIcon icon="chevron-down" width="12" height="12" class="o-site-navigation__icon" />
     </button>
 
     <div 
