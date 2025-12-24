@@ -214,6 +214,15 @@
       :gradient="finalCtaGradient"
       @click="scrollToForm"
     />
+
+    <OrganismsGuideSection
+      v-if="cmsContent?.guidesSection"
+      :title="cmsContent.guidesSection.title"
+      :description="cmsContent.guidesSection.description || ''"
+      :guides="cmsContent.guidesSection.guides"
+      :gradient-class="'gradient-text-light'"
+      :section="false"
+    />
   </div>
 </template>
 

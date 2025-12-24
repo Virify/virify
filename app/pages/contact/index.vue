@@ -49,18 +49,13 @@
     </section>
 
     <!-- Guides Section -->
-    <section class="contact-guides">
-      <div class="container">
-        <h2 class="contact-guides__title | title-xl">
-          <template v-for="(part, index) in parseGradientTextParts(cmsContent?.guidesSection?.title || '')" :key="index">
-            <span v-if="part.isGradient" class="gradient-text-light">{{ part.text }}</span>
-            <template v-else>{{ part.text }}</template>
-          </template>
-        </h2>
-        <p class="contact-guides__description | body-lg">{{ cmsContent?.guidesSection?.description || "" }}</p>
-        <OrganismsGuidesCarousel v-if="cmsContent?.guidesSection" :guides="cmsContent.guidesSection.guides" />
-      </div>
-    </section>
+    <OrganismsGuideSection
+      v-if="cmsContent?.guidesSection"
+      :title="cmsContent.guidesSection.title"
+      :description="cmsContent.guidesSection.description || ''"
+      :guides="cmsContent.guidesSection.guides"
+      :gradient-class="'gradient-text-light'"
+    />
   </div>
 </template>
 

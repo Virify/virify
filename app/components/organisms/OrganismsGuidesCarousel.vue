@@ -1,19 +1,14 @@
 <template>
-  <MoleculesCarousel v-if="guides && guides.length > 0" :slides="guides" :slide-size="'350px'" :gap="'var(--size-24)'" :loop="true" :show-arrows="true">
+  <MoleculesCarousel v-if="guides && guides.length > 0" :slides="guides" :slide-size="'350px'" :gap="'var(--size-18)'" :loop="false" :show-arrows="true" :button-position="'110%'">
     <template #default="{ slide }">
-      <NuxtLink :to="`/guides/${slide.category?.slug?.current}/${slide.slug.current}`" class="guides-carousel__link">
-        <div class="guides-carousel__guide">
-          <div class="guides-carousel__guide--img">
-            <NuxtImg :src="slide.heroImage?.asset._ref" :alt="slide.heroImage?.asset.alt || slide.title || 'Guide Image'" :width="300" :height="200" :object-fit="'cover'" provider="sanity" placeholder="/img/preload.svg" />
-            <AtomsPill v-if="slide.category?.title" variant="secondary" size="sm" class="guides-carousel__guide--category">
-              {{ slide.category.title }}
-            </AtomsPill>
-            <AtomsPill v-if="slide.readTime" variant="primary" size="sm" class="guides-carousel__guide--read-time"> {{ slide.readTime }} min read </AtomsPill>
-          </div>
-          <h2 class="title-xs">{{ slide.title }}</h2>
-          <p class="body-sm">{{ slide.excerpt }}</p>
-        </div>
-      </NuxtLink>
+      <MoleculesGuideCard
+        :title="slide.title"
+        :to="`/guides/${slide.category?.slug?.current}/${slide.slug.current}`"
+        :image="slide.heroImage"
+        :excerpt="slide.excerpt"
+        :readTime="slide.readTime"
+        :updatedAt="slide.updatedAt"
+      />
     </template>
   </MoleculesCarousel>
 </template>

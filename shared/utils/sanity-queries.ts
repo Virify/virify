@@ -198,6 +198,26 @@ export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
     description,
     buttonText
   },
+  guidesSection {
+    title,
+    description,
+    guides[]-> {
+      _id,
+      title,
+      slug,
+      excerpt,
+      heroImage,
+      icon,
+      readTime,
+      publishedAt,
+      orderIndex,
+      category-> {
+        _id,
+        title,
+        slug
+      }
+    }
+  },
   seo {
     metaTitle,
     metaDescription,
