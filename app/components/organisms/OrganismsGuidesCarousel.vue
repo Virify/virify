@@ -1,5 +1,5 @@
 <template>
-  <MoleculesCarousel v-if="guides && guides.length > 0" :slides="guides" :slide-size="'350px'" :gap="'var(--size-18)'" :loop="false" :show-arrows="true" :button-position="'110%'">
+  <MoleculesCarousel v-if="guides && guides.length > 0" :slides="guides" :slide-size="'350px'" :gap="'var(--size-18)'" :loop="true" :show-arrows="true" :button-position="'110%'">
     <template #default="{ slide }">
       <MoleculesGuideCard
         :title="slide.title"
@@ -7,7 +7,7 @@
         :image="slide.heroImage"
         :excerpt="slide.excerpt"
         :readTime="slide.readTime"
-        :updatedAt="slide.updatedAt"
+        :updatedAt="slide._updatedAt"
       />
     </template>
   </MoleculesCarousel>
