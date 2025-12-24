@@ -33,7 +33,7 @@
     "db:setup:prod": "tsx layers/seed/server/utils/run-setup.ts --prod",
     "db:fetch-rates": "tsx layers/seed/server/utils/run-fetch-rates.ts",
     "db:update-admin-password": "tsx layers/seed/server/utils/run-admin-update.ts",
-    "seed:address": "tsx layers/seed/scripts/extract-and-geocode-addresses.ts",
+    "seed:address": "tsx layers/seed/server/utils/extract-and-geocode-addresses.ts",
     "test": "vitest run",
     "test:full": "vitest run",
     "start": "node .output/server/index.mjs"

@@ -202,7 +202,7 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     
     - "k" = thousand: "400k" → 400000
     - "m" = million: "1.5m" → 1500000
-    - "+N" or "N+" means "at least N": "3+ beds" → { gte: 3 }
+    - "+N" or "N+" means "at least N": "3+ bedroom" → { gte: 3 }
     - Ranges with hyphen: "2-4" means between 2 and 4, "200k-500k" → { gte: 200000, lte: 500000 }
     - Currency: "£" or "gbp" both mean GBP (British pounds)
 
@@ -217,6 +217,32 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     - Floor level: 0=ground, positive=above, negative=below
     - Always filter out archived: { archived: false } (unless explicitly requested)
     - Existence checks: { parking: { isNot: null } } or { parking: { is: null } }
+
+    ═══════════════════════════════════════════════════════════════════════════════
+    AMENITY SEARCH RULES
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    Amenities are stored as a list of nearby facilities with type, subtype, and distanceM (in meters).
+    For location-based queries, use these generic rules:
+
+    * BASIC AMENITY PRESENCE:
+      - "near [amenity]" → property: { is: { amenities: { some: { [field]: "[VALUE]" } } } }
+      - Map common terms to schema values:
+        - "school" → type: "EDUCATION", subtype: "SCHOOL"
+        - "hospital" → type: "HEALTHCARE", subtype: "HOSPITAL"
+        - "train station" → type: "TRANSPORT", subtype: "TRAIN_STATION"
+        - "bus stop" → type: "TRANSPORT", subtype: "BUS_STOP"
+        - "park" → type: "GREEN_SPACE", subtype: "PARK"
+        - "gym" → type: "SHOPPING_ENTERTAINMENT", subtype: "GYM"
+
+    * DISTANCE-BASED SEARCH:
+      - "within [N] miles of [amenity]" → property: { is: { amenities: { some: { [field]: "[VALUE]", distanceM: { lte: [N * 1609] } } } } }
+      - Convert miles to meters: 1 mile = 1609 meters
+      - Examples: "within 2 miles" = distanceM: { lte: 3218 }
+
+    * MULTIPLE AMENITIES:
+      - Combine with AND: multiple some conditions on amenities
+      - "near school and gym" → amenities: { some: { type: "EDUCATION" } }, amenities: { some: { type: "SHOPPING_ENTERTAINMENT" } }
 
     ═══════════════════════════════════════════════════════════════════════════════
     RESPONSE FORMAT
@@ -236,20 +262,22 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     - Bedrooms: Combine ranges: "3-4 bedrooms" or "3+ bedrooms" or "3 bedrooms"
     - Bathrooms: Same as bedrooms: "2+ bathrooms" or "2 bathrooms"
     - Property type: Use proper capitalization: "House" not "HOUSE", "Detached house" not "DETACHED_HOUSE"
-    - Features: Human readable: "En-suite" not "EN_SUITE", "South-facing garden" not "SOUTH facing"
+    - Features: Human readable: "En-suite" not "EN_SUITE", "South-facing garden" not "SOUTH facing", "Garden" for garden presence
     - Listing type: "For sale" or "To rent" not "saleListing" or "rentalListing"
     - Location terms: Keep city/area names as-is
+    - Amenities: Include distance context: "Near hospital", "Within 2 miles of gym", "Close to school"
     - Combine related terms into single phrases, not individual words
     
     Examples of GOOD usedTerms:
-    ["3-4 bedrooms", "House", "For sale", "Under £300,000", "Cardiff"]
-    ["2+ bathrooms", "Detached house", "En-suite", "Garage", "South-facing garden"]
-    ["Furnished", "To rent", "£1,000-£1,500 pcm", "City centre"]
+    ["3-4 bedrooms", "House", "For sale", "Under £300,000", "Cardiff", "Near hospital", "Within 2 miles of gym"]
+    ["2+ bathrooms", "Detached house", "En-suite", "Garage", "South-facing garden", "Close to school"]
+    ["Furnished", "To rent", "£1,000-£1,500 pcm", "City centre", "Near train station"]
     
     Examples of BAD usedTerms:
     ["3", "4", "bedroom", "house", "sale", "300000"] [wrong - split terms]
     ["DETACHED_HOUSE", "EN_SUITE", "GARAGE"] [wrong - enum values not human text]
     ["saleListing", "rentalListing"] [wrong - use "For sale" or "To rent"]
+    ["school", "gym"] [wrong - use "Near school", "Close to gym"]
     `;
 
   // Combine all sections

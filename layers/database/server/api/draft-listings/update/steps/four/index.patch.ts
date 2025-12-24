@@ -22,6 +22,7 @@ const addressSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const { findNearbyAmenities } = useMapSearch();
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
   
@@ -86,6 +87,7 @@ export default defineEventHandler(async (event) => {
           property: {
             include: {
               address: true,
+              amenities: true
             },
           },
         },
@@ -97,10 +99,14 @@ export default defineEventHandler(async (event) => {
     /**
      * If we have latitude and longitude, update the PostGIS location
      * Note: This is done outside the transaction as it's a separate operation
+     * And then update the amenities for the property
      */
     if (address && address.lat && address.lon) {
       const { id, lat, lon } = address;
       await updateLocationByAddressId(id, lon, lat);
+      const amenities = await findNearbyAmenities(address.lat!, address.lon!);
+      const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
+      await createAmenitiesForProperty(result.property!.id, amenitiesArray);
     }
     
     return result;

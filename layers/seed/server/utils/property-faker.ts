@@ -713,6 +713,81 @@ export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
   };
 };
 
+/**
+ * Generate fake amenities for seeding
+ */
+export const generateFakeAmenities = (): Prisma.AmenitiesCreateWithoutPropertyInput[] => {
+  const amenities: Prisma.AmenitiesCreateWithoutPropertyInput[] = [];
+
+  // Generate some schools
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'EDUCATION',
+      subtype: 'SCHOOL',
+      name: faker.company.name() + ' School',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate some hospitals
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'HEALTHCARE',
+      subtype: 'HOSPITAL',
+      name: faker.company.name() + ' Hospital',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate train stations
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'TRANSPORT',
+      subtype: 'TRAIN_STATION',
+      name: faker.location.city() + ' Train Station',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate bus stations
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'TRANSPORT',
+      subtype: 'BUS_STOP',
+      name: faker.location.street() + ' Bus Stop',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate parks
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'GREEN_SPACE',
+      subtype: 'PARK',
+      name: faker.location.city() + ' Park',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate gyms
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'SHOPPING_ENTERTAINMENT',
+      subtype: 'GYM',
+      name: faker.company.name() + ' Gym',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  return amenities;
+};
+
 export const generateAddress = (address: AddressCreateWithoutPropertiesInput) => {
   return {
     number: address.number,
@@ -780,7 +855,9 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       accessibilityFeatures: {
         create: generateAccessability(),
       },
-      amenities: {},
+      amenities: {
+        create: generateFakeAmenities(),
+      },
       numberBedrooms: bedroomCount,
       numberBathrooms: bathroomCount,
       numberReceptions: receptionCount,
