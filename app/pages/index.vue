@@ -204,6 +204,14 @@
       </div>
     </section>
 
+    <OrganismsGuideSection
+      v-if="cmsContent?.guidesSection"
+      :title="cmsContent.guidesSection.title"
+      :description="cmsContent.guidesSection.description || ''"
+      :guides="cmsContent.guidesSection.guides"
+      :gradient-class="'gradient-text-light'"
+    />
+
     <!-- ============================================ -->
     <!-- FINAL CTA SECTION -->
     <!-- ============================================ -->
@@ -211,18 +219,10 @@
       :title="cmsContent?.finalCta.title || ''"
       :description="cmsContent?.finalCta.description || ''"
       :buttonText="cmsContent?.finalCta.buttonText || ''"
-      :gradient="finalCtaGradient"
+      :gradient="true"
       @click="scrollToForm"
     />
 
-    <OrganismsGuideSection
-      v-if="cmsContent?.guidesSection"
-      :title="cmsContent.guidesSection.title"
-      :description="cmsContent.guidesSection.description || ''"
-      :guides="cmsContent.guidesSection.guides"
-      :gradient-class="'gradient-text-light'"
-      :section="false"
-    />
   </div>
 </template>
 
