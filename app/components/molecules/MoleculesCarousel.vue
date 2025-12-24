@@ -99,7 +99,8 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style lang="scss"scoped>
+  @use "#styles/_utils/media" as mq;
 .embla-wrapper {
   position: relative;
 }
@@ -111,7 +112,7 @@ defineExpose({
 .embla-slides {
   display: flex;
   align-items: stretch;
-  gap: v-bind(gap);
+  gap: 0;
 }
 
 .embla-slide {
@@ -121,6 +122,11 @@ defineExpose({
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  margin-right: v-bind(gap);
+
+  @include mq.mobile-only {
+    flex: 0 0 99%;
+  }
 }
 
 .embla-slide:active {

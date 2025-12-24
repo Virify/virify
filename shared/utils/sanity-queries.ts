@@ -203,6 +203,7 @@ export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
     description,
     guides[]-> {
       _id,
+      _updatedAt,
       title,
       slug,
       excerpt,
@@ -270,6 +271,7 @@ export const contactPageQuery = `*[_type == "contactPage"][0] {
     description,
     guides[]-> {
       _id,
+      _updatedAt,
       title,
       slug,
       excerpt,

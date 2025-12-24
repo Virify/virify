@@ -52,15 +52,10 @@ const imageAlt = computed(() =>
   text-decoration: none;
   transition: all 0.3s ease;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   background: var(--background-200);
   height: 100%;
   width: 100%;
   border: 1px solid var(--monochrome-500);
-
-  &:hover {
-    transform: translateY(-4px);
-  }
 
     &__top {
     display: flex;
