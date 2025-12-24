@@ -7,11 +7,11 @@
         <AtomsIcon v-else-if="iconName" :icon="iconName" :size="32" />
       </div>
       <div class="feature-tile__header-text">
-        <h4 :class="{
+        <h3 :class="{
           'title-xs': size === 'xs',
           'title-sm': size === 'sm',
           'title-md': size === 'md',
-        }">{{ title }}</h4>
+        }">{{ title }}</h3>
         <p v-if="subtitle" :class="{
           'body-xs': size === 'xs' || size === 'sm',
           'body-md': size === 'sm',

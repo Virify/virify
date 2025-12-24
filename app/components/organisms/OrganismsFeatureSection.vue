@@ -192,6 +192,7 @@ const contentClasses = computed(() => ({
     grid-template-columns: 1fr;
     gap: var(--size-48);
     align-items: center;
+    justify-content: center;
 
     @include mq.tablet {
       grid-template-columns: 1fr 1fr;
