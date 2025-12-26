@@ -127,6 +127,7 @@ export const useAnalytics = createSharedComposable(() => {
   };
 
   const trackSearch = async (params: {
+    listingType: ListingType;
     query: string;
     location: GeocodingFeature;
     radius: number;
@@ -135,6 +136,7 @@ export const useAnalytics = createSharedComposable(() => {
   }) => {
     try {
       const payload = {
+        listingType: params.listingType,
         query: params.query,
         location: params.location,
         radius: params.radius,

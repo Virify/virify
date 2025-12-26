@@ -21,7 +21,7 @@ const { checkContent, isChecking } = useModeration()
 const { showToast } = useToast()
 
 async function searchSubmit(query: string) {
-  const { location, radius } = asObject(searchState.value)
+  const { location, radius, listingType } = asObject(searchState.value)
   
   if (!location) return
 
@@ -33,7 +33,7 @@ async function searchSubmit(query: string) {
   }
 
   // Build clean URL and navigate - this will trigger the search
-  await navigateTo(createSearchURL(location, radius ?? 5, query))
+  await navigateTo(createSearchURL(listingType, location, radius ?? 5, query))
 }
 
 function searchReset() {

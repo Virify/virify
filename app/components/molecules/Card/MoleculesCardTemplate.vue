@@ -166,18 +166,20 @@ const parkingType = computed(() => {
 })
 
 const pills = computed(() => {
-  const { chain, tenureType } = asObject(props.result?.saleListing)
-
-  // Create empty pills object
   const pills: string[] = []
 
-  // Extract info from saleListing
-  const tenureString = getTenureType(tenureType)
-
-  // Add relevant info to pills
-  if (tenureString) pills.push(tenureString)
-  if (chain) pills.push('Chain free')
-
+  if(props.result?.saleListing) {
+    const { chain, tenureType } = asObject(props.result?.saleListing)
+    const tenureString = getTenureType(tenureType)
+    if (tenureString) pills.push(tenureString)
+    if (chain) pills.push('Chain free')
+  } else {
+    const { furnishedStatus } = asObject(props.result?.rentalListing)
+    if(furnishedStatus) {
+      const furnishedString = convertEnumToString(furnishedStatus as string)
+      if (furnishedString) pills.push(furnishedString)
+    }
+  }
   // Return
   return pills
 })

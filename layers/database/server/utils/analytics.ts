@@ -1,6 +1,7 @@
-import type { TrackSearch } from "../database/prisma/generated/client";
+import type { ListingType, TrackSearch } from "../database/prisma/generated/client";
 
 export interface TrackSearchParams {
+  listingType: string;
   query: string;
   location: GeocodingFeature;
   radius: number;
@@ -292,8 +293,9 @@ export async function getRecentViewedListings(userId: number, limit: number = 6)
  * @returns The created or updated track record
  */
 export async function trackSearch(params: TrackSearchParams): Promise<TrackSearch> {
-  const { query, location, radius, resultCount, userId } = params;
+  const { listingType, query, location, radius, resultCount, userId } = params;
   
+  const listingTypeUpper = listingType.toLocaleUpperCase();
   const locationId = location.id || '';
   const locationPlaceName = location.place_name_en || location.place_name;
   const locationText = location.text;
@@ -302,7 +304,8 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
   // Check if this search combination already exists
   const existing = await prisma.trackSearch.findUnique({
     where: {
-      locationPlaceName_radius_query: {
+      listingType_locationPlaceName_radius_query: {
+        listingType: listingTypeUpper as ListingType,
         locationPlaceName,
         radius,
         query,
@@ -320,6 +323,7 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
     return prisma.trackSearch.update({
       where: { id: existing.id },
       data: {
+        listingType: listingTypeUpper as ListingType,
         count: { increment: 1 }, // Increment search count
         resultCount, // Update with latest result count
         locationId, // Update locationId in case it was missing
@@ -331,6 +335,7 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
   // Create new record with count = 1
   return prisma.trackSearch.create({
     data: {
+      listingType: listingTypeUpper as ListingType,
       locationId,
       locationPlaceName,
       locationText,

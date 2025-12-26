@@ -21,8 +21,40 @@ export function checkAiConfiguration() {
 /**
  * Constructs the Prisma WHERE clause from the query and location filters.
  */
-export async function constructPrismaWhereClause(query: string, propertyIds: number[] | null) {
+export async function constructPrismaWhereClause(listingType: ListingType | string | undefined, query: string, propertyIds: number[] | null) {
   const { whereClause, queryAnalysis } = await generateWhereClauseFromQuery(query);
+
+  let typeValue: string | undefined;
+  if (typeof listingType === "string") {
+    typeValue = listingType;
+  } else if (listingType && typeof listingType === "object" && "listingType" in listingType) {
+    typeValue = (listingType as any).listingType;
+  }
+
+  // Apply listing type relation filters when provided and not 'all'
+  if (typeValue && typeValue !== "all") {
+    if (typeValue === "sale") {
+      // If AI already provided saleListing conditions, wrap them under `is`
+      if (whereClause.saleListing) {
+        if (!whereClause.saleListing.is) {
+          whereClause.saleListing = { is: whereClause.saleListing };
+        }
+      } else {
+        // Otherwise require that a SaleListing relation exists
+        whereClause.saleListing = { isNot: null };
+      }
+    } else if (typeValue === "rent") {
+      // If AI already provided rentalListing conditions, wrap them under `is`
+      if (whereClause.rentalListing) {
+        if (!whereClause.rentalListing.is) {
+          whereClause.rentalListing = { is: whereClause.rentalListing };
+        }
+      } else {
+        // Otherwise require that a RentalListing relation exists
+        whereClause.rentalListing = { isNot: null };
+      }
+    }
+  }
 
   if (propertyIds !== null) {
     if (propertyIds.length === 0) {

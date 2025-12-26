@@ -1,3 +1,5 @@
+import type { ListingWithFullProperty } from "./listing";
+
 export type QueryAnalysis = {
   usedTerms: string[];
   ignoredTerms: string[];

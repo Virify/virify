@@ -18,7 +18,7 @@ export default function useAi() {
    * @param limit The number of results per page (optional, defaults to 20)
    * @returns The search results
    */
-  async function aiSearch(location: GeocodingFeatureWithBoundary, radius: number, query: string, page?: number, limit?: number) {
+  async function aiSearch(listingType: ListingType, location: GeocodingFeatureWithBoundary, radius: number, query: string, page?: number, limit?: number) {
     searchQuery.value = query; // Update state for analysis function
     
     // Get center coordinates - use center property if available (for regions with Polygon geometry)
@@ -30,6 +30,7 @@ export default function useAi() {
     const response = await $fetch<AISearchResponse>("/api/search/rag/", {
       method: "POST",
       body: {
+        listingType,
         query: query,
         lat,
         lon,
@@ -51,6 +52,7 @@ export default function useAi() {
     
     // Track search with full context
     trackSearch({
+      listingType,
       query,
       location: locationForTracking,
       radius,

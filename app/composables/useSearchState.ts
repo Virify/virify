@@ -36,6 +36,21 @@ function createSearchState() {
   }
 
   /**
+   * Update listing type filter
+   */
+  function setListingType(value: string, callback?: () => void) {
+    if(value !== 'all' && value !== 'sale' && value !== 'rent') return
+    // Check value is valid
+    if (!isString(value)) return
+
+    // Update state
+    updateState({ listingType: value })
+
+    // Run optional callback
+    _runCallback(callback)
+  }
+
+  /**
    *  Update state layout
    */
   function setLocation(value: GeocodingFeature, callback?: () => void) {
@@ -149,6 +164,7 @@ function createSearchState() {
     searchState,
     setSortOrder,
     setViewMode,
+    setListingType,
     setLocation,
     setLocationRadius,
     setSearchPending,
