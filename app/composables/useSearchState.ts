@@ -38,9 +38,10 @@ function createSearchState() {
   /**
    * Update listing type filter
    */
-  function setListingType(value: ListingType, callback?: () => void) {
+  function setListingType(value: string, callback?: () => void) {
+    if(value !== 'all' && value !== 'sale' && value !== 'rent') return
     // Check value is valid
-    if (!isObject(value) || !('listingType' in value)) return
+    if (!isString(value)) return
 
     // Update state
     updateState({ listingType: value })

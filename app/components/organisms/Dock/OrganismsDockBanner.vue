@@ -136,7 +136,7 @@ const initialQuery = computed(() => {
 })
 
 async function searchSubmit(query: string) {
-  const { location, radius } = asObject(searchState.value)
+  const { location, radius, listingType } = asObject(searchState.value)
   
   if (!location) return
 
@@ -148,7 +148,7 @@ async function searchSubmit(query: string) {
   }
 
   await animateFormToDock()
-  await navigateTo(createSearchURL('all', location, radius ?? 5, query))
+  await navigateTo(createSearchURL(listingType, location, radius ?? 5, query))
 
   /**
    *  To avoid global smooth scrolling

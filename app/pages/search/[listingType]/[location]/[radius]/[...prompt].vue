@@ -104,6 +104,7 @@ const {
   isLoading,
   searchState,
   setResults,
+  setListingType,
   setQueryAnalysis,
   setSearchPending,
   setViewMode,
@@ -159,8 +160,6 @@ const location = computed(() => asObject(searchState.value).location)
 const radius = computed(() => asObject(searchState.value).radius)
 const sortBy = computed(() => asObject(searchState.value).sortBy)
 const viewMode = computed(() => asObject(searchState.value).viewMode)
-const query = computed(() => asObject(searchState.value).query)
-
 // When location or radius changes, mark results as stale (not current for this search criteria)
 watch([location, radius], () => {
   resultsAreCurrentForLocation.value = false
@@ -172,9 +171,11 @@ const { aiSearch } = useAi()
  * Trigger search - called on initial load only
  */
 async function triggerSearch() {
-  const { listingType: lt,location: loc, query: q, radius: r } = asObject(searchState.value)
+  const { listingType: lt, location: loc, query: q, radius: r } = asObject(searchState.value)
 
   if (!loc || !q) return
+
+  console.log('Triggering search for:', { lt, loc, r, q })
 
   // Clear previous results and show loading state
   setResults([])
@@ -251,7 +252,7 @@ const isInitializing = ref(true)
 onMounted(async () => {
 
   // Parse URL params
-  const listingType = route.params.type as string
+  const listingType = route.params.listingType as string
   const locationSlug = route.params.location as string
   const radiusSlug = route.params.radius as string
   const promptSlug = Array.isArray(route.params.prompt) 
@@ -310,6 +311,7 @@ onMounted(async () => {
       setLocation(locationData)
       setLocationRadius(radiusValue)
       setQuery(promptText)
+      setListingType(listingType)
       
       // Trigger the search
       await triggerSearch()

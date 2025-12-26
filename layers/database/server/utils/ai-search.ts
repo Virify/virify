@@ -34,13 +34,25 @@ export async function constructPrismaWhereClause(listingType: ListingType | stri
   // Apply listing type relation filters when provided and not 'all'
   if (typeValue && typeValue !== "all") {
     if (typeValue === "sale") {
-      // Ensure we require a SaleListing relation
-      if (!whereClause.saleListing) whereClause.saleListing = { is: {} };
-      else if (!whereClause.saleListing.is) whereClause.saleListing = { is: whereClause.saleListing };
+      // If AI already provided saleListing conditions, wrap them under `is`
+      if (whereClause.saleListing) {
+        if (!whereClause.saleListing.is) {
+          whereClause.saleListing = { is: whereClause.saleListing };
+        }
+      } else {
+        // Otherwise require that a SaleListing relation exists
+        whereClause.saleListing = { isNot: null };
+      }
     } else if (typeValue === "rent") {
-      // Ensure we require a RentalListing relation
-      if (!whereClause.rentalListing) whereClause.rentalListing = { is: {} };
-      else if (!whereClause.rentalListing.is) whereClause.rentalListing = { is: whereClause.rentalListing };
+      // If AI already provided rentalListing conditions, wrap them under `is`
+      if (whereClause.rentalListing) {
+        if (!whereClause.rentalListing.is) {
+          whereClause.rentalListing = { is: whereClause.rentalListing };
+        }
+      } else {
+        // Otherwise require that a RentalListing relation exists
+        whereClause.rentalListing = { isNot: null };
+      }
     }
   }
 
