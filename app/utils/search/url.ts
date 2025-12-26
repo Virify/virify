@@ -37,6 +37,7 @@ export function getSanitisedRadius(radius: number | string | undefined): string 
  * Uses shortened location name for cleaner URLs (e.g. "newport-wales" not "newport-united-kingdom")
  */
 export function createSearchURL(
+  listingStype: ListingType,
   location: {
     id?: string
     text?: string
@@ -47,13 +48,14 @@ export function createSearchURL(
   query: string
 ): string {
   // Use place_name directly from MapTiler
+  const listingType = listingStype || 'all'
   const locationText = location.place_name_en || location.place_name || ''
   const locationSlug = sanitisePath(locationText)
   const radiusSlug = getSanitisedRadius(radius)
   const promptSlug = sanitisePath(query)
   
   // Add location ID as query param for precise lookup on page load
-  const baseUrl = `/search/${locationSlug}/${radiusSlug}/${promptSlug}`
+  const baseUrl = `/search/${listingType}/${locationSlug}/${radiusSlug}/${promptSlug}`
   return location.id ? `${baseUrl}?lid=${encodeURIComponent(location.id)}` : baseUrl
 }
 

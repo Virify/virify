@@ -3,6 +3,11 @@
  * Used by both frontend composables and backend API endpoints
  */
 
+import type { QueryAnalysis } from "./ai"
+import type { ListingWithFullProperty } from "./listing"
+import type { GeocodingFeature } from "./map"
+import type { ListingType } from "./search"
+
 /**
  * Map viewport state for preserving user's map interaction
  */
@@ -24,6 +29,9 @@ export interface MapViewportState {
 export interface SearchState {
   /** User's search query text */
   query: string
+
+  /** Listing type filter */
+  listingType: ListingType
 
   /** Selected location from geocoding service */
   location: GeocodingFeature | null
@@ -72,6 +80,7 @@ export interface SearchState {
  * Default values for search state
  */
 export const defaultSearchState: SearchState = {
+  listingType: 'all',
   searchPending: false,
   query: '',
   location: null,
