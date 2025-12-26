@@ -176,7 +176,11 @@ const contentClasses = computed(() => ({
 @use '#styles/_utils/functions' as fn;
 
 .o-feature-section {
-  padding: var(--size-120) 0;
+  padding: var(--size-120) var(--size-32);
+
+  @include mq.mobile-and-small-tablet {
+    padding: var(--size-120) 0;
+  }
 
   &--white {
     background: var(--background-100);
@@ -194,7 +198,7 @@ const contentClasses = computed(() => ({
     align-items: center;
     justify-content: center;
 
-    @include mq.tablet {
+    @include mq.desktop {
       grid-template-columns: 1fr 1fr;
       gap: var(--size-80);
     }
@@ -205,26 +209,36 @@ const contentClasses = computed(() => ({
   }
 
   &__image-container {
-    @include mq.mobile-only {
-      order: 2;
+    order: 2;
+    
+    // On desktop we want to control left/right explicitly
+    &--left {
+      @include mq.desktop {
+        order: 1;
+      }
     }
 
     &--right {
-      @include mq.tablet {
+      @include mq.desktop {
         order: 2;
       }
     }
+
   }
 
   &__image {
     width: 100%;
     overflow: hidden;
-    box-shadow: var(--elevate-200);
 
     img {
       width: 100%;
       height: auto;
       display: block;
+
+      @include mq.tablet {
+        max-width: 800px;
+        margin: 0 auto;
+      }
     }
   }
 
@@ -249,10 +263,13 @@ const contentClasses = computed(() => ({
     top: 0;
     left: 0;
     overflow: hidden;
-    box-shadow: var(--elevate-200);
     z-index: 1;
 
-    @include mq.mobile-only {
+    @include mq.tablet {
+      width: 50%;
+    }
+
+    @include mq.desktop {
       width: 60%;
     }
 
@@ -269,10 +286,13 @@ const contentClasses = computed(() => ({
     bottom: 0;
     right: 0;
     overflow: hidden;
-    box-shadow: var(--elevate-300);
     z-index: 2;
 
-    @include mq.mobile-only {
+    @include mq.tablet {
+      width: 50%;
+    }
+
+    @include mq.desktop {
       width: 60%;
     }
 
@@ -284,8 +304,23 @@ const contentClasses = computed(() => ({
   }
 
   &__content {
+    // Default mobile: content first
+    order: 1;
+    
     @include mq.mobile-only {
-      order: 1;
+      text-align: center;
+    }
+
+    // On desktop default content should come second unless explicitly ordered first
+    @include mq.desktop {
+      order: 2;
+      text-align: left;
+    }
+
+    &--order-first {
+      @include mq.desktop {
+        order: 1;
+      }
     }
 
     h2 {
@@ -312,6 +347,7 @@ const contentClasses = computed(() => ({
   }
 
   &__list {
+    text-align: left;
     list-style: none;
     padding: 0;
     margin: 0;
