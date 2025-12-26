@@ -30,6 +30,14 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 
+interface Props {
+  listingType?: ListingType;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  listingType: 'all'
+});
+
 /**
  *  Animate dock to final position
  */
@@ -125,7 +133,7 @@ onClickOutside($formWrapper, () => {
 /**
  *  Fetch filters
  */
-const { setQuery, searchState } = useSearchState()
+const { setQuery, setListingType, searchState } = useSearchState()
 const { checkContent, isChecking } = useModeration()
 const { showToast } = useToast()
 
@@ -136,6 +144,7 @@ const initialQuery = computed(() => {
 })
 
 async function searchSubmit(query: string) {
+  setListingType(props.listingType)
   const { location, radius, listingType } = asObject(searchState.value)
   
   if (!location) return

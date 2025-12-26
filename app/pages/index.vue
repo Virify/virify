@@ -31,8 +31,9 @@
             Virify AI
           </span>
         </h1>
-
-        <OrganismsDockBanner />
+        
+        <!-- When searching from for-sale page, this would be sale etc -->
+        <OrganismsDockBanner listingType="all" />
       </div>
     </div>
 

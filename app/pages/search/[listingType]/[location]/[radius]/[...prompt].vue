@@ -311,7 +311,7 @@ onMounted(async () => {
       setLocation(locationData)
       setLocationRadius(radiusValue)
       setQuery(promptText)
-      setListingType(listingType)
+      setListingType(listingType as ListingType)
       
       // Trigger the search
       await triggerSearch()
