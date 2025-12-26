@@ -3,6 +3,7 @@
 model TrackSearch {
   id                Int      @id @default(autoincrement())
   locationId        String   @default("") // MapTiler geocoding ID for re-geocoding
+  listingType       ListingType
   locationPlaceName String
   locationText      String
   locationLat       Float
@@ -15,9 +16,15 @@ model TrackSearch {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  @@unique([locationPlaceName, radius, query])
+  @@unique([listingType, locationPlaceName, radius, query])
   @@index([locationPlaceName])
   @@index([query])
   @@index([createdAt])
   @@index([resultCount])
+}
+
+enum ListingType {
+  SALE
+  RENT
+  ALL
 }

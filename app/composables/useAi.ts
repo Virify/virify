@@ -52,6 +52,7 @@ export default function useAi() {
     
     // Track search with full context
     trackSearch({
+      listingType,
       query,
       location: locationForTracking,
       radius,
