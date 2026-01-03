@@ -20,6 +20,7 @@
         description="Here are some of our most frequently asked questions. If you need further assistance, feel free to reach out to our support team."
         :items="nonSupportFaqItems" />
     </section>
+    <!-- support form -->
     <section class="p-support__form section">
       <h2 class="p-support__form--title | title-xl">
         <AtomsGradientTextRenderer text="Get {gradient}Help{/gradient} and {gradient}Support{/gradient}" variant="light" />
@@ -31,9 +32,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import OrganismsSupportForm from "~/components/organisms/Forms/OrganismsSupportForm.vue";
-import { supportFaqItems, nonSupportFaqItems } from "~/utils/faq";
-
+  
 const heroTitle = "{gradient}" + "Help" + "{/gradient}" + " and " + "{gradient}" + " Support" + "{/gradient}";
 
 </script>
