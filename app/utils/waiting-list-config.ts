@@ -40,6 +40,7 @@ const waitingListConfig: WaitingListConfig = {
     '/guides',   // allow /guides root
     '/login',
     '/cookie',
+    '/support',
     // '/mortgage-calculator',
   ],
 

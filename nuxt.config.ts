@@ -55,6 +55,7 @@ export default defineNuxtConfig({
       '/privacy',
       '/terms',
       '/cookie',
+      '/support',
     ],
     disallow: [
       '/account',

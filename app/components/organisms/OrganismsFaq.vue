@@ -28,7 +28,7 @@ useSchemaOrg({
   &-subtitle {
     text-align: center;
     margin: 0 auto;
-    margin-bottom: var(--size-32);
+    margin-bottom: var(--size-40);
     max-width: 700px;
   }
 

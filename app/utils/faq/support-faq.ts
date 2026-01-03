@@ -2,53 +2,38 @@ import type { FaqItem } from "#imports";
 
 export const supportFaqItems: FaqItem[] = [
   {
-    question: "How do I create an account?",
-    answer: "Click Sign up, choose email or social sign-in, and complete the quick onboarding steps. We will confirm your email before activating your account.",
+    question: "How do I join the waiting list?",
+    answer: "Visit our homepage and enter your email address in the waiting list form. You'll receive a confirmation email with your position in the queue and updates as we approach launch.",
     active: true,
   },
   {
-    question: "How do I create a listing?",
-    answer: "Go to My Listings and select Create listing. Fill in the property details, upload photos, set pricing, and publish when you are ready.",
+    question: "What happens after I join the waiting list?",
+    answer: "You'll receive regular updates about our progress and be among the first to access the platform when we launch. Early waiting list members will receive exclusive benefits.",
     active: false,
   },
   {
-    question: "How do I edit or update my listing?",
-    answer: "Open My Listings, pick the listing, and click Edit. You can update photos, pricing, description, and availability; changes save immediately on publish.",
+    question: "How do I use the price paid data?",
+    answer: "Search for any UK property address to see historical sale prices, transaction dates, and property details. This data comes directly from the Land Registry and helps you understand property values in your area.",
     active: false,
   },
   {
-    question: "How do I see my listing performance?",
-    answer: "Open a listing and check the Performance tab to view views, saves, inquiries, and conversion trends over your selected date range.",
+    question: "Where does the price paid data come from?",
+    answer: "All price paid data is sourced from the UK Land Registry, ensuring accuracy and reliability. The data includes all residential property sales in England and Wales.",
     active: false,
   },
   {
-    question: "How do I boost visibility for my listing?",
-    answer: "Use the Promote option inside the listing to feature it in search results. Strong photos, complete details, and competitive pricing also improve ranking.",
-    active: false,
-  },
-  {
-    question: "How do I use AI Search?",
-    answer: "Type what you want (e.g., '2-bed near parks with parking under £2k'), and the assistant will filter listings, explain matches, and suggest refinements.",
-    active: false,
-  },
-  {
-    question: "How do I save searches and get alerts?",
-    answer: "After running a search, click Save search and toggle alerts. We will email or notify you when new matches appear.",
-    active: false,
-  },
-  {
-    question: "How do I report a chat?",
-    answer: "Inside the chat, open the menu (three dots) and select Report chat. Choose a reason, add details, and submit so our team can review.",
-    active: false,
-  },
-  {
-    question: "How do I report a listing?",
-    answer: "On the listing page, click Report listing, pick the reason (incorrect info, scam, inappropriate), add context, and send it to our trust and safety team.",
+    question: "How do I access the guides?",
+    answer: "Browse our guides section to find helpful articles about property search, the rental market, and using our platform. Guides are free to access and regularly updated.",
     active: false,
   },
   {
     question: "How do I contact support?",
-    answer: "Use the Help center contact form or email support@virify.co.uk. For urgent safety issues, use Report in-app so we can triage faster.",
+    answer: "Use the contact form on our Contact page or email us at support@virify.co.uk. We typically respond within 24 hours during business days.",
+    active: false,
+  },
+  {
+    question: "When will the full platform launch?",
+    answer: "We're working hard to bring you the best property search experience. Join the waiting list to be notified as soon as we launch and receive early access.",
     active: false,
   },
 ];
