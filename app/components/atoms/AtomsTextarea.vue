@@ -48,5 +48,6 @@ const { validityText, checkValidity } = useCheckValidity(props.customValidation)
 <style>
   .a-textarea {
     font-size: var(--font-md);
+    border: 1px solid var(--input-text-border);
   }
 </style>
