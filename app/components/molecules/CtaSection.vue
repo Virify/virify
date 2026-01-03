@@ -3,10 +3,10 @@
     <div class="container">
       <div class="cta-section__content">
         <h2 class="title-xl">
-          <template v-for="(part, index) in parseGradientTextParts(title)" :key="index">
-            <span v-if="part.isGradient" :class="gradient ? 'gradient-text' : 'gradient-text-light'">{{ part.text }}</span>
-            <template v-else>{{ part.text }}</template>
-          </template>
+          <AtomsGradientTextRenderer 
+            :text="title" 
+            :variant="gradient ? 'dark' : 'light'"
+          />
         </h2>
         <p class="body-lg max-width-prose">{{ description }}</p>
         <div class="cta-section__button-wrapper">

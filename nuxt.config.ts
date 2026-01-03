@@ -124,6 +124,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
   vite: {
+    server: {
+      watch: {
+        usePolling: true,
+      },
+    },
     plugins: [],
     vue: {
       template: {

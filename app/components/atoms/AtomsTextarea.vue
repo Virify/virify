@@ -1,11 +1,5 @@
 <template>
-  <div :class="wrapperClass" class="a-input" role="presentation">
-    <slot name="prefix" />
-
-    <input v-bind="$attrs" :value="modelValue" :aria-describedby="ariaDescribed" class="| text-input body-sm" @input="handleInput" />
-
-    <slot name="suffix" />
-  </div>
+  <textarea :value="modelValue" :aria-describedby="ariaDescribed" v-bind="$attrs" @input="handleInput" class="a-textarea" />
 
   <AtomsInlineError v-if="validityText" :id="errorId">
     {{ validityText }}
@@ -13,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+
 /**
  *  a11y
  */
@@ -25,14 +20,11 @@ const ariaDescribed = computed(() => {
 })
 
 /**
- *  Apply the appropriate settings for password inputs
+ *  Props and emits
  */
 const props = defineProps({
   customValidation: {
     type: Object
-  },
-  wrapperClass: {
-    type: String
   },
   modelValue: {
     type: [String, Number],
@@ -43,21 +35,18 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 function handleInput(event: Event) {
-  const target = event.target as HTMLInputElement
+  const target = event.target as HTMLTextAreaElement
   emit('update:modelValue', target.value)
   checkValidity(event)
 }
 
 /**
- *  Validate inputs - this can probably be made into a composable
+ *  Validate textarea
  */
 const { validityText, checkValidity } = useCheckValidity(props.customValidation)
-
-/**
- *  Expose validation state to parent components
- */
-defineExpose({
-  validityText,
-  isValid: computed(() => !validityText.value)
-})
 </script>
+<style>
+  .a-textarea {
+    font-size: var(--font-md);
+  }
+</style>

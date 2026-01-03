@@ -1,16 +1,10 @@
 <template>
   <div class="price-paid-page">
     <!-- Hero like the homepage -->
-    <section class="price-paid-hero">
-      <div class="container">
-        <div class="price-paid-hero__content">
-          <h1 class="title-2xl lineheight-xs">Price Paid Data</h1>
-          <p class="body-lg">
-            Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address.
-          </p>
-        </div>
-      </div>
-    </section>
+    <OrganismsHero
+      title="{gradient}Price Paid{/gradient} Data"
+      subtitle="Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address."
+    />
 
     <!-- Form + results (unchanged) -->
     <div class="price-paid | container">
@@ -237,21 +231,6 @@ useSchemaOrg([
 <style lang="scss" scoped>
 .price-paid-page {
   background: var(--background-100);
-}
-
-.price-paid-hero {
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-  color: var(--monochrome-900);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 45vh;
-
-  .price-paid-hero__content {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
-  }
 }
 
 .price-paid {

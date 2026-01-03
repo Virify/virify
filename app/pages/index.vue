@@ -4,38 +4,12 @@
     <!-- ============================================ -->
     <!-- HERO SECTION -->
     <!-- ============================================ -->
-    <section class="waiting-list-hero" v-if="isWaitingListMode">
-      <div class="container">
-        <div class="waiting-list-hero__content">
-          <h1 class="waiting-list-hero__title | title-2xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <span v-else>{{ part.text }}</span>
-            </template>
-          </h1>
-          <p class="waiting-list-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
-          
-          <div class="waiting-list-hero__search-demo">
-            <MoleculesAnimatedSearchInput />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- AI Search Hero -->
-    <div v-else class="p-index__banner">
-      <div class="p-index__banner-content | flow flow-xl">
-        <h1 class="p-index__title | title-2xl lineheight-xs">
-          Find Your Perfect Home with
-          <span class="gradient-text">
-            Virify AI
-          </span>
-        </h1>
-        
-        <!-- When searching from for-sale page, this would be sale etc -->
-        <OrganismsDockBanner listingType="all" />
-      </div>
-    </div>
+    <OrganismsHero
+      :title="cmsContent?.hero.title || ''"
+      :subtitle="cmsContent?.hero.subtitle || ''"
+      :input="true"
+      :search="true"
+    />
 
     <!-- ============================================ -->
     <!-- SIGN UP FORM SECTION -->
@@ -101,10 +75,10 @@
       v-bind="section"
     >
       <template #title>
-        <template v-for="(part, titleIndex) in parseGradientTextParts(section.title || '')" :key="titleIndex">
-          <span v-if="part.isGradient" :class="(section.background || 'white') === 'white' ? 'gradient-text-light' : 'gradient-text'">{{ part.text }}</span>
-          <span v-else>{{ part.text }}</span>
-        </template>
+        <AtomsGradientTextRenderer 
+          :text="section.title || ''" 
+          :background="section.background || 'white'"
+        />
       </template>
     </OrganismsFeatureSection>
 
@@ -115,10 +89,7 @@
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.sellersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" :class="sellersGradientClass">{{ part.text }}</span>
-              <span v-else>{{ part.text }}</span>
-            </template>
+            <AtomsGradientTextRenderer :text="cmsContent?.sellersBenefits.title || ''" :variant="sellersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.sellersBenefits.subtitle }}</p>
         </header>
@@ -144,10 +115,7 @@
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.buyersBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" :class="buyersGradientClass">{{ part.text }}</span>
-              <span v-else>{{ part.text }}</span>
-            </template>
+            <AtomsGradientTextRenderer :text="cmsContent?.buyersBenefits.title || ''" :variant="buyersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
         </header>
@@ -183,10 +151,7 @@
       <div class="container">
         <header class="waiting-list-benefits__header">
           <h2 class="title-xl">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.earlyAccessBenefits.title || '')" :key="index">
-              <span v-if="part.isGradient" :class="benefitsGradientClass">{{ part.text }}</span>
-              <span v-else>{{ part.text }}</span>
-            </template>
+            <AtomsGradientTextRenderer :text="cmsContent?.earlyAccessBenefits.title || ''" :variant="benefitsGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.earlyAccessBenefits.subtitle }}</p>
         </header>
@@ -194,10 +159,7 @@
         <div class="waiting-list-benefits__cards">
           <AtomsHeroCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index" :variant="index === 1 ? 'secondary' : undefined">
             <h3 class="title-md">
-              <template v-for="(part, pIndex) in parseGradientTextParts(benefit.title || '')" :key="pIndex">
-                <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-                <span v-else>{{ part.text }}</span>
-              </template>
+              <AtomsGradientTextRenderer :text="benefit.title || ''" variant="dark" />
             </h3>
             <p class="body-md">{{ benefit.description }}</p>
           </AtomsHeroCard>
@@ -230,7 +192,6 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
 const { showToast } = useToast();
-const { isWaitingListMode } = useWaitingListMode();
 
 // Fetch CMS content - module automatically uses correct perspective
 const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(
@@ -381,78 +342,11 @@ useSchemaOrg([
 <style lang="scss" scoped>
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
+@use "#styles/3-elements/sections" as *;
 
 // Shared gradient background
 .section-gradient-bg {
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-  color: var(--monochrome-900);
-}
-
-// search hero banner
-.p-index {
-  &__title {
-    color: var(--monochrome-900);
-    max-width: 20ch;
-    margin: 0 auto var(--size-40);
-  }
-
-  &__banner {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 50vh;
-    padding: var(--size-64) var(--size-32);
-    box-sizing: border-box;
-    background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-    text-align: center;
-  }
-
-  &__banner-content {
-    max-width: min(100%, 45rem);
-    margin: 0 auto;
-    flex: 1 0;
-  }
-}
-
-// Hero Section
-.waiting-list-hero {
-  @extend .section-gradient-bg;
-  padding: var(--size-64) var(--size-32);
-  min-height: 45vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @include mq.tablet {
-    padding: var(--size-32);
-    background:
-      url("/img/logo-background.svg") no-repeat top right,
-      linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-    background-size:
-      auto 120%,
-      cover;
-  }
-
-  &__content {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  &__title {
-    margin-bottom: var(--size-24);
-  }
-
-  &__subtitle {
-    margin: 0 auto var(--size-32);
-  }
-
-  &__search-demo {
-    max-width: 600px;
-    margin: 0 auto;
-  }
+  @include section-gradient-bg();
 }
 
 // Form Section

@@ -1,19 +1,10 @@
 <template>
   <div class="contact-page">
     <!-- Hero Section -->
-    <section class="contact-hero">
-      <div class="container">
-        <div class="contact-hero__content">
-          <h1 class="contact-hero__title | title-2xl lineheight-xs">
-            <template v-for="(part, index) in parseGradientTextParts(cmsContent?.hero.title || '')" :key="index">
-              <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-              <template v-else>{{ part.text }}</template>
-            </template>
-          </h1>
-          <p class="contact-hero__subtitle | body-lg">{{ cmsContent?.hero.subtitle }}</p>
-        </div>
-      </div>
-    </section>
+    <OrganismsHero
+      :title="cmsContent?.hero.title || ''"
+      :subtitle="cmsContent?.hero.subtitle || ''"
+    />
 
     <!-- Contact Form Section -->
     <section class="contact-form-section" id="contact">
@@ -39,10 +30,7 @@
     <section class="contact-faq section-gradient-bg">
       <div class="container">
         <h2 class="contact-faq__title | title-xl">
-          <template v-for="(part, index) in parseGradientTextParts(cmsContent?.faqSection.title || '')" :key="index">
-            <span v-if="part.isGradient" class="gradient-text">{{ part.text }}</span>
-            <template v-else>{{ part.text }}</template>
-          </template>
+          <AtomsGradientTextRenderer :text="cmsContent?.faqSection.title || ''" variant="dark" />
         </h2>
         <OrganismsFaq :items="cmsContent?.faqSection.faqs || []" :description="cmsContent?.faqSection.description || ''" />
       </div>
@@ -122,45 +110,11 @@ useSchemaOrg([
 <style lang="scss" scoped>
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
+@use "#styles/3-elements/sections" as *;
 
 // Shared gradient background
 .section-gradient-bg {
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-  color: var(--monochrome-900);
-}
-
-// Hero Section
-.contact-hero {
-  @extend .section-gradient-bg;
-  padding: var(--size-80) var(--size-32) var(--size-64);
-  min-height: 45vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @include mq.tablet {
-    padding: var(--size-32);
-    background:
-      url("/img/logo-background.svg") no-repeat top right,
-      linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-    background-size:
-      auto 120%,
-      cover;
-  }
-
-  &__content {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  &__title {
-    margin-bottom: var(--size-24);
-  }
-
-  &__subtitle {
-    margin: 0 auto;
-  }
+  @include section-gradient-bg();
 }
 
 // Form Section
