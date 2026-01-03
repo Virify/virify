@@ -114,6 +114,7 @@ const props = defineProps<{
 
 const { showToast } = useToast();
 const config = useRuntimeConfig();
+const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 
 const formData = ref({
   name: "",
@@ -127,9 +128,6 @@ const isSuccess = ref(false);
 const formError = ref<string | null>(null);
 const enquiryError = ref<string | null>(null);
 const message = ref("Thank you for your enquiry. We'll get back to you as soon as possible.");
-const turnstileToken = ref<string | null>(null);
-const turnstileEl = ref<HTMLElement | null>(null);
-const widgetId = ref<string | null>(null);
 
 const isFormValid = computed(() => {
   return formData.value.name.trim() !== "" &&
@@ -149,41 +147,13 @@ function checkEnquiryValidity(event: Event) {
 }
 
 onMounted(() => {
-  let retryCount = 0;
-  const maxRetries = 50;
-
-  const initTurnstile = () => {
-    if ((window as any).turnstile && turnstileEl.value) {
-      try {
-        widgetId.value = (window as any).turnstile.render(turnstileEl.value, {
-          sitekey: config.public.CF_SITE_KEY,
-          size: 'invisible',
-          execution: 'execute',
-          callback: (token: string) => {
-            turnstileToken.value = token;
-            submitForm();
-          },
-        });
-      } catch (error) {
-        console.error('Failed to initialize Turnstile:', error);
-      }
-    } else if (retryCount < maxRetries) {
-      retryCount++;
-      setTimeout(initTurnstile, 100);
-    } else {
-      console.error('Turnstile script failed to load after maximum retries');
-    }
-  };
-
-  initTurnstile();
+  initializeTurnstile((token) => {
+    submitForm();
+  });
 });
 
 onUnmounted(() => {
-  if ((window as any).turnstile && widgetId.value) {
-    try {
-      (window as any).turnstile.remove(widgetId.value);
-    } catch (_) { }
-  }
+  cleanupTurnstile();
 });
 
 async function handleSubmit() {
@@ -195,10 +165,7 @@ async function handleSubmit() {
   }
 
   isSubmitting.value = true;
-
-  if ((window as any).turnstile && widgetId.value) {
-    (window as any).turnstile.execute(widgetId.value);
-  }
+  executeTurnstile();
 }
 
 async function submitForm() {
@@ -223,13 +190,7 @@ async function submitForm() {
   } catch (error: any) {
     console.error("Contact form error:", error);
     formError.value = error.data?.statusMessage || error.statusMessage || "Failed to send enquiry. Please try again.";
-
-    if ((window as any).turnstile && widgetId.value) {
-      try {
-        (window as any).turnstile.reset(widgetId.value);
-      } catch (_) { }
-      turnstileToken.value = null;
-    }
+    resetTurnstile();
   } finally {
     isSubmitting.value = false;
   }

@@ -2,10 +2,7 @@
   <section :class="['contact-guides', padding]">
     <div class="container">
       <h2 class="contact-guides__title | title-xl">
-        <template v-for="(part, index) in parseGradientTextParts(title || '')" :key="index">
-          <span v-if="part.isGradient" :class="gradientClass">{{ part.text }}</span>
-          <template v-else>{{ part.text }}</template>
-        </template>
+        <AtomsGradientTextRenderer :text="title || ''" :variant="gradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
       </h2>
       <p class="contact-guides__description | body-lg">{{ description || '' }}</p>
       <OrganismsGuidesCarousel v-if="guides && guides.length" :guides="guides" />
@@ -14,8 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { parseGradientTextParts as parseParts } from "../../utils/gradient-text";
-
 const props = defineProps({
   title: { type: String, default: "" },
   description: { type: String, default: "" },
@@ -23,8 +18,6 @@ const props = defineProps({
   gradientClass: { type: String, default: "gradient-text" },
   section: { type: Boolean, default: true },
 });
-
-const parseGradientTextParts = (text: string) => parseParts(text);
 
 const title = props.title;
 const description = props.description;

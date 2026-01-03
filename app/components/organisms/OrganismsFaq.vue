@@ -7,11 +7,7 @@
 <script lang="ts" setup>
 interface Props {
   description?: string;
-  items: {
-    question: string;
-    answer: string;
-    active: boolean;
-  }[];
+  items: FaqItem[];
 }
 const props = defineProps<Props>();
 
@@ -32,15 +28,15 @@ useSchemaOrg({
   &-subtitle {
     text-align: center;
     margin: 0 auto;
-    margin-bottom: var(--size-32);
-    max-width: 600px;
+    margin-bottom: var(--size-40);
+    max-width: 700px;
   }
 
   &-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
   }
 }

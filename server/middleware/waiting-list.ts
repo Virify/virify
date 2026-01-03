@@ -25,6 +25,7 @@ export default defineEventHandler((event) => {
       // '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
       // '/api/analytics/mortgage/track', // Track mortgage calculator usage
       '/auth/update-admin-password', // Admin password update (protected by TASK_SECRET)
+      '/api/support',              // POST - support request form
     ];
 
     // Check if the path is an API route

@@ -13,20 +13,31 @@ export const getBaseCenterItems = (): NavigationItem[] => {
       href: "/",
     },
     {
+      id: "contact",
+      label: "Contact Us",
+      href: "/contact/",
+      type: "link",
+    },
+    {
       id: "guides",
       label: "Guides",
       href: "/guides",
       type: "dropdown",
       children: [],
     },
+    {
+      id: "property-info",
+      label: "Property Information",
+      type: "dropdown",
+      children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: "account/billing" }],
+    },
+    {
+      id: "support",
+      label: "Support",
+      href: "/support/",
+      type: "link",
+    },
   ];
-
-  items.push({
-    id: "property-info",
-    label: "Property Information",
-    type: "dropdown",
-    children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: "account/billing" }],
-  });
 
   // items.push({
   //   id: "mortgage-calculator",
@@ -34,16 +45,6 @@ export const getBaseCenterItems = (): NavigationItem[] => {
   //   href: "/mortgage-calculator/",
   //   type: "link",
   // })
-
-  // Add Contact link only in waiting list mode
-  if (isWaitingListMode.value) {
-    items.push({
-      id: "contact",
-      label: "Contact Us",
-      href: "/contact/",
-      type: "link",
-    });
-  }
 
   return items;
 };

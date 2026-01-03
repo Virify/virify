@@ -9,28 +9,6 @@ const contactSchema = z.object({
   turnstileToken: z.string().min(1, "Bot verification is required"),
 });
 
-async function verifyTurnstileToken(token: string, remoteIp: string): Promise<boolean> {
-  const config = useRuntimeConfig();
-
-  const formData = new FormData();
-  formData.append("secret", config.CF_SECRET_KEY);
-  formData.append("response", token);
-  formData.append("remoteip", remoteIp);
-
-  try {
-    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-      method: "POST",
-      body: formData,
-    });
-
-    const outcome = await response.json();
-    return outcome.success;
-  } catch (error) {
-    console.error("Turnstile verification error:", error);
-    return false;
-  }
-}
-
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 

@@ -1,10 +1,11 @@
 <template>
   <div class="m-faq-item" @click="isActive = !isActive">
-    <div class="m-faq-item__question">
+    <div class="m-faq-item__question | body-lg">
       <h3 class="m-faq-item__question--title | body-lg">{{ question }}</h3>
       <AtomsIcon class="m-faq-item__question--icon" :class="{ 'is-active': isActive }" icon="chevron-down" />
     </div>
-    <p v-show="isActive" class="m-faq-item__answer | body-md">{{ answer }}</p>
+    <p v-show="isActive" class="m-faq-item__answer | body-lg">{{ answer }}</p>
+    <AtomsDivider class="m-faq-item__divider" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -21,7 +22,7 @@ const isActive = ref(props.active ?? false);
 @use "#styles/_utils/media" as mq;
 
 .m-faq-item {
-  padding: var(--size-8) 0;
+  padding: var(--size-12);
 
   &__question {
     display: flex;
@@ -31,7 +32,6 @@ const isActive = ref(props.active ?? false);
 
     &--title {
       margin: 0;
-      line-height: var(--lineheight-sm);
     }
 
     &--icon {
@@ -47,6 +47,10 @@ const isActive = ref(props.active ?? false);
   &__answer {
     margin-top: var(--size-8);
     line-height: 1.6;
+  }
+
+  &__divider {
+    margin: var(--size-16) 0 0 0;
   }
 }
 </style>
