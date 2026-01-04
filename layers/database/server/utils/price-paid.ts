@@ -37,8 +37,11 @@ export async function getPricePaidByAddress(postcode: string, street: string, ci
  */
 export async function calculateMarketContext(city: string, postcode: string, number: string, flat: string | null | undefined, propertyType: string | null, latestPrice: number, sortedSales: PricePaidSale[]): Promise<MarketContext> {
   const currentYear = new Date().getFullYear();
-  const mostRecentSaleYear = sortedSales.length > 0 && sortedSales[0] ? new Date(sortedSales[0].transfer_date).getFullYear() : currentYear;
-  const referenceYear = Math.max(currentYear, mostRecentSaleYear);
+  // If it's early in the year (Jan-March), use previous year as reference to ensure we have data
+  const effectiveCurrentYear = new Date().getMonth() < 3 ? currentYear - 1 : currentYear;
+  
+  const mostRecentSaleYear = sortedSales.length > 0 && sortedSales[0] ? new Date(sortedSales[0].transfer_date).getFullYear() : effectiveCurrentYear;
+  const referenceYear = Math.max(effectiveCurrentYear, mostRecentSaleYear);
   const yearStart = new Date(`${referenceYear}-01-01`);
   const yearEnd = new Date(`${referenceYear}-12-31`);
   const [areaStats, propertyTypeStats, allAreaPrices] = await Promise.all([
