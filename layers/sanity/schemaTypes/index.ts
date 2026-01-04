@@ -8,6 +8,7 @@ import {contactPageType} from './contactPageType'
 import {iconType} from './iconType'
 import {featureSectionType} from './featureSectionType'
 import {faqType} from './faqType'
+import { supportPageType } from './supportPageType'
 
 export const schemaTypes = [
   // Reusable types
@@ -23,4 +24,5 @@ export const schemaTypes = [
   cookieType,
   waitingListPageType,
   contactPageType,
+  supportPageType,
 ]

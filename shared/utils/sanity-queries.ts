@@ -183,7 +183,7 @@ export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
     benefits[] {
       title,
       description,
-      icon
+      variant
     }
   },
   contactSection {
@@ -286,6 +286,64 @@ export const contactPageQuery = `*[_type == "contactPage"][0] {
         slug
       }
     }
+  },
+  seo {
+    metaTitle,
+    metaDescription,
+    keywords,
+    ogTitle,
+    ogDescription,
+    ogImage,
+    twitterCard,
+    canonicalUrl
+  }
+}`
+
+export const supportPageQuery = `*[_type == "supportPage"][0] {
+  _id,
+  _type,
+  hero {
+    title,
+    subtitle
+  },
+  faqSection {
+    title,
+    description,
+    faqs[]-> {
+      _id,
+      question,
+      answer,
+      active
+    }
+  },
+  ourSupportSection {
+    title,
+    subtitle,
+    benefits[] {
+      title,
+      description,
+      variant
+    }
+  },
+  whatWeDontSupportSection {
+    title,
+    description,
+    faqs[]-> {
+      _id,
+      question,
+      answer,
+      active
+    }
+  },
+  SupportFormSection {
+    title,
+    description
+  },
+  ctaSection {
+    title,
+    description,
+    buttonText,
+    buttonLink
   },
   seo {
     metaTitle,

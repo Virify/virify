@@ -150,6 +150,7 @@ onUnmounted(() => {
     font-size: var(--font-md);
     line-height: var(--lineheight-sm);
     background-color: var(--background-200);
+    color: var(--foreground-100);
   }
 
   &__turnstile {

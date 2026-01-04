@@ -357,3 +357,57 @@ export interface ContactPage {
 }
 
 export interface ContactPageResponse extends ContactPage {}
+
+// Support Page
+export interface SupportBenefit {
+  title: string
+  description: string
+  variant: 'primary' | 'secondary'
+}
+
+export interface SupportPage {
+  _id: string
+  _type: 'supportPage'
+  hero: {
+    title: string
+    subtitle: string
+  }
+  faqSection: {
+    title: string
+    description: string
+    faqs: {
+      _id: string
+      question: string
+      answer: string
+      active: boolean
+    }[]
+  }
+  ourSupportSection: {
+    title: string
+    subtitle: string
+    benefits: SupportBenefit[]
+  }
+  whatWeDontSupportSection: {
+    title: string
+    description: string
+    faqs: {
+      _id: string
+      question: string
+      answer: string
+      active: boolean
+    }[]
+  }
+  SupportFormSection: {
+    title: string
+    description: string
+  }
+  ctaSection: {
+    title: string
+    description: string
+    buttonText: string
+    buttonLink: string
+  }
+  seo?: SeoMetadata
+}
+
+export interface SupportPageResponse extends SupportPage {}

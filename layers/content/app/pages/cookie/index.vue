@@ -1,15 +1,15 @@
 <template>
-  <div class="legal-page | container">
-    <section v-if="pending" class="legal-page__content">
+  <div class="legal-page">
+    <section v-if="pending" class="legal-page__content | container">
       <div class="legal-page__loading">Loading...</div>
     </section>
     
-    <section v-else-if="error" class="legal-page__content">
+    <section v-else-if="error" class="legal-page__content | container">
       <h1 class="legal-page__title | title-2xl">Cookie Policy</h1>
       <p class="legal-page__error">Failed to load cookie policy. Please try again later.</p>
     </section>
     
-    <section v-else-if="data" class="legal-page__content">
+    <section v-else-if="data" class="legal-page__content | container">
       <h1 class="legal-page__title | title-2xl">{{ data.title }}</h1>
       <p class="legal-page__updated | body-xs" v-if="data.lastUpdated">
         Last updated: {{ formatDate(data.lastUpdated) }}
@@ -67,7 +67,13 @@ useSchemaOrg([
 
 .legal-page {
   margin: 0 auto;
-  padding-block: var(--size-24);
+  background: var(--background-200);
+
+  &__content {
+    display: block;
+    padding: var(--size-24);
+    color: var(--foreground-100);
+  }
 
   > section + section {
     margin-top: var(--size-32);
@@ -95,14 +101,6 @@ useSchemaOrg([
 
   &__error {
     color: var(--error-500);
-  }
-
-  &__content {
-    display: block;
-    background: var(--background-200);
-    border-radius: var(--border-radius-xl);
-    padding: var(--size-24);
-    color: var(--foreground-100);
   }
 }
 </style>

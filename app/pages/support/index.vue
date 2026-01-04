@@ -1,34 +1,28 @@
 <template>
   <div class="p-support">
-    <OrganismsHero :title="heroTitle"
-      :subtitle="'Find answers to common questions and get assistance from our support team.'" />
+    <OrganismsHero :title="cmsData.hero.title"
+      :subtitle="cmsData.hero.subtitle" />
     <!-- support faq -->
     <section class="p-support__faq section | flow flow-lg">
       <h2 class="p-support__faq--title | title-xl">
-        <AtomsGradientTextRenderer text="Frequently Asked {gradient}Questions{/gradient}" variant="light" />
+        <AtomsGradientTextRenderer :text="cmsData.faqSection.title" variant="light" />
       </h2>
       <OrganismsFaq
-        description="Here are some of our most frequently asked questions. If you need further assistance, feel free to reach out to our support team."
-        :items="supportFaqItems" />
+        :description="cmsData.faqSection.description"
+        :items="cmsData.faqSection.faqs" />
     </section>
     <section class="section-gradient-bg">
       <h2 class="title-xl">
-        <AtomsGradientTextRenderer text="Our {gradient}Support{/gradient}" variant="light" />
+        <AtomsGradientTextRenderer :text="cmsData.ourSupportSection.title" variant="light" />
         <div class="p-support__info | container">
-          <AtomsHeroCard>
-            <h3 class="title-md">24/7 Support</h3>
-            <p class="body-md">Our support team is available around the clock to assist you with any issues or questions
-              you may have.</p>
-          </AtomsHeroCard>
-          <AtomsHeroCard variant="secondary">
-            <h3 class="title-md">Expert Assistance</h3>
-            <p class="body-md">Our support staff are knowledgeable and experienced, ensuring you receive the best
-              possible assistance.</p>
-          </AtomsHeroCard>
-          <AtomsHeroCard>
-            <h3 class="title-md">Comprehensive Resources</h3>
-            <p class="body-md">We provide a wide range of resources, including FAQs, guides, and tutorials to help you
-              find answers quickly.</p>
+          <AtomsHeroCard
+            v-for="(benefit, index) in cmsData.ourSupportSection.benefits"
+            :key="index"
+            :variant="benefit.variant">
+            <h3 class="title-md">
+              <AtomsGradientTextRenderer :text="benefit.title" variant="dark" />
+            </h3>
+            <p class="body-md">{{ benefit.description }}</p>
           </AtomsHeroCard>
         </div>
 
@@ -38,50 +32,76 @@
     <!-- Things we cant help with -->
     <section class="p-support__faq section | flow flow-lg">
       <h2 class="p-support__faq--title | title-xl">
-        <AtomsGradientTextRenderer text="Things We {gradient}Can't Help With{/gradient}" variant="light" />
+        <AtomsGradientTextRenderer :text="cmsData.whatWeDontSupportSection.title" variant="light" />
       </h2>
       <OrganismsFaq
-        description="Here are some of our most frequently asked questions. If you need further assistance, feel free to reach out to our support team."
-        :items="nonSupportFaqItems" />
+        :description="cmsData.whatWeDontSupportSection.description"
+        :items="cmsData.whatWeDontSupportSection.faqs" />
     </section>
     <!-- support form -->
     <section class="p-support__form section-gradient-bg">
       <h2 class="p-support__form--title | title-xl">
-        <AtomsGradientTextRenderer text="Get {gradient}Help{/gradient} and {gradient}Support{/gradient}"
+        <AtomsGradientTextRenderer :text="cmsData.SupportFormSection.title"
           variant="light" />
       </h2>
-      <p class="p-support__form--description | body-lg center-text">Having an issue or need help? Let us know and we'll
-        get back to you as soon as possible.</p>
+      <p class="p-support__form--description | body-lg center-text">{{ cmsData.SupportFormSection.description }}</p>
 
       <OrganismsFormsSupport />
     </section>
     <section>
       <MoleculesCtaSection
-        title="Join the {gradient}waiting list{/gradient}"
-        description="Be the first to know when we launch. Join our waiting list today!"
-        buttonText="Join the waiting list"
-        to="/contact"
+        :title="cmsData.ctaSection.title"
+        :description="cmsData.ctaSection.description"
+        :buttonText="cmsData.ctaSection.buttonText"
+        :to="cmsData.ctaSection.buttonLink"
         />
     </section>
   </div>
 </template>
 <script lang="ts" setup>
 
-const heroTitle = "{gradient}" + "Help" + "{/gradient}" + " and " + "{gradient}" + " Support" + "{/gradient}";
+const { data: cmsDataRef } = await useSanityQuery<SupportPage>(supportPageQuery);
+
+// Ensure we have CMS data - throw error if document doesn't exist
+if (!cmsDataRef.value) {
+  throw createError({
+    statusCode: 500,
+    statusMessage: 'Support page content not found in CMS',
+  });
+}
+
+// Create a non-null version for the template
+const cmsData = cmsDataRef.value!;
+
+// SEO metadata
+const seoData = computed(() => {
+  const cms = cmsData.seo;
+  return {
+    title: cms?.metaTitle || "Support & Help Center | Virify - Property Search Made Easy",
+    description: cms?.metaDescription || "Get help with Virify's property search platform. Access our comprehensive FAQs, guides, and support resources. Contact our support team for assistance with price paid data, waiting list, and more.",
+    keywords: cms?.keywords || "property support, help center, FAQ, property guides, UK property data, real estate support",
+    ogTitle: cms?.ogTitle || "Support & Help Center | Virify",
+    ogDescription: cms?.ogDescription || "Find answers to your questions and get support from the Virify team. Access guides, FAQs, and contact support.",
+    ogImage: cms?.ogImage || 'https://virify.co.uk/og-image.jpg',
+    twitterCard: cms?.twitterCard || "summary_large_image",
+    canonicalUrl: cms?.canonicalUrl || "https://virify.co.uk/support",
+  };
+});
 
 useSeoMeta({
-  title: "Support & Help Center | Virify - Property Search Made Easy",
-  description: "Get help with Virify's property search platform. Access our comprehensive FAQs, guides, and support resources. Contact our support team for assistance with price paid data, waiting list, and more.",
-  keywords: "property support, help center, FAQ, property guides, UK property data, real estate support",
-  ogTitle: "Support & Help Center | Virify",
-  ogDescription: "Find answers to your questions and get support from the Virify team. Access guides, FAQs, and contact support.",
+  title: seoData.value.title,
+  description: seoData.value.description,
+  keywords: seoData.value.keywords,
+  ogTitle: seoData.value.ogTitle,
+  ogDescription: seoData.value.ogDescription,
+  ogImage: seoData.value.ogImage,
   ogType: "website",
-  ogUrl: "https://virify.co.uk/support",
-  twitterCard: "summary_large_image",
+  ogUrl: seoData.value.canonicalUrl,
+  twitterCard: seoData.value.twitterCard as "summary" | "summary_large_image",
 });
 
 useHead({
-  link: [{ rel: "canonical", href: "https://virify.co.uk/support" }],
+  link: [{ rel: "canonical", href: seoData.value.canonicalUrl }],
   script: [
     {
       src: "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit",
