@@ -2,18 +2,18 @@
 
 // Standard section padding with responsive adjustments
 @mixin section-padding() {
-  padding: var(--size-64) 0;
+  padding: var(--size-120) 0;
 
   h2 {
     text-align: center;
   }
 
   @include mq.mobile-and-small-tablet {
-    padding: var(--size-64) var(--size-32);
+    padding: var(--size-120) var(--size-32);
   }
 
   @include mq.mobile-only {
-    padding: var(--size-48) var(--size-12);
+    padding: var(--size-120) var(--size-24);
   }
 }
 

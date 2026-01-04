@@ -50,7 +50,6 @@ const showSearch = props.search && !isWaitingListMode.value;
 // Helpers
 @mixin hero-gradient() {
   background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-  color: var(--monochrome-900);
 }
 
 @mixin hero-background() {
@@ -65,7 +64,11 @@ const showSearch = props.search && !isWaitingListMode.value;
 // Hero component styles
 .o-hero {
   @include hero-gradient();
-  @include hero-background();
+  
+  @include mq.small-tablet {
+    @include hero-background();
+  }
+
   padding: var(--size-64) var(--size-32);
   min-height: 45vh;
   display: flex;
@@ -81,10 +84,12 @@ const showSearch = props.search && !isWaitingListMode.value;
 
   &__title {
     margin-bottom: var(--size-24);
+    color: var(--monochrome-900);
   }
 
   &__subtitle {
     margin: 0 auto var(--size-32);
+    color: var(--monochrome-900);
   }
 
   &__search-demo {

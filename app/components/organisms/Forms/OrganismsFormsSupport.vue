@@ -1,14 +1,14 @@
 <template>
   <MoleculesForm @submit.prevent="submitForm" class="o-support-form | stacked" :error="formErrors">
-    <MoleculesFormField label="Your Name" v-slot="{ id }">
-      <AtomsInput ref="nameInput" :id type="text" name="name" v-model="formName" required />
+    <MoleculesFormField label="Your Name" id="support-form-name" v-slot="{ id }">
+      <AtomsInput ref="nameInput" :id type="text" name="name" v-model="formName" required error-id="support-form-name-error" />
     </MoleculesFormField>
 
-    <MoleculesFormField label="Email Address" v-slot="{ id }">
-      <AtomsInput ref="emailInput" :id type="email" name="email" v-model="formEmail" required />
+    <MoleculesFormField label="Email Address" id="support-form-email" v-slot="{ id }">
+      <AtomsInput ref="emailInput" :id type="email" name="email" v-model="formEmail" required error-id="support-form-email-error" />
     </MoleculesFormField>
 
-    <MoleculesFormField label="Type" v-slot="{ id }">
+    <MoleculesFormField label="Type" id="support-form-type" v-slot="{ id }">
       <AtomsSelect :id name="type" v-model="formType" :options="typeOptions" required
         class="o-support-form__select | body-sm select-input">
         <template #default="{ options }">
@@ -20,9 +20,9 @@
       </AtomsSelect>
     </MoleculesFormField>
 
-    <MoleculesFormField label="Details" v-slot="{ id }">
+    <MoleculesFormField label="Details" id="support-form-details" v-slot="{ id }">
       <AtomsTextarea :id name="details" v-model="formDetails" rows="5" required
-        placeholder="Please describe your issue or question in detail." class="o-support-form__textarea" />
+        placeholder="Please describe your issue or question in detail." class="o-support-form__textarea" error-id="support-form-details-error" />
     </MoleculesFormField>
 
     <!-- Cloudflare Turnstile -->
@@ -150,6 +150,7 @@ onUnmounted(() => {
     font-size: var(--font-md);
     line-height: var(--lineheight-sm);
     background-color: var(--background-200);
+    color: var(--foreground-100);
   }
 
   &__turnstile {

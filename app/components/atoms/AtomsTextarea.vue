@@ -1,23 +1,12 @@
 <template>
   <textarea :value="modelValue" :aria-describedby="ariaDescribed" v-bind="$attrs" @input="handleInput" class="a-textarea" />
 
-  <AtomsInlineError v-if="validityText" :id="errorId">
+  <AtomsInlineError v-if="validityText" :id="finalErrorId">
     {{ validityText }}
   </AtomsInlineError>
 </template>
 
 <script setup lang="ts">
-
-/**
- *  a11y
- */
-const errorId = useId()
-
-const ariaDescribed = computed(() => {
-  if (validityText.value) return errorId
-
-  return ''
-})
 
 /**
  *  Props and emits
@@ -29,7 +18,23 @@ const props = defineProps({
   modelValue: {
     type: [String, Number],
     default: ''
+  },
+  errorId: {
+    type: String,
+    default: undefined
   }
+})
+
+/**
+ *  a11y
+ */
+const autoId = useId()
+const finalErrorId = computed(() => props.errorId || autoId)
+
+const ariaDescribed = computed(() => {
+  if (validityText.value) return finalErrorId.value
+
+  return ''
 })
 
 const emit = defineEmits(['update:modelValue'])

@@ -9,7 +9,9 @@
   <OrganismsFooter />
 
   <ViewsDialog />
-  <ViewsHelpButton v-if="!isWaitingListMode"/>
+  <ClientOnly>
+    <ViewsHelpButton v-if="!isWaitingListMode"/>
+  </ClientOnly>
   <MoleculesToastContainer />
 </template>
 

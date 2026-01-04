@@ -22,7 +22,11 @@ const isActive = ref(props.active ?? false);
 @use "#styles/_utils/media" as mq;
 
 .m-faq-item {
-  padding: var(--size-12);
+  padding: var(--size-12) 0;
+
+  @include mq.tablet {
+    padding: var(--size-16) var(--size-32);
+  }
 
   &__question {
     display: flex;

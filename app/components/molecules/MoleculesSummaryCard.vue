@@ -257,16 +257,11 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
   }
 
   &__price {
-    color: var(--blue-400);
+    color: light-dark(var(--blue-400), var(--monochrome-900));
     margin: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-
-    // Dark mode override for better contrast
-    @media (prefers-color-scheme: dark) {
-      color: var(--monochrome-800);
-    }
   }
 
   &__price-type {

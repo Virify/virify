@@ -8,7 +8,7 @@
           <span class="o-site-navigation__drawer-link-content">
             <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16"
               class="o-site-navigation__drawer-icon" />
-            <span class="o-site-navigation__drawer-text | body-md">{{ item.label }}</span>
+            <span class="o-site-navigation__drawer-text | body-sm">{{ item.label }}</span>
           </span>
         </NuxtLink>
 

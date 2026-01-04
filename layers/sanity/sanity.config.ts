@@ -3,6 +3,7 @@ import {structureTool} from 'sanity/structure'
 import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
+import {faqTemplates} from './schemaTypes/templates/faqTemplates'
 
 export default defineConfig({
   name: 'default',
@@ -26,5 +27,6 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+    templates: faqTemplates,
   },
 })
