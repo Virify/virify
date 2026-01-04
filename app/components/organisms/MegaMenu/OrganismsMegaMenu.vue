@@ -97,9 +97,13 @@ let leaveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Computed
 const categories = computed<NavigationSubItem[]>(() => props.item.children ?? []);
-const hasDropdown = computed(() => props.item.type === "dropdown" && categories.value.length > 0);
+const hasDropdown = computed(() => props.item.type === "dropdown");
 const defaultCategoryId = computed(() => categories.value[0]?.id ?? null);
-const isSingleColumn = computed(() => !categories.value.some((category) => Array.isArray(category.children) && category.children.length > 0));
+const isSingleColumn = computed(() => {
+  // If we have no categories, default to single column to match server state if data is missing
+  if (categories.value.length === 0) return false;
+  return !categories.value.some((category) => Array.isArray(category.children) && category.children.length > 0)
+});
 const menuId = computed(() => `mega-menu-${props.item.id}`);
 const isOpen = computed(() => props.dropdown.openItemId.value === props.item.id);
 const activeCategoryId = computed(() => props.dropdown.activeCategoryId.value);

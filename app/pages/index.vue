@@ -30,8 +30,10 @@
                 <label for="email" class="waiting-list-form__label | body-sm"> Email address </label>
                 <div class="waiting-list-form__input-button-group">
                   <div class="waiting-list-form__input">
-                    <AtomsInput id="email" v-model="email" type="email" name="email"
-                      placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" />
+                    <ClientOnly>
+                      <AtomsInput id="email" v-model="email" type="email" name="email"
+                        placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" error-id="email-error" />
+                    </ClientOnly>
                   </div>
                   <div class="waiting-list-form__submit">
                     <AtomsButton v-if="!isSuccess" class="waiting-list-form__submit-button | button-monochrome"

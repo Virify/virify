@@ -1,29 +1,16 @@
 <template>
   <div :class="wrapperClass" class="a-input" role="presentation">
     <slot name="prefix" />
-
     <input v-bind="$attrs" :value="modelValue" :aria-describedby="ariaDescribed" class="| text-input body-sm" @input="handleInput" />
-
     <slot name="suffix" />
   </div>
 
-  <AtomsInlineError v-if="validityText" :id="errorId">
+  <AtomsInlineError v-if="validityText" :id="finalErrorId">
     {{ validityText }}
   </AtomsInlineError>
 </template>
 
 <script setup lang="ts">
-/**
- *  a11y
- */
-const errorId = useId()
-
-const ariaDescribed = computed(() => {
-  if (validityText.value) return errorId
-
-  return ''
-})
-
 /**
  *  Apply the appropriate settings for password inputs
  */
@@ -37,7 +24,23 @@ const props = defineProps({
   modelValue: {
     type: [String, Number],
     default: ''
+  },
+  errorId: {
+    type: String,
+    default: undefined
   }
+})
+
+/**
+ *  a11y
+ */
+const autoId = useId()
+const finalErrorId = computed(() => props.errorId || autoId)
+
+const ariaDescribed = computed(() => {
+  if (validityText.value) return finalErrorId.value
+
+  return ''
 })
 
 const emit = defineEmits(['update:modelValue'])

@@ -1,5 +1,4 @@
 import { ViewsDialogLogin, ViewsDialogSignup } from "#components";
-import { createSharedComposable } from "@vueuse/core";
 
 const buildActionItems = getActionItemsBuilder();
 const baseCenterItems = computed(getBaseCenterItems);
@@ -36,19 +35,27 @@ export interface NavigationComposable {
 
 const isClient = () => typeof window !== "undefined";
 
-export const useNavigation = createSharedComposable((): NavigationComposable => {
+export const useNavigation = (): NavigationComposable => {
   const session = useUserSession();
   const dialog = useDialog();
+  const sanity = useSanity();
 
-  const { data: navigationData } = useSanityQuery<SanityGuideCategory[]>(
-    navigationQuery)
+  // Use useAsyncData for proper SSR hydration
+  const { data: navigationData } = useAsyncData<SanityGuideCategory[]>('navigation-guides', async () => {
+    return await sanity.fetch(navigationQuery) || []
+  }, {
+    default: () => []
+  })
+  
+  // Ensure we have an array even if data is null/undefined
+  const safeNavigationData = computed(() => navigationData.value ?? [])
 
   const isMobileMenuOpen = ref(false);
   const openItemId = ref<string | null>(null);
   const activeCategoryId = ref<string | null>(null);
   const lastTrigger = ref<HTMLElement | null>(null);
 
-  const guidesChildren = computed(() => mapSanityGuidesToNavigationChildren(navigationData.value ?? []));
+  const guidesChildren = computed(() => mapSanityGuidesToNavigationChildren(safeNavigationData.value));
 
   function toggleMobileMenu() {
     isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -196,4 +203,4 @@ export const useNavigation = createSharedComposable((): NavigationComposable => 
     logout,
     dropdown,
   };
-});
+};

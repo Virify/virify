@@ -65,7 +65,7 @@ const showSearch = props.search && !isWaitingListMode.value;
 .o-hero {
   @include hero-gradient();
   
-  @include mq.tablet {
+  @include mq.small-tablet {
     @include hero-background();
   }
 
