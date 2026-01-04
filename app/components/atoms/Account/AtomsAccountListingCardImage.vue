@@ -18,9 +18,11 @@ const props= defineProps<Props>();
 @use '#styles/_utils/media' as mq;
 
 .account-card-image {
-  width: 120px;
-  flex: 0 0 120px;
   height: 100%;
+  // max-height: 120px;
+  flex: 0 0 auto;
+  aspect-ratio: 4 / 3;
+  width: auto;
   box-sizing: border-box;
   border-radius: var(--border-radius-lg);
   overflow: hidden;
@@ -34,9 +36,10 @@ const props= defineProps<Props>();
 
   @include mq.mobile-only {
     width: 100%;
-    flex: 0 0 auto;
-    aspect-ratio: 16 / 9;
     height: auto;
+    max-height: none;
+    flex: 0 0 auto;
+    aspect-ratio: 4 / 3;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
@@ -46,7 +49,6 @@ const props= defineProps<Props>();
     height: 100%;
     object-fit: cover;
     display: block;
-    aspect-ratio: 4 / 3;
   }
 }
 </style>

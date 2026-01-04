@@ -10,10 +10,12 @@
         @toggle="() => {}"
       >
         <template #actions>
-          <button v-if="features?.description" @click.stop="openDescription($event)" 
-            class="button button-xs button-quiet" type="button" :aria-label="`Show description for ${title}`">
+          <AtomsTooltip v-if="features?.description" :responsive="true">
             <AtomsIcon icon="property/info" :size="16" />
-          </button>
+            <template #tooltip>
+              <p class="body-xs">{{ features?.description }}</p>
+            </template>
+          </AtomsTooltip>
         </template>
       </AtomsCollapsibleHeader>
 
@@ -35,14 +37,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Description modal -->
-  <AtomsInfoModal 
-    :show="showDescription" 
-    :content="features?.description || ''" 
-    :position="modalPosition"
-    @close="closeDescription"
-  />
 </template>
 
 <script setup lang="ts">
@@ -54,30 +48,15 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Computed property to filter only TRUE boolean features and convert to readable strings
+// Computed property to convert feature enum array to readable strings
 const filteredFeatures = computed(() => {
-  if (!props.features || typeof props.features !== 'object') return [];
+  if (!props.features?.features?.length) return [];
 
-  const features: string[] = [];
-
-  Object.entries(props.features).forEach(([key, value]) => {
-    // Skip non-boolean properties or specific properties we handle separately
-    if (typeof value === 'boolean' && value === true && key !== 'description' && key !== 'size') {
-      features.push(convertRoomEnumToString(key));
-    }
-  });
-
-  return features;
+  return props.features.features.map((feature: string) => convertEnumToString(feature));
 });
 
-// Collapse state
-const isCollapsed = ref(true);
-
-// Description modal state
-const showDescription = ref(false);
-const { modalPosition, openModal, closeModal } = useInfoModal(() => {
-  showDescription.value = false;
-});
+// Collapse state - open by default
+const isCollapsed = ref(false);
 
 // Helper function to get feature icon based on title
 const getFeatureIcon = (title: string): string => {
@@ -89,17 +68,6 @@ const getFeatureIcon = (title: string): string => {
 const formattedSize = computed(() => {
   return Math.round(props.features?.size || 0);
 });
-
-// Description modal methods
-const openDescription = (event: MouseEvent) => {
-  showDescription.value = true;
-  openModal(event, -200, 8);
-};
-
-const closeDescription = () => {
-  showDescription.value = false;
-  closeModal();
-};
 
 // Collapse toggle
 const toggleCollapse = () => {

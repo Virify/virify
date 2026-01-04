@@ -94,7 +94,7 @@ function handleConversationSelect(conversation: ConversationWithUserAndMessages)
     padding: var(--size-8) var(--size-16) var(--size-8) var(--size-8);
     display: flex;
     flex-direction: column;
-    gap: var(--size-4);
+    gap: var(--size-8);
     overflow-y: auto;
     max-height: 100%;
     -webkit-overflow-scrolling: touch;

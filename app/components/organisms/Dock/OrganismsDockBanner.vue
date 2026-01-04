@@ -21,7 +21,8 @@
 
               <template v-slot:ai>
                 <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-                  @submit-search="searchSubmit" @reset-search="searchReset" class="o-dock-banner__toggle-content" />
+                  @submit-search="searchSubmit" @reset-search="searchReset" :loading="isChecking"
+                  class="o-dock-banner__toggle-content" />
               </template>
             </OrganismsFilterSwitcher>
           </Transition>
@@ -39,6 +40,14 @@
 
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
+
+interface Props {
+  listingType?: ListingType;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  listingType: 'all'
+});
 
 /**
  *  Animate dock to final position
@@ -135,7 +144,9 @@ onClickOutside($formWrapper, () => {
 /**
  *  Fetch filters
  */
-const { setQuery, searchState } = useSearchState()
+const { setQuery, setListingType, searchState } = useSearchState()
+const { checkContent, isChecking } = useModeration()
+const { showToast } = useToast()
 
 const initialQuery = computed(() => {
   const { query } = asObject(searchState.value)
@@ -144,20 +155,23 @@ const initialQuery = computed(() => {
 })
 
 async function searchSubmit(query: string) {
-  setQuery(query)
+  setListingType(props.listingType)
+  const { location, radius, listingType } = asObject(searchState.value)
+
+  if (!location) return
+
+  // Check content moderation before proceeding
+  const { safe, reason } = await checkContent(query)
+  if (!safe) {
+    showToast(reason || 'Please try a different search.', { type: 'error' })
+    return
+  }
 
   await animateFormToDock()
-  await navigateTo({
-    path: '/search'
-  })
+  await navigateTo(createSearchURL(listingType, location, radius ?? 5, query))
 
   /**
    *  To avoid global smooth scrolling
-   *
-   *  @TODO - we may want to have a more site-wide and elevant fix for
-   *          this, perhaps finding a way to adjust the Vue Router
-   *          behaviour to have `behaviour: instant` instead
-   *          https://router.vuejs.org/guide/advanced/scroll-behavior
    */
   window.scrollTo({
     top: 0,

@@ -11,7 +11,7 @@
           <span class="m-chat-summary-item__time | body-xs">{{ lastMessageTime }}</span>
         </div>
         <button v-if="unreadMessages > 0"
-          class="m-chat-summary-item__unread m-chat-summary-item__unread--top | button button-secondary button-xs">{{
+          class="m-chat-summary-item__unread m-chat-summary-item__unread--top | button button-tertiary button-xs">{{
             unreadMessages }}</button>
       </div>
 
@@ -82,22 +82,34 @@ const firstImage = computed(() => {
   cursor: pointer;
   padding: var(--size-8);
   color: var(--monochrome-100);
+  background: var(--background-100);
+  border-radius: var(--border-radius-xl);
 
   &:hover {
-    background: var(--background-100);
+    background: var(--background-200);
     border-radius: var(--border-radius-xl);
+    color: var(--foreground-100);
   }
 
   &--active {
-    background: var(--secondary-500);
+    background: var(--blue-400);
     border-radius: var(--border-radius-xl);
     color: var(--monochrome-100);
+
+    &:hover {
+      background: var(--blue-400);
+    }
 
     .m-chat-summary-item__address,
     .m-chat-summary-item__username,
     .m-chat-summary-item__time,
     .m-chat-summary-item__message {
-      color: var(--monochrome-100);
+      color: var(--monochrome-900);
+    }
+
+    .m-chat-summary-item__address,
+    .m-chat-summary-item__time {
+      color: var(--monochrome-600);
     }
   }
 
@@ -105,7 +117,7 @@ const firstImage = computed(() => {
     display: flex;
     flex-direction: column;
     gap: var(--size-4);
-    padding: var(--size-16);
+    padding: var(--size-12);
 
     @include mq.mobile-only {
       padding: var(--size-8);
@@ -169,7 +181,7 @@ const firstImage = computed(() => {
   &__unread.button {
     border-radius: 50%;
     line-height: var(--font-xs);
-    color: var(--background-100);
+    color: var(--monochrome-900);
   }
 
   &__unread--top {
@@ -185,7 +197,7 @@ const firstImage = computed(() => {
   }
 
   .unread {
-    color: var(--secondary-400);
+    color: light-dark(var(--blue-400), var(--blue-600));
   }
 }
 </style>

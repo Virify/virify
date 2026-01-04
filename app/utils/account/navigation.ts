@@ -1,4 +1,4 @@
-export const navigationHome: NavigationItem[] = [
+export const navigationHome: AccountNavigationItem[] = [
   {
     name: "Home",
     url: "/account",
@@ -12,7 +12,7 @@ export const navigationHome: NavigationItem[] = [
   },
 ];
 
-export const accountNavigation: NavigationItem[] = [
+export const accountNavigation: AccountNavigationItem[] = [
   {
     name: "Profile",
     url: "#",
@@ -41,7 +41,7 @@ export const accountNavigation: NavigationItem[] = [
 
 ];
 
-export const listingsNavigation: NavigationItem[] = [
+export const listingsNavigation: AccountNavigationItem[] = [
   {
     name: "My Listings",
     url: "/account/my-listings",
@@ -85,7 +85,7 @@ export const listingsNavigation: NavigationItem[] = [
   },
 ];
 
-export const searchNavigation: NavigationItem[] = [
+export const searchNavigation: AccountNavigationItem[] = [
   {
     name: "Saved Searches",
     url: "#",
@@ -100,7 +100,7 @@ export const searchNavigation: NavigationItem[] = [
   },
 ];
 
-export const navigationGroups: NavigationGroup[] = [
+export const navigationGroups: AccountNavigationGroup[] = [
   {
     title: "Dashboard",
     icon: "account/dash",

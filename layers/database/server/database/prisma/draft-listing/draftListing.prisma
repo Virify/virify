@@ -1,0 +1,23 @@
+model DraftListing {
+  id                Int                @id @default(autoincrement())
+  price             Float?
+  moveInDate        DateTime?
+  listingTier       ListingTier
+  listingStartDate  DateTime?
+  listingEndDate    DateTime?
+  viewingOptions    String?
+  verificationLevel VerificationLevel?
+  completedSteps    Int[]              @default([])
+  rentalListing     RentalListing?
+  saleListing       SaleListing?
+  userId            Int
+  propertyId        Int?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  user              User?              @relation(fields: [userId], references: [id])
+  property          Property?          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([price])
+}

@@ -12,6 +12,15 @@
       <AtomsIcon icon="property/receptions" title="Receptions count" class="m-cards-slots-icons__icon | faded-text" />
       {{ receptions }}
     </li>
+    <li v-if="hasOutdoorSpace" class="m-cards-slots-icons__row">
+      <AtomsIcon icon="property/rear-garden" title="Outdoor space" class="m-cards-slots-icons__icon | faded-text" />
+    </li>
+    <li v-if="parkingType === 'garage'" class="m-cards-slots-icons__row">
+      <AtomsIcon icon="property/garage" title="Garage" class="m-cards-slots-icons__icon | faded-text" />
+    </li>
+    <li v-else-if="parkingType === 'parking'" class="m-cards-slots-icons__row">
+      <AtomsIcon icon="property/parking" title="Parking" class="m-cards-slots-icons__icon | faded-text" />
+    </li>
   </ul>
 </template>
 
@@ -22,6 +31,8 @@ interface Props {
     baths?: number | null
     receptions?: number | null
   }
+  hasOutdoorSpace?: boolean
+  parkingType?: 'garage' | 'parking' | null
 }
 
 const props = defineProps<Props>()
@@ -40,13 +51,13 @@ const { beds, baths, receptions } = asObject(props.roomCounts)
   margin: var(--size-8) 0;
   display: flex;
   align-items: center;
-  gap: var(--size-24);
+  gap: var(--size-12);
 
   &__row {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--size-10);
+    gap: var(--size-6);
   }
 
   &__icon {

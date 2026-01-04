@@ -57,22 +57,22 @@
       {{ otherRooms }} other room{{ otherRooms !== 1 ? "s" : "" }}
     </li>
 
-    <li v-if="rearGarden" class="o-listing-sidebar-icons__row">
+    <li v-if="hasGarden" class="o-listing-sidebar-icons__row">
       <AtomsIcon
         icon="property/rear-garden"
         aria-hidden
         class="o-listing-sidebar-icons__icon"
       />
-      rear garden
+      garden
     </li>
 
-    <li v-if="frontGarden" class="o-listing-sidebar-icons__row">
+    <li v-if="hasLand" class="o-listing-sidebar-icons__row">
       <AtomsIcon
-        icon="property/front-garden"
+        icon="property/land"
         aria-hidden
         class="o-listing-sidebar-icons__icon"
       />
-      front garden
+      land
     </li>
   </ul>
 </template>
@@ -87,8 +87,8 @@ interface Props {
   bathrooms?: number;
   receptions?: number;
   otherRooms?: number;
-  rearGarden?: boolean;
-  frontGarden?: boolean;
+  hasGarden?: boolean;
+  hasLand?: boolean;
   classification?: string;
 }
 

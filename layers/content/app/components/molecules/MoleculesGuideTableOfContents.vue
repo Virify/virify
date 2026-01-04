@@ -104,7 +104,7 @@ onMounted(() => {
 
   &__title {
     margin-bottom: var(--size-16);
-    color: var(--secondary-400);
+    color: var(--foreground-200);
   }
 
   &__list {
@@ -114,7 +114,6 @@ onMounted(() => {
   }
 
   &__item {
-    margin-bottom: var(--size-8);
 
     &--2 {
       padding-left: var(--size-16);
@@ -144,7 +143,7 @@ onMounted(() => {
     }
 
     &.active {
-      color: var(--secondary-400);
+      color: var(--foreground-200);
       font-weight: var(--font-semibold);
     }
   }

@@ -3,10 +3,10 @@
     <h2 v-if="price" class="o-listing-overview__title | title-xl lineheight-xs">
       <div class="o-listing-overview__title-offertype">
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
-          {{ convertRoomEnumToString(priceType!) }}
+          {{ convertEnumToString(priceType!) }}
         </AtomsPill>
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
-          {{ convertRoomEnumToString(available!) }}
+          {{ convertEnumToString(available!) }}
         </AtomsPill>
       </div>
 
@@ -21,7 +21,7 @@
     <!-- Property Icons -->
     <div class="o-listing-overview__icons">
       <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
-        :receptions="receptions" :other-rooms="otherRooms" :rear-garden="rearGarden" :front-garden="frontGarden"
+        :receptions="receptions" :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand"
         :classification="classification" />
     </div>
 
@@ -48,8 +48,8 @@ interface Props {
   yearBuilt?: string
   constructionType?: string
   chainFree?: boolean | null
-  rearGarden?: boolean
-  frontGarden?: boolean
+  hasGarden?: boolean
+  hasLand?: boolean
   available?: string
 }
 

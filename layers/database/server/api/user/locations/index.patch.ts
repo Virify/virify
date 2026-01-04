@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
 
     return updated;
   } catch (error) {
-    console.log(error);
     return errorResponse(error, event);
   }
 });

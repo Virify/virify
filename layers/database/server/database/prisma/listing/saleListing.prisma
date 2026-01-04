@@ -1,13 +1,17 @@
 model SaleListing {
-  id                 Int                    @id
-  listing            Listing                @relation(fields: [id], references: [id])
+  id                 Int                    @id @default(autoincrement())
+  listing            Listing?               @relation(fields: [listingId], references: [id])
+  listingId          Int?                   @unique
   tenureType         TenureType?
   chain              Boolean                @default(false)
   sharedOwnership    Boolean                @default(false)
-  priceType          SalePriceType
-  availabilityStatus SaleAvailabilityStatus
+  priceType          SalePriceType?
+  availabilityStatus SaleAvailabilityStatus @default(AVAILABLE)
+  DraftListing       DraftListing?          @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
+  draftListingId     Int?                   @unique
 
-  @@index([id])
+  @@index([listingId])
+  @@index([draftListingId])
 }
 
 enum TenureType {

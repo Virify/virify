@@ -1,7 +1,7 @@
 <template>
   <select v-show="!disabled" class="a-select" v-model="selected">
     <slot v-bind="{ options: validOptions }">
-      <option v-for="({ key, value }) of validOptions" :key="value" :value>
+      <option v-for="({ key, value }) of validOptions" :key="value" :value="value">
         {{ key }}
       </option>
     </slot>
@@ -45,7 +45,7 @@ const selected = defineModel({
   padding-right: var(--size-32);
   background-position: right;
   background-repeat: no-repeat;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40' fill='black'><path d='M20 23.4L14 17.4L15.4 16L20 20.6L24.6 16L26 17.4L20 23.4Z'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40' fill='%232b2c35'><path d='M20 23.4L14 17.4L15.4 16L20 20.6L24.6 16L26 17.4L20 23.4Z'/></svg>");
   
   /* iOS Safari specific fixes */
   @supports (-webkit-touch-callout: none) {
@@ -55,8 +55,8 @@ const selected = defineModel({
     border-radius: var(--border-radius-ui);
   }
 
-  @media (prefers-color-scheme: dark) {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40' fill='white'><path d='M20 23.4L14 17.4L15.4 16L20 20.6L24.6 16L26 17.4L20 23.4Z'/></svg>");
+  html.dark & {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40' fill='%23ffffff'><path d='M20 23.4L14 17.4L15.4 16L20 20.6L24.6 16L26 17.4L20 23.4Z'/></svg>");
   }
 
   option {

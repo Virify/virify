@@ -1,27 +1,14 @@
 <template>
   <div class="gallery-modal" @click="handleBackdropClick">
-    <!-- Thumbnail Strip at Top -->
-    <div class="gallery-modal__thumbnails">
-      <div class="gallery-modal__thumbnails-container">
-        <button
-          v-for="(image, index) in images"
-          :key="index"
-          class="gallery-modal__thumbnail"
-          :class="{ 'gallery-modal__thumbnail--active': index === currentIndex }"
-          @click="setCurrentIndex(index)"
-        >
-          <AtomsCloudFlareImage
-            :src="image.src"
-            :alt="image.alt"
-            variant="thumbnail"
-            class="gallery-modal__thumbnail-image"
-          />
-        </button>
-      </div>
-    </div>
+    <!-- Close Button (Top Left) -->
+    <button class="gallery-modal__close" @click="closeModal" aria-label="Close gallery">
+      <AtomsIcon icon="cross" :size="24" />
+    </button>
 
-    <!-- Bottom Bar -->
-    <AtomsBottomBar :title="currentImage.alt || 'Image'" @close="closeModal" />
+    <!-- Image Counter (Top Center) -->
+    <div class="gallery-modal__counter">
+      {{ currentIndex + 1 }} / {{ images.length }}
+    </div>
 
     <!-- Main Image Display -->
     <div class="gallery-modal__main">
@@ -36,11 +23,6 @@
           decoding="async"
           @click.stop="toggleZoom"
         />
-        
-        <!-- Image Counter -->
-        <div class="gallery-modal__counter">
-          {{ currentIndex + 1 }} / {{ images.length }}
-        </div>
       </div>
     </div>
 
@@ -174,13 +156,12 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-80) var(--size-24) var(--size-24);
+    padding: var(--size-24);
     min-height: 0;
-    height: calc(100vh - var(--size-80) - var(--size-24));
+    height: 100%;
 
     @include mq.mobile-only {
-      padding: var(--size-60) var(--size-16) var(--size-16);
-      height: calc(100vh - var(--size-60) - var(--size-16));
+      padding: var(--size-16);
     }
   }
 
@@ -213,23 +194,62 @@ onUnmounted(() => {
     }
   }
 
-
-  // Image counter
-  &__counter {
+  // Close button (Top Left)
+  &__close {
     position: absolute;
-    top: var(--size-16);
-    left: var(--size-16);
+    top: var(--size-24);
+    left: var(--size-24);
     background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
     color: white;
-    padding: var(--size-8) var(--size-12);
-    border-radius: var(--border-radius-full);
-    font-size: var(--t-font-sm);
-    font-weight: 500;
     backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+    z-index: 1002;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.9);
+      transform: scale(1.1);
+    }
+
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
 
     @include mq.mobile-only {
-      font-size: var(--font-xs);
-      padding: var(--size-6) var(--size-10);
+      top: var(--size-16);
+      left: var(--size-16);
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  // Image counter (Top Center)
+  &__counter {
+    position: absolute;
+    top: var(--size-24);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: var(--size-8) var(--size-16);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    z-index: 1002;
+
+    @include mq.mobile-only {
+      top: var(--size-16);
+      font-size: var(--font-size-xs);
+      padding: var(--size-6) var(--size-12);
     }
   }
 
@@ -276,74 +296,6 @@ onUnmounted(() => {
     @include mq.mobile-only {
       width: 44px;
       height: 44px;
-    }
-  }
-
-  // Thumbnail strip at top
-  &__thumbnails {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(rgba(0, 0, 0, 0.8), transparent);
-    padding: var(--size-24) var(--size-24) var(--size-40);
-    backdrop-filter: blur(20px);
-    z-index: 1001;
-
-    @include mq.mobile-only {
-      padding: var(--size-16) var(--size-16) var(--size-32);
-    }
-  }
-
-  &__thumbnails-container {
-    display: flex;
-    gap: var(--size-8);
-    justify-content: center;
-    overflow-x: auto;
-    padding: var(--size-4) 0;
-    max-width: 100%;
-
-    // Hide scrollbar
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    @include mq.mobile-only {
-      gap: var(--size-6);
-    }
-  }
-
-  &__thumbnail {
-    background: none;
-    border: 2px solid transparent;
-    border-radius: var(--border-radius-lg);
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.5);
-      transform: scale(1.05);
-    }
-
-    &--active {
-      border-color: white;
-      transform: scale(1.1);
-    }
-  }
-
-  &__thumbnail-image {
-    width: 80px;
-    height: 60px;
-    object-fit: cover;
-    display: block;
-
-    @include mq.mobile-only {
-      width: 60px;
-      height: 45px;
     }
   }
 }

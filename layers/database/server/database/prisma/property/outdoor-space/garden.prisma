@@ -1,0 +1,30 @@
+model Garden {
+  id                Int                   @id @default(autoincrement())
+  description       String?
+  name              String
+  size              Float?
+  additionalDetails Boolean               @default(false)
+  facing            GardenFacing?
+  position          GardenPosition?
+  features          OutdoorSpaceFeature[]
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  media             Media[]
+  outdoorSpace      OutdoorSpace?         @relation(fields: [outdoorSpaceId], references: [id])
+  outdoorSpaceId    Int?
+
+  @@index([outdoorSpaceId])
+}
+
+enum GardenFacing {
+  NORTH
+  EAST
+  SOUTH
+  WEST
+}
+
+enum GardenPosition {
+  FRONT
+  REAR
+  SIDE
+}

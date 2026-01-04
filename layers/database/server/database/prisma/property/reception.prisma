@@ -1,40 +1,39 @@
 model Reception {
-  id               Int            @id @default(autoincrement())
-  roomNumber       Int
-  floor            Int
-  name             String
-  type             ReceptionType
-  description      String?
-  size             Float?
-  conservatory     Boolean        @default(false)
-  openPlan         Boolean        @default(false)
-  openConcept      Boolean        @default(false)
-  fireplace        FireplaceType?
-  balcony          Boolean        @default(false)
-  bayWindow        Boolean        @default(false)
-  builtInShelving  Boolean        @default(false)
-  hasView          Boolean        @default(false)
-  patioDoors       Boolean        @default(false)
-  builtInStorage   Boolean        @default(false)
-  servingHatch     Boolean        @default(false)
-  barArea          Boolean        @default(false)
-  soundProofing    Boolean        @default(false)
-  accousticPanels  Boolean        @default(false)
-  stoneFlooring    Boolean        @default(false)
-  hardwoodFlooring Boolean        @default(false)
-  builtInDesk      Boolean        @default(false)
-  propertyId       Int
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  property         Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  media            Media[]
+  id          Int           @id @default(autoincrement())
+  roomNumber  Int
+  floor       Int
+  name        String
+  type        ReceptionType
+  description String?
+  size        Float?
+  features    RoomFeature[]
+  propertyId  Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  property    Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  media       Media[]
 
   @@index([propertyId])
 }
 
-enum FireplaceType {
-  LOG_BURNER
-  OPEN_FIRE
+enum RoomFeature {
+  OPEN_PLAN
+  OPEN_CONCEPT
+  FIREPLACE
+  BALCONY
+  BAY_WINDOW
+  BUILT_IN_SHELVING
+  HAS_VIEW
+  PATIO_DOORS
+  BUILT_IN_STORAGE
+  SERVING_HATCH
+  BAR_AREA
+  SOUND_PROOFING
+  ACCOUSTIC_PANELS
+  STONE_FLOORING
+  HARDWOOD_FLOORING
+  BUILT_IN_DESK
+  CONSERVATORY
 }
 
 enum ReceptionType {

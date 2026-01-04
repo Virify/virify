@@ -5,7 +5,7 @@
     </template>
 
     <template
-      #content="{ price, priceGuide, propertyType, fullAddress, roomCounts, pills, propertyId, description, premiumFeatures }">
+      #content="{ price, priceGuide, propertyType, address, roomCounts, pills, propertyId, description, premiumFeatures }">
       <MoleculesCardSlotsViewLink :property-id>
         <span class="m-card-premium__spotlight-title | title-sm">Spotlight</span>
       </MoleculesCardSlotsViewLink>
@@ -14,7 +14,7 @@
         <div class="m-card-premium__grid-row">
           <MoleculesCardSlotsViewLink :property-id>
             <MoleculesCardSlotsPrice :price :price-guide />
-            <MoleculesCardSlotsOverview :property-type :full-address />
+            <MoleculesCardSlotsOverview :property-type :address />
             <MoleculesCardSlotsIcons :room-counts />
           </MoleculesCardSlotsViewLink>
 
@@ -22,13 +22,13 @@
 
           <template v-if="isExpandingContent">
             <MoleculesCardSlotsAccordion>
-              <MoleculesCardSlotsDescription v-if="description" :description />
+              <MoleculesCardSlotsDescription v-if="description" :description="result.property.description" />
               <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
             </MoleculesCardSlotsAccordion>
           </template>
 
           <template v-else>
-            <MoleculesCardSlotsDescription if="description" :description />
+            <MoleculesCardSlotsDescription if="description" :description="result.property.description" />
           </template>
         </div>
 

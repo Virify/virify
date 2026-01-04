@@ -72,32 +72,74 @@ The schema includes models for:
 ## API Endpoints
 
 ### Account Management
-- `GET /api/account/` - Get user account details
-- `PUT /api/account/` - Update user account
+- `GET    /api/account/` — Get user account details
+- `PUT    /api/account/` — Update user account
 
-### Conversations & Messaging  
-- `GET /api/conversation/` - List user conversations
-- `POST /api/conversation/create/` - Create new conversation
-- `POST /api/conversation/reply/` - Send message reply
+### Conversations & Messaging
+- `GET    /api/conversation/` — List user conversations
+- `POST   /api/conversation/create/` — Create new conversation
+- `POST   /api/conversation/reply/` — Send message reply
+- `POST   /api/conversation/mark-read/` — Mark conversation as read
+- `GET    /api/conversation/sent/` — List sent conversations
 
-### Property Listings
-- `GET /api/listing/` - Search and filter listings
-- `POST /api/listing/` - Create new listing
-- `GET /api/listing/[id]/` - Get specific listing
+### Listings
+- `GET    /api/listing/` — List/search property listings
+- `POST   /api/listing/` — Create new listing
+- `POST   /api/listing/create-bulk/` — Bulk create listings
+- `POST   /api/listing/publish/` — Publish a listing
+- `GET    /api/listing/[id]/` — Get specific listing by ID
 
-### Property Management
-- `GET /api/property/` - List user properties
-- `POST /api/property/` - Create new property
-- `PUT /api/property/[id]/` - Update property
+### Properties
+- `GET    /api/property/` — List user properties
+- `POST   /api/property/` — Create new property
+- `GET    /api/property/[id]/` — Get property by ID
+- `PUT    /api/property/[id]/` — Update property by ID
 
-### Property Notes
-- `GET /api/note/` - Get property notes
-- `POST /api/note/` - Create property note
-- `DELETE /api/note/[id]/` - Delete property note
+### Draft Listings
+- `POST   /api/draft-listings/create/` — Create draft listing
+- `GET    /api/draft-listings/[id]/` — Get draft listing by ID
+- `PATCH  /api/draft-listings/[id]/` — Update draft listing by ID
 
-### Location Services
-- `GET /api/location/search/` - Search locations
-- `POST /api/location/validate/` - Validate address
+### Notes
+- `GET    /api/note/` — Get property notes
+- `POST   /api/note/` — Create property note
+- `DELETE /api/note/[id]/` — Delete property note by ID
+
+### Location & Address
+- `GET    /api/location/search/` — Search locations
+- `POST   /api/location/validate/` — Validate address
+- `GET    /api/address/auto-complete/` — Address autocomplete
+
+### Price & Price Paid
+- `GET    /api/price/` — Get price data
+- `GET    /api/price/graph/` — Get price graph data
+- `POST   /api/price-paid/` — Submit price paid data
+- `POST   /api/price-paid/[id]/` — Update price paid record by ID
+
+### Property Type
+- `GET    /api/property-type/` — List property types
+
+### Media
+- `POST   /api/media/` — Upload media
+
+### Notifications
+- `GET    /api/notifications/aggregates/` — Get notification aggregates
+
+### Waiting List
+- `POST   /api/waiting-list/` — Join waiting list
+- `GET    /api/waiting-list/count/` — Get waiting list count
+
+### User
+- `DELETE /api/user/my-listings/[id]/` — Delete user listing by ID
+- `POST   /api/user/my-listings/[id]/` — Update user listing by ID
+- `PATCH  /api/user/locations/` — Update user locations
+
+### Search
+- `POST   /api/search/listings/` — Search listings (advanced)
+
+---
+
+> **Note:** Dynamic segments like `[id]` should be replaced with the actual resource ID. Some endpoints may require authentication or specific permissions.
 
 ## Best Practices
 - Use transactions for related operations

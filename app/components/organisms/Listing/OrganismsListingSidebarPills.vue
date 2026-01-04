@@ -25,7 +25,7 @@ const pills = computed(() => {
 
   if (props.constructionType) {
     pillsArray.push(
-      `Construction Type: ${convertRoomEnumToString(props.constructionType)}`
+      `Construction Type: ${convertEnumToString(props.constructionType)}`
     );
   }
 

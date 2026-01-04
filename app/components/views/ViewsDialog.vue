@@ -119,6 +119,9 @@ watch(useRoute(), close)
   padding: var(--size-8);
   width: var(--size-42);
   height: var(--size-42);
+  &:hover {
+    color: var(--foreground-200);
+  }
 }
 
 .o-dialog-close-icon {

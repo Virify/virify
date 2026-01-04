@@ -1,5 +1,6 @@
 <template>
   <button 
+    type="button"
     :class="[
       'collapsible-header',
       `collapsible-header--${variant}`
@@ -70,7 +71,7 @@ defineEmits<{
     min-width: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    align-items: flex-start;
+    align-items: center;
 
     & .title-icon {
       margin-top: 4px;

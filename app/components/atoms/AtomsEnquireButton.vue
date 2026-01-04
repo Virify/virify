@@ -11,19 +11,18 @@ import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
 
 interface Props {
   listingId: number;
-  userId: number;
+  userId?: number | null;
 }
 
 const props = defineProps<Props>();
 
-const { hasConversation, loading: loadingConversation } = useConversations();
 const { showDialog } = useDialog();
 const { user } = useUserSession();
 
 const safeUserId = computed(() => {
-  const { userId } = asObject(props)
+  const { userId } = props
 
-  return Number.isNaN(userId) ? null : userId
+  return userId && !Number.isNaN(userId) ? userId : null
 })
 
 const isSelf = computed(() => {
@@ -31,19 +30,11 @@ const isSelf = computed(() => {
 });
 
 const isEnquiryDisabled = computed(() => {
-  const { listingId } = asObject(props)
-
-  return !safeUserId.value || hasConversation(listingId) || loadingConversation.value || isSelf.value
+  return !safeUserId.value || isSelf.value
 });
 
 const defaultContent = computed(() => {
-  const { listingId } = asObject(props)
-
-  return isSelf.value
-    ? 'Enquire'
-    : hasConversation(listingId)
-      ? 'Enquiry Sent'
-      : 'Enquire'
+  return isSelf.value ? 'Your Listing' : 'Enquire'
 });
 
 function handleEnquire() {

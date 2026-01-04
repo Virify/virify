@@ -1,18 +1,22 @@
 model Accessibility {
-  id                 Int      @id @default(autoincrement())
-  wheelchairFriendly Boolean  @default(false)
-  stepFreeAccess     Boolean  @default(false)
-  wideDoorways       Boolean  @default(false)
-  wetRoom            Boolean  @default(false)
-  handrails          Boolean  @default(false)
-  elevator           Boolean  @default(false)
-  stairs             Boolean  @default(false)
-  accessibleParking  Boolean  @default(false)
-  description        String?
-  propertyId         Int      @unique
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  property           Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  id          Int                    @id @default(autoincrement())
+  description String?
+  features    AccessibilityFeature[]
+  propertyId  Int                    @unique
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  property    Property               @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
+}
+
+enum AccessibilityFeature {
+  WHEELCHAIR_FRIENDLY
+  STEP_FREE_ACCESS
+  WIDE_DOORWAYS
+  WET_ROOM
+  HANDRAILS
+  ELEVATOR
+  STAIRS
+  ACCESSIBLE_PARKING
 }

@@ -1,15 +1,19 @@
 model RentalListing {
-  id                 Int                      @id
-  listing            Listing                  @relation(fields: [id], references: [id])
+  id                 Int                      @id @default(autoincrement())
+  listing            Listing?                 @relation(fields: [listingId], references: [id])
+  listingId          Int?                     @unique
   deposit            Float?
   holdingDeposit     Float?
-  rentFrequency      RentalPriceType
+  rentFrequency      RentalPriceType?
   isBillsIncluded    Boolean
-  rentalLength       Int?
+  rentalLength       RentalLengthType?
   furnishedStatus    FurnishedStatus?
-  availabilityStatus RentalAvailabilityStatus
+  availabilityStatus RentalAvailabilityStatus @default(AVAILABLE)
+  DraftListing       DraftListing?            @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
+  draftListingId     Int?                     @unique
 
-  @@index([id])
+  @@index([listingId])
+  @@index([draftListingId])
 }
 
 enum FurnishedStatus {
@@ -27,4 +31,9 @@ enum RentalAvailabilityStatus {
   AVAILABLE
   LET_AGREED
   LET
+}
+
+enum RentalLengthType {
+  SHORT_TERM
+  LONG_TERM
 }

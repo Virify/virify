@@ -10,6 +10,12 @@
     }
 }
 
+@mixin mobile-and-small-tablet {
+    @media (max-width: #{ breakpoints.$tablet - 1px }) {
+        @content;
+    }
+}
+
 @mixin small-tablet {
     @media (min-width: breakpoints.$small-tablet) {
         @content;

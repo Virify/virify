@@ -1,4 +1,4 @@
-export type NavigationItem = {
+export type AccountNavigationItem = {
   name: string;
   url: string;
   icon: string;
@@ -6,10 +6,10 @@ export type NavigationItem = {
   countKey?: string;
 }
 
-export type NavigationGroup = {
+export type AccountNavigationGroup = {
   title?: string;
   icon: string;
-  items?: NavigationItem[];
+  items?: AccountNavigationItem[];
 }
 
 // AccountCounts has been moved to AnalyticsAggregates in ~/shared/types/analytics.ts

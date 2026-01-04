@@ -1,3 +1,4 @@
+
 /**
  * Sanity CMS Types
  * These types match our Sanity schema definitions
@@ -10,10 +11,11 @@ export interface SanitySlug {
 }
 
 export interface SanityImage {
-  _type: 'image'
+  _type?: 'image'
   asset: {
-    _ref: string
-    _type: 'reference'
+    _ref?: string
+    _id?: string
+    _type?: 'reference'
     url?: string
   }
   alt?: string
@@ -99,6 +101,7 @@ export interface GuideCategory {
 export interface Guide {
   _id: string
   _type: 'guide'
+  _updatedAt?: string
   title: string
   slug: SanitySlug
   excerpt?: string
@@ -130,3 +133,281 @@ export interface CategoryWithGuidesResponse extends GuideCategory {
 export interface GuideResponse extends Guide {
   category?: GuideCategory
 }
+
+// Guide with dereferenced category (used in queries with category->)
+export interface GuideWithCategory extends Omit<Guide, 'category'> {
+  category?: GuideCategory
+}
+
+export interface SanityGuideCategory {
+  _id: string
+  title: string
+  slug?: { current?: string }
+  description?: string
+  guides?: SanityGuide[]
+}
+
+export interface SanityGuide {
+  _id: string
+  title: string
+  slug?: { current?: string }
+  excerpt?: string
+  icon?: string
+}
+
+// Legal Documents
+export interface Terms {
+  _id: string
+  _type: 'terms'
+  title: string
+  slug: SanitySlug
+  content?: PortableTextContent[]
+  updatedAt?: string
+}
+
+export interface Privacy {
+  _id: string
+  _type: 'privacy'
+  title: string
+  slug: SanitySlug
+  content?: PortableTextContent[]
+  updatedAt?: string
+}
+
+export interface Cookie {
+  _id: string
+  _type: 'cookie'
+  title: string
+  slug: SanitySlug
+  content?: PortableTextContent[]
+  updatedAt?: string
+}
+
+export interface TermsResponse extends Terms {}
+
+export interface PrivacyResponse extends Privacy {}
+
+export interface CookieResponse extends Cookie {}
+
+// Policy page union type for convenience
+export interface PolicyPage {
+  _id: string
+  title: string
+  lastUpdated: string
+  content: PortableTextContent[]
+}
+
+// Waiting List Page
+export interface WaitingListFeature {
+  icon: string
+  title: string
+  subtitle: string
+  description: string
+}
+
+export interface WaitingListBenefit {
+  title: string
+  description: string
+  icon?: string
+}
+
+// Feature Section (reusable component)
+export interface FeatureSectionFeature {
+  icon: string
+  title: string
+  description: string
+}
+
+export interface OverlaidImages {
+  rear: string
+  rearAlt: string
+  front: string
+  frontAlt: string
+}
+
+export interface OverlaidSanityImages {
+  rear: SanityImage
+  front: SanityImage
+}
+
+export interface FeatureSection {
+  title: string
+  subtitle: string
+  features: FeatureSectionFeature[]
+  imageType: 'single' | 'overlaid'
+  imageSource?: 'cloudflare' | 'sanity'
+  image?: string
+  imageAlt?: string
+  sanityImage?: SanityImage
+  overlaidImagesSource?: 'cloudflare' | 'sanity'
+  overlaidImages?: OverlaidImages
+  overlaidSanityImages?: OverlaidSanityImages
+  imagePosition: 'left' | 'right'
+  background: 'white' | 'gradient'
+  iconColor: 'orange' | 'blue'
+}
+
+export interface SeoMetadata {
+  metaTitle?: string
+  metaDescription?: string
+  keywords?: string
+  ogTitle?: string
+  ogDescription?: string
+  ogImage?: string
+  twitterCard?: 'summary' | 'summary_large_image'
+  canonicalUrl?: string
+}
+
+export interface WaitingListPage {
+  _id: string
+  _type: 'waitingListPage'
+  hero: {
+    title: string
+    subtitle: string
+  }
+  formSection: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  featureSections?: FeatureSection[]
+  buyersBenefits: {
+    title: string
+    subtitle: string
+    features: WaitingListFeature[]
+  }
+  sellersBenefits: {
+    title: string
+    subtitle: string
+    features: WaitingListFeature[]
+  }
+  earlyAccessBenefits: {
+    title: string
+    subtitle: string
+    benefits: WaitingListBenefit[]
+  }
+  contactSection: {
+    title: string
+    subtitle: string
+    description: string
+    buttonText: string
+  }
+  guidesSection?: {
+    title: string,
+    description: string,
+    guides: (Omit<Guide, 'category'> & {
+      category: GuideCategory
+    })[]
+  }
+  finalCta: {
+    title: string
+    subtitle: string
+    description: string
+    buttonText: string
+  }
+  seo?: SeoMetadata
+}
+
+export interface WaitingListPageResponse extends WaitingListPage {}
+
+// Contact Page
+export interface ContactPage {
+  _id: string
+  _type: 'contactPage'
+  hero: {
+    title: string
+    subtitle: string
+  }
+  formSection: {
+    title: string
+    description: string
+  }
+  interestedSection: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  pressFormSection: {
+    title: string
+    description: string
+  }
+  partnerSection: {
+    title: string
+    description: string
+    buttonText: string
+  }
+  faqSection: {
+    title: string
+    description: string
+    faqs: {
+      _id: string
+      question: string
+      answer: string
+      active: boolean
+    }[]
+  }
+  guidesSection?: {
+    title: string,
+    description: string,
+    guides: (Omit<Guide, 'category'> & {
+      category: GuideCategory
+    })[]
+  }
+  seo?: SeoMetadata
+}
+
+export interface ContactPageResponse extends ContactPage {}
+
+// Support Page
+export interface SupportBenefit {
+  title: string
+  description: string
+  variant: 'primary' | 'secondary'
+}
+
+export interface SupportPage {
+  _id: string
+  _type: 'supportPage'
+  hero: {
+    title: string
+    subtitle: string
+  }
+  faqSection: {
+    title: string
+    description: string
+    faqs: {
+      _id: string
+      question: string
+      answer: string
+      active: boolean
+    }[]
+  }
+  ourSupportSection: {
+    title: string
+    subtitle: string
+    benefits: SupportBenefit[]
+  }
+  whatWeDontSupportSection: {
+    title: string
+    description: string
+    faqs: {
+      _id: string
+      question: string
+      answer: string
+      active: boolean
+    }[]
+  }
+  SupportFormSection: {
+    title: string
+    description: string
+  }
+  ctaSection: {
+    title: string
+    description: string
+    buttonText: string
+    buttonLink: string
+  }
+  seo?: SeoMetadata
+}
+
+export interface SupportPageResponse extends SupportPage {}

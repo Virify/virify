@@ -1,4 +1,5 @@
 @use '../_utils/functions' as fn;
+@use '../_utils/media' as mq;
 
 /**
  *  Button base
@@ -45,11 +46,11 @@
 .button {
   &-secondary {
     background: var(--secondary-400);
-    color: var(--monochrome-100);
+    color: var(--background-100);
 
     &:hover {
       background: var(--secondary-300);
-      color: var(--monochrome-100);
+      color: var(--background-100);
     }
   }
 
@@ -68,18 +69,18 @@
     color: var(--monochrome-900);
 
     &:hover {
-      background: var(--blue-400);
+      background: var(--blue-500);
       color: var(--monochrome-900);
     }
   }
 
   &-ghost {
-    background: fn.faded-color(6%, light-dark(var(--blue-100), var(--blue-900)));
-    color: light-dark(var(--monochrome-100), var(--monochrome-900));
+    background: fn.faded-color(6%, var(--blue-900));
+    color: var(--monochrome-900);
 
     &:hover {
-      background: fn.faded-color(12%, light-dark(var(--blue-100), var(--blue-900)));
-      color: light-dark(var(--monochrome-100), var(--monochrome-900));
+      background: fn.faded-color(12%, light-dark(var(--blue-700), var(--blue-900)));
+      color: light-dark(var(--monochrome-900), var(--monochrome-900));
     }
   }
 
@@ -89,7 +90,7 @@
 
     &:hover {
       background: fn.faded-color(12%);
-      color: light-dark(var(--monochrome-100), var(--monochrome-900));
+      color: light-dark(var(--monochrome-900), var(--monochrome-900));
     }
   }
 
@@ -139,6 +140,16 @@
   &-sm {
     font-size: var(--font-sm);
     padding: var(--size-10) var(--size-16);
+  }
+
+  &-r-sm {
+    font-size: var(--font-sm);
+    padding: var(--size-10) var(--size-16);
+    
+    @include mq.mobile-only {
+      font-size: var(--font-xs);
+      padding: var(--size-6) var(--size-10);
+    }
   }
 
   &-lg {

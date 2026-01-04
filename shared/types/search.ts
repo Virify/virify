@@ -1,3 +1,6 @@
+import type { QueryAnalysis } from "./ai";
+import type { PropertyTypeWithOptions } from "./property-type";
+
 export type SearchParams = {
   location?: string | null;
   radius?: number | string | null;
@@ -59,8 +62,14 @@ export interface SearchResult {
     reception?: any
     otherRooms?: any
     utility?: any
-    frontGarden?: any
-    rearGarden?: any
+    outdoorSpace?: {
+      description?: string | null
+      garden?: any[]
+      land?: any[]
+      totalGardenSize?: number | null
+      totalLandSize?: number | null
+      separateParcel?: boolean
+    }
     energyAndUtilities?: any
     securityFeatures?: any
     storageFeatures?: any
@@ -80,3 +89,5 @@ export type aiSearchResult = {
   whereClause: any
   queryAnalysis: QueryAnalysis
 }
+
+export type ListingType = 'sale' | 'rent' | 'all';

@@ -23,10 +23,10 @@
           {{ price }}
 
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            {{ convertRoomEnumToString(priceType!) }}
+            {{ convertEnumToString(priceType!) }}
           </AtomsPill>
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            {{ convertRoomEnumToString(available!) }}
+            {{ convertEnumToString(available!) }}
           </AtomsPill>
         </h2>
 
@@ -44,8 +44,8 @@
             :bathrooms="bathrooms"
             :receptions="receptions"
             :other-rooms="otherRooms"
-            :rear-garden="rearGarden"
-            :front-garden="frontGarden"
+            :has-garden="hasGarden"
+            :has-land="hasLand"
             :classification="classification"
           />
 
@@ -68,7 +68,7 @@
             {{ price }}
 
             <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-              {{ convertRoomEnumToString(priceType!) }}
+              {{ convertEnumToString(priceType!) }}
             </AtomsPill>
           </h2>
 
@@ -77,7 +77,7 @@
           </p>
         </div>
 
-        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent" />
+        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent" :is-draft="isDraft" />
       </div>
     </div>
   </div>
@@ -102,8 +102,8 @@ interface Props {
   yearBuilt?: string
   constructionType?: string
   chainFree?: boolean | null
-  rearGarden?: boolean
-  frontGarden?: boolean
+  hasGarden?: boolean
+  hasLand?: boolean
   listingId?: number
   agent?: {
     username?: string | null
@@ -113,6 +113,7 @@ interface Props {
     avatar?: string | null
   }
   available?: string
+  isDraft?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

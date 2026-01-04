@@ -24,15 +24,12 @@ import ViewsDialogTierConfirmation from "~/components/views/Dialog/ViewsDialogTi
 import ViewsDialogPayment from "~/components/views/Dialog/ViewsDialogPayment.vue";
 
 const { showDialog } = useDialog();
-const { isMember, membershipType, membershipEndDate, isIncludedInMembership, requestMembershipUpgrade } = useUserMembership();
-
-console.log("isMember", isMember.value);
-console.log("membershipType", membershipType.value);
-console.log("membershipEndDate", membershipEndDate.value);
+const { isIncludedInMembership, requestMembershipUpgrade } = useUserMembership();
+const { createDraftListing } = useListingEdit();
 
 const tierPrice = (tier: TierOption) => {
   if (isIncludedInMembership(tier)) {
-    return 'Included with your membership';
+    return 'Included in your membership';
   }
 
   return formattedPrice(tier.price) + ' / month';
@@ -48,12 +45,6 @@ const formattedPrice = (price: number) => {
   return `£${price.toFixed(2)}`;
 };
 
-const emit = defineEmits<{
-  (e: "create", tier: TierOption): void;
-  (e: "paymentRequested", tier: TierOption): void;
-  (e: "upgradeRequested", tier: TierOption): void;
-  (e: "paymentSuccess", tier: TierOption): void;
-}>();
 
 function createTier(tier: TierOption) {
   showTierConfirmation(tier);
@@ -65,34 +56,31 @@ function showTierConfirmation(tier: TierOption) {
     props: {
       tier: tier,
     },
-    onClose: (result) => {
+    onClose: async (result) => {
         const { returnValue } = result as { returnValue?: { action?: string; tier?: TierOption } };
 
         if (!returnValue) return;
 
         if (returnValue.action === 'create' && returnValue.tier) {
-          // Tier is included in membership — create listing immediately
-          emit('create', returnValue.tier);
-          navigateTo('/account/create-listing');
-          return;
+          try {
+            const draftId = await createDraftListing(returnValue.tier);
+            // Navigate directly to the stepper instead of the dashboard
+            navigateTo(`/account/create-listing/${draftId}`);
+          } catch (error) {
+            // Error already handled in createDraftListing
+            console.error('Failed to create draft listing:', error);
+          }
         }
 
         if (returnValue.action === 'upgrade' && returnValue.tier) {
           // User needs to upgrade membership — placeholder flow
-          // Emit event so parent consumers can react (analytics / UI)
-          emit('upgradeRequested', returnValue.tier);
           requestMembershipUpgrade(returnValue.tier);
           return;
         }
 
         if (returnValue.action === 'payment' && returnValue.tier) {
-          // Notify parent consumers and open payment dialog
-          emit('paymentRequested', returnValue.tier);
           showPaymentDialog(returnValue.tier);
-        } else if (returnValue.action === 'back') {
-          // User went back, just close the dialog
-          console.log('User went back to tier selection');
-      }
+        }
     },
   });
 }
@@ -103,14 +91,19 @@ function showPaymentDialog(tier: TierOption) {
     props: {
       tier: tier,
     },
-    onClose: (result) => {
+    onClose: async (result) => {
       const { returnValue } = result as { returnValue?: { paymentConfirmed?: boolean; cancelled?: boolean; tier?: TierOption } };
 
       if (returnValue?.paymentConfirmed && returnValue.tier) {
-        emit("paymentSuccess", returnValue.tier);
-        console.log("Payment successful!");
+        try {
+          const draftId = await createDraftListing(returnValue.tier);
+          // Navigate directly to the stepper instead of the dashboard  
+          navigateTo(`/account/create-listing/${draftId}`);
+        } catch (error) {
+          // Error already handled in createDraftListing
+          console.error('Failed to create draft listing:', error);
+        }
       } else if (returnValue?.cancelled) {
-        // User cancelled payment, show tier confirmation again
         showTierConfirmation(tier);
       }
     },

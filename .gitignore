@@ -30,5 +30,6 @@ logs
 # prisma
 layers/database/server/database/prisma/generated
 layers/database/server/database/prisma-ppd/generated
+layers/database/server/database/prisma-waiting-list/generated
 server.crt
 server.key

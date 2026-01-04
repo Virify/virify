@@ -1,8 +1,6 @@
 name: Tests
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -45,7 +43,7 @@ jobs:
       run: pnpm install
 
     - name: Generate Prisma client
-      run: pnpm prisma generate
+      run: pnpm pgen
 
     # - name: Run database migrations
     #   run: pnpm prisma migrate deploy

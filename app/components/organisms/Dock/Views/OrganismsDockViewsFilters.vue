@@ -10,7 +10,7 @@
 
         <template v-slot:ai>
           <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="searchSubmit"
-            @reset-search="searchReset" />
+            :loading="isChecking" @reset-search="searchReset" />
         </template>
       </OrganismsFilterSwitcher>
     </template>
@@ -23,14 +23,29 @@ const initialQuery = ref('')
 /**
  *  Fetch filters
  */
-const { setQuery, isLoading } = useSearchState()
+const { searchState, isLoading } = useSearchState()
+const { checkContent, isChecking } = useModeration()
+const { showToast } = useToast()
 
-function searchSubmit(query: string) {
-  setQuery(query)
-};
+async function searchSubmit(query: string) {
+  const { location, radius, listingType } = asObject(searchState.value)
+
+  if (!location) return
+
+  // Check content moderation before proceeding
+  const { safe, reason } = await checkContent(query)
+  if (!safe) {
+    showToast(reason || 'Please try a different search.', { type: 'error' })
+    return
+  }
+
+  // Build clean URL and navigate - this will trigger the search
+  await navigateTo(createSearchURL(listingType, location, radius ?? 5, query))
+}
 
 function searchReset() {
-  setQuery('')
+  // Navigate to home to start fresh
+  navigateTo('/')
 }
 
 </script>

@@ -6,7 +6,7 @@ model Verification {
   address               Boolean?
   bank                  Boolean?
   payslip               Boolean?
-  business              Boolean?
+  role                  Role         @default(USER)
   reviewed              Reviewed     @default(PENDING)
   reviewToken           String?      @unique
   reviewTokenExpiry     DateTime?
@@ -23,4 +23,10 @@ enum Reviewed {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum Role {
+  USER
+  BUSINESS
+  ADMIN
 }

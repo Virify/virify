@@ -4,7 +4,7 @@
       <legend class="| visually-hidden">The property</legend>
 
       <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-        :disabled="!isValid" @submit="searchSubmit" />
+        :disabled="!isValid" :loading="props.loading" @submit="searchSubmit" />
     </div>
 
     <!--
@@ -35,6 +35,7 @@ interface Props {
   disabled?: boolean
   hideSuggestions?: boolean
   hideReset?: boolean
+  loading?: boolean
 }
 
 const props = defineProps<Props>();

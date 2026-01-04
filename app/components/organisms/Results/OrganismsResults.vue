@@ -10,9 +10,10 @@
     </template>
 
     <template v-else>
-      <h2 class="o-results__title | title-sm">
-        {{ visibleResultsTitle }}
-      </h2>
+      <div v-if="hasSearchInfo" class="o-results__header">
+        <MoleculesResultsContext :count="results.length" :query-analysis="queryAnalysis" :location="location"
+          :radius="radius" @open-popover="$emit('open-popover', $event)" />
+      </div>
 
       <div class="o-results__grid">
         <component v-for="{ variant, fullWidth, component, result } of paginatedResults" :is="component" :variant
@@ -37,10 +38,30 @@ import {
 interface Props {
   isLoading?: boolean
   results: ListingCardData[]
+  queryAnalysis?: QueryAnalysis | null
+  location?: GeocodingFeature | null
+  radius?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isLoading: false
+  isLoading: false,
+  queryAnalysis: null,
+  location: null,
+  radius: 0
+})
+
+defineEmits<{
+  'open-popover': [type: 'location' | 'filters']
+}>()
+
+/**
+ * Check if we have search info to display
+ */
+const hasSearchInfo = computed(() => {
+  const hasTerms = isPopulatedArray(props.queryAnalysis?.usedTerms)
+  const hasLocation = !!props.location
+  const hasRadius = props.radius > 0
+  return hasTerms || hasLocation || hasRadius || props.results.length > 0
 })
 
 /**
@@ -173,8 +194,12 @@ const resultsComponents = computed(() => {
 .o-results {
   container-type: inline-size;
 
+  &__header {
+    margin-bottom: var(--size-16);
+  }
+
   &__title {
-    margin: 0 0 var(--size-16);
+    margin: 0 0 var(--size-12);
 
     &--skeleton {
       width: 12ch;
@@ -201,7 +226,7 @@ const resultsComponents = computed(() => {
       grid-gap: var(--size-16);
 
       .o-results__card--large {
-        grid-column: span 2;
+        grid-column: span 4;
       }
     }
   }

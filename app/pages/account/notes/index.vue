@@ -80,7 +80,4 @@ const isNotesCollapsed = ref(false);
     }
   }
 }
-.breadcrumb {
-  padding: 0 !important;
-}
 </style>

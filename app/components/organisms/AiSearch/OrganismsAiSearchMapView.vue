@@ -1,16 +1,15 @@
 <template>
   <div class="ai-search-map-view">
-    <Map ref="mapRef" :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true" />
+    <Map ref="mapRef" :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true" @map-ready="onMapReady" />
 
-    <!-- Loading overlay for map view -->
-    <div v-if="isSearching || !results || results.length === 0" class="ai-search-map-view__overlay | body-lg">
-      <template v-if="isSearching">
-        {{ loadingMessage }}
-      </template>
+    <!-- Loading overlay for map view - only show when actively searching -->
+    <div v-if="isSearching" class="ai-search-map-view__overlay | body-lg">
+      {{ loadingMessage }}
+    </div>
 
-      <template v-else>
-        No results found
-      </template>
+    <!-- No results overlay - show when search completed with no results -->
+    <div v-else-if="hasSearched && !results.length" class="ai-search-map-view__overlay ai-search-map-view__overlay--no-results | body-lg">
+      No properties found in this area
     </div>
   </div>
 </template>
@@ -29,6 +28,7 @@ interface Props {
   location?: GeocodingFeatureWithBoundary | null;
   radius?: number;
   isSearching?: boolean;
+  hasSearched?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -36,6 +36,7 @@ const props = defineProps<Props>();
 const { updateSearchRadiusVisualization } = useMap();
 
 const mapRef = ref();
+const mapInstance = ref<any>(null);
 
 // Convert ListingWithFullProperty to ListingCardType format that Map component expects
 const convertedMarkers = computed((): ListingCardType[] => {
@@ -58,25 +59,23 @@ const mapZoom = computed(() => {
   return undefined; // Let Map component use defaults
 });
 
-// Manually add radius visualization when map is ready
-onMounted(() => {
-  // Wait for map to be fully mounted
-  nextTick(() => {
-    setTimeout(() => {
-      if (mapRef.value?.map && props.location) {
-        const center = calculateMapCenter(props.location, props.radius);
-        updateSearchRadiusVisualization(mapRef.value.map, center, props.radius, props.location.bbox, props.location.boundaryPolygon);
-      }
-    }, 500); // Give map time to fully initialize
-  });
-});
+// Apply radius visualization to the map
+function applyRadiusVisualization() {
+  if (mapInstance.value && props.location) {
+    const center = calculateMapCenter(props.location, props.radius);
+    updateSearchRadiusVisualization(mapInstance.value, center, props.radius, props.location.bbox, props.location.boundaryPolygon);
+  }
+}
+
+// Handle map ready event - apply visualization when map is fully initialized
+function onMapReady(map: any) {
+  mapInstance.value = map;
+  applyRadiusVisualization();
+}
 
 // Watch for prop changes and update radius
-watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => {
-  if (mapRef.value?.map && newLocation) {
-    const center = calculateMapCenter(newLocation, newRadius);
-    updateSearchRadiusVisualization(mapRef.value.map, center, newRadius, newLocation.bbox, newLocation.boundaryPolygon);
-  }
+watch([() => props.location, () => props.radius], () => {
+  applyRadiusVisualization();
 });
 </script>
 
@@ -106,6 +105,10 @@ watch([() => props.location, () => props.radius], ([newLocation, newRadius]) => 
     background: fn.faded-color(70%, var(--monochrome-100));
     color: var(--monochrome-900);
     font-weight: var(--font-semibold);
+
+    &--no-results {
+      background: fn.faded-color(50%, var(--monochrome-100));
+    }
   }
 }
 </style>

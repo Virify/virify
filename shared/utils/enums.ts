@@ -20,12 +20,40 @@ export function convertToValidEnum(
 }
 
 /**
- * Format and return a pretty price type enum.
+ * Convert enum values to readable strings (handles underscore, camelCase, and uppercase)
+ * This is the comprehensive version used for all feature/room enums.
  * 
- * @param type Price Type enum.
- * @returns string.
+ * @param enumValue The enum value to convert
+ * @returns Readable string with proper capitalization
  */
-export function convertEnumToString(type: string | undefined): string {
+export function convertEnumToString(enumValue: string | null | undefined): string {
+  if (!enumValue) return "";
+  
+  // Handle underscore-separated enums first (e.g., "OPEN_PLAN" -> "Open Plan")
+  if (enumValue.includes('_')) {
+    return enumValue
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+  
+  // Handle all-uppercase enums (like "GYM" -> "Gym")
+  if (enumValue === enumValue.toUpperCase() && enumValue.length > 1) {
+    return enumValue.charAt(0).toUpperCase() + enumValue.slice(1).toLowerCase();
+  }
+  
+  // Handle camelCase enums (e.g., "enSuite" -> "En Suite")
+  return enumValue.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+}
+
+/**
+ * Format and return a capitalized enum string (simple version for basic enums).
+ * 
+ * @param type Enum value.
+ * @returns Capitalized string.
+ */
+export function convertEnumToCapalizedString(type: string | undefined): string {
   if(!type) return "";
-  return type.toUpperCase().replace("_", " ");
+  const formatted = type.toLowerCase().replace(/_/g, " ");
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }

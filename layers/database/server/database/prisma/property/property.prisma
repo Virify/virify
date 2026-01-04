@@ -1,6 +1,5 @@
 model Property {
   id                       Int                    @id @default(autoincrement())
-  title                    String
   description              String
   value                    Float?
   size                     Float?
@@ -17,19 +16,19 @@ model Property {
   numberBathrooms          Int?                   @default(0)
   numberReceptions         Int?                   @default(0)
   numberOtherRooms         Int?                   @default(0)
+  numberKitchens           Int?                   @default(0)
   bathroomFeatures         Bathroom[]
   bedroomFeatures          Bedroom[]
-  kitchenFeatures          Kitchen?
+  kitchenFeatures          Kitchen[]
   reception                Reception[]
   otherRoom                OtherRoom[]
-  frontGarden              FrontGarden?
-  rearGarden               RearGarden?
+  outdoorSpace             OutdoorSpace?
   utility                  Utility?
   listing                  Listing[]
   media                    Media[]
   parking                  Parking?
   energyAndUtilities       EnergyAndUtilities?
-  address                  Address                @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  address                  Address?               @relation(fields: [addressId], references: [id], onDelete: Cascade)
   runningCosts             RunningCosts?
   securityFeatures         Security?
   storageFeatures          Storage?
@@ -40,11 +39,12 @@ model Property {
   classification           PropertyClassification @relation(fields: [propertyClassificationId], references: [id])
   createdAt                DateTime               @default(now())
   updatedAt                DateTime               @updatedAt
-  addressId                Int
+  addressId                Int?
   userId                   Int?
   estateAgentId            Int?
   propertyTypeId           Int
   propertyClassificationId Int
+  DraftListing             DraftListing[]
 
   @@index(addressId)
 }

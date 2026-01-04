@@ -33,7 +33,7 @@
           name="type"
           required
           :disabled="isSubmitting"
-          class="support-dialog__select"
+          class="support-dialog__select | body-sm"
         >
           <option value="">Select type...</option>
           <option value="bug">Bug Report</option>
@@ -52,12 +52,13 @@
           required
           :disabled="isSubmitting"
           placeholder="Please describe the bug/issue including page name, device type, browser, and any steps to reproduce..."
-          class="support-dialog__textarea"
+          class="support-dialog__textarea | text-sm"
         ></textarea>
       </MoleculesFormField>
 
-      <div v-if="success" class="support-dialog__success | body-sm">
-        Your support request has been sent successfully! We'll get back to you soon.
+      <!-- Cloudflare Turnstile -->
+      <div class="support-dialog__turnstile">
+        <div ref="turnstileEl"></div>
       </div>
 
       <div class="support-dialog__actions">
@@ -82,7 +83,11 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
 const { hideDialog } = useDialog()
+const { showToast } = useToast()
+const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile()
 
 const form = ref({
   name: '',
@@ -93,17 +98,23 @@ const form = ref({
 
 const isSubmitting = ref(false)
 const formError = ref(null)
-const success = ref(false)
+const pendingResolve = ref(null)
 
 async function submitForm() {
   if (isSubmitting.value) return
 
-  success.value = false
-  isSubmitting.value = true
-
-  // Clear any existing form errors
   formError.value = null
 
+  // Start submission flow and execute Turnstile
+  isSubmitting.value = true
+  pendingResolve.value = new Promise((resolve) => {
+    pendingResolve.value = resolve
+  })
+  
+  executeTurnstile()
+}
+
+async function performSubmit() {
   try {
     await $fetch('/api/support', {
       method: 'POST',
@@ -111,16 +122,13 @@ async function submitForm() {
         name: form.value.name,
         email: form.value.email,
         type: form.value.type,
-        details: form.value.details
+        details: form.value.details,
+        turnstileToken: turnstileToken.value,
       }
     })
 
-    success.value = true
-    
-    // Close dialog after a short delay to show success message
-    setTimeout(() => {
-      hideDialog()
-    }, 2000)
+    showToast('Support request submitted successfully!', { type: 'success' })
+    hideDialog()
     
   } catch (err) {
     console.error('Support form submission error:', err)
@@ -128,10 +136,25 @@ async function submitForm() {
       title: 'Support request failed',
       message: 'Failed to send support request. Please try again.'
     }
+    resetTurnstile()
   } finally {
     isSubmitting.value = false
+    if (pendingResolve.value) {
+      pendingResolve.value()
+      pendingResolve.value = null
+    }
   }
 }
+
+onMounted(() => {
+  initializeTurnstile(() => {
+    performSubmit()
+  })
+})
+
+onUnmounted(() => {
+  cleanupTurnstile()
+})
 </script>
 
 <style lang="scss">
@@ -146,6 +169,8 @@ async function submitForm() {
     background: var(--background-200);
     resize: vertical;
     min-height: var(--size-120);
+    font-size: var(--font-sm);
+    line-height: var(--lineheight-sm);
 
     &:focus {
       outline: none;
@@ -188,6 +213,12 @@ async function submitForm() {
     border: 1px solid var(--success-200);
     border-radius: var(--border-radius-md);
     padding: var(--size-12);
+  }
+
+  &__turnstile {
+    display: flex;
+    justify-content: center;
+    margin: var(--size-16) 0;
   }
 
   &__actions {

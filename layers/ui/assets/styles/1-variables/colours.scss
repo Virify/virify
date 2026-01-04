@@ -95,6 +95,13 @@
   --error: #ef1b1b;
 
   /**
+  *  Success colours
+  */
+  --success-background: light-dark(#e6f4ea, #22342a);
+  --success-foreground: light-dark(#1bbf4e, #6dff95);
+  --success: #1bbf4e;
+
+  /**
    *
    */
   --favourite-colour: #FF4A9E;

@@ -1,9 +1,9 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import type { Prisma, Listing } from "~~/layers/database/server/database/prisma/generated/client";
-import { RentalPriceType, FurnishedStatus, RentalAvailabilityStatus, TenureType, SalePriceType, SaleAvailabilityStatus, ListingTier, VerificationLevel } from "~~/layers/database/server/database/prisma/generated/enums";
-import { roundFloat } from "~~/shared/utils/numbers";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
+import type { Prisma, Listing } from "../../../database/server/database/prisma/generated/client";
+import { RentalPriceType, FurnishedStatus, RentalAvailabilityStatus, TenureType, SalePriceType, SaleAvailabilityStatus, ListingTier, VerificationLevel } from "../../../database/server/database/prisma/generated/enums";
+import { roundFloat } from "../../../../shared/utils/numbers";
+import { prisma } from "../../../database/server/utils/prisma-client";
 /**
  * Generate a random date between 1, 3, 7, and 14 days ago.
  */
@@ -24,7 +24,7 @@ export const generateRentalObject = (): Prisma.RentalListingCreateWithoutListing
     holdingDeposit: roundFloat(faker.number.float({ min: 1000, max: 10000 }), 2),
     rentFrequency: faker.helpers.arrayElement(Object.values(RentalPriceType)),
     isBillsIncluded: faker.datatype.boolean(),
-    rentalLength: faker.number.int({ min: 1, max: 48 }),
+    rentalLength: faker.helpers.arrayElement(['SHORT_TERM', 'LONG_TERM']),
     furnishedStatus: faker.helpers.arrayElement(Object.values(FurnishedStatus)),
     availabilityStatus: faker.helpers.arrayElement(Object.values(RentalAvailabilityStatus)),
   };
@@ -44,6 +44,24 @@ export const generateSaleObject = (): Prisma.SaleListingCreateWithoutListingInpu
     availabilityStatus: faker.helpers.arrayElement(Object.values(SaleAvailabilityStatus)),
   }
 }
+
+/**
+ * Generate a weighted listing tier
+ * 60% BASIC, 30% FEATURED, 10% PREMIUM
+ * 
+ * @returns ListingTier
+ */
+const generateWeightedListingTier = (): ListingTier => {
+  const random = Math.random() * 100;
+  
+  if (random < 60) {
+    return ListingTier.BASIC;
+  } else if (random < 90) {
+    return ListingTier.FEATURED;
+  } else {
+    return ListingTier.PREMIUM;
+  }
+};
 
 const generateRandomViews = () => {
   return faker.number.int({ min: 0, max: 50 });
@@ -93,11 +111,9 @@ export const generateListingViews = async (listingId: number): Promise<number> =
 export const generateRentalListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
-      title: faker.word.words(10),
-      description: faker.word.words(20),
       price: roundFloat(faker.number.float({ min: 300, max: 3000 }), 2),
       moveInDate: faker.date.future(),
-      listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
+      listingTier: generateWeightedListingTier(),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
       viewingOptions: faker.word.words(10),
@@ -139,11 +155,9 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
 export const generateSaleListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
-      title: faker.word.words(10),
-      description: faker.word.words(20),
       price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
       moveInDate: faker.date.future(),
-      listingTier: faker.helpers.arrayElement(Object.values(ListingTier)),
+      listingTier: generateWeightedListingTier(),
       listingStartDate: new Date(),
       listingEndDate: faker.date.future(),
       viewingOptions: faker.word.words(10),

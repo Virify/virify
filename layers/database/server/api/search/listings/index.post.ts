@@ -25,7 +25,7 @@ const searchSchema = z.object({
   bathrooms: z.array(z.coerce.number()).optional(),
   addedToSite: z.enum(["0", "1", "3", "7", "14"]).optional(),
   availabilityOptions: z.string().optional(),
-  featured: z.array(z.object({ key: z.string(), group: z.enum(["parking", "additionalFeatures", "accessibilityFeatures", "rearGarden", "frontGarden"]) })).optional(),
+  featured: z.array(z.object({ key: z.string(), group: z.enum(["parking", "additionalFeatures", "accessibilityFeatures", "outdoorSpace"]) })).optional(),
   page: z.coerce.number().optional(),
   pageSize: z.coerce.number().optional(),
 });

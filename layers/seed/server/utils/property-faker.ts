@@ -1,12 +1,23 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
-import { BedSizeType, BoilerType, BroadbandType, ConnectedUtilities, ConstructionType, EPCRating, FireplaceType, HeatingType, HotWaterSource, OtherRoomType, ReceptionType, RenewableEnergy, type Prisma } from "~~/layers/database/server/database/prisma/generated/client";
-import { roundFloat } from "~~/shared/utils/numbers";
+import { AccessibilityFeature, BathroomFeature, BedSizeType, BedroomFeature, BoilerType, BroadbandType, BuildingFeature, ConnectedUtilities, ConstructionType, EPCRating, HeatingType, HotWaterSource, KitchenFeature, LandFeature, OtherRoomType, OutdoorSpaceFeature, ParkingFeature, ReceptionType, RenewableEnergy, RoomFeature, SecurityFeature, StorageFeature, UtilityFeature, type Address, type Prisma } from "../../../database/server/database/prisma/generated/client";
+import { roundFloat } from "../../../../shared/utils/numbers";
 import { typeToClassificationMap } from "./property-type-map";
-import type { PropertyWithAddress } from "~~/shared/types/property";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
+import type { PropertyWithAddress } from "../../../../shared/types/property";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed";
 import { getRequiredImages, getRandomAdditionalImages, getAllImagesByRoom } from "./images-to-seed";
+import type { AddressCreateWithoutPropertiesInput } from "../../../database/server/database/prisma/generated/models";
+import { prisma } from "../../../database/server/utils/prisma-client";
+
+/**
+ * Helper function to randomly select enum values based on probability
+ * @param enumValues - Array of enum values
+ * @param probability - Probability for each enum to be included (0-1)
+ * @returns Array of selected enum values
+ */
+const selectRandomEnumValues = <T>(enumValues: T[], probability: number = 0.3): T[] => {
+  return enumValues.filter(() => faker.datatype.boolean({ probability }));
+};
 
 /**LandUse
  * Generate random additiional features
@@ -18,11 +29,7 @@ export const generateAdditionalFeatures = (): Prisma.AdditionalFeaturesCreateWit
     description: faker.word.words(10),
     petFriendly: faker.datatype.boolean(),
     moveInDate: faker.date.future(),
-    pool: faker.datatype.boolean(),
-    internet: faker.datatype.boolean(),
-    concierge: faker.datatype.boolean(),
-    shop: faker.datatype.boolean(),
-    gym: faker.datatype.boolean(),
+    features: selectRandomEnumValues(Object.values(BuildingFeature), 0.4),
   };
 };
 
@@ -34,24 +41,20 @@ export const generateAdditionalFeatures = (): Prisma.AdditionalFeaturesCreateWit
 export const generateAccessability = (): Prisma.AccessibilityCreateWithoutPropertyInput => {
   return {
     description: faker.word.words(10),
-    wheelchairFriendly: faker.datatype.boolean(),
-    stepFreeAccess: faker.datatype.boolean(),
-    wideDoorways: faker.datatype.boolean(),
-    wetRoom: faker.datatype.boolean(),
-    handrails: faker.datatype.boolean(),
-    elevator: faker.datatype.boolean(),
-    stairs: faker.datatype.boolean(),
-    accessibleParking: faker.datatype.boolean(),
+    features: selectRandomEnumValues(Object.values(AccessibilityFeature), 0.3),
   };
 };
 
 /**
  * Generate a random number of bathrooms
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of bathrooms
  */
-export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreateWithoutPropertyInput[] } => {
-  const bathroomCount = faker.number.int({ min: 1, max: 3 });
+export const generateBathrooms = (totalFloors: number): { count: number; data: Prisma.BathroomCreateWithoutPropertyInput[] } => {
+  // 50% of properties have 2 bathrooms, 50% have 1 bathroom
+  const bathroomCount = faker.datatype.boolean({ probability: 0.5 }) ? 2 : 1;
+  
   const bathroomNames = [
     'Master Bathroom',
     'Guest Bathroom',
@@ -60,28 +63,37 @@ export const generateBathrooms = (): { count: number; data: Prisma.BathroomCreat
     'Powder Room',
     'Shared Bathroom',
   ];
-  return {
-    count: bathroomCount,
-    data: Array.from({ length: bathroomCount }, (_, i) => ({
+  
+  const bathrooms = Array.from({ length: bathroomCount }, (_, i) => {
+    const features = selectRandomEnumValues(Object.values(BathroomFeature), 0.6);
+    // Ground floor bathroom not en-suite
+    if (i === 0 && features.includes(BathroomFeature.EN_SUITE)) {
+      const index = features.indexOf(BathroomFeature.EN_SUITE);
+      features.splice(index, 1);
+    }
+    return {
       roomNumber: i + 1,
-      floor: faker.number.int({ min: 1, max: 3 }),
+      floor: i === 0 ? 0 : faker.number.int({ min: 1, max: totalFloors }),
       name: faker.helpers.arrayElement(bathroomNames),
       description: faker.word.words(10),
-      enSuite: faker.datatype.boolean(),
-      toilet: faker.datatype.boolean(),
-      bathtub: faker.datatype.boolean(),
-      walkInShower: faker.datatype.boolean(),
+      features,
       size: faker.number.int({ min: 10, max: 50 }),
-    })),
+    };
+  });
+  
+  return {
+    count: bathroomCount,
+    data: bathrooms,
   };
 };
 
 /**
  * Generate a random number of bedrooms
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of bedrooms
  */
-export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateWithoutPropertyInput[] } => {
+export const generateBedrooms = (totalFloors: number): { count: number; data: Prisma.BedroomCreateWithoutPropertyInput[] } => {
   const bedroomCount = faker.number.int({ min: 1, max: 5 });
   const bedroomNames = [
     'Master Bedroom',
@@ -96,17 +108,10 @@ export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateW
     data: Array.from({ length: bedroomCount }, (_, i) => ({
       roomNumber: i + 1,
       name: faker.helpers.arrayElement(bedroomNames),
-      floor: faker.number.int({ min: 0, max: 3 }),
+      floor: faker.number.int({ min: 1, max: totalFloors }),
       bed: [faker.helpers.arrayElement(Object.values(BedSizeType))],
       description: faker.word.words(10),
-      enSuite: faker.datatype.boolean(),
-      builtInStorage: faker.datatype.boolean(),
-      walkInWardrobe: faker.datatype.boolean(),
-      bayWindow: faker.datatype.boolean(),
-      balcony: faker.datatype.boolean(),
-      hasView: faker.datatype.boolean(),
-      patioDoors: faker.datatype.boolean(),
-      builtInDesk: faker.datatype.boolean(),
+      features: selectRandomEnumValues(Object.values(BedroomFeature), 0.4),
       size: faker.number.int({ min: 10, max: 50 }),
     })),
   };
@@ -115,87 +120,79 @@ export const generateBedrooms = (): { count: number; data: Prisma.BedroomCreateW
 /**
  * Generate random Kitchen object
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns KitchenWithoutPropertyInput
  */
-export const generateKitchen = (): Prisma.KitchenCreateWithoutPropertyInput => {
+export const generateKitchen = (totalFloors: number): { count: number, data: Prisma.KitchenCreateWithoutPropertyInput[] } => {
+  const kitchenCount = faker.number.int({ min: 1, max: 3 });
   return {
-    modern: faker.datatype.boolean(),
-    openPlan: faker.datatype.boolean(),
-    whiteGoods: faker.datatype.boolean(),
-    description: faker.word.words(10),
-    size: faker.number.int({ min: 10, max: 50 }),
-    breakfastBar: faker.datatype.boolean(),
-    island: faker.datatype.boolean(),
-    pantry: faker.datatype.boolean(),
-    utilityAccess: faker.datatype.boolean(),
+    count: kitchenCount,
+    data: Array.from({ length: kitchenCount }, () => ({
+      roomNumber: faker.number.int({ min: 1, max: 3 }),
+      floor: faker.number.int({ min: 1, max: totalFloors }),
+      name: faker.word.words(2),
+      features: selectRandomEnumValues(Object.values(KitchenFeature), 0.5),
+      description: faker.word.words(10),
+      size: faker.number.int({ min: 10, max: 50 }),
+    }))
   };
 };
 
 /**
  * Generate a random number of reception objects
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of Reception objects
  */
-export const generateReception = (): { count: number; data: Prisma.ReceptionCreateWithoutPropertyInput[] } => {
+export const generateReception = (totalFloors: number): { count: number; data: Prisma.ReceptionCreateWithoutPropertyInput[] } => {
   const receptionCount = faker.number.int({ min: 1, max: 3 });
   return {
     count: receptionCount,
-    data: Array.from({ length: receptionCount }, (_, i) => ({
-      roomNumber: i + 1,
-      floor: faker.number.int({ min: 0, max: 3 }),
-      name: faker.word.words(2),
-      type: faker.helpers.arrayElement(Object.values(ReceptionType)),
-      description: faker.word.words(10),
-      size: faker.number.int({ min: 10, max: 50 }),
-      openPlan: faker.datatype.boolean(),
-      fireplace: faker.helpers.arrayElement(Object.values(FireplaceType)),
-      balcony: faker.datatype.boolean(),
-      bayWindow: faker.datatype.boolean(),
-      openConcept: faker.datatype.boolean(),
-      conservatory: faker.datatype.boolean(),
-      barArea: faker.datatype.boolean(),
-      builtInDesk: faker.datatype.boolean(),
-      builtInStorage: faker.datatype.boolean(),
-      builtInShelving: faker.datatype.boolean(),
-      hasView: faker.datatype.boolean(),
-      soundProofing: faker.datatype.boolean(),
-      accousticPanels: faker.datatype.boolean(),
-      stoneFlooring: faker.datatype.boolean(),
-      hardwoodFlooring: faker.datatype.boolean(),
-    })),
+    data: Array.from({ length: receptionCount }, (_, i) => {
+      const features = selectRandomEnumValues(Object.values(RoomFeature), 0.35);
+      // Add fireplace randomly
+      if (faker.datatype.boolean({ probability: 0.3 })) {
+        features.push(RoomFeature.FIREPLACE);
+      }
+      return {
+        roomNumber: i + 1,
+        floor: faker.number.int({ min: 1, max: totalFloors }),
+        name: faker.word.words(2),
+        type: faker.helpers.arrayElement(Object.values(ReceptionType)),
+        description: faker.word.words(10),
+        size: faker.number.int({ min: 10, max: 50 }),
+        features,
+      };
+    }),
   };
 };
 
 /**
  * Generate a random number of reception objects
  *
+ * @param totalFloors - The total number of floors in the property
  * @returns Array of Reception objects
  */
-export const generateOtherRooms = (): { count: number; data: Prisma.OtherRoomCreateWithoutPropertyInput[] } => {
+export const generateOtherRooms = (totalFloors: number): { count: number; data: Prisma.OtherRoomCreateWithoutPropertyInput[] } => {
   const otherRoomCount = faker.number.int({ min: 1, max: 3 });
   return {
     count: otherRoomCount,
-    data: Array.from({ length: otherRoomCount }, (_, i) => ({
-      roomNumber: i + 1,
-      floor: faker.number.int({ min: 0, max: 3 }),
-      name: faker.word.words(2),
-      type: faker.helpers.arrayElement(Object.values(OtherRoomType)),
-      description: faker.word.words(10),
-      size: faker.number.int({ min: 10, max: 50 }),
-      openPlan: faker.datatype.boolean(),
-      fireplace: faker.helpers.arrayElement(Object.values(FireplaceType)),
-      balcony: faker.datatype.boolean(),
-      openConcept: faker.datatype.boolean(),
-      barArea: faker.datatype.boolean(),
-      builtInDesk: faker.datatype.boolean(),
-      builtInStorage: faker.datatype.boolean(),
-      builtInShelving: faker.datatype.boolean(),
-      hasView: faker.datatype.boolean(),
-      soundProofing: faker.datatype.boolean(),
-      accousticPanels: faker.datatype.boolean(),
-      stoneFlooring: faker.datatype.boolean(),
-      hardwoodFlooring: faker.datatype.boolean(),
-    })),
+    data: Array.from({ length: otherRoomCount }, (_, i) => {
+      const features: RoomFeature[] = selectRandomEnumValues(Object.values(RoomFeature).filter(f => f !== RoomFeature.FIREPLACE && f !== RoomFeature.CONSERVATORY) as RoomFeature[], 0.35);
+      // Add fireplace randomly
+      if (faker.datatype.boolean({ probability: 0.25 })) {
+        features.push(RoomFeature.FIREPLACE);
+      }
+      return {
+        roomNumber: i + 1,
+        floor: faker.number.int({ min: 0, max: totalFloors - 1 }),
+        name: faker.word.words(2),
+        type: faker.helpers.arrayElement(Object.values(OtherRoomType)),
+        description: faker.word.words(10),
+        size: faker.number.int({ min: 10, max: 50 }),
+        features,
+      };
+    }),
   };
 };
 
@@ -207,9 +204,7 @@ export const generateOtherRooms = (): { count: number; data: Prisma.OtherRoomCre
 export const generateUtility = (): Prisma.UtilityCreateWithoutPropertyInput => {
   return {
     description: faker.word.words(10),
-    storage: faker.datatype.boolean(),
-    sink: faker.datatype.boolean(),
-    plumbing: faker.datatype.boolean(),
+    features: selectRandomEnumValues(Object.values(UtilityFeature), 0.6),
     size: faker.number.float({ min: 5, max: 50 }),
   };
 };
@@ -218,11 +213,11 @@ export const generateUtility = (): Prisma.UtilityCreateWithoutPropertyInput => {
  * Generate media objects for a specific room type using Cloudflare images
  *
  * @param roomId - The ID of the room to link the media to
- * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom, frontGarden, rearGarden, kitchen)
+ * @param roomType - The type of room (bedroom, bathroom, reception, otherRoom, garden, kitchen, outdoorSpace, yard)
  * @param roomName - The display name of the room (for metadata)
  * @returns Array of media objects
  */
-export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom' | 'frontGarden' | 'rearGarden' | 'kitchen', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
+export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bathroom' | 'reception' | 'otherRoom' | 'garden' | 'kitchen' | 'outdoorSpace' | 'land' | 'yard', roomName: string): Prisma.MediaUncheckedCreateWithoutPropertyInput[] => {
   const mediaCount = faker.number.int({ min: 1, max: 2 });
   const allImagesByRoom = getAllImagesByRoom();
   
@@ -240,8 +235,10 @@ export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bath
       case 'kitchen':
         imageId = faker.helpers.arrayElement(allImagesByRoom.kitchen);
         break;
-      case 'frontGarden':
-      case 'rearGarden':
+      case 'garden':
+      case 'outdoorSpace':
+      case 'land':
+      case 'yard':
         imageId = faker.helpers.arrayElement(allImagesByRoom.garden);
         break;
       case 'reception':
@@ -281,11 +278,17 @@ export const generateMediaForRoom = (roomId: number, roomType: 'bedroom' | 'bath
       case 'otherRoom':
         mediaData.otherRoomId = roomId;
         break;
-      case 'frontGarden':
-        mediaData.frontGardenId = roomId
+      case 'garden':
+        mediaData.gardenId = roomId;
         break;
-      case 'rearGarden':
-        mediaData.rearGardenId = roomId
+      case 'outdoorSpace':
+        mediaData.outdoorSpaceId = roomId;
+        break;
+      case 'land':
+        mediaData.landId = roomId;
+        break;
+      case 'yard':
+        mediaData.yardId = roomId;
         break;
       case 'kitchen':
         mediaData.kitchenId = roomId;
@@ -342,44 +345,299 @@ export const generateGeneralMedia = (imageType: string): Prisma.MediaUncheckedCr
 };
 
 /**
- * Generate a random number of outdoor space objects
+ * Generate a random garden object with position-appropriate features
  *
- * @returns Random RearGarden object
+ * @param position - The position of the garden (FRONT, REAR, SIDE)
+ * @returns Random Garden object
  */
-export const generateRearGarden = (): Prisma.RearGardenCreateWithoutPropertyInput => {
+export const generateGarden = (position: 'FRONT' | 'REAR' | 'SIDE'): Prisma.GardenCreateWithoutOutdoorSpaceInput => {
+  // Generate name based on position
+  const name = position === 'FRONT' ? 'Front Garden' : 
+               position === 'REAR' ? 'Rear Garden' : 
+               'Side Garden';
+
+  // Randomly decide if this garden has additional details
+  const additionalDetails = faker.datatype.boolean({ probability: 0.50 }); // 50% chance of having details
+
+  // Base garden features
+  const baseGarden = {
+    name: name,
+    description: additionalDetails ? faker.word.words(10) : null,
+    size: parseFloat(faker.number.float({ min: 10, max: 150, fractionDigits: 2 }).toFixed(2)),
+    additionalDetails: additionalDetails,
+    facing: faker.helpers.arrayElement(['NORTH', 'EAST', 'SOUTH', 'WEST'] as const),
+    position: position,
+  };
+
+  // Only add features if additionalDetails is true
+  if (!additionalDetails) {
+    return {
+      ...baseGarden,
+      features: [],
+    };
+  }
+
+  let featureProbabilities: Record<OutdoorSpaceFeature, number>;
+  
+  if (position === 'REAR') {
+    featureProbabilities = {
+      [OutdoorSpaceFeature.SUN_TERRACE]: 0.45,
+      [OutdoorSpaceFeature.TERRACE]: 0.55,
+      [OutdoorSpaceFeature.BALCONY]: 0.30,
+      [OutdoorSpaceFeature.PATIO]: 0.75,
+      [OutdoorSpaceFeature.SHED]: 0.65,
+      [OutdoorSpaceFeature.SUMMER_HOUSE]: 0.25,
+      [OutdoorSpaceFeature.GARDEN_OFFICE]: 0.30,
+      [OutdoorSpaceFeature.POOL]: 0.08,
+      [OutdoorSpaceFeature.SEPARATE_PARCEL]: 0.05,
+    };
+  } else if (position === 'FRONT') {
+    featureProbabilities = {
+      [OutdoorSpaceFeature.SUN_TERRACE]: 0.20,
+      [OutdoorSpaceFeature.TERRACE]: 0.25,
+      [OutdoorSpaceFeature.BALCONY]: 0.20,
+      [OutdoorSpaceFeature.PATIO]: 0.35,
+      [OutdoorSpaceFeature.SHED]: 0.20,
+      [OutdoorSpaceFeature.SUMMER_HOUSE]: 0.10,
+      [OutdoorSpaceFeature.GARDEN_OFFICE]: 0.10,
+      [OutdoorSpaceFeature.POOL]: 0.04,
+      [OutdoorSpaceFeature.SEPARATE_PARCEL]: 0.05,
+    };
+  } else {
+    featureProbabilities = {
+      [OutdoorSpaceFeature.SUN_TERRACE]: 0.25,
+      [OutdoorSpaceFeature.TERRACE]: 0.35,
+      [OutdoorSpaceFeature.BALCONY]: 0.25,
+      [OutdoorSpaceFeature.PATIO]: 0.40,
+      [OutdoorSpaceFeature.SHED]: 0.45,
+      [OutdoorSpaceFeature.SUMMER_HOUSE]: 0.15,
+      [OutdoorSpaceFeature.GARDEN_OFFICE]: 0.18,
+      [OutdoorSpaceFeature.POOL]: 0.04,
+      [OutdoorSpaceFeature.SEPARATE_PARCEL]: 0.05,
+    };
+  }
+
+  const features = Object.entries(featureProbabilities)
+    .filter(([_, prob]) => faker.datatype.boolean({ probability: prob }))
+    .map(([feature]) => feature as OutdoorSpaceFeature);
+
   return {
-    description: faker.word.words(10),
-    size: faker.number.int({ min: 10, max: 100 }),
-    sunTerrace: faker.datatype.boolean(),
-    terrace: faker.datatype.boolean(),
-    balcony: faker.datatype.boolean(),
-    patio: faker.datatype.boolean(),
-    separateParcel: faker.datatype.boolean(),
-    shed: faker.datatype.boolean(),
-    summerHouse: faker.datatype.boolean(),
-    gardenOffice: faker.datatype.boolean(),
-    pool: faker.datatype.boolean(),
+    ...baseGarden,
+    features,
   };
 };
 
 /**
- * Generate a random number of outdoor space objects
+ * Generate land with features
  *
- * @returns Random FrontGarden object
+ * @returns Random Land object
  */
-export const generateFrontGarden = (): Prisma.FrontGardenCreateWithoutPropertyInput => {
+export const generateLand = (): Prisma.LandCreateWithoutOutdoorSpaceInput => {
+  const landNames = [
+    'Main Land',
+    'Additional Land',
+    'Field',
+    'Paddock',
+    'Woodland Area',
+    'Orchard',
+  ];
+
+  // Randomly decide if this land has additional details
+  const additionalDetails = faker.datatype.boolean({ probability: 0.50 }); // 50% chance of having details
+
+  return {
+    name: faker.helpers.arrayElement(landNames),
+    description: additionalDetails ? faker.word.words(10) : null,
+    size: parseFloat(faker.number.float({ min: 50, max: 500, fractionDigits: 2 }).toFixed(2)),
+    additionalDetails: additionalDetails,
+    separateParcel: faker.datatype.boolean({ probability: 0.3 }),
+    features: additionalDetails ? selectRandomEnumValues(Object.values(LandFeature), 0.35) : [],
+  };
+};
+
+/**
+ * Generate a yard with features
+ *
+ * @param position - The position of the yard (FRONT, REAR, SIDE)
+ * @returns Random Yard object
+ */
+export const generateYard = (position: 'FRONT' | 'REAR' | 'SIDE'): Prisma.YardCreateWithoutOutdoorSpaceInput => {
+  // Generate name based on position
+  const name = position === 'FRONT' ? 'Front Yard' : 
+               position === 'REAR' ? 'Rear Yard' : 
+               'Side Yard';
+
+  // Randomly decide if this yard has additional details
+  const additionalDetails = faker.datatype.boolean({ probability: 0.50 }); // 50% chance of having details
+
+  // Base yard features
+  const baseYard = {
+    name: name,
+    description: additionalDetails ? faker.word.words(10) : null,
+    size: parseFloat(faker.number.float({ min: 10, max: 150, fractionDigits: 2 }).toFixed(2)),
+    additionalDetails: additionalDetails,
+    facing: faker.helpers.arrayElement(['NORTH', 'EAST', 'SOUTH', 'WEST'] as const),
+    position: position,
+  };
+
+  // Only add features if additionalDetails is true
+  if (!additionalDetails) {
+    return {
+      ...baseYard,
+      features: [],
+    };
+  }
+
+  let featureProbabilities: Record<OutdoorSpaceFeature, number>;
+  
+  if (position === 'REAR') {
+    featureProbabilities = {
+      [OutdoorSpaceFeature.SUN_TERRACE]: 0.45,
+      [OutdoorSpaceFeature.TERRACE]: 0.55,
+      [OutdoorSpaceFeature.BALCONY]: 0.30,
+      [OutdoorSpaceFeature.PATIO]: 0.75,
+      [OutdoorSpaceFeature.SHED]: 0.65,
+      [OutdoorSpaceFeature.SUMMER_HOUSE]: 0.25,
+      [OutdoorSpaceFeature.GARDEN_OFFICE]: 0.30,
+      [OutdoorSpaceFeature.POOL]: 0.08,
+      [OutdoorSpaceFeature.SEPARATE_PARCEL]: 0.05,
+    };
+  } else if (position === 'FRONT') {
+    featureProbabilities = {
+      [OutdoorSpaceFeature.SUN_TERRACE]: 0.20,
+      [OutdoorSpaceFeature.TERRACE]: 0.25,
+      [OutdoorSpaceFeature.BALCONY]: 0.20,
+      [OutdoorSpaceFeature.PATIO]: 0.35,
+      [OutdoorSpaceFeature.SHED]: 0.20,
+      [OutdoorSpaceFeature.SUMMER_HOUSE]: 0.10,
+      [OutdoorSpaceFeature.GARDEN_OFFICE]: 0.10,
+      [OutdoorSpaceFeature.POOL]: 0.04,
+      [OutdoorSpaceFeature.SEPARATE_PARCEL]: 0.05,
+    };
+  } else {
+    featureProbabilities = {
+      [OutdoorSpaceFeature.SUN_TERRACE]: 0.25,
+      [OutdoorSpaceFeature.TERRACE]: 0.35,
+      [OutdoorSpaceFeature.BALCONY]: 0.25,
+      [OutdoorSpaceFeature.PATIO]: 0.40,
+      [OutdoorSpaceFeature.SHED]: 0.45,
+      [OutdoorSpaceFeature.SUMMER_HOUSE]: 0.15,
+      [OutdoorSpaceFeature.GARDEN_OFFICE]: 0.18,
+      [OutdoorSpaceFeature.POOL]: 0.04,
+      [OutdoorSpaceFeature.SEPARATE_PARCEL]: 0.05,
+    };
+  }
+
+  const features = Object.entries(featureProbabilities)
+    .filter(([_, prob]) => faker.datatype.boolean({ probability: prob }))
+    .map(([feature]) => feature as OutdoorSpaceFeature);
+
+  return {
+    ...baseYard,
+    features,
+  };
+};
+
+/**
+ * Generate outdoor space with gardens, yards and land
+ *
+ * @returns Random OutdoorSpace object
+ */
+export const generateOutdoorSpace = (): Prisma.OutdoorSpaceCreateWithoutPropertyInput => {
+  const hasGarden = faker.datatype.boolean({ probability: 0.80 }); // 80% chance
+  const hasYard = faker.datatype.boolean({ probability: 0.80 }); // 80% chance
+  const hasLand = faker.datatype.boolean({ probability: 0.80 }); // 80% chance
+  
+  if (!hasGarden && !hasYard && !hasLand) {
+    return {
+      description: faker.word.words(10),
+      garden: {
+        create: []
+      },
+      yard: {
+        create: []
+      },
+      land: {
+        create: []
+      }
+    };
+  }
+
+  const gardens: Prisma.GardenCreateWithoutOutdoorSpaceInput[] = [];
+  const yards: Prisma.YardCreateWithoutOutdoorSpaceInput[] = [];
+  const lands: Prisma.LandCreateWithoutOutdoorSpaceInput[] = [];
+  
+  // Generate gardens
+  if (hasGarden) {
+    if (faker.datatype.boolean({ probability: 0.70 })) {
+      gardens.push(generateGarden('FRONT'));
+    }
+    
+    if (faker.datatype.boolean({ probability: 0.85 })) {
+      gardens.push(generateGarden('REAR'));
+    }
+    
+    if (faker.datatype.boolean({ probability: 0.35 })) {
+      gardens.push(generateGarden('SIDE'));
+    }
+
+    if (gardens.length === 0) {
+      gardens.push(generateGarden('REAR'));
+    }
+  }
+
+  // Generate yards
+  if (hasYard) {
+    if (faker.datatype.boolean({ probability: 0.70 })) {
+      yards.push(generateYard('FRONT'));
+    }
+    
+    if (faker.datatype.boolean({ probability: 0.85 })) {
+      yards.push(generateYard('REAR'));
+    }
+    
+    if (faker.datatype.boolean({ probability: 0.35 })) {
+      yards.push(generateYard('SIDE'));
+    }
+
+    if (yards.length === 0) {
+      yards.push(generateYard('REAR'));
+    }
+  }
+
+  // Generate land (1-2 parcels)
+  if (hasLand) {
+    const landCount = faker.number.int({ min: 1, max: 2 });
+    for (let i = 0; i < landCount; i++) {
+      lands.push(generateLand());
+    }
+  }
+
+  // Calculate total area as sum of all garden, yard, and land sizes
+  let totalArea: number | null = null;
+  const gardenSizes = gardens.map(g => g.size || 0);
+  const yardSizes = yards.map(y => y.size || 0);
+  const landSizes = lands.map(l => l.size || 0);
+  
+  const allSizes = [...gardenSizes, ...yardSizes, ...landSizes];
+  if (allSizes.length > 0) {
+    totalArea = parseFloat(allSizes.reduce((sum, size) => sum + size, 0).toFixed(2));
+  }
+
   return {
     description: faker.word.words(10),
-    size: faker.number.int({ min: 10, max: 100 }),
-    sunTerrace: faker.datatype.boolean(),
-    terrace: faker.datatype.boolean(),
-    balcony: faker.datatype.boolean(),
-    patio: faker.datatype.boolean(),
-    separateParcel: faker.datatype.boolean(),
-    shed: faker.datatype.boolean(),
-    summerHouse: faker.datatype.boolean(),
-    gardenOffice: faker.datatype.boolean(),
-    pool: faker.datatype.boolean(),
+    totalArea: totalArea,
+    // Features for the outdoor space itself
+    features: selectRandomEnumValues(Object.values(OutdoorSpaceFeature), 0.35),
+    garden: {
+      create: gardens
+    },
+    yard: {
+      create: yards
+    },
+    land: {
+      create: lands
+    }
   };
 };
 
@@ -391,12 +649,7 @@ export const generateFrontGarden = (): Prisma.FrontGardenCreateWithoutPropertyIn
 export const generateParking = (): Prisma.ParkingCreateWithoutPropertyInput => {
   return {
     description: faker.word.words(10),
-    garage: faker.datatype.boolean(),
-    driveway: faker.datatype.boolean(),
-    onStreet: faker.datatype.boolean(),
-    carport: faker.datatype.boolean(),
-    allocatedParking: faker.datatype.boolean(),
-    evCharging: faker.datatype.boolean(),
+    features: selectRandomEnumValues(Object.values(ParkingFeature), 0.4),
   };
 };
 
@@ -444,13 +697,7 @@ export const generateRunningCosts = (): Prisma.RunningCostsCreateWithoutProperty
 export const generateSecurity = (): Prisma.SecurityCreateWithoutPropertyInput => {
   return {
     description: faker.word.words(15),
-    gatedCommunity: faker.datatype.boolean(),
-    cctv: faker.datatype.boolean(),
-    alarmSystem: faker.datatype.boolean(),
-    neighborhoodWatch: faker.datatype.boolean(),
-    intercomSystem: faker.datatype.boolean(),
-    security: faker.datatype.boolean(),
-    reception: faker.datatype.boolean(),
+    features: selectRandomEnumValues(Object.values(SecurityFeature), 0.35),
   };
 };
 
@@ -461,20 +708,98 @@ export const generateSecurity = (): Prisma.SecurityCreateWithoutPropertyInput =>
  */
 export const generateStorage = (): Prisma.StorageCreateWithoutPropertyInput => {
   return {
-    attic: faker.datatype.boolean(),
-    basement: faker.datatype.boolean(),
-    separateDressing: faker.datatype.boolean(),
-    underStairsStorage: faker.datatype.boolean(),
     description: faker.word.words(20),
+    features: selectRandomEnumValues(Object.values(StorageFeature), 0.4),
   };
 };
 
-export const generateAddress = (address: any) => {
+/**
+ * Generate fake amenities for seeding
+ */
+export const generateFakeAmenities = (): Prisma.AmenitiesCreateWithoutPropertyInput[] => {
+  const amenities: Prisma.AmenitiesCreateWithoutPropertyInput[] = [];
+
+  // Generate some schools
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'EDUCATION',
+      subtype: 'SCHOOL',
+      name: faker.company.name() + ' School',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate some hospitals
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'HEALTHCARE',
+      subtype: 'HOSPITAL',
+      name: faker.company.name() + ' Hospital',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate train stations
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'TRANSPORT',
+      subtype: 'TRAIN_STATION',
+      name: faker.location.city() + ' Train Station',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate bus stations
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'TRANSPORT',
+      subtype: 'BUS_STOP',
+      name: faker.location.street() + ' Bus Stop',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate parks
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'GREEN_SPACE',
+      subtype: 'PARK',
+      name: faker.location.city() + ' Park',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  // Generate gyms
+  for (let i = 0; i < 3; i++) {
+    amenities.push({
+      type: 'SHOPPING_ENTERTAINMENT',
+      subtype: 'GYM',
+      name: faker.company.name() + ' Gym',
+      distanceM: faker.number.int({ min: 100, max: 9000 }),
+      description: null,
+    });
+  }
+
+  return amenities;
+};
+
+export const generateAddress = (address: AddressCreateWithoutPropertiesInput) => {
   return {
     number: address.number,
+    flat: address.flat,
+    name: address.name,
     street: address.street,
     city: address.city,
     postcode: address.postcode,
+    locality: address.locality,
+    county: address.county,
+    district: address.district,
+    country: address.country,
     fullAddress: address.number + ", " + address.street + ", " + address.city + ", " + address.postcode,
     lat: address.lat,
     lon: address.lon,
@@ -487,23 +812,37 @@ export const generateAddress = (address: any) => {
  * @returns PropertyWithAddress
  */
 export const generateProperty = async (address: Prisma.AddressCreateWithoutPropertiesInput): Promise<PropertyWithAddress> => {
-  // Generate mapped property types and classifications
-  const typeId = faker.helpers.arrayElement(Object.keys(typeToClassificationMap).map(Number));
+  // Generate mapped property types and classifications with weighted distribution:
+  // 70% houses (1), 5% cottages (2), 5% bungalows (3), 5% flats (4), 15% other (5-8)
+  const weightedTypeIds = [
+    ...Array(70).fill(1),  // 70% House
+    ...Array(5).fill(2),   // 5% Cottage
+    ...Array(5).fill(3),   // 5% Bungalow
+    ...Array(5).fill(4),   // 5% Flat
+    ...Array(4).fill(5),   // 4% Land
+    ...Array(4).fill(6),   // 4% Farms
+    ...Array(4).fill(7),   // 4% Specialty
+    ...Array(3).fill(8),   // 3% Student Accommodation
+  ];
+  const typeId = faker.helpers.arrayElement(weightedTypeIds);
   const classificationOptions = typeToClassificationMap[typeId];
   const classificationId = faker.helpers.arrayElement(classificationOptions!);
 
-  const { count: bedroomCount, data: bedrooms } = generateBedrooms();
-  const { count: bathroomCount, data: bathrooms } = generateBathrooms();
-  const { count: receptionCount, data: receptions } = generateReception();
-  const { count: otherRoomCount, data: otherRooms } = generateOtherRooms();
+  // Generate totalFloors first so we can constrain room floor numbers
+  const totalFloors = faker.number.int({ min: 1, max: 5 });
+
+  const { count: bedroomCount, data: bedrooms } = generateBedrooms(totalFloors);
+  const { count: bathroomCount, data: bathrooms } = generateBathrooms(totalFloors);
+  const { count: receptionCount, data: receptions } = generateReception(totalFloors);
+  const { count: otherRoomCount, data: otherRooms } = generateOtherRooms(totalFloors);
+  const { count: kitchenCount, data: kitchens } = generateKitchen(totalFloors);
 
   // First create the property with all features
   const propertyWithFeatures = await prisma.property.create({
     data: {
-      title: faker.word.words(10),
       description: faker.word.words(20),
       value: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
-      totalFloors: faker.number.int({ min: 1, max: 5 }),
+      totalFloors,
       size: faker.number.int({ min: 50, max: 500 }),
       yearBuilt: faker.date.past().getFullYear().toString(),
       chainFree: faker.datatype.boolean(),
@@ -516,11 +855,14 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       accessibilityFeatures: {
         create: generateAccessability(),
       },
-      amenities: {},
+      amenities: {
+        create: generateFakeAmenities(),
+      },
       numberBedrooms: bedroomCount,
       numberBathrooms: bathroomCount,
       numberReceptions: receptionCount,
       numberOtherRooms: otherRoomCount,
+      numberKitchens: kitchenCount,
       bathroomFeatures: {
         create: bathrooms,
       },
@@ -528,7 +870,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
         create: bedrooms,
       },
       kitchenFeatures: {
-        create: generateKitchen(),
+        create: kitchens,
       },
       reception: {
         create: receptions,
@@ -539,11 +881,8 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       utility: {
         create: generateUtility(),
       },
-      frontGarden: faker.datatype.boolean({ probability: 0.7 }) ? {
-        create: generateFrontGarden(),
-      } : undefined,
-      rearGarden: faker.datatype.boolean({ probability: 0.8 }) ? {
-        create: generateRearGarden(),
+      outdoorSpace: faker.datatype.boolean({ probability: 0.8 }) ? {
+        create: generateOutdoorSpace(),
       } : undefined,
       parking: {
         create: generateParking(),
@@ -590,8 +929,13 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       otherRoom: true,
       reception: true,
       kitchenFeatures: true,
-      rearGarden: true,
-      frontGarden: true,
+      outdoorSpace: {
+        include: {
+          garden: true,
+          yard: true,
+          land: true
+        }
+      },
       utility: true,
     },
   });
@@ -648,7 +992,11 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       mediaToCreate.push(...generateMediaForRoom(bedroom.id, 'bedroom', `Bedroom ${bedroom.roomNumber}`));
     }
   });
-  
+
+  propertyWithFeatures.kitchenFeatures.forEach((kitchen: { id: number; roomNumber: any; }) => {
+    mediaToCreate.push(...generateMediaForRoom(kitchen.id, 'kitchen', `Kitchen ${kitchen.roomNumber}`));
+  });
+
   // Bathroom media
   propertyWithFeatures.bathroomFeatures.forEach((bathroom: { id: number; roomNumber: any; }) => {
     mediaToCreate.push(...generateMediaForRoom(bathroom.id, 'bathroom', `Bathroom ${bathroom.roomNumber}`));
@@ -664,28 +1012,34 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     mediaToCreate.push(...generateMediaForRoom(otherRoom.id, 'otherRoom', `Other Room ${otherRoom.roomNumber}`));
   });
   
-  // Front garden media
-  if (propertyWithFeatures.frontGarden) {
-    mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.frontGarden.id), 'frontGarden', 'Front Garden'));
-  }
-  
-  // Rear garden media
-  if (propertyWithFeatures.rearGarden) {
-    mediaToCreate.push(...generateMediaForRoom(Number(propertyWithFeatures.rearGarden.id), 'rearGarden', 'Rear Garden'));
-  }
-  
-  // Kitchen media - ensure it uses required kitchen image
-  if (propertyWithFeatures.kitchenFeatures) {
-    mediaToCreate.push({
-      image: requiredImages.kitchen,
-      metadata: JSON.stringify({
-        alt: 'Kitchen',
-        description: faker.word.words(5),
-        roomType: 'Kitchen',
-        cloudflareImageId: requiredImages.kitchen
-      }),
-      kitchenId: Number(propertyWithFeatures.kitchenFeatures.id),
-    });
+  // OutdoorSpace, Garden, Yard and Land media
+  if (propertyWithFeatures.outdoorSpace) {
+    // Add media for outdoor space itself
+    mediaToCreate.push(...generateMediaForRoom(propertyWithFeatures.outdoorSpace.id, 'outdoorSpace', 'Outdoor Space'));
+    
+    // Add media for each garden
+    if (propertyWithFeatures.outdoorSpace.garden) {
+      propertyWithFeatures.outdoorSpace.garden.forEach((garden: { id: number; position: string | null; }) => {
+        const gardenName = garden.position ? `${garden.position.charAt(0)}${garden.position.slice(1).toLowerCase()} Garden` : 'Garden';
+        mediaToCreate.push(...generateMediaForRoom(garden.id, 'garden', gardenName));
+      });
+    }
+    
+    // Add media for each yard
+    if (propertyWithFeatures.outdoorSpace.yard) {
+      propertyWithFeatures.outdoorSpace.yard.forEach((yard: { id: number; position: string | null; }) => {
+        const yardName = yard.position ? `${yard.position.charAt(0)}${yard.position.slice(1).toLowerCase()} Yard` : 'Yard';
+        mediaToCreate.push(...generateMediaForRoom(yard.id, 'yard', yardName));
+      });
+    }
+    
+    // Add media for each land parcel
+    if (propertyWithFeatures.outdoorSpace.land) {
+      propertyWithFeatures.outdoorSpace.land.forEach((land: { id: number; name: string | null; }) => {
+        const landName = land.name || 'Land';
+        mediaToCreate.push(...generateMediaForRoom(land.id, 'land', landName));
+      });
+    }
   }
   
   // Add additional random images to ensure minimum of 5 total images
@@ -722,7 +1076,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       })),
     }) : Promise.resolve(),
     // Update location
-    updateLocationByAddressIdForSeed(propertyWithFeatures.addressId, propertyWithFeatures.address.lon!, propertyWithFeatures.address.lat!)
+    updateLocationByAddressIdForSeed(propertyWithFeatures.addressId!, propertyWithFeatures.address?.lon!, propertyWithFeatures.address?.lat!)
   ]);
 
   // Return the property with just address for compatibility
@@ -731,7 +1085,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     address: propertyWithFeatures.address,
   };
 
-  await getLocationByAddressIdForSeed(property.addressId);
+  await getLocationByAddressIdForSeed(property.addressId!);
 
   return property;
 };

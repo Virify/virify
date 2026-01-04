@@ -2,6 +2,7 @@ import * as z from "zod";
 
 // Schema for validating the request body
 const ragSearchSchema = z.object({
+  listingType: z.enum(['sale', 'rent', 'all']).optional().default('all'),
   query: z.string().min(1, "Query is required"),
   lat: z.coerce.number().optional(),
   lon: z.coerce.number().optional(),
@@ -19,11 +20,11 @@ export default defineEventHandler(async (event) => {
   try {
     checkAiConfiguration();
 
-    const { query, lat, lon, radius, bbox, boundaryPolygon, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
+    const { listingType, query, lat, lon, radius, bbox, boundaryPolygon, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
 
     const { propertyIds, locationContext } = await handleLocationFilter(lat, lon, radius, bbox as [number, number, number, number] | undefined, boundaryPolygon);
 
-    const { whereClause, queryAnalysis } = await constructPrismaWhereClause(query, propertyIds);
+    const { whereClause, queryAnalysis } = await constructPrismaWhereClause(listingType, query, propertyIds);
 
     // If propertyIds is an empty array, no properties were found, so we can return early.
     if (Array.isArray(propertyIds) && propertyIds.length === 0) {
@@ -67,5 +68,10 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     console.error("Error performing RAG search:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      statusMessage: error.statusMessage || "Failed to perform AI search",
+      message: error.message || "An error occurred during the search"
+    });
   }
 });

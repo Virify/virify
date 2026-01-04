@@ -63,6 +63,7 @@ const showSearchControls = computed(() => {
   &__filter-select {
     min-width: 160px;
     padding: var(--size-8) var(--size-12);
+    border: 1px solid var(--border-color-200);
 
     @include mq.mobile-only {
       width: 100%;

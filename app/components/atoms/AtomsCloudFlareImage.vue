@@ -13,7 +13,7 @@
 const props = defineProps<{
   src: string;
   alt?: string;
-  variant?: 'public' | 'thumbnail' | 'card' | 'gallery' | 'marker';
+  variant?: 'public' | 'thumbnail' | 'card' | 'gallery' | 'marker' | 'marketing';
   placeholder?: boolean;
 }>();
 
