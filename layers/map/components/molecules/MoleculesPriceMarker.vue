@@ -9,9 +9,10 @@
       <span class="m-price-marker__price | body-xs font-semibold" aria-hidden="true">
         {{ priceDisplay }}
       </span>
-
-      <AtomsFavouriteButton v-if="id" @click.stop :listing-id="Number(id)" />
-      <AtomsNoteButton v-if="id" @click.stop :listing-id="Number(id)" />
+      <div v-if="!isWaitingListMode">
+          <AtomsFavouriteButton v-if="id" @click.stop :listing-id="Number(id)" />
+          <AtomsNoteButton v-if="id" @click.stop :listing-id="Number(id)" />
+      </div>
     </div>
 
   </button>
@@ -29,6 +30,7 @@ interface MarkerProps {
 }
 
 const props = defineProps<MarkerProps>();
+const { isWaitingListMode } = useWaitingListMode();
 
 // Format price based on property type (sale vs rental)
 const priceDisplay = computed(() => {

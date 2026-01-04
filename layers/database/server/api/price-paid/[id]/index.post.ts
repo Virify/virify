@@ -50,33 +50,34 @@ export default defineEventHandler(async (event) => {
     // Use utility function to get PPD data
     const ppdData = await getPricePaidByAddress(postcode, street, city, number, flat);
 
-    if (ppdData.length === 0) {
-      // Return empty data structure instead of throwing error
-      const emptyResult = {
-        data: {
-          sales: [],
-          total_sales: 0,
-          latest_sale: null,
-          price_range: null,
-          market_context: null
-        }
-      };
-      
-      // Cache the empty result for 7 days (shorter than successful results)
-      await useStorage().setItem(cacheKey, emptyResult, {
-        ttl: 60 * 60 * 24 * 7 // 7 days in seconds
-      });
-      
-      return emptyResult;
-    }
-
     // Sort sales by date (newest first)
     const sortedSales = ppdData
       .sort((a, b) => new Date(b.transfer_date).getTime() - new Date(a.transfer_date).getTime());
 
     // Calculate market context using utility function
-    const latestPrice = sortedSales.length > 0 && sortedSales[0] ? sortedSales[0].price : 0;
-    const propertyType = sortedSales[0]?.property_type || null;
+    let latestPrice = sortedSales.length > 0 && sortedSales[0] ? sortedSales[0].price : 0;
+    let propertyType = sortedSales[0]?.property_type || null;
+
+    // If no sales, try to get data from listing
+    if (sortedSales.length === 0) {
+      const listing = await prisma.listing.findUnique({
+        where: { id: listingId },
+        include: { property: { include: { type: true } } }
+      });
+      
+      if (listing) {
+        latestPrice = listing.price;
+        // Map property type
+        const typeName = listing.property?.type?.name;
+        if (typeName) {
+          if (typeName.includes('Detached') && !typeName.includes('Semi')) propertyType = 'D';
+          else if (typeName.includes('Semi')) propertyType = 'S';
+          else if (typeName.includes('Terraced')) propertyType = 'T';
+          else if (typeName.includes('Flat') || typeName.includes('Apartment') || typeName.includes('Maisonette')) propertyType = 'F';
+          else propertyType = 'O';
+        }
+      }
+    }
     
     const marketContext = await calculateMarketContext(
       city, 

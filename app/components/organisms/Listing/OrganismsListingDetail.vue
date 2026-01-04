@@ -104,14 +104,19 @@
 
           <!-- Price Paid History -->
           <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
-            <MoleculesListingPricePaid :listing-id="listing.id" :address="{
-              number: property.address.number,
-              flat: property.address.flat,
-              street: property.address.street,
-              city: property.address.city,
-              postcode: property.address.postcode,
-              county: property.address.county,
-            }" />
+            <MoleculesListingPricePaid 
+              :listing-id="listing.id" 
+              :price="listing.saleListing ? listing.price : undefined"
+              :property-type="property?.type?.name"
+              :address="{
+                number: property.address.number,
+                flat: property.address.flat,
+                street: property.address.street,
+                city: property.address.city,
+                postcode: property.address.postcode,
+                county: property.address.county,
+              }" 
+            />
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
@@ -129,7 +134,7 @@
           </div>
 
           <div class="p-listing__section">
-            <MoleculesListingAdvert />
+            <MoleculesListingAdvert :title="advertTitle" :description="advertDescription" :link="advertLink" :linkText="advertLinkText" />
           </div>
         </div>
 
@@ -179,11 +184,11 @@
     </client-only>
   </main>
   <!-- Similar Listings (only for published listings, not drafts) -->
-  <div v-if="!isDraft" class="p-listing | container">
+  <div v-if="!isDraft && !isWaitingListMode" class="p-listing | container">
     <OrganismsRelevantListings type="similar" :listing-id="String(listing?.id)" :address="similarListingsAddress" />
   </div>
   <!-- Trending Listings (only for published listings, not drafts) -->
-  <div v-if="!isDraft" class="p-listing | container">
+  <div v-if="!isDraft && !isWaitingListMode" class="p-listing | container">
     <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
   </div>
 </template>
@@ -198,6 +203,7 @@ const props = defineProps<{
 }>();
 
 const { trackListingView } = useAnalytics();
+const { isWaitingListMode } = useWaitingListMode();
 
 const similarListingsAddress = computed(() => {
   return props.listing?.property?.address ? {
@@ -237,6 +243,24 @@ const hasRooms = computed(() => {
     (prop.reception && prop.reception.length > 0) ||
     (prop.otherRoom && prop.otherRoom.length > 0)
   );
+});
+
+const advertTitle = computed(() => {
+  return isWaitingListMode ? 'Join the waiting list to list your property with Virify!' : 'List your property with Virify!';
+});
+
+const advertDescription = computed(() => {
+  return isWaitingListMode
+    ? 'Virify is launching soon! Join our waiting list to be among the first to list your property on our smart, modern platform.'
+    : 'Ready to sell or rent? Get your home in front of the right buyers and renters with Virify’s smart, modern platform.';
+});
+
+const advertLinkText = computed(() => {
+  return isWaitingListMode ? 'Join Waiting List' : 'List Your Property';
+});
+
+const advertLink = computed(() => {
+  return isWaitingListMode ? '/' : '/account/create-listing';
 });
 
 // Handle amenities array/object conversion

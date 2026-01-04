@@ -28,7 +28,7 @@
             {{ formattedPriceType }}
           </p>
         </div>
-        <div class="summary-card__actions" @click.stop>
+        <div class="summary-card__actions" @click.stop v-if="!isWaitingListMode">
           <AtomsFavouriteButton :listing-id="Number(listing.id)" class="a-favourite-button" />
           <AtomsNoteButton :listing-id="Number(listing.id)" class="note-button" />
         </div>
@@ -95,6 +95,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { isWaitingListMode } = useWaitingListMode();
 
 // Computed properties
 const formattedPrice = computed(() => {

@@ -9,12 +9,6 @@
 export interface WaitingListConfig {
   /** Routes that are accessible in waiting-list mode */
   allowedRoutes: string[]
-  /** Navigation items to show in waiting-list mode */
-  navigation: {
-    showSearch: boolean
-    showAuth: boolean
-    showAccount: boolean
-  }
   /** Footer sections to show in waiting-list mode */
   footer: {
     showPropertySearch: boolean
@@ -41,15 +35,12 @@ const waitingListConfig: WaitingListConfig = {
     '/login',
     '/cookie',
     '/support',
+    '/listing/*',
+    '/listing/preview/*',
+    '/account',
+    '/account/*',
     // '/mortgage-calculator',
   ],
-
-  // Navigation visibility
-  navigation: {
-    showSearch: false,
-    showAuth: false,
-    showAccount: false,
-  },
 
   // Footer sections visibility
   footer: {

@@ -2,9 +2,9 @@
  * Base center items for the site navigation (static structure only).
  * Guides children are injected dynamically by the composable.
  */
-export const getBaseCenterItems = (): NavigationItem[] => {
-  const { isWaitingListMode, config } = useWaitingListMode();
 
+
+export const getBaseCenterItems = (): NavigationItem[] => {
   const items: NavigationItem[] = [
     {
       id: "home",
@@ -54,12 +54,12 @@ export const getBaseCenterItems = (): NavigationItem[] => {
  */
 export const getActionItemsBuilder = () => {
   return ({ loggedIn, actions }: { loggedIn: boolean; actions: { openLogin: () => void; openSignup: () => void; logout: () => void } }): NavigationItem[] => {
-    const { isWaitingListMode, config } = useWaitingListMode();
+    const { isWaitingListMode } = useWaitingListMode();
 
     const items: NavigationItem[] = [];
 
     // Only show auth buttons if configured to show (disabled in waiting-list mode by default)
-    if (!isWaitingListMode.value || config.navigation.showAuth) {
+    if (!isWaitingListMode.value ) {
       if (!loggedIn) {
         items.push({ 
           id: "signup", 
@@ -68,7 +68,7 @@ export const getActionItemsBuilder = () => {
           hideWhenAuth: true, 
           action: actions.openSignup, buttonClass: "button-monochrome"
         });
-      } else if (!isWaitingListMode.value || config.navigation.showAccount) {
+      } else if (!isWaitingListMode.value) {
         items.push({ 
           id: "account", 
           label: "Account", 
@@ -88,8 +88,15 @@ export const getActionItemsBuilder = () => {
         requiresAuth: true, 
         action: actions.logout, 
         buttonClass: "button-monochrome" 
-      }, 
-      { 
+      }),
+      items.push({
+        id: 'account',
+        label: 'Account',
+        href: '/account',
+        type: 'link',
+        requiresAuth: true
+      }),
+      items.push({ 
         id: "theme-toggle", 
         label: "Theme", 
         type: "component" 
