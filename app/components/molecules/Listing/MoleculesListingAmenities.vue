@@ -148,12 +148,19 @@ function getMapUrl(item: any) {
 }
 </script>
 
+
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
 .m-listing-amenities {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--size-16);
   width: 100%;
+
+  @include mq.mobile-and-small-tablet {
+    grid-template-columns: 1fr;
+  }
+
 
   &__category {
     background: var(--background-100);
