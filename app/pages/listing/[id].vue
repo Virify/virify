@@ -8,29 +8,30 @@ const route = useRoute();
 /**
  *  Fetch and validate listing - reactive to route changes
  */
-const { data: listingData } = await useAsyncData(
+const { data: listingData, error } = await useAsyncData(
   () => `listing-${route.params.id}`,
   async () => {
-    try {
-      const response = await $fetch<{ listing: ListingWithFullProperty }>(`/api/listing/${route.params.id}`);
-      if (!response?.listing) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: 'Listing not found'
-        });
-      }
-      return response;
-    } catch (error: any) {
+    const response = await $fetch<{ listing: ListingWithFullProperty }>(`/api/listing/${route.params.id}`);
+    if (!response?.listing) {
       throw createError({
-        statusCode: error.statusCode || 404,
+        statusCode: 404,
         statusMessage: 'Listing not found'
       });
     }
+    return response;
   },
   {
     watch: [() => route.params.id]
   }
 );
+
+if (error.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Listing not found',
+    fatal: true
+  });
+}
 
 const listing = computed(() => listingData.value?.listing);
 

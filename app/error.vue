@@ -45,9 +45,9 @@ function clearErrors() {
               <NuxtLink to="/" class="button button-tertiary">
                 Go Home
               </NuxtLink>
-              <button class="button button-secondary">
+              <NuxtLink to="/support" class="button button-secondary">
                 Contact Support
-              </button>
+              </NuxtLink>
             </div>
           </div>
         </div>
