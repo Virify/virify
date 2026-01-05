@@ -1,6 +1,6 @@
 <template>
   <div class="m-input">
-    <AtomsInput v-bind="$attrs" :model-value="modelValue" class="m-input__input" />
+    <AtomsInput v-bind="$attrs" :model-value="modelValue" class="m-input__text" />
     <AtomsIcon v-if="icon" :icon="icon" :title="iconTitle" class="m-input__icon--search" />
     <AtomsIcon v-if="deleteble && modelValue" icon="cross" title="Clear input" class="m-input__icon--remove"
       @click="$emit('update:model-value', '')" />
@@ -17,9 +17,13 @@ interface Props {
 
 defineProps<Props>();
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .m-input {
   position: relative;
+
+  :deep(.m-input__text) {
+    padding-left: var(--size-40);
+  }
 
   &__icon {
 
@@ -40,13 +44,6 @@ defineProps<Props>();
       padding-right: var(--size-12);
       cursor: pointer;
     }
-  }
-}
-
-.a-input {
-  input {
-    padding-left: var(--size-40);
-    padding-right: var(--size-40);
   }
 }
 </style>
