@@ -4,15 +4,32 @@
 
     <AtomsGuideHero title="Virify Guides" description="Complete step-by-step guides for buying, selling, and renting properties. Learn how to find the right property, negotiate deals, and navigate the entire process with confidence." />
 
+    <section class="guides-home__search">
+      <OrganismsSearchInput
+        :placeholder="'Search guide categories...'"
+        icon="search"
+        iconTitle="Search icon"
+        :guides="fullCategories"
+        :deleteble="true"
+        @filter="filtered => filteredCategories = filtered as GuideCategory[]"
+      />
+    </section>
+
     <MoleculesGuideGrid>
       <MoleculesGuideCard 
-      v-for="category in categories" 
+      v-for="category in filteredCategories" 
       :key="category._id" 
       :title="category.title" 
       :description="category.description" 
       :to="`/guides/${category.slug.current}`"
       :image="category.heroImage" />
     </MoleculesGuideGrid>
+
+    <section v-if="fullCategories.length > 0 && filteredCategories.length === 0">
+      <div class="| body-md">
+        No guide categories found.
+      </div>
+    </section>
 
     <section v-if="!isWaitingListMode">
       <div class="guides-home__advert">
@@ -29,10 +46,16 @@
 <script setup lang="ts">
 
 const { isWaitingListMode} = useWaitingListMode()
+const filteredCategories = ref<GuideCategory[]>([]);
 
 const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery)
 
+
 const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }]);
+
+const fullCategories = computed(() => {
+  return categories.value || [];
+});
 
 // SEO - Nuxt SEO auto-generates CollectionPage schema from this
 const seoDescription = computed(() => {
@@ -76,6 +99,10 @@ useSchemaOrg([
 <style scoped lang="scss">
 .guides-home {
   padding-bottom: var(--size-32);
+
+  &__search {
+    margin: var(--size-32) 0;
+  }
 
   &__advert {
     padding: var(--size-32) 0;
