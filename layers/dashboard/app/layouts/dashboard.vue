@@ -49,7 +49,7 @@
                       <UIcon v-if="child.icon" :name="child.icon" class="size-5 text-secondary" />
                       <span>{{ child.label }}</span>
                     </div>
-                    <UBadge v-if="child.badge" :label="child.badge" size="md" variant="outline" />
+                    <UBadge v-if="child.badge" :label="child.badge" size="md" variant="outline" class="text-foreground"/>
                   </ULink>
                 </li>
               </ul>
