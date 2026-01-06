@@ -1,11 +1,12 @@
 <template>
-  
+  <h2>Home</h2>
 </template>
 <script lang="ts" setup>
   definePageMeta({
   middleware: ["authenticated"],
   head: {
-    title: "Dashboard",
+    title: "Home",
+    icon: 'i-lucide-home',
   },
   layout: "dashboard",
 });

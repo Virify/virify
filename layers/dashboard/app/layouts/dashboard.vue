@@ -40,14 +40,16 @@
       <!-- panel header -->
       <template #header>
         <UDashboardNavbar
-          title="Dashboard"
+          :title="$route.meta.head.title || 'Dashboard'"
+          :icon="$route.meta.head.icon"
           toggle-side="right"
           class="body-sm"
         />
       </template>
+      <template #body>
+        <slot />
+      </template>
     </UDashboardPanel>
-    <!-- page -->
-    <slot />
   </UDashboardGroup>
 </template>
 <script lang="ts" setup>
