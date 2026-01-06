@@ -39,7 +39,7 @@ definePageMeta({
 const route = useRoute();
 const { getCurrentStep, determineInitialStep, nextStep, previousStep, cleanupListingStep } = useListingStep();
 const { getStepperMap, getStepperProps, getCurrentStepData, handleStepUpdate } = useListingEditor();
-const { showToast } = useToast();
+const { showToast } = useToastNotification();
 
 const listingId = Number(route.params.id);
 

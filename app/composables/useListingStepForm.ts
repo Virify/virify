@@ -47,7 +47,7 @@ export function useListingStepForm<T>(
 ): ListingStepFormReturn<T> {
   const configRef = toRef(config);
   const listingRef = toRef(listing);
-  const { showToast } = useToast();
+  const { showToast } = useToastNotification();
   const { markStepAsCompleted } = useListingEdit();
   
   // Initialize form data with deep copy to avoid reference issues

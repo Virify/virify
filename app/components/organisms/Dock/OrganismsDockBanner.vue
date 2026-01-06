@@ -135,7 +135,7 @@ onClickOutside($formWrapper, () => {
  */
 const { setQuery, setListingType, searchState } = useSearchState()
 const { checkContent, isChecking } = useModeration()
-const { showToast } = useToast()
+const { showToast } = useToastNotification()
 
 const initialQuery = computed(() => {
   const { query } = asObject(searchState.value)

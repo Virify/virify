@@ -193,8 +193,8 @@
 
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
-import useToast from "~/composables/useToast";
-const { showToast } = useToast();
+
+const { showToast } = useToastNotification();
 
 // Fetch CMS content - module automatically uses correct perspective
 const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(

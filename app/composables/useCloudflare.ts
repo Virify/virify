@@ -33,7 +33,7 @@ export interface UploadResponse {
 export const useCloudflare = () => {
   const isUploading = ref(false);
   const uploadError = ref<string | null>(null);
-  const { showToast } = useToast();
+  const { showToast } = useToastNotification();
 
   /**
    * Upload an image to Cloudflare using direct upload

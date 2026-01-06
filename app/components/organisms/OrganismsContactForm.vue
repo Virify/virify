@@ -112,7 +112,7 @@ const props = defineProps<{
   formId: string;
 }>();
 
-const { showToast } = useToast();
+const { showToast } = useToastNotification();
 const config = useRuntimeConfig();
 const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 

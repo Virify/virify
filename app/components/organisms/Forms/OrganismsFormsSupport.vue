@@ -40,7 +40,7 @@
 import type { AtomsInput } from '#components';
 import type { ErrorBoxProp } from '~/types';
 
-const { showToast } = useToast();
+const { showToast } = useToastNotification();
 const { isPending, setPendingWhile } = usePending();
 const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 

@@ -8,7 +8,7 @@ import type { NoteData } from "~~/shared/types/note";
 export const useNotes = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
-  const { showToast } = useToast();
+  const { showToast } = useToastNotification();
 
   // Local filtering state (mirrors favourites pattern)
   const searchTerm = ref("");

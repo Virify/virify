@@ -37,7 +37,7 @@ definePageMeta({
 const route = useRoute();
 const { getCurrentStep, determineInitialStep, nextStep, previousStep, cleanupListingStep } = useListingStep();
 const { getDraft, getStepperMap, getStepperProps, getCurrentStepData, handleStepUpdate } = useListingEditor();
-const { showToast } = useToast();
+const { showToast } = useToastNotification();
 
 const draftId = Number(route.params.id);
 const draft = getDraft(draftId);

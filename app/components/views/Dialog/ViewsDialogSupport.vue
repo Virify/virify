@@ -86,7 +86,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const { hideDialog } = useDialog()
-const { showToast } = useToast()
+const { showToast } = useToastNotification()
 const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile()
 
 const form = ref({

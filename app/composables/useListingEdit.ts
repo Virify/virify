@@ -12,7 +12,7 @@ export function isLiveListing(listing: EditableListing): listing is ListingWithF
 }
 
 export const useListingEdit = createSharedComposable(() => {
-  const { showToast } = useToast();
+  const { showToast } = useToastNotification();
 
   // Track which drafts are currently being deleted
   const deletingIds = ref(new Set<number>());

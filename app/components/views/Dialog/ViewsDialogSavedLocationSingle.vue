@@ -16,7 +16,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const entry = computed(() => props.entry);
-const { showToast } = useToast();
+const { showToast } = useToastNotification();
 const { hideDialog } = useDialog();
 
 function onUpdated(name: string) {

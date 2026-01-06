@@ -39,7 +39,7 @@ definePageMeta({
 });
 
 const { draftListings, draftListingsPending, deleteDraftListing, isDraftDeleting, refreshDraftListings } = useListingEdit();
-const { showToast } = useToast();
+const { showToast } = useToastNotification();
 
 const publishingDrafts = ref<Set<number>>(new Set());
 

@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-const { toasts, hideToast } = useToast()
+const { toasts, hideToast } = useToastNotification()
 </script>
 
 <style scoped>

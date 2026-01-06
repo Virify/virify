@@ -9,11 +9,11 @@ const { mockShowToast, mockMarkStepAsCompleted, mockRequestFetch } = vi.hoisted(
 }));
 
 // Mock composables
-vi.mock("../../../app/composables/useToast", () => ({
+vi.mock("../../../app/composables/useToastNotification", () => ({
   default: () => ({
     showToast: mockShowToast,
   }),
-  useToast: () => ({
+  useToastNotification: () => ({
     showToast: mockShowToast,
   }),
 }));

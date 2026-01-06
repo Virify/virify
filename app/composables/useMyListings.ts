@@ -5,7 +5,7 @@ type SortBy = "new" | "old" | "premium" | "featured" | "basic";
 
 export const useMyListings = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
-  const { showToast } = useToast();
+  const { showToast } = useToastNotification();
 
   // Query state
   const searchTerm = ref("");

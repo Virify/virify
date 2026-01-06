@@ -67,7 +67,7 @@ const sortOrStatus = computed({
 })
 
 function onEdit(id: number) {
-  useToast().showToast('Edit not implemented yet', { type: 'info' })
+  useToastNotification().showToast('Edit not implemented yet', { type: 'info' })
 }
 </script>
 

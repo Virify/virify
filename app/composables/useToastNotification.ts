@@ -11,7 +11,7 @@ interface ToastOptions {
   duration?: number
 }
 
-interface UseToastResponse {
+interface UseToastNotificationResponse {
   toasts: Ref<ToastState[]>
   showToast: (message: string, options?: ToastOptions) => void
   hideToast: (id: string) => void
@@ -22,7 +22,7 @@ interface UseToastResponse {
  * Toast notification system
  * Provides temporary user feedback messages with brand styling
  */
-export default function useToast(): UseToastResponse {
+export default function useToastNotification(): UseToastNotificationResponse {
   const toasts = useState<ToastState[]>('toasts', () => [])
 
   /**

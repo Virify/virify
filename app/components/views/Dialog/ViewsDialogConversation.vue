@@ -25,7 +25,7 @@ const message = ref('');
 const sending = ref(false);
 const { startConversation } = useConversations();
 const { hideDialog } = useDialog();
-const { showToast } = useToast();
+const { showToast } = useToastNotification();
 
 async function onSend() {
   if (!message.value.trim()) return;

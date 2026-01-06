@@ -18,7 +18,7 @@ const initialQuery = ref('')
  */
 const { searchState, isLoading } = useSearchState()
 const { checkContent, isChecking } = useModeration()
-const { showToast } = useToast()
+const { showToast } = useToastNotification()
 
 async function searchSubmit(query: string) {
   const { location, radius, listingType } = asObject(searchState.value)

@@ -9,7 +9,7 @@ import { createSharedComposable } from "@vueuse/core";
 export const useFavourites = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
-  const { showToast } = useToast();
+  const { showToast } = useToastNotification();
 
   // Lightweight shared search / category state (favourites + notes share util)
   const searchTerm = ref("");
