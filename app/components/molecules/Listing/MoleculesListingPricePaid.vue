@@ -4,7 +4,7 @@
     <p class="property-history-desc | r-body-md-sm">
       See when this property changed hands, how the price has moved, and how it stacks up against the rest of the city. Get a feel for its journey so far, spot local price trends, and find out if you’re looking at a hidden gem—or a record breaker. All data comes straight from the Land Registry, so you’re always in the know.
     </p>
-    <div v-if="pricePaidData?.data?.sales || loading" class="price-history-grid">
+    <div v-if="pricePaidData?.data?.sales || pricePaidData?.data?.market_context || loading" class="price-history-grid">
       <!-- Property History Column -->
       <MoleculesTimeline title="This Property" :items="timelineItems" :loading="loading" note="Note: This data is based on the latest available information provided by the Land Registry." />
 
@@ -51,6 +51,8 @@ interface Props {
     postcode: string;
     county?: string | null;
   };
+  price?: number;
+  propertyType?: string;
 }
 
 const props = defineProps<Props>();
@@ -100,13 +102,13 @@ const timelineItems = computed(() => {
 // Computed properties for market analytics cards
 const areaAverageCard = computed(() => {
   const marketContext = pricePaidData.value?.data?.market_context;
-  const latestPrice = pricePaidData.value?.data?.sales?.[0]?.price;
+  const latestPrice = pricePaidData.value?.data?.sales?.[0]?.price || props.price;
 
-  if (!marketContext?.area_average || !latestPrice) return null;
+  if (!marketContext?.area_average) return null;
 
   return {
     title: `Area Average: £${marketContext.area_average.toLocaleString()}`,
-    value: formatVsAverage(latestPrice, marketContext.area_average),
+    value: latestPrice ? formatVsAverage(latestPrice, marketContext.area_average) : 'N/A',
     description: `${marketContext.sample_size} sales this year`,
   };
 });
@@ -114,12 +116,21 @@ const areaAverageCard = computed(() => {
 const propertyTypeAverageCard = computed(() => {
   const marketContext = pricePaidData.value?.data?.market_context;
   const latestSale = pricePaidData.value?.data?.sales?.[0];
+  const latestPrice = latestSale?.price || props.price;
+  
+  // Use prop property type if available and no sales data
+  let typeName = 'Property';
+  if (latestSale?.property_type) {
+    typeName = formatPropertyTypeName(latestSale.property_type);
+  } else if (props.propertyType) {
+    typeName = props.propertyType;
+  }
 
-  if (!marketContext?.property_type_average || !latestSale?.price || !latestSale?.property_type) return null;
+  if (!marketContext?.property_type_average) return null;
 
   return {
-    title: `${formatPropertyTypeName(latestSale.property_type)} Average: £${marketContext.property_type_average.toLocaleString()}`,
-    value: formatVsAverage(latestSale.price, marketContext.property_type_average),
+    title: `${typeName} Average: £${marketContext.property_type_average.toLocaleString()}`,
+    value: latestPrice ? formatVsAverage(latestPrice, marketContext.property_type_average) : 'N/A',
     description: `${marketContext.property_type_sample_size} similar properties`,
   };
 });

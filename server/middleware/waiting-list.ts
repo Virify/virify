@@ -25,16 +25,30 @@ export default defineEventHandler((event) => {
       // '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
       // '/api/analytics/mortgage/track', // Track mortgage calculator usage
       '/auth/update-admin-password', // Admin password update (protected by TASK_SECRET)
+      '/auth/login',                 // Login endpoint
+      '/auth/verify-otp',            // OTP verification
       '/api/support',              // POST - support request form
+      '/api/analytics/listing/track', // Track listing views
+      '/api/listing',              // Listing data endpoints
+      '/api/draft-listings',       // Create/Edit listing endpoints
+      '/api/listing/preview',      // Listing preview endpoints
+      '/api/address',              // Address lookup
+      '/api/property-type',        // Property types
+      '/api/cloudflare',           // Image upload
+      '/api/user',                 // User dashboard data
     ];
 
-    // Check if the path is an API route
-    if (path.startsWith('/api/')) {
+    // Check if the path is an API route or Auth route
+    if (path.startsWith('/api/') || path.startsWith('/auth/')) {
       // Check if it's an allowed API
       const isAllowed = allowedApis.some(allowed => path.startsWith(allowed));
       
       if (!isAllowed) {
         console.warn(`[MIDDLEWARE] Blocking API access to ${path} in waiting-list mode`);
+        throw createError({
+          statusCode: 403,
+          statusMessage: 'Access denied in waiting list mode'
+        });
       }
     }
   }

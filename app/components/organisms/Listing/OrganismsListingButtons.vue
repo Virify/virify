@@ -1,5 +1,5 @@
 <template>
-  <div class="o-listing-buttons" role="presentation">
+  <div class="o-listing-buttons" role="presentation" v-if="!isWaitingListMode">
     <AtomsNoteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
     <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
 
@@ -26,7 +26,7 @@ interface Props {
   }
   isDraft?: boolean
 }
-
+const { isWaitingListMode } = useWaitingListMode();
 const props = defineProps<Props>()
 </script>
 
