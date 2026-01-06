@@ -3,7 +3,8 @@ export default defineAppConfig({
     colors: {
       primary: 'brand-purple',
       secondary: 'brand-orange',
-      bg: 'brand-bg',
+      tertiary: 'tertiary',
+      neutral: 'monochrome',
     }
   }
 })

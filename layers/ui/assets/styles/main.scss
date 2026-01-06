@@ -1,5 +1,6 @@
 // Normalise
 @use '0-normalise/normalise' as normalise;
+@use '0-normalise/theme' as theme;
 
 // Variables
 @use '1-variables/sizes' as variables-sizes;
@@ -38,3 +39,6 @@
 @use '6-components/boxes' as components-boxes;
 @use '6-components/buttons' as components-buttons;
 @use '6-components/inputs' as components-inputs;
+
+@use 'tailwindcss';
+@use '@nuxt/ui';

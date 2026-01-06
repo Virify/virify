@@ -3,7 +3,9 @@
   <OrganismsHeader />
 
   <div class="page">
-    <NuxtPage />
+    <UApp>
+      <NuxtPage />
+    </UApp>
   </div>
 
   <OrganismsFooter />

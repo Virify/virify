@@ -1,3 +1,5 @@
+import type { NavigationMenuItem } from "@nuxt/ui";
+
 export const navigationHome: AccountNavigationItem[] = [
   {
     name: "Home",
@@ -131,3 +133,234 @@ export const logout = async () => {
     navigateTo('/')
   }
 }
+
+/**
+ * Dashboard navigation items for Nuxt UI NavigationMenu component.
+ */
+export const dashboardNavigationitems = ref<NavigationMenuItem[]>([
+  {
+    label: 'Dashboard',
+    type: 'label',
+  },
+  {
+    label: 'Home',
+    icon: 'i-lucide-home',
+    type: 'link',
+    to: '/dashboard',
+    tooltip: {
+      text: 'Dashboard Home',
+    },
+  },
+  {
+    label: 'Listings',
+    icon: 'i-lucide-house-heart',
+    type: 'label',
+    tooltip: {
+      text: 'Manage your property listings',
+    },
+    defaultOpen: true,
+    children: [
+      {
+        label: 'My Listings',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-library',
+        tooltip: {
+          text: 'View all your listings',
+        },
+      },
+      {
+        label: 'Create Listing',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-square-plus',
+        tooltip: {
+          text: 'Create a new listing',
+        },
+      },
+      {
+        label: 'Draft Listings',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-file-text',
+        tooltip: {
+          text: 'View draft listings',
+        },
+      },
+      {
+        label: 'Offers',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-hand-heart',
+        tooltip: {
+          text: 'Manage offers',
+        },
+      },
+      {
+        label: 'Viewings',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-calendar-check',
+        tooltip: {
+          text: 'Schedule viewings',
+        },
+      },
+      {
+        label: 'Enquiries',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-message-circle',
+        tooltip: {
+          text: 'View enquiries',
+        },
+      },
+      {
+        label: 'Favourites',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-heart',
+        tooltip: {
+          text: 'Your favourite properties',
+        },
+      },
+      {
+        label: 'Notes',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-sticky-note',
+        tooltip: {
+          text: 'Your saved notes',
+        },
+      },
+      {
+        label: 'Viewed',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-eye',
+        tooltip: {
+          text: 'Recently viewed properties',
+        },
+      },
+    ],
+  },
+  {
+    label: 'Account',
+    icon: 'i-lucide-circle-user',
+    type: 'label',
+    tooltip: {
+      text: 'Account settings',
+    },
+    children: [
+      {
+        label: 'Profile',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-user',
+        tooltip: {
+          text: 'Your profile',
+        },
+      },
+      {
+        label: 'Settings',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-settings',
+        tooltip: {
+          text: 'Account settings',
+        },
+      },
+      {
+        label: 'Billing',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-credit-card',
+        tooltip: {
+          text: 'Billing & payments',
+        },
+      },
+      {
+        label: 'Security',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-shield-check',
+        tooltip: {
+          text: 'Security settings',
+        },
+      },
+      {
+        label: 'Notifications',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-bell',
+        tooltip: {
+          text: 'Notification preferences',
+        },
+      },
+      {
+        label: 'Analytics',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-chart-bar',
+        tooltip: {
+          text: 'View analytics',
+        },
+      }
+    ],
+  },
+  {
+    label: 'Search',
+    icon: 'i-lucide-search',
+    type: 'label',
+    tooltip: {
+      text: 'Search preferences',
+    },
+    children: [
+      {
+        label: 'Saved Searches',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-text-search',
+        tooltip: {
+          text: 'Your saved searches',
+        },
+      },
+      {
+        label: 'Saved Locations',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-bookmark',
+        tooltip: {
+          text: 'Your saved locations',
+        },
+      },
+    ],
+  },
+  {
+    label: 'Help & Support',
+    icon: 'i-lucide-message-circle-question-mark',
+    type: 'label',
+    tooltip: {
+      text: 'Get help',
+    },
+    children: [
+      {
+        label: 'Documentation',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-book-open',
+        tooltip: {
+          text: 'View documentation',
+        },
+      },
+      {
+        label: 'Contact Support',
+        type: 'link',
+        to: '#',
+        icon: 'i-lucide-headphones',
+        tooltip: {
+          text: 'Contact support team',
+        },
+      },
+    ],
+  },
+]);

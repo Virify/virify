@@ -2,8 +2,12 @@ import { fileURLToPath } from 'node:url'
 
 export default defineNuxtConfig({
 
+
   // Global styles
-  css: ['./layers/ui/assets/styles/main.scss'],
+  css: [
+    './layers/ui/assets/styles/main.scss',
+    './layers/ui/assets/styles/tailwind.css',
+  ],
 
   // Alias for referencing styles
   alias: {
@@ -13,7 +17,8 @@ export default defineNuxtConfig({
   // Modules
   modules: [
     '@nuxtjs/fontaine',
-    './layers/ui/modules/icons.ts'
+    './layers/ui/modules/icons.ts',
+    '@nuxt/ui',
   ],
 
   // Fonts

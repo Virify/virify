@@ -40,3 +40,10 @@ const iconFile = computed(() => {
   return `/sprites/icon-${prefix}.svg#${name}`
 })
 </script>
+
+<style scoped>
+.a-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+</style>

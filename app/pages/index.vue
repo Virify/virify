@@ -193,6 +193,7 @@
 
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
+import useToast from "~/composables/useToast";
 const { showToast } = useToast();
 
 // Fetch CMS content - module automatically uses correct perspective
