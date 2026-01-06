@@ -20,8 +20,8 @@
             link: 'body-sm no-underline text-foreground text-normal',
             content: 'no-underline',
             linkLeadingIcon: 'text-secondary',
-          }" :collapsed="collapsed">
-          </UNavigationMenu>
+            linkTrailingBadgeSize: 'md',
+          }" :collapsed="collapsed" />
         </TooltipProvider>
       </template>
       <!-- sidebar footer -->
@@ -40,8 +40,8 @@
       <!-- panel header -->
       <template #header>
         <UDashboardNavbar
-          :title="$route.meta.head.title || 'Dashboard'"
-          :icon="$route.meta.head.icon"
+          :title="($route.meta.head as any)?.title || 'Dashboard'"
+          :icon="($route.meta.head as any)?.icon"
           toggle-side="right"
           class="body-sm"
         />
@@ -53,11 +53,17 @@
   </UDashboardGroup>
 </template>
 <script lang="ts" setup>
-import { dashboardNavigationitems } from '~/utils/account/navigation';
 import type { NavigationMenuItem } from '@nuxt/ui';
 import { TooltipProvider } from 'reka-ui';
 
 const { clear } = useUserSession()
+const { fetchUserItemsAggregates } = useNotifications()
+const { dashboardNavigationitems } = useDashboardNavigation()
+
+onMounted(async () => {
+  await fetchUserItemsAggregates()
+})
+
 async function logout() {
   await clear()
   navigateTo('/')
