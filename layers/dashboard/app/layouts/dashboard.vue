@@ -1,28 +1,60 @@
 <template>
   <UDashboardGroup>
     <!-- sidebar -->
-    <UDashboardSidebar collapsable resizable toggle-side="right" :ui="{
-      header: 'p-0',
-    }" collapsible>
+    <UDashboardSidebar collapsible resizable mode="slideover" side="left" toggle-side="right" :min-size="15"  :ui="{
+      header: 'p-4',
+    }" >
     <!-- sidebar header -->
       <template #header="{ collapsed }">
-        <nuxt-link to="/" class="o-site-navigation__brand w-100" :class="[collapsed ? 'flex justify-center' : 'pl-4']"
-          aria-label="Virify Home">
-          <AtomsIcon v-if="!collapsed" icon="logo/horizontal-colour" width="140" height="42" />
-          <AtomsIcon v-else icon="logo/v-logo" width="42" height="42" />
-        </nuxt-link>
+        <div class="flex items-center justify-between w-full p-2">
+          <nuxt-link to="/" :class="[collapsed ? 'flex justify-center w-full' : '']"
+            aria-label="Virify Home">
+            <AtomsIcon v-if="!collapsed" icon="logo/horizontal-colour"  width="140" height="42" class="max-w-140" />
+            <AtomsIcon v-else icon="logo/v-logo" width="42" height="42" class="shrink-0" />
+          </nuxt-link>
+          <UDashboardSidebarCollapse v-if="!collapsed" :ui="{
+            leadingIcon: 'text-secondary',
+          }" />
+        </div>
       </template>
       <!-- sidebar content -->
       <template #default="{ collapsed }">
         <TooltipProvider :delay-duration="400">
+          <!-- navigation menu -->
           <UNavigationMenu orientation="vertical" :items="dashboardNavigationitems" :popover="true" :ui="{
             label: 'body-sm',
             link: 'body-sm no-underline text-foreground text-normal',
             content: 'no-underline',
             linkLeadingIcon: 'text-secondary',
-            childLinkIcon: 'text-secondary',
             linkTrailingBadgeSize: 'md',
-          }" :collapsed="collapsed" />
+            childLinkIcon: 'text-secondary',
+          }" :collapsed="collapsed">
+            <!-- collapse icon -->
+            <template #list-leading>
+              <TooltipProvider :delay-duration="400">
+                <UTooltip text="Expand sidebar">
+                  <UDashboardSidebarCollapse v-if="collapsed" :ui="{
+                      leadingIcon: 'text-secondary',
+                    }"
+                  />
+                </UTooltip>
+              </TooltipProvider>
+            </template>
+            <!-- popover badges -->
+            <template #item-content="{ item }">
+              <ul class="grid gap-1 p-2">
+                <li v-for="child in item.children" :key="child.label">
+                  <ULink :to="child.to" class="flex items-center justify-between gap-2 rounded-md p-2 text-sm">
+                    <div class="flex items-center gap-2">
+                      <UIcon v-if="child.icon" :name="child.icon" class="size-5 text-secondary" />
+                      <span>{{ child.label }}</span>
+                    </div>
+                    <UBadge v-if="child.badge" :label="child.badge" size="md" variant="outline" />
+                  </ULink>
+                </li>
+              </ul>
+            </template>
+          </UNavigationMenu>
         </TooltipProvider>
       </template>
       <!-- sidebar footer -->
@@ -59,7 +91,6 @@
   </UDashboardGroup>
 </template>
 <script lang="ts" setup>
-import type { NavigationMenuItem } from '@nuxt/ui';
 import { TooltipProvider } from 'reka-ui';
 
 const { clear } = useUserSession()

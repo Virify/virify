@@ -1,3 +1,4 @@
+import { badge } from "#build/ui";
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 /**
