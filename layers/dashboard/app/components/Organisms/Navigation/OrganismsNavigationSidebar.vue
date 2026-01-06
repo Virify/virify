@@ -45,7 +45,7 @@
             linkLeadingIcon: 'text-secondary',
             linkTrailingBadgeSize: 'md',
             childLinkIcon: 'text-secondary',
-            linkTrailingBadge: 'text-primary bg-white',
+            linkTrailingBadge: 'text-white bg-background',
           }"
           :collapsed="collapsed"
         >
