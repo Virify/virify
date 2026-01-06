@@ -24,7 +24,6 @@
   </UDashboardGroup>
 </template>
 <script lang="ts" setup>
-import { TooltipProvider } from 'reka-ui';
 
 const { clear } = useUserSession()
 const { fetchUserItemsAggregates } = useNotifications()

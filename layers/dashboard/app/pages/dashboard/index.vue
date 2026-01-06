@@ -5,11 +5,21 @@
     label: 'body-sm',
   }">
     <template #favourite-listings>
-      <UPageCard v-for="item in recentFavourites" :key="item.id" title="Favourited Listings" description="test decription" variant="soft" class="my-2" />
+      <div v-if="recentFavourites.length > 0">
+        <UPageCard v-for="item in recentFavourites" :key="item.id" title="Favourited Listings" description="test decription" variant="soft" class="my-2" />
+      </div>
+      <div v-else>
+        <p class="body-sm">You have no recent favourite listings.</p>
+      </div>
+      
     </template>
     
     <template #viewed-listings>
-      <p>Viewed Listings</p>
+      <p class="body-sm">No recently viewed listings.</p>
+    </template>
+
+     <template #notes-added>
+      <p class="body-sm">No recent Notes added.</p>
     </template>
   </UAccordion>
 </template>
@@ -43,6 +53,7 @@ const accordionItems: AccordionItem[] = [
     {
       label: 'Notes Added',
       icon: 'i-lucide-sticky-note',
+      slot: 'notes-added',
       value: 'notes-added',
     },
 ]
