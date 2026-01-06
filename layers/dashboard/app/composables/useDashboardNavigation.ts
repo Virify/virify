@@ -9,10 +9,6 @@ export function useDashboardNavigation() {
 
   const dashboardNavigationitems = computed<NavigationMenuItem[]>(() => [
     {
-      label: 'Dashboard',
-      type: 'label',
-    },
-    {
       label: 'Home',
       icon: 'i-lucide-home',
       type: 'link',
@@ -24,7 +20,6 @@ export function useDashboardNavigation() {
     {
       label: 'Listings',
       icon: 'i-lucide-house-heart',
-      type: 'label',
       tooltip: {
         text: 'Manage your property listings',
       },
@@ -84,7 +79,7 @@ export function useDashboardNavigation() {
           to: '#',
           icon: 'i-lucide-sticky-note',
           tooltip: {
-            text: 'Your saved notes',
+            text: 'Your saved notes' + (aggregates.value.notes ? ` (${aggregates.value.notes})` : ''),
           },
           badge: aggregates.value.notes ? String(aggregates.value.notes) : undefined,
         },
@@ -120,7 +115,6 @@ export function useDashboardNavigation() {
     {
       label: 'Account',
       icon: 'i-lucide-circle-user',
-      type: 'label',
       tooltip: {
         text: 'Account settings',
       },
@@ -184,7 +178,6 @@ export function useDashboardNavigation() {
     {
       label: 'Search',
       icon: 'i-lucide-search',
-      type: 'label',
       tooltip: {
         text: 'Search preferences',
       },
@@ -212,7 +205,6 @@ export function useDashboardNavigation() {
     {
       label: 'Help & Support',
       icon: 'i-lucide-message-circle-question-mark',
-      type: 'label',
       tooltip: {
         text: 'Get help',
       },

@@ -15,11 +15,12 @@
       <!-- sidebar content -->
       <template #default="{ collapsed }">
         <TooltipProvider :delay-duration="400">
-          <UNavigationMenu orientation="vertical" :items="getStyles(collapsed || false)" :ui="{
+          <UNavigationMenu orientation="vertical" :items="dashboardNavigationitems" :popover="true" :ui="{
             label: 'body-sm',
             link: 'body-sm no-underline text-foreground text-normal',
             content: 'no-underline',
             linkLeadingIcon: 'text-secondary',
+            childLinkIcon: 'text-secondary',
             linkTrailingBadgeSize: 'md',
           }" :collapsed="collapsed" />
         </TooltipProvider>
@@ -27,10 +28,15 @@
       <!-- sidebar footer -->
       <template #footer="{ collapsed }">
         <div class="flex" :class="collapsed ? 'flex-col items-center gap-2' : 'justify-between w-100'">
-          <UButton icon="i-lucide-log-out" color="secondary" variant="link" size="xs" @click="logout"
-            class="body-sm font-bold" :ui="{
-              leadingIcon: 'text-secondary'
-            }" :label="collapsed ? undefined : 'Logout'" :square="collapsed" />
+          <TooltipProvider :delay-duration="400">
+            <UTooltip text="Logout">
+              <UButton icon="i-lucide-log-out" color="secondary" variant="link" size="xs" @click="logout"
+                tooltip="Logout"
+                  class="body-sm font-bold" :ui="{
+                    leadingIcon: 'text-secondary'
+                  }" :label="collapsed ? undefined : 'Logout'" :square="collapsed" />
+            </UTooltip>
+          </TooltipProvider>
           <UColorModeButton />
         </div>
       </template>
@@ -67,22 +73,5 @@ onMounted(async () => {
 async function logout() {
   await clear()
   navigateTo('/')
-}
-
-function getStyles(collapsed: boolean): NavigationMenuItem[] {
-  if (!collapsed) return dashboardNavigationitems.value as NavigationMenuItem[];
-
-  return (dashboardNavigationitems.value as any[]).flatMap((item: NavigationMenuItem) => {
-    // If it's a group with children, return the children (effectively flattening)
-    if (item.children) {
-      return item.children;
-    }
-    // If it's a label-only item (section header), hide it in collapsed mode
-    if (item.type === 'label' && !item.children && !item.to) {
-      return [];
-    }
-    // Return regular links
-    return item;
-  });
 }
 </script>
