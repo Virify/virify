@@ -81,7 +81,10 @@
           :title="($route.meta.head as any)?.title || 'Dashboard'"
           :icon="($route.meta.head as any)?.icon"
           toggle-side="right"
-          class="body-sm"
+          class="body-sm border-0"
+          :ui="{
+            icon: 'text-secondary'
+          }"
         />
       </template>
       <template #body>
