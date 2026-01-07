@@ -14,6 +14,8 @@
       body: 'border-none',
       content: 'bg-primary',
       footer: 'border-none w-full',
+      overlay: 'backdrop-blur-sm',
+      toggle: '!text-white hover:!bg-white/10',
     }"
   >
     <!-- sidebar header -->
@@ -42,7 +44,7 @@
           :popover="true"
           :ui="{
             label: 'text-normal',
-            link: 'body-xs no-underline text-normal',
+            link: 'body-xs no-underline',
             item: 'text-white',
             content: 'no-underline bg-primary text-white ring-0 border-0',
             viewport: 'shadow-none ring-0 border-0',
@@ -116,6 +118,7 @@
   </UDashboardSidebar>
 </template>
 <script lang="ts" setup>
+import type { button } from '#build/ui';
 import { TooltipProvider } from 'reka-ui';
 const { dashboardNavigationitems } = useDashboardNavigation();
 </script>
