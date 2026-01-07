@@ -26,8 +26,6 @@
   <MoleculesToastContainer />
 </template>
 <script lang="ts" setup>
-
-const { clear } = useUserSession()
 const { fetchUserItemsAggregates } = useNotifications()
 
 onMounted(async () => {

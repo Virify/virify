@@ -4,7 +4,7 @@
     reverse
     class="p-4 border border-accented/50 bg-elevated/50 rounded-lg h-full flex flex-col"
     :ui="{
-      header: 'mb-0',
+      header: 'mb-0 w-full',
       title: 'my-1',
       description: 'my-2 text-(--foreground-100) w-full flex-1 flex flex-col',
       footer: 'mt-1 pt-0 w-full',
@@ -21,13 +21,18 @@
     />
 
     <template #header>
-      <div class="flex justify-between items-start">
-        <p class="body-sm">
-          <span class="font-bold body-md">
-            {{ formattedPrice(listing) }}
-          </span>
-            / {{ convertEnumToCapalizedString(listing.saleListing?.priceType!) }}
-        </p>
+      <div class="flex justify-between">
+        <div class="flex justify-between items-start">
+          <p class="body-sm">
+            <span class="font-bold body-md">
+              {{ formattedPrice(listing) }}
+            </span>
+              / {{ convertEnumToCapalizedString(listing.saleListing?.priceType!) }}
+          </p>
+        </div>
+      <UBadge size="md" color="secondary" class="mx-1" variant="solid">
+        {{ listing.rentalListing ? 'For Rent' : 'For Sale' }}
+      </UBadge>
       </div>
     </template>
 
@@ -37,26 +42,25 @@
 
     <template #description>
       <div class="flex flex-row flex-wrap gap-2">
-        <UBadge icon="i-lucide-bed-double" size="md" color="secondary">
+        <UBadge icon="i-lucide-bed-double" size="md" color="secondary" variant="solid">
         {{ listing?.property?.numberBedrooms }} bed
         </UBadge>
-        <UBadge icon="i-lucide-bath" size="md" color="secondary">
+        <UBadge icon="i-lucide-bath" size="md" color="secondary" variant="solid">
           {{ listing?.property?.numberBathrooms }} bathroom
         </UBadge>
-        <UBadge v-if="listing?.property?.outdoorSpace?.garden.length" icon="i-lucide-fence" size="md" color="secondary">
+        <UBadge v-if="listing?.property?.outdoorSpace?.garden.length" icon="i-lucide-fence" size="md" color="secondary" variant="solid">
           {{ listing?.property?.outdoorSpace?.garden.length }} garden
         </UBadge>
       </div>
-      <div class="mt-4 border border-accented/50 bg-elevated w-full rounded-lg p-2 cursor-pointer">
-        <p class="body-xs" @click="showNoteDialog(listing?.id!)">Note: {{ getNote(listing?.id!) || 'Click to add note!' }}</p>
-      </div>
-      
+        <UBadge size="lg" class="mt-4 cursor-pointer" variant="outline" color="neutral" @click="showNoteDialog(listing?.id!)">
+          Note: {{ note.note || 'Click to add note!' }}
+        </UBadge>
     </template>
 
     <template #footer>
-      <USeparator class="mb-4" />
+      <USeparator class="mb-4 mt-2" />
       <div class="flex justify-between w-full">
-        <UBadge size="md" color="secondary" class="mx-1">
+        <UBadge size="md" color="secondary" class="mx-1" variant="solid">
           {{ listing.rentalListing ? 'For Rent' : 'For Sale' }}
         </UBadge>
         <div class="flex gap-2">
@@ -75,13 +79,16 @@
 </template>
 <script lang="ts" setup>
 const  {removeFromFavourite } = useFavourites()
-const { getNote, showNoteDialog } = useNotes()
+const { getNoteData, showNoteDialog } = useNotes()
 
 interface Props {
   listing: any
 }
+const props= defineProps<Props>()
 
-defineProps<Props>()
+const note = computed(() => {
+  return getNoteData(props.listing?.id!)
+})
 
 function formattedPrice(listing: any): string {
   if (!listing || !listing.price) {
@@ -94,10 +101,8 @@ function formattedPrice(listing: any): string {
   }).format(listing.price);
 }
 
-/** omit street number */
 const formattedAddress = (address: any): string => {
   if (!address) return '';
-  /** omit street number */
   return address.street + ", " + address.city + ", " + address.postcode.split(" ")[0]
 };
 </script>

@@ -41,7 +41,7 @@ export const useNotes = createSharedComposable(() => {
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         return createdAt >= sevenDaysAgo;
       })
-      .slice(0, 6);
+      .slice(0, 8);
   });
 
   const saleNotes = computed(() => {
@@ -83,6 +83,19 @@ export const useNotes = createSharedComposable(() => {
   const getNote = (listingId: number): string | undefined => {
     const noteData = userNotes.value.find((note) => note.listingId === listingId);
     return noteData?.note;
+  };
+
+  /**
+   * Get the notes data object for a specific listing
+   * 
+   * @param listingId  - ID of the Listing
+   * @returns NoteData object or undefined
+   */
+  const getNoteData = (listingId: number): { note?: string; createdAt?: any } => {
+    return {
+      note: userNotes.value.find((note) => note.listingId === listingId)?.note,
+      createdAt: userNotes.value.find((note) => note.listingId === listingId)?.createdAt,
+    };
   };
 
   /**
@@ -203,6 +216,7 @@ export const useNotes = createSharedComposable(() => {
 
   return {
     getNote,
+    getNoteData,
     updateNote,
     deleteNote,
     hasNote,

@@ -12,7 +12,7 @@
           {{ isPending ? 'Deleting...' : 'Delete note' }}
         </button>
         <div class="notes-dialog-buttons">
-          <button class="| button button-ghost button-sm" @click="() => hideDialog()" :disabled="isPending">
+          <button class="| button button-monochrome button-sm button-secondary" @click="() => hideDialog()" :disabled="isPending">
             Cancel
           </button>
           <button class="| button button-secondary button-sm" @click="saveNotes" :disabled="isPending || !notes.trim()">
