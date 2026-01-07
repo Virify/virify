@@ -1,9 +1,9 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 pb-5">
+  <OrganismsDashboardListingGrid v-if="favourites.length > 0">
     <div v-for="item in favourites" :key="item.listing?.id" class="h-full">
       <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
     </div>
-  </div>
+  </OrganismsDashboardListingGrid>
 </template>
 <script lang="ts" setup>
   definePageMeta({

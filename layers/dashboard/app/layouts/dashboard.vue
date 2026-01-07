@@ -1,5 +1,5 @@
 <template>
-  <UDashboardGroup>
+  <UDashboardGroup unit="px">
     <!-- sidebar -->
     <OrganismsNavigationSidebar />
     <!-- panel -->
@@ -33,3 +33,10 @@ onMounted(async () => {
   await fetchUserItemsAggregates()
 })
 </script>
+<style lang="scss">
+  @media (min-width: 2560px) {
+  .uw-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+</style>

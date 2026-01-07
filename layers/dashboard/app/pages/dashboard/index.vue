@@ -9,33 +9,33 @@
     }"
   >
     <template #favourite-listings>
-      <div v-if="recentFavourites.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 pb-5">
+      <OrganismsDashboardListingGrid v-if="recentFavourites.length > 0">
         <div v-for="item in recentFavourites" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
         </div>
-      </div>
+      </OrganismsDashboardListingGrid>
       <div v-else>
         <p class="body-sm">You have no recent favourite listings.</p>
       </div>
     </template>
 
     <template #notes-added>
-      <div v-if="recentUserNotes.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 pb-5">
+      <OrganismsDashboardListingGrid v-if="recentUserNotes.length > 0">
         <div v-for="item in recentUserNotes" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
         </div>
-      </div>
+      </OrganismsDashboardListingGrid>
       <div v-else>
         <p class="body-sm">No recent Notes added.</p>
       </div>
     </template>
     
     <template #viewed-listings>
-      <div v-if="recentlyViewedListings.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 pb-5">
+      <OrganismsDashboardListingGrid v-if="recentlyViewedListings.length > 0">
         <div v-for="item in recentlyViewedListings" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" />
         </div>
-      </div>
+      </OrganismsDashboardListingGrid>
       <p class="body-sm">No recently viewed listings.</p>
     </template>
 

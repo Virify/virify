@@ -6,7 +6,8 @@
     mode="slideover"
     side="left"
     toggle-side="right"
-    :min-size="18"
+    :min-size="300"
+    :max-size="400"
     class="border-0 ring-0"
     :ui="{
       header: 'p-4 border-none',
