@@ -21,18 +21,13 @@
     />
 
     <template #header>
-      <div class="flex justify-between">
-        <div class="flex justify-between items-start">
-          <p class="body-sm">
-            <span class="font-bold body-md">
-              {{ formattedPrice(listing) }}
-            </span>
-              / {{ convertEnumToCapalizedString(listing.saleListing?.priceType!) }}
-          </p>
-        </div>
-      <UBadge size="md" color="secondary" class="mx-1" variant="solid">
-        {{ listing.rentalListing ? 'For Rent' : 'For Sale' }}
-      </UBadge>
+      <div class="flex justify-between items-start">
+        <p class="body-sm">
+          <span class="font-bold body-md">
+            {{ formattedPrice(listing) }}
+          </span>
+            / {{ convertEnumToCapalizedString(listing.saleListing?.priceType || listing.rentalListing?.rentFrequency || '') }}
+        </p>
       </div>
     </template>
 
@@ -82,7 +77,7 @@ const  {removeFromFavourite } = useFavourites()
 const { getNoteData, showNoteDialog } = useNotes()
 
 interface Props {
-  listing: any
+  listing: ListingCardType
 }
 const props= defineProps<Props>()
 
