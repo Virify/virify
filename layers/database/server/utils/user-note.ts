@@ -24,6 +24,7 @@ export async function getAllUserNotes(userId: number): Promise<NoteData[]> {
       listingId: true,
       note: true,
       createdAt: true,
+      updatedAt: true,
     },
   });
 }

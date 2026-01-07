@@ -1,4 +1,3 @@
-import { badge } from "#build/ui";
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 /**
@@ -67,7 +66,7 @@ export function useDashboardNavigation() {
         {
           label: 'Favourites',
           type: 'link',
-          to: '#',
+          to: '/dashboard/favourites',
           icon: 'i-lucide-heart',
           tooltip: {
             text: 'Your favourite properties',
@@ -77,7 +76,7 @@ export function useDashboardNavigation() {
         {
           label: 'Notes',
           type: 'link',
-          to: '#',
+          to: '/dashboard/notes',
           icon: 'i-lucide-sticky-note',
           tooltip: {
             text: 'Your saved notes' + (aggregates.value.notes ? ` (${aggregates.value.notes})` : ''),

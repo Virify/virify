@@ -12,7 +12,8 @@
           toggle-side="right"
           class="body-sm border-0"
           :ui="{
-            icon: 'text-secondary'
+            icon: 'text-secondary',
+            title: 'font-bold',
           }"
         />
       </template>
