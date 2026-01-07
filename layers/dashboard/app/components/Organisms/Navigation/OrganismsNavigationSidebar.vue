@@ -38,7 +38,7 @@
           :popover="true"
           :ui="{
             label: 'text-normal',
-            link: 'body-sm no-underline text-normal',
+            link: 'body-xs no-underline text-normal',
             item: 'text-white',
             content: 'no-underline bg-primary text-white ring-0 border-0',
             viewport: 'shadow-none ring-0 border-0',
@@ -67,12 +67,12 @@
           <template #item-content="{ item }">
             <ul class="grid gap-1 p-2">
               <li v-for="child in item.children" :key="child.label">
-                <ULink :to="child.to" class="flex items-center justify-between p-2 body-sm hover:bg-white/5 transition-colors">
+                <ULink :to="child.to" class="flex items-center justify-between p-2 body-xs hover:bg-white/5 transition-colors">
                   <div class="flex items-center gap-2 pr-2">
                     <UIcon v-if="child.icon" :name="child.icon" class="size-5 text-secondary" />
                     <span>{{ child.label }}</span>
                   </div>
-                  <UBadge v-if="child.badge" :label="child.badge" size="md" variant="outline" class="text-foreground border" />
+                  <UBadge v-if="child.badge" :label="child.badge" size="sm" variant="outline" class="text-foreground border" />
                 </ULink>
               </li>
             </ul>

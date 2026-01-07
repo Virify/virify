@@ -1,13 +1,16 @@
 <template>
-  <UApp>
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </UApp>
+  <ConfigProvider :use-id="useIdFunction">
+    <UApp>
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </UApp>
+  </ConfigProvider>
 </template>
 
 <script setup lang="ts">
-
+import { ConfigProvider } from 'reka-ui'
+const useIdFunction = () => useId()
 // Global head configuration
 useHead({
   meta: [

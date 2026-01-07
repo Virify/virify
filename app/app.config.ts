@@ -1,9 +1,0 @@
-export default defineAppConfig({
-  ui: {
-    colors: {
-      primary: 'brand-purple',
-      secondary: 'brand-orange',
-      bg: 'brand-bg',
-    }
-  }
-})

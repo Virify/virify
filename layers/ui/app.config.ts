@@ -5,6 +5,7 @@ export default defineAppConfig({
       secondary: 'brand-orange',
       tertiary: 'tertiary',
       neutral: 'monochrome',
+      bg: 'brand-bg',
     },
     navigationMenu: {
       compoundVariants: [

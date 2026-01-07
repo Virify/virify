@@ -2,7 +2,6 @@
   <UPageColumns>
     <UPageCard 
       icon="i-lucide-eye"
-      class=""
       variant="subtle"
       :ui="{
         leadingIcon: 'text-secondary',

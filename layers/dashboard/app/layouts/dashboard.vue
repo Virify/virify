@@ -22,6 +22,8 @@
       </template>
     </UDashboardPanel>
   </UDashboardGroup>
+  <ViewsDialog />
+  <MoleculesToastContainer />
 </template>
 <script lang="ts" setup>
 
@@ -31,9 +33,4 @@ const { fetchUserItemsAggregates } = useNotifications()
 onMounted(async () => {
   await fetchUserItemsAggregates()
 })
-
-async function logout() {
-  await clear()
-  navigateTo('/')
-}
 </script>

@@ -106,11 +106,12 @@ function toggle() {
     animation: selectedBounce var(--animation-subtle) linear;
 
     .a-icon {
+      overflow: visible;
       filter: 
-        drop-shadow(0 0 1px rgba(255, 255, 255, 1)) 
-        drop-shadow(0 0 1px rgba(255, 255, 255, 1)) 
-        drop-shadow(0 0 1px rgba(255, 255, 255, 1))
-        drop-shadow(0 0 2px rgba(255, 255, 255, 1));
+        drop-shadow(1px 0 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
+        drop-shadow(-1px 0 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
+        drop-shadow(0 1px 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
+        drop-shadow(0 -1px 0 light-dark(var(--monochrome-400), var(--monochrome-600)));
     }
   }
 
