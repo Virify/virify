@@ -2,7 +2,7 @@
   <UPageCard
     variant="naked"
     reverse
-    class="p-4 border border-accented/50  bg-elevated rounded-lg h-full flex flex-col"
+    class="p-4 border border-accented/50 bg-elevated/50 rounded-lg h-full flex flex-col"
     :ui="{
       header: 'mb-0',
       title: 'my-1',
@@ -47,7 +47,10 @@
           {{ listing?.property?.outdoorSpace?.garden.length }} garden
         </UBadge>
       </div>
-      <p class="body-xs pt-4 cursor-pointer flex-1" @click="showNoteDialog(listing?.id!)">Note: {{ getNote(listing?.id!) || 'Click to add note!' }}</p>
+      <div class="mt-4 border border-accented/50 bg-elevated w-full rounded-lg p-2 cursor-pointer">
+        <p class="body-xs" @click="showNoteDialog(listing?.id!)">Note: {{ getNote(listing?.id!) || 'Click to add note!' }}</p>
+      </div>
+      
     </template>
 
     <template #footer>

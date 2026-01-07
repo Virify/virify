@@ -4,6 +4,7 @@ export default defineAppConfig({
       primary: 'brand-purple',
       secondary: 'brand-orange',
       tertiary: 'tertiary',
+      accent: 'brand-accent',
       neutral: 'monochrome',
       bg: 'brand-bg',
     },

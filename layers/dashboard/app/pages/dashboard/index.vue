@@ -9,7 +9,7 @@
     }"
   >
     <template #favourite-listings>
-      <div v-if="recentFavourites.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-4">
+      <div v-if="recentFavourites.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-5">
         <div v-for="item in recentFavourites" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing" />
         </div>
@@ -20,7 +20,7 @@
     </template>
 
     <template #notes-added>
-      <div v-if="recentUserNotes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-4">
+      <div v-if="recentUserNotes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-5">
         <div v-for="item in recentUserNotes" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing" />
         </div>
@@ -31,7 +31,7 @@
     </template>
     
     <template #viewed-listings>
-      <div v-if="recentlyViewedListings.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-4">
+      <div v-if="recentlyViewedListings.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 pb-5">
         <div v-for="item in recentlyViewedListings" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing" />
         </div>

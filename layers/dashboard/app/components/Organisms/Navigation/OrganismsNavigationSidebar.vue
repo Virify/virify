@@ -7,9 +7,13 @@
     side="left"
     toggle-side="right"
     :min-size="18"
+    class="border-0 ring-0"
     :ui="{
-      header: 'p-4',
+      header: 'p-4 border-none',
       root: 'bg-primary',
+      body: 'border-none',
+      content: 'bg-primary',
+      footer: 'border-none w-full',
     }"
   >
     <!-- sidebar header -->
@@ -82,7 +86,7 @@
     </template>
     <!-- sidebar footer -->
     <template #footer="{ collapsed }">
-      <div class="flex" :class="collapsed ? 'flex-col items-center gap-2' : 'justify-between w-100'">
+      <div class="flex" :class="collapsed ? 'flex-col items-center gap-2' : 'justify-between w-full'">
         <TooltipProvider :delay-duration="400">
           <UTooltip text="Logout">
             <UButton

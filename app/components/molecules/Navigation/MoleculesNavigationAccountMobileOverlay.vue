@@ -91,7 +91,8 @@ function handleNavClick(item: any) {
   left: 0;
   height: calc(100dvh - var(--mobile-nav-header-height));
   width: 100vw;
-  background: var(--background-200);
+  background: var(--blue-400);
+  color: var(--monochrome-900);
   transform: translateX(-100%);
   transition: transform 0.3s ease;
   display: flex;

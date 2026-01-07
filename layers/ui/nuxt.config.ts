@@ -5,19 +5,19 @@ export default defineNuxtConfig({
 
   // Global styles
   css: [
-    './layers/ui/assets/styles/main.scss',
-    './layers/ui/assets/styles/tailwind.css',
+    './layers/ui/app/assets/styles/main.scss',
+    './layers/ui/app/assets/styles/tailwind.css',
   ],
 
   // Alias for referencing styles
   alias: {
-    '#styles': fileURLToPath(new URL('./assets/styles', import.meta.url))
+    '#styles': fileURLToPath(new URL('./app/assets/styles', import.meta.url))
   },
 
   // Modules
   modules: [
     '@nuxtjs/fontaine',
-    './layers/ui/modules/icons.ts',
+    './layers/ui/app/modules/icons.ts',
     '@nuxt/ui',
   ],
 
@@ -28,7 +28,7 @@ export default defineNuxtConfig({
 
   // Sprite icons
   icons: {
-    input: ['./layers/ui/assets/sprites'],
+    input: ['./layers/ui/app/assets/sprites'],
     output: './public/sprites'
   },
 
