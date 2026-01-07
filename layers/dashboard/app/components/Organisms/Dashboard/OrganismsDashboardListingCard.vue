@@ -6,7 +6,7 @@
     :ui="{
       header: 'mb-0 w-full',
       title: 'my-1',
-      description: 'my-2 text-(--foreground-100) w-full flex-1 flex flex-col justify-between',
+      description: 'text-(--foreground-100) w-full flex-1 flex flex-col justify-between',
       footer: 'mt-1 pt-0 w-full',
       body: 'w-full flex flex-col flex-1',
     }"
@@ -17,7 +17,7 @@
     alt="Listing image"
     variant="gallery"
     :placeholder="true"
-    class="w-full h-64 object-bottom object-cover rounded-lg aspect-4/3"
+    class="w-full h-54 object-bottom object-cover rounded-lg aspect-4/3"
     />
 
     <template #header>
@@ -30,52 +30,59 @@
               / {{ convertEnumToCapalizedString(listing.saleListing?.priceType || listing.rentalListing?.rentFrequency || '') }}
           </p>
         </div>
-        <UBadge size="md" color="secondary" class="mx-1" variant="solid">
+        <UBadge size="md" color="secondary" class="mx-1" variant="subtle">
           {{ listing.rentalListing ? 'For Rent' : 'For Sale' }}
         </UBadge>
       </div>
     </template>
 
     <template #title>
-      <p class="body-sm font-semibold">{{ formattedAddress(listing?.property?.address) }}</p>
+      <p class="body-sm">{{ formattedAddress(listing?.property?.address) }}</p>
     </template>
 
     <template #description>
-      <div class="flex flex-row flex-wrap gap-2">
-        <UBadge icon="i-lucide-bed-double" size="md" color="secondary" variant="solid">
+      <div class="flex flex-row flex-wrap gap-1">
+        <UBadge icon="i-lucide-bed-double" size="md" color="secondary" variant="subtle">
         {{ listing?.property?.numberBedrooms }} bed
         </UBadge>
-        <UBadge icon="i-lucide-bath" size="md" color="secondary" variant="solid">
+        <UBadge icon="i-lucide-bath" size="md" color="secondary" variant="subtle">
           {{ listing?.property?.numberBathrooms }} bathroom
         </UBadge>
-        <UBadge v-if="listing?.property?.outdoorSpace?.garden.length" icon="i-lucide-fence" size="md" color="secondary" variant="solid">
+        <UBadge v-if="listing?.property?.outdoorSpace?.garden.length" icon="i-lucide-fence" size="md" color="secondary" variant="subtle">
           {{ listing?.property?.outdoorSpace?.garden.length }} garden
         </UBadge>
       </div>
-      <UBadge size="lg" class="mt-4 cursor-pointer" variant="outline" color="neutral" @click="showNoteDialog(listing?.id!)">
-        {{ `Note: ${note.note || 'Click to add note!'}` }}
-      </UBadge>
-      <div class="mt-4 w-full flex justify-center items-center gap-2 text-center">
+      <div v-if="note.note" class="my-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors flex items-start gap-1 group" @click="showNoteDialog(listing?.id!)">
+        <UIcon name="i-lucide-notebook-pen" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0 group-hover:text-primary" />
+        <span class="leading-snug line-clamp-2">{{ note.note }}</span>
+      </div>
+      <div v-else class="my-2">
+        <button
+          class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          @click="showNoteDialog(listing?.id!)"
+        >
+          <UIcon name="i-lucide-plus-circle" class="w-3.5 h-3.5 mt-0.5" />
+          Add Note
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 items-center">
         <UButton
           variant="solid"
           size="md"
           color="secondary"
-          class="w-full justify-center text-white! font-bold"
-          :ui="{
-            label: 'body-sm font-semibold',
-          }"
+          block
+          class="text-white! font-bold"
           :to="`/listing/${listing?.id}`"
         >
         View
         </UButton>
         <UButton
-          variant="solid"
+          variant="soft"
           size="md"
           color="secondary"
-          class="w-full justify-center text-white! font-bold"
-          :ui="{
-            label: 'body-sm font-bold',
-          }"
+          block
+          class="font-bold"
           :to="`/listing/${listing?.id}`"
         >
         Enquire
@@ -84,7 +91,7 @@
     </template>
 
     <template #footer>
-      <USeparator class="mb-4 mt-2" />
+      <USeparator class="my-3" />
       <div class="flex justify-between items-center w-full">
         <p v-if="showFavDate" class="body-xs">
           Added on: {{ new Date(showFavDate).toLocaleDateString('en-GB', {
@@ -103,14 +110,16 @@
         <div class="flex gap-2 items-center ml-auto">
           <UIcon
             name="i-lucide-share-2"
-            class="m-0 p-0"
+            class="w-5 h-5 m-0 p-0 cursor-pointer text-muted-foreground hover:text-foreground"
           />
           <AtomsNoteButton
             :listing-id="listing?.id!"
+            icon-class="w-5 h-5"
           />
           <AtomsFavouriteButton
             :is-favourite="true"
             :listing-id="listing?.id!"
+            icon-class="w-5 h-5"
             @remove="removeFromFavourite(listing?.id!)"
           />
         </div>
