@@ -1,14 +1,7 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :title="($route.meta.head as any)?.title || 'Your Notes'"
-        :icon="($route.meta.head as any)?.icon || 'i-lucide-sticky-note'"
-        class="body-sm border-0"
-        :ui="{
-          icon: 'text-secondary'
-        }"
-      />
+      <OrganismsNavigationSearch :title="'Your Notes'" />
     </template>
 
     <template #body>
@@ -32,5 +25,10 @@
   },
   layout: "dashboard",
 });
-  const { filteredUserNotes } = useNotes()
+  const { userNotes, filteredUserNotes } = useNotes()
+  const { setGroups } = useDashboardSearch()
+
+  watch(userNotes, () => {
+    setGroups(generateDashboardSearchGroups(userNotes.value, 'notes'))
+  }, { immediate: true, deep: true })
 </script>

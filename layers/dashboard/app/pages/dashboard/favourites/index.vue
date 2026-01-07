@@ -3,15 +3,15 @@
     <template #header>
       <UDashboardNavbar
         :title="($route.meta.head as any)?.title || 'Your Notes'"
-        :icon="($route.meta.head as any)?.icon || 'i-lucide-sticky-note'"
         class="body-sm border-0"
         :ui="{
-          icon: 'text-secondary'
+          title: 'title-sm m-0!',
+          icon: 'text-secondary',
         }"
       >
-      <template #right>
-        <UDashboardSearchButton color="neutral" variant="outline" class="w-full" />
-      </template>
+        <template #right>
+          <UDashboardSearchButton color="neutral" variant="outline" block class="w-full!" label="Search..." />
+        </template>
       </UDashboardNavbar>
     </template>
 
@@ -21,8 +21,9 @@
           <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
         </div>
       </OrganismsDashboardListingGrid>
-      <div v-else class="text-center text-gray-500 py-8">
+      <div v-else class="text-center">
         No favourites found matching your criteria.
+
       </div>
     </template>
   </UDashboardPanel>
@@ -38,4 +39,9 @@
 });
 
 const { favourites } = useFavourites()
+const { setGroups } = useDashboardSearch()
+
+watch(favourites, () => {
+  setGroups(generateDashboardSearchGroups(favourites.value, 'favourites'))
+}, { immediate: true })
 </script>

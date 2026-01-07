@@ -123,14 +123,24 @@ export const useNotes = createSharedComposable(() => {
         },
       });
 
-      // Update the state after successful API call
+      // Simpler approach: Just refresh the notes from the server to ensure consistency.
+      // This matches the behavior of "Adding" a note (the else block below), which the user confirmed works.
+      await refreshUserNotes();
+      
+      /* 
+      // Manual update (commented out as it was causing reactivity issues)
       const existingIndex = userNotes.value.findIndex((n) => n.listingId === listingId);
       if (existingIndex >= 0 && userNotes.value[existingIndex]) {
-        userNotes.value[existingIndex].note = note;
+        userNotes.value[existingIndex] = {
+          ...userNotes.value[existingIndex],
+          note: note,
+          updatedAt: new Date()
+        };
+        userNotes.value = [...userNotes.value];
       } else {
-        // If note doesn't exist, we should refetch all notes to get the complete data
         refreshUserNotes();
-      }
+      } 
+      */
 
       // Show success toast
       showToast(isUpdating ? "Note updated" : "Note added", { type: "success" });
@@ -161,8 +171,8 @@ export const useNotes = createSharedComposable(() => {
         body: { listingId },
       });
 
-      // Remove from state after successful API call
-      userNotes.value = userNotes.value.filter((note) => note.listingId !== listingId);
+      // Refresh notes from server to ensure consistency
+      await refreshUserNotes();
 
       // Show success toast
       showToast("Note deleted", { type: "success" });
