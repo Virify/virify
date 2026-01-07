@@ -1,46 +1,61 @@
 <template>
-  <OrganismsAnalyticsCard />
-  <UAccordion 
-    :items="accordionItems" 
-    default-value="favourite-listings" 
-    :ui="{
-      leadingIcon: 'text-secondary',
-      label: 'body-sm font-bold',
-    }"
-  >
-    <template #favourite-listings>
-      <OrganismsDashboardListingGrid v-if="recentFavourites.length > 0">
-        <div v-for="item in recentFavourites" :key="item.listing?.id" class="h-full">
-          <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
-        </div>
-      </OrganismsDashboardListingGrid>
-      <div v-else>
-        <p class="body-sm">You have no recent favourite listings.</p>
-      </div>
+  <UDashboardPanel>
+    <template #header>
+      <UDashboardNavbar
+        :title="($route.meta.head as any)?.title || 'Dashboard'"
+        :icon="($route.meta.head as any)?.icon"
+        toggle-side="right"
+        class="body-sm border-0"
+        :ui="{
+          icon: 'text-secondary',
+          title: 'font-bold',
+        }"
+      />
     </template>
 
-    <template #notes-added>
-      <OrganismsDashboardListingGrid v-if="recentUserNotes.length > 0">
-        <div v-for="item in recentUserNotes" :key="item.listing?.id" class="h-full">
-          <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
-        </div>
-      </OrganismsDashboardListingGrid>
-      <div v-else>
-        <p class="body-sm">No recent Notes added.</p>
-      </div>
-    </template>
-    
-    <template #viewed-listings>
-      <OrganismsDashboardListingGrid v-if="recentlyViewedListings.length > 0">
-        <div v-for="item in recentlyViewedListings" :key="item.listing?.id" class="h-full">
-          <OrganismsDashboardListingCard :listing="item.listing!" />
-        </div>
-      </OrganismsDashboardListingGrid>
-      <p class="body-sm">No recently viewed listings.</p>
-    </template>
+    <template #body>
+      <OrganismsAnalyticsCard />
+      <UAccordion 
+        :items="accordionItems" 
+        default-value="favourite-listings" 
+        :ui="{
+          leadingIcon: 'text-secondary',
+          label: 'body-sm font-bold',
+        }"
+      >
+        <template #favourite-listings>
+          <OrganismsDashboardListingGrid v-if="recentFavourites.length > 0">
+            <div v-for="item in recentFavourites" :key="item.listing?.id" class="h-full">
+              <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
+            </div>
+          </OrganismsDashboardListingGrid>
+          <div v-else>
+            <p class="body-sm">You have no recent favourite listings.</p>
+          </div>
+        </template>
 
-    
-  </UAccordion>
+        <template #notes-added>
+          <OrganismsDashboardListingGrid v-if="recentUserNotes.length > 0">
+            <div v-for="item in recentUserNotes" :key="item.listing?.id" class="h-full">
+              <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
+            </div>
+          </OrganismsDashboardListingGrid>
+          <div v-else>
+            <p class="body-sm">No recent Notes added.</p>
+          </div>
+        </template>
+        
+        <template #viewed-listings>
+          <OrganismsDashboardListingGrid v-if="recentlyViewedListings.length > 0">
+            <div v-for="item in recentlyViewedListings" :key="item.listing?.id" class="h-full">
+              <OrganismsDashboardListingCard :listing="item.listing!" />
+            </div>
+          </OrganismsDashboardListingGrid>
+          <p class="body-sm">No recently viewed listings.</p>
+        </template>
+      </UAccordion>
+    </template>
+  </UDashboardPanel>
 </template>
 <script lang="ts" setup>
 import type { AccordionItem } from '@nuxt/ui';

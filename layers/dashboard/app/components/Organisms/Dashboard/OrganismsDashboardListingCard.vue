@@ -53,7 +53,7 @@
         </UBadge>
       </div>
       <div v-if="note.note" class="my-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors flex items-start gap-1 group" @click="showNoteDialog(listing?.id!)">
-        <UIcon name="i-lucide-notebook-pen" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0 group-hover:text-primary" />
+        <UIcon name="i-lucide-notebook-pen" class="w-3.5 h-3.5 mt-0.5 shrink-0 group-hover:text-primary" />
         <span class="leading-snug line-clamp-2">{{ note.note }}</span>
       </div>
       <div v-else class="my-2">
