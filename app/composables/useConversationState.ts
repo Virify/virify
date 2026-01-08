@@ -71,7 +71,6 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
       const senderEmail = c.sender?.email?.toLowerCase() || "";
       const receiverUsername = c.receiver?.username?.toLowerCase() || "";
       const receiverEmail = c.receiver?.email?.toLowerCase() || "";
-      const listingTitle = c.listing?.title?.toLowerCase() || "";
       const lastMsg = c.messages?.[c.messages.length-1]?.content?.toLowerCase() || "";
       const address = c.listing?.property?.address?.fullAddress?.toLowerCase() || "";
 
@@ -80,7 +79,6 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
         senderEmail.includes(term) ||
         receiverUsername.includes(term) ||
         receiverEmail.includes(term) ||
-        listingTitle.includes(term) ||
         lastMsg.includes(term) ||
         address.includes(term)
       );

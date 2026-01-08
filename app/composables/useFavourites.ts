@@ -10,6 +10,7 @@ export const useFavourites = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
   const { showToast } = useToastNotification();
+  const { handleAggregateUpdate } = useNotifications();
 
   // Lightweight shared search / category state (favourites + notes share util)
   const searchTerm = ref("");
@@ -86,16 +87,23 @@ export const useFavourites = createSharedComposable(() => {
       return;
     }
 
+    // Optimistic badge update
+    handleAggregateUpdate({ aggregateType: 'favourites', operation: 'add' } as any);
+
     try {
       await $fetch<UserFavouriteListingCard[]>(`/api/user/favourites/${listingId}/`, {
         method: "POST",
         body: { listingId },
       });
+      
       await refreshFavourites();
 
       // Show success toast
       showToast("Added to favourites", { type: "success" });
     } catch (error) {
+      // Revert badge update
+      handleAggregateUpdate({ aggregateType: 'favourites', operation: 'remove' } as any);
+
       // Show error toast
       showToast("Failed to add to favourites", { type: "error" });
       console.error("Error adding to favourites:", error);
@@ -110,18 +118,32 @@ export const useFavourites = createSharedComposable(() => {
    * @returns Array of remaining favourite listing IDs or empty array on error
    */
   const removeFromFavourite = async (listingId: number) => {
+    const previousFavourites = [...(favourites.value || [])];
+
+    // Optimistically update UI
+    if (favourites.value) {
+      favourites.value = favourites.value.filter((item) => item.listing.id !== listingId);
+    }
+
     try {
       const result = await $fetch<number[]>(`/api/user/favourites/${listingId}/`, {
         method: "DELETE",
         body: { listingId },
       });
-      if (result) {
-        await refreshFavourites();
 
+      // Optimistic badge update
+      handleAggregateUpdate({ aggregateType: 'favourites', operation: 'remove' } as any);
+
+      if (result) {
         // Show success toast
         showToast("Removed from favourites", { type: "success" });
       }
     } catch (error) {
+      // Revert optimistic update
+      favourites.value = previousFavourites;
+      // Revert badge update
+      handleAggregateUpdate({ aggregateType: 'favourites', operation: 'add' } as any);
+
       // Show error toast
       showToast("Failed to remove from favourites", { type: "error" });
       console.error("Error removing from favourites:", error);
@@ -162,6 +184,10 @@ export const useFavourites = createSharedComposable(() => {
     refreshFavourites,
     searchTerm,
     categoryFilter,
-    isLoading: computed(() => status.value === 'pending' || status.value === 'idle'),
+    isLoading: computed(() => {
+      // Show loading if idle (not started) or pending with no data
+      // If we have data, we suppress the loading state to avoid UI flash during background refreshes
+      return status.value === 'idle' || (status.value === 'pending' && !(favourites.value && favourites.value.length > 0));
+    }),
   };
 });

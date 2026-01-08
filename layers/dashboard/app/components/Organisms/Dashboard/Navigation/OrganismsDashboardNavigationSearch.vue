@@ -13,6 +13,7 @@
   </UDashboardNavbar>
 </template>
 <script lang="ts" setup>
+import { TooltipProvider } from 'reka-ui';
 interface Props {
   title: string;
 }

@@ -58,17 +58,13 @@
         >
           <!-- collapse icon -->
           <template #list-leading>
-            <TooltipProvider :delay-duration="400">
-              <UTooltip text="Expand sidebar">
-                <UDashboardSidebarCollapse
-                  v-if="collapsed"
-                  class="hover:bg-white/5 rounded-md transition-colors"
-                  :ui="{
-                    leadingIcon: 'text-white',
-                  }"
-                />
-              </UTooltip>
-            </TooltipProvider>
+            <UDashboardSidebarCollapse
+              v-if="collapsed"
+              class="hover:bg-white/5 rounded-md transition-colors"
+              :ui="{
+                leadingIcon: 'text-white',
+              }"
+            />
           </template>
           <!-- popover badges -->
           <template #item-content="{ item }">

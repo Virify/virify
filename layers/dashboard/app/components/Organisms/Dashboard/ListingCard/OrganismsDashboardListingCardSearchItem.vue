@@ -26,33 +26,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-export interface SearchItemAddress {
-  street?: string
-  city?: string
-  postcode?: string
-}
-
-export interface SearchItemSpecs {
-  beds?: number
-  baths?: number
-}
-
-export interface DashboardSearchItem {
-  id: string | number
-  label?: string
-  icon?: string
-  image?: string
-  itemPrice?: number
-  address?: SearchItemAddress
-  specs?: SearchItemSpecs
-  note?: string
-  to?: string
-  target?: string
-}
-
 interface Props {
   item: DashboardSearchItem;
 }
-
 defineProps<Props>();
 </script>

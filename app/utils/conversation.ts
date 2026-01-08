@@ -48,6 +48,16 @@ export const getConvoMessagePoV = (convoMessage: MessageWithUser, currentUserId:
 };
 
 /**
+ * 
+ * @param message Message
+ * @param currentUserId User ID
+ * @returns Boolean indicating if the message was sent by the current user
+ */
+export const isMessageFromUser = (message: MessageWithUser, currentUserId: string | number): boolean => {
+  return String(message.senderId) !== String(currentUserId)
+}
+
+/**
  * Formats a message creation timestamp to a time string (HH:MM).
  * 
  * @param createdAt - The timestamp of message creation.

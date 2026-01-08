@@ -13,7 +13,7 @@
       }"
     >
       <template #item="{ item }">
-        <OrganismsDashboardListingCardSearchItem :item="item" />
+        <OrganismsDashboardListingCardSearchItem :item="(item as DashboardSearchItem)" />
       </template>
     </UDashboardSearch>
     <slot />
@@ -22,15 +22,18 @@
   <MoleculesToastContainer />
 </template>
 <script lang="ts" setup>
+
 const { fetchUserItemsAggregates } = useNotifications()
 const { groups } = useDashboardSearch()
+
+// Initialize shared composables to keep them alive and cache data across dashboard navigation
+useAnalytics()
+useFavourites()
+useNotes()
 
 onMounted(async () => {
   await fetchUserItemsAggregates()
 })
-
-
-
 </script>
 <style lang="scss">
   @media (min-width: 2560px) {
