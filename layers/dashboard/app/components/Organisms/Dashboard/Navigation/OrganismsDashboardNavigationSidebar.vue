@@ -119,7 +119,6 @@
   </UDashboardSidebar>
 </template>
 <script lang="ts" setup>
-import type { button } from '#build/ui';
 import { TooltipProvider } from 'reka-ui';
 const { dashboardNavigationitems } = useDashboardNavigation();
 </script>

@@ -14,7 +14,7 @@
     </template>
 
     <template #body>
-      <OrganismsAnalyticsCard />
+      <OrganismsDashboardAnalyticsCard />
       <UAccordion 
         :items="accordionItems" 
         default-value="favourite-listings" 
@@ -24,39 +24,39 @@
         }"
       >
         <template #favourite-listings>
-          <OrganismsDashboardListingGrid v-if="isFavouritesLoading">
-            <OrganismsSkeletonListingCardDashboard :cards="3"/>
-          </OrganismsDashboardListingGrid>
-          <OrganismsDashboardListingGrid v-else-if="recentFavourites.length > 0">
+          <OrganismsDashboardListingCardGrid v-if="isFavouritesLoading">
+            <OrganismsDashboardListingCardSkeleton :cards="3"/>
+          </OrganismsDashboardListingCardGrid>
+          <OrganismsDashboardListingCardGrid v-else-if="recentFavourites.length > 0">
             <div v-for="item in recentFavourites" :key="item.listing?.id" class="h-full">
               <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
             </div>
-          </OrganismsDashboardListingGrid>
+          </OrganismsDashboardListingCardGrid>
           <div v-else>
             <p class="body-sm">You have no recent favourite listings.</p>
           </div>
         </template>
 
         <template #notes-added>
-          <OrganismsDashboardListingGrid v-if="isNotesLoading">
-            <OrganismsSkeletonListingCardDashboard :cards="3"/>
-          </OrganismsDashboardListingGrid>
-          <OrganismsDashboardListingGrid v-else>
+          <OrganismsDashboardListingCardGrid v-if="isNotesLoading">
+            <OrganismsDashboardListingCardSkeleton :cards="3"/>
+          </OrganismsDashboardListingCardGrid>
+          <OrganismsDashboardListingCardGrid v-else>
             <div v-for="item in recentUserNotes" :key="item.listing?.id" class="h-full">
               <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
             </div>
-          </OrganismsDashboardListingGrid>
+          </OrganismsDashboardListingCardGrid>
         </template>
         
         <template #viewed-listings>
-          <OrganismsDashboardListingGrid v-if="isAnalyticsLoading">
-            <OrganismsSkeletonListingCardDashboard :cards="3"/>
-          </OrganismsDashboardListingGrid>
-          <OrganismsDashboardListingGrid v-else-if="recentlyViewedListings.length > 0">
+          <OrganismsDashboardListingCardGrid v-if="isAnalyticsLoading">
+            <OrganismsDashboardListingCardSkeleton :cards="3"/>
+          </OrganismsDashboardListingCardGrid>
+          <OrganismsDashboardListingCardGrid v-else-if="recentlyViewedListings.length > 0">
             <div v-for="item in recentlyViewedListings" :key="item.listing?.id" class="h-full">
               <OrganismsDashboardListingCard :listing="item.listing!" />
             </div>
-          </OrganismsDashboardListingGrid>
+          </OrganismsDashboardListingCardGrid>
           <p v-else class="body-sm">No recently viewed listings.</p>
         </template>
       </UAccordion>

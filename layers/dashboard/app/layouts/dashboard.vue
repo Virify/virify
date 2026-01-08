@@ -1,17 +1,19 @@
 <template>
   <UDashboardGroup unit="px">
     <!-- sidebar -->
-    <OrganismsNavigationSidebar />
+    <OrganismsDashboardNavigationSidebar />
     <UDashboardSearch
       :groups="groups"
-      placeholder="Search..."
+      placeholder="Search your saved listings for quick view..."
       :color-mode="false"
+      label="Quick View"
       :ui="{
-        label: 'body-md'
+        label: 'body-sm',
+        input: 'body-sm',
       }"
     >
       <template #item="{ item }">
-        <OrganismsListingCardSearchItem :item="item" />
+        <OrganismsDashboardListingCardSearchItem :item="item" />
       </template>
     </UDashboardSearch>
     <slot />

@@ -4,7 +4,11 @@
     icon: 'text-secondary',
   }">
     <template #right>
-      <UDashboardSearchButton color="neutral" variant="outline" size="xs" label="Search..." />
+      <TooltipProvider :delay-duration="400">
+        <UTooltip text="Search to quickly view your saved listings details">
+          <UDashboardSearchButton color="neutral" variant="outline" size="xs" label="Quick view search..." />
+        </UTooltip>
+      </TooltipProvider>
     </template>
   </UDashboardNavbar>
 </template>

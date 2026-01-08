@@ -1,18 +1,23 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <OrganismsNavigationSearch :title="'Your Notes'" />
+      <OrganismsDashboardNavigationSearch :title="'Your Notes'" />
     </template>
 
     <template #body>
-      <OrganismsDashboardListingGrid v-if="isLoading">
-        <OrganismsSkeletonListingCardDashboard :cards="3"/>
-      </OrganismsDashboardListingGrid>
-      <OrganismsDashboardListingGrid v-else-if="filteredUserNotes.length > 0">
+      <OrganismsDashboardFilter
+        :items="userNotes"
+        :date-key="'updatedAt'"
+        @update:filtered="filteredUserNotes = $event"
+      />
+      <OrganismsDashboardListingCardGrid v-if="isLoading">
+        <OrganismsDashboardListingCardSkeleton :cards="3"/>
+      </OrganismsDashboardListingCardGrid>
+      <OrganismsDashboardListingCardGrid v-else-if="filteredUserNotes.length > 0">
         <div v-for="item in filteredUserNotes" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
         </div>
-      </OrganismsDashboardListingGrid>
+      </OrganismsDashboardListingCardGrid>
       <div v-else class="text-center text-gray-500 py-8">
         No notes found matching your criteria.
       </div>
@@ -28,8 +33,10 @@
   },
   layout: "dashboard",
 });
-  const { userNotes, filteredUserNotes, isLoading } = useNotes()
+  const { userNotes, isLoading } = useNotes()
   const { setGroups } = useDashboardSearch()
+  
+  const filteredUserNotes = ref<typeof userNotes.value>([])
 
   watch(userNotes, () => {
     setGroups(generateDashboardSearchGroups(userNotes.value, 'notes'))
