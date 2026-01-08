@@ -17,22 +17,29 @@ export const useAnalytics = createSharedComposable(() => {
   // Reactive state for analytics data
   const recentlyViewedListings = ref<RecentlyViewed[]>([]);
   const recentOwnedListings = ref<OwnedListingWithAnalytics[]>([]);
-  const analytics = ref<UserAnalyticsSummary | null>(null);
+  // Use state for specific analytics to prevent refreshing on navigation
+  const analytics = useState<UserAnalyticsSummary | null>("analytics-user-summary", () => null);
+  const allUserListings = ref<OwnedListingWithAnalytics[]>([]);
+  
+  // Loading states
+  const isAnalyticsLoading = useState("analytics-is-loading", () => true);
+  // isFavouritesLoading and isNotesLoading are now handled by their respective composables
+  const isListingsLoading = ref(true);
   
   const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/search/location"), {
     immediate: true,
   });
-  const { favourites, refreshFavourites } = useFavourites();
-  const { userNotes, refreshUserNotes } = useNotes();
   const { getAllListingsForAnalytics } = useMyListings();
-  
-  // Add state for all listings analytics data
-  const allUserListings = ref<OwnedListingWithAnalytics[]>([]);
   
   // Fetch ALL analytics data when logged in
   const fetchAnalytics = async () => {
     if (!loggedIn.value) return;
     
+    // Only show loading state if we don't have data yet
+    if (!analytics.value) {
+      isAnalyticsLoading.value = true;
+    }
+
     try {
       // Fetch core analytics data
       const [viewedListings, userAnalytics] = await Promise.all([
@@ -42,18 +49,26 @@ export const useAnalytics = createSharedComposable(() => {
       
       recentlyViewedListings.value = viewedListings;
       analytics.value = userAnalytics;
+      isAnalyticsLoading.value = false; // Analytics loaded
       
       // Ensure ALL data is fetched from respective composables
-      const [allListings] = await Promise.all([
-        getAllListingsForAnalytics(), // Load ALL listings for analytics
-        refreshFavourites(),          // Load ALL favourites
-        refreshUserNotes()            // Load ALL notes  
-      ]);
-      
-      allUserListings.value = allListings;
+      // Loading states for favourites and notes are handled by their composables
+      // Listings loading is handled locally
+      (async () => {
+        if (allUserListings.value.length === 0) {
+          isListingsLoading.value = true;
+        }
+        try {
+          allUserListings.value = await getAllListingsForAnalytics();
+        } finally {
+          isListingsLoading.value = false;
+        }
+      })();
       
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
+      isAnalyticsLoading.value = false;
+      isListingsLoading.value = false;
     }
   };
   
@@ -184,13 +199,13 @@ export const useAnalytics = createSharedComposable(() => {
     analytics,
     trackListingView,
     trackMortgageCalculation,
-    favourites,
-    userNotes,
     recentlyViewedListings,
     recentOwnedListings,
     allUserListings,
     trackSearch,
     trendingLocations,
     fetchAnalytics,
+    isAnalyticsLoading,
+    isListingsLoading,
   };
 });

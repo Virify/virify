@@ -8,16 +8,20 @@
       }"
     >
       <template #title>
-        <p class="font-normal">Total Listing Views: 
-          <span class="font-bold italic text-secondary">
+        <div class="flex flex-col gap-1">
+          <span class="font-normal text-sm text-gray-500 dark:text-gray-400">Total Listing Views</span>
+          <USkeleton v-if="isLoading" class="h-8 w-20 bg-primary/25" />
+          <span v-else class="text-3xl font-bold italic text-secondary">
             {{ totalListingViews }} 
           </span>
-        </p>
+        </div>
       </template>
 
       <template #description>
         <p class="text-foreground-secondary">
-          {{ analytics?.percentageChange || 0 }}% increase in views compared to last month.
+          <USkeleton v-if="isLoading" class="h-4 w-10 inline-block align-sub bg-primary/25" />
+          <span v-else>{{ analytics?.percentageChange || 0 }}%</span>
+          increase in views compared to last month.
         </p>
       </template>
     </UPageCard>
@@ -30,11 +34,13 @@
       }"
     >
       <template #title>
-        <p class="font-normal">Listing Favourited: 
-          <span class="font-bold italic text-secondary">
+        <div class="flex flex-col gap-1">
+          <span class="font-normal text-sm text-gray-500 dark:text-gray-400">Listings Favourited</span>
+          <USkeleton v-if="isLoading" class="h-8 w-20 bg-primary/25" />
+          <span v-else class="text-3xl font-bold italic text-secondary">
             {{ analytics?.favoritedByOthersCount || 0 }} 
           </span>
-        </p>
+        </div>
       </template>
 
       <template #description>
@@ -52,11 +58,13 @@
       }"
     >
       <template #title>
-        <p class="font-normal">Total Enquiries: 
-          <span class="font-bold italic text-secondary">
+        <div class="flex flex-col gap-1">
+          <span class="font-normal text-sm text-gray-500 dark:text-gray-400">Total Enquiries</span>
+          <USkeleton v-if="isLoading" class="h-8 w-20 bg-primary/25" />
+          <span v-else class="text-3xl font-bold italic text-secondary">
             {{ analytics?.totalConversations || 0 }} 
           </span>
-        </p>
+        </div>
       </template>
 
       <template #description>
@@ -69,7 +77,7 @@
   </UPageColumns>
 </template>
 <script lang="ts" setup>
-  const { analytics } = useAnalytics();
+  const { analytics, isAnalyticsLoading: isLoading } = useAnalytics();
 
 const totalListingViews = computed(() => {
   return analytics.value?.totalViews || 0;

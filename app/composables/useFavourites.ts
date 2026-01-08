@@ -18,7 +18,7 @@ export const useFavourites = createSharedComposable(() => {
   /**
    * State Management
    */
-  const { data: favourites, refresh: refreshFavourites } = useAsyncData<UserFavouriteListingCard[]>(
+  const { data: favourites, refresh: refreshFavourites, status } = useAsyncData<UserFavouriteListingCard[]>(
     "favourites",
     () => {
       // Only make API call if user is logged in
@@ -162,5 +162,6 @@ export const useFavourites = createSharedComposable(() => {
     refreshFavourites,
     searchTerm,
     categoryFilter,
+    isLoading: computed(() => status.value === 'pending' || status.value === 'idle'),
   };
 });

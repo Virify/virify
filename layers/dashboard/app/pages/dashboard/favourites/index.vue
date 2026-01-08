@@ -16,8 +16,15 @@
     </template>
 
     <template #body>
-      <OrganismsDashboardListingGrid v-if="favourites.length > 0">
-        <div v-for="item in favourites" :key="item.listing?.id" class="h-full">
+      <div class="flex gap-2 shrink-0 body-sm">
+        <USelect v-model="saleRentFilter" :items="saleRentOptions" :highlight="false" color="secondary" size="lg" />
+        <USelect v-model="sortOrderValue" :items="sortOrder" :highlight="false" color="secondary" size="lg" />
+      </div>
+      <OrganismsDashboardListingGrid v-if="isLoading">
+        <OrganismsSkeletonListingCardDashboard :cards="3"/>
+      </OrganismsDashboardListingGrid>
+      <OrganismsDashboardListingGrid v-else-if="favourites.length > 0">
+        <div v-for="item in favouritesFiltered" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
         </div>
       </OrganismsDashboardListingGrid>
@@ -38,8 +45,52 @@
   layout: "dashboard",
 });
 
-const { favourites } = useFavourites()
+const { favourites, isLoading } = useFavourites()
 const { setGroups } = useDashboardSearch()
+const sortOrderValue = ref('Newest')
+const saleRentFilter = ref('All')
+
+const sortOrder = ref([
+  'Newest',
+  'Oldest',
+])
+
+const saleRentOptions = ref([
+  'All',
+  'Sale',
+  'Rent',
+])
+
+const appliedFilters = computed(() => {
+  return {
+    sortOrder: sortOrderValue.value,
+    saleRent: saleRentFilter.value,
+  }
+})
+
+const favouritesFiltered = computed(() => {
+  // Start with a copy to avoid mutating the original array
+  let filtered = [...favourites.value]
+
+  // Filter by Sale/Rent
+  if (appliedFilters.value.saleRent === 'Sale') {
+    filtered = filtered.filter(fav => fav.listing?.saleListing)
+  } else if (appliedFilters.value.saleRent === 'Rent') {
+    filtered = filtered.filter(fav => fav.listing?.rentalListing)
+  }
+
+  // Sort by date
+  filtered.sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime()
+    const dateB = new Date(b.createdAt).getTime()
+    
+    return appliedFilters.value.sortOrder === 'Newest' 
+      ? dateB - dateA 
+      : dateA - dateB
+  })
+
+  return filtered
+})
 
 watch(favourites, () => {
   setGroups(generateDashboardSearchGroups(favourites.value, 'favourites'))

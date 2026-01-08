@@ -24,7 +24,10 @@
         }"
       >
         <template #favourite-listings>
-          <OrganismsDashboardListingGrid v-if="recentFavourites.length > 0">
+          <OrganismsDashboardListingGrid v-if="isFavouritesLoading">
+            <OrganismsSkeletonListingCardDashboard :cards="3"/>
+          </OrganismsDashboardListingGrid>
+          <OrganismsDashboardListingGrid v-else-if="recentFavourites.length > 0">
             <div v-for="item in recentFavourites" :key="item.listing?.id" class="h-full">
               <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
             </div>
@@ -35,23 +38,26 @@
         </template>
 
         <template #notes-added>
-          <OrganismsDashboardListingGrid v-if="recentUserNotes.length > 0">
+          <OrganismsDashboardListingGrid v-if="isNotesLoading">
+            <OrganismsSkeletonListingCardDashboard :cards="3"/>
+          </OrganismsDashboardListingGrid>
+          <OrganismsDashboardListingGrid v-else>
             <div v-for="item in recentUserNotes" :key="item.listing?.id" class="h-full">
               <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
             </div>
           </OrganismsDashboardListingGrid>
-          <div v-else>
-            <p class="body-sm">No recent Notes added.</p>
-          </div>
         </template>
         
         <template #viewed-listings>
-          <OrganismsDashboardListingGrid v-if="recentlyViewedListings.length > 0">
+          <OrganismsDashboardListingGrid v-if="isAnalyticsLoading">
+            <OrganismsSkeletonListingCardDashboard :cards="3"/>
+          </OrganismsDashboardListingGrid>
+          <OrganismsDashboardListingGrid v-else-if="recentlyViewedListings.length > 0">
             <div v-for="item in recentlyViewedListings" :key="item.listing?.id" class="h-full">
               <OrganismsDashboardListingCard :listing="item.listing!" />
             </div>
           </OrganismsDashboardListingGrid>
-          <p class="body-sm">No recently viewed listings.</p>
+          <p v-else class="body-sm">No recently viewed listings.</p>
         </template>
       </UAccordion>
     </template>
@@ -69,9 +75,9 @@ definePageMeta({
   layout: "dashboard",
 });
 
-const { recentlyViewedListings } = useAnalytics()
-const { recentFavourites } = useFavourites()
-const { recentUserNotes } = useNotes()
+const { recentlyViewedListings, isAnalyticsLoading } = useAnalytics()
+const { recentFavourites, isLoading: isFavouritesLoading } = useFavourites()
+const { recentUserNotes, isLoading: isNotesLoading } = useNotes()
 
 console.log(recentUserNotes.value)
 

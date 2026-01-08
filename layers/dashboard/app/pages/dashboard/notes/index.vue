@@ -5,7 +5,10 @@
     </template>
 
     <template #body>
-      <OrganismsDashboardListingGrid v-if="filteredUserNotes.length > 0">
+      <OrganismsDashboardListingGrid v-if="isLoading">
+        <OrganismsSkeletonListingCardDashboard :cards="3"/>
+      </OrganismsDashboardListingGrid>
+      <OrganismsDashboardListingGrid v-else-if="filteredUserNotes.length > 0">
         <div v-for="item in filteredUserNotes" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
         </div>
@@ -25,7 +28,7 @@
   },
   layout: "dashboard",
 });
-  const { userNotes, filteredUserNotes } = useNotes()
+  const { userNotes, filteredUserNotes, isLoading } = useNotes()
   const { setGroups } = useDashboardSearch()
 
   watch(userNotes, () => {

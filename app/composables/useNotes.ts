@@ -18,7 +18,7 @@ export const useNotes = createSharedComposable(() => {
    * State Management
    * Store notes as an array with listing relationship
    */
-  const { data: userNotes, refresh: refreshUserNotes } = useAsyncData<NoteData[]>(
+  const { data: userNotes, refresh: refreshUserNotes, status } = useAsyncData<NoteData[]>(
     "userNotes",
     () => {
       // Only make API call if user is logged in
@@ -240,5 +240,6 @@ export const useNotes = createSharedComposable(() => {
     // search filter state
     searchTerm,
     categoryFilter,
+    isLoading: computed(() => status.value === 'pending' || status.value === 'idle'),
   };
 });
