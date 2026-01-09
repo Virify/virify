@@ -11,6 +11,7 @@
 
         <template #right>
           <OrganismsDashboardFilter
+            ref="filterRef"
             :items="filteredConversations"
             :date-key="'updatedAt'"
             enquiries
@@ -63,6 +64,7 @@ definePageMeta({
 const { allConversations, loading, unreadConversationsCount } = useConversations();
 const { user } = useUserSession();
 const open = ref(false);
+const filterRef = ref();
 
 const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
 const activeTab = ref<"all" | "unread">("all");
@@ -88,5 +90,6 @@ const tabItems = [
 function openModal(conversation: ConversationWithUserAndMessages) {
   open.value = !open.value;
   selectedConversation.value = conversation;
+  filterRef.value?.close();
 }
 </script>
