@@ -19,15 +19,12 @@
       <OrganismsDashboardListingCardGrid v-if="isLoading">
         <OrganismsDashboardListingCardSkeleton :cards="3"/>
       </OrganismsDashboardListingCardGrid>
-      <OrganismsDashboardListingCardGrid v-else-if="favourites.length > 0">
+      <OrganismsDashboardListingCardGrid v-else-if="favouritesFiltered.length > 0">
         <div v-for="item in favouritesFiltered" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
         </div>
       </OrganismsDashboardListingCardGrid>
-      <div v-else class="text-center">
-        No favourites found matching your criteria.
-
-      </div>
+      <OrganismsDashboardNoResults v-else :description="'No favourites found matching your criteria.'" />
     </template>
   </UDashboardPanel>
 </template>

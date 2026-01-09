@@ -45,12 +45,25 @@ const props = defineProps<{
   enquiries?: boolean;
   userId?: string | number;
   view?: "grid" | "list";
+  activeTab?: "all" | "unread";
 }>();
+
 const { allConversations, loading, unreadConversationsCount } = useConversations();
 
 const isOpen = ref(false);
 const enableTransition = ref(true);
-const activeTab = ref<"all" | "unread">("all");
+
+const emit = defineEmits<{
+  (e: "update:filtered", value: T[]): void;
+  (e: "update:view", value: "grid" | "list"): void;
+  (e: "update:activeTab", value: "all" | "unread"): void;
+}>();
+
+const activeTab = computed({
+  get: () => props.activeTab || "all",
+  set: (val) => emit("update:activeTab", val),
+});
+
 const viewOptions = [
   {
     label: "",
@@ -68,11 +81,6 @@ const tabItems = [
   { label: "All", value: "all", icon: "i-lucide-inbox" },
   { label: "Unread", value: "unread", icon: "i-lucide-mail" },
 ];
-
-const emit = defineEmits<{
-  (e: "update:filtered", value: T[]): void;
-  (e: "update:view", value: "grid" | "list"): void;
-}>();
 
 const activeView = computed({
   get: () => props.view || "grid",

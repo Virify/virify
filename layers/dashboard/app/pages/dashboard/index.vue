@@ -2,13 +2,11 @@
   <UDashboardPanel>
     <template #header>
       <UDashboardNavbar
-        :title="($route.meta.head as any)?.title || 'Dashboard'"
-        :icon="($route.meta.head as any)?.icon"
+        :title="'Welcome back, ' + (user?.username || user?.email) + '!'"
         toggle-side="left"
-        class="body-sm border-0"
+        class="border-0"
         :ui="{
-          icon: 'text-primary',
-          title: 'font-bold',
+          title: 'title-sm m-0!',
         }"
       />
     </template>
@@ -66,6 +64,7 @@
 </template>
 <script lang="ts" setup>
 import type { AccordionItem } from '@nuxt/ui';
+const { user } = useUserSession()
 
 definePageMeta({
   middleware: ["authenticated"],

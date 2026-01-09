@@ -17,6 +17,7 @@
             enquiries
             :user-id="user?.id"
             v-model:view="view"
+            v-model:active-tab="activeTab"
             @update:filtered="sortedAndFilteredConversations = $event"
           />
         </template>
@@ -40,7 +41,7 @@
             @reply="openModal"
           />
         </template>
-        <OrganismsDashboardEnquiryNoResultCard v-else />
+        <OrganismsDashboardNoResults v-else :description="'No enquiries found matching your criteria.'" />
       </UPageList>
       <OrganismsDashboardEnquiryModal
         v-model:open="open"
@@ -69,7 +70,7 @@ const filterRef = ref();
 const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
 const activeTab = ref<"all" | "unread">("all");
 const sortedAndFilteredConversations = ref<ConversationWithUserAndMessages[]>([]);
-const view = ref<'grid' | 'list'>('grid');
+const view = useCookie<'grid' | 'list'>('enquiries-view-preference', { default: () => 'grid', maxAge: 60 * 60 * 24 * 365 });
 
 const filteredConversations = computed(() => {
   if (activeTab.value === "all") {

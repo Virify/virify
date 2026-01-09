@@ -23,10 +23,8 @@
         <div v-for="item in filteredUserNotes" :key="item.listing?.id" class="h-full">
           <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
         </div>
-      </OrganismsDashboardListingCardGrid>
-      <div v-else class="text-center text-gray-500 py-8">
-        No notes found matching your criteria.
-      </div>
+      </OrganismsDashboardListingCardGrid> 
+      <OrganismsDashboardNoResults v-else :description="'No notes found matching your criteria.'" />
     </template>
   </UDashboardPanel>
 </template>
