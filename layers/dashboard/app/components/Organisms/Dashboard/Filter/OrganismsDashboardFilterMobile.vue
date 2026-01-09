@@ -157,59 +157,36 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  isOpen: boolean;
-  enableTransition: boolean;
-  enquiries?: boolean;
-  saleRentFilter: any;
-  saleRentOptions: any[];
-  enquiriesFilter: any;
-  enquiriesOptions: any[];
-  sortOrderValue: string;
-  sortOrder: any[];
-  activeTab: string;
-  tabItems: any[];
-  allConversationsCount: number;
-  unreadConversationsCount: number;
-  searchQuery: string;
-}>();
+  const props = defineProps<{
+    isOpen: boolean;
+    enableTransition: boolean;
+    enquiries?: boolean;
+    saleRentFilter: any;
+    saleRentOptions: any[];
+    enquiriesFilter: any;
+    enquiriesOptions: any[];
+    sortOrderValue: string;
+    sortOrder: any[];
+    activeTab: string;
+    tabItems: any[];
+    allConversationsCount: number;
+    unreadConversationsCount: number;
+    searchQuery: string;
+  }>();
 
-const emit = defineEmits<{
-  (e: 'update:isOpen', value: boolean): void;
-  (e: 'update:saleRentFilter', value: any): void;
-  (e: 'update:enquiriesFilter', value: any): void;
-  (e: 'update:sortOrderValue', value: string): void;
-  (e: 'update:activeTab', value: string): void;
-  (e: 'update:searchQuery', value: string): void;
-}>();
+  const emit = defineEmits<{
+    (e: 'update:isOpen', value: boolean): void;
+    (e: 'update:saleRentFilter', value: any): void;
+    (e: 'update:enquiriesFilter', value: any): void;
+    (e: 'update:sortOrderValue', value: string): void;
+    (e: 'update:activeTab', value: string): void;
+    (e: 'update:searchQuery', value: string): void;
+  }>();
 
-const isOpenOriginal = computed({
-  get: () => props.isOpen,
-  set: (val) => emit('update:isOpen', val),
-});
-
-const saleRentFilterOriginal = computed({
-  get: () => props.saleRentFilter,
-  set: (val) => emit('update:saleRentFilter', val),
-});
-
-const enquiriesFilterOriginal = computed({
-  get: () => props.enquiriesFilter,
-  set: (val) => emit('update:enquiriesFilter', val),
-});
-
-const sortOrderValueOriginal = computed({
-  get: () => props.sortOrderValue,
-  set: (val) => emit('update:sortOrderValue', val),
-});
-
-const activeTabOriginal = computed({
-  get: () => props.activeTab,
-  set: (val) => emit('update:activeTab', val),
-});
-
-const searchQueryOriginal = computed({
-  get: () => props.searchQuery,
-  set: (val) => emit('update:searchQuery', val),
-});
+  const isOpenOriginal = usePropModel(props, 'isOpen', emit);
+  const saleRentFilterOriginal = usePropModel(props, 'saleRentFilter', emit);
+  const enquiriesFilterOriginal = usePropModel(props, 'enquiriesFilter', emit);
+  const sortOrderValueOriginal = usePropModel(props, 'sortOrderValue', emit);
+  const activeTabOriginal = usePropModel(props, 'activeTab', emit);
+  const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);
 </script>

@@ -38,81 +38,99 @@
 </template>
 
 <script lang="ts" setup generic="T extends Record<string, any>">
+  const props = defineProps<{
+    items: T[];
+    dateKey?: keyof T;
+    enquiries?: boolean;
+    userId?: string | number;
+    view?: "grid" | "list";
+    activeTab?: "all" | "unread";
+  }>();
 
-const props = defineProps<{
-  items: T[];
-  dateKey?: keyof T;
-  enquiries?: boolean;
-  userId?: string | number;
-  view?: "grid" | "list";
-  activeTab?: "all" | "unread";
-}>();
+  const { allConversations, unreadConversationsCount } = useConversations();
 
-const { allConversations, loading, unreadConversationsCount } = useConversations();
+  const isOpen = ref(false);
+  const enableTransition = ref(true);
+  const isDesktop = useTailwindDesktop();
+  const { searchQuery, enquiriesFilter, enquiriesOptions, sortOrderValue, saleRentFilter, sortOrder, saleRentOptions, filteredItems } = useDashboardListFilter(toRef(props, "items"), {
+    dateKey: props.dateKey,
+    userId: toRef(props, "userId"),
+  });
 
-const isOpen = ref(false);
-const enableTransition = ref(true);
+  const emit = defineEmits<{
+    (e: "update:filtered", value: T[]): void;
+    (e: "update:view", value: "grid" | "list"): void;
+    (e: "update:activeTab", value: "all" | "unread"): void;
+  }>();
 
-const emit = defineEmits<{
-  (e: "update:filtered", value: T[]): void;
-  (e: "update:view", value: "grid" | "list"): void;
-  (e: "update:activeTab", value: "all" | "unread"): void;
-}>();
+  /**
+   * Active Tab
+   */
+  const activeTab = computed({
+    get: () => props.activeTab || "all",
+    set: (val) => emit("update:activeTab", val),
+  });
 
-const activeTab = computed({
-  get: () => props.activeTab || "all",
-  set: (val) => emit("update:activeTab", val),
-});
+  /**
+   * View Options
+   */
+  const viewOptions = [
+    {
+      label: "",
+      icon: "i-lucide-layout-grid",
+      value: "grid",
+    },
+    {
+      label: "",
+      icon: "i-lucide-list",
+      value: "list",
+    },
+  ];
 
-const viewOptions = [
-  {
-    label: "",
-    icon: "i-lucide-layout-grid",
-    value: "grid",
-  },
-  {
-    label: "",
-    icon: "i-lucide-list",
-    value: "list",
-  },
-];
+  /**
+   * Tab Items
+   */
+  const tabItems = [
+    { label: "All", value: "all", icon: "i-lucide-inbox" },
+    { label: "Unread", value: "unread", icon: "i-lucide-mail" },
+  ];
 
-const tabItems = [
-  { label: "All", value: "all", icon: "i-lucide-inbox" },
-  { label: "Unread", value: "unread", icon: "i-lucide-mail" },
-];
+  /**
+   * Active View
+   */
+  const activeView = computed({
+    get: () => props.view || "grid",
+    set: (val) => emit("update:view", val as "grid" | "list"),
+  });
 
-const activeView = computed({
-  get: () => props.view || "grid",
-  set: (val) => emit("update:view", val as "grid" | "list"),
-});
+  /**
+  * Watch Filtered Items
+  */
+  watch(
+    filteredItems,
+    (newVal) => {
+      emit("update:filtered", newVal);
+    },
+    { immediate: true }
+  );
 
-const { searchQuery, enquiriesFilter, enquiriesOptions, sortOrderValue, saleRentFilter, sortOrder, saleRentOptions, filteredItems } = useDashboardListFilter(toRef(props, "items"), {
-  dateKey: props.dateKey,
-  userId: toRef(props, "userId"),
-});
+  /**
+   * Watch isDesktop
+   */
+  watch(isDesktop, (val) => {
+    if (val) {
+      enableTransition.value = false;
+      isOpen.value = false;
+      nextTick(() => {
+        enableTransition.value = true;
+      });
+    }
+  });
 
-// Emit the filtered results back to the parent whenever they change
-watch(
-  filteredItems,
-  (newVal) => {
-    emit("update:filtered", newVal);
-  },
-  { immediate: true }
-);
-
-const isDesktop = useTailwindDesktop();
-watch(isDesktop, (val) => {
-  if (val) {
-    enableTransition.value = false;
-    isOpen.value = false;
-    nextTick(() => {
-      enableTransition.value = true;
-    });
-  }
-});
-
-defineExpose({
-  close: () => isOpen.value = false
-});
+  /**
+   * Expose Close Method
+   */
+  defineExpose({
+    close: () => isOpen.value = false
+  });
 </script>

@@ -92,9 +92,12 @@
   </UPageColumns>
 </template>
 <script lang="ts" setup>
-const { analytics, isAnalyticsLoading: isLoading } = useAnalytics();
+  const { analytics, isAnalyticsLoading: isLoading } = useAnalytics();
 
-const totalListingViews = computed(() => {
-  return analytics.value?.totalViews || 0;
-});
+  /**
+   * Total Listing Views Computed
+   */
+  const totalListingViews = computed(() => {
+    return analytics.value?.totalViews || 0;
+  });
 </script>

@@ -74,89 +74,125 @@
 </template>
 
 <script setup lang="ts">
-import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
+  import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
+  import type { User } from '#auth-utils'
 
-const props = defineProps<{
-  open: boolean
-  conversation: any // ConversationWithUserAndMessages
-  user: any
-}>()
+  /**
+   * Application Composables
+   */
+  const { sendReply, markMessageAsRead } = useConversations();
+  const breakpoints = useBreakpoints(breakpointsTailwind);
+  const activeBreakpoints = breakpoints.active();
 
-const emit = defineEmits<{
-  (e: 'update:open', value: boolean): void
-}>()
+  /**
+   * Props & Emits
+   */
+  const props = defineProps<{
+    open: boolean;
+    conversation: ConversationWithUserAndMessages;
+    user: User | null;
+  }>();
 
-const isOpen = computed({
-  get: () => props.open,
-  set: (val) => emit('update:open', val)
-})
+  const emit = defineEmits<{
+    (e: 'update:open', value: boolean): void;
+  }>();
 
-const { sendReply, markMessageAsRead } = useConversations();
-const messageContent = ref("");
-const chatContainer = ref<HTMLElement | null>(null);
-
-const breakpoints = useBreakpoints(breakpointsTailwind);
-const activeBreakpoints = breakpoints.active();
-
-const isMobile = computed(() => {
-  return !activeBreakpoints.value.includes("md") && !activeBreakpoints.value.includes("lg") && !activeBreakpoints.value.includes("xl") && !activeBreakpoints.value.includes("2xl");
-});
-
-const messages = computed(() => {
-  return props.conversation?.messages || [];
-});
-
-function scrollToBottom() {
-  nextTick(() => {
-    if (chatContainer.value) {
-      chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-    }
-  });
-}
-
-async function handleSendMessage() {
-  if (!messageContent.value.trim() || !props.conversation?.id) return;
-
-  try {
-    await sendReply(props.conversation.id, messageContent.value);
-    messageContent.value = "";
-    console.log("Message sent");
-  } catch (e) {
-    console.error("Failed to send message", e);
-  }
-}
-
-watch(
-  () => messages.value.length,
-  () => {
-    scrollToBottom();
-  }
-);
-
-// Scroll to bottom when opening
-watch(
-  () => props.open,
-  (newVal) => {
-    if (newVal) {
-      scrollToBottom();
-      markMessagesAsRead();
-    }
-  }
-)
-
-function markMessagesAsRead() {
-  if (!props.conversation?.messages || !props.conversation?.id || !props.user?.id) return;
+  /**
+   * Component State
+   */
+  const messageContent = ref("");
+  const chatContainer = ref<HTMLElement | null>(null);
   
-  const unreadMessages = props.conversation.messages.filter(
-    (message: any) => !message.isRead && message.receiverId === props.user.id
+  /**
+   * Computed Properties
+   */
+  const isOpen = usePropModel(props, 'open', emit);
+
+  /**
+   * Determines if the current viewport is mobile size
+   */
+  const isMobile = computed(() => {
+    return !activeBreakpoints.value.includes("md") && !activeBreakpoints.value.includes("lg") && !activeBreakpoints.value.includes("xl") && !activeBreakpoints.value.includes("2xl");
+  });
+
+  /**
+   * Computed list of messages from the conversation
+   */
+  const messages = computed(() => {
+    return props.conversation?.messages || [];
+  });
+
+  /**
+   * Component Methods
+   */
+
+  /**
+   * Scrolls the chat container to the bottom
+   */
+  function scrollToBottom() {
+    nextTick(() => {
+      if (chatContainer.value) {
+        chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+      }
+    });
+  }
+
+  /**
+   * Sends a reply message to the current conversation
+   */
+  async function handleSendMessage() {
+    if (!messageContent.value.trim() || !props.conversation?.id) return;
+
+    try {
+      await sendReply(props.conversation.id, messageContent.value);
+      messageContent.value = "";
+      console.log("Message sent");
+    } catch (e) {
+      console.error("Failed to send message", e);
+    }
+  }
+
+  /**
+   * Marks all unread messages from the other user as read
+   */
+  async function markMessagesAsRead() {
+    if (!props.conversation?.messages || !props.conversation?.id || !props.user?.id) return;
+    
+    // Using any for message temporarily as message types might be loose
+    const unreadMessages = props.conversation.messages.filter(
+      (message: any) => !message.isRead && message.receiverId === props.user!.id
+    );
+
+    // Process all mark-as-read operations
+    await Promise.all(unreadMessages.map(async (message: any) => {
+      try {
+        await markMessageAsRead(message.id, props.conversation.id);
+      } catch (e) {
+        console.error(`Failed to mark message ${message.id} as read`, e);
+      }
+    }));
+  }
+
+  /**
+   * Watchers
+   */
+
+  // Scroll to bottom when new messages arrive
+  watch(
+    () => messages.value.length,
+    () => {
+      scrollToBottom();
+    }
   );
 
-  unreadMessages.forEach(async (message: any) => {
-    try {
-      await markMessageAsRead(message.id, props.conversation.id);
-    } catch (e) {
-      console.error(`Failed to mark message ${message.id} as read`, e);
+  // Initialize view when modal opens
+  watch(
+    () => props.open,
+    (newVal) => {
+      if (newVal) {
+        scrollToBottom();
+        markMessagesAsRead();
+      }
     }
-  });
-}
+  );
 </script>

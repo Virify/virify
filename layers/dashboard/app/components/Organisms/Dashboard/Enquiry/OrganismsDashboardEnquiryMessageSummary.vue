@@ -41,12 +41,14 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  enquiry: any,
-  user: any
-}>()
+  import type { User } from '#auth-utils'
 
-const unreadCount = computed(() => getUnreadCount(props.enquiry, props.user?.id));
+  const props = defineProps<{
+    enquiry: ConversationWithUserAndMessages,
+    user: User | null,
+  }>()
 
-defineEmits(['reply'])
+  const unreadCount = computed(() => getUnreadCount(props.enquiry, props.user?.id));
+
+  defineEmits(['reply'])
 </script>

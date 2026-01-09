@@ -41,13 +41,15 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  enquiry: any, // ConversationWithUserAndMessages
-  user: any
-}>()
+  import type { User } from '#auth-utils'
 
-defineEmits<{
-  (e: 'click'): void
-  (e: 'reply', enquiry: any): void
-}>()
+  defineProps<{
+    enquiry: ConversationWithUserAndMessages,
+    user: User | null,
+  }>()
+
+  defineEmits<{
+    (e: 'click'): void
+    (e: 'reply', enquiry: any): void
+  }>()
 </script>

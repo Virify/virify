@@ -24,22 +24,23 @@
           <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
         </div>
       </OrganismsDashboardListingCardGrid> 
-      <OrganismsDashboardNoResults v-else :description="'No notes found matching your criteria.'" />
+      <OrganismsDashboardNoResults v-else :description="'No Notes found.'" />
     </template>
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
   definePageMeta({
-  middleware: ["authenticated"],
-  head: {
-    title: "Your Notes",
-    icon: 'i-lucide-sticky-note',
-  },
-  layout: "dashboard",
-});
+    middleware: ["authenticated"],
+    head: {
+      title: "Your Notes",
+      icon: 'i-lucide-sticky-note',
+    },
+    layout: "dashboard",
+  });
+
   const { userNotes, isLoading } = useNotes()
   const { setGroups } = useDashboardSearch()
-  
+
   const filteredUserNotes = ref<typeof userNotes.value>([])
 
   watch(userNotes, () => {

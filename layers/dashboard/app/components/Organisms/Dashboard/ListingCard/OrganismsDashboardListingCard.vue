@@ -25,7 +25,7 @@
         <div class="flex justify-between items-start">
           <p class="body-sm">
             <span class="font-bold body-md">
-              {{ formattedPrice(listing) }}
+              {{ formatCurrency(listing.price) }}
             </span>
               / {{ convertEnumToCapalizedString(listing.saleListing?.priceType || listing.rentalListing?.rentFrequency || '') }}
           </p>
@@ -128,42 +128,43 @@
   </UPageCard>
 </template>
 <script lang="ts" setup>
-const  { removeFromFavourite } = useFavourites()
-const { getNoteData, showNoteDialog } = useNotes()
+  const  { removeFromFavourite } = useFavourites()
+  const { getNoteData, showNoteDialog } = useNotes()
 
-interface Props {
-  listing: ListingCardType
-  fav?: string | Date
-  note?: string | Date
-}
-
-const props= defineProps<Props>()
-
-const note = computed(() => {
-  return getNoteData(props.listing?.id!)
-})
-
-const showFavDate = computed(() => {
-  return props.fav as Date
-})
-
-const showNotesDate = computed(() => {
-  return props.note as Date
-})
-
-function formattedPrice(listing: any): string {
-  if (!listing || !listing.price) {
-    return 'Price not available';
+  interface Props {
+    listing: ListingCardType
+    fav?: string | Date
+    note?: string | Date
   }
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    maximumFractionDigits: 0,
-  }).format(listing.price);
-}
+  const props= defineProps<Props>()
 
-const formattedAddress = (address: any): string => {
-  if (!address) return '';
-  return address.street + ", " + address.city + ", " + address.postcode.split(" ")[0]
-};
+    /**
+     * Get Note Data
+     */
+  const note = computed(() => {
+    return getNoteData(props.listing?.id!)
+  })
+
+  /**
+   * Show Favourite Date
+   */
+  const showFavDate = computed(() => {
+    return props.fav as Date
+  })
+
+  /**
+   * Show Notes Date
+   */
+  const showNotesDate = computed(() => {
+    return props.note as Date
+  })
+
+  /**
+   * Format Address
+   * @param address String
+   */
+  const formattedAddress = (address: any): string => {
+    if (!address) return '';
+    return address.street + ", " + address.city + ", " + address.postcode.split(" ")[0]
+  };
 </script>

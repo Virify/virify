@@ -55,10 +55,8 @@
     </p>
   </div>
 </template>
-
 <script setup lang="ts">
-
-defineProps<{
-  listing: any
-}>()
+  defineProps<{
+    listing: any
+  }>()
 </script>

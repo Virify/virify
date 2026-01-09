@@ -1,20 +1,40 @@
 import { refDebounced } from "@vueuse/core"
 
+/**
+ * Filter and sort a list of items for the dashboard
+ * 
+ * Includes support for:
+ * - Text search (fuzzy matching on searchable fields)
+ * - Date sorting (Newest/Oldest)
+ * - Category filtering (Sale/Rent)
+ * - Enquiry status/type filtering (Sent/Received/My Enquiries)
+ * 
+ * @param items List of items to filter
+ * @param options Configuration options
+ */
 export const useDashboardListFilter = <T extends Record<string, any>>(
   items: Ref<T[]>,
   options: {
+    /** Key to use for date sorting. Defaults to 'createdAt' */
     dateKey?: keyof T
+    /** Current user ID for 'My Enquiries' filtering */
     userId?: string | Ref<string | undefined>
   } = {}
 ) => {
   const { dateKey = 'createdAt', userId } = options
 
+  /**
+   * State
+   */
   const searchQuery = ref('')
   const debouncedSearchQuery = refDebounced(searchQuery, 300)
   const sortOrderValue = ref('Newest')
   const saleRentFilter = ref('All')
   const enquiriesFilter = ref('All')
 
+  /**
+   * Options configuration
+   */
   const sortOrder = [
     {
       label: 'Newest',
@@ -39,6 +59,9 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     { label: 'My Enquiries', value: 'My Enquiries', icon: 'i-lucide-mail' }
   ]
 
+  /**
+   * Computed list of filtered items
+   */
   const filteredItems = computed(() => {
     const query = debouncedSearchQuery.value.toLowerCase()
     const sortVal = sortOrderValue.value

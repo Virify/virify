@@ -24,25 +24,25 @@
           <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
         </div>
       </OrganismsDashboardListingCardGrid>
-      <OrganismsDashboardNoResults v-else :description="'No favourites found matching your criteria.'" />
+      <OrganismsDashboardNoResults v-else :description="'No Favourites found.'" />
     </template>
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
   definePageMeta({
-  middleware: ["authenticated"],
-  head: {
-    title: "Your Favourites",
-    icon: 'i-lucide-heart',
-  },
-  layout: "dashboard",
-});
+    middleware: ["authenticated"],
+    head: {
+      title: "Your Favourites",
+      icon: 'i-lucide-heart',
+    },
+    layout: "dashboard",
+  });
 
-const { favourites, isLoading } = useFavourites()
-const { setGroups } = useDashboardSearch()
-const favouritesFiltered = ref<typeof favourites.value>([])
+  const { favourites, isLoading } = useFavourites()
+  const { setGroups } = useDashboardSearch()
+  const favouritesFiltered = ref<typeof favourites.value>([])
 
-watch(favourites, () => {
-  setGroups(generateDashboardSearchGroups(favourites.value, 'favourites'))
-}, { immediate: true })
+  watch(favourites, () => {
+    setGroups(generateDashboardSearchGroups(favourites.value, 'favourites'))
+  }, { immediate: true })
 </script>

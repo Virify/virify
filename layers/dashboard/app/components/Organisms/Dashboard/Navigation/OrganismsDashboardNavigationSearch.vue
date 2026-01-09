@@ -14,9 +14,7 @@
 </template>
 <script lang="ts" setup>
 import { TooltipProvider } from 'reka-ui';
-interface Props {
-  title: string;
-}
-
-defineProps<Props>();
+  defineProps<{
+    title: string;
+  }>()
 </script>

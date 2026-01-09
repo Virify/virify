@@ -141,61 +141,41 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  enquiries?: boolean;
-  saleRentFilter: any;
-  saleRentOptions: any[];
-  enquiriesFilter: any;
-  enquiriesOptions: any[];
-  sortOrderValue: string;
-  sortOrder: any[];
-  activeTab: string;
-  tabItems: any[];
-  allConversationsCount: number;
-  unreadConversationsCount: number;
-  searchQuery: string;
-  view?: "grid" | "list";
-  activeView: string;
-  viewOptions: any[];
-}>();
+  const props = defineProps<{
+    enquiries?: boolean;
+    saleRentFilter: any;
+    saleRentOptions: any[];
+    enquiriesFilter: any;
+    enquiriesOptions: any[];
+    sortOrderValue: string;
+    sortOrder: any[];
+    activeTab: string;
+    tabItems: any[];
+    allConversationsCount: number;
+    unreadConversationsCount: number;
+    searchQuery: string;
+    view?: "grid" | "list";
+    activeView: string;
+    viewOptions: any[];
+  }>();
 
-const emit = defineEmits<{
-  (e: 'update:saleRentFilter', value: any): void;
-  (e: 'update:enquiriesFilter', value: any): void;
-  (e: 'update:sortOrderValue', value: string): void;
-  (e: 'update:activeTab', value: string): void;
-  (e: 'update:searchQuery', value: string): void;
-  (e: 'update:activeView', value: string): void;
-}>();
+  const emit = defineEmits<{
+    (e: 'update:saleRentFilter', value: any): void;
+    (e: 'update:enquiriesFilter', value: any): void;
+    (e: 'update:sortOrderValue', value: string): void;
+    (e: 'update:activeTab', value: string): void;
+    (e: 'update:searchQuery', value: string): void;
+    (e: 'update:activeView', value: string): void;
+  }>();
 
-const saleRentFilterOriginal = computed({
-  get: () => props.saleRentFilter,
-  set: (val) => emit('update:saleRentFilter', val),
-});
-
-const enquiriesFilterOriginal = computed({
-  get: () => props.enquiriesFilter,
-  set: (val) => emit('update:enquiriesFilter', val),
-});
-
-const sortOrderValueOriginal = computed({
-  get: () => props.sortOrderValue,
-  set: (val) => emit('update:sortOrderValue', val),
-});
-
-const activeTabOriginal = computed({
-  get: () => props.activeTab,
-  set: (val) => emit('update:activeTab', val),
-});
-
-const searchQueryOriginal = computed({
-  get: () => props.searchQuery,
-  set: (val) => emit('update:searchQuery', val),
-});
-
-const activeViewOriginal = computed({
-  get: () => props.activeView,
-  set: (val) => emit('update:activeView', val),
-});
+  /**
+   * Computed Bindings for v-model Props
+   */
+  const saleRentFilterOriginal = usePropModel(props, 'saleRentFilter', emit);
+  const enquiriesFilterOriginal = usePropModel(props, 'enquiriesFilter', emit);
+  const sortOrderValueOriginal = usePropModel(props, 'sortOrderValue', emit);
+  const activeTabOriginal = usePropModel(props, 'activeTab', emit);
+  const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);
+  const activeViewOriginal = usePropModel(props, 'activeView', emit);
 
 </script>

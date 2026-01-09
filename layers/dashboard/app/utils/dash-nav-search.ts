@@ -1,5 +1,9 @@
-
-export const formatDashboardLabel = (listing: any) => {
+/**
+ * Format dashboard listing label
+ * @param listing 
+ * @returns Formatted label string
+ */
+export const formatDashboardLabel = (listing: any): string => {
   const price = listing.price || 0
   const formattedPrice = numberToCurrency(typeof price === 'number' ? price : 0)
   const address = listing.property?.address
@@ -9,7 +13,13 @@ export const formatDashboardLabel = (listing: any) => {
   return `Price: ${formattedPrice}, ${addressString}`
 }
 
-export const generateDashboardSearchGroups = (items: any[], type: 'favourites' | 'notes') => {
+/**
+ * Generate dashboard search groups for favourites or notes
+ * @param items 
+ * @param type 
+ * @returns 
+ */
+export const generateDashboardSearchGroups = (items: any[], type: 'favourites' | 'notes'): any[] => {
   const isNotes = type === 'notes'
   
   const salesItems: any[] = []

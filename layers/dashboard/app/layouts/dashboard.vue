@@ -22,14 +22,12 @@
   <MoleculesToastContainer />
 </template>
 <script lang="ts" setup>
+  const { fetchUserItemsAggregates } = useNotifications()
+  const { groups } = useDashboardSearch()
 
-const { fetchUserItemsAggregates } = useNotifications()
-const { groups } = useDashboardSearch()
-
-
-onMounted(async () => {
-  await fetchUserItemsAggregates()
-})
+  onMounted(async () => {
+    await fetchUserItemsAggregates()
+  })
 </script>
 <style lang="scss">
   @media (min-width: 2560px) {

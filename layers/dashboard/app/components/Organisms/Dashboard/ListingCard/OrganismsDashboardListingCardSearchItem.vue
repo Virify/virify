@@ -26,8 +26,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-interface Props {
-  item: DashboardSearchItem;
-}
-defineProps<Props>();
+  defineProps<{
+    item: DashboardSearchItem
+  }>();
 </script>

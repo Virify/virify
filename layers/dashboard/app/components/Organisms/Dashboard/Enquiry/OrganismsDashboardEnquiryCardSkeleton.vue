@@ -58,9 +58,9 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
-  cards?: number
-}>(), {
-  cards: 3
-})
+  withDefaults(defineProps<{
+    cards?: number
+  }>(), {
+    cards: 3
+  })
 </script>

@@ -63,44 +63,43 @@
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
-import type { AccordionItem } from '@nuxt/ui';
-const { user } = useUserSession()
+  import type { AccordionItem } from '@nuxt/ui';
 
-definePageMeta({
-  middleware: ["authenticated"],
-  head: {
-    title: "Home",
-    icon: 'i-lucide-home',
-  },
-  layout: "dashboard",
-});
+  definePageMeta({
+    middleware: ["authenticated"],
+    head: {
+      title: "Home",
+      icon: 'i-lucide-home',
+    },
+    layout: "dashboard",
+  });
 
-const { recentlyViewedListings, isAnalyticsLoading } = useAnalytics()
-const { recentFavourites, isLoading: isFavouritesLoading } = useFavourites()
-const { recentUserNotes, isLoading: isNotesLoading } = useNotes()
+  const { user } = useUserSession()
+  const { recentlyViewedListings, isAnalyticsLoading } = useAnalytics()
+  const { recentFavourites, isLoading: isFavouritesLoading } = useFavourites()
+  const { recentUserNotes, isLoading: isNotesLoading } = useNotes()
 
-
-const accordionItems: AccordionItem[] = [
-  {
-    id: useId(),
-    label: 'Recent Favourite Listings',
-    icon: 'i-lucide-heart',
-    slot: 'favourite-listings',
-    value: 'favourite-listings',
-  },
-  {
-    id: useId(),
-    label: 'Recent Notes Added',
-    icon: 'i-lucide-sticky-note',
-    slot: 'notes-added',
-    value: 'notes-added',
-  },
-  {
-    id: useId(),
-    label: 'Viewed Listings',
-    icon: 'i-lucide-eye',
-    slot: 'viewed-listings',
-    value: 'viewed-listings',
-  },
-];
+  const accordionItems: AccordionItem[] = [
+    {
+      id: useId(),
+      label: 'Recent Favourite Listings',
+      icon: 'i-lucide-heart',
+      slot: 'favourite-listings',
+      value: 'favourite-listings',
+    },
+    {
+      id: useId(),
+      label: 'Recent Notes Added',
+      icon: 'i-lucide-sticky-note',
+      slot: 'notes-added',
+      value: 'notes-added',
+    },
+    {
+      id: useId(),
+      label: 'Viewed Listings',
+      icon: 'i-lucide-eye',
+      slot: 'viewed-listings',
+      value: 'viewed-listings',
+    },
+  ];
 </script>
