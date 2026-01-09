@@ -84,7 +84,7 @@ export const getActionItemsBuilder = () => {
       items.push({
         id: 'account',
         label: 'Account',
-        href: '/account',
+        href: '/dashboard',
         type: 'link',
         requiresAuth: true
       }),

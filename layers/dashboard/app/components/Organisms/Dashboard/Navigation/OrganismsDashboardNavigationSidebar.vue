@@ -7,6 +7,7 @@
       side="left"
       toggle-side="right"
       :min-size="300"
+      :default-size="300"
       :max-size="400"
       class="border-0 ring-0"
       :ui="{
@@ -117,4 +118,9 @@
 <script lang="ts" setup>
   import { TooltipProvider } from 'reka-ui';
   const { dashboardNavigationitems } = useDashboardNavigation();
+  const { clear } = useUserSession();
+  const logout = () => {
+    clear();
+    navigateTo('/login');
+  };
 </script>
