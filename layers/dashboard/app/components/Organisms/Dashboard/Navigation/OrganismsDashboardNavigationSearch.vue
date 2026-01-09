@@ -1,5 +1,5 @@
 <template>
-  <UDashboardNavbar :title="title" class="body-sm border-0" :ui="{
+  <UDashboardNavbar :title="title" class="body-sm border-0 px-3" :ui="{
     title: 'title-sm m-0!',
     icon: 'text-secondary',
   }">

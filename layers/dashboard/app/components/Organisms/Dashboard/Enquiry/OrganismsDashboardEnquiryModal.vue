@@ -18,12 +18,13 @@
             :variant="isMessageFromUser(message, user?.id!) ? 'soft' : 'subtle'"
             :key="message.id"
             :side="isMessageFromUser(message, user?.id!) ? 'left' : 'right'"
+            role="user"
             :parts="[
               {
                 text: message.content,
               },
             ]"
-            :id="message.id"
+            :id="String(message.id)"
             :ui="{
               container: 'pb-1',
               content: 'text-white min-w-60' + (isMessageFromUser(message, user?.id!) ? ' bg-secondary/90' : ' bg-primary/100'),

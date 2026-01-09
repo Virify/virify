@@ -10,7 +10,7 @@
         <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
           {{ isLastMessageFromCurrentUser(enquiry, user?.id) ? 'You' : (getConversationOtherUser(enquiry, user?.id).username || formatPartnerName(getConversationOtherUser(enquiry, user?.id).email || 'Them')) }}
         </p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 break-all">
           {{ getLastMessageContent(enquiry) }}
         </p>
       </div>
@@ -41,8 +41,6 @@
 </template>
 
 <script setup lang="ts">
-// Assuming utils are auto-imported. If not, we might need imports.
-// isLastMessageFromCurrentUser, getConversationOtherUser, formatPartnerName, getLastMessageContent, getUnreadCount
 const props = defineProps<{
   enquiry: any,
   user: any

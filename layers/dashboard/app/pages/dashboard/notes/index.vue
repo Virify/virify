@@ -1,15 +1,21 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <OrganismsDashboardNavigationSearch :title="'Your Notes'" />
+      <UDashboardNavbar title="Your Notes" class="body-sm border-0 px-3" :ui="{
+        title: 'title-sm m-0!',
+        icon: 'text-secondary',
+      }">
+        <template #right>
+          <OrganismsDashboardFilter
+            :items="userNotes"
+            :date-key="'updatedAt'"
+            @update:filtered="filteredUserNotes = $event"
+          />
+        </template>
+      </UDashboardNavbar>
     </template>
 
     <template #body>
-      <OrganismsDashboardFilter
-        :items="userNotes"
-        :date-key="'updatedAt'"
-        @update:filtered="filteredUserNotes = $event"
-      />
       <OrganismsDashboardListingCardGrid v-if="isLoading">
         <OrganismsDashboardListingCardSkeleton :cards="3"/>
       </OrganismsDashboardListingCardGrid>

@@ -1,26 +1,21 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :title="($route.meta.head as any)?.title || 'Your Notes'"
-        class="body-sm border-0"
-        :ui="{
-          title: 'title-sm m-0!',
-          icon: 'text-secondary',
-        }"
-      >
+      <UDashboardNavbar title="Your Favourites" class="body-sm border-0 px-3" :ui="{
+        title: 'title-sm m-0!',
+        icon: 'text-secondary',
+      }">
         <template #right>
-          <UDashboardSearchButton color="neutral" variant="outline" block class="w-full!" label="Search..." />
+          <OrganismsDashboardFilter
+            :items="favourites"
+            :date-key="'createdAt'"
+            @update:filtered="favouritesFiltered = $event"
+          />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <OrganismsDashboardFilter
-        :items="favourites"
-        :date-key="'createdAt'"
-        @update:filtered="favouritesFiltered = $event"
-      />
       <OrganismsDashboardListingCardGrid v-if="isLoading">
         <OrganismsDashboardListingCardSkeleton :cards="3"/>
       </OrganismsDashboardListingCardGrid>

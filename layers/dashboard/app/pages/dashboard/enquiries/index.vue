@@ -1,43 +1,31 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar class="body-sm border-0" :ui="{
+      <UDashboardNavbar class="border-0" :ui="{
         title: 'title-sm m-0!',
-        icon: 'text-secondary',
+        right: 'flex items-center gap-4',
       }">
         <template #title>
           Your Enquiries
         </template>
+
         <template #right>
-          <UTabs :items="tabItems" default-value="all" size="sm" class="w-full" :content="false" v-model="activeTab" color="secondary" :ui="{
-            trigger: 'data-[state=active]:text-white!',
-            label: 'body-xs',
-            
-          }">
-            <template #trailing="{ item }">
-              <UBadge
-                :label="item.value === 'all' ? allConversations.length : unreadConversationsCount" 
-                variant="solid"
-                color="secondary"
-                size="md"
-                :ui="{
-                  base: 'border-1 border-white text-white',
-                }"
-              />
-            </template>
-          </UTabs>
+          <OrganismsDashboardFilter
+            :items="filteredConversations"
+            :date-key="'updatedAt'"
+            enquiries
+            :user-id="user?.id"
+            v-model:view="view"
+            @update:filtered="sortedAndFilteredConversations = $event"
+          />
         </template>
       </UDashboardNavbar>
     </template>
     <template #body>
-      <OrganismsDashboardFilter
-        :items="filteredConversations"
-        :date-key="'updatedAt'"
-        enquiries
-        :user-id="user?.id"
-        @update:filtered="sortedAndFilteredConversations = $event"
-      />
-      <UPageList divide class="gap-4">
+      <UPageList divide :class="[
+        'gap-4',
+        view === 'grid' && (loading || sortedAndFilteredConversations.length > 0) ? 'grid grid-cols-1 xl:grid-cols-2' : ''
+      ]">
         <template v-if="loading">
           <OrganismsDashboardEnquiryCardSkeleton :cards="3" />
         </template>
@@ -79,13 +67,15 @@ const open = ref(false);
 const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
 const activeTab = ref<"all" | "unread">("all");
 const sortedAndFilteredConversations = ref<ConversationWithUserAndMessages[]>([]);
+const view = ref<'grid' | 'list'>('grid');
 
 const filteredConversations = computed(() => {
   if (activeTab.value === "all") {
     return allConversations.value;
   } else {
     return allConversations.value.filter((convo: ConversationWithUserAndMessages) => 
-      getUnreadCount(convo, user.value?.id) > 0
+      // Optimization: Use .some() instead of counting all unread messages
+      convo.messages?.some(m => !m.isRead && String(m.receiverId) === String(user.value?.id))
     );
   }
 });

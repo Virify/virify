@@ -12,51 +12,40 @@ export const formatDashboardLabel = (listing: any) => {
 export const generateDashboardSearchGroups = (items: any[], type: 'favourites' | 'notes') => {
   const isNotes = type === 'notes'
   
-  const salesItems = items
-    .filter(item => item.listing?.saleListing)
-    .map(item => {
-      const listing = item.listing!
-      return {
-        id: listing.id,
-        label: formatDashboardLabel(listing),
-        icon: isNotes ? 'i-lucide-sticky-note' : 'i-heroicons-heart',
-        to: `/listing/${listing.id}`,
-        target: '_blank',
-        note: item.note,
-        // Suffix is a hidden search field containing all searchable text
-        suffix: [item.note, listing.property?.address?.fullAddress, listing.property?.numberBedrooms + ' beds', listing.property?.numberBathrooms + ' baths'].filter(Boolean).join(' '),
-        image: listing.property?.media?.[0]?.src || '',
-        itemPrice: listing.price || listing.saleListing?.price || 0,
-        address: listing.property?.address,
-        specs: {
-          beds: listing.property?.numberBedrooms || 0,
-          baths: listing.property?.numberBathrooms || 0
-        }
-      }
-    })
+  const salesItems: any[] = []
+  const rentalItems: any[] = []
 
-  const rentalItems = items
-    .filter(item => item.listing?.rentalListing)
-    .map(item => {
-      const listing = item.listing!
-      return {
-        id: listing.id,
-        label: formatDashboardLabel(listing),
-        icon: isNotes ? 'i-lucide-sticky-note' : 'i-heroicons-heart',
-        to: `/listing/${listing.id}`,
-        target: '_blank',
-        note: item.note,
-        // Suffix is a hidden search field containing all searchable text
-        suffix: [item.note, listing.property?.address?.fullAddress, listing.property?.numberBedrooms + ' beds', listing.property?.numberBathrooms + ' baths'].filter(Boolean).join(' '),
-        image: listing.property?.media?.[0]?.src || '',
-        itemPrice: listing.price || listing.rentalListing?.price || 0,
-        address: listing.property?.address,
-        specs: {
-          beds: listing.property?.numberBedrooms || 0,
-          baths: listing.property?.numberBathrooms || 0
-        }
+  // Single pass through items
+  for (const item of items) {
+    const listing = item.listing
+    if (!listing) continue
+
+    const isSale = !!listing.saleListing
+    const isRent = !!listing.rentalListing
+
+    if (!isSale && !isRent) continue
+
+    const mappedItem = {
+      id: listing.id,
+      label: formatDashboardLabel(listing),
+      icon: isNotes ? 'i-lucide-sticky-note' : 'i-heroicons-heart',
+      to: `/listing/${listing.id}`,
+      target: '_blank',
+      note: item.note,
+      // Suffix is a hidden search field containing all searchable text
+      suffix: [item.note, listing.property?.address?.fullAddress, listing.property?.numberBedrooms + ' beds', listing.property?.numberBathrooms + ' baths'].filter(Boolean).join(' '),
+      image: listing.property?.media?.[0]?.src || '',
+      itemPrice: listing.price || (isSale ? listing.saleListing?.price : listing.rentalListing?.price) || 0,
+      address: listing.property?.address,
+      specs: {
+        beds: listing.property?.numberBedrooms || 0,
+        baths: listing.property?.numberBathrooms || 0
       }
-    })
+    }
+
+    if (isSale) salesItems.push(mappedItem)
+    if (isRent) rentalItems.push(mappedItem)
+  }
 
   const prefix = isNotes ? 'Notes' : 'Favourites'
   const idPrefix = isNotes ? 'notes' : 'favourites'

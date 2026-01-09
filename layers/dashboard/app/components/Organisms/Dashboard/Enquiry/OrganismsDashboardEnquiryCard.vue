@@ -2,9 +2,9 @@
   <UPageCard
     variant="outline"
     :ui="{
-      root: 'cursor-pointer gap-2!',
+      root: 'cursor-pointer gap-2! h-full',
       header: 'body-sm w-full flex justify-between items-center mb-2',
-      body: 'w-full',
+      body: 'w-full flex-1',
       container: 'p-4!',
     }"
     @click="$emit('click')"
@@ -22,7 +22,7 @@
       <p class="self-end">{{ formatMessageTimestamp(enquiry.updatedAt) }}</p>
     </template>
     <template #body>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+      <div class="flex flex-col gap-4 w-full h-full">
         <!-- Column 1: Listing Card -->
         <OrganismsDashboardListingCardEnquiry 
           :listing="enquiry.listing" 
@@ -30,6 +30,7 @@
 
         <!-- Column 2: Last Message and Reply Button -->
         <OrganismsDashboardEnquiryMessageSummary
+          class="flex-1"
           :enquiry="enquiry"
           :user="user"
           @reply="$emit('reply', $event)"

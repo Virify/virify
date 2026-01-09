@@ -4,10 +4,10 @@
       <UDashboardNavbar
         :title="($route.meta.head as any)?.title || 'Dashboard'"
         :icon="($route.meta.head as any)?.icon"
-        toggle-side="right"
+        toggle-side="left"
         class="body-sm border-0"
         :ui="{
-          icon: 'text-secondary',
+          icon: 'text-primary',
           title: 'font-bold',
         }"
       />

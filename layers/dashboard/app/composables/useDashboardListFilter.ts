@@ -1,3 +1,5 @@
+import { refDebounced } from "@vueuse/core"
+
 export const useDashboardListFilter = <T extends Record<string, any>>(
   items: Ref<T[]>,
   options: {
@@ -8,6 +10,7 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   const { dateKey = 'createdAt', userId } = options
 
   const searchQuery = ref('')
+  const debouncedSearchQuery = refDebounced(searchQuery, 300)
   const sortOrderValue = ref('Newest')
   const saleRentFilter = ref('All')
   const enquiriesFilter = ref('All')
@@ -37,20 +40,27 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   ]
 
   const filteredItems = computed(() => {
-    // Start with a copy to avoid mutating the original array
-    let filtered = [...items.value]
-
-    // Filter by Search Query
-    if (searchQuery.value) {
-      const query = searchQuery.value.toLowerCase()
-      filtered = filtered.filter((item) => {
+    const query = debouncedSearchQuery.value.toLowerCase()
+    const sortVal = sortOrderValue.value
+    const filterVal = saleRentFilter.value
+    const enquiryVal = enquiriesFilter.value
+    const curUserId = unref(userId)
+    
+    // Single pass filtering
+    const filtered = items.value.filter((item) => {
+      // 1. Search Logic
+      if (query) {
         const listing = item.listing
         if (!listing) return false
 
         // Address search (checking common address fields)
         const address = listing.property?.address
-        const addressMatch = address ? Object.values(address).some(val => 
-          typeof val === 'string' && val.toLowerCase().includes(query)
+        // Optimization: check specific fields instead of Object.values which creates arrays
+        const addressMatch = address ? (
+          (typeof address.fullAddress === 'string' && address.fullAddress.toLowerCase().includes(query)) ||
+          Object.values(address).some(val => 
+            typeof val === 'string' && val.toLowerCase().includes(query)
+          )
         ) : false
 
         // Price search
@@ -62,36 +72,36 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
         const typeMatch = priceType?.toLowerCase().includes(query)
 
         // Note search
-        // Check both direct string and object.note pattern
         const noteContent = (item as any).note
         const noteMatch = typeof noteContent === 'string' 
           ? noteContent.toLowerCase().includes(query)
           : noteContent?.note?.toLowerCase().includes(query)
 
-        return addressMatch || priceMatch || typeMatch || noteMatch
-      })
-    }
+        if (!(addressMatch || priceMatch || typeMatch || noteMatch)) return false
+      }
 
-    // Filter by Sale/Rent
-    if (saleRentFilter.value === 'Sale') {
-      filtered = filtered.filter((item) => item.listing?.saleListing)
-    }
-    else if (saleRentFilter.value === 'Rent') {
-      filtered = filtered.filter((item) => item.listing?.rentalListing)
-    }
+      // 2. Sale/Rent Filter
+      if (filterVal === 'Sale' && !item.listing?.saleListing) return false
+      if (filterVal === 'Rent' && !item.listing?.rentalListing) return false
 
-    // Filter by Enquiries (Sent / Received)
-    const curUserId = unref(userId)
-    if (curUserId) {
-      filtered = filterEnquiriesByRole(filtered, enquiriesFilter.value, curUserId)
-    }
+      // 3. Enquiries Role Filter
+      if (curUserId && enquiryVal !== 'All') {
+        const senderId = item.senderId || item.sender?.id
+        const receiverId = item.receiverId || item.receiver?.id
+        
+        if (enquiryVal === 'Sent' && String(senderId) !== String(curUserId)) return false
+        if (enquiryVal === 'My Enquiries' && String(receiverId) !== String(curUserId)) return false
+      }
+
+      return true
+    })
 
     // Sort by date
     filtered.sort((a, b) => {
       const dateA = new Date(a[dateKey]).getTime()
       const dateB = new Date(b[dateKey]).getTime()
 
-      return sortOrderValue.value === 'Newest'
+      return sortVal === 'Newest'
         ? dateB - dateA
         : dateA - dateB
     })
