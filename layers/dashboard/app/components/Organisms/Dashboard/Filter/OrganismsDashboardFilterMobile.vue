@@ -80,7 +80,7 @@
                     size="lg"
                     block
                     class="body-sm truncate"
-                    :label="sortOrderValue === 'asc' ? 'Oldest' : 'Newest'"
+                    :label="sortOrderValueOriginal === 'Newest' ? 'Newest First' : 'Oldest First'"
                     :ui="{
                       base: 'text-white!',
                     }"

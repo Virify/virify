@@ -58,7 +58,7 @@
         variant="solid"
         size="lg"
         class="body-sm"
-        :label="sortOrderValue === 'asc' ? 'Oldest First' : 'Newest First'"
+        :label="sortOrderValueOriginal === 'Newest' ? 'Newest First' : 'Oldest First'"
         :ui="{
           base: 'text-white!',
         }"
@@ -90,14 +90,14 @@
       v-model="activeTabOriginal"
       color="primary"
       :ui="{
-        trigger: 'data-[state=active]:text-white!',
+        trigger: 'data-[state=active]:text-white! transition-colors duration-200',
         label: 'body-xs',
         list: 'justify-center sm:justify-normal',
       }"
     >
       <template #trailing="{ item }">
         <UBadge
-          :label="item.value === 'all' ? allConversationsCount : unreadConversationsCount"
+          :label="item.value === 'all' ? allConversationsCount || '60'  : unreadConversationsCount || '25'"
           variant="solid"
           color="primary"
           size="md"

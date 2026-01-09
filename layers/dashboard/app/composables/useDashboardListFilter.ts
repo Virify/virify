@@ -47,12 +47,19 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
       icon: 'i-lucide-calendar-arrow-down'
     } 
   ]
+  
+  /**
+   * Sale/Rent filter options
+   */
   const saleRentOptions = [
     { label: 'All', value: 'All', icon: 'i-lucide-home' },
     { label: 'Sale', value: 'Sale', icon: 'i-lucide-tag' },
     { label: 'Rent', value: 'Rent', icon: 'i-lucide-key' }
   ]
 
+  /**
+   * Enquiries filter options
+   */
   const enquiriesOptions = [
     { label: 'All', value: 'All', icon: 'i-lucide-message-circle' },
     { label: 'Sent', value: 'Sent', icon: 'i-lucide-check-circle' },
