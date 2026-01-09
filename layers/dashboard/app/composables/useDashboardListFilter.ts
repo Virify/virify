@@ -2,13 +2,15 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   items: Ref<T[]>,
   options: {
     dateKey?: keyof T
+    userId?: string | Ref<string | undefined>
   } = {}
 ) => {
-  const { dateKey = 'createdAt' } = options
+  const { dateKey = 'createdAt', userId } = options
 
   const searchQuery = ref('')
   const sortOrderValue = ref('Newest')
   const saleRentFilter = ref('All')
+  const enquiriesFilter = ref('All')
 
   const sortOrder = [
     {
@@ -26,6 +28,12 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     { label: 'All', value: 'All', icon: 'i-lucide-home' },
     { label: 'Sale', value: 'Sale', icon: 'i-lucide-tag' },
     { label: 'Rent', value: 'Rent', icon: 'i-lucide-key' }
+  ]
+
+  const enquiriesOptions = [
+    { label: 'All', value: 'All', icon: 'i-lucide-message-circle' },
+    { label: 'Sent', value: 'Sent', icon: 'i-lucide-check-circle' },
+    { label: 'My Enquiries', value: 'My Enquiries', icon: 'i-lucide-mail' }
   ]
 
   const filteredItems = computed(() => {
@@ -72,6 +80,12 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
       filtered = filtered.filter((item) => item.listing?.rentalListing)
     }
 
+    // Filter by Enquiries (Sent / Received)
+    const curUserId = unref(userId)
+    if (curUserId) {
+      filtered = filterEnquiriesByRole(filtered, enquiriesFilter.value, curUserId)
+    }
+
     // Sort by date
     filtered.sort((a, b) => {
       const dateA = new Date(a[dateKey]).getTime()
@@ -89,6 +103,8 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     searchQuery,
     sortOrderValue,
     saleRentFilter,
+    enquiriesFilter,
+    enquiriesOptions,
     sortOrder,
     saleRentOptions,
     filteredItems,

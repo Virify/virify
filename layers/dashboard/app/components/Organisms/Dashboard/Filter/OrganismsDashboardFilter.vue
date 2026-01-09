@@ -1,7 +1,7 @@
 <template>
-  <div class="flex gap-2 shrink-0 body-sm items-center">
+  <div class="flex flex-wrap sm:flex-nowrap gap-2 body-sm items-center">
     <!-- Filter: Sale / Rent -->
-    <USelect 
+    <USelect v-if="!enquiries"
       v-model="saleRentFilter" 
       :items="saleRentOptions" 
       option-attribute="label" 
@@ -10,6 +10,23 @@
       color="secondary" 
       size="lg" 
       icon="i-lucide-funnel" 
+      :ui="{
+        leadingIcon: 'text-secondary',
+        itemLeadingIcon: 'text-secondary',
+        item: 'data-highlighted:not-data-disabled:text-secondary data-highlighted:not-data-disabled:before:bg-elevated/50'
+      }" 
+    />
+
+    <USelect v-else
+      v-model="enquiriesFilter" 
+      :items="enquiriesOptions" 
+      option-attribute="label" 
+      value-attribute="value" 
+      :highlight="false" 
+      color="secondary" 
+      size="lg" 
+      icon="i-lucide-funnel" 
+      class="w-40!"
       :ui="{
         leadingIcon: 'text-secondary',
         itemLeadingIcon: 'text-secondary',
@@ -55,23 +72,26 @@
   const props = defineProps<{
     items: T[]
     dateKey?: keyof T
+    enquiries?: boolean
+    userId?: string | number
   }>()
 
   const emit = defineEmits<{
     (e: 'update:filtered', value: T[]): void
   }>()
 
-  // Use the composable internally
-  // toRef(props, 'items') ensures reactivity connects to the composable
   const { 
     searchQuery, 
+    enquiriesFilter,
+    enquiriesOptions,
     sortOrderValue, 
     saleRentFilter, 
     sortOrder, 
     saleRentOptions, 
     filteredItems 
   } = useDashboardListFilter(toRef(props, 'items'), { 
-    dateKey: props.dateKey 
+    dateKey: props.dateKey,
+    userId: toRef(props, 'userId')
   })
 
   // Emit the filtered results back to the parent whenever they change

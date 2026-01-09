@@ -25,6 +25,9 @@ export const useConversations = createSharedComposable((options?: { limit?: numb
     
     // Actions (now includes new conversation functionality)
     ...conversationActions,
+
+    // Conversation Events
+    ...conversationEvents,
     
     // Typing
     ...conversationTyping,

@@ -13,7 +13,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
 
   // State
   const conversations = ref<ConversationWithUserAndMessages[]>([]);
-  const loading = ref(false);
+  const loading = ref(true);
   const error = ref<string | null>(null);
 
   // Get current userId safely
@@ -95,6 +95,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
       } else {
         conversations.value = [];
         error.value = null;
+        loading.value = false;
       }
     });
   }
@@ -122,6 +123,21 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     conversations.value = updateConversationInArray(conversations.value, conversationId, updatedData);
   }
 
+  /**
+   * Get the total number of conversations with unread messages for the current user
+   * Efficiently cached using computed property since conversations is already reactive
+   */
+  const unreadConversationsCount = computed(() => {
+    if (!currentUserId.value) return 0;
+    
+    return conversations.value.reduce((count, convo) => {
+      // Direct message check slightly more efficient than calling external function repeatedly
+      // Check if ANY message in this convo is unread AND sent to me
+      const hasUnread = convo.messages?.some(m => !m.isRead && String(m.receiverId) === String(currentUserId.value));
+      return count + (hasUnread ? 1 : 0);
+    }, 0);
+  });
+
   return {
     conversations: limitedConversations,
     allConversations: conversations,
@@ -130,6 +146,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     loading: readonly(loading),
     error: readonly(error),
     currentUserId: readonly(currentUserId),
+    unreadConversationsCount,
     fetchConversations,
     refreshConversations,
     addConversation,
