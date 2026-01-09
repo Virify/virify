@@ -56,12 +56,12 @@ export function useDashboardNavigation() {
         {
           label: 'Enquiries',
           type: 'link',
-          to: '#',
+          to: '/dashboard/enquiries',
           icon: 'i-lucide-message-circle',
           tooltip: {
             text: 'View enquiries',
           },
-          badge: aggregates.value.unreadMessages ? String(aggregates.value.unreadMessages) : undefined,
+          badge: aggregates.value.unreadMessages ? String(aggregates.value.unreadMessages) : aggregates.value.enquiries ? String(aggregates.value.enquiries) : undefined,
         },
         {
           label: 'Favourites',

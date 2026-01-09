@@ -26,10 +26,6 @@
 const { fetchUserItemsAggregates } = useNotifications()
 const { groups } = useDashboardSearch()
 
-// Initialize shared composables to keep them alive and cache data across dashboard navigation
-useAnalytics()
-useFavourites()
-useNotes()
 
 onMounted(async () => {
   await fetchUserItemsAggregates()

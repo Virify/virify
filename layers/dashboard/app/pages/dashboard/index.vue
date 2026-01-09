@@ -15,6 +15,7 @@
 
     <template #body>
       <OrganismsDashboardAnalyticsCard />
+      <!-- https://github.com/nuxt/ui/issues/5529 -->
       <UAccordion 
         :items="accordionItems" 
         default-value="favourite-listings" 
@@ -79,23 +80,24 @@ const { recentlyViewedListings, isAnalyticsLoading } = useAnalytics()
 const { recentFavourites, isLoading: isFavouritesLoading } = useFavourites()
 const { recentUserNotes, isLoading: isNotesLoading } = useNotes()
 
-console.log(recentUserNotes.value)
-
 
 const accordionItems: AccordionItem[] = [
   {
+    id: useId(),
     label: 'Recent Favourite Listings',
     icon: 'i-lucide-heart',
     slot: 'favourite-listings',
     value: 'favourite-listings',
   },
   {
+    id: useId(),
     label: 'Recent Notes Added',
     icon: 'i-lucide-sticky-note',
     slot: 'notes-added',
     value: 'notes-added',
   },
   {
+    id: useId(),
     label: 'Viewed Listings',
     icon: 'i-lucide-eye',
     slot: 'viewed-listings',

@@ -74,8 +74,8 @@ export const useAnalytics = createSharedComposable(() => {
   
   // Auto-fetch when logged in
   if (import.meta.client) {
-    watchEffect(() => {
-      if (loggedIn.value) {
+    watch(loggedIn, (isLoggedIn) => {
+      if (isLoggedIn) {
         fetchAnalytics();
       } else {
         recentlyViewedListings.value = [];
@@ -83,7 +83,7 @@ export const useAnalytics = createSharedComposable(() => {
         allUserListings.value = [];
         analytics.value = null;
       }
-    });
+    }, { immediate: true });
   }
   /**
    * !! Important: useRequestFetch is required for SSR authenticated requests

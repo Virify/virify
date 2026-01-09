@@ -1,16 +1,46 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar title="Your Enquiries" class="body-sm border-0" :ui="{
+      <UDashboardNavbar class="body-sm border-0" :ui="{
         title: 'title-sm m-0!',
         icon: 'text-secondary',
-      }"/>
+      }">
+        <template #title>
+          Your Enquiries
+          <UBadge 
+            v-if="allConversations.length > 0" 
+            :label="allConversations.filter(convo => convo.messages.some(msg => !msg.isRead && msg.receiverId === user?.id)).length" 
+            color="secondary" 
+            size="md" 
+            class="ml-2"
+          />
+        </template>
+        <template #right>
+          <UTabs :items="tabItems" default-value="all" size="xs" class="w-full" :content="false" v-model="activeTab" color="secondary" :ui="{
+            trigger: 'data-[state=active]:text-white!',
+            label: 'body-sm',
+            
+          }">
+            <template #trailing="{ item }">
+              <UBadge
+                :label="item.value === 'all' ? allConversations.length : allConversations.filter(convo => convo.messages.some(msg => !msg.isRead && msg.receiverId === user?.id)).length" 
+                variant="solid"
+                color="secondary"
+                size="md"
+                :ui="{
+                  base: 'border-1 border-white text-white',
+                }"
+              />
+            </template>
+          </UTabs>
+        </template>
+      </UDashboardNavbar>
       <!-- <OrganismsDashboardNavigationSearch :title="'Your Enquiries'" /> -->
     </template>
     <template #body>
       <UPageList divide class="gap-4">
         <UPageCard
-          v-for="enquiry in allConversations"
+          v-for="enquiry in filteredConversations"
           :key="enquiry.id"
           variant="outline"
           :ui="{
@@ -42,12 +72,12 @@
               >
                 <div 
                   v-if="enquiry.listing.property?.media?.[0]?.image" 
-                  class="w-16 h-16 rounded-md overflow-hidden shrink-0"
+                  class="w-16 h-full overflow-hidden shrink-0"
                 >
                   <AtomsCloudFlareImage
                     :src="enquiry.listing.property.media[0].image"
                     :alt="enquiry.listing.property.address?.fullAddress || 'Property'"
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-cover aspect-4/3 rounded-md"
                     variant="thumbnail"
                   />
                 </div>
@@ -229,6 +259,17 @@ const messageContent = ref("");
 const chatContainer = ref<HTMLElement | null>(null);
 
 const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
+const activeTab = ref<"all" | "unread">("all");
+
+const filteredConversations = computed(() => {
+  if (activeTab.value === "all") {
+    return allConversations.value;
+  } else {
+    return allConversations.value.filter((convo: ConversationWithUserAndMessages) => 
+      convo.messages.some(msg => !msg.isRead)
+    );
+  }
+});
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const activeBreakpoints = breakpoints.active();
@@ -236,6 +277,11 @@ const activeBreakpoints = breakpoints.active();
 const isMobile = computed(() => {
   return !activeBreakpoints.value.includes("md") && !activeBreakpoints.value.includes("lg") && !activeBreakpoints.value.includes("xl") && !activeBreakpoints.value.includes("2xl");
 });
+
+const tabItems = [
+  { label: "All", value: "all", icon: "i-lucide-inbox" },
+  { label: "Unread", value: "unread", icon: "i-lucide-mail" },
+];
 
 // Helper functions for card data
 function getOtherUser(conversation: ConversationWithUserAndMessages) {
