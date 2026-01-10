@@ -32,7 +32,7 @@
                     :ui="{
                       base: 'text-white!',
                     }"
-                    :label="!enquiries ? saleRentFilter : enquiriesFilter"
+                    :label="!enquiries ? saleRentFilter : directionFilter"
                   />
                   <USelect
                     v-if="!enquiries"
@@ -54,8 +54,8 @@
                   />
                   <USelect
                     v-else
-                    v-model="enquiriesFilterOriginal"
-                    :items="enquiriesOptions"
+                    v-model="directionFilterOriginal"
+                    :items="directionOptions"
                     option-attribute="label"
                     value-attribute="value"
                     color="primary"
@@ -80,7 +80,7 @@
                     size="lg"
                     block
                     class="body-sm truncate"
-                    :label="sortOrderValueOriginal === 'Newest' ? 'Newest First' : 'Oldest First'"
+                    :label="sortOrderValueOriginal === 'newest' ? 'Newest First' : 'Oldest First'"
                     :ui="{
                       base: 'text-white!',
                     }"
@@ -172,6 +172,8 @@
     allConversationsCount: number;
     unreadConversationsCount: number;
     searchQuery: string;
+    directionFilter: string;
+    directionOptions: any[];
   }>();
 
   const emit = defineEmits<{
@@ -181,6 +183,7 @@
     (e: 'update:sortOrderValue', value: string): void;
     (e: 'update:activeTab', value: string): void;
     (e: 'update:searchQuery', value: string): void;
+    (e: 'update:directionFilter', value: string): void;
   }>();
 
   const isOpenOriginal = usePropModel(props, 'isOpen', emit);
@@ -189,4 +192,5 @@
   const sortOrderValueOriginal = usePropModel(props, 'sortOrderValue', emit);
   const activeTabOriginal = usePropModel(props, 'activeTab', emit);
   const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);
+  const directionFilterOriginal = usePropModel(props, 'directionFilter', emit);
 </script>

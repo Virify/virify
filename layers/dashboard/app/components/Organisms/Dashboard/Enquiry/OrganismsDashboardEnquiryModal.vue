@@ -81,6 +81,7 @@
    * Application Composables
    */
   const { sendReply, markMessageAsRead } = useConversations();
+  const { aggregates } = useNotifications();
   const breakpoints = useBreakpoints(breakpointsTailwind);
   const activeBreakpoints = breakpoints.active();
 
@@ -163,7 +164,15 @@
       (message: any) => !message.isRead && message.receiverId === props.user!.id
     );
 
+    if (unreadMessages.length === 0) return;
+
+    // Optimistically decrement unreadConversations since we're marking all messages as read
+    if (aggregates.value.unreadConversations > 0) {
+      aggregates.value.unreadConversations--;
+    }
+
     // Process all mark-as-read operations
+    // Backend will send unreadMessages decrements via WebSocket
     await Promise.all(unreadMessages.map(async (message: any) => {
       try {
         await markMessageAsRead(message.id, props.conversation.id);

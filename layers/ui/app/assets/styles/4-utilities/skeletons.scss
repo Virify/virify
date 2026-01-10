@@ -1,30 +1,57 @@
 /**
- *  Focus states
+ *  Skeletons
+ * 
+ *  Performance Note:
+ *  We use a pseudo-element (::after) with a transform animation instead of 
+ *  animating background-position. 
+ *  
+ *  - Transforms are handled by the GPU (compositor thread).
+ *  - Background-position triggers layout/paint on the main thread.
+ *  
+ *  This ensures the shimmer effect remains smooth even when the main thread 
+ *  is blocked by heavy data processing (e.g. rendering large lists).
  */
 
-.skeleton {
-  --gradient-start: var(--background-100);
-  --gradient-end: var(--background-300);
-
-  background: linear-gradient(to left,
-      var(--gradient-start),
-      var(--gradient-end),
-      var(--gradient-start),
-      var(--gradient-end),
-      var(--gradient-start)) repeat;
-  background-size: 200%;
-  animation: skeleton-load 1s infinite linear;
+.skeleton,
+.skeleton-fluid {
+  background-color: var(--background-100);
+  position: relative;
+  overflow: hidden;
 }
 
-:where(.skeleton) {
+.skeleton::after,
+.skeleton-fluid::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0,
+    var(--background-300) 50%,
+    transparent 100%
+  );
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+:where(.skeleton),
+:where(.skeleton-fluid) {
   display: block;
-  height: var(--lineheight-md);
-  width: var(--lineheight-md);
   border-radius: var(--border-radius-ui);
 }
 
-@keyframes skeleton-load {
-  from {
-    background-position: -100% 0;
-  }
+// Original skeleton class maintains fixed dimensions for backwards compatibility
+:where(.skeleton) {
+  height: var(--lineheight-md);
+  width: var(--lineheight-md);
 }

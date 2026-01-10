@@ -11,8 +11,7 @@ import { prisma } from '../../../database/server/utils/prisma-client'
 import { MembershipType } from "../../../database/server/database/prisma/generated/enums"
 import { updateLocationsByAddressListForSeed } from './location-for-seed'
 import { generateProperty } from './property-faker'
-import { generateSaleListing, generateRentalListing } from './listing-faker'
-import { seedFakeUsers } from './user-faker'
+import { seedFakeUsers, distributeListingsToUsers } from './user-faker'
 import { rentalAddress, saleAddress, cityCenters } from './address-to-seed'
 import { seedAdminFavourites } from './admin-favourites-seed'
 
@@ -140,36 +139,25 @@ async function seedFullDatabase() {
     console.log('🏙️  Seeding city centers...')
     await seedCityCenters()
 
-    console.log('🏠 Seeding properties and listings...')
+    console.log('🏠 Seeding properties (without listings)...')
     
-    // Generate properties and listings in parallel batches
-    await Promise.all([
-      // Sale properties and listings
-      (async () => {
-        const saleProperties = await Promise.all(
-          saleAddress.map(addr => generateProperty(addr))
-        )
-        await Promise.all(
-          saleProperties.map((prop: { id: number; }) => generateSaleListing(prop.id))
-        )
-      })(),
-      
-      // Rental properties and listings  
-      (async () => {
-        const rentalProperties = await Promise.all(
-          rentalAddress.map(addr => generateProperty(addr))
-        )
-        await Promise.all(
-          rentalProperties.map((prop: { id: number; }) => generateRentalListing(prop.id))
-        )
-      })()
-    ])
+    // Generate properties only (listings will be assigned later)
+    const saleProperties = await Promise.all(
+      saleAddress.map(addr => generateProperty(addr))
+    );
+    const rentalProperties = await Promise.all(
+      rentalAddress.map(addr => generateProperty(addr))
+    );
     
-    console.log('✅ Properties and listings seeded.')
+    console.log(`✅ Properties created: ${saleProperties.length} sale, ${rentalProperties.length} rental`);
 
     console.log('👥 Seeding fake users...')
-    await seedFakeUsers(20)
+    const userIds = await seedFakeUsers(1000)
     console.log('✅ Fake users seeded.')
+
+    console.log('🏠 Distributing listings to users...')
+    await distributeListingsToUsers(userIds)
+    console.log('✅ Listings distributed.')
 
     console.log('⭐ Seeding admin favourites...')
     await seedAdminFavourites()

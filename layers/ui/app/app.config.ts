@@ -8,6 +8,11 @@ export default defineAppConfig({
       neutral: 'monochrome',
       bg: 'brand-bg',
     },
+    skeleton: {
+      base: 'skeleton-fluid',
+      background: '',
+      rounded: '',
+    },
     navigationMenu: {
       compoundVariants: [
         // Active state for sidebar navigation (expanded)

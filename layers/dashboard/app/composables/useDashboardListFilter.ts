@@ -28,9 +28,9 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
    */
   const searchQuery = ref('')
   const debouncedSearchQuery = refDebounced(searchQuery, 300)
-  const sortOrderValue = ref('Newest')
-  const saleRentFilter = ref('All')
-  const enquiriesFilter = ref('All')
+  const sortOrderValue = ref('newest')
+  const saleRentFilter = ref('all')
+  const enquiriesFilter = ref('all')
 
   /**
    * Options configuration
@@ -38,12 +38,12 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   const sortOrder = [
     {
       label: 'Newest',
-      value: 'Newest',
+      value: 'newest',
       icon: 'i-lucide-calendar-arrow-up'
     },
     {
       label: 'Oldest',
-      value: 'Oldest',
+      value: 'oldest',
       icon: 'i-lucide-calendar-arrow-down'
     } 
   ]
@@ -52,18 +52,34 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
    * Sale/Rent filter options
    */
   const saleRentOptions = [
-    { label: 'All', value: 'All', icon: 'i-lucide-home' },
-    { label: 'Sale', value: 'Sale', icon: 'i-lucide-tag' },
-    { label: 'Rent', value: 'Rent', icon: 'i-lucide-key' }
+    { label: 'All', value: 'all', icon: 'i-lucide-home' },
+    { label: 'Sale', value: 'sale', icon: 'i-lucide-tag' },
+    { label: 'Rent', value: 'rent', icon: 'i-lucide-key' }
   ]
 
   /**
-   * Enquiries filter options
+   * Direction filter options (Sent/Received)
    */
-  const enquiriesOptions = [
-    { label: 'All', value: 'All', icon: 'i-lucide-message-circle' },
-    { label: 'Sent', value: 'Sent', icon: 'i-lucide-check-circle' },
-    { label: 'My Enquiries', value: 'My Enquiries', icon: 'i-lucide-mail' }
+  const directionOptions = [
+    { label: 'All Enquiries', value: 'all', icon: 'i-lucide-inbox' },
+    { label: 'Sent Enquiries', value: 'sent', icon: 'i-lucide-send' },
+    { label: 'Received Enquiries', value: 'received', icon: 'i-lucide-mail' }
+  ]
+
+  /**
+   * Tab Items (All/Unread)
+   */
+  const tabItems = [
+    { label: 'All', value: 'all', icon: 'i-lucide-inbox' },
+    { label: 'Unread', value: 'unread', icon: 'i-lucide-mail' }
+  ]
+
+  /**
+   * View Options (Grid/List)
+   */
+  const viewOptions = [
+    { label: '', icon: 'i-lucide-layout-grid', value: 'grid' },
+    { label: '', icon: 'i-lucide-list', value: 'list' }
   ]
 
   /**
@@ -111,16 +127,16 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
       }
 
       // 2. Sale/Rent Filter
-      if (filterVal === 'Sale' && !item.listing?.saleListing) return false
-      if (filterVal === 'Rent' && !item.listing?.rentalListing) return false
+      if (filterVal === 'sale' && !item.listing?.saleListing) return false
+      if (filterVal === 'rent' && !item.listing?.rentalListing) return false
 
       // 3. Enquiries Role Filter
-      if (curUserId && enquiryVal !== 'All') {
+      if (curUserId && enquiryVal !== 'all') {
         const senderId = item.senderId || item.sender?.id
         const receiverId = item.receiverId || item.receiver?.id
         
-        if (enquiryVal === 'Sent' && String(senderId) !== String(curUserId)) return false
-        if (enquiryVal === 'My Enquiries' && String(receiverId) !== String(curUserId)) return false
+        if (enquiryVal === 'sent' && String(senderId) !== String(curUserId)) return false
+        if (enquiryVal === 'received' && String(receiverId) !== String(curUserId)) return false
       }
 
       return true
@@ -131,7 +147,7 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
       const dateA = new Date(a[dateKey]).getTime()
       const dateB = new Date(b[dateKey]).getTime()
 
-      return sortVal === 'Newest'
+      return sortVal === 'newest'
         ? dateB - dateA
         : dateA - dateB
     })
@@ -144,7 +160,9 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     sortOrderValue,
     saleRentFilter,
     enquiriesFilter,
-    enquiriesOptions,
+    directionOptions,
+    tabItems,
+    viewOptions,
     sortOrder,
     saleRentOptions,
     filteredItems,

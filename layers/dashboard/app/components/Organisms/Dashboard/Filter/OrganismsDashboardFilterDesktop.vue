@@ -10,8 +10,9 @@
         class="body-sm"
         :ui="{
           base: 'text-white!',
+          label: 'capitalize',
         }"
-        :label="!enquiries ? saleRentFilter : enquiriesFilter"
+        :label="!enquiries ? saleRentFilter : directionFilter"
       />
       <USelect
         v-if="!enquiries"
@@ -33,15 +34,15 @@
       />
       <USelect
         v-else
-        v-model="enquiriesFilterOriginal"
-        :items="enquiriesOptions"
+        v-model="directionFilterOriginal"
+        :items="directionOptions"
         option-attribute="label"
         value-attribute="value"
         color="primary"
         size="lg"
         class="absolute inset-0 w-full h-full opacity-0 z-10"
         :ui="{
-          base: 'w-full h-full',
+          base: 'w-full h-full capitalize',
           content: 'min-w-fit',
           group: 'p-0!',
           item: 'outline-0! ring-0! cursor-pointer bg-elevated hover:bg-gray-200 dark:hover:bg-gray-500 hover:rounded',
@@ -58,7 +59,7 @@
         variant="solid"
         size="lg"
         class="body-sm"
-        :label="sortOrderValueOriginal === 'Newest' ? 'Newest First' : 'Oldest First'"
+        :label="sortOrderValueOriginal === 'newest' ? 'Newest First' : 'Oldest First'"
         :ui="{
           base: 'text-white!',
         }"
@@ -84,25 +85,23 @@
     <UTabs v-if="enquiries"
       :items="tabItems"
       default-value="all"
-      size="sm"
-      class="inline-flex"
+      size="md"
       :content="false"
       v-model="activeTabOriginal"
       color="primary"
       :ui="{
-        trigger: 'data-[state=active]:text-white! transition-colors duration-200',
-        label: 'body-xs',
+        trigger: 'data-[state=active]:text-white! transition-none',
+        label: 'body-sm min-w-10',
         list: 'justify-center sm:justify-normal',
       }"
     >
       <template #trailing="{ item }">
         <UBadge
-          :label="item.value === 'all' ? allConversationsCount || '60'  : unreadConversationsCount || '25'"
-          variant="solid"
+          :label="item.value === 'all' ? allConversationsCount  : unreadConversationsCount"
           color="primary"
           size="md"
           :ui="{
-            base: 'border-1 border-white text-white',
+            base: 'border-1 border-white text-white body-xs',
           }"
         />
       </template>
@@ -157,6 +156,8 @@
     view?: "grid" | "list";
     activeView: string;
     viewOptions: any[];
+    directionFilter: string;
+    directionOptions: any[];
   }>();
 
   const emit = defineEmits<{
@@ -166,6 +167,7 @@
     (e: 'update:activeTab', value: string): void;
     (e: 'update:searchQuery', value: string): void;
     (e: 'update:activeView', value: string): void;
+    (e: 'update:directionFilter', value: string): void;
   }>();
 
   /**
@@ -177,5 +179,6 @@
   const activeTabOriginal = usePropModel(props, 'activeTab', emit);
   const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);
   const activeViewOriginal = usePropModel(props, 'activeView', emit);
+  const directionFilterOriginal = usePropModel(props, 'directionFilter', emit);
 
 </script>

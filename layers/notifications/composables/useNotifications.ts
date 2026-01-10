@@ -8,10 +8,8 @@ const aggregates = ref<UserItemsAggregates>({
   locations: 0,
   listings: 0,
   unreadMessages: 0,
-  notifications: 0,
   messages: 0,
-  offers: 0,
-  viewings: 0,
+  unreadConversations: 0,
 });
 const aggregatesLoading = ref(false);
 const aggregatesError = ref<Error | null>(null);

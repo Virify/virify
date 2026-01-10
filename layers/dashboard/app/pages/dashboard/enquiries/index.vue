@@ -17,19 +17,21 @@
             enquiries
             :user-id="user?.id"
             v-model:view="view"
-            v-model:active-tab="activeTab"
+            v-model:active-tab="conversationFilter"
+            v-model:direction-filter="directionFilter"
+            v-model:sort-order="sortOrder"
             @update:filtered="sortedAndFilteredConversations = $event"
           />
         </template>
       </UDashboardNavbar>
     </template>
     <template #body>
-      <UPageList divide :class="[
-        'gap-4',
+      <UPageList :class="[
+        'gap-4 ',
         view === 'grid' && (loading || sortedAndFilteredConversations.length > 0) ? 'grid grid-cols-1 xl:grid-cols-2' : ''
       ]">
         <template v-if="loading">
-          <OrganismsDashboardEnquiryCardSkeleton :cards="3" />
+          <OrganismsDashboardEnquiryCardSkeleton :cards="3" :view="view" />
         </template>
         <template v-else-if="sortedAndFilteredConversations.length > 0">
           <OrganismsDashboardEnquiryCard
@@ -37,12 +39,18 @@
             :key="enquiry.id"
             :enquiry="enquiry"
             :user="user"
+            :view="view"
             @click="openModal(enquiry)"
             @reply="openModal"
           />
         </template>
         <OrganismsDashboardNoResults v-else :description="'No Enquiries found.'" />
       </UPageList>
+
+      <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
+        <UPagination :v-model:page="page" @update:page="onPageChange" :total="total" :page-count="10" variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
+      </div>
+
       <OrganismsDashboardEnquiryModal
         v-if="user"
         v-model:open="open"
@@ -62,29 +70,30 @@
     layout: "dashboard",
   });
 
-  const { allConversations, loading } = useConversations();
+  const { allConversations, loading, fetchConversations, total } = useConversations();
   const { user } = useUserSession();
 
   const open = ref(false);
   const filterRef = ref();
+  const page = ref(1);
   const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
-  const activeTab = ref<"all" | "unread">("all");
   const sortedAndFilteredConversations = ref<ConversationWithUserAndMessages[]>([]);
   const view = useCookie<'grid' | 'list'>('enquiries-view-preference', { default: () => 'grid', maxAge: 60 * 60 * 24 * 365 });
+  const conversationFilter = useCookie<"all" | "unread">('enquiries-filter-preference', { default: () => 'all', maxAge: 60 * 60 * 24 * 365 });
+  const directionFilter = useCookie<"all" | "sent" | "received">('enquiries-direction-preference', { default: () => 'all', maxAge: 60 * 60 * 24 * 365 });
+  const sortOrder = useCookie<'newest' | 'oldest'>('enquiries-sort-preference', { default: () => 'newest', maxAge: 60 * 60 * 24 * 365 });
 
-  /**
-   * Filtered Conversations
-   */
-  const filteredConversations = computed(() => {
-    if (activeTab.value === "all") {
-      return allConversations.value;
-    } else {
-      return allConversations.value.filter((convo: ConversationWithUserAndMessages) => 
-        // Optimization: Use .some() instead of counting all unread messages
-        convo.messages?.some(m => !m.isRead && String(m.receiverId) === String(user.value?.id))
-      );
-    }
-  });
+  // Filtered conversations come directly from API
+  const filteredConversations = computed(() => allConversations.value);
+
+  // Handle page changes from pagination component
+  async function onPageChange(newPage: number) {
+    page.value = newPage;
+    await fetchConversations(conversationFilter.value, directionFilter.value, newPage);
+    // TODO: Add scrolling to top here
+    // !! smooth not working !!
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
 
   /**
    * Open Enquiry Modal

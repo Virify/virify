@@ -61,7 +61,7 @@ export function useDashboardNavigation() {
           tooltip: {
             text: 'View enquiries',
           },
-          badge: aggregates.value.unreadMessages ? String(aggregates.value.unreadMessages) : aggregates.value.enquiries ? String(aggregates.value.enquiries) : undefined,
+          badge: aggregates.value.unreadConversations ? String(aggregates.value.unreadConversations) : aggregates.value.enquiries ? String(aggregates.value.enquiries) : undefined,
         },
         {
           label: 'Favourites',

@@ -15,26 +15,26 @@ export async function seedAdminFavourites() {
     return
   }
 
-  // Get 20 sale listings and 20 rental listings for favourites
+  // Get 25 sale listings and 25 rental listings for favourites
   const favSaleListings = await prisma.listing.findMany({
     where: { saleListing: { isNot: null } },
-    take: 20,
+    take: 25,
     select: { id: true }
   })
 
   const favRentalListings = await prisma.listing.findMany({
     where: { rentalListing: { isNot: null } },
-    take: 20,
+    take: 25,
     select: { id: true }
   })
 
-  // Get 20 DIFFERENT sale listings and 20 DIFFERENT rental listings for notes
+  // Get 25 DIFFERENT sale listings and 25 DIFFERENT rental listings for notes
   const noteSaleListings = await prisma.listing.findMany({
     where: { 
       saleListing: { isNot: null },
       NOT: { id: { in: favSaleListings.map(l => l.id) } }
     },
-    take: 20,
+    take: 25,
     select: { id: true }
   })
 
@@ -43,7 +43,7 @@ export async function seedAdminFavourites() {
       rentalListing: { isNot: null },
       NOT: { id: { in: favRentalListings.map(l => l.id) } }
     },
-    take: 20,
+    take: 25,
     select: { id: true }
   })
 

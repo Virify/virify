@@ -13,6 +13,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
 
   // State
   const conversations = ref<ConversationWithUserAndMessages[]>([]);
+  const total = ref(0);
   const loading = ref(true);
   const error = ref<string | null>(null);
 
@@ -23,9 +24,14 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
    * Fetch conversations from the API
    * Returns the conversations ordered by most recent activity
    */
-  async function fetchConversations() {
+  async function fetchConversations(
+    filter: 'all' | 'unread' = 'all', 
+    direction: 'all' | 'sent' | 'received' = 'all',
+    page: number = 1
+  ) {
     if (!loggedIn.value || !currentUserId.value) {
       conversations.value = [];
+      total.value = 0;
       return;
     }
 
@@ -33,12 +39,14 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     error.value = null;
 
     try {
-      const data = await requestFetch<ConversationWithUserAndMessages[]>('/api/conversation/');
-      conversations.value = data || [];
+      const data = await requestFetch<{ conversations: ConversationWithUserAndMessages[], total: number }>(`/api/conversation/?filter=${filter}&direction=${direction}&page=${page}&limit=${limit}`);
+      conversations.value = data.conversations || [];
+      total.value = data.total || 0;
     } catch (err) {
       console.error('Error fetching conversations:', err);
       error.value = 'Failed to load conversations';
       conversations.value = [];
+      total.value = 0;
     } finally {
       loading.value = false;
     }
@@ -48,7 +56,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
    * Get limited conversations based on the configured limit
    */
   const limitedConversations = computed(() => {
-    return conversations.value.slice(0, limit);
+    return conversations.value; 
   });
 
   /**
@@ -151,5 +159,6 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     refreshConversations,
     addConversation,
     updateConversation,
+    total: readonly(total),
   };
 });

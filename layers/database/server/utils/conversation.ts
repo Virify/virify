@@ -136,20 +136,63 @@ export async function replyToConversation(conversationId: number, messageContent
  *
  * @param userId User ID
  * @param conversationId conversation ID
+ * @param skip number of records to skip
+ * @param take number of records to take
+ * @param sort "asc" | "desc"
  * @returns
  */
-export async function getConversationsByUserId(userId: number): Promise<ConversationWithUserAndMessages[]> {
-  return await prisma.conversation.findMany({
-    where: {
-      OR: [{ senderId: userId }, { receiverId: userId }],
-    },
-    select: {
-      ...conversationWithUserAndMessages,
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-  });
+export async function getConversationsByUserId(
+  userId: number, 
+  options?: { 
+    skip?: number; 
+    take?: number; 
+    sort?: "asc" | "desc";
+    filter?: "all" | "unread";
+    direction?: "all" | "sent" | "received";
+  }
+): Promise<{ conversations: ConversationWithUserAndMessages[], total: number }> {
+  const { skip, take, sort = "desc", filter = "all", direction = "all" } = options || {};
+  
+  const whereClause: any = {};
+
+  // Add direction filter
+  if (direction === "sent") {
+    whereClause.senderId = userId;
+  } else if (direction === "received") {
+    whereClause.receiverId = userId;
+  } else {
+    // Default: show all conversations where user is participant
+    whereClause.OR = [{ senderId: userId }, { receiverId: userId }];
+  }
+
+  // Add unread filter if requested
+  if (filter === "unread") {
+    whereClause.messages = {
+      some: {
+        isRead: false,
+        receiverId: userId,
+      },
+    };
+  }
+
+  const [conversations, total] = await Promise.all([
+    prisma.conversation.findMany({
+      where: whereClause,
+      select: {
+        ...conversationWithUserAndMessages,
+      },
+      skip,
+      take,
+      orderBy: {
+        updatedAt: sort,
+      },
+    }),
+    prisma.conversation.count({
+      where: whereClause,
+    }),
+  ]);
+
+  return { conversations, total };
 }
 
 /**
