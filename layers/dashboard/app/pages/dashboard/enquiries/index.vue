@@ -86,10 +86,16 @@
   // Filtered conversations come directly from API
   const filteredConversations = computed(() => allConversations.value);
 
+  // Watch filter changes and re-fetch from API (reset to page 1)
+  watch([conversationFilter, directionFilter, sortOrder], async () => {
+    page.value = 1;
+    await fetchConversations(conversationFilter.value, directionFilter.value, 1, sortOrder.value);
+  });
+
   // Handle page changes from pagination component
   async function onPageChange(newPage: number) {
     page.value = newPage;
-    await fetchConversations(conversationFilter.value, directionFilter.value, newPage);
+    await fetchConversations(conversationFilter.value, directionFilter.value, newPage, sortOrder.value);
     // TODO: Add scrolling to top here
     // !! smooth not working !!
     window.scrollTo({top: 0, behavior: 'smooth'});

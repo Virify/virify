@@ -3,6 +3,7 @@ import * as z from "zod";
 const conversationQuerySchema = z.object({
   filter: z.enum(['all', 'unread']).optional().default('all'),
   direction: z.enum(['all', 'sent', 'received']).optional().default('all'),
+  sort: z.enum(['newest', 'oldest']).optional().default('newest'),
   page: z.coerce.number().min(1).optional().default(1),
   limit: z.coerce.number().min(1).max(100).optional().default(10),
 });
@@ -23,6 +24,7 @@ export default defineEventHandler(async (event) => {
   return await getConversationsByUserId(user.id, { 
     filter: query.filter, 
     direction: query.direction,
+    sort: query.sort === 'oldest' ? 'asc' : 'desc',
     skip,
     take: query.limit 
   });

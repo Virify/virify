@@ -10,6 +10,10 @@ const aggregates = ref<UserItemsAggregates>({
   unreadMessages: 0,
   messages: 0,
   unreadConversations: 0,
+  sentEnquiries: 0,
+  sentUnreadEnquiries: 0,
+  receivedEnquiries: 0,
+  receivedUnreadEnquiries: 0
 });
 const aggregatesLoading = ref(false);
 const aggregatesError = ref<Error | null>(null);

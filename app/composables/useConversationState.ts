@@ -27,7 +27,8 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
   async function fetchConversations(
     filter: 'all' | 'unread' = 'all', 
     direction: 'all' | 'sent' | 'received' = 'all',
-    page: number = 1
+    page: number = 1,
+    sort: 'newest' | 'oldest' = 'newest'
   ) {
     if (!loggedIn.value || !currentUserId.value) {
       conversations.value = [];
@@ -39,7 +40,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     error.value = null;
 
     try {
-      const data = await requestFetch<{ conversations: ConversationWithUserAndMessages[], total: number }>(`/api/conversation/?filter=${filter}&direction=${direction}&page=${page}&limit=${limit}`);
+      const data = await requestFetch<{ conversations: ConversationWithUserAndMessages[], total: number }>(`/api/conversation/?filter=${filter}&direction=${direction}&sort=${sort}&page=${page}&limit=${limit}`);
       conversations.value = data.conversations || [];
       total.value = data.total || 0;
     } catch (err) {
