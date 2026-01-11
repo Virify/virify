@@ -17,9 +17,15 @@ export const useAnalytics = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const sessionId = useState("analytics-session-id", () => nanoid());
   
-  // Get refresh functions from favourites and notes composables
-  const { refreshRecentFavourites, recentFavourites } = useFavourites();
-  const { refreshRecentNotes, recentUserNotes } = useNotes();
+  // Get refresh functions from recent items composable (Singleton)
+  const { 
+    refreshRecentFavourites, 
+    recentFavourites,
+    recentFavouritesStatus,
+    refreshRecentNotes,
+    recentUserNotes,
+    recentNotesStatus
+  } = useDashboardRecentItems();
   
   // Reactive state for analytics data
   const recentlyViewedListings = ref<RecentlyViewed[]>([]);
@@ -228,6 +234,8 @@ export const useAnalytics = createSharedComposable(() => {
     // Recent data from other composables (centralized access for dashboard)
     recentFavourites,
     recentUserNotes,
+    recentFavouritesStatus,
+    recentNotesStatus,
     refreshRecentFavourites,
     refreshRecentNotes,
   };

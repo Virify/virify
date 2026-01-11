@@ -125,10 +125,10 @@
     </div>
 
     <!-- View Toggle -->
-    <div v-if="enquiries" class="ml-auto hidden md:flex">
+    <div v-if="enquiries && currentViewOptions.length > 0" class="ml-auto hidden md:flex">
       <UTabs
         v-model="activeView"
-        :items="viewOptions"
+        :items="currentViewOptions"
         :content="false"
         color="primary"
         size="lg"
@@ -146,6 +146,7 @@
     filterState: ReturnType<typeof useDashboardListFilter>;
     allConversationsCount: number;
     unreadConversationsCount: number;
+    viewOptions?: { label: string; value: string; icon?: string; disabled?: boolean }[];
   }>();
 
   // Destructure for easier use in template
@@ -162,7 +163,15 @@
     directionOptions,
     sortOrder,
     tabItems,
-    viewOptions
+    viewOptions: defaultViewOptions
   } = props.filterState;
+
+  const currentViewOptions = computed(() => {
+    const options = props.viewOptions || defaultViewOptions;
+    return options.map(option => ({
+      ...option,
+      icon: option.icon || 'i-lucide-layout-list'
+    }));
+  });
 
 </script>

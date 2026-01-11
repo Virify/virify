@@ -35,6 +35,7 @@
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'text-muted-foreground body-xs',
+            container: 'border border-secondary rounded-lg',
           }"
         />
         <UPageCard
@@ -49,6 +50,7 @@
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'text-muted-foreground body-xs',
+            container: 'border border-secondary rounded-lg',
           }"
         />
         <UPageCard
@@ -63,6 +65,7 @@
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'text-muted-foreground body-xs',
+            container: 'border border-secondary rounded-lg',
           }"
         />
         <UPageCard
@@ -77,6 +80,7 @@
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'text-muted-foreground body-xs',
+            container: 'border border-secondary rounded-lg',
           }"
         />
       </div>
@@ -137,11 +141,14 @@
     recentlyViewedListings, 
     recentFavourites, 
     recentUserNotes,
+    recentFavouritesStatus,
+    recentNotesStatus,
     isAnalyticsLoading 
   } = useAnalytics()
-  // Get loading states from individual composables
-  const { isLoading: isFavouritesLoading } = useFavourites()
-  const { isLoading: isNotesLoading } = useNotes()
+  
+  // Computed loading states from statuses
+  const isFavouritesLoading = computed(() => recentFavouritesStatus.value === 'pending')
+  const isNotesLoading = computed(() => recentNotesStatus.value === 'pending')
 
   const accordionItems: AccordionItem[] = [
     {

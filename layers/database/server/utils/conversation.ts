@@ -147,11 +147,13 @@ export async function getConversationsByUserId(
     skip?: number; 
     take?: number; 
     sort?: "asc" | "desc";
+    sortBy?: "date" | "listing";
     filter?: "all" | "unread";
     direction?: "all" | "sent" | "received";
+    listingId?: number;
   }
 ): Promise<{ conversations: ConversationWithUserAndMessages[], total: number }> {
-  const { skip, take, sort = "desc", filter = "all", direction = "all" } = options || {};
+  const { skip, take, sort = "desc", sortBy = "date", filter = "all", direction = "all", listingId } = options || {};
   
   const whereClause: any = {};
 
@@ -175,24 +177,87 @@ export async function getConversationsByUserId(
     };
   }
 
-  const [conversations, total] = await Promise.all([
-    prisma.conversation.findMany({
-      where: whereClause,
+  if (listingId) {
+    whereClause.listingId = listingId;
+  }
+
+  if (sortBy === 'listing') {
+    // Unique listing pagination logic
+    // 1. Get paginated unique listing IDs sorted by most recent activity
+    const [distinctListings, totalListings] = await Promise.all([
+      prisma.conversation.findMany({
+        where: whereClause,
+        orderBy: [
+          { updatedAt: sort },
+          { id: 'desc' }
+        ],
+        distinct: ['listingId'],
+        skip,
+        take,
+        select: { listingId: true },
+      }),
+      // Count distinct listings (approximated by grouping)
+      prisma.conversation.groupBy({
+        by: ['listingId'],
+        where: whereClause,
+      }).then(res => res.length)
+    ]);
+
+    const listingIds = distinctListings.map(c => c.listingId).filter(id => id !== null) as number[];
+    const includeGeneral = distinctListings.some(c => c.listingId === null);
+    
+    // If no distinct listings found for this page, return empty result
+    // This prevents an empty OR clause which could return unexpected results
+    if (listingIds.length === 0 && !includeGeneral) {
+      return { conversations: [], total: totalListings };
+    }
+    
+    // 2. Fetch all conversations for these listings defined by original filters
+    // ensuring we include 'null' listingId (general enquiries) if they appeared in the distinct list
+    
+    const conversations = await prisma.conversation.findMany({
+      where: {
+        ...whereClause,
+        AND: [
+          {
+            OR: [
+               ...(listingIds.length > 0 ? [{ listingId: { in: listingIds } }] : []),
+               ...(includeGeneral ? [{ listingId: null }] : [])
+            ]
+          }
+        ]
+      },
       select: {
         ...conversationWithUserAndMessages,
       },
-      skip,
-      take,
       orderBy: {
-        updatedAt: sort,
-      },
-    }),
-    prisma.conversation.count({
-      where: whereClause,
-    }),
-  ]);
+        updatedAt: sort, // Sort conversations within the listing groups by date too
+      }
+    });
 
-  return { conversations, total };
+    return { conversations, total: totalListings };
+
+  } else {
+    // Standard conversation pagination
+    const [conversations, total] = await Promise.all([
+      prisma.conversation.findMany({
+        where: whereClause,
+        select: {
+          ...conversationWithUserAndMessages,
+        },
+        skip,
+        take,
+        orderBy: {
+          updatedAt: sort,
+        },
+      }),
+      prisma.conversation.count({
+        where: whereClause,
+      }),
+    ]);
+
+    return { conversations, total };
+  }
 }
 
 /**

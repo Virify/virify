@@ -1,12 +1,9 @@
 import { ViewsDialogLogin, ViewsDialogNotes } from "#components";
-import { createSharedComposable } from "@vueuse/core";
 import type { NoteData } from "~~/shared/types/note";
 import { performOptimisticUpdate, performMultiOptimisticUpdate } from "~/utils/optimistic-update";
 
-interface NoteLookup {
-  listingId: number;
-  note: string;
-}
+// Track items pending removal (for visual feedback) - Share across instances
+const pendingRemoval = ref<Set<number>>(new Set());
 
 /**
  * Notes Composable
@@ -14,7 +11,7 @@ interface NoteLookup {
  * Manages user's property notes with optimistic updates for seamless UX.
  * Uses lightweight lookups for efficient hasNote/getNote checks across the app.
  */
-export const useNotes = createSharedComposable(() => {
+export const useNotes = () => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
   const { showToast } = useToastNotification();
@@ -28,22 +25,10 @@ export const useNotes = createSharedComposable(() => {
   const total = ref(0);
   const loading = ref(false);
 
-  /**
-   * Lightweight lookups (just listingId + note content) - for hasNote/getNote checks
-   * Uses useRequestFetch to handle authenticated requests during SSR
-   */
-  const { data: noteLookups, refresh: refreshUserNotes } = useAsyncData<NoteLookup[]>(
-    "noteLookups",
-    () => {
-      if (!loggedIn.value) return Promise.resolve([]);
-      return useRequestFetch()<NoteLookup[]>("/api/user/notes/all/lookups");
-    },
-    {
-      default: () => [],
-      watch: [loggedIn],
-      immediate: true,
-    }
-  );
+  // Use Shared Global Lookups
+  const { noteLookups, refreshUserNotes } = useNoteLookups();
+  // Use Shared Recent Items
+  const { recentUserNotes, refreshRecentNotes, recentNotesStatus } = useDashboardRecentItems();
 
   /**
    * Full notes data (for dashboard pages with pagination)
@@ -95,23 +80,6 @@ export const useNotes = createSharedComposable(() => {
       await fetchNotes(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
     }
   }
-
-  /**
-   * Recent notes (last 7 days, max 8) - for dashboard homepage
-   * Uses dedicated lightweight endpoint
-   */
-  const { data: recentUserNotes, refresh: refreshRecentNotes, status: recentNotesStatus } = useAsyncData<NoteData[]>(
-    "recentUserNotes",
-    () => {
-      if (!loggedIn.value) return Promise.resolve([]);
-      return useRequestFetch()<NoteData[]>("/api/user/notes/all/recent");
-    },
-    {
-      default: () => [],
-      watch: [loggedIn],
-      immediate: true,
-    }
-  );
 
   const saleNotes = computed(() => {
     return userNotes.value.filter((item) => item.listing?.saleListing);
@@ -317,4 +285,4 @@ export const useNotes = createSharedComposable(() => {
     categoryFilter,
     isLoading: computed(() => loading.value || recentNotesStatus.value === 'pending'),
   };
-});
+};

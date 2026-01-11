@@ -50,9 +50,18 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
         to: index === segments.length - 1 ? undefined : currentPath,
       })
     } else {
+      // Check if previous segment implies this is an ID
+      const prevSegment = index > 0 ? segments[index - 1] : null;
+      let label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+
+      // Custom override for IDs
+      if (prevSegment === 'enquiries') {
+        label = 'Enquiry';
+      }
+
       // Fallback for unknown segments - capitalize and format
       items.push({
-        label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
+        label: label,
         to: index === segments.length - 1 ? undefined : currentPath,
       })
     }

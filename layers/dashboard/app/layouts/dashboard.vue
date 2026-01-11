@@ -16,7 +16,7 @@
         <OrganismsDashboardListingCardSearchItem :item="(item as DashboardSearchItem)" />
       </template>
     </UDashboardSearch>
-    <slot />
+      <slot/>
   </UDashboardGroup>
   <ViewsDialog />
   <MoleculesToastContainer />
@@ -30,9 +30,19 @@
   })
 </script>
 <style lang="scss">
-  @media (min-width: 2560px) {
-  .uw-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  @media (min-width: 1921px) {
+    .uw-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
   }
-}
+  @media (min-width: 3000px) {
+    .uw-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    }
+  }
+  @media (min-width: 4000px) {
+    .uw-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    }
+  }   
 </style>

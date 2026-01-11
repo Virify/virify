@@ -2,17 +2,17 @@
   <div class="space-y-6">
     <!-- SELLER ANALYTICS (First 4) -->
     <div>
-      <h3 class="body-sm font-bold text-muted-foreground mb-3">Your Listings Performance</h3>
+      <h3 class="body-sm font-bold text-muted-foreground pb-2">Your Listings Performance</h3>
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <UPageCard
           icon="i-lucide-eye"
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>
@@ -34,10 +34,10 @@
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>
@@ -59,10 +59,10 @@
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>
@@ -84,10 +84,10 @@
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>
@@ -107,17 +107,17 @@
 
     <!-- BUYER ANALYTICS (Second 4) -->
     <div>
-      <h3 class="body-sm font-bold text-muted-foreground mb-3">Your Search Activity</h3>
+      <h3 class="body-sm font-bold text-muted-foreground pb-2">Your Search Activity</h3>
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <UPageCard
           icon="i-lucide-send"
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>
@@ -139,10 +139,10 @@
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>
@@ -164,10 +164,10 @@
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>
@@ -189,10 +189,10 @@
           spotlight
           spotlight-color="secondary"
           :ui="{
-            root: 'bg-(--background-200)',
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
             description: 'body-xs text-muted-foreground',
+            container: 'border border-secondary rounded-lg',
           }"
         >
           <template #title>

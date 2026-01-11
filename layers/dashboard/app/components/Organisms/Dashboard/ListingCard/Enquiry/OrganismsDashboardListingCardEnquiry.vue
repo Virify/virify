@@ -15,7 +15,7 @@
       />
     </div>
     <div class="min-w-0 flex-1">
-      <div class="flex items-center justify-between gap-2 mb-1">
+      <div class="flex items-center justify-between gap-2 mb-0">
         <p class="text-base font-bold text-secondary leading-none">
           {{ formatCurrency((listing.price)) }}
         </p>
@@ -26,7 +26,7 @@
           size="md"
         />
       </div>
-      <p class="text-xs font-medium text-foreground mb-1">
+      <p class="text-xs font-medium text-foreground mb-2">
         {{ listing.property?.type?.name || 'Property Type N/A' }}
       </p>
       <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mb-2">

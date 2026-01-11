@@ -14,6 +14,7 @@
       :filter-state="filterState"
       :allConversationsCount="allConversationsCount"
       :unreadConversationsCount="unreadConversationsCount"
+      :view-options="viewOptions"
     />
   </div>
 </template>
@@ -25,6 +26,9 @@
     enquiries?: boolean;
     userId?: string | number;
     persistenceKey?: string;
+    viewOptions?: { label: string; value: string; icon?: string; disabled?: boolean }[];
+    allCount?: number;
+    unreadCount?: number;
   }>();
 
   // Fetch aggregates from shared notification state
@@ -42,6 +46,7 @@
     dateKey: props.dateKey,
     userId: toRef(props, "userId"),
     persistenceKey: props.persistenceKey,
+    enquiries: props.enquiries,
   });
 
   const { filteredItems, enquiriesFilter } = filterState;
@@ -51,6 +56,8 @@
    * Calculates appropriate counts from aggregates depending on selected direction
    */
   const allConversationsCount = computed(() => {
+    if (props.allCount !== undefined) return props.allCount;
+
     const direction = enquiriesFilter.value || 'all';
     if (direction === 'sent') return aggregates.value.sentEnquiries || 0;
     if (direction === 'received') return aggregates.value.receivedEnquiries || 0;
@@ -58,6 +65,8 @@
   });
 
   const unreadConversationsCount = computed(() => {
+    if (props.unreadCount !== undefined) return props.unreadCount;
+
     const direction = enquiriesFilter.value || 'all';
     if (direction === 'sent') return aggregates.value.sentUnreadEnquiries || 0;
     if (direction === 'received') return aggregates.value.receivedUnreadEnquiries || 0;

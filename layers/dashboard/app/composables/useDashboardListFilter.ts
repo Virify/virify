@@ -21,9 +21,11 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     userId?: string | Ref<string | undefined>
     /** Key to use for cookie persistence. If provided, sort and filters will be saved */
     persistenceKey?: string
+    /** Whether to include enquiries-specific options */
+    enquiries?: boolean
   } = {}
 ) => {
-  const { dateKey = 'createdAt', userId, persistenceKey } = options
+  const { dateKey = 'createdAt', userId, persistenceKey, enquiries = false } = options
 
   /**
    * State
@@ -55,18 +57,30 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   /**
    * Options configuration
    */
-  const sortOrder = [
-    {
-      label: 'Newest',
-      value: 'newest',
-      icon: 'i-lucide-calendar-arrow-up'
-    },
-    {
-      label: 'Oldest',
-      value: 'oldest',
-      icon: 'i-lucide-calendar-arrow-down'
-    } 
-  ]
+  const sortOrder = computed(() => {
+    const options = [
+      {
+        label: 'Newest',
+        value: 'newest',
+        icon: 'i-lucide-calendar-arrow-up'
+      },
+      {
+        label: 'Oldest',
+        value: 'oldest',
+        icon: 'i-lucide-calendar-arrow-down'
+      }
+    ]
+
+    if (enquiries) {
+      options.push({
+        label: 'Listing',
+        value: 'listing',
+        icon: 'i-lucide-list-tree'
+      })
+    }
+
+    return options
+  })
   
   /**
    * Sale/Rent filter options

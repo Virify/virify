@@ -26,14 +26,35 @@ export function useNotifications() {
 
   /**
    * Fetch user item aggregates from the API
+   * Uses useAsyncData for deduplication and caching
    */
   async function fetchUserItemsAggregates() {
+    // Return existing data if loading to prevent duplicate requests
+    if (aggregatesLoading.value) return;
+    
     aggregatesLoading.value = true;
     aggregatesError.value = null;
 
     try {
-      const data = await $fetch<UserItemsAggregates>("/api/notifications/aggregates");
-      aggregates.value = data;
+      // Use useAsyncData with a specific key to deduplicate requests across the app
+      // execute: false because we want to trigger it manually here
+      const { data, error } = await useAsyncData<UserItemsAggregates>(
+        'user-notifications-aggregates',
+        () => $fetch<UserItemsAggregates>("/api/notifications/aggregates"),
+        {
+          immediate: false,
+          dedupe: 'defer' 
+        }
+      );
+
+      // Execute the fetch
+      await refreshNuxtData('user-notifications-aggregates');
+      
+      if (error.value) throw error.value;
+      
+      if (data.value) {
+        aggregates.value = data.value;
+      }
     } catch (err) {
       console.error("Failed to fetch user items aggregates:", err);
       aggregatesError.value = err as Error;

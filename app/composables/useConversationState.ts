@@ -1,10 +1,10 @@
-import { createSharedComposable } from '@vueuse/core';
+
 
 /**
  * Core conversation state management
  * Handles data fetching, loading states, and basic conversation management
  */
-export const useConversationState = createSharedComposable((options?: { limit?: number }) => {
+export const useConversationState = (options?: { limit?: number }) => {
   const { loggedIn, user } = useUserSession();
   const requestFetch = useRequestFetch();
 
@@ -28,8 +28,9 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     filter: 'all' | 'unread' = 'all', 
     direction: 'all' | 'sent' | 'received' = 'all',
     page: number = 1,
-    sort: 'newest' | 'oldest' = 'newest',
+    sort: 'newest' | 'oldest' | 'listing' = 'newest',
     limit: number = defaultLimit,
+    listingId?: number
   ) {
     if (!loggedIn.value || !currentUserId.value) {
       conversations.value = [];
@@ -41,7 +42,11 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     error.value = null;
 
     try {
-      const data = await requestFetch<{ conversations: ConversationWithUserAndMessages[], total: number }>(`/api/conversation/?filter=${filter}&direction=${direction}&sort=${sort}&page=${page}&limit=${limit}`);
+      let url = `/api/conversation/?filter=${filter}&direction=${direction}&sort=${sort}&page=${page}&limit=${limit}`;
+      if (listingId) {
+        url += `&listingId=${listingId}`;
+      }
+      const data = await requestFetch<{ conversations: ConversationWithUserAndMessages[], total: number }>(url);
       conversations.value = data.conversations || [];
       total.value = data.total || 0;
     } catch (err) {
@@ -148,4 +153,4 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     updateConversation,
     total: readonly(total),
   };
-});
+};

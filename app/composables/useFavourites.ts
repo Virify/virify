@@ -1,6 +1,8 @@
 import { ViewsDialogLogin } from "#components";
-import { createSharedComposable } from "@vueuse/core";
 import { performOptimisticUpdate, performPendingRemoval } from "~/utils/optimistic-update";
+
+// Track items pending removal (for visual feedback) - Share across instances
+const pendingRemoval = ref<Set<number>>(new Set());
 
 /**
  * Favourites Composable
@@ -10,7 +12,7 @@ import { performOptimisticUpdate, performPendingRemoval } from "~/utils/optimist
  *
  * @returns Favourites state and actions
  */
-export const useFavourites = createSharedComposable(() => {
+export const useFavourites = () => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
   const { showToast } = useToastNotification();
@@ -24,30 +26,15 @@ export const useFavourites = createSharedComposable(() => {
   const total = ref(0);
   const loading = ref(false);
 
-  /**
-   * Lightweight lookups (just listing IDs) - for isFavourite checks
-   * Uses useRequestFetch to handle authenticated requests during SSR
-   */
-  const { data: favouriteLookups, refresh: refreshFavourites } = useAsyncData<number[]>(
-    "favouriteLookups",
-    () => {
-      if (!loggedIn.value) return Promise.resolve([]);
-      return useRequestFetch()<number[]>("/api/user/favourites/all/lookups");
-    },
-    {
-      default: () => [],
-      watch: [loggedIn],
-      immediate: true,
-    }
-  );
+  // Use Shared Global Lookups
+  const { favouriteLookups, refreshFavourites } = useFavouriteLookups();
+  // Use Shared Recent Items
+  const { recentFavourites, refreshRecentFavourites, recentFavouritesStatus } = useDashboardRecentItems();
 
   /**
    * Full favourites data (for dashboard pages with pagination)
    */
   const favourites = ref<UserFavouriteListingCard[]>([]);
-
-  // Track items pending removal (for visual feedback)
-  const pendingRemoval = ref<Set<number>>(new Set());
 
   // Track current pagination state for refetching after add/remove
   const currentFilter = ref<'all' | 'sale' | 'rent'>('all');
@@ -94,23 +81,6 @@ export const useFavourites = createSharedComposable(() => {
       await fetchFavourites(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
     }
   }
-
-  /**
-   * Recent favourites (last 7 days, max 8) - for dashboard homepage
-   * Uses dedicated lightweight endpoint
-   */
-  const { data: recentFavourites, refresh: refreshRecentFavourites, status: recentFavouritesStatus } = useAsyncData<UserFavouriteListingCard[]>(
-    "recentFavourites",
-    () => {
-      if (!loggedIn.value) return Promise.resolve([]);
-      return useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/all/recent");
-    },
-    {
-      default: () => [],
-      watch: [loggedIn],
-      immediate: true,
-    }
-  );
 
   const saleFavourites = computed(() => {
     return favourites.value.filter((item) => item.listing.saleListing);
@@ -183,6 +153,9 @@ export const useFavourites = createSharedComposable(() => {
    * @param listingId - The ID of the listing to remove from favourites
    */
   const removeFromFavourite = async (listingId: number) => {
+    // Only remove locally if it exists in the lookups
+    if (!favouriteLookups.value.includes(listingId)) return;
+
     await performPendingRemoval({
       pendingSet: pendingRemoval,
       id: listingId,
@@ -194,6 +167,8 @@ export const useFavourites = createSharedComposable(() => {
       },
       onSuccess: () => {
         showToast("Removed from favourites", { type: "success" });
+        // Optimistically remove from global lookups immediately
+        favouriteLookups.value = favouriteLookups.value.filter(id => id !== listingId);
         refreshFavourites();
       },
       onError: (error) => {
@@ -251,4 +226,4 @@ export const useFavourites = createSharedComposable(() => {
     categoryFilter,
     isLoading: computed(() => loading.value || recentFavouritesStatus.value === 'pending'),
   };
-});
+};
