@@ -16,10 +16,7 @@
             :date-key="'updatedAt'"
             enquiries
             :user-id="user?.id"
-            v-model:view="view"
-            v-model:active-tab="conversationFilter"
-            v-model:direction-filter="directionFilter"
-            v-model:sort-order="sortOrder"
+            persistence-key="dashboard-enquiries"
             @update:filtered="sortedAndFilteredConversations = $event"
           />
         </template>
@@ -80,10 +77,13 @@
   const pageTop = ref<HTMLElement | null>(null);
   const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
   const sortedAndFilteredConversations = ref<ConversationWithUserAndMessages[]>([]);
-  const view = useCookie<'grid' | 'list'>('enquiries-view-preference', { default: () => 'grid', maxAge: 60 * 60 * 24 * 365 });
-  const conversationFilter = useCookie<"all" | "unread">('enquiries-filter-preference', { default: () => 'all', maxAge: 60 * 60 * 24 * 365 });
-  const directionFilter = useCookie<"all" | "sent" | "received">('enquiries-direction-preference', { default: () => 'all', maxAge: 60 * 60 * 24 * 365 });
-  const sortOrder = useCookie<'newest' | 'oldest'>('enquiries-sort-preference', { default: () => 'newest', maxAge: 60 * 60 * 24 * 365 });
+  
+  const { 
+    activeView: view,
+    activeTab: conversationFilter,
+    enquiriesFilter: directionFilter,
+    sortOrderValue: sortOrder
+  } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-enquiries' });
 
   // Filtered conversations come directly from API
   const filteredConversations = computed(() => allConversations.value);
@@ -92,7 +92,7 @@
   watch([conversationFilter, directionFilter, sortOrder], async () => {
     page.value = 1;
     await fetchConversations(conversationFilter.value, directionFilter.value, 1, sortOrder.value, limit.value);
-  });
+  }, { immediate: true });
 
   // Handle page changes from pagination component
   async function onPageChange(newPage: number) {    // Remove focus from pagination button to prevent browser fighting the scroll

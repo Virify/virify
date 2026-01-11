@@ -4,7 +4,7 @@
     <div class="relative">
       <USelect
         v-if="!enquiries"
-        v-model="saleRentFilterOriginal"
+        v-model="saleRentFilter"
         :items="saleRentOptions"
         option-attribute="label"
         value-attribute="value"
@@ -26,7 +26,7 @@
       
       <USelect
         v-else
-        v-model="directionFilterOriginal"
+        v-model="enquiriesFilter"
         :items="directionOptions"
         option-attribute="label"
         value-attribute="value"
@@ -50,7 +50,7 @@
     <!-- Sort Filter -->
     <div class="relative inline-flex">
       <USelect
-        v-model="sortOrderValueOriginal"
+        v-model="sortOrderValue"
         :items="sortOrder"
         option-attribute="label"
         value-attribute="value"
@@ -76,7 +76,7 @@
       default-value="all"
       size="sm"
       :content="false"
-      v-model="activeTabOriginal"
+      v-model="activeTab"
       variant="pill"
       :ui="{
         trigger: 'data-[state=active]:text-white! transition-none',
@@ -106,7 +106,7 @@
         }" />
         <template #content>
           <UInput
-            v-model="searchQueryOriginal"
+            v-model="searchQuery"
             variant="subtle"
             icon="i-lucide-search"
             color="secondary"
@@ -125,9 +125,9 @@
     </div>
 
     <!-- View Toggle -->
-    <div v-if="view" class="ml-auto hidden md:flex">
+    <div v-if="enquiries" class="ml-auto hidden md:flex">
       <UTabs
-        v-model="activeViewOriginal"
+        v-model="activeView"
         :items="viewOptions"
         :content="false"
         color="primary"
@@ -143,42 +143,26 @@
 <script setup lang="ts">
   const props = defineProps<{
     enquiries?: boolean;
-    saleRentFilter: any;
-    saleRentOptions: any[];
-    enquiriesFilter: any;
-    enquiriesOptions: any[];
-    sortOrderValue: string;
-    sortOrder: any[];
-    activeTab: string;
-    tabItems: any[];
+    filterState: ReturnType<typeof useDashboardListFilter>;
     allConversationsCount: number;
     unreadConversationsCount: number;
-    searchQuery: string;
-    view?: "grid" | "list";
-    activeView: string;
-    viewOptions: any[];
-    directionFilter: string;
-    directionOptions: any[];
   }>();
 
-  const emit = defineEmits<{
-    (e: 'update:saleRentFilter', value: any): void;
-    (e: 'update:enquiriesFilter', value: any): void;
-    (e: 'update:sortOrderValue', value: string): void;
-    (e: 'update:activeTab', value: string): void;
-    (e: 'update:searchQuery', value: string): void;
-    (e: 'update:activeView', value: string): void;
-    (e: 'update:directionFilter', value: string): void;
-  }>();
-
-  /**
-   * Computed Bindings for v-model Props
-   */
-  const saleRentFilterOriginal = usePropModel(props, 'saleRentFilter', emit);
-  const sortOrderValueOriginal = usePropModel(props, 'sortOrderValue', emit);
-  const activeTabOriginal = usePropModel(props, 'activeTab', emit);
-  const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);
-  const activeViewOriginal = usePropModel(props, 'activeView', emit);
-  const directionFilterOriginal = usePropModel(props, 'directionFilter', emit);
+  // Destructure for easier use in template
+  const { 
+    // State (Refs)
+    saleRentFilter,
+    enquiriesFilter,
+    sortOrderValue,
+    activeTab,
+    activeView,
+    searchQuery,
+    // Options
+    saleRentOptions,
+    directionOptions,
+    sortOrder,
+    tabItems,
+    viewOptions
+  } = props.filterState;
 
 </script>

@@ -19,18 +19,38 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     dateKey?: keyof T
     /** Current user ID for 'My Enquiries' filtering */
     userId?: string | Ref<string | undefined>
+    /** Key to use for cookie persistence. If provided, sort and filters will be saved */
+    persistenceKey?: string
   } = {}
 ) => {
-  const { dateKey = 'createdAt', userId } = options
+  const { dateKey = 'createdAt', userId, persistenceKey } = options
 
   /**
    * State
    */
   const searchQuery = ref('')
   const debouncedSearchQuery = refDebounced(searchQuery, 300)
-  const sortOrderValue = ref('newest')
-  const saleRentFilter = ref('all')
-  const enquiriesFilter = ref('all')
+  
+  // Use cookies if persistenceKey is provided, otherwise use standard refs
+  const sortOrderValue = persistenceKey 
+    ? useCookie<DashboardSortOrder>(`${persistenceKey}-sort`, { default: () => 'newest', maxAge: 60 * 60 * 24 * 365 })
+    : ref<DashboardSortOrder>('newest')
+
+  const saleRentFilter = persistenceKey
+    ? useCookie<DashboardSaleRentFilter>(`${persistenceKey}-filter`, { default: () => 'all', maxAge: 60 * 60 * 24 * 365 })
+    : ref<DashboardSaleRentFilter>('all')
+
+  const enquiriesFilter = persistenceKey
+    ? useCookie<DashboardEnquiriesFilter>(`${persistenceKey}-enquiries`, { default: () => 'all', maxAge: 60 * 60 * 24 * 365 })
+    : ref<DashboardEnquiriesFilter>('all')
+
+  const activeTab = persistenceKey
+    ? useCookie<DashboardConversationFilter>(`${persistenceKey}-tab`, { default: () => 'all', maxAge: 60 * 60 * 24 * 365 })
+    : ref<DashboardConversationFilter>('all')
+
+  const activeView = persistenceKey
+    ? useCookie<DashboardViewType>(`${persistenceKey}-view`, { default: () => 'grid', maxAge: 60 * 60 * 24 * 365 })
+    : ref<DashboardViewType>('grid')
 
   /**
    * Options configuration
@@ -90,6 +110,7 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     const sortVal = sortOrderValue.value
     const filterVal = saleRentFilter.value
     const enquiryVal = enquiriesFilter.value
+    const tabVal = activeTab.value
     const curUserId = unref(userId)
     
     // Single pass filtering
@@ -130,15 +151,6 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
       if (filterVal === 'sale' && !item.listing?.saleListing) return false
       if (filterVal === 'rent' && !item.listing?.rentalListing) return false
 
-      // 3. Enquiries Role Filter
-      if (curUserId && enquiryVal !== 'all') {
-        const senderId = item.senderId || item.sender?.id
-        const receiverId = item.receiverId || item.receiver?.id
-        
-        if (enquiryVal === 'sent' && String(senderId) !== String(curUserId)) return false
-        if (enquiryVal === 'received' && String(receiverId) !== String(curUserId)) return false
-      }
-
       return true
     })
 
@@ -166,5 +178,7 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     sortOrder,
     saleRentOptions,
     filteredItems,
+    activeTab,
+    activeView,
   }
 }

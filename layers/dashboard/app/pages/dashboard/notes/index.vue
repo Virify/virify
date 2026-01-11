@@ -9,6 +9,7 @@
           <OrganismsDashboardFilter
             :items="userNotes"
             :date-key="'updatedAt'"
+            persistence-key="dashboard-notes"
             @update:filtered="filteredUserNotes = $event"
           />
         </template>

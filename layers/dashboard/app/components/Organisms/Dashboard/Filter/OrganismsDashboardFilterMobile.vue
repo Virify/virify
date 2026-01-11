@@ -26,7 +26,7 @@
                 default-value="all"
                 size="sm"
                 :content="false"
-                v-model="activeTabOriginal"
+                v-model="activeTab"
                 variant="pill"
                 class="max-w-80"
                 :ui="{
@@ -53,7 +53,7 @@
               <div class="relative">
                 <USelect
                   v-if="!enquiries"
-                  v-model="saleRentFilterOriginal"
+                  v-model="saleRentFilter"
                   :items="saleRentOptions"
                   option-attribute="label"
                   value-attribute="value"
@@ -75,7 +75,7 @@
                 />
                 <USelect
                   v-else
-                  v-model="directionFilterOriginal"
+                  v-model="enquiriesFilter"
                   :items="directionOptions"
                   option-attribute="label"
                   value-attribute="value"
@@ -100,7 +100,7 @@
               <!-- Sort Filter -->
               <div class="relative">
                 <USelect
-                  v-model="sortOrderValueOriginal"
+                  v-model="sortOrderValue"
                   :items="sortOrder"
                   option-attribute="label"
                   value-attribute="value"
@@ -126,7 +126,7 @@
             <!-- Search -->
             <div class="w-full">
               <UInput
-                v-model="searchQueryOriginal"
+                v-model="searchQuery"
                 variant="subtle"
                 icon="i-lucide-search"
                 color="secondary"
@@ -152,35 +152,28 @@
     isOpen: boolean;
     enableTransition: boolean;
     enquiries?: boolean;
-    saleRentFilter: any;
-    saleRentOptions: any[];
-    enquiriesFilter: any;
-    enquiriesOptions: any[];
-    sortOrderValue: string;
-    sortOrder: any[];
-    activeTab: string;
-    tabItems: any[];
+    filterState: ReturnType<typeof useDashboardListFilter>;
     allConversationsCount: number;
     unreadConversationsCount: number;
-    searchQuery: string;
-    directionFilter: string;
-    directionOptions: any[];
   }>();
 
   const emit = defineEmits<{
     (e: 'update:isOpen', value: boolean): void;
-    (e: 'update:saleRentFilter', value: any): void;
-    (e: 'update:enquiriesFilter', value: any): void;
-    (e: 'update:sortOrderValue', value: string): void;
-    (e: 'update:activeTab', value: string): void;
-    (e: 'update:searchQuery', value: string): void;
-    (e: 'update:directionFilter', value: string): void;
   }>();
 
+  const { 
+    // State (Refs)
+    saleRentFilter,
+    enquiriesFilter,
+    sortOrderValue,
+    activeTab,
+    searchQuery,
+    // Options
+    saleRentOptions,
+    directionOptions,
+    sortOrder,
+    tabItems
+  } = props.filterState;
+
   const isOpenOriginal = usePropModel(props, 'isOpen', emit);
-  const saleRentFilterOriginal = usePropModel(props, 'saleRentFilter', emit);
-  const sortOrderValueOriginal = usePropModel(props, 'sortOrderValue', emit);
-  const activeTabOriginal = usePropModel(props, 'activeTab', emit);
-  const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);
-  const directionFilterOriginal = usePropModel(props, 'directionFilter', emit);
 </script>

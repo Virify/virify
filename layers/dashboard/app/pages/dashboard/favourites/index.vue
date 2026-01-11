@@ -9,6 +9,7 @@
           <OrganismsDashboardFilter
             :items="favourites"
             :date-key="'createdAt'"
+            persistence-key="dashboard-favourites"
             @update:filtered="favouritesFiltered = $event"
           />
         </template>

@@ -96,21 +96,6 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
   }
 
   /**
-   * Auto-fetch conversations when user logs in
-   */
-  if (import.meta.client) {
-    watchEffect(() => {
-      if (loggedIn.value && currentUserId.value) {
-        fetchConversations();
-      } else {
-        conversations.value = [];
-        error.value = null;
-        loading.value = false;
-      }
-    });
-  }
-
-  /**
    * Refresh conversations manually
    */
   function refreshConversations() {
