@@ -15,33 +15,11 @@
         <OrganismsDashboardListingCardEnquiry v-if="group.listing" :listing="group.listing" />
 
         <!-- Summary Stats -->
-        <div class="flex flex-wrap items-center gap-2 py-2">
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-circle" class="w-2.5 h-2.5" :class="unreadConversations.length > 0 ? 'text-secondary fill-secondary' : 'text-gray-300 fill-gray-300'" />
-            <span class="body-xs" :class="unreadConversations.length > 0 ? 'text-secondary body-xs' : 'text-(--foreground-200)'"> {{ unreadConversations.length }} Unread </span>
-          </div>
-
-          <USeparator orientation="vertical" class="h-4" />
-          <span class="body-xs text-(--foreground-200)"> {{ readConversations.length }} Read </span>
-          <USeparator orientation="horizontal" class="h-4" />
-          <div class="flex items-center justify-between w-full">
-            <span class="body-xs text-(--foreground-200)"> {{ group.conversations.length }} Total Enquiries </span>
-
-            <UButton
-              variant="solid"
-              size="sm"
-              color="secondary"
-              label="View All"
-              class="body-sm"
-              trailing-icon="i-lucide-arrow-right"
-              :to="`/dashboard/enquiries/${group.listing?.id}`"
-              :ui="{
-                trailingIcon: 'group-hover:translate-x-1 transition-transform text-white',
-                label: 'text-white',
-              }"
-            />
-          </div>
-        </div>
+        <MoleculesDashboardEnquiryGroupSummary
+          :conversations="group.conversations"
+          :listing-id="group.listing?.id"
+          :user-id="user?.id"
+        />
       </div>
     </template>
   </UPageCard>
@@ -66,12 +44,4 @@ const props = defineProps<{
 defineEmits<{
   (e: "click", listingId?: number): void;
 }>();
-
-const unreadConversations = computed(() => {
-  return props.group.conversations.filter((c) => getUnreadCount(c, props.user?.id) > 0);
-});
-
-const readConversations = computed(() => {
-  return props.group.conversations.filter((c) => getUnreadCount(c, props.user?.id) === 0);
-});
 </script>

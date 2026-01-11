@@ -88,6 +88,7 @@
       <UAccordion 
         :items="accordionItems" 
         type="multiple"
+        default-values="['favourite-listings']"
         :ui="{
           leadingIcon: 'text-secondary',
           label: 'body-sm font-bold',

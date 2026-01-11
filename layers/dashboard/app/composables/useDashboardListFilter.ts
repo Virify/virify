@@ -23,9 +23,11 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     persistenceKey?: string
     /** Whether to include enquiries-specific options */
     enquiries?: boolean
+    /** Whether to hide the Listing sort option */
+    hideListingSort?: boolean
   } = {}
 ) => {
-  const { dateKey = 'createdAt', userId, persistenceKey, enquiries = false } = options
+  const { dateKey = 'createdAt', userId, persistenceKey, enquiries = false, hideListingSort = false } = options
 
   /**
    * State
@@ -71,7 +73,7 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
       }
     ]
 
-    if (enquiries) {
+    if (enquiries && !hideListingSort) {
       options.push({
         label: 'Listing',
         value: 'listing',
