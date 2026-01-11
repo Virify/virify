@@ -1,5 +1,5 @@
 <template>
-  <div class="| flow dialog-container dialog-container-xs">
+  <div class="| flow dialog-container dialog-container-sm">
     <h1 class="| title-xl">{{ title }}</h1>
     <p class="| body-sm">{{ content }}</p>
 

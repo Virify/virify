@@ -86,6 +86,42 @@ export async function getAllUserNotes(
 }
 
 /**
+ * Get recent notes for a user (last 7 days, max 8 items)
+ * Used for dashboard homepage recent notes section
+ * 
+ * @param userId - The ID of the user
+ * @param limit - Maximum number of notes to return (default 8)
+ * @returns Array of recent notes
+ */
+export async function getRecentUserNotes(userId: number, limit: number = 10): Promise<NoteData[]> {
+  return await prisma.userNote.findMany({
+    where: {
+      userPreferences: {
+        userId,
+      },
+      updatedAt: {
+        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+    take: limit,
+    select: {
+      id: true,
+      userPreferencesId: true,
+      listing: {
+        select: listingCardFields,
+      },
+      listingId: true,
+      note: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+/**
  * Get a user's note for a specific listing
  *
  * @param userId - The ID of the user
@@ -106,25 +142,6 @@ export async function getUserNote(userId: number, listingId: number): Promise<No
   });
 
   return userNote?.note || null;
-}
-
-/**
- * 
- * @param userId - The ID of the user
- * @description Fetch recent user notes created in the last 7 days
- * @returns Array of recent user notes
- */
-export async function getRecentUserNotes(userId: number) {
-  return await prisma.userNote.findMany({
-    where: {
-      userPreferences: {
-        userId: userId,
-      },
-      createdAt: {
-        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
-      },
-    },
-  });
 }
 
 /**
@@ -183,4 +200,22 @@ export async function deleteUserNote(userId: number, listingId: number) {
   });
 
   return { success: true };
+}
+
+/**
+ * Delete all user notes
+ *
+ * @param userId - The ID of the user
+ * @returns Success status with count of deleted notes
+ */
+export async function deleteAllUserNotes(userId: number) {
+  const result = await prisma.userNote.deleteMany({
+    where: {
+      userPreferences: {
+        userId,
+      },
+    },
+  });
+
+  return { success: true, count: result.count };
 }

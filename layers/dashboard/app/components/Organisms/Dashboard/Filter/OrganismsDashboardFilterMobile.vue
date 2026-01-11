@@ -59,7 +59,7 @@
                   value-attribute="value"
                   icon="i-lucide-funnel"
                   color="primary"
-                  variant="subtle"
+                  variant="ghost"
                   size="lg"
                   class="body-sm text-white"
                   :ui="{

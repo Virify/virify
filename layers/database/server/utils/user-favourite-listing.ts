@@ -1,4 +1,25 @@
 /**
+ * Get user favourite lookups (listing IDs only)
+ * Used for checking if a listing is favourited without fetching full data
+ * 
+ * @param userId number
+ * @returns Array of favourite listing IDs
+ */
+export async function getUserFavouriteLookups(userId: number): Promise<number[]> {
+  const favourites = await prisma.userFavouriteListing.findMany({
+    where: {
+      userPreferences: {
+        userId,
+      },
+    },
+    select: {
+      listingId: true,
+    },
+  });
+  return favourites.map(f => f.listingId);
+}
+
+/**
  * Get user favourites with listing data only
  *
  * @param userId number
@@ -60,12 +81,14 @@ export async function getUserFavourites(
 }
 
 /**
- * Get recent favourites for a user
+ * Get recent favourites for a user (last 7 days)
+ * Used for dashboard homepage recent favourites section
  * 
  * @param userId number
+ * @param limit Maximum number of items to return (default 8)
  * @returns UserFavouriteListingCard[]
  */
-export async function getRecentFavourites(userId: number): Promise<UserFavouriteListingCard[]> {
+export async function getRecentFavourites(userId: number, limit: number = 8): Promise<UserFavouriteListingCard[]> {
   return await prisma.userFavouriteListing.findMany({
     where: {
       userPreferences: {
@@ -78,6 +101,7 @@ export async function getRecentFavourites(userId: number): Promise<UserFavourite
     orderBy: {
       createdAt: "desc",
     },
+    take: limit,
     select: {
       id: true,
       createdAt: true,

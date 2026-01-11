@@ -8,7 +8,9 @@ const favouritesQuerySchema = z.object({
 });
 
 /**
- * Get user saved listings (favourites)
+ * Get user saved listings (favourites) with full listing data (paginated)
+ * 
+ * GET /api/user/favourites/all/full
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -30,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
     return result;
   } catch (error) {
-    console.log(error)
-    errorResponse(error, event);
+    console.error("Error fetching favourites:", error);
+    return errorResponse(error, event);
   }
 });

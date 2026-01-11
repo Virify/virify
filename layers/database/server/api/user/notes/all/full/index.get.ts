@@ -9,7 +9,9 @@ const notesQuerySchema = z.object({
 });
 
 /**
- * Get all of a user's notes
+ * Get all of a user's notes with full listing data (paginated)
+ * 
+ * GET /api/user/notes/all/full
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();

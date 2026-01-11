@@ -1,16 +1,31 @@
 <template>
-  <UPageCard
-    variant="naked"
-    reverse
-    class="p-4 border border-accented/50 bg-elevated/50 rounded-lg h-full flex flex-col"
-    :ui="{
-      header: 'mb-0 w-full',
-      title: 'my-1',
-      description: 'text-(--foreground-100) w-full flex-1 flex flex-col justify-between',
-      footer: 'mt-1 pt-0 w-full',
-      body: 'w-full flex flex-col flex-1',
-    }"
-  >
+  <div class="relative h-full">
+    <!-- Removed overlay -->
+    <Transition name="fade">
+      <div 
+        v-if="isPending" 
+        class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-elevated/70 rounded-lg"
+      >
+        <UIcon name="i-lucide-heart-off" class="w-8 h-8 text-muted-foreground mb-2" />
+        <span class="text-muted-foreground body-md">Removed</span>
+      </div>
+    </Transition>
+
+    <UPageCard
+      variant="naked"
+      reverse
+      class="p-4 border border-accented/50 bg-elevated/50 rounded-lg h-full flex flex-col transition-all duration-300"
+      :class="{
+        'opacity-40 blur-xs pointer-events-none': isPending
+      }"
+      :ui="{
+        header: 'mb-0 w-full',
+        title: 'my-1',
+        description: 'text-(--foreground-100) w-full flex-1 flex flex-col justify-between',
+        footer: 'mt-1 pt-0 w-full',
+        body: 'w-full flex flex-col flex-1',
+      }"
+    >
   <AtomsCloudFlareImage
     v-if="listing?.property?.media[0]"
     :src="listing?.property?.media[0]?.image!"
@@ -117,19 +132,22 @@
             icon-class="w-5 h-5"
           />
           <AtomsFavouriteButton
-            :is-favourite="true"
             :listing-id="listing?.id!"
             icon-class="w-5 h-5"
-            @remove="removeFromFavourite(listing?.id!)"
+            :confirm-removal="true"
           />
         </div>
       </div>
     </template>
   </UPageCard>
+  </div>
 </template>
 <script lang="ts" setup>
-  const  { removeFromFavourite } = useFavourites()
+  import { ViewsDialogConfirmRemoveFavourite } from '#components'
+  
+  const { isPendingRemoval } = useFavourites()
   const { getNoteData, showNoteDialog } = useNotes()
+  const { showDialog } = useDialog()
 
   interface Props {
     listing: ListingCardType
@@ -137,6 +155,13 @@
     note?: string | Date
   }
   const props= defineProps<Props>()
+
+  /**
+   * Check if this card is pending removal
+   */
+  const isPending = computed(() => {
+    return isPendingRemoval(props.listing?.id!)
+  })
 
     /**
      * Get Note Data

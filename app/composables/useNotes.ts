@@ -1,9 +1,18 @@
 import { ViewsDialogLogin, ViewsDialogNotes } from "#components";
 import { createSharedComposable } from "@vueuse/core";
 import type { NoteData } from "~~/shared/types/note";
+import { performOptimisticUpdate, performMultiOptimisticUpdate } from "~/utils/optimistic-update";
+
+interface NoteLookup {
+  listingId: number;
+  note: string;
+}
 
 /**
  * Notes Composable
+ * 
+ * Manages user's property notes with optimistic updates for seamless UX.
+ * Uses lightweight lookups for efficient hasNote/getNote checks across the app.
  */
 export const useNotes = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
@@ -20,27 +29,32 @@ export const useNotes = createSharedComposable(() => {
   const loading = ref(false);
 
   /**
-   * State Management
-   * Store notes as an array with listing relationship
+   * Lightweight lookups (just listingId + note content) - for hasNote/getNote checks
+   * Uses useRequestFetch to handle authenticated requests during SSR
    */
-  const { data: userNotes, refresh: refreshUserNotes, status } = useAsyncData<NoteData[]>(
-    "userNotes",
+  const { data: noteLookups, refresh: refreshUserNotes } = useAsyncData<NoteLookup[]>(
+    "noteLookups",
     () => {
-      // Only make API call if user is logged in
-      if (!loggedIn.value) {
-        return Promise.resolve([]);
-      }
-      return useRequestFetch()<{ notes: NoteData[], total: number }>("/api/user/notes/").then(res => {
-        total.value = res.total || 0;
-        return res.notes || [];
-      });
+      if (!loggedIn.value) return Promise.resolve([]);
+      return useRequestFetch()<NoteLookup[]>("/api/user/notes/all/lookups");
     },
     {
       default: () => [],
       watch: [loggedIn],
-      server: true,
+      immediate: true,
     }
   );
+
+  /**
+   * Full notes data (for dashboard pages with pagination)
+   */
+  const userNotes = ref<NoteData[]>([]);
+
+  // Track current pagination state for refetching after add/remove
+  const currentFilter = ref<'all' | 'sale' | 'rent'>('all');
+  const currentPage = ref(1);
+  const currentSort = ref<'newest' | 'oldest'>('newest');
+  const currentLimit = ref(20);
 
   /**
    * Fetch notes with pagination, sort, and filter (for dashboard)
@@ -51,10 +65,16 @@ export const useNotes = createSharedComposable(() => {
     sort: 'newest' | 'oldest' = 'newest',
     limit: number = 20
   ) {
+    // Store current pagination state
+    currentFilter.value = filter;
+    currentPage.value = page;
+    currentSort.value = sort;
+    currentLimit.value = limit;
+
     loading.value = true;
     try {
       const data = await requestFetch<{ notes: NoteData[], total: number }>(
-        `/api/user/notes/?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`
+        `/api/user/notes/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`
       );
       userNotes.value = data.notes || [];
       total.value = data.total || 0;
@@ -67,15 +87,31 @@ export const useNotes = createSharedComposable(() => {
     }
   }
 
-  const recentUserNotes = computed(() => {
-    return userNotes.value
-      .filter((item) => {
-        const createdAt = new Date(item.createdAt);
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        return createdAt >= sevenDaysAgo;
-      })
-      .slice(0, 8);
-  });
+  /**
+   * Refetch current page (used after add/remove when dashboard is active)
+   */
+  async function refetchCurrentPage() {
+    if (userNotes.value.length > 0 || total.value > 0) {
+      await fetchNotes(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
+    }
+  }
+
+  /**
+   * Recent notes (last 7 days, max 8) - for dashboard homepage
+   * Uses dedicated lightweight endpoint
+   */
+  const { data: recentUserNotes, refresh: refreshRecentNotes, status: recentNotesStatus } = useAsyncData<NoteData[]>(
+    "recentUserNotes",
+    () => {
+      if (!loggedIn.value) return Promise.resolve([]);
+      return useRequestFetch()<NoteData[]>("/api/user/notes/all/recent");
+    },
+    {
+      default: () => [],
+      watch: [loggedIn],
+      immediate: true,
+    }
+  );
 
   const saleNotes = computed(() => {
     return userNotes.value.filter((item) => item.listing?.saleListing);
@@ -98,115 +134,146 @@ export const useNotes = createSharedComposable(() => {
   });
 
   /**
-   * Check if a property has a note
+   * Check if a property has a note (uses lightweight lookups)
    *
    * @param listingId - ID of the listing
    * @returns boolean indicating if the listing has a note
    */
   const hasNote = (listingId: number): boolean => {
-    return userNotes.value.some((note) => note.listingId === listingId);
+    return noteLookups.value.some((note) => note.listingId === listingId);
   };
 
   /**
-   * Get note for a specific listing
+   * Get note for a specific listing (uses lightweight lookups)
    *
    * @param listingId - ID of the Listing
    * @returns note string or undefined
    */
   const getNote = (listingId: number): string | undefined => {
-    const noteData = userNotes.value.find((note) => note.listingId === listingId);
+    const noteData = noteLookups.value.find((note) => note.listingId === listingId);
     return noteData?.note;
   };
 
   /**
    * Get the notes data object for a specific listing
+   * Uses lightweight lookups first, falls back to full userNotes for createdAt
    * 
    * @param listingId  - ID of the Listing
    * @returns NoteData object or undefined
    */
   const getNoteData = (listingId: number): { note?: string; createdAt?: any } => {
+    // First check lightweight lookups (available across all pages)
+    const lookup = noteLookups.value.find((note) => note.listingId === listingId);
+    // Fall back to full userNotes for createdAt (only available on notes dashboard)
+    const fullNote = userNotes.value.find((note) => note.listingId === listingId);
+    
     return {
-      note: userNotes.value.find((note) => note.listingId === listingId)?.note,
-      createdAt: userNotes.value.find((note) => note.listingId === listingId)?.createdAt,
+      note: lookup?.note ?? fullNote?.note,
+      createdAt: fullNote?.createdAt,
     };
   };
 
   /**
-   * Update note for a specific listing
+   * Update or create a note for a specific listing
+   * 
+   * Uses optimistic updates: the UI updates immediately while the API call
+   * happens in the background. If the API call fails, the change is rolled back.
    *
    * @param listingId - ID of the Listing
-   * @param note - The note to save
+   * @param note - The note content to save
    */
   const updateNote = async (listingId: number, note: string) => {
     if (!loggedIn.value) {
-      showDialog({
-        component: ViewsDialogLogin,
-      });
+      showDialog({ component: ViewsDialogLogin });
       return;
     }
 
     const isUpdating = hasNote(listingId);
+    const successMessage = isUpdating ? "Note updated" : "Note added";
+    const errorMessage = isUpdating ? "Failed to update note" : "Failed to add note";
 
-    try {
-      await $fetch(`/api/user/notes/${listingId}/`, {
-        method: "POST",
-        body: {
-          listingId,
-          note,
+    await performMultiOptimisticUpdate({
+      updates: [
+        {
+          ref: noteLookups,
+          optimisticChange: (current) => 
+            isUpdating
+              ? current.map((n: NoteLookup) => n.listingId === listingId ? { ...n, note } : n)
+              : [...current, { listingId, note }],
         },
-      });
-
-      await refreshUserNotes();
-      showToast(isUpdating ? "Note updated" : "Note added", { type: "success" });
-    } catch (error) {
-      console.error("Error updating note:", error);
-      // Show error toast
-      showToast(isUpdating ? "Failed to update note" : "Failed to add note", { type: "error" });
-      throw error;
-    }
+        {
+          ref: userNotes,
+          optimisticChange: (current) =>
+            current.map((n: NoteData) => n.listingId === listingId ? { ...n, note } : n),
+        },
+      ],
+      operation: async () => {
+        await $fetch(`/api/user/notes/${listingId}/`, {
+          method: "POST",
+          body: { listingId, note },
+        });
+      },
+      onSuccess: () => {
+        refreshUserNotes();
+        refetchCurrentPage();
+        showToast(successMessage, { type: "success" });
+      },
+      onError: (error) => {
+        console.error("Error updating note:", error);
+        showToast(errorMessage, { type: "error" });
+      },
+    });
   };
 
   /**
-   * Delete note for a specific listing
+   * Delete a note for a specific listing
+   * 
+   * Uses optimistic updates: the note is removed from the UI immediately while
+   * the API call happens in the background. If the API call fails, the note is restored.
    *
    * @param listingId - ID of the Listing
    */
   const deleteNote = async (listingId: number) => {
     if (!loggedIn.value) {
-      showDialog({
-        component: ViewsDialogLogin,
-      });
+      showDialog({ component: ViewsDialogLogin });
       return;
     }
 
-    try {
-      await $fetch(`/api/user/notes/${listingId}/`, {
-        method: "DELETE",
-        body: { listingId },
-      });
-
-      // Refetch to update list with correct pagination
-      await refreshUserNotes();
-
-      // Show success toast
-      showToast("Note deleted", { type: "success" });
-    } catch (error) {
-      console.error("Error deleting note:", error);
-      // Show error toast
-      showToast("Failed to delete note", { type: "error" });
-      throw error;
-    }
+    await performMultiOptimisticUpdate({
+      updates: [
+        {
+          ref: noteLookups,
+          optimisticChange: (current) => current.filter((n: NoteLookup) => n.listingId !== listingId),
+        },
+        {
+          ref: userNotes,
+          optimisticChange: (current) => current.filter((n: NoteData) => n.listingId !== listingId),
+        },
+      ],
+      operation: async () => {
+        await $fetch(`/api/user/notes/${listingId}/`, {
+          method: "DELETE",
+          body: { listingId },
+        });
+      },
+      onSuccess: () => {
+        refreshUserNotes();
+        refetchCurrentPage();
+        showToast("Note deleted", { type: "success" });
+      },
+      onError: (error) => {
+        console.error("Error deleting note:", error);
+        showToast("Failed to delete note", { type: "error" });
+      },
+    });
   };
 
   /**
    * Watch for changes in the loggedIn state
    * When the user logs out, clear cached notes state
-   * When the user logs in, prefetch notes
    */
-  watch(loggedIn, async (isLoggedIn) => {
-    if (isLoggedIn) {
-      await refreshUserNotes();
-    } else {
+  watch(loggedIn, (isLoggedIn) => {
+    if (!isLoggedIn) {
       userNotes.value = [];
     }
   });
@@ -238,6 +305,7 @@ export const useNotes = createSharedComposable(() => {
     userNotes,
     filteredUserNotes,
     recentUserNotes,
+    refreshRecentNotes,
     saleNotes,
     rentalNotes,
     refreshUserNotes,
@@ -247,10 +315,6 @@ export const useNotes = createSharedComposable(() => {
     // search filter state
     searchTerm,
     categoryFilter,
-    isLoading: computed(() => {
-      // Show loading if idle (not started) or pending with no data
-      // If we have data, we suppress the loading state to avoid UI flash during background refreshes
-      return status.value === 'idle' || (status.value === 'pending' && !(userNotes.value && userNotes.value.length > 0));
-    }),
+    isLoading: computed(() => loading.value || recentNotesStatus.value === 'pending'),
   };
 });

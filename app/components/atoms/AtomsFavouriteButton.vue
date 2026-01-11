@@ -34,7 +34,10 @@
 
 <script setup lang="ts">
 import { watchOnce } from '@vueuse/core';
+import { ViewsDialogConfirmRemoveFavourite } from '#components';
+
 const { isFavourite, addToFavourite, removeFromFavourite } = useFavourites();
+const { showDialog } = useDialog();
 
 interface Props {
   listingId: number
@@ -76,16 +79,32 @@ const ariaLabel = computed(() => {
 });
 
 /**
+ *  Show confirmation dialog for removal
+ */
+function showConfirmRemoval() {
+  showDialog({
+    component: ViewsDialogConfirmRemoveFavourite,
+    props: { listingId: props.listingId }
+  });
+}
+
+/**
  *  Fetch, retrieve favourites
  */
 function toggle() {
   isSelected.value = !isSelected.value
   if (isCurrentFavourite.value) {
-    // just a tad delayed to allow the animation to finish when removing from a list of favourites
-    setTimeout(() => {
-      isSelected.value = false
-      removeFromFavourite(props.listingId)
-    }, 100)
+    // If confirmRemoval is enabled, show dialog instead of removing directly
+    if (props.confirmRemoval) {
+      isSelected.value = true // Reset selection state
+      showConfirmRemoval()
+    } else {
+      // just a tad delayed to allow the animation to finish when removing from a list of favourites
+      setTimeout(() => {
+        isSelected.value = false
+        removeFromFavourite(props.listingId)
+      }, 100)
+    }
   } else {
     addToFavourite(props.listingId)
   }
