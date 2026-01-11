@@ -18,6 +18,7 @@
     </template>
 
     <template #body>
+      <MoleculesDashboardBreadcrumb />
       <OrganismsDashboardListingCardGrid ref="pageTop" v-if="loading">
         <OrganismsDashboardListingCardSkeleton :cards="3"/>
       </OrganismsDashboardListingCardGrid>

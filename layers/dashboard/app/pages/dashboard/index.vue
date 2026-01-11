@@ -14,9 +14,70 @@
     <template #body>
       <OrganismsDashboardAnalyticsCard />
 
+      <!-- Quick Actions Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <UPageCard
+          title="My Favourites"
+          description="View and manage your saved properties"
+          icon="i-lucide-heart"
+          to="/dashboard/favourites"
+          spotlight
+          spotlight-color="secondary"
+          variant="subtle"
+          :ui="{
+            leadingIcon: 'text-secondary',
+            title: 'body-sm font-bold',
+            description: 'text-muted-foreground body-xs',
+          }"
+        />
+        <UPageCard
+          title="My Notes"
+          description="Review your property notes and annotations"
+          icon="i-lucide-sticky-note"
+          to="/dashboard/notes"
+          spotlight
+          spotlight-color="secondary"
+          variant="subtle"
+          :ui="{
+            leadingIcon: 'text-secondary',
+            title: 'body-sm font-bold',
+            description: 'text-muted-foreground body-xs',
+          }"
+        />
+        <UPageCard
+          title="Search Properties"
+          description="Find your perfect home with our search tools"
+          icon="i-lucide-search"
+          spotlight
+          spotlight-color="secondary"
+          to="/search"
+          variant="subtle"
+          :ui="{
+            leadingIcon: 'text-secondary',
+            title: 'body-sm font-bold',
+            description: 'text-muted-foreground body-xs',
+          }"
+        />
+        <UPageCard
+          title="My Enquiries"
+          description="Track your property enquiries and responses"
+          icon="i-lucide-mail"
+          to="/dashboard/enquiries"
+          spotlight
+          spotlight-color="secondary"
+          variant="subtle"
+          :ui="{
+            leadingIcon: 'text-secondary',
+            title: 'body-sm font-bold',
+            description: 'text-muted-foreground body-xs',
+          }"
+        />
+      </div>
+
       <UAccordion 
         :items="accordionItems" 
-        default-value="favourite-listings" 
+        type="multiple"
+        :default-value="['favourite-listings', 'notes-added', 'viewed-listings']"
         :ui="{
           leadingIcon: 'text-secondary',
           label: 'body-sm font-bold',
@@ -82,21 +143,18 @@
       icon: 'i-lucide-heart',
       slot: 'favourite-listings',
       value: 'favourite-listings',
-      defaultValue: true,
     },
     {
       label: 'Recent Notes Added',
       icon: 'i-lucide-sticky-note',
       slot: 'notes-added',
       value: 'notes-added',
-      defaultValue: true,
     },
     {
       label: 'Viewed Listings',
       icon: 'i-lucide-eye',
       slot: 'viewed-listings',
       value: 'viewed-listings',
-      defaultValue: true,
     },
   ];
 </script>

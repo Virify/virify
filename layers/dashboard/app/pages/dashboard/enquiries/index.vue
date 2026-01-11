@@ -23,6 +23,7 @@
       </UDashboardNavbar>
     </template>
     <template #body>
+      <MoleculesDashboardBreadcrumb />
       <UPageList ref="pageTop" :class="[
         'gap-4 ',
         view === 'grid' && (loading || sortedAndFilteredConversations.length > 0) ? 'grid grid-cols-1 xl:grid-cols-2' : ''

@@ -14,7 +14,7 @@
       :next="{ variant: 'subtle', color: 'secondary' }"
       :ui="{ 
         container: 'items-stretch',
-        item: 'basis-auto flex-none w-[400px] ps-4',
+        item: 'basis-auto flex-none md:w-[420px] ps-4',
         prev: 'start-4 sm:-start-10',
         next: 'end-4 sm:-end-10',
       }"
