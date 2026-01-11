@@ -155,6 +155,9 @@ export async function distributeListingsToUsers(userIds: number[]): Promise<void
 
   // Now seed conversations
   await seedConversations(userIds);
+  
+  // Seed fake user favourites and notes on admin listings
+  await seedFakeUserFavouritesOnAdminListings(userIds);
 }
 
 /**
@@ -361,4 +364,109 @@ async function seedConversations(userIds: number[]): Promise<void> {
 
   console.log(`  ✓ Admin: ${adminSentListings.length} sent, ${adminReceivedCount} received enquiries`);
   console.log(`✅ Seeded ${totalConversations} conversations with ${totalMessages} messages`);
+}
+
+/**
+ * Seed favourites and notes for fake users on admin's listings
+ * This ensures admin's listings have analytics data (favourites, notes)
+ */
+export async function seedFakeUserFavouritesOnAdminListings(userIds: number[]): Promise<void> {
+  console.log("⭐ Seeding fake user favourites and notes on admin's listings...");
+
+  const ADMIN_ID = 1;
+  
+  // Get all admin listings
+  const adminListings = await prisma.listing.findMany({
+    where: { userId: ADMIN_ID },
+    select: { id: true },
+  });
+
+  if (adminListings.length === 0) {
+    console.log("No admin listings found. Skipping fake user favourites seeding.");
+    return;
+  }
+
+  console.log(`Found ${adminListings.length} admin listings`);
+
+  // Filter out admin from user list
+  const fakeUsers = userIds.filter(id => id !== ADMIN_ID);
+  
+  if (fakeUsers.length === 0) {
+    console.log("No fake users found. Skipping fake user favourites seeding.");
+    return;
+  }
+
+  let totalFavourites = 0;
+  let totalNotes = 0;
+
+  // Each fake user has a chance to add some admin listings to favourites/notes
+  for (const userId of fakeUsers) {
+    // Each user favourites 0-5 admin listings
+    const numFavourites = faker.number.int({ min: 0, max: 5 });
+    if (numFavourites > 0) {
+      const selectedFavourites = faker.helpers.arrayElements(
+        adminListings,
+        Math.min(numFavourites, adminListings.length)
+      );
+
+      for (const listing of selectedFavourites) {
+        // Create or get user preferences
+        const preferences = await prisma.userPreferences.upsert({
+          where: { userId },
+          create: { userId },
+          update: {},
+        });
+
+        // Add to favourites
+        await prisma.userFavouriteListing.create({
+          data: {
+            userPreferencesId: preferences.id,
+            listingId: listing.id,
+          },
+        });
+
+        totalFavourites++;
+      }
+    }
+
+    // Each user adds notes to 0-5 admin listings (different from favourites)
+    const numNotes = faker.number.int({ min: 0, max: 5 });
+    if (numNotes > 0) {
+      const selectedNotes = faker.helpers.arrayElements(
+        adminListings,
+        Math.min(numNotes, adminListings.length)
+      );
+
+      for (const listing of selectedNotes) {
+        // Create or get user preferences
+        const preferences = await prisma.userPreferences.upsert({
+          where: { userId },
+          create: { userId },
+          update: {},
+        });
+
+        // Check if note already exists (avoid duplicates)
+        const existingNote = await prisma.userNote.findFirst({
+          where: {
+            userPreferencesId: preferences.id,
+            listingId: listing.id,
+          },
+        });
+
+        if (!existingNote) {
+          await prisma.userNote.create({
+            data: {
+              userPreferencesId: preferences.id,
+              listingId: listing.id,
+              note: faker.lorem.sentence(),
+            },
+          });
+
+          totalNotes++;
+        }
+      }
+    }
+  }
+
+  console.log(`✅ Created ${totalFavourites} favourites and ${totalNotes} notes from fake users on admin's listings`);
 }

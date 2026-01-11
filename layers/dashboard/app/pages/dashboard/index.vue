@@ -12,9 +12,16 @@
     </template>
 
     <template #body>
+      <h2 class="title-xs mb-0! flex items-center gap-2">Quick analytics
+        <UIcon name="i-lucide-bar-chart-3" class="text-secondary" />
+      </h2>
       <OrganismsDashboardAnalyticsCard />
 
       <!-- Quick Actions Grid -->
+      <h2 class="title-xs mb-0! flex items-center gap-2">Quick actions
+        <UIcon name="i-lucide-rocket" class="text-secondary" />
+      </h2>
+
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <UPageCard
           title="My Favourites"
@@ -77,7 +84,6 @@
       <UAccordion 
         :items="accordionItems" 
         type="multiple"
-        :default-value="['favourite-listings', 'notes-added', 'viewed-listings']"
         :ui="{
           leadingIcon: 'text-secondary',
           label: 'body-sm font-bold',
