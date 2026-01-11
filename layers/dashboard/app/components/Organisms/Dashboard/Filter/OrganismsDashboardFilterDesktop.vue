@@ -1,127 +1,128 @@
 <template>
   <div class="hidden lg:flex gap-2 items-center flex-wrap w-full">
     <!-- Category Filter -->
-    <div class="relative inline-flex">
-      <UButton
-        icon="i-lucide-funnel"
-        color="primary"
-        variant="solid"
-        size="lg"
-        class="body-sm"
-        :ui="{
-          base: 'text-white!',
-          label: 'capitalize',
-        }"
-        :label="!enquiries ? saleRentFilter : directionFilter"
-      />
+    <div class="relative">
       <USelect
         v-if="!enquiries"
         v-model="saleRentFilterOriginal"
         :items="saleRentOptions"
         option-attribute="label"
         value-attribute="value"
+        icon="i-lucide-funnel"
         color="primary"
-        variant="soft"
-        size="lg"
-        class="absolute inset-0 w-full h-full opacity-0 z-10"
+        variant="subtle"
+        size="md"
+        class="body-sm text-white"
         :ui="{
-          base: 'w-full h-full',
-          content: 'min-w-fit',
-          group: 'p-0!',
-          item: 'outline-0! ring-0! cursor-pointer bg-elevated hover:bg-gray-200 dark:hover:bg-gray-500 hover:rounded',
-          itemLeadingIcon: 'text-primary! dark:text-white/50!',
+          base: 'capitalize cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+          value: 'text-white',
+          leadingIcon: 'text-white',
+          trailingIcon: 'text-white',
+          group: 'bg-(--background-200) text-(--foreground-100) p-1',
+          item: 'hover:bg-(--background-100)',
         }"
+        trailing-icon="i-lucide-chevron-down"
       />
+      
       <USelect
         v-else
         v-model="directionFilterOriginal"
         :items="directionOptions"
         option-attribute="label"
         value-attribute="value"
-        color="primary"
-        size="lg"
-        class="absolute inset-0 w-full h-full opacity-0 z-10"
+        icon="i-lucide-funnel"
+        color="secondary"
+        variant="ghost"
+        size="md"
+        class="body-sm text-white"
         :ui="{
-          base: 'w-full h-full capitalize',
-          content: 'min-w-fit',
-          group: 'p-0!',
-          item: 'outline-0! ring-0! cursor-pointer bg-elevated hover:bg-gray-200 dark:hover:bg-gray-500 hover:rounded',
-          itemLeadingIcon: 'text-primary! dark:text-white/50!',
+          base: 'capitalize cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+          value: 'text-white',
+          leadingIcon: 'text-white',
+          trailingIcon: 'text-white',
+          group: 'bg-(--background-200) text-(--foreground-100) p-1',
+          item: 'hover:bg-(--background-100)',
         }"
+        trailing-icon="i-lucide-chevron-down"
       />
     </div>
 
     <!-- Sort Filter -->
     <div class="relative inline-flex">
-      <UButton
-        icon="i-lucide-arrow-down-up"
-        color="primary"
-        variant="solid"
-        size="lg"
-        class="body-sm"
-        :label="sortOrderValueOriginal === 'newest' ? 'Newest First' : 'Oldest First'"
-        :ui="{
-          base: 'text-white!',
-        }"
-      />
       <USelect
         v-model="sortOrderValueOriginal"
         :items="sortOrder"
         option-attribute="label"
         value-attribute="value"
-        variant="soft"
-        size="lg"
-        class="absolute inset-0 w-full h-full opacity-0 z-10"
+        icon="i-lucide-arrow-down-up"
+        color="primary"
+        variant="ghost"
+        size="md"
+        class="body-sm text-white"
         :ui="{
-          base: 'w-full h-full',
-          content: 'min-w-fit',
-          group: 'p-0!',
-          item: 'outline-0! ring-0! cursor-pointer bg-elevated hover:bg-gray-200 dark:hover:bg-gray-500 hover:rounded',
-          itemLeadingIcon: 'text-primary! dark:text-white/50!',
+          base: 'capitalize cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+          value: 'text-white',
+          leadingIcon: 'text-white',
+          trailingIcon: 'text-white',
+          group: 'bg-(--background-200) text-(--foreground-100) p-1',
+          item: 'hover:bg-(--background-100)',
         }"
+        trailing-icon="i-lucide-chevron-down"
       />
     </div>
 
     <UTabs v-if="enquiries"
       :items="tabItems"
       default-value="all"
-      size="md"
+      size="sm"
       :content="false"
       v-model="activeTabOriginal"
-      color="primary"
+      variant="pill"
       :ui="{
         trigger: 'data-[state=active]:text-white! transition-none',
-        label: 'body-sm min-w-10',
-        list: 'justify-center sm:justify-normal',
+        label: 'body-sm',
+        list: 'justify-center bg-(--background-200) p-0',
       }"
     >
       <template #trailing="{ item }">
         <UBadge
           :label="item.value === 'all' ? allConversationsCount  : unreadConversationsCount"
           color="primary"
-          size="md"
+          size="lg"
+          class="font-normal"
           :ui="{
-            base: 'border-1 border-white text-white body-xs',
+            base: 'border-1 border-white text-white',
+            label: 'font-light',
           }"
         />
       </template>
     </UTabs>
 
-    <!-- Search (Desktop Inline) -->
-    <UInput
-      v-model="searchQueryOriginal"
-      variant="subtle"
-      icon="i-lucide-search"
-      color="secondary"
-      placeholder="Search..."
-      :highlight="false"
-      size="lg"
-      class="w-full order-last md:order-0 md:flex-1 md:w-auto body-sm"
-      :ui="{
-        base: 'focus-visible:outline-0! outline-primary/50! ring-primary/50!',
-        leadingIcon: 'text-primary dark:text-white!',
-      }"
-    />
+    <div class="relative">
+      <UPopover>
+        <UButton color="primary" variant="solid" size="lg" icon="i-lucide-search" :ui="{
+          base: 'cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+          leadingIcon: 'text-white',
+        }" />
+        <template #content>
+          <UInput
+            v-model="searchQueryOriginal"
+            variant="subtle"
+            icon="i-lucide-search"
+            color="secondary"
+            placeholder="Search..."
+            :highlight="false"
+            size="md"
+            class="w-full order-last md:order-0 md:flex-1 md:w-auto body-sm"
+            :ui="{
+              root: 'w-150!',
+              base: 'focus-visible:outline-0! outline-primary/50! ring-primary/50!',
+              leadingIcon: 'text-primary dark:text-white!',
+            }"
+          />
+        </template>
+      </UPopover>
+    </div>
 
     <!-- View Toggle -->
     <div v-if="view" class="ml-auto hidden md:flex">
@@ -174,7 +175,6 @@
    * Computed Bindings for v-model Props
    */
   const saleRentFilterOriginal = usePropModel(props, 'saleRentFilter', emit);
-  const enquiriesFilterOriginal = usePropModel(props, 'enquiriesFilter', emit);
   const sortOrderValueOriginal = usePropModel(props, 'sortOrderValue', emit);
   const activeTabOriginal = usePropModel(props, 'activeTab', emit);
   const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);

@@ -1,5 +1,5 @@
 <template>
-  <div class="lg:hidden w-full">
+  <div class="lg:hidden ">
     <UButton block variant="solid" color="primary" class="justify-between body-sm text-white!" size="sm" :icon="isOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'" trailing @click="isOpenOriginal = !isOpenOriginal">
       <div class="flex items-center gap-2">
         <UIcon name="i-lucide-filter" class="w-5 h-5" />
@@ -17,119 +17,110 @@
         :leave-to-class="enableTransition ? 'transform -translate-y-2 opacity-0' : ''"
       >
         <div v-if="isOpen" class="fixed inset-x-0 top-[calc(var(--header-height,64px)-1px)] z-20">
-          <div class="p-4 flex flex-col gap-2 bg-default border-b border-gray-200 dark:border-gray-800">
-            <div class="flex flex-row justify-between items-center w-full flex-wrap">
-              <div class="flex flex-row gap-2">
-                <!-- Category Filter -->
-                <div class="relative inline-flex">
-                  <UButton
-                    icon="i-lucide-funnel"
-                    color="primary"
-                    variant="solid"
-                    size="lg"
-                    block
-                    class="body-sm truncate"
-                    :ui="{
-                      base: 'text-white!',
-                    }"
-                    :label="!enquiries ? saleRentFilter : directionFilter"
-                  />
-                  <USelect
-                    v-if="!enquiries"
-                    v-model="saleRentFilterOriginal"
-                    :items="saleRentOptions"
-                    option-attribute="label"
-                    value-attribute="value"
-                    color="primary"
-                    variant="soft"
-                    size="lg"
-                    class="absolute inset-0 w-full h-full opacity-0 z-10"
-                    :ui="{
-                      base: 'w-full h-full',
-                      content: 'min-w-fit z-[60]!',
-                      group: 'p-0!',
-                      item: 'outline-0! ring-0! cursor-pointer bg-elevated hover:bg-gray-200 dark:hover:bg-gray-500 hover:rounded',
-                      itemLeadingIcon: 'text-primary! dark:text-white/50!',
-                    }"
-                  />
-                  <USelect
-                    v-else
-                    v-model="directionFilterOriginal"
-                    :items="directionOptions"
-                    option-attribute="label"
-                    value-attribute="value"
-                    color="primary"
-                    size="lg"
-                    class="absolute inset-0 w-full h-full opacity-0 z-10"
-                    :ui="{
-                      base: 'w-full h-full',
-                      content: 'min-w-fit z-[60]!',
-                      group: 'p-0!',
-                      item: 'outline-0! ring-0! cursor-pointer bg-elevated hover:bg-gray-200 dark:hover:bg-gray-500 hover:rounded',
-                      itemLeadingIcon: 'text-primary! dark:text-white/50!',
-                    }"
-                  />
-                </div>
-
-                <!-- Sort Filter -->
-                <div class="relative inline-flex">
-                  <UButton
-                    icon="i-lucide-arrow-down-up"
-                    color="primary"
-                    variant="solid"
-                    size="lg"
-                    block
-                    class="body-sm truncate"
-                    :label="sortOrderValueOriginal === 'newest' ? 'Newest First' : 'Oldest First'"
-                    :ui="{
-                      base: 'text-white!',
-                    }"
-                  />
-                  <USelect
-                    v-model="sortOrderValueOriginal"
-                    :items="sortOrder"
-                    option-attribute="label"
-                    value-attribute="value"
-                    variant="soft"
-                    size="lg"
-                    class="absolute inset-0 w-full h-full opacity-0 z-10"
-                    :ui="{
-                      base: 'w-full h-full',
-                      content: 'min-w-fit z-[60]!',
-                      group: 'p-0!',
-                      item: 'outline-0! ring-0! cursor-pointer bg-elevated hover:bg-gray-200 dark:hover:bg-gray-500 hover:rounded',
-                      itemLeadingIcon: 'text-primary! dark:text-white/50!',
-                    }"
-                  />
-                </div>
-              </div>
-
+          <div class="p-4 pt-2 flex flex-col gap-2 bg-default border-b border-gray-200 dark:border-gray-800 justify-between">
+            <!-- Tabs & Filters Combined -->
+            <div class="flex flex-wrap gap-2 items-center justify-start w-full flex-row-reverse">
               <!-- Tabs -->
               <UTabs v-if="enquiries"
                 :items="tabItems"
                 default-value="all"
-                size="lg"
+                size="sm"
                 :content="false"
                 v-model="activeTabOriginal"
-                color="primary"
+                variant="pill"
+                class="max-w-80"
                 :ui="{
-                  trigger: 'data-[state=active]:text-white! flex-1',
-                  label: 'body-xs',
-                  list: 'w-full p-0',
+                  trigger: 'data-[state=active]:text-white! transition-none',
+                  label: 'body-sm',
+                  list: 'justify-center bg-(--background-200) p-0',
                 }"
               >
-                <template #trailing="{ item }">
-                  <UBadge
-                    :label="item.value === 'all' ? allConversationsCount : unreadConversationsCount"
-                    variant="solid"
-                    color="primary"
-                    size="lg"
-                    :ui="{
-                      base: 'border-1 border-white text-white',
-                    }"
-                  />
-                </template>
+                  <template #trailing="{ item }">
+                    <UBadge
+                      :label="item.value === 'all' ? allConversationsCount  : unreadConversationsCount"
+                      color="primary"
+                      size="lg"
+                      class="font-normal"
+                      :ui="{
+                        base: 'border-1 border-white text-white',
+                        label: 'font-light',
+                      }"
+                    />
+                  </template>
               </UTabs>
+
+              <!-- Category Filter -->
+              <div class="relative">
+                <USelect
+                  v-if="!enquiries"
+                  v-model="saleRentFilterOriginal"
+                  :items="saleRentOptions"
+                  option-attribute="label"
+                  value-attribute="value"
+                  icon="i-lucide-funnel"
+                  color="primary"
+                  variant="subtle"
+                  size="lg"
+                  class="body-sm text-white"
+                  :ui="{
+                    base: 'capitalize cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+                    value: 'text-white',
+                    leadingIcon: 'text-white',
+                    trailingIcon: 'text-white',
+                    content: 'z-[60]!',
+                    group: 'bg-(--background-200) text-(--foreground-100) p-1',
+                    item: 'hover:bg-(--background-100)',
+                  }"
+                  trailing-icon="i-lucide-chevron-down"
+                />
+                <USelect
+                  v-else
+                  v-model="directionFilterOriginal"
+                  :items="directionOptions"
+                  option-attribute="label"
+                  value-attribute="value"
+                  icon="i-lucide-funnel"
+                  color="secondary"
+                  variant="ghost"
+                  size="lg"
+                  class="body-sm text-white"
+                  :ui="{
+                    base: 'capitalize cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+                    value: 'text-white',
+                    leadingIcon: 'text-white',
+                    trailingIcon: 'text-white',
+                    content: 'z-[60]!',
+                    group: 'bg-(--background-200) text-(--foreground-100) p-1',
+                    item: 'hover:bg-(--background-100)',
+                  }"
+                  trailing-icon="i-lucide-chevron-down"
+                />
+              </div>
+
+              <!-- Sort Filter -->
+              <div class="relative">
+                <USelect
+                  v-model="sortOrderValueOriginal"
+                  :items="sortOrder"
+                  option-attribute="label"
+                  value-attribute="value"
+                  icon="i-lucide-arrow-down-up"
+                  color="primary"
+                  variant="ghost"
+                  size="lg"
+                  class="body-sm text-white"
+                  :ui="{
+                    base: 'capitalize cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+                    value: 'text-white',
+                    leadingIcon: 'text-white',
+                    trailingIcon: 'text-white',
+                    content: 'z-[60]!',
+                    group: 'bg-(--background-200) text-(--foreground-100) p-1',
+                    item: 'hover:bg-(--background-100)',
+                  }"
+                  trailing-icon="i-lucide-chevron-down"
+                />
+              </div>
             </div>
             
             <!-- Search -->
@@ -188,7 +179,6 @@
 
   const isOpenOriginal = usePropModel(props, 'isOpen', emit);
   const saleRentFilterOriginal = usePropModel(props, 'saleRentFilter', emit);
-  const enquiriesFilterOriginal = usePropModel(props, 'enquiriesFilter', emit);
   const sortOrderValueOriginal = usePropModel(props, 'sortOrderValue', emit);
   const activeTabOriginal = usePropModel(props, 'activeTab', emit);
   const searchQueryOriginal = usePropModel(props, 'searchQuery', emit);

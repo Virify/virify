@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-3 p-3 rounded-lg bg-elevated">
+  <div class="flex flex-col gap-3 p-3 rounded-lg bg-(--background-100)">
     <div class="flex items-start gap-2 flex-1">
       <UIcon 
         :name="!isLastMessageFromCurrentUser(enquiry, user?.id) ? 'i-lucide-corner-down-right' : 'i-lucide-corner-down-left'" 
@@ -7,10 +7,10 @@
         :class="!isLastMessageFromCurrentUser(enquiry, user?.id) ? 'text-secondary' : 'text-gray-400'"
       />
       <div class="min-w-0 flex-1">
-        <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+        <p class="text-xs font-semibold text-secondary mb-1">
           {{ isLastMessageFromCurrentUser(enquiry, user?.id) ? 'You' : (getConversationOtherUser(enquiry, user?.id).username || formatPartnerName(getConversationOtherUser(enquiry, user?.id).email || 'Them')) }}
         </p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 break-all">
+        <p class="text-sm text-(--foreground-100) line-clamp-3 break-all">
           {{ getLastMessageContent(enquiry) }}
         </p>
       </div>

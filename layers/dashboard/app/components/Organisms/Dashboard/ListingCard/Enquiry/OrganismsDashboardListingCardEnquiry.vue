@@ -1,7 +1,7 @@
 <template>
   <div 
     v-if="listing" 
-    class="flex gap-3 p-3 h-auto w-full rounded-lg bg-elevated"
+    class="flex gap-3 p-3 h-auto w-full rounded-lg bg-(--background-100) )"
   >
     <div 
       v-if="listing.property?.media?.[0]?.image" 

@@ -5,10 +5,24 @@
     :ui="{
       overlay: 'bg-black/50 backdrop-blur-sm',
       content: 'max-w-[1300px] w-full sm:w-[90vw]',
+      body: 'py-6 px-0!',
     }"
   >
     <template #title>
-      <h2 class="body-sm">{{ conversation?.listing?.user?.username || "Listing Unavailable" }}</h2>
+      <div class="flex items-center gap-3">
+        <UAvatar 
+          :alt="otherUser?.username!" 
+          :name="otherUser?.username!"
+          size="sm" 
+          class="bg-(--background-300)"
+        />
+        <div class="flex flex-col gap-1 flex-wrap">
+          <h2 class="text-sm font-bold leading-none">{{ otherUser?.username || "Unknown User" }}</h2>
+          <p class="text-xs text-(--foreground-200)/80 truncate mt-1 font-normal">
+            {{ subTitle }}
+          </p>
+        </div>
+      </div>
     </template>
     <template #body>
       <div ref="chatContainer" class="overflow-y-auto px-4 scroll-smooth" :class="isMobile ? 'h-full' : 'h-[60vh]'">
@@ -27,14 +41,20 @@
             :id="String(message.id)"
             :ui="{
               container: 'pb-1',
-              content: 'text-white min-w-60' + (isMessageFromUser(message, user?.id!) ? ' bg-secondary/90' : ' bg-primary/100'),
+              content: 'min-w-60' + (isMessageFromUser(message, user?.id!) ? ' bg-secondary/90 text-(--monochrome-100)' : ' bg-primary/100 text-(--monochrome-600)'),
             }"
           >
             <template #content>
               <p class="body-xs italic pb-1">{{ formatMessageTimestamp(message.createdAt) }}</p>
-              <p class="body-md break-all whitespace-pre-wrap">{{ message.content }}</p>
+              <p :class="[
+                'body-sm break-all whitespace-pre-wrap'
+                , isMessageFromUser(message, user?.id!) ? 'text-(--monochrome-900)' : 'text-(--monochrome-900)'
+                ]
+              ">
+                {{ message.content }}
+              </p>
               <div class="flex mt-1 items-center gap-1">
-                <UAvatar :alt="message.sender.username!" class="text-black" size="xs" />
+                <UAvatar :alt="message.sender.username!" class="text-(--foreground-100) bg-(--background-100)" size="xs" />
                 <p class="body-xs italic py-1">{{ getConvoMessagePoV(message, user?.id!) }}</p>
               </div>
             </template>
@@ -123,9 +143,32 @@
     return props.conversation?.messages || [];
   });
 
-  /**
-   * Component Methods
-   */
+  const otherUser = computed(() => {
+    if (!props.conversation || !props.user?.id) return null;
+    return props.conversation.sender?.id === props.user.id
+      ? props.conversation.receiver
+      : props.conversation.sender;
+  });
+
+  const subTitle = computed(() => {
+    const listing = props.conversation.listing;
+    if (!listing?.property?.address) return "Address not provided";
+
+    const { street, city, postcode, fullAddress } = listing.property.address;
+    const parts = [street, city, postcode].filter(Boolean);
+    const address = parts.length > 0 ? parts.join(", ") : (fullAddress || "Address not provided");
+
+    const price = listing.price
+      ? new Intl.NumberFormat('en-GB', { 
+          style: 'currency', 
+          currency: 'GBP', 
+          minimumFractionDigits: 0, 
+          maximumFractionDigits: 0 
+        }).format(Number(listing.price))
+      : null;
+
+    return price ? `${price} - ${address}` : address;
+  });
 
   /**
    * Scrolls the chat container to the bottom

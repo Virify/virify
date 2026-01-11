@@ -9,7 +9,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
   const requestFetch = useRequestFetch();
 
   // Configuration
-  const limit = options?.limit || 10;
+  const defaultLimit = options?.limit || 10;
 
   // State
   const conversations = ref<ConversationWithUserAndMessages[]>([]);
@@ -28,7 +28,8 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     filter: 'all' | 'unread' = 'all', 
     direction: 'all' | 'sent' | 'received' = 'all',
     page: number = 1,
-    sort: 'newest' | 'oldest' = 'newest'
+    sort: 'newest' | 'oldest' = 'newest',
+    limit: number = defaultLimit,
   ) {
     if (!loggedIn.value || !currentUserId.value) {
       conversations.value = [];
