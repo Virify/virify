@@ -69,12 +69,6 @@
   }>();
 
   /**
-   * SYNC PATTERN:
-   * 
-   * We rely on the composable (cookies) for state management.
-   */
-
-  /**
   * Watch filtered items from composable and emit to parent
   */
   watch(

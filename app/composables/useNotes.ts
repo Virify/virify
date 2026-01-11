@@ -9,11 +9,15 @@ export const useNotes = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
   const { showToast } = useToastNotification();
-  const { handleAggregateUpdate } = useNotifications();
+  const requestFetch = useRequestFetch();
 
   // Local filtering state (mirrors favourites pattern)
   const searchTerm = ref("");
   const categoryFilter = ref<"all" | "sale" | "rental">("all");
+
+  // Pagination state for dashboard
+  const total = ref(0);
+  const loading = ref(false);
 
   /**
    * State Management
@@ -26,14 +30,42 @@ export const useNotes = createSharedComposable(() => {
       if (!loggedIn.value) {
         return Promise.resolve([]);
       }
-      return useRequestFetch()<NoteData[]>("/api/user/notes/");
+      return useRequestFetch()<{ notes: NoteData[], total: number }>("/api/user/notes/").then(res => {
+        total.value = res.total || 0;
+        return res.notes || [];
+      });
     },
     {
       default: () => [],
       watch: [loggedIn],
-      server: false, // Prevent server-side execution
+      server: true,
     }
   );
+
+  /**
+   * Fetch notes with pagination, sort, and filter (for dashboard)
+   */
+  async function fetchNotes(
+    filter: 'all' | 'sale' | 'rent' = 'all',
+    page: number = 1,
+    sort: 'newest' | 'oldest' = 'newest',
+    limit: number = 20
+  ) {
+    loading.value = true;
+    try {
+      const data = await requestFetch<{ notes: NoteData[], total: number }>(
+        `/api/user/notes/?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`
+      );
+      userNotes.value = data.notes || [];
+      total.value = data.total || 0;
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+      userNotes.value = [];
+      total.value = 0;
+    } finally {
+      loading.value = false;
+    }
+  }
 
   const recentUserNotes = computed(() => {
     return userNotes.value
@@ -115,11 +147,6 @@ export const useNotes = createSharedComposable(() => {
 
     const isUpdating = hasNote(listingId);
 
-    if (!isUpdating) {
-      // Optimistic badge update for new note
-      handleAggregateUpdate({ aggregateType: 'notes', operation: 'add' } as any);
-    }
-
     try {
       await $fetch(`/api/user/notes/${listingId}/`, {
         method: "POST",
@@ -129,32 +156,9 @@ export const useNotes = createSharedComposable(() => {
         },
       });
 
-      // Simpler approach: Just refresh the notes from the server to ensure consistency.
-      // This matches the behavior of "Adding" a note (the else block below), which the user confirmed works.
       await refreshUserNotes();
-      
-      /* 
-      // Manual update (commented out as it was causing reactivity issues)
-      const existingIndex = userNotes.value.findIndex((n) => n.listingId === listingId);
-      if (existingIndex >= 0 && userNotes.value[existingIndex]) {
-        userNotes.value[existingIndex] = {
-          ...userNotes.value[existingIndex],
-          note: note,
-          updatedAt: new Date()
-        };
-        userNotes.value = [...userNotes.value];
-      } else {
-        refreshUserNotes();
-      } 
-      */
-
-      // Show success toast
       showToast(isUpdating ? "Note updated" : "Note added", { type: "success" });
     } catch (error) {
-      if (!isUpdating) {
-        // Revert badge update
-        handleAggregateUpdate({ aggregateType: 'notes', operation: 'remove' } as any);
-      }
       console.error("Error updating note:", error);
       // Show error toast
       showToast(isUpdating ? "Failed to update note" : "Failed to add note", { type: "error" });
@@ -175,33 +179,18 @@ export const useNotes = createSharedComposable(() => {
       return;
     }
 
-    const previousNotes = [...(userNotes.value || [])];
-
-    // Optimistic delete
-    if (userNotes.value) {
-      userNotes.value = userNotes.value.filter((n) => n.listingId !== listingId);
-    }
-
     try {
-      if (userNotes.value) {
-        userNotes.value = userNotes.value.filter((n) => n.listingId !== listingId);
-      }
-      // Optimistic badge update
-      handleAggregateUpdate({ aggregateType: 'notes', operation: 'remove' } as any);
-
       await $fetch(`/api/user/notes/${listingId}/`, {
         method: "DELETE",
         body: { listingId },
       });
 
+      // Refetch to update list with correct pagination
+      await refreshUserNotes();
+
       // Show success toast
       showToast("Note deleted", { type: "success" });
     } catch (error) {
-      // Revert optimistic update
-      userNotes.value = previousNotes;
-      // Revert badge update
-      handleAggregateUpdate({ aggregateType: 'notes', operation: 'add' } as any);
-
       console.error("Error deleting note:", error);
       // Show error toast
       showToast("Failed to delete note", { type: "error" });
@@ -252,6 +241,9 @@ export const useNotes = createSharedComposable(() => {
     saleNotes,
     rentalNotes,
     refreshUserNotes,
+    fetchNotes,
+    total,
+    loading,
     // search filter state
     searchTerm,
     categoryFilter,

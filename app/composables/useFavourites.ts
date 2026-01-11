@@ -10,11 +10,15 @@ export const useFavourites = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
   const { showToast } = useToastNotification();
-  const { handleAggregateUpdate } = useNotifications();
+  const requestFetch = useRequestFetch();
 
   // Lightweight shared search / category state (favourites + notes share util)
   const searchTerm = ref("");
   const categoryFilter = ref<"all" | "sale" | "rental">("all");
+
+  // Pagination state for dashboard
+  const total = ref(0);
+  const loading = ref(false);
 
   /**
    * State Management
@@ -26,14 +30,42 @@ export const useFavourites = createSharedComposable(() => {
       if (!loggedIn.value) {
         return Promise.resolve([]);
       }
-      return useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/");
+      return useRequestFetch()<{ favourites: UserFavouriteListingCard[], total: number }>("/api/user/favourites/").then(res => {
+        total.value = res.total || 0;
+        return res.favourites || [];
+      });
     },
     {
       default: () => [],
       watch: [loggedIn],
-      server: false, // Prevent server-side execution
+      server: true,
     }
   );
+
+  /**
+   * Fetch favourites with pagination, sort, and filter (for dashboard)
+   */
+  async function fetchFavourites(
+    filter: 'all' | 'sale' | 'rent' = 'all',
+    page: number = 1,
+    sort: 'newest' | 'oldest' = 'newest',
+    limit: number = 20
+  ) {
+    loading.value = true;
+    try {
+      const data = await requestFetch<{ favourites: UserFavouriteListingCard[], total: number }>(
+        `/api/user/favourites/?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`
+      );
+      favourites.value = data.favourites || [];
+      total.value = data.total || 0;
+    } catch (error) {
+      console.error('Error fetching favourites:', error);
+      favourites.value = [];
+      total.value = 0;
+    } finally {
+      loading.value = false;
+    }
+  }
 
   const saleFavourites = computed(() => {
     return favourites.value.filter((item) => item.listing.saleListing);
@@ -87,9 +119,6 @@ export const useFavourites = createSharedComposable(() => {
       return;
     }
 
-    // Optimistic badge update
-    handleAggregateUpdate({ aggregateType: 'favourites', operation: 'add' } as any);
-
     try {
       await $fetch<UserFavouriteListingCard[]>(`/api/user/favourites/${listingId}/`, {
         method: "POST",
@@ -101,9 +130,6 @@ export const useFavourites = createSharedComposable(() => {
       // Show success toast
       showToast("Added to favourites", { type: "success" });
     } catch (error) {
-      // Revert badge update
-      handleAggregateUpdate({ aggregateType: 'favourites', operation: 'remove' } as any);
-
       // Show error toast
       showToast("Failed to add to favourites", { type: "error" });
       console.error("Error adding to favourites:", error);
@@ -118,32 +144,18 @@ export const useFavourites = createSharedComposable(() => {
    * @returns Array of remaining favourite listing IDs or empty array on error
    */
   const removeFromFavourite = async (listingId: number) => {
-    const previousFavourites = [...(favourites.value || [])];
-
-    // Optimistically update UI
-    if (favourites.value) {
-      favourites.value = favourites.value.filter((item) => item.listing.id !== listingId);
-    }
-
     try {
-      const result = await $fetch<number[]>(`/api/user/favourites/${listingId}/`, {
+      await $fetch<number[]>(`/api/user/favourites/${listingId}/`, {
         method: "DELETE",
         body: { listingId },
       });
 
-      // Optimistic badge update
-      handleAggregateUpdate({ aggregateType: 'favourites', operation: 'remove' } as any);
+      // Refetch to update list with correct pagination
+      await refreshFavourites();
 
-      if (result) {
-        // Show success toast
-        showToast("Removed from favourites", { type: "success" });
-      }
+      // Show success toast
+      showToast("Removed from favourites", { type: "success" });
     } catch (error) {
-      // Revert optimistic update
-      favourites.value = previousFavourites;
-      // Revert badge update
-      handleAggregateUpdate({ aggregateType: 'favourites', operation: 'add' } as any);
-
       // Show error toast
       showToast("Failed to remove from favourites", { type: "error" });
       console.error("Error removing from favourites:", error);
@@ -182,6 +194,9 @@ export const useFavourites = createSharedComposable(() => {
     rentalFavourites,
     filteredFavourites,
     refreshFavourites,
+    fetchFavourites,
+    total,
+    loading,
     searchTerm,
     categoryFilter,
     isLoading: computed(() => {

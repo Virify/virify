@@ -73,7 +73,7 @@
   const open = ref(false);
   const filterRef = ref();
   const page = ref(1);
-  const limit = ref(30);
+  const limit = ref(20);
   const pageTop = ref<HTMLElement | null>(null);
   const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
   const sortedAndFilteredConversations = ref<ConversationWithUserAndMessages[]>([]);

@@ -103,68 +103,45 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   ]
 
   /**
-   * Computed list of filtered items
+   * Computed list of filtered items (client-side search only)
+   * Sort and category filters are now handled by backend API
    */
   const filteredItems = computed(() => {
     const query = debouncedSearchQuery.value.toLowerCase()
-    const sortVal = sortOrderValue.value
-    const filterVal = saleRentFilter.value
-    const enquiryVal = enquiriesFilter.value
-    const tabVal = activeTab.value
-    const curUserId = unref(userId)
     
-    // Single pass filtering
-    const filtered = items.value.filter((item) => {
-      // 1. Search Logic
-      if (query) {
-        const listing = item.listing
-        if (!listing) return false
+    // If no search query, return items as-is (already sorted/filtered by backend)
+    if (!query) return items.value
 
-        // Address search (checking common address fields)
-        const address = listing.property?.address
-        // Optimization: check specific fields instead of Object.values which creates arrays
-        const addressMatch = address ? (
-          (typeof address.fullAddress === 'string' && address.fullAddress.toLowerCase().includes(query)) ||
-          Object.values(address).some(val => 
-            typeof val === 'string' && val.toLowerCase().includes(query)
-          )
-        ) : false
+    // Client-side search filtering only
+    return items.value.filter((item) => {
+      const listing = item.listing
+      if (!listing) return false
 
-        // Price search
-        const price = listing.saleListing?.price || listing.rentalListing?.price
-        const priceMatch = price?.toString().includes(query)
+      // Address search
+      const address = listing.property?.address
+      const addressMatch = address ? (
+        (typeof address.fullAddress === 'string' && address.fullAddress.toLowerCase().includes(query)) ||
+        Object.values(address).some(val => 
+          typeof val === 'string' && val.toLowerCase().includes(query)
+        )
+      ) : false
 
-        // Price Type / Frequency search
-        const priceType = listing.saleListing?.priceType || listing.rentalListing?.rentFrequency
-        const typeMatch = priceType?.toLowerCase().includes(query)
+      // Price search
+      const price = listing.saleListing?.price || listing.rentalListing?.price
+      const priceMatch = price?.toString().includes(query)
 
-        // Note search
-        const noteContent = (item as any).note
-        const noteMatch = typeof noteContent === 'string' 
-          ? noteContent.toLowerCase().includes(query)
-          : noteContent?.note?.toLowerCase().includes(query)
+      // Price Type / Frequency search
+      const priceType = listing.saleListing?.priceType || listing.rentalListing?.rentFrequency
+      const typeMatch = priceType?.toLowerCase().includes(query)
 
-        if (!(addressMatch || priceMatch || typeMatch || noteMatch)) return false
-      }
+      // Note search
+      const noteContent = (item as any).note
+      const noteMatch = typeof noteContent === 'string' 
+        ? noteContent.toLowerCase().includes(query)
+        : noteContent?.note?.toLowerCase().includes(query)
 
-      // 2. Sale/Rent Filter
-      if (filterVal === 'sale' && !item.listing?.saleListing) return false
-      if (filterVal === 'rent' && !item.listing?.rentalListing) return false
-
-      return true
+      return addressMatch || priceMatch || typeMatch || noteMatch
     })
-
-    // Sort by date
-    filtered.sort((a, b) => {
-      const dateA = new Date(a[dateKey]).getTime()
-      const dateB = new Date(b[dateKey]).getTime()
-
-      return sortVal === 'newest'
-        ? dateB - dateA
-        : dateA - dateB
-    })
-
-    return filtered
   })
 
   return {

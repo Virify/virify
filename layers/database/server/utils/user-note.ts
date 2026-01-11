@@ -1,12 +1,12 @@
 import type { NoteResponse, NoteData } from "~~/shared/types/note";
-import { listingCardFields } from "~~/shared/types/listing";
 /**
- * Get all notes for a user
- *
+ * Get all user note lookups (Ids and Content only)
+ * used for checking existence and displaying small notes on cards
+ * 
  * @param userId - The ID of the user
- * @returns Array of notes with propertyId and note text
+ * @returns Array of object with listingId and note
  */
-export async function getAllUserNotes(userId: number): Promise<NoteData[]> {
+export async function getUserNoteLookups(userId: number): Promise<{ listingId: number; note: string }[]> {
   return await prisma.userNote.findMany({
     where: {
       userPreferences: {
@@ -14,19 +14,75 @@ export async function getAllUserNotes(userId: number): Promise<NoteData[]> {
       },
     },
     select: {
-      id: true,
-      userPreferencesId: true,
-      listing: {
-        select: {
-          ...listingCardFields,
-        },
-      },
       listingId: true,
       note: true,
-      createdAt: true,
-      updatedAt: true,
     },
   });
+}
+
+/**
+ * Get all notes for a user
+ *
+ * @param userId - The ID of the user
+ * @param options - Pagination, sorting and filtering options
+ * @returns Array of notes with propertyId and note text
+ */
+export async function getAllUserNotes(
+  userId: number,
+  options?: {
+    skip?: number;
+    take?: number;
+    sort?: "newest" | "oldest";
+    filter?: "all" | "sale" | "rent";
+  }
+): Promise<{ notes: NoteData[], total: number }> {
+  const { skip, take, sort = "newest", filter = "all" } = options || {};
+
+  const whereClause: any = {
+    userPreferences: {
+      userId: userId,
+    },
+  };
+
+  // Add filter logic
+  if (filter === "sale") {
+    whereClause.listing = {
+      saleListing: { isNot: null }
+    };
+  } else if (filter === "rent") {
+    whereClause.listing = {
+      rentalListing: { isNot: null }
+    };
+  }
+
+  const orderBy = sort === "oldest" ? { updatedAt: "asc" } : { updatedAt: "desc" };
+
+  const [notes, total] = await Promise.all([
+    prisma.userNote.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        userPreferencesId: true,
+        listing: {
+          select: {
+            ...listingCardFields,
+          },
+        },
+        listingId: true,
+        note: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      skip,
+      take,
+      orderBy: orderBy as any,
+    }),
+    prisma.userNote.count({
+      where: whereClause,
+    }),
+  ]);
+
+  return { notes, total };
 }
 
 /**
