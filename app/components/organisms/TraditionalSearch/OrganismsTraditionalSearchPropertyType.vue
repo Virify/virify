@@ -199,6 +199,11 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     box-sizing: border-box;
     overflow: hidden;
     border-radius: var(--border-radius-xl);
+    color: currentColor;
+
+    &:hover {
+      color: currentColor;
+    }
   }
 
   /**

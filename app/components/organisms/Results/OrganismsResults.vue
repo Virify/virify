@@ -226,7 +226,7 @@ const resultsComponents = computed(() => {
       grid-gap: var(--size-16);
 
       .o-results__card--large {
-        grid-column: span 4;
+        grid-column: span 2;
       }
     }
   }
