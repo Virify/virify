@@ -11,38 +11,15 @@
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-4 lg:gap-4 w-full lg:max-w-2xl mx-auto pt-6">
+      <AtomsDashboardFormContainer>
         <UForm :schema="profileSchema" :state="state" @submit="onSubmit">
-          <UPageCard
-            orientation="horizontal"
+          <OrganismsDashboardAccountHeroCard
             title="Edit Your Profile"
-            class="pb-4"
             description="Update your profile information to keep your account up to date. We use this information to personalize your experience and for verification."
-            variant="ghost"
-            :ui="{
-              root: 'w-full border-0!',
-              container: 'p-2! grid grid-cols-1 lg:grid-cols-4 gap-4 w-full',
-              wrapper: 'lg:col-span-3',
-              description: 'body-sm text-(--foreground-200)',
-              title: 'title-sm',
-            }"
-          >
-            <div class="lg:col-span-1 flex justify-start lg:justify-end h-full lg:items-end w-full">
-              <UButton
-                variant="solid"
-                color="secondary"
-                label="Save Changes"
-                size="md"
-                :ui="{
-                  label: 'text-(--monochrome-900) body-sm',
-                }"
-                type="submit"
-              />
-            </div>
-          </UPageCard>
+            label="Save Changes" />
 
-          <div class="bg-elevated dark:bg-elevated/40 w-full p-6 sm:p-6 rounded-lg border-0!">
-            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed">
+          <AtomsDashboardForm>
+            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="">
               <template #error="{ error }">
                 <p>{{ error }}</p>
               </template>
@@ -197,9 +174,9 @@
                 orientation="horizontal"
               />
             </UFormField>
-          </div>
+          </AtomsDashboardForm>
         </UForm>
-      </div>
+      </AtomsDashboardFormContainer>
     </template>
   </UDashboardPanel>
 </template>

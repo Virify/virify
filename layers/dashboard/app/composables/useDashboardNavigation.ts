@@ -150,7 +150,7 @@ export function useDashboardNavigation() {
         {
           label: "Security",
           type: "link",
-          to: "#",
+          to: "/dashboard/security",
           icon: "i-lucide-shield-check",
           tooltip: {
             text: "Security settings",
@@ -266,7 +266,7 @@ export function useDashboardNavigation() {
     {
       label: "Security",
       type: "link",
-      to: "#",
+      to: "/dashboard/security",
       icon: "i-lucide-shield-check",
       tooltip: {
         text: "Security settings",
