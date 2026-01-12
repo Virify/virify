@@ -7,7 +7,7 @@
           title: 'title-sm m-0!',
         }"
       />
-      <UNavigationMenu highlight variant="pill" :items="accountNavigationItems" class="hidden sm:flex" />
+      <UNavigationMenu highlight variant="pill" :items="accountNavigationItems" class="hidden sm:flex ml-4" color="secondary" />
     </template>
 
     <template #body>
@@ -15,15 +15,17 @@
         <UPageCard
           orientation="horizontal"
           title="Edit Your Profile"
-          description="Update your profile information to keep your account up to date."
+          description="Update your profile information to keep your account up to date. We use this information to personalize your experience and for verification."
           variant="ghost"
           :ui="{
-            container: 'p-2! justify-between!',
+            root: 'w-full border-0!',
+            container: 'p-2! grid grid-cols-1 lg:grid-cols-4 gap-4 w-full',
+            wrapper: 'lg:col-span-3',
+            description: 'body-sm text-(--foreground-200)',
             title: 'title-sm',
-            description: 'body-sm',
           }"
         >
-          <div class="w-full flex lg:justify-end justify-start">
+          <div class="lg:col-span-1 flex justify-start lg:justify-end h-full lg:items-end w-full">
             <UButton
               variant="solid"
               color="secondary"
@@ -31,7 +33,6 @@
               size="md"
               :ui="{
                 label: 'text-(--monochrome-900) body-sm',
-                base: 'self-start!',
               }"
             />
           </div>
@@ -46,11 +47,13 @@
               :ui="{
                 label: 'body-sm text-(--foreground-100) font-semibold',
                 description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center pb-4 gap-2 md:gap-0',
+                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
               }"
             >
               <UInput v-model="state.firstName" type="text" variant="subtle" placeholder="First Name" :loading="pending" color="secondary" class="w-full md:w-80" />
             </UFormField>
+
+            <USeparator class="my-4" />
 
             <UFormField
               label="Last Name"
@@ -60,11 +63,13 @@
               :ui="{
                 label: 'body-sm text-(--foreground-100) font-semibold',
                 description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center pb-4 gap-2 md:gap-0',
+                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
               }"
             >
               <UInput v-model="state.lastName" variant="subtle" type="text" placeholder="Last Name" :loading="pending" color="secondary" class="w-full md:w-80" />
             </UFormField>
+
+            <USeparator class="my-4" />
 
             <UFormField
               label="Username"
@@ -74,11 +79,13 @@
               :ui="{
                 label: 'body-sm text-(--foreground-100) font-semibold',
                 description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center pb-4 gap-2 md:gap-0',
+                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
               }"
             >
               <UInput v-model="state.username" type="text" placeholder="Username" variant="subtle" :loading="pending" color="secondary" class="w-full md:w-80" />
             </UFormField>
+
+            <USeparator class="my-4" />
 
             <UFormField
               label="Avatar"
@@ -87,7 +94,7 @@
               :ui="{
                 label: 'body-sm text-(--foreground-100) font-semibold',
                 description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center pb-4 gap-2 md:gap-0',
+                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
               }"
             >
               <UInput
@@ -108,6 +115,8 @@
               </UInput>
             </UFormField>
 
+            <USeparator class="my-4" />
+
             <UFormField
               label="Bio"
               orientation="horizontal"
@@ -115,7 +124,7 @@
               :ui="{
                 label: 'body-sm text-(--foreground-100) font-semibold',
                 description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start pb-4 gap-2 md:gap-0',
+                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0',
               }"
             >
               <UTextarea
@@ -132,6 +141,8 @@
               />
             </UFormField>
 
+            <USeparator class="my-4" />
+
             <UFormField
               label="Your Intent"
               description="Please enter your interests and intent"
@@ -140,7 +151,7 @@
               :ui="{
                 label: 'body-sm text-(--foreground-100) font-semibold',
                 description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start pb-4 gap-2 md:gap-0',
+                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0',
                 help: 'body-xs text-(--foreground-200)/60 self-center mt-1',
               }"
             >
@@ -166,6 +177,7 @@
 
 <script setup lang="ts">
 import { z } from "zod";
+import type { describe } from "zod/v4/core";
 import { UserIntent } from "~~/layers/database/server/database/prisma/generated/enums";
 definePageMeta({
   middleware: ["authenticated"],
