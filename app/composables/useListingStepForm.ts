@@ -47,7 +47,7 @@ export function useListingStepForm<T>(
 ): ListingStepFormReturn<T> {
   const configRef = toRef(config);
   const listingRef = toRef(listing);
-  const { showToast } = useToastNotification();
+  const toast = useToast();
   const { markStepAsCompleted } = useListingEdit();
   
   // Initialize form data with deep copy to avoid reference issues
@@ -126,7 +126,7 @@ export function useListingStepForm<T>(
           markStepAsCompleted(listing.id, configRef.value.stepNumber!);
         } catch (error) {
           console.error('Failed to mark step as completed:', error);
-          showToast('Failed to save progress. Please try again.', { type: 'error' });
+          toast.add({ title: 'Error', description: 'Failed to save progress. Please try again.', color: 'error' });
           return; // Block navigation on error
         }
       }

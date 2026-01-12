@@ -19,3 +19,8 @@ export type NoteUpdateResponse = {
 };
 
 export type NoteResponse = string | null;
+
+export type NoteLookup = {
+  listingId: number;
+  note: string;
+}

@@ -25,17 +25,17 @@ const message = ref('');
 const sending = ref(false);
 const { startConversation } = useConversations();
 const { hideDialog } = useDialog();
-const { showToast } = useToastNotification();
+const toast = useToast();
 
 async function onSend() {
   if (!message.value.trim()) return;
   sending.value = true;
   try {
     await startConversation(props.listingId, props.receiverId, message.value.trim());
-    showToast('Message sent successfully!', { type: 'success' });
+    toast.add({ title: 'Success', description: 'Message sent successfully!', color: 'success' });
     hideDialog();
   } catch (e) {
-    showToast('Failed to send message. Please try again.', { type: 'error' });
+    toast.add({ title: 'Error', description: 'Failed to send message. Please try again.', color: 'error' });
     console.error('Error starting conversation:', e);
   } finally {
     sending.value = false;

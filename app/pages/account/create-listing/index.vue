@@ -39,7 +39,7 @@ definePageMeta({
 });
 
 const { draftListings, draftListingsPending, deleteDraftListing, isDraftDeleting, refreshDraftListings } = useListingEdit();
-const { showToast } = useToastNotification();
+const toast = useToast();
 
 const publishingDrafts = ref<Set<number>>(new Set());
 
@@ -58,7 +58,7 @@ const handlePublish = async (draftId: number) => {
       body: { draftId }
     });
     
-    showToast('Listing published successfully!', { type: 'success' });
+    toast.add({ title: 'Success', description: 'Listing published successfully!', color: 'success' });
     
     // Refresh draft listings to remove the published one
     await refreshDraftListings();
@@ -69,7 +69,7 @@ const handlePublish = async (draftId: number) => {
     }
   } catch (error: any) {
     console.error('Failed to publish listing:', error);
-    showToast(error?.data?.message || 'Failed to publish listing. Please try again.', { type: 'error' });
+    toast.add({ title: 'Error', description: error?.data?.message || 'Failed to publish listing. Please try again.', color: 'error' });
   } finally {
     publishingDrafts.value.delete(draftId);
   }

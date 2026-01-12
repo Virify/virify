@@ -1,5 +1,3 @@
-import type { Ref } from 'vue'
-
 /**
  * Options for performing an optimistic update
  */
@@ -32,8 +30,8 @@ interface OptimisticUpdateOptions<T> {
  *   ref: favouriteLookups,
  *   optimisticChange: (current) => [...current, listingId],
  *   operation: () => $fetch(`/api/user/favourites/${listingId}`, { method: 'POST' }),
- *   onSuccess: () => showToast('Added!', { type: 'success' }),
- *   onError: () => showToast('Failed!', { type: 'error' }),
+ *   onSuccess: () => toast.add({ title: 'Success', description: 'Added!', color: 'primary' }),
+ *   onError: () => toast.add({ title: 'Error', description: 'Failed!', color: 'secondary' }),
  * })
  * ```
  */
@@ -94,8 +92,8 @@ interface MultiOptimisticUpdateOptions {
  *     { ref: userNotes, optimisticChange: (current) => current.filter(n => n.listingId !== id) },
  *   ],
  *   operation: () => $fetch(`/api/user/notes/${id}`, { method: 'DELETE' }),
- *   onSuccess: () => showToast('Deleted!', { type: 'success' }),
- *   onError: () => showToast('Failed!', { type: 'error' }),
+ *   onSuccess: () => toast.add({ title: 'Success', description: 'Deleted!', color: 'primary' }),
+ *   onError: () => toast.add({ title: 'Error', description: 'Failed!', color: 'secondary' }),
  * })
  * ```
  */
@@ -159,8 +157,8 @@ interface PendingRemovalOptions {
  *   pendingSet: pendingRemoval,
  *   id: listingId,
  *   operation: () => $fetch(`/api/user/favourites/${listingId}`, { method: 'DELETE' }),
- *   onSuccess: () => showToast('Removed!', { type: 'success' }),
- *   onError: () => showToast('Failed!', { type: 'error' }),
+ *   onSuccess: () => toast.add({ title: 'Success', description: 'Removed!', color: 'primary' }),
+ *   onError: () => toast.add({ title: 'Error', description: 'Failed!', color: 'secondary' }),
  * })
  * ```
  */

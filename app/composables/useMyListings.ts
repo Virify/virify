@@ -5,7 +5,7 @@ type SortBy = "new" | "old" | "premium" | "featured" | "basic";
 
 export const useMyListings = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
-  const { showToast } = useToastNotification();
+  const toast = useToast();
 
   // Query state
   const searchTerm = ref("");
@@ -109,13 +109,14 @@ export const useMyListings = createSharedComposable(() => {
         listings.value.splice(listingIndex, 1)
       }
 
-      showToast(
-        published ? "Listing published" : "Listing unpublished", 
-        { type: "success" }
-      )
+      toast.add({
+        title: 'Success',
+        description: published ? "Listing published" : "Listing unpublished", 
+        color: 'success',
+      })
     } catch (error) {
       console.error("Failed to update publish state", error)
-      showToast("Failed to update publish state", { type: "error" })
+      toast.add({ title: 'Error', description: "Failed to update publish state", color: 'error' })
       throw error
     }
   }
@@ -136,10 +137,10 @@ export const useMyListings = createSharedComposable(() => {
         listings.value.splice(listingIndex, 1)
       }
 
-      showToast("Listing archived successfully", { type: "success" })
+      toast.add({ title: 'Success', description: "Listing archived successfully", color: "success" })
     } catch (error) {
       console.error("Failed to archive listing", error)
-      showToast("Failed to archive listing", { type: "error" })
+      toast.add({ title: "Failed to archive listing", description: "Failed to archive listing", color: "error" })
       throw error
     }
   }

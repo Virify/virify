@@ -119,7 +119,61 @@ export function useDashboardNavigation() {
         text: "Account settings",
       },
       children: [
-        ...accountNavigationItems.value
+        // pushing this causes critical errors need to hard code
+        {
+          label: "Profile",
+          type: "link",
+          to: "/dashboard/profile",
+          icon: "i-lucide-user",
+          tooltip: {
+            text: "Your profile",
+          },
+        },
+        {
+          label: "Settings",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-settings",
+          tooltip: {
+            text: "Account settings",
+          },
+        },
+        {
+          label: "Billing",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-credit-card",
+          tooltip: {
+            text: "Billing & payments",
+          },
+        },
+        {
+          label: "Security",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-shield-check",
+          tooltip: {
+            text: "Security settings",
+          },
+        },
+        {
+          label: "Notifications",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-bell",
+          tooltip: {
+            text: "Notification preferences",
+          },
+        },
+        {
+          label: "Analytics",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-chart-bar",
+          tooltip: {
+            text: "View analytics",
+          },
+        },
       ],
     },
     {
@@ -240,6 +294,6 @@ export function useDashboardNavigation() {
 
   return {
     dashboardNavigationitems,
-    accountNavigationItems
+    accountNavigationItems,
   };
 }

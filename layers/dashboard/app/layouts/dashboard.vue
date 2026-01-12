@@ -19,7 +19,6 @@
       <slot/>
   </UDashboardGroup>
   <ViewsDialog />
-  <MoleculesToastContainer />
 </template>
 <script lang="ts" setup>
   const { fetchUserItemsAggregates } = useNotifications()

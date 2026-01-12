@@ -9,12 +9,9 @@ const { mockShowToast, mockMarkStepAsCompleted, mockRequestFetch } = vi.hoisted(
 }));
 
 // Mock composables
-vi.mock("../../../app/composables/useToastNotification", () => ({
-  default: () => ({
-    showToast: mockShowToast,
-  }),
-  useToastNotification: () => ({
-    showToast: mockShowToast,
+vi.mock("#imports", () => ({
+  useToast: () => ({
+    add: mockShowToast,
   }),
 }));
 
@@ -332,7 +329,7 @@ describe("useListingStepForm", () => {
 
       await submitForm(updateFn, nextStepFn);
 
-      expect(mockShowToast).toHaveBeenCalledWith("Failed to save progress. Please try again.", { type: "error" });
+      expect(mockShowToast).toHaveBeenCalledWith({ title: 'Error', description: "Failed to save progress. Please try again.", color: 'secondary' });
       expect(nextStepFn).not.toHaveBeenCalled();
     });
   });

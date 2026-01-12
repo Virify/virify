@@ -1,10 +1,7 @@
-import { type User, Prisma, Reviewed, MembershipType } from "../database/prisma/generated/client";
+import { type User, Reviewed, MembershipType } from "../database/prisma/generated/client";
+import type { ProfileSchemaType } from "~~/shared/utils/profile-schema";
 
 import { prisma } from "./prisma-client";
-export type UserWithVerification = Prisma.UserGetPayload<{ include: { verification: true, } }>;
-export type UserWithVerificationAndMembership = Prisma.UserGetPayload<{ include: { verification: true, membership: true } }>;
-export type UserWithMembership = Prisma.UserGetPayload<{ include: { membership: true } }>;
-export type { User };
 
 /**
  * Finds an user by email.
@@ -19,6 +16,20 @@ export async function findUser(email: string): Promise<UserWithVerificationAndMe
     include: {
       membership: true,
       verification: true,
+    },
+  });
+}
+
+/**
+ * Get user with address for profile update
+ * @param id User ID
+ * @returns User With Address
+ */
+export async function findUserforProfileUpdate(id: number): Promise<UserWithAddress | null> {
+  return prisma.user.findUnique({
+    where: { id },
+    include: {
+      address: true,
     },
   });
 }
@@ -387,6 +398,32 @@ export async function updateUserAndReview(id: number, approval: Reviewed, token:
       },
     });
   }
+}
+
+/**
+ * Update User Profile Data and Address
+ * @param id User Id
+ * @param data User Pofile Data and Address
+ * @returns User With Address
+ */
+export async function updateUserProfileData(id: number, data: ProfileSchemaType): Promise<UserWithAddress> {
+  const { address, ...userData } = data;
+  
+  return await prisma.user.update({
+    where: { id },
+    data: {
+      ...userData,
+      address: {
+        upsert: {
+          create: address,
+          update: address,
+        }
+      },
+    },
+    include: {
+      address: true,
+    },
+  });
 }
 
 /**

@@ -18,7 +18,7 @@ const initialQuery = ref('')
  */
 const { searchState, isLoading } = useSearchState()
 const { checkContent, isChecking } = useModeration()
-const { showToast } = useToastNotification()
+const toast = useToast()
 
 async function searchSubmit(query: string) {
   const { location, radius, listingType } = asObject(searchState.value)
@@ -28,7 +28,7 @@ async function searchSubmit(query: string) {
   // Check content moderation before proceeding
   const { safe, reason } = await checkContent(query)
   if (!safe) {
-    showToast(reason || 'Please try a different search.', { type: 'error' })
+    toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
     return
   }
 

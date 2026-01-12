@@ -12,91 +12,120 @@
 
     <template #body>
       <div class="flex flex-col gap-4 sm:gap-4 lg:gap-4 w-full lg:max-w-2xl mx-auto pt-6">
-        <UPageCard
-          orientation="horizontal"
-          title="Edit Your Profile"
-          description="Update your profile information to keep your account up to date. We use this information to personalize your experience and for verification."
-          variant="ghost"
-          :ui="{
-            root: 'w-full border-0!',
-            container: 'p-2! grid grid-cols-1 lg:grid-cols-4 gap-4 w-full',
-            wrapper: 'lg:col-span-3',
-            description: 'body-sm text-(--foreground-200)',
-            title: 'title-sm',
-          }"
-        >
-          <div class="lg:col-span-1 flex justify-start lg:justify-end h-full lg:items-end w-full">
-            <UButton
-              variant="solid"
-              color="secondary"
-              label="Save Changes"
-              size="md"
-              :ui="{
-                label: 'text-(--monochrome-900) body-sm',
-              }"
-            />
-          </div>
-        </UPageCard>
-        <UForm :schema="schema" :state="state">
+        <UForm :schema="profileSchema" :state="state" @submit="onSubmit">
+          <UPageCard
+            orientation="horizontal"
+            title="Edit Your Profile"
+            class="pb-4"
+            description="Update your profile information to keep your account up to date. We use this information to personalize your experience and for verification."
+            variant="ghost"
+            :ui="{
+              root: 'w-full border-0!',
+              container: 'p-2! grid grid-cols-1 lg:grid-cols-4 gap-4 w-full',
+              wrapper: 'lg:col-span-3',
+              description: 'body-sm text-(--foreground-200)',
+              title: 'title-sm',
+            }"
+          >
+            <div class="lg:col-span-1 flex justify-start lg:justify-end h-full lg:items-end w-full">
+              <UButton
+                variant="solid"
+                color="secondary"
+                label="Save Changes"
+                size="md"
+                :ui="{
+                  label: 'text-(--monochrome-900) body-sm',
+                }"
+                type="submit"
+              />
+            </div>
+          </UPageCard>
+
           <div class="bg-elevated dark:bg-elevated/40 w-full p-6 sm:p-6 rounded-lg border-0!">
-            <UFormField
-              label="First Name"
-              required
-              orientation="horizontal"
-              description="Only your username will be displayed"
-              :ui="{
-                label: 'body-sm text-(--foreground-100) font-semibold',
-                description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
-              }"
-            >
-              <UInput v-model="state.firstName" type="text" variant="subtle" placeholder="First Name" :loading="pending" color="secondary" class="w-full md:w-80" />
+            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed">
+              <template #error="{ error }">
+                <p>{{ error }}</p>
+              </template>
+              <UInput
+                v-model="state.firstName"
+                type="text"
+                variant="subtle"
+                icon="i-lucide-user-pen"
+                placeholder="First Name"
+                :loading="pending"
+                color="secondary"
+                class="w-full md:w-80"
+                :ui="{
+                  base: 'placeholder:text-(--foreground-200)/50!',
+                  leadingIcon: 'text-(--foreground-200)/50'
+                }"
+              />
             </UFormField>
 
             <USeparator class="my-4" />
 
-            <UFormField
-              label="Last Name"
-              required
-              orientation="horizontal"
-              description="Your family name"
-              :ui="{
-                label: 'body-sm text-(--foreground-100) font-semibold',
-                description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
-              }"
-            >
-              <UInput v-model="state.lastName" variant="subtle" type="text" placeholder="Last Name" :loading="pending" color="secondary" class="w-full md:w-80" />
+            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Your family name">
+              <UInput
+                v-model="state.lastName"
+                variant="subtle"
+                type="text"
+                icon="i-lucide-user-pen"
+                placeholder="Last Name"
+                :loading="pending"
+                color="secondary"
+                class="w-full md:w-80"
+                :ui="{
+                  base: 'placeholder:text-(--foreground-200)/50!',
+                  leadingIcon: 'text-(--foreground-200)/50'
+                }"
+              />
             </UFormField>
 
             <USeparator class="my-4" />
 
-            <UFormField
-              label="Username"
-              required
-              orientation="horizontal"
-              description="Your public username"
-              :ui="{
-                label: 'body-sm text-(--foreground-100) font-semibold',
-                description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
-              }"
-            >
-              <UInput v-model="state.username" type="text" placeholder="Username" variant="subtle" :loading="pending" color="secondary" class="w-full md:w-80" />
+            <UFormField label="Username" name="username" required orientation="horizontal" description="Your public username">
+              <UInput
+                v-model="state.username"
+                type="text"
+                icon="i-lucide-contact"
+                placeholder="Username"
+                variant="subtle"
+                :loading="pending"
+                color="secondary"
+                class="w-full md:w-80"
+                :ui="{
+                  base: 'placeholder:text-(--foreground-200)/50!',
+                  leadingIcon: 'text-(--foreground-200)/50'
+                }"
+              />
             </UFormField>
 
             <USeparator class="my-4" />
 
-            <UFormField
-              label="Avatar"
-              orientation="horizontal"
-              description="URL to your profile picture"
-              :ui="{
-                label: 'body-sm text-(--foreground-100) font-semibold',
-                description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-0',
-              }"
-            >
+            <OrganismsDashboardProfileAddressLookup v-model="state.address" :pending="pending" />
+
+            <USeparator class="my-4" />
+
+            <UFormField label="Phone Number" name="phoneNumber" orientation="horizontal" description="Your contact phone number">
+              <UInput
+                v-model="state.phoneNumber"
+                type="tel"
+                icon="i-lucide-phone"
+                placeholder="Phone Number"
+                variant="subtle"
+                :loading="pending"
+                color="secondary"
+                class="w-full md:w-80"
+                :ui="{
+                  base: 'placeholder:text-(--foreground-200)/50!',
+                  leadingIcon: 'text-(--foreground-200)/50'
+                }"
+              />
+            </UFormField>
+
+            <USeparator class="my-4" />
+
+            <UFormField label="Avatar" name="avatar" orientation="horizontal" description="URL to your profile picture">
               <UInput
                 v-model="state.avatar"
                 type="url"
@@ -107,6 +136,7 @@
                 class="w-full md:w-80"
                 :ui="{
                   base: 'pl-16 placeholder:text-(--foreground-200)/50!',
+                  leadingIcon: 'text-(--foreground-200)/50'
                 }"
               >
                 <template #leading>
@@ -117,16 +147,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField
-              label="Bio"
-              orientation="horizontal"
-              description="A short description of yourself"
-              :ui="{
-                label: 'body-sm text-(--foreground-100) font-semibold',
-                description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0',
-              }"
-            >
+            <UFormField label="Bio" name="bio" orientation="horizontal" description="A short description of yourself">
               <UTextarea
                 v-model="state.bio"
                 type="text"
@@ -136,25 +157,14 @@
                 color="secondary"
                 class="w-full md:w-80"
                 :ui="{
-                  base: 'body-sm placeholder:text-(--foreground-200)/50',
+                  base: 'text-sm placeholder:text-(--foreground-200)/50!',
                 }"
               />
             </UFormField>
 
             <USeparator class="my-4" />
 
-            <UFormField
-              label="Your Intent"
-              description="Please enter your interests and intent"
-              help="You can select multiple"
-              orientation="horizontal"
-              :ui="{
-                label: 'body-sm text-(--foreground-100) font-semibold',
-                description: 'body-xs text-(--foreground-200)/60',
-                root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0',
-                help: 'body-xs text-(--foreground-200)/60 self-center mt-1',
-              }"
-            >
+            <UFormField label="Your Intent" name="intents" description="Please enter your site interests and intent" help="You can select multiple" orientation="horizontal">
               <USelect
                 v-model="state.intents"
                 :items="intents"
@@ -168,6 +178,25 @@
                 }"
               />
             </UFormField>
+
+            <USeparator class="my-4" />
+
+            <UFormField label="Interests" name="interests" description="Please enter your personal interests" help="Remove tags by clicking the 'x' on each" orientation="horizontal">
+              <UInputTags
+                v-model="state.interests"
+                variant="subtle"
+                multiple
+                color="secondary"
+                :highlight="false"
+                :ui="{
+                  root: 'w-full! md:w-80! outline-0!',
+                  input: 'outline-0!',
+                }"
+                label="Interests"
+                name="interests"
+                orientation="horizontal"
+              />
+            </UFormField>
           </div>
         </UForm>
       </div>
@@ -177,42 +206,63 @@
 
 <script setup lang="ts">
 import { z } from "zod";
-import type { describe } from "zod/v4/core";
 import { UserIntent } from "~~/layers/database/server/database/prisma/generated/enums";
+import type { FormSubmitEvent } from "#ui/types";
+
 definePageMeta({
   middleware: ["authenticated"],
   layout: "dashboard",
 });
 
-const { data: fullUser, refresh, pending } = await useAsyncData("fullUser", () => useRequestFetch()<FullUser>(`/api/user`));
+const { data: fullUser, pending } = await useAsyncData("fullUser", () => useRequestFetch()<UserWithAddress>(`/api/user/profile`));
 
 const { accountNavigationItems } = useDashboardNavigation();
 
-const schema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.email("Must be a valid email").optional(),
-  address: z.any(),
-  avatar: z.url("Must be a valid URL").optional().or(z.literal("")),
-  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
-  intents: z.array(z.enum(Object.values(UserIntent))).optional(),
-  interests: z.array(z.string()).optional(),
-});
-
-type Schema = z.output<typeof schema>;
+type Schema = z.output<typeof profileSchema>;
 
 const state = reactive<Schema>({
   firstName: fullUser.value?.firstName || "",
   lastName: fullUser.value?.lastName || "",
   username: fullUser.value?.username || "",
   email: fullUser.value?.email || "",
-  address: fullUser.value?.address || "",
+  address: fullUser.value?.address || {
+    number: null,
+    flat: null,
+    name: null,
+    street: "",
+    city: "",
+    locality: null,
+    county: null,
+    district: null,
+    country: null,
+    postcode: "",
+    fullAddress: null,
+    lat: null,
+    lon: null,
+  },
   avatar: fullUser.value?.avatar || "",
   bio: fullUser.value?.bio || "",
   intents: fullUser.value?.intents || [],
-  interests: fullUser.value?.interests || [],
+  interests: fullUser.value?.interests?.length ? fullUser.value.interests : ["property"],
+  phoneNumber: fullUser.value?.phoneNumber || "",
 });
+
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  // TODO: Handle form submission
+  try {
+    const response = await $fetch<Schema>("/api/user/profile", {
+      method: "PATCH",
+      body: event.data,
+    });
+
+    if (response) {
+      useToast().add({ title: "Success", description: "Profile updated successfully", color: "success" });
+      console.log(response);
+    }
+  } catch (error: any) {
+    // proppagate to form
+  }
+}
 
 const intents: { value: UserIntent; label: string }[] = [
   { value: UserIntent.BUYING, label: "Buying" },

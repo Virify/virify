@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
   }
 
-  const fullUser = await getFullUserById(user.id);
+  const fullUser = await findUserforProfileUpdate(user.id);
 
   if (!fullUser) {
     throw createError({ statusCode: 404, statusMessage: 'User not found' });

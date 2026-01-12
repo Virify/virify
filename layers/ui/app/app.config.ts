@@ -93,5 +93,19 @@ export default defineAppConfig({
         },
       ],
     },
+    toast: {
+      slots: {
+        root: 'bg-(--background-200)'
+      },
+    },
+    formField: {
+      slots: {
+        label: 'body-sm text-(--foreground-100)',
+        description: 'body-xs text-(--foreground-200)/60',
+        root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0',
+        error: 'w-full md:w-80 body-xs',
+        help: 'body-xs text-(--foreground-200)/60 self-center mt-1',
+      }
+    },
   },
 });

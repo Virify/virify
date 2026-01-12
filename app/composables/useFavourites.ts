@@ -15,7 +15,7 @@ const pendingRemoval = ref<Set<number>>(new Set());
 export const useFavourites = () => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
-  const { showToast } = useToastNotification();
+  const toast = useToast();
   const requestFetch = useRequestFetch();
 
   // Lightweight shared search / category state (favourites + notes share util)
@@ -134,10 +134,10 @@ export const useFavourites = () => {
       onSuccess: () => {
         refreshFavourites();
         refetchCurrentPage();
-        showToast("Added to favourites", { type: "success" });
+        toast.add({ title: 'Success', description: "Added to favourites", color: 'success' });
       },
       onError: (error) => {
-        showToast("Failed to add to favourites", { type: "error" });
+        toast.add({ title: 'Error', description: "Failed to add to favourites", color: 'error' });
         console.error("Error adding to favourites:", error);
       },
     });
@@ -166,13 +166,13 @@ export const useFavourites = () => {
         });
       },
       onSuccess: () => {
-        showToast("Removed from favourites", { type: "success" });
+        toast.add({ title: 'Success', description: "Removed from favourites", color: 'success' });
         // Optimistically remove from global lookups immediately
         favouriteLookups.value = favouriteLookups.value.filter(id => id !== listingId);
         refreshFavourites();
       },
       onError: (error) => {
-        showToast("Failed to remove from favourites", { type: "error" });
+        toast.add({ title: 'Error', description: "Failed to remove from favourites", color: 'error' });
         console.error("Error removing from favourites:", error);
       },
     });

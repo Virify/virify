@@ -28,7 +28,6 @@
 
     <ViewsDialog />
     <ViewsHelpButton />
-    <MoleculesToastContainer />
   </div>
 </template>
 

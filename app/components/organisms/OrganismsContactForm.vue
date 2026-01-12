@@ -112,7 +112,7 @@ const props = defineProps<{
   formId: string;
 }>();
 
-const { showToast } = useToastNotification();
+const toast = useToast();
 const config = useRuntimeConfig();
 const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 
@@ -185,7 +185,7 @@ async function submitForm() {
     if (response.success) {
       isSuccess.value = true;
       message.value = response.message;
-      showToast(message.value, { type: "success" });
+      toast.add({ title: 'Success', description: message.value, color: 'success' });
     }
   } catch (error: any) {
     console.error("Contact form error:", error);

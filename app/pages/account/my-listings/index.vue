@@ -67,7 +67,7 @@ const sortOrStatus = computed({
 })
 
 function onEdit(id: number) {
-  useToastNotification().showToast('Edit not implemented yet', { type: 'info' })
+  useToast().add({ title: 'Edit not implemented yet', description: 'Editing listings is not available at the moment.', color: 'secondary' })
 }
 </script>
 

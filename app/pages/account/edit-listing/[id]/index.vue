@@ -39,7 +39,7 @@ definePageMeta({
 const route = useRoute();
 const { getCurrentStep, determineInitialStep, nextStep, previousStep, cleanupListingStep } = useListingStep();
 const { getStepperMap, getStepperProps, getCurrentStepData, handleStepUpdate } = useListingEditor();
-const { showToast } = useToastNotification();
+const toast = useToast();
 
 const listingId = Number(route.params.id);
 
@@ -69,7 +69,7 @@ const handleUpdateStepData = async (stepData: any, step: number) => {
     if (result.success) {
       // Show success toast with step-specific message
       const stepTitle = stepperMap.value[step - 1]?.title || 'Step';
-      showToast(`${stepTitle} updated`, { type: 'success' });
+      toast.add({ title: 'Success', description: `${stepTitle} updated`, color: 'success' });
       
       // Refresh the listing data after update
       await refreshListing();

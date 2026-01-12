@@ -1,6 +1,5 @@
 import { ViewsDialogLogin, ViewsDialogNotes } from "#components";
-import type { NoteData } from "~~/shared/types/note";
-import { performOptimisticUpdate, performMultiOptimisticUpdate } from "~/utils/optimistic-update";
+import { performMultiOptimisticUpdate } from "~/utils/optimistic-update";
 
 // Track items pending removal (for visual feedback) - Share across instances
 const pendingRemoval = ref<Set<number>>(new Set());
@@ -14,7 +13,7 @@ const pendingRemoval = ref<Set<number>>(new Set());
 export const useNotes = () => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
-  const { showToast } = useToastNotification();
+  const toast = useToast();
   const requestFetch = useRequestFetch();
 
   // Local filtering state (mirrors favourites pattern)
@@ -184,11 +183,11 @@ export const useNotes = () => {
       onSuccess: () => {
         refreshUserNotes();
         refetchCurrentPage();
-        showToast(successMessage, { type: "success" });
+        toast.add({ title: 'Success', description: successMessage, color: 'success' });
       },
       onError: (error) => {
         console.error("Error updating note:", error);
-        showToast(errorMessage, { type: "error" });
+        toast.add({ title: 'Error', description: errorMessage, color: 'error' });
       },
     });
   };
@@ -227,11 +226,11 @@ export const useNotes = () => {
       onSuccess: () => {
         refreshUserNotes();
         refetchCurrentPage();
-        showToast("Note deleted", { type: "success" });
+        toast.add({ title: 'Success', description: "Note deleted", color: 'success' });
       },
       onError: (error) => {
         console.error("Error deleting note:", error);
-        showToast("Failed to delete note", { type: "error" });
+        toast.add({ title: 'Error', description: "Failed to delete note", color: 'error' });
       },
     });
   };

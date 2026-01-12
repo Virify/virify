@@ -33,7 +33,7 @@ export interface UploadResponse {
 export const useCloudflare = () => {
   const isUploading = ref(false);
   const uploadError = ref<string | null>(null);
-  const { showToast } = useToastNotification();
+  const toast = useToast();
 
   /**
    * Upload an image to Cloudflare using direct upload
@@ -77,13 +77,13 @@ export const useCloudflare = () => {
       } else {
         const errorMessage = data.errors?.[0]?.message || 'Upload failed';
         uploadError.value = errorMessage;
-        showToast(`Failed to upload image: ${errorMessage}`, { type: 'error' });
+        toast.add({ title: 'Error', description: `Failed to upload image: ${errorMessage}`, color: 'error' });
         return null;
       }
     } catch (error: any) {
       const errorMessage = error?.data?.message || error?.message || 'Upload failed';
       uploadError.value = errorMessage;
-      showToast(`Error uploading image: ${errorMessage}`, { type: 'error' });
+      toast.add({ title:'Error', description: `Error uploading image: ${errorMessage}`, color: 'error' });
       console.error('Upload error:', error);
       return null;
     } finally {
@@ -115,7 +115,7 @@ export const useCloudflare = () => {
       return response.success;
     } catch (error: any) {
       console.error('Error deleting image:', error);
-      showToast('Failed to delete image', { type: 'error' });
+      toast.add({ title: 'Error', description: 'Failed to delete image', color: 'secondary' });
       return false;
     }
   };

@@ -194,7 +194,7 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
 
-const { showToast } = useToastNotification();
+const toast = useToast();
 
 // Fetch CMS content - module automatically uses correct perspective
 const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(
@@ -279,7 +279,7 @@ async function handleSubmit() {
     if (response.success) {
       isSuccess.value = true;
       message.value = response.message;
-      showToast(message.value, { type: "success" });
+      toast.add({ title: 'Success', description: message.value, color: 'success' });
     }
   } catch (error: any) {
     console.error("Waiting list signup error:", error);

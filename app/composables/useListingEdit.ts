@@ -12,7 +12,7 @@ export function isLiveListing(listing: EditableListing): listing is ListingWithF
 }
 
 export const useListingEdit = createSharedComposable(() => {
-  const { showToast } = useToastNotification();
+  const toast = useToast();
 
   // Track which drafts are currently being deleted
   const deletingIds = ref(new Set<number>());
@@ -48,7 +48,7 @@ export const useListingEdit = createSharedComposable(() => {
       });
       
       refreshDraftListings();
-      showToast("Draft listing created successfully", { type: "success" });
+      toast.add({ title: 'Success', description: "Draft listing created successfully", color: 'success' });
       return createdListing.id;
     } catch (error) {
       console.error("Error creating draft listing:", error);
@@ -79,10 +79,10 @@ export const useListingEdit = createSharedComposable(() => {
       
       // Refresh the draft listings after successful deletion
       await refreshDraftListings();
-      showToast("Draft listing deleted successfully", { type: "success" });
+      toast.add({ title: 'Success', description: "Draft listing deleted successfully", color: 'success' });
       return true;
     } catch (error) {
-      showToast("Failed to delete draft listing. Please try again.", { type: "error" });
+      toast.add({ title: 'Error', description: "Failed to delete draft listing. Please try again.", color: 'error' });
       console.error("Error deleting draft listing:", error);
       return false;
     } finally {
