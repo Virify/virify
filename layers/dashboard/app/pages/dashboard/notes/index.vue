@@ -1,7 +1,7 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar title="Your Notes" class="body-sm border-0 px-3" :ui="{
+      <UDashboardNavbar title="Your Notes" class="body-sm px-3" :ui="{
         title: 'title-sm m-0!',
         icon: 'text-secondary',
       }">
@@ -50,7 +50,6 @@
   const { userNotes, fetchNotes, total, loading } = useNotes()
   const { setGroups } = useDashboardSearch()
   
-  const filterRef = ref()
   const page = ref(1)
   const limit = ref(20)
   const pageTop = ref<HTMLElement | null>(null)
@@ -64,13 +63,15 @@
   // Watch filter changes and re-fetch from API (reset to page 1)
   watch([saleRentFilter, sortOrderValue], async () => {
     page.value = 1
-    await fetchNotes(saleRentFilter.value, 1, sortOrderValue.value, limit.value)
+    const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
+    await fetchNotes(saleRentFilter.value, 1, validSortOrder, limit.value)
   }, { immediate: true })
 
   // Handle page changes from pagination component
   async function onPageChange(newPage: number) {
     page.value = newPage
-    await fetchNotes(saleRentFilter.value, newPage, sortOrderValue.value, limit.value)
+    const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
+    await fetchNotes(saleRentFilter.value, newPage, validSortOrder, limit.value)
 
     const el = (pageTop.value as any)?.$el ?? pageTop.value
     const scrollContainer = el?.closest('.overflow-y-auto, .overflow-y-scroll, .overflow-auto')

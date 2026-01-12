@@ -1,13 +1,15 @@
-import { getAllUsers } from "../../utils/user";
-
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
 
   if (!user.id) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
   }
 
-  const users = await getAllUsers();
+  const fullUser = await getFullUserById(user.id);
 
-  return users;
+  if (!fullUser) {
+    throw createError({ statusCode: 404, statusMessage: 'User not found' });
+  }
+
+  return fullUser;
 });

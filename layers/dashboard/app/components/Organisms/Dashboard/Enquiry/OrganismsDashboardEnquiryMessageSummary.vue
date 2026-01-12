@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-3 p-4 bg-(--background-100) rounded-b-lg">
+  <div class="flex flex-col gap-3 p-4 bg-(--background-200)">
     <div class="flex items-start gap-2 flex-1">
       <UIcon 
         :name="!isLastMessageFromCurrentUser(enquiry, user?.id) ? 'i-lucide-corner-down-right' : 'i-lucide-corner-down-left'" 

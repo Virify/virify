@@ -23,6 +23,87 @@ export async function findUser(email: string): Promise<UserWithVerificationAndMe
   });
 }
 
+export async function getFullUserById(id: number): Promise<FullUser | null> {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      address: true,
+      listings: {
+        include: {
+          rentalListing: true,
+          saleListing: true,
+          property: {
+            include: {
+              address: true,
+              media: true,
+              type: true,
+              classification: true,
+              bedroomFeatures: {
+                include: {
+                  media: true,
+                },
+              },
+              bathroomFeatures: {
+                include: {
+                  media: true,
+                },
+              },
+              otherRoom: {
+                include: {
+                  media: true,
+                },
+              },
+              parking: true,
+              amenities: true,
+              additionalFeatures: true,
+              accessibilityFeatures: true,
+              kitchenFeatures: {
+                include: {
+                  media: true,
+                },
+              },
+              reception: {
+                include: {
+                  media: true,
+                },
+              },
+              utility: true,
+              outdoorSpace: {
+                include: {
+                  garden: {
+                    include: {
+                      media: true,
+                    },
+                  },
+                  yard: {
+                    include: {
+                      media: true,
+                    },
+                  },
+                  land: {
+                    include: {
+                      media: true,
+                    },
+                  },
+                  media: true,
+                },
+              },
+              energyAndUtilities: true,
+              securityFeatures: true,
+              storageFeatures: true,
+              runningCosts: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return user as FullUser | null;
+}
+
 /**
  * Find user by ID
  * @param id number

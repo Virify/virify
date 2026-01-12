@@ -1,7 +1,7 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar class="border-0" :ui="{
+      <UDashboardNavbar :ui="{
         title: 'title-sm m-0!',
         right: 'flex items-center gap-4',
       }">
