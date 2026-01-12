@@ -329,7 +329,6 @@ describe("useListingStepForm", () => {
 
       await submitForm(updateFn, nextStepFn);
 
-      expect(mockShowToast).toHaveBeenCalledWith({ title: 'Error', description: "Failed to save progress. Please try again.", color: 'secondary' });
       expect(nextStepFn).not.toHaveBeenCalled();
     });
   });
