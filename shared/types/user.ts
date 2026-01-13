@@ -21,5 +21,6 @@ export type UserWithVerification = Prisma.UserGetPayload<{ include: { verificati
 export type UserWithVerificationAndMembership = Prisma.UserGetPayload<{ include: { verification: true, membership: true } }>;
 export type UserWithMembership = Prisma.UserGetPayload<{ include: { membership: true } }>;
 export type UserWithAddress = Prisma.UserGetPayload<{ include: { address: true } }>;
+export type UserSecurity = { id: number, email: string };
 
 export type { User };

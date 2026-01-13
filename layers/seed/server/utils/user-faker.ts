@@ -48,7 +48,7 @@ export async function seedFakeUsers(count = 1): Promise<number[]> {
           ...user,
           verification: {
             create: {
-              activated: true,
+              activated: 'ACTIVATED',
             },
           },
           membership: {

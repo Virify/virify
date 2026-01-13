@@ -1,5 +1,3 @@
-import type { UserWithVerification } from "~~/layers/database/server/utils/user";
-
 /**
  * Validate the activation token and check if it is expired.
  *

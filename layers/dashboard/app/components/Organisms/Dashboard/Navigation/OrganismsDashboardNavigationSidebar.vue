@@ -119,8 +119,8 @@
   import { TooltipProvider } from 'reka-ui';
   const { dashboardNavigationitems } = useDashboardNavigation();
   const { clear } = useUserSession();
-  const logout = () => {
+  const logout = async () => {
+    navigateTo('/');
     clear();
-    navigateTo('/login');
   };
 </script>

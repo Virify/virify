@@ -8,14 +8,15 @@
         }"
       />
       <UNavigationMenu highlight variant="pill" :items="accountNavigationItems" class="hidden sm:flex ml-4" color="secondary" />
+      <MoleculesDashboardPasswordAlert />
     </template>
     <template #body>
       <AtomsDashboardFormContainer>
         <UForm :schema="schema" :state="state" @error="(event: FormErrorEvent) => errors = event" @submit="onSubmit" :validateOn="['input']">
           <OrganismsDashboardAccountHeroCard
-            :disable="disableButton"
+            :disable="isValidSubmission ? false : true"
             title="Enhance Your Account Security"
-            description="Protect your account by updating your security settings. Enable two-factor authentication and review recent activity to keep your account safe."
+            description="Protect and update your account. Here you can change your email address and update your password to keep your account secure."
             label="Save Changes"
           />
           <AtomsDashboardForm>
@@ -44,13 +45,15 @@
             </div>
             <div class="flex flex-col gap-4">
               <UFormField
-              label="Current Password"
-              name="currentPassword"
-              orientation="horizontal"
-              :required="isChangingPassword"
-              description="You will need your current password"
-              eagerValidation
-              >
+                v-if="isUserVerified"
+                label="Current Password"
+                name="currentPassword"
+                orientation="horizontal"
+                :required="isChangingPassword"
+                description="You will need your current password"
+                eagerValidation
+                :error="submitErrors?.find(e => e.name === 'currentPassword')?.message"
+                >
               <UInput
                 :type="showCurrentPassword ? 'text' : 'password'"
                 variant="subtle"
@@ -59,6 +62,7 @@
                 color="secondary"
                 class="w-full md:w-80"
                 v-model="state.currentPassword"
+                @focus="clearSubmitErrors"
                 :ui="{
                   base: 'placeholder:text-(--foreground-200)/50!',
                   leadingIcon: 'text-(--foreground-200)/50',
@@ -162,9 +166,9 @@
   </UDashboardPanel>
 </template>
 <script setup lang="ts">
-import { securitySchema, securitySchemaBase } from '~~/shared/utils/securitySchema';
+import { securitySchema, securitySchemaBase, securitySchemaSetPassword } from '~~/shared/utils/securitySchema';
 import { z } from "zod";
-import type { FormErrorEvent, FormSubmitEvent } from '@nuxt/ui';
+import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui';
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -172,45 +176,102 @@ definePageMeta({
 });
 
 const { accountNavigationItems } = useDashboardNavigation();
+const { user, fetch } = useUserSession();
+const toast = useToast();
 
 type Schema = z.output<typeof securitySchemaBase>;
 const errors = ref<FormErrorEvent | null>(null);
+const submitErrors = ref<FormError[] | null>(null);
 
 const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
 const showConfirmNewPassword = ref(false);
 
 const state = reactive<Schema>({
-  email: "",
+  email: user.value?.email || '',
   currentPassword: null,
   newPassword: null,
   confirmNewPassword: null,
 });
 
+const isUserVerified = computed(() => isVerified(user.value));
 
 const isChangingPassword = computed(() => {
   return !!state.currentPassword || !!state.newPassword || !!state.confirmNewPassword
 });
 
 const schema = computed(() => {
+  if (!isUserVerified.value) {
+    return securitySchemaSetPassword;
+  }
   if (isChangingPassword.value) {
     return securitySchema;
   }
   return securitySchemaBase;
 });
 
-const disableButton = computed(() => {
-    const result = schema.value.safeParse(state);
-    return !result.success;
+const isValidSubmission = computed(() => {
+  const isEmailChanged = state.email !== user.value?.email;
+
+  // For unverified users, we require they set a password IF they are interacting with it, or maybe always?
+  // Based on schema, strict validation implies they MUST set it if utilizing that schema.
+  if (!isUserVerified.value && !state.newPassword && !isEmailChanged) {
+      return false;
+  }
+
+  if (isUserVerified.value && !isEmailChanged && !isChangingPassword.value) {
+    return false;
+  }
+
+  const result = schema.value.safeParse(state);
+  return result.success;
 });
 
+function clearSubmitErrors() {
+  submitErrors.value = null;
+}
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
+  submitErrors.value = null;
+  
+  const querySchema = !isUserVerified.value ? 'set-password' : (isChangingPassword.value ? 'full' : 'base');
+
   try {
-      // Handle form submission logic here
-      console.log('Form submitted with data:', event.data);
-    // You can add your API call or other logic here
-  } catch (error) {
-    console.error('Error submitting form:', error);
+    const response = await $fetch<Schema>("/api/user/security", {
+      method: "PATCH",
+      body: event.data,
+      query: {
+        schema: querySchema,
+      }
+    });
+
+    if(response) {
+      toast.add({
+        title: 'Success',
+        description: 'Your security settings have been updated.',
+        color: 'success',
+      })
+      await fetch();
+    }
+
+  } catch (error: any) {
+    if(error.status === 400) {
+      submitErrors.value = [{
+        name: 'newPassword',
+        message: 'New password must not be the same as the current password.',
+      }]
+    }
+    if (error.status === 401) {
+      submitErrors.value = [{
+        name: 'currentPassword',
+        message: 'Current password is incorrect.',
+      }]
+    }
+    toast.add({
+      title: 'Error',
+      description: error.statusText,
+      color: 'error',
+    })
   }
 }
 

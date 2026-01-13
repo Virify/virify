@@ -4,6 +4,8 @@
     <p class="| body-sm">Please enter your one time pin that you have recived in your email below.</p>
     <p v-if="errors" class="| body-sm">{{ errors }}</p>
     <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
+    <AtomsDivider text="Warning" />
+    <p class="body-sm">If you close this dialog, you will need to restart the verification process.</p>
   </div>
 </template>
 
@@ -46,11 +48,13 @@ async function registerCompletion() {
       });
     });
   } else {
-    useViewTransition(() => {
-      showDialog({
-        component: ViewsDialogPasswordSet,
-      });
-    })
+    // useViewTransition(() => {
+    //   showDialog({
+    //     component: ViewsDialogPasswordSet,
+    //   });
+    // })
+    // On successful OTP verification, navigate to dashboard for password setting
+    navigateTo('/dashboard');
   }
 }
 

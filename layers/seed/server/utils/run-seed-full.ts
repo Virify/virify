@@ -69,7 +69,7 @@ async function seedAdminUser() {
         lastName: 'Admin',
         verification: {
           create: {
-            activated: true,
+            activated: 'ACTIVATED',
             role: 'ADMIN',
           },
         },

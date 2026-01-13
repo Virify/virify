@@ -1,5 +1,5 @@
 <template>
-  <span role="separator" v-if="text" class="a-divider | divider">{{ text }}</span>
+  <span role="separator" v-if="text" class="a-divider | divider body-sm">{{ text }}</span>
   <hr v-else class="| divider" />
 </template>
 

@@ -8,15 +8,13 @@
         }"
       />
       <UNavigationMenu highlight variant="pill" :items="accountNavigationItems" class="hidden sm:flex ml-4" color="secondary" />
+      <MoleculesDashboardPasswordAlert />
     </template>
 
     <template #body>
       <AtomsDashboardFormContainer>
         <UForm :schema="profileSchema" :state="state" @submit="onSubmit">
-          <OrganismsDashboardAccountHeroCard
-            title="Edit Your Profile"
-            description="Update your profile information to keep your account up to date. We use this information to personalize your experience and for verification."
-            label="Save Changes" />
+          <OrganismsDashboardAccountHeroCard title="Edit Your Profile" description="Update your profile information to keep your account up to date. We use this information to personalize your experience and for verification." label="Save Changes" />
 
           <AtomsDashboardForm>
             <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="">
@@ -34,7 +32,7 @@
                 class="w-full md:w-80"
                 :ui="{
                   base: 'placeholder:text-(--foreground-200)/50!',
-                  leadingIcon: 'text-(--foreground-200)/50'
+                  leadingIcon: 'text-(--foreground-200)/50',
                 }"
               />
             </UFormField>
@@ -53,7 +51,7 @@
                 class="w-full md:w-80"
                 :ui="{
                   base: 'placeholder:text-(--foreground-200)/50!',
-                  leadingIcon: 'text-(--foreground-200)/50'
+                  leadingIcon: 'text-(--foreground-200)/50',
                 }"
               />
             </UFormField>
@@ -72,7 +70,7 @@
                 class="w-full md:w-80"
                 :ui="{
                   base: 'placeholder:text-(--foreground-200)/50!',
-                  leadingIcon: 'text-(--foreground-200)/50'
+                  leadingIcon: 'text-(--foreground-200)/50',
                 }"
               />
             </UFormField>
@@ -95,7 +93,7 @@
                 class="w-full md:w-80"
                 :ui="{
                   base: 'placeholder:text-(--foreground-200)/50!',
-                  leadingIcon: 'text-(--foreground-200)/50'
+                  leadingIcon: 'text-(--foreground-200)/50',
                 }"
               />
             </UFormField>
@@ -113,7 +111,7 @@
                 class="w-full md:w-80"
                 :ui="{
                   base: 'pl-16 placeholder:text-(--foreground-200)/50!',
-                  leadingIcon: 'text-(--foreground-200)/50'
+                  leadingIcon: 'text-(--foreground-200)/50',
                 }"
               >
                 <template #leading>
@@ -225,7 +223,6 @@ const state = reactive<Schema>({
 });
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // TODO: Handle form submission
   try {
     const response = await $fetch<Schema>("/api/user/profile", {
       method: "PATCH",
@@ -234,10 +231,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     if (response) {
       useToast().add({ title: "Success", description: "Profile updated successfully", color: "success" });
-      console.log(response);
     }
   } catch (error: any) {
-    // proppagate to form
+    useToast().add({ title: "Error", description: error?.message || "An error occurred while updating profile", color: "error" });
   }
 }
 

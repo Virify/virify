@@ -9,6 +9,7 @@
           title: 'title-sm m-0!',
         }"
       />
+      <MoleculesDashboardPasswordAlert />
     </template>
 
     <template #body>

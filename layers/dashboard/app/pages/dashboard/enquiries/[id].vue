@@ -21,6 +21,7 @@
           />
         </template>
       </UDashboardNavbar>
+      <MoleculesDashboardPasswordAlert />
     </template>
 
     <template #body>

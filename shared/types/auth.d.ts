@@ -1,4 +1,4 @@
-import type { MembershipStatus, MembershipType, Role } from "../../layers/database/server/database/prisma/generated/enums";
+import type { ActivationStatus, MembershipStatus, MembershipType, Role } from "../../layers/database/server/database/prisma/generated/enums";
 
 declare module "#auth-utils" {
   interface User {
@@ -8,6 +8,7 @@ declare module "#auth-utils" {
     membership: MembershipType;
     membershipActive?: MembershipStatus;
     membershipEndDate?: Date | null;
-    role: Role;
+    role?: Role;
+    activated?: ActivationStatus;
   }
 }
