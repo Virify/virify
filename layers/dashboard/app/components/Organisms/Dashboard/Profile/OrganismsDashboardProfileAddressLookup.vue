@@ -17,7 +17,7 @@
             base: 'placeholder:text-(--foreground-200)/50!',
           }"
         />
-        <UButton icon="i-heroicons-x-mark" color="neutral" variant="ghost" @click="clearAddress" />
+        <UButton icon="i-lucide-x" color="neutral" variant="ghost" @click="clearAddress" />
       </div>
       <div v-else key="address-lookup" class="w-full flex flex-col gap-2">
         <div class="flex gap-2">

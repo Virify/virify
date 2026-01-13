@@ -231,6 +231,12 @@ function clearSubmitErrors() {
   submitErrors.value = null;
 }
 
+function clearForm() {
+  state.currentPassword = null;
+  state.newPassword = null;
+  state.confirmNewPassword = null;
+}
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   submitErrors.value = null;
   
@@ -252,6 +258,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         color: 'success',
       })
       await fetch();
+      clearForm();
     }
 
   } catch (error: any) {
