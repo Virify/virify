@@ -1,25 +1,47 @@
 <template>
-  <UAlert v-if="!isVerified(user)" title="Warning:" orientation="horizontal"
+  <UAlert
+    v-if="showAlert && loggedIn"
+    title="Warning:"
+    orientation="horizontal"
     :actions="[
       {
-        label: 'Set Password',
-        to: '/dashboard/security',
+        label: 'Complete Profile',
+        to: '/dashboard/profile/setup-profile',
         color: 'secondary',
         variant: 'solid',
         size: 'xl',
-      }
-    ]" 
-    icon="i-lucide-octagon-x" color="warning" :ui="{
+      },
+    ]"
+    icon="i-lucide-octagon-x"
+    color="warning"
+    :ui="{
       root: 'text-black rounded-none',
       title: 'title-xs mb-0! ',
       description: 'body-sm font-normal',
       icon: ' size-8 self-start',
-    }">
+    }"
+  >
     <template #description>
-      <p>You currently don't have a password set. Your account will be limited. If you log out without setting a password, you will have to do the password reset process to regain access.</p>
+      <p>{{ status }}</p>
     </template>
   </UAlert>
 </template>
 <script lang="ts" setup>
-const { user } = useUserSession();
+const { user, loggedIn } = useUserSession();
+
+const status = computed(() => {
+  if (!isVerified(user.value) && !user.value?.username) {
+    return "Please complete your profile to fully activate your account.";
+  }
+  if (!isVerified(user.value) && user.value?.username) {
+    return "Please create a password to fully activate your account.";
+  }
+  if (isVerified(user.value) && !user.value?.username) {
+    return "Please create a username to fully activate your account.";
+  }
+});
+
+const showAlert = computed(() => {
+  return (!isVerified(user.value) && !user.value?.username) || (!isVerified(user.value) && user.value?.username) || (isVerified(user.value) && !user.value?.username);
+});
 </script>

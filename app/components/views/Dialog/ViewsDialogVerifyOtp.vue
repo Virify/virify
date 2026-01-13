@@ -54,7 +54,7 @@ async function registerCompletion() {
     //   });
     // })
     // On successful OTP verification, navigate to dashboard for password setting
-    navigateTo('/dashboard');
+    navigateTo('/dashboard/profile/setup-profile');
   }
 }
 

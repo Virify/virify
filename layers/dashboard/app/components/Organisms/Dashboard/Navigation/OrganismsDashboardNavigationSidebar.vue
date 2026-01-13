@@ -120,7 +120,7 @@
   const { dashboardNavigationitems } = useDashboardNavigation();
   const { clear } = useUserSession();
   const logout = async () => {
+    await clear();
     navigateTo('/');
-    clear();
   };
 </script>

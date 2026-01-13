@@ -17,7 +17,7 @@ export async function loginUser(event: H3Event, user: UserWithVerificationAndMem
     user: {
       id: user.id,
       email: user.email,
-      username: user.username ?? user.email ?? user.firstName,
+      username: user.username || "",
       membership: user.membership?.type!,
       membershipActive: user.membership?.status,
       membershipEndDate: user.membership?.endDate,

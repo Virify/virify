@@ -1,7 +1,8 @@
-import { type User, Reviewed, MembershipType } from "../database/prisma/generated/client";
+import { type User, Reviewed, MembershipType, ActivationStatus } from "../database/prisma/generated/client";
 import type { ProfileSchemaType } from "~~/shared/utils/profile-schema";
 
 import { prisma } from "./prisma-client";
+import { UserWithVerification, UserWithVerificationAndMembership } from "~~/shared/types/user";
 
 /**
  * Finds an user by email.
@@ -206,6 +207,52 @@ export async function findUserByPasswordToken(token: string): Promise<UserWithVe
     },
   });
 }
+
+/**
+ * 
+ * @param id User Id
+ * @param data Data
+ * @returns User
+ */
+export async function updateUserById(id: number, username: string, hashedPassword: string, activate?: string): Promise<UserWithVerificationAndMembership> {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      username,
+      password: hashedPassword,
+      ...(activate ? {
+        verification: {
+          update: {
+            activated: activate as ActivationStatus,
+          }
+        }
+      } : {})
+    },
+    include: {
+      verification: true,
+      membership: true,
+    }
+  });
+}
+
+/**
+ * Update user username by ID
+ * @param id 
+ * @param username 
+ * @returns UserWithVerificationAndMembership
+ */
+export async function updateUserUsernameById(id: number, username: string): Promise<UserWithVerificationAndMembership> {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      username,
+    },
+    include: {
+      verification: true,
+      membership: true,
+    }
+  });
+}
 /**
  * Update the users password based on the token *which has been verified*.
  * @param token string
@@ -265,7 +312,7 @@ export async function updateUserPasswordToken(email: string, token: string, otpC
       passwordResetTokenExpiry: new Date(Date.now() + 3600000),
       verification: {
         update: {
-          activated: 'ACTIVATED',
+          activated: 'UNVERIFIED',
         },
       },
     },

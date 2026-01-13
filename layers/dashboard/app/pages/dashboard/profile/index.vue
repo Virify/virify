@@ -14,7 +14,7 @@
     <template #body>
       <AtomsDashboardFormContainer>
         <UForm :schema="profileSchema" :state="state" @submit="onSubmit">
-          <OrganismsDashboardAccountHeroCard title="Edit Your Profile" description="Update your profile information to keep your account up to date. We use this information to personalize your experience and for verification." label="Save Changes" />
+          <OrganismsDashboardAccountHeroCard title="Setup your profile" description="Create your profile information to fully act" label="Save Changes" />
 
           <AtomsDashboardForm>
             <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="">
