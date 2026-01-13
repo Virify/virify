@@ -1,0 +1,26 @@
+/**
+ *  Base links
+ *  :not() exceptions to prevent broad overriding of utility classes
+ */
+// Base reset: Allow utility classes to work easily
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+// Only underline links within text content flows or when explicit class is used
+:where(p, li, blockquote, .prose) a:not([class]), // Catch raw links in text
+a.link { // Explicit utility class
+  color: currentColor;
+  text-decoration: underline;
+  transition: color var(--animation-fast);
+  text-decoration-thickness: var(--size-2);
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: none;
+  text-decoration-style: solid;
+  text-decoration-color: var(--secondary-400);
+
+  &:hover {
+    text-decoration-thickness: var(--size-4);
+  }
+}

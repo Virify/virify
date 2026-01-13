@@ -34,6 +34,8 @@ defineProps<Props>();
       transform: translateY(-50%);
       padding-left: var(--size-12);
       pointer-events: none;
+      width: auto;
+      height: auto;
     }
 
     &--remove {
@@ -43,6 +45,8 @@ defineProps<Props>();
       transform: translateY(-50%);
       padding-right: var(--size-12);
       cursor: pointer;
+      width: auto;
+      height: auto;
     }
   }
 }

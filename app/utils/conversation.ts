@@ -48,6 +48,16 @@ export const getConvoMessagePoV = (convoMessage: MessageWithUser, currentUserId:
 };
 
 /**
+ * 
+ * @param message Message
+ * @param currentUserId User ID
+ * @returns Boolean indicating if the message was sent by the current user
+ */
+export const isMessageFromUser = (message: MessageWithUser, currentUserId: string | number): boolean => {
+  return String(message.senderId) !== String(currentUserId)
+}
+
+/**
  * Formats a message creation timestamp to a time string (HH:MM).
  * 
  * @param createdAt - The timestamp of message creation.
@@ -94,6 +104,7 @@ export const formatMessageTimestamp = (createdAt?: string | Date): string => {
 };
 
 /**
+ * @deprecated Use getConversationPoV or getConversationOtherUser to get structured user info.
  * Get the other user's ID in a conversation (not the current user)
  * 
  * @param conversation - The conversation object
@@ -344,3 +355,78 @@ export const getNewUnreadMessagesFromOthers = (
 
   return added.filter(m => !m.isRead && m.senderId !== currentUserId);
 };
+
+/**
+ * Get the other user in the conversation (not the current user).
+ * 
+ * @param conversation - The conversation object
+ * @param currentUserId - The current user's ID
+ * @returns The other user object, or a fallback object with null username
+ */
+export const getConversationOtherUser = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined) => {
+  if (!currentUserId || !conversation.sender) return { username: null, email: 'Unknown User', id: undefined };
+  
+  // If current user is the sender, return the receiver
+  if (String(conversation.sender.id) === String(currentUserId)) {
+    return conversation.receiver || { username: null, email: 'Unknown User', id: undefined };
+  }
+  // Otherwise return the sender
+  return conversation.sender || { username: null, email: 'Unknown User', id: undefined };
+}
+
+/**
+ * Get the number of unread messages for the current user in a conversation
+ * 
+ * @param conversation - The conversation object
+ * @param currentUserId - The current user's ID
+ * @returns Number of unread messages
+ */
+export const getUnreadCount = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined): number => {
+  if (!currentUserId || !conversation.messages) return 0;
+  return conversation.messages.filter(
+    (message) => !message.isRead && String(message.receiverId) === String(currentUserId)
+  ).length;
+}
+
+/**
+ * Check if the last message in the conversation was sent by the current user
+ * 
+ * @param conversation - The conversation object
+ * @param currentUserId - The current user's ID
+ * @returns True if the last message was sent by the current user
+ */
+export const isLastMessageFromCurrentUser = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined): boolean => {
+  const lastMessage = getLastMessage(conversation);
+  if (!lastMessage || !currentUserId) return false;
+  return String(lastMessage.senderId) === String(currentUserId);
+}
+
+/**
+ * Filter items (enquiries) by role (Sent vs Received/My Enquiries)
+ * 
+ * @param items - The items to filter
+ * @param role - The role to filter by ('Sent', 'My Enquiries', or 'All')
+ * @param currentUserId - The current user's ID
+ * @returns Filtered array of items
+ */
+export const filterEnquiriesByRole = <T extends Record<string, any>>(
+  items: T[], 
+  role: string, 
+  currentUserId: string | number | undefined
+): T[] => {
+  if (!currentUserId || role === 'All') return items;
+
+  return items.filter((item) => {
+    const senderId = item.senderId || item.sender?.id;
+    const receiverId = item.receiverId || item.receiver?.id;
+
+    if (role === 'Sent') {
+      return String(senderId) === String(currentUserId)
+    }
+    else if (role === 'My Enquiries') {
+      return String(receiverId) === String(currentUserId)
+    }
+    return true
+  })
+}
+

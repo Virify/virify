@@ -2,6 +2,7 @@ import type { Address, Prisma } from "~~/layers/database/server/database/prisma/
 import type { SaleAvailabilityStatus, RentalAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
 import type { MapMarker } from "~~/shared/types/map";
 import type { DraftListingWithFullPayload } from "~~/shared/types/draft";
+import type { QueryAnalysis } from "./ai";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {

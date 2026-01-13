@@ -1,6 +1,6 @@
 import * as zod from "zod";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
-import { updateUserNote } from "../../../../utils/user-note";
+import { updateUserNote, getUserNote } from "../../../../utils/user-note";
 
 /**
  * Zod automatically santizes the input
@@ -24,11 +24,17 @@ export default defineEventHandler(async (event) => {
 
     if (!listingId) throw createError({ statusCode: 400, statusMessage: "Bad Request", message: "No listing ID provided" });
 
+    // Check if note already exists (to determine if this is a create or update)
+    const existingNote = await getUserNote(user.id, listingId);
+    const isNewNote = !existingNote;
+
     const result = await updateUserNote(user.id, listingId, note);
 
-    // Broadcast aggregate update via WebSocket
-    const aggregateMessage = createAggregateUpdateMessage("notes", "add", user.id);
-    sendMessage(aggregateMessage);
+    // Only broadcast aggregate update for new notes, not updates
+    if (isNewNote) {
+      const aggregateMessage = createAggregateUpdateMessage("notes", "add", user.id);
+      sendMessage(aggregateMessage);
+    }
 
     return result;
   } catch (error) {

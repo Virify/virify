@@ -6,7 +6,20 @@
  * @returns UserItemsAggregates - An object containing notification counts
  */
 export async function getUserItemsAggregates(userId: number): Promise<UserItemsAggregates> {
-  const [favourites, notes, enquiries, locations, listings, unreadMessages] = await prisma.$transaction([
+  const [
+      favourites, 
+      notes, 
+      enquiries, 
+      locations, 
+      listings, 
+      messages, 
+      unreadMessages, 
+      unreadConversations, 
+      sentEnquiries, 
+      sentUnreadEnquiries, 
+      receivedEnquiries, 
+      receivedUnreadEnquiries
+    ] = await prisma.$transaction([
     prisma.userFavouriteListing.count({
       where: {
         userPreferences: {
@@ -21,9 +34,10 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
         },
       },
     }),
+    // Count ALL conversations where user is either sender or receiver
     prisma.conversation.count({
       where: {
-        receiverId: userId,
+        OR: [{ senderId: userId }, { receiverId: userId }],
       },
     }),
     prisma.userLocation.count({
@@ -38,11 +52,73 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
         userId: userId,
       },
     }),
-    // Count unread messages that were sent TO the current user
+    // Count ALL messages in conversations where user is a participant
     prisma.message.count({
       where: {
+        conversation: {
+          OR: [{ senderId: userId }, { receiverId: userId }],
+        },
+      },
+    }),
+    // Count ALL unread messages in conversations where user is a participant
+    prisma.message.count({
+      where: {
+        AND: [
+          { isRead: false },
+          {
+            conversation: {
+              OR: [{ senderId: userId }, { receiverId: userId }],
+            },
+          },
+        ],
+      },
+    }),
+    // Count conversations with unread messages
+    prisma.conversation.count({
+      where: {
+        OR: [{ senderId: userId }, { receiverId: userId }],
+        messages: {
+          some: {
+            isRead: false,
+            receiverId: userId,
+          },
+        },
+      },
+    }),
+    // Count SENT conversations
+    prisma.conversation.count({
+      where: {
+        senderId: userId,
+      },
+    }),
+    // Count SENT conversations with unread messages
+    prisma.conversation.count({
+      where: {
+        senderId: userId,
+        messages: {
+          some: {
+            isRead: false,
+            receiverId: userId,
+          },
+        },
+      },
+    }),
+    // Count RECEIVED conversations
+    prisma.conversation.count({
+      where: {
         receiverId: userId,
-        isRead: false,
+      },
+    }),
+    // Count RECEIVED conversations with unread messages
+    prisma.conversation.count({
+      where: {
+        receiverId: userId,
+        messages: {
+          some: {
+            isRead: false,
+            receiverId: userId,
+          },
+        },
       },
     }),
   ]);
@@ -53,11 +129,12 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
     enquiries,
     locations,
     listings,
+    messages,
     unreadMessages,
-    // Include all the original ones even if not used yet
-    notifications: 0,
-    messages: 0,
-    offers: 0,
-    viewings: 0,
+    unreadConversations,
+    sentEnquiries,
+    sentUnreadEnquiries,
+    receivedEnquiries,
+    receivedUnreadEnquiries,
   };
 }

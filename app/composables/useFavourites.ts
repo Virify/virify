@@ -1,38 +1,86 @@
 import { ViewsDialogLogin } from "#components";
-import { createSharedComposable } from "@vueuse/core";
+import { performOptimisticUpdate, performPendingRemoval } from "~/utils/optimistic-update";
+
+// Track items pending removal (for visual feedback) - Share across instances
+const pendingRemoval = ref<Set<number>>(new Set());
 
 /**
  * Favourites Composable
+ * 
+ * Manages user's favourite listings with optimistic updates for seamless UX.
+ * Uses lightweight lookups for efficient isFavourite checks across the app.
  *
- * @returns { addToFavourites }
+ * @returns Favourites state and actions
  */
-export const useFavourites = createSharedComposable(() => {
+export const useFavourites = () => {
   const { loggedIn } = useUserSession();
   const { showDialog } = useDialog();
-  const { showToast } = useToast();
+  const toast = useToast();
+  const requestFetch = useRequestFetch();
 
   // Lightweight shared search / category state (favourites + notes share util)
   const searchTerm = ref("");
   const categoryFilter = ref<"all" | "sale" | "rental">("all");
 
+  // Pagination state for dashboard
+  const total = ref(0);
+  const loading = ref(false);
+
+  // Use Shared Global Lookups
+  const { favouriteLookups, refreshFavourites } = useFavouriteLookups();
+  // Use Shared Recent Items
+  const { recentFavourites, refreshRecentFavourites, recentFavouritesStatus } = useDashboardRecentItems();
+
   /**
-   * State Management
+   * Full favourites data (for dashboard pages with pagination)
    */
-  const { data: favourites, refresh: refreshFavourites } = useAsyncData<UserFavouriteListingCard[]>(
-    "favourites",
-    () => {
-      // Only make API call if user is logged in
-      if (!loggedIn.value) {
-        return Promise.resolve([]);
-      }
-      return useRequestFetch()<UserFavouriteListingCard[]>("/api/user/favourites/");
-    },
-    {
-      default: () => [],
-      watch: [loggedIn],
-      server: false, // Prevent server-side execution
+  const favourites = ref<UserFavouriteListingCard[]>([]);
+
+  // Track current pagination state for refetching after add/remove
+  const currentFilter = ref<'all' | 'sale' | 'rent'>('all');
+  const currentPage = ref(1);
+  const currentSort = ref<'newest' | 'oldest'>('newest');
+  const currentLimit = ref(20);
+
+  /**
+   * Fetch favourites with pagination, sort, and filter (for dashboard)
+   */
+  async function fetchFavourites(
+    filter: 'all' | 'sale' | 'rent' = 'all',
+    page: number = 1,
+    sort: 'newest' | 'oldest' = 'newest',
+    limit: number = 20
+  ) {
+    // Store current pagination state
+    currentFilter.value = filter;
+    currentPage.value = page;
+    currentSort.value = sort;
+    currentLimit.value = limit;
+
+    loading.value = true;
+    try {
+      const data = await requestFetch<{ favourites: UserFavouriteListingCard[], total: number }>(
+        `/api/user/favourites/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`
+      );
+      favourites.value = data.favourites || [];
+      total.value = data.total || 0;
+    } catch (error) {
+      console.error('Error fetching favourites:', error);
+      favourites.value = [];
+      total.value = 0;
+    } finally {
+      loading.value = false;
     }
-  );
+  }
+
+  /**
+   * Refetch current page (used after add/remove when dashboard is active)
+   */
+  async function refetchCurrentPage() {
+    if (favourites.value.length > 0 || total.value > 0) {
+      await fetchFavourites(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
+    }
+  }
 
   const saleFavourites = computed(() => {
     return favourites.value.filter((item) => item.listing.saleListing);
@@ -50,83 +98,92 @@ export const useFavourites = createSharedComposable(() => {
     return filterListingItems(list, searchTerm.value);
   });
 
-  const recentFavourites = computed(() => {
-    return favourites.value
-      .filter((item) => {
-        const createdAt = new Date(item.createdAt);
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        return createdAt >= sevenDaysAgo;
-      })
-      .slice(0, 6);
-  });
-
   /**
-   * Is a listing a favourite
+   * Is a listing a favourite (uses lightweight lookups)
    *
    * @param listingId - ID of the Listing
    * @returns
    */
   function isFavourite(listingId: number): boolean {
-    return favourites.value.some((listing) => listing.listing.id === listingId);
+    return favouriteLookups.value.includes(listingId);
   }
 
   /**
-   * Adds a listing to the user's favourites and updates the state.
-   * Updates the favourites state with the new listing ID.
+   * Add a listing to the user's favourites
+   * 
+   * Uses optimistic updates: the UI updates immediately while the API call
+   * happens in the background. If the API call fails, the change is rolled back.
    *
    * @param listingId - The ID of the listing to add to favourites
-   * @returns Array of favourited listing IDs
    */
   const addToFavourite = async (listingId: number) => {
-    // prompt user to login if not logged in
     if (!loggedIn.value) {
-      showDialog({
-        component: ViewsDialogLogin,
-      });
+      showDialog({ component: ViewsDialogLogin });
       return;
     }
 
-    try {
-      await $fetch<UserFavouriteListingCard[]>(`/api/user/favourites/${listingId}/`, {
-        method: "POST",
-        body: { listingId },
-      });
-      await refreshFavourites();
-
-      // Show success toast
-      showToast("Added to favourites", { type: "success" });
-    } catch (error) {
-      // Show error toast
-      showToast("Failed to add to favourites", { type: "error" });
-      console.error("Error adding to favourites:", error);
-    }
+    await performOptimisticUpdate({
+      ref: favouriteLookups,
+      optimisticChange: (current) => [...current, listingId],
+      operation: async () => {
+        await $fetch(`/api/user/favourites/${listingId}/`, {
+          method: "POST",
+          body: { listingId },
+        });
+      },
+      onSuccess: () => {
+        refreshFavourites();
+        refetchCurrentPage();
+        toast.add({ title: 'Success', description: "Added to favourites", color: 'success' });
+      },
+      onError: (error) => {
+        toast.add({ title: 'Error', description: "Failed to add to favourites", color: 'error' });
+        console.error("Error adding to favourites:", error);
+      },
+    });
   };
 
   /**
    * Remove a listing from the user's favourites
-   * Removes the listing ID from the favourites state.
+   * 
+   * Uses pending removal pattern: the item is marked as "pending" (showing a
+   * visual overlay), then the delete happens. The item stays visible but marked
+   * as removed until the user navigates away or refreshes.
    *
    * @param listingId - The ID of the listing to remove from favourites
-   * @returns Array of remaining favourite listing IDs or empty array on error
    */
   const removeFromFavourite = async (listingId: number) => {
-    try {
-      const result = await $fetch<number[]>(`/api/user/favourites/${listingId}/`, {
-        method: "DELETE",
-        body: { listingId },
-      });
-      if (result) {
-        await refreshFavourites();
+    // Only remove locally if it exists in the lookups
+    if (!favouriteLookups.value.includes(listingId)) return;
 
-        // Show success toast
-        showToast("Removed from favourites", { type: "success" });
-      }
-    } catch (error) {
-      // Show error toast
-      showToast("Failed to remove from favourites", { type: "error" });
-      console.error("Error removing from favourites:", error);
-    }
+    await performPendingRemoval({
+      pendingSet: pendingRemoval,
+      id: listingId,
+      operation: async () => {
+        await $fetch(`/api/user/favourites/${listingId}/`, {
+          method: "DELETE",
+          body: { listingId },
+        });
+      },
+      onSuccess: () => {
+        toast.add({ title: 'Success', description: "Removed from favourites", color: 'success' });
+        // Optimistically remove from global lookups immediately
+        favouriteLookups.value = favouriteLookups.value.filter(id => id !== listingId);
+        refreshFavourites();
+      },
+      onError: (error) => {
+        toast.add({ title: 'Error', description: "Failed to remove from favourites", color: 'error' });
+        console.error("Error removing from favourites:", error);
+      },
+    });
   };
+
+  /**
+   * Check if a listing is pending removal
+   */
+  function isPendingRemoval(listingId: number): boolean {
+    return pendingRemoval.value.has(listingId);
+  }
 
   /**
    * Remove a listing from an array of favourite Listings
@@ -151,16 +208,22 @@ export const useFavourites = createSharedComposable(() => {
   return {
     addToFavourite,
     isFavourite,
+    isPendingRemoval,
     removeFromFavourite,
     removeListingFromArray,
     toggleFavourite,
     favourites,
     recentFavourites,
+    refreshRecentFavourites,
     saleFavourites,
     rentalFavourites,
     filteredFavourites,
     refreshFavourites,
+    fetchFavourites,
+    total,
+    loading,
     searchTerm,
     categoryFilter,
+    isLoading: computed(() => loading.value || recentFavouritesStatus.value === 'pending'),
   };
-});
+};

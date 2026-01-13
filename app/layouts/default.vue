@@ -3,7 +3,9 @@
   <OrganismsHeader />
 
   <div class="page">
-    <NuxtPage />
+    <UApp>
+      <NuxtPage />
+    </UApp>
   </div>
 
   <OrganismsFooter />
@@ -12,7 +14,6 @@
   <ClientOnly>
     <ViewsHelpButton v-if="!isWaitingListMode"/>
   </ClientOnly>
-  <MoleculesToastContainer />
 </template>
 
 <script setup lang="ts">

@@ -10,6 +10,7 @@ export type NoteData = {
   listingId: number;
   note: string;
   createdAt: Date | string;
+  updatedAt: Date;
 }
 
 export type NoteUpdateResponse = {
@@ -18,3 +19,8 @@ export type NoteUpdateResponse = {
 };
 
 export type NoteResponse = string | null;
+
+export type NoteLookup = {
+  listingId: number;
+  note: string;
+}

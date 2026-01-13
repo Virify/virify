@@ -97,73 +97,193 @@ export async function getListingsFavoritedByOthersCount(userId: number) {
 }
 
 /**
- * Get analytics summary for a user's listings
+ * SELLER ANALYTICS - Individual performant functions
+ */
+
+/**
+ * Get total views for user's listings
+ */
+export async function getTotalListingViews(userId: number): Promise<number> {
+  const listingIds = await getUserListingIds(userId);
+  if (listingIds.length === 0) return 0;
+
+  return await prisma.listingView.count({
+    where: { listingId: { in: listingIds } },
+  });
+}
+
+/**
+ * Get views for user's listings in a specific date range
+ */
+export async function getListingViewsByDateRange(
+  userId: number,
+  startDate: Date,
+  endDate: Date
+): Promise<number> {
+  const listingIds = await getUserListingIds(userId);
+  if (listingIds.length === 0) return 0;
+
+  return await prisma.listingView.count({
+    where: {
+      listingId: { in: listingIds },
+      createdAt: { gte: startDate, lt: endDate },
+    },
+  });
+}
+
+/**
+ * Get active listings count
+ */
+export async function getActiveListingsCount(userId: number): Promise<number> {
+  return await prisma.listing.count({
+    where: {
+      userId,
+      published: true,
+      archived: false,
+    },
+  });
+}
+
+/**
+ * Get total enquiries received on user's listings
+ */
+export async function getReceivedEnquiriesCount(userId: number): Promise<number> {
+  return await prisma.conversation.count({
+    where: { receiverId: userId },
+  });
+}
+
+/**
+ * BUYER/SEARCHER ANALYTICS - Individual performant functions
+ */
+
+/**
+ * Get total enquiries sent by user
+ */
+export async function getSentEnquiriesCount(userId: number): Promise<number> {
+  return await prisma.conversation.count({
+    where: { senderId: userId },
+  });
+}
+
+/**
+ * Get sent enquiries that received replies
+ */
+export async function getSentEnquiriesWithRepliesCount(userId: number): Promise<number> {
+  return await prisma.conversation.count({
+    where: {
+      senderId: userId,
+      messages: {
+        some: {
+          senderId: { not: userId }, // Reply from someone else
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get total favourites by user
+ */
+export async function getUserFavouritesCount(userId: number): Promise<number> {
+  return await prisma.userFavouriteListing.count({
+    where: {
+      userPreferences: { userId },
+    },
+  });
+}
+
+/**
+ * Get total notes by user
+ */
+export async function getUserNotesCount(userId: number): Promise<number> {
+  return await prisma.userNote.count({
+    where: {
+      userPreferences: { userId },
+    },
+  });
+}
+
+/**
+ * Get recently viewed listings count (last 30 days)
+ */
+export async function getRecentlyViewedCount(userId: number): Promise<number> {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const result = await prisma.listingView.groupBy({
+    by: ['listingId'],
+    where: {
+      userId,
+      createdAt: { gte: thirtyDaysAgo },
+    },
+  });
+  
+  return result.length;
+}
+
+/**
+ * COMPREHENSIVE ANALYTICS - Optimized single query
+ * Get complete analytics summary for a user (both seller and buyer metrics)
  *
  * @param userId User ID
- * @returns Summary of view counts and percentage change
+ * @returns Complete analytics summary
  */
 export async function getUserListingAnalytics(userId: number) {
   // Get user's listing IDs first
   const listingIds = await getUserListingIds(userId);
 
-  if (listingIds.length === 0) {
-    return {
-      totalViews: 0,
-      previousMonthViews: 0,
-      percentageChange: 0,
-      favoritedByOthersCount: 0,
-      totalConversations: 0,
-    };
-  }
-
   // Get current date and previous periods
   const now = new Date();
-
   const previousMonth = new Date();
   previousMonth.setMonth(previousMonth.getMonth() - 1);
-
   const twoMonthsAgo = new Date(previousMonth);
   twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 1);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   const [
+    // Seller metrics
     totalViews,
     previousMonthViews,
     twoMonthsAgoViews,
     favoritedByOthersCount,
-    totalConversations
-  ] = await prisma.$transaction([
+    totalConversations,
+    totalListings,
+    activeListings,
+    listingsWithNotes,
+    // Buyer metrics
+    sentEnquiries,
+    sentEnquiriesWithReplies,
+    totalFavourites,
+    totalNotes,
+    recentlyViewedCount,
+  ] = await Promise.all([
+    // SELLER METRICS
     // Total views for all user's listings
-    prisma.listingView.count({
-      where: {
-        listingId: {
-          in: listingIds,
-        },
-      },
-    }),
+    listingIds.length > 0
+      ? prisma.listingView.count({
+          where: { listingId: { in: listingIds } },
+        })
+      : Promise.resolve(0),
     // Views in the previous month
-    prisma.listingView.count({
-      where: {
-        listingId: {
-          in: listingIds,
-        },
-        createdAt: {
-          gte: previousMonth,
-          lt: now,
-        },
-      },
-    }),
+    listingIds.length > 0
+      ? prisma.listingView.count({
+          where: {
+            listingId: { in: listingIds },
+            createdAt: { gte: previousMonth, lt: now },
+          },
+        })
+      : Promise.resolve(0),
     // Views from two months ago (for comparison)
-    prisma.listingView.count({
-      where: {
-        listingId: {
-          in: listingIds,
-        },
-        createdAt: {
-          gte: twoMonthsAgo,
-          lt: previousMonth,
-        },
-      },
-    }),
+    listingIds.length > 0
+      ? prisma.listingView.count({
+          where: {
+            listingId: { in: listingIds },
+            createdAt: { gte: twoMonthsAgo, lt: previousMonth },
+          },
+        })
+      : Promise.resolve(0),
     // Count of user's listings favorited by others
     prisma.listing.count({
       where: {
@@ -171,38 +291,108 @@ export async function getUserListingAnalytics(userId: number) {
         UserFavouriteListing: {
           some: {
             userPreferences: {
-              userId: {
-                not: userId,
-              },
+              userId: { not: userId },
             },
           },
         },
       },
     }),
-    // Total conversations for user's listings
+    // Total conversations for user's listings (enquiries received)
     prisma.conversation.count({
+      where: { receiverId: userId },
+    }),
+    // Total listings count
+    prisma.listing.count({
+      where: { userId: userId },
+    }),
+    // Active listings (published and not archived)
+    prisma.listing.count({
       where: {
-        listing: {
-          id: {
-            in: listingIds,
+        userId: userId,
+        published: true,
+        archived: false,
+      },
+    }),
+    // Listings that have notes from other users
+    prisma.listing.count({
+      where: {
+        userId: userId,
+        UserNote: {
+          some: {
+            userPreferences: {
+              userId: { not: userId },
+            },
           },
         },
       },
     }),
+    // BUYER/SEARCHER METRICS
+    // Total enquiries sent by user
+    prisma.conversation.count({
+      where: { senderId: userId },
+    }),
+    // Sent enquiries that received replies
+    prisma.conversation.count({
+      where: {
+        senderId: userId,
+        messages: {
+          some: {
+            senderId: { not: userId },
+          },
+        },
+      },
+    }),
+    // Total favourites by user
+    prisma.userFavouriteListing.count({
+      where: {
+        userPreferences: { userId },
+      },
+    }),
+    // Total notes by user
+    prisma.userNote.count({
+      where: {
+        userPreferences: { userId },
+      },
+    }),
+    // Recently viewed listings (last 30 days, unique)
+    prisma.listingView.groupBy({
+      by: ['listingId'],
+      where: {
+        userId,
+        createdAt: { gte: thirtyDaysAgo },
+      },
+    }).then(result => result.length),
   ]);
 
   // Calculate percentage change
   let percentageChange = 0;
   if (twoMonthsAgoViews > 0) {
-    percentageChange = Math.round(((previousMonthViews - twoMonthsAgoViews) / twoMonthsAgoViews) * 100);
+    percentageChange = Math.round(
+      ((previousMonthViews - twoMonthsAgoViews) / twoMonthsAgoViews) * 100
+    );
   }
 
+  // Calculate average views per listing
+  const averageViewsPerListing =
+    totalListings > 0 ? Math.round(totalViews / totalListings) : 0;
+
   return {
+    // Seller analytics
     totalViews,
     previousMonthViews,
     percentageChange,
     favoritedByOthersCount,
     totalConversations,
+    totalListings,
+    activeListings,
+    listingsWithNotes,
+    averageViewsPerListing,
+    // Buyer analytics
+    sentEnquiries,
+    sentEnquiriesWithReplies,
+    totalFavourites,
+    totalNotes,
+    recentlyViewedCount,
   };
 }
 

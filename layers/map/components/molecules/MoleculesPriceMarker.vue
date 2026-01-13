@@ -9,10 +9,8 @@
       <span class="m-price-marker__price | body-xs font-semibold" aria-hidden="true">
         {{ priceDisplay }}
       </span>
-      <div v-if="!isWaitingListMode">
-          <AtomsFavouriteButton v-if="id" @click.stop :listing-id="Number(id)" />
-          <AtomsNoteButton v-if="id" @click.stop :listing-id="Number(id)" />
-      </div>
+      <AtomsFavouriteButton v-if="id && !isWaitingListMode" @click.stop :listing-id="Number(id)" />
+      <AtomsNoteButton v-if="id && !isWaitingListMode" @click.stop :listing-id="Number(id)" />
     </div>
 
   </button>

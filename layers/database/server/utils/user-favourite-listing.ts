@@ -1,35 +1,94 @@
 /**
- * Get user favourites with listing data only
- *
+ * Get user favourite lookups (listing IDs only)
+ * Used for checking if a listing is favourited without fetching full data
+ * 
  * @param userId number
- * @returns list of favourite listings
+ * @returns Array of favourite listing IDs
  */
-export async function getUserFavourites(userId: number): Promise<UserFavouriteListingCard[]> {
-  return await prisma.userFavouriteListing.findMany({
+export async function getUserFavouriteLookups(userId: number): Promise<number[]> {
+  const favourites = await prisma.userFavouriteListing.findMany({
     where: {
       userPreferences: {
         userId,
       },
     },
     select: {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      userPreferencesId: true,
-      listing: {
-        select: listingCardFields,
-      },
+      listingId: true,
     },
   });
+  return favourites.map(f => f.listingId);
 }
 
 /**
- * Get recent favourites for a user
+ * Get user favourites with listing data only
+ *
+ * @param userId number
+ * @param options - Pagination, sorting and filtering options
+ * @returns list of favourite listings with total count
+ */
+export async function getUserFavourites(
+  userId: number,
+  options?: {
+    skip?: number;
+    take?: number;
+    sort?: "newest" | "oldest";
+    filter?: "all" | "sale" | "rent";
+  }
+): Promise<{ favourites: UserFavouriteListingCard[], total: number }> {
+  const { skip, take, sort = "newest", filter = "all" } = options || {};
+
+  const whereClause: any = {
+    userPreferences: {
+      userId,
+    },
+  };
+
+  // Add filter logic
+  if (filter === "sale") {
+    whereClause.listing = {
+      saleListing: { isNot: null }
+    };
+  } else if (filter === "rent") {
+    whereClause.listing = {
+      rentalListing: { isNot: null }
+    };
+  }
+
+  const orderBy = sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" };
+
+  const [favourites, total] = await Promise.all([
+    prisma.userFavouriteListing.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        userPreferencesId: true,
+        listing: {
+          select: listingCardFields,
+        },
+      },
+      skip,
+      take,
+      orderBy: orderBy as any,
+    }),
+    prisma.userFavouriteListing.count({
+      where: whereClause,
+    }),
+  ]);
+
+  return { favourites, total };
+}
+
+/**
+ * Get recent favourites for a user (last 7 days)
+ * Used for dashboard homepage recent favourites section
  * 
  * @param userId number
+ * @param limit Maximum number of items to return (default 8)
  * @returns UserFavouriteListingCard[]
  */
-export async function getRecentFavourites(userId: number): Promise<UserFavouriteListingCard[]> {
+export async function getRecentFavourites(userId: number, limit: number = 8): Promise<UserFavouriteListingCard[]> {
   return await prisma.userFavouriteListing.findMany({
     where: {
       userPreferences: {
@@ -42,6 +101,7 @@ export async function getRecentFavourites(userId: number): Promise<UserFavourite
     orderBy: {
       createdAt: "desc",
     },
+    take: limit,
     select: {
       id: true,
       createdAt: true,

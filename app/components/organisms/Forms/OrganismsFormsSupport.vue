@@ -40,7 +40,7 @@
 import type { AtomsInput } from '#components';
 import type { ErrorBoxProp } from '~/types';
 
-const { showToast } = useToast();
+const toast = useToast();
 const { isPending, setPendingWhile } = usePending();
 const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 
@@ -109,15 +109,15 @@ async function performSubmit(form: HTMLFormElement) {
     });
 
     if (result?.success) {
-      showToast("Support request submitted successfully!", { type: "success" });
+      toast.add({ title: 'Success', description: "Support request submitted successfully!", color: 'success' });
       form.reset();
       formErrors.value = null;
     } else {
-      showToast("There was an error submitting your request. Please try again later.", { type: "error" });
+      toast.add({ title: 'Error', description: "There was an error submitting your request. Please try again later.", color: 'error' });
       resetTurnstile();
     }
   } catch (error) {
-    showToast("There was an error submitting your request. Please try again later.", { type: "error" });
+    toast.add({ title: 'Error', description: "There was an error submitting your request. Please try again later.", color: 'error' });
     resetTurnstile();
   } finally {
     // Resolve the promise to end pending state

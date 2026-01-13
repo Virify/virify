@@ -1,26 +1,30 @@
 <template>
-  <div class="o-listing-mobile-banner" role="presentation" :class="{
+  <Teleport to="body">
+    <div class="o-listing-mobile-banner" role="presentation" :class="{
     'o-listing-mobile-banner--expanded': isExpanded
   }">
-    <div class="| container" role="presentation">
-      <Transition name="o-listing-mobile-banner">
-        <button ref="$handle" v-show="!overviewVisible" type="button"
-          class="o-listing-mobile-banner__drag-handle" :aria-label="isExpanded ? 'Hide additional information' : 'Show additional information'"></button>
-      </Transition>
+      <div class="| container" role="presentation">
+        <Transition name="o-listing-mobile-banner">
+          <button ref="$handle" v-show="!overviewVisible" type="button"
+            class="o-listing-mobile-banner__drag-handle"
+            :aria-label="isExpanded ? 'Hide additional information' : 'Show additional information'"></button>
+        </Transition>
 
-      <Teleport to="body">
-        <button v-show="isDragging || isExpanded" ref="$backdrop"
-          class="o-listing-mobile-banner__additional-info-backdrop" @click.prevent="closeExpanded"
-          aria-label="Close additional information"></button>
-      </Teleport>
+        <Teleport to="body">
+          <button v-show="isDragging || isExpanded" ref="$backdrop"
+            class="o-listing-mobile-banner__additional-info-backdrop" @click.prevent="closeExpanded"
+            aria-label="Close additional information"></button>
+        </Teleport>
 
-      <div v-show="isDragging || isExpanded" ref="$additional" class="o-listing-mobile-banner__additional-info" :class="{
+        <div v-show="isDragging || isExpanded" ref="$additional" class="o-listing-mobile-banner__additional-info"
+          :class="{
         'o-listing-mobile-banner__additional-info--expanded': isExpanded
       }">
 
-        <h2 v-if="price"
-          class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs">
-          {{ price }}
+          <h2 v-if="price"
+            class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs">
+            {{ price }}
+
 
           <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
             {{ convertEnumToString(priceType!) }}
@@ -81,6 +85,7 @@
       </div>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

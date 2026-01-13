@@ -68,14 +68,6 @@ export const getActionItemsBuilder = () => {
           hideWhenAuth: true, 
           action: actions.openSignup, buttonClass: "button-monochrome"
         });
-      } else if (!isWaitingListMode.value) {
-        items.push({ 
-          id: "account", 
-          label: "Account", 
-          href: "/account", 
-          type: "link", 
-          requiresAuth: true 
-        });
       }
     }
 
@@ -92,7 +84,7 @@ export const getActionItemsBuilder = () => {
       items.push({
         id: 'account',
         label: 'Account',
-        href: '/account',
+        href: '/dashboard',
         type: 'link',
         requiresAuth: true
       }),

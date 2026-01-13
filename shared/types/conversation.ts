@@ -1,4 +1,5 @@
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import type { ListingCardType } from "./listing";
 
 export type ConversationWithMessages = Prisma.ConversationGetPayload<{
   include: {

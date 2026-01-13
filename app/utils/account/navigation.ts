@@ -1,3 +1,5 @@
+import type { NavigationMenuItem } from "@nuxt/ui";
+
 export const navigationHome: AccountNavigationItem[] = [
   {
     name: "Home",
@@ -130,4 +132,4 @@ export const logout = async () => {
   if (route.path.startsWith('/account')) {
     navigateTo('/')
   }
-}
+};

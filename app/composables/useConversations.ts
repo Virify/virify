@@ -1,10 +1,10 @@
-import { createSharedComposable } from '@vueuse/core';
+
 
 /**
  * Main conversations composable that orchestrates all conversation functionality
  * This composable combines state, events, typing, actions, and new conversation creation
  */
-export const useConversations = createSharedComposable((options?: { limit?: number }) => {
+export const useConversations = (options?: { limit?: number }) => {
   // Initialize all sub-composables
   const conversationState = useConversationState(options);
   const conversationEvents = useConversationEvents(conversationState);
@@ -25,8 +25,11 @@ export const useConversations = createSharedComposable((options?: { limit?: numb
     
     // Actions (now includes new conversation functionality)
     ...conversationActions,
+
+    // Conversation Events
+    ...conversationEvents,
     
     // Typing
     ...conversationTyping,
   };
-});
+};

@@ -4,7 +4,6 @@
     <MoleculesFormField label="Email address" v-slot="{ id }">
       <AtomsInput :id v-model="email" type="email" name="email" required />
     </MoleculesFormField>
-
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Create account </AtomsButton>
   </MoleculesForm>
 </template>
@@ -28,7 +27,7 @@ const email = ref('')
 /**
  *  Handle errors
  */
-const formErrors = ref(null);
+const formErrors = ref<{ title: string; message: string } | null>(null);
 
 /**
  *  Validate form and submit
@@ -68,3 +67,13 @@ async function createAccount({ target }: SubmitEvent) {
   });
 }
 </script>
+<style lang="scss" scoped>
+.o-signup-form {
+  &__terms {
+    a {
+      text-decoration: underline;
+      text-decoration-color: var(--secondary-400);
+    }
+  }
+}
+</style>

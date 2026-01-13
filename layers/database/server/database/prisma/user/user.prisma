@@ -3,6 +3,10 @@ model User {
   firstName                String?
   lastName                 String?
   username                 String?               @unique
+  avatar                   String?
+  bio                      String?
+  intents                  UserIntent[]
+  interests                String[]
   email                    String                @unique
   phoneNumber              String?
   password                 String?
@@ -32,4 +36,11 @@ model User {
   @@index([addressId])
   @@index([email])
   @@index([username])
+}
+
+enum UserIntent {
+  BUYING
+  SELLING
+  RENTING
+  LANDLORD
 }

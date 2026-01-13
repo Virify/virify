@@ -12,12 +12,13 @@ export interface UserItemsAggregates {
   enquiries: number;
   locations: number;
   listings: number; // Count of user's listings
-  unreadMessages: number; // Count of unread messages from other users
-  // Keep all the original ones even if not used yet
-  notifications?: number;
-  messages?: number;
-  offers?: number;
-  viewings?: number;
+  messages: number; // Total count of all messages in user's conversations
+  unreadMessages: number; // Count of unread messages
+  unreadConversations: number; // Count of conversations with unread messages
+  sentEnquiries: number; // Count of conversations user sent
+  sentUnreadEnquiries: number; // Count of sent conversations with unread messages
+  receivedEnquiries: number; // Count of conversations user received
+  receivedUnreadEnquiries: number; // Count of received conversations with unread messages
 }
 
 /**

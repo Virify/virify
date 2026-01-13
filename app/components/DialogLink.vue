@@ -1,5 +1,5 @@
 <template>
-  <nuxt-link v-bind="{ ...aria, ...$attrs }" @click.capture="openDialog">
+  <nuxt-link v-bind="{ ...aria, ...$attrs }" @click.capture="openDialog" class="link">
     <slot></slot>
   </nuxt-link>
 </template>

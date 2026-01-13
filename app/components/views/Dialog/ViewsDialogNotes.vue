@@ -1,5 +1,5 @@
 <template>
-  <div class="| flow dialog-container dialog-container-xs">
+  <div class="| flow dialog-container dialog-container-sm">
     <h1 class="| title-xl">{{ title }}</h1>
     <p class="| body-sm">{{ content }}</p>
 
@@ -12,7 +12,7 @@
           {{ isPending ? 'Deleting...' : 'Delete note' }}
         </button>
         <div class="notes-dialog-buttons">
-          <button class="| button button-ghost button-sm" @click="() => hideDialog()" :disabled="isPending">
+          <button class="| button button-monochrome button-sm button-secondary" @click="() => hideDialog()" :disabled="isPending">
             Cancel
           </button>
           <button class="| button button-secondary button-sm" @click="saveNotes" :disabled="isPending || !notes.trim()">

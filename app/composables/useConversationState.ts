@@ -1,19 +1,20 @@
-import { createSharedComposable } from '@vueuse/core';
+
 
 /**
  * Core conversation state management
  * Handles data fetching, loading states, and basic conversation management
  */
-export const useConversationState = createSharedComposable((options?: { limit?: number }) => {
+export const useConversationState = (options?: { limit?: number }) => {
   const { loggedIn, user } = useUserSession();
   const requestFetch = useRequestFetch();
 
   // Configuration
-  const limit = options?.limit || 10;
+  const defaultLimit = options?.limit || 10;
 
   // State
   const conversations = ref<ConversationWithUserAndMessages[]>([]);
-  const loading = ref(false);
+  const total = ref(0);
+  const loading = ref(true);
   const error = ref<string | null>(null);
 
   // Get current userId safely
@@ -23,9 +24,17 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
    * Fetch conversations from the API
    * Returns the conversations ordered by most recent activity
    */
-  async function fetchConversations() {
+  async function fetchConversations(
+    filter: 'all' | 'unread' = 'all', 
+    direction: 'all' | 'sent' | 'received' = 'all',
+    page: number = 1,
+    sort: 'newest' | 'oldest' | 'listing' = 'newest',
+    limit: number = defaultLimit,
+    listingId?: number
+  ) {
     if (!loggedIn.value || !currentUserId.value) {
       conversations.value = [];
+      total.value = 0;
       return;
     }
 
@@ -33,12 +42,18 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     error.value = null;
 
     try {
-      const data = await requestFetch<ConversationWithUserAndMessages[]>('/api/conversation/');
-      conversations.value = data || [];
+      let url = `/api/conversation/?filter=${filter}&direction=${direction}&sort=${sort}&page=${page}&limit=${limit}`;
+      if (listingId) {
+        url += `&listingId=${listingId}`;
+      }
+      const data = await requestFetch<{ conversations: ConversationWithUserAndMessages[], total: number }>(url);
+      conversations.value = data.conversations || [];
+      total.value = data.total || 0;
     } catch (err) {
       console.error('Error fetching conversations:', err);
       error.value = 'Failed to load conversations';
       conversations.value = [];
+      total.value = 0;
     } finally {
       loading.value = false;
     }
@@ -48,7 +63,7 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
    * Get limited conversations based on the configured limit
    */
   const limitedConversations = computed(() => {
-    return conversations.value.slice(0, limit);
+    return conversations.value; 
   });
 
   /**
@@ -71,7 +86,6 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
       const senderEmail = c.sender?.email?.toLowerCase() || "";
       const receiverUsername = c.receiver?.username?.toLowerCase() || "";
       const receiverEmail = c.receiver?.email?.toLowerCase() || "";
-      const listingTitle = c.listing?.title?.toLowerCase() || "";
       const lastMsg = c.messages?.[c.messages.length-1]?.content?.toLowerCase() || "";
       const address = c.listing?.property?.address?.fullAddress?.toLowerCase() || "";
 
@@ -80,24 +94,9 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
         senderEmail.includes(term) ||
         receiverUsername.includes(term) ||
         receiverEmail.includes(term) ||
-        listingTitle.includes(term) ||
         lastMsg.includes(term) ||
         address.includes(term)
       );
-    });
-  }
-
-  /**
-   * Auto-fetch conversations when user logs in
-   */
-  if (import.meta.client) {
-    watchEffect(() => {
-      if (loggedIn.value && currentUserId.value) {
-        fetchConversations();
-      } else {
-        conversations.value = [];
-        error.value = null;
-      }
     });
   }
 
@@ -124,6 +123,21 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     conversations.value = updateConversationInArray(conversations.value, conversationId, updatedData);
   }
 
+  /**
+   * Get the total number of conversations with unread messages for the current user
+   * Efficiently cached using computed property since conversations is already reactive
+   */
+  const unreadConversationsCount = computed(() => {
+    if (!currentUserId.value) return 0;
+    
+    return conversations.value.reduce((count, convo) => {
+      // Direct message check slightly more efficient than calling external function repeatedly
+      // Check if ANY message in this convo is unread AND sent to me
+      const hasUnread = convo.messages?.some(m => !m.isRead && String(m.receiverId) === String(currentUserId.value));
+      return count + (hasUnread ? 1 : 0);
+    }, 0);
+  });
+
   return {
     conversations: limitedConversations,
     allConversations: conversations,
@@ -132,9 +146,11 @@ export const useConversationState = createSharedComposable((options?: { limit?: 
     loading: readonly(loading),
     error: readonly(error),
     currentUserId: readonly(currentUserId),
+    unreadConversationsCount,
     fetchConversations,
     refreshConversations,
     addConversation,
     updateConversation,
+    total: readonly(total),
   };
-});
+};
