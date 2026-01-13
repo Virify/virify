@@ -166,9 +166,7 @@
   </UDashboardPanel>
 </template>
 <script setup lang="ts">
-import { securitySchema, securitySchemaBase, securitySchemaSetPassword } from '~~/shared/utils/securitySchema';
-import { z } from "zod";
-import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui';
+import type { FormErrorEvent } from '@nuxt/ui';
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -176,110 +174,20 @@ definePageMeta({
 });
 
 const { accountNavigationItems } = useDashboardNavigation();
-const { user, fetch } = useUserSession();
-const toast = useToast();
 
-type Schema = z.output<typeof securitySchemaBase>;
-const errors = ref<FormErrorEvent | null>(null);
-const submitErrors = ref<FormError[] | null>(null);
-
-const showCurrentPassword = ref(false);
-const showNewPassword = ref(false);
-const showConfirmNewPassword = ref(false);
-
-const state = reactive<Schema>({
-  email: user.value?.email || '',
-  currentPassword: null,
-  newPassword: null,
-  confirmNewPassword: null,
-});
-
-const isUserVerified = computed(() => isVerified(user.value));
-
-const isChangingPassword = computed(() => {
-  return !!state.currentPassword || !!state.newPassword || !!state.confirmNewPassword
-});
-
-const schema = computed(() => {
-  if (!isUserVerified.value) {
-    return securitySchemaSetPassword;
-  }
-  if (isChangingPassword.value) {
-    return securitySchema;
-  }
-  return securitySchemaBase;
-});
-
-const isValidSubmission = computed(() => {
-  const isEmailChanged = state.email !== user.value?.email;
-
-  // For unverified users, we require they set a password IF they are interacting with it, or maybe always?
-  // Based on schema, strict validation implies they MUST set it if utilizing that schema.
-  if (!isUserVerified.value && !state.newPassword && !isEmailChanged) {
-      return false;
-  }
-
-  if (isUserVerified.value && !isEmailChanged && !isChangingPassword.value) {
-    return false;
-  }
-
-  const result = schema.value.safeParse(state);
-  return result.success;
-});
-
-function clearSubmitErrors() {
-  submitErrors.value = null;
-}
-
-function clearForm() {
-  state.currentPassword = null;
-  state.newPassword = null;
-  state.confirmNewPassword = null;
-}
-
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  submitErrors.value = null;
-  
-  const querySchema = !isUserVerified.value ? 'set-password' : (isChangingPassword.value ? 'full' : 'base');
-
-  try {
-    const response = await $fetch<Schema>("/api/user/security", {
-      method: "PATCH",
-      body: event.data,
-      query: {
-        schema: querySchema,
-      }
-    });
-
-    if(response) {
-      toast.add({
-        title: 'Success',
-        description: 'Your security settings have been updated.',
-        color: 'success',
-      })
-      await fetch();
-      clearForm();
-    }
-
-  } catch (error: any) {
-    if(error.status === 400) {
-      submitErrors.value = [{
-        name: 'newPassword',
-        message: 'New password must not be the same as the current password.',
-      }]
-    }
-    if (error.status === 401) {
-      submitErrors.value = [{
-        name: 'currentPassword',
-        message: 'Current password is incorrect.',
-      }]
-    }
-    toast.add({
-      title: 'Error',
-      description: error.statusText,
-      color: 'error',
-    })
-  }
-}
+const {
+  state,
+  errors,
+  submitErrors,
+  showCurrentPassword,
+  showNewPassword,
+  showConfirmNewPassword,
+  isUserVerified,
+  isChangingPassword,
+  schema,
+  isValidSubmission,
+  clearSubmitErrors,
+  onSubmit
+} = useSecurityForm();
 
 </script>

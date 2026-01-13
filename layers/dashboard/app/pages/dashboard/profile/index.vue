@@ -180,67 +180,16 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-import { UserIntent } from "~~/layers/database/server/database/prisma/generated/enums";
-import type { FormSubmitEvent } from "#ui/types";
+import { profileIntents } from "~~/layers/dashboard/app/composables/useProfileForm";
 
 definePageMeta({
   middleware: ["authenticated"],
   layout: "dashboard",
 });
 
-const { data: fullUser, pending } = await useAsyncData("fullUser", () => useRequestFetch()<UserWithAddress>(`/api/user/profile`));
-
 const { accountNavigationItems } = useDashboardNavigation();
 
-type Schema = z.output<typeof profileSchema>;
+const { state, pending, onSubmit, profileSchema } = await useProfileForm();
+const intents = profileIntents;
 
-const state = reactive<Schema>({
-  firstName: fullUser.value?.firstName || "",
-  lastName: fullUser.value?.lastName || "",
-  username: fullUser.value?.username || "",
-  email: fullUser.value?.email || "",
-  address: fullUser.value?.address || {
-    number: null,
-    flat: null,
-    name: null,
-    street: "",
-    city: "",
-    locality: null,
-    county: null,
-    district: null,
-    country: null,
-    postcode: "",
-    fullAddress: null,
-    lat: null,
-    lon: null,
-  },
-  avatar: fullUser.value?.avatar || "",
-  bio: fullUser.value?.bio || "",
-  intents: fullUser.value?.intents || [],
-  interests: fullUser.value?.interests?.length ? fullUser.value.interests : ["property"],
-  phoneNumber: fullUser.value?.phoneNumber || "",
-});
-
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  try {
-    const response = await $fetch<Schema>("/api/user/profile", {
-      method: "PATCH",
-      body: event.data,
-    });
-
-    if (response) {
-      useToast().add({ title: "Success", description: "Profile updated successfully", color: "success" });
-    }
-  } catch (error: any) {
-    useToast().add({ title: "Error", description: error?.message || "An error occurred while updating profile", color: "error" });
-  }
-}
-
-const intents: { value: UserIntent; label: string }[] = [
-  { value: UserIntent.BUYING, label: "Buying" },
-  { value: UserIntent.SELLING, label: "Selling" },
-  { value: UserIntent.RENTING, label: "Renting" },
-  { value: UserIntent.LANDLORD, label: "Landlord" },
-];
 </script>
