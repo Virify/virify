@@ -40,8 +40,11 @@
     <template #default="{ collapsed }">
       <TooltipProvider :delay-duration="400">
         <!-- notifications button at top -->
-        <div class="flex items-center gap-2 border-b border-white/20 pb-2">
-          <OrganismsDashboardNotificationButton color="secondary" />
+        <div 
+          class="flex items-center gap-2 border-b border-white/20 pb-2 cursor-pointer p-1"
+          @click="notificationSlideoverOpen = true"
+        >
+          <OrganismsDashboardNotificationButton v-model:open="notificationSlideoverOpen" color="secondary" />
           <div v-if="!collapsed" class="flex items-center gap-2 px-0 py-0">
             <p class="body-xs! text-white">Notifications</p>
             <UBadge
@@ -137,6 +140,8 @@
   const { dashboardNavigationitems } = useDashboardNavigation();
   const { notificationCounts, fetchNotificationCounts } = useNotifications();
   const { clear } = useUserSession();
+
+  const notificationSlideoverOpen = ref(false);
 
   onMounted(() => {
     fetchNotificationCounts();
