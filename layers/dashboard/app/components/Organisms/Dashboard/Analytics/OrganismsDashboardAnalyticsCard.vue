@@ -113,6 +113,7 @@
           icon="i-lucide-send"
           spotlight
           spotlight-color="secondary"
+          :to="buildEnquiriesUrl({ direction: 'sent', sort: 'newest' })"
           :ui="{
             leadingIcon: 'text-secondary',
             title: 'body-sm font-bold',
