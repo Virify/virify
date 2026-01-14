@@ -1,7 +1,9 @@
 <template>
-  <div class="| flow dialog-container dialog-container-xs">
-    <h1 class="| title-xl">Start Conversation</h1>
+  <div class="| flow dialog-container dialog-container-sm">
+    <h1 class="| title-xl">Start Enquiry</h1>
     <p class="| body-sm">Write your message or question below - we will notify them of your message.</p>
+    <AtomsDivider text="Hint" />
+    <p class="| body-sm">You can view your enquiries in the dashboard or check your notifications for a reply.</p>
     <div class="| flow flow-md">
       <textarea v-model="message" class="| body-sm" rows="4" placeholder="Type your message..."></textarea>
       <div class="| flex justify-end gap-2">
@@ -23,19 +25,27 @@ const props = defineProps<{ listingId: number; receiverId: number }>();
 
 const message = ref('');
 const sending = ref(false);
-const { startConversation } = useConversations();
+const { startConversation, hasContactedListing } = useEnquiries();
 const { hideDialog } = useDialog();
 const toast = useToast();
 
 async function onSend() {
   if (!message.value.trim()) return;
+  
+  // Check if conversation already exists before sending
+  if (hasContactedListing(props.listingId)) {
+    toast.add({ title: 'Already Contacted', description: 'You have already started a conversation for this listing.', icon: 'i-lucide-circle-x', color: 'error' });
+    hideDialog();
+    return;
+  }
+
   sending.value = true;
   try {
     await startConversation(props.listingId, props.receiverId, message.value.trim());
-    toast.add({ title: 'Success', description: 'Message sent successfully!', color: 'success' });
+    toast.add({ title: 'Success', description: 'Message sent successfully!', icon: 'i-lucide-message-circle', color: 'success' });
     hideDialog();
   } catch (e) {
-    toast.add({ title: 'Error', description: 'Failed to send message. Please try again.', color: 'error' });
+    toast.add({ title: 'Error', description: 'Failed to send message. Please try again.', icon: 'i-lucide-circle-x', color: 'error' });
     console.error('Error starting conversation:', e);
   } finally {
     sending.value = false;

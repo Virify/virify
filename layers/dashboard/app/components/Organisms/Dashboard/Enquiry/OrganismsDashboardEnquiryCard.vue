@@ -44,7 +44,7 @@
   import type { User } from '#auth-utils'
 
   defineProps<{
-    enquiry: ConversationWithUserAndMessages,
+    enquiry: ConversationWithMinimalListing,
     user: User | null,
   }>()
 

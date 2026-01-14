@@ -1,4 +1,5 @@
-import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
+import type { MessageWithUser } from "~~/shared/types/conversation";
+
 
 /**
  * Create a conversation
@@ -9,7 +10,7 @@ import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared
  * @param messageContent Message content
  * @returns
  */
-export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number): Promise<ConversationWithUserAndMessages> {
+export async function createConversation(senderId: number, receiverId: number, messageContent: string, listingId?: number): Promise<ConversationWithMinimalListing> {
   return await prisma.conversation.create({
     data: {
       ...(listingId ? { listing: { connect: { id: listingId } } } : {}),
@@ -37,18 +38,19 @@ export async function createConversation(senderId: number, receiverId: number, m
           isRead: true,
           createdAt: true,
           updatedAt: true,
+          conversationId: true,
           sender: {
             select: {
               id: true,
               username: true,
-              email: true,
+              avatar: true,
             },
           },
           receiver: {
             select: {
               id: true,
               username: true,
-              email: true,
+              avatar: true,
             },
           },
         },
@@ -57,14 +59,14 @@ export async function createConversation(senderId: number, receiverId: number, m
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
       receiver: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
     },
@@ -84,7 +86,7 @@ export async function replyToConversation(conversationId: number, messageContent
     const conversation = await tx.conversation.findUnique({
       where: { id: conversationId },
       select: {
-        ...conversationWithUserAndMessages,
+        ...conversationWithListingCard,
       },
     });
 
@@ -105,6 +107,7 @@ export async function replyToConversation(conversationId: number, messageContent
       },
       select: {
         id: true,
+        conversationId: true,
         senderId: true,
         receiverId: true,
         content: true,
@@ -115,20 +118,33 @@ export async function replyToConversation(conversationId: number, messageContent
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
         receiver: {
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
       },
     });
 
     return newMessage;
+  });
+}
+
+/**
+ * Get a conversation by ID with all details
+ *
+ * @param conversationId Conversation ID
+ * @returns Conversation object or null
+ */
+export async function getConversation(conversationId: number): Promise<ConversationWithMinimalListing | null> {
+  return await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    select: conversationWithListingCard,
   });
 }
 
@@ -152,7 +168,7 @@ export async function getConversationsByUserId(
     direction?: "all" | "sent" | "received";
     listingId?: number;
   }
-): Promise<{ conversations: ConversationWithUserAndMessages[], total: number }> {
+): Promise<{ conversations: ConversationWithMinimalListing[], total: number }> {
   const { skip, take, sort = "desc", sortBy = "date", filter = "all", direction = "all", listingId } = options || {};
   
   const whereClause: any = {};
@@ -221,14 +237,14 @@ export async function getConversationsByUserId(
         AND: [
           {
             OR: [
-               ...(listingIds.length > 0 ? [{ listingId: { in: listingIds } }] : []),
-               ...(includeGeneral ? [{ listingId: null }] : [])
+              ...(listingIds.length > 0 ? [{ listingId: { in: listingIds } }] : []),
+              ...(includeGeneral ? [{ listingId: null }] : [])
             ]
           }
         ]
       },
       select: {
-        ...conversationWithUserAndMessages,
+        ...conversationWithListingCard,
       },
       orderBy: {
         updatedAt: sort, // Sort conversations within the listing groups by date too
@@ -243,7 +259,7 @@ export async function getConversationsByUserId(
       prisma.conversation.findMany({
         where: whereClause,
         select: {
-          ...conversationWithUserAndMessages,
+          ...conversationWithListingCard,
         },
         skip,
         take,
@@ -267,14 +283,14 @@ export async function getConversationsByUserId(
  * @param userId The ID of the user requesting the conversation
  * @returns The conversation if the user is a participant, otherwise null
  */
-export async function getConversationById(conversationId: number, userId: number): Promise<ConversationWithUserAndMessages | null> {
+export async function getConversationById(conversationId: number, userId: number): Promise<ConversationWithMinimalListing | null> {
   const conversation = await prisma.conversation.findFirst({
     where: {
       id: conversationId,
       OR: [{ senderId: userId }, { receiverId: userId }],
     },
     select: {
-      ...conversationWithUserAndMessages,
+      ...conversationWithListingCard,
     },
   });
 
@@ -338,18 +354,19 @@ export async function markMessageAsRead(messageId: number, userId: number): Prom
         isRead: true,
         createdAt: true,
         updatedAt: true,
+        conversationId: true,
         sender: {
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
         receiver: {
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
       },
@@ -368,30 +385,68 @@ export async function markMessageAsRead(messageId: number, userId: number): Prom
       isRead: true,
       createdAt: true,
       updatedAt: true,
+      conversationId: true,
       sender: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
       receiver: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
     },
   });
 }
 
-export const conversationWithUserAndMessages = {
+
+export async function findConversationForUser(conversationId: number, userId: number): Promise<ConversationWithMinimalListing | null> {
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      id: conversationId,
+      OR: [
+        { senderId: userId },
+        { receiverId: userId }
+      ]
+    },
+    select: conversationWithListingCard
+  });
+  
+  return conversation as ConversationWithMinimalListing | null;
+}
+
+/**
+ * Determine the receiver ID based on the sender and the conversation 
+ */
+export function getConversationReceiverId(senderId: number, conversation: { sender: { id: number }, receiver: { id: number } }): number {
+  return senderId === conversation.sender.id ? conversation.receiver.id : conversation.sender.id;
+}
+
+/**
+ * Get the ID of the other participant involved in a message or conversation
+ */
+export function getOtherParticipantId(currentUserId: number, context: { senderId: number, receiverId: number }): number {
+  return context.senderId === currentUserId ? context.receiverId : context.senderId;
+}
+
+/**
+ * Base conversation select without listing
+ * Used as the foundation for all conversation queries
+ */
+const conversationBaseSelect = {
   id: true,
   listingId: true,
   createdAt: true,
   updatedAt: true,
   messages: {
+    orderBy: {
+      createdAt: 'asc' as const
+    },
     select: {
       id: true,
       senderId: true,
@@ -400,18 +455,19 @@ export const conversationWithUserAndMessages = {
       content: true,
       createdAt: true,
       updatedAt: true,
+      conversationId: true,
       sender: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
       receiver: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
     },
@@ -420,19 +476,113 @@ export const conversationWithUserAndMessages = {
     select: {
       id: true,
       username: true,
-      email: true,
+      avatar: true,
     },
   },
   receiver: {
     select: {
       id: true,
       username: true,
-      email: true,
+      avatar: true,
     },
   },
-  listing: {
+};
+
+/**
+ * Minimal listing fields for conversation lists
+ * Contains only essential data for display in conversation list items
+ */
+const conversationListingMinimalSelect = {
+  id: true,
+  price: true,
+  rentalListing: { select: { id: true } },
+  saleListing: { select: { id: true } },
+  property: {
     select: {
-      ...listingCardFields,
-    }
+      media: {
+        select: {
+          image: true,
+        },
+        take: 1,
+      },
+      address: {
+        select: {
+          fullAddress: true,
+          city: true,
+          postcode: true,
+        },
+      },
+      type: {
+        select: {
+          name: true,
+        },
+      },
+      numberBedrooms: true,
+      numberBathrooms: true,
+      numberReceptions: true,
+      numberOtherRooms: true,
+    },
+  },
+};
+
+/**
+ * Conversation card listing fields
+ * Contains more data for rendering the listing card in conversation lists
+ */
+const conversationListingCardSelect = {
+  id: true,
+  price: true,
+  rentalListing: { select: { id: true } },
+  saleListing: { select: { id: true } },
+  property: {
+    select: {
+      media: {
+        select: {
+          image: true,
+          metadata: true,
+        },
+      },
+      address: {
+        select: {
+          fullAddress: true,
+          street: true,
+          city: true,
+          postcode: true,
+        },
+      },
+      type: {
+        select: {
+          name: true,
+        },
+      },
+      numberBedrooms: true,
+      numberBathrooms: true,
+      numberReceptions: true,
+      numberOtherRooms: true,
+    },
+  },
+};
+
+/**
+ * Conversation select with minimal listing data
+ * Used for conversation lists where multiple conversations are displayed
+ */
+export const conversationWithMinimalListing = {
+  ...conversationBaseSelect,
+  listing: {
+    select: conversationListingMinimalSelect
   }
 };
+
+/**
+ * Conversation select with card listing data
+ * Used for enquiry lists where listing cards need to be rendered
+ */
+export const conversationWithListingCard = {
+  ...conversationBaseSelect,
+  listing: {
+    select: conversationListingCardSelect
+  }
+};
+
+

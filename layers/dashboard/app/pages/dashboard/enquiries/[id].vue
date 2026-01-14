@@ -11,14 +11,16 @@
       >
         <template #right>
           <OrganismsDashboardFilter 
-            :items="conversations" 
+            :items="enquiries" 
             :enquiries="true" 
             persistence-key="dashboard-listing-enquiries" 
             :all-count="allCount" 
-            :unread-count="unreadCount" 
-            @update:filtered="filteredConversations = $event" 
+            :unread-count="unreadCountLocal" 
+            @update:filtered="filteredEnquiries = $event" 
             :view-options="[]" 
+
           />
+          <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
       <MoleculesDashboardPasswordAlert />
@@ -42,14 +44,14 @@
           </div>
 
           <!-- Loading State -->
-          <div v-if="loading && !conversations.length" class="space-y-4">
+          <div v-if="loading && !enquiries.length" class="space-y-4">
             <USkeleton class="h-32 w-full" v-for="i in 3" :key="i" />
           </div>
 
           <!-- Results (Filtered) -->
-          <div v-else-if="filteredConversations.length > 0" class="space-y-3 w-full">
+          <div v-else-if="filteredEnquiries.length > 0" class="space-y-3 w-full">
             <UPageCard
-              v-for="enquiry in filteredConversations"
+              v-for="enquiry in filteredEnquiries"
               :key="enquiry.id"
               variant="subtle"
               :ui="{
@@ -57,7 +59,7 @@
                 container: 'p-0 sm:p-0',
                 body: 'w-full',
               }"
-              @click="openModal(enquiry)"
+              @click="handleOpenModal(enquiry)"
             >
               <template #body>
                 <!-- Header -->
@@ -73,7 +75,7 @@
                   </span>
                 </div>
                 <!-- Content -->
-                <OrganismsDashboardEnquiryMessageSummary :enquiry="enquiry" :user="user" @reply="openModal" />
+                <OrganismsDashboardEnquiryMessageSummary :enquiry="enquiry" :user="user" @reply="handleOpenModal" />
               </template>
             </UPageCard>
           </div>
@@ -83,15 +85,17 @@
         </div>
       </div>
 
-      <OrganismsDashboardEnquiryModal v-if="user" v-model:open="open" :conversation="selectedConversation" :user="user" />
+      <OrganismsDashboardEnquiryModal 
+        v-if="user" 
+        v-model:open="modalOpen" 
+        :conversation="activeEnquiry" 
+        :user="user" 
+      />
     </template>
   </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
-import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
-import { getConversationOtherUser, formatMessageTimestamp, getUnreadCount } from "~/utils/conversation";
-
 definePageMeta({
   middleware: ["authenticated"],
   title: "Listing Enquiries",
@@ -99,26 +103,24 @@ definePageMeta({
 });
 
 const route = useRoute();
-const router = useRouter();
 const { user } = useUserSession();
 const requestFetch = useRequestFetch();
 
-// State
-const { conversations, total: totalCount, loading, fetchConversations } = useConversations();
-const filteredConversations = ref<ConversationWithUserAndMessages[]>([]); // Results from client-side search/filter component
+// State from useEnquiries
+const { enquiries, total: totalCount, loading, fetchEnquiries, activeEnquiry, openEnquiry, closeEnquiry, getUnreadCount } = useEnquiries();
+const filteredEnquiries = ref<ConversationWithMinimalListing[]>([]);;
 
 const listingId = computed(() => Number(route.params.id));
 
-const open = ref(false);
-const selectedConversation = ref<ConversationWithUserAndMessages>({} as ConversationWithUserAndMessages);
+const modalOpen = ref(false);
 
 // Filter Logic
 const filterState = useDashboardListFilter(ref([]), { 
   persistenceKey: "dashboard-listing-enquiries", 
   enquiries: true,
-  hideListingSort: true // New option
+  hideListingSort: true
 });
-const { activeTab: conversationFilter, enquiriesFilter: directionFilter, sortOrderValue: sortOrder } = filterState;
+const { activeTab: enquiryFilter, enquiriesFilter: directionFilter, sortOrderValue: sortOrder } = filterState;
 
 // Determine the listing object from the fetched conversations or separate fetch
 const persistentListing = ref<any>(null);
@@ -127,17 +129,6 @@ const persistentListing = ref<any>(null);
 const { data: fetchedListing } = await useAsyncData(`listing-${listingId.value}`, () => requestFetch<any>(`/api/listings/${listingId.value}`), {
   watch: [listingId],
   immediate: true,
-});
-
-// Unified listing object computation
-const currentListing = computed(() => {
-  // Prefer the explicitly fetched listing
-  if (fetchedListing.value) return fetchedListing.value;
-
-  // Fallback to finding it in conversations (less reliable if filtered)
-  const list = conversations.value.find((c) => c.listing)?.listing;
-  if (list) persistentListing.value = list;
-  return list || persistentListing.value;
 });
 
 // Update persistentListing when fetchedListing changes
@@ -159,33 +150,50 @@ const allCount = computed(() => {
 // Capture the total count when we are viewing 'all'
 const realAllCount = ref(0);
 watch(totalCount, (newVal) => {
-  if (conversationFilter.value === 'all') {
+  if (enquiryFilter.value === 'all') {
     realAllCount.value = newVal;
   }
 });
 
-const unreadCount = computed(() => {
-  return conversations.value.filter((c) => getUnreadCount(c, user.value?.id) > 0).length; // This is only for current page, ideally should come from API metadata
-  // Given we fetch "conversations", we might not have global unread count for this listing unless API returns it.
-  // But we can just use current page's unread count for now or rely on the global aggregates if we had them per-listing (we don't).
-  // The 'totalCount' from API is total conversations matching filter.
+const unreadCountLocal = computed(() => {
+  return enquiries.value.filter((c) => getUnreadCount(c) > 0).length;
 });
 
-watch([conversationFilter, directionFilter, sortOrder], async () => {
+watch([enquiryFilter, directionFilter, sortOrder], async () => {
   if (listingId.value) {
-    await fetchConversations(conversationFilter.value as any, directionFilter.value as any, 1, sortOrder.value as any, 50, listingId.value);
+    await fetchEnquiries({ 
+      filter: enquiryFilter.value as any, 
+      direction: directionFilter.value as any, 
+      page: 1, 
+      sort: sortOrder.value as any, 
+      limit: 50, 
+      listingId: listingId.value 
+    });
   }
 });
 
 onMounted(() => {
   if (listingId.value) {
-    // Fetch conversations for this listing
-    fetchConversations(conversationFilter.value as any, directionFilter.value as any, 1, sortOrder.value as any, 50, listingId.value);
+    fetchEnquiries({ 
+      filter: enquiryFilter.value as any, 
+      direction: directionFilter.value as any, 
+      page: 1, 
+      sort: sortOrder.value as any, 
+      limit: 50, 
+      listingId: listingId.value 
+    });
   }
 });
 
-function openModal(conversation: ConversationWithUserAndMessages) {
-  open.value = true;
-  selectedConversation.value = conversation;
+function handleOpenModal(enquiry: ConversationWithMinimalListing) {
+  openEnquiry(enquiry);
+  modalOpen.value = true;
 }
+
+// Close modal and clear active enquiry
+watch(modalOpen, (isOpen) => {
+  if (!isOpen) {
+    closeEnquiry();
+  }
+});
 </script>

@@ -22,6 +22,7 @@ model User {
   properties               Property[]
   verification             Verification?
   preferences              UserPreferences[]
+  notifications            UserNotification[]
   address                  Address?              @relation(fields: [addressId], references: [id])
   addressId                Int?
   ListingView              ListingView[]

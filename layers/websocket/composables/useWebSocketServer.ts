@@ -2,11 +2,12 @@
  * Client-side event handlers interface
  */
 export interface WebSocketEvents {
-  onNewMessage?: (data: { conversationId: number; message: any }) => void;
+  onNewMessage?: (data: { conversationId: number; message: any; conversation?: any }) => void;
   onNewConversation?: (data: { conversation: any }) => void;
   onTyping?: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
   onMessageRead?: (data: { conversationId: number; messageId: number; from: number }) => void;
   onAggregateUpdate?: (data: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" | "update" }) => void;
+  onNotificationNew?: (data: { notification: UserNotification }) => void;
 }
 
 /**
@@ -21,6 +22,8 @@ const globalPeers = new Map<number, Set<{ send: (data: string) => void; close: (
 export const useWebSocketServer = () => {
   // Use the global singleton peers Map
   const peers = globalPeers;
+  // Track which conversation a user is actively viewing (if any)
+  const activeConversationByUser = new Map<number, number | null>();
 
   /**
    * Adds a new WebSocket peer for a user
@@ -176,6 +179,20 @@ export const useWebSocketServer = () => {
           break;
         }
 
+        case "conversation_presence": {
+          const convId: number | null = typeof message.conversationId === 'number' ? message.conversationId : null;
+          const isOpen: boolean = !!message.open;
+          if (isOpen) {
+            activeConversationByUser.set(fromUserId, convId);
+          } else {
+            const current = activeConversationByUser.get(fromUserId) ?? null;
+            if (!convId || current === convId) {
+              activeConversationByUser.set(fromUserId, null);
+            }
+          }
+          break;
+        }
+
         default:
           console.warn("Unknown message type:", message.type);
       }
@@ -215,6 +232,7 @@ export const useWebSocketServer = () => {
           events.onNewMessage?.({
             conversationId: wsMessage.conversationId!,
             message: wsMessage.message!,
+            conversation: wsMessage.conversation,
           });
           break;
 
@@ -267,6 +285,16 @@ export const useWebSocketServer = () => {
           });
           break;
 
+        /**
+         * New notification created - emitted after server saves notification
+         * Triggers: Add to notification list, toast, badge updates
+         */
+        case "notification_new":
+          events.onNotificationNew?.({
+            notification: (wsMessage as NotificationNewMessage).notification,
+          });
+          break;
+
         default:
           console.warn("Unknown message type:", wsMessage.type);
       }
@@ -314,10 +342,11 @@ export const useWebSocketServer = () => {
    * @param from - The user ID who sent the message (optional, will be set by server)
    * @returns Formatted new message notification object
    */
-  const createNewMessageMessage = (conversationId: number, message: any, to: number | number[], from?: number): NewMessageMessage => ({
+  const createNewMessageMessage = (conversationId: number, message: any, to: number | number[], from?: number, conversation?: any): NewMessageMessage => ({
     type: "new_message",
     conversationId,
     message,
+    conversation,
     to,
     from,
     timestamp: new Date().toISOString(),
@@ -369,6 +398,18 @@ export const useWebSocketServer = () => {
     timestamp: new Date().toISOString(),
   });
 
+  /**
+   * Creates a notification_new message for WebSocket transmission
+   * @param notification - The created UserNotification record
+   * @param to - The user ID(s) to notify
+   */
+  const createNotificationNewMessage = (notification: UserNotification, to: number | number[]): NotificationNewMessage => ({
+    type: "notification_new",
+    notification,
+    to,
+    timestamp: new Date().toISOString(),
+  });
+
   return {
     addPeer,
     removePeer,
@@ -377,6 +418,8 @@ export const useWebSocketServer = () => {
     sendMessage,
     handleIncomingMessages,
     isUserOnline,
+    // Presence helper
+    isUserViewingConversation: (userId: number, conversationId: number) => activeConversationByUser.get(userId) === conversationId,
     // Type-safe message creators
     createTypingMessage,
     createMessageReadMessage,
@@ -384,6 +427,7 @@ export const useWebSocketServer = () => {
     createNewConversationMessage,
     createConnectionStatusMessage,
     createAggregateUpdateMessage,
+    createNotificationNewMessage,
     // Client-side handling
     handleOutgoingMessages,
   };

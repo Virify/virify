@@ -12,7 +12,7 @@
       class="border-0 ring-0"
       :ui="{
         header: 'p-4 border-none',
-        root: 'bg-primary',
+        root: 'bg-primary text-sm',
         body: 'border-none',
         content: 'bg-primary',
         footer: 'border-none w-full',
@@ -39,6 +39,23 @@
     <!-- sidebar content -->
     <template #default="{ collapsed }">
       <TooltipProvider :delay-duration="400">
+        <!-- notifications button at top -->
+        <div class="flex items-center gap-2 border-b border-white/20 pb-2">
+          <OrganismsDashboardNotificationButton color="secondary" />
+          <div v-if="!collapsed" class="flex items-center gap-2 px-0 py-0">
+            <p class="body-xs! text-white">Notifications</p>
+            <UBadge
+              v-if="notificationCounts?.total"
+              :label="notificationCounts.total"
+              size="md"
+              class="text-white border"
+              color="primary"
+              :ui="{
+                label: 'font-normal',
+              }"
+            />
+          </div>
+        </div>
         <!-- navigation menu -->
         <UNavigationMenu
           orientation="vertical"
@@ -118,7 +135,13 @@
 <script lang="ts" setup>
   import { TooltipProvider } from 'reka-ui';
   const { dashboardNavigationitems } = useDashboardNavigation();
+  const { notificationCounts, fetchNotificationCounts } = useNotifications();
   const { clear } = useUserSession();
+
+  onMounted(() => {
+    fetchNotificationCounts();
+  });
+
   const logout = async () => {
     await clear();
     navigateTo('/');

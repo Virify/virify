@@ -6,7 +6,11 @@
         :ui="{
           title: 'title-sm m-0!',
         }"
-      />
+      >
+        <template #right>
+          <OrganismsDashboardNotificationButton />
+        </template>
+      </UDashboardNavbar>
       <UNavigationMenu highlight variant="pill" :items="accountNavigationItems" class="hidden sm:flex ml-4" color="secondary" />
       <MoleculesDashboardPasswordAlert />
     </template>

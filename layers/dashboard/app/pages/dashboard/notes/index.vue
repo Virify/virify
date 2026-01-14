@@ -13,6 +13,7 @@
             persistence-key="dashboard-notes"
             @update:filtered="filteredUserNotes = $event"
           />
+          <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
       <MoleculesDashboardPasswordAlert />

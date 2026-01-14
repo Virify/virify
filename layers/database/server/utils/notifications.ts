@@ -60,17 +60,11 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
         },
       },
     }),
-    // Count ALL unread messages in conversations where user is a participant
+    // Count ALL unread messages received by the user
     prisma.message.count({
       where: {
-        AND: [
-          { isRead: false },
-          {
-            conversation: {
-              OR: [{ senderId: userId }, { receiverId: userId }],
-            },
-          },
-        ],
+        isRead: false,
+        receiverId: userId,
       },
     }),
     // Count conversations with unread messages

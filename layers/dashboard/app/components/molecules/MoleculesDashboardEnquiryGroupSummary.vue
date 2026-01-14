@@ -30,11 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
+import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
 import { getUnreadCount } from "~/utils/conversation";
 
 const props = defineProps<{
-  conversations: ConversationWithUserAndMessages[];
+  conversations: ConversationWithMinimalListing[];
   listingId?: number;
   userId?: number;
 }>();
