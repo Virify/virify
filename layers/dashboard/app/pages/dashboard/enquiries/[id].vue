@@ -99,7 +99,6 @@ definePageMeta({
 });
 
 const route = useRoute();
-const router = useRouter();
 const { user } = useUserSession();
 const requestFetch = useRequestFetch();
 
@@ -129,16 +128,6 @@ const { data: fetchedListing } = await useAsyncData(`listing-${listingId.value}`
   immediate: true,
 });
 
-// Unified listing object computation
-const currentListing = computed(() => {
-  // Prefer the explicitly fetched listing
-  if (fetchedListing.value) return fetchedListing.value;
-
-  // Fallback to finding it in conversations (less reliable if filtered)
-  const list = conversations.value.find((c) => c.listing)?.listing;
-  if (list) persistentListing.value = list;
-  return list || persistentListing.value;
-});
 
 // Update persistentListing when fetchedListing changes
 watch(
@@ -165,10 +154,7 @@ watch(totalCount, (newVal) => {
 });
 
 const unreadCount = computed(() => {
-  return conversations.value.filter((c) => getUnreadCount(c, user.value?.id) > 0).length; // This is only for current page, ideally should come from API metadata
-  // Given we fetch "conversations", we might not have global unread count for this listing unless API returns it.
-  // But we can just use current page's unread count for now or rely on the global aggregates if we had them per-listing (we don't).
-  // The 'totalCount' from API is total conversations matching filter.
+  return conversations.value.filter((c) => getUnreadCount(c, user.value?.id) > 0).length;
 });
 
 watch([conversationFilter, directionFilter, sortOrder], async () => {

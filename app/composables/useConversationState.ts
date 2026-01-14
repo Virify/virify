@@ -12,10 +12,10 @@ export const useConversationState = (options?: { limit?: number }) => {
   const defaultLimit = options?.limit || 10;
 
   // State
-  const conversations = ref<ConversationWithUserAndMessages[]>([]);
-  const total = ref(0);
-  const loading = ref(true);
-  const error = ref<string | null>(null);
+  const conversations = useState<ConversationWithUserAndMessages[]>('conversations', () => []);
+  const total = useState<number>('conversations-total', () => 0);
+  const loading = useState<boolean>('conversations-loading', () => true);
+  const error = useState<string | null>('conversations-error', () => null);
 
   // Get current userId safely
   const currentUserId = computed(() => user.value?.id ?? null);
@@ -77,27 +77,7 @@ export const useConversationState = (options?: { limit?: number }) => {
    * Filter conversations by search term
    */
   function filterConversations(conversations: ConversationWithUserAndMessages[], searchTerm: string) {
-    if (!searchTerm.trim()) return conversations;
-    
-    const term = searchTerm.trim().toLowerCase();
-    return conversations.filter(c => {
-      // Search by sender/receiver name or username, listing title, or last message content
-      const senderUsername = c.sender?.username?.toLowerCase() || "";
-      const senderEmail = c.sender?.email?.toLowerCase() || "";
-      const receiverUsername = c.receiver?.username?.toLowerCase() || "";
-      const receiverEmail = c.receiver?.email?.toLowerCase() || "";
-      const lastMsg = c.messages?.[c.messages.length-1]?.content?.toLowerCase() || "";
-      const address = c.listing?.property?.address?.fullAddress?.toLowerCase() || "";
-
-      return (
-        senderUsername.includes(term) ||
-        senderEmail.includes(term) ||
-        receiverUsername.includes(term) ||
-        receiverEmail.includes(term) ||
-        lastMsg.includes(term) ||
-        address.includes(term)
-      );
-    });
+    return filterConversationsByTerm(conversations, searchTerm);
   }
 
   /**
@@ -131,9 +111,8 @@ export const useConversationState = (options?: { limit?: number }) => {
     if (!currentUserId.value) return 0;
     
     return conversations.value.reduce((count, convo) => {
-      // Direct message check slightly more efficient than calling external function repeatedly
-      // Check if ANY message in this convo is unread AND sent to me
-      const hasUnread = convo.messages?.some(m => !m.isRead && String(m.receiverId) === String(currentUserId.value));
+      // Use utility to check for unread messages
+      const hasUnread = getUnreadCount(convo, currentUserId.value!) > 0;
       return count + (hasUnread ? 1 : 0);
     }, 0);
   });

@@ -20,26 +20,26 @@ export type ConversationWithUserAndMessages = {
     createdAt: Date;
     updatedAt: Date;
     isRead: boolean;
+    conversationId: number;
     sender: {
       id: number;
       username: string | null;
-      email: string;
+      avatar: string | null;
     };
     receiver: {
       id: number;
+      avatar: string | null;
       username: string | null;
-      email: string;
     };
   }[];
   sender: {
     id: number;
+    avatar: string | null;
     username: string | null;
-    email: string;
   };
   receiver: {
     id: number;
     username: string | null;
-    email: string;
   };
 }
 & {
@@ -48,6 +48,7 @@ export type ConversationWithUserAndMessages = {
 
 export type MessageWithUser = {
   id: number;
+  conversationId: number;
   senderId: number;
   receiverId: number;
   content: string;
@@ -56,12 +57,12 @@ export type MessageWithUser = {
   updatedAt: Date;
   sender: {
     id: number;
+    avatar: string | null;
     username: string | null;
-    email: string;
   };
   receiver: {
     id: number;
     username: string | null;
-    email: string;
+    avatar: string | null;
   };
 };

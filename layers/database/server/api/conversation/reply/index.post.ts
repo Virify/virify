@@ -22,21 +22,13 @@ export default defineEventHandler(async (event) => {
     }
 
     const newMessage = await replyToConversation(conversationId, message, senderId);
+    const conversation = await getConversation(conversationId);
 
-    const receiverId = newMessage.senderId === senderId ? newMessage.receiverId : newMessage.senderId;
+    const receiverId = getOtherParticipantId(senderId, newMessage);
 
-    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId);
+    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId, conversation);
 
     sendMessage(messageToSend);
-
-    // Send aggregate update to the receiver (unreadMessages count increased)
-    const aggregateUpdate = createAggregateUpdateMessage(
-      "unreadMessages",
-      "add",
-      receiverId
-    );
-
-    sendMessage(aggregateUpdate);
 
     return newMessage;
   } catch (error) {

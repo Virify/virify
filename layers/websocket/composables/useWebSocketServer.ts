@@ -2,7 +2,7 @@
  * Client-side event handlers interface
  */
 export interface WebSocketEvents {
-  onNewMessage?: (data: { conversationId: number; message: any }) => void;
+  onNewMessage?: (data: { conversationId: number; message: any; conversation?: any }) => void;
   onNewConversation?: (data: { conversation: any }) => void;
   onTyping?: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
   onMessageRead?: (data: { conversationId: number; messageId: number; from: number }) => void;
@@ -215,6 +215,7 @@ export const useWebSocketServer = () => {
           events.onNewMessage?.({
             conversationId: wsMessage.conversationId!,
             message: wsMessage.message!,
+            conversation: wsMessage.conversation,
           });
           break;
 
@@ -314,10 +315,11 @@ export const useWebSocketServer = () => {
    * @param from - The user ID who sent the message (optional, will be set by server)
    * @returns Formatted new message notification object
    */
-  const createNewMessageMessage = (conversationId: number, message: any, to: number | number[], from?: number): NewMessageMessage => ({
+  const createNewMessageMessage = (conversationId: number, message: any, to: number | number[], from?: number, conversation?: any): NewMessageMessage => ({
     type: "new_message",
     conversationId,
     message,
+    conversation,
     to,
     from,
     timestamp: new Date().toISOString(),

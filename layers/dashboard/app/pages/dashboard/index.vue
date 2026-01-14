@@ -1,5 +1,5 @@
 <template>
-  <UDashboardPanel>
+  <UDashboardPanel id="dashboard-home-panel">
     <template #header>
       <UDashboardNavbar
         :title="'Welcome back, ' + (user?.username || user?.email) + '!'"
@@ -8,18 +8,24 @@
         :ui="{
           title: 'title-sm m-0!',
         }"
-      />
+      >
+        <template #right>
+          <OrganismsDashboardNotificationButton @open-conversation="openConversation" />
+        </template>
+      </UDashboardNavbar>
       <MoleculesDashboardPasswordAlert />
     </template>
 
     <template #body>
-      <h2 class="title-xs mb-0! flex items-center gap-2">Quick analytics
+      <h2 class="title-xs mb-0! flex items-center gap-2">
+        Quick analytics
         <UIcon name="i-lucide-bar-chart-3" class="text-secondary" />
       </h2>
       <OrganismsDashboardAnalyticsCard />
 
       <!-- Quick Actions Grid -->
-      <h2 class="title-xs mb-0! flex items-center gap-2">Quick actions
+      <h2 class="title-xs mb-0! flex items-center gap-2">
+        Quick actions
         <UIcon name="i-lucide-rocket" class="text-secondary" />
       </h2>
 
@@ -86,90 +92,86 @@
         />
       </div>
 
-      <UAccordion 
-        :items="accordionItems" 
-        type="multiple"
-        default-values="['favourite-listings']"
-        :ui="{
-          leadingIcon: 'text-secondary',
-          label: 'body-sm font-bold',
-        }"
-      >
-        <template #favourite-listings>
-          <OrganismsDashboardListingCardCarousel
-            :items="recentFavourites"
-            :loading="isFavouritesLoading"
-            type="favourites"
-            empty-message="You have no recent favourite listings."
-          />
-        </template>
+      <ClientOnly>
+        <UAccordion
+          :items="accordionItems"
+          type="multiple"
+          default-values="['favourite-listings']"
+          :ui="{
+            leadingIcon: 'text-secondary',
+            label: 'body-sm font-bold',
+          }"
+        >
+          <template #favourite-listings>
+            <OrganismsDashboardListingCardCarousel :items="recentFavourites" :loading="isFavouritesLoading" type="favourites" empty-message="You have no recent favourite listings." />
+          </template>
 
-        <template #notes-added>
-          <OrganismsDashboardListingCardCarousel
-            :items="recentUserNotes"
-            :loading="isNotesLoading"
-            type="notes"
-            empty-message="You have no recent notes."
-          />
-        </template>
-        
-        <template #viewed-listings>
-          <OrganismsDashboardListingCardCarousel
-            :items="recentlyViewedListings"
-            :loading="isAnalyticsLoading"
-            type="viewed"
-            empty-message="You have no recent viewed listings."
-          />
-        </template>
-      </UAccordion>
+          <template #notes-added>
+            <OrganismsDashboardListingCardCarousel :items="recentUserNotes" :loading="isNotesLoading" type="notes" empty-message="You have no recent notes." />
+          </template>
+
+          <template #viewed-listings>
+            <OrganismsDashboardListingCardCarousel :items="recentlyViewedListings" :loading="isAnalyticsLoading" type="viewed" empty-message="You have no recent viewed listings." />
+          </template>
+        </UAccordion>
+      </ClientOnly>
+
+      <OrganismsDashboardEnquiryModal v-if="selectedConversation && user" v-model:open="isModalOpen" :conversation="selectedConversation" :user="user" />
     </template>
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
-  import type { AccordionItem } from '@nuxt/ui';
+import type { AccordionItem } from "@nuxt/ui";
 
-  definePageMeta({
-    middleware: ["authenticated"],
-    head: {
-      title: "Home",
-      icon: 'i-lucide-home',
-    },
-    layout: "dashboard",
-  });
+definePageMeta({
+  middleware: ["authenticated"],
+  head: {
+    title: "Home",
+    icon: "i-lucide-home",
+  },
+  layout: "dashboard",
+});
 
-  const { user } = useUserSession()
-  // Get all recent data from useAnalytics (centralized dashboard data)
-  const { 
-    recentlyViewedListings, 
-    recentFavourites, 
-    recentUserNotes,
-    recentFavouritesStatus,
-    recentNotesStatus,
-    isAnalyticsLoading 
-  } = useAnalytics()
-  
-  // Computed loading states from statuses
-  const isFavouritesLoading = computed(() => recentFavouritesStatus.value === 'pending')
-  const isNotesLoading = computed(() => recentNotesStatus.value === 'pending')
+const { user } = useUserSession();
 
-  const accordionItems: AccordionItem[] = [
-    {
-      label: 'Recent Favourite Listings',
-      icon: 'i-lucide-heart',
-      slot: 'favourite-listings',
-      value: 'favourite-listings',
-    },
-    {
-      label: 'Recent Notes Added',
-      icon: 'i-lucide-sticky-note',
-      slot: 'notes-added',
-      value: 'notes-added',
-    },
-    {
-      label: 'Viewed Listings',
-      icon: 'i-lucide-eye',
-      slot: 'viewed-listings',
-      value: 'viewed-listings',
-    },
-  ];
+const isModalOpen = ref(false);
+const selectedConversation = ref<ConversationWithUserAndMessages | null>(null);
+
+async function openConversation(id: number) {
+  try {
+    const data = await $fetch<ConversationWithUserAndMessages>(`/api/conversation/${id}`);
+    selectedConversation.value = data;
+    isModalOpen.value = true;
+  } catch (error) {
+    console.error("Failed to fetch conversation", error);
+  }
+}
+
+// Get all recent data from useAnalytics (centralized dashboard data)
+const { recentlyViewedListings, recentFavourites, recentUserNotes, recentFavouritesStatus, recentNotesStatus, isAnalyticsLoading } = useAnalytics();
+
+// Computed loading states from statuses
+const isFavouritesLoading = computed(() => recentFavouritesStatus.value === "pending");
+const isNotesLoading = computed(() => recentNotesStatus.value === "pending");
+
+const accordionItems: AccordionItem[] = [
+  {
+    label: "Recent Favourite Listings",
+    icon: "i-lucide-heart",
+    slot: "favourite-listings",
+    value: "favourite-listings",
+  },
+  {
+    label: "Recent Notes Added",
+    icon: "i-lucide-sticky-note",
+    slot: "notes-added",
+    value: "notes-added",
+  },
+  {
+    label: "Viewed Listings",
+    icon: "i-lucide-eye",
+    slot: "viewed-listings",
+    value: "viewed-listings",
+  },
+];
 </script>

@@ -1,5 +1,6 @@
 import type { ConversationWithUserAndMessages, MessageWithUser } from "~~/shared/types/conversation";
 
+
 /**
  * Create a conversation
  *
@@ -37,18 +38,19 @@ export async function createConversation(senderId: number, receiverId: number, m
           isRead: true,
           createdAt: true,
           updatedAt: true,
+          conversationId: true,
           sender: {
             select: {
               id: true,
               username: true,
-              email: true,
+              avatar: true,
             },
           },
           receiver: {
             select: {
               id: true,
               username: true,
-              email: true,
+              avatar: true,
             },
           },
         },
@@ -57,14 +59,14 @@ export async function createConversation(senderId: number, receiverId: number, m
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
       receiver: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
     },
@@ -105,6 +107,7 @@ export async function replyToConversation(conversationId: number, messageContent
       },
       select: {
         id: true,
+        conversationId: true,
         senderId: true,
         receiverId: true,
         content: true,
@@ -115,20 +118,33 @@ export async function replyToConversation(conversationId: number, messageContent
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
         receiver: {
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
       },
     });
 
     return newMessage;
+  });
+}
+
+/**
+ * Get a conversation by ID with all details
+ *
+ * @param conversationId Conversation ID
+ * @returns Conversation object or null
+ */
+export async function getConversation(conversationId: number): Promise<ConversationWithUserAndMessages | null> {
+  return await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    select: conversationWithUserAndMessages,
   });
 }
 
@@ -221,8 +237,8 @@ export async function getConversationsByUserId(
         AND: [
           {
             OR: [
-               ...(listingIds.length > 0 ? [{ listingId: { in: listingIds } }] : []),
-               ...(includeGeneral ? [{ listingId: null }] : [])
+              ...(listingIds.length > 0 ? [{ listingId: { in: listingIds } }] : []),
+              ...(includeGeneral ? [{ listingId: null }] : [])
             ]
           }
         ]
@@ -338,18 +354,19 @@ export async function markMessageAsRead(messageId: number, userId: number): Prom
         isRead: true,
         createdAt: true,
         updatedAt: true,
+        conversationId: true,
         sender: {
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
         receiver: {
           select: {
             id: true,
             username: true,
-            email: true,
+            avatar: true,
           },
         },
       },
@@ -368,22 +385,53 @@ export async function markMessageAsRead(messageId: number, userId: number): Prom
       isRead: true,
       createdAt: true,
       updatedAt: true,
+      conversationId: true,
       sender: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
       receiver: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
     },
   });
+}
+
+
+export async function findConversationForUser(conversationId: number, userId: number): Promise<ConversationWithUserAndMessages | null> {
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      id: conversationId,
+      OR: [
+        { senderId: userId },
+        { receiverId: userId }
+      ]
+    },
+    select: conversationWithUserAndMessages
+  });
+  
+  return conversation as ConversationWithUserAndMessages | null;
+}
+
+/**
+ * Determine the receiver ID based on the sender and the conversation 
+ */
+export function getConversationReceiverId(senderId: number, conversation: { sender: { id: number }, receiver: { id: number } }): number {
+  return senderId === conversation.sender.id ? conversation.receiver.id : conversation.sender.id;
+}
+
+/**
+ * Get the ID of the other participant involved in a message or conversation
+ */
+export function getOtherParticipantId(currentUserId: number, context: { senderId: number, receiverId: number }): number {
+  return context.senderId === currentUserId ? context.receiverId : context.senderId;
 }
 
 export const conversationWithUserAndMessages = {
@@ -392,6 +440,9 @@ export const conversationWithUserAndMessages = {
   createdAt: true,
   updatedAt: true,
   messages: {
+    orderBy: {
+      createdAt: 'asc' as const
+    },
     select: {
       id: true,
       senderId: true,
@@ -400,18 +451,19 @@ export const conversationWithUserAndMessages = {
       content: true,
       createdAt: true,
       updatedAt: true,
+      conversationId: true,
       sender: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
       receiver: {
         select: {
           id: true,
           username: true,
-          email: true,
+          avatar: true,
         },
       },
     },
@@ -420,14 +472,14 @@ export const conversationWithUserAndMessages = {
     select: {
       id: true,
       username: true,
-      email: true,
+      avatar: true,
     },
   },
   receiver: {
     select: {
       id: true,
       username: true,
-      email: true,
+      avatar: true,
     },
   },
   listing: {

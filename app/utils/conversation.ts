@@ -1,7 +1,38 @@
-
 interface ConversationPoV {
   name: string;
   otherUserId?: number;
+}
+
+/**
+ * Filter messages to exclude those from a specific conversation
+ */
+export const filterMessagesExcludingConversation = (messages: MessageWithUser[], conversationId: number): MessageWithUser[] => {
+  return messages.filter(msg => msg.conversationId !== conversationId);
+}
+
+/**
+ * Determine if we should notify the user about a new conversation
+ */
+export const shouldNotifyForNewConversation = (conversation: ConversationWithUserAndMessages, currentUserId: number | undefined): boolean => {
+  if (!currentUserId) return false;
+  return conversation.sender.id !== currentUserId;
+}
+
+/**
+ * Get the name of the sender of the conversation
+ */
+export const getConversationSenderName = (conversation: ConversationWithUserAndMessages): string => {
+  return conversation.sender?.username || 'Someone';
+}
+
+/**
+ * Get the latest message from a conversation
+ */
+export const getConversationLatestMessage = (conversation: ConversationWithUserAndMessages): MessageWithUser | null => {
+  if (conversation.messages && conversation.messages.length > 0) {
+    return conversation.messages[conversation.messages.length - 1] || null;
+  }
+  return null;
 }
 
 /**
@@ -20,12 +51,12 @@ export const getConversationPoV = (conversation: ConversationWithUserAndMessages
   }
   if (String(conversation.sender.id) === String(currentUserId)) {
     return {
-      name: conversation.receiver.username || conversation.receiver.email,
+      name: conversation.receiver.username || 'Unknown Participant',
       otherUserId: conversation.receiver.id
     };
   } else {
     return {
-      name: conversation.sender.username || conversation.sender.email,
+      name: conversation.sender.username || 'Unknown Participant',
       otherUserId: conversation.sender.id
     };
   }
@@ -39,11 +70,11 @@ export const getConversationPoV = (conversation: ConversationWithUserAndMessages
  * @returns 'You' if the sender is the current user, otherwise the sender's username (or email if username not available).
  */
 export const getConvoMessagePoV = (convoMessage: MessageWithUser, currentUserId: string | number | undefined): string => {
-  if (currentUserId === undefined || !convoMessage?.sender) return convoMessage?.sender?.username || convoMessage?.sender?.email || 'Unknown Sender';
+  if (currentUserId === undefined || !convoMessage?.sender) return convoMessage?.sender?.username || 'Unknown Sender';
   if (String(convoMessage.sender.id) === String(currentUserId)) {
     return 'You';
   } else {
-    return convoMessage.sender.username || convoMessage.sender.email;
+    return convoMessage.sender.username || 'Unknown Sender';
   }
 };
 
@@ -333,6 +364,38 @@ export const sortConversations = (
 };
 
 /**
+ * Filter conversations by search term
+ * Search by sender/receiver name or username, listing title, or last message content
+ * 
+ * @param conversations - Array of conversations
+ * @param searchTerm - Term to search for
+ * @returns Filtered array of conversations
+ */
+export const filterConversationsByTerm = (conversations: ConversationWithUserAndMessages[], searchTerm: string): ConversationWithUserAndMessages[] => {
+  if (!searchTerm.trim()) return conversations;
+  
+  const term = searchTerm.trim().toLowerCase();
+  return conversations.filter(c => {
+    // Search by sender/receiver name or username, listing title, or last message content
+    const senderUsername = c.sender?.username?.toLowerCase() || "";
+    const receiverUsername = c.receiver?.username?.toLowerCase() || "";
+
+    const lastMsg = c.messages && c.messages.length > 0 
+      ? c.messages[c.messages.length-1]?.content?.toLowerCase() || ""
+      : "";
+      
+    const address = c.listing?.property?.address?.fullAddress?.toLowerCase() || "";
+
+    return (
+      senderUsername.includes(term) ||
+      receiverUsername.includes(term) ||
+      lastMsg.includes(term) ||
+      address.includes(term)
+    );
+  });
+}
+
+/**
  * Get newly-added messages between two lengths and return only those that are unread and sent by other users
  *
  * @param conversation - Conversation object
@@ -364,14 +427,14 @@ export const getNewUnreadMessagesFromOthers = (
  * @returns The other user object, or a fallback object with null username
  */
 export const getConversationOtherUser = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined) => {
-  if (!currentUserId || !conversation.sender) return { username: null, email: 'Unknown User', id: undefined };
+  if (!currentUserId || !conversation.sender) return { username: 'Unknown User', id: undefined };
   
   // If current user is the sender, return the receiver
   if (String(conversation.sender.id) === String(currentUserId)) {
-    return conversation.receiver || { username: null, email: 'Unknown User', id: undefined };
+    return conversation.receiver || { username: 'Unknown User', id: undefined };
   }
   // Otherwise return the sender
-  return conversation.sender || { username: null, email: 'Unknown User', id: undefined };
+  return conversation.sender || { username: 'Unknown User', id: undefined };
 }
 
 /**
@@ -428,5 +491,102 @@ export const filterEnquiriesByRole = <T extends Record<string, any>>(
     }
     return true
   })
+}
+
+/**
+ * Handle new message event logic
+ * 
+ * @param conversations - Current list of conversations
+ * @param eventData - The incoming message event data
+ * @returns Updated array of conversations
+ */
+export const handleNewMessageInList = (
+  conversations: ConversationWithUserAndMessages[], 
+  newMessage: MessageWithUser,
+  conversationData: ConversationWithUserAndMessages | undefined
+): ConversationWithUserAndMessages[] => {
+  // Try to find the conversation
+  const index = conversations.findIndex(c => c.id === newMessage.conversationId);
+  
+  if (index !== -1) {
+    const conversation = conversations[index];
+    if (!conversation) return conversations;
+
+    // Prevent duplicate messages
+    if (conversation.messages.some(m => m.id === newMessage.id)) {
+      return conversations;
+    }
+    
+    // Create updated conversation with new message
+    const updatedConversation: ConversationWithUserAndMessages = {
+      ...conversation,
+      messages: [...conversation.messages, newMessage],
+      updatedAt: new Date()
+    };
+    
+    // Move to top
+    const newConversations = [...conversations];
+    newConversations.splice(index, 1);
+    newConversations.unshift(updatedConversation);
+    return newConversations;
+  } 
+  else if (conversationData) {
+    // If conversation is not in the list (e.g. older conversation resurfacing), add it to top
+    // Ensure the new message is in the messages list if not already
+    const messages = conversationData.messages || [];
+    const hasMessage = messages.some((m: any) => m.id === newMessage.id);
+    
+    const conversationToAdd = {
+      ...conversationData,
+      messages: hasMessage ? messages : [...messages, newMessage],
+      updatedAt: new Date() // Ensure it appears as most recent
+    };
+    
+    return [conversationToAdd, ...conversations];
+  }
+  
+  return conversations;
+}
+
+/**
+ * Handle message read receipts logic
+ * 
+ * @param conversations - Current list of conversations
+ * @param conversationId - The conversation ID
+ * @param messageId - The message ID that was read
+ * @returns Updated array of conversations, or null if no change needed
+ */
+export const handleMessageReadInList = (
+  conversations: ConversationWithUserAndMessages[], 
+  conversationId: number,
+  messageId: number
+): ConversationWithUserAndMessages[] | null => {
+  const index = conversations.findIndex(c => c.id === conversationId);
+  if (index === -1) return null;
+
+  const conversation = conversations[index];
+  if (!conversation) return null;
+
+  const messageIndex = conversation.messages.findIndex((m: MessageWithUser) => m.id === messageId);
+  
+  if (messageIndex === -1) return null;
+  
+  const message = conversation.messages[messageIndex];
+  if (!message || message.isRead) return null; // Already read or not found, no change
+  
+  // Clone structures to be immutable
+  const newConversations = [...conversations];
+  const newMessages = [...conversation.messages];
+  
+  // Update message
+  newMessages[messageIndex] = { ...message, isRead: true };
+  
+  // Update conversation
+  newConversations[index] = {
+    ...conversation,
+    messages: newMessages
+  };
+  
+  return newConversations;
 }
 

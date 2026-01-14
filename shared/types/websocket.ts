@@ -25,6 +25,7 @@ export interface NewMessageMessage extends BaseWebSocketMessage {
   type: "new_message";
   conversationId: number;
   message: MessageWithUser;
+  conversation?: ConversationWithUserAndMessages;
   to: number | number[];
 }
 

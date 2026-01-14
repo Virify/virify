@@ -6,7 +6,7 @@ import { useWebSocket } from "@vueuse/core";
  */
 export function useConversationEvents(conversationState: ReturnType<typeof useConversationState>) {
   const config = useRuntimeConfig();
-  const { allConversations, currentUserId, addConversation } = conversationState;
+  const { allConversations, currentUserId, addConversation, updateConversation } = conversationState;
 
   // WebSocket connection (only on client side)
   let wsConnection: ReturnType<typeof useWebSocket> | null = null;
@@ -27,24 +27,17 @@ export function useConversationEvents(conversationState: ReturnType<typeof useCo
      * Handle new messages in conversations
      * Updates the conversation with the new message and moves it to the top
      */
-    onNewMessage: ({ conversationId, message: newMessage }) => {
+    onNewMessage: ({ conversationId, message: newMessage, conversation: conversationData }) => {
       if (!allConversations.value || !currentUserId.value) return;
 
-      const conversation = allConversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
-      if (!conversation) return;
+      const updatedList = handleNewMessageInList(
+        allConversations.value,
+        newMessage as MessageWithUser,
+        conversationData as ConversationWithUserAndMessages | undefined
+      );
 
-      // Prevent duplicate messages
-      if (conversation.messages.some((m: any) => m.id === newMessage.id)) return;
-
-      // Add message and update conversation timestamp
-      conversation.messages.push(newMessage);
-      conversation.updatedAt = new Date();
-
-      // Move conversation to top of list
-      const index = allConversations.value.indexOf(conversation);
-      if (index > 0) {
-        allConversations.value.splice(index, 1);
-        allConversations.value.unshift(conversation);
+      if (updatedList !== allConversations.value) {
+        allConversations.value = updatedList;
       }
     },
 
@@ -77,18 +70,9 @@ export function useConversationEvents(conversationState: ReturnType<typeof useCo
     onMessageRead: ({ conversationId, messageId, from }) => {
       if (!allConversations.value) return;
 
-      const conversation = allConversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
-      if (!conversation) return;
-
-      // Find and update the message read status
-      const message = conversation.messages.find((m: any) => m.id === messageId);
-      if (message) {
-        // Only update/react if the message wasn't already marked as read
-        if (!message.isRead) {
-          message.isRead = true;
-          // Force reactivity by creating a new array reference
-          allConversations.value = [...allConversations.value];
-        }
+      const updatedList = handleMessageReadInList(allConversations.value, conversationId, messageId);
+      if (updatedList) {
+        allConversations.value = updatedList;
       }
     },
   };
@@ -113,17 +97,9 @@ export function useConversationEvents(conversationState: ReturnType<typeof useCo
     try {
       // Optimistically update the local state first for immediate UI feedback
       if (allConversations.value) {
-        const conversation = allConversations.value.find((c: ConversationWithUserAndMessages) => c.id === conversationId);
-        if (conversation) {
-          const message = conversation.messages.find((m: any) => m.id === messageId);
-          if (message) {
-            // Only perform optimistic update if message wasn't already read
-            if (!message.isRead) {
-              message.isRead = true;
-              // Force reactivity by creating a new array reference
-              allConversations.value = [...allConversations.value];
-            }
-          }
+        const updatedList = handleMessageReadInList(allConversations.value, conversationId, messageId);
+        if (updatedList) {
+          allConversations.value = updatedList;
         }
       }
 

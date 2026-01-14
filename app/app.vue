@@ -4,6 +4,8 @@
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
+      
+      <OrganismsGlobalNotificationHandler />
     </UApp>
   </ConfigProvider>
 </template>
@@ -11,6 +13,7 @@
 <script setup lang="ts">
 import { ConfigProvider } from 'reka-ui'
 const useIdFunction = () => useId()
+
 // Global head configuration
 useHead({
   meta: [
