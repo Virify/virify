@@ -18,7 +18,9 @@
             :unread-count="unreadCount" 
             @update:filtered="filteredConversations = $event" 
             :view-options="[]" 
+
           />
+          <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
       <MoleculesDashboardPasswordAlert />

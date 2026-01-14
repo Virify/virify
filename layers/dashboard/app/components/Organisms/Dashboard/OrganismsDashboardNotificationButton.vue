@@ -22,7 +22,7 @@
       <template #body>
         <OrganismsDashboardNotificationList 
           :messages="unreadMessages" 
-          @select="$emit('open-conversation', $event)" 
+          @select="openConversation($event)" 
         />
       </template>
     </USlideover>
@@ -31,10 +31,7 @@
 
 <script setup lang="ts">
 const { aggregates, unreadMessages, fetchUnreadMessages } = useNotifications();
-
-defineEmits<{
-  (e: 'open-conversation', conversationId: number): void;
-}>();
+const { openConversation } = useGlobalEnquiryModal();
 
 onMounted(() => {
   if (aggregates.value.unreadMessages > 0) {

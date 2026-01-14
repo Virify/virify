@@ -20,6 +20,7 @@
             persistence-key="dashboard-enquiries"
             @update:filtered="sortedAndFilteredConversations = $event"
           />
+          <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
       <MoleculesDashboardPasswordAlert />

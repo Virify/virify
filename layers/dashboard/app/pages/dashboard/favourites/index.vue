@@ -12,8 +12,10 @@
             persistence-key="dashboard-favourites"
             @update:filtered="filteredFavourites = $event"
           />
+          <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
+      
       <MoleculesDashboardPasswordAlert />
     </template>
 

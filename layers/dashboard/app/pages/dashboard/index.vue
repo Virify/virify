@@ -10,7 +10,7 @@
         }"
       >
         <template #right>
-          <OrganismsDashboardNotificationButton @open-conversation="openConversation" />
+          <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
       <MoleculesDashboardPasswordAlert />
@@ -115,8 +115,6 @@
           </template>
         </UAccordion>
       </ClientOnly>
-
-      <OrganismsDashboardEnquiryModal v-if="selectedConversation && user" v-model:open="isModalOpen" :conversation="selectedConversation" :user="user" />
     </template>
   </UDashboardPanel>
 </template>
@@ -133,19 +131,6 @@ definePageMeta({
 });
 
 const { user } = useUserSession();
-
-const isModalOpen = ref(false);
-const selectedConversation = ref<ConversationWithUserAndMessages | null>(null);
-
-async function openConversation(id: number) {
-  try {
-    const data = await $fetch<ConversationWithUserAndMessages>(`/api/conversation/${id}`);
-    selectedConversation.value = data;
-    isModalOpen.value = true;
-  } catch (error) {
-    console.error("Failed to fetch conversation", error);
-  }
-}
 
 // Get all recent data from useAnalytics (centralized dashboard data)
 const { recentlyViewedListings, recentFavourites, recentUserNotes, recentFavouritesStatus, recentNotesStatus, isAnalyticsLoading } = useAnalytics();
