@@ -39,6 +39,7 @@
 <script setup lang="ts">
 const { aggregates, unreadNotifications, fetchNotifications, loadMoreNotifications, notificationHasMore, notificationsLoading } = useNotifications();
 const { openConversation } = useGlobalEnquiryModal();
+const { enquiries } = useEnquiries();
 
 const props = withDefaults(defineProps<{
   color?: string;
@@ -69,10 +70,15 @@ const isOpen = computed({
 
 const hasFetchedOnce = ref(false);
 
-// Close slideover and open conversation modal
+// Open conversation modal
 function handleSelectConversation(conversationId: number) {
-  isOpen.value = false;
-  openConversation(conversationId);
+  // Try to find conversation in already-loaded enquiries first
+  const conversation = enquiries.value.find(e => e.id === conversationId);
+  
+  // Open modal with conversation object if available, otherwise just the ID
+  openConversation(conversation || conversationId);
+  
+  // Keep slideover open for convenience - user can browse multiple notifications
 }
 
 // Fetch notifications once when unread count becomes available

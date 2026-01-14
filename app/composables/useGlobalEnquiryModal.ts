@@ -10,12 +10,17 @@ export const useGlobalEnquiryModal = () => {
    */
   async function openConversation(conversation: ConversationWithMinimalListing | number) {
     if (typeof conversation === 'number') {
+      // Open modal immediately with null data (shows loading state)
+      isModalOpen.value = true;
+      modalConversation.value = null;
+      
       try {
         const data = await $fetch<ConversationWithMinimalListing>(`/api/conversation/${conversation}`);
         modalConversation.value = data;
-        isModalOpen.value = true;
       } catch (error) {
         console.error("Failed to fetch conversation", error);
+        // Close modal on error
+        isModalOpen.value = false;
       }
     } else {
       modalConversation.value = conversation;
