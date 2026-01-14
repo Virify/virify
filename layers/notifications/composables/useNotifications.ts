@@ -226,37 +226,29 @@ export function useNotifications() {
    * Dismiss a notification without marking the underlying enquiry as read
    */
   async function dismissNotification(notificationId: number) {
+    // Find the notification and calculate count decrement
+    const notification = notifications.value.find(n => n.id === notificationId);
+    const countDecrement = calculateDismissCountDecrement(notification);
+
+    // Always optimistically mark as dismissed locally
+    notifications.value = notifications.value.map(n =>
+      n.id === notificationId ? { ...n, isDismissed: true } : n
+    );
+
+    // Decrement counts (only if notification was unread)
+    const updated = decrementNotificationCounts(aggregates.value, notificationCounts.value, countDecrement);
+    aggregates.value = updated.aggregates;
+    notificationCounts.value = updated.notificationCounts;
+
+    // Try to sync with backend, but don't revert on error (local state is source of truth for dismissal)
     try {
-      // Find the notification and calculate count decrement
-      const notification = notifications.value.find(n => n.id === notificationId);
-      const countDecrement = calculateDismissCountDecrement(notification);
-
-      // Optimistically mark as dismissed locally
-      notifications.value = notifications.value.map(n =>
-        n.id === notificationId ? { ...n, isDismissed: true } : n
-      );
-
-      // Decrement counts (only if notification was unread)
-      const updated = decrementNotificationCounts(aggregates.value, notificationCounts.value, countDecrement);
-      aggregates.value = updated.aggregates;
-      notificationCounts.value = updated.notificationCounts;
-
       await requestFetch('/api/notifications/dismiss', {
         method: 'POST',
         body: { notificationId },
       });
     } catch (e) {
-      console.error('Failed to dismiss notification', e);
-      // Revert on error
-      notifications.value = notifications.value.map(n =>
-        n.id === notificationId ? { ...n, isDismissed: false } : n
-      );
-      // Revert counts (add back)
-      const notification = notifications.value.find(n => n.id === notificationId);
-      const countDecrement = calculateDismissCountDecrement(notification);
-      const reverted = decrementNotificationCounts(aggregates.value, notificationCounts.value, -countDecrement);
-      aggregates.value = reverted.aggregates;
-      notificationCounts.value = reverted.notificationCounts;
+      // Log error but keep local dismissal - backend may be out of sync or notification already dismissed
+      console.warn('Failed to sync notification dismissal with backend:', e);
     }
   }
 

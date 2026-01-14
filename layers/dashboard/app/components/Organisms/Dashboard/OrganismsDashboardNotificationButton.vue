@@ -28,7 +28,7 @@
           :notifications="unreadNotifications" 
           :hasMore="notificationHasMore"
           :loading="notificationsLoading"
-          @select="openConversation($event)" 
+          @select="handleSelectConversation($event)" 
           @loadMore="loadMoreNotifications()"
         />
       </template>
@@ -69,6 +69,12 @@ const isOpen = computed({
 
 const hasFetchedOnce = ref(false);
 
+// Close slideover and open conversation modal
+function handleSelectConversation(conversationId: number) {
+  isOpen.value = false;
+  openConversation(conversationId);
+}
+
 // Fetch notifications once when unread count becomes available
 watch(() => aggregates.value.unreadMessages, (count) => {
   if (count > 0 && !hasFetchedOnce.value) {
@@ -76,4 +82,12 @@ watch(() => aggregates.value.unreadMessages, (count) => {
     hasFetchedOnce.value = true;
   }
 }, { immediate: true });
+
+// Prefetch notifications when slideover opens if not already fetched
+watch(isOpen, (newValue) => {
+  if (newValue && !hasFetchedOnce.value && aggregates.value.unreadMessages > 0) {
+    fetchNotifications();
+    hasFetchedOnce.value = true;
+  }
+});
 </script>
