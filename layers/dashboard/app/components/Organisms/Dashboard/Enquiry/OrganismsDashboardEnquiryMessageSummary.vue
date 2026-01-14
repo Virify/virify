@@ -8,7 +8,7 @@
       />
       <div class="min-w-0 flex-1">
         <p class="text-xs font-semibold text-secondary mb-1">
-          {{ isLastMessageFromCurrentUser(enquiry, user?.id) ? 'You' : (getConversationOtherUser(enquiry, user?.id).username || formatPartnerName(getConversationOtherUser(enquiry, user?.id).email || 'Them')) }}
+          {{ isLastMessageFromCurrentUser(enquiry, user?.id) ? 'You' : (getConversationOtherUser(enquiry, user?.id).username || 'Them') }}
         </p>
         <p class="text-sm text-(--foreground-100) line-clamp-3 break-all">
           {{ getLastMessageContent(enquiry) }}
@@ -42,9 +42,11 @@
 
 <script setup lang="ts">
   import type { User } from '#auth-utils'
+  import type { ConversationWithMinimalListing } from "~~/shared/types/conversation"
+  import { getConversationOtherUser, getLastMessageContent, getUnreadCount, isLastMessageFromCurrentUser } from "~/utils/conversation"
 
   const props = defineProps<{
-    enquiry: ConversationWithUserAndMessages,
+    enquiry: ConversationWithMinimalListing,
     user: User | null,
   }>()
 

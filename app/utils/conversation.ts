@@ -13,7 +13,7 @@ export const filterMessagesExcludingConversation = (messages: MessageWithUser[],
 /**
  * Determine if we should notify the user about a new conversation
  */
-export const shouldNotifyForNewConversation = (conversation: ConversationWithUserAndMessages, currentUserId: number | undefined): boolean => {
+export const shouldNotifyForNewConversation = (conversation: ConversationWithMinimalListing, currentUserId: number | undefined): boolean => {
   if (!currentUserId) return false;
   return conversation.sender.id !== currentUserId;
 }
@@ -21,14 +21,14 @@ export const shouldNotifyForNewConversation = (conversation: ConversationWithUse
 /**
  * Get the name of the sender of the conversation
  */
-export const getConversationSenderName = (conversation: ConversationWithUserAndMessages): string => {
+export const getConversationSenderName = (conversation: ConversationWithMinimalListing): string => {
   return conversation.sender?.username || 'Someone';
 }
 
 /**
  * Get the latest message from a conversation
  */
-export const getConversationLatestMessage = (conversation: ConversationWithUserAndMessages): MessageWithUser | null => {
+export const getConversationLatestMessage = (conversation: ConversationWithMinimalListing): MessageWithUser | null => {
   if (conversation.messages && conversation.messages.length > 0) {
     return conversation.messages[conversation.messages.length - 1] || null;
   }
@@ -42,7 +42,7 @@ export const getConversationLatestMessage = (conversation: ConversationWithUserA
  * @param currentUserId - The ID of the current user.
  * @returns An object containing the name and ID of the other participant.
  */
-export const getConversationPoV = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined): ConversationPoV => {
+export const getConversationPoV = (conversation: ConversationWithMinimalListing, currentUserId: string | number | undefined): ConversationPoV => {
   if (currentUserId === undefined || !conversation?.sender || !conversation?.receiver) {
     return {
       name: conversation?.sender?.username || conversation?.receiver?.username || 'Unknown Participant',
@@ -135,18 +135,6 @@ export const formatMessageTimestamp = (createdAt?: string | Date): string => {
 };
 
 /**
- * @deprecated Use getConversationPoV or getConversationOtherUser to get structured user info.
- * Get the other user's ID in a conversation (not the current user)
- * 
- * @param conversation - The conversation object
- * @param currentUserId - The current user's ID
- * @returns The other user's ID, or null if not found
- */
-export const getOtherUserId = (conversation: ConversationWithUserAndMessages, currentUserId: number): number | null => {
-  return conversation.sender.id === currentUserId ? conversation.receiver.id : conversation.sender.id;
-};
-
-/**
  * Format a partner name from email by removing @ domain and replacing separators
  * 
  * @param name - The name or email to format
@@ -167,7 +155,7 @@ export const formatPartnerName = (name: string): string => {
  * @param conversation - The conversation object
  * @returns The last message or null if no messages
  */
-export const getLastMessage = (conversation: ConversationWithUserAndMessages): MessageWithUser | null => {
+export const getLastMessage = (conversation: ConversationWithMinimalListing): MessageWithUser | null => {
   if (conversation.messages && conversation.messages.length > 0) {
     return conversation.messages[conversation.messages.length - 1] || null;
   }
@@ -180,7 +168,7 @@ export const getLastMessage = (conversation: ConversationWithUserAndMessages): M
  * @param conversation - The conversation object
  * @returns The last message content or fallback text
  */
-export const getLastMessageContent = (conversation: ConversationWithUserAndMessages): string => {
+export const getLastMessageContent = (conversation: ConversationWithMinimalListing): string => {
   const lastMessage = getLastMessage(conversation);
   return lastMessage?.content || "No messages yet";
 };
@@ -191,7 +179,7 @@ export const getLastMessageContent = (conversation: ConversationWithUserAndMessa
  * @param conversation - The conversation object
  * @returns Formatted time string or empty string
  */
-export const getLastMessageTime = (conversation: ConversationWithUserAndMessages): string => {
+export const getLastMessageTime = (conversation: ConversationWithMinimalListing): string => {
   const lastMessage = getLastMessage(conversation);
   return lastMessage ? formatMessageTimestampToTime(lastMessage.createdAt) : "";
 };
@@ -205,10 +193,10 @@ export const getLastMessageTime = (conversation: ConversationWithUserAndMessages
  * @returns Updated conversations array
  */
 export const updateConversationInArray = (
-  conversations: ConversationWithUserAndMessages[], 
+  conversations: ConversationWithMinimalListing[], 
   conversationId: number, 
-  updatedData: Partial<ConversationWithUserAndMessages>
-): ConversationWithUserAndMessages[] => {
+  updatedData: Partial<ConversationWithMinimalListing>
+): ConversationWithMinimalListing[] => {
   const index = conversations.findIndex(c => c.id === conversationId);
   
   if (index >= 0) {
@@ -216,7 +204,7 @@ export const updateConversationInArray = (
     if (!existingConversation) return conversations;
     
     // Create a new conversation object with updates
-    const updatedConversation: ConversationWithUserAndMessages = {
+    const updatedConversation: ConversationWithMinimalListing = {
       ...existingConversation,
       ...updatedData,
       id: existingConversation.id,
@@ -248,9 +236,9 @@ export const updateConversationInArray = (
  * @returns Updated conversations array
  */
 export const addConversationToArray = (
-  conversations: ConversationWithUserAndMessages[], 
-  conversation: ConversationWithUserAndMessages
-): ConversationWithUserAndMessages[] => {
+  conversations: ConversationWithMinimalListing[], 
+  conversation: ConversationWithMinimalListing
+): ConversationWithMinimalListing[] => {
   // Check if conversation already exists
   const existingIndex = conversations.findIndex(c => c.id === conversation.id);
   
@@ -273,9 +261,9 @@ export const addConversationToArray = (
  * @returns Sorted conversations array (unread first, then by most recent activity)
  */
 export const sortConversationsByUnreadAndRecency = (
-  conversations: ConversationWithUserAndMessages[], 
+  conversations: ConversationWithMinimalListing[], 
   currentUserId?: string | number
-): ConversationWithUserAndMessages[] => {
+): ConversationWithMinimalListing[] => {
   return conversations.sort((a, b) => {
     const aHasUnread = a.messages.some(message => !message.isRead && message.senderId !== currentUserId);
     const bHasUnread = b.messages.some(message => !message.isRead && message.senderId !== currentUserId);
@@ -300,10 +288,10 @@ export const sortConversationsByUnreadAndRecency = (
  * @returns Sorted/filtered conversations array
  */
 export const sortConversations = (
-  conversations: ConversationWithUserAndMessages[], 
+  conversations: ConversationWithMinimalListing[], 
   sortBy: string, 
   userId?: number
-): ConversationWithUserAndMessages[] => {
+): ConversationWithMinimalListing[] => {
   const conversationsCopy = [...conversations];
 
   switch (sortBy) {
@@ -371,7 +359,7 @@ export const sortConversations = (
  * @param searchTerm - Term to search for
  * @returns Filtered array of conversations
  */
-export const filterConversationsByTerm = (conversations: ConversationWithUserAndMessages[], searchTerm: string): ConversationWithUserAndMessages[] => {
+export const filterConversationsByTerm = (conversations: ConversationWithMinimalListing[], searchTerm: string): ConversationWithMinimalListing[] => {
   if (!searchTerm.trim()) return conversations;
   
   const term = searchTerm.trim().toLowerCase();
@@ -405,7 +393,7 @@ export const filterConversationsByTerm = (conversations: ConversationWithUserAnd
  * @returns Array of messages that were newly added and need marking
  */
 export const getNewUnreadMessagesFromOthers = (
-  conversation: ConversationWithUserAndMessages | null | undefined,
+  conversation: ConversationWithMinimalListing | null | undefined,
   oldLen: number | undefined | null,
   newLen: number | undefined | null,
   currentUserId?: number | string | null
@@ -426,7 +414,7 @@ export const getNewUnreadMessagesFromOthers = (
  * @param currentUserId - The current user's ID
  * @returns The other user object, or a fallback object with null username
  */
-export const getConversationOtherUser = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined) => {
+export const getConversationOtherUser = (conversation: ConversationWithMinimalListing, currentUserId: string | number | undefined) => {
   if (!currentUserId || !conversation.sender) return { username: 'Unknown User', id: undefined };
   
   // If current user is the sender, return the receiver
@@ -444,7 +432,7 @@ export const getConversationOtherUser = (conversation: ConversationWithUserAndMe
  * @param currentUserId - The current user's ID
  * @returns Number of unread messages
  */
-export const getUnreadCount = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined): number => {
+export const getUnreadCount = (conversation: ConversationWithMinimalListing, currentUserId: string | number | undefined): number => {
   if (!currentUserId || !conversation.messages) return 0;
   return conversation.messages.filter(
     (message) => !message.isRead && String(message.receiverId) === String(currentUserId)
@@ -458,7 +446,7 @@ export const getUnreadCount = (conversation: ConversationWithUserAndMessages, cu
  * @param currentUserId - The current user's ID
  * @returns True if the last message was sent by the current user
  */
-export const isLastMessageFromCurrentUser = (conversation: ConversationWithUserAndMessages, currentUserId: string | number | undefined): boolean => {
+export const isLastMessageFromCurrentUser = (conversation: ConversationWithMinimalListing, currentUserId: string | number | undefined): boolean => {
   const lastMessage = getLastMessage(conversation);
   if (!lastMessage || !currentUserId) return false;
   return String(lastMessage.senderId) === String(currentUserId);
@@ -501,10 +489,10 @@ export const filterEnquiriesByRole = <T extends Record<string, any>>(
  * @returns Updated array of conversations
  */
 export const handleNewMessageInList = (
-  conversations: ConversationWithUserAndMessages[], 
+  conversations: ConversationWithMinimalListing[], 
   newMessage: MessageWithUser,
-  conversationData: ConversationWithUserAndMessages | undefined
-): ConversationWithUserAndMessages[] => {
+  conversationData: ConversationWithMinimalListing | undefined
+): ConversationWithMinimalListing[] => {
   // Try to find the conversation
   const index = conversations.findIndex(c => c.id === newMessage.conversationId);
   
@@ -518,7 +506,7 @@ export const handleNewMessageInList = (
     }
     
     // Create updated conversation with new message
-    const updatedConversation: ConversationWithUserAndMessages = {
+    const updatedConversation: ConversationWithMinimalListing = {
       ...conversation,
       messages: [...conversation.messages, newMessage],
       updatedAt: new Date()
@@ -557,10 +545,10 @@ export const handleNewMessageInList = (
  * @returns Updated array of conversations, or null if no change needed
  */
 export const handleMessageReadInList = (
-  conversations: ConversationWithUserAndMessages[], 
+  conversations: ConversationWithMinimalListing[], 
   conversationId: number,
   messageId: number
-): ConversationWithUserAndMessages[] | null => {
+): ConversationWithMinimalListing[] | null => {
   const index = conversations.findIndex(c => c.id === conversationId);
   if (index === -1) return null;
 

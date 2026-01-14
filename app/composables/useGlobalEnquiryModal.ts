@@ -1,16 +1,17 @@
+import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
 
 export const useGlobalEnquiryModal = () => {
   const isModalOpen = useState<boolean>('globalEnquiryModalOpen', () => false);
-  const modalConversation = useState<ConversationWithUserAndMessages | null>('globalEnquiryModalConversation', () => null);
+  const modalConversation = useState<ConversationWithMinimalListing | null>('globalEnquiryModalConversation', () => null);
 
   /**
    * Opens a conversation in the global modal
    * @param conversation - The conversation object or ID to open
    */
-  async function openConversation(conversation: ConversationWithUserAndMessages | number) {
+  async function openConversation(conversation: ConversationWithMinimalListing | number) {
     if (typeof conversation === 'number') {
       try {
-        const data = await $fetch<ConversationWithUserAndMessages>(`/api/conversation/${conversation}`);
+        const data = await $fetch<ConversationWithMinimalListing>(`/api/conversation/${conversation}`);
         modalConversation.value = data;
         isModalOpen.value = true;
       } catch (error) {
@@ -33,7 +34,7 @@ export const useGlobalEnquiryModal = () => {
   /**
    * Updates the modal conversation if it matches the provided conversation ID (e.g. for real-time updates)
    */
-  function syncConversationIfOpen(conversation: ConversationWithUserAndMessages) {
+  function syncConversationIfOpen(conversation: ConversationWithMinimalListing) {
     if (isModalOpen.value && modalConversation.value?.id === conversation.id) {
       modalConversation.value = conversation;
       return true;

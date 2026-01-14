@@ -25,7 +25,7 @@ const props = defineProps<{ listingId: number; receiverId: number }>();
 
 const message = ref('');
 const sending = ref(false);
-const { startConversation, hasConversation } = useConversations();
+const { startConversation, hasContactedListing } = useEnquiries();
 const { hideDialog } = useDialog();
 const toast = useToast();
 
@@ -33,7 +33,7 @@ async function onSend() {
   if (!message.value.trim()) return;
   
   // Check if conversation already exists before sending
-  if (hasConversation(props.listingId)) {
+  if (hasContactedListing(props.listingId)) {
     toast.add({ title: 'Already Contacted', description: 'You have already started a conversation for this listing.', icon: 'i-lucide-circle-x', color: 'error' });
     hideDialog();
     return;

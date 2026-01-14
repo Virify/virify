@@ -75,19 +75,19 @@
 
 <script setup lang="ts">
   import type { User } from '#auth-utils'
-  import type { ConversationWithUserAndMessages } from '~~/shared/types/conversation'
+  import type { ConversationWithMinimalListing } from '~~/shared/types/conversation'
   import { getUnreadCount } from '~/utils/conversation'
 
   // This component now takes a LIST of conversations and a LISTING directly
   const props = defineProps<{
     listing: any;
-    conversations: ConversationWithUserAndMessages[];
+    conversations: ConversationWithMinimalListing[];
     user: User | null;
   }>()
 
   defineEmits<{
-    (e: 'click', enquiry: ConversationWithUserAndMessages): void
-    (e: 'reply', enquiry: ConversationWithUserAndMessages): void
+    (e: 'click', enquiry: ConversationWithMinimalListing): void
+    (e: 'reply', enquiry: ConversationWithMinimalListing): void
   }>()
 
   const unreadConversations = computed(() => {

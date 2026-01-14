@@ -130,6 +130,81 @@ export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilitySta
 /**
  * Listing Card Select Object
  */
+/**
+ * Minimal listing fields for conversation lists
+ * Used when displaying multiple conversations - contains only essential display data
+ */
+export const listingMinimalFields = {
+  id: true,
+  price: true,
+  rentalListing: { select: { id: true } },
+  saleListing: { select: { id: true } },
+  property: {
+    select: {
+      media: {
+        select: {
+          image: true,
+        },
+        take: 1, // Only need the first image
+      },
+      address: {
+        select: {
+          fullAddress: true,
+          city: true,
+          postcode: true,
+        },
+      },
+      type: {
+        select: {
+          name: true,
+        },
+      },
+      numberBedrooms: true,
+      numberBathrooms: true,
+      numberReceptions: true,
+      numberOtherRooms: true,
+    },
+  },
+};
+
+/**
+ * Listing fields for conversation card display (enquiry list)
+ * Includes more data for rendering the listing card in conversation lists
+ */
+export const listingConversationCardFields = {
+  id: true,
+  price: true,
+  rentalListing: { select: { id: true } },
+  saleListing: { select: { id: true } },
+  property: {
+    select: {
+      media: {
+        select: {
+          image: true,
+          metadata: true,
+        },
+      },
+      address: {
+        select: {
+          fullAddress: true,
+          street: true,
+          city: true,
+          postcode: true,
+        },
+      },
+      type: {
+        select: {
+          name: true,
+        },
+      },
+      numberBedrooms: true,
+      numberBathrooms: true,
+      numberReceptions: true,
+      numberOtherRooms: true,
+    },
+  },
+};
+
 export const listingCardFields = {
   id: true,
   price: true,
@@ -206,6 +281,22 @@ export const listingCardFields = {
     },
   },
 };
+
+/**
+ * Minimal Listing Type for conversation list items
+ * Contains only essential data for displaying in conversation lists
+ */
+export type ListingMinimalType = Prisma.ListingGetPayload<{
+  select: typeof listingMinimalFields;
+}>;
+
+/**
+ * Listing Card Type for conversation cards (enquiry list)
+ * Contains more data than minimal but less than full listing card
+ */
+export type ListingConversationCardType = Prisma.ListingGetPayload<{
+  select: typeof listingConversationCardFields;
+}>;
 
 /**
  * Listing Card Type

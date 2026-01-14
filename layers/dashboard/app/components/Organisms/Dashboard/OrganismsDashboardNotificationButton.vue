@@ -9,20 +9,27 @@
       <UButton 
         icon="i-lucide-bell" 
         variant="link" 
-        @click="fetchUnreadMessages" 
+        size="md"
+        :ui="{
+          leadingIcon: 'text-' + color,
+        }"
+        @click="handleClick"
       />
       
       <template #title>
         <div class="flex items-center">
-          <UIcon name="i-lucide-bell" class="text-secondary mr-2" />
+          <UIcon name="i-lucide-bell" class="mr-2" />
           <p>Notifications</p>
         </div>
       </template>
 
       <template #body>
         <OrganismsDashboardNotificationList 
-          :messages="unreadMessages" 
+          :notifications="unreadNotifications" 
+          :hasMore="notificationHasMore"
+          :loading="notificationsLoading"
           @select="openConversation($event)" 
+          @loadMore="loadMoreNotifications()"
         />
       </template>
     </USlideover>
@@ -30,12 +37,23 @@
 </template>
 
 <script setup lang="ts">
-const { aggregates, unreadMessages, fetchUnreadMessages } = useNotifications();
+const { aggregates, unreadNotifications, fetchNotifications, loadMoreNotifications, notificationHasMore, notificationsLoading, resetNotifications } = useNotifications();
 const { openConversation } = useGlobalEnquiryModal();
+
+withDefaults(defineProps<{
+  color?: string;
+}>(), {
+  color: 'foreground',
+});
+
+function handleClick() {
+  resetNotifications();
+  fetchNotifications();
+}
 
 onMounted(() => {
   if (aggregates.value.unreadMessages > 0) {
-    fetchUnreadMessages();
+    fetchNotifications();
   }
 });
 </script>

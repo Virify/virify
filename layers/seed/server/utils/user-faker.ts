@@ -3,6 +3,7 @@ import type { Prisma } from "../../../database/server/database/prisma/generated/
 import { MembershipType } from "../../../database/server/database/prisma/generated/enums";
 import { prisma } from "../../../database/server/utils/prisma-client";
 import { generateSaleListing, generateRentalListing } from "./listing-faker";
+import { createNotification } from "../../../database/server/utils/notification";
 
 export function generateFakeUser(): Prisma.UserCreateInput {
   return {
@@ -333,6 +334,25 @@ async function seedConversations(userIds: number[]): Promise<void> {
           senderId: senderId,
           receiverId: ADMIN_ID,
         },
+        include: {
+          sender: { select: { username: true, avatar: true } },
+          listing: { 
+            select: { 
+              price: true, 
+              rentalListing: { select: { id: true } },
+              property: { 
+                select: { 
+                  address: { select: { fullAddress: true } },
+                  media: { 
+                    select: { image: true }, 
+                    take: 1,
+                    where: { image: { not: null } }
+                  }
+                } 
+              }
+            } 
+          }
+        }
       });
 
       const messageCount = faker.number.int({ min: 3, max: 8 });
@@ -355,6 +375,30 @@ async function seedConversations(userIds: number[]): Promise<void> {
       await prisma.message.createMany({
         data: messages,
       });
+
+      // Create a notification only if there's an unread message for the admin
+      const unreadToAdmin = messages.filter(m => m.receiverId === ADMIN_ID && !m.isRead);
+      if (unreadToAdmin.length > 0) {
+        const latestUnread = unreadToAdmin[unreadToAdmin.length - 1];
+        if (latestUnread) {
+          await createNotification({
+            userId: ADMIN_ID,
+            type: 'NEW_MESSAGE',
+            title: 'New Enquiry',
+            message: latestUnread.content,
+            senderUsername: conversation.sender.username,
+            senderAvatar: conversation.sender.avatar,
+            conversationId: conversation.id,
+            listingId: listing.id,
+            listingPrice: conversation.listing?.price ? Math.round(conversation.listing.price) : null,
+            listingAddress: conversation.listing?.property?.address?.fullAddress ?? null,
+            listingImage: conversation.listing?.property?.media[0]?.image ?? null,
+            listingIsRental: !!conversation.listing?.rentalListing,
+            isRead: latestUnread.isRead,
+            readAt: latestUnread.isRead ? new Date() : null,
+          });
+        }
+      }
 
       totalConversations++;
       totalMessages += messages.length;

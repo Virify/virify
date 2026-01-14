@@ -1,5 +1,5 @@
-import type { ConversationWithUserAndMessages, MessageWithUser } from "./conversation";
-import type { UserItemsAggregates } from "./notifications";
+import type { ConversationWithMinimalListing, MessageWithUser } from "./conversation";
+import type { UserItemsAggregates, UserNotification } from "./notifications";
 
 /**
  * Base WebSocket message structure
@@ -25,13 +25,13 @@ export interface NewMessageMessage extends BaseWebSocketMessage {
   type: "new_message";
   conversationId: number;
   message: MessageWithUser;
-  conversation?: ConversationWithUserAndMessages;
+  conversation?: ConversationWithMinimalListing;
   to: number | number[];
 }
 
 export interface NewConversationMessage extends BaseWebSocketMessage {
   type: "new_conversation";
-  conversation: ConversationWithUserAndMessages;
+  conversation: ConversationWithMinimalListing;
   to: number | number[];
 }
 
@@ -57,14 +57,33 @@ export interface AggregateUpdateMessage extends BaseWebSocketMessage {
 }
 
 /**
+ * Notification created message - emitted after server persists a notification
+ */
+export interface NotificationNewMessage extends BaseWebSocketMessage {
+  type: "notification_new";
+  notification: UserNotification;
+  to: number | number[];
+}
+
+/**
+ * Conversation presence message - sent from client to server
+ * Indicates whether the user is currently viewing a conversation
+ */
+export interface ConversationPresenceMessage extends BaseWebSocketMessage {
+  type: "conversation_presence";
+  conversationId: number | null;
+  open: boolean;
+}
+
+/**
  * Union type of all possible WebSocket messages
  */
-export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | ConnectionStatusMessage | AggregateUpdateMessage;
+export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | ConnectionStatusMessage | AggregateUpdateMessage | NotificationNewMessage | ConversationPresenceMessage;
 
 /**
  * Message types - determined by the 'type' field
  */
-export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "connection_status" | "aggregate_update";
+export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "connection_status" | "aggregate_update" | "notification_new" | "conversation_presence";
 
 /**
  * Handler function type for processing messages

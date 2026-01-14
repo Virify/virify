@@ -7,6 +7,7 @@ export interface WebSocketEvents {
   onTyping?: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
   onMessageRead?: (data: { conversationId: number; messageId: number; from: number }) => void;
   onAggregateUpdate?: (data: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" | "update" }) => void;
+  onNotificationNew?: (data: { notification: UserNotification }) => void;
 }
 
 /**
@@ -21,6 +22,8 @@ const globalPeers = new Map<number, Set<{ send: (data: string) => void; close: (
 export const useWebSocketServer = () => {
   // Use the global singleton peers Map
   const peers = globalPeers;
+  // Track which conversation a user is actively viewing (if any)
+  const activeConversationByUser = new Map<number, number | null>();
 
   /**
    * Adds a new WebSocket peer for a user
@@ -176,6 +179,20 @@ export const useWebSocketServer = () => {
           break;
         }
 
+        case "conversation_presence": {
+          const convId: number | null = typeof message.conversationId === 'number' ? message.conversationId : null;
+          const isOpen: boolean = !!message.open;
+          if (isOpen) {
+            activeConversationByUser.set(fromUserId, convId);
+          } else {
+            const current = activeConversationByUser.get(fromUserId) ?? null;
+            if (!convId || current === convId) {
+              activeConversationByUser.set(fromUserId, null);
+            }
+          }
+          break;
+        }
+
         default:
           console.warn("Unknown message type:", message.type);
       }
@@ -265,6 +282,16 @@ export const useWebSocketServer = () => {
           events.onAggregateUpdate?.({
             aggregateType: wsMessage.aggregateType as keyof UserItemsAggregates,
             operation: wsMessage.operation!,
+          });
+          break;
+
+        /**
+         * New notification created - emitted after server saves notification
+         * Triggers: Add to notification list, toast, badge updates
+         */
+        case "notification_new":
+          events.onNotificationNew?.({
+            notification: (wsMessage as NotificationNewMessage).notification,
           });
           break;
 
@@ -371,6 +398,18 @@ export const useWebSocketServer = () => {
     timestamp: new Date().toISOString(),
   });
 
+  /**
+   * Creates a notification_new message for WebSocket transmission
+   * @param notification - The created UserNotification record
+   * @param to - The user ID(s) to notify
+   */
+  const createNotificationNewMessage = (notification: UserNotification, to: number | number[]): NotificationNewMessage => ({
+    type: "notification_new",
+    notification,
+    to,
+    timestamp: new Date().toISOString(),
+  });
+
   return {
     addPeer,
     removePeer,
@@ -379,6 +418,8 @@ export const useWebSocketServer = () => {
     sendMessage,
     handleIncomingMessages,
     isUserOnline,
+    // Presence helper
+    isUserViewingConversation: (userId: number, conversationId: number) => activeConversationByUser.get(userId) === conversationId,
     // Type-safe message creators
     createTypingMessage,
     createMessageReadMessage,
@@ -386,6 +427,7 @@ export const useWebSocketServer = () => {
     createNewConversationMessage,
     createConnectionStatusMessage,
     createAggregateUpdateMessage,
+    createNotificationNewMessage,
     // Client-side handling
     handleOutgoingMessages,
   };

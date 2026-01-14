@@ -9,37 +9,36 @@
 
 <script setup lang="ts">
 // Watch for global notifications triggered by plugins/websockets
-const { lastNotification, activeConversationId } = useNotifications();
+const { lastNotification } = useNotifications();
+const { activeEnquiryId } = useEnquiries();
 const { isModalOpen, modalConversation, openConversation, syncConversationIfOpen } = useGlobalEnquiryModal();
 const toast = useToast();
 const { user } = useUserSession();
 
 watch(lastNotification, (notification) => {
   if (notification) {
-    const notifConvId = notification.data?.conversationId;
+    const notifConvId = notification.conversationId;
 
-    // Check if ANY modal is currently viewing this conversation
-    if (activeConversationId.value && notifConvId && activeConversationId.value === notifConvId) {
-      // If the global handler's modal is the one open, update its state
-      if (notification.data?.conversation) {
-        syncConversationIfOpen(notification.data.conversation);
-      }
-      // Suppress toast completely
+    // Suppress if this client is already viewing that conversation in ANY modal
+    if (
+      notifConvId && (
+        activeEnquiryId.value === notifConvId ||
+        (isModalOpen.value && modalConversation.value?.id === notifConvId)
+      )
+    ) {
       return;
     }
 
     toast.add({
       title: notification.title,
-      description: notification.data?.message?.content || 
-      notification.data?.conversation?.messages?.slice(-1)[0]?.content || 
-      notification.description,
+      description: notification.description,
       icon: 'i-heroicons-chat-bubble-left-right',
       color: 'secondary',
       onClick: async () => {
-        if (notification.data?.conversation) {
-          openConversation(notification.data.conversation);
+        if (notification.conversationId) {
+          await openConversation(notification.conversationId);
         } else {
-          navigateTo('/dashboard/enquiries');
+          await navigateTo('/dashboard/enquiries');
         }
       },
     });

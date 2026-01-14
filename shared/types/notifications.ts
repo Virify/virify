@@ -4,6 +4,53 @@
  */
 
 /**
+ * Notification types - matches the database model
+ */
+export type NotificationType = 
+  | 'NEW_MESSAGE'
+  | 'NEW_ENQUIRY'
+  | 'ENQUIRY_REPLY'
+  | 'LISTING_UPDATE'
+  | 'SYSTEM';
+
+/**
+ * User notification type - matches the database model
+ */
+export interface UserNotification {
+  id: number;
+  userId: number;
+  type: NotificationType;
+  title: string;
+  message: string;
+  senderUsername: string | null;
+  senderAvatar: string | null;
+  conversationId: number | null;
+  listingId: number | null;
+  messageId: number | null;
+  listingPrice: number | null;
+  listingAddress: string | null;
+  listingImage: string | null;
+  listingIsRental: boolean | null;
+  isRead: boolean;
+  isDismissed: boolean;
+  createdAt: Date;
+  readAt: Date | null;
+}
+
+/**
+ * Notification counts response from /api/notifications/counts
+ */
+export interface NotificationCounts {
+  total: number;
+  byType: Record<string, number>;
+  newMessages: number;
+  newEnquiries: number;
+  enquiryReplies: number;
+  listingUpdates: number;
+  system: number;
+}
+
+/**
  * User notification counts for real-time updates and navigation badges
  */
 export interface UserItemsAggregates {
@@ -22,45 +69,23 @@ export interface UserItemsAggregates {
 }
 
 /**
+ * Minimal data for displaying an in-app toast notification
+ * Used when a WebSocket event arrives
+ */
+export interface InAppNotificationPayload {
+  id: number;
+  title: string;
+  description: string;
+  conversationId?: number;
+  listingId?: number;
+  senderUsername?: string;
+  senderAvatar?: string;
+}
+
+/**
  * Notification types for future expansion
  */
-export interface NotificationBase {
-  id: string;
-  userId: number;
-  title: string;
-  message: string;
-  read: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Reserved for future use when implementing push notifications, email notifications, etc.
 
-/**
- * Push notification payload
- */
-export interface PushNotificationPayload {
-  title: string;
-  body: string;
-  icon?: string;
-  badge?: string;
-  data?: Record<string, any>;
-}
-
-/**
- * Email notification payload
- */
-export interface EmailNotificationPayload {
-  to: string;
-  subject: string;
-  template: string;
-  data?: Record<string, any>;
-}
-
-/**
- * In-app notification types
- */
 export type NotificationCategory = keyof UserItemsAggregates;
 
-export interface InAppNotification extends NotificationBase {
-  category: NotificationCategory;
-  actionUrl?: string;
-}

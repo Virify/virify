@@ -91,10 +91,10 @@ import { breakpointsTailwind, useBreakpoints } from "@vueuse/core";
 import type { User } from "#auth-utils";
 
 /**
- * Application Composables
+ * Composables
  */
-const { sendReply, markMessageAsRead } = useConversations();
-const { aggregates, removeUnreadMessagesForConversation, activeConversationId } = useNotifications();
+const { sendReply, markMessageAsRead, activeEnquiry } = useEnquiries();
+const { markAsRead } = useNotifications();
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const activeBreakpoints = breakpoints.active();
 
@@ -103,7 +103,7 @@ const activeBreakpoints = breakpoints.active();
  */
 const props = defineProps<{
   open: boolean;
-  conversation: ConversationWithUserAndMessages;
+  conversation: ConversationWithMinimalListing | null;
   user: User | null;
 }>();
 
@@ -117,15 +117,14 @@ const emit = defineEmits<{
 const messageContent = ref("");
 const chatContainer = ref<HTMLElement | null>(null);
 const localMessages = ref<any[]>([]);
+const processedMessageIds = new Set<number>();
+const isMarkingAsRead = ref(false);
 
 /**
  * Computed Properties
  */
 const isOpen = usePropModel(props, "open", emit);
 
-/**
- * Determines if the current viewport is mobile size
- */
 const isMobile = computed(() => {
   return !activeBreakpoints.value.includes("md") && !activeBreakpoints.value.includes("lg") && !activeBreakpoints.value.includes("xl") && !activeBreakpoints.value.includes("2xl");
 });
@@ -136,10 +135,10 @@ const otherUser = computed(() => {
 });
 
 const subTitle = computed(() => {
-  const listing = props.conversation.listing;
+  const listing = props.conversation?.listing;
   if (!listing?.property?.address) return "Address not provided";
 
-  const { street, city, postcode, fullAddress } = listing.property.address;
+  const { street, city, postcode, fullAddress } = listing.property.address as any;
   const parts = [street, city, postcode].filter(Boolean);
   const address = parts.length > 0 ? parts.join(", ") : fullAddress || "Address not provided";
 
@@ -156,7 +155,7 @@ const subTitle = computed(() => {
 });
 
 /**
- * Scrolls the chat container to the bottom
+ * Methods
  */
 function scrollToBottom() {
   nextTick(() => {
@@ -166,15 +165,10 @@ function scrollToBottom() {
   });
 }
 
-/**
- * Sends a reply message to the current conversation
- */
 async function handleSendMessage() {
   if (!messageContent.value.trim() || !props.conversation?.id) return;
 
   try {
-    // Send the message - we rely on the WebSocket event to add it to the UI
-    // This prevents duplication and ensures the server received it
     await sendReply(props.conversation.id, messageContent.value);
     messageContent.value = "";
   } catch (e) {
@@ -182,144 +176,86 @@ async function handleSendMessage() {
   }
 }
 
-/**
- * Marks all unread messages from the other user as read
- */
 async function markMessagesAsRead() {
   if (!props.conversation?.messages || !props.conversation?.id || !props.user?.id) return;
+  if (isMarkingAsRead.value) {
+    return;
+  }
 
-  // Using any for message temporarily as message types might be loose
   const unreadMessages = props.conversation.messages.filter((message: any) => !message.isRead && message.receiverId === props.user!.id);
 
   if (unreadMessages.length === 0) return;
 
-  // Optimistically decrement unreadConversations since we're marking all messages as read
-  if (aggregates.value.unreadConversations > 0) {
-    aggregates.value.unreadConversations--;
+  isMarkingAsRead.value = true;
+  try {
+    // Mark notifications for this conversation as read
+    // Pass exact count of unread messages so aggregates decrement correctly
+    await markAsRead({ conversationId: props.conversation.id, unreadMessageCount: unreadMessages.length });
+
+    // Mark individual messages as read
+    const messagesToMark = unreadMessages.filter((m: any) => !processedMessageIds.has(m.id));
+    
+    if (messagesToMark.length === 0) return;
+
+    messagesToMark.forEach((m: any) => processedMessageIds.add(m.id));
+
+    await Promise.all(
+      messagesToMark.map(async (message: any) => {
+        try {
+          await markMessageAsRead(message.id, props.conversation!.id);
+        } catch (e) {
+          console.error(`Failed to mark message ${message.id} as read`, e);
+          processedMessageIds.delete(message.id);
+        }
+      })
+    );
+  } finally {
+    isMarkingAsRead.value = false;
   }
-
-  // Remove messages from the global notification list
-  removeUnreadMessagesForConversation(props.conversation.id);
-
-  // Process all mark-as-read operations
-  // Backend will send unreadMessages decrements via WebSocket
-  // processedMessages tracks IDs we've already attempted to mark to prevent 429 loops
-  const messagesToMark = unreadMessages.filter((m: any) => !processedMessageIds.has(m.id));
-  
-  if (messagesToMark.length === 0) return;
-
-  messagesToMark.forEach((m: any) => processedMessageIds.add(m.id));
-
-  await Promise.all(
-    messagesToMark.map(async (message: any) => {
-      try {
-        await markMessageAsRead(message.id, props.conversation.id);
-      } catch (e) {
-        console.error(`Failed to mark message ${message.id} as read`, e);
-        // If failed, remove from processed so we can try again next time
-        processedMessageIds.delete(message.id);
-      }
-    })
-  );
 }
-
-const processedMessageIds = new Set<number>();
 
 /**
  * Watchers
  */
 
-// Sync global active conversation ID
+// Sync local messages with activeEnquiry from useEnquiries (WebSocket updates will flow through here)
 watch(
-  [() => props.open, () => props.conversation?.id],
-  ([isOpen, convId]) => {
-    if (isOpen && convId) {
-      activeConversationId.value = convId;
-    } else if (!isOpen && activeConversationId.value === convId) {
-        // Only clear if WE set it (it matches our ID)
-      activeConversationId.value = null;
+  () => activeEnquiry.value?.messages,
+  (newMessages) => {
+    if (newMessages && props.open) {
+      localMessages.value = [...newMessages];
+      scrollToBottom();
+      markMessagesAsRead();
     }
   },
-  { immediate: true }
-);
-
-onUnmounted(() => {
-  if (activeConversationId.value === props.conversation?.id) {
-    activeConversationId.value = null;
-  }
-});
-
-// Scroll to bottom when new messages arrive
-watch(
-  () => localMessages.value.length,
-  () => {
-    scrollToBottom();
-  }
+  { deep: true }
 );
 
 // Initialize view when modal opens
 watch(
   () => props.open,
   (newVal) => {
-    if (newVal) {
-      // Hydrate local messages from prop
-      if (props.conversation?.messages) {
-        localMessages.value = [...props.conversation.messages];
-      }
-
+    if (newVal && props.conversation?.messages) {
+      processedMessageIds.clear();
+      localMessages.value = [...props.conversation.messages];
       scrollToBottom();
-
-      // Force removal if conversation is open (state update might be slow)
-      if (props.conversation?.id) {
-        removeUnreadMessagesForConversation(props.conversation.id);
-      }
-
       markMessagesAsRead();
     }
   },
   { immediate: true }
 );
 
-// Watch for connection/prop updates
+// Watch for prop updates (in case conversation is updated externally)
 watch(
   () => props.conversation,
   (newVal) => {
-    if (newVal?.messages) {
+    if (newVal?.messages && props.open) {
+      processedMessageIds.clear();
       localMessages.value = [...newVal.messages];
       scrollToBottom();
-      // If conversation updates (new messages) while open, mark them as read
-      if (props.open) {
-        markMessagesAsRead();
-      }
+      markMessagesAsRead();
     }
   },
   { deep: true }
 );
-
-// Listen for incoming messages on this conversation
-import { useWebSocket } from "@vueuse/core";
-const config = useRuntimeConfig();
-
-const { data: wsData } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
-  autoReconnect: true,
-});
-
-watch(wsData, (newData) => {
-  try {
-    if (newData && typeof newData === "string") {
-      const parsed = JSON.parse(newData);
-      if (parsed.type === "new_message" && Number(parsed.conversationId) === Number(props.conversation?.id)) {
-        // Ensure IDs are compared as numbers to avoid type mismatch duplicates
-        // And ignore if we somehow already have it
-        const newMsgId = Number(parsed.message.id);
-        if (!localMessages.value.some((m) => Number(m.id) === newMsgId)) {
-          localMessages.value.push(parsed.message);
-          scrollToBottom();
-        }
-      }
-    }
-  } catch (e) {
-    // ignore parse errors
-  }
-});
 </script>

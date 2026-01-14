@@ -27,13 +27,13 @@
 
 <script setup lang="ts">
 import type { User } from "#auth-utils";
-import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
+import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
 import { getUnreadCount } from "~/utils/conversation";
 
 // Define input prop for the group
 interface EnquiryGroup {
   listing: any;
-  conversations: ConversationWithUserAndMessages[];
+  conversations: ConversationWithMinimalListing[];
 }
 
 const props = defineProps<{
