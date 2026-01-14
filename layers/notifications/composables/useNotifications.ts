@@ -227,10 +227,19 @@ export function useNotifications() {
    */
   async function dismissNotification(notificationId: number) {
     try {
+      // Find the notification and calculate count decrement
+      const notification = notifications.value.find(n => n.id === notificationId);
+      const countDecrement = calculateDismissCountDecrement(notification);
+
       // Optimistically mark as dismissed locally
       notifications.value = notifications.value.map(n =>
         n.id === notificationId ? { ...n, isDismissed: true } : n
       );
+
+      // Decrement counts (only if notification was unread)
+      const updated = decrementNotificationCounts(aggregates.value, notificationCounts.value, countDecrement);
+      aggregates.value = updated.aggregates;
+      notificationCounts.value = updated.notificationCounts;
 
       await requestFetch('/api/notifications/dismiss', {
         method: 'POST',
@@ -242,6 +251,12 @@ export function useNotifications() {
       notifications.value = notifications.value.map(n =>
         n.id === notificationId ? { ...n, isDismissed: false } : n
       );
+      // Revert counts (add back)
+      const notification = notifications.value.find(n => n.id === notificationId);
+      const countDecrement = calculateDismissCountDecrement(notification);
+      const reverted = decrementNotificationCounts(aggregates.value, notificationCounts.value, -countDecrement);
+      aggregates.value = reverted.aggregates;
+      notificationCounts.value = reverted.notificationCounts;
     }
   }
 

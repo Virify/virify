@@ -126,3 +126,37 @@ export function canProcessNotification(notification: UserNotification | null | u
 export function shouldShowNotificationBadge(unreadCount: number): boolean {
   return unreadCount > 0;
 }
+
+/**
+ * Calculate how much to decrement notification counts when dismissing
+ * Only decrement if the notification was unread (read notifications aren't in the count)
+ */
+export function calculateDismissCountDecrement(notification: UserNotification | undefined): number {
+  if (!notification) return 0;
+  // Only decrement if it was unread - read notifications don't contribute to the count
+  return notification.isRead ? 0 : 1;
+}
+
+/**
+ * Decrement notification counts (aggregates and counts) by specified amount
+ * Safely handles null values and prevents negative counts
+ */
+export function decrementNotificationCounts(
+  aggregates: UserItemsAggregates,
+  notificationCounts: NotificationCounts | null,
+  decrement: number
+): { aggregates: UserItemsAggregates; notificationCounts: NotificationCounts | null } {
+  if (decrement <= 0) {
+    return { aggregates, notificationCounts };
+  }
+
+  const newAggregates = aggregates.unreadMessages > 0
+    ? { ...aggregates, unreadMessages: Math.max(0, aggregates.unreadMessages - decrement) }
+    : aggregates;
+
+  const newNotificationCounts = notificationCounts && notificationCounts.total > 0
+    ? { ...notificationCounts, total: Math.max(0, notificationCounts.total - decrement) }
+    : notificationCounts;
+
+  return { aggregates: newAggregates, notificationCounts: newNotificationCounts };
+}
