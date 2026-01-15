@@ -16,6 +16,11 @@ const activeEnquiryId = computed(() => activeEnquiry.value?.id ?? null);
 // Track which listings user has already contacted (for "Contact now" button state)
 const contactedListings = ref<Set<number>>(new Set());
 const contactedListingsLoading = ref(false);
+// Track which conversations we are hydrating to avoid duplicate fetches
+const hydratingConversations = new Set<number>();
+// Simple queue to serialize listing hydration requests and avoid 429s
+const hydrationQueue: number[] = [];
+let processingHydrationQueue = false;
 
 /**
  * Streamlined enquiries composable for dashboard
@@ -123,6 +128,11 @@ export const useEnquiries = createSharedComposable(() => {
       enquiries.value = [conversation, ...enquiries.value];
       total.value += 1;
     }
+
+    // If listing details are missing but listingId is set, hydrate from API
+    if (conversation.listingId && !conversation.listing) {
+      hydrateConversationListing(conversation.id);
+    }
   }
 
   /**
@@ -158,6 +168,11 @@ export const useEnquiries = createSharedComposable(() => {
       if (isActiveConversation(conversationId, activeEnquiryId.value)) {
         activeEnquiry.value = updated;
       }
+
+      // Hydrate listing if it's missing but we have a listingId
+      if (updated.listingId && !updated.listing) {
+        hydrateConversationListing(conversationId);
+      }
     } else if (conversation) {
       // New conversation not in list - add it
       const messages = conversation.messages || [];
@@ -171,6 +186,11 @@ export const useEnquiries = createSharedComposable(() => {
 
       enquiries.value = [conversationToAdd, ...enquiries.value];
       total.value += 1;
+
+      // Hydrate listing if it's missing but we have a listingId
+      if (conversationToAdd.listingId && !conversationToAdd.listing) {
+        hydrateConversationListing(conversationToAdd.id);
+      }
     }
   }
 
@@ -250,6 +270,51 @@ export const useEnquiries = createSharedComposable(() => {
       console.error('Error marking message as read:', err);
       // Could revert optimistic update here if needed
     }
+  }
+
+  /**
+   * Hydrate a conversation's listing from the API when missing
+   * Used when WebSocket payloads omit listing details to keep payloads light
+   */
+  async function hydrateConversationListing(conversationId: number) {
+    // Avoid duplicate enqueues
+    if (hydratingConversations.has(conversationId)) return;
+    hydratingConversations.add(conversationId);
+    hydrationQueue.push(conversationId);
+    processHydrationQueue();
+  }
+
+  async function processHydrationQueue() {
+    if (processingHydrationQueue) return;
+    processingHydrationQueue = true;
+
+    while (hydrationQueue.length) {
+      const conversationId = hydrationQueue.shift();
+      if (typeof conversationId !== 'number') continue;
+
+      try {
+        // Only fetch if the conversation exists locally and lacks listing data
+        const local = enquiries.value.find(c => c.id === conversationId);
+        if (!local || !local.listingId || local.listing) continue;
+
+        const conversation = await requestFetch<ConversationWithMinimalListing>(`/api/conversation/${conversationId}`);
+        if (!conversation?.listing) continue;
+
+        // Merge the hydrated conversation, preserving local ordering
+        enquiries.value = enquiries.value.map((c) => c.id === conversationId ? conversation : c);
+
+        // Keep modal in sync if this is the active enquiry
+        if (activeEnquiry.value?.id === conversationId) {
+          activeEnquiry.value = conversation;
+        }
+      } catch (err) {
+        console.error('Error hydrating conversation listing:', err);
+      } finally {
+        hydratingConversations.delete(conversationId);
+      }
+    }
+
+    processingHydrationQueue = false;
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -350,6 +415,7 @@ export const useEnquiries = createSharedComposable(() => {
     sendReply,
     startConversation,
     markMessageAsRead,
+    hydrateConversationListing,
 
     // Utilities
     hasContactedListing,
