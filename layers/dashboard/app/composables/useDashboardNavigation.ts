@@ -28,7 +28,7 @@ export function useDashboardNavigation() {
         {
           label: "My Listings",
           type: "link",
-          to: "#",
+          to: "/dashboard/my-listings",
           icon: "i-lucide-library",
           tooltip: {
             text: "View all your listings",

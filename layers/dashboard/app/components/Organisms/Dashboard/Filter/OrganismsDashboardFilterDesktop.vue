@@ -125,7 +125,7 @@
     </div>
 
     <!-- View Toggle -->
-    <div v-if="enquiries && currentViewOptions.length > 0" class="ml-auto hidden md:flex">
+    <div v-if="currentViewOptions.length > 0" class="ml-auto hidden md:flex">
       <UTabs
         v-model="activeView"
         :items="currentViewOptions"

@@ -140,6 +140,21 @@
                 }"
               />
             </div>
+
+            <!-- View Toggle (mobile) -->
+            <div v-if="viewOptions.length > 0" class="w-full">
+              <UTabs
+                v-model="activeView"
+                :items="viewOptions"
+                :content="false"
+                color="primary"
+                size="md"
+                class="w-full"
+                :ui="{
+                  trigger: 'data-[state=active]:text-white!',
+                }"
+              />
+            </div>
           </div>
         </div>
       </Transition>
@@ -155,6 +170,7 @@
     filterState: ReturnType<typeof useDashboardListFilter>;
     allConversationsCount: number;
     unreadConversationsCount: number;
+    viewOptions?: { label: string; value: string; icon?: string; disabled?: boolean }[];
   }>();
 
   const emit = defineEmits<{
@@ -167,13 +183,23 @@
     enquiriesFilter,
     sortOrderValue,
     activeTab,
+    activeView,
     searchQuery,
     // Options
     saleRentOptions,
     directionOptions,
     sortOrder,
-    tabItems
+    tabItems,
+    viewOptions: defaultViewOptions
   } = props.filterState;
+
+  const viewOptions = computed(() => {
+    const options = props.viewOptions || defaultViewOptions;
+    return options.map(option => ({
+      ...option,
+      icon: option.icon || 'i-lucide-layout-list'
+    }));
+  });
 
   const isOpenOriginal = usePropModel(props, 'isOpen', emit);
 </script>
