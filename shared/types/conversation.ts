@@ -36,7 +36,7 @@ export type ConversationListingMinimal = {
   rentalListing: { id: number } | null;
   saleListing: { id: number } | null;
   property: {
-    media: { image: string }[];
+    media: { image: string | null }[];
     address: {
       fullAddress: string | null;
       city: string | null;
