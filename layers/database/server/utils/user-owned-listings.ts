@@ -121,9 +121,9 @@ export async function getUserOwnedListingsWithAnalytics(
     take,
     skip,
     orderBy: { updatedAt: sort === 'old' ? 'asc' : 'desc' },
-  }) as (ListingCardType & { published: boolean; publishedAt: Date | null; archived: boolean })[]\n\n  if (listings.length === 0) return { listings: [], total }
+  }) as (ListingCardType & { published: boolean; publishedAt: Date | null; archived: boolean })[]
 
-  if (listings.length === 0) return []
+  if (listings.length === 0) return { listings: [], total }
 
   const listingIds = listings.map(listing => listing.id)
 
