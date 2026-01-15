@@ -292,8 +292,98 @@ export function useDashboardNavigation() {
     },
   ]);
 
+  const listingsAccountNavigation = computed<NavigationMenuItem[]>(() => [
+   
+        {
+          label: "My Listings",
+          type: "link",
+          to: "/dashboard/my-listings",
+          icon: "i-lucide-library",
+          tooltip: {
+            text: "View all your listings",
+          },
+          badge: aggregates.value.listings ? String(aggregates.value.listings) : undefined,
+        },
+        {
+          label: "Offers",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-hand-heart",
+          tooltip: {
+            text: "Manage offers",
+          },
+        },
+        {
+          label: "Viewings",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-calendar-check",
+          tooltip: {
+            text: "Schedule viewings",
+          },
+        },
+        {
+          label: "Enquiries",
+          type: "link",
+          to: "/dashboard/enquiries",
+          icon: "i-lucide-message-circle",
+          tooltip: {
+            text: "View enquiries",
+          },
+          badge: aggregates.value.unreadConversations ? String(aggregates.value.unreadConversations) : aggregates.value.enquiries ? String(aggregates.value.enquiries) : undefined,
+        },
+        {
+          label: "Favourites",
+          type: "link",
+          to: "/dashboard/favourites",
+          icon: "i-lucide-heart",
+          tooltip: {
+            text: "Your favourite properties",
+          },
+          badge: aggregates.value.favourites ? String(aggregates.value.favourites) : undefined,
+        },
+        {
+          label: "Notes",
+          type: "link",
+          to: "/dashboard/notes",
+          icon: "i-lucide-sticky-note",
+          tooltip: {
+            text: "Your saved notes" + (aggregates.value.notes ? ` (${aggregates.value.notes})` : ""),
+          },
+          badge: aggregates.value.notes ? String(aggregates.value.notes) : undefined,
+        },
+        {
+          label: "Create Listing",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-square-plus",
+          tooltip: {
+            text: "Create a new listing",
+          },
+        },
+        {
+          label: "Draft Listings",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-file-text",
+          tooltip: {
+            text: "View draft listings",
+          },
+        },
+        {
+          label: "Viewed",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-eye",
+          tooltip: {
+            text: "Recently viewed properties",
+          },
+        },
+      ]);
+
   return {
     dashboardNavigationitems,
     accountNavigationItems,
+    listingsAccountNavigation,
   };
 }

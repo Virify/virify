@@ -24,12 +24,13 @@
     </template>
 
     <template #body>
-      <!-- Grid View -->
+      <MoleculesDashboardBreadcrumb />
+      
       <OrganismsDashboardListingCardGrid 
         ref="pageTop" 
         v-if="loading"
       >
-        <OrganismsDashboardMyListingCardSkeleton :cards="3" />
+        <OrganismsDashboardListingCardMyListingSkeleton :cards="3" />
       </OrganismsDashboardListingCardGrid>
       
       <OrganismsDashboardListingCardGrid 
@@ -37,7 +38,7 @@
         v-else-if="filteredListings.length > 0"
       >
         <div v-for="listing in filteredListings" :key="listing.id" class="h-full">
-          <OrganismsDashboardMyListingCard :listing="listing" />
+          <OrganismsDashboardListingCardMyListing :listing="listing" />
         </div>
       </OrganismsDashboardListingCardGrid>
 
@@ -66,9 +67,6 @@
 </template>
 
 <script setup lang="ts">
-import type { OwnedListingWithAnalytics } from "~~/shared/types/user-owned-listing";
-import OrganismsDashboardMyListingCardSkeleton from "../../../components/Organisms/Dashboard/ListingCard/MyListing/OrganismsDashboardMyListingCardSkeleton.vue";
-import OrganismsDashboardMyListingCard from "../../../components/Organisms/Dashboard/ListingCard/MyListing/OrganismsDashboardMyListingCard.vue";
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -80,9 +78,6 @@ definePageMeta({
 });
 
 const { listings, loading, fetchMyListings, total } = useMyListings();
-const { user } = useUserSession();
-
-const filterRef = ref();
 const pageTop = ref<HTMLElement | null>(null);
 const page = ref(1);
 const limit = ref(20);
@@ -97,27 +92,31 @@ const {
   hideListingSort: true
 });
 
+// Map sort order value to API enum
+const mapSortOrder = computed(() => {
+  if (sortOrderValue.value === 'newest') return 'new';
+  if (sortOrderValue.value === 'oldest') return 'old';
+  return 'new';
+});
+
 // Watch filter changes and re-fetch from API (reset to page 1)
-watch([saleRentFilter, sortOrderValue], async () => {
+watch([saleRentFilter, mapSortOrder], async () => {
   page.value = 1;
-  const mapSortOrder = sortOrderValue.value === 'newest' ? 'new' : sortOrderValue.value === 'oldest' ? 'old' : 'new';
-  await fetchMyListings(saleRentFilter.value as any, 1, mapSortOrder as any, limit.value);
+  await fetchMyListings(saleRentFilter.value as any, 1, mapSortOrder.value as any, limit.value);
 }, { immediate: true });
 
 // Handle page changes from pagination component
 async function onPageChange(newPage: number) {
   page.value = newPage;
-  const mapSortOrder = sortOrderValue.value === 'newest' ? 'new' : sortOrderValue.value === 'oldest' ? 'old' : 'new';
-  
-  await fetchMyListings(saleRentFilter.value as any, newPage, mapSortOrder as any, limit.value);
+  await fetchMyListings(saleRentFilter.value as any, newPage, mapSortOrder.value as any, limit.value);
 
   const el = (pageTop.value as any)?.$el ?? pageTop.value;
   const scrollContainer = el?.closest('.overflow-y-auto, .overflow-y-scroll, .overflow-auto');
   scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Filter listings by sale/rent after fetch
-watch(listings, () => {
+// Filter listings by sale/rent + search after API returns
+watch([listings, searchQuery], () => {
   let filtered = listings.value;
   
   if (saleRentFilter.value === 'sale') {

@@ -17,7 +17,7 @@
     <template #header>
       <div class="flex flex-col gap-3">
         <div class="flex flex-wrap items-center gap-2">
-          <p class="body-sm m-0">
+          <p class="body-md m-0">
             <span class="font-bold body-md">{{ formatCurrency(listing.price) }}</span>
             <span v-if="priceType" class="text-muted-foreground"> / {{ priceType }}</span>
           </p>
@@ -33,21 +33,21 @@
       <div class="flex flex-col gap-3 h-full">
         <p class="body-sm text-foreground mt-1!">{{ formattedAddress }}</p>
         <div class="flex flex-row flex-wrap gap-1">
-          <UBadge icon="i-lucide-bed-double" size="lg" color="secondary" variant="subtle">{{ listing?.property?.numberBedrooms }} bed</UBadge>
-          <UBadge icon="i-lucide-bath" size="lg" color="secondary" variant="subtle">{{ listing?.property?.numberBathrooms }} bath</UBadge>
-          <UBadge v-if="listing?.property?.outdoorSpace?.garden?.length" icon="i-lucide-fence" size="lg" color="secondary" variant="subtle">{{ listing?.property?.outdoorSpace?.garden.length }} garden</UBadge>
+          <UBadge icon="i-lucide-bed-double" size="md" color="secondary" variant="subtle">{{ listing?.property?.numberBedrooms }} bed</UBadge>
+          <UBadge icon="i-lucide-bath" size="md" color="secondary" variant="subtle">{{ listing?.property?.numberBathrooms }} bath</UBadge>
+          <UBadge v-if="listing?.property?.outdoorSpace?.garden?.length" icon="i-lucide-fence" size="md" color="secondary" variant="subtle">{{ listing?.property?.outdoorSpace?.garden.length }} garden</UBadge>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <UBadge icon="i-lucide-eye" size="lg" color="primary" variant="solid" :title="`${listing.analytics.viewsCount} views`">{{ listing.analytics.viewsCount }}</UBadge>
-          <UBadge icon="i-lucide-heart" size="lg" color="primary" variant="solid" :title="`${listing.analytics.favouritesCount} favourites`">{{ listing.analytics.favouritesCount }}</UBadge>
-          <UBadge icon="i-lucide-mail" size="lg" color="primary" variant="solid" :title="`${listing.analytics.enquiriesCount} enquiries`">{{ listing.analytics.enquiriesCount }}</UBadge>
+          <UBadge icon="i-lucide-eye" size="md" color="primary" variant="solid" :title="`${listing.analytics.viewsCount} views`">{{ listing.analytics.viewsCount }}</UBadge>
+          <UBadge icon="i-lucide-heart" size="md" color="primary" variant="solid" :title="`${listing.analytics.favouritesCount} favourites`">{{ listing.analytics.favouritesCount }}</UBadge>
+          <UBadge icon="i-lucide-mail" size="md" color="primary" variant="solid" :title="`${listing.analytics.enquiriesCount} enquiries`">{{ listing.analytics.enquiriesCount }}</UBadge>
         </div>
         <div v-if="!listing.isDraft && !listing.archived">
           <USwitch
             v-model="isPublished"
             :disabled="isUpdating"
             label="Published"
-            size="sm"
+            size="md"
             color="secondary"
             @update:model-value="handleTogglePublish"
             :ui="{
@@ -58,10 +58,10 @@
           />
         </div>
 
-        <div class="flex flex-wrap gap-2 mt-auto pt-2 text-white">
-          <UButton variant="solid" size="md" color="secondary" class="font-semibold flex-1 justify-center" icon="i-lucide-pencil" label="Edit" :to="editHref" />
-          <UButton variant="solid" size="md" color="secondary" class="font-semibold flex-1 justify-center" :to="`/listing/${listing.id}`" target="_blank" icon="i-lucide-eye" label="View" :disabled="!listing.published && !listing.isDraft" />
-          <UButton v-if="!listing.isDraft" variant="solid" size="md" color="error" class="font-semibold flex-1 justify-center cursor-pointer" :disabled="isDeleting" @click="handleDelete" icon="i-lucide-trash-2" label="Delete" />
+        <div class="flex flex-wrap gap-2 mt-auto pt-2">
+          <UButton variant="subtle" size="md" color="secondary" class="font-semibold flex-1 justify-center" icon="i-lucide-pencil" label="Edit" :to="editHref" />
+          <UButton variant="subtle" size="md" color="secondary" class="font-semibold flex-1 justify-center" :to="`/listing/${listing.id}`" target="_blank" icon="i-lucide-eye" label="View" :disabled="!listing.published && !listing.isDraft" />
+          <UButton v-if="!listing.isDraft" variant="subtle" size="md" color="error" class="font-semibold flex-1 justify-center cursor-pointer" :disabled="isDeleting" @click="handleDelete" icon="i-lucide-trash-2" label="Delete" />
         </div>
       </div>
     </template>
@@ -69,7 +69,6 @@
 </template>
 
 <script setup lang="ts">
-import type { OwnedListingWithAnalytics } from "~~/shared/types/user-owned-listing";
 
 interface Props {
   listing: OwnedListingWithAnalytics;
