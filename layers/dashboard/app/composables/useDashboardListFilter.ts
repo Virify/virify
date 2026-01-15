@@ -28,6 +28,8 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   } = {}
 ) => {
   const { dateKey = 'createdAt', userId, persistenceKey, enquiries = false, hideListingSort = false } = options
+  const route = useRoute()
+  const router = useRouter()
 
   /**
    * State
@@ -37,24 +39,65 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
   
   // Use cookies if persistenceKey is provided, otherwise use standard refs
   const sortOrderValue = persistenceKey 
-    ? useCookie<DashboardSortOrder>(`${persistenceKey}-sort`, { default: () => 'newest', maxAge: 60 * 60 * 24 * 365 })
+    ? useCookie<DashboardSortOrder>(`${persistenceKey}-sort`, { 
+        default: () => 'newest', 
+        maxAge: 60 * 60 * 24 * 365 
+      })
     : ref<DashboardSortOrder>('newest')
 
   const saleRentFilter = persistenceKey
-    ? useCookie<DashboardSaleRentFilter>(`${persistenceKey}-filter`, { default: () => 'all', maxAge: 60 * 60 * 24 * 365 })
+    ? useCookie<DashboardSaleRentFilter>(`${persistenceKey}-filter`, { 
+        default: () => 'all', 
+        maxAge: 60 * 60 * 24 * 365 
+      })
     : ref<DashboardSaleRentFilter>('all')
 
   const enquiriesFilter = persistenceKey
-    ? useCookie<DashboardEnquiriesFilter>(`${persistenceKey}-enquiries`, { default: () => 'all', maxAge: 60 * 60 * 24 * 365 })
+    ? useCookie<DashboardEnquiriesFilter>(`${persistenceKey}-enquiries`, { 
+        default: () => 'all', 
+        maxAge: 60 * 60 * 24 * 365 
+      })
     : ref<DashboardEnquiriesFilter>('all')
 
   const activeTab = persistenceKey
-    ? useCookie<DashboardConversationFilter>(`${persistenceKey}-tab`, { default: () => 'all', maxAge: 60 * 60 * 24 * 365 })
+    ? useCookie<DashboardConversationFilter>(`${persistenceKey}-tab`, { 
+        default: () => 'all', 
+        maxAge: 60 * 60 * 24 * 365 
+      })
     : ref<DashboardConversationFilter>('all')
 
   const activeView = persistenceKey
-    ? useCookie<DashboardViewType>(`${persistenceKey}-view`, { default: () => 'grid', maxAge: 60 * 60 * 24 * 365 })
+    ? useCookie<DashboardViewType>(`${persistenceKey}-view`, { 
+        default: () => 'grid', 
+        maxAge: 60 * 60 * 24 * 365 
+      })
     : ref<DashboardViewType>('grid')
+
+  /**
+   * Apply URL query parameters on mount
+   */
+  if (process.client) {
+    const sort = route.query.sort as DashboardSortOrder | undefined
+    const direction = route.query.direction as DashboardEnquiriesFilter | undefined
+    const filter = route.query.filter as DashboardConversationFilter | undefined
+    const category = route.query.category as DashboardSaleRentFilter | undefined
+    const view = route.query.view as DashboardViewType | undefined
+
+    if (sort) sortOrderValue.value = sort
+    if (direction) enquiriesFilter.value = direction
+    if (filter) activeTab.value = filter
+    if (category) saleRentFilter.value = category
+    if (view) activeView.value = view
+
+    // Watch for route changes to sync query params
+    watch(() => route.query, (newQuery) => {
+      if (newQuery.sort) sortOrderValue.value = newQuery.sort as DashboardSortOrder
+      if (newQuery.direction) enquiriesFilter.value = newQuery.direction as DashboardEnquiriesFilter
+      if (newQuery.filter) activeTab.value = newQuery.filter as DashboardConversationFilter
+      if (newQuery.category) saleRentFilter.value = newQuery.category as DashboardSaleRentFilter
+      if (newQuery.view) activeView.value = newQuery.view as DashboardViewType
+    })
+  }
 
   /**
    * Options configuration

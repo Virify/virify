@@ -1,3 +1,4 @@
+import { createSharedComposable } from "@vueuse/core";
 
 /**
  * Global state - shared across all composable instances
@@ -17,11 +18,13 @@ const aggregates = ref<UserItemsAggregates>({
   receivedUnreadEnquiries: 0
 });
 const aggregatesLoading = ref(false);
+const aggregatesFetched = ref(false);
 const aggregatesError = ref<Error | null>(null);
 
 // Notification state
 const notifications = ref<UserNotification[]>([]);
 const notificationsLoading = ref(false);
+const notificationsFetched = ref(false);
 const notificationCounts = ref<NotificationCounts | null>(null);
 const notificationPage = ref(1);
 const notificationHasMore = ref(true);
@@ -38,7 +41,7 @@ const toastedNotificationIds = new Set<number>();
  * 
  * Note: Active conversation state is now managed by useEnquiries
  */
-export function useNotifications() {
+export const useNotifications = createSharedComposable(() => {
   const { user } = useUserSession();
   const requestFetch = useRequestFetch();
 
@@ -46,7 +49,11 @@ export function useNotifications() {
    * Fetch notifications from the new notifications API
    * Much more efficient than fetching full conversations
    */
-  async function fetchNotifications(options?: { includeRead?: boolean; limit?: number; page?: number; append?: boolean }) {
+  async function fetchNotifications(options?: { includeRead?: boolean; limit?: number; page?: number; append?: boolean; force?: boolean }) {
+    // Prevent duplicate initial fetches during SSR + hydration
+    if (!options?.force && !options?.append && notificationsFetched.value) return;
+    if (notificationsLoading.value) return;
+    
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 20;
     notificationsLoading.value = true;
@@ -60,6 +67,8 @@ export function useNotifications() {
       notificationPage.value = page;
       const loaded = page * limit;
       notificationHasMore.value = loaded < total;
+      
+      if (!options?.append) notificationsFetched.value = true;
     } catch (e) {
       console.error("Failed to fetch notifications", e);
     } finally {
@@ -71,6 +80,7 @@ export function useNotifications() {
     notificationPage.value = 1;
     notificationHasMore.value = true;
     notifications.value = [];
+    notificationsFetched.value = false;
   }
 
   async function loadMoreNotifications(options?: { includeRead?: boolean; limit?: number }) {
@@ -100,7 +110,10 @@ export function useNotifications() {
   /**
    * Fetch user item aggregates from the API
    */
-  async function fetchUserItemsAggregates() {
+  async function fetchUserItemsAggregates(force = false) {
+    if (!force && aggregatesFetched.value) return;
+    if (aggregatesLoading.value) return;
+    
     aggregatesLoading.value = true;
     aggregatesError.value = null;
 
@@ -108,6 +121,7 @@ export function useNotifications() {
       const data = await requestFetch<UserItemsAggregates>("/api/notifications/aggregates");
       if (data) {
         aggregates.value = data;
+        aggregatesFetched.value = true;
       }
     } catch (err) {
       console.error("Failed to fetch user items aggregates:", err);
@@ -213,50 +227,42 @@ export function useNotifications() {
       notifications.value = markNotificationsAsReadOptimistic(notifications.value, filterType, id);
 
       // Refresh aggregates and counts in the background to sync with server
-      fetchUserItemsAggregates().catch(e => console.error("Failed to refresh aggregates", e));
+      fetchUserItemsAggregates(true).catch(e => console.error("Failed to refresh aggregates", e));
       fetchNotificationCounts().catch(e => console.error("Failed to refresh notification counts", e));
     } catch (e) {
       console.error("Failed to mark notifications as read", e);
       // On error, refresh aggregates to get correct state
-      fetchUserItemsAggregates().catch(err => console.error("Failed to refresh aggregates after error", err));
+      fetchUserItemsAggregates(true).catch(err => console.error("Failed to refresh aggregates after error", err));
     }
   }
 
   /**
    * Dismiss a notification without marking the underlying enquiry as read
+   * This ONLY updates the notificationCounts, NOT the aggregates (enquiries unread count)
+   * because dismissing a notification doesn't mean the message is read
    */
   async function dismissNotification(notificationId: number) {
+    // Find the notification and calculate count decrement
+    const notification = notifications.value.find(n => n.id === notificationId);
+    const countDecrement = calculateDismissCountDecrement(notification);
+
+    // Always optimistically mark as dismissed locally
+    notifications.value = notifications.value.map(n =>
+      n.id === notificationId ? { ...n, isDismissed: true } : n
+    );
+
+    // ONLY decrement notificationCounts, NOT aggregates (dismissing doesn't mark as read)
+    notificationCounts.value = decrementNotificationCounts(notificationCounts.value, countDecrement);
+
+    // Try to sync with backend, but don't revert on error (local state is source of truth for dismissal)
     try {
-      // Find the notification and calculate count decrement
-      const notification = notifications.value.find(n => n.id === notificationId);
-      const countDecrement = calculateDismissCountDecrement(notification);
-
-      // Optimistically mark as dismissed locally
-      notifications.value = notifications.value.map(n =>
-        n.id === notificationId ? { ...n, isDismissed: true } : n
-      );
-
-      // Decrement counts (only if notification was unread)
-      const updated = decrementNotificationCounts(aggregates.value, notificationCounts.value, countDecrement);
-      aggregates.value = updated.aggregates;
-      notificationCounts.value = updated.notificationCounts;
-
       await requestFetch('/api/notifications/dismiss', {
         method: 'POST',
         body: { notificationId },
       });
     } catch (e) {
-      console.error('Failed to dismiss notification', e);
-      // Revert on error
-      notifications.value = notifications.value.map(n =>
-        n.id === notificationId ? { ...n, isDismissed: false } : n
-      );
-      // Revert counts (add back)
-      const notification = notifications.value.find(n => n.id === notificationId);
-      const countDecrement = calculateDismissCountDecrement(notification);
-      const reverted = decrementNotificationCounts(aggregates.value, notificationCounts.value, -countDecrement);
-      aggregates.value = reverted.aggregates;
-      notificationCounts.value = reverted.notificationCounts;
+      // Log error but keep local dismissal - backend may be out of sync or notification already dismissed
+      console.warn('Failed to sync notification dismissal with backend:', e);
     }
   }
 
@@ -303,4 +309,4 @@ export function useNotifications() {
     lastNotification,
     showToast,
   };
-}
+});

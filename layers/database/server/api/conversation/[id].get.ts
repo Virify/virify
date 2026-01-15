@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // Fetch the conversation ensuring the user is a participant
-  const conversation = await findConversationForUser(conversationId, user.id);
+  // Use getConversationById which uses minimal listing data (1 image, no metadata)
+  const conversation = await getConversationById(conversationId, user.id);
 
   if (!conversation) {
     throw createError({ statusCode: 404, statusMessage: "Conversation not found" });

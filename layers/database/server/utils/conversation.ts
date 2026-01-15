@@ -290,7 +290,7 @@ export async function getConversationById(conversationId: number, userId: number
       OR: [{ senderId: userId }, { receiverId: userId }],
     },
     select: {
-      ...conversationWithListingCard,
+      ...conversationWithMinimalListing,
     },
   });
 
@@ -541,6 +541,7 @@ const conversationListingCardSelect = {
           image: true,
           metadata: true,
         },
+        take: 1,
       },
       address: {
         select: {

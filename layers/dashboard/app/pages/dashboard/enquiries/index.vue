@@ -109,9 +109,19 @@ watch(
       sort: sortOrder.value as any,
       limit: limit.value,
     });
-  },
-  { immediate: true }
+  }
 );
+
+// Initial fetch on component mount (not in watch immediate)
+onMounted(async () => {
+  await fetchEnquiries({
+    filter: enquiryFilter.value as any,
+    direction: directionFilter.value as any,
+    page: 1,
+    sort: sortOrder.value as any,
+    limit: limit.value,
+  })
+});
 
 // Handle page changes from pagination component
 async function onPageChange(newPage: number) {

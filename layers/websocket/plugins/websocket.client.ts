@@ -32,7 +32,7 @@ export default defineNuxtPlugin(() => {
   });
 
   if (import.meta.client) {
-    const { handleAggregateUpdate, showToast, addNotification } = useNotifications();
+    const { handleAggregateUpdate, showToast, addNotification, fetchUserItemsAggregates, aggregatesLoading, fetchNotificationCounts } = useNotifications();
     const { handleNewConversation, handleNewMessage, handleMessageRead, activeEnquiryId, enquiries } = useEnquiries();
     const { syncConversationIfOpen, isModalOpen, modalConversation } = useGlobalEnquiryModal();
     const wsComposable = useWebSocketServer();
@@ -78,6 +78,17 @@ export default defineNuxtPlugin(() => {
           to: 0, 
           timestamp: new Date().toISOString() 
         });
+        handleAggregateUpdate({ 
+          type: "aggregate_update", 
+          aggregateType: "unreadConversations", 
+          operation: "add", 
+          to: 0, 
+          timestamp: new Date().toISOString() 
+        });
+
+        // Update notification counts so notification panel badge updates immediately
+        // Trust optimistic local updates for enquiries badge
+        fetchNotificationCounts().catch(e => console.error("Failed to fetch notification counts", e));
       },
       
       /**
@@ -89,6 +100,7 @@ export default defineNuxtPlugin(() => {
       onNewMessage: ({ conversationId, message, conversation }) => {
         const msg = message as MessageWithUser;
         const conv = conversation as ConversationWithMinimalListing | undefined;
+        const isFromCurrentUser = msg.senderId === user.value?.id;
         
         // Update enquiries state
         handleNewMessage(conversationId, msg, conv);
@@ -99,14 +111,27 @@ export default defineNuxtPlugin(() => {
           syncConversationIfOpen(updatedConv);
         }
         
-        // Update aggregates
-        handleAggregateUpdate({ 
-          type: "aggregate_update", 
-          aggregateType: "unreadMessages", 
-          operation: "add", 
-          to: 0, 
-          timestamp: new Date().toISOString() 
-        });
+        // Only adjust unread counts if message is from someone else
+        if (!isFromCurrentUser) {
+          handleAggregateUpdate({ 
+            type: "aggregate_update", 
+            aggregateType: "unreadMessages", 
+            operation: "add", 
+            to: 0, 
+            timestamp: new Date().toISOString() 
+          });
+          handleAggregateUpdate({ 
+            type: "aggregate_update", 
+            aggregateType: "unreadConversations", 
+            operation: "add", 
+            to: 0, 
+            timestamp: new Date().toISOString() 
+          });
+
+          // Update notification counts so notification panel badge displays immediately
+          // Don't refetch aggregates - trust the optimistic local update to avoid flicker
+          fetchNotificationCounts().catch(e => console.error("Failed to fetch notification counts", e));
+        }
       },
 
       /**

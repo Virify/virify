@@ -28,7 +28,7 @@
           :notifications="unreadNotifications" 
           :hasMore="notificationHasMore"
           :loading="notificationsLoading"
-          @select="openConversation($event)" 
+          @select="handleSelectConversation($event)" 
           @loadMore="loadMoreNotifications()"
         />
       </template>
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 const { aggregates, unreadNotifications, fetchNotifications, loadMoreNotifications, notificationHasMore, notificationsLoading } = useNotifications();
 const { openConversation } = useGlobalEnquiryModal();
+const { enquiries } = useEnquiries();
 
 const props = withDefaults(defineProps<{
   color?: string;
@@ -69,11 +70,31 @@ const isOpen = computed({
 
 const hasFetchedOnce = ref(false);
 
-// Fetch notifications once when unread count becomes available
-watch(() => aggregates.value.unreadMessages, (count) => {
-  if (count > 0 && !hasFetchedOnce.value) {
-    fetchNotifications();
-    hasFetchedOnce.value = true;
-  }
-}, { immediate: true });
+// Open conversation modal
+function handleSelectConversation(conversationId: number) {
+  // Try to find conversation in already-loaded enquiries first
+  const conversation = enquiries.value.find(e => e.id === conversationId);
+  
+  // Open modal with conversation object if available, otherwise just the ID
+  openConversation(conversation || conversationId);
+  
+  // Keep slideover open for convenience - user can browse multiple notifications
+}
+
+// Fetch notifications when unread count becomes available OR slideover opens (whichever comes first)
+const shouldFetchNotifications = computed(() => {
+  const hasUnread = aggregates.value.unreadMessages > 0;
+  const isSlideoverOpen = isOpen.value;
+  return (hasUnread || isSlideoverOpen) && !hasFetchedOnce.value;
+});
+
+// Only watch on client to prevent SSR hydration issues
+if (import.meta.client) {
+  watch(shouldFetchNotifications, (shouldFetch) => {
+    if (shouldFetch) {
+      fetchNotifications();
+      hasFetchedOnce.value = true;
+    }
+  }, { immediate: true });
+}
 </script>
