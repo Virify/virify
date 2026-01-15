@@ -32,7 +32,7 @@ export default defineNuxtPlugin(() => {
   });
 
   if (import.meta.client) {
-    const { handleAggregateUpdate, showToast, addNotification } = useNotifications();
+    const { handleAggregateUpdate, showToast, addNotification, fetchUserItemsAggregates } = useNotifications();
     const { handleNewConversation, handleNewMessage, handleMessageRead, activeEnquiryId, enquiries } = useEnquiries();
     const { syncConversationIfOpen, isModalOpen, modalConversation } = useGlobalEnquiryModal();
     const wsComposable = useWebSocketServer();
@@ -99,7 +99,7 @@ export default defineNuxtPlugin(() => {
           syncConversationIfOpen(updatedConv);
         }
         
-        // Update aggregates
+        // Update aggregates - fetch from server to get accurate unreadConversations count
         handleAggregateUpdate({ 
           type: "aggregate_update", 
           aggregateType: "unreadMessages", 
@@ -107,6 +107,9 @@ export default defineNuxtPlugin(() => {
           to: 0, 
           timestamp: new Date().toISOString() 
         });
+        
+        // Re-fetch aggregates to update unreadConversations count accurately
+        fetchUserItemsAggregates(true);
       },
 
       /**

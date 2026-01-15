@@ -81,19 +81,20 @@ function handleSelectConversation(conversationId: number) {
   // Keep slideover open for convenience - user can browse multiple notifications
 }
 
-// Fetch notifications once when unread count becomes available
-watch(() => aggregates.value.unreadMessages, (count) => {
-  if (count > 0 && !hasFetchedOnce.value) {
-    fetchNotifications();
-    hasFetchedOnce.value = true;
-  }
-}, { immediate: true });
-
-// Prefetch notifications when slideover opens if not already fetched
-watch(isOpen, (newValue) => {
-  if (newValue && !hasFetchedOnce.value && aggregates.value.unreadMessages > 0) {
-    fetchNotifications();
-    hasFetchedOnce.value = true;
-  }
+// Fetch notifications when unread count becomes available OR slideover opens (whichever comes first)
+const shouldFetchNotifications = computed(() => {
+  const hasUnread = aggregates.value.unreadMessages > 0;
+  const isSlideoverOpen = isOpen.value;
+  return (hasUnread || isSlideoverOpen) && !hasFetchedOnce.value;
 });
+
+// Only watch on client to prevent SSR hydration issues
+if (import.meta.client) {
+  watch(shouldFetchNotifications, (shouldFetch) => {
+    if (shouldFetch) {
+      fetchNotifications();
+      hasFetchedOnce.value = true;
+    }
+  }, { immediate: true });
+}
 </script>

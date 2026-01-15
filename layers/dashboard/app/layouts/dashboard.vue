@@ -10,7 +10,13 @@
   const { fetchUserItemsAggregates, fetchNotifications, fetchNotificationCounts } = useNotifications()
   const { groups } = useDashboardSearch()
 
+  const hasFetched = ref(false)
+
   onMounted(async () => {
+    // Only fetch once per layout instance to prevent duplicate requests on page navigation
+    if (hasFetched.value) return
+    hasFetched.value = true
+
     // Fetch aggregates (badge counts) immediately
     await fetchUserItemsAggregates()
     

@@ -1,3 +1,4 @@
+import { createSharedComposable } from "@vueuse/core";
 
 /**
  * Global state - shared across all composable instances
@@ -30,7 +31,7 @@ const contactedListingsLoading = ref(false);
  * - Enquiry modal (OrganismsDashboardEnquiryModal.vue)
  * - ViewsDialogConversation.vue (for starting new conversations)
  */
-export function useEnquiries() {
+export const useEnquiries = createSharedComposable(() => {
   const { loggedIn, user } = useUserSession();
   const requestFetch = useRequestFetch();
 
@@ -98,13 +99,13 @@ export function useEnquiries() {
 
   // Auto-hydrate on login (client only)
   if (import.meta.client) {
-    watchEffect(() => {
-      if (loggedIn.value) {
-        hydrateContactedListings();
+    watch(() => loggedIn.value, (isLoggedIn) => {
+      if (isLoggedIn) {
+        hydrateContactedListings()
       } else {
-        contactedListings.value = new Set();
+        contactedListings.value = new Set()
       }
-    });
+    }, { immediate: true })
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -186,6 +187,10 @@ export function useEnquiries() {
     if (activeEnquiry.value?.id === conversationId) {
       activeEnquiry.value = updated;
     }
+
+    // Re-fetch aggregates to update unreadConversations count
+    const { fetchUserItemsAggregates } = useNotifications();
+    fetchUserItemsAggregates(true);
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -354,4 +359,4 @@ export function useEnquiries() {
     totalUnreadCount,
     contactedListingsLoading: readonly(contactedListingsLoading),
   };
-}
+});
