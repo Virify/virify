@@ -14,8 +14,11 @@ export const useGlobalEnquiryModal = () => {
       isModalOpen.value = true;
       modalConversation.value = null;
       
+      // Allow modal to render before fetching
+      await nextTick();
+      
       try {
-        const data = await $fetch<ConversationWithMinimalListing>(`/api/conversation/${conversation}`);
+        const data = await useRequestFetch()<ConversationWithMinimalListing>(`/api/conversation/${conversation}`);
         modalConversation.value = data;
       } catch (error) {
         console.error("Failed to fetch conversation", error);

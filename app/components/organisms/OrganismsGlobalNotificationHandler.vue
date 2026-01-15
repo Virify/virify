@@ -1,6 +1,6 @@
 <template>
-  <OrganismsDashboardEnquiryModal 
-    v-if="modalConversation && user" 
+  <LazyOrganismsDashboardEnquiryModal 
+    v-if="isModalOpen && user" 
     v-model:open="isModalOpen" 
     :conversation="modalConversation" 
     :user="user" 

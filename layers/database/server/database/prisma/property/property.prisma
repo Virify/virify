@@ -46,7 +46,11 @@ model Property {
   propertyClassificationId Int
   DraftListing             DraftListing[]
 
-  @@index(addressId)
+  @@index([addressId])
+  @@index([userId])
+  @@index([estateAgentId])
+  @@index([propertyTypeId])
+  @@index([propertyClassificationId])
 }
 
 enum ConstructionType {

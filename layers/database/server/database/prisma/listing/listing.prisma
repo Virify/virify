@@ -30,6 +30,7 @@ model Listing {
 
   @@index([userId])
   @@index([propertyId])
+  @@index([estateAgentId])
   @@index([price])
   @@index([publishedAt])
 }

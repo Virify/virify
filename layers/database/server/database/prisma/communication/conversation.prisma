@@ -14,4 +14,7 @@ model Conversation {
   @@index([receiverId])
   @@index([listingId])
   @@index([createdAt])
+  // Composite index for user conversation lookups (findFirst with OR clause)
+  @@index([id, senderId])
+  @@index([id, receiverId])
 }
