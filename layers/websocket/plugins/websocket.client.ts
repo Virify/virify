@@ -86,8 +86,9 @@ export default defineNuxtPlugin(() => {
           timestamp: new Date().toISOString() 
         });
 
-        // Pull fresh aggregates so unreadConversations badge reflects the new thread
-        if (!aggregatesLoading.value) fetchUserItemsAggregates(true);
+        // Update notification counts so notification panel badge updates immediately
+        // Trust optimistic local updates for enquiries badge
+        fetchNotificationCounts().catch(e => console.error("Failed to fetch notification counts", e));
       },
       
       /**

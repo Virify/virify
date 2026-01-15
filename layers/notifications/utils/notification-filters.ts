@@ -141,22 +141,24 @@ export function calculateDismissCountDecrement(notification: UserNotification | 
  * Decrement notification counts (aggregates and counts) by specified amount
  * Safely handles null values and prevents negative counts
  */
+/**
+ * Decrement only notification counts (for dismissing notifications)
+ * Does NOT decrement aggregates - dismissing a notification doesn't mark messages as read
+ */
 export function decrementNotificationCounts(
-  aggregates: UserItemsAggregates,
   notificationCounts: NotificationCounts | null,
   decrement: number
-): { aggregates: UserItemsAggregates; notificationCounts: NotificationCounts | null } {
+): NotificationCounts | null {
   if (decrement <= 0) {
-    return { aggregates, notificationCounts };
+    return notificationCounts;
   }
 
-  const newAggregates = aggregates.unreadMessages > 0
-    ? { ...aggregates, unreadMessages: Math.max(0, aggregates.unreadMessages - decrement) }
-    : aggregates;
+  if (!notificationCounts || notificationCounts.total <= 0) {
+    return notificationCounts;
+  }
 
-  const newNotificationCounts = notificationCounts && notificationCounts.total > 0
-    ? { ...notificationCounts, total: Math.max(0, notificationCounts.total - decrement) }
-    : notificationCounts;
-
-  return { aggregates: newAggregates, notificationCounts: newNotificationCounts };
+  return {
+    ...notificationCounts,
+    total: Math.max(0, notificationCounts.total - decrement)
+  };
 }

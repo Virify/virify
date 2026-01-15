@@ -238,6 +238,8 @@ export const useNotifications = createSharedComposable(() => {
 
   /**
    * Dismiss a notification without marking the underlying enquiry as read
+   * This ONLY updates the notificationCounts, NOT the aggregates (enquiries unread count)
+   * because dismissing a notification doesn't mean the message is read
    */
   async function dismissNotification(notificationId: number) {
     // Find the notification and calculate count decrement
@@ -249,10 +251,8 @@ export const useNotifications = createSharedComposable(() => {
       n.id === notificationId ? { ...n, isDismissed: true } : n
     );
 
-    // Decrement counts (only if notification was unread)
-    const updated = decrementNotificationCounts(aggregates.value, notificationCounts.value, countDecrement);
-    aggregates.value = updated.aggregates;
-    notificationCounts.value = updated.notificationCounts;
+    // ONLY decrement notificationCounts, NOT aggregates (dismissing doesn't mark as read)
+    notificationCounts.value = decrementNotificationCounts(notificationCounts.value, countDecrement);
 
     // Try to sync with backend, but don't revert on error (local state is source of truth for dismissal)
     try {
