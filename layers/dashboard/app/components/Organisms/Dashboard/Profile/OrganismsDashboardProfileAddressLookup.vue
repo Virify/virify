@@ -1,5 +1,5 @@
 <template>
-  <UFormField label="Address" name="address" required orientation="horizontal" description="This will not be publicly displayed" :error="addressError" help="Enter your postcode">
+  <UFormField label="Address" name="address" required orientation="horizontal" description="This will not be publicly displayed" :error="addressError" help="Enter your postcode" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
     <template #error="{ error }">
       <p>{{ error }}</p>
     </template>

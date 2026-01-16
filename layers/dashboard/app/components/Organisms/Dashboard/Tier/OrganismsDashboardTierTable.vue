@@ -54,21 +54,23 @@
 
     <!-- Buttons -->
     <template #basic-button="{ tier }">
-      <UButton @click="$emit('create-listing')" :label="tier.button.label" block class="body-sm cursor-pointer text-center" color="neutral" variant="outline" />
+      <UButton @click="$emit('create-listing', 'BASIC')" :label="tier.button.label" block class="body-sm cursor-pointer text-center" color="neutral" variant="outline" />
     </template>
 
     <template #premium-button="{ tier }">
-      <UButton @click="$emit('create-listing')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" />
+      <UButton @click="$emit('create-listing', 'PREMIUM')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" />
     </template>
     
     <template #professional-button="{ tier }">
-      <UButton @click="$emit('create-listing')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" color="secondary" variant="solid" />
+      <UButton @click="$emit('create-listing', 'FEATURED')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" color="secondary" variant="solid" />
     </template>
   </UPricingTable>
 </template>
 
 <script setup lang="ts">
+import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
+
 defineEmits<{
-  'create-listing': []
+  'create-listing': [tier: ListingTier]
 }>();
 </script>

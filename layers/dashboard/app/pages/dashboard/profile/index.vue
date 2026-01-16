@@ -25,7 +25,7 @@
           <OrganismsDashboardAccountHeroCard title="Setup your profile" description="Create your profile information to fully act" label="Save Changes" />
 
           <AtomsDashboardForm>
-            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="">
+            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <template #error="{ error }">
                 <p>{{ error }}</p>
               </template>
@@ -47,7 +47,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Your family name">
+            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Your family name" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 v-model="state.lastName"
                 variant="subtle"
@@ -66,7 +66,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Username" name="username" required orientation="horizontal" description="Your public username">
+            <UFormField label="Username" name="username" required orientation="horizontal" description="Your public username" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 v-model="state.username"
                 type="text"
@@ -89,7 +89,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Phone Number" name="phoneNumber" orientation="horizontal" description="Your contact phone number">
+            <UFormField label="Phone Number" name="phoneNumber" orientation="horizontal" description="Your contact phone number" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 v-model="state.phoneNumber"
                 type="tel"
@@ -108,7 +108,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Avatar" name="avatar" orientation="horizontal" description="URL to your profile picture">
+            <UFormField label="Avatar" name="avatar" orientation="horizontal" description="URL to your profile picture" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 v-model="state.avatar"
                 type="url"
@@ -130,7 +130,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Bio" name="bio" orientation="horizontal" description="A short description of yourself">
+            <UFormField label="Bio" name="bio" orientation="horizontal" description="A short description of yourself" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UTextarea
                 v-model="state.bio"
                 type="text"
@@ -147,7 +147,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Your Intent" name="intents" description="Please enter your site interests and intent" help="You can select multiple" orientation="horizontal">
+            <UFormField label="Your Intent" name="intents" description="Please enter your site interests and intent" help="You can select multiple" orientation="horizontal" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <USelect
                 v-model="state.intents"
                 :items="intents"
@@ -164,7 +164,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Interests" name="interests" description="Please enter your personal interests" help="Remove tags by clicking the 'x' on each" orientation="horizontal">
+            <UFormField label="Interests" name="interests" description="Please enter your personal interests" help="Remove tags by clicking the 'x' on each" orientation="horizontal" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInputTags
                 v-model="state.interests"
                 variant="subtle"

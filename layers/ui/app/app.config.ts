@@ -102,9 +102,9 @@ export default defineAppConfig({
       slots: {
         label: 'body-sm text-(--foreground-100)',
         description: 'body-xs text-(--foreground-200)/60',
-        root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0',
-        error: 'w-full md:w-80 body-xs',
-        help: 'body-xs text-(--foreground-200)/60 self-center mt-1',
+        root: 'flex flex-col gap-1.5',
+        error: 'w-full body-xs',
+        help: 'body-xs text-(--foreground-200)/60 mt-1',
       }
     },
   },
