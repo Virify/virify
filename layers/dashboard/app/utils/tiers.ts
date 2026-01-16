@@ -73,8 +73,8 @@ export const tableSections = ref([
         title: 'Maximum photos',
         tiers: {
           basic: '5',
-          premium: '20',
-          professional: 'Unlimited'
+          premium: '50',
+          professional: '20'
         }
       },
       {
@@ -89,8 +89,8 @@ export const tableSections = ref([
         title: 'Virtual tour',
         tiers: {
           basic: false,
-          premium: false,
-          professional: true
+          premium: true,
+          professional: false
         }
       }
     ]
@@ -118,8 +118,8 @@ export const tableSections = ref([
         title: 'Premium placement',
         tiers: {
           basic: false,
-          premium: false,
-          professional: true
+          premium: true,
+          professional: false
         }
       }
     ]
@@ -147,8 +147,8 @@ export const tableSections = ref([
         title: 'Advanced analytics',
         tiers: {
           basic: false,
-          premium: false,
-          professional: true
+          premium: true,
+          professional: false
         }
       }
     ]
