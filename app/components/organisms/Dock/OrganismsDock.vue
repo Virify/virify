@@ -10,10 +10,10 @@
         </AtomsButton>
 
         <template v-if="popover">
-          <component :is="popover.component" />
+          <component class="o-dock__popover-content" :is="popover.component" />
 
-          <OrganismsDockViewsFooter :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
-            @close-popover="hidePopover" />
+          <OrganismsDockViewsFooter class="o-dock__popover-content" :popover-id="popoverId"
+            :currently-open="popover?.type" @open-popover="showPopover" @close-popover="hidePopover" />
         </template>
       </div>
     </div>
@@ -163,22 +163,32 @@ onMounted(() => {
   &__popover {
     position: relative;
     max-height: calc(100dvh - var(--size-24));
-    padding: var(--size-16);
-    padding-top: var(--size-48);
     margin: 0;
     z-index: 10;
     overflow: auto;
     scrollbar-width: thin;
+    scrollbar-color: var(--monochrome-400) transparent;
     pointer-events: all;
     overscroll-behavior: contain;
 
     @include mq.tablet {
       max-height: calc(100dvh - var(--size-32) - #{ $dock-height });
-      padding: var(--size-32);
     }
 
     @include mq.notebook {
       max-height: calc(100dvh - var(--size-48) - #{ $dock-height });
+    }
+  }
+
+  &__popover-content {
+    padding: var(--size-16);
+
+    &:first-of-type {
+      padding-top: var(--size-48);
+    }
+
+    @include mq.tablet {
+      padding: var(--size-32);
     }
   }
 

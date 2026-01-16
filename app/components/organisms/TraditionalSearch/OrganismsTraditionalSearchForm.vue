@@ -42,6 +42,8 @@
         </p>
       </AtomsCollapsibleTip>
     </div>
+
+    <OrganismsTraditionalSearchToolbar class="o-traditional-search-form__toolbar" />
   </div>
 </template>
 
@@ -141,6 +143,11 @@ const additionalFeatures = [
 
   &__tip {
     margin: var(--size-24) 0 0;
+  }
+
+  &__toolbar {
+    position: sticky;
+    bottom: 0;
   }
 }
 </style>

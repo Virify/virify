@@ -46,11 +46,11 @@
 .button {
   &-secondary {
     background: var(--secondary-400);
-    color: var(--background-100);
+    color: var(--monochrome-900);
 
     &:hover {
       background: var(--secondary-300);
-      color: var(--background-100);
+      color: var(--monochrome-900);
     }
   }
 
@@ -145,7 +145,7 @@
   &-r-sm {
     font-size: var(--font-sm);
     padding: var(--size-10) var(--size-16);
-    
+
     @include mq.mobile-only {
       font-size: var(--font-xs);
       padding: var(--size-6) var(--size-10);
