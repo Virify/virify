@@ -17,7 +17,7 @@
             <OrganismsFilterSwitcher>
               <template v-slot:traditional>
                 <!-- @TODO put in a nicer skeleton loader here -->
-                <template v-if="isTraditionalLoading">
+                <template v-if="isTraditionalFormLoading">
                   <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
                     <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
                   </div>
@@ -28,7 +28,7 @@
                 </template>
                 <!-- @TODO end -->
 
-                <LazyOrganismsTraditionalSearchForm hydrate-on-visible @hydrated="hideTraditionalLoader"
+                <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
                   class="o-dock-banner__toggle-content" />
               </template>
 
@@ -65,12 +65,11 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  *  Manage lazy hydration
  */
-const isTraditionalLoading = ref(true)
+const isTraditionalFormLoading = ref(true)
 
-function hideTraditionalLoader() {
-  isTraditionalLoading.value = false
+function hideTraditionalFormLoader() {
+  isTraditionalFormLoading.value = false
 }
-
 
 /**
  *  Animate dock to final position

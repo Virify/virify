@@ -46,7 +46,15 @@
 </template>
 
 <script setup lang="ts">
+const emits = defineEmits(['is-loaded'])
 
+onBeforeMount(() => {
+  emits('is-loaded', true)
+})
+
+/**
+ *  Data
+ */
 const bedroomMin = [
   { key: 0, value: 'Any', selected: true },
   { key: 0.5, value: 'Studio' },
