@@ -7,12 +7,13 @@
         class=" m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--left | skeleton">
         <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
       </span>
+
       <span aria-hidden
         class="m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--right | skeleton">
         <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
       </span>
 
-      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+      <div class="m-range-slider__skeleton-slider"></div>
     </div>
 
     <template v-else>
@@ -97,13 +98,8 @@ const selectedRange = defineModel<[number, number]>({
     min-height: 7.35rem;
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
-
-    .a-icon {
-      width: var(--size-32);
-      height: var(--size-32);
-    }
   }
 
   &__skeleton-loader-input {
@@ -116,7 +112,6 @@ const selectedRange = defineModel<[number, number]>({
     height: var(--input-text-height);
     background: transparent;
     border-radius: var(--border-radius-ui);
-    color: var(--monochrome-900);
     border: 2px dashed fn.faded-color(15%);
     box-sizing: border-box;
 
@@ -131,6 +126,35 @@ const selectedRange = defineModel<[number, number]>({
     }
 
     &--right {
+      right: 0;
+    }
+  }
+
+  &__skeleton-slider {
+    position: relative;
+    width: 100%;
+    height: var(--size-6);
+    border-radius: var(--border-radius-ui);
+    margin: var(--size-14) 0;
+    background: var(--blue-500);
+
+    &::before,
+    &::after {
+      content: '';
+      display: block;
+      width: var(--size-32);
+      height: var(--size-32);
+      position: absolute;
+      top: calc(50% - var(--size-16));
+      border-radius: var(--border-radius-pill);
+      background: var(--blue-500);
+    }
+
+    &::before {
+      left: 0;
+    }
+
+    &::after {
       right: 0;
     }
   }
