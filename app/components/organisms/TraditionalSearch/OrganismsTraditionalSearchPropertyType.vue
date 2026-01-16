@@ -126,6 +126,8 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/functions' as fn;
+
 .o-property-types {
   container-type: inline-size;
 
@@ -199,9 +201,12 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     box-sizing: border-box;
     overflow: hidden;
     border-radius: var(--border-radius-xl);
+    background: fn.faded-color(12%, light-dark(var(--blue-700), var(--blue-900)));
     color: currentColor;
 
+    &[aria-expanded=true],
     &:hover {
+      background: fn.faded-color(30%, light-dark(var(--blue-700), var(--blue-900)));
       color: currentColor;
     }
   }
@@ -213,6 +218,7 @@ function updateSelectedSubtype({ name, selected }: SelectSubType) {
     border-color: var(--secondary-400);
   }
 
+  &__list-item:has(button[aria-expanded=true]) &__input,
   &__list-item:has(&__dropdown:hover):not(:has(input:checked)) &__input {
     border-color: light-dark(var(--secondary-700), var(--secondary-200));
   }
