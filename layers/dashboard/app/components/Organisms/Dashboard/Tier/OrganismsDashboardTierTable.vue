@@ -54,15 +54,21 @@
 
     <!-- Buttons -->
     <template #basic-button="{ tier }">
-      <UButton v-bind="tier.button" :label="tier.button.label" block class="body-sm cursor-pointer text-center" />
+      <UButton @click="$emit('create-listing')" :label="tier.button.label" block class="body-sm cursor-pointer text-center" color="neutral" variant="outline" />
     </template>
 
     <template #premium-button="{ tier }">
-      <UButton v-bind="tier.button" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" />
+      <UButton @click="$emit('create-listing')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" />
     </template>
     
     <template #professional-button="{ tier }">
-      <UButton v-bind="tier.button" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" />
+      <UButton @click="$emit('create-listing')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" color="secondary" variant="solid" />
     </template>
   </UPricingTable>
 </template>
+
+<script setup lang="ts">
+defineEmits<{
+  'create-listing': []
+}>();
+</script>
