@@ -13,28 +13,28 @@
   >
     <!-- Main field row -->
     <div class="flex flex-wrap gap-6">
-      <div class="basis-full sm:basis-0 flex-1">
-        <UFormField label="Sale or Rental?" name="selectedType" description="Select your type of listing" required>
+      <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
+        <UFormField label="Sale or Rental?" name="selectedType" description="Type of listing" required>
           <USelect v-model="state.selectedType" :items="listingTypeItems" @update:model-value="onListingTypeChange" class="w-full" />
         </UFormField>
       </div>
 
       <!-- SALE FIELDS - Nested Form -->
       <UForm v-if="state.selectedType === 'sale'" :state="state.saleListing!" class="contents">
-        <div class="basis-full sm:basis-0 flex-1">
-          <UFormField label="Property Tenure" name="tenureType" required description="Select the tenure type for this property">
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
+          <UFormField label="Property Tenure" name="tenureType" required description="Tenure type">
             <USelect v-model="state.saleListing!.tenureType" :items="tenureItems" class="w-full" />
           </UFormField>
         </div>
 
-        <div class="basis-full sm:basis-0 flex-1">
-          <UFormField label="Chain Status" name="chain" description="Are you part of a property chain?" required>
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-44 sm:max-w-52">
+          <UFormField label="Chain Status" name="chain" description="Part of a chain?" required>
             <USelect v-model="state.saleListing!.chain" :items="chainItems" class="w-full" />
           </UFormField>
         </div>
 
-        <div class="basis-full sm:basis-0 flex-1">
-          <UFormField label="Shared Ownership" name="sharedOwnership" description="Is this property shared ownership?" required>
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
+          <UFormField label="Shared Ownership" name="sharedOwnership" description="Shared ownership?" required>
             <USwitch v-model="state.saleListing!.sharedOwnership" color="secondary" size="xl" :ui="{
               base: 'data-[state=checked]:bg-secondary/80 data-[state=unchecked]:bg-primary/20 dark:data-[state=unchecked]:bg-(--foreground-100)/50 w-10 transition-colors',
               container: 'w-11! h-6 p-0.5',
@@ -43,19 +43,37 @@
             }" />
           </UFormField>
         </div>
+
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
+          <UFormField label="Availability" name="availabilityStatus" description="Current availability" required>
+            <USelect v-model="state.saleListing!.availabilityStatus" :items="saleAvailabilityItems" class="w-full" />
+          </UFormField>
+        </div>
       </UForm>
 
       <!-- RENTAL FIELDS - Nested Form -->
       <UForm v-if="state.selectedType === 'rent'" :state="state.rentalListing!" class="contents">
-        <div class="basis-full sm:basis-0 flex-1">
-          <UFormField label="Bills Included" name="isBillsIncluded" required description="Are bills such as gas, electric, water included in the rent?">
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-48 sm:max-w-56">
+          <UFormField label="Bills Included" name="isBillsIncluded" required description="Are bills included in rent?">
             <USelect v-model="state.rentalListing!.isBillsIncluded" :items="billsIncludedItems" class="w-full" />
           </UFormField>
         </div>
 
-        <div class="basis-full sm:basis-0 flex-1">
-          <UFormField label="Furnished Status" name="furnishedStatus" required description="Select the furnished status of the property">
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-44 sm:max-w-52">
+          <UFormField label="Furnished Status" name="furnishedStatus" required description="Furnished or unfurnished?">
             <USelect v-model="state.rentalListing!.furnishedStatus" :items="furnishedItems" class="w-full" />
+          </UFormField>
+        </div>
+
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
+          <UFormField label="Rental Length" name="rentalLength" required description="Short or long-term?">
+            <USelect v-model="state.rentalListing!.rentalLength" :items="rentalLengthItems" class="w-full" />
+          </UFormField>
+        </div>
+
+        <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
+          <UFormField label="Availability" name="availabilityStatus" description="Current availability" required>
+            <USelect v-model="state.rentalListing!.availabilityStatus" :items="rentalAvailabilityItems" class="w-full" />
           </UFormField>
         </div>
       </UForm>
@@ -75,6 +93,7 @@ const state = reactive<Step1FormData>(savedData && Object.keys(savedData).length
     tenureType: "FREEHOLD",
     chain: false,
     sharedOwnership: false,
+    availabilityStatus: "AVAILABLE",
   },
   rentalListing: null,
 })
@@ -107,13 +126,32 @@ const furnishedItems = [
   { value: "FURNISHED", label: "Furnished" },
 ]
 
+const rentalLengthItems = [
+  { value: "LONG_TERM", label: "Long-term" },
+  { value: "SHORT_TERM", label: "Short-term" },
+]
+
+const saleAvailabilityItems = [
+  { value: "AVAILABLE", label: "Available" },
+  { value: "UNDER_OFFER", label: "Under Offer" },
+  { value: "SOLD", label: "Sold" },
+]
+
+const rentalAvailabilityItems = [
+  { value: "AVAILABLE", label: "Available" },
+  { value: "LET_AGREED", label: "Let Agreed" },
+  { value: "LET", label: "Let" },
+]
+
 // Computed validation
 const isFormValid = computed(() => {
   if (state.selectedType === "sale") {
     return !!state.saleListing?.tenureType
   }
   if (state.selectedType === "rent") {
-    return !!state.rentalListing?.furnishedStatus && state.rentalListing?.isBillsIncluded != null
+    return !!state.rentalListing?.furnishedStatus && 
+           state.rentalListing?.isBillsIncluded != null &&
+           !!state.rentalListing?.rentalLength
   }
   return false
 })
@@ -129,12 +167,15 @@ function onListingTypeChange(newType: any) {
       tenureType: "FREEHOLD",
       chain: false,
       sharedOwnership: false,
+      availabilityStatus: "AVAILABLE",
     }
   } else {
     state.saleListing = null
     state.rentalListing = {
       furnishedStatus: "UNFURNISHED",
       isBillsIncluded: false,
+      rentalLength: "LONG_TERM",
+      availabilityStatus: "AVAILABLE",
     }
   }
 }

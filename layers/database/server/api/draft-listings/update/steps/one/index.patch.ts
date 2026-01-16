@@ -24,11 +24,13 @@ export default defineEventHandler(async (event) => {
             tenureType: saleListing.tenureType,
             chain: saleListing.chain,
             sharedOwnership: saleListing.sharedOwnership,
+            availabilityStatus: saleListing.availabilityStatus,
           },
           create: {
             tenureType: saleListing.tenureType,
             chain: saleListing.chain,
             sharedOwnership: saleListing.sharedOwnership,
+            availabilityStatus: saleListing.availabilityStatus,
           },
         },
       };
@@ -40,10 +42,14 @@ export default defineEventHandler(async (event) => {
           update: {
             furnishedStatus: rentalListing.furnishedStatus,
             isBillsIncluded: rentalListing.isBillsIncluded,
+            rentalLength: rentalListing.rentalLength,
+            availabilityStatus: rentalListing.availabilityStatus,
           },
           create: {
             furnishedStatus: rentalListing.furnishedStatus,
             isBillsIncluded: rentalListing.isBillsIncluded,
+            rentalLength: rentalListing.rentalLength,
+            availabilityStatus: rentalListing.availabilityStatus,
           },
         },
       };

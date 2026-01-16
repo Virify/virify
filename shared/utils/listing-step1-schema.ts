@@ -12,6 +12,7 @@ export const saleListingSchema = z.object({
   }),
   chain: z.boolean().default(false),
   sharedOwnership: z.boolean().default(false),
+  availabilityStatus: z.enum(['AVAILABLE', 'UNDER_OFFER', 'SOLD']).default('AVAILABLE'),
 })
 
 // Rental listing schema
@@ -22,6 +23,10 @@ export const rentalListingSchema = z.object({
   isBillsIncluded: z.boolean({
     message: 'Please specify if bills are included',
   }),
+  rentalLength: z.enum(['SHORT_TERM', 'LONG_TERM'], {
+    message: 'Rental length is required',
+  }),
+  availabilityStatus: z.enum(['AVAILABLE', 'LET_AGREED', 'LET']).default('AVAILABLE'),
 })
 
 // Step 1 form schema (sale OR rental, not both)
@@ -40,7 +45,8 @@ export const step1Schema = z.object({
     // If rent is selected, validate rental listing
     if (data.selectedType === 'rent') {
       return data.rentalListing?.furnishedStatus != null && 
-             data.rentalListing?.isBillsIncluded != null
+             data.rentalListing?.isBillsIncluded != null &&
+             data.rentalListing?.rentalLength != null
     }
     return false
   },
