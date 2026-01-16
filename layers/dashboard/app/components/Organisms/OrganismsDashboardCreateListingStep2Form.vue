@@ -38,13 +38,14 @@
         </UFormField>
       </div>
 
-      <!-- Classification (only shown when type selected) -->
-      <div v-if="state.property.type" class="basis-full sm:basis-0 sm:flex-1 sm:max-w-56 min-w-fit">
+      <!-- Classification (disabled until type selected) -->
+      <div class="basis-full sm:basis-0 sm:flex-1 sm:max-w-56 min-w-fit">
         <UFormField label="Classification" name="property.classification" description="Select the classification" required>
           <USelect 
             v-model="state.property.classification" 
             :items="classificationItems" 
-            placeholder="Select classification"
+            :disabled="!state.property.type"
+            :placeholder="state.property.type ? 'Select classification' : 'Select type first'"
             class="w-full" 
           />
         </UFormField>

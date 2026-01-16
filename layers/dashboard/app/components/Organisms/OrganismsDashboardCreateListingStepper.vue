@@ -8,6 +8,7 @@
       orientation="horizontal"
       class="w-full"
       size="md"
+      :linear="false"
       :ui="{
         separator: 'bg-secondary!',
         title: 'text-sm! sm:text-sm!',
@@ -42,19 +43,55 @@ const currentStepNumber = computed(() => {
   return 1
 })
 
-// Map steps to stepper items with disabled state
+// Map steps to stepper items with disabled and completed state styling
 const stepperItems = computed(() => {
-  const items = props.steps.map(step => ({
-    title: step.title,
-    value: step.value,
-    disabled: step.locked,
-    // Per-item UI overrides for locked steps
-    ui: step.locked ? {
-      separator: 'bg-(--secondary-400)/50!',
-      title: 'text-muted/50!',
-      trigger: 'cursor-not-allowed! opacity-50!'
-    } : {}
-  }))
+  const currentValue = currentStepNumber.value
+  
+  const items = props.steps.map(step => {
+    // Determine step state for styling
+    const isLocked = step.locked
+    const isCompleted = step.completed
+    const isActive = step.id === currentValue
+    
+    // Build UI overrides based on state
+    // Priority: Locked > Active > Completed > Unlocked (pending)
+    let ui: Record<string, string> = {}
+    
+    if (isLocked) {
+      // Locked steps - greyed out, not clickable (no separator override - use default)
+      ui = {
+        indicator: 'bg-muted/30! text-muted/50! border-muted/30!',
+        title: 'text-muted/50!',
+        trigger: 'cursor-not-allowed! opacity-50!'
+      }
+    } else if (isActive) {
+      // Active step - secondary (orange) color with ring highlight
+      ui = {
+        indicator: 'bg-secondary! text-white! ring-2 ring-secondary ring-offset-2!',
+        separator: 'bg-secondary!'
+      }
+    } else if (isCompleted) {
+      // Completed but not active - success (green) color with checkmark
+      ui = {
+        indicator: 'bg-primary! text-white!',
+        separator: 'bg-primary!'
+      }
+    } else {
+      // Unlocked but not completed (pending) - neutral styling (no separator override - use default)
+      ui = {
+        indicator: 'bg-elevated! text-muted! border border-muted/50!'
+      }
+    }
+    
+    return {
+      title: step.title,
+      value: step.value,
+      disabled: isLocked,
+      // Show checkmark for completed steps that aren't active, show number for active
+      icon: (isCompleted && !isActive) ? 'i-lucide-check' : undefined,
+      ui
+    }
+  })
   return items
 })
 </script>

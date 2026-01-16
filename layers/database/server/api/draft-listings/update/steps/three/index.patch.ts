@@ -1,27 +1,15 @@
-import * as z from "zod";
-import { RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { z } from "zod";
+import { step3Schema } from "~~/shared/utils/listing-step3-schema";
 
-const stepDataSchema = z.object({
+// Extend step3Schema to require draftId for updates
+const stepDataSchema = step3Schema.extend({
   draftId: z.number().int().positive(),
-  price: z.number().positive(),
-  rentalListing: z
-    .object({
-  deposit: z.number().min(0).nullable().optional(),
-  holdingDeposit: z.number().min(0).nullable().optional(),
-      rentFrequency: z.enum(Object.values(RentalPriceType)).nullable().optional(),
-      rentalLength: z.enum(["SHORT_TERM", "LONG_TERM"]).nullable().optional(),
-    })
-    .optional(),
-  saleListing: z
-    .object({
-      priceType: z.enum(Object.values(SalePriceType)).nullable().optional(),
-    })
-    .optional(),
 });
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
+  
   try {
     const { draftId, price, rentalListing, saleListing } = await readValidatedBody(event, stepDataSchema.parse);
 
@@ -32,14 +20,16 @@ export default defineEventHandler(async (event) => {
         rentalListing: rentalListing
           ? {
               update: {
-                ...rentalListing,
+                rentFrequency: rentalListing.rentFrequency,
+                deposit: rentalListing.deposit ?? null,
+                holdingDeposit: rentalListing.holdingDeposit ?? null,
               },
             }
           : undefined,
         saleListing: saleListing
           ? {
               update: {
-                ...saleListing,
+                priceType: saleListing.priceType,
               },
             }
           : undefined,
