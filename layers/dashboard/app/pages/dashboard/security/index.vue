@@ -2,11 +2,14 @@
   <UDashboardPanel>
     <template #header>
       <UDashboardNavbar
-        title="Account"
         :ui="{
           title: 'title-sm m-0!',
         }"
       >
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+
         <template #right>
           <OrganismsDashboardNotificationButton />
         </template>

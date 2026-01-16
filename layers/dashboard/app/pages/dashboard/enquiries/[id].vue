@@ -3,12 +3,15 @@
     <template #header>
       <UDashboardNavbar
         class="border-0"
-        title="Enquiry Details"
         :ui="{
           title: 'title-sm m-0!',
           left: 'flex items-center gap-2',
         }"
       >
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+
         <template #right>
           <OrganismsDashboardFilter 
             :items="enquiries" 
@@ -27,8 +30,6 @@
     </template>
 
     <template #body>
-      <MoleculesDashboardBreadcrumb />
-
       <div class="grid xl:grid-cols-3 gap-6 mt-0 items-start">
         <!-- Left: Listing Card (Sticky) -->
         <div class="hidden xl:block xl:col-span-1 sticky top-0">

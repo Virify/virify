@@ -7,7 +7,9 @@
           right: 'flex items-center gap-4',
         }"
       >
-        <template #title> Your Listings </template>
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
 
         <template #right>
           <OrganismsDashboardFilter ref="filterRef" :items="listings" :view-options="[]" persistence-key="dashboard-my-listings" @update:filtered="filteredListings = $event" />
@@ -18,7 +20,6 @@
     </template>
 
     <template #body>
-      <MoleculesDashboardBreadcrumb />
       <!-- Grid View -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-if="loading">
         <OrganismsDashboardListingCardMyListingSkeleton :cards="3" />

@@ -7,7 +7,10 @@
           right: 'flex items-center gap-4',
         }"
       >
-        <template #title> Create a listing </template>
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+        
         <template #right>
           <OrganismsDashboardNotificationButton />
         </template>

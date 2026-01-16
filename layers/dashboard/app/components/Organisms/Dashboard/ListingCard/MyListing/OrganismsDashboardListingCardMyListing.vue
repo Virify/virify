@@ -59,9 +59,9 @@
         </div>
 
         <div class="flex flex-wrap gap-2 mt-auto pt-2">
-          <UButton variant="subtle" size="md" color="secondary" class="font-semibold flex-1 justify-center" icon="i-lucide-pencil" label="Edit" :to="editHref" />
-          <UButton variant="subtle" size="md" color="secondary" class="font-semibold flex-1 justify-center" :to="`/listing/${listing.id}`" target="_blank" icon="i-lucide-eye" label="View" :disabled="!listing.published && !listing.isDraft" />
-          <UButton v-if="!listing.isDraft" variant="subtle" size="md" color="error" class="font-semibold flex-1 justify-center cursor-pointer" :disabled="isDeleting" @click="handleDelete" icon="i-lucide-trash-2" label="Delete" />
+          <UButton variant="subtle" size="xs" color="secondary" class="font-semibold flex-1 justify-center" icon="i-lucide-pencil" label="Edit" :to="editHref" />
+          <UButton variant="subtle" size="xs" color="secondary" class="font-semibold flex-1 justify-center" :to="`/listing/${listing.id}`" target="_blank" icon="i-lucide-eye" label="View" :disabled="!listing.published && !listing.isDraft" />
+          <UButton v-if="!listing.isDraft" variant="subtle" size="xs" color="error" class="font-semibold flex-1 justify-center cursor-pointer" :disabled="isDeleting" @click="handleDelete" icon="i-lucide-trash-2" label="Delete" />
         </div>
       </div>
     </template>

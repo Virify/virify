@@ -7,7 +7,10 @@
           right: 'flex items-center gap-4',
         }"
       >
-        <template #title>Pricing & Tiers</template>
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+        
         <template #right>
           <OrganismsDashboardNotificationButton />
         </template>

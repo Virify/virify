@@ -6,7 +6,12 @@
         :ui="{
           title: 'title-sm m-0!',
         }"
-      />
+      >
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+      </UDashboardNavbar>
+      
       <MoleculesDashboardPasswordAlert />
     </template>
 
