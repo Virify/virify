@@ -1,22 +1,22 @@
 <template>
   <div class="m-range-slider | relative">
     <AtomsRangeGraph v-if="graphData.length" :min :max :range="selectedRange" :graph-data="!loading ? graphData : []"
-      class="m-range-slider-graph" />
+      class="m-range-slider__graph" />
 
-    <AtomsLabel class="m-range-slider-label-min">
-      <AtomsCurrencyInput v-model="selectedRange[0]" class="m-range-slider-input | body-md" />
+    <AtomsLabel class="m-range-slider__label-min">
+      <AtomsCurrencyInput v-model="selectedRange[0]" name="minprice" class="m-range-slider__input | body-md" />
     </AtomsLabel>
 
-    <AtomsLabel class="m-range-slider-label-max">
-      <AtomsCurrencyInput v-model="selectedRange[1]" class="m-range-slider-input | body-md" />
+    <AtomsLabel class="m-range-slider__label-max">
+      <AtomsCurrencyInput v-model="selectedRange[1]" name="maxprice" class="m-range-slider__input | body-md" />
     </AtomsLabel>
 
-    <SliderRoot v-model="selectedRange" :min="min" :max="max" class="m-range-slider-root">
-      <SliderTrack class="m-range-slider-track">
-        <SliderRange class="m-range-slider-range" />
+    <SliderRoot v-model="selectedRange" :min="min" :max="max" class="m-range-slider__root">
+      <SliderTrack class="m-range-slider__track">
+        <SliderRange class="m-range-slider__range" />
       </SliderTrack>
-      <SliderThumb class="m-range-slider-thumb" />
-      <SliderThumb class="m-range-slider-thumb" />
+      <SliderThumb class="m-range-slider__thumb" />
+      <SliderThumb class="m-range-slider__thumb" />
     </SliderRoot>
   </div>
 </template>
@@ -66,91 +66,91 @@ const selectedRange = defineModel<[number, number]>({
   grid-template-columns: repeat(2, 1fr);
   align-items: center;
   gap: var(--size-12);
+
+  &__graph {
+    --thumb-size: var(--size-32);
+
+    position: absolute;
+    bottom: var(--size-16);
+    left: calc(var(--thumb-size) / 2);
+    width: calc(100% - var(--thumb-size));
+    height: auto;
+  }
+
+  &__label-min,
+  &__label-max {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--size-32);
+  }
+
+  &__label-min {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  &__label-max {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  &__input {
+    margin-bottom: var(--size-4);
+    text-align: inherit;
+    max-width: 15ch;
+
+    @supports (field-sizing: content) {
+      field-sizing: content;
+      width: auto;
+    }
+  }
+
+  /**
+ *  Range slider styling
+ */
+  &__root {
+    grid-column: span 2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    touch-action: none;
+    height: var(--size-32);
+    flex-shrink: 1;
+  }
+
+  &__track {
+    position: relative;
+    background: var(--track-empty-color);
+    flex-grow: 1;
+    height: var(--size-6);
+    border-radius: var(--border-radius-ui);
+  }
+
+  &__range {
+    position: absolute;
+    border-radius: var(--border-radius-pill);
+    background: var(--track-fill-color);
+    height: 100%;
+  }
+
+  &__thumb {
+    display: block;
+    width: var(--size-32);
+    height: var(--size-32);
+    background: var(--track-thumb-color);
+    border: var(--track-thumb-border);
+    border-radius: 100%;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
 }
 
 :where(.m-range-slider) {
   margin: 0;
-}
-
-.m-range-slider-graph {
-  --thumb-size: var(--size-32);
-
-  position: absolute;
-  bottom: var(--size-16);
-  left: calc(var(--thumb-size) / 2);
-  width: calc(100% - var(--thumb-size));
-  height: auto;
-}
-
-.m-range-slider-label-min,
-.m-range-slider-label-max {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: var(--size-32);
-}
-
-.m-range-slider-label-min {
-  text-align: left;
-  align-items: flex-start;
-}
-
-.m-range-slider-label-max {
-  text-align: right;
-  align-items: flex-end;
-}
-
-.m-range-slider-input {
-  margin-bottom: var(--size-4);
-  text-align: inherit;
-  max-width: 15ch;
-
-  @supports (field-sizing: content) {
-    field-sizing: content;
-    width: auto;
-  }
-}
-
-/**
- *  Range slider styling
- */
-.m-range-slider-root {
-  grid-column: span 2;
-  position: relative;
-  display: flex;
-  align-items: center;
-  user-select: none;
-  touch-action: none;
-  height: var(--size-32);
-  flex-shrink: 1;
-}
-
-.m-range-slider-track {
-  position: relative;
-  background: var(--track-empty-color);
-  flex-grow: 1;
-  height: var(--size-6);
-  border-radius: var(--border-radius-ui);
-}
-
-.m-range-slider-range {
-  position: absolute;
-  border-radius: var(--border-radius-pill);
-  background: var(--track-fill-color);
-  height: 100%;
-}
-
-.m-range-slider-thumb {
-  display: block;
-  width: var(--size-32);
-  height: var(--size-32);
-  background: var(--track-thumb-color);
-  border: var(--track-thumb-border);
-  border-radius: 100%;
-  cursor: grab;
-
-  &:active {
-    cursor: grabbing;
-  }
 }
 </style>

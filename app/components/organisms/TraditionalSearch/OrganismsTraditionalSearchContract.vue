@@ -233,7 +233,7 @@ function updateIsBuy(newValue: boolean) {
     --track-thumb-border: none;
   }
 
-  .m-range-slider-input {
+  .m-range-slider__input {
     background: var(--blue-400);
     color: var(--monochrome-900);
     border-width: 2px;
