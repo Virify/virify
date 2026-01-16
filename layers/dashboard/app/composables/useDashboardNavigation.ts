@@ -24,7 +24,7 @@ export function useDashboardNavigation() {
         text: "See our pricing and plans",
       },
       type: "link",
-      to: "/dashboard/create-listing",
+      to: "/dashboard/tiers",
     },
     {
       label: "Listings",
