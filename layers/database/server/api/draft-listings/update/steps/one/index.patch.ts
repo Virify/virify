@@ -10,12 +10,8 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
   
-  console.log('[Step1 PATCH] Request received');
-  
   try {
     const body = await readBody(event);
-    console.log('[Step1 PATCH] Body:', JSON.stringify(body, null, 2));
-    
     const { saleListing, rentalListing, draftId, selectedType } = stepDataSchema.parse(body);
 
     // Prepare data based on selected type

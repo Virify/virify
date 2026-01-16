@@ -81,6 +81,14 @@ export const useCreateListingSteps = createSharedComposable(() => {
   // Selected tier for new draft (set before opening modal)
   const selectedTier = ref<ListingTier>('BASIC')
   
+  // Static data - fetched once and cached globally
+  // Property types for Step 2 (non-blocking, lazy fetch)
+  const { data: propertyTypes, status: propertyTypesStatus } = useAsyncData(
+    'create-listing-property-types',
+    () => $fetch<PropertyTypeWithOptions[]>('/api/property-type/'),
+    { lazy: true }
+  )
+  
   // Current draft listing being edited
   const draftListingId = ref<number | null>(null)
   const isLoading = ref(false)
@@ -106,7 +114,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     steps.value.map(step => [step.id, false])
   ))
 
-  // Form data for each step
+  // Form data for each step (current state)
   const stepData = ref<Record<number, any>>({
     1: {},
     2: {},
@@ -119,6 +127,36 @@ export const useCreateListingSteps = createSharedComposable(() => {
     9: {},
     10: {},
   })
+
+  // Last saved data for each step (for dirty checking)
+  const lastSavedStepData = ref<Record<number, any>>({
+    1: {},
+    2: {},
+    3: {},
+    4: {},
+    5: {},
+    6: {},
+    7: {},
+    8: {},
+    9: {},
+    10: {},
+  })
+
+  // Track which steps have been visited (for lazy mounting)
+  const visitedSteps = ref(new Set<number>([1])) // Step 1 always visited initially
+
+  /**
+   * Check if step data has changed since last save.
+   * Compares current data with last saved snapshot.
+   */
+  const isStepDirty = (stepNumber: number, currentData: Record<string, any>): boolean => {
+    const lastSaved = lastSavedStepData.value[stepNumber]
+    if (!lastSaved || Object.keys(lastSaved).length === 0) {
+      // Never saved before - always dirty
+      return true
+    }
+    return JSON.stringify(currentData) !== JSON.stringify(lastSaved)
+  }
 
   // Computed: Current accordion/stepper value
   const currentStepValue = computed({
@@ -275,6 +313,23 @@ export const useCreateListingSteps = createSharedComposable(() => {
   ): Promise<boolean> => {
     if (isSaving.value) return false
     
+    // Check if data actually changed
+    const isDirty = isStepDirty(stepNumber, stepFormData)
+    
+    // If not dirty and step already complete, just navigate (no POST needed)
+    const step = steps.value.find(s => s.id === stepNumber)
+    if (!isDirty && step?.completed) {
+      if (advance) {
+        goToStep(stepNumber + 1)
+        toast.add({
+          title: 'Moving to next step',
+          icon: 'i-lucide-arrow-right',
+          color: 'info'
+        })
+      }
+      return true
+    }
+    
     isSaving.value = true
     
     try {
@@ -299,15 +354,20 @@ export const useCreateListingSteps = createSharedComposable(() => {
         throw new Error('Failed to save step data')
       }
       
-      // Step 3: Save to local state
+      // Step 3: Save to local state and snapshot for dirty checking
       saveStepData(stepNumber, stepFormData)
+      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(stepFormData))
+      
+      // Step 4: Mark step complete and unlock next (regardless of advance flag)
+      // This allows users to navigate to next step after saving progress
+      markStepComplete(stepNumber)
       
       // Get step title for toast
       const stepTitle = steps.value.find(s => s.id === stepNumber)?.title || `Step ${stepNumber}`
       
-      // Step 4: Handle advancement
+      // Step 5: Handle advancement (navigate to next step)
       if (advance) {
-        await completeStep(stepNumber)
+        goToStep(stepNumber + 1)
         toast.add({
           title: `${stepTitle} completed`,
           icon: 'i-lucide-check-circle-2',
@@ -389,21 +449,42 @@ export const useCreateListingSteps = createSharedComposable(() => {
     return !step.locked
   }
 
-  // Mark a step as completed and unlock next step
-  const completeStep = async (stepId: number) => {
+  /**
+   * Mark a step as completed and unlock the next step.
+   * Does NOT navigate - just updates completion state.
+   */
+  const markStepComplete = (stepId: number) => {
     const step = steps.value.find(s => s.id === stepId)
     if (step) {
       step.completed = true
       
-      // Unlock the next step and navigate to it
+      // Unlock the next step
       if (stepId < steps.value.length) {
         const nextStepObj = steps.value.find(s => s.id === stepId + 1)
         if (nextStepObj) {
           nextStepObj.locked = false
         }
-        currentStep.value = stepId + 1
       }
     }
+  }
+
+  /**
+   * Navigate to a specific step (if allowed).
+   */
+  const goToStep = (stepId: number) => {
+    if (stepId >= 1 && stepId <= steps.value.length) {
+      const step = steps.value.find(s => s.id === stepId)
+      if (step && !step.locked) {
+        currentStep.value = stepId
+        visitedSteps.value.add(stepId)
+      }
+    }
+  }
+
+  // Mark a step as completed and unlock next step (legacy - combines mark + navigate)
+  const completeStep = async (stepId: number) => {
+    markStepComplete(stepId)
+    goToStep(stepId + 1)
   }
 
   // Save step data
@@ -457,6 +538,11 @@ export const useCreateListingSteps = createSharedComposable(() => {
       1: {}, 2: {}, 3: {}, 4: {}, 5: {},
       6: {}, 7: {}, 8: {}, 9: {}, 10: {},
     }
+    lastSavedStepData.value = {
+      1: {}, 2: {}, 3: {}, 4: {}, 5: {},
+      6: {}, 7: {}, 8: {}, 9: {}, 10: {},
+    }
+    visitedSteps.value = new Set<number>([1])
   }
 
   // Initialize with an existing draft or create new
@@ -496,6 +582,11 @@ export const useCreateListingSteps = createSharedComposable(() => {
     loadError: readonly(loadError),
     hasActiveDraft,
     firstIncompleteStep,
+    visitedSteps,
+    
+    // Static data (cached)
+    propertyTypes,
+    propertyTypesStatus,
     
     // Methods - Draft Management
     initializeDraft,
@@ -511,9 +602,12 @@ export const useCreateListingSteps = createSharedComposable(() => {
     closeStepModal,
     updateModalState,
     canNavigateToStep,
+    markStepComplete,
+    goToStep,
     completeStep,
     saveStepData,
     getStepData,
+    isStepDirty,
     validateStep,
     nextStep,
     previousStep,

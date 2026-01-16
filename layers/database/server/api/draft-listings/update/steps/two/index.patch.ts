@@ -1,29 +1,18 @@
-import * as z from "zod";
-import { ConstructionType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { z } from "zod";
+import { step2Schema } from "~~/shared/utils/listing-step2-schema";
 
-const stepTwoScehma = z.object({
+// Extend step2Schema to require draftId for updates
+const stepDataSchema = step2Schema.extend({
   draftId: z.number().int().positive(),
-  property: z.object({
-    type: z.number().int().positive(),
-    classification: z.number().int().positive(),
-    constructionType: z.enum(Object.values(ConstructionType)).nullable().optional(),
-    yearBuilt: z.coerce
-      .number()
-      .min(4)
-      .max(new Date().getFullYear() || 2024)
-      .nullable()
-      .optional(),
-    size: z.number().positive().nullable(),
-    description: z.string().max(5000),
-    totalFloors: z.number().int().min(1),
-  }),
 });
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
+  
   try {
-    const { draftId, property } = await readValidatedBody(event, stepTwoScehma.parse);
+    const body = await readBody(event);
+    const { draftId, property } = stepDataSchema.parse(body);
 
     return await prisma.draftListing.update({
       where: { id: draftId, userId: user.id },
@@ -34,7 +23,7 @@ export default defineEventHandler(async (event) => {
               type: { connect: { id: property.type } },
               classification: { connect: { id: property.classification } },
               constructionType: property.constructionType || null,
-              yearBuilt: property.yearBuilt ? String(property.yearBuilt) : null,
+              yearBuilt: property.yearBuilt && property.yearBuilt !== '0' ? property.yearBuilt : null,
               size: property.size || null,
               description: property.description,
               totalFloors: property.totalFloors,
@@ -43,7 +32,7 @@ export default defineEventHandler(async (event) => {
               type: { connect: { id: property.type } },
               classification: { connect: { id: property.classification } },
               constructionType: property.constructionType || null,
-              yearBuilt: property.yearBuilt ? String(property.yearBuilt) : null,
+              yearBuilt: property.yearBuilt && property.yearBuilt !== '0' ? property.yearBuilt : null,
               size: property.size || null,
               description: property.description,
               totalFloors: property.totalFloors,
