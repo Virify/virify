@@ -91,10 +91,14 @@ watch([priceMinMax, () => contractType.value.isSale], () => {
   const { sale, rental } = asObject(priceMinMax.value)
   const [min, max] = asArray(contractType.value.isSale ? sale : rental, true)
 
-  contractType.value.minPrice = Number(min)
-  contractType.value.maxPrice = Number(max)
-  contractType.value.price = [Number(min), Number(max)]
+  const minNumber = Number(min)
+  const maxNumber = Number(max)
+
+  contractType.value.minPrice = minNumber
+  contractType.value.maxPrice = maxNumber
+  contractType.value.price = [minNumber, maxNumber]
 })
+
 
 /**
  *  Tabs for buy/rent
