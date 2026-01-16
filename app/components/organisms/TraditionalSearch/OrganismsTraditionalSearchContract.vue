@@ -49,7 +49,7 @@
           Price
         </h3>
 
-        <LazyMoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="contractType.price"
+        <MoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="contractType.price"
           :min="contractType.minPrice" :max="contractType.maxPrice" :graph-data="priceGraph"
           :loading="priceGraphLoading" hydrate-on-visible />
       </section>
@@ -98,7 +98,6 @@ watch([priceMinMax, () => contractType.value.isSale], () => {
   contractType.value.maxPrice = maxNumber
   contractType.value.price = [minNumber, maxNumber]
 })
-
 
 /**
  *  Tabs for buy/rent
