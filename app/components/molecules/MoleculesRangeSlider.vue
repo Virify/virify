@@ -1,23 +1,40 @@
 <template>
-  <div class="m-range-slider | relative">
-    <AtomsRangeGraph v-if="graphData.length" :min :max :range="selectedRange" :graph-data="!loading ? graphData : []"
-      class="m-range-slider__graph" />
+  <div class="m-range-slider | relative" :class="{
+    'm-range-slider--loading': loading
+  }">
+    <div v-if="loading" class="m-range-slider__skeleton-loader">
+      <span aria-hidden
+        class=" m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--left | skeleton">
+        <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+      </span>
+      <span aria-hidden
+        class="m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--right | skeleton">
+        <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+      </span>
 
-    <AtomsLabel class="m-range-slider__label-min">
-      <AtomsCurrencyInput v-model="selectedRange[0]" name="minprice" class="m-range-slider__input | body-md" />
-    </AtomsLabel>
+      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+    </div>
 
-    <AtomsLabel class="m-range-slider__label-max">
-      <AtomsCurrencyInput v-model="selectedRange[1]" name="maxprice" class="m-range-slider__input | body-md" />
-    </AtomsLabel>
+    <template v-else>
+      <AtomsRangeGraph v-if="graphData.length" :min :max :range="selectedRange" :graph-data="!loading ? graphData : []"
+        class="m-range-slider__graph" />
 
-    <SliderRoot v-model="selectedRange" :min="min" :max="max" class="m-range-slider__root">
-      <SliderTrack class="m-range-slider__track">
-        <SliderRange class="m-range-slider__range" />
-      </SliderTrack>
-      <SliderThumb class="m-range-slider__thumb" />
-      <SliderThumb class="m-range-slider__thumb" />
-    </SliderRoot>
+      <AtomsLabel class="m-range-slider__label-min">
+        <AtomsCurrencyInput v-model="selectedRange[0]" name="minprice" class="m-range-slider__input | body-md" />
+      </AtomsLabel>
+
+      <AtomsLabel class="m-range-slider__label-max">
+        <AtomsCurrencyInput v-model="selectedRange[1]" name="maxprice" class="m-range-slider__input | body-md" />
+      </AtomsLabel>
+
+      <SliderRoot v-model="selectedRange" :min="min" :max="max" class="m-range-slider__root">
+        <SliderTrack class="m-range-slider__track">
+          <SliderRange class="m-range-slider__range" />
+        </SliderTrack>
+        <SliderThumb class="m-range-slider__thumb" />
+        <SliderThumb class="m-range-slider__thumb" />
+      </SliderRoot>
+    </template>
   </div>
 </template>
 
@@ -50,6 +67,8 @@ const selectedRange = defineModel<[number, number]>({
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/functions' as fn;
+
 :where(.m-range-slider) {
   --track-empty-color:
     light-dark(var(--monochrome-700), var(--monochrome-200));
@@ -66,6 +85,55 @@ const selectedRange = defineModel<[number, number]>({
   grid-template-columns: repeat(2, 1fr);
   align-items: center;
   gap: var(--size-12);
+
+  &--loading {
+    display: block;
+  }
+
+  &__skeleton-loader {
+    --gradient-start: var(--blue-300);
+    --gradient-end: var(--blue-400);
+
+    min-height: 7.35rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .a-icon {
+      width: var(--size-32);
+      height: var(--size-32);
+    }
+  }
+
+  &__skeleton-loader-input {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 8ch;
+    height: var(--input-text-height);
+    background: transparent;
+    border-radius: var(--border-radius-ui);
+    color: var(--monochrome-900);
+    border: 2px dashed fn.faded-color(15%);
+    box-sizing: border-box;
+
+    .a-icon {
+      width: var(--size-24);
+      height: var(--size-24);
+      color: var(--blue-500);
+    }
+
+    &--left {
+      left: 0;
+    }
+
+    &--right {
+      right: 0;
+    }
+  }
 
   &__graph {
     --thumb-size: var(--size-32);
@@ -107,8 +175,8 @@ const selectedRange = defineModel<[number, number]>({
   }
 
   /**
- *  Range slider styling
- */
+   *  Range slider styling
+   */
   &__root {
     grid-column: span 2;
     position: relative;
