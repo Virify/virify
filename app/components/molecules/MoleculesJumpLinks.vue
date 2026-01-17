@@ -122,6 +122,9 @@ function resizeIndicator() {
   // Get all active links
   const activeLinks = wrapper.querySelectorAll('.m-jump-links__link--active')
 
+  // Do not recalculate if no active links
+  if (!activeLinks.length) return
+
   // Loop through each link and get the min/max X coords
   let minLeft = 0
   let maxRight = 0
@@ -155,6 +158,7 @@ useResizeObserver($root, resizeIndicator)
 .m-jump-links {
   position: relative;
   overflow: auto;
+  scrollbar-width: none;
 
   &__indicator {
     position: absolute;
