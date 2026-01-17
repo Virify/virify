@@ -50,9 +50,17 @@ export default defineEventHandler(async (event) => {
       addressId = address.id;
     }
 
+    // Get current completedSteps to check if step 2 already exists
+    const currentDraft = await prisma.draftListing.findUnique({
+      where: { id: draftId },
+      select: { completedSteps: true },
+    });
+
     return await prisma.draftListing.update({
       where: { id: draftId, userId: user.id },
       data: {
+        // Add step 2 to completedSteps if not already there
+        ...(currentDraft && !currentDraft.completedSteps.includes(2) ? { completedSteps: { push: 2 } } : {}),
         property: {
           upsert: {
             update: {

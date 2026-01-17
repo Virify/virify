@@ -82,78 +82,15 @@
 </template>
 
 <script setup lang="ts">
+
 const { getStepData } = useCreateListingSteps()
 
 // Form state - initialize with saved data if exists
 const savedData = getStepData(1) as Step1FormData | undefined
-const state = reactive<Step1FormData>(savedData && Object.keys(savedData).length > 0 ? savedData : {
-  selectedType: "sale",
-  saleListing: {
-    tenureType: "FREEHOLD",
-    chain: false,
-    sharedOwnership: false,
-    availabilityStatus: "AVAILABLE",
-  },
-  rentalListing: null,
-})
+const state = reactive<Step1FormData>(savedData && Object.keys(savedData).length > 0 ? savedData : createInitialStep1Values())
 
-// Select items
-const listingTypeItems = [
-  { value: "sale", label: "For Sale" },
-  { value: "rent", label: "For Rent" },
-]
-
-const tenureItems = [
-  { value: "FREEHOLD", label: "Freehold" },
-  { value: "LEASEHOLD", label: "Leasehold" },
-  { value: "COMMONHOLD", label: "Commonhold" },
-]
-
-const chainItems = [
-  { value: false, label: "No" },
-  { value: true, label: "Yes" },
-]
-
-const billsIncludedItems = [
-  { value: false, label: "No" },
-  { value: true, label: "Yes" },
-]
-
-const furnishedItems = [
-  { value: "UNFURNISHED", label: "Unfurnished" },
-  { value: "PART_FURNISHED", label: "Part Furnished" },
-  { value: "FURNISHED", label: "Furnished" },
-]
-
-const rentalLengthItems = [
-  { value: "LONG_TERM", label: "Long-term" },
-  { value: "SHORT_TERM", label: "Short-term" },
-]
-
-const saleAvailabilityItems = [
-  { value: "AVAILABLE", label: "Available" },
-  { value: "UNDER_OFFER", label: "Under Offer" },
-  { value: "SOLD", label: "Sold" },
-]
-
-const rentalAvailabilityItems = [
-  { value: "AVAILABLE", label: "Available" },
-  { value: "LET_AGREED", label: "Let Agreed" },
-  { value: "LET", label: "Let" },
-]
-
-// Computed validation
-const isFormValid = computed(() => {
-  if (state.selectedType === "sale") {
-    return !!state.saleListing?.tenureType
-  }
-  if (state.selectedType === "rent") {
-    return !!state.rentalListing?.furnishedStatus && 
-           state.rentalListing?.isBillsIncluded != null &&
-           !!state.rentalListing?.rentalLength
-  }
-  return false
-})
+// Computed validation using utility
+const isFormValid = computed(() => isStep1Valid(state))
 
 // Handle listing type change
 function onListingTypeChange(newType: any) {
@@ -162,20 +99,10 @@ function onListingTypeChange(newType: any) {
 
   if (typeStr === "sale") {
     state.rentalListing = null
-    state.saleListing = {
-      tenureType: "FREEHOLD",
-      chain: false,
-      sharedOwnership: false,
-      availabilityStatus: "AVAILABLE",
-    }
+    state.saleListing = createDefaultSaleListing()
   } else {
     state.saleListing = null
-    state.rentalListing = {
-      furnishedStatus: "UNFURNISHED",
-      isBillsIncluded: false,
-      rentalLength: "LONG_TERM",
-      availabilityStatus: "AVAILABLE",
-    }
+    state.rentalListing = createDefaultRentalListing()
   }
 }
 

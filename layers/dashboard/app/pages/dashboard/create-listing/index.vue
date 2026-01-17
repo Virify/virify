@@ -19,45 +19,15 @@
     </template>
 
     <template #body>
-      <OrganismsDashboardTierTable @create-listing="openModal" />
-      <!-- Create Listing Modal -->
-      <UModal
-        v-model:open="isModalOpen"
-        :dismissible="false"
-        :fullscreen="isMobile"
-        :ui="{
-          overlay: 'backdrop-blur-sm',
-          content: 'max-w-7xl h-full lg:h-[85vh] lg:max-h-[85vh] bg-(--background-200) dark:bg-(--background-100)! flex flex-col overflow-hidden',
-          body: 'flex-1 min-h-0 flex flex-col overflow-hidden p-0!',
-        }"
-      >
-        <template #title>
-          <h2 class="title-md m-0!">Create a New Listing</h2>
-        </template>
-        <template #body>
-          <!-- Mobile: Accordion -->
-          <OrganismsDashboardCreateListingAccordion
-            v-if="isMobile"
-            :steps="steps"
-            v-model="currentStepValue"
-            class="h-full overflow-y-auto p-4"
-          />
-
-          <!-- Tablet and above: Stepper -->
-          <OrganismsDashboardCreateListingStepper
-            v-else
-            :steps="steps"
-            v-model="currentStepValue"
-            class="h-full"
-          />
-        </template>
-      </UModal>
+      <OrganismsDashboardTierTable @create-listing="handleCreateListing" />
+      
+      <!-- Shared Listing Editor Modal -->
+      <OrganismsDashboardCreateListingModal ref="listingModal" />
     </template>
   </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
-import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
 import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
 
 definePageMeta({
@@ -69,35 +39,11 @@ definePageMeta({
   layout: "dashboard",
 })
 
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const activeBreakpoints = breakpoints.active()
+import OrganismsDashboardCreateListingModal from '~~/layers/dashboard/app/components/Organisms/Dashboard/CreateListing/OrganismsDashboardCreateListingModal.vue';
 
-const isMobile = computed(() => {
-  return !activeBreakpoints.value.includes("lg") && !activeBreakpoints.value.includes("xl") && !activeBreakpoints.value.includes("2xl")
-})
+const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
 
-// Use the composable for all step state management
-const {
-  steps,
-  currentStepValue,
-  modalStatesArray,
-  openStepModal,
-  updateModalState,
-  nextStep,
-  startNewListing,
-} = useCreateListingSteps()
-
-const isModalOpen = ref(false)
-
-const openModal = (tier: ListingTier) => {
-  startNewListing(tier)
-  isModalOpen.value = true
+function handleCreateListing(tier: ListingTier) {
+  listingModal.value?.openForNewListing(tier);
 }
-
-const closeModal = () => {
-  isModalOpen.value = false
-}
-
-// Provide closeModal to child components
-provide('closeModal', closeModal)
 </script>

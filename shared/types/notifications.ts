@@ -59,6 +59,7 @@ export interface UserItemsAggregates {
   enquiries: number;
   locations: number;
   listings: number; // Count of user's listings
+  draftListings: number; // Count of user's draft listings
   messages: number; // Total count of all messages in user's conversations
   unreadMessages: number; // Count of unread messages
   unreadConversations: number; // Count of conversations with unread messages

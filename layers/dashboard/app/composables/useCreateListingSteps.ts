@@ -153,22 +153,64 @@ export const useCreateListingSteps = createSharedComposable(() => {
     return incomplete?.id ?? 1
   })
 
+  // Infer completed steps from draft data (for legacy drafts without completedSteps array)
+  const inferCompletedStepsFromData = (draft: DraftListingWithFullPayload): number[] => {
+    const inferred: number[] = []
+    
+    // Step 1: Has saleListing or rentalListing
+    if (draft.saleListing || draft.rentalListing) inferred.push(1)
+    
+    // Step 2: Has property with address
+    if (draft.property?.address) inferred.push(2)
+    
+    // Step 3: Has price
+    if (draft.price !== null && draft.price !== undefined) inferred.push(3)
+    
+    // Step 4: Has bedrooms or bathrooms defined
+    if (draft.property?.bedroomFeatures?.length || draft.property?.bathroomFeatures?.length || 
+        draft.property?.numberBedrooms !== null || draft.property?.numberBathrooms !== null) inferred.push(4)
+    
+    // Step 5: Has kitchens, receptions, or other rooms
+    if (draft.property?.kitchenFeatures?.length || draft.property?.reception?.length || 
+        draft.property?.otherRoom?.length) inferred.push(5)
+    
+    // Step 6: Has outdoor space data
+    if (draft.property?.outdoorSpace) inferred.push(6)
+    
+    // Step 7: Has additional features (parking, security, etc.)
+    if (draft.property?.additionalFeatures || draft.property?.parking || 
+        draft.property?.securityFeatures) inferred.push(7)
+    
+    // Step 8: Has energy/utilities data
+    if (draft.property?.energyAndUtilities || draft.property?.runningCosts) inferred.push(8)
+    
+    // Step 9: Has media
+    if (draft.property?.media?.length) inferred.push(9)
+    
+    return inferred
+  }
+
   // Load draft listing data from API
   const loadDraftListing = async (id: number) => {
     isLoading.value = true
     loadError.value = null
     
     try {
-      const response = await useRequestFetch()<{ success: boolean; data: DraftListingWithFullPayload }>(
-        `/api/listing/draft/${id}`,
+      // GET /api/draft-listings/:id returns the draft directly (not wrapped)
+      const draft = await useRequestFetch()<DraftListingWithFullPayload>(
+        `/api/draft-listings/${id}/`,
         { method: 'GET' }
       )
       
-      if (response.success && response.data) {
-        draftListingId.value = response.data.id
+      if (draft?.id) {
+        draftListingId.value = draft.id
         
-        // Update step completion status from database
-        const completedSteps = response.data.completedSteps || []
+        // Use stored completedSteps, or infer from data for legacy drafts
+        let completedSteps = draft.completedSteps || []
+        if (completedSteps.length === 0) {
+          completedSteps = inferCompletedStepsFromData(draft)
+        }
+        
         steps.value.forEach(step => {
           step.completed = completedSteps.includes(step.id)
           // Unlock step if previous step is completed OR it's step 1
@@ -176,7 +218,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
         })
         
         // Populate step data from the draft
-        populateStepDataFromDraft(response.data)
+        populateStepDataFromDraft(draft)
         
         // Set current step to first incomplete
         currentStep.value = firstIncompleteStep.value
@@ -184,6 +226,47 @@ export const useCreateListingSteps = createSharedComposable(() => {
     } catch (error: any) {
       console.error('Failed to load draft listing:', error)
       loadError.value = error?.data?.message || 'Failed to load draft listing'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // Track if we're editing a live listing (vs a draft)
+  const editingListingId = ref<number | null>(null)
+
+  // Load a published listing for editing
+  const loadListing = async (id: number) => {
+    isLoading.value = true
+    loadError.value = null
+    
+    try {
+      // GET /api/listing/:id returns { listing: FullListing }
+      const response = await useRequestFetch()<{ listing: any }>(
+        `/api/listing/${id}/`,
+        { method: 'GET' }
+      )
+      
+      if (response?.listing) {
+        const listing = response.listing
+        editingListingId.value = listing.id
+        // For live listings, we don't have a draftListingId - we're editing directly
+        draftListingId.value = null
+        
+        // All steps are complete for a published listing
+        steps.value.forEach(step => {
+          step.completed = true
+          step.locked = false
+        })
+        
+        // Populate step data from the listing (same structure as draft)
+        populateStepDataFromDraft(listing)
+        
+        // Go to last step for editing published listings (all steps complete)
+        currentStep.value = 9
+      }
+    } catch (error: any) {
+      console.error('Failed to load listing:', error)
+      loadError.value = error?.data?.message || 'Failed to load listing'
     } finally {
       isLoading.value = false
     }
@@ -606,6 +689,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     currentStepValue,
     modalStatesArray,
     draftListingId: readonly(draftListingId),
+    editingListingId: readonly(editingListingId),
     selectedTier: readonly(selectedTier),
     isLoading: readonly(isLoading),
     isSaving: readonly(isSaving),
@@ -621,6 +705,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     // Methods - Draft Management
     initializeDraft,
     loadDraftListing,
+    loadListing,
     createDraftListing,
     setDraftListingId,
     ensureDraftExists,

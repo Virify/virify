@@ -14,6 +14,18 @@ export const listingTypeItems: SelectOption[] = [
   { value: 'rent', label: 'For Rent' },
 ]
 
+/** Boolean yes/no options for chain status */
+export const chainItems: SelectOption[] = [
+  { value: false, label: 'No' },
+  { value: true, label: 'Yes' },
+]
+
+/** Boolean yes/no options for bills included */
+export const billsIncludedItems: SelectOption[] = [
+  { value: false, label: 'No' },
+  { value: true, label: 'Yes' },
+]
+
 // ============================================================================
 // Sale Listing Options
 // ============================================================================

@@ -45,23 +45,42 @@ export function useDashboardNavigation() {
           badge: aggregates.value.listings ? String(aggregates.value.listings) : undefined,
         },
         {
-          label: "Offers",
+          label: "Draft Listings",
           type: "link",
-          to: "#",
-          icon: "i-lucide-hand-heart",
+          to: "/dashboard/draft-listings",
+          icon: "i-lucide-file-text",
           tooltip: {
-            text: "Manage offers",
+            text: "View draft listings",
           },
+          badge: aggregates.value.draftListings ? String(aggregates.value.draftListings) : undefined,
         },
         {
-          label: "Viewings",
+          label: "Create Listing",
           type: "link",
-          to: "#",
-          icon: "i-lucide-calendar-check",
+          to: "/dashboard/create-listing",
+          icon: "i-lucide-square-plus",
           tooltip: {
-            text: "Schedule viewings",
+            text: "Create a new listing",
           },
         },
+        // {
+        //   label: "Offers",
+        //   type: "link",
+        //   to: "#",
+        //   icon: "i-lucide-hand-heart",
+        //   tooltip: {
+        //     text: "Manage offers",
+        //   },
+        // },
+        // {
+        //   label: "Viewings",
+        //   type: "link",
+        //   to: "#",
+        //   icon: "i-lucide-calendar-check",
+        //   tooltip: {
+        //     text: "Schedule viewings",
+        //   },
+        // },
         {
           label: "Enquiries",
           type: "link",
@@ -93,30 +112,41 @@ export function useDashboardNavigation() {
           badge: aggregates.value.notes ? String(aggregates.value.notes) : undefined,
         },
         {
-          label: "Create Listing",
-          type: "link",
-          to: "/dashboard/create-listing",
-          icon: "i-lucide-square-plus",
-          tooltip: {
-            text: "Create a new listing",
-          },
-        },
-        {
-          label: "Draft Listings",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-file-text",
-          tooltip: {
-            text: "View draft listings",
-          },
-        },
-        {
           label: "Viewed",
           type: "link",
           to: "#",
           icon: "i-lucide-eye",
           tooltip: {
             text: "Recently viewed properties",
+          },
+        },
+      ],
+    },
+    {
+      label: "Search",
+      icon: "i-lucide-search",
+      tooltip: {
+        text: "Search preferences",
+      },
+      defaultOpen: true,
+      children: [
+        {
+          label: "Saved Locations",
+          type: "link",
+          to: "/dashboard/saved-locations",
+          icon: "i-lucide-map-pin",
+          tooltip: {
+            text: "Your saved search locations",
+          },
+          badge: aggregates.value.locations ? String(aggregates.value.locations) : undefined,
+        },
+        {
+          label: "Saved Searches",
+          type: "link",
+          to: "#",
+          icon: "i-lucide-text-search",
+          tooltip: {
+            text: "Your saved searches",
           },
         },
       ],
@@ -138,24 +168,24 @@ export function useDashboardNavigation() {
             text: "Your profile",
           },
         },
-        {
-          label: "Settings",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-settings",
-          tooltip: {
-            text: "Account settings",
-          },
-        },
-        {
-          label: "Billing",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-credit-card",
-          tooltip: {
-            text: "Billing & payments",
-          },
-        },
+        // {
+        //   label: "Settings",
+        //   type: "link",
+        //   to: "#",
+        //   icon: "i-lucide-settings",
+        //   tooltip: {
+        //     text: "Account settings",
+        //   },
+        // },
+        // {
+        //   label: "Billing",
+        //   type: "link",
+        //   to: "#",
+        //   icon: "i-lucide-credit-card",
+        //   tooltip: {
+        //     text: "Billing & payments",
+        //   },
+        // },
         {
           label: "Security",
           type: "link",
@@ -181,33 +211,6 @@ export function useDashboardNavigation() {
           icon: "i-lucide-chart-bar",
           tooltip: {
             text: "View analytics",
-          },
-        },
-      ],
-    },
-    {
-      label: "Search",
-      icon: "i-lucide-search",
-      tooltip: {
-        text: "Search preferences",
-      },
-      children: [
-        {
-          label: "Saved Searches",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-text-search",
-          tooltip: {
-            text: "Your saved searches",
-          },
-        },
-        {
-          label: "Saved Locations",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-bookmark",
-          tooltip: {
-            text: "Your saved locations",
           },
         },
       ],

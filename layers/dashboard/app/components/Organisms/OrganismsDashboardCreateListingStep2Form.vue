@@ -131,23 +131,43 @@ const emptyAddress: AddressParsed = {
 }
 
 // Form state - initialize with saved data if exists
-const savedData = getStepData(2) as Step2FormData | undefined
-const state = reactive<Step2FormData>(savedData && Object.keys(savedData).length > 0 ? { ...savedData } : {
-  property: {
-    address: { ...emptyAddress },
-    type: null as unknown as number,
-    classification: null as unknown as number,
-    description: '',
-    totalFloors: 1,
-    constructionType: null,
-    size: null,
-    yearBuilt: null,
-  },
+// savedData may include extra UI fields like sizeUnit that aren't in the schema
+const savedData = getStepData(2) as (Step2FormData & { sizeUnit?: 'sqm' | 'sqft' }) | undefined
+
+// Default property state
+const defaultProperty = {
+  address: { ...emptyAddress },
+  type: null as unknown as number,
+  classification: null as unknown as number,
+  description: '',
+  totalFloors: 1,
+  constructionType: null,
+  size: null,
+  yearBuilt: null,
+}
+
+const state = reactive<Step2FormData>({
+  property: savedData?.property 
+    ? { ...defaultProperty, ...savedData.property, address: { ...emptyAddress, ...savedData.property.address } }
+    : defaultProperty,
 })
 
 // Size conversion (UI only - stored in meters)
-const sizeUnit = ref<'sqm' | 'sqft'>('sqm')
-const sizeInput = ref<number | null>(state.property.size ?? null)
+// Restore user's preferred unit from saved data, default to sqm
+const sizeUnit = ref<'sqm' | 'sqft'>(savedData?.sizeUnit ?? 'sqm')
+
+// Initialize sizeInput based on the stored unit preference
+// If user had selected sqft, convert the stored m² back to sqft for display
+const initSizeInput = (): number | null => {
+  const storedSize = state.property.size
+  if (storedSize === null || storedSize === undefined) return null
+  // If user's preferred unit was sqft, convert back for display
+  if (savedData?.sizeUnit === 'sqft') {
+    return sqmToSqft(storedSize)
+  }
+  return storedSize
+}
+const sizeInput = ref<number | null>(initSizeInput())
 
 // Watch size input and convert to meters for storage
 watch([sizeInput, sizeUnit], ([size, unit]) => {
@@ -225,6 +245,8 @@ function onPropertyTypeChange() {
 // Get submission data for the wrapper
 function getSubmissionData() {
   return {
+    // Store user's preferred size unit so we can restore it when editing
+    sizeUnit: sizeUnit.value,
     property: {
       address: state.property.address,
       type: state.property.type,
@@ -232,7 +254,7 @@ function getSubmissionData() {
       description: state.property.description,
       totalFloors: state.property.totalFloors,
       constructionType: state.property.constructionType,
-      size: state.property.size,
+      size: state.property.size, // Always stored in m²
       yearBuilt: state.property.yearBuilt,
     }
   }

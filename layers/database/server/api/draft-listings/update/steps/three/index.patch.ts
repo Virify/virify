@@ -13,9 +13,17 @@ export default defineEventHandler(async (event) => {
   try {
     const { draftId, price, rentalListing, saleListing } = await readValidatedBody(event, stepDataSchema.parse);
 
+    // Get current completedSteps to check if step 3 already exists
+    const currentDraft = await prisma.draftListing.findUnique({
+      where: { id: draftId },
+      select: { completedSteps: true },
+    });
+
     const updatedDraftListing = await prisma.draftListing.update({
       where: { id: draftId, userId: user.id },
       data: {
+        // Add step 3 to completedSteps if not already there
+        ...(currentDraft && !currentDraft.completedSteps.includes(3) ? { completedSteps: { push: 3 } } : {}),
         price: price,
         rentalListing: rentalListing
           ? {

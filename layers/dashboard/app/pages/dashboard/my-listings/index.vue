@@ -20,6 +20,9 @@
     </template>
 
     <template #body>
+      <!-- Tier Selection Table -->
+      <MoleculesDashboardPriceTier v-if="!listings.length && !loading" @select-tier="handleCreateListing" />
+
       <!-- Grid View -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-if="loading">
         <OrganismsDashboardListingCardMyListingSkeleton :cards="3" />
@@ -27,7 +30,7 @@
 
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="filteredListings.length > 0">
         <div v-for="listing in filteredListings" :key="listing.id" class="h-full">
-          <OrganismsDashboardListingCardMyListing :listing="listing" />
+          <OrganismsDashboardListingCardMyListing :listing="listing" @edit="handleEditListing" />
         </div>
       </OrganismsDashboardListingCardGrid>
 
@@ -38,14 +41,14 @@
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
         <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit" variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
       </div>
+
+      <!-- Shared Listing Editor Modal -->
+      <OrganismsDashboardCreateListingModal ref="listingModal" @close="handleModalClose" />
     </template>
   </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
-import type { PricingPlanProps } from '@nuxt/ui';
-
-
 definePageMeta({
   middleware: ["authenticated"],
   head: {
@@ -61,60 +64,15 @@ const page = ref(1);
 const limit = ref(20);
 const filteredListings = ref<OwnedListingWithAnalytics[]>([]);
 
-const plans = ref<PricingPlanProps[]>([
-  {
-    title: 'Standard',
-    description: 'Entry level tier',
-    badge: 'Most value',
-    features: [
-      'Listing creator tools',
-      'Up to 8 images',
-      'Verified identification and property ownership',
-      'Basic analytics'
-    ],
-    button: {
-      label: 'Create Listing',
-      color: 'neutral' as const,
-      variant: 'subtle' as const
-    }
-  },
-  
-  {
-    title: 'Premium',
-    description: 'Ideal for larger teams and organizations.',
-    scale: true,
-    button: {
-      label: 'Create Listing',
-      color: 'primary' as const,
-      variant: 'subtle' as const
-    },
-    features: [
-      'Everything in Premium, plus:',
-      'Larger more detailed listing cards',
-      'Gallery on search results',
-      'Priority placement',
-      'Up to 50 images',
-      'Priotity support',
-      'Professional analytics',
-    ]
-  },
-  {
-    title: 'Professional',
-    description: 'Serious sellers and landlords',
-    button: {
-      label: 'Create Listing',
-      color: 'secondary' as const,
-      variant: 'subtle' as const
-    },
-    features: [
-      'Everything in Standard, plus:',
-      'Up to 25 images',
-      'Video media uploads',
-      'Improved listing card visibility',
-      'Advanced analytics',
-    ]
-  },
-])
+// Modal ref
+import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
+import OrganismsDashboardCreateListingModal from '~~/layers/dashboard/app/components/Organisms/Dashboard/CreateListing/OrganismsDashboardCreateListingModal.vue';
+const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
+
+// Handle create listing from tier table
+function handleCreateListing(tier: ListingTier) {
+  listingModal.value?.openForNewListing(tier);
+}
 
 const { sortOrderValue, searchQuery, saleRentFilter } = useDashboardListFilter(ref([]), {
   persistenceKey: "dashboard-my-listings",
@@ -146,6 +104,20 @@ async function onPageChange(newPage: number) {
   const el = (pageTop.value as any)?.$el ?? pageTop.value;
   const scrollContainer = el?.closest(".overflow-y-auto, .overflow-y-scroll, .overflow-auto");
   scrollContainer?.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Handle edit listing - open modal
+async function handleEditListing(payload: { id: number; isDraft: boolean }) {
+  if (payload.isDraft) {
+    await listingModal.value?.openForDraft(payload.id);
+  } else {
+    await listingModal.value?.openForListing(payload.id);
+  }
+}
+
+// Handle modal close - refetch to get any updates
+function handleModalClose() {
+  fetchMyListings(saleRentFilter.value as any, page.value, mapSortOrder.value as any, limit.value);
 }
 
 // Filter listings by sale/rent + search after API returns

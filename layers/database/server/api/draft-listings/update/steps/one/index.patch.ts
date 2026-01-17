@@ -83,6 +83,17 @@ export default defineEventHandler(async (event) => {
       delete updateData.rentalListing?.delete;
     }
 
+    // Get current completedSteps to check if step 1 already exists
+    const currentDraft = await prisma.draftListing.findUnique({
+      where: { id: draftId },
+      select: { completedSteps: true },
+    });
+
+    // Add step 1 to completedSteps if not already there
+    if (currentDraft && !currentDraft.completedSteps.includes(1)) {
+      updateData.completedSteps = { push: 1 };
+    }
+
     return await prisma.draftListing.update({
       where: { id: draftId, userId: user.id },
       data: updateData,

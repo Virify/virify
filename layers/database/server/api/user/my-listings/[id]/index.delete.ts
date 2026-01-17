@@ -1,3 +1,5 @@
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
+
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse()
   

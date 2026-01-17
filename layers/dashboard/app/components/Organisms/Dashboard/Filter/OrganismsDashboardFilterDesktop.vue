@@ -1,7 +1,7 @@
 <template>
   <div class="hidden lg:flex gap-2 items-center flex-wrap w-full">
     <!-- Category Filter -->
-    <div class="relative">
+    <div v-if="!hideSaleRentFilter" class="relative">
       <USelect
         v-if="!enquiries"
         v-model="saleRentFilter"
@@ -147,6 +147,7 @@
     allConversationsCount: number;
     unreadConversationsCount: number;
     viewOptions?: { label: string; value: string; icon?: string; disabled?: boolean }[];
+    hideSaleRentFilter?: boolean;
   }>();
 
   // Destructure for easier use in template

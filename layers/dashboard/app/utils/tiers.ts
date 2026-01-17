@@ -1,11 +1,11 @@
-export const basicFeatures = [
+export const basicFeatures: string[] = [
   'Listing creator tools',
   'Up to 8 images',
   'Verified identification and property ownership',
   'Basic analytics'
 ];
 
-export const professionalFeatures = [
+export const professionalFeatures: string[] = [
   'Everything in Standard, plus:',
   'Up to 25 images',
   'Video media uploads',
@@ -13,7 +13,7 @@ export const professionalFeatures = [
   'Advanced analytics',
 ];
 
-export const premiumFeatures = [
+export const premiumFeatures: string[] = [
   'Everything in Premium, plus:',
   'Larger more detailed listing cards',
   'Gallery on search results',

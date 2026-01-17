@@ -1,5 +1,5 @@
 <template>
-  <UPageColumns class="max-w-500 m-auto">
+  <UPageColumns class="max-w-500 items-center">
     <UPricingPlan
       title="Basic"
       description="Entry level tier"
@@ -16,18 +16,19 @@
         price: 'title-md mt-0! mb-0!',
         priceWrapper: 'mt-2 mb-2',
       }"
-      :features="basicFeatures"
+      :features="basicFeaturesFormatted"
       :button="{
         label: 'Create Listing',
         color: 'neutral',
         variant: 'subtle',
         size: 'xs',
         class: ' body-sm cursor-pointer',
+        onClick: () => emit('select-tier', ListingTier.BASIC),
       }"
     />
     <UPricingPlan
       title="Premium"
-      description="Our premium tier"
+      description="Enhanced visibility"
       price="Free"
       variant="subtle"
       badge="Serious sellers"
@@ -41,18 +42,19 @@
         price: 'title-md mt-0! mb-0! text-primary dark:text-(--blue-600)',
         priceWrapper: 'mt-2 mb-2',
       }"
-      :features="premiumFeatures"
+      :features="premiumFeaturesFormatted"
       :button="{
         label: 'Create Listing',
         color: 'primary',
         variant: 'solid',
         size: 'xs',
         class: ' body-sm text-white! cursor-pointer',
+        onClick: () => emit('select-tier', ListingTier.FEATURED),
       }"
     />
     <UPricingPlan
       title="Professional"
-      description="Tier designed for professionals"
+      description="Professional features"
       price="Free"
       badge="Professionals"
       variant="soft"
@@ -66,14 +68,28 @@
         price: 'title-md mt-0! mb-0! text-secondary',
         priceWrapper: 'mt-2 mb-2',
       }"
-      :features="professionalFeatures"
+      :features="professionalFeaturesFormatted"
       :button="{
         label: 'Create Listing',
         color: 'secondary',
         variant: 'solid',
         size: 'xs',
-        class: ' body-sm text-white!',
+        class: ' body-sm text-white! cursor-pointer',
+        onClick: () => emit('select-tier', ListingTier.PREMIUM),
       }"
     />
   </UPageColumns>
 </template>
+
+<script setup lang="ts">
+import { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
+
+const emit = defineEmits<{
+  'select-tier': [tier: ListingTier]
+}>();
+
+// Format features from tiers.ts config for UPricingPlan
+const basicFeaturesFormatted = basicFeatures.map((f: string) => ({ title: f }));
+const premiumFeaturesFormatted = premiumFeatures.map((f: string) => ({ title: f }));
+const professionalFeaturesFormatted = professionalFeatures.map((f: string) => ({ title: f }));
+</script>

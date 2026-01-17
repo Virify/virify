@@ -11,7 +11,8 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
       notes, 
       enquiries, 
       locations, 
-      listings, 
+      listings,
+      draftListings,
       messages, 
       unreadMessages, 
       unreadConversations, 
@@ -48,6 +49,12 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
       },
     }),
     prisma.listing.count({
+      where: {
+        userId: userId,
+      },
+    }),
+    // Count draft listings
+    prisma.draftListing.count({
       where: {
         userId: userId,
       },
@@ -123,6 +130,7 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
     enquiries,
     locations,
     listings,
+    draftListings,
     messages,
     unreadMessages,
     unreadConversations,
