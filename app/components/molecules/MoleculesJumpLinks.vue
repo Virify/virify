@@ -3,11 +3,15 @@
     <span aria-hidden class="m-jump-links__indicator"></span>
 
     <ul class="m-jump-links__list">
-      <li v-for="{ title, id, isIntersecting } of sortedLinksWithVisibility">
-        <a :href="'#' + id" :title class="m-jump-links__link | button button-ghost button-sm" :class="{
+      <li v-for="{ icon, title, id, isIntersecting } of sortedLinksWithVisibility">
+        <a :href="'#' + id" :title class="m-jump-links__link" :class="{
           'm-jump-links__link--active': isIntersecting
         }">
-          {{ title }}
+          <AtomsIcon v-if="icon" :icon />
+
+          <span class="m-jump-links__link-text">
+            {{ title }}
+          </span>
         </a>
       </li>
     </ul>
@@ -159,6 +163,9 @@ useResizeObserver($root, resizeIndicator)
   position: relative;
   overflow: auto;
   scrollbar-width: none;
+  container-name: jumplinks;
+  container-type: inline-size;
+  width: 100%;
 
   &__indicator {
     position: absolute;
@@ -180,21 +187,75 @@ useResizeObserver($root, resizeIndicator)
     gap: var(--size-4);
     padding: 0;
     margin: 0;
+
+    @container jumplinks (width < 520px) {
+      gap: 0
+    }
   }
 
   &__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     color: currentColor;
     text-decoration: none;
     white-space: nowrap;
+    font-weight: var(--font-semibold);
+    padding: var(--size-12) var(--size-20);
+    gap: var(--size-10);
+    line-height: var(--lineheight-xs);
 
     &:hover {
       background: fn.faded-color(10%);
       color: currentColor;
+
+      @container jumplinks (width < 520px) {
+        background: transparent;
+      }
     }
 
     &--active {
       color: var(--secondary-200);
+    }
+
+    @container jumplinks (width < 520px) {
+      padding: var(--size-10) var(--size-14) var(--size-4);
+      flex-direction: column;
+      gap: 0;
+    }
+
+    @container jumplinks (width < 420px) {
+      padding: var(--size-8) var(--size-10) var(--size-2);
+    }
+
+    @container jumplinks (width < 250px) {
+      padding: var(--size-6) var(--size-8) var(--size-2);
+    }
+
+    .a-icon {
+      width: var(--size-20);
+      height: var(--size-20);
+
+      @container jumplinks (width < 420px) {
+        width: var(--size-24);
+        height: var(--size-24);
+      }
+    }
+  }
+
+  &__link-text {
+    font-size: var(--font-sm);
+
+    @container jumplinks (width < 520px) {
+      display: block;
+      font-size: var(--font-2xs);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @container jumplinks (width < 250px) {
+      font-size: 10px;
     }
   }
 }
