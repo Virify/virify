@@ -192,6 +192,10 @@ useResizeObserver($root, resizeIndicator)
       background: fn.faded-color(10%);
       color: currentColor;
     }
+
+    &--active {
+      color: var(--secondary-200);
+    }
   }
 }
 </style>
