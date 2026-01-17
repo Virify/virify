@@ -29,13 +29,18 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   
   /**
    * Get base payload with common fields
+   * Returns null sessionId if user has declined consent (anonymous tracking)
    */
-  const getBasePayload = (): TrackingBasePayload => ({
-    sessionId: sessionId.value,
-    timestamp: Date.now(),
-    userAgent: import.meta.client ? navigator.userAgent : undefined,
-    referrer: import.meta.client ? document.referrer : undefined,
-  });
+  const getBasePayload = (): TrackingBasePayload => {
+    const { hasConsented } = useCookieConsent();
+    
+    return {
+      sessionId: hasConsented.value ? sessionId.value : null,
+      timestamp: Date.now(),
+      userAgent: import.meta.client ? navigator.userAgent : undefined,
+      referrer: import.meta.client ? document.referrer : undefined,
+    };
+  };
   
   /**
    * Detect traffic source from referrer
@@ -79,6 +84,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   /**
    * Send tracking event via sendBeacon
    * Fire-and-forget - doesn't wait for response
+   * Supports both consented (with sessionId) and anonymous (without sessionId) tracking
    */
   const sendBeaconEvent = <T extends object>(endpoint: string, payload: T): boolean => {
     if (!import.meta.client || typeof navigator.sendBeacon !== 'function') {

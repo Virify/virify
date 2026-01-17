@@ -24,9 +24,10 @@ export type AnalyticsEventType =
 
 /**
  * Base payload for all tracking events
+ * sessionId is null when user declines consent (anonymous tracking)
  */
 export interface TrackingBasePayload {
-  sessionId: string;
+  sessionId: string | null;
   timestamp: number;
   userAgent?: string;
   referrer?: string;

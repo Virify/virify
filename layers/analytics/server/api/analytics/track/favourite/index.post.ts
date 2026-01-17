@@ -11,7 +11,7 @@ import * as z from "zod";
 
 const favouriteSchema = z.object({
   listingId: z.union([z.string(), z.number()]),
-  sessionId: z.string(),
+  sessionId: z.string().nullable().optional(), // Optional for anonymous tracking
   timestamp: z.number(),
   action: z.enum(['add', 'remove']),
   userAgent: z.string().optional(),

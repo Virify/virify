@@ -6,6 +6,7 @@
       </NuxtLayout>
       
       <OrganismsGlobalNotificationHandler />
+      <OrganismsGlobalCookieConsent />
     </UApp>
   </ConfigProvider>
 </template>

@@ -11,7 +11,7 @@ import * as z from "zod";
 
 const enquirySchema = z.object({
   listingId: z.union([z.string(), z.number()]),
-  sessionId: z.string(),
+  sessionId: z.string().nullable().optional(), // Optional for anonymous tracking
   timestamp: z.number(),
   source: z.enum(['search', 'direct', 'social', 'email', 'referral']).optional(),
   userAgent: z.string().optional(),

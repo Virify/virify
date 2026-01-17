@@ -8,7 +8,7 @@ import * as z from "zod";
 
 const shareSchema = z.object({
   listingId: z.union([z.string(), z.number()]),
-  sessionId: z.string(),
+  sessionId: z.string().nullable().optional(), // Optional for anonymous tracking
   timestamp: z.number(),
   platform: z.string(), // e.g., 'twitter', 'facebook', 'whatsapp', 'copy', 'email'
   userAgent: z.string().optional(),
