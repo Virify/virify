@@ -122,6 +122,10 @@ export const useFavourites = () => {
       return;
     }
 
+    // Track the favourite action
+    const { trackFavourite } = useAnalyticsTracking();
+    trackFavourite(listingId, 'add');
+
     await performOptimisticUpdate({
       ref: favouriteLookups,
       optimisticChange: (current) => [...current, listingId],
@@ -155,6 +159,10 @@ export const useFavourites = () => {
   const removeFromFavourite = async (listingId: number) => {
     // Only remove locally if it exists in the lookups
     if (!favouriteLookups.value.includes(listingId)) return;
+
+    // Track the favourite action
+    const { trackFavourite } = useAnalyticsTracking();
+    trackFavourite(listingId, 'remove');
 
     await performPendingRemoval({
       pendingSet: pendingRemoval,

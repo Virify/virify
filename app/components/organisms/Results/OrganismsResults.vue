@@ -133,6 +133,19 @@ const resultsComponents = computed(() => {
       return { variant, fullWidth, component, result }
     })
 })
+
+// Track impressions when results are displayed
+const { trackImpressions } = useAnalyticsTracking()
+
+watch(() => props.results, (newResults) => {
+  if (newResults && newResults.length > 0 && !props.isLoading) {
+    // Track all listing IDs as impressions
+    const listingIds = newResults.map(r => r.id).filter(Boolean)
+    if (listingIds.length > 0) {
+      trackImpressions(listingIds)
+    }
+  }
+}, { immediate: true })
 </script>
 
 <style lang="scss">

@@ -5,8 +5,119 @@
 
 import type { ListingCardType } from "#imports";
 
+// ============================================================================
+// TRACKING EVENT TYPES (used by useAnalyticsTracking composable)
+// ============================================================================
+
+/**
+ * Event types for analytics tracking
+ */
+export type AnalyticsEventType = 
+  | 'view'           // User views a listing detail page
+  | 'impression'     // Listing appears in search results
+  | 'click'          // User clicks listing card in search results  
+  | 'favourite'      // User favourites/unfavourites a listing
+  | 'enquiry'        // User sends an enquiry
+  | 'share'          // User shares a listing
+  | 'search'         // User performs a search
+  | 'mortgage_calc'; // User uses mortgage calculator
+
+/**
+ * Base payload for all tracking events
+ */
+export interface TrackingBasePayload {
+  sessionId: string;
+  timestamp: number;
+  userAgent?: string;
+  referrer?: string;
+}
+
+/**
+ * Traffic source types
+ */
+export type TrafficSourceType = 'search' | 'direct' | 'social' | 'email' | 'referral';
+
+/**
+ * Listing event payload (view, click, enquiry, share)
+ */
+export interface TrackingListingPayload extends TrackingBasePayload {
+  listingId: number | string;
+  source?: TrafficSourceType;
+  position?: number; // Position in search results (for impressions/clicks)
+}
+
+/**
+ * Impression batch payload - for tracking multiple impressions at once
+ */
+export interface TrackingImpressionBatchPayload extends TrackingBasePayload {
+  listingIds: number[];
+  source?: string;
+  searchQuery?: string;
+}
+
+/**
+ * Favourite event payload
+ */
+export interface TrackingFavouritePayload extends TrackingBasePayload {
+  listingId: number | string;
+  action: 'add' | 'remove';
+}
+
+/**
+ * Share event payload
+ */
+export interface TrackingSharePayload extends TrackingBasePayload {
+  listingId: number | string;
+  platform: string;
+}
+
+/**
+ * Search event payload
+ */
+export interface TrackingSearchPayload extends TrackingBasePayload {
+  listingType: string;
+  query: string;
+  location: {
+    id: string;
+    placeName: string;
+    text: string;
+    lat: number;
+    lon: number;
+  };
+  radius: number;
+  resultCount: number;
+  filters?: Record<string, unknown>;
+}
+
+/**
+ * Mortgage calculation event payload
+ */
+export interface TrackingMortgageCalcPayload extends TrackingBasePayload {
+  listingId?: string | null;
+  propertyPrice: number;
+  deposit: number;
+  termYears: number;
+  buyerType: string;
+  customRate?: number | null;
+  loanAmount: number;
+  ltv: number;
+  ltvBracket: string;
+  monthlyPayment: number;
+  totalPayment: number;
+  totalInterest: number;
+  rateUsed: number;
+  rateType: string;
+  usedDefaultRates: boolean;
+  usedCustomRate: boolean;
+}
+
+// ============================================================================
+// LEGACY/EXISTING TYPES
+// ============================================================================
+
 /**
  * Request body for tracking a listing view
+ * @deprecated Use TrackingListingPayload instead
  */
 export interface TrackListingViewBody {
   listingId: number | string;

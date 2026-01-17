@@ -7,80 +7,11 @@
  * Separation of concerns:
  * - useAnalyticsTracking: POST events (fire-and-forget)
  * - useAnalytics: GET/fetch analytics data for display
+ * 
+ * Types are defined in shared/types/analytics.ts
  */
 import { nanoid } from "nanoid";
 import { createSharedComposable } from '@vueuse/core';
-
-/**
- * Event types for analytics tracking
- */
-export type AnalyticsEventType = 
-  | 'view'           // User views a listing detail page
-  | 'impression'     // Listing appears in search results
-  | 'click'          // User clicks listing card in search results  
-  | 'favourite'      // User favourites/unfavourites a listing
-  | 'enquiry'        // User sends an enquiry
-  | 'share'          // User shares a listing
-  | 'search'         // User performs a search
-  | 'mortgage_calc'; // User uses mortgage calculator
-
-/**
- * Base payload for all tracking events
- */
-interface BaseTrackingPayload {
-  sessionId: string;
-  timestamp: number;
-  userAgent?: string;
-  referrer?: string;
-}
-
-/**
- * Listing event payload
- */
-interface ListingEventPayload extends BaseTrackingPayload {
-  listingId: number | string;
-  source?: 'search' | 'direct' | 'social' | 'email' | 'referral';
-  position?: number; // Position in search results (for impressions/clicks)
-}
-
-/**
- * Impression batch payload - for tracking multiple impressions at once
- */
-interface ImpressionBatchPayload extends BaseTrackingPayload {
-  listingIds: number[];
-  source?: string;
-  searchQuery?: string;
-}
-
-/**
- * Search event payload
- */
-interface SearchEventPayload extends BaseTrackingPayload {
-  listingType: string;
-  query: string;
-  location: {
-    id: string;
-    placeName: string;
-    text: string;
-    lat: number;
-    lon: number;
-  };
-  radius: number;
-  resultCount: number;
-  filters?: Record<string, unknown>;
-}
-
-/**
- * Mortgage calculation event payload
- */
-interface MortgageCalcPayload extends BaseTrackingPayload {
-  listingId?: number | string;
-  propertyPrice: number;
-  deposit: number;
-  interestRate: number;
-  termYears: number;
-  monthlyPayment: number;
-}
 
 /**
  * Analytics tracking composable
@@ -99,7 +30,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   /**
    * Get base payload with common fields
    */
-  const getBasePayload = (): BaseTrackingPayload => ({
+  const getBasePayload = (): TrackingBasePayload => ({
     sessionId: sessionId.value,
     timestamp: Date.now(),
     userAgent: import.meta.client ? navigator.userAgent : undefined,
@@ -109,7 +40,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   /**
    * Detect traffic source from referrer
    */
-  const detectSource = (): ListingEventPayload['source'] => {
+  const detectSource = (): TrafficSourceType => {
     if (!import.meta.client) return 'direct';
     
     const referrer = document.referrer;
@@ -167,7 +98,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
    * Track a listing view (user visits listing detail page)
    * Debounced - only counts once per 30 minutes per listing
    */
-  const trackView = (listingId: number | string, options?: { source?: ListingEventPayload['source'] }) => {
+  const trackView = (listingId: number | string, options?: { source?: TrafficSourceType }) => {
     if (!import.meta.client) return;
     
     const listingKey = `listing-${listingId}`;
@@ -189,7 +120,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       // localStorage not available
     }
     
-    const payload: ListingEventPayload = {
+    const payload: TrackingListingPayload = {
       ...getBasePayload(),
       listingId,
       source: options?.source || detectSource(),
@@ -212,7 +143,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     // Mark as sent
     newImpressions.forEach(id => sentImpressions.value.add(id));
     
-    const payload: ImpressionBatchPayload = {
+    const payload: TrackingImpressionBatchPayload = {
       ...getBasePayload(),
       listingIds: newImpressions,
       source: options?.source,
@@ -235,7 +166,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   const trackClick = (listingId: number | string, options?: { position?: number; source?: string }) => {
     if (!import.meta.client) return;
     
-    const payload: ListingEventPayload = {
+    const payload: TrackingListingPayload = {
       ...getBasePayload(),
       listingId,
       source: detectSource(),
@@ -251,7 +182,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   const trackFavourite = (listingId: number | string, action: 'add' | 'remove') => {
     if (!import.meta.client) return;
     
-    const payload = {
+    const payload: TrackingFavouritePayload = {
       ...getBasePayload(),
       listingId,
       action,
@@ -266,7 +197,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   const trackEnquiry = (listingId: number | string) => {
     if (!import.meta.client) return;
     
-    const payload: ListingEventPayload = {
+    const payload: TrackingListingPayload = {
       ...getBasePayload(),
       listingId,
       source: detectSource(),
@@ -281,7 +212,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
   const trackShare = (listingId: number | string, platform: string) => {
     if (!import.meta.client) return;
     
-    const payload = {
+    const payload: TrackingSharePayload = {
       ...getBasePayload(),
       listingId,
       platform,
@@ -306,7 +237,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     // Reset impression tracking for new search
     resetImpressionTracking();
     
-    const payload: SearchEventPayload = {
+    const payload: TrackingSearchPayload = {
       ...getBasePayload(),
       listingType: params.listingType,
       query: params.query,
@@ -329,16 +260,26 @@ export const useAnalyticsTracking = createSharedComposable(() => {
    * Track mortgage calculation
    */
   const trackMortgageCalc = (data: {
-    listingId?: number | string;
+    listingId?: string | null;
     propertyPrice: number;
     deposit: number;
-    interestRate: number;
     termYears: number;
+    buyerType: string;
+    customRate?: number | null;
+    loanAmount: number;
+    ltv: number;
+    ltvBracket: string;
     monthlyPayment: number;
+    totalPayment: number;
+    totalInterest: number;
+    rateUsed: number;
+    rateType: string;
+    usedDefaultRates: boolean;
+    usedCustomRate: boolean;
   }) => {
     if (!import.meta.client) return;
     
-    const payload: MortgageCalcPayload = {
+    const payload: TrackingMortgageCalcPayload = {
       ...getBasePayload(),
       ...data,
     };
