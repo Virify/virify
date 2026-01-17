@@ -1,6 +1,7 @@
 <template>
   <div class="o-traditional-search-form | flow flow-4xl">
-    <OrganismsTraditionalSearchContract id="traditional-search-form-price" />
+    <OrganismsTraditionalSearchContract v-model:is-sale="contractType.isSale" v-model:min-price="contractType.minPrice"
+      v-model:max-price="contractType.maxPrice" v-model:price="contractType.price" id="traditional-search-form-price" />
 
     <section class="o-traditional-search-form__property-type" id="tradition-search-form-type">
       <h3 class="o-traditional-search-form__title | title-xs">
@@ -53,6 +54,16 @@ const emits = defineEmits(['is-loaded'])
 onBeforeMount(() => {
   emits('is-loaded', true)
 })
+
+/**
+ *  Form data
+ */
+const contractType = useState('search-contract-type', () => reactive({
+  isSale: false,
+  minPrice: 0,
+  maxPrice: 0,
+  price: <[number, number]>[0, 0]
+}))
 
 /**
  *  Data
