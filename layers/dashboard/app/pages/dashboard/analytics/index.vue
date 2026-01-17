@@ -31,7 +31,9 @@
             trailing-icon="i-lucide-chevron-down"
             @update:model-value="changePeriod"
           />
+          <OrganismsDashboardNotificationButton />
         </template>
+        
       </UDashboardNavbar>
     </template>
 
