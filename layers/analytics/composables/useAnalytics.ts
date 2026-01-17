@@ -19,7 +19,6 @@ import { createSharedComposable } from '@vueuse/core';
  */
 export const useAnalytics = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
-  const sessionId = useState("analytics-session-id", () => nanoid());
   
   // Get refresh functions from recent items composable (Singleton)
   const { 
