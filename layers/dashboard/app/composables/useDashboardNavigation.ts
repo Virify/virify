@@ -120,6 +120,15 @@ export function useDashboardNavigation() {
             text: "Recently viewed properties",
           },
         },
+        {
+          label: "Analytics",
+          type: "link",
+          to: "/dashboard/analytics",
+          icon: "i-lucide-bar-chart-3",
+          tooltip: {
+            text: "View listing performance analytics",
+          },
+        },
       ],
     },
     {
@@ -202,15 +211,6 @@ export function useDashboardNavigation() {
           icon: "i-lucide-bell",
           tooltip: {
             text: "Notification preferences",
-          },
-        },
-        {
-          label: "Analytics",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-chart-bar",
-          tooltip: {
-            text: "View analytics",
           },
         },
       ],

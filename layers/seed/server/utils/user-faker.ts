@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import type { Prisma } from "../../../database/server/database/prisma/generated/client";
 import { MembershipType } from "../../../database/server/database/prisma/generated/enums";
 import { prisma } from "../../../database/server/utils/prisma-client";
-import { generateSaleListing, generateRentalListing } from "./listing-faker";
+import { generateSaleListing, generateRentalListing, batchCreateListings } from "./listing-faker";
 import { createNotification } from "../../../database/server/utils/notification";
 
 export function generateFakeUser(): Prisma.UserCreateInput {
@@ -98,35 +98,31 @@ export async function distributeListingsToUsers(userIds: number[]): Promise<void
     return;
   }
 
-  console.log(`Distributing ${properties.length} properties as listings...`);
+  console.log(`Distributing ${properties.length} properties as listings (batched)...`);
 
-  let propertyIndex = 0;
   const ADMIN_ID = 1;
   const ADMIN_LISTINGS = 15;
   
+  // Build batch items for all listings
+  const batchItems: { propertyId: number; userId: number; isRental: boolean }[] = [];
+  let propertyIndex = 0;
+
   // Admin gets 15 listings
-  console.log(`Creating ${ADMIN_LISTINGS} listings for admin...`);
   for (let i = 0; i < ADMIN_LISTINGS && propertyIndex < properties.length; i++) {
     const property = properties[propertyIndex];
     if (!property) continue;
     
-    const isRental = Math.random() > 0.5;
-    
-    if (isRental) {
-      await generateRentalListing(property.id, ADMIN_ID);
-    } else {
-      await generateSaleListing(property.id, ADMIN_ID);
-    }
-    
+    batchItems.push({
+      propertyId: property.id,
+      userId: ADMIN_ID,
+      isRental: Math.random() > 0.5,
+    });
     propertyIndex++;
   }
 
   // Distribute remaining properties to other users (3-5 each)
-  console.log(`Distributing remaining properties to ${userIds.length} users...`);
-  let processedUsers = 0;
-  
   for (const userId of userIds) {
-    if (userId === ADMIN_ID) continue; // Skip admin
+    if (userId === ADMIN_ID) continue;
     
     const listingsForUser = faker.number.int({ min: 3, max: 5 });
     
@@ -134,25 +130,18 @@ export async function distributeListingsToUsers(userIds: number[]): Promise<void
       const property = properties[propertyIndex];
       if (!property) continue;
       
-      const isRental = Math.random() > 0.5;
-      
-      if (isRental) {
-        await generateRentalListing(property.id, userId);
-      } else {
-        await generateSaleListing(property.id, userId);
-      }
-      
+      batchItems.push({
+        propertyId: property.id,
+        userId,
+        isRental: Math.random() > 0.5,
+      });
       propertyIndex++;
-    }
-    
-    processedUsers++;
-    
-    if (processedUsers % 100 === 0) {
-      console.log(`  Progress: ${processedUsers}/${userIds.length} users, ${propertyIndex} listings created...`);
     }
   }
 
-  console.log(`✅ Created ${propertyIndex} total listings`);
+  console.log(`📦 Batch creating ${batchItems.length} listings...`);
+  await batchCreateListings(batchItems);
+  console.log(`✅ Created ${batchItems.length} total listings`);
 
   // Now seed conversations
   await seedConversations(userIds);

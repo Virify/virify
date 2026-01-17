@@ -3,6 +3,10 @@
  * Pure analytics functionality - separate from user notifications
  * 
  * Also orchestrates fetching of recent data (favourites, notes) for dashboard
+ * 
+ * TWO MODES:
+ * - Quick analytics: Lightweight data for dashboard homepage (fast)
+ * - Comprehensive analytics: Full data with time-series for analytics page (detailed)
  */
 import { nanoid } from "nanoid";
 import { createSharedComposable } from '@vueuse/core';
@@ -34,6 +38,15 @@ export const useAnalytics = createSharedComposable(() => {
   const analytics = useState<UserAnalyticsSummary | null>("analytics-user-summary", () => null);
   const allUserListings = ref<OwnedListingWithAnalytics[]>([]);
   
+  // Quick analytics for dashboard homepage (lightweight)
+  const quickAnalytics = useState<QuickAnalytics | null>("analytics-quick", () => null);
+  const isQuickLoading = useState("analytics-quick-loading", () => false);
+  
+  // Comprehensive analytics for full analytics page
+  const comprehensiveAnalytics = useState<ComprehensiveAnalytics | null>("analytics-comprehensive", () => null);
+  const isComprehensiveLoading = useState("analytics-comprehensive-loading", () => false);
+  const selectedPeriod = useState<'7d' | '30d' | '90d'>("analytics-period", () => '30d');
+  
   // Loading states
   const isAnalyticsLoading = useState("analytics-is-loading", () => true);
   // isFavouritesLoading and isNotesLoading are now handled by their respective composables
@@ -43,6 +56,51 @@ export const useAnalytics = createSharedComposable(() => {
     immediate: true,
   });
   const { getAllListingsForAnalytics } = useMyListings();
+  
+  /**
+   * Fetch QUICK analytics for dashboard homepage
+   * Lightweight - just totals and last 7 days
+   */
+  const fetchQuickAnalytics = async () => {
+    if (!loggedIn.value) return;
+    
+    if (!quickAnalytics.value) {
+      isQuickLoading.value = true;
+    }
+    
+    try {
+      const data = await useRequestFetch()<QuickAnalytics>("/api/analytics/quick");
+      quickAnalytics.value = data;
+    } catch (error) {
+      console.error('Failed to fetch quick analytics:', error);
+    } finally {
+      isQuickLoading.value = false;
+    }
+  };
+  
+  /**
+   * Fetch COMPREHENSIVE analytics for full analytics page
+   * Includes time-series, per-listing breakdowns, traffic sources
+   */
+  const fetchComprehensiveAnalytics = async (period?: '7d' | '30d' | '90d') => {
+    if (!loggedIn.value) return;
+    
+    const fetchPeriod = period || selectedPeriod.value;
+    selectedPeriod.value = fetchPeriod;
+    
+    isComprehensiveLoading.value = true;
+    
+    try {
+      const data = await useRequestFetch()<ComprehensiveAnalytics>(
+        `/api/analytics/comprehensive?period=${fetchPeriod}`
+      );
+      comprehensiveAnalytics.value = data;
+    } catch (error) {
+      console.error('Failed to fetch comprehensive analytics:', error);
+    } finally {
+      isComprehensiveLoading.value = false;
+    }
+  };
   
   /**
    * Fetch ALL analytics and recent data when logged in
@@ -238,5 +296,14 @@ export const useAnalytics = createSharedComposable(() => {
     recentNotesStatus,
     refreshRecentFavourites,
     refreshRecentNotes,
+    // NEW: Quick analytics (dashboard homepage)
+    quickAnalytics,
+    isQuickLoading,
+    fetchQuickAnalytics,
+    // NEW: Comprehensive analytics (full analytics page)
+    comprehensiveAnalytics,
+    isComprehensiveLoading,
+    selectedPeriod,
+    fetchComprehensiveAnalytics,
   };
 });

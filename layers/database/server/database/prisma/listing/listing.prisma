@@ -27,6 +27,12 @@ model Listing {
   UserNote             UserNote[]
   archived             Boolean                @default(false)
   archivedAt           DateTime?
+  // Analytics relations
+  ListingImpression    ListingImpression[]
+  ListingPriceHistory  ListingPriceHistory[]
+  DailyListingStats    DailyListingStats[]
+  ListingClick         ListingClick[]
+  ListingShare         ListingShare[]
 
   @@index([userId])
   @@index([propertyId])

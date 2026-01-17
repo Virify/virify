@@ -104,3 +104,95 @@ export type RecentItem = {
   };
   isFavourite?: boolean;
 }
+
+/**
+ * Quick analytics for dashboard homepage (lightweight)
+ */
+export interface QuickAnalytics {
+  activeListings: number;
+  totalEnquiriesReceived: number;
+  totalEnquiriesSent: number;
+  favouritesReceived: number;
+  last7Days: {
+    views: number;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+  };
+}
+
+/**
+ * Time series data point for analytics graphs
+ */
+export interface AnalyticsTimeSeriesPoint {
+  date: string;
+  views: number;
+  impressions: number;
+  clicks: number;
+  favourites: number;
+  enquiries: number;
+}
+
+/**
+ * Per-listing analytics breakdown
+ */
+export interface ListingAnalytics {
+  id: number;
+  address: string;
+  image: string | null;
+  price: number;
+  bedrooms: number;
+  tier: string;
+  views: number;
+  impressions: number;
+  clicks: number;
+  favourites: number;
+  enquiries: number;
+  avgDuration: number;
+  ctr: number;
+}
+
+/**
+ * Traffic source breakdown
+ */
+export interface TrafficSource {
+  source: string;
+  count: number;
+  percentage: number;
+}
+
+/**
+ * Device breakdown
+ */
+export interface DeviceBreakdown {
+  device: string;
+  count: number;
+  percentage: number;
+}
+
+/**
+ * Comprehensive analytics summary
+ */
+export interface ComprehensiveAnalyticsSummary {
+  totalViews: number;
+  totalImpressions: number;
+  totalFavourites: number;
+  totalEnquiries: number;
+  ctr: number;
+  viewsChange: number;
+  impressionsChange: number;
+  activeListings: number;
+  totalListings: number;
+}
+
+/**
+ * Full comprehensive analytics response
+ */
+export interface ComprehensiveAnalytics {
+  summary: ComprehensiveAnalyticsSummary;
+  timeSeries: AnalyticsTimeSeriesPoint[];
+  topListings: ListingAnalytics[];
+  trafficSources: TrafficSource[];
+  deviceBreakdown: DeviceBreakdown[];
+  period: '7d' | '30d' | '90d';
+}
