@@ -1,17 +1,17 @@
 <template>
   <div class="o-traditional-search-form | flow flow-4xl">
-    <OrganismsTraditionalSearchContract />
+    <OrganismsTraditionalSearchContract id="traditional-search-form-price" />
 
-    <div class="o-traditional-search-form__property-type">
+    <section class="o-traditional-search-form__property-type" id="tradition-search-form-type">
       <h3 class="o-traditional-search-form__title | title-xs">
         Property type
       </h3>
 
       <OrganismsTraditionalSearchPropertyType class="o-traditional-search-form__property-type-grid" />
-    </div>
+    </section>
 
 
-    <div class="o-traditional-search-form__room-count">
+    <section class="o-traditional-search-form__room-count" id="tradition-search-form-rooms">
       <h3 class="o-traditional-search-form__title | title-xs">
         Room counts
       </h3>
@@ -20,9 +20,9 @@
         <MoleculesRoomCount :min="bedroomMin" :max="bedroomMax" room-type="bedrooms" />
         <MoleculesRoomCount :min="bathroomMin" :max="bathroomMax" room-type="bathrooms" />
       </div>
-    </div>
+    </section>
 
-    <div>
+    <section id="tradition-search-form-features">
       <h3 class="o-traditional-search-form__title | title-xs">
         Additional features
       </h3>
@@ -32,7 +32,7 @@
           <AtomsCheckbox :label="feature" />
         </li>
       </ul>
-    </div>
+    </section>
 
     <AtomsCollapsibleTip class="o-traditional-search-form__tip">
       <h3 class="| title-2xs">Want even more customisability?</h3>
