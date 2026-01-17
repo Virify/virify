@@ -1,5 +1,6 @@
 import { createSharedComposable } from "@vueuse/core"
 import type { DraftListing } from '~~/layers/database/server/database/prisma/generated/client'
+import type { DraftListingWithFullPayload } from '~~/shared/types/draft'
 import { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
 
 /**
@@ -42,38 +43,6 @@ import { ListingTier } from '~~/layers/database/server/database/prisma/generated
  * ```
  */
 
-// Types for step data mapping
-interface DraftListingData {
-  id: number
-  completedSteps: number[]
-  // Step 1 data
-  rentalListing?: {
-    furnishedStatus: string
-    isBillsIncluded: boolean
-  } | null
-  saleListing?: {
-    tenureType: string
-    chain: boolean
-    sharedOwnership: boolean
-  } | null
-  // Step 2 data (property basics)
-  property?: {
-    description?: string
-    type?: { id: number; name: string }
-    classification?: { id: number; name: string }
-  } | null
-  // Step 3 data
-  price?: number | null
-  // Step 4 data
-  address?: {
-    line1?: string
-    line2?: string
-    city?: string
-    postcode?: string
-  } | null
-  // Additional step data will be added as we build them
-}
-
 export const useCreateListingSteps = createSharedComposable(() => {
   const currentStep = ref(1)
   const toast = useToast()
@@ -96,17 +65,17 @@ export const useCreateListingSteps = createSharedComposable(() => {
   const loadError = ref<string | null>(null)
   
   // Define all steps with initial state (all locked except step 1)
+  // Note: Address is now part of Step 2 (Property Basics)
   const steps = ref<CreateListingStep[]>([
-    { id: 1, title: "Listing Type", content: "This is step 1", slot: "step1", value: '1', completed: false, locked: false },
-    { id: 2, title: "Property Basics", content: "Type and description", slot: "step2", value: '2', completed: false, locked: true },
+    { id: 1, title: "Listing Type", content: "Sale or rental details", slot: "step1", value: '1', completed: false, locked: false },
+    { id: 2, title: "Property Basics", content: "Address, type and description", slot: "step2", value: '2', completed: false, locked: true },
     { id: 3, title: "Price", content: "Pricing details", slot: "step3", value: '3', completed: false, locked: true },
-    { id: 4, title: "Address", content: "Property location", slot: "step4", value: '4', completed: false, locked: true },
-    { id: 5, title: "Bedrooms & Bathrooms", content: "Room details", slot: "step5", value: '5', completed: false, locked: true },
-    { id: 6, title: "Living Spaces", content: "Kitchens, receptions & other rooms", slot: "step6", value: '6', completed: false, locked: true },
-    { id: 7, title: "Outdoor & Utilities", content: "Gardens and outdoor space", slot: "step7", value: '7', completed: false, locked: true },
-    { id: 8, title: "Additional Features", content: "Parking, security & storage", slot: "step8", value: '8', completed: false, locked: true },
-    { id: 9, title: "Energy & Costs", content: "EPC and running costs", slot: "step9", value: '9', completed: false, locked: true },
-    { id: 10, title: "Property Images", content: "Upload photos", slot: "step10", value: '10', completed: false, locked: true },
+    { id: 4, title: "Bedrooms & Bathrooms", content: "Room details", slot: "step4", value: '4', completed: false, locked: true },
+    { id: 5, title: "Living Spaces", content: "Kitchens, receptions & other rooms", slot: "step5", value: '5', completed: false, locked: true },
+    { id: 6, title: "Outdoor & Utilities", content: "Gardens and outdoor space", slot: "step6", value: '6', completed: false, locked: true },
+    { id: 7, title: "Additional Features", content: "Parking, security & storage", slot: "step7", value: '7', completed: false, locked: true },
+    { id: 8, title: "Energy & Costs", content: "EPC and running costs", slot: "step8", value: '8', completed: false, locked: true },
+    { id: 9, title: "Property Images", content: "Upload photos", slot: "step9", value: '9', completed: false, locked: true },
   ])
 
   // Modal states - using a Map for cleaner access
@@ -115,6 +84,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
   ))
 
   // Form data for each step (current state)
+  // Note: Now 9 steps after merging Address into Property Basics
   const stepData = ref<Record<number, any>>({
     1: {},
     2: {},
@@ -125,10 +95,10 @@ export const useCreateListingSteps = createSharedComposable(() => {
     7: {},
     8: {},
     9: {},
-    10: {},
   })
 
   // Last saved data for each step (for dirty checking)
+  // Note: Now 9 steps after merging Address into Property Basics
   const lastSavedStepData = ref<Record<number, any>>({
     1: {},
     2: {},
@@ -139,7 +109,6 @@ export const useCreateListingSteps = createSharedComposable(() => {
     7: {},
     8: {},
     9: {},
-    10: {},
   })
 
   // Track which steps have been visited (for lazy mounting)
@@ -190,7 +159,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     loadError.value = null
     
     try {
-      const response = await useRequestFetch()<{ success: boolean; data: DraftListingData }>(
+      const response = await useRequestFetch()<{ success: boolean; data: DraftListingWithFullPayload }>(
         `/api/listing/draft/${id}`,
         { method: 'GET' }
       )
@@ -221,7 +190,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
   }
 
   // Populate local step data from draft listing response
-  const populateStepDataFromDraft = (draft: DraftListingData) => {
+  const populateStepDataFromDraft = (draft: DraftListingWithFullPayload) => {
     // Step 1: Listing Type
     if (draft.saleListing) {
       stepData.value[1] = {
@@ -237,12 +206,13 @@ export const useCreateListingSteps = createSharedComposable(() => {
       }
     }
     
-    // Step 2: Property Basics
+    // Step 2: Property Basics (includes address)
     if (draft.property) {
       stepData.value[2] = {
         description: draft.property.description,
         propertyTypeId: draft.property.type?.id,
-        propertyClassificationId: draft.property.classification?.id
+        propertyClassificationId: draft.property.classification?.id,
+        address: draft.property.address ? { ...draft.property.address } : null
       }
     }
     
@@ -253,9 +223,12 @@ export const useCreateListingSteps = createSharedComposable(() => {
       }
     }
     
-    // Step 4: Address
-    if (draft.address) {
-      stepData.value[4] = { ...draft.address }
+    // Step 4: Bedrooms & Bathrooms
+    if (draft.property?.bedroomFeatures || draft.property?.bathroomFeatures) {
+      stepData.value[4] = {
+        bedroomFeatures: draft.property.bedroomFeatures || [],
+        bathroomFeatures: draft.property.bathroomFeatures || []
+      }
     }
     
     // Additional steps can be populated as we build them
@@ -324,7 +297,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
         toast.add({
           title: 'Moving to next step',
           icon: 'i-lucide-arrow-right',
-          color: 'info'
+          color: 'info',
+          duration: 2000
         })
       }
       return true
@@ -372,14 +346,16 @@ export const useCreateListingSteps = createSharedComposable(() => {
           title: `${stepTitle} completed`,
           icon: 'i-lucide-check-circle-2',
           description: 'Moving to next step',
-          color: 'success'
+          color: 'success',
+          duration: 2000
         })
       } else {
         toast.add({
           title: `${stepTitle} saved`,
           icon: 'i-lucide-check-circle-2',
           description: 'Your progress has been saved',
-          color: 'success'
+          color: 'success',
+          duration: 2000
         })
       }
       
@@ -389,7 +365,61 @@ export const useCreateListingSteps = createSharedComposable(() => {
       toast.add({
         title: 'Error',
         description: error?.data?.message || error?.message || 'Failed to save progress',
-        color: 'error'
+        color: 'error',
+        duration: 3000
+      })
+      return false
+    } finally {
+      isSaving.value = false
+    }
+  }
+
+  /**
+   * Silent save for room data (bedrooms/bathrooms) - no toast notifications
+   * Used when saving individual rooms in Step 4 slideoversa
+   */
+  const saveRoomData = async (
+    stepNumber: number,
+    apiEndpoint: string,
+    stepFormData: Record<string, any>
+  ): Promise<boolean> => {
+    if (isSaving.value) return false
+    
+    isSaving.value = true
+    
+    try {
+      const currentDraftId = await ensureDraftExists()
+      if (!currentDraftId) {
+        throw new Error('Failed to create draft listing')
+      }
+      
+      const submissionData = {
+        ...stepFormData,
+        draftId: currentDraftId
+      }
+      
+      const response = await useRequestFetch()<DraftListing>(apiEndpoint, {
+        method: 'PATCH',
+        body: submissionData
+      })
+      
+      if (!response?.id) {
+        throw new Error('Failed to save room data')
+      }
+      
+      // Save to local state
+      saveStepData(stepNumber, stepFormData)
+      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(stepFormData))
+      
+      return true
+    } catch (error: any) {
+      console.error(`Failed to save room data:`, error)
+      // Still show error toast for failures
+      toast.add({
+        title: 'Error',
+        description: error?.data?.message || error?.message || 'Failed to save room',
+        color: 'error',
+        duration: 3000
       })
       return false
     } finally {
@@ -595,6 +625,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     setDraftListingId,
     ensureDraftExists,
     saveStep,
+    saveRoomData,
     startNewListing,
     
     // Methods - Step Navigation

@@ -12,7 +12,7 @@
     @saved="onStepSaved"
   >
     <!-- Main field row -->
-    <div class="flex flex-wrap gap-6">
+    <div class="flex flex-wrap justify-evenly gap-6">
       <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
         <UFormField label="Sale or Rental?" name="selectedType" description="Type of listing" required>
           <USelect v-model="state.selectedType" :items="listingTypeItems" @update:model-value="onListingTypeChange" class="w-full" />
@@ -82,7 +82,6 @@
 </template>
 
 <script setup lang="ts">
-// step1Schema and Step1FormData are auto-imported from shared/utils/
 const { getStepData } = useCreateListingSteps()
 
 // Form state - initialize with saved data if exists

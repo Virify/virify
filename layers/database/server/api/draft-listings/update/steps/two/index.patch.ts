@@ -14,6 +14,42 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { draftId, property } = stepDataSchema.parse(body);
 
+    // First, handle address upsert if provided
+    let addressId: number | undefined;
+    if (property.address && property.address.street && property.address.city && property.address.postcode) {
+      const addressData = {
+        number: property.address.number,
+        flat: property.address.flat,
+        name: property.address.name,
+        street: property.address.street,
+        city: property.address.city,
+        postcode: property.address.postcode,
+        country: property.address.country || 'United Kingdom',
+        locality: property.address.locality,
+        county: property.address.county,
+        district: property.address.district,
+        fullAddress: property.address.fullAddress,
+        lat: property.address.lat,
+        lon: property.address.lon,
+      };
+
+      // Upsert address based on unique constraint
+      const address = await prisma.address.upsert({
+        where: {
+          number_street_city_postcode_country: {
+            number: addressData.number || '',
+            street: addressData.street,
+            city: addressData.city,
+            postcode: addressData.postcode,
+            country: addressData.country || 'United Kingdom',
+          },
+        },
+        update: addressData,
+        create: addressData,
+      });
+      addressId = address.id;
+    }
+
     return await prisma.draftListing.update({
       where: { id: draftId, userId: user.id },
       data: {
@@ -23,25 +59,31 @@ export default defineEventHandler(async (event) => {
               type: { connect: { id: property.type } },
               classification: { connect: { id: property.classification } },
               constructionType: property.constructionType || null,
-              yearBuilt: property.yearBuilt && property.yearBuilt !== '0' ? property.yearBuilt : null,
+              yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
               size: property.size || null,
               description: property.description,
               totalFloors: property.totalFloors,
+              ...(addressId ? { address: { connect: { id: addressId } } } : {}),
             },
             create: {
               type: { connect: { id: property.type } },
               classification: { connect: { id: property.classification } },
               constructionType: property.constructionType || null,
-              yearBuilt: property.yearBuilt && property.yearBuilt !== '0' ? property.yearBuilt : null,
+              yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
               size: property.size || null,
               description: property.description,
               totalFloors: property.totalFloors,
+              ...(addressId ? { address: { connect: { id: addressId } } } : {}),
             },
           },
         },
       },
       include: {
-        property: true,
+        property: {
+          include: {
+            address: true,
+          },
+        },
       },
     });
   } catch (error) {

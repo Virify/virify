@@ -107,5 +107,10 @@ export default defineAppConfig({
         help: 'body-xs text-(--foreground-200)/60 mt-1',
       }
     },
+    select: {
+      slots: {
+        
+      }
+    }
   },
 });

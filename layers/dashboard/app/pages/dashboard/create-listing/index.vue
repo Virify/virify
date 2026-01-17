@@ -24,11 +24,11 @@
       <UModal
         v-model:open="isModalOpen"
         :dismissible="false"
-        scrollable
         :fullscreen="isMobile"
         :ui="{
           overlay: 'backdrop-blur-sm',
-          content: 'max-w-7xl h-full lg:h-auto bg-(--background-200) dark:bg-(--background-100)!',
+          content: 'max-w-7xl h-full lg:h-[85vh] lg:max-h-[85vh] bg-(--background-200) dark:bg-(--background-100)! flex flex-col overflow-hidden',
+          body: 'flex-1 min-h-0 flex flex-col overflow-hidden p-0!',
         }"
       >
         <template #title>
@@ -40,6 +40,7 @@
             v-if="isMobile"
             :steps="steps"
             v-model="currentStepValue"
+            class="h-full overflow-y-auto p-4"
           />
 
           <!-- Tablet and above: Stepper -->
@@ -47,6 +48,7 @@
             v-else
             :steps="steps"
             v-model="currentStepValue"
+            class="h-full"
           />
         </template>
       </UModal>

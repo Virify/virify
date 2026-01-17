@@ -1,5 +1,5 @@
 <template>
-  <div class="lg:p-4">
+  <div class="h-full">
     <Transition name="step-fade" mode="out-in">
       <component :is="currentStepComponent" :key="stepNumber" />
     </Transition>
@@ -21,6 +21,8 @@ const currentStepComponent = computed(() => {
       return resolveComponent('OrganismsDashboardCreateListingStep2Form')
     case 3:
       return resolveComponent('OrganismsDashboardCreateListingStep3Form')
+    case 4:
+      return resolveComponent('OrganismsDashboardCreateListingStep4Form')
     default:
       return 'p'
   }

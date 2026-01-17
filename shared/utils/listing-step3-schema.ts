@@ -25,9 +25,11 @@ export const rentalPriceSchema = z.object({
 export const step3Schema = z.object({
   price: z.number().positive({
     message: 'Price must be greater than 0',
+  }).nullable().refine(val => val !== null && val > 0, {
+    message: 'Please enter a price',
   }),
-  saleListing: salePriceSchema.optional(),
-  rentalListing: rentalPriceSchema.optional(),
+  saleListing: salePriceSchema.nullable().optional(),
+  rentalListing: rentalPriceSchema.nullable().optional(),
 })
 
 export type Step3FormData = z.infer<typeof step3Schema>

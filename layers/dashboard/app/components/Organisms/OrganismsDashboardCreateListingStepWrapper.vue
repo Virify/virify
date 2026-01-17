@@ -1,58 +1,63 @@
 <template>
-  <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-8 pt-2">
-    <!-- Dismissible Alert -->
-    <UAlert
-      v-if="!alertDismissed"
-      icon="i-lucide-info"
-      variant="subtle"
-      color="secondary"
-      :title="alertTitle"
-      :description="alertDescription"
-      close
-      @update:open="(val) => alertDismissed = !val"
-    />
-
-    <!-- Form Fields Slot -->
-    <slot />
-
-    <!-- Form Actions -->
-    <div class="flex justify-between flex-wrap items-center gap-4 pt-2 pb-6 lg:pb-0">
-      <UButton 
-        type="button" 
+  <UForm :schema="schema" :state="state" @submit="onSubmit" @error="onFormError" class="flex flex-col h-full">
+    <!-- Scrollable Form Content -->
+    <div class="flex-1 space-y-8 py-4 px-4">
+      <!-- Dismissible Alert -->
+      <UAlert
+        v-if="!alertDismissed"
+        icon="i-lucide-info"
         variant="subtle"
-        color="neutral"
-        size="sm"
-        @click="onCancel"
-        class="body-sm cursor-pointer"
-      >
-        Cancel
-      </UButton>
+        color="secondary"
+        :title="alertTitle"
+        :description="alertDescription"
+        close
+        @update:open="(val) => alertDismissed = !val"
+      />
 
-      <div class="flex gap-4">
+      <!-- Form Fields Slot -->
+      <slot />
+    </div>
+
+    <!-- Sticky Footer Actions -->
+    <div class="sticky bottom-0 bg-(--background-200) dark:bg-(--background-100) border-t border-black/20 py-4 px-4 mt-auto">
+      <div class="flex justify-between flex-wrap items-center gap-4">
         <UButton 
           type="button" 
-          variant="solid"
-          color="secondary"
+          variant="subtle"
+          color="neutral"
           size="sm"
-          @click="handleSaveProgress"
-          :disabled="!isValid || isSaving"
-          :loading="isSaving"
-          class="body-sm text-white! cursor-pointer"
+          @click="onCancel"
+          class="body-sm cursor-pointer"
         >
-          Save Progress
+          Cancel
         </UButton>
-      
-        <UButton 
-          type="submit" 
-          color="secondary"
-          variant="solid"
-          size="sm"
-          :disabled="!isValid || isSaving"
-          :loading="isSaving"
-          class="body-sm text-white! cursor-pointer"
-        >
-          Next Step
-        </UButton>
+
+        <div class="flex gap-4">
+          <UButton 
+            type="button" 
+            variant="solid"
+            color="secondary"
+            size="sm"
+            @click="handleSaveProgress"
+            :disabled="!isValid || isSaving"
+            :loading="isSaving"
+            class="body-sm text-white! cursor-pointer"
+          >
+            Save Progress
+          </UButton>
+        
+          <UButton 
+            type="submit" 
+            color="secondary"
+            variant="solid"
+            size="sm"
+            :disabled="!isValid || isSaving"
+            :loading="isSaving"
+            class="body-sm text-white! cursor-pointer"
+          >
+            Next Step
+          </UButton>
+        </div>
       </div>
     </div>
   </UForm>
@@ -81,6 +86,7 @@ const emit = defineEmits<{
 
 const { saveStep, isSaving } = useCreateListingSteps()
 const closeModal = inject<() => void>('closeModal')
+const toast = useToast()
 
 // Alert state
 const alertDismissed = ref(false)
@@ -90,8 +96,19 @@ function onCancel() {
   closeModal?.()
 }
 
+// Form validation error handler
+function onFormError(error: any) {
+  console.error('Form validation failed:', error)
+  toast.add({
+    title: 'Validation Error',
+    description: error?.errors?.[0]?.message || 'Please check the form fields',
+    color: 'error'
+  })
+}
+
 // Submit handler (next step)
 async function onSubmit() {
+  console.log('onSubmit called')
   await handleSave(true)
 }
 
