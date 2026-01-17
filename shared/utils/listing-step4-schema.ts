@@ -13,7 +13,7 @@ const bathroomFeatureValues = Object.values(BathroomFeature) as [string, ...stri
 
 // Bedroom schema - matches Prisma model (name and bed are optional)
 export const bedroomSchema = z.object({
-  name: z.string().max(100).nullable().optional(),
+  name: z.string().min(1, 'Bedroom name is required').max(100, 'Bedroom name must be 100 characters or less'),
   roomNumber: z.coerce.number().int().min(1),
   description: z.string().max(500).nullable().optional(),
   floor: z.coerce.number().int().min(1, 'Floor is required'),
@@ -24,7 +24,7 @@ export const bedroomSchema = z.object({
 
 // Bathroom schema - matches Prisma model (name is optional)
 export const bathroomSchema = z.object({
-  name: z.string().max(100).nullable().optional(),
+  name: z.string().min(1, 'Bathroom name is required').max(100, 'Bathroom name must be 100 characters or less'),
   roomNumber: z.coerce.number().int().min(1),
   description: z.string().max(500).nullable().optional(),
   floor: z.coerce.number().int().min(1, 'Floor is required'),

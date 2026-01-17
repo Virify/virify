@@ -19,7 +19,7 @@
         variant="listing"
       />
 
-      <UFormField label="Property Type" name="property.type" description="Select the type of property" required>
+      <UFormField label="Property Type" name="property.type" description="Select the type of property" required eagerValidation>
         <USelect 
           v-model="state.property.type" 
           :items="propertyTypeItems" 
@@ -31,7 +31,7 @@
         />
       </UFormField>
 
-      <UFormField label="Classification" name="property.classification" description="Select the classification" required>
+      <UFormField label="Classification" name="property.classification" description="Select the classification" required eagerValidation>
         <USelect 
           v-model="state.property.classification" 
           :items="classificationItems" 
@@ -45,7 +45,7 @@
 
     <!-- Row 2: Floors, Construction, Size, Year Built -->
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-4">
-      <UFormField label="Total Floors" name="property.totalFloors" description="Number of floors" required>
+      <UFormField label="Total Floors" name="property.totalFloors" description="Number of floors" required eagerValidation>
         <UInput 
           v-model.number="state.property.totalFloors" 
           type="number"
@@ -99,7 +99,7 @@
     </div>
 
     <!-- Row 3: Description (full width) -->
-    <UFormField label="Property Description" name="property.description" description="Add a compelling description of your property (min 10 characters)" required>
+    <UFormField label="Property Description" name="property.description" description="Add a compelling description of your property (min 10 characters)" required eagerValidation>
       <UTextarea 
         v-model="state.property.description" 
         placeholder="e.g. 'This charming 2-bedroom apartment offers stunning views...'"

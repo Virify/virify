@@ -1,46 +1,28 @@
-import * as z from "zod";
-import { BedSizeType, BedroomFeature, BathroomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+import { z } from "zod";
+import { step5Schema } from "~~/shared/utils/listing-step5-schema";
+import { OtherRoomType, ReceptionType, KitchenFeature, RoomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
-// Validate payload to match Prisma Bedroom and Bathroom models and StepFive type (now includes both)
-const bedroomBathroomSchema = z.object({
+/**
+ * Step 5: Kitchens, Receptions & Other Rooms API Endpoint
+ * 
+ * This endpoint handles saving kitchen features, reception rooms, and other rooms for a draft listing.
+ * It uses deleteMany + create pattern to replace all existing room features.
+ */
+
+// Extend step5Schema to require draftId for updates
+const stepDataSchema = step5Schema.extend({
   draftId: z.number().int().positive(),
-  property: z.object({
-    totalFloors: z.coerce.number().int().min(0),
-    bedroomFeatures: z
-      .array(
-        z.object({
-          name: z.string().max(100),
-          roomNumber: z.coerce.number().int().min(1),
-          description: z.string().max(500).nullable().optional(),
-          floor: z.coerce.number().int().min(1),
-          bed: z.array(z.enum(Object.values(BedSizeType) as [string, ...string[]])).min(1),
-          features: z.array(z.enum(Object.values(BedroomFeature) as [string, ...string[]])).optional(),
-          size: z.coerce.number().min(0).nullable().optional(),
-        })
-      ),
-    numberBedrooms: z.coerce.number().int().min(0),
-    bathroomFeatures: z
-      .array(
-        z.object({
-          name: z.string().max(100).nullable(),
-          roomNumber: z.coerce.number().int().min(1),
-          description: z.string().max(500).optional(),
-          floor: z.coerce.number().int().min(1),
-          features: z.array(z.enum(Object.values(BathroomFeature) as [string, ...string[]])).optional(),
-          size: z.coerce.number().min(0).nullable().optional(),
-        })
-      ),
-    numberBathrooms: z.coerce.number().int().min(0)
-  }),
 });
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
+  
   try {
-    const { draftId, property } = await readValidatedBody(event, bedroomBathroomSchema.parse);
+    const body = await readBody(event);
+    const { draftId, property } = stepDataSchema.parse(body);
 
-    const { bedroomFeatures, numberBedrooms, bathroomFeatures, numberBathrooms, totalFloors } = property;
+    const { kitchenFeatures, numberKitchens, reception, numberReceptions, otherRoom, numberOtherRooms, totalFloors } = property;
 
     // Get current completedSteps to check if step 5 already exists
     const currentDraft = await prisma.draftListing.findUnique({
@@ -48,53 +30,77 @@ export default defineEventHandler(async (event) => {
       select: { completedSteps: true },
     });
 
-    const result = await prisma.draftListing.update({
-      where: { id: draftId, userId: user.id },
-      data: {
-        // Add step 5 to completedSteps if not already there
-        ...(currentDraft && !currentDraft.completedSteps.includes(5) ? { completedSteps: { push: 5 } } : {}),
-        property: {
-          update: {
-            totalFloors,
-            numberBedrooms: numberBedrooms ?? bedroomFeatures.length,
-            numberBathrooms: numberBathrooms ?? bathroomFeatures.length,
-            bedroomFeatures: {
-              deleteMany: {},
-              create: bedroomFeatures.map((b) => ({
-                name: b.name,
-                roomNumber: b.roomNumber,
-                description: b.description ?? null,
-                floor: b.floor,
-                bed: b.bed as BedSizeType[],
-                features: (b.features ?? []) as BedroomFeature[],
-                size: b.size ?? null,
-              })),
-            },
-            bathroomFeatures: {
-              deleteMany: {},
-              create: bathroomFeatures.map((b) => ({
-                name: b.name,
-                roomNumber: b.roomNumber,
-                description: b.description ?? null,
-                floor: b.floor,
-                features: (b.features ?? []) as BathroomFeature[],
-                size: b.size ?? null,
-              })),
-            },
+    if (!currentDraft) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Draft listing not found",
+      });
+    }
+
+    // Prepare update data
+    const updateData: any = {
+      // Add step 5 to completedSteps if not already there
+      ...(currentDraft && !currentDraft.completedSteps.includes(5) ? { completedSteps: { push: 5 } } : {}),
+      property: {
+        update: {
+          totalFloors,
+          numberKitchens: numberKitchens ?? kitchenFeatures.length,
+          numberReceptions: numberReceptions ?? reception.length,
+          numberOtherRooms: numberOtherRooms ?? otherRoom.length,
+          kitchenFeatures: {
+            deleteMany: {},
+            create: kitchenFeatures.map((k) => ({
+              name: k.name,
+              roomNumber: k.roomNumber,
+              description: k.description ?? null,
+              floor: k.floor,
+              size: k.size ?? null,
+              features: (k.features ?? []) as KitchenFeature[],
+            })),
+          },
+          reception: {
+            deleteMany: {},
+            create: reception.map((r) => ({
+              name: r.name,
+              roomNumber: r.roomNumber,
+              description: r.description ?? null,
+              floor: r.floor,
+              size: r.size ?? null,
+              type: r.type as ReceptionType,
+              features: (r.features ?? []) as RoomFeature[],
+            })),
+          },
+          otherRoom: {
+            deleteMany: {},
+            create: otherRoom.map((o) => ({
+              name: o.name,
+              roomNumber: o.roomNumber,
+              description: o.description ?? null,
+              floor: o.floor,
+              size: o.size ?? null,
+              type: o.type as OtherRoomType,
+              features: (o.features ?? []) as RoomFeature[],
+            })),
           },
         },
       },
+    };
+
+    return await prisma.draftListing.update({
+      where: { id: draftId, userId: user.id },
+      data: updateData,
       include: {
         property: {
           include: {
-            bedroomFeatures: true,
-            bathroomFeatures: true,
+            kitchenFeatures: true,
+            reception: true,
+            otherRoom: true,
           },
         },
       },
     });
-    return result;
   } catch (error) {
+    console.error('[Step5 PATCH] Error:', error);
     return errorResponse(error, event);
   }
 });

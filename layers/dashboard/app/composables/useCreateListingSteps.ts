@@ -153,42 +153,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     return incomplete?.id ?? 1
   })
 
-  // Infer completed steps from draft data (for legacy drafts without completedSteps array)
-  const inferCompletedStepsFromData = (draft: DraftListingWithFullPayload): number[] => {
-    const inferred: number[] = []
-    
-    // Step 1: Has saleListing or rentalListing
-    if (draft.saleListing || draft.rentalListing) inferred.push(1)
-    
-    // Step 2: Has property with address
-    if (draft.property?.address) inferred.push(2)
-    
-    // Step 3: Has price
-    if (draft.price !== null && draft.price !== undefined) inferred.push(3)
-    
-    // Step 4: Has bedrooms or bathrooms defined
-    if (draft.property?.bedroomFeatures?.length || draft.property?.bathroomFeatures?.length || 
-        draft.property?.numberBedrooms !== null || draft.property?.numberBathrooms !== null) inferred.push(4)
-    
-    // Step 5: Has kitchens, receptions, or other rooms
-    if (draft.property?.kitchenFeatures?.length || draft.property?.reception?.length || 
-        draft.property?.otherRoom?.length) inferred.push(5)
-    
-    // Step 6: Has outdoor space data
-    if (draft.property?.outdoorSpace) inferred.push(6)
-    
-    // Step 7: Has additional features (parking, security, etc.)
-    if (draft.property?.additionalFeatures || draft.property?.parking || 
-        draft.property?.securityFeatures) inferred.push(7)
-    
-    // Step 8: Has energy/utilities data
-    if (draft.property?.energyAndUtilities || draft.property?.runningCosts) inferred.push(8)
-    
-    // Step 9: Has media
-    if (draft.property?.media?.length) inferred.push(9)
-    
-    return inferred
-  }
+
 
   // Load draft listing data from API
   const loadDraftListing = async (id: number) => {
@@ -205,11 +170,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
       if (draft?.id) {
         draftListingId.value = draft.id
         
-        // Use stored completedSteps, or infer from data for legacy drafts
-        let completedSteps = draft.completedSteps || []
-        if (completedSteps.length === 0) {
-          completedSteps = inferCompletedStepsFromData(draft)
-        }
+        // Use stored completedSteps from database
+        const completedSteps = draft.completedSteps || []
         
         steps.value.forEach(step => {
           step.completed = completedSteps.includes(step.id)
@@ -274,47 +236,10 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
   // Populate local step data from draft listing response
   const populateStepDataFromDraft = (draft: DraftListingWithFullPayload) => {
-    // Step 1: Listing Type
-    if (draft.saleListing) {
-      stepData.value[1] = {
-        selectedType: 'sale',
-        saleListing: draft.saleListing,
-        rentalListing: null
-      }
-    } else if (draft.rentalListing) {
-      stepData.value[1] = {
-        selectedType: 'rent',
-        saleListing: null,
-        rentalListing: draft.rentalListing
-      }
-    }
-    
-    // Step 2: Property Basics (includes address)
-    if (draft.property) {
-      stepData.value[2] = {
-        description: draft.property.description,
-        propertyTypeId: draft.property.type?.id,
-        propertyClassificationId: draft.property.classification?.id,
-        address: draft.property.address ? { ...draft.property.address } : null
-      }
-    }
-    
-    // Step 3: Price
-    if (draft.price !== null && draft.price !== undefined) {
-      stepData.value[3] = {
-        price: draft.price
-      }
-    }
-    
-    // Step 4: Bedrooms & Bathrooms
-    if (draft.property?.bedroomFeatures || draft.property?.bathroomFeatures) {
-      stepData.value[4] = {
-        bedroomFeatures: draft.property.bedroomFeatures || [],
-        bathroomFeatures: draft.property.bathroomFeatures || []
-      }
-    }
-    
-    // Additional steps can be populated as we build them
+    const loadedSteps = populateAllStepsFromDraft(draft)
+    Object.entries(loadedSteps).forEach(([stepNum, data]) => {
+      stepData.value[Number(stepNum)] = data
+    })
   }
 
   /**

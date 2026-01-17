@@ -151,11 +151,14 @@ function closeBathroomEditor() {
 
 // Save room data silently (no toast)
 async function saveRoomProgress() {
-  await saveRoomData(
+  const data = getSubmissionData()
+  console.log('Saving Step 4 data:', data)
+  const result = await saveRoomData(
     4,
     '/api/draft-listings/update/steps/four/',
-    getSubmissionData()
+    data
   )
+  console.log('Save Step 4 result:', result)
 }
 
 // Handle bedroom done - save and close

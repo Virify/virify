@@ -14,7 +14,7 @@
     <!-- Sale Price Fields -->
     <div v-if="listingType === 'sale'" class="flex flex-wrap gap-6 items-start">
       <div class="basis-full sm:basis-0 sm:flex-1 sm:max-w-64 min-w-fit">
-        <UFormField label="Asking Price" name="price" description="The price you're asking for the property" required>
+        <UFormField label="Asking Price" name="price" description="The price you're asking for the property" required eagerValidation>
           <UInput
             v-model.number="state.price"
             type="number"
@@ -30,7 +30,7 @@
       </div>
 
       <div class="basis-full sm:basis-0 sm:flex-1 sm:max-w-56 min-w-fit">
-        <UFormField label="Price Type" name="saleListing.priceType" description="How the price should be displayed" required>
+        <UFormField label="Price Type" name="saleListing.priceType" description="How the price should be displayed" required eagerValidation>
           <USelect
             v-model="state.saleListing!.priceType"
             :items="priceTypeItems"
@@ -50,7 +50,7 @@
     <!-- Rental Price Fields -->
     <div v-else-if="listingType === 'rent'" class="flex flex-wrap gap-6 items-start">
       <div class="basis-full sm:basis-0 sm:flex-1 sm:max-w-64 min-w-fit">
-        <UFormField label="Rent Amount" name="price" description="The rent amount" required>
+        <UFormField label="Rent Amount" name="price" description="The rent amount" required eagerValidation>
           <UInput
             v-model.number="state.price"
             type="number"
@@ -66,7 +66,7 @@
       </div>
 
       <div class="basis-full sm:basis-0 sm:flex-1 sm:max-w-48 min-w-fit">
-        <UFormField label="Rent Frequency" name="rentalListing.rentFrequency" description="How often rent is paid" required>
+        <UFormField label="Rent Frequency" name="rentalListing.rentFrequency" description="How often rent is paid" required eagerValidation>
           <USelect
             v-model="state.rentalListing!.rentFrequency"
             :items="rentFrequencyItems"

@@ -23,11 +23,7 @@ export const rentalPriceSchema = z.object({
 
 // Step 3 form schema - price is always required, listing-specific fields optional
 export const step3Schema = z.object({
-  price: z.number().positive({
-    message: 'Price must be greater than 0',
-  }).nullable().refine(val => val !== null && val > 0, {
-    message: 'Please enter a price',
-  }),
+  price: z.coerce.number({ message: 'Price is required' }).positive('Price must be greater than 0'),
   saleListing: salePriceSchema.nullable().optional(),
   rentalListing: rentalPriceSchema.nullable().optional(),
 })

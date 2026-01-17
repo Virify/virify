@@ -8,7 +8,7 @@
     <template #body>
       <div v-if="bathroom" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Bathroom Name" :name="`property.bathroomFeatures.${bathroomIndex}.name`" description="Please add a bathroom name" required>
+        <UFormField label="Bathroom Name" :name="`property.bathroomFeatures.${bathroomIndex}.name`" description="Please add a bathroom name" required eagerValidation>
           <UInput
             v-model="bathroom.name"
             placeholder="e.g. Master En Suite, Family Bathroom"
@@ -19,7 +19,7 @@
 
         <!-- Floor & Room Size -->
         <div class="grid grid-cols-2 gap-4">
-          <UFormField label="Floor" :name="`property.bathroomFeatures.${bathroomIndex}.floor`" description="Select the floor the room is on" required>
+          <UFormField label="Floor" :name="`property.bathroomFeatures.${bathroomIndex}.floor`" description="Select the floor the room is on" required eagerValidation>
             <USelect
               v-model="bathroom.floor"
               :items="floorOptions"

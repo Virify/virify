@@ -1,39 +1,38 @@
 <template>
   <USlideover
     v-model:open="isOpen"
-    :title="bedroom ? `Edit ${bedroom.name || `Bedroom ${bedroomIndex + 1}`}` : 'Edit Bedroom'"
-    description="Configure bedroom details"
+    :title="otherRoom ? `Edit ${otherRoom.name || `Room ${otherRoomIndex + 1}`}` : 'Edit Room'"
+    description="Configure room details"
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="bedroom" class="space-y-6">
+      <div v-if="otherRoom" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Bedroom Name" :name="`property.bedroomFeatures.${bedroomIndex}.name`" description="Please add a bedroom name" required eagerValidation>
+        <UFormField label="Room Name" :name="`property.otherRoom.${otherRoomIndex}.name`" description="Please add a room name" required eagerValidation>
           <UInput
-            v-model="bedroom.name"
-            placeholder="e.g. Master Bedroom, Guest Room"
+            v-model="otherRoom.name"
+            placeholder="e.g. Home Office, Gym"
             size="lg"
             class="w-full"
           />
         </UFormField>
 
-        <!-- Floor & Bed Size -->
+        <!-- Floor & Type -->
         <div class="grid grid-cols-2 gap-4">
-          <UFormField label="Floor" :name="`property.bedroomFeatures.${bedroomIndex}.floor`" description="Select the floor the room is on" required eagerValidation>
+          <UFormField label="Floor" :name="`property.otherRoom.${otherRoomIndex}.floor`" description="Select the floor the room is on" required eagerValidation>
             <USelect
-              v-model="bedroom.floor"
+              v-model="otherRoom.floor"
               :items="floorOptions"
               size="lg"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Bed Size" :name="`property.bedroomFeatures.${bedroomIndex}.bed`" description="Select the bed size" required eagerValidation>
+          <UFormField label="Room Type" :name="`property.otherRoom.${otherRoomIndex}.type`" description="Type of room" required eagerValidation>
             <USelect
-              :model-value="selectedBedSize"
-              @update:model-value="setBedSize"
-              :items="getBedSizeOptions()"
-              placeholder="Select size"
+              v-model="otherRoom.type"
+              :items="getOtherRoomTypeOptions()"
+              placeholder="Select type"
               size="lg"
               class="w-full"
             />
@@ -41,7 +40,7 @@
         </div>
 
         <!-- Room Size -->
-        <UFormField label="Room Size" :name="`property.bedroomFeatures.${bedroomIndex}.size`" description="Size of the bedroom">
+        <UFormField label="Room Size" :name="`property.otherRoom.${otherRoomIndex}.size`" description="Size of the room">
           <div class="flex gap-2">
             <UInput
               :model-value="sizeDisplay"
@@ -62,13 +61,13 @@
         </UFormField>
 
         <!-- Features -->
-        <UFormField label="Bedroom Features" :name="`property.bedroomFeatures.${bedroomIndex}.features`" description="Optional: Select any additional features">
+        <UFormField label="Room Features" :name="`property.otherRoom.${otherRoomIndex}.features`" description="Optional: Select any additional features">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
-              v-for="feature in getBedroomFeatureOptions()"
+              v-for="feature in getOtherRoomFeatureOptions()"
               :key="String(feature.value)"
-              :id="`bedroom-${bedroomIndex}-feature-${feature.value}`"
-              :model-value="bedroom.features?.includes(feature.value as string)"
+              :id="`otherroom-${otherRoomIndex}-feature-${feature.value}`"
+              :model-value="otherRoom.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
             />
@@ -76,10 +75,10 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.bedroomFeatures.${bedroomIndex}.description`" description="Add any details about this bedroom">
+        <UFormField label="Description" :name="`property.otherRoom.${otherRoomIndex}.description`" description="Add any details about this room">
           <UTextarea
-            v-model="bedroom.description"
-            placeholder="Describe this bedroom..."
+            v-model="otherRoom.description"
+            placeholder="Describe this room..."
             :rows="3"
             class="w-full"
           />
@@ -101,7 +100,7 @@
         <UButton
           color="primary"
           variant="solid"
-          :disabled="!bedroom || !step4Validation.isBedroomComplete(bedroom) || isSaving"
+          :disabled="!otherRoom || !isOtherRoomComplete(otherRoom) || isSaving"
           :loading="isSaving"
           class="body-sm text-white!"
           @click="handleDone"
@@ -114,11 +113,9 @@
 </template>
 
 <script setup lang="ts">
-import { BedSizeType } from '~~/layers/database/server/database/prisma/generated/enums'
-
 const props = defineProps<{
-  bedroom: BedroomData | null
-  bedroomIndex: number
+  otherRoom: OtherRoomData | null
+  otherRoomIndex: number
   floorOptions: FloorOption[]
   isSaving?: boolean
 }>()
@@ -132,46 +129,38 @@ const isOpen = defineModel<boolean>('open', { required: true })
 // Size unit tracking (UI only - stored values always in m²)
 const sizeUnit = ref<'sqm' | 'sqft'>('sqm')
 
-// Computed bed size for select (validates and narrows type)
-const selectedBedSize = computed((): BedSizeType | undefined => {
-  const bedValue = props.bedroom?.bed[0]
-  if (!bedValue || !Object.values(BedSizeType).includes(bedValue as BedSizeType)) return undefined
-  return bedValue as BedSizeType
-})
-
 // Computed size display based on unit
 const sizeDisplay = computed(() => {
-  if (!props.bedroom || props.bedroom.size === null || props.bedroom.size === undefined) {
+  if (!props.otherRoom || props.otherRoom.size === null || props.otherRoom.size === undefined) {
     return null
   }
-  return sizeUnit.value === 'sqft' ? sqmToSqft(props.bedroom.size) : props.bedroom.size
+  return sizeUnit.value === 'sqft' ? sqmToSqft(props.otherRoom.size) : props.otherRoom.size
 })
 
 // Update size with unit conversion
 function updateSize(val: string | number | null) {
-  if (!props.bedroom) return
+  if (!props.otherRoom) return
   if (val === null || val === '') {
-    props.bedroom.size = null
+    props.otherRoom.size = null
     return
   }
   const numVal = typeof val === 'string' ? parseFloat(val) : val
   if (isNaN(numVal) || numVal <= 0) {
-    props.bedroom.size = null
+    props.otherRoom.size = null
   } else {
-    props.bedroom.size = sizeUnit.value === 'sqft' ? sqftToSqm(numVal) : numVal
+    props.otherRoom.size = sizeUnit.value === 'sqft' ? sqftToSqm(numVal) : numVal
   }
-}
-
-// Set bed size
-function setBedSize(val: string | number | boolean | null) {
-  if (!props.bedroom || !val || typeof val === 'boolean') return
-  props.bedroom.bed = [String(val)]
 }
 
 // Handle feature toggle
 function handleFeatureToggle(feature: string, checked: boolean) {
-  if (!props.bedroom) return
-  props.bedroom.features = toggleRoomFeature(props.bedroom.features, feature, checked)
+  if (!props.otherRoom) return
+  props.otherRoom.features = toggleRoomFeature(props.otherRoom.features, feature, checked)
+}
+
+// Other room complete validation
+function isOtherRoomComplete(room: OtherRoomData): boolean {
+  return Boolean(room.name && room.type && room.floor !== null && room.floor !== undefined)
 }
 
 // Handle done
