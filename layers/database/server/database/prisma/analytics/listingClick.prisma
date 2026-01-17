@@ -1,13 +1,13 @@
-model ListingView {
+/// Track listing clicks from search results/cards
+model ListingClick {
   id        Int      @id @default(autoincrement())
   listingId Int
   userId    Int?
   sessionId String?
   ip        String?
-  userAgent String? // Device/browser detection
-  referrer  String? // Where traffic came from (google, facebook, etc.)
-  source    String? // Traffic source type: direct, search, share, email, social
-  duration  Int? // Seconds spent viewing (updated via beacon on page leave)
+  userAgent String?
+  source    String? // Traffic source: direct, search, social, email, referral
+  position  Int? // Position in search results when clicked
   createdAt DateTime @default(now())
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)

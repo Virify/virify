@@ -12,6 +12,7 @@ import { MembershipType } from "../../../database/server/database/prisma/generat
 import { updateLocationsByAddressListForSeed } from './location-for-seed'
 import { generateProperty } from './property-faker'
 import { seedFakeUsers, distributeListingsToUsers } from './user-faker'
+import { generateDailyUserStats } from './listing-faker'
 import { rentalAddress, saleAddress, cityCenters } from './address-to-seed'
 import { seedAdminFavourites } from './admin-favourites-seed'
 
@@ -159,6 +160,19 @@ async function seedFullDatabase() {
     console.log('🏠 Distributing listings to users...')
     await distributeListingsToUsers(userIds)
     console.log('✅ Listings distributed.')
+
+    console.log('📊 Generating daily user stats...')
+    // Generate daily stats for a subset of users (admin + first 100 users for performance)
+    const usersForStats = [1, ...userIds.slice(0, 100)]
+    let statsGenerated = 0
+    for (const userId of usersForStats) {
+      await generateDailyUserStats(userId)
+      statsGenerated++
+      if (statsGenerated % 20 === 0) {
+        console.log(`  Progress: ${statsGenerated}/${usersForStats.length} users...`)
+      }
+    }
+    console.log('✅ Daily user stats generated.')
 
     console.log('⭐ Seeding admin favourites...')
     await seedAdminFavourites()

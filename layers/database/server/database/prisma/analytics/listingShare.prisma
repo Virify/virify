@@ -1,13 +1,11 @@
-model ListingView {
+/// Track listing shares across platforms
+model ListingShare {
   id        Int      @id @default(autoincrement())
   listingId Int
   userId    Int?
   sessionId String?
   ip        String?
-  userAgent String? // Device/browser detection
-  referrer  String? // Where traffic came from (google, facebook, etc.)
-  source    String? // Traffic source type: direct, search, share, email, social
-  duration  Int? // Seconds spent viewing (updated via beacon on page leave)
+  platform  String // twitter, facebook, whatsapp, copy, email, etc.
   createdAt DateTime @default(now())
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
@@ -15,7 +13,6 @@ model ListingView {
 
   @@index([listingId])
   @@index([userId])
-  @@index([sessionId])
+  @@index([platform])
   @@index([createdAt])
-  @@index([source])
 }

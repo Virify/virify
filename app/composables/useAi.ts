@@ -1,7 +1,7 @@
 import type { GeocodingFeatureWithBoundary } from '~~/shared/types/map';
 
 export default function useAi() {
-  const { trackSearch } = useAnalytics();
+  const { trackSearch } = useAnalyticsTracking();
   // Global state for query analysis and search query
   const queryAnalysis = useState<QueryAnalysis | null>(
     "ai-query-analysis",
