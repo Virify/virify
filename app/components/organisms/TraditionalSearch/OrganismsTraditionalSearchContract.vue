@@ -51,7 +51,7 @@
 
         <MoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="contractType.price"
           :min="contractType.minPrice" :max="contractType.maxPrice" :graph-data="priceGraph"
-          :loading="priceGraphLoading" hydrate-on-visible />
+          :loading="priceGraphLoading" />
       </section>
     </div>
   </div>
