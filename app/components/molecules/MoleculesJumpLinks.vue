@@ -1,5 +1,7 @@
 <template>
-  <nav class="m-jump-links">
+  <nav ref="$root" class="m-jump-links">
+    <span aria-hidden class="m-jump-links__indicator"></span>
+
     <ul class="m-jump-links__list">
       <li v-for="{ title, id, isIntersecting } of sortedLinksWithVisibility">
         <a :href="'#' + id" :title class="m-jump-links__link | button button-ghost button-sm" :class="{
@@ -56,6 +58,9 @@ const sortedLinksWithVisibility = computed(() => {
   }))
 })
 
+/**
+ *  Mount and observe
+ */
 let observer: IntersectionObserver;
 
 onMounted(() => {
@@ -69,6 +74,10 @@ onMounted(() => {
         visibleIds.value[target.id] = isIntersecting
       }
     }
+
+    nextTick(() => {
+      resizeIndicator()
+    })
   }, {
     rootMargin: '-100px'
   })
@@ -97,6 +106,40 @@ onBeforeUnmount(() => {
   observer.disconnect()
 })
 
+/**
+ *  Slider resizer
+ */
+const $root = useTemplateRef('$root')
+
+const indicatorX = ref('0px')
+const indicatorWidth = ref('0px')
+
+function resizeIndicator() {
+  const wrapper = $root.value
+
+  if (!wrapper) return
+
+  // Get all active links
+  const activeLinks = wrapper.querySelectorAll('.m-jump-links__link--active')
+
+  // Loop through each link and get the min/max X coords
+  let minLeft = 0
+  let maxRight = 0
+
+  for (const link of activeLinks) {
+    const { left, right } = link.getBoundingClientRect()
+
+    minLeft = minLeft ? Math.min(left, minLeft) : left
+    maxRight = Math.max(maxRight, right)
+  }
+
+  // Get offset for wrapper, recalculate min/max
+  const { left } = wrapper.getBoundingClientRect()
+
+  indicatorX.value = Math.max(0, minLeft - left) + 'px'
+  indicatorWidth.value = (maxRight - minLeft) + 'px'
+}
+
 </script>
 
 <style lang="scss">
@@ -108,8 +151,23 @@ onBeforeUnmount(() => {
 }
 
 .m-jump-links {
+  position: relative;
+
+  &__indicator {
+    position: absolute;
+    left: v-bind(indicatorX);
+    top: 0;
+    height: 100%;
+    width: v-bind(indicatorWidth);
+    background: var(--secondary-800);
+    border-radius: var(--border-radius-xl);
+    transition: width, left;
+    transition-duration: var(--animation-medium);
+    transition-timing-function: var(--ease-out);
+  }
 
   &__list {
+    position: relative;
     list-style: none;
     display: flex;
     gap: var(--size-4);
@@ -129,8 +187,7 @@ onBeforeUnmount(() => {
 
     &--active,
     &--active:hover {
-      background: var(--secondary-800);
-      color: var(--monochrome-100);
+      color: var(--secondart-400);
     }
   }
 }
