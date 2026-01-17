@@ -1,41 +1,31 @@
 <template>
   <USlideover
     v-model:open="isOpen"
-    :title="kitchen ? `Edit ${kitchen.name || `Kitchen ${kitchenIndex + 1}`}` : 'Edit Kitchen'"
-    description="Configure kitchen details"
+    :title="land ? `Edit ${land.name || `Land ${landIndex + 1}`}` : 'Edit Land'"
+    description="Configure land parcel details"
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="kitchen" class="space-y-6">
+      <div v-if="land" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Kitchen Name" :name="`property.kitchenFeatures.${kitchenIndex}.name`" description="Please add a kitchen name" required eagerValidation>
+        <UFormField label="Land Name" :name="`property.outdoorSpace.land.${landIndex}.name`" description="Please add a land parcel name" required eagerValidation>
           <UInput
-            v-model="kitchen.name"
-            placeholder="e.g. Main Kitchen, Breakfast Kitchen"
+            v-model="land.name"
+            placeholder="e.g. Paddock, Woodland"
             size="lg"
             class="w-full"
           />
         </UFormField>
 
-        <!-- Floor -->
-        <UFormField label="Floor" :name="`property.kitchenFeatures.${kitchenIndex}.floor`" description="Select the floor the kitchen is on" required eagerValidation>
-          <USelect
-            v-model="kitchen.floor"
-            :items="floorOptions"
-            size="lg"
-            class="w-full"
-          />
-        </UFormField>
-
-        <!-- Room Size -->
-        <UFormField label="Room Size" :name="`property.kitchenFeatures.${kitchenIndex}.size`" description="Size of the kitchen">
+        <!-- Size -->
+        <UFormField label="Land Size" :name="`property.outdoorSpace.land.${landIndex}.size`" description="Size of the land parcel">
           <div class="flex gap-2">
             <UInput
               :model-value="sizeDisplay"
               @update:model-value="updateSize"
               type="number"
               :min="0"
-              placeholder="e.g. 20"
+              placeholder="e.g. 500"
               size="lg"
               class="flex-1"
             />
@@ -49,13 +39,13 @@
         </UFormField>
 
         <!-- Features -->
-        <UFormField label="Kitchen Features" :name="`property.kitchenFeatures.${kitchenIndex}.features`" description="Optional: Select any additional features">
+        <UFormField label="Land Features" :name="`property.outdoorSpace.land.${landIndex}.features`" description="Optional: Select any additional features">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
-              v-for="feature in getKitchenFeatureOptions()"
+              v-for="feature in landFeatureOptions"
               :key="String(feature.value)"
-              :id="`kitchen-${kitchenIndex}-feature-${feature.value}`"
-              :model-value="kitchen.features?.includes(feature.value as string)"
+              :id="`land-${landIndex}-feature-${feature.value}`"
+              :model-value="land.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
             />
@@ -63,10 +53,10 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.kitchenFeatures.${kitchenIndex}.description`" description="Add any details about this kitchen">
+        <UFormField label="Description" :name="`property.outdoorSpace.land.${landIndex}.description`" description="Add any details about this land parcel">
           <UTextarea
-            v-model="kitchen.description"
-            placeholder="Describe this kitchen..."
+            v-model="land.description"
+            placeholder="Describe this land..."
             :rows="3"
             class="w-full"
           />
@@ -88,7 +78,7 @@
         <UButton
           color="primary"
           variant="solid"
-          :disabled="!kitchen || !isKitchenComplete(kitchen) || isSaving"
+          :disabled="!land || !isLandValid || isSaving"
           :loading="isSaving"
           class="body-sm text-white!"
           @click="handleDone"
@@ -102,9 +92,8 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  kitchen: KitchenData | null
-  kitchenIndex: number
-  floorOptions: FloorOption[]
+  land: LandData | null
+  landIndex: number
   isSaving?: boolean
 }>()
 
@@ -120,36 +109,37 @@ const sizeUnit = ref<'sqm' | 'sqft'>('sqm')
 
 // Computed size display based on unit
 const sizeDisplay = computed(() => {
-  if (!props.kitchen || props.kitchen.size === null || props.kitchen.size === undefined) {
+  if (!props.land || props.land.size === null || props.land.size === undefined) {
     return null
   }
-  return sizeUnit.value === 'sqft' ? sqmToSqft(props.kitchen.size) : props.kitchen.size
+  return sizeUnit.value === 'sqft' ? sqmToSqft(props.land.size) : props.land.size
 })
 
 // Update size with unit conversion
 function updateSize(val: string | number | null) {
-  if (!props.kitchen) return
+  if (!props.land) return
   if (val === null || val === '') {
-    props.kitchen.size = null
+    props.land.size = null
     return
   }
   const numVal = typeof val === 'string' ? parseFloat(val) : val
   if (isNaN(numVal) || numVal <= 0) {
-    props.kitchen.size = null
+    props.land.size = null
   } else {
-    props.kitchen.size = sizeUnit.value === 'sqft' ? sqftToSqm(numVal) : numVal
+    props.land.size = sizeUnit.value === 'sqft' ? sqftToSqm(numVal) : numVal
   }
 }
 
+// Validation
+const isLandValid = computed(() => {
+  if (!props.land) return false
+  return step6Validation.isLandComplete(props.land)
+})
+
 // Handle feature toggle
 function handleFeatureToggle(feature: string, checked: boolean) {
-  if (!props.kitchen) return
-  props.kitchen.features = toggleRoomFeature(props.kitchen.features, feature, checked)
-}
-
-// Kitchen complete validation
-function isKitchenComplete(kitchen: KitchenData): boolean {
-  return Boolean(kitchen.name && kitchen.floor !== null && kitchen.floor !== undefined)
+  if (!props.land) return
+  props.land.features = toggleRoomFeature(props.land.features ?? [], feature, checked)
 }
 
 // Handle done

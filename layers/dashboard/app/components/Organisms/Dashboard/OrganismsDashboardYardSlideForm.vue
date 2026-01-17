@@ -1,53 +1,56 @@
 <template>
   <USlideover
     v-model:open="isOpen"
-    :title="otherRoom ? `Edit ${otherRoom.name || `Room ${otherRoomIndex + 1}`}` : 'Edit Room'"
-    description="Configure room details"
+    :title="yard ? `Edit ${yard.name || `Yard ${yardIndex + 1}`}` : 'Edit Yard'"
+    description="Configure yard details"
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="otherRoom" class="space-y-6">
+      <div v-if="yard" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Room Name" :name="`property.otherRoom.${otherRoomIndex}.name`" description="Please add a room name" required eagerValidation>
+        <UFormField label="Yard Name" :name="`property.outdoorSpace.yard.${yardIndex}.name`" description="Please add a yard name" required eagerValidation>
           <UInput
-            v-model="otherRoom.name"
-            placeholder="e.g. Home Office, Gym"
+            v-model="yard.name"
+            placeholder="e.g. Courtyard, Side Yard"
             size="lg"
             class="w-full"
           />
         </UFormField>
 
-        <!-- Floor & Type -->
+        <!-- Position & Facing -->
         <div class="grid grid-cols-2 gap-4">
-          <UFormField label="Floor" :name="`property.otherRoom.${otherRoomIndex}.floor`" description="Select the floor the room is on" required eagerValidation>
+          <UFormField label="Position" :name="`property.outdoorSpace.yard.${yardIndex}.position`" description="Select the yard position" eagerValidation>
             <USelect
-              v-model="otherRoom.floor"
-              :items="floorOptions"
+              :model-value="(yard.position as GardenPosition | undefined) ?? undefined"
+              @update:model-value="(val) => { if (yard) yard.position = val ?? null }"
+              :items="gardenPositionOptions"
+              placeholder="Select position"
               size="lg"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Room Type" :name="`property.otherRoom.${otherRoomIndex}.type`" description="Type of room" required eagerValidation>
+          <UFormField label="Facing" :name="`property.outdoorSpace.yard.${yardIndex}.facing`" description="Select the facing direction" eagerValidation>
             <USelect
-              v-model="otherRoom.type"
-              :items="getOtherRoomTypeOptions()"
-              placeholder="Select type"
+              :model-value="(yard.facing as GardenFacing | undefined) ?? undefined"
+              @update:model-value="(val) => { if (yard) yard.facing = val ?? null }"
+              :items="gardenFacingOptions"
+              placeholder="Select facing"
               size="lg"
               class="w-full"
             />
           </UFormField>
         </div>
 
-        <!-- Room Size -->
-        <UFormField label="Room Size" :name="`property.otherRoom.${otherRoomIndex}.size`" description="Size of the room">
+        <!-- Size -->
+        <UFormField label="Yard Size" :name="`property.outdoorSpace.yard.${yardIndex}.size`" description="Size of the yard">
           <div class="flex gap-2">
             <UInput
               :model-value="sizeDisplay"
               @update:model-value="updateSize"
               type="number"
               :min="0"
-              placeholder="e.g. 15"
+              placeholder="e.g. 30"
               size="lg"
               class="flex-1"
             />
@@ -61,13 +64,13 @@
         </UFormField>
 
         <!-- Features -->
-        <UFormField label="Room Features" :name="`property.otherRoom.${otherRoomIndex}.features`" description="Optional: Select any additional features">
+        <UFormField label="Yard Features" :name="`property.outdoorSpace.yard.${yardIndex}.features`" description="Optional: Select any additional features">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
-              v-for="feature in getOtherRoomFeatureOptions()"
+              v-for="feature in outdoorSpaceFeatureOptions"
               :key="String(feature.value)"
-              :id="`otherroom-${otherRoomIndex}-feature-${feature.value}`"
-              :model-value="otherRoom.features?.includes(feature.value as string)"
+              :id="`yard-${yardIndex}-feature-${feature.value}`"
+              :model-value="yard.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
             />
@@ -75,10 +78,10 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.otherRoom.${otherRoomIndex}.description`" description="Add any details about this room">
+        <UFormField label="Description" :name="`property.outdoorSpace.yard.${yardIndex}.description`" description="Add any details about this yard">
           <UTextarea
-            v-model="otherRoom.description"
-            placeholder="Describe this room..."
+            v-model="yard.description"
+            placeholder="Describe this yard..."
             :rows="3"
             class="w-full"
           />
@@ -100,7 +103,7 @@
         <UButton
           color="primary"
           variant="solid"
-          :disabled="!otherRoom || !isOtherRoomComplete(otherRoom) || isSaving"
+          :disabled="!yard || !isYardValid || isSaving"
           :loading="isSaving"
           class="body-sm text-white!"
           @click="handleDone"
@@ -113,10 +116,11 @@
 </template>
 
 <script setup lang="ts">
+import { GardenPosition, GardenFacing } from '~~/layers/database/server/database/prisma/generated/enums'
+
 const props = defineProps<{
-  otherRoom: OtherRoomData | null
-  otherRoomIndex: number
-  floorOptions: FloorOption[]
+  yard: YardData | null
+  yardIndex: number
   isSaving?: boolean
 }>()
 
@@ -132,36 +136,37 @@ const sizeUnit = ref<'sqm' | 'sqft'>('sqm')
 
 // Computed size display based on unit
 const sizeDisplay = computed(() => {
-  if (!props.otherRoom || props.otherRoom.size === null || props.otherRoom.size === undefined) {
+  if (!props.yard || props.yard.size === null || props.yard.size === undefined) {
     return null
   }
-  return sizeUnit.value === 'sqft' ? sqmToSqft(props.otherRoom.size) : props.otherRoom.size
+  return sizeUnit.value === 'sqft' ? sqmToSqft(props.yard.size) : props.yard.size
 })
 
 // Update size with unit conversion
 function updateSize(val: string | number | null) {
-  if (!props.otherRoom) return
+  if (!props.yard) return
   if (val === null || val === '') {
-    props.otherRoom.size = null
+    props.yard.size = null
     return
   }
   const numVal = typeof val === 'string' ? parseFloat(val) : val
   if (isNaN(numVal) || numVal <= 0) {
-    props.otherRoom.size = null
+    props.yard.size = null
   } else {
-    props.otherRoom.size = sizeUnit.value === 'sqft' ? sqftToSqm(numVal) : numVal
+    props.yard.size = sizeUnit.value === 'sqft' ? sqftToSqm(numVal) : numVal
   }
 }
 
+// Validation
+const isYardValid = computed(() => {
+  if (!props.yard) return false
+  return step6Validation.isYardComplete(props.yard)
+})
+
 // Handle feature toggle
 function handleFeatureToggle(feature: string, checked: boolean) {
-  if (!props.otherRoom) return
-  props.otherRoom.features = toggleRoomFeature(props.otherRoom.features, feature, checked)
-}
-
-// Other room complete validation
-function isOtherRoomComplete(room: OtherRoomData): boolean {
-  return Boolean(room.name && room.type && room.floor !== null && room.floor !== undefined)
+  if (!props.yard) return
+  props.yard.features = toggleRoomFeature(props.yard.features ?? [], feature, checked)
 }
 
 // Handle done

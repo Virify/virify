@@ -1,50 +1,29 @@
-import * as z from "zod";
-import { GardenFacing, GardenPosition, OutdoorSpaceFeature, LandFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+import { z } from "zod";
+import { step7Schema } from "~~/shared/utils/listing-step7-schema";
+import {
+  ParkingFeature,
+  AccessibilityFeature,
+  SecurityFeature,
+  StorageFeature,
+  UtilityFeature,
+  BuildingFeature,
+} from "~~/layers/database/server/database/prisma/generated/enums";
 
-const stepSevenSchema = z.object({
+/**
+ * Step 7: Additional Features API Endpoint
+ * 
+ * This endpoint handles saving additional features for a draft listing:
+ * - Parking
+ * - Accessibility
+ * - Security
+ * - Storage
+ * - Utility room
+ * - Building/Additional features
+ */
+
+// Extend step7Schema to require draftId for updates
+const stepDataSchema = step7Schema.extend({
   draftId: z.number().int().positive(),
-  property: z.object({
-    outdoorSpace: z.object({
-      description: z.string().max(500).nullable().optional(),
-      totalArea: z.coerce.number().min(0).nullable().optional(),
-      hasGarden: z.boolean().optional(),
-      hasYard: z.boolean().optional(),
-      hasLand: z.boolean().optional(),
-      // OutdoorSpace features array
-      features: z.array(z.enum(Object.values(OutdoorSpaceFeature) as [string, ...string[]])).optional(),
-      garden: z.array(
-        z.object({
-          name: z.string().max(100),
-          description: z.string().max(500).nullable().optional(),
-          facing: z.enum(Object.values(GardenFacing) as [string, ...string[]]).nullable().optional(),
-          position: z.enum(Object.values(GardenPosition) as [string, ...string[]]).nullable().optional(),
-          features: z.array(z.enum(Object.values(OutdoorSpaceFeature) as [string, ...string[]])).optional(),
-          size: z.coerce.number().min(0).nullable().optional(),
-          additionalDetails: z.boolean().optional(),
-        })
-      ),
-      yard: z.array(
-        z.object({
-          name: z.string().max(100),
-          description: z.string().max(500).nullable().optional(),
-          facing: z.enum(Object.values(GardenFacing) as [string, ...string[]]).nullable().optional(),
-          position: z.enum(Object.values(GardenPosition) as [string, ...string[]]).nullable().optional(),
-          features: z.array(z.enum(Object.values(OutdoorSpaceFeature) as [string, ...string[]])).optional(),
-          size: z.coerce.number().min(0).nullable().optional(),
-          additionalDetails: z.boolean().optional(),
-        })
-      ),
-      land: z.array(
-        z.object({
-          name: z.string().max(100),
-          description: z.string().max(500).nullable().optional(),
-          features: z.array(z.enum(Object.values(LandFeature) as [string, ...string[]])).optional(),
-          size: z.coerce.number().min(0).nullable().optional(),
-          additionalDetails: z.boolean().optional(),
-        })
-      ),
-    }),
-  }),
 });
 
 export default defineEventHandler(async (event) => {
@@ -52,9 +31,10 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
   
   try {
-    const { draftId, property } = await readValidatedBody(event, stepSevenSchema.parse);
+    const body = await readBody(event);
+    const { draftId, property } = stepDataSchema.parse(body);
 
-    const { outdoorSpace } = property;
+    const { parking, accessibilityFeatures, securityFeatures, storageFeatures, utility, additionalFeatures } = property;
 
     // Get current completedSteps to check if step 7 already exists
     const currentDraft = await prisma.draftListing.findUnique({
@@ -69,100 +49,107 @@ export default defineEventHandler(async (event) => {
         ...(currentDraft && !currentDraft.completedSteps.includes(7) ? { completedSteps: { push: 7 } } : {}),
         property: {
           update: {
-            outdoorSpace: {
+            // Parking
+            parking: parking ? {
               upsert: {
                 create: {
-                  description: outdoorSpace.description ?? null,
-                  totalArea: outdoorSpace.totalArea ?? null,
-                  // OutdoorSpace features array
-                  features: outdoorSpace.features as OutdoorSpaceFeature[] ?? [],
-                  garden: {
-                    create: outdoorSpace.garden.map((g) => ({
-                      name: g.name,
-                      description: g.description ?? null,
-                      facing: g.facing as GardenFacing | null,
-                      position: g.position as GardenPosition | null,
-                      features: g.features as OutdoorSpaceFeature[] ?? [],
-                      size: g.size ?? null,
-                      additionalDetails: g.additionalDetails ?? false,
-                    })),
-                  },
-                  yard: {
-                    create: outdoorSpace.yard.map((y) => ({
-                      name: y.name,
-                      description: y.description ?? null,
-                      facing: y.facing as GardenFacing | null,
-                      position: y.position as GardenPosition | null,
-                      features: y.features as OutdoorSpaceFeature[] ?? [],
-                      size: y.size ?? null,
-                      additionalDetails: y.additionalDetails ?? false,
-                    })),
-                  },
-                  land: {
-                    create: outdoorSpace.land.map((l) => ({
-                      name: l.name,
-                      description: l.description ?? null,
-                      features: l.features as LandFeature[] ?? [],
-                      size: l.size ?? null,
-                      additionalDetails: l.additionalDetails ?? false,
-                    })),
-                  },
+                  description: parking.description ?? null,
+                  features: parking.features as ParkingFeature[] ?? [],
                 },
                 update: {
-                  description: outdoorSpace.description ?? null,
-                  totalArea: outdoorSpace.totalArea ?? null,
-                  // OutdoorSpace features array
-                  features: outdoorSpace.features as OutdoorSpaceFeature[] ?? [],
-                  garden: {
-                    deleteMany: {},
-                    create: outdoorSpace.garden.map((g) => ({
-                      name: g.name,
-                      description: g.description ?? null,
-                      facing: g.facing as GardenFacing | null,
-                      position: g.position as GardenPosition | null,
-                      features: g.features as OutdoorSpaceFeature[] ?? [],
-                      size: g.size ?? null,
-                      additionalDetails: g.additionalDetails ?? false,
-                    })),
-                  },
-                  yard: {
-                    deleteMany: {},
-                    create: outdoorSpace.yard.map((y) => ({
-                      name: y.name,
-                      description: y.description ?? null,
-                      facing: y.facing as GardenFacing | null,
-                      position: y.position as GardenPosition | null,
-                      features: y.features as OutdoorSpaceFeature[] ?? [],
-                      size: y.size ?? null,
-                      additionalDetails: y.additionalDetails ?? false,
-                    })),
-                  },
-                  land: {
-                    deleteMany: {},
-                    create: outdoorSpace.land.map((l) => ({
-                      name: l.name,
-                      description: l.description ?? null,
-                      features: l.features as LandFeature[] ?? [],
-                      size: l.size ?? null,
-                      additionalDetails: l.additionalDetails ?? false,
-                    })),
-                  },
+                  description: parking.description ?? null,
+                  features: parking.features as ParkingFeature[] ?? [],
                 },
               },
-            },
+            } : undefined,
+            
+            // Accessibility
+            accessibilityFeatures: accessibilityFeatures ? {
+              upsert: {
+                create: {
+                  description: accessibilityFeatures.description ?? null,
+                  features: accessibilityFeatures.features as AccessibilityFeature[] ?? [],
+                },
+                update: {
+                  description: accessibilityFeatures.description ?? null,
+                  features: accessibilityFeatures.features as AccessibilityFeature[] ?? [],
+                },
+              },
+            } : undefined,
+            
+            // Security
+            securityFeatures: securityFeatures ? {
+              upsert: {
+                create: {
+                  description: securityFeatures.description ?? null,
+                  features: securityFeatures.features as SecurityFeature[] ?? [],
+                },
+                update: {
+                  description: securityFeatures.description ?? null,
+                  features: securityFeatures.features as SecurityFeature[] ?? [],
+                },
+              },
+            } : undefined,
+            
+            // Storage
+            storageFeatures: storageFeatures ? {
+              upsert: {
+                create: {
+                  description: storageFeatures.description ?? null,
+                  features: storageFeatures.features as StorageFeature[] ?? [],
+                },
+                update: {
+                  description: storageFeatures.description ?? null,
+                  features: storageFeatures.features as StorageFeature[] ?? [],
+                },
+              },
+            } : undefined,
+            
+            // Utility room
+            utility: utility ? {
+              upsert: {
+                create: {
+                  description: utility.description ?? null,
+                  features: utility.features as UtilityFeature[] ?? [],
+                  size: utility.size ?? null,
+                },
+                update: {
+                  description: utility.description ?? null,
+                  features: utility.features as UtilityFeature[] ?? [],
+                  size: utility.size ?? null,
+                },
+              },
+            } : undefined,
+            
+            // Additional/Building features
+            additionalFeatures: additionalFeatures ? {
+              upsert: {
+                create: {
+                  description: additionalFeatures.description ?? null,
+                  petFriendly: additionalFeatures.petFriendly ?? true,
+                  moveInDate: additionalFeatures.moveInDate ?? null,
+                  features: additionalFeatures.features as BuildingFeature[] ?? [],
+                },
+                update: {
+                  description: additionalFeatures.description ?? null,
+                  petFriendly: additionalFeatures.petFriendly ?? true,
+                  moveInDate: additionalFeatures.moveInDate ?? null,
+                  features: additionalFeatures.features as BuildingFeature[] ?? [],
+                },
+              },
+            } : undefined,
           },
         },
       },
       include: {
         property: {
           include: {
-            outdoorSpace: {
-              include: {
-                garden: true,
-                yard: true,
-                land: true,
-              },
-            },
+            parking: true,
+            accessibilityFeatures: true,
+            securityFeatures: true,
+            storageFeatures: true,
+            utility: true,
+            additionalFeatures: true,
           },
         },
       },

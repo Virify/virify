@@ -93,7 +93,7 @@
           color="neutral"
           size="sm"
           class="body-sm"
-          @click="isOpen = false"
+          @click="handleCancel"
         >
           Cancel
         </UButton>
@@ -122,6 +122,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   done: []
+  cancel: []
 }>()
 
 const isOpen = defineModel<boolean>('open', { required: true })
@@ -167,5 +168,11 @@ function isReceptionComplete(reception: ReceptionData): boolean {
 function handleDone() {
   isOpen.value = false
   emit('done')
+}
+
+// Handle cancel
+function handleCancel() {
+  isOpen.value = false
+  emit('cancel')
 }
 </script>

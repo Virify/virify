@@ -43,6 +43,7 @@
       :floor-options="floorOptions"
       :is-saving="isSaving"
       @done="handleKitchenDone"
+      @cancel="handleKitchenCancel"
     />
 
     <!-- Reception Editor Slideover -->
@@ -53,6 +54,7 @@
       :floor-options="floorOptions"
       :is-saving="isSaving"
       @done="handleReceptionDone"
+      @cancel="handleReceptionCancel"
     />
 
     <!-- Other Room Editor Slideover -->
@@ -63,6 +65,7 @@
       :floor-options="floorOptions"
       :is-saving="isSaving"
       @done="handleOtherRoomDone"
+      @cancel="handleOtherRoomCancel"
     />
   </OrganismsDashboardCreateListingStepWrapper>
 </template>
@@ -91,6 +94,9 @@ const otherRoomEditorOpen = ref(false)
 const editingKitchenIndex = ref<number | null>(null)
 const editingReceptionIndex = ref<number | null>(null)
 const editingOtherRoomIndex = ref<number | null>(null)
+const isAddingNewKitchen = ref(false)
+const isAddingNewReception = ref(false)
+const isAddingNewOtherRoom = ref(false)
 
 // Computed refs for currently editing rooms
 const editingKitchen = computed((): KitchenData | null => 
@@ -125,6 +131,7 @@ function addKitchen() {
     features: [],
     size: null,
   })
+  isAddingNewKitchen.value = true
   openKitchenEditor(newIndex)
 }
 
@@ -136,12 +143,16 @@ function removeKitchen(index: number) {
 }
 
 function openKitchenEditor(index: number) {
+  if (!isAddingNewKitchen.value) {
+    isAddingNewKitchen.value = false
+  }
   editingKitchenIndex.value = index
   kitchenEditorOpen.value = true
 }
 
 function closeKitchenEditor() {
   editingKitchenIndex.value = null
+  isAddingNewKitchen.value = false
 }
 
 // Reception methods
@@ -156,6 +167,7 @@ function addReception() {
     features: [],
     size: null,
   })
+  isAddingNewReception.value = true
   openReceptionEditor(newIndex)
 }
 
@@ -167,12 +179,16 @@ function removeReception(index: number) {
 }
 
 function openReceptionEditor(index: number) {
+  if (!isAddingNewReception.value) {
+    isAddingNewReception.value = false
+  }
   editingReceptionIndex.value = index
   receptionEditorOpen.value = true
 }
 
 function closeReceptionEditor() {
   editingReceptionIndex.value = null
+  isAddingNewReception.value = false
 }
 
 // Other Room methods
@@ -187,6 +203,7 @@ function addOtherRoom() {
     features: [],
     size: null,
   })
+  isAddingNewOtherRoom.value = true
   openOtherRoomEditor(newIndex)
 }
 
@@ -198,12 +215,16 @@ function removeOtherRoom(index: number) {
 }
 
 function openOtherRoomEditor(index: number) {
+  if (!isAddingNewOtherRoom.value) {
+    isAddingNewOtherRoom.value = false
+  }
   editingOtherRoomIndex.value = index
   otherRoomEditorOpen.value = true
 }
 
 function closeOtherRoomEditor() {
   editingOtherRoomIndex.value = null
+  isAddingNewOtherRoom.value = false
 }
 
 // Save room data silently (no toast)
@@ -217,19 +238,55 @@ async function saveRoomProgress() {
 
 // Handle kitchen done - save and close
 async function handleKitchenDone() {
+  isAddingNewKitchen.value = false
   await saveRoomProgress()
+  closeKitchenEditor()
+}
+
+// Handle kitchen cancel - remove if new
+function handleKitchenCancel() {
+  if (isAddingNewKitchen.value && editingKitchenIndex.value !== null) {
+    state.property.kitchenFeatures.splice(editingKitchenIndex.value, 1)
+    state.property.kitchenFeatures.forEach((k, i) => {
+      k.roomNumber = i + 1
+    })
+  }
   closeKitchenEditor()
 }
 
 // Handle reception done - save and close
 async function handleReceptionDone() {
+  isAddingNewReception.value = false
   await saveRoomProgress()
+  closeReceptionEditor()
+}
+
+// Handle reception cancel - remove if new
+function handleReceptionCancel() {
+  if (isAddingNewReception.value && editingReceptionIndex.value !== null) {
+    state.property.reception.splice(editingReceptionIndex.value, 1)
+    state.property.reception.forEach((r, i) => {
+      r.roomNumber = i + 1
+    })
+  }
   closeReceptionEditor()
 }
 
 // Handle other room done - save and close
 async function handleOtherRoomDone() {
+  isAddingNewOtherRoom.value = false
   await saveRoomProgress()
+  closeOtherRoomEditor()
+}
+
+// Handle other room cancel - remove if new
+function handleOtherRoomCancel() {
+  if (isAddingNewOtherRoom.value && editingOtherRoomIndex.value !== null) {
+    state.property.otherRoom.splice(editingOtherRoomIndex.value, 1)
+    state.property.otherRoom.forEach((o, i) => {
+      o.roomNumber = i + 1
+    })
+  }
   closeOtherRoomEditor()
 }
 

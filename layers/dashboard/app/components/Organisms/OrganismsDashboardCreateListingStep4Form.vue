@@ -35,6 +35,7 @@
       :floor-options="floorOptions"
       :is-saving="isSaving"
       @done="handleBedroomDone"
+      @cancel="handleBedroomCancel"
     />
 
     <!-- Bathroom Editor Slideover -->
@@ -45,6 +46,7 @@
       :floor-options="floorOptions"
       :is-saving="isSaving"
       @done="handleBathroomDone"
+      @cancel="handleBathroomCancel"
     />
   </OrganismsDashboardCreateListingStepWrapper>
 </template>
@@ -71,6 +73,8 @@ const bedroomEditorOpen = ref(false)
 const bathroomEditorOpen = ref(false)
 const editingBedroomIndex = ref<number | null>(null)
 const editingBathroomIndex = ref<number | null>(null)
+const isAddingNewBedroom = ref(false)
+const isAddingNewBathroom = ref(false)
 
 // Computed refs for currently editing rooms
 const editingBedroom = computed((): BedroomData | null => 
@@ -100,6 +104,7 @@ function addBedroom() {
     features: [],
     size: null,
   })
+  isAddingNewBedroom.value = true
   openBedroomEditor(newIndex)
 }
 
@@ -111,12 +116,17 @@ function removeBedroom(index: number) {
 }
 
 function openBedroomEditor(index: number) {
+  // Only reset if not called from addBedroom (which sets it to true)
+  if (!isAddingNewBedroom.value) {
+    isAddingNewBedroom.value = false
+  }
   editingBedroomIndex.value = index
   bedroomEditorOpen.value = true
 }
 
 function closeBedroomEditor() {
   editingBedroomIndex.value = null
+  isAddingNewBedroom.value = false
 }
 
 // Bathroom methods
@@ -130,6 +140,7 @@ function addBathroom() {
     features: [],
     size: null,
   })
+  isAddingNewBathroom.value = true
   openBathroomEditor(newIndex)
 }
 
@@ -141,12 +152,17 @@ function removeBathroom(index: number) {
 }
 
 function openBathroomEditor(index: number) {
+  // Only reset if not called from addBathroom (which sets it to true)
+  if (!isAddingNewBathroom.value) {
+    isAddingNewBathroom.value = false
+  }
   editingBathroomIndex.value = index
   bathroomEditorOpen.value = true
 }
 
 function closeBathroomEditor() {
   editingBathroomIndex.value = null
+  isAddingNewBathroom.value = false
 }
 
 // Save room data silently (no toast)
@@ -163,13 +179,37 @@ async function saveRoomProgress() {
 
 // Handle bedroom done - save and close
 async function handleBedroomDone() {
+  isAddingNewBedroom.value = false
   await saveRoomProgress()
+  closeBedroomEditor()
+}
+
+// Handle bedroom cancel - remove if new
+function handleBedroomCancel() {
+  if (isAddingNewBedroom.value && editingBedroomIndex.value !== null) {
+    state.property.bedroomFeatures.splice(editingBedroomIndex.value, 1)
+    state.property.bedroomFeatures.forEach((b, i) => {
+      b.roomNumber = i + 1
+    })
+  }
   closeBedroomEditor()
 }
 
 // Handle bathroom done - save and close
 async function handleBathroomDone() {
+  isAddingNewBathroom.value = false
   await saveRoomProgress()
+  closeBathroomEditor()
+}
+
+// Handle bathroom cancel - remove if new
+function handleBathroomCancel() {
+  if (isAddingNewBathroom.value && editingBathroomIndex.value !== null) {
+    state.property.bathroomFeatures.splice(editingBathroomIndex.value, 1)
+    state.property.bathroomFeatures.forEach((b, i) => {
+      b.roomNumber = i + 1
+    })
+  }
   closeBathroomEditor()
 }
 

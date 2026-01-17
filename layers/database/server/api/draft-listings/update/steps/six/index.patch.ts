@@ -1,59 +1,28 @@
-import * as z from "zod";
+import { z } from "zod";
+import { step6Schema } from "~~/shared/utils/listing-step6-schema";
+import { GardenFacing, GardenPosition, OutdoorSpaceFeature, LandFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
-import { OtherRoomType, ReceptionType, KitchenFeature, RoomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+/**
+ * Step 6: Outdoor Spaces API Endpoint
+ * 
+ * This endpoint handles saving outdoor space features (gardens, yards, land) for a draft listing.
+ * It uses deleteMany + create pattern to replace all existing outdoor space features.
+ */
 
-const stepSixSchema = z.object({
+// Extend step6Schema to require draftId for updates
+const stepDataSchema = step6Schema.extend({
   draftId: z.number().int().positive(),
-  property: z.object({
-    totalFloors: z.coerce.number().int().min(0),
-    kitchenFeatures: z
-      .array(
-        z.object({
-          name: z.string().max(100),
-          roomNumber: z.coerce.number().int().min(1),
-          description: z.string().max(500).nullable().optional(),
-          floor: z.coerce.number().int().min(1),
-          size: z.coerce.number().min(0).nullable().optional(),
-          features: z.array(z.enum(Object.values(KitchenFeature) as [string, ...string[]])).optional(),
-        })
-      ),
-    numberKitchens: z.coerce.number().int().min(0).optional(),
-    reception: z
-      .array(
-        z.object({
-          name: z.string().max(100),
-          roomNumber: z.coerce.number().int().min(1),
-          description: z.string().max(500).nullable().optional(),
-          floor: z.coerce.number().int().min(1),
-          size: z.coerce.number().min(0).nullable().optional(),
-          type: z.enum(Object.values(ReceptionType) as [string, ...string[]]),
-          features: z.array(z.enum(Object.values(RoomFeature) as [string, ...string[]])).optional(),
-        })
-      ),
-    numberReceptions: z.coerce.number().int().min(0).optional(),
-    otherRoom: z
-      .array(
-        z.object({
-          name: z.string().max(100),
-          roomNumber: z.coerce.number().int().min(1),
-          description: z.string().max(500).nullable().optional(),
-          floor: z.coerce.number().int().min(1),
-          size: z.coerce.number().min(0).nullable().optional(),
-          type: z.enum(Object.values(OtherRoomType) as [string, ...string[]]),
-          features: z.array(z.enum(Object.values(RoomFeature) as [string, ...string[]])).optional(),
-        })
-      ),
-    numberOtherRooms: z.coerce.number().int().min(0).optional(),
-  }),
 });
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
+  
   try {
-    const { draftId, property } = await readValidatedBody(event, stepSixSchema.parse);
+    const body = await readBody(event);
+    const { draftId, property } = stepDataSchema.parse(body);
 
-    const { kitchenFeatures, numberKitchens, reception, numberReceptions, otherRoom, numberOtherRooms, totalFloors } = property;
+    const { outdoorSpace } = property;
 
     // Get current completedSteps to check if step 6 already exists
     const currentDraft = await prisma.draftListing.findUnique({
@@ -68,44 +37,78 @@ export default defineEventHandler(async (event) => {
         ...(currentDraft && !currentDraft.completedSteps.includes(6) ? { completedSteps: { push: 6 } } : {}),
         property: {
           update: {
-            totalFloors,
-            numberKitchens: numberKitchens ?? kitchenFeatures.length,
-            numberReceptions: numberReceptions ?? reception.length,
-            numberOtherRooms: numberOtherRooms ?? otherRoom.length,
-            kitchenFeatures: {
-              deleteMany: {},
-              create: kitchenFeatures.map((k) => ({
-                name: k.name,
-                roomNumber: k.roomNumber,
-                description: k.description ?? null,
-                floor: k.floor,
-                size: k.size ?? null,
-                features: (k.features ?? []) as KitchenFeature[],
-              })),
-            },
-            reception: {
-              deleteMany: {},
-              create: reception.map((r) => ({
-                name: r.name,
-                roomNumber: r.roomNumber,
-                description: r.description ?? null,
-                floor: r.floor,
-                size: r.size ?? null,
-                type: r.type as ReceptionType,
-                features: (r.features ?? []) as RoomFeature[],
-              })),
-            },
-            otherRoom: {
-              deleteMany: {},
-              create: otherRoom.map((o) => ({
-                name: o.name,
-                roomNumber: o.roomNumber,
-                description: o.description ?? null,
-                floor: o.floor,
-                size: o.size ?? null,
-                type: o.type as OtherRoomType,
-                features: (o.features ?? []) as RoomFeature[],
-              })),
+            outdoorSpace: {
+              upsert: {
+                create: {
+                  description: outdoorSpace.description ?? null,
+                  totalArea: outdoorSpace.totalArea ?? null,
+                  features: outdoorSpace.features as OutdoorSpaceFeature[] ?? [],
+                  garden: {
+                    create: outdoorSpace.garden.map((g) => ({
+                      name: g.name,
+                      description: g.description ?? null,
+                      facing: g.facing as GardenFacing | null,
+                      position: g.position as GardenPosition | null,
+                      features: g.features as OutdoorSpaceFeature[] ?? [],
+                      size: g.size ?? null,
+                    })),
+                  },
+                  yard: {
+                    create: outdoorSpace.yard.map((y) => ({
+                      name: y.name,
+                      description: y.description ?? null,
+                      facing: y.facing as GardenFacing | null,
+                      position: y.position as GardenPosition | null,
+                      features: y.features as OutdoorSpaceFeature[] ?? [],
+                      size: y.size ?? null,
+                    })),
+                  },
+                  land: {
+                    create: outdoorSpace.land.map((l) => ({
+                      name: l.name,
+                      description: l.description ?? null,
+                      features: l.features as LandFeature[] ?? [],
+                      size: l.size ?? null,
+                    })),
+                  },
+                },
+                update: {
+                  description: outdoorSpace.description ?? null,
+                  totalArea: outdoorSpace.totalArea ?? null,
+                  features: outdoorSpace.features as OutdoorSpaceFeature[] ?? [],
+                  garden: {
+                    deleteMany: {},
+                    create: outdoorSpace.garden.map((g) => ({
+                      name: g.name,
+                      description: g.description ?? null,
+                      facing: g.facing as GardenFacing | null,
+                      position: g.position as GardenPosition | null,
+                      features: g.features as OutdoorSpaceFeature[] ?? [],
+                      size: g.size ?? null,
+                    })),
+                  },
+                  yard: {
+                    deleteMany: {},
+                    create: outdoorSpace.yard.map((y) => ({
+                      name: y.name,
+                      description: y.description ?? null,
+                      facing: y.facing as GardenFacing | null,
+                      position: y.position as GardenPosition | null,
+                      features: y.features as OutdoorSpaceFeature[] ?? [],
+                      size: y.size ?? null,
+                    })),
+                  },
+                  land: {
+                    deleteMany: {},
+                    create: outdoorSpace.land.map((l) => ({
+                      name: l.name,
+                      description: l.description ?? null,
+                      features: l.features as LandFeature[] ?? [],
+                      size: l.size ?? null,
+                    })),
+                  },
+                },
+              },
             },
           },
         },
@@ -113,16 +116,21 @@ export default defineEventHandler(async (event) => {
       include: {
         property: {
           include: {
-            kitchenFeatures: true,
-            reception: true,
-            otherRoom: true,
+            outdoorSpace: {
+              include: {
+                garden: true,
+                yard: true,
+                land: true,
+              },
+            },
           },
         },
       },
     });
+
     return result;
   } catch (error) {
-    console.log("Error updating draft listing:", error);
+    console.log("Error updating draft listing step six:", error);
     return errorResponse(error, event);
   }
 });
