@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { watchImmediate } from '@vueuse/core';
+import { useResizeObserver, watchImmediate } from '@vueuse/core';
 
 interface JumpLink {
   order?: number,
@@ -139,6 +139,8 @@ function resizeIndicator() {
   indicatorX.value = Math.max(0, minLeft - left) + 'px'
   indicatorWidth.value = (maxRight - minLeft) + 'px'
 }
+
+useResizeObserver($root, resizeIndicator)
 
 </script>
 

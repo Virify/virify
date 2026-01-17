@@ -49,6 +49,7 @@ const links = [
   background: var(--background-200);
   border-top: 2px solid var(--monochrome-800);
   margin-bottom: calc(0px - var(--toolbar-padding));
+  gap: var(--size-16);
 
   &__button {
     border-radius: var(--border-radius-xl);
