@@ -1,0 +1,21 @@
+/// Track listing clicks from search results/cards
+model ListingClick {
+  id        Int      @id @default(autoincrement())
+  listingId Int
+  userId    Int?
+  sessionId String?
+  ip        String?
+  userAgent String?
+  source    String? // Traffic source: direct, search, social, email, referral
+  position  Int? // Position in search results when clicked
+  createdAt DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([listingId])
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@index([source])
+}

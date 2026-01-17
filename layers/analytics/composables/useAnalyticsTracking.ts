@@ -1,0 +1,391 @@
+/**
+ * Composable for fire-and-forget analytics tracking via sendBeacon
+ * 
+ * This composable handles all OUTBOUND analytics events - tracking user interactions
+ * Uses navigator.sendBeacon for lightweight, non-blocking requests
+ * 
+ * Separation of concerns:
+ * - useAnalyticsTracking: POST events (fire-and-forget)
+ * - useAnalytics: GET/fetch analytics data for display
+ */
+import { nanoid } from "nanoid";
+import { createSharedComposable } from '@vueuse/core';
+
+/**
+ * Event types for analytics tracking
+ */
+export type AnalyticsEventType = 
+  | 'view'           // User views a listing detail page
+  | 'impression'     // Listing appears in search results
+  | 'click'          // User clicks listing card in search results  
+  | 'favourite'      // User favourites/unfavourites a listing
+  | 'enquiry'        // User sends an enquiry
+  | 'share'          // User shares a listing
+  | 'search'         // User performs a search
+  | 'mortgage_calc'; // User uses mortgage calculator
+
+/**
+ * Base payload for all tracking events
+ */
+interface BaseTrackingPayload {
+  sessionId: string;
+  timestamp: number;
+  userAgent?: string;
+  referrer?: string;
+}
+
+/**
+ * Listing event payload
+ */
+interface ListingEventPayload extends BaseTrackingPayload {
+  listingId: number | string;
+  source?: 'search' | 'direct' | 'social' | 'email' | 'referral';
+  position?: number; // Position in search results (for impressions/clicks)
+}
+
+/**
+ * Impression batch payload - for tracking multiple impressions at once
+ */
+interface ImpressionBatchPayload extends BaseTrackingPayload {
+  listingIds: number[];
+  source?: string;
+  searchQuery?: string;
+}
+
+/**
+ * Search event payload
+ */
+interface SearchEventPayload extends BaseTrackingPayload {
+  listingType: string;
+  query: string;
+  location: {
+    id: string;
+    placeName: string;
+    text: string;
+    lat: number;
+    lon: number;
+  };
+  radius: number;
+  resultCount: number;
+  filters?: Record<string, unknown>;
+}
+
+/**
+ * Mortgage calculation event payload
+ */
+interface MortgageCalcPayload extends BaseTrackingPayload {
+  listingId?: number | string;
+  propertyPrice: number;
+  deposit: number;
+  interestRate: number;
+  termYears: number;
+  monthlyPayment: number;
+}
+
+/**
+ * Analytics tracking composable
+ * Provides fire-and-forget tracking methods using sendBeacon
+ */
+export const useAnalyticsTracking = createSharedComposable(() => {
+  // Persistent session ID for tracking
+  const sessionId = useState("analytics-session-id", () => nanoid());
+  
+  // Track view history to prevent duplicate views
+  const viewHistory = useState<Record<string, number>>("analytics-view-history", () => ({}));
+  
+  // Track impressions that have been sent to avoid duplicates
+  const sentImpressions = useState<Set<number>>("analytics-sent-impressions", () => new Set());
+  
+  /**
+   * Get base payload with common fields
+   */
+  const getBasePayload = (): BaseTrackingPayload => ({
+    sessionId: sessionId.value,
+    timestamp: Date.now(),
+    userAgent: import.meta.client ? navigator.userAgent : undefined,
+    referrer: import.meta.client ? document.referrer : undefined,
+  });
+  
+  /**
+   * Detect traffic source from referrer
+   */
+  const detectSource = (): ListingEventPayload['source'] => {
+    if (!import.meta.client) return 'direct';
+    
+    const referrer = document.referrer;
+    if (!referrer) return 'direct';
+    
+    const url = new URL(referrer);
+    const hostname = url.hostname.toLowerCase();
+    
+    // Social platforms
+    if (hostname.includes('facebook') || hostname.includes('twitter') || 
+        hostname.includes('instagram') || hostname.includes('linkedin') ||
+        hostname.includes('tiktok') || hostname.includes('pinterest')) {
+      return 'social';
+    }
+    
+    // Search engines
+    if (hostname.includes('google') || hostname.includes('bing') || 
+        hostname.includes('yahoo') || hostname.includes('duckduckgo')) {
+      return 'search';
+    }
+    
+    // Email services
+    if (hostname.includes('mail') || hostname.includes('outlook') || 
+        hostname.includes('gmail')) {
+      return 'email';
+    }
+    
+    // Check if it's our own domain (internal navigation)
+    if (import.meta.client && hostname === window.location.hostname) {
+      return 'direct';
+    }
+    
+    return 'referral';
+  };
+  
+  /**
+   * Send tracking event via sendBeacon
+   * Fire-and-forget - doesn't wait for response
+   */
+  const sendBeaconEvent = <T extends object>(endpoint: string, payload: T): boolean => {
+    if (!import.meta.client || typeof navigator.sendBeacon !== 'function') {
+      return false;
+    }
+    
+    try {
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      return navigator.sendBeacon(endpoint, blob);
+    } catch (error) {
+      console.error(`Failed to send beacon to ${endpoint}:`, error);
+      return false;
+    }
+  };
+  
+  /**
+   * Track a listing view (user visits listing detail page)
+   * Debounced - only counts once per 30 minutes per listing
+   */
+  const trackView = (listingId: number | string, options?: { source?: ListingEventPayload['source'] }) => {
+    if (!import.meta.client) return;
+    
+    const listingKey = `listing-${listingId}`;
+    const now = Date.now();
+    const DEBOUNCE_MS = 30 * 60 * 1000; // 30 minutes
+    
+    // Check if we've tracked this listing recently
+    if (viewHistory.value[listingKey] && now - viewHistory.value[listingKey] < DEBOUNCE_MS) {
+      return;
+    }
+    
+    // Update view history
+    viewHistory.value[listingKey] = now;
+    
+    // Persist to localStorage for cross-session deduplication
+    try {
+      localStorage.setItem('virify-view-history', JSON.stringify(viewHistory.value));
+    } catch (e) {
+      // localStorage not available
+    }
+    
+    const payload: ListingEventPayload = {
+      ...getBasePayload(),
+      listingId,
+      source: options?.source || detectSource(),
+    };
+    
+    sendBeaconEvent('/api/analytics/track/view', payload);
+  };
+  
+  /**
+   * Track listing impressions (listings appearing in search results)
+   * Batched to reduce requests - call with array of listing IDs
+   */
+  const trackImpressions = (listingIds: number[], options?: { source?: string; searchQuery?: string }) => {
+    if (!import.meta.client || listingIds.length === 0) return;
+    
+    // Filter out already-sent impressions (this session)
+    const newImpressions = listingIds.filter(id => !sentImpressions.value.has(id));
+    if (newImpressions.length === 0) return;
+    
+    // Mark as sent
+    newImpressions.forEach(id => sentImpressions.value.add(id));
+    
+    const payload: ImpressionBatchPayload = {
+      ...getBasePayload(),
+      listingIds: newImpressions,
+      source: options?.source,
+      searchQuery: options?.searchQuery,
+    };
+    
+    sendBeaconEvent('/api/analytics/track/impressions', payload);
+  };
+  
+  /**
+   * Reset impression tracking (call when search changes)
+   */
+  const resetImpressionTracking = () => {
+    sentImpressions.value.clear();
+  };
+  
+  /**
+   * Track listing click (user clicks a listing card)
+   */
+  const trackClick = (listingId: number | string, options?: { position?: number; source?: string }) => {
+    if (!import.meta.client) return;
+    
+    const payload: ListingEventPayload = {
+      ...getBasePayload(),
+      listingId,
+      source: detectSource(),
+      position: options?.position,
+    };
+    
+    sendBeaconEvent('/api/analytics/track/click', payload);
+  };
+  
+  /**
+   * Track favourite action
+   */
+  const trackFavourite = (listingId: number | string, action: 'add' | 'remove') => {
+    if (!import.meta.client) return;
+    
+    const payload = {
+      ...getBasePayload(),
+      listingId,
+      action,
+    };
+    
+    sendBeaconEvent('/api/analytics/track/favourite', payload);
+  };
+  
+  /**
+   * Track enquiry sent
+   */
+  const trackEnquiry = (listingId: number | string) => {
+    if (!import.meta.client) return;
+    
+    const payload: ListingEventPayload = {
+      ...getBasePayload(),
+      listingId,
+      source: detectSource(),
+    };
+    
+    sendBeaconEvent('/api/analytics/track/enquiry', payload);
+  };
+  
+  /**
+   * Track share action
+   */
+  const trackShare = (listingId: number | string, platform: string) => {
+    if (!import.meta.client) return;
+    
+    const payload = {
+      ...getBasePayload(),
+      listingId,
+      platform,
+    };
+    
+    sendBeaconEvent('/api/analytics/track/share', payload);
+  };
+  
+  /**
+   * Track search performed
+   */
+  const trackSearch = (params: {
+    listingType: string;
+    query: string;
+    location: GeocodingFeature;
+    radius: number;
+    resultCount: number;
+    filters?: Record<string, unknown>;
+  }) => {
+    if (!import.meta.client) return;
+    
+    // Reset impression tracking for new search
+    resetImpressionTracking();
+    
+    const payload: SearchEventPayload = {
+      ...getBasePayload(),
+      listingType: params.listingType,
+      query: params.query,
+      location: {
+        id: params.location.id || '',
+        placeName: params.location.place_name_en || params.location.place_name,
+        text: params.location.text,
+        lat: params.location.geometry.coordinates[1],
+        lon: params.location.geometry.coordinates[0],
+      },
+      radius: params.radius,
+      resultCount: params.resultCount,
+      filters: params.filters,
+    };
+    
+    sendBeaconEvent('/api/analytics/search', payload);
+  };
+  
+  /**
+   * Track mortgage calculation
+   */
+  const trackMortgageCalc = (data: {
+    listingId?: number | string;
+    propertyPrice: number;
+    deposit: number;
+    interestRate: number;
+    termYears: number;
+    monthlyPayment: number;
+  }) => {
+    if (!import.meta.client) return;
+    
+    const payload: MortgageCalcPayload = {
+      ...getBasePayload(),
+      ...data,
+    };
+    
+    sendBeaconEvent('/api/analytics/mortgage/track', payload);
+  };
+  
+  // Initialize view history from localStorage on client
+  if (import.meta.client) {
+    try {
+      const stored = localStorage.getItem('virify-view-history');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Clean up entries older than 30 minutes
+        const now = Date.now();
+        const DEBOUNCE_MS = 30 * 60 * 1000;
+        for (const [key, time] of Object.entries(parsed)) {
+          if (now - (time as number) < DEBOUNCE_MS) {
+            viewHistory.value[key] = time as number;
+          }
+        }
+      }
+    } catch (e) {
+      // localStorage not available
+    }
+  }
+  
+  return {
+    // Session management
+    sessionId,
+    
+    // Listing events
+    trackView,
+    trackImpressions,
+    trackClick,
+    trackFavourite,
+    trackEnquiry,
+    trackShare,
+    
+    // Search events
+    trackSearch,
+    resetImpressionTracking,
+    
+    // Utility events
+    trackMortgageCalc,
+    
+    // Utilities
+    detectSource,
+  };
+});
