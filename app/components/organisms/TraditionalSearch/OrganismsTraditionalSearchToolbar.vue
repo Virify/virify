@@ -1,5 +1,5 @@
 <template>
-  <div class="o-traditional-search-toolbar">
+  <div class="o-traditional-search-toolbar | gradient-box">
     <MoleculesJumpLinks :links />
 
     <button type="button" class="o-traditional-search-toolbar__button | button button-secondary">
@@ -40,25 +40,29 @@ const links = [
 
 <style lang="scss">
 .o-traditional-search-toolbar {
-  --toolbar-padding: var(--size-16);
+  --toolbar-padding: var(--size-14);
+  --toolbar-offset: calc(0px - var(--toolbar-padding));
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--toolbar-padding) 0;
+  padding: var(--toolbar-padding);
   background: var(--background-200);
-  border-top: 2px solid var(--monochrome-800);
-  margin-bottom: calc(0px - var(--toolbar-padding));
+  margin: var(--toolbar-padding) var(--toolbar-offset) var(--toolbar-offset);
   gap: var(--size-16);
+  border-radius: var(--size-20);
+  box-sizing: border-box;
 
   &__button {
-    border-radius: var(--border-radius-xl);
     padding: var(--size-12) var(--size-24);
-    font-size: var(--font-sm)
+    font-size: var(--font-sm);
+    border-radius: var(--size-12);
+    white-space: nowrap;
   }
 
-  .m-jump-links__link {
-    border-radius: var(--border-radius-xl);
+  .m-jump-links__link,
+  .m-jump-links__indicator {
+    border-radius: var(--size-12);
   }
 }
 </style>

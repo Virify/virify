@@ -154,6 +154,7 @@ useResizeObserver($root, resizeIndicator)
 
 .m-jump-links {
   position: relative;
+  overflow: auto;
 
   &__indicator {
     position: absolute;
@@ -181,15 +182,11 @@ useResizeObserver($root, resizeIndicator)
     background: transparent;
     color: currentColor;
     text-decoration: none;
+    white-space: nowrap;
 
     &:hover {
       background: fn.faded-color(10%);
       color: currentColor;
-    }
-
-    &--active,
-    &--active:hover {
-      color: var(--secondart-400);
     }
   }
 }
