@@ -1,7 +1,7 @@
 <template>
   <UForm :schema="schema" :state="state" @submit="onSubmit" @error="onFormError" :validateOn="['input']" class="flex flex-col h-full">
     <!-- Scrollable Form Content -->
-    <div class="flex-1 space-y-8 py-4 px-4">
+    <div class="flex-1 space-y-8 py-4 px-0 lg:px-6 lg:overflow-y-auto">
       <!-- Dismissible Alert -->
       <UAlert
         v-if="!alertDismissed"
