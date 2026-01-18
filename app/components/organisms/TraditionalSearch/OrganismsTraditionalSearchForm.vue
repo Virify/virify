@@ -33,8 +33,8 @@
       </h3>
 
       <ul class="o-traditional-search-form__additional-features">
-        <li v-for="feature of additionalFeatures">
-          <AtomsCheckbox :label="feature" />
+        <li v-for="{ key, label } of additionalFeatures">
+          <AtomsCheckbox v-model="formData.additionalFeatures[key]" :label :name="key" />
         </li>
       </ul>
     </section>
@@ -126,13 +126,13 @@ const bathroomMax: RoomCount[] = [
 ]
 
 const additionalFeatures = [
-  'Garage',
-  'Off-street parking',
-  'Disability access',
-  'Garden',
-  'Pet-friendly',
-  'Another feature',
-  'And another',
+  { key: 'garage', label: 'Garage' },
+  { key: 'off-street-parking', label: 'Off-street parking' },
+  { key: 'disabled-access', label: 'Disability access' },
+  { key: 'garden', label: 'Garden' },
+  { key: 'pets', label: 'Pet-friendly' },
+  { key: 'another-feature', label: 'Another feature' },
+  { key: 'and-another', label: 'And another' },
 ]
 
 /**
@@ -153,6 +153,7 @@ const formData = useState('search-contract-type', () => reactive({
   maxBeds: <number>getDefaultSelected(bedroomMax),
   minBathrooms: <number>getDefaultSelected(bathroomMin),
   maxBathrooms: <number>getDefaultSelected(bathroomMax),
+  additionalFeatures: reactive<{ [key: string]: boolean }>({}),
 }))
 
 </script>
