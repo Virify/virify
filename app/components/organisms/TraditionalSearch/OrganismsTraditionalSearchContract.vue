@@ -3,7 +3,7 @@
     <nav>
       <ul class="o-traditional-search-form-contract__menu">
         <li class="o-traditional-search-form-contract__menu-item">
-          <button type="button" :aria-expanded="!isSale" aria-controls="o-traditional-search-form-contract-buy"
+          <button type="button" :aria-expanded="isSale" aria-controls="o-traditional-search-form-contract-buy"
             class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(true)">
             To Buy
@@ -11,7 +11,7 @@
         </li>
 
         <li class="o-traditional-search-form-contract__menu-item">
-          <button type="button" :aria-expanded="isSale" aria-controls="o-traditional-search-form-contract-rent"
+          <button type="button" :aria-expanded="!isSale" aria-controls="o-traditional-search-form-contract-rent"
             class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(false)">
             To Rent
@@ -26,7 +26,7 @@
       </h3>
 
       <section id="o-traditional-search-form-contract-buy" class="o-traditional-search-form-contract__content-block"
-        :hidden="isSale">
+        :hidden="!isSale">
 
         <AtomsChecktext label="Include sold STC" />
         <AtomsChecktext label="Include shared ownership" />
@@ -35,7 +35,7 @@
       </section>
 
       <section id="o-traditional-search-form-contract-rent" class="o-traditional-search-form-contract__content-block"
-        :hidden="!isSale">
+        :hidden="isSale">
 
         <AtomsChecktext label="Include let agreed" />
         <AtomsChecktext label="Include short-term lets" />
@@ -98,7 +98,7 @@ watch([priceMinMax, isSale], () => {
  *  Tabs for buy/rent
  */
 function updateIsBuy(newValue: boolean) {
-  isSale.value = !newValue
+  isSale.value = newValue
 }
 
 </script>
