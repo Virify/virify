@@ -15,7 +15,7 @@
     <!-- Image with placeholder for drafts without images -->
     <AtomsCloudFlareImage 
       v-if="hasImage" 
-      :src="listing?.property?.media[0]?.image!" 
+      :src="getMainImage(listing?.property)!" 
       alt="Listing image" 
       variant="gallery" 
       :placeholder="true" 
@@ -73,7 +73,20 @@
         
         <!-- Draft progress indicator -->
         <div v-if="listing.isDraft" class="flex items-center gap-2">
-          <UBadge icon="i-lucide-construction" size="md" color="error" variant="outline">In Progress</UBadge>
+          <UBadge 
+            v-if="isAllStepsCompleted" 
+            icon="i-lucide-check-circle" 
+            size="md" 
+            color="success" 
+            variant="outline"
+          >Ready to Publish</UBadge>
+          <UBadge 
+            v-else 
+            icon="i-lucide-construction" 
+            size="md" 
+            color="error" 
+            variant="outline"
+          >{{ completedStepsCount }}/9 Steps</UBadge>
         </div>
         
         <!-- Publish toggle (only for completed non-archived listings) -->
@@ -109,11 +122,23 @@
             size="xs" 
             color="secondary" 
             class="font-semibold flex-1 justify-center" 
-            :to="canView ? `/listing/${listing.id}` : undefined" 
+            :to="viewUrl" 
             target="_blank" 
             icon="i-lucide-eye" 
             label="View" 
             :disabled="!canView" 
+          />
+          <UButton 
+            v-if="listing.isDraft"
+            variant="solid" 
+            size="xs" 
+            color="secondary" 
+            class="font-semibold flex-1 justify-center text-white!" 
+            icon="i-lucide-rocket"
+            label="Publish"
+            :disabled="!isAllStepsCompleted || isPublishing"
+            :loading="isPublishing"
+            @click="handlePublish"
           />
           <UButton 
             v-if="!listing.isDraft" 
@@ -190,10 +215,20 @@ const discardDialog = ref<InstanceType<typeof OrganismsDashboardConfirmDialog> |
 
 const isDeleting = ref(false);
 const isUpdating = ref(false);
+const isPublishing = ref(false);
 const isPublished = ref(props.listing.published);
 
+// Draft completion tracking
+const completedStepsCount = computed(() => {
+  if (!props.listing.isDraft) return 9;
+  // completedSteps is an array of step numbers
+  return (props.listing as any).completedSteps?.length ?? 0;
+});
+
+const isAllStepsCompleted = computed(() => completedStepsCount.value >= 9);
+
 // Computed properties for checking if data exists
-const hasImage = computed(() => !!props.listing?.property?.media?.[0]?.image);
+const hasImage = computed(() => !!getMainImage(props.listing?.property));
 const hasPrice = computed(() => props.listing.price != null && props.listing.price > 0);
 const hasAddress = computed(() => {
   const address = props.listing.property?.address;
@@ -207,8 +242,22 @@ const hasAnalytics = computed(() => {
   return viewsCount > 0 || favouritesCount > 0 || enquiriesCount > 0;
 });
 
-// Can only view if published or not a draft
-const canView = computed(() => props.listing.published || !props.listing.isDraft);
+// Can view if: published, OR not a draft, OR draft with 3+ steps completed (for preview)
+const canView = computed(() => {
+  if (props.listing.published || !props.listing.isDraft) return true;
+  // For drafts, allow preview after step 3 (pricing) is complete
+  return completedStepsCount.value >= 3;
+});
+
+// View URL - drafts use preview route, live listings use normal route
+const viewUrl = computed(() => {
+  if (!canView.value) return undefined;
+  if (props.listing.isDraft) {
+    const draftId = (props.listing as any).draftId ?? props.listing.id;
+    return `/listing/preview/${draftId}`;
+  }
+  return `/listing/${props.listing.id}`;
+});
 
 // Can only toggle publish for non-draft, non-archived listings
 const canTogglePublish = computed(() => !props.listing.isDraft && !props.listing.archived);
@@ -244,6 +293,38 @@ async function handleEdit() {
   } else {
     // For live listings, use the listing id
     emit('edit', { id: props.listing.id, isDraft: false });
+  }
+}
+
+async function handlePublish() {
+  if (!isAllStepsCompleted.value) return;
+  
+  isPublishing.value = true;
+  try {
+    const draftId = (props.listing as any).draftId ?? props.listing.id;
+    await useRequestFetch()('/api/listing/publish/', {
+      method: 'POST',
+      body: { draftId }
+    });
+    toast.add({
+      title: 'Success!',
+      description: 'Your listing has been published',
+      color: 'success',
+    });
+    // Refresh aggregates to update sidebar counts
+    const { fetchUserItemsAggregates } = useNotifications();
+    await fetchUserItemsAggregates(true);
+    // Refresh the listings
+    const { refetchCurrentPage } = useDraftListings();
+    await refetchCurrentPage();
+  } catch (error: any) {
+    toast.add({
+      title: 'Publish Failed',
+      description: error?.data?.statusMessage || 'Failed to publish listing',
+      color: 'error',
+    });
+  } finally {
+    isPublishing.value = false;
   }
 }
 
@@ -284,6 +365,9 @@ async function handleArchiveConfirm() {
   try {
     await archiveListing(props.listing.id);
     archiveDialog.value?.close();
+    // Refresh aggregates to update sidebar counts
+    const { fetchUserItemsAggregates } = useNotifications();
+    await fetchUserItemsAggregates(true);
     // Toast is shown by useMyListings.archiveListing
   } catch (error) {
     // Error toast is shown by useMyListings.archiveListing

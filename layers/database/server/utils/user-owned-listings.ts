@@ -62,10 +62,11 @@ export async function getUserOwnedListingsWithAnalytics(
     search?: string
     take?: number
     skip?: number
-    sort?: "new" | "old" | "premium" | "featured" | "basic" 
+    sort?: "new" | "old" | "premium" | "featured" | "basic"
+    saleRent?: "all" | "sale" | "rent"
   }
 ): Promise<{ listings: OwnedListingWithAnalytics[]; total: number }> {
-  const { status = "all", search = "", take = 50, skip = 0, sort = "new" } = opts || {}
+  const { status = "all", search = "", take = 50, skip = 0, sort = "new", saleRent = "all" } = opts || {}
 
   const where: Prisma.ListingWhereInput = { userId }
 
@@ -89,6 +90,14 @@ export async function getUserOwnedListingsWithAnalytics(
     default:
       // "all" - show everything except archived
       where.archived = false
+  }
+
+  // Apply sale/rent filter
+  if (saleRent === "sale") {
+    where.saleListing = { isNot: null }
+    where.rentalListing = null
+  } else if (saleRent === "rent") {
+    where.rentalListing = { isNot: null }
   }
 
   // Apply search filters

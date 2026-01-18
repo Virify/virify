@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="1"
-    alert-title="Step 1: Listing Type"
-    alert-description="This information helps us categorize your listing correctly. You can always update these details later."
     :schema="step1Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 1: Listing Type</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            This information helps us categorize your listing correctly. You can always update these details later.
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- Main field row -->
     <div class="flex flex-wrap justify-between gap-6">
       <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">

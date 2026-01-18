@@ -11,7 +11,6 @@ export const useFavouriteLookups = createSharedComposable(() => {
   const { data: favouriteLookups, refresh: refreshFavourites } = useAsyncData<number[]>(
     "favouriteLookups",
     () => {
-      if (!loggedIn.value) return Promise.resolve([]);
       return requestFetch<number[]>("/api/user/favourites/all/lookups");
     },
     {

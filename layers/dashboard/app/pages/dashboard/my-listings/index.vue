@@ -77,7 +77,7 @@ function handleCreateListing(tier: ListingTier) {
 const { sortOrderValue, searchQuery, saleRentFilter } = useDashboardListFilter(ref([]), {
   persistenceKey: "dashboard-my-listings",
   hideListingSort: true,
-});
+})
 
 // Map sort order value to API enum
 const mapSortOrder = computed(() => {
@@ -91,7 +91,8 @@ watch(
   [saleRentFilter, mapSortOrder],
   async () => {
     page.value = 1;
-    await fetchMyListings(saleRentFilter.value as any, 1, mapSortOrder.value as any, limit.value);
+    // status='all' since we don't have a status filter UI, saleRent filter is passed as 5th param
+    await fetchMyListings('all', 1, mapSortOrder.value as any, limit.value, saleRentFilter.value as any);
   },
   { immediate: true }
 );
@@ -99,7 +100,7 @@ watch(
 // Handle page changes from pagination component
 async function onPageChange(newPage: number) {
   page.value = newPage;
-  await fetchMyListings(saleRentFilter.value as any, newPage, mapSortOrder.value as any, limit.value);
+  await fetchMyListings('all', newPage, mapSortOrder.value as any, limit.value, saleRentFilter.value as any);
 
   const el = (pageTop.value as any)?.$el ?? pageTop.value;
   const scrollContainer = el?.closest(".overflow-y-auto, .overflow-y-scroll, .overflow-auto");
@@ -117,18 +118,12 @@ async function handleEditListing(payload: { id: number; isDraft: boolean }) {
 
 // Handle modal close - refetch to get any updates
 function handleModalClose() {
-  fetchMyListings(saleRentFilter.value as any, page.value, mapSortOrder.value as any, limit.value);
+  fetchMyListings('all', page.value, mapSortOrder.value as any, limit.value, saleRentFilter.value as any);
 }
 
-// Filter listings by sale/rent + search after API returns
+// Apply search filter after API returns (sale/rent is now filtered by backend)
 watch([listings, searchQuery], () => {
   let filtered = listings.value;
-
-  if (saleRentFilter.value === "sale") {
-    filtered = filtered.filter((item) => !!item.saleListing && !item.rentalListing);
-  } else if (saleRentFilter.value === "rent") {
-    filtered = filtered.filter((item) => !!item.rentalListing);
-  }
 
   // Apply search filter if present
   if (searchQuery.value) {

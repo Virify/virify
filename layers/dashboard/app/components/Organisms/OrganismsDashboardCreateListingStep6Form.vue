@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="6"
-    alert-title="Step 6: Outdoor Spaces"
-    alert-description="Add details about your outdoor spaces including gardens, yards, and additional land. Complete information helps viewers understand your property's outdoor amenities."
     :schema="step6Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 6: Outdoor Spaces</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            Add details about your outdoor spaces including gardens, yards, and additional land. Complete information helps viewers understand your property's outdoor amenities.
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- General Outdoor Space Info -->
     <div class="space-y-5 mb-6">
       <UFormField label="Outdoor Space Description" name="property.outdoorSpace.description" description="Describe your general outdoor space" hint="optional" eager-validation>

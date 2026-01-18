@@ -1,10 +1,19 @@
 import { z } from "zod";
 import { step1Schema } from "~~/shared/utils/listing-step1-schema";
 
-// Extend step1Schema to require draftId for updates
+/**
+ * Step 1: Listing Type API Endpoint
+ * 
+ * Works for BOTH draft listings (draftId) and live listings (listingId)
+ */
+
 const stepDataSchema = step1Schema.extend({
-  draftId: z.number().int().positive(),
-});
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
+}).refine(
+  (data) => data.draftId !== undefined || data.listingId !== undefined,
+  { message: "Either draftId or listingId must be provided" }
+);
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -12,7 +21,7 @@ export default defineEventHandler(async (event) => {
   
   try {
     const body = await readBody(event);
-    const { saleListing, rentalListing, draftId, selectedType } = stepDataSchema.parse(body);
+    const { saleListing, rentalListing, draftId, listingId, selectedType } = stepDataSchema.parse(body);
 
     // Prepare data based on selected type
     const updateData: any = {};
@@ -57,7 +66,49 @@ export default defineEventHandler(async (event) => {
       updateData.saleListing = { delete: true };
     }
 
-    // First check if there's existing listings to delete
+    // LIVE LISTING - update Listing table
+    if (listingId) {
+      const existingListing = await prisma.listing.findUnique({
+        where: { id: listingId, userId: user.id },
+        include: { saleListing: true, rentalListing: true },
+      });
+
+      if (!existingListing) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Listing not found",
+        });
+      }
+
+      // Handle deletion of opposite listing type
+      if (selectedType === 'sale' && existingListing.rentalListing) {
+        await prisma.rentalListing.delete({ where: { listingId: listingId } });
+        delete updateData.rentalListing;
+      } else if (selectedType === 'rent' && existingListing.saleListing) {
+        await prisma.saleListing.delete({ where: { listingId: listingId } });
+        delete updateData.saleListing;
+      } else {
+        delete updateData.saleListing?.delete;
+        delete updateData.rentalListing?.delete;
+      }
+
+      const result = await prisma.listing.update({
+        where: { id: listingId, userId: user.id },
+        data: updateData,
+        include: {
+          saleListing: true,
+          rentalListing: true,
+        },
+      });
+
+      // Invalidate listing cache so modal shows fresh data
+      const storage = useStorage('cache:listing');
+      await storage.removeItem(`listing:${listingId}`);
+
+      return result;
+    }
+
+    // DRAFT LISTING - update DraftListing table with completedSteps
     const existingDraft = await prisma.draftListing.findUnique({
       where: { id: draftId, userId: user.id },
       include: { saleListing: true, rentalListing: true },
@@ -95,7 +146,7 @@ export default defineEventHandler(async (event) => {
     }
 
     return await prisma.draftListing.update({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId!, userId: user.id },
       data: updateData,
       include: {
         saleListing: true,

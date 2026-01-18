@@ -251,7 +251,7 @@ export default defineEventHandler(async (event) => {
           address: listing.property?.address 
             ? `${listing.property.address.street}, ${listing.property.address.city}`
             : 'Unknown',
-          image: listing.property?.media?.[0]?.image || null,
+          image: getMainImageUrl(listing.property),
           price: listing.price,
           bedrooms: listing.property?.numberBedrooms || 0,
           tier: listing.listingTier,

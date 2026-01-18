@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
         id: listing.id,
         price: listing.price ? Number(listing.price) : null,
         address: listing.property?.address?.fullAddress || null,
-        image: listing.property?.media?.[0]?.image || null,
+        image: getMainImageUrl(listing.property),
         isRental: !!listing.rentalListing,
       };
     }

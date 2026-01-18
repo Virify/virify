@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="5"
-    alert-title="Step 5: Kitchens, Receptions & Other Rooms"
-    alert-description="Add all the living spaces for your property. Complete information helps viewers find the right property. It will automatically save as you complete each room."
     :schema="step5Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 5: Kitchens, Receptions & Other Rooms</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            Add all the living spaces for your property. Complete information helps viewers find the right property. It will automatically save as you complete each room.
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- Kitchens Section -->
     <OrganismsDashboardKitchenForm
       :kitchens="state.property.kitchenFeatures"

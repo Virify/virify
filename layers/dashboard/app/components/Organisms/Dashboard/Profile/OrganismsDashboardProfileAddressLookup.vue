@@ -119,6 +119,9 @@ const foundAddresses = ref<{ label: string; value: string }[]>([]);
 const rawAddresses = ref<any[]>([]);
 const selectedAddress = ref("");
 const addressError = ref<string | undefined>(undefined);
+// Store lat/lon from response level (getaddress.io returns these at top level, not per-address)
+const responseLat = ref<number | null>(null);
+const responseLon = ref<number | null>(null);
 
 const clearAddress = () => {
   emit("update:modelValue", {
@@ -141,6 +144,8 @@ const clearAddress = () => {
   rawAddresses.value = [];
   selectedAddress.value = "";
   addressError.value = undefined;
+  responseLat.value = null;
+  responseLon.value = null;
 };
 
 const lookupPostcode = async () => {
@@ -160,7 +165,12 @@ const lookupPostcode = async () => {
   lookupPending.value = true;
   try {
     const data: any = await $fetch(`https://api.getaddress.io/find/${postcode.value}?api-key=${apiKey}&expand=true`);
+
     if (data && data.addresses && data.addresses.length > 0) {
+       console.log(data)
+      // Store lat/lon from response level (getaddress.io returns these at top level)
+      responseLat.value = data.latitude ?? null;
+      responseLon.value = data.longitude ?? null;
       rawAddresses.value = data.addresses;
       foundAddresses.value = data.addresses.map((addr: any) => {
         const fullString = addr.formatted_address.filter((s: string) => s).join(", ");
@@ -186,7 +196,13 @@ const onAddressSelect = (value: string) => {
     });
 
     if (selectedRaw) {
-      const parsed = parseAddress(selectedRaw, postcode.value);
+      // Inject lat/lon from response level before parsing
+      const addressWithCoords = {
+        ...selectedRaw,
+        latitude: responseLat.value,
+        longitude: responseLon.value,
+      };
+      const parsed = parseAddress(addressWithCoords, postcode.value);
       emit("update:modelValue", parsed);
     }
   }

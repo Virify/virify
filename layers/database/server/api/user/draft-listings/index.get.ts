@@ -42,7 +42,23 @@ export default defineEventHandler(async (event) => {
           saleListing: true,
           property: {
             include: {
-              media: { select: { image: true, metadata: true } },
+              media: { 
+                select: { 
+                  image: true, 
+                  metadata: true, 
+                  sortOrder: true,
+                  bedroomId: true,
+                  bathroomId: true,
+                  receptionId: true,
+                  otherRoomId: true,
+                  kitchenId: true,
+                  gardenId: true,
+                  outdoorSpaceId: true,
+                  landId: true,
+                  yardId: true,
+                },
+                orderBy: { sortOrder: 'asc' as const },
+              },
               address: true,
               type: { select: { name: true } },
               classification: { select: { name: true } },

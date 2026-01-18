@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="8"
-    alert-title="Step 8: Energy & Costs"
-    alert-description="Add details about energy efficiency, heating systems, utilities, council tax, and running costs of your property."
     :schema="step8Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 8: Energy & Costs</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            Add details about energy efficiency, heating systems, utilities, council tax, and running costs of your property.
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- Collapsible Sections -->
     <UAccordion 
       :items="accordionItems" 

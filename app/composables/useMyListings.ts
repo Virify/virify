@@ -3,6 +3,8 @@ import { createSharedComposable } from "@vueuse/core";
 type StatusFilter = "all" | "active" | "inactive" | "draft" | "archived";
 type SortBy = "new" | "old" | "premium" | "featured" | "basic";
 
+type SaleRentFilter = "all" | "sale" | "rent";
+
 export const useMyListings = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const toast = useToast();
@@ -16,6 +18,7 @@ export const useMyListings = createSharedComposable(() => {
 
   // Track current pagination state for refetching after add/remove
   const currentFilter = ref<'all' | 'active' | 'inactive' | 'draft' | 'archived'>('all');
+  const currentSaleRentFilter = ref<SaleRentFilter>('all');
   const currentPage = ref(1);
   const currentSort = ref<SortBy>('new');
   const currentLimit = ref(20);
@@ -29,10 +32,12 @@ export const useMyListings = createSharedComposable(() => {
     filter: StatusFilter = 'all',
     page: number = 1,
     sort: SortBy = 'new',
-    limit: number = 20
+    limit: number = 20,
+    saleRent: SaleRentFilter = 'all'
   ) {
     // Store current pagination state
     currentFilter.value = filter;
+    currentSaleRentFilter.value = saleRent;
     currentPage.value = page;
     currentSort.value = sort;
     currentLimit.value = limit;
@@ -40,7 +45,7 @@ export const useMyListings = createSharedComposable(() => {
     loading.value = true;
     try {
       const data = await requestFetch<{ listings: OwnedListingWithAnalytics[], total: number }>(
-        `/api/user/my-listings/?status=${filter}&sort=${sort}&page=${page}&take=${limit}`
+        `/api/user/my-listings/?status=${filter}&sort=${sort}&page=${page}&take=${limit}&saleRent=${saleRent}`
       );
       listings.value = data.listings || [];
       total.value = data.total || 0;
@@ -58,7 +63,7 @@ export const useMyListings = createSharedComposable(() => {
    */
   async function refetchCurrentPage() {
     if (listings.value.length > 0 || total.value > 0) {
-      await fetchMyListings(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
+      await fetchMyListings(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value, currentSaleRentFilter.value);
     }
   }
 

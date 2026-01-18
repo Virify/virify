@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="2"
-    alert-title="Step 2: Property Basics"
-    alert-description="Start by finding your property address, then provide basic details about your property."
     :schema="step2Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 2: Property Basics</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            Start by finding your property address, then provide basic details about your property.
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- Row 1: Address, Type, Classification -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
       <OrganismsDashboardProfileAddressLookup

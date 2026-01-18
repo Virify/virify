@@ -272,17 +272,19 @@ interface ListingBatchItem {
   propertyId: number;
   userId: number;
   isRental: boolean;
+  tier?: ListingTier;
 }
 
 /**
  * Generate base listing data (without relations)
+ * @param tier Optional tier - if provided, uses that instead of random weighted tier
  */
-const generateBaseListingData = (propertyId: number, userId: number, isRental: boolean) => ({
+const generateBaseListingData = (propertyId: number, userId: number, isRental: boolean, tier?: ListingTier) => ({
   price: isRental 
     ? roundFloat(faker.number.float({ min: 300, max: 3000 }), 2)
     : roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
   moveInDate: faker.date.future(),
-  listingTier: generateWeightedListingTier(),
+  listingTier: tier ?? generateWeightedListingTier(),
   listingStartDate: new Date(),
   listingEndDate: faker.date.future(),
   viewingOptions: faker.word.words(10),
@@ -311,7 +313,7 @@ export const batchCreateListings = async (items: ListingBatchItem[]): Promise<nu
       batch.map(item => 
         prisma.listing.create({
           data: {
-            ...generateBaseListingData(item.propertyId, item.userId, item.isRental),
+            ...generateBaseListingData(item.propertyId, item.userId, item.isRental, item.tier),
             ...(item.isRental 
               ? { rentalListing: { create: generateRentalObject() } }
               : { saleListing: { create: generateSaleObject() } }

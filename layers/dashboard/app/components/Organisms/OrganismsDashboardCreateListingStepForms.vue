@@ -31,6 +31,8 @@ const currentStepComponent = computed(() => {
       return resolveComponent('OrganismsDashboardCreateListingStep7Form')
     case 8:
       return resolveComponent('OrganismsDashboardCreateListingStep8Form')
+    case 9:
+      return resolveComponent('OrganismsDashboardCreateListingStep9Form')
     default:
       return 'p'
   }

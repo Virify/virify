@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type { Prisma } from "../../../database/server/database/prisma/generated/client";
-import { MembershipType } from "../../../database/server/database/prisma/generated/enums";
+import { MembershipType, ListingTier } from "../../../database/server/database/prisma/generated/enums";
 import { prisma } from "../../../database/server/utils/prisma-client";
 import { generateSaleListing, generateRentalListing, batchCreateListings } from "./listing-faker";
 import { createNotification } from "../../../database/server/utils/notification";
@@ -77,8 +77,10 @@ export async function seedFakeUsers(count = 1): Promise<number[]> {
  * - Each other user gets 3-5 listings
  * - Each listing gets 2-5 enquiries
  * - Admin sends 10 enquiries to random listings
+ * @param userIds Array of user IDs to distribute listings to
+ * @param propertyTierMap Optional map of propertyId -> ListingTier to sync tier with images
  */
-export async function distributeListingsToUsers(userIds: number[]): Promise<void> {
+export async function distributeListingsToUsers(userIds: number[], propertyTierMap?: Map<number, ListingTier>): Promise<void> {
   // Get all properties that don't have listings yet
   const allProperties = await prisma.property.findMany({
     select: {
@@ -104,7 +106,7 @@ export async function distributeListingsToUsers(userIds: number[]): Promise<void
   const ADMIN_LISTINGS = 15;
   
   // Build batch items for all listings
-  const batchItems: { propertyId: number; userId: number; isRental: boolean }[] = [];
+  const batchItems: { propertyId: number; userId: number; isRental: boolean; tier?: ListingTier }[] = [];
   let propertyIndex = 0;
 
   // Admin gets 15 listings
@@ -116,6 +118,7 @@ export async function distributeListingsToUsers(userIds: number[]): Promise<void
       propertyId: property.id,
       userId: ADMIN_ID,
       isRental: Math.random() > 0.5,
+      tier: propertyTierMap?.get(property.id),
     });
     propertyIndex++;
   }
@@ -134,6 +137,7 @@ export async function distributeListingsToUsers(userIds: number[]): Promise<void
         propertyId: property.id,
         userId,
         isRental: Math.random() > 0.5,
+        tier: propertyTierMap?.get(property.id),
       });
       propertyIndex++;
     }

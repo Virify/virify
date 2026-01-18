@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="4"
-    alert-title="Step 4: Bedrooms & Bathrooms"
-    alert-description="Add details about bedrooms and bathrooms in your property. Complete information helps viewers find the right property. It will automatically save as you complete each room."
     :schema="step4Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 4: Bedrooms & Bathrooms</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            Add details about bedrooms and bathrooms in your property. Complete information helps viewers find the right property. It will automatically save as you complete each room.
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- Bedrooms Section -->
     <OrganismsDashboardBedroomForm
       :bedrooms="state.property.bedroomFeatures"

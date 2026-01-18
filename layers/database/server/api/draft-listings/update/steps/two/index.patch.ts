@@ -1,10 +1,19 @@
 import { z } from "zod";
 import { step2Schema } from "~~/shared/utils/listing-step2-schema";
 
-// Extend step2Schema to require draftId for updates
+/**
+ * Step 2: Property Details API Endpoint
+ * 
+ * Works for BOTH draft listings (draftId) and live listings (listingId)
+ */
+
 const stepDataSchema = step2Schema.extend({
-  draftId: z.number().int().positive(),
-});
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
+}).refine(
+  (data) => data.draftId !== undefined || data.listingId !== undefined,
+  { message: "Either draftId or listingId must be provided" }
+);
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -12,7 +21,7 @@ export default defineEventHandler(async (event) => {
   
   try {
     const body = await readBody(event);
-    const { draftId, property } = stepDataSchema.parse(body);
+    const { draftId, listingId, property } = stepDataSchema.parse(body);
 
     // First, handle address upsert if provided
     let addressId: number | undefined;
@@ -50,41 +59,64 @@ export default defineEventHandler(async (event) => {
       addressId = address.id;
     }
 
-    // Get current completedSteps to check if step 2 already exists
+    const propertyUpdate = {
+      upsert: {
+        update: {
+          type: { connect: { id: property.type } },
+          classification: { connect: { id: property.classification } },
+          constructionType: property.constructionType || null,
+          yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
+          size: property.size || null,
+          description: property.description,
+          totalFloors: property.totalFloors,
+          ...(addressId ? { address: { connect: { id: addressId } } } : {}),
+        },
+        create: {
+          type: { connect: { id: property.type } },
+          classification: { connect: { id: property.classification } },
+          constructionType: property.constructionType || null,
+          yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
+          size: property.size || null,
+          description: property.description,
+          totalFloors: property.totalFloors,
+          ...(addressId ? { address: { connect: { id: addressId } } } : {}),
+        },
+      },
+    };
+
+    // LIVE LISTING - update Listing table
+    if (listingId) {
+      const result = await prisma.listing.update({
+        where: { id: listingId, userId: user.id },
+        data: { property: propertyUpdate },
+        include: {
+          property: {
+            include: {
+              address: true,
+            },
+          },
+        },
+      });
+
+      // Invalidate listing cache so modal shows fresh data
+      const storage = useStorage('cache:listing');
+      await storage.removeItem(`listing:${listingId}`);
+
+      return result;
+    }
+
+    // DRAFT LISTING - update DraftListing table with completedSteps
     const currentDraft = await prisma.draftListing.findUnique({
       where: { id: draftId },
       select: { completedSteps: true },
     });
 
     return await prisma.draftListing.update({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId!, userId: user.id },
       data: {
         // Add step 2 to completedSteps if not already there
         ...(currentDraft && !currentDraft.completedSteps.includes(2) ? { completedSteps: { push: 2 } } : {}),
-        property: {
-          upsert: {
-            update: {
-              type: { connect: { id: property.type } },
-              classification: { connect: { id: property.classification } },
-              constructionType: property.constructionType || null,
-              yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
-              size: property.size || null,
-              description: property.description,
-              totalFloors: property.totalFloors,
-              ...(addressId ? { address: { connect: { id: addressId } } } : {}),
-            },
-            create: {
-              type: { connect: { id: property.type } },
-              classification: { connect: { id: property.classification } },
-              constructionType: property.constructionType || null,
-              yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
-              size: property.size || null,
-              description: property.description,
-              totalFloors: property.totalFloors,
-              ...(addressId ? { address: { connect: { id: addressId } } } : {}),
-            },
-          },
-        },
+        property: propertyUpdate,
       },
       include: {
         property: {

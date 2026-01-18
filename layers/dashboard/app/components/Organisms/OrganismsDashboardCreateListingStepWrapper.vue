@@ -2,17 +2,8 @@
   <UForm :schema="schema" :state="state" @submit="onSubmit" @error="onFormError" :validateOn="['input']" class="flex flex-col h-full">
     <!-- Scrollable Form Content -->
     <div class="flex-1 space-y-8 py-4 px-0 lg:px-6 lg:overflow-y-auto">
-      <!-- Dismissible Alert -->
-      <UAlert
-        v-if="!alertDismissed"
-        icon="i-lucide-info"
-        variant="subtle"
-        color="secondary"
-        :title="alertTitle"
-        :description="alertDescription"
-        close
-        @update:open="(val) => alertDismissed = !val"
-      />
+      <!-- Dismissible Alert Slot -->
+      <slot name="alert" />
 
       <!-- Form Fields Slot -->
       <slot />
@@ -55,7 +46,7 @@
             :loading="isSaving"
             class="body-sm text-white! cursor-pointer"
           >
-            Next Step
+            {{ stepNumber === 9 ? 'Complete' : 'Next Step' }}
           </UButton>
         </div>
       </div>
@@ -68,8 +59,6 @@ import type { ZodSchema } from 'zod'
 
 interface Props {
   stepNumber: number
-  alertTitle: string
-  alertDescription: string
   schema: ZodSchema
   state: Record<string, any>
   isValid: boolean
@@ -87,9 +76,6 @@ const emit = defineEmits<{
 const { saveStep, isSaving } = useCreateListingSteps()
 const closeModal = inject<() => void>('closeModal')
 const toast = useToast()
-
-// Alert state
-const alertDismissed = ref(false)
 
 // Cancel handler
 function onCancel() {
@@ -121,15 +107,22 @@ async function handleSaveProgress() {
 async function handleSave(advance: boolean) {
   if (!props.isValid || isSaving.value) return
   
-  const success = await saveStep(
+  const result = await saveStep(
     props.stepNumber,
     props.apiEndpoint,
     props.getSubmissionData(),
     advance
   )
   
+  // Handle different result types
+  const success = result === true || (typeof result === 'object' && result?.success)
+  const draftComplete = typeof result === 'object' && result?.draftComplete
+  
   if (success) {
-    if (advance) {
+    if (draftComplete) {
+      // Step 9 complete - close the modal
+      closeModal?.()
+    } else if (advance) {
       emit('completed')
     } else {
       emit('saved')

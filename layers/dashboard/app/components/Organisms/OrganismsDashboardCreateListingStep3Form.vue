@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="3"
-    alert-title="Step 3: Price"
-    :alert-description="alertDescription"
     :schema="step3Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 3: Price</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            {{ alertDescription }}
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- Sale Price Fields -->
     <div v-if="listingType === 'sale'" class="flex flex-wrap gap-6 items-start">
       <div class="basis-full sm:basis-0 sm:flex-1 sm:max-w-64 min-w-fit">

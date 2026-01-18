@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
       search?: string
       take?: string | number
       page?: string | number
-      sort?: string 
+      sort?: string
+      saleRent?: string
     }
 
     const take = query.take ? Number(query.take) : 20
@@ -22,13 +23,15 @@ export default defineEventHandler(async (event) => {
     const status = query.status ?? "all"
     const search = query.search ?? ""
     const sort = query.sort ?? 'new'
+    const saleRent = query.saleRent ?? 'all'
 
     const { listings, total } = await getUserOwnedListingsWithAnalytics(userId as number, { 
       status: status as any, 
       search, 
       take, 
       skip, 
-      sort: sort as any 
+      sort: sort as any,
+      saleRent: saleRent as any
     })
 
     return { listings, total }

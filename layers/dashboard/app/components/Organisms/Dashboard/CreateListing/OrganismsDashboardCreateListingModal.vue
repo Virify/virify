@@ -107,8 +107,14 @@ async function openForListing(listingId: number) {
  */
 function close() {
   isOpen.value = false;
-  emit('close');
 }
+
+// Watch isOpen to emit close event when modal is closed (by any method)
+watch(isOpen, (newValue, oldValue) => {
+  if (oldValue && !newValue) {
+    emit('close');
+  }
+});
 
 // Provide closeModal to child components (step forms use this)
 provide('closeModal', close);

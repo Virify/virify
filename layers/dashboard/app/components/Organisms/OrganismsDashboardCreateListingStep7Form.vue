@@ -1,8 +1,6 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="7"
-    alert-title="Step 7: Additional Features"
-    alert-description="Add details about parking, security, accessibility, storage, and other building features. All fields are optional but help buyers or renters find the right property."
     :schema="step7Schema"
     :state="state"
     :is-valid="isFormValid"
@@ -11,6 +9,19 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <template #alert>
+      <UAlert type="info" class="mb-6" color="secondary" variant="subtle" icon="i-lucide-info" close>
+        <template #title>
+          <h3>Step 7: Additional Features</h3>
+        </template>
+        <template #description>
+          <p class="body-sm text-muted">
+            Add details about parking, security, accessibility, storage, and other building features. All fields are optional but help buyers or renters find the right property.
+          </p>
+        </template>
+      </UAlert>
+    </template>
+
     <!-- Collapsible Sections -->
     <UAccordion 
       :items="accordionItems" 

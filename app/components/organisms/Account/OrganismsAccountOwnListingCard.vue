@@ -108,7 +108,7 @@ const addressText = computed(() => {
 })
 const bedrooms = computed(() => props.item.property?.numberBedrooms || 0)
 const bathrooms = computed(() => props.item.property?.numberBathrooms || 0)
-const firstImage = computed(() => props.item.property?.media?.find((m) => m.image)?.image || null)
+const firstImage = computed(() => getMainImage(props.item.property))
 const viewHref = computed(() => `/listing/${props.item.id}`)
 
 // Edit link - different for drafts vs live listings

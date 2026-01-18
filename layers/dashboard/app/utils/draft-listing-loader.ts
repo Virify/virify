@@ -271,6 +271,41 @@ export function loadStep8FromDraft(draft: DraftListingWithFullPayload) {
   return null
 }
 
+export function loadStep9FromDraft(draft: DraftListingWithFullPayload) {
+  const property = draft.property
+  const existingMedia = property?.media || []
+
+  // Map existing media to our format
+  const media = existingMedia.map((m: any) => {
+    const metadata = m.metadata ? JSON.parse(m.metadata) : {}
+    const isGeneral = !m.bedroomId && !m.bathroomId && !m.kitchenId && 
+                      !m.receptionId && !m.otherRoomId && !m.gardenId && 
+                      !m.yardId && !m.landId
+
+    return {
+      cloudflareId: m.image || '',
+      filename: metadata.cloudflareImageId || m.image || '',
+      description: metadata.description || null,
+      bedroomId: m.bedroomId || null,
+      bathroomId: m.bathroomId || null,
+      kitchenId: m.kitchenId || null,
+      receptionId: m.receptionId || null,
+      otherRoomId: m.otherRoomId || null,
+      gardenId: m.gardenId || null,
+      yardId: m.yardId || null,
+      landId: m.landId || null,
+      outdoorSpaceId: m.outdoorSpaceId || null,
+      isGeneral,
+    }
+  })
+
+  return {
+    property: {
+      media,
+    },
+  }
+}
+
 /**
  * Populate all step data from a draft listing
  * Returns a record of step data indexed by step number
@@ -302,7 +337,8 @@ export function populateAllStepsFromDraft(draft: DraftListingWithFullPayload): R
   const step8Data = loadStep8FromDraft(draft)
   if (step8Data) stepData[8] = step8Data
   
-  // Additional steps can be added here as they are built
+  const step9Data = loadStep9FromDraft(draft)
+  if (step9Data) stepData[9] = step9Data
   
   return stepData
 }

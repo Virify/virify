@@ -153,6 +153,11 @@ export const useCreateListingSteps = createSharedComposable(() => {
     return incomplete?.id ?? 1
   })
 
+  // Computed: Check if all steps are completed
+  const allStepsCompleted = computed(() => {
+    return steps.value.every(s => s.completed)
+  })
+
 
 
   // Load draft listing data from API
@@ -182,8 +187,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
         // Populate step data from the draft
         populateStepDataFromDraft(draft)
         
-        // Set current step to first incomplete
-        currentStep.value = firstIncompleteStep.value
+        // Set current step: if all complete, go to last step (9); otherwise first incomplete
+        currentStep.value = allStepsCompleted.value ? 9 : firstIncompleteStep.value
       }
     } catch (error: any) {
       console.error('Failed to load draft listing:', error)
@@ -281,17 +286,17 @@ export const useCreateListingSteps = createSharedComposable(() => {
    * 4. If advancing, mark step complete and unlock next
    * 
    * @param stepNumber - The step being saved (1-10)
-   * @param apiEndpoint - The PATCH endpoint for this step
+   * @param apiEndpoint - The PATCH endpoint for this step (draft endpoint - will be converted to listing endpoint if editing live)
    * @param stepData - The form data to save
    * @param advance - Whether to mark complete and move to next step
-   * @returns Success boolean
+   * @returns Success boolean or { success: true, draftComplete: true } for step 9 completion
    */
   const saveStep = async (
     stepNumber: number, 
     apiEndpoint: string, 
     stepFormData: Record<string, any>,
     advance: boolean = false
-  ): Promise<boolean> => {
+  ): Promise<boolean | { success: boolean; draftComplete: boolean }> => {
     if (isSaving.value) return false
     
     // Check if data actually changed
@@ -315,18 +320,30 @@ export const useCreateListingSteps = createSharedComposable(() => {
     isSaving.value = true
     
     try {
-      // Step 1: Ensure draft exists (creates with selectedTier if new)
-      const currentDraftId = await ensureDraftExists()
-      if (!currentDraftId) {
-        throw new Error('Failed to create draft listing')
+      // Determine if we're editing a live listing or a draft
+      const isEditingLiveListing = editingListingId.value !== null
+      
+      let submissionData: Record<string, any>
+      
+      if (isEditingLiveListing) {
+        // Live listing - pass listingId (same endpoint handles both)
+        submissionData = {
+          ...stepFormData,
+          listingId: editingListingId.value
+        }
+      } else {
+        // Draft flow - ensure draft exists first
+        const currentDraftId = await ensureDraftExists()
+        if (!currentDraftId) {
+          throw new Error('Failed to create draft listing')
+        }
+        submissionData = {
+          ...stepFormData,
+          draftId: currentDraftId
+        }
       }
       
-      // Step 2: PATCH to update the step
-      const submissionData = {
-        ...stepFormData,
-        draftId: currentDraftId
-      }
-      
+      // PATCH to update the step (same endpoint handles both draft and live)
       const response = await useRequestFetch()<DraftListing>(apiEndpoint, {
         method: 'PATCH',
         body: submissionData
@@ -347,16 +364,29 @@ export const useCreateListingSteps = createSharedComposable(() => {
       // Get step title for toast
       const stepTitle = steps.value.find(s => s.id === stepNumber)?.title || `Step ${stepNumber}`
       
-      // Step 5: Handle advancement (navigate to next step)
+      // Step 5: Handle advancement (navigate to next step or complete draft)
       if (advance) {
-        goToStep(stepNumber + 1)
-        toast.add({
-          title: `${stepTitle} completed`,
-          icon: 'i-lucide-check-circle-2',
-          description: 'Moving to next step',
-          color: 'success',
-          duration: 2000
-        })
+        // Step 9 is the final step - show draft complete message
+        if (stepNumber === 9) {
+          toast.add({
+            title: 'Draft Complete!',
+            icon: 'i-lucide-check-circle-2',
+            description: 'Your draft listing is ready to publish',
+            color: 'success',
+            duration: 3000
+          })
+          // Signal that the draft is complete (caller should close modal)
+          return { success: true, draftComplete: true }
+        } else {
+          goToStep(stepNumber + 1)
+          toast.add({
+            title: `${stepTitle} completed`,
+            icon: 'i-lucide-check-circle-2',
+            description: 'Moving to next step',
+            color: 'success',
+            duration: 2000
+          })
+        }
       } else {
         toast.add({
           title: `${stepTitle} saved`,
@@ -384,7 +414,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
   /**
    * Silent save for room data (bedrooms/bathrooms) - no toast notifications
-   * Used when saving individual rooms in Step 4 slideoversa
+   * Used when saving individual rooms in Step 4 slideovers
    */
   const saveRoomData = async (
     stepNumber: number,
@@ -396,16 +426,29 @@ export const useCreateListingSteps = createSharedComposable(() => {
     isSaving.value = true
     
     try {
-      const currentDraftId = await ensureDraftExists()
-      if (!currentDraftId) {
-        throw new Error('Failed to create draft listing')
+      // Determine if we're editing a live listing or a draft
+      const isEditingLiveListing = editingListingId.value !== null
+      
+      let submissionData: Record<string, any>
+      
+      if (isEditingLiveListing) {
+        // Live listing - pass listingId (same endpoint handles both)
+        submissionData = {
+          ...stepFormData,
+          listingId: editingListingId.value
+        }
+      } else {
+        const currentDraftId = await ensureDraftExists()
+        if (!currentDraftId) {
+          throw new Error('Failed to create draft listing')
+        }
+        submissionData = {
+          ...stepFormData,
+          draftId: currentDraftId
+        }
       }
       
-      const submissionData = {
-        ...stepFormData,
-        draftId: currentDraftId
-      }
-      
+      // Same endpoint handles both draft and live
       const response = await useRequestFetch()<DraftListing>(apiEndpoint, {
         method: 'PATCH',
         body: submissionData
