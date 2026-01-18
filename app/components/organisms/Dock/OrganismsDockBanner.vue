@@ -8,7 +8,7 @@
         <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
       </div>
 
-      <fieldset class="o-dock-banner__fader | flow flow-lg" :disabled="isSearchLoading">
+      <section class="o-dock-banner__fader | flow flow-lg" :disabled="isSearchLoading">
         <MoleculesAiSearchFormLocation />
 
         <client-only>
@@ -46,7 +46,7 @@
           @click.prevent="showExpandedForm">
           Expand form
         </AtomsButton>
-      </fieldset>
+      </section>
     </div>
   </section>
 </template>
