@@ -49,7 +49,7 @@
         variant: 'solid',
         size: 'xs',
         class: ' body-sm text-white! cursor-pointer',
-        onClick: () => emit('select-tier', ListingTier.FEATURED),
+        onClick: () => emit('select-tier', ListingTier.PREMIUM),
       }"
     />
     <UPricingPlan
@@ -75,7 +75,7 @@
         variant: 'solid',
         size: 'xs',
         class: ' body-sm text-white! cursor-pointer',
-        onClick: () => emit('select-tier', ListingTier.PREMIUM),
+        onClick: () => emit('select-tier', ListingTier.FEATURED),
       }"
     />
   </UPageColumns>

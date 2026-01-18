@@ -175,6 +175,11 @@ export const useCreateListingSteps = createSharedComposable(() => {
       if (draft?.id) {
         draftListingId.value = draft.id
         
+        // Set the tier from the draft
+        if (draft.listingTier) {
+          selectedTier.value = draft.listingTier as ListingTier
+        }
+        
         // Use stored completedSteps from database
         const completedSteps = draft.completedSteps || []
         
@@ -623,6 +628,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
   const resetSteps = () => {
     currentStep.value = 1
     draftListingId.value = null
+    editingListingId.value = null
+    selectedTier.value = 'BASIC'
     loadError.value = null
     steps.value.forEach(step => {
       step.completed = false

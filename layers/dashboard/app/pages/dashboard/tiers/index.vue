@@ -19,12 +19,17 @@
     </template>
 
     <template #body>
-      <OrganismsDashboardTierTable />
+      <OrganismsDashboardTierTable @create-listing="handleCreateListing" />
+      
+      <!-- Shared Listing Editor Modal -->
+      <OrganismsDashboardCreateListingModal ref="listingModal" />
     </template>
   </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
+import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
+
 definePageMeta({
   middleware: ["authenticated"],
   head: {
@@ -33,4 +38,10 @@ definePageMeta({
   },
   layout: "dashboard",
 });
+
+const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
+
+function handleCreateListing(tier: ListingTier) {
+  listingModal.value?.openForNewListing(tier);
+}
 </script>

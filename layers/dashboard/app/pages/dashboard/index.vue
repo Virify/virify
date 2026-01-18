@@ -17,7 +17,7 @@
     </template>
 
     <template #body>
-      <MoleculesDashboardPriceTier />
+      <MoleculesDashboardPriceTier @select-tier="handleCreateListing" />
       <h2 class="title-xs mb-0! flex items-center gap-2">
         Quick analytics
         <UIcon name="i-lucide-bar-chart-3" class="text-secondary" />
@@ -116,11 +116,16 @@
           </template>
         </UAccordion>
       </ClientOnly>
+      
+      <!-- Shared Listing Editor Modal -->
+      <OrganismsDashboardCreateListingModal ref="listingModal" />
     </template>
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
 import type { AccordionItem } from "@nuxt/ui";
+import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
+import OrganismsDashboardCreateListingModal from '~~/layers/dashboard/app/components/Organisms/Dashboard/CreateListing/OrganismsDashboardCreateListingModal.vue';
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -132,6 +137,13 @@ definePageMeta({
 });
 
 const { user } = useUserSession();
+
+// Modal ref for creating listings
+const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
+
+function handleCreateListing(tier: ListingTier) {
+  listingModal.value?.openForNewListing(tier);
+}
 
 // Get all recent data from useAnalytics (centralized dashboard data)
 const { recentlyViewedListings, recentFavourites, recentUserNotes, recentFavouritesStatus, recentNotesStatus, isAnalyticsLoading } = useAnalytics();

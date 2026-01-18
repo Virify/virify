@@ -10,7 +10,12 @@
     }"
   >
     <template #title>
-      <h2 class="title-md m-0!">{{ modalTitle }}</h2>
+      <div class="flex items-center gap-2">
+        <h2 class="title-md m-0!">{{ modalTitle }}</h2>
+        <UBadge v-if="tierLabel" :color="tierColor" variant="subtle" size="lg">
+          {{ tierLabel }}
+        </UBadge>
+      </div>
     </template>
     <template #body>
       <!-- Mobile: Accordion -->
@@ -53,6 +58,7 @@ const {
   currentStepValue,
   draftListingId,
   editingListingId,
+  selectedTier,
   startNewListing,
   loadDraftListing,
   loadListing,
@@ -60,6 +66,27 @@ const {
 
 const isOpen = ref(false);
 const mode = ref<'create' | 'draft' | 'edit'>('create');
+
+// Format tier for display
+const tierLabel = computed(() => {
+  const tier = selectedTier.value
+  if (!tier) return ''
+  return tier.charAt(0) + tier.slice(1).toLowerCase()
+})
+
+// Tier badge color: neutral for Basic, primary for Featured, secondary for Premium
+const tierColor = computed(() => {
+  switch (selectedTier.value) {
+    case 'BASIC':
+      return 'neutral'
+    case 'PREMIUM':
+      return 'primary'
+    case 'FEATURED':
+      return 'secondary'
+    default:
+      return 'neutral'
+  }
+})
 
 // Dynamic title based on mode
 const modalTitle = computed(() => {
