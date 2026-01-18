@@ -28,18 +28,15 @@
       <section id="o-traditional-search-form-contract-buy" class="o-traditional-search-form-contract__content-block"
         :hidden="!isSale">
 
-        <AtomsChecktext label="Include sold STC" />
-        <AtomsChecktext label="Include shared ownership" />
-        <AtomsChecktext label="Include retirement properties" />
-        <AtomsChecktext label="Include cash-only properties" />
+        <AtomsChecktext v-for="{ key, label } of saleIncludesOptions" v-model="saleIncludes[key]" :label="label"
+          :name="key" />
       </section>
 
       <section id="o-traditional-search-form-contract-rent" class="o-traditional-search-form-contract__content-block"
         :hidden="isSale">
 
-        <AtomsChecktext label="Include let agreed" />
-        <AtomsChecktext label="Include short-term lets" />
-        <AtomsChecktext label="Include long-term lets" />
+        <AtomsChecktext v-for="{ key, label } of rentIncludesOptions" v-model="rentIncludes[key]" :label="label"
+          :name="key" />
       </section>
 
       <section class="o-traditional-search-form-contract__price">
@@ -56,13 +53,48 @@
 
 <script setup lang="ts">
 
+interface IncludesOption {
+  key: string,
+  label: string
+}
+
+interface IncludeChecked {
+  [key: string]: unknown
+}
+
+interface Props {
+  saleIncludesOptions: IncludesOption[]
+  rentIncludesOptions: IncludesOption[]
+}
+
+defineProps<Props>()
+
 /**
  *  Models
  */
-const isSale = defineModel<boolean>('is-sale', { default: true })
-const minPrice = defineModel<number>('min-price', { default: 0 })
-const maxPrice = defineModel<number>('max-price', { default: 0 })
-const price = defineModel<[number, number]>('price', { default: [0, 0] })
+const isSale = defineModel<boolean>('is-sale', {
+  default: true
+})
+
+const minPrice = defineModel<number>('min-price', {
+  default: 0
+})
+
+const maxPrice = defineModel<number>('max-price', {
+  default: 0
+})
+
+const price = defineModel<[number, number]>('price', {
+  default: [0, 0]
+})
+
+const saleIncludes = defineModel<IncludeChecked>('sale-includes', {
+  default: reactive({})
+})
+
+const rentIncludes = defineModel<IncludeChecked>('rent-includes', {
+  default: reactive({})
+})
 
 /**
  *  Graph data

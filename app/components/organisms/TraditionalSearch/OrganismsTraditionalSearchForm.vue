@@ -1,7 +1,9 @@
 <template>
   <div class="o-traditional-search-form | flow flow-4xl">
-    <OrganismsTraditionalSearchContract v-model:is-sale="contractType.isSale" v-model:min-price="contractType.minPrice"
-      v-model:max-price="contractType.maxPrice" v-model:price="contractType.price" id="traditional-search-form-price" />
+    <OrganismsTraditionalSearchContract :sale-includes-options :rent-includes-options v-model:is-sale="formData.isSale"
+      v-model:min-price="formData.minPrice" v-model:max-price="formData.maxPrice" v-model:price="formData.price"
+      v-model:sale-includes="formData.saleIncludes" v-model:rent-includes="formData.rentIncludes"
+      id="traditional-search-form-price" />
 
     <section class="o-traditional-search-form__property-type" id="tradition-search-form-type">
       <h3 class="o-traditional-search-form__title | title-xs">
@@ -58,16 +60,31 @@ onBeforeMount(() => {
 /**
  *  Form data
  */
-const contractType = useState('search-contract-type', () => reactive({
+const formData = useState('search-contract-type', () => reactive({
   isSale: false,
   minPrice: 0,
   maxPrice: 0,
-  price: <[number, number]>[0, 0]
+  price: <[number, number]>[0, 0],
+  saleIncludes: reactive<{ [key: string]: boolean }>({}),
+  rentIncludes: reactive<{ [key: string]: boolean }>({})
 }))
 
 /**
  *  Data
  */
+const saleIncludesOptions = [
+  { key: 'sold-stc', label: 'Include sold STC' },
+  { key: 'shared-ownership', label: 'Include shared ownership' },
+  { key: 'retirement', label: 'Include retirement properties' },
+  { key: 'cash-only', label: 'Include cash-only properties' },
+]
+
+const rentIncludesOptions = [
+  { key: 'let-agreed', label: 'Include let agreed' },
+  { key: 'short-term-lets', label: 'Include short-term lets' },
+  { key: 'long-term-lets', label: 'Include long-term lets' },
+]
+
 const bedroomMin = [
   { key: 0, value: 'Any', selected: true },
   { key: 0.5, value: 'Studio' },
