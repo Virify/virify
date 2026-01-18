@@ -1,15 +1,15 @@
 <template>
   <div class="o-property-types" role="presentation">
     <ul class="o-property-types__list">
-      <li v-for="{ name, icon, options, selected, defaultSelected } of propertyTypes" :key="name"
+      <li v-for="{ name, icon, options } of propertyTypes" :key="name"
         class="o-property-types__list-item | gradient-box">
 
-        <OrganismsTraditionalSearchPropertySubtype button-class="o-property-types__dropdown" :name :options :selected
-          @update-selected="updateSelectedSubtype" />
+        <OrganismsTraditionalSearchPropertySubtype button-class="o-property-types__dropdown" :name :options
+          :selected="modelSelected[name]" @update-selected="updateSubTypes" />
 
         <label class="o-property-types__input | font-bold">
-          <input type="checkbox" :name="name" v-model="selectedTypes[name]" class="| visually-hidden"
-            :checked="defaultSelected" @input="event => updateSelectedType(event, { name, options })" />
+          <input type="checkbox" :name="name" class="| visually-hidden" :checked="modelSelected[name]?.length"
+            @input.prevent="updateTypes({ name, options })" />
 
           <AtomsIcon :icon aria-hidden class="o-property-types__input-icon" />
 
@@ -21,9 +21,43 @@
 </template>
 
 <script setup lang="ts">
+interface SelectType {
+  name: string
+  options: PropertyTypeOption[]
+}
+
+interface SelectSubType {
+  name: string
+  selected: string[]
+}
+
 interface PropertyType extends PropertyTypeWithOptions {
   selected: string[]
   icon: string
+}
+
+/**
+ *  Model
+ */
+const modelSelected = defineModel<{ [key: string]: string[] }>({
+  default: reactive({})
+})
+
+/**
+ *  Manage model
+ */
+function updateTypes({ name, options }: SelectType) {
+  const isSelected = modelSelected.value[name]?.length
+
+  modelSelected.value[name] = isSelected ? [] : getOptionsAsStrings(options)
+}
+
+function updateSubTypes({ name, selected }: SelectSubType) {
+  modelSelected.value[name] = selected
+}
+
+function getOptionsAsStrings(options: PropertyTypeOption[]): string[] {
+  return asArray(options).map(({ value }) => value)
 }
 
 /**
@@ -44,84 +78,22 @@ const propertyTypeIcons: Record<string, string> = {
 
 callOnce(async () => {
   useFetch<PropertyTypeWithOptions[]>('/api/property-type/').then(({ data }) => {
-    propertyTypes.value = asArray(data.value).map((row) => {
-      const { options, name, defaultSelected } = asObject(row)
+    const types: PropertyType[] = asArray(data.value)
 
-      return {
-        ...(asObject(row) as Record<string, unknown>),
-        icon: propertyTypeIcons[name as string] || 'legacy-search/unknown',
-        selected: defaultSelected ? getOptionsAsStrings(options) : []
-      }
-    }) as never as PropertyType[]
+    for (const type of types) {
+      const { name, defaultSelected, options } = asObject(type)
+
+      // Store property options, icon, etc.
+      propertyTypes.value.push({
+        ...type,
+        icon: propertyTypeIcons[name] || 'legacy-search/unknown',
+      })
+
+      // Store whether property type is selected
+      modelSelected.value[name] = defaultSelected ? getOptionsAsStrings(options) : []
+    }
   })
 })
-
-/**
- *  Allow selecting property type
- */
-const selectedTypes = useState('selected-property-types', () => {
-  return reactive<Record<string, boolean>>({})
-})
-
-/**
- *  Update selected types
- */
-type MatchType = PropertyType | undefined
-
-type SelectType = {
-  name: string
-  options: PropertyTypeOption[]
-}
-
-type SelectSubType = {
-  name: string
-  selected: string[]
-}
-
-function getOptionsAsStrings(options: PropertyTypeOption[]): string[] {
-  return asArray(options).map(({ value }) => value)
-}
-
-function setSelectedOptions(match: MatchType, options: string[]) {
-  if (!match) return
-
-  match.selected = options
-}
-
-function getPropertyTypeByName(name: string): PropertyType | undefined {
-  return propertyTypes.value.find((row) => row.name === name)
-}
-
-function updateSelectedType({ target }: Event, selected: SelectType) {
-  const { checked } = asObject(target)
-  const { name, options } = asObject(selected)
-
-  // Find the matching option
-  const match = getPropertyTypeByName(name)
-
-  // If unchecked, select all
-  if (checked) {
-    setSelectedOptions(match, getOptionsAsStrings(options))
-
-    return
-  }
-
-  // Else select none
-  setSelectedOptions(match, [])
-}
-
-function updateSelectedSubtype({ name, selected }: SelectSubType) {
-  const match = getPropertyTypeByName(name)
-
-  // If no matches, do nothing
-  if (!match) return
-
-  // If a selection is made, apply it
-  setSelectedOptions(match, selected)
-
-  // Ensure match is appropriately updated
-  selectedTypes.value[name] = !!selected.length
-}
 
 </script>
 
