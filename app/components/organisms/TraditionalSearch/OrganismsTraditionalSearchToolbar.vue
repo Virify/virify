@@ -2,7 +2,7 @@
   <div class="o-traditional-search-toolbar | gradient-box">
     <MoleculesJumpLinks :links />
 
-    <button type="button" class="o-traditional-search-toolbar__button | button button-secondary">
+    <button type="submit" class="o-traditional-search-toolbar__button | button button-secondary">
       Search
     </button>
   </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="o-traditional-search-form | flow flow-4xl">
+  <form class="o-traditional-search-form | flow flow-4xl" @submit.prevent="postFormData">
     <OrganismsTraditionalSearchContract :sale-includes-options :rent-includes-options v-model:is-sale="formData.isSale"
       v-model:min-price="formData.minPrice" v-model:max-price="formData.maxPrice" v-model:price="formData.price"
       v-model:sale-includes="formData.saleIncludes" v-model:rent-includes="formData.rentIncludes"
@@ -50,7 +50,7 @@
     </AtomsCollapsibleTip>
 
     <OrganismsTraditionalSearchToolbar class="o-traditional-search-form__toolbar" />
-  </div>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -157,6 +157,15 @@ const formData = useState('search-contract-type', () => reactive({
   propertyTypes: reactive<{ [key: string]: string[] }>({}),
   additionalFeatures: reactive<{ [key: string]: boolean }>({}),
 }))
+
+/**
+ *  Handle post
+ */
+function postFormData() {
+  console.log('SEARCH', JSON.parse(JSON.stringify({
+    ...formData.value
+  })))
+}
 
 </script>
 
