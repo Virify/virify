@@ -8,7 +8,7 @@
           :selected="modelSelected[name]" @update-selected="updateSubTypes" />
 
         <label class="o-property-types__input | font-bold">
-          <input type="checkbox" :name="name" class="| visually-hidden" :checked="modelSelected[name]?.length"
+          <input type="checkbox" :name="name" class="| visually-hidden" :checked="!!modelSelected[name]?.length"
             @input.prevent="updateTypes({ name, options })" />
 
           <AtomsIcon :icon aria-hidden class="o-property-types__input-icon" />
