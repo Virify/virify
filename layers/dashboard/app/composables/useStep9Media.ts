@@ -5,7 +5,7 @@
 
 
 export function useStep9Media(options: UseStep9MediaOptions) {
-  const { draftListingId, media, maxImages, listingTier } = options
+  const { draftListingId, editingListingId, media, maxImages, listingTier } = options
   
   const { uploadImage, deleteImage, isUploading } = useCloudflare()
   const toast = useToast()
@@ -160,12 +160,21 @@ export function useStep9Media(options: UseStep9MediaOptions) {
     deletingIds.value.add(cloudflareId)
 
     try {
-      if (draftListingId.value) {
-        await useRequestFetch()(`/api/draft-listings/${draftListingId.value}/media`, {
-          method: 'DELETE',
-          body: { cloudflareIds: [cloudflareId] },
-        })
+      // Use single endpoint with draftId or listingId in body
+      const body: { cloudflareIds: string[]; draftId?: number; listingId?: number } = {
+        cloudflareIds: [cloudflareId],
       }
+      
+      if (draftListingId.value) {
+        body.draftId = draftListingId.value
+      } else if (editingListingId?.value) {
+        body.listingId = editingListingId.value
+      }
+
+      await useRequestFetch()('/api/draft-listings/0/media', {
+        method: 'DELETE',
+        body,
+      })
       media.splice(index, 1)
     } catch (error) {
       console.error('Failed to delete image:', error)
@@ -190,12 +199,21 @@ export function useStep9Media(options: UseStep9MediaOptions) {
     cloudflareIds.forEach(id => deletingIds.value.add(id))
 
     try {
-      if (draftListingId.value) {
-        await useRequestFetch()(`/api/draft-listings/${draftListingId.value}/media`, {
-          method: 'DELETE',
-          body: { cloudflareIds },
-        })
+      // Use single endpoint with draftId or listingId in body
+      const body: { cloudflareIds: string[]; draftId?: number; listingId?: number } = {
+        cloudflareIds,
       }
+      
+      if (draftListingId.value) {
+        body.draftId = draftListingId.value
+      } else if (editingListingId?.value) {
+        body.listingId = editingListingId.value
+      }
+
+      await useRequestFetch()('/api/draft-listings/0/media', {
+        method: 'DELETE',
+        body,
+      })
       
       media.length = 0
       

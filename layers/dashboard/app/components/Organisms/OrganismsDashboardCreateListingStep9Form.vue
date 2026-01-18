@@ -66,24 +66,34 @@ const isDesktop = useMediaQuery('(min-width: 1024px)')
 // Draft Data & Tier
 // ============================================================================
 
-const { getStepData, draftListingId, selectedTier } = useCreateListingSteps()
+const { getStepData, draftListingId, editingListingId, selectedTier } = useCreateListingSteps()
 const draftData = getStepData(9)
 
-const { data: fullDraftData } = useAsyncData(
-  `draft-listing-${draftListingId.value}`,
-  () => draftListingId.value 
-    ? useRequestFetch()<DraftListingWithFullPayload>(`/api/draft-listings/${draftListingId.value}/`) 
-    : Promise.resolve(null),
-  { immediate: !!draftListingId.value }
-)
-
-const listingTier = computed(() => 
-  fullDraftData.value?.listingTier?.toLowerCase() || selectedTier.value?.toLowerCase() || 'basic'
-)
+// selectedTier is already set when loading draft or live listing
+const listingTier = computed(() => (selectedTier.value || 'BASIC').toLowerCase())
 
 const maxImages = computed(() => 
   getMaxImagesForTier(listingTier.value as 'premium' | 'featured' | 'basic')
 )
+
+// Build room data from already-loaded step data (steps 4, 5, 6)
+// This avoids re-fetching the entire listing on every step visit
+const propertyDataFromSteps = computed(() => {
+  const step4 = getStepData(4)
+  const step5 = getStepData(5)
+  const step6 = getStepData(6)
+  
+  return {
+    property: {
+      bedroomFeatures: step4?.property?.bedroomFeatures || [],
+      bathroomFeatures: step4?.property?.bathroomFeatures || [],
+      kitchenFeatures: step5?.property?.kitchenFeatures || [],
+      reception: step5?.property?.reception || [],
+      otherRoom: step5?.property?.otherRoom || [],
+      outdoorSpace: step6?.property?.outdoorSpace || null,
+    }
+  }
+})
 
 const state = reactive<Step9FormState>({
   property: {
@@ -106,12 +116,14 @@ const {
   removeAllImages,
 } = useStep9Media({
   draftListingId,
+  editingListingId,
   media: state.property.media,
   maxImages,
   listingTier,
 })
 
-const availableRooms = computed(() => getAvailableRoomsFromDraft(fullDraftData.value))
+// Use step data for room assignment (no extra fetch needed)
+const availableRooms = computed(() => getAvailableRoomsFromDraft(propertyDataFromSteps.value))
 
 const roomOptions = computed(() => generateRoomOptions(availableRooms.value))
 

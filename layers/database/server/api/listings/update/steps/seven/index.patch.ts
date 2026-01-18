@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { GardenFacing, GardenPosition, OutdoorSpaceFeature, LandFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
 
 const stepSevenSchema = z.object({
   listingId: z.number().int().positive(),
@@ -147,6 +148,9 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+
+    // Invalidate cache after update
+    await invalidateListingCache(listingId);
 
     return result;
   } catch (error) {

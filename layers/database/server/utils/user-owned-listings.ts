@@ -193,6 +193,8 @@ function applyTierSorting(listings: any[], sort: string) {
   )
 }
 
+import { invalidateListingCache } from "./listing-cache";
+
 export async function toggleListingPublished(userId: number, listingId: number, published: boolean) {
   const listing = await prisma.listing.findFirst({ 
     where: { id: listingId, userId } 
@@ -214,6 +216,9 @@ export async function toggleListingPublished(userId: number, listingId: number, 
       publishedAt: true,
     },
   })
+
+  // Invalidate cache after update
+  await invalidateListingCache(listingId);
 
   // Send websocket update for listings count change (if this changes draft status)
   const wasDraft = !listing.published && !listing.publishedAt
@@ -253,6 +258,9 @@ export async function archiveListing(userId: number, listingId: number) {
       archivedAt: true,
     },
   })
+
+  // Invalidate cache after update
+  await invalidateListingCache(listingId);
 
   console.log(`[archiveListing] Successfully updated listing ${listingId}:`, result)
 

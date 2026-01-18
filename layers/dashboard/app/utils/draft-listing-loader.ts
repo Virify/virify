@@ -87,6 +87,7 @@ export function loadStep4FromDraft(draft: DraftListingWithFullPayload) {
       property: {
         totalFloors: draft.property.totalFloors ?? 1,
         bedroomFeatures: draft.property.bedroomFeatures?.map(b => ({
+          id: b.id,
           name: b.name ?? '',
           roomNumber: b.roomNumber ?? 1,
           description: b.description ?? null,
@@ -97,6 +98,7 @@ export function loadStep4FromDraft(draft: DraftListingWithFullPayload) {
         })) ?? [],
         numberBedrooms: draft.property.numberBedrooms ?? draft.property.bedroomFeatures?.length ?? 0,
         bathroomFeatures: draft.property.bathroomFeatures?.map(b => ({
+          id: b.id,
           name: b.name ?? '',
           roomNumber: b.roomNumber ?? 1,
           description: b.description ?? null,
@@ -117,6 +119,7 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
       property: {
         totalFloors: draft.property.totalFloors ?? 1,
         kitchenFeatures: draft.property.kitchenFeatures?.map(k => ({
+          id: k.id,
           name: k.name ?? '',
           roomNumber: k.roomNumber ?? 1,
           description: k.description ?? null,
@@ -126,6 +129,7 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
         })) ?? [],
         numberKitchens: draft.property.numberKitchens ?? draft.property.kitchenFeatures?.length ?? 0,
         reception: draft.property.reception?.map(r => ({
+          id: r.id,
           name: r.name ?? '',
           roomNumber: r.roomNumber ?? 1,
           description: r.description ?? null,
@@ -136,6 +140,7 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
         })) ?? [],
         numberReceptions: draft.property.numberReceptions ?? draft.property.reception?.length ?? 0,
         otherRoom: draft.property.otherRoom?.map(o => ({
+          id: o.id,
           name: o.name ?? '',
           roomNumber: o.roomNumber ?? 1,
           description: o.description ?? null,
@@ -161,6 +166,7 @@ export function loadStep6FromDraft(draft: DraftListingWithFullPayload) {
           totalArea: outdoorSpace.totalArea ?? null,
           features: outdoorSpace.features ?? [],
           garden: outdoorSpace.garden?.map(g => ({
+            id: g.id,
             name: g.name ?? '',
             description: g.description ?? null,
             facing: g.facing ?? null,
@@ -169,6 +175,7 @@ export function loadStep6FromDraft(draft: DraftListingWithFullPayload) {
             size: g.size ?? null,
           })) ?? [],
           yard: outdoorSpace.yard?.map(y => ({
+            id: y.id,
             name: y.name ?? '',
             description: y.description ?? null,
             facing: y.facing ?? null,
@@ -177,6 +184,7 @@ export function loadStep6FromDraft(draft: DraftListingWithFullPayload) {
             size: y.size ?? null,
           })) ?? [],
           land: outdoorSpace.land?.map(l => ({
+            id: l.id,
             name: l.name ?? '',
             description: l.description ?? null,
             features: l.features ?? [],

@@ -1,13 +1,18 @@
 import { z } from 'zod';
+import { invalidateListingCache } from '~~/layers/database/server/utils/listing-cache';
 
 /**
  * DELETE /api/draft-listings/[id]/media
- * Delete media images from a draft listing (bulk delete)
+ * Delete media images from a draft or live listing (bulk delete)
  * Also deletes from Cloudflare
+ * 
+ * Works for BOTH draft listings (draftId) and live listings (listingId)
  */
 
 const requestSchema = z.object({
   cloudflareIds: z.array(z.string()).min(1),
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -15,34 +20,58 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
 
   try {
-    const draftId = parseInt(getRouterParam(event, 'id') || '0');
-    
-    if (!draftId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Draft ID is required',
-      });
-    }
+    // Get ID from route param as fallback (for backwards compatibility)
+    const routeId = parseInt(getRouterParam(event, 'id') || '0');
 
     const body = await readBody(event);
-    const { cloudflareIds } = requestSchema.parse(body);
+    const parsed = requestSchema.parse(body);
+    const { cloudflareIds } = parsed;
+    
+    // Use body params if provided, otherwise fall back to route param (draft)
+    const draftId = parsed.draftId ?? (parsed.listingId ? undefined : routeId);
+    const listingId = parsed.listingId;
 
-    // Verify draft ownership and get property ID
-    const existingDraft = await prisma.draftListing.findUnique({
-      where: { id: draftId, userId: user.id },
-      include: {
-        property: true,
-      },
-    });
-
-    if (!existingDraft || !existingDraft.property) {
+    if (!draftId && !listingId) {
       throw createError({
-        statusCode: 404,
-        statusMessage: 'Draft listing or property not found',
+        statusCode: 400,
+        statusMessage: 'Either draftId or listingId must be provided',
       });
     }
 
-    const propertyId = existingDraft.property.id;
+    let propertyId: number;
+
+    if (listingId) {
+      // LIVE LISTING
+      const existingListing = await prisma.listing.findUnique({
+        where: { id: listingId, userId: user.id },
+        include: { property: true },
+      });
+
+      if (!existingListing || !existingListing.property) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Listing or property not found',
+        });
+      }
+
+      propertyId = existingListing.property.id;
+    } else {
+      // DRAFT LISTING
+      const existingDraft = await prisma.draftListing.findUnique({
+        where: { id: draftId, userId: user.id },
+        include: { property: true },
+      });
+
+      if (!existingDraft || !existingDraft.property) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Draft listing or property not found',
+        });
+      }
+
+      propertyId = existingDraft.property.id;
+    }
+
     const config = useRuntimeConfig();
 
     // Delete from Cloudflare in parallel
@@ -84,6 +113,11 @@ export default defineEventHandler(async (event) => {
         image: { in: cloudflareIds },
       },
     });
+
+    // Invalidate cache for live listings
+    if (listingId) {
+      await invalidateListingCache(listingId);
+    }
 
     return {
       success: true,

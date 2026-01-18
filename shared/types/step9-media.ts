@@ -42,6 +42,7 @@ export interface Step9FormState {
 /** Options for useStep9Media composable */
 export interface UseStep9MediaOptions {
   draftListingId: Ref<number | null | undefined>
+  editingListingId?: Ref<number | null | undefined>
   media: MediaAssignment[]
   maxImages: Ref<number>
   listingTier: Ref<string>

@@ -325,44 +325,45 @@ export function getAvailableRoomsFromDraft(draftData?: any): AvailableRooms {
     }
   }
 
+  // For new drafts, rooms don't have database IDs yet - use roomNumber as fallback
   return {
     bedrooms: (property.bedroomFeatures || []).map((room: any, i: number) => ({
-      id: room.id,
+      id: room.id ?? room.roomNumber ?? i + 1,
       name: room.name || `Bedroom ${i + 1}`,
       roomNumber: room.roomNumber || i + 1,
     })),
     bathrooms: (property.bathroomFeatures || []).map((room: any, i: number) => ({
-      id: room.id,
+      id: room.id ?? room.roomNumber ?? i + 1,
       name: room.name || `Bathroom ${i + 1}`,
       roomNumber: room.roomNumber || i + 1,
     })),
     kitchens: (property.kitchenFeatures || []).map((room: any, i: number) => ({
-      id: room.id,
+      id: room.id ?? room.roomNumber ?? i + 1,
       name: room.name || `Kitchen ${i + 1}`,
       roomNumber: room.roomNumber || i + 1,
     })),
     receptions: (property.reception || []).map((room: any, i: number) => ({
-      id: room.id,
+      id: room.id ?? room.roomNumber ?? i + 1,
       name: room.name || `Reception ${i + 1}`,
       roomNumber: room.roomNumber || i + 1,
       type: room.type,
     })),
     otherRooms: (property.otherRoom || []).map((room: any, i: number) => ({
-      id: room.id,
+      id: room.id ?? room.roomNumber ?? i + 1,
       name: room.name || `Other Room ${i + 1}`,
       roomNumber: room.roomNumber || i + 1,
       type: room.type,
     })),
     gardens: (property.outdoorSpace?.garden || []).map((g: any, i: number) => ({
-      id: g.id,
+      id: g.id ?? i + 1,
       name: g.name || `Garden ${i + 1}`,
     })),
     yards: (property.outdoorSpace?.yard || []).map((y: any, i: number) => ({
-      id: y.id,
+      id: y.id ?? i + 1,
       name: y.name || `Yard ${i + 1}`,
     })),
     lands: (property.outdoorSpace?.land || []).map((l: any, i: number) => ({
-      id: l.id,
+      id: l.id ?? i + 1,
       name: l.name || `Land ${i + 1}`,
     })),
   }

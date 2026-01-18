@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
 
 // Validate payload for Step Eight - Property Features
 const stepEightSchema = z.object({
@@ -59,7 +60,7 @@ export default defineEventHandler(async (event) => {
   try {
     const { listingId, property } = await readValidatedBody(event, stepEightSchema.parse);
 
-    return await prisma.listing.update({
+    const result = await prisma.listing.update({
       where: { id: listingId, userId: user.id },
       data: {
         property: {
@@ -175,6 +176,11 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+
+    // Invalidate cache after update
+    await invalidateListingCache(listingId);
+
+    return result;
   } catch (error) {
     return errorResponse(error, event);
   }

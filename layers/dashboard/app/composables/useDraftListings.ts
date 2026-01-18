@@ -86,12 +86,14 @@ export const useDraftListings = createSharedComposable(() => {
   }
 
   /**
-   * Refetch current page (used after delete)
+   * Refetch current page (used after modal close or delete)
+   * Also updates the aggregates (draft listing count in sidebar)
    */
   async function refetchCurrentPage() {
-    if (draftListings.value.length > 0 || total.value > 0) {
-      await fetchDraftListings(currentPage.value, currentSort.value, currentLimit.value);
-    }
+    await fetchDraftListings(currentPage.value, currentSort.value, currentLimit.value);
+    // Update aggregates to refresh draft count in sidebar
+    const { fetchUserItemsAggregates } = useNotifications();
+    fetchUserItemsAggregates(true);
   }
 
   /**

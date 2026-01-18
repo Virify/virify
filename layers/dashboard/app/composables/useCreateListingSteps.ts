@@ -219,6 +219,11 @@ export const useCreateListingSteps = createSharedComposable(() => {
         // For live listings, we don't have a draftListingId - we're editing directly
         draftListingId.value = null
         
+        // Set the tier from the live listing
+        if (listing.listingTier) {
+          selectedTier.value = listing.listingTier as ListingTier
+        }
+        
         // All steps are complete for a published listing
         steps.value.forEach(step => {
           step.completed = true
@@ -306,6 +311,18 @@ export const useCreateListingSteps = createSharedComposable(() => {
     const step = steps.value.find(s => s.id === stepNumber)
     if (!isDirty && step?.completed) {
       if (advance) {
+        // Step 9 is the final step - signal completion
+        if (stepNumber === 9) {
+          const isLiveListing = editingListingId.value !== null
+          toast.add({
+            title: isLiveListing ? 'Listing Updated' : 'Draft Complete!',
+            icon: 'i-lucide-check-circle-2',
+            description: isLiveListing ? 'Your changes have been saved' : 'Your draft listing is ready to publish',
+            color: 'success',
+            duration: 3000
+          })
+          return { success: true, draftComplete: true }
+        }
         goToStep(stepNumber + 1)
         toast.add({
           title: 'Moving to next step',
@@ -366,12 +383,12 @@ export const useCreateListingSteps = createSharedComposable(() => {
       
       // Step 5: Handle advancement (navigate to next step or complete draft)
       if (advance) {
-        // Step 9 is the final step - show draft complete message
+        // Step 9 is the final step - show completion message
         if (stepNumber === 9) {
           toast.add({
-            title: 'Draft Complete!',
+            title: isEditingLiveListing ? 'Listing Updated' : 'Draft Complete!',
             icon: 'i-lucide-check-circle-2',
-            description: 'Your draft listing is ready to publish',
+            description: isEditingLiveListing ? 'Your changes have been saved' : 'Your draft listing is ready to publish',
             color: 'success',
             duration: 3000
           })
