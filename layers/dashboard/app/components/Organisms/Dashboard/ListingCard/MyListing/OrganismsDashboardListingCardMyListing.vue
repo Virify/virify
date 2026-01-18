@@ -166,6 +166,16 @@
       </div>
     </template>
 
+    <template #footer>
+      <USeparator class="my-3" />
+      <div class="flex justify-between items-center w-full">
+        <p class="body-xs text-muted-foreground">{{ dateLabel }}</p>
+        <div class="flex gap-2 items-center ml-auto">
+          <UIcon name="i-lucide-share-2" class="w-4 h-4 text-muted-foreground" />
+        </div>
+      </div>
+    </template>
+
     <!-- Archive Listing Confirmation Dialog -->
     <OrganismsDashboardConfirmDialog
       ref="archiveDialog"
@@ -278,6 +288,21 @@ const tierBadge = computed(() => {
   if (tier === "premium") return "Premium";
   if (tier === "featured") return "Featured";
   return null;
+});
+
+const dateLabel = computed(() => {
+  // Use updatedAt for the footer date
+  const date = (props.listing as any).updatedAt;
+  if (!date) return "";
+  
+  const dateObj = new Date(date);
+  const formatted = dateObj.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+  
+  return `Updated on: ${formatted}`;
 });
 
 /**
