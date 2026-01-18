@@ -20,8 +20,10 @@
       </h3>
 
       <div class="o-traditional-search-form__room-count-grid">
-        <MoleculesRoomCount :min="bedroomMin" :max="bedroomMax" room-type="bedrooms" />
-        <MoleculesRoomCount :min="bathroomMin" :max="bathroomMax" room-type="bathrooms" />
+        <MoleculesRoomCount v-model:min-count="formData.minBeds" v-model:max-count="formData.maxBeds" :min="bedroomMin"
+          :max="bedroomMax" room-type="bedrooms" />
+        <MoleculesRoomCount v-model:min-count="formData.minBathrooms" v-model:max-count="formData.maxBathrooms"
+          :min="bathroomMin" :max="bathroomMax" room-type="bathrooms" />
       </div>
     </section>
 
@@ -58,20 +60,14 @@ onBeforeMount(() => {
 })
 
 /**
- *  Form data
- */
-const formData = useState('search-contract-type', () => reactive({
-  isSale: false,
-  minPrice: 0,
-  maxPrice: 0,
-  price: <[number, number]>[0, 0],
-  saleIncludes: reactive<{ [key: string]: boolean }>({}),
-  rentIncludes: reactive<{ [key: string]: boolean }>({})
-}))
-
-/**
  *  Data
  */
+interface RoomCount {
+  key: number
+  value: string
+  selected?: boolean
+}
+
 const saleIncludesOptions = [
   { key: 'sold-stc', label: 'Include sold STC' },
   { key: 'shared-ownership', label: 'Include shared ownership' },
@@ -85,7 +81,7 @@ const rentIncludesOptions = [
   { key: 'long-term-lets', label: 'Include long-term lets' },
 ]
 
-const bedroomMin = [
+const bedroomMin: RoomCount[] = [
   { key: 0, value: 'Any', selected: true },
   { key: 0.5, value: 'Studio' },
   { key: 1, value: '1' },
@@ -98,7 +94,7 @@ const bedroomMin = [
   { key: 8, value: '8+' }
 ]
 
-const bedroomMax = [
+const bedroomMax: RoomCount[] = [
   { key: 0.5, value: 'Studio' },
   { key: 1, value: '1' },
   { key: 2, value: '2' },
@@ -111,7 +107,7 @@ const bedroomMax = [
   { key: 9, value: 'Any', selected: true }
 ]
 
-const bathroomMin = [
+const bathroomMin: RoomCount[] = [
   { key: 0, value: 'Any', selected: true },
   { key: 1, value: '1' },
   { key: 2, value: '2' },
@@ -120,7 +116,7 @@ const bathroomMin = [
   { key: 5, value: '5+' },
 ]
 
-const bathroomMax = [
+const bathroomMax: RoomCount[] = [
   { key: 1, value: '1' },
   { key: 2, value: '2' },
   { key: 3, value: '3' },
@@ -138,6 +134,27 @@ const additionalFeatures = [
   'Another feature',
   'And another',
 ]
+
+/**
+ *  Form data
+ */
+function getDefaultSelected(arr: RoomCount[]) {
+  return arr.find(({ selected }) => selected)?.key
+}
+
+const formData = useState('search-contract-type', () => reactive({
+  isSale: true,
+  minPrice: 0,
+  maxPrice: 0,
+  price: <[number, number]>[0, 0],
+  saleIncludes: reactive<{ [key: string]: boolean }>({}),
+  rentIncludes: reactive<{ [key: string]: boolean }>({}),
+  minBeds: <number>getDefaultSelected(bedroomMin),
+  maxBeds: <number>getDefaultSelected(bedroomMax),
+  minBathrooms: <number>getDefaultSelected(bathroomMin),
+  maxBathrooms: <number>getDefaultSelected(bathroomMax),
+}))
+
 </script>
 
 <style lang="scss">
