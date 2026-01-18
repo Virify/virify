@@ -1,12 +1,16 @@
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h3 class="font-medium text-sm text-muted">Kitchens</h3>
+      <h3 class="font-medium title-xs mb-0!">
+        Kitchens
+        <span class="body-xs text-(--foreground-200)/60 font-normal">optional</span>
+      </h3>
       <UButton
-        variant="outline"
+        variant="subtle"
         size="xs"
         icon="i-lucide-plus"
         class="body-sm"
+        color="secondary"
         @click="emit('add')"
       >
         Add Kitchen
@@ -14,9 +18,9 @@
     </div>
 
     <!-- Empty state -->
-    <div v-if="kitchens.length === 0" class="rounded-lg border border-dashed border-muted p-6 text-center">
-      <UIcon name="i-lucide-chef-hat" class="mx-auto h-10 w-10 text-muted" />
-      <p class="mt-2 text-sm text-muted">No kitchens added yet</p>
+    <div v-if="kitchens.length === 0" class="rounded-lg border border-dashed border-elevated p-6 text-center">
+      <UIcon name="i-lucide-chef-hat" class="mx-auto h-10 w-10 text-secondary/80" />
+      <p class="mt-2 text-sm text-muted italic">No kitchens added yet</p>
     </div>
 
     <!-- Kitchen cards (compact list) -->
@@ -25,25 +29,27 @@
         v-for="(kitchen, index) in kitchens"
         :key="index"
         variant="subtle"
-        :ui="{ body: 'p-0' }"
+        :ui="{ 
+          root: 'border border-secondary/30 ring-0!',
+          body: 'p-0'
+        }"
+        class="border-secondary!"
       >
         <template #header>
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3 min-w-0">
-              <UIcon name="i-lucide-chef-hat" class="h-5 w-5 text-muted shrink-0" />
+            <div class="flex items-start gap-3 min-w-0">
+              <UIcon name="i-lucide-chef-hat" class="h-5 w-5 text-muted shrink-0 mt-1" />
               <div class="min-w-0 flex-1 space-y-0.5">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
                   <span class="font-medium body-sm line-clamp-1">
                     {{ kitchen.name || `Kitchen ${index + 1}` }}
                   </span>
-                  <UBadge v-if="isKitchenComplete(kitchen)" color="primary" variant="subtle" size="md" class="shrink-0">
+                  <UBadge v-if="isKitchenComplete(kitchen)" color="secondary" variant="subtle" size="md" class="shrink-0">
                     Complete
                   </UBadge>
                 </div>
-                <p class="text-xs text-muted line-clamp-1">
-                  <span v-if="kitchen.features?.length">
-                    {{ kitchen.features.length }} feature{{ kitchen.features.length > 1 ? 's' : '' }}
-                  </span>
+                <p class="text-xs text-muted line-clamp-1 mt-2!">
+                  <span v-if="kitchen.features?.length">{{ kitchen.features.length }} feature{{ kitchen.features.length > 1 ? 's' : '' }}</span>
                   <span v-if="kitchen.size">
                     <span v-if="kitchen.features?.length"> · </span>
                     {{ kitchen.size }}m²

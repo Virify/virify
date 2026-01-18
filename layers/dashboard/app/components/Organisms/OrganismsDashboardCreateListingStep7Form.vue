@@ -14,8 +14,8 @@
     <!-- Collapsible Sections -->
     <UAccordion 
       :items="accordionItems" 
-      multiple
-      :default-value="['building', 'parking']"
+      type="multiple"
+      :default-value="['building']"
       :ui="{ 
         item: 'border border-default rounded-lg mb-3 last:border-b!',
         trigger: 'px-4 py-3 items-center',
@@ -27,35 +27,40 @@
       <!-- Building Features Section -->
       <template #building>
         <div class="space-y-5 p-4 pt-2">
-          <UFormField label="Description" name="property.additionalFeatures.description" description="Describe any special features or amenities">
+          <UFormField label="Description" name="property.additionalFeatures.description" description="Describe any special features or amenities" hint="optional" eager-validation>
             <UTextarea
               v-model="state.property.additionalFeatures!.description"
               placeholder="e.g. Recently renovated throughout, high ceilings, original period features..."
-              :rows="2"
+              :rows="3"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
           <div class="flex flex-col sm:flex-row gap-6">
             <div class="sm:w-48 shrink-0">
-              <UFormField label="Pet Friendly" name="property.additionalFeatures.petFriendly" description="Suitable for pets?">
+              <UFormField label="Pet Friendly" name="property.additionalFeatures.petFriendly" description="Suitable for pets?" hint="optional" eager-validation>
                 <USelect
                   v-model="state.property.additionalFeatures!.petFriendly"
                   :items="petFriendlyOptions"
+                  color="secondary"
                   class="w-full"
                 />
               </UFormField>
             </div>
 
             <div class="flex-1">
-              <UFormField label="Features" name="property.additionalFeatures.features" description="Select applicable features">
-                <div class="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+              <UFormField label="Features" name="property.additionalFeatures.features" description="Select applicable features" hint="optional" eager-validation>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-3 mt-2">
                   <UCheckbox
                     v-for="feature in buildingFeatureOptions"
                     :key="String(feature.value)"
+                    :id="`building-feature-${feature.value}`"
+                    :name="`building-feature-${feature.value}`"
                     :model-value="state.property.additionalFeatures!.features?.includes(feature.value)"
                     @update:model-value="(val: boolean | 'indeterminate') => toggleFeature('additionalFeatures', feature.value, val === true)"
                     :label="feature.label"
+                    color="secondary"
                   />
                 </div>
               </UFormField>
@@ -67,23 +72,27 @@
       <!-- Parking Section -->
       <template #parking>
         <div class="space-y-5 p-4 pt-2">
-          <UFormField label="Description" name="property.parking.description" description="Describe parking arrangements">
+          <UFormField label="Description" name="property.parking.description" description="Describe parking arrangements" hint="optional" eager-validation>
             <UTextarea
               v-model="state.property.parking!.description"
               placeholder="e.g. Private driveway with space for 2 cars, EV charging point available..."
-              :rows="2"
+              :rows="3"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Parking Options" name="property.parking.features" description="Select available options">
-            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+          <UFormField label="Parking Options" name="property.parking.features" description="Select available options" hint="optional" eager-validation>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-3 mt-2">
               <UCheckbox
                 v-for="feature in parkingFeatureOptions"
                 :key="String(feature.value)"
+                :id="`parking-feature-${feature.value}`"
+                :name="`parking-feature-${feature.value}`"
                 :model-value="state.property.parking!.features?.includes(feature.value)"
                 @update:model-value="(val: boolean | 'indeterminate') => toggleFeature('parking', feature.value, val === true)"
                 :label="feature.label"
+                color="secondary"
               />
             </div>
           </UFormField>
@@ -93,23 +102,27 @@
       <!-- Security Section -->
       <template #security>
         <div class="space-y-5 p-4 pt-2">
-          <UFormField label="Description" name="property.securityFeatures.description" description="Describe security measures">
+          <UFormField label="Description" name="property.securityFeatures.description" description="Describe security measures" hint="optional" eager-validation>
             <UTextarea
               v-model="state.property.securityFeatures!.description"
               placeholder="e.g. Gated community with 24/7 security, CCTV coverage..."
-              :rows="2"
+              :rows="3"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Security Features" name="property.securityFeatures.features" description="Select available features">
-            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+          <UFormField label="Security Features" name="property.securityFeatures.features" description="Select available features" hint="optional" eager-validation>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-3 mt-2">
               <UCheckbox
                 v-for="feature in securityFeatureOptions"
                 :key="String(feature.value)"
+                :id="`security-feature-${feature.value}`"
+                :name="`security-feature-${feature.value}`"
                 :model-value="state.property.securityFeatures!.features?.includes(feature.value)"
                 @update:model-value="(val: boolean | 'indeterminate') => toggleFeature('securityFeatures', feature.value, val === true)"
                 :label="feature.label"
+                color="secondary"
               />
             </div>
           </UFormField>
@@ -119,23 +132,27 @@
       <!-- Accessibility Section -->
       <template #accessibility>
         <div class="space-y-5 p-4 pt-2">
-          <UFormField label="Description" name="property.accessibilityFeatures.description" description="Describe accessibility features">
+          <UFormField label="Description" name="property.accessibilityFeatures.description" description="Describe accessibility features" hint="optional" eager-validation>
             <UTextarea
               v-model="state.property.accessibilityFeatures!.description"
               placeholder="e.g. Ground floor living, wide doorways throughout, wet room bathroom..."
-              :rows="2"
+              :rows="3"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Accessibility Features" name="property.accessibilityFeatures.features" description="Select available features">
-            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+          <UFormField label="Accessibility Features" name="property.accessibilityFeatures.features" description="Select available features" hint="optional" eager-validation>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-3 mt-2">
               <UCheckbox
                 v-for="feature in accessibilityFeatureOptions"
                 :key="String(feature.value)"
+                :id="`accessibility-feature-${feature.value}`"
+                :name="`accessibility-feature-${feature.value}`"
                 :model-value="state.property.accessibilityFeatures!.features?.includes(feature.value)"
                 @update:model-value="(val: boolean | 'indeterminate') => toggleFeature('accessibilityFeatures', feature.value, val === true)"
                 :label="feature.label"
+                color="secondary"
               />
             </div>
           </UFormField>
@@ -145,23 +162,27 @@
       <!-- Storage Section -->
       <template #storage>
         <div class="space-y-5 p-4 pt-2">
-          <UFormField label="Description" name="property.storageFeatures.description" description="Describe storage facilities">
+          <UFormField label="Description" name="property.storageFeatures.description" description="Describe storage facilities" hint="optional" eager-validation>
             <UTextarea
               v-model="state.property.storageFeatures!.description"
               placeholder="e.g. Large loft with pull-down ladder, garden shed, built-in wardrobes..."
-              :rows="2"
+              :rows="3"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Storage Features" name="property.storageFeatures.features" description="Select available options">
-            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+          <UFormField label="Storage Features" name="property.storageFeatures.features" description="Select available options" hint="optional" eager-validation>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-3 mt-2">
               <UCheckbox
                 v-for="feature in storageFeatureOptions"
                 :key="String(feature.value)"
+                :id="`storage-feature-${feature.value}`"
+                :name="`storage-feature-${feature.value}`"
                 :model-value="state.property.storageFeatures!.features?.includes(feature.value)"
                 @update:model-value="(val: boolean | 'indeterminate') => toggleFeature('storageFeatures', feature.value, val === true)"
                 :label="feature.label"
+                color="secondary"
               />
             </div>
           </UFormField>
@@ -171,44 +192,54 @@
       <!-- Utility Room Section -->
       <template #utility>
         <div class="space-y-5 p-4 pt-2">
-          <UFormField label="Description" name="property.utility.description" description="Describe the utility room">
+          <UFormField label="Description" name="property.utility.description" description="Describe the utility room" hint="optional" eager-validation>
             <UTextarea
               v-model="state.property.utility!.description"
               placeholder="e.g. Spacious utility with plumbing for washer and dryer, extra storage..."
-              :rows="2"
+              :rows="3"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Room Size" name="property.utility.size" description="Size of the utility room">
-            <div class="flex gap-2 max-w-xs">
-              <UInput
-                :model-value="utilitySizeDisplay"
-                @update:model-value="updateUtilitySize"
-                type="number"
-                :min="0"
-                placeholder="e.g. 8"
-                class="flex-1"
-              />
-              <USelect
-                v-model="utilitySizeUnit"
-                :items="sizeUnitItems"
-                class="w-24"
-              />
+          <div class="flex flex-col sm:flex-row gap-6">
+            <div class="sm:w-64 shrink-0">
+              <UFormField label="Room Size" name="property.utility.size" description="Size of the utility room" hint="optional">
+                <div class="flex gap-2">
+                  <UInput
+                    :model-value="utilitySizeDisplay"
+                    @update:model-value="updateUtilitySize"
+                    type="number"
+                    :min="0"
+                    placeholder="e.g. 8"
+                    color="secondary"
+                    class="flex-1"
+                  />
+                  <USelect
+                    v-model="utilitySizeUnit"
+                    :items="sizeUnitItems"
+                    class="w-24"
+                    color="secondary"
+                  />
+                </div>
+              </UFormField>
             </div>
-          </UFormField>
 
-          <UFormField label="Utility Features" name="property.utility.features" description="Select available features">
-            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-2">
-              <UCheckbox
-                v-for="feature in utilityFeatureOptions"
-                :key="String(feature.value)"
-                :model-value="state.property.utility!.features?.includes(feature.value)"
-                @update:model-value="(val: boolean | 'indeterminate') => toggleFeature('utility', feature.value, val === true)"
-                :label="feature.label"
-              />
+            <div class="flex-1">
+              <UFormField label="Utility Features" name="property.utility.features" description="Select available features" hint="optional">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3 mt-2">
+                  <UCheckbox
+                    v-for="feature in utilityFeatureOptions"
+                    :key="String(feature.value)"
+                    :model-value="state.property.utility!.features?.includes(feature.value)"
+                    @update:model-value="(val: boolean | 'indeterminate') => toggleFeature('utility', feature.value, val === true)"
+                    :label="feature.label"
+                    color="secondary"
+                  />
+                </div>
+              </UFormField>
             </div>
-          </UFormField>
+          </div>
         </div>
       </template>
     </UAccordion>
@@ -216,10 +247,6 @@
 </template>
 
 <script setup lang="ts">
-// Uses auto-imported types and utils from shared/utils/listing-step7-schema.ts:
-// - step7Schema, Step7FormData, createInitialStep7Values, step7Validation
-// Uses auto-imported options from layers/dashboard/app/utils/step7.ts
-
 const { getStepData } = useCreateListingSteps()
 
 // Initialize state from saved data or empty

@@ -20,6 +20,7 @@
             type="number"
             :min="1"
             placeholder="e.g. 350000"
+            color="secondary"
             class="w-full"
           >
             <template #leading>
@@ -34,6 +35,7 @@
           <USelect
             v-model="state.saleListing!.priceType"
             :items="priceTypeItems"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -56,6 +58,7 @@
             type="number"
             :min="1"
             placeholder="e.g. 1500"
+            color="secondary"
             class="w-full"
           >
             <template #leading>
@@ -70,6 +73,7 @@
           <USelect
             v-model="state.rentalListing!.rentFrequency"
             :items="rentFrequencyItems"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -82,6 +86,7 @@
             type="number"
             :min="0"
             placeholder="e.g. 1500"
+            color="secondary"
             class="w-full"
           >
             <template #leading>
@@ -97,6 +102,7 @@
             v-model.number="state.rentalListing!.holdingDeposit"
             type="number"
             :min="0"
+            color="secondary"
             placeholder="e.g. 300"
             class="w-full"
           >

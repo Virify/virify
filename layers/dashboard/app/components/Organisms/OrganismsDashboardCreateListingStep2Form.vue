@@ -12,7 +12,7 @@
     @saved="onStepSaved"
   >
     <!-- Row 1: Address, Type, Classification -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
       <OrganismsDashboardProfileAddressLookup
         v-model="state.property.address"
         :pending="false"
@@ -36,6 +36,7 @@
           v-model="state.property.classification" 
           :items="classificationItems" 
           :disabled="!state.property.type"
+          color="secondary"
           size="lg"
           :placeholder="state.property.type ? 'Select' : 'Select type first'"
           class="w-full"
@@ -44,54 +45,59 @@
     </div>
 
     <!-- Row 2: Floors, Construction, Size, Year Built -->
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-4">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
       <UFormField label="Total Floors" name="property.totalFloors" description="Number of floors" required eagerValidation>
         <UInput 
           v-model.number="state.property.totalFloors" 
           type="number"
           :min="1"
           :max="100"
+          color="secondary"
           size="lg"
           placeholder="e.g. 2"
           class="w-full"
         />
       </UFormField>
 
-      <UFormField label="Construction" name="property.constructionType" description="Build type">
+      <UFormField label="Construction" name="property.constructionType" description="Build type" hint="optional">
         <USelect 
           v-model="state.property.constructionType" 
           :items="constructionTypeItems" 
           placeholder="Select"
+          color="secondary"
           size="lg"
           class="w-full"
         />
       </UFormField>
 
-      <UFormField label="Property Size" name="property.size" description="Square meters (optional)">
+      <UFormField label="Property Size" name="property.size" description="Total size of the property" hint="optional">
         <div class="flex gap-2">
           <UInput 
             v-model.number="sizeInput" 
             type="number"
             :min="1"
             size="lg"
+            color="secondary"
             placeholder="e.g. 85"
             class="flex-1"
           />
           <USelect 
             v-model="sizeUnit" 
             :items="sizeUnitItems"
+            color="secondary"
             class="w-20"
           />
         </div>
       </UFormField>
 
-      <UFormField label="Year Built" name="property.yearBuilt" description="(optional)">
+      <UFormField label="Year Built" name="property.yearBuilt" description="Year the property was built" hint="optional">
         <UInput 
           v-model="state.property.yearBuilt" 
           type="number"
           :min="1500"
           size="lg"
           :max="currentYear"
+          color="secondary"
           placeholder="e.g. 1995"
           class="w-full"
         />
@@ -104,6 +110,7 @@
         v-model="state.property.description" 
         placeholder="e.g. 'This charming 2-bedroom apartment offers stunning views...'"
         :rows="4"
+        color="secondary"
         class="w-full"
       />
     </UFormField>

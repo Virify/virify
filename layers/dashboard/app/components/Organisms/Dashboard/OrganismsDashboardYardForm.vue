@@ -1,12 +1,16 @@
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h3 class="font-medium text-sm text-muted">Yards</h3>
+      <h3 class="font-medium title-xs mb-0!">
+        Yards
+        <span class="body-xs text-(--foreground-200)/60 font-normal">optional</span>
+      </h3>
       <UButton
-        variant="outline"
+        variant="subtle"
         size="xs"
         icon="i-lucide-plus"
         class="body-sm"
+        color="secondary"
         @click="emit('add')"
       >
         Add Yard
@@ -14,9 +18,9 @@
     </div>
 
     <!-- Empty state -->
-    <div v-if="yards.length === 0" class="rounded-lg border border-dashed border-muted p-6 text-center">
-      <UIcon name="i-lucide-fence" class="mx-auto h-10 w-10 text-muted" />
-      <p class="mt-2 text-sm text-muted">No yards added yet</p>
+    <div v-if="yards.length === 0" class="rounded-lg border border-dashed border-elevated p-6 text-center">
+      <UIcon name="i-lucide-fence" class="mx-auto h-10 w-10 text-secondary/80" />
+      <p class="mt-2 text-sm text-muted italic">No yards added yet</p>
     </div>
 
     <!-- Yard cards (compact list) -->
@@ -25,7 +29,11 @@
         v-for="(yard, index) in yards"
         :key="index"
         variant="subtle"
-        :ui="{ body: 'p-0' }"
+        :ui="{
+          root: 'border border-secondary/30 ring-0!',
+          body: 'p-0'
+        }"
+        class="border-secondary!"
       >
         <template #header>
           <div class="flex items-center justify-between">
@@ -36,7 +44,7 @@
                   <span class="font-medium body-sm line-clamp-1">
                     {{ yard.name || `Yard ${index + 1}` }}
                   </span>
-                  <UBadge v-if="isYardComplete(yard)" color="primary" variant="subtle" size="md" class="shrink-0">
+                  <UBadge v-if="isYardComplete(yard)" color="secondary" variant="subtle" size="md" class="shrink-0">
                     Complete
                   </UBadge>
                 </div>

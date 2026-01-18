@@ -13,6 +13,7 @@
             v-model="otherRoom.name"
             placeholder="e.g. Home Office, Gym"
             size="lg"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -24,6 +25,7 @@
               v-model="otherRoom.floor"
               :items="floorOptions"
               size="lg"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
@@ -34,13 +36,14 @@
               :items="getOtherRoomTypeOptions()"
               placeholder="Select type"
               size="lg"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
         </div>
 
         <!-- Room Size -->
-        <UFormField label="Room Size" :name="`property.otherRoom.${otherRoomIndex}.size`" description="Size of the room">
+        <UFormField label="Room Size" :name="`property.otherRoom.${otherRoomIndex}.size`" description="Size of the room" hint="optional">
           <div class="flex gap-2">
             <UInput
               :model-value="sizeDisplay"
@@ -49,19 +52,21 @@
               :min="0"
               placeholder="e.g. 15"
               size="lg"
+              color="secondary"
               class="flex-1"
             />
             <USelect
               v-model="sizeUnit"
               :items="sizeUnitItems"
               size="lg"
+              color="secondary"
               class="w-24"
             />
           </div>
         </UFormField>
 
         <!-- Features -->
-        <UFormField label="Room Features" :name="`property.otherRoom.${otherRoomIndex}.features`" description="Optional: Select any additional features">
+        <UFormField label="Room Features" :name="`property.otherRoom.${otherRoomIndex}.features`" description="Select any additional features" hint="optional">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
               v-for="feature in getOtherRoomFeatureOptions()"
@@ -70,16 +75,18 @@
               :model-value="otherRoom.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
+              color="secondary"
             />
           </div>
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.otherRoom.${otherRoomIndex}.description`" description="Add any details about this room">
+        <UFormField label="Description" :name="`property.otherRoom.${otherRoomIndex}.description`" description="Add any details about this room" hint="optional">
           <UTextarea
             v-model="otherRoom.description"
             placeholder="Describe this room..."
             :rows="3"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -90,7 +97,7 @@
       <div class="flex justify-end gap-3 p-4 w-full">
         <UButton
           variant="outline"
-          color="neutral"
+          color="secondary"
           size="sm"
           class="body-sm"
           @click="handleCancel"
@@ -98,7 +105,7 @@
           Cancel
         </UButton>
         <UButton
-          color="primary"
+          color="secondary"
           variant="solid"
           :disabled="!otherRoom || !isOtherRoomComplete(otherRoom) || isSaving"
           :loading="isSaving"

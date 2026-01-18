@@ -13,37 +13,40 @@
             v-model="yard.name"
             placeholder="e.g. Courtyard, Side Yard"
             size="lg"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
 
         <!-- Position & Facing -->
         <div class="grid grid-cols-2 gap-4">
-          <UFormField label="Position" :name="`property.outdoorSpace.yard.${yardIndex}.position`" description="Select the yard position" eagerValidation>
+          <UFormField label="Position" :name="`property.outdoorSpace.yard.${yardIndex}.position`" description="Select the yard position" eagerValidation hint="optional">
             <USelect
               :model-value="(yard.position as GardenPosition | undefined) ?? undefined"
               @update:model-value="(val) => { if (yard) yard.position = val ?? null }"
               :items="gardenPositionOptions"
               placeholder="Select position"
               size="lg"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Facing" :name="`property.outdoorSpace.yard.${yardIndex}.facing`" description="Select the facing direction" eagerValidation>
+          <UFormField label="Facing" :name="`property.outdoorSpace.yard.${yardIndex}.facing`" description="Select the facing direction" eagerValidation hint="optional">
             <USelect
               :model-value="(yard.facing as GardenFacing | undefined) ?? undefined"
               @update:model-value="(val) => { if (yard) yard.facing = val ?? null }"
               :items="gardenFacingOptions"
               placeholder="Select facing"
               size="lg"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
         </div>
 
         <!-- Size -->
-        <UFormField label="Yard Size" :name="`property.outdoorSpace.yard.${yardIndex}.size`" description="Size of the yard">
+        <UFormField label="Yard Size" :name="`property.outdoorSpace.yard.${yardIndex}.size`" description="Size of the yard" hint="optional">
           <div class="flex gap-2">
             <UInput
               :model-value="sizeDisplay"
@@ -52,19 +55,21 @@
               :min="0"
               placeholder="e.g. 30"
               size="lg"
+              color="secondary"
               class="flex-1"
             />
             <USelect
               v-model="sizeUnit"
               :items="sizeUnitItems"
               size="lg"
+              color="secondary"
               class="w-24"
             />
           </div>
         </UFormField>
 
         <!-- Features -->
-        <UFormField label="Yard Features" :name="`property.outdoorSpace.yard.${yardIndex}.features`" description="Optional: Select any additional features">
+        <UFormField label="Yard Features" :name="`property.outdoorSpace.yard.${yardIndex}.features`" description="Select any additional features" hint="optional">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
               v-for="feature in outdoorSpaceFeatureOptions"
@@ -73,16 +78,18 @@
               :model-value="yard.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
+              color="secondary"
             />
           </div>
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.outdoorSpace.yard.${yardIndex}.description`" description="Add any details about this yard">
+        <UFormField label="Description" :name="`property.outdoorSpace.yard.${yardIndex}.description`" description="Add any details about this yard" hint="optional">
           <UTextarea
             v-model="yard.description"
             placeholder="Describe this yard..."
             :rows="3"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -93,7 +100,7 @@
       <div class="flex justify-end gap-3 p-4 w-full">
         <UButton
           variant="outline"
-          color="neutral"
+          color="secondary"
           size="sm"
           class="body-sm"
           @click="handleCancel"
@@ -101,7 +108,7 @@
           Cancel
         </UButton>
         <UButton
-          color="primary"
+          color="secondary"
           variant="solid"
           :disabled="!yard || !isYardValid || isSaving"
           :loading="isSaving"

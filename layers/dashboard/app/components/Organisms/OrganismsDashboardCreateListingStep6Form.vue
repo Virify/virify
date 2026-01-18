@@ -11,6 +11,55 @@
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
+    <!-- General Outdoor Space Info -->
+    <div class="space-y-5 mb-6">
+      <UFormField label="Outdoor Space Description" name="property.outdoorSpace.description" description="Describe your general outdoor space" hint="optional" eager-validation>
+        <UTextarea
+          v-model="state.property.outdoorSpace.description"
+          placeholder="e.g. Landscaped gardens, private outdoor area, south-facing aspect..."
+          :rows="3"
+          color="secondary"
+          class="w-full"
+        />
+      </UFormField>
+
+      <div class="flex flex-col sm:flex-row gap-6">
+        <div class="sm:w-64 shrink-0">
+          <UFormField label="Total Outdoor Area" name="property.outdoorSpace.totalArea" description="Combined size of all outdoor spaces" hint="optional" eager-validation>
+            <UInput
+              v-model.number="state.property.outdoorSpace.totalArea"
+              type="number"
+              :min="0"
+              placeholder="e.g. 500"
+              color="secondary"
+              class="w-full"
+            >
+              <template #trailing>
+                <span class="text-muted text-sm">m²</span>
+              </template>
+            </UInput>
+          </UFormField>
+        </div>
+
+        <div class="flex-1">
+          <UFormField label="General Outdoor Features" name="property.outdoorSpace.features" description="Features that apply to overall outdoor space" hint="optional" eager-validation>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3 mt-2">
+              <UCheckbox
+                v-for="feature in outdoorSpaceFeatureOptions"
+                :key="String(feature.value)"
+                :id="`outdoor-feature-${feature.value}`"
+                :name="`outdoor-feature-${feature.value}`"
+                :model-value="state.property.outdoorSpace.features?.includes(feature.value)"
+                @update:model-value="(val: boolean | 'indeterminate') => toggleOutdoorFeature(feature.value, val === true)"
+                :label="feature.label"
+                color="secondary"
+              />
+            </div>
+          </UFormField>
+        </div>
+      </div>
+    </div>
+
     <!-- Gardens Section -->
     <OrganismsDashboardGardenForm
       :gardens="state.property.outdoorSpace.garden"
@@ -68,10 +117,6 @@
 </template>
 
 <script setup lang="ts">
-// Uses auto-imported types and utils from shared/utils/listing-step6-schema.ts:
-// - step6Schema, Step6FormData, GardenData, YardData, LandData
-// - createInitialStep6Values, step6Validation
-
 const { getStepData, saveRoomData, isSaving } = useCreateListingSteps()
 
 // Initialize state from saved data or empty
@@ -115,6 +160,16 @@ const editingLand = computed((): LandData | null =>
 const isFormValid = computed(() => {
   return step6Validation.isStep6Valid(state)
 })
+
+// Toggle outdoor feature
+function toggleOutdoorFeature(value: string, checked: boolean) {
+  const current = state.property.outdoorSpace.features ?? []
+  if (checked) {
+    state.property.outdoorSpace.features = [...current, value]
+  } else {
+    state.property.outdoorSpace.features = current.filter((v) => v !== value)
+  }
+}
 
 // Garden handlers
 const addGarden = () => {

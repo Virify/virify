@@ -228,6 +228,49 @@ export function loadStep7FromDraft(draft: DraftListingWithFullPayload) {
   return null
 }
 
+export function loadStep8FromDraft(draft: DraftListingWithFullPayload) {
+  const property = draft.property
+  if (property?.energyAndUtilities || property?.runningCosts) {
+    return {
+      property: {
+        energyAndUtilities: property.energyAndUtilities ? {
+          description: property.energyAndUtilities.description ?? null,
+          epcRating: property.energyAndUtilities.epcRating ?? 'G',
+          epcCertificateUrl: property.energyAndUtilities.epcCertificateUrl ?? null,
+          primaryHeatingType: property.energyAndUtilities.primaryHeatingType ?? [],
+          secondaryHeatingType: property.energyAndUtilities.secondaryHeatingType ?? [],
+          boilerType: property.energyAndUtilities.boilerType ?? null,
+          hotWaterSource: property.energyAndUtilities.hotWaterSource ?? null,
+          renewables: property.energyAndUtilities.renewables ?? [],
+          connectedUtilities: property.energyAndUtilities.connectedUtilities ?? [],
+        } : {
+          description: null,
+          epcRating: 'G',
+          epcCertificateUrl: null,
+          primaryHeatingType: [],
+          secondaryHeatingType: [],
+          boilerType: null,
+          hotWaterSource: null,
+          renewables: [],
+          connectedUtilities: [],
+        },
+        runningCosts: property.runningCosts ? {
+          description: property.runningCosts.description ?? null,
+          councilTaxBand: property.runningCosts.councilTaxBand ?? 'A',
+          serviceCharges: property.runningCosts.serviceCharges ?? null,
+          groundRent: property.runningCosts.groundRent ?? null,
+        } : {
+          description: null,
+          councilTaxBand: 'A',
+          serviceCharges: null,
+          groundRent: null,
+        },
+      }
+    }
+  }
+  return null
+}
+
 /**
  * Populate all step data from a draft listing
  * Returns a record of step data indexed by step number
@@ -255,6 +298,9 @@ export function populateAllStepsFromDraft(draft: DraftListingWithFullPayload): R
   
   const step7Data = loadStep7FromDraft(draft)
   if (step7Data) stepData[7] = step7Data
+  
+  const step8Data = loadStep8FromDraft(draft)
+  if (step8Data) stepData[8] = step8Data
   
   // Additional steps can be added here as they are built
   

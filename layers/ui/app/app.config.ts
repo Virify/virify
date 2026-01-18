@@ -13,7 +13,19 @@ export default defineAppConfig({
       background: "",
       rounded: "",
     },
+    select: {
+      slots: {
+        base: "bg-(--background-200)! placeholder:text-(--foreground-200)/60! focus:outline-none!",
+        group: "bg-(--background-200)!",
+        item: 'hover:bg-(--background-300)/50! focus:outline-none! cursor-pointer!',
+        placeholder: "text-(--foreground-200)/60!",
+      },
+    },
     input: {
+      slots: {
+        base: "bg-(--background-200)! placeholder:text-(--foreground-200)/60! focus:outline-none! ",
+        input: "text-(--foreground-100)",
+      },
       compoundVariants: [
         {
           variant: "subtle",
@@ -22,12 +34,30 @@ export default defineAppConfig({
       ],
     },
     textarea: {
+      slots: {
+        base: "bg-(--background-200)! placeholder:text-(--foreground-200)/60! focus:outline-none!",
+      },
       compoundVariants: [
         {
           variant: "subtle",
           class: "outline-0!",
         },
       ],
+    },
+    toast: {
+      slots: {
+        root: "bg-(--background-200)",
+      },
+    },
+    formField: {
+      slots: {
+        label: "body-sm text-(--foreground-100) font-semibold",
+        description: "body-xs text-(--foreground-200)/60",
+        root: "flex flex-col gap-1.5",
+        error: "w-full body-xs",
+        help: "body-xs text-(--foreground-200)/60 mt-1",
+        hint: "body-xs text-(--foreground-200)/60",
+      },
     },
     navigationMenu: {
       compoundVariants: [
@@ -93,24 +123,5 @@ export default defineAppConfig({
         },
       ],
     },
-    toast: {
-      slots: {
-        root: 'bg-(--background-200)'
-      },
-    },
-    formField: {
-      slots: {
-        label: 'body-sm text-(--foreground-100)',
-        description: 'body-xs text-(--foreground-200)/60',
-        root: 'flex flex-col gap-1.5',
-        error: 'w-full body-xs',
-        help: 'body-xs text-(--foreground-200)/60 mt-1',
-      }
-    },
-    select: {
-      slots: {
-        
-      }
-    }
   },
 });

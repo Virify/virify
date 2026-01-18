@@ -1,12 +1,16 @@
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h3 class="font-medium text-sm text-muted">Additional Land</h3>
+      <h3 class="font-medium title-xs mb-0!">
+        Additional Land
+        <span class="body-xs text-(--foreground-200)/60 font-normal">optional</span>
+      </h3>
       <UButton
-        variant="outline"
+        variant="subtle"
         size="xs"
         icon="i-lucide-plus"
         class="body-sm"
+        color="secondary"
         @click="emit('add')"
       >
         Add Land
@@ -14,9 +18,9 @@
     </div>
 
     <!-- Empty state -->
-    <div v-if="landParcels.length === 0" class="rounded-lg border border-dashed border-muted p-6 text-center">
-      <UIcon name="i-lucide-trees" class="mx-auto h-10 w-10 text-muted" />
-      <p class="mt-2 text-sm text-muted">No additional land added yet</p>
+    <div v-if="landParcels.length === 0" class="rounded-lg border border-dashed border-elevated p-6 text-center">
+      <UIcon name="i-lucide-trees" class="mx-auto h-10 w-10 text-secondary/80" />
+      <p class="mt-2 text-sm text-muted italic">No additional land added yet</p>
     </div>
 
     <!-- Land cards (compact list) -->
@@ -25,7 +29,11 @@
         v-for="(land, index) in landParcels"
         :key="index"
         variant="subtle"
-        :ui="{ body: 'p-0' }"
+        :ui="{
+          root: 'border border-secondary/30 ring-0!',
+          body: 'p-0'
+        }"
+        class="border-secondary!"
       >
         <template #header>
           <div class="flex items-center justify-between">
@@ -36,7 +44,7 @@
                   <span class="font-medium body-sm line-clamp-1">
                     {{ land.name || `Land ${index + 1}` }}
                   </span>
-                  <UBadge v-if="isLandComplete(land)" color="primary" variant="subtle" size="md" class="shrink-0">
+                  <UBadge v-if="isLandComplete(land)" color="secondary" variant="subtle" size="md" class="shrink-0">
                     Complete
                   </UBadge>
                 </div>

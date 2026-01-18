@@ -13,6 +13,7 @@
             v-model="reception.name"
             placeholder="e.g. Living Room, Lounge"
             size="lg"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -24,6 +25,7 @@
               v-model="reception.floor"
               :items="floorOptions"
               size="lg"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
@@ -34,13 +36,14 @@
               :items="getReceptionTypeOptions()"
               placeholder="Select type"
               size="lg"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
         </div>
 
         <!-- Room Size -->
-        <UFormField label="Room Size" :name="`property.reception.${receptionIndex}.size`" description="Size of the reception">
+        <UFormField label="Room Size" :name="`property.reception.${receptionIndex}.size`" description="Size of the reception" hint="optional">
           <div class="flex gap-2">
             <UInput
               :model-value="sizeDisplay"
@@ -49,19 +52,21 @@
               :min="0"
               placeholder="e.g. 25"
               size="lg"
+              color="secondary"
               class="flex-1"
             />
             <USelect
               v-model="sizeUnit"
               :items="sizeUnitItems"
               size="lg"
+              color="secondary"
               class="w-24"
             />
           </div>
         </UFormField>
 
         <!-- Features -->
-        <UFormField label="Reception Features" :name="`property.reception.${receptionIndex}.features`" description="Optional: Select any additional features">
+        <UFormField label="Reception Features" :name="`property.reception.${receptionIndex}.features`" description="Select any additional features" hint="optional">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
               v-for="feature in getReceptionFeatureOptions()"
@@ -70,16 +75,18 @@
               :model-value="reception.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
+              color="secondary"
             />
           </div>
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.reception.${receptionIndex}.description`" description="Add any details about this reception">
+        <UFormField label="Description" :name="`property.reception.${receptionIndex}.description`" description="Add any details about this reception" hint="optional">
           <UTextarea
             v-model="reception.description"
             placeholder="Describe this reception..."
             :rows="3"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -90,7 +97,7 @@
       <div class="flex justify-end gap-3 p-4 w-full">
         <UButton
           variant="outline"
-          color="neutral"
+          color="secondary"
           size="sm"
           class="body-sm"
           @click="handleCancel"
@@ -98,7 +105,7 @@
           Cancel
         </UButton>
         <UButton
-          color="primary"
+          color="secondary"
           variant="solid"
           :disabled="!reception || !isReceptionComplete(reception) || isSaving"
           :loading="isSaving"

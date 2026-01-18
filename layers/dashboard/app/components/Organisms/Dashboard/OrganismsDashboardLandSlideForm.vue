@@ -13,12 +13,13 @@
             v-model="land.name"
             placeholder="e.g. Paddock, Woodland"
             size="lg"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
 
         <!-- Size -->
-        <UFormField label="Land Size" :name="`property.outdoorSpace.land.${landIndex}.size`" description="Size of the land parcel">
+        <UFormField label="Land Size" :name="`property.outdoorSpace.land.${landIndex}.size`" description="Size of the land parcel" hint="optional">
           <div class="flex gap-2">
             <UInput
               :model-value="sizeDisplay"
@@ -27,19 +28,21 @@
               :min="0"
               placeholder="e.g. 500"
               size="lg"
+              color="secondary"
               class="flex-1"
             />
             <USelect
               v-model="sizeUnit"
               :items="sizeUnitItems"
               size="lg"
+              color="secondary"
               class="w-24"
             />
           </div>
         </UFormField>
 
         <!-- Features -->
-        <UFormField label="Land Features" :name="`property.outdoorSpace.land.${landIndex}.features`" description="Optional: Select any additional features">
+        <UFormField label="Land Features" :name="`property.outdoorSpace.land.${landIndex}.features`" description="Select any additional features" hint="optional">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
               v-for="feature in landFeatureOptions"
@@ -48,16 +51,18 @@
               :model-value="land.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
+              color="secondary"
             />
           </div>
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.outdoorSpace.land.${landIndex}.description`" description="Add any details about this land parcel">
+        <UFormField label="Description" :name="`property.outdoorSpace.land.${landIndex}.description`" description="Add any details about this land parcel" hint="optional">
           <UTextarea
             v-model="land.description"
             placeholder="Describe this land..."
             :rows="3"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -68,7 +73,7 @@
       <div class="flex justify-end gap-3 p-4 w-full">
         <UButton
           variant="outline"
-          color="neutral"
+          color="secondary"
           size="sm"
           class="body-sm"
           @click="handleCancel"
@@ -76,7 +81,7 @@
           Cancel
         </UButton>
         <UButton
-          color="primary"
+          color="secondary"
           variant="solid"
           :disabled="!land || !isLandValid || isSaving"
           :loading="isSaving"

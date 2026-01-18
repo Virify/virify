@@ -12,4 +12,5 @@ export interface CreateListingStep {
   value: string
   completed: boolean
   locked: boolean
+  icon: string
 }

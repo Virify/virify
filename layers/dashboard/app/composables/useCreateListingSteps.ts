@@ -67,15 +67,15 @@ export const useCreateListingSteps = createSharedComposable(() => {
   // Define all steps with initial state (all locked except step 1)
   // Note: Address is now part of Step 2 (Property Basics)
   const steps = ref<CreateListingStep[]>([
-    { id: 1, title: "Listing Type", content: "Sale or rental details", slot: "step1", value: '1', completed: false, locked: false },
-    { id: 2, title: "Property Basics", content: "Address, type and description", slot: "step2", value: '2', completed: false, locked: true },
-    { id: 3, title: "Price", content: "Pricing details", slot: "step3", value: '3', completed: false, locked: true },
-    { id: 4, title: "Bedrooms & Bathrooms", content: "Room details", slot: "step4", value: '4', completed: false, locked: true },
-    { id: 5, title: "Living Spaces", content: "Kitchens, receptions & other rooms", slot: "step5", value: '5', completed: false, locked: true },
-    { id: 6, title: "Outdoor & Utilities", content: "Gardens and outdoor space", slot: "step6", value: '6', completed: false, locked: true },
-    { id: 7, title: "Additional Features", content: "Parking, security & storage", slot: "step7", value: '7', completed: false, locked: true },
-    { id: 8, title: "Energy & Costs", content: "EPC and running costs", slot: "step8", value: '8', completed: false, locked: true },
-    { id: 9, title: "Property Images", content: "Upload photos", slot: "step9", value: '9', completed: false, locked: true },
+    { id: 1, title: "Listing Type", content: "Sale or rental details", slot: "step1", value: '1', completed: false, locked: false, icon: 'i-lucide-home' },
+    { id: 2, title: "Property Basics", content: "Address, type and description", slot: "step2", value: '2', completed: false, locked: true, icon: 'i-lucide-info' },
+    { id: 3, title: "Price", content: "Pricing details", slot: "step3", value: '3', completed: false, locked: true, icon: 'i-lucide-pound-sterling' },
+    { id: 4, title: "Bedrooms & Bathrooms", content: "Room details", slot: "step4", value: '4', completed: false, locked: true, icon: 'i-lucide-bed' },
+    { id: 5, title: "Living Spaces", content: "Kitchens, receptions & other rooms", slot: "step5", value: '5', completed: false, locked: true, icon: 'i-lucide-sofa' },
+    { id: 6, title: "Outdoor & Utilities", content: "Gardens and outdoor space", slot: "step6", value: '6', completed: false, locked: true, icon: 'i-lucide-trees' },
+    { id: 7, title: "Additional Features", content: "Parking, security & storage", slot: "step7", value: '7', completed: false, locked: true, icon: 'i-lucide-sparkles' },
+    { id: 8, title: "Energy & Costs", content: "EPC and running costs", slot: "step8", value: '8', completed: false, locked: true, icon: 'i-lucide-zap' },
+    { id: 9, title: "Property Images", content: "Upload photos", slot: "step9", value: '9', completed: false, locked: true, icon: 'i-lucide-image' },
   ])
 
   // Modal states - using a Map for cleaner access

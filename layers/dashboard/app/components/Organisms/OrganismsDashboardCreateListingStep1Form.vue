@@ -15,7 +15,13 @@
     <div class="flex flex-wrap justify-between gap-6">
       <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
         <UFormField label="Sale or Rental?" name="selectedType" description="Type of listing" required eagerValidation>
-          <USelect v-model="state.selectedType" :items="listingTypeItems" @update:model-value="onListingTypeChange" class="w-full" />
+          <USelect
+            v-model="state.selectedType"
+            :items="listingTypeItems"
+            @update:model-value="onListingTypeChange"
+            color="secondary"
+            class="w-full"
+          />
         </UFormField>
       </div>
 
@@ -23,30 +29,50 @@
       <UForm v-if="state.selectedType === 'sale'" :state="state.saleListing!" class="contents">
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
           <UFormField label="Property Tenure" name="tenureType" required description="Tenure type" eagerValidation>
-            <USelect v-model="state.saleListing!.tenureType" :items="tenureItems" class="w-full" />
+            <USelect
+              v-model="state.saleListing!.tenureType"
+              :items="tenureItems"
+              color="secondary"
+              class="w-full"
+            />
           </UFormField>
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-44 sm:max-w-52">
           <UFormField label="Chain Status" name="chain" description="Part of a chain?" required eagerValidation>
-            <USelect v-model="state.saleListing!.chain" :items="chainItems" class="w-full" />
+            <USelect
+              v-model="state.saleListing!.chain"
+              :items="chainItems"
+              color="secondary"
+              class="w-full"
+            />
           </UFormField>
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
           <UFormField label="Shared Ownership" name="sharedOwnership" description="Shared ownership?" required eagerValidation>
-            <USwitch v-model="state.saleListing!.sharedOwnership" color="secondary" size="xl" :ui="{
-              base: 'data-[state=checked]:bg-secondary/80 data-[state=unchecked]:bg-primary/20 dark:data-[state=unchecked]:bg-(--foreground-100)/50 w-10 transition-colors',
-              container: 'w-11! h-6 p-0.5',
-              wrapper: 'w-20! h-6 p-0.5',
-              thumb: 'border border-elevated'
-            }" />
+            <USwitch
+              v-model="state.saleListing!.sharedOwnership"
+              color="secondary"
+              size="xl"
+              :ui="{
+                base: 'data-[state=checked]:bg-secondary/80 data-[state=unchecked]:bg-primary/20 dark:data-[state=unchecked]:bg-(--foreground-100)/50 w-10 transition-colors',
+                container: 'w-11! h-6 p-0.5',
+                wrapper: 'w-20! h-6 p-0.5',
+                thumb: 'border border-elevated'
+              }"
+            />
           </UFormField>
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
           <UFormField label="Availability" name="availabilityStatus" description="Current availability" required eagerValidation>
-            <USelect v-model="state.saleListing!.availabilityStatus" :items="saleAvailabilityItems" class="w-full" />
+            <USelect
+              v-model="state.saleListing!.availabilityStatus"
+              :items="saleAvailabilityItems"
+              color="secondary"
+              class="w-full"
+            />
           </UFormField>
         </div>
       </UForm>
@@ -55,25 +81,45 @@
       <UForm v-if="state.selectedType === 'rent'" :state="state.rentalListing!" class="contents">
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-48 sm:max-w-56">
           <UFormField label="Bills Included" name="isBillsIncluded" required description="Are bills included in rent?" eagerValidation>
-            <USelect v-model="state.rentalListing!.isBillsIncluded" :items="billsIncludedItems" class="w-full" />
+            <USelect
+              v-model="state.rentalListing!.isBillsIncluded"
+              :items="billsIncludedItems"
+              color="secondary"
+              class="w-full"
+            />
           </UFormField>
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-44 sm:max-w-52">
           <UFormField label="Furnished Status" name="furnishedStatus" required description="Furnished or unfurnished?" eagerValidation>
-            <USelect v-model="state.rentalListing!.furnishedStatus" :items="furnishedItems" class="w-full" />
+            <USelect
+              v-model="state.rentalListing!.furnishedStatus"
+              :items="furnishedItems"
+              color="secondary"
+              class="w-full"
+            />
           </UFormField>
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
           <UFormField label="Rental Length" name="rentalLength" required description="Short or long-term?" eagerValidation>
-            <USelect v-model="state.rentalListing!.rentalLength" :items="rentalLengthItems" class="w-full" />
+            <USelect
+              v-model="state.rentalListing!.rentalLength"
+              :items="rentalLengthItems"
+              color="secondary"
+              class="w-full"
+            />
           </UFormField>
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
           <UFormField label="Availability" name="availabilityStatus" description="Current availability" required eagerValidation>
-            <USelect v-model="state.rentalListing!.availabilityStatus" :items="rentalAvailabilityItems" class="w-full" />
+            <USelect
+              v-model="state.rentalListing!.availabilityStatus"
+              :items="rentalAvailabilityItems"
+              color="secondary"
+              class="w-full"
+            />
           </UFormField>
         </div>
       </UForm>

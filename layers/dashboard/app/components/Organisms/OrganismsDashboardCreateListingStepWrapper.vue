@@ -19,7 +19,7 @@
     </div>
 
     <!-- Sticky Footer Actions -->
-    <div class="sticky bottom-0 bg-(--background-200) dark:bg-(--background-100) border-t border-black/20 py-4 px-4 mt-auto">
+    <div class="sticky bottom-0 bg-(--background-200) dark:bg-(--background-100) border-t border-black/20 py-4 px-6 lg:px-4 mt-auto">
       <div class="flex justify-between flex-wrap items-center gap-4">
         <UButton 
           type="button" 

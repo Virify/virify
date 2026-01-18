@@ -8,7 +8,7 @@
     </p>
 
     <h3 v-if="info" class="step__info | title-xs">{{ info }}</h3>
-    
+
     <!-- Error message display -->
     <AtomsInlineError v-if="errorMessage" class="step__error">
       {{ errorMessage }}
@@ -32,7 +32,6 @@
       </MoleculesListingFormActions>
     </form>
   </section>
-  
 </template>
 
 <script setup lang="ts">
@@ -45,13 +44,13 @@ defineProps<{
   showPrevious?: boolean;
   formKey?: number;
   errorMessage?: string;
-}>()
+}>();
 
 defineEmits<{
   cancel: [];
   previous: [];
   submit: [];
-}>()
+}>();
 </script>
 
 <style lang="scss">

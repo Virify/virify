@@ -13,6 +13,7 @@
             v-model="bathroom.name"
             placeholder="e.g. Master En Suite, Family Bathroom"
             size="lg"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -24,11 +25,12 @@
               v-model="bathroom.floor"
               :items="floorOptions"
               size="lg"
+              color="secondary"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Room Size" :name="`property.bathroomFeatures.${bathroomIndex}.size`" description="Size of the bathroom">
+          <UFormField label="Room Size" :name="`property.bathroomFeatures.${bathroomIndex}.size`" description="Size of the bathroom" hint="optional">
             <div class="flex gap-2">
               <UInput
                 :model-value="sizeDisplay"
@@ -37,12 +39,14 @@
                 :min="0"
                 placeholder="e.g. 6"
                 size="lg"
+                color="secondary"
                 class="flex-1"
               />
               <USelect
                 v-model="sizeUnit"
                 :items="sizeUnitItems"
                 size="lg"
+                color="secondary"
                 class="w-24"
               />
             </div>
@@ -50,7 +54,7 @@
         </div>
 
         <!-- Features -->
-        <UFormField label="Bathroom Features" :name="`property.bathroomFeatures.${bathroomIndex}.features`" description="Select features in this bathroom">
+        <UFormField label="Bathroom Features" :name="`property.bathroomFeatures.${bathroomIndex}.features`" description="Select features in this bathroom" hint="optional">
           <div class="grid grid-cols-2 gap-3 mt-2">
             <UCheckbox
               v-for="feature in getBathroomFeatureOptions()"
@@ -59,16 +63,18 @@
               :model-value="bathroom.features?.includes(feature.value as string)"
               @update:model-value="(val: boolean | 'indeterminate') => handleFeatureToggle(feature.value as string, val === true)"
               :label="feature.label"
+              color="secondary"
             />
           </div>
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.bathroomFeatures.${bathroomIndex}.description`" description="Add any details about this bathroom">
+        <UFormField label="Description" :name="`property.bathroomFeatures.${bathroomIndex}.description`" description="Add any details about this bathroom" hint="optional">
           <UTextarea
             v-model="bathroom.description"
             placeholder="Describe this bathroom..."
             :rows="3"
+            color="secondary"
             class="w-full"
           />
         </UFormField>
@@ -79,7 +85,7 @@
       <div class="flex justify-end gap-3 p-4 w-full">
         <UButton
           variant="outline"
-          color="neutral"
+          color="secondary"
           size="sm"
           class="body-sm"
           @click="handleCancel"
@@ -87,7 +93,7 @@
           Cancel
         </UButton>
         <UButton
-          color="primary"
+          color="secondary"
           variant="solid"
           :disabled="!bathroom || !step4Validation.isBathroomComplete(bathroom) || isSaving"
           :loading="isSaving"
