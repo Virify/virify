@@ -73,7 +73,7 @@ const draftData = getStepData(9)
 const listingTier = computed(() => (selectedTier.value || 'BASIC').toLowerCase())
 
 const maxImages = computed(() => 
-  getMaxImagesForTier(listingTier.value as 'premium' | 'featured' | 'basic')
+  getMaxImagesForTier(listingTier.value as 'PREMIUM' | 'FEATURED' | 'BASIC')
 )
 
 // Build room data from already-loaded step data (steps 4, 5, 6)
