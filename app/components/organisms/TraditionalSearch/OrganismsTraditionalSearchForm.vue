@@ -10,7 +10,8 @@
         Property type
       </h3>
 
-      <OrganismsTraditionalSearchPropertyType class="o-traditional-search-form__property-type-grid" />
+      <OrganismsTraditionalSearchPropertyType v-model="formData.propertyTypes"
+        class="o-traditional-search-form__property-type-grid" />
     </section>
 
 
@@ -153,6 +154,7 @@ const formData = useState('search-contract-type', () => reactive({
   maxBeds: <number>getDefaultSelected(bedroomMax),
   minBathrooms: <number>getDefaultSelected(bathroomMin),
   maxBathrooms: <number>getDefaultSelected(bathroomMax),
+  propertyTypes: reactive<{ [key: string]: string[] }>({}),
   additionalFeatures: reactive<{ [key: string]: boolean }>({}),
 }))
 
