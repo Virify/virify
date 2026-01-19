@@ -3,13 +3,11 @@
     'm-range-slider--loading': loading
   }">
     <div v-if="loading" class="m-range-slider__skeleton-loader">
-      <span aria-hidden
-        class=" m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--left | skeleton">
+      <span aria-hidden class=" m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--left">
         <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
       </span>
 
-      <span aria-hidden
-        class="m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--right | skeleton">
+      <span aria-hidden class="m-range-slider__skeleton-loader-input m-range-slider__skeleton-loader-input--right">
         <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
       </span>
 
