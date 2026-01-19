@@ -5,11 +5,11 @@
     <template v-else>
       <OrganismsFilterSwitcher>
         <template v-slot:traditional>
-          <OrganismsTraditionalSearchForm />
+          <OrganismsTraditionalSearchForm @submit-search="traditionalSearchSubmit" />
         </template>
 
         <template v-slot:ai>
-          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="searchSubmit"
+          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="aiSearchSubmit"
             :loading="isChecking" @reset-search="searchReset" />
         </template>
       </OrganismsFilterSwitcher>
@@ -27,7 +27,13 @@ const { searchState, isLoading } = useSearchState()
 const { checkContent, isChecking } = useModeration()
 const { showToast } = useToast()
 
-async function searchSubmit(query: string) {
+async function traditionalSearchSubmit(formData: TraditionalSearchData) {
+  const query = buildQueryFromTraditionalFormData(formData)
+
+  await aiSearchSubmit(query)
+}
+
+async function aiSearchSubmit(query: string) {
   const { location, radius, listingType } = asObject(searchState.value)
 
   if (!location) return
