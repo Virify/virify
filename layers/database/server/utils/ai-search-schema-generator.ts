@@ -248,14 +248,24 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     RESPONSE FORMAT
     ═══════════════════════════════════════════════════════════════════════════════
     
-    Return ONLY valid JSON (no markdown, no comments):
+    Return ONLY **STRICT VALID JSON** with ALL property names in double quotes (no markdown, no comments, no JavaScript object notation):
+    
+    CORRECT JSON FORMAT:
     {
-      "whereClause": { ... },
+      "whereClause": { "archived": false, "price": { "gte": 100000 } },
       "queryAnalysis": {
         "usedTerms": ["term1", "term2"],
         "ignoredTerms": ["term3"]
       }
     }
+    
+    INCORRECT (JavaScript object notation - DO NOT USE):
+    {
+      whereClause: { archived: false }, Missing quotes around property names
+      queryAnalysis: { ... }
+    }
+    
+    ALL property names MUST be quoted: "in", "gte", "lte", "has", "some", "is", etc.
     
     IMPORTANT - usedTerms MUST be human-readable summaries:
     - Price: Format with currency symbol and commas: "£300,000" or "Under £500,000" or "£200k-£400k"
