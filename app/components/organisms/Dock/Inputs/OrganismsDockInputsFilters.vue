@@ -10,7 +10,7 @@
       <AtomsIcon class="o-dock-inputs-filters__icon" icon="search/filter" />
 
       <span role="presentation" class="o-dock-inputs-filters__text">
-        Filters
+        Property
       </span>
 
       <span role="presentation" class="o-dock-inputs-filters__count | body-xs" :class="{

@@ -42,7 +42,7 @@ const iconFile = computed(() => {
 </script>
 
 <style scoped>
-.a-icon {
+:where(.a-icon) {
   display: inline-block;
   vertical-align: middle;
 }

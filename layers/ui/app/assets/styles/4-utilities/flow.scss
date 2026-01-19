@@ -55,6 +55,14 @@
   --flow-gap: var(--size-28);
 }
 
+.flow-3xl>* {
+  --flow-gap: var(--size-32);
+}
+
+.flow-4xl>* {
+  --flow-gap: var(--size-40);
+}
+
 :where(.flow>*:not(:first-child)) {
   margin-top: var(--flow-gap);
 }

@@ -64,7 +64,7 @@ const showSearch = props.search && !isWaitingListMode.value;
 // Hero component styles
 .o-hero {
   @include hero-gradient();
-  
+
   @include mq.small-tablet {
     @include hero-background();
   }
@@ -105,7 +105,7 @@ const showSearch = props.search && !isWaitingListMode.value;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 50vh;
+    min-height: min(50vh, 25rem);
     padding: var(--size-64) var(--size-32);
     box-sizing: border-box;
     text-align: center;

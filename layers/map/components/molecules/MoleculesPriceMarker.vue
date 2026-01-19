@@ -2,6 +2,7 @@
   <button class="m-price-marker" :class="{
     'm-price-marker--featured': tier === 'FEATURED',
     'm-price-marker--premium': tier === 'PREMIUM',
+    'm-price-marker--hovered': id === hoverState
   }" aria-label="Expand property card">
     <AtomsCloudFlareImage v-if="image && tier === 'PREMIUM'" :src="image" class="m-price-marker__image" />
 
@@ -55,10 +56,20 @@ const priceDisplay = computed(() => {
   }
 });
 
+/**
+ *  Animate marker on corresponding hover
+ */
+const hoverState = useCardHoverState()
+
 </script>
 
 <style lang="scss">
+@use 'sass:math';
+
 .m-price-marker {
+  $animation-speed: 1s;
+  $animation-pulse-size: 50px;
+
   --marker-background: var(--blue-400);
   --marker-foreground: var(--monochrome-900);
   --marker-border: var(--blue-300);
@@ -70,6 +81,7 @@ const priceDisplay = computed(() => {
   border: 2px solid var(--marker-border);
   padding: var(--size-2);
   margin: 0;
+  z-index: 2;
 
   .a-note-button {
     --notes-active-color: var(--monochrome-900);
@@ -94,11 +106,32 @@ const priceDisplay = computed(() => {
     min-width: 17ch;
   }
 
+  &--hovered {
+    z-index: 99;
+    animation: bounceMapMarker $animation-speed infinite var(--ease-out);
+
+    &::before {
+
+      content: '';
+      position: absolute;
+      bottom: -#{ math.div($animation-pulse-size, 2) + 3px };
+      left: calc(50% - math.div($animation-pulse-size, 2));
+      width: $animation-pulse-size;
+      height: $animation-pulse-size;
+      background: var(--marker-background);
+      opacity: 0;
+      border-radius: 100%;
+      z-index: -2;
+      animation: pulseMapMarker $animation-speed infinite var(--ease-out);
+      animation-delay: #{ math.div($animation-speed, 1.75) };
+    }
+  }
+
   &::after {
     content: '';
     position: absolute;
     bottom: -6px;
-    left: calc(50% - 3px);
+    left: calc(50% - 4px);
     transform: rotate(45deg);
     width: 6px;
     height: 6px;
@@ -156,6 +189,27 @@ const priceDisplay = computed(() => {
 
   &:has(.m-price-marker--premium) {
     z-index: 3;
+  }
+}
+
+/**
+ *  Bounce animation
+ */
+@keyframes bounceMapMarker {
+  50% {
+    transform: translateY(-3px)
+  }
+}
+
+@keyframes pulseMapMarker {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.1)
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1)
   }
 }
 </style>

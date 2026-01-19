@@ -2,6 +2,10 @@ import * as z from "zod";
 import { updateUserSavedLocation } from "~~/layers/database/server/utils/user-saved-location";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 
+// Polygon coordinates schema for boundary
+const polygonCoordinatesSchema = z.array(z.array(z.tuple([z.number(), z.number()])));
+const multiPolygonCoordinatesSchema = z.array(polygonCoordinatesSchema);
+
 const LocationSchema = z
   .object({
     id: z.number().optional(),
@@ -18,10 +22,25 @@ const LocationSchema = z
       place_name: z.string(),
       geometry: z.object({
         type: z.string(),
-        coordinates: z.tuple([z.number(), z.number()]),
+        coordinates: z.union([
+          z.tuple([z.number(), z.number()]), // Point
+          polygonCoordinatesSchema, // Polygon
+          multiPolygonCoordinatesSchema, // MultiPolygon
+        ]),
       }),
       bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
-      properties: z.record(z.any(), z.any())
+      center: z.tuple([z.number(), z.number()]).optional(),
+      properties: z.record(z.any(), z.any()),
+      context: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        text_en: z.string().optional(),
+      })).optional(),
+      // Boundary polygon for map visualization
+      boundaryPolygon: z.object({
+        type: z.enum(["Polygon", "MultiPolygon"]),
+        coordinates: z.union([polygonCoordinatesSchema, multiPolygonCoordinatesSchema]),
+      }).optional(),
     }),
   })
   .optional();

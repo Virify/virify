@@ -39,3 +39,10 @@
     box-shadow: 0 0 0 var(--pulse-size) fn.faded-color(00%, var(--pulse-colour))
   }
 }
+
+@keyframes scaleFadeIn {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+}

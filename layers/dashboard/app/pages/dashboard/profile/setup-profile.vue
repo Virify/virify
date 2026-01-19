@@ -6,7 +6,12 @@
         :ui="{
           title: 'title-sm m-0!',
         }"
-      />
+      >
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+      </UDashboardNavbar>
+      
       <MoleculesDashboardPasswordAlert />
     </template>
 
@@ -16,7 +21,7 @@
           <OrganismsDashboardAccountHeroCard title="Complete your profile" description="Complete your profile information to fully activate your account" label="Save Changes" />
 
           <AtomsDashboardForm>
-            <UFormField label="Username" name="username" required orientation="horizontal" description="Your public username">
+            <UFormField label="Username" name="username" required orientation="horizontal" description="Your public username" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 v-model="state.username"
                 type="text"
@@ -41,7 +46,7 @@
                 <p class="text-(--foreground-200)/50 body-xs pt-1">We will send a confirmation email to your registered email address.</p>
               </div>
               <div class="flex flex-col gap-4">
-                <UFormField label="New Password" name="newPassword" orientation="horizontal" required description="Enter your new password" eagerValidation>
+                <UFormField label="New Password" name="newPassword" orientation="horizontal" required description="Enter your new password" eagerValidation :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
                   <UInput
                     :type="showNewPassword ? 'text' : 'password'"
                     variant="subtle"
@@ -71,7 +76,7 @@
                   </UInput>
                 </UFormField>
 
-                <UFormField label="Confirm New Password" name="confirmNewPassword" orientation="horizontal" required description="Re-enter your new password to confirm" eagerValidation>
+                <UFormField label="Confirm New Password" name="confirmNewPassword" orientation="horizontal" required description="Re-enter your new password to confirm" eagerValidation :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
                   <UInput
                     :type="showConfirmNewPassword ? 'text' : 'password'"
                     variant="subtle"

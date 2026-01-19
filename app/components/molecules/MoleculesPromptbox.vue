@@ -1,17 +1,12 @@
 <template>
-  <div class="m-promptbox | elevate-200">
+  <div class="m-promptbox | gradient-box">
     <div class="m-promptbox__input-wrapper">
-      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"></textarea>
+      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label"
+        v-model="textarea"></textarea>
     </div>
 
-    <AtomsButton
-      type="submit"
-      class="m-promptbox__button"
-      :pending="loading"
-      :disabled="disabled"
-      aria-label="Submit"
-      @click.prevent="$emit('submit', textarea)"
-    >
+    <AtomsButton type="submit" class="m-promptbox__button" :pending="loading" :disabled="disabled" aria-label="Submit"
+      @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
     </AtomsButton>
   </div>
@@ -26,11 +21,24 @@ const props = defineProps({
   loading: { type: Boolean, default: false }
 })
 
-defineEmits<{
+const textarea = defineModel({ default: '' })
+
+const emits = defineEmits<{
   (e: 'submit', value: string): void
 }>()
 
-const textarea = defineModel({ default: '' })
+function emitSearch() {
+  emits('submit', textarea.value)
+}
+
+function keyboardSubmit(e: KeyboardEvent) {
+  // Allow return carriage if shift key pressed
+  if (e.shiftKey) return
+
+  e.preventDefault()
+
+  emitSearch()
+}
 </script>
 
 <style lang="scss">
@@ -41,13 +49,7 @@ const textarea = defineModel({ default: '' })
   align-items: flex-end;
   gap: var(--size-16);
   background: var(--background-200);
-  border-radius: var(--border-radius-xl);
   padding: var(--size-16);
-  border: 1px solid var(--border-color-200);
-
-  @include mq.small-tablet {
-    border-radius: var(--border-radius-2xl);
-  }
 
   &:has(textarea:focus) {
     outline: var(--focus-outline);
@@ -140,8 +142,13 @@ const textarea = defineModel({ default: '' })
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .m-promptbox__analysis {

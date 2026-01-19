@@ -1,5 +1,5 @@
 <template>
-  <MoleculesCardTemplate variant="premium" :result>
+  <MoleculesCardTemplate ref="$content" variant="premium" :result>
     <template #carousel="{ media, propertyId }">
       <MoleculesCardSlotsPremiumCarousel :slides="media" :property-id />
     </template>
@@ -7,7 +7,7 @@
     <template
       #content="{ price, priceGuide, propertyType, address, roomCounts, pills, propertyId, description, premiumFeatures }">
       <MoleculesCardSlotsViewLink :property-id>
-        <span class="m-card-premium__title | title-sm">Spotlight</span>
+        <span class="m-card-premium__spotlight-title | title-sm">Spotlight</span>
       </MoleculesCardSlotsViewLink>
 
       <div class="m-card-premium__grid">
@@ -20,12 +20,23 @@
 
           <MoleculesCardSlotsPills v-if="pills.length" :pills />
 
-          <MoleculesCardSlotsDescription v-if="description" :description="result.property.description" />
+          <template v-if="isExpandingContent">
+            <MoleculesCardSlotsAccordion>
+              <MoleculesCardSlotsDescription v-if="description" :description="result.property.description" />
+              <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
+            </MoleculesCardSlotsAccordion>
+          </template>
+
+          <template v-else>
+            <MoleculesCardSlotsDescription if="description" :description="result.property.description" />
+          </template>
         </div>
 
-        <div class="m-card-premium__grid-row">
-          <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
-        </div>
+        <template v-if="!isExpandingContent">
+          <div class="m-card-premium__grid-row">
+            <MoleculesCardSlotsChecklist v-if="premiumFeatures?.length" :list="premiumFeatures" />
+          </div>
+        </template>
       </div>
 
       <MoleculesCardSlotsBookmark :property-id />
@@ -34,25 +45,35 @@
 </template>
 
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core';
+
 interface Props {
   result: ListingCardData
 }
 
 defineProps<Props>()
 
+/**
+ *  Toggle mobile layout
+ */
+const $content = useTemplateRef('$content')
+const { width } = useElementSize($content)
+
+const isExpandingContent = computed(() => width.value < 550)
+
 </script>
 
 <style lang="scss">
 .m-card-premium {
-  &__title {
+  &__spotlight-title {
     display: flex;
     align-items: center;
     gap: var(--size-16);
     padding: var(--size-8) 0;
-    padding-right: var(--size-36);
+    padding-right: var(--size-64);
     margin: 0 auto var(--size-24);
 
-    @container (width > 600px) {
+    @container listing-card-content (width > 600px) {
       max-width: min(26ch, 100% - var(--size-48));
     }
 
@@ -70,16 +91,31 @@ defineProps<Props>()
     display: grid;
     gap: var(--size-12);
 
-    @container (width <=600px) {
+    @container listing-card-content (width <=600px) {
       .m-card-slots-checklist__row:nth-child(n+7) {
         display: none;
       }
     }
 
-    @container (width > 600px) {
+    @container listing-card-content (width > 600px) {
       align-items: center;
       grid-template-columns: 1fr 1.1fr;
       column-gap: var(--size-40);
+    }
+  }
+
+  @container listing-card (width < 550px) {
+
+    &__spotlight-title {
+      display: none;
+    }
+
+    &__grid {
+
+      .m-card-slots-overview,
+      .m-cards-slots-price {
+        margin-right: var(--size-56)
+      }
     }
   }
 }

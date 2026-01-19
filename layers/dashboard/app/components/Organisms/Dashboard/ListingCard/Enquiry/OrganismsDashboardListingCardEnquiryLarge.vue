@@ -5,12 +5,12 @@
   >
     <!-- Large Image -->
     <div 
-      v-if="listing.property?.media?.[0]?.image" 
+      v-if="getMainImage(listing.property)" 
       class="w-full shrink-0"
     >
       <AtomsCloudFlareImage
-        :src="listing.property.media[0].image"
-        :alt="listing.property.address?.fullAddress || 'Property'"
+        :src="getMainImage(listing.property)!"
+        :alt="listing.property?.address?.fullAddress || 'Property'"
         class="w-full h-full object-cover aspect-video"
         variant="public"
       />

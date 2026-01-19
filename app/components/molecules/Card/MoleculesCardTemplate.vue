@@ -1,5 +1,5 @@
 <template>
-  <div class="m-card-template__container">
+  <div class="m-card-template__container" ref="$hoverCard">
     <div class="m-card-template" :class="{
       'm-card-template--basic': isBasic,
       'm-card-template--featured': isFeatured,
@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import { useElementHover } from '@vueuse/core';
 import { getPremiumFeatures } from '~/utils/results/premium-features';
 
 interface Props {
@@ -57,7 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  *  Check variants
  */
-const isFeatured = computed(() => props.variant === 'basic')
+const isFeatured = computed(() => props.variant !== 'basic')
 const isPremium = computed(() => props.variant === 'premium')
 const isBasic = computed(() => !isFeatured.value && !isPremium.value)
 
@@ -196,10 +197,21 @@ const premiumFeatures = computed(() => {
   return asArray(getPremiumFeatures(result, 16))
 })
 
+/**
+ *  Track active hover card
+ */
+const $hoverCard = useTemplateRef('$hoverCard')
+const hoverState = useCardHoverState()
+
+watch(useElementHover($hoverCard), (isHovered) => {
+  hoverState.value = isHovered ? propertyId.value : null
+})
+
 </script>
 
 <style lang="scss">
 .m-card-template__container {
+  container-name: listing-card;
   container-type: inline-size;
   display: flex;
 }
@@ -229,7 +241,6 @@ const premiumFeatures = computed(() => {
   box-sizing: border-box;
   display: grid;
   align-items: stretch;
-  gap: var(--size-8);
   flex-grow: 1;
   overflow: hidden;
 
@@ -252,7 +263,7 @@ const premiumFeatures = computed(() => {
 
   }
 
-  @container (width > 750px) {
+  @container listing-card (width > 700px) {
 
     &--basic,
     &--featured {
@@ -264,6 +275,19 @@ const premiumFeatures = computed(() => {
     &--basic &__gallery,
     &--featured &__gallery {
       align-items: center;
+    }
+  }
+
+  @container listing-card (800px > width > 700px) {
+
+    &--basic,
+    &--featured {
+      grid-template-columns: 1fr 20ch;
+
+      .m-cards-slots-price {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   }
 
@@ -283,7 +307,7 @@ const premiumFeatures = computed(() => {
 
     border: 4px solid var(--primary-500);
 
-    @container (width > 900px) {
+    @container listing-card (width > 900px) {
       --card-layout: horizontal;
 
       grid-template-columns: 1.2fr minmax(20ch, 1fr);
@@ -333,23 +357,31 @@ const premiumFeatures = computed(() => {
   &__gallery,
   &__content,
   &__footer {
+    container-name: listing-card-content;
     container-type: inline-size;
   }
 
   /**
    *  Default layout
    */
-  &__content-grid {
-    padding-right: var(--size-36);
+  &__content {
+    .a-note-button--active::after {
+      top: 0;
+      right: 0;
+    }
   }
 
-  @container (width <=420px) {
+  &__content-grid {
+    padding-right: var(--size-48);
+  }
+
+  @container listing-card-content (width <=420px) {
     &__content-grid {
       margin: 0 0 var(--size-10);
     }
   }
 
-  @container (width > 420px) {
+  @container listing-card-content (width > 420px) {
     &__content-grid {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -366,6 +398,8 @@ const premiumFeatures = computed(() => {
         flex-direction: column-reverse;
         justify-content: flex-start;
         align-items: flex-start;
+        gap: var(--size-8);
+        padding-right: var(--size-40);
       }
 
       .m-card-lots-pills,

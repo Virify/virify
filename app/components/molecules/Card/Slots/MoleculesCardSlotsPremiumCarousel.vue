@@ -199,7 +199,7 @@ onBeforeUnmount(() => {
   /**
    * Containers
    */
-  @container (width < 740px) {
+  @container listing-card-content (width < 740px) {
     grid-template-columns: 1fr;
     aspect-ratio: unset;
 
@@ -238,7 +238,7 @@ onBeforeUnmount(() => {
   /**
    * Smaller containers
    */
-  @container (width < 580px) {
+  @container listing-card-content (width < 580px) {
     &__skeleton-thumbnail {
       width: calc(33% - var(--size-10));
     }

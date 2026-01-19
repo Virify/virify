@@ -3,9 +3,16 @@
     <MoleculesAiSearchLoading v-if="isLoading" />
 
     <template v-else>
-      <h2 class="| title-md">Describe your new home</h2>
+      <OrganismsFilterSwitcher>
+        <template v-slot:traditional>
+          <OrganismsTraditionalSearchForm @submit-search="traditionalSearchSubmit" />
+        </template>
 
-      <MoleculesAiSearchFormFilters :initial-query :loading="isChecking" @submit-search="searchSubmit" @reset-search="searchReset" />
+        <template v-slot:ai>
+          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="aiSearchSubmit"
+            :loading="isChecking" @reset-search="searchReset" />
+        </template>
+      </OrganismsFilterSwitcher>
     </template>
   </div>
 </template>
@@ -20,9 +27,15 @@ const { searchState, isLoading } = useSearchState()
 const { checkContent, isChecking } = useModeration()
 const toast = useToast()
 
-async function searchSubmit(query: string) {
+async function traditionalSearchSubmit(formData: TraditionalSearchData) {
+  const query = buildQueryFromTraditionalFormData(formData)
+
+  await aiSearchSubmit(query)
+}
+
+async function aiSearchSubmit(query: string) {
   const { location, radius, listingType } = asObject(searchState.value)
-  
+
   if (!location) return
 
   // Check content moderation before proceeding

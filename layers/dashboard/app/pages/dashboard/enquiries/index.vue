@@ -7,7 +7,9 @@
           right: 'flex items-center gap-4',
         }"
       >
-        <template #title> Your Enquiries </template>
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
 
         <template #right>
           <OrganismsDashboardFilter
@@ -26,7 +28,6 @@
       <MoleculesDashboardPasswordAlert />
     </template>
     <template #body>
-      <MoleculesDashboardBreadcrumb />
       <UPageList
         ref="pageTop"
         :class="['gap-4', view === 'grid' && (loading || sortedAndFilteredEnquiries.length > 0) ? (sortOrder === 'listing' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 uw-grid' : 'grid grid-cols-1 xl:grid-cols-2') : '']"

@@ -1,106 +1,229 @@
-import * as z from "zod";
-import { 
-  EPCRating, 
-  HeatingType, 
-  BoilerType, 
-  HotWaterSource, 
-  RenewableEnergy, 
-  ConnectedUtilities 
-} from "~~/layers/database/server/database/prisma/generated/enums";
+import { z } from "zod";
+/**
+ * Step 9: Property Images API Endpoint
+ * 
+ * Works for BOTH draft listings (draftId) and live listings (listingId)
+ * Handles: Upload images to Cloudflare (done client-side via direct upload),
+ * store cloudflare IDs and room assignments in database,
+ * associate images with specific rooms (bedrooms, bathrooms, etc.)
+ */
 
-// Validate payload for Step Nine - Energy & Costs
-const stepNineSchema = z.object({
-  draftId: z.number().int().positive(),
-  property: z.object({
-    energyAndUtilities: z.object({
-      description: z.string().max(5000).nullable().optional(),
-      epcRating: z.enum(Object.values(EPCRating)),
-      epcCertificateUrl: z.string().url().nullable().optional(),
-      primaryHeatingType: z.array(z.enum(Object.values(HeatingType))).default([]),
-      secondaryHeatingType: z.array(z.enum(Object.values(HeatingType))).default([]),
-      boilerType: z.enum(Object.values(BoilerType)).nullable().optional(),
-      hotWaterSource: z.enum(Object.values(HotWaterSource)).nullable().optional(),
-      renewables: z.array(z.enum(Object.values(RenewableEnergy))).default([]),
-      connectedUtilities: z.array(z.enum(Object.values(ConnectedUtilities))).default([]),
-    }),
-    runningCosts: z.object({
-      description: z.string().max(5000).nullable().optional(),
-      councilTaxBand: z.string(),
-      serviceCharges: z.coerce.number().min(0).nullable().optional(),
-      groundRent: z.coerce.number().min(0).nullable().optional(),
-    }),
-  }),
-});
+const stepDataSchema = step9Schema.extend({
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
+}).refine(
+  (data) => data.draftId !== undefined || data.listingId !== undefined,
+  { message: "Either draftId or listingId must be provided" }
+);
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
+  
   try {
-    const { draftId, property } = await readValidatedBody(event, stepNineSchema.parse);
+    const body = await readBody(event);
+    const { draftId, listingId, property } = stepDataSchema.parse(body);
 
-    return await prisma.draftListing.update({
-      where: { id: draftId, userId: user.id },
-      data: {
-        property: {
-          update: {
-            // Energy And Utilities (required)
-            energyAndUtilities: {
-              upsert: {
-                create: {
-                  description: property.energyAndUtilities.description ?? null,
-                  epcRating: property.energyAndUtilities.epcRating,
-                  epcCertificateUrl: property.energyAndUtilities.epcCertificateUrl ?? null,
-                  primaryHeatingType: property.energyAndUtilities.primaryHeatingType,
-                  secondaryHeatingType: property.energyAndUtilities.secondaryHeatingType,
-                  boilerType: property.energyAndUtilities.boilerType ?? null,
-                  hotWaterSource: property.energyAndUtilities.hotWaterSource ?? null,
-                  renewables: property.energyAndUtilities.renewables,
-                  connectedUtilities: property.energyAndUtilities.connectedUtilities,
-                },
-                update: {
-                  description: property.energyAndUtilities.description ?? null,
-                  epcRating: property.energyAndUtilities.epcRating,
-                  epcCertificateUrl: property.energyAndUtilities.epcCertificateUrl ?? null,
-                  primaryHeatingType: property.energyAndUtilities.primaryHeatingType,
-                  secondaryHeatingType: property.energyAndUtilities.secondaryHeatingType,
-                  boilerType: property.energyAndUtilities.boilerType ?? null,
-                  hotWaterSource: property.energyAndUtilities.hotWaterSource ?? null,
-                  renewables: property.energyAndUtilities.renewables,
-                  connectedUtilities: property.energyAndUtilities.connectedUtilities,
-                },
-              },
+    const { media } = property;
+
+    // LIVE LISTING - update Listing table
+    if (listingId) {
+      const existingListing = await prisma.listing.findUnique({
+        where: { id: listingId, userId: user.id },
+        include: {
+          property: {
+            include: {
+              media: true,
             },
-            // Running Costs (required)
-            runningCosts: {
-              upsert: {
-                create: {
-                  description: property.runningCosts.description ?? null,
-                  councilTaxBand: property.runningCosts.councilTaxBand,
-                  serviceCharges: property.runningCosts.serviceCharges ?? null,
-                  groundRent: property.runningCosts.groundRent ?? null,
-                },
-                update: {
-                  description: property.runningCosts.description ?? null,
-                  councilTaxBand: property.runningCosts.councilTaxBand,
-                  serviceCharges: property.runningCosts.serviceCharges ?? null,
-                  groundRent: property.runningCosts.groundRent ?? null,
+          },
+        },
+      });
+
+      if (!existingListing || !existingListing.property) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Listing or property not found',
+        });
+      }
+
+      const propertyId = existingListing.property.id;
+
+      // Update room assignments and sortOrder for existing media
+      for (let i = 0; i < media.length; i++) {
+        const mediaItem = media[i];
+        await prisma.media.updateMany({
+          where: {
+            propertyId,
+            image: mediaItem.cloudflareId,
+          },
+          data: {
+            sortOrder: i,
+            metadata: JSON.stringify({
+              alt: mediaItem.description || 'Property image',
+              description: mediaItem.description || null,
+              cloudflareImageId: mediaItem.cloudflareId,
+              filename: mediaItem.filename || null,
+            }),
+            bedroomId: mediaItem.bedroomId || null,
+            bathroomId: mediaItem.bathroomId || null,
+            kitchenId: mediaItem.kitchenId || null,
+            receptionId: mediaItem.receptionId || null,
+            otherRoomId: mediaItem.otherRoomId || null,
+            gardenId: mediaItem.gardenId || null,
+            yardId: mediaItem.yardId || null,
+            landId: mediaItem.landId || null,
+            outdoorSpaceId: mediaItem.outdoorSpaceId || null,
+          },
+        });
+      }
+
+      return await prisma.listing.findUnique({
+        where: { id: listingId, userId: user.id },
+        include: {
+          property: {
+            include: {
+              media: true,
+              bedroomFeatures: { include: { media: true } },
+              bathroomFeatures: { include: { media: true } },
+              kitchenFeatures: { include: { media: true } },
+              reception: { include: { media: true } },
+              otherRoom: { include: { media: true } },
+              outdoorSpace: {
+                include: {
+                  garden: { include: { media: true } },
+                  yard: { include: { media: true } },
+                  land: { include: { media: true } },
                 },
               },
             },
           },
         },
-      },
+      }).then(async (listing) => {
+        // Invalidate listing cache so modal shows fresh data
+        const storage = useStorage('cache:listing');
+        await storage.removeItem(`listing:${listingId}`);
+        return listing;
+      });
+    }
+
+    // DRAFT LISTING - update DraftListing table with completedSteps
+    const existingDraft = await prisma.draftListing.findUnique({
+      where: { id: draftId, userId: user.id },
       include: {
         property: {
           include: {
-            energyAndUtilities: true,
-            runningCosts: true,
+            media: true,
           },
         },
       },
     });
+
+    if (!existingDraft || !existingDraft.property) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Draft listing or property not found',
+      });
+    }
+
+    const propertyId = existingDraft.property.id;
+
+    // Update room assignments and sortOrder for existing media
+    // Images are already in DB (auto-saved on upload), just update their room assignments and order
+    // The array index determines sortOrder (0 = first/main image)
+    for (let i = 0; i < media.length; i++) {
+      const mediaItem = media[i];
+      await prisma.media.updateMany({
+        where: {
+          propertyId,
+          image: mediaItem.cloudflareId,
+        },
+        data: {
+          sortOrder: i, // Array position becomes sortOrder
+          metadata: JSON.stringify({
+            alt: mediaItem.description || 'Property image',
+            description: mediaItem.description || null,
+            cloudflareImageId: mediaItem.cloudflareId,
+            filename: mediaItem.filename || null,
+          }),
+          bedroomId: mediaItem.bedroomId || null,
+          bathroomId: mediaItem.bathroomId || null,
+          kitchenId: mediaItem.kitchenId || null,
+          receptionId: mediaItem.receptionId || null,
+          otherRoomId: mediaItem.otherRoomId || null,
+          gardenId: mediaItem.gardenId || null,
+          yardId: mediaItem.yardId || null,
+          landId: mediaItem.landId || null,
+          outdoorSpaceId: mediaItem.outdoorSpaceId || null,
+        },
+      });
+    }
+
+    // Get current completedSteps to check if step 9 already exists
+    const completedSteps = existingDraft.completedSteps || [];
+
+    // Update draft with step completion
+    const result = await prisma.draftListing.update({
+      where: { id: draftId!, userId: user.id },
+      data: {
+        // Add step 9 to completedSteps if not already there
+        ...(!completedSteps.includes(9) ? { completedSteps: { push: 9 } } : {}),
+      },
+      include: {
+        property: {
+          include: {
+            media: true,
+            bedroomFeatures: {
+              include: {
+                media: true,
+              },
+            },
+            bathroomFeatures: {
+              include: {
+                media: true,
+              },
+            },
+            kitchenFeatures: {
+              include: {
+                media: true,
+              },
+            },
+            reception: {
+              include: {
+                media: true,
+              },
+            },
+            otherRoom: {
+              include: {
+                media: true,
+              },
+            },
+            outdoorSpace: {
+              include: {
+                garden: {
+                  include: {
+                    media: true,
+                  },
+                },
+                yard: {
+                  include: {
+                    media: true,
+                  },
+                },
+                land: {
+                  include: {
+                    media: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return result;
   } catch (error) {
-    console.log(error);
+    console.error('Step nine update error:', error);
     return errorResponse(error, event);
   }
 });

@@ -17,10 +17,12 @@ import { useDebounceFn } from '@vueuse/core';
  */
 const map = shallowRef();
 const mapContainer = ref<HTMLElement>();
-const { 
-  initMap, 
+const {
+  initMap,
+  addMarker,
   addMarkers,
   clearMarkers,
+  clearClusters,
   initDrawing,
   updateSearchRadiusVisualization,
   removeSearchRadiusVisualization
@@ -40,6 +42,7 @@ const props = withDefaults(defineProps<{
   interactive?: boolean;
   mapId?: string;
   markers?: ListingCardType[];
+  listingView?: boolean
   draw?: boolean;
   searchRadius?: number | null;
   searchCenter?: [number, number] | null;
@@ -239,10 +242,26 @@ function loadMap() {
 function updateMarkers() {
   if (!map.value) return;
 
-  const { markers } = props
+  const { markers = [], listingView } = props
 
-  clearMarkers(map.value);
-  addMarkers(map.value, markers);
+  // Remove any existing markers
+  clearMarkers(map.value, true);
+
+  // If no listing view, add any number of markers provided
+  if (!listingView) {
+    addMarkers(map.value, markers);
+
+    return
+  }
+
+  // Remove any clusters from the map
+  clearClusters(map.value)
+
+  // Add get the first marker...
+  const [firstMarker] = asArray(markers)
+
+  // And if it exists, add it to the map
+  if (firstMarker) addMarker(map.value, firstMarker);
 }
 
 /**

@@ -23,7 +23,7 @@
         body: 'w-full flex flex-col flex-1',
       }"
     >
-      <AtomsCloudFlareImage v-if="listing?.property?.media[0]" :src="listing?.property?.media[0]?.image!" alt="Listing image" variant="gallery" :placeholder="true" class="w-full h-54 object-bottom object-cover rounded-lg aspect-4/3" />
+      <AtomsCloudFlareImage v-if="getMainImage(listing?.property)" :src="getMainImage(listing?.property)!" alt="Listing image" variant="gallery" :placeholder="true" class="w-full h-54 object-bottom object-cover rounded-lg aspect-4/3" />
 
       <template #header>
         <div class="flex flex-row justify-between">

@@ -3,22 +3,30 @@ import type { Property } from "../database/prisma/generated/client";
 
 export const propertyInclude = {
   address: true,
-  media: true,
+  media: {
+    orderBy: { sortOrder: 'asc' as const },
+  },
   type: true,
   classification: true,
   bedroomFeatures: {
     include: {
-      media: true,
+      media: {
+        orderBy: { sortOrder: 'asc' as const },
+      },
     },
   },
   bathroomFeatures: {
     include: {
-      media: true,
+      media: {
+        orderBy: { sortOrder: 'asc' as const },
+      },
     },
   },
   otherRoom: {
     include: {
-      media: true,
+      media: {
+        orderBy: { sortOrder: 'asc' as const },
+      },
     },
   },
   parking: true,
@@ -27,12 +35,16 @@ export const propertyInclude = {
   accessibilityFeatures: true,
   kitchenFeatures: {
     include: {
-      media: true,
+      media: {
+        orderBy: { sortOrder: 'asc' as const },
+      },
     },
   },
   reception: {
     include: {
-      media: true,
+      media: {
+        orderBy: { sortOrder: 'asc' as const },
+      },
     },
   },
   utility: true,
@@ -40,20 +52,28 @@ export const propertyInclude = {
     include: {
       yard: {
         include: {
-          media: true,
+          media: {
+            orderBy: { sortOrder: 'asc' as const },
+          },
         },
       },
       garden: {
         include: {
-          media: true,
+          media: {
+            orderBy: { sortOrder: 'asc' as const },
+          },
         },
       },
       land: {
         include: {
-          media: true,
+          media: {
+            orderBy: { sortOrder: 'asc' as const },
+          },
         },
       },
-      media: true,
+      media: {
+        orderBy: { sortOrder: 'asc' as const },
+      },
     },
   },
   energyAndUtilities: true,

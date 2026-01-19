@@ -11,21 +11,19 @@
 
     <template v-else>
       <div v-if="hasSearchInfo" class="o-results__header">
-        <MoleculesResultsContext 
-          :count="results.length"
-          :query-analysis="queryAnalysis"
-          :location="location"
-          :radius="radius"
-          @open-popover="$emit('open-popover', $event)"
-        />
+        <MoleculesResultsContext :count="results.length" :query-analysis="queryAnalysis" :location="location"
+          :radius="radius" @open-popover="$emit('open-popover', $event)" />
       </div>
 
       <div class="o-results__grid">
-        <component v-for="{ variant, fullWidth, component, result } of resultsComponents" :is="component" :variant
+        <component v-for="{ variant, fullWidth, component, result } of paginatedResults" :is="component" :variant
           :result :class="{
             'o-results__card--large': !!fullWidth
           }" />
       </div>
+
+      <MoleculesPaginator v-if="requiresPagnination" :current-page="currentPage" :items-per-page="RESULTS_PER_PAGE"
+        :total-items="resultsLength" @change-page="updateCurrentPage" />
     </template>
   </div>
 </template>
@@ -67,6 +65,61 @@ const hasSearchInfo = computed(() => {
 })
 
 /**
+ *  Pagination
+ */
+const RESULTS_PER_PAGE = 24;
+const currentPage = ref(1)
+
+function updateCurrentPage(newIndex: number) {
+  currentPage.value = newIndex
+
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+}
+
+// Get paginatable results length
+const resultsLength = computed(() => {
+  const results = asArray(resultsComponents.value)
+
+  return results.length
+})
+
+// Check if pagination is necessary
+const requiresPagnination = computed(() => {
+  return resultsLength.value > RESULTS_PER_PAGE
+})
+
+// Get first paginated index
+const firstPaginatedIndex = computed(() => {
+  return 1 + (RESULTS_PER_PAGE * (currentPage.value - 1))
+})
+
+// Get last paginated index
+const lastPaginatedIndex = computed(() => {
+  return Math.min(firstPaginatedIndex.value + RESULTS_PER_PAGE - 1, resultsLength.value)
+})
+
+// Get title for visible paginated indexes
+const visibleResultsTitle = computed(() => {
+  // If no pagination, show normal title
+  if (!requiresPagnination.value) {
+    return `Showing ${resultsLength.value} results`
+  }
+
+  return `Showing results ${firstPaginatedIndex.value} to ${lastPaginatedIndex.value} of ${resultsLength.value}`
+})
+
+const paginatedResults = computed(() => {
+  // If no results, return empty array
+  if (!resultsLength.value) return []
+
+  // Else return sliced results
+  return asArray(resultsComponents.value).slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value)
+})
+
+/**
  *  Get the variant of the card
  */
 function getCardVariant(result: ListingCardData) {
@@ -101,7 +154,7 @@ function distributeListings(listings: ListingCardData[]): ListingCardData[] {
   // Use the existing utility function
   const sections = distributePremiumListings(listings as ListingWithFullProperty[])
   const result: ListingCardData[] = []
-  
+
   // Flatten the sections into a simple array
   for (const section of sections) {
     if (section.item) {
@@ -114,7 +167,7 @@ function distributeListings(listings: ListingCardData[]): ListingCardData[] {
       }
     }
   }
-  
+
   return result
 }
 
@@ -123,7 +176,9 @@ function distributeListings(listings: ListingCardData[]): ListingCardData[] {
  */
 const resultsComponents = computed(() => {
   const { results } = asObject(props)
-  const distributedResults = distributeListings(asArray(results))
+
+  const sortedResults = asArray(results) /* @TODO - sort here */
+  const distributedResults = distributeListings(sortedResults)
 
   return distributedResults
     .filter((result): result is ListingCardData => !!result) // Type guard to remove undefined
@@ -133,6 +188,19 @@ const resultsComponents = computed(() => {
       return { variant, fullWidth, component, result }
     })
 })
+
+// Track impressions when results are displayed
+const { trackImpressions } = useAnalyticsTracking()
+
+watch(() => props.results, (newResults) => {
+  if (newResults && newResults.length > 0 && !props.isLoading) {
+    // Track all listing IDs as impressions
+    const listingIds = newResults.map(r => r.id).filter(Boolean)
+    if (listingIds.length > 0) {
+      trackImpressions(listingIds)
+    }
+  }
+}, { immediate: true })
 </script>
 
 <style lang="scss">
@@ -166,30 +234,12 @@ const resultsComponents = computed(() => {
       }
     }
 
-    @container (1100px > width >=950px) {
+    @container (width >=950px) {
       grid-template-columns: repeat(2, 1fr);
       grid-gap: var(--size-16);
 
       .o-results__card--large {
         grid-column: span 2;
-      }
-    }
-
-    @container (1600px > width >=1100px) {
-      grid-template-columns: repeat(3, 1fr);
-      grid-gap: var(--size-20);
-
-      .o-results__card--large {
-        grid-column: span 3;
-      }
-    }
-
-    @container (width >=1600px) {
-      grid-template-columns: repeat(4, 1fr);
-      grid-gap: var(--size-20);
-
-      .o-results__card--large {
-        grid-column: span 4;
       }
     }
   }

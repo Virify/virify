@@ -1,0 +1,18 @@
+/// Track listing shares across platforms
+model ListingShare {
+  id        Int      @id @default(autoincrement())
+  listingId Int
+  userId    Int?
+  sessionId String?
+  ip        String?
+  platform  String // twitter, facebook, whatsapp, copy, email, etc.
+  createdAt DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([listingId])
+  @@index([userId])
+  @@index([platform])
+  @@index([createdAt])
+}

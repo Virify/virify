@@ -7,6 +7,7 @@
       :filter-state="filterState"
       :allConversationsCount="allConversationsCount"
       :unreadConversationsCount="unreadConversationsCount"
+      :hide-sale-rent-filter="hideSaleRentFilter"
     />
 
     <OrganismsDashboardFilterDesktop
@@ -15,6 +16,7 @@
       :allConversationsCount="allConversationsCount"
       :unreadConversationsCount="unreadConversationsCount"
       :view-options="viewOptions"
+      :hide-sale-rent-filter="hideSaleRentFilter"
     />
   </div>
 </template>
@@ -29,6 +31,7 @@
     viewOptions?: { label: string; value: string; icon?: string; disabled?: boolean }[];
     allCount?: number;
     unreadCount?: number;
+    hideSaleRentFilter?: boolean;
   }>();
 
   // Fetch aggregates from shared notification state

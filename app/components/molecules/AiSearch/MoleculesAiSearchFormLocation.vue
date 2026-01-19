@@ -1,11 +1,12 @@
 <template>
   <form @submit.prevent="hidePopover" class="| flow">
     <div role="presentation" ref="$location" class="m-ai-search-form-location__container | flow flow-lg">
-      <fieldset class="m-ai-search-form-location__fieldset | elevate-200">
+      <fieldset class="m-ai-search-form-location__fieldset | gradient-box">
         <legend class="| visually-hidden">Location</legend>
 
-        <input type="text" class="m-ai-search-form-location__input | body-md" placeholder="Where do you want to live?"
-          aria-label="Location" v-model="locationQuery" @input="updateAutocompleteValue" @focus="showPopover" />
+        <input ref="$searchInput" type="text" class="m-ai-search-form-location__input | body-md"
+          placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery"
+          @input="updateAutocompleteValue" @focus="showPopover" />
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
@@ -14,7 +15,7 @@
 
       <client-only>
         <Transition name="m-ai-search-form-location">
-          <div role="presentation" v-show="popoverExpanded">
+          <div role="presentation" class="m-ai-search-form-location__popover" v-show="popoverExpanded">
             <MoleculesAutocompletePopover :search-value="autocompleteValue"
               @location-selected="handleLocationSelected" />
           </div>
@@ -109,6 +110,23 @@ const hidePopover = () => { popoverExpanded.value = false; };
 
 onClickOutside($location, hidePopover);
 
+/**
+ *  Show popover if focused on first mount
+ */
+const $searchInput = useTemplateRef('$searchInput')
+
+onMounted(() => {
+  const input = unref($searchInput)
+
+  // If input is not an element, do nothing
+  if (!isElement(input)) return
+
+  // If input is focused
+  if (input === document.activeElement) {
+    showPopover()
+  }
+})
+
 </script>
 
 <style lang="scss">
@@ -120,9 +138,14 @@ onClickOutside($location, hidePopover);
   &__fieldset {
     background: var(--background-200);
     color: var(--foreground-100);
-    border-radius: var(--border-radius-xl);
     align-items: center;
-    border: 1px solid var(--border-color-200);
+
+    @include mq.not-tablet {
+      --gradient-box-shadow: none;
+      --gradient-box-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+
+      border: 0;
+    }
 
     @include mq.tablet {
       display: grid;
@@ -137,20 +160,33 @@ onClickOutside($location, hidePopover);
     }
   }
 
+  &__popover {
+    @include mq.not-tablet {
+      margin: 0;
+
+      .m-autocomplete-popover {
+        border-radius: 0;
+        border-width: 2px;
+        border-top: 0;
+        border-bottom: 0;
+      }
+    }
+  }
+
   &__radius,
   &__input {
     background-color: transparent;
     color: currentColor;
-    border-radius: var(--border-radius-lg);
-
-    @include mq.tablet {
-      border-radius: var(--border-radius-xl);
-    }
+    border-radius: var(--border-radius-xl);
   }
 
   &__input {
     padding: var(--size-14) var(--size-16);
     width: 100%;
+
+    @include mq.not-tablet {
+      border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+    }
 
     @include mq.tablet {
       width: auto;
@@ -176,6 +212,12 @@ onClickOutside($location, hidePopover);
       display: none;
       padding: var(--size-14) var(--size-18);
       padding-right: var(--size-48);
+    }
+
+    @include mq.not-tablet {
+      margin-top: 0;
+      border-top: 0;
+      border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
     }
 
     @include mq.tablet {

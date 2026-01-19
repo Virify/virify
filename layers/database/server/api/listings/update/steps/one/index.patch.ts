@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { FurnishedStatus, RentalPriceType, SalePriceType, TenureType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
 
 const saleListingSchema = z.object({
   tenureType: z.enum(Object.values(TenureType)).nullable().optional(),
@@ -62,6 +63,11 @@ export default defineEventHandler(async (event) => {
         rentalListing: true,
       },
     });
+
+    // Invalidate cache after update
+    await invalidateListingCache(listingId);
+
+    return result;
   } catch (error) {
     return errorResponse(error, event);
   }

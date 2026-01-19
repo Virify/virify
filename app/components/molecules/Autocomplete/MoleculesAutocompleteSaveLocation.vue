@@ -86,6 +86,7 @@ const entryExists = computed(() => {
 const locationName = ref('')
 
 const { checkEntry: checkSavedLocation, addEntry: addSavedLocation } = useSavedLocation()
+const { enhanceWithBoundaryPolygon } = useMap()
 const { isPending, setPendingWhile } = usePending()
 
 async function saveLocation() {
@@ -97,6 +98,10 @@ async function saveLocation() {
     const { option } = props
     const { geometry, place_name_en, bbox } = asObject(option)
     const { coordinates } = asObject(geometry)
+    
+    // Enhance the geocoding feature with boundary polygon for map visualization
+    // This fetches the actual boundary shape from MapTiler if available
+    const enhancedFeature = await enhanceWithBoundaryPolygon(option)
 
     await addSavedLocation({
       name,
@@ -104,7 +109,7 @@ async function saveLocation() {
       lon: (coordinates as [number, number])[1],
       location: place_name_en,
       bbox: bbox as [number, number, number, number] | undefined,
-      geocodingFeature: option
+      geocodingFeature: enhancedFeature // Now includes boundaryPolygon if available
     } as UserSavedLocation);
 
     closePopover()

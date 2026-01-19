@@ -111,14 +111,27 @@ async function getAiSearchCompletion(query: string): Promise<string> {
  */
 function parseAiCompletion(aiResponse: string): any {
   try {
+    // Try parsing as-is first
     return JSON.parse(aiResponse);
-  } catch (error) {
-    console.error("Failed to parse AI response:", aiResponse, error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: `Invalid JSON response from AI: ${aiResponse.substring(0, 200)}...`,
-      message: `Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`,
-    });
+  } catch (firstError) {
+    // Fallback: Try to fix common issues (unquoted property names)
+    try {
+      // Replace unquoted property names like "in:" or "gte:" with quoted versions
+      // This regex looks for word characters followed by : that aren't already quoted
+      const sanitized = aiResponse.replace(/(?<!")(\b\w+)(?=\s*:)/g, '"$1"');
+      
+      return JSON.parse(sanitized);
+    } catch (secondError) {
+      console.error("Failed to parse AI response (original):", aiResponse);
+      console.error("First parse error:", firstError);
+      console.error("Second parse error (after sanitization):", secondError);
+      
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Invalid JSON response from AI: ${aiResponse.substring(0, 200)}...`,
+        message: `Failed to parse AI response. The AI returned invalid JSON format. Please try again.`,
+      });
+    }
   }
 }
 

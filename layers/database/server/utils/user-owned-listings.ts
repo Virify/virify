@@ -1,19 +1,16 @@
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client"
 
 /**
- * Get listings owned by the provided user with lightweight analytics counts
+ * Count listings owned by the provided user matching filters
  */
-export async function getUserOwnedListingsWithAnalytics(
+export async function getUserOwnedListingsCountWithFilters(
   userId: number,
   opts?: { 
     status?: "all" | "active" | "inactive" | "draft" | "archived"
     search?: string
-    take?: number
-    skip?: number
-    sort?: "new" | "old" | "premium" | "featured" | "basic" 
   }
-): Promise<OwnedListingWithAnalytics[]> {
-  const { status = "all", search = "", take = 50, skip = 0, sort = "new" } = opts || {}
+): Promise<number> {
+  const { status = "all", search = "" } = opts || {}
 
   const where: Prisma.ListingWhereInput = { userId }
 
@@ -52,6 +49,73 @@ export async function getUserOwnedListingsWithAnalytics(
     }
   }
 
+  return prisma.listing.count({ where })
+}
+
+/**
+ * Get listings owned by the provided user with lightweight analytics counts
+ */
+export async function getUserOwnedListingsWithAnalytics(
+  userId: number,
+  opts?: { 
+    status?: "all" | "active" | "inactive" | "draft" | "archived"
+    search?: string
+    take?: number
+    skip?: number
+    sort?: "new" | "old" | "premium" | "featured" | "basic"
+    saleRent?: "all" | "sale" | "rent"
+  }
+): Promise<{ listings: OwnedListingWithAnalytics[]; total: number }> {
+  const { status = "all", search = "", take = 50, skip = 0, sort = "new", saleRent = "all" } = opts || {}
+
+  const where: Prisma.ListingWhereInput = { userId }
+
+  // Apply status filters
+  switch (status) {
+    case "active":
+      where.published = true
+      where.archived = false
+      break
+    case "inactive":
+      where.AND = [{ published: false }, { NOT: { publishedAt: null } }, { archived: false }]
+      break
+    case "draft":
+      where.published = false
+      where.publishedAt = null
+      where.archived = false
+      break
+    case "archived":
+      where.archived = true
+      break
+    default:
+      // "all" - show everything except archived
+      where.archived = false
+  }
+
+  // Apply sale/rent filter
+  if (saleRent === "sale") {
+    where.saleListing = { isNot: null }
+    where.rentalListing = null
+  } else if (saleRent === "rent") {
+    where.rentalListing = { isNot: null }
+  }
+
+  // Apply search filters
+  const searchTerm = search.trim()
+  if (searchTerm) {
+    where.OR = [
+      { property: { address: { fullAddress: { contains: searchTerm, mode: "insensitive" } } } },
+    ]
+    
+    const numericSearch = Number(searchTerm)
+    if (!Number.isNaN(numericSearch)) {
+      (where.OR as Prisma.ListingWhereInput[]).push({ price: numericSearch })
+    }
+  }
+
+  // Get total count for pagination
+  const total = await prisma.listing.count({ where })
+
   // Fetch listings
   const listings = await prisma.listing.findMany({
     where,
@@ -68,7 +132,7 @@ export async function getUserOwnedListingsWithAnalytics(
     orderBy: { updatedAt: sort === 'old' ? 'asc' : 'desc' },
   }) as (ListingCardType & { published: boolean; publishedAt: Date | null; archived: boolean })[]
 
-  if (listings.length === 0) return []
+  if (listings.length === 0) return { listings: [], total }
 
   const listingIds = listings.map(listing => listing.id)
 
@@ -102,7 +166,7 @@ export async function getUserOwnedListingsWithAnalytics(
   // Apply tier-based sorting if requested
   const sortedListings = applyTierSorting(listings, sort)
 
-  return sortedListings.map((listing) => ({
+  const enrichedListings = sortedListings.map((listing) => ({
     ...listing,
     analytics: {
       viewsCount: viewsMap.get(listing.id) ?? 0,
@@ -113,6 +177,8 @@ export async function getUserOwnedListingsWithAnalytics(
     archived: listing.archived,
     isDraft: !listing.published && !listing.publishedAt,
   }))
+
+  return { listings: enrichedListings, total }
 }
 
 function applyTierSorting(listings: any[], sort: string) {
@@ -126,6 +192,8 @@ function applyTierSorting(listings: any[], sort: string) {
     (listing.listingTier || '').toUpperCase() === targetTier
   )
 }
+
+import { invalidateListingCache } from "./listing-cache";
 
 export async function toggleListingPublished(userId: number, listingId: number, published: boolean) {
   const listing = await prisma.listing.findFirst({ 
@@ -148,6 +216,9 @@ export async function toggleListingPublished(userId: number, listingId: number, 
       publishedAt: true,
     },
   })
+
+  // Invalidate cache after update
+  await invalidateListingCache(listingId);
 
   // Send websocket update for listings count change (if this changes draft status)
   const wasDraft = !listing.published && !listing.publishedAt
@@ -187,6 +258,9 @@ export async function archiveListing(userId: number, listingId: number) {
       archivedAt: true,
     },
   })
+
+  // Invalidate cache after update
+  await invalidateListingCache(listingId);
 
   console.log(`[archiveListing] Successfully updated listing ${listingId}:`, result)
 

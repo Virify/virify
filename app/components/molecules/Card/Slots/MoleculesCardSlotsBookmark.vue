@@ -37,7 +37,7 @@ defineProps<Props>()
     width: var(--size-28);
     height: var(--size-28);
     transition: opacity var(--animation-fast);
-    
+
     svg {
       stroke: var(--monochrome-100);
     }

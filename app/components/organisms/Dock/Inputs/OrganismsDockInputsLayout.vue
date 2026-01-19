@@ -68,38 +68,94 @@ const $labels = useTemplateRef('$labels')
 const $highlight = useTemplateRef('$highlight')
 const $wrapper = useTemplateRef('$wrapper')
 
-async function updateHighlightPosition() {
-  if (!import.meta.client) return
-
-  await nextTick()
-
+/**
+ *  @TODO
+ *  Convert to composable so reuse with
+ *  app/components/molecules/MoleculesSwitcher.vue
+ */
+function updateHighlightPosition(isResize = false) {
   // Search for active label
   const activeLabel = unref($labels)?.find(label => {
     return label.querySelector('input:checked')
   })
 
-  // If no valid matches found, do nothing
-  if (!isElement(activeLabel)) return
-
-  // Get width, left position of active element
-  const { offsetLeft, offsetWidth } = activeLabel
-
   // Get highlight as a non-reactive value
   const highlight = unref($highlight);
 
   // Do nothing if highlight is not an element
-  if (!isElement(highlight)) return
+  if (!isElement(highlight) || !isElement(activeLabel)) return
 
-  // Update higlight positions accordingly
-  highlight.style.width = `${offsetWidth}px`
-  highlight.style.left = `${offsetLeft}px`
+  // Get width, left position of active element
+  const { offsetLeft, offsetWidth } = activeLabel
+
+  // Get current, previous states
+  const previousLeft = highlight.style.left
+  const previousWidth = highlight.style.width
+  const nextLeft = offsetLeft + 'px'
+  const nextWidth = offsetWidth + 'px'
+
+  // Do not animate resizes
+  if (isResize || !previousWidth) {
+    highlight.style.left = nextLeft
+    highlight.style.width = nextWidth
+
+    return
+  }
+
+  // Clear any existing animatinos
+  highlight.getAnimations().forEach(animation => {
+    if ((animation instanceof CSSTransition)) return
+
+    // Hide abort errors - they are intended
+    animation.finished.catch(() => { })
+
+    // Cancel existing animations
+    animation.cancel()
+
+    // Set to intended state
+    highlight.style.left = nextLeft
+    highlight.style.width = nextWidth
+  })
+
+  // Do a little bounce animation whilst animating
+  const animation = highlight.animate([
+    {
+      transform: '',
+      width: previousWidth,
+      left: previousLeft,
+    },
+    { transform: 'scale(1.8, 1)' },
+    {
+      transform: '',
+      width: nextWidth,
+      left: nextLeft,
+    },
+  ], {
+    duration: 250,
+    easing: 'cubic-bezier(0.3, 0.5, 0.5, 1)',
+  })
+
+  // Apply final style to slider
+  animation.finished.then(() => {
+    highlight.style.left = nextLeft
+    highlight.style.width = nextWidth
+  }).catch(() => { })
+}
+
+async function updateSelection(isResize?: boolean) {
+  if (!import.meta.client) return
+
+  await nextTick()
+
+  // Update highlight position
+  updateHighlightPosition(isResize)
 
   // Save new view mode
   setViewMode(viewMode.value)
 }
 
-watchImmediate(viewMode, updateHighlightPosition)
-useResizeObserver($wrapper, updateHighlightPosition)
+watchImmediate(viewMode, () => updateSelection(false))
+useResizeObserver($wrapper, () => updateSelection(true))
 
 /**
  *  Update layout in state
@@ -130,6 +186,7 @@ watch(options, (newValue) => {
   color: var(--foreground-300);
   border-radius: var(--border-radius-2xl);
   box-sizing: border-box;
+  overflow: hidden;
 
   &__label {
     display: flex;
@@ -179,9 +236,6 @@ watch(options, (newValue) => {
     background: var(--secondary-400);
     border-radius: var(--border-radius-2xl);
     z-index: -1;
-    transition-property: width, left;
-    transition-duration: var(--animation-medium);
-    transition-timing-function: var(--ease-out);
   }
 }
 </style>

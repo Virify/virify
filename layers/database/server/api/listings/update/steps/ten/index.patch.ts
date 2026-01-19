@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
 
 /**
  * Schema for media assignment to rooms
@@ -147,6 +148,9 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+
+    // Invalidate cache after update
+    await invalidateListingCache(listingId);
 
     return result;
   } catch (error) {

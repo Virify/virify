@@ -1,181 +1,113 @@
-import * as z from "zod";
-import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+import { z } from "zod";
+import { step8Schema } from "~~/shared/utils/listing-step8-schema";
+import {
+  EPCRating,
+  HeatingType,
+  BoilerType,
+  HotWaterSource,
+  RenewableEnergy,
+  ConnectedUtilities,
+} from "~~/layers/database/server/database/prisma/generated/enums";
 
-// Validate payload for Step Eight - Property Features
-const stepEightSchema = z.object({
-  draftId: z.number().int().positive(),
-  property: z.object({
-    additionalFeatures: z
-      .object({
-        description: z.string().max(5000).nullable().optional(),
-        petFriendly: z.boolean().optional(),
-        features: z.array(z.enum(Object.values(BuildingFeature) as [string, ...string[]])).optional(),
-        moveInDate: z.coerce.date().nullable().optional(),
-      })
-      .nullable()
-      .optional(),
-    parking: z
-      .object({
-        description: z.string().max(5000).nullable().optional(),
-        features: z.array(z.enum(Object.values(ParkingFeature) as [string, ...string[]])).optional(),
-      })
-      .nullable()
-      .optional(),
-    securityFeatures: z
-      .object({
-        description: z.string().max(5000).nullable().optional(),
-        features: z.array(z.enum(Object.values(SecurityFeature) as [string, ...string[]])).optional(),
-      })
-      .nullable()
-      .optional(),
-    accessibilityFeatures: z
-      .object({
-        description: z.string().max(5000).nullable().optional(),
-        features: z.array(z.enum(Object.values(AccessibilityFeature) as [string, ...string[]])).optional(),
-      })
-      .nullable()
-      .optional(),
-    storageFeatures: z
-      .object({
-        description: z.string().max(5000).nullable().optional(),
-        features: z.array(z.enum(Object.values(StorageFeature) as [string, ...string[]])).optional(),
-      })
-      .nullable()
-      .optional(),
-    utility: z
-      .object({
-        description: z.string().max(5000).nullable().optional(),
-        features: z.array(z.enum(Object.values(UtilityFeature) as [string, ...string[]])).optional(),
-        size: z.coerce.number().min(0).nullable().optional(),
-      })
-      .nullable()
-      .optional(),
-  }),
-});
+/**
+ * Step 8: Energy & Costs API Endpoint
+ * 
+ * Works for BOTH draft listings (draftId) and live listings (listingId)
+ */
+
+const stepDataSchema = step8Schema.extend({
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
+}).refine(
+  (data) => data.draftId !== undefined || data.listingId !== undefined,
+  { message: "Either draftId or listingId must be provided" }
+);
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
+  
   try {
-    const { draftId, property } = await readValidatedBody(event, stepEightSchema.parse);
+    const body = await readBody(event);
+    const { draftId, listingId, property } = stepDataSchema.parse(body);
+    const { energyAndUtilities, runningCosts } = property;
+
+    const propertyUpdate = {
+      energyAndUtilities: {
+        upsert: {
+          create: {
+            description: energyAndUtilities.description ?? null,
+            epcRating: energyAndUtilities.epcRating as EPCRating,
+            epcCertificateUrl: energyAndUtilities.epcCertificateUrl ?? null,
+            primaryHeatingType: energyAndUtilities.primaryHeatingType as HeatingType[] ?? [],
+            secondaryHeatingType: energyAndUtilities.secondaryHeatingType as HeatingType[] ?? [],
+            boilerType: energyAndUtilities.boilerType as BoilerType ?? null,
+            hotWaterSource: energyAndUtilities.hotWaterSource as HotWaterSource ?? null,
+            renewables: energyAndUtilities.renewables as RenewableEnergy[] ?? [],
+            connectedUtilities: energyAndUtilities.connectedUtilities as ConnectedUtilities[] ?? [],
+          },
+          update: {
+            description: energyAndUtilities.description ?? null,
+            epcRating: energyAndUtilities.epcRating as EPCRating,
+            epcCertificateUrl: energyAndUtilities.epcCertificateUrl ?? null,
+            primaryHeatingType: energyAndUtilities.primaryHeatingType as HeatingType[] ?? [],
+            secondaryHeatingType: energyAndUtilities.secondaryHeatingType as HeatingType[] ?? [],
+            boilerType: energyAndUtilities.boilerType as BoilerType ?? null,
+            hotWaterSource: energyAndUtilities.hotWaterSource as HotWaterSource ?? null,
+            renewables: energyAndUtilities.renewables as RenewableEnergy[] ?? [],
+            connectedUtilities: energyAndUtilities.connectedUtilities as ConnectedUtilities[] ?? [],
+          },
+        },
+      },
+      runningCosts: {
+        upsert: {
+          create: {
+            description: runningCosts.description ?? null,
+            councilTaxBand: runningCosts.councilTaxBand,
+            serviceCharges: runningCosts.serviceCharges ?? null,
+            groundRent: runningCosts.groundRent ?? null,
+          },
+          update: {
+            description: runningCosts.description ?? null,
+            councilTaxBand: runningCosts.councilTaxBand,
+            serviceCharges: runningCosts.serviceCharges ?? null,
+            groundRent: runningCosts.groundRent ?? null,
+          },
+        },
+      },
+    };
+
+    // DRAFT or LIVE - same update, different table
+    if (listingId) {
+      const result = await prisma.listing.update({
+        where: { id: listingId, userId: user.id },
+        data: { property: { update: propertyUpdate } },
+        include: { property: { include: { energyAndUtilities: true, runningCosts: true } } },
+      });
+
+      // Invalidate listing cache so modal shows fresh data
+      const storage = useStorage('cache:listing');
+      await storage.removeItem(`listing:${listingId}`);
+
+      return result;
+    }
+
+    // Draft - also update completedSteps
+    const current = await prisma.draftListing.findUnique({
+      where: { id: draftId },
+      select: { completedSteps: true },
+    });
 
     return await prisma.draftListing.update({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId!, userId: user.id },
       data: {
-        property: {
-          update: {
-            ...(property.additionalFeatures && {
-              additionalFeatures: {
-                upsert: {
-                  create: {
-                    description: property.additionalFeatures.description ?? null,
-                    petFriendly: property.additionalFeatures.petFriendly ?? false,
-                    features: property.additionalFeatures.features as BuildingFeature[] ?? [],
-                    moveInDate: property.additionalFeatures.moveInDate ?? null,
-                  },
-                  update: {
-                    description: property.additionalFeatures.description ?? null,
-                    petFriendly: property.additionalFeatures.petFriendly ?? false,
-                    features: property.additionalFeatures.features as BuildingFeature[] ?? [],
-                    moveInDate: property.additionalFeatures.moveInDate ?? null,
-                  },
-                },
-              },
-            }),
-            // Parking (optional)
-            ...(property.parking && {
-              parking: {
-                upsert: {
-                  create: {
-                    description: property.parking.description ?? null,
-                    features: property.parking.features as ParkingFeature[] ?? [],
-                  },
-                  update: {
-                    description: property.parking.description ?? null,
-                    features: property.parking.features as ParkingFeature[] ?? [],
-                  },
-                },
-              },
-            }),
-            // Security Features (optional)
-            ...(property.securityFeatures && {
-              securityFeatures: {
-                upsert: {
-                  create: {
-                    description: property.securityFeatures.description ?? null,
-                    features: property.securityFeatures.features as SecurityFeature[] ?? [],
-                  },
-                  update: {
-                    description: property.securityFeatures.description ?? null,
-                    features: property.securityFeatures.features as SecurityFeature[] ?? [],
-                  },
-                },
-              },
-            }),
-            // Accessibility Features (optional)
-            ...(property.accessibilityFeatures && {
-              accessibilityFeatures: {
-                upsert: {
-                  create: {
-                    description: property.accessibilityFeatures.description ?? null,
-                    features: property.accessibilityFeatures.features as AccessibilityFeature[] ?? [],
-                  },
-                  update: {
-                    description: property.accessibilityFeatures.description ?? null,
-                    features: property.accessibilityFeatures.features as AccessibilityFeature[] ?? [],
-                  },
-                },
-              },
-            }),
-            // Storage Features (optional)
-            ...(property.storageFeatures && {
-              storageFeatures: {
-                upsert: {
-                  create: {
-                    description: property.storageFeatures.description ?? null,
-                    features: property.storageFeatures.features as StorageFeature[] ?? [],
-                  },
-                  update: {
-                    description: property.storageFeatures.description ?? null,
-                    features: property.storageFeatures.features as StorageFeature[] ?? [],
-                  },
-                },
-              },
-            }),
-            // Utility Room (optional)
-            ...(property.utility && {
-              utility: {
-                upsert: {
-                  create: {
-                    description: property.utility.description ?? null,
-                    features: property.utility.features as UtilityFeature[] ?? [],
-                    size: property.utility.size ?? null,
-                  },
-                  update: {
-                    description: property.utility.description ?? null,
-                    features: property.utility.features as UtilityFeature[] ?? [],
-                    size: property.utility.size ?? null,
-                  },
-                },
-              },
-            }),
-          },
-        },
+        ...(current && !current.completedSteps.includes(8) ? { completedSteps: { push: 8 } } : {}),
+        property: { update: propertyUpdate },
       },
-      include: {
-        property: {
-          include: {
-            additionalFeatures: true,
-            parking: true,
-            securityFeatures: true,
-            accessibilityFeatures: true,
-            storageFeatures: true,
-            utility: true,
-          },
-        },
-      },
+      include: { property: { include: { energyAndUtilities: true, runningCosts: true } } },
     });
   } catch (error) {
+    console.log(error);
     return errorResponse(error, event);
   }
 });

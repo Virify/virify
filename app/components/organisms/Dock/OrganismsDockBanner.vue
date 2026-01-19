@@ -1,19 +1,43 @@
 <template>
   <section class="o-dock-banner__form-height" role="presentation">
-    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" @focusin="showExpandedForm">
+    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
+      @focusin="showExpandedForm">
       <div class="o-dock-banner__backdrop | elevate-300" :class="{
         'o-dock-banner__backdrop--hidden': !hasLocation
       }" aria-hidden="true" ref="$backdrop">
         <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
       </div>
 
-      <fieldset class="o-dock-banner__fader | flow" :disabled="isSearchLoading">
+      <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
         <MoleculesAiSearchFormLocation />
 
         <client-only>
           <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
-            <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" :loading="isChecking" hideReset
-              @submit-search="searchSubmit" @reset-search="searchReset" />
+
+            <OrganismsFilterSwitcher>
+              <template v-slot:traditional>
+                <!-- @TODO put in a nicer skeleton loader here -->
+                <template v-if="isTraditionalFormLoading">
+                  <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
+                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                  </div>
+
+                  <div class="o-dock-banner__toggle-content-loader">
+                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                  </div>
+                </template>
+                <!-- @TODO end -->
+
+                <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
+                  @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
+              </template>
+
+              <template v-slot:ai>
+                <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
+                  @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
+                  class="o-dock-banner__toggle-content" />
+              </template>
+            </OrganismsFilterSwitcher>
           </Transition>
         </client-only>
 
@@ -22,7 +46,7 @@
           @click.prevent="showExpandedForm">
           Expand form
         </AtomsButton>
-      </fieldset>
+      </section>
     </div>
   </section>
 </template>
@@ -37,6 +61,15 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   listingType: 'all'
 });
+
+/**
+ *  Manage lazy hydration
+ */
+const isTraditionalFormLoading = ref(true)
+
+function hideTraditionalFormLoader() {
+  isTraditionalFormLoading.value = false
+}
 
 /**
  *  Animate dock to final position
@@ -113,9 +146,16 @@ async function animateFormToDock() {
 }
 
 /**
+ *  Reset loading state after navigation
+ */
+onMounted(() => {
+  isSearchLoading.value = false
+})
+
+/**
  *  Toggle filters as visible
  */
-const isExpanded = ref(true)
+const isExpanded = ref(false)
 
 function showExpandedForm() {
   isExpanded.value = true
@@ -143,10 +183,17 @@ const initialQuery = computed(() => {
   return query
 })
 
-async function searchSubmit(query: string) {
+async function traditionalSearchSubmit(formData: TraditionalSearchData) {
+  const query = buildQueryFromTraditionalFormData(formData)
+
+  await aiSearchSubmit(query)
+}
+
+async function aiSearchSubmit(query: string) {
   setListingType(props.listingType)
+
   const { location, radius, listingType } = asObject(searchState.value)
-  
+
   if (!location) return
 
   // Check content moderation before proceeding
@@ -199,6 +246,21 @@ const hasLocation = computed(() => {
     }
   }
 
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: -1;
+    pointer-events: none;
+    transition: background-color var(--animation-slow);
+  }
+
+  &--backdrop::before,
+  &:hover::before {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
   &__backdrop {
     position: absolute;
     z-index: -1;
@@ -243,6 +305,46 @@ const hasLocation = computed(() => {
 
     &--expanded {
       margin-top: var(--size-36);
+    }
+  }
+
+  &__toggle-content {
+    padding: 0 var(--size-6) var(--size-6);
+
+    @include mq.small-tablet {
+      padding: 0 var(--size-16) var(--size-16);
+    }
+  }
+
+  &__toggle-content-loader {
+    --tab-height-offset: 3.6rem;
+    min-height: 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: var(--size-24);
+
+    .a-icon {
+      width: var(--size-40);
+      height: var(--size-40);
+    }
+
+    &--dark {
+      border-radius: var(--border-radius-2xl);
+      margin: var(--tab-height-offset) var(--size-6) var(--size-6);
+
+      @include mq.small-tablet {
+        margin: var(--tab-height-offset) var(--size-16) var(--size-16);
+      }
+
+      /**
+       *  @TODO This is currently duplicated from the component:
+       *        OrganismsTraditionalSearchContract - we should probably
+       *        create a global utility class so this can be 'shared'
+       */
+      background: linear-gradient(to bottom, var(--blue-400), var(--blue-300));
+      color: var(--monochrome-900);
     }
   }
 }

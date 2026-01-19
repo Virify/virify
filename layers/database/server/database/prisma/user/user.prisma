@@ -33,6 +33,12 @@ model User {
   membership               Membership?
   DraftListing             DraftListing[]
   mortgageCalculations     MortgageCalculation[]
+  // Analytics relations
+  ListingImpression        ListingImpression[]
+  DailyListingStats        DailyListingStats[]
+  DailyUserStats           DailyUserStats[]
+  ListingClick             ListingClick[]
+  ListingShare             ListingShare[]
 
   @@index([addressId])
   @@index([email])

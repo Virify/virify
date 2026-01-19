@@ -15,7 +15,9 @@ const aggregates = ref<UserItemsAggregates>({
   sentEnquiries: 0,
   sentUnreadEnquiries: 0,
   receivedEnquiries: 0,
-  receivedUnreadEnquiries: 0
+  receivedUnreadEnquiries: 0,
+  draftListings: 0,
+  archivedListings: 0
 });
 const aggregatesLoading = ref(false);
 const aggregatesFetched = ref(false);

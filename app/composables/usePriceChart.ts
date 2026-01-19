@@ -83,9 +83,10 @@ export function usePriceChart(canvas: Canvas, userConfig: Config = {}) {
   } = config
 
   // Compile colours
-  const emptyFillColour = `rgba(${emptyRGB}, 0.18)`;
+  const emptyFillColour = `rgba(${emptyRGB}, 0.25)`;
   const emptyFillFadedColour = `rgba(${emptyRGB}, 0)`;
   const fillColour = `rgba(${filledRGB}, 1)`;
+  const fillFadedColour = `rgba(${filledRGB}, 0.4)`;
   const strokeColor = `rgb(${filledRGB})`;
 
   /**
@@ -154,7 +155,7 @@ export function usePriceChart(canvas: Canvas, userConfig: Config = {}) {
 
     // Start a path
     context.strokeStyle = strokeColor
-    context.lineWidth = 1
+    context.lineWidth = 2
 
     // Create clip area
     const activeX = activeArea.min
@@ -269,7 +270,7 @@ export function usePriceChart(canvas: Canvas, userConfig: Config = {}) {
       ...config,
       strokeColor,
       fillColour: fillColour,
-      fillFadedColour: fillColour,
+      fillFadedColour: fillFadedColour,
     }, true)
   }
 

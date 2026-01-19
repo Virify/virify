@@ -16,15 +16,27 @@ export default defineEventHandler(async (event) => {
     const { conversationId, message, suppressNotification } = await readValidatedBody(event, replySchema.parse);
     const senderId = user.id;
 
-    if (!senderId) {
+    // Verify the user is a participant in this conversation before allowing reply
+    const conversation = await getConversation(conversationId);
+    if (!conversation) {
       throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
+        statusCode: 404,
+        statusMessage: "Conversation not found",
+      });
+    }
+
+    const isParticipant = conversation.sender.id === senderId || conversation.receiver.id === senderId;
+    if (!isParticipant) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "You do not have permission to reply to this conversation",
       });
     }
 
     const newMessage = await replyToConversation(conversationId, message, senderId);
-    const conversation = await getConversation(conversationId);
+
+    // Refetch conversation to include the new message for websocket
+    const updatedConversation = await getConversation(conversationId);
 
     const receiverId = getOtherParticipantId(senderId, newMessage);
 
@@ -37,7 +49,7 @@ export default defineEventHandler(async (event) => {
         id: listing.id,
         price: listing.price ? Number(listing.price) : null,
         address: listing.property?.address?.fullAddress || null,
-        image: listing.property?.media?.[0]?.image || null,
+        image: getMainImage(listing.property),
         isRental: !!listing.rentalListing,
       };
     }
@@ -56,7 +68,7 @@ export default defineEventHandler(async (event) => {
       );
     }
 
-    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId, conversation);
+    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId, updatedConversation);
     sendMessage(messageToSend);
 
     // Emit notification_new if we created one

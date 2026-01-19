@@ -1,5 +1,5 @@
 <template>
-  <div role="presentation">
+  <div role="presentation" class="m-card-slots-overview">
     <p v-if="propertyType" class="m-card-slots-overview__type | font-semibold body-sm">
       {{ propertyType }}
     </p>

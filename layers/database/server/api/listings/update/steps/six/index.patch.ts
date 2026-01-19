@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
 
 import { OtherRoomType, ReceptionType, KitchenFeature, RoomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
 
@@ -112,6 +113,10 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+
+    // Invalidate cache after update
+    await invalidateListingCache(listingId);
+
     return result;
   } catch (error) {
     console.log("Error updating draft listing:", error);
