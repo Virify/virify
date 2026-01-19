@@ -210,6 +210,19 @@
         </UPageCard>
       </div>
     </div>
+    
+    <!-- View Full Analytics Link -->
+    <div class="flex justify-end">
+      <UButton
+        to="/dashboard/analytics"
+        variant="link"
+        color="primary"
+        trailing-icon="i-lucide-arrow-right"
+        class="text-sm"
+      >
+        View full analytics with graphs
+      </UButton>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>

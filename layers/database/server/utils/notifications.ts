@@ -11,7 +11,9 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
       notes, 
       enquiries, 
       locations, 
-      listings, 
+      listings,
+      draftListings,
+      archivedListings,
       messages, 
       unreadMessages, 
       unreadConversations, 
@@ -47,9 +49,24 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
         },
       },
     }),
+    // Count active (non-archived) listings
     prisma.listing.count({
       where: {
         userId: userId,
+        archived: false,
+      },
+    }),
+    // Count draft listings
+    prisma.draftListing.count({
+      where: {
+        userId: userId,
+      },
+    }),
+    // Count archived listings
+    prisma.listing.count({
+      where: {
+        userId: userId,
+        archived: true,
       },
     }),
     // Count ALL messages in conversations where user is a participant
@@ -123,6 +140,8 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
     enquiries,
     locations,
     listings,
+    draftListings,
+    archivedListings,
     messages,
     unreadMessages,
     unreadConversations,

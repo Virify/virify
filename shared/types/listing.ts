@@ -145,7 +145,8 @@ export const listingMinimalFields = {
         select: {
           image: true,
         },
-        take: 1, // Only need the first image
+        orderBy: { sortOrder: 'asc' as const },
+        take: 1, // Only need the first image (main image)
       },
       address: {
         select: {
@@ -183,6 +184,7 @@ export const listingConversationCardFields = {
           image: true,
           metadata: true,
         },
+        orderBy: { sortOrder: 'asc' as const },
       },
       address: {
         select: {
@@ -219,6 +221,7 @@ export const listingCardFields = {
           image: true,
           metadata: true,
         },
+        orderBy: { sortOrder: 'asc' as const },
       },
       address: {
         select: {

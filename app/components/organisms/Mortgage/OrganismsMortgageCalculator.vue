@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 
-const { trackMortgageCalculation } = useAnalytics()
+const { trackMortgageCalc } = useAnalyticsTracking()
 
 interface Props {
   propertyPrice?: number
@@ -81,7 +81,7 @@ async function calculateMortgage() {
       // Track the calculation for analytics (fire-and-forget)
       const firstResult = response.data.results[0]
       if (firstResult) {
-        trackMortgageCalculation({
+        trackMortgageCalc({
           listingId: props.listingId ?? null,
           propertyPrice: response.data.propertyPrice,
           deposit: response.data.deposit,

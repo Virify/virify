@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { nanoid } from "nanoid";
 import { createConversation } from "~~/layers/database/server/utils/conversation";
 import { createEnquiryNotification } from "~~/layers/database/server/utils/notification";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
@@ -38,6 +39,19 @@ export default defineEventHandler(async (event) => {
     const conversation = (await createConversation(userId, receiverId, message, listingId)) as ConversationWithMinimalListing;
     const firstMessage = conversation.messages[0];
 
+    // Track enquiry if it's related to a listing
+    if (listingId) {
+      // Fire-and-forget tracking (server-side)
+      $fetch('/api/analytics/track/enquiry', {
+        method: 'POST',
+        body: {
+          listingId,
+          sessionId: nanoid(),
+          timestamp: Date.now(),
+        },
+      }).catch(() => {/* Silent fail */});
+    }
+
     // Persist notification to DB (for when user is offline)
     let listingData: { id: number; price: number | null; address: string | null; image: string | null; isRental: boolean } | undefined;
     
@@ -47,7 +61,7 @@ export default defineEventHandler(async (event) => {
         id: listing.id,
         price: listing.price ? Number(listing.price) : null,
         address: listing.property?.address?.fullAddress || null,
-        image: listing.property?.media?.[0]?.image || null,
+        image: getMainImageUrl(listing.property),
         isRental: !!listing.rentalListing,
       };
     }

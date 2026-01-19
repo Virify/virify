@@ -1,5 +1,5 @@
 <template>
-  <nuxt-link v-if="propertyId" :to="`/listing/${propertyId}/`" class="m-card-lots-view-link">
+  <nuxt-link v-if="propertyId" :to="`/listing/${propertyId}/`" class="m-card-lots-view-link" @click="handleClick">
     <slot></slot>
   </nuxt-link>
 
@@ -13,7 +13,15 @@ interface Props {
   propertyId?: number
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const { trackClick } = useAnalyticsTracking()
+
+const handleClick = () => {
+  if (props.propertyId) {
+    trackClick(props.propertyId)
+  }
+}
 
 </script>
 

@@ -132,17 +132,14 @@ const formatDate = (date: string) => {
   });
 };
 
-// Get first image from media
+// Get main image from property using helper
 const firstImage = computed(() => {
   const config = useRuntimeConfig();
-  const media = props.draft.property?.media;
-  if (!media || media.length === 0) return null;
-  
-  const firstMedia = media[0];
-  if (!firstMedia.image) return null;
+  const mainImageId = getMainImage(props.draft.property);
+  if (!mainImageId) return null;
   
   // Build Cloudflare image URL with thumbnail variant
-  return `https://imagedelivery.net/${config.public.CF_ACCOUNT_HASH}/${firstMedia.image}/thumbnail`;
+  return `https://imagedelivery.net/${config.public.CF_ACCOUNT_HASH}/${mainImageId}/thumbnail`;
 });
 
 // Tier-based computed properties (matching OrganismsAccountOwnListingCard)

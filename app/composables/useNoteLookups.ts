@@ -16,7 +16,6 @@ export const useNoteLookups = createSharedComposable(() => {
   const { data: noteLookups, refresh: refreshUserNotes } = useAsyncData<NoteLookup[]>(
     "noteLookups",
     () => {
-      if (!loggedIn.value) return Promise.resolve([]);
       return requestFetch<NoteLookup[]>("/api/user/notes/all/lookups");
     },
     {

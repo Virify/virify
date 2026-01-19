@@ -202,7 +202,7 @@ const props = defineProps<{
   isDraft?: boolean;
 }>();
 
-const { trackListingView } = useAnalytics();
+const { trackView } = useAnalyticsTracking();
 const { isWaitingListMode } = useWaitingListMode();
 
 const similarListingsAddress = computed(() => {
@@ -410,7 +410,7 @@ onMounted(() => {
   window.addEventListener("scroll", parallaxCarousel, { passive: true });
   // Track listing view only for published listings, not drafts
   if (!props.isDraft && props.listing && props.listing.id) {
-    trackListingView(String(props.listing.id));
+    trackView(props.listing.id);
   }
 });
 

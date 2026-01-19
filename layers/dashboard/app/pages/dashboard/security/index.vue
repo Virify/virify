@@ -2,11 +2,14 @@
   <UDashboardPanel>
     <template #header>
       <UDashboardNavbar
-        title="Account"
         :ui="{
           title: 'title-sm m-0!',
         }"
       >
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+
         <template #right>
           <OrganismsDashboardNotificationButton />
         </template>
@@ -24,7 +27,7 @@
             label="Save Changes"
           />
           <AtomsDashboardForm>
-            <UFormField label="Email" name="email" orientation="horizontal" description="Your registered email address" help="We will send out and email to verify its you" eagerValidation>
+            <UFormField label="Email" name="email" orientation="horizontal" description="Your registered email address" help="We will send out and email to verify its you" eagerValidation :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 type="email"
                 variant="subtle"
@@ -57,6 +60,7 @@
                 description="You will need your current password"
                 eagerValidation
                 :error="submitErrors?.find(e => e.name === 'currentPassword')?.message"
+                :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }"
                 >
               <UInput
                 :type="showCurrentPassword ? 'text' : 'password'"
@@ -95,6 +99,7 @@
               :required="isChangingPassword"
               description="Enter your new password"
               eagerValidation
+              :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }"
               >
               <UInput
                 :type="showNewPassword ? 'text' : 'password'"
@@ -132,6 +137,7 @@
               :required="isChangingPassword"
               description="Re-enter your new password to confirm"
               eagerValidation
+              :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }"
               >
               <UInput
                 :type="showConfirmNewPassword ? 'text' : 'password'"
