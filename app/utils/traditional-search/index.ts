@@ -6,7 +6,7 @@ import { buildFeaturesQuery } from './build-features-query'
 import { buildPriceQuery } from './build-price-query'
 import type { TraditionalSearchData } from './types'
 
-export function buildQueryFromTraditionalFormData(data: TraditionalSearchData): unknown {
+export function buildQueryFromTraditionalFormData(data: TraditionalSearchData): string {
   // Build mock AI query
   const { isSale, propertyTypes, maxBathrooms, minBathrooms, maxBeds, minBeds, price, rentIncludes, saleIncludes, additionalFeatures } = asObject(data)
 
