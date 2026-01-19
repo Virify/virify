@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-const emits = defineEmits(['is-loaded'])
+const emits = defineEmits(['is-loaded', 'submit-search'])
 
 onBeforeMount(() => {
   emits('is-loaded', true)
@@ -132,8 +132,6 @@ const additionalFeatures = [
   { key: 'disabled-access', label: 'Disability access' },
   { key: 'garden', label: 'Garden' },
   { key: 'pets', label: 'Pet-friendly' },
-  { key: 'another-feature', label: 'Another feature' },
-  { key: 'and-another', label: 'And another' },
 ]
 
 /**
@@ -162,9 +160,7 @@ const formData = useState('search-contract-type', () => reactive({
  *  Handle post
  */
 function postFormData() {
-  console.log('SEARCH', JSON.parse(JSON.stringify({
-    ...formData.value
-  })))
+  emits('submit-search', formData.value);
 }
 
 </script>

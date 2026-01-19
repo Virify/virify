@@ -29,12 +29,12 @@
                 <!-- @TODO end -->
 
                 <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
-                  class="o-dock-banner__toggle-content" />
+                  @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
               </template>
 
               <template v-slot:ai>
                 <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-                  @submit-search="searchSubmit" @reset-search="searchReset" :loading="isChecking"
+                  @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
                   class="o-dock-banner__toggle-content" />
               </template>
             </OrganismsFilterSwitcher>
@@ -176,8 +176,18 @@ const initialQuery = computed(() => {
   return query
 })
 
-async function searchSubmit(query: string) {
+async function traditionalSearchSubmit(formData: TraditionalSearchData) {
+  const query = buildQueryFromTraditionalFormData(formData)
+
+  console.log(JSON.parse(JSON.stringify({
+    formData,
+    query,
+  })))
+}
+
+async function aiSearchSubmit(query: string) {
   setListingType(props.listingType)
+
   const { location, radius, listingType } = asObject(searchState.value)
 
   if (!location) return
