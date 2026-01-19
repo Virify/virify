@@ -108,7 +108,7 @@ export const generateListingViews = async (listingId: number): Promise<number> =
  * @param propertyId number
  * @returns Listing
  */
-export const generateRentalListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
+export const generateRentalListing = async (propertyId: number, userId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
       price: roundFloat(faker.number.float({ min: 300, max: 3000 }), 2),
@@ -130,7 +130,7 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
       },
       user: {
         connect: {
-          id: 1, // admin user
+          id: userId,
         },
       },
     },
@@ -152,7 +152,7 @@ export const generateRentalListing = async (propertyId: number): Promise<Prisma.
  * @param propertyId number
  * @returns Listing
  */
-export const generateSaleListing = async (propertyId: number): Promise<Prisma.ListingCreateInput> => {
+export const generateSaleListing = async (propertyId: number, userId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
       price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
@@ -174,7 +174,7 @@ export const generateSaleListing = async (propertyId: number): Promise<Prisma.Li
       },
       user: {
         connect: {
-          id: 1, // admin user
+          id: userId,
         },
       }
     },

@@ -1,7 +1,7 @@
 import vue from "@vitejs/plugin-vue";
 
 export default defineNuxtConfig({
-  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", './layers/sanity'],
+  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", './layers/sanity', './layers/dashboard'],
   future: {
     compatibilityVersion: 4,
   },
@@ -124,7 +124,6 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
-  css: ["~/assets/css/main.css"],
   vite: {
     server: {
       watch: {

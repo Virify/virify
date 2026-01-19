@@ -158,7 +158,7 @@ const hasExistingAddress = computed(() => {
 });
 
 // Handle address selection from search
-const handleAddressSelected = (selectedAddress: any) => {
+const handleAddressSelected = (selectedAddress: AddressParsed) => {
   console.log('Address selected in Step 4:', selectedAddress);
   console.log('Current Step Four Data before update:', stepFourData.value);
   // Populate the form with selected address

@@ -28,7 +28,7 @@ export default defineEventHandler((event) => {
       '/auth/login',                 // Login endpoint
       '/auth/verify-otp',            // OTP verification
       '/api/support',              // POST - support request form
-      '/api/analytics/listing/track', // Track listing views
+      '/api/analytics', // Track listing views & dashboard analytics
       '/api/listing',              // Listing data endpoints
       '/api/draft-listings',       // Create/Edit listing endpoints
       '/api/listing/preview',      // Listing preview endpoints
@@ -36,6 +36,8 @@ export default defineEventHandler((event) => {
       '/api/property-type',        // Property types
       '/api/cloudflare',           // Image upload
       '/api/user',                 // User dashboard data
+      '/api/conversation',         // Dashboard conversations
+      '/api/notifications',        // Dashboard notifications
     ];
 
     // Check if the path is an API route or Auth route

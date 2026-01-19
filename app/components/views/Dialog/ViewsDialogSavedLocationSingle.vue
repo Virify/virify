@@ -16,16 +16,16 @@ interface Props {
 }
 const props = defineProps<Props>();
 const entry = computed(() => props.entry);
-const { showToast } = useToast();
+const toast = useToast();
 const { hideDialog } = useDialog();
 
 function onUpdated(name: string) {
-  showToast('Location updated', { type: 'success' })
+  toast.add({ title: 'Success', description: 'Location updated', color: 'success' })
   hideDialog?.({ returnValue: { updated: true, name } })
 }
 
 function onDeleted() {
-  showToast('Location deleted', { type: 'success' })
+  toast.add({ title: 'Success', description: 'Location deleted', color: 'success' })
   hideDialog?.({ returnValue: { deleted: true } })
 }
 </script>

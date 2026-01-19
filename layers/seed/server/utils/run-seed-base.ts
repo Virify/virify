@@ -64,7 +64,7 @@ async function seedAdminUser() {
         lastName: 'Admin',
         verification: {
           create: {
-            activated: true,
+            activated: 'ACTIVATED',
             role: 'ADMIN',
           },
         },
@@ -74,6 +74,7 @@ async function seedAdminUser() {
             city: 'Admin City',
             postcode: '12345',
             country: 'Admin Country',
+            fullAddress: '123 Admin St, Admin City, 12345, Admin Country',
           },
         },
         membership: { 

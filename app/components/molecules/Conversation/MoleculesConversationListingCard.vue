@@ -44,10 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ConversationWithUserAndMessages } from "~~/shared/types/conversation";
+import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
 
 const props = defineProps<{
-  conversation: ConversationWithUserAndMessages | null;
+  conversation: ConversationWithMinimalListing | null;
 }>();
 
 const listing = computed(() => props.conversation?.listing)

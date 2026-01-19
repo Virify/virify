@@ -1,11 +1,16 @@
+import { createError } from "#imports";
+
 /**
  * format date to "MM/DD/YYYY"
  * 
  * @param date - Date to format
- * @returns Date in the format "MM/DD/YYYY"
+ * @returns Date in the format "MM/DD/YYYY" or 'N/A' if invalid
  */
-export const formatMDY = (date: Date) => {
-  return new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "long", day: "numeric" }).format(new Date(date))
+export const formatMDY = (date: Date | null | undefined) => {
+  if (!date) return 'N/A';
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) return 'N/A';
+  return new Intl.DateTimeFormat("en-GB", { year: "numeric", month: "long", day: "numeric" }).format(parsedDate)
 }
 
 /**

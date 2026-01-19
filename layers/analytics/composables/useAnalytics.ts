@@ -1,6 +1,8 @@
 /**
  * Composable for tracking analytics events and business intelligence
  * Pure analytics functionality - separate from user notifications
+ * 
+ * Also orchestrates fetching of recent data (favourites, notes) for dashboard
  */
 import { nanoid } from "nanoid";
 import { createSharedComposable } from '@vueuse/core';
@@ -8,59 +10,96 @@ import { createSharedComposable } from '@vueuse/core';
 /**
  * Analytics tracking composable
  * Provides methods for tracking user interactions and business analytics
+ * Also coordinates fetching of recent favourites/notes for dashboard homepage
  * Note: User notification counts are handled by the notifications layer
  */
 export const useAnalytics = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const sessionId = useState("analytics-session-id", () => nanoid());
   
+  // Get refresh functions from recent items composable (Singleton)
+  const { 
+    refreshRecentFavourites, 
+    recentFavourites,
+    recentFavouritesStatus,
+    refreshRecentNotes,
+    recentUserNotes,
+    recentNotesStatus
+  } = useDashboardRecentItems();
+  
   // Reactive state for analytics data
   const recentlyViewedListings = ref<RecentlyViewed[]>([]);
   const recentOwnedListings = ref<OwnedListingWithAnalytics[]>([]);
-  const analytics = ref<UserAnalyticsSummary | null>(null);
+  // Use state for specific analytics to prevent refreshing on navigation
+  const analytics = useState<UserAnalyticsSummary | null>("analytics-user-summary", () => null);
+  const allUserListings = ref<OwnedListingWithAnalytics[]>([]);
+  
+  // Loading states
+  const isAnalyticsLoading = useState("analytics-is-loading", () => true);
+  // isFavouritesLoading and isNotesLoading are now handled by their respective composables
+  const isListingsLoading = ref(true);
   
   const { data: trendingLocations } = useAsyncData("trending-locations", () => useRequestFetch()<TrendingLocation[]>("/api/analytics/search/location"), {
     immediate: true,
   });
-  const { favourites, refreshFavourites } = useFavourites();
-  const { userNotes, refreshUserNotes } = useNotes();
   const { getAllListingsForAnalytics } = useMyListings();
   
-  // Add state for all listings analytics data
-  const allUserListings = ref<OwnedListingWithAnalytics[]>([]);
-  
-  // Fetch ALL analytics data when logged in
+  /**
+   * Fetch ALL analytics and recent data when logged in
+   * Orchestrates fetching of:
+   * - Recently viewed listings
+   * - User analytics summary
+   * - Recent favourites (via useFavourites)
+   * - Recent notes (via useNotes)
+   * - User's own listings
+   */
   const fetchAnalytics = async () => {
     if (!loggedIn.value) return;
     
+    // Only show loading state if we don't have data yet
+    if (!analytics.value) {
+      isAnalyticsLoading.value = true;
+    }
+
     try {
-      // Fetch core analytics data
+      // Fetch core analytics data + trigger recent favourites/notes refresh
       const [viewedListings, userAnalytics] = await Promise.all([
         useRequestFetch()<RecentlyViewed[]>("/api/analytics/listing/track-view").catch(() => []),
-        useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all").catch(() => null)
+        useRequestFetch()<UserAnalyticsSummary>("/api/analytics/all").catch(() => null),
+        // Also refresh recent favourites and notes
+        refreshRecentFavourites(),
+        refreshRecentNotes(),
       ]);
       
       recentlyViewedListings.value = viewedListings;
       analytics.value = userAnalytics;
+      isAnalyticsLoading.value = false; // Analytics loaded
       
       // Ensure ALL data is fetched from respective composables
-      const [allListings] = await Promise.all([
-        getAllListingsForAnalytics(), // Load ALL listings for analytics
-        refreshFavourites(),          // Load ALL favourites
-        refreshUserNotes()            // Load ALL notes  
-      ]);
-      
-      allUserListings.value = allListings;
+      // Loading states for favourites and notes are handled by their composables
+      // Listings loading is handled locally
+      (async () => {
+        if (allUserListings.value.length === 0) {
+          isListingsLoading.value = true;
+        }
+        try {
+          allUserListings.value = await getAllListingsForAnalytics();
+        } finally {
+          isListingsLoading.value = false;
+        }
+      })();
       
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
+      isAnalyticsLoading.value = false;
+      isListingsLoading.value = false;
     }
   };
   
   // Auto-fetch when logged in
   if (import.meta.client) {
-    watchEffect(() => {
-      if (loggedIn.value) {
+    watch(loggedIn, (isLoggedIn) => {
+      if (isLoggedIn) {
         fetchAnalytics();
       } else {
         recentlyViewedListings.value = [];
@@ -68,7 +107,7 @@ export const useAnalytics = createSharedComposable(() => {
         allUserListings.value = [];
         analytics.value = null;
       }
-    });
+    }, { immediate: true });
   }
   /**
    * !! Important: useRequestFetch is required for SSR authenticated requests
@@ -184,13 +223,20 @@ export const useAnalytics = createSharedComposable(() => {
     analytics,
     trackListingView,
     trackMortgageCalculation,
-    favourites,
-    userNotes,
     recentlyViewedListings,
     recentOwnedListings,
     allUserListings,
     trackSearch,
     trendingLocations,
     fetchAnalytics,
+    isAnalyticsLoading,
+    isListingsLoading,
+    // Recent data from other composables (centralized access for dashboard)
+    recentFavourites,
+    recentUserNotes,
+    recentFavouritesStatus,
+    recentNotesStatus,
+    refreshRecentFavourites,
+    refreshRecentNotes,
   };
 });

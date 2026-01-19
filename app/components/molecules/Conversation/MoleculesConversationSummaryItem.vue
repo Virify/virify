@@ -25,8 +25,10 @@
 </template>
 
 <script setup lang="ts">
+import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
+
 interface Props {
-  conversation: ConversationWithUserAndMessages;
+  conversation: ConversationWithMinimalListing;
   currentUserId?: string | number;
   isActive?: boolean;
 }
@@ -34,7 +36,7 @@ interface Props {
 const props = defineProps<Props>();
 
 defineEmits<{
-  "select-conversation": [conversation: ConversationWithUserAndMessages];
+  "select-conversation": [conversation: ConversationWithMinimalListing];
 }>();
 
 const conversationPartnerName = computed(() => {

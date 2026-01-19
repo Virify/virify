@@ -86,7 +86,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const { hideDialog } = useDialog()
-const { showToast } = useToast()
+const toast = useToast()
 const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile()
 
 const form = ref({
@@ -127,7 +127,7 @@ async function performSubmit() {
       }
     })
 
-    showToast('Support request submitted successfully!', { type: 'success' })
+    toast.add({ title: 'Success', description: 'Support request submitted successfully!', color: 'success' })
     hideDialog()
     
   } catch (err) {

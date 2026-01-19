@@ -39,6 +39,8 @@ const waitingListConfig: WaitingListConfig = {
     '/listing/preview/*',
     '/account',
     '/account/*',
+    '/dashboard',
+    '/dashboard/*',
     // '/mortgage-calculator',
   ],
 

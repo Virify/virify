@@ -3,6 +3,8 @@
  * Pure analytics data for business intelligence and performance metrics
  */
 
+import type { ListingCardType } from "#imports";
+
 /**
  * Request body for tracking a listing view
  */
@@ -16,11 +18,23 @@ export interface TrackListingViewBody {
  * Pure analytics data about user activity and performance
  */
 export interface UserAnalyticsSummary {
+  // Seller Analytics (Your Listings Performance)
   totalViews: number;
   previousMonthViews: number;
   percentageChange: number;
   favoritedByOthersCount: number;
-  totalConversations: number;
+  totalConversations: number; // Enquiries received on your listings
+  totalListings: number;
+  activeListings: number;
+  listingsWithNotes: number;
+  averageViewsPerListing: number;
+  
+  // Buyer/Searcher Analytics (Your Activity)
+  sentEnquiries: number; // Enquiries you sent
+  sentEnquiriesWithReplies: number; // Enquiries you sent that got replies
+  totalFavourites: number; // Listings you favorited
+  totalNotes: number; // Listings you added notes to
+  recentlyViewedCount: number; // Listings you viewed recently
 }
 
 /**

@@ -25,7 +25,7 @@ const initialQuery = ref('')
  */
 const { searchState, isLoading } = useSearchState()
 const { checkContent, isChecking } = useModeration()
-const { showToast } = useToast()
+const toast = useToast()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   const query = buildQueryFromTraditionalFormData(formData)
@@ -41,7 +41,7 @@ async function aiSearchSubmit(query: string) {
   // Check content moderation before proceeding
   const { safe, reason } = await checkContent(query)
   if (!safe) {
-    showToast(reason || 'Please try a different search.', { type: 'error' })
+    toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
     return
   }
 

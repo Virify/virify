@@ -81,7 +81,9 @@ definePageMeta({
   layout: "account",
 });
 
-const { analytics, recentlyViewedListings, favourites, userNotes, allUserListings } = useAnalytics();
+const { analytics, recentlyViewedListings, allUserListings } = useAnalytics();
+const { favourites } = useFavourites();
+const { userNotes } = useNotes();
 
 // Computed properties for derived analytics
 const totalUserActivity = computed(() => {

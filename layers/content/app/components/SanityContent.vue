@@ -198,7 +198,7 @@ const customComponents = {
   }
 
   p {
-    margin-bottom: var(--size-24);
+    margin-bottom: var(--size-16);
     font-size: var(--font-md);
     line-height: var(--lineheight-md);
     color: var(--foreground-100);
@@ -215,7 +215,7 @@ const customComponents = {
     padding-left: var(--size-32);
     
     li {
-      margin-bottom: var(--size-12);
+      margin-bottom: var(--size-8);
       line-height: var(--lineheight-lg);
       color: var(--foreground-100);
       font-size: var(--font-md);
@@ -226,6 +226,14 @@ const customComponents = {
       margin-top: var(--size-8);
       margin-bottom: var(--size-24);
     }
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
   }
 
   // Blockquotes

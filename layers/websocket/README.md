@@ -64,7 +64,7 @@ layers/websocket/
 ```typescript
 {
   type: "new_conversation",
-  conversation: ConversationWithUserAndMessages,
+  conversation: ConversationWithMinimalListing,
   recipients: number[],
   from: number
 }

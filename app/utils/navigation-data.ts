@@ -2,9 +2,8 @@
  * Base center items for the site navigation (static structure only).
  * Guides children are injected dynamically by the composable.
  */
-
-
 export const getBaseCenterItems = (): NavigationItem[] => {
+  const { isWaitingListMode } = useWaitingListMode();
   const items: NavigationItem[] = [
     {
       id: "home",
@@ -29,7 +28,22 @@ export const getBaseCenterItems = (): NavigationItem[] => {
       id: "property-info",
       label: "Property Information",
       type: "dropdown",
-      children: [{ id: "price-paid", label: "Price paid data", href: "/price-paid/", icon: "account/billing" }],
+      children: [
+        { 
+          id: "price-paid", 
+          label: "Price paid data", 
+          href: "/price-paid/", 
+          icon: "account/billing"
+        },
+        // Only show mortgage calculator link if not in waiting-list mode
+        ...(!isWaitingListMode.value ? [{
+          id: "mortgage-calculator",
+          label: "Mortgage Calculator",
+          href: "/mortgage-calculator/",
+          icon: "account/billing"
+        }] : []),
+
+      ],
     },
     {
       id: "support",
@@ -38,13 +52,6 @@ export const getBaseCenterItems = (): NavigationItem[] => {
       type: "link",
     },
   ];
-
-  // items.push({
-  //   id: "mortgage-calculator",
-  //   label: "Mortgage Calculator",
-  //   href: "/mortgage-calculator/",
-  //   type: "link",
-  // })
 
   return items;
 };
@@ -55,7 +62,6 @@ export const getBaseCenterItems = (): NavigationItem[] => {
 export const getActionItemsBuilder = () => {
   return ({ loggedIn, actions }: { loggedIn: boolean; actions: { openLogin: () => void; openSignup: () => void; logout: () => void } }): NavigationItem[] => {
     const { isWaitingListMode } = useWaitingListMode();
-
     const items: NavigationItem[] = [];
 
     // Only show auth buttons if configured to show (disabled in waiting-list mode by default)
@@ -67,14 +73,6 @@ export const getActionItemsBuilder = () => {
           type: "button", 
           hideWhenAuth: true, 
           action: actions.openSignup, buttonClass: "button-monochrome"
-        });
-      } else if (!isWaitingListMode.value) {
-        items.push({ 
-          id: "account", 
-          label: "Account", 
-          href: "/account", 
-          type: "link", 
-          requiresAuth: true 
         });
       }
     }
@@ -92,7 +90,7 @@ export const getActionItemsBuilder = () => {
       items.push({
         id: 'account',
         label: 'Account',
-        href: '/account',
+        href: '/dashboard',
         type: 'link',
         requiresAuth: true
       }),

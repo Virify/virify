@@ -11,7 +11,7 @@ export const isLoggedIn = (user: User): boolean => {
   return !!user && !!user.id
 }
 
-    /**
+/**
  * Check if user is logged in and is an admin
  * 
  * @param user UserWithVerificationAndMembership
@@ -19,4 +19,13 @@ export const isLoggedIn = (user: User): boolean => {
  */
 export const isAdmin = (user: User): boolean => {
   return isLoggedIn(user) && user?.role === "ADMIN"
+}
+
+/**
+ * Check if user is verified
+ * @param user User
+ * @returns Boolean
+ */
+export const isVerified = (user: User | null): boolean => {
+  return !!user && isLoggedIn(user) && user?.activated === 'ACTIVATED'
 }

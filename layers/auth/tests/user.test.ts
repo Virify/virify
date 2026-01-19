@@ -262,6 +262,7 @@ describe("user functions", () => {
         otpCodeExpiry: expect.any(Date),
         verification: {
           create: {
+            activated: "PENDING",
             activationToken: newUser.token,
             activationTokenExpiry: expect.any(Date),
           },
@@ -278,8 +279,8 @@ describe("user functions", () => {
    * Verifies that it correctly identifies both active and inactive users.
    */
   it("should check if user is active", () => {
-    const activeUser = { ...mockUser, verification: { ...mockUser.verification, activated: true } };
-    expect(isActive(activeUser)).toBe(true);
+    const activeUser = { ...mockUser, verification: { ...mockUser.verification, activated: "ACTIVATED" } };
+    expect(isActive(activeUser as any)).toBe(true);
     expect(isActive(mockUser)).toBe(false);
   });
 }); 

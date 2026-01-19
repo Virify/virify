@@ -3,6 +3,10 @@ model User {
   firstName                String?
   lastName                 String?
   username                 String?               @unique
+  avatar                   String?
+  bio                      String?
+  intents                  UserIntent[]
+  interests                String[]
   email                    String                @unique
   phoneNumber              String?
   password                 String?
@@ -18,6 +22,7 @@ model User {
   properties               Property[]
   verification             Verification?
   preferences              UserPreferences[]
+  notifications            UserNotification[]
   address                  Address?              @relation(fields: [addressId], references: [id])
   addressId                Int?
   ListingView              ListingView[]
@@ -32,4 +37,11 @@ model User {
   @@index([addressId])
   @@index([email])
   @@index([username])
+}
+
+enum UserIntent {
+  BUYING
+  SELLING
+  RENTING
+  LANDLORD
 }

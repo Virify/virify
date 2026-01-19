@@ -57,7 +57,6 @@ function clearErrors() {
     <OrganismsFooter />
     <ViewsDialog />
     <ViewsHelpButton />
-    <MoleculesToastContainer />
   </div>
 </template>
 

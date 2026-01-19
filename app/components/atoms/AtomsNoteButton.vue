@@ -7,7 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogNotes, ViewsDialogLogin } from '#components'
+import ViewsDialogNotes from '../views/Dialog/ViewsDialogNotes.vue'
+import ViewsDialogLogin from '../views/Dialog/ViewsDialogLogin.vue'
 
 interface Props {
   listingId: number

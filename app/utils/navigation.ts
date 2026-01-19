@@ -16,9 +16,9 @@ export const scrollToBottom = (element: HTMLElement | null, behavior: ScrollBeha
  * Utility functions for navigation and scrolling
  */
 
-export const scrollToTop = () => {
+export const scrollToTop = (behavior: ScrollBehavior = "instant") => {
   window.scrollTo({
     top: 0,
-    behavior: "instant"
+    behavior
   });
 };

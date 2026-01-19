@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     const updatedUser = await updateUserAndActivate(user.id);
     await loginUser(event, updatedUser);
 
-    return sendRedirect(event, "/account");
+    return sendRedirect(event, "/dashboard");
   } catch (error) {
     const structuredError = errorResponse(error, event);
     return sendRedirect(event, "/login?error=" + structuredError.statusCode);

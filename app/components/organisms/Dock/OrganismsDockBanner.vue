@@ -168,7 +168,7 @@ onClickOutside($formWrapper, () => {
  */
 const { setQuery, setListingType, searchState } = useSearchState()
 const { checkContent, isChecking } = useModeration()
-const { showToast } = useToast()
+const toast = useToast()
 
 const initialQuery = computed(() => {
   const { query } = asObject(searchState.value)
@@ -192,7 +192,7 @@ async function aiSearchSubmit(query: string) {
   // Check content moderation before proceeding
   const { safe, reason } = await checkContent(query)
   if (!safe) {
-    showToast(reason || 'Please try a different search.', { type: 'error' })
+    toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
     return
   }
 
