@@ -61,6 +61,8 @@ export default defineNuxtConfig({
     disallow: [
       '/account',
       '/account/*',
+      '/dashboard',
+      '/dashboard/*',
       '/api',
       '/api/*',
       '/auth/update-admin-password',
