@@ -3,8 +3,7 @@
     <nav>
       <ul class="o-traditional-search-form-contract__menu">
         <li class="o-traditional-search-form-contract__menu-item">
-          <button type="button" :aria-expanded="!contractType.isSale"
-            aria-controls="o-traditional-search-form-contract-buy"
+          <button type="button" :aria-expanded="isSale" aria-controls="o-traditional-search-form-contract-buy"
             class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(true)">
             To Buy
@@ -12,8 +11,7 @@
         </li>
 
         <li class="o-traditional-search-form-contract__menu-item">
-          <button type="button" :aria-expanded="contractType.isSale"
-            aria-controls="o-traditional-search-form-contract-rent"
+          <button type="button" :aria-expanded="!isSale" aria-controls="o-traditional-search-form-contract-rent"
             class="o-traditional-search-form-contract__menu-button | button button-none"
             @click.prevent="updateIsBuy(false)">
             To Rent
@@ -28,20 +26,17 @@
       </h3>
 
       <section id="o-traditional-search-form-contract-buy" class="o-traditional-search-form-contract__content-block"
-        :hidden="contractType.isSale">
+        :hidden="!isSale">
 
-        <AtomsChecktext label="Include sold STC" />
-        <AtomsChecktext label="Include shared ownership" />
-        <AtomsChecktext label="Include retirement properties" />
-        <AtomsChecktext label="Include cash-only properties" />
+        <AtomsChecktext v-for="{ key, label } of saleIncludesOptions" v-model="saleIncludes[key]" :label="label"
+          :name="key" />
       </section>
 
       <section id="o-traditional-search-form-contract-rent" class="o-traditional-search-form-contract__content-block"
-        :hidden="!contractType.isSale">
+        :hidden="isSale">
 
-        <AtomsChecktext label="Include let agreed" />
-        <AtomsChecktext label="Include short-term lets" />
-        <AtomsChecktext label="Include long-term lets" />
+        <AtomsChecktext v-for="{ key, label } of rentIncludesOptions" v-model="rentIncludes[key]" :label="label"
+          :name="key" />
       </section>
 
       <section class="o-traditional-search-form-contract__price">
@@ -49,9 +44,8 @@
           Price
         </h3>
 
-        <LazyMoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="contractType.price"
-          :min="contractType.minPrice" :max="contractType.maxPrice" :graph-data="priceGraph"
-          :loading="priceGraphLoading" hydrate-on-visible />
+        <MoleculesRangeSlider class="o-traditional-search-form-contract__price-slider" v-model="price" :min="minPrice"
+          :max="maxPrice" :graph-data="priceGraph" :loading="priceGraphLoading" />
       </section>
     </div>
   </div>
@@ -59,15 +53,48 @@
 
 <script setup lang="ts">
 
+interface IncludesOption {
+  key: string,
+  label: string
+}
+
+interface IncludeChecked {
+  [key: string]: unknown
+}
+
+interface Props {
+  saleIncludesOptions: IncludesOption[]
+  rentIncludesOptions: IncludesOption[]
+}
+
+defineProps<Props>()
+
 /**
- *  Search data model
+ *  Models
  */
-const contractType = useState('search-contract-type', () => reactive({
-  isSale: false,
-  minPrice: 0,
-  maxPrice: 0,
-  price: <[number, number]>[0, 0]
-}))
+const isSale = defineModel<boolean>('is-sale', {
+  default: true
+})
+
+const minPrice = defineModel<number>('min-price', {
+  default: 0
+})
+
+const maxPrice = defineModel<number>('max-price', {
+  default: 0
+})
+
+const price = defineModel<[number, number]>('price', {
+  default: [0, 0]
+})
+
+const saleIncludes = defineModel<IncludeChecked>('sale-includes', {
+  default: reactive({})
+})
+
+const rentIncludes = defineModel<IncludeChecked>('rent-includes', {
+  default: reactive({})
+})
 
 /**
  *  Graph data
@@ -76,31 +103,34 @@ const contractType = useState('search-contract-type', () => reactive({
 const { data: priceGraph, pending: priceGraphLoading } = useAsyncData('price-graph', () => {
   return $fetch<string[]>("/api/price/graph/", {
     params: {
-      listingType: contractType.value.isSale ? 'buy' : 'rent'
+      listingType: isSale.value ? 'buy' : 'rent'
     }
   })
 }, {
-  watch: [() => contractType.value.isSale]
+  watch: [isSale]
 })
 
 const { data: priceMinMax } = useAsyncData('price-min-max', () => {
   return $fetch<string[]>("/api/price/min-max/")
 })
 
-watch([priceMinMax, () => contractType.value.isSale], () => {
+watch([priceMinMax, isSale], () => {
   const { sale, rental } = asObject(priceMinMax.value)
-  const [min, max] = asArray(contractType.value.isSale ? sale : rental, true)
+  const [min, max] = asArray(isSale.value ? sale : rental, true)
 
-  contractType.value.minPrice = Number(min)
-  contractType.value.maxPrice = Number(max)
-  contractType.value.price = [Number(min), Number(max)]
+  const minNumber = Number(min)
+  const maxNumber = Number(max)
+
+  minPrice.value = minNumber
+  maxPrice.value = maxNumber
+  price.value = [minNumber, maxNumber]
 })
 
 /**
  *  Tabs for buy/rent
  */
 function updateIsBuy(newValue: boolean) {
-  contractType.value.isSale = !newValue
+  isSale.value = newValue
 }
 
 </script>
@@ -230,7 +260,7 @@ function updateIsBuy(newValue: boolean) {
     --track-thumb-border: none;
   }
 
-  .m-range-slider-input {
+  .m-range-slider__input {
     background: var(--blue-400);
     color: var(--monochrome-900);
     border-width: 2px;

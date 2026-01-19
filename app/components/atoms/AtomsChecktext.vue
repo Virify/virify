@@ -1,6 +1,6 @@
 <template>
   <label class="a-checktext | body-sm font-semibold">
-    <input type="checkbox" :value :checked v-model="isChecked" class="| visually-hidden" />
+    <input type="checkbox" :value :checked v-model="isChecked" class="| visually-hidden" :name />
 
     <span class="a-checktext__box" aria-hidden>
       <AtomsIcon icon="tick" aria-hidden class="a-checktext__icon" />
@@ -15,6 +15,7 @@
 <script setup lang="ts">
 interface Props {
   label: string
+  name?: string
   value?: string | number
   checked?: boolean
 }

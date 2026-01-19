@@ -2,24 +2,20 @@
   <footer class="o-footer">
     <div class="o-footer__container | container">
       <!-- Logo Section -->
-      <div class="o-footer__brand">
+      <div class="o-footer__brand" v-if="!isWaitingListMode">
         <nuxt-link to="/" class="o-footer__logo-link">
           <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="180" height="54" class="o-footer__logo" />
         </nuxt-link>
       </div>
 
       <div class="o-footer__sections">
-        <!-- Property Search Section -->
-        <div class="o-footer__section">
-          <h3 class="o-footer__section-title | title-3xs">Property Search</h3>
-          <ul class="o-footer__links">
-            <li><nuxt-link to="/ai-search" class="o-footer__link | body-sm">AI Search</nuxt-link></li>
-            <li><nuxt-link to="/search/legacy" class="o-footer__link | body-sm">Legacy Search</nuxt-link></li>
-          </ul>
+        <div class="o-footer__brand" v-if="isWaitingListMode">
+          <nuxt-link to="/" class="o-footer__logo-link">
+            <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="120" height="54" class="o-footer__logo" />
+          </nuxt-link>
         </div>
-
         <!-- List Property Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showSellProperty" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Sell Property</h3>
           <div class="o-footer__cta">
             <a href="#" class="o-footer__button | button button-secondary button-xs">List your property</a>
@@ -27,15 +23,16 @@
         </div>
 
         <!-- Property Tools Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showPropertyTools" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Property Tools</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/price-paid" class="o-footer__link | body-sm">Price Paid Data</nuxt-link></li>
+            <!-- <li><nuxt-link to="/mortgage-calculator" class="o-footer__link | body-sm">Mortgage Calculator</nuxt-link></li> -->
           </ul>
         </div>
 
         <!-- Guides Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showGuides" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Guides</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/guides" class="o-footer__link | body-sm">All Guides</nuxt-link></li>
@@ -48,31 +45,61 @@
         </div>
 
         <!-- Company Section -->
-        <div class="o-footer__section">
+        <div v-if="footerConfig.showCompany" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Company</h3>
           <ul class="o-footer__links">
-            <li><a href="#" class="o-footer__link | body-sm">About Us</a></li>
-            <li><a href="#" class="o-footer__link | body-sm">Contact Us</a></li>
-            <li><a href="#" class="o-footer__link | body-sm">Privacy Policy</a></li>
-            <li><a href="#" class="o-footer__link | body-sm">Terms of Service</a></li>
+            <!-- <li><a href="#" class="o-footer__link | body-sm">About Us</a></li> -->
+            <li><nuxt-link to="/contact" class="o-footer__link | body-sm">Contact Us</nuxt-link></li>
+            <li><nuxt-link to="/support" class="o-footer__link | body-sm">Support</nuxt-link></li>
+            <li><nuxt-link to="/privacy" class="o-footer__link | body-sm">Privacy Policy</nuxt-link></li>
+            <li><nuxt-link to="/terms" class="o-footer__link | body-sm">Terms & Conditions</nuxt-link></li>
+            <li><nuxt-link to="/cookie" class="o-footer__link | body-sm">Cookie Policy</nuxt-link></li>
           </ul>
         </div>
       </div>
 
       <!-- Copyright -->
       <div class="o-footer__bottom">
-        <p class="o-footer__copyright | body-xs">Copyright &copy; Virify Ltd {{ currentYear }}</p>
+        <!-- Friendlier, Monzo-like disclaimer with protective legal backup on hover -->
+        <p class="o-footer__copyright | body-xs">
+          We like to help — our guides are friendly tips, not legal advice.
+        </p>
+        <p class="o-footer__copyright | body-xs" title="Our guides are for informational purposes only and do not constitute legal or professional advice.">
+          © {{ currentYear }} Virify Ltd. All rights reserved. Company No. 16255324.
+        </p>
       </div>
     </div>
   </footer>
 </template>
 
-<script setup>
-const currentYear = new Date().getFullYear();
+<script setup lang="ts">
+
+const { isWaitingListMode, config } = useWaitingListMode()
 
 // Get guide categories for footer navigation
-const { useCategories } = useSanity();
-const { data: categories } = await useCategories();
+const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery)
+
+// Determine which sections to show
+const footerConfig = computed(() => {
+  if (!isWaitingListMode.value) {
+    // Show everything when not in waiting-list mode
+    return {
+      showSellProperty: true,
+      showPropertyTools: true,
+      showGuides: true,
+      showCompany: true,
+    }
+  }
+  // Use waiting-list config when in waiting-list mode
+  return {
+    showSellProperty: config.footer.showSellProperty,
+    showPropertyTools: config.footer.showPropertyTools,
+    showGuides: config.footer.showGuides,
+    showCompany: config.footer.showCompany,
+  }
+})
+
+const currentYear = new Date().getFullYear();
 </script>
 
 <style lang="scss">
@@ -92,15 +119,17 @@ const { data: categories } = await useCategories();
 
   &__sections {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: flex-start;
     flex-direction: row;
-    gap: var(--size-12);
+    gap: var(--size-48);
     margin-top: var(--size-12);
     width: 100%;
     text-align: left;
 
     @include mq.mobile-only {
       flex-direction: column;
+      gap: var(--size-12);
     }
   }
 
@@ -152,6 +181,9 @@ const { data: categories } = await useCategories();
   }
 
   &__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-8);
     border-top: 1px solid var(--monochrome-700);
     padding-top: var(--size-24);
   }

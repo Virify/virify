@@ -4,11 +4,14 @@ export function useMapVisualization() {
    *
    * @param map The map instance
    * @param center The center coordinates [lon, lat]
-   * @param radiusMiles The radius in miles
+   * @param radiusMiles The radius in miles (0 or undefined = "this area only")
    * @param bbox Optional bounding box for exact location searches [west, south, east, north]
    * @param boundaryPolygon Optional actual boundary polygon geometry
    */
-  function updateSearchRadiusVisualization(map: ExtendedMapTilerMap, center: [number, number], radiusMiles: number, bbox?: [number, number, number, number], boundaryPolygon?: any) {
+  function updateSearchRadiusVisualization(map: ExtendedMapTilerMap, center: [number, number], radiusMiles: number | undefined, bbox?: [number, number, number, number], boundaryPolygon?: any) {
+    // Normalize radius - treat undefined/null as 0 (this area only)
+    const normalizedRadius = Number(radiusMiles) || 0;
+    
     // Remove any existing SVG overlay
     const mapContainer = map.getContainer();
     let svgOverlay = mapContainer.querySelector(".search-radius-svg") as SVGSVGElement | null;
@@ -42,11 +45,19 @@ export function useMapVisualization() {
 
       const mapAny = map as any; // project exists at runtime
 
-      // For "this location only", prioritize actual boundary polygon, then bbox, then circle
-      if (radiusMiles === 0 && boundaryPolygon) {
+      // Helper to check if bbox is valid (has actual area, not a point)
+      function isValidBbox(box: [number, number, number, number] | undefined): box is [number, number, number, number] {
+        if (!box) return false;
+        const [west, south, east, north] = box;
+        // Check if bbox has actual area (not a degenerate point)
+        return west !== east && south !== north;
+      }
+
+      // For "this location only" (radius = 0), prioritize actual boundary polygon, then bbox, then small circle
+      if (normalizedRadius === 0 && boundaryPolygon) {
         // Draw the actual boundary polygon shape
         drawPolygonShape(svgOverlay as SVGSVGElement, mapAny, boundaryPolygon);
-      } else if (radiusMiles === 0 && bbox) {
+      } else if (normalizedRadius === 0 && isValidBbox(bbox)) {
         // Draw the boundary rectangle  
         const [west, south, east, north] = bbox;
         
@@ -66,11 +77,14 @@ export function useMapVisualization() {
         rect.setAttribute("stroke-opacity", "0.4");
         (svgOverlay as SVGSVGElement).appendChild(rect);
       } else {
-        // Draw circle for radius-based searches
+        // Draw circle for radius-based searches (or 0.1 mile fallback for radius=0 without bbox/boundary)
         const centerPx = mapAny.project(center);
 
+        // Use 0.1 mile fallback if radius is 0 but no bbox/boundary (e.g., specific address or point)
+        const effectiveRadius = normalizedRadius || 0.1;
+        
         // Calculate radius in meters
-        const radiusMeters = radiusMiles * 1609.34;
+        const radiusMeters = effectiveRadius * 1609.34;
         // Calculate pixel radius at current zoom
         // Use a point due east of center at the radius distance
         const earthRadius = 6378137;

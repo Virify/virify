@@ -6,7 +6,7 @@
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
         v-slot="{ option, rowClass, actionClass }">
         <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-          {{ option.display_name || option.place_name_en }}
+          {{ option.place_name_en || option.place_name }}
         </button>
 
         <MoleculesAutocompleteSaveLocation :option :custom-class="actionClass" />
@@ -47,7 +47,7 @@
 
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
           <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
-            {{ option.display_name || option.place_name_en }}
+            {{ option.place_name_en || option.place_name }}
           </button>
 
           <button type="button" aria-label="Remove saved location" :class="actionClass" class="| faded-icon"
@@ -58,7 +58,7 @@
       </template>
     </ClientOnly>
 
-    <template v-if="trendingLocations">
+    <template v-if="trendingLocations?.length">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Trending locations</h3>
 
       <ul class="m-autocomplete-popover__pill-list">
@@ -206,7 +206,7 @@ const autocompleteFeedback = computed(() => {
   const { searchValue } = props
   const MIN_SEARCH_LENGTH = 4
 
-  if (searchValue.length < MIN_SEARCH_LENGTH) {
+  if (searchValue && searchValue.length < MIN_SEARCH_LENGTH) {
     return 'Keep typing for location suggestions...'
   }
 

@@ -1,15 +1,16 @@
 <template>
-  <div class="o-listing-buttons" role="presentation">
-    <AtomsNoteButton class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
-    <AtomsFavouriteButton class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
+  <div class="o-listing-buttons" role="presentation" v-if="!isWaitingListMode">
+    <AtomsNoteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
+    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
 
-    <button 
+    <AtomsEnquireButton
+      v-if="!isDraft && agent?.id"
+      :listing-id="listingId"
+      :user-id="agent.id"
       class="o-listing-buttons__contact | button button-secondary button-full"
-      :disabled="conversationState.isDisabled"
-      @click="() => handleConversationClick(listingId, agent?.id)"
     >
-      {{ conversationState.label }}
-    </button>
+      Enquire
+    </AtomsEnquireButton>
   </div>
 </template>
 
@@ -23,13 +24,10 @@ interface Props {
     createdAt?: Date | String | null
     avatar?: string | null
   }
+  isDraft?: boolean
 }
-
+const { isWaitingListMode } = useWaitingListMode();
 const props = defineProps<Props>()
-
-const { getConversationState, handleConversationClick } = useConversations()
-
-const conversationState = computed(() => getConversationState(props.listingId, props.agent?.id))
 </script>
 
 <style lang="scss">

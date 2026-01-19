@@ -126,52 +126,70 @@ export const useAnalytics = createSharedComposable(() => {
     }
   };
 
-  const trackAiSearch = async (aiQuery: string, location: GeocodingFeature) => {
-    console.log("trackAiSearch called with:", { aiQuery, location: location.text });
-    
+  const trackSearch = async (params: {
+    listingType: ListingType;
+    query: string;
+    location: GeocodingFeature;
+    radius: number;
+    resultCount: number;
+    userId?: number;
+  }) => {
     try {
-      const payload: { aiQuery: string; location: GeocodingFeature } = {
-        aiQuery,
-        location,
+      const payload = {
+        listingType: params.listingType,
+        query: params.query,
+        location: params.location,
+        radius: params.radius,
+        resultCount: params.resultCount,
+        userId: params.userId,
       };
-      
-      console.log("Sending payload (size:", JSON.stringify(payload).length, "bytes)");
-      console.log("Payload preview:", { 
-        aiQuery, 
-        locationId: location.id, 
-        locationText: location.text,
-        hasProperties: !!location.properties,
-        hasBbox: !!location.bbox 
-      });
       
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
       const success = navigator.sendBeacon("/api/analytics/search", blob);
-      console.log("sendBeacon result:", success);
-      
       if (!success) {
-        console.warn("sendBeacon failed, falling back to fetch");
-        await $fetch("/api/analytics/search", {
-          method: "POST",
-          body: payload,
-        });
-        console.log("Fetch fallback completed successfully");
-      } else {
-        console.log("sendBeacon completed successfully");
+        try {
+          await $fetch("/api/analytics/search", {
+            method: "POST",
+            body: payload,
+          });
+        } catch (e) {
+          // swallow fallback errors to avoid noisy logs
+        }
       }
     } catch (error) {
-      console.error("Failed to track AI search:", error);
+      // intentionally silent for analytics failures
+    }
+  };
+
+  /**
+   * Track when a user performs a mortgage calculation
+   * Uses sendBeacon for fire-and-forget lightweight tracking
+   * @param data Mortgage calculation data for analytics
+   */
+  const trackMortgageCalculation = (data: TrackMortgageCalculationPayload) => {
+    try {
+      const payload = {
+        sessionId: sessionId.value,
+        ...data,
+      };
+
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+      const success = navigator.sendBeacon("/api/analytics/mortgage/track", blob);
+    } catch (error) {
+      console.error("Failed to track mortgage calculation:", error);
     }
   };
 
   return {
     analytics,
     trackListingView,
+    trackMortgageCalculation,
     favourites,
     userNotes,
     recentlyViewedListings,
     recentOwnedListings,
     allUserListings,
-    trackAiSearch,
+    trackSearch,
     trendingLocations,
     fetchAnalytics,
   };

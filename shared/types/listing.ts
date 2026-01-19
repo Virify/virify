@@ -1,6 +1,7 @@
-import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
+import type { Address, Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 import type { SaleAvailabilityStatus, RentalAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
 import type { MapMarker } from "~~/shared/types/map";
+import type { DraftListingWithFullPayload } from "~~/shared/types/draft";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {
@@ -42,13 +43,23 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
           },
         },
         utility: true,
-        rearGarden: {
+        outdoorSpace: {
           include: {
-            media: true,
-          },
-        },
-        frontGarden: {
-          include: {
+            garden: {
+              include: {
+                media: true,
+              },
+            },
+            yard: {
+              include: {
+                media: true,
+              },
+            },
+            land: {
+              include: {
+                media: true,
+              },
+            },
             media: true,
           },
         },
@@ -71,7 +82,7 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
 
 export type ListingCardData = Omit<ListingWithFullProperty, 'property' | 'user'> & {
   property: NonNullable<ListingWithFullProperty['property']> & {
-    address: NonNullable<ListingWithFullProperty['property']>['address'];
+    address: Address;
     type: NonNullable<ListingWithFullProperty['property']>['type'];
     classification: NonNullable<ListingWithFullProperty['property']>['classification'];
   };
@@ -120,7 +131,6 @@ export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilitySta
  */
 export const listingCardFields = {
   id: true,
-  title: true,
   price: true,
   listingTier: true,
   publishedAt: true,
@@ -161,7 +171,7 @@ export const listingCardFields = {
       },
       accessibilityFeatures: {
         select: {
-          wheelchairFriendly: true,
+          features: true,
         },
       },
       additionalFeatures: {
@@ -175,12 +185,16 @@ export const listingCardFields = {
       numberOtherRooms: true,
       parking: {
         select: {
-          evCharging: true,
-          garage: true,
+          features: true,
         },
       },
-      rearGarden: true,
-      frontGarden: true,
+      outdoorSpace: {
+        select: {
+          garden: true,
+          yard: true,
+          land: true,
+        },
+      },
     },
   },
   user: {
@@ -218,3 +232,8 @@ export type ListingWithSimilar = {
   listing: ListingWithFullProperty;
   similarListings: SummaryCardData[];
 };
+
+/**
+ * Union type for editing - either a draft or a live listing
+ */
+export type EditableListing = DraftListingWithFullPayload | ListingWithFullProperty;

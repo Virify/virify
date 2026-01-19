@@ -28,7 +28,7 @@
             {{ formattedPriceType }}
           </p>
         </div>
-        <div class="summary-card__actions" @click.stop>
+        <div class="summary-card__actions" @click.stop v-if="!isWaitingListMode">
           <AtomsFavouriteButton :listing-id="Number(listing.id)" class="a-favourite-button" />
           <AtomsNoteButton :listing-id="Number(listing.id)" class="note-button" />
         </div>
@@ -95,6 +95,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { isWaitingListMode } = useWaitingListMode();
 
 // Computed properties
 const formattedPrice = computed(() => {
@@ -257,16 +258,11 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
   }
 
   &__price {
-    color: var(--blue-400);
+    color: light-dark(var(--blue-400), var(--monochrome-900));
     margin: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-
-    // Dark mode override for better contrast
-    @media (prefers-color-scheme: dark) {
-      color: var(--monochrome-800);
-    }
   }
 
   &__price-type {

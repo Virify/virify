@@ -9,6 +9,7 @@ const LocationSchema = z
     lat: z.number(),
     lon: z.number(),
     location: z.string(),
+    bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
     geocodingFeature: z.object({
       id: z.string(),
       text: z.string(),
@@ -19,6 +20,7 @@ const LocationSchema = z
         type: z.string(),
         coordinates: z.tuple([z.number(), z.number()]),
       }),
+      bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
       properties: z.record(z.any(), z.any())
     }),
   })
@@ -37,7 +39,10 @@ export default defineEventHandler(async (event) => {
 
     // Create the user saved location in the database
     if (newLocation) {
-      const { id, name, geocodingFeature, lat, lon, location } = newLocation;
+      const { id, name, geocodingFeature, lat, lon, location, bbox } = newLocation;
+      
+      // Extract bbox from geocodingFeature if not provided directly
+      const locationBbox = bbox ?? geocodingFeature.bbox;
 
       const savedLocation = await updateUserSavedLocation(id, user.id, {
         name,
@@ -45,6 +50,7 @@ export default defineEventHandler(async (event) => {
         lat,
         lon,
         location,
+        bbox: locationBbox,
       });
       // if updated location has no ID, it means it's a new location
       if (!newLocation?.id) {

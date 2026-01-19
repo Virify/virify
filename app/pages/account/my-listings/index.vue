@@ -49,6 +49,7 @@ const combinedOptions = [
   { key: 'Active', value: 'active' },
   { key: 'Inactive', value: 'inactive' },
   { key: 'Draft', value: 'draft' },
+  { key: 'Archived', value: 'archived' },
 ]
 
 const sortOptions = ['new', 'old', 'premium', 'featured', 'basic'] as const

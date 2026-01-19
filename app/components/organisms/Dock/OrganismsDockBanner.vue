@@ -8,7 +8,7 @@
         <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
       </div>
 
-      <fieldset class="o-dock-banner__fader | flow flow-lg" :disabled="isSearchLoading">
+      <section class="o-dock-banner__fader | flow flow-lg" :disabled="isSearchLoading">
         <MoleculesAiSearchFormLocation />
 
         <client-only>
@@ -16,12 +16,26 @@
 
             <OrganismsFilterSwitcher>
               <template v-slot:traditional>
-                <OrganismsTraditionalSearchForm class="o-dock-banner__toggle-content" />
+                <!-- @TODO put in a nicer skeleton loader here -->
+                <template v-if="isTraditionalFormLoading">
+                  <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
+                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                  </div>
+
+                  <div class="o-dock-banner__toggle-content-loader">
+                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                  </div>
+                </template>
+                <!-- @TODO end -->
+
+                <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
+                  @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
               </template>
 
               <template v-slot:ai>
                 <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-                  @submit-search="searchSubmit" @reset-search="searchReset" class="o-dock-banner__toggle-content" />
+                  @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
+                  class="o-dock-banner__toggle-content" />
               </template>
             </OrganismsFilterSwitcher>
           </Transition>
@@ -32,13 +46,30 @@
           @click.prevent="showExpandedForm">
           Expand form
         </AtomsButton>
-      </fieldset>
+      </section>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
+
+interface Props {
+  listingType?: ListingType;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  listingType: 'all'
+});
+
+/**
+ *  Manage lazy hydration
+ */
+const isTraditionalFormLoading = ref(true)
+
+function hideTraditionalFormLoader() {
+  isTraditionalFormLoading.value = false
+}
 
 /**
  *  Animate dock to final position
@@ -135,7 +166,9 @@ onClickOutside($formWrapper, () => {
 /**
  *  Fetch filters
  */
-const { setQuery, searchState } = useSearchState()
+const { setQuery, setListingType, searchState } = useSearchState()
+const { checkContent, isChecking } = useModeration()
+const { showToast } = useToast()
 
 const initialQuery = computed(() => {
   const { query } = asObject(searchState.value)
@@ -143,21 +176,31 @@ const initialQuery = computed(() => {
   return query
 })
 
-async function searchSubmit(query: string) {
-  setQuery(query)
+async function traditionalSearchSubmit(formData: TraditionalSearchData) {
+  const query = buildQueryFromTraditionalFormData(formData)
+
+  await aiSearchSubmit(query)
+}
+
+async function aiSearchSubmit(query: string) {
+  setListingType(props.listingType)
+
+  const { location, radius, listingType } = asObject(searchState.value)
+
+  if (!location) return
+
+  // Check content moderation before proceeding
+  const { safe, reason } = await checkContent(query)
+  if (!safe) {
+    showToast(reason || 'Please try a different search.', { type: 'error' })
+    return
+  }
 
   await animateFormToDock()
-  await navigateTo({
-    path: '/search'
-  })
+  await navigateTo(createSearchURL(listingType, location, radius ?? 5, query))
 
   /**
    *  To avoid global smooth scrolling
-   *
-   *  @TODO - we may want to have a more site-wide and elevant fix for
-   *          this, perhaps finding a way to adjust the Vue Router
-   *          behaviour to have `behaviour: instant` instead
-   *          https://router.vuejs.org/guide/advanced/scroll-behavior
    */
   window.scrollTo({
     top: 0,
@@ -263,6 +306,38 @@ const hasLocation = computed(() => {
 
     @include mq.small-tablet {
       padding: 0 var(--size-16) var(--size-16);
+    }
+  }
+
+  &__toggle-content-loader {
+    --tab-height-offset: 3.6rem;
+    min-height: 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: var(--size-24);
+
+    .a-icon {
+      width: var(--size-40);
+      height: var(--size-40);
+    }
+
+    &--dark {
+      border-radius: var(--border-radius-2xl);
+      margin: var(--tab-height-offset) var(--size-6) var(--size-6);
+
+      @include mq.small-tablet {
+        margin: var(--tab-height-offset) var(--size-16) var(--size-16);
+      }
+
+      /**
+       *  @TODO This is currently duplicated from the component:
+       *        OrganismsTraditionalSearchContract - we should probably
+       *        create a global utility class so this can be 'shared'
+       */
+      background: linear-gradient(to bottom, var(--blue-400), var(--blue-300));
+      color: var(--monochrome-900);
     }
   }
 }

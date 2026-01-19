@@ -10,7 +10,7 @@
         </div>
       </template>
 
-      <MoleculesNewCarousel v-else :slides :embla-options="thumbnailOptions" :pagination="false" :navigation="false"
+      <MoleculesCardsCarousel v-else :slides :embla-options="thumbnailOptions" :pagination="false" :navigation="false"
         class="m-card-slots-gallery-carousel__thumbnail-carousel" v-model="currentThumbnail"
         v-slot="{ slide, slideIndex }">
         <button @click.prevent="goToSlide(slideIndex)" class="m-card-slots-gallery-carousel__thumbnail-button" :class="{
@@ -19,7 +19,7 @@
           <AtomsCloudFlareImage :src="slide?.image" :alt="slide?.alt" class="m-card-slots-gallery-carousel__thumbnail"
             loading="lazy" />
         </button>
-      </MoleculesNewCarousel>
+      </MoleculesCardsCarousel>
     </div>
   </div>
 </template>

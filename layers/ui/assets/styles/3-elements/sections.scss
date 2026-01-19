@@ -1,0 +1,30 @@
+@use "../_utils/media" as mq;
+
+// Standard section padding with responsive adjustments
+@mixin section-padding() {
+  padding: var(--size-120) 0;
+
+  h2 {
+    text-align: center;
+  }
+
+  @include mq.mobile-and-small-tablet {
+    padding: var(--size-120) var(--size-32);
+  }
+
+  @include mq.mobile-only {
+    padding: var(--size-120) var(--size-24);
+  }
+}
+
+// Gradient background section
+@mixin section-gradient-bg() {
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+  color: var(--monochrome-900);
+}
+
+// Apply both padding and gradient
+@mixin section-gradient() {
+  @include section-padding();
+  @include section-gradient-bg();
+}

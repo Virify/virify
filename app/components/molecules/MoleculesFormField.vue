@@ -12,14 +12,15 @@
 interface Props {
   label: string
   noSpacing?: boolean
+  id?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   noSpacing: false
 })
 
 // Create ID for label
-const labelId = useId()
+const labelId = props.id || useId()
 </script>
 
 <style>

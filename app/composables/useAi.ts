@@ -1,7 +1,7 @@
 import type { GeocodingFeatureWithBoundary } from '~~/shared/types/map';
 
 export default function useAi() {
-  const { trackAiSearch } = useAnalytics();
+  const { trackSearch } = useAnalytics();
   // Global state for query analysis and search query
   const queryAnalysis = useState<QueryAnalysis | null>(
     "ai-query-analysis",
@@ -18,23 +18,46 @@ export default function useAi() {
    * @param limit The number of results per page (optional, defaults to 20)
    * @returns The search results
    */
-  async function aiSearch(location: GeocodingFeatureWithBoundary, radius: number, query: string, page?: number, limit?: number) {
+  async function aiSearch(listingType: ListingType, location: GeocodingFeatureWithBoundary, radius: number, query: string, page?: number, limit?: number) {
     searchQuery.value = query; // Update state for analysis function
+    
+    // Get center coordinates - use center property if available (for regions with Polygon geometry)
+    // otherwise fall back to Point geometry coordinates
+    const [lon, lat] = location.center 
+      ?? (location.geometry?.type === 'Point' ? location.geometry.coordinates : null)
+      ?? [0, 0];
+    
     const response = await $fetch<AISearchResponse>("/api/search/rag/", {
       method: "POST",
       body: {
+        listingType,
         query: query,
-        lat: location.geometry.coordinates[1],
-        lon: location.geometry.coordinates[0],
+        lat,
+        lon,
         radius: radius,
         bbox: location.bbox,
         boundaryPolygon: location.boundaryPolygon,
       },
     });
 
-    // Strip boundaryPolygon for analytics tracking
-    const { boundaryPolygon, ...locationForTracking } = location;
-    trackAiSearch(query, locationForTracking);
+    // Strip boundaryPolygon for analytics tracking and normalize geometry to Point
+    const { boundaryPolygon, geometry, ...locationBase } = location;
+    const locationForTracking = {
+      ...locationBase,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [lon, lat] as [number, number]
+      }
+    };
+    
+    // Track search with full context
+    trackSearch({
+      listingType,
+      query,
+      location: locationForTracking,
+      radius,
+      resultCount: response.results?.length ?? 0,
+    });
 
     if (response.queryAnalysis) {
       queryAnalysis.value = response.queryAnalysis;
@@ -76,56 +99,10 @@ export default function useAi() {
     return response;
   }
 
-  /**
-   * Generate a structured array of query segments for highlighting.
-   * @returns An array of objects with text and type ('used', 'ignored', 'normal').
-   */
-  function getAnalyzedQuerySegments() {
-    if (!searchQuery.value) return [];
-    if (!queryAnalysis.value) {
-      return [{ text: searchQuery.value, type: "normal" }];
-    }
-
-    const { usedTerms, ignoredTerms } = queryAnalysis.value;
-    const allTerms = [...usedTerms, ...ignoredTerms].sort((a, b) => b.length - a.length);
-
-    const segments: { text: string; type: "used" | "ignored" | "normal" }[] = [];
-    let lastIndex = 0;
-
-    const termMap = new Map<string, "used" | "ignored">();
-    usedTerms.forEach(term => termMap.set(term.toLowerCase(), "used"));
-    ignoredTerms.forEach(term => termMap.set(term.toLowerCase(), "ignored"));
-
-    const regex = new RegExp(allTerms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "gi");
-
-    searchQuery.value.replace(regex, (match, offset) => {
-      // Add the text before the current match as a normal segment
-      if (offset > lastIndex) {
-        segments.push({ text: searchQuery.value.substring(lastIndex, offset), type: "normal" });
-      }
-
-      // Add the matched term with its type
-      const type = termMap.get(match.toLowerCase());
-      if (type) {
-        segments.push({ text: match, type });
-      }
-
-      lastIndex = offset + match.length;
-      return match; // Required by replace function
-    });
-
-    // Add any remaining text after the last match
-    if (lastIndex < searchQuery.value.length) {
-      segments.push({ text: searchQuery.value.substring(lastIndex), type: "normal" });
-    }
-
-    return segments;
-  }
 
   return {
     aiSearch,
     paginateSearch,
-    getAnalyzedQuery: getAnalyzedQuerySegments, // Rename for compatibility
     queryAnalysis,
     searchQuery,
   };

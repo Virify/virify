@@ -1,33 +1,24 @@
 <template>
   <div class="m-promptbox | gradient-box">
     <div class="m-promptbox__input-wrapper">
-      <!-- analysed query overlays the textarea -->
-      <div class="m-promptbox__overlay | body-md" v-if="queryAnalysis" aria-hidden="true">
-        <span v-for="(segment, index) in getAnalyzedQuery()" :key="index" :class="`segment--${segment.type}`">
-          {{ segment.text }}
-        </span>
-      </div>
-
-      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label" v-model="textarea"
-        :style="queryAnalysis ? 'color: transparent; caret-color: var(--foreground-100);' : ''"
-        @keypress.enter="keyboardSubmit"></textarea>
+      <textarea :id class="m-promptbox__textarea | body-md" :placeholder :aria-label="props.label"
+        v-model="textarea"></textarea>
     </div>
 
-    <button type="submit" class="m-promptbox__button" aria-label="Submit" :disabled="disabled"
-      @click.prevent="emitSearch">
+    <AtomsButton type="submit" class="m-promptbox__button" :pending="loading" :disabled="disabled" aria-label="Submit"
+      @click.prevent="$emit('submit', textarea)">
       <AtomsIcon icon="ai/send" aria-hidden />
-    </button>
+    </AtomsButton>
   </div>
 </template>
 
 <script setup lang="ts">
-const { getAnalyzedQuery, queryAnalysis } = useAi()
-
 const props = defineProps({
   id: String,
   placeholder: String,
   label: { type: String, default: 'Enter your prompt here' },
-  disabled: { type: Boolean, default: false }
+  disabled: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false }
 })
 
 const textarea = defineModel({ default: '' })
@@ -130,10 +121,33 @@ function keyboardSubmit(e: KeyboardEvent) {
     background: var(--monochrome-300);
   }
 
+  &--loading {
+    background: var(--secondary-400);
+  }
+
   svg {
     display: block;
     width: var(--size-24);
     height: var(--size-24);
+  }
+}
+
+.m-promptbox__spinner {
+  width: var(--size-24);
+  height: var(--size-24);
+  border: 3px solid var(--monochrome-400);
+  border-top-color: var(--monochrome-900);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 

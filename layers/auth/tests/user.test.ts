@@ -36,7 +36,7 @@ import {
   User,
 } from "../../database/server/utils/user";
 import { prisma } from "../../database/server/utils/prisma-client";
-import { Reviewed } from "../../database/server/database/prisma/generated/enums";
+import { Reviewed, Role } from "../../database/server/database/prisma/generated/enums";
 
 const prismaAny = prisma as any;
 
@@ -71,6 +71,7 @@ describe("user functions", () => {
     bank: null,
     payslip: null,
     business: null,
+    role: Role.USER,
   };
 
   const mockUser: MockUser = {
@@ -108,7 +109,7 @@ describe("user functions", () => {
     expect(found).toEqual(mockUser);
     expect(prismaAny.user.findUnique).toHaveBeenCalledWith({
       where: { email: mockUser.email },
-      include: { membership: true },
+      include: { membership: true, verification: true },
     });
   });
 

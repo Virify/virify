@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { PortableText } from '@portabletext/vue'
+import AtomsDivider from '~/components/atoms/AtomsDivider.vue';
 
 const props = defineProps<{
   blocks: PortableTextContent[]
@@ -35,19 +36,45 @@ onMounted(() => {
   console.log(props.blocks)
 })
 
+// Helper to check if string is a Cloudflare image ID
+const isCloudflareId = (str: string | undefined): boolean => {
+  if (!str) return false
+  // Cloudflare IDs are UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+}
+
 // Custom components for different block types
 const customComponents = {
   types: {
-    // Custom image component (uses Nuxt Image with Sanity provider)
+    // Custom image component (handles both Sanity images and Cloudflare IDs)
     image: (props: any) => {
-      const NuxtImg = resolveComponent('NuxtImg') as any
       const srcRef = props.value?.asset?._ref || props.value?.asset?.url
+      const alt = props.value?.alt || props.value?.caption || 'Guide content image'
+      
+      // Check if this is a Cloudflare ID
+      if (isCloudflareId(srcRef)) {
+        const CloudFlareImage = resolveComponent('AtomsCloudFlareImage') as any
+        return h('figure', { class: 'content-image' }, [
+          h(CloudFlareImage, {
+            src: srcRef,
+            alt,
+            variant: 'marketing',
+            placeholder: true,
+            class: 'content-image__img'
+          }),
+          props.value.caption ? h('figcaption', { class: 'image-caption' }, props.value.caption) : null
+        ].filter(Boolean))
+      }
+      
+      // Otherwise use Sanity image
+      const NuxtImg = resolveComponent('NuxtImg') as any
       const width = props.value?.metadata?.dimensions?.width
       const height = props.value?.metadata?.dimensions?.height
       return h('figure', { class: 'content-image' }, [
         h(NuxtImg, {
           provider: 'sanity',
           src: srcRef,
+          alt,
           width,
           height,
           loading: 'lazy',
@@ -84,6 +111,11 @@ const customComponents = {
           }) : null
         ])
       ])
+    },
+
+    // Custom divider component
+    divider: () => {
+      return h(AtomsDivider)
     }
   },
 
@@ -132,9 +164,9 @@ const customComponents = {
 
   // Typography elements
   h1, h2, h3, h4, h5, h6 {
-    margin-bottom: var(--size-16);
+    margin-bottom: var(--size-24);
     font-weight: var(--font-bold);
-    color: var(--secondary-400);
+    color: var(--foreground-100);
   }
 
   h1 {
@@ -166,9 +198,9 @@ const customComponents = {
   }
 
   p {
-    margin-bottom: var(--size-16);
+    margin-bottom: var(--size-24);
     font-size: var(--font-md);
-    line-height: var(--lineheight-lg);
+    line-height: var(--lineheight-md);
     color: var(--foreground-100);
 
     // Paragraphs immediately after headings get tighter spacing
@@ -192,7 +224,7 @@ const customComponents = {
     // Nested lists get tighter spacing
     ul, ol {
       margin-top: var(--size-8);
-      margin-bottom: var(--size-16);
+      margin-bottom: var(--size-24);
     }
   }
 
@@ -266,7 +298,7 @@ const customComponents = {
 }
 
 .content-block {
-  margin-bottom: var(--size-16);
+  margin-bottom: var(--size-24);
 }
 
 .content-image {

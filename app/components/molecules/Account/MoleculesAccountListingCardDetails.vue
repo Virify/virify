@@ -1,5 +1,5 @@
 <template>
-  <div class="account-card-details">
+  <div class="account-card-details" :class="tierClass">
     <div class="account-card-details__price-row">
       <h3 class="account-card-details__price | title-sm">{{ formattedPrice }}</h3>
       <div class="account-card-details__actions">
@@ -26,6 +26,11 @@
         <span class="account-card-details__feature-text | body-xs">{{ bathrooms }}</span>
       </div>
     </div>
+
+    <div v-if="note" class="account-card-details__note" @click.prevent>
+      <AtomsIcon icon="cards/notes" size="16" />
+      <p class="body-xs">{{ note }}</p>
+    </div>
   </div>
 </template>
 
@@ -41,9 +46,19 @@ interface Props {
   bedrooms?: number;
   bathrooms?: number;
   isRental: boolean;
+  tier?: string;
+  note?: string;
 }
 
 const props = defineProps<Props>();
+
+const tierKey = computed(() => String(props.tier || 'basic').toLowerCase())
+
+const tierClass = computed(() => ({
+  'account-card-details--premium': tierKey.value === 'premium',
+  'account-card-details--featured': tierKey.value === 'featured',
+  'account-card-details--basic': !tierKey.value || tierKey.value === 'basic'
+}))
 
 const formattedPrice = computed(() => {
   if (!props.price) return "";
@@ -84,7 +99,7 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
 
   &__actions {
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--size-4);
     flex-shrink: 0;
     padding-right: var(--size-2);
@@ -92,13 +107,13 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
 
   &__price {
     margin: 0;
-    color: var(--secondary-400);
+    color: var(--tier-color, var(--secondary-400));
     flex: 1;
     min-width: 0;
   }
 
   &__type-pill {
-    background: var(--secondary-400);
+    background: var(--tier-color, var(--secondary-400));
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -139,10 +154,49 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
   }
 
   &__note {
-    margin: var(--size-4) 0 0 0;
-    color: var(--text-muted);
-    font-style: italic;
-    line-height: 1.4;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-8);
+    margin-top: var(--size-12);
+    padding-top: var(--size-12);
+    border-top: 1px solid var(--monochrome-500);
+    color: var(--foreground-200);
+    line-height: 1.5;
+
+    p {
+      margin: 0;
+      flex: 1;
+    }
+
+    :deep(svg) {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--foreground-300);
+    }
+  }
+
+  /* Tier color themes */
+  &.account-card-details--premium {
+    --tier-color: var(--blue-400);
+
+    .account-card-details__price {
+      color: var(--foreground-100);
+    }
+    .account-card-details__type-pill {
+      color: var(--monochrome-900);
+    }
+  }
+
+  &.account-card-details--featured {
+    --tier-color: var(--secondary-400);
+  }
+
+  &.account-card-details--basic {
+    --tier-color: var(--foreground-100);
+    
+    .account-card-details__type-pill {
+      color: var(--background-100);
+    }
   }
 }
 </style>

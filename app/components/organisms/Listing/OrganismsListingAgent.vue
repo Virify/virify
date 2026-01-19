@@ -5,8 +5,8 @@
         v-if="agent?.avatar"
         :src="agent.avatar"
         :alt="`${agent.username}'s avatar`"
-        width="40"
-        height="40"
+        :width="20"
+        :height="20"
         class="o-listing-sidebar-agent__logo-image"
       />
       <AtomsIcon
@@ -14,7 +14,7 @@
         icon="profile"
         class="o-listing-sidebar-agent__logo-icon"
         aria-hidden="true"
-        size="40"
+        :size="40"
       />
     </div>
 
@@ -26,7 +26,6 @@
         {{ agent?.username }}
       </h3>
       <!-- <p class="| body-xs">123 Agent Street, SM1 TWN</p> -->
-      <address>{{ agent?.email }}</address>
       <p class="| body-xs">{{ memberSince }}</p>
     </div>
   </section>
@@ -76,7 +75,8 @@ const memberSince = computed(() => {
   flex: 1 0 auto;
 
   &__logo {
-    aspect-ratio: 1;
+    height: 100%;
+    width: 100%;
     border-radius: var(--border-radius-lg);
     background: #{fn.faded-color(80%)};
     display: flex;
@@ -85,16 +85,16 @@ const memberSince = computed(() => {
   }
 
   &__logo-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     border-radius: var(--border-radius-lg);
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
   }
 
   &__logo-icon {
-    width: 100%;
-    height: 100%;
     color: var(--blue-400);
+    height: 100%;
+    
   }
 
   &__name {

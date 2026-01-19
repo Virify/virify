@@ -6,8 +6,8 @@ export const typeToClassificationMap: Record<number, number[]> = {
   4: [14, 15, 16, 17, 18, 19],
   5: [20, 21, 22, 23, 24],
   6: [25, 26, 27],
-  7: [28, 29, 30], 
-  8: [31, 32, 33],
+  7: [28, 29], 
+  8: [30, 31, 32],
 };
 
 // property_type_id |  property_type_name   | classification_id |  classification_name
@@ -36,12 +36,10 @@ export const typeToClassificationMap: Record<number, number[]> = {
 //                 5 | Land                  |                22 | Agricultural
 //                 5 | Land                  |                23 | Development Plot
 //                 5 | Land                  |                24 | Development Potential
-//                 6 | Farms                 |                25 | Non-working Farmhouse
-//                 6 | Farms                 |                26 | Working Farm
-//                 6 | Farms                 |                27 | Small Holding
-//                 7 | Specialty             |                28 | Shared Ownership
-//                 7 | Specialty             |                29 | Retirement Home
-//                 7 | Specialty             |                30 | New Build Home
-//                 8 | Student Accommodation |                31 | Flat
-//                 8 | Student Accommodation |                32 | House
-//                 8 | Student Accommodation |                33 | House-share
+//                 6 | Farms                 |                25 | Non-working
+//                 6 | Farms                 |                26 | Working
+//                 7 | Specialty             |                27 | Retirement Home
+//                 7 | Specialty             |                28 | New Build Home
+//                 8 | Student Accommodation |                29 | Flat
+//                 8 | Student Accommodation |                30 | House
+//                 8 | Student Accommodation |                31 | House-share

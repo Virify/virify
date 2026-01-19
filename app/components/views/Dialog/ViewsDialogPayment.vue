@@ -121,14 +121,10 @@ function onCancel() {
 }
 
 function onSuccessClose() {
-  /**
-   * TODO: Create a listing draft on the server here then navigate to the listing creation page
-   */
   hideDialog({
     paymentConfirmed: true,
     tier: props.tier,
   });
-  navigateTo("/account/create-listing");
 }
 
 function resetDialogState() {

@@ -26,9 +26,8 @@
 const { searchState } = useSearchState()
 
 const locationName = computed(() => {
-  const { place_name_en } = asObject(searchState.value?.location)
-
-  return place_name_en
+  const location = searchState.value?.location
+  return location?.place_name_en || location?.place_name || ''
 })
 
 const radius = computed(() => {

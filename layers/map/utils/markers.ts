@@ -143,7 +143,6 @@ export function formatMarker(listing: any): any {
     id: listing.id,
     lat: listing.property?.address?.lat ?? 0,
     lon: listing.property?.address?.lon ?? 0,
-    title: listing.title ?? null,
     bedrooms: listing.property?.numberBedrooms ?? null,
     bathrooms: listing.property?.numberBathrooms ?? null,
     receptions: listing.property?.numberReceptions ?? null,
@@ -172,7 +171,6 @@ export function convertListingsToMarkers(listings: any[]): any[] {
     .filter(listing => listing.property?.address?.lat && listing.property?.address?.lon)
     .map((listing, index) => ({
       id: listing.id || `listing-${index}`,
-      title: listing.title,
       price: listing.price,
       listingTier: listing.listingTier,
       publishedAt: listing.publishedAt,
@@ -202,8 +200,7 @@ export function convertListingsToMarkers(listings: any[]): any[] {
         accessibilityFeatures: listing.property?.accessibilityFeatures || null,
         additionalFeatures: listing.property?.additionalFeatures || null,
         parking: listing.property?.parking || null,
-        rearGarden: listing.property?.rearGarden || null,
-        frontGarden: listing.property?.frontGarden || null,
+        outdoorSpace: listing.property?.outdoorSpace || null,
       },
       user: listing.user,
     }));

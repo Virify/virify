@@ -3,10 +3,10 @@
     <h2 v-if="price" class="o-listing-sidebar__title | title-2xl lineheight-xs">
       <div class="o-listing-sidebar__title-offertype">
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
-          {{ convertRoomEnumToString(priceType!) }}
+          {{ convertEnumToString(priceType!) }}
         </AtomsPill>
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
-          {{ convertRoomEnumToString(available!) }}
+          {{ convertEnumToString(available!) }}
         </AtomsPill>
       </div>
 
@@ -19,13 +19,13 @@
     </p>
 
     <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
-      :receptions="receptions" :other-rooms="otherRooms" :rear-garden="rearGarden" :front-garden="frontGarden"
+      :receptions="receptions" :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand"
       :classification="classification" />
 
     <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree" :year-built="newBuild"
       :construction-type="constructionType" />
 
-    <OrganismsListingButtons :listing-id="listingId" :agent="agent" />
+    <OrganismsListingButtons :listing-id="listingId" :agent="agent" :is-draft="isDraft" />
 
     <NuxtLink v-if="agent" to="#" class="o-listing-sidebar__agent-link">
       <OrganismsListingAgent :agent="agent" />
@@ -58,12 +58,15 @@ interface Props {
     createdAt?: Date | String | null
     avatar?: string | null
   }
-  rearGarden?: boolean
-  frontGarden?: boolean
+  hasGarden?: boolean
+  hasLand?: boolean
   available?: string
+  isDraft?: boolean
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
+
+  
 
 const newBuild = computed(() => {
   // if built in the last 3 years, return "New build"

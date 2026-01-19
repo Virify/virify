@@ -1,17 +1,21 @@
 model AdditionalFeatures {
-  id          Int      @id @default(autoincrement())
-  description String
-  petFriendly Boolean  @default(true)
-  moveInDate  DateTime
-  pool        Boolean  @default(false)
-  internet    Boolean  @default(false)
-  concierge   Boolean  @default(false)
-  shop        Boolean  @default(false)
-  gym         Boolean  @default(false)
-  propertyId  Int      @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  id          Int               @id @default(autoincrement())
+  description String?
+  petFriendly Boolean           @default(true)
+  moveInDate  DateTime?
+  features    BuildingFeature[]
+  propertyId  Int               @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  property    Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
+}
+
+enum BuildingFeature {
+  POOL
+  INTERNET
+  CONCIERGE
+  SHOP
+  GYM
 }

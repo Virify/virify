@@ -1,53 +1,88 @@
 <template>
-  <div class="o-traditional-search-form | flow flow-4xl">
-    <OrganismsTraditionalSearchContract />
+  <form class="o-traditional-search-form | flow flow-4xl" @submit.prevent="postFormData">
+    <OrganismsTraditionalSearchContract :sale-includes-options :rent-includes-options v-model:is-sale="formData.isSale"
+      v-model:min-price="formData.minPrice" v-model:max-price="formData.maxPrice" v-model:price="formData.price"
+      v-model:sale-includes="formData.saleIncludes" v-model:rent-includes="formData.rentIncludes"
+      id="traditional-search-form-price" />
 
-    <div class="o-traditional-search-form__property-type">
+    <section class="o-traditional-search-form__property-type" id="tradition-search-form-type">
       <h3 class="o-traditional-search-form__title | title-xs">
         Property type
       </h3>
 
-      <OrganismsTraditionalSearchPropertyType class="o-traditional-search-form__property-type-grid" />
-    </div>
+      <OrganismsTraditionalSearchPropertyType v-model="formData.propertyTypes"
+        class="o-traditional-search-form__property-type-grid" />
+    </section>
 
 
-    <div class="o-traditional-search-form__room-count">
+    <section class="o-traditional-search-form__room-count" id="tradition-search-form-rooms">
       <h3 class="o-traditional-search-form__title | title-xs">
         Room counts
       </h3>
 
       <div class="o-traditional-search-form__room-count-grid">
-        <MoleculesRoomCount :min="bedroomMin" :max="bedroomMax" room-type="bedrooms" />
-        <MoleculesRoomCount :min="bathroomMin" :max="bathroomMax" room-type="bathrooms" />
+        <MoleculesRoomCount v-model:min-count="formData.minBeds" v-model:max-count="formData.maxBeds" :min="bedroomMin"
+          :max="bedroomMax" room-type="bedrooms" />
+        <MoleculesRoomCount v-model:min-count="formData.minBathrooms" v-model:max-count="formData.maxBathrooms"
+          :min="bathroomMin" :max="bathroomMax" room-type="bathrooms" />
       </div>
-    </div>
+    </section>
 
-    <div>
+    <section id="tradition-search-form-features">
       <h3 class="o-traditional-search-form__title | title-xs">
         Additional features
       </h3>
 
       <ul class="o-traditional-search-form__additional-features">
-        <li v-for="feature of additionalFeatures">
-          <AtomsCheckbox :label="feature" />
+        <li v-for="{ key, label } of additionalFeatures">
+          <AtomsCheckbox v-model="formData.additionalFeatures[key]" :label :name="key" />
         </li>
       </ul>
+    </section>
 
-      <AtomsCollapsibleTip class="o-traditional-search-form__tip">
-        <h3 class="| title-2xs">Want even more customisability?</h3>
+    <AtomsCollapsibleTip class="o-traditional-search-form__tip">
+      <h3 class="| title-2xs">Want even more customisability?</h3>
 
-        <p class="| body-sm">
-          Why not check out our AI-enhanced search to find your perfect home! Just select the 'AI enhanced' option at
-          the top of this form
-        </p>
-      </AtomsCollapsibleTip>
-    </div>
-  </div>
+      <p class="| body-sm">
+        Why not check out our AI-enhanced search to find your perfect home! Just select the 'AI enhanced' option at
+        the top of this form
+      </p>
+    </AtomsCollapsibleTip>
+
+    <OrganismsTraditionalSearchToolbar class="o-traditional-search-form__toolbar" />
+  </form>
 </template>
 
 <script setup lang="ts">
+const emits = defineEmits(['is-loaded', 'submit-search'])
 
-const bedroomMin = [
+onBeforeMount(() => {
+  emits('is-loaded', true)
+})
+
+/**
+ *  Data
+ */
+interface RoomCount {
+  key: number
+  value: string
+  selected?: boolean
+}
+
+const saleIncludesOptions = [
+  { key: 'sold-stc', label: 'Include sold STC' },
+  { key: 'shared-ownership', label: 'Include shared ownership' },
+  { key: 'retirement', label: 'Include retirement properties' },
+  { key: 'cash-only', label: 'Include cash-only properties' },
+]
+
+const rentIncludesOptions = [
+  { key: 'let-agreed', label: 'Include let agreed' },
+  { key: 'short-term-lets', label: 'Include short-term lets' },
+  { key: 'long-term-lets', label: 'Include long-term lets' },
+]
+
+const bedroomMin: RoomCount[] = [
   { key: 0, value: 'Any', selected: true },
   { key: 0.5, value: 'Studio' },
   { key: 1, value: '1' },
@@ -60,7 +95,7 @@ const bedroomMin = [
   { key: 8, value: '8+' }
 ]
 
-const bedroomMax = [
+const bedroomMax: RoomCount[] = [
   { key: 0.5, value: 'Studio' },
   { key: 1, value: '1' },
   { key: 2, value: '2' },
@@ -73,7 +108,7 @@ const bedroomMax = [
   { key: 9, value: 'Any', selected: true }
 ]
 
-const bathroomMin = [
+const bathroomMin: RoomCount[] = [
   { key: 0, value: 'Any', selected: true },
   { key: 1, value: '1' },
   { key: 2, value: '2' },
@@ -82,7 +117,7 @@ const bathroomMin = [
   { key: 5, value: '5+' },
 ]
 
-const bathroomMax = [
+const bathroomMax: RoomCount[] = [
   { key: 1, value: '1' },
   { key: 2, value: '2' },
   { key: 3, value: '3' },
@@ -92,14 +127,42 @@ const bathroomMax = [
 ]
 
 const additionalFeatures = [
-  'Garage',
-  'Off-street parking',
-  'Disability access',
-  'Garden',
-  'Pet-friendly',
-  'Another feature',
-  'And another',
+  { key: 'garage', label: 'Garage' },
+  { key: 'off-street-parking', label: 'Off-street parking' },
+  { key: 'disabled-access', label: 'Disability access' },
+  { key: 'garden', label: 'Garden' },
+  { key: 'pets', label: 'Pet-friendly' },
 ]
+
+/**
+ *  Form data
+ */
+function getDefaultSelected(arr: RoomCount[]) {
+  return arr.find(({ selected }) => selected)?.key
+}
+
+const formData = useState('search-contract-type', () => reactive({
+  isSale: true,
+  minPrice: 0,
+  maxPrice: 0,
+  price: <[number, number]>[0, 0],
+  saleIncludes: reactive<{ [key: string]: boolean }>({}),
+  rentIncludes: reactive<{ [key: string]: boolean }>({}),
+  minBeds: <number>getDefaultSelected(bedroomMin),
+  maxBeds: <number>getDefaultSelected(bedroomMax),
+  minBathrooms: <number>getDefaultSelected(bathroomMin),
+  maxBathrooms: <number>getDefaultSelected(bathroomMax),
+  propertyTypes: reactive<{ [key: string]: string[] }>({}),
+  additionalFeatures: reactive<{ [key: string]: boolean }>({}),
+}))
+
+/**
+ *  Handle post
+ */
+function postFormData() {
+  emits('submit-search', formData.value);
+}
+
 </script>
 
 <style lang="scss">
@@ -133,6 +196,11 @@ const additionalFeatures = [
 
   &__tip {
     margin: var(--size-24) 0 0;
+  }
+
+  &__toolbar {
+    position: sticky;
+    bottom: 0;
   }
 }
 </style>

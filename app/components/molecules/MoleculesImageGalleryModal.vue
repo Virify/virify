@@ -1,8 +1,8 @@
 <template>
-  <!-- Grid Gallery Modal (First Level) -->
-  <MoleculesImageGalleryGridModal
+  <!-- Room Grid Gallery Modal (First Level) -->
+  <MoleculesImageGalleryRoomGrid
     v-if="showGridModal"
-    :images="images"
+    :images="props.images"
     @close="closeGridModal"
     @open-image="openImageModal"
   />
@@ -10,7 +10,7 @@
   <!-- Individual Image Modal (Second Level) -->
   <MoleculesImageModal
     v-if="showImageModal"
-    :images="images"
+    :images="flatImages"
     :initial-index="selectedImageIndex"
     @close="closeImageModal"
   />
@@ -20,6 +20,16 @@
 interface ImageData {
   src: string
   alt: string
+  bedroomId?: number | null
+  bathroomId?: number | null
+  kitchenId?: number | null
+  receptionId?: number | null
+  otherRoomId?: number | null
+  gardenId?: number | null
+  yardId?: number | null
+  landId?: number | null
+  outdoorSpaceId?: number | null
+  globalIndex: number
 }
 
 interface Props {
@@ -41,16 +51,19 @@ const showGridModal = ref(false)
 const showImageModal = ref(false)
 const selectedImageIndex = ref(props.initialIndex)
 
+// Convert all images to flat format for the image modal
+const flatImages = computed(() => {
+  return props.images.map(img => ({
+    src: img.src,
+    alt: img.alt
+  }))
+})
+
 // Watch for show prop changes to open grid modal
 watch(() => props.show, (newShow) => {
   if (newShow) {
-    // If an initial index is provided, go directly to image modal
-    if (props.initialIndex > 0) {
-      selectedImageIndex.value = props.initialIndex
-      showImageModal.value = true
-    } else {
-      showGridModal.value = true
-    }
+    // Always open the grid modal first
+    showGridModal.value = true
   } else {
     closeAll()
   }
@@ -82,7 +95,3 @@ function closeAll() {
   showImageModal.value = false
 }
 </script>
-
-<style lang="scss">
-// Coordinator component - no styles needed
-</style>

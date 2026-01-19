@@ -1,34 +1,46 @@
 <template>
   <NuxtLink :to="to" class="guide-card">
     <div class="guide-card__top">
-      <div class="guide-card__content">
-        <div class="guide-card__icon">
-          <AtomsIcon :icon="icon" :size="64" />
+      <nuxt-img 
+        v-if="image" 
+        provider="sanity" 
+        :src="image.asset._ref"
+        :alt="imageAlt"
+        :width="600" 
+        :height="300"
+        class="guide-card__image"
+        placeholder='/img/preload.svg'
+      />  
+    </div>
+    <div class="guide-card__description">
+      <h3 class="guide-card__title | title-xs">{{ title }}</h3>
+      <div class="guide-card__excerpt">
+        <p class="body-sm">{{ excerpt || description }}</p>
+        <div class="guide-card__details" v-if="readTime || updatedAt">
+          <AtomsPill v-if="readTime" class="body-xs">{{ readTime }} min read</AtomsPill>
+          <AtomsPill v-if="updatedAt" class="body-xs">Updated on {{ formatDate(updatedAt) }}</AtomsPill>
         </div>
-        <h3 class="guide-card__title | title-xs">{{ title }}</h3>
       </div>
-    </div>
-    <div class="guide-card__description | body-sm">
-      <p>{{ excerpt || description }}</p>
-    </div>
-    <div class="guide-card__details">
-      <p v-if="readTime" class="body-xs">{{ readTime }} min read</p>
-      <p v-if="publishedAt" class="body-xs">Published on {{ formatDate(publishedAt) }}</p>
     </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   title: string;
   to: string;
-  icon?: string;
+  image?: SanityImage;
   description?: string;
   excerpt?: string;
   readTime?: number;
   isFeatured?: boolean;
-  publishedAt?: string;
+  updatedAt?: string;
 }>();
+
+// Generate descriptive alt text for SEO and accessibility
+const imageAlt = computed(() => 
+  props.image?.alt || `${props.title} guide cover image`
+);
 </script>
 
 <style scoped lang="scss">
@@ -40,27 +52,21 @@ defineProps<{
   text-decoration: none;
   transition: all 0.3s ease;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   background: var(--background-200);
   height: 100%;
   width: 100%;
+  border: 1px solid var(--monochrome-500);
 
-  &:hover {
-    transform: translateY(-4px);
-  }
-
-  &__top {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)), var(--secondary-400);
-    padding: var(--size-32);
+    &__top {
     display: flex;
     flex-direction: column;
-    justify-content: baseline;
+    justify-content: center;
     align-items: center;
     text-align: center;
+    height: 200px;
+    flex-shrink: 0;
+    width: 100%;
     position: relative;
-    flex: 1;
-    min-height: 130px;
-    height: fit-content;
 
     &::before {
       content: "";
@@ -73,56 +79,65 @@ defineProps<{
       background-size: cover;
       opacity: 0.7;
       pointer-events: none;
+      z-index: 0;
     }
   }
 
-  &__content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--size-16);
-    position: relative;
-    z-index: 1;
-  }
-
-  &__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--border-radius-lg);
-
-    .a-icon {
-      color: var(--monochrome-100);
-    }
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
   }
 
   &__title {
-    color: var(--monochrome-100);
+    color: var(--foreground-100);
+    margin-bottom: var(--size-8);
   }
 
   &__description {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
-    padding: var(--size-16);
+    align-items: flex-start;
+    padding: var(--size-20);
     color: var(--foreground-100);
-    text-align: center;
-    flex: 1 1 auto;
-    min-height: 100px;
+    text-align: left;
+    flex: 1;
+    gap: var(--size-4);
+    min-height: 0;
 
     @include mq.mobile-only {
-      justify-content: center;
+      justify-content: flex-start;
     }
   }
 
+  &__excerpt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--size-12);
+    justify-content: space-between;
+  }
+
   &__details {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     flex-direction: row;
     align-items: center;
-    color: var(--secondary-400);
-    padding: var(--size-16);
+    color: var(--foreground-200);
+    padding-top: var(--size-16);
+    flex-shrink: 0;
+
+    @include mq.desktop {
+      flex-direction: row;
+      align-items: center;
+      gap: 0;
+    }
   }
 }
 </style>

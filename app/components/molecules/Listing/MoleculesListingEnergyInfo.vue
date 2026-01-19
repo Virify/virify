@@ -10,10 +10,12 @@
         @toggle="() => {}"
       >
         <template #actions>
-          <button v-if="description" @click.stop="openDescription($event)" 
-            class="button button-xs button-quiet" type="button" :aria-label="`Show description for Energy`">
+          <AtomsTooltip v-if="description" :responsive="true">
             <AtomsIcon icon="property/info" :size="16" />
-          </button>
+            <template #tooltip>
+              <p class="body-xs">{{ description }}</p>
+            </template>
+          </AtomsTooltip>
         </template>
       </AtomsCollapsibleHeader>
 
@@ -71,14 +73,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Description modal -->
-  <AtomsInfoModal 
-    :show="showDescription" 
-    :content="description" 
-    :position="modalPosition"
-    @close="closeDescription"
-  />
 </template>
 
 <script setup lang="ts">
@@ -97,30 +91,12 @@ interface Props {
 
 defineProps<Props>();
 
-// Collapse state
-const isCollapsed = ref(true);
+// Collapse state - open by default
+const isCollapsed = ref(false);
 
 // Collapse toggle
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
-};
-
-// Description modal state
-const showDescription = ref(false);
-
-const { modalPosition, openModal, closeModal } = useInfoModal(() => {
-  showDescription.value = false;
-});
-
-// Description modal methods
-const openDescription = (event: MouseEvent) => {
-  showDescription.value = true;
-  openModal(event, -200, 8);
-};
-
-const closeDescription = () => {
-  showDescription.value = false;
-  closeModal();
 };
 
 const description = computed(() => {
@@ -129,19 +105,19 @@ const description = computed(() => {
 
 // Format helper functions
 const formatHeatingType = (type: string): string => {
-  return convertRoomEnumToString(type);
+  return convertEnumToString(type);
 };
 
 const formatBoilerType = (type: string): string => {
-  return convertRoomEnumToString(type);
+  return convertEnumToString(type);
 };
 
 const formatHotWaterSource = (source: string): string => {
-  return convertRoomEnumToString(source);
+  return convertEnumToString(source);
 };
 
 const formatUtility = (utility: string): string => {
-  return convertRoomEnumToString(utility);
+  return convertEnumToString(utility);
 };
 </script>
 

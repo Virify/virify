@@ -101,7 +101,9 @@ export type GeocodingFeature = {
   place_name: string;
   place_name_en: string;
   text: string;
+  text_en?: string;
   display_name?: string;
+  place_type?: string[];
   geometry: {
     type: string;
     coordinates: [number, number];
@@ -113,6 +115,12 @@ export type GeocodingFeature = {
     [key: string]: any;
   };
   bbox?: [number, number, number, number];
+  center?: [number, number];
+  context?: Array<{
+    id: string;
+    text: string;
+    text_en?: string;
+  }>;
 };
 
 /**

@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
-import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
-import { MembershipType } from "~~/layers/database/server/database/prisma/generated/enums";
-import { prisma } from "~~/layers/database/server/utils/prisma-client";
+import type { Prisma } from "../../../database/server/database/prisma/generated/client";
+import { MembershipType } from "../../../database/server/database/prisma/generated/enums";
+import { prisma } from "../../../database/server/utils/prisma-client";
 
 export function generateFakeUser(): Prisma.UserCreateInput {
   return {
@@ -15,28 +15,6 @@ export function generateFakeUser(): Prisma.UserCreateInput {
     updatedAt: new Date(),
   };
 }
-
-/**
- * Example geocoding feature for saved user locations
- */
-export const geocodingFeature = {
-  "type": "Feature",
-  "geometry": {
-      "type": "Point",
-      "coordinates": [
-          -3.1791935116052628,
-          51.481654752296365
-      ]
-  },
-  "place_name": "Cardiff, United Kingdom",
-  "place_type": [
-      "county"
-  ],
-  "language": "en",
-  "text_en": "Cardiff",
-  "language_en": "en",
-  "place_name_en": "Cardiff, United Kingdom"
-};
 
 export async function seedFakeUsers(count = 1): Promise<void> {
   const users: Prisma.UserCreateInput[] = [];
@@ -93,15 +71,6 @@ export async function seedFakeUsers(count = 1): Promise<void> {
             create: {
               favourites: {
                 create: selectedIds.map((id) => ({ listingId: id })),
-              },
-              savedLocation: {
-                create: [{
-                  location: geocodingFeature.place_name_en,
-                  geocodingFeature: geocodingFeature,
-                  lat: Number(geocodingFeature.geometry.coordinates[1]),
-                  lon: Number(geocodingFeature.geometry.coordinates[0]),
-                  name: "my home location",
-                }],
               },
             },
           },

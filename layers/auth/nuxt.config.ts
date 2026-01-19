@@ -1,18 +1,23 @@
 export default defineNuxtConfig({
   modules: ["nuxt-auth-utils"],
   runtimeConfig: {
+    TASK_SECRET: process.env.TASK_SECRET,
     public: {
       redirectCookieName: "redirect",
       loginUrl: "/login",
       NUXT_SESSION_PASSWORD: process.env.NUXT_SESSION_PASSWORD,
+      DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
     },
   },
-  devServer: {
-    https: process.env.SKIP_HTTPS === 'true' ? false : {
-      key: "./server.key",
-      cert: "./server.crt",
-    },
+  imports: {
+    dirs: ["server/utils", "server/plugins"],
   },
+  // devServer: {
+  //   https: {
+  //     key: "./server.key",
+  //     cert: "./server.crt",
+  //   },
+  // },
 });
 
 /**

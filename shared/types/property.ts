@@ -21,8 +21,13 @@ export type Fullproperty = Prisma.PropertyGetPayload<{
     kitchenFeatures: true;
     reception: true;
     utility: true;
-    rearGarden: true;
-    frontGarden: true;
+    outdoorSpace: {
+      include: {
+        garden: true;
+        yard: true;
+        land: true;
+      };
+    };
     energyAndUtilities: true;
     securityFeatures: true;
     storageFeatures: true;

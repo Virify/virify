@@ -1,15 +1,15 @@
 <template>
   <div class="a-number-range">
-    <AtomsRangeSelect :label="'Min ' + roomType" :options="availableMin" v-model="minValue"
+    <AtomsRangeSelect :label="'Min ' + roomType" :options="availableMin" v-model="minCount"
       class="a-number-range__range-select" />
-    <AtomsRangeSelect :label="'Max ' + roomType" :options="availableMax" v-model="maxValue"
+    <AtomsRangeSelect :label="'Max ' + roomType" :options="availableMax" v-model="maxCount"
       class="a-number-range__range-select" />
   </div>
 </template>
 
 <script setup lang="ts">
 interface RoomRange {
-  key: number
+  key: number | string
   value: string
   selected?: boolean
 }
@@ -25,8 +25,8 @@ const props = defineProps<Props>()
 /**
  *  Selection
  */
-const minValue = ref(props.min.find(({ selected }) => selected)?.key)
-const maxValue = ref(props.max.find(({ selected }) => selected)?.key)
+const minCount = defineModel<number>('min-count', { default: 0 })
+const maxCount = defineModel<number>('max-count', { default: 0 })
 
 /**
  *  Avoid overlapping selections
@@ -34,7 +34,7 @@ const maxValue = ref(props.max.find(({ selected }) => selected)?.key)
 const availableMin = computed(() => {
   const { min, max } = props
 
-  const maxKey = Number(maxValue.value)
+  const maxKey = Number(maxCount.value)
   const selected = max.findIndex(({ key }) => key === maxKey)
 
   return min.slice(0, selected + 2)
@@ -43,7 +43,7 @@ const availableMin = computed(() => {
 const availableMax = computed(() => {
   const { min, max } = props
 
-  const minKey = Number(minValue.value)
+  const minKey = Number(minCount.value)
   const selected = min.findIndex(({ key }) => key === minKey)
 
   return max.slice(Math.max(selected - 1, 0))

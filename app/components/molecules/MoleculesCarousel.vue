@@ -7,21 +7,13 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Navigation Arrows -->
     <template v-if="showArrows">
-      <button
-        class="embla-prev"
-        @click="scrollPrev"
-        :disabled="!canScrollPrev"
-      >
+      <button class="embla-prev" @click="scrollPrev" :disabled="!canScrollPrev">
         <AtomsIcon icon="chevron-left" :size="24" />
       </button>
-      <button
-        class="embla-next"
-        @click="scrollNext"
-        :disabled="!canScrollNext"
-      >
+      <button class="embla-next" @click="scrollNext" :disabled="!canScrollNext">
         <AtomsIcon icon="chevron-right" :size="24" />
       </button>
     </template>
@@ -29,75 +21,86 @@
 </template>
 
 <script setup lang="ts">
-import emblaCarouselVue from 'embla-carousel-vue'
+import emblaCarouselVue from "embla-carousel-vue";
 
 interface Props {
-  slides?: any[]
-  slideSize?: string // e.g., '280px', '50%', 'auto'
-  gap?: string // e.g., 'var(--size-16)', '1rem'
-  loop?: boolean
-  showArrows?: boolean // Show navigation arrows
-  options?: any // Additional Embla options
+  slides?: any[];
+  slideSize?: string; // e.g., '280px', '50%', 'auto'
+  gap?: string; // e.g., 'var(--size-16)', '1rem'
+  loop?: boolean;
+  showArrows?: boolean; // Show navigation arrows
+  options?: any; // Additional Embla options
+  buttonSize?: string; // Size of navigation buttons in pixels
+  buttonPosition?: string; // Position of navigation buttons
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  slideSize: '100%',
-  gap: 'var(--size-12)',
+  slideSize: "100%",
+  gap: "var(--size-12)",
   loop: true,
   showArrows: false,
-  options: () => ({})
-})
+  buttonSize: "40px",
+  buttonPosition: "50%",
+  options: () => ({}),
+});
 
 const emblaOptions = computed(() => ({
   loop: props.loop,
-  align: 'start',
-  containScroll: 'trimSnaps',
+  align: "start",
+  containScroll: "trimSnaps",
   dragFree: true,
-  ...props.options
-}))
+  ...props.options,
+}));
 
-const [emblaRef, emblaApi] = emblaCarouselVue(emblaOptions)
+const [emblaRef, emblaApi] = emblaCarouselVue(emblaOptions);
 
 // Arrow navigation state
-const canScrollPrev = ref(false)
-const canScrollNext = ref(false)
+const canScrollPrev = ref(false);
+const canScrollNext = ref(false);
 
 // Navigation functions
 function scrollPrev() {
-  emblaApi.value?.scrollPrev()
+  emblaApi.value?.scrollPrev();
 }
 
 function scrollNext() {
-  emblaApi.value?.scrollNext()
+  emblaApi.value?.scrollNext();
+}
+
+function scrollTo(index: number) {
+  emblaApi.value?.scrollTo(index);
 }
 
 // Update navigation state
 function updateNavigation() {
   if (emblaApi.value) {
-    canScrollPrev.value = emblaApi.value.canScrollPrev()
-    canScrollNext.value = emblaApi.value.canScrollNext()
+    canScrollPrev.value = emblaApi.value.canScrollPrev();
+    canScrollNext.value = emblaApi.value.canScrollNext();
   }
 }
 
 // Watch for embla API changes and set up event listeners
 watchEffect(() => {
   if (emblaApi.value) {
-    updateNavigation()
-    emblaApi.value.on('scroll', updateNavigation)
-    emblaApi.value.on('reInit', updateNavigation)
+    updateNavigation();
+    emblaApi.value.on("scroll", updateNavigation);
+    emblaApi.value.on("reInit", updateNavigation);
   }
-})
+});
 
 // Expose the API for parent components
 defineExpose({
   scrollPrev,
   scrollNext,
+  scrollTo,
   canScrollPrev: () => canScrollPrev.value,
-  canScrollNext: () => canScrollNext.value
-})
+  canScrollNext: () => canScrollNext.value,
+  emblaApi: computed(() => emblaApi.value),
+});
 </script>
 
-<style scoped>
+<style lang="scss"scoped>
+  @use "#styles/_utils/media" as mq;
 .embla-wrapper {
   position: relative;
 }
@@ -108,32 +111,45 @@ defineExpose({
 
 .embla-slides {
   display: flex;
-  gap: v-bind(gap);
   align-items: stretch;
+  gap: 0;
 }
 
 .embla-slide {
   flex: 0 0 v-bind(slideSize);
   min-width: 0;
   cursor: grab;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-right: v-bind(gap);
+
+  @include mq.mobile-only {
+    flex: 0 0 99%;
+  }
 }
 
 .embla-slide:active {
   cursor: grabbing;
 }
 
+.embla-slide > * {
+  /* Ensure direct child (the slotted card) fills the slide height */
+  height: 100%;
+}
+
 /* Navigation Arrows */
 .embla-prev,
 .embla-next {
   position: absolute;
-  top: 50%;
+  top: v-bind(buttonPosition);
   transform: translateY(-50%);
   background: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: v-bind(buttonSize);
+  height: v-bind(buttonSize);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -13,22 +13,22 @@
         <slot name="carousel" v-bind="{ media, propertyId }">
           <MoleculesCardSlotsCarousel :slides="media" :property-id />
         </slot>
+        
+        <MoleculesCardSlotsBookmark :property-id />
       </div>
 
       <div class="m-card-template__content">
         <slot name="content"
-          v-bind="{ price, priceGuide, fullAddress, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
+          v-bind="{ price, priceGuide, listingType, address, propertyType, roomCounts, pills, propertyId, description, premiumFeatures }">
           <div class="m-card-template__content-grid">
             <MoleculesCardSlotsViewLink :property-id class="m-card-template__content-subgrid">
-              <MoleculesCardSlotsPrice :price :price-guide />
-              <MoleculesCardSlotsOverview :property-type :full-address />
-              <MoleculesCardSlotsIcons :room-counts />
+              <MoleculesCardSlotsPrice :price :price-guide :listing-type />
+              <MoleculesCardSlotsOverview :property-type :address />
+              <MoleculesCardSlotsIcons :room-counts :has-outdoor-space :parking-type />
             </MoleculesCardSlotsViewLink>
 
             <MoleculesCardSlotsPills v-if="pills.length" :pills />
           </div>
-
-          <MoleculesCardSlotsBookmark :property-id />
         </slot>
 
         <div role="presentation" class="m-card-template__footer">
@@ -70,7 +70,10 @@ const { property } = toRefs(props.result)
 const media = computed(() => {
   const { media } = asObject(property.value)
 
-  return asArray(media)
+  return asArray(media).map((item: any) => ({
+    ...item,
+    alt: item.alt || 'Property image'
+  }))
 })
 
 const user = computed(() => {
@@ -92,29 +95,38 @@ const price = computed(() => {
 })
 
 const priceGuide = computed(() => {
-  const { priceType } = asObject(props.result?.saleListing)
+  if (props.result?.rentalListing) {
+    return convertEnumToString(props.result.rentalListing.rentFrequency)
+  }
 
-  if (priceType === 'OFFERS_OVER') return 'Offers over'
-  if (priceType === 'GUIDE_PRICE') return 'Guide price'
-
-  return 'Fixed'
+  if (props.result?.saleListing) {
+    return convertEnumToString(props.result.saleListing.priceType)
+  }
 })
 
-const fullAddress = computed(() => {
-  const { fullAddress } = asObject(property.value?.address)
-
-  return fullAddress
+const listingType = computed(() => {
+  if (props.result?.rentalListing) return 'Rental'
+  if (props.result?.saleListing) return 'Sale'
+  return ''
 })
 
-const propertyType = computed(() => {
+const address = computed(() => {
+  const { address } = asObject(property.value)
+
+  const { street, city, postcode } = asObject(address)
+
+  return `${street}, ${city}, ${postcode.split(" ")[0]}`
+})
+
+const propertyType = computed<string>(() => {
   const { numberBedrooms, type, classification } = asObject(property.value)
   const { name: propertyType } = asObject(type)
   const { name: propertyClassification } = asObject(classification)
 
-  const propertyDescription = `${propertyClassification} ${propertyType}`
+  const propertyDescription = `${propertyClassification as string} ${propertyType as string}`
 
   if (!!numberBedrooms) {
-    return `${numberBedrooms} Bed ${propertyDescription}`
+    return `${numberBedrooms as number} Bed ${propertyDescription}`
   }
 
   return propertyDescription
@@ -130,25 +142,51 @@ const roomCounts = computed(() => {
   }
 });
 
-const pills = computed(() => {
-  const { chain, tenureType } = asObject(props.result?.saleListing)
+const hasOutdoorSpace = computed(() => {
+  const { outdoorSpace } = asObject(property.value)
+  if (!outdoorSpace) return false
+  
+  const { garden, yard, land } = asObject(outdoorSpace)
+  return containsPopulatedArray(garden, yard, land)
+})
 
-  // Create empty pills object
+const parkingType = computed(() => {
+  const { parking } = asObject(property.value)
+  if (!parking) return null
+  
+  const { features } = asObject(parking)
+  const parkingFeatures = asArray(features)
+  
+  // Check for garage first (priority)
+  if (parkingFeatures.includes('GARAGE')) return 'garage'
+  
+  // Check for any other parking
+  if (isPopulatedArray(parkingFeatures) && !parkingFeatures.includes('NO_PARKING')) return 'parking'
+  
+  return null
+})
+
+const pills = computed(() => {
   const pills: string[] = []
 
-  // Extract info from saleListing
-  const tenureString = getTenureType(tenureType)
-
-  // Add relevant info to pills
-  if (tenureString) pills.push(tenureString)
-  if (chain) pills.push('Chain free')
-
+  if(props.result?.saleListing) {
+    const { chain, tenureType } = asObject(props.result?.saleListing)
+    const tenureString = getTenureType(tenureType)
+    if (tenureString) pills.push(tenureString)
+    if (chain) pills.push('Chain free')
+  } else {
+    const { furnishedStatus } = asObject(props.result?.rentalListing)
+    if(furnishedStatus) {
+      const furnishedString = convertEnumToString(furnishedStatus as string)
+      if (furnishedString) pills.push(furnishedString)
+    }
+  }
   // Return
   return pills
 })
 
 const description = computed(() => {
-  const { description = '--' } = asObject(props.result)
+  const { description = '--' } = asObject(props.result.property.description)
 
   return description
 })
@@ -192,6 +230,8 @@ watch(useElementHover($hoverCard), (isHovered) => {
   --card-button-background-hover: light-dark(var(--blue-200), var(--blue-900));
   --card-button-foreground-hover: light-dark(var(--monochrome-900), var(--monochrome-100));
   --card-button-border-colour: light-dark(var(--blue-400), var(--blue-600));
+  --card-bookmark-colour: var(--card-colour);
+
 
   position: relative;
   color: var(--card-foreground);
@@ -219,6 +259,8 @@ watch(useElementHover($hoverCard), (isHovered) => {
     --card-button-background-hover: var(--secondary-500);
     --card-button-foreground-hover: var(--monochrome-100);
     --card-button-border-colour: var(--secondary-400);
+    --card-bookmark-colour: var(--secondary-400);
+
   }
 
   @container listing-card (width > 700px) {
@@ -261,6 +303,7 @@ watch(useElementHover($hoverCard), (isHovered) => {
     --card-button-background-hover: var(--primary-600);
     --card-button-foreground-hover: var(--monochrome-100);
     --card-button-border-colour: var(--primary-400);
+    --card-bookmark-colour: var(--card-colour);
 
     border: 4px solid var(--primary-500);
 
@@ -290,6 +333,7 @@ watch(useElementHover($hoverCard), (isHovered) => {
   }
 
   &__gallery {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;

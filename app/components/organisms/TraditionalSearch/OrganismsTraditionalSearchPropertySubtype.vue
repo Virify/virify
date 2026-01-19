@@ -31,10 +31,12 @@ interface Props {
   buttonClass?: string
   name: string
   options: PropertyTypeOption[]
-  selected: string[]
+  selected?: string[]
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  selected: () => []
+})
 
 defineOptions({
   inheritAttrs: false

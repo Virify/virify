@@ -20,8 +20,9 @@ export function useCheckValidityInput(maybeRefInput: unknown, userOverrides: Err
   // Combine user and default overrides
   const overrides = defu(userOverrides, defaultOverrides)
 
-  // If not an input, or checkValidity is true, return empty string
-  if (!isInputElement(input) || input.checkValidity()) return ''
+  // If not an input element, or checkValidity is true, return empty string
+  if (!isInputElement(input) && !isSelectElement(input) && !isTextAreaElement(input)) return ''
+  if (input.checkValidity()) return ''
 
   // Destructure overrides
   const { patternMismatch, valueMissing } = asObject(overrides)

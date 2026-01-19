@@ -6,7 +6,7 @@
 
 <template>
   <label class="a-checkbox | body-sm font-semibold">
-    <input type="checkbox" :value :checked v-model="isChecked" class="| visually-hidden" />
+    <input type="checkbox" :name :value :checked v-model="isChecked" class="| visually-hidden" />
     <AtomsIcon icon="tick-solid" aria-hidden class="a-checkbox-icon" />
     <span class="a-checkbox-text">
       {{ label }}
@@ -17,13 +17,14 @@
 <script setup lang="ts">
 interface Props {
   label: string
+  name?: string
   value?: string | number
   checked?: boolean
 }
 
 defineProps<Props>()
 
-const isChecked = defineModel({
+const isChecked = defineModel<boolean>({
   default: (props) => !!props.checked
 })
 </script>

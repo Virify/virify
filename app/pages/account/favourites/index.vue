@@ -13,7 +13,7 @@
     <div class="favourites-page__grid">
       <!-- Conversations List Section -->
       <AtomsAccountCardContainer>
-        <OrganismsAccountListingCard 
+        <OrganismsAccountListingCard
           :is-collapsed="isSaleCollapsed" 
           @toggle="isSaleCollapsed = !isSaleCollapsed"
           title="Favourites" 
@@ -92,9 +92,5 @@ const isSaleCollapsed = ref(false);
       overflow: visible;
     }
   }
-}
-
-.breadcrumb {
-  padding: 0 !important;
 }
 </style>

@@ -1,455 +1,487 @@
 <template>
-  <div class="homepage">
-    <!-- AI Search Hero -->
-    <div class="p-index__banner">
-      <div class="p-index__banner-content | flow flow-xl">
-        <h1 class="p-index__title | title-2xl lineheight-xs">
-          Find Your Perfect Home with
-          <span class="gradient-text">
-            Virify AI
-          </span>
-        </h1>
+  <div class="waiting-list-page">
+    
+    <!-- ============================================ -->
+    <!-- HERO SECTION -->
+    <!-- ============================================ -->
+    <OrganismsHero
+      :title="cmsContent?.hero.title || ''"
+      :subtitle="cmsContent?.hero.subtitle || ''"
+      :input="true"
+      :search="true"
+    />
 
-        <OrganismsDockBanner />
-      </div>
-    </div>
-
-    <!-- How It Works Steps -->
-    <section class="ai-stepper-section homepage-section">
+    <!-- ============================================ -->
+    <!-- SIGN UP FORM SECTION -->
+    <!-- ============================================ -->
+    <section class="waiting-list-form-section">
       <div class="container">
-        <header class="ai-stepper__header">
-          <h2 class="title-xl">How It Works</h2>
-          <p class="body-md">
-            Four steps to finding your perfect home. No jargon, no fuss—just smart tech doing the hard work.
-          </p>
-        </header>
+        <div class="waiting-list-form__header">
+          <h2 class="waiting-list-form__title | title-md">{{ cmsContent?.formSection.title }}</h2>
+          <p class="waiting-list-form__description | body-md">{{ cmsContent?.formSection.description }}</p>
 
-        <MoleculesStepper>
-          <MoleculesStepperStep :step-number="1" variant="blue">
-            <h3 class="title-md">Tell us what you want</h3>
-            <p class="body-sm">
-              "Big windows and a garden" or "somewhere quiet"—speak human, not estate agent.
-            </p>
-          </MoleculesStepperStep>
+          <form @submit.prevent="handleSubmit" class="waiting-list-form">
+            <div v-if="formError" class="waiting-list-form__error">
+              {{ formError }}
+            </div>
 
-          <MoleculesStepperStep :step-number="2" variant="secondary">
-            <h3 class="title-md">We do the searching</h3>
-            <p class="body-sm">
-              Smart tech scans thousands of properties in seconds to find ones that actually match what you said.
-            </p>
-          </MoleculesStepperStep>
+            <div class="waiting-list-form__input-group">
+              <div class="waiting-list-form__input-wrapper">
+                <label for="email" class="waiting-list-form__label | body-sm"> Email address </label>
+                <div class="waiting-list-form__input-button-group">
+                  <div class="waiting-list-form__input">
+                    <ClientOnly>
+                      <AtomsInput id="email" v-model="email" type="email" name="email"
+                        placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" error-id="email-error" />
+                    </ClientOnly>
+                  </div>
+                  <div class="waiting-list-form__submit">
+                    <AtomsButton v-if="!isSuccess" class="waiting-list-form__submit-button | button-monochrome"
+                      type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email"> 
+                      {{ cmsContent?.formSection.buttonText }}
+                    </AtomsButton>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <MoleculesStepperStep :step-number="3" variant="blue">
-            <h3 class="title-md">Get the real story</h3>
-            <p class="body-sm">
-              Price history, safety stats, school ratings—all the stuff that actually matters, made simple.
-            </p>
-          </MoleculesStepperStep>
+            <div class="waiting-list-form__checkbox">
+              <label class="waiting-list-form__checkbox-label | body-sm">
+                <input type="checkbox" v-model="agreedToTerms" class="waiting-list-form__checkbox-input"
+                  :disabled="isSubmitting || isSuccess" required />
+                <span class="waiting-list-form__checkbox-text">
+                  I agree to the
+                  <NuxtLink to="/terms" class="link">Terms & Conditions</NuxtLink>
+                  and
+                  <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
+                </span>
+              </label>
+            </div>
 
-          <MoleculesStepperStep :step-number="4" variant="secondary">
-            <h3 class="title-md">Make your move</h3>
-            <p class="body-sm">
-              Armed with real facts, not marketing fluff. You'll know it's the right choice before you even view.
-            </p>
-          </MoleculesStepperStep>
-        </MoleculesStepper>
+            <div class="waiting-list-form__success" v-if="isSuccess">
+              <AtomsIcon icon="tick" :size="48" class="waiting-list-form__success-icon" />
+              <h3 class="title-sm">You're on the list!</h3>
+              <p class="body-sm">{{ message }}</p>
+            </div>
+          </form>
+        </div>
       </div>
     </section>
 
-    <!-- Key Features Showcase -->
-    <section class="features-showcase section-hero-bg homepage-section">
+    <!-- ============================================ -->
+    <!-- FEATURE SECTIONS (FROM SANITY CMS) -->
+    <!-- ============================================ -->
+    <OrganismsFeatureSection
+      v-for="(section, index) in processedFeatureSections"
+      :key="index"
+      v-bind="section"
+    >
+      <template #title>
+        <AtomsGradientTextRenderer 
+          :text="section.title || ''" 
+          :background="section.background || 'white'"
+        />
+      </template>
+    </OrganismsFeatureSection>
+
+    <!-- ============================================ -->
+    <!-- SELLERS BENEFITS SECTION -->
+    <!-- ============================================ -->
+    <section class="waiting-list-sellers" :class="sellersBackground">
       <div class="container">
-        <header class="features-showcase__header">
+        <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
-            Everything you <GradientText>actually</GradientText> need to know
+            <AtomsGradientTextRenderer :text="cmsContent?.sellersBenefits.title || ''" :variant="sellersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
           </h2>
-          <p class="max-width-prose body-md">
-            No estate agent waffle. Just the real data that helps you make smart decisions about where you'll live.
-          </p>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.sellersBenefits.subtitle }}</p>
         </header>
 
-        <div class="features-showcase__grid" ref="featuresRef">
-          <MoleculesFeatureTile iconName="listings/savings" title="Real prices" subtitle="Up-to-date sale prices"
-            description="Skip the guesswork. See what properties actually sold for and spot the trends that matter."
-            :class="{ 'animate-in': isFeaturesVisible }" />
-
-          <MoleculesFeatureTile iconName="listings/flood" title="Will it flood?" subtitle="Straight answers about water"
-            description="Plain English flood risk info. No confusing maps, just clear answers about staying dry."
-            :class="{ 'animate-in': isFeaturesVisible }" />
-
-          <MoleculesFeatureTile iconName="listings/eco" title="Bills and broadband" subtitle="What you'll actually pay"
-            description="Energy costs, council tax, broadband speeds. The boring but important stuff, made simple."
-            :class="{ 'animate-in': isFeaturesVisible }" />
-
-          <MoleculesFeatureTile iconName="property/security" title="How safe is it?"
-            subtitle="Real safety, not scare stories"
-            description="Honest crime stats without the drama. Know what's actually happening in your potential neighbourhood."
-            :class="{ 'animate-in': isFeaturesVisible }" />
-
-          <MoleculesFeatureTile iconName="explore/map" title="Getting around" subtitle="Your actual commute time"
-            description="Tube delays, bus routes, walking times. How you'll really get to work, not the marketing version."
-            :class="{ 'animate-in': isFeaturesVisible }" />
-
-          <MoleculesFeatureTile iconName="amenities/school" title="Local schools"
-            subtitle="Education without the stress"
-            description="Good schools nearby? We'll show you Ofsted ratings and catchment areas in plain English."
-            :class="{ 'animate-in': isFeaturesVisible }" />
+        <div class="waiting-list-sellers__grid" ref="sellersRef">
+          <MoleculesFeatureTile 
+            v-for="(feature, index) in cmsContent?.sellersBenefits.features" 
+            :key="index"
+            :iconName="feature.icon" 
+            :title="feature.title" 
+            :subtitle="feature.subtitle"
+            :description="feature.description"
+            :variant="sellersVariant"
+            :class="{ 'animate-in': isSellersVisible }" />
         </div>
       </div>
     </section>
 
-    <!-- Why People Love Virify Section -->
-    <section class="why-virify homepage-section">
+    <!-- ============================================ -->
+    <!-- BUYERS BENEFITS SECTION -->
+    <!-- ============================================ -->
+    <section class="waiting-list-features" :class="buyersBackground">
       <div class="container">
-        <header class="why-virify__header">
-          <h2 class="title-xl">Why Virify?</h2>
-          <p class="body-md max-width-prose section-subtitle">
-            Property hunting shouldn't be painful. We're here to make it actually helpful (and maybe even enjoyable).
-          </p>
+        <header class="waiting-list-sellers__header">
+          <h2 class="title-xl">
+            <AtomsGradientTextRenderer :text="cmsContent?.buyersBenefits.title || ''" :variant="buyersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+          </h2>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
         </header>
 
-        <div class="why-virify__highlights" ref="highlightsRef">
-          <div class="why-virify__highlight why-virify__highlight--left" :class="{ 'animate-in': isVisible }">
-            <div class="why-virify__image">
-              <AtomsIcon icon="ai/star" :size="48" />
-            </div>
-            <div class="why-virify__content">
-              <h3 class="title-sm">Plain English, always</h3>
-              <p class="r-body-md-sm">
-                No estate agent speak. Complex stuff made simple so you actually understand what you're looking at.
-              </p>
-            </div>
-          </div>
-
-          <div class="why-virify__highlight why-virify__highlight--right" :class="{ 'animate-in': isVisible }">
-            <div class="why-virify__content">
-              <h3 class="title-md">Smart, not flashy</h3>
-              <p class="r-body-md-sm">
-                Tech that actually works for you. Fast searches, real insights, zero hassle.
-              </p>
-            </div>
-            <div class="why-virify__image">
-              <AtomsIcon icon="explore/ai" :size="40" />
-            </div>
-          </div>
-
-          <div class="why-virify__highlight why-virify__highlight--left" :class="{ 'animate-in': isVisible }">
-            <div class="why-virify__image">
-              <AtomsIcon icon="account/chat" :size="48" />
-            </div>
-            <div class="why-virify__content">
-              <h3 class="title-md">Humans when you need them</h3>
-              <p class="body-md">
-                Real support from real people. No chatbots pretending to understand your house-hunting stress.
-              </p>
-            </div>
-          </div>
-
-          <div class="why-virify__highlight why-virify__highlight--right" :class="{ 'animate-in': isVisible }">
-            <div class="why-virify__content">
-              <h3 class="title-md">Your data, your business</h3>
-              <p class="body-md">
-                We don't sell your info or spam you with calls. Your search stays private, full stop.
-              </p>
-            </div>
-            <div class="why-virify__image">
-              <AtomsIcon icon="property/security" :size="48" />
-            </div>
-          </div>
+        <div class="waiting-list-features__grid" ref="buyersRef">
+          <MoleculesFeatureTile 
+            v-for="(feature, index) in cmsContent?.buyersBenefits.features"
+            :key="index"
+            :iconName="feature.icon" 
+            :title="feature.title" 
+            :subtitle="feature.subtitle"
+            :description="feature.description"
+            :variant="buyersVariant"
+            :class="{ 'animate-in': isBuyersVisible }" />
         </div>
       </div>
     </section>
 
-    <!-- Trust Signals / Stats -->
-    <section class="trust-signals section-hero-bg homepage-section">
+    <!-- ============================================ -->
+    <!-- CONTACT SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.contactSection.title || ''"
+      :description="cmsContent?.contactSection.description || ''"
+      :buttonText="cmsContent?.contactSection.buttonText || ''"
+      :gradient="contactGradient"
+      to="/contact" />
+
+    <!-- ============================================ -->
+    <!-- EARLY ACCESS BENEFITS SECTION -->
+    <!-- ============================================ -->
+    <section class="waiting-list-benefits" :class="benefitsBackground">
       <div class="container">
-        <header class="trust-signals__header">
-          <h2 class="title-xl">The <GradientText>numbers</GradientText> don't lie</h2>
-          <p class="body-md max-width-prose section-subtitle section-subtitle--large">
-            Thousands of people have already ditched the estate agent spin for straight answers.
-            Here's what we're building together.
-          </p>
+        <header class="waiting-list-benefits__header">
+          <h2 class="title-xl">
+            <AtomsGradientTextRenderer :text="cmsContent?.earlyAccessBenefits.title || ''" :variant="benefitsGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+          </h2>
+          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.earlyAccessBenefits.subtitle }}</p>
         </header>
 
-        <div class="trust-signals__cards" ref="statsCardsRef">
-          <AtomsStatsCard value="50,000+" subtitle="Properties checked" title="Data We've Crunched"
-            :class="{ 'animate-in': isStatsVisible }" />
-          <AtomsStatsCard value="15+" subtitle="Data sources" title="Where We Get Info"
-            :class="{ 'animate-in': isStatsVisible }" />
-          <AtomsStatsCard value="10,000+" subtitle="People helped" title="Happy House Hunters"
-            :class="{ 'animate-in': isStatsVisible }" />
-          <AtomsStatsCard value="<1s" subtitle="Average search time" title="Speed That Matters"
-            :class="{ 'animate-in': isStatsVisible }" />
-          <AtomsStatsCard value="5M+" subtitle="Sale records" title="Real Price Data"
-            :class="{ 'animate-in': isStatsVisible }" />
-          <AtomsStatsCard value="100%" subtitle="Privacy compliant" title="Your Data Is Safe"
-            :class="{ 'animate-in': isStatsVisible }" />
-          <AtomsStatsCard value="24/7" subtitle="Human support" title="When You Need Help"
-            :class="{ 'animate-in': isStatsVisible }" />
-          <AtomsStatsCard value="99.9%" subtitle="Data accuracy" title="Getting It Right"
-            :class="{ 'animate-in': isStatsVisible }" />
+        <div class="waiting-list-benefits__cards">
+          <AtomsHeroCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index" :variant="index === 1 ? 'secondary' : undefined">
+            <h3 class="title-md">
+              <AtomsGradientTextRenderer :text="benefit.title || ''" variant="dark" />
+            </h3>
+            <p class="body-md">{{ benefit.description }}</p>
+          </AtomsHeroCard>
         </div>
       </div>
     </section>
 
-    <!-- Listing Advert -->
-    <section class="homepage-section">
-      <div class="container">
-        <MoleculesListingAdvert />
-      </div>
-    </section>
+    <OrganismsGuideSection
+      v-if="cmsContent?.guidesSection"
+      :title="cmsContent.guidesSection.title"
+      :description="cmsContent.guidesSection.description || ''"
+      :guides="cmsContent.guidesSection.guides"
+      :gradient-class="'gradient-text-light'"
+    />
 
-    <div class="container">
-      <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
-    </div>
+    <!-- ============================================ -->
+    <!-- FINAL CTA SECTION -->
+    <!-- ============================================ -->
+    <MoleculesCtaSection
+      :title="cmsContent?.finalCta.title || ''"
+      :description="cmsContent?.finalCta.description || ''"
+      :buttonText="cmsContent?.finalCta.buttonText || ''"
+      :gradient="true"
+      @click="scrollToForm"
+    />
 
   </div>
 </template>
-<script setup>
-import GradientText from '~/components/atoms/GradientText.vue';
-import { useIntersectionObserver } from '@vueuse/core';
 
-// Page metadata
-useHead({
-  title: 'AI Property Search - Find Your Perfect Home',
-  meta: [
-    { name: 'description', content: 'Revolutionary AI-powered property search. Simply describe your ideal home and let our intelligent system find perfect matches using natural language processing.' }
-  ]
-})
+<script setup lang="ts">
+import { useIntersectionObserver } from "@vueuse/core";
+const { showToast } = useToast();
 
-// Intersection observer wrapper function
+// Fetch CMS content - module automatically uses correct perspective
+const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(
+  waitingListPageQuery
+);
+
+// Process feature sections: clean stega encoding and determine which image props to pass
+const processedFeatureSections = computed(() => 
+  processFeatureSections(cmsContent.value?.featureSections)
+);
+
+// Determine if we should alternate backgrounds for remaining sections
+// If there are NO CMS feature sections, alternate them; otherwise keep current backgrounds
+const hasCmsFeatures = computed(() => processedFeatureSections.value.length > 0);
+
+// Background classes for remaining sections (alternating only if no CMS features)
+const sellersBackground = computed(() => hasCmsFeatures.value ? '' : 'section-gradient-bg');
+const buyersBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const contactGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
+const benefitsBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const finalCtaGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
+
+// Gradient text classes based on background
+const sellersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text-light' : 'gradient-text');
+const buyersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
+const benefitsGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
+
+// Variant for feature tiles (blue when no gradient background, default otherwise)
+const sellersVariant = computed(() => hasCmsFeatures.value ? 'blue' : undefined);
+const buyersVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
+const benefitsVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
+
+// Gradient text is used via AtomsGradientText auto-registered component
+const email = ref("");
+const agreedToTerms = ref(false);
+const isSubmitting = ref(false);
+const isSuccess = ref(false);
+const formError = ref<string | null>(null);
+const message = ref("You're on the list! Check your email for confirmation.");
+
+// Intersection Observer helper (mirrors homepage pattern)
 const createIntersectionObserver = () => {
-  const elementRef = ref(null)
-  const isVisible = ref(false)
+  const elementRef = ref<HTMLElement | null>(null);
+  const isVisible = ref(false);
 
-  useIntersectionObserver(elementRef, ([{ isIntersecting }]) => {
-    if (isIntersecting) {
-      isVisible.value = true
+  useIntersectionObserver(
+    elementRef,
+    (entries) => {
+      const [entry] = entries;
+      if (entry && entry.isIntersecting) {
+        isVisible.value = true;
+      }
+    },
+    { threshold: 0.3 }
+  );
+
+  return { elementRef, isVisible };
+};
+
+// Buyers (Searchers) grid
+const { elementRef: buyersRef, isVisible: isBuyersVisible } = createIntersectionObserver();
+// Sellers grid
+const { elementRef: sellersRef, isVisible: isSellersVisible } = createIntersectionObserver();
+
+async function handleSubmit() {
+  if (!email.value || !agreedToTerms.value) {
+    formError.value = "Please complete all required fields";
+    return;
+  }
+
+  isSubmitting.value = true;
+  formError.value = null;
+
+  try {
+    const response = await $fetch<{ success: boolean; message: string; alreadyExists?: boolean }>("/api/waiting-list", {
+      method: "POST",
+      body: {
+        email: email.value,
+      },
+    });
+
+    if (response.success) {
+      isSuccess.value = true;
+      message.value = response.message;
+      showToast(message.value, { type: "success" });
     }
-  }, { threshold: 0.3 })
-
-  return { elementRef, isVisible }
+  } catch (error: any) {
+    console.error("Waiting list signup error:", error);
+    formError.value = error.data?.statusMessage || "Failed to join waiting list. Please try again.";
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 
-// Create observers for each section
-const { elementRef: highlightsRef, isVisible } = createIntersectionObserver()
-const { elementRef: featuresRef, isVisible: isFeaturesVisible } = createIntersectionObserver()
-const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersectionObserver()
+function scrollToForm() {
+  const formSection = document.querySelector(".waiting-list-form-section");
+  if (formSection) {
+    formSection.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+// SEO - Nuxt SEO auto-generates WebPage schema from this
+// Use CMS SEO metadata if available, otherwise fallback to defaults
+const seoData = computed(() => {
+  const cms = cmsContent.value?.seo;
+  
+  return {
+    title: cms?.metaTitle,
+    description: cms?.metaDescription,
+    keywords: cms?.keywords,
+    ogTitle: cms?.ogTitle,
+    ogDescription: cms?.ogDescription,
+    ogImage: cms?.ogImage,
+    twitterCard: cms?.twitterCard,
+    canonicalUrl: cms?.canonicalUrl,
+  };
+});
+
+useSeoMeta({
+  title: seoData.value.title,
+  description: seoData.value.description,
+  keywords: seoData.value.keywords,
+  ogTitle: seoData.value.ogTitle,
+  ogDescription: seoData.value.ogDescription,
+  ogType: 'website',
+  ogUrl: 'https://virify.co.uk',
+  twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
+});
+
+useHead({
+  link: [
+    { rel: 'canonical', href: seoData.value.canonicalUrl }
+  ],
+});
+
+// Custom breadcrumbs
+useSchemaOrg([
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
+    ]
+  }
+]);
 
 </script>
 
-<style scoped lang="scss">
-@use '#styles/_utils/media' as mq;
-@use '#styles/_utils/functions' as fn;
+<style lang="scss" scoped>
+@use "#styles/_utils/media" as mq;
+@use "#styles/_utils/functions" as fn;
+@use "#styles/3-elements/sections" as *;
 
-// Hero banner
-.p-index {
-  &__title {
-    color: var(--monochrome-900);
-    max-width: 20ch;
-    margin: 0 auto var(--size-40);
-  }
-
-  &__banner {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 50vh;
-    padding: var(--size-64) var(--size-32);
-    box-sizing: border-box;
-    background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-    text-align: center;
-  }
-
-  &__banner-content {
-    max-width: min(100%, 45rem);
-    margin: 0 auto;
-    flex: 1 0;
-  }
+// Shared gradient background
+.section-gradient-bg {
+  @include section-gradient-bg();
 }
 
-// Full-width hero-style background for alternating sections
-.section-hero-bg {
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-
-  color: var(--monochrome-900);
-  margin: var(--size-60) 0;
-  padding: 100px 0;
-
-  @media (max-width: 900px) {
-    padding: 80px 0;
-  }
+// Form Section
+.waiting-list-form-section {
+  padding: var(--size-64) 0;
 }
 
-// Centered content with max width
-.max-width-prose {
-  max-width: 65ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-// Section subtitle classes
-.section-subtitle {
+.waiting-list-form-container {
+  max-width: 1200px;
   margin: 0 auto;
-  margin-top: var(--size-12);
+  padding: var(--size-48);
 
-  &--large {
-    margin-top: var(--size-16);
+  @include mq.mobile-only {
+    padding: 0;
   }
 }
 
-// Default section spacing
-:where(.homepage-section) {
-  margin: calc(var(--size-72) / 2) 0;
-  padding: calc(var(--size-72) / 2) 0;
-}
-
-// Stepper section
-
-.ai-stepper-section {
-  padding: var(--size-40) 0;
-  background: var(--background-100);
-}
-
-.ai-stepper__header {
-  text-align: center;
-  margin-bottom: var(--size-48);
-}
-
-// Features Showcase Section
-
-.features-showcase {
-
-  @media (max-width: 900px) {
-    padding: 80px 0;
-  }
-
-  &__header {
+.waiting-list-form {
+  &__title {
+    margin: 0 0 var(--size-12) 0;
     text-align: center;
-    margin-bottom: var(--size-48);
   }
 
-  &__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--size-20);
-    margin: 0 auto;
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (min-width: 1024px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    // Animation styles for feature tiles
-    :deep(.feature-tile) {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.6s ease-out;
-
-      &.animate-in {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    // Generate staggered delays for any number of children
-    @for $i from 1 through 20 {
-      :deep(.feature-tile:nth-child(#{$i})) {
-        transition-delay: #{$i * 0.1}s;
-      }
-    }
-  }
-}
-
-// Why Virify Section
-
-.why-virify {
-  text-align: center;
-
-  &__header {
-    margin-bottom: var(--size-40);
+  &__description {
+    text-align: center;
+    color: var(--text-muted);
+    max-width: 800px;
+    margin: 0 auto var(--size-32);
   }
 
-  &__highlights {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--size-32);
-    margin-top: var(--size-40);
-  }
-
-  &__highlight {
-    display: flex;
-    align-items: center;
-    gap: var(--size-32);
-    color: var(--foreground-100);
-    border-radius: var(--border-radius-2xl);
-    box-shadow: 0 2px 8px 0 rgba(60, 80, 180, 0.04), 0 1.5px 6px 0 rgba(0, 0, 0, 0.02);
-    border: 1.5px solid var(--foreground-100);
+  &__error {
     padding: var(--size-16);
-    transition: all 0.8s ease-out;
-    width: 100%;
-    max-width: 900px;
-    flex-shrink: 0;
-    opacity: 0;
-    transform: translateY(40px);
-
-    &.animate-in {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    &--left {
-      align-self: flex-start;
-    }
-
-    &--right {
-      align-self: flex-end;
-
-      .why-virify__content {
-        text-align: right;
-        order: 1;
-      }
-
-      .why-virify__image {
-        order: 2;
-      }
-    }
+    background: fn.faded-color(10%, var(--error));
+    border: 1px solid var(--error);
+    border-radius: var(--border-radius-md);
+    color: var(--error);
+    margin-bottom: var(--size-24);
+    text-align: center;
   }
 
-  // Generate staggered delays for why-virify highlights
-  @for $i from 1 through 10 {
-    &__highlight:nth-child(#{$i}) {
-      transition-delay: #{$i * 0.2}s;
-    }
+  &__input-wrapper {
+    max-width: 800px;
+    margin: 0 auto var(--size-20);
   }
 
-  &__image {
-    flex-shrink: 0;
-    width: 120px;
-    height: 120px;
-    background: var(--blue-400);
-    border-radius: var(--border-radius-xl);
+  &__label {
+    display: block;
+    margin-bottom: var(--size-8);
+  }
+
+  &__input-button-group {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    gap: var(--size-12);
+    align-items: flex-start;
 
-    .a-icon {
-      color: var(--monochrome-900);
+    @include mq.mobile-only {
+      flex-direction: column;
     }
   }
 
-  &__content {
+  &__input {
     flex: 1;
-    text-align: left;
+    width: 100%;
+  }
+
+  &__submit {
+    align-self: flex-start;
+
+    @include mq.mobile-only {
+      align-self: stretch;
+    }
+  }
+
+  &__submit-button {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: var(--size-12) var(--size-24);
+
+    @include mq.mobile-only {
+      width: 100%;
+    }
+  }
+
+  &__checkbox {
+    max-width: 800px;
+    margin: var(--size-20) auto;
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-12);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__checkbox-input {
+    flex-shrink: 0;
+    width: var(--size-20);
+    height: var(--size-20);
+    margin-top: var(--size-2);
+    cursor: pointer;
+    accent-color: var(--secondary-400);
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &__checkbox-text {
+    flex: 1;
+    line-height: 1.5;
+
+    .link {
+      color: var(--secondary-400);
+      text-decoration: underline;
+      font-weight: 500;
+
+      &:hover {
+        color: var(--secondary-500);
+      }
+    }
+  }
+
+  &__success {
+    text-align: center;
+    padding: var(--size-32) var(--size-16);
+    border-radius: var(--border-radius-lg);
+    margin-top: var(--size-12);
 
     h3 {
-      margin: 0 0 var(--size-12) 0;
+      margin: var(--size-16) 0 var(--size-8);
     }
 
     p {
@@ -458,63 +490,111 @@ const { elementRef: statsCardsRef, isVisible: isStatsVisible } = createIntersect
   }
 }
 
-@media (max-width: 900px) {
-  .why-virify {
-    &__highlights {
-      gap: var(--size-32);
-      align-items: stretch;
+// Shared grid section styles
+%section-grid {
+  padding: var(--size-120) 0;
+
+  .feature-tile {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+
+    &.animate-in {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    &__highlight {
-      flex-direction: column;
-      text-align: center;
-      gap: var(--size-24);
-      align-self: stretch;
-      max-width: none;
-      width: auto;
-
-      &--left,
-      &--right {
-        align-self: stretch;
+    @for $i from 1 through 6 {
+      &:nth-child(#{$i}) {
+        transition-delay: #{$i * 0.1}s;
       }
-
-      .why-virify__image {
-        order: 1;
-      }
-
-      .why-virify__content {
-        order: 2;
-        text-align: center;
-      }
-    }
-
-    &__content {
-      text-align: center;
     }
   }
 }
 
-// Trust signals
-.trust-signals {
+%grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--size-32);
+
+  @include mq.tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mq.notebook {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+%section-header {
   text-align: center;
+  margin-bottom: var(--size-48);
+
+  h2 {
+    margin-bottom: var(--size-16);
+  }
+}
+
+// Features Section (Buyers)
+.waiting-list-features {
+  @extend %section-grid;
 
   &__header {
+    @extend %section-header;
+  }
+
+  &__grid {
+    @extend %grid-layout;
+  }
+}
+
+// Sellers Section
+.waiting-list-sellers {
+  @extend %section-grid;
+
+  &__header {
+    @extend %section-header;
+  }
+
+  &__grid {
+    @extend %grid-layout;
+  }
+}
+
+// Benefits Section
+.waiting-list-benefits {
+  padding: var(--size-120) 0;
+
+  &__header {
+    text-align: center;
     margin-bottom: var(--size-48);
   }
 
   &__cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--size-16);
+    @extend %grid-layout;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: var(--size-24);
 
-    @media (min-width: 768px) {
-      gap: var(--size-20);
+    h3 {
+      margin: 0 0 var(--size-16) 0;
     }
 
-    @media (min-width: 1024px) {
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--size-24);
+    p {
+      margin: 0;
     }
   }
 }
+
+// Utility classes
+.max-width-prose {
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-subtitle {
+  margin: var(--size-12) auto 0;
+}
 </style>
+

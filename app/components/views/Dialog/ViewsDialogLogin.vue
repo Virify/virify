@@ -8,18 +8,21 @@
     
     <OrganismsFormsLogin @form-success="formSuccess" />
 
-    <AtomsDivider text="or" />
+    <div v-if="!isWaitingListMode">
+      <AtomsDivider text="or" />
 
-    <div class="| center-text flow flow-sm">
-      <p>
-        <dialog-link to="/password/forgot" :component="ViewsDialogForgotPassword" class="| body-sm"> Forgot password? </dialog-link>
-      </p>
+      <div class="| center-text flow flow-sm">
+        <p>
+          <dialog-link to="/password/forgot" :component="ViewsDialogForgotPassword" class="| body-sm"> Forgot password? </dialog-link>
+        </p>
 
-      <p class="| body-sm">
-        Don't have an account yet?
-        <dialog-link to="/signup" :component="ViewsDialogSignup"> Create an account </dialog-link>
-      </p>
+        <p class="| body-sm">
+          Don't have an account yet?
+          <dialog-link to="/signup" :component="ViewsDialogSignup"> Create an account </dialog-link>
+        </p>
+      </div>
     </div>
+    
   </div>
 </template>
 
@@ -37,6 +40,7 @@ defineProps({
 })
 const { fetch } = useUserSession();
 const { hideDialog } = useDialog();
+const { isWaitingListMode } = useWaitingListMode();
 
 /**
  *  Modal control

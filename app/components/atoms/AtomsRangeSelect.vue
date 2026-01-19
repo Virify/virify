@@ -50,7 +50,7 @@ const optionsArray = computed(() => {
 /**
  *  Track selection
  */
-const selected = defineModel({
+const selected = defineModel<number>({
   default: (props) => {
     const options = asArray(props.options) as Option[]
 
@@ -84,7 +84,7 @@ function selectPreviousOption() {
   const prevIndex = selectedIndex.value - 1
   const { key } = asObject(optionsArray.value[prevIndex])
 
-  selected.value = key as never as string
+  selected.value = key as never as number
 }
 
 function selectNextOption() {
@@ -92,7 +92,7 @@ function selectNextOption() {
   const { key } = asObject(optionsArray.value[nextIndex])
 
 
-  selected.value = key as never as string
+  selected.value = key as never as number
 }
 
 </script>

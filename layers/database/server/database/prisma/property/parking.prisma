@@ -1,18 +1,22 @@
 model Parking {
-  id               Int      @id @default(autoincrement())
-  garage           Boolean  @default(false)
-  driveway         Boolean  @default(false)
-  permitParking    Boolean  @default(false)
-  onStreet         Boolean  @default(false)
-  noParking        Boolean  @default(false)
-  carport          Boolean  @default(false)
-  allocatedParking Boolean  @default(false)
-  evCharging       Boolean  @default(false)
-  description      String?
-  propertyId       Int      @unique
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  property         Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  id          Int              @id @default(autoincrement())
+  description String?
+  features    ParkingFeature[]
+  propertyId  Int              @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  property    Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
+}
+
+enum ParkingFeature {
+  GARAGE
+  DRIVEWAY
+  PERMIT_PARKING
+  ON_STREET
+  NO_PARKING
+  CARPORT
+  ALLOCATED_PARKING
+  EV_CHARGING
 }

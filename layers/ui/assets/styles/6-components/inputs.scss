@@ -13,6 +13,8 @@
   border: 1px solid var(--input-text-border);
   height: var(--input-text-height);
   border-radius: var(--border-radius-ui);
+  outline-offset: -3px;
+  font-size: var(--size-16);
 
   &:user-invalid {
     color: var(--text-input-error-color);
@@ -20,8 +22,18 @@
   }
 
   &:disabled {
-    color: var(--input-text-disabled);
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
+}
+
+.select-input {
+  background-color: var(--background-100);
+  width: 100%;
+  padding: var(--size-16);
+  border-radius: var(--border-radius-ui);;
+  border: 1px solid var(--input-text-border);
 }
 
 /**
