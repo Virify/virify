@@ -8,7 +8,7 @@
         <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
       </div>
 
-      <section class="o-dock-banner__fader | flow flow-lg" :disabled="isSearchLoading">
+      <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
         <MoleculesAiSearchFormLocation />
 
         <client-only>
@@ -144,6 +144,13 @@ async function animateFormToDock() {
     }
   })
 }
+
+/**
+ *  Reset loading state after navigation
+ */
+onMounted(() => {
+  isSearchLoading.value = false
+})
 
 /**
  *  Toggle filters as visible
