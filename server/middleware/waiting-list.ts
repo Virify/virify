@@ -27,17 +27,19 @@ export default defineEventHandler((event) => {
       '/auth/update-admin-password', // Admin password update (protected by TASK_SECRET)
       '/auth/login',                 // Login endpoint
       '/auth/verify-otp',            // OTP verification
-      '/api/support',              // POST - support request form
-      '/api/analytics', // Track listing views & dashboard analytics
-      '/api/listing',              // Listing data endpoints
-      '/api/draft-listings',       // Create/Edit listing endpoints
-      '/api/listing/preview',      // Listing preview endpoints
-      '/api/address',              // Address lookup
-      '/api/property-type',        // Property types
-      '/api/cloudflare',           // Image upload
-      '/api/user',                 // User dashboard data
-      '/api/conversation',         // Dashboard conversations
-      '/api/notifications',        // Dashboard notifications
+      '/api/support',                // POST - support request form
+      '/api/analytics',              // Track listing views & dashboard analytics
+      '/api/listing',                // Listing data endpoints
+      '/api/draft-listings',         // Create/Edit listing endpoints
+      '/api/listing/preview',        // Listing preview endpoints
+      '/api/address',                // Address lookup
+      '/api/property-type',          // Property types
+      '/api/cloudflare',             // Image upload
+      '/api/user',                   // User dashboard data
+      '/api/conversation',           // Dashboard conversations
+      '/api/notifications',          // Dashboard notifications
+      // BLOCKED: /auth/signup - No new signups in waiting list mode
+      // BLOCKED: /api/search/ - No property search in waiting list mode
     ];
 
     // Check if the path is an API route or Auth route
