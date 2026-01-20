@@ -229,6 +229,16 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     - Existence checks: { parking: { isNot: null } } or { parking: { is: null } }
 
     ═══════════════════════════════════════════════════════════════════════════════
+    LISTING TYPE MAPPING
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    - "For sale" -> Listing has a SaleListing relation: { "saleListing": { "isNot": null } }
+    - Synonyms for sale: "To buy", "Buy", "To purchase", "Purchase" should be treated as "For sale".
+    - "For rent" or "To rent" -> Listing has a RentalListing relation: { "rentalListing": { "isNot": null } }
+    - When querying specific sale/rental fields (price, rent, tenancy, etc.), nest those filters under the appropriate relation, e.g.: { "rentalListing": { "is": { "rentPerMonth": { "lte": 1500 } } } }
+    - In "usedTerms" always use human-readable phrases: "For sale" or "To rent" — do NOT emit "saleListing" or "rentalListing".
+
+    ═══════════════════════════════════════════════════════════════════════════════
     AMENITY SEARCH RULES
     ═══════════════════════════════════════════════════════════════════════════════
 
