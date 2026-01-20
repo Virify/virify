@@ -136,7 +136,12 @@ const imageAlt = computed(() =>
     @include mq.desktop {
       flex-direction: row;
       align-items: center;
-      gap: 0;
+      gap: var(--size-4);
+      flex-wrap: wrap;
+
+      .a-pill {
+        white-space: nowrap;
+      }
     }
   }
 }
