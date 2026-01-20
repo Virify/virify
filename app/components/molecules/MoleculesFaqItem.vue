@@ -1,10 +1,10 @@
 <template>
   <div class="m-faq-item" @click="isActive = !isActive">
-    <div class="m-faq-item__question | body-lg">
-      <h3 class="m-faq-item__question--title | body-lg">{{ question }}</h3>
+    <div class="m-faq-item__question">
+      <h3 class="m-faq-item__question--title | title-xs">{{ question }}</h3>
       <AtomsIcon class="m-faq-item__question--icon" :class="{ 'is-active': isActive }" icon="chevron-down" />
     </div>
-    <p v-show="isActive" class="m-faq-item__answer | body-lg">{{ answer }}</p>
+    <p v-show="isActive" class="m-faq-item__answer | body-md">{{ answer }}</p>
     <AtomsDivider class="m-faq-item__divider" />
   </div>
 </template>
@@ -32,6 +32,7 @@ const isActive = ref(props.active ?? false);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    font-weight: 500;
     cursor: pointer;
 
     &--title {

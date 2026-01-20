@@ -23,7 +23,7 @@ useSchemaOrg({
   })),
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .o-faq {
   &-subtitle {
     text-align: center;
