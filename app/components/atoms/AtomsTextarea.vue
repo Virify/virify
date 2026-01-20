@@ -50,9 +50,14 @@ function handleInput(event: Event) {
  */
 const { validityText, checkValidity } = useCheckValidity(props.customValidation)
 </script>
-<style>
+<style lang="scss" scoped>
   .a-textarea {
     font-size: var(--font-md);
     border: 1px solid var(--input-text-border);
+    background: var(--background-200);
+    color: var(--foreground-100);
+    width: 100%;
+    border-radius: var(--border-radius-xl);
+    padding: var(--size-16);
   }
 </style>

@@ -1,11 +1,11 @@
 <template>
   <MoleculesForm @submit.prevent="submitForm" class="o-support-form | stacked" :error="formErrors">
     <MoleculesFormField label="Your Name" id="support-form-name" v-slot="{ id }">
-      <AtomsInput ref="nameInput" :id type="text" name="name" v-model="formName" required error-id="support-form-name-error" />
+      <AtomsInput ref="nameInput" :id type="text" name="name" v-model="formName" required error-id="support-form-name-error" placeholder="Enter your name" />
     </MoleculesFormField>
 
     <MoleculesFormField label="Email Address" id="support-form-email" v-slot="{ id }">
-      <AtomsInput ref="emailInput" :id type="email" name="email" v-model="formEmail" required error-id="support-form-email-error" />
+      <AtomsInput ref="emailInput" :id type="email" name="email" v-model="formEmail" required error-id="support-form-email-error" placeholder="you@example.com" />
     </MoleculesFormField>
 
     <MoleculesFormField label="Type" id="support-form-type" v-slot="{ id }">
