@@ -1,7 +1,12 @@
 <template>
   <div class="o-property-filter">
-    <MoleculesSwitcher name="search-type" legend="Change search type" :options="toggleSearchType" v-model="searchType"
-      class="o-property-filter__switcher | gradient-box" />
+    <MoleculesSwitcher
+      name="search-type"
+      legend="Change search type"
+      :options="toggleSearchType"
+      v-model="searchType"
+      class="o-property-filter__switcher | gradient-box"
+    />
 
     <template v-if="searchType === 'traditional'">
       <slot name="traditional"></slot>
@@ -17,18 +22,16 @@
 /**
  *  Toggle between search variant
  */
-const searchType = useState('search-type', () => 'ai')
+const searchType = useState("search-type", () => "ai");
 
 const toggleSearchType = [
-  { value: 'Traditional', key: 'traditional' },
-  { value: 'AI enhanced', key: 'ai' }
-]
-
+  { value: "Traditional", key: "traditional" },
+  { value: "Natural Language", key: "ai" },
+];
 </script>
 
 <style lang="scss">
 .o-property-filter {
-
   &__switcher {
     --switcher-outer-radius: var(--border-radius-2xl);
     --switcher-inner-radius: var(--border-radius-xl);
