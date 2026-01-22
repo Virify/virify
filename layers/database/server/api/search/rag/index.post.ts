@@ -4,14 +4,20 @@ import * as z from "zod";
 const ragSearchSchema = z.object({
   listingType: z.enum(['sale', 'rent', 'all']).optional().default('all'),
   query: z.string().min(1, "Query is required"),
-  lat: z.coerce.number().optional(),
-  lon: z.coerce.number().optional(),
+  location: z.object({
+    geometry: z.object({
+      coordinates: z.tuple([z.number(), z.number()])
+    }).optional(),
+    boundaryPolygon: z.object({
+      type: z.enum(['Polygon', 'MultiPolygon']),
+      coordinates: z.union([
+        z.array(z.array(z.array(z.number()))),
+        z.array(z.array(z.array(z.array(z.number()))))
+      ])
+    }).optional(),
+    bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional()
+  }).passthrough().optional(),
   radius: z.coerce.number().optional().default(40),
-  bbox: z.array(z.number()).length(4).optional(),
-  boundaryPolygon: z.object({
-    type: z.enum(["Polygon", "MultiPolygon"]),
-    coordinates: z.array(z.any())
-  }).optional(),
   page: z.coerce.number().min(1).optional(),
   limit: z.coerce.number().min(1).max(100).optional()
 });
@@ -20,7 +26,13 @@ export default defineEventHandler(async (event) => {
   try {
     checkAiConfiguration();
 
-    const { listingType, query, lat, lon, radius, bbox, boundaryPolygon, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
+    const { listingType, query, location, radius, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
+
+    // Extract location data from the full location object
+    const lat = location?.geometry?.coordinates?.[1];
+    const lon = location?.geometry?.coordinates?.[0];
+    const boundaryPolygon = location?.boundaryPolygon;
+    const bbox = location?.bbox;
 
     const { propertyIds, locationContext } = await handleLocationFilter(lat, lon, radius, bbox as [number, number, number, number] | undefined, boundaryPolygon);
 
