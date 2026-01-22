@@ -185,8 +185,9 @@ const initialQuery = computed(() => {
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   const query = buildQueryFromTraditionalFormData(formData)
+  console.log(formData)
 
-  await aiSearchSubmit(query)
+  console.log('Traditional search submit:', query)
 }
 
 async function aiSearchSubmit(query: string) {
