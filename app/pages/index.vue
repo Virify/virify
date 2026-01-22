@@ -116,21 +116,52 @@
       </div>
     </section>
 
-    <!-- ============================================ -->
-    <!-- FEATURE SECTIONS (FROM SANITY CMS) -->
-    <!-- ============================================ -->
-    <OrganismsFeatureSection
+    <!-- Features -->
+    <UPageCTA
       v-for="(section, index) in processedFeatureSections"
-      :key="index"
-      v-bind="section"
+      orientation="horizontal"
+      variant="soft"
+      :class="index % 2 === 0 ? 'section-gradient-bg' : ''"
+      :reverse="index % 2 !== 0"
+      :ui="{
+        body: 'border-0 radius-0',
+        root: 'rounded-none',
+        title: 'text-secondary/90!',
+      }"
     >
       <template #title>
-        <AtomsGradientTextRenderer
-          :text="section.title || ''"
-          :background="section.background || 'white'"
-        />
+        <h2>{{ section.title }}</h2>
       </template>
-    </OrganismsFeatureSection>
+
+      <template #description>
+        <p class="body-md">
+          {{ section.subtitle }}
+        </p>
+      </template>
+
+      <template #body>
+        <div class="flex flex-col gap-4">
+          <UPageFeature
+            v-for="feature in section.features"
+            icon="i-lucide-info"
+            :title="feature.title"
+            :description="feature.description"
+            :ui="{
+              description: 'body-sm',
+              leadingIcon: 'text-secondary h-6 w-6',
+            }"
+          >
+          </UPageFeature>
+        </div>
+      </template>
+
+      <AtomsCloudFlareImage
+        v-if="section.image"
+        :src="section.image"
+        :alt="section.imageAlt"
+        class="h-auto w-full"
+      />
+    </UPageCTA>
 
     <!-- ============================================ -->
     <!-- SELLERS BENEFITS SECTION -->
@@ -304,7 +335,6 @@ const contactGradient = computed(() => !hasCmsFeatures.value); // Boolean for CT
 const benefitsBackground = computed(() =>
   hasCmsFeatures.value ? "section-gradient-bg" : "",
 );
-const finalCtaGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
 
 // Gradient text classes based on background
 const sellersGradientClass = computed(() =>
