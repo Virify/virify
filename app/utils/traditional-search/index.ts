@@ -39,7 +39,7 @@ export function buildQueryFromTraditionalFormData(data: TraditionalSearchData): 
     query += `. Only include properties that ${optionalIncludes.join(' and ')}`
   }
 
-  return encodeURI(query)
+  return query
 }
 
 export type { TraditionalSearchData }
