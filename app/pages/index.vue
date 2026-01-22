@@ -1,15 +1,29 @@
 <template>
   <div class="waiting-list-page">
-    
-    <!-- ============================================ -->
-    <!-- HERO SECTION -->
-    <!-- ============================================ -->
-    <OrganismsHero
-      :title="cmsContent?.hero.title || ''"
-      :subtitle="cmsContent?.hero.subtitle || ''"
-      :input="true"
-      :search="true"
-    />
+    <UPageHero
+      title="Access the property platform that works for everyone"
+      description="Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need."
+      headline="Join the waiting list"
+      :ui="{
+        root: 'hero-gradient-bg',
+        headline: 'text-secondary',
+        title: 'title-2xl text-white!',
+        description: 'text-white body-lg',
+      }"
+    >
+      <div class="flex justify-center items-center w-full px-4 sm:px-6">
+        <MoleculesImageSwap
+          front-image="/img/natural_lang.png"
+          back-image="/img/traditional.png"
+          front-label="Natural Language"
+          back-label="Traditional Search"
+          class="w-full max-w-2xl"
+        />
+      </div>
+      <!-- <div v-else class="max-w-200 w-full m-auto">
+        <OrganismsDockBanner listingType="all" />
+      </div> -->
+    </UPageHero>
 
     <!-- ============================================ -->
     <!-- SIGN UP FORM SECTION -->
@@ -17,8 +31,12 @@
     <section class="waiting-list-form-section">
       <div class="container">
         <div class="waiting-list-form__header">
-          <h2 class="waiting-list-form__title | title-md">{{ cmsContent?.formSection.title }}</h2>
-          <p class="waiting-list-form__description | body-md">{{ cmsContent?.formSection.description }}</p>
+          <h2 class="waiting-list-form__title | title-md">
+            {{ cmsContent?.formSection.title }}
+          </h2>
+          <p class="waiting-list-form__description | body-md">
+            {{ cmsContent?.formSection.description }}
+          </p>
 
           <form @submit.prevent="handleSubmit" class="waiting-list-form">
             <div v-if="formError" class="waiting-list-form__error">
@@ -27,17 +45,32 @@
 
             <div class="waiting-list-form__input-group">
               <div class="waiting-list-form__input-wrapper">
-                <label for="email" class="waiting-list-form__label | body-sm"> Email address </label>
+                <label for="email" class="waiting-list-form__label | body-sm">
+                  Email address
+                </label>
                 <div class="waiting-list-form__input-button-group">
                   <div class="waiting-list-form__input">
                     <ClientOnly>
-                      <AtomsInput id="email" v-model="email" type="email" name="email"
-                        placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" error-id="email-error" />
+                      <AtomsInput
+                        id="email"
+                        v-model="email"
+                        type="email"
+                        name="email"
+                        placeholder="your.email@example.com"
+                        required
+                        :disabled="isSubmitting || isSuccess"
+                        error-id="email-error"
+                      />
                     </ClientOnly>
                   </div>
                   <div class="waiting-list-form__submit">
-                    <AtomsButton v-if="!isSuccess" class="waiting-list-form__submit-button | button-monochrome"
-                      type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email"> 
+                    <AtomsButton
+                      v-if="!isSuccess"
+                      class="waiting-list-form__submit-button | button-monochrome"
+                      type="submit"
+                      :pending="isSubmitting"
+                      :disabled="!agreedToTerms || !email"
+                    >
                       {{ cmsContent?.formSection.buttonText }}
                     </AtomsButton>
                   </div>
@@ -47,11 +80,18 @@
 
             <div class="waiting-list-form__checkbox">
               <label class="waiting-list-form__checkbox-label | body-sm">
-                <input type="checkbox" v-model="agreedToTerms" class="waiting-list-form__checkbox-input"
-                  :disabled="isSubmitting || isSuccess" required />
+                <input
+                  type="checkbox"
+                  v-model="agreedToTerms"
+                  class="waiting-list-form__checkbox-input"
+                  :disabled="isSubmitting || isSuccess"
+                  required
+                />
                 <span class="waiting-list-form__checkbox-text">
                   I agree to the
-                  <NuxtLink to="/terms" class="link">Terms & Conditions</NuxtLink>
+                  <NuxtLink to="/terms" class="link"
+                    >Terms & Conditions</NuxtLink
+                  >
                   and
                   <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
                 </span>
@@ -59,7 +99,11 @@
             </div>
 
             <div class="waiting-list-form__success" v-if="isSuccess">
-              <AtomsIcon icon="tick" :size="48" class="waiting-list-form__success-icon" />
+              <AtomsIcon
+                icon="tick"
+                :size="48"
+                class="waiting-list-form__success-icon"
+              />
               <h3 class="title-sm">You're on the list!</h3>
               <p class="body-sm">{{ message }}</p>
             </div>
@@ -77,8 +121,8 @@
       v-bind="section"
     >
       <template #title>
-        <AtomsGradientTextRenderer 
-          :text="section.title || ''" 
+        <AtomsGradientTextRenderer
+          :text="section.title || ''"
           :background="section.background || 'white'"
         />
       </template>
@@ -91,21 +135,31 @@
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
-            <AtomsGradientTextRenderer :text="cmsContent?.sellersBenefits.title || ''" :variant="sellersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+            <AtomsGradientTextRenderer
+              :text="cmsContent?.sellersBenefits.title || ''"
+              :variant="
+                sellersGradientClass === 'gradient-text-light'
+                  ? 'light'
+                  : 'dark'
+              "
+            />
           </h2>
-          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.sellersBenefits.subtitle }}</p>
+          <p class="body-md max-width-prose section-subtitle">
+            {{ cmsContent?.sellersBenefits.subtitle }}
+          </p>
         </header>
 
         <div class="waiting-list-sellers__grid" ref="sellersRef">
-          <MoleculesFeatureTile 
-            v-for="(feature, index) in cmsContent?.sellersBenefits.features" 
+          <MoleculesFeatureTile
+            v-for="(feature, index) in cmsContent?.sellersBenefits.features"
             :key="index"
-            :iconName="feature.icon" 
-            :title="feature.title" 
+            :iconName="feature.icon"
+            :title="feature.title"
             :subtitle="feature.subtitle"
             :description="feature.description"
             :variant="sellersVariant"
-            :class="{ 'animate-in': isSellersVisible }" />
+            :class="{ 'animate-in': isSellersVisible }"
+          />
         </div>
       </div>
     </section>
@@ -117,21 +171,29 @@
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
-            <AtomsGradientTextRenderer :text="cmsContent?.buyersBenefits.title || ''" :variant="buyersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+            <AtomsGradientTextRenderer
+              :text="cmsContent?.buyersBenefits.title || ''"
+              :variant="
+                buyersGradientClass === 'gradient-text-light' ? 'light' : 'dark'
+              "
+            />
           </h2>
-          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
+          <p class="body-md max-width-prose section-subtitle">
+            {{ cmsContent?.buyersBenefits.subtitle }}
+          </p>
         </header>
 
         <div class="waiting-list-features__grid" ref="buyersRef">
-          <MoleculesFeatureTile 
+          <MoleculesFeatureTile
             v-for="(feature, index) in cmsContent?.buyersBenefits.features"
             :key="index"
-            :iconName="feature.icon" 
-            :title="feature.title" 
+            :iconName="feature.icon"
+            :title="feature.title"
             :subtitle="feature.subtitle"
             :description="feature.description"
             :variant="buyersVariant"
-            :class="{ 'animate-in': isBuyersVisible }" />
+            :class="{ 'animate-in': isBuyersVisible }"
+          />
         </div>
       </div>
     </section>
@@ -144,7 +206,8 @@
       :description="cmsContent?.contactSection.description || ''"
       :buttonText="cmsContent?.contactSection.buttonText || ''"
       :gradient="contactGradient"
-      to="/contact" />
+      to="/contact"
+    />
 
     <!-- ============================================ -->
     <!-- EARLY ACCESS BENEFITS SECTION -->
@@ -153,15 +216,31 @@
       <div class="container">
         <header class="waiting-list-benefits__header">
           <h2 class="title-xl">
-            <AtomsGradientTextRenderer :text="cmsContent?.earlyAccessBenefits.title || ''" :variant="benefitsGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+            <AtomsGradientTextRenderer
+              :text="cmsContent?.earlyAccessBenefits.title || ''"
+              :variant="
+                benefitsGradientClass === 'gradient-text-light'
+                  ? 'light'
+                  : 'dark'
+              "
+            />
           </h2>
-          <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.earlyAccessBenefits.subtitle }}</p>
+          <p class="body-md max-width-prose section-subtitle">
+            {{ cmsContent?.earlyAccessBenefits.subtitle }}
+          </p>
         </header>
 
         <div class="waiting-list-benefits__cards">
-          <AtomsHeroCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index" :variant="index === 1 ? 'secondary' : undefined">
+          <AtomsHeroCard
+            v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
+            :key="index"
+            :variant="index === 1 ? 'secondary' : undefined"
+          >
             <h3 class="title-md">
-              <AtomsGradientTextRenderer :text="benefit.title || ''" variant="dark" />
+              <AtomsGradientTextRenderer
+                :text="benefit.title || ''"
+                variant="dark"
+              />
             </h3>
             <p class="body-md">{{ benefit.description }}</p>
           </AtomsHeroCard>
@@ -187,45 +266,63 @@
       :gradient="true"
       @click="scrollToForm"
     />
-
   </div>
 </template>
 
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
-
+const { isWaitingListMode } = useWaitingListMode();
 const toast = useToast();
 
 // Fetch CMS content - module automatically uses correct perspective
-const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(
-  waitingListPageQuery
-);
+const { data: cmsContent, error: cmsError } =
+  await useSanityQuery<WaitingListPage>(waitingListPageQuery);
 
 // Process feature sections: clean stega encoding and determine which image props to pass
-const processedFeatureSections = computed(() => 
-  processFeatureSections(cmsContent.value?.featureSections)
+const processedFeatureSections = computed(() =>
+  processFeatureSections(cmsContent.value?.featureSections),
 );
 
 // Determine if we should alternate backgrounds for remaining sections
 // If there are NO CMS feature sections, alternate them; otherwise keep current backgrounds
-const hasCmsFeatures = computed(() => processedFeatureSections.value.length > 0);
+const hasCmsFeatures = computed(
+  () => processedFeatureSections.value.length > 0,
+);
 
 // Background classes for remaining sections (alternating only if no CMS features)
-const sellersBackground = computed(() => hasCmsFeatures.value ? '' : 'section-gradient-bg');
-const buyersBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const sellersBackground = computed(() =>
+  hasCmsFeatures.value ? "" : "section-gradient-bg",
+);
+const buyersBackground = computed(() =>
+  hasCmsFeatures.value ? "section-gradient-bg" : "",
+);
 const contactGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
-const benefitsBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
+const benefitsBackground = computed(() =>
+  hasCmsFeatures.value ? "section-gradient-bg" : "",
+);
 const finalCtaGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
 
 // Gradient text classes based on background
-const sellersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text-light' : 'gradient-text');
-const buyersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
-const benefitsGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text' : 'gradient-text-light');
+const sellersGradientClass = computed(() =>
+  hasCmsFeatures.value ? "gradient-text-light" : "gradient-text",
+);
+const buyersGradientClass = computed(() =>
+  hasCmsFeatures.value ? "gradient-text" : "gradient-text-light",
+);
+const benefitsGradientClass = computed(() =>
+  hasCmsFeatures.value ? "gradient-text" : "gradient-text-light",
+);
 
 // Variant for feature tiles (blue when no gradient background, default otherwise)
-const sellersVariant = computed(() => hasCmsFeatures.value ? 'blue' : undefined);
-const buyersVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
-const benefitsVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
+const sellersVariant = computed(() =>
+  hasCmsFeatures.value ? "blue" : undefined,
+);
+const buyersVariant = computed(() =>
+  hasCmsFeatures.value ? undefined : "blue",
+);
+const benefitsVariant = computed(() =>
+  hasCmsFeatures.value ? undefined : "blue",
+);
 
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
@@ -248,16 +345,18 @@ const createIntersectionObserver = () => {
         isVisible.value = true;
       }
     },
-    { threshold: 0.3 }
+    { threshold: 0.3 },
   );
 
   return { elementRef, isVisible };
 };
 
 // Buyers (Searchers) grid
-const { elementRef: buyersRef, isVisible: isBuyersVisible } = createIntersectionObserver();
+const { elementRef: buyersRef, isVisible: isBuyersVisible } =
+  createIntersectionObserver();
 // Sellers grid
-const { elementRef: sellersRef, isVisible: isSellersVisible } = createIntersectionObserver();
+const { elementRef: sellersRef, isVisible: isSellersVisible } =
+  createIntersectionObserver();
 
 async function handleSubmit() {
   if (!email.value || !agreedToTerms.value) {
@@ -269,7 +368,11 @@ async function handleSubmit() {
   formError.value = null;
 
   try {
-    const response = await $fetch<{ success: boolean; message: string; alreadyExists?: boolean }>("/api/waiting-list", {
+    const response = await $fetch<{
+      success: boolean;
+      message: string;
+      alreadyExists?: boolean;
+    }>("/api/waiting-list", {
       method: "POST",
       body: {
         email: email.value,
@@ -279,11 +382,17 @@ async function handleSubmit() {
     if (response.success) {
       isSuccess.value = true;
       message.value = response.message;
-      toast.add({ title: 'Success', description: message.value, color: 'success' });
+      toast.add({
+        title: "Success",
+        description: message.value,
+        color: "success",
+      });
     }
   } catch (error: any) {
     console.error("Waiting list signup error:", error);
-    formError.value = error.data?.statusMessage || "Failed to join waiting list. Please try again.";
+    formError.value =
+      error.data?.statusMessage ||
+      "Failed to join waiting list. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
@@ -300,7 +409,7 @@ function scrollToForm() {
 // Use CMS SEO metadata if available, otherwise fallback to defaults
 const seoData = computed(() => {
   const cms = cmsContent.value?.seo;
-  
+
   return {
     title: cms?.metaTitle,
     description: cms?.metaDescription,
@@ -319,27 +428,29 @@ useSeoMeta({
   keywords: seoData.value.keywords,
   ogTitle: seoData.value.ogTitle,
   ogDescription: seoData.value.ogDescription,
-  ogType: 'website',
-  ogUrl: 'https://virify.co.uk',
-  twitterCard: seoData.value.twitterCard as 'summary' | 'summary_large_image',
+  ogType: "website",
+  ogUrl: "https://virify.co.uk",
+  twitterCard: seoData.value.twitterCard as "summary" | "summary_large_image",
 });
 
 useHead({
-  link: [
-    { rel: 'canonical', href: seoData.value.canonicalUrl }
-  ],
+  link: [{ rel: "canonical", href: seoData.value.canonicalUrl }],
 });
 
 // Custom breadcrumbs
 useSchemaOrg([
   {
-    '@type': 'BreadcrumbList',
+    "@type": "BreadcrumbList",
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
-    ]
-  }
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://virify.co.uk",
+      },
+    ],
+  },
 ]);
-
 </script>
 
 <style lang="scss" scoped>
@@ -347,14 +458,39 @@ useSchemaOrg([
 @use "#styles/_utils/functions" as fn;
 @use "#styles/3-elements/sections" as *;
 
+@mixin hero-gradient() {
+  background: linear-gradient(
+    135deg,
+    var(--blue-400) 50%,
+    var(--secondary-400) 150%
+  );
+}
+
+@mixin hero-background() {
+  background:
+    url("/img/logo-background.svg") no-repeat top right,
+    linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+  background-size:
+    auto 120%,
+    cover;
+}
+
 // Shared gradient background
 .section-gradient-bg {
   @include section-gradient-bg();
 }
 
+.hero-gradient-bg {
+  @include hero-gradient();
+
+  @include mq.desktop {
+    @include hero-background();
+  }
+}
+
 // Form Section
 .waiting-list-form-section {
-  padding: var(--size-64) 0;
+  padding: var(--size-120) 0;
 }
 
 .waiting-list-form-container {
@@ -598,4 +734,3 @@ useSchemaOrg([
   margin: var(--size-12) auto 0;
 }
 </style>
-
