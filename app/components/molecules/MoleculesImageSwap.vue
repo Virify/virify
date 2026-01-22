@@ -82,7 +82,7 @@ const toggle = () => {
   padding: var(--size-16) var(--size-8) var(--size-8) var(--size-24);
 
   @include mq.tablet {
-     padding: var(--size-32) var(--size-16) var(--size-16) var(--size-48); 
+    padding: var(--size-32) var(--size-16) var(--size-16) var(--size-48); 
   }
   
   &__container {
