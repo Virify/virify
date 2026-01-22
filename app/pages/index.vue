@@ -4,7 +4,7 @@
       title="Access the property platform that works for everyone"
       description="Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need."
       headline="Join the waiting list"
-      orientation="horizontal"
+      :orientation="isWaitingListMode ? 'horizontal' : 'vertical'"
       :ui="{
         root: 'hero-gradient-bg',
         headline: 'text-secondary',
@@ -12,7 +12,10 @@
         description: 'text-white body-lg',
       }"
     >
-      <div class="flex justify-center items-center w-full px-4 sm:px-6">
+      <div
+        v-if="isWaitingListMode"
+        class="flex justify-center items-center w-full px-4 sm:px-6"
+      >
         <MoleculesImageSwap
           front-image="/img/natural_lang.png"
           back-image="/img/traditional.png"
@@ -21,9 +24,9 @@
           class="w-full max-w-2xl"
         />
       </div>
-      <!-- <div v-else class="max-w-200 w-full m-auto">
+      <div v-else class="max-w-200 w-full m-auto">
         <OrganismsDockBanner listingType="all" />
-      </div> -->
+      </div>
     </UPageHero>
 
     <!-- ============================================ -->
