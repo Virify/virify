@@ -4,6 +4,7 @@
       title="Access the property platform that works for everyone"
       description="Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need."
       headline="Join the waiting list"
+      orientation="horizontal"
       :ui="{
         root: 'hero-gradient-bg',
         headline: 'text-secondary',
