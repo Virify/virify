@@ -101,6 +101,9 @@
     <!-- Features -->
     <UPageCTA
       v-for="(section, index) in processedFeatureSections"
+      :key="`feature-${index}`"
+      :title="section.title"
+      :description="section.subtitle"
       orientation="horizontal"
       variant="soft"
       :class="index % 2 === 0 ? 'section-gradient-bg' : ''"
@@ -109,22 +112,14 @@
         body: 'border-0 radius-0',
         root: 'rounded-none',
         title: 'text-secondary/90!',
+        description: 'body-md',
       }"
     >
-      <template #title>
-        <h2>{{ section.title }}</h2>
-      </template>
-
-      <template #description>
-        <p class="body-md">
-          {{ section.subtitle }}
-        </p>
-      </template>
-
       <template #body>
         <div class="flex flex-col gap-4">
           <UPageFeature
-            v-for="feature in section.features"
+            v-for="(feature, idx) in section.features"
+            :key="`feature-${index}-${idx}`"
             icon="i-lucide-info"
             :title="feature.title"
             :description="feature.description"
