@@ -2,10 +2,7 @@
   <div class="waiting-list-page">
     <UPageHero
       :title="cmsContent?.hero.title || 'Join the waiting list'"
-      :description="
-        cmsContent?.hero.subtitle ||
-        'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'
-      "
+      :description="cmsContent?.hero.subtitle || 'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'"
       headline="Join the waiting list"
       :orientation="isWaitingListMode ? 'horizontal' : 'vertical'"
       :ui="{
@@ -15,27 +12,68 @@
         description: 'text-white body-lg',
       }"
     >
-      <div
-        v-if="isWaitingListMode"
-        class="flex justify-center items-center w-full px-4 sm:px-6"
-      >
-        <MoleculesImageSwap
-          front-image="/img/natural_lang.png"
-          back-image="/img/traditional.png"
-          front-label="Natural Language"
-          back-label="Traditional Search"
-          class="w-full max-w-2xl"
-        />
+      <div v-if="isWaitingListMode" class="flex justify-center items-center w-full px-4 sm:px-6">
+        <MoleculesImageSwap front-image="/img/natural_lang.png" back-image="/img/traditional.png" front-label="Natural Language" back-label="Traditional Search" class="w-full max-w-2xl" />
       </div>
       <div v-else class="max-w-200 w-full m-auto">
         <OrganismsDockBanner listingType="all" />
       </div>
     </UPageHero>
 
-    <!-- ============================================ -->
-    <!-- SIGN UP FORM SECTION -->
-    <!-- ============================================ -->
-    <section class="waiting-list-form-section">
+    <!-- sign up form -->
+    <UPageSection
+      :title="cmsContent?.formSection.title || 'Join the Waiting List'"
+      :description="cmsContent?.formSection.description || 'Be the first to know'"
+      headline="Stay updated"
+      :ui="{
+        title: 'title-md',
+        headline: 'text-secondary/90!',
+      }"
+    >
+      <UForm class="max-w-200 w-full m-auto flex flex-row items-center gap-2" @submit.prevent="handleSubmit">
+        <div class="flex flex-col items-start gap-2 w-full">
+          <UFormField label="Email Address" required class="w-full">
+            <UInput
+              v-model="email"
+              type="email"
+              :disabled="isSubmitting || isSuccess"
+              placeholder="Enter your email"
+              class="w-full"
+              :ui="{
+                base: 'p-3',
+              }"
+            />
+          </UFormField>
+          <UFormField>
+            <UCheckbox v-model="agreedToTerms" :disabled="isSubmitting || isSuccess" :ui="{
+              indicator: 'bg-secondary'
+            }">
+              <template #label>
+                <span class="body-sm">
+                  I agree to the
+                  <NuxtLink to="/terms" class="link">Terms & Conditions</NuxtLink>
+                  and
+                  <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
+                </span>
+              </template>
+            </UCheckbox>
+          </UFormField>
+        </div>
+
+        <UButton
+          type="submit"
+          :label="cmsContent?.formSection?.buttonText || 'Join Now'"
+          variant="soft"
+          :pending="isSubmitting"
+          :disabled="!agreedToTerms || !email || isSuccess"
+          size="xl"
+          class="font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! disabled:text-black! hover:bg-(--blue-500) px-5 body-md"
+          @click.prevent="handleSubmit"
+        />
+      </UForm>
+    </UPageSection>
+
+    <!-- <section class="waiting-list-form-section">
       <div class="container">
         <div class="waiting-list-form__header">
           <h2 class="waiting-list-form__title | title-md">
@@ -52,32 +90,15 @@
 
             <div class="waiting-list-form__input-group">
               <div class="waiting-list-form__input-wrapper">
-                <label for="email" class="waiting-list-form__label | body-sm">
-                  Email address
-                </label>
+                <label for="email" class="waiting-list-form__label | body-sm"> Email address </label>
                 <div class="waiting-list-form__input-button-group">
                   <div class="waiting-list-form__input">
                     <ClientOnly>
-                      <AtomsInput
-                        id="email"
-                        v-model="email"
-                        type="email"
-                        name="email"
-                        placeholder="your.email@example.com"
-                        required
-                        :disabled="isSubmitting || isSuccess"
-                        error-id="email-error"
-                      />
+                      <AtomsInput id="email" v-model="email" type="email" name="email" placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" error-id="email-error" />
                     </ClientOnly>
                   </div>
                   <div class="waiting-list-form__submit">
-                    <AtomsButton
-                      v-if="!isSuccess"
-                      class="waiting-list-form__submit-button | button-monochrome"
-                      type="submit"
-                      :pending="isSubmitting"
-                      :disabled="!agreedToTerms || !email"
-                    >
+                    <AtomsButton v-if="!isSuccess" class="waiting-list-form__submit-button | button-monochrome" type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email">
                       {{ cmsContent?.formSection.buttonText }}
                     </AtomsButton>
                   </div>
@@ -87,18 +108,10 @@
 
             <div class="waiting-list-form__checkbox">
               <label class="waiting-list-form__checkbox-label | body-sm">
-                <input
-                  type="checkbox"
-                  v-model="agreedToTerms"
-                  class="waiting-list-form__checkbox-input"
-                  :disabled="isSubmitting || isSuccess"
-                  required
-                />
+                <input type="checkbox" v-model="agreedToTerms" class="waiting-list-form__checkbox-input" :disabled="isSubmitting || isSuccess" required />
                 <span class="waiting-list-form__checkbox-text">
                   I agree to the
-                  <NuxtLink to="/terms" class="link"
-                    >Terms & Conditions</NuxtLink
-                  >
+                  <NuxtLink to="/terms" class="link">Terms & Conditions</NuxtLink>
                   and
                   <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
                 </span>
@@ -106,18 +119,14 @@
             </div>
 
             <div class="waiting-list-form__success" v-if="isSuccess">
-              <AtomsIcon
-                icon="tick"
-                :size="48"
-                class="waiting-list-form__success-icon"
-              />
+              <AtomsIcon icon="tick" :size="48" class="waiting-list-form__success-icon" />
               <h3 class="title-sm">You're on the list!</h3>
               <p class="body-sm">{{ message }}</p>
             </div>
           </form>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Features -->
     <UPageCTA
@@ -158,12 +167,7 @@
         </div>
       </template>
 
-      <AtomsCloudFlareImage
-        v-if="section.image"
-        :src="section.image"
-        :alt="section.imageAlt"
-        class="h-auto w-full"
-      />
+      <AtomsCloudFlareImage v-if="section.image" :src="section.image" :alt="section.imageAlt" class="h-auto w-full" />
     </UPageCTA>
 
     <!-- sellers section -->
@@ -249,31 +253,26 @@
     />
 
     <!-- TODO: REPLACE THE REST OF THIS PAGE -->
-    <UPageSection
-      :title="cmsContent?.earlyAccessBenefits.title"
-      :description="cmsContent?.earlyAccessBenefits.subtitle"
-      headline="Early Access Benefits"
-      class="section-gradient-bg"
-    >
-    <template #features>
-      <UPageCard
-        v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
-        :key="index"
-        icon="i-lucide-info"
-        :title="benefit.title"
-        :description="benefit.description"
-        class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
-        :ui="{
+    <UPageSection :title="cmsContent?.earlyAccessBenefits.title" :description="cmsContent?.earlyAccessBenefits.subtitle" headline="Early Access Benefits" class="section-gradient-bg">
+      <template #features>
+        <UPageCard
+          v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
+          :key="index"
+          icon="i-lucide-info"
+          :title="benefit.title"
+          :description="benefit.description"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :ui="{
             root: 'bg-primary/50! ring-0',
             container: 'shadow-xl',
             title: 'title-md',
             leadingIcon: 'h-6 w-6 text-secondary',
             description: 'body-sm',
             body: 'flex flex-col justify-evenly',
-            }"
+          }"
         >
-      </UPageCard>
-    </template>
+        </UPageCard>
+      </template>
     </UPageSection>
 
     <!-- guides -->
@@ -282,7 +281,7 @@
       :description="cmsContent?.guidesSection?.description"
       headline="Helpful Guides"
       :ui="{
-        headline: 'text-secondary'
+        headline: 'text-secondary',
       }"
     >
       <UBlogPosts>
@@ -296,19 +295,18 @@
           :badge="'Read Time: ' + guide.readTime + ' mins'"
           :date="guide.publishedAt"
           :authors="[
-            { 
+            {
               name: 'Virify',
               avatar: {
                 src: '/android-chrome-96x96.png',
                 alt: 'Virify',
-              }
-            }
-
+              },
+            },
           ]"
           :image="{
             provider: 'sanity',
             src: guide.heroImage?.asset._ref,
-            alt: guide.heroImage?.alt || guide.title
+            alt: guide.heroImage?.alt || guide.title,
           }"
           :ui="{
             title: 'body-md font-bold',
@@ -347,15 +345,11 @@
 const { isWaitingListMode } = useWaitingListMode();
 const toast = useToast();
 
-
 // Fetch CMS content - module automatically uses correct perspective
-const { data: cmsContent, error: cmsError } =
-  await useSanityQuery<WaitingListPage>(waitingListPageQuery);
+const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(waitingListPageQuery);
 
 // Process feature sections: clean stega encoding and determine which image props to pass
-const processedFeatureSections = computed(() =>
-  processFeatureSections(cmsContent.value?.featureSections),
-);
+const processedFeatureSections = computed(() => processFeatureSections(cmsContent.value?.featureSections));
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
 const agreedToTerms = ref(false);
@@ -396,9 +390,7 @@ async function handleSubmit() {
     }
   } catch (error: any) {
     console.error("Waiting list signup error:", error);
-    formError.value =
-      error.data?.statusMessage ||
-      "Failed to join waiting list. Please try again.";
+    formError.value = error.data?.statusMessage || "Failed to join waiting list. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
@@ -465,11 +457,7 @@ useSchemaOrg([
 @use "#styles/3-elements/sections" as *;
 
 @mixin hero-gradient() {
-  background: linear-gradient(
-    135deg,
-    var(--blue-400) 50%,
-    var(--secondary-400) 150%
-  );
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
 }
 
 @mixin hero-background() {
