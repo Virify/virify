@@ -299,8 +299,8 @@
             { 
               name: 'Virify',
               avatar: {
+                src: '/android-chrome-96x96.png',
                 alt: 'Virify',
-                class: 'border-1'
               }
             }
 
