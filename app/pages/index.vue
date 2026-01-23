@@ -2,7 +2,10 @@
   <div class="waiting-list-page">
     <UPageHero
       :title="cmsContent?.hero.title || 'Join the waiting list'"
-      :description="cmsContent?.hero.subtitle || 'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'"
+      :description="
+        cmsContent?.hero.subtitle ||
+        'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'
+      "
       headline="Join the waiting list"
       :orientation="isWaitingListMode ? 'horizontal' : 'vertical'"
       :ui="{
@@ -12,8 +15,17 @@
         description: 'text-white body-lg',
       }"
     >
-      <div v-if="isWaitingListMode" class="flex justify-center items-center w-full px-4 sm:px-6">
-        <MoleculesImageSwap front-image="/img/natural_lang.png" back-image="/img/traditional.png" front-label="Natural Language" back-label="Traditional Search" class="w-full max-w-2xl" />
+      <div
+        v-if="isWaitingListMode"
+        class="flex justify-center items-center w-full px-4 sm:px-6"
+      >
+        <MoleculesImageSwap
+          front-image="/img/natural_lang.png"
+          back-image="/img/traditional.png"
+          front-label="Natural Language"
+          back-label="Traditional Search"
+          class="w-full max-w-2xl"
+        />
       </div>
       <div v-else class="max-w-200 w-full m-auto">
         <OrganismsDockBanner listingType="all" />
@@ -23,31 +35,43 @@
     <!-- sign up form -->
     <UPageSection
       :title="cmsContent?.formSection.title || 'Join the Waiting List'"
-      :description="cmsContent?.formSection.description || 'Be the first to know'"
+      :description="
+        cmsContent?.formSection.description || 'Be the first to know'
+      "
       headline="Stay updated"
       :ui="{
         title: 'title-md',
         headline: 'text-secondary/90!',
       }"
     >
-      <UForm class="max-w-200 w-full m-auto flex flex-row items-center gap-2" @submit.prevent="handleSubmit">
-        <div class="flex flex-col items-start gap-2 w-full">
-          <UFormField label="Email Address" required class="w-full">
-            <UInput
-              v-model="email"
-              type="email"
+      <UForm
+        :schema="signupSchema"
+        :state="state"
+        class="max-w-200 w-full m-auto flex flex-col items-start gap-4"
+        @submit="handleSubmit"
+      >
+        <UFormField name="email" label="Email Address" required class="w-full">
+          <UInput
+            v-model="state.email"
+            type="email"
+            :disabled="isSubmitting || isSuccess"
+            placeholder="Enter your email"
+            trailingIcon="i-lucide-mail"
+            class="w-full"
+            :ui="{
+              base: 'p-3 focus:ring-secondary!',
+            }"
+          />
+        </UFormField>
+        <div class="flex flex-col md:flex-row justify-between w-full gap-4">
+          <UFormField name="agreedToTerms">
+            <UCheckbox
+              v-model="state.agreedToTerms"
               :disabled="isSubmitting || isSuccess"
-              placeholder="Enter your email"
-              class="w-full"
               :ui="{
-                base: 'p-3',
+                indicator: 'bg-secondary',
               }"
-            />
-          </UFormField>
-          <UFormField>
-            <UCheckbox v-model="agreedToTerms" :disabled="isSubmitting || isSuccess" :ui="{
-              indicator: 'bg-secondary'
-            }">
+            >
               <template #label>
                 <span class="body-sm">
                   I agree to the
@@ -58,75 +82,19 @@
               </template>
             </UCheckbox>
           </UFormField>
+          <UButton
+            type="submit"
+            :label="cmsContent?.formSection?.buttonText || 'Join Now'"
+            variant="solid"
+            :pending="isSubmitting"
+            :disabled="!state.agreedToTerms || !state.email || isSuccess"
+            loading-auto
+            size="xl"
+            class="font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) px-5 body-md"
+          />
         </div>
-
-        <UButton
-          type="submit"
-          :label="cmsContent?.formSection?.buttonText || 'Join Now'"
-          variant="soft"
-          :pending="isSubmitting"
-          :disabled="!agreedToTerms || !email || isSuccess"
-          size="xl"
-          class="font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! disabled:text-black! hover:bg-(--blue-500) px-5 body-md"
-          @click.prevent="handleSubmit"
-        />
       </UForm>
     </UPageSection>
-
-    <!-- <section class="waiting-list-form-section">
-      <div class="container">
-        <div class="waiting-list-form__header">
-          <h2 class="waiting-list-form__title | title-md">
-            {{ cmsContent?.formSection.title }}
-          </h2>
-          <p class="waiting-list-form__description | body-md">
-            {{ cmsContent?.formSection.description }}
-          </p>
-
-          <form @submit.prevent="handleSubmit" class="waiting-list-form">
-            <div v-if="formError" class="waiting-list-form__error">
-              {{ formError }}
-            </div>
-
-            <div class="waiting-list-form__input-group">
-              <div class="waiting-list-form__input-wrapper">
-                <label for="email" class="waiting-list-form__label | body-sm"> Email address </label>
-                <div class="waiting-list-form__input-button-group">
-                  <div class="waiting-list-form__input">
-                    <ClientOnly>
-                      <AtomsInput id="email" v-model="email" type="email" name="email" placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" error-id="email-error" />
-                    </ClientOnly>
-                  </div>
-                  <div class="waiting-list-form__submit">
-                    <AtomsButton v-if="!isSuccess" class="waiting-list-form__submit-button | button-monochrome" type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email">
-                      {{ cmsContent?.formSection.buttonText }}
-                    </AtomsButton>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="waiting-list-form__checkbox">
-              <label class="waiting-list-form__checkbox-label | body-sm">
-                <input type="checkbox" v-model="agreedToTerms" class="waiting-list-form__checkbox-input" :disabled="isSubmitting || isSuccess" required />
-                <span class="waiting-list-form__checkbox-text">
-                  I agree to the
-                  <NuxtLink to="/terms" class="link">Terms & Conditions</NuxtLink>
-                  and
-                  <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
-                </span>
-              </label>
-            </div>
-
-            <div class="waiting-list-form__success" v-if="isSuccess">
-              <AtomsIcon icon="tick" :size="48" class="waiting-list-form__success-icon" />
-              <h3 class="title-sm">You're on the list!</h3>
-              <p class="body-sm">{{ message }}</p>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section> -->
 
     <!-- Features -->
     <UPageCTA
@@ -167,7 +135,12 @@
         </div>
       </template>
 
-      <AtomsCloudFlareImage v-if="section.image" :src="section.image" :alt="section.imageAlt" class="h-auto w-full" />
+      <AtomsCloudFlareImage
+        v-if="section.image"
+        :src="section.image"
+        :alt="section.imageAlt"
+        class="h-auto w-full"
+      />
     </UPageCTA>
 
     <!-- sellers section -->
@@ -247,13 +220,19 @@
           icon: 'i-lucide-mail',
           size: 'xl',
           variant: 'solid',
-          class: 'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+          class:
+            'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
         },
       ]"
     />
 
     <!-- TODO: REPLACE THE REST OF THIS PAGE -->
-    <UPageSection :title="cmsContent?.earlyAccessBenefits.title" :description="cmsContent?.earlyAccessBenefits.subtitle" headline="Early Access Benefits" class="section-gradient-bg">
+    <UPageSection
+      :title="cmsContent?.earlyAccessBenefits.title"
+      :description="cmsContent?.earlyAccessBenefits.subtitle"
+      headline="Early Access Benefits"
+      class="section-gradient-bg"
+    >
       <template #features>
         <UPageCard
           v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
@@ -291,7 +270,9 @@
           variant="subtle"
           :title="guide.title"
           :description="guide.excerpt"
-          :to="'guides/' + guide.category.slug.current + '/' + guide.slug.current"
+          :to="
+            'guides/' + guide.category.slug.current + '/' + guide.slug.current
+          "
           :badge="'Read Time: ' + guide.readTime + ' mins'"
           :date="guide.publishedAt"
           :authors="[
@@ -331,9 +312,10 @@
           label: cmsContent?.finalCta.buttonText || 'Contact Us',
           color: 'neutral',
           icon: 'i-lucide-mail',
-          size: 'xl',
+          size: 'lg',
           variant: 'solid',
-          class: 'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+          class:
+            'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
         },
       ]"
       @click="scrollToForm"
@@ -342,31 +324,39 @@
 </template>
 
 <script setup lang="ts">
+import * as z from "zod";
 const { isWaitingListMode } = useWaitingListMode();
 const toast = useToast();
 
 // Fetch CMS content - module automatically uses correct perspective
-const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(waitingListPageQuery);
+const { data: cmsContent, error: cmsError } =
+  await useSanityQuery<WaitingListPage>(waitingListPageQuery);
 
 // Process feature sections: clean stega encoding and determine which image props to pass
-const processedFeatureSections = computed(() => processFeatureSections(cmsContent.value?.featureSections));
-// Gradient text is used via AtomsGradientText auto-registered component
-const email = ref("");
-const agreedToTerms = ref(false);
+const processedFeatureSections = computed(() =>
+  processFeatureSections(cmsContent.value?.featureSections),
+);
+
 const isSubmitting = ref(false);
 const isSuccess = ref(false);
-const formError = ref<string | null>(null);
 const message = ref("You're on the list! Check your email for confirmation.");
 
+const signupSchema = z.object({
+  email: z.email("Please enter a valid email address"),
+  agreedToTerms: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the terms and conditions",
+  }),
+});
+
+type Schema = z.output<typeof signupSchema>;
+
+const state = reactive<Schema>({
+  email: "",
+  agreedToTerms: false,
+});
+
 async function handleSubmit() {
-  if (!email.value || !agreedToTerms.value) {
-    formError.value = "Please complete all required fields";
-    return;
-  }
-
   isSubmitting.value = true;
-  formError.value = null;
-
   try {
     const response = await $fetch<{
       success: boolean;
@@ -375,14 +365,14 @@ async function handleSubmit() {
     }>("/api/waiting-list", {
       method: "POST",
       body: {
-        email: email.value,
+        email: state.email,
       },
     });
 
     if (response.success) {
-      isSuccess.value = true;
       message.value = response.message;
       toast.add({
+        icon: "i-lucide-check-circle",
         title: "Success",
         description: message.value,
         color: "success",
@@ -390,7 +380,6 @@ async function handleSubmit() {
     }
   } catch (error: any) {
     console.error("Waiting list signup error:", error);
-    formError.value = error.data?.statusMessage || "Failed to join waiting list. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
@@ -456,168 +445,15 @@ useSchemaOrg([
 @use "#styles/_utils/functions" as fn;
 @use "#styles/3-elements/sections" as *;
 
-@mixin hero-gradient() {
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-}
-
-@mixin hero-background() {
-  background:
-    url("/img/logo-background.svg") no-repeat top right,
-    linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
-  background-size:
-    auto 120%,
-    cover;
-}
-
-// Shared gradient background
 .section-gradient-bg {
   @include section-gradient-bg();
 }
 
 .hero-gradient-bg {
-  @include hero-gradient();
+  @include section-gradient-bg();
 
   @include mq.desktop {
     @include hero-background();
-  }
-}
-
-// Form Section
-.waiting-list-form-section {
-  padding: var(--size-120) 0;
-}
-
-.waiting-list-form-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--size-48);
-
-  @include mq.mobile-only {
-    padding: 0;
-  }
-}
-
-.waiting-list-form {
-  &__title {
-    margin: 0 0 var(--size-12) 0;
-    text-align: center;
-  }
-
-  &__description {
-    text-align: center;
-    color: var(--text-muted);
-    max-width: 800px;
-    margin: 0 auto var(--size-32);
-  }
-
-  &__error {
-    padding: var(--size-16);
-    background: fn.faded-color(10%, var(--error));
-    border: 1px solid var(--error);
-    border-radius: var(--border-radius-md);
-    color: var(--error);
-    margin-bottom: var(--size-24);
-    text-align: center;
-  }
-
-  &__input-wrapper {
-    max-width: 800px;
-    margin: 0 auto var(--size-20);
-  }
-
-  &__label {
-    display: block;
-    margin-bottom: var(--size-8);
-  }
-
-  &__input-button-group {
-    display: flex;
-    gap: var(--size-12);
-    align-items: flex-start;
-
-    @include mq.mobile-only {
-      flex-direction: column;
-    }
-  }
-
-  &__input {
-    flex: 1;
-    width: 100%;
-  }
-
-  &__submit {
-    align-self: flex-start;
-
-    @include mq.mobile-only {
-      align-self: stretch;
-    }
-  }
-
-  &__submit-button {
-    flex-shrink: 0;
-    white-space: nowrap;
-    padding: var(--size-12) var(--size-24);
-
-    @include mq.mobile-only {
-      width: 100%;
-    }
-  }
-
-  &__checkbox {
-    max-width: 800px;
-    margin: var(--size-20) auto;
-  }
-
-  &__checkbox-label {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--size-12);
-    cursor: pointer;
-    user-select: none;
-  }
-
-  &__checkbox-input {
-    flex-shrink: 0;
-    width: var(--size-20);
-    height: var(--size-20);
-    margin-top: var(--size-2);
-    cursor: pointer;
-    accent-color: var(--secondary-400);
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-  }
-
-  &__checkbox-text {
-    flex: 1;
-    line-height: 1.5;
-
-    .link {
-      color: var(--secondary-400);
-      text-decoration: underline;
-      font-weight: 500;
-
-      &:hover {
-        color: var(--secondary-500);
-      }
-    }
-  }
-
-  &__success {
-    text-align: center;
-    padding: var(--size-32) var(--size-16);
-    border-radius: var(--border-radius-lg);
-    margin-top: var(--size-12);
-
-    h3 {
-      margin: var(--size-16) 0 var(--size-8);
-    }
-
-    p {
-      margin: 0;
-    }
   }
 }
 </style>
