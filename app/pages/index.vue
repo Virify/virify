@@ -75,7 +75,9 @@
               <template #label>
                 <span class="body-sm">
                   I agree to the
-                  <NuxtLink to="/terms" class="link">Terms & Conditions</NuxtLink>
+                  <NuxtLink to="/terms" class="link"
+                    >Terms & Conditions</NuxtLink
+                  >
                   and
                   <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
                 </span>
