@@ -281,8 +281,9 @@
               avatar: {
                 src: '/android-chrome-96x96.png',
                 alt: 'Virify',
-              },
-            },
+              }
+            }
+
           ]"
           :image="{
             provider: 'sanity',
