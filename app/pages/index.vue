@@ -292,7 +292,7 @@
           variant="subtle"
           :title="guide.title"
           :description="guide.excerpt"
-          :to="'guides/' + guide.slug.current"
+          :to="'guides/' + guide.category.slug.current + '/' + guide.slug.current"
           :badge="'Read Time: ' + guide.readTime + ' mins'"
           :date="guide.publishedAt"
           :authors="[
