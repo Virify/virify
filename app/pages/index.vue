@@ -249,69 +249,101 @@
     />
 
     <!-- TODO: REPLACE THE REST OF THIS PAGE -->
+    <UPageSection
+      :title="cmsContent?.earlyAccessBenefits.title"
+      :description="cmsContent?.earlyAccessBenefits.subtitle"
+      headline="Early Access Benefits"
+      class="section-gradient-bg"
+    >
+    <template #features>
+      <UPageCard
+        v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
+        :key="index"
+        icon="i-lucide-info"
+        :title="benefit.title"
+        :description="benefit.description"
+        class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+        :ui="{
+            root: 'bg-primary/50! ring-0',
+            container: 'shadow-xl',
+            title: 'title-md',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-sm',
+            body: 'flex flex-col justify-evenly',
+            }"
+        >
+      </UPageCard>
+    </template>
+    </UPageSection>
 
-    <!-- ============================================ -->
-    <!-- EARLY ACCESS BENEFITS SECTION -->
-    <!-- ============================================ -->
-    <section class="waiting-list-benefits" :class="benefitsBackground">
-      <div class="container">
-        <header class="waiting-list-benefits__header">
-          <h2 class="title-xl">
-            <AtomsGradientTextRenderer
-              :text="cmsContent?.earlyAccessBenefits.title || ''"
-              :variant="
-                benefitsGradientClass === 'gradient-text-light'
-                  ? 'light'
-                  : 'dark'
-              "
-            />
-          </h2>
-          <p class="body-md max-width-prose section-subtitle">
-            {{ cmsContent?.earlyAccessBenefits.subtitle }}
-          </p>
-        </header>
+    <!-- guides -->
+    <UPageSection
+      :title="cmsContent?.guidesSection?.title"
+      :description="cmsContent?.guidesSection?.description"
+      headline="Helpful Guides"
+      :ui="{
+        headline: 'text-secondary'
+      }"
+    >
+      <UBlogPosts>
+        <UBlogPost
+          v-for="(guide, index) in cmsContent?.guidesSection?.guides"
+          :key="index"
+          variant="subtle"
+          :title="guide.title"
+          :description="guide.excerpt"
+          :to="'guides/' + guide.slug.current"
+          :badge="'Read Time: ' + guide.readTime + ' mins'"
+          :date="guide.publishedAt"
+          :authors="[
+            { 
+              name: 'Virify',
+              avatar: {
+                alt: 'Virify',
+                class: 'border-1'
+              }
+            }
 
-        <div class="waiting-list-benefits__cards">
-          <AtomsHeroCard
-            v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
-            :key="index"
-            :variant="index === 1 ? 'secondary' : undefined"
-          >
-            <h3 class="title-md">
-              <AtomsGradientTextRenderer
-                :text="benefit.title || ''"
-                variant="dark"
-              />
-            </h3>
-            <p class="body-md">{{ benefit.description }}</p>
-          </AtomsHeroCard>
-        </div>
-      </div>
-    </section>
+          ]"
+          :image="{
+            provider: 'sanity',
+            src: guide.heroImage?.asset._ref,
+            alt: guide.heroImage?.alt || guide.title
+          }"
+          :ui="{
+            title: 'body-md font-bold',
+            meta: 'justify-between',
+            description: 'body-sm',
+            body: 'justify-evenly',
+          }"
+        />
+      </UBlogPosts>
+    </UPageSection>
 
-    <OrganismsGuideSection
-      v-if="cmsContent?.guidesSection"
-      :title="cmsContent.guidesSection.title"
-      :description="cmsContent.guidesSection.description || ''"
-      :guides="cmsContent.guidesSection.guides"
-      :gradient-class="'gradient-text-light'"
-    />
-
-    <!-- ============================================ -->
-    <!-- FINAL CTA SECTION -->
-    <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.finalCta.title || ''"
-      :description="cmsContent?.finalCta.description || ''"
-      :buttonText="cmsContent?.finalCta.buttonText || ''"
-      :gradient="true"
+    <!-- final cta section -->
+    <UPageCTA
+      :title="cmsContent?.finalCta.title"
+      :description="cmsContent?.finalCta.description"
+      :ui="{
+        root: 'rounded-none ring-0',
+      }"
+      class="section-gradient-bg"
+      :links="[
+        {
+          label: cmsContent?.finalCta.buttonText || 'Contact Us',
+          color: 'neutral',
+          icon: 'i-lucide-mail',
+          size: 'xl',
+          variant: 'solid',
+          class: 'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+        },
+      ]"
       @click="scrollToForm"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useIntersectionObserver } from "@vueuse/core";
 const { isWaitingListMode } = useWaitingListMode();
 const toast = useToast();
 
@@ -324,47 +356,6 @@ const { data: cmsContent, error: cmsError } =
 const processedFeatureSections = computed(() =>
   processFeatureSections(cmsContent.value?.featureSections),
 );
-
-// Determine if we should alternate backgrounds for remaining sections
-// If there are NO CMS feature sections, alternate them; otherwise keep current backgrounds
-const hasCmsFeatures = computed(
-  () => processedFeatureSections.value.length > 0,
-);
-
-// Background classes for remaining sections (alternating only if no CMS features)
-const sellersBackground = computed(() =>
-  hasCmsFeatures.value ? "" : "section-gradient-bg",
-);
-const buyersBackground = computed(() =>
-  hasCmsFeatures.value ? "section-gradient-bg" : "",
-);
-const contactGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
-const benefitsBackground = computed(() =>
-  hasCmsFeatures.value ? "section-gradient-bg" : "",
-);
-
-// Gradient text classes based on background
-const sellersGradientClass = computed(() =>
-  hasCmsFeatures.value ? "gradient-text-light" : "gradient-text",
-);
-const buyersGradientClass = computed(() =>
-  hasCmsFeatures.value ? "gradient-text" : "gradient-text-light",
-);
-const benefitsGradientClass = computed(() =>
-  hasCmsFeatures.value ? "gradient-text" : "gradient-text-light",
-);
-
-// Variant for feature tiles (blue when no gradient background, default otherwise)
-const sellersVariant = computed(() =>
-  hasCmsFeatures.value ? "blue" : undefined,
-);
-const buyersVariant = computed(() =>
-  hasCmsFeatures.value ? undefined : "blue",
-);
-const benefitsVariant = computed(() =>
-  hasCmsFeatures.value ? undefined : "blue",
-);
-
 // Gradient text is used via AtomsGradientText auto-registered component
 const email = ref("");
 const agreedToTerms = ref(false);
@@ -372,32 +363,6 @@ const isSubmitting = ref(false);
 const isSuccess = ref(false);
 const formError = ref<string | null>(null);
 const message = ref("You're on the list! Check your email for confirmation.");
-
-// Intersection Observer helper (mirrors homepage pattern)
-const createIntersectionObserver = () => {
-  const elementRef = ref<HTMLElement | null>(null);
-  const isVisible = ref(false);
-
-  useIntersectionObserver(
-    elementRef,
-    (entries) => {
-      const [entry] = entries;
-      if (entry && entry.isIntersecting) {
-        isVisible.value = true;
-      }
-    },
-    { threshold: 0.3 },
-  );
-
-  return { elementRef, isVisible };
-};
-
-// Buyers (Searchers) grid
-const { elementRef: buyersRef, isVisible: isBuyersVisible } =
-  createIntersectionObserver();
-// Sellers grid
-const { elementRef: sellersRef, isVisible: isSellersVisible } =
-  createIntersectionObserver();
 
 async function handleSubmit() {
   if (!email.value || !agreedToTerms.value) {
@@ -666,112 +631,5 @@ useSchemaOrg([
       margin: 0;
     }
   }
-}
-
-// Shared grid section styles
-%section-grid {
-  padding: var(--size-120) 0;
-
-  .feature-tile {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s ease-out;
-
-    &.animate-in {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @for $i from 1 through 6 {
-      &:nth-child(#{$i}) {
-        transition-delay: #{$i * 0.1}s;
-      }
-    }
-  }
-}
-
-%grid-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--size-32);
-
-  @include mq.tablet {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @include mq.notebook {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-%section-header {
-  text-align: center;
-  margin-bottom: var(--size-48);
-
-  h2 {
-    margin-bottom: var(--size-16);
-  }
-}
-
-// Features Section (Buyers)
-.waiting-list-features {
-  @extend %section-grid;
-
-  &__header {
-    @extend %section-header;
-  }
-
-  &__grid {
-    @extend %grid-layout;
-  }
-}
-
-// Sellers Section
-.waiting-list-sellers {
-  @extend %section-grid;
-
-  &__header {
-    @extend %section-header;
-  }
-
-  &__grid {
-    @extend %grid-layout;
-  }
-}
-
-// Benefits Section
-.waiting-list-benefits {
-  padding: var(--size-120) 0;
-
-  &__header {
-    text-align: center;
-    margin-bottom: var(--size-48);
-  }
-
-  &__cards {
-    @extend %grid-layout;
-    max-width: 1200px;
-    margin: 0 auto;
-    gap: var(--size-24);
-
-    h3 {
-      margin: 0 0 var(--size-16) 0;
-    }
-
-    p {
-      margin: 0;
-    }
-  }
-}
-
-// Utility classes
-.max-width-prose {
-  max-width: 65ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.section-subtitle {
-  margin: var(--size-12) auto 0;
 }
 </style>
