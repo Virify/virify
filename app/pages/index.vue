@@ -1,8 +1,11 @@
 <template>
   <div class="waiting-list-page">
     <UPageHero
-      title="Access the property platform that works for everyone"
-      description="Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need."
+      :title="cmsContent?.hero.title || 'Join the waiting list'"
+      :description="
+        cmsContent?.hero.subtitle ||
+        'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'
+      "
       headline="Join the waiting list"
       :orientation="isWaitingListMode ? 'horizontal' : 'vertical'"
       :ui="{
@@ -163,85 +166,87 @@
       />
     </UPageCTA>
 
-    <!-- ============================================ -->
-    <!-- SELLERS BENEFITS SECTION -->
-    <!-- ============================================ -->
-    <section class="waiting-list-sellers" :class="sellersBackground">
-      <div class="container">
-        <header class="waiting-list-sellers__header">
-          <h2 class="title-xl">
-            <AtomsGradientTextRenderer
-              :text="cmsContent?.sellersBenefits.title || ''"
-              :variant="
-                sellersGradientClass === 'gradient-text-light'
-                  ? 'light'
-                  : 'dark'
-              "
-            />
-          </h2>
-          <p class="body-md max-width-prose section-subtitle">
-            {{ cmsContent?.sellersBenefits.subtitle }}
-          </p>
-        </header>
+    <!-- sellers section -->
+    <UPageSection
+      :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
+      :description="cmsContent?.sellersBenefits.subtitle || ''"
+      headline="Your in control"
+      :ui="{
+        headline: 'text-secondary/90!',
+        body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
+      }"
+    >
+      <template #body>
+        <UPageCard
+          v-for="(feature, index) in cmsContent?.sellersBenefits.features"
+          :key="index"
+          :title="feature.title"
+          :description="feature.description"
+          variant="subtle"
+          spotlight
+          spotlight-color="primary"
+          icon="i-lucide-chart-no-axes-gantt"
+          :ui="{
+            title: 'text-secondary/90!',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-sm',
+          }"
+        />
+      </template>
+    </UPageSection>
 
-        <div class="waiting-list-sellers__grid" ref="sellersRef">
-          <MoleculesFeatureTile
-            v-for="(feature, index) in cmsContent?.sellersBenefits.features"
-            :key="index"
-            :iconName="feature.icon"
-            :title="feature.title"
-            :subtitle="feature.subtitle"
-            :description="feature.description"
-            :variant="sellersVariant"
-            :class="{ 'animate-in': isSellersVisible }"
-          />
-        </div>
-      </div>
-    </section>
+    <!-- buyers section -->
+    <UPageSection
+      :title="cmsContent?.buyersBenefits.title || 'What we offer buyers'"
+      :description="cmsContent?.buyersBenefits.subtitle || ''"
+      headline="Get the best results"
+      :ui="{
+        root: 'section-gradient-bg',
+        headline: 'text-secondary/90!',
+        body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
+      }"
+    >
+      <template #body>
+        <UPageCard
+          v-for="(feature, index) in cmsContent?.buyersBenefits.features"
+          :key="index"
+          :title="feature.title"
+          :description="feature.description"
+          variant="subtle"
+          spotlight
+          spotlight-color="secondary"
+          icon="i-lucide-chart-no-axes-gantt"
+          :ui="{
+            spotlight: 'bg-primary/50!',
+            root: 'bg-primary/50! ring-primary/60',
+            container: 'border-secondary!',
+            title: 'text-secondary/90!',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-sm',
+          }"
+        />
+      </template>
+    </UPageSection>
 
-    <!-- ============================================ -->
-    <!-- BUYERS BENEFITS SECTION -->
-    <!-- ============================================ -->
-    <section class="waiting-list-features" :class="buyersBackground">
-      <div class="container">
-        <header class="waiting-list-sellers__header">
-          <h2 class="title-xl">
-            <AtomsGradientTextRenderer
-              :text="cmsContent?.buyersBenefits.title || ''"
-              :variant="
-                buyersGradientClass === 'gradient-text-light' ? 'light' : 'dark'
-              "
-            />
-          </h2>
-          <p class="body-md max-width-prose section-subtitle">
-            {{ cmsContent?.buyersBenefits.subtitle }}
-          </p>
-        </header>
+    <!-- contact us cta -->
 
-        <div class="waiting-list-features__grid" ref="buyersRef">
-          <MoleculesFeatureTile
-            v-for="(feature, index) in cmsContent?.buyersBenefits.features"
-            :key="index"
-            :iconName="feature.icon"
-            :title="feature.title"
-            :subtitle="feature.subtitle"
-            :description="feature.description"
-            :variant="buyersVariant"
-            :class="{ 'animate-in': isBuyersVisible }"
-          />
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================ -->
-    <!-- CONTACT SECTION -->
-    <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.contactSection.title || ''"
-      :description="cmsContent?.contactSection.description || ''"
-      :buttonText="cmsContent?.contactSection.buttonText || ''"
-      :gradient="contactGradient"
-      to="/contact"
+    <UPageCTA
+      :title="cmsContent?.contactSection.title"
+      :description="cmsContent?.contactSection.description"
+      :ui="{
+        root: 'rounded-none ring-0',
+      }"
+      :links="[
+        {
+          label: cmsContent?.contactSection.buttonText || 'Contact Us',
+          to: '/contact',
+          color: 'neutral',
+          icon: 'i-lucide-mail',
+          size: 'xl',
+          variant: 'solid',
+          class: 'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+        },
+      ]"
     />
 
     <!-- ============================================ -->
@@ -308,6 +313,7 @@
 import { useIntersectionObserver } from "@vueuse/core";
 const { isWaitingListMode } = useWaitingListMode();
 const toast = useToast();
+
 
 // Fetch CMS content - module automatically uses correct perspective
 const { data: cmsContent, error: cmsError } =
