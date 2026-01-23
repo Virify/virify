@@ -6,7 +6,7 @@
       headline="Join the waiting list"
       :orientation="isWaitingListMode ? 'horizontal' : 'vertical'"
       :ui="{
-        root: 'hero-gradient-bg',
+        root: 'hero-gradient-bg z-2',
         headline: 'text-secondary',
         title: 'title-2xl text-white!',
         description: 'text-white body-lg',
