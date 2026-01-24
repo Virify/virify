@@ -13,15 +13,19 @@
   />
   
   <UContainer class="max-w-[75ch] py-8">
-    <NuxtImg
-      placeholder
-      provider="sanity" 
-      :src="guide?.heroImage?.asset._ref"
-      :alt="guide?.heroImage?.alt || guide?.title || 'Guide Hero Image'"
-      :width="800"
-      eager
-      class="rounded-lg aspect-auto w-full max-h-70 object-cover my-8 m-auto"
-    />
+    <div class="relative w-full aspect-video rounded-lg overflow-hidden my-8">
+      <NuxtImg
+        provider="sanity" 
+        :src="guide?.heroImage?.asset._ref"
+        :alt="guide?.heroImage?.alt || guide?.title || 'Guide Hero Image'"
+        :width="800"
+        :height="450"
+        class="absolute inset-0 w-full h-full object-cover"
+        placeholder="/img/preload.svg"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
     <div class="flex flex-wrap gap-2 pb-4 items-center">
       <UAvatar src="/android-chrome-96x96.png" alt="Virify" text="Virify" />
       <p class="body-md font-semibold">Virify</p>

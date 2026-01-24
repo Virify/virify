@@ -36,9 +36,14 @@
           provider: 'sanity',
           src: category.heroImage?.asset._ref,
           alt: category.heroImage?.alt || category.title,
-          width: 800,
-          height: 600,
-          loading: index < 3 ? 'eager' : 'lazy',
+          width: 600,
+          height: 400,
+          loading: index < 2 ? 'eager' : 'lazy',
+          format: 'webp',
+          quality: 85,
+          sizes: 'sm:100vw md:50vw lg:33vw',
+          preload: index === 0,
+          placeholder: '/img/preload.svg',
         }"
         :ui="{
           title: 'body-md font-bold',

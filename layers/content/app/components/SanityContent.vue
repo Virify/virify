@@ -32,8 +32,6 @@ onMounted(() => {
       heading.id = slug || 'heading'
     }
   })
-
-  console.log(props.blocks)
 })
 
 // Helper to check if string is a Cloudflare image ID
