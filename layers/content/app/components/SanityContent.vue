@@ -305,7 +305,6 @@ const customComponents = {
       line-height: 1;
       color: var(--secondary-400);
       opacity: 0.2;
-      font-family: Georgia, serif;
     }
   }
 
@@ -508,75 +507,26 @@ const customComponents = {
   &--info {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
     border-left-color: var(--blue-500);
-    
-    &::before {
-      content: 'ℹ';
-      position: absolute;
-      top: var(--size-20);
-      right: var(--size-24);
-      font-size: 1.5rem;
-      color: var(--blue-500);
-      opacity: 0.3;
-    }
   }
 
   &--warning {
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
     border-left-color: var(--secondary-500);
-    
-    &::before {
-      content: '⚠';
-      position: absolute;
-      top: var(--size-20);
-      right: var(--size-24);
-      font-size: 1.5rem;
-      color: var(--secondary-500);
-      opacity: 0.3;
-    }
   }
 
   &--success {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
     border-left-color: var(--primary-500);
-    
-    &::before {
-      content: '✓';
-      position: absolute;
-      top: var(--size-20);
-      right: var(--size-24);
-      font-size: 1.5rem;
-      color: var(--primary-500);
-      opacity: 0.3;
-    }
   }
 
   &--error {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
     border-left-color: var(--error);
-    
-    &::before {
-      content: '✕';
-      position: absolute;
-      top: var(--size-20);
-      right: var(--size-24);
-      font-size: 1.5rem;
-      color: var(--error);
-      opacity: 0.3;
-    }
   }
 
   &--tip {
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
     border-left-color: var(--tertiary-500);
-    
-    &::before {
-      content: '💡';
-      position: absolute;
-      top: var(--size-20);
-      right: var(--size-24);
-      font-size: 1.5rem;
-      opacity: 0.6;
-    }
   }
 }
 
