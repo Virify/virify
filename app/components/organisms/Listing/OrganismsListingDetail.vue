@@ -183,14 +183,6 @@
         :is-draft="isDraft" />
     </client-only>
   </main>
-  <!-- Similar Listings (only for published listings, not drafts) -->
-  <div v-if="!isDraft && !isWaitingListMode" class="p-listing | container">
-    <OrganismsRelevantListings type="similar" :listing-id="String(listing?.id)" :address="similarListingsAddress" />
-  </div>
-  <!-- Trending Listings (only for published listings, not drafts) -->
-  <div v-if="!isDraft && !isWaitingListMode" class="p-listing | container">
-    <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
-  </div>
 </template>
 
 <script setup lang="ts">

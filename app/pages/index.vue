@@ -223,7 +223,6 @@
       ]"
     />
 
-    <!-- TODO: REPLACE THE REST OF THIS PAGE -->
     <UPageSection
       :title="cmsContent?.earlyAccessBenefits.title"
       :description="cmsContent?.earlyAccessBenefits.subtitle"
@@ -286,6 +285,9 @@
             provider: 'sanity',
             src: guide.heroImage?.asset._ref,
             alt: guide.heroImage?.alt || guide.title,
+            width: 800,
+            height: 600,
+            loading: index < 3 ? 'eager' : 'lazy',
           }"
           :ui="{
             title: 'body-md font-bold',

@@ -1,71 +1,72 @@
 <template>
-  <div class="category-page | container">
-    <MoleculesBreadcrumb :items="breadcrumbItems" />
-
-    <AtomsGuideHero :title="title" :description="description" :image="image" />
-
-    <section class="category-page__search">
-      <OrganismsSearchInput
-        :placeholder="`Search guides in ${title}`"
-        icon="search"
-        iconTitle="Search icon"
-        :guides="fullGuides"
-        :deleteble="true"
-        @filter="filtered => filteredGuides = filtered as Guide[]"
+  <UPageSection
+    :title="category?.title"
+    :description="category?.description"
+  > 
+    <template #top>
+      <UBreadcrumb
+        :items="[
+          { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
+          { label: category?.title || '', to: category ? `/guides/${category.slug.current}` : undefined, icon: 'i-lucide-book-open' }
+        ]"
+        :ui="{
+          linkLeadingIcon: 'text-secondary',
+        }"
+        class="m-4 text-(--foreground-100)"
       />
-    </section>
+    </template>
+    <UBlogPosts>
+      <UBlogPost
+        v-for="(guide, index) in category?.guides"
+        :key="index"
+        variant="subtle"
+        :title="guide?.title"
+        :description="guide?.excerpt"
+        :to="'guides/' + guide?.slug.current"
+        :badge="'Read Time: ' + guide.readTime + ' mins'"
+        :date="guide?.publishedAt"
+        :authors="[
+          {
+            name: 'Virify',
+            avatar: {
+              src: '/android-chrome-96x96.png',
+              alt: 'Virify',
+            }
+          }
 
-    <section v-if="category && visibleGuides.length > 0">
-      <MoleculesGuideGrid>
-        <MoleculesGuideCard v-for="guide in visibleGuides" :key="guide._id" :title="guide.title"
-          :to="`/guides/${categorySlug}/${guide.slug.current}`" :excerpt="guide.excerpt" :read-time="guide.readTime"
-          :updated-at="guide._updatedAt" :is-featured="guide.isFeatured" :image="guide.heroImage" />
-      </MoleculesGuideGrid>
-    </section>
-
-    <section v-if="fullGuides.length > 0 && visibleGuides.length === 0">
-      <div class="| body-md">
-        No guide categories found.
-      </div>
-    </section>
-
-    <section v-if="!isWaitingListMode">
-      <div class="category-page__advert">
-        <MoleculesListingAdvert />
-      </div>
-    </section>
-    <section v-if="!isWaitingListMode">
-      <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
-    </section>
-  </div>
+        ]"
+        :image="{
+          provider: 'sanity',
+          src: guide.heroImage?.asset._ref,
+          alt: guide.heroImage?.alt || guide.title,
+          width: 600,
+          height: 400,
+          loading: index < 2 ? 'eager' : 'lazy',
+          format: 'webp',
+          quality: 85,
+          sizes: 'sm:100vw md:50vw lg:33vw',
+          preload: index === 0,
+          placeholder: '/img/preload.svg',
+        }"
+        :ui="{
+          title: 'body-md font-bold',
+          meta: 'justify-between',
+          description: 'body-sm',
+          body: 'justify-evenly',
+        }"
+      />
+    </UBlogPosts>
+  </UPageSection>
 </template>
 
 <script setup lang="ts">
 
 const route = useRoute();
 const categorySlug = route.params.category as string;
-const filteredGuides = ref<Guide[]>([]);
 
-const { isWaitingListMode } = useWaitingListMode()
 
 const { data: category } = await useSanityQuery<GuideCategory>(categoryBySlugQuery, { slug: categorySlug });
 
-const fullGuides = computed(() => {
-  return category.value?.guides || [];
-});
-
-const title = computed(() => (category.value ? category.value.title : "Category Not Found"));
-
-const description = computed(() => (category.value && category.value.description ? category.value.description : "Explore our collection of guides to help you navigate your marketing journey."));
-
-const image = computed(() => (category.value?.heroImage?.asset?._ref ? category.value?.heroImage : undefined));
-
-const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }, { label: category.value?.title || categorySlug }]);
-
-const visibleGuides = computed(() => {
-  if (filteredGuides.value.length > 0) return filteredGuides.value;
-  return fullGuides.value;
-});
 
 // SEO metadata - Nuxt SEO auto-generates CollectionPage schema
 const seoTitle = computed(() =>
@@ -107,23 +108,3 @@ useSchemaOrg([
   }
 ]);
 </script>
-
-<style scoped lang="scss">
-.category-page {
-  padding-bottom: var(--size-32);
-
-  &__breadcrumb {
-    padding: var(--size-16) 0;
-  }
-
-  &__search {
-    margin: var(--size-32) 0;
-  }
-
-  &__advert {
-    padding: var(--size-32) 0;
-    display: flex;
-    justify-content: center;
-  }
-}
-</style>
