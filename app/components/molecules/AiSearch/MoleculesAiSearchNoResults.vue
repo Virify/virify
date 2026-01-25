@@ -31,10 +31,9 @@ const props = defineProps<{
   lastSearchQuery: string;
 }>();
 
-const { searchState } = useSearchState()
+const { searchState, setQuery } = useSearchState()
 
 const location = computed(() => searchState.value?.location)
-const radius = computed(() => searchState.value?.radius)
 
 // @TODO: Consider making these dynamic based on popular searches or user preferences
 const examplePrompts = [
@@ -52,8 +51,8 @@ function searchWithPrompt(prompt: string) {
     navigateTo('/')
     return
   }
-  
-  navigateTo(createSearchURL(loc, radius.value ?? 5, prompt))
+
+  setQuery(prompt)
 }
 </script>
 
