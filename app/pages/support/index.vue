@@ -24,6 +24,7 @@
         label: 'font-bold title-xs',
         body: 'body-md'
       }"
+      class="max-w-175 m-auto"
     />
   </UPageSection>
 
@@ -68,21 +69,108 @@
         label: 'font-bold title-xs',
         body: 'body-md'
       }"
+      class="max-w-175 m-auto"
+
     />
   </UPageSection>
 
-  <div class="p-support">
-   <!-- TODO: REDO FORM TO UFORM -->
-    <section class="p-support__form section-gradient-bg">
-      <h2 class="p-support__form--title | title-xl">
-        <AtomsGradientTextRenderer :text="cmsData.SupportFormSection.title"
-          variant="light" />
-      </h2>
-      <p class="p-support__form--description | body-lg center-text">{{ cmsData.SupportFormSection.description }}</p>
+  <UPageSection
+    :title="cmsData?.SupportFormSection.title"
+    :description="cmsData?.SupportFormSection.description"
+    headline="Contact us"
+    :ui="{
+      root: 'section-gradient',
+      container: 'max-w-180 mx-auto',
+      headline: 'text-secondary',
+    }"
+  >
+    <UForm :schema="supportSchema" :state="state" class="flex flex-col gap-4">
 
-      <OrganismsFormsSupport />
-    </section>
-  </div>
+      <UFormField
+        name="name"
+        label="Name"
+        required
+        :ui="{
+          label: 'text-(--monochrome-900)'
+        }"
+      >
+        <UInput 
+          v-model="state.name" 
+          placeholder="Enter your name"        
+          class="w-full" 
+          :ui="{
+          base: 'p-3 text-(--foreground-100)'
+          }"
+        />
+      </UFormField>
+
+      <UFormField
+        name="email"
+        label="Email"
+        required
+        :ui="{
+          label: 'text-(--monochrome-900)'
+        }"
+      >
+        <UInput 
+          v-model="state.email" 
+          placeholder="you@example.com" 
+          class="w-full" 
+          :ui="{
+            base: 'p-3 text-(--foreground-100)',
+          }"
+        />
+      </UFormField>
+
+      <UFormField
+        name="subject"
+        label="Subject"
+        required
+        :ui="{
+          label: 'text-(--monochrome-900)'
+        }"
+      >
+        <USelect 
+          v-model="state.subject" 
+          :items="typeOptions" 
+          placeholder="Select subject type" 
+          class="w-full" 
+          :ui="{
+            base: 'p-3 text-(--foreground-100)',
+            trailingIcon: 'text-(--foreground-100)',
+          }"
+        />
+      </UFormField>
+
+      <UFormField
+        name="details"
+        label="Details"
+        required
+        :ui="{
+          label: 'text-(--monochrome-900)'
+        }"
+      >
+        <UTextarea 
+          v-model="state.details" 
+          placeholder="Enter your message" 
+          class="w-full" 
+          :ui="{
+            base: 'p-3 text-(--foreground-100)',
+          }"    
+        />
+      </UFormField>
+      <UButton
+        icon="i-lucide-send-horizontal"
+        type="submit"
+        label="Submit Request"
+        variant="solid"
+        loading-auto
+        block
+        size="md"
+        class="font-bold button button-monochrome mt-3!"
+      />
+    </UForm>
+  </UPageSection>
 
   <!-- final cta section -->
   <UPageCTA
@@ -99,16 +187,16 @@
         to: cmsData?.ctaSection.buttonLink || '/',
         size: 'lg',
         variant: 'solid',
-        class:
-          'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+        class: 'font-bold button button-monochrome',
       },
     ]"
   />
   
 </template>
 <script lang="ts" setup>
-
+import * as z from 'zod';
 const { data: cmsDataRef } = await useSanityQuery<SupportPage>(supportPageQuery);
+const cmsData = cmsDataRef.value!;
 
 // Ensure we have CMS data - throw error if document doesn't exist
 if (!cmsDataRef.value) {
@@ -117,9 +205,6 @@ if (!cmsDataRef.value) {
     statusMessage: 'Support page content not found in CMS',
   });
 }
-
-// Create a non-null version for the template
-const cmsData = cmsDataRef.value!;
 
 const faqItems = computed(() => {
   return cmsData.faqSection.faqs.map((faq) => ({
@@ -135,6 +220,27 @@ const dontSupportFaqItems = computed(() => {
     label: faq.question,
     content: faq.answer,
   }));
+});
+
+const typeOptions = [
+  { label: "Bug Report", value: "bug" },
+  { label: "General Issue", value: "issue" },
+  { label: "Feature Request", value: "feature" },
+  { label: "Other", value: "other" },
+];
+
+const supportSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.email('Invalid email address'),
+  subject: z.string().min(1, 'Please select a subject'),
+  details: z.string().min(1, 'Details are required'),
+});
+
+const state = reactive<z.infer<typeof supportSchema>>({
+  name: '',
+  email: '',
+  subject: '',
+  details: '',
 });
 
 // SEO metadata

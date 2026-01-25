@@ -85,13 +85,14 @@
         </UFormField>
         <UButton
           type="submit"
+          icon="i-lucide-send-horizontal"
           :label="cmsContent?.formSection?.buttonText || 'Join Now'"
           variant="solid"
           :pending="isSubmitting"
           :disabled="!state.agreedToTerms || !state.email || isSuccess"
           loading-auto
           size="xl"
-          class="font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) px-5 body-md"
+          class="font-bold button button-monochrome mt-2"
         />
       </div>
     </UForm>
@@ -216,8 +217,7 @@
         icon: 'i-lucide-mail',
         size: 'xl',
         variant: 'solid',
-        class:
-          'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+        class: 'font-bold button button-monochrome',
       },
     ]"
   />
@@ -313,8 +313,7 @@
         icon: 'i-lucide-mail',
         size: 'lg',
         variant: 'solid',
-        class:
-          'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+        class: 'font-bold button button-monochrome',
       },
     ]"
     @click="scrollToForm"
