@@ -25,6 +25,8 @@ const { data: listingData, error } = await useAsyncData(
   }
 );
 
+
+
 if (error.value) {
   throw createError({
     statusCode: 404,

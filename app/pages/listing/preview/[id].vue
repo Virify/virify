@@ -31,11 +31,12 @@ definePageMeta({
 const route = useRoute();
 
 /**
- *  Fetch and validate draft listing
+ *  Fetch and validate draft listing - reactive to route changes
  */
-async function fetchDraftListing(id: string) {
-  try {
-    const draft = await useRequestFetch()<DraftListingWithFullPayload>(`/api/draft-listings/${id}`);
+const { data: draftListingData, error } = await useAsyncData(
+  `draft-listing-${route.params.id}`,
+  async () => {
+    const draft = await useRequestFetch()<DraftListingWithFullPayload>(`/api/draft-listings/${route.params.id}`);
     if (!draft) {
       throw createError({
         statusCode: 404,
@@ -43,15 +44,21 @@ async function fetchDraftListing(id: string) {
       });
     }
     return draft;
-  } catch (error: any) {
-    throw createError({
-      statusCode: error.statusCode || 404,
-      statusMessage: 'Draft listing not found'
-    });
+  },
+  {
+    watch: [() => route.params.id]
   }
+);
+
+if (error.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Draft listing not found',
+    fatal: true
+  });
 }
 
-const draftListing = await fetchDraftListing(route.params?.id as string);
+const draftListing = computed(() => draftListingData.value);
 </script>
 
 <style scoped lang="scss">
