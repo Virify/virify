@@ -143,31 +143,44 @@ const {
  *  Set locations
  */
 const emits = defineEmits(['location-selected'])
+const { enhanceWithBoundaryPolygon } = useMap()
 
-function setLocationFromTrending(option: Partial<TrendingLocation>) {
+async function setLocationFromTrending(option: Partial<TrendingLocation>) {
   const { location } = asObject(option)
   if (location) {
-    addLocationToHistory(location as GeocodingFeature)
-    emits('location-selected', location)
+    // Enhance location with boundary polygon before adding to history
+    const enhancedLocation = await enhanceWithBoundaryPolygon(location as GeocodingFeature)
+      .catch(() => location as GeocodingFeature)
+    
+    addLocationToHistory(enhancedLocation)
+    emits('location-selected', enhancedLocation)
     suppressAutocomplete.value = true
   }
 }
 
-function setLocationFromSaved(option: Partial<UserLocation>) {
+async function setLocationFromSaved(option: Partial<UserLocation>) {
   const { geocodingFeature } = asObject(option)
 
   if (geocodingFeature) {
-    addLocationToHistory(geocodingFeature as GeocodingFeature)
-    emits('location-selected', geocodingFeature)
+    // Enhance location with boundary polygon before adding to history
+    const enhancedLocation = await enhanceWithBoundaryPolygon(geocodingFeature as GeocodingFeature)
+      .catch(() => geocodingFeature as GeocodingFeature)
+    
+    addLocationToHistory(enhancedLocation)
+    emits('location-selected', enhancedLocation)
     suppressAutocomplete.value = true
   }
 }
 
-function setLocation(option: MaybeRef<GeocodingFeature>) {
+async function setLocation(option: MaybeRef<GeocodingFeature>) {
   const rawOption = unref(option)
 
-  addLocationToHistory(rawOption)
-  emits('location-selected', rawOption)
+  // Enhance location with boundary polygon before adding to history
+  const enhancedLocation = await enhanceWithBoundaryPolygon(rawOption)
+    .catch(() => rawOption)
+
+  addLocationToHistory(enhancedLocation)
+  emits('location-selected', enhancedLocation)
   suppressAutocomplete.value = true
 }
 
