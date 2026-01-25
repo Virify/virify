@@ -170,6 +170,7 @@
 
     <client-only>
       <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
+        :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal"
         :price-type="priceType" :address="address" :property-type="property?.type?.name"
         :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
         :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
@@ -196,14 +197,6 @@ const props = defineProps<{
 
 const { trackView } = useAnalyticsTracking();
 const { isWaitingListMode } = useWaitingListMode();
-
-const similarListingsAddress = computed(() => {
-  return props.listing?.property?.address ? {
-    street: props.listing.property.address.street,
-    city: props.listing.property.address.city,
-    postcode: props.listing.property.address.postcode,
-  } : {};
-});
 
 /**
  *  Content
@@ -418,6 +411,15 @@ const isOverviewVisible = shallowRef(true);
 
 useIntersectionObserver($overview, ([entry]) => {
   isOverviewVisible.value = !!entry?.isIntersecting;
+});
+
+/**
+ *  Toggle mobile gallery visibility
+ */
+const isMobileGalleryVisible = shallowRef(false);
+
+useIntersectionObserver($mobileCarousel, ([entry]) => {
+  isMobileGalleryVisible.value = !!entry?.isIntersecting;
 });
 
 /**

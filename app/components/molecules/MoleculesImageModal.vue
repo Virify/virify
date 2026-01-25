@@ -17,10 +17,10 @@
           :key="currentIndex"
           :src="currentImage.src"
           :alt="currentImage.alt"
-          variant="gallery"
-          class="gallery-modal__image"
+          variant="marketing"
+          class="aspect-3/4 w-full"
           :class="{ 'gallery-modal__image--zoomed': isZoomed }"
-          decoding="async"
+          eager
           @click.stop="toggleZoom"
         />
       </div>
@@ -180,6 +180,7 @@ onUnmounted(() => {
     max-width: 100%;
     max-height: 100%;
     border-radius: 0;
+    aspect-ratio: auto;
     cursor: zoom-in;
     transition: transform 0.3s ease, cursor 0.2s ease;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);

@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="o-listing-mobile-banner" role="presentation" :class="{
+    <div v-show="!galleryVisible && !modalOpen" class="o-listing-mobile-banner" role="presentation" :class="{
     'o-listing-mobile-banner--expanded': isExpanded
   }">
       <div class="| container" role="presentation">
@@ -95,6 +95,8 @@
 interface Props {
   price: string
   overviewVisible?: boolean
+  galleryVisible?: boolean
+  modalOpen?: boolean
   address?: string
   priceType?: string
   propertyType?: string
@@ -122,7 +124,9 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  overviewVisible: true
+  overviewVisible: true,
+  galleryVisible: false,
+  modalOpen: false
 })
 
 /**
@@ -146,10 +150,24 @@ const additionalInfoHeight = shallowRef(0)
 const isDragging = shallowRef(false)
 const backdropIsDragging = shallowRef(false)
 
-// Auto-close when overview becomes visible again
+// Auto-close when overview becomes visible again OR gallery becomes visible OR modal opens
 watch(() => props.overviewVisible, (newValue, oldValue) => {
   if (newValue && !oldValue && isExpanded.value) {
     // Overview just became visible and banner is expanded - auto close
+    closeExpanded()
+  }
+})
+
+watch(() => props.galleryVisible, (isVisible) => {
+  if (isVisible && isExpanded.value) {
+    // Gallery is visible and banner is expanded - auto close
+    closeExpanded()
+  }
+})
+
+watch(() => props.modalOpen, (isOpen) => {
+  if (isOpen && isExpanded.value) {
+    // Modal opened and banner is expanded - auto close
     closeExpanded()
   }
 })

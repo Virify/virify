@@ -5,7 +5,7 @@
         :src="item.media[0].image!" 
         :alt="item.media[0].metadata!" 
         variant="card" 
-        class="| image-sm" 
+        class="w-full h-full aspect-4/3 object-cover" 
       />
     </div>
     <div class="listing-room-card__content | body-sm">

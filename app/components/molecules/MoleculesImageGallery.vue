@@ -12,7 +12,7 @@
             <AtomsCloudFlareImage
               :src="image.src"
               :alt="image.alt"
-              variant="card"
+              variant="gallery"
               class="m-image-gallery__image"
               :placeholder="true"
             />
