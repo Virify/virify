@@ -1,44 +1,78 @@
 <template>
+  <UPageHero
+    :title="cmsData?.hero.title || 'Join the waiting list'"
+    :description="
+      cmsData?.hero.subtitle ||
+      'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'
+    "
+    headline="Virify Support & Help Center"
+    :ui="{
+      root: 'hero-background z-2',
+      headline: 'text-secondary',
+      title: 'title-2xl text-white!',
+      description: 'text-white body-lg',
+    }"
+  />
+
+  <UPageSection
+    :title="cmsData.faqSection.title"
+    :description="cmsData.faqSection.description"
+  >
+    <UAccordion
+      :items="faqItems"
+      :ui="{
+        label: 'font-bold title-xs',
+        body: 'body-md'
+      }"
+    />
+  </UPageSection>
+
+  <UPageSection
+    :title="cmsData?.ourSupportSection.title"
+    :description="cmsData?.ourSupportSection.subtitle"
+    headline="How we can help you"
+    class="section-gradient"
+    :ui="{
+      headline: 'text-secondary'
+    }"
+  >
+    <template #features>
+      <UPageCard
+        v-for="(benefit, index) in cmsData?.ourSupportSection.benefits"
+        :key="index"
+        icon="i-lucide-info"
+        :title="benefit.title"
+        :description="benefit.description"
+        class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+        :ui="{
+          root: 'bg-primary/50! ring-0',
+          container: 'shadow-xl',
+          title: 'title-md',
+          leadingIcon: 'h-6 w-6 text-secondary',
+          description: 'body-sm',
+          body: 'flex flex-col justify-evenly',
+        }"
+      >
+      </UPageCard>
+    </template>
+  </UPageSection>
+  
+  
+  <UPageSection
+    :title="cmsData.whatWeDontSupportSection.title"
+    :description="cmsData.whatWeDontSupportSection.description"
+  >
+    <UAccordion
+      :items="dontSupportFaqItems"
+      :ui="{
+        label: 'font-bold title-xs',
+        body: 'body-md'
+      }"
+    />
+  </UPageSection>
+
   <div class="p-support">
-    <OrganismsHero :title="cmsData.hero.title"
-      :subtitle="cmsData.hero.subtitle" />
-    <!-- support faq -->
-    <section class="p-support__faq section | flow flow-lg">
-      <h2 class="p-support__faq--title | title-xl">
-        <AtomsGradientTextRenderer :text="cmsData.faqSection.title" variant="light" />
-      </h2>
-      <OrganismsFaq
-        :description="cmsData.faqSection.description"
-        :items="cmsData.faqSection.faqs" />
-    </section>
-    <section class="section-gradient-bg">
-      <h2 class="title-xl">
-        <AtomsGradientTextRenderer :text="cmsData.ourSupportSection.title" variant="light" />
-        <div class="p-support__info | container">
-          <AtomsHeroCard
-            v-for="(benefit, index) in cmsData.ourSupportSection.benefits"
-            :key="index"
-            :variant="benefit.variant">
-            <h3 class="title-md">
-              <AtomsGradientTextRenderer :text="benefit.title" variant="dark" />
-            </h3>
-            <p class="body-md">{{ benefit.description }}</p>
-          </AtomsHeroCard>
-        </div>
-
-      </h2>
-
-    </section>
-    <!-- Things we cant help with -->
-    <section class="p-support__faq section | flow flow-lg">
-      <h2 class="p-support__faq--title | title-xl">
-        <AtomsGradientTextRenderer :text="cmsData.whatWeDontSupportSection.title" variant="light" />
-      </h2>
-      <OrganismsFaq
-        :description="cmsData.whatWeDontSupportSection.description"
-        :items="cmsData.whatWeDontSupportSection.faqs" />
-    </section>
-    <!-- support form -->
+   <!-- TODO: REDO FORM TO UFORM -->
     <section class="p-support__form section-gradient-bg">
       <h2 class="p-support__form--title | title-xl">
         <AtomsGradientTextRenderer :text="cmsData.SupportFormSection.title"
@@ -48,15 +82,29 @@
 
       <OrganismsFormsSupport />
     </section>
-    <section>
-      <MoleculesCtaSection
-        :title="cmsData.ctaSection.title"
-        :description="cmsData.ctaSection.description"
-        :buttonText="cmsData.ctaSection.buttonText"
-        :to="cmsData.ctaSection.buttonLink"
-        />
-    </section>
   </div>
+
+  <!-- final cta section -->
+  <UPageCTA
+    :title="cmsData?.ctaSection.title"
+    :description="cmsData?.ctaSection.description"
+    :ui="{
+      root: 'rounded-none ring-0',
+    }"
+    :links="[
+      {
+        label: cmsData?.ctaSection.buttonText || 'Contact Us',
+        color: 'neutral',
+        icon: 'i-lucide-mail',
+        to: cmsData?.ctaSection.buttonLink || '/',
+        size: 'lg',
+        variant: 'solid',
+        class:
+          'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
+      },
+    ]"
+  />
+  
 </template>
 <script lang="ts" setup>
 
@@ -72,6 +120,22 @@ if (!cmsDataRef.value) {
 
 // Create a non-null version for the template
 const cmsData = cmsDataRef.value!;
+
+const faqItems = computed(() => {
+  return cmsData.faqSection.faqs.map((faq) => ({
+    id: useId(),
+    label: faq.question,
+    content: faq.answer,
+  }));
+});
+
+const dontSupportFaqItems = computed(() => {
+  return cmsData.whatWeDontSupportSection.faqs.map((faq) => ({
+    id: useId(),
+    label: faq.question,
+    content: faq.answer,
+  }));
+});
 
 // SEO metadata
 const seoData = computed(() => {
