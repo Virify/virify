@@ -176,7 +176,7 @@ function resetAnimation() {
 
 .homepage-typing {
   position: relative;
-  padding: var(--size-24);
+  padding: var(--size-28);
   background: var(--background-200);
   border-radius: var(--border-radius-3xl);
   border: 2px solid rgba(red, 0.1);
@@ -203,8 +203,10 @@ function resetAnimation() {
   &__text {
     @extend %animation-height;
 
-    padding: var(--size-24) var(--size-32);
-    border-radius: var(--border-radius-xl);
+    --gradient-box-radius: var(--border-radius-xl);
+
+    padding: var(--size-20) var(--size-28);
+    border-radius: var(--gradient-box-radius);
 
     em {
       font-style: normal;
