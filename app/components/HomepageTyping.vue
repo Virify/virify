@@ -70,7 +70,7 @@ const keywords = [
 /**
  *  Typing animation
  */
-const { text, animateText, resetText } = useTypingAnimation('Show me 3 bedroom houses for sale with south-facing gardens, close to hospital and within 1 mile of a gym and park with a downstairs bathroom and renewable energy source')
+const { text, animateText, resetText, isTyping } = useTypingAnimation('Show me 3 bedroom houses for sale with south-facing gardens, close to hospital and within 1 mile of a gym and park with a downstairs bathroom and renewable energy source')
 
 function typingAnimation() {
   resetHighlights(true)
@@ -108,9 +108,15 @@ function runHighlightWords() {
   resetHighlights(true)
 
   interval = setInterval(() => {
-    if (wordsHighlighted.value >= words.length) {
+    if (wordsHighlighted.value >= words.value.length) {
       resetHighlights()
+
+      return
     }
+
+    // Avoiding highlighting text whilst typing animation as occurring
+    // as it can look quite jarring
+    if (isTyping.value) return
 
     wordsHighlighted.value += 1
   }, 20)

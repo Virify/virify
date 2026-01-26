@@ -1,5 +1,6 @@
 export default function useTypingAnimation(originalText: string) {
   const typedText = shallowRef(' ')
+  const isTyping = shallowRef(false)
 
   let interval: NodeJS.Timeout
 
@@ -13,12 +14,16 @@ export default function useTypingAnimation(originalText: string) {
 
     let tickCounter = 0
 
+    isTyping.value = true
+
     interval = setInterval(() => {
       typedText.value += originalText[tickCounter]
 
       tickCounter++
 
       if (tickCounter >= originalText.length) {
+        isTyping.value = false
+
         resetText()
       }
     }, 25)
@@ -26,6 +31,7 @@ export default function useTypingAnimation(originalText: string) {
 
   return {
     text: typedText,
+    isTyping,
     animateText,
     resetText
   }
