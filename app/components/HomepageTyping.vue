@@ -250,8 +250,7 @@ function resetAnimation() {
     justify-content: center;
     gap: var(--size-6);
     font-size: var(--font-2xs);
-    line-height: 1em;
-    white-space: nowrap;
+    line-height: 1.4em;
     border: 1px solid var(--input-text-border);
     border-radius: var(--border-radius-pill);
     padding: var(--size-6) var(--size-12);
@@ -263,6 +262,7 @@ function resetAnimation() {
       width: var(--size-18);
       height: var(--size-18);
       color: var(--secondary-400);
+      flex: 1 0 auto;
     }
   }
 }
