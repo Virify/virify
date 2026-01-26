@@ -1,18 +1,15 @@
 import sendSupportRequest from '../../../layers/email/server/email/send-support-request';
 import * as z from 'zod';
 
-const supportRequestSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.email('Invalid email format'),
-  type: z.enum(['bug', 'issue', 'feature', 'other'], 'Invalid support request type'),
-  details: z.string().min(1, 'Details are required'),
-  turnstileToken: z.string().min(1, 'Turnstile token is required')
+const supportSchemaWithToken = supportSchema.extend({
+  turnstileToken: z.string().min(1, 'Turnstile token is required'),
 });
+
 
 export default defineEventHandler(async (event) => {
   try {
     // Get the request body
-    const { name, email, type, details, turnstileToken } = await readValidatedBody(event, supportRequestSchema.parse);
+    const { name, email, subject, details, turnstileToken } = await readValidatedBody(event, supportSchemaWithToken.parse);
     
     // Verify Turnstile token
     const clientIp = getRequestIP(event, { xForwardedFor: true }) || "";
@@ -27,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
     // Validate type
     const validTypes = ['bug', 'issue', 'feature', 'other'];
-    if (!validTypes.includes(type)) {
+    if (!validTypes.includes(subject)) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Invalid support request type'
@@ -38,7 +35,7 @@ export default defineEventHandler(async (event) => {
     await sendSupportRequest(
       name,
       email,
-      type,
+      subject,
       details
     );
     

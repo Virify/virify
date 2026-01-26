@@ -13,10 +13,13 @@
       description: 'text-white body-lg',
     }"
   />
-
+  <!-- Faq section -->
   <UPageSection
     :title="cmsData.faqSection.title"
     :description="cmsData.faqSection.description"
+    :ui="{
+      description: 'max-w-180 mx-auto',
+    }"
   >
     <UAccordion
       :items="faqItems"
@@ -24,10 +27,10 @@
         label: 'font-bold title-xs',
         body: 'body-md'
       }"
-      class="max-w-175 m-auto"
+      class="max-w-170 m-auto"
     />
   </UPageSection>
-
+  <!-- our support section -->
   <UPageSection
     :title="cmsData?.ourSupportSection.title"
     :description="cmsData?.ourSupportSection.subtitle"
@@ -57,11 +60,13 @@
       </UPageCard>
     </template>
   </UPageSection>
-  
-  
+  <!-- what we don't support section -->
   <UPageSection
     :title="cmsData.whatWeDontSupportSection.title"
     :description="cmsData.whatWeDontSupportSection.description"
+    :ui="{
+      description: 'max-w-180 mx-auto',
+    }"
   >
     <UAccordion
       :items="dontSupportFaqItems"
@@ -69,11 +74,11 @@
         label: 'font-bold title-xs',
         body: 'body-md'
       }"
-      class="max-w-175 m-auto"
+      class="max-w-170 m-auto"
 
     />
   </UPageSection>
-
+  <!-- support form section -->
   <UPageSection
     :title="cmsData?.SupportFormSection.title"
     :description="cmsData?.SupportFormSection.description"
@@ -84,8 +89,13 @@
       headline: 'text-secondary',
     }"
   >
-    <UForm :schema="supportSchema" :state="state" class="flex flex-col gap-4">
-
+    <UForm 
+      :schema="supportSchema" 
+      :state="state" 
+      class="flex flex-col gap-4"
+      @submit="handleSubmit"
+    >
+      <!-- name -->
       <UFormField
         name="name"
         label="Name"
@@ -99,11 +109,11 @@
           placeholder="Enter your name"        
           class="w-full" 
           :ui="{
-          base: 'p-3 text-(--foreground-100)'
+          base: 'p-3 text-(--foreground-100) focus:ring-secondary!'
           }"
         />
       </UFormField>
-
+      <!-- email -->
       <UFormField
         name="email"
         label="Email"
@@ -117,11 +127,11 @@
           placeholder="you@example.com" 
           class="w-full" 
           :ui="{
-            base: 'p-3 text-(--foreground-100)',
+            base: 'p-3 text-(--foreground-100) focus:ring-secondary!',
           }"
         />
       </UFormField>
-
+      <!-- select -->
       <UFormField
         name="subject"
         label="Subject"
@@ -134,14 +144,16 @@
           v-model="state.subject" 
           :items="typeOptions" 
           placeholder="Select subject type" 
+          variant="subtle"
           class="w-full" 
           :ui="{
-            base: 'p-3 text-(--foreground-100)',
+            base: 'p-3 text-(--foreground-100) focus:ring-secondary!',
             trailingIcon: 'text-(--foreground-100)',
+            value: 'text-(--foreground-100)',
           }"
         />
       </UFormField>
-
+      <!-- details -->
       <UFormField
         name="details"
         label="Details"
@@ -155,23 +167,30 @@
           placeholder="Enter your message" 
           class="w-full" 
           :ui="{
-            base: 'p-3 text-(--foreground-100)',
+            base: 'p-3 text-(--foreground-100) focus:ring-secondary!',
           }"    
         />
       </UFormField>
+
+      <!-- Cloudflare Turnstile -->
+      <div class="o-support-form__turnstile">
+        <div ref="turnstileEl"></div>
+      </div>
+
+      <!-- submit -->
       <UButton
         icon="i-lucide-send-horizontal"
         type="submit"
         label="Submit Request"
         variant="solid"
-        loading-auto
+        :loading="isPending"
+        :disabled="disableButton || isPending"
         block
         size="md"
         class="font-bold button button-monochrome mt-3!"
       />
     </UForm>
   </UPageSection>
-
   <!-- final cta section -->
   <UPageCTA
     :title="cmsData?.ctaSection.title"
@@ -194,9 +213,86 @@
   
 </template>
 <script lang="ts" setup>
-import * as z from 'zod';
+const { turnstileToken, turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 const { data: cmsDataRef } = await useSanityQuery<SupportPage>(supportPageQuery);
 const cmsData = cmsDataRef.value!;
+const toast = useToast();
+const { isPending, setPendingWhile } = usePending();
+
+onMounted(() => {
+  initializeTurnstile();
+});
+
+const typeOptions = [
+  { label: "Bug Report", value: "bug" },
+  { label: "General Issue", value: "issue" },
+  { label: "Feature Request", value: "feature" },
+  { label: "Other", value: "other" },
+];
+
+const state = reactive({
+  name: '',
+  email: '',
+  subject: undefined as "bug" | "issue" | "feature" | "other" | undefined,
+  details: '',
+});
+
+async function handleSubmit() {
+  await setPendingWhile(async () => {
+    try {
+      await executeTurnstile();
+      
+      const response = await $fetch('/api/support', {
+        method: 'POST',
+        body: {
+          ...state,
+          turnstileToken: turnstileToken.value,
+        },
+      });
+
+      if (response.success) {
+        toast.add({ 
+          title: 'Success', 
+          description: 'Your support request has been submitted successfully!', 
+          color: 'success', 
+          icon: 'i-lucide-check-circle' 
+        });
+        resetForm();
+      } else {
+        toast.add({ 
+          title: 'Error', 
+          description: 'There was an issue submitting your request. Please try again later.', 
+          color: 'error', 
+          icon: 'i-lucide-alert-circle' 
+        });
+        resetTurnstile();
+      }
+    } catch (error) {
+      console.error('Support form submission error:', error);
+      toast.add({ 
+        title: 'Error', 
+        description: 'An unexpected error occurred. Please try again later.', 
+        color: 'error', 
+        icon: 'i-lucide-alert-circle' 
+      });
+      resetTurnstile();
+    }
+  });
+}
+
+function resetForm() {
+  state.name = '';
+  state.email = '';
+  state.subject = undefined;
+  state.details = '';
+  resetTurnstile();
+}
+
+const disableButton = computed(() => {
+  return (
+    supportSchema.safeParse(state).success === false
+  );
+});
 
 // Ensure we have CMS data - throw error if document doesn't exist
 if (!cmsDataRef.value) {
@@ -220,27 +316,6 @@ const dontSupportFaqItems = computed(() => {
     label: faq.question,
     content: faq.answer,
   }));
-});
-
-const typeOptions = [
-  { label: "Bug Report", value: "bug" },
-  { label: "General Issue", value: "issue" },
-  { label: "Feature Request", value: "feature" },
-  { label: "Other", value: "other" },
-];
-
-const supportSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.email('Invalid email address'),
-  subject: z.string().min(1, 'Please select a subject'),
-  details: z.string().min(1, 'Details are required'),
-});
-
-const state = reactive<z.infer<typeof supportSchema>>({
-  name: '',
-  email: '',
-  subject: '',
-  details: '',
 });
 
 // SEO metadata
@@ -280,48 +355,8 @@ useHead({
     },
   ],
 });
+
+onUnmounted(() => {
+  cleanupTurnstile();
+});
 </script>
-<style lang="scss" scoped>
-@use "#styles/3-elements/sections" as *;
-
-.p-support {
-  .section {
-    @include section-padding();
-  }
-
-  .section-gradient-bg {
-    @include section-gradient();
-  }
-
-  &__faq {
-    &--title {
-      text-align: center;
-      margin-bottom: var(--size-48);
-    }
-  }
-
-  &__info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--size-24);
-    margin-top: var(--size-48);
-    margin-bottom: var(--size-48);
-    max-width: 1200px;
-    text-align: left;
-    font-weight: normal;
-  }
-
-  &__form {
-    &--title {
-      text-align: center;
-      margin-bottom: var(--size-16);
-    }
-
-    &--description {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto 48px auto;
-    }
-  }
-}
-</style>

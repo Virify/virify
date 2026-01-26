@@ -353,7 +353,6 @@ const state = reactive<Schema>({
 });
 
 async function handleSubmit() {
-  isSubmitting.value = true;
   try {
     const response = await $fetch<{
       success: boolean;
@@ -377,8 +376,6 @@ async function handleSubmit() {
     }
   } catch (error: any) {
     console.error("Waiting list signup error:", error);
-  } finally {
-    isSubmitting.value = false;
   }
 }
 
