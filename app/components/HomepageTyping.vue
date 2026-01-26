@@ -1,52 +1,54 @@
 <template>
-  <div class="homepage-typing">
+  <div>
     <!-- START DEBUGGER -->
     <div style="display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0 0 2rem;l">
-      <h3 style="margin: 0; width: 100%">Debug</h3>
-
-      <button class="| button button-secondary button-xs" @click.prevent="animateText">
-        Animate!
+      <button class="| button button-secondary button-xs" @click.prevent="typingAnimation">
+        Show typing
       </button>
 
-      <button class="| button button-secondary button-xs" @click.prevent="runHighlightWords">Highlight!</button>
-
-      <button class="| button button-secondary button-xs" @click.prevent="resetText">
-        Reset typing!
+      <button class="| button button-secondary button-xs" @click.prevent="runHighlightWords">
+        Show highlights
       </button>
 
-      <button class="| button button-secondary button-xs" @click.prevent="resetHighlights">
-        Reset highlights!
+      <button class="| button button-secondary button-xs" @click.prevent="showSuggestions">
+        Show suggestions
       </button>
 
-      <button class="| button button-secondary button-xs" @click.prevent="toggleSuggestionsVisible">
-        Toggle suggestions
+      <button class="| button button-delete button-xs" @click.prevent="resetAnimation">
+        Reset
       </button>
     </div>
     <!-- END DEBUGGER -->
 
-    <h3 class="| title-sm">Describe your new home</h3>
+    <!-- REAL CONTENT -->
 
-    <p v-cloak class="homepage-typing__text | gradient-box">
-      <template v-for="{ word, isKeywords }, index of words">
-        <em v-if="isKeywords" :class="{
-          'highlighted': index <= wordsHighlighted
-        }">
-          {{ word }}
-        </em>
-        <template v-else>
-          {{ word }}
+    <div class="homepage-typing">
+      <h3 class="| title-sm">Describe your new home</h3>
+
+      <p v-cloak class="homepage-typing__text | gradient-box">
+        <template v-for="{ word, isKeywords }, index of words">
+          <em v-if="isKeywords" :class="{
+            'highlighted': index <= wordsHighlighted
+          }">
+            {{ word }}
+          </em>
+          <template v-else>
+            {{ word }}
+          </template>
         </template>
-      </template>
-      <span class="homepage-typing__text-cursor">_</span>
-    </p>
+        <span class="homepage-typing__text-cursor">_</span>
+      </p>
 
-    <ul v-show="isSuggestionsVisible" class="homepage-typing__suggestions">
-      <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-typing__suggestion"
-        :style="{ animationDelay: index * 40 + 'ms' }">
-        <AtomsIcon icon="ai/prompt" />
-        {{ suggestion }}
-      </li>
-    </ul>
+      <ul v-show="isSuggestionsVisible" class="homepage-typing__suggestions">
+        <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-typing__suggestion"
+          :style="{ animationDelay: index * 40 + 'ms' }">
+          <AtomsIcon icon="ai/prompt" />
+          {{ suggestion }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- END REAL CONTENT -->
   </div>
 </template>
 
@@ -70,6 +72,10 @@ const keywords = [
  */
 const { text, animateText, resetText } = useTypingAnimation('Show me 3 bedroom houses for sale with south-facing gardens, close to hospital and within 1 mile of a gym and park with a downstairs bathroom and renewable energy source')
 
+function typingAnimation() {
+  resetHighlights(true)
+  animateText()
+}
 
 /**
  *  Split words by keyword, so they can be highlighted later on
@@ -129,8 +135,21 @@ const suggestions = [
 
 const isSuggestionsVisible = ref(false)
 
-function toggleSuggestionsVisible() {
-  isSuggestionsVisible.value = !isSuggestionsVisible.value
+function showSuggestions() {
+  isSuggestionsVisible.value = true
+}
+
+function hideSuggestions() {
+  isSuggestionsVisible.value = false
+}
+
+/**
+ *  Reset
+ */
+function resetAnimation() {
+  resetText(true)
+  resetHighlights(true)
+  hideSuggestions()
 }
 
 </script>
@@ -232,7 +251,7 @@ function toggleSuggestionsVisible() {
     padding: var(--size-6) var(--size-12);
     padding-left: var(--size-8);
     font-weight: var(--font-semibold);
-    animation: fadeSuggestionIn var(--animation-subtle) var(--ease-in-out) backwards;
+    animation: fadeSuggestionIn var(--animation-veryslow) var(--ease-in-out) backwards;
 
     svg {
       width: var(--size-18);
