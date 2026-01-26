@@ -37,3 +37,15 @@
     auto 120%,
     cover;
 }
+
+.hero-background {
+  @include section-gradient-bg();
+  @include mq.tablet {
+    @include hero-background();
+  }
+  
+}
+
+.section-gradient {
+  @include section-gradient-bg();
+}

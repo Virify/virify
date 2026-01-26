@@ -1,326 +1,323 @@
 <template>
-  <div class="waiting-list-page">
-    <UPageHero
-      :title="cmsContent?.hero.title || 'Join the waiting list'"
-      :description="
-        cmsContent?.hero.subtitle ||
-        'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'
-      "
-      headline="Join the waiting list"
-      :orientation="isWaitingListMode ? 'horizontal' : 'vertical'"
-      :ui="{
-        root: 'hero-gradient-bg z-2',
-        headline: 'text-secondary',
-        title: 'title-2xl text-white!',
-        description: 'text-white body-lg',
-      }"
+  <UPageHero
+    :title="cmsContent?.hero.title || 'Join the waiting list'"
+    :description="
+      cmsContent?.hero.subtitle ||
+      'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'
+    "
+    headline="Join the waiting list"
+    :orientation="isWaitingListMode ? 'horizontal' : 'vertical'"
+    :ui="{
+      root: 'hero-background z-2',
+      headline: 'text-secondary',
+      title: 'title-2xl text-white!',
+      description: 'text-white body-lg',
+    }"
+  >
+    <div
+      v-if="isWaitingListMode"
+      class="flex justify-center items-center w-full px-4 sm:px-6"
     >
-      <div
-        v-if="isWaitingListMode"
-        class="flex justify-center items-center w-full px-4 sm:px-6"
-      >
-        <MoleculesImageSwap
-          front-image="/img/natural_lang.png"
-          back-image="/img/traditional.png"
-          front-label="Natural Language"
-          back-label="Traditional Search"
-          class="w-full max-w-2xl"
+      <MoleculesImageSwap
+        front-image="/img/natural_lang.png"
+        back-image="/img/traditional.png"
+        front-label="Natural Language"
+        back-label="Traditional Search"
+        class="w-full max-w-2xl"
+      />
+    </div>
+    <div v-else class="max-w-200 w-full m-auto">
+      <OrganismsDockBanner listingType="all" />
+    </div>
+  </UPageHero>
+
+  <!-- sign up form -->
+  <UPageSection
+    :title="cmsContent?.formSection.title || 'Join the Waiting List'"
+    :description="
+      cmsContent?.formSection.description || 'Be the first to know'
+    "
+    headline="Stay updated"
+    :ui="{
+      title: 'title-md',
+      headline: 'text-secondary/90!',
+    }"
+  >
+    <UForm
+      :schema="signupSchema"
+      :state="state"
+      class="max-w-200 w-full m-auto flex flex-col items-start gap-4"
+      @submit="handleSubmit"
+    >
+      <UFormField name="email" label="Email Address" required class="w-full">
+        <UInput
+          v-model="state.email"
+          type="email"
+          :disabled="isSubmitting || isSuccess"
+          placeholder="Enter your email"
+          trailingIcon="i-lucide-mail"
+          class="w-full"
+          :ui="{
+            base: 'p-3 focus:ring-secondary!',
+          }"
         />
-      </div>
-      <div v-else class="max-w-200 w-full m-auto">
-        <OrganismsDockBanner listingType="all" />
-      </div>
-    </UPageHero>
-
-    <!-- sign up form -->
-    <UPageSection
-      :title="cmsContent?.formSection.title || 'Join the Waiting List'"
-      :description="
-        cmsContent?.formSection.description || 'Be the first to know'
-      "
-      headline="Stay updated"
-      :ui="{
-        title: 'title-md',
-        headline: 'text-secondary/90!',
-      }"
-    >
-      <UForm
-        :schema="signupSchema"
-        :state="state"
-        class="max-w-200 w-full m-auto flex flex-col items-start gap-4"
-        @submit="handleSubmit"
-      >
-        <UFormField name="email" label="Email Address" required class="w-full">
-          <UInput
-            v-model="state.email"
-            type="email"
+      </UFormField>
+      <div class="flex flex-col md:flex-row justify-between w-full gap-4">
+        <UFormField name="agreedToTerms">
+          <UCheckbox
+            v-model="state.agreedToTerms"
             :disabled="isSubmitting || isSuccess"
-            placeholder="Enter your email"
-            trailingIcon="i-lucide-mail"
-            class="w-full"
             :ui="{
-              base: 'p-3 focus:ring-secondary!',
-            }"
-          />
-        </UFormField>
-        <div class="flex flex-col md:flex-row justify-between w-full gap-4">
-          <UFormField name="agreedToTerms">
-            <UCheckbox
-              v-model="state.agreedToTerms"
-              :disabled="isSubmitting || isSuccess"
-              :ui="{
-                indicator: 'bg-secondary',
-              }"
-            >
-              <template #label>
-                <span class="body-sm">
-                  I agree to the
-                  <NuxtLink to="/terms" class="link"
-                    >Terms & Conditions</NuxtLink
-                  >
-                  and
-                  <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
-                </span>
-              </template>
-            </UCheckbox>
-          </UFormField>
-          <UButton
-            type="submit"
-            :label="cmsContent?.formSection?.buttonText || 'Join Now'"
-            variant="solid"
-            :pending="isSubmitting"
-            :disabled="!state.agreedToTerms || !state.email || isSuccess"
-            loading-auto
-            size="xl"
-            class="font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) px-5 body-md"
-          />
-        </div>
-      </UForm>
-    </UPageSection>
-
-    <!-- Features -->
-    <UPageCTA
-      v-for="(section, index) in processedFeatureSections"
-      :key="`feature-${index}`"
-      :title="section.title"
-      :description="section.subtitle"
-      orientation="horizontal"
-      variant="soft"
-      :class="index % 2 === 0 ? 'section-gradient-bg' : ''"
-      :reverse="index % 2 !== 0"
-      :ui="{
-        body: 'border-0 radius-0',
-        root: 'rounded-none',
-        title: 'text-secondary/90!',
-        description: 'body-md',
-      }"
-    >
-      <template #body>
-        <div class="flex flex-col gap-4">
-          <UPageFeature
-            v-for="(feature, idx) in section.features"
-            :key="`feature-${index}-${idx}`"
-            icon="i-lucide-info"
-            :title="feature.title"
-            :description="feature.description"
-            :ui="{
-              description: 'body-sm',
-              leadingIcon: 'text-secondary h-6 w-6',
+              indicator: 'bg-secondary',
             }"
           >
-          </UPageFeature>
-        </div>
-      </template>
-
-      <AtomsCloudFlareImage
-        v-if="section.image"
-        :src="section.image"
-        :alt="section.imageAlt"
-        class="h-auto w-full"
-      />
-    </UPageCTA>
-
-    <!-- sellers section -->
-    <UPageSection
-      :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
-      :description="cmsContent?.sellersBenefits.subtitle || ''"
-      headline="Your in control"
-      :ui="{
-        headline: 'text-secondary/90!',
-        body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
-      }"
-    >
-      <template #body>
-        <UPageCard
-          v-for="(feature, index) in cmsContent?.sellersBenefits.features"
-          :key="index"
-          :title="feature.title"
-          :description="feature.description"
-          variant="subtle"
-          spotlight
-          spotlight-color="primary"
-          icon="i-lucide-chart-no-axes-gantt"
-          :ui="{
-            title: 'text-secondary/90!',
-            leadingIcon: 'h-6 w-6 text-secondary',
-            description: 'body-sm',
-          }"
+            <template #label>
+              <span class="body-sm">
+                I agree to the
+                <NuxtLink to="/terms" class="link"
+                  >Terms & Conditions</NuxtLink
+                >
+                and
+                <NuxtLink to="/privacy" class="link">Privacy Policy</NuxtLink>
+              </span>
+            </template>
+          </UCheckbox>
+        </UFormField>
+        <UButton
+          type="submit"
+          icon="i-lucide-send-horizontal"
+          :label="cmsContent?.formSection?.buttonText || 'Join Now'"
+          variant="solid"
+          :pending="isSubmitting"
+          :disabled="!state.agreedToTerms || !state.email || isSuccess"
+          loading-auto
+          size="xl"
+          class="font-bold button button-monochrome mt-2"
         />
-      </template>
-    </UPageSection>
+      </div>
+    </UForm>
+  </UPageSection>
 
-    <!-- buyers section -->
-    <UPageSection
-      :title="cmsContent?.buyersBenefits.title || 'What we offer buyers'"
-      :description="cmsContent?.buyersBenefits.subtitle || ''"
-      headline="Get the best results"
-      :ui="{
-        root: 'section-gradient-bg',
-        headline: 'text-secondary/90!',
-        body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
-      }"
-    >
-      <template #body>
-        <UPageCard
-          v-for="(feature, index) in cmsContent?.buyersBenefits.features"
-          :key="index"
-          :title="feature.title"
-          :description="feature.description"
-          variant="subtle"
-          spotlight
-          spotlight-color="secondary"
-          icon="i-lucide-chart-no-axes-gantt"
-          :ui="{
-            spotlight: 'bg-primary/50!',
-            root: 'bg-primary/50! ring-primary/60',
-            container: 'border-secondary!',
-            title: 'text-secondary/90!',
-            leadingIcon: 'h-6 w-6 text-secondary',
-            description: 'body-sm',
-          }"
-        />
-      </template>
-    </UPageSection>
-
-    <!-- contact us cta -->
-    <UPageCTA
-      :title="cmsContent?.contactSection.title"
-      :description="cmsContent?.contactSection.description"
-      :ui="{
-        root: 'rounded-none ring-0',
-      }"
-      :links="[
-        {
-          label: cmsContent?.contactSection.buttonText || 'Contact Us',
-          to: '/contact',
-          color: 'neutral',
-          icon: 'i-lucide-mail',
-          size: 'xl',
-          variant: 'solid',
-          class:
-            'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
-        },
-      ]"
-    />
-
-    <UPageSection
-      :title="cmsContent?.earlyAccessBenefits.title"
-      :description="cmsContent?.earlyAccessBenefits.subtitle"
-      headline="Early Access Benefits"
-      class="section-gradient-bg"
-    >
-      <template #features>
-        <UPageCard
-          v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
-          :key="index"
+  <!-- Features -->
+  <UPageCTA
+    v-for="(section, index) in processedFeatureSections"
+    :key="`feature-${index}`"
+    :title="section.title"
+    :description="section.subtitle"
+    orientation="horizontal"
+    variant="soft"
+    :class="index % 2 === 0 ? 'section-gradient' : ''"
+    :reverse="index % 2 !== 0"
+    :ui="{
+      body: 'border-0 radius-0',
+      root: 'rounded-none',
+      title: 'text-secondary/90!',
+      description: 'body-md',
+    }"
+  >
+    <template #body>
+      <div class="flex flex-col gap-4">
+        <UPageFeature
+          v-for="(feature, idx) in section.features"
+          :key="`feature-${index}-${idx}`"
           icon="i-lucide-info"
-          :title="benefit.title"
-          :description="benefit.description"
-          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :title="feature.title"
+          :description="feature.description"
           :ui="{
-            root: 'bg-primary/50! ring-0',
-            container: 'shadow-xl',
-            title: 'title-md',
-            leadingIcon: 'h-6 w-6 text-secondary',
             description: 'body-sm',
-            body: 'flex flex-col justify-evenly',
+            leadingIcon: 'text-secondary h-6 w-6',
           }"
         >
-        </UPageCard>
-      </template>
-    </UPageSection>
+        </UPageFeature>
+      </div>
+    </template>
 
-    <!-- guides -->
-    <UPageSection
-      :title="cmsContent?.guidesSection?.title"
-      :description="cmsContent?.guidesSection?.description"
-      headline="Helpful Guides"
-      :ui="{
-        headline: 'text-secondary',
-      }"
-    >
-      <UBlogPosts>
-        <UBlogPost
-          v-for="(guide, index) in cmsContent?.guidesSection?.guides"
-          :key="index"
-          variant="subtle"
-          :title="guide.title"
-          :description="guide.excerpt"
-          :to="
-            'guides/' + guide.category.slug.current + '/' + guide.slug.current
-          "
-          :badge="'Read Time: ' + guide.readTime + ' mins'"
-          :date="guide.publishedAt"
-          :authors="[
-            {
-              name: 'Virify',
-              avatar: {
-                src: '/android-chrome-96x96.png',
-                alt: 'Virify',
-              }
-            }
-
-          ]"
-          :image="{
-            provider: 'sanity',
-            src: guide.heroImage?.asset._ref,
-            alt: guide.heroImage?.alt || guide.title,
-            width: 800,
-            height: 600,
-            loading: index < 3 ? 'eager' : 'lazy',
-          }"
-          :ui="{
-            title: 'body-md font-bold',
-            meta: 'justify-between',
-            description: 'body-sm',
-            body: 'justify-evenly',
-          }"
-        />
-      </UBlogPosts>
-    </UPageSection>
-
-    <!-- final cta section -->
-    <UPageCTA
-      :title="cmsContent?.finalCta.title"
-      :description="cmsContent?.finalCta.description"
-      :ui="{
-        root: 'rounded-none ring-0',
-      }"
-      class="section-gradient-bg"
-      :links="[
-        {
-          label: cmsContent?.finalCta.buttonText || 'Contact Us',
-          color: 'neutral',
-          icon: 'i-lucide-mail',
-          size: 'lg',
-          variant: 'solid',
-          class:
-            'font-bold rounded-full bg-(--monochrome-100) text-(--monochrome-900)! hover:bg-(--blue-500) p-4',
-        },
-      ]"
-      @click="scrollToForm"
+    <AtomsCloudFlareImage
+      v-if="section.image"
+      :src="section.image"
+      :alt="section.imageAlt"
+      class="h-auto w-full"
     />
-  </div>
+  </UPageCTA>
+
+  <!-- sellers section -->
+  <UPageSection
+    :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
+    :description="cmsContent?.sellersBenefits.subtitle || ''"
+    headline="Your in control"
+    :ui="{
+      headline: 'text-secondary/90!',
+      body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
+    }"
+  >
+    <template #body>
+      <UPageCard
+        v-for="(feature, index) in cmsContent?.sellersBenefits.features"
+        :key="index"
+        :title="feature.title"
+        :description="feature.description"
+        variant="subtle"
+        spotlight
+        spotlight-color="primary"
+        icon="i-lucide-chart-no-axes-gantt"
+        :ui="{
+          title: 'text-secondary/90!',
+          leadingIcon: 'h-6 w-6 text-secondary',
+          description: 'body-sm',
+        }"
+      />
+    </template>
+  </UPageSection>
+
+  <!-- buyers section -->
+  <UPageSection
+    :title="cmsContent?.buyersBenefits.title || 'What we offer buyers'"
+    :description="cmsContent?.buyersBenefits.subtitle || ''"
+    headline="Get the best results"
+    :ui="{
+      root: 'section-gradient',
+      headline: 'text-secondary/90!',
+      body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
+    }"
+  >
+    <template #body>
+      <UPageCard
+        v-for="(feature, index) in cmsContent?.buyersBenefits.features"
+        :key="index"
+        :title="feature.title"
+        :description="feature.description"
+        variant="subtle"
+        spotlight
+        spotlight-color="secondary"
+        icon="i-lucide-chart-no-axes-gantt"
+        :ui="{
+          spotlight: 'bg-primary/50!',
+          root: 'bg-primary/50! ring-primary/60',
+          container: 'border-secondary!',
+          title: 'text-secondary/90!',
+          leadingIcon: 'h-6 w-6 text-secondary',
+          description: 'body-sm',
+        }"
+      />
+    </template>
+  </UPageSection>
+
+  <!-- contact us cta -->
+  <UPageCTA
+    :title="cmsContent?.contactSection.title"
+    :description="cmsContent?.contactSection.description"
+    :ui="{
+      root: 'rounded-none ring-0',
+    }"
+    :links="[
+      {
+        label: cmsContent?.contactSection.buttonText || 'Contact Us',
+        to: '/contact',
+        color: 'neutral',
+        icon: 'i-lucide-mail',
+        size: 'xl',
+        variant: 'solid',
+        class: 'font-bold button button-monochrome',
+      },
+    ]"
+  />
+
+  <UPageSection
+    :title="cmsContent?.earlyAccessBenefits.title"
+    :description="cmsContent?.earlyAccessBenefits.subtitle"
+    headline="Early Access Benefits"
+    class="section-gradient"
+  >
+    <template #features>
+      <UPageCard
+        v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits"
+        :key="index"
+        icon="i-lucide-info"
+        :title="benefit.title"
+        :description="benefit.description"
+        class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+        :ui="{
+          root: 'bg-primary/50! ring-0',
+          container: 'shadow-xl',
+          title: 'title-md',
+          leadingIcon: 'h-6 w-6 text-secondary',
+          description: 'body-sm',
+          body: 'flex flex-col justify-evenly',
+        }"
+      >
+      </UPageCard>
+    </template>
+  </UPageSection>
+
+  <!-- guides -->
+  <UPageSection
+    :title="cmsContent?.guidesSection?.title"
+    :description="cmsContent?.guidesSection?.description"
+    headline="Helpful Guides"
+    :ui="{
+      headline: 'text-secondary',
+    }"
+  >
+    <UBlogPosts>
+      <UBlogPost
+        v-for="(guide, index) in cmsContent?.guidesSection?.guides"
+        :key="index"
+        variant="subtle"
+        :title="guide.title"
+        :description="guide.excerpt"
+        :to="
+          'guides/' + guide.category.slug.current + '/' + guide.slug.current
+        "
+        :badge="'Read Time: ' + guide.readTime + ' mins'"
+        :date="guide.publishedAt"
+        :authors="[
+          {
+            name: 'Virify',
+            avatar: {
+              src: '/android-chrome-96x96.png',
+              alt: 'Virify',
+            }
+          }
+
+        ]"
+        :image="{
+          provider: 'sanity',
+          src: guide.heroImage?.asset._ref,
+          alt: guide.heroImage?.alt || guide.title,
+          width: 800,
+          height: 600,
+          loading: index < 3 ? 'eager' : 'lazy',
+        }"
+        :ui="{
+          title: 'body-md font-bold',
+          meta: 'justify-between',
+          description: 'body-sm',
+          body: 'justify-evenly',
+        }"
+      />
+    </UBlogPosts>
+  </UPageSection>
+
+  <!-- final cta section -->
+  <UPageCTA
+    :title="cmsContent?.finalCta.title"
+    :description="cmsContent?.finalCta.description"
+    :ui="{
+      root: 'rounded-none ring-0',
+    }"
+    class="section-gradient"
+    :links="[
+      {
+        label: cmsContent?.finalCta.buttonText || 'Contact Us',
+        color: 'neutral',
+        icon: 'i-lucide-mail',
+        size: 'lg',
+        variant: 'solid',
+        class: 'font-bold button button-monochrome',
+      },
+    ]"
+    @click="scrollToForm"
+  />
 </template>
 
 <script setup lang="ts">
@@ -356,7 +353,6 @@ const state = reactive<Schema>({
 });
 
 async function handleSubmit() {
-  isSubmitting.value = true;
   try {
     const response = await $fetch<{
       success: boolean;
@@ -380,8 +376,6 @@ async function handleSubmit() {
     }
   } catch (error: any) {
     console.error("Waiting list signup error:", error);
-  } finally {
-    isSubmitting.value = false;
   }
 }
 
@@ -439,21 +433,3 @@ useSchemaOrg([
   },
 ]);
 </script>
-
-<style lang="scss" scoped>
-@use "#styles/_utils/media" as mq;
-@use "#styles/_utils/functions" as fn;
-@use "#styles/3-elements/sections" as *;
-
-.section-gradient-bg {
-  @include section-gradient-bg();
-}
-
-.hero-gradient-bg {
-  @include section-gradient-bg();
-
-  @include mq.desktop {
-    @include hero-background();
-  }
-}
-</style>
