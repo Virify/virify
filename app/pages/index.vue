@@ -33,20 +33,22 @@
 
   <!-- sign up form -->
   <UPageSection
-    :title="cmsContent?.formSection.title || 'Join the Waiting List'"
-    :description="
-      cmsContent?.formSection.description || 'Be the first to know'
-    "
-    headline="Stay updated"
+    title="A smarter and cheaper way to buy, sell and rent is coming. Join early to receive a free premium listing."
+    description="Whether you're looking for your next home, ready to market privately, or an estate agent looking for a more cost-effective and easy-to-use platform, join our waiting list for exclusive early access free premium listings and progress updates."
+    headline="Smarter and cheaper..."
     :ui="{
       title: 'title-md',
       headline: 'text-secondary/90!',
     }"
   >
+    <OrganismsDashboardTierTable :table="joinTableTiers" :show-buttons="false" />
+    <USeparator class="my-8" label="Join the waiting list" :ui="{
+      label: 'title-sm'
+    }" />
     <UForm
       :schema="signupSchema"
       :state="state"
-      class="max-w-200 w-full m-auto flex flex-col items-start gap-4"
+      class="max-w-5xl w-full m-auto flex flex-col items-start gap-4"
       @submit="handleSubmit"
     >
       <UFormField name="email" label="Email Address" required class="w-full">

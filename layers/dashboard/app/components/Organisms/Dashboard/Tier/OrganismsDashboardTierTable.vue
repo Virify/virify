@@ -1,6 +1,6 @@
 <template>
   <UPricingTable
-    :tiers="tableTiers"
+    :tiers="table"
     :sections="tableSections"
     class="max-w-5xl m-auto"
     :ui="{
@@ -13,8 +13,16 @@
       <span class="title-sm mb-0 text-(--foreground-100)">{{ tier.title }}</span>
     </template>
 
+    <template #basic-discount="{ tier }">
+      <h4>{{ tier.discount }}</h4>
+    </template>
+
     <template #basic-price="{ tier }">
-      <span class="title-md mt-0 mb-0 font-semibold text-(--foreground-100)">{{ tier.price }}</span>
+      <p class="title-md mt-3! mb-0! text-(--foreground-100)">
+        {{ tier.price}}
+        <span class="body-xs font-normal! italic text-(--foreground-100) line-clamp-1">{{ tier["billing-cycle"] }}</span>
+      </p>
+      
     </template>
 
     <!-- Premium Title/Price -->
@@ -22,8 +30,14 @@
       <span class="title-sm mb-0 text-primary dark:text-(--blue-600)">{{ tier.title }}</span>
     </template>
 
+    <template #premium-discount="{ tier }">
+      {{ tier.discount }}
+    </template>
+
     <template #premium-price="{ tier }">
-      <span class="title-md mt-0 mb-0 text-primary dark:text-(--blue-600)">{{ tier.price }}</span>
+      <p class="title-md mt-3! mb-0! text-primary dark:text-(--blue-600)">{{ tier.price }}
+        <span class="body-xs font-normal! italic text-(--foreground-100) line-clamp-1">{{ tier["billing-cycle"] }}</span>
+      </p>
     </template>
 
     <!-- Professional Title/Price -->
@@ -31,8 +45,14 @@
       <span class="title-sm mb-0! text-secondary">{{ tier.title }}</span>
     </template>
 
+    <template #professional-discount="{ tier }">
+      {{ tier.discount }}
+    </template>
+
     <template #professional-price="{ tier }">
-      <span class="title-md mt-0! mb-0! text-secondary">{{ tier.price }}</span>
+      <p class="title-md mt-3! mb-0! text-secondary">{{ tier.price }}
+        <span class="body-xs font-normal! italic text-(--foreground-100) line-clamp-1">{{ tier["billing-cycle"] }}</span>
+      </p>
     </template>
 
     <!-- Generic Description -->
@@ -54,21 +74,31 @@
 
     <!-- Buttons -->
     <template #basic-button="{ tier }">
-      <UButton @click="$emit('create-listing', 'BASIC')" :label="tier.button.label" block class="body-sm cursor-pointer text-center" color="neutral" variant="outline" />
+      <UButton  @click="$emit('create-listing', 'BASIC')" :label="tier?.button?.label" block class="body-sm cursor-pointer text-center" color="neutral" variant="outline" :disabled="!showButtons" />
     </template>
 
     <template #premium-button="{ tier }">
-      <UButton @click="$emit('create-listing', 'PREMIUM')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" />
+      <UButton @click="$emit('create-listing', 'PREMIUM')" :label="tier?.button?.label" block class="body-sm cursor-pointer text-white!" :disabled="!showButtons" />
     </template>
     
     <template #professional-button="{ tier }">
-      <UButton @click="$emit('create-listing', 'FEATURED')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" color="secondary" variant="solid" />
+      <UButton @click="$emit('create-listing', 'FEATURED')" :label="tier?.button?.label" block class="body-sm cursor-pointer text-white!" color="secondary" variant="solid" :disabled="!showButtons" />
     </template>
   </UPricingTable>
 </template>
 
 <script setup lang="ts">
 import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
+
+interface Props {
+  table?: Array<any>
+  showButtons?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  table: () => tableTiers.value,
+  showButtons: true,
+})
 
 defineEmits<{
   'create-listing': [tier: ListingTier]

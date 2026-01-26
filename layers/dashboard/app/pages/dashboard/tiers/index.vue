@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import type { OrganismsDashboardCreateListingModal } from '#components';
 import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
 
 definePageMeta({

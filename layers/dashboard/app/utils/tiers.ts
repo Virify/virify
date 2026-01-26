@@ -29,6 +29,8 @@ export const tableTiers = ref<any[]>([
     title: 'Basic',
     description: 'Entry level listing',
     price: 'Free',
+    discount: '£10',
+    "billing-cycle": 'per month',
     button: {
       label: 'Create Listing',
       color: 'neutral',
@@ -41,6 +43,8 @@ export const tableTiers = ref<any[]>([
     title: 'Premium',
     description: 'Enhanced visibility',
     price: 'Free',
+    discount: '£150',
+    "billing-cycle": 'per month',
     highlight: true,
     variant: 'subtle',
     button: {
@@ -54,10 +58,56 @@ export const tableTiers = ref<any[]>([
     id: 'professional',
     title: 'Professional',
     description: 'Professional features',
+    discount: '£75',
     price: 'Free',
-    variant: 'soft',
+    "billing-cycle": 'per month',
     button: {
       label: 'Create Listing',
+      color: 'secondary',
+      variant: 'solid',
+      size: 'xs',
+    }
+  }
+])
+
+export const joinTableTiers = ref<any[]>([
+  {
+    id: 'basic',
+    title: 'Basic',
+    description: 'Entry level listing',
+    price: '£10',
+    "billing-cycle": 'per month',
+    button: {
+      label: 'Coming soon',
+      color: 'neutral',
+      variant: 'subtle',
+      size: 'xs',
+    }
+  },
+  {
+    id: 'premium',
+    title: 'Premium',
+    description: 'Enhanced visibility',
+    price: '£150',
+    "billing-cycle": 'per month',
+    highlight: true,
+    variant: 'subtle',
+    button: {
+      label: 'Coming soon',
+      color: 'primary',
+      variant: 'solid',
+      size: 'xs',
+    }
+  },
+  {
+    id: 'professional',
+    title: 'Professional',
+    description: 'Professional features',
+    discount: '£75',
+    price: 'Free',
+    "billing-cycle": 'For early access',
+    button: {
+      label: 'Coming soon',
       color: 'secondary',
       variant: 'solid',
       size: 'xs',
