@@ -24,10 +24,16 @@ $animated-gradient-blue: #6aafff;
 $animated-gradient-border: 7px;
 $animated-gradient-blur: 3px;
 
+:where(:has(> .animated-gradient)) {
+  position: relative;
+  z-index: 2;
+}
+
 .animated-gradient {
   --radius: var(--border-radius-3xl);
   --background: var(--background-100);
 
+  position: relative;
   border-radius: var(--radius);
   background: var(--background);
   border: 2px solid rgba($animated-gradient-red, 0.12);

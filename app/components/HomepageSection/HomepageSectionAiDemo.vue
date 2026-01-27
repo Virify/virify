@@ -21,13 +21,13 @@
     <!-- END DEBUGGER -->
 
     <!-- REAL CONTENT -->
-    <div class="homepage-typing | animated-gradient">
-      <h3 class="homepage-typing__title | title-sm">Describe your new home</h3>
+    <div class="homepage-section-ai-demo | animated-gradient">
+      <h3 class="homepage-section-ai-demo__title | title-sm">Describe your new home</h3>
 
-      <p v-cloak class="homepage-typing__text | animated-height gradient-box">
+      <p v-cloak class="homepage-section-ai-demo__text | animated-height gradient-box">
         <template v-for="{ word, isKeywords }, index of words">
-          <em v-if="isKeywords" class="homepage-typing__text-span" :class="{
-            'homepage-typing__text-span--highlighted': index <= wordsHighlighted
+          <em v-if="isKeywords" class="homepage-section-ai-demo__text-span" :class="{
+            'homepage-section-ai-demo__text-span--highlighted': index <= wordsHighlighted
           }">
             {{ word }}
           </em>
@@ -35,11 +35,11 @@
             {{ word }}
           </template>
         </template>
-        <span class="homepage-typing__text-cursor" aria-hidden>_</span>
+        <span class="homepage-section-ai-demo__text-cursor" aria-hidden>_</span>
       </p>
 
-      <ul v-show="isSuggestionsVisible" class="homepage-typing__suggestions | animated-height">
-        <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-typing__suggestion"
+      <ul v-show="isSuggestionsVisible" class="homepage-section-ai-demo__suggestions | animated-height">
+        <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-section-ai-demo__suggestion"
           :style="{ animationDelay: index * 40 + 'ms' }">
           <AtomsIcon icon="ai/prompt" />
           {{ suggestion }}
@@ -161,24 +161,31 @@ function resetAnimation() {
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
 
-.homepage-typing {
-  position: relative;
+.homepage-section-ai-demo {
+  --radius: var(--border-radius-xl);
+
   padding: var(--size-14);
   background: var(--background-200);
 
   @include mq.tablet {
+    --radius: var(--border-radius-2xl);
+
     padding: var(--size-20);
   }
 
   @include mq.desktop {
+    --radius: var(--border-radius-3xl);
+
     padding: var(--size-28);
   }
 
   &__title {
     margin: 0 0 var(--size-8);
+    font-size: var(--font-lg);
 
     @include mq.tablet {
       margin: 0 0 var(--size-14);
+      font-size: var(--font-xl);
     }
   }
 
