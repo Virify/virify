@@ -21,14 +21,13 @@
     <!-- END DEBUGGER -->
 
     <!-- REAL CONTENT -->
+    <div class="homepage-typing | animated-gradient">
+      <h3 class="homepage-typing__title | title-sm">Describe your new home</h3>
 
-    <div class="homepage-typing">
-      <h3 class="| title-sm">Describe your new home</h3>
-
-      <p v-cloak class="homepage-typing__text | gradient-box">
+      <p v-cloak class="homepage-typing__text | animated-height gradient-box">
         <template v-for="{ word, isKeywords }, index of words">
-          <em v-if="isKeywords" :class="{
-            'highlighted': index <= wordsHighlighted
+          <em v-if="isKeywords" class="homepage-typing__text-span" :class="{
+            'homepage-typing__text-span--highlighted': index <= wordsHighlighted
           }">
             {{ word }}
           </em>
@@ -36,10 +35,10 @@
             {{ word }}
           </template>
         </template>
-        <span class="homepage-typing__text-cursor">_</span>
+        <span class="homepage-typing__text-cursor" aria-hidden>_</span>
       </p>
 
-      <ul v-show="isSuggestionsVisible" class="homepage-typing__suggestions">
+      <ul v-show="isSuggestionsVisible" class="homepage-typing__suggestions | animated-height">
         <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-typing__suggestion"
           :style="{ animationDelay: index * 40 + 'ms' }">
           <AtomsIcon icon="ai/prompt" />
@@ -47,7 +46,6 @@
         </li>
       </ul>
     </div>
-
     <!-- END REAL CONTENT -->
   </div>
 </template>
@@ -161,65 +159,33 @@ function resetAnimation() {
 </script>
 
 <style lang="scss">
-@use 'sass:math';
-
-%animation-height {
-  interpolate-size: allow-keywords;
-
-  @starting-style {
-    height: 0px;
-  }
-
-  transition: height var(--animation-subtle) var(--ease-in-out);
-  overflow: visible;
-}
-
 .homepage-typing {
   position: relative;
   padding: var(--size-28);
   background: var(--background-200);
-  border-radius: var(--border-radius-3xl);
-  border: 2px solid rgba(red, 0.1);
 
-  &::before {
-    $border-size: 7px;
-
-    content: '';
-    position: absolute;
-    inset: -#{$border-size};
-    filter: blur(#{math.div($border-size, 2)});
-    border-radius: calc(var(--border-radius-3xl) + $border-size);
-    background: radial-gradient(var(--background-100), transparent, var(--background-100)), linear-gradient(45deg, #ff224e, #ffd518, #6aafff);
-    background-size: 200% 200%;
-    animation: rotateBackground 3s infinite linear;
-    z-index: -1;
-  }
-
-  h3 {
-    font-weight: var(--font-bold);
+  &__title {
     margin: 0 0 var(--size-14);
   }
 
   &__text {
-    @extend %animation-height;
-
     --gradient-box-radius: var(--border-radius-xl);
 
     padding: var(--size-20) var(--size-28);
     border-radius: var(--gradient-box-radius);
+  }
 
-    em {
-      font-style: normal;
-      border: transparent;
-      background-color: transparent;
-      transition-property: padding,
-        background-color,
-        border-color;
-      transition-duration: var(--animation-subtle);
-      transition-timing-function: var(--ease-in-out);
-    }
+  &__text-span {
+    font-style: normal;
+    border: transparent;
+    background-color: transparent;
+    transition-property: padding,
+      background-color,
+      border-color;
+    transition-duration: var(--animation-subtle);
+    transition-timing-function: var(--ease-in-out);
 
-    em.highlighted {
+    &--highlighted {
       white-space: nowrap;
       font-weight: var(--font-semibold);
       color: var(--secondary-400);
@@ -231,12 +197,10 @@ function resetAnimation() {
   }
 
   &__text-cursor {
-    animation: blinkCursor 1s linear infinite;
+    animation: blinkDemoCursor 1s linear infinite;
   }
 
   &__suggestions {
-    @extend %animation-height;
-
     list-style: none;
     display: flex;
     align-items: center;
@@ -258,9 +222,9 @@ function resetAnimation() {
     padding: var(--size-6) var(--size-12);
     padding-left: var(--size-8);
     font-weight: var(--font-semibold);
-    animation: fadeSuggestionIn var(--animation-veryslow) var(--ease-in-out) backwards;
+    animation: fadeDemoSuggestionIn var(--animation-veryslow) var(--ease-in-out) backwards;
 
-    svg {
+    .a-icon {
       width: var(--size-18);
       height: var(--size-18);
       color: var(--secondary-400);
@@ -269,15 +233,14 @@ function resetAnimation() {
   }
 }
 
-
-@keyframes fadeSuggestionIn {
+@keyframes fadeDemoSuggestionIn {
   from {
     opacity: 0;
     transform: translateY(var(--size-24))
   }
 }
 
-@keyframes blinkCursor {
+@keyframes blinkDemoCursor {
   0% {
     opacity: 0;
   }
@@ -292,24 +255,6 @@ function resetAnimation() {
 
   100% {
     opacity: 1;
-  }
-}
-
-@keyframes rotateBackground {
-  0% {
-    background-position: 0 0;
-  }
-
-  25% {
-    background-position: 100% 0;
-  }
-
-  50% {
-    background-position: 100% 100%;
-  }
-
-  75% {
-    background-position: 0 100%;
   }
 }
 </style>

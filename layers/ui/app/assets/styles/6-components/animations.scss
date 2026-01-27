@@ -1,0 +1,66 @@
+@use 'sass:math';
+
+/**
+ *  Animated heights
+ */
+.animated-height {
+  interpolate-size: allow-keywords;
+
+  @starting-style {
+    height: 0px;
+  }
+
+  transition: height var(--animation-subtle) var(--ease-in-out);
+  overflow: clip;
+}
+
+/**
+ * Animated gradients
+ */
+$animated-gradient-red: #ff224e;
+$animated-gradient-yellow: #ffd518;
+$animated-gradient-blue: #6aafff;
+
+$animated-gradient-border: 7px;
+$animated-gradient-blur: 3px;
+
+.animated-gradient {
+  --radius: var(--border-radius-3xl);
+  --background: var(--background-100);
+
+  border-radius: var(--radius);
+  background: var(--background);
+  border: 2px solid rgba($animated-gradient-red, 0.12);
+
+  &::before {
+    $border-size: 7px;
+
+    content: '';
+    position: absolute;
+    inset: -#{$animated-gradient-border};
+    filter: blur(#{$animated-gradient-blur});
+    border-radius: calc(var(--radius) + $animated-gradient-border);
+    background: radial-gradient(var(--background), transparent, var(--background)), linear-gradient(45deg, $animated-gradient-red, $animated-gradient-yellow, $animated-gradient-blue);
+    background-size: 200% 200%;
+    animation: animateGradientBackground 4s infinite linear;
+    z-index: -1;
+  }
+}
+
+@keyframes animateGradientBackground {
+  0% {
+    background-position: 0 0;
+  }
+
+  25% {
+    background-position: 100% 0;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+
+  75% {
+    background-position: 0 100%;
+  }
+}
