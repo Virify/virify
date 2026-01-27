@@ -12,8 +12,8 @@
       </p>
 
       <ul class="home-section-ai-scroller__sections-list">
-        <li v-for="{ id, title, content, icon } of scrollingSections" :key="id" :id
-          class="home-section-ai-scroller__section">
+        <li v-for="{ id, title, content, icon } of scrollingSections" :key="id" :data-id="id"
+          class="home-section-ai-scroller__section" ref="$sections">
           <h3 class="home-section-ai-scroller__section-title | title-lg">
             <AtomsIcon v-if="icon" :icon class="home-section-ai-scroller__section-title-icon"
               aria-role="presentation" />
@@ -29,12 +29,15 @@
 
     <div
       class="home-section-ai-scroller__column home-section-ai-scroller__column--sticky home-section-ai-scroller__column--demo">
-      <HomepageSectionAiDemo class="home-section-ai-scroller__demo" />
+      <HomepageSectionAiDemo :current-section="lastVisibileId" :is-scrolled-before
+        class="home-section-ai-scroller__demo" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
+
 interface Section {
   icon?: string
   id: string
@@ -44,30 +47,84 @@ interface Section {
 
 const scrollingSections: Section[] = [
   {
-    id: 'natural-language',
+    id: '1-natural-language',
     icon: 'ai/star',
     title: 'Natural language search',
     content: 'Type exactly what you want: "2+ bed house with an en-suite, downstairs bathroom and south-facing garden to buy that\'s less than £325,000". Just say what you\'re looking for!'
   },
   {
-    id: 'prompt',
+    id: '2-prompt',
     icon: 'ai/prompt',
     title: 'Smart suggestions',
     content: 'Get intelligent property suggestions based on your requirements. See popular searches and trending options as you type.'
   },
   {
-    id: 'filters',
+    id: '3-filters',
     icon: 'search/filter',
     title: 'Contextual filtering',
     content: 'Our intelligent search extracts property type, transaction type and features from your search query for faster results.'
   },
   {
-    id: 'results',
+    id: '4-results',
     icon: 'ai/send',
     title: 'Instant results',
     content: 'Type what you want and get relevant property matches in seconds. Forget confusing filters, forms, or slow loads.'
   }
 ]
+
+/**
+ *  Scroll events
+ */
+const isScrolledBefore = shallowRef(false)
+const sectionsState = reactive<{ [key: string]: boolean }>({})
+const $sections = useTemplateRef('$sections')
+
+// Cast $sections as ref due to type bug with VueUse:
+// https://github.com/vueuse/vueuse/issues/4712
+useIntersectionObserver($sections as Ref<HTMLElement[]>, (entries) => {
+  for (const { target, isIntersecting } of entries) {
+    const { id } = asObject((target as HTMLElement).dataset)
+
+    if (isString(id)) {
+      sectionsState[id] = isIntersecting
+    }
+  }
+
+  checkIsScrolledBefore()
+}, {
+  rootMargin: '-100px'
+})
+
+/**
+ *  IntersectionObserver only tells us if the element is visible. Not
+ *  its scroll distance. So check if the scroll position of the first
+ *  item is above or below the users current window position...
+ */
+function checkIsScrolledBefore() {
+  if (!$sections.value?.length) return
+
+  // Get first element from template ref
+  const [firstElement] = $sections.value
+
+  // Make sure first item is an element
+  if (!isElement(firstElement)) return
+
+  // Check if element is above the current window position
+  isScrolledBefore.value = firstElement.getBoundingClientRect().top > 0
+}
+
+/**
+ *  Monitor the first visible element
+ */
+const lastVisibileId = computed(() => {
+  const sectionsArray = Object.entries(sectionsState)
+
+  const firstVisible = sectionsArray.reverse().find(([_, visibility]) => {
+    return !!visibility
+  })
+
+  return firstVisible && firstVisible[0]
+})
 
 </script>
 

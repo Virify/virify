@@ -17,6 +17,11 @@
       <button class="| button button-delete button-xs" @click.prevent="resetAnimation">
         Reset
       </button>
+
+      <pre>{{ {
+        currentSection,
+        isScrolledBefore
+      } }}</pre>
     </div>
     <!-- END DEBUGGER -->
 
@@ -50,7 +55,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+interface Props {
+  currentSection?: string
+  isScrolledBefore: boolean
+}
+
+defineProps<Props>()
 
 const keywords = [
   '3 bedroom',
@@ -100,7 +111,7 @@ const words = computed(() => {
  */
 const wordsHighlighted = ref(0)
 
-let interval
+let interval: NodeJS.Timeout
 
 function runHighlightWords() {
   resetHighlights(true)
