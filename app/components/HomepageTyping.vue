@@ -159,20 +159,45 @@ function resetAnimation() {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .homepage-typing {
   position: relative;
-  padding: var(--size-28);
+  padding: var(--size-14);
   background: var(--background-200);
 
+  @include mq.tablet {
+    padding: var(--size-20);
+  }
+
+  @include mq.desktop {
+    padding: var(--size-28);
+  }
+
   &__title {
-    margin: 0 0 var(--size-14);
+    margin: 0 0 var(--size-8);
+
+    @include mq.tablet {
+      margin: 0 0 var(--size-14);
+    }
   }
 
   &__text {
     --gradient-box-radius: var(--border-radius-xl);
 
-    padding: var(--size-20) var(--size-28);
+    padding: var(--size-12) var(--size-16);
     border-radius: var(--gradient-box-radius);
+    font-size: var(--font-sm);
+    line-height: var(--lineheight-lg);
+
+    @include mq.tablet {
+      font-size: var(--font-md);
+    }
+
+    @include mq.desktop {
+      padding: var(--size-20) var(--size-28);
+      font-size: var(--font-lg);
+    }
   }
 
   &__text-span {
@@ -207,7 +232,11 @@ function resetAnimation() {
     justify-content: flex-start;
     flex-wrap: wrap;
     gap: var(--size-4);
-    margin: var(--size-24) 0 0;
+    margin: var(--size-12) 0 0;
+
+    @include mq.tablet {
+      margin: var(--size-24) 0 0;
+    }
   }
 
   &__suggestion {
