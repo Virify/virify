@@ -253,6 +253,7 @@ watchImmediate([currentSection], ([id]) => {
     flex-wrap: wrap;
     gap: var(--size-4);
     margin: var(--size-12) 0 0;
+    padding: 0;
 
     @include mq.tablet {
       margin: var(--size-24) 0 0;
