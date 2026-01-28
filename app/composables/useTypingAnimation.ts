@@ -10,6 +10,8 @@ export default function useTypingAnimation(originalText: string) {
   }
 
   function animateText() {
+    if (typedText.value.length) return
+
     resetText(true)
 
     let tickCounter = 0
@@ -26,7 +28,7 @@ export default function useTypingAnimation(originalText: string) {
 
         resetText()
       }
-    }, 25)
+    }, 15)
   }
 
   return {

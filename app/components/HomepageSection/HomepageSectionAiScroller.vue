@@ -38,34 +38,36 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
 
+export type SectionId = 'language' | 'prompt' | 'filters' | 'results'
+
 interface Section {
   icon?: string
-  id: string
+  id: SectionId
   title: string
   content: string
 }
 
 const scrollingSections: Section[] = [
   {
-    id: '1-natural-language',
+    id: 'language',
     icon: 'ai/star',
     title: 'Natural language search',
     content: 'Type exactly what you want: "2+ bed house with an en-suite, downstairs bathroom and south-facing garden to buy that\'s less than £325,000". Just say what you\'re looking for!'
   },
   {
-    id: '2-prompt',
+    id: 'prompt',
     icon: 'ai/prompt',
     title: 'Smart suggestions',
     content: 'Get intelligent property suggestions based on your requirements. See popular searches and trending options as you type.'
   },
   {
-    id: '3-filters',
+    id: 'filters',
     icon: 'search/filter',
     title: 'Contextual filtering',
     content: 'Our intelligent search extracts property type, transaction type and features from your search query for faster results.'
   },
   {
-    id: '4-results',
+    id: 'results',
     icon: 'ai/send',
     title: 'Instant results',
     content: 'Type what you want and get relevant property matches in seconds. Forget confusing filters, forms, or slow loads.'
@@ -123,7 +125,7 @@ const lastVisibileId = computed(() => {
     return !!visibility
   })
 
-  return firstVisible && firstVisible[0]
+  return firstVisible && firstVisible[0] as SectionId
 })
 
 </script>
@@ -190,23 +192,11 @@ const lastVisibileId = computed(() => {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
-    padding: var(--size-24);
+    justify-content: flex-start;
+    padding: var(--size-40) var(--size-24);
     padding-left: var(--size-56);
     box-sizing: border-box;
-    margin: var(--size-56) 0;
-
-    @include mq.notebook {
-      margin: var(--size-72) 0;
-    }
-
-    @include mq.desktop {
-      margin: var(--size-120) 0;
-    }
-
-    &:not(:last-of-type) {
-      margin-bottom: var(--size-32);
-    }
+    min-height: 80vh;
   }
 
   &__sections-list,

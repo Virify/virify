@@ -1,67 +1,41 @@
 <template>
-  <div>
-    <!-- START DEBUGGER -->
-    <div style="display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0 0 2rem;l">
-      <button class="| button button-secondary button-xs" @click.prevent="typingAnimation">
-        Show typing
-      </button>
+  <div class="homepage-section-ai-demo | animated-gradient">
+    <h3 class="homepage-section-ai-demo__title | title-sm">Describe your new home</h3>
 
-      <button class="| button button-secondary button-xs" @click.prevent="runHighlightWords">
-        Show highlights
-      </button>
-
-      <button class="| button button-secondary button-xs" @click.prevent="showSuggestions">
-        Show suggestions
-      </button>
-
-      <button class="| button button-delete button-xs" @click.prevent="resetAnimation">
-        Reset
-      </button>
-
-      <pre>{{ {
-        currentSection,
-        isScrolledBefore
-      } }}</pre>
-    </div>
-    <!-- END DEBUGGER -->
-
-    <!-- REAL CONTENT -->
-    <div class="homepage-section-ai-demo | animated-gradient">
-      <h3 class="homepage-section-ai-demo__title | title-sm">Describe your new home</h3>
-
-      <p v-cloak class="homepage-section-ai-demo__text | animated-height gradient-box">
-        <template v-for="{ word, isKeywords }, index of words">
-          <em v-if="isKeywords" class="homepage-section-ai-demo__text-span" :class="{
-            'homepage-section-ai-demo__text-span--highlighted': index <= wordsHighlighted
-          }">
-            {{ word }}
-          </em>
-          <template v-else>
-            {{ word }}
-          </template>
+    <p v-cloak class="homepage-section-ai-demo__text | animated-height gradient-box">
+      <template v-for="{ word, isKeywords }, index of words">
+        <em v-if="isKeywords" class="homepage-section-ai-demo__text-span" :class="{
+          'homepage-section-ai-demo__text-span--highlighted': index <= wordsHighlighted
+        }">
+          {{ word }}
+        </em>
+        <template v-else>
+          {{ word }}
         </template>
-        <span class="homepage-section-ai-demo__text-cursor" aria-hidden>_</span>
-      </p>
+      </template>
+      <span class="homepage-section-ai-demo__text-cursor" aria-hidden>_</span>
+    </p>
 
-      <ul v-show="isSuggestionsVisible" class="homepage-section-ai-demo__suggestions | animated-height">
-        <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-section-ai-demo__suggestion"
-          :style="{ animationDelay: index * 40 + 'ms' }">
-          <AtomsIcon icon="ai/prompt" />
-          {{ suggestion }}
-        </li>
-      </ul>
-    </div>
-    <!-- END REAL CONTENT -->
+    <ul v-show="isSuggestionsVisible" class="homepage-section-ai-demo__suggestions | animated-height">
+      <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-section-ai-demo__suggestion"
+        :style="{ animationDelay: index * 40 + 'ms' }">
+        <AtomsIcon icon="ai/prompt" />
+        {{ suggestion }}
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { SectionId } from './HomepageSectionAiScroller.vue'
+import { watchImmediate } from '@vueuse/core'
+
 interface Props {
-  currentSection?: string
+  currentSection?: SectionId
   isScrolledBefore: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const keywords = [
   '3 bedroom',
@@ -80,11 +54,6 @@ const keywords = [
  *  Typing animation
  */
 const { text, animateText, resetText, isTyping } = useTypingAnimation('Show me 3 bedroom houses for sale with south-facing gardens, close to hospital and within 1 mile of a gym and park with a downstairs bathroom and renewable energy source')
-
-function typingAnimation() {
-  resetHighlights(true)
-  animateText()
-}
 
 /**
  *  Split words by keyword, so they can be highlighted later on
@@ -114,6 +83,8 @@ const wordsHighlighted = ref(0)
 let interval: NodeJS.Timeout
 
 function runHighlightWords() {
+  if (wordsHighlighted.value) return
+
   resetHighlights(true)
 
   interval = setInterval(() => {
@@ -166,6 +137,37 @@ function resetAnimation() {
   resetHighlights(true)
   hideSuggestions()
 }
+
+/**
+ *  Scroll events
+ */
+const { currentSection, isScrolledBefore } = toRefs(props)
+
+watchImmediate([currentSection], ([id]) => {
+  // If no ID, check if scrolled
+  if (!id) {
+    isScrolledBefore.value && resetAnimation()
+
+    return
+  }
+
+  // Else animate the appropriate section
+  if (id === 'language') {
+    animateText()
+    resetHighlights(true)
+    hideSuggestions()
+  }
+  else if (id === 'prompt') {
+    runHighlightWords()
+    hideSuggestions()
+  }
+  else if (id === 'filters') {
+    showSuggestions()
+  }
+  else {
+    console.log('SHOW RESULTS')
+  }
+})
 
 </script>
 
