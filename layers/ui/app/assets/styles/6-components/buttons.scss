@@ -76,7 +76,7 @@
 
   &-ghost {
     background: fn.faded-color(6%, var(--blue-900));
-    color: var(--monochrome-900);
+    color: currentColor;
 
     &:hover {
       background: fn.faded-color(12%, light-dark(var(--blue-700), var(--blue-900)));

@@ -31,7 +31,8 @@
    *  Line-height sizes
    */
   --font-light: 300;
-  --font-medium: 400;
+  --font-medium: 400; // @TODO rename this to 'regular'
+  --font-semisemibold: 500; // @TODO rename this to 'medium'
   --font-semibold: 600;
   --font-bold: 700;
 
