@@ -4,30 +4,29 @@
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price | title-md">
-        {{ propertyDetails.price }}
+        {{ price }}
 
-        <PropertyCardPill :content="propertyDetails.priceLabel" variant="orange" />
+        <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
       </h2>
 
       <p class="property-card-root__overview">
         <strong class="property-card-root__overview-address">
-          {{ propertyDetails.overview }}
+          {{ overview }}
         </strong>
-        {{ propertyDetails.overviewAddress }}
+        {{ overviewAddress }}
       </p>
 
-      <MoleculesScrollBox v-if="propertyDetails.labels?.length">
+      <MoleculesScrollBox v-if="labels?.length">
         <ul class="property-card-root__labels">
-          <li v-for="label of propertyDetails.labels" :key="label">
+          <li v-for="label of labels" :key="label">
             <PropertyCardPill :content="label" />
           </li>
         </ul>
       </MoleculesScrollBox>
 
-      <MoleculesScrollBox v-if="propertyDetails.icons?.length">
+      <MoleculesScrollBox v-if="icons?.length">
         <ul class="property-card-root__icons">
-          <li v-for="{ icon, count, label } of propertyDetails.icons" :key="label"
-            class="property-card-root__icon | body-2xs">
+          <li v-for="{ icon, count, label } of validIcons" :key="label" class="property-card-root__icon | body-2xs">
             <span class="property-card-root__icon-count | body-sm">
               <AtomsIcon :icon aria-hidden />
               {{ count }}
@@ -39,52 +38,101 @@
       </MoleculesScrollBox>
 
       <div class="property-card-root__buttons" aria-role="presentation">
-        <a href="#" class="property-card-root__button property-card-root__button--view | body-sm">
+        <component :is="viewComponent" :href="viewURL"
+          class="property-card-root__button property-card-root__button--view | body-sm">
           View
-        </a>
+        </component>
 
-        <a href="#" class="property-card-root__button property-card-root__button--enquire | body-sm">
+        <component :is="enquiryComponent" :href="enquiryURL"
+          class="property-card-root__button property-card-root__button--enquire | body-sm">
           Enquire
-        </a>
+        </component>
       </div>
 
+      <div v-if="sellerName" class="property-card-root__profile | body-xs" aria-role="presentation">
+        <img v-if="sellerImage" :src="sellerImage" :alt="`Profile image for ${sellerName}`"
+          class="property-card-root__profile-image" />
+        <span v-else aria-hidden class="property-card-root__profile-image property-card-root__profile-image--empty">
+          <AtomsIcon icon="profile" />
+        </span>
+
+        {{ profileText }}
+      </div>
     </div>
   </section>
 </template>
 
-<script setup>
-const propertyDetails = {
-  price: '£2,200,000',
-  priceLabel: 'In excess of',
-  overview: '4 bed detached house',
-  overviewAddress: '123 Somewhere St., Cardiff, CF3',
-  labels: [
-    'Freehold',
-    'Chain-free'
-  ],
-  icons: [
-    { icon: 'property/bedrooms', count: 3, label: 'Bedrooms' },
-    { icon: 'property/bathrooms', count: 1, label: 'Bathrooms' },
-    { icon: 'property/receptions', count: 2, label: 'Receptions' },
-    { icon: 'property/land', label: 'Garden' },
-    { icon: 'property/utility', label: 'Renewables' },
-  ]
+<script setup lang="ts">
+interface FacilitiesIcon {
+  icon: string
+  label: string
+  count?: number
 }
 
+interface Props {
+  saleOrRent?: 'sale' | 'rent'
+  price?: string
+  priceLabel?: string
+  overview?: string
+  overviewAddress?: string
+  labels?: string[]
+  icons?: FacilitiesIcon[]
+  sellerImage?: string
+  sellerName?: string
+  viewURL?: string
+  enquiryURL?: string
+}
+
+const props = defineProps<Props>()
+
+/**
+ *  Conditionally show as links
+ */
+function getLinkComponent(url?: string): 'a' | 'span' {
+  return url ? 'a' : 'span'
+}
+
+const viewComponent = computed(() => getLinkComponent(props.viewURL))
+const enquiryComponent = computed(() => getLinkComponent(props.enquiryURL))
+
+/**
+ *  Format profile text
+ */
+const profileText = computed(() => {
+  const { saleOrRent, sellerName } = props
+
+  switch (saleOrRent) {
+    case 'sale':
+      return `Sold by ${sellerName}`
+    case 'rent':
+      return `Let by ${sellerName}`
+    default:
+      return `By ${sellerName}`
+  }
+})
+
+/**
+ *  Ensure icons are valid
+ */
+const validIcons = computed(() => {
+  const { icons } = props
+
+  return asArray(icons).filter((icon: FacilitiesIcon) => {
+    return isObject(icon) && isString(icon.label) && isString(icon.icon)
+  })
+})
 
 </script>
 
 <style lang="scss">
 .property-card-root {
-  max-width: 35ch;
-
   &__content {
     padding: var(--size-18);
   }
 
   &__image {
     width: 100%;
-    aspect-ratio: 16/9;
+    aspect-ratio: 4/3;
     background: var(--monochrome-300);
     border-radius: var(--border-radius-2xl);
   }
@@ -165,27 +213,66 @@ const propertyDetails = {
   &__button {
     border: 0;
     padding: var(--size-8) var(--size-16);
-    color: currentColor;
-    background-color: var(--monochrome-800);
     border-radius: var(--border-radius-lg);
     box-sizing: border-box;
     width: 100%;
     text-align: center;
     font-weight: var(--font-bold);
     transition: background-color var(--animation-fast);
+    color: var(--monochrome-500);
+    background-color: var(--monochrome-800);
 
-    &:hover {
+    &[href] {
       color: currentColor;
-      background-color: var(--monochrome-700);
+      background-color: var(--monochrome-800);
+
+      &:hover {
+        color: currentColor;
+        background-color: var(--monochrome-700);
+      }
     }
 
-    &--enquire {
+    &--enquire[href] {
       background: var(--secondary-400);
       color: var(--monochrome-900);
 
       &:hover {
         background: var(--secondary-300);
         color: var(--monochrome-900);
+      }
+    }
+  }
+
+  &__profile {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--size-10);
+    margin-top: var(--size-8);
+    padding: var(--size-8);
+    background-color: var(--monochrome-800);
+    border-radius: var(--border-radius-lg);
+    font-weight: var(--font-semisemibold);
+  }
+
+  &__profile-image {
+    display: block;
+    width: var(--size-28);
+    height: var(--size-28);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    object-fit: contain;
+
+    &--empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--monochrome-400);
+
+      .a-icon {
+        color: var(--monochrome-900);
+        width: var(--size-24);
+        height: var(--size-24);
       }
     }
   }
