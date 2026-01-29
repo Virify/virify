@@ -1,6 +1,10 @@
 <template>
   <section class="property-card-root">
-    <div class="property-card-root__image"></div>
+    <div class="property-card-root__images">
+      <img v-if="propertyImage" class="property-card-root__image" :src="propertyImage" :alt="propertyImageAlt" />
+
+      <PropertyCardInteractions :disabled="disabledInteractions" class="property-card-root__interactions" />
+    </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price | title-md">
@@ -71,6 +75,9 @@ interface FacilitiesIcon {
 
 interface Props {
   saleOrRent?: 'sale' | 'rent'
+  propertyImage?: string
+  propertyImageAlt?: string
+  disabledInteractions?: boolean
   price?: string
   priceLabel?: string
   overview?: string
@@ -89,7 +96,7 @@ const props = defineProps<Props>()
  *  Conditionally show as links
  */
 function getLinkComponent(url?: string): 'a' | 'span' {
-  return url ? 'a' : 'span'
+  return isString(url) ? 'a' : 'span'
 }
 
 const viewComponent = computed(() => getLinkComponent(props.viewURL))
@@ -126,15 +133,34 @@ const validIcons = computed(() => {
 
 <style lang="scss">
 .property-card-root {
-  &__content {
-    padding: var(--size-18);
-  }
+  position: relative;
 
+  &__images,
   &__image {
     width: 100%;
     aspect-ratio: 4/3;
+  }
+
+  &__images {
+    position: relative;
     background: var(--monochrome-300);
     border-radius: var(--border-radius-2xl);
+    overflow: hidden;
+  }
+
+  &__image {
+    display: block;
+    object-fit: cover;
+  }
+
+  &__interactions {
+    position: absolute;
+    top: var(--size-12);
+    right: var(--size-12);
+  }
+
+  &__content {
+    padding: var(--size-18);
   }
 
   &__price {
