@@ -1,28 +1,48 @@
 <template>
-  <div class="homepage-section-ai-demo | animated-gradient">
-    <h3 class="homepage-section-ai-demo__title | title-sm">Describe your new home</h3>
+  <div class="homepage-section-ai-demo__wrapper" :class="{
+    'homepage-section-ai-demo__wrapper--image': isCardVisible
+  }">
 
-    <p v-cloak class="homepage-section-ai-demo__text | animated-height gradient-box">
-      <template v-for="{ word, isKeywords }, index of words">
-        <em v-if="isKeywords" class="homepage-section-ai-demo__text-span" :class="{
-          'homepage-section-ai-demo__text-span--highlighted': index <= wordsHighlighted
-        }">
-          {{ word }}
-        </em>
-        <template v-else>
-          {{ word }}
-        </template>
-      </template>
-      <span class="homepage-section-ai-demo__text-cursor" aria-hidden>_</span>
-    </p>
+    <!-- 
+      Extra div needed to fix Chrome bug with faded content breaking the
+      animated background gradient of the child component when applied
+      directly
+    -->
+    <div class="homepage-section-ai-demo__fadable-content" aria-role="presentation">
 
-    <ul v-show="isSuggestionsVisible" class="homepage-section-ai-demo__suggestions | animated-height">
-      <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-section-ai-demo__suggestion"
-        :style="{ animationDelay: index * 40 + 'ms' }">
-        <AtomsIcon icon="ai/prompt" />
-        {{ suggestion }}
-      </li>
-    </ul>
+      <div class="homepage-section-ai-demo | animated-gradient">
+        <h3 class="homepage-section-ai-demo__title | title-sm">Describe your new home</h3>
+
+        <p v-cloak class="homepage-section-ai-demo__text | animated-height gradient-box">
+          <template v-for="{ word, isKeywords }, index of words">
+            <em v-if="isKeywords" class="homepage-section-ai-demo__text-span" :class="{
+              'homepage-section-ai-demo__text-span--highlighted': index <= wordsHighlighted
+            }">
+              {{ word }}
+            </em>
+            <template v-else>
+              {{ word }}
+            </template>
+          </template>
+          <span class="homepage-section-ai-demo__text-cursor" aria-hidden>_</span>
+        </p>
+
+        <Transition name="homepage-section-ai-demo__suggestions">
+          <ul v-show="isSuggestionsVisible" class="homepage-section-ai-demo__suggestions">
+            <li v-for="suggestion, index of suggestions" :key="suggestion" class="homepage-section-ai-demo__suggestion"
+              :style="{ animationDelay: index * 40 + 'ms' }">
+              <AtomsIcon icon="ai/prompt" />
+              {{ suggestion }}
+            </li>
+          </ul>
+        </Transition>
+      </div>
+    </div>
+
+    <Transition name="homepage-section-ai-demo__card">
+      <PropertyCardRoot v-show="isCardVisible" class="homepage-section-ai-demo__card | gradient-box"
+        v-bind="propertyDetails" />
+    </Transition>
   </div>
 </template>
 
@@ -136,6 +156,20 @@ function resetAnimation() {
   resetText(true)
   resetHighlights(true)
   hideSuggestions()
+  hideCard()
+}
+
+/** 
+ *  Toggle demo card visibility
+ */
+const isCardVisible = shallowRef(false)
+
+function hideCard() {
+  isCardVisible.value = false
+}
+
+function showCard() {
+  isCardVisible.value = true
 }
 
 /**
@@ -151,6 +185,9 @@ watchImmediate([currentSection], ([id]) => {
     return
   }
 
+  // Hide the card, if it exists
+  hideCard()
+
   // Else animate the appropriate section
   if (id === 'language') {
     animateText()
@@ -165,9 +202,37 @@ watchImmediate([currentSection], ([id]) => {
     showSuggestions()
   }
   else {
-    console.log('SHOW RESULTS')
+    showCard()
   }
 })
+
+/**
+ *  Mock card
+ */
+const propertyDetails = {
+  disabledInteractions: true,
+  saleOrRent: 'sale',
+  propertyImage: '/img/demo/demo-1.jpg',
+  price: '£325,000',
+  priceLabel: 'In excess of',
+  overview: '3 bed detached house',
+  overviewAddress: '101 Virify Street, Cardiff, CF3',
+  labels: [
+    'Freehold',
+    'Chain-free'
+  ],
+  icons: [
+    { icon: 'property/bedrooms', count: 3, label: 'Bedrooms' },
+    { icon: 'property/bathrooms', count: 1, label: 'Bathrooms' },
+    { icon: 'property/receptions', count: 2, label: 'Receptions' },
+    { icon: 'property/utility', label: 'Renewables' },
+    { icon: 'property/land', label: 'Garden' },
+  ],
+  sellerImage: null,
+  sellerName: 'Virify',
+  viewURL: undefined,
+  enquiryURL: undefined
+}
 
 </script>
 
@@ -192,6 +257,10 @@ watchImmediate([currentSection], ([id]) => {
     padding: var(--size-28);
   }
 
+  &__wrapper {
+    position: relative;
+  }
+
   &__title {
     margin: 0 0 var(--size-8);
     font-size: var(--font-lg);
@@ -209,9 +278,11 @@ watchImmediate([currentSection], ([id]) => {
     border-radius: var(--gradient-box-radius);
     font-size: var(--font-sm);
     line-height: var(--lineheight-lg);
+    margin: 0 0 var(--size-12);
 
     @include mq.tablet {
       font-size: var(--font-md);
+      margin: 0 0 var(--size-24);
     }
 
     @include mq.desktop {
@@ -246,18 +317,28 @@ watchImmediate([currentSection], ([id]) => {
   }
 
   &__suggestions {
+    interpolate-size: allow-keywords;
+
     list-style: none;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     flex-wrap: wrap;
     gap: var(--size-4);
-    margin: var(--size-12) 0 0;
     padding: 0;
+    margin: 0;
+    transition: height var(--animation-veryslow) var(--ease-in-out);
+    overflow: hidden;
+  }
 
-    @include mq.tablet {
-      margin: var(--size-24) 0 0;
-    }
+  &__suggestions-leave-to,
+  &__suggestions-enter-from {
+    height: 0;
+  }
+
+  &__suggestions-leave-active &__suggestion {
+    transition: opacity var(--animation-veryslow) var(--ease-in-out);
+    opacity: 0;
   }
 
   &__suggestion {
@@ -280,6 +361,41 @@ watchImmediate([currentSection], ([id]) => {
       color: var(--secondary-400);
       flex: 1 0 auto;
     }
+  }
+
+  &__card {
+    --gradient-box-radius: var(--border-radius-3xl);
+
+    background: var(--background-200);
+    padding: var(--size-14);
+    width: min(32ch, 100%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    transition-property: opacity, transform;
+    transition-duration: var(--animation-veryslow);
+    transition-timing-function: var(--ease-out);
+  }
+
+  &__card-leave-to,
+  &__card-enter-from {
+    transform: translate(-50%, 0);
+    opacity: 0;
+  }
+
+  // Animate card, content
+  &__fadable-content {
+    transform-origin: 50% 0;
+    transition-property: opacity, transform;
+    transition-duration: var(--animation-veryslow);
+    transition-timing-function: var(--ease-out);
+  }
+
+  &__wrapper--image &__fadable-content {
+    opacity: 0.4;
+    transform: scale(0.85);
   }
 }
 
