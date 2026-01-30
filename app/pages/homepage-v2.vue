@@ -5,6 +5,7 @@
     </div>
 
     <HomepageSectionAiScroller class="| container" />
+    <HomepageSectionMapScroller class="| container" />
 
     <div class="hv2__spacer">
       Spacer
