@@ -220,7 +220,7 @@ watchImmediate([currentSection], ([id]) => {
  */
 const propertyDetails = {
   disabledInteractions: true,
-  saleOrRent: 'sale',
+  saleOrRent: 'sale' as 'sale' | 'rent',
   propertyImage: '/img/demo/demo-1.jpg',
   price: '£325,000',
   priceLabel: 'In excess of',
@@ -237,7 +237,7 @@ const propertyDetails = {
     { icon: 'property/utility', label: 'Renewables' },
     { icon: 'property/land', label: 'Garden' },
   ],
-  sellerImage: null,
+  sellerImage: undefined,
   sellerName: 'Virify',
   viewURL: undefined,
   enquiryURL: undefined
