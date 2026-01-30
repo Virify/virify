@@ -73,7 +73,7 @@ const keywords = [
 /**
  *  Typing animation
  */
-const { text, animateText, resetText, isTyping } = useTypingAnimation('Show me 3 bedroom houses for sale with south-facing gardens, close to hospital and within 1 mile of a gym and park with a downstairs bathroom and renewable energy source')
+const { text, animateText, animateSkipToEnd, resetText, isTyping } = useTypingAnimation('Show me 3 bedroom houses for sale with south-facing gardens, close to hospital and within 1 mile of a gym and park with a downstairs bathroom and renewable energy source')
 
 /**
  *  Split words by keyword, so they can be highlighted later on
@@ -120,6 +120,10 @@ function runHighlightWords() {
 
     wordsHighlighted.value += 1
   }, 20)
+}
+
+function forceAllHighlights() {
+  wordsHighlighted.value = words.value.length
 }
 
 function resetHighlights(resetCount = false) {
@@ -178,6 +182,9 @@ function showCard() {
 const { currentSection, isScrolledBefore } = toRefs(props)
 
 watchImmediate([currentSection], ([id]) => {
+  if (import.meta.server) return
+
+
   // If no ID, check if scrolled
   if (!id) {
     isScrolledBefore.value && resetAnimation()
@@ -202,6 +209,8 @@ watchImmediate([currentSection], ([id]) => {
     showSuggestions()
   }
   else {
+    animateSkipToEnd()
+    forceAllHighlights()
     showCard()
   }
 })
