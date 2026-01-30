@@ -94,7 +94,7 @@ useIntersectionObserver($sections as Ref<HTMLElement[]>, (entries) => {
 
   checkIsScrolledBefore()
 }, {
-  rootMargin: '-100px'
+  rootMargin: '-25%'
 })
 
 /**
@@ -196,7 +196,15 @@ const lastVisibileId = computed(() => {
     padding: var(--size-40) var(--size-24);
     padding-left: var(--size-56);
     box-sizing: border-box;
-    min-height: 80vh;
+    margin: 0 0 var(--size-32);
+
+    @include mq.notebook {
+      margin: var(--size-56) 0;
+    }
+
+    @include mq.desktop {
+      margin: var(--size-72) 0;
+    }
   }
 
   &__sections-list,
