@@ -1,15 +1,7 @@
 <template>
   <section class="home-section-ai-scroller">
-    <div class="home-section-ai-scroller__column">
-      <h2 class="home-section-ai-scroller__title | title-xl">
-        We speak your language
-      </h2>
-
-      <p class="home-section-ai-scroller__overview | body-lg">
-        Find exactly what you're visualising with natural queries, interactive maps, and granular filters. Our
-        intelligent search platform understands you perfectly, even if you can't find the words for lincrusta or
-        gingerbread trim for the estate agent.
-      </p>
+    <HomepageSectionIntro class="home-section-ai-scroller__column" :title="sectionTitle"
+      :description="sectionDescription">
 
       <ul class="home-section-ai-scroller__sections-list">
         <li v-for="{ id, title, content, icon } of scrollingSections" :key="id" :data-id="id"
@@ -25,7 +17,8 @@
           </p>
         </li>
       </ul>
-    </div>
+    </HomepageSectionIntro>
+
 
     <div
       class="home-section-ai-scroller__column home-section-ai-scroller__column--sticky home-section-ai-scroller__column--demo">
@@ -46,6 +39,9 @@ interface Section {
   title: string
   content: string
 }
+
+const sectionTitle = 'We speak your language'
+const sectionDescription = "Find exactly what you're visualising with natural queries, interactive maps, and granular filters. Our intelligent search platform understands you perfectly, even if you can't find the words for lincrusta or gingerbread trim for the estate agent."
 
 const scrollingSections: Section[] = [
   {
@@ -164,21 +160,6 @@ const lastVisibileId = computed(() => {
       @include mq.desktop {
         padding: 12ch 0;
       }
-    }
-  }
-
-  &__title {
-    font-size: var(--font-6xl);
-    width: min(100%, 12ch);
-    line-height: var(--lineheight-xs);
-    margin: 0 0 var(--size-32);
-
-    @include mq.notebook {
-      font-size: var(--font-7xl);
-    }
-
-    @include mq.desktop {
-      font-size: var(--font-8xl);
     }
   }
 
