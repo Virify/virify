@@ -5,17 +5,23 @@
 
     <div ref="$map" class="homepage-section-map__map">
       <template v-if="isVisible">
-        <div v-for="{ bottom, left, price, variant }, index of markers" :key="index"
+        <div v-for="{ bottom, left, price, variant, image }, index of markers" :key="index"
           class="homepage-section-map__marker" :style="{ bottom, left, animationDelay: index * 70 + 'ms' }">
 
 
           <button class="homepage-section-map__marker-button | body-2xs"
             :class="variant && `homepage-section-map__marker-button--${variant}`">
-            {{ price }}
+            <img v-if="variant === 'premium' && image" :src="image" alt="Photo of property"
+              class="homepage-section-map__marker-button-image" />
 
-            <div role="presentation" class="homepage-section-map__marker-button-interactions">
-              <AtomsIcon icon="cards/favourite" />
-              <AtomsIcon icon="cards/notes" />
+            <div class="homepage-section-map__marker-button-flex">
+              {{ price }}
+
+              <div role="presentation"
+                class="homepage-section-map__marker-button-flex homepage-section-map__marker-button-flex--interactions">
+                <AtomsIcon icon="cards/favourite" />
+                <AtomsIcon icon="cards/notes" />
+              </div>
             </div>
           </button>
         </div>
@@ -64,6 +70,7 @@ interface Marker {
   left: string
   price: string
   variant?: 'premium' | 'featured'
+  image?: string
 }
 
 const markers: Marker[] = [
@@ -88,7 +95,8 @@ const markers: Marker[] = [
     bottom: '60%',
     left: '70%',
     price: '£455k',
-    variant: 'premium'
+    variant: 'premium',
+    image: '/img/demo/demo-1.jpg'
   },
   {
     bottom: '58%',
@@ -104,7 +112,7 @@ const markers: Marker[] = [
   width: min(100%, 40ch);
   position: relative;
   margin: 0 auto;
-  height: min(100vh, 60ch);
+  height: min(90vh, 55ch);
   box-sizing: border-box;
   display: flex;
   align-items: flex-end;
@@ -152,10 +160,6 @@ const markers: Marker[] = [
     --marker-colour: var(--monochrome-900);
 
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--size-8);
     border-radius: var(--border-radius-md);
     background: var(--marker-bg);
     color: var(--monochrome-900);
@@ -194,6 +198,12 @@ const markers: Marker[] = [
     &--premium {
       font-size: var(--font-sm);
 
+      &:has(img) {
+        padding: var(--size-6) var(--size-6) var(--size-4);
+        border-radius: var(--border-radius-lg);
+        width: 14ch;
+      }
+
       .a-icon {
         width: var(--size-18);
         height: var(--size-18);
@@ -201,11 +211,22 @@ const markers: Marker[] = [
     }
   }
 
-  &__marker-button-interactions {
+  &__marker-button-image {
+    display: block;
+    width: 100%;
+    border-radius: var(--border-radius-md);
+    margin: 0 0 var(--size-4);
+  }
+
+  &__marker-button-flex {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--size-4);
+    gap: var(--size-8);
+
+    &--interactions {
+      gap: var(--size-4);
+    }
   }
 
   // Pause animation play state on hover, for those with poor
@@ -219,7 +240,7 @@ const markers: Marker[] = [
 @keyframes dropInMarker {
   from {
     opacity: 0;
-    transform: translateY(-50vh)
+    transform: translateY(-75vh)
   }
 }
 
