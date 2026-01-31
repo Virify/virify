@@ -59,7 +59,9 @@ useIntersectionObserver($map,
     timeout = setTimeout(() => {
       isVisible.value = true
     }, 1000)
-  }
+  }, {
+  rootMargin: '50px'
+}
 )
 
 /**
