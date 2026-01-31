@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="hv2__overflow">
+      <HomepageSectionSignup class="| container" />
+    </div>
+
     <div class="hv2__spacer">
       Spacer
     </div>
@@ -16,6 +20,10 @@
 
 <style lang="scss">
 .hv2 {
+
+  &__overflow {
+    overflow: hidden;
+  }
 
   &__spacer {
     display: flex;
