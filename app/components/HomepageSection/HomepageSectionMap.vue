@@ -5,10 +5,20 @@
 
     <div ref="$map" class="homepage-section-map__map">
       <template v-if="isVisible">
-        <span v-for="{ bottom, left, price }, index of markers" :key="index" class="homepage-section-map__marker"
-          :style="{ bottom, left, animationDelay: index * 70 + 'ms' }">
-          {{ price }}
-        </span>
+        <div v-for="{ bottom, left, price, variant }, index of markers" :key="index"
+          class="homepage-section-map__marker" :style="{ bottom, left, animationDelay: index * 70 + 'ms' }">
+
+
+          <button class="homepage-section-map__marker-button | body-2xs"
+            :class="variant && `homepage-section-map__marker-button--${variant}`">
+            {{ price }}
+
+            <div role="presentation" class="homepage-section-map__marker-button-interactions">
+              <AtomsIcon icon="cards/favourite" />
+              <AtomsIcon icon="cards/notes" />
+            </div>
+          </button>
+        </div>
       </template>
 
       <img src="/img/demo/map.svg" alt="Floating map tile" class="homepage-section-map__map-tile" />
@@ -53,14 +63,38 @@ interface Marker {
   bottom: string
   left: string
   price: string
+  variant?: 'premium' | 'featured'
 }
 
 const markers: Marker[] = [
-  { bottom: '40%', left: '35%', price: '£375,000' },
-  { bottom: '80%', left: '40%', price: '£287,000' },
-  { bottom: '60%', left: '70%', price: '£455,000' },
-  { bottom: '30%', left: '55%', price: '£1,200,000' },
-  { bottom: '55%', left: '15%', price: '£195,000' },
+  {
+    bottom: '30%',
+    left: '62%',
+    price: '£1.2m',
+    variant: 'featured'
+  },
+  {
+    bottom: '44%',
+    left: '39%',
+    price: '£375k'
+  },
+  {
+    bottom: '80%',
+    left: '40%',
+    price: '£287k',
+    variant: 'featured'
+  },
+  {
+    bottom: '60%',
+    left: '70%',
+    price: '£455k',
+    variant: 'premium'
+  },
+  {
+    bottom: '58%',
+    left: '20%',
+    price: '£195k'
+  },
 ]
 
 </script>
@@ -109,12 +143,76 @@ const markers: Marker[] = [
 
   &__marker {
     position: absolute;
-    width: 1.5em;
-    height: 2em;
     animation: dropInMarker var(--animation-subtle) cubic-bezier(0.44, 1.42, 0.64, 0.87);
     animation-fill-mode: backwards;
-    border-radius: var(--border-radius-pill);
-    background: var(--secondary-400);
+  }
+
+  &__marker-button {
+    --marker-bg: var(--blue-400);
+    --marker-colour: var(--monochrome-900);
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-8);
+    border-radius: var(--border-radius-md);
+    background: var(--marker-bg);
+    color: var(--monochrome-900);
+    padding: var(--size-4) var(--size-10);
+    line-height: var(--lineheight-md);
+    font-weight: var(--font-semisemibold);
+    transform: translateX(-50%);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: calc(100% - var(--size-4));
+      left: calc(50% - var(--size-4));
+      width: var(--size-8);
+      height: var(--size-8);
+      background: var(--marker-bg);
+      transform: rotate(45deg);
+    }
+
+    .a-icon {
+      width: var(--size-16);
+      height: var(--size-16);
+    }
+
+    &--featured {
+      --marker-bg: var(--secondary-400);
+
+      font-size: var(--font-sm);
+
+      .a-icon {
+        width: var(--size-18);
+        height: var(--size-18);
+      }
+    }
+
+    &--premium {
+      font-size: var(--font-sm);
+
+      .a-icon {
+        width: var(--size-18);
+        height: var(--size-18);
+      }
+    }
+  }
+
+  &__marker-button-interactions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-4);
+  }
+
+  // Pause animation play state on hover, for those with poor
+  // motor neuron skills
+  &:hover &__map,
+  &:hover &__shadow {
+    animation-play-state: paused;
   }
 }
 
