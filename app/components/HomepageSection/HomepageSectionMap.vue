@@ -5,11 +5,10 @@
 
     <div ref="$map" class="homepage-section-map__map">
       <template v-if="isVisible">
-        <div class="homepage-section-map__marker homepage-section-map__marker--1"></div>
-        <div class="homepage-section-map__marker homepage-section-map__marker--2"></div>
-        <div class="homepage-section-map__marker homepage-section-map__marker--3"></div>
-        <div class="homepage-section-map__marker homepage-section-map__marker--4"></div>
-        <div class="homepage-section-map__marker homepage-section-map__marker--5"></div>
+        <span v-for="{ bottom, left, price }, index of markers" :key="index" class="homepage-section-map__marker"
+          :style="{ bottom, left, animationDelay: index * 70 + 'ms' }">
+          {{ price }}
+        </span>
       </template>
 
       <img src="/img/demo/map.svg" alt="Floating map tile" class="homepage-section-map__map-tile" />
@@ -46,6 +45,23 @@ useIntersectionObserver($map,
     }, 1000)
   }
 )
+
+/**
+ *  Markers
+ */
+interface Marker {
+  bottom: string
+  left: string
+  price: string
+}
+
+const markers: Marker[] = [
+  { bottom: '40%', left: '35%', price: '£375,000' },
+  { bottom: '80%', left: '40%', price: '£287,000' },
+  { bottom: '60%', left: '70%', price: '£455,000' },
+  { bottom: '30%', left: '55%', price: '£1,200,000' },
+  { bottom: '55%', left: '15%', price: '£195,000' },
+]
 
 </script>
 
@@ -95,43 +111,10 @@ useIntersectionObserver($map,
     position: absolute;
     width: 1.5em;
     height: 2em;
-    animation: dropInMarker var(--animation-subtle) cubic-bezier(.44, 1.42, .64, .87);
+    animation: dropInMarker var(--animation-subtle) cubic-bezier(0.44, 1.42, 0.64, 0.87);
     animation-fill-mode: backwards;
     border-radius: var(--border-radius-pill);
-
-    &--1 {
-      bottom: 35%;
-      left: 30%;
-      background: red;
-    }
-
-    &--2 {
-      bottom: 80%;
-      left: 40%;
-      background: blue;
-      animation-delay: 100ms;
-    }
-
-    &--3 {
-      bottom: 60%;
-      left: 70%;
-      background: green;
-      animation-delay: 200ms;
-    }
-
-    &--4 {
-      bottom: 30%;
-      left: 55%;
-      background: orange;
-      animation-delay: 200ms;
-    }
-
-    &--5 {
-      bottom: 55%;
-      left: 15%;
-      background: purple;
-      animation-delay: 200ms;
-    }
+    background: var(--secondary-400);
   }
 }
 
