@@ -138,7 +138,7 @@ const markers: Marker[] = [
     left: 0;
     width: 100%;
     animation-name: fadeMapShadow;
-    opacity: 0.7;
+    opacity: 0.66;
     filter: blur(20px);
     transform: scale(0.9);
   }
@@ -255,7 +255,7 @@ const markers: Marker[] = [
 @keyframes fadeMapShadow {
   from {
     opacity: 1;
-    filter: blur(10px);
+    filter: blur(8px);
     transform: scale(0.95);
   }
 }
