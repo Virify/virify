@@ -54,11 +54,11 @@ const contentSection = [
 .homepage-section-map-scroller {
   display: grid;
   gap: var(--size-32);
-  margin-top: var(--size-120);
   align-items: center;
   justify-content: center;
 
   @include mq.tablet {
+    margin-top: var(--size-120);
     grid-template-columns: 1fr 1fr;
     gap: var(--size-56);
     align-items: flex-start;
@@ -66,6 +66,13 @@ const contentSection = [
 
   @include mq.desktop {
     gap: var(--size-72);
+  }
+
+  @include mq.tablet {
+    &__column--sticky {
+      position: sticky;
+      top: 0;
+    }
   }
 
   &__list {
@@ -102,11 +109,6 @@ const contentSection = [
     @include mq.desktop {
       font-size: var(--font-4xl);
     }
-  }
-
-  &__column--sticky {
-    position: sticky;
-    top: 0;
   }
 }
 </style>

@@ -109,16 +109,22 @@ const markers: Marker[] = [
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .homepage-section-map {
   width: min(100%, 40ch);
   position: relative;
   margin: 0 auto;
-  height: min(90vh, 55ch);
   box-sizing: border-box;
   display: flex;
   align-items: flex-end;
-  padding: var(--size-72) 0;
+  padding: var(--size-24) 0;
   box-sizing: border-box;
+
+  @include mq.tablet {
+    height: min(90vh, 55ch);
+    padding: var(--size-72) 0;
+  }
 
   &__map {
     position: relative;
