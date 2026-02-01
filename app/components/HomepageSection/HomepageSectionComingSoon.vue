@@ -39,11 +39,6 @@
   }
 
   &__computer {
-    $computer-bevel-size: 24px;
-    $computer-webcam-size: 8px;
-    $computer-webcam-left: math.div($computer-webcam-size, 2);
-    $computer-webcam-top: math.div($computer-bevel-size - $computer-webcam-size, 2);
-
     position: relative;
     margin: var(--size-48) auto 0;
     width: min(100%, 640px);
@@ -63,28 +58,39 @@
     &::after {
       content: '';
       position: absolute;
-      top: $computer-webcam-top;
-      left: calc(50% - #{ $computer-webcam-left });
-      width: $computer-webcam-size;
-      height: $computer-webcam-size;
+      top: 4px;
+      left: calc(50% - 4px);
+      width: 8px;
+      height: 8px;
       background: var(--blue-500);
       border: 1px solid var(--blue-700);
       box-sizing: border-box;
       border-radius: 100%;
+
+      @include mq.small-tablet {
+        top: 8px;
+      }
     }
 
     .video {
       display: block;
       box-shadow: 0 -10px 40px -15px var(--monochrome-600);
-      border: #{$computer-bevel-size} solid var(--monochrome-200);
+      border: 16px solid var(--monochrome-200);
       border-bottom: 0;
-      border-top-left-radius: var(--border-radius-4xl);
-      border-top-right-radius: var(--border-radius-4xl);
+      border-top-left-radius: var(--border-radius-3xl);
+      border-top-right-radius: var(--border-radius-3xl);
       overflow: hidden;
       width: 100%;
       object-fit: contain;
       margin: 0;
       padding: 0;
+
+      @include mq.small-tablet {
+        border: 24px solid var(--monochrome-200);
+        border-top-left-radius: var(--border-radius-4xl);
+        border-top-right-radius: var(--border-radius-4xl);
+        border-bottom: 0;
+      }
 
       // Until actual video exists...
       display: flex;
