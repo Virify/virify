@@ -151,14 +151,10 @@ const lastVisibileId = computed(() => {
     }
 
     &--demo {
-      padding: 5ch 0;
+      padding: 8ch 0;
 
       @include mq.notebook {
-        padding: 8ch 0;
-      }
-
-      @include mq.desktop {
-        padding: 12ch 0;
+        padding: 12ch 0 0;
       }
     }
   }
@@ -185,6 +181,10 @@ const lastVisibileId = computed(() => {
 
     @include mq.desktop {
       margin: var(--size-72) 0;
+    }
+
+    &:last-child {
+      padding-bottom: 20vh;
     }
   }
 

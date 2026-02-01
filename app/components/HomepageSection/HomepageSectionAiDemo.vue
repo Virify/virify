@@ -1,5 +1,5 @@
 <template>
-  <div class="homepage-section-ai-demo__wrapper" :class="{
+  <div ref="$root" class="homepage-section-ai-demo__wrapper" :class="{
     'homepage-section-ai-demo__wrapper--image': isCardVisible
   }">
 
@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import type { SectionId } from './HomepageSectionAiScroller.vue'
-import { watchImmediate } from '@vueuse/core'
+import { useIntersectionObserver, watchImmediate } from '@vueuse/core'
 
 interface Props {
   currentSection?: SectionId
@@ -177,6 +177,22 @@ function showCard() {
 }
 
 /**
+ *  Do not entirely reset animation if visible
+ */
+const $root = useTemplateRef('$root')
+const isRootVisible = shallowRef(false)
+
+useIntersectionObserver($root, ([entry]) => {
+  const { isIntersecting } = asObject(entry)
+
+  isRootVisible.value = !!isIntersecting
+})
+
+watch(isRootVisible, (visibility) => {
+  if (!visibility) resetAnimation()
+})
+
+/**
  *  Scroll events
  */
 const { currentSection, isScrolledBefore } = toRefs(props)
@@ -187,7 +203,7 @@ watchImmediate([currentSection], ([id]) => {
 
   // If no ID, check if scrolled
   if (!id) {
-    isScrolledBefore.value && resetAnimation()
+    isScrolledBefore.value && !isRootVisible && resetAnimation()
 
     return
   }
@@ -268,6 +284,9 @@ const propertyDetails = {
 
   &__wrapper {
     position: relative;
+    min-height: 30em;
+    box-sizing: border-box;
+
   }
 
   &__title {
@@ -390,7 +409,7 @@ const propertyDetails = {
 
   &__card-leave-to,
   &__card-enter-from {
-    transform: translate(-50%, 0);
+    transform: translate(-50%, calc(-50% - 20vh));
     opacity: 0;
   }
 
