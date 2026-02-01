@@ -19,7 +19,7 @@
 
       <form class="homepage-section-signup__form" @submit.prevent="signUpUser">
         <input type="email" required aria-label="Email address" placeholder="Email address" name="email"
-          class="homepage-section-signup__text-input | body-lg" />
+          class="homepage-section-signup__text-input | body-md" />
 
         <label class="homepage-section-signup__consent | body-sm">
           <AtomsCheckInput name="terms" required class="homepage-section-signup__consent-checkbox" />
@@ -36,7 +36,7 @@
           </span>
         </label>
 
-        <button type="submit" class="homepage-section-signup__button | button button-secondary">
+        <button type="submit" class="homepage-section-signup__button | button button-secondary body-md">
           Join waiting list
         </button>
       </form>
@@ -144,6 +144,7 @@ function signUpUser() {
     max-width: 30ch;
     text-align: center;
     line-height: var(--lineheight-xs);
+    font-size: var(--font-4xl);
   }
 
   &__title-caption {
@@ -170,7 +171,7 @@ function signUpUser() {
     background: var(--monochrome-900);
     color: var(--monochrome-100);
     padding: var(--size-16) var(--size-28);
-    width: min(100%, 34ch);
+    width: min(100%, 38ch);
     border-radius: var(--border-radius-xl);
     box-sizing: border-box;
   }
