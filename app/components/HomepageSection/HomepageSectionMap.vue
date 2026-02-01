@@ -8,7 +8,6 @@
         <div v-for="{ bottom, left, price, variant, image }, index of markers" :key="index"
           class="homepage-section-map__marker" :style="{ bottom, left, animationDelay: index * 70 + 'ms' }">
 
-
           <button class="homepage-section-map__marker-button | body-2xs"
             :class="variant && `homepage-section-map__marker-button--${variant}`">
             <img v-if="variant === 'premium' && image" :src="image" alt="Photo of property"
@@ -58,7 +57,7 @@ useIntersectionObserver($map,
     // ...else wait for timeout and add active classnames
     timeout = setTimeout(() => {
       isVisible.value = true
-    }, 1000)
+    }, 500)
   }, {
   rootMargin: '50px'
 }
