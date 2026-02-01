@@ -245,16 +245,16 @@ const validIcons = computed(() => {
     text-align: center;
     font-weight: var(--font-bold);
     transition: background-color var(--animation-fast);
-    color: var(--monochrome-500);
-    background-color: var(--monochrome-800);
+    color: light-dark(var(--monochrome-500), var(--monochrome-500));
+    background-color: light-dark(var(--monochrome-800), var(--monochrome-400));
 
     &[href] {
       color: currentColor;
-      background-color: var(--monochrome-800);
+      background-color: light-dark(var(--monochrome-800), var(--monochrome-200));
 
       &:hover {
         color: currentColor;
-        background-color: var(--monochrome-700);
+        background-color: light-dark(var(--monochrome-700), var(--monochrome-100));
       }
     }
 
@@ -276,7 +276,7 @@ const validIcons = computed(() => {
     gap: var(--size-10);
     margin-top: var(--size-8);
     padding: var(--size-8);
-    background-color: var(--monochrome-800);
+    background-color: light-dark(var(--monochrome-800), var(--monochrome-300));
     border-radius: var(--border-radius-lg);
     font-weight: var(--font-semisemibold);
   }

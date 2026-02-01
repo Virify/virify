@@ -332,11 +332,11 @@ const propertyDetails = {
     &--highlighted {
       white-space: nowrap;
       font-weight: var(--font-semibold);
-      color: var(--secondary-400);
-      background: var(--secondary-900);
+      color: light-dark(var(--secondary-400), var(--monochrome-900));
+      background: light-dark(var(--secondary-900), var(--secondary-400));
       border-radius: var(--border-radius-lg);
       padding: var(--size-2) var(--size-8);
-      border: 1px solid var(--secondary-800);
+      border: 1px solid light-dark(var(--secondary-800), var(--secondary-700));
     }
   }
 
