@@ -20,22 +20,34 @@
 @use '#styles/_utils/media' as mq;
 
 .homepage-section-coming-soon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
   padding: max(var(--size-32), 15vh) 0;
 
+  @include mq.tablet {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
   .homepage-section-intro__title {
-    width: min(100%, 20ch);
-    text-align: center;
-    margin: 0 auto var(--size-24);
+    margin: 0 0 var(--size-24);
+    width: auto;
+
+    @include mq.tablet {
+      text-align: center;
+      width: min(100%, 20ch);
+      margin: 0 auto var(--size-24);
+    }
   }
 
   .homepage-section-intro__overview {
-    width: min(100%, 60ch);
-    text-align: center;
-    margin: 0 auto;
+    width: auto;
+
+    @include mq.tablet {
+      width: min(100%, 60ch);
+      text-align: center;
+      margin: 0 auto;
+    }
   }
 
   &__computer {
