@@ -62,11 +62,13 @@
 .head,
 .hair1,
 .hair2,
-.hair3,
+.hair3 {
+  animation: 3.6s infinite alternate ease-in-out;
+}
 .arm,
 .hand,
 .ruler {
-  animation: 3.5s infinite alternate ease-in-out;
+  animation: 1.8s infinite alternate ease-in-out;
 }
 .arm {
   transform-origin: 267px 236px;
