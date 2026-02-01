@@ -409,7 +409,7 @@ const propertyDetails = {
 
   &__card-leave-to,
   &__card-enter-from {
-    transform: translate(-50%, calc(-50% - 20vh));
+    transform: translate(-50%, calc(-50% + 20vh));
     opacity: 0;
   }
 

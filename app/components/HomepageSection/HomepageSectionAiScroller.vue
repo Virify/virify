@@ -151,10 +151,10 @@ const lastVisibileId = computed(() => {
     }
 
     &--demo {
-      padding: 8ch 0;
+      padding: 8ch 0 20vh;
 
       @include mq.notebook {
-        padding: 12ch 0 0;
+        padding: 12ch 0 20vh;
       }
     }
   }
