@@ -53,6 +53,7 @@ import { useIntersectionObserver, watchImmediate } from '@vueuse/core'
 interface Props {
   currentSection?: SectionId
   isScrolledBefore: boolean
+  isMobile: boolean
 }
 
 const props = defineProps<Props>()
@@ -195,7 +196,7 @@ watch(isRootVisible, (visibility) => {
 /**
  *  Scroll events
  */
-const { currentSection, isScrolledBefore } = toRefs(props)
+const { currentSection, isScrolledBefore, isMobile } = toRefs(props)
 
 watchImmediate([currentSection], ([id]) => {
   if (import.meta.server) return
@@ -203,7 +204,9 @@ watchImmediate([currentSection], ([id]) => {
 
   // If no ID, check if scrolled
   if (!id) {
-    isScrolledBefore.value && !isRootVisible && resetAnimation()
+    const shouldHardReset = isMobile.value || (isScrolledBefore.value && !isRootVisible)
+
+    shouldHardReset && resetAnimation()
 
     return
   }

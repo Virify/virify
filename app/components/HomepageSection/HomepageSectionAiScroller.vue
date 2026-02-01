@@ -19,17 +19,16 @@
       </ul>
     </HomepageSectionIntro>
 
-
     <div
       class="home-section-ai-scroller__column home-section-ai-scroller__column--sticky home-section-ai-scroller__column--demo">
-      <HomepageSectionAiDemo :current-section="lastVisibileId" :is-scrolled-before
+      <HomepageSectionAiDemo :current-section="lastVisibileId" :is-scrolled-before :is-mobile
         class="home-section-ai-scroller__demo" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { useIntersectionObserver } from '@vueuse/core'
+import { useIntersectionObserver, useMediaQuery, watchImmediate } from '@vueuse/core'
 
 export type SectionId = 'language' | 'prompt' | 'filters' | 'results'
 
@@ -38,6 +37,7 @@ interface Section {
   id: SectionId
   title: string
   content: string
+  timeout?: number
 }
 
 const sectionTitle = 'We speak your language'
@@ -80,6 +80,8 @@ const $sections = useTemplateRef('$sections')
 // Cast $sections as ref due to type bug with VueUse:
 // https://github.com/vueuse/vueuse/issues/4712
 useIntersectionObserver($sections as Ref<HTMLElement[]>, (entries) => {
+  if (isMobile.value) return
+
   for (const { target, isIntersecting } of entries) {
     const { id } = asObject((target as HTMLElement).dataset)
 
@@ -123,6 +125,48 @@ const lastVisibileId = computed(() => {
 
   return firstVisible && firstVisible[0] as SectionId
 })
+
+/**
+ *  For mobile screens we need to just cycle through animations
+ */
+const isMobile = useMediaQuery('(max-width: 767px)')
+
+let mobileAnimationTimeout: NodeJS.Timeout
+
+function clearMobileAnimationTimeout() {
+  if (mobileAnimationTimeout) clearTimeout(mobileAnimationTimeout)
+}
+
+watchImmediate(isMobile, () => {
+  if (!isMobile.value) {
+    clearMobileAnimationTimeout()
+
+    return
+  }
+
+  // Track current step
+  let currentStep = 0
+
+  // Get all possible IDs
+  const allIds = scrollingSections.map(({ id }) => id)
+
+  // Cycle through and alternative the visible ID
+  mobileAnimationTimeout = setInterval(() => {
+    if (currentStep >= scrollingSections.length) currentStep = -1
+
+    // Get current step ID
+    const { id: currentId } = asObject(scrollingSections[currentStep])
+
+    // Loop through each ID and assign visibility
+    for (const id of allIds) {
+      sectionsState[id] = id === currentId
+    }
+
+    currentStep++
+  }, 3000)
+})
+
+onBeforeUnmount(clearMobileAnimationTimeout)
 
 </script>
 
@@ -170,10 +214,19 @@ const lastVisibileId = computed(() => {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: var(--size-40) var(--size-24);
+    padding: var(--size-24);
     padding-left: var(--size-56);
     box-sizing: border-box;
-    margin: 0 0 var(--size-32);
+    max-width: 50ch;
+
+    @include mq.tablet {
+      padding: var(--size-40) var(--size-24);
+      margin: 0 0 var(--size-32);
+
+      &:last-child {
+        padding-bottom: 20vh;
+      }
+    }
 
     @include mq.notebook {
       margin: var(--size-56) 0;
@@ -181,10 +234,6 @@ const lastVisibileId = computed(() => {
 
     @include mq.desktop {
       margin: var(--size-72) 0;
-    }
-
-    &:last-child {
-      padding-bottom: 20vh;
     }
   }
 
