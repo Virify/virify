@@ -4,10 +4,7 @@
       <HomepageSectionSignup class="| container" />
     </div>
 
-    <div class="hv2__spacer">
-      Spacer
-    </div>
-
+    <HomepageSectionComingSoon class="| container" />
     <HomepageSectionAiScroller class="| container" />
     <HomepageSectionMapScroller class="| container" />
 
