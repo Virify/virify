@@ -272,10 +272,12 @@ const propertyDetails = {
 
   padding: var(--size-14);
   background: var(--background-200);
+  min-height: 24em;
 
   @include mq.tablet {
     --radius: var(--border-radius-2xl);
 
+    min-height: auto;
     padding: var(--size-20);
   }
 
@@ -287,9 +289,8 @@ const propertyDetails = {
 
   &__wrapper {
     position: relative;
-    min-height: 30em;
     box-sizing: border-box;
-
+    min-height: 30em;
   }
 
   &__title {
@@ -399,7 +400,7 @@ const propertyDetails = {
 
     background: var(--background-200);
     padding: var(--size-14);
-    width: min(32ch, 100%);
+    width: min(24ch, 100%);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -408,6 +409,10 @@ const propertyDetails = {
     transition-property: opacity, transform;
     transition-duration: var(--animation-veryslow);
     transition-timing-function: var(--ease-out);
+
+    @include mq.tablet {
+      width: min(32ch, 100%);
+    }
   }
 
   &__card-leave-to,
@@ -426,7 +431,11 @@ const propertyDetails = {
 
   &__wrapper--image &__fadable-content {
     opacity: 0.4;
-    transform: scale(0.85);
+    transform: scale(0.95) translateY(var(--size-16));
+
+    @include mq.tablet {
+      transform: scale(0.85);
+    }
   }
 }
 

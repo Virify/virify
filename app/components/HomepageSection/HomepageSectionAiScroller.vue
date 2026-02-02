@@ -19,8 +19,7 @@
       </ul>
     </HomepageSectionIntro>
 
-    <div
-      class="home-section-ai-scroller__column home-section-ai-scroller__column--sticky home-section-ai-scroller__column--demo">
+    <div class="home-section-ai-scroller__column home-section-ai-scroller__column--sticky">
       <HomepageSectionAiDemo :current-section="lastVisibileId" :is-scrolled-before :is-mobile
         class="home-section-ai-scroller__demo" />
     </div>
@@ -188,14 +187,25 @@ onBeforeUnmount(clearMobileAnimationTimeout)
   }
 
   &__column {
+    order: 2;
 
-    &--sticky {
-      top: 0;
-      position: sticky;
+    @include mq.tablet {
+      order: unset;
     }
 
-    &--demo {
-      padding: 8ch 0 20vh;
+    &--sticky {
+      order: 1;
+      width: min(100%, 27ch);
+      margin: 0 auto;
+
+      @include mq.tablet {
+        order: unset;
+
+        top: 0;
+        position: sticky;
+        padding: 8ch 0 20vh;
+        width: 100%;
+      }
 
       @include mq.notebook {
         padding: 12ch 0 20vh;
@@ -205,8 +215,12 @@ onBeforeUnmount(clearMobileAnimationTimeout)
 
   &__sections-list {
     list-style: none;
-    margin: var(--size-40) 0;
+    margin: var(--size-40) 0 var(--size-120);
     padding: 0;
+
+    @include mq.tablet {
+      padding-bottom: 20vh;
+    }
   }
 
   &__section {
@@ -222,10 +236,6 @@ onBeforeUnmount(clearMobileAnimationTimeout)
     @include mq.tablet {
       padding: var(--size-40) var(--size-24);
       margin: 0 0 var(--size-32);
-
-      &:last-child {
-        padding-bottom: 20vh;
-      }
     }
 
     @include mq.notebook {
@@ -239,8 +249,12 @@ onBeforeUnmount(clearMobileAnimationTimeout)
 
   &__sections-list,
   &__demo {
-    width: min(100%, 50ch);
-    justify-self: center;
+    width: auto;
+
+    @include mq.tablet {
+      width: min(100%, 50ch);
+      justify-self: center;
+    }
   }
 
   &__section-title {
