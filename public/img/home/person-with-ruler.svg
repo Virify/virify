@@ -63,12 +63,12 @@
 .hair1,
 .hair2,
 .hair3 {
-  animation: 3.6s infinite alternate ease-in-out;
+  animation: 4s infinite alternate ease-in-out;
 }
 .arm,
 .hand,
 .ruler {
-  animation: 1.8s infinite alternate ease-in-out;
+  animation: 2.5s infinite alternate ease-in-out;
 }
 .arm {
   transform-origin: 267px 236px;
@@ -90,9 +90,11 @@
 }
 .hair2 {
   animation-name: hair2bounce;
+  animation-timing-function: cubic-bezier(.68,-0.6,.4,1.57)
 }
 .hair3 {
   animation-name: hair3bounce;
+  animation-timing-function: cubic-bezier(.68,-0.6,.4,1.57)
 }
 @keyframes headShake {
   0% {transform: translateX(25px)}
@@ -115,15 +117,19 @@
   30% {transform: none}
 }
 @keyframes wobbleRuler {
-  from {transform: rotate(-1deg) translateY(-1px)}
-  to {transform: rotate(0.5deg) translateY(-0.5px)}
+  0% {transform: rotate(-1deg) translateY(-1px)}
+  80% {transform: rotate(-1deg) translateY(-1px)}
+  100% {transform: rotate(0.5deg) translateY(-0.5px)}
 }
 @keyframes wobbleArm {
-  from {transform: rotate(-4deg)}
+  0% {transform: rotate(-4deg)}
+  80% {transform: rotate(-4deg)}
+  100% {transform: none}
 }
 @keyframes wobbleHand {
-  from {transform: rotate(6deg)}
-  to {transform: rotate(-1deg)}
+  0%  {transform: rotate(6deg)}
+  80%  {transform: rotate(6deg)}
+  100% {transform: rotate(-1deg)}
 }
 </style>
 </defs>

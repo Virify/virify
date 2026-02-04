@@ -4,7 +4,11 @@
       class="homepage-section-signup__image homepage-section-signup__image--left"
       aria-label="Peace lily and a moving box" />
 
-    <img src="/img/home/window.svg" class="homepage-section-signup__image homepage-section-signup__image--window" />
+    <picture>
+      <source srcset="/img/home/window.svg" media="(max-width: 1023px)" />
+      <img src="/img/home/window-partial.svg"
+        class="homepage-section-signup__image homepage-section-signup__image--window" />
+    </picture>
 
     <img src="/img/home/person-with-ruler.svg"
       class="homepage-section-signup__image homepage-section-signup__image--person"
@@ -59,7 +63,7 @@ function signUpUser() {
   background: #26333C; // @TODO replace with new colours once supported
   color: var(--monochrome-900);
   border-radius: var(--border-radius-2xl);
-  padding: var(--size-40) var(--size-32) 250px;
+  padding: var(--size-56) var(--size-32) 250px;
   margin: var(--size-16) auto;
   display: flex;
   align-items: center;
@@ -103,13 +107,19 @@ function signUpUser() {
     }
 
     &--window {
-      top: 0;
+      bottom: 100px;
       right: 0;
-      width: 180px;
+      max-height: calc(100% - 140px);
+      width: auto;
+      max-width: 220px;
       opacity: 0.5;
 
       @include mq.notebook {
+        bottom: auto;
+        top: 0;
         width: 270px;
+        max-height: none;
+        max-width: none;
         opacity: 1;
       }
 
