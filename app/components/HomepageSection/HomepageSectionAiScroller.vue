@@ -22,6 +22,8 @@
     <div class="home-section-ai-scroller__column home-section-ai-scroller__column--sticky">
       <HomepageSectionAiDemo :current-section="lastVisibileId" :is-scrolled-before :is-mobile
         class="home-section-ai-scroller__demo" />
+
+      <HomepageSectionAiCarousel :sections="scrollingSections" class="home-section-ai-scroller__carousel-list" />
     </div>
   </section>
 </template>
@@ -187,20 +189,11 @@ onBeforeUnmount(clearMobileAnimationTimeout)
   }
 
   &__column {
-    order: 2;
-
-    @include mq.tablet {
-      order: unset;
-    }
 
     &--sticky {
-      order: 1;
-      width: min(100%, 27ch);
       margin: 0 auto;
 
       @include mq.tablet {
-        order: unset;
-
         top: 0;
         position: sticky;
         padding: 8ch 0 20vh;
@@ -214,11 +207,13 @@ onBeforeUnmount(clearMobileAnimationTimeout)
   }
 
   &__sections-list {
+    display: none;
     list-style: none;
     margin: var(--size-40) 0 var(--size-120);
     padding: 0;
 
     @include mq.tablet {
+      display: block;
       padding-bottom: 20vh;
     }
   }
@@ -247,11 +242,15 @@ onBeforeUnmount(clearMobileAnimationTimeout)
     }
   }
 
-  &__sections-list,
   &__demo {
-    width: auto;
+    width: min(100%, 36ch);
+    margin: var(--size-24) auto var(--size-48);
+  }
 
-    @include mq.tablet {
+  @include mq.tablet {
+
+    &__demo,
+    &__sections-list {
       width: min(100%, 50ch);
       justify-self: center;
     }
@@ -278,6 +277,14 @@ onBeforeUnmount(clearMobileAnimationTimeout)
     width: var(--size-40);
     height: var(--size-40);
     color: var(--secondary-400);
+  }
+
+  &__carousel-list {
+    margin: 0 0 var(--size-72);
+
+    @include mq.tablet {
+      display: none;
+    }
   }
 }
 </style>

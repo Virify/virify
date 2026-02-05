@@ -53,7 +53,11 @@
   &__computer {
     position: relative;
     margin: var(--size-48) auto 0;
-    width: min(90%, 640px);
+    width: min(100%, 480px);
+
+    @include mq.tablet {
+      width: min(90%, 640px);
+    }
 
     &::before {
       $gradient-offset: 40px;

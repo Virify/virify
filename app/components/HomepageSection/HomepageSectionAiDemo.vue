@@ -272,7 +272,7 @@ const propertyDetails = {
 
   padding: var(--size-14);
   background: var(--background-200);
-  min-height: 24em;
+  min-height: 30em;
 
   @include mq.tablet {
     --radius: var(--border-radius-2xl);
@@ -400,7 +400,7 @@ const propertyDetails = {
 
     background: var(--background-200);
     padding: var(--size-14);
-    width: min(24ch, 100%);
+    width: 90%;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -410,8 +410,12 @@ const propertyDetails = {
     transition-duration: var(--animation-veryslow);
     transition-timing-function: var(--ease-out);
 
+    @media (min-width: 400px) {
+      width: min(31ch, 90%);
+    }
+
     @include mq.tablet {
-      width: min(32ch, 100%);
+      width: min(31ch, 100%);
     }
   }
 
