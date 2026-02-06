@@ -230,6 +230,7 @@ onBeforeUnmount(clearMobileAnimationTimeout)
 
     @include mq.tablet {
       padding: var(--size-40) var(--size-24);
+      padding-left: var(--size-56);
       margin: 0 0 var(--size-32);
     }
 
@@ -259,7 +260,7 @@ onBeforeUnmount(clearMobileAnimationTimeout)
   &__section-title {
     position: relative;
     font-size: var(--font-2xl);
-    line-height: var(--lineheight-sm);
+    line-height: var(--lineheight-xs);
 
     @include mq.notebook {
       font-size: var(--font-3xl);

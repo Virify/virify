@@ -99,7 +99,7 @@ const contentSection = [
   &__list-title {
     position: relative;
     font-size: var(--font-2xl);
-    line-height: var(--lineheight-sm);
+    line-height: var(--lineheight-xs);
     margin: 0 0 var(--size-8);
 
     @include mq.notebook {
