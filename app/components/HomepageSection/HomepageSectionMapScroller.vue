@@ -3,16 +3,7 @@
     <HomepageSectionMap class="homepage-section-map-scroller__column homepage-section-map-scroller__column--sticky" />
 
     <HomepageSectionIntro :title="sectionTitle" :description="sectionDescription">
-      <ul class="homepage-section-map-scroller__list">
-        <li v-for="{ title, icon, content } of contentSection" :key="title"
-          class="homepage-section-map-scroller__list-item">
-          <h3 class="homepage-section-map-scroller__list-title | title-md">
-            <AtomsIcon v-if="icon" :icon class="homepage-section-map-scroller__list-icon" />
-            {{ title }}
-          </h3>
-          <p class="| body-lg">{{ content }}</p>
-        </li>
-      </ul>
+      <HomepageSectionList :sections="contentSection" />
     </HomepageSectionIntro>
   </div>
 </template>
@@ -72,42 +63,6 @@ const contentSection = [
     &__column--sticky {
       position: sticky;
       top: 0;
-    }
-  }
-
-  &__list {
-    list-style: none;
-    margin: var(--size-48) 0;
-    padding: 0;
-  }
-
-  &__list-item {
-    padding: var(--size-24);
-    padding-left: var(--size-56);
-    max-width: 50ch;
-  }
-
-  &__list-icon {
-    position: absolute;
-    top: calc(50% - var(--size-20));
-    left: calc(0px - var(--size-56));
-    width: var(--size-40);
-    height: var(--size-40);
-    color: var(--secondary-400);
-  }
-
-  &__list-title {
-    position: relative;
-    font-size: var(--font-2xl);
-    line-height: var(--lineheight-xs);
-    margin: 0 0 var(--size-8);
-
-    @include mq.notebook {
-      font-size: var(--font-3xl);
-    }
-
-    @include mq.desktop {
-      font-size: var(--font-4xl);
     }
   }
 }
