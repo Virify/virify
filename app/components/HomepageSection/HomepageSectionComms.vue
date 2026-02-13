@@ -6,11 +6,13 @@
 
     </HomepageSectionIntro>
 
-    <div class="homepage-section-comms__infographic">
+    <div class="homepage-section-comms__infographic" ref="$infographic" :class="{
+      'homepage-section-comms__infographic--visible': isInfographicVisible
+    }">
 
       <div class="homepage-section-comms__chats">
-        <HomepageSectionCommsChat v-for="{ image, author, isSeller, message, time }, index of chatMessages" :image
-          :author :message :time :is-seller class="homepage-section-comms__chat" />
+        <HomepageSectionCommsChat v-for="{ image, author, isSeller, message, time, animationDelay } of chatMessages"
+          :image :author :message :time :is-seller class="homepage-section-comms__chat" :style="{ animationDelay }" />
       </div>
 
       <PropertyCardRoot class="homepage-section-comms__card | gradient-box" v-bind="propertyDetails" />
@@ -19,6 +21,8 @@
 </template>
 
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
+
 const sectionTitle = 'Communication made simple'
 const sectionDescription = "Talk directly with landlords, sellers, buyers and tenants, with Virify's built-in messaging. Get the answers you need, without the wait."
 
@@ -31,21 +35,24 @@ const chatMessages = [
     author: 'Paul',
     isSeller: false,
     message: 'Hey, I saw your property for sale and I absolutely love it! Are you available this weekend for a viewing?',
-    time: '1 hour ago'
+    time: '1 hour ago',
+    animationDelay: '2400ms'
   },
   {
     image: '/img/demo/author1.jpg',
     author: 'Jasmine',
     isSeller: true,
     message: 'Hi! Yes, this weekend sounds great - I am available all morning',
-    time: '32 minutes ago'
+    time: '32 minutes ago',
+    animationDelay: '2600ms'
   },
   {
     image: '/img/demo/author2.jpg',
     author: 'Paul',
     isSeller: false,
     message: "Amazing, let's book something in for 11:00am - I'll see you then",
-    time: '19 minutes ago'
+    time: '19 minutes ago',
+    animationDelay: '2800ms'
   }
 ]
 
@@ -76,6 +83,18 @@ const propertyDetails = {
   viewURL: undefined,
   enquiryURL: undefined
 }
+
+/**
+ *  Animate content in
+ */
+const $infographic = useTemplateRef('$infographic')
+const isInfographicVisible = shallowRef(false)
+
+useIntersectionObserver($infographic, ([entry]) => {
+  const { isIntersecting } = asObject(entry)
+
+  isInfographicVisible.value = !!isIntersecting
+})
 </script>
 
 <style lang="scss">
@@ -110,11 +129,64 @@ const propertyDetails = {
   &__card {
     --gradient-box-radius: var(--border-radius-3xl);
 
+    background: var(--background-200);
     padding: var(--size-14);
     box-sizing: border-box;
-    transform: scale(0.8);
+    transform: scale(0.76);
     width: min(90%, 31ch);
     margin: 0 auto;
+  }
+
+  &__card {
+    animation: fadeInHomeInfographic 2.4s var(--ease-out);
+    animation-delay: 500ms;
+    filter: none;
+  }
+
+  &__chat {
+    animation: fadeInHomeInfographicChat var(--animation-subtle) var(--ease-out);
+    animation-delay: 2000ms;
+  }
+
+  &__chat,
+  &__card {
+    animation-fill-mode: backwards;
+    display: none;
+  }
+
+  &__infographic--visible &__chat,
+  &__infographic--visible &__card {
+    display: block;
+  }
+
+  &__infographic--visible &__card {
+    opacity: 0.75;
+    filter: grayscale(1);
+  }
+}
+
+@keyframes fadeInHomeInfographic {
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+
+  20% {
+    opacity: 1;
+    transform: none;
+  }
+
+  80% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes fadeInHomeInfographicChat {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
   }
 }
 </style>
