@@ -1,22 +1,23 @@
 <template>
   <div class="homepage-section-comms">
-    <HomepageSectionIntro class="home-section-ai-scroller__column" :title="sectionTitle"
+    <div class="homepage-section-comms__column homepage-section-comms__column--sticky">
+      <div class="homepage-section-comms__infographic" ref="$infographic" :class="{
+        'homepage-section-comms__infographic--visible': isInfographicVisible
+      }">
+        <div class="homepage-section-comms__chats">
+          <HomepageSectionCommsChat v-for="{ image, author, isSeller, message, time, animationDelay } of chatMessages"
+            :image :author :message :time :is-seller class="homepage-section-comms__chat" :style="{ animationDelay }" />
+        </div>
+
+        <PropertyCardRoot class="homepage-section-comms__card | gradient-box" v-bind="propertyDetails" />
+      </div>
+    </div>
+
+    <HomepageSectionIntro class="homepage-section-comms__column" :title="sectionTitle"
       :description="sectionDescription">
 
-
+      <HomepageSectionList :sections="contentSection" />
     </HomepageSectionIntro>
-
-    <div class="homepage-section-comms__infographic" ref="$infographic" :class="{
-      'homepage-section-comms__infographic--visible': isInfographicVisible
-    }">
-
-      <div class="homepage-section-comms__chats">
-        <HomepageSectionCommsChat v-for="{ image, author, isSeller, message, time, animationDelay } of chatMessages"
-          :image :author :message :time :is-seller class="homepage-section-comms__chat" :style="{ animationDelay }" />
-      </div>
-
-      <PropertyCardRoot class="homepage-section-comms__card | gradient-box" v-bind="propertyDetails" />
-    </div>
   </div>
 </template>
 
@@ -25,6 +26,29 @@ import { useIntersectionObserver } from '@vueuse/core'
 
 const sectionTitle = 'Communication made simple'
 const sectionDescription = "Talk directly with landlords, sellers, buyers and tenants, with Virify's built-in messaging. Get the answers you need, without the wait."
+
+const contentSection = [
+  {
+    icon: 'map/marker-home',
+    title: 'Direct messaging',
+    content: 'With Virify, there are no intermediaries. Chat directly with property owners, landlords, tenants and potential buyers'
+  },
+  {
+    icon: 'map/marker-home',
+    title: 'Real-time notifications',
+    content: 'Never miss an opportunity. Instant notifications for new messages helps you act quickly in a changing market'
+  },
+  {
+    icon: 'map/marker-home',
+    title: 'Rich media sharing',
+    content: 'Share photos, documents, and listing details directly in the chat. Everything stays in one place'
+  },
+  {
+    icon: 'map/marker-home',
+    title: 'Listing context',
+    content: 'See property details, price, and location at-a-glance inside the conversation thread'
+  },
+]
 
 /**
  *  Mock chat
@@ -36,7 +60,7 @@ const chatMessages = [
     isSeller: false,
     message: 'Hey, I saw your property for sale and I absolutely love it! Are you available this weekend for a viewing?',
     time: '1 hour ago',
-    animationDelay: '2400ms'
+    animationDelay: '2250ms'
   },
   {
     image: '/img/demo/author1.jpg',
@@ -44,7 +68,7 @@ const chatMessages = [
     isSeller: true,
     message: 'Hi! Yes, this weekend sounds great - I am available all morning',
     time: '32 minutes ago',
-    animationDelay: '2600ms'
+    animationDelay: '4400ms'
   },
   {
     image: '/img/demo/author2.jpg',
@@ -52,7 +76,7 @@ const chatMessages = [
     isSeller: false,
     message: "Amazing, let's book something in for 11:00am - I'll see you then",
     time: '19 minutes ago',
-    animationDelay: '2800ms'
+    animationDelay: '5600ms'
   }
 ]
 
@@ -101,11 +125,41 @@ useIntersectionObserver($infographic, ([entry]) => {
 @use '#styles/_utils/media' as mq;
 
 .homepage-section-comms {
+  display: grid;
+  gap: var(--size-32);
+  align-items: center;
+  justify-content: center;
+
+  @include mq.tablet {
+    margin-top: var(--size-120);
+    grid-template-columns: 1fr 1fr;
+    gap: var(--size-56);
+    align-items: flex-start;
+  }
+
+  @include mq.desktop {
+    gap: var(--size-72);
+  }
+
+  &__column--sticky {
+    overflow: hidden;
+
+    @include mq.tablet {
+      position: sticky;
+      top: 10ch;
+      order: 2;
+    }
+  }
 
   &__infographic {
     position: relative;
     width: min(90%, 40ch);
     margin: 0 auto;
+
+    @include mq.mobile-only {
+      transform: scale(0.85);
+      width: min(100%, 40ch);
+    }
   }
 
   &__chats {
@@ -133,33 +187,30 @@ useIntersectionObserver($infographic, ([entry]) => {
     padding: var(--size-14);
     box-sizing: border-box;
     transform: scale(0.76);
-    width: min(90%, 31ch);
+    width: min(100%, 31ch);
     margin: 0 auto;
-  }
-
-  &__card {
-    animation: fadeInHomeInfographic 2.4s var(--ease-out);
-    animation-delay: 500ms;
+    opacity: 0;
+    animation: 3s var(--ease-out);
     filter: none;
   }
 
   &__chat {
     animation: fadeInHomeInfographicChat var(--animation-subtle) var(--ease-out);
     animation-delay: 2000ms;
+    display: none;
   }
 
   &__chat,
   &__card {
     animation-fill-mode: backwards;
-    display: none;
   }
 
-  &__infographic--visible &__chat,
-  &__infographic--visible &__card {
+  &__infographic--visible &__chat {
     display: block;
   }
 
   &__infographic--visible &__card {
+    animation-name: fadeInHomeInfographic;
     opacity: 0.75;
     filter: grayscale(1);
   }
@@ -167,16 +218,11 @@ useIntersectionObserver($infographic, ([entry]) => {
 
 @keyframes fadeInHomeInfographic {
   0% {
-    opacity: 0;
-    transform: translateY(100px);
-  }
-
-  20% {
     opacity: 1;
     transform: none;
   }
 
-  80% {
+  75% {
     opacity: 1;
     transform: none;
     filter: none;
