@@ -68,7 +68,7 @@ const chatMessages = [
     isSeller: true,
     message: 'Hi! Yes, this weekend sounds great - I am available all morning',
     time: '32 minutes ago',
-    animationDelay: '3200ms'
+    animationDelay: '2200ms'
   },
   {
     image: '/img/demo/author2.jpg',
@@ -76,7 +76,7 @@ const chatMessages = [
     isSeller: false,
     message: "Amazing, let's book something in for 11:00am - I'll see you then",
     time: '19 minutes ago',
-    animationDelay: '4400ms'
+    animationDelay: '3000ms'
   }
 ]
 
