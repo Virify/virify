@@ -60,7 +60,7 @@ const chatMessages = [
     isSeller: false,
     message: 'Hey, I saw your property for sale and I absolutely love it! Are you available this weekend for a viewing?',
     time: '1 hour ago',
-    animationDelay: '2250ms'
+    animationDelay: '1000ms'
   },
   {
     image: '/img/demo/author1.jpg',
@@ -68,7 +68,7 @@ const chatMessages = [
     isSeller: true,
     message: 'Hi! Yes, this weekend sounds great - I am available all morning',
     time: '32 minutes ago',
-    animationDelay: '4400ms'
+    animationDelay: '3200ms'
   },
   {
     image: '/img/demo/author2.jpg',
@@ -76,7 +76,7 @@ const chatMessages = [
     isSeller: false,
     message: "Amazing, let's book something in for 11:00am - I'll see you then",
     time: '19 minutes ago',
-    animationDelay: '5600ms'
+    animationDelay: '4400ms'
   }
 ]
 
@@ -189,9 +189,7 @@ useIntersectionObserver($infographic, ([entry]) => {
     transform: scale(0.76);
     width: min(100%, 31ch);
     margin: 0 auto;
-    opacity: 0;
-    animation: 3s var(--ease-out);
-    filter: none;
+    animation: var(--animation-slow) var(--ease-out) 1000ms;
   }
 
   &__chat {
@@ -217,12 +215,7 @@ useIntersectionObserver($infographic, ([entry]) => {
 }
 
 @keyframes fadeInHomeInfographic {
-  0% {
-    opacity: 1;
-    transform: none;
-  }
-
-  75% {
+  from {
     opacity: 1;
     transform: none;
     filter: none;
