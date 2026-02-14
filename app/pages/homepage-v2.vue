@@ -8,6 +8,7 @@
     <HomepageSectionAiScroller class="| container" />
     <HomepageSectionMapScroller class="| container" />
     <HomepageSectionComms class="| container" />
+    <HomepageSectionLocation class="| container" />
 
     <div class="hv2__spacer">
       Spacer
