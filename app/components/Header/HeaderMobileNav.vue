@@ -113,7 +113,7 @@ function toggleMenu() {
 
   &__menu-list {
     list-style: none;
-    padding: var(--size-24) var(--size-4);
+    padding: var(--size-24) var(--size-4) var(--size-48);
     border: 0;
   }
 }
