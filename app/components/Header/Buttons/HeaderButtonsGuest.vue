@@ -73,7 +73,7 @@ function showSignup(e: PointerEvent) {
   }
 
   @include mq.mobile-and-small-tablet {
-    gap: var(--size-6);
+    gap: var(--size-4);
 
     &__text--mobile {
       display: unset;
@@ -86,7 +86,6 @@ function showSignup(e: PointerEvent) {
     &__login-button {
       background: transparent;
       color: currentColor;
-      padding: var(--size-12);
 
       &:hover {
         background: transparent;

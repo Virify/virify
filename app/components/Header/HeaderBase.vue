@@ -3,10 +3,10 @@
     'header-base--shadow': hasShadow
   }">
     <header class="header-base__inner | container">
-      <nuxt-link to="/">
+      <nuxt-link to="/" class="header-base__home-link">
         <picture>
           <source media="(prefers-color-scheme: dark)" srcset="/img/header/logo-dark.svg" />
-          <img src="/img/header/logo-light.svg" alt="Virify logo" width="113" height="32" />
+          <img src="/img/header/logo-light.svg" alt="Virify logo" width="113" height="32" class="header-base__logo" />
         </picture>
       </nuxt-link>
 
@@ -70,9 +70,9 @@ onBeforeUnmount(() => {
   transition: box-shadow var(--animation-subtle) var(--ease-in-out);
 
   @include mq.tablet {
-    padding: var(--size-16) 0;
+    padding: var(--size-12) 0;
 
-    @media (min-height: 1000px) {
+    @media (min-height: 940px) {
       padding: var(--size-20) 0;
     }
   }
@@ -82,6 +82,24 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: space-between;
     gap: var(--size-36);
+  }
+
+  &__home-link {
+    display: block;
+    margin-right: auto;
+
+    @include mq.desktop {
+      margin: 0;
+    }
+  }
+
+  &__logo {
+    width: auto;
+    height: var(--size-28);
+
+    @include mq.tablet {
+      height: var(--size-32);
+    }
   }
 
   &--shadow {
