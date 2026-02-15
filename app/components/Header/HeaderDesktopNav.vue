@@ -1,6 +1,6 @@
 <template>
-  <nav aria-label="Site navigation">
-    <ul class="header-desktop-nav">
+  <nav aria-label="Site navigation" class="header-desktop-nav">
+    <ul class="header-desktop-nav__menu">
       <li v-for="item of menu">
         <a href="#" class="header-desktop-nav__link">{{ item.label }}</a>
       </li>
@@ -32,13 +32,16 @@ defineProps<Props>()
 
 <style lang="scss">
 .header-desktop-nav {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--size-36);
+
+  &__menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-36);
+  }
 
   &__link {
     text-decoration: none;

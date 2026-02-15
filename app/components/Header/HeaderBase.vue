@@ -64,22 +64,27 @@ onBeforeUnmount(() => {
 @use "#styles/_utils/media" as mq;
 
 .header-base {
+  --header-height: 52px;
+
   position: sticky;
   top: 0;
+  display: flex;
+  align-items: center;
   background: var(--background-100);
-  padding: var(--size-8) 0;
-  z-index: 3;
+  height: var(--header-height);
+  padding: 0;
+  z-index: 9;
   transition: box-shadow var(--animation-subtle) var(--ease-in-out);
 
   @include mq.tablet {
-    padding: var(--size-10) 0;
+    --header-height: 64px;
   }
 
   @include mq.notebook {
-    padding: var(--size-12) 0;
+    --header-height: 68px;
 
     @media (min-height: 940px) {
-      padding: var(--size-20) 0;
+      --header-height: 78px;
     }
   }
 

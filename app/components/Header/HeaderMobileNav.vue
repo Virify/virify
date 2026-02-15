@@ -1,14 +1,21 @@
 <template>
-  <nav class="header-mobile-nav">
+  <nav class="header-mobile-nav" aria-label="Site navigation">
     <button type="button" @click.prevent="toggleMenu" aria-label="Expand mobile menu" class="header-mobile-nav__toggle"
       :class="{
         'header-mobile-nav__toggle--expanded': isExpanded
-      }">
-      <span class="header-mobile-nav__toggle-line header-mobile-nav__toggle-line--1"></span>
-      <span class="header-mobile-nav__toggle-line header-mobile-nav__toggle-line--2"></span>
-      <span class="header-mobile-nav__toggle-line header-mobile-nav__toggle-line--3"></span>
+      }" :aria-controls="menuId" :aria-expanded="isExpanded">
+      <span class="header-mobile-nav__toggle-line header-mobile-nav__toggle-line--1" aria-hidden></span>
+      <span class="header-mobile-nav__toggle-line header-mobile-nav__toggle-line--2" aria-hidden></span>
+      <span class="header-mobile-nav__toggle-line header-mobile-nav__toggle-line--3" aria-hidden></span>
     </button>
 
+    <div :id="menuId" class="header-mobile-nav__menu" :hidden="!isExpanded">
+      <ul class="header-mobile-nav__menu-list | container">
+        <li v-for="item of menu">
+          <a href="#">{{ item.label }}</a>
+        </li>
+      </ul>
+    </div>
   </nav>
 </template>
 
@@ -33,6 +40,11 @@ interface Props {
 defineProps<Props>()
 
 /**
+ *  a11y
+ */
+const menuId = useId()
+
+/**
  *  Toggle menu
  */
 const isExpanded = shallowRef(false)
@@ -44,8 +56,9 @@ function toggleMenu() {
 </script>
 
 <style lang="scss">
-.header-mobile-nav {
+@use "#styles/_utils/media" as mq;
 
+.header-mobile-nav {
   &__toggle {
     display: block;
     position: relative;
@@ -84,6 +97,24 @@ function toggleMenu() {
   &__toggle--expanded &__toggle-line--2,
   &__toggle--expanded &__toggle-line--3 {
     transform: rotate(-45deg);
+  }
+
+  &__menu {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--header-height));
+    overflow: auto;
+    overscroll-behavior: contain;
+    background: var(--background-100);
+    z-index: -1;
+  }
+
+  &__menu-list {
+    list-style: none;
+    padding: var(--size-24) var(--size-4);
+    border: 0;
   }
 }
 </style>
