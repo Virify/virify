@@ -71,6 +71,10 @@ onBeforeUnmount(() => {
 
   @include mq.tablet {
     padding: var(--size-16) 0;
+
+    @media (min-height: 1000px) {
+      padding: var(--size-20) 0;
+    }
   }
 
   &__inner {

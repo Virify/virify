@@ -35,7 +35,7 @@
   color: var(--monochrome-900);
   border-radius: var(--border-radius-2xl);
   padding: var(--size-56) var(--size-32) 250px;
-  margin: var(--size-16) auto;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,7 +44,6 @@
   @include mq.tablet {
     border-radius: var(--border-radius-3xl);
     padding: var(--size-48) var(--size-72) 160px;
-    margin: var(--size-32) auto;
   }
 
   @include mq.notebook {
@@ -55,7 +54,6 @@
   @include mq.desktop {
     border-radius: var(--border-radius-4xl);
     padding: var(--size-56);
-    margin: var(--size-48) auto;
   }
 
   &__image {
