@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
   background: var(--background-100);
   padding: var(--size-8) 0;
   z-index: 3;
-  transition: box-shadow var(--animation-slow) var(--ease-in-out);
+  transition: box-shadow var(--animation-subtle) var(--ease-in-out);
 
   @include mq.tablet {
     padding: var(--size-16) 0;
@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
   }
 
   &--shadow {
-    box-shadow: 0 30px 60px -20px light-dark(rgba(#000, 0.1), rgba(#000, 0.5));
+    box-shadow: 0 30px 60px -20px light-dark(rgba(#000, 0.07), rgba(#000, 0.5));
   }
 }
 </style>
