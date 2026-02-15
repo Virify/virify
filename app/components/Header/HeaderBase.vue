@@ -45,16 +45,12 @@ const isWaitingList = checkWaitingList()
 .header-base {
   position: sticky;
   top: 0;
-  background: var(--background-200);
+  background: var(--background-100);
   padding: var(--size-8) 0;
-  z-index: 2;
+  z-index: 3;
 
   @include mq.tablet {
     padding: var(--size-16) 0;
-  }
-
-  @include mq.notebook {
-    padding: var(--size-24) 0;
   }
 
   &__inner {

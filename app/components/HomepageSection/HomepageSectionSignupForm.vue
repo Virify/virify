@@ -62,6 +62,7 @@ function signUpUser() {
     cursor: pointer;
     line-height: var(--lineheight-sm);
     font-size: var(--font-xs);
+    text-align: left;
 
     @include mq.tablet {
       font-size: var(--font-sm);
