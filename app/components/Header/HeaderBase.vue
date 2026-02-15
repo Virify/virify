@@ -3,6 +3,8 @@
     'header-base--shadow': hasShadow
   }">
     <header class="header-base__inner | container">
+      <LazyHeaderMobileNav class="header-base__nav header-base__nav--mobile" hydrate-on-visible :menu="mainMenu" />
+
       <nuxt-link to="/" class="header-base__home-link">
         <picture>
           <source media="(prefers-color-scheme: dark)" srcset="/img/header/logo-dark.svg" />
@@ -10,7 +12,7 @@
         </picture>
       </nuxt-link>
 
-      <LazyHeaderDesktopNav hydrate-on-visible :menu="mainMenu" />
+      <LazyHeaderDesktopNav class="header-base__nav header-base__nav--desktop" hydrate-on-visible :menu="mainMenu" />
 
       <template v-if="isWaitingList">
         <LazyHeaderButtonsWaitingList />
@@ -70,6 +72,10 @@ onBeforeUnmount(() => {
   transition: box-shadow var(--animation-subtle) var(--ease-in-out);
 
   @include mq.tablet {
+    padding: var(--size-10) 0;
+  }
+
+  @include mq.notebook {
     padding: var(--size-12) 0;
 
     @media (min-height: 940px) {
@@ -81,7 +87,11 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--size-36);
+    gap: var(--size-10);
+
+    @include mq.desktop {
+      gap: var(--size-36);
+    }
   }
 
   &__home-link {
@@ -104,6 +114,26 @@ onBeforeUnmount(() => {
 
   &--shadow {
     box-shadow: 0 30px 60px -20px light-dark(rgba(#000, 0.07), rgba(#000, 0.5));
+  }
+
+  &__nav {
+    &--mobile {
+      display: block;
+    }
+
+    &--desktop {
+      display: none;
+    }
+
+    @include mq.desktop {
+      &--mobile {
+        display: none;
+      }
+
+      &--desktop {
+        display: block;
+      }
+    }
   }
 }
 </style>
