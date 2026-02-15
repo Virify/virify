@@ -1,5 +1,3 @@
-export * from './is-object'
-export * from './as-object'
 export * from './is-option-object'
 export * from './remove-object-empty-arrays'
 export * from './objects-equal'

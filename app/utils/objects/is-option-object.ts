@@ -1,4 +1,3 @@
-import { isObject } from './is-object'
 import { isStringy } from '../strings'
 
 interface Option {
