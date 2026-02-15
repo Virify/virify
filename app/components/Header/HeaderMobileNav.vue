@@ -10,11 +10,7 @@
     </button>
 
     <div :id="menuId" class="header-mobile-nav__menu" :hidden="!isExpanded">
-      <ul class="header-mobile-nav__menu-list | container">
-        <li v-for="item of menu">
-          <a href="#">{{ item.label }}</a>
-        </li>
-      </ul>
+      <HeaderMobileMenu :menu class="header-mobile-nav__menu-list | container" />
     </div>
   </nav>
 </template>
