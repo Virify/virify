@@ -13,12 +13,13 @@ export default defineNuxtConfig({
     CF_SERVICE_TOKEN_ID: process.env.CF_SERVICE_TOKEN_ID,
     CF_SERVICE_TOKEN_SECRET: process.env.CF_SERVICE_TOKEN_SECRET,
     public: {
+      isWaitingList: process.env.DEPLOYMENT_ENV === 'waiting-list',
       CF_SITE_KEY: process.env.CF_SITE_KEY,
       CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
     },
   },
   modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
-  
+
   // Nuxt SEO Configuration
   site: {
     url: 'https://virify.co.uk',
@@ -27,7 +28,7 @@ export default defineNuxtConfig({
     defaultLocale: 'en-GB',
     indexable: process.env.SANITY_PREVIEW !== 'true',
   },
-  
+
   // Schema.org structured data
   schemaOrg: {
     identity: {
@@ -42,7 +43,7 @@ export default defineNuxtConfig({
       ],
     }
   },
-  
+
   // Robots configuration
   robots: {
     allow: [
