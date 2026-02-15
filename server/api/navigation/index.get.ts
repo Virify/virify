@@ -20,7 +20,7 @@ interface MenuItem {
   href?: string
   description?: string
   icon?: string
-  type?: 'link' | 'dropdown'
+  type: 'link' | 'dropdown'
   children?: MenuItem[]
 }
 
@@ -52,10 +52,12 @@ function formatGuides(category: GuideCategory, parentSlug = '/guides/') {
     href: fullSlugWithSlash,
     description: description,
     icon: icon || 'article',
+    type: 'link',
   }
 
   // If the guides has any children, format and append them as well
   if (Array.isArray(category.guides)) {
+    formattedCategory.type = 'dropdown'
     formattedCategory.children = category.guides.map((child) => {
       return formatGuides(child, fullSlugWithSlash)
     })
@@ -90,7 +92,8 @@ export default defineCachedEventHandler(async () => {
           id: "price-paid",
           label: "Price paid data",
           href: "/price-paid/",
-          icon: "account/billing"
+          icon: "account/billing",
+          type: 'link'
         },
       ]
     },
@@ -117,7 +120,8 @@ export default defineCachedEventHandler(async () => {
         id: "mortgage-calculator",
         label: "Mortgage Calculator",
         href: "/mortgage-calculator/",
-        icon: "account/billing"
+        icon: "account/billing",
+        type: 'link'
       })
     }
   }
