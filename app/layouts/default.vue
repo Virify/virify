@@ -1,6 +1,7 @@
 <template>
   <NuxtLoadingIndicator />
-  <OrganismsHeader />
+  <OrganismsHeader v-if="!showNewHeader" />
+  <HeaderBase v-else />
 
   <div class="page">
     <UApp>
@@ -18,6 +19,8 @@
 
 <script setup lang="ts">
 import { ViewsDialogLogin } from '#components'
+
+const showNewHeader = true
 
 onMounted(async () => {
   const { path, query } = useRoute()
