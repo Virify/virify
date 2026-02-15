@@ -1,5 +1,7 @@
 <template>
-  <div class="header-base">
+  <div class="header-base" :class="{
+    'header-base--shadow': hasShadow
+  }">
     <header class="header-base__inner | container">
       <nuxt-link to="/">
         <picture>
@@ -37,6 +39,23 @@ const checkWaitingList = () => {
 
 const isWaitingList = checkWaitingList()
 
+/**
+ *  Add subtle shadow to menu when user has scrolled
+ */
+const hasShadow = shallowRef(false)
+
+function toggleShadow() {
+  hasShadow.value = window.scrollY > 0
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', toggleShadow, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', toggleShadow)
+})
+
 </script>
 
 <style lang="scss">
@@ -48,6 +67,7 @@ const isWaitingList = checkWaitingList()
   background: var(--background-100);
   padding: var(--size-8) 0;
   z-index: 3;
+  transition: box-shadow var(--animation-slow) var(--ease-in-out);
 
   @include mq.tablet {
     padding: var(--size-16) 0;
@@ -58,6 +78,10 @@ const isWaitingList = checkWaitingList()
     align-items: center;
     justify-content: space-between;
     gap: var(--size-36);
+  }
+
+  &--shadow {
+    box-shadow: 0 30px 60px -20px light-dark(rgba(#000, 0.1), rgba(#000, 0.5));
   }
 }
 </style>
