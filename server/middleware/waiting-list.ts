@@ -38,6 +38,7 @@ export default defineEventHandler((event) => {
       '/api/user',                   // User dashboard data
       '/api/conversation',           // Dashboard conversations
       '/api/notifications',          // Dashboard notifications
+      '/api/navigation',             // Main navigation
       // BLOCKED: /auth/signup - No new signups in waiting list mode
       // BLOCKED: /api/search/ - No property search in waiting list mode
     ];
