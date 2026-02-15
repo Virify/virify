@@ -8,18 +8,34 @@
         </picture>
       </nuxt-link>
 
-      <HeaderDesktopNav :menu="mainMenu" />
+      <LazyHeaderDesktopNav hydrate-on-visible :menu="mainMenu" />
 
-      <div>
-        <button class="| button button-ghost button-sm">Log in</button>
-        <button class="| button button-secondary button-sm">Create Account</button>
-      </div>
+      <template v-if="isWaitingList">
+        <LazyHeaderButtonsWaitingList />
+      </template>
+
+      <template v-else>
+        <LazyHeaderButtonsGuest />
+      </template>
     </header>
   </div>
 </template>
 
 <script setup lang="ts">
 const { mainMenu } = await useMainNavigation()
+
+/**
+ *  Check whether to skip the wait list - this doesn't need to be
+ *  reactive so we don't need to use computed functions
+ */
+const checkWaitingList = () => {
+  const { isWaitingList } = useRuntimeConfig().public
+  const { query } = useRoute()
+
+  return isWaitingList && !query.skipWaitlist
+}
+
+const isWaitingList = checkWaitingList()
 
 </script>
 
