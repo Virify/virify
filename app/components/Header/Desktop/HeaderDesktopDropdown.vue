@@ -1,5 +1,5 @@
 <template>
-  <div class="header-desktop-dropdown" @keydown.escape="closeDropdown">
+  <div ref="$root" class="header-desktop-dropdown" @keydown.escape="closeDropdown">
     <button ref="$button" type="button" @click.prevent="showDropdown" class="header-desktop-dropdown__toggle | body-md"
       :aria-controls="dropdownId" :aria-expanded="isExpanded">
       {{ label }}
