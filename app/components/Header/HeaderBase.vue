@@ -15,11 +15,12 @@
       <LazyHeaderDesktopRoot class="header-base__nav header-base__nav--desktop" hydrate-on-visible :menu="mainMenu" />
 
       <template v-if="isWaitingList">
-        <LazyHeaderButtonsWaitingList />
+        <LazyHeaderActionsWaitingList />
       </template>
 
       <template v-else>
-        <LazyHeaderButtonsGuest />
+        <LazyHeaderActionsGuest v-if="!isLoggedIn" />
+        <LazyHeaderActionsLoggedIn v-else />
       </template>
     </header>
   </div>
@@ -27,6 +28,11 @@
 
 <script setup lang="ts">
 const { mainMenu } = await useMainNavigation()
+
+/**
+ *  Track logged in state
+ */
+const isLoggedIn = shallowRef(true)
 
 /**
  *  Check whether to skip the wait list - this doesn't need to be
