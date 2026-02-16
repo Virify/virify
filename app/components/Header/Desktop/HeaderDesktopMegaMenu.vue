@@ -1,22 +1,38 @@
 <template>
-  <ul class="header-desktop-mega-menu">
-    <li v-for="{ label, children } of menu">
-      <h3 class="header-desktop-mega-menu__title | title-xs">
-        {{ label }}
-      </h3>
+  <div class="header-desktop-mega-menu">
+    <ul class="header-desktop-mega-menu__headers">
+      <li v-for="{ label, isCurrent } of selectedTitles">
+        <button type="button" @click.prevent="showSection(label)" class="header-desktop-mega-menu__header" :class="{
+          'header-desktop-mega-menu__header--selected': isCurrent
+        }">
+          {{ label }}
 
-      <!--
-        @TODO - make this so it can show nested dropdowns or links
-      -->
-      <ul class="header-desktop-mega-menu__sub-menu">
-        <li v-for="{ label, href } of children">
-          <nuxt-link :to="href" class="| body-md">
-            {{ label }}
-          </nuxt-link>
-        </li>
-      </ul>
-    </li>
-  </ul>
+          <AtomsIcon icon="chevron-right" />
+        </button>
+      </li>
+    </ul>
+
+
+    <ul class="header-desktop-mega-menu__sub-links">
+      <li v-for="{ isViewAll, href, label } of currentChildren">
+        <nuxt-link v-if="isViewAll" :to="href" class="header-desktop-mega-menu__sub-link-title | title-sm">
+          {{ currentTitle }}
+        </nuxt-link>
+
+        <nuxt-link v-else :to="href" class="header-desktop-mega-menu__sub-link | body-sm">
+          {{ label }}
+        </nuxt-link>
+      </li>
+    </ul>
+
+    <nuxt-link :to="href" class="header-desktop-mega-menu__view-all">
+      <span class="header-desktop-mega-menu__view-all-text | body-md">
+        All {{ label }}
+
+        <AtomsIcon icon="arrow-right" />
+      </span>
+    </nuxt-link>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -32,33 +48,189 @@ interface MenuItem {
 
 interface Props {
   menu?: MenuItem[]
+  label?: string
+  href?: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
+/**
+ *  Track currently-visible children
+ */
+const currentSelection = ref<string | null>(null)
+
+const currentTitle = computed(() => {
+  const menu = asArray(props.menu) as MenuItem[]
+
+  if (!currentSelection.value) {
+    const { label } = asObject(menu[0])
+
+    return label
+  }
+
+  const { label } = asObject(menu.find((menuItem) => {
+    const { label } = asObject(menuItem)
+
+    return label === currentSelection.value
+  }))
+
+  return label
+})
+
+const selectedTitles = computed(() => {
+  const menu = asArray(props.menu) as MenuItem[]
+
+  return menu.map((menuItem) => {
+    const { label } = asObject(menuItem)
+
+    return {
+      label,
+      isCurrent: label === currentTitle.value
+    }
+  })
+})
+
+const currentChildren = computed(() => {
+  const menu = asArray(props.menu) as MenuItem[]
+
+  // If no current selection, there are no children to show
+  if (!currentTitle.value) return []
+
+  // Else get matching section
+  const { children } = asObject(menu.find((menuItem) => {
+    const { label } = asObject(menuItem)
+
+    return label === currentTitle.value
+  }))
+
+  return asArray(children)
+})
+
+function showSection(newSelection?: string) {
+  if (!newSelection) return
+
+  currentSelection.value = newSelection
+}
 </script>
 
 <style lang="scss">
 .header-desktop-mega-menu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  columns: 4;
-  column-gap: var(--size-24);
-  min-width: 70ch;
+  display: grid;
+  grid-template-columns: 20ch 24ch 18ch;
+  grid-gap: var(--size-28);
+  align-items: stretch;
+  height: min(calc(100vh - var(--header-height) - var(--size-28)), 28ch);
+  box-sizing: border-box;
 
-  >* {
-    break-inside: avoid;
+  &__view-all {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    color: var(--monochrome-900);
+    background: var(--secondary-400);
+    font-weight: var(--font-bold);
+    transition: background-color var(--animation-fast);
+    aspect-ratio: 4/3;
+    align-self: flex-start;
+
+    &:hover {
+      color: var(--monochrome-900);
+      background: var(--secondary-500);
+    }
   }
 
-  &__title {
-    margin: 0 0 var(--size-10);
+  &__view-all-text {
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
+    white-space: nowrap;
+
+    .a-icon {
+      display: block;
+      width: var(--size-24);
+      height: var(--size-24);
+    }
   }
 
-  &__sub-menu {
+  &__view-all,
+  &__sub-links,
+  &__headers {
+    padding: var(--size-20) var(--size-28);
+    border-radius: var(--border-radius-xl);
+  }
+
+  &__headers {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  &__sub-links,
+  &__headers {
+    height: 100%;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  &__headers {
     list-style: none;
-    margin: 0 0 var(--size-24);
-    padding: 0;
+    margin: 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-12);
+    text-align: left;
+    line-height: var(--lineheight-sm);
+    font-weight: var(--font-bold);
+    font-size: var(--font-md);
+    margin: 0;
+    padding: var(--size-8) 0;
+    border: 0;
+    cursor: pointer;
+    transition: color var(--animation-fast);
+    width: 100%;
+    box-sizing: border-box;
+
+    &--selected,
+    &:hover {
+      color: var(--secondary-400);
+    }
+
+    .a-icon {
+      display: block;
+      width: var(--size-24);
+      height: var(--size-24);
+      flex-shrink: 0;
+    }
+  }
+
+  &__sub-links {
+    list-style: none;
+    margin: 0;
+    background: var(--background-200);
+  }
+
+  &__sub-link-title {
+    display: block;
+    line-height: var(--lineheight-sm);
+    margin: 0 0 var(--size-12);
+    color: var(--secondary-400);
+  }
+
+  &__sub-link {
+    display: block;
+    padding: var(--size-4) 0;
+    text-decoration: none;
+    font-size: var(--font-sm);
+    font-weight: var(--font-semibold);
+    color: currentColor;
+    transition: color var(--animation-fast);
+
+    &:hover {
+      color: var(--secondary-400);
+    }
   }
 }
 </style>
