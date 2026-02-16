@@ -5,7 +5,8 @@
     <p class="homepage-section-comms-chat__message | body-md">{{ message }}</p>
 
     <div class="homepage-section-comms-chat__footer | body-xs">
-      <img :src="image" class="homepage-section-comms-chat__author-image" :title="`Profile picture for ${author}`" />
+      <img :src="image" class="homepage-section-comms-chat__author-image" :title="`Profile picture for ${author}`"
+        width="28" height="28" loading="lazy" />
 
       <span class="homepage-section-comms-chat__author">
         {{ author }}

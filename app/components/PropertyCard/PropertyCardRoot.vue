@@ -1,7 +1,8 @@
 <template>
   <section class="property-card-root">
     <div class="property-card-root__images">
-      <img v-if="propertyImage" class="property-card-root__image" :src="propertyImage" :alt="propertyImageAlt" />
+      <img v-if="propertyImage" class="property-card-root__image" :src="propertyImage" :alt="propertyImageAlt"
+        width="491" height="368" loading="lazy" />
 
       <PropertyCardInteractions :disabled="disabledInteractions" class="property-card-root__interactions" />
     </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="homepage-section-map">
 
-    <img src="/img/demo/map-shadow.svg" class="homepage-section-map__shadow" />
+    <img src="/img/demo/map-shadow.svg" class="homepage-section-map__shadow" width="484" height="262" loading="lazy" />
 
     <div ref="$map" class="homepage-section-map__map">
       <template v-if="isVisible">
@@ -11,7 +11,7 @@
           <button class="homepage-section-map__marker-button | body-2xs"
             :class="variant && `homepage-section-map__marker-button--${variant}`">
             <img v-if="variant === 'premium' && image" :src="image" alt="Photo of property"
-              class="homepage-section-map__marker-button-image" />
+              class="homepage-section-map__marker-button-image" width="491" height="368" loading="lazy" />
 
             <div class="homepage-section-map__marker-button-flex">
               {{ price }}
@@ -26,7 +26,8 @@
         </div>
       </template>
 
-      <img src="/img/demo/map.svg" alt="Floating map tile" class="homepage-section-map__map-tile" />
+      <img src="/img/demo/map.svg" alt="Floating map tile" class="homepage-section-map__map-tile" width="484"
+        height="262" loading="lazy" />
     </div>
   </div>
 </template>
