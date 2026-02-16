@@ -13,7 +13,7 @@
     </ul>
 
 
-    <ul class="header-desktop-mega-menu__sub-links">
+    <ul ref="$links" class="header-desktop-mega-menu__sub-links">
       <li v-for="{ isViewAll, href, label } of currentChildren">
         <nuxt-link v-if="isViewAll" :to="href" class="header-desktop-mega-menu__sub-link-title | title-sm">
           {{ currentTitle }}
@@ -106,10 +106,17 @@ const currentChildren = computed(() => {
   return asArray(children)
 })
 
+const $links = useTemplateRef('$links')
+
 function showSection(newSelection?: string) {
   if (!newSelection) return
 
   currentSelection.value = newSelection
+
+  // Focus on first visible link
+  nextTick(() => {
+    $links.value?.querySelector('a')?.focus()
+  })
 }
 </script>
 
