@@ -143,13 +143,15 @@ onBeforeUnmount(() => {
   &__menu {
     position: absolute;
     top: 100%;
-    left: calc(0px - var(--size-8));
+    left: calc(0px - var(--size-12));
     width: fit-content;
-    background: var(--background-200);
-    padding: var(--size-16) var(--size-24);
+    background: var(--background-100);
+    padding: var(--size-24) var(--size-28) var(--size-16);
     margin: 0;
     list-style: none;
     border-radius: var(--border-radius-2xl);
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
     box-shadow: 0 30px 60px -20px light-dark(rgba(#000, 0.07), rgba(#000, 0.5));
     min-width: 24ch;
 

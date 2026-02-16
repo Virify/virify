@@ -115,6 +115,14 @@ onBeforeUnmount(() => {
     @include mq.tablet {
       height: var(--size-32);
     }
+
+    @include mq.notebook {
+      height: var(--size-36);
+    }
+
+    @include mq.superultrawide {
+      height: var(--size-40);
+    }
   }
 
   &--shadow {
