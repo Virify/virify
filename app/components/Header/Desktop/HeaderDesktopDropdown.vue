@@ -1,5 +1,5 @@
 <template>
-  <div ref="$root" class="header-desktop-dropdown" @keydown.escape="closeDropdown">
+  <div ref="$root" class="header-desktop-dropdown" @keydown.escape="closeDropdownWithFocus">
     <button ref="$button" type="button" @click.prevent="showDropdown" class="header-desktop-dropdown__toggle | body-md"
       :aria-controls="dropdownId" :aria-expanded="isExpanded">
       {{ label }}
@@ -9,7 +9,7 @@
 
     <div ref="$menu" :id="dropdownId" :hidden="!isExpanded" class="header-desktop-dropdown__menu" :class="{
       'header-desktop-dropdown__menu--mega-menu': containsSubdropdowns
-    }">
+    }" tabindex="-1">
       <HeaderDesktopMegaMenu v-if="containsSubdropdowns" :menu="children" :label :href />
       <HeaderDesktopNormalMenu v-else :children />
     </div>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside, useFocusWithin } from '@vueuse/core'
 
 interface MenuItem {
   id?: string
@@ -81,6 +81,10 @@ function showDropdown() {
 
 function closeDropdown() {
   isExpanded.value = false
+}
+
+function closeDropdownWithFocus() {
+  closeDropdown()
 
   $button.value?.focus()
 }
@@ -88,13 +92,28 @@ function closeDropdown() {
 /**
  *  Close on click outside
  */
-onClickOutside($root, closeDropdown)
+onClickOutside($root, async () => {
+  if (!isExpanded.value) return
+
+  closeDropdown()
+})
+
+/**
+ *  Close on focus leave
+ */
+const { focused } = useFocusWithin($root)
+
+watch(focused, (isFocused) => {
+  if (!isExpanded.value || isFocused) return
+
+  closeDropdown()
+})
 
 /**
  *  Close menu on page change
  */
 watch(useRoute(), () => {
-  isExpanded.value = false
+  closeDropdown()
 })
 
 </script>
