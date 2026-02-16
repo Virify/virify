@@ -35,10 +35,6 @@ interface Props {
 
 defineProps<Props>()
 
-/**
- *  a11y
- */
-const menuId = useId()
 
 /**
  *  Toggle menu
@@ -55,6 +51,27 @@ function toggleMenu() {
 watch(useRoute(), () => {
   isExpanded.value = false
 })
+
+/**
+ *  a11y
+ */
+const menuId = useId()
+
+/**
+ *  @TODO - add focus trap when menu is open
+ * 
+import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
+
+// ...
+
+const $menu = useTemplateRef('$menu')
+
+const { activate, deactivate } = useFocusTrap($menu)
+
+watch(isExpanded, (newState) => {
+  newState ? activate() : deactivate()
+})
+*/
 
 </script>
 
