@@ -1,6 +1,6 @@
 <template>
   <div class="header-desktop-mega-menu">
-    <ul class="header-desktop-mega-menu__headers">
+    <ul ref="$headers" class="header-desktop-mega-menu__headers">
       <li v-for="{ label, isCurrent } of selectedTitles">
         <button type="button" @click.prevent="showSection(label)" class="header-desktop-mega-menu__header" :class="{
           'header-desktop-mega-menu__header--selected': isCurrent
@@ -12,14 +12,15 @@
       </li>
     </ul>
 
-
     <ul ref="$links" class="header-desktop-mega-menu__sub-links">
       <li v-for="{ isViewAll, href, label } of currentChildren">
-        <nuxt-link v-if="isViewAll" :to="href" class="header-desktop-mega-menu__sub-link-title | title-sm">
+        <nuxt-link v-if="isViewAll" :to="href" @keydown.escape.stop="selectParent"
+          class="header-desktop-mega-menu__sub-link-title | title-sm">
           {{ currentTitle }}
         </nuxt-link>
 
-        <nuxt-link v-else :to="href" class="header-desktop-mega-menu__sub-link | body-sm">
+        <nuxt-link v-else :to="href" @keydown.escape.stop="selectParent"
+          class="header-desktop-mega-menu__sub-link | body-sm">
           {{ label }}
         </nuxt-link>
       </li>
@@ -106,7 +107,11 @@ const currentChildren = computed(() => {
   return asArray(children)
 })
 
+/**
+ *  Toggle active state
+ */
 const $links = useTemplateRef('$links')
+const $headers = useTemplateRef('$headers')
 
 function showSection(newSelection?: string) {
   if (!newSelection) return
@@ -118,6 +123,13 @@ function showSection(newSelection?: string) {
     $links.value?.querySelector('a')?.focus()
   })
 }
+
+function selectParent() {
+  const selectedHeader = $headers.value?.querySelector('.header-desktop-mega-menu__header--selected') as HTMLButtonElement
+
+  selectedHeader?.focus()
+}
+
 </script>
 
 <style lang="scss">

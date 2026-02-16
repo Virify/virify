@@ -1,5 +1,5 @@
 <template>
-  <div ref="$root" class="header-desktop-dropdown">
+  <div class="header-desktop-dropdown" @keydown.escape="closeDropdown">
     <button ref="$button" type="button" @click.prevent="showDropdown" class="header-desktop-dropdown__toggle | body-md"
       :aria-controls="dropdownId" :aria-expanded="isExpanded">
       {{ label }}
@@ -81,6 +81,8 @@ function showDropdown() {
 
 function closeDropdown() {
   isExpanded.value = false
+
+  $button.value?.focus()
 }
 
 /**
@@ -95,27 +97,6 @@ const { focused } = useFocusWithin($root)
 
 watch(focused, (isFocused) => {
   if (!isFocused) closeDropdown()
-})
-
-/**
- *  Close on esc key press
- */
-function closeOnKeypress(e: KeyboardEvent) {
-  if (e.key !== 'Escape') return
-
-  e.preventDefault()
-
-  closeDropdown()
-
-  $button.value?.focus()
-}
-
-onMounted(() => {
-  $root.value?.addEventListener('keydown', closeOnKeypress)
-})
-
-onBeforeUnmount(() => {
-  $root.value?.removeEventListener('keydown', closeOnKeypress)
 })
 
 /**
