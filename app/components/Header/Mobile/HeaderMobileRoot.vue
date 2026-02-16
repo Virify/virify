@@ -80,7 +80,7 @@ watch(useRoute(), () => {
     left: calc(50% - 10px);
     width: 20px;
     height: 3px;
-    background: var(--monochrome-200);
+    background: light-dark(var(--monochrome-200), var(--monochrome-900));
     border-radius: 2px;
     transition: transform var(--animation-slow) var(--bounce-out);
 
