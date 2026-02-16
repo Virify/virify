@@ -3,7 +3,7 @@
     'header-base--shadow': hasShadow
   }">
     <header class="header-base__inner | container">
-      <LazyHeaderMobileNav class="header-base__nav header-base__nav--mobile" hydrate-on-visible :menu="mainMenu" />
+      <LazyHeaderMobileRoot class="header-base__nav header-base__nav--mobile" hydrate-on-visible :menu="mainMenu" />
 
       <nuxt-link to="/" class="header-base__home-link">
         <picture>
