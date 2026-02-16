@@ -112,6 +112,13 @@ onBeforeUnmount(() => {
   $root.value?.removeEventListener('keydown', closeOnKeypress)
 })
 
+/**
+ *  Close menu on page change
+ */
+watch(useRoute(), () => {
+  isExpanded.value = false
+})
+
 </script>
 
 <style lang="scss">
