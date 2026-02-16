@@ -9,8 +9,7 @@
     <AtomsIcon icon="chevron-down" class="header-mobile-dropdown__chevron" />
   </button>
 
-  <HeaderMobileMenu :id="dropdownId" :hidden="!isExpanded" :menu="menuWithViewAll"
-    class="header-mobile-dropdown__children" />
+  <HeaderMobileMenu :id="dropdownId" :hidden="!isExpanded" :menu="children" class="header-mobile-dropdown__children" />
 </template>
 
 <script setup lang="ts">
@@ -20,7 +19,6 @@ interface MenuItem {
   href?: string
   description?: string
   icon?: string
-  isViewAll?: boolean
   type?: 'link' | 'dropdown'
   children?: MenuItem[]
 }
@@ -47,23 +45,6 @@ const isExpanded = shallowRef(false)
 function toggleDropdown() {
   isExpanded.value = !isExpanded.value
 }
-
-/**
- *  Add a 'view all' link to the dropdown
- */
-const menuWithViewAll = computed(() => {
-  const { children, href, label } = asObject(props)
-
-  return [
-    href && {
-      href,
-      label: `View All`,
-      type: 'link',
-      isViewAll: true
-    },
-    ...asArray(children),
-  ].filter(Boolean) as MenuItem[]
-})
 
 </script>
 

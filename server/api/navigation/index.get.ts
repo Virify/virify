@@ -20,6 +20,7 @@ interface MenuItem {
   href?: string
   description?: string
   icon?: string
+  isViewAll?: boolean
   type: 'link' | 'dropdown'
   children?: MenuItem[]
 }
@@ -49,7 +50,6 @@ function formatGuides(category: GuideCategory, parentSlug = '/guides/') {
   const formattedCategory: MenuItem = {
     id: _id,
     label: title,
-    href: fullSlugWithSlash,
     description: description,
     icon: icon || 'article',
     type: 'link',
@@ -58,9 +58,21 @@ function formatGuides(category: GuideCategory, parentSlug = '/guides/') {
   // If the guides has any children, format and append them as well
   if (Array.isArray(category.guides)) {
     formattedCategory.type = 'dropdown'
-    formattedCategory.children = category.guides.map((child) => {
-      return formatGuides(child, fullSlugWithSlash)
-    })
+    formattedCategory.children = [
+      {
+        href: fullSlugWithSlash,
+        label: `View All`,
+        type: 'link',
+        isViewAll: true
+      },
+      ...category.guides.map((child) => {
+        return formatGuides(child, fullSlugWithSlash)
+      })
+    ]
+  }
+  // Otherwise the category is a link, so include the href
+  else {
+    formattedCategory.href = fullSlugWithSlash
   }
 
   return formattedCategory

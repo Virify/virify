@@ -17,7 +17,6 @@ interface MenuItem {
   href?: string
   description?: string
   icon?: string
-  isViewAll?: boolean
   type?: 'link' | 'dropdown'
   children?: MenuItem[]
 }
