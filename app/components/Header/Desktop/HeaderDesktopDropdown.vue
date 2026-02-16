@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside, useFocusWithin } from '@vueuse/core'
+import { onClickOutside } from '@vueuse/core'
 
 interface MenuItem {
   id?: string
@@ -88,16 +88,7 @@ function closeDropdown() {
 /**
  *  Close on click outside
  */
-onClickOutside($root, closeDropdown)
-
-/**
- *  Close on focus leave
- */
-const { focused } = useFocusWithin($root)
-
-watch(focused, (isFocused) => {
-  if (!isFocused) closeDropdown()
-})
+onClickOutside($root, () => closeDropdown)
 
 /**
  *  Close menu on page change
