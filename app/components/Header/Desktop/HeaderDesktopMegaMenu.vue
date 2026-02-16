@@ -149,8 +149,6 @@ function selectParent() {
     background: var(--secondary-400);
     font-weight: var(--font-bold);
     transition: background-color var(--animation-fast);
-    aspect-ratio: 4/3;
-    align-self: flex-start;
 
     &:hover {
       color: var(--monochrome-900);
