@@ -40,6 +40,12 @@ const { children } = defineProps<Props>()
 
 /**
  *  Set menu type, based on if dropdown contains sub-dropdowns
+ * 
+ *  @TODO - currently the mega menu just assumes that ALL children are
+ *          sub-dropdowns. We should really change the below to be
+ *          .every({ type } => ...) to reflect this, and have an
+ *          alternative component (or adapt the 'normal menu' component)
+ *          to reflect this potential state
  */
 const containsSubdropdowns = asArray(children).some(({ type }) => {
   return type === 'dropdown'
