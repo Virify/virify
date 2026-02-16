@@ -32,7 +32,7 @@ const { mainMenu } = await useMainNavigation()
 /**
  *  Track logged in state
  */
-const isLoggedIn = shallowRef(true)
+const isLoggedIn = shallowRef(false)
 
 /**
  *  Check whether to skip the wait list - this doesn't need to be
