@@ -143,7 +143,13 @@ watch(useRoute(), () => {
     min-width: 24ch;
 
     &--mega-menu {
-      padding: var(--size-16) var(--size-28) var(--size-28);
+      position: fixed;
+      top: var(--header-height);
+      left: 50%;
+      transform: translate(-50%);
+      padding: 0 var(--size-28) var(--size-28);
+      width: min(calc(100vw - var(--container-padding)), 88ch);
+      box-sizing: border-box;
     }
   }
 }

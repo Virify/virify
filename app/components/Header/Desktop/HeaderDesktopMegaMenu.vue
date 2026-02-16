@@ -135,10 +135,10 @@ function selectParent() {
 <style lang="scss">
 .header-desktop-mega-menu {
   display: grid;
-  grid-template-columns: 20ch 24ch 18ch;
+  height: min(calc(100vh - var(--header-height) - var(--size-28)), 28ch);
+  grid-template-columns: 1fr 1.5fr 20ch;
   grid-gap: var(--size-28);
   align-items: stretch;
-  height: min(calc(100vh - var(--header-height) - var(--size-28)), 28ch);
   box-sizing: border-box;
 
   &__view-all {
@@ -172,13 +172,12 @@ function selectParent() {
   &__view-all,
   &__sub-links,
   &__headers {
-    padding: var(--size-20) var(--size-28);
+    padding: var(--size-24) var(--size-28);
     border-radius: var(--border-radius-xl);
   }
 
   &__headers {
-    padding-left: 0;
-    padding-right: 0;
+    padding: var(--size-20) 0;
   }
 
   &__sub-links,
@@ -238,7 +237,7 @@ function selectParent() {
 
   &__sub-link {
     display: block;
-    padding: var(--size-4) 0;
+    padding: var(--size-6) 0;
     text-decoration: none;
     font-size: var(--font-sm);
     font-weight: var(--font-semibold);
