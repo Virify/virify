@@ -88,7 +88,7 @@ function closeDropdown() {
 /**
  *  Close on click outside
  */
-onClickOutside($root, () => closeDropdown)
+onClickOutside($root, closeDropdown)
 
 /**
  *  Close menu on page change
