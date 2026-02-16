@@ -12,7 +12,7 @@
         </picture>
       </nuxt-link>
 
-      <LazyHeaderDesktopNav class="header-base__nav header-base__nav--desktop" hydrate-on-visible :menu="mainMenu" />
+      <LazyHeaderDesktopRoot class="header-base__nav header-base__nav--desktop" hydrate-on-visible :menu="mainMenu" />
 
       <template v-if="isWaitingList">
         <LazyHeaderButtonsWaitingList />
