@@ -1,8 +1,9 @@
 <template>
   <nav aria-label="Site navigation" class="header-desktop-nav">
     <ul class="header-desktop-nav__menu">
-      <li v-for="item of menu">
-        <a href="#" class="header-desktop-nav__link">{{ item.label }}</a>
+      <li v-for="{ type, href, label, children } of menu">
+        <HeaderDesktopLink v-if="type === 'link'" :href :label />
+        <HeaderDesktopDropdown v-else-if="type === 'dropdown'" :label :href :children />
       </li>
     </ul>
   </nav>
@@ -40,14 +41,7 @@ defineProps<Props>()
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--size-36);
+    gap: var(--size-2);
   }
-
-  &__link {
-    text-decoration: none;
-    font-weight: var(--font-bold);
-    font-size: var(--font-sm);
-  }
-
 }
 </style>
