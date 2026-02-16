@@ -1,7 +1,7 @@
 <template>
   <ul class="header-mobile-menu">
-    <li v-for="{ type, href, label, children, icon } of validatedMenu">
-      <HeaderMobileLink v-if="type === 'link'" :label :href />
+    <li v-for="{ type, href, label, children, icon, isViewAll } of validatedMenu">
+      <HeaderMobileLink v-if="type === 'link'" :label :href :is-view-all />
       <HeaderMobileDropdown v-else-if="type === 'dropdown'" :label :href :children :icon />
     </li>
   </ul>
@@ -17,6 +17,7 @@ interface MenuItem {
   href?: string
   description?: string
   icon?: string
+  isViewAll?: boolean
   type?: 'link' | 'dropdown'
   children?: MenuItem[]
 }
