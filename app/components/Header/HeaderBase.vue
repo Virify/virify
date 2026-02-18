@@ -70,7 +70,7 @@ onBeforeUnmount(() => {
 @use "#styles/_utils/media" as mq;
 
 .header-base {
-  --header-height: 52px;
+  --header-height: 60px;
 
   position: sticky;
   top: 0;
