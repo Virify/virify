@@ -116,11 +116,7 @@ onBeforeUnmount(() => {
 
   &__logo {
     width: auto;
-    height: var(--size-28);
-
-    @include mq.tablet {
-      height: var(--size-32);
-    }
+    height: var(--size-32);
 
     @include mq.notebook {
       height: var(--size-36);

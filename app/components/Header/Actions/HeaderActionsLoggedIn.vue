@@ -104,7 +104,7 @@ async function logOut() {
   &__toggle {
     display: flex;
     align-items: center;
-    gap: var(--size-14);
+    gap: var(--size-12);
     font-weight: var(--font-bold);
     padding: 0;
     margin: 0;
@@ -112,10 +112,10 @@ async function logOut() {
     background: transparent;
     cursor: pointer;
     transition: color var(--animation-fast);
-    font-size: var(--font-lg);
+    font-size: var(--font-md);
 
-    @include mq.desktop {
-      font-size: var(--font-md);
+    @include mq.tablet {
+      gap: var(--size-14);
     }
 
     @media (hover: hover) {
