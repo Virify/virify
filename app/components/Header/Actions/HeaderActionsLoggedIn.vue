@@ -4,7 +4,7 @@
       Account
 
       <span role="img" class="header-actions-logged-in__profile-image">
-        <!-- img here -->
+        <AtomsIcon icon="profile" />
       </span>
     </PopoverTrigger>
 
@@ -127,12 +127,21 @@ async function logOut() {
   }
 
   &__profile-image {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: var(--size-36);
     height: var(--size-36);
     border-radius: var(--border-radius-pill);
-    background: var(--monochrome-500);
+    background: light-dark(var(--monochrome-700), var(--monochrome-400));
     object-fit: contain;
+    color: light-dark(var(--monochrome-100), var(--monochrome-900));
+
+    .a-icon {
+      display: block;
+      width: var(--size-24);
+      height: var(--size-24);
+    }
   }
 
   &__popover {
