@@ -40,7 +40,7 @@ function updateToggled() {
     height: var(--size-16);
     background: var(--monochrome-500);
     border-radius: var(--border-radius-pill);
-    transition: background-color var(--animation-subtle), transform var(--animation-slow);
+    transition: background-color var(--animation-fast), transform var(--animation-slow);
   }
 
   &:hover &__thumb {
