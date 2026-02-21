@@ -33,10 +33,11 @@
           <HeaderDarkModeToggle />
         </label>
 
-        <a href="#" class="header-actions-logged-in__button header-actions-logged-in__button--logout">
+        <button type="button" class="header-actions-logged-in__button header-actions-logged-in__button--logout"
+          @click.prevent="logOut">
           Log out
           <AtomsIcon icon="account/logout" />
-        </a>
+        </button>
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>
@@ -51,6 +52,22 @@ import {
 } from 'reka-ui'
 
 const notificationCount = shallowRef(12)
+
+
+/**
+ *  Log user out
+ */
+const { clear } = useUserSession()
+
+async function logOut() {
+  await clear()
+
+  const { path } = useRoute()
+
+  if (path.startsWith('/account')) {
+    navigateTo('/')
+  }
+}
 
 </script>
 
@@ -112,6 +129,8 @@ const notificationCount = shallowRef(12)
     transition: background-color var(--animation-fast);
     cursor: pointer;
     font-size: var(--font-lg);
+    box-sizing: border-box;
+    width: 100%;
 
     @include mq.desktop {
       font-size: var(--font-md);
