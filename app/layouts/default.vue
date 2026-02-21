@@ -1,7 +1,6 @@
 <template>
   <NuxtLoadingIndicator />
-  <OrganismsHeader v-if="!showNewHeader" />
-  <HeaderBase v-else />
+  <HeaderBase />
 
   <div class="page">
     <UApp>
@@ -22,8 +21,6 @@ import { ViewsDialogLogin } from '#components'
 import { useDark } from '@vueuse/core'
 
 useDark()
-
-const showNewHeader = true
 
 onMounted(async () => {
   const { path, query } = useRoute()

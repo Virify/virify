@@ -31,7 +31,7 @@ function clearErrors() {
 <template>
   <div>
     <NuxtLoadingIndicator />
-    <OrganismsHeader />
+    <HeaderBase />
 
     <div class="page">
       <div class="error-page">
