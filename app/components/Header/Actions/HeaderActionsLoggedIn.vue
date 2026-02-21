@@ -55,6 +55,8 @@ const notificationCount = shallowRef(12)
 </script>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
+
 .header-actions-logged-in {
 
   &__toggle {
@@ -68,10 +70,17 @@ const notificationCount = shallowRef(12)
     background: transparent;
     cursor: pointer;
     transition: color var(--animation-fast);
+    font-size: var(--font-lg);
 
-    &:hover {
-      background: transparent;
-      color: var(--secondary-400);
+    @include mq.desktop {
+      font-size: var(--font-md);
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background: transparent;
+        color: var(--secondary-400);
+      }
     }
   }
 
@@ -99,14 +108,20 @@ const notificationCount = shallowRef(12)
     color: currentColor;
     text-decoration: none;
     font-weight: var(--font-bold);
-    font-size: var(--font-md);
     border-radius: var(--border-radius-xl);
     transition: background-color var(--animation-fast);
     cursor: pointer;
+    font-size: var(--font-lg);
 
-    &:hover {
-      background: var(--background-300);
-      color: currentColor;
+    @include mq.desktop {
+      font-size: var(--font-md);
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--background-300);
+        color: currentColor;
+      }
     }
 
     &--logout {
