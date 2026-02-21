@@ -11,21 +11,20 @@
     <PopoverPortal>
       <PopoverContent align="end" :align-offset="-16" :side-offset="8"
         class="header-actions-logged-in__popover | gradient-box">
-        <a href="#account" class="header-actions-logged-in__button">
-          Profile
-        </a>
+        <nuxt-link v-for="{ title, url } of accountLinks" :key="title" :to="url"
+          class="header-actions-logged-in__button">
+          {{ title }}
+        </nuxt-link>
 
-        <a href="#security" class="header-actions-logged-in__button">
-          Security
-        </a>
-
-        <a href="#notifications" class="header-actions-logged-in__button">
+        <nuxt-link to="dashboard?notifications=true" class="header-actions-logged-in__button">
           Notifications
 
-          <span v-if="notificationCount" class="header-actions-logged-in__notifications | body-2xs">
-            {{ notificationCount }}
+          <span class="header-actions-logged-in__notifications | body-2xs" :class="{
+            'header-actions-logged-in__notifications--active': notificationsTotal
+          }">
+            {{ notificationsTotal }}
           </span>
-        </a>
+        </nuxt-link>
 
         <label class="header-actions-logged-in__button">
           Dark mode
@@ -51,8 +50,34 @@ import {
   PopoverTrigger
 } from 'reka-ui'
 
-const notificationCount = shallowRef(12)
+/**
+ *  Account navigation
+ */
+const accountLinks = [
+  {
+    title: 'Dashboard',
+    url: '/dashboard'
+  },
+  {
+    title: 'Security',
+    url: '/dashboard/security'
+  }
+]
 
+/**
+ *  Show notifications
+ */
+const { notificationCounts, fetchNotificationCounts } = useNotifications()
+
+onMounted(() => {
+  fetchNotificationCounts();
+})
+
+const notificationsTotal = computed(() => {
+  const { total = 0 } = asObject(notificationCounts.value)
+
+  return total
+})
 
 /**
  *  Log user out
@@ -166,8 +191,12 @@ async function logOut() {
     display: block;
     border-radius: var(--border-radius-pill);
     padding: var(--size-4) var(--size-8);
-    background: var(--error);
+    background: light-dark(var(--monochrome-600), var(--monochrome-400));
     color: var(--monochrome-900);
+
+    &--active {
+      background: var(--error);
+    }
   }
 }
 </style>
