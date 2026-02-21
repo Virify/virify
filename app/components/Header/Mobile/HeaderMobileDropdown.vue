@@ -1,5 +1,5 @@
 <template>
-  <button type="button" @click.prevent="toggleDropdown" class="header-mobile-dropdown | body-md" :class="{
+  <button type="button" @click.prevent="toggleDropdown" class="header-mobile-dropdown | body-lg" :class="{
     'header-mobile-dropdown--expanded': isExpanded
   }" :aria-expanded="isExpanded" :aria-controls="dropdownId">
     <AtomsIcon v-if="icon" :icon class="header-mobile-dropdown__icon" />
@@ -57,7 +57,7 @@ function toggleDropdown() {
   background: transparent;
   color: currentColor;
   border: 0;
-  padding: var(--size-8) 0;
+  padding: var(--size-12) 0;
   font-weight: var(--font-bold);
   line-height: var(--lineheight-sm);
   cursor: pointer;

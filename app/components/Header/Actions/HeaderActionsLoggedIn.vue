@@ -9,7 +9,7 @@
     </PopoverTrigger>
 
     <PopoverPortal>
-      <PopoverContent align="end" :align-offset="-16" :side-offset="12"
+      <PopoverContent align="end" :align-offset="-16" :side-offset="8"
         class="header-actions-logged-in__popover | gradient-box">
         <a href="#account" class="header-actions-logged-in__button">
           Profile

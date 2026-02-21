@@ -1,5 +1,5 @@
 <template>
-  <nuxt-link :to="href" class="header-mobile-link | body-md">
+  <nuxt-link :to="href" class="header-mobile-link | body-lg">
     {{ label }}
 
     <AtomsIcon v-if="isViewAll" icon="arrow-right" />
@@ -22,7 +22,7 @@ defineProps<Props>()
   display: flex;
   align-items: center;
   gap: var(--size-8);
-  padding: var(--size-8) 0;
+  padding: var(--size-12) 0;
   font-weight: var(--font-bold);
   color: currentColor;
   text-decoration: none;
