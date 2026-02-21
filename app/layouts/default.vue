@@ -19,6 +19,9 @@
 
 <script setup lang="ts">
 import { ViewsDialogLogin } from '#components'
+import { useDark } from '@vueuse/core'
+
+useDark()
 
 const showNewHeader = true
 
