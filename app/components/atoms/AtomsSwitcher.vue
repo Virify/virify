@@ -1,6 +1,8 @@
 <template>
   <button type="button" role="switch" :aria-checked="isToggled" aria-required="false" @click.prevent="updateToggled"
-    class="a-switcher">
+    class="a-switcher" :class="{
+      'a-switcher--active': isToggled
+    }">
     <span class="a-switcher__thumb"></span>
   </button>
 </template>
@@ -47,13 +49,13 @@ function updateToggled() {
     background: var(--monochrome-400);
   }
 
-  &[aria-checked=true] &__thumb {
+  &--active &__thumb {
     background: var(--secondary-400);
     transform: translateX(var(--size-12));
+  }
 
-    &:hover {
-      background: var(--secondary-500);
-    }
+  &--active:hover &__thumb {
+    background: var(--secondary-500);
   }
 }
 </style>
