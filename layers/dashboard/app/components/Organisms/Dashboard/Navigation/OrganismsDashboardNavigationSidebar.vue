@@ -146,11 +146,13 @@
   onMounted(() => {
     fetchNotificationCounts();
 
-    const { query } = useRoute()
+    nextTick(() => {
+      const { query } = useRoute()
 
-    if (query?.notifications === 'true') {
-      notificationSlideoverOpen.value = true
-    }
+      if (query?.notifications === 'true') {
+        notificationSlideoverOpen.value = true
+      }
+    })
   });
 
   const logout = async () => {
