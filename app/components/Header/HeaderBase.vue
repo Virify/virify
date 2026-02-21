@@ -19,8 +19,8 @@
       </template>
 
       <template v-else>
-        <LazyHeaderActionsGuest v-if="!isLoggedIn" />
-        <LazyHeaderActionsLoggedIn v-else />
+        <LazyHeaderActionsLoggedIn v-if="loggedIn" />
+        <LazyHeaderActionsGuest v-else />
       </template>
     </header>
   </div>
@@ -32,7 +32,7 @@ const { mainMenu } = await useMainNavigation()
 /**
  *  Track logged in state
  */
-const isLoggedIn = shallowRef(true)
+const { loggedIn } = useUserSession();
 
 /**
  *  Check whether to skip the wait list - this doesn't need to be
