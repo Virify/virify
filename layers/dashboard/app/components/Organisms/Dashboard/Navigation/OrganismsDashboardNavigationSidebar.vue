@@ -145,6 +145,12 @@
 
   onMounted(() => {
     fetchNotificationCounts();
+
+    const { query } = useRoute()
+
+    if (query?.notifications === 'true') {
+      notificationSlideoverOpen.value = true
+    }
   });
 
   const logout = async () => {
