@@ -1,19 +1,16 @@
 <template>
-  <div class="waiting-list-page">
-    
+  <div class="p-index">
+
     <!-- ============================================ -->
     <!-- HERO SECTION -->
     <!-- ============================================ -->
-    <OrganismsHero
-      :title="cmsContent?.hero.title || ''"
-      :subtitle="cmsContent?.hero.subtitle || ''"
-      :input="true"
-      :search="true"
-    />
+    <div class="p-index__hero">
+      <HomepageSectionSignup class="| container" />
+    </div>
 
     <!-- ============================================ -->
     <!-- SIGN UP FORM SECTION -->
-    <!-- ============================================ -->
+    <!-- ============================================ 
     <section class="waiting-list-form-section">
       <div class="container">
         <div class="waiting-list-form__header">
@@ -32,12 +29,13 @@
                   <div class="waiting-list-form__input">
                     <ClientOnly>
                       <AtomsInput id="email" v-model="email" type="email" name="email"
-                        placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess" error-id="email-error" />
+                        placeholder="your.email@example.com" required :disabled="isSubmitting || isSuccess"
+                        error-id="email-error" />
                     </ClientOnly>
                   </div>
                   <div class="waiting-list-form__submit">
                     <AtomsButton v-if="!isSuccess" class="waiting-list-form__submit-button | button-monochrome"
-                      type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email"> 
+                      type="submit" :pending="isSubmitting" :disabled="!agreedToTerms || !email">
                       {{ cmsContent?.formSection.buttonText }}
                     </AtomsButton>
                   </div>
@@ -67,20 +65,19 @@
         </div>
       </div>
     </section>
+    -->
+
+    <!-- ============================================ -->
+    <!-- INTRO SECTION -->
+    <!-- ============================================ -->
+    <HomepageSectionComingSoon class="| container" />
 
     <!-- ============================================ -->
     <!-- FEATURE SECTIONS (FROM SANITY CMS) -->
     <!-- ============================================ -->
-    <OrganismsFeatureSection
-      v-for="(section, index) in processedFeatureSections"
-      :key="index"
-      v-bind="section"
-    >
+    <OrganismsFeatureSection v-for="(section, index) in processedFeatureSections" :key="index" v-bind="section">
       <template #title>
-        <AtomsGradientTextRenderer 
-          :text="section.title || ''" 
-          :background="section.background || 'white'"
-        />
+        <AtomsGradientTextRenderer :text="section.title || ''" :background="section.background || 'white'" />
       </template>
     </OrganismsFeatureSection>
 
@@ -91,21 +88,16 @@
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
-            <AtomsGradientTextRenderer :text="cmsContent?.sellersBenefits.title || ''" :variant="sellersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+            <AtomsGradientTextRenderer :text="cmsContent?.sellersBenefits.title || ''"
+              :variant="sellersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.sellersBenefits.subtitle }}</p>
         </header>
 
         <div class="waiting-list-sellers__grid" ref="sellersRef">
-          <MoleculesFeatureTile 
-            v-for="(feature, index) in cmsContent?.sellersBenefits.features" 
-            :key="index"
-            :iconName="feature.icon" 
-            :title="feature.title" 
-            :subtitle="feature.subtitle"
-            :description="feature.description"
-            :variant="sellersVariant"
-            :class="{ 'animate-in': isSellersVisible }" />
+          <MoleculesFeatureTile v-for="(feature, index) in cmsContent?.sellersBenefits.features" :key="index"
+            :iconName="feature.icon" :title="feature.title" :subtitle="feature.subtitle"
+            :description="feature.description" :variant="sellersVariant" :class="{ 'animate-in': isSellersVisible }" />
         </div>
       </div>
     </section>
@@ -117,21 +109,16 @@
       <div class="container">
         <header class="waiting-list-sellers__header">
           <h2 class="title-xl">
-            <AtomsGradientTextRenderer :text="cmsContent?.buyersBenefits.title || ''" :variant="buyersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+            <AtomsGradientTextRenderer :text="cmsContent?.buyersBenefits.title || ''"
+              :variant="buyersGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.buyersBenefits.subtitle }}</p>
         </header>
 
         <div class="waiting-list-features__grid" ref="buyersRef">
-          <MoleculesFeatureTile 
-            v-for="(feature, index) in cmsContent?.buyersBenefits.features"
-            :key="index"
-            :iconName="feature.icon" 
-            :title="feature.title" 
-            :subtitle="feature.subtitle"
-            :description="feature.description"
-            :variant="buyersVariant"
-            :class="{ 'animate-in': isBuyersVisible }" />
+          <MoleculesFeatureTile v-for="(feature, index) in cmsContent?.buyersBenefits.features" :key="index"
+            :iconName="feature.icon" :title="feature.title" :subtitle="feature.subtitle"
+            :description="feature.description" :variant="buyersVariant" :class="{ 'animate-in': isBuyersVisible }" />
         </div>
       </div>
     </section>
@@ -139,12 +126,9 @@
     <!-- ============================================ -->
     <!-- CONTACT SECTION -->
     <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.contactSection.title || ''"
+    <MoleculesCtaSection :title="cmsContent?.contactSection.title || ''"
       :description="cmsContent?.contactSection.description || ''"
-      :buttonText="cmsContent?.contactSection.buttonText || ''"
-      :gradient="contactGradient"
-      to="/contact" />
+      :buttonText="cmsContent?.contactSection.buttonText || ''" :gradient="contactGradient" to="/contact" />
 
     <!-- ============================================ -->
     <!-- EARLY ACCESS BENEFITS SECTION -->
@@ -153,13 +137,15 @@
       <div class="container">
         <header class="waiting-list-benefits__header">
           <h2 class="title-xl">
-            <AtomsGradientTextRenderer :text="cmsContent?.earlyAccessBenefits.title || ''" :variant="benefitsGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
+            <AtomsGradientTextRenderer :text="cmsContent?.earlyAccessBenefits.title || ''"
+              :variant="benefitsGradientClass === 'gradient-text-light' ? 'light' : 'dark'" />
           </h2>
           <p class="body-md max-width-prose section-subtitle">{{ cmsContent?.earlyAccessBenefits.subtitle }}</p>
         </header>
 
         <div class="waiting-list-benefits__cards">
-          <AtomsHeroCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index" :variant="index === 1 ? 'secondary' : undefined">
+          <AtomsHeroCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index"
+            :variant="index === 1 ? 'secondary' : undefined">
             <h3 class="title-md">
               <AtomsGradientTextRenderer :text="benefit.title || ''" variant="dark" />
             </h3>
@@ -169,32 +155,33 @@
       </div>
     </section>
 
-    <OrganismsGuideSection
-      v-if="cmsContent?.guidesSection"
-      :title="cmsContent.guidesSection.title"
-      :description="cmsContent.guidesSection.description || ''"
-      :guides="cmsContent.guidesSection.guides"
-      :gradient-class="'gradient-text-light'"
-    />
+    <OrganismsGuideSection v-if="cmsContent?.guidesSection" :title="cmsContent.guidesSection.title"
+      :description="cmsContent.guidesSection.description || ''" :guides="cmsContent.guidesSection.guides"
+      :gradient-class="'gradient-text-light'" />
 
     <!-- ============================================ -->
     <!-- FINAL CTA SECTION -->
     <!-- ============================================ -->
-    <MoleculesCtaSection
-      :title="cmsContent?.finalCta.title || ''"
-      :description="cmsContent?.finalCta.description || ''"
-      :buttonText="cmsContent?.finalCta.buttonText || ''"
-      :gradient="true"
-      @click="scrollToForm"
-    />
+    <MoleculesCtaSection :title="cmsContent?.finalCta.title || ''" :description="cmsContent?.finalCta.description || ''"
+      :buttonText="cmsContent?.finalCta.buttonText || ''" :gradient="true" @click="showSignupForm" />
 
   </div>
 </template>
 
 <script setup lang="ts">
 import { useIntersectionObserver } from "@vueuse/core";
+import { ViewsDialogWaitingList } from '#components'
 
-const toast = useToast();
+/**
+ *  Show waiting list form
+ */
+const { showDialog } = useDialog()
+
+function showSignupForm() {
+  showDialog({
+    component: ViewsDialogWaitingList
+  })
+}
 
 // Fetch CMS content - module automatically uses correct perspective
 const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPage>(
@@ -202,7 +189,7 @@ const { data: cmsContent, error: cmsError } = await useSanityQuery<WaitingListPa
 );
 
 // Process feature sections: clean stega encoding and determine which image props to pass
-const processedFeatureSections = computed(() => 
+const processedFeatureSections = computed(() =>
   processFeatureSections(cmsContent.value?.featureSections)
 );
 
@@ -215,7 +202,6 @@ const sellersBackground = computed(() => hasCmsFeatures.value ? '' : 'section-gr
 const buyersBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
 const contactGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
 const benefitsBackground = computed(() => hasCmsFeatures.value ? 'section-gradient-bg' : '');
-const finalCtaGradient = computed(() => !hasCmsFeatures.value); // Boolean for CTA component
 
 // Gradient text classes based on background
 const sellersGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-text-light' : 'gradient-text');
@@ -225,15 +211,7 @@ const benefitsGradientClass = computed(() => hasCmsFeatures.value ? 'gradient-te
 // Variant for feature tiles (blue when no gradient background, default otherwise)
 const sellersVariant = computed(() => hasCmsFeatures.value ? 'blue' : undefined);
 const buyersVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
-const benefitsVariant = computed(() => hasCmsFeatures.value ? undefined : 'blue');
 
-// Gradient text is used via AtomsGradientText auto-registered component
-const email = ref("");
-const agreedToTerms = ref(false);
-const isSubmitting = ref(false);
-const isSuccess = ref(false);
-const formError = ref<string | null>(null);
-const message = ref("You're on the list! Check your email for confirmation.");
 
 // Intersection Observer helper (mirrors homepage pattern)
 const createIntersectionObserver = () => {
@@ -259,48 +237,11 @@ const { elementRef: buyersRef, isVisible: isBuyersVisible } = createIntersection
 // Sellers grid
 const { elementRef: sellersRef, isVisible: isSellersVisible } = createIntersectionObserver();
 
-async function handleSubmit() {
-  if (!email.value || !agreedToTerms.value) {
-    formError.value = "Please complete all required fields";
-    return;
-  }
-
-  isSubmitting.value = true;
-  formError.value = null;
-
-  try {
-    const response = await $fetch<{ success: boolean; message: string; alreadyExists?: boolean }>("/api/waiting-list", {
-      method: "POST",
-      body: {
-        email: email.value,
-      },
-    });
-
-    if (response.success) {
-      isSuccess.value = true;
-      message.value = response.message;
-      toast.add({ title: 'Success', description: message.value, color: 'success' });
-    }
-  } catch (error: any) {
-    console.error("Waiting list signup error:", error);
-    formError.value = error.data?.statusMessage || "Failed to join waiting list. Please try again.";
-  } finally {
-    isSubmitting.value = false;
-  }
-}
-
-function scrollToForm() {
-  const formSection = document.querySelector(".waiting-list-form-section");
-  if (formSection) {
-    formSection.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
-}
-
 // SEO - Nuxt SEO auto-generates WebPage schema from this
 // Use CMS SEO metadata if available, otherwise fallback to defaults
 const seoData = computed(() => {
   const cms = cmsContent.value?.seo;
-  
+
   return {
     title: cms?.metaTitle,
     description: cms?.metaDescription,
@@ -346,6 +287,14 @@ useSchemaOrg([
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
 @use "#styles/3-elements/sections" as *;
+
+// Main page styles
+.p-index {
+
+  &__hero {
+    overflow: hidden;
+  }
+}
 
 // Shared gradient background
 .section-gradient-bg {
@@ -598,4 +547,3 @@ useSchemaOrg([
   margin: var(--size-12) auto 0;
 }
 </style>
-
