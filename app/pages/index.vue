@@ -4,16 +4,7 @@
       <HomepageSectionSignup class="| container" />
     </div>
 
-    <div v-else class="p-index__search | container">
-
-      <h1 class="p-index__search-title | title-2xl lineheight-xs">
-        Find Your Perfect Home with
-        <span class="gradient-text"> Virify AI </span>
-      </h1>
-
-      <OrganismsDockBanner listingType="all" class="p-index__search-dock" />
-
-    </div>
+    <HomepageSectionSearch v-else class="p-index__search | container" />
 
     <HomepageSectionComingSoon class="| container" />
 
@@ -235,51 +226,10 @@ function showSignupForm() {
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/media' as mq;
-
 .p-index {
 
   &__hero {
     overflow: hidden;
-  }
-
-  &__search {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    position: relative;
-    z-index: 2;
-    background: #26333C;
-    border-radius: var(--border-radius-2xl);
-    padding: var(--size-56) var(--size-32) 250px;
-
-    @include mq.tablet {
-      border-radius: var(--border-radius-3xl);
-      padding: var(--size-48) var(--size-72) 160px;
-    }
-
-    @include mq.notebook {
-      padding: var(--size-48) var(--size-72) var(--size-72);
-      min-height: 32em;
-    }
-
-    @include mq.desktop {
-      border-radius: var(--border-radius-4xl);
-      padding: var(--size-56);
-    }
-  }
-
-  &__search-dock {
-    width: min(100%, 720px);
-    margin: 0 auto;
-  }
-
-  &__search-title {
-    color: var(--monochrome-900);
-    max-width: 20ch;
-    margin: 0 auto var(--size-40);
   }
 }
 </style>
