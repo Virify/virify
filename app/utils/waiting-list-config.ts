@@ -46,7 +46,7 @@ const waitingListConfig: WaitingListConfig = {
 
   // Footer sections visibility
   footer: {
-  showPropertySearch: false,
+    showPropertySearch: false,
     showSellProperty: false,
     showPropertyTools: true,
     showGuides: true,
@@ -59,8 +59,12 @@ const waitingListConfig: WaitingListConfig = {
  */
 export const useWaitingListMode = () => {
   const config = useRuntimeConfig()
-  const isWaitingListMode = computed(() => config.public.DEPLOYMENT_ENV === 'waiting-list')
-  
+  const isWaitingListMode = computed(() => {
+    const { query } = useRoute()
+
+    return query.waitList === 'true' || config.public.DEPLOYMENT_ENV === 'waiting-list'
+  })
+
   return {
     isWaitingListMode,
     config: waitingListConfig,
