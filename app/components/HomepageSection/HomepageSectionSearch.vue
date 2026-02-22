@@ -32,11 +32,12 @@
 
   @include mq.desktop {
     border-radius: var(--border-radius-4xl);
-    padding: var(--size-56) var(--size-56) var(--size-72);
+    padding: var(--size-56) var(--size-56) var(--size-96);
+    min-height: 30em;
   }
 
   &__search-dock {
-    width: min(100%, 720px);
+    width: min(100%, 740px);
     margin: 0 auto;
   }
 
