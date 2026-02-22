@@ -3,13 +3,19 @@
     <HomepageSectionIntro title="A smarter way to buy, sell and rent is coming soon" description="Whether you're looking for your next home, ready to market privately, or an estate agent looking for a more
       cost-effective and easy-to-use platform, join our waiting list for exclusive early access and progress updates.">
 
-      <div class="homepage-section-coming-soon__computer">
-        <!-- <video width="700" autoplay muted loop disablepictureinpicture playsinline>
+      <!-- <div class="homepage-section-coming-soon__computer">
+        <video width="700" autoplay muted loop disablepictureinpicture playsinline>
           <source src="/videos/preview.mp4" media="(prefers-color-scheme: light)" />
           <source src="/videos/preview-dark.mp4" media="(prefers-color-scheme: dark)" />
-        </video> -->
+        </video>
         <span class="video">Video here...</span>
-      </div>
+      </div> -->
+
+      <!-- Temporary button until we have video -->
+      <a href="#homepage-content" class="homepage-section-coming-soon__down">
+        <AtomsIcon icon="chevron-down" />
+      </a>
+      <!-- End temporary button -->
     </HomepageSectionIntro>
 
   </div>
@@ -119,5 +125,33 @@
       color: var(--background-300);
     }
   }
+
+  /* Start of temporary button */
+  &__down {
+    display: block;
+    margin: var(--size-32) auto;
+    padding: var(--size-10);
+    width: fit-content;
+    background: var(--background-300);
+    border-radius: var(--border-radius-pill);
+    color: currentColor;
+    border: 0;
+    cursor: pointer;
+    transition: color var(--animation-fast),
+      background-color var(--animation-fast);
+
+    &:hover {
+      background: var(--secondary-400);
+      color: var(--monochrome-900);
+    }
+
+    .a-icon {
+      display: block;
+      width: var(--size-36);
+      height: var(--size-36);
+    }
+  }
+
+  /* End of temporary button */
 }
 </style>

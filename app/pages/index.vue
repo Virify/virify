@@ -75,6 +75,8 @@
     <!-- ============================================ -->
     <!-- FEATURE SECTIONS (FROM SANITY CMS) -->
     <!-- ============================================ -->
+    <a name="homepage-content" aria-hidden></a>
+
     <OrganismsFeatureSection v-for="(section, index) in processedFeatureSections" :key="index" v-bind="section">
       <template #title>
         <AtomsGradientTextRenderer :text="section.title || ''" :background="section.background || 'white'" />
