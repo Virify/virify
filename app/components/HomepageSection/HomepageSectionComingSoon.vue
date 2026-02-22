@@ -20,7 +20,7 @@
 @use '#styles/_utils/media' as mq;
 
 .homepage-section-coming-soon {
-  padding: max(var(--size-32), 15vh) 0;
+  padding: clamp(var(--size-32), 10vh, var(--size-120)) 0;
 
   @include mq.tablet {
     display: flex;
@@ -56,7 +56,7 @@
     width: min(100%, 480px);
 
     @include mq.tablet {
-      width: min(90%, 640px);
+      width: min(90%, 720px);
     }
 
     &::before {
