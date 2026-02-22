@@ -170,6 +170,7 @@
 
     <client-only>
       <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
+        :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal"
         :price-type="priceType" :address="address" :property-type="property?.type?.name"
         :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
         :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
@@ -183,14 +184,6 @@
         :is-draft="isDraft" />
     </client-only>
   </main>
-  <!-- Similar Listings (only for published listings, not drafts) -->
-  <div v-if="!isDraft && !isWaitingListMode" class="p-listing | container">
-    <OrganismsRelevantListings type="similar" :listing-id="String(listing?.id)" :address="similarListingsAddress" />
-  </div>
-  <!-- Trending Listings (only for published listings, not drafts) -->
-  <div v-if="!isDraft && !isWaitingListMode" class="p-listing | container">
-    <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -204,14 +197,6 @@ const props = defineProps<{
 
 const { trackView } = useAnalyticsTracking();
 const { isWaitingListMode } = useWaitingListMode();
-
-const similarListingsAddress = computed(() => {
-  return props.listing?.property?.address ? {
-    street: props.listing.property.address.street,
-    city: props.listing.property.address.city,
-    postcode: props.listing.property.address.postcode,
-  } : {};
-});
 
 /**
  *  Content
@@ -426,6 +411,15 @@ const isOverviewVisible = shallowRef(true);
 
 useIntersectionObserver($overview, ([entry]) => {
   isOverviewVisible.value = !!entry?.isIntersecting;
+});
+
+/**
+ *  Toggle mobile gallery visibility
+ */
+const isMobileGalleryVisible = shallowRef(false);
+
+useIntersectionObserver($mobileCarousel, ([entry]) => {
+  isMobileGalleryVisible.value = !!entry?.isIntersecting;
 });
 
 /**

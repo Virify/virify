@@ -173,7 +173,7 @@ onClickOutside($formWrapper, () => {
 /**
  *  Fetch filters
  */
-const { setQuery, setListingType, searchState } = useSearchState()
+const { setQuery, setListingType, setSearchType, setResults, searchState, setSearchPending, setQueryAnalysis } = useSearchState()
 const { checkContent, isChecking } = useModeration()
 const toast = useToast()
 
@@ -184,9 +184,38 @@ const initialQuery = computed(() => {
 })
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const query = buildQueryFromTraditionalFormData(formData)
+  const { location, radius } = asObject(searchState.value)
 
-  await aiSearchSubmit(query)
+  if (!location) {
+    return
+  }
+
+  try {
+    await animateFormToDock()
+    setSearchPending(true)
+    
+    // Build query analysis from form data for filter badges
+    const queryAnalysis = buildQueryAnalysisFromFormData(formData)
+    
+    // Set search parameters and navigate instead of fetching here
+    // The search page will handle the fetch
+    searchState.value = {
+      ...asObject(searchState.value),
+      searchType: 'traditional',
+      traditionalSearchForm: formData,
+      queryAnalysis,
+      results: [], // Clear old results
+      hasSearched: false
+    }
+    
+    // Navigate to search results page
+    await navigateTo('/search')
+    
+  } catch (error) {
+    console.error('Traditional search error:', error)
+    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
+    setSearchPending(false)
+  }
 }
 
 async function aiSearchSubmit(query: string) {
@@ -194,7 +223,9 @@ async function aiSearchSubmit(query: string) {
 
   const { location, radius, listingType } = asObject(searchState.value)
 
-  if (!location) return
+  if (!location) {
+    return
+  }
 
   // Check content moderation before proceeding
   const { safe, reason } = await checkContent(query)
@@ -203,16 +234,34 @@ async function aiSearchSubmit(query: string) {
     return
   }
 
-  await animateFormToDock()
-  await navigateTo(createSearchURL(listingType, location, radius ?? 5, query))
+  try {
+    await animateFormToDock()
+    setSearchPending(true)
+    
+    // Set search parameters and navigate instead of fetching here
+    // The search page will handle the fetch
+    searchState.value = {
+      ...asObject(searchState.value),
+      searchType: 'ai',
+      query,
+      listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
+      radius: radius ?? 5,
+      results: [], // Clear old results
+      hasSearched: false
+    }
 
-  /**
-   *  To avoid global smooth scrolling
-   */
-  window.scrollTo({
-    top: 0,
-    behavior: "instant"
-  });
+    // Navigate to search results page
+    await navigateTo('/search')
+      
+    window.scrollTo({
+      top: 0,
+      behavior: "instant"
+    })
+  } catch (error) {
+    console.error('AI search error:', error)
+    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
+    setSearchPending(false)
+  }
 };
 
 function searchReset() {
@@ -222,7 +271,15 @@ function searchReset() {
 /**
  *  Disable filters button if no location is added
  */
+const isMounted = ref(false)
+onMounted(() => {
+  isMounted.value = true
+})
+
 const hasLocation = computed(() => {
+  // Prevent hydration mismatch by ensuring we match server state (false) until mounted
+  if (!isMounted.value) return false
+  
   const { location } = asObject(searchState.value)
 
   return !!location

@@ -30,6 +30,9 @@ export interface SearchState {
   /** User's search query text */
   query: string
 
+  /** Type of search being performed (traditional or enhanced/AI) */
+  searchType: 'traditional' | 'ai'
+
   /** Listing type filter */
   listingType: ListingType
 
@@ -74,12 +77,16 @@ export interface SearchState {
 
   /** Map viewport state for preserving zoom, center, and bounds */
   mapViewport?: MapViewportState
+
+  /** Preserved traditional search form data for re-running search */
+  traditionalSearchForm?: any
 }
 
 /**
  * Default values for search state
  */
 export const defaultSearchState: SearchState = {
+  searchType: 'ai',
   listingType: 'all',
   searchPending: false,
   query: '',
@@ -95,7 +102,8 @@ export const defaultSearchState: SearchState = {
   whereClause: null,
   locationContext: null,
   viewMode: 'grid',
-  mapViewport: undefined
+  mapViewport: undefined,
+  traditionalSearchForm: null
 }
 
 /**
