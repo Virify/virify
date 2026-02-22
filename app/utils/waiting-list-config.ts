@@ -60,6 +60,8 @@ const waitingListConfig: WaitingListConfig = {
 export const useWaitingListMode = () => {
   const config = useRuntimeConfig()
   const isWaitingListMode = computed(() => {
+    // @TODO - as best practice, useRoute shouldn't be called in
+    // middleware, but it's fine as a temporary measure
     const { query } = useRoute()
 
     return query.waitList === 'true' || config.public.DEPLOYMENT_ENV === 'waiting-list'
