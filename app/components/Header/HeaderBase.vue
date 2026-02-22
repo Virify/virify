@@ -14,7 +14,7 @@
 
       <LazyHeaderDesktopRoot class="header-base__nav header-base__nav--desktop" hydrate-on-visible :menu="mainMenu" />
 
-      <template v-if="isWaitingList">
+      <template v-if="isWaitingListMode">
         <LazyHeaderActionsWaitingList />
       </template>
 
@@ -38,14 +38,7 @@ const { loggedIn } = useUserSession();
  *  Check whether to skip the wait list - this doesn't need to be
  *  reactive so we don't need to use computed functions
  */
-const checkWaitingList = () => {
-  const { isWaitingList } = useRuntimeConfig().public
-  const { query } = useRoute()
-
-  return isWaitingList && !query.skipWaitlist
-}
-
-const isWaitingList = checkWaitingList()
+const { isWaitingListMode } = useWaitingListMode();
 
 /**
  *  Add subtle shadow to menu when user has scrolled
