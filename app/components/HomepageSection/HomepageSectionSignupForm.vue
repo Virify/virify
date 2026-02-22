@@ -57,17 +57,24 @@ async function signUpUser({ target }: SubmitEvent) {
     const { errors, formData } = useFormData(target);
 
     // If errors exist, show them
-    if (errors) {
+    if (errors || !formData) {
       showErrors(errors)
 
       return;
     }
 
-    hasJoinedWaitingList.value = true
+    // Get email address from the form
+    const email = formData.get('email')
 
-    console.log({
-      email: formData?.get('email')
-    })
+    // Submit waiting list address
+    await $fetch<{ success: boolean; message: string; alreadyExists?: boolean }>("/api/waiting-list", {
+      method: "POST",
+      body: {
+        email,
+      },
+    }).then(() => {
+      hasJoinedWaitingList.value = true
+    }).catch(showGenericError)
   })
 }
 
@@ -84,7 +91,7 @@ function showGenericError() {
   })
 }
 
-function showErrors(errors: ErrorBoxProp) {
+function showErrors(errors?: ErrorBoxProp) {
   const { list } = asObject(errors)
 
   // If the error list cannot be parsed, show a generic error
