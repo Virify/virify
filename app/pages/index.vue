@@ -12,8 +12,8 @@
 
     <!-- Features -->
     <UPageCTA v-for="(section, index) in processedFeatureSections" :key="`feature-${index}`" :title="section.title"
-      :description="section.subtitle" orientation="horizontal" variant="soft"
-      :class="index % 2 === 0 ? 'section-gradient' : ''" :reverse="index % 2 !== 0" :ui="{
+      :description="section.subtitle" orientation="horizontal" variant="soft" class="p-index__border-radius | container"
+      :class="index % 2 === 0 ? 'section-gradient' : 'bg-transparent'" :reverse="index % 2 !== 0" :ui="{
         body: 'border-0 radius-0',
         root: 'rounded-none',
         title: 'text-secondary/90!',
@@ -226,10 +226,24 @@ function showSignupForm() {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .p-index {
 
   &__hero {
     overflow: hidden;
+  }
+
+  &__border-radius {
+    border-radius: var(--border-radius-2xl);
+
+    @include mq.tablet {
+      border-radius: var(--border-radius-3xl);
+    }
+
+    @include mq.desktop {
+      border-radius: var(--border-radius-4xl);
+    }
   }
 }
 </style>
