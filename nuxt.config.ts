@@ -156,4 +156,9 @@ export default defineNuxtConfig({
       plugins: [vue()],
     },
   },
+  // Only show sourcemap for dev mode
+  sourcemap: {
+    server: import.meta.dev,
+    client: import.meta.dev
+  }
 });
