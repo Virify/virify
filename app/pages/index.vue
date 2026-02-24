@@ -13,7 +13,7 @@
     <!-- Features -->
     <UPageCTA v-for="(section, index) in processedFeatureSections" :key="`feature-${index}`" :title="section.title"
       :description="section.subtitle" orientation="horizontal" variant="soft" class="p-index__border-radius | container"
-      :class="index % 2 === 0 ? 'section-gradient' : 'bg-transparent'" :reverse="index % 2 !== 0" :ui="{
+      :class="index % 2 === 0 ? 'p-index__hero-dark' : 'bg-transparent'" :reverse="index % 2 !== 0" :ui="{
         body: 'border-0 radius-0',
         root: 'rounded-none',
         title: 'text-secondary/90!',
@@ -36,13 +36,15 @@
     <!-- sellers section -->
     <UPageSection :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
       :description="cmsContent?.sellersBenefits.subtitle || ''" headline="Your in control" :ui="{
+        root: '| container',
         headline: 'text-secondary/90!',
         body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
       }">
       <template #body>
         <UPageCard v-for="(feature, index) in cmsContent?.sellersBenefits.features" :key="index" :title="feature.title"
-          :description="feature.description" variant="subtle" spotlight spotlight-color="primary"
+          :description="feature.description" variant="subtle" spotlight spotlight-color="secondary"
           icon="i-lucide-chart-no-axes-gantt" :ui="{
+            root: 'ring-[#ccc]/60',
             title: 'text-secondary/90!',
             leadingIcon: 'h-6 w-6 text-secondary',
             description: 'body-sm',
@@ -53,7 +55,7 @@
     <!-- buyers section -->
     <UPageSection :title="cmsContent?.buyersBenefits.title || 'What we offer buyers'"
       :description="cmsContent?.buyersBenefits.subtitle || ''" headline="Get the best results" :ui="{
-        root: 'section-gradient',
+        root: 'p-index__hero-dark p-index__border-radius | container',
         headline: 'text-secondary/90!',
         body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
       }">
@@ -61,8 +63,8 @@
         <UPageCard v-for="(feature, index) in cmsContent?.buyersBenefits.features" :key="index" :title="feature.title"
           :description="feature.description" variant="subtle" spotlight spotlight-color="secondary"
           icon="i-lucide-chart-no-axes-gantt" :ui="{
-            spotlight: 'bg-primary/50!',
-            root: 'bg-primary/50! ring-primary/60',
+            spotlight: 'bg-[#2b3945]!',
+            root: 'bg-secondary/50! ring-[#2b3945]/60',
             container: 'border-secondary!',
             title: 'text-secondary/90!',
             leadingIcon: 'h-6 w-6 text-secondary',
@@ -87,12 +89,12 @@
     ]" />
 
     <UPageSection :title="cmsContent?.earlyAccessBenefits.title" :description="cmsContent?.earlyAccessBenefits.subtitle"
-      headline="Early Access Benefits" class="section-gradient">
+      headline="Early Access Benefits" class="p-index__hero-dark p-index__border-radius | container">
       <template #features>
         <UPageCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index"
           icon="i-lucide-info" :title="benefit.title" :description="benefit.description"
           class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right" :ui="{
-            root: 'bg-primary/50! ring-0',
+            root: 'bg-[#2b3945]! ring-0',
             container: 'shadow-xl',
             title: 'title-md',
             leadingIcon: 'h-6 w-6 text-secondary',
@@ -139,14 +141,14 @@
     <!-- final cta section -->
     <UPageCTA :title="cmsContent?.finalCta.title" :description="cmsContent?.finalCta.description" :ui="{
       root: 'rounded-none ring-0',
-    }" class="section-gradient" :links="[
+    }" class="bg-[#2b3945] text-[#fff]" :links="[
       {
         label: cmsContent?.finalCta.buttonText || 'Contact Us',
         color: 'neutral',
         icon: 'i-lucide-mail',
         size: 'lg',
         variant: 'solid',
-        class: 'font-bold button button-monochrome',
+        class: 'font-bold button button-secondary',
       },
     ]" @click="showSignupForm" />
   </div>
@@ -232,6 +234,11 @@ function showSignupForm() {
 
   &__hero {
     overflow: hidden;
+  }
+
+  &__hero-dark {
+    color: var(--monochrome-900);
+    background: #26333C;
   }
 
   &__border-radius {
