@@ -6,7 +6,7 @@ import { defineEventHandler, createError } from "h3";
 
 export default defineEventHandler((event) => {
   const config = useRuntimeConfig();
-  
+
   // Only apply restrictions if in waiting-list mode
   if (config.public.DEPLOYMENT_ENV === 'waiting-list') {
     const path = event.path;
@@ -38,15 +38,17 @@ export default defineEventHandler((event) => {
       '/api/user',                   // User dashboard data
       '/api/conversation',           // Dashboard conversations
       '/api/notifications',          // Dashboard notifications
+      '/api/navigation',             // Main navigation
       // BLOCKED: /auth/signup - No new signups in waiting list mode
       // BLOCKED: /api/search/ - No property search in waiting list mode
+      'api/_nuxt_icon/lucide.json?icons=x',  // Nuxt UI icons
     ];
 
     // Check if the path is an API route or Auth route
     if (path.startsWith('/api/') || path.startsWith('/auth/')) {
       // Check if it's an allowed API
       const isAllowed = allowedApis.some(allowed => path.startsWith(allowed));
-      
+
       if (!isAllowed) {
         console.warn(`[MIDDLEWARE] Blocking API access to ${path} in waiting-list mode`);
         throw createError({

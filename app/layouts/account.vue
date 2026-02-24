@@ -1,7 +1,7 @@
 <template>
   <div>
     <NuxtLoadingIndicator />
-    <OrganismsHeader />
+    <HeaderBase />
 
     <div class="account-page">
       <div class="account-layout | container">
@@ -80,6 +80,7 @@ useHead({
 </script>
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .account-page {
   background: var(--background-100);
   transition: min-height 0.25s ease;

@@ -82,6 +82,11 @@ watch(useRoute(), close)
 @use '#styles/_utils/functions' as fn;
 @use '#styles/_utils/media' as mq;
 
+html,
+body {
+  scrollbar-gutter: stable;
+}
+
 .o-dialog {
   position: fixed;
   inset: 0;

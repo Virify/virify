@@ -15,11 +15,14 @@
   --font-3xl: #{fn.toRem(28)};
   --font-4xl: #{fn.toRem(32)};
   --font-5xl: #{fn.toRem(36)};
+  --font-6xl: #{fn.toRem(40)};
+  --font-7xl: #{fn.toRem(56)};
+  --font-8xl: #{fn.toRem(72)};
 
   /*
    *  Line-height sizes
    */
-  --lineheight-xs: 1.2em;
+  --lineheight-xs: 1.25em;
   --lineheight-sm: 1.4em;
   --lineheight-md: 1.7em;
   --lineheight-lg: 1.9em;
@@ -28,7 +31,8 @@
    *  Line-height sizes
    */
   --font-light: 300;
-  --font-medium: 400;
+  --font-medium: 400; // @TODO rename this to 'regular'
+  --font-semisemibold: 500; // @TODO rename this to 'medium'
   --font-semibold: 600;
   --font-bold: 700;
 

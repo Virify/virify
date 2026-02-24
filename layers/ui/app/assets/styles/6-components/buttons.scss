@@ -76,7 +76,7 @@
 
   &-ghost {
     background: fn.faded-color(6%, var(--blue-900));
-    color: var(--monochrome-900);
+    color: currentColor;
 
     &:hover {
       background: fn.faded-color(12%, light-dark(var(--blue-700), var(--blue-900)));
@@ -124,6 +124,33 @@
     &:hover {
       background: var(--error-foreground);
       color: var(--error-background);
+    }
+  }
+
+  &-header {
+    font-weight: var(--font-bold);
+    font-size: var(--font-sm);
+    padding: var(--size-8) var(--size-18);
+    background: light-dark(var(--monochrome-700), var(--monochrome-400));
+    color: light-dark(var(--monochrome-100), var(--monochrome-900));
+
+    &:hover {
+      background: light-dark(var(--monochrome-800), var(--monochrome-500));
+      color: light-dark(var(--monochrome-100), var(--monochrome-900));
+    }
+
+    &--cta {
+      background: var(--secondary-400);
+      color: var(--monochrome-900);
+
+      &:hover {
+        background: var(--secondary-500);
+        color: var(--monochrome-900);
+      }
+    }
+
+    @include mq.tablet {
+      padding: var(--size-12) var(--size-24);
     }
   }
 }

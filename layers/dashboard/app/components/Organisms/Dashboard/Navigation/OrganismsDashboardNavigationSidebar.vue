@@ -145,6 +145,14 @@
 
   onMounted(() => {
     fetchNotificationCounts();
+
+    nextTick(() => {
+      const { query } = useRoute()
+
+      if (query?.notifications === 'true') {
+        notificationSlideoverOpen.value = true
+      }
+    })
   });
 
   const logout = async () => {
