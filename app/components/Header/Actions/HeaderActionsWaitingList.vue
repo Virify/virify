@@ -1,17 +1,59 @@
 <template>
-  <button @click.prevent="showSignupForm" class="| button button button-header button-header--cta">
+  <div v-if="isAllowLogin" class="header-buttons-guest">
+    <nuxt-link to="#" @click.capture="showLoginForm" class="header-buttons-guest__login-button | button button-header">
+      Log in
+    </nuxt-link>
+
+    <button @click.prevent="showSignupForm" class="| button button button-header button-header--cta">
+      Join waiting list
+    </button>
+  </div>
+
+  <button v-else @click.prevent="showSignupForm" class="| button button button-header button-header--cta">
     Join waiting list
   </button>
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogWaitingList } from '#components'
+import { ViewsDialogLogin, ViewsDialogWaitingList } from '#components'
+import { watchImmediate } from '@vueuse/core'
 
 const { showDialog } = useDialog()
 
+/**
+ *  Sign-up form
+ */
 function showSignupForm() {
   showDialog({
     component: ViewsDialogWaitingList
   })
 }
+
+/**
+ *  Log in
+ */
+const { query } = useRoute()
+const isAllowLogin = shallowRef(false)
+
+watchImmediate(query, () => {
+  const { showLogin } = asObject(query)
+
+  isAllowLogin.value = showLogin === 'true'
+})
+
+function showLoginForm(e: PointerEvent) {
+  e.preventDefault()
+
+  showDialog({
+    component: ViewsDialogLogin,
+  });
+}
 </script>
+
+<style lang="scss">
+.header-buttons-guest {
+  display: flex;
+  align-items: center;
+  gap: var(--size-8);
+}
+</style>
