@@ -1,8 +1,8 @@
 <template>
   <div v-if="isAllowLogin" class="header-buttons-guest">
-    <nuxt-link to="#" @click.capture="showLoginForm" class="header-buttons-guest__login-button | button button-header">
+    <button @click.prevent="showLoginForm" class="header-buttons-guest__login-button | button button-header">
       Log in
-    </nuxt-link>
+    </button>
 
     <button @click.prevent="showSignupForm" class="| button button button-header button-header--cta">
       Join waiting list
