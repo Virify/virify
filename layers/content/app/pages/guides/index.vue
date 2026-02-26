@@ -10,6 +10,7 @@
         ]"
         :ui="{
           linkLeadingIcon: 'text-secondary',
+          root: 'container'
         }"
         class="m-4 text-(--foreground-100)"
       />

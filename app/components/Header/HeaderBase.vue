@@ -1,7 +1,5 @@
 <template>
-  <div class="header-base" :class="{
-    'header-base--shadow': hasShadow
-  }">
+  <div class="header-base" ref="$header">
     <header class="header-base__inner | container">
       <LazyHeaderMobileRoot class="header-base__nav header-base__nav--mobile" hydrate-on-visible :menu="mainMenu" />
 
@@ -43,10 +41,18 @@ const { isWaitingListMode } = useWaitingListMode();
 /**
  *  Add subtle shadow to menu when user has scrolled
  */
-const hasShadow = shallowRef(false)
+const $header = useTemplateRef('$header')
 
 function toggleShadow() {
-  hasShadow.value = window.scrollY > 0
+  if (!isElement($header.value)) return
+
+  // @TODO
+  // This should be handled via Vue reactivity, e.g. having:
+  //   hasShadow.value = window.scrollY > 0
+  // And on the component,
+  //   :class={ 'header-base--shadow': hasShadow }
+  // But there is an unknown bug, so doing it this way for now
+  $header.value.classList.toggle('header-base--shadow', window.scrollY > 0)
 }
 
 onMounted(() => {

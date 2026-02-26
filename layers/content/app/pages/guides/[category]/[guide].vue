@@ -8,6 +8,7 @@
     :ui="{
       linkLeadingIcon: 'text-secondary',
       link: 'text-(--foreground-100)',
+      root: 'container'
     }"
     class="m-4"
   />
