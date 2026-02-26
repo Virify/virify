@@ -1,5 +1,3 @@
-import { asObject } from '../objects'
-
 interface Range {
   min: number
   max: number

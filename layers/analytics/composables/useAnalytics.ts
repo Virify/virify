@@ -3,6 +3,10 @@
  * Pure analytics functionality - separate from user notifications
  * 
  * Also orchestrates fetching of recent data (favourites, notes) for dashboard
+ * 
+ * TWO MODES:
+ * - Quick analytics: Lightweight data for dashboard homepage (fast)
+ * - Comprehensive analytics: Full data with time-series for analytics page (detailed)
  */
 import { nanoid } from "nanoid";
 import { createSharedComposable } from '@vueuse/core';
@@ -15,7 +19,6 @@ import { createSharedComposable } from '@vueuse/core';
  */
 export const useAnalytics = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
-  const sessionId = useState("analytics-session-id", () => nanoid());
   
   // Get refresh functions from recent items composable (Singleton)
   const { 
@@ -34,6 +37,15 @@ export const useAnalytics = createSharedComposable(() => {
   const analytics = useState<UserAnalyticsSummary | null>("analytics-user-summary", () => null);
   const allUserListings = ref<OwnedListingWithAnalytics[]>([]);
   
+  // Quick analytics for dashboard homepage (lightweight)
+  const quickAnalytics = useState<QuickAnalytics | null>("analytics-quick", () => null);
+  const isQuickLoading = useState("analytics-quick-loading", () => false);
+  
+  // Comprehensive analytics for full analytics page
+  const comprehensiveAnalytics = useState<ComprehensiveAnalytics | null>("analytics-comprehensive", () => null);
+  const isComprehensiveLoading = useState("analytics-comprehensive-loading", () => false);
+  const selectedPeriod = useState<'7d' | '30d' | '90d'>("analytics-period", () => '30d');
+  
   // Loading states
   const isAnalyticsLoading = useState("analytics-is-loading", () => true);
   // isFavouritesLoading and isNotesLoading are now handled by their respective composables
@@ -43,6 +55,51 @@ export const useAnalytics = createSharedComposable(() => {
     immediate: true,
   });
   const { getAllListingsForAnalytics } = useMyListings();
+  
+  /**
+   * Fetch QUICK analytics for dashboard homepage
+   * Lightweight - just totals and last 7 days
+   */
+  const fetchQuickAnalytics = async () => {
+    if (!loggedIn.value) return;
+    
+    if (!quickAnalytics.value) {
+      isQuickLoading.value = true;
+    }
+    
+    try {
+      const data = await useRequestFetch()<QuickAnalytics>("/api/analytics/quick");
+      quickAnalytics.value = data;
+    } catch (error) {
+      console.error('Failed to fetch quick analytics:', error);
+    } finally {
+      isQuickLoading.value = false;
+    }
+  };
+  
+  /**
+   * Fetch COMPREHENSIVE analytics for full analytics page
+   * Includes time-series, per-listing breakdowns, traffic sources
+   */
+  const fetchComprehensiveAnalytics = async (period?: '7d' | '30d' | '90d') => {
+    if (!loggedIn.value) return;
+    
+    const fetchPeriod = period || selectedPeriod.value;
+    selectedPeriod.value = fetchPeriod;
+    
+    isComprehensiveLoading.value = true;
+    
+    try {
+      const data = await useRequestFetch()<ComprehensiveAnalytics>(
+        `/api/analytics/comprehensive?period=${fetchPeriod}`
+      );
+      comprehensiveAnalytics.value = data;
+    } catch (error) {
+      console.error('Failed to fetch comprehensive analytics:', error);
+    } finally {
+      isComprehensiveLoading.value = false;
+    }
+  };
   
   /**
    * Fetch ALL analytics and recent data when logged in
@@ -113,120 +170,11 @@ export const useAnalytics = createSharedComposable(() => {
    * !! Important: useRequestFetch is required for SSR authenticated requests
    */
 
-  /**
-   * Track when a user views a listing
-   * @param listingId ID of the listing being viewed
-   */
-  const trackListingView = async (listingId: number | string) => {
-    try {
-      const viewHistoryKey = "listing-view-history";
-      let viewHistory: Record<string, number> = {};
-
-      // Try to get existing view history from localStorage
-      try {
-        const storedHistory = localStorage.getItem(viewHistoryKey);
-        if (storedHistory) {
-          viewHistory = JSON.parse(storedHistory);
-        }
-      } catch (e) {
-        // Fallback to session if localStorage unavailable
-      }
-
-      const listingKey = `listing-${listingId}`;
-      const now = Date.now();
-
-      // Only count a view once every 30 minutes per listing
-      if (viewHistory[listingKey] && now - viewHistory[listingKey] < 30 * 60 * 1000) {
-        return;
-      }
-
-      viewHistory = {
-        ...viewHistory,
-        [listingKey]: now,
-      };
-
-      // Save to localStorage immediately to prevent duplicate tracking
-      try {
-        localStorage.setItem(viewHistoryKey, JSON.stringify(viewHistory));
-      } catch (e) {
-        // Continue if localStorage save fails
-      }
-
-      const payload: TrackListingViewBody = {
-        listingId,
-        sessionId: sessionId.value,
-      };
-
-      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-      navigator.sendBeacon("/api/analytics/listing/track-view", blob);
-    } catch (error) {
-      // Silently fail to not disturb user experience
-      console.error("Failed to track listing view:", error);
-    }
-  };
-
-  const trackSearch = async (params: {
-    listingType: ListingType;
-    query: string;
-    location: GeocodingFeature;
-    radius: number;
-    resultCount: number;
-    userId?: number;
-  }) => {
-    try {
-      const payload = {
-        listingType: params.listingType,
-        query: params.query,
-        location: params.location,
-        radius: params.radius,
-        resultCount: params.resultCount,
-        userId: params.userId,
-      };
-      
-      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-      const success = navigator.sendBeacon("/api/analytics/search", blob);
-      if (!success) {
-        try {
-          await $fetch("/api/analytics/search", {
-            method: "POST",
-            body: payload,
-          });
-        } catch (e) {
-          // swallow fallback errors to avoid noisy logs
-        }
-      }
-    } catch (error) {
-      // intentionally silent for analytics failures
-    }
-  };
-
-  /**
-   * Track when a user performs a mortgage calculation
-   * Uses sendBeacon for fire-and-forget lightweight tracking
-   * @param data Mortgage calculation data for analytics
-   */
-  const trackMortgageCalculation = (data: TrackMortgageCalculationPayload) => {
-    try {
-      const payload = {
-        sessionId: sessionId.value,
-        ...data,
-      };
-
-      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-      const success = navigator.sendBeacon("/api/analytics/mortgage/track", blob);
-    } catch (error) {
-      console.error("Failed to track mortgage calculation:", error);
-    }
-  };
-
   return {
     analytics,
-    trackListingView,
-    trackMortgageCalculation,
     recentlyViewedListings,
     recentOwnedListings,
     allUserListings,
-    trackSearch,
     trendingLocations,
     fetchAnalytics,
     isAnalyticsLoading,
@@ -238,5 +186,14 @@ export const useAnalytics = createSharedComposable(() => {
     recentNotesStatus,
     refreshRecentFavourites,
     refreshRecentNotes,
+    // NEW: Quick analytics (dashboard homepage)
+    quickAnalytics,
+    isQuickLoading,
+    fetchQuickAnalytics,
+    // NEW: Comprehensive analytics (full analytics page)
+    comprehensiveAnalytics,
+    isComprehensiveLoading,
+    selectedPeriod,
+    fetchComprehensiveAnalytics,
   };
 });

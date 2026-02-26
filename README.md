@@ -276,7 +276,89 @@ pnpm test:full   # Full suite (unit + E2E)
 
 ---
 
-## 🔑 Environment Variables
+## � Waiting List Mode
+
+Virify supports a **Waiting List Mode** for controlled rollout or maintenance periods. When enabled, the application restricts access to certain features while allowing existing users to continue using core functionality.
+
+### Enabling Waiting List Mode
+
+Set the environment variable:
+```bash
+DEPLOYMENT_ENV=waiting-list
+```
+
+### What's Blocked in Waiting List Mode
+
+The following features are **completely disabled** when in waiting list mode:
+
+- ❌ **New User Signups** (`/auth/signup`) - No new accounts can be created
+- ❌ **Property Search** (`/api/search/`) - All search functionality is disabled (traditional and AI search)
+
+### What's Allowed in Waiting List Mode
+
+Existing users and specific functionality remain available:
+
+#### Authentication & Account Management
+- ✅ User login (`/auth/login`)
+- ✅ OTP verification (`/auth/verify-otp`)
+- ✅ Account settings and profile management
+
+#### Property Management (Existing Users Only)
+- ✅ Create and edit draft listings
+- ✅ Publish listings
+- ✅ View own listings and manage properties
+- ✅ Upload and manage property images
+
+#### Dashboard & Messaging
+- ✅ Full dashboard access for authenticated users
+- ✅ Conversations and messaging between users
+- ✅ Notifications system
+- ✅ User favorites and notes
+
+#### Content & Data
+- ✅ Sanity CMS content (guides, help articles)
+- ✅ Price Paid data lookup
+- ✅ Address lookup and validation
+- ✅ Property type data
+
+#### Other Allowed Features
+- ✅ Contact form submissions
+- ✅ Support requests
+- ✅ Analytics tracking (for existing users)
+- ✅ Waiting list signup form
+
+### Route Configuration
+
+Accessible routes in waiting list mode are configured in [`app/utils/waiting-list-config.ts`](./app/utils/waiting-list-config.ts):
+
+```typescript
+allowedRoutes: [
+  '/',
+  '/contact',
+  '/terms',
+  '/privacy',
+  '/price-paid',
+  '/guides/*',
+  '/login',
+  '/account/*',
+  '/dashboard/*',
+  // etc.
+]
+```
+
+### API Middleware
+
+The waiting list middleware ([`server/middleware/waiting-list.ts`](./server/middleware/waiting-list.ts)) enforces API restrictions by:
+
+1. Checking if `DEPLOYMENT_ENV === 'waiting-list'`
+2. Blocking all API calls except those explicitly allowed
+3. Returning 403 Forbidden for blocked endpoints
+
+This ensures that even if users access blocked pages, the underlying API calls will fail securely.
+
+---
+
+## �🔑 Environment Variables
 
 Set these in your `.env` file (see `.env.example` for all options):
 

@@ -4,6 +4,10 @@ model ListingView {
   userId    Int?
   sessionId String?
   ip        String?
+  userAgent String? // Device/browser detection
+  referrer  String? // Where traffic came from (google, facebook, etc.)
+  source    String? // Traffic source type: direct, search, share, email, social
+  duration  Int? // Seconds spent viewing (updated via beacon on page leave)
   createdAt DateTime @default(now())
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
@@ -13,4 +17,5 @@ model ListingView {
   @@index([userId])
   @@index([sessionId])
   @@index([createdAt])
+  @@index([source])
 }

@@ -9,7 +9,7 @@ const route = useRoute();
  *  Fetch and validate listing - reactive to route changes
  */
 const { data: listingData, error } = await useAsyncData(
-  () => `listing-${route.params.id}`,
+  `listing-${route.params.id}`,
   async () => {
     const response = await $fetch<{ listing: ListingWithFullProperty }>(`/api/listing/${route.params.id}`);
     if (!response?.listing) {
@@ -24,6 +24,8 @@ const { data: listingData, error } = await useAsyncData(
     watch: [() => route.params.id]
   }
 );
+
+
 
 if (error.value) {
   throw createError({
@@ -55,8 +57,11 @@ const seoDescription = computed(() => {
   return desc.length > 155 ? desc.slice(0, 155) + '...' : desc;
 });
 
+const config = useRuntimeConfig();
 const seoImage = computed(() => {
-  return listing.value?.property?.media?.[0]?.image;
+  const imageId = getMainImage(listing.value?.property);
+  if (!imageId) return null;
+  return `https://imagedelivery.net/${config.public.CF_ACCOUNT_HASH}/${imageId}/public`;
 });
 
 useSeoMeta({

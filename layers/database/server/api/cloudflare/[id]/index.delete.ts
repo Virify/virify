@@ -38,10 +38,19 @@ export default defineEventHandler(async (event) => {
     const data = await response.json();
 
     if (!data.success) {
+      // Check if error is "Image not found" - this is OK, image already deleted
+      const errorMessage = data.errors?.[0]?.message || '';
+      const isNotFound = errorMessage.toLowerCase().includes('not found') || response.status === 404;
+      
+      if (isNotFound) {
+        console.log(`Image ${imageId} already deleted from Cloudflare`);
+        return { success: true };
+      }
+      
       console.error('Cloudflare delete error:', data.errors);
       throw createError({
         statusCode: 500,
-        statusMessage: data.errors?.[0]?.message || 'Failed to delete from Cloudflare',
+        statusMessage: errorMessage || 'Failed to delete from Cloudflare',
       });
     }
 

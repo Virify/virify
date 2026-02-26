@@ -147,9 +147,7 @@ function checkEnquiryValidity(event: Event) {
 }
 
 onMounted(() => {
-  initializeTurnstile((token) => {
-    submitForm();
-  });
+  initializeTurnstile();
 });
 
 onUnmounted(() => {
@@ -165,11 +163,10 @@ async function handleSubmit() {
   }
 
   isSubmitting.value = true;
-  executeTurnstile();
-}
-
-async function submitForm() {
+  
   try {
+    await executeTurnstile();
+    
     const response = await $fetch<{ success: boolean; message: string }>("/api/contact", {
       method: "POST",
       body: {

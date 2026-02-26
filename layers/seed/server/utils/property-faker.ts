@@ -6,6 +6,30 @@ import { typeToClassificationMap } from "./property-type-map";
 import type { PropertyWithAddress } from "../../../../shared/types/property";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed";
 import { getRequiredImages, getRandomAdditionalImages, getAllImagesByRoom } from "./images-to-seed";
+import { ListingTier } from "../../../database/server/database/prisma/generated/enums";
+
+/**
+ * Result of generating a property, includes the tier used for image limiting
+ */
+export interface GeneratedPropertyResult {
+  property: PropertyWithAddress;
+  tier: ListingTier;
+}
+
+/**
+ * Get max images allowed for a listing tier
+ */
+const getMaxImagesForTier = (tier: ListingTier): number => {
+  switch (tier) {
+    case ListingTier.PREMIUM:
+      return 50;
+    case ListingTier.FEATURED:
+      return 20;
+    case ListingTier.BASIC:
+    default:
+      return 5;
+  }
+};
 import type { AddressCreateWithoutPropertiesInput } from "../../../database/server/database/prisma/generated/models";
 import { prisma } from "../../../database/server/utils/prisma-client";
 
@@ -809,9 +833,11 @@ export const generateAddress = (address: AddressCreateWithoutPropertiesInput) =>
  * Generates a full property object with address
  *
  * @param address Address
- * @returns PropertyWithAddress
+ * @param listingTier Optional listing tier to limit image count (defaults to FEATURED for balanced seeding)
+ * @returns GeneratedPropertyResult containing the property and the tier used
  */
-export const generateProperty = async (address: Prisma.AddressCreateWithoutPropertiesInput): Promise<PropertyWithAddress> => {
+export const generateProperty = async (address: Prisma.AddressCreateWithoutPropertiesInput, listingTier: ListingTier = ListingTier.FEATURED): Promise<GeneratedPropertyResult> => {
+  const maxImages = getMaxImagesForTier(listingTier);
   // Generate mapped property types and classifications with weighted distribution:
   // 70% houses (1), 5% cottages (2), 5% bungalows (3), 5% flats (4), 15% other (5-8)
   const weightedTypeIds = [
@@ -1042,14 +1068,22 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
     }
   }
   
-  // Add additional random images to ensure minimum of 5 total images
-  const currentImageCount = mediaToCreate.length;
-  if (currentImageCount < 5) {
-    const additionalImagesNeeded = 5 - currentImageCount;
+  // Limit to max images allowed for the tier
+  // First ensure we have at least 3 images (for basic tier display), then cap at maxImages
+  const minImages = Math.min(3, maxImages);
+  let finalMediaToCreate = mediaToCreate;
+  
+  if (mediaToCreate.length > maxImages) {
+    // Keep the first few images (usually the required ones like exterior, garden)
+    // and randomly select from the rest to fill up to maxImages
+    finalMediaToCreate = mediaToCreate.slice(0, maxImages);
+  } else if (mediaToCreate.length < minImages) {
+    // Add additional random images to ensure minimum images
+    const additionalImagesNeeded = minImages - mediaToCreate.length;
     const additionalImages = getRandomAdditionalImages(additionalImagesNeeded, requiredImageIds as string[]);
     
     additionalImages.forEach((imageId: string) => {
-      mediaToCreate.push({
+      finalMediaToCreate.push({
         image: imageId,
         metadata: JSON.stringify({
           alt: 'Property Image',
@@ -1060,17 +1094,12 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       });
     });
   }
-  
-  // Utility media (general property media)
-  if (propertyWithFeatures.utility) {
-    mediaToCreate.push(generateGeneralMedia('Utility'));
-  }
 
   // Create all media and update location in parallel
   await Promise.all([
-    // Batch create all media
-    mediaToCreate.length > 0 ? prisma.media.createMany({
-      data: mediaToCreate.map(media => ({
+    // Batch create all media (limited to tier's max images)
+    finalMediaToCreate.length > 0 ? prisma.media.createMany({
+      data: finalMediaToCreate.map(media => ({
         ...media,
         propertyId: propertyWithFeatures.id,
       })),
@@ -1087,5 +1116,5 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
 
   await getLocationByAddressIdForSeed(property.addressId!);
 
-  return property;
+  return { property, tier: listingTier };
 };

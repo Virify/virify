@@ -1,3 +1,5 @@
+import { useStorage } from '@vueuse/core'
+
 export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
 export type ResultLayout = 'map' | 'grid' | 'split'
 
@@ -33,6 +35,20 @@ function createSearchState() {
    */
   function setSearchPending(value: boolean = false) {
     isLoading.value = value
+  }
+
+  /**
+   * Update search type (traditional vs AI)
+   */
+  function setSearchType(value: 'traditional' | 'ai', callback?: () => void) {
+    // Check value is valid
+    if (value !== 'traditional' && value !== 'ai') return
+
+    // Update state
+    updateState({ searchType: value })
+
+    // Run optional callback
+    _runCallback(callback)
   }
 
   /**
@@ -164,6 +180,7 @@ function createSearchState() {
     searchState,
     setSortOrder,
     setViewMode,
+    setSearchType,
     setListingType,
     setLocation,
     setLocationRadius,

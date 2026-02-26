@@ -4,12 +4,12 @@
     class="flex gap-3 p-3 h-auto w-full rounded-lg bg-(--background-100) )"
   >
     <div 
-      v-if="listing.property?.media?.[0]?.image" 
+      v-if="getMainImage(listing.property)" 
       class="w-16 h-full overflow-hidden shrink-0"
     >
       <AtomsCloudFlareImage
-        :src="listing.property.media[0].image"
-        :alt="listing.property.address?.fullAddress || 'Property'"
+        :src="getMainImage(listing.property)!"
+        :alt="listing.property?.address?.fullAddress || 'Property'"
         class="w-full h-full object-cover aspect-4/3 rounded-md"
         variant="thumbnail"
       />

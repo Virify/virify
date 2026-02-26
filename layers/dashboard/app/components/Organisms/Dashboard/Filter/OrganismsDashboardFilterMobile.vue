@@ -50,7 +50,7 @@
               </UTabs>
 
               <!-- Category Filter -->
-              <div class="relative">
+              <div v-if="!hideSaleRentFilter" class="relative">
                 <USelect
                   v-if="!enquiries"
                   v-model="saleRentFilter"
@@ -155,6 +155,7 @@
     filterState: ReturnType<typeof useDashboardListFilter>;
     allConversationsCount: number;
     unreadConversationsCount: number;
+    hideSaleRentFilter?: boolean;
   }>();
 
   const emit = defineEmits<{
@@ -172,7 +173,7 @@
     saleRentOptions,
     directionOptions,
     sortOrder,
-    tabItems
+    tabItems,
   } = props.filterState;
 
   const isOpenOriginal = usePropModel(props, 'isOpen', emit);

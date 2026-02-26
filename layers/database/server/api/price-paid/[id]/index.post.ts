@@ -58,12 +58,24 @@ export default defineEventHandler(async (event) => {
     let latestPrice = sortedSales.length > 0 && sortedSales[0] ? sortedSales[0].price : 0;
     let propertyType = sortedSales[0]?.property_type || null;
 
-    // If no sales, try to get data from listing
+    // If no sales, try to get data from listing or draft listing
     if (sortedSales.length === 0) {
-      const listing = await prisma.listing.findUnique({
+      // Try live listing first
+      let listing = await prisma.listing.findUnique({
         where: { id: listingId },
         include: { property: { include: { type: true } } }
       });
+      
+      // If not found, try draft listing
+      if (!listing) {
+        const draftListing = await prisma.draftListing.findUnique({
+          where: { id: listingId },
+          include: { property: { include: { type: true } } }
+        });
+        if (draftListing) {
+          listing = draftListing as any; // Use same structure
+        }
+      }
       
       if (listing) {
         latestPrice = listing.price;

@@ -1,113 +1,107 @@
 import * as z from "zod";
+import { BedSizeType, BedroomFeature, BathroomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
+import { step4PropertySchema } from "~~/shared/utils/listing-step4-schema";
 
-const addressSchema = z.object({
-  draftId: z.number().int().positive(),
-  property: z.object({
-    address: z.object({
-      number: z.string().max(20),
-      flat: z.string().max(20).nullable().optional(),
-      name: z.string().max(100).nullable().optional(),
-      street: z.string().max(50),
-      city: z.string().max(100),
-      locality: z.string().max(100).nullable().optional(),
-      district: z.string().max(100).nullable().optional(),
-      postcode: z.string().max(20),
-      county: z.string().max(100).nullable().optional(),
-      country: z.string().max(100).optional(),
-      fullAddress: z.string().max(300),
-      lat: z.number(),
-      lon: z.number()
-    }),
-  }),
-});
+/**
+ * Step 4: Bedrooms & Bathrooms API Endpoint
+ * 
+ * Works for BOTH draft listings (draftId) and live listings (listingId)
+ * Uses deleteMany + create pattern to replace all existing room features.
+ */
+
+const bedroomBathroomSchema = z.object({
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
+  property: step4PropertySchema,
+}).refine(
+  (data) => data.draftId !== undefined || data.listingId !== undefined,
+  { message: "Either draftId or listingId must be provided" }
+);
 
 export default defineEventHandler(async (event) => {
-  const { findNearbyAmenities } = useMapSearch();
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
   
   try {
-    const { draftId, property } = await readValidatedBody(event, addressSchema.parse);
+    const { draftId, listingId, property } = await readValidatedBody(event, bedroomBathroomSchema.parse);
 
-    // Map incoming payload to Address model fields
-    const addressData = {
-      ...property.address,
-    };
-    
-    const result = await prisma.$transaction(async (tx) => {
-      // First, try to find an existing address with the same unique fields
-      const existingAddress = await tx.address.findUnique({
-        where: {
-          number_street_city_postcode_country: {
-            number: addressData.number || '',
-            street: addressData.street,
-            city: addressData.city,
-            postcode: addressData.postcode,
-            country: addressData.country || 'UK'
-          }
-        }
-      });
+    const { bedroomFeatures, numberBedrooms, bathroomFeatures, numberBathrooms, totalFloors } = property;
 
-      let addressId: number;
-
-      if (existingAddress) {
-        // Use the existing address
-        addressId = existingAddress.id;
-        
-        // Optionally update the existing address with new data (like lat/lon if provided)
-        if (addressData.lat || addressData.lon || addressData.fullAddress) {
-          await tx.address.update({
-            where: { id: existingAddress.id },
-            data: {
-              lat: addressData.lat || existingAddress.lat,
-              lon: addressData.lon || existingAddress.lon,
-              fullAddress: addressData.fullAddress || existingAddress.fullAddress,
-            }
-          });
-        }
-      } else {
-        // Create a new address
-        const newAddress = await tx.address.create({
-          data: addressData
-        });
-        addressId = newAddress.id;
-      }
-
-      // Update the property to link to the address (existing or new)
-      return await tx.draftListing.update({
-        where: { id: draftId, userId: user.id },
-        data: {
-          property: {
-            update: {
-              addressId: addressId
-            },
-          },
+    const propertyUpdate = {
+      update: {
+        totalFloors,
+        numberBedrooms: numberBedrooms ?? bedroomFeatures.length,
+        numberBathrooms: numberBathrooms ?? bathroomFeatures.length,
+        bedroomFeatures: {
+          deleteMany: {},
+          create: bedroomFeatures.map((b) => ({
+            name: b.name,
+            roomNumber: b.roomNumber,
+            description: b.description ?? null,
+            floor: b.floor,
+            bed: b.bed as BedSizeType[],
+            features: (b.features ?? []) as BedroomFeature[],
+            size: b.size ?? null,
+          })),
         },
+        bathroomFeatures: {
+          deleteMany: {},
+          create: bathroomFeatures.map((b) => ({
+            name: b.name,
+            roomNumber: b.roomNumber,
+            description: b.description ?? null,
+            floor: b.floor,
+            features: (b.features ?? []) as BathroomFeature[],
+            size: b.size ?? null,
+          })),
+        },
+      },
+    };
+
+    // LIVE LISTING - update Listing table
+    if (listingId) {
+      const result = await prisma.listing.update({
+        where: { id: listingId, userId: user.id },
+        data: { property: propertyUpdate },
         include: {
           property: {
             include: {
-              address: true,
-              amenities: true
+              bedroomFeatures: true,
+              bathroomFeatures: true,
             },
           },
         },
       });
+
+      // Invalidate listing cache so modal shows fresh data
+      const storage = useStorage('cache:listing');
+      await storage.removeItem(`listing:${listingId}`);
+
+      return result;
+    }
+
+    // DRAFT LISTING - update DraftListing table with completedSteps
+    const currentDraft = await prisma.draftListing.findUnique({
+      where: { id: draftId },
+      select: { completedSteps: true },
     });
 
-    const address = result.property?.address;
-    
-    /**
-     * If we have latitude and longitude, update the PostGIS location
-     * Note: This is done outside the transaction as it's a separate operation
-     * And then update the amenities for the property
-     */
-    if (address && address.lat && address.lon) {
-      const { id, lat, lon } = address;
-      await updateLocationByAddressId(id, lon, lat);
-      const amenities = await findNearbyAmenities(address.lat!, address.lon!);
-      const amenitiesArray = Array.isArray(amenities) ? amenities : [amenities];
-      await createAmenitiesForProperty(result.property!.id, amenitiesArray);
-    }
+    const result = await prisma.draftListing.update({
+      where: { id: draftId!, userId: user.id },
+      data: {
+        // Add step 4 to completedSteps if not already there
+        ...(currentDraft && !currentDraft.completedSteps.includes(4) ? { completedSteps: { push: 4 } } : {}),
+        property: propertyUpdate,
+      },
+      include: {
+        property: {
+          include: {
+            bedroomFeatures: true,
+            bathroomFeatures: true,
+          },
+        },
+      },
+    });
     
     return result;
   } catch (error) {

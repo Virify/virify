@@ -103,23 +103,45 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     BEFORE WRITING ANY QUERY: Read the RELEVANT PRISMA SCHEMA section and find the EXACT field/relation for each term.
 
     STEP 1 - FIELD IDENTIFICATION:
-       - "garden" → Schema lookup: OutdoorSpace.garden Garden[] (one-to-many relation inside outdoorSpace)
-       - "parking" → Schema lookup: Property.parking Parking? (one-to-one relation)
-       - "garage" → Schema lookup: Parking.features ParkingFeature[] (enum array on parking relation)
-       - "EPC" → Schema lookup: EnergyAndUtilities.epcRating EPCRating (direct enum)
-       - "amenities" → Schema lookup: Property.amenities Amenities[] (model list relation)
+      - "garden" → Schema lookup: OutdoorSpace.garden Garden[] (one-to-many relation inside outdoorSpace)
+      - "parking" → Schema lookup: Property.parking Parking? (one-to-one relation)
+      - "garage" → Schema lookup: Parking.features ParkingFeature[] (enum array on parking relation)
+      - "EPC" → Schema lookup: EnergyAndUtilities.epcRating EPCRating (direct enum)
+      - "amenities" → Schema lookup: Property.amenities Amenities[] (model list relation)
 
     STEP 2 - APPLY EXACT TYPE RULES:
-       - Direct enum (e.g., epcRating): { field: "VALUE" }
-       - Enum array (e.g., features): { field: { has: "VALUE" } }
-       - One-to-one relation (e.g., parking?): { relation: { is: { ... } } } or { isNot: null }
-       - One-to-many relation (e.g., bedroomFeatures[]): { relation: { some: { ... } } }
-       - Model list (e.g., amenities[]): { relation: { some: { field: "VALUE" } } }
+      - Direct enum (e.g., epcRating): { field: "VALUE" }
+      - Enum array (e.g., features): { field: { has: "VALUE" } }
+      - One-to-one relation (e.g., parking?): { relation: { is: { ... } } } or { isNot: null }
+      - One-to-many relation (e.g., bedroomFeatures[]): { relation: { some: { ... } } }
+      - Model list (e.g., amenities[]): { relation: { some: { field: "VALUE" } } }
 
-    STEP 3 - NESTING PROTOCOL:
-       - ALL property fields: property: { is: { ... } }
-       - Nested relations: Follow exact schema hierarchy
-       - Garden inside outdoorSpace: outdoorSpace: { is: { garden: { some: { ... } } } }
+    STEP 3 - NESTING PROTOCOL (CRITICAL - MODEL FIELD SEPARATION):
+      
+      LISTING MODEL FIELDS (top level only, NEVER inside property):
+      - price, archived, published, moveInDate, listingTier, userId, propertyId
+      - saleListing (optional relation - use { isNot: null } for presence)
+      - rentalListing (optional relation - use { isNot: null } for presence)
+      
+      PROPERTY MODEL FIELDS (inside property.is ONLY):
+      - numberBedrooms, numberBathrooms, numberReceptions, type, classification
+      - parking, outdoorSpace, amenities, energyAndUtilities, securityFeatures, etc.
+      
+      CRITICAL RULES:
+      - saleListing and rentalListing are NEVER nested inside property: { is: { ... } }
+      - Property filters are NEVER at the root level (except property: { is: { ... } })
+      - Garden inside outdoorSpace: outdoorSpace: { is: { garden: { some: { ... } } } }
+      - ALL Property model fields MUST be nested under property: { is: { ... } }
+      
+      WRONG (NEVER DO THIS):
+      - { property: { is: { saleListing: { isNot: null } } } }
+      - { property: { is: { rentalListing: { isNot: null } } } }
+      - { numberBedrooms: 3 } (property fields at root)
+      
+      CORRECT:
+      - { saleListing: { isNot: null }, property: { is: { numberBedrooms: 3 } } }
+      - { rentalListing: { isNot: null }, price: { lte: 2000 } }
+      - { property: { is: { parking: { isNot: null } } } }
 
     CRITICAL EXAMPLES:
     - "has garden" → property: { is: { outdoorSpace: { is: { garden: { some: {} } } } } }
@@ -131,12 +153,21 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     QUERY TYPE RULES
     ═══════════════════════════════════════════════════════════════════════════════
 
-    - PRICE QUERIES: "£300k", "under £500k" → { price: { lte: 500000 } } + listing filter.
-    - BEDROOM/BATHROOM: "3 beds" → property: { is: { numberBedrooms: 3 } }
-    - PROPERTY TYPE: "House" → property: { is: { type: { name: "House" } } } (relation!)
-    - CLASSIFICATION: "Detached" → property: { is: { classification: { name: "Detached" } } } (relation!)
-    - LOCATION: Use address fields if specified, but schema may not have full location - prioritize property fields.
+    - PRICE QUERIES: "£300k", "under £500k" → { "price": { "lte": 500000 } }
+    - BEDROOM/BATHROOM: "3 beds" → "property": { "is": { "numberBedrooms": 3 } }
+    - PROPERTY TYPE: "House" → "property": { "is": { "type": { "name": "House" } } }
+    - CLASSIFICATION: "Detached" → "property": { "is": { "classification": { "name": "Detached" } } }
+    - LOCATION: Use address fields if specified, but schema may not have full location.
     - FEATURES: See RULE-BASED 'HAS' section below.
+
+    IMPORTANT: PropertyType and PropertyClassification are SEPARATE relations on Property.
+    
+    PropertyType fields: id, name, description, icon
+    PropertyClassification fields: id, name, description, propertyTypeId
+    
+    They are sibling relations, NOT nested:
+    WRONG: "type": { "name": "House", "classification": { ... } }
+    CORRECT: "type": { "name": "House" }, "classification": { "name": "Detached" }
 
     ═══════════════════════════════════════════════════════════════════════════════
     RULE-BASED 'HAS' AND FIELD MAPPING (MANDATORY SCHEMA LOOKUP)
@@ -158,6 +189,10 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
       - Presence: { [relation]: { isNot: null } }
       - With features: { [relation]: { is: { features: { isEmpty: false } } } }
       - Specific feature: { [relation]: { is: { features: { has: "ENUM_VALUE" } } } }
+      
+      CRITICAL: When nested inside property.is, use "isNot" for presence checks:
+      - "has parking" → property: { is: { parking: { isNot: null } } }
+      - NOT property: { is: { isNot: null } } ("isNot" goes on the relation field, not on "is")
 
     * ONE-TO-MANY RELATION (e.g., bedroomFeatures Bedroom[], kitchenFeatures Kitchen[]):
       - Presence: { [relation]: { some: {} } }
@@ -216,7 +251,29 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     - OtherRoom type IS DIRECT ENUM: property: { is: { otherRoom: { some: { type: "OFFICE" } } } }
     - Floor level: 0=ground, positive=above, negative=below
     - Always filter out archived: { archived: false } (unless explicitly requested)
-    - Existence checks: { parking: { isNot: null } } or { parking: { is: null } }
+    - Existence checks for Property relations: { parking: { isNot: null } } or { parking: { is: null } }
+
+    ═══════════════════════════════════════════════════════════════════════════════
+    LISTING TYPE MAPPING (CRITICAL - EXACT SYNTAX REQUIRED)
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    The Listing model has TWO optional one-to-one relations: saleListing and rentalListing.
+    THESE ARE THE ONLY FIELDS ON LISTING WHERE "isNot" IS VALID AT THE ROOT LEVEL.
+
+    CORRECT USAGE:
+    - "For sale" → { "saleListing": { "isNot": null } }
+    - Synonyms: "To buy", "Buy", "To purchase", "Purchase" → treat as "For sale"
+    - "For rent" or "To rent" → { "rentalListing": { "isNot": null } }
+    - Synonyms: "To let", "Let", "Rental" → treat as "For rent"
+
+    NEVER use "isNot" directly inside property: { is: { ... } } filters.
+    Property filters use proper relation syntax as documented in the schema section above.
+
+    When querying specific sale/rental fields, nest under the appropriate relation:
+    - Sale price query: { "saleListing": { "is": { "priceType": "FIXED" } } }
+    - Rent query: { "rentalListing": { "is": { "rentFrequency": "MONTHLY" } } }
+
+    In "usedTerms" ALWAYS use: "For sale" or "To rent" — NEVER "saleListing" or "rentalListing".
 
     ═══════════════════════════════════════════════════════════════════════════════
     AMENITY SEARCH RULES
@@ -248,14 +305,24 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     RESPONSE FORMAT
     ═══════════════════════════════════════════════════════════════════════════════
     
-    Return ONLY valid JSON (no markdown, no comments):
+    Return ONLY **STRICT VALID JSON** with ALL property names in double quotes (no markdown, no comments, no JavaScript object notation):
+    
+    CORRECT JSON FORMAT:
     {
-      "whereClause": { ... },
+      "whereClause": { "archived": false, "price": { "gte": 100000 } },
       "queryAnalysis": {
         "usedTerms": ["term1", "term2"],
         "ignoredTerms": ["term3"]
       }
     }
+    
+    INCORRECT (JavaScript object notation - DO NOT USE):
+    {
+      whereClause: { archived: false }, Missing quotes around property names
+      queryAnalysis: { ... }
+    }
+    
+    ALL property names MUST be quoted: "in", "gte", "lte", "has", "some", "is", etc.
     
     IMPORTANT - usedTerms MUST be human-readable summaries:
     - Price: Format with currency symbol and commas: "£300,000" or "Under £500,000" or "£200k-£400k"

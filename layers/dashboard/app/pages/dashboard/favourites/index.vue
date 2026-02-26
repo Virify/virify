@@ -1,10 +1,15 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar title="Your Favourites" class="body-sm px-3" :ui="{
+      <UDashboardNavbar class="body-sm px-3" :ui="{
         title: 'title-sm m-0!',
         icon: 'text-secondary',
       }">
+
+        <template #title>
+          <MoleculesDashboardBreadcrumb />
+        </template>
+
         <template #right>
           <OrganismsDashboardFilter
             :items="favourites"
@@ -20,7 +25,6 @@
     </template>
 
     <template #body>
-      <MoleculesDashboardBreadcrumb />
       <OrganismsDashboardListingCardGrid ref="pageTop" v-if="loading">
         <OrganismsDashboardListingCardSkeleton :cards="3"/>
       </OrganismsDashboardListingCardGrid>

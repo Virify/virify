@@ -13,7 +13,7 @@ textarea {
   }
 }
 
-:where(button) {
+:where(button:not([class]), button.button) {
   cursor: pointer;
   width: fit-content;
 }

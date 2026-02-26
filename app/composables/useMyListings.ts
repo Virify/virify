@@ -1,80 +1,71 @@
-import { createSharedComposable, useDebounceFn } from "@vueuse/core";
+import { createSharedComposable } from "@vueuse/core";
 
 type StatusFilter = "all" | "active" | "inactive" | "draft" | "archived";
 type SortBy = "new" | "old" | "premium" | "featured" | "basic";
+
+type SaleRentFilter = "all" | "sale" | "rent";
 
 export const useMyListings = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const toast = useToast();
 
-  // Query state
-  const searchTerm = ref("");
-  const statusFilter = ref<StatusFilter>("all");
-  const sortBy = ref<SortBy>("new");
-  const take = 50;
-  const page = ref(1);
-
-  // Data state
-  const listings = ref<OwnedListingWithAnalytics[]>([]);
+  // Pagination state for dashboard
+  const total = ref(0);
   const loading = ref(false);
-  const ended = ref(false);
+
+  // Use for dashboard pages with pagination
+  const listings = ref<OwnedListingWithAnalytics[]>([]);
+
+  // Track current pagination state for refetching after add/remove
+  const currentFilter = ref<'all' | 'active' | 'inactive' | 'draft' | 'archived'>('all');
+  const currentSaleRentFilter = ref<SaleRentFilter>('all');
+  const currentPage = ref(1);
+  const currentSort = ref<SortBy>('new');
+  const currentLimit = ref(20);
 
   const requestFetch = useRequestFetch();
 
-  async function fetchPage(reset = false) {
-    if (!loggedIn.value) {
-      listings.value = []
-      ended.value = true
-      return
-    }
-    
-    if (loading.value || (!reset && ended.value)) return
+  /**
+   * Fetch listings with pagination, sort, and filter (for dashboard)
+   */
+  async function fetchMyListings(
+    filter: StatusFilter = 'all',
+    page: number = 1,
+    sort: SortBy = 'new',
+    limit: number = 20,
+    saleRent: SaleRentFilter = 'all'
+  ) {
+    // Store current pagination state
+    currentFilter.value = filter;
+    currentSaleRentFilter.value = saleRent;
+    currentPage.value = page;
+    currentSort.value = sort;
+    currentLimit.value = limit;
 
-    if (reset) {
-      page.value = 1
-      ended.value = false
-      listings.value = []
-    }
-
-    loading.value = true
-    
+    loading.value = true;
     try {
-      const data = await requestFetch<OwnedListingWithAnalytics[]>("/api/user/my-listings/", {
-        query: {
-          status: statusFilter.value,
-          search: searchTerm.value.trim() || undefined,
-          page: page.value,
-          take,
-          sort: sortBy.value,
-        },
-      })
-      
-      const list = Array.isArray(data) ? data : []
-      listings.value = reset ? list : [...listings.value, ...list]
-      
-      if (list.length < take) {
-        ended.value = true
-      } else {
-        page.value += 1
-      }
+      const data = await requestFetch<{ listings: OwnedListingWithAnalytics[], total: number }>(
+        `/api/user/my-listings/?status=${filter}&sort=${sort}&page=${page}&take=${limit}&saleRent=${saleRent}`
+      );
+      listings.value = data.listings || [];
+      total.value = data.total || 0;
+    } catch (error) {
+      console.error('Error fetching my listings:', error);
+      listings.value = [];
+      total.value = 0;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
-  const debouncedRefetch = useDebounceFn(() => fetchPage(true), 350)
-
-  watch([statusFilter, loggedIn, sortBy], () => {
-    fetchPage(true)
-  })
-
-  watch(searchTerm, () => {
-    debouncedRefetch()
-  })
-
-  onMounted(() => {
-    fetchPage(true)
-  })
+  /**
+   * Refetch current page (used after add/remove when dashboard is active)
+   */
+  async function refetchCurrentPage() {
+    if (listings.value.length > 0 || total.value > 0) {
+      await fetchMyListings(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value, currentSaleRentFilter.value);
+    }
+  }
 
   async function setPublished(listingId: number, published: boolean) {
     try {
@@ -98,15 +89,16 @@ export const useMyListings = createSharedComposable(() => {
 
       // Check if listing should remain visible based on current filter
       const shouldKeepListing = 
-        statusFilter.value === "all" ||
-        (statusFilter.value === "active" && updatedListing.published) ||
-        (statusFilter.value === "inactive" && !updatedListing.published && !updatedListing.isDraft) ||
-        (statusFilter.value === "draft" && updatedListing.isDraft)
+        currentFilter.value === "all" ||
+        (currentFilter.value === "active" && updatedListing.published) ||
+        (currentFilter.value === "inactive" && !updatedListing.published && !updatedListing.isDraft) ||
+        (currentFilter.value === "draft" && updatedListing.isDraft)
 
       if (shouldKeepListing) {
         listings.value[listingIndex] = updatedListing
       } else {
         listings.value.splice(listingIndex, 1)
+        total.value -= 1
       }
 
       toast.add({
@@ -135,6 +127,7 @@ export const useMyListings = createSharedComposable(() => {
       const listingIndex = listings.value.findIndex((listing) => listing.id === listingId)
       if (listingIndex !== -1) {
         listings.value.splice(listingIndex, 1)
+        total.value -= 1
       }
 
       toast.add({ title: 'Success', description: "Listing archived successfully", color: "success" })
@@ -145,28 +138,15 @@ export const useMyListings = createSharedComposable(() => {
     }
   }
 
-  function loadMore() {
-    return fetchPage(false)
-  }
-
-  function refreshList() {
-    return fetchPage(true)
-  }
-
   async function getRecentListings(limit = 5) {
     if (!loggedIn.value) return []
     
     try {
-      const data = await requestFetch<OwnedListingWithAnalytics[]>("/api/user/my-listings/", {
-        query: {
-          status: "all",
-          page: 1,
-          take: limit,
-          sort: "new",
-        },
-      })
+      const data = await requestFetch<{ listings: OwnedListingWithAnalytics[] }>(
+        `/api/user/my-listings/?status=all&page=1&take=${limit}&sort=new`
+      )
       
-      return Array.isArray(data) ? data : []
+      return data.listings || []
     } catch (error) {
       console.error("Failed to fetch recent listings:", error)
       return []
@@ -178,33 +158,23 @@ export const useMyListings = createSharedComposable(() => {
     
     try {
       // Fetch with a very high limit to get all listings for analytics
-      const data = await requestFetch<OwnedListingWithAnalytics[]>("/api/user/my-listings/", {
-        query: {
-          status: "all",
-          page: 1,
-          take: 10000, // High limit to get all listings
-          sort: "new",
-        },
-      })
+      const data = await requestFetch<{ listings: OwnedListingWithAnalytics[] }>(
+        `/api/user/my-listings/?status=all&page=1&take=10000&sort=new`
+      )
       
-      return Array.isArray(data) ? data : []
+      return data.listings || []
     } catch (error) {
       console.error("Failed to fetch all listings for analytics:", error)
       return []
     }
   }
 
-  const hasMore = computed(() => !ended.value && !loading.value)
-
   return {
     listings,
     loading,
-    hasMore,
-    loadMore,
-    refreshList,
-    searchTerm,
-    statusFilter,
-    sortBy,
+    total,
+    fetchMyListings,
+    refetchCurrentPage,
     setPublished,
     togglePublished,
     archiveListing,

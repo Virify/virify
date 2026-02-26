@@ -7,12 +7,12 @@ export function useTurnstile() {
   const turnstileToken = ref<string | null>(null);
   const turnstileEl = ref<HTMLElement | null>(null);
   const widgetId = ref<string | null>(null);
+  const tokenResolver = ref<((token: string) => void) | null>(null);
 
   /**
    * Initialize Turnstile widget
-   * @param onSuccess - Callback function to execute when token is received
    */
-  const initializeTurnstile = (onSuccess: (token: string) => void) => {
+  const initializeTurnstile = () => {
     let retryCount = 0;
     const maxRetries = 50;
 
@@ -25,7 +25,10 @@ export function useTurnstile() {
             execution: 'execute',
             callback: (token: string) => {
               turnstileToken.value = token;
-              onSuccess(token);
+              if (tokenResolver.value) {
+                tokenResolver.value(token);
+                tokenResolver.value = null;
+              }
             },
           });
         } catch (error) {
@@ -43,12 +46,15 @@ export function useTurnstile() {
   };
 
   /**
-   * Execute Turnstile challenge
+   * Execute Turnstile challenge and return a promise that resolves with the token
    */
-  const executeTurnstile = () => {
-    if ((window as any).turnstile && widgetId.value) {
-      (window as any).turnstile.execute(widgetId.value);
-    }
+  const executeTurnstile = (): Promise<string> => {
+    return new Promise((resolve) => {
+      tokenResolver.value = resolve;
+      if ((window as any).turnstile && widgetId.value) {
+        (window as any).turnstile.execute(widgetId.value);
+      }
+    });
   };
 
   /**

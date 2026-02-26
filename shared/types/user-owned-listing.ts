@@ -11,4 +11,5 @@ export type OwnedListingWithAnalytics = ListingCardType & {
   archived: boolean
   analytics: OwnedListingAnalytics
   isDraft: boolean
+  draftId?: number // Present when isDraft is true, used for editing drafts
 }

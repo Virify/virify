@@ -1,48 +1,77 @@
-import * as z from "zod";
-import { RentalPriceType, SalePriceType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { z } from "zod";
+import { step3Schema } from "~~/shared/utils/listing-step3-schema";
 
-const stepDataSchema = z.object({
-  draftId: z.number().int().positive(),
-  price: z.number().positive(),
-  rentalListing: z
-    .object({
-  deposit: z.number().min(0).nullable().optional(),
-  holdingDeposit: z.number().min(0).nullable().optional(),
-      rentFrequency: z.enum(Object.values(RentalPriceType)).nullable().optional(),
-      rentalLength: z.enum(["SHORT_TERM", "LONG_TERM"]).nullable().optional(),
-    })
-    .optional(),
-  saleListing: z
-    .object({
-      priceType: z.enum(Object.values(SalePriceType)).nullable().optional(),
-    })
-    .optional(),
-});
+/**
+ * Step 3: Pricing API Endpoint
+ * 
+ * Works for BOTH draft listings (draftId) and live listings (listingId)
+ */
+
+const stepDataSchema = step3Schema.extend({
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
+}).refine(
+  (data) => data.draftId !== undefined || data.listingId !== undefined,
+  { message: "Either draftId or listingId must be provided" }
+);
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
+  
   try {
-    const { draftId, price, rentalListing, saleListing } = await readValidatedBody(event, stepDataSchema.parse);
+    const { draftId, listingId, price, rentalListing, saleListing } = await readValidatedBody(event, stepDataSchema.parse);
+
+    const updateData = {
+      price: price,
+      rentalListing: rentalListing
+        ? {
+            update: {
+              rentFrequency: rentalListing.rentFrequency,
+              deposit: rentalListing.deposit ?? null,
+              holdingDeposit: rentalListing.holdingDeposit ?? null,
+            },
+          }
+        : undefined,
+      saleListing: saleListing
+        ? {
+            update: {
+              priceType: saleListing.priceType,
+            },
+          }
+        : undefined,
+    };
+
+    // LIVE LISTING - update Listing table
+    if (listingId) {
+      const result = await prisma.listing.update({
+        where: { id: listingId, userId: user.id },
+        data: updateData,
+        include: {
+          saleListing: true,
+          rentalListing: true,
+        },
+      });
+
+      // Invalidate listing cache so modal shows fresh data
+      const storage = useStorage('cache:listing');
+      await storage.removeItem(`listing:${listingId}`);
+
+      return result;
+    }
+
+    // DRAFT LISTING - update DraftListing table with completedSteps
+    const currentDraft = await prisma.draftListing.findUnique({
+      where: { id: draftId },
+      select: { completedSteps: true },
+    });
 
     const updatedDraftListing = await prisma.draftListing.update({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId!, userId: user.id },
       data: {
-        price: price,
-        rentalListing: rentalListing
-          ? {
-              update: {
-                ...rentalListing,
-              },
-            }
-          : undefined,
-        saleListing: saleListing
-          ? {
-              update: {
-                ...saleListing,
-              },
-            }
-          : undefined,
+        // Add step 3 to completedSteps if not already there
+        ...(currentDraft && !currentDraft.completedSteps.includes(3) ? { completedSteps: { push: 3 } } : {}),
+        ...updateData,
       },
       include: {
         saleListing: true,

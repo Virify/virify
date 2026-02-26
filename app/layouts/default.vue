@@ -1,24 +1,65 @@
 <template>
   <NuxtLoadingIndicator />
-  <OrganismsHeader />
+  <HeaderBase />
 
   <div class="page">
-    <UApp>
-      <NuxtPage />
-    </UApp>
+    <NuxtPage />
   </div>
 
   <OrganismsFooter />
 
   <ViewsDialog />
   <ClientOnly>
-    <ViewsHelpButton v-if="!isWaitingListMode"/>
+    <ViewsHelpButton v-if="!isWaitingListMode" />
   </ClientOnly>
 </template>
 
 <script setup lang="ts">
-// Handle authentication dialog logic
-useAuthenticationHandler();
+import { ViewsDialogLogin } from '#components'
+import { useDark } from '@vueuse/core'
+
+useDark()
+
+onMounted(async () => {
+  const { path, query } = useRoute()
+
+  // Check if we should show the login dialog (from authentication middleware)
+  if (!query.showLogin) return
+
+  const { showDialog } = useDialog()
+  const { loggedIn } = useUserSession()
+  const cleanQuery = objectWithoutKey(query, 'showLogin')
+
+  // User is already logged in, just clean up the URL
+  if (loggedIn.value) {
+    const cleanQuery = { ...query }
+    delete cleanQuery.showLogin
+
+    return await navigateTo({
+      path,
+      query: cleanQuery
+    }, { replace: true })
+  }
+
+  // Only show if user is still not logged in - check if there's a
+  // redirect cookie to determine if user came from a protected page
+  const redirectCookie = useCookie('redirect')
+  const fromProtectedPage = !!redirectCookie.value
+
+  showDialog({
+    component: ViewsDialogLogin,
+    props: {
+      fromProtectedPage
+    },
+    onClose: async () => {
+      await navigateTo({
+        path,
+        query: cleanQuery
+      }, { replace: true })
+    }
+  })
+})
+
 const { isWaitingListMode } = useWaitingListMode()
 
 useHead({
@@ -49,6 +90,7 @@ useHead({
   ],
 });
 </script>
+
 <style lang="scss">
 .page {
   background: var(--background-100);

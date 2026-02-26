@@ -78,7 +78,7 @@ async function handleDeleteNote() {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 textarea {
   width: 100%;
   padding: var(--size-12);

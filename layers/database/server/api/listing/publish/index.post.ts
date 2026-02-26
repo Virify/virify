@@ -37,7 +37,7 @@ const publishableDraftSchema = z.object({
     description: z.string().nullable().optional(),
     totalFloors: z.number().int().min(0).nullable().optional(),
     
-    // Step 4: Address (required)
+    // Step 2: Address (required - now part of Property Basics)
     address: z.object({
       number: z.string().nullable().optional(),
       street: z.string().min(1, "Street is required"),
@@ -48,18 +48,23 @@ const publishableDraftSchema = z.object({
       lon: z.number(),
     }),
     
-    // Step 5: Room counts
+    // Step 4: Room counts
     numberBedrooms: z.number().int().min(0).nullable().optional(),
     numberBathrooms: z.number().int().min(0).nullable().optional(),
     
-    // Step 10: Media (at least 1 image required)
+    // Step 9: Media (at least 1 image required, with sortOrder for ordering)
+    // Note: image field can be null for video tours/floor plans, so we filter for images with actual image values
     media: z.array(z.object({
-      image: z.string().min(1),
-    })).min(1, "At least one image is required"),
+      image: z.string().nullable().optional(),
+      sortOrder: z.number().int().min(0).optional(),
+    })).refine(
+      (mediaArray) => mediaArray.some(m => m.image && m.image.length > 0),
+      { message: "At least one image is required" }
+    ),
   }),
   
-  // Must have completed all 10 steps
-  completedSteps: z.array(z.number().int().min(1).max(10)).length(10, "All 10 steps must be completed"),
+  // Must have completed all 9 steps (new flow)
+  completedSteps: z.array(z.number().int().min(1).max(9)).length(9, "All 9 steps must be completed"),
 }).refine(
   (data) => data.saleListing !== null || data.rentalListing !== null,
   {

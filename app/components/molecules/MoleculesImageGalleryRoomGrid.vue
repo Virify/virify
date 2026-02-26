@@ -29,9 +29,9 @@
               :src="image.src"
               :alt="image.alt"
               variant="gallery"
-              class="gallery-room-grid__image"
+              class="gallery-room-grid__image w-full h-full"
             />
-            <span class="gallery-room-grid__image-caption | body-sm">{{ image.alt }}</span>
+            <span v-if="image.alt !== 'Property image'" class="gallery-room-grid__image-caption | body-sm">{{ image.alt }}</span>
           </button>
         </div>
       </section>

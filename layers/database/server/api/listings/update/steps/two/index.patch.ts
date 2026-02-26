@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { ConstructionType } from "~~/layers/database/server/database/prisma/generated/enums";
+import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
 
 const stepTwoScehma = z.object({
   listingId: z.number().int().positive(),
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event) => {
   try {
     const { listingId, property } = await readValidatedBody(event, stepTwoScehma.parse);
 
-    return await prisma.listing.update({
+    const result = await prisma.listing.update({
       where: { id: listingId, userId: user.id },
       data: {
         property: {
@@ -55,6 +56,11 @@ export default defineEventHandler(async (event) => {
         property: true,
       },
     });
+
+    // Invalidate cache after update
+    await invalidateListingCache(listingId);
+
+    return result;
   } catch (error) {
     return errorResponse(error, event);
   }

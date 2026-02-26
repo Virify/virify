@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
 
 const addressSchema = z.object({
   listingId: z.number().int().positive(),
@@ -102,6 +103,9 @@ export default defineEventHandler(async (event) => {
       const { id, lat, lon } = address;
       await updateLocationByAddressId(id, lon, lat);
     }
+
+    // Invalidate cache after update
+    await invalidateListingCache(listingId);
     
     return result;
   } catch (error) {

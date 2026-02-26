@@ -98,24 +98,16 @@ const form = ref({
 
 const isSubmitting = ref(false)
 const formError = ref(null)
-const pendingResolve = ref(null)
 
 async function submitForm() {
   if (isSubmitting.value) return
 
   formError.value = null
-
-  // Start submission flow and execute Turnstile
   isSubmitting.value = true
-  pendingResolve.value = new Promise((resolve) => {
-    pendingResolve.value = resolve
-  })
   
-  executeTurnstile()
-}
-
-async function performSubmit() {
   try {
+    await executeTurnstile()
+    
     await $fetch('/api/support', {
       method: 'POST',
       body: {
@@ -139,17 +131,11 @@ async function performSubmit() {
     resetTurnstile()
   } finally {
     isSubmitting.value = false
-    if (pendingResolve.value) {
-      pendingResolve.value()
-      pendingResolve.value = null
-    }
   }
 }
 
 onMounted(() => {
-  initializeTurnstile(() => {
-    performSubmit()
-  })
+  initializeTurnstile()
 })
 
 onUnmounted(() => {

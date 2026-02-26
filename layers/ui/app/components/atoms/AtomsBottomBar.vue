@@ -1,7 +1,7 @@
 <template>
   <div class="bottom-bar">
     <div class="bottom-bar__section bottom-bar__section--left">
-      <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="222" height="67" class="bottom-bar__logo-image" />
+      <AtomsIcon title="Virify Ltd" icon="logo/v-logo" width="222" height="67" class="bottom-bar__logo-image" />
     </div>
     <div class="bottom-bar__section bottom-bar__section--center">
       <h2 class="bottom-bar__title | body-md">{{ title }}</h2>
@@ -55,36 +55,26 @@ defineEmits<Emits>()
     align-items: center;
 
     &--left {
-      flex: 0 0 200px; // Fixed width to match logo area
       justify-content: flex-start;
-
-      @include mq.mobile-only {
-        flex: 0 0 80px; // Much smaller on mobile
-      }
     }
 
     &--center {
       flex: 1;
       justify-content: center;
-      min-width: 0; // Allow text to shrink if needed
+      min-width: 0;
     }
 
     &--right {
-      flex: 0 0 200px; // Fixed width to match left section
       justify-content: flex-end;
-
-      @include mq.mobile-only {
-        flex: 0 0 60px; // Smaller on mobile, just enough for close button
-      }
     }
   }
 
   &__logo-image {
     height: 32px;
-    width: auto;
+    width: 32px;
 
     @include mq.mobile-only {
-      height: 28px;
+      height: 32px;
     }
   }
 

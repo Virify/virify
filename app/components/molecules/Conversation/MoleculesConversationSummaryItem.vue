@@ -73,7 +73,7 @@ const conversationAddress = computed(() => {
 });
 
 const firstImage = computed(() => {
-  return props.conversation.listing?.property?.media?.[0]?.image || "/img/preload.svg";
+  return getMainImage(props.conversation.listing?.property) || "/img/preload.svg";
 });
 </script>
 

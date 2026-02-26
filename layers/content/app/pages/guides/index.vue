@@ -1,61 +1,65 @@
 <template>
-  <div class="guides-home | container">
-    <MoleculesBreadcrumb :items="breadcrumbItems" />
-
-    <AtomsGuideHero title="Virify Guides" description="Complete step-by-step guides for buying, selling, and renting properties. Learn how to find the right property, negotiate deals, and navigate the entire process with confidence." />
-
-    <section class="guides-home__search">
-      <OrganismsSearchInput
-        :placeholder="'Search guide categories...'"
-        icon="search"
-        iconTitle="Search icon"
-        :guides="fullCategories"
-        :deleteble="true"
-        @filter="filtered => filteredCategories = filtered as GuideCategory[]"
+  <UPageSection
+    title="Virify Guides"
+    description="Complete step-by-step guides for buying, selling, and renting properties. Learn how to find the right property, negotiate deals, and navigate the entire process with confidence."
+  >
+    <template #top>
+      <UBreadcrumb
+        :items="[
+          { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
+        ]"
+        :ui="{
+          linkLeadingIcon: 'text-secondary',
+          root: 'container'
+        }"
+        class="m-4 text-(--foreground-100)"
       />
-    </section>
+    </template>
+    <UBlogPosts>
+      <UBlogPost
+        v-for="(category, index) in categories"
+        :key="index"
+        variant="subtle"
+        :title="category.title"
+        :description="category.description"
+        :to="'guides/' + category.slug.current"
+        :authors="[
+          {
+            name: 'Virify',
+            avatar: {
+              src: '/android-chrome-96x96.png',
+              alt: 'Virify',
+            }
+          }
 
-    <MoleculesGuideGrid>
-      <MoleculesGuideCard 
-      v-for="category in filteredCategories" 
-      :key="category._id" 
-      :title="category.title" 
-      :description="category.description" 
-      :to="`/guides/${category.slug.current}`"
-      :image="category.heroImage" />
-    </MoleculesGuideGrid>
-
-    <section v-if="fullCategories.length > 0 && filteredCategories.length === 0">
-      <div class="| body-md">
-        No guide categories found.
-      </div>
-    </section>
-
-    <section v-if="!isWaitingListMode">
-      <div class="guides-home__advert">
-        <MoleculesListingAdvert />
-      </div>
-    </section>
-
-    <section v-if="!isWaitingListMode">
-      <OrganismsRelevantListings type="trending" title="Trending" :days="7" :limit="10" />
-    </section>
-  </div>
+        ]"
+        :image="{
+          provider: 'sanity',
+          src: category.heroImage?.asset._ref,
+          alt: category.heroImage?.alt || category.title,
+          width: 600,
+          height: 400,
+          loading: index < 2 ? 'eager' : 'lazy',
+          format: 'webp',
+          quality: 85,
+          sizes: 'sm:100vw md:50vw lg:33vw',
+          preload: index === 0,
+          placeholder: '/img/preload.svg',
+        }"
+        :ui="{
+          title: 'body-md font-bold',
+          meta: 'justify-between',
+          description: 'body-sm',
+          body: 'justify-evenly',
+        }"
+      />
+    </UBlogPosts>
+  </UPageSection>
 </template>
 
 <script setup lang="ts">
 
-const { isWaitingListMode} = useWaitingListMode()
-const filteredCategories = ref<GuideCategory[]>([]);
-
 const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery)
-
-
-const breadcrumbItems = computed(() => [{ label: "Guides", to: "/guides" }]);
-
-const fullCategories = computed(() => {
-  return categories.value || [];
-});
 
 // SEO - Nuxt SEO auto-generates CollectionPage schema from this
 const seoDescription = computed(() => {
@@ -95,19 +99,3 @@ useSchemaOrg([
 ]);
 
 </script>
-
-<style scoped lang="scss">
-.guides-home {
-  padding-bottom: var(--size-32);
-
-  &__search {
-    margin: var(--size-32) 0;
-  }
-
-  &__advert {
-    padding: var(--size-32) 0;
-    display: flex;
-    justify-content: center;
-  }
-}
-</style>
