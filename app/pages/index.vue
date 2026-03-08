@@ -35,7 +35,7 @@
 
     <!-- sellers section -->
     <UPageSection :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
-      :description="cmsContent?.sellersBenefits.subtitle || ''" headline="Your in control" :ui="{
+      :description="cmsContent?.sellersBenefits.subtitle || ''" headline="You're in control" :ui="{
         root: '| container',
         headline: 'text-secondary/90!',
         body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
