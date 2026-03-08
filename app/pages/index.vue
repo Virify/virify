@@ -6,32 +6,12 @@
 
     <HomepageSectionSearch v-else class="p-index__search | container" />
 
-    <HomepageSectionComingSoon class="| container" />
-
-    <a id="homepage-content" aria-hidden></a>
-
     <!-- Features -->
-    <UPageCTA v-for="(section, index) in processedFeatureSections" :key="`feature-${index}`" :title="section.title"
-      :description="section.subtitle" orientation="horizontal" variant="soft" class="p-index__border-radius | container"
-      :class="index % 2 === 0 ? 'p-index__hero-dark' : 'bg-transparent'" :reverse="index % 2 !== 0" :ui="{
-        body: 'border-0 radius-0',
-        root: 'rounded-none',
-        title: 'text-secondary/90!',
-        description: 'body-md',
-      }">
-      <template #body>
-        <div class="flex flex-col gap-4">
-          <UPageFeature v-for="(feature, idx) in section.features" :key="`feature-${index}-${idx}`" icon="i-lucide-info"
-            :title="feature.title" :description="feature.description" :ui="{
-              description: 'body-sm',
-              leadingIcon: 'text-secondary h-6 w-6',
-            }">
-          </UPageFeature>
-        </div>
-      </template>
-
-      <AtomsCloudFlareImage v-if="section.image" :src="section.image" :alt="section.imageAlt" class="h-auto w-full" />
-    </UPageCTA>
+    <HomepageSectionComingSoon class="| container" />
+    <HomepageSectionAiScroller class="| container" />
+    <HomepageSectionMapScroller class="| container" />
+    <HomepageSectionComms class="| container" />
+    <HomepageSectionLocation class="| container" />
 
     <!-- sellers section -->
     <UPageSection :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
