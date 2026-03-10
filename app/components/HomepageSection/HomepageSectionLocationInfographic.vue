@@ -130,7 +130,8 @@ const timestamps = [
       savedInputContent.value = ''
       showSuggestions.value = false
       selectedLocationIndex.value = -1
-      radiusSelectedIndex.value = -1;
+      radiusSelectedIndex.value = -1
+      showSaveModal.value = false
       savedLocations.value = ['Work']
       radiusDropdownOpen.value = false
       selectedRadius.value = radiusOptions[0]!.key
@@ -507,8 +508,12 @@ useIntersectionObserver($root, ([entry]) => {
   &__dropdown {
     margin: 0 0 var(--size-12);
     padding: var(--size-14) var(--size-24);
+    transition: opacity, transform;
+    transition-duration: var(--animation-slow);
+    transition-timing-function: var(--ease-in-out);
 
     &--hidden {
+      transform: translateY(-1rem);
       opacity: 0;
     }
   }
