@@ -1,5 +1,5 @@
 <template>
-  <div class="homepage-section-location-infographic" :class="{
+  <div ref="$root" class="homepage-section-location-infographic" :class="{
     'homepage-section-location-infographic--has-modal': showSaveModal
   }">
     <div class="homepage-section-location-infographic__input | gradient-box">
@@ -85,6 +85,8 @@
 </template>
 
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
+
 /**
  *  Suggestions
  */
@@ -371,12 +373,24 @@ const timestamps = [
   },
 ]
 
-const { start } = useTimestampAnimation(timestamps, {
+const { start, stop } = useTimestampAnimation(timestamps, {
   duration: 10000
 })
 
-onMounted(() => {
-  start()
+/**
+ *  Only run animation when visible
+ */
+const $root = useTemplateRef('$root')
+
+useIntersectionObserver($root, ([entry]) => {
+  const { isIntersecting } = asObject(entry)
+
+  if (isIntersecting) {
+    start()
+  }
+  else {
+    stop()
+  }
 })
 
 </script>
