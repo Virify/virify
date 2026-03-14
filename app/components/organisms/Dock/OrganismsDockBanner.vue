@@ -166,7 +166,7 @@ onMounted(() => {
 /**
  *  Toggle filters as visible
  */
-const isExpanded = ref(false)
+const isExpanded = shallowRef(false)
 
 function showExpandedForm() {
   isExpanded.value = true
@@ -280,20 +280,18 @@ function searchReset() {
 }
 
 /**
- *  Disable filters button if no location is added
+ *  Disable filters button if no location is added - to avoid hydration
+ *  mismatch, server never has a location
+ *
  */
-const isMounted = ref(false)
-onMounted(() => {
-  isMounted.value = true
-})
-
 const hasLocation = computed(() => {
-  // Prevent hydration mismatch by ensuring we match server state (false) until mounted
-  if (!isMounted.value) return false
-
   const { location } = asObject(searchState.value)
 
-  return !!location
+  return import.meta.client && !!location
+})
+
+
+
 })
 </script>
 
