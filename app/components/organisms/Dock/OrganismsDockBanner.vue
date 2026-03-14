@@ -2,13 +2,15 @@
   <section class="o-dock-banner__scrollbox" :class="{
     'o-dock-banner__scrollbox--fullscreen': isExpandedWithLocation
   }" role="presentation">
+    <div class="o-dock-banner__backdrop" :class="{ 'o-dock-banner__backdrop--visible': isExpandedWithLocation }">
+    </div>
+
     <div class="o-dock-banner__form-height" role="presentation" v-bind="$attrs">
-      <div ref="$dock" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
-        @focusin="showExpandedForm">
-        <div class="o-dock-banner__backdrop | elevate-300" :class="{
-          'o-dock-banner__backdrop--hidden': !hasLocation
+      <div ref="$dock" tabindex="-1" class="o-dock-banner" @focusin="showExpandedForm">
+        <div class="o-dock-banner__pseudo-border | elevate-300" :class="{
+          'o-dock-banner__pseudo-border--hidden': !hasLocation
         }" aria-hidden="true" ref="$backdrop">
-          <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
+          <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__pseudo-border-skeleton" />
         </div>
 
         <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
@@ -295,7 +297,37 @@ const $dock = useTemplateRef('$dock')
 
 onClickOutside($dock, () => {
   isExpanded.value = false
+})
 
+/**
+ *  Animate menu to scrollbox
+ */
+watch(isExpandedWithLocation, async () => {
+  const dockWrapper = $dock.value
+
+  // If not an element, something has gone wrong. Abort
+  if (!isElement(dockWrapper)) return
+
+  // Get distance before any DOM updates
+  const { top: start } = dockWrapper.getBoundingClientRect()
+
+  // Await next tick
+  await nextTick()
+
+  // Get new distance
+  const { top: end } = dockWrapper.getBoundingClientRect()
+
+  // Calculate distance moved
+  const distanceMoved = end - start
+
+  // Animate element
+  dockWrapper.animate([
+    { transform: `translateY(${0 - distanceMoved}px)` },
+    { transform: 'none' },
+  ], {
+    duration: 200,
+    easing: 'cubic-bezier(0, 0.7, 0.5, 1)'
+  })
 })
 </script>
 
@@ -307,6 +339,21 @@ onClickOutside($dock, () => {
   z-index: 2;
   text-align: left;
 
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--background-100);
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+    transition: opacity var(--animation-slow);
+
+    &--visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
   &__scrollbox {
     display: contents;
 
@@ -316,11 +363,17 @@ onClickOutside($dock, () => {
       inset: 0;
       overflow: auto;
       overscroll-behavior: contain;
+      scrollbar-width: none;
+      z-index: 10;
     }
   }
 
   &__scrollbox--fullscreen &__form-height {
-    margin: var(--size-96) auto;
+    margin-top: 70px;
+
+    @include mq.tablet {
+      margin-top: 120px;
+    }
   }
 
   &__form-height {
@@ -332,26 +385,7 @@ onClickOutside($dock, () => {
     }
   }
 
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: var(--background-100);
-    opacity: 0;
-    z-index: -1;
-    pointer-events: none;
-    transition: opacity var(--animation-slow);
-  }
-
-  &:not(&--backdrop):hover::before {
-    opacity: 0.125;
-  }
-
-  &--backdrop::before {
-    opacity: 1;
-  }
-
-  &__backdrop {
+  &__pseudo-border {
     position: absolute;
     z-index: -1;
     inset: calc(0px - var(--size-12));
@@ -374,7 +408,7 @@ onClickOutside($dock, () => {
     }
   }
 
-  &__backdrop-skeleton {
+  &__pseudo-border-skeleton {
     padding: var(--size-12);
     height: 100%;
     box-sizing: border-box;
