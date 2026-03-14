@@ -1,52 +1,56 @@
 <template>
-  <section class="o-dock-banner__form-height" role="presentation">
-    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
-      @focusin="showExpandedForm">
-      <div class="o-dock-banner__backdrop | elevate-300" :class="{
-        'o-dock-banner__backdrop--hidden': !hasLocation
-      }" aria-hidden="true" ref="$backdrop">
-        <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
-      </div>
+  <section class="o-dock-banner__scrollbox" :class="{
+    'o-dock-banner__scrollbox--fullscreen': isExpanded && hasLocation
+  }" role="presentation">
+    <div class="o-dock-banner__form-height" role="presentation" v-bind="$attrs">
+      <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
+        @focusin="showExpandedForm">
+        <div class="o-dock-banner__backdrop | elevate-300" :class="{
+          'o-dock-banner__backdrop--hidden': !hasLocation
+        }" aria-hidden="true" ref="$backdrop">
+          <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
+        </div>
 
-      <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
-        <MoleculesAiSearchFormLocation />
+        <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
+          <MoleculesAiSearchFormLocation />
 
-        <client-only>
-          <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
+          <client-only>
+            <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
 
-            <OrganismsFilterSwitcher>
-              <template v-slot:traditional>
-                <!-- @TODO put in a nicer skeleton loader here -->
-                <template v-if="isTraditionalFormLoading">
-                  <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
-                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-                  </div>
+              <OrganismsFilterSwitcher>
+                <template v-slot:traditional>
+                  <!-- @TODO put in a nicer skeleton loader here -->
+                  <template v-if="isTraditionalFormLoading">
+                    <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
+                      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                    </div>
 
-                  <div class="o-dock-banner__toggle-content-loader">
-                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-                  </div>
+                    <div class="o-dock-banner__toggle-content-loader">
+                      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                    </div>
+                  </template>
+                  <!-- @TODO end -->
+
+                  <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
+                    @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
                 </template>
-                <!-- @TODO end -->
 
-                <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
-                  @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
-              </template>
+                <template v-slot:ai>
+                  <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
+                    @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
+                    class="o-dock-banner__toggle-content" />
+                </template>
+              </OrganismsFilterSwitcher>
+            </Transition>
+          </client-only>
 
-              <template v-slot:ai>
-                <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-                  @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
-                  class="o-dock-banner__toggle-content" />
-              </template>
-            </OrganismsFilterSwitcher>
-          </Transition>
-        </client-only>
-
-        <AtomsButton v-if="hasLocation && !isExpanded"
-          class="o-dock-banner__toggle | button-bordered button-full button-xs" type="button"
-          @click.prevent="showExpandedForm">
-          Expand form
-        </AtomsButton>
-      </section>
+          <AtomsButton v-if="hasLocation && !isExpanded"
+            class="o-dock-banner__toggle | button-bordered button-full button-xs" type="button"
+            @click.prevent="showExpandedForm">
+            Expand form
+          </AtomsButton>
+        </section>
+      </div>
     </div>
   </section>
 </template>
@@ -61,6 +65,13 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   listingType: 'all'
 });
+
+/**
+ *  Disable auto-inherited attributes
+ */
+defineOptions({
+  inheritAttrs: false
+})
 
 /**
  *  Manage lazy hydration
@@ -193,10 +204,10 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   try {
     await animateFormToDock()
     setSearchPending(true)
-    
+
     // Build query analysis from form data for filter badges
     const queryAnalysis = buildQueryAnalysisFromFormData(formData)
-    
+
     // Set search parameters and navigate instead of fetching here
     // The search page will handle the fetch
     searchState.value = {
@@ -207,10 +218,10 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
       results: [], // Clear old results
       hasSearched: false
     }
-    
+
     // Navigate to search results page
     await navigateTo('/search')
-    
+
   } catch (error) {
     console.error('Traditional search error:', error)
     toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
@@ -237,7 +248,7 @@ async function aiSearchSubmit(query: string) {
   try {
     await animateFormToDock()
     setSearchPending(true)
-    
+
     // Set search parameters and navigate instead of fetching here
     // The search page will handle the fetch
     searchState.value = {
@@ -252,7 +263,7 @@ async function aiSearchSubmit(query: string) {
 
     // Navigate to search results page
     await navigateTo('/search')
-      
+
     window.scrollTo({
       top: 0,
       behavior: "instant"
@@ -279,7 +290,7 @@ onMounted(() => {
 const hasLocation = computed(() => {
   // Prevent hydration mismatch by ensuring we match server state (false) until mounted
   if (!isMounted.value) return false
-  
+
   const { location } = asObject(searchState.value)
 
   return !!location
@@ -294,6 +305,22 @@ const hasLocation = computed(() => {
   z-index: 2;
   text-align: left;
 
+  &__scrollbox {
+    display: contents;
+
+    &--fullscreen {
+      display: block;
+      position: fixed;
+      inset: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+  }
+
+  &__scrollbox--fullscreen &__form-height {
+    margin: var(--size-96) auto;
+  }
+
   &__form-height {
     height: 7em;
     overflow: visible;
@@ -307,15 +334,19 @@ const hasLocation = computed(() => {
     content: '';
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0);
+    background: var(--background-100);
+    opacity: 0;
     z-index: -1;
     pointer-events: none;
-    transition: background-color var(--animation-slow);
+    transition: opacity var(--animation-slow);
   }
 
-  &--backdrop::before,
-  &:hover::before {
-    background: rgba(0, 0, 0, 0.4);
+  &:not(&--backdrop):hover::before {
+    opacity: 0.125;
+  }
+
+  &--backdrop::before {
+    opacity: 1;
   }
 
   &__backdrop {
