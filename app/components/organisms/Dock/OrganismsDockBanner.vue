@@ -1,6 +1,6 @@
 <template>
   <section class="o-dock-banner__scrollbox" :class="{
-    'o-dock-banner__scrollbox--fullscreen': isExpanded && hasLocation
+    'o-dock-banner__scrollbox--fullscreen': isExpandedWithLocation
   }" role="presentation">
     <div class="o-dock-banner__form-height" role="presentation" v-bind="$attrs">
       <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
@@ -15,7 +15,7 @@
           <MoleculesAiSearchFormLocation />
 
           <client-only>
-            <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
+            <Transition v-show="isExpandedWithLocation" name="o-dock-banner">
 
               <OrganismsFilterSwitcher>
                 <template v-slot:traditional>
@@ -290,6 +290,11 @@ const hasLocation = computed(() => {
   return import.meta.client && !!location
 })
 
+/**
+ *  Simplify tracking isExpandedWithLocation
+ */
+const isExpandedWithLocation = computed(() => {
+  return hasLocation.value && isExpanded.value
 
 
 })
