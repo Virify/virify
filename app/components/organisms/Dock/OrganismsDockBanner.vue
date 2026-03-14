@@ -3,7 +3,7 @@
     'o-dock-banner__scrollbox--fullscreen': isExpandedWithLocation
   }" role="presentation">
     <div class="o-dock-banner__form-height" role="presentation" v-bind="$attrs">
-      <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
+      <div ref="$dock" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
         @focusin="showExpandedForm">
         <div class="o-dock-banner__backdrop | elevate-300" :class="{
           'o-dock-banner__backdrop--hidden': !hasLocation
@@ -173,15 +173,6 @@ function showExpandedForm() {
 }
 
 /**
- *  Close form on click outside
- */
-const $formWrapper = useTemplateRef('$focusWrapper')
-
-onClickOutside($formWrapper, () => {
-  isExpanded.value = false
-})
-
-/**
  *  Fetch filters
  */
 const { setQuery, setListingType, searchState, setSearchPending } = useSearchState()
@@ -295,7 +286,15 @@ const hasLocation = computed(() => {
  */
 const isExpandedWithLocation = computed(() => {
   return hasLocation.value && isExpanded.value
+})
 
+/**
+ *  Close form on click outside
+ */
+const $dock = useTemplateRef('$dock')
+
+onClickOutside($dock, () => {
+  isExpanded.value = false
 
 })
 </script>
