@@ -195,7 +195,7 @@ const initialQuery = computed(() => {
 })
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const { location, radius } = asObject(searchState.value)
+  const { location } = asObject(searchState.value)
 
   if (!location) {
     return
