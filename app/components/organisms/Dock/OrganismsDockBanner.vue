@@ -184,7 +184,7 @@ onClickOutside($formWrapper, () => {
 /**
  *  Fetch filters
  */
-const { setQuery, setListingType, setSearchType, setResults, searchState, setSearchPending, setQueryAnalysis } = useSearchState()
+const { setQuery, setListingType, searchState, setSearchPending } = useSearchState()
 const { checkContent, isChecking } = useModeration()
 const toast = useToast()
 
