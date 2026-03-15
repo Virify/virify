@@ -370,6 +370,7 @@ watch(isExpandedWithLocation, async () => {
 
   &__scrollbox--fullscreen &__form-height {
     margin-top: 70px;
+    max-width: calc(100vw - var(--size-48));
 
     @include mq.tablet {
       margin-top: 120px;
