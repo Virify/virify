@@ -501,7 +501,7 @@ useIntersectionObserver($root, ([entry]) => {
   }
 
   &__location-radius--active {
-    background-color: var(--secondary-400);
+    background-color: var(--primary-400);
     color: var(--monochrome-900);
   }
 
@@ -592,7 +592,7 @@ useIntersectionObserver($root, ([entry]) => {
 
   &__saved-pill-icon {
     display: block;
-    color: var(--secondary-500);
+    color: var(--primary-500);
     width: var(--size-20);
     height: var(--size-20);
   }
@@ -656,7 +656,7 @@ useIntersectionObserver($root, ([entry]) => {
     text-align: center;
     padding: var(--size-8);
     font-weight: var(--font-bold);
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
     border-radius: var(--border-radius-ui);
 
@@ -667,8 +667,8 @@ useIntersectionObserver($root, ([entry]) => {
     }
 
     &--clicked {
-      background-color: var(--secondary-500);
-      outline: 2px solid var(--secondary-400);
+      background-color: var(--primary-500);
+      outline: 2px solid var(--primary-400);
     }
   }
 }

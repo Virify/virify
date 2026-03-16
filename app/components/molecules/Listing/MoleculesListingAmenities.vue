@@ -192,7 +192,7 @@ function getMapUrl(item: any) {
     a {
       color: inherit;
       text-decoration: underline;
-      text-decoration-color: var(--secondary-400);
+      text-decoration-color: var(--primary-400);
       text-underline-offset: 2px;
     }
   }

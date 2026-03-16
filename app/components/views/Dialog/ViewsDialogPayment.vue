@@ -5,39 +5,17 @@
     <p v-if="!paymentSuccess" class="| title-xs">
       <span class="payment-dialog__tier">{{ tier?.tier }}</span> Tier - £{{ tier?.price }}/month
     </p>
-    
+
     <div v-if="!paymentProcessing && !paymentSuccess" class="| flow flow-md">
       <div class="payment-dialog__form | flow flow-md">
-        <AtomsInput 
-          v-model="cardNumber" 
-          type="text" 
-          placeholder="Card Number" 
-          autocomplete="cc-number"
-          class="body-sm"
-        />
+        <AtomsInput v-model="cardNumber" type="text" placeholder="Card Number" autocomplete="cc-number"
+          class="body-sm" />
         <div class="payment-dialog__form-row">
-          <AtomsInput 
-            v-model="expiryDate" 
-            type="text" 
-            placeholder="MM/YY" 
-            autocomplete="cc-exp" 
-            class="body-sm" 
-          />
-          <AtomsInput 
-            v-model="cvv" 
-            type="text" 
-            placeholder="CVV" 
-            autocomplete="cc-csc" 
-            class="body-sm" 
-          />
+          <AtomsInput v-model="expiryDate" type="text" placeholder="MM/YY" autocomplete="cc-exp" class="body-sm" />
+          <AtomsInput v-model="cvv" type="text" placeholder="CVV" autocomplete="cc-csc" class="body-sm" />
         </div>
-        <AtomsInput 
-          v-model="cardholderName" 
-          type="text" 
-          placeholder="Cardholder Name" 
-          autocomplete="cc-name"
-          class="body-sm" 
-        />
+        <AtomsInput v-model="cardholderName" type="text" placeholder="Cardholder Name" autocomplete="cc-name"
+          class="body-sm" />
       </div>
 
       <p v-if="!paymentSuccess" class="payment-dialog__info | body-xs">This is for testing <strong>*do not*</strong> put
@@ -46,21 +24,12 @@
         processed at all.</p>
 
       <div class="payment-dialog__actions">
-        <AtomsButton 
-          type="button" 
-          @click="onCancel" 
-          class="| button-quiet" 
-          :disabled="paymentProcessing"
-        > 
-        Cancel
+        <AtomsButton type="button" @click="onCancel" class="| button-quiet" :disabled="paymentProcessing">
+          Cancel
         </AtomsButton>
-        <AtomsButton 
-          type="button" 
-          @click="processPayment" 
-          class="| button-secondary"
-          :disabled="paymentProcessing || !isFormValid"
-        > 
-          Pay Now 
+        <AtomsButton type="button" @click="processPayment" class="| button-secondary"
+          :disabled="paymentProcessing || !isFormValid">
+          Pay Now
         </AtomsButton>
       </div>
     </div>
@@ -156,7 +125,7 @@ function processPayment() {
 .payment-dialog {
 
   &__title {
-   color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__tier {
@@ -191,7 +160,7 @@ function processPayment() {
     display: flex;
     justify-content: center;
     margin-bottom: var(--size-16);
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__success {

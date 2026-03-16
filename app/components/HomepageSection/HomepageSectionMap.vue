@@ -193,7 +193,7 @@ const markers: Marker[] = [
     }
 
     &--featured {
-      --marker-bg: var(--secondary-400);
+      --marker-bg: var(--primary-400);
 
       font-size: var(--font-sm);
 

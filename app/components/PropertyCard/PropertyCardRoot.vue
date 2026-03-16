@@ -260,11 +260,11 @@ const validIcons = computed(() => {
     }
 
     &--enquire[href] {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
 
       &:hover {
-        background: var(--secondary-300);
+        background: var(--primary-300);
         color: var(--monochrome-900);
       }
     }

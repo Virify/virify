@@ -141,7 +141,7 @@ onMounted(() => {
     transition: all 0.2s ease;
 
     &:hover {
-      color: var(--secondary-500);
+      color: var(--primary-500);
     }
 
     &.active {

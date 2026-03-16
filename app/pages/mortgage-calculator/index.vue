@@ -140,7 +140,7 @@ useSchemaOrg([
 }
 
 .mortgage-hero {
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
   color: var(--monochrome-900);
   display: flex;
   align-items: center;
@@ -167,7 +167,7 @@ useSchemaOrg([
   }
 
   &--gradient {
-    background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+    background: linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
     color: var(--monochrome-900);
   }
 
@@ -200,7 +200,7 @@ useSchemaOrg([
   padding: var(--size-120) 0;
 
   &--gradient {
-    background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+    background: linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
     color: var(--monochrome-900);
   }
 

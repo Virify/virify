@@ -55,7 +55,7 @@ const circleClass = computed(() => `stepper-step__circle--${props.variant}`)
     justify-content: center;
     margin-bottom: var(--size-16);
     border: 4px solid #fff;
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.2s;
 
     &--blue {
@@ -63,7 +63,7 @@ const circleClass = computed(() => `stepper-step__circle--${props.variant}`)
     }
 
     &--secondary {
-      background: var(--secondary-400);
+      background: var(--primary-400);
     }
   }
 

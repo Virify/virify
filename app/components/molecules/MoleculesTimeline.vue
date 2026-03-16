@@ -98,12 +98,12 @@ const formatDisplayDate = (date: string | Date): string => {
   }
 
   &__type-pill {
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
   }
 
   &__duration-pill {
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
   }
 
@@ -141,7 +141,7 @@ const formatDisplayDate = (date: string | Date): string => {
       top: var(--size-16);
       width: var(--size-16);
       height: var(--size-16);
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
       border-radius: 50%;
       z-index: 2;
     }
@@ -161,7 +161,7 @@ const formatDisplayDate = (date: string | Date): string => {
       top: calc(var(--size-16) + var(--size-16));
       width: 2px;
       height: calc(100% + var(--size-16));
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
       z-index: 1;
     }
 

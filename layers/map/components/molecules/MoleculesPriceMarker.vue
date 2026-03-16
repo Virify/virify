@@ -88,8 +88,8 @@ const hoverState = useCardHoverState()
   }
 
   &--featured {
-    --marker-background: var(--secondary-400);
-    --marker-border: var(--secondary-300);
+    --marker-background: var(--primary-400);
+    --marker-border: var(--primary-300);
 
     .a-favourite-button {
       --favourite-colour: var(--monochrome-900);
@@ -101,7 +101,7 @@ const hoverState = useCardHoverState()
   }
 
   &--premium {
-    --marker-foreground: var(--primary-500);
+    --marker-foreground: var(--secondary--500);
 
     min-width: 17ch;
   }

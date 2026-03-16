@@ -75,24 +75,24 @@ const contentFormatted = computed(() => {
     flex-shrink: 0;
     width: var(--size-18);
     height: var(--lineheight-sm);
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   // Use semantic mark element instead of span
   mark {
     background: transparent;
-    color: var(--secondary-400);
+    color: var(--primary-400);
     font-weight: 600;
   }
 
   // Variants
   &--filled {
-    background: var(--secondary-400);
-    border-color: var(--secondary-300);
+    background: var(--primary-400);
+    border-color: var(--primary-300);
     color: var(--monochrome-900);
 
     &:hover {
-      background: var(--secondary-300);
+      background: var(--primary-300);
     }
 
     svg {

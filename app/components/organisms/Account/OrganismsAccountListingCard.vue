@@ -259,8 +259,8 @@ const getTierClass = (item: RecentItem): Record<string, boolean> => {
 
   &__card--featured {
     .account-card__note-btn {
-      --notes-active-color: var(--secondary-400);
-      --notes-dot-color: var(--secondary-400);
+      --notes-active-color: var(--primary-400);
+      --notes-dot-color: var(--primary-400);
     }
   }
 

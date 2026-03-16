@@ -86,7 +86,7 @@ defineProps<Props>()
   }
 
   &__top {
-    background: var(--secondary-400);
+    background: var(--primary-400);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -123,7 +123,7 @@ defineProps<Props>()
     }
 
     &.tier-featured {
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
       color: var(--foreground-100);
     }
 

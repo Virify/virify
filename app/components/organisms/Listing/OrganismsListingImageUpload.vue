@@ -471,13 +471,13 @@ defineExpose({
     }
 
     &:hover:not(&--disabled) {
-      border-color: var(--secondary-400);
+      border-color: var(--primary-400);
       background: var(--background-100);
     }
 
     &--dragging {
-      border-color: var(--primary-500);
-      background: var(--primary-50);
+      border-color: var(--secondary--500);
+      background: var(--secondary--50);
     }
 
     &--disabled {
@@ -532,7 +532,7 @@ defineExpose({
 
   &__progress-fill {
     height: 100%;
-    background: var(--primary-500);
+    background: var(--secondary--500);
     transition: width 0.3s ease;
   }
 
@@ -609,7 +609,7 @@ defineExpose({
   }
 
   &__input {
-    border: 1px solid var(--secondary-400);
+    border: 1px solid var(--primary-400);
   }
 
   &__select {

@@ -145,7 +145,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
   // Tier variants
   &--featured {
     background-color: var(--background-100);
-    border-color: var(--secondary-400);
+    border-color: var(--primary-400);
 
     .summary-card__banner {
       left: -1px;
@@ -153,11 +153,11 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     }
 
     .summary-card__price {
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
 
     .summary-card__actions {
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
     }
 
     .summary-card__view-btn {
@@ -170,14 +170,14 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     color: var(--monochrome-900);
 
     .summary-card__banner {
-      background-color: var(--primary-400);
+      background-color: var(--secondary--400);
       color: var(--monochrome-300);
       left: -1px;
       top: -1px;
     }
 
     .summary-card__price {
-      color: var(--primary-400);
+      color: var(--secondary--400);
     }
 
     .summary-card__price-type {
@@ -193,15 +193,15 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     }
 
     .summary-card__actions {
-      background-color: var(--primary-400);
+      background-color: var(--secondary--400);
     }
 
     .summary-card__view-btn {
       color: var(--monochrome-100);
-      background: var(--primary-400);
+      background: var(--secondary--400);
 
       &:hover {
-        background-color: var(--primary-300);
+        background-color: var(--secondary--300);
       }
     }
 
@@ -209,7 +209,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
   // Banner
   &__banner {
-    background-color: var(--secondary-400);
+    background-color: var(--primary-400);
     border-radius: calc(var(--border-radius-2xl) - 4px) 0 var(--border-radius-lg) 0;
     color: var(--monochrome-900);
     left: -2px;
@@ -304,7 +304,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
       transition: border-color 0.2s;
 
       &:hover {
-        border-color: var(--secondary-400);
+        border-color: var(--primary-400);
       }
     }
   }

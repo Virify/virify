@@ -112,7 +112,7 @@ function keyboardSubmit(e: KeyboardEvent) {
 
   &:hover:not(:disabled) {
     color: var(--monochrome-900);
-    background: var(--secondary-400);
+    background: var(--primary-400);
   }
 
   &:disabled {
@@ -122,7 +122,7 @@ function keyboardSubmit(e: KeyboardEvent) {
   }
 
   &--loading {
-    background: var(--secondary-400);
+    background: var(--primary-400);
   }
 
   svg {

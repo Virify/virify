@@ -40,7 +40,7 @@ const { children } = defineProps<Props>()
 
     &:hover {
       background: transparent;
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
   }
 }

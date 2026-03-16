@@ -88,8 +88,8 @@ console.log("OrganismsListingOverview loaded with props:", props.address);
     margin-bottom: var(--size-4);
 
     &__item {
-    background: var(--blue-400);
-    color: var(--monochrome-900);
+      background: var(--blue-400);
+      color: var(--monochrome-900);
     }
   }
 
@@ -103,7 +103,7 @@ console.log("OrganismsListingOverview loaded with props:", props.address);
   }
 
   &__address {
-    color: var(--secondary-400);
+    color: var(--primary-400);
     margin: 0;
     font-weight: 500;
     text-align: center;

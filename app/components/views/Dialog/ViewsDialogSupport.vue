@@ -124,7 +124,7 @@ onUnmounted(() => {
 
     &:focus {
       outline: none;
-      border-color: var(--secondary-400);
+      border-color: var(--primary-400);
     }
 
     &:disabled {
@@ -148,7 +148,7 @@ onUnmounted(() => {
 
     &:focus {
       outline: none;
-      border-color: var(--secondary-400);
+      border-color: var(--primary-400);
     }
 
     &:disabled {

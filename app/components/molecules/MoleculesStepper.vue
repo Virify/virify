@@ -32,7 +32,7 @@
     left: calc(-50vw + 50%);
     right: calc(-50vw + 50%);
     height: 4px;
-    background: linear-gradient(90deg, var(--blue-400), var(--secondary-400));
+    background: linear-gradient(90deg, var(--blue-400), var(--primary-400));
     z-index: 1;
     border-radius: 2px;
   }
@@ -61,7 +61,7 @@
       left: 28px;
       width: 4px;
       height: calc(100% - 90px);
-      background: linear-gradient(180deg, var(--blue-400), var(--secondary-400));
+      background: linear-gradient(180deg, var(--blue-400), var(--primary-400));
       z-index: 0;
     }
   }

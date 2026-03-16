@@ -187,25 +187,25 @@ callOnce(async () => {
    *  Hover, active state
    */
   &__input:hover {
-    border-color: var(--secondary-400);
+    border-color: var(--primary-400);
   }
 
   &__list-item:has(button[aria-expanded=true]) &__input,
   &__list-item:has(&__dropdown:hover):not(:has(input:checked)) &__input {
-    border-color: light-dark(var(--secondary-700), var(--secondary-200));
+    border-color: light-dark(var(--primary-700), var(--primary-200));
   }
 
   &__list-item:has(input:checked) &__input {
-    border-color: var(--secondary-500);
-    background-color: light-dark(var(--secondary-900), var(--background-100));
+    border-color: var(--primary-500);
+    background-color: light-dark(var(--primary-900), var(--background-100));
   }
 
   &__list-item:has(input:checked) &__dropdown {
-    background-color: var(--secondary-500);
+    background-color: var(--primary-500);
     color: var(--monochrome-100);
 
     &:hover {
-      background-color: var(--secondary-600);
+      background-color: var(--primary-600);
       color: var(--monochrome-100);
     }
   }

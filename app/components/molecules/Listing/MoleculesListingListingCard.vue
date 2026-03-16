@@ -308,7 +308,7 @@ const canPublish = computed(() => {
 
   &__price {
     margin: 0;
-    color: var(--tier-color, var(--secondary-400));
+    color: var(--tier-color, var(--primary-400));
   }
 
   &__badges {
@@ -318,7 +318,7 @@ const canPublish = computed(() => {
   }
 
   &__pill {
-    background: var(--tier-color, var(--secondary-400));
+    background: var(--tier-color, var(--primary-400));
     color: var(--background-200);
     text-transform: capitalize;
 
@@ -451,7 +451,7 @@ const canPublish = computed(() => {
   }
 
   &.draft-card--featured {
-    --tier-color: var(--secondary-400);
+    --tier-color: var(--primary-400);
 
     .button:not([disabled]) {
       background-color: var(--tier-color);

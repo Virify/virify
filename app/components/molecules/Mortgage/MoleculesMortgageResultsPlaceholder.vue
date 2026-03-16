@@ -79,7 +79,7 @@
       border-radius: var(--border-radius-md);
 
       svg {
-        color: var(--primary-300);
+        color: var(--secondary--300);
         flex-shrink: 0;
       }
     }

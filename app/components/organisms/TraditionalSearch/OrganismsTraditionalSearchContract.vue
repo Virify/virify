@@ -255,8 +255,8 @@ function updateIsBuy(newValue: boolean) {
 
   &__price-slider {
     --track-empty-color: var(--blue-500);
-    --track-fill-color: var(--secondary-500);
-    --track-thumb-color: var(--secondary-500);
+    --track-fill-color: var(--primary-500);
+    --track-thumb-color: var(--primary-500);
     --track-thumb-border: none;
   }
 
@@ -267,7 +267,7 @@ function updateIsBuy(newValue: boolean) {
 
     &:focus {
       outline: none;
-      border-color: var(--secondary-500);
+      border-color: var(--primary-500);
     }
   }
 }

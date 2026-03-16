@@ -141,7 +141,7 @@
       background-color var(--animation-fast);
 
     &:hover {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
     }
 

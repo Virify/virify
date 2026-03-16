@@ -43,8 +43,8 @@ function closeSelf() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--secondary-800);
-  color: var(--secondary-100);
+  background: var(--primary-800);
+  color: var(--primary-100);
   border-radius: var(--border-radius-xl);
   padding: var(--size-16);
   gap: var(--size-16);
@@ -53,7 +53,7 @@ function closeSelf() {
   &__icon {
     width: var(--size-32);
     height: var(--size-32);
-    color: var(--secondary-400);
+    color: var(--primary-400);
     flex-shrink: 0;
   }
 
@@ -66,11 +66,11 @@ function closeSelf() {
     right: var(--size-6);
     width: var(--size-32);
     height: var(--size-32);
-    color: var(--secondary-100);
+    color: var(--primary-100);
     transition: color var(--animation-fast);
 
     &:hover {
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
 
     .a-icon {

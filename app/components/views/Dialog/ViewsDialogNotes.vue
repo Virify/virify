@@ -90,7 +90,7 @@ textarea {
 
   &:focus {
     outline: none;
-    border-color: var(--secondary-400);
+    border-color: var(--primary-400);
   }
 }
 

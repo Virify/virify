@@ -77,7 +77,7 @@ const { searchState } = useSearchState()
     }
 
     &[aria-expanded="true"] {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
     }
   }
@@ -136,7 +136,7 @@ const { searchState } = useSearchState()
     }
 
     &[data-state="checked"] {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
     }
   }

@@ -40,7 +40,7 @@ function clearErrors() {
             <h1 class="error-page__title | title-xl">{{ error?.statusCode }}</h1>
             <h2 class="error-page__title | title-lg">{{ errorTitle || 'Page Not Found' }}</h2>
             <p class="error-page__message | body-md">{{ errorMessage || 'The page you are looking for does not exist.'
-            }}</p>
+              }}</p>
 
             <div class="error-page__actions">
               <NuxtLink to="/" class="button button-tertiary">
@@ -160,7 +160,7 @@ function clearErrors() {
     }
 
     .link {
-      color: var(--secondary-400);
+      color: var(--primary-400);
       text-decoration: none;
       font-weight: 500;
 

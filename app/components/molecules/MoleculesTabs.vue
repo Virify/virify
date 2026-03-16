@@ -68,7 +68,7 @@ const emit = defineEmits(['update:content']);
 function setCurrentOption(index: number) {
   currentIndex.value = index
   focusIndex.value = index
-  
+
   // Emit the content value when tab changes
   if (validOptions.value[index]) {
     emit('update:content', validOptions.value[index].content)
@@ -126,8 +126,8 @@ watch(focusIndex, (newIndex: number) => {
 }
 
 .m-tabs-tabbutton[aria-expanded=true] {
-  color: var(--secondary-400);
-  border-bottom-color: var(--secondary-400);
+  color: var(--primary-400);
+  border-bottom-color: var(--primary-400);
 }
 
 .m-tabs-content {

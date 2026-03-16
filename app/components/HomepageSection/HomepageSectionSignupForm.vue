@@ -173,7 +173,7 @@ function showErrors(errors?: ErrorBoxProp) {
 
     a {
       text-decoration: none;
-      color: var(--secondary-400);
+      color: var(--primary-400);
       font: inherit;
     }
   }

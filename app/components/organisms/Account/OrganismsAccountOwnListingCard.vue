@@ -248,7 +248,7 @@ const handleArchive = async () => {
 
   &__price {
     margin: 0;
-    color: var(--tier-color, var(--secondary-400));
+    color: var(--tier-color, var(--primary-400));
   }
 
   &__badges {
@@ -258,7 +258,7 @@ const handleArchive = async () => {
   }
 
   &__pill {
-    background: var(--tier-color, var(--secondary-400));
+    background: var(--tier-color, var(--primary-400));
     color: var(--background-200);
     text-transform: capitalize;
 
@@ -267,7 +267,7 @@ const handleArchive = async () => {
     }
 
     &--active {
-      background: var(--tier-color, var(--secondary-400));
+      background: var(--tier-color, var(--primary-400));
       color: var(--background-200);
     }
 
@@ -406,7 +406,7 @@ const handleArchive = async () => {
   }
 
   &.own-card--featured {
-    --tier-color: var(--secondary-400);
+    --tier-color: var(--primary-400);
 
     .button {
       background-color: var(--tier-color);
@@ -487,7 +487,7 @@ const handleArchive = async () => {
 }
 
 input:checked+.slider {
-  background-color: var(--tier-color, var(--secondary-400));
+  background-color: var(--tier-color, var(--primary-400));
 }
 
 input:checked+.slider:before {

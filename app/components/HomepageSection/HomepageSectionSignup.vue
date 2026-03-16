@@ -131,7 +131,7 @@
     font-size: 0.6em;
     line-height: var(--lineheight-xs);
     font-weight: var(--font-semibold);
-    color: var(--secondary-400);
+    color: var(--primary-400);
     margin: 0 auto var(--size-16);
   }
 }

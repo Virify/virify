@@ -250,7 +250,7 @@ const customComponents = {
       &::before {
         position: absolute;
         left: 0;
-        color: var(--secondary-400);
+        color: var(--primary-400);
         font-weight: 600;
       }
     }
@@ -289,7 +289,7 @@ const customComponents = {
     margin: var(--size-40) 0;
     padding: var(--size-24) var(--size-32);
     background: linear-gradient(135deg, var(--background-200) 0%, var(--background-100) 100%);
-    border-left: 4px solid var(--secondary-400);
+    border-left: 4px solid var(--primary-400);
     border-radius: var(--border-radius-lg);
     font-style: italic;
     font-size: var(--font-md);
@@ -307,14 +307,14 @@ const customComponents = {
       left: var(--size-16);
       font-size: 4rem;
       line-height: 1;
-      color: var(--secondary-400);
+      color: var(--primary-400);
       opacity: 0.2;
     }
   }
 
   // Enhanced links
   a {
-    color: var(--secondary-400);
+    color: var(--primary-400);
     text-decoration: none;
     position: relative;
     font-weight: 500;
@@ -327,14 +327,14 @@ const customComponents = {
       bottom: -2px;
       width: 100%;
       height: 2px;
-      background: var(--secondary-400);
+      background: var(--primary-400);
       transform: scaleX(0);
       transform-origin: right;
       transition: transform 0.3s ease;
     }
 
     &:hover {
-      color: var(--secondary-500);
+      color: var(--primary-500);
 
       &::after {
         transform: scaleX(1);
@@ -350,7 +350,7 @@ const customComponents = {
     border-radius: var(--border-radius-sm);
     font-family: 'Fira Code', 'Courier New', monospace;
     font-size: 0.875em;
-    color: var(--secondary-400);
+    color: var(--primary-400);
     border: 1px solid var(--background-300);
   }
 
@@ -516,12 +516,12 @@ const customComponents = {
 
   &--warning {
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
-    border-left-color: var(--secondary-500);
+    border-left-color: var(--primary-500);
   }
 
   &--success {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
-    border-left-color: var(--primary-500);
+    border-left-color: var(--secondary--500);
   }
 
   &--error {

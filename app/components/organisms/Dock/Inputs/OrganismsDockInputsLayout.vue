@@ -216,7 +216,7 @@ watch(options, (newValue) => {
   }
 
   &--loading &__label:has(input:checked) {
-    background: var(--secondary-400);
+    background: var(--primary-400);
   }
 
   &__label-text {
@@ -233,7 +233,7 @@ watch(options, (newValue) => {
     height: 100%;
     left: 0;
     width: 0;
-    background: var(--secondary-400);
+    background: var(--primary-400);
     border-radius: var(--border-radius-2xl);
     z-index: -1;
   }

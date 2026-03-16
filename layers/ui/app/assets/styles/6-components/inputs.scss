@@ -44,7 +44,7 @@
   display: inline-block;
   padding: 0.1em 0.35em;
   margin: 1px 0;
-  border: 2px solid #{fn.faded-color(40%, var(--secondary-500))};
+  border: 2px solid #{fn.faded-color(40%, var(--primary-500))};
   border-radius: var(--border-radius-md);
   white-space: nowrap;
   min-width: 4ch;
@@ -52,7 +52,7 @@
   field-sizing: content;
 
   &:focus {
-    border-color: var(--secondary-500);
+    border-color: var(--primary-500);
     outline: none;
   }
 }

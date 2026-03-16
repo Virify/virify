@@ -124,7 +124,7 @@ async function saveLocation() {
   position: relative;
 
   &:focus-within {
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__popover {

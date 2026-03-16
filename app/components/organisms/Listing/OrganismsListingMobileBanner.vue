@@ -422,7 +422,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
   }
 
   &__additional-info-address {
-    color: var(--secondary-400);
+    color: var(--primary-400);
     margin: var(--size-8) 0;
     text-align: center;
     font-weight: 500;

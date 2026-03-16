@@ -108,7 +108,7 @@ watch(emblaOptions, (newProps) => {
     transition: background-color var(--animation-fast), opacity var(--animation-slow);
 
     &:hover {
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
     }
 
     .a-icon {

@@ -75,7 +75,7 @@ defineProps<Props<T>>()
     transition: color var(--animation-fast);
 
     &:hover {
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
 
     svg {

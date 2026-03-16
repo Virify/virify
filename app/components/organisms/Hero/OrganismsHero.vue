@@ -49,13 +49,13 @@ const showSearch = props.search && !isWaitingListMode.value;
 
 // Helpers
 @mixin hero-gradient() {
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
 }
 
 @mixin hero-background() {
   background:
     url("/img/logo-background.svg") no-repeat top right,
-    linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+    linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
   background-size:
     auto 120%,
     cover;

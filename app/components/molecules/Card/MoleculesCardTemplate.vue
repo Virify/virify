@@ -249,17 +249,17 @@ watch(useElementHover($hoverCard), (isHovered) => {
   }
 
   &--featured {
-    --card-colour: var(--secondary-500);
+    --card-colour: var(--primary-500);
     --card-background: var(--background-100);
-    --card-background-overlay: light-dark(var(--secondary-800), var(--background-100));
-    --card-background-pill: light-dark(var(--secondary-800), var(--background-100));
-    --card-border-colour: var(--secondary-600);
-    --card-button-background: var(--secondary-400);
+    --card-background-overlay: light-dark(var(--primary-800), var(--background-100));
+    --card-background-pill: light-dark(var(--primary-800), var(--background-100));
+    --card-border-colour: var(--primary-600);
+    --card-button-background: var(--primary-400);
     --card-button-foreground: var(--monochrome-100);
-    --card-button-background-hover: var(--secondary-500);
+    --card-button-background-hover: var(--primary-500);
     --card-button-foreground-hover: var(--monochrome-100);
-    --card-button-border-colour: var(--secondary-400);
-    --card-bookmark-colour: var(--secondary-400);
+    --card-button-border-colour: var(--primary-400);
+    --card-bookmark-colour: var(--primary-400);
 
   }
 
@@ -293,19 +293,19 @@ watch(useElementHover($hoverCard), (isHovered) => {
 
   &--premium {
     --card-foreground: var(--monochrome-900);
-    --card-colour: var(--primary-400);
+    --card-colour: var(--secondary--400);
     --card-background: var(--blue-400);
     --card-background-overlay: var(--blue-300);
     --card-background-pill: var(--blue-400);
     --card-border-colour: var(--blue-600);
-    --card-button-background: var(--primary-400);
+    --card-button-background: var(--secondary--400);
     --card-button-foreground: var(--monochrome-100);
-    --card-button-background-hover: var(--primary-600);
+    --card-button-background-hover: var(--secondary--600);
     --card-button-foreground-hover: var(--monochrome-100);
-    --card-button-border-colour: var(--primary-400);
+    --card-button-border-colour: var(--secondary--400);
     --card-bookmark-colour: var(--card-colour);
 
-    border: 4px solid var(--primary-500);
+    border: 4px solid var(--secondary--500);
 
     @container listing-card (width > 900px) {
       --card-layout: horizontal;

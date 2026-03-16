@@ -16,13 +16,13 @@
   --input-toggle-border: light-dark(var(--blue-700), var(--blue-300));
 
   // General accent colours
-  --input-accent-colour: var(--secondary-400);
+  --input-accent-colour: var(--primary-400);
   --input-accent-inactive: var(--monochrome-500);
-  --input-accent-colour-hover: var(--secondary-400);
+  --input-accent-colour-hover: var(--primary-400);
   --input-accent-inactive-hover: var(--monochrome-400);
 
   // Focus states
   --outline-size: 3px;
-  --outline-color: #{fn.faded-color(60%, var(--secondary-400))};
+  --outline-color: #{fn.faded-color(60%, var(--primary-400))};
   --focus-outline: var(--outline-size) solid var(--outline-color);
 }

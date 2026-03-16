@@ -135,7 +135,7 @@ const skeletonCategories = [
     a {
       color: inherit;
       text-decoration: underline;
-      text-decoration-color: var(--secondary-400);
+      text-decoration-color: var(--primary-400);
       text-underline-offset: 2px;
     }
   }
@@ -143,7 +143,7 @@ const skeletonCategories = [
   &__fake-link {
     color: inherit;
     text-decoration: underline;
-    text-decoration-color: var(--secondary-400);
+    text-decoration-color: var(--primary-400);
     text-underline-offset: 2px;
     pointer-events: none; // Disable clicking on the fake link
   }

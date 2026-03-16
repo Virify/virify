@@ -134,11 +134,11 @@ function handleDeleteSelectedShape() {
 }
 
 .m-map-draw-controls-button-active {
-  background-color: var(--secondary-500) !important;
+  background-color: var(--primary-500) !important;
   color: var(--monochrome-100) !important;
 
   &:hover {
-    background-color: var(--secondary-600) !important;
+    background-color: var(--primary-600) !important;
   }
 }
 
