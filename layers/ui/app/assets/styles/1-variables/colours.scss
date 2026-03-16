@@ -30,25 +30,26 @@
   --monochrome-900: #FFFFFF;
 
   /**
-   *  Primary
+   *  Primary/Orange
    */
-  --blue-0: #020205;
-  --blue-50: #040409;
-  --blue-100: #0B0B1C;
-  --blue-200: #0F0F25;
-  --blue-300: #13132E;
-  --blue-400: #2D2D4F;
-  --blue-500: #474770;
-  --blue-600: #9595D3;
-  --blue-700: #B7B7EB;
-  --blue-800: #D8D8FF;
-  --blue-900: #EFEFFF;
+  --primary-0: #1E0101; // Not used, just for TW config completeness
+  --primary-50: #390202; // Not used, just for TW config completeness
+  --primary-100: #4D0505;
+  --primary-200: #700900;
+  --primary-300: #B13807;
+  --primary-400: #E8591E;
+  --primary-500: #FC7239;
+  --primary-600: #FFAC8A;
+  --primary-700: #FFC8B1;
+  --primary-800: #FFDDCF;
+  --primary-900: #FFECE4;
 
   /**
-   *  Green
+   *  Secondary/Green
+   *  @deprectated - avoid using this colour
    */
-  --secondary--0: #030400;
-  --secondary--50: #2B330C;
+  --secondary--0: #030400; // Not used, just for TW config completeness
+  --secondary--50: #2B330C; // Not used, just for TW config completeness
   --secondary--100: #3F4B12;
   --secondary--200: #536218;
   --secondary--300: #A4C031;
@@ -60,25 +61,26 @@
   --secondary--900: #FAFDEC;
 
   /**
-   *  Orange
+   *  Blue
    */
-  --primary-0: #0D0400;
-  --primary-50: #3D1A0B;
-  --primary-100: #552511;
-  --primary-200: #6D3017;
-  --primary-300: #CC5C2E;
-  --primary-400: #FC7239;
-  --primary-500: #FD8E61;
-  --primary-600: #FDAA88;
-  --primary-700: #FEC7B0;
-  --primary-800: #FEE3D7;
-  --primary-900: #FFF1EB;
+  --blue-0: #080B0D; // Not used, just for TW config completeness
+  --blue-50: #11191E; // Not used, just for TW config completeness
+  --blue-100: #17242C;
+  --blue-200: #26333C;
+  --blue-300: #2B3945;
+  --blue-400: #394956;
+  --blue-500: #7A95A2;
+  --blue-600: #C3D0D8;
+  --blue-700: #E0E7EB;
+  --blue-800: #E9EDF1;
+  --blue-900: #F5F8FA;
 
   /**
-   *  Orange
+   *  Tertiary/Blue
+   *  @deprectated - avoid using this colour
    */
-  --tertiary-0: #000910;
-  --tertiary-50: #000E18;
+  --tertiary-0: #000910; // Not used, just for TW config completeness
+  --tertiary-50: #000E18; // Not used, just for TW config completeness
   --tertiary-100: #001320;
   --tertiary-200: #011C31;
   --tertiary-300: #012641;
@@ -92,21 +94,54 @@
   /**
    *  Error colours
    */
-  --error-background: light-dark(#f8e6e6, #342222);
-  --error-background-hover: light-dark(#efd8d8, #4a2b2b);
-  --error-foreground: light-dark(#ef1b1b, #ff6d6d);
-  --error: #ef1b1b;
+  --error-100: #500000;
+  --error-200: #780000;
+  --error-300: #A80000;
+  --error-400: #D00000;
+  --error-500: #F03131;
+  --error-600: #F76565;
+  --error-700: #FFAFAF;
+  --error-800: #FFD8D8;
+  --error-900: #FBE8E8;
+
+  --error-background: light-dark(var(--error-800), var(--error-200));
+  --error-background-hover: light-dark(var(--error-900), var(--error-300));
+  --error-foreground: var(--error-400);
+  --error: var(--error-500);
 
   /**
   *  Success colours
   */
-  --success-background: light-dark(#e6f4ea, #22342a);
-  --success-foreground: light-dark(#1bbf4e, #6dff95);
-  --success-foreground-hover: light-dark(#13a240, #42e06c);
-  --success: #1bbf4e;
+  --success-100: #044C0B;
+  --success-200: #0D7117;
+  --success-300: #23922E;
+  --success-400: #43AE4E;
+  --success-500: #68C773;
+  --success-600: #91D999;
+  --success-700: #B7E4BC;
+  --success-800: #D4F0D7;
+  --success-900: #EAF4EB;
+
+  --success-background: light-dark(var(--success-800), var(--success-300));
+  --success-foreground: light-dark(var(--monochrome-100), var(--monochrome-900));
+  --success-background-hover: light-dark(var(--success-500), var(--success-200));
+  --success: var(--success-500);
 
   /**
-   *
+  *  Warning colours
+  */
+  --warning-100: #C94000;
+  --warning-200: #D36007;
+  --warning-300: #EC8C17;
+  --warning-400: #F5B639;
+  --warning-500: #FED169;
+  --warning-600: #FFE097;
+  --warning-700: #FCEDCA;
+  --warning-800: #FBF3DF;
+  --warning-900: #FBF6E9;
+
+  /**
+   *  Favourites/pink
    */
   --favourite-colour: #FF4A9E;
 

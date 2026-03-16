@@ -200,8 +200,8 @@ function showErrors(errors?: ErrorBoxProp) {
   &__success {
     padding: var(--size-20) var(--size-24) var(--size-24);
     font-weight: var(--font-semisemibold);
-    background: light-dark(var(--success-background), var(--success-foreground));
-    color: var(--monochrome-100);
+    background: var(--success-background);
+    color: var(--success-foreground);
     border-radius: var(--border-radius-2xl);
     box-sizing: border-box;
     width: min(100%, 42ch);
@@ -215,8 +215,8 @@ function showErrors(errors?: ErrorBoxProp) {
 
   &__success-button {
     margin: var(--size-16) 0 0;
-    background: light-dark(var(--success-foreground), var(--success-foreground-hover));
-    color: light-dark(var(--monochrome-900), var(--monochrome-100));
+    background: light-dark(var(--success-400), var(--success-200));
+    color: var(--monochrome-900);
     padding-left: var(--size-24);
     padding-right: var(--size-24);
 
@@ -225,8 +225,7 @@ function showErrors(errors?: ErrorBoxProp) {
     }
 
     &:hover {
-      background: light-dark(var(--success-foreground), var(--success-foreground-hover));
-      color: light-dark(var(--monochrome-900), var(--monochrome-100));
+      background: light-dark(var(--success-300), var(--success-100));
     }
   }
 }
