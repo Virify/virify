@@ -96,7 +96,7 @@ const { searchState } = useSearchState()
   }
 
   &__popover {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-2xl);
     box-shadow: var(--elevate-200);
     overflow: hidden;

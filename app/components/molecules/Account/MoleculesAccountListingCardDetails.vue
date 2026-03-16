@@ -182,6 +182,7 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
     .account-card-details__price {
       color: var(--foreground-100);
     }
+
     .account-card-details__type-pill {
       color: var(--monochrome-900);
     }
@@ -193,9 +194,9 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
 
   &.account-card-details--basic {
     --tier-color: var(--foreground-100);
-    
+
     .account-card-details__type-pill {
-      color: var(--background-100);
+      color: var(--background-200);
     }
   }
 }

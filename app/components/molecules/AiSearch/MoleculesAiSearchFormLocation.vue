@@ -136,7 +136,7 @@ onMounted(() => {
 .m-ai-search-form-location {
 
   &__fieldset {
-    background: var(--background-200);
+    background: var(--background-100);
     color: var(--foreground-100);
     align-items: center;
 
@@ -198,7 +198,7 @@ onMounted(() => {
   }
 
   &__radius {
-    background-color: var(--background-100);
+    background-color: var(--background-200);
     border: 1px solid var(--border-color-200);
     padding: var(--size-10) var(--size-18);
     padding-right: var(--size-48);

@@ -11,15 +11,9 @@
         </ClientOnly>
         <ClientOnly>
           <div class="p-listing-creator__content-inner">
-              <component
-                v-if="draft && (currentSlide as any).component"
-                :is="(currentSlide as any).component"
-                :draft="draft"
-                :error-message="stepErrorMessage"
-                @update-step-data="handleUpdateStepData"
-                @next-step="handleNextStep"
-                @previous-step="() => previousStep(draftId)"
-              />
+            <component v-if="draft && (currentSlide as any).component" :is="(currentSlide as any).component"
+              :draft="draft" :error-message="stepErrorMessage" @update-step-data="handleUpdateStepData"
+              @next-step="handleNextStep" @previous-step="() => previousStep(draftId)" />
             <div v-else class="loading">Loading draft...</div>
           </div>
         </ClientOnly>
@@ -55,14 +49,14 @@ const handleUpdateStepData = async (stepData: any, step: number) => {
     stepUpdateInProgress.value = true;
     lastStepUpdateFailed.value = false;
     stepErrorMessage.value = '';
-    
+
     const result = await handleStepUpdate(draftId, stepperMap, stepData, step);
-    
+
     if (result.success) {
       // Show success toast with step-specific message
       const stepTitle = stepperMap.value[step - 1]?.title || 'Step';
       toast.add({ title: 'Success', description: `${stepTitle} updated`, color: 'success' });
-      
+
       // Success - move to next step
       nextStep(draftId, stepperMap.value.length);
     } else {
@@ -80,7 +74,7 @@ const handleNextStep = () => {
   if (lastStepUpdateFailed.value || stepUpdateInProgress.value) {
     return;
   }
-  
+
   // Clear error message when successfully moving to next step
   stepErrorMessage.value = '';
   nextStep(draftId, stepperMap.value.length);
@@ -130,17 +124,18 @@ const breadcrumbItems = computed(() => [
 </script>
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .p-listing-creator {
   display: flex;
   flex-direction: column;
-  
+
   &__content {
-    background: var(--background-100);
+    background: var(--background-200);
 
     &-inner {
       padding: 0 var(--size-32);
       padding-bottom: var(--size-32);
-      
+
       @include mq.mobile-only {
         padding: var(--size-8);
       }

@@ -151,7 +151,7 @@ async function setLocationFromTrending(option: Partial<TrendingLocation>) {
     // Enhance location with boundary polygon before adding to history
     const enhancedLocation = await enhanceWithBoundaryPolygon(location as GeocodingFeature)
       .catch(() => location as GeocodingFeature)
-    
+
     addLocationToHistory(enhancedLocation)
     emits('location-selected', enhancedLocation)
     suppressAutocomplete.value = true
@@ -165,7 +165,7 @@ async function setLocationFromSaved(option: Partial<UserLocation>) {
     // Enhance location with boundary polygon before adding to history
     const enhancedLocation = await enhanceWithBoundaryPolygon(geocodingFeature as GeocodingFeature)
       .catch(() => geocodingFeature as GeocodingFeature)
-    
+
     addLocationToHistory(enhancedLocation)
     emits('location-selected', enhancedLocation)
     suppressAutocomplete.value = true
@@ -231,7 +231,7 @@ const autocompleteFeedback = computed(() => {
 @use '#styles/_utils/media' as mq;
 
 .m-autocomplete-popover {
-  background-color: var(--background-200);
+  background-color: var(--background-100);
   border-radius: var(--border-radius-xl);
   padding: var(--size-16);
   border: 1px solid var(--border-color-100);
@@ -262,7 +262,7 @@ const autocompleteFeedback = computed(() => {
 
   &__empty {
     padding: var(--size-16);
-    background: var(--background-100);
+    background: var(--background-200);
     border-radius: var(--border-radius-xl);
     text-align: center;
   }

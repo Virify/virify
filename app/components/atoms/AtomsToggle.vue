@@ -1,20 +1,11 @@
 <template>
   <div v-if="hasOptions" class="a-toggle" role="radiogroup" :aria-label="ariaLabel">
     <div v-for="(opt, idx) in options" :key="`option-${idx}-${opt.value}`">
-      <input
-        :key="`input-${idx}-${opt.value}`"
-        type="radio"
-        :id="`toggle-${opt.value}`"
-        class="visually-hidden"
-        :name="name"
-        :value="opt.value"
-        :checked="modelValue === opt.value"
+      <input :key="`input-${idx}-${opt.value}`" type="radio" :id="`toggle-${opt.value}`" class="visually-hidden"
+        :name="name" :value="opt.value" :checked="modelValue === opt.value"
         @change="() => opt.value !== undefined && select(opt.value)" />
 
-      <label
-        :key="`label-${idx}-${opt.value}`"
-        :for="`toggle-${opt.value}`"
-        class="a-toggle__option | body-sm"
+      <label :key="`label-${idx}-${opt.value}`" :for="`toggle-${opt.value}`" class="a-toggle__option | body-sm"
         tabindex="0">
         {{ opt.label ?? opt.name ?? opt.value }}
       </label>
@@ -50,7 +41,7 @@ function select(value: string | number) {
   display: inline-flex;
   margin-top: var(--size-4);
   padding: 3px;
-  background: var(--background-200);
+  background: var(--background-100);
   border-radius: var(--border-radius-2xl);
   border: 1px solid var(--blue-500);
   box-sizing: border-box;
@@ -74,12 +65,13 @@ function select(value: string | number) {
     color: var(--monochrome-900);
   }
 
-  input[type="radio"]:checked + label.a-toggle__option {
+  input[type="radio"]:checked+label.a-toggle__option {
     background: light-dark(var(--blue-400), var(--blue-500));
     color: var(--monochrome-900, #111);
   }
 
   label.a-toggle__option {
+
     &:hover,
     &:focus {
       box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02) inset;

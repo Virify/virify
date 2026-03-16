@@ -75,7 +75,7 @@ onBeforeUnmount(() => {
   top: 0;
   display: flex;
   align-items: center;
-  background: var(--background-100);
+  background: var(--background-200);
   height: var(--header-height);
   padding: 0;
   z-index: 9;

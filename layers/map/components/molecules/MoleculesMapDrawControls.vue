@@ -3,20 +3,14 @@
     <div class="m-map-draw-controls-group">
       <!-- Polygon Drawing Toggle Button -->
       <div class="m-map-draw-controls-item">
-        <AtomsButton
-          :class="[
-            'button-overlay',
-            'm-map-draw-controls-button',
-            { 'm-map-draw-controls-button-active': drawingState.isDrawing }
-          ]"
-          :aria-pressed="drawingState.isDrawing"
+        <AtomsButton :class="[
+          'button-overlay',
+          'm-map-draw-controls-button',
+          { 'm-map-draw-controls-button-active': drawingState.isDrawing }
+        ]" :aria-pressed="drawingState.isDrawing"
           :aria-label="drawingState.isDrawing ? 'Stop drawing polygon' : 'Start drawing polygon'"
-          @click="handleTogglePolygonDrawing"
-        >
-          <AtomsIcon 
-            icon="draw" 
-            :title="drawingState.isDrawing ? 'Stop drawing' : 'Draw new shape'"
-          />
+          @click="handleTogglePolygonDrawing">
+          <AtomsIcon icon="draw" :title="drawingState.isDrawing ? 'Stop drawing' : 'Draw new shape'" />
         </AtomsButton>
         <div class="m-map-draw-controls-label | body-xs font-medium">
           {{ drawingState.isDrawing ? 'Stop drawing' : 'Draw new shape' }}
@@ -25,31 +19,19 @@
 
       <!-- Delete Selected Shape Button (only show when a shape is selected) -->
       <div v-if="drawingState.hasSelectedShape" class="m-map-draw-controls-item">
-        <AtomsButton
-          class="button-overlay m-map-draw-controls-button"
-          :aria-label="'Delete selected shape'"
-          @click="handleDeleteSelectedShape"
-        >
-          <AtomsIcon 
-            icon="cross" 
-            title="Delete selected shape"
-          />
+        <AtomsButton class="button-overlay m-map-draw-controls-button" :aria-label="'Delete selected shape'"
+          @click="handleDeleteSelectedShape">
+          <AtomsIcon icon="cross" title="Delete selected shape" />
         </AtomsButton>
         <div class="m-map-draw-controls-label | body-xs font-medium">Delete selected</div>
       </div>
 
       <!-- Delete All Shapes Button -->
       <div v-else class="m-map-draw-controls-item">
-        <AtomsButton
-          class="button-overlay m-map-draw-controls-button"
-          :disabled="!drawingState.hasShapes"
+        <AtomsButton class="button-overlay m-map-draw-controls-button" :disabled="!drawingState.hasShapes"
           :aria-label="drawingState.hasShapes ? 'Delete all shapes' : 'No shapes to delete'"
-          @click="handleDeleteAllShapes"
-        >
-          <AtomsIcon 
-            icon="cross" 
-            title="Delete all shapes"
-          />
+          @click="handleDeleteAllShapes">
+          <AtomsIcon icon="cross" title="Delete all shapes" />
         </AtomsButton>
         <div class="m-map-draw-controls-label | body-xs font-medium">
           {{ drawingState.hasShapes ? 'Delete all' : 'No shapes' }}
@@ -70,7 +52,7 @@ interface Props {
 const props = defineProps<Props>();
 
 // Use the map composable directly for drawing state and functions
-const { 
+const {
   drawingState,
   togglePolygonDrawing,
   deleteAllShapes,
@@ -121,7 +103,7 @@ function handleDeleteSelectedShape() {
 .m-map-draw-controls-button {
   width: var(--size-56);
   height: var(--size-56);
-  background: var(--background-100);
+  background: var(--background-200);
   padding: 0;
   display: flex;
   align-items: center;
@@ -167,7 +149,7 @@ function handleDeleteSelectedShape() {
 }
 
 .m-map-draw-controls-label {
-  background: var(--background-100);
+  background: var(--background-200);
   color: var(--text-primary);
   padding: var(--size-8) var(--size-12);
   border-radius: var(--border-radius-md);

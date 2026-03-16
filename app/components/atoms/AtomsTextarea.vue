@@ -1,5 +1,6 @@
 <template>
-  <textarea :value="modelValue" :aria-describedby="ariaDescribed" v-bind="$attrs" @input="handleInput" class="a-textarea" />
+  <textarea :value="modelValue" :aria-describedby="ariaDescribed" v-bind="$attrs" @input="handleInput"
+    class="a-textarea" />
 
   <AtomsInlineError v-if="validityText" :id="finalErrorId">
     {{ validityText }}
@@ -51,13 +52,13 @@ function handleInput(event: Event) {
 const { validityText, checkValidity } = useCheckValidity(props.customValidation)
 </script>
 <style lang="scss" scoped>
-  .a-textarea {
-    font-size: var(--font-md);
-    border: 1px solid var(--input-text-border);
-    background: var(--background-200);
-    color: var(--foreground-100);
-    width: 100%;
-    border-radius: var(--border-radius-xl);
-    padding: var(--size-16);
-  }
+.a-textarea {
+  font-size: var(--font-md);
+  border: 1px solid var(--input-text-border);
+  background: var(--background-100);
+  color: var(--foreground-100);
+  width: 100%;
+  border-radius: var(--border-radius-xl);
+  padding: var(--size-16);
+}
 </style>

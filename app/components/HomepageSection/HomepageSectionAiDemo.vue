@@ -271,7 +271,7 @@ const propertyDetails = {
   --radius: var(--border-radius-xl);
 
   padding: var(--size-14);
-  background: var(--background-200);
+  background: var(--background-100);
   min-height: 30em;
 
   @include mq.tablet {
@@ -398,7 +398,7 @@ const propertyDetails = {
   &__card {
     --gradient-box-radius: var(--border-radius-3xl);
 
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-14);
     width: 90%;
     position: absolute;

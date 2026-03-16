@@ -2,7 +2,8 @@
   <div class="stats-card" :class="{
     'animate-in': animated,
   }">
-    <component :is="to ? 'NuxtLink' : 'div'" :to="to" :class="to ? 'stats-card__link' : 'stats-card__content-wrapper'" :aria-label="to ? `Navigate to ${title}` : undefined">
+    <component :is="to ? 'NuxtLink' : 'div'" :to="to" :class="to ? 'stats-card__link' : 'stats-card__content-wrapper'"
+      :aria-label="to ? `Navigate to ${title}` : undefined">
       <div class="stats-card__top" :class="{
         'tier-basic': tier === 'basic',
         'tier-featured': tier === 'featured',
@@ -110,7 +111,7 @@ defineProps<Props>()
       pointer-events: none;
     }
 
-    > * {
+    >* {
       position: relative;
       z-index: 1;
     }
@@ -172,7 +173,7 @@ defineProps<Props>()
   }
 
   &__title {
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-16);
     color: var(--foreground-100);
     text-align: center;

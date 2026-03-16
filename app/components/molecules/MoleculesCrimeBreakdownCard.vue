@@ -13,8 +13,7 @@
       </AtomsSkeletonBar>
     </div>
     <div class="crime-breakdown-card__bar">
-      <div v-if="!loading" class="crime-breakdown-card__fill"
-        :style="{ width: `${percentage}%` }">
+      <div v-if="!loading" class="crime-breakdown-card__fill" :style="{ width: `${percentage}%` }">
       </div>
       <AtomsSkeletonBar v-else loading :width="120" :height="4" />
     </div>
@@ -41,7 +40,7 @@ function formatCategoryName(category: string): string {
 
 <style lang="scss" scoped>
 .crime-breakdown-card {
-  background: var(--background-100);
+  background: var(--background-200);
   border: 1px solid var(--monochrome-600);
   border-radius: var(--border-radius-lg);
   padding: var(--size-16);

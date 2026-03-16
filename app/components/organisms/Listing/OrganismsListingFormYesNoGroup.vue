@@ -1,7 +1,8 @@
 <template>
   <div class="o-form-group">
     <AtomsDivider v-if="divider" />
-    <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+    <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip"
+      :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
       <template #tooltip-content>
         <slot name="tooltip-content">
           <p v-if="tooltip" class="body-sm">{{ tooltip }}</p>
@@ -11,32 +12,18 @@
     <ul class="o-form-group__list">
       <li class="o-form-group__item">
         <label class="o-form-group__label | body-sm" @click.prevent="handleClick(true)">
-          <AtomsPill class="o-form-group__radio"
-            :class="{ 'o-form-group__radio--selected': modelValue === true }">
-            <input 
-              type="radio" 
-              :name="name" 
-              :value="true"
-              :checked="modelValue === true" 
-              class="o-form-group__input | visually-hidden"
-              :required="required"
-            />
+          <AtomsPill class="o-form-group__radio" :class="{ 'o-form-group__radio--selected': modelValue === true }">
+            <input type="radio" :name="name" :value="true" :checked="modelValue === true"
+              class="o-form-group__input | visually-hidden" :required="required" />
             Yes
           </AtomsPill>
         </label>
       </li>
       <li class="o-form-group__item">
         <label class="o-form-group__label | body-sm" @click.prevent="handleClick(false)">
-          <AtomsPill class="o-form-group__radio"
-            :class="{ 'o-form-group__radio--selected': modelValue === false }">
-            <input 
-              type="radio" 
-              :name="name" 
-              :value="false"
-              :checked="modelValue === false" 
-              class="o-form-group__input | visually-hidden"
-              :required="required"
-            />
+          <AtomsPill class="o-form-group__radio" :class="{ 'o-form-group__radio--selected': modelValue === false }">
+            <input type="radio" :name="name" :value="false" :checked="modelValue === false"
+              class="o-form-group__input | visually-hidden" :required="required" />
             No
           </AtomsPill>
         </label>
@@ -71,8 +58,10 @@ function handleClick(value: boolean) {
 
 <style lang="scss" scoped>
 @use '#styles/_utils/media' as mq;
+
 .o-form-group {
   padding: var(--size-32) 0;
+
   @include mq.mobile-only {
     padding: var(--size-16) 0;
   }
@@ -90,7 +79,7 @@ function handleClick(value: boolean) {
     margin: 0;
     flex-wrap: wrap;
   }
-  
+
   &__required {
     color: var(--error);
     margin-left: var(--size-4);
@@ -98,7 +87,7 @@ function handleClick(value: boolean) {
   }
 
   &__radio {
-    background: var(--background-200);
+    background: var(--background-100);
     border: 1px solid light-dark(var(--blue-400), var(--blue-500));
     cursor: pointer;
     text-transform: capitalize;

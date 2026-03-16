@@ -1,81 +1,65 @@
 <template>
   <div class="price-paid-page">
     <!-- Hero like the homepage -->
-    <OrganismsHero
-      title="{gradient}Price Paid{/gradient} Data"
-      subtitle="Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address."
-    />
+    <OrganismsHero title="{gradient}Price Paid{/gradient} Data"
+      subtitle="Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address." />
 
     <!-- Form + results (unchanged) -->
     <div class="price-paid | container">
-    <AtomsHeroCard class="price-paid__hero">
-      <p class="| body-md">Enter a UK postcode and search for property sales history</p>
-      <div class="price-paid__search">
-        <div class="price-paid__input">
-          <AtomsInput
-            v-model="searchQuery"
-            type="text"
-            placeholder="e.g., 'CF10 1AA' or 'cf101aa'"
-            required
-            class="| body-sm"
-            :disabled="loading"
-            @keyup.enter="search"
-          />
+      <AtomsHeroCard class="price-paid__hero">
+        <p class="| body-md">Enter a UK postcode and search for property sales history</p>
+        <div class="price-paid__search">
+          <div class="price-paid__input">
+            <AtomsInput v-model="searchQuery" type="text" placeholder="e.g., 'CF10 1AA' or 'cf101aa'" required
+              class="| body-sm" :disabled="loading" @keyup.enter="search" />
+          </div>
+          <div class="price-paid__button">
+            <button class="| button button-secondary button-md" @click="search" :disabled="loading">
+              <span v-if="loading">Searching...</span>
+              <span v-else>Search</span>
+            </button>
+          </div>
         </div>
-        <div class="price-paid__button">
-          <button 
-            class="| button button-secondary button-md" 
-            @click="search"
-            :disabled="loading"
-          >
-            <span v-if="loading">Searching...</span>
-            <span v-else>Search</span>
-          </button>
-        </div>
+      </AtomsHeroCard>
+
+      <div v-if="results.length > 0" class="price-paid__results">
+        <ul class="price-paid__list">
+          <li v-for="(result, index) in results" :key="index" class="price-paid__item">
+            <MoleculesTimeline :title="result.full_address" :type="result.property_type_display"
+              :duration="result.duration_display" :items="formatTimelineItems(result.sales)" />
+          </li>
+        </ul>
       </div>
-    </AtomsHeroCard>
 
-    <div v-if="results.length > 0" class="price-paid__results">
-      <ul class="price-paid__list">
-        <li v-for="(result, index) in results" :key="index" class="price-paid__item">
-          <MoleculesTimeline 
-            :title="result.full_address"
-            :type="result.property_type_display"
-            :duration="result.duration_display"
-            :items="formatTimelineItems(result.sales)"
-          />
-        </li>
-      </ul>
-    </div>
-
-    <!-- Loading State -->
-    <div v-else-if="loading" class="price-paid__loading">
-      <div class="loading-container">
-        <SkeletonLoader class="loading-skeleton loading-skeleton--title" />
-        <div class="loading-skeleton-group">
-          <SkeletonLoader class="loading-skeleton loading-skeleton--item" />
-          <SkeletonLoader class="loading-skeleton loading-skeleton--item" />
-          <SkeletonLoader class="loading-skeleton loading-skeleton--item" />
+      <!-- Loading State -->
+      <div v-else-if="loading" class="price-paid__loading">
+        <div class="loading-container">
+          <SkeletonLoader class="loading-skeleton loading-skeleton--title" />
+          <div class="loading-skeleton-group">
+            <SkeletonLoader class="loading-skeleton loading-skeleton--item" />
+            <SkeletonLoader class="loading-skeleton loading-skeleton--item" />
+            <SkeletonLoader class="loading-skeleton loading-skeleton--item" />
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="price-paid__error">
-      <div class="error-message">
-        <h3 class="| title-sm">Something went wrong</h3>
-        <p class="| body-md">{{ error }}</p>
-        <button class="| button button-secondary button-sm" @click="error = null">Try again</button>
+      <!-- Error State -->
+      <div v-else-if="error" class="price-paid__error">
+        <div class="error-message">
+          <h3 class="| title-sm">Something went wrong</h3>
+          <p class="| body-md">{{ error }}</p>
+          <button class="| button button-secondary button-sm" @click="error = null">Try again</button>
+        </div>
       </div>
-    </div>
 
-    <!-- No Results State -->
-    <div v-else-if="searched && results.length === 0" class="price-paid__no-results">
-      <div class="no-results-message">
-        <h3 class="| title-sm">No results found</h3>
-        <p class="| body-md">We couldn't find any price paid data for this postcode. Try a different postcode or check the spelling.</p>
+      <!-- No Results State -->
+      <div v-else-if="searched && results.length === 0" class="price-paid__no-results">
+        <div class="no-results-message">
+          <h3 class="| title-sm">No results found</h3>
+          <p class="| body-md">We couldn't find any price paid data for this postcode. Try a different postcode or check
+            the spelling.</p>
+        </div>
       </div>
-    </div>
     </div>
 
     <!-- Feature tiles teaser (hidden once results load) -->
@@ -84,58 +68,35 @@
         <header class="price-paid-teaser__header">
           <h2 class="title-xl">What you can do with Price Paid data</h2>
           <p class="body-md max-width-prose">
-            Explore recent sold prices, track local market momentum, and understand how a home’s value has changed over time. This is a preview of the tools we’re building.
+            Explore recent sold prices, track local market momentum, and understand how a home’s value has changed over
+            time. This is a preview of the tools we’re building.
           </p>
         </header>
 
         <div class="price-paid-teaser__grid">
-          <MoleculesFeatureTile
-            iconName="listings/savings"
-            title="See sold history by address"
+          <MoleculesFeatureTile iconName="listings/savings" title="See sold history by address"
             subtitle="Every transaction, one place"
             description="Look up a property and see its full sale timeline with prices and transfer dates."
-            variant="blue"
-          />
+            variant="blue" />
 
-          <MoleculesFeatureTile
-            iconName="explore/trending"
-            title="Track local trends"
+          <MoleculesFeatureTile iconName="explore/trending" title="Track local trends"
             subtitle="Postcode-level insights"
-            description="Understand price momentum in your area over the last 12–36 months."
-            variant="blue"
-          />
+            description="Understand price momentum in your area over the last 12–36 months." variant="blue" />
 
-          <MoleculesFeatureTile
-            iconName="explore/map"
-            title="Map the neighbourhood"
+          <MoleculesFeatureTile iconName="explore/map" title="Map the neighbourhood"
             subtitle="Streets that set the tone"
-            description="Spot streets and pockets that outperform the postcode average."
-            variant="blue"
-          />
+            description="Spot streets and pockets that outperform the postcode average." variant="blue" />
 
-          <MoleculesFeatureTile
-            iconName="listings/property-type"
-            title="Compare property types"
+          <MoleculesFeatureTile iconName="listings/property-type" title="Compare property types"
             subtitle="Flats vs houses"
             description="See how detached, semi, terrace, and flats differ in both price and velocity."
-            variant="blue"
-          />
+            variant="blue" />
 
-          <MoleculesFeatureTile
-            iconName="search"
-            title="Verify asking prices"
-            subtitle="Reality check"
-            description="Sense‑check current listings against actual sold prices nearby."
-            variant="blue"
-          />
+          <MoleculesFeatureTile iconName="search" title="Verify asking prices" subtitle="Reality check"
+            description="Sense‑check current listings against actual sold prices nearby." variant="blue" />
 
-          <MoleculesFeatureTile
-            iconName="content/info"
-            title="Timing the move"
-            subtitle="Seasonality & cycles"
-            description="See when sales cluster and how that affects negotiation power."
-            variant="blue"
-          />
+          <MoleculesFeatureTile iconName="content/info" title="Timing the move" subtitle="Seasonality & cycles"
+            description="See when sales cluster and how that affects negotiation power." variant="blue" />
         </div>
 
         <div class="price-paid-teaser__cta">
@@ -158,15 +119,15 @@ async function search() {
   if (searchQuery.value.trim() === "") {
     return;
   }
-  
+
   loading.value = true;
   error.value = null;
   searched.value = false;
-  
+
   try {
     // Validate and format the postcode
     const validatedPostcode = postcodeSchema.parse(searchQuery.value.trim());
-    
+
     const response = await $fetch<any>("/api/price-paid/", {
       method: "POST",
       body: { postcode: validatedPostcode },
@@ -175,7 +136,7 @@ async function search() {
     searched.value = true;
   } catch (err: any) {
     console.error("Error searching price paid data:", err);
-    
+
     // Check if it's a validation error from Zod
     if (err instanceof z.ZodError) {
       error.value = err.issues[0]?.message || "Invalid postcode format";
@@ -230,7 +191,7 @@ useSchemaOrg([
 </script>
 <style lang="scss" scoped>
 .price-paid-page {
-  background: var(--background-100);
+  background: var(--background-200);
 }
 
 .price-paid {
@@ -285,35 +246,34 @@ useSchemaOrg([
     margin-top: var(--size-48);
     display: flex;
     justify-content: center;
-    
+
     .loading-container {
       width: 100%;
       max-width: 800px;
     }
-    
+
     .loading-skeleton {
-      background: linear-gradient(90deg, 
-        var(--background-300) 25%, 
-        var(--background-200) 50%, 
-        var(--background-300) 75%
-      );
+      background: linear-gradient(90deg,
+          var(--background-300) 25%,
+          var(--background-100) 50%,
+          var(--background-300) 75%);
       background-size: 200% 100%;
       animation: loading-shimmer 1.5s infinite;
       border-radius: var(--border-radius-md);
-      
+
       &--title {
         height: 32px;
         width: 60%;
         margin-bottom: var(--size-24);
       }
-      
+
       &--item {
         height: 80px;
         width: 100%;
         margin-bottom: var(--size-16);
       }
     }
-    
+
     .loading-skeleton-group {
       display: flex;
       flex-direction: column;
@@ -325,20 +285,20 @@ useSchemaOrg([
     margin-top: var(--size-48);
     display: flex;
     justify-content: center;
-    
+
     .error-message {
       text-align: center;
       padding: var(--size-32);
       border-radius: var(--border-radius-lg);
-      background: var(--background-200);
+      background: var(--background-100);
       border: 1px solid var(--border-100);
       max-width: 400px;
-      
+
       h3 {
         color: var(--red-500);
         margin-bottom: var(--size-12);
       }
-      
+
       p {
         margin-bottom: var(--size-20);
         color: var(--foreground-200);
@@ -350,20 +310,20 @@ useSchemaOrg([
     margin-top: var(--size-48);
     display: flex;
     justify-content: center;
-    
+
     .no-results-message {
       text-align: center;
       padding: var(--size-32);
       border-radius: var(--border-radius-lg);
-      background: var(--background-200);
+      background: var(--background-100);
       border: 1px solid var(--border-100);
       max-width: 400px;
-      
+
       h3 {
         color: var(--foreground-100);
         margin-bottom: var(--size-12);
       }
-      
+
       p {
         color: var(--foreground-200);
       }
@@ -385,8 +345,13 @@ useSchemaOrg([
     grid-template-columns: 1fr;
     gap: var(--size-20);
 
-    @media (min-width: 720px) { grid-template-columns: repeat(2, 1fr); }
-    @media (min-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
+    @media (min-width: 720px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   &__cta {
@@ -400,6 +365,7 @@ useSchemaOrg([
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }

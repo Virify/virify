@@ -1,16 +1,9 @@
 <template>
   <div class="a-aria-tooltip">
-    <div 
-      class="a-aria-tooltip__trigger"
-      :aria-describedby="tooltipId"
-    >
+    <div class="a-aria-tooltip__trigger" :aria-describedby="tooltipId">
       <slot />
     </div>
-    <div 
-      :id="tooltipId"
-      class="a-aria-tooltip__content | body-xs"
-      role="tooltip"
-    >
+    <div :id="tooltipId" class="a-aria-tooltip__content | body-xs" role="tooltip">
       {{ content }}
     </div>
   </div>
@@ -53,7 +46,7 @@ const tooltipId = computed(() => {
     bottom: calc(100% + var(--size-8));
     left: 50%;
     transform: translateX(-50%);
-    background: var(--background-100);
+    background: var(--background-200);
     color: var(--foreground-100);
     padding: var(--size-8) var(--size-12);
     border-radius: var(--border-radius-lg);
@@ -73,10 +66,8 @@ const tooltipId = computed(() => {
       left: 50%;
       transform: translateX(-50%);
       border: 5px solid transparent;
-      border-top-color: var(--background-100);
+      border-top-color: var(--background-200);
     }
   }
 }
 </style>
-
-

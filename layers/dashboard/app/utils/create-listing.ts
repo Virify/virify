@@ -83,9 +83,9 @@ export function formatPrice(price: number | null | undefined): string {
 /** Shared slideover UI configuration for consistent styling */
 export const slideoverUiConfig = {
   content: 'w-full! lg:max-w-lg!',
-  header: 'bg-(--background-200)',
-  body: 'bg-(--background-200) p-4 sm:p-6',
-  footer: 'w-full! bg-(--background-200) py-2 px-4'
+  header: 'bg-(--background-100)',
+  body: 'bg-(--background-100) p-4 sm:p-6',
+  footer: 'w-full! bg-(--background-100) py-2 px-4'
 }
 
 // ============================================================================

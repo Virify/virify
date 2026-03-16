@@ -21,17 +21,17 @@
         class="m-search-form-collapsed__select" @click.stop @change="updateSearchRadius" />
 
       <!-- Sorting -->
-      <AtomsSelect v-if="!isMapView" id="sort-by" v-model="sortOrder" :options="selectOptionSortOrder" aria-label="Sort results by"
-        class="m-search-form-collapsed__select" @change="updateSortOrder" />
+      <AtomsSelect v-if="!isMapView" id="sort-by" v-model="sortOrder" :options="selectOptionSortOrder"
+        aria-label="Sort results by" class="m-search-form-collapsed__select" @change="updateSortOrder" />
 
       <!-- View Toggle Button -->
-      <AtomsButton v-if="isMapView" @click="toggleView" type="button" 
+      <AtomsButton v-if="isMapView" @click="toggleView" type="button"
         class="m-search-form-collapsed__view-toggle | button button-secondary button-sm">
         Show List
       </AtomsButton>
-      
+
       <!-- Show Map Button (desktop/tablet only) -->
-      <AtomsButton v-if="!isMapView" @click="toggleView" type="button" 
+      <AtomsButton v-if="!isMapView" @click="toggleView" type="button"
         class="m-search-form-collapsed__view-toggle m-search-form-collapsed__view-toggle--desktop | button button-secondary button-sm">
         Show Map
       </AtomsButton>
@@ -160,7 +160,7 @@ function toggleView() {
 
   &__select {
     flex: 1;
-    background-color: var(--background-100);
+    background-color: var(--background-200);
     border: 1px solid var(--border-color-200);
     padding: var(--size-10) var(--size-12);
     padding-right: var(--size-36);

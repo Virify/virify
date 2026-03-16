@@ -6,24 +6,16 @@
       '| container': showGrid
     }">
       <template #left v-if="showGrid">
-        <OrganismsResults v-if="isLoading || results.length" :results
-          :is-loading="isLoading" :query-analysis="searchState?.queryAnalysis"
-          :location="searchState?.location" :radius="searchState?.radius" @open-popover="handleOpenPopover" />
+        <OrganismsResults v-if="isLoading || results.length" :results :is-loading="isLoading"
+          :query-analysis="searchState?.queryAnalysis" :location="searchState?.location" :radius="searchState?.radius"
+          @open-popover="handleOpenPopover" />
         <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
 
       <!-- Use v-show to keep map in DOM once initialized, avoiding expensive re-initialization -->
       <template #right>
-        <LazyOrganismsAiSearchMapView 
-          v-if="mapHasBeenShown" 
-          v-show="showMap" 
-          class="p-dock__map" 
-          :results 
-          :is-searching="isLoading" 
-          :has-searched="resultsAreCurrentForLocation"
-          :radius 
-          :location 
-        />
+        <LazyOrganismsAiSearchMapView v-if="mapHasBeenShown" v-show="showMap" class="p-dock__map" :results
+          :is-searching="isLoading" :has-searched="resultsAreCurrentForLocation" :radius :location />
       </template>
     </OrganismsPaneSlider>
 
@@ -58,37 +50,37 @@ const {
  */
 onMounted(async () => {
   const state = searchState.value
-  
+
   // If we have results already, nothing to do
   if (state.results && state.results.length > 0) return
-  
+
   // If we don't have a location or search type, can't re-run search
   if (!state.location || !state.searchType) return
-  
+
   // Re-run the search based on type
   try {
     setSearchPending(true)
-    
+
     if (state.searchType === 'traditional') {
       // Use preserved form data if available
       const formData = (state as any).traditionalSearchForm
-      
+
       if (!formData) {
         navigateTo('/')
         return
       }
-      
+
       const body = {
         ...formData,
         location: state.location,
         radius: state.radius,
       }
-      
+
       const response = await $fetch<ListingWithFullProperty[]>('/api/search/traditional', {
         method: 'POST',
         body
       })
-      
+
       if (response) {
         setResults(response)
       }
@@ -100,12 +92,12 @@ onMounted(async () => {
         location: state.location,
         radius: state.radius ?? 5,
       }
-      
+
       const response = await $fetch('/api/search/rag', {
         method: 'POST',
         body
       })
-      
+
       if (response) {
         setResults(response.results || [])
         if (response.queryAnalysis) {
@@ -287,7 +279,7 @@ useHead({
     left: 50%;
     transform: translateX(-50%);
     z-index: 8;
-    background: var(--background-100);
+    background: var(--background-200);
     border-radius: var(--border-radius-2xl);
     padding: var(--size-24);
     box-shadow: var(--shadow-300);

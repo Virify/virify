@@ -20,7 +20,7 @@ const { entries } = useSavedLocation();
 
 <style lang="scss">
 .v-dialog-saved-locations {
-  background-color: var(--background-100);
+  background-color: var(--background-200);
 
   &__list {
     list-style: none;

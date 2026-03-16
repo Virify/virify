@@ -1,7 +1,8 @@
 <template>
   <div class="o-form-group">
     <AtomsDivider v-if="divider" />
-    <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+    <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip"
+      :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
       <template #tooltip-content>
         <slot name="tooltip-content">
           <p v-if="tooltip" class="body-sm">{{ tooltip }}</p>
@@ -13,14 +14,8 @@
         <label class="o-form-group__label | body-sm" @click.prevent="handleClick(option.value)">
           <AtomsPill class="o-form-group__radio"
             :class="{ 'o-form-group__radio--selected': modelValue === option.value }">
-            <input 
-              type="radio" 
-              :name="name" 
-              :value="option.value"
-              :checked="modelValue === option.value" 
-              class="| visually-hidden"
-              :required="required"
-            />
+            <input type="radio" :name="name" :value="option.value" :checked="modelValue === option.value"
+              class="| visually-hidden" :required="required" />
             {{ option.key }}
           </AtomsPill>
         </label>
@@ -86,7 +81,7 @@ function handleClick(value: any) {
     margin: 0;
     flex-wrap: wrap;
   }
-  
+
   &__required {
     color: var(--error);
     margin-left: var(--size-4);
@@ -94,7 +89,7 @@ function handleClick(value: any) {
   }
 
   &__radio {
-    background: var(--background-200);
+    background: var(--background-100);
     border: 1px solid light-dark(var(--blue-500), var(--blue-600));
     cursor: pointer;
     text-transform: capitalize;
@@ -104,6 +99,7 @@ function handleClick(value: any) {
       color: var(--monochrome-900);
     }
   }
+
   @include mq.mobile-only {
     padding: var(--size-16) 0;
   }

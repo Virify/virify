@@ -5,36 +5,16 @@
 
     <MoleculesForm @submit.prevent="submitForm" class="| stacked" :error="formError">
       <MoleculesFormField label="Your Name" v-slot="{ id }">
-        <AtomsInput 
-          :id 
-          v-model="form.name" 
-          type="text" 
-          name="name"
-          required 
-          :disabled="isSubmitting"
-        />
+        <AtomsInput :id v-model="form.name" type="text" name="name" required :disabled="isSubmitting" />
       </MoleculesFormField>
 
       <MoleculesFormField label="Email Address" v-slot="{ id }">
-        <AtomsInput 
-          :id 
-          v-model="form.email" 
-          type="email" 
-          name="email"
-          required 
-          :disabled="isSubmitting"
-        />
+        <AtomsInput :id v-model="form.email" type="email" name="email" required :disabled="isSubmitting" />
       </MoleculesFormField>
 
       <MoleculesFormField label="Type" v-slot="{ id }">
-        <select
-          :id
-          v-model="form.type"
-          name="type"
-          required
-          :disabled="isSubmitting"
-          class="support-dialog__select | body-sm"
-        >
+        <select :id v-model="form.type" name="type" required :disabled="isSubmitting"
+          class="support-dialog__select | body-sm">
           <option value="">Select type...</option>
           <option value="bug">Bug Report</option>
           <option value="issue">General Issue</option>
@@ -44,16 +24,9 @@
       </MoleculesFormField>
 
       <MoleculesFormField label="Details" v-slot="{ id }">
-        <textarea
-          :id
-          v-model="form.details"
-          name="details"
-          rows="5"
-          required
-          :disabled="isSubmitting"
+        <textarea :id v-model="form.details" name="details" rows="5" required :disabled="isSubmitting"
           placeholder="Please describe the bug/issue including page name, device type, browser, and any steps to reproduce..."
-          class="support-dialog__textarea | text-sm"
-        ></textarea>
+          class="support-dialog__textarea | text-sm"></textarea>
       </MoleculesFormField>
 
       <!-- Cloudflare Turnstile -->
@@ -62,19 +35,10 @@
       </div>
 
       <div class="support-dialog__actions">
-        <AtomsButton
-          type="button"
-          @click="hideDialog"
-          class="| button-quiet"
-          :disabled="isSubmitting"
-        >
+        <AtomsButton type="button" @click="hideDialog" class="| button-quiet" :disabled="isSubmitting">
           Cancel
         </AtomsButton>
-        <AtomsButton
-          type="submit"
-          class="| button-secondary"
-          :pending="isSubmitting"
-        >
+        <AtomsButton type="submit" class="| button-secondary" :pending="isSubmitting">
           Send Support Request
         </AtomsButton>
       </div>
@@ -104,10 +68,10 @@ async function submitForm() {
 
   formError.value = null
   isSubmitting.value = true
-  
+
   try {
     await executeTurnstile()
-    
+
     await $fetch('/api/support', {
       method: 'POST',
       body: {
@@ -121,7 +85,7 @@ async function submitForm() {
 
     toast.add({ title: 'Success', description: 'Support request submitted successfully!', color: 'success' })
     hideDialog()
-    
+
   } catch (err) {
     console.error('Support form submission error:', err)
     formError.value = {
@@ -152,7 +116,7 @@ onUnmounted(() => {
     padding: var(--size-12);
     border: 1px solid var(--background-300);
     border-radius: var(--border-radius-lg);
-    background: var(--background-200);
+    background: var(--background-100);
     resize: vertical;
     min-height: var(--size-120);
     font-size: var(--font-sm);
@@ -174,7 +138,7 @@ onUnmounted(() => {
     padding: var(--size-12);
     border: 1px solid var(--background-300);
     border-radius: var(--border-radius-lg);
-    background: var(--background-200);
+    background: var(--background-100);
     appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40' fill='%23666'><path d='M20 23.4L14 17.4L15.4 16L20 20.6L24.6 16L26 17.4L20 23.4Z'/></svg>");
     background-repeat: no-repeat;

@@ -3,18 +3,18 @@
     <section v-if="pending" class="legal-page__content | container">
       <div class="legal-page__loading">Loading...</div>
     </section>
-    
+
     <section v-else-if="error" class="legal-page__content | container">
       <h1 class="legal-page__title | title-2xl">Cookie Policy</h1>
       <p class="legal-page__error">Failed to load cookie policy. Please try again later.</p>
     </section>
-    
+
     <section v-else-if="data" class="legal-page__content | container">
       <h1 class="legal-page__title | title-2xl">{{ data.title }}</h1>
       <p class="legal-page__updated | body-xs" v-if="data.lastUpdated">
         Last updated: {{ formatDate(data.lastUpdated) }}
       </p>
-      
+
       <SanityContent v-if="data.content" :blocks="data.content" />
     </section>
   </div>
@@ -67,7 +67,7 @@ useSchemaOrg([
 
 .legal-page {
   margin: 0 auto;
-  background: var(--background-200);
+  background: var(--background-100);
 
   &__content {
     display: block;
@@ -75,7 +75,7 @@ useSchemaOrg([
     color: var(--foreground-100);
   }
 
-  > section + section {
+  >section+section {
     margin-top: var(--size-32);
 
     @include mq.desktop {

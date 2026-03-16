@@ -12,26 +12,15 @@
     <!-- Content Area -->
     <div class="gallery-room-grid__content">
       <!-- Room Categories -->
-      <section
-        v-for="category in categorizedRooms"
-        :key="category.type"
-        class="gallery-room-grid__section | container"
-      >
+      <section v-for="category in categorizedRooms" :key="category.type" class="gallery-room-grid__section | container">
         <h2 class="gallery-room-grid__section-title">{{ category.title }}</h2>
         <div class="gallery-room-grid__grid">
-          <button
-            v-for="(image, index) in category.images"
-            :key="`${category.type}-${index}`"
-            class="gallery-room-grid__image-button"
-            @click="openImageModal(image.globalIndex)"
-          >
-            <AtomsCloudFlareImage
-              :src="image.src"
-              :alt="image.alt"
-              variant="gallery"
-              class="gallery-room-grid__image w-full h-full"
-            />
-            <span v-if="image.alt !== 'Property image'" class="gallery-room-grid__image-caption | body-sm">{{ image.alt }}</span>
+          <button v-for="(image, index) in category.images" :key="`${category.type}-${index}`"
+            class="gallery-room-grid__image-button" @click="openImageModal(image.globalIndex)">
+            <AtomsCloudFlareImage :src="image.src" :alt="image.alt" variant="gallery"
+              class="gallery-room-grid__image w-full h-full" />
+            <span v-if="image.alt !== 'Property image'" class="gallery-room-grid__image-caption | body-sm">{{ image.alt
+            }}</span>
           </button>
         </div>
       </section>
@@ -89,9 +78,9 @@ const categorizedRooms = computed<RoomCategory[]>(() => {
   const lands = props.images.filter(img => img.landId)
 
   // Uncategorized (no room assignment)
-  const uncategorized = props.images.filter(img => 
-    !img.bedroomId && !img.bathroomId && !img.kitchenId && 
-    !img.receptionId && !img.otherRoomId && !img.outdoorSpaceId && 
+  const uncategorized = props.images.filter(img =>
+    !img.bedroomId && !img.bathroomId && !img.kitchenId &&
+    !img.receptionId && !img.otherRoomId && !img.outdoorSpaceId &&
     !img.gardenId && !img.yardId && !img.landId
   )
 
@@ -169,7 +158,7 @@ onUnmounted(() => {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: var(--background-100);
+  background: var(--background-200);
   display: flex;
   flex-direction: column;
   user-select: none;
@@ -291,6 +280,7 @@ onUnmounted(() => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

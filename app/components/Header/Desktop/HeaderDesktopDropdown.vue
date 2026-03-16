@@ -151,7 +151,7 @@ watch(useRoute(), () => {
     top: 100%;
     left: calc(0px - var(--size-12));
     width: fit-content;
-    background: var(--background-100);
+    background: var(--background-200);
     padding: var(--size-16) var(--size-28);
     margin: 0;
     list-style: none;

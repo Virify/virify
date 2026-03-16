@@ -1,8 +1,7 @@
 <template>
   <template v-for="(group, groupIndex) in navigationGroups" :key="group.title">
     <!-- Group header -->
-    <li class="icon-cell" :class="{ 'last-visible': isLastVisibleGroup(groupIndex) }"
-      @click="toggleGroup(groupIndex)">
+    <li class="icon-cell" :class="{ 'last-visible': isLastVisibleGroup(groupIndex) }" @click="toggleGroup(groupIndex)">
       <AtomsIcon :icon="group.icon" size="32" />
     </li>
     <li class="text-cell group-header" :class="{ 'last-visible': isLastVisibleGroup(groupIndex) }"
@@ -24,7 +23,8 @@
         <li v-if="groupStates[groupIndex]" class="text-cell group-item | body-sm">
           <NuxtLink :to="item.url" @click="handleNavClick(item)">
             {{ item.name }}
-            <span v-if="item.countKey && aggregates[item.countKey as keyof UserItemsAggregates]" class="nav-count body-xs font-bold">
+            <span v-if="item.countKey && aggregates[item.countKey as keyof UserItemsAggregates]"
+              class="nav-count body-xs font-bold">
               ({{ aggregates[item.countKey as keyof UserItemsAggregates] }})
             </span>
           </NuxtLink>
@@ -118,7 +118,7 @@ function isLastVisibleGroup(groupIndex: number) {
 }
 
 .text-cell {
-  background: var(--background-200);
+  background: var(--background-100);
   display: flex;
   align-items: center;
   padding: 0 var(--size-16);
@@ -182,5 +182,4 @@ function isLastVisibleGroup(groupIndex: number) {
   opacity: 1;
   max-height: 60px; // Approximate height of nav items
 }
-
 </style>

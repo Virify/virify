@@ -1,8 +1,8 @@
 :root {
   /* Backgrounds */
-  --ui-bg: var(--background-100);
-  --ui-bg-elevated: var(--background-200);
-  
+  --ui-bg: var(--background-200);
+  --ui-bg-elevated: var(--background-100);
+
   /* Foregrounds */
   --ui-fg: var(--foreground-100);
   --ui-fg-muted: var(--foreground-300);
@@ -16,6 +16,6 @@
 
   /* Secondary (Brand Orange) */
   --ui-secondary: var(--secondary-400);
-  
+
   /* Radius - Assuming standard map to Nuxt UI if needed, but Nuxt UI uses --ui-radius defaults */
 }

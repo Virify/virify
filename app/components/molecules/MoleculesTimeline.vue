@@ -31,13 +31,13 @@
           {{ formatDisplayDate(item.date) }}
         </time>
       </li>
-      
+
       <!-- Render the no more history card (always visible at the end of the timeline) -->
       <li class="timeline__item timeline__item--no-history">
         <p class="timeline__no-history-message | body-sm">No more property history available</p>
       </li>
     </ol>
-    
+
     <p v-if="note" class="timeline__note | body-xs">{{ note }}</p>
   </div>
 </template>
@@ -126,7 +126,7 @@ const formatDisplayDate = (date: string | Date): string => {
   }
 
   &__item {
-    background: var(--background-100);
+    background: var(--background-200);
     border: 1px solid var(--monochrome-600);
     border-radius: var(--border-radius-lg);
     padding: var(--size-16);
@@ -171,7 +171,7 @@ const formatDisplayDate = (date: string | Date): string => {
 
     // No history item styling
     &--no-history {
-      background: var(--background-100);
+      background: var(--background-200);
       border: 1px dashed var(--monochrome-600);
       text-align: center;
     }

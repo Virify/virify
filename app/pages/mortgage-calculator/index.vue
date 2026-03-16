@@ -6,7 +6,8 @@
         <div class="mortgage-hero__content">
           <h1 class="title-2xl lineheight-xs gradient-text">Mortgage Calculator</h1>
           <p class="body-lg">
-            Estimate your monthly mortgage payments. Enter your property price, deposit and see what you could be paying with current UK rates.
+            Estimate your monthly mortgage payments. Enter your property price, deposit and see what you could be paying
+            with current UK rates.
           </p>
         </div>
       </div>
@@ -28,27 +29,15 @@
         </header>
 
         <div class="mortgage-section__grid">
-          <MoleculesFeatureTile 
-            icon-name="listings/savings"
-            title="Loan-to-Value (LTV)"
-            subtitle="Your deposit ratio"
+          <MoleculesFeatureTile icon-name="listings/savings" title="Loan-to-Value (LTV)" subtitle="Your deposit ratio"
             description="The ratio of your mortgage loan to the property's value. Lower LTV ratios (bigger deposits) typically unlock better interest rates and more lender options."
-            variant="default"
-          />
-          <MoleculesFeatureTile 
-            icon-name="property/info"
-            title="Interest Rates"
-            subtitle="The cost of borrowing"
+            variant="default" />
+          <MoleculesFeatureTile icon-name="property/info" title="Interest Rates" subtitle="The cost of borrowing"
             description="Determines how much you pay on top of what you borrowed. Even small differences can mean thousands of pounds over your mortgage term."
-            variant="default"
-          />
-          <MoleculesFeatureTile 
-            icon-name="listings/map"
-            title="Mortgage Term"
-            subtitle="Repayment length"
+            variant="default" />
+          <MoleculesFeatureTile icon-name="listings/map" title="Mortgage Term" subtitle="Repayment length"
             description="How long you have to repay your mortgage. Longer terms mean lower monthly payments but more total interest paid over time."
-            variant="default"
-          />
+            variant="default" />
         </div>
       </div>
     </section>
@@ -64,27 +53,15 @@
         </header>
 
         <div class="mortgage-section__grid">
-          <MoleculesFeatureTile 
-            icon-name="listings/savings"
-            title="Fixed Rate"
-            subtitle="Budget certainty"
+          <MoleculesFeatureTile icon-name="listings/savings" title="Fixed Rate" subtitle="Budget certainty"
             description="Your interest rate stays the same for an agreed period (typically 2-5 years). This gives you certainty over your monthly payments, protecting you if interest rates rise."
-            variant="blue"
-          />
-          <MoleculesFeatureTile 
-            icon-name="listings/signal"
-            title="Tracker Rate"
-            subtitle="Rate drops potential"
+            variant="blue" />
+          <MoleculesFeatureTile icon-name="listings/signal" title="Tracker Rate" subtitle="Rate drops potential"
             description="Your rate moves in line with the Bank of England base rate, plus a set percentage. When the base rate goes down, so do your payments — but they'll rise if rates increase."
-            variant="blue"
-          />
-          <MoleculesFeatureTile 
-            icon-name="listings/map"
-            title="Variable Rate"
-            subtitle="Maximum flexibility"
+            variant="blue" />
+          <MoleculesFeatureTile icon-name="listings/map" title="Variable Rate" subtitle="Maximum flexibility"
             description="Your lender's standard variable rate (SVR) can change at any time. Often higher than other options, but typically has no early repayment charges."
-            variant="blue"
-          />
+            variant="blue" />
         </div>
       </div>
     </section>
@@ -102,28 +79,27 @@
         <div class="mortgage-benefits__cards">
           <AtomsHeroCard>
             <h3 class="title-md">Check Your <span class="gradient-text">Credit Score</span></h3>
-            <p class="body-md">Lenders use this to decide your rates. Check for errors and pay down debts before applying for a mortgage.</p>
+            <p class="body-md">Lenders use this to decide your rates. Check for errors and pay down debts before
+              applying for a mortgage.</p>
           </AtomsHeroCard>
           <AtomsHeroCard variant="secondary">
             <h3 class="title-md">Budget <span class="gradient-text">Beyond the Deposit</span></h3>
-            <p class="body-md">Save for stamp duty, legal fees, surveys, and moving costs — typically an extra 3-5% of the property price.</p>
+            <p class="body-md">Save for stamp duty, legal fees, surveys, and moving costs — typically an extra 3-5% of
+              the property price.</p>
           </AtomsHeroCard>
           <AtomsHeroCard>
             <h3 class="title-md">Get an <span class="gradient-text">Agreement in Principle</span></h3>
-            <p class="body-md">Shows sellers you're serious and gives you clarity on what you can afford before house hunting.</p>
+            <p class="body-md">Shows sellers you're serious and gives you clarity on what you can afford before house
+              hunting.</p>
           </AtomsHeroCard>
         </div>
       </div>
     </section>
 
     <!-- CTA Section -->
-    <MoleculesCtaSection
-      title="Ready to market the {gradient}new way?{/gradient}"
+    <MoleculesCtaSection title="Ready to market the {gradient}new way?{/gradient}"
       description="Thousands are ready for intelligent property searching and better, equal marketing opportunities. Are you?"
-      button-text="Join the waiting list"
-      :gradient="false"
-      to="/"
-    />
+      button-text="Join the waiting list" :gradient="false" to="/" />
   </div>
 </template>
 
@@ -160,7 +136,7 @@ useSchemaOrg([
 @use "#styles/_utils/media" as mq;
 
 .mortgage-page {
-  background: var(--background-100);
+  background: var(--background-200);
 }
 
 .mortgage-hero {
@@ -187,7 +163,7 @@ useSchemaOrg([
   padding: var(--size-120) 0;
 
   &--white {
-    background: var(--background-100);
+    background: var(--background-200);
   }
 
   &--gradient {

@@ -98,7 +98,7 @@ async function saveLocation() {
     const { option } = props
     const { geometry, place_name_en, bbox } = asObject(option)
     const { coordinates } = asObject(geometry)
-    
+
     // Enhance the geocoding feature with boundary polygon for map visualization
     // This fetches the actual boundary shape from MapTiler if available
     const enhancedFeature = await enhanceWithBoundaryPolygon(option)
@@ -130,7 +130,7 @@ async function saveLocation() {
   &__popover {
     position: fixed;
     inset: unset;
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-14) var(--size-16) var(--size-16);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--border-color-200);
@@ -157,7 +157,7 @@ async function saveLocation() {
       width: $arrow-size;
       height: $arrow-size;
       transform: rotate(45deg);
-      background: var(--background-200);
+      background: var(--background-100);
       border-top: 1px solid var(--border-color-200);
       border-left: 1px solid var(--border-color-200);
       border-top-left-radius: 2px;

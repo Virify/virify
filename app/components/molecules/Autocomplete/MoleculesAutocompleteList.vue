@@ -48,7 +48,7 @@ defineProps<Props<T>>()
     }
 
     &:has(.m-autocomplete-list__select:hover) {
-      background: var(--background-100);
+      background: var(--background-200);
     }
   }
 

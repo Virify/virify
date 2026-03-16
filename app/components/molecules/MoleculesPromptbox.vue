@@ -48,7 +48,7 @@ function keyboardSubmit(e: KeyboardEvent) {
   display: flex;
   align-items: flex-end;
   gap: var(--size-16);
-  background: var(--background-200);
+  background: var(--background-100);
   padding: var(--size-16);
 
   &:has(textarea:focus) {

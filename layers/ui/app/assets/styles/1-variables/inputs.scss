@@ -1,7 +1,7 @@
 @use '../_utils/functions' as fn;
 
 :root {
-  --input-text-background: var(--background-200);
+  --input-text-background: var(--background-100);
   --input-text-border: #{fn.faded-color(15%)};
   --input-text-color: var(--foreground-100);
   --input-text-disabled: #{fn.faded-color(50%, var(--foreground-100))};

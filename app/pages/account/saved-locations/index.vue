@@ -1,8 +1,6 @@
 <template>
   <div class="saved-locations-page">
-   <MoleculesAccountHeader 
-      :title="'My Favourite Locations'"
-    />
+    <MoleculesAccountHeader :title="'My Favourite Locations'" />
 
     <div class="saved-locations-page__grid">
       <AtomsAccountCardContainer>
@@ -69,7 +67,7 @@ function openEditDialog(entry?: any) {
   }
 
   &__header {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-xl);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: var(--size-24);
@@ -116,7 +114,7 @@ function openEditDialog(entry?: any) {
       'icon address address';
     column-gap: var(--size-12);
     align-items: start;
-    background: var(--background-200);
+    background: var(--background-100);
     border: 1px solid var(--border-color-200);
     border-radius: var(--border-radius-xl);
     padding: var(--size-16);
@@ -130,10 +128,10 @@ function openEditDialog(entry?: any) {
     width: var(--size-40);
     height: var(--size-40);
     border-radius: var(--border-radius-lg);
-    background: var(--background-200);
+    background: var(--background-100);
     color: var(--foreground-100);
   }
-  
+
   &__name {
     grid-area: name;
     margin: 0;

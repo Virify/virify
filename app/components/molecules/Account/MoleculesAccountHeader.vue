@@ -30,7 +30,7 @@ const showSearchControls = computed(() => {
 @use "#styles/_utils/media" as mq;
 
 .account-header {
-  background: var(--background-200);
+  background: var(--background-100);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: var(--size-24);

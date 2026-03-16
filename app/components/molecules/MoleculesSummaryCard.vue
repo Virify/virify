@@ -9,14 +9,9 @@
     </div>
     <!-- Image -->
     <div class="summary-card__image-container">
-      <AtomsCloudFlareImage
-        v-if="hasImage"
-        :src="listing.image?.[0]?.image"
-        :alt="listing.image?.[0]?.metadata?.alt || 'Listing image'"
-        variant="card"
-        :placeholder="true"
-        class="summary-card__image"
-      />
+      <AtomsCloudFlareImage v-if="hasImage" :src="listing.image?.[0]?.image"
+        :alt="listing.image?.[0]?.metadata?.alt || 'Listing image'" variant="card" :placeholder="true"
+        class="summary-card__image" />
     </div>
     <!-- Content -->
     <div class="summary-card__content">
@@ -67,14 +62,12 @@
 
       <!-- View button -->
       <div class="summary-card__footer">
-        <NuxtLink :to="`/listing/${listing.id}`"
-          class="summary-card__view-btn | button body-sm" aria-label="View property details"
-          :class="{
+        <NuxtLink :to="`/listing/${listing.id}`" class="summary-card__view-btn | button body-sm"
+          aria-label="View property details" :class="{
             'button-primary': isPremium,
             'button-secondary': isFeatured,
             'button-tertiary': isBasic
-          }"
-          title="View property details">
+          }" title="View property details">
           View
         </NuxtLink>
       </div>
@@ -137,7 +130,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
 <style lang="scss">
 .summary-card {
-  background-color: var(--background-200);
+  background-color: var(--background-100);
   border: none;
   border-radius: var(--border-radius-2xl);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -151,7 +144,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
   // Tier variants
   &--featured {
-    background-color: var(--background-200);
+    background-color: var(--background-100);
     border-color: var(--secondary-400);
 
     .summary-card__banner {
@@ -195,7 +188,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
       color: var(--text-color);
     }
 
-    .summary-card__type { 
+    .summary-card__type {
       color: var(--monochrome-900);
     }
 
@@ -211,7 +204,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
         background-color: var(--primary-300);
       }
     }
-    
+
   }
 
   // Banner

@@ -183,7 +183,7 @@ useIntersectionObserver($infographic, ([entry]) => {
   &__card {
     --gradient-box-radius: var(--border-radius-3xl);
 
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-14);
     box-sizing: border-box;
     transform: scale(0.76);

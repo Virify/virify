@@ -342,7 +342,7 @@ watch(isExpandedWithLocation, async () => {
   &__backdrop {
     position: fixed;
     inset: 0;
-    background: var(--background-100);
+    background: var(--background-200);
     opacity: 0;
     z-index: -1;
     pointer-events: none;
@@ -390,7 +390,7 @@ watch(isExpandedWithLocation, async () => {
     position: absolute;
     z-index: -1;
     inset: calc(0px - var(--size-12));
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-2xl);
     transition: box-shadow, inset, opacity;
     transition-duration: var(--animation-slow);

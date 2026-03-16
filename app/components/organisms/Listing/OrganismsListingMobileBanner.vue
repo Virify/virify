@@ -1,12 +1,11 @@
 <template>
   <Teleport to="body">
     <div v-show="!galleryVisible && !modalOpen" class="o-listing-mobile-banner" role="presentation" :class="{
-    'o-listing-mobile-banner--expanded': isExpanded
-  }">
+      'o-listing-mobile-banner--expanded': isExpanded
+    }">
       <div class="| container" role="presentation">
         <Transition name="o-listing-mobile-banner">
-          <button ref="$handle" v-show="!overviewVisible" type="button"
-            class="o-listing-mobile-banner__drag-handle"
+          <button ref="$handle" v-show="!overviewVisible" type="button" class="o-listing-mobile-banner__drag-handle"
             :aria-label="isExpanded ? 'Hide additional information' : 'Show additional information'"></button>
         </Transition>
 
@@ -18,73 +17,62 @@
 
         <div v-show="isDragging || isExpanded" ref="$additional" class="o-listing-mobile-banner__additional-info"
           :class="{
-        'o-listing-mobile-banner__additional-info--expanded': isExpanded
-      }">
+            'o-listing-mobile-banner__additional-info--expanded': isExpanded
+          }">
 
           <h2 v-if="price"
             class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs">
             {{ price }}
 
 
-          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            {{ convertEnumToString(priceType!) }}
-          </AtomsPill>
-          <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
-            {{ convertEnumToString(available!) }}
-          </AtomsPill>
-        </h2>
-
-        <p role="presentation" class="o-listing-mobile-banner__additional-info-address | body-md">
-          {{ address }}
-        </p>
-
-        <div role="presentation">
-          <h3 class="o-listing-mobile-banner__additional-info-subtitle | title-sm">At a glance</h3>
-
-          <OrganismsListingSidebarIcons 
-            class="o-listing-mobile-banner__additional-info-icons"
-            :property-type="propertyType"
-            :bedrooms="bedrooms"
-            :bathrooms="bathrooms"
-            :receptions="receptions"
-            :other-rooms="otherRooms"
-            :has-garden="hasGarden"
-            :has-land="hasLand"
-            :classification="classification"
-          />
-
-          <div class="o-listing-mobile-banner__additional-info-pills">
-            <OrganismsListingSidebarPills 
-              :property-size="propertySize"
-              :chain-free="chainFree"
-              :year-built="yearBuilt"
-              :construction-type="constructionType"
-            />
-          </div>
-        </div>
-
-        <OrganismsListingAgent :agent="agent" />
-      </div>
-
-      <div class="o-listing-mobile-banner__grid" role="presentation">
-        <div class="o-listing-mobile-banner__overview" role="presentation">
-          <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
-            {{ price }}
-
             <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
               {{ convertEnumToString(priceType!) }}
             </AtomsPill>
+            <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+              {{ convertEnumToString(available!) }}
+            </AtomsPill>
           </h2>
 
-          <p role="presentation" class="o-listing-mobile-banner__address | body-md">
+          <p role="presentation" class="o-listing-mobile-banner__additional-info-address | body-md">
             {{ address }}
           </p>
+
+          <div role="presentation">
+            <h3 class="o-listing-mobile-banner__additional-info-subtitle | title-sm">At a glance</h3>
+
+            <OrganismsListingSidebarIcons class="o-listing-mobile-banner__additional-info-icons"
+              :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms" :receptions="receptions"
+              :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand" :classification="classification" />
+
+            <div class="o-listing-mobile-banner__additional-info-pills">
+              <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree"
+                :year-built="yearBuilt" :construction-type="constructionType" />
+            </div>
+          </div>
+
+          <OrganismsListingAgent :agent="agent" />
         </div>
 
-        <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent" :is-draft="isDraft" />
+        <div class="o-listing-mobile-banner__grid" role="presentation">
+          <div class="o-listing-mobile-banner__overview" role="presentation">
+            <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
+              {{ price }}
+
+              <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+                {{ convertEnumToString(priceType!) }}
+              </AtomsPill>
+            </h2>
+
+            <p role="presentation" class="o-listing-mobile-banner__address | body-md">
+              {{ address }}
+            </p>
+          </div>
+
+          <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent"
+            :is-draft="isDraft" />
+        </div>
       </div>
     </div>
-  </div>
   </Teleport>
 </template>
 
@@ -199,13 +187,13 @@ useVerticalDrag($handle, {
       // Auto-close when threshold reached - but let it animate smoothly
       if (-relativeY > DRAG_CLOSE_THRESHOLD) {
         isDragging.value = false
-        
+
         // Set final closed state with smooth transition
         setStyle($additional, {
           height: '0px',
           overflow: 'hidden'
         })
-        
+
         // Set expanded state after animation completes
         setTimeout(() => {
           isExpanded.value = false
@@ -241,7 +229,7 @@ useVerticalDrag($handle, {
       if (-relativeY > DRAG_CLOSE_THRESHOLD) {
         return closeExpanded()
       }
-      
+
       openExpanded()
     } else {
       // Handle drag end when collapsed (opening)
@@ -356,7 +344,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
   left: 0;
   z-index: 5;
   width: 100%;
-  background: var(--background-100);
+  background: var(--background-200);
   border-top: 1px solid var(--border-color-200);
   padding: var(--size-12) 0;
   padding-bottom: calc(var(--size-12) + env(safe-area-inset-bottom, 0px));

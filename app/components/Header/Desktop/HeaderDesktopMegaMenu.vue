@@ -225,7 +225,7 @@ function selectParent() {
   &__sub-links {
     list-style: none;
     margin: 0;
-    background: var(--background-200);
+    background: var(--background-100);
   }
 
   &__sub-link-title {

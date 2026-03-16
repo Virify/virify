@@ -1,13 +1,8 @@
 <template>
   <div class="account-card">
     <div class="account-card__header">
-      <AtomsCollapsibleHeader 
-        :is-collapsed="isCollapsed" 
-        :title="title" 
-        :icon="icon" 
-        variant="inline" 
-        @toggle="$emit('toggle')"
-      />
+      <AtomsCollapsibleHeader :is-collapsed="isCollapsed" :title="title" :icon="icon" variant="inline"
+        @toggle="$emit('toggle')" />
     </div>
 
     <Transition name="collapse-fade">
@@ -21,31 +16,20 @@
                     <AtomsAccountListingCardImage :image-src="getFirstImage(item)" :has-note="!!item.note" />
 
                     <div class="account-card__content-wrapper">
-                      <MoleculesAccountListingCardDetails
-                        :price="item.listing?.price"
-                        :price-type="getPriceType(item)"
-                        :address="item.listing?.property?.address"
-                        :bedrooms="item.listing?.property?.numberBedrooms"
-                        :bathrooms="item.listing?.property?.numberBathrooms"
-                        :is-rental="isRental(item)"
-                        :tier="item.listing?.listingTier"
-                      >
+                      <MoleculesAccountListingCardDetails :price="item.listing?.price" :price-type="getPriceType(item)"
+                        :address="item.listing?.property?.address" :bedrooms="item.listing?.property?.numberBedrooms"
+                        :bathrooms="item.listing?.property?.numberBathrooms" :is-rental="isRental(item)"
+                        :tier="item.listing?.listingTier">
                         <template #after-pill>
-                          <AtomsNoteButton v-if="showNotesIcon" 
-                            :listing-id="item.listing?.id!" 
-                            class="account-card__note-btn" 
-                            @click.prevent 
-                          />
-                          <AtomsFavouriteButton v-if="showFavouriteIcon" 
-                            :is-favourite="item.isFavourite" 
-                            :listing-id="item.listing?.id!" 
-                            @click.prevent class="account-card__fav" 
-                          />
+                          <AtomsNoteButton v-if="showNotesIcon" :listing-id="item.listing?.id!"
+                            class="account-card__note-btn" @click.prevent />
+                          <AtomsFavouriteButton v-if="showFavouriteIcon" :is-favourite="item.isFavourite"
+                            :listing-id="item.listing?.id!" @click.prevent class="account-card__fav" />
                         </template>
                       </MoleculesAccountListingCardDetails>
                     </div>
                   </div>
-                  
+
                   <!-- Notes row - full width below main content -->
                   <div v-if="item.note" class="account-card__notes" @click.prevent>
                     <AtomsIcon icon="cards/notes" size="16" />
@@ -123,7 +107,7 @@ const getTierClass = (item: RecentItem): Record<string, boolean> => {
     flex-shrink: 0;
     position: sticky;
     top: 0;
-    background: var(--background-200);
+    background: var(--background-100);
     z-index: 1;
     padding: var(--size-16);
   }
@@ -173,7 +157,7 @@ const getTierClass = (item: RecentItem): Record<string, boolean> => {
   &__card {
     margin: 0;
     overflow: hidden;
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--monochrome-500);
     transition: all 0.2s ease;

@@ -1,27 +1,18 @@
 <template>
-  <button 
-    type="button"
-    :class="[
-      'collapsible-header',
-      `collapsible-header--${variant}`
-    ]"
-    @click="$emit('toggle')" 
-    :aria-expanded="!isCollapsed" 
-    :aria-controls="ariaControls"
-  >
+  <button type="button" :class="[
+    'collapsible-header',
+    `collapsible-header--${variant}`
+  ]" @click="$emit('toggle')" :aria-expanded="!isCollapsed" :aria-controls="ariaControls">
     <h2 class="collapsible-header__title | body-md font-semibold">
-      <AtomsIcon v-if="icon && (variant === 'card' || variant === 'inline')" :icon="icon" :size="20" class="title-icon" />
+      <AtomsIcon v-if="icon && (variant === 'card' || variant === 'inline')" :icon="icon" :size="20"
+        class="title-icon" />
       <slot name="title">{{ title }}</slot>
       <ClientOnly>
         <slot name="actions"></slot>
       </ClientOnly>
     </h2>
-    <AtomsIcon 
-      icon="chevron-down" 
-      :size="variant === 'card' ? 24 : 18" 
-      class="collapsible-header__chevron" 
-      :class="{ 'collapsible-header__chevron--open': !isCollapsed }" 
-    />
+    <AtomsIcon icon="chevron-down" :size="variant === 'card' ? 24 : 18" class="collapsible-header__chevron"
+      :class="{ 'collapsible-header__chevron--open': !isCollapsed }" />
   </button>
 </template>
 
@@ -80,7 +71,7 @@ defineEmits<{
 
   // Card variant (styled with background, border, shadow)
   &--card {
-    background: var(--background-100);
+    background: var(--background-200);
     border: 1px solid var(--monochrome-600);
     border-radius: var(--border-radius-lg);
     box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
