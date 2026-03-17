@@ -3,7 +3,7 @@
     <h1 class="tier-confirmation__title | title-md">Confirm Your Selection</h1>
 
     <AtomsDivider />
-    
+
     <div class=" | flow flow-md">
       <div class="tier-confirmation__header">
         <h3 class="| title-xs">You have selected the {{ tier?.tier }} tier</h3>
@@ -26,18 +26,10 @@
       </div>
 
       <div class="tier-confirmation__actions">
-        <AtomsButton
-          type="button"
-          @click="onBack"
-          class="| button-quiet"
-        >
+        <AtomsButton type="button" @click="onBack" class="| button-quiet">
           Back
         </AtomsButton>
-        <AtomsButton
-          type="button"
-          @click="onContinue"
-          class="| button-secondary"
-        >
+        <AtomsButton type="button" @click="onContinue" class="| button-secondary">
           {{ primaryActionLabel }}
         </AtomsButton>
       </div>
@@ -94,9 +86,9 @@ function onContinue() {
 <style lang="scss" scoped>
 .tier-confirmation {
   &__title {
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
-  
+
   &__features {
     margin: var(--size-16) 0;
     max-height: 35dvh;
@@ -104,7 +96,7 @@ function onContinue() {
     transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
 
     &--title {
-      color: var(--secondary-400);
+      color: var(--primary-400);
       margin-bottom: var(--size-8);
     }
   }
@@ -158,7 +150,7 @@ function onContinue() {
   }
 
   &-icon {
-    color: var(--secondary-400);
+    color: var(--primary-400);
     flex-shrink: 0;
   }
 }

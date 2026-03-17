@@ -31,9 +31,9 @@ withDefaults(defineProps<Props>(), {
   font-weight: var(--font-semisemibold);
 
   &--orange {
-    color: light-dark(var(--secondary-400), var(--monochrome-900));
-    border-color: light-dark(var(--secondary-700), var(--secondary-600));
-    background: light-dark(var(--secondary-800), var(--secondary-400));
+    color: light-dark(var(--primary-400), var(--monochrome-900));
+    border-color: light-dark(var(--primary-700), var(--primary-600));
+    background: light-dark(var(--primary-800), var(--primary-400));
   }
 }
 </style>

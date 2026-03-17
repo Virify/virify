@@ -4,21 +4,23 @@
     <div class="preview-banner">
       <div class="container preview-banner__content">
         <NuxtLink to="/dashboard/draft-listings/" class="preview-banner__back | body-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
           Back to Editing
         </NuxtLink>
         <div class="preview-banner__badge | body-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-            <circle cx="12" cy="12" r="3"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
           </svg>
           Preview Mode
         </div>
       </div>
     </div>
-    
+
     <OrganismsListingDetail :listing="draftListing" :is-draft="true" />
   </div>
 </template>
@@ -63,11 +65,12 @@ const draftListing = computed(() => draftListingData.value);
 
 <style scoped lang="scss">
 @use "#styles/_utils/media" as mq;
+
 .preview-banner {
   position: sticky;
   top: 0;
   z-index: 12;
-  background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+  background: linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
   padding: var(--size-16) 0;
   box-shadow: 0 var(--size-2) var(--size-4) rgba(0, 0, 0, 0.1);
 
@@ -85,7 +88,7 @@ const draftListing = computed(() => draftListingData.value);
     color: white;
     text-decoration: none;
     transition: opacity 0.2s;
-    
+
     &:hover {
       opacity: 0.8;
     }

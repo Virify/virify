@@ -1,34 +1,20 @@
 <template>
-  <div 
-    v-if="listing" 
-    class="flex flex-col h-auto w-full rounded-lg bg-(--background-100) overflow-hidden"
-  >
+  <div v-if="listing" class="flex flex-col h-auto w-full rounded-lg bg-(--background-200) overflow-hidden">
     <!-- Large Image -->
-    <div 
-      v-if="getMainImage(listing.property)" 
-      class="w-full shrink-0"
-    >
-      <AtomsCloudFlareImage
-        :src="getMainImage(listing.property)!"
-        :alt="listing.property?.address?.fullAddress || 'Property'"
-        class="w-full h-full object-cover aspect-video"
-        variant="public"
-      />
+    <div v-if="getMainImage(listing.property)" class="w-full shrink-0">
+      <AtomsCloudFlareImage :src="getMainImage(listing.property)!"
+        :alt="listing.property?.address?.fullAddress || 'Property'" class="w-full h-full object-cover aspect-video"
+        variant="public" />
     </div>
-    
+
     <div class="flex flex-col gap-2 p-4">
       <div class="flex items-center justify-between gap-2">
         <p class="text-xl font-bold text-secondary leading-none">
           {{ formatCurrency((listing.price)) }}
         </p>
-        <UBadge
-          :label="listing.rentalListing ? 'To Rent' : 'For Sale'"
-          color="secondary"
-          variant="soft"
-          size="md"
-        />
+        <UBadge :label="listing.rentalListing ? 'To Rent' : 'For Sale'" color="secondary" variant="soft" size="md" />
       </div>
-      
+
       <p class="text-sm font-medium text-foreground">
         {{ listing.property?.address?.fullAddress || 'Address not available' }}
       </p>
@@ -36,7 +22,7 @@
       <p class="text-sm text-gray-500 dark:text-gray-400">
         {{ listing.property?.type?.name || 'Property Type N/A' }}
       </p>
-      
+
       <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mt-1">
         <span v-if="listing.property?.numberBedrooms" class="flex items-center gap-2">
           <UIcon name="i-lucide-bed" class="w-4 h-4" />
@@ -62,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-  defineProps<{
-    listing: any
-  }>()
+defineProps<{
+  listing: any
+}>()
 </script>

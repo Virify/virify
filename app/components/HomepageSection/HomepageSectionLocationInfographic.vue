@@ -410,7 +410,7 @@ useIntersectionObserver($root, ([entry]) => {
     inset: 0;
     z-index: 2;
     opacity: 0;
-    background: var(--background-100);
+    background: var(--background-200);
     pointer-events: none;
     transition: opacity var(--animation-subtle);
   }
@@ -421,7 +421,7 @@ useIntersectionObserver($root, ([entry]) => {
 
   &__input,
   &__dropdown {
-    background: var(--background-200);
+    background: var(--background-100);
     color: currentColor;
     width: 100%;
     box-sizing: border-box;
@@ -457,7 +457,7 @@ useIntersectionObserver($root, ([entry]) => {
     position: relative;
     padding: var(--size-10);
     padding-left: var(--size-14);
-    background: var(--background-100);
+    background: var(--background-200);
     border: 1px solid var(--input-text-border);
     border-radius: var(--border-radius-ui);
     font-weight: var(--font-semisemibold);
@@ -476,7 +476,7 @@ useIntersectionObserver($root, ([entry]) => {
       right: 0;
       min-width: max(12ch, 100%);
       z-index: 4;
-      background: var(--background-200);
+      background: var(--background-100);
       padding: var(--size-10);
       margin: 0;
     }
@@ -501,7 +501,7 @@ useIntersectionObserver($root, ([entry]) => {
   }
 
   &__location-radius--active {
-    background-color: var(--secondary-400);
+    background-color: var(--primary-400);
     color: var(--monochrome-900);
   }
 
@@ -541,7 +541,7 @@ useIntersectionObserver($root, ([entry]) => {
     border-radius: var(--border-radius-ui);
 
     &--highlighted {
-      background-color: var(--background-100);
+      background-color: var(--background-200);
     }
   }
 
@@ -592,7 +592,7 @@ useIntersectionObserver($root, ([entry]) => {
 
   &__saved-pill-icon {
     display: block;
-    color: var(--secondary-500);
+    color: var(--primary-500);
     width: var(--size-20);
     height: var(--size-20);
   }
@@ -602,7 +602,7 @@ useIntersectionObserver($root, ([entry]) => {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-16);
     width: min(100%, 12em);
     z-index: 3;
@@ -656,7 +656,7 @@ useIntersectionObserver($root, ([entry]) => {
     text-align: center;
     padding: var(--size-8);
     font-weight: var(--font-bold);
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
     border-radius: var(--border-radius-ui);
 
@@ -667,8 +667,8 @@ useIntersectionObserver($root, ([entry]) => {
     }
 
     &--clicked {
-      background-color: var(--secondary-500);
-      outline: 2px solid var(--secondary-400);
+      background-color: var(--primary-500);
+      outline: 2px solid var(--primary-400);
     }
   }
 }

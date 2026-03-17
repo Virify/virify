@@ -15,7 +15,8 @@
     </header>
     <div v-if="description || loading" class="stat-card__desc-row">
       <AtomsSkeletonBar :loading="loading" :width="16" :height="16">
-        <button v-if="info" class="stat-card__info-btn button button-xs button-quiet" type="button" aria-label="Show info about this statistic" @click="openInfoModal">
+        <button v-if="info" class="stat-card__info-btn button button-xs button-quiet" type="button"
+          aria-label="Show info about this statistic" @click="openInfoModal">
           <AtomsIcon icon="property/info" :size="16" />
         </button>
       </AtomsSkeletonBar>
@@ -25,12 +26,7 @@
     </div>
 
     <!-- Info Modal -->
-    <AtomsInfoModal 
-      :show="showInfoModal" 
-      :content="info || ''" 
-      :position="modalPosition"
-      @close="closeInfoModal"
-    />
+    <AtomsInfoModal :show="showInfoModal" :content="info || ''" :position="modalPosition" @close="closeInfoModal" />
   </div>
 </template>
 
@@ -66,7 +62,7 @@ function closeInfoModal() {
 @use "#styles/_utils/media" as mq;
 
 .stat-card {
-  background: var(--background-100);
+  background: var(--background-200);
   border: 1px solid var(--monochrome-600);
   border-radius: var(--border-radius-lg);
   padding: var(--size-16);

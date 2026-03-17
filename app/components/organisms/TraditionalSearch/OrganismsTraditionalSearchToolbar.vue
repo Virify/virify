@@ -49,7 +49,7 @@ const links = [
   align-items: center;
   justify-content: space-between;
   padding: var(--toolbar-padding);
-  background: var(--background-200);
+  background: var(--background-100);
   margin: var(--toolbar-padding) var(--toolbar-offset) var(--toolbar-offset);
   gap: var(--size-16);
   border-radius: var(--size-20);

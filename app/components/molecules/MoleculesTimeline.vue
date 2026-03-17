@@ -31,13 +31,13 @@
           {{ formatDisplayDate(item.date) }}
         </time>
       </li>
-      
+
       <!-- Render the no more history card (always visible at the end of the timeline) -->
       <li class="timeline__item timeline__item--no-history">
         <p class="timeline__no-history-message | body-sm">No more property history available</p>
       </li>
     </ol>
-    
+
     <p v-if="note" class="timeline__note | body-xs">{{ note }}</p>
   </div>
 </template>
@@ -98,12 +98,12 @@ const formatDisplayDate = (date: string | Date): string => {
   }
 
   &__type-pill {
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
   }
 
   &__duration-pill {
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
   }
 
@@ -126,7 +126,7 @@ const formatDisplayDate = (date: string | Date): string => {
   }
 
   &__item {
-    background: var(--background-100);
+    background: var(--background-200);
     border: 1px solid var(--monochrome-600);
     border-radius: var(--border-radius-lg);
     padding: var(--size-16);
@@ -141,7 +141,7 @@ const formatDisplayDate = (date: string | Date): string => {
       top: var(--size-16);
       width: var(--size-16);
       height: var(--size-16);
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
       border-radius: 50%;
       z-index: 2;
     }
@@ -161,7 +161,7 @@ const formatDisplayDate = (date: string | Date): string => {
       top: calc(var(--size-16) + var(--size-16));
       width: 2px;
       height: calc(100% + var(--size-16));
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
       z-index: 1;
     }
 
@@ -171,7 +171,7 @@ const formatDisplayDate = (date: string | Date): string => {
 
     // No history item styling
     &--no-history {
-      background: var(--background-100);
+      background: var(--background-200);
       border: 1px dashed var(--monochrome-600);
       text-align: center;
     }

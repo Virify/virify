@@ -1,10 +1,6 @@
 <template>
   <div class="m-listing-amenities-skeleton">
-    <div
-      v-for="category in skeletonCategories"
-      :key="category.name"
-      class="m-listing-amenities-skeleton__category"
-    >
+    <div v-for="category in skeletonCategories" :key="category.name" class="m-listing-amenities-skeleton__category">
       <div class="m-listing-amenities-skeleton__category-header">
         <h3 class="m-listing-amenities-skeleton__category-title | title-xs">
           {{ category.name }}
@@ -12,34 +8,19 @@
       </div>
 
       <ul class="m-listing-amenities-skeleton__list | body-sm">
-        <li
-          v-for="item in category.items"
-          :key="item.id"
-          class="m-listing-amenities-skeleton__item"
-        >
+        <li v-for="item in category.items" :key="item.id" class="m-listing-amenities-skeleton__item">
           <div class="m-listing-amenities-skeleton__item-icon">
             <AtomsIcon :icon="category.icon" :size="16" />
           </div>
           <div class="m-listing-amenities-skeleton__item-content">
-            <span
-              v-if="showRedacted"
-              class="m-listing-amenities-skeleton__placeholder-text"
-              :class="{ shimmer: showRedacted }"
-            >
+            <span v-if="showRedacted" class="m-listing-amenities-skeleton__placeholder-text"
+              :class="{ shimmer: showRedacted }">
               {{ item.name }}
             </span>
-            <a
-              v-else
-              href="#"
-              class="m-listing-amenities-skeleton__fake-link"
-              >{{ item.name }}</a
-            >
+            <a v-else href="#" class="m-listing-amenities-skeleton__fake-link">{{ item.name }}</a>
             -
-            <span
-              v-if="showRedacted"
-              class="| font-semibold m-listing-amenities-skeleton__placeholder-text"
-              :class="{ shimmer: showRedacted }"
-            >
+            <span v-if="showRedacted" class="| font-semibold m-listing-amenities-skeleton__placeholder-text"
+              :class="{ shimmer: showRedacted }">
               {{ item.distance }}
             </span>
             <span v-else class="| font-semibold">{{ item.distance }}</span>
@@ -97,12 +78,13 @@ const skeletonCategories = [
   gap: var(--size-16);
   width: 100%;
 
- &__category {
-    background: var(--background-100);
+  &__category {
+    background: var(--background-200);
     padding: var(--size-16);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--monochrome-600);
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+
     &-title {
       margin: 0;
       color: var(--foreground-100);
@@ -153,7 +135,7 @@ const skeletonCategories = [
     a {
       color: inherit;
       text-decoration: underline;
-      text-decoration-color: var(--secondary-400);
+      text-decoration-color: var(--primary-400);
       text-underline-offset: 2px;
     }
   }
@@ -161,7 +143,7 @@ const skeletonCategories = [
   &__fake-link {
     color: inherit;
     text-decoration: underline;
-    text-decoration-color: var(--secondary-400);
+    text-decoration-color: var(--primary-400);
     text-underline-offset: 2px;
     pointer-events: none; // Disable clicking on the fake link
   }
@@ -173,12 +155,10 @@ const skeletonCategories = [
     background: var(--blue-400);
 
     &.shimmer {
-      background: linear-gradient(
-        90deg,
-        var(--blue-400) 25%,
-        var(--background-100) 50%,
-        var(--blue-400) 75%
-      );
+      background: linear-gradient(90deg,
+          var(--blue-400) 25%,
+          var(--background-200) 50%,
+          var(--blue-400) 75%);
       background-size: 200% 100%;
       animation: shimmer 2s infinite;
     }
@@ -189,6 +169,7 @@ const skeletonCategories = [
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }

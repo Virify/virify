@@ -7,11 +7,8 @@
         </span>
       </TooltipTrigger>
       <TooltipPortal>
-        <TooltipContent 
-          :side-offset="5" 
-          class="a-tooltip-popover | body-sm lineheight-sm"
-          :class="{ 'a-tooltip-popover--responsive': responsive }"
-        >
+        <TooltipContent :side-offset="5" class="a-tooltip-popover | body-sm lineheight-sm"
+          :class="{ 'a-tooltip-popover--responsive': responsive }">
           <slot name="tooltip"></slot>
           <TooltipArrow :width="10" :height="5" class="a-tooltip-arrow" />
         </TooltipContent>
@@ -49,7 +46,7 @@ function onUpdateOpen(val: boolean) {
 <style lang="scss">
 .a-tooltip-popover {
   z-index: 10;
-  background: var(--background-200);
+  background: var(--background-100);
   color: var(--foreground-200);
   border: 1px solid var(--background-300);
   padding: var(--size-8) var(--size-12);
@@ -59,31 +56,31 @@ function onUpdateOpen(val: boolean) {
   max-width: min(600px, var(--reka-tooltip-content-available-width));
   max-height: var(--reka-tooltip-content-available-height);
   white-space: pre-line;
-  
+
   @media (max-width: 768px) {
     max-width: calc(100vw - 32px);
     margin-left: var(--size-16);
     margin-right: var(--size-16);
   }
-  
+
   @media (max-width: 480px) {
     max-width: calc(100vw - 24px);
     margin-left: var(--size-12);
     margin-right: var(--size-12);
   }
-  
+
   &--responsive {
     min-width: var(--reka-tooltip-trigger-width, 200px);
     max-width: min(400px, var(--reka-tooltip-content-available-width));
     white-space: normal;
     word-wrap: break-word;
-    
+
     @media (max-width: 768px) {
       min-width: 250px;
-      max-width: calc(100vw - 48px); 
+      max-width: calc(100vw - 48px);
       margin: 0 var(--size-16);
     }
-    
+
     @media (max-width: 480px) {
       min-width: 200px;
       max-width: calc(100vw - 40px);
@@ -94,10 +91,11 @@ function onUpdateOpen(val: boolean) {
 }
 
 .a-tooltip-arrow {
-  fill: var(--background-100);
+  fill: var(--background-200);
 }
 
 .a-tooltip-popover {
+
   // Style common HTML elements in tooltip content
   h4 {
     font-size: var(--font-sm);
@@ -111,6 +109,7 @@ function onUpdateOpen(val: boolean) {
     font-size: var(--font-sm);
     margin-bottom: var(--size-8);
     line-height: var(--lineheight-md);
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -121,13 +120,15 @@ function onUpdateOpen(val: boolean) {
     color: var(--foreground-100);
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin: var(--size-8) 0;
     padding-left: var(--size-20);
-    
+
     li {
       font-size: var(--font-sm);
       margin-bottom: var(--size-4);
+
       &:last-child {
         margin-bottom: 0;
       }

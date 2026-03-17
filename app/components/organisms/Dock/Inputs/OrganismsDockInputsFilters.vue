@@ -85,7 +85,7 @@ defineProps<Props>()
     gap: var(--size-10);
 
     &--active:not([disabled]) {
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
       color: var(--monochrome-900);
     }
   }
@@ -123,7 +123,7 @@ defineProps<Props>()
     width: var(--size-28);
     height: var(--size-28);
     line-height: var(--size-28);
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
     border-radius: var(--border-radius-pill);
     margin-left: auto;
@@ -134,7 +134,7 @@ defineProps<Props>()
   }
 
   &--active:not([disabled]) &__count {
-    background: var(--secondary-300);
+    background: var(--primary-300);
   }
 }
 </style>

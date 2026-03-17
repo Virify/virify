@@ -1,9 +1,5 @@
 <template>
-  <button 
-    :class="buttonClasses"
-    :data-highlight="shouldHighlight"
-    class="body-xs"
-  >
+  <button :class="buttonClasses" :data-highlight="shouldHighlight" class="body-xs">
     <span v-html="contentFormatted"></span>
     <AtomsIcon v-if="icon" :icon aria-hidden />
   </button>
@@ -26,8 +22,8 @@ const HIGHLIGHT_TERMS = [
   'to buy', 'to rent', 'for sale', 'to let', 'for rent',
 ] as const
 
-const shouldHighlight = computed(() => 
-  HIGHLIGHT_TERMS.some(term => 
+const shouldHighlight = computed(() =>
+  HIGHLIGHT_TERMS.some(term =>
     props.content.toLowerCase().includes(term.toLowerCase())
   )
 )
@@ -41,14 +37,14 @@ const buttonClasses = computed(() => ({
 
 const contentFormatted = computed(() => {
   if (!shouldHighlight.value) return props.content
-  
+
   const regex = new RegExp(
-    `(${HIGHLIGHT_TERMS.map(term => 
+    `(${HIGHLIGHT_TERMS.map(term =>
       term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    ).join('|')})`, 
+    ).join('|')})`,
     'gi'
   )
-  
+
   return props.content.replace(regex, '<mark>$1</mark>')
 })
 </script>
@@ -71,7 +67,7 @@ const contentFormatted = computed(() => {
   cursor: pointer;
 
   &:hover {
-    background: var(--background-200);
+    background: var(--background-100);
   }
 
   svg {
@@ -79,24 +75,24 @@ const contentFormatted = computed(() => {
     flex-shrink: 0;
     width: var(--size-18);
     height: var(--lineheight-sm);
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   // Use semantic mark element instead of span
   mark {
     background: transparent;
-    color: var(--secondary-400);
+    color: var(--primary-400);
     font-weight: 600;
   }
 
   // Variants
   &--filled {
-    background: var(--secondary-400);
-    border-color: var(--secondary-300);
+    background: var(--primary-400);
+    border-color: var(--primary-300);
     color: var(--monochrome-900);
 
     &:hover {
-      background: var(--secondary-300);
+      background: var(--primary-300);
     }
 
     svg {

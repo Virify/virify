@@ -31,7 +31,7 @@
 
 .homepage-section-signup {
   position: relative;
-  background: #26333C; // @TODO replace with new colours once supported
+  background: var(--blue-200);
   color: var(--monochrome-900);
   border-radius: var(--border-radius-2xl);
   padding: var(--size-56) var(--size-32) 250px;
@@ -131,7 +131,7 @@
     font-size: 0.6em;
     line-height: var(--lineheight-xs);
     font-weight: var(--font-semibold);
-    color: var(--secondary-400);
+    color: var(--primary-400);
     margin: 0 auto var(--size-16);
   }
 }

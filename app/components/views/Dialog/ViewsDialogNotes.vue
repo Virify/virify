@@ -12,7 +12,8 @@
           {{ isPending ? 'Deleting...' : 'Delete note' }}
         </button>
         <div class="notes-dialog-buttons">
-          <button class="| button button-monochrome button-sm button-secondary" @click="() => hideDialog()" :disabled="isPending">
+          <button class="| button button-monochrome button-sm button-secondary" @click="() => hideDialog()"
+            :disabled="isPending">
             Cancel
           </button>
           <button class="| button button-secondary button-sm" @click="saveNotes" :disabled="isPending || !notes.trim()">
@@ -84,12 +85,12 @@ textarea {
   padding: var(--size-12);
   border: 1px solid var(--background-300);
   border-radius: var(--border-radius-lg);
-  background: var(--background-200);
+  background: var(--background-100);
   resize: vertical;
 
   &:focus {
     outline: none;
-    border-color: var(--secondary-400);
+    border-color: var(--primary-400);
   }
 }
 

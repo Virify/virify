@@ -1,12 +1,9 @@
 <template>
   <li class="listing-outdoor-space-card">
-    <div v-if="outdoorSpace.media && outdoorSpace.media.length > 0 && outdoorSpace.media[0]" class="listing-outdoor-space-card__image">
-      <AtomsCloudFlareImage 
-        :src="outdoorSpace.media[0].image!" 
-        :alt="outdoorSpace.media[0].metadata!" 
-        variant="card" 
-        class="| image-sm" 
-      />
+    <div v-if="outdoorSpace.media && outdoorSpace.media.length > 0 && outdoorSpace.media[0]"
+      class="listing-outdoor-space-card__image">
+      <AtomsCloudFlareImage :src="outdoorSpace.media[0].image!" :alt="outdoorSpace.media[0].metadata!" variant="card"
+        class="| image-sm" />
     </div>
     <div class="listing-outdoor-space-card__content | body-sm">
       <!-- Title row with icon and info button -->
@@ -57,7 +54,7 @@ const props = defineProps<Props>();
 // Extract features from outdoor space
 const features = computed(() => {
   const features: string[] = [];
-  
+
   // Show what it contains (Garden, Yard, Land)
   if (props.hasGardens) {
     features.push("Garden");
@@ -68,21 +65,21 @@ const features = computed(() => {
   if (props.hasLand) {
     features.push("Land");
   }
-  
+
   // Add features from the features array (new enum-based structure)
   if (props.outdoorSpace.features?.length) {
     props.outdoorSpace.features.forEach((feature: string) => {
       features.push(convertEnumToString(feature));
     });
   }
-  
+
   return features;
 });
 </script>
 
 <style lang="scss" scoped>
 .listing-outdoor-space-card {
-  background: var(--background-100);
+  background: var(--background-200);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--monochrome-600);
   box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);

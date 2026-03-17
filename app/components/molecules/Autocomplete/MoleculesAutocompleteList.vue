@@ -48,7 +48,7 @@ defineProps<Props<T>>()
     }
 
     &:has(.m-autocomplete-list__select:hover) {
-      background: var(--background-100);
+      background: var(--background-200);
     }
   }
 
@@ -75,7 +75,7 @@ defineProps<Props<T>>()
     transition: color var(--animation-fast);
 
     &:hover {
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
 
     svg {

@@ -271,7 +271,7 @@ const propertyDetails = {
   --radius: var(--border-radius-xl);
 
   padding: var(--size-14);
-  background: var(--background-200);
+  background: var(--background-100);
   min-height: 30em;
 
   @include mq.tablet {
@@ -336,11 +336,11 @@ const propertyDetails = {
     &--highlighted {
       white-space: nowrap;
       font-weight: var(--font-semibold);
-      color: light-dark(var(--secondary-400), var(--monochrome-900));
-      background: light-dark(var(--secondary-900), var(--secondary-400));
+      color: light-dark(var(--primary-400), var(--monochrome-900));
+      background: light-dark(var(--primary-900), var(--primary-400));
       border-radius: var(--border-radius-lg);
       padding: var(--size-2) var(--size-8);
-      border: 1px solid light-dark(var(--secondary-800), var(--secondary-700));
+      border: 1px solid light-dark(var(--primary-800), var(--primary-700));
     }
   }
 
@@ -390,7 +390,7 @@ const propertyDetails = {
     .a-icon {
       width: var(--size-18);
       height: var(--size-18);
-      color: var(--secondary-400);
+      color: var(--primary-400);
       flex: 1 0 auto;
     }
   }
@@ -398,7 +398,7 @@ const propertyDetails = {
   &__card {
     --gradient-box-radius: var(--border-radius-3xl);
 
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-14);
     width: 90%;
     position: absolute;

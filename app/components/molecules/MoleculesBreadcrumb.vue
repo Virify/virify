@@ -31,6 +31,7 @@ defineProps<{
 
 <style scoped lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -48,7 +49,7 @@ defineProps<{
   }
 
   &__separator {
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__item {

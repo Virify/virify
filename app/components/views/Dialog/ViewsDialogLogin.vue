@@ -5,7 +5,7 @@
     <p v-if="fromProtectedPage" class="protected-page-message | body-md">
       Login is required to view this page - please login below
     </p>
-    
+
     <OrganismsFormsLogin @form-success="formSuccess" />
 
     <div v-if="!isWaitingListMode">
@@ -13,7 +13,8 @@
 
       <div class="| center-text flow flow-sm">
         <p>
-          <dialog-link to="/password/forgot" :component="ViewsDialogForgotPassword" class="| body-sm"> Forgot password? </dialog-link>
+          <dialog-link to="/password/forgot" :component="ViewsDialogForgotPassword" class="| body-sm"> Forgot password?
+          </dialog-link>
         </p>
 
         <p class="| body-sm">
@@ -22,7 +23,7 @@
         </p>
       </div>
     </div>
-    
+
   </div>
 </template>
 
@@ -51,19 +52,19 @@ const { isWaitingListMode } = useWaitingListMode();
  */
 async function formSuccess() {
   console.log('Login form success triggered');
-  
+
   // Fetch user session
   await fetch();
   console.log('Session fetched');
-  
+
   console.log('Closing dialog');
-  
+
   // Check if there's a redirect destination from the middleware
   const redirectCookie = useCookie('redirect');
   const destination = redirectCookie.value;
-  
+
   hideDialog({ loginSuccess: true });
-  
+
   // Navigate to the intended destination if there's a redirect cookie
   if (destination) {
     redirectCookie.value = null;
@@ -73,7 +74,7 @@ async function formSuccess() {
 </script>
 <style>
 .success {
-  color: var(--primary-500);
+  color: var(--secondary--500);
 }
 
 .protected-page-message {

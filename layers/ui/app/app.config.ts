@@ -15,15 +15,15 @@ export default defineAppConfig({
     },
     select: {
       slots: {
-        base: "bg-(--background-200)! placeholder:text-(--foreground-200)/60! focus:outline-none!",
-        group: "bg-(--background-200)!",
+        base: "bg-(--background-100)! placeholder:text-(--foreground-200)/60! focus:outline-none!",
+        group: "bg-(--background-100)!",
         item: 'hover:bg-(--background-300)/50! focus:outline-none! cursor-pointer!',
         placeholder: "text-(--foreground-200)/60!",
       },
     },
     input: {
       slots: {
-        base: "bg-(--background-200)! placeholder:text-(--foreground-200)/60! focus:outline-none! ",
+        base: "bg-(--background-100)! placeholder:text-(--foreground-200)/60! focus:outline-none! ",
         input: "text-(--foreground-100)",
       },
       compoundVariants: [
@@ -35,7 +35,7 @@ export default defineAppConfig({
     },
     textarea: {
       slots: {
-        base: "bg-(--background-200)! placeholder:text-(--foreground-200)/60! focus:outline-none!",
+        base: "bg-(--background-100)! placeholder:text-(--foreground-200)/60! focus:outline-none!",
       },
       compoundVariants: [
         {
@@ -46,7 +46,7 @@ export default defineAppConfig({
     },
     toast: {
       slots: {
-        root: "bg-(--background-200)",
+        root: "bg-(--background-100)",
       },
     },
     formField: {

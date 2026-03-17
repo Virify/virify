@@ -2,37 +2,34 @@
   <div class="dashboard">
     <div class="analytics-section">
       <slot name="analytics">
-        <AtomsStatsCard :value="String(analytics?.totalViews || 0)" :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views" :animated="true" tier="premium" />
-        <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users" title="Listings Favourited" :animated="true" tier="premium" />
-        <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings" title="Total Enquiries" :animated="true" tier="premium" />
+        <AtomsStatsCard :value="String(analytics?.totalViews || 0)"
+          :subtitle="`+${analytics?.percentageChange || 0}% from last month`" title="Total Listings Views"
+          :animated="true" tier="premium" />
+        <AtomsStatsCard :value="String(analytics?.favoritedByOthersCount || 0)" subtitle="Listings saved by users"
+          title="Listings Favourited" :animated="true" tier="premium" />
+        <AtomsStatsCard :value="String(analytics?.totalConversations || 0)" subtitle="Enquiries on your listings"
+          title="Total Enquiries" :animated="true" tier="premium" />
       </slot>
     </div>
 
     <div v-if="recentOwnedListings?.length > 0" class="content-section">
       <div class="account-card">
         <div class="account-card__header">
-          <AtomsCollapsibleHeader 
-            :is-collapsed="isOwnedCollapsed" 
-            title="My Recent Listings"
-            icon="read-more"
-            variant="inline" 
-            @toggle="isOwnedCollapsed = !isOwnedCollapsed"
-          />
+          <AtomsCollapsibleHeader :is-collapsed="isOwnedCollapsed" title="My Recent Listings" icon="read-more"
+            variant="inline" @toggle="isOwnedCollapsed = !isOwnedCollapsed" />
         </div>
 
         <Transition name="collapse-fade">
           <div v-show="!isOwnedCollapsed" class="account-card__content">
             <div class="account-card__scrollable">
               <div class="owned-listings-grid">
-                <OrganismsAccountOwnListingCard 
-                  v-for="listing in recentOwnedListings.slice(0, 6)" 
-                  :key="listing.id" 
-                  :item="listing" 
-                />
+                <OrganismsAccountOwnListingCard v-for="listing in recentOwnedListings.slice(0, 6)" :key="listing.id"
+                  :item="listing" />
               </div>
             </div>
-            
-            <nuxt-link v-if="recentOwnedListings?.length >= 6" to="/account/my-listings" class="content-section__see-all | button button-sm button-secondary">
+
+            <nuxt-link v-if="recentOwnedListings?.length >= 6" to="/account/my-listings"
+              class="content-section__see-all | button button-sm button-secondary">
               See all listings
             </nuxt-link>
           </div>
@@ -42,48 +39,32 @@
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountListingCard
-          :is-collapsed="isFavouritesCollapsed"
-          @toggle="isFavouritesCollapsed = !isFavouritesCollapsed"
-          title="Recently Favourited Listings"
-          icon="cards/favourite"
-          :items="(recentFavourites as RecentItem[])"
-          empty-message="No recent favourites yet."
-          :show-favourite-icon="true"
-        />
+        <OrganismsAccountListingCard :is-collapsed="isFavouritesCollapsed"
+          @toggle="isFavouritesCollapsed = !isFavouritesCollapsed" title="Recently Favourited Listings"
+          icon="cards/favourite" :items="(recentFavourites as RecentItem[])" empty-message="No recent favourites yet."
+          :show-favourite-icon="true" />
 
-        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites" class="content-section__see-all | button button-sm button-tertiary">See all favourites</nuxt-link>
+        <nuxt-link v-if="recentFavourites?.length > 5 && !isFavouritesCollapsed" to="account/favourites"
+          class="content-section__see-all | button button-sm button-tertiary">See all favourites</nuxt-link>
       </slot>
     </div>
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountListingCard
-          :is-collapsed="isNotesCollapsed"
-          @toggle="isNotesCollapsed = !isNotesCollapsed"
-          title="Recently Added Notes"
-          icon="cards/notes"
-          :items="(recentUserNotes as RecentItem[])"          
-          empty-message="No recent notes yet."
-          :show-notes-icon="true"
-        />
+        <OrganismsAccountListingCard :is-collapsed="isNotesCollapsed" @toggle="isNotesCollapsed = !isNotesCollapsed"
+          title="Recently Added Notes" icon="cards/notes" :items="(recentUserNotes as RecentItem[])"
+          empty-message="No recent notes yet." :show-notes-icon="true" />
 
-        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="account/notes" class="content-section__see-all | button button-sm button-tertiary">See all notes</nuxt-link>
+        <nuxt-link v-if="recentUserNotes?.length > 5 && !isNotesCollapsed" to="account/notes"
+          class="content-section__see-all | button button-sm button-tertiary">See all notes</nuxt-link>
       </slot>
     </div>
 
     <div class="content-section">
       <slot name="content">
-        <OrganismsAccountListingCard
-          :is-collapsed="isViewedCollapsed"
-          @toggle="isViewedCollapsed = !isViewedCollapsed"
-          title="Recently Viewed Listings"
-          icon="search"
-          :items="(recentlyViewedListings as RecentItem[])"
-          empty-message="No recent views yet."
-          :show-favourite-icon="true"
-          :show-notes-icon="true"
-        />
+        <OrganismsAccountListingCard :is-collapsed="isViewedCollapsed" @toggle="isViewedCollapsed = !isViewedCollapsed"
+          title="Recently Viewed Listings" icon="search" :items="(recentlyViewedListings as RecentItem[])"
+          empty-message="No recent views yet." :show-favourite-icon="true" :show-notes-icon="true" />
       </slot>
     </div>
   </div>
@@ -123,6 +104,7 @@ watchEffect(() => {
 
 <style lang="scss" scoped>
 @use "#styles/_utils/media" as mq;
+
 .dashboard {
   display: flex;
   flex-direction: column;
@@ -148,7 +130,7 @@ watchEffect(() => {
 }
 
 .content-section {
-  background: var(--background-200);
+  background: var(--background-100);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;

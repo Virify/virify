@@ -209,7 +209,7 @@ onMounted(() => {
 
   &__popover,
   &__menu {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-3xl);
     border: 1px solid var(--border-color-200);
     box-sizing: border-box;

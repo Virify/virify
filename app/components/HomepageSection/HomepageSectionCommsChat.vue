@@ -75,7 +75,7 @@ defineProps<Props>()
   }
 
   &--seller {
-    background: var(--secondary-700);
+    background: var(--primary-700);
     color: var(--monochrome-100);
     border-radius: var(--border-radius-2xl) var(--border-radius-2xl) 0;
     justify-self: flex-end;
@@ -83,7 +83,7 @@ defineProps<Props>()
   }
 
   &--seller &__footer {
-    color: var(--secondary-300);
+    color: var(--primary-300);
   }
 }
 </style>

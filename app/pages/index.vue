@@ -218,7 +218,7 @@ function showSignupForm() {
 
   &__hero-dark {
     color: var(--monochrome-900);
-    background: #26333C;
+    background: var(--blue-200);
   }
 
   &__border-radius {

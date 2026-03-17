@@ -93,7 +93,7 @@ useHead({
 
 <style lang="scss">
 .page {
-  background: var(--background-100);
+  background: var(--background-200);
 }
 
 .page-enter-active,

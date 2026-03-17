@@ -2,26 +2,23 @@
   <main class="p-listing">
     <div class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
-        <MoleculesImageGallery :images="galleryImages"
-          @open-modal="openImageModal" />
+        <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
         <div class="p-listing__content | flow flow-sm">
           <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
             role="presentation">
-            <MoleculesImageGallery :images="galleryImages"
-              @open-modal="openImageModal" />
+            <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
             :address="address" :price-type="priceType" :property-type="property?.type?.name"
             :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-            :has-garden="hasGarden"
-            :has-land="hasLand"
-            :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
-            :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+            :has-garden="hasGarden" :has-land="hasLand" :receptions="property?.numberReceptions || undefined"
+            :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
+            :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
 
@@ -36,30 +33,21 @@
 
           <div v-if="hasRooms" class="p-listing__section">
             <h2 class="title-md">Rooms</h2>
-            <MoleculesListingItemDetails v-if="property?.bedroomFeatures && property.bedroomFeatures.length > 0" :items="property?.bedroomFeatures" type="room"
-              subtype="Bedroom" title="Bedrooms" />
-            <MoleculesListingItemDetails v-if="property?.bathroomFeatures && property.bathroomFeatures.length > 0" :items="property?.bathroomFeatures"
-              type="room" subtype="Bathroom" title="Bathrooms" />
-            <MoleculesListingItemDetails v-if="property?.kitchenFeatures && property.kitchenFeatures.length > 0" :items="property?.kitchenFeatures" type="room"
-              subtype="Kitchen" title="Kitchen" />
-            <MoleculesListingItemDetails v-if="property?.reception && property.reception.length > 0" :items="property?.reception" type="room"
-              subtype="Reception" title="Receptions" />
-            <MoleculesListingItemDetails v-if="property?.otherRoom && property.otherRoom.length > 0" :items="property?.otherRoom" type="room"
-              subtype="Other Rooms" title="Other Rooms" />
+            <MoleculesListingItemDetails v-if="property?.bedroomFeatures && property.bedroomFeatures.length > 0"
+              :items="property?.bedroomFeatures" type="room" subtype="Bedroom" title="Bedrooms" />
+            <MoleculesListingItemDetails v-if="property?.bathroomFeatures && property.bathroomFeatures.length > 0"
+              :items="property?.bathroomFeatures" type="room" subtype="Bathroom" title="Bathrooms" />
+            <MoleculesListingItemDetails v-if="property?.kitchenFeatures && property.kitchenFeatures.length > 0"
+              :items="property?.kitchenFeatures" type="room" subtype="Kitchen" title="Kitchen" />
+            <MoleculesListingItemDetails v-if="property?.reception && property.reception.length > 0"
+              :items="property?.reception" type="room" subtype="Reception" title="Receptions" />
+            <MoleculesListingItemDetails v-if="property?.otherRoom && property.otherRoom.length > 0"
+              :items="property?.otherRoom" type="room" subtype="Other Rooms" title="Other Rooms" />
             <!-- Outdoor Space Section (if it exists) -->
-            <MoleculesListingItemDetails 
-              v-if="property?.outdoorSpace"
-              :items="[property.outdoorSpace]" 
-              type="outdoorspace" 
-              title="Outdoor Space" 
-              :show-floor="false" 
-              :total-area="property.outdoorSpace.totalArea"
-              :has-gardens="hasGarden"
-              :has-yards="hasYard"
-              :has-land="hasLand"
-              :gardens="gardensWithDetails"
-              :yards="yardsWithDetails"
-              :lands="landsWithDetails" />
+            <MoleculesListingItemDetails v-if="property?.outdoorSpace" :items="[property.outdoorSpace]"
+              type="outdoorspace" title="Outdoor Space" :show-floor="false"
+              :total-area="property.outdoorSpace.totalArea" :has-gardens="hasGarden" :has-yards="hasYard"
+              :has-land="hasLand" :gardens="gardensWithDetails" :yards="yardsWithDetails" :lands="landsWithDetails" />
           </div>
 
           <!-- Energy & Utilities -->
@@ -83,12 +71,12 @@
                 :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
               <MoleculesListingFeatures v-if="property?.additionalFeatures?.features?.length"
                 title="Additional Features" :features="property?.additionalFeatures" />
-              <MoleculesListingFeatures v-if="property?.accessibilityFeatures?.features?.length"
-                title="Accessibility" :features="property?.accessibilityFeatures" />
+              <MoleculesListingFeatures v-if="property?.accessibilityFeatures?.features?.length" title="Accessibility"
+                :features="property?.accessibilityFeatures" />
               <MoleculesListingFeatures v-if="property?.securityFeatures?.features?.length" title="Security"
                 :features="property?.securityFeatures" />
-              <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities"
-                title="Energy & Utilities" :energy-data="property.energyAndUtilities!" />
+              <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities" title="Energy & Utilities"
+                :energy-data="property.energyAndUtilities!" />
               <MoleculesListingMobileCoverage />
             </div>
           </div>
@@ -104,19 +92,15 @@
 
           <!-- Price Paid History -->
           <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
-            <MoleculesListingPricePaid 
-              :listing-id="listing.id" 
-              :price="listing.saleListing ? listing.price : undefined"
-              :property-type="property?.type?.name"
-              :address="{
+            <MoleculesListingPricePaid :listing-id="listing.id" :price="listing.saleListing ? listing.price : undefined"
+              :property-type="property?.type?.name" :address="{
                 number: property.address.number,
                 flat: property.address.flat,
                 street: property.address.street,
                 city: property.address.city,
                 postcode: property.address.postcode,
                 county: property.address.county,
-              }" 
-            />
+              }" />
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
@@ -134,7 +118,8 @@
           </div>
 
           <div class="p-listing__section">
-            <MoleculesListingAdvert :title="advertTitle" :description="advertDescription" :link="advertLink" :linkText="advertLinkText" />
+            <MoleculesListingAdvert :title="advertTitle" :description="advertDescription" :link="advertLink"
+              :linkText="advertLinkText" />
           </div>
         </div>
 
@@ -142,8 +127,7 @@
           <Transition name="p-listing-images">
             <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
               <div class="p-listing__sidebar-carousel">
-                <MoleculesImageGallery :images="galleryImages"
-                  @open-modal="openImageModal" />
+                <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
               </div>
             </div>
           </Transition>
@@ -152,10 +136,9 @@
             :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
             :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
             :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-            :has-garden="hasGarden"
-            :has-land="hasLand"
-            :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
-            :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+            :has-garden="hasGarden" :has-land="hasLand" :receptions="property?.numberReceptions || undefined"
+            :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
+            :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
             :agent="listing?.user || {}"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus"
@@ -170,12 +153,10 @@
 
     <client-only>
       <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
-        :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal"
-        :price-type="priceType" :address="address" :property-type="property?.type?.name"
-        :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
-        :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-        :has-garden="hasGarden"
-        :has-land="hasLand"
+        :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal" :price-type="priceType"
+        :address="address" :property-type="property?.type?.name" :property-size="property?.size || undefined"
+        :bedrooms="property?.numberBedrooms || undefined" :bathrooms="property?.numberBathrooms || undefined"
+        :other-rooms="property?.numberOtherRooms || undefined" :has-garden="hasGarden" :has-land="hasLand"
         :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
         :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
         :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
@@ -462,7 +443,7 @@ ul {
       z-index: 2;
       width: 100%;
       max-width: none;
-      background: var(--background-100);
+      background: var(--background-200);
       border-top-right-radius: var(--border-radius-3xl);
       border-top-left-radius: var(--border-radius-3xl);
       padding: var(--border-radius-3xl) 0 0;
@@ -629,7 +610,7 @@ ul {
     row-gap: var(--size-12);
   }
 
-  > * {
+  >* {
     break-inside: avoid;
     margin-bottom: var(--size-16);
     display: inline-block;

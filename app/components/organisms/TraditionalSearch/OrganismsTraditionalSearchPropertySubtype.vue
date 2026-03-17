@@ -108,7 +108,7 @@ async function emitChange(updatedValue: string, checked: boolean) {
     z-index: 9;
     min-width: 15ch;
     max-width: 20ch;
-    background: var(--background-200);
+    background: var(--background-100);
     color: var(--foreground-100);
     padding: var(--size-16);
   }

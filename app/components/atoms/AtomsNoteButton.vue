@@ -65,7 +65,7 @@ function handleClick() {
 <style lang="scss">
 .a-note-button {
   --notes-active-background: transparent;
-  --notes-active-color: var(--secondary-400);
+  --notes-active-color: var(--primary-400);
   --notes-dot-color: var(--error);
 
   position: relative;
@@ -92,7 +92,7 @@ function handleClick() {
 
 <style scoped>
 circle {
-  fill: var(--primary-600);
+  fill: var(--secondary--600);
   border: none;
 }
 

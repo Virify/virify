@@ -62,7 +62,7 @@ defineProps({
   display: block;
   width: var(--size-24);
   height: var(--size-24);
-  color: var(--secondary-500);
+  color: var(--primary-500);
 }
 
 .m-icon-link-icon-large {

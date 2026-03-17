@@ -50,12 +50,12 @@ function updateToggled() {
   }
 
   &--active &__thumb {
-    background: var(--secondary-400);
+    background: var(--primary-400);
     transform: translateX(var(--size-12));
   }
 
   &--active:hover &__thumb {
-    background: var(--secondary-500);
+    background: var(--primary-500);
   }
 }
 </style>

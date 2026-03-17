@@ -1,14 +1,11 @@
 <template>
   <div ref="sidebarContent" class="navigation-container">
-      <nav class="navigation" role="navigation" aria-label="Desktop sidebar navigation">
-        <ul>
-          <MoleculesNavigationGroup 
-            :groupStates="groupStates"
-            @toggleGroup="$emit('toggleGroup', $event)"
-            @navClick="$emit('navClick', $event)"
-          />
-        </ul>
-      </nav>
+    <nav class="navigation" role="navigation" aria-label="Desktop sidebar navigation">
+      <ul>
+        <MoleculesNavigationGroup :groupStates="groupStates" @toggleGroup="$emit('toggleGroup', $event)"
+          @navClick="$emit('navClick', $event)" />
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -64,7 +61,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .navigation-container {
-  background: var(--background-200);
+  background: var(--background-100);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;

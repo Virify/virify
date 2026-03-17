@@ -1,12 +1,8 @@
 <template>
   <li class="listing-garden-yard-land-card">
     <div v-if="item.media && item.media.length > 0 && item.media[0]" class="listing-garden-yard-land-card__image">
-      <AtomsCloudFlareImage 
-        :src="item.media[0].image!" 
-        :alt="item.media[0].metadata!" 
-        variant="card" 
-        class="| image-sm" 
-      />
+      <AtomsCloudFlareImage :src="item.media[0].image!" :alt="item.media[0].metadata!" variant="card"
+        class="| image-sm" />
     </div>
     <div class="listing-garden-yard-land-card__content | body-sm">
       <!-- Title row with icon, name, and info button -->
@@ -45,10 +41,10 @@
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 
 interface Props {
-  item: 
-    | Prisma.GardenGetPayload<{ include: { media: true } }>
-    | Prisma.YardGetPayload<{ include: { media: true } }>
-    | Prisma.LandGetPayload<{ include: { media: true } }>;
+  item:
+  | Prisma.GardenGetPayload<{ include: { media: true } }>
+  | Prisma.YardGetPayload<{ include: { media: true } }>
+  | Prisma.LandGetPayload<{ include: { media: true } }>;
   type: 'garden' | 'yard' | 'land';
 }
 
@@ -63,7 +59,7 @@ const icon = computed(() => {
 // Extract features
 const features = computed(() => {
   const features: string[] = [];
-  
+
   // Add position and facing first (for gardens and yards)
   if ((props.type === 'garden' || props.type === 'yard') && 'position' in props.item && props.item.position) {
     features.push(convertEnumToString(props.item.position));
@@ -71,21 +67,21 @@ const features = computed(() => {
       features.push(`${convertEnumToString(props.item.facing)} Facing`);
     }
   }
-  
+
   // Add features from the features array (new enum-based structure)
   if (props.item.features?.length) {
     props.item.features.forEach((feature: string) => {
       features.push(convertEnumToString(feature));
     });
   }
-  
+
   return features;
 });
 </script>
 
 <style lang="scss" scoped>
 .listing-garden-yard-land-card {
-  background: var(--background-100);
+  background: var(--background-200);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--monochrome-600);
   box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);

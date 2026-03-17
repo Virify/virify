@@ -1,12 +1,8 @@
 <template>
   <li class="listing-room-card">
     <div v-if="item.media && item.media.length > 0 && item.media[0]" class="listing-room-card__image">
-      <AtomsCloudFlareImage 
-        :src="item.media[0].image!" 
-        :alt="item.media[0].metadata!" 
-        variant="card" 
-        class="w-full h-full aspect-4/3 object-cover" 
-      />
+      <AtomsCloudFlareImage :src="item.media[0].image!" :alt="item.media[0].metadata!" variant="card"
+        class="w-full h-full aspect-4/3 object-cover" />
     </div>
     <div class="listing-room-card__content | body-sm">
       <!-- Title row with icon, title, and info button -->
@@ -49,12 +45,12 @@
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 
 interface Props {
-  item: 
-    | Prisma.BedroomGetPayload<{ include: { media: true } }>
-    | Prisma.BathroomGetPayload<{ include: { media: true } }>
-    | Prisma.ReceptionGetPayload<{ include: { media: true } }>
-    | Prisma.OtherRoomGetPayload<{ include: { media: true } }>
-    | Prisma.KitchenGetPayload<{ include: { media: true } }>;
+  item:
+  | Prisma.BedroomGetPayload<{ include: { media: true } }>
+  | Prisma.BathroomGetPayload<{ include: { media: true } }>
+  | Prisma.ReceptionGetPayload<{ include: { media: true } }>
+  | Prisma.OtherRoomGetPayload<{ include: { media: true } }>
+  | Prisma.KitchenGetPayload<{ include: { media: true } }>;
   subtype?: string;
   showFloor?: boolean;
 }
@@ -80,7 +76,7 @@ const features = computed(() => {
 
 <style lang="scss" scoped>
 .listing-room-card {
-  background: var(--background-100);
+  background: var(--background-200);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--monochrome-600);
   box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);

@@ -32,7 +32,7 @@ function onDeleted() {
 
 <style lang="scss">
 .v-dialog-saved-location-single {
-  background-color: var(--background-100);
+  background-color: var(--background-200);
 
   &__title {
     margin: 0;

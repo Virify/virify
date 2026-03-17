@@ -1,12 +1,7 @@
 <template>
   <Teleport to="#teleports">
     <dialog ref="$dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
-      <button
-        class="o-dialog-backdrop"
-        role="none"
-        tabindex="-1"
-        @click.prevent="handleBackdropClick"
-      ></button>
+      <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="handleBackdropClick"></button>
 
       <section v-if="dialog" class="o-dialog-window" :class="dialog.className">
         <component :is="dialog.component" v-bind="dialog.props" />
@@ -124,6 +119,7 @@ body {
   padding: var(--size-8);
   width: var(--size-42);
   height: var(--size-42);
+
   &:hover {
     color: var(--foreground-200);
   }
@@ -151,7 +147,7 @@ body {
 
 :where(.o-dialog-window) {
   position: relative;
-  background: light-dark(var(--background-200), var(--background-100));
+  background: light-dark(var(--background-100), var(--background-200));
   color: var(--foreground-200);
   margin: auto;
   width: fit-content;

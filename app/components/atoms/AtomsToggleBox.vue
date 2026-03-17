@@ -1,13 +1,7 @@
 <template>
   <label class="a-toggle-box | font-semibold body-sm lineheight-sm">
-    <input
-      :type="type"
-      :name="name"
-      :value="label"
-      :checked="checked"
-      class="| visually-hidden"
-      @change="$emit('change', $event)"
-    />
+    <input :type="type" :name="name" :value="label" :checked="checked" class="| visually-hidden"
+      @change="$emit('change', $event)" />
     {{ label }}
   </label>
 </template>
@@ -28,7 +22,7 @@ defineEmits(['change']);
 <style lang="scss">
 .a-toggle-box {
   display: block;
-  background: var(--background-200);
+  background: var(--background-100);
   color: var(--foreground-100);
   box-shadow: inset 0 0 0 1px light-dark(var(--monochrome-700), var(--monochrome-400));
   padding: var(--size-10) var(--size-16);
@@ -42,7 +36,7 @@ defineEmits(['change']);
   }
 
   &:hover {
-    background: light-dark(var(--background-300), var(--background-100));
+    background: light-dark(var(--background-300), var(--background-200));
   }
 
   &:has(:focus-visible) {
@@ -50,7 +44,7 @@ defineEmits(['change']);
   }
 
   &:has(input:checked) {
-    background: light-dark(var(--background-300), var(--background-100));
+    background: light-dark(var(--background-300), var(--background-200));
     box-shadow: inset 0 0 0 2px currentColor;
 
     &:hover {

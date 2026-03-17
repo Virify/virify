@@ -79,7 +79,7 @@ function toggleDropdown() {
 
   &__icon {
     flex-shrink: 0;
-    color: var(--secondary-400);
+    color: var(--primary-400);
     width: var(--size-18);
     height: var(--size-18);
   }

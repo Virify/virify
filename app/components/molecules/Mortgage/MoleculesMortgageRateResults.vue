@@ -29,7 +29,7 @@ function getRateInfo(result: MortgageResult): string {
 
   &__card {
     :deep(.stat-card) {
-      background: var(--background-100);
+      background: var(--background-200);
       border: 1px solid var(--border-color-200);
     }
   }

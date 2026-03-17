@@ -2,13 +2,8 @@
   <div class="feature-card" @click="toggleCollapse">
     <div class="feature-card__content | body-md">
       <!-- Title row with icon, title, info button, and collapse arrow -->
-      <AtomsCollapsibleHeader
-        :is-collapsed="isCollapsed"
-        icon="property/utility"
-        title="Energy"
-        variant="inline"
-        @toggle="() => {}"
-      >
+      <AtomsCollapsibleHeader :is-collapsed="isCollapsed" icon="property/utility" title="Energy" variant="inline"
+        @toggle="() => { }">
         <template #actions>
           <AtomsTooltip v-if="description" :responsive="true">
             <AtomsIcon icon="property/info" :size="16" />
@@ -22,7 +17,8 @@
       <!-- Energy details (collapsible) -->
       <div v-show="!isCollapsed" class="feature-card__details-section">
         <!-- Heating & Hot Water -->
-        <div v-if="energyData?.primaryHeatingType?.length || energyData?.boilerType" class="feature-card__details-group">
+        <div v-if="energyData?.primaryHeatingType?.length || energyData?.boilerType"
+          class="feature-card__details-group">
           <h6 class="feature-card__group-title | body-sm font-semibold">Heating & Hot Water</h6>
           <ul class="energy-info__list">
             <li v-if="energyData.primaryHeatingType?.length" class="feature-card__detail-row">
@@ -134,7 +130,7 @@ const formatUtility = (utility: string): string => {
 }
 
 .feature-card {
-  background: var(--background-100);
+  background: var(--background-200);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--monochrome-600);
   box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);

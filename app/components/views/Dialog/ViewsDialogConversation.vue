@@ -10,7 +10,8 @@
         <button class="| button button-ghost button-sm" type="button" @click="onClose" :disabled="sending">
           Cancel
         </button>
-        <button class="| button button-secondary button-sm" type="submit" @click="onSend" :disabled="sending || !message.trim()">
+        <button class="| button button-secondary button-sm" type="submit" @click="onSend"
+          :disabled="sending || !message.trim()">
           {{ sending ? 'Sending...' : 'Send' }}
         </button>
       </div>
@@ -31,7 +32,7 @@ const toast = useToast();
 
 async function onSend() {
   if (!message.value.trim()) return;
-  
+
   // Check if conversation already exists before sending
   if (hasContactedListing(props.listingId)) {
     toast.add({ title: 'Already Contacted', description: 'You have already started a conversation for this listing.', icon: 'i-lucide-circle-x', color: 'error' });
@@ -63,7 +64,7 @@ textarea {
   padding: var(--size-12);
   border: 1px solid var(--background-300);
   border-radius: var(--border-radius-lg);
-  background: var(--background-200);
+  background: var(--background-100);
   resize: vertical;
   font-size: 1rem;
 }

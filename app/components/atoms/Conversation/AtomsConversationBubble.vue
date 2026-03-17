@@ -14,7 +14,7 @@ const props = defineProps<{
 }>();
 
 const contentPov = computed(() => {
-return props.variant === 'sent' ? 'You' : props.user;
+  return props.variant === 'sent' ? 'You' : props.user;
 });
 </script>
 
@@ -31,7 +31,7 @@ return props.variant === 'sent' ? 'You' : props.user;
   position: relative;
 
   &.sent {
-    background: var(--background-100);
+    background: var(--background-200);
     color: var(--foreground-300);
     margin-left: auto;
     border-bottom-left-radius: var(--border-radius-lg);

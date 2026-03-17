@@ -20,7 +20,7 @@
   text-align: center;
   position: relative;
   z-index: 2;
-  background: #26333C;
+  background: var(--blue-200);
   border-radius: var(--border-radius-2xl);
   padding: var(--size-48) var(--size-32) var(--size-32);
 

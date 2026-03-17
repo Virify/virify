@@ -183,13 +183,13 @@ const tileClasses = computed(() => {
       background: rgba(255, 255, 255, 0.1);
 
       .a-icon {
-        color: var(--secondary-500);
+        color: var(--primary-500);
       }
     }
 
     .feature-tile__header-text {
       h4 {
-        color: var(--secondary-500);
+        color: var(--primary-500);
       }
     }
 
@@ -203,24 +203,24 @@ const tileClasses = computed(() => {
   }
 
   &--primary {
-    background-color: var(--primary-400);
+    background-color: var(--secondary--400);
 
     .feature-tile__icon {
       background: rgba(255, 255, 255, 0.1);
 
       .a-icon {
-        color: var(--secondary-500);
+        color: var(--primary-500);
       }
     }
 
     .feature-tile__header-text {
       h4 {
-        color: var(--secondary-500);
+        color: var(--primary-500);
       }
     }
 
     &.feature-tile--with-background {
-      background-image: url('/img/logo-background.svg'), linear-gradient(135deg, var(--primary-400), var(--primary-500));
+      background-image: url('/img/logo-background.svg'), linear-gradient(135deg, var(--secondary--400), var(--secondary--500));
     }
   }
 
@@ -231,13 +231,13 @@ const tileClasses = computed(() => {
       background: rgba(255, 255, 255, 0.1);
 
       .a-icon {
-        color: var(--secondary-500);
+        color: var(--primary-500);
       }
     }
 
     .feature-tile__header-text {
       h4 {
-        color: var(--secondary-500);
+        color: var(--primary-500);
       }
     }
 
@@ -263,7 +263,7 @@ const tileClasses = computed(() => {
   }
 
   &--secondary {
-    background: linear-gradient(135deg, var(--secondary-400), var(--secondary-300));
+    background: linear-gradient(135deg, var(--primary-400), var(--primary-300));
     color: var(--monochrome-900);
 
     .a-icon {
@@ -272,7 +272,7 @@ const tileClasses = computed(() => {
 
     &.feature-tile--with-background {
       position: relative;
-      background: linear-gradient(135deg, var(--secondary-400), var(--secondary-300));
+      background: linear-gradient(135deg, var(--primary-400), var(--primary-300));
 
       &::before {
         content: '';

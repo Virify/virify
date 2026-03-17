@@ -13,7 +13,7 @@
         <slot name="carousel" v-bind="{ media, propertyId }">
           <MoleculesCardSlotsCarousel :slides="media" :property-id />
         </slot>
-        
+
         <MoleculesCardSlotsBookmark :property-id />
       </div>
 
@@ -145,7 +145,7 @@ const roomCounts = computed(() => {
 const hasOutdoorSpace = computed(() => {
   const { outdoorSpace } = asObject(property.value)
   if (!outdoorSpace) return false
-  
+
   const { garden, yard, land } = asObject(outdoorSpace)
   return containsPopulatedArray(garden, yard, land)
 })
@@ -153,30 +153,30 @@ const hasOutdoorSpace = computed(() => {
 const parkingType = computed(() => {
   const { parking } = asObject(property.value)
   if (!parking) return null
-  
+
   const { features } = asObject(parking)
   const parkingFeatures = asArray(features)
-  
+
   // Check for garage first (priority)
   if (parkingFeatures.includes('GARAGE')) return 'garage'
-  
+
   // Check for any other parking
   if (isPopulatedArray(parkingFeatures) && !parkingFeatures.includes('NO_PARKING')) return 'parking'
-  
+
   return null
 })
 
 const pills = computed(() => {
   const pills: string[] = []
 
-  if(props.result?.saleListing) {
+  if (props.result?.saleListing) {
     const { chain, tenureType } = asObject(props.result?.saleListing)
     const tenureString = getTenureType(tenureType)
     if (tenureString) pills.push(tenureString)
     if (chain) pills.push('Chain free')
   } else {
     const { furnishedStatus } = asObject(props.result?.rentalListing)
-    if(furnishedStatus) {
+    if (furnishedStatus) {
       const furnishedString = convertEnumToString(furnishedStatus as string)
       if (furnishedString) pills.push(furnishedString)
     }
@@ -220,9 +220,9 @@ watch(useElementHover($hoverCard), (isHovered) => {
   --card-layout: vertical;
 
   --card-foreground: var(--foreground-200);
-  --card-background: var(--background-200);
-  --card-background-overlay: light-dark(var(--background-300), var(--background-200));
-  --card-background-pill: light-dark(var(--background-300), var(--background-200));
+  --card-background: var(--background-100);
+  --card-background-overlay: light-dark(var(--background-300), var(--background-100));
+  --card-background-pill: light-dark(var(--background-300), var(--background-100));
   --card-colour: var(--blue-400);
   --card-border-colour: light-dark(var(--border-color-200), var(--blue-500));
   --card-button-background: light-dark(var(--blue-400), var(--blue-600));
@@ -249,17 +249,17 @@ watch(useElementHover($hoverCard), (isHovered) => {
   }
 
   &--featured {
-    --card-colour: var(--secondary-500);
-    --card-background: var(--background-200);
-    --card-background-overlay: light-dark(var(--secondary-800), var(--background-200));
-    --card-background-pill: light-dark(var(--secondary-800), var(--background-200));
-    --card-border-colour: var(--secondary-600);
-    --card-button-background: var(--secondary-400);
+    --card-colour: var(--primary-500);
+    --card-background: var(--background-100);
+    --card-background-overlay: light-dark(var(--primary-800), var(--background-100));
+    --card-background-pill: light-dark(var(--primary-800), var(--background-100));
+    --card-border-colour: var(--primary-600);
+    --card-button-background: var(--primary-400);
     --card-button-foreground: var(--monochrome-100);
-    --card-button-background-hover: var(--secondary-500);
+    --card-button-background-hover: var(--primary-500);
     --card-button-foreground-hover: var(--monochrome-100);
-    --card-button-border-colour: var(--secondary-400);
-    --card-bookmark-colour: var(--secondary-400);
+    --card-button-border-colour: var(--primary-400);
+    --card-bookmark-colour: var(--primary-400);
 
   }
 
@@ -293,19 +293,19 @@ watch(useElementHover($hoverCard), (isHovered) => {
 
   &--premium {
     --card-foreground: var(--monochrome-900);
-    --card-colour: var(--primary-400);
+    --card-colour: var(--secondary--400);
     --card-background: var(--blue-400);
     --card-background-overlay: var(--blue-300);
     --card-background-pill: var(--blue-400);
     --card-border-colour: var(--blue-600);
-    --card-button-background: var(--primary-400);
+    --card-button-background: var(--secondary--400);
     --card-button-foreground: var(--monochrome-100);
-    --card-button-background-hover: var(--primary-600);
+    --card-button-background-hover: var(--secondary--600);
     --card-button-foreground-hover: var(--monochrome-100);
-    --card-button-border-colour: var(--primary-400);
+    --card-button-border-colour: var(--secondary--400);
     --card-bookmark-colour: var(--card-colour);
 
-    border: 4px solid var(--primary-500);
+    border: 4px solid var(--secondary--500);
 
     @container listing-card (width > 900px) {
       --card-layout: horizontal;

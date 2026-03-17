@@ -66,7 +66,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-  
+
 
 const newBuild = computed(() => {
   // if built in the last 3 years, return "New build"
@@ -92,14 +92,14 @@ const newBuild = computed(() => {
     margin-bottom: var(--size-4);
 
     &__item {
-    background: var(--blue-400);
-    color: var(--monochrome-900);
+      background: var(--blue-400);
+      color: var(--monochrome-900);
     }
   }
 
   &__address {
     margin: 0;
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__agent-link {

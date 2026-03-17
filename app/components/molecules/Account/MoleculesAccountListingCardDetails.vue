@@ -107,13 +107,13 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
 
   &__price {
     margin: 0;
-    color: var(--tier-color, var(--secondary-400));
+    color: var(--tier-color, var(--primary-400));
     flex: 1;
     min-width: 0;
   }
 
   &__type-pill {
-    background: var(--tier-color, var(--secondary-400));
+    background: var(--tier-color, var(--primary-400));
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -182,20 +182,21 @@ const listingTypeText = computed(() => (props.isRental ? "Rent" : "Sale"));
     .account-card-details__price {
       color: var(--foreground-100);
     }
+
     .account-card-details__type-pill {
       color: var(--monochrome-900);
     }
   }
 
   &.account-card-details--featured {
-    --tier-color: var(--secondary-400);
+    --tier-color: var(--primary-400);
   }
 
   &.account-card-details--basic {
     --tier-color: var(--foreground-100);
-    
+
     .account-card-details__type-pill {
-      color: var(--background-100);
+      color: var(--background-200);
     }
   }
 }

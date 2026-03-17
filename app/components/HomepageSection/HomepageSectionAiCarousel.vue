@@ -47,7 +47,7 @@ defineProps<Props>()
     left: calc(0px - var(--size-56));
     width: var(--size-40);
     height: var(--size-40);
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 }
 </style>

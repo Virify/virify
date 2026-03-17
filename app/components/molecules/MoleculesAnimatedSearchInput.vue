@@ -1,14 +1,8 @@
 <template>
   <div class="m-animated-search-input__container">
     <div class="m-animated-search-input__fieldset | elevate-200">
-      <input 
-        type="text" 
-        class="m-animated-search-input__input | body-md" 
-        :value="displayText"
-        placeholder="Where do you want to live?"
-        aria-label="Location"
-        readonly
-      />
+      <input type="text" class="m-animated-search-input__input | body-md" :value="displayText"
+        placeholder="Where do you want to live?" aria-label="Location" readonly />
     </div>
   </div>
 </template>
@@ -40,29 +34,29 @@ function sleep(ms: number) {
 async function animateSearches() {
   while (true) {
     const currentSearch = searches[currentSearchIndex.value]
-    
+
     if (!currentSearch) continue
-    
+
     // Type out the text
     isTyping.value = true
     for (let i = 0; i <= currentSearch.length; i++) {
       displayText.value = currentSearch.substring(0, i)
       await sleep(typeSpeed)
     }
-    
+
     // Pause with full text
     await sleep(pauseBeforeDelete)
-    
+
     // Delete the text
     isTyping.value = false
     for (let i = currentSearch.length; i >= 0; i--) {
       displayText.value = currentSearch.substring(0, i)
       await sleep(deleteSpeed)
     }
-    
+
     // Move to next search
     currentSearchIndex.value = (currentSearchIndex.value + 1) % searches.length
-    
+
     // Pause before typing next
     await sleep(pauseBeforeType)
   }
@@ -83,13 +77,13 @@ onMounted(() => {
   }
 
   &__fieldset {
-    background: var(--background-200);
+    background: var(--background-100);
     color: var(--foreground-100);
     border-radius: var(--border-radius-xl);
     align-items: center;
     border: 1px solid var(--border-color-200);
     padding: var(--size-16);
-    
+
     @include mq.tablet {
       border-radius: var(--border-radius-2xl);
     }
@@ -108,7 +102,7 @@ onMounted(() => {
     @include mq.tablet {
       border-radius: var(--border-radius-xl);
     }
-    
+
     &::placeholder {
       color: var(--foreground-300);
     }

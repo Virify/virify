@@ -14,7 +14,7 @@
   top: env(safe-area-inset-top);
   z-index: 10;
   background: var(--blue-400);
-  border-bottom: var(--size-4) solid var(--secondary-400);
+  border-bottom: var(--size-4) solid var(--primary-400);
   height: 100%;
 
   &-container {
@@ -24,5 +24,4 @@
     height: var(--header-height);
   }
 }
-
 </style>
