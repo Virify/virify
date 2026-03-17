@@ -87,7 +87,7 @@ interface Props {
   icons?: FacilitiesIcon[]
   sellerImage?: string
   sellerName?: string
-  viewURL?: string
+  viewUrl?: string
 }
 
 const props = defineProps<Props>()
@@ -209,6 +209,7 @@ const validIcons = computed(() => {
     gap: var(--size-20);
     padding: var(--size-4) 0;
     align-items: flex-start;
+    width: fit-content;
   }
 
   &__icon {

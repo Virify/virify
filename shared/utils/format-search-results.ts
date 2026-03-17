@@ -20,7 +20,6 @@ function __getUsername(result: Result): string | undefined {
   return username as string | undefined
 }
 
-
 /**
  *  Get first image from property media attribute
  */
@@ -46,16 +45,17 @@ function __getFullAddress(property: Result['property']): string | undefined {
 /**
  *  Get labels for sale type (e.g. 'chain free', 'leasehold')
  */
-function __getLabels(property: Result['property'], isSale: boolean) {
+function __getLabels(result: Result, isSale: boolean) {
+
   if (isSale) {
-    const { saleListing } = asObject(property)
+    const { saleListing } = asObject(result)
 
     // @ts-ignore
     // @TODO - check what the actual type expected is, here
     return [saleListing?.tenureType].filter(Boolean)
   }
 
-  const { rentalListing } = asObject(property)
+  const { rentalListing } = asObject(result)
 
   // @ts-ignore
   // @TODO - check what the actual type expected is, here
@@ -108,7 +108,7 @@ function __getIcons(property: Result['property']): { icon: string, label: string
       active: hasFeatures(parking),
     },
     {
-      icon: 'property/font-garden',
+      icon: 'property/front-garden',
       label: 'Garden',
       active: hasFeatures(outdoorSpace),
     }
@@ -139,11 +139,10 @@ function __getOverview(property: Result['property']): string {
   return `${typeName} ${classificationName}`
 }
 
-
 /**
  *  Get price label (e.g. 'Offers in excess of', 'Fixed price')
  */
-function __getPriceLabel(result: Result, isSale: boolean) {
+function __getPriceLabel(result: Result, isSale: boolean): string | undefined {
   if (isSale) {
     const { priceType } = asObject(result?.saleListing)
 
@@ -155,7 +154,6 @@ function __getPriceLabel(result: Result, isSale: boolean) {
   return priceType
 }
 
-
 /**
  *  Construct URL for listing
  */
@@ -164,7 +162,6 @@ function __getListingURL(result: Result) {
 
   return `/listing/${id}/`
 }
-
 
 /**
  *  Get formatted property information
@@ -180,7 +177,7 @@ export function formatSearchResults(result?: Result) {
    *          mean this does not error)
    */
   return {
-    saleOrRent: listingType,
+    saleOrRent: listingType as 'buy' | 'rent',
     price: numberToCurrency(price as number),
     overviewAddress: __getFullAddress(property as Result['property']),
     propertyImage: __getFirstImage(property as Result['property']),
@@ -188,10 +185,10 @@ export function formatSearchResults(result?: Result) {
     sellerName: __getUsername(result as Result),
     overview: __getOverview(property as Result['property']),
     icons: __getIcons(property as Result['property']),
-    viewURL: __getListingURL(result as Result),
+    viewUrl: __getListingURL(result as Result),
 
     // @TODO - partial
-    labels: __getLabels(property as Result['property'], isSale),
+    labels: __getLabels(result as Result, isSale),
     priceLabel: __getPriceLabel(result as Result, isSale),
 
     // @TODO - full
