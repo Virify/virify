@@ -41,7 +41,7 @@ const internalValue = computed({
 
     :deep(.a-select) {
       width: 100%;
-      background-color: #fff;
+      background-color: var(--monochrome-900);
       border-radius: var(--border-radius-ui);
       padding: var(--size-12) var(--size-40) var(--size-12) var(--size-16);
       color: var(--foreground-100);

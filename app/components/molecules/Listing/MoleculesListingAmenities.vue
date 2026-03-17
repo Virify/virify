@@ -208,7 +208,7 @@ function getMapUrl(item: any) {
   }
 
   &__error {
-    color: var(--danger-500, #ef4444);
+    color: var(--error-500);
   }
 
   &__empty {

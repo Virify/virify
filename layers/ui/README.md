@@ -74,14 +74,14 @@ layers/ui/
 ### Colors
 ```scss
 // Primary palette
-$primary-50: #f0f9ff;
-$primary-500: #3b82f6;
-$primary-900: #1e3a8a;
+$primary-100: var(--primary-100);
+$primary-500: var(--primary-500);
+$primary-900: var(--primary-900);
 
 // Semantic colors
-$success: #10b981;
-$warning: #f59e0b;
-$error: #ef4444;
+$success: var(--success-500);
+$warning: var(--warning-500);
+$error: var(--error-500);
 $info: #3b82f6;
 ```
 

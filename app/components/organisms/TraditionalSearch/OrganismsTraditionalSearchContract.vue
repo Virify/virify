@@ -140,7 +140,7 @@ function updateIsBuy(newValue: boolean) {
 @use '#styles/_utils/functions' as fn;
 
 .o-traditional-search-form-contract {
-  --search-form-background: linear-gradient(to bottom, var(--blue-400), var(--blue-300));
+  --search-form-background: linear-gradient(to bottom, var(--blue-300), var(--blue-100));
   --search-form-foreground: var(--monochrome-900);
 
   &__title {
@@ -214,7 +214,7 @@ function updateIsBuy(newValue: boolean) {
 
     &[aria-expanded=true],
     &[aria-expanded=true]:hover {
-      --tab-bg: var(--blue-400);
+      --tab-bg: var(--blue-300);
       --tab-colour: var(--monochrome-900);
 
       z-index: 2;
@@ -260,8 +260,17 @@ function updateIsBuy(newValue: boolean) {
     --track-thumb-border: none;
   }
 
+  .m-range-slider__label-min,
+  .m-range-slider__label-max {
+    width: fit-content;
+  }
+
+  .m-range-slider__label-max {
+    margin-left: auto;
+  }
+
   .m-range-slider__input {
-    background: var(--blue-400);
+    background: var(--blue-300);
     color: var(--monochrome-900);
     border-width: 2px;
 

@@ -40,7 +40,7 @@ function clearErrors() {
             <h1 class="error-page__title | title-xl">{{ error?.statusCode }}</h1>
             <h2 class="error-page__title | title-lg">{{ errorTitle || 'Page Not Found' }}</h2>
             <p class="error-page__message | body-md">{{ errorMessage || 'The page you are looking for does not exist.'
-              }}</p>
+            }}</p>
 
             <div class="error-page__actions">
               <NuxtLink to="/" class="button button-tertiary">
@@ -70,7 +70,7 @@ function clearErrors() {
   align-items: center;
   justify-content: center;
   padding: var(--size-64, 64px) var(--size-24, 24px);
-  background: var(--background-200, #f9f9f9);
+  background: var(--background-200);
 
   .container {
     display: flex;
@@ -87,12 +87,12 @@ function clearErrors() {
 
   &__title {
     margin-bottom: var(--size-24, 24px);
-    color: var(--foreground-100, #000);
+    color: var(--foreground-200);
   }
 
   &__message {
     margin-bottom: var(--size-48, 48px);
-    color: var(--text-muted, #666);
+    color: var(--foreground-400);
     line-height: 1.6;
   }
 
@@ -115,7 +115,7 @@ function clearErrors() {
 
   &__icon {
     margin-bottom: var(--size-24);
-    color: var(--monochrome-500);
+    color: var(--foreground-400);
   }
 
   &__title {
@@ -125,7 +125,7 @@ function clearErrors() {
 
   &__message {
     margin-bottom: var(--size-32);
-    color: var(--text-muted);
+    color: var(--foreground-400);
     line-height: 1.6;
   }
 

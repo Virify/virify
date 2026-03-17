@@ -180,7 +180,7 @@ function showErrors(errors?: ErrorBoxProp) {
 
   &__consent-checkbox {
     margin-right: var(--size-12);
-    border-color: #788792; // @TODO replace with new colours once supported
+    border-color: var(--blue-500);
     width: var(--size-20);
     height: var(--size-20);
 

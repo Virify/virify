@@ -159,12 +159,12 @@ function keyboardSubmit(e: KeyboardEvent) {
 }
 
 .segment--used {
-  color: #ea580c;
+  color: var(--primary-400);
 }
 
 .segment--ignored {
   text-decoration: line-through;
-  color: #6b7280;
+  color: var(--blue-500);
   opacity: 0.7;
 }
 

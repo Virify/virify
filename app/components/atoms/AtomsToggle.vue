@@ -67,7 +67,7 @@ function select(value: string | number) {
 
   input[type="radio"]:checked+label.a-toggle__option {
     background: light-dark(var(--blue-400), var(--blue-500));
-    color: var(--monochrome-900, #111);
+    color: var(--monochrome-900);
   }
 
   label.a-toggle__option {

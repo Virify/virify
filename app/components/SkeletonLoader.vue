@@ -39,6 +39,6 @@ onMounted(() => {
 
 <style>
 .skeleton-loader {
-  background: #ccc;
+  background: var(--monochrome-600);
 }
 </style>

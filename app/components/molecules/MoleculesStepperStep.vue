@@ -40,21 +40,22 @@ const circleClass = computed(() => `stepper-step__circle--${props.variant}`)
 
 
   &--active .stepper-step__circle {
-    box-shadow: 0 0 0 4px var(--blue-400, #3b82f6);
+    box-shadow: 0 0 0 4px #3b82f6;
+    // @TODO - COLOR - add info colour
   }
 
   &__circle {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    color: #fff;
+    color: var(--monochrome-900);
     font-size: 1.5rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: var(--size-16);
-    border: 4px solid #fff;
+    border: 4px solid var(--monochrome-900);
     box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.2s;
 

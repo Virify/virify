@@ -31,7 +31,7 @@
 
 .homepage-section-signup {
   position: relative;
-  background: #26333C; // @TODO replace with new colours once supported
+  background: var(--blue-200);
   color: var(--monochrome-900);
   border-radius: var(--border-radius-2xl);
   padding: var(--size-56) var(--size-32) 250px;

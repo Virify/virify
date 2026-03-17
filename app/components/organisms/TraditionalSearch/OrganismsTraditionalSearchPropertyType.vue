@@ -173,12 +173,12 @@ callOnce(async () => {
     box-sizing: border-box;
     overflow: hidden;
     border-radius: var(--border-radius-xl);
-    background: fn.faded-color(12%, light-dark(var(--blue-700), var(--blue-900)));
+    background: light-dark(var(--blue-800), var(--blue-200));
     color: currentColor;
 
     &[aria-expanded=true],
     &:hover {
-      background: fn.faded-color(30%, light-dark(var(--blue-700), var(--blue-900)));
+      background: light-dark(var(--blue-700), var(--blue-400));
       color: currentColor;
     }
   }
