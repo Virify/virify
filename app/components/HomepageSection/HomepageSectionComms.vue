@@ -85,7 +85,7 @@ const chatMessages = [
  */
 const propertyDetails = {
   disabledInteractions: true,
-  saleOrRent: 'sale' as 'sale' | 'rent',
+  saleOrRent: 'buy' as 'buy' | 'rent',
   propertyImage: '/img/demo/demo-1.jpg',
   price: '£325,000',
   priceLabel: 'In excess of',
@@ -104,8 +104,7 @@ const propertyDetails = {
   ],
   sellerImage: undefined,
   sellerName: 'Virify',
-  viewURL: undefined,
-  enquiryURL: undefined
+  viewURL: undefined
 }
 
 /**

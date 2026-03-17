@@ -43,15 +43,15 @@
       </MoleculesScrollBox>
 
       <div class="property-card-root__buttons" aria-role="presentation">
-        <component :is="viewComponent" :href="viewURL"
+        <component :is="viewLinkComponent.is" :href="viewLinkComponent.href"
           class="property-card-root__button property-card-root__button--view | body-sm">
           View
         </component>
 
-        <component :is="enquiryComponent" :href="enquiryURL"
+        <button :disabled="disabledInteractions"
           class="property-card-root__button property-card-root__button--enquire | body-sm">
           Enquire
-        </component>
+        </button>
       </div>
 
       <div v-if="sellerName" class="property-card-root__profile | body-xs" aria-role="presentation">
@@ -75,7 +75,7 @@ interface FacilitiesIcon {
 }
 
 interface Props {
-  saleOrRent?: 'sale' | 'rent'
+  saleOrRent?: 'buy' | 'rent'
   propertyImage?: string
   propertyImageAlt?: string
   disabledInteractions?: boolean
@@ -88,7 +88,6 @@ interface Props {
   sellerImage?: string
   sellerName?: string
   viewURL?: string
-  enquiryURL?: string
 }
 
 const props = defineProps<Props>()
@@ -96,12 +95,20 @@ const props = defineProps<Props>()
 /**
  *  Conditionally show as links
  */
-function getLinkComponent(url?: string): 'a' | 'span' {
-  return isString(url) ? 'a' : 'span'
-}
+const viewLinkComponent = computed(() => {
+  const { viewUrl, disabledInteractions } = props
 
-const viewComponent = computed(() => getLinkComponent(props.viewURL))
-const enquiryComponent = computed(() => getLinkComponent(props.enquiryURL))
+  if (!disabledInteractions && viewUrl) {
+    return {
+      is: 'a',
+      href: viewUrl
+    }
+  }
+
+  return {
+    is: 'span'
+  }
+})
 
 /**
  *  Format profile text
@@ -110,7 +117,7 @@ const profileText = computed(() => {
   const { saleOrRent, sellerName } = props
 
   switch (saleOrRent) {
-    case 'sale':
+    case 'buy':
       return `Sold by ${sellerName}`
     case 'rent':
       return `Let by ${sellerName}`
@@ -249,7 +256,7 @@ const validIcons = computed(() => {
     color: light-dark(var(--monochrome-500), var(--monochrome-500));
     background-color: light-dark(var(--monochrome-800), var(--monochrome-400));
 
-    &[href] {
+    &--view[href] {
       color: currentColor;
       background-color: light-dark(var(--monochrome-800), var(--monochrome-200));
 
@@ -259,7 +266,7 @@ const validIcons = computed(() => {
       }
     }
 
-    &--enquire[href] {
+    &--enquire:not([disabled]) {
       background: var(--primary-400);
       color: var(--monochrome-900);
 
