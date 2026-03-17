@@ -23,7 +23,9 @@
       </div>
 
       <MoleculesPaginator v-if="requiresPagnination" :current-page="currentPage" :items-per-page="RESULTS_PER_PAGE"
-        :total-items="resultsLength" @change-page="updateCurrentPage" />
+        :total-items="resultsLength" @change-page="updateCurrentPage" class="o-results__pagination" />
+
+      <div class="o-results__gradient"></div>
     </template>
   </div>
 </template>
@@ -242,6 +244,21 @@ watch(() => props.results, (newResults) => {
         grid-column: span 2;
       }
     }
+  }
+
+  &__pagination {
+    position: relative;
+    z-index: 2;
+    margin: var(--size-48) 0 0;
+  }
+
+  &__gradient {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    height: 6em;
+    background: linear-gradient(to bottom, transparent, var(--background-200) 95%);
+    pointer-events: none;
   }
 }
 </style>
