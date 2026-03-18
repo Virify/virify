@@ -104,9 +104,14 @@
   --error-800: #FFD8D8;
   --error-900: #FBE8E8;
 
-  --error-background: light-dark(var(--error-800), var(--error-300));
-  --error-background-hover: light-dark(var(--error-900), var(--error-200));
-  --error-foreground: light-dark(var(--error-400), var(--error-900));
+  // Blend with blue for darker backgrounds
+  $error-faded: fn.faded-color(18%, var(--error-500));
+  $error-hover: fn.faded-color(30%, var(--error-500));
+
+  // For easy access
+  --error-background: light-dark(var(--error-900), #{ $error-faded });
+  --error-background-hover: light-dark(var(--error-800), #{ $error-hover });
+  --error-foreground: light-dark(var(--error-400), var(--monochrome-900));
   --error: var(--error-500);
 
   /**

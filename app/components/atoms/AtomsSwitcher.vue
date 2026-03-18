@@ -27,26 +27,26 @@ function updateToggled() {
   border-radius: var(--border-radius-pill);
   box-sizing: content-box;
   cursor: pointer;
-  background: light-dark(var(--monochrome-800), var(--monochrome-200));
-  border: 1px solid light-dark(var(--monochrome-700), var(--monochrome-300));
+  background: light-dark(var(--blue-800), var(--blue-200));
+  border: 1px solid light-dark(var(--blue-700), var(--blue-400));
   transition: border-color var(--animation-fast);
 
   &:hover {
-    background: light-dark(var(--monochrome-800), var(--monochrome-200));
-    border: 1px solid light-dark(var(--monochrome-600), var(--monochrome-400));
+    background: light-dark(var(--blue-800), var(--blue-200));
+    border: 1px solid light-dark(var(--blue-600), var(--blue-400));
   }
 
   &__thumb {
     display: block;
     width: var(--size-16);
     height: var(--size-16);
-    background: var(--monochrome-500);
+    background: var(--blue-500);
     border-radius: var(--border-radius-pill);
     transition: background-color var(--animation-fast), transform var(--animation-slow);
   }
 
   &:hover &__thumb {
-    background: var(--monochrome-400);
+    background: var(--blue-400);
   }
 
   &--active &__thumb {
