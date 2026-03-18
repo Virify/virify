@@ -40,7 +40,7 @@ const initials = computed(() => {
   font-weight: var(--font-bold);
   border-radius: var(--border-radius-ui);
   background: light-dark(var(--blue-400), var(--blue-100));
-  color: light-dark(var(--monochrome-900), var(--monochrome-100));
+  color: var(--monochrome-900);
   width: 4ch;
   height: 4ch;
 }
