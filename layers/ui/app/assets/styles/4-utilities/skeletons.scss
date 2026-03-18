@@ -1,3 +1,21 @@
+.v-skeleton {
+  --gradient-start: light-dark(var(--blue-800), var(--blue-300));
+  --gradient-end: light-dark(var(--blue-600), var(--blue-400));
+
+  background: linear-gradient(to left,
+      var(--gradient-start),
+      var(--gradient-end),
+      var(--gradient-start)) repeat;
+  background-size: 200%;
+  animation: skeleton-gradient-shimmer 1s infinite linear;
+}
+
+@keyframes skeleton-gradient-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+}
+
 /**
  *  Skeletons
  * 

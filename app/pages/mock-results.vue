@@ -13,6 +13,8 @@
         priceLabel
       } of resultsMapped" :price :overview :sale-or-rent :icons :overview-address :seller-name :view-url :labels
         :price-label />
+
+      <PropertyCardSkeleton v-for="_ of 8" />
     </div>
   </div>
 </template>
