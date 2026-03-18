@@ -9,9 +9,9 @@
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price | title-md">
-        {{ price }}
-
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
+
+        {{ price }}
       </h2>
 
       <p class="property-card-root__overview">
@@ -61,7 +61,9 @@
           <AtomsIcon icon="profile" />
         </span>
 
-        {{ profileText }}
+        <span role="presentation" class="property-card-root__profile-name">
+          {{ profileText }}
+        </span>
       </div>
     </div>
   </section>
@@ -140,8 +142,13 @@ const validIcons = computed(() => {
 </script>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
+
 .property-card-root {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
   &__images,
   &__image {
@@ -168,20 +175,24 @@ const validIcons = computed(() => {
   }
 
   &__content {
+    display: flex;
+    flex-direction: column;
     padding: var(--size-18);
+    flex-grow: 1;
   }
 
   &__price {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     margin: 0 0 var(--size-4);
+    gap: var(--size-2);
   }
 
   &__overview {
     font-size: var(--font-xs);
     line-height: var(--lineheight-sm);
     font-weight: var(--font-semisemibold);
+    margin-bottom: auto;
   }
 
   &__overview-address {
@@ -268,6 +279,7 @@ const validIcons = computed(() => {
     }
 
     &--enquire:not([disabled]) {
+      cursor: pointer;
       background: var(--primary-400);
       color: var(--monochrome-900);
 
@@ -297,6 +309,7 @@ const validIcons = computed(() => {
     border-radius: var(--border-radius-md);
     overflow: hidden;
     object-fit: contain;
+    flex-shrink: 0;
 
     &--empty {
       display: flex;
@@ -310,6 +323,12 @@ const validIcons = computed(() => {
         height: var(--size-24);
       }
     }
+  }
+
+  &__profile-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 </style>
