@@ -29,7 +29,7 @@ function __getTimeElapsed(isoDate?: string): number {
 /**
  *  Convert number to named time ago
  */
-function __convertToTimeAgo(isoTime: string): TimeAgo {
+function __convertToTimeAgo(isoTime?: string): TimeAgo {
   const timeAgoInSeconds = __getTimeElapsed(isoTime)
 
   if (timeAgoInSeconds > YEAR) {
@@ -83,7 +83,7 @@ function __convertToTimeAgo(isoTime: string): TimeAgo {
 /**
  *  Convert ISO date time to human-readable time elapsed (e.g. '4 days ago')
  */
-export function getTimeAgo(isoTime: string): string {
+export function getTimeAgo(isoTime?: string): string {
   const { elapsed, unit } = __convertToTimeAgo(isoTime)
 
   // Round down to whole numbers
