@@ -1,24 +1,28 @@
 <template>
-  <nuxt-img
-    provider="cloudflare"
-    :src="source"
-    :alt="alt"
-    class="a-cloudflare-image"
-    :placeholder="placeholder"
-    v-bind="$attrs"
-  />
+  <nuxt-img provider="cloudflare" :src="sourceVariant" :alt="alt" class="a-cloudflare-image"
+    :placeholder="placeholder && '/img/preload.svg'" v-bind="$attrs" />
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{
-  src: string;
-  alt?: string;
-  variant?: 'public' | 'thumbnail' | 'card' | 'gallery' | 'marker' | 'marketing';
-  placeholder?: boolean;
-}>();
+import { joinURL } from 'ufo'
 
-const source = props.src + '/' + (props.variant || 'public');
-const placeholder = props.placeholder ? '/img/preload.svg' : undefined;
+interface Props {
+  src: string
+  alt?: string
+  variant?: 'public' | 'thumbnail' | 'card' | 'gallery' | 'marker' | 'marketing'
+  placeholder?: boolean
+  // @TODO setting width and height breaks image
+  width: number | `${number}`
+  height: number | `${number}`
+}
+
+const props = defineProps<Props>()
+
+const sourceVariant = computed(() => {
+  const { src, variant = 'public' } = props
+
+  return joinURL(src, '/', variant)
+})
 
 // Allow all other attributes to be passed through
 defineOptions({
