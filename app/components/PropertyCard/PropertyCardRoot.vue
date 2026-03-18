@@ -1,8 +1,9 @@
 <template>
   <section class="property-card-root">
-    <div class="property-card-root__images">
-      <img v-if="propertyImage" class="property-card-root__image" :src="propertyImage" :alt="propertyImageAlt"
-        width="491" height="368" loading="lazy" />
+    <div class="property-card-root__images | v-skeleton">
+      <component v-if="propertyImage" :is="imageComponent.component" :variant="imageComponent.variant"
+        :src="propertyImage" :alt="propertyImageAlt" class="property-card-root__image" width="491" height="368"
+        loading="lazy" />
 
       <PropertyCardInteractions :disabled="disabledInteractions" class="property-card-root__interactions" />
     </div>
@@ -70,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+import { AtomsCloudFlareImage, NuxtImg } from '#components'
+
 interface FacilitiesIcon {
   icon: string
   label: string
@@ -81,6 +84,7 @@ interface Props {
   propertyImage?: string
   propertyImageAlt?: string
   disabledInteractions?: boolean
+  imageProvider?: 'cloudflare' | 'local'
   price?: string
   priceLabel?: string
   overview?: string
@@ -92,7 +96,9 @@ interface Props {
   viewUrl?: string
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  imageProvider: 'cloudflare'
+})
 
 /**
  *  Conditionally show as links
@@ -139,6 +145,20 @@ const validIcons = computed(() => {
   })
 })
 
+/**
+ *  Get correct image component
+ */
+const imageComponent = computed(() => {
+  const { imageProvider } = props
+
+  return imageProvider === 'cloudflare' ? {
+    component: AtomsCloudFlareImage,
+    variant: 'card'
+  } : {
+    component: NuxtImg
+  }
+})
+
 </script>
 
 <style lang="scss">
@@ -158,7 +178,6 @@ const validIcons = computed(() => {
 
   &__images {
     position: relative;
-    background: light-dark(var(--blue-400), var(--blue-100));
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
   }

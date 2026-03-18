@@ -241,6 +241,7 @@ const propertyDetails = {
   disabledInteractions: true,
   saleOrRent: 'buy' as 'buy' | 'rent',
   propertyImage: '/img/demo/demo-1.jpg',
+  imageProvider: 'local',
   price: '£325,000',
   priceLabel: 'In excess of',
   overview: '3 bed detached house',
