@@ -158,7 +158,7 @@ const validIcons = computed(() => {
 
   &__images {
     position: relative;
-    background: var(--monochrome-300);
+    background: light-dark(var(--blue-400), var(--blue-100));
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
   }
@@ -265,16 +265,16 @@ const validIcons = computed(() => {
     text-align: center;
     font-weight: var(--font-bold);
     transition: background-color var(--animation-fast);
-    color: light-dark(var(--monochrome-500), var(--monochrome-500));
-    background-color: light-dark(var(--monochrome-800), var(--monochrome-400));
+    color: var(--blue-500);
+    background-color: light-dark(var(--blue-800), var(--blue-400));
 
     &--view[href] {
       color: currentColor;
-      background-color: light-dark(var(--monochrome-800), var(--monochrome-200));
+      background-color: light-dark(var(--blue-700), var(--blue-400));
 
       &:hover {
         color: currentColor;
-        background-color: light-dark(var(--monochrome-700), var(--monochrome-100));
+        background-color: light-dark(var(--blue-600), var(--blue-100));
       }
     }
 
@@ -284,7 +284,7 @@ const validIcons = computed(() => {
       color: var(--monochrome-900);
 
       &:hover {
-        background: var(--primary-300);
+        background: var(--primary-500);
         color: var(--monochrome-900);
       }
     }
@@ -297,7 +297,7 @@ const validIcons = computed(() => {
     gap: var(--size-10);
     margin-top: var(--size-8);
     padding: var(--size-8);
-    background-color: light-dark(var(--monochrome-800), var(--monochrome-300));
+    background-color: light-dark(var(--blue-800), var(--blue-100));
     border-radius: var(--border-radius-lg);
     font-weight: var(--font-semisemibold);
   }
