@@ -12,8 +12,8 @@ interface Props {
   variant?: 'public' | 'thumbnail' | 'card' | 'gallery' | 'marker' | 'marketing'
   placeholder?: boolean
   // @TODO setting width and height breaks image
-  width: number | `${number}`
-  height: number | `${number}`
+  width?: number | `${number}`
+  height?: number | `${number}`
 }
 
 const props = defineProps<Props>()
