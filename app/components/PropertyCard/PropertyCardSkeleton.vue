@@ -102,7 +102,7 @@ defineOptions({
   &__icons {
     display: flex;
     gap: var(--size-16);
-    margin: var(--size-18) 0;
+    margin: var(--size-18) 0 var(--size-20);
     overflow: hidden;
   }
 
@@ -140,7 +140,7 @@ defineOptions({
   }
 
   &__additional {
-    height: var(--size-48);
+    height: var(--size-56);
     grid-column: span 2;
     border-radius: var(--border-radius-ui);
   }

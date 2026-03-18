@@ -21,38 +21,34 @@ defineProps<Props>()
 
 <style lang="scss">
 .property-card-interactions {
-  background: var(--blue-300);
-  color: var(--monochrome-900);
-  padding: var(--size-4);
-  border-radius: var(--border-radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--size-6);
+  gap: var(--size-6);
 
   &__button {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-6);
+    color: var(--blue-500);
     margin: 0;
-    background: var(--blue-300);
     border: 0;
-    border-radius: var(--border-radius-lg);
 
     &:not([disabled]) {
-      transition: background-color var(--animation-fast);
-      color: currentColor;
+      transition: color var(--animation-fast);
+      color: light-dark(var(--monochrome-100), var(--monochrome-900));
       cursor: pointer;
 
       &:hover {
-        background: var(--blue-500);
+        color: var(--primary-500);
       }
     }
+  }
 
-    .a-icon {
-      width: var(--size-20);
-      height: var(--size-20);
-    }
+  .a-icon {
+    width: var(--size-24);
+    height: var(--size-24);
   }
 }
 </style>

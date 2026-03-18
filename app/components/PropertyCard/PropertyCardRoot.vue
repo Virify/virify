@@ -52,16 +52,19 @@
         </button>
       </div>
 
-      <div v-if="sellerName" class="property-card-root__profile | body-xs" aria-role="presentation">
-        <img v-if="sellerImage" :src="sellerImage" :alt="`Profile image for ${sellerName}`"
-          class="property-card-root__profile-image" />
-        <span v-else aria-hidden class="property-card-root__profile-image property-card-root__profile-image--empty">
-          <AtomsIcon icon="profile" />
-        </span>
+      <div v-if="!disabledInteractions" class="property-card-root__footer" aria-role="presentation">
+        <PropertyCardSeller :name="sellerName" />
 
-        <span role="presentation" class="property-card-root__profile-name">
-          {{ profileText }}
-        </span>
+        <div role="presentation" class="property-card-root__footer-text">
+          <span role="presentation" class="property-card-root__footer-name | body-xs">
+            {{ profileText }}
+          </span>
+          <time :datetime="dateChanged" class="property-card-root__footer-date | body-2xs">
+            {{ timeAgo }}
+          </time>
+        </div>
+
+        <PropertyCardInteractions class="property-card-root__interactions" />
       </div>
     </div>
   </section>
@@ -84,6 +87,8 @@ interface Props {
   priceLabel?: string
   overview?: string
   overviewAddress?: string
+  dateChanged?: string
+  dateChangedType?: 'Added' | 'Reduced'
   labels?: string[]
   icons?: FacilitiesIcon[]
   sellerImage?: string
@@ -117,7 +122,7 @@ const viewLinkComponent = computed(() => {
  *  Format profile text
  */
 const profileText = computed(() => {
-  const { saleOrRent, sellerName } = props
+  const { saleOrRent, sellerName = 'Virify' } = props
 
   switch (saleOrRent) {
     case 'buy':
@@ -140,13 +145,21 @@ const validIcons = computed(() => {
   })
 })
 
+/**
+ *  Get date as 'time ago'
+ */
+const timeAgo = computed(() => {
+  const { dateChanged, dateChangedType } = props
+
+  return [dateChangedType, getTimeAgo(dateChanged)].filter(Boolean).join(' ')
+})
+
 </script>
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
 .property-card-root {
-  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -166,12 +179,6 @@ const validIcons = computed(() => {
   &__image {
     display: block;
     object-fit: cover;
-  }
-
-  &__interactions {
-    position: absolute;
-    top: var(--size-12);
-    right: var(--size-12);
   }
 
   &__content {
@@ -290,45 +297,41 @@ const validIcons = computed(() => {
     }
   }
 
-  &__profile {
+  &__footer {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: var(--size-10);
     margin-top: var(--size-8);
     padding: var(--size-8);
-    background-color: light-dark(var(--blue-800), var(--blue-100));
+    background-color: light-dark(var(--blue-800), var(--blue-300));
+    border: 1px solid light-dark(var(--blue-600), var(--blue-400));
     border-radius: var(--border-radius-lg);
     font-weight: var(--font-semisemibold);
   }
 
-  &__profile-image {
-    display: block;
-    width: var(--size-28);
-    height: var(--size-28);
-    border-radius: var(--border-radius-md);
+  &__footer-text {
     overflow: hidden;
-    object-fit: contain;
-    flex-shrink: 0;
-
-    &--empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--monochrome-400);
-
-      .a-icon {
-        color: var(--monochrome-900);
-        width: var(--size-24);
-        height: var(--size-24);
-      }
-    }
   }
 
-  &__profile-name {
+  &__footer-name,
+  &__footer-date {
+    display: block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  &__footer-name {
+    font-weight: var(--font-semibold);
+  }
+
+  &__footer-date {
+    color: var(--blue-500);
+  }
+
+  &__interactions {
+    margin-left: auto;
   }
 }
 </style>
