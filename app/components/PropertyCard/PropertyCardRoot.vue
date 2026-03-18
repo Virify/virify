@@ -1,11 +1,8 @@
 <template>
   <section class="property-card-root">
     <div class="property-card-root__images | v-skeleton">
-      <component v-if="propertyImage" :is="imageComponent.component" :variant="imageComponent.variant"
-        :src="propertyImage" :alt="propertyImageAlt" class="property-card-root__image" width="491" height="368"
-        loading="lazy" />
-
-      <PropertyCardInteractions :disabled="disabledInteractions" class="property-card-root__interactions" />
+      <PropertyCardImage :provider="imageProvider" :src="propertyImage" :alt="propertyImageAlt" variant="card"
+        class="property-card-root__image" width="491" height="368" loading="lazy" />
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
@@ -71,8 +68,6 @@
 </template>
 
 <script setup lang="ts">
-import { AtomsCloudFlareImage, NuxtImg } from '#components'
-
 interface FacilitiesIcon {
   icon: string
   label: string
@@ -143,20 +138,6 @@ const validIcons = computed(() => {
   return asArray(icons).filter((icon: FacilitiesIcon) => {
     return isObject(icon) && isString(icon.label) && isString(icon.icon)
   })
-})
-
-/**
- *  Get correct image component
- */
-const imageComponent = computed(() => {
-  const { imageProvider } = props
-
-  return imageProvider === 'cloudflare' ? {
-    component: AtomsCloudFlareImage,
-    variant: 'card'
-  } : {
-    component: NuxtImg
-  }
 })
 
 </script>
