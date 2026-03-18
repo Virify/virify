@@ -266,6 +266,7 @@ const propertyDetails = {
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+@use '#styles/_utils/functions' as fn;
 
 .homepage-section-ai-demo {
   --radius: var(--border-radius-xl);
@@ -311,6 +312,7 @@ const propertyDetails = {
     font-size: var(--font-sm);
     line-height: var(--lineheight-lg);
     margin: 0 0 var(--size-12);
+    background: light-dark(var(--background-100), var(--background-200));
 
     @include mq.tablet {
       font-size: var(--font-md);
@@ -336,11 +338,12 @@ const propertyDetails = {
     &--highlighted {
       white-space: nowrap;
       font-weight: var(--font-semibold);
-      color: light-dark(var(--primary-400), var(--monochrome-900));
-      background: light-dark(var(--primary-900), var(--primary-400));
       border-radius: var(--border-radius-lg);
       padding: var(--size-2) var(--size-8);
-      border: 1px solid light-dark(var(--primary-800), var(--primary-700));
+      // @TODO - maybe pill colours should be a global variable?
+      color: light-dark(var(--primary-400), var(--monochrome-900));
+      border: 1px solid light-dark(var(--primary-700), #{ fn.faded-color(35%, var(--primary-500)) });
+      background: light-dark(var(--primary-900), #{ fn.faded-color(15%, var(--primary-500)) });
     }
   }
 
