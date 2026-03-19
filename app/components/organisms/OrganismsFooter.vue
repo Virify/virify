@@ -4,7 +4,10 @@
       <!-- Logo Section -->
       <div class="o-footer__brand" v-if="!isWaitingListMode">
         <nuxt-link to="/" class="o-footer__logo-link">
-          <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="180" height="54" class="o-footer__logo" />
+          <svg width="113" height="32" class="o-footer__logo">
+            <title>Virify logo</title>
+            <use href="/img/logo.svg"></use>
+          </svg>
         </nuxt-link>
       </div>
 
@@ -153,8 +156,8 @@ const currentYear = new Date().getFullYear();
 
   &__logo {
     display: block;
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: var(--size-40);
   }
 
   &__section-title {
