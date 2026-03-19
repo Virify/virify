@@ -158,6 +158,7 @@ const timeAgo = computed(() => {
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
+@use "#styles/_utils/functions" as fn;
 
 .property-card-root {
   display: flex;
@@ -277,11 +278,13 @@ const timeAgo = computed(() => {
 
     &--view[href] {
       color: currentColor;
-      background-color: light-dark(var(--blue-700), var(--blue-400));
+      background-color: light-dark(var(--primary-700),
+        #{ fn.faded-color(20%, var(--primary-500)) });
 
       &:hover {
         color: currentColor;
-        background-color: light-dark(var(--blue-600), var(--blue-100));
+        background-color: light-dark(var(--primary-800),
+          #{ fn.faded-color(35%, var(--primary-500)) });
       }
     }
 
