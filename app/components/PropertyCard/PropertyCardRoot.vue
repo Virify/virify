@@ -78,7 +78,7 @@ interface FacilitiesIcon {
 }
 
 interface Props {
-  saleOrRent?: 'buy' | 'rent'
+  saleOrRent?: 'buy' | 'rent' | string
   propertyImage?: string
   propertyImageAlt?: string
   disabledInteractions?: boolean
@@ -88,7 +88,7 @@ interface Props {
   overview?: string
   overviewAddress?: string
   dateChanged?: string
-  dateChangedType?: 'Added' | 'Reduced'
+  dateChangedType?: 'Added' | 'Updated' | string
   labels?: string[]
   icons?: FacilitiesIcon[]
   sellerImage?: string

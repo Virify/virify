@@ -1,5 +1,10 @@
 import type { ListingWithFullProperty as Result } from '../types/listing'
 
+interface LastChange {
+  dateChanged: string
+  dateChangedType: 'Added' | 'Updated'
+}
+
 /**
  *  Get property coords
  */
@@ -164,12 +169,47 @@ function __getListingURL(result: Result) {
 }
 
 /**
+ *  Get the year part of an ISO datetime string
+ */
+function __getDateFromISOString(isoDate?: string): string[] {
+  if (!isString(isoDate)) return []
+
+  return isoDate?.split('T') as string[]
+}
+
+/**
+ *  Get date added, updated
+ */
+function __getLastChanged(property: Result['property']): LastChange {
+  const { createdAt, updatedAt } = asObject(property)
+
+  // Check if the created/edited is the same day. We don't need to
+  // convert to dates - we can just compare the ISO string up until the
+  // time delineater
+  const [day1] = __getDateFromISOString(createdAt)
+  const [day2] = __getDateFromISOString(updatedAt)
+
+  if (day1 !== day2) {
+    return {
+      dateChangedType: 'Reduced',
+      dateChanged: updatedAt as string
+    }
+  }
+
+  return {
+    dateChangedType: 'Added',
+    dateChanged: createdAt as string
+  }
+}
+
+/**
  *  Get formatted property information
  */
 export function formatSearchResults(result?: Result) {
   const { price, property, listingType } = asObject(result)
 
   const isSale = listingType === 'buy'
+  const { dateChanged, dateChangedType } = __getLastChanged(property)
 
   /**
    *  @TODO - Should fix type hinting below, as casting everything can
@@ -186,6 +226,8 @@ export function formatSearchResults(result?: Result) {
     overview: __getOverview(property as Result['property']),
     icons: __getIcons(property as Result['property']),
     viewUrl: __getListingURL(result as Result),
+    dateChanged: dateChanged,
+    dateChangedType: dateChangedType,
 
     // @TODO - partial
     labels: __getLabels(result as Result, isSale),
