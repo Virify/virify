@@ -283,18 +283,18 @@ const timeAgo = computed(() => {
 
       &:hover {
         color: currentColor;
-        background-color: light-dark(var(--primary-800),
+        background-color: light-dark(var(--primary-600),
           #{ fn.faded-color(35%, var(--primary-500)) });
       }
     }
 
     &--enquire:not([disabled]) {
       cursor: pointer;
-      background: var(--primary-400);
+      background: var(--primary-500);
       color: var(--monochrome-900);
 
       &:hover {
-        background: var(--primary-500);
+        background: var(--primary-400);
         color: var(--monochrome-900);
       }
     }

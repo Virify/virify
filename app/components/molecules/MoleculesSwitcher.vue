@@ -166,7 +166,11 @@ onMounted(() => {
 
 .m-switcher-text-loading .m-switcher-text-label:has(input:checked) {
   background: var(--primary-500);
-  box-shadow: var(--monochrome-100);
+  color: var(--monochrome-900);
+}
+
+.m-switcher-text-label:has(input:checked) {
+  color: var(--monochrome-900);
 }
 
 .m-switcher-text-highlight {
@@ -176,7 +180,6 @@ onMounted(() => {
   height: calc(100% - (2 * var(--switcher-highlight-offset)));
   width: 0;
   background: var(--primary-500);
-  box-shadow: var(--monochrome-100);
   border-radius: var(--switcher-inner-radius);
   transform-origin: 50% 50%;
 }
