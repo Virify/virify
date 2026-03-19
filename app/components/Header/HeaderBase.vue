@@ -4,10 +4,10 @@
       <LazyHeaderMobileRoot class="header-base__nav header-base__nav--mobile" hydrate-on-visible :menu="mainMenu" />
 
       <nuxt-link to="/" class="header-base__home-link">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="/img/header/logo-dark.svg" />
-          <img src="/img/header/logo-light.svg" alt="Virify logo" width="113" height="32" class="header-base__logo" />
-        </picture>
+        <svg width="113" height="32" class="header-base__logo">
+          <title>Virify logo</title>
+          <use href="/img/header/logo.svg"></use>
+        </svg>
       </nuxt-link>
 
       <LazyHeaderDesktopRoot class="header-base__nav header-base__nav--desktop" hydrate-on-visible :menu="mainMenu" />
