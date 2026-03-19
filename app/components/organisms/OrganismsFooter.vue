@@ -111,7 +111,7 @@ const currentYear = new Date().getFullYear();
 @use "#styles/_utils/media" as mq;
 
 .o-footer {
-  background-color: var(--blue-200);
+  background-color: light-dark(var(--blue-200), var(--blue-100));
   color: var(--monochrome-900);
   width: 100%;
   padding: var(--size-48) 0 var(--size-32);
