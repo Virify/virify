@@ -107,8 +107,8 @@
   --error-800: #FFD8D8;
   --error-900: #FBE8E8;
 
-  --error-background-100: light-dark(#{fn.faded-token(error, 12%)}, #{fn.faded-token(error, 18%)});
-  --error-background-200: light-dark(#{fn.faded-token(error, 24%)}, #{fn.faded-token(error, 36%)});
+  --error-background-100: light-dark(#{fn.faded-token(12%, error)}, #{fn.faded-token(18%, error)});
+  --error-background-200: light-dark(#{fn.faded-token(24%, error)}, #{fn.faded-token(36%, error)});
   --error-foreground: light-dark(var(--error-400), var(--monochrome-900));
   --error: var(--error-500);
 
