@@ -34,10 +34,9 @@ withDefaults(defineProps<Props>(), {
   font-weight: var(--font-semisemibold);
 
   &--orange {
-    // @TODO - maybe pill colours should be a global variable?
     color: light-dark(var(--primary-400), var(--monochrome-900));
-    border-color: light-dark(var(--primary-700), #{ fn.faded-color(25%, var(--primary-500)) });
-    background: light-dark(var(--primary-800), #{ fn.faded-color(15%, var(--primary-500)) });
+    border-color: var(--primary-background-200);
+    background: var(--primary-background-100);
   }
 }
 </style>

@@ -118,12 +118,12 @@
   }
 
   &-delete {
-    background: var(--error-background);
+    background: var(--error-background-100);
     color: var(--error-foreground);
 
     &:hover {
       background: var(--error-foreground);
-      color: var(--error-background);
+      color: var(--error-background-100);
     }
   }
 

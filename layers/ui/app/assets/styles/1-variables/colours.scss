@@ -44,6 +44,9 @@
   --primary-800: #FFDDCF;
   --primary-900: #FFECE4;
 
+  --primary-background-100: #{fn.faded-token(18%)};
+  --primary-background-200: #{fn.faded-token(36%)};
+
   /**
    *  Secondary/Green
    *  @deprectated - avoid using this colour
@@ -104,13 +107,8 @@
   --error-800: #FFD8D8;
   --error-900: #FBE8E8;
 
-  // Blend with blue for darker backgrounds
-  $error-faded: fn.faded-color(18%, var(--error-500));
-  $error-hover: fn.faded-color(30%, var(--error-500));
-
-  // For easy access
-  --error-background: light-dark(var(--error-900), #{ $error-faded });
-  --error-background-hover: light-dark(var(--error-800), #{ $error-hover });
+  --error-background-100: light-dark(#{fn.faded-token(error, 12%)}, #{fn.faded-token(error, 18%)});
+  --error-background-200: light-dark(#{fn.faded-token(error, 24%)}, #{fn.faded-token(error, 36%)});
   --error-foreground: light-dark(var(--error-400), var(--monochrome-900));
   --error: var(--error-500);
 

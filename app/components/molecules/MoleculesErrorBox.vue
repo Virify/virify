@@ -62,7 +62,7 @@ const formattedError = computed(() => {
 <style>
 .m-error-box {
   color: var(--error-foreground);
-  background-color: var(--error-background);
+  background-color: var(--error-background-100);
   padding: var(--size-16);
   border-radius: var(--border-radius-lg);
 }

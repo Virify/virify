@@ -151,7 +151,7 @@ function showErrors(errors?: ErrorBoxProp) {
     box-sizing: border-box;
 
     &:user-invalid:not(:placeholder-shown):not(:focus) {
-      background-color: var(--error-background);
+      background-color: var(--error-background-100);
       color: var(--error-foreground);
     }
   }

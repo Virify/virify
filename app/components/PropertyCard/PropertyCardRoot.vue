@@ -278,13 +278,11 @@ const timeAgo = computed(() => {
 
     &--view[href] {
       color: currentColor;
-      background-color: light-dark(var(--primary-700),
-        #{ fn.faded-color(20%, var(--primary-500)) });
+      background-color: var(--primary-background-100);
 
       &:hover {
         color: currentColor;
-        background-color: light-dark(var(--primary-600),
-          #{ fn.faded-color(35%, var(--primary-500)) });
+        background-color: var(--primary-background-200);
       }
     }
 

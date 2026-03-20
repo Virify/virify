@@ -180,11 +180,11 @@ async function logOut() {
     &--logout {
       margin-top: var(--size-36);
       padding: var(--size-14) var(--size-20);
-      background: var(--error-background);
+      background: var(--error-background-100);
       color: var(--error-foreground);
 
       &:hover {
-        background: var(--error-background-hover);
+        background: var(--error-background-200);
         color: var(--error-foreground);
       }
     }

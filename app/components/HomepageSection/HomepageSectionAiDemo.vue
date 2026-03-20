@@ -340,10 +340,9 @@ const propertyDetails = {
       font-weight: var(--font-semibold);
       border-radius: var(--border-radius-lg);
       padding: var(--size-2) var(--size-8);
-      // @TODO - maybe pill colours should be a global variable?
       color: light-dark(var(--primary-400), var(--monochrome-900));
-      border: 1px solid light-dark(var(--primary-700), #{ fn.faded-color(35%, var(--primary-500)) });
-      background: light-dark(var(--primary-900), #{ fn.faded-color(15%, var(--primary-500)) });
+      border: 1px solid var(--primary-background-200);
+      background: var(--primary-background-100);
     }
   }
 
