@@ -43,7 +43,7 @@ const resultsMapped = [{ "saleOrRent": "buy", "price": "£211,357.5", "overviewA
 .o-mock-results {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: var(--size-8);
+  gap: var(--size-12);
   row-gap: var(--size-24);
 
   @include mq.small-tablet {
@@ -53,11 +53,12 @@ const resultsMapped = [{ "saleOrRent": "buy", "price": "£211,357.5", "overviewA
 
   @include mq.notebook {
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--size-16);
+    gap: var(--size-20);
   }
 
   @include mq.desktop {
     grid-template-columns: repeat(4, 1fr);
+    gap: var(--size-24);
   }
 
   @include mq.superultrawide {
