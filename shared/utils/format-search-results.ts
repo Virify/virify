@@ -218,7 +218,7 @@ export function formatSearchResults(result?: Result) {
    */
   return {
     saleOrRent: listingType as 'buy' | 'rent',
-    price: numberToCurrency(price as number),
+    price: numberToCurrency(price as number, true),
     overviewAddress: __getFullAddress(property as Result['property']),
     propertyImage: __getFirstImage(property as Result['property']),
     coords: __getCoords(property as Result['property']),

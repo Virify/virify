@@ -7,9 +7,13 @@ type CurrencyString = `£${string}`
  * @param value string
  * @returns string
  */
-export function numberToCurrency(value: number): string {
+export function numberToCurrency(value: number, isFloor = false): string {
   if (!Number.isFinite(value)) return '£-'
 
+  // Conditionally round down, if we want no decimal places
+  value = isFloor ? Math.floor(value) : value
+
+  // Format as currency, then return
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
