@@ -1,8 +1,8 @@
 <template>
   <section class="property-card-root">
     <div class="property-card-root__images | v-skeleton">
-      <PropertyCardImage :provider="imageProvider" :src="propertyImage" :alt="propertyImageAlt" variant="card"
-        class="property-card-root__image" width="491" height="368" loading="lazy" />
+      <PropertyCardImage v-if="propertyImage" :provider="imageProvider" :src="propertyImage" :alt="propertyImageAlt"
+        variant="card" class="property-card-root__image" width="491" height="368" loading="lazy" />
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
@@ -19,7 +19,7 @@
         {{ overviewAddress }}
       </p>
 
-      <MoleculesScrollBox v-if="labels?.length">
+      <MoleculesScrollBox v-if="labels?.length" class="property-card-root__labels-scrollbox">
         <ul class="property-card-root__labels">
           <li v-for="label of labels" :key="label">
             <PropertyCardPill :content="label" />
@@ -27,10 +27,10 @@
         </ul>
       </MoleculesScrollBox>
 
-      <MoleculesScrollBox v-if="icons?.length">
+      <MoleculesScrollBox v-if="icons?.length" class="property-card-root__icons-scrollbox">
         <ul class="property-card-root__icons">
-          <li v-for="{ icon, count, label } of validIcons" :key="label" class="property-card-root__icon | body-2xs">
-            <span class="property-card-root__icon-count | body-sm">
+          <li v-for="{ icon, count, label } of validIcons" :key="label" class="property-card-root__icon">
+            <span class="property-card-root__icon-count">
               <AtomsIcon :icon aria-hidden />
               {{ count }}
             </span>
@@ -160,10 +160,18 @@ const timeAgo = computed(() => {
 @use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
 
+@mixin small-card {
+  @container card (width < 275px) {
+    @content;
+  }
+}
+
 .property-card-root {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  container-name: card;
+  container-type: inline-size;
 
   &__images,
   &__image {
@@ -187,6 +195,10 @@ const timeAgo = computed(() => {
     flex-direction: column;
     padding: var(--size-18);
     flex-grow: 1;
+
+    @include small-card {
+      padding: var(--size-12) 0;
+    }
   }
 
   &__price {
@@ -201,6 +213,7 @@ const timeAgo = computed(() => {
     line-height: var(--lineheight-sm);
     font-weight: var(--font-semisemibold);
     margin-bottom: auto;
+    padding-right: var(--size-16);
   }
 
   &__overview-address {
@@ -208,6 +221,10 @@ const timeAgo = computed(() => {
     font-weight: var(--font-bold);
     font-size: var(--font-sm);
     line-height: var(--lineheight-sm);
+
+    @include small-card {
+      font-size: var(--font-xs);
+    }
   }
 
   &__labels,
@@ -217,6 +234,17 @@ const timeAgo = computed(() => {
     list-style: none;
     margin: 0;
     padding: 0;
+
+    @include small-card {
+      padding-right: var(--size-10);
+    }
+  }
+
+  &__labels-scrollbox,
+  &__icons-scrollbox {
+    @include small-card {
+      margin-right: var(--size-16);
+    }
   }
 
   &__labels {
@@ -229,6 +257,10 @@ const timeAgo = computed(() => {
     padding: var(--size-4) 0;
     align-items: flex-start;
     width: fit-content;
+
+    @include small-card {
+      gap: var(--size-16);
+    }
   }
 
   &__icon {
@@ -237,10 +269,17 @@ const timeAgo = computed(() => {
     align-items: center;
     justify-content: flex-start;
     font-weight: var(--font-semibold);
+    font-size: var(--font-2xs);
+    line-height: var(--lineheight-sm);
     gap: var(--size-4);
     flex: 1 0 fit-content;
     max-width: 10ch;
     text-align: center;
+
+    @include small-card {
+      font-size: var(--font-3xs);
+      gap: var(--size-2);
+    }
   }
 
   &__icon-count {
@@ -249,6 +288,12 @@ const timeAgo = computed(() => {
     justify-content: center;
     gap: var(--size-4);
     line-height: var(--size-24);
+    font-size: var(--font-sm);
+    line-height: var(--lineheight-sm);
+
+    @include small-card {
+      font-size: var(--font-xs);
+    }
 
     .a-icon {
       width: var(--size-24);
@@ -262,6 +307,10 @@ const timeAgo = computed(() => {
     justify-content: stretch;
     gap: var(--size-8);
     margin: var(--size-16) 0 0;
+
+    @include small-card {
+      margin: var(--size-12) 0 0;
+    }
   }
 
   &__button {
@@ -309,10 +358,22 @@ const timeAgo = computed(() => {
     border: 1px solid light-dark(var(--blue-600), var(--blue-400));
     border-radius: var(--border-radius-lg);
     font-weight: var(--font-semisemibold);
+
+    @include small-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+    }
   }
 
   &__footer-text {
     overflow: hidden;
+
+    @include small-card {
+      order: -1;
+      grid-column: span 2;
+      padding-bottom: var(--size-6);
+      border-bottom: 1px solid var(--blue-500);
+    }
   }
 
   &__footer-name,
