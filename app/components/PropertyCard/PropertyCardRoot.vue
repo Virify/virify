@@ -19,7 +19,7 @@
         {{ overviewAddress }}
       </p>
 
-      <MoleculesScrollBox v-if="labels?.length" class="property-card-root__labels-scrollbox">
+      <MoleculesScrollBox v-if="labels?.length" :scroll-indicator="true" class="property-card-root__labels-scrollbox">
         <ul class="property-card-root__labels">
           <li v-for="label of labels" :key="label">
             <PropertyCardPill :content="label" />
@@ -27,7 +27,7 @@
         </ul>
       </MoleculesScrollBox>
 
-      <MoleculesScrollBox v-if="icons?.length" class="property-card-root__icons-scrollbox">
+      <MoleculesScrollBox v-if="icons?.length" :scroll-indicator="true" class="property-card-root__icons-scrollbox">
         <ul class="property-card-root__icons">
           <li v-for="{ icon, count, label } of validIcons" :key="label" class="property-card-root__icon">
             <span class="property-card-root__icon-count">

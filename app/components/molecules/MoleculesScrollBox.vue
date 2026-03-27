@@ -10,6 +10,17 @@
 import { useResizeObserver } from '@vueuse/core'
 
 /**
+ *  Show gradient indicator for scrollbox
+ */
+interface Props {
+  scrollIndicator?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  scrollIndicator: false
+})
+
+/**
  *  Wrappers
  */
 const $scrollbox = useTemplateRef('$scrollbox')
