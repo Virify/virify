@@ -41,8 +41,6 @@ const resultsMapped = [{ "saleOrRent": "buy", "price": "£211,357", "overviewAdd
 @use "#styles/_utils/media" as mq;
 
 .o-mock-results {
-  --container-padding: var(--size-24);
-
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--size-12);
