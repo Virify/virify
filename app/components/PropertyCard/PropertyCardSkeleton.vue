@@ -6,6 +6,7 @@
       <div class="property-card-skeleton__price-type | v-skeleton"></div>
       <div class="property-card-skeleton__price | v-skeleton"></div>
       <div class="property-card-skeleton__address-1 | v-skeleton"></div>
+      <div class="property-card-skeleton__address-1 property-card-skeleton__address-1--mobile | v-skeleton"></div>
       <div class="property-card-skeleton__address-2 | v-skeleton"></div>
       <div class="property-card-skeleton__pills">
         <div class="property-card-skeleton__pill | v-skeleton"></div>
@@ -93,6 +94,15 @@ defineOptions({
 
   &__address-1 {
     margin: var(--size-12) 0 0;
+
+    &--mobile {
+      display: none;
+      margin: var(--size-4) 0 0;
+
+      @include small-card {
+        display: block;
+      }
+    }
   }
 
   &__address-2 {
