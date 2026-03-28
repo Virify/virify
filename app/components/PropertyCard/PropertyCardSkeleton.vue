@@ -62,6 +62,10 @@ defineOptions({
 
   &__content {
     padding: var(--size-18);
+
+    @include small-card {
+      padding: var(--size-12) 0;
+    }
   }
 
   &__price-type {
