@@ -5772,6 +5772,14 @@ const data = [
   },
 ]
 
-export default defineEventHandler(() => {
+async function sleep(DELAY = 1000) {
+  await new Promise((resolve) => {
+    setTimeout(resolve, DELAY)
+  })
+}
+
+export default defineEventHandler(async () => {
+  await sleep()
+
   return data
 })

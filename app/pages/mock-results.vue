@@ -1,6 +1,7 @@
 <template>
   <div class="o-mock-results | container">
-    <PropertyCardRoot v-for="{
+    <PropertyCardSkeleton v-if="pending" v-for="_ of 8" />
+    <PropertyCardRoot v-else v-for="{
       price,
       saleOrRent,
       overviewAddress,
@@ -15,8 +16,6 @@
       priceLabel
     } of results" :property-image :price :overview :sale-or-rent :icons :overview-address :seller-name :date-changed
       :date-changed-type :view-url :labels :price-label />
-
-    <PropertyCardSkeleton v-for="_ of 8" />
   </div>
 </template>
 
@@ -28,7 +27,7 @@
 // coords: __getCoords(property as Result['property']),
 // sellerImage: null,
 
-const { data: results } = await useFetch('/api/mock-cards', {
+const { data: results, pending } = await useLazyFetch('/api/mock-cards', {
   transform: (data: ListingWithFullProperty[]) => {
     if (!Array.isArray(data)) return []
 
