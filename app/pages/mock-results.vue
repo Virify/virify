@@ -27,7 +27,8 @@
 // coords: __getCoords(property as Result['property']),
 // sellerImage: null,
 
-const { data: results, pending } = await useLazyFetch('/api/mock-cards', {
+const { data: results, pending } = await useFetch('/api/mock-cards', {
+  server: false,
   transform: (data: ListingWithFullProperty[]) => {
     if (!Array.isArray(data)) return []
 

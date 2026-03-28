@@ -1,870 +1,5 @@
 const data = [
   {
-    "id": 4,
-    "price": 211357.5,
-    "moveInDate": "2026-08-29T12:30:30.358Z",
-    "listingTier": "BASIC",
-    "listingStartDate": "2026-01-19T11:13:38.185Z",
-    "listingEndDate": "2026-06-06T12:02:26.831Z",
-    "viewingOptions": "essence at stiffen fumigate facilitate yippee briskly circa ouch cruelly",
-    "verificationLevel": "VERIFIED",
-    "userId": 1,
-    "propertyId": 6,
-    "estateAgentId": null,
-    "publishedAt": "2026-01-19T06:59:03.432Z",
-    "published": true,
-    "createdAt": "2026-01-19T11:13:38.214Z",
-    "updatedAt": "2026-01-19T11:13:38.214Z",
-    "archived": false,
-    "archivedAt": null,
-    "rentalListing": null,
-    "saleListing": {
-      "id": 2,
-      "listingId": 4,
-      "tenureType": "COMMONHOLD",
-      "chain": true,
-      "sharedOwnership": false,
-      "priceType": "FIXED",
-      "availabilityStatus": "UNDER_OFFER",
-      "draftListingId": null
-    },
-    "property": {
-      "id": 6,
-      "description": "boom numeracy list hopelessly swear solidly circa independence strictly manner indolent wholly afford fooey unto underneath via ha ad um",
-      "value": 102686.32,
-      "size": 174,
-      "yearBuilt": "2026",
-      "chainFree": true,
-      "vacant": false,
-      "constructionType": "NON_STANDARD",
-      "floorLevel": null,
-      "totalFloors": 5,
-      "numberBedrooms": 4,
-      "numberBathrooms": 2,
-      "numberReceptions": 3,
-      "numberOtherRooms": 3,
-      "numberKitchens": 1,
-      "createdAt": "2026-01-19T11:12:44.967Z",
-      "updatedAt": "2026-01-19T11:12:44.967Z",
-      "addressId": 17,
-      "userId": 1,
-      "estateAgentId": null,
-      "propertyTypeId": 8,
-      "propertyClassificationId": 30,
-      "address": {
-        "id": 17,
-        "number": "70",
-        "flat": null,
-        "name": null,
-        "street": "Richmond Road",
-        "city": "Cardiff",
-        "postcode": "CF24 3AT",
-        "country": null,
-        "locality": null,
-        "county": null,
-        "district": null,
-        "fullAddress": "70, Richmond Road, Cardiff, CF24 3AT",
-        "lat": 51.489286,
-        "lon": -3.171296,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "media": [
-        {
-          "id": 49,
-          "image": "d0f1451c-5944-431d-8b40-583622460f00",
-          "videoTour": null,
-          "floorPlan": null,
-          "metadata": "{\"alt\":\"Exterior - record wallaby machine\",\"description\":\"gruesome rigidly confound fine quip\",\"roomType\":\"Exterior\",\"cloudflareImageId\":\"d0f1451c-5944-431d-8b40-583622460f00\"}",
-          "propertyId": 6,
-          "sortOrder": 0,
-          "createdAt": "2026-01-19T11:12:58.472Z",
-          "updatedAt": "2026-01-19T11:12:58.472Z",
-          "bedroomId": null,
-          "bathroomId": null,
-          "receptionId": null,
-          "otherRoomId": null,
-          "kitchenId": null,
-          "gardenId": null,
-          "outdoorSpaceId": null,
-          "landId": null,
-          "yardId": null
-        },
-        {
-          "id": 50,
-          "image": "55957534-6202-4033-361b-f67b7fd89000",
-          "videoTour": null,
-          "floorPlan": null,
-          "metadata": "{\"alt\":\"Garden - if weakly boss\",\"description\":\"napkin talkative aside slide when\",\"roomType\":\"Garden\",\"cloudflareImageId\":\"55957534-6202-4033-361b-f67b7fd89000\"}",
-          "propertyId": 6,
-          "sortOrder": 0,
-          "createdAt": "2026-01-19T11:12:58.472Z",
-          "updatedAt": "2026-01-19T11:12:58.472Z",
-          "bedroomId": null,
-          "bathroomId": null,
-          "receptionId": null,
-          "otherRoomId": null,
-          "kitchenId": null,
-          "gardenId": null,
-          "outdoorSpaceId": null,
-          "landId": null,
-          "yardId": null
-        },
-        {
-          "id": 51,
-          "image": "0ba57463-d707-4914-8370-eeaad9efb700",
-          "videoTour": null,
-          "floorPlan": null,
-          "metadata": "{\"alt\":\"Dining Room\",\"description\":\"how excluding limply than bah\",\"roomType\":\"Dining Room\",\"cloudflareImageId\":\"0ba57463-d707-4914-8370-eeaad9efb700\"}",
-          "propertyId": 6,
-          "sortOrder": 0,
-          "createdAt": "2026-01-19T11:12:58.472Z",
-          "updatedAt": "2026-01-19T11:12:58.472Z",
-          "bedroomId": null,
-          "bathroomId": null,
-          "receptionId": null,
-          "otherRoomId": null,
-          "kitchenId": null,
-          "gardenId": null,
-          "outdoorSpaceId": null,
-          "landId": null,
-          "yardId": null
-        },
-        {
-          "id": 52,
-          "image": "00263fad-70a3-41e0-83d5-5aa8b83a3500",
-          "videoTour": null,
-          "floorPlan": null,
-          "metadata": "{\"alt\":\"Home Office\",\"description\":\"back dramatize yahoo abnormally so\",\"roomType\":\"Home Office\",\"cloudflareImageId\":\"00263fad-70a3-41e0-83d5-5aa8b83a3500\"}",
-          "propertyId": 6,
-          "sortOrder": 0,
-          "createdAt": "2026-01-19T11:12:58.472Z",
-          "updatedAt": "2026-01-19T11:12:58.472Z",
-          "bedroomId": null,
-          "bathroomId": null,
-          "receptionId": null,
-          "otherRoomId": null,
-          "kitchenId": null,
-          "gardenId": null,
-          "outdoorSpaceId": null,
-          "landId": null,
-          "yardId": null
-        },
-        {
-          "id": 53,
-          "image": "9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00",
-          "videoTour": null,
-          "floorPlan": null,
-          "metadata": "{\"alt\":\"Bedroom 1\",\"description\":\"gadzooks since ack reward frugal\",\"roomType\":\"Bedroom 1\",\"cloudflareImageId\":\"9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00\"}",
-          "propertyId": 6,
-          "sortOrder": 0,
-          "createdAt": "2026-01-19T11:12:58.472Z",
-          "updatedAt": "2026-01-19T11:12:58.472Z",
-          "bedroomId": 18,
-          "bathroomId": null,
-          "receptionId": null,
-          "otherRoomId": null,
-          "kitchenId": null,
-          "gardenId": null,
-          "outdoorSpaceId": null,
-          "landId": null,
-          "yardId": null
-        }
-      ],
-      "type": {
-        "id": 8,
-        "name": "Student Accommodation",
-        "defaultSelected": true
-      },
-      "classification": {
-        "id": 30,
-        "name": "Flat",
-        "categoryId": 8
-      },
-      "bedroomFeatures": [
-        {
-          "id": 18,
-          "roomNumber": 1,
-          "name": "Spare Bedroom",
-          "bed": [
-            "SINGLE"
-          ],
-          "floor": 1,
-          "description": "horde sheepishly regal consequently abnormally angle incidentally skyline gosh pendant",
-          "features": [
-            "BUILT_IN_STORAGE",
-            "WALK_IN_WARDROBE"
-          ],
-          "size": 20,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": [
-            {
-              "id": 53,
-              "image": "9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00",
-              "videoTour": null,
-              "floorPlan": null,
-              "metadata": "{\"alt\":\"Bedroom 1\",\"description\":\"gadzooks since ack reward frugal\",\"roomType\":\"Bedroom 1\",\"cloudflareImageId\":\"9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00\"}",
-              "propertyId": 6,
-              "sortOrder": 0,
-              "createdAt": "2026-01-19T11:12:58.472Z",
-              "updatedAt": "2026-01-19T11:12:58.472Z",
-              "bedroomId": 18,
-              "bathroomId": null,
-              "receptionId": null,
-              "otherRoomId": null,
-              "kitchenId": null,
-              "gardenId": null,
-              "outdoorSpaceId": null,
-              "landId": null,
-              "yardId": null
-            }
-          ]
-        },
-        {
-          "id": 19,
-          "roomNumber": 2,
-          "name": "Nursery",
-          "bed": [
-            "DOUBLE"
-          ],
-          "floor": 2,
-          "description": "boohoo known jive charm fortunately stealthily yahoo damp psst including",
-          "features": [
-            "EN_SUITE",
-            "BUILT_IN_STORAGE",
-            "WALK_IN_WARDROBE",
-            "BAY_WINDOW",
-            "HAS_VIEW",
-            "PATIO_DOORS"
-          ],
-          "size": 11,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        },
-        {
-          "id": 20,
-          "roomNumber": 3,
-          "name": "Nursery",
-          "bed": [
-            "SINGLE"
-          ],
-          "floor": 1,
-          "description": "until oof geez decongestant pile nearly baa worriedly stark inside",
-          "features": [
-            "BUILT_IN_STORAGE",
-            "BAY_WINDOW",
-            "BALCONY",
-            "PATIO_DOORS"
-          ],
-          "size": 15,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        },
-        {
-          "id": 21,
-          "roomNumber": 4,
-          "name": "Child's Bedroom",
-          "bed": [
-            "QUEEN"
-          ],
-          "floor": 3,
-          "description": "since instead pfft boo huzzah owlishly unlike catalyze pitiful eek",
-          "features": [
-            "BUILT_IN_STORAGE",
-            "WALK_IN_WARDROBE",
-            "HAS_VIEW"
-          ],
-          "size": 46,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        }
-      ],
-      "bathroomFeatures": [
-        {
-          "id": 7,
-          "roomNumber": 1,
-          "floor": 0,
-          "name": "Guest Bathroom",
-          "features": [
-            "TOILET",
-            "BATHTUB"
-          ],
-          "description": "plastic onto hydrocarbon boohoo defiantly warp sophisticated sideboard huzzah openly",
-          "size": 32,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        },
-        {
-          "id": 8,
-          "roomNumber": 2,
-          "floor": 3,
-          "name": "Master Bathroom",
-          "features": [
-            "TOILET",
-            "BATHTUB",
-            "WALK_IN_SHOWER"
-          ],
-          "description": "whose gosh necklace vacantly overconfidently ack apropos phooey apt dwell",
-          "size": 29,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        }
-      ],
-      "otherRoom": [
-        {
-          "id": 9,
-          "roomNumber": 1,
-          "floor": 3,
-          "name": "warming pish",
-          "type": "LIBRARY",
-          "description": "oily woot release now in whenever over unless noisily excepting",
-          "size": 22,
-          "features": [
-            "OPEN_PLAN",
-            "OPEN_CONCEPT",
-            "BALCONY",
-            "BAY_WINDOW",
-            "PATIO_DOORS",
-            "SERVING_HATCH"
-          ],
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        },
-        {
-          "id": 10,
-          "roomNumber": 2,
-          "floor": 2,
-          "name": "ack readily",
-          "type": "WORKSHOP",
-          "description": "pish flashy especially fooey likewise compassionate meh zowie although mostly",
-          "size": 24,
-          "features": [
-            "OPEN_PLAN",
-            "BALCONY",
-            "HAS_VIEW",
-            "SOUND_PROOFING",
-            "ACCOUSTIC_PANELS",
-            "STONE_FLOORING",
-            "HARDWOOD_FLOORING"
-          ],
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        },
-        {
-          "id": 11,
-          "roomNumber": 3,
-          "floor": 3,
-          "name": "yowza well-lit",
-          "type": "POOL_ROOM",
-          "description": "quirkily righteously apropos yum ouch duh ick ack steel generally",
-          "size": 40,
-          "features": [
-            "BALCONY",
-            "BAY_WINDOW",
-            "BUILT_IN_STORAGE",
-            "SERVING_HATCH",
-            "ACCOUSTIC_PANELS"
-          ],
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        }
-      ],
-      "parking": {
-        "id": 4,
-        "description": "bid untimely seemingly ha though ugh fast notwithstanding familiar yuck",
-        "features": [
-          "DRIVEWAY",
-          "ON_STREET",
-          "CARPORT"
-        ],
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "amenities": [
-        {
-          "id": 73,
-          "type": "EDUCATION",
-          "subtype": "SCHOOL",
-          "name": "Breitenberg Group School",
-          "distanceM": 4870,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 74,
-          "type": "EDUCATION",
-          "subtype": "SCHOOL",
-          "name": "Shanahan Group School",
-          "distanceM": 6369,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 75,
-          "type": "EDUCATION",
-          "subtype": "SCHOOL",
-          "name": "Skiles and Sons School",
-          "distanceM": 4642,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 76,
-          "type": "HEALTHCARE",
-          "subtype": "HOSPITAL",
-          "name": "Fritsch Group Hospital",
-          "distanceM": 4221,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 77,
-          "type": "HEALTHCARE",
-          "subtype": "HOSPITAL",
-          "name": "Sporer, Schimmel and Bernhard Hospital",
-          "distanceM": 1247,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 78,
-          "type": "HEALTHCARE",
-          "subtype": "HOSPITAL",
-          "name": "Purdy - Rutherford Hospital",
-          "distanceM": 3438,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 79,
-          "type": "TRANSPORT",
-          "subtype": "TRAIN_STATION",
-          "name": "Bustertown Train Station",
-          "distanceM": 8301,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 80,
-          "type": "TRANSPORT",
-          "subtype": "TRAIN_STATION",
-          "name": "Fort Graceburgh Train Station",
-          "distanceM": 5554,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 81,
-          "type": "TRANSPORT",
-          "subtype": "TRAIN_STATION",
-          "name": "Gutmannland Train Station",
-          "distanceM": 3676,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 82,
-          "type": "TRANSPORT",
-          "subtype": "BUS_STOP",
-          "name": "Schaefer Falls Bus Stop",
-          "distanceM": 4385,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 83,
-          "type": "TRANSPORT",
-          "subtype": "BUS_STOP",
-          "name": "Torphy Estates Bus Stop",
-          "distanceM": 8672,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 84,
-          "type": "TRANSPORT",
-          "subtype": "BUS_STOP",
-          "name": "Blind Lane Bus Stop",
-          "distanceM": 4914,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 85,
-          "type": "GREEN_SPACE",
-          "subtype": "PARK",
-          "name": "South Cletaland Park",
-          "distanceM": 1163,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 86,
-          "type": "GREEN_SPACE",
-          "subtype": "PARK",
-          "name": "Chicopee Park",
-          "distanceM": 3710,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 87,
-          "type": "GREEN_SPACE",
-          "subtype": "PARK",
-          "name": "Delbertchester Park",
-          "distanceM": 7783,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 88,
-          "type": "SHOPPING_ENTERTAINMENT",
-          "subtype": "GYM",
-          "name": "Feil and Sons Gym",
-          "distanceM": 2080,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 89,
-          "type": "SHOPPING_ENTERTAINMENT",
-          "subtype": "GYM",
-          "name": "Walker - Okuneva Gym",
-          "distanceM": 5981,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        },
-        {
-          "id": 90,
-          "type": "SHOPPING_ENTERTAINMENT",
-          "subtype": "GYM",
-          "name": "Beatty LLC Gym",
-          "distanceM": 132,
-          "description": null,
-          "location": null,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z"
-        }
-      ],
-      "additionalFeatures": {
-        "id": 6,
-        "description": "aside astride next rapid up gracefully swear how below dime",
-        "petFriendly": false,
-        "moveInDate": "2026-03-28T02:24:48.322Z",
-        "features": [
-          "SHOP"
-        ],
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "accessibilityFeatures": {
-        "id": 5,
-        "description": "why coolly while assured likewise huff unnecessarily underneath ugh duh",
-        "features": [],
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "kitchenFeatures": [
-        {
-          "id": 10,
-          "roomNumber": 3,
-          "floor": 1,
-          "name": "insert able",
-          "features": [
-            "MODERN",
-            "ISLAND"
-          ],
-          "description": "coil untrue pluck bah and well-documented round printer whether amidst",
-          "size": 41,
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        }
-      ],
-      "reception": [
-        {
-          "id": 8,
-          "roomNumber": 1,
-          "floor": 2,
-          "name": "complete throughout",
-          "type": "GAMES_ROOM",
-          "description": "jell fatherly while insolence frail shred unzip ack bravely tapioca",
-          "size": 41,
-          "features": [
-            "OPEN_PLAN",
-            "SERVING_HATCH"
-          ],
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        },
-        {
-          "id": 9,
-          "roomNumber": 2,
-          "floor": 3,
-          "name": "stoop bleak",
-          "type": "LIVING_ROOM",
-          "description": "urgently courageously freely er fly separately beneath political yellowish ick",
-          "size": 13,
-          "features": [
-            "OPEN_CONCEPT",
-            "BALCONY",
-            "PATIO_DOORS",
-            "BUILT_IN_DESK"
-          ],
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        },
-        {
-          "id": 10,
-          "roomNumber": 3,
-          "floor": 3,
-          "name": "depend apud",
-          "type": "DINING_ROOM",
-          "description": "starch and near noisily whether maintainer remark wisely lest ha",
-          "size": 13,
-          "features": [
-            "BAY_WINDOW",
-            "BUILT_IN_SHELVING",
-            "SERVING_HATCH",
-            "BAR_AREA",
-            "ACCOUSTIC_PANELS"
-          ],
-          "propertyId": 6,
-          "createdAt": "2026-01-19T11:12:44.967Z",
-          "updatedAt": "2026-01-19T11:12:44.967Z",
-          "media": []
-        }
-      ],
-      "utility": {
-        "id": 5,
-        "description": "of when oof bend trivial mouser notwithstanding surface anenst exhausted",
-        "features": [
-          "SINK"
-        ],
-        "size": 49.88542553425006,
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "outdoorSpace": {
-        "id": 2,
-        "description": "for given phew foodstuffs coil midst wring inscribe but winding",
-        "totalArea": 612.5,
-        "features": [
-          "BALCONY",
-          "POOL"
-        ],
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z",
-        "yard": [
-          {
-            "id": 6,
-            "description": null,
-            "name": "Rear Yard",
-            "size": 101.27,
-            "additionalDetails": false,
-            "facing": "NORTH",
-            "position": "REAR",
-            "features": [],
-            "createdAt": "2026-01-19T11:12:44.967Z",
-            "updatedAt": "2026-01-19T11:12:44.967Z",
-            "outdoorSpaceId": 2,
-            "media": []
-          }
-        ],
-        "garden": [
-          {
-            "id": 6,
-            "description": "instructive chunter diagram aside what unbearably swiftly bulky limply ack",
-            "name": "Front Garden",
-            "size": 45.2,
-            "additionalDetails": true,
-            "facing": "NORTH",
-            "position": "FRONT",
-            "features": [
-              "SHED",
-              "SUMMER_HOUSE"
-            ],
-            "createdAt": "2026-01-19T11:12:44.967Z",
-            "updatedAt": "2026-01-19T11:12:44.967Z",
-            "outdoorSpaceId": 2,
-            "media": []
-          },
-          {
-            "id": 7,
-            "description": "entrench spattering furthermore under lucky frankly who alongside seagull alongside",
-            "name": "Rear Garden",
-            "size": 108.55,
-            "additionalDetails": true,
-            "facing": "EAST",
-            "position": "REAR",
-            "features": [
-              "TERRACE",
-              "BALCONY",
-              "PATIO",
-              "SUMMER_HOUSE",
-              "GARDEN_OFFICE"
-            ],
-            "createdAt": "2026-01-19T11:12:44.967Z",
-            "updatedAt": "2026-01-19T11:12:44.967Z",
-            "outdoorSpaceId": 2,
-            "media": []
-          }
-        ],
-        "land": [
-          {
-            "id": 4,
-            "description": "ugh in fort with whale before however considering vice ick",
-            "additionalDetails": true,
-            "size": 357.48,
-            "name": "Field",
-            "separateParcel": true,
-            "features": [
-              "WOODLAND",
-              "PADDOCK",
-              "STABLES",
-              "ORCHARD",
-              "POND"
-            ],
-            "createdAt": "2026-01-19T11:12:44.967Z",
-            "updatedAt": "2026-01-19T11:12:44.967Z",
-            "outdoorSpaceId": 2,
-            "media": []
-          }
-        ],
-        "media": []
-      },
-      "energyAndUtilities": {
-        "id": 6,
-        "propertyId": 6,
-        "description": "nephew boo fast stiff compromise surprisingly miserly what that ick",
-        "epcRating": "D",
-        "epcCertificateUrl": "https://recent-hubris.org/",
-        "primaryHeatingType": [
-          "BIOMASS"
-        ],
-        "secondaryHeatingType": [
-          "BIOMASS",
-          "UNDERFLOOR"
-        ],
-        "boilerType": "CONVENTIONAL",
-        "hotWaterSource": "SOLAR_THERMAL",
-        "renewables": [
-          "SMART_METER",
-          "BATTERY_STORAGE"
-        ],
-        "connectedUtilities": [
-          "CESSPIT",
-          "GAS",
-          "WATER"
-        ],
-        "broadbandType": "FTTC",
-        "fullFibreAvailable": false,
-        "maxDownloadSpeedMbps": 430,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "securityFeatures": {
-        "id": 6,
-        "description": "carelessly amongst gee or curiously blah mysteriously ouch progress sweetly from evil solemnly enthusiastically without",
-        "features": [
-          "CCTV",
-          "ALARM_SYSTEM",
-          "NEIGHBORHOOD_WATCH"
-        ],
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "storageFeatures": {
-        "id": 5,
-        "description": "incandescence preregister boohoo finally clinking signature kiddingly gosh daddy guard quickly joyfully finally astride abnormally eventually symbolise bestride charm gerbil",
-        "features": [],
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      },
-      "runningCosts": {
-        "id": 6,
-        "description": "dearly gah next across season though priesthood debut anenst frightfully part runny coordinated generally supposing",
-        "councilTaxBand": "B",
-        "serviceCharges": 188.04,
-        "groundRent": 491.8,
-        "propertyId": 6,
-        "createdAt": "2026-01-19T11:12:44.967Z",
-        "updatedAt": "2026-01-19T11:12:44.967Z"
-      }
-    },
-    "user": {
-      "id": 1,
-      "username": "Virify",
-      "email": "admin@virify.co.uk",
-      "createdAt": "2026-01-19T11:12:43.934Z"
-    },
-    "listingType": "buy"
-  },
-  {
     "id": 5,
     "price": 256850.02,
     "moveInDate": "2027-01-14T05:50:46.481Z",
@@ -5767,6 +4902,872 @@ const data = [
       "username": "Darwin_Prohaska63_10",
       "email": "10_Therese15@gmail.com",
       "createdAt": "2026-01-19T11:13:37.360Z"
+    },
+    "listingType": "buy"
+  },
+
+  {
+    "id": 4,
+    "price": 211357.5,
+    "moveInDate": "2026-08-29T12:30:30.358Z",
+    "listingTier": "BASIC",
+    "listingStartDate": "2026-01-19T11:13:38.185Z",
+    "listingEndDate": "2026-06-06T12:02:26.831Z",
+    "viewingOptions": "essence at stiffen fumigate facilitate yippee briskly circa ouch cruelly",
+    "verificationLevel": "VERIFIED",
+    "userId": 1,
+    "propertyId": 6,
+    "estateAgentId": null,
+    "publishedAt": "2026-01-19T06:59:03.432Z",
+    "published": true,
+    "createdAt": "2026-01-19T11:13:38.214Z",
+    "updatedAt": "2026-01-19T11:13:38.214Z",
+    "archived": false,
+    "archivedAt": null,
+    "rentalListing": null,
+    "saleListing": {
+      "id": 2,
+      "listingId": 4,
+      "tenureType": "COMMONHOLD",
+      "chain": true,
+      "sharedOwnership": false,
+      "priceType": "FIXED",
+      "availabilityStatus": "UNDER_OFFER",
+      "draftListingId": null
+    },
+    "property": {
+      "id": 6,
+      "description": "boom numeracy list hopelessly swear solidly circa independence strictly manner indolent wholly afford fooey unto underneath via ha ad um",
+      "value": 102686.32,
+      "size": 174,
+      "yearBuilt": "2026",
+      "chainFree": true,
+      "vacant": false,
+      "constructionType": "NON_STANDARD",
+      "floorLevel": null,
+      "totalFloors": 5,
+      "numberBedrooms": 4,
+      "numberBathrooms": 2,
+      "numberReceptions": 3,
+      "numberOtherRooms": 3,
+      "numberKitchens": 1,
+      "createdAt": "2026-01-19T11:12:44.967Z",
+      "updatedAt": "2026-01-19T11:12:44.967Z",
+      "addressId": 17,
+      "userId": 1,
+      "estateAgentId": null,
+      "propertyTypeId": 8,
+      "propertyClassificationId": 30,
+      "address": {
+        "id": 17,
+        "number": "70",
+        "flat": null,
+        "name": null,
+        "street": "Richmond Road",
+        "city": "Cardiff",
+        "postcode": "CF24 3AT",
+        "country": null,
+        "locality": null,
+        "county": null,
+        "district": null,
+        "fullAddress": "70, Richmond Road, Cardiff, CF24 3AT",
+        "lat": 51.489286,
+        "lon": -3.171296,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "media": [
+        {
+          "id": 49,
+          "image": "d0f1451c-5944-431d-8b40-583622460f00",
+          "videoTour": null,
+          "floorPlan": null,
+          "metadata": "{\"alt\":\"Exterior - record wallaby machine\",\"description\":\"gruesome rigidly confound fine quip\",\"roomType\":\"Exterior\",\"cloudflareImageId\":\"d0f1451c-5944-431d-8b40-583622460f00\"}",
+          "propertyId": 6,
+          "sortOrder": 0,
+          "createdAt": "2026-01-19T11:12:58.472Z",
+          "updatedAt": "2026-01-19T11:12:58.472Z",
+          "bedroomId": null,
+          "bathroomId": null,
+          "receptionId": null,
+          "otherRoomId": null,
+          "kitchenId": null,
+          "gardenId": null,
+          "outdoorSpaceId": null,
+          "landId": null,
+          "yardId": null
+        },
+        {
+          "id": 50,
+          "image": "55957534-6202-4033-361b-f67b7fd89000",
+          "videoTour": null,
+          "floorPlan": null,
+          "metadata": "{\"alt\":\"Garden - if weakly boss\",\"description\":\"napkin talkative aside slide when\",\"roomType\":\"Garden\",\"cloudflareImageId\":\"55957534-6202-4033-361b-f67b7fd89000\"}",
+          "propertyId": 6,
+          "sortOrder": 0,
+          "createdAt": "2026-01-19T11:12:58.472Z",
+          "updatedAt": "2026-01-19T11:12:58.472Z",
+          "bedroomId": null,
+          "bathroomId": null,
+          "receptionId": null,
+          "otherRoomId": null,
+          "kitchenId": null,
+          "gardenId": null,
+          "outdoorSpaceId": null,
+          "landId": null,
+          "yardId": null
+        },
+        {
+          "id": 51,
+          "image": "0ba57463-d707-4914-8370-eeaad9efb700",
+          "videoTour": null,
+          "floorPlan": null,
+          "metadata": "{\"alt\":\"Dining Room\",\"description\":\"how excluding limply than bah\",\"roomType\":\"Dining Room\",\"cloudflareImageId\":\"0ba57463-d707-4914-8370-eeaad9efb700\"}",
+          "propertyId": 6,
+          "sortOrder": 0,
+          "createdAt": "2026-01-19T11:12:58.472Z",
+          "updatedAt": "2026-01-19T11:12:58.472Z",
+          "bedroomId": null,
+          "bathroomId": null,
+          "receptionId": null,
+          "otherRoomId": null,
+          "kitchenId": null,
+          "gardenId": null,
+          "outdoorSpaceId": null,
+          "landId": null,
+          "yardId": null
+        },
+        {
+          "id": 52,
+          "image": "00263fad-70a3-41e0-83d5-5aa8b83a3500",
+          "videoTour": null,
+          "floorPlan": null,
+          "metadata": "{\"alt\":\"Home Office\",\"description\":\"back dramatize yahoo abnormally so\",\"roomType\":\"Home Office\",\"cloudflareImageId\":\"00263fad-70a3-41e0-83d5-5aa8b83a3500\"}",
+          "propertyId": 6,
+          "sortOrder": 0,
+          "createdAt": "2026-01-19T11:12:58.472Z",
+          "updatedAt": "2026-01-19T11:12:58.472Z",
+          "bedroomId": null,
+          "bathroomId": null,
+          "receptionId": null,
+          "otherRoomId": null,
+          "kitchenId": null,
+          "gardenId": null,
+          "outdoorSpaceId": null,
+          "landId": null,
+          "yardId": null
+        },
+        {
+          "id": 53,
+          "image": "9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00",
+          "videoTour": null,
+          "floorPlan": null,
+          "metadata": "{\"alt\":\"Bedroom 1\",\"description\":\"gadzooks since ack reward frugal\",\"roomType\":\"Bedroom 1\",\"cloudflareImageId\":\"9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00\"}",
+          "propertyId": 6,
+          "sortOrder": 0,
+          "createdAt": "2026-01-19T11:12:58.472Z",
+          "updatedAt": "2026-01-19T11:12:58.472Z",
+          "bedroomId": 18,
+          "bathroomId": null,
+          "receptionId": null,
+          "otherRoomId": null,
+          "kitchenId": null,
+          "gardenId": null,
+          "outdoorSpaceId": null,
+          "landId": null,
+          "yardId": null
+        }
+      ],
+      "type": {
+        "id": 8,
+        "name": "Student Accommodation",
+        "defaultSelected": true
+      },
+      "classification": {
+        "id": 30,
+        "name": "Flat",
+        "categoryId": 8
+      },
+      "bedroomFeatures": [
+        {
+          "id": 18,
+          "roomNumber": 1,
+          "name": "Spare Bedroom",
+          "bed": [
+            "SINGLE"
+          ],
+          "floor": 1,
+          "description": "horde sheepishly regal consequently abnormally angle incidentally skyline gosh pendant",
+          "features": [
+            "BUILT_IN_STORAGE",
+            "WALK_IN_WARDROBE"
+          ],
+          "size": 20,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": [
+            {
+              "id": 53,
+              "image": "9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00",
+              "videoTour": null,
+              "floorPlan": null,
+              "metadata": "{\"alt\":\"Bedroom 1\",\"description\":\"gadzooks since ack reward frugal\",\"roomType\":\"Bedroom 1\",\"cloudflareImageId\":\"9ef289b1-e2cf-4e70-a1e3-1ca4beba4f00\"}",
+              "propertyId": 6,
+              "sortOrder": 0,
+              "createdAt": "2026-01-19T11:12:58.472Z",
+              "updatedAt": "2026-01-19T11:12:58.472Z",
+              "bedroomId": 18,
+              "bathroomId": null,
+              "receptionId": null,
+              "otherRoomId": null,
+              "kitchenId": null,
+              "gardenId": null,
+              "outdoorSpaceId": null,
+              "landId": null,
+              "yardId": null
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "roomNumber": 2,
+          "name": "Nursery",
+          "bed": [
+            "DOUBLE"
+          ],
+          "floor": 2,
+          "description": "boohoo known jive charm fortunately stealthily yahoo damp psst including",
+          "features": [
+            "EN_SUITE",
+            "BUILT_IN_STORAGE",
+            "WALK_IN_WARDROBE",
+            "BAY_WINDOW",
+            "HAS_VIEW",
+            "PATIO_DOORS"
+          ],
+          "size": 11,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        },
+        {
+          "id": 20,
+          "roomNumber": 3,
+          "name": "Nursery",
+          "bed": [
+            "SINGLE"
+          ],
+          "floor": 1,
+          "description": "until oof geez decongestant pile nearly baa worriedly stark inside",
+          "features": [
+            "BUILT_IN_STORAGE",
+            "BAY_WINDOW",
+            "BALCONY",
+            "PATIO_DOORS"
+          ],
+          "size": 15,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        },
+        {
+          "id": 21,
+          "roomNumber": 4,
+          "name": "Child's Bedroom",
+          "bed": [
+            "QUEEN"
+          ],
+          "floor": 3,
+          "description": "since instead pfft boo huzzah owlishly unlike catalyze pitiful eek",
+          "features": [
+            "BUILT_IN_STORAGE",
+            "WALK_IN_WARDROBE",
+            "HAS_VIEW"
+          ],
+          "size": 46,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        }
+      ],
+      "bathroomFeatures": [
+        {
+          "id": 7,
+          "roomNumber": 1,
+          "floor": 0,
+          "name": "Guest Bathroom",
+          "features": [
+            "TOILET",
+            "BATHTUB"
+          ],
+          "description": "plastic onto hydrocarbon boohoo defiantly warp sophisticated sideboard huzzah openly",
+          "size": 32,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        },
+        {
+          "id": 8,
+          "roomNumber": 2,
+          "floor": 3,
+          "name": "Master Bathroom",
+          "features": [
+            "TOILET",
+            "BATHTUB",
+            "WALK_IN_SHOWER"
+          ],
+          "description": "whose gosh necklace vacantly overconfidently ack apropos phooey apt dwell",
+          "size": 29,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        }
+      ],
+      "otherRoom": [
+        {
+          "id": 9,
+          "roomNumber": 1,
+          "floor": 3,
+          "name": "warming pish",
+          "type": "LIBRARY",
+          "description": "oily woot release now in whenever over unless noisily excepting",
+          "size": 22,
+          "features": [
+            "OPEN_PLAN",
+            "OPEN_CONCEPT",
+            "BALCONY",
+            "BAY_WINDOW",
+            "PATIO_DOORS",
+            "SERVING_HATCH"
+          ],
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        },
+        {
+          "id": 10,
+          "roomNumber": 2,
+          "floor": 2,
+          "name": "ack readily",
+          "type": "WORKSHOP",
+          "description": "pish flashy especially fooey likewise compassionate meh zowie although mostly",
+          "size": 24,
+          "features": [
+            "OPEN_PLAN",
+            "BALCONY",
+            "HAS_VIEW",
+            "SOUND_PROOFING",
+            "ACCOUSTIC_PANELS",
+            "STONE_FLOORING",
+            "HARDWOOD_FLOORING"
+          ],
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        },
+        {
+          "id": 11,
+          "roomNumber": 3,
+          "floor": 3,
+          "name": "yowza well-lit",
+          "type": "POOL_ROOM",
+          "description": "quirkily righteously apropos yum ouch duh ick ack steel generally",
+          "size": 40,
+          "features": [
+            "BALCONY",
+            "BAY_WINDOW",
+            "BUILT_IN_STORAGE",
+            "SERVING_HATCH",
+            "ACCOUSTIC_PANELS"
+          ],
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        }
+      ],
+      "parking": {
+        "id": 4,
+        "description": "bid untimely seemingly ha though ugh fast notwithstanding familiar yuck",
+        "features": [
+          "DRIVEWAY",
+          "ON_STREET",
+          "CARPORT"
+        ],
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "amenities": [
+        {
+          "id": 73,
+          "type": "EDUCATION",
+          "subtype": "SCHOOL",
+          "name": "Breitenberg Group School",
+          "distanceM": 4870,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 74,
+          "type": "EDUCATION",
+          "subtype": "SCHOOL",
+          "name": "Shanahan Group School",
+          "distanceM": 6369,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 75,
+          "type": "EDUCATION",
+          "subtype": "SCHOOL",
+          "name": "Skiles and Sons School",
+          "distanceM": 4642,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 76,
+          "type": "HEALTHCARE",
+          "subtype": "HOSPITAL",
+          "name": "Fritsch Group Hospital",
+          "distanceM": 4221,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 77,
+          "type": "HEALTHCARE",
+          "subtype": "HOSPITAL",
+          "name": "Sporer, Schimmel and Bernhard Hospital",
+          "distanceM": 1247,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 78,
+          "type": "HEALTHCARE",
+          "subtype": "HOSPITAL",
+          "name": "Purdy - Rutherford Hospital",
+          "distanceM": 3438,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 79,
+          "type": "TRANSPORT",
+          "subtype": "TRAIN_STATION",
+          "name": "Bustertown Train Station",
+          "distanceM": 8301,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 80,
+          "type": "TRANSPORT",
+          "subtype": "TRAIN_STATION",
+          "name": "Fort Graceburgh Train Station",
+          "distanceM": 5554,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 81,
+          "type": "TRANSPORT",
+          "subtype": "TRAIN_STATION",
+          "name": "Gutmannland Train Station",
+          "distanceM": 3676,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 82,
+          "type": "TRANSPORT",
+          "subtype": "BUS_STOP",
+          "name": "Schaefer Falls Bus Stop",
+          "distanceM": 4385,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 83,
+          "type": "TRANSPORT",
+          "subtype": "BUS_STOP",
+          "name": "Torphy Estates Bus Stop",
+          "distanceM": 8672,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 84,
+          "type": "TRANSPORT",
+          "subtype": "BUS_STOP",
+          "name": "Blind Lane Bus Stop",
+          "distanceM": 4914,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 85,
+          "type": "GREEN_SPACE",
+          "subtype": "PARK",
+          "name": "South Cletaland Park",
+          "distanceM": 1163,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 86,
+          "type": "GREEN_SPACE",
+          "subtype": "PARK",
+          "name": "Chicopee Park",
+          "distanceM": 3710,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 87,
+          "type": "GREEN_SPACE",
+          "subtype": "PARK",
+          "name": "Delbertchester Park",
+          "distanceM": 7783,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 88,
+          "type": "SHOPPING_ENTERTAINMENT",
+          "subtype": "GYM",
+          "name": "Feil and Sons Gym",
+          "distanceM": 2080,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 89,
+          "type": "SHOPPING_ENTERTAINMENT",
+          "subtype": "GYM",
+          "name": "Walker - Okuneva Gym",
+          "distanceM": 5981,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        },
+        {
+          "id": 90,
+          "type": "SHOPPING_ENTERTAINMENT",
+          "subtype": "GYM",
+          "name": "Beatty LLC Gym",
+          "distanceM": 132,
+          "description": null,
+          "location": null,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z"
+        }
+      ],
+      "additionalFeatures": {
+        "id": 6,
+        "description": "aside astride next rapid up gracefully swear how below dime",
+        "petFriendly": false,
+        "moveInDate": "2026-03-28T02:24:48.322Z",
+        "features": [
+          "SHOP"
+        ],
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "accessibilityFeatures": {
+        "id": 5,
+        "description": "why coolly while assured likewise huff unnecessarily underneath ugh duh",
+        "features": [],
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "kitchenFeatures": [
+        {
+          "id": 10,
+          "roomNumber": 3,
+          "floor": 1,
+          "name": "insert able",
+          "features": [
+            "MODERN",
+            "ISLAND"
+          ],
+          "description": "coil untrue pluck bah and well-documented round printer whether amidst",
+          "size": 41,
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        }
+      ],
+      "reception": [
+        {
+          "id": 8,
+          "roomNumber": 1,
+          "floor": 2,
+          "name": "complete throughout",
+          "type": "GAMES_ROOM",
+          "description": "jell fatherly while insolence frail shred unzip ack bravely tapioca",
+          "size": 41,
+          "features": [
+            "OPEN_PLAN",
+            "SERVING_HATCH"
+          ],
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        },
+        {
+          "id": 9,
+          "roomNumber": 2,
+          "floor": 3,
+          "name": "stoop bleak",
+          "type": "LIVING_ROOM",
+          "description": "urgently courageously freely er fly separately beneath political yellowish ick",
+          "size": 13,
+          "features": [
+            "OPEN_CONCEPT",
+            "BALCONY",
+            "PATIO_DOORS",
+            "BUILT_IN_DESK"
+          ],
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        },
+        {
+          "id": 10,
+          "roomNumber": 3,
+          "floor": 3,
+          "name": "depend apud",
+          "type": "DINING_ROOM",
+          "description": "starch and near noisily whether maintainer remark wisely lest ha",
+          "size": 13,
+          "features": [
+            "BAY_WINDOW",
+            "BUILT_IN_SHELVING",
+            "SERVING_HATCH",
+            "BAR_AREA",
+            "ACCOUSTIC_PANELS"
+          ],
+          "propertyId": 6,
+          "createdAt": "2026-01-19T11:12:44.967Z",
+          "updatedAt": "2026-01-19T11:12:44.967Z",
+          "media": []
+        }
+      ],
+      "utility": {
+        "id": 5,
+        "description": "of when oof bend trivial mouser notwithstanding surface anenst exhausted",
+        "features": [
+          "SINK"
+        ],
+        "size": 49.88542553425006,
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "outdoorSpace": {
+        "id": 2,
+        "description": "for given phew foodstuffs coil midst wring inscribe but winding",
+        "totalArea": 612.5,
+        "features": [
+          "BALCONY",
+          "POOL"
+        ],
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z",
+        "yard": [
+          {
+            "id": 6,
+            "description": null,
+            "name": "Rear Yard",
+            "size": 101.27,
+            "additionalDetails": false,
+            "facing": "NORTH",
+            "position": "REAR",
+            "features": [],
+            "createdAt": "2026-01-19T11:12:44.967Z",
+            "updatedAt": "2026-01-19T11:12:44.967Z",
+            "outdoorSpaceId": 2,
+            "media": []
+          }
+        ],
+        "garden": [
+          {
+            "id": 6,
+            "description": "instructive chunter diagram aside what unbearably swiftly bulky limply ack",
+            "name": "Front Garden",
+            "size": 45.2,
+            "additionalDetails": true,
+            "facing": "NORTH",
+            "position": "FRONT",
+            "features": [
+              "SHED",
+              "SUMMER_HOUSE"
+            ],
+            "createdAt": "2026-01-19T11:12:44.967Z",
+            "updatedAt": "2026-01-19T11:12:44.967Z",
+            "outdoorSpaceId": 2,
+            "media": []
+          },
+          {
+            "id": 7,
+            "description": "entrench spattering furthermore under lucky frankly who alongside seagull alongside",
+            "name": "Rear Garden",
+            "size": 108.55,
+            "additionalDetails": true,
+            "facing": "EAST",
+            "position": "REAR",
+            "features": [
+              "TERRACE",
+              "BALCONY",
+              "PATIO",
+              "SUMMER_HOUSE",
+              "GARDEN_OFFICE"
+            ],
+            "createdAt": "2026-01-19T11:12:44.967Z",
+            "updatedAt": "2026-01-19T11:12:44.967Z",
+            "outdoorSpaceId": 2,
+            "media": []
+          }
+        ],
+        "land": [
+          {
+            "id": 4,
+            "description": "ugh in fort with whale before however considering vice ick",
+            "additionalDetails": true,
+            "size": 357.48,
+            "name": "Field",
+            "separateParcel": true,
+            "features": [
+              "WOODLAND",
+              "PADDOCK",
+              "STABLES",
+              "ORCHARD",
+              "POND"
+            ],
+            "createdAt": "2026-01-19T11:12:44.967Z",
+            "updatedAt": "2026-01-19T11:12:44.967Z",
+            "outdoorSpaceId": 2,
+            "media": []
+          }
+        ],
+        "media": []
+      },
+      "energyAndUtilities": {
+        "id": 6,
+        "propertyId": 6,
+        "description": "nephew boo fast stiff compromise surprisingly miserly what that ick",
+        "epcRating": "D",
+        "epcCertificateUrl": "https://recent-hubris.org/",
+        "primaryHeatingType": [
+          "BIOMASS"
+        ],
+        "secondaryHeatingType": [
+          "BIOMASS",
+          "UNDERFLOOR"
+        ],
+        "boilerType": "CONVENTIONAL",
+        "hotWaterSource": "SOLAR_THERMAL",
+        "renewables": [
+          "SMART_METER",
+          "BATTERY_STORAGE"
+        ],
+        "connectedUtilities": [
+          "CESSPIT",
+          "GAS",
+          "WATER"
+        ],
+        "broadbandType": "FTTC",
+        "fullFibreAvailable": false,
+        "maxDownloadSpeedMbps": 430,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "securityFeatures": {
+        "id": 6,
+        "description": "carelessly amongst gee or curiously blah mysteriously ouch progress sweetly from evil solemnly enthusiastically without",
+        "features": [
+          "CCTV",
+          "ALARM_SYSTEM",
+          "NEIGHBORHOOD_WATCH"
+        ],
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "storageFeatures": {
+        "id": 5,
+        "description": "incandescence preregister boohoo finally clinking signature kiddingly gosh daddy guard quickly joyfully finally astride abnormally eventually symbolise bestride charm gerbil",
+        "features": [],
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      },
+      "runningCosts": {
+        "id": 6,
+        "description": "dearly gah next across season though priesthood debut anenst frightfully part runny coordinated generally supposing",
+        "councilTaxBand": "B",
+        "serviceCharges": 188.04,
+        "groundRent": 491.8,
+        "propertyId": 6,
+        "createdAt": "2026-01-19T11:12:44.967Z",
+        "updatedAt": "2026-01-19T11:12:44.967Z"
+      }
+    },
+    "user": {
+      "id": 1,
+      "username": "Virify",
+      "email": "admin@virify.co.uk",
+      "createdAt": "2026-01-19T11:12:43.934Z"
     },
     "listingType": "buy"
   },
