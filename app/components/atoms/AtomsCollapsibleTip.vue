@@ -68,6 +68,7 @@ function closeSelf() {
     height: var(--size-32);
     color: var(--primary-100);
     transition: color var(--animation-fast);
+    cursor: pointer;
 
     &:hover {
       color: var(--primary-400);
