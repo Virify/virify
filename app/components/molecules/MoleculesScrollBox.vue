@@ -1,8 +1,13 @@
 <template>
-  <div ref="$scrollbox" class="m-scrollbox | no-visible-scroll" :class="{
-    'm-scrollbox--overflow': isOverflowing
+  <div role="presentation" class="m-scrollbox-indicator" :class="{
+    'm-scrollbox-indicator--left': isOverflowing && indicatorPosition !== 'right',
+    'm-scrollbox-indicator--right': isOverflowing && indicatorPosition !== 'left'
   }">
-    <slot></slot>
+    <div ref="$scrollbox" class="m-scrollbox | no-visible-scroll" :class="{
+      'm-scrollbox--overflow': isOverflowing
+    }">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -68,13 +73,19 @@ function setIsOverflowing(resizeEvents: readonly ResizeObserverEntry[]) {
 
   // Set size if scrollbox can overflow
   isOverflowing.value = target.scrollWidth > target.clientWidth
+
+  // Update scroll indicators
+  toggleScrollIndicator(target)
 }
 
 /**
  *  Register events
  */
 onMounted(() => {
-  $scrollbox.value?.addEventListener('mousedown', mouseDown)
+  const root = $scrollbox.value
+
+  root?.addEventListener('scroll', addScrollIndicatorEvent)
+  root?.addEventListener('mousedown', mouseDown)
   window.addEventListener('mousemove', mouseMove)
   window.addEventListener('mouseup', mouseUp)
 
@@ -82,10 +93,44 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  $scrollbox.value?.removeEventListener('mousedown', mouseDown)
+  const root = $scrollbox.value
+
+  root?.removeEventListener('scroll', addScrollIndicatorEvent)
+  root?.removeEventListener('mousedown', mouseDown)
   window.removeEventListener('mousemove', mouseMove)
   window.removeEventListener('mouseup', mouseUp)
 })
+
+/**
+ *  Monitor if scrolled to start/end
+ */
+const indicatorPosition = shallowRef<'left' | 'right' | 'both'>('both')
+
+function addScrollIndicatorEvent({ target }: Event) {
+  toggleScrollIndicator(target as HTMLElement)
+}
+
+function toggleScrollIndicator(scrollBox: HTMLElement) {
+  if (!isElement(scrollBox)) return
+
+  // Get min/max scroll - offset by up to 1 to account for sub-pixels
+  const scrollLeft = scrollBox.scrollLeft
+  const MIN_SCROLL = 0
+  const MAX_SCROLL = Math.floor(scrollBox.scrollWidth - scrollBox.offsetWidth)
+
+  // Check scroll distances
+  if (scrollLeft <= MIN_SCROLL + 1) {
+    indicatorPosition.value = 'right'
+
+    return
+  }
+  if (scrollLeft >= MAX_SCROLL - 1) {
+    indicatorPosition.value = 'left'
+
+    return
+  }
+  indicatorPosition.value = 'both'
+}
 </script>
 
 <style lang="scss">
@@ -101,6 +146,45 @@ onUnmounted(() => {
       scroll-behavior: auto;
       cursor: grabbing;
     }
+  }
+}
+
+.m-scrollbox-indicator {
+  --overflow-indicator-size: var(--size-56);
+  --overflow-indicator-color: var(--background-200);
+
+  position: relative;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: var(--overflow-indicator-size);
+    pointer-events: none;
+    transition: transform var(--animation-subtle) var(--ease-out);
+  }
+
+  &::before {
+    left: 0;
+    transform: translateX(calc(0px - var(--overflow-indicator-size)));
+    background: linear-gradient(to right, var(--overflow-indicator-color), transparent);
+  }
+
+  &::after {
+    right: 0;
+    transform: translateX(var(--overflow-indicator-size));
+    background: linear-gradient(to left, var(--overflow-indicator-color), transparent);
+  }
+
+  &--left::before {
+    transform: none;
+  }
+
+  &--right::after {
+    transform: none;
   }
 }
 </style>
