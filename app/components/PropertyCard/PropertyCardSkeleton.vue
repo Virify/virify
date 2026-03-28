@@ -42,8 +42,16 @@ defineOptions({
 </script>
 
 <style lang="scss">
+@mixin small-card {
+  @container card (width < 275px) {
+    @content;
+  }
+}
+
 .property-card-skeleton {
   overflow: hidden;
+  container-name: card;
+  container-type: inline-size;
 
   &__image {
     display: block;
@@ -143,6 +151,10 @@ defineOptions({
     height: var(--size-56);
     grid-column: span 2;
     border-radius: var(--border-radius-ui);
+
+    @include small-card {
+      height: var(--size-96);
+    }
   }
 }
 </style>
