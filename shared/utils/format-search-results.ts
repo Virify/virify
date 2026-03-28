@@ -42,9 +42,9 @@ function __getFirstImage(property: Result['property']): string | undefined {
  *  Get full property address
  */
 function __getFullAddress(property: Result['property']): string | undefined {
-  const { fullAddress } = asObject(property?.address)
+  const { street, city, postcode } = asObject(property?.address)
 
-  return fullAddress as string | undefined
+  return [street, city, postcode].filter(Boolean).join(', ')
 }
 
 /**
