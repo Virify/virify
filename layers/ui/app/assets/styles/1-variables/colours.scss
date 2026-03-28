@@ -44,8 +44,8 @@
   --primary-800: #FFDDCF;
   --primary-900: #FFECE4;
 
-  --primary-background-100: #{fn.faded-token(18%)};
-  --primary-background-200: #{fn.faded-token(36%)};
+  --primary-background-100: light-dark(#{fn.faded-token(18%)}, #{fn.faded-token(26%)});
+  --primary-background-200: light-dark(#{fn.faded-token(36%)}, #{fn.faded-token(40%)});
 
   /**
    *  Secondary/Green
