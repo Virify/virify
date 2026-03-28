@@ -43,8 +43,7 @@ function closeSelf() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-800);
-  color: var(--primary-100);
+  background: var(--primary-background-100);
   border-radius: var(--border-radius-xl);
   padding: var(--size-16);
   gap: var(--size-16);
@@ -66,7 +65,6 @@ function closeSelf() {
     right: var(--size-6);
     width: var(--size-32);
     height: var(--size-32);
-    color: var(--primary-100);
     transition: color var(--animation-fast);
     cursor: pointer;
 
