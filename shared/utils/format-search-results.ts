@@ -137,7 +137,7 @@ function __getOverview(property: Result['property']): string {
 
   // Check bedrooms (e.g. to exclude land without bedrooms)
   if ((numberBedrooms as number) > 0) {
-    return `${numberBedrooms} Bed ${typeName} ${classificationName}`
+    return `${numberBedrooms} Bed ${typeName}, ${classificationName}`
   }
 
   // Otherwise return just the type, classification names
