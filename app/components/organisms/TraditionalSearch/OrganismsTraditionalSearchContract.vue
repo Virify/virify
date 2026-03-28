@@ -140,7 +140,9 @@ function updateIsBuy(newValue: boolean) {
 @use '#styles/_utils/functions' as fn;
 
 .o-traditional-search-form-contract {
-  --search-form-background: linear-gradient(to bottom, var(--blue-300), var(--blue-100));
+  --search-form-background: linear-gradient(to bottom,
+      var(--blue-300),
+      light-dark(var(--blue-100), var(--background-100)));
   --search-form-foreground: var(--monochrome-900);
 
   &__title {
