@@ -6,10 +6,14 @@
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
-      <h2 class="property-card-root__price | title-md">
+      <h2 class="property-card-root__price">
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
 
-        {{ price }}
+        <span class="property-card-root__price-amount | title-md">
+          {{ price }}
+
+          <sub v-if="rentFrequency" class="property-card-root__price-frequency">{{ rentFrequency }}</sub>
+        </span>
       </h2>
 
       <p class="property-card-root__overview">
@@ -85,6 +89,7 @@ interface Props {
   imageProvider?: 'cloudflare' | 'local'
   price?: string
   priceLabel?: string
+  rentFrequency?: string
   overview?: string
   overviewAddress?: string
   dateChanged?: string
@@ -204,8 +209,20 @@ const timeAgo = computed(() => {
   &__price {
     display: flex;
     flex-direction: column;
-    margin: 0 0 var(--size-4);
     gap: var(--size-2);
+    margin: 0 0 var(--size-4);
+  }
+
+  &__price-amount {
+    margin: var(--size-4) 0;
+    line-height: 1;
+  }
+
+  &__price-frequency {
+    position: unset;
+    bottom: unset;
+    font-size: var(--font-xs);
+    vertical-align: baseline;
   }
 
   &__overview {

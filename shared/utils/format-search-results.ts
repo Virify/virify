@@ -6,21 +6,6 @@ interface LastChange {
 }
 
 /**
- *  Convert sale offer types to plain text
- */
-function __formatSalePriceLabel(offerType: string): string | undefined {
-  if (!isString(offerType)) return undefined
-
-  const offersDictionary: Record<string, string> = {
-    FIXED: 'Fixed Price',
-    OFFERS_OVER: 'Offers Over',
-    GUIDE_PRICE: 'Guide Price',
-  }
-
-  return offersDictionary[offerType] || offerType
-}
-
-/**
  *  Get property coords
  */
 function __getCoords(property: Result['property']): [number, number] | undefined {
@@ -160,18 +145,40 @@ function __getOverview(property: Result['property']): string {
 }
 
 /**
- *  Get price label (e.g. 'Offers in excess of', 'Fixed price')
+ *  Get rental duration (e.g. price per week or per month)
  */
-function __getPriceLabel(result: Result, isSale: boolean): string | undefined {
-  if (isSale) {
-    const { priceType } = asObject(result?.saleListing)
+function __getRentalFrequency(rentalListing: Result['rentalListing']) {
+  const { rentFrequency } = asObject(rentalListing)
 
-    return __formatSalePriceLabel(priceType)
+  // If not a string, return nothing
+  if (!isString(rentFrequency)) return undefined
+
+  // Otherwise return closest match, OR itself
+  const frequencyDictionary: Record<string, string> = {
+    WEEKLY: '/week',
+    MONTHLY: '/month',
   }
 
-  const { priceType } = asObject(result?.rentalListing)
+  return frequencyDictionary[rentFrequency] || undefined
+}
 
-  return priceType
+/**
+ *  Get price label (e.g. 'Offers in excess of', 'Fixed price')
+ */
+function __getPriceLabel(saleListing: Result['saleListing']): string | undefined {
+  const { priceType } = asObject(saleListing)
+
+  // If not a string, return nothing
+  if (!isString(priceType)) return undefined
+
+  // Otherwise return closest match, OR itself
+  const priceLabelDictionary: Record<string, string> = {
+    FIXED: 'Fixed Price',
+    OFFERS_OVER: 'Offers Over',
+    GUIDE_PRICE: 'Guide Price',
+  }
+
+  return priceLabelDictionary[priceType] || priceType
 }
 
 /**
@@ -221,7 +228,13 @@ function __getLastChanged(property: Result['property']): LastChange {
  *  Get formatted property information
  */
 export function formatSearchResults(result?: Result) {
-  const { price, property, listingType } = asObject(result)
+  const {
+    price,
+    property,
+    listingType,
+    saleListing,
+    rentalListing
+  } = asObject(result)
 
   const isSale = listingType === 'buy'
   const { dateChanged, dateChangedType } = __getLastChanged(property)
@@ -246,7 +259,8 @@ export function formatSearchResults(result?: Result) {
 
     // @TODO - partial
     labels: __getLabels(result as Result, isSale),
-    priceLabel: __getPriceLabel(result as Result, isSale),
+    priceLabel: __getPriceLabel(isSale && saleListing),
+    rentFrequency: __getRentalFrequency(!isSale && rentalListing),
 
     // @TODO - full
     sellerImage: null,

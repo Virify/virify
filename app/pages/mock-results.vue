@@ -13,9 +13,10 @@
       labels,
       dateChanged,
       dateChangedType,
-      priceLabel
+      priceLabel,
+      rentFrequency
     } of results" :property-image :price :overview :sale-or-rent :icons :overview-address :seller-name :date-changed
-      :date-changed-type :view-url :labels :price-label />
+      :date-changed-type :view-url :labels :price-label :rent-frequency />
   </div>
 </template>
 
