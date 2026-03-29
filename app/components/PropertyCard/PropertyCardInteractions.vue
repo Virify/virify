@@ -1,10 +1,7 @@
 <template>
   <div role="presentation" class="property-card-interactions">
-    <AtomsFavouriteButton :listing-id :confirm-removal="false" class="property-card-interactions__button" />
-
-    <button :disabled type="button" class="property-card-interactions__button" aria-label="Add note">
-      <AtomsIcon icon="cards/notes" />
-    </button>
+    <AtomsFavouriteButton :disabled :listing-id :confirm-removal="false" class="property-card-interactions__button" />
+    <AtomsNoteButton :disabled :listing-id class="property-card-interactions__button" />
   </div>
 </template>
 
