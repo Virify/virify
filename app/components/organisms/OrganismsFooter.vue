@@ -6,7 +6,7 @@
         <nuxt-link to="/" class="o-footer__logo-link">
           <svg width="113" height="32" class="o-footer__logo">
             <title>Virify logo</title>
-            <use href="/img/logo.svg"></use>
+            <use href="/img/logo.svg#default"></use>
           </svg>
         </nuxt-link>
       </div>
