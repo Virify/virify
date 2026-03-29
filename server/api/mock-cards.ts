@@ -1,3 +1,5 @@
+import { formatSearchResults } from '../../shared/utils/format-search-results'
+
 const data = [
   {
     "id": 5,
@@ -8610,7 +8612,18 @@ async function sleep(DELAY = 1000) {
   })
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  const { format } = getQuery(event)
+
+  if (format === 'true') {
+    try {
+      return data.map(formatSearchResults)
+    }
+    catch ({ message }) {
+      return { error: message }
+    }
+  }
+
   await sleep()
 
   return data
