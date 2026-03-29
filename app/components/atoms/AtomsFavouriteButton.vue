@@ -54,6 +54,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 /**
+ *  Show filled card on selected
+ */
+const icon = computed(() => {
+  return isCurrentFavourite.value ? 'cards/favourite-filled' : 'cards/favourite'
+});
+
+/**
  *  Do not show animation on first use
  */
 const isSelected = ref(false)
@@ -70,10 +77,6 @@ watchOnce(isSelected, () => {
 /**
  *  a11y
  */
-const icon = computed(() => {
-  return isCurrentFavourite.value ? 'cards/favourite-filled' : 'cards/favourite'
-});
-
 const ariaLabel = computed(() => {
   return isCurrentFavourite.value ? 'Remove from favourites' : 'Add to favourites'
 });
@@ -117,23 +120,13 @@ function toggle() {
   flex: 0 0;
 
   &.pending {
-    color: var(--monochrome-400);
+    color: var(--blue-500);
   }
 
   &.selected {
     color: var(--favourite-colour);
     animation: selectedBounce var(--animation-subtle) linear;
-
-    .a-icon {
-      overflow: visible;
-      filter: 
-        drop-shadow(1px 0 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
-        drop-shadow(-1px 0 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
-        drop-shadow(0 1px 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
-        drop-shadow(0 -1px 0 light-dark(var(--monochrome-400), var(--monochrome-600)));
-    }
   }
-
 }
 
 @keyframes selectedBounce {
