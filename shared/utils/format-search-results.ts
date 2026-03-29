@@ -6,6 +6,49 @@ interface LastChange {
 }
 
 /**
+ *  Format copy from labels
+ */
+function __formatString(key?: string | null): string | undefined {
+  // If not a string, return nothing
+  if (!isString(key)) return undefined
+
+  // Otherwise return closest match, OR itself
+  const dictionaryPhrases: Record<string, string> = {
+    // Rental frequency
+    WEEKLY: '/week',
+    MONTHLY: '/month',
+
+    // Price offer type
+    FIXED: 'Fixed Price',
+    OFFERS_OVER: 'Offers Over',
+    GUIDE_PRICE: 'Guide Price',
+
+    // Furnishing
+    FURNISHED: 'Unfurnished',
+    UNFURNISHED: 'Unfurnished',
+    PART_FURNISHED: 'Part-furnished',
+
+    // Availability
+    AVAILABLE: 'Available',
+    LET_AGREED: 'Let agreed',
+    LET: 'Let',
+    UNDER_OFFER: 'Under offer',
+    SOLD: 'Sold STC',
+
+    // Sale contract type
+    FREEHOLD: 'Freehold',
+    LEASEHOLD: 'Leasehold',
+    COMMONHOLD: 'Commonhold',
+
+    // Let length
+    SHORT_TERM: 'Short term',
+    LONG_TERM: 'Long term',
+  }
+
+  return dictionaryPhrases[key] || key
+}
+
+/**
  *  Get property coords
  */
 function __getCoords(property: Result['property']): [number, number] | undefined {
@@ -51,20 +94,19 @@ function __getFullAddress(property: Result['property']): string | undefined {
  *  Get labels for sale type (e.g. 'chain free', 'leasehold')
  */
 function __getLabels(result: Result, isSale: boolean) {
-
   if (isSale) {
-    const { saleListing } = asObject(result)
+    const { tenureType } = asObject(result?.saleListing)
 
     // @ts-ignore
     // @TODO - check what the actual type expected is, here
-    return [saleListing?.tenureType].filter(Boolean)
+    return [tenureType].map(__formatString).filter(isString)
   }
 
-  const { rentalListing } = asObject(result)
+  const { rentalLength, furnishedStatus } = asObject(result?.rentalListing)
 
   // @ts-ignore
   // @TODO - check what the actual type expected is, here
-  return [rentalListing?.tenureType].filter(Boolean)
+  return [rentalLength, furnishedStatus].map(__formatString).filter(isString)
 }
 
 /**
@@ -150,16 +192,7 @@ function __getOverview(property: Result['property']): string {
 function __getRentalFrequency(rentalListing: Result['rentalListing']) {
   const { rentFrequency } = asObject(rentalListing)
 
-  // If not a string, return nothing
-  if (!isString(rentFrequency)) return undefined
-
-  // Otherwise return closest match, OR itself
-  const frequencyDictionary: Record<string, string> = {
-    WEEKLY: '/week',
-    MONTHLY: '/month',
-  }
-
-  return frequencyDictionary[rentFrequency] || undefined
+  return __formatString(rentalListing?.rentFrequency) || rentFrequency
 }
 
 /**
@@ -168,17 +201,7 @@ function __getRentalFrequency(rentalListing: Result['rentalListing']) {
 function __getPriceLabel(saleListing: Result['saleListing']): string | undefined {
   const { priceType } = asObject(saleListing)
 
-  // If not a string, return nothing
-  if (!isString(priceType)) return undefined
-
-  // Otherwise return closest match, OR itself
-  const priceLabelDictionary: Record<string, string> = {
-    FIXED: 'Fixed Price',
-    OFFERS_OVER: 'Offers Over',
-    GUIDE_PRICE: 'Guide Price',
-  }
-
-  return priceLabelDictionary[priceType] || priceType
+  return __formatString(priceType) || priceType
 }
 
 /**
