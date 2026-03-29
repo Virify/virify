@@ -3,7 +3,7 @@
     class="a-favourite-button | relative button-none" :class="{
       selected: isCurrentFavourite,
     }" @click.prevent="toggle">
-    <AtomsIcon :icon :class="iconClass" />
+    <AtomsIcon :icon="isCurrentFavourite ? 'cards/favourite-filled' : 'cards/favourite'" :class="iconClass" />
 
     <client-only>
       <svg v-if="isCurrentFavourite && isSelected && isInteracted" width="90" height="90" viewBox="0 0 90 90"
@@ -52,13 +52,6 @@ const props = withDefaults(defineProps<Props>(), {
   listingId: 0,
   confirmRemoval: true
 })
-
-/**
- *  Show filled card on selected
- */
-const icon = computed(() => {
-  return isCurrentFavourite.value ? 'cards/favourite-filled' : 'cards/favourite'
-});
 
 /**
  *  Do not show animation on first use
