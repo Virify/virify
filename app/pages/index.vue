@@ -8,6 +8,9 @@
 
     <!-- Features -->
     <HomepageSectionComingSoon class="| container" />
+
+    <a name="homepage-content" class="| inline-scroll-margin"></a>
+
     <HomepageSectionAiScroller class="| container" />
     <HomepageSectionMapScroller class="| container" />
     <HomepageSectionComms class="| container" />
