@@ -292,6 +292,7 @@ const propertyDetails = {
     position: relative;
     box-sizing: border-box;
     min-height: 30em;
+    isolation: isolate;
   }
 
   &__title {
