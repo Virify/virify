@@ -1,8 +1,6 @@
 <template>
   <div role="presentation" class="property-card-interactions">
-    <button :disabled type="button" class="property-card-interactions__button" aria-label="Add to favourites">
-      <AtomsIcon icon="cards/favourite" />
-    </button>
+    <AtomsFavouriteButton :listing-id :confirm-removal="false" class="property-card-interactions__button" />
 
     <button :disabled type="button" class="property-card-interactions__button" aria-label="Add note">
       <AtomsIcon icon="cards/notes" />
@@ -12,6 +10,7 @@
 
 <script setup lang="ts">
 interface Props {
+  listingId: number,
   disabled?: boolean
 }
 
@@ -31,18 +30,17 @@ defineProps<Props>()
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--blue-500);
     margin: 0;
     border: 0;
 
+    &[disabled] {
+      color: var(--blue-500);
+      pointer-events: none;
+    }
+
     &:not([disabled]) {
       transition: color var(--animation-fast);
-      color: light-dark(var(--monochrome-100), var(--monochrome-900));
       cursor: pointer;
-
-      &:hover {
-        color: var(--primary-500);
-      }
     }
   }
 

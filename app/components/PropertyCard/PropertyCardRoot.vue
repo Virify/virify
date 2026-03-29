@@ -68,7 +68,7 @@
           </time>
         </div>
 
-        <PropertyCardInteractions class="property-card-root__interactions" />
+        <PropertyCardInteractions v-if="listingId" :listing-id class="property-card-root__interactions" />
       </div>
     </div>
   </section>
@@ -99,6 +99,7 @@ interface Props {
   sellerImage?: string
   sellerName?: string
   viewUrl?: string
+  listingId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
