@@ -372,7 +372,7 @@ const timeAgo = computed(() => {
       order: -1;
       grid-column: span 2;
       padding-bottom: var(--size-6);
-      border-bottom: 1px solid var(--blue-500);
+      border-bottom: 1px solid light-dark(var(--blue-600), var(--blue-400));
     }
   }
 
