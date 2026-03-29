@@ -6,6 +6,21 @@ interface LastChange {
 }
 
 /**
+ *  Convert sale offer types to plain text
+ */
+function __formatSalePriceLabel(offerType: string): string | undefined {
+  if (!isString(offerType)) return undefined
+
+  const offersDictionary: Record<string, string> = {
+    FIXED: 'Fixed Price',
+    OFFERS_OVER: 'Offers Over',
+    GUIDE_PRICE: 'Guide Price',
+  }
+
+  return offersDictionary[offerType] || offerType
+}
+
+/**
  *  Get property coords
  */
 function __getCoords(property: Result['property']): [number, number] | undefined {
@@ -151,7 +166,7 @@ function __getPriceLabel(result: Result, isSale: boolean): string | undefined {
   if (isSale) {
     const { priceType } = asObject(result?.saleListing)
 
-    return priceType
+    return __formatSalePriceLabel(priceType)
   }
 
   const { priceType } = asObject(result?.rentalListing)
