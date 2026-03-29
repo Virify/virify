@@ -419,6 +419,10 @@ const propertyDetails = {
     @include mq.tablet {
       width: min(31ch, 100%);
     }
+
+    .m-scrollbox-indicator {
+      --overflow-indicator-color: var(--background-100);
+    }
   }
 
   &__card-leave-to,

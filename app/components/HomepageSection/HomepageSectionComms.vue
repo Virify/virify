@@ -190,6 +190,10 @@ useIntersectionObserver($infographic, ([entry]) => {
     width: min(100%, 31ch);
     margin: 0 auto;
     animation: var(--animation-slow) var(--ease-out) 1000ms;
+
+    .m-scrollbox-indicator {
+      --overflow-indicator-color: var(--background-100);
+    }
   }
 
   &__chat {
