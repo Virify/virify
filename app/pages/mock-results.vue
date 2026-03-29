@@ -16,8 +16,9 @@
       priceLabel,
       rentFrequency,
       listingId,
+      userId,
     } of results" :property-image :price :overview :sale-or-rent :icons :overview-address :seller-name :date-changed
-      :date-changed-type :view-url :labels :price-label :rent-frequency :listing-id />
+      :date-changed-type :view-url :labels :price-label :rent-frequency :listing-id :user-id />
   </div>
 </template>
 

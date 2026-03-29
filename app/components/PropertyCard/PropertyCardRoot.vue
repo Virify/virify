@@ -50,10 +50,8 @@
           View
         </component>
 
-        <button :disabled="disabledInteractions"
-          class="property-card-root__button property-card-root__button--enquire | body-sm">
-          Enquire
-        </button>
+        <AtomsEnquireButton v-if="listingId && userId" :disabled="disabledInteractions" :listing-id :user-id="userId"
+          class="property-card-root__button property-card-root__button--enquire | body-sm" />
       </div>
 
       <div v-if="!disabledInteractions" class="property-card-root__footer" aria-role="presentation">
@@ -99,7 +97,8 @@ interface Props {
   sellerImage?: string
   sellerName?: string
   viewUrl?: string
-  listingId?: string
+  listingId?: number
+  userId?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {

@@ -259,6 +259,7 @@ function __getLastChanged(property: Result['property']): LastChange {
 export function formatSearchResults(result?: Result) {
   const {
     id,
+    userId,
     price,
     property,
     listingType,
@@ -276,6 +277,7 @@ export function formatSearchResults(result?: Result) {
    */
   return {
     listingId: id,
+    userId,
     saleOrRent: listingType as 'buy' | 'rent',
     price: numberToCurrency(price as number, true),
     overviewAddress: __getFullAddress(property as Result['property']),
