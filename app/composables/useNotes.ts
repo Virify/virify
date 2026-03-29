@@ -133,7 +133,7 @@ export const useNotes = () => {
     const lookup = noteLookups.value.find((note) => note.listingId === listingId);
     // Fall back to full userNotes for createdAt (only available on notes dashboard)
     const fullNote = userNotes.value.find((note) => note.listingId === listingId);
-    
+
     return {
       note: lookup?.note ?? fullNote?.note,
       createdAt: fullNote?.createdAt,
@@ -163,7 +163,7 @@ export const useNotes = () => {
       updates: [
         {
           ref: noteLookups,
-          optimisticChange: (current) => 
+          optimisticChange: (current) =>
             isUpdating
               ? current.map((n: NoteLookup) => n.listingId === listingId ? { ...n, note } : n)
               : [...current, { listingId, note }],
@@ -183,7 +183,6 @@ export const useNotes = () => {
       onSuccess: () => {
         refreshUserNotes();
         refetchCurrentPage();
-        toast.add({ title: 'Success', description: successMessage, color: 'success' });
       },
       onError: (error) => {
         console.error("Error updating note:", error);
@@ -226,7 +225,6 @@ export const useNotes = () => {
       onSuccess: () => {
         refreshUserNotes();
         refetchCurrentPage();
-        toast.add({ title: 'Success', description: "Note deleted", color: 'success' });
       },
       onError: (error) => {
         console.error("Error deleting note:", error);
