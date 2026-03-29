@@ -1,8 +1,6 @@
 <template>
-  <button @click.prevent="handleEnquire" :disabled="isEnquiryDisabled">
-    <slot>
-      {{ defaultContent }}
-    </slot>
+  <button @click.prevent="handleEnquire" :disabled="disabled || isEnquiryDisabled">
+    <slot>Enquire</slot>
   </button>
 </template>
 
@@ -12,46 +10,54 @@ import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
 interface Props {
   listingId: number;
   userId?: number | null;
+  disabled?: boolean
 }
 
 const props = defineProps<Props>();
 
-const { showDialog } = useDialog();
-const { user } = useUserSession();
+/**
+ *  Validate user, viewer IDs
+ */
+const { user: sessionUser } = useUserSession();
 
 const safeUserId = computed(() => {
   const { userId } = props
 
-  return userId && !Number.isNaN(userId) ? userId : null
+  return isNumber(userId) ? userId : null
+})
+
+const sessionId = computed(() => {
+  return sessionUser.value?.id
 })
 
 const isSelf = computed(() => {
-  return safeUserId.value !== null && user.value?.id === safeUserId.value
+  return sessionId.value === safeUserId.value
 });
 
 const isEnquiryDisabled = computed(() => {
   return !safeUserId.value || isSelf.value
 });
 
-const defaultContent = computed(() => {
-  return isSelf.value ? 'Your Listing' : 'Enquire'
-});
+/**
+ *  Dialog
+ */
+const { showDialog } = useDialog();
 
 function handleEnquire() {
-  if (isEnquiryDisabled.value) return;
-
-  if (!user.value || !user.value.id) {
+  if (!sessionId.value) {
     showDialog({
       component: ViewsDialogLogin,
     });
+
     return;
   }
 
-  if (safeUserId.value !== null && !isSelf.value) {
-    showDialog({
-      component: ViewsDialogConversation,
-      props: { listingId: props.listingId, receiverId: safeUserId.value },
-    });
-  }
+  showDialog({
+    component: ViewsDialogConversation,
+    props: {
+      listingId: props.listingId,
+      receiverId: safeUserId.value
+    },
+  });
 }
 </script>
