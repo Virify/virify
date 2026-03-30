@@ -9,8 +9,7 @@
 
     <PopoverContent :side-offset="10" position-strategy="absolute"
       class="o-traditional-search-property-subtype__content | gradient-box">
-      <PopoverClose class="o-traditional-search-property-subtype__close | button button-ghost"
-        aria-label="Close popover">
+      <PopoverClose class="o-traditional-search-property-subtype__close" aria-label="Close popover">
         <AtomsIcon icon="cross" aria-hidden class="o-traditional-search-property-subtype__close-icon" />
       </PopoverClose>
       <h3 class="o-traditional-search-property-subtype__title | title-xs">{{ name }}</h3>
@@ -95,7 +94,19 @@ async function emitChange(updatedValue: string, checked: boolean) {
     right: var(--size-10);
     width: var(--size-32);
     height: var(--size-32);
+    margin: 0;
     padding: 0;
+    border: 0;
+    padding: var(--size-4);
+    border-radius: var(--border-radius-pill);
+    cursor: pointer;
+    background: transparent;
+    color: currentColor;
+    transition: background-color var(--animation-fast) var(--ease-in-out);
+
+    &:hover {
+      background: light-dark(var(--monochrome-800), var(--monochrome-200))
+    }
   }
 
   &__close-icon {
