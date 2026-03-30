@@ -1,4 +1,4 @@
-import { isStringy } from '../../../shared/utils/strings'
+import { isStringy } from '../strings'
 
 interface Option {
   key: string | number
