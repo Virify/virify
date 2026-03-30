@@ -11,9 +11,16 @@
 
     <a name="homepage-content" class="| inline-scroll-margin"></a>
 
-    <HomepageSectionAiScroller class="| container" />
+    <div class="p-index__bg-change">
+      <HomepageSectionAiScroller class="| container" />
+    </div>
+
     <HomepageSectionMapScroller class="| container" />
-    <HomepageSectionComms class="| container" />
+
+    <div class="p-index__bg-change">
+      <HomepageSectionComms class="| container" />
+    </div>
+
     <HomepageSectionLocation class="| container" />
 
     <!-- sellers section -->
@@ -233,6 +240,14 @@ function showSignupForm() {
 
     @include mq.desktop {
       border-radius: var(--border-radius-4xl);
+    }
+  }
+
+  &__bg-change {
+
+    @include mq.tablet {
+      background-color: var(--background-300);
+      padding: 10ch 0;
     }
   }
 }

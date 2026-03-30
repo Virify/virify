@@ -131,7 +131,6 @@ useIntersectionObserver($infographic, ([entry]) => {
   justify-content: center;
 
   @include mq.tablet {
-    margin-top: var(--size-120);
     grid-template-columns: 1fr 1fr;
     gap: var(--size-56);
     align-items: flex-start;
@@ -145,6 +144,7 @@ useIntersectionObserver($infographic, ([entry]) => {
     overflow: hidden;
 
     @include mq.tablet {
+      padding: 8ch 0;
       position: sticky;
       top: 10ch;
       order: 2;
