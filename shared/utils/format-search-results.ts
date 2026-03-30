@@ -1,5 +1,4 @@
 import type { ListingWithFullProperty as Result } from '../types/listing'
-import { isString, asObject } from '#imports'
 
 interface LastChange {
   dateChanged: string
@@ -9,7 +8,7 @@ interface LastChange {
 /**
  *  Format copy from labels
  */
-function __formatString(key?: unknown): string | undefined {
+function __formatString(key?: string | null): string | undefined {
   // If not a string, return nothing
   if (!isString(key)) return undefined
 
@@ -75,15 +74,10 @@ function __getUsername(result: Result): string | undefined {
 function __getFirstImage(property: Result['property']): string | undefined {
   const { media } = asObject(property)
 
-  // If no media exists, return undefined
-  if (!Array.isArray(media) || !media.length) {
-    return undefined
-  }
+  // @ts-ignore
+  const [firstImage] = asArray(media)
 
-  // Else get the first image
-  const [firstImage] = media
-
-  // And return the image src
+  // @ts-ignore
   return firstImage?.image
 }
 
