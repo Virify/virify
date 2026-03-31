@@ -19,21 +19,24 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/functions' as fn;
+
 .property-card-pill {
   display: block;
   width: fit-content;
-  border: 1px solid var(--monochrome-600);
-  background: var(--monochrome-800);
-  color: var(--monochrome-100);
+  // @TODO - maybe pill colours should be a global variable?
+  border: 1px solid light-dark(var(--blue-600), var(--blue-400));
+  background: light-dark(var(--blue-700), var(--blue-300));
+  color: light-dark(var(--blue-100), var(--monochrome-900));
   border-radius: var(--border-radius-md);
   padding: var(--size-2) var(--size-6);
   white-space: nowrap;
   font-weight: var(--font-semisemibold);
 
   &--orange {
-    color: light-dark(var(--secondary-400), var(--monochrome-900));
-    border-color: light-dark(var(--secondary-700), var(--secondary-600));
-    background: light-dark(var(--secondary-800), var(--secondary-400));
+    color: light-dark(var(--primary-400), var(--monochrome-900));
+    border-color: var(--primary-background-200);
+    background: var(--primary-background-100);
   }
 }
 </style>

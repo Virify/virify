@@ -32,7 +32,7 @@ const loadingMessage = computed(() => {
   &__spinner {
     display: flex;
     justify-content: center;
-    color: var(--secondary-400);
+    color: var(--primary-400);
     width: auto;
     height: 4ch;
   }

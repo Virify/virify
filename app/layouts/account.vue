@@ -82,12 +82,12 @@ useHead({
 @use '#styles/_utils/media' as mq;
 
 .account-page {
-  background: var(--background-100);
+  background: var(--background-200);
   transition: min-height 0.25s ease;
   min-height: 100dvh;
 
   @include mq.menu-mobile {
-    background: var(--background-200);
+    background: var(--background-100);
   }
 }
 

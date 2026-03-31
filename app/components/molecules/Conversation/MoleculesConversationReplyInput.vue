@@ -31,9 +31,9 @@ async function handleSend() {
 <style lang="scss" scoped>
 .reply-section {
   flex-shrink: 0;
-  background: var(--background-200);
+  background: var(--background-100);
   border-top: 1px solid var(--border-100);
-  
+
   @media (max-width: 768px) {
     padding-bottom: calc(var(--size-16) + 90px + env(safe-area-inset-bottom));
   }
@@ -53,7 +53,7 @@ async function handleSend() {
     padding: var(--size-8);
     border-radius: var(--border-radius-2xl);
     border: 1px solid var(--monochrome-600);
-    background: var(--background-100);
+    background: var(--background-200);
     color: var(--foreground-100);
     outline: none;
 

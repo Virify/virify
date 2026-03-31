@@ -41,7 +41,7 @@
               <AtomsSkeletonBar :loading="loading" :width="40" :height="16">
                 <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold">{{
                   historicalFloodEvents?.length || 0
-                }}</span>
+                  }}</span>
               </AtomsSkeletonBar>
             </div>
 
@@ -54,7 +54,7 @@
               <AtomsSkeletonBar :loading="loading" :width="40" :height="16">
                 <span class="o-listing-flood-risk__data-value | r-body-md-sm font-semibold">{{
                   floodStations?.length || 0
-                }}</span>
+                  }}</span>
               </AtomsSkeletonBar>
             </div>
           </div>
@@ -152,7 +152,7 @@ onMounted(() => {
     gap: var(--size-12);
     padding: var(--size-24);
     text-align: center;
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__error {
@@ -161,7 +161,7 @@ onMounted(() => {
 
   &__risk-highlight {
     background-color: fn.faded-color(12%, var(--monochrome-600));
-    border: 2px solid var(--secondary-400);
+    border: 2px solid var(--primary-400);
     border-radius: var(--border-radius-xl);
     padding: var(--size-16);
     margin: var(--size-32) auto;
@@ -199,7 +199,7 @@ onMounted(() => {
     justify-content: center;
     box-sizing: border-box;
     background-color: fn.faded-color(12%, var(--monochrome-600));
-    border: 2px solid var(--secondary-400);
+    border: 2px solid var(--primary-400);
     border-radius: var(--border-radius-xl);
     padding: var(--size-16);
     color: var(--monochrome-900);

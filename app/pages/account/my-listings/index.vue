@@ -3,13 +3,8 @@
     <!-- Analytics/CTA band -->
     <OrganismsAccountCreateListingHero />
 
-    <MoleculesAccountHeader 
-      v-model:search-term="searchTerm" 
-      v-model:category-filter="sortOrStatus"
-      :filter-options="combinedOptions"
-      :title="'My Listings'"
-      placeholder="Search listings..."
-    />
+    <MoleculesAccountHeader v-model:search-term="searchTerm" v-model:category-filter="sortOrStatus"
+      :filter-options="combinedOptions" :title="'My Listings'" placeholder="Search listings..." />
 
     <div class="my-listings-page__grid">
       <AtomsAccountCardContainer>
@@ -31,9 +26,9 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ["authenticated"], layout: "account" });
 
-const seoData = { 
-  title: "My Listings - Virify", 
-  description: "Manage your listings, publish status and view analytics." 
+const seoData = {
+  title: "My Listings - Virify",
+  description: "Manage your listings, publish status and view analytics."
 }
 useSeoMeta(seoData)
 
@@ -92,7 +87,7 @@ function onEdit(id: number) {
     gap: var(--size-12);
     align-items: stretch;
 
-    > * {
+    >* {
       flex: 1 1 calc(33.333% - var(--size-12));
       min-width: 260px;
     }
@@ -103,7 +98,7 @@ function onEdit(id: number) {
   }
 
   &__header {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-xl);
     box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
     padding: var(--size-24);
@@ -151,7 +146,7 @@ function onEdit(id: number) {
   }
 
   &__card {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-xl);
     box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
     display: flex;

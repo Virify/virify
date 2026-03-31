@@ -7,7 +7,7 @@
   color: var(--foreground-100);
   padding: var(--size-12) var(--size-16);
   border-radius: var(--border-radius-lg);
-  background-color: var(--background-200);
+  background-color: var(--background-100);
   border: 1px solid var(--background-300);
 }
 
@@ -36,7 +36,7 @@
   --gradient-box-gradient: linear-gradient(var(--gradident-box-bg-direction), var(--gradient-box-start), var(--gradient-box-middle), var(--gradient-box-end));
 
   // Used to set image to clip against
-  --clip: linear-gradient(var(--background-200), var(--background-200));
+  --clip: linear-gradient(var(--background-100), var(--background-100));
 
   position: relative;
   box-shadow: var(--gradient-box-shadow);

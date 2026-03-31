@@ -9,14 +9,9 @@
     </div>
     <!-- Image -->
     <div class="summary-card__image-container">
-      <AtomsCloudFlareImage
-        v-if="hasImage"
-        :src="listing.image?.[0]?.image"
-        :alt="listing.image?.[0]?.metadata?.alt || 'Listing image'"
-        variant="card"
-        :placeholder="true"
-        class="summary-card__image"
-      />
+      <AtomsCloudFlareImage v-if="hasImage" :src="listing.image?.[0]?.image"
+        :alt="listing.image?.[0]?.metadata?.alt || 'Listing image'" variant="card" :placeholder="true"
+        class="summary-card__image" />
     </div>
     <!-- Content -->
     <div class="summary-card__content">
@@ -67,14 +62,12 @@
 
       <!-- View button -->
       <div class="summary-card__footer">
-        <NuxtLink :to="`/listing/${listing.id}`"
-          class="summary-card__view-btn | button body-sm" aria-label="View property details"
-          :class="{
+        <NuxtLink :to="`/listing/${listing.id}`" class="summary-card__view-btn | button body-sm"
+          aria-label="View property details" :class="{
             'button-primary': isPremium,
             'button-secondary': isFeatured,
             'button-tertiary': isBasic
-          }"
-          title="View property details">
+          }" title="View property details">
           View
         </NuxtLink>
       </div>
@@ -137,7 +130,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
 <style lang="scss">
 .summary-card {
-  background-color: var(--background-200);
+  background-color: var(--background-100);
   border: none;
   border-radius: var(--border-radius-2xl);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -151,8 +144,8 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
 
   // Tier variants
   &--featured {
-    background-color: var(--background-200);
-    border-color: var(--secondary-400);
+    background-color: var(--background-100);
+    border-color: var(--primary-400);
 
     .summary-card__banner {
       left: -1px;
@@ -160,11 +153,11 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     }
 
     .summary-card__price {
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
 
     .summary-card__actions {
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
     }
 
     .summary-card__view-btn {
@@ -177,14 +170,14 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     color: var(--monochrome-900);
 
     .summary-card__banner {
-      background-color: var(--primary-400);
+      background-color: var(--secondary--400);
       color: var(--monochrome-300);
       left: -1px;
       top: -1px;
     }
 
     .summary-card__price {
-      color: var(--primary-400);
+      color: var(--secondary--400);
     }
 
     .summary-card__price-type {
@@ -195,28 +188,28 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
       color: var(--text-color);
     }
 
-    .summary-card__type { 
+    .summary-card__type {
       color: var(--monochrome-900);
     }
 
     .summary-card__actions {
-      background-color: var(--primary-400);
+      background-color: var(--secondary--400);
     }
 
     .summary-card__view-btn {
       color: var(--monochrome-100);
-      background: var(--primary-400);
+      background: var(--secondary--400);
 
       &:hover {
-        background-color: var(--primary-300);
+        background-color: var(--secondary--300);
       }
     }
-    
+
   }
 
   // Banner
   &__banner {
-    background-color: var(--secondary-400);
+    background-color: var(--primary-400);
     border-radius: calc(var(--border-radius-2xl) - 4px) 0 var(--border-radius-lg) 0;
     color: var(--monochrome-900);
     left: -2px;
@@ -311,7 +304,7 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
       transition: border-color 0.2s;
 
       &:hover {
-        border-color: var(--secondary-400);
+        border-color: var(--primary-400);
       }
     }
   }

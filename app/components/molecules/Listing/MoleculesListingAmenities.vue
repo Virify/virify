@@ -1,49 +1,21 @@
 <template>
   <div class="m-listing-amenities">
-    <div 
-      v-for="[categoryKey, items] in amenityCategories"
-      :key="categoryKey"
-      class="m-listing-amenities__category"
-    >
+    <div v-for="[categoryKey, items] in amenityCategories" :key="categoryKey" class="m-listing-amenities__category">
       <div class="m-listing-amenities__category-header">
         <h3 class="m-listing-amenities__category-title | title-xs">
           {{ formatCategoryKey(categoryKey) }}
         </h3>
       </div>
-      
+
       <ul class="m-listing-amenities__list | body-sm">
         <li v-for="item in items" :key="item.name" class="m-listing-amenities__item">
           <div class="m-listing-amenities__item-icon">
-            <AtomsIcon 
-              v-if="categoryKey === 'hospitals'" 
-              icon="amenities/hospital" 
-              :size="16" 
-            />
-            <AtomsIcon 
-              v-else-if="categoryKey === 'schools'" 
-              icon="amenities/school" 
-              :size="16" 
-            />
-            <AtomsIcon 
-              v-else-if="categoryKey === 'train_stations'" 
-              icon="amenities/train" 
-              :size="16" 
-            />
-            <AtomsIcon
-              v-else-if="categoryKey === 'bus_stations'" 
-              icon="amenities/bus" 
-              :size="16" 
-            />
-            <AtomsIcon
-              v-else-if="categoryKey === 'parks'" 
-              icon="amenities/park" 
-              :size="16" 
-            />
-            <AtomsIcon
-              v-else-if="categoryKey === 'gyms'" 
-              icon="amenities/fitness" 
-              :size="16" 
-            />
+            <AtomsIcon v-if="categoryKey === 'hospitals'" icon="amenities/hospital" :size="16" />
+            <AtomsIcon v-else-if="categoryKey === 'schools'" icon="amenities/school" :size="16" />
+            <AtomsIcon v-else-if="categoryKey === 'train_stations'" icon="amenities/train" :size="16" />
+            <AtomsIcon v-else-if="categoryKey === 'bus_stations'" icon="amenities/bus" :size="16" />
+            <AtomsIcon v-else-if="categoryKey === 'parks'" icon="amenities/park" :size="16" />
+            <AtomsIcon v-else-if="categoryKey === 'gyms'" icon="amenities/fitness" :size="16" />
           </div>
           <div class="m-listing-amenities__item-content">
             <NuxtLink :to="getMapUrl(item)" external target="_blank" rel="noopener noreferrer">
@@ -151,6 +123,7 @@ function getMapUrl(item: any) {
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
+
 .m-listing-amenities {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -163,11 +136,12 @@ function getMapUrl(item: any) {
 
 
   &__category {
-    background: var(--background-100);
+    background: var(--background-200);
     padding: var(--size-16);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--monochrome-600);
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+
     &-title {
       margin: 0;
       color: var(--foreground-100);
@@ -218,7 +192,7 @@ function getMapUrl(item: any) {
     a {
       color: inherit;
       text-decoration: underline;
-      text-decoration-color: var(--secondary-400);
+      text-decoration-color: var(--primary-400);
       text-underline-offset: 2px;
     }
   }
@@ -234,7 +208,7 @@ function getMapUrl(item: any) {
   }
 
   &__error {
-    color: var(--danger-500, #ef4444);
+    color: var(--error-500);
   }
 
   &__empty {

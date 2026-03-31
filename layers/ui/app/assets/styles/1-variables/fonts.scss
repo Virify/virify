@@ -5,6 +5,7 @@
   /*
    *  Font sizes
    */
+  --font-3xs: #{fn.toRem(11)};
   --font-2xs: #{fn.toRem(12)};
   --font-xs: #{fn.toRem(14)};
   --font-sm: #{fn.toRem(16)};

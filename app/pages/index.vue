@@ -6,36 +6,26 @@
 
     <HomepageSectionSearch v-else class="p-index__search | container" />
 
+    <!-- Features -->
     <HomepageSectionComingSoon class="| container" />
 
-    <a id="homepage-content" aria-hidden></a>
+    <a id="homepage-content" class="| inline-scroll-margin"></a>
 
-    <!-- Features -->
-    <UPageCTA v-for="(section, index) in processedFeatureSections" :key="`feature-${index}`" :title="section.title"
-      :description="section.subtitle" orientation="horizontal" variant="soft" class="p-index__border-radius | container"
-      :class="index % 2 === 0 ? 'p-index__hero-dark' : 'bg-transparent'" :reverse="index % 2 !== 0" :ui="{
-        body: 'border-0 radius-0',
-        root: 'rounded-none',
-        title: 'text-secondary/90!',
-        description: 'body-md',
-      }">
-      <template #body>
-        <div class="flex flex-col gap-4">
-          <UPageFeature v-for="(feature, idx) in section.features" :key="`feature-${index}-${idx}`" icon="i-lucide-info"
-            :title="feature.title" :description="feature.description" :ui="{
-              description: 'body-sm',
-              leadingIcon: 'text-secondary h-6 w-6',
-            }">
-          </UPageFeature>
-        </div>
-      </template>
+    <div class="p-index__bg-change">
+      <HomepageSectionAiScroller class="| container" />
+    </div>
 
-      <AtomsCloudFlareImage v-if="section.image" :src="section.image" :alt="section.imageAlt" class="h-auto w-full" />
-    </UPageCTA>
+    <HomepageSectionMapScroller class="| container" />
+
+    <div class="p-index__bg-change">
+      <HomepageSectionComms class="| container" />
+    </div>
+
+    <HomepageSectionLocation class="| container" />
 
     <!-- sellers section -->
     <UPageSection :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
-      :description="cmsContent?.sellersBenefits.subtitle || ''" headline="Your in control" :ui="{
+      :description="cmsContent?.sellersBenefits.subtitle || ''" headline="You're in control" :ui="{
         root: '| container',
         headline: 'text-secondary/90!',
         body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
@@ -238,7 +228,7 @@ function showSignupForm() {
 
   &__hero-dark {
     color: var(--monochrome-900);
-    background: #26333C;
+    background: var(--blue-200);
   }
 
   &__border-radius {
@@ -250,6 +240,14 @@ function showSignupForm() {
 
     @include mq.desktop {
       border-radius: var(--border-radius-4xl);
+    }
+  }
+
+  &__bg-change {
+
+    @include mq.tablet {
+      background-color: var(--background-300);
+      padding: 10ch 0;
     }
   }
 }

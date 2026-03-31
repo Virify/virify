@@ -26,7 +26,7 @@ function openSupportDialog() {
   width: var(--size-48);
   height: var(--size-48);
   border-radius: 50%;
-  background: var(--secondary-500);
+  background: var(--primary-500);
   color: white;
   border: none;
   cursor: pointer;
@@ -39,7 +39,7 @@ function openSupportDialog() {
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    background: var(--secondary-500);
+    background: var(--primary-500);
   }
 
   &:active {

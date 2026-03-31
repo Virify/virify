@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: var(--primary-300);
+  background-color: var(--primary-500);
   color: var(--monochrome-100);
   padding: var(--size-12) var(--size-18);
   border-radius: var(--border-radius-pill);
@@ -45,11 +45,11 @@
  */
 .button {
   &-secondary {
-    background: var(--secondary-400);
+    background: var(--primary-400);
     color: var(--monochrome-900);
 
     &:hover {
-      background: var(--secondary-300);
+      background: var(--primary-300);
       color: var(--monochrome-900);
     }
   }
@@ -118,12 +118,12 @@
   }
 
   &-delete {
-    background: var(--error-background);
+    background: var(--error-background-100);
     color: var(--error-foreground);
 
     &:hover {
       background: var(--error-foreground);
-      color: var(--error-background);
+      color: var(--error-background-100);
     }
   }
 
@@ -140,11 +140,11 @@
     }
 
     &--cta {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
 
       &:hover {
-        background: var(--secondary-500);
+        background: var(--primary-500);
         color: var(--monochrome-900);
       }
     }

@@ -2,7 +2,8 @@
   <Teleport to="body">
     <div v-if="show">
       <div class="info-modal" @click.stop :style="position">
-        <button @click="$emit('close')" class="info-modal__close button button-xs button-quiet" type="button" aria-label="Close info">
+        <button @click="$emit('close')" class="info-modal__close button button-xs button-quiet" type="button"
+          aria-label="Close info">
           <AtomsIcon icon="cross" :size="16" />
         </button>
         <p class="| body-sm">{{ content }}</p>
@@ -26,7 +27,7 @@ defineEmits<{
 
 <style lang="scss" scoped>
 .info-modal {
-  background: var(--background-100);
+  background: var(--background-200);
   border: 1px solid var(--monochrome-600);
   border-radius: var(--border-radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

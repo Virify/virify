@@ -1,28 +1,18 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        class="border-0"
-        :ui="{
-          title: 'title-sm m-0!',
-          left: 'flex items-center gap-2',
-        }"
-      >
+      <UDashboardNavbar class="border-0" :ui="{
+        title: 'title-sm m-0!',
+        left: 'flex items-center gap-2',
+      }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
 
         <template #right>
-          <OrganismsDashboardFilter 
-            :items="enquiries" 
-            :enquiries="true" 
-            persistence-key="dashboard-listing-enquiries" 
-            :all-count="allCount" 
-            :unread-count="unreadCountLocal" 
-            @update:filtered="filteredEnquiries = $event" 
-            :view-options="[]" 
-
-          />
+          <OrganismsDashboardFilter :items="enquiries" :enquiries="true" persistence-key="dashboard-listing-enquiries"
+            :all-count="allCount" :unread-count="unreadCountLocal" @update:filtered="filteredEnquiries = $event"
+            :view-options="[]" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
@@ -51,22 +41,18 @@
 
           <!-- Results (Filtered) -->
           <div v-else-if="filteredEnquiries.length > 0" class="space-y-3 w-full">
-            <UPageCard
-              v-for="enquiry in filteredEnquiries"
-              :key="enquiry.id"
-              variant="subtle"
-              :ui="{
-                root: 'cursor-pointer transition-colors w-full',
-                container: 'p-0 sm:p-0',
-                body: 'w-full',
-              }"
-              @click="handleOpenModal(enquiry)"
-            >
+            <UPageCard v-for="enquiry in filteredEnquiries" :key="enquiry.id" variant="subtle" :ui="{
+              root: 'cursor-pointer transition-colors w-full',
+              container: 'p-0 sm:p-0',
+              body: 'w-full',
+            }" @click="handleOpenModal(enquiry)">
               <template #body>
                 <!-- Header -->
                 <div class="flex justify-between items-center p-3">
                   <div class="flex items-center gap-2">
-                    <UAvatar :name="getConversationOtherUser(enquiry, user?.id)?.username || 'User'" :alt="getConversationOtherUser(enquiry, user?.id)?.username || 'User'" size="xs" class="bg-(--background-200) text-(--foreground-100)" />
+                    <UAvatar :name="getConversationOtherUser(enquiry, user?.id)?.username || 'User'"
+                      :alt="getConversationOtherUser(enquiry, user?.id)?.username || 'User'" size="xs"
+                      class="bg-(--background-100) text-(--foreground-100)" />
                     <span class="text-sm font-bold text-(--foreground-100)">
                       {{ getConversationOtherUser(enquiry, user?.id)?.username || "User" }}
                     </span>
@@ -86,12 +72,7 @@
         </div>
       </div>
 
-      <OrganismsDashboardEnquiryModal 
-        v-if="user" 
-        v-model:open="modalOpen" 
-        :conversation="activeEnquiry" 
-        :user="user" 
-      />
+      <OrganismsDashboardEnquiryModal v-if="user" v-model:open="modalOpen" :conversation="activeEnquiry" :user="user" />
     </template>
   </UDashboardPanel>
 </template>
@@ -116,8 +97,8 @@ const listingId = computed(() => Number(route.params.id));
 const modalOpen = ref(false);
 
 // Filter Logic
-const filterState = useDashboardListFilter(ref([]), { 
-  persistenceKey: "dashboard-listing-enquiries", 
+const filterState = useDashboardListFilter(ref([]), {
+  persistenceKey: "dashboard-listing-enquiries",
   enquiries: true,
   hideListingSort: true
 });
@@ -162,26 +143,26 @@ const unreadCountLocal = computed(() => {
 
 watch([enquiryFilter, directionFilter, sortOrder], async () => {
   if (listingId.value) {
-    await fetchEnquiries({ 
-      filter: enquiryFilter.value as any, 
-      direction: directionFilter.value as any, 
-      page: 1, 
-      sort: sortOrder.value as any, 
-      limit: 50, 
-      listingId: listingId.value 
+    await fetchEnquiries({
+      filter: enquiryFilter.value as any,
+      direction: directionFilter.value as any,
+      page: 1,
+      sort: sortOrder.value as any,
+      limit: 50,
+      listingId: listingId.value
     });
   }
 });
 
 onMounted(() => {
   if (listingId.value) {
-    fetchEnquiries({ 
-      filter: enquiryFilter.value as any, 
-      direction: directionFilter.value as any, 
-      page: 1, 
-      sort: sortOrder.value as any, 
-      limit: 50, 
-      listingId: listingId.value 
+    fetchEnquiries({
+      filter: enquiryFilter.value as any,
+      direction: directionFilter.value as any,
+      page: 1,
+      sort: sortOrder.value as any,
+      limit: 50,
+      listingId: listingId.value
     });
   }
 });

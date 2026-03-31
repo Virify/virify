@@ -4,14 +4,18 @@
       <!-- Logo Section -->
       <div class="o-footer__brand" v-if="!isWaitingListMode">
         <nuxt-link to="/" class="o-footer__logo-link">
-          <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="180" height="54" class="o-footer__logo" />
+          <svg width="113" height="32" class="o-footer__logo">
+            <title>Virify logo</title>
+            <use href="/img/logo.svg#default"></use>
+          </svg>
         </nuxt-link>
       </div>
 
       <div class="o-footer__sections">
         <div class="o-footer__brand" v-if="isWaitingListMode">
           <nuxt-link to="/" class="o-footer__logo-link">
-            <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="120" height="54" class="o-footer__logo" />
+            <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="120" height="54"
+              class="o-footer__logo" />
           </nuxt-link>
         </div>
         <!-- List Property Section -->
@@ -64,7 +68,8 @@
         <p class="o-footer__copyright | body-xs">
           We like to help — our guides are friendly tips, not legal advice.
         </p>
-        <p class="o-footer__copyright | body-xs" title="Our guides are for informational purposes only and do not constitute legal or professional advice.">
+        <p class="o-footer__copyright | body-xs"
+          title="Our guides are for informational purposes only and do not constitute legal or professional advice.">
           © {{ currentYear }} Virify Ltd. All rights reserved. Company No. 16255324.
         </p>
       </div>
@@ -106,7 +111,7 @@ const currentYear = new Date().getFullYear();
 @use "#styles/_utils/media" as mq;
 
 .o-footer {
-  background-color: #26333C;
+  background-color: light-dark(var(--blue-200), var(--blue-100));
   color: var(--monochrome-900);
   width: 100%;
   padding: var(--size-48) 0 var(--size-32);
@@ -151,8 +156,8 @@ const currentYear = new Date().getFullYear();
 
   &__logo {
     display: block;
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: var(--size-40);
   }
 
   &__section-title {

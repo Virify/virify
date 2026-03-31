@@ -151,7 +151,7 @@ function showErrors(errors?: ErrorBoxProp) {
     box-sizing: border-box;
 
     &:user-invalid:not(:placeholder-shown):not(:focus) {
-      background-color: var(--error-background);
+      background-color: var(--error-background-100);
       color: var(--error-foreground);
     }
   }
@@ -173,14 +173,14 @@ function showErrors(errors?: ErrorBoxProp) {
 
     a {
       text-decoration: none;
-      color: var(--secondary-400);
+      color: var(--primary-400);
       font: inherit;
     }
   }
 
   &__consent-checkbox {
     margin-right: var(--size-12);
-    border-color: #788792; // @TODO replace with new colours once supported
+    border-color: var(--blue-500);
     width: var(--size-20);
     height: var(--size-20);
 
@@ -200,8 +200,8 @@ function showErrors(errors?: ErrorBoxProp) {
   &__success {
     padding: var(--size-20) var(--size-24) var(--size-24);
     font-weight: var(--font-semisemibold);
-    background: light-dark(var(--success-background), var(--success-foreground));
-    color: var(--monochrome-100);
+    background: var(--success-background);
+    color: var(--success-foreground);
     border-radius: var(--border-radius-2xl);
     box-sizing: border-box;
     width: min(100%, 42ch);
@@ -215,8 +215,8 @@ function showErrors(errors?: ErrorBoxProp) {
 
   &__success-button {
     margin: var(--size-16) 0 0;
-    background: light-dark(var(--success-foreground), var(--success-foreground-hover));
-    color: light-dark(var(--monochrome-900), var(--monochrome-100));
+    background: light-dark(var(--success-400), var(--success-200));
+    color: var(--monochrome-900);
     padding-left: var(--size-24);
     padding-right: var(--size-24);
 
@@ -225,8 +225,7 @@ function showErrors(errors?: ErrorBoxProp) {
     }
 
     &:hover {
-      background: light-dark(var(--success-foreground), var(--success-foreground-hover));
-      color: light-dark(var(--monochrome-900), var(--monochrome-100));
+      background: light-dark(var(--success-300), var(--success-100));
     }
   }
 }

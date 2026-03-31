@@ -74,7 +74,7 @@ defineProps<Props>()
     font-size: var(--font-sm);
 
     &--active {
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
       color: var(--monochrome-900);
     }
   }

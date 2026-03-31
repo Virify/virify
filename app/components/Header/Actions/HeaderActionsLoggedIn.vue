@@ -121,7 +121,7 @@ async function logOut() {
     @media (hover: hover) {
       &:hover {
         background: transparent;
-        color: var(--secondary-400);
+        color: var(--primary-400);
       }
     }
   }
@@ -146,7 +146,7 @@ async function logOut() {
 
   &__popover {
     padding: var(--size-20) var(--size-16) var(--size-16);
-    background: var(--background-200);
+    background: var(--background-100);
     width: min(calc(100vw - var(--size-32)), 24ch);
   }
 
@@ -180,11 +180,11 @@ async function logOut() {
     &--logout {
       margin-top: var(--size-36);
       padding: var(--size-14) var(--size-20);
-      background: var(--error-background);
+      background: var(--error-background-100);
       color: var(--error-foreground);
 
       &:hover {
-        background: var(--error-background-hover);
+        background: var(--error-background-200);
         color: var(--error-foreground);
       }
     }

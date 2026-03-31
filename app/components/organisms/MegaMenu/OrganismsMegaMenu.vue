@@ -1,80 +1,39 @@
 <template>
-  <li 
-    v-if="hasDropdown" 
-    ref="dropdownRef"
-    class="o-site-navigation__dropdown"
-    @mouseenter="openMenu"
-    @mouseleave="handleMouseLeave"
-  >
-    <button 
-      ref="triggerRef" 
-      type="button"
-      class="o-site-navigation-link | button button-ghost button-sm"
-      @click="handleButtonClick"
-      @keydown="handleKeydown"
-      :aria-expanded="isOpen" 
-      aria-haspopup="true"
-      :aria-controls="menuId"
-    >
+  <li v-if="hasDropdown" ref="dropdownRef" class="o-site-navigation__dropdown" @mouseenter="openMenu"
+    @mouseleave="handleMouseLeave">
+    <button ref="triggerRef" type="button" class="o-site-navigation-link | button button-ghost button-sm"
+      @click="handleButtonClick" @keydown="handleKeydown" :aria-expanded="isOpen" aria-haspopup="true"
+      :aria-controls="menuId">
       <AtomsIcon v-if="item.icon" :icon="item.icon" width="16" height="16" class="o-site-navigation__icon" />
       {{ item.label }}
       <AtomsIcon icon="chevron-down" width="12" height="12" class="o-site-navigation__icon" />
     </button>
 
-    <div 
-      :id="menuId" 
-      ref="menuRef" 
-      class="o-site-navigation__dropdown-menu o-site-navigation__mega"
-      :class="menuStateClasses" 
-      role="menu" 
-      :aria-hidden="!isOpen" 
-      :inert="!isOpen"
-    >
+    <div :id="menuId" ref="menuRef" class="o-site-navigation__dropdown-menu o-site-navigation__mega"
+      :class="menuStateClasses" role="menu" :aria-hidden="!isOpen" :inert="!isOpen">
       <!-- Main Category Link Button -->
       <div class="o-site-navigation__mega-header" v-if="item.href">
-        <NuxtLink
-          v-if="item.href"
-          :to="item.href"
-          class="o-site-navigation__mega-main-link | button button-ghost button-sm"
-          @click="handleMenuClose"
-        >
+        <NuxtLink v-if="item.href" :to="item.href"
+          class="o-site-navigation__mega-main-link | button button-ghost button-sm" @click="handleMenuClose">
           Browse all {{ item.label.toLowerCase() }}
         </NuxtLink>
       </div>
 
       <template v-if="isSingleColumn">
         <div class="o-site-navigation__mega-col o-site-navigation__mega-col--single">
-          <OrganismsMegaMenuItem 
-            v-for="link in categories" 
-            :key="link.id" 
-            :to="link.href || '#'" 
-            :label="link.label"
-            :icon="link.icon" 
-            variant="single"
-            @click="handleMenuClose"
-          />
+          <OrganismsMegaMenuItem v-for="link in categories" :key="link.id" :to="link.href || '#'" :label="link.label"
+            :icon="link.icon" variant="single" @click="handleMenuClose" />
         </div>
       </template>
       <template v-else>
-        <OrganismsMegaMenuLeft 
-          :categories="categories" 
-          :active-category-id="activeCategoryId"
-          @select="handleCategorySelect"
-          @close="handleMenuClose"
-        />
+        <OrganismsMegaMenuLeft :categories="categories" :active-category-id="activeCategoryId"
+          @select="handleCategorySelect" @close="handleMenuClose" />
         <div class="o-site-navigation__mega-divider"></div>
-        <OrganismsMegaMenuRight 
-          :guides="activeGuides" 
-          @close="handleMenuClose"
-        />
+        <OrganismsMegaMenuRight :guides="activeGuides" @close="handleMenuClose" />
       </template>
     </div>
   </li>
-  <li 
-    v-else 
-    class="o-site-navigation__item"
-    @mouseenter="closeMenuIfOpen"
-  >
+  <li v-else class="o-site-navigation__item" @mouseenter="closeMenuIfOpen">
     <nuxt-link :to="item.href || '#'" class="o-site-navigation-link | button button-ghost button-sm">
       {{ item.label }}
     </nuxt-link>
@@ -85,7 +44,7 @@
 import { onClickOutside } from '@vueuse/core'
 
 const props = defineProps<{
-  item: NavigationItem; 
+  item: NavigationItem;
   dropdown: NavigationDropdownControls
 }>();
 
@@ -149,13 +108,13 @@ watch(
  */
 function openMenu() {
   if (!hasDropdown.value) return;
-  
+
   // Clear any pending close timeout
   if (leaveTimeout) {
     clearTimeout(leaveTimeout);
     leaveTimeout = null;
   }
-  
+
   props.dropdown.open(props.item.id, {
     trigger: triggerRef.value,
     defaultCategoryId: defaultCategoryId.value,
@@ -302,7 +261,7 @@ onUnmounted(() => {
 
     &-divider {
       width: 1px;
-      background-color: var(--secondary-400);
+      background-color: var(--primary-400);
     }
 
     &-col {

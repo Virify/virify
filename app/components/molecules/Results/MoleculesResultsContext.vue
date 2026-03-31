@@ -4,15 +4,18 @@
       <AtomsIcon icon="content/search" width="16" height="16" />
       {{ count }} {{ count === 1 ? 'property' : 'properties' }} found
     </AtomsPill>
-    <AtomsPill v-for="term in searchTerms" :key="term" class="m-results-context__pill m-results-context__pill--term | body-sm" @click="openFilters">
+    <AtomsPill v-for="term in searchTerms" :key="term"
+      class="m-results-context__pill m-results-context__pill--term | body-sm" @click="openFilters">
       <AtomsIcon icon="explore/ai" width="16" height="16" />
       {{ term }}
     </AtomsPill>
-    <AtomsPill v-if="locationName" class="m-results-context__pill m-results-context__pill--location | body-sm" @click="openLocation">
+    <AtomsPill v-if="locationName" class="m-results-context__pill m-results-context__pill--location | body-sm"
+      @click="openLocation">
       <AtomsIcon icon="explore/map" width="16" height="16" />
       {{ locationName }}
     </AtomsPill>
-    <AtomsPill v-if="radiusText" class="m-results-context__pill m-results-context__pill--radius | body-sm" @click="openLocation">
+    <AtomsPill v-if="radiusText" class="m-results-context__pill m-results-context__pill--radius | body-sm"
+      @click="openLocation">
       <AtomsIcon icon="explore/map" width="16" height="16" />
       {{ radiusText }}
     </AtomsPill>
@@ -57,7 +60,7 @@ function openLocation() {
  */
 const searchTerms = computed(() => {
   if (!props.queryAnalysis?.usedTerms) return []
-  return props.queryAnalysis.usedTerms.map(term => 
+  return props.queryAnalysis.usedTerms.map(term =>
     term.charAt(0).toUpperCase() + term.slice(1)
   )
 })
@@ -120,6 +123,7 @@ const hasSearchInfo = computed(() => {
       background: light-dark(var(--monochrome-800), var(--monochrome-200));
       border: none;
       color: var(--foreground-100);
+
       &:hover {
         transform: none;
         box-shadow: none;
@@ -127,7 +131,7 @@ const hasSearchInfo = computed(() => {
     }
 
     &--term {
-      background: light-dark(var(--secondary-500), var(--secondary-400));
+      background: light-dark(var(--primary-500), var(--primary-400));
       border: none;
     }
 

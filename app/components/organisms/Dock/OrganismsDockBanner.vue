@@ -1,52 +1,58 @@
 <template>
-  <section class="o-dock-banner__form-height" role="presentation">
-    <div ref="$focusWrapper" tabindex="-1" class="o-dock-banner" :class="{ 'o-dock-banner--backdrop': isExpanded }"
-      @focusin="showExpandedForm">
-      <div class="o-dock-banner__backdrop | elevate-300" :class="{
-        'o-dock-banner__backdrop--hidden': !hasLocation
-      }" aria-hidden="true" ref="$backdrop">
-        <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__backdrop-skeleton" />
-      </div>
+  <section class="o-dock-banner__scrollbox" :class="{
+    'o-dock-banner__scrollbox--fullscreen': isExpandedWithLocation
+  }" role="presentation">
+    <div class="o-dock-banner__backdrop" :class="{ 'o-dock-banner__backdrop--visible': isExpandedWithLocation }">
+    </div>
 
-      <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
-        <MoleculesAiSearchFormLocation />
+    <div class="o-dock-banner__form-height" role="presentation" v-bind="$attrs">
+      <div ref="$dock" tabindex="-1" class="o-dock-banner" @focusin="showExpandedForm">
+        <div class="o-dock-banner__pseudo-border | elevate-300" :class="{
+          'o-dock-banner__pseudo-border--hidden': !hasLocation
+        }" aria-hidden="true" ref="$backdrop">
+          <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__pseudo-border-skeleton" />
+        </div>
 
-        <client-only>
-          <Transition v-show="hasLocation && isExpanded" name="o-dock-banner">
+        <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
+          <MoleculesAiSearchFormLocation />
 
-            <OrganismsFilterSwitcher>
-              <template v-slot:traditional>
-                <!-- @TODO put in a nicer skeleton loader here -->
-                <template v-if="isTraditionalFormLoading">
-                  <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
-                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-                  </div>
+          <client-only>
+            <Transition v-show="isExpandedWithLocation" name="o-dock-banner">
 
-                  <div class="o-dock-banner__toggle-content-loader">
-                    <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-                  </div>
+              <OrganismsFilterSwitcher>
+                <template v-slot:traditional>
+                  <!-- @TODO put in a nicer skeleton loader here -->
+                  <template v-if="isTraditionalFormLoading">
+                    <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
+                      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                    </div>
+
+                    <div class="o-dock-banner__toggle-content-loader">
+                      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
+                    </div>
+                  </template>
+                  <!-- @TODO end -->
+
+                  <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
+                    @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
                 </template>
-                <!-- @TODO end -->
 
-                <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
-                  @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
-              </template>
+                <template v-slot:ai>
+                  <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
+                    @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
+                    class="o-dock-banner__toggle-content" />
+                </template>
+              </OrganismsFilterSwitcher>
+            </Transition>
+          </client-only>
 
-              <template v-slot:ai>
-                <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-                  @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
-                  class="o-dock-banner__toggle-content" />
-              </template>
-            </OrganismsFilterSwitcher>
-          </Transition>
-        </client-only>
-
-        <AtomsButton v-if="hasLocation && !isExpanded"
-          class="o-dock-banner__toggle | button-bordered button-full button-xs" type="button"
-          @click.prevent="showExpandedForm">
-          Expand form
-        </AtomsButton>
-      </section>
+          <AtomsButton v-if="hasLocation && !isExpanded"
+            class="o-dock-banner__toggle | button-bordered button-full button-xs" type="button"
+            @click.prevent="showExpandedForm">
+            Expand form
+          </AtomsButton>
+        </section>
+      </div>
     </div>
   </section>
 </template>
@@ -61,6 +67,13 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   listingType: 'all'
 });
+
+/**
+ *  Disable auto-inherited attributes
+ */
+defineOptions({
+  inheritAttrs: false
+})
 
 /**
  *  Manage lazy hydration
@@ -155,25 +168,16 @@ onMounted(() => {
 /**
  *  Toggle filters as visible
  */
-const isExpanded = ref(false)
+const isExpanded = shallowRef(false)
 
 function showExpandedForm() {
   isExpanded.value = true
 }
 
 /**
- *  Close form on click outside
- */
-const $formWrapper = useTemplateRef('$focusWrapper')
-
-onClickOutside($formWrapper, () => {
-  isExpanded.value = false
-})
-
-/**
  *  Fetch filters
  */
-const { setQuery, setListingType, setSearchType, setResults, searchState, setSearchPending, setQueryAnalysis } = useSearchState()
+const { setQuery, setListingType, searchState, setSearchPending } = useSearchState()
 const { checkContent, isChecking } = useModeration()
 const toast = useToast()
 
@@ -184,7 +188,7 @@ const initialQuery = computed(() => {
 })
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const { location, radius } = asObject(searchState.value)
+  const { location } = asObject(searchState.value)
 
   if (!location) {
     return
@@ -193,10 +197,10 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   try {
     await animateFormToDock()
     setSearchPending(true)
-    
+
     // Build query analysis from form data for filter badges
     const queryAnalysis = buildQueryAnalysisFromFormData(formData)
-    
+
     // Set search parameters and navigate instead of fetching here
     // The search page will handle the fetch
     searchState.value = {
@@ -207,10 +211,10 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
       results: [], // Clear old results
       hasSearched: false
     }
-    
+
     // Navigate to search results page
     await navigateTo('/search')
-    
+
   } catch (error) {
     console.error('Traditional search error:', error)
     toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
@@ -237,7 +241,7 @@ async function aiSearchSubmit(query: string) {
   try {
     await animateFormToDock()
     setSearchPending(true)
-    
+
     // Set search parameters and navigate instead of fetching here
     // The search page will handle the fetch
     searchState.value = {
@@ -252,7 +256,7 @@ async function aiSearchSubmit(query: string) {
 
     // Navigate to search results page
     await navigateTo('/search')
-      
+
     window.scrollTo({
       top: 0,
       behavior: "instant"
@@ -269,20 +273,61 @@ function searchReset() {
 }
 
 /**
- *  Disable filters button if no location is added
+ *  Disable filters button if no location is added - to avoid hydration
+ *  mismatch, server never has a location
+ *
  */
-const isMounted = ref(false)
-onMounted(() => {
-  isMounted.value = true
-})
-
 const hasLocation = computed(() => {
-  // Prevent hydration mismatch by ensuring we match server state (false) until mounted
-  if (!isMounted.value) return false
-  
   const { location } = asObject(searchState.value)
 
-  return !!location
+  return import.meta.client && !!location
+})
+
+/**
+ *  Simplify tracking isExpandedWithLocation
+ */
+const isExpandedWithLocation = computed(() => {
+  return hasLocation.value && isExpanded.value
+})
+
+/**
+ *  Close form on click outside
+ */
+const $dock = useTemplateRef('$dock')
+
+onClickOutside($dock, () => {
+  isExpanded.value = false
+})
+
+/**
+ *  Animate menu to scrollbox
+ */
+watch(isExpandedWithLocation, async () => {
+  const dockWrapper = $dock.value
+
+  // If not an element, something has gone wrong. Abort
+  if (!isElement(dockWrapper)) return
+
+  // Get distance before any DOM updates
+  const { top: start } = dockWrapper.getBoundingClientRect()
+
+  // Await next tick
+  await nextTick()
+
+  // Get new distance
+  const { top: end } = dockWrapper.getBoundingClientRect()
+
+  // Calculate distance moved
+  const distanceMoved = end - start
+
+  // Animate element
+  dockWrapper.animate([
+    { transform: `translateY(${0 - distanceMoved}px)` },
+    { transform: 'none' },
+  ], {
+    duration: 200,
+    easing: 'cubic-bezier(0, 0.7, 0.5, 1)'
+  })
 })
 </script>
 
@@ -294,6 +339,44 @@ const hasLocation = computed(() => {
   z-index: 2;
   text-align: left;
 
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--background-200);
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+    transition: opacity var(--animation-slow);
+
+    &--visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &__scrollbox {
+    display: contents;
+
+    &--fullscreen {
+      display: block;
+      position: fixed;
+      inset: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+      z-index: 10;
+    }
+  }
+
+  &__scrollbox--fullscreen &__form-height {
+    margin-top: 70px;
+    max-width: calc(100vw - var(--size-48));
+
+    @include mq.tablet {
+      margin-top: 120px;
+    }
+  }
+
   &__form-height {
     height: 7em;
     overflow: visible;
@@ -303,26 +386,11 @@ const hasLocation = computed(() => {
     }
   }
 
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0);
-    z-index: -1;
-    pointer-events: none;
-    transition: background-color var(--animation-slow);
-  }
-
-  &--backdrop::before,
-  &:hover::before {
-    background: rgba(0, 0, 0, 0.4);
-  }
-
-  &__backdrop {
+  &__pseudo-border {
     position: absolute;
     z-index: -1;
     inset: calc(0px - var(--size-12));
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-2xl);
     transition: box-shadow, inset, opacity;
     transition-duration: var(--animation-slow);
@@ -341,7 +409,7 @@ const hasLocation = computed(() => {
     }
   }
 
-  &__backdrop-skeleton {
+  &__pseudo-border-skeleton {
     padding: var(--size-12);
     height: 100%;
     box-sizing: border-box;

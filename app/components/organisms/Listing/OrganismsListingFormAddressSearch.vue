@@ -1,31 +1,20 @@
 <template>
   <div class="address-search">
-    <MoleculesListingFormHeading 
-      title="Enter your address or postcode." 
-      :required="true" 
-      :tooltip="tooltip" 
-      :hasTooltip="!!tooltip || !!$slots['tooltip-content']"
-    >
+    <MoleculesListingFormHeading title="Enter your address or postcode." :required="true" :tooltip="tooltip"
+      :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
       <template #tooltip-content>
         <slot name="tooltip-content">
           <p class="body-xs">{{ tooltip }}</p>
         </slot>
       </template>
     </MoleculesListingFormHeading>
-    
+
     <div class="address-search__input-wrapper">
       <!-- Single input with getaddress.io autocomplete -->
-      <AtomsInput
-        ref="addressInput"
-        id="getaddress-autocomplete"
-        name="address-search"
-        placeholder="Start typing your address..."
-        required
-        class="address-search__input | body-sm"
-        autocomplete="street-address"
-        v-model="query"
-      />
-      
+      <AtomsInput ref="addressInput" id="getaddress-autocomplete" name="address-search"
+        placeholder="Start typing your address..." required class="address-search__input | body-sm"
+        autocomplete="street-address" v-model="query" />
+
       <!-- Error message -->
       <div v-if="error" class="address-search__error">
         <span class="body-xs">{{ error }}</span>
@@ -55,11 +44,11 @@ const query = ref('');
 // Initialize autocomplete
 const initializeAutocomplete = async () => {
   if (isInitialized.value) return;
-  
+
   try {
     const config = useRuntimeConfig();
     const apiKey = config.public.GETADDRESS_IO_API_KEY;
-    
+
     if (!apiKey) {
       error.value = 'API key not configured';
       return;
@@ -74,25 +63,25 @@ const initializeAutocomplete = async () => {
 
     // Try different ways to call the autocomplete function
     const autocompleteFn = (getAddress as any).autocomplete || (getAddress as any).default?.autocomplete || getAddress;
-    
+
     await autocompleteFn('getaddress-autocomplete', apiKey, {
       delay: 200,
       minimum_characters: 4,
       suggestion_count: 6,
       show_postcode: true,
       enable_history: false,
-      full_length:true,
+      full_length: true,
       mobile_friendly: true,
       selected: (address: any) => {
         console.log('Address selected:', address);
         // Parse the address from getaddress.io format
         const parsedAddress = parseAddress(address, address.postcode);
-        
+
         // Reflect the selected address in the input
         if (parsedAddress.fullAddress) {
           query.value = parsedAddress.fullAddress;
         }
-        
+
         emit('address-selected', parsedAddress);
       },
       suggested: (suggestions: any[]) => {
@@ -108,9 +97,9 @@ const initializeAutocomplete = async () => {
         error.value = message || 'Failed to get address suggestions';
       }
     });
-    
+
     isInitialized.value = true;
-    
+
   } catch (err) {
     console.error('Failed to initialize address autocomplete:', err);
     error.value = 'Failed to initialize address search';
@@ -169,8 +158,7 @@ onUnmounted(() => {
   & {
     --ga-autocomplete-list-max-height: 20em;
     --ga-autocomplete-list-font-size: var(--font-sm);
-    --ga-autocomplete-list-background-color: var(--background-200);
-  } 
+    --ga-autocomplete-list-background-color: var(--background-100);
+  }
 }
-
 </style>

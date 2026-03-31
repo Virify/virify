@@ -85,8 +85,9 @@ const chatMessages = [
  */
 const propertyDetails = {
   disabledInteractions: true,
-  saleOrRent: 'sale' as 'sale' | 'rent',
+  saleOrRent: 'buy' as 'buy' | 'rent',
   propertyImage: '/img/demo/demo-1.jpg',
+  imageProvider: 'local',
   price: '£325,000',
   priceLabel: 'In excess of',
   overview: '3 bed detached house',
@@ -104,8 +105,7 @@ const propertyDetails = {
   ],
   sellerImage: undefined,
   sellerName: 'Virify',
-  viewURL: undefined,
-  enquiryURL: undefined
+  viewURL: undefined
 }
 
 /**
@@ -131,7 +131,6 @@ useIntersectionObserver($infographic, ([entry]) => {
   justify-content: center;
 
   @include mq.tablet {
-    margin-top: var(--size-120);
     grid-template-columns: 1fr 1fr;
     gap: var(--size-56);
     align-items: flex-start;
@@ -145,6 +144,7 @@ useIntersectionObserver($infographic, ([entry]) => {
     overflow: hidden;
 
     @include mq.tablet {
+      padding: 8ch 0;
       position: sticky;
       top: 10ch;
       order: 2;
@@ -183,13 +183,17 @@ useIntersectionObserver($infographic, ([entry]) => {
   &__card {
     --gradient-box-radius: var(--border-radius-3xl);
 
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-14);
     box-sizing: border-box;
     transform: scale(0.76);
     width: min(100%, 31ch);
     margin: 0 auto;
     animation: var(--animation-slow) var(--ease-out) 1000ms;
+
+    .m-scrollbox-indicator {
+      --overflow-indicator-color: var(--background-100);
+    }
   }
 
   &__chat {

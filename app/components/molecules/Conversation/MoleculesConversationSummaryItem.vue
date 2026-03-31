@@ -84,11 +84,11 @@ const firstImage = computed(() => {
   cursor: pointer;
   padding: var(--size-8);
   color: var(--monochrome-100);
-  background: var(--background-100);
+  background: var(--background-200);
   border-radius: var(--border-radius-xl);
 
   &:hover {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-xl);
     color: var(--foreground-100);
   }

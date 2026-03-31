@@ -1,82 +1,56 @@
 <template>
   <section class="o-account-listing-stepper">
     <div class="o-account-listing-stepper__wrapper">
-      <MoleculesCarousel 
-      ref="carouselRef"
-      :slides="stepperSlides" 
-      :slide-size="carouselSize"
-      :options="carouselOptions"
-      gap="0"
-      :loop="false" 
-      :show-arrows="false"
-      button-size="30px"
-      class="o-account-listing-stepper__carousel"
-    >
-      <template #default="{ slide, slideIndex }">
-        <div 
-          class="o-account-listing-stepper__step" 
-          :class="{
+      <MoleculesCarousel ref="carouselRef" :slides="stepperSlides" :slide-size="carouselSize" :options="carouselOptions"
+        gap="0" :loop="false" :show-arrows="false" button-size="30px" class="o-account-listing-stepper__carousel">
+        <template #default="{ slide, slideIndex }">
+          <div class="o-account-listing-stepper__step" :class="{
             'o-account-listing-stepper__step--complete': slide.complete || slideIndex < currentStep,
             'o-account-listing-stepper__step--active': slideIndex === currentStep,
             'o-account-listing-stepper__step--disabled': !isStepAccessible(slideIndex)
-          }" 
-          @click="goToStep(slideIndex)"
-        >
-          <!-- Connecting line before step (except first) -->
-          <div 
-            v-if="slideIndex > 0"
-            class="o-account-listing-stepper__connector o-account-listing-stepper__connector--before"
-          ></div>
+          }" @click="goToStep(slideIndex)">
+            <!-- Connecting line before step (except first) -->
+            <div v-if="slideIndex > 0"
+              class="o-account-listing-stepper__connector o-account-listing-stepper__connector--before"></div>
 
-          <div 
-            class="o-account-listing-stepper__step-indicator" 
-            :class="{
+            <div class="o-account-listing-stepper__step-indicator" :class="{
               'o-account-listing-stepper__step-indicator--complete': slide.complete || slideIndex < currentStep,
               'o-account-listing-stepper__step-indicator--active': slideIndex === currentStep
-            }"
-          ></div>
+            }"></div>
 
-          <h2 class="o-account-listing-stepper__title | body-sm">
-            {{ slide.title }}
-          </h2>
+            <h2 class="o-account-listing-stepper__title | body-sm">
+              {{ slide.title }}
+            </h2>
 
-          <p class="o-account-listing-stepper__counter | body-sm">
-            <em>Step {{ slideIndex + 1 }} of {{ stepperSlides.length }}</em>
-          </p>
+            <p class="o-account-listing-stepper__counter | body-sm">
+              <em>Step {{ slideIndex + 1 }} of {{ stepperSlides.length }}</em>
+            </p>
 
-          <!-- Connecting line after step (except last) -->
-          <div 
-            v-if="slideIndex < stepperSlides.length - 1"
-            class="o-account-listing-stepper__connector o-account-listing-stepper__connector--after"
-          ></div>
-        </div>
-      </template>
-    </MoleculesCarousel>
+            <!-- Connecting line after step (except last) -->
+            <div v-if="slideIndex < stepperSlides.length - 1"
+              class="o-account-listing-stepper__connector o-account-listing-stepper__connector--after"></div>
+          </div>
+        </template>
+      </MoleculesCarousel>
 
-    <!-- Navigation arrows below carousel -->
-    <div class="o-account-listing-stepper__nav-buttons">
-      <button
-        class="o-account-listing-stepper__nav-button o-account-listing-stepper__nav-button--prev"
-        :disabled="!canNavigatePrev"
-        @click="navigatePrev"
-        aria-label="Previous step"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      
-      <button
-        class="o-account-listing-stepper__nav-button o-account-listing-stepper__nav-button--next"
-        :disabled="!canNavigateNext"
-        @click="navigateNext"
-        aria-label="Next step"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
+      <!-- Navigation arrows below carousel -->
+      <div class="o-account-listing-stepper__nav-buttons">
+        <button class="o-account-listing-stepper__nav-button o-account-listing-stepper__nav-button--prev"
+          :disabled="!canNavigatePrev" @click="navigatePrev" aria-label="Previous step">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+
+        <button class="o-account-listing-stepper__nav-button o-account-listing-stepper__nav-button--next"
+          :disabled="!canNavigateNext" @click="navigateNext" aria-label="Next step">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
     </div>
   </section>
 </template>
@@ -138,7 +112,7 @@ const currentStep = computed({
 const isStepAccessible = (stepIndex: number): boolean => {
   // Step 0 (first step) is always accessible
   if (stepIndex === 0) return true;
-  
+
   // For any other step, the previous step must be completed
   const previousStepIndex = stepIndex - 1;
   return props.stepperSlides[previousStepIndex]?.complete === true;
@@ -250,7 +224,7 @@ onMounted(() => {
           });
         }
       });
-      
+
       // Initial centering on mount
       scrollToCurrentStep();
     }
@@ -272,23 +246,25 @@ defineExpose({
   display: flex;
   justify-content: flex-start;
   padding: var(--size-32) var(--size-32);
+
   @include mq.mobile-only {
     padding: 0;
     border-radius: 0;
     background: none;
   }
+
   overflow: visible;
 
   @include mq.mobile-only {
     padding: var(--size-8) 0;
   }
-  
+
   &__wrapper {
     width: 100%;
   }
-  
+
   &__carousel {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-lg);
     position: relative;
     width: 100%;
@@ -296,7 +272,7 @@ defineExpose({
     align-items: center;
     justify-content: flex-start;
     overflow: visible;
-    
+
     :deep(.embla-prev),
     :deep(.embla-next) {
       top: 85%;
@@ -309,6 +285,7 @@ defineExpose({
     }
 
     @include mq.tablet {
+
       :deep(.embla-prev),
       :deep(.embla-next) {
         top: 50%;
@@ -348,6 +325,7 @@ defineExpose({
       .o-account-listing-stepper__step-indicator {
         box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.6);
       }
+
       @media (prefers-color-scheme: dark) {
         .o-account-listing-stepper__step-indicator {
           box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.5);
@@ -434,7 +412,7 @@ defineExpose({
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--background-100);
+    color: var(--background-200);
 
     &:hover:not(:disabled) {
       background: var(--blue-500);

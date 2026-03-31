@@ -1,14 +1,9 @@
 <template>
-  <UModal
-    v-model:open="isOpen"
-    :dismissible="false"
-    :fullscreen="isMobile"
-    :ui="{
-      overlay: 'backdrop-blur-sm',
-      content: 'max-w-7xl h-full lg:h-[85vh] lg:max-h-[85vh] bg-(--background-200) dark:bg-(--background-100)! flex flex-col overflow-hidden',
-      body: 'flex-1 min-h-0 flex flex-col overflow-hidden p-0!',
-    }"
-  >
+  <UModal v-model:open="isOpen" :dismissible="false" :fullscreen="isMobile" :ui="{
+    overlay: 'backdrop-blur-sm',
+    content: 'max-w-7xl h-full lg:h-[85vh] lg:max-h-[85vh] bg-(--background-100) dark:bg-(--background-200)! flex flex-col overflow-hidden',
+    body: 'flex-1 min-h-0 flex flex-col overflow-hidden p-0!',
+  }">
     <template #title>
       <div class="flex items-center gap-2">
         <h2 class="title-md m-0!">{{ modalTitle }}</h2>
@@ -19,20 +14,11 @@
     </template>
     <template #body>
       <!-- Mobile: Accordion -->
-      <OrganismsDashboardCreateListingAccordion
-        v-if="isMobile"
-        :steps="steps"
-        v-model="currentStepValue"
-        class="h-full overflow-y-auto p-4"
-      />
+      <OrganismsDashboardCreateListingAccordion v-if="isMobile" :steps="steps" v-model="currentStepValue"
+        class="h-full overflow-y-auto p-4" />
 
       <!-- Tablet and above: Stepper -->
-      <OrganismsDashboardCreateListingStepper
-        v-else
-        :steps="steps"
-        v-model="currentStepValue"
-        class="h-full"
-      />
+      <OrganismsDashboardCreateListingStepper v-else :steps="steps" v-model="currentStepValue" class="h-full" />
     </template>
   </UModal>
 </template>

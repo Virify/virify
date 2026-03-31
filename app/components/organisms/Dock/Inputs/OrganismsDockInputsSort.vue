@@ -77,7 +77,7 @@ const { searchState } = useSearchState()
     }
 
     &[aria-expanded="true"] {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
     }
   }
@@ -96,7 +96,7 @@ const { searchState } = useSearchState()
   }
 
   &__popover {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-2xl);
     box-shadow: var(--elevate-200);
     overflow: hidden;
@@ -136,7 +136,7 @@ const { searchState } = useSearchState()
     }
 
     &[data-state="checked"] {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
     }
   }

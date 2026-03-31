@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
     transition: border-color var(--animation-medium);
 
     &--active {
-      border-color: var(--secondary-400);
+      border-color: var(--primary-400);
     }
   }
 

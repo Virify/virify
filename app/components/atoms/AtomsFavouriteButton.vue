@@ -3,7 +3,7 @@
     class="a-favourite-button | relative button-none" :class="{
       selected: isCurrentFavourite,
     }" @click.prevent="toggle">
-    <AtomsIcon :icon :class="iconClass" />
+    <AtomsIcon :icon="isCurrentFavourite ? 'cards/favourite-filled' : 'cards/favourite'" :class="iconClass" />
 
     <client-only>
       <svg v-if="isCurrentFavourite && isSelected && isInteracted" width="90" height="90" viewBox="0 0 90 90"
@@ -70,10 +70,6 @@ watchOnce(isSelected, () => {
 /**
  *  a11y
  */
-const icon = computed(() => {
-  return isCurrentFavourite.value ? 'cards/favourite-filled' : 'cards/favourite'
-});
-
 const ariaLabel = computed(() => {
   return isCurrentFavourite.value ? 'Remove from favourites' : 'Add to favourites'
 });
@@ -117,23 +113,13 @@ function toggle() {
   flex: 0 0;
 
   &.pending {
-    color: var(--monochrome-400);
+    color: var(--blue-500);
   }
 
   &.selected {
     color: var(--favourite-colour);
     animation: selectedBounce var(--animation-subtle) linear;
-
-    .a-icon {
-      overflow: visible;
-      filter: 
-        drop-shadow(1px 0 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
-        drop-shadow(-1px 0 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
-        drop-shadow(0 1px 0 light-dark(var(--monochrome-400), var(--monochrome-600))) 
-        drop-shadow(0 -1px 0 light-dark(var(--monochrome-400), var(--monochrome-600)));
-    }
   }
-
 }
 
 @keyframes selectedBounce {

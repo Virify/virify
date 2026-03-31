@@ -1,8 +1,5 @@
-
 <template>
-  <div
-    :class="['a-hero-card', variantClass]"
-  >
+  <div :class="['a-hero-card', variantClass]">
     <slot />
   </div>
 </template>
@@ -23,6 +20,7 @@ const variantClass = props.variant === 'primary'
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
+
 .a-hero-card {
   border-radius: var(--border-radius-2xl);
   width: 100%;
@@ -45,7 +43,7 @@ const variantClass = props.variant === 'primary'
 }
 
 .a-hero-card--primary {
-  background: url('/img/logo-background.svg') no-repeat bottom right, linear-gradient(135deg, var(--monochrome-100), var(--primary-400));
+  background: url('/img/logo-background.svg') no-repeat bottom right, linear-gradient(135deg, var(--monochrome-100), var(--secondary--400));
   background-size: auto 180%, cover;
 
   .button {
@@ -54,7 +52,7 @@ const variantClass = props.variant === 'primary'
 }
 
 .a-hero-card--secondary {
-  background: url('/img/logo-background.svg') no-repeat bottom right, linear-gradient(135deg, var(--secondary-200), var(--secondary-400));
+  background: url('/img/logo-background.svg') no-repeat bottom right, linear-gradient(135deg, var(--primary-200), var(--primary-400));
   background-size: auto 180%, cover;
 
   .button {

@@ -28,7 +28,7 @@
 <script setup lang="ts">
 interface Props { entry: UserSavedLocation }
 const props = defineProps<Props>()
-const emit = defineEmits<{ (e:'updated', name:string): void; (e:'deleted', id:number): void }>()
+const emit = defineEmits<{ (e: 'updated', name: string): void; (e: 'deleted', id: number): void }>()
 
 /**
  *  Check if location name is updated
@@ -60,7 +60,7 @@ function removeLocation() {
 
   setPendingWhileDeleting(async () => {
     await deleteEntry(id as number)
-  emit('deleted', id as number)
+    emit('deleted', id as number)
   })
 }
 
@@ -99,7 +99,7 @@ function updateLocation() {
   padding: var(--size-16);
   border: 1px solid var(--border-color-200);
   border-radius: var(--border-radius-xl);
-  background-color: var(--background-200);
+  background-color: var(--background-100);
 
   label {
     display: flex;

@@ -138,7 +138,6 @@ export const useFavourites = () => {
       onSuccess: () => {
         refreshFavourites();
         refetchCurrentPage();
-        toast.add({ title: 'Success', description: "Added to favourites", color: 'success' });
       },
       onError: (error) => {
         toast.add({ title: 'Error', description: "Failed to add to favourites", color: 'error' });
@@ -174,7 +173,6 @@ export const useFavourites = () => {
         });
       },
       onSuccess: () => {
-        toast.add({ title: 'Success', description: "Removed from favourites", color: 'success' });
         // Optimistically remove from global lookups immediately
         favouriteLookups.value = favouriteLookups.value.filter(id => id !== listingId);
         refreshFavourites();

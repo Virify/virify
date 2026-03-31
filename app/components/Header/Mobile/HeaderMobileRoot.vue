@@ -127,7 +127,7 @@ watch(isExpanded, (newState) => {
     height: calc(100% - var(--header-height));
     overflow: auto;
     overscroll-behavior: contain;
-    background: var(--background-100);
+    background: var(--background-200);
     z-index: -1;
   }
 

@@ -1,0 +1,12 @@
+@use '../_utils/media' as mq;
+
+/**
+ *  Offsets for inline scrolling
+ */
+.inline-scroll-margin {
+  scroll-margin: 70px;
+
+  @include mq.desktop {
+    scroll-margin: 100px;
+  }
+}

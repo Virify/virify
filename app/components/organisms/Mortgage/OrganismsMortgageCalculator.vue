@@ -2,13 +2,8 @@
   <section class="o-mortgage-calculator | container-xs">
     <div class="o-mortgage-calculator__layout">
       <!-- Form Column -->
-      <OrganismsMortgageForm
-        :form-data="formData"
-        :calculation-result="calculationResult"
-        :is-calculating="isCalculating"
-        @update:form-data="formData = $event"
-        @calculate="calculateMortgage"
-      />
+      <OrganismsMortgageForm :form-data="formData" :calculation-result="calculationResult"
+        :is-calculating="isCalculating" @update:form-data="formData = $event" @calculate="calculateMortgage" />
 
       <!-- Results Column -->
       <div class="o-mortgage-calculator__results-column">
@@ -18,8 +13,9 @@
         <div v-if="!calculationResult" class="o-mortgage-calculator__disclaimer">
           <AtomsIcon icon="property/info" :size="18" />
           <p class="body-xs">
-            <strong>Important:</strong> This calculator provides estimates only and does not constitute financial advice. 
-            Your actual mortgage rate will depend on your credit history, income, property type, and lender criteria. 
+            <strong>Important:</strong> This calculator provides estimates only and does not constitute financial
+            advice.
+            Your actual mortgage rate will depend on your credit history, income, property type, and lender criteria.
             We recommend speaking with a qualified mortgage advisor before making any financial decisions.
           </p>
         </div>
@@ -63,7 +59,7 @@ async function calculateMortgage() {
 
   try {
     const termYears = getTotalTermYears(formData.value)
-    
+
     const response = await $fetch<{ success: boolean; data: MortgageCalculationData }>('/api/mortgage/calculate', {
       method: 'POST',
       body: {
@@ -77,7 +73,7 @@ async function calculateMortgage() {
 
     if (response.success) {
       calculationResult.value = response.data
-      
+
       // Track the calculation for analytics (fire-and-forget)
       const firstResult = response.data.results[0]
       if (firstResult) {
@@ -139,7 +135,7 @@ async function calculateMortgage() {
     align-items: flex-start;
     gap: var(--size-12);
     padding: var(--size-16);
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: var(--border-radius-lg);
     text-align: left;
 

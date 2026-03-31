@@ -1,7 +1,8 @@
 <template>
   <div class="o-form-group">
     <AtomsDivider v-if="divider" />
-    <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip" :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
+    <MoleculesListingFormHeading :title="title" :required="required" :tooltip="tooltip"
+      :hasTooltip="!!tooltip || !!$slots['tooltip-content']">
       <template #tooltip-content>
         <slot name="tooltip-content">
           <p v-if="tooltip" class="body-sm">{{ tooltip }}</p>
@@ -11,18 +12,12 @@
     <ul class="o-form-group__list">
       <li v-for="option in options" :key="option.value" class="o-form-group__item">
         <label class="o-form-group__label | body-sm">
-            <AtomsPill class="o-form-group__checkbox"
-              :class="{ 'o-form-group__checkbox--selected': isSelected(option.value) }">
-              <input 
-                type="checkbox" 
-                :name="name" 
-                :value="option.value"
-                :checked="isSelected(option.value)" 
-                class="visually-hidden"
-                @change="handleChange(option.value)" 
-              />
-              {{ option.key }}
-            </AtomsPill>
+          <AtomsPill class="o-form-group__checkbox"
+            :class="{ 'o-form-group__checkbox--selected': isSelected(option.value) }">
+            <input type="checkbox" :name="name" :value="option.value" :checked="isSelected(option.value)"
+              class="visually-hidden" @change="handleChange(option.value)" />
+            {{ option.key }}
+          </AtomsPill>
         </label>
       </li>
     </ul>
@@ -58,7 +53,7 @@ function isSelected(value: string): boolean {
 function handleChange(value: string) {
   const currentValue = [...props.modelValue];
   const index = currentValue.indexOf(value);
-  
+
   if (index > -1) {
     // Remove if already selected
     currentValue.splice(index, 1);
@@ -66,18 +61,21 @@ function handleChange(value: string) {
     // Add if not selected
     currentValue.push(value);
   }
-  
+
   emit('update:modelValue', currentValue);
 }
 </script>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .o-form-group {
   padding: var(--size-32) 0;
+
   @include mq.mobile-only {
     padding: var(--size-16) 0;
   }
+
   &__list {
     width: 100%;
     display: flex;
@@ -91,7 +89,7 @@ function handleChange(value: string) {
     margin: 0;
     flex-wrap: wrap;
   }
-  
+
   &__required {
     color: var(--error);
     margin-left: var(--size-4);
@@ -99,7 +97,7 @@ function handleChange(value: string) {
   }
 
   &__checkbox {
-    background: var(--background-200);
+    background: var(--background-100);
     border: 1px solid light-dark(var(--blue-400), var(--blue-500));
     cursor: pointer;
 

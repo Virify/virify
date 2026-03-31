@@ -3,10 +3,7 @@
     <div class="container">
       <div class="cta-section__content">
         <h2 class="title-xl">
-          <AtomsGradientTextRenderer 
-            :text="title" 
-            :variant="gradient ? 'dark' : 'light'"
-          />
+          <AtomsGradientTextRenderer :text="title" :variant="gradient ? 'dark' : 'light'" />
         </h2>
         <p class="body-lg max-width-prose">{{ description }}</p>
         <div class="cta-section__button-wrapper">
@@ -42,7 +39,7 @@ defineEmits<{
   padding: var(--size-120) 0;
 
   &--gradient {
-    background: linear-gradient(135deg, var(--blue-400) 50%, var(--secondary-400) 150%);
+    background: linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
     color: var(--monochrome-900);
   }
 

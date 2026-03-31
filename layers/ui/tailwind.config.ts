@@ -135,7 +135,7 @@ export default <Config>{
         // States
         error: {
           DEFAULT: "var(--error)",
-          background: "var(--error-background)",
+          background: "var(--error-background-100)",
           foreground: "var(--error-foreground)",
         },
         success: {

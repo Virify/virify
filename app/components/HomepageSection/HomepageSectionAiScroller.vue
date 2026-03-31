@@ -196,12 +196,8 @@ onBeforeUnmount(clearMobileAnimationTimeout)
       @include mq.tablet {
         top: 0;
         position: sticky;
-        padding: 8ch 0 20vh;
+        padding: 8ch 0 0;
         width: 100%;
-      }
-
-      @include mq.notebook {
-        padding: 12ch 0 20vh;
       }
     }
   }
@@ -277,7 +273,7 @@ onBeforeUnmount(clearMobileAnimationTimeout)
     left: calc(0px - var(--size-56));
     width: var(--size-40);
     height: var(--size-40);
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__carousel-list {

@@ -2,12 +2,7 @@
   <div class="draft-card" :class="draftCardClasses">
     <div class="draft-card__main">
       <figure class="draft-card__image">
-        <img 
-          v-if="firstImage" 
-          :src="firstImage" 
-          alt="Property image"
-          class="draft-card__img"
-        />
+        <img v-if="firstImage" :src="firstImage" alt="Property image" class="draft-card__img" />
         <div v-else class="draft-card__placeholder">
           <AtomsIcon icon="property/placeholder" size="32" />
         </div>
@@ -54,24 +49,16 @@
 
       <div class="draft-card__right">
         <div class="draft-card__buttons">
-          <button 
-            v-if="canPublish"
-            @click="$emit('publish', draft.id)" 
-            class="button button-xs button-primary"
-            :disabled="publishing"
-            title="Publish your listing to make it searchable"
-          >
+          <button v-if="canPublish" @click="$emit('publish', draft.id)" class="button button-xs button-primary"
+            :disabled="publishing" title="Publish your listing to make it searchable">
             {{ publishing ? 'Publishing...' : 'Publish' }}
           </button>
           <NuxtLink :to="`/account/create-listing/${draft.id}`" class="draft-card__button-link">
             <button class="button button-xs">Edit</button>
           </NuxtLink>
-          <button 
-            class="button button-xs" 
-            :disabled="!canPreview"
+          <button class="button button-xs" :disabled="!canPreview"
             :title="canPreview ? 'Preview your listing' : 'Complete address details (Step 4) to preview'"
-            @click="canPreview && navigateTo(`/listing/preview/${draft.id}`)"
-          >
+            @click="canPreview && navigateTo(`/listing/preview/${draft.id}`)">
             Preview
           </button>
           <button @click="$emit('delete', draft.id)" class="button button-xs" :disabled="deleting">
@@ -137,7 +124,7 @@ const firstImage = computed(() => {
   const config = useRuntimeConfig();
   const mainImageId = getMainImage(props.draft.property);
   if (!mainImageId) return null;
-  
+
   // Build Cloudflare image URL with thumbnail variant
   return `https://imagedelivery.net/${config.public.CF_ACCOUNT_HASH}/${mainImageId}/thumbnail`;
 });
@@ -186,7 +173,7 @@ const canPublish = computed(() => {
 
 .draft-card {
   width: 100%;
-  background: var(--background-100);
+  background: var(--background-200);
   border: 1px solid var(--monochrome-500);
   border-radius: var(--border-radius-xl);
   overflow: hidden;
@@ -240,7 +227,7 @@ const canPublish = computed(() => {
     overflow: hidden;
     position: relative;
     margin: 0;
-    background: var(--background-200);
+    background: var(--background-100);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -321,7 +308,7 @@ const canPublish = computed(() => {
 
   &__price {
     margin: 0;
-    color: var(--tier-color, var(--secondary-400));
+    color: var(--tier-color, var(--primary-400));
   }
 
   &__badges {
@@ -331,13 +318,13 @@ const canPublish = computed(() => {
   }
 
   &__pill {
-    background: var(--tier-color, var(--secondary-400));
-    color: var(--background-100);
+    background: var(--tier-color, var(--primary-400));
+    color: var(--background-200);
     text-transform: capitalize;
 
     &--draft {
       background: var(--accent-400);
-      color: var(--background-100);
+      color: var(--background-200);
     }
   }
 
@@ -464,7 +451,7 @@ const canPublish = computed(() => {
   }
 
   &.draft-card--featured {
-    --tier-color: var(--secondary-400);
+    --tier-color: var(--primary-400);
 
     .button:not([disabled]) {
       background-color: var(--tier-color);

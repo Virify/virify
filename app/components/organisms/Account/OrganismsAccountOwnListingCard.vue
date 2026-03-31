@@ -36,13 +36,8 @@
       <div class="own-card__left">
         <div class="own-card__toggle">
           <label class="switch" :class="{ 'switch--disabled': item.archived }">
-            <input 
-              type="checkbox" 
-              :checked="item.published" 
-              :disabled="item.archived"
-              @change="onTogglePublish"
-              :aria-label="item.archived ? 'Cannot publish archived listing' : (item.published ? 'Unpublish listing' : 'Publish listing')" 
-            />
+            <input type="checkbox" :checked="item.published" :disabled="item.archived" @change="onTogglePublish"
+              :aria-label="item.archived ? 'Cannot publish archived listing' : (item.published ? 'Unpublish listing' : 'Publish listing')" />
             <span class="slider"></span>
           </label>
           <span class="body-xs">{{ item.archived ? "Archived" : (item.published ? "Published" : "Unpublished") }}</span>
@@ -95,10 +90,10 @@ const props = defineProps<{ item: OwnedListingWithAnalytics }>();
 const { archiveListing } = useMyListings();
 
 const isRental = computed(() => !!props.item.rentalListing)
-const priceFormatted = computed(() => 
+const priceFormatted = computed(() =>
   props.item.price != null ? `£${parseInt(String(props.item.price)).toLocaleString()}` : ""
 )
-const priceTypeText = computed(() => 
+const priceTypeText = computed(() =>
   convertEnumToString(props.item.saleListing?.priceType || props.item.rentalListing?.rentFrequency || "").toLowerCase()
 )
 const addressText = computed(() => {
@@ -142,7 +137,7 @@ const handleArchive = async () => {
   if (!confirm('Are you sure you want to archive this listing? This will unpublish it and mark it as archived.')) {
     return
   }
-  
+
   try {
     await archiveListing(props.item.id)
   } catch (error) {
@@ -156,7 +151,7 @@ const handleArchive = async () => {
 
 .own-card {
   width: 100%;
-  background: var(--background-200);
+  background: var(--background-100);
   border: 1px solid var(--monochrome-500);
   border-radius: var(--border-radius-xl);
   overflow: hidden;
@@ -253,7 +248,7 @@ const handleArchive = async () => {
 
   &__price {
     margin: 0;
-    color: var(--tier-color, var(--secondary-400));
+    color: var(--tier-color, var(--primary-400));
   }
 
   &__badges {
@@ -263,8 +258,8 @@ const handleArchive = async () => {
   }
 
   &__pill {
-    background: var(--tier-color, var(--secondary-400));
-    color: var(--background-100);
+    background: var(--tier-color, var(--primary-400));
+    color: var(--background-200);
     text-transform: capitalize;
 
     &--draft {
@@ -272,8 +267,8 @@ const handleArchive = async () => {
     }
 
     &--active {
-      background: var(--tier-color, var(--secondary-400));
-      color: var(--background-100);
+      background: var(--tier-color, var(--primary-400));
+      color: var(--background-200);
     }
 
     &--inactive {
@@ -368,7 +363,7 @@ const handleArchive = async () => {
 
   /* Buttons should use tier color */
   .button {
-    color: var(--background-100);
+    color: var(--background-200);
   }
 
   .button:hover,
@@ -394,22 +389,24 @@ const handleArchive = async () => {
       background-color: var(--tier-color);
       border-color: var(--tier-color);
     }
+
     .own-card__price {
       color: var(--foreground-100);
     }
+
     .own-card__pill,
     .own-card__pill--active {
       color: var(--monochrome-900);
     }
 
     /* Make toggle darker for premium tier */
-    input:checked + .slider {
+    input:checked+.slider {
       background-color: var(--blue-500);
     }
   }
 
   &.own-card--featured {
-    --tier-color: var(--secondary-400);
+    --tier-color: var(--primary-400);
 
     .button {
       background-color: var(--tier-color);
@@ -426,7 +423,7 @@ const handleArchive = async () => {
     }
 
     /* Make toggle more visible for basic tier */
-    input:checked + .slider {
+    input:checked+.slider {
       background-color: var(--monochrome-100);
     }
   }
@@ -448,7 +445,7 @@ const handleArchive = async () => {
   &--disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    
+
     .slider {
       cursor: not-allowed;
     }
@@ -460,7 +457,7 @@ const handleArchive = async () => {
   width: 0;
   height: 0;
 
-  &:disabled + .slider {
+  &:disabled+.slider {
     cursor: not-allowed;
   }
 }
@@ -489,11 +486,11 @@ const handleArchive = async () => {
   border-radius: 50%;
 }
 
-input:checked+.slider{
-  background-color: var(--tier-color, var(--secondary-400));
+input:checked+.slider {
+  background-color: var(--tier-color, var(--primary-400));
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(14px);
 }
 </style>

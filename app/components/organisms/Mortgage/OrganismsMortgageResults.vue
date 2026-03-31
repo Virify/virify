@@ -4,7 +4,8 @@
     <div v-if="error" class="o-mortgage-results__error">
       <AtomsIcon icon="property/info" :size="24" />
       <h3 class="| title-sm">Unable to Calculate</h3>
-      <p class="| body-sm">We couldn't calculate your mortgage estimate at this time. Please try again later or enter a custom interest rate.</p>
+      <p class="| body-sm">We couldn't calculate your mortgage estimate at this time. Please try again later or enter a
+        custom interest rate.</p>
     </div>
 
     <!-- Placeholder state (before calculation) -->
@@ -14,12 +15,9 @@
     <Transition name="fade-in" mode="out-in">
       <div v-if="result" class="o-mortgage-results__content" key="results">
         <h3 class="| title-sm">Your Mortgage Results</h3>
-        
-        <MoleculesMortgageResultsSummary
-          :loan-amount="result.loanAmount"
-          :ltv="result.ltv"
-          :term-years="result.termYears"
-        />
+
+        <MoleculesMortgageResultsSummary :loan-amount="result.loanAmount" :ltv="result.ltv"
+          :term-years="result.termYears" />
 
         <div v-if="result.usingCustomRate" class="o-mortgage-results__notice o-mortgage-results__notice--custom">
           <AtomsIcon icon="property/info" :size="14" />
@@ -33,15 +31,12 @@
 
         <MoleculesMortgageRateResults :results="result.results" />
 
-        <MoleculesMortgageResultsBreakdown
-          v-if="selectedResult"
-          :total-payment="selectedResult.totalPayment"
-          :total-interest="selectedResult.totalInterest"
-          :interest-percentage="interestPercentage"
-        />
+        <MoleculesMortgageResultsBreakdown v-if="selectedResult" :total-payment="selectedResult.totalPayment"
+          :total-interest="selectedResult.totalInterest" :interest-percentage="interestPercentage" />
 
         <p class="o-mortgage-results__disclaimer | body-xs text-muted">
-          These calculations are estimates only and do not constitute financial advice. Actual rates and terms will depend on your individual circumstances and lender criteria. Always consult with a qualified mortgage advisor.
+          These calculations are estimates only and do not constitute financial advice. Actual rates and terms will
+          depend on your individual circumstances and lender criteria. Always consult with a qualified mortgage advisor.
         </p>
       </div>
     </Transition>
@@ -90,7 +85,7 @@ const interestPercentage = computed(() =>
 .o-mortgage-results {
   width: 100%;
   min-height: 300px;
-  background: var(--background-200);
+  background: var(--background-100);
   border-radius: var(--border-radius-2xl);
   padding: var(--size-24);
 
@@ -130,7 +125,7 @@ const interestPercentage = computed(() =>
     align-items: center;
     gap: var(--size-8);
     padding: var(--size-12);
-    background: var(--background-100);
+    background: var(--background-200);
     border-radius: var(--border-radius-md);
     margin-bottom: var(--size-16);
   }
@@ -138,7 +133,7 @@ const interestPercentage = computed(() =>
   &__disclaimer {
     margin-top: var(--size-24);
     padding: var(--size-12);
-    background: var(--background-100);
+    background: var(--background-200);
     border-radius: var(--border-radius-md);
     font-style: italic;
   }

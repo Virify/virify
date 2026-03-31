@@ -4,6 +4,12 @@
  *  Common breakpoints
  */
 
+@mixin mobile {
+    @media (min-width: breakpoints.$mobile) {
+        @content;
+    }
+}
+
 @mixin mobile-only {
     @media (max-width: #{ breakpoints.$small-tablet - 1px }) {
         @content;

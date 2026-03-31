@@ -2,6 +2,7 @@
 $menu: 1024px;
 
 // Device breakpoints
+$mobile: 325px;
 $small-tablet: 560px;
 $tablet: 768px;
 $notebook: 1024px;
@@ -11,6 +12,7 @@ $superultrawide: 1600px;
 
 // Exports
 :export {
+    mobile: $mobile;
     smallTablet: $small-tablet;
     tablet: $tablet;
     notebook: $notebook;

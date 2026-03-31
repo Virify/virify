@@ -1,7 +1,7 @@
 <template>
   <div class="homepage-section-location">
     <div class="homepage-section-location__column homepage-section-location__column--sticky">
-      Infographic...
+      <HomepageSectionLocationInfographic />
     </div>
 
     <HomepageSectionIntro class="homepage-section-location__column" :title="sectionTitle"
@@ -39,7 +39,6 @@ const contentSection = [
     content: "Review previous searches without having to type them in again with Virify's Quick Access feature"
   },
 ]
-
 </script>
 
 <style lang="scss">

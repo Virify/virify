@@ -2,8 +2,8 @@
   <div class="feature-card" @click="toggleCollapse">
     <div class="feature-card__content | body-md">
       <!-- Title row with icon, title, info button, and collapse arrow -->
-      <AtomsCollapsibleHeader :is-collapsed="isCollapsed" icon="listings/signal" title="Mobile Coverage" variant="inline"
-        @toggle="() => {}">
+      <AtomsCollapsibleHeader :is-collapsed="isCollapsed" icon="listings/signal" title="Mobile Coverage"
+        variant="inline" @toggle="() => { }">
         <template #actions>
           <AtomsTooltip v-if="description" :responsive="true">
             <AtomsIcon icon="property/info" :size="16" />
@@ -75,7 +75,7 @@ const description = computed(() => {
 }
 
 .feature-card {
-  background: var(--background-100);
+  background: var(--background-200);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--monochrome-600);
   box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);

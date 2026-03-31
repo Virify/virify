@@ -282,7 +282,7 @@ const leftWidth = computed(() => unref(positionPercent) + '%')
   &__slider:hover &__slider-icon {
     width: var(--size-8);
     height: 7ch;
-    background: var(--secondary-400);
+    background: var(--primary-400);
   }
 }
 </style>

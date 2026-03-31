@@ -146,13 +146,13 @@ function selectParent() {
     align-items: flex-end;
     justify-content: flex-start;
     color: var(--monochrome-900);
-    background: var(--secondary-400);
+    background: var(--primary-400);
     font-weight: var(--font-bold);
     transition: background-color var(--animation-fast);
 
     &:hover {
       color: var(--monochrome-900);
-      background: var(--secondary-500);
+      background: var(--primary-500);
     }
   }
 
@@ -211,7 +211,7 @@ function selectParent() {
 
     &--selected,
     &:hover {
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
 
     .a-icon {
@@ -225,14 +225,14 @@ function selectParent() {
   &__sub-links {
     list-style: none;
     margin: 0;
-    background: var(--background-200);
+    background: var(--background-100);
   }
 
   &__sub-link-title {
     display: block;
     line-height: var(--lineheight-sm);
     margin: 0 0 var(--size-12);
-    color: var(--secondary-400);
+    color: var(--primary-400);
   }
 
   &__sub-link {
@@ -245,7 +245,7 @@ function selectParent() {
     transition: color var(--animation-fast);
 
     &:hover {
-      color: var(--secondary-400);
+      color: var(--primary-400);
     }
   }
 }

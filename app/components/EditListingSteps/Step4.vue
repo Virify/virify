@@ -1,115 +1,55 @@
 <template>
-  <EditListingStepsStepLayout
-    title="Address"
-    :hasChanges="hasChanges"
-    :buttonDisabled="buttonDisabled"
-    :buttonText="buttonText"
-    :errorMessage="errorMessage"
-    showPrevious
-    @cancel="resetForm"
-    @previous="$emit('previousStep')"
-    @submit="submitForm"
-  >
-      <!-- Show search if no existing address -->
-      <div v-if="!hasExistingAddress" class="step__form-search">
-        <OrganismsListingFormAddressSearch      
-          @address-selected="handleAddressSelected" 
-        />
+  <EditListingStepsStepLayout title="Address" :hasChanges="hasChanges" :buttonDisabled="buttonDisabled"
+    :buttonText="buttonText" :errorMessage="errorMessage" showPrevious @cancel="resetForm"
+    @previous="$emit('previousStep')" @submit="submitForm">
+    <!-- Show search if no existing address -->
+    <div v-if="!hasExistingAddress" class="step__form-search">
+      <OrganismsListingFormAddressSearch @address-selected="handleAddressSelected" />
+    </div>
+
+    <!-- Show manual inputs if address exists or after search -->
+    <div class="step__form-manual">
+      <div v-if="hasExistingAddress" class="step__form-instruction">
+        <p class="body-sm">
+          Your address has been auto-filled below. If this is incorrect:
+        </p>
+        <button type="button" @click="clearAddress" class="button button-xs button-tertiary | body-xs">
+          Change address
+        </button>
       </div>
 
-      <!-- Show manual inputs if address exists or after search -->
-      <div class="step__form-manual">
-        <div v-if="hasExistingAddress" class="step__form-instruction">
-          <p class="body-sm">
-            Your address has been auto-filled below. If this is incorrect:
-          </p>
-          <button 
-            type="button" 
-            @click="clearAddress" 
-            class="button button-xs button-tertiary | body-xs"
-          >
-            Change address
-          </button>
-        </div>
+      <div class="step__form-address-grid">
+        <!-- Number (required) -->
+        <OrganismsListingFormTextGroup title="Property Number" v-model="stepFourData.property.address!.number"
+          name="property-number" placeholder="e.g. 123" :grid="true" :disabled="true" :required="true" />
 
-        <div class="step__form-address-grid">
-          <!-- Number (required) -->
-          <OrganismsListingFormTextGroup 
-            title="Property Number" 
-            v-model="stepFourData.property.address!.number"
-            name="property-number"
-            placeholder="e.g. 123" 
-            :grid="true"
-            :disabled="true" 
-            :required="true"
-            />
+        <!-- Street (required) -->
+        <OrganismsListingFormTextGroup title="Street Name" v-model="stepFourData.property.address!.street"
+          name="property-street" placeholder="e.g. High Street" :grid="true" :disabled="true" :required="true" />
 
-          <!-- Street (required) -->
-          <OrganismsListingFormTextGroup 
-            title="Street Name" 
-            v-model="stepFourData.property.address!.street"
-            name="property-street" 
-            placeholder="e.g. High Street" 
-            :grid="true"
-            :disabled="true" 
-            :required="true"
-          />
+        <!-- City (required) -->
+        <OrganismsListingFormTextGroup title="City" v-model="stepFourData.property.address!.city" name="property-city"
+          placeholder="e.g. London" :grid="true" :disabled="true" :required="true" />
 
-          <!-- City (required) -->
-          <OrganismsListingFormTextGroup 
-            title="City" 
-            v-model="stepFourData.property.address!.city" 
-            name="property-city"
-            placeholder="e.g. London" 
-            :grid="true"
-            :disabled="true"
-            :required="true"
-          />
+        <!-- County -->
+        <OrganismsListingFormTextGroup v-if="stepFourData.property.address!.county" title="County/District"
+          v-model="stepFourData.property.address!.county" name="property-county" placeholder="e.g. Greater London"
+          :grid="true" :disabled="true" />
 
-          <!-- County -->
-          <OrganismsListingFormTextGroup
-            v-if="stepFourData.property.address!.county" 
-            title="County/District" 
-            v-model="stepFourData.property.address!.county"
-            name="property-county" 
-            placeholder="e.g. Greater London" 
-            :grid="true"
-            :disabled="true" 
-          />
+        <!-- Postcode (required) -->
+        <OrganismsListingFormTextGroup title="Postcode" v-model="stepFourData.property.address!.postcode"
+          name="property-postcode" placeholder="e.g. SW1A 1AA" :grid="true" :disabled="true" :required="true" />
 
-          <!-- Postcode (required) -->
-          <OrganismsListingFormTextGroup 
-            title="Postcode" 
-            v-model="stepFourData.property.address!.postcode"
-            name="property-postcode" 
-            placeholder="e.g. SW1A 1AA" 
-            :grid="true"
-            :disabled="true"
-            :required="true"
-          />
+        <!-- Locality -->
+        <OrganismsListingFormTextGroup v-if="stepFourData.property.address!.locality" title="Locality"
+          v-model="stepFourData.property.address!.locality" name="property-locality" placeholder="e.g. Westminster"
+          :grid="true" :disabled="true" />
 
-          <!-- Locality -->
-          <OrganismsListingFormTextGroup
-            v-if="stepFourData.property.address!.locality" 
-            title="Locality" 
-            v-model="stepFourData.property.address!.locality"
-            name="property-locality" 
-            placeholder="e.g. Westminster" 
-            :grid="true"
-            :disabled="true" 
-          />
-
-          <!-- Country -->
-          <OrganismsListingFormTextGroup 
-            title="District" 
-            v-model="stepFourData.property.address!.district"
-            name="property-country" 
-            placeholder="e.g. United Kingdom" 
-            :grid="true"
-            :disabled="true" 
-          />
-        </div>
+        <!-- Country -->
+        <OrganismsListingFormTextGroup title="District" v-model="stepFourData.property.address!.district"
+          name="property-country" placeholder="e.g. United Kingdom" :grid="true" :disabled="true" />
       </div>
+    </div>
 
   </EditListingStepsStepLayout>
 </template>
@@ -229,7 +169,7 @@ function submitForm() {
       justify-content: flex-start;
       gap: var(--size-16);
       margin-bottom: var(--size-24);
-      background: var(--background-200);
+      background: var(--background-100);
       border-radius: var(--radius-md);
 
       @include mq.desktop {

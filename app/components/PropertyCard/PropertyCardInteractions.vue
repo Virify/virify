@@ -1,17 +1,13 @@
 <template>
   <div role="presentation" class="property-card-interactions">
-    <button :disabled type="button" class="property-card-interactions__button" aria-label="Add to favourites">
-      <AtomsIcon icon="cards/favourite" />
-    </button>
-
-    <button :disabled type="button" class="property-card-interactions__button" aria-label="Add note">
-      <AtomsIcon icon="cards/notes" />
-    </button>
+    <AtomsFavouriteButton :disabled :listing-id :confirm-removal="false" class="property-card-interactions__button" />
+    <AtomsNoteButton :disabled :listing-id class="property-card-interactions__button" />
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
+  listingId: number,
   disabled?: boolean
 }
 
@@ -21,38 +17,33 @@ defineProps<Props>()
 
 <style lang="scss">
 .property-card-interactions {
-  background: var(--blue-300);
-  color: var(--monochrome-900);
-  padding: var(--size-4);
-  border-radius: var(--border-radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--size-6);
+  gap: var(--size-8);
 
   &__button {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-6);
     margin: 0;
-    background: var(--blue-300);
     border: 0;
-    border-radius: var(--border-radius-lg);
+
+    &[disabled] {
+      color: var(--blue-500);
+      pointer-events: none;
+    }
 
     &:not([disabled]) {
-      transition: background-color var(--animation-fast);
-      color: currentColor;
+      transition: color var(--animation-fast);
       cursor: pointer;
-
-      &:hover {
-        background: var(--blue-500);
-      }
     }
+  }
 
-    .a-icon {
-      width: var(--size-20);
-      height: var(--size-20);
-    }
+  .a-icon {
+    width: var(--size-24);
+    height: var(--size-24);
   }
 }
 </style>

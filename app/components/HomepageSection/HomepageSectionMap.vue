@@ -121,6 +121,8 @@ const markers: Marker[] = [
   align-items: flex-end;
   padding: var(--size-24) 0;
   box-sizing: border-box;
+  overflow: visible;
+  overflow-x: clip;
 
   @include mq.tablet {
     height: min(90vh, 55ch);
@@ -130,7 +132,6 @@ const markers: Marker[] = [
   &__map {
     position: relative;
     animation-name: levitateMap;
-    z-index: 2;
   }
 
   &__map-tile {
@@ -193,7 +194,7 @@ const markers: Marker[] = [
     }
 
     &--featured {
-      --marker-bg: var(--secondary-400);
+      --marker-bg: var(--primary-400);
 
       font-size: var(--font-sm);
 

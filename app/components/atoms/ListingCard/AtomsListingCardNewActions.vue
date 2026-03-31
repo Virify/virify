@@ -1,12 +1,12 @@
 <template>
   <div class="m-listing-card-actions" role="group" aria-label="Property actions">
-    <nuxt-link :to="`/listing/${listingId}`" class="| button button-primary body-sm"
-      aria-label="View property details" title="View property details">
+    <nuxt-link :to="`/listing/${listingId}`" class="| button button-primary body-sm" aria-label="View property details"
+      title="View property details">
       View
     </nuxt-link>
-    <button class="| button button-ghost body-sm" :disabled="conversationState.isDisabled" @click="onContact" 
-        :aria-label="conversationState.isDisabled ? 'Cannot contact about this property' : 'Contact about this property'"
-        :title="conversationState.isDisabled ? 'Cannot contact about this property' : 'Contact about this property'">
+    <button class="| button button-ghost body-sm" :disabled="conversationState.isDisabled" @click="onContact"
+      :aria-label="conversationState.isDisabled ? 'Cannot contact about this property' : 'Contact about this property'"
+      :title="conversationState.isDisabled ? 'Cannot contact about this property' : 'Contact about this property'">
       {{ conversationState.label }}
     </button>
   </div>
@@ -37,14 +37,14 @@ const conversationState = computed(() => ({
 
 function onContact() {
   if (conversationState.value.isDisabled) return;
-  
+
   if (!user.value || !user.value.id) {
     showDialog({
       component: ViewsDialogLogin,
     });
     return;
   }
-  
+
   if (safeUserId.value !== null && !isSelf.value) {
     showDialog({
       component: ViewsDialogConversation,
@@ -64,7 +64,7 @@ function onContact() {
     width: 100%;
     padding: var(--size-8);
     border-radius: var(--border-radius-lg);
-    border-color: var(--secondary-400);
+    border-color: var(--primary-400);
   }
 }
 </style>

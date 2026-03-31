@@ -74,7 +74,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(to bottom, transparent, var(--background-100) calc(100% - #{ $gradient-offset }))
+      background: linear-gradient(to bottom, transparent, var(--background-200) calc(100% - #{ $gradient-offset }))
     }
 
     &::after {
@@ -121,7 +121,7 @@
       aspect-ratio: 16/9;
       font-weight: var(--font-bold);
       font-size: 2em;
-      background: var(--background-200);
+      background: var(--background-100);
       color: var(--background-300);
     }
   }
@@ -141,7 +141,7 @@
       background-color var(--animation-fast);
 
     &:hover {
-      background: var(--secondary-400);
+      background: var(--primary-400);
       color: var(--monochrome-900);
     }
 

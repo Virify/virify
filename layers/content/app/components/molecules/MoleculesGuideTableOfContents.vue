@@ -3,8 +3,10 @@
     <nav class="guide-toc">
       <h3 class="guide-toc__title | title-lg">Table of Contents</h3>
       <ul class="guide-toc__list">
-        <li v-for="heading in tableOfContents" :key="heading.id" :class="['guide-toc__item', `guide-toc__item--${heading.level}`]">
-          <a :href="`#${heading.id}`" :class="['guide-toc__link | body-sm', { active: activeHeading === heading.id }]" @click.prevent="scrollToSection(heading.id)">
+        <li v-for="heading in tableOfContents" :key="heading.id"
+          :class="['guide-toc__item', `guide-toc__item--${heading.level}`]">
+          <a :href="`#${heading.id}`" :class="['guide-toc__link | body-sm', { active: activeHeading === heading.id }]"
+            @click.prevent="scrollToSection(heading.id)">
             {{ heading.text }}
           </a>
         </li>
@@ -48,7 +50,7 @@ const scrollToSection = (id: string) => {
     // Use a fixed offset for the header + some padding
     const offset = 120 // Approximate header height + padding
     const elementPosition = element.getBoundingClientRect().top + window.scrollY - offset
-    
+
     window.scrollTo({
       top: elementPosition,
       behavior: 'smooth'
@@ -69,9 +71,9 @@ onMounted(() => {
               activeHeading.value = (entry.target as HTMLElement).id
             }
           },
-          { 
+          {
             rootMargin: '-120px 0px -70% 0px', // Adjust top margin for header offset
-            threshold: 0.1 
+            threshold: 0.1
           }
         )
       }
@@ -97,7 +99,7 @@ onMounted(() => {
 }
 
 .guide-toc {
-  background: var(--background-100);
+  background: var(--background-200);
   border-left: 1px solid var(--monochrome-600);
   margin-top: var(--size-32);
   padding: 0 var(--size-32);
@@ -139,7 +141,7 @@ onMounted(() => {
     transition: all 0.2s ease;
 
     &:hover {
-      color: var(--secondary-500);
+      color: var(--primary-500);
     }
 
     &.active {

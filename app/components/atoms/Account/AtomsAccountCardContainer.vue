@@ -1,13 +1,14 @@
 <template>
   <div class="account-card-container">
-    <slot/>
+    <slot />
   </div>
 </template>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .account-card-container {
-  background: var(--background-200);
+  background: var(--background-100);
   border-radius: var(--border-radius-xl);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -16,7 +17,7 @@
   overflow: auto;
 
   @include mq.mobile-only {
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: 0;
     box-shadow: none;
   }

@@ -2,37 +2,19 @@
   <div class="m-image-gallery">
     <div class="embla" ref="emblaRef">
       <div class="embla-slides">
-        <div 
-          class="embla-slide" 
-          v-for="(image, index) in images" 
-          :key="index"
-          @click="openModal"
-        >
+        <div class="embla-slide" v-for="(image, index) in images" :key="index" @click="openModal">
           <div class="m-image-gallery__image-container">
-            <AtomsCloudFlareImage
-              :src="image.src"
-              :alt="image.alt"
-              variant="gallery"
-              class="m-image-gallery__image"
-              :placeholder="true"
-            />
+            <AtomsCloudFlareImage :src="image.src" :alt="image.alt" variant="gallery" class="m-image-gallery__image"
+              :placeholder="true" />
           </div>
         </div>
       </div>
-      
+
       <!-- Navigation Arrows -->
-      <button
-        class="m-image-gallery__prev"
-        @click="scrollPrev"
-        :disabled="!canScrollPrev"
-      >
+      <button class="m-image-gallery__prev" @click="scrollPrev" :disabled="!canScrollPrev">
         <AtomsIcon icon="chevron-left" :size="24" />
       </button>
-      <button
-        class="m-image-gallery__next"
-        @click="scrollNext"
-        :disabled="!canScrollNext"
-      >
+      <button class="m-image-gallery__next" @click="scrollNext" :disabled="!canScrollNext">
         <AtomsIcon icon="chevron-right" :size="24" />
       </button>
     </div>
@@ -40,21 +22,11 @@
     <!-- Thumbnails (Desktop only) -->
     <div class="m-image-gallery__thumbs" ref="emblaThumbsRef" v-if="images.length">
       <div class="m-image-gallery__thumbs-container">
-        <button
-          v-for="(image, index) in images"
-          :key="index"
-          class="m-image-gallery__thumb"
-          :class="{ 'is-active': index === selectedIndex }"
-          @click="onThumbClick(index)"
-        >
+        <button v-for="(image, index) in images" :key="index" class="m-image-gallery__thumb"
+          :class="{ 'is-active': index === selectedIndex }" @click="onThumbClick(index)">
           <div class="m-image-gallery__thumb-container">
-            <AtomsCloudFlareImage
-              :src="image.src"
-              :alt="image.alt"
-              variant="thumbnail"
-              class="m-image-gallery__thumb-image"
-              :placeholder="true"
-            />
+            <AtomsCloudFlareImage :src="image.src" :alt="image.alt" variant="thumbnail"
+              class="m-image-gallery__thumb-image" :placeholder="true" />
           </div>
         </button>
       </div>
@@ -110,7 +82,7 @@ function onThumbClick(index: number) {
 
 function updateSelection() {
   if (!emblaApi.value || !emblaThumbsApi.value) return
-  
+
   selectedIndex.value = emblaApi.value.selectedScrollSnap()
   canScrollPrev.value = emblaApi.value.canScrollPrev()
   canScrollNext.value = emblaApi.value.canScrollNext()
@@ -239,11 +211,11 @@ onUnmounted(() => {
     padding: 0;
 
     &.is-active {
-      border-color: var(--secondary-400);
+      border-color: var(--primary-400);
     }
 
     &:hover {
-      border-color: var(--secondary-400);
+      border-color: var(--primary-400);
     }
   }
 
@@ -270,5 +242,4 @@ onUnmounted(() => {
     display: none;
   }
 }
-
 </style>

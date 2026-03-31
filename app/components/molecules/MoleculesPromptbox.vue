@@ -48,7 +48,7 @@ function keyboardSubmit(e: KeyboardEvent) {
   display: flex;
   align-items: flex-end;
   gap: var(--size-16);
-  background: var(--background-200);
+  background: var(--background-100);
   padding: var(--size-16);
 
   &:has(textarea:focus) {
@@ -112,7 +112,7 @@ function keyboardSubmit(e: KeyboardEvent) {
 
   &:hover:not(:disabled) {
     color: var(--monochrome-900);
-    background: var(--secondary-400);
+    background: var(--primary-400);
   }
 
   &:disabled {
@@ -122,7 +122,7 @@ function keyboardSubmit(e: KeyboardEvent) {
   }
 
   &--loading {
-    background: var(--secondary-400);
+    background: var(--primary-400);
   }
 
   svg {
@@ -159,12 +159,12 @@ function keyboardSubmit(e: KeyboardEvent) {
 }
 
 .segment--used {
-  color: #ea580c;
+  color: var(--primary-400);
 }
 
 .segment--ignored {
   text-decoration: line-through;
-  color: #6b7280;
+  color: var(--blue-500);
   opacity: 0.7;
 }
 

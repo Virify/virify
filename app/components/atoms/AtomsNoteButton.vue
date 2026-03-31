@@ -2,7 +2,7 @@
   <button type="button" role="switch" :aria-checked="hasNote" :aria-label="tooltip"
     class="a-note-button | relative button-none" :class="{ 'a-note-button--active': hasNote }" @click="handleClick">
 
-    <AtomsIcon icon="cards/notes" :class="iconClass" />
+    <AtomsIcon :icon="hasNote ? 'cards/notes-filled' : 'cards/notes'" :class="iconClass" />
   </button>
 </template>
 
@@ -64,35 +64,15 @@ function handleClick() {
 
 <style lang="scss">
 .a-note-button {
-  --notes-active-background: transparent;
-  --notes-active-color: var(--secondary-400);
-  --notes-dot-color: var(--error);
-
   position: relative;
   color: currentColor;
   flex: 0 0;
-
-  &--active {
-    color: var(--notes-active-color);
-    background-color: var(--notes-active-background);
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: calc(0px - var(--size-2));
-      right: calc(0px - var(--size-2));
-      width: var(--size-10);
-      height: var(--size-10);
-      background-color: var(--notes-dot-color);
-      border-radius: 50%;
-    }
-  }
 }
 </style>
 
 <style scoped>
 circle {
-  fill: var(--primary-600);
+  fill: var(--secondary--600);
   border: none;
 }
 

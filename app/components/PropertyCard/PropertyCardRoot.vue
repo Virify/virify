@@ -1,17 +1,19 @@
 <template>
   <section class="property-card-root">
-    <div class="property-card-root__images">
-      <img v-if="propertyImage" class="property-card-root__image" :src="propertyImage" :alt="propertyImageAlt"
-        width="491" height="368" loading="lazy" />
-
-      <PropertyCardInteractions :disabled="disabledInteractions" class="property-card-root__interactions" />
+    <div class="property-card-root__images | v-skeleton">
+      <PropertyCardImage v-if="propertyImage" :provider="imageProvider" :src="propertyImage" :alt="propertyImageAlt"
+        variant="card" class="property-card-root__image" width="491" height="368" loading="lazy" />
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
-      <h2 class="property-card-root__price | title-md">
-        {{ price }}
-
+      <h2 class="property-card-root__price">
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
+
+        <span class="property-card-root__price-amount | title-md">
+          {{ price }}
+
+          <sub v-if="rentFrequency" class="property-card-root__price-frequency">{{ rentFrequency }}</sub>
+        </span>
       </h2>
 
       <p class="property-card-root__overview">
@@ -21,7 +23,7 @@
         {{ overviewAddress }}
       </p>
 
-      <MoleculesScrollBox v-if="labels?.length">
+      <MoleculesScrollBox v-if="labels?.length" :scroll-indicator="true" class="property-card-root__labels-scrollbox">
         <ul class="property-card-root__labels">
           <li v-for="label of labels" :key="label">
             <PropertyCardPill :content="label" />
@@ -29,10 +31,10 @@
         </ul>
       </MoleculesScrollBox>
 
-      <MoleculesScrollBox v-if="icons?.length">
+      <MoleculesScrollBox v-if="icons?.length" :scroll-indicator="true" class="property-card-root__icons-scrollbox">
         <ul class="property-card-root__icons">
-          <li v-for="{ icon, count, label } of validIcons" :key="label" class="property-card-root__icon | body-2xs">
-            <span class="property-card-root__icon-count | body-sm">
+          <li v-for="{ icon, count, label } of validIcons" :key="label" class="property-card-root__icon">
+            <span class="property-card-root__icon-count">
               <AtomsIcon :icon aria-hidden />
               {{ count }}
             </span>
@@ -43,25 +45,28 @@
       </MoleculesScrollBox>
 
       <div class="property-card-root__buttons" aria-role="presentation">
-        <component :is="viewComponent" :href="viewURL"
+        <component :is="viewLinkComponent.is" :href="viewLinkComponent.href"
           class="property-card-root__button property-card-root__button--view | body-sm">
           View
         </component>
 
-        <component :is="enquiryComponent" :href="enquiryURL"
-          class="property-card-root__button property-card-root__button--enquire | body-sm">
-          Enquire
-        </component>
+        <AtomsEnquireButton v-if="listingId && userId" :disabled="disabledInteractions" :listing-id :user-id="userId"
+          class="property-card-root__button property-card-root__button--enquire | body-sm" />
       </div>
 
-      <div v-if="sellerName" class="property-card-root__profile | body-xs" aria-role="presentation">
-        <img v-if="sellerImage" :src="sellerImage" :alt="`Profile image for ${sellerName}`"
-          class="property-card-root__profile-image" />
-        <span v-else aria-hidden class="property-card-root__profile-image property-card-root__profile-image--empty">
-          <AtomsIcon icon="profile" />
-        </span>
+      <div v-if="!disabledInteractions" class="property-card-root__footer" aria-role="presentation">
+        <PropertyCardSeller :name="sellerName" />
 
-        {{ profileText }}
+        <div role="presentation" class="property-card-root__footer-text">
+          <span role="presentation" class="property-card-root__footer-name | body-xs">
+            {{ profileText }}
+          </span>
+          <time :datetime="dateChanged" class="property-card-root__footer-date | body-2xs">
+            {{ timeAgo }}
+          </time>
+        </div>
+
+        <PropertyCardInteractions v-if="listingId" :listing-id class="property-card-root__interactions" />
       </div>
     </div>
   </section>
@@ -75,42 +80,57 @@ interface FacilitiesIcon {
 }
 
 interface Props {
-  saleOrRent?: 'sale' | 'rent'
+  saleOrRent?: 'buy' | 'rent' | string
   propertyImage?: string
   propertyImageAlt?: string
   disabledInteractions?: boolean
+  imageProvider?: 'cloudflare' | 'local'
   price?: string
   priceLabel?: string
+  rentFrequency?: string
   overview?: string
   overviewAddress?: string
+  dateChanged?: string
+  dateChangedType?: 'Added' | 'Updated' | string
   labels?: string[]
   icons?: FacilitiesIcon[]
   sellerImage?: string
   sellerName?: string
-  viewURL?: string
-  enquiryURL?: string
+  viewUrl?: string
+  listingId?: number
+  userId?: number
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  imageProvider: 'cloudflare'
+})
 
 /**
  *  Conditionally show as links
  */
-function getLinkComponent(url?: string): 'a' | 'span' {
-  return isString(url) ? 'a' : 'span'
-}
+const viewLinkComponent = computed(() => {
+  const { viewUrl, disabledInteractions } = props
 
-const viewComponent = computed(() => getLinkComponent(props.viewURL))
-const enquiryComponent = computed(() => getLinkComponent(props.enquiryURL))
+  if (!disabledInteractions && viewUrl) {
+    return {
+      is: 'a',
+      href: viewUrl
+    }
+  }
+
+  return {
+    is: 'span'
+  }
+})
 
 /**
  *  Format profile text
  */
 const profileText = computed(() => {
-  const { saleOrRent, sellerName } = props
+  const { saleOrRent, sellerName = 'Virify' } = props
 
   switch (saleOrRent) {
-    case 'sale':
+    case 'buy':
       return `Sold by ${sellerName}`
     case 'rent':
       return `Let by ${sellerName}`
@@ -130,11 +150,33 @@ const validIcons = computed(() => {
   })
 })
 
+/**
+ *  Get date as 'time ago'
+ */
+const timeAgo = computed(() => {
+  const { dateChanged, dateChangedType } = props
+
+  return [dateChangedType, getTimeAgo(dateChanged)].filter(Boolean).join(' ')
+})
+
 </script>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
+@use "#styles/_utils/functions" as fn;
+
+@mixin small-card {
+  @container card (width < 275px) {
+    @content;
+  }
+}
+
 .property-card-root {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  container-name: card;
+  container-type: inline-size;
 
   &__images,
   &__image {
@@ -144,7 +186,6 @@ const validIcons = computed(() => {
 
   &__images {
     position: relative;
-    background: var(--monochrome-300);
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
   }
@@ -154,27 +195,42 @@ const validIcons = computed(() => {
     object-fit: cover;
   }
 
-  &__interactions {
-    position: absolute;
-    top: var(--size-12);
-    right: var(--size-12);
-  }
-
   &__content {
+    display: flex;
+    flex-direction: column;
     padding: var(--size-18);
+    flex-grow: 1;
+
+    @include small-card {
+      padding: var(--size-12) 0;
+    }
   }
 
   &__price {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: var(--size-2);
     margin: 0 0 var(--size-4);
+  }
+
+  &__price-amount {
+    margin: var(--size-4) 0;
+    line-height: 1;
+  }
+
+  &__price-frequency {
+    position: unset;
+    bottom: unset;
+    font-size: var(--font-xs);
+    vertical-align: baseline;
   }
 
   &__overview {
     font-size: var(--font-xs);
     line-height: var(--lineheight-sm);
     font-weight: var(--font-semisemibold);
+    margin-bottom: auto;
+    padding-right: var(--size-16);
   }
 
   &__overview-address {
@@ -182,6 +238,10 @@ const validIcons = computed(() => {
     font-weight: var(--font-bold);
     font-size: var(--font-sm);
     line-height: var(--lineheight-sm);
+
+    @include small-card {
+      font-size: var(--font-xs);
+    }
   }
 
   &__labels,
@@ -191,6 +251,17 @@ const validIcons = computed(() => {
     list-style: none;
     margin: 0;
     padding: 0;
+
+    @include small-card {
+      padding-right: var(--size-10);
+    }
+  }
+
+  &__labels-scrollbox,
+  &__icons-scrollbox {
+    @include small-card {
+      margin-right: var(--size-16);
+    }
   }
 
   &__labels {
@@ -202,6 +273,11 @@ const validIcons = computed(() => {
     gap: var(--size-20);
     padding: var(--size-4) 0;
     align-items: flex-start;
+    width: fit-content;
+
+    @include small-card {
+      gap: var(--size-16);
+    }
   }
 
   &__icon {
@@ -210,10 +286,17 @@ const validIcons = computed(() => {
     align-items: center;
     justify-content: flex-start;
     font-weight: var(--font-semibold);
+    font-size: var(--font-2xs);
+    line-height: var(--lineheight-sm);
     gap: var(--size-4);
     flex: 1 0 fit-content;
     max-width: 10ch;
     text-align: center;
+
+    @include small-card {
+      font-size: var(--font-3xs);
+      gap: var(--size-2);
+    }
   }
 
   &__icon-count {
@@ -222,6 +305,12 @@ const validIcons = computed(() => {
     justify-content: center;
     gap: var(--size-4);
     line-height: var(--size-24);
+    font-size: var(--font-sm);
+    line-height: var(--lineheight-sm);
+
+    @include small-card {
+      font-size: var(--font-xs);
+    }
 
     .a-icon {
       width: var(--size-24);
@@ -235,6 +324,10 @@ const validIcons = computed(() => {
     justify-content: stretch;
     gap: var(--size-8);
     margin: var(--size-16) 0 0;
+
+    @include small-card {
+      margin: var(--size-12) 0 0;
+    }
   }
 
   &__button {
@@ -246,62 +339,78 @@ const validIcons = computed(() => {
     text-align: center;
     font-weight: var(--font-bold);
     transition: background-color var(--animation-fast);
-    color: light-dark(var(--monochrome-500), var(--monochrome-500));
-    background-color: light-dark(var(--monochrome-800), var(--monochrome-400));
+    color: var(--blue-500);
+    background-color: light-dark(var(--blue-800), var(--blue-400));
 
-    &[href] {
+    &--view[href] {
       color: currentColor;
-      background-color: light-dark(var(--monochrome-800), var(--monochrome-200));
+      background-color: var(--primary-background-100);
 
       &:hover {
         color: currentColor;
-        background-color: light-dark(var(--monochrome-700), var(--monochrome-100));
+        background-color: var(--primary-background-200);
       }
     }
 
-    &--enquire[href] {
-      background: var(--secondary-400);
+    &--enquire:not([disabled]) {
+      cursor: pointer;
+      background: var(--primary-500);
       color: var(--monochrome-900);
 
       &:hover {
-        background: var(--secondary-300);
+        background: var(--primary-400);
         color: var(--monochrome-900);
       }
     }
   }
 
-  &__profile {
+  &__footer {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: var(--size-10);
     margin-top: var(--size-8);
     padding: var(--size-8);
-    background-color: light-dark(var(--monochrome-800), var(--monochrome-300));
+    background-color: light-dark(var(--blue-800), var(--blue-300));
+    border: 1px solid light-dark(var(--blue-600), var(--blue-400));
     border-radius: var(--border-radius-lg);
     font-weight: var(--font-semisemibold);
+
+    @include small-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+    }
   }
 
-  &__profile-image {
-    display: block;
-    width: var(--size-28);
-    height: var(--size-28);
-    border-radius: var(--border-radius-md);
+  &__footer-text {
     overflow: hidden;
-    object-fit: contain;
 
-    &--empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--monochrome-400);
-
-      .a-icon {
-        color: var(--monochrome-900);
-        width: var(--size-24);
-        height: var(--size-24);
-      }
+    @include small-card {
+      order: -1;
+      grid-column: span 2;
+      padding-bottom: var(--size-6);
+      border-bottom: 1px solid light-dark(var(--blue-600), var(--blue-400));
     }
+  }
+
+  &__footer-name,
+  &__footer-date {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__footer-name {
+    font-weight: var(--font-semibold);
+  }
+
+  &__footer-date {
+    color: var(--blue-500);
+  }
+
+  &__interactions {
+    margin-left: auto;
   }
 }
 </style>

@@ -13,7 +13,7 @@
   color: var(--error-foreground);
   gap: var(--size-14);
   padding: var(--size-14) var(--size-16);
-  background: var(--error-background);
+  background: var(--error-background-100);
   border-radius: var(--border-radius-ui);
 }
 

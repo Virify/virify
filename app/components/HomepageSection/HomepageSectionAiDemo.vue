@@ -239,8 +239,9 @@ watchImmediate([currentSection], ([id]) => {
  */
 const propertyDetails = {
   disabledInteractions: true,
-  saleOrRent: 'sale' as 'sale' | 'rent',
+  saleOrRent: 'buy' as 'buy' | 'rent',
   propertyImage: '/img/demo/demo-1.jpg',
+  imageProvider: 'local',
   price: '£325,000',
   priceLabel: 'In excess of',
   overview: '3 bed detached house',
@@ -258,20 +259,20 @@ const propertyDetails = {
   ],
   sellerImage: undefined,
   sellerName: 'Virify',
-  viewURL: undefined,
-  enquiryURL: undefined
+  viewURL: undefined
 }
 
 </script>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+@use '#styles/_utils/functions' as fn;
 
 .homepage-section-ai-demo {
   --radius: var(--border-radius-xl);
 
   padding: var(--size-14);
-  background: var(--background-200);
+  background: var(--background-100);
   min-height: 30em;
 
   @include mq.tablet {
@@ -291,6 +292,7 @@ const propertyDetails = {
     position: relative;
     box-sizing: border-box;
     min-height: 30em;
+    isolation: isolate;
   }
 
   &__title {
@@ -311,6 +313,7 @@ const propertyDetails = {
     font-size: var(--font-sm);
     line-height: var(--lineheight-lg);
     margin: 0 0 var(--size-12);
+    background: light-dark(var(--background-100), var(--background-200));
 
     @include mq.tablet {
       font-size: var(--font-md);
@@ -336,11 +339,11 @@ const propertyDetails = {
     &--highlighted {
       white-space: nowrap;
       font-weight: var(--font-semibold);
-      color: light-dark(var(--secondary-400), var(--monochrome-900));
-      background: light-dark(var(--secondary-900), var(--secondary-400));
       border-radius: var(--border-radius-lg);
       padding: var(--size-2) var(--size-8);
-      border: 1px solid light-dark(var(--secondary-800), var(--secondary-700));
+      color: light-dark(var(--primary-400), var(--monochrome-900));
+      border: 1px solid var(--primary-background-200);
+      background: var(--primary-background-100);
     }
   }
 
@@ -390,7 +393,7 @@ const propertyDetails = {
     .a-icon {
       width: var(--size-18);
       height: var(--size-18);
-      color: var(--secondary-400);
+      color: var(--primary-400);
       flex: 1 0 auto;
     }
   }
@@ -398,7 +401,7 @@ const propertyDetails = {
   &__card {
     --gradient-box-radius: var(--border-radius-3xl);
 
-    background: var(--background-200);
+    background: var(--background-100);
     padding: var(--size-14);
     width: 90%;
     position: absolute;
@@ -416,6 +419,10 @@ const propertyDetails = {
 
     @include mq.tablet {
       width: min(31ch, 100%);
+    }
+
+    .m-scrollbox-indicator {
+      --overflow-indicator-color: var(--background-100);
     }
   }
 

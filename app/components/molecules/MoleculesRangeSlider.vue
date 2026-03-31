@@ -72,11 +72,11 @@ const selectedRange = defineModel<[number, number]>({
   --track-empty-color:
     light-dark(var(--monochrome-700), var(--monochrome-200));
   --track-fill-color:
-    light-dark(var(--secondary-300), var(--secondary-500));
+    light-dark(var(--primary-300), var(--primary-500));
   --track-thumb-color:
-    light-dark(var(--secondary-500), var(--secondary-300));
+    light-dark(var(--primary-500), var(--primary-300));
   --track-thumb-border:
-    2px solid light-dark(var(--secondary-300), var(--secondary-500));
+    2px solid light-dark(var(--primary-300), var(--primary-500));
 }
 
 .m-range-slider {

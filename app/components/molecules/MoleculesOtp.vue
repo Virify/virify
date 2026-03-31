@@ -43,7 +43,7 @@ function notifyCompletion(otpCode: any) {
   margin: 0;
   text-align: center;
   border: 1px solid fn.faded-color(10%);
-  background: var(--background-200);
+  background: var(--background-100);
   color: var(--foreground-100);
   border-radius: var(--border-radius-ui);
 

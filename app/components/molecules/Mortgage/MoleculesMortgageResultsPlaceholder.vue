@@ -53,7 +53,7 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: var(--background-100);
+    background: var(--background-200);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,11 +75,11 @@
       align-items: center;
       gap: var(--size-12);
       padding: var(--size-12) var(--size-16);
-      background: var(--background-100);
+      background: var(--background-200);
       border-radius: var(--border-radius-md);
 
       svg {
-        color: var(--primary-300);
+        color: var(--secondary--300);
         flex-shrink: 0;
       }
     }
@@ -91,7 +91,7 @@
     gap: var(--size-8);
     margin-top: var(--size-8);
     padding: var(--size-12) var(--size-16);
-    background: var(--background-100);
+    background: var(--background-200);
     border-radius: var(--border-radius-md);
   }
 }

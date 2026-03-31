@@ -1,41 +1,36 @@
 <template>
   <div v-if="conversation && conversation.listing" class="property-header">
     <NuxtLink :to="`/listing/${conversation.listing.id}`" target="_blank">
-    <div class="property-main-row">
-      <div class="property-image" v-if="firstImage">
-        <AtomsCloudFlareImage
-          :src="firstImage"
-          alt="Property image"
-          variant="thumbnail"
-          :placeholder="true"
-        />
-      </div>
-      <div class="property-details">
-        <div class="property-info">
-          <h3 class="property-price | title-sm">{{ priceFormatted }}</h3>
-          <p class="property-address | body-xs">{{ address }}</p>
+      <div class="property-main-row">
+        <div class="property-image" v-if="firstImage">
+          <AtomsCloudFlareImage :src="firstImage" alt="Property image" variant="thumbnail" :placeholder="true" />
         </div>
-        <div class="agent-info">
-          <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
-          <div class="agent-details">
-            <div class="agent-avatar">
-              <AtomsIcon icon="profile" size="28" />
+        <div class="property-details">
+          <div class="property-info">
+            <h3 class="property-price | title-sm">{{ priceFormatted }}</h3>
+            <p class="property-address | body-xs">{{ address }}</p>
+          </div>
+          <div class="agent-info">
+            <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
+            <div class="agent-details">
+              <div class="agent-avatar">
+                <AtomsIcon icon="profile" size="28" />
+              </div>
+              <span class="agent-name | body-sm">{{ conversation.listing.user?.username }}</span>
             </div>
-            <span class="agent-name | body-sm">{{ conversation.listing.user?.username  }}</span>
           </div>
         </div>
       </div>
-    </div>
-    <div class="agent-info-row">
-      <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
-      <div class="agent-details">
-        <div class="agent-avatar">
-          <AtomsIcon icon="profile" size="28" />
+      <div class="agent-info-row">
+        <AtomsPill v-if="isMyProperty" class="property-badge | body-xs">Your Property</AtomsPill>
+        <div class="agent-details">
+          <div class="agent-avatar">
+            <AtomsIcon icon="profile" size="28" />
+          </div>
+          <!-- Show listing owner in the compact (narrow) layout as well -->
+          <span class="agent-name | body-sm">{{ conversation.listing.user?.username }}</span>
         </div>
-        <!-- Show listing owner in the compact (narrow) layout as well -->
-        <span class="agent-name | body-sm">{{ conversation.listing.user?.username }}</span>
       </div>
-    </div>
     </NuxtLink>
   </div>
   <div v-else class="property-header property-header--empty">
@@ -150,6 +145,7 @@ const isMyProperty = computed(() => {
     gap: var(--size-8);
     flex-shrink: 0;
     padding-top: var(--size-8);
+
     /* Hide when side by side layout */
     @container (min-width: 400px) {
       display: none;
@@ -191,7 +187,7 @@ const isMyProperty = computed(() => {
   .agent-avatar {
     width: var(--size-32);
     height: var(--size-32);
-    background: var(--background-200);
+    background: var(--background-100);
     border-radius: 50%;
     display: flex;
     align-items: center;

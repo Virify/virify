@@ -17,15 +17,8 @@
     <form :key="formKey" class="step__form" @submit.prevent="$emit('submit')">
       <slot />
 
-      <MoleculesListingFormActions
-        :hasChanges="hasChanges"
-        :buttonDisabled="buttonDisabled"
-        :primaryText="buttonText"
-        :showPrevious="showPrevious"
-        @cancel="$emit('cancel')"
-        @previous="$emit('previous')"
-        @submit="$emit('submit')"
-      >
+      <MoleculesListingFormActions :hasChanges="hasChanges" :buttonDisabled="buttonDisabled" :primaryText="buttonText"
+        :showPrevious="showPrevious" @cancel="$emit('cancel')" @previous="$emit('previous')" @submit="$emit('submit')">
         <template #additionalActions>
           <slot name="additionalActions" />
         </template>
@@ -98,7 +91,7 @@ defineEmits<{
   &__section-title {
     display: flex;
     justify-content: flex-start;
-    color: var(--secondary-400);
+    color: var(--primary-400);
     margin-bottom: 0;
 
     &--require {

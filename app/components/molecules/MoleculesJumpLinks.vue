@@ -173,7 +173,8 @@ useResizeObserver($root, resizeIndicator)
     top: 0;
     height: 100%;
     width: v-bind(indicatorWidth);
-    background: var(--secondary-800);
+    background: var(--primary-background-100);
+    color: light-dark(var(--primary-200), var(--monochrome-900));
     border-radius: var(--border-radius-xl);
     transition: width, left;
     transition-duration: var(--animation-medium);
@@ -216,7 +217,7 @@ useResizeObserver($root, resizeIndicator)
     }
 
     &--active {
-      color: var(--secondary-200);
+      color: light-dark(var(--primary-200), var(--monochrome-900));
     }
 
     @container jumplinks (width < 520px) {

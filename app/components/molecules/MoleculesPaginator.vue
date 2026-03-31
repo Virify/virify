@@ -212,7 +212,7 @@ const formattedPagination = computed(() => {
 
     &:hover:not(:disabled),
     &--active {
-      background: var(--secondary-700);
+      background: var(--primary-700);
     }
 
     .a-icon {

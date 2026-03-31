@@ -1,16 +1,8 @@
 <template>
   <NuxtLink :to="to" class="guide-card">
     <div class="guide-card__top">
-      <nuxt-img 
-        v-if="image" 
-        provider="sanity" 
-        :src="image.asset._ref"
-        :alt="imageAlt"
-        :width="600" 
-        :height="300"
-        class="guide-card__image"
-        placeholder='/img/preload.svg'
-      />  
+      <nuxt-img v-if="image" provider="sanity" :src="image.asset._ref" :alt="imageAlt" :width="600" :height="300"
+        class="guide-card__image" placeholder='/img/preload.svg' />
     </div>
     <div class="guide-card__description">
       <h3 class="guide-card__title | title-xs">{{ title }}</h3>
@@ -38,13 +30,14 @@ const props = defineProps<{
 }>();
 
 // Generate descriptive alt text for SEO and accessibility
-const imageAlt = computed(() => 
+const imageAlt = computed(() =>
   props.image?.alt || `${props.title} guide cover image`
 );
 </script>
 
 <style scoped lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .guide-card {
   display: flex;
   flex-direction: column;
@@ -52,12 +45,12 @@ const imageAlt = computed(() =>
   text-decoration: none;
   transition: all 0.3s ease;
   overflow: hidden;
-  background: var(--background-200);
+  background: var(--background-100);
   height: 100%;
   width: 100%;
   border: 1px solid var(--monochrome-500);
 
-    &__top {
+  &__top {
     display: flex;
     flex-direction: column;
     justify-content: center;

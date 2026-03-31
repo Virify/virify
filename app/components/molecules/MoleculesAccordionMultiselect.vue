@@ -89,7 +89,7 @@ const emits = defineEmits(['expanded'])
 <style lang="scss">
 .m-accordion-multiselect {
   border: 1px solid var(--border-color-200);
-  background: var(--background-200);
+  background: var(--background-100);
   color: var(--foreground-100);
   border-radius: var(--border-radius-ui);
   overflow: hidden;
@@ -102,7 +102,7 @@ const emits = defineEmits(['expanded'])
 
   &-title:hover,
   &:has(input:checked) &-title {
-    background: var(--background-100);
+    background: var(--background-200);
   }
 
   &-title {

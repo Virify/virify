@@ -1,30 +1,16 @@
 <template>
-  <div 
-    v-if="listing" 
-    class="flex gap-3 p-3 h-auto w-full rounded-lg bg-(--background-100) )"
-  >
-    <div 
-      v-if="getMainImage(listing.property)" 
-      class="w-16 h-full overflow-hidden shrink-0"
-    >
-      <AtomsCloudFlareImage
-        :src="getMainImage(listing.property)!"
+  <div v-if="listing" class="flex gap-3 p-3 h-auto w-full rounded-lg bg-background-200">
+    <div v-if="getMainImage(listing.property)" class="w-16 h-full overflow-hidden shrink-0">
+      <AtomsCloudFlareImage :src="getMainImage(listing.property)!"
         :alt="listing.property?.address?.fullAddress || 'Property'"
-        class="w-full h-full object-cover aspect-4/3 rounded-md"
-        variant="thumbnail"
-      />
+        class="w-full h-full object-cover aspect-4/3 rounded-md" variant="thumbnail" />
     </div>
     <div class="min-w-0 flex-1">
       <div class="flex items-center justify-between gap-2 mb-0">
         <p class="text-base font-bold text-secondary leading-none">
           {{ formatCurrency((listing.price)) }}
         </p>
-        <UBadge
-          :label="listing.rentalListing ? 'To Rent' : 'For Sale'"
-          color="secondary"
-          variant="soft"
-          size="md"
-        />
+        <UBadge :label="listing.rentalListing ? 'To Rent' : 'For Sale'" color="secondary" variant="soft" size="md" />
       </div>
       <p class="text-xs font-medium text-foreground mb-2">
         {{ listing.property?.type?.name || 'Property Type N/A' }}
@@ -56,7 +42,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  defineProps<{
-    listing: any
-  }>()
+defineProps<{
+  listing: any
+}>()
 </script>

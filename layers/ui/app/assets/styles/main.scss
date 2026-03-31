@@ -34,6 +34,7 @@
 @use '4-utilities/pointer-events' as utilities-pointer-events;
 @use '4-utilities/skeletons' as utilities-skeletons;
 @use '4-utilities/colours' as utilities-colours;
+@use '4-utilities/inline-scrolling' as inline-scrolling;
 
 // Components
 @use '6-components/animations' as components-animations;

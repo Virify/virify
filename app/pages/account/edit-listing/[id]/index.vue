@@ -11,15 +11,9 @@
         </ClientOnly>
         <ClientOnly>
           <div class="p-listing-creator__content-inner">
-              <component
-                v-if="listing && (currentSlide as any).component"
-                :is="(currentSlide as any).component"
-                :draft="listing"
-                :error-message="stepErrorMessage"
-                @update-step-data="handleUpdateStepData"
-                @next-step="handleNextStep"
-                @previous-step="() => previousStep(listingId)"
-              />
+            <component v-if="listing && (currentSlide as any).component" :is="(currentSlide as any).component"
+              :draft="listing" :error-message="stepErrorMessage" @update-step-data="handleUpdateStepData"
+              @next-step="handleNextStep" @previous-step="() => previousStep(listingId)" />
             <div v-else class="loading">Loading listing...</div>
           </div>
         </ClientOnly>
@@ -63,17 +57,17 @@ const handleUpdateStepData = async (stepData: any, step: number) => {
     stepUpdateInProgress.value = true;
     lastStepUpdateFailed.value = false;
     stepErrorMessage.value = '';
-    
+
     const result = await handleStepUpdate(listingId, stepperMap, stepData, step, listing as Ref<ListingWithFullProperty | null>);
-    
+
     if (result.success) {
       // Show success toast with step-specific message
       const stepTitle = stepperMap.value[step - 1]?.title || 'Step';
       toast.add({ title: 'Success', description: `${stepTitle} updated`, color: 'success' });
-      
+
       // Refresh the listing data after update
       await refreshListing();
-      
+
       // Success - move to next step
       nextStep(listingId, stepperMap.value.length);
     } else {
@@ -91,7 +85,7 @@ const handleNextStep = () => {
   if (lastStepUpdateFailed.value || stepUpdateInProgress.value) {
     return;
   }
-  
+
   // Clear error message when successfully moving to next step
   stepErrorMessage.value = '';
   nextStep(listingId, stepperMap.value.length);
@@ -141,17 +135,18 @@ const breadcrumbItems = computed(() => [
 </script>
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
+
 .p-listing-creator {
   display: flex;
   flex-direction: column;
-  
+
   &__content {
     padding: var(--size-16) 0;
-    background: var(--background-100);
+    background: var(--background-200);
 
     &-inner {
       padding: var(--size-16) var(--size-32);
-      
+
       @include mq.mobile-only {
         padding: var(--size-8);
       }

@@ -4,8 +4,16 @@
 /**
  *  Faded colours
  */
-@function faded-color($opacity: 10%, $colour: currentColor) {
+@function faded-color($opacity, $colour: currentColor) {
     @return color-mix(in srgb, #{$colour} #{$opacity}, transparent);
+}
+
+/**
+ *  Faded colour tokens
+ */
+
+@function faded-token($opacity, $token: primary, $variant: 500) {
+    @return color-mix(in srgb, var(--#{$token}-#{$variant}) #{$opacity}, transparent);
 }
 
 /**
