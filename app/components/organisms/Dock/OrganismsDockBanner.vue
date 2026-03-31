@@ -7,6 +7,13 @@
 
     <div class="o-dock-banner__form-height" role="presentation" v-bind="$attrs">
       <div ref="$dock" tabindex="-1" class="o-dock-banner" @focusin="showExpandedForm">
+
+        <button v-if="isExpandedWithLocation" class="o-dock-banner__close-button | button button-ghost button-sm"
+          @click.prevent="closeExpandedForm">
+          <AtomsIcon icon="arrow-left" />
+          Close search
+        </button>
+
         <div class="o-dock-banner__pseudo-border | elevate-300" :class="{
           'o-dock-banner__pseudo-border--hidden': !hasLocation
         }" aria-hidden="true" ref="$backdrop">
@@ -172,6 +179,10 @@ const isExpanded = shallowRef(false)
 
 function showExpandedForm() {
   isExpanded.value = true
+}
+
+function closeExpandedForm() {
+  isExpanded.value = false
 }
 
 /**
@@ -354,6 +365,25 @@ watch(isExpandedWithLocation, async () => {
     }
   }
 
+  &__close-button {
+    position: absolute;
+    bottom: calc(100% + var(--size-32));
+    left: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: none;
+    color: currentColor;
+    animation: fadeUp var(--animation-slow) var(--ease-in-out);
+    animation-delay: var(--animation-fast);
+    animation-fill-mode: both;
+
+    &:hover {
+      background: none;
+      color: currentColor;
+    }
+  }
+
   &__scrollbox {
     display: contents;
 
@@ -369,11 +399,11 @@ watch(isExpandedWithLocation, async () => {
   }
 
   &__scrollbox--fullscreen &__form-height {
-    margin-top: 70px;
+    margin-top: 140px;
     max-width: calc(100vw - var(--size-48));
 
     @include mq.tablet {
-      margin-top: 120px;
+      margin-top: 160px;
     }
   }
 

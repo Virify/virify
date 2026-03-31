@@ -15,3 +15,10 @@
   --animation-veryslow: 0.35s;
   --animation-subtle: 0.5s;
 }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--size-32));
+  }
+}
