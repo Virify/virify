@@ -15,7 +15,7 @@
         </button>
 
         <div class="o-dock-banner__pseudo-border | elevate-300" :class="{
-          'o-dock-banner__pseudo-border--hidden': !hasLocation
+          'o-dock-banner__pseudo-border--hidden': !isExpandedWithLocation
         }" aria-hidden="true" ref="$backdrop">
           <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__pseudo-border-skeleton" />
         </div>
@@ -53,9 +53,8 @@
             </Transition>
           </client-only>
 
-          <AtomsButton v-if="hasLocation && !isExpanded"
-            class="o-dock-banner__toggle | button-bordered button-full button-xs" type="button"
-            @click.prevent="showExpandedForm">
+          <AtomsButton v-if="hasLocation && !isExpanded" class="o-dock-banner__toggle | button-full button-xs"
+            type="button" @click.prevent="showExpandedForm">
             Expand form
           </AtomsButton>
         </section>
@@ -457,6 +456,13 @@ watch(isExpandedWithLocation, async () => {
 
   &__toggle {
     margin-top: var(--size-16);
+    color: var(--foreground-100);
+    background-color: var(--background-100);
+    transition: background-color var(--animation-fast) var(--ease-in-out);
+
+    &:hover {
+      background-color: var(--background-300);
+    }
 
     &--expanded {
       margin-top: var(--size-36);

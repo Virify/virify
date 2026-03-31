@@ -22,3 +22,10 @@
     transform: translateY(var(--size-32));
   }
 }
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(calc(0px - var(--size-32)));
+  }
+}

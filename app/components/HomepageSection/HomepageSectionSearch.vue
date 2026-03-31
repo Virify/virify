@@ -50,5 +50,19 @@
       margin-bottom: var(--size-48);
     }
   }
+
+  .o-dock-banner__toggle {
+    background: var(--blue-300);
+    color: var(--monochrome-900);
+    border: 1px solid var(--blue-500);
+    animation: fadeDown var(--animation-slow) var(--ease-in-out);
+    animation-delay: var(--animation-slow);
+    animation-fill-mode: both;
+
+    &:hover {
+      background: var(--blue-400);
+      color: var(--monochrome-900);
+    }
+  }
 }
 </style>
