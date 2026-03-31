@@ -424,6 +424,7 @@ watch(isExpandedWithLocation, async () => {
     transition: box-shadow, inset, opacity;
     transition-duration: var(--animation-slow);
     transition-timing-function: var(--ease-in-out);
+    transition-delay: var(--animation-fast);
     overflow: hidden;
 
     @include mq.tablet {
