@@ -1,5 +1,5 @@
 <template>
-  <div role="img" class="avatar-initials">
+  <div role="img" class="avatar-initials" aria-label="Blank profile image">
     {{ initials || 'V' }}
   </div>
 </template>

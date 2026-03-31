@@ -4,7 +4,8 @@ type CurrencyString = `£${string}`
 /**
  * Format Price for GBP
  * 
- * @param value string
+ * @param {Number} value
+ * @param {Boolean} value* - false
  * @returns string
  */
 export function numberToCurrency(value: number, isFloor = false): string {

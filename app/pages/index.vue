@@ -9,7 +9,7 @@
     <!-- Features -->
     <HomepageSectionComingSoon class="| container" />
 
-    <a name="homepage-content" class="| inline-scroll-margin"></a>
+    <a id="homepage-content" class="| inline-scroll-margin"></a>
 
     <div class="p-index__bg-change">
       <HomepageSectionAiScroller class="| container" />

@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: var(--secondary--300);
+  background-color: var(--primary-500);
   color: var(--monochrome-100);
   padding: var(--size-12) var(--size-18);
   border-radius: var(--border-radius-pill);
@@ -23,7 +23,7 @@
   text-decoration: none;
 
   &:hover {
-    background-color: var(--secondary--400);
+    background-color: var(--primary-400);
     color: var(--monochrome-100);
     text-decoration: none;
   }
