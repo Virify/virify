@@ -242,6 +242,11 @@ onBeforeUnmount(clearMobileAnimationTimeout)
   &__demo {
     width: min(100%, 36ch);
     margin: var(--size-24) auto var(--size-48);
+    color: var(--foreground-100);
+
+    @include mq.notebook {
+      width: min(100%, 40ch);
+    }
   }
 
   @include mq.tablet {
