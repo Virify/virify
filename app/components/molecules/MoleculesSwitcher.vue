@@ -9,7 +9,7 @@
     <span ref="$highlight" class="m-switcher-text-highlight"></span>
 
     <label ref="$labels" v-for="{ key, value } of options" :key class="m-switcher-text-label | font-semibold">
-      <input type="radio" class="| visually-hidden" :value="key" v-model="selected" :name />
+      <input type="radio" class="| visually-hidden" :value="key" v-model="selected" :name="name + radioId" />
       {{ value }}
     </label>
   </fieldset>
@@ -22,14 +22,22 @@ interface Props {
   legend?: string
   name?: string
   options: { key: string, value: string }[]
+  initSelected?: string
 }
 
 defineProps<Props>()
 
 /**
+ *  Ensure unique names for radio buttons
+ */
+const radioId = useId()
+
+/**
  *  Track current value
  */
-const selected = defineModel({ default: 'buy' })
+const selected = defineModel<string>({
+  default: (props) => props.initSelected
+})
 
 /**
  *  Loading state
