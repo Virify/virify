@@ -1,22 +1,28 @@
 <template>
-  <UPageSection
-    :title="category?.title"
-    :description="category?.description"
-  > 
-    <template #top>
-      <UBreadcrumb
-        :items="[
-          { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
-          { label: category?.title || '', to: category ? `/guides/${category.slug.current}` : undefined, icon: 'i-lucide-book-open' }
-        ]"
-        :ui="{
-          linkLeadingIcon: 'text-secondary',
-          root: 'container'
-        }"
-        class="m-4 text-(--foreground-100)"
-      />
-    </template>
-    <UBlogPosts>
+  <div>
+    <OrganismsBannerHero
+      class="container"
+      :description="category?.description"
+    >
+      <template #top>
+        <UBreadcrumb
+          :items="[
+            { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
+            { label: category?.title || '', to: category ? `/guides/${category.slug.current}` : undefined, icon: 'i-lucide-book-open' }
+          ]"
+          :ui="{
+            linkLeadingIcon: 'text-secondary',
+          }"
+          class="text-white pt-2 pb-2"
+        />
+      </template>
+
+      <template #title>
+        <span class="gradient-text">{{ category?.title }}</span>
+      </template>
+    </OrganismsBannerHero>
+
+    <UBlogPosts class="pt-8 pb-8 | container">
       <UBlogPost
         v-for="(guide, index) in category?.guides"
         :key="index"
@@ -57,7 +63,7 @@
         }"
       />
     </UBlogPosts>
-  </UPageSection>
+  </div>
 </template>
 
 <script setup lang="ts">
