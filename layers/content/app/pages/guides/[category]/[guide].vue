@@ -21,7 +21,7 @@
       </template>
 
       <template #title>
-        <span>{{ guide?.title }}</span>
+        {{ guide?.title }}
       </template>
     </OrganismsBannerHero>
 

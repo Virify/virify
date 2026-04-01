@@ -19,7 +19,7 @@
       </template>
 
       <template #title>
-        <span>{{ category?.title }}</span>
+        {{ category?.title }}
       </template>
     </OrganismsBannerHero>
 

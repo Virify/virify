@@ -7,7 +7,7 @@
       description="Estimate your monthly mortgage payments. Enter your property price, deposit and see what you could be paying with current UK rates."
     >
       <template #title>
-        Mortgage <span>Calculator</span>
+        Mortgage Calculator
       </template>
     </OrganismsBannerHero>
 

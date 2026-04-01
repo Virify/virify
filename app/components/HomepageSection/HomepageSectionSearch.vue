@@ -1,8 +1,7 @@
 <template>
   <OrganismsBannerHero class="homepage-section-search">
     <template #title>
-      Find Your Perfect Home with
-      <span class="gradient-text"> Virify AI </span>
+      Find Your Perfect Home with Virify AI
     </template>
 
     <OrganismsDockBanner listingType="all" class="homepage-section-search__dock" />

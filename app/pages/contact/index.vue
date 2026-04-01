@@ -36,7 +36,7 @@
         </div>
         <UButton icon="i-lucide-send-horizontal" type="submit" label="Send Enquiry" variant="solid"
           :loading="isEnquiryPending" :disabled="disableEnquiryButton || isEnquiryPending" block size="md"
-          class="font-bold button button-secondary mt-3!" />
+          class="font-bold button button-secondary mt-3! self-center" />
       </UForm>
     </UPageSection>
 
@@ -82,7 +82,7 @@
         </div>
         <UButton icon="i-lucide-send-horizontal" type="submit" label="Send Enquiry" variant="solid"
           :loading="isPressPending" :disabled="disablePressButton || isPressPending" block size="md"
-          class="font-bold button button-secondary mt-3!" />
+          class="font-bold button button-secondary mt-3! self-center" />
       </UForm>
     </UPageSection>
 

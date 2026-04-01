@@ -2,7 +2,7 @@
   <div class="price-paid-page">
     <!-- Hero with search form inside -->
     <OrganismsBannerHero class="container" compact description="Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address.">
-      <template #title> <span class="gradient-text">Price Paid</span> Data </template>
+      <template #title>Price Paid Data</template>
 
       <div class="price-paid__search-form">
         <div class="price-paid__search">

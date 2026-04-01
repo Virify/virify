@@ -18,7 +18,7 @@
       </template>
 
       <template #title>
-        Virify <span>Guides</span>
+        Virify Guides
       </template>
     </OrganismsBannerHero>
 

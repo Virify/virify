@@ -5,7 +5,7 @@
     :description="cmsData?.hero.subtitle || 'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'"
   >
     <template #title>
-      Virify <span class="gradient-text">Support</span>
+      Virify Support
     </template>
   </OrganismsBannerHero>
   <!-- Faq section -->
@@ -183,7 +183,7 @@
         :disabled="disableButton || isPending"
         block
         size="md"
-        class="font-bold button button-secondary mt-3!"
+        class="font-bold button button-secondary mt-3! self-center"
       />
     </UForm>
   </UPageSection>
