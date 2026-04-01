@@ -119,9 +119,7 @@ const foundAddresses = ref<{ label: string; value: string }[]>([]);
 const rawAddresses = ref<any[]>([]);
 const selectedAddress = ref<string | undefined>(undefined);
 const addressError = ref<string | undefined>(undefined);
-// Store lat/lon from response level (getaddress.io returns these at top level, not per-address)
-const responseLat = ref<number | null>(null);
-const responseLon = ref<number | null>(null);
+const postcodeCache = new Map<string, any[]>();
 
 const clearAddress = () => {
   emit("update:modelValue", {
@@ -144,14 +142,27 @@ const clearAddress = () => {
   rawAddresses.value = [];
   selectedAddress.value = undefined;
   addressError.value = undefined;
-  responseLat.value = null;
-  responseLon.value = null;
+};
+
+const setAddressResults = (data: any[]) => {
+  rawAddresses.value = data;
+  foundAddresses.value = data.map((addr: any) => ({
+    label: capataliseWords(addr.envelopeAddress.summaryLine) ?? addr.envelopeAddress.summaryLine,
+    value: addr.envelopeAddress.summaryLine,
+  }));
 };
 
 const lookupPostcode = async () => {
   addressError.value = undefined;
-  if (!postcode.value) {
+  const normalised = postcode.value.trim().toUpperCase();
+  if (!normalised) {
     addressError.value = "Please enter a postcode";
+    return;
+  }
+
+  const cached = postcodeCache.get(normalised);
+  if (cached) {
+    setAddressResults(cached);
     return;
   }
 
@@ -164,20 +175,13 @@ const lookupPostcode = async () => {
 
   lookupPending.value = true;
   try {
-    const data: any = await $fetch(`https://api.easypostcodes.com/addresses/${postcode.value}?includeGeo=true`, {
-      headers: {
-        'Key': `${apiKey}`,
-      },
+    const data: any = await $fetch(`https://api.easypostcodes.com/addresses/${normalised}?includeGeo=true`, {
+      headers: { 'Key': apiKey },
     });
 
-    console.log('Address lookup response:', data);
-
-    if(data && data.length > 0) {
-      rawAddresses.value = data;
-      foundAddresses.value = data.map((addr: any) => ({
-        label: capataliseWords(addr.envelopeAddress.summaryLine) ?? addr.envelopeAddress.summaryLine,
-        value: addr.envelopeAddress.summaryLine,
-      }));
+    if (data && data.length > 0) {
+      postcodeCache.set(normalised, data);
+      setAddressResults(data);
     } else {
       addressError.value = "No addresses found for this postcode";
     }
