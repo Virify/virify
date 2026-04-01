@@ -1,6 +1,6 @@
 <template>
   <div role="presentation" class="| flow flow-lg">
-    <MoleculesAiSearchFormLocation />
+    <MoleculesAiSearchFormLocation :focus-on-mount="!hasLocation" />
 
     <OrganismsFilterSwitcher v-if="hasLocation" class="search-form-modal__switcher">
       <template v-slot:traditional>
@@ -170,7 +170,7 @@ const hasLocation = computed(() => {
     height: calc-size(max-content, size);
     transition: height, margin;
     transition-duration: var(--animation-slow);
-    transition-timing-function: var(--ease-out);
+    transition-timing-function: var(--ease-in-out);
     overflow: hidden;
 
     @starting-style {
